@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="SlipeServer.Net" Version="0.1.0-CI-20220807-160739" />
+    <PackageReference Include="SlipeServer.Packets" Version="0.1.0-CI-20220807-160739" />
+    <PackageReference Include="SlipeServer.Server" Version="0.1.0-CI-20220807-160739" />
+  </ItemGroup>
+
+</Project>
