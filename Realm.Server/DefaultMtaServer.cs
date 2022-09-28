@@ -1,4 +1,8 @@
-﻿using SlipeServer.Packets.Lua.Camera;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
+using Realm.Persistance;
+using Realm.Persistance.SQLite;
+using SlipeServer.Packets.Lua.Camera;
 using System.Numerics;
 
 namespace Realm.Server;
@@ -16,10 +20,10 @@ public partial class DefaultMtaServer
         configuration = new Configuration()
         {
             IsVoiceEnabled = true,
-            ServerName = "Realm by CrosRoad95",
+            ServerName = "Default New-Realm Server",
             Port = 22003,
             HttpPort = 22005,
-            MaxPlayerCount = 4097,
+            MaxPlayerCount = 128,
         };
 
         server = MtaServer.CreateWithDiSupport<DefaultPlayer>(
@@ -36,14 +40,19 @@ public partial class DefaultMtaServer
 
                 builder.ConfigureServices(services =>
                 {
+                    services.AddSingleton<Startup>();
+                    services.AddPersistance<SQLiteDb>(db => db.UseSqlite("Filename=./server.db"));
                 });
             }
         );
 
-        server.GameType = "Realm";
+        server.GameType = "New-Realm";
         server.MapName = "N/A";
 
         Logger = server.GetRequiredService<ILogger>();
+
+        var startup = server.GetRequiredService<Startup>();
+        var _ = Task.Run(startup.StartAsync);
 
         Console.CancelKeyPress += (sender, args) =>
         {

@@ -3,9 +3,15 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.3.32819.101
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Realm.Console", "./Realm.Console/Realm.Console.csproj", "{45D93C1E-8D67-4CD3-B40A-1B5A19D4BC38}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Realm.Console", "Realm.Console\Realm.Console.csproj", "{45D93C1E-8D67-4CD3-B40A-1B5A19D4BC38}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Realm.Server", "./Realm.Server/Realm.Server.csproj", "{2F28E678-3F92-4314-8DBA-543C494DCEE2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Realm.Server", "Realm.Server\Realm.Server.csproj", "{2F28E678-3F92-4314-8DBA-543C494DCEE2}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Data", "Data", "{FF8A52BA-23E6-4192-A37D-7693642A9BCE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Realm.Persistance", "Realm.Persistance\Realm.Persistance.csproj", "{7DDBEF8D-43FF-4778-9CB3-158DDFEF6EDA}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Realm.Persistance.SQLite", "Realm.Persistance.SQLite\Realm.Persistance.SQLite.csproj", "{21D5188B-9C09-4372-B143-8E99C917CC02}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,9 +27,21 @@ Global
 		{2F28E678-3F92-4314-8DBA-543C494DCEE2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2F28E678-3F92-4314-8DBA-543C494DCEE2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2F28E678-3F92-4314-8DBA-543C494DCEE2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7DDBEF8D-43FF-4778-9CB3-158DDFEF6EDA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7DDBEF8D-43FF-4778-9CB3-158DDFEF6EDA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7DDBEF8D-43FF-4778-9CB3-158DDFEF6EDA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7DDBEF8D-43FF-4778-9CB3-158DDFEF6EDA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{21D5188B-9C09-4372-B143-8E99C917CC02}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{21D5188B-9C09-4372-B143-8E99C917CC02}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{21D5188B-9C09-4372-B143-8E99C917CC02}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{21D5188B-9C09-4372-B143-8E99C917CC02}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{7DDBEF8D-43FF-4778-9CB3-158DDFEF6EDA} = {FF8A52BA-23E6-4192-A37D-7693642A9BCE}
+		{21D5188B-9C09-4372-B143-8E99C917CC02} = {FF8A52BA-23E6-4192-A37D-7693642A9BCE}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {3922BF34-8D0B-4DC1-9EFC-D4CFB948B3B8}
