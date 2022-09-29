@@ -12,3 +12,4 @@ global using SlipeServer.Server.ServerBuilders;
 
 global using Realm.Persistance;
 global using Realm.Persistance.Repositories.Interfaces;
+global using Realm.Scripting.Interfaces;

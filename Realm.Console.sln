@@ -9,9 +9,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Realm.Server", "Realm.Serve
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Data", "Data", "{FF8A52BA-23E6-4192-A37D-7693642A9BCE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Realm.Persistance", "Realm.Persistance\Realm.Persistance.csproj", "{7DDBEF8D-43FF-4778-9CB3-158DDFEF6EDA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Realm.Persistance", "Realm.Persistance\Realm.Persistance.csproj", "{7DDBEF8D-43FF-4778-9CB3-158DDFEF6EDA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Realm.Persistance.SQLite", "Realm.Persistance.SQLite\Realm.Persistance.SQLite.csproj", "{21D5188B-9C09-4372-B143-8E99C917CC02}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Realm.Persistance.SQLite", "Realm.Persistance.SQLite\Realm.Persistance.SQLite.csproj", "{21D5188B-9C09-4372-B143-8E99C917CC02}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Realm.Scripting", "Realm.Scripting\Realm.Scripting.csproj", "{03AFE959-37FE-49F8-B86F-8D44A0BB5CBE}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -35,6 +37,10 @@ Global
 		{21D5188B-9C09-4372-B143-8E99C917CC02}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{21D5188B-9C09-4372-B143-8E99C917CC02}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{21D5188B-9C09-4372-B143-8E99C917CC02}.Release|Any CPU.Build.0 = Release|Any CPU
+		{03AFE959-37FE-49F8-B86F-8D44A0BB5CBE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{03AFE959-37FE-49F8-B86F-8D44A0BB5CBE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{03AFE959-37FE-49F8-B86F-8D44A0BB5CBE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{03AFE959-37FE-49F8-B86F-8D44A0BB5CBE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

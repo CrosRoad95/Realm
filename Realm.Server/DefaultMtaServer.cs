@@ -2,6 +2,8 @@
 using Microsoft.Extensions.DependencyInjection;
 using Realm.Persistance;
 using Realm.Persistance.SQLite;
+using Realm.Scripting;
+using Realm.Scripting.Extensions;
 using SlipeServer.Packets.Lua.Camera;
 using System.Numerics;
 
@@ -41,6 +43,7 @@ public partial class DefaultMtaServer
                 builder.ConfigureServices(services =>
                 {
                     services.AddSingleton<Startup>();
+                    services.AddScripting();
                     services.AddPersistance<SQLiteDb>(db => db.UseSqlite("Filename=./server.db"));
                 });
             }
@@ -59,6 +62,13 @@ public partial class DefaultMtaServer
             server.Stop();
             waitHandle.Set();
         };
+    }
+
+    public void InitializeScripting(string fileName)
+    {
+        var code = File.ReadAllText(fileName);
+        var scripting = server.GetRequiredService<IScripting>();
+        scripting.Execute(code);
     }
 
     public void Start()

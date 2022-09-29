@@ -12,4 +12,9 @@
   <ItemGroup>
     <ProjectReference Include="..\Realm.Server\Realm.Server.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <None Update="Resources\startup.js">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
 </Project>

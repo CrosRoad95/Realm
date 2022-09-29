@@ -3,6 +3,7 @@ Console.WriteLine("Starting server...");
 try
 {
     program = new DefaultMtaServer(args);
+    program.InitializeScripting("Resources/startup.js");
     program.Start();
 }
 catch (Exception exception)
