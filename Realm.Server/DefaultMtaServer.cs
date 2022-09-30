@@ -1,11 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
-using Realm.Persistance;
-using Realm.Persistance.SQLite;
-using Realm.Scripting;
-using Realm.Scripting.Extensions;
-using SlipeServer.Packets.Lua.Camera;
-using System.Numerics;
+﻿using Realm.Server.Resources.ClientInterface;
 
 namespace Realm.Server;
 
@@ -39,6 +32,7 @@ public partial class DefaultMtaServer
 #else
                 builder.AddDefaults();
 #endif
+                builder.AddResourceWithAutostart<ClientInterfaceResource, IClientInterface, ClientInterfaceLogic>();
 
                 builder.ConfigureServices(services =>
                 {
