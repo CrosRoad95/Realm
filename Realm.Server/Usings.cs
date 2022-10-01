@@ -30,6 +30,7 @@ global using Realm.Scripting.Extensions;
 global using Realm.Server.Resources;
 global using Realm.Server.Data.Configurations;
 global using Realm.Server.Resources.ClientInterface;
+global using Realm.Server.Resources.UI;
 global using Realm.Server.Commands;
 global using Realm.Server.Commands.Interfaces;
 global using Realm.Server.Interfaces;

@@ -27,6 +27,7 @@ public partial class DefaultMtaServer
                 builder.AddDefaults();
 #endif
                 builder.AddResourceWithAutostart<ClientInterfaceResource, IClientInterface, ClientInterfaceLogic>();
+                builder.AddResourceWithAutostart<ClientUIResource, IClientUI, ClientUILogic>();
 
                 builder.ConfigureServices(services =>
                 {
