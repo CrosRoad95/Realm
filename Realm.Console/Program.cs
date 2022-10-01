@@ -5,6 +5,7 @@ DefaultMtaServer? program = null;
 var configuration = new ConfigurationBuilder()
     .AddJsonFile("appsettings.json", false)
     .AddJsonFile("appsettings.development.json", true, true)
+    .AddJsonFile("appsettings.local.json", true, true)
     .AddEnvironmentVariables()
     .Build();
 
@@ -17,6 +18,9 @@ try
     program = new DefaultMtaServer(configuration, services =>
     {
         services.AddSingleton<IConsoleCommands>(serverConsole);
+    }, serverBuilder =>
+    {
+        serverBuilder.AddLogic<TestLogic>();
     });
     Task.Run(program.Start);
     serverConsole.Start();

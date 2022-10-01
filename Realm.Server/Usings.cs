@@ -33,3 +33,5 @@ global using Realm.Server.Resources.ClientInterface;
 global using Realm.Server.Commands;
 global using Realm.Server.Commands.Interfaces;
 global using Realm.Server.Interfaces;
+global using Realm.Discord;
+global using Realm.Interfaces;

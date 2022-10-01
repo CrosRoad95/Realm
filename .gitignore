@@ -2,3 +2,4 @@ Realm.Console/.vs/
 bin/
 obj/
 .vs/
+Realm.Console/appsettings.local.json

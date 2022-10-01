@@ -9,7 +9,8 @@ public partial class DefaultMtaServer
 
     public ILogger Logger { get; }
 
-    public DefaultMtaServer(IConfiguration configuration, Action<ServiceCollection>? configureServices = null)
+    public DefaultMtaServer(IConfiguration configuration, Action<ServiceCollection>? configureServices = null,
+        Action<ServerBuilder>? configureServerBuilder = null)
     {
         _serverConfiguration = configuration.GetSection("server").Get<Configuration>();
         _scriptingConfiguration = configuration.GetSection("scripting").Get<ScriptingConfiguration>();
@@ -29,11 +30,13 @@ public partial class DefaultMtaServer
 
                 builder.ConfigureServices(services =>
                 {
+                    services.AddSingleton(configuration);
                     if(configureServices != null)
                         configureServices(services);
                     services.AddSingleton<Startup>();
                     if(_scriptingConfiguration.Enabled)
                         services.AddScripting();
+                    services.AddDiscord();
                     services.AddPersistance<SQLiteDb>(db => db.UseSqlite("Filename=./server.db"));
 
                     services.AddSingleton<HelpCommand>();
@@ -41,6 +44,9 @@ public partial class DefaultMtaServer
                 });
 
                 builder.AddLogic<CommandsLogic>();
+
+                if (configureServerBuilder != null)
+                    configureServerBuilder(builder);
             }
         );
 

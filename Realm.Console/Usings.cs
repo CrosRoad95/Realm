@@ -10,3 +10,4 @@ global using Microsoft.Extensions.Configuration;
 global using Realm.Server;
 global using Realm.Server.Interfaces;
 global using Realm.Console;
+global using Realm.Discord.Channels.Interfaces;

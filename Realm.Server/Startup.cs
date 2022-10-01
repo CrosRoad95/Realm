@@ -6,13 +6,15 @@ internal class Startup
     private readonly MtaServer<DefaultPlayer> _server;
     private readonly IResourceProvider _resourceProvider;
     private readonly IEnumerable<IAutoStartResource> _autoStartResources;
+    private readonly IEnumerable<IAsyncService> _asyncServices;
 
-    public Startup(ITestRepository testRepository, MtaServer<DefaultPlayer> server, IResourceProvider resourceProvider, IEnumerable<IAutoStartResource> autoStartResources)
+    public Startup(ITestRepository testRepository, MtaServer<DefaultPlayer> server, IResourceProvider resourceProvider, IEnumerable<IAutoStartResource> autoStartResources, IEnumerable<IAsyncService> asyncServices)
     {
         _testRepository = testRepository;
         _server = server;
         _resourceProvider = resourceProvider;
         _autoStartResources = autoStartResources;
+        _asyncServices = asyncServices;
         server.PlayerJoined += Server_PlayerJoined;
     }
 
@@ -25,6 +27,9 @@ internal class Startup
 
     public async Task StartAsync()
     {
+        foreach (var asyncService in _asyncServices)
+            await asyncService.StartAsync();
+
         await _testRepository.AddTest(new Persistance.Entities.Test
         {
             Number = 123,

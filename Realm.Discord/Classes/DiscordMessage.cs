@@ -1,0 +1,16 @@
+﻿namespace Realm.Discord.Classes;
+
+internal class DiscordMessage : IDiscordMessage
+{
+    private readonly IMessage _message;
+
+    public DiscordMessage(IMessage message)
+    {
+        _message = message;
+    }
+
+    public async Task Modify(string newContent)
+    {
+        await (_message as IUserMessage).ModifyAsync(m => m.Content = newContent);
+    }
+}
