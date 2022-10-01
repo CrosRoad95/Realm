@@ -1,8 +1,4 @@
-﻿using SlipeServer.Server.Resources;
-using System.Reflection;
-using System.Xml.Linq;
-
-namespace Realm.Server.Resources;
+﻿namespace Realm.Server.Resources;
 
 public class ResourceBase : Resource
 {

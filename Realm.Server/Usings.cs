@@ -4,10 +4,12 @@ global using System.Linq;
 global using System.Text;
 global using System.Numerics;
 global using System.Threading.Tasks;
+global using System.Reflection;
 global using Microsoft.Extensions.Logging;
 global using Microsoft.Extensions.Hosting;
 global using Microsoft.EntityFrameworkCore;
 global using Microsoft.Extensions.DependencyInjection;
+global using Microsoft.Extensions.Configuration;
 
 global using SlipeServer.Server.Elements;
 global using SlipeServer.Server;
@@ -26,3 +28,5 @@ global using Realm.Persistance.SQLite;
 global using Realm.Scripting;
 global using Realm.Scripting.Extensions;
 global using Realm.Server.Resources;
+global using Realm.Server.Data.Configurations;
+global using Realm.Server.Resources.ClientInterface;

@@ -1,34 +1,27 @@
-﻿using Realm.Server.Resources.ClientInterface;
-
-namespace Realm.Server;
+﻿namespace Realm.Server;
 
 public partial class DefaultMtaServer
 {
-    private readonly EventWaitHandle waitHandle = new(false, EventResetMode.AutoReset);
-    private readonly MtaServer<DefaultPlayer> server;
-    private readonly Configuration configuration;
+    private readonly EventWaitHandle _waitHandle = new(false, EventResetMode.AutoReset);
+    private readonly MtaServer<DefaultPlayer> _server;
+    private readonly Configuration _serverConfiguration;
+    private readonly ScriptingConfiguration _scriptingConfiguration;
 
     public ILogger Logger { get; }
 
-    public DefaultMtaServer(string[] args)
+    public DefaultMtaServer(IConfiguration configuration)
     {
-        configuration = new Configuration()
-        {
-            IsVoiceEnabled = true,
-            ServerName = "Default New-Realm Server",
-            Port = 22003,
-            HttpPort = 22005,
-            MaxPlayerCount = 128,
-        };
+        _serverConfiguration = configuration.GetSection("server").Get<Configuration>();
+        _scriptingConfiguration = configuration.GetSection("scripting").Get<ScriptingConfiguration>();
 
-        server = MtaServer.CreateWithDiSupport<DefaultPlayer>(
-            (builder) =>
+        _server = MtaServer.CreateWithDiSupport<DefaultPlayer>(
+            builder =>
             {
-                builder.UseConfiguration(configuration);
+                builder.UseConfiguration(_serverConfiguration);
 
 #if DEBUG
                 builder.AddDefaults(exceptBehaviours: ServerBuilderDefaultBehaviours.MasterServerAnnouncementBehaviour);
-                builder.AddNetWrapper(dllPath: "net_d", port: (ushort)(configuration.Port + 1));
+                builder.AddNetWrapper(dllPath: "net_d", port: (ushort)(_serverConfiguration.Port + 1));
 #else
                 builder.AddDefaults();
 #endif
@@ -37,40 +30,45 @@ public partial class DefaultMtaServer
                 builder.ConfigureServices(services =>
                 {
                     services.AddSingleton<Startup>();
-                    services.AddScripting();
+                    if(_scriptingConfiguration.Enabled)
+                        services.AddScripting();
                     services.AddPersistance<SQLiteDb>(db => db.UseSqlite("Filename=./server.db"));
                 });
             }
         );
 
-        server.GameType = "New-Realm";
-        server.MapName = "N/A";
+        var serverListConfiguration = configuration.GetSection("serverList").Get<ServerListConfiguration>();
+        _server.GameType = serverListConfiguration.GameType;
+        _server.MapName = serverListConfiguration.MapName;
 
-        Logger = server.GetRequiredService<ILogger>();
+        Logger = _server.GetRequiredService<ILogger>();
 
-        var startup = server.GetRequiredService<Startup>();
+        var startup = _server.GetRequiredService<Startup>();
         var _ = Task.Run(startup.StartAsync);
 
         Console.CancelKeyPress += (sender, args) =>
         {
-            server.Stop();
-            waitHandle.Set();
+            _server.Stop();
+            _waitHandle.Set();
         };
     }
 
     public void InitializeScripting(string fileName)
     {
         var code = File.ReadAllText(fileName);
-        var scripting = server.GetRequiredService<IScripting>();
+        var scripting = _server.GetRequiredService<IScripting>();
         scripting.Execute(code);
     }
 
     public void Start()
     {
+        if(_scriptingConfiguration.Enabled)
+            InitializeScripting("Resources/startup.js");
+
         Logger.LogInformation("Server started.");
-        server.PlayerJoined += OnPlayerJoin;
-        server.Start();
-        waitHandle.WaitOne();
+        _server.PlayerJoined += OnPlayerJoin;
+        _server.Start();
+        _waitHandle.WaitOne();
     }
 
     private void OnPlayerJoin(DefaultPlayer player)

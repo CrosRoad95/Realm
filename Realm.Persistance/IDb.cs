@@ -1,6 +1,4 @@
-﻿using Realm.Persistance.Entities;
-
-namespace Realm.Persistance;
+﻿namespace Realm.Persistance;
 
 public interface IDb
 {

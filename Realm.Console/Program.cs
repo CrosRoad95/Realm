@@ -1,9 +1,15 @@
 ﻿DefaultMtaServer? program = null;
+
+var configuration = new ConfigurationBuilder()
+    .AddJsonFile("appsettings.json", false)
+    .AddJsonFile("appsettings.development.json", true, true)
+    .AddEnvironmentVariables()
+    .Build();
+
 Console.WriteLine("Starting server...");
 try
 {
-    program = new DefaultMtaServer(args);
-    program.InitializeScripting("Resources/startup.js");
+    program = new DefaultMtaServer(configuration);
     program.Start();
 }
 catch (Exception exception)
