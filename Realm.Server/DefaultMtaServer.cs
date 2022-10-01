@@ -3,7 +3,7 @@
 public partial class DefaultMtaServer
 {
     private readonly SemaphoreSlim _semaphore = new SemaphoreSlim(1);
-    private readonly MtaServer<DefaultPlayer> _server;
+    private readonly MtaServer<RPGPlayer> _server;
     private readonly Configuration _serverConfiguration;
     private readonly ScriptingConfiguration _scriptingConfiguration;
 
@@ -15,7 +15,7 @@ public partial class DefaultMtaServer
         _serverConfiguration = configuration.GetSection("server").Get<Configuration>();
         _scriptingConfiguration = configuration.GetSection("scripting").Get<ScriptingConfiguration>();
 
-        _server = MtaServer.CreateWithDiSupport<DefaultPlayer>(
+        _server = MtaServer.CreateWithDiSupport<RPGPlayer>(
             builder =>
             {
                 builder.UseConfiguration(_serverConfiguration);
@@ -84,7 +84,7 @@ public partial class DefaultMtaServer
         await _semaphore.WaitAsync();
     }
 
-    private void OnPlayerJoin(DefaultPlayer player)
+    private void OnPlayerJoin(RPGPlayer player)
     {
         player.Camera.Target = player;
         player.Camera.Fade(CameraFade.In);

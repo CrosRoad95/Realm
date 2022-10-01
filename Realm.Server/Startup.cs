@@ -3,12 +3,12 @@
 internal class Startup
 {
     private readonly ITestRepository _testRepository;
-    private readonly MtaServer<DefaultPlayer> _server;
+    private readonly MtaServer<RPGPlayer> _server;
     private readonly IResourceProvider _resourceProvider;
     private readonly IEnumerable<IAutoStartResource> _autoStartResources;
     private readonly IEnumerable<IAsyncService> _asyncServices;
 
-    public Startup(ITestRepository testRepository, MtaServer<DefaultPlayer> server, IResourceProvider resourceProvider, IEnumerable<IAutoStartResource> autoStartResources, IEnumerable<IAsyncService> asyncServices)
+    public Startup(ITestRepository testRepository, MtaServer<RPGPlayer> server, IResourceProvider resourceProvider, IEnumerable<IAutoStartResource> autoStartResources, IEnumerable<IAsyncService> asyncServices)
     {
         _testRepository = testRepository;
         _server = server;
@@ -18,7 +18,7 @@ internal class Startup
         server.PlayerJoined += Server_PlayerJoined;
     }
 
-    private void Server_PlayerJoined(DefaultPlayer player)
+    private void Server_PlayerJoined(RPGPlayer player)
     {
         foreach (var resource in _autoStartResources)
             resource.StartFor(_resourceProvider, player);
