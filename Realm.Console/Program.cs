@@ -1,4 +1,6 @@
-﻿DefaultMtaServer? program = null;
+﻿using Microsoft.Extensions.DependencyInjection;
+
+DefaultMtaServer? program = null;
 
 var configuration = new ConfigurationBuilder()
     .AddJsonFile("appsettings.json", false)
@@ -7,10 +9,17 @@ var configuration = new ConfigurationBuilder()
     .Build();
 
 Console.WriteLine("Starting server...");
+
+var serverConsole = new ServerConsole();
+
 try
 {
-    program = new DefaultMtaServer(configuration);
-    program.Start();
+    program = new DefaultMtaServer(configuration, services =>
+    {
+        services.AddSingleton<IConsoleCommands>(serverConsole);
+    });
+    Task.Run(program.Start);
+    serverConsole.Start();
 }
 catch (Exception exception)
 {

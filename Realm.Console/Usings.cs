@@ -8,3 +8,5 @@ global using Microsoft.Extensions.Logging;
 global using Microsoft.Extensions.Configuration;
 
 global using Realm.Server;
+global using Realm.Server.Interfaces;
+global using Realm.Console;

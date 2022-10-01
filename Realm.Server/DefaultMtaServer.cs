@@ -2,14 +2,14 @@
 
 public partial class DefaultMtaServer
 {
-    private readonly EventWaitHandle _waitHandle = new(false, EventResetMode.AutoReset);
+    private readonly SemaphoreSlim _semaphore = new SemaphoreSlim(1);
     private readonly MtaServer<DefaultPlayer> _server;
     private readonly Configuration _serverConfiguration;
     private readonly ScriptingConfiguration _scriptingConfiguration;
 
     public ILogger Logger { get; }
 
-    public DefaultMtaServer(IConfiguration configuration)
+    public DefaultMtaServer(IConfiguration configuration, Action<ServiceCollection>? configureServices = null)
     {
         _serverConfiguration = configuration.GetSection("server").Get<Configuration>();
         _scriptingConfiguration = configuration.GetSection("scripting").Get<ScriptingConfiguration>();
@@ -29,11 +29,18 @@ public partial class DefaultMtaServer
 
                 builder.ConfigureServices(services =>
                 {
+                    if(configureServices != null)
+                        configureServices(services);
                     services.AddSingleton<Startup>();
                     if(_scriptingConfiguration.Enabled)
                         services.AddScripting();
                     services.AddPersistance<SQLiteDb>(db => db.UseSqlite("Filename=./server.db"));
+
+                    services.AddSingleton<HelpCommand>();
+                    services.AddSingleton<ICommand, TestCommand>();
                 });
+
+                builder.AddLogic<CommandsLogic>();
             }
         );
 
@@ -49,7 +56,7 @@ public partial class DefaultMtaServer
         Console.CancelKeyPress += (sender, args) =>
         {
             _server.Stop();
-            _waitHandle.Set();
+            _semaphore.Release();
         };
     }
 
@@ -60,7 +67,7 @@ public partial class DefaultMtaServer
         scripting.Execute(code);
     }
 
-    public void Start()
+    public async Task Start()
     {
         if(_scriptingConfiguration.Enabled)
             InitializeScripting("Resources/startup.js");
@@ -68,7 +75,7 @@ public partial class DefaultMtaServer
         Logger.LogInformation("Server started.");
         _server.PlayerJoined += OnPlayerJoin;
         _server.Start();
-        _waitHandle.WaitOne();
+        await _semaphore.WaitAsync();
     }
 
     private void OnPlayerJoin(DefaultPlayer player)
