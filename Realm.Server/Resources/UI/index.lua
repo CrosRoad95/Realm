@@ -1,0 +1,5 @@
+﻿setDebugViewActive(true)
+addEventHandler("onClientResourceStart", resourceRoot, function()
+	outputChatBox("asdasd56")
+	outputChatBox(tostring(getCeguiUIProvider()))
+end)

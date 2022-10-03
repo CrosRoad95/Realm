@@ -33,7 +33,7 @@ internal class DiscordIntegration : IDiscord, IAsyncService
 
     private Task LogAsync(LogMessage log)
     {
-        Console.WriteLine(log.ToString());
+        //Console.WriteLine(log.ToString());
         return Task.CompletedTask;
     }
 }

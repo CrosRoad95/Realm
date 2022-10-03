@@ -1,4 +1,6 @@
-﻿namespace Realm.Server;
+﻿using Realm.Server.ResourcesLogic;
+
+namespace Realm.Server;
 
 public partial class DefaultMtaServer
 {
@@ -9,8 +11,7 @@ public partial class DefaultMtaServer
 
     public ILogger Logger { get; }
 
-    public DefaultMtaServer(IConfiguration configuration, Action<ServiceCollection>? configureServices = null,
-        Action<ServerBuilder>? configureServerBuilder = null)
+    public DefaultMtaServer(IConfiguration configuration, Action<ServerBuilder>? configureServerBuilder = null)
     {
         _serverConfiguration = configuration.GetSection("server").Get<Configuration>();
         _scriptingConfiguration = configuration.GetSection("scripting").Get<ScriptingConfiguration>();
@@ -26,15 +27,13 @@ public partial class DefaultMtaServer
 #else
                 builder.AddDefaults();
 #endif
-                builder.AddResourceWithAutostart<ClientInterfaceResource, IClientInterface, ClientInterfaceLogic>();
-                builder.AddResourceWithAutostart<ClientUIResource, IClientUI, ClientUILogic>();
 
                 builder.ConfigureServices(services =>
                 {
                     services.AddSingleton(configuration);
-                    if(configureServices != null)
-                        configureServices(services);
                     services.AddSingleton<Startup>();
+                    services.AddSingleton<IAutoStartResource, ClientInterfaceLogic>();
+                    services.AddSingleton<IAutoStartResource, ClientUILogic>();
                     if(_scriptingConfiguration.Enabled)
                         services.AddScripting();
                     services.AddDiscord();

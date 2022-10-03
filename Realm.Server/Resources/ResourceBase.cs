@@ -1,4 +1,6 @@
-﻿namespace Realm.Server.Resources;
+﻿using SlipeServer.Server.Elements.Events;
+
+namespace Realm.Server.Resources;
 
 public class ResourceBase : Resource
 {
@@ -6,31 +8,17 @@ public class ResourceBase : Resource
     {
     }
 
-    private static byte[] GetLuaFile(string name)
+    public async Task StartForAsync(Player player)
     {
-        var assembly = Assembly.GetExecutingAssembly();
-        using var stream = assembly.GetManifestResourceStream(name);
+        var wait = new TaskCompletionSource();
+        ElementEventHandler<Player, PlayerResourceStartedEventArgs> resourceStarted = (player, eventArgs) => {
+            if (eventArgs.NetId == NetId)
+                wait.SetResult();
+        };
 
-        if (stream == null)
-            throw new FileNotFoundException($"File \"{name}\" not found in embedded resources.");
-
-        byte[] buffer = new byte[stream.Length];
-        stream.Read(buffer, 0, buffer.Length);
-        return buffer;
-    }
-
-    public static Dictionary<string, byte[]> GetAdditionalFiles<TResource>() where TResource : ResourceBase, IResourceConstructor
-    {
-        const string basePath = "Realm.Server.Resources";
-        var additionalFiles = new Dictionary<string, byte[]>();
-        var resourceNameBase = $"{basePath}.{TResource.ResourceName}.Lua.";
-        var assembly = Assembly.GetExecutingAssembly();
-        var resourceNames = assembly.GetManifestResourceNames();
-        foreach (var name in resourceNames)
-        {
-            if(name.Contains(resourceNameBase))
-                additionalFiles[name.Substring(resourceNameBase.Length)] = GetLuaFile(name);
-        }
-        return additionalFiles;
+        player.ResourceStarted += resourceStarted;
+        StartFor(player);
+        await wait.Task;
+        player.ResourceStarted -= resourceStarted;
     }
 }

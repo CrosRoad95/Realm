@@ -1,1 +1,0 @@
-﻿outputChatBox("Hello ui")

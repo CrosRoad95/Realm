@@ -21,7 +21,7 @@ internal class Startup
     private void Server_PlayerJoined(RPGPlayer player)
     {
         foreach (var resource in _autoStartResources)
-            resource.StartFor(_resourceProvider, player);
+            resource.StartFor(player);
 
     }
 

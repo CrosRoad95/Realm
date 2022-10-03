@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using Realm.Server.Extensions;
 
 DefaultMtaServer? program = null;
 
@@ -15,12 +15,14 @@ var serverConsole = new ServerConsole();
 
 try
 {
-    program = new DefaultMtaServer(configuration, services =>
+    program = new DefaultMtaServer(configuration, serverBuilder =>
     {
-        services.AddSingleton<IConsoleCommands>(serverConsole);
-    }, serverBuilder =>
-    {
+        serverBuilder.AddGuiFilesLocation("Gui");
         serverBuilder.AddLogic<TestLogic>();
+        serverBuilder.ConfigureServices(services =>
+        {
+            services.AddSingleton<IConsoleCommands>(serverConsole);
+        });
     });
     Task.Run(program.Start);
     serverConsole.Start();
