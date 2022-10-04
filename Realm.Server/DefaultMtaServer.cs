@@ -1,4 +1,6 @@
-﻿using Realm.Server.ResourcesLogic;
+﻿using Realm.Interfaces.Scripting;
+using Realm.Server.Managers;
+using Realm.Server.ResourcesLogic;
 
 namespace Realm.Server;
 
@@ -34,6 +36,8 @@ public partial class DefaultMtaServer
                     services.AddSingleton<Startup>();
                     services.AddSingleton<IAutoStartResource, ClientInterfaceLogic>();
                     services.AddSingleton<IAutoStartResource, ClientUILogic>();
+
+                    services.AddSingleton<ISpawnManager, SpawnManager>();
                     if(_scriptingConfiguration.Enabled)
                         services.AddScripting();
                     services.AddDiscord();

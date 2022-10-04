@@ -9,5 +9,6 @@ global using Microsoft.ClearScript.JavaScript;
 global using Microsoft.ClearScript.V8;
 global using Microsoft.Extensions.DependencyInjection;
 
-global using Realm.Scripting.Interfaces;
 global using Realm.Scripting.Runtimes;
+global using Realm.Interfaces.Scripting;
+global using System.Numerics;

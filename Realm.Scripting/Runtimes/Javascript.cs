@@ -1,28 +1,30 @@
-﻿namespace Realm.Scripting.Runtimes;
+﻿using Realm.Scripting.Classes;
 
-public class Test
-{
-    public static async Task<double> Add(double a, double b)
-    {
-        await Task.Delay(1000);
-        return a + b;
-    }
-}
+namespace Realm.Scripting.Runtimes;
 
 internal class Javascript : IScripting
 {
     private readonly V8ScriptEngine _engine;
-    public Javascript()
+    public Javascript(IWorld world)
     {
+        // 1443589824
         _engine = new V8ScriptEngine();
-        AddType(typeof(JavaScriptExtensions));
-        AddType(typeof(Test));
-        AddType(typeof(Console));
+        AddHostType("JavaScriptExtensions", typeof(JavaScriptExtensions));
+        AddHostType("Vector3", typeof(Vector3));
+        AddHostType("Console", typeof(Console));
+        AddHostType("World", typeof(World));
+
+        AddHostObject("World", world);
     }
 
-    public void AddType(Type type)
+    public void AddHostType(string name, Type type)
     {
-        _engine.AddHostType(type.Name, type);
+        _engine.AddHostType(name, type);
+    }
+
+    public void AddHostObject(string name, object @object)
+    {
+        _engine.AddHostObject(name, @object);
     }
 
     public async Task<object> ExecuteAsync(string code)

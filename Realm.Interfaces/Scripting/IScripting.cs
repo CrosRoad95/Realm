@@ -1,8 +1,8 @@
-﻿namespace Realm.Scripting.Interfaces;
+﻿namespace Realm.Interfaces.Scripting;
 
 public interface IScripting
 {
-    void AddType(Type type);
+    void AddHostType(string name, Type type);
     void Execute(string code);
     Task<object> ExecuteAsync(string code);
 }

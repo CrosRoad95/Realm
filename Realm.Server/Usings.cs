@@ -22,7 +22,6 @@ global using SlipeServer.Packets.Lua.Camera;
 
 global using Realm.Persistance;
 global using Realm.Persistance.Repositories.Interfaces;
-global using Realm.Scripting.Interfaces;
 global using Realm.Persistance.SQLite;
 global using Realm.Scripting;
 global using Realm.Scripting.Extensions;
@@ -35,3 +34,4 @@ global using Realm.Discord;
 global using Realm.Interfaces;
 global using Realm.Server.Gui;
 global using Realm.Server.Gui.Interfaces;
+global using Realm.Interfaces.Server;

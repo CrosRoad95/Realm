@@ -1,2 +1,4 @@
-﻿const a = 1;
-Console.WriteLine("hello javascript {0}, {1}", a, JSON.stringify([1, 2, 3]));
+﻿const spawnA = World.CreateSpawn("test", new Vector3(0, 2, 3));
+const spawnB = World.CreateSpawn("test", new Vector3(0, 10, 3));
+
+Console.WriteLine("Spawns ids: {0} {1}", spawnA, spawnB)

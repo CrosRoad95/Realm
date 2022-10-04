@@ -11,6 +11,5 @@ internal class ServerConsole : IConsoleCommands
             var line = System.Console.ReadLine();
             CommandExecuted?.Invoke(line);
         }
-    }
-    
+    }   
 }

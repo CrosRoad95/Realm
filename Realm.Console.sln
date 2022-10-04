@@ -15,9 +15,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Realm.Persistance.SQLite", 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Realm.Scripting", "Realm.Scripting\Realm.Scripting.csproj", "{03AFE959-37FE-49F8-B86F-8D44A0BB5CBE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Realm.Discord", "Realm.Discord\Realm.Discord.csproj", "{0BCE6CE9-657D-4BEB-A1C7-94CF6E631BD2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Realm.Discord", "Realm.Discord\Realm.Discord.csproj", "{0BCE6CE9-657D-4BEB-A1C7-94CF6E631BD2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Realm.Interfaces", "Realm.Interfaces\Realm.Interfaces.csproj", "{83778BBA-6B63-480F-8946-8986396C2756}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Realm.Interfaces", "Realm.Interfaces\Realm.Interfaces.csproj", "{83778BBA-6B63-480F-8946-8986396C2756}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
