@@ -1,4 +1,4 @@
-﻿using Realm.Interfaces.Scripting;
+﻿using Realm.Interfaces.Scripting.Classes;
 using Realm.Scripting.Classes;
 
 namespace Realm.Scripting.Extensions;

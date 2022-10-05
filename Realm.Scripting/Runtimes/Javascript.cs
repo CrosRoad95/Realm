@@ -1,4 +1,5 @@
-﻿using Realm.Scripting.Classes;
+﻿using Realm.Interfaces.Scripting.Classes;
+using Realm.Scripting.Classes;
 
 namespace Realm.Scripting.Runtimes;
 
@@ -7,12 +8,13 @@ internal class Javascript : IScripting
     private readonly V8ScriptEngine _engine;
     public Javascript(IWorld world)
     {
-        // 1443589824
         _engine = new V8ScriptEngine();
         AddHostType("JavaScriptExtensions", typeof(JavaScriptExtensions));
         AddHostType("Vector3", typeof(Vector3));
         AddHostType("Console", typeof(Console));
+
         AddHostType("World", typeof(World));
+        AddHostType("Spawn", typeof(Spawn));
 
         AddHostObject("World", world);
     }

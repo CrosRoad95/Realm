@@ -1,4 +1,5 @@
-﻿using Realm.Interfaces.Server;
+﻿using Realm.Interfaces.Scripting.Classes;
+using Realm.Interfaces.Server;
 
 namespace Realm.Scripting.Classes;
 
@@ -11,9 +12,9 @@ public class World : IWorld
         _spawnManager = spawnManager;
     }
 
-    public string CreateSpawn(string name, Vector3 position, Vector3? rotation = null)
+    public ISpawn CreateSpawn(string name, Vector3 position, Vector3? rotation = null)
     {
         var id = _spawnManager.CreateSpawn(name, position, rotation ?? Vector3.Zero);
-        return id.ToString();
+        return new Spawn(_spawnManager, id);
     }
 }
