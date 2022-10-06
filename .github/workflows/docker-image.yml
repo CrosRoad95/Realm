@@ -1,10 +1,8 @@
 name: Docker Image CI
 
 on:
-  push:
-    branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
+  release:
+    types: [published]
 
 jobs:
 
@@ -34,5 +32,5 @@ jobs:
           context: .
           file: ./Realm.Console/Dockerfile
           push: true
-          tags: ${{ steps.meta.outputs.tags }}
+          tags: $GITHUB_REF
           labels: ${{ steps.meta.outputs.labels }}
