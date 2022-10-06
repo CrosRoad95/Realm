@@ -24,6 +24,6 @@ FROM base AS final
 WORKDIR /app
 EXPOSE 22003/udp
 EXPOSE 22126/udp
-EXPOSE 22005/udp
+EXPOSE 22005/tcp
 COPY --from=publish /app/publish .
 ENTRYPOINT ["dotnet", "Realm.Console.dll"]

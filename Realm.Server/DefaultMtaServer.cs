@@ -6,7 +6,7 @@ namespace Realm.Server;
 
 public partial class DefaultMtaServer
 {
-    private readonly SemaphoreSlim _semaphore = new SemaphoreSlim(1);
+    private readonly SemaphoreSlim _semaphore = new SemaphoreSlim(0);
     private readonly MtaServer<RPGPlayer> _server;
     private readonly Configuration _serverConfiguration;
     private readonly ScriptingConfiguration _scriptingConfiguration;
@@ -26,7 +26,6 @@ public partial class DefaultMtaServer
                 builder.AddNetWrapper(dllPath: "net_d", port: (ushort)(_serverConfiguration.Port + 1));
 #else
                 builder.AddDefaults();
-                Console.WriteLine("Started production version at port: {0}", _serverConfiguration.Port);
 #endif
 
                 builder.ConfigureServices(services =>
@@ -59,6 +58,7 @@ public partial class DefaultMtaServer
         Logger = _server.GetRequiredService<ILogger>();
 
         var startup = _server.GetRequiredService<Startup>();
+
         var _ = Task.Run(startup.StartAsync);
 
         Console.CancelKeyPress += (sender, args) =>
@@ -80,8 +80,8 @@ public partial class DefaultMtaServer
         if(_scriptingConfiguration.Enabled)
             InitializeScripting("Resources/startup.js");
 
-        Logger.LogInformation("Server started.");
         _server.PlayerJoined += OnPlayerJoin;
+        Console.WriteLine("Server started at port: {0}", _serverConfiguration.Port);
         _server.Start();
         await _semaphore.WaitAsync();
     }

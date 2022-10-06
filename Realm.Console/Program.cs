@@ -24,14 +24,20 @@ try
             services.AddSingleton<IConsoleCommands>(serverConsole);
         });
     });
-    Task.Run(program.Start);
-    serverConsole.Start();
+    var serverTask = Task.Run(program.Start);
+    if(configuration.GetSection("DOTNET_RUNNING_IN_CONTAINER").Value == "true")
+    {
+        serverTask.Wait();
+    }
+    else
+        serverConsole.Start();
 }
 catch (Exception exception)
 {
     if (program != null)
     {
-        program.Logger.LogCritical(exception, "{message}", exception.Message);
+        //program.Logger.LogCritical(exception, "{message}", exception.Message);
+        Console.WriteLine($"Error in startup {exception.Message}");
     }
     else
     {
