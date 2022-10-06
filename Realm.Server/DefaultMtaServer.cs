@@ -17,17 +17,16 @@ public partial class DefaultMtaServer
     {
         _serverConfiguration = configuration.GetSection("server").Get<Configuration>();
         _scriptingConfiguration = configuration.GetSection("scripting").Get<ScriptingConfiguration>();
-
         _server = MtaServer.CreateWithDiSupport<RPGPlayer>(
             builder =>
             {
                 builder.UseConfiguration(_serverConfiguration);
-
 #if DEBUG
                 builder.AddDefaults(exceptBehaviours: ServerBuilderDefaultBehaviours.MasterServerAnnouncementBehaviour);
                 builder.AddNetWrapper(dllPath: "net_d", port: (ushort)(_serverConfiguration.Port + 1));
 #else
                 builder.AddDefaults();
+                Console.WriteLine("Started production version at port: {0}", _serverConfiguration.Port);
 #endif
 
                 builder.ConfigureServices(services =>
@@ -53,7 +52,6 @@ public partial class DefaultMtaServer
                     configureServerBuilder(builder);
             }
         );
-
         var serverListConfiguration = configuration.GetSection("serverList").Get<ServerListConfiguration>();
         _server.GameType = serverListConfiguration.GameType;
         _server.MapName = serverListConfiguration.MapName;

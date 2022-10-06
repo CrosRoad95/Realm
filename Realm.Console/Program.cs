@@ -9,7 +9,7 @@ var configuration = new ConfigurationBuilder()
     .AddEnvironmentVariables()
     .Build();
 
-Console.WriteLine("Starting server...");
+Console.WriteLine("Starting server");
 
 var serverConsole = new ServerConsole();
 
