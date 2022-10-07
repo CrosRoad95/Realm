@@ -7,6 +7,7 @@ internal class DefaultTestServer
     public DefaultTestServer()
     {
         var configuration = new TestConfiguration().Configuration;
+        Console.WriteLine("Files: {0}", string.Join(' ', Directory.GetFiles(".")));
         TestServer = MtaServer.CreateWithDiSupport<TestRPGPlayer>(builder =>
         {
             builder.ConfigureServices(services =>
