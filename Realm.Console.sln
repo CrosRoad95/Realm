@@ -19,6 +19,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Realm.Discord", "Realm.Disc
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Realm.Interfaces", "Realm.Interfaces\Realm.Interfaces.csproj", "{83778BBA-6B63-480F-8946-8986396C2756}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Realm.Tests", "Realm.Tests\Realm.Tests.csproj", "{34808A81-F2EA-4B91-A69C-8B0D47AA02F4}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -53,6 +55,10 @@ Global
 		{83778BBA-6B63-480F-8946-8986396C2756}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{83778BBA-6B63-480F-8946-8986396C2756}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{83778BBA-6B63-480F-8946-8986396C2756}.Release|Any CPU.Build.0 = Release|Any CPU
+		{34808A81-F2EA-4B91-A69C-8B0D47AA02F4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{34808A81-F2EA-4B91-A69C-8B0D47AA02F4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{34808A81-F2EA-4B91-A69C-8B0D47AA02F4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{34808A81-F2EA-4B91-A69C-8B0D47AA02F4}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

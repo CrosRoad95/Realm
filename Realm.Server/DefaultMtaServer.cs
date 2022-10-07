@@ -1,4 +1,5 @@
 ﻿using Realm.Interfaces.Scripting;
+using Realm.Server.Extensions;
 using Realm.Server.Managers;
 using Realm.Server.ResourcesLogic;
 
@@ -20,33 +21,7 @@ public partial class DefaultMtaServer
         _server = MtaServer.CreateWithDiSupport<RPGPlayer>(
             builder =>
             {
-                builder.UseConfiguration(_serverConfiguration);
-#if DEBUG
-                builder.AddDefaults(exceptBehaviours: ServerBuilderDefaultBehaviours.MasterServerAnnouncementBehaviour);
-                builder.AddNetWrapper(dllPath: "net_d", port: (ushort)(_serverConfiguration.Port + 1));
-#else
-                builder.AddDefaults();
-#endif
-
-                builder.ConfigureServices(services =>
-                {
-                    services.AddSingleton(configuration);
-                    services.AddSingleton<Startup>();
-                    services.AddSingleton<IAutoStartResource, ClientInterfaceLogic>();
-                    services.AddSingleton<IAutoStartResource, ClientUILogic>();
-
-                    services.AddSingleton<ISpawnManager, SpawnManager>();
-                    if(_scriptingConfiguration.Enabled)
-                        services.AddScripting();
-                    services.AddDiscord();
-                    services.AddPersistance<SQLiteDb>(db => db.UseSqlite("Filename=./server.db"));
-
-                    services.AddSingleton<HelpCommand>();
-                    services.AddSingleton<ICommand, TestCommand>();
-                });
-
-                builder.AddLogic<CommandsLogic>();
-
+                builder.ConfigureServer(configuration);
                 if (configureServerBuilder != null)
                     configureServerBuilder(builder);
             }

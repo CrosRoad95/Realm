@@ -1,6 +1,6 @@
 ﻿using Realm.Server.Extensions;
 
-DefaultMtaServer? program = null;
+DefaultMtaServer? server = null;
 
 var configuration = new ConfigurationBuilder()
     .AddJsonFile("appsettings.json", false)
@@ -15,7 +15,7 @@ var serverConsole = new ServerConsole();
 
 try
 {
-    program = new DefaultMtaServer(configuration, serverBuilder =>
+    server = new DefaultMtaServer(configuration, serverBuilder =>
     {
         serverBuilder.AddGuiFilesLocation("Gui");
         serverBuilder.AddLogic<TestLogic>();
@@ -24,7 +24,7 @@ try
             services.AddSingleton<IConsoleCommands>(serverConsole);
         });
     });
-    var serverTask = Task.Run(program.Start);
+    var serverTask = Task.Run(server.Start);
     if(configuration.GetSection("DOTNET_RUNNING_IN_CONTAINER").Value == "true")
     {
         serverTask.Wait();
@@ -34,7 +34,7 @@ try
 }
 catch (Exception exception)
 {
-    if (program != null)
+    if (server != null)
     {
         //program.Logger.LogCritical(exception, "{message}", exception.Message);
         Console.WriteLine($"Error in startup {exception.Message}");
