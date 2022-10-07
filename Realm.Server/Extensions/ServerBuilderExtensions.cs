@@ -13,7 +13,6 @@ public static class ServerBuilderExtensions
         builder.UseConfiguration(_serverConfiguration);
 #if DEBUG
         builder.AddDefaults(exceptBehaviours: ServerBuilderDefaultBehaviours.MasterServerAnnouncementBehaviour);
-        builder.AddNetWrapper(dllPath: "net_d", port: (ushort)(_serverConfiguration.Port + 1));
 #else
                 builder.AddDefaults();
 #endif
