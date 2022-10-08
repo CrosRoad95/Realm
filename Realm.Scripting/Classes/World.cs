@@ -15,5 +15,5 @@ public class World : IWorld
         return new Spawn(_spawnManager, id);
     }
 
-    public int? Add(int a, int b) => a + b;
+    public override string ToString() => "World";
 }

@@ -6,4 +6,6 @@ public class RPGPlayer : Player, IRPGPlayer
     {
 
     }
+
+    public override string ToString() => Name;
 }

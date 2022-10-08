@@ -12,4 +12,6 @@ public class Spawn : ISpawn
     }
 
     public string Id => _id.ToString();
+
+    public override string ToString() => "Spawn";
 }

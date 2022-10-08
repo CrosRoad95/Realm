@@ -45,4 +45,6 @@ public class Event : IEvent
     //    }
     //    return false;
     //}
+
+    public override string ToString() => "Event";
 }
