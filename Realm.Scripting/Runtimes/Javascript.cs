@@ -1,4 +1,6 @@
-﻿namespace Realm.Scripting.Runtimes;
+﻿using Realm.Scripting.Classes.Events;
+
+namespace Realm.Scripting.Runtimes;
 
 class LowercaseSymbolsLoader : CustomAttributeLoader
 {
@@ -17,7 +19,7 @@ internal class Javascript : IScripting
 {
     private readonly V8ScriptEngine _engine;
     private readonly TypescriptTypesGenerator _typescriptTypesGenerator;
-    public Javascript(IWorld world)
+    public Javascript(IWorld world, IEvent @event)
     {
         HostSettings.CustomAttributeLoader = new LowercaseSymbolsLoader();
         _engine = new V8ScriptEngine();
@@ -34,8 +36,13 @@ internal class Javascript : IScripting
 
         AddHostType(typeof(World));
         AddHostType(typeof(Spawn));
+        AddHostType(typeof(Player));
+
+        AddHostType(typeof(Event));
+        AddHostType(typeof(PlayerJoinedEvent));
 
         AddHostObject("World", world);
+        AddHostObject("Event", @event);
     }
 
     public string GetTypescriptDefinition()
@@ -61,7 +68,14 @@ internal class Javascript : IScripting
 
     public void Execute(string code)
     {
-        _engine.Evaluate(code);
+        try
+        {
+            _engine.Evaluate(code);
+        }
+        catch(ScriptEngineException ex)
+        {
+            Console.WriteLine("Javascript exception: {0}", ex);
+        }
     }
 
 }

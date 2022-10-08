@@ -25,6 +25,7 @@ public static class ServerBuilderExtensions
             services.AddSingleton<IAutoStartResource, ClientUILogic>();
 
             services.AddSingleton<ISpawnManager, SpawnManager>();
+            services.AddSingleton<IPlayerManager, PlayerManager>();
             if (_scriptingConfiguration.Enabled)
                 services.AddScripting();
             services.AddDiscord();

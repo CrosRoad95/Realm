@@ -1,7 +1,4 @@
-﻿using Realm.Interfaces.Scripting.Classes;
-using Realm.Interfaces.Server;
-
-namespace Realm.Scripting.Classes;
+﻿namespace Realm.Scripting.Classes;
 
 public class World : IWorld
 {
