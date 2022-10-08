@@ -8,8 +8,8 @@ internal class ClientInterfaceLogic : IAutoStartResource
         _resource = resourceProvider.GetResource("ClientInterface");
     }
 
-    public void StartFor(Player player)
+    public void StartFor(IRPGPlayer player)
     {
-        _resource.StartFor(player);
+        _resource.StartFor(player as Player); // TODO: Make it better
     }
 }

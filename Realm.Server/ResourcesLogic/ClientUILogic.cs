@@ -11,8 +11,8 @@ internal class ClientUILogic : IAutoStartResource
             _resource.NoClientScripts[$"{_resource!.Name}/{pair.Item1}"] = pair.Item2;
     }
 
-    public void StartFor(Player player)
+    public void StartFor(IRPGPlayer player)
     {
-        _resource.StartFor(player);
+        _resource.StartFor(player as Player); // TODO: Make it better
     }
 }

@@ -2,5 +2,5 @@
 
 public interface IAutoStartResource
 {
-    void StartFor(Player player);
+    void StartFor(IRPGPlayer player);
 }

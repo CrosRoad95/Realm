@@ -1,14 +1,17 @@
 ﻿using Realm.Interfaces.Scripting;
 using Realm.Server.Extensions;
+using System.Reactive;
 
 namespace Realm.Server;
 
-public partial class DefaultMtaServer : IReloadable
+public partial class DefaultMtaServer : IReloadable, IMtaServer
 {
     private readonly SemaphoreSlim _semaphore = new SemaphoreSlim(0);
     private readonly MtaServer<RPGPlayer> _server;
     private readonly Configuration _serverConfiguration;
     private readonly ScriptingConfiguration _scriptingConfiguration;
+
+    public event Action<IRPGPlayer>? PlayerJoined;
 
     public ILogger Logger { get; }
 
@@ -26,12 +29,14 @@ public partial class DefaultMtaServer : IReloadable
                 builder.ConfigureServices(services =>
                 {
                     services.AddSingleton<IReloadable>(this);
+                    services.AddSingleton<IMtaServer>(this);
                 });
             }
         );
         var serverListConfiguration = configuration.GetSection("serverList").Get<ServerListConfiguration>();
         _server.GameType = serverListConfiguration.GameType;
         _server.MapName = serverListConfiguration.MapName;
+        _server.PlayerJoined += e => PlayerJoined?.Invoke(e);
 
         Logger = _server.GetRequiredService<ILogger>();
 
