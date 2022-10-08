@@ -47,7 +47,7 @@ public partial class DefaultMtaServer
     {
         var code = File.ReadAllText(fileName);
         var scripting = _server.GetRequiredService<IScripting>();
-        scripting.Execute(code);
+        scripting.Execute(code, fileName);
 
         var typescriptDefinitions = scripting.GetTypescriptDefinition();
         var directory = Path.GetDirectoryName(fileName);
@@ -57,7 +57,7 @@ public partial class DefaultMtaServer
     public async Task Start()
     {
         if(_scriptingConfiguration.Enabled)
-            InitializeScripting("Resources/startup.js");
+            InitializeScripting("Server/startup.js");
 
         _server.PlayerJoined += OnPlayerJoin;
         Console.WriteLine("Server started at port: {0}", _serverConfiguration.Port);

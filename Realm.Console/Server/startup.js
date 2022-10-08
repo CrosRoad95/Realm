@@ -1,4 +1,7 @@
-﻿const spawnA = World.createSpawn("test", new Vector3(0, 2, 3));
+﻿import * as TestModule from "Test/test.js"
+
+Console.writeLine("Module: {0}", TestModule.test)
+const spawnA = World.createSpawn("test", new Vector3(0, 2, 3));
 const spawnB = World.createSpawn("test", new Vector3(0, 10, 3));
 
 Console.writeLine("Spawns ids: {0} {1}", spawnA, spawnB.id)

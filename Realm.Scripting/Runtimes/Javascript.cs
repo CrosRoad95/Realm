@@ -1,4 +1,6 @@
-﻿using Realm.Scripting.Classes.Events;
+﻿using Microsoft.Extensions.Configuration;
+using Realm.Scripting.Classes.Events;
+using System.Xml.Linq;
 
 namespace Realm.Scripting.Runtimes;
 
@@ -15,6 +17,19 @@ class LowercaseSymbolsLoader : CustomAttributeLoader
     }
 }
 
+class CustomDocumentLoader : DocumentLoader
+{
+    public override async Task<Document> LoadDocumentAsync(DocumentSettings settings, DocumentInfo? sourceInfo, string specifier, DocumentCategory category, DocumentContextCallback contextCallback)
+    {
+        var file = await File.ReadAllTextAsync(Path.Join("Server", specifier));
+        return new StringDocument(new DocumentInfo(specifier)
+        {
+            Category = category,
+            ContextCallback = contextCallback
+        }, file);
+    }
+}
+
 internal class Javascript : IScripting
 {
     private readonly V8ScriptEngine _engine;
@@ -24,6 +39,9 @@ internal class Javascript : IScripting
         HostSettings.CustomAttributeLoader = new LowercaseSymbolsLoader();
         _engine = new V8ScriptEngine();
         _typescriptTypesGenerator = new TypescriptTypesGenerator();
+
+        _engine.DocumentSettings.Loader = new CustomDocumentLoader();
+        _engine.DocumentSettings.AccessFlags = DocumentAccessFlags.EnableAllLoading;
 
         AddHostType(typeof(JavaScriptExtensions), "javaScriptExtensions");
         AddHostType(typeof(Vector2));
@@ -61,16 +79,24 @@ internal class Javascript : IScripting
         _engine.AddHostObject(name, @object);
     }
 
-    public async Task<object> ExecuteAsync(string code)
+    public async Task<object> ExecuteAsync(string code, string name)
     {
-        return await _engine.Evaluate(code).ToTask();
+        var documentInfo = new DocumentInfo(name)
+        {
+            Category = ModuleCategory.Standard
+        };
+        return await _engine.Evaluate(new DocumentInfo { Category = ModuleCategory.Standard }, code).ToTask();
     }
 
-    public void Execute(string code)
+    public void Execute(string code, string name)
     {
         try
         {
-            _engine.Evaluate(code);
+            var documentInfo = new DocumentInfo(name)
+            {
+                Category = ModuleCategory.Standard
+            };
+            _engine.Evaluate(documentInfo, code);
         }
         catch(ScriptEngineException ex)
         {
