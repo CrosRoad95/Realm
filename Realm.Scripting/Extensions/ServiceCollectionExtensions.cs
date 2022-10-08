@@ -6,6 +6,7 @@ public static class ServiceCollectionExtensions
     {
         services.AddSingleton<IWorld, World>();
         services.AddSingleton<IEvent, Event>();
+        services.AddSingleton<IReloadable>(x => x.GetRequiredService<IEvent>());
         services.AddSingleton<IScripting, Javascript>();
         return services;
     }

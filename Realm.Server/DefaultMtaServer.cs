@@ -3,7 +3,7 @@ using Realm.Server.Extensions;
 
 namespace Realm.Server;
 
-public partial class DefaultMtaServer
+public partial class DefaultMtaServer : IReloadable
 {
     private readonly SemaphoreSlim _semaphore = new SemaphoreSlim(0);
     private readonly MtaServer<RPGPlayer> _server;
@@ -22,6 +22,11 @@ public partial class DefaultMtaServer
                 builder.ConfigureServer(configuration);
                 if (configureServerBuilder != null)
                     configureServerBuilder(builder);
+
+                builder.ConfigureServices(services =>
+                {
+                    services.AddSingleton<IReloadable>(this);
+                });
             }
         );
         var serverListConfiguration = configuration.GetSection("serverList").Get<ServerListConfiguration>();
@@ -52,10 +57,15 @@ public partial class DefaultMtaServer
         File.WriteAllText(Path.Join(directory,"types.ts"), typescriptDefinitions);
     }
 
+    private void StartScripting()
+    {
+        InitializeScripting("Server/startup.js");
+    }
+
     public async Task Start()
     {
-        if(_scriptingConfiguration.Enabled)
-            InitializeScripting("Server/startup.js");
+        if (_scriptingConfiguration.Enabled)
+            StartScripting();
 
         _server.PlayerJoined += OnPlayerJoin;
         Console.WriteLine("Server started at port: {0}", _serverConfiguration.Port);
@@ -69,4 +79,11 @@ public partial class DefaultMtaServer
         player.Camera.Fade(CameraFade.In);
         player.Spawn(new Vector3(0, 0, 3), 0, 7, 0, 0);
     }
+
+    public void Reload()
+    {
+        StartScripting();
+    }
+
+    public int GetPriority() => int.MaxValue;
 }

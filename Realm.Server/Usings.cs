@@ -29,3 +29,4 @@ global using Realm.Interfaces;
 global using Realm.Server.Gui;
 global using Realm.Server.Gui.Interfaces;
 global using Realm.Interfaces.Server;
+global using Realm.Interfaces.Common;

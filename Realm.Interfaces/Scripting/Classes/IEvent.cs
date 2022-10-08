@@ -1,5 +1,5 @@
 ﻿namespace Realm.Interfaces.Scripting.Classes;
 
-public interface IEvent
+public interface IEvent : IReloadable
 {
 }

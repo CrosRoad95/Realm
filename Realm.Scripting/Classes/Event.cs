@@ -46,5 +46,12 @@ public class Event : IEvent
     //    return false;
     //}
 
+    public void Reload()
+    {
+        _playerJoinedEvents.Clear();
+    }
+
+    public int GetPriority() => 10000;
+
     public override string ToString() => "Event";
 }

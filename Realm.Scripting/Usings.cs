@@ -18,3 +18,5 @@ global using Realm.Interfaces.Server;
 global using Realm.Scripting.Classes;
 global using Realm.Scripting.Extensions;
 global using Realm.Scripting.Classes.Events;
+global using Realm.Interfaces.Common;
+
