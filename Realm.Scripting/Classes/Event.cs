@@ -35,16 +35,15 @@ public class Event : IEvent
         return false;
     }
 
-    //public bool RemoveHandler(string eventName, ScriptObject callback)
-    //{
-    //    switch(eventName)
-    //    {
-    //        case "onPlayerJoin":
-    //            var a = _playerJoinedEvents.Remove(callback.);
-    //            return _playerJoinedEvents.Remove(callback);
-    //    }
-    //    return false;
-    //}
+    public bool RemoveHandler(string eventName, ScriptObject callback)
+    {
+        switch (eventName)
+        {
+            case "onPlayerJoin":
+                return _playerJoinedEvents.RemoveAll(x => callback.Is(x)) > 0;
+        }
+        return false;
+    }
 
     public void Reload()
     {

@@ -9,3 +9,7 @@ Console.writeLine("Spawns ids: {0} {1}", spawnA, spawnB.id)
 Event.addHandler("onPlayerJoin", ({player}) => {
     Console.writeLine("player joined: {0} {1}", String(player), player.name);
 })
+
+const func = () => Console.writeLine("you should not see this");
+Event.addHandler("onPlayerJoin", func);
+Event.removeHandler("onPlayerJoin", func);
