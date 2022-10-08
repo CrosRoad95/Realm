@@ -34,9 +34,9 @@ internal class Javascript : IScripting
         AddHostType(typeof(Console));
         AddHostType(typeof(Type));
 
+        AddHostType(typeof(IRPGPlayer), "Player");
         AddHostType(typeof(World));
         AddHostType(typeof(Spawn));
-        AddHostType(typeof(Player));
 
         AddHostType(typeof(Event));
         AddHostType(typeof(PlayerJoinedEvent));
