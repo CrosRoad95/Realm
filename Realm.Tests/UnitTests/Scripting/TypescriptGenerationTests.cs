@@ -20,6 +20,22 @@ public class TypescriptGenerationTest
     {
         _typescriptTypesGenerator.AddType(typeof(Test));
         var result = _typescriptTypesGenerator.Build();
-        result.Should().Be("export interface NotImplemented { }\r\n\r\nexport interface Object {\r\n  getType(): Type;\r\n  toString(): string;\r\n  equals(obj?: Object): boolean;\r\n  equals(objA?: Object, objB?: Object): boolean;\r\n  referenceEquals(objA?: Object, objB?: Object): boolean;\r\n  getHashCode(): number;\r\n}\r\n\r\n\r\nexport interface Test extends Object {\r\n  sampleProperty?: string;\r\n  add(a: number, b?: number | null): number;\r\n}\r\n");
+        result.Should().Be(@"export interface NotImplemented { }
+
+export interface Object {
+  getType(): Type;
+  toString(): string;
+  equals(obj?: Object): boolean;
+  equals(objA?: Object, objB?: Object): boolean;
+  referenceEquals(objA?: Object, objB?: Object): boolean;
+  getHashCode(): number;
+}
+
+
+export interface Test extends Object {
+  sampleProperty?: string;
+  add(a: number, b?: number | null): number;
+}
+");
     }
 }
