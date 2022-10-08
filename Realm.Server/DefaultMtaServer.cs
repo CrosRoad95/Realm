@@ -48,6 +48,10 @@ public partial class DefaultMtaServer
         var code = File.ReadAllText(fileName);
         var scripting = _server.GetRequiredService<IScripting>();
         scripting.Execute(code);
+
+        var typescriptDefinitions = scripting.GetTypescriptDefinition();
+        var directory = Path.GetDirectoryName(fileName);
+        File.WriteAllText(Path.Join(directory,"types.ts"), typescriptDefinitions);
     }
 
     public async Task Start()

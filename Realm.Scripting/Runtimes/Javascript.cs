@@ -1,8 +1,4 @@
-﻿using Realm.Interfaces.Scripting.Classes;
-using Realm.Scripting.Classes;
-using System.Reflection;
-
-namespace Realm.Scripting.Runtimes;
+﻿namespace Realm.Scripting.Runtimes;
 
 class LowercaseSymbolsLoader : CustomAttributeLoader
 {
@@ -11,8 +7,7 @@ class LowercaseSymbolsLoader : CustomAttributeLoader
         var declaredAttributes = base.LoadCustomAttributes<T>(resource, inherit);
         if (!declaredAttributes.Any() && typeof(T) == typeof(ScriptMemberAttribute) && resource is MemberInfo member)
         {
-            var lowerCamelCaseName = char.ToLowerInvariant(member.Name[0]) + member.Name[1..];
-            return new[] { new ScriptMemberAttribute(lowerCamelCaseName) } as T[];
+            return new[] { new ScriptMemberAttribute(member.Name.ToTypescriptName()) } as T[];
         }
         return declaredAttributes;
     }
@@ -21,23 +16,37 @@ class LowercaseSymbolsLoader : CustomAttributeLoader
 internal class Javascript : IScripting
 {
     private readonly V8ScriptEngine _engine;
+    private readonly TypescriptTypesGenerator _typescriptTypesGenerator;
     public Javascript(IWorld world)
     {
         HostSettings.CustomAttributeLoader = new LowercaseSymbolsLoader();
         _engine = new V8ScriptEngine();
-        AddHostType("javaScriptExtensions", typeof(JavaScriptExtensions));
-        AddHostType("vector3", typeof(Vector3));
-        AddHostType("console", typeof(Console));
+        _typescriptTypesGenerator = new TypescriptTypesGenerator();
 
-        AddHostType("world", typeof(World));
-        AddHostType("spawn", typeof(Spawn));
+        AddHostType(typeof(JavaScriptExtensions), "javaScriptExtensions");
+        AddHostType(typeof(Vector2));
+        AddHostType(typeof(Vector4));
+        AddHostType(typeof(Vector3));
+        AddHostType(typeof(Matrix4x4));
+        AddHostType(typeof(Quaternion));
+        AddHostType(typeof(Console));
+        AddHostType(typeof(Type));
 
-        AddHostObject("world", world);
+        AddHostType(typeof(World));
+        AddHostType(typeof(Spawn));
+
+        AddHostObject("World", world);
     }
 
-    public void AddHostType(string name, Type type)
+    public string GetTypescriptDefinition()
     {
-        _engine.AddHostType(name, type);
+        return _typescriptTypesGenerator.Build();
+    }
+
+    public void AddHostType(Type type, string? customName = null)
+    {
+        _engine.AddHostType(customName ?? type.Name, type);
+        _typescriptTypesGenerator.AddType(type);
     }
 
     public void AddHostObject(string name, object @object)

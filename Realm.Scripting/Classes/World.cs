@@ -17,4 +17,6 @@ public class World : IWorld
         var id = _spawnManager.CreateSpawn(name, position, rotation ?? Vector3.Zero);
         return new Spawn(_spawnManager, id);
     }
+
+    public int? Add(int a, int b) => a + b;
 }
