@@ -1,4 +1,6 @@
-﻿namespace Realm.Tests.UnitTests.Scripting;
+﻿using System.Text.RegularExpressions;
+
+namespace Realm.Tests.UnitTests.Scripting;
 
 
 [CollectionDefinition("Non-Parallel Collection", DisableParallelization = true)]
@@ -22,6 +24,9 @@ public class TypescriptGenerationTest
     {
         _typescriptTypesGenerator.AddType(typeof(Test));
         var result = _typescriptTypesGenerator.Build();
-        result.Should().Be("export interface NotImplemented { }\r\n\r\nexport interface Object {\r\n  getType(): Type;\r\n  toString(): string;\r\n  equals(obj?: Object): boolean;\r\n  equals(objA?: Object, objB?: Object): boolean;\r\n  referenceEquals(objA?: Object, objB?: Object): boolean;\r\n  getHashCode(): number;\r\n}\r\n\r\n\r\nexport interface Test extends Object {\r\n  sampleProperty?: string;\r\n  add(a: number, b?: number | null): number;\r\n}\r\n");
+        var expectedGeneratedTypes = "export interface NotImplemented { }\r\n\r\nexport interface Object {\r\n  getType(): Type;\r\n  toString(): string;\r\n  equals(obj?: Object): boolean;\r\n  equals(objA?: Object, objB?: Object): boolean;\r\n  referenceEquals(objA?: Object, objB?: Object): boolean;\r\n  getHashCode(): number;\r\n}\r\n\r\n\r\nexport interface Test extends Object {\r\n  sampleProperty?: string;\r\n  add(a: number, b?: number | null): number;\r\n}\r\n";
+        var expectedGeneratedTypesWithoutWhiteSpaces = Regex.Replace(expectedGeneratedTypes, @"\s+", "");
+        var resultWithoutWhiteSpaces = Regex.Replace(result, @"\s+", "");
+        resultWithoutWhiteSpaces.Should().Be(expectedGeneratedTypesWithoutWhiteSpaces);
     }
 }
