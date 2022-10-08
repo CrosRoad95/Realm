@@ -1,7 +1,4 @@
-﻿using Realm.Server.Commands.Interfaces;
-using Realm.Server.Interfaces;
-
-namespace Realm.Server.Commands;
+﻿namespace Realm.Server.Commands;
 
 internal class HelpCommand : ICommand
 {

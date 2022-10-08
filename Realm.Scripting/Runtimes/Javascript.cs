@@ -1,8 +1,4 @@
-﻿using Microsoft.Extensions.Configuration;
-using Realm.Scripting.Classes.Events;
-using System.Xml.Linq;
-
-namespace Realm.Scripting.Runtimes;
+﻿namespace Realm.Scripting.Runtimes;
 
 class LowercaseSymbolsLoader : CustomAttributeLoader
 {

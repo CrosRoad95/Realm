@@ -1,6 +1,4 @@
-﻿using System.IO;
-
-namespace Realm.Server.Gui;
+﻿namespace Realm.Server.Gui;
 
 internal class GuiFilesProvider : IGuiFilesProvider
 {

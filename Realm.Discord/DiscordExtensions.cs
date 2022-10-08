@@ -1,6 +1,4 @@
-﻿using Realm.Discord.Providers;
-
-namespace Realm.Discord;
+﻿namespace Realm.Discord;
 
 public static class PersistanceExtensions
 {

@@ -1,7 +1,4 @@
-﻿using Realm.Interfaces.Scripting.Classes;
-using Realm.Scripting.Classes;
-
-namespace Realm.Scripting.Extensions;
+﻿namespace Realm.Scripting.Extensions;
 
 public static class ServiceCollectionExtensions
 {

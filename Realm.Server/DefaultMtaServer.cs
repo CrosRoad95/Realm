@@ -1,7 +1,5 @@
 ﻿using Realm.Interfaces.Scripting;
 using Realm.Server.Extensions;
-using Realm.Server.Managers;
-using Realm.Server.ResourcesLogic;
 
 namespace Realm.Server;
 
