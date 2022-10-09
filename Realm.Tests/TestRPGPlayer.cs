@@ -1,11 +1,13 @@
-﻿namespace Realm.Tests;
+﻿using Realm.Interfaces.Scripting.Classes;
+
+namespace Realm.Tests;
 
 public class TestRPGPlayer : TestingPlayer, IRPGPlayer
 {
-    public void Spawn(Vector3 position, Vector3 rotation)
+    public void Spawn(ISpawn spawn)
     {
         Camera.Target = this;
         Camera.Fade(CameraFade.In);
-        Spawn(position, rotation.Z, 0, 0, 0);
+        Spawn(spawn.Position, spawn.Rotation.Z, 0, 0, 0);
     }
 }
