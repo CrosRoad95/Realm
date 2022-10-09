@@ -2,6 +2,6 @@
 
 public interface IMovable
 {
-    public Vector3 Position { get; set; }
-    public Vector3 Rotation { get; set; }
+    Vector3 Position { get; set; }
+    Vector3 Rotation { get; set; }
 }

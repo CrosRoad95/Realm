@@ -90,13 +90,13 @@ public class TypescriptTypesGenerator
 
         sb.AppendLine($"export interface {className}{extends} {{");
 
-        foreach (var propertyInfo in type.GetProperties())
+        foreach (var propertyInfo in type.GetPublicProperties())
         {
             var name = ResolvePropertyInfoName(propertyInfo);
             var typescriptType = ResolveTypescriptPropertyName(propertyInfo.PropertyType);
             sb.AppendLine($"  {name}: {typescriptType};");
         }
-        
+
         foreach (var methodInfo in type.GetMethods()
             .Where(x => (type.IsInterface || x.DeclaringType == type) && !x.IsSpecialName))
         {
