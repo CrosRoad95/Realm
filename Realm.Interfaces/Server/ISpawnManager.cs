@@ -3,4 +3,5 @@
 public interface ISpawnManager
 {
     ISpawn CreateSpawn(string name, Vector3 position, Vector3 rotation);
+    ISpawn[] GetAll();
 }

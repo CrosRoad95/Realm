@@ -1,16 +1,30 @@
 ﻿import * as TestModule from "Test/test.js"
 
-Console.writeLine("Module: {0}", TestModule.test)
-const spawnA = World.createSpawn("test", new Vector3(0, 2, 3));
-const spawnB = World.createSpawn("test", new Vector3(0, 10, 3));
+Console.WriteLine("Module: {0}", TestModule.test)
+const spawnA = World.CreateSpawn("test", new Vector3(0, 2, 3));
+const spawnB = World.CreateSpawn("test", new Vector3(0, 10, 3));
 
-Console.writeLine("Spawns ids: {0} {1}", spawnA, spawnB.id)
+Console.WriteLine("Spawns ids: {0} {1}", spawnA, spawnB.Id)
 
-Event.addHandler("onPlayerJoin", ({player}) => {
-    Console.writeLine("player joined: {0} {1}", String(player), player.name);
-    player.spawn(spawnA);
+Event.AddHandler("onPlayerJoin", ({ Player }) => {
+    Console.WriteLine("player joined: {0} {1}", String(Player), Player.Name);
+    Player.Spawn(spawnA);
 })
 
-const func = () => Console.writeLine("you should not see this");
-Event.addHandler("onPlayerJoin", func);
-Event.removeHandler("onPlayerJoin", func);
+const func = () => Console.WriteLine("you should not see this");
+Event.AddHandler("onPlayerJoin", func);
+Event.RemoveHandler("onPlayerJoin", func);
+
+Console.WriteLine("All spawns: {0}", World.GetElementsByType("spawn").length);
+
+const plrs = World.GetElementsByType("player")
+for (var key in plrs) {
+    Console.WriteLine("Player: {0} = {1}", key, plrs[key].Name);
+}
+
+//try {
+//    World.getElementsByType("unexisting type")
+//}
+//catch (ex) {
+//    Console.writeLine("Exception caught: {0}", ex.toString());
+//}

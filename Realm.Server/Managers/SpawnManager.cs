@@ -11,4 +11,6 @@ internal class SpawnManager : ISpawnManager
         _spawns.Add(spawn);
         return spawn;
     }
+
+    public ISpawn[] GetAll() => _spawns.ToArray();
 }

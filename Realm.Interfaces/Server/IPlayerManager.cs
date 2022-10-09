@@ -3,4 +3,6 @@
 public interface IPlayerManager
 {
     event Action<IRPGPlayer>? PlayerJoined;
+
+    IRPGPlayer[] GetAll();
 }
