@@ -18,3 +18,5 @@ global using Realm.Interfaces.Server;
 global using Realm.Interfaces.Common;
 global using Realm.Interfaces;
 global using Realm.Server;
+global using SlipeServer.Packets.Lua.Camera;
+global using System.Numerics;

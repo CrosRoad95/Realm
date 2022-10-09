@@ -11,8 +11,8 @@ public class World : IWorld
 
     public ISpawn CreateSpawn(string name, Vector3 position, Vector3? rotation = null)
     {
-        var id = _spawnManager.CreateSpawn(name, position, rotation ?? Vector3.Zero);
-        return new Spawn(_spawnManager, id);
+        var spawn = _spawnManager.CreateSpawn(name, position, rotation ?? Vector3.Zero);
+        return spawn;
     }
 
     public override string ToString() => "World";

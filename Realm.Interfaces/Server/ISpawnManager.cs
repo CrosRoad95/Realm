@@ -1,6 +1,8 @@
-﻿namespace Realm.Interfaces.Server;
+﻿using Realm.Interfaces.Scripting.Classes;
+
+namespace Realm.Interfaces.Server;
 
 public interface ISpawnManager
 {
-    Guid CreateSpawn(string name, Vector3 position, Vector3 rotation);
+    ISpawn CreateSpawn(string name, Vector3 position, Vector3 rotation);
 }

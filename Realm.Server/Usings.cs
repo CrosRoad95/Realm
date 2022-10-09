@@ -30,3 +30,5 @@ global using Realm.Server.Gui;
 global using Realm.Server.Gui.Interfaces;
 global using Realm.Interfaces.Server;
 global using Realm.Interfaces.Common;
+global using Realm.Interfaces.Scripting.Classes;
+global using Realm.Scripting.Classes;
