@@ -1,4 +1,4 @@
-﻿namespace Realm.Server.Interfaces;
+﻿namespace Realm.Interfaces.Server;
 
 public interface IConsoleCommands
 {

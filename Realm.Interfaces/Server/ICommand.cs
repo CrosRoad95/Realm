@@ -1,6 +1,6 @@
-﻿namespace Realm.Server.Commands.Interfaces;
+﻿namespace Realm.Interfaces.Server;
 
-internal interface ICommand
+public interface ICommand
 {
     string CommandName { get; }
 

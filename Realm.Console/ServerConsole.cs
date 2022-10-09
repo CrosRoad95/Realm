@@ -6,10 +6,17 @@ internal class ServerConsole : IConsoleCommands
 
     public void Start()
     {
-        while (true)
+        try
         {
-            var line = System.Console.ReadLine();
-            CommandExecuted?.Invoke(line);
+            while (true)
+            {
+                var line = System.Console.ReadLine();
+                CommandExecuted?.Invoke(line);
+            }
+        }
+        finally
+        {
+
         }
     }   
 }

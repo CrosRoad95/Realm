@@ -1,6 +1,4 @@
-﻿using Realm.Server.Extensions;
-
-DefaultMtaServer? server = null;
+﻿DefaultMtaServer? server = null;
 
 var configuration = new ConfigurationBuilder()
     .AddJsonFile("appsettings.json", false)

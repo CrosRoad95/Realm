@@ -1,7 +1,4 @@
-﻿using Realm.Interfaces.Attributes;
-using System.Collections.ObjectModel;
-
-namespace Realm.Scripting;
+﻿namespace Realm.Scripting;
 
 public class TypescriptTypesGenerator
 {

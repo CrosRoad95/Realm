@@ -1,6 +1,4 @@
-﻿using Realm.Interfaces.Scripting.Classes;
-
-namespace Realm.Interfaces.Server;
+﻿namespace Realm.Interfaces.Server;
 
 public interface ISpawnManager
 {

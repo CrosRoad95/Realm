@@ -8,9 +8,7 @@ global using System.Threading.Tasks;
 global using Discord;
 global using Discord.WebSocket;
 
-global using Realm.Discord.Interfaces;
 global using Realm.Discord.Channels;
-global using Realm.Discord.Channels.Interfaces;
 global using Realm.Interfaces;
 global using Realm.Interfaces.Discord;
 global using Realm.Discord.Classes;

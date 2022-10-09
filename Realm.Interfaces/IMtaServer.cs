@@ -1,7 +1,4 @@
-﻿using Realm.Interfaces.Scripting.Classes;
-using Realm.Interfaces.Server;
-
-namespace Realm.Interfaces;
+﻿namespace Realm.Interfaces;
 
 public interface IMtaServer
 {

@@ -1,4 +1,4 @@
-﻿namespace Realm.Discord.Channels.Interfaces;
+﻿namespace Realm.Interfaces.Discord;
 
 public interface IStatusChannel
 {

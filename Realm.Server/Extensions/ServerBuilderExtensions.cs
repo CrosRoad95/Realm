@@ -1,7 +1,4 @@
-﻿using Realm.Server.Managers;
-using Realm.Server.ResourcesLogic;
-
-namespace Realm.Server.Extensions;
+﻿namespace Realm.Server.Extensions;
 
 public static class ServerBuilderExtensions
 {

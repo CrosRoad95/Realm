@@ -4,6 +4,7 @@ global using System.Linq;
 global using System.Text;
 global using System.Threading.Tasks;
 global using System.Reflection;
+global using System.Collections.ObjectModel;
 
 global using Microsoft.ClearScript;
 global using Microsoft.ClearScript.JavaScript;
@@ -19,4 +20,4 @@ global using Realm.Scripting.Classes;
 global using Realm.Scripting.Extensions;
 global using Realm.Scripting.Classes.Events;
 global using Realm.Interfaces.Common;
-
+global using Realm.Interfaces.Attributes;

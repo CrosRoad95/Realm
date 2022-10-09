@@ -1,6 +1,4 @@
-﻿using Realm.Interfaces.Scripting.Classes;
-
-namespace Realm.Tests;
+﻿namespace Realm.Tests;
 
 public class TestRPGPlayer : TestingPlayer, IRPGPlayer
 {

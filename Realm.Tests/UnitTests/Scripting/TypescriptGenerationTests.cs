@@ -1,6 +1,4 @@
-﻿using System.Text.RegularExpressions;
-
-namespace Realm.Tests.UnitTests.Scripting;
+﻿namespace Realm.Tests.UnitTests.Scripting;
 
 
 [CollectionDefinition("Non-Parallel Collection", DisableParallelization = true)]

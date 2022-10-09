@@ -1,6 +1,4 @@
-﻿using SlipeServer.Server.Elements.Events;
-
-namespace Realm.Server.Resources;
+﻿namespace Realm.Server.Resources;
 
 public class ResourceBase : Resource
 {

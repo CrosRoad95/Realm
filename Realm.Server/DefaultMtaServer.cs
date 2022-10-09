@@ -1,8 +1,4 @@
-﻿using Realm.Interfaces.Scripting;
-using Realm.Server.Extensions;
-using System.Reactive;
-
-namespace Realm.Server;
+﻿namespace Realm.Server;
 
 public partial class DefaultMtaServer : IReloadable, IMtaServer
 {
