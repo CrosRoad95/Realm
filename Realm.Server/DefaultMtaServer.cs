@@ -72,17 +72,9 @@ public partial class DefaultMtaServer : IReloadable, IMtaServer
         if (_scriptingConfiguration.Enabled)
             StartScripting();
 
-        _server.PlayerJoined += OnPlayerJoin;
         Console.WriteLine("Server started at port: {0}", _serverConfiguration.Port);
         _server.Start();
         await _semaphore.WaitAsync();
-    }
-
-    private void OnPlayerJoin(RPGPlayer player)
-    {
-        player.Camera.Target = player;
-        player.Camera.Fade(CameraFade.In);
-        player.Spawn(new Vector3(0, 0, 3), 0, 7, 0, 0);
     }
 
     public void Reload()
