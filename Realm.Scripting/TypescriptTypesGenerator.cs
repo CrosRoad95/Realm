@@ -1,5 +1,6 @@
 ﻿using Realm.Common.Attributes;
 using Realm.Common.Extensions;
+using System.Reflection;
 
 namespace Realm.Scripting;
 
@@ -71,9 +72,11 @@ public class TypescriptTypesGenerator
         return $"{propertyInfo.Name.ToTypescriptName()}{(isNullable? "?" : "")}";
     }
 
-    private string ResolveParameterInfoName(ParameterInfo parameterInfo)
+    private string ResolveParameterInfoName(ParameterInfo parameterInfo, ref bool wasNullable)
     {
-        var isNullable = parameterInfo.IsNullable();
+        var isNullable = wasNullable || parameterInfo.IsNullable();
+        if (isNullable)
+            wasNullable = true;
         var name = parameterInfo.Name.ToTypescriptName();
         var typeName = ResolveTypescriptPropertyName(parameterInfo.ParameterType);
         return $"{name}{(isNullable ? "?" : "")}: {typeName}";
@@ -100,8 +103,9 @@ public class TypescriptTypesGenerator
         foreach (var methodInfo in type.GetMethods()
             .Where(x => (type.IsInterface || x.DeclaringType == type) && !x.IsSpecialName))
         {
+            bool wasNullable = false;
             var methodName = methodInfo.Name.ToTypescriptName();
-            var parameters = string.Join(", ", methodInfo.GetParameters().Select(ResolveParameterInfoName));
+            var parameters = string.Join(", ", methodInfo.GetParameters().Select(x => ResolveParameterInfoName(x, ref wasNullable)));
             var returnType = ResolveTypescriptPropertyName(methodInfo.ReturnType);
             sb.AppendLine($"  {methodName}({parameters}): {returnType};");
         }
