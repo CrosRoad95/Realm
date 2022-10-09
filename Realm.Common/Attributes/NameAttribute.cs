@@ -1,4 +1,4 @@
-﻿namespace Realm.Interfaces.Attributes;
+﻿namespace Realm.Common.Attributes;
 
 public class NameAttribute : Attribute
 {

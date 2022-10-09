@@ -1,4 +1,7 @@
-﻿namespace Realm.Scripting;
+﻿using Realm.Common.Attributes;
+using Realm.Common.Extensions;
+
+namespace Realm.Scripting;
 
 public class TypescriptTypesGenerator
 {
@@ -14,89 +17,16 @@ public class TypescriptTypesGenerator
         return this;
     }
 
-    public bool IsNullable(PropertyInfo property) =>
-        IsNullableHelper(property.PropertyType, property.DeclaringType, property.CustomAttributes);
-
-    public bool IsNullable(FieldInfo field) =>
-        IsNullableHelper(field.FieldType, field.DeclaringType, field.CustomAttributes);
-
-    public bool IsNullable(ParameterInfo parameter) =>
-        IsNullableHelper(parameter.ParameterType, parameter.Member, parameter.CustomAttributes);
-    
-    public bool IsNullable(Type parameter) =>
-        IsNullableHelper(parameter, null, Enumerable.Empty<CustomAttributeData>());
-
-    private bool IsNullableHelper(Type memberType, MemberInfo? declaringType, IEnumerable<CustomAttributeData> customAttributes)
-    {
-        if (memberType.IsValueType)
-            return Nullable.GetUnderlyingType(memberType) != null;
-
-        var nullable = customAttributes
-            .FirstOrDefault(x => x.AttributeType.FullName == "System.Runtime.CompilerServices.NullableAttribute");
-        if (nullable != null && nullable.ConstructorArguments.Count == 1)
-        {
-            var attributeArgument = nullable.ConstructorArguments[0];
-            if (attributeArgument.ArgumentType == typeof(byte[]))
-            {
-                var args = (ReadOnlyCollection<CustomAttributeTypedArgument>)attributeArgument.Value!;
-                if (args.Count > 0 && args[0].ArgumentType == typeof(byte))
-                {
-                    return (byte)args[0].Value! == 2;
-                }
-            }
-            else if (attributeArgument.ArgumentType == typeof(byte))
-            {
-                return (byte)attributeArgument.Value! == 2;
-            }
-        }
-
-        if(declaringType != null)
-            for (var type = declaringType; type != null; type = type.DeclaringType)
-            {
-                var context = type.CustomAttributes
-                    .FirstOrDefault(x => x.AttributeType.FullName == "System.Runtime.CompilerServices.NullableContextAttribute");
-                if (context != null &&
-                    context.ConstructorArguments.Count == 1 &&
-                    context.ConstructorArguments[0].ArgumentType == typeof(byte))
-                {
-                    return (byte)context.ConstructorArguments[0].Value! == 2;
-                }
-            }
-
-        return false;
-    }
-
-    public bool IsNumericType(Type type)
-    {
-        switch (Type.GetTypeCode(type))
-        {
-            case TypeCode.Byte:
-            case TypeCode.SByte:
-            case TypeCode.UInt16:
-            case TypeCode.UInt32:
-            case TypeCode.UInt64:
-            case TypeCode.Int16:
-            case TypeCode.Int32:
-            case TypeCode.Int64:
-            case TypeCode.Decimal:
-            case TypeCode.Double:
-            case TypeCode.Single:
-                return true;
-            default:
-                return false;
-        }
-    }
-
     private string ResolveTypeName(Type type)
     {
-        var isNullable = IsNullable(type);
+        var isNullable = type.IsNullable();
         if (isNullable)
             type = type.GetGenericArguments()[0];
 
         string name = "NotImplemented";
         if (type == typeof(string))
             name = "string";
-        else if (IsNumericType(type))
+        else if (type.IsNumericType())
             name = "number";
         else if (type == typeof(bool))
             name = "boolean";
@@ -126,7 +56,7 @@ public class TypescriptTypesGenerator
 
     private string ResolveTypescriptPropertyName(Type type)
     {
-        var isNullable = IsNullable(type);
+        var isNullable = type.IsNullable();
         var name = ResolveTypeName(type);
         if (name == string.Empty)
             throw new NotImplementedException($"Not implemented type: {type.Name}");
@@ -136,14 +66,14 @@ public class TypescriptTypesGenerator
 
     private string ResolvePropertyInfoName(PropertyInfo propertyInfo)
     {
-        var isNullable = IsNullable(propertyInfo);
+        var isNullable = propertyInfo.IsNullable();
 
         return $"{propertyInfo.Name.ToTypescriptName()}{(isNullable? "?" : "")}";
     }
 
     private string ResolveParameterInfoName(ParameterInfo parameterInfo)
     {
-        var isNullable = IsNullable(parameterInfo);
+        var isNullable = parameterInfo.IsNullable();
         var name = parameterInfo.Name.ToTypescriptName();
         var typeName = ResolveTypescriptPropertyName(parameterInfo.ParameterType);
         return $"{name}{(isNullable ? "?" : "")}: {typeName}";

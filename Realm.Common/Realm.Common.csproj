@@ -6,8 +6,4 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\Realm.Common\Realm.Common.csproj" />
-  </ItemGroup>
-
 </Project>

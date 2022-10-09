@@ -1,6 +1,6 @@
-﻿namespace Realm.Scripting.Extensions;
+﻿namespace Realm.Common.Extensions;
 
-internal static class StringExtensions
+public static class StringExtensions
 {
     public static string ToTypescriptName(this string str)
     {
