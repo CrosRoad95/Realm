@@ -1,7 +1,7 @@
 ﻿namespace Realm.Interfaces.Server;
 
 [Name("Player")]
-public interface IRPGPlayer
+public interface IRPGPlayer : IMovable
 {
     string Name { get; set; }
 
