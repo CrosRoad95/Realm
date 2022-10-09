@@ -1,6 +1,6 @@
 ﻿namespace Realm.Interfaces;
 
-public interface IMtaServer
+public interface IRPGServer
 {
     event Action<IRPGPlayer>? PlayerJoined;
 }

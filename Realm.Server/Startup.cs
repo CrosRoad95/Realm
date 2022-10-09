@@ -3,12 +3,12 @@
 internal class Startup
 {
     private readonly ITestRepository _testRepository;
-    private readonly IMtaServer _server;
+    private readonly IRPGServer _server;
     private readonly IResourceProvider _resourceProvider;
     private readonly IEnumerable<IAutoStartResource> _autoStartResources;
     private readonly IEnumerable<IAsyncService> _asyncServices;
 
-    public Startup(ITestRepository testRepository, IMtaServer server, IResourceProvider resourceProvider, IEnumerable<IAutoStartResource> autoStartResources, IEnumerable<IAsyncService> asyncServices)
+    public Startup(ITestRepository testRepository, IRPGServer server, IResourceProvider resourceProvider, IEnumerable<IAutoStartResource> autoStartResources, IEnumerable<IAsyncService> asyncServices)
     {
         _testRepository = testRepository;
         _server = server;

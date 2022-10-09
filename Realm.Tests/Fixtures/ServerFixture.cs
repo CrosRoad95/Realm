@@ -2,10 +2,10 @@
 
 public class ServerFixture : IDisposable
 {
-    internal DefaultTestServer TestServer { get; private set; }
+    internal TestRPGServer TestServer { get; private set; }
     public ServerFixture()
     {
-        TestServer = new DefaultTestServer();
+        TestServer = new TestRPGServer();
         TestServer.TestServer.Start();
     }
 

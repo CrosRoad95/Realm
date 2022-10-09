@@ -1,13 +1,11 @@
-﻿using Realm.Console;
+﻿namespace Realm.Tests.TestServers;
 
-namespace Realm.Tests.TestServers;
-
-internal class DefaultTestServer : IReloadable, IMtaServer
+internal class TestRPGServer : IReloadable, IRPGServer
 {
     public MtaServer<TestRPGPlayer> TestServer { get; private set; }
     public event Action<IRPGPlayer>? PlayerJoined;
 
-    public DefaultTestServer()
+    public TestRPGServer()
     {
         var configuration = new TestConfiguration().Configuration;
         TestServer = MtaServer.CreateWithDiSupport<TestRPGPlayer>(builder =>
@@ -16,8 +14,8 @@ internal class DefaultTestServer : IReloadable, IMtaServer
             {
                 services.AddSingleton<IConsoleCommands, TestConsoleCommands>();
                 services.AddSingleton<IReloadable>(this);
-                services.AddSingleton<IMtaServer>(this);
-                services.AddSingleton(new Logger().GetLogger().ForContext<IMtaServer>());
+                services.AddSingleton<IRPGServer>(this);
+                services.AddSingleton(new Logger().GetLogger().ForContext<IRPGServer>());
             });
             builder.ConfigureServer(configuration);
         });

@@ -1,6 +1,6 @@
 ﻿namespace Realm.Server;
 
-public partial class DefaultMtaServer : IReloadable, IMtaServer
+public partial class RPGServer : IReloadable, IRPGServer
 {
     private readonly SemaphoreSlim _semaphore = new SemaphoreSlim(0);
     private readonly MtaServer<RPGPlayer> _server;
@@ -10,9 +10,9 @@ public partial class DefaultMtaServer : IReloadable, IMtaServer
 
     public event Action<IRPGPlayer>? PlayerJoined;
 
-    public DefaultMtaServer(IConfiguration configuration, ILogger logger, Action<ServerBuilder>? configureServerBuilder = null)
+    public RPGServer(IConfiguration configuration, ILogger logger, Action<ServerBuilder>? configureServerBuilder = null)
     {
-        _logger = logger.ForContext<IMtaServer>();
+        _logger = logger.ForContext<IRPGServer>();
         _serverConfiguration = configuration.GetSection("server").Get<Configuration>();
         _scriptingConfiguration = configuration.GetSection("scripting").Get<ScriptingConfiguration>();
         _server = MtaServer.CreateWithDiSupport<RPGPlayer>(
@@ -26,7 +26,7 @@ public partial class DefaultMtaServer : IReloadable, IMtaServer
                 {
                     services.AddSingleton(logger);
                     services.AddSingleton<IReloadable>(this);
-                    services.AddSingleton<IMtaServer>(this);
+                    services.AddSingleton<IRPGServer>(this);
                 });
             }
         );

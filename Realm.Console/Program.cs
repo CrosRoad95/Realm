@@ -1,4 +1,4 @@
-﻿DefaultMtaServer? server = null;
+﻿RPGServer? server = null;
 var serverConsole = new ServerConsole();
 var logger = new Logger().GetLogger();
 
@@ -13,7 +13,7 @@ logger.Information("Starting server");
 
 try
 {
-    server = new DefaultMtaServer(configuration, logger, serverBuilder =>
+    server = new RPGServer(configuration, logger, serverBuilder =>
     {
         serverBuilder.AddGuiFilesLocation("Gui");
         serverBuilder.AddLogic<TestLogic>();

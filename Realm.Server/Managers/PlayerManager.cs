@@ -3,7 +3,7 @@
 internal class PlayerManager : IPlayerManager
 {
     public event Action<IRPGPlayer>? PlayerJoined;
-    public PlayerManager(IMtaServer mtaServer)
+    public PlayerManager(IRPGServer mtaServer)
     {
         mtaServer.PlayerJoined += MtaServer_PlayerJoined;
     }
@@ -12,4 +12,5 @@ internal class PlayerManager : IPlayerManager
     {
         PlayerJoined?.Invoke(rpgPlayer);
     }
+
 }
