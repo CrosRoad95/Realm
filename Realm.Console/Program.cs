@@ -1,4 +1,6 @@
 ﻿DefaultMtaServer? server = null;
+var serverConsole = new ServerConsole();
+var logger = new Logger().GetLogger();
 
 var configuration = new ConfigurationBuilder()
     .AddJsonFile("appsettings.json", false)
@@ -7,13 +9,11 @@ var configuration = new ConfigurationBuilder()
     .AddEnvironmentVariables()
     .Build();
 
-Console.WriteLine("Starting server");
-
-var serverConsole = new ServerConsole();
+logger.Information("Starting server");
 
 try
 {
-    server = new DefaultMtaServer(configuration, serverBuilder =>
+    server = new DefaultMtaServer(configuration, logger, serverBuilder =>
     {
         serverBuilder.AddGuiFilesLocation("Gui");
         serverBuilder.AddLogic<TestLogic>();
@@ -32,15 +32,6 @@ try
 }
 catch (Exception exception)
 {
-    if (server != null)
-    {
-        //program.Logger.LogCritical(exception, "{message}", exception.Message);
-        Console.WriteLine($"Error in startup {exception.Message}");
-    }
-    else
-    {
-        Console.WriteLine($"Error in startup {exception.Message}");
-    }
-    Console.WriteLine("Press any key to exit...");
-    Console.Read();
+    logger.Error(exception, "Error in startup");
+    Thread.Sleep(2000);
 }

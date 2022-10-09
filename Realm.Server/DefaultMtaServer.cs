@@ -6,13 +6,13 @@ public partial class DefaultMtaServer : IReloadable, IMtaServer
     private readonly MtaServer<RPGPlayer> _server;
     private readonly Configuration _serverConfiguration;
     private readonly ScriptingConfiguration _scriptingConfiguration;
+    private readonly ILogger _logger;
 
     public event Action<IRPGPlayer>? PlayerJoined;
 
-    public ILogger Logger { get; }
-
-    public DefaultMtaServer(IConfiguration configuration, Action<ServerBuilder>? configureServerBuilder = null)
+    public DefaultMtaServer(IConfiguration configuration, ILogger logger, Action<ServerBuilder>? configureServerBuilder = null)
     {
+        _logger = logger.ForContext<IMtaServer>();
         _serverConfiguration = configuration.GetSection("server").Get<Configuration>();
         _scriptingConfiguration = configuration.GetSection("scripting").Get<ScriptingConfiguration>();
         _server = MtaServer.CreateWithDiSupport<RPGPlayer>(
@@ -24,6 +24,7 @@ public partial class DefaultMtaServer : IReloadable, IMtaServer
 
                 builder.ConfigureServices(services =>
                 {
+                    services.AddSingleton(logger);
                     services.AddSingleton<IReloadable>(this);
                     services.AddSingleton<IMtaServer>(this);
                 });
@@ -33,8 +34,6 @@ public partial class DefaultMtaServer : IReloadable, IMtaServer
         _server.GameType = serverListConfiguration.GameType;
         _server.MapName = serverListConfiguration.MapName;
         _server.PlayerJoined += e => PlayerJoined?.Invoke(e);
-
-        Logger = _server.GetRequiredService<ILogger>();
 
         var startup = _server.GetRequiredService<Startup>();
 
@@ -68,7 +67,7 @@ public partial class DefaultMtaServer : IReloadable, IMtaServer
         if (_scriptingConfiguration.Enabled)
             StartScripting();
 
-        Console.WriteLine("Server started at port: {0}", _serverConfiguration.Port);
+        _logger.Information("Server started at port: {port}", _serverConfiguration.Port);
         _server.Start();
         await _semaphore.WaitAsync();
     }

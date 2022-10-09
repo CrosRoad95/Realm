@@ -1,4 +1,6 @@
-﻿namespace Realm.Tests.TestServers;
+﻿using Realm.Console;
+
+namespace Realm.Tests.TestServers;
 
 internal class DefaultTestServer : IReloadable, IMtaServer
 {
@@ -15,6 +17,7 @@ internal class DefaultTestServer : IReloadable, IMtaServer
                 services.AddSingleton<IConsoleCommands, TestConsoleCommands>();
                 services.AddSingleton<IReloadable>(this);
                 services.AddSingleton<IMtaServer>(this);
+                services.AddSingleton(new Logger().GetLogger().ForContext<IMtaServer>());
             });
             builder.ConfigureServer(configuration);
         });

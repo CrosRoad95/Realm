@@ -22,3 +22,4 @@ global using Realm.Interfaces.Common;
 global using Realm.Interfaces;
 global using Realm.Server;
 global using Realm.Interfaces.Scripting.Classes;
+global using Realm.Console;

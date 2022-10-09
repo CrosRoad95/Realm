@@ -3,11 +3,11 @@ global using System.Collections.Generic;
 global using System.Linq;
 global using System.Numerics;
 global using System.Threading.Tasks;
-global using Microsoft.Extensions.Logging;
 global using Microsoft.Extensions.Hosting;
 global using Microsoft.EntityFrameworkCore;
 global using Microsoft.Extensions.DependencyInjection;
 global using Microsoft.Extensions.Configuration;
+global using Serilog;
 
 global using SlipeServer.Server.Elements;
 global using SlipeServer.Server;

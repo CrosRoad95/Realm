@@ -30,11 +30,14 @@ internal class Javascript : IScripting
 {
     private readonly V8ScriptEngine _engine;
     private readonly TypescriptTypesGenerator _typescriptTypesGenerator;
-    public Javascript(IWorld world, IEvent @event)
+    private readonly ILogger _logger;
+
+    public Javascript(ILogger logger, IWorld world, IEvent @event)
     {
         HostSettings.CustomAttributeLoader = new LowercaseSymbolsLoader();
         _engine = new V8ScriptEngine();
         _typescriptTypesGenerator = new TypescriptTypesGenerator();
+        _logger = logger.ForContext<IScripting>();
 
         _engine.DocumentSettings.Loader = new CustomDocumentLoader();
         _engine.DocumentSettings.AccessFlags = DocumentAccessFlags.EnableAllLoading;
@@ -96,7 +99,7 @@ internal class Javascript : IScripting
         }
         catch(ScriptEngineException ex)
         {
-            Console.WriteLine("Javascript exception: {0}", ex);
+            _logger.Error(ex, "Failed to execute");
         }
     }
 

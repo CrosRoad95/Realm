@@ -1,16 +1,20 @@
-﻿namespace Realm.Discord;
+﻿using Serilog;
+
+namespace Realm.Discord;
 
 internal class DiscordIntegration : IDiscord, IAsyncService
 {
     private readonly DiscordSocketClient _client;
     private readonly DiscordConfiguration _discordConfiguration;
     private readonly IStatusChannel _statusChannel;
+    private readonly ILogger _logger;
 
-    public DiscordIntegration(DiscordConfiguration discordConfiguration, IStatusChannel statusChannel)
+    public DiscordIntegration(DiscordConfiguration discordConfiguration, IStatusChannel statusChannel, ILogger logger)
     {
         _client = new DiscordSocketClient();
         _discordConfiguration = discordConfiguration;
         _statusChannel = statusChannel;
+        _logger = logger.ForContext<IDiscord>();
         _client.Ready += ClientReady;
         _client.Log += LogAsync;
     }
@@ -33,7 +37,7 @@ internal class DiscordIntegration : IDiscord, IAsyncService
 
     private Task LogAsync(LogMessage log)
     {
-        //Console.WriteLine(log.ToString());
+        _logger.Information(log.ToString());
         return Task.CompletedTask;
     }
 }
