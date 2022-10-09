@@ -1,4 +1,5 @@
-﻿using System.Collections.ObjectModel;
+﻿using Realm.Interfaces.Attributes;
+using System.Collections.ObjectModel;
 
 namespace Realm.Scripting;
 
@@ -155,7 +156,12 @@ public class TypescriptTypesGenerator
     {
         var sb = new StringBuilder();
         var extends = type == typeof(object) ? "" : " extends Object";
-        sb.AppendLine($"export interface {type.Name}{extends} {{");
+        var nameAttribute = type.GetCustomAttribute<NameAttribute>();
+        var className = type.Name;
+        if (nameAttribute != null)
+            className = nameAttribute.Name;
+
+        sb.AppendLine($"export interface {className}{extends} {{");
 
         foreach (var propertyInfo in type.GetProperties())
         {
@@ -165,7 +171,7 @@ public class TypescriptTypesGenerator
         }
         
         foreach (var methodInfo in type.GetMethods()
-            .Where(x => x.DeclaringType == type && !x.IsSpecialName))
+            .Where(x => (type.IsInterface || x.DeclaringType == type) && !x.IsSpecialName))
         {
             var methodName = methodInfo.Name.ToTypescriptName();
             var parameters = string.Join(", ", methodInfo.GetParameters().Select(ResolveParameterInfoName));

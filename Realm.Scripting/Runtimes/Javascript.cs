@@ -39,7 +39,7 @@ internal class Javascript : IScripting
         _engine.DocumentSettings.Loader = new CustomDocumentLoader();
         _engine.DocumentSettings.AccessFlags = DocumentAccessFlags.EnableAllLoading;
 
-        AddHostType(typeof(JavaScriptExtensions), "javaScriptExtensions");
+        AddHostType(typeof(JavaScriptExtensions));
         AddHostType(typeof(Vector2));
         AddHostType(typeof(Vector4));
         AddHostType(typeof(Vector3));
@@ -48,7 +48,7 @@ internal class Javascript : IScripting
         AddHostType(typeof(Console));
         AddHostType(typeof(Type));
 
-        AddHostType(typeof(IRPGPlayer), "Player");
+        AddHostType(typeof(IRPGPlayer));
         AddHostType(typeof(World));
         AddHostType(typeof(Spawn));
 
@@ -64,9 +64,9 @@ internal class Javascript : IScripting
         return _typescriptTypesGenerator.Build();
     }
 
-    public void AddHostType(Type type, string? customName = null)
+    public void AddHostType(Type type)
     {
-        _engine.AddHostType(customName ?? type.Name, type);
+        _engine.AddHostType(type.Name, type);
         _typescriptTypesGenerator.AddType(type);
     }
 

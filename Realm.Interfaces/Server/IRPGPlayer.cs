@@ -1,7 +1,6 @@
-﻿using Realm.Interfaces.Scripting.Classes;
+﻿namespace Realm.Interfaces.Server;
 
-namespace Realm.Interfaces.Server;
-
+[Name("Player")]
 public interface IRPGPlayer
 {
     string Name { get; set; }
