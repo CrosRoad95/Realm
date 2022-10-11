@@ -2,7 +2,7 @@
 using Serilog;
 using Serilog.Events;
 
-namespace Realm.Console;
+namespace Realm.Logging;
 
 public class Logger
 {

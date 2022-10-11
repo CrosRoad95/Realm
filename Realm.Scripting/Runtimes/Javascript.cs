@@ -17,7 +17,9 @@ class CustomDocumentLoader : DocumentLoader
 {
     public override async Task<Document> LoadDocumentAsync(DocumentSettings settings, DocumentInfo? sourceInfo, string specifier, DocumentCategory category, DocumentContextCallback contextCallback)
     {
-        var file = await File.ReadAllTextAsync(Path.Join("Server", specifier));
+        var path = Path.GetDirectoryName(
+              System.Reflection.Assembly.GetExecutingAssembly().GetName().CodeBase)[6..];
+        var file = await File.ReadAllTextAsync(Path.Join(path, "Server", specifier));
         return new StringDocument(new DocumentInfo(specifier)
         {
             Category = category,

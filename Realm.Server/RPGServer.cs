@@ -60,7 +60,9 @@ public partial class RPGServer : IReloadable, IRPGServer
 
     private void StartScripting()
     {
-        InitializeScripting("Server/startup.js");
+        var path = Path.GetDirectoryName(
+              System.Reflection.Assembly.GetExecutingAssembly().GetName().CodeBase)[6..];
+        InitializeScripting(Path.Join(path, "Server/startup.js"));
     }
 
     public async Task Start()
