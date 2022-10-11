@@ -21,7 +21,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Realm.Interfaces", "Realm.I
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Realm.Tests", "Realm.Tests\Realm.Tests.csproj", "{34808A81-F2EA-4B91-A69C-8B0D47AA02F4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Realm.Common", "Realm.Common\Realm.Common.csproj", "{DB48C5CE-FDDA-4790-8D40-97320F39F65C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Realm.Common", "Realm.Common\Realm.Common.csproj", "{DB48C5CE-FDDA-4790-8D40-97320F39F65C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Realm.Configuration", "Realm.Configuration\Realm.Configuration.csproj", "{22B462AD-74A2-44F2-9D20-6B4C78CF4681}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -65,6 +67,10 @@ Global
 		{DB48C5CE-FDDA-4790-8D40-97320F39F65C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DB48C5CE-FDDA-4790-8D40-97320F39F65C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DB48C5CE-FDDA-4790-8D40-97320F39F65C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{22B462AD-74A2-44F2-9D20-6B4C78CF4681}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{22B462AD-74A2-44F2-9D20-6B4C78CF4681}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{22B462AD-74A2-44F2-9D20-6B4C78CF4681}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{22B462AD-74A2-44F2-9D20-6B4C78CF4681}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -1,6 +1,6 @@
-﻿namespace Realm.Server.Data.Configurations;
+﻿namespace Realm.Configuration.Configurations;
 
-internal class ServerListConfiguration
+public class ServerListConfiguration
 {
     public string GameType { get; set; } = "New-Realm";
     public string MapName { get; set; } = "N/A";

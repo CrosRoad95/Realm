@@ -4,7 +4,7 @@ public static class ServerBuilderExtensions
 {
     public static ServerBuilder ConfigureServer(this ServerBuilder builder, IConfiguration configuration)
     {
-        var _serverConfiguration = configuration.GetSection("server").Get<Configuration>();
+        var _serverConfiguration = configuration.GetSection("server").Get<SlipeServerConfiguration>();
         var _scriptingConfiguration = configuration.GetSection("scripting").Get<ScriptingConfiguration>();
         builder.UseConfiguration(_serverConfiguration);
 #if DEBUG

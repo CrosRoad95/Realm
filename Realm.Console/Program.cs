@@ -1,14 +1,7 @@
 ﻿RPGServer? server = null;
 var serverConsole = new ServerConsole();
 var logger = new Logger().GetLogger();
-
-var configuration = new ConfigurationBuilder()
-    .AddJsonFile("appsettings.json", false)
-    .AddJsonFile("appsettings.development.json", true, true)
-    .AddJsonFile("appsettings.local.json", true, true)
-    .AddEnvironmentVariables()
-    .Build();
-
+var configuration = new Realm.Configuration.ConfigurationProvider();
 logger.Information("Starting server");
 
 try
@@ -23,7 +16,7 @@ try
         });
     });
     var serverTask = Task.Run(server.Start);
-    if(configuration.GetSection("DOTNET_RUNNING_IN_CONTAINER").Value == "true")
+    if(configuration.Get<bool>("DOTNET_RUNNING_IN_CONTAINER") == true)
     {
         serverTask.Wait();
     }

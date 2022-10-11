@@ -1,5 +1,4 @@
 ﻿global using Microsoft.Extensions.DependencyInjection;
-global using Microsoft.Extensions.Configuration;
 global using System;
 global using System.Collections.Generic;
 global using System.Linq;
@@ -13,3 +12,4 @@ global using Realm.Interfaces;
 global using Realm.Interfaces.Discord;
 global using Realm.Discord.Classes;
 global using Realm.Discord.Providers;
+global using Realm.Configuration;

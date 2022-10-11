@@ -4,33 +4,34 @@ public partial class RPGServer : IReloadable, IRPGServer
 {
     private readonly SemaphoreSlim _semaphore = new SemaphoreSlim(0);
     private readonly MtaServer<RPGPlayer> _server;
-    private readonly Configuration _serverConfiguration;
+    private readonly SlipeServerConfiguration _serverConfiguration;
     private readonly ScriptingConfiguration _scriptingConfiguration;
     private readonly ILogger _logger;
 
     public event Action<IRPGPlayer>? PlayerJoined;
 
-    public RPGServer(IConfiguration configuration, ILogger logger, Action<ServerBuilder>? configureServerBuilder = null)
+    public RPGServer(ConfigurationProvider configurationProvider, ILogger logger, Action<ServerBuilder>? configureServerBuilder = null)
     {
         _logger = logger.ForContext<IRPGServer>();
-        _serverConfiguration = configuration.GetSection("server").Get<Configuration>();
-        _scriptingConfiguration = configuration.GetSection("scripting").Get<ScriptingConfiguration>();
+        _serverConfiguration = configurationProvider.Get<SlipeServerConfiguration>("server");
+        _scriptingConfiguration = configurationProvider.Get<ScriptingConfiguration>("scripting");
         _server = MtaServer.CreateWithDiSupport<RPGPlayer>(
             builder =>
             {
-                builder.ConfigureServer(configuration);
+                builder.ConfigureServer(configurationProvider.Configuration);
                 if (configureServerBuilder != null)
                     configureServerBuilder(builder);
 
                 builder.ConfigureServices(services =>
                 {
+                    services.AddSingleton(configurationProvider);
                     services.AddSingleton(logger);
                     services.AddSingleton<IReloadable>(this);
                     services.AddSingleton<IRPGServer>(this);
                 });
             }
         );
-        var serverListConfiguration = configuration.GetSection("serverList").Get<ServerListConfiguration>();
+        var serverListConfiguration = configurationProvider.Get<ServerListConfiguration>("serverList");
         _server.GameType = serverListConfiguration.GameType;
         _server.MapName = serverListConfiguration.MapName;
         _server.PlayerJoined += e => PlayerJoined?.Invoke(e);
