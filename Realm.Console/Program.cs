@@ -1,5 +1,5 @@
 ﻿using Realm.Console;
-using Realm.Interfaces.Server;
+using Realm.Logging;
 using Realm.MTARPGServer;
 
 var serverConsole = new ServerConsole();

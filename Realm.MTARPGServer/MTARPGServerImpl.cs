@@ -5,7 +5,7 @@ public class MTARPGServerImpl
     private readonly RPGServer _rpgServer;
     private readonly Configuration.ConfigurationProvider _configurationProvider;
 
-    private RPGServer Server => _rpgServer;
+    public RPGServer Server => _rpgServer;
 
     public MTARPGServerImpl(IConsoleCommands consoleCommands, ILogger logger, Realm.Configuration.ConfigurationProvider configurationProvider)
     {
