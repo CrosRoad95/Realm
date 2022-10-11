@@ -15,19 +15,11 @@
   <ItemGroup>
     <ProjectReference Include="..\Realm.Configuration\Realm.Configuration.csproj" />
     <ProjectReference Include="..\Realm.Discord\Realm.Discord.csproj" />
+    <ProjectReference Include="..\Realm.MTARPGServer\Realm.MTARPGServer.csproj" />
     <ProjectReference Include="..\Realm.Server\Realm.Server.csproj" />
   </ItemGroup>
   <ItemGroup>
     <None Update="appsettings.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="Gui\Login.lua">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="Server\startup.js">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="Server\Test\test.js">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>

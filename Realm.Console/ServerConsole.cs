@@ -1,4 +1,6 @@
-﻿namespace Realm.Console;
+﻿using Realm.Interfaces.Server;
+
+namespace Realm.Console;
 
 internal class ServerConsole : IConsoleCommands
 {
@@ -18,5 +20,5 @@ internal class ServerConsole : IConsoleCommands
         {
 
         }
-    }   
+    }
 }

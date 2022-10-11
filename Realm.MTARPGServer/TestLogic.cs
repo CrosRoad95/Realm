@@ -1,4 +1,4 @@
-﻿namespace Realm.Console;
+﻿namespace Realm.MTARPGServer;
 
 internal class TestLogic
 {

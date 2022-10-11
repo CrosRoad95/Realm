@@ -1,4 +1,8 @@
-﻿namespace Realm.Console;
+﻿using Realm.Interfaces.Discord;
+using Serilog;
+using Serilog.Events;
+
+namespace Realm.Console;
 
 public class Logger
 {
