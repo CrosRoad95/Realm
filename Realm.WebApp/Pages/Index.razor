@@ -1,9 +1,33 @@
 ﻿@page "/"
+@inject RPGServer server;
 
 <PageTitle>Index</PageTitle>
 
-<h1>Hello, world!</h1>
+<h1>Players joined recently:</h1>
 
-Welcome to your new app.
+<ul>
+@foreach (var pair in _players)
+{
+    <li>@pair.Item1: @pair.Item2.Name</li>
+}
+</ul>
 
-<SurveyPrompt Title="How is Blazor working for you?" />
+@code{
+    private List<(DateTime, IRPGPlayer)> _players = new();
+
+    private void PlayerJoined(IRPGPlayer player)
+    {
+        InvokeAsync(() =>
+        {
+            _players.Add((DateTime.Now, player));
+            StateHasChanged();
+        });
+    }
+
+    protected override void OnInitialized()
+    {
+        server.PlayerJoined += PlayerJoined;
+        base.OnInitialized();
+    }
+
+}

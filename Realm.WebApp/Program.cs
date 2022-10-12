@@ -24,7 +24,7 @@ var server = new MTARPGServerImpl(serverConsole, logger, _configurationProvider)
 server.Start();
 Directory.SetCurrentDirectory(previousDirectory);
 
-builder.Services.AddSingleton(server);
+builder.Services.AddSingleton(server.Server);
 builder.Services.AddSingleton<WeatherForecastService>();
 
 var app = builder.Build();

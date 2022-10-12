@@ -47,6 +47,11 @@ public partial class RPGServer : IReloadable, IRPGServer
         };
     }
 
+    public TService GetRequiredService<TService>() where TService: notnull
+    {
+        return _server.GetRequiredService<TService>();
+    }
+
     public void InitializeScripting(string fileName)
     {
         var code = File.ReadAllText(fileName);
