@@ -29,4 +29,9 @@ internal class TestRPGServer : IReloadable, IRPGServer
     }
 
     public int GetPriority() => int.MaxValue;
+
+    public TService GetRequiredService<TService>() where TService : notnull
+    {
+        return TestServer.GetRequiredService<TService>();
+    }
 }
