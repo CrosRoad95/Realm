@@ -37,11 +37,16 @@ public class LowercaseSymbolsLoader : CustomAttributeLoader
 
 class CustomDocumentLoader : DocumentLoader
 {
+    private readonly string _basePath;
+
+    public CustomDocumentLoader(string basePath)
+    {
+        _basePath = basePath;
+    }
+
     public override async Task<Document> LoadDocumentAsync(DocumentSettings settings, DocumentInfo? sourceInfo, string specifier, DocumentCategory category, DocumentContextCallback contextCallback)
     {
-        var path = Path.GetDirectoryName(
-              System.Reflection.Assembly.GetExecutingAssembly().GetName().CodeBase)[6..];
-        var file = await File.ReadAllTextAsync(Path.Join(path, "Server", specifier));
+        var file = await File.ReadAllTextAsync(Path.Join(_basePath, "Server", specifier));
         return new StringDocument(new DocumentInfo(specifier)
         {
             Category = category,
@@ -56,14 +61,14 @@ internal class Javascript : IScripting
     private readonly TypescriptTypesGenerator _typescriptTypesGenerator;
     private readonly ILogger _logger;
 
-    public Javascript(ILogger logger, IWorld world, IEvent @event)
+    public Javascript(ILogger logger, IWorld world, IEvent @event, Func<string> basePathFactory)
     {
         HostSettings.CustomAttributeLoader = new LowercaseSymbolsLoader();
         _engine = new V8ScriptEngine();
         _typescriptTypesGenerator = new TypescriptTypesGenerator();
         _logger = logger.ForContext<IScripting>();
 
-        _engine.DocumentSettings.Loader = new CustomDocumentLoader();
+        _engine.DocumentSettings.Loader = new CustomDocumentLoader(basePathFactory());
         _engine.DocumentSettings.AccessFlags = DocumentAccessFlags.EnableAllLoading;
 
         AddHostType(typeof(JavaScriptExtensions));

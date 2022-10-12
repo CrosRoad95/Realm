@@ -54,19 +54,27 @@ public partial class RPGServer : IReloadable, IRPGServer
 
     public void InitializeScripting(string fileName)
     {
-        var code = File.ReadAllText(fileName);
-        var scripting = _server.GetRequiredService<IScripting>();
-        scripting.Execute(code, fileName);
+        _logger.Information("Initializing startup.js: {fileName}", fileName);
+        try
+        {
+            var code = File.ReadAllText(fileName);
+            var scripting = _server.GetRequiredService<IScripting>();
+            scripting.Execute(code, fileName);
 
-        var typescriptDefinitions = scripting.GetTypescriptDefinition();
-        var directory = Path.GetDirectoryName(fileName);
-        File.WriteAllText(Path.Join(directory,"types.ts"), typescriptDefinitions);
+            var typescriptDefinitions = scripting.GetTypescriptDefinition();
+            var directory = Path.GetDirectoryName(fileName);
+            File.WriteAllText(Path.Join(directory,"types.ts"), typescriptDefinitions);
+            _logger.Information("Scripting initialized, created types.js");
+        }
+        catch(Exception ex)
+        {
+            _logger.Error(ex, "Failed to initialize scripting!");
+        }
     }
 
     private void StartScripting()
     {
-        var path = Path.GetDirectoryName(
-              System.Reflection.Assembly.GetExecutingAssembly().GetName().CodeBase)[6..];
+        var path = _server.GetRequiredService<Func<string>>()();
         InitializeScripting(Path.Join(path, "Server/startup.js"));
     }
 

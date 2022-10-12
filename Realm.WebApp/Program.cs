@@ -20,7 +20,7 @@ var path = System.IO.Path.GetDirectoryName(
 
 var previousDirectory = Directory.GetCurrentDirectory();
 Directory.SetCurrentDirectory(path);
-var server = new MTARPGServerImpl(serverConsole, logger, _configurationProvider);
+var server = new MTARPGServerImpl(serverConsole, logger, _configurationProvider, path);
 server.Start();
 Directory.SetCurrentDirectory(previousDirectory);
 

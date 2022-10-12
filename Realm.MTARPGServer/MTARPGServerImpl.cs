@@ -7,7 +7,7 @@ public class MTARPGServerImpl
 
     public RPGServer Server => _rpgServer;
 
-    public MTARPGServerImpl(IConsoleCommands consoleCommands, ILogger logger, Realm.Configuration.ConfigurationProvider configurationProvider)
+    public MTARPGServerImpl(IConsoleCommands consoleCommands, ILogger logger, Realm.Configuration.ConfigurationProvider configurationProvider, string basePath = "")
     {
         logger.Information("Starting server");
         _configurationProvider = configurationProvider;
@@ -19,6 +19,7 @@ public class MTARPGServerImpl
             serverBuilder.ConfigureServices(services =>
             {
                 services.AddSingleton(consoleCommands);
+                services.AddSingleton<Func<string>>(() => basePath);
             });
         });
         _configurationProvider = configurationProvider;
