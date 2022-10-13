@@ -3,6 +3,11 @@
 public class TestRPGPlayer : TestingPlayer, IRPGPlayer
 {
     public CancellationToken CancellationToken { get; private set; }
+
+    public new string Id => Name;
+
+    public bool IsPersistant => true;
+
     private readonly CancellationTokenSource _cancellationTokenSource;
 
     public event Action<IRPGPlayer, int>? ResourceReady;

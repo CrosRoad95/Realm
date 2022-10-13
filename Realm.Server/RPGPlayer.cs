@@ -9,6 +9,8 @@ public class RPGPlayer : Player, IRPGPlayer
     private readonly CancellationTokenSource _cancellationTokenSource;
     private readonly LuaValueMapper _luaValueMapper;
 
+    public bool IsPersistant => true;
+    public new string Id => Name;
     public CancellationToken CancellationToken { get; private set; }
     public event Action<IRPGPlayer, int>? ResourceReady;
     public RPGPlayer(LuaValueMapper luaValueMapper)

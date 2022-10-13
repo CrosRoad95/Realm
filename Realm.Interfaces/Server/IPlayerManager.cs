@@ -1,8 +1,6 @@
 ﻿namespace Realm.Interfaces.Server;
 
-public interface IPlayerManager
+public interface IPlayerManager : ICommonManager
 {
     event Action<IRPGPlayer>? PlayerJoined;
-
-    IRPGPlayer[] GetAll();
 }

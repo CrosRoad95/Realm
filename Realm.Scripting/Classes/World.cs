@@ -17,22 +17,27 @@ public class World : IWorld
         return spawn;
     }
 
+    private ICommonManager GetManagerByType(string type)
+    {
+        return type switch
+        {
+            "spawn" => _spawnManager,
+            "player" => _playerManager,
+            _ => throw new ScriptEngineException($"Unsupported element type '{type}'")
+        };
+    }
+
     public object GetElementsByType(string type)
     {
-        object[] elements;
-        switch(type)
-        {
-            case "spawn":
-                elements = _spawnManager.GetAll();
-                break;
-            case "player":
-                elements = _playerManager.GetAll();
-                break;
-            default:
-                throw new ScriptEngineException($"Unsupported element type '{type}'");
-        }
-
+        var manager = GetManagerByType(type);
+        var elements = manager.GetAll();
         return elements.ToScriptArray();
+    }
+    
+    public IElement? GetElementByTypeAndId(string type, string id)
+    {
+        var manager = GetManagerByType(type);
+        return manager.GetById(id);
     }
 
     public override string ToString() => "World";

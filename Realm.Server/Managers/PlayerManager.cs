@@ -20,6 +20,7 @@ internal class PlayerManager : IPlayerManager
         PlayerJoined?.Invoke(rpgPlayer);
     }
 
-    public IRPGPlayer[] GetAll() => _elementCollection.GetByType<RPGPlayer>().ToArray();
+    public IElement[] GetAll() => _elementCollection.GetByType<RPGPlayer>().ToArray();
 
+    public IElement? GetById(string id) => _elementCollection.GetByType<RPGPlayer>().FirstOrDefault(x => x.Id == id);
 }

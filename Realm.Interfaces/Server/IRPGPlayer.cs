@@ -1,7 +1,7 @@
 ﻿namespace Realm.Interfaces.Server;
 
 [Name("Player")]
-public interface IRPGPlayer : IMovable
+public interface IRPGPlayer : IElement, IMovable
 {
     string Name { get; set; }
     CancellationToken CancellationToken { get; }

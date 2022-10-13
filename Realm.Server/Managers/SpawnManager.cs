@@ -12,5 +12,11 @@ internal class SpawnManager : ISpawnManager
         return spawn;
     }
 
-    public ISpawn[] GetAll() => _spawns.Values.ToArray();
+    public IElement[] GetAll() => _spawns.Values.ToArray();
+
+    public IElement? GetById(string id)
+    {
+        _spawns.TryGetValue(id, out var spawn);
+        return spawn;
+    }
 }
