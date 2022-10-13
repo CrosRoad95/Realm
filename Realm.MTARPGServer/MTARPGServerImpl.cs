@@ -10,10 +10,11 @@ public class MTARPGServerImpl
 
     public RPGServer Server => _rpgServer;
 
-    public MTARPGServerImpl(IConsoleCommands consoleCommands, ILogger logger, Realm.Configuration.ConfigurationProvider configurationProvider, string basePath = "")
+    public MTARPGServerImpl(IConsoleCommands consoleCommands, ILogger logger, Realm.Configuration.ConfigurationProvider configurationProvider, string? basePath = null)
     {
         var previousDirectory = Directory.GetCurrentDirectory();
-        Directory.SetCurrentDirectory(basePath);
+        if(basePath != null)
+            Directory.SetCurrentDirectory(basePath);
         logger.Information("Starting server");
         _configurationProvider = configurationProvider;
         _basePath = basePath;
@@ -33,7 +34,8 @@ public class MTARPGServerImpl
     public void Start()
     {
         var previousDirectory = Directory.GetCurrentDirectory();
-        Directory.SetCurrentDirectory(_basePath);
+        if(_basePath != null)
+            Directory.SetCurrentDirectory(_basePath);
         var serverTask = Task.Run(_rpgServer.Start);
         Directory.SetCurrentDirectory(previousDirectory);
     }

@@ -15,10 +15,12 @@ public class ConfigurationProvider
 
     public T Get<T>(string name) => Configuration.GetSection(name).Get<T>();
 
-    public static IConfigurationBuilder AddRealmConfiguration(IConfigurationBuilder configurationBuilder, string basePath = "")
+    public static IConfigurationBuilder AddRealmConfiguration(IConfigurationBuilder configurationBuilder, string? basePath = null)
     {
         var previousDirectory = Directory.GetCurrentDirectory();
-        Directory.SetCurrentDirectory(basePath);
+        if(basePath != null)
+            Directory.SetCurrentDirectory(basePath);
+
         configurationBuilder = configurationBuilder
             .AddJsonFile(Path.Join(basePath, "appsettings.server.json"), false)
             .AddJsonFile(Path.Join(basePath, "appsettings.server.development.json"), true, true)
