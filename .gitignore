@@ -2,5 +2,5 @@ Realm.Console/.vs/
 bin/
 obj/
 .vs/
-Realm.Configuration/appsettings.local.json
 RealmRPG/Server/types.ts
+Realm.Configuration/appsettings.server.local.json
