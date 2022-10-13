@@ -6,7 +6,7 @@ public class MTARPGServerImpl
 {
     private readonly RPGServer _rpgServer;
     private readonly Configuration.ConfigurationProvider _configurationProvider;
-    private readonly string _basePath;
+    private readonly string? _basePath;
 
     public RPGServer Server => _rpgServer;
 
@@ -25,7 +25,7 @@ public class MTARPGServerImpl
             serverBuilder.ConfigureServices(services =>
             {
                 services.AddSingleton(consoleCommands);
-                services.AddSingleton<Func<string>>(() => basePath);
+                services.AddSingleton<Func<string?>>(() => basePath);
             });
         });
         Directory.SetCurrentDirectory(previousDirectory);

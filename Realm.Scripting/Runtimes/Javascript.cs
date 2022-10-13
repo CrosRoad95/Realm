@@ -39,9 +39,9 @@ class CustomDocumentLoader : DocumentLoader
 {
     private readonly string _basePath;
 
-    public CustomDocumentLoader(string basePath)
+    public CustomDocumentLoader(string? basePath = null)
     {
-        _basePath = basePath;
+        _basePath = basePath ?? "";
     }
 
     public override async Task<Document> LoadDocumentAsync(DocumentSettings settings, DocumentInfo? sourceInfo, string specifier, DocumentCategory category, DocumentContextCallback contextCallback)
@@ -61,7 +61,7 @@ internal class Javascript : IScripting
     private readonly TypescriptTypesGenerator _typescriptTypesGenerator;
     private readonly ILogger _logger;
 
-    public Javascript(ILogger logger, IWorld world, IEvent @event, Func<string> basePathFactory)
+    public Javascript(ILogger logger, IWorld world, IEvent @event, Func<string?> basePathFactory)
     {
         HostSettings.CustomAttributeLoader = new LowercaseSymbolsLoader();
         _engine = new V8ScriptEngine();
