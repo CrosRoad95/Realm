@@ -3,5 +3,5 @@
 [Name("World")]
 public interface IWorld
 {
-    ISpawn CreateSpawn(string name, Vector3 position, Vector3? rotation = null);
+    ISpawn CreateSpawn(string id, string name, Vector3 position, Vector3? rotation = null);
 }

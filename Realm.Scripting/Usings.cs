@@ -23,3 +23,4 @@ global using Realm.Scripting.Extensions;
 global using Realm.Scripting.Classes.Events;
 global using Realm.Interfaces.Common;
 global using Realm.Common.Extensions;
+global using Realm.Scripting.Scopes;

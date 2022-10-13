@@ -8,11 +8,19 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Realm.Server\Realm.Server.csproj" />
+    <PackageReference Include="YamlDotNet" Version="12.0.2" />
+    <PackageReference Include="FluentValidation" Version="11.2.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+	  <ProjectReference Include="..\Realm.Server\Realm.Server.csproj" />
   </ItemGroup>
 
   <ItemGroup>
     <None Update="Gui\Login.lua">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="provisioning.yaml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="Server\startup.js">

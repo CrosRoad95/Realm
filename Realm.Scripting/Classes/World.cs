@@ -11,9 +11,9 @@ public class World : IWorld
         _playerManager = playerManager;
     }
 
-    public ISpawn CreateSpawn(string name, Vector3 position, Vector3? rotation = null)
+    public ISpawn CreateSpawn(string id, string name, Vector3 position, Vector3? rotation = null)
     {
-        var spawn = _spawnManager.CreateSpawn(name, position, rotation ?? Vector3.Zero);
+        var spawn = _spawnManager.CreateSpawn(id, name, position, rotation ?? Vector3.Zero);
         return spawn;
     }
 

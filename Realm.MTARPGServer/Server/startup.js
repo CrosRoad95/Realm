@@ -1,10 +1,9 @@
 ﻿import * as TestModule from "Test/test.js"
 
 Console.writeLine("Module: {0}", TestModule.test)
-const spawnA = World.createSpawn("test", new Vector3(0, 2, 3));
-const spawnB = World.createSpawn("test", new Vector3(0, 10, 3));
+const spawnA = World.createSpawn("dynamicSpawn", "test", new Vector3(0, 20, 3));
 
-Console.writeLine("Spawns ids: {0} {1}", spawnA, spawnB.id)
+Console.writeLine("Spawns ids: {0} {1}", spawnA.id, spawnA.isPersistant)
 
 Event.addHandler("onPlayerJoin", ({ player }) => {
     Console.writeLine("player joined: {0} {1}", String(player), player.name);
@@ -15,9 +14,14 @@ const func = () => Console.writeLine("you should not see this");
 Event.addHandler("onPlayerJoin", func);
 Event.removeHandler("onPlayerJoin", func);
 
-Console.writeLine("All spawns: {0}", World.getElementsByType("spawn").length);
+const spawns = World.getElementsByType("spawn");
+Console.writeLine("All spawns: {0}", spawns.length);
+for (var key in spawns) {
+    Console.writeLine("Spawn: {0} = {1}, persistant: {2}", key, spawns[key].name, spawns[key].isPersistant);
+}
 
 const plrs = World.getElementsByType("player")
+Console.writeLine("All players: {0}", plrs.length);
 for (var key in plrs) {
     Console.writeLine("Player: {0} = {1}", key, plrs[key].name);
 }

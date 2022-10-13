@@ -2,7 +2,7 @@
 
 public class Spawn : ISpawn
 {
-    private readonly Guid _id;
+    private readonly string _id;
     private readonly string _name;
 
     public string Id => _id.ToString();
@@ -10,7 +10,9 @@ public class Spawn : ISpawn
     public Vector3 Position { get; set; }
     public Vector3 Rotation { get; set; }
 
-    public Spawn(Guid id, string name, Vector3 position, Vector3 rotation)
+    public bool IsPersistant { get; } = PersistantScope.IsPersistant;
+
+    public Spawn(string id, string name, Vector3 position, Vector3 rotation)
     {
         _id = id;
         _name = name;

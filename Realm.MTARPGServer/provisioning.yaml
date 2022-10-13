@@ -1,0 +1,9 @@
+﻿spawns:
+  spawnA:
+    name: "Test spawn A"
+    position: [0, 2, 3]
+    rotation: [0, 0, 0]
+  spawnB:
+    name: "Test spawn B"
+    position: [0, 10, 3]
+    rotation: [0, 0, 0]

@@ -1,8 +1,7 @@
 ﻿namespace Realm.Interfaces.Scripting.Classes;
 
 [Name("Spawn")]
-public interface ISpawn : IMovable
+public interface ISpawn : IElement, IMovable
 {
-    string Id { get; }
     string Name { get; }
 }
