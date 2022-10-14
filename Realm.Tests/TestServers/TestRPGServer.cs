@@ -34,4 +34,9 @@ internal class TestRPGServer : IReloadable, IRPGServer
     {
         return TestServer.GetRequiredService<TService>();
     }
+
+    public void SubscribeLuaEvent(string eventName, Action<ILuaEventContext> callback)
+    {
+        throw new NotImplementedException();
+    }
 }
