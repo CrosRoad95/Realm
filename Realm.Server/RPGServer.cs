@@ -1,4 +1,6 @@
-﻿namespace Realm.Server;
+﻿using SlipeServer.Packets.Definitions.Lua;
+
+namespace Realm.Server;
 
 public partial class RPGServer : IReloadable, IRPGServer
 {
@@ -7,8 +9,11 @@ public partial class RPGServer : IReloadable, IRPGServer
     private readonly SlipeServerConfiguration _serverConfiguration;
     private readonly ScriptingConfiguration _scriptingConfiguration;
     private readonly ILogger _logger;
+    private readonly LuaEventContextFactory _luaEventContextFactory;
 
     public event Action<IRPGPlayer>? PlayerJoined;
+
+    private readonly List<(string, Action<ILuaEventContext>)> _eventsSubscribers = new();
 
     public RPGServer(ConfigurationProvider configurationProvider, ILogger logger, Action<ServerBuilder>? configureServerBuilder = null)
     {
@@ -28,6 +33,7 @@ public partial class RPGServer : IReloadable, IRPGServer
                     services.AddSingleton(logger);
                     services.AddSingleton<IReloadable>(this);
                     services.AddSingleton<IRPGServer>(this);
+                    services.AddSingleton<LuaEventContextFactory>();
                 });
             }
         );
@@ -35,8 +41,10 @@ public partial class RPGServer : IReloadable, IRPGServer
         _server.GameType = serverListConfiguration.GameType;
         _server.MapName = serverListConfiguration.MapName;
         _server.PlayerJoined += e => PlayerJoined?.Invoke(e);
+        _server.LuaEventTriggered += Server_LuaEventTriggered;
 
         var startup = _server.GetRequiredService<Startup>();
+        _luaEventContextFactory = _server.GetRequiredService<LuaEventContextFactory>();
 
         var _ = Task.Run(startup.StartAsync);
 
@@ -45,6 +53,23 @@ public partial class RPGServer : IReloadable, IRPGServer
             _server.Stop();
             _semaphore.Release();
         };
+    }
+
+    private void Server_LuaEventTriggered(LuaEvent luaEvent)
+    {
+        var context = _luaEventContextFactory.CreateContextFromLuaEvent(luaEvent);
+        foreach (var pair in _eventsSubscribers)
+        {
+            if(pair.Item1 == luaEvent.Name)
+            {
+                pair.Item2(context);
+            }
+        }
+    }
+
+    public void SubscribeLuaEvent(string eventName, Action<ILuaEventContext> callback)
+    {
+        _eventsSubscribers.Add((eventName, callback));
     }
 
     public TService GetRequiredService<TService>() where TService: notnull
@@ -90,6 +115,7 @@ public partial class RPGServer : IReloadable, IRPGServer
 
     public void Reload()
     {
+        _eventsSubscribers.Clear();
         StartScripting();
     }
 

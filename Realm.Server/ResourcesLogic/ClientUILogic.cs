@@ -3,13 +3,22 @@
 internal class ClientUILogic : IAutoStartResource
 {
     private readonly Resource _resource;
+    private readonly IRPGServer _server;
 
-    public ClientUILogic(IResourceProvider resourceProvider, IGuiFilesProvider guiFilesProvider)
+    public ClientUILogic(IResourceProvider resourceProvider, IGuiFilesProvider guiFilesProvider, IRPGServer server)
     {
+        _server = server;
         _resource = resourceProvider.GetResource("UI");
 
         foreach (var pair in guiFilesProvider.GetFiles())
             _resource.NoClientScripts[$"{_resource!.Name}/{pair.Item1}"] = pair.Item2;
+
+        _server.SubscribeLuaEvent("internalSubmitForm", HandleForSubmissions);
+    }
+
+    public void HandleForSubmissions(ILuaEventContext context)
+    {
+        ;
     }
 
     public void StartFor(IRPGPlayer player)
@@ -41,10 +50,10 @@ internal class ClientUILogic : IAutoStartResource
             "dsa",
         });
 
-        Task.Run(async () =>
-        {
-            await Task.Delay(1000);
-            SetGuiClose(player, "login");
-        });
+        //Task.Run(async () =>
+        //{
+        //    await Task.Delay(1000);
+        //    SetGuiClose(player, "login");
+        //});
     }
 }

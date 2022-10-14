@@ -1,6 +1,7 @@
-﻿local guis = {}
+﻿local guis = {};
 local currentOpenedGui = nil;
 local currentGuiProvider = nil;
+local pendingFormsSubmissions = {}
 
 local function internalGetWindowHandleByName(name)
 	if(guis[name] == nil)then
@@ -61,6 +62,24 @@ function closeGui(name)
 	internalCloseGui(name)
 	showCursor(false)
 	currentOpenedGui = nil;
+end
+
+function createForm(name, fields)
+	return {
+		submit = function()
+			if(pendingFormsSubmissions[name])then
+				return false
+			end
+			pendingFormsSubmissions[name] = true;
+			local data = {}
+			for name,v in pairs(fields)do
+				data[name] = currentGuiProvider.getValue(v)
+			end
+			print("trigger");
+			triggerServerEvent("internalSubmitForm", resourceRoot, name, data);
+			return true;
+		end,
+	};
 end
 
 local function entrypoint()
