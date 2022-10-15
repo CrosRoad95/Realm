@@ -1,6 +1,4 @@
-﻿using SlipeServer.Packets.Definitions.Lua;
-
-namespace Realm.Server;
+﻿namespace Realm.Server;
 
 public partial class RPGServer : IReloadable, IRPGServer
 {
@@ -13,7 +11,7 @@ public partial class RPGServer : IReloadable, IRPGServer
 
     public event Action<IRPGPlayer>? PlayerJoined;
 
-    private readonly List<(string, Action<ILuaEventContext>)> _eventsSubscribers = new();
+    private readonly List<(string, Func<ILuaEventContext, Task>)> _eventsSubscribers = new();
 
     public RPGServer(ConfigurationProvider configurationProvider, ILogger logger, Action<ServerBuilder>? configureServerBuilder = null)
     {
@@ -55,19 +53,19 @@ public partial class RPGServer : IReloadable, IRPGServer
         };
     }
 
-    private void Server_LuaEventTriggered(LuaEvent luaEvent)
+    private async void Server_LuaEventTriggered(LuaEvent luaEvent)
     {
         var context = _luaEventContextFactory.CreateContextFromLuaEvent(luaEvent);
         foreach (var pair in _eventsSubscribers)
         {
             if(pair.Item1 == luaEvent.Name)
             {
-                pair.Item2(context);
+                await pair.Item2(context);
             }
         }
     }
 
-    public void SubscribeLuaEvent(string eventName, Action<ILuaEventContext> callback)
+    public void SubscribeLuaEvent(string eventName, Func<ILuaEventContext, Task> callback)
     {
         _eventsSubscribers.Add((eventName, callback));
     }

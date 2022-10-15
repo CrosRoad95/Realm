@@ -7,7 +7,10 @@
 		["test"] = loginInput
 	});
 
-	guiProvider.onClick(loginButton, form.submit)
+	guiProvider.onClick(loginButton, function()
+		local success, data = form.submit()
+		iprint("response", success, data)
+	end)
 
 	function stateChanged(key, value)
 		iprint("payload", key, value)

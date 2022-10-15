@@ -19,7 +19,7 @@
 	onClick = function(elementHandle, callback)
 	    addEventHandler ( "onClientGUIClick", elementHandle, function(button, state, absoluteX, absoluteY)
 			if button == "left" and state == "up" then
-				callback()
+				async(callback)
 			end
 		end, false)
 	end,

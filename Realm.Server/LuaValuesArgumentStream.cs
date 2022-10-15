@@ -30,10 +30,10 @@ public class LuaEventContextFactory
             return _elementCollection.Get(value.ElementId!.Value);
         else if (_implicitlyCastableTypes.ContainsKey(type))
             return _implicitlyCastableTypes[type](value);
-        else if (type.IsAssignableTo(typeof(Dictionary<,>)) && value.TableValue != null)
+        else if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Dictionary<,>) && value.TableValue != null)
             return value.TableValue.ToDictionary(
                 x => ConvertLuaValue(type.GenericTypeArguments.First(), x.Key) ?? new object(),
-                x => ConvertLuaValue(type.GenericTypeArguments.ElementAt(1), x.Value));
+                x => ConvertLuaValue(type.GenericTypeArguments.Last(), x.Value));
         else if (type.IsAssignableTo(typeof(IEnumerable<>)) && value.TableValue != null)
             return value.TableValue.Values.Select(x => ConvertLuaValue(type.GenericTypeArguments.First(), value));
         else if (type.IsEnum && value.IntegerValue.HasValue)
@@ -41,21 +41,29 @@ public class LuaEventContextFactory
         else
             return null;
     }
-
 }
 
 public class LuaEventContext : ILuaEventContext
 {
     private readonly LuaEvent _luaEvent;
     private readonly Func<Type, LuaValue, object?> _converter;
+    private readonly string _id;
+
+    public IRPGPlayer Player => (RPGPlayer)_luaEvent.Player;
     public LuaEventContext(LuaEvent luaEvent, Func<Type, LuaValue, object?> converter)
     {
         _luaEvent = luaEvent;
         _converter = converter;
+        _id = (GetValue<string>(0) as string) ?? throw new Exception("id not found.");
     }
 
-    public T? GetValue<T>(int argumentIndex)
+    public object? GetValue<T>(int argumentIndex)
     {
-        return (T?)_converter(typeof(T), _luaEvent.Parameters[argumentIndex]);
+        return _converter(typeof(T), _luaEvent.Parameters[argumentIndex]);
+    }
+
+    public void Response(params object[] values)
+    {
+        Player.TriggerClientEvent($"{_luaEvent.Name}Response", values.Prepend(_id).ToArray());
     }
 }

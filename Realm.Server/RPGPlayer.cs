@@ -1,8 +1,4 @@
-﻿using SlipeServer.Packets.Definitions.Lua;
-using SlipeServer.Server.Mappers;
-using System.Linq;
-
-namespace Realm.Server;
+﻿namespace Realm.Server;
 
 public class RPGPlayer : Player, IRPGPlayer
 {
@@ -39,9 +35,9 @@ public class RPGPlayer : Player, IRPGPlayer
         Spawn(spawn.Position, spawn.Rotation.Z, 0, 0, 0);
     }
 
-    public void TriggerClientEvent(string name, object value)
+    public void TriggerClientEvent(string name, params object[] values)
     {
-        LuaValue luaValue = _luaValueMapper.Map(value);
+        LuaValue[] luaValue = values.Select(_luaValueMapper.Map).ToArray();
         TriggerLuaEvent(name, this, luaValue);
     }
     public override string ToString() => "Player";

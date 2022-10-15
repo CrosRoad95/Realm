@@ -64,20 +64,30 @@ function closeGui(name)
 	currentOpenedGui = nil;
 end
 
+addEvent("internalSubmitFormResponse", true)
+addEventHandler("internalSubmitFormResponse", localPlayer, function(id, name, ...)
+	coroutine.resume(pendingFormsSubmissions[name].coroutine, ...)
+	pendingFormsSubmissions[name] = nil;
+end)
+
 function createForm(name, fields)
 	return {
 		submit = function()
 			if(pendingFormsSubmissions[name])then
 				return false
 			end
-			pendingFormsSubmissions[name] = true;
+
 			local data = {}
-			for name,v in pairs(fields)do
-				data[name] = currentGuiProvider.getValue(v)
+			for name,elementHandle in pairs(fields)do
+				data[name] = currentGuiProvider.getValue(elementHandle)
 			end
-			print("trigger");
-			triggerServerEvent("internalSubmitForm", resourceRoot, name, data);
-			return true;
+
+			local id = triggerServerEvent("internalSubmitForm", resourceRoot, name, data);
+			pendingFormsSubmissions[name] = {
+				id = id,
+				coroutine = coroutine.running()
+			};
+			return coroutine.yield();
 		end,
 	};
 end

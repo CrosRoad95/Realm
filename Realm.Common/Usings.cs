@@ -6,3 +6,5 @@ global using System.Threading.Tasks;
 
 global using System.Collections.ObjectModel;
 global using System.Reflection;
+
+global using Realm.Common.Extensions;

@@ -6,6 +6,7 @@ internal class ClientInterfaceLogic : IAutoStartResource
     public ClientInterfaceLogic(IResourceProvider resourceProvider)
     {
         _resource = resourceProvider.GetResource("ClientInterface");
+        _resource.AddGlobals();
     }
 
     public void StartFor(IRPGPlayer player)

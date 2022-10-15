@@ -35,7 +35,7 @@ internal class TestRPGServer : IReloadable, IRPGServer
         return TestServer.GetRequiredService<TService>();
     }
 
-    public void SubscribeLuaEvent(string eventName, Action<ILuaEventContext> callback)
+    public void SubscribeLuaEvent(string eventName, Func<ILuaEventContext, Task> callback)
     {
         throw new NotImplementedException();
     }

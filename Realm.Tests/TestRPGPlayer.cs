@@ -25,7 +25,7 @@ public class TestRPGPlayer : TestingPlayer, IRPGPlayer
         Spawn(spawn.Position, spawn.Rotation.Z, 0, 0, 0);
     }
 
-    public void TriggerClientEvent(string @event, object value)
+    public void TriggerClientEvent(string @event, params object[] values)
     {
 
     }

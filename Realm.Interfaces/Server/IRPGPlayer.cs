@@ -9,5 +9,5 @@ public interface IRPGPlayer : IElement, IMovable
     event Action<IRPGPlayer, int>? ResourceReady;
 
     void Spawn(ISpawn spawn);
-    void TriggerClientEvent(string @event, object value);
+    void TriggerClientEvent(string @event, params object[] values);
 }
