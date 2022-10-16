@@ -1,0 +1,12 @@
+﻿global using Microsoft.AspNetCore.Components;
+global using Microsoft.AspNetCore.Components.Web;
+global using Microsoft.Extensions.DependencyInjection;
+global using Realm.Interfaces;
+global using Realm.Logging;
+global using Realm.MTARPGServer;
+global using Realm.WebApp;
+global using Realm.WebApp.Data;
+global using Microsoft.AspNetCore.Mvc;
+global using Microsoft.AspNetCore.Mvc.RazorPages;
+global using System.Diagnostics;
+global using Realm.Interfaces.Server;

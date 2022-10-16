@@ -1,6 +1,4 @@
-﻿using Serilog;
-
-namespace Realm.Discord;
+﻿namespace Realm.Discord;
 
 internal class DiscordIntegration : IDiscord, IAsyncService
 {

@@ -1,6 +1,4 @@
-﻿using Realm.Interfaces.Server;
-
-namespace Realm.WebApp;
+﻿namespace Realm.WebApp;
 
 public class EmptyConsoleCommands : IConsoleCommands
 {

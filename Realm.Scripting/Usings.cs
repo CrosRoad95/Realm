@@ -24,3 +24,6 @@ global using Realm.Scripting.Classes.Events;
 global using Realm.Interfaces.Common;
 global using Realm.Common.Extensions;
 global using Realm.Scripting.Scopes;
+global using Realm.Common.Attributes;
+global using Realm.Scripting.Classes.Contextes;
+global using Realm.Interfaces.Discord;

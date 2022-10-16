@@ -1,6 +1,4 @@
-﻿using Realm.Logging;
-
-namespace Realm.Tests.TestServers;
+﻿namespace Realm.Tests.TestServers;
 
 internal class TestRPGServer : IReloadable, IRPGServer
 {

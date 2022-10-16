@@ -1,12 +1,3 @@
-using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Web;
-using Microsoft.Extensions.DependencyInjection;
-using Realm.Interfaces;
-using Realm.Logging;
-using Realm.MTARPGServer;
-using Realm.WebApp;
-using Realm.WebApp.Data;
-
 var basePath = Path.GetDirectoryName(
       System.Reflection.Assembly.GetExecutingAssembly().GetName().CodeBase)[6..];
 

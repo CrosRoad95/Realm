@@ -1,14 +1,4 @@
-﻿using System.IO;
-using YamlDotNet.Serialization.NamingConventions;
-using YamlDotNet.Serialization;
-using Realm.Scripting.Scopes;
-using FluentValidation;
-using Realm.Interfaces.Scripting.Classes;
-using YamlDotNet.Core;
-using System.Numerics;
-using YamlDotNet.Core.Events;
-
-namespace Realm.MTARPGServer;
+﻿namespace Realm.MTARPGServer;
 
 public class Vector3Converter : IYamlTypeConverter
 {

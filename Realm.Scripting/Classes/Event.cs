@@ -1,9 +1,4 @@
-﻿using Realm.Interfaces.Discord;
-using Realm.Interfaces.Scripting.Classes;
-using Realm.Scripting.Classes.Contextes;
-using Realm.Scripting.Extensions;
-
-namespace Realm.Scripting.Classes;
+﻿namespace Realm.Scripting.Classes;
 
 public class Event : IEvent
 {

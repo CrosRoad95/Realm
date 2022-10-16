@@ -1,8 +1,4 @@
-﻿using Realm.Common.Attributes;
-using Realm.Common.Extensions;
-using System.Reflection;
-
-namespace Realm.Scripting;
+﻿namespace Realm.Scripting;
 
 public class TypescriptTypesGenerator
 {

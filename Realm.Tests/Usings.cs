@@ -23,3 +23,4 @@ global using Realm.Interfaces;
 global using Realm.Server;
 global using Realm.Interfaces.Scripting.Classes;
 global using Realm.Console;
+global using Realm.Logging;

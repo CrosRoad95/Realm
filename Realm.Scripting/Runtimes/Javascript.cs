@@ -1,6 +1,4 @@
-﻿using Realm.Scripting.Classes.Contextes;
-
-namespace Realm.Scripting.Runtimes;
+﻿namespace Realm.Scripting.Runtimes;
 
 public class LowercaseSymbolsLoader : CustomAttributeLoader
 {
