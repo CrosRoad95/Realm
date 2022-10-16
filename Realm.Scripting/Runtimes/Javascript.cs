@@ -1,4 +1,6 @@
-﻿namespace Realm.Scripting.Runtimes;
+﻿using Realm.Scripting.Classes.Contextes;
+
+namespace Realm.Scripting.Runtimes;
 
 public class LowercaseSymbolsLoader : CustomAttributeLoader
 {
@@ -64,13 +66,13 @@ internal class Javascript : IScripting
     public Javascript(ILogger logger, IWorld world, IEvent @event, Func<string?> basePathFactory)
     {
         HostSettings.CustomAttributeLoader = new LowercaseSymbolsLoader();
-        _engine = new V8ScriptEngine();
+        _engine = new V8ScriptEngine(V8ScriptEngineFlags.EnableValueTaskPromiseConversion);
         _typescriptTypesGenerator = new TypescriptTypesGenerator();
         _logger = logger.ForContext<IScripting>();
 
         _engine.DocumentSettings.Loader = new CustomDocumentLoader(basePathFactory());
         _engine.DocumentSettings.AccessFlags = DocumentAccessFlags.EnableAllLoading;
-
+        _engine.Script.isAsyncFunc = _engine.Evaluate("const ctor = (async() => {}).constructor; x => x instanceof ctor");
         AddHostType(typeof(JavaScriptExtensions));
         AddHostType(typeof(Vector2));
         AddHostType(typeof(Vector4));
@@ -87,6 +89,7 @@ internal class Javascript : IScripting
 
         AddHostType(typeof(IEvent));
         AddHostType(typeof(PlayerJoinedEvent));
+        AddHostType(typeof(DiscordStatusChannelUpdateContext));
 
         AddHostObject("World", world);
         AddHostObject("Event", @event);

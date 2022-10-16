@@ -29,6 +29,16 @@ for (var key in plrs) {
     Console.writeLine("Player: {0} = {1}", key, plrs[key].name);
 }
 
+Event.addHandler("onDiscordStatusChannelUpdate", context => {
+    context.addLine(`======================================`);
+    context.addLine(`Ostatnia aktualizacja statusu serwera: <t:${Math.floor(Date.now() / 1000)}:R>`);
+})
+
+Event.addHandler("onDiscordStatusChannelUpdate", context => {
+    const plrs = World.getElementsByType("player")
+    context.addLine(`Ilość graczy: ${plrs.length}`);
+})
+
 //try {
 //    World.getElementsByType("unexisting type")
 //}
