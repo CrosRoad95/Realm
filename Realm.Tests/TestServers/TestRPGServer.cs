@@ -36,6 +36,6 @@ internal class TestRPGServer : IReloadable, IRPGServer
 
     public void SubscribeLuaEvent(string eventName, Func<ILuaEventContext, Task> callback)
     {
-        throw new NotImplementedException();
+        //throw new NotImplementedException();
     }
 }
