@@ -1,10 +1,13 @@
 ﻿local function createLoginWindow(guiProvider)
 	local window = guiProvider.window("Logowanie", 100, 100, 400, 400);
-	local loginInput = guiProvider.input(10, 10, 200, 20, window);
-	local loginButton = guiProvider.button("Zaloguj", 10, 200, 200, 20, window);
+	local loginInput = guiProvider.input(100, 10, 200, 25, window);
+	local passwordInput = guiProvider.input(100, 120, 200, 25, window);
+	local loginButton = guiProvider.button("Zaloguj", 100, 300, 200, 20, window);
 
-	local form = createForm("test123", {
-		["test"] = loginInput
+	guiProvider.setMasked(passwordInput, true)
+	local form = createForm("login", {
+		["login"] = loginInput,
+		["password"] = passwordInput
 	});
 
 	guiProvider.onClick(loginButton, function()

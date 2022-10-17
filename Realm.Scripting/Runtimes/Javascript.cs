@@ -88,6 +88,7 @@ internal class Javascript : IScripting
         AddHostType(typeof(IEvent));
         AddHostType(typeof(PlayerJoinedEvent));
         AddHostType(typeof(DiscordStatusChannelUpdateContext));
+        AddHostType(typeof(FormSubmitDataEvent));
 
         AddHostObject("World", world);
         AddHostObject("Event", @event);

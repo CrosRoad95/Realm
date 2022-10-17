@@ -19,6 +19,7 @@ public static class ServerBuilderExtensions
             services.AddSingleton<Startup>();
             services.AddSingleton<IAutoStartResource, ClientInterfaceLogic>();
             services.AddSingleton<IAutoStartResource, ClientUILogic>();
+            services.AddSingleton<IPasswordHasher, PasswordHasher>();
 
             services.AddSingleton<ISpawnManager, SpawnManager>();
             services.AddSingleton<IPlayerManager, PlayerManager>();

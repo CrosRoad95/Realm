@@ -1,4 +1,5 @@
 ﻿local ceguiUIProvider = {
+	-- Elements
 	window = function(title, px, py, sx, sy)
 		return guiCreateWindow(px, py, sx, sy, title, false)
 	end,
@@ -8,11 +9,19 @@
 	button = function(text, px, py, sx, sy, parent)
 		return guiCreateButton(px, py, sx, sy, text, false, parent)
 	end,
+	label = function(text, px, py, sx, sy, parent)
+		return guiCreateLabel(px, py, sx, sy, text, false, parent)
+	end,
+
+	-- Getters, setters
 	getValue = function(elementHandle)
 		return guiGetText(elementHandle)
 	end,
 	setValue = function(elementHandle, value)
 		return guiSetText(elementHandle, value)
+	end,
+	setMasked = function(elementHandle, enabled)
+		return guiEditSetMasked(elementHandle, true)
 	end,
 
 	-- Events:

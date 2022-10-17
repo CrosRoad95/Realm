@@ -41,4 +41,7 @@ global using Realm.Interfaces.Scripting;
 global using Realm.Server.Extensions;
 global using Realm.Configuration.Configurations;
 global using Realm.Common.Extensions;
+global using Realm.Interfaces.Server.Identity;
+global using Realm.Server.Identity;
+
 global using ConfigurationProvider = Realm.Configuration.ConfigurationProvider;

@@ -39,6 +39,10 @@ Event.addHandler("onDiscordStatusChannelUpdate", context => {
     context.addLine(`Ilość graczy: ${plrs.length}`);
 })
 
+Event.addHandler("onFormSubmit", context => {
+    Console.writeLine("event {0} {1}", context, context.name);
+})
+
 //try {
 //    World.getElementsByType("unexisting type")
 //}

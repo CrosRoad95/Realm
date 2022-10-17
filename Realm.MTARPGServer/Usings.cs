@@ -18,3 +18,4 @@ global using Realm.Scripting.Scopes;
 global using Realm.Interfaces.Scripting.Classes;
 global using YamlDotNet.Core;
 global using YamlDotNet.Core.Events;
+global using Realm.Interfaces.Server.Identity;

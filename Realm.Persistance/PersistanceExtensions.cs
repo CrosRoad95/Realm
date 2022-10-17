@@ -8,6 +8,8 @@ public static class PersistanceExtensions
         services.AddDbContextPool<IDb, T>(dboptions);
 
         services.AddTransient<ITestRepository, TestRepository>();
+        services.AddTransient<IAdminGroupRepository, AdminGroupRepository>();
+        services.AddTransient<IUserAccountRepository, UserAccountRepository>();
         return services;
     }
 }

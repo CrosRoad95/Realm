@@ -67,7 +67,9 @@ end
 addEvent("internalSubmitFormResponse", true)
 addEventHandler("internalSubmitFormResponse", localPlayer, function(id, name, ...)
 	coroutine.resume(pendingFormsSubmissions[name].coroutine, ...)
-	pendingFormsSubmissions[name] = nil;
+	setTimer(function()
+		pendingFormsSubmissions[name] = nil;
+	end, 200, 1)
 end)
 
 function createForm(name, fields)
