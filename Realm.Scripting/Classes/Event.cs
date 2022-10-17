@@ -63,7 +63,7 @@ public class Event : IEvent
         var group = GetSubscribersGroupByEventName(eventName);
         if (group == null)
             return false;
-        group.Remove(callback);
+        group.RemoveAll(x => x.Is(callback));
         return true;
     }
 
