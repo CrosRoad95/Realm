@@ -14,3 +14,4 @@ global using Realm.Discord.Classes;
 global using Realm.Discord.Providers;
 global using Realm.Configuration;
 global using Serilog;
+global using Realm.Interfaces.Extend;

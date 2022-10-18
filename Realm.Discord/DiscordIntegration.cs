@@ -1,6 +1,6 @@
 ﻿namespace Realm.Discord;
 
-internal class DiscordIntegration : IDiscord, IAsyncService
+internal class DiscordIntegration : IDiscord
 {
     private readonly DiscordSocketClient _client;
     private readonly DiscordConfiguration _discordConfiguration;

@@ -25,7 +25,6 @@ public static class ServerBuilderExtensions
             services.AddSingleton<IPlayerManager, PlayerManager>();
             if (_scriptingConfiguration.Enabled)
                 services.AddScripting();
-            services.AddDiscord();
             services.AddPersistance<SQLiteDb>(db => db.UseSqlite("Filename=./server.db"));
 
             services.AddSingleton<HelpCommand>();

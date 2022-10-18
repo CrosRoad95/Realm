@@ -1,4 +1,6 @@
-﻿namespace Realm.Server;
+﻿using System.Linq;
+
+namespace Realm.Server;
 
 public partial class RPGServer : IReloadable, IRPGServer
 {
@@ -13,7 +15,7 @@ public partial class RPGServer : IReloadable, IRPGServer
 
     private readonly List<(string, Func<ILuaEventContext, Task>)> _eventsSubscribers = new();
 
-    public RPGServer(ConfigurationProvider configurationProvider, ILogger logger, Action<ServerBuilder>? configureServerBuilder = null)
+    public RPGServer(ConfigurationProvider configurationProvider, ILogger logger, Action<ServerBuilder>? configureServerBuilder = null, IEnumerable<IModule>? modules = null)
     {
         _logger = logger.ForContext<IRPGServer>();
         _serverConfiguration = configurationProvider.Get<SlipeServerConfiguration>("server");
@@ -32,9 +34,21 @@ public partial class RPGServer : IReloadable, IRPGServer
                     services.AddSingleton<IReloadable>(this);
                     services.AddSingleton<IRPGServer>(this);
                     services.AddSingleton<LuaEventContextFactory>();
+
+                    if(modules != null)
+                        foreach (var module in modules)
+                            module.Configure(services);
                 });
             }
         );
+
+        if (modules != null)
+        {
+            _logger.Information("Initializing modules: {modules}", string.Join(", ", modules.Select(x => x.Name)));
+            foreach (var module in modules)
+                module.Init(_server.GetRequiredService<IServiceProvider>());
+        }
+
         var serverListConfiguration = configurationProvider.Get<ServerListConfiguration>("serverList");
         _server.GameType = serverListConfiguration.GameType;
         _server.MapName = serverListConfiguration.MapName;

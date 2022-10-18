@@ -43,5 +43,6 @@ global using Realm.Configuration.Configurations;
 global using Realm.Common.Extensions;
 global using Realm.Interfaces.Server.Identity;
 global using Realm.Server.Identity;
+global using Realm.Interfaces.Extend;
 
 global using ConfigurationProvider = Realm.Configuration.ConfigurationProvider;

@@ -1,4 +1,7 @@
-﻿namespace Realm.MTARPGServer;
+﻿using Realm.Discord;
+using Realm.Interfaces.Extend;
+
+namespace Realm.MTARPGServer;
 
 public class Vector3Converter : IYamlTypeConverter
 {
@@ -45,6 +48,9 @@ public class MTARPGServerImpl
                 services.AddSingleton(consoleCommands);
                 services.AddSingleton<Func<string?>>(() => basePath);
             });
+        }, new IModule[]
+        {
+            new DiscordModule(),
         });
         Directory.SetCurrentDirectory(previousDirectory);
     }
