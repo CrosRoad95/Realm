@@ -16,7 +16,10 @@ public static class ServiceCollectionExtensions
 
     public static IServiceCollection AddRealmIdentity<T>(this IServiceCollection services) where T : Db<T>
     {
-        services.AddIdentity<User, Role>()
+        services.AddIdentity<User, Role>(setup =>
+        {
+            setup.SignIn.RequireConfirmedAccount = true;
+        })
            .AddEntityFrameworkStores<T>()
            .AddDefaultTokenProviders();
         return services;
