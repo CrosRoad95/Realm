@@ -1,51 +1,35 @@
 ﻿import * as TestModule from "Test/test.js"
 
-Console.writeLine("Module: {0}", TestModule.test)
-const spawnA = World.createSpawn("dynamicSpawn", "test", new Vector3(0, 20, 3));
+Logger.information("startup.js, TestModule: {TestModule}", TestModule);
 
-Console.writeLine("Spawns ids: {0} {1}", spawnA.id, spawnA.isPersistant)
-
-const provisionedSpawn = World.getElementByTypeAndId("spawn", "spawnA");
-Console.writeLine("Provisioned spawn id: '{0}', persistant={1}", provisionedSpawn.id, provisionedSpawn.isPersistant);
-
-Event.addHandler("onPlayerJoin", ({ player }) => {
-    Console.writeLine("player joined: {0} {1}", String(player), player.name);
-    player.spawn(spawnA);
+const spawn = createSpawn("dynamicSpawn", "test", new Vector3(0, 20, 3));
+Logger.information("createSpawn is persistant?: {persistant}", spawn.isPersistant());
+addEventHandler("onPlayerJoin", ({ player }) => {
+    Logger.information("player joined: {player}", player.name);
+    player.spawn(spawn);
 })
 
-const func = () => Console.writeLine("you should not see this");
-Event.addHandler("onPlayerJoin", func);
-Event.removeHandler("onPlayerJoin", func);
+const spawns = getElementsByType("spawn");
+Logger.information("spawns: {spawnsA} {spawnsB}", spawns.length, countElementsByType("spawn"));
 
-const spawns = World.getElementsByType("spawn");
-Console.writeLine("All spawns: {0}", spawns.length);
 for (var key in spawns) {
-    Console.writeLine("Spawn: {0} = {1}, persistant: {2}", key, spawns[key].name, spawns[key].isPersistant);
+    Logger.information("Spawn: {spawnName}, is persistant: {isPersistant}", spawns[key].name, spawns[key].isPersistant());
 }
 
-const plrs = World.getElementsByType("player")
-Console.writeLine("All players: {0}", plrs.length);
-for (var key in plrs) {
-    Console.writeLine("Player: {0} = {1}", key, plrs[key].name);
-}
-
-Event.addHandler("onDiscordStatusChannelUpdate", context => {
+addEventHandler("onDiscordStatusChannelUpdate", context => {
     context.addLine(`======================================`);
     context.addLine(`Ostatnia aktualizacja statusu serwera: <t:${Math.floor(Date.now() / 1000)}:R>`);
 })
 
-Event.addHandler("onDiscordStatusChannelUpdate", context => {
-    const plrs = World.getElementsByType("player")
-    context.addLine(`Ilość graczy: ${plrs.length}`);
+addEventHandler("onDiscordStatusChannelUpdate", context => {
+    const plrs = countElementsByType("player")
+    context.addLine(`Ilość graczy: ${plrs}`);
 })
 
-Event.addHandler("onFormSubmit", context => {
-    Console.writeLine("event {0} {1}", context, context.name);
-})
+const func = () => Logger.information("you should not see this");
+addEventHandler("onPlayerJoin", func);
+removeEventHandler("onPlayerJoin", func);
 
-//try {
-//    World.getElementsByType("unexisting type")
-//}
-//catch (ex) {
-//    Console.writeLine("Exception caught: {0}", ex.toString());
-//}
+//Event.addHandler("onFormSubmit", context => {
+//    Console.writeLine("event {0} {1}", context, context.name);
+//})

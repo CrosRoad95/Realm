@@ -1,8 +1,11 @@
-﻿using System.Linq;
+﻿using Realm.Scripting.Classes;
+using Realm.Scripting.Interfaces;
+using Realm.Server.Scripting;
+using Realm.Server.Scripting.Events;
 
 namespace Realm.Server;
 
-public partial class RPGServer : IReloadable, IRPGServer
+public partial class RPGServer : IRPGServer
 {
     private readonly SemaphoreSlim _semaphore = new SemaphoreSlim(0);
     private readonly MtaServer<RPGPlayer> _server;
@@ -10,13 +13,15 @@ public partial class RPGServer : IReloadable, IRPGServer
     private readonly ScriptingConfiguration _scriptingConfiguration;
     private readonly ILogger _logger;
     private readonly LuaEventContextFactory _luaEventContextFactory;
+    private readonly EventFunctions _eventFunctions;
+    private readonly ElementFunctions _elementFunctions;
+    private readonly IEnumerable<IModule> _modules;
 
-    public event Action<IRPGPlayer>? PlayerJoined;
+    public event Action<Player>? PlayerJoined;
 
-    private readonly List<(string, Func<ILuaEventContext, Task>)> _eventsSubscribers = new();
-
-    public RPGServer(ConfigurationProvider configurationProvider, ILogger logger, Action<ServerBuilder>? configureServerBuilder = null, IEnumerable<IModule>? modules = null)
+    public RPGServer(ConfigurationProvider configurationProvider, ILogger logger, IEnumerable<IModule> modules, Action<ServerBuilder>? configureServerBuilder = null)
     {
+        _modules = modules;
         _logger = logger.ForContext<IRPGServer>();
         _serverConfiguration = configurationProvider.Get<SlipeServerConfiguration>("server");
         _scriptingConfiguration = configurationProvider.Get<ScriptingConfiguration>("scripting");
@@ -31,23 +36,21 @@ public partial class RPGServer : IReloadable, IRPGServer
                 {
                     services.AddSingleton(configurationProvider);
                     services.AddSingleton(logger);
-                    services.AddSingleton<IReloadable>(this);
+                    services.AddSingleton(this);
                     services.AddSingleton<IRPGServer>(this);
                     services.AddSingleton<LuaEventContextFactory>();
+                    services.AddSingleton<ElementFunctions>();
 
-                    if(modules != null)
+                    if (modules != null)
                         foreach (var module in modules)
+                        {
+                            services.AddSingleton(module);
                             module.Configure(services);
+                        }
                 });
             }
         );
 
-        if (modules != null)
-        {
-            _logger.Information("Initializing modules: {modules}", string.Join(", ", modules.Select(x => x.Name)));
-            foreach (var module in modules)
-                module.Init(_server.GetRequiredService<IServiceProvider>());
-        }
 
         var serverListConfiguration = configurationProvider.Get<ServerListConfiguration>("serverList");
         _server.GameType = serverListConfiguration.GameType;
@@ -57,6 +60,8 @@ public partial class RPGServer : IReloadable, IRPGServer
 
         var startup = _server.GetRequiredService<Startup>();
         _luaEventContextFactory = _server.GetRequiredService<LuaEventContextFactory>();
+        _eventFunctions = _server.GetRequiredService<EventFunctions>();
+        _elementFunctions = _server.GetRequiredService<ElementFunctions>();
 
         var _ = Task.Run(startup.StartAsync);
 
@@ -65,23 +70,39 @@ public partial class RPGServer : IReloadable, IRPGServer
             _server.Stop();
             _semaphore.Release();
         };
+
+        _server.PlayerJoined += Server_PlayerJoined;
+    }
+
+    public void AssociateElement(Element element)
+    {
+        _server.AssociateElement(element);
+    }
+
+    private async void Server_PlayerJoined(RPGPlayer player)
+    {
+        await _eventFunctions.InvokeEvent("onPlayerJoin", new PlayerJoinedEvent
+        {
+            Player = player,
+        });
+    }
+
+    public void InitializeScripting(IScriptingModuleInterface scriptingModuleInterface)
+    {
+        // Events
+        _eventFunctions.RegisterEvent("onPlayerJoin");
+
+        // Functions
+        scriptingModuleInterface.AddHostObject("Elements", _elementFunctions, true);
+
+        // Classes & Events & Contextes
+        scriptingModuleInterface.AddHostType(typeof(RPGPlayer));
+        scriptingModuleInterface.AddHostType(typeof(Spawn));
     }
 
     private async void Server_LuaEventTriggered(LuaEvent luaEvent)
     {
-        var context = _luaEventContextFactory.CreateContextFromLuaEvent(luaEvent);
-        foreach (var pair in _eventsSubscribers)
-        {
-            if(pair.Item1 == luaEvent.Name)
-            {
-                await pair.Item2(context);
-            }
-        }
-    }
 
-    public void SubscribeLuaEvent(string eventName, Func<ILuaEventContext, Task> callback)
-    {
-        _eventsSubscribers.Add((eventName, callback));
     }
 
     public TService GetRequiredService<TService>() where TService: notnull
@@ -89,47 +110,22 @@ public partial class RPGServer : IReloadable, IRPGServer
         return _server.GetRequiredService<TService>();
     }
 
-    public void InitializeScripting(string fileName)
-    {
-        _logger.Information("Initializing startup.js: {fileName}", fileName);
-        try
-        {
-            var code = File.ReadAllText(fileName);
-            var scripting = _server.GetRequiredService<IScripting>();
-            scripting.Execute(code, fileName);
-
-            var typescriptDefinitions = scripting.GetTypescriptDefinition();
-            var directory = Path.GetDirectoryName(fileName);
-            File.WriteAllText(Path.Join(directory,"types.ts"), typescriptDefinitions);
-            _logger.Information("Scripting initialized, created types.js");
-        }
-        catch(Exception ex)
-        {
-            _logger.Error(ex, "Failed to initialize scripting!");
-        }
-    }
-
-    private void StartScripting()
-    {
-        var path = _server.GetRequiredService<Func<string>>()();
-        InitializeScripting(Path.Join(path, "Server/startup.js"));
-    }
-
     public async Task Start()
     {
-        if (_scriptingConfiguration.Enabled)
-            StartScripting();
+        _logger.Information("Initializing modules: {modules}", string.Join(", ", _modules.Select(x => x.Name)));
+        var serviceProvider = _server.GetRequiredService<IServiceProvider>();
+        foreach (var module in _modules)
+            module.Init(serviceProvider);
+
+        var scriptingModule = _modules.FirstOrDefault(x => x.Name == "Scripting");
+        if (scriptingModule != null)
+            InitializeScripting(scriptingModule.GetInterface<IScriptingModuleInterface>());
+
+        foreach (var module in _modules)
+            module.PostInit(serviceProvider);
 
         _logger.Information("Server started at port: {port}", _serverConfiguration.Port);
         _server.Start();
         await _semaphore.WaitAsync();
     }
-
-    public void Reload()
-    {
-        _eventsSubscribers.Clear();
-        StartScripting();
-    }
-
-    public int GetPriority() => int.MaxValue;
 }

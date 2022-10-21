@@ -1,4 +1,4 @@
-﻿namespace Realm.Scripting.Classes.Contextes;
+﻿namespace Realm.Discord.Scripting.Events;
 
 public class DiscordStatusChannelUpdateContext
 {

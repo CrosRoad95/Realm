@@ -17,14 +17,8 @@ public static class ServerBuilderExtensions
         {
             services.AddSingleton(configuration);
             services.AddSingleton<Startup>();
-            services.AddSingleton<IAutoStartResource, ClientInterfaceLogic>();
-            services.AddSingleton<IAutoStartResource, ClientUILogic>();
             services.AddSingleton<IPasswordHasher, PasswordHasher>();
 
-            services.AddSingleton<ISpawnManager, SpawnManager>();
-            services.AddSingleton<IPlayerManager, PlayerManager>();
-            if (_scriptingConfiguration.Enabled)
-                services.AddScripting();
             services.AddPersistance<SQLiteDb>(db => db.UseSqlite("Filename=./server.db"));
 
             services.AddSingleton<HelpCommand>();
@@ -32,6 +26,8 @@ public static class ServerBuilderExtensions
             services.AddSingleton<ICommand, ReloadCommand>();
         });
 
+        builder.AddLogic<ClientInterfaceLogic>();
+        builder.AddLogic<ClientUILogic>();
         builder.AddLogic<CommandsLogic>();
 
         return builder;

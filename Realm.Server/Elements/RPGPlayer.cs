@@ -1,14 +1,12 @@
-﻿namespace Realm.Server;
+﻿namespace Realm.Server.Elements;
 
-public class RPGPlayer : Player, IRPGPlayer
+public class RPGPlayer : Player
 {
     private readonly CancellationTokenSource _cancellationTokenSource;
     private readonly LuaValueMapper _luaValueMapper;
 
-    public bool IsPersistant => true;
-    public new string Id => Name;
     public CancellationToken CancellationToken { get; private set; }
-    public event Action<IRPGPlayer, int>? ResourceReady;
+    public event Action<RPGPlayer, int>? ResourceReady;
     public RPGPlayer(LuaValueMapper luaValueMapper)
     {
         _cancellationTokenSource = new CancellationTokenSource();
@@ -28,17 +26,20 @@ public class RPGPlayer : Player, IRPGPlayer
         ResourceReady?.Invoke(sender as RPGPlayer, e.NetId);
     }
 
-    public void Spawn(ISpawn spawn)
+    public void Spawn(Spawn spawn)
     {
         Camera.Target = this;
         Camera.Fade(CameraFade.In);
         Spawn(spawn.Position, spawn.Rotation.Z, 0, 0, 0);
     }
 
+    public bool IsPersistant() => true;
+
     public void TriggerClientEvent(string name, params object[] values)
     {
         LuaValue[] luaValue = values.Select(_luaValueMapper.Map).ToArray();
         TriggerLuaEvent(name, this, luaValue);
     }
+
     public override string ToString() => "Player";
 }

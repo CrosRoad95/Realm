@@ -12,7 +12,7 @@ builder.Services.AddServerSideBlazor();
 
 builder.Services.AddSingleton<WeatherForecastService>();
 builder.Services.AddSingleton(x => new MTARPGServerImpl(serverConsole, logger, new Realm.Configuration.ConfigurationProvider(x.GetRequiredService<IConfiguration>()), basePath));
-builder.Services.AddSingleton<IRPGServer>(x => x.GetRequiredService<MTARPGServerImpl>().Server);
+builder.Services.AddSingleton(x => x.GetRequiredService<MTARPGServerImpl>().Server);
 
 var app = builder.Build();
 

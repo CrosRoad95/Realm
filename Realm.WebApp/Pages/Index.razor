@@ -13,9 +13,9 @@
 </ul>
 
 @code{
-    private List<(DateTime, IRPGPlayer)> _players = new();
+    private List<(DateTime, Player)> _players = new();
 
-    private void PlayerJoined(IRPGPlayer player)
+    private void PlayerJoined(Player player)
     {
         InvokeAsync(() =>
         {

@@ -1,6 +1,6 @@
 ﻿namespace Realm.Server.ResourcesLogic;
 
-internal class ClientInterfaceLogic : IAutoStartResource
+internal class ClientInterfaceLogic
 {
     private readonly Resource _resource;
     public ClientInterfaceLogic(IResourceProvider resourceProvider)
@@ -9,8 +9,8 @@ internal class ClientInterfaceLogic : IAutoStartResource
         _resource.AddGlobals();
     }
 
-    public void StartFor(IRPGPlayer player)
+    public void StartFor(RPGPlayer player)
     {
-        _resource.StartFor(player as Player); // TODO: Make it better
+        _resource.StartFor(player);
     }
 }

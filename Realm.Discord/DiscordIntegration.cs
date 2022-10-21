@@ -4,17 +4,25 @@ internal class DiscordIntegration : IDiscord
 {
     private readonly DiscordSocketClient _client;
     private readonly DiscordConfiguration _discordConfiguration;
-    private readonly IStatusChannel _statusChannel;
+    private readonly StatusChannel _statusChannel;
+    private readonly EventFunctions _eventFunctions;
     private readonly ILogger _logger;
 
-    public DiscordIntegration(DiscordConfiguration discordConfiguration, IStatusChannel statusChannel, ILogger logger)
+    public DiscordIntegration(DiscordConfiguration discordConfiguration, StatusChannel statusChannel, ILogger logger, EventFunctions eventFunctions)
     {
         _client = new DiscordSocketClient();
         _discordConfiguration = discordConfiguration;
         _statusChannel = statusChannel;
+        _eventFunctions = eventFunctions;
         _logger = logger.ForContext<IDiscord>();
         _client.Ready += ClientReady;
         _client.Log += LogAsync;
+    }
+
+    public void InitializeScripting(IScriptingModuleInterface scriptingModuleInterface)
+    {
+        _eventFunctions.RegisterEvent("onDiscordStatusChannelUpdate");
+        scriptingModuleInterface.AddHostType(typeof(DiscordStatusChannelUpdateContext));
     }
 
     public async Task StartAsync()

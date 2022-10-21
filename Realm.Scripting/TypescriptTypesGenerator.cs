@@ -29,8 +29,6 @@ public class TypescriptTypesGenerator
             name = "boolean";
         else if (type == typeof(void))
             name = "void";
-        else if (type == typeof(ISpawn))
-            name = "Spawn";
         else if (type == typeof(Vector2))
             name = "Vector2";
         else if (type == typeof(Vector3))

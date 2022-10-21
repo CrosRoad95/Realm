@@ -1,5 +1,7 @@
 ﻿using Realm.Discord;
 using Realm.Interfaces.Extend;
+using Realm.Scripting;
+using Realm.Server.Scripting;
 
 namespace Realm.MTARPGServer;
 
@@ -39,18 +41,19 @@ public class MTARPGServerImpl
         logger.Information("Starting server");
         _configurationProvider = configurationProvider;
         _basePath = basePath;
-        _rpgServer = new RPGServer(_configurationProvider, logger, serverBuilder =>
+        _rpgServer = new RPGServer(_configurationProvider, logger, new IModule[]
+        {
+            new DiscordModule(),
+            new ScriptingModule(),
+            new ServerScriptingModule(),
+        }, serverBuilder =>
         {
             serverBuilder.AddGuiFilesLocation("Gui");
-            serverBuilder.AddLogic<TestLogic>();
             serverBuilder.ConfigureServices(services =>
             {
                 services.AddSingleton(consoleCommands);
                 services.AddSingleton<Func<string?>>(() => basePath);
             });
-        }, new IModule[]
-        {
-            new DiscordModule(),
         });
         Directory.SetCurrentDirectory(previousDirectory);
     }
@@ -72,10 +75,10 @@ public class MTARPGServerImpl
         await provisioningValidator.ValidateAndThrowAsync(provisioning);
         using (var _ = new PersistantScope())
         {
-            var world = _rpgServer.GetRequiredService<IWorld>();
+            var elementFunctions = _rpgServer.GetRequiredService<ElementFunctions>();
             foreach (var pair in provisioning.Spawns)
             {
-                world.CreateSpawn(pair.Key, pair.Value.Name, pair.Value.Position, pair.Value.Rotation);
+                elementFunctions.CreateSpawn(pair.Key, pair.Value.Name, pair.Value.Position, pair.Value.Rotation);
             }
         }
         Directory.SetCurrentDirectory(previousDirectory);

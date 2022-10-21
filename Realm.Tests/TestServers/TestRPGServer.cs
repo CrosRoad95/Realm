@@ -1,15 +1,21 @@
-﻿namespace Realm.Tests.TestServers;
+﻿using Realm.Server.Interfaces;
+using SlipeServer.Server.Elements;
+using SlipeServer.Server.ServerBuilders;
+
+namespace Realm.Tests.TestServers;
 
 internal class TestRPGServer : IReloadable, IRPGServer
 {
     public MtaServer<TestRPGPlayer> TestServer { get; private set; }
-    public event Action<IRPGPlayer>? PlayerJoined;
+
+    public event Action<Player>? PlayerJoined;
 
     public TestRPGServer()
     {
         var configuration = new TestConfiguration().Configuration;
         TestServer = MtaServer.CreateWithDiSupport<TestRPGPlayer>(builder =>
         {
+            builder.AddGuiFilesLocation("Gui");
             builder.ConfigureServices(services =>
             {
                 services.AddSingleton(new Configuration.ConfigurationProvider());
@@ -34,7 +40,12 @@ internal class TestRPGServer : IReloadable, IRPGServer
         return TestServer.GetRequiredService<TService>();
     }
 
-    public void SubscribeLuaEvent(string eventName, Func<ILuaEventContext, Task> callback)
+    public void SubscribeLuaEvent(string eventName, Func<LuaEventContext, Task> callback)
+    {
+        //throw new NotImplementedException();
+    }
+
+    public void AssociateElement(Element element)
     {
         //throw new NotImplementedException();
     }

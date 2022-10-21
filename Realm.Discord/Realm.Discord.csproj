@@ -14,6 +14,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Realm.Configuration\Realm.Configuration.csproj" />
     <ProjectReference Include="..\Realm.Interfaces\Realm.Interfaces.csproj" />
+    <ProjectReference Include="..\Realm.Scripting\Realm.Scripting.csproj" />
   </ItemGroup>
 
 </Project>

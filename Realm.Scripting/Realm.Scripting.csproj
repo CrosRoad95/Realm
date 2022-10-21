@@ -7,12 +7,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="Interfaces\**" />
-    <EmbeddedResource Remove="Interfaces\**" />
-    <None Remove="Interfaces\**" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="Microsoft.ClearScript.V8" Version="7.3.4" />
     <PackageReference Include="Microsoft.ClearScript.V8.Native.linux-x64" Version="7.3.4" />
     <PackageReference Include="Microsoft.ClearScript.V8.Native.win-x64" Version="7.3.4" />

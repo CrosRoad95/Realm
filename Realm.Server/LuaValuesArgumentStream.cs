@@ -10,7 +10,7 @@ public class LuaEventContextFactory
         IndexImplicitlyCastableTypes();
     }
 
-    public ILuaEventContext CreateContextFromLuaEvent(LuaEvent luaEvent) => new LuaEventContext(luaEvent, ConvertLuaValue);
+    public LuaEventContext CreateContextFromLuaEvent(LuaEvent luaEvent) => new LuaEventContext(luaEvent, ConvertLuaValue);
 
     private void IndexImplicitlyCastableTypes()
     {
@@ -43,13 +43,13 @@ public class LuaEventContextFactory
     }
 }
 
-public class LuaEventContext : ILuaEventContext
+public class LuaEventContext
 {
     private readonly LuaEvent _luaEvent;
     private readonly Func<Type, LuaValue, object?> _converter;
     private readonly string _id;
 
-    public IRPGPlayer Player => (RPGPlayer)_luaEvent.Player;
+    public RPGPlayer Player => (RPGPlayer)_luaEvent.Player;
     public LuaEventContext(LuaEvent luaEvent, Func<Type, LuaValue, object?> converter)
     {
         _luaEvent = luaEvent;

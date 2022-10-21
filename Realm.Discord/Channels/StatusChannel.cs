@@ -1,21 +1,21 @@
 ﻿namespace Realm.Discord.Channels;
 
-internal class StatusChannel : IStatusChannel
+internal class StatusChannel
 {
     private readonly DiscordConfiguration.StatusChannelConfiguration _configuration;
     private readonly IBotdIdProvider _botdIdProvider;
+    private readonly EventFunctions _eventFunctions;
     private ILogger _logger;
     private IDiscordMessage? _statusDiscordMessage;
 
     public delegate Task<string> GetStatusChannelContent();
 
-    public Func<Task<string>>? BeginStatusChannelUpdate { get; set; } = null;
-
-    public StatusChannel(DiscordConfiguration discordConfiguration, IBotdIdProvider botdIdProvider, ILogger logger)
+    public StatusChannel(DiscordConfiguration discordConfiguration, IBotdIdProvider botdIdProvider, ILogger logger, EventFunctions eventFunctions)
     {
         _configuration = discordConfiguration.StatusChannel;
         _botdIdProvider = botdIdProvider;
-        _logger = logger.ForContext<IStatusChannel>();
+        _eventFunctions = eventFunctions;
+        _logger = logger.ForContext<StatusChannel>();
     }
 
     public async Task StartAsync(IDiscordGuild discordGuild)
@@ -26,7 +26,7 @@ internal class StatusChannel : IStatusChannel
             _statusDiscordMessage = await channel.SendMessage("");
 
         await Update();
-        while(true)
+        while(true) // TODO: user periodic timer
         {
             await Task.Delay(TimeSpan.FromSeconds(30));
             await Update();
@@ -37,10 +37,12 @@ internal class StatusChannel : IStatusChannel
     {
         try
         {
-            if(_statusDiscordMessage != null && BeginStatusChannelUpdate != null)
+            if(_statusDiscordMessage != null)
             {
-                var content = await BeginStatusChannelUpdate();
-                if(!string.IsNullOrEmpty(content))
+                var context = new DiscordStatusChannelUpdateContext();
+                await _eventFunctions.InvokeEvent("onDiscordStatusChannelUpdate", context);
+                var content = context.Content;
+                if (!string.IsNullOrEmpty(content))
                     await _statusDiscordMessage.Modify(content);
             }
         }

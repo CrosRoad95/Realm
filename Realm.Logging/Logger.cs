@@ -18,6 +18,5 @@ public class Logger
 
     private static bool SourceContextEquals(LogEvent logEvent, Type sourceContext) => logEvent.Properties.GetValueOrDefault("SourceContext") is ScalarValue sv && sv.Value?.ToString() == sourceContext.FullName;
 
-
     public ILogger GetLogger() => _logger;
 }
