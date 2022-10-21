@@ -1,4 +1,6 @@
-﻿namespace Realm.Persistance.Repositories;
+﻿using Realm.Persistance.Interfaces;
+
+namespace Realm.Persistance.Repositories;
 
 internal class TestRepository : ITestRepository
 {

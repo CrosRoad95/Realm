@@ -1,4 +1,4 @@
-﻿namespace Realm.Persistance.Repositories.Interfaces;
+﻿namespace Realm.Persistance.Interfaces;
 
 public interface ITestRepository
 {

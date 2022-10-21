@@ -24,7 +24,6 @@ global using SlipeServer.Server.Mappers;
 global using SlipeServerConfiguration = SlipeServer.Server.Configuration;
 
 global using Realm.Persistance;
-global using Realm.Persistance.Repositories.Interfaces;
 global using Realm.Persistance.SQLite;
 global using Realm.Server.Commands;
 global using Realm.Server.Gui;
@@ -42,8 +41,6 @@ global using Realm.Server.Elements;
 global using Realm.Scripting.Interfaces;
 global using Realm.Server.Interfaces;
 global using Realm.Scripting.Extensions;
-global using Realm.Identity;
 global using Microsoft.AspNetCore.Identity;
-global using Realm.Identity.Data;
 
 global using ConfigurationProvider = Realm.Configuration.ConfigurationProvider;

@@ -2,4 +2,3 @@
 global using System.Threading.Tasks;
 
 global using Realm.Interfaces.Common;
-global using Realm.Interfaces.Scripting.Classes;

@@ -1,4 +1,7 @@
-﻿namespace Realm.Server;
+﻿using Realm.Persistance.Data;
+using Realm.Persistance.Interfaces;
+
+namespace Realm.Server;
 
 internal class Startup
 {

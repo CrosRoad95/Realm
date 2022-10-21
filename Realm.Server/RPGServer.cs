@@ -1,5 +1,4 @@
 ﻿using Realm.Scripting.Classes;
-using Realm.Scripting.Interfaces;
 using Realm.Server.Scripting;
 using Realm.Server.Scripting.Events;
 
