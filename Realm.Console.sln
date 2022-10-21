@@ -23,13 +23,13 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Realm.Tests", "Realm.Tests\
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Realm.Common", "Realm.Common\Realm.Common.csproj", "{DB48C5CE-FDDA-4790-8D40-97320F39F65C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Realm.Configuration", "Realm.Configuration\Realm.Configuration.csproj", "{22B462AD-74A2-44F2-9D20-6B4C78CF4681}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Realm.Configuration", "Realm.Configuration\Realm.Configuration.csproj", "{22B462AD-74A2-44F2-9D20-6B4C78CF4681}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Realm.MTARPGServer", "Realm.MTARPGServer\Realm.MTARPGServer.csproj", "{6AD80302-4597-4F95-94F2-F6F6076C9127}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Realm.MTARPGServer", "Realm.MTARPGServer\Realm.MTARPGServer.csproj", "{6AD80302-4597-4F95-94F2-F6F6076C9127}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Realm.WebApp", "Realm.WebApp\Realm.WebApp.csproj", "{F0BAB8CC-D627-46C1-BEEB-86ED7E3B090F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Realm.WebApp", "Realm.WebApp\Realm.WebApp.csproj", "{F0BAB8CC-D627-46C1-BEEB-86ED7E3B090F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Realm.Logging", "Realm.Logging\Realm.Logging.csproj", "{BBE03435-D579-40C6-8107-1DE73AEFE697}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Realm.Logging", "Realm.Logging\Realm.Logging.csproj", "{BBE03435-D579-40C6-8107-1DE73AEFE697}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

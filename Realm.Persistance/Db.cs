@@ -1,10 +1,13 @@
 ﻿namespace Realm.Persistance;
 
-public abstract class Db<T> : DbContext, IDb where T : Db<T>
+public abstract class Db<T> : IdentityDbContext<User, Role, Guid,
+        IdentityUserClaim<Guid>,
+        IdentityUserRole<Guid>,
+        IdentityUserLogin<Guid>,
+        IdentityRoleClaim<Guid>,
+        IdentityUserToken<Guid>>, IDb where T : Db<T>
 {
     public DbSet<Test> Tests => Set<Test>();
-    public DbSet<AdminGroup> AdminGroups => Set<AdminGroup>();
-    public DbSet<UserAccount> UserAccounts => Set<UserAccount>();
 
     public Db(DbContextOptions<T> options) : base(options)
     {
@@ -13,22 +16,19 @@ public abstract class Db<T> : DbContext, IDb where T : Db<T>
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        base.OnModelCreating(modelBuilder);
+
         modelBuilder.Entity<Test>(entityBuilder =>
         {
             entityBuilder.HasKey(x => x.Id);
         });
 
-        modelBuilder.Entity<AdminGroup>(entityBuilder =>
-        {
-            entityBuilder.HasKey(x => x.Id);
-            entityBuilder.HasMany(x => x.Users);
-        });
-
-        modelBuilder.Entity<UserAccount>(entityBuilder =>
-        {
-            entityBuilder.HasKey(x => x.Id);
-            entityBuilder.HasIndex(x => x.Login);
-            entityBuilder.HasMany(x => x.AdminGroups);
-        });
+        modelBuilder.Entity<User>().ToTable("Users");
+        modelBuilder.Entity<Role>().ToTable("Roles");
+        modelBuilder.Entity<IdentityUserClaim<Guid>>().ToTable("UserClaims");
+        modelBuilder.Entity<IdentityUserRole<Guid>>().ToTable("UserRoles");
+        modelBuilder.Entity<IdentityUserLogin<Guid>>().ToTable("UserLogins");
+        modelBuilder.Entity<IdentityRoleClaim<Guid>>().ToTable("RoleClaims");
+        modelBuilder.Entity<IdentityUserToken<Guid>>().ToTable("UserTokens");
     }
 }

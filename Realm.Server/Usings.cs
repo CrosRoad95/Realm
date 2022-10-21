@@ -42,5 +42,8 @@ global using Realm.Server.Elements;
 global using Realm.Scripting.Interfaces;
 global using Realm.Server.Interfaces;
 global using Realm.Scripting.Extensions;
+global using Realm.Identity;
+global using Microsoft.AspNetCore.Identity;
+global using Realm.Identity.Data;
 
 global using ConfigurationProvider = Realm.Configuration.ConfigurationProvider;

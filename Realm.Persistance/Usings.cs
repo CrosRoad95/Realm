@@ -8,5 +8,7 @@ global using Microsoft.Extensions.DependencyInjection;
 global using Realm.Persistance.Entities;
 global using Realm.Persistance.Repositories.Interfaces;
 global using Realm.Persistance.Repositories;
-global using Realm.Persistance.Interfaces;
 global using Realm.Interfaces.Server.Identity;
+global using Microsoft.AspNetCore.Identity;
+global using Realm.Identity.Data;
+global using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
