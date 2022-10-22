@@ -30,6 +30,9 @@ const func = () => Logger.information("you should not see this");
 addEventHandler("onPlayerJoin", func);
 removeEventHandler("onPlayerJoin", func);
 
-//Event.addHandler("onFormSubmit", context => {
-//    Console.writeLine("event {0} {1}", context, context.name);
-//})
+addEventHandler("onFormSubmit", context => {
+    const { name, player } = context;
+    const { login, password } = context.form;
+    Logger.information("event name={name} playerName={player} login={login} password={password}", name, player.name, login, password);
+    context.success();
+})

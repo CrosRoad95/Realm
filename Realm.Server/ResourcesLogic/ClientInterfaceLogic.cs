@@ -3,13 +3,15 @@
 internal class ClientInterfaceLogic
 {
     private readonly Resource _resource;
-    public ClientInterfaceLogic(IResourceProvider resourceProvider)
+    public ClientInterfaceLogic(IResourceProvider resourceProvider, IRPGServer rpgServer)
     {
         _resource = resourceProvider.GetResource("ClientInterface");
         _resource.AddGlobals();
+
+        rpgServer.PlayerJoined += Start;
     }
 
-    public void StartFor(RPGPlayer player)
+    public void Start(Player player)
     {
         _resource.StartFor(player);
     }

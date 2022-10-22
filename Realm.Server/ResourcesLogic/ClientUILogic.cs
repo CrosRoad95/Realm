@@ -3,20 +3,35 @@
 internal class ClientUILogic
 {
     private readonly Resource _resource;
+    private readonly EventFunctions _eventFunctions;
+    private readonly FromLuaValueMapper _fromLuaValueMapper;
 
-    public ClientUILogic(IResourceProvider resourceProvider, IGuiFilesProvider guiFilesProvider)
+    public ClientUILogic(IResourceProvider resourceProvider, IGuiFilesProvider guiFilesProvider, IRPGServer rpgServer, EventFunctions eventFunctions, FromLuaValueMapper fromLuaValueMapper)
     {
+        _eventFunctions = eventFunctions;
+        _fromLuaValueMapper = fromLuaValueMapper;
         _resource = resourceProvider.GetResource("UI");
         _resource.AddGlobals();
 
         foreach (var pair in guiFilesProvider.GetFiles())
             _resource.NoClientScripts[$"{_resource!.Name}/{pair.Item1}"] = pair.Item2;
+
+        rpgServer.PlayerJoined += Start;
+        rpgServer.AddEventHandler("internalSubmitForm", InternalSubmitFormHandler);
     }
 
-    public void StartFor(RPGPlayer player)
+    private async Task<object?> InternalSubmitFormHandler(LuaEvent luaEvent)
     {
+        var formContext = new FormContext(luaEvent, _fromLuaValueMapper);
+        await _eventFunctions.InvokeEvent("onFormSubmit", formContext);
+        return new object[] { formContext.Id, formContext.Name, formContext.IsSuccess, formContext.Response };
+    }
+
+    private void Start(Player player)
+    {
+        var rpgPlayer = player as RPGPlayer;
         _resource.StartFor(player);
-        player.ResourceReady += Player_ResourceReady;
+        rpgPlayer.ResourceReady += Player_ResourceReady;
     }
 
     public void SetGuiOpen(RPGPlayer player, string guiName)

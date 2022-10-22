@@ -11,10 +11,10 @@ public partial class RPGServer : IRPGServer
     private readonly SlipeServerConfiguration _serverConfiguration;
     private readonly ScriptingConfiguration _scriptingConfiguration;
     private readonly ILogger _logger;
-    private readonly LuaEventContextFactory _luaEventContextFactory;
     private readonly EventFunctions _eventFunctions;
     private readonly ElementFunctions _elementFunctions;
     private readonly IEnumerable<IModule> _modules;
+    private readonly Dictionary<string, Func<LuaEvent, Task<object?>>> _eventHandlers = new();
 
     public event Action<Player>? PlayerJoined;
 
@@ -37,7 +37,6 @@ public partial class RPGServer : IRPGServer
                     services.AddSingleton(logger);
                     services.AddSingleton(this);
                     services.AddSingleton<IRPGServer>(this);
-                    services.AddSingleton<LuaEventContextFactory>();
                     services.AddSingleton<ElementFunctions>();
 
                     if (modules != null)
@@ -58,7 +57,6 @@ public partial class RPGServer : IRPGServer
         _server.LuaEventTriggered += Server_LuaEventTriggered;
 
         var startup = _server.GetRequiredService<Startup>();
-        _luaEventContextFactory = _server.GetRequiredService<LuaEventContextFactory>();
         _eventFunctions = _server.GetRequiredService<EventFunctions>();
         _elementFunctions = _server.GetRequiredService<ElementFunctions>();
 
@@ -71,11 +69,34 @@ public partial class RPGServer : IRPGServer
         };
 
         _server.PlayerJoined += Server_PlayerJoined;
+
+
+        _server.LuaEventTriggered += async e =>
+        {
+            foreach (var pair in _eventHandlers)
+            {
+                if (pair.Key == e.Name)
+                {
+                    var response = await pair.Value(e);
+                    if(response != null)
+                    {
+                        (e.Player as RPGPlayer).TriggerClientEvent($"{e.Name}Response", response);
+                    }
+                }
+            }
+        };
     }
 
     public void AssociateElement(Element element)
     {
         _server.AssociateElement(element);
+    }
+
+    public void AddEventHandler(string eventName, Func<LuaEvent, Task<object?>> callback)
+    {
+        if (_eventHandlers.ContainsKey(eventName))
+            throw new Exception("Event already handled");
+        _eventHandlers[eventName] = callback;
     }
 
     private async void Server_PlayerJoined(RPGPlayer player)
@@ -90,6 +111,7 @@ public partial class RPGServer : IRPGServer
     {
         // Events
         _eventFunctions.RegisterEvent("onPlayerJoin");
+        _eventFunctions.RegisterEvent("onFormSubmit");
 
         // Functions
         scriptingModuleInterface.AddHostObject("Elements", _elementFunctions, true);
@@ -97,6 +119,7 @@ public partial class RPGServer : IRPGServer
         // Classes & Events & Contextes
         scriptingModuleInterface.AddHostType(typeof(RPGPlayer));
         scriptingModuleInterface.AddHostType(typeof(Spawn));
+        scriptingModuleInterface.AddHostType(typeof(FormContext));
     }
 
     private async void Server_LuaEventTriggered(LuaEvent luaEvent)

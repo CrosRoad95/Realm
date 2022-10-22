@@ -35,9 +35,18 @@ public class RPGPlayer : Player
 
     public bool IsPersistant() => true;
 
+    // TODO: improve
     public void TriggerClientEvent(string name, params object[] values)
     {
-        LuaValue[] luaValue = values.Select(_luaValueMapper.Map).ToArray();
+        LuaValue[] luaValue;
+        if (values.Length == 1 && values[0].GetType() == typeof(object[]))
+        {
+            luaValue = (values[0] as object[]).Select(_luaValueMapper.Map).ToArray();
+        }
+        else
+        {
+            luaValue = values.Select(_luaValueMapper.Map).ToArray();
+        }
         TriggerLuaEvent(name, this, luaValue);
     }
 

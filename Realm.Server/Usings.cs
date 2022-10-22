@@ -8,6 +8,7 @@ global using Microsoft.Extensions.Hosting;
 global using Microsoft.EntityFrameworkCore;
 global using Microsoft.Extensions.DependencyInjection;
 global using Microsoft.Extensions.Configuration;
+global using Microsoft.AspNetCore.Identity;
 global using Serilog;
 
 global using SlipeServer.Server.Elements;
@@ -41,6 +42,8 @@ global using Realm.Server.Elements;
 global using Realm.Scripting.Interfaces;
 global using Realm.Server.Interfaces;
 global using Realm.Scripting.Extensions;
-global using Microsoft.AspNetCore.Identity;
+global using Realm.Scripting.Classes;
+global using Realm.Server.Scripting.Events;
+global using Microsoft.ClearScript;
 
 global using ConfigurationProvider = Realm.Configuration.ConfigurationProvider;
