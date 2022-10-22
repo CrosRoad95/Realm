@@ -9,6 +9,7 @@ global using Microsoft.EntityFrameworkCore;
 global using Microsoft.Extensions.DependencyInjection;
 global using Microsoft.Extensions.Configuration;
 global using Microsoft.AspNetCore.Identity;
+global using Microsoft.ClearScript;
 global using Serilog;
 
 global using SlipeServer.Server.Elements;
@@ -44,6 +45,6 @@ global using Realm.Server.Interfaces;
 global using Realm.Scripting.Extensions;
 global using Realm.Scripting.Classes;
 global using Realm.Server.Scripting.Events;
-global using Microsoft.ClearScript;
+global using Realm.Persistance.Data;
 
 global using ConfigurationProvider = Realm.Configuration.ConfigurationProvider;

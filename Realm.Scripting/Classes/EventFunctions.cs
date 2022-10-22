@@ -16,7 +16,7 @@ public class EventFunctions
             foreach (var scriptObject in events)
             {
                 if (scriptObject.IsAsync())
-                    await scriptObject.Invoke(false, arguments).ToTask();
+                    await (scriptObject.Invoke(false, arguments) as dynamic);
                 else
                     scriptObject.Invoke(false, arguments);
             }

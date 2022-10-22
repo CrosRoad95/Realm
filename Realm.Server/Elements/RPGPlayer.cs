@@ -1,4 +1,6 @@
-﻿namespace Realm.Server.Elements;
+﻿using System.Security.Claims;
+
+namespace Realm.Server.Elements;
 
 public class RPGPlayer : Player
 {
@@ -7,6 +9,10 @@ public class RPGPlayer : Player
 
     public CancellationToken CancellationToken { get; private set; }
     public event Action<RPGPlayer, int>? ResourceReady;
+
+    [NoScriptAccess]
+    public ClaimsPrincipal? ClaimsPrincipal { get; set; }
+
     public RPGPlayer(LuaValueMapper luaValueMapper)
     {
         _cancellationTokenSource = new CancellationTokenSource();

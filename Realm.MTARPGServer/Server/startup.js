@@ -4,9 +4,11 @@ Logger.information("startup.js, TestModule: {TestModule}", TestModule);
 
 const spawn = createSpawn("dynamicSpawn", "test", new Vector3(0, 20, 3));
 Logger.information("createSpawn is persistant?: {persistant}", spawn.isPersistant());
-addEventHandler("onPlayerJoin", ({ player }) => {
+addEventHandler("onPlayerJoin", async ({ player }) => {
     Logger.information("player joined: {player}", player.name);
     player.spawn(spawn);
+    let account = await findAccountByUserName("test")
+    await logIn(player, account, "asdASD123!@#");
 })
 
 const spawns = getElementsByType("spawn");
@@ -35,6 +37,14 @@ addEventHandler("onFormSubmit", context => {
     const { login, password } = context.form;
     Logger.information("event name={name} playerName={player} login={login} password={password}", name, player.name, login, password);
     context.success();
+});
+
+addEventHandler("onPlayerLogin", ({player, account}) => {
+    Logger.information("login {player}, {account}", player, account)
+})
+
+addEventHandler("onPlayerLogout", ({ player }) => {
+    Logger.information("logout {player}", player)
 });
 
 (async () => {
