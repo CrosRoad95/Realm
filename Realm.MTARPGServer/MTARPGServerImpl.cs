@@ -1,5 +1,6 @@
 ﻿using Realm.Discord;
 using Realm.Interfaces.Extend;
+using Realm.Persistance;
 using Realm.Scripting;
 using Realm.Server.Scripting;
 
@@ -44,6 +45,7 @@ public class MTARPGServerImpl
         _rpgServer = new RPGServer(_configurationProvider, logger, new IModule[]
         {
             new DiscordModule(),
+            new IdentityModule(),
             new ScriptingModule(),
             new ServerScriptingModule(),
         }, serverBuilder =>

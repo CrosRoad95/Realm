@@ -8,7 +8,7 @@ public static class ServiceCollectionExtensions
     public static IServiceCollection AddPersistance<T>(this IServiceCollection services,
     Action<DbContextOptionsBuilder> dboptions) where T : DbContext, IDb
     {
-        services.AddDbContextPool<IDb, T>(dboptions);
+        services.AddDbContext<IDb, T>(dboptions, ServiceLifetime.Transient);
 
         services.AddTransient<ITestRepository, TestRepository>();
         return services;

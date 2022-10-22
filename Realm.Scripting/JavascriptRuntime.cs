@@ -9,7 +9,7 @@ internal class JavascriptRuntime : IScriptingModuleInterface
     public JavascriptRuntime(ILogger logger, Func<string?> basePathFactory, EventFunctions eventFunctions)
     {
         HostSettings.CustomAttributeLoader = new LowercaseSymbolsLoader();
-        _engine = new V8ScriptEngine(V8ScriptEngineFlags.EnableValueTaskPromiseConversion);
+        _engine = new V8ScriptEngine(V8ScriptEngineFlags.EnableTaskPromiseConversion);
         _typescriptTypesGenerator = new TypescriptTypesGenerator();
         _logger = logger.ForContext<JavascriptRuntime>();
 

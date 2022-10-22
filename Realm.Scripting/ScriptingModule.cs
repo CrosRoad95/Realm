@@ -14,7 +14,6 @@ public class ScriptingModule : IModule
     public void Init(IServiceProvider serviceProvider)
     {
         _interface = serviceProvider.GetRequiredService<IScriptingModuleInterface>();
-        ;
     }
 
     public void PostInit(IServiceProvider serviceProvider)

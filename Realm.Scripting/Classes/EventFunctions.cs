@@ -5,6 +5,7 @@ public class EventFunctions
     private readonly HashSet<string> _supportedEventsNames = new();
     private readonly Dictionary<string, List<ScriptObject>> _events = new();
 
+    [NoScriptAccess]
     public async Task InvokeEvent(string eventName, params object[] arguments)
     {
         if (!_supportedEventsNames.Contains(eventName))
@@ -22,6 +23,7 @@ public class EventFunctions
         }
     }
 
+    [NoScriptAccess]
     public void RegisterEvent(string eventName)
     {
         _supportedEventsNames.Add(eventName);

@@ -1,5 +1,6 @@
 ﻿using Realm.Discord;
 using Realm.Interfaces.Extend;
+using Realm.Persistance;
 using Realm.Server.Interfaces;
 using SlipeServer.Server.Elements;
 using SlipeServer.Server.Events;
@@ -16,6 +17,7 @@ internal class TestRPGServer : IReloadable, IRPGServer
     {
         var modules = new IModule[] {
             new DiscordModule(),
+            new IdentityModule(),
             new ScriptingModule(),
             new ServerScriptingModule(),
         };

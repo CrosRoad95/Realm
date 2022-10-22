@@ -35,4 +35,13 @@ addEventHandler("onFormSubmit", context => {
     const { login, password } = context.form;
     Logger.information("event name={name} playerName={player} login={login} password={password}", name, player.name, login, password);
     context.success();
-})
+});
+
+(async () => {
+    let account = await findAccountByUserName("test")
+    if (account === null) {
+        Logger.information("creating account...");
+        account = await createAccount("test", "asdASD123!@#")
+    }
+    Logger.information("account: {account} {username}", account, account.userName);
+})()
