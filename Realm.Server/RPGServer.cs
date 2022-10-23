@@ -13,7 +13,6 @@ public partial class RPGServer : IRPGServer
     private readonly ILogger _logger;
     private readonly EventFunctions _eventFunctions;
     private readonly ElementFunctions _elementFunctions;
-    private readonly PlayerFunctions _playerfunctions;
     private readonly IEnumerable<IModule> _modules;
     private readonly Dictionary<string, Func<LuaEvent, Task<object?>>> _eventHandlers = new();
 
@@ -39,7 +38,6 @@ public partial class RPGServer : IRPGServer
                     services.AddSingleton(this);
                     services.AddSingleton<IRPGServer>(this);
                     services.AddSingleton<ElementFunctions>();
-                    services.AddSingleton<PlayerFunctions>();
 
                     if (modules != null)
                         foreach (var module in modules)
@@ -61,7 +59,6 @@ public partial class RPGServer : IRPGServer
         var startup = _server.GetRequiredService<Startup>();
         _eventFunctions = _server.GetRequiredService<EventFunctions>();
         _elementFunctions = _server.GetRequiredService<ElementFunctions>();
-        _playerfunctions = _server.GetRequiredService<PlayerFunctions>();
 
         var _ = Task.Run(startup.StartAsync);
 
@@ -120,12 +117,15 @@ public partial class RPGServer : IRPGServer
 
         // Functions
         scriptingModuleInterface.AddHostObject("Elements", _elementFunctions, true);
-        scriptingModuleInterface.AddHostObject("Players", _playerfunctions, true);
 
         // Classes & Events & Contextes
+        scriptingModuleInterface.AddHostType(typeof(Claim));
         scriptingModuleInterface.AddHostType(typeof(RPGPlayer));
         scriptingModuleInterface.AddHostType(typeof(Spawn));
         scriptingModuleInterface.AddHostType(typeof(FormContext));
+        scriptingModuleInterface.AddHostType(typeof(PlayerJoinedEvent));
+        scriptingModuleInterface.AddHostType(typeof(PlayerLoggedInEvent));
+        scriptingModuleInterface.AddHostType(typeof(PlayerLoggedOutEvent));
     }
 
     private async void Server_LuaEventTriggered(LuaEvent luaEvent)

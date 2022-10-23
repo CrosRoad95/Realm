@@ -4,6 +4,7 @@ global using System.Linq;
 global using System.Numerics;
 global using System.Threading.Tasks;
 global using System.Reflection;
+global using System.Security.Claims;
 global using Microsoft.Extensions.Hosting;
 global using Microsoft.EntityFrameworkCore;
 global using Microsoft.Extensions.DependencyInjection;
@@ -46,5 +47,6 @@ global using Realm.Scripting.Extensions;
 global using Realm.Scripting.Classes;
 global using Realm.Server.Scripting.Events;
 global using Realm.Persistance.Data;
+global using Realm.Persistance.Scripting.Classes;
 
 global using ConfigurationProvider = Realm.Configuration.ConfigurationProvider;

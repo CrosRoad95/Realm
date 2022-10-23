@@ -5,10 +5,18 @@ Logger.information("startup.js, TestModule: {TestModule}", TestModule);
 const spawn = createSpawn("dynamicSpawn", "test", new Vector3(0, 20, 3));
 Logger.information("createSpawn is persistant?: {persistant}", spawn.isPersistant());
 addEventHandler("onPlayerJoin", async ({ player }) => {
-    Logger.information("player joined: {player}", player.name);
-    player.spawn(spawn);
+    Logger.information("player joined: {player} isLoggedIn={isLoggedIn}", player.name, player.isLoggedIn);
     let account = await findAccountByUserName("test")
-    await logIn(player, account, "asdASD123!@#");
+    Logger.information("account = {account}", account);
+    const loggedIn = await player.logIn(account, "asdASD123!@#");
+    if (!loggedIn)
+        Logger.warning("Fail to log in");
+    Logger.information("is logged in?: {player} isLoggedIn={isLoggedIn}", player.name, player.isLoggedIn);
+    let account2 = await player.getAccount();
+    Logger.information("accounts ids: {a} = {b}", account.id, account2.id);
+    Logger.information("role: {a}", player.isInRole("admin"));
+    Logger.information("claims: {claims}", JSON.stringify(player.claims));
+    Logger.information("roles: {roles}", JSON.stringify(player.roles));
 })
 
 const spawns = getElementsByType("spawn");
@@ -40,7 +48,8 @@ addEventHandler("onFormSubmit", context => {
 });
 
 addEventHandler("onPlayerLogin", ({player, account}) => {
-    Logger.information("login {player}, {account}", player, account)
+    Logger.information("player logged in: {player}, {account}", player, account)
+    player.spawn(spawn);
 })
 
 addEventHandler("onPlayerLogout", ({ player }) => {

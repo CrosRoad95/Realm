@@ -2,21 +2,34 @@
 
 public class IdentityFunctions
 {
-    private readonly SignInManager<User> _signInManager;
     private readonly UserManager<User> _userManager;
 
-    public IdentityFunctions(SignInManager<User> signInManager, UserManager<User> userManager)
+    public IdentityFunctions(UserManager<User> userManager)
     {
-        _signInManager = signInManager;
         _userManager = userManager;
     }
 
-    public async Task<User?> FindAccountByUserName(string username)
+    public async Task<PlayerAccount?> FindAccountById(string id)
     {
-        return await _userManager.FindByNameAsync(username);
+        var user = await _userManager.FindByIdAsync(id);
+
+        if (user == null)
+            return null;
+
+        return new PlayerAccount(user, _userManager);
+    }
+    
+    public async Task<PlayerAccount?> FindAccountByUserName(string username)
+    {
+        var user = await _userManager.FindByNameAsync(username);
+
+        if (user == null)
+            return null;
+
+        return new PlayerAccount(user, _userManager);
     }
 
-    public async Task<User> CreateAccount(string username, string password)
+    public async Task<PlayerAccount> CreateAccount(string username, string password)
     {
         var result = await _userManager.CreateAsync(new User
         {
@@ -30,6 +43,9 @@ public class IdentityFunctions
             throw new Exception(result.ToString());
         }
 
-        return await _userManager.FindByNameAsync(username);
+        var account = await FindAccountByUserName(username);
+        if (account == null)
+            throw new Exception("Failed to create an account");
+        return account;
     }
 }

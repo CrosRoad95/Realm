@@ -3,5 +3,5 @@
 public class PlayerLoggedInEvent
 {
     public RPGPlayer Player { get; init; }
-    public User Account { get; init; }
+    public PlayerAccount Account { get; init; }
 }
