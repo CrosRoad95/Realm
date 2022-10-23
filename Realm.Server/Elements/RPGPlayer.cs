@@ -1,4 +1,7 @@
-﻿namespace Realm.Server.Elements;
+﻿using Microsoft.AspNetCore.Authorization;
+using System.Security.Principal;
+
+namespace Realm.Server.Elements;
 
 public class RPGPlayer : Player
 {
@@ -6,6 +9,8 @@ public class RPGPlayer : Player
     private readonly LuaValueMapper _luaValueMapper;
     private readonly SignInManager<User> _signInManager;
     private readonly UserManager<User> _userManager;
+    private readonly IAuthorizationService _authorizationService;
+    private readonly AuthorizationPoliciesProvider _authorizationPoliciesProvider;
     private readonly EventFunctions _eventFunctions;
     private readonly IdentityFunctions _identityFunctions;
 
@@ -43,11 +48,13 @@ public class RPGPlayer : Player
         }
     }
 
-    public RPGPlayer(LuaValueMapper luaValueMapper, SignInManager<User> signInManager, UserManager<User> userManager, EventFunctions eventFunctions, IdentityFunctions identityFunctions)
+    public RPGPlayer(LuaValueMapper luaValueMapper, SignInManager<User> signInManager, UserManager<User> userManager, IAuthorizationService authorizationService, AuthorizationPoliciesProvider authorizationPoliciesProvider, EventFunctions eventFunctions, IdentityFunctions identityFunctions)
     {
         _luaValueMapper = luaValueMapper;
         _signInManager = signInManager;
         _userManager = userManager;
+        _authorizationService = authorizationService;
+        _authorizationPoliciesProvider = authorizationPoliciesProvider;
         _eventFunctions = eventFunctions;
         _identityFunctions = identityFunctions;
         _cancellationTokenSource = new CancellationTokenSource();
@@ -66,11 +73,21 @@ public class RPGPlayer : Player
         ResourceReady?.Invoke(sender as RPGPlayer, e.NetId);
     }
 
-    public void Spawn(Spawn spawn)
+    public virtual async Task<bool> Spawn(Spawn spawn)
     {
-        Camera.Target = this;
-        Camera.Fade(CameraFade.In);
-        Spawn(spawn.Position, spawn.Rotation.Z, 0, 0, 0);
+        if(await spawn.Authorize(this))
+        {
+            Camera.Target = this;
+            Camera.Fade(CameraFade.In);
+            Spawn(spawn.Position, spawn.Rotation.Z, 0, 0, 0);
+            await _eventFunctions.InvokeEvent("onPlayerSpawn", new PlayerSpawned
+            {
+                Player = this,
+                Spawn = spawn,
+            });
+            return true;
+        }
+        return false;
     }
 
     public bool IsPersistant() => true;
@@ -151,6 +168,28 @@ public class RPGPlayer : Player
             return null;
 
         return ClaimsPrincipal!.Claims.First(x => x.Type == type).Value;
+    }
+
+    [NoScriptAccess]
+    public async Task<AuthorizationResult?> AuthorizeInternal(string policy)
+    {
+        _authorizationPoliciesProvider.ValidatePolicy(policy);
+        if (!IsLoggedIn)
+            return null;
+
+        var result = await _authorizationService.AuthorizeAsync(ClaimsPrincipal!, policy);
+
+        return result;
+    }
+
+    public async Task<bool> Authorize(string policy)
+    {
+        if (!IsLoggedIn)
+            return false;
+
+        var result = await _authorizationService.AuthorizeAsync(ClaimsPrincipal!, policy);
+
+        return result.Succeeded;
     }
 
     public override string ToString() => "Player";

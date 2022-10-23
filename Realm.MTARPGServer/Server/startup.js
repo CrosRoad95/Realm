@@ -3,6 +3,8 @@
 Logger.information("startup.js, TestModule: {TestModule}", TestModule);
 
 const spawn = createSpawn("dynamicSpawn", "test", new Vector3(0, 20, 3));
+//spawn.addRequiredPolicy("Admin");
+
 Logger.information("createSpawn is persistant?: {persistant}", spawn.isPersistant());
 addEventHandler("onPlayerJoin", async ({ player }) => {
     Logger.information("player joined: {player} isLoggedIn={isLoggedIn}", player.name, player.isLoggedIn);
@@ -47,13 +49,18 @@ addEventHandler("onFormSubmit", context => {
     context.success();
 });
 
-addEventHandler("onPlayerLogin", ({player, account}) => {
+addEventHandler("onPlayerLogin", async ({player, account}) => {
     Logger.information("player logged in: {player}, {account}", player, account)
-    player.spawn(spawn);
+    await player.spawn(spawn);
+    Logger.information("is player authorized to admin? {isAuythorized}", await player.authorize("Admin"))
 })
 
 addEventHandler("onPlayerLogout", ({ player }) => {
     Logger.information("logout {player}", player)
+});
+
+addEventHandler("onPlayerSpawn", ({ player, spawn }) => {
+    Logger.information("player spawned: {player}", player)
 });
 
 (async () => {

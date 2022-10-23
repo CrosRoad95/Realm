@@ -4,16 +4,18 @@ public class ElementFunctions
 {
     private readonly RPGServer _rpgServer;
     private readonly IElementCollection _elementCollection;
+    private readonly AuthorizationPoliciesProvider _authorizationPoliciesProvider;
 
-    public ElementFunctions(RPGServer rpgServer, IElementCollection elementCollection)
+    public ElementFunctions(RPGServer rpgServer, IElementCollection elementCollection, AuthorizationPoliciesProvider authorizationPoliciesProvider)
     {
         _rpgServer = rpgServer;
         _elementCollection = elementCollection;
+        _authorizationPoliciesProvider = authorizationPoliciesProvider;
     }
 
     public Spawn CreateSpawn(string id, string name, Vector3 position, Vector3? rotation = null)
     {
-        var spawn = new Spawn(id, name, position, rotation ?? Vector3.Zero);
+        var spawn = new Spawn(_authorizationPoliciesProvider, id, name, position, rotation ?? Vector3.Zero);
         _rpgServer.AssociateElement(spawn);
         return spawn;
     }

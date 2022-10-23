@@ -19,6 +19,8 @@ internal class TestConfiguration
                 ["discord:token"] = "true",
                 ["discord:guild"] = "997787973775011850",
                 ["discord:statusChannel:channelId"] = "1025774028255932497",
+                ["Identity:Policies:Admin:RequireRoles:0"] = "Admin",
+                ["Identity:Policies:Admin:RequireClaims:Test"] = "true",
             }).Build();
     }
 }

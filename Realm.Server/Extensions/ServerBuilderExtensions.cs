@@ -20,7 +20,7 @@ public static class ServerBuilderExtensions
             services.AddSingleton<IPasswordHasher, PasswordHasher>();
 
             services.AddPersistance<SQLiteDb>(db => db.UseSqlite("Filename=./server.db"));
-            services.AddRealmIdentity<SQLiteDb>();
+            services.AddRealmIdentity<SQLiteDb>(configuration.GetSection("Identity").Get<IdentityConfiguration>());
 
             services.AddSingleton<HelpCommand>();
             services.AddSingleton<ICommand, TestCommand>();

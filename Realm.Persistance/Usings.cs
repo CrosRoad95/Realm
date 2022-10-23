@@ -12,3 +12,4 @@ global using Realm.Interfaces.Extend;
 global using Realm.Persistance.Scripting.Classes;
 global using Realm.Scripting.Interfaces;
 global using Realm.Persistance.Data;
+global using Realm.Persistance.Interfaces;

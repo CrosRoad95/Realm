@@ -48,5 +48,6 @@ global using Realm.Scripting.Classes;
 global using Realm.Server.Scripting.Events;
 global using Realm.Persistance.Data;
 global using Realm.Persistance.Scripting.Classes;
+global using Microsoft.AspNetCore.Authorization;
 
 global using ConfigurationProvider = Realm.Configuration.ConfigurationProvider;

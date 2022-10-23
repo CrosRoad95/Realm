@@ -114,6 +114,7 @@ public partial class RPGServer : IRPGServer
         _eventFunctions.RegisterEvent("onFormSubmit");
         _eventFunctions.RegisterEvent("onPlayerLogin");
         _eventFunctions.RegisterEvent("onPlayerLogout");
+        _eventFunctions.RegisterEvent("onPlayerSpawn");
 
         // Functions
         scriptingModuleInterface.AddHostObject("Elements", _elementFunctions, true);
@@ -126,6 +127,7 @@ public partial class RPGServer : IRPGServer
         scriptingModuleInterface.AddHostType(typeof(PlayerJoinedEvent));
         scriptingModuleInterface.AddHostType(typeof(PlayerLoggedInEvent));
         scriptingModuleInterface.AddHostType(typeof(PlayerLoggedOutEvent));
+        scriptingModuleInterface.AddHostType(typeof(PlayerSpawned));
     }
 
     private async void Server_LuaEventTriggered(LuaEvent luaEvent)
