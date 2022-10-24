@@ -34,7 +34,7 @@ public class MTARPGServerImpl
 
     public RPGServer Server => _rpgServer;
 
-    public MTARPGServerImpl(IConsoleCommands consoleCommands, ILogger logger, Realm.Configuration.ConfigurationProvider configurationProvider, string? basePath = null)
+    public MTARPGServerImpl(IConsoleCommands consoleCommands, ILogger logger, Realm.Configuration.ConfigurationProvider configurationProvider, IModule[] modules, string? basePath = null)
     {
         var previousDirectory = Directory.GetCurrentDirectory();
         if(basePath != null)
@@ -42,13 +42,7 @@ public class MTARPGServerImpl
         logger.Information("Starting server");
         _configurationProvider = configurationProvider;
         _basePath = basePath;
-        _rpgServer = new RPGServer(_configurationProvider, logger, new IModule[]
-        {
-            new DiscordModule(),
-            new IdentityModule(),
-            new ScriptingModule(),
-            new ServerScriptingModule(),
-        }, serverBuilder =>
+        _rpgServer = new RPGServer(_configurationProvider, logger, modules, serverBuilder =>
         {
             serverBuilder.AddGuiFilesLocation("Gui");
             serverBuilder.ConfigureServices(services =>

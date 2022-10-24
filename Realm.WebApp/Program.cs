@@ -1,4 +1,9 @@
+using Microsoft.Extensions.DependencyInjection;
 using MudBlazor.Services;
+using Realm.Discord;
+using Realm.Persistance;
+using Realm.Scripting;
+using Realm.Server;
 
 var basePath = Path.GetDirectoryName(
       System.Reflection.Assembly.GetExecutingAssembly().GetName().CodeBase)[6..];
@@ -13,8 +18,18 @@ builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
 builder.Services.AddMudServices();
 
+builder.Services.AddSingleton<SnackbarFunctions>();
+builder.Services.AddSingleton<WebPanelIntegration>();
+builder.Services.AddSingleton<WebPanelModule>();
 builder.Services.AddSingleton<WeatherForecastService>();
-builder.Services.AddSingleton(x => new MTARPGServerImpl(serverConsole, logger, new Realm.Configuration.ConfigurationProvider(x.GetRequiredService<IConfiguration>()), basePath));
+builder.Services.AddSingleton(x => new MTARPGServerImpl(serverConsole, logger, new Realm.Configuration.ConfigurationProvider(x.GetRequiredService<IConfiguration>()), new IModule[]
+        {
+            new DiscordModule(),
+            new IdentityModule(),
+            new ScriptingModule(),
+            x.GetRequiredService<WebPanelModule>(),
+            new ServerScriptingModule(),
+        }, basePath));
 builder.Services.AddSingleton<IRPGServer>(x => x.GetRequiredService<MTARPGServerImpl>().Server);
 
 var app = builder.Build();

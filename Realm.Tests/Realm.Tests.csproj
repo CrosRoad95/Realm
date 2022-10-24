@@ -27,6 +27,7 @@
     <ProjectReference Include="..\Realm.Console\Realm.Console.csproj" />
     <ProjectReference Include="..\Realm.Scripting\Realm.Scripting.csproj" />
     <ProjectReference Include="..\Realm.Server\Realm.Server.csproj" />
+    <ProjectReference Include="..\Realm.WebApp\Realm.WebApp.csproj" />
   </ItemGroup>
 
 </Project>

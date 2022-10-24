@@ -29,6 +29,9 @@
     <None Update="Server\startup.js">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Update="Server\panel.js">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="Server\Test\test.js">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

@@ -1,5 +1,6 @@
 ﻿import * as TestModule from "Test/test.js"
 import "discord.js"
+import "panel.js"
 
 Logger.information("startup.js, TestModule: {TestModule}", TestModule);
 

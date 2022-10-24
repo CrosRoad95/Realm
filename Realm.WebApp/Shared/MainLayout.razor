@@ -1,4 +1,6 @@
 ﻿@inherits LayoutComponentBase
+@inject ISnackbar Snackbar
+@inject SnackbarFunctions SnackbarFunctions
 
 <MudThemeProvider IsDarkMode="true"/>
 <MudDialogProvider/>
@@ -29,5 +31,16 @@
     void DrawerToggle()
     {
         _drawerOpen = !_drawerOpen;
+    }
+
+    private void AddSnackbar(string message)
+    {
+        Snackbar.Add(message);
+    }
+
+    protected override void OnInitialized()
+    {
+        SnackbarFunctions.SnackbarAdded += AddSnackbar;
+        base.OnInitialized();
     }
 }
