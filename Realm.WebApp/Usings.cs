@@ -7,3 +7,4 @@ global using Microsoft.AspNetCore.Mvc;
 global using Microsoft.AspNetCore.Mvc.RazorPages;
 global using System.Diagnostics;
 global using Realm.Interfaces.Server;
+global using Realm.Server.Interfaces;
