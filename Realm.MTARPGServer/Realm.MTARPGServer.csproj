@@ -23,6 +23,9 @@
     <None Update="provisioning.yaml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Update="Server\discord.js">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="Server\startup.js">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

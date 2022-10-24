@@ -1,4 +1,5 @@
 ﻿import * as TestModule from "Test/test.js"
+import "discord.js"
 
 Logger.information("startup.js, TestModule: {TestModule}", TestModule);
 
@@ -27,16 +28,6 @@ Logger.information("spawns: {spawnsA} {spawnsB}", spawns.length, countElementsBy
 for (var key in spawns) {
     Logger.information("Spawn: {spawnName}, is persistant: {isPersistant}", spawns[key].name, spawns[key].isPersistant());
 }
-
-addEventHandler("onDiscordStatusChannelUpdate", context => {
-    context.addLine(`======================================`);
-    context.addLine(`Ostatnia aktualizacja statusu serwera: <t:${Math.floor(Date.now() / 1000)}:R>`);
-})
-
-addEventHandler("onDiscordStatusChannelUpdate", context => {
-    const plrs = countElementsByType("player")
-    context.addLine(`Ilość graczy: ${plrs}`);
-})
 
 const func = () => Logger.information("you should not see this");
 addEventHandler("onPlayerJoin", func);
