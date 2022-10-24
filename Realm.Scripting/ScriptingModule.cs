@@ -8,6 +8,7 @@ public class ScriptingModule : IModule
     public void Configure(IServiceCollection services)
     {
         services.AddSingleton<EventFunctions>();
+        services.AddSingleton<ModulesFunctions>();
         services.AddSingleton<IScriptingModuleInterface, JavascriptRuntime>();
     }
 

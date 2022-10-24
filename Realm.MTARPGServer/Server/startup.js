@@ -1,8 +1,15 @@
 ﻿import * as TestModule from "Test/test.js"
-import "discord.js"
-import "panel.js"
+
+if (moduleExists("Discord-Scripting")) {
+    import("discord.js")
+}
+
+if (moduleExists("WebPanel-Scripting")) {
+    import("panel.js")
+}
 
 Logger.information("startup.js, TestModule: {TestModule}", TestModule);
+Logger.information("loaded modules: {modules}", JSON.stringify(getModules()));
 
 const spawn = createSpawn("dynamicSpawn", "test", new Vector3(0, 20, 3));
 //spawn.addRequiredPolicy("Admin");

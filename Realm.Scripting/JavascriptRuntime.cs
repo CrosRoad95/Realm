@@ -6,7 +6,7 @@ internal class JavascriptRuntime : IScriptingModuleInterface
     private readonly TypescriptTypesGenerator _typescriptTypesGenerator;
     private readonly ILogger _logger;
 
-    public JavascriptRuntime(ILogger logger, Func<string?> basePathFactory, EventFunctions eventFunctions)
+    public JavascriptRuntime(ILogger logger, Func<string?> basePathFactory, EventFunctions eventFunctions, ModulesFunctions modulesFunctions)
     {
         HostSettings.CustomAttributeLoader = new LowercaseSymbolsLoader();
         _engine = new V8ScriptEngine(V8ScriptEngineFlags.EnableTaskPromiseConversion);
@@ -26,6 +26,7 @@ internal class JavascriptRuntime : IScriptingModuleInterface
 
         AddHostObject("Logger", _logger.ForContext("javascript", true), false);
         AddHostObject("Events", eventFunctions, true);
+        AddHostObject("Modules", modulesFunctions, true);
     }
 
     public string GetTypescriptDefinition()
