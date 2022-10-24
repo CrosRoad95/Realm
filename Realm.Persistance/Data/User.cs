@@ -3,7 +3,6 @@
 public sealed class User : IdentityUser<Guid>
 {
     public string Nick { get; set; }
-    public ulong? DiscordId { get; set; }
     public DateTime? RegisteredDateTime { get; set; }
     public DateTime? LastLogindDateTime { get; set; }
     public string? RegisterSerial { get; set; }
