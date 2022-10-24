@@ -4,3 +4,4 @@ obj/
 .vs/
 RealmRPG/Server/types.ts
 Realm.Configuration/appsettings.server.local.json
+*.db
