@@ -56,7 +56,7 @@ public class MTARPGServerImpl
                 services.AddSingleton(consoleCommands);
                 services.AddSingleton<Func<string?>>(() => basePath);
             });
-        });
+        }, basePath);
         Directory.SetCurrentDirectory(previousDirectory);
     }
 

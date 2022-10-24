@@ -18,7 +18,7 @@ public partial class RPGServer : IRPGServer
 
     public event Action<Player>? PlayerJoined;
 
-    public RPGServer(ConfigurationProvider configurationProvider, ILogger logger, IEnumerable<IModule> modules, Action<ServerBuilder>? configureServerBuilder = null)
+    public RPGServer(ConfigurationProvider configurationProvider, ILogger logger, IEnumerable<IModule> modules, Action<ServerBuilder>? configureServerBuilder = null, string? basePath = null)
     {
         _modules = modules;
         _logger = logger.ForContext<IRPGServer>();
@@ -27,7 +27,7 @@ public partial class RPGServer : IRPGServer
         _server = MtaServer.CreateWithDiSupport<RPGPlayer>(
             builder =>
             {
-                builder.ConfigureServer(configurationProvider.Configuration);
+                builder.ConfigureServer(configurationProvider.Configuration, basePath);
                 if (configureServerBuilder != null)
                     configureServerBuilder(builder);
 
@@ -48,7 +48,6 @@ public partial class RPGServer : IRPGServer
                 });
             }
         );
-
 
         var serverListConfiguration = configurationProvider.Get<ServerListConfiguration>("serverList");
         _server.GameType = serverListConfiguration.GameType;

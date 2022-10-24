@@ -2,10 +2,12 @@
 
 public static class ServerBuilderExtensions
 {
-    public static ServerBuilder ConfigureServer(this ServerBuilder builder, IConfiguration configuration)
+    public static ServerBuilder ConfigureServer(this ServerBuilder builder, IConfiguration configuration, string? basePath = null)
     {
         var _serverConfiguration = configuration.GetSection("server").Get<SlipeServerConfiguration>();
         var _scriptingConfiguration = configuration.GetSection("scripting").Get<ScriptingConfiguration>();
+        if (basePath != null)
+            _serverConfiguration.ResourceDirectory = Path.Join(basePath, _serverConfiguration.ResourceDirectory);
         builder.UseConfiguration(_serverConfiguration);
 #if DEBUG
         builder.AddDefaults(exceptBehaviours: ServerBuilderDefaultBehaviours.MasterServerAnnouncementBehaviour);
