@@ -31,6 +31,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Realm.WebApp", "Realm.WebAp
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Realm.Logging", "Realm.Logging\Realm.Logging.csproj", "{BBE03435-D579-40C6-8107-1DE73AEFE697}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Sample servers", "Sample servers", "{E154567C-A804-4377-AE57-1E6DB6B4413A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -94,8 +96,10 @@ Global
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
+		{45D93C1E-8D67-4CD3-B40A-1B5A19D4BC38} = {E154567C-A804-4377-AE57-1E6DB6B4413A}
 		{7DDBEF8D-43FF-4778-9CB3-158DDFEF6EDA} = {FF8A52BA-23E6-4192-A37D-7693642A9BCE}
 		{21D5188B-9C09-4372-B143-8E99C917CC02} = {FF8A52BA-23E6-4192-A37D-7693642A9BCE}
+		{F0BAB8CC-D627-46C1-BEEB-86ED7E3B090F} = {E154567C-A804-4377-AE57-1E6DB6B4413A}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {3922BF34-8D0B-4DC1-9EFC-D4CFB948B3B8}
