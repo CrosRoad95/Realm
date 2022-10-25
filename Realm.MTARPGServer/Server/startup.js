@@ -1,12 +1,6 @@
 ﻿import * as TestModule from "Test/test.js"
-
-if (moduleExists("Discord-Scripting")) {
-    import("discord.js")
-}
-
-if (moduleExists("WebPanel-Scripting")) {
-    import("panel.js")
-}
+import "panel.js"
+import "discord.js"
 
 Logger.information("startup.js, TestModule: {TestModule}", TestModule);
 Logger.information("loaded modules: {modules}", JSON.stringify(getModules()));

@@ -4,7 +4,7 @@ public class WebPanelModule : IModule
 {
     private readonly WebPanelIntegration _webPanelIntegration;
 
-    public string Name => "WebPanel-Scripting";
+    public string Name => "WebPanel";
 
     public WebPanelModule(WebPanelIntegration webPanelIntegration)
     {

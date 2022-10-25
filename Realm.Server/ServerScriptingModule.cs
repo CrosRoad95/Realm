@@ -2,7 +2,7 @@
 
 public class ServerScriptingModule : IModule
 {
-    public string Name => "Server-Scripting";
+    public string Name => "Server";
 
     public void Configure(IServiceCollection services)
     {

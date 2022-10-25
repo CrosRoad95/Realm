@@ -2,7 +2,7 @@
 
 public class IdentityModule : IModule
 {
-    public string Name => "Identity-Scripting";
+    public string Name => "Identity";
 
     public void Configure(IServiceCollection services)
     {
