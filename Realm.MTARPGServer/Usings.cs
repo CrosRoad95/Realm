@@ -20,3 +20,4 @@ global using Realm.Persistance;
 global using Realm.Scripting;
 global using Realm.Server.Scripting;
 global using Realm.MTARPGServer.Serialization.Yaml;
+global using Realm.Persistance.Scripting.Classes;

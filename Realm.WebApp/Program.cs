@@ -34,7 +34,10 @@ builder.Services.AddSingleton<IRPGServer>(x => x.GetRequiredService<MTARPGServer
 
 var app = builder.Build();
 
-app.Services.GetRequiredService<MTARPGServerImpl>().Start();
+var serverImpl = app.Services.GetRequiredService<MTARPGServerImpl>();
+var fileName = serverImpl.ConfigurationProvider.Get<string>("General:ProvisioningFile");
+await serverImpl.BuildFromProvisioningFile(fileName);
+serverImpl.Start();
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())

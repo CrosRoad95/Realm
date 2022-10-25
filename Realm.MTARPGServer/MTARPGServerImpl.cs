@@ -7,6 +7,7 @@ public class MTARPGServerImpl
     private readonly string? _basePath;
 
     public RPGServer Server => _rpgServer;
+    public Configuration.ConfigurationProvider ConfigurationProvider => _configurationProvider;
 
     public MTARPGServerImpl(IConsoleCommands consoleCommands, ILogger logger, Realm.Configuration.ConfigurationProvider configurationProvider, IModule[] modules, string? basePath = null)
     {
@@ -22,6 +23,7 @@ public class MTARPGServerImpl
             serverBuilder.ConfigureServices(services =>
             {
                 services.AddSingleton(consoleCommands);
+                services.AddSingleton<ProvisioningServerBuilder>();
                 services.AddSingleton<Func<string?>>(() => basePath);
             });
         }, basePath);
@@ -43,14 +45,8 @@ public class MTARPGServerImpl
         var provisioning = deserializer.Deserialize<Provisioning>(provisioningSource);
         var provisioningValidator = new ProvisioningValidator();
         await provisioningValidator.ValidateAndThrowAsync(provisioning);
-        using (var _ = new PersistantScope())
-        {
-            var elementFunctions = _rpgServer.GetRequiredService<ElementFunctions>();
-            foreach (var pair in provisioning.Spawns)
-            {
-                elementFunctions.CreateSpawn(pair.Key, pair.Value.Name, pair.Value.Position, pair.Value.Rotation);
-            }
-        }
+        var provisioningServerBuilder = _rpgServer.GetRequiredService<ProvisioningServerBuilder>();
+        await provisioningServerBuilder.BuildFrom(provisioning);
         Directory.SetCurrentDirectory(previousDirectory);
     }
 
