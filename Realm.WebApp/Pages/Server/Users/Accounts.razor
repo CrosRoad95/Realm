@@ -1,0 +1,55 @@
+﻿@page "/server/users/accounts"
+@inject IRPGServer server;
+
+<h3>Konta:</h3>
+
+<MudTable Items="@_accounts" Hover="true" Breakpoint="Breakpoint.Sm" Loading="@_loading" LoadingProgressColor="Color.Info">
+    <HeaderContent>
+        <MudTh>Id</MudTh>
+        <MudTh>Nazwa użytkownika</MudTh>
+        <MudTh>Role</MudTh>
+        <MudTh>Prawa</MudTh>
+        <MudTh>Data rejestracji</MudTh>
+        <MudTh>Akcje</MudTh>
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd DataLabel="Id">@context.PlayerAccount.Id[..8]...</MudTd>
+        <MudTd DataLabel="UserName">@context.PlayerAccount.UserName</MudTd>
+        <MudTd DataLabel="Roles">
+            @foreach (var role in context.Roles)
+            {
+                <MudChip Text="purple" Variant="Variant.Text" Color="Color.Primary">@role</MudChip>
+            }
+        </MudTd>
+        <MudTd DataLabel="Claims">
+            @foreach (var claim in context.Claims)
+            {
+                <MudChip Text="orange" Variant="Variant.Text" Color="Color.Secondary">@claim.Type = @claim.Value</MudChip>
+            }
+        </MudTd>
+        <MudTd DataLabel="RegisterDateTime">@(context.PlayerAccount.RegisterDateTime != null ? context.PlayerAccount.RegisterDateTime : "nieznana")</MudTd>
+        <MudTd DataLabel="Id">
+            <MudButtonGroup Color="Color.Primary" Variant="Variant.Text">
+                <MudButton Href=@($"/server/users/account/{context.PlayerAccount.Id}")>Edytuj</MudButton>
+                <MudButton>Zmień hasło</MudButton>
+            </MudButtonGroup>
+        </MudTd>
+    </RowTemplate>
+</MudTable>
+
+    @code {
+    private bool _loading = true;
+    private List<Account> _accounts = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        var identityFunctions = server.GetRequiredService<IdentityFunctions>();
+        var accounts = await identityFunctions.GetAllAccounts();
+        foreach (var item in accounts)
+        {
+            _accounts.Add(await Account.CreateAsync(item));
+        }
+        _loading = false;
+        await base.OnInitializedAsync();
+    }
+}

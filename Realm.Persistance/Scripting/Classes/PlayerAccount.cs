@@ -16,6 +16,7 @@ public class PlayerAccount : IDisposable
 
     public string Id => _user.Id.ToString();
     public string UserName => _user.UserName;
+    public DateTime? RegisterDateTime => _user.RegisteredDateTime;
     public PlayerAccount(User user, UserManager<User> userManager)
     {
         _user = user;
@@ -81,13 +82,32 @@ public class PlayerAccount : IDisposable
 
         return (await _userManager.GetClaimsAsync(_user)).Select(x => x.Type).ToArray().ToScriptArray();
     }
+
+    [NoScriptAccess]
+    public async Task<string[]> InternalGetRoles()
+    {
+        if (_disposed)
+            throw new ObjectDisposedException(GetType().ShortDisplayName());
+
+        return (await _userManager.GetRolesAsync(_user)).ToArray();
+    }
     
+
+    [NoScriptAccess]
+    public async Task<Claim[]> InternalGetClaims()
+    {
+        if (_disposed)
+            throw new ObjectDisposedException(GetType().ShortDisplayName());
+
+        return (await _userManager.GetClaimsAsync(_user)).ToArray();
+    }
+
     public async Task<object> GetRoles()
     {
         if (_disposed)
             throw new ObjectDisposedException(GetType().ShortDisplayName());
 
-        return (await _userManager.GetRolesAsync(_user)).ToArray().ToScriptArray();
+        return (await InternalGetRoles()).ToScriptArray();
     }
 
     public async Task<bool> RemoveClaim(string type, string? value = null)

@@ -1,0 +1,47 @@
+﻿@page "/server/users/account/{id}"
+@inject IRPGServer server;
+
+<MudBreadcrumbs Items="_items">
+    <ItemTemplate Context="item">
+        <MudLink Href="@item.Href">@item.Text.ToUpper()</MudLink>
+    </ItemTemplate>
+</MudBreadcrumbs>
+
+@if (!_loading && account == null)
+{
+    <h4>Nie znaleziono konta o id @Id</h4>
+}
+else
+{
+    <h3>Konto: @Id</h3>
+}
+
+@code {
+    private bool _loading = true;
+
+    [Parameter]
+    public string? Id { get; set; }
+
+    private Account? account { get; set; }
+
+    private List<BreadcrumbItem> _items = new List<BreadcrumbItem>
+    {
+        new BreadcrumbItem("Dashboard", href: "/"),
+        new BreadcrumbItem("Konta", href: "/server/users/accounts"),
+        new BreadcrumbItem("Konto", href: null, disabled: true)
+    };
+
+    protected override async Task OnInitializedAsync()
+    {
+        var identityFunctions = server.GetRequiredService<IdentityFunctions>();
+        if(Guid.TryParse(Id, out Guid guidId))
+        {
+            var playerAccount = await identityFunctions.FindAccountById(guidId.ToString());
+            if (playerAccount != null)
+                account = await Account.CreateAsync(playerAccount);
+        }
+
+        _loading = false;
+        await base.OnInitializedAsync();
+    }
+}
