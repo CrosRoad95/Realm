@@ -1,10 +1,3 @@
-using Microsoft.Extensions.DependencyInjection;
-using MudBlazor.Services;
-using Realm.Discord;
-using Realm.Persistance;
-using Realm.Scripting;
-using Realm.Server;
-
 var basePath = Path.GetDirectoryName(
       System.Reflection.Assembly.GetExecutingAssembly().GetName().CodeBase)[6..];
 
@@ -17,6 +10,8 @@ builder.Logging.ClearProviders();
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
 builder.Services.AddMudServices();
+
+builder.Services.AddSingleton<SettingsService>();
 
 builder.Services.AddSingleton<SnackbarFunctions>();
 builder.Services.AddSingleton<WebPanelIntegration>();

@@ -1,5 +1,5 @@
-﻿@page "/server/users/accounts"
-@inject IRPGServer server;
+﻿@page "/users/accounts"
+@inject IRPGServer _server;
 
 <h3>Konta:</h3>
 
@@ -30,7 +30,7 @@
         <MudTd DataLabel="RegisterDateTime">@(context.PlayerAccount.RegisterDateTime != null ? context.PlayerAccount.RegisterDateTime : "nieznana")</MudTd>
         <MudTd DataLabel="Id">
             <MudButtonGroup Color="Color.Primary" Variant="Variant.Text">
-                <MudButton Href=@($"/server/users/account/{context.PlayerAccount.Id}")>Edytuj</MudButton>
+                <MudButton Href=@($"/users/account/{context.PlayerAccount.Id}")>Edytuj</MudButton>
                 <MudButton>Zmień hasło</MudButton>
             </MudButtonGroup>
         </MudTd>
@@ -43,7 +43,7 @@
 
     protected override async Task OnInitializedAsync()
     {
-        var identityFunctions = server.GetRequiredService<IdentityFunctions>();
+        var identityFunctions = _server.GetRequiredService<IdentityFunctions>();
         var accounts = await identityFunctions.GetAllAccounts();
         foreach (var item in accounts)
         {

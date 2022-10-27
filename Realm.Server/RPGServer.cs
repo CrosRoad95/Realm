@@ -17,6 +17,17 @@ public partial class RPGServer : IRPGServer
     private readonly Dictionary<string, Func<LuaEvent, Task<object?>>> _eventHandlers = new();
 
     public event Action<Player>? PlayerJoined;
+    public string MapName
+    {
+        get => _server.MapName;
+        set => _server.MapName = value;
+    }
+
+    public string GameType
+    {
+        get => _server.GameType;
+        set => _server.GameType = value;
+    }
 
     public RPGServer(ConfigurationProvider configurationProvider, ILogger logger, IEnumerable<IModule> modules, Action<ServerBuilder>? configureServerBuilder = null, string? basePath = null)
     {

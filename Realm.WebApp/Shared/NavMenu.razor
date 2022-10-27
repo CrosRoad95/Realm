@@ -1,8 +1,11 @@
 ﻿<MudNavMenu>
     <MudNavLink Href="/" Match="NavLinkMatch.All">Strona główna</MudNavLink>
-    <MudNavLink Href="/server/dashboard" Match="NavLinkMatch.Prefix">Dashboard</MudNavLink>
+    <MudNavGroup Title="Serwer" Expanded="true">
+        <MudNavLink Href="/server/dashboard" Match="NavLinkMatch.Prefix">Dashboard</MudNavLink>
+        <MudNavLink Href="/server/settings" Match="NavLinkMatch.Prefix">Ustawienia</MudNavLink>
+    </MudNavGroup>
     <MudNavGroup Title="Użytkownicy" Expanded="true">
-        <MudNavLink Href="/server/users/accounts"  Match="NavLinkMatch.Prefix">Konta</MudNavLink>
-        <MudNavLink Href="/server/users/roles"  Match="NavLinkMatch.Prefix">Role</MudNavLink>
+        <MudNavLink Href="/users/accounts" Match="NavLinkMatch.Prefix">Konta</MudNavLink>
+        <MudNavLink Href="/users/roles" Match="NavLinkMatch.Prefix">Role</MudNavLink>
     </MudNavGroup>
 </MudNavMenu>

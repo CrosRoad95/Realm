@@ -1,33 +1,3 @@
 ﻿@page "/"
-@inject IRPGServer server;
 
 <PageTitle>Index</PageTitle>
-
-<h1>Gracze:</h1>
-
-<ul>
-@foreach (var pair in _players)
-{
-    <li>@pair.Item1: @pair.Item2.Name</li>
-}
-</ul>
-
-@code{
-    private List<(DateTime, Player)> _players = new();
-
-    private void PlayerJoined(Player player)
-    {
-        InvokeAsync(() =>
-        {
-            _players.Add((DateTime.Now, player));
-            StateHasChanged();
-        });
-    }
-
-    protected override void OnInitialized()
-    {
-        server.PlayerJoined += PlayerJoined;
-        base.OnInitialized();
-    }
-
-}

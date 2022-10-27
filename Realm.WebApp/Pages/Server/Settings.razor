@@ -1,0 +1,99 @@
+﻿@page "/server/settings"
+@inject SettingsService _settingsService;
+<PageTitle>Ustawienia</PageTitle>
+
+<MudGrid>
+    <MudItem xs="12" sm="6" md="12">
+        <h3>Serwer:</h3>
+    </MudItem>
+    <MudItem xs="12" sm="6" md="12">
+        <MudTextField @bind-Value="_settingsService.ServerName" Label="Nazwa serwera" Variant="Variant.Text" Disabled="true" />
+    </MudItem>
+    <MudItem xs="12" sm="6" md="4">
+        <MudTextField @bind-Value="_settingsService.GameType" Label="Typ gry" Variant="Variant.Text" />
+    </MudItem>
+    <MudItem xs="12" sm="6" md="4">
+        <MudTextField @bind-Value="_settingsService.MapName" Label="Nazwa mapy" Variant="Variant.Text" />
+    </MudItem>
+    <MudItem xs="12" sm="6" md="4">
+        <MudSelect @bind-Value="_settingsService.Weather" Label="Pogoda" AnchorOrigin="Origin.BottomCenter">
+            <MudSelectItem Value="0">
+                Extra sunny LA
+            </MudSelectItem>
+            <MudSelectItem Value="1">
+                Sunny LA
+            </MudSelectItem>
+            <MudSelectItem Value="2">
+                Extra sunny smog LA
+            </MudSelectItem>
+            <MudSelectItem Value="3">
+                Sunny smog LA
+            </MudSelectItem>
+            <MudSelectItem Value="4">
+                Cloudy LA
+            </MudSelectItem>
+            <MudSelectItem Value="5">
+                Sunny SF
+            </MudSelectItem>
+            <MudSelectItem Value="6">
+                Extra sunny SF
+            </MudSelectItem>
+            <MudSelectItem Value="7">
+                Cludy SF
+            </MudSelectItem>
+            <MudSelectItem Value="8">
+                Rainy SF
+            </MudSelectItem>
+            <MudSelectItem Value="9">
+                Foggy SF
+            </MudSelectItem>
+            <MudSelectItem Value="10">
+                Sunny Vegas
+            </MudSelectItem>
+            <MudSelectItem Value="11">
+                Extra sunny Vegas
+            </MudSelectItem>
+            <MudSelectItem Value="12">
+                Cloudy Vegas
+            </MudSelectItem>
+            <MudSelectItem Value="13">
+                Extra sunny Country Side
+            </MudSelectItem>
+            <MudSelectItem Value="14">
+                Sunny Country Side
+            </MudSelectItem>
+            <MudSelectItem Value="15">
+                Clody Country Side
+            </MudSelectItem>
+            <MudSelectItem Value="16">
+                Rainy Country Side
+            </MudSelectItem>
+            <MudSelectItem Value="17">
+                Extra sunny Desert
+            </MudSelectItem>
+            <MudSelectItem Value="18">
+                Sunny Desert
+            </MudSelectItem>
+            <MudSelectItem Value="19">
+                Sandstorm Desert
+            </MudSelectItem>
+            <MudSelectItem Value="20">
+                Underwater
+            </MudSelectItem>
+            <MudSelectItem Value="21">
+                Extra colors 1
+            </MudSelectItem>
+            <MudSelectItem Value="22">
+                Extra colors 2
+            </MudSelectItem>
+        </MudSelect>
+    </MudItem>
+    <MudItem xs="12" sm="6" md="4">
+        <MudSelect @bind-Value="_settingsService.FpsLimit" Label="FPS" AnchorOrigin="Origin.BottomCenter">
+            <MudSelectItem Value="25" />
+            <MudSelectItem Value="30" />
+            <MudSelectItem Value="60" />
+            <MudSelectItem Value="100" />
+        </MudSelect>
+    </MudItem>
+</MudGrid>

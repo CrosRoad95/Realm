@@ -5,3 +5,5 @@ obj/
 RealmRPG/Server/types.ts
 Realm.Configuration/appsettings.server.local.json
 *.db
+*.db-shm
+*.db-wal
