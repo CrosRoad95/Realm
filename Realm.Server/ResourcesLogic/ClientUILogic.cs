@@ -1,4 +1,6 @@
-﻿namespace Realm.Server.ResourcesLogic;
+﻿using SlipeServer.Server.Mappers;
+
+namespace Realm.Server.ResourcesLogic;
 
 internal class ClientUILogic
 {
@@ -18,6 +20,7 @@ internal class ClientUILogic
 
         rpgServer.PlayerJoined += Start;
         rpgServer.AddEventHandler("internalSubmitForm", InternalSubmitFormHandler);
+        rpgServer.AddEventHandler("internalRequestGuiClose", InternalRequestGuiClose);
     }
 
     private async Task<object?> InternalSubmitFormHandler(LuaEvent luaEvent)
@@ -27,40 +30,40 @@ internal class ClientUILogic
         return new object[] { formContext.Id, formContext.Name, formContext.IsSuccess, formContext.Response };
     }
 
+    private async Task<object?> InternalRequestGuiClose(LuaEvent luaEvent)
+    {
+        string? guiName = _fromLuaValueMapper.Map(typeof(string), luaEvent.Parameters[1]) as string;
+        if (guiName == null)
+            throw new NullReferenceException(nameof(guiName));
+
+        var player = (RPGPlayer)luaEvent.Player;
+        player.OpenGui(guiName);
+        return null;
+    }
+
     private void Start(Player player)
     {
         var rpgPlayer = player as RPGPlayer;
         _resource.StartFor(player);
-        rpgPlayer.ResourceReady += Player_ResourceReady;
     }
 
-    public void SetGuiOpen(RPGPlayer player, string guiName)
-    {
-        player.TriggerClientEvent("internalUiOpenGui", guiName);
-    }
-    
-    public void SetGuiClose(RPGPlayer player, string guiName)
-    {
-        player.TriggerClientEvent("internalUiCloseGui", guiName);
-    }
+    //private void Player_ResourceReady(RPGPlayer player, int netId)
+    //{
+    //    if(_resource.NetId != netId)
+    //        return;
 
-    private void Player_ResourceReady(RPGPlayer player, int netId)
-    {
-        if(_resource.NetId != netId)
-            return;
+    //    SetGuiOpen(player, "login");
+    //    player.TriggerClientEvent("internalUiStatechanged", new List<object>
+    //    {
+    //        "login",
+    //        "asd",
+    //        "dsa",
+    //    });
 
-        SetGuiOpen(player, "login");
-        player.TriggerClientEvent("internalUiStatechanged", new List<object>
-        {
-            "login",
-            "asd",
-            "dsa",
-        });
-
-        //Task.Run(async () =>
-        //{
-        //    await Task.Delay(1000);
-        //    SetGuiClose(player, "login");
-        //});
-    }
+    //    //Task.Run(async () =>
+    //    //{
+    //    //    await Task.Delay(1000);
+    //    //    SetGuiClose(player, "login");
+    //    //});
+    //}
 }

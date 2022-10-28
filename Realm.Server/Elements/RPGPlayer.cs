@@ -1,4 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
+using SlipeServer.Server.Elements;
+using System.Numerics;
 using System.Security.Principal;
 
 namespace Realm.Server.Elements;
@@ -14,6 +16,8 @@ public class RPGPlayer : Player
     private readonly EventFunctions _eventFunctions;
     private readonly IdentityFunctions _identityFunctions;
 
+    [NoScriptAccess]
+    public string? CurrentlyOpenGui { get; set; } = null;
     [NoScriptAccess]
     public CancellationToken CancellationToken { get; private set; }
     [NoScriptAccess]
@@ -184,12 +188,28 @@ public class RPGPlayer : Player
 
     public async Task<bool> Authorize(string policy)
     {
-        if (!IsLoggedIn)
-            return false;
+        var result = await AuthorizeInternal(policy);
 
-        var result = await _authorizationService.AuthorizeAsync(ClaimsPrincipal!, policy);
+        return result?.Succeeded ?? false;
+    }
 
-        return result.Succeeded;
+    public bool CloseCurrentGui()
+    {
+        if (CurrentlyOpenGui != null)
+        {
+            TriggerClientEvent("internalUiCloseGui", CurrentlyOpenGui);
+            CurrentlyOpenGui = null;
+            return true;
+        }
+        return false;
+    }
+
+    public bool OpenGui(string guiName)
+    {
+        CloseCurrentGui();
+        CurrentlyOpenGui = guiName;
+        TriggerClientEvent("internalUiOpenGui", CurrentlyOpenGui);
+        return true;
     }
 
     public override string ToString() => "Player";

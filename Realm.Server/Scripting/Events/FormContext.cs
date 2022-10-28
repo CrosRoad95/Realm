@@ -10,9 +10,9 @@ public class FormContext
     public string Name => _luaEvent.Parameters[1].StringValue ?? throw new InvalidOperationException();
 
     [NoScriptAccess]
-    public bool IsSuccess = false;
+    public bool IsSuccess { get; private set; } = false;
     [NoScriptAccess]
-    public string? Response = null;
+    public string? Response { get; private set; } = null;
 
     public PropertyBag Form
     {
@@ -34,6 +34,12 @@ public class FormContext
     public void Success()
     {
         IsSuccess = true;
+    }
+
+    public void Success(string response)
+    {
+        IsSuccess = true;
+        Response = response; 
     }
 
     public void Error(string errorMessage)

@@ -1,6 +1,8 @@
 ﻿local function createLoginWindow(guiProvider)
-	local window = guiProvider.window("Logowanie", 100, 100, 400, 400);
-	local loginInput = guiProvider.input(100, 10, 200, 25, window);
+	local window = guiProvider.window("Logowanie", 0, 0, 400, 400);
+	guiProvider.centerWindow(window)
+	local information = guiProvider.label("", 10, 20, 380, 25, window);
+	local loginInput = guiProvider.input(100, 45, 200, 25, window);
 	local passwordInput = guiProvider.input(100, 120, 200, 25, window);
 	local loginButton = guiProvider.button("Zaloguj", 100, 300, 200, 20, window);
 
@@ -13,6 +15,11 @@
 	guiProvider.onClick(loginButton, function()
 		local success, data = form.submit()
 		iprint("response", success, data)
+		if(success)then
+			--guiProvider.closeCurrentGui();
+		else
+			guiProvider.setValue(information, data)
+		end
 	end)
 
 	function stateChanged(key, value)

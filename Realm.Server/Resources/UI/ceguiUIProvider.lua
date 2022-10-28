@@ -1,4 +1,11 @@
-﻿local ceguiUIProvider = {
+﻿local function centerCEGUIWindow(center_window)
+    local screenW, screenH = guiGetScreenSize()
+    local windowW, windowH = guiGetSize(center_window, false)
+    local x, y = (screenW - windowW) /2,(screenH - windowH) /2
+    return guiSetPosition(center_window, x, y, false)
+end
+
+local ceguiUIProvider = {
 	-- Elements
 	window = function(title, px, py, sx, sy)
 		return guiCreateWindow(px, py, sx, sy, title, false)
@@ -18,7 +25,7 @@
 		return guiGetText(elementHandle)
 	end,
 	setValue = function(elementHandle, value)
-		return guiSetText(elementHandle, value)
+		return guiSetText(elementHandle, value or "")
 	end,
 	setMasked = function(elementHandle, enabled)
 		return guiEditSetMasked(elementHandle, true)
@@ -51,6 +58,9 @@
 	destroy = function(elementHandle)
 		destroyElement(elementHandle)
 		return true;
+	end,
+	centerWindow = function(windowHandle)
+		centerCEGUIWindow(windowHandle)
 	end,
 }
 

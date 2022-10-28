@@ -12,6 +12,8 @@ namespace Realm.Tests.TestServers;
 internal class TestRPGServer : IReloadable, IRPGServer
 {
     public MtaServer<TestRPGPlayer> TestServer { get; private set; }
+    public string MapName { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+    public string GameType { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
 
     public event Action<Player>? PlayerJoined;
 

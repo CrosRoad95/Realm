@@ -1,6 +1,7 @@
 ﻿import * as TestModule from "Test/test.js"
 import "panel.js"
 import "discord.js"
+import "login.js"
 
 Logger.information("startup.js, TestModule: {TestModule}", TestModule);
 Logger.information("loaded modules: {modules}", JSON.stringify(getModules()));
@@ -13,15 +14,17 @@ addEventHandler("onPlayerJoin", async ({ player }) => {
     Logger.information("player joined: {player} isLoggedIn={isLoggedIn}", player.name, player.isLoggedIn);
     let account = await findAccountByUserName("test")
     Logger.information("account = {account}", account);
-    const loggedIn = await player.logIn(account, "asdASD123!@#");
-    if (!loggedIn)
-        Logger.warning("Fail to log in");
-    Logger.information("is logged in?: {player} isLoggedIn={isLoggedIn}", player.name, player.isLoggedIn);
-    let account2 = await player.getAccount();
-    Logger.information("accounts ids: {a} = {b}", account.id, account2.id);
-    Logger.information("role: {a}", player.isInRole("admin"));
-    Logger.information("claims: {claims}", JSON.stringify(player.claims));
-    Logger.information("roles: {roles}", JSON.stringify(player.roles));
+    //const loggedIn = await player.logIn(account, "asdASD123!@#");
+    //if (!loggedIn)
+    //    Logger.warning("Fail to log in");
+    //Logger.information("is logged in?: {player} isLoggedIn={isLoggedIn}", player.name, player.isLoggedIn);
+    //let account2 = await player.getAccount();
+    //Logger.information("accounts ids: {a} = {b}", account.id, account2.id);
+    //Logger.information("role: {a}", player.isInRole("admin"));
+    //Logger.information("claims: {claims}", JSON.stringify(player.claims));
+    //Logger.information("roles: {roles}", JSON.stringify(player.roles));
+
+    player.openGui("login")
 })
 
 const spawns = getElementsByType("spawn");
@@ -34,13 +37,6 @@ for (var key in spawns) {
 const func = () => Logger.information("you should not see this");
 addEventHandler("onPlayerJoin", func);
 removeEventHandler("onPlayerJoin", func);
-
-addEventHandler("onFormSubmit", context => {
-    const { name, player } = context;
-    const { login, password } = context.form;
-    Logger.information("event name={name} playerName={player} login={login} password={password}", name, player.name, login, password);
-    context.success();
-});
 
 addEventHandler("onPlayerLogin", async ({player, account}) => {
     Logger.information("player logged in: {player}, {account}", player, account)

@@ -84,7 +84,7 @@ function createForm(name, fields)
 				data[name] = currentGuiProvider.getValue(elementHandle)
 			end
 
-			local id = triggerServerEvent("internalSubmitForm", resourceRoot, name, data);
+			local id = triggerServerEvent("internalSubmitForm", name, data);
 			pendingFormsSubmissions[name] = {
 				id = id,
 				coroutine = coroutine.running()
@@ -94,9 +94,20 @@ function createForm(name, fields)
 	};
 end
 
+local function internalCommonGuiProvider()
+	return {
+		closeCurrentGui = function()
+			triggerServerEvent("internalRequestGuiClose", currentOpenedGui);
+		end,
+	}
+end
 local function entrypoint()
 	currentGuiProvider = getCeguiUIProvider();
-	
+	local internals = internalCommonGuiProvider()
+	for name, func in pairs(internals)do
+		currentGuiProvider[name] = func
+	end
+
 	addEvent("internalUiStatechanged", true)
 	addEventHandler("internalUiStatechanged", localPlayer, function(data)
 		local guiName, payloadKey, payloadValue = unpack(data);
