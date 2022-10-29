@@ -1,6 +1,6 @@
 ﻿namespace Realm.Server.Commands;
 
-internal class HelpCommand : ICommand
+public class HelpCommand : ICommand
 {
     public string CommandName => "help";
 

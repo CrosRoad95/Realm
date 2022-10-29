@@ -3,31 +3,25 @@
 internal class CommandsLogic
 {
     private readonly IConsoleCommands _consoleCommands;
-    private readonly IEnumerable<ICommand> _commands;
-    private readonly ICommand _helpCommand;
+    private readonly List<ICommand> _commands;
 
     public CommandsLogic(IConsoleCommands consoleCommands, IEnumerable<ICommand> commands, HelpCommand helpCommand)
     {
         _consoleCommands = consoleCommands;
-        _commands = commands;
-        _helpCommand = helpCommand;
+        _commands = commands.ToList();
+        _commands.Add(helpCommand);
         _consoleCommands.CommandExecuted += CommandExecuted;
     }
 
     private void CommandExecuted(string? line)
     {
-        if (line == null)
+        var firstWord = line.Split(' ').FirstOrDefault();
+        if (firstWord == null)
             return;
-
-        if(line.StartsWith(_helpCommand.CommandName))
-        {
-            _helpCommand.HandleCommand(line);
-            return;
-        }
 
         foreach (var command in _commands)
         {
-            if(line.StartsWith(command.CommandName))
+            if (line.StartsWith(command.CommandName))
             {
                 command.HandleCommand(line);
             }
