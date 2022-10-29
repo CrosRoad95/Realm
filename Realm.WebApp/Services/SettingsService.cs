@@ -44,6 +44,6 @@ public class SettingsService
         _server = server;
         _gameWorld = _server.GetRequiredService<GameWorld>();
         var configurationProvider = _server.GetRequiredService<Realm.Configuration.ConfigurationProvider>();
-        _serverConfiguration = configurationProvider.Get<SlipeServer.Server.Configuration>("server");
+        _serverConfiguration = configurationProvider.Get<SlipeServer.Server.Configuration>("Server");
     }
 }

@@ -21,7 +21,7 @@ internal class DiscordIntegration : IDiscord
 
     public void InitializeScripting(IScriptingModuleInterface scriptingModuleInterface)
     {
-        _eventFunctions.RegisterEvent("onDiscordStatusChannelUpdate");
+        _eventFunctions.RegisterEvent(DiscordStatusChannelUpdateContext.Name);
         scriptingModuleInterface.AddHostType(typeof(DiscordStatusChannelUpdateContext));
     }
 

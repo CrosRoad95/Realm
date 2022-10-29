@@ -16,7 +16,7 @@
 		local success, data = form.submit()
 		iprint("response", success, data)
 		if(success)then
-			--guiProvider.closeCurrentGui();
+			guiProvider.setValue(information, "")
 		else
 			guiProvider.setValue(information, data)
 		end

@@ -2,7 +2,7 @@
 
 namespace Realm.Interfaces.Extend;
 
-public interface IModule : IReloadable
+public interface IModule
 {
     string Name { get; }
     void Configure(IServiceCollection services);

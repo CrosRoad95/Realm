@@ -1,13 +1,14 @@
 ﻿namespace Realm.Server.Scripting.Events;
 
-public class FormContext
+public class FormContext : INamedLuaEvent
 {
+    public static string Name => "onFormSubmit";
     private readonly LuaEvent _luaEvent;
     private readonly FromLuaValueMapper _fromLuaValueMapper;
 
     public RPGPlayer Player => (RPGPlayer)_luaEvent.Player;
     public string Id => _luaEvent.Parameters[0].StringValue ?? throw new InvalidOperationException();
-    public string Name => _luaEvent.Parameters[1].StringValue ?? throw new InvalidOperationException();
+    public string EventName => _luaEvent.Parameters[1].StringValue ?? throw new InvalidOperationException();
 
     [NoScriptAccess]
     public bool IsSuccess { get; private set; } = false;

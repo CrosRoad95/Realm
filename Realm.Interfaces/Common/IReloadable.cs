@@ -2,6 +2,6 @@
 
 public interface IReloadable
 {
-    void Reload();
+    Task Reload();
     int GetPriority();
 }

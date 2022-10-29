@@ -1,9 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using SlipeServer.Server.Elements;
-using System.Numerics;
-using System.Security.Principal;
-
-namespace Realm.Server.Elements;
+﻿namespace Realm.Server.Elements;
 
 public class RPGPlayer : Player
 {
@@ -74,7 +69,7 @@ public class RPGPlayer : Player
 
     private void RPGPlayer_ResourceStarted(Player sender, PlayerResourceStartedEventArgs e)
     {
-        ResourceReady?.Invoke(sender as RPGPlayer, e.NetId);
+        ResourceReady?.Invoke((RPGPlayer)sender, e.NetId);
     }
 
     public virtual async Task<bool> Spawn(Spawn spawn)
@@ -84,7 +79,7 @@ public class RPGPlayer : Player
             Camera.Target = this;
             Camera.Fade(CameraFade.In);
             Spawn(spawn.Position, spawn.Rotation.Z, 0, 0, 0);
-            await _eventFunctions.InvokeEvent("onPlayerSpawn", new PlayerSpawned
+            await _eventFunctions.InvokeEvent(new PlayerSpawned
             {
                 Player = this,
                 Spawn = spawn,
@@ -102,7 +97,7 @@ public class RPGPlayer : Player
         LuaValue[] luaValue;
         if (values.Length == 1 && values[0].GetType() == typeof(object[]))
         {
-            luaValue = (values[0] as object[]).Select(_luaValueMapper.Map).ToArray();
+            luaValue = ((object[])values[0]).Select(_luaValueMapper.Map).ToArray();
         }
         else
         {
@@ -120,7 +115,7 @@ public class RPGPlayer : Player
         {
             var claimsPrincipal = await _signInManager.CreateUserPrincipalAsync(account.User);
             ClaimsPrincipal = claimsPrincipal;
-            await _eventFunctions.InvokeEvent("onPlayerLogin", new PlayerLoggedInEvent
+            await _eventFunctions.InvokeEvent(new PlayerLoggedInEvent
             {
                 Player = this,
                 Account = account,
@@ -136,7 +131,7 @@ public class RPGPlayer : Player
             return false;
 
         ClaimsPrincipal = null;
-        await _eventFunctions.InvokeEvent("onPlayerLogout", new PlayerLoggedOutEvent
+        await _eventFunctions.InvokeEvent(new PlayerLoggedOutEvent
         {
             Player = this
         });

@@ -1,15 +1,13 @@
-﻿using Realm.Scripting.Classes;
+﻿using Realm.Server.Elements;
 using Realm.Server.Scripting;
-using Realm.Server.Scripting.Events;
 
 namespace Realm.Server;
 
-public partial class RPGServer : IRPGServer
+public partial class RPGServer : IRPGServer, IReloadable
 {
-    private readonly SemaphoreSlim _semaphore = new SemaphoreSlim(0);
+    private readonly SemaphoreSlim _semaphore = new(0);
     private readonly MtaServer<RPGPlayer> _server;
     private readonly SlipeServerConfiguration _serverConfiguration;
-    private readonly ScriptingConfiguration _scriptingConfiguration;
     private readonly ILogger _logger;
     private readonly EventFunctions _eventFunctions;
     private readonly ElementFunctions _elementFunctions;
@@ -33,8 +31,7 @@ public partial class RPGServer : IRPGServer
     {
         _modules = modules;
         _logger = logger.ForContext<IRPGServer>();
-        _serverConfiguration = configurationProvider.Get<SlipeServerConfiguration>("server");
-        _scriptingConfiguration = configurationProvider.Get<ScriptingConfiguration>("scripting");
+        _serverConfiguration = configurationProvider.Get<SlipeServerConfiguration>("Server");
         _server = MtaServer.CreateWithDiSupport<RPGPlayer>(
             builder =>
             {
@@ -60,11 +57,10 @@ public partial class RPGServer : IRPGServer
             }
         );
 
-        var serverListConfiguration = configurationProvider.Get<ServerListConfiguration>("serverList");
+        var serverListConfiguration = configurationProvider.Get<ServerListConfiguration>("ServerList");
         _server.GameType = serverListConfiguration.GameType;
         _server.MapName = serverListConfiguration.MapName;
         _server.PlayerJoined += e => PlayerJoined?.Invoke(e);
-        _server.LuaEventTriggered += Server_LuaEventTriggered;
 
         var startup = _server.GetRequiredService<Startup>();
         _eventFunctions = _server.GetRequiredService<EventFunctions>();
@@ -90,7 +86,7 @@ public partial class RPGServer : IRPGServer
                     var response = await pair.Value(e);
                     if(response != null)
                     {
-                        (e.Player as RPGPlayer).TriggerClientEvent($"{e.Name}Response", response);
+                        ((RPGPlayer)e.Player).TriggerClientEvent($"{e.Name}Response", response);
                     }
                 }
             }
@@ -111,7 +107,7 @@ public partial class RPGServer : IRPGServer
 
     private async void Server_PlayerJoined(RPGPlayer player)
     {
-        await _eventFunctions.InvokeEvent("onPlayerJoin", new PlayerJoinedEvent
+        await _eventFunctions.InvokeEvent(new PlayerJoinedEvent
         {
             Player = player,
         });
@@ -120,11 +116,11 @@ public partial class RPGServer : IRPGServer
     public void InitializeScripting(IScriptingModuleInterface scriptingModuleInterface)
     {
         // Events
-        _eventFunctions.RegisterEvent("onPlayerJoin");
-        _eventFunctions.RegisterEvent("onFormSubmit");
-        _eventFunctions.RegisterEvent("onPlayerLogin");
-        _eventFunctions.RegisterEvent("onPlayerLogout");
-        _eventFunctions.RegisterEvent("onPlayerSpawn");
+        _eventFunctions.RegisterEvent(FormContext.Name);
+        _eventFunctions.RegisterEvent(PlayerJoinedEvent.Name);
+        _eventFunctions.RegisterEvent(PlayerLoggedInEvent.Name);
+        _eventFunctions.RegisterEvent(PlayerLoggedOutEvent.Name);
+        _eventFunctions.RegisterEvent(PlayerSpawned.Name);
 
         // Functions
         scriptingModuleInterface.AddHostObject("Elements", _elementFunctions, true);
@@ -138,11 +134,6 @@ public partial class RPGServer : IRPGServer
         scriptingModuleInterface.AddHostType(typeof(PlayerLoggedInEvent));
         scriptingModuleInterface.AddHostType(typeof(PlayerLoggedOutEvent));
         scriptingModuleInterface.AddHostType(typeof(PlayerSpawned));
-    }
-
-    private async void Server_LuaEventTriggered(LuaEvent luaEvent)
-    {
-
     }
 
     public TService GetRequiredService<TService>() where TService: notnull
@@ -168,4 +159,12 @@ public partial class RPGServer : IRPGServer
         _server.Start();
         await _semaphore.WaitAsync();
     }
+
+    public Task Reload()
+    {
+
+        return Task.CompletedTask;
+    }
+
+    public int GetPriority() => 0;
 }

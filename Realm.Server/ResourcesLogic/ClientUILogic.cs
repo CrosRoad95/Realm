@@ -1,6 +1,4 @@
-﻿using SlipeServer.Server.Mappers;
-
-namespace Realm.Server.ResourcesLogic;
+﻿namespace Realm.Server.ResourcesLogic;
 
 internal class ClientUILogic
 {
@@ -26,11 +24,11 @@ internal class ClientUILogic
     private async Task<object?> InternalSubmitFormHandler(LuaEvent luaEvent)
     {
         var formContext = new FormContext(luaEvent, _fromLuaValueMapper);
-        await _eventFunctions.InvokeEvent("onFormSubmit", formContext);
-        return new object[] { formContext.Id, formContext.Name, formContext.IsSuccess, formContext.Response };
+        await _eventFunctions.InvokeEvent(formContext);
+        return new object?[] { formContext.Id, formContext.EventName, formContext.IsSuccess, formContext.Response };
     }
 
-    private async Task<object?> InternalRequestGuiClose(LuaEvent luaEvent)
+    private Task<object?> InternalRequestGuiClose(LuaEvent luaEvent)
     {
         string? guiName = _fromLuaValueMapper.Map(typeof(string), luaEvent.Parameters[1]) as string;
         if (guiName == null)
@@ -38,32 +36,12 @@ internal class ClientUILogic
 
         var player = (RPGPlayer)luaEvent.Player;
         player.OpenGui(guiName);
-        return null;
+        return Task.FromResult<object?>(null);
     }
 
     private void Start(Player player)
     {
-        var rpgPlayer = player as RPGPlayer;
-        _resource.StartFor(player);
+        var rpgPlayer = (RPGPlayer)player;
+        _resource.StartFor(rpgPlayer);
     }
-
-    //private void Player_ResourceReady(RPGPlayer player, int netId)
-    //{
-    //    if(_resource.NetId != netId)
-    //        return;
-
-    //    SetGuiOpen(player, "login");
-    //    player.TriggerClientEvent("internalUiStatechanged", new List<object>
-    //    {
-    //        "login",
-    //        "asd",
-    //        "dsa",
-    //    });
-
-    //    //Task.Run(async () =>
-    //    //{
-    //    //    await Task.Delay(1000);
-    //    //    SetGuiClose(player, "login");
-    //    //});
-    //}
 }

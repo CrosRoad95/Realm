@@ -1,9 +1,13 @@
-﻿namespace Realm.Discord.Scripting.Events;
+﻿using Realm.Interfaces.Server;
 
-public class DiscordStatusChannelUpdateContext
+namespace Realm.Discord.Scripting.Events;
+
+public class DiscordStatusChannelUpdateContext : INamedLuaEvent
 {
+    public static string Name => "onDiscordStatusChannelUpdate";
     private readonly StringBuilder _content = new StringBuilder();
     public string Content => _content.ToString();
+
 
     public DiscordStatusChannelUpdateContext()
     {

@@ -1,5 +1,6 @@
 ﻿using Realm.Console;
 using Realm.Discord;
+using Realm.Interfaces.Discord;
 using Realm.Interfaces.Extend;
 using Realm.Logging;
 using Realm.MTARPGServer;
@@ -8,7 +9,9 @@ using Realm.Scripting;
 using Realm.Server;
 
 var serverConsole = new ServerConsole();
-var logger = new Logger().GetLogger();
+var logger = new Logger()
+    .ByExcluding<IDiscord>()
+    .GetLogger();
 var configurationProvider = new Realm.Configuration.ConfigurationProvider();
 var server = new MTARPGServerImpl(serverConsole, logger, configurationProvider, new IModule[]
         {

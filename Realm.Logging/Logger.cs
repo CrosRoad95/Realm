@@ -1,5 +1,4 @@
-﻿using Realm.Interfaces.Discord;
-using Serilog;
+﻿using Serilog;
 using Serilog.Core;
 using Serilog.Events;
 
@@ -12,13 +11,19 @@ public class Logger
     {
         _loggerConfiguration = new LoggerConfiguration()
             .MinimumLevel.Debug()
-            .Filter.ByExcluding(le => SourceContextEquals(le, typeof(IDiscord)))
             .WriteTo.Console(restrictedToMinimumLevel: LogEventLevel.Debug);
     }
 
     public Logger WithSink(ILogEventSink sink)
     {
         _loggerConfiguration = _loggerConfiguration.WriteTo.Sink(sink);
+        return this;
+    }
+
+    public Logger ByExcluding<T>()
+    {
+        _loggerConfiguration = _loggerConfiguration
+            .Filter.ByExcluding(le => SourceContextEquals(le, typeof(T)));
         return this;
     }
 

@@ -52,8 +52,9 @@ internal class TestRPGServer : IReloadable, IRPGServer
         TestServer.PlayerJoined += e => PlayerJoined?.Invoke(e);
     }
 
-    public void Reload()
+    public Task Reload()
     {
+        return Task.CompletedTask;
     }
 
     public int GetPriority() => int.MaxValue;

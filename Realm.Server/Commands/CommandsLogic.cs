@@ -15,6 +15,9 @@ internal class CommandsLogic
 
     private void CommandExecuted(string? line)
     {
+        if (line == null)
+            return;
+
         var firstWord = line.Split(' ').FirstOrDefault();
         if (firstWord == null)
             return;

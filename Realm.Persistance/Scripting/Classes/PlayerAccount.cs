@@ -1,9 +1,4 @@
-﻿using Microsoft.AspNetCore.Identity;
-using Newtonsoft.Json.Linq;
-using Realm.Persistance.Data;
-using System.Security.Claims;
-
-namespace Realm.Persistance.Scripting.Classes;
+﻿namespace Realm.Persistance.Scripting.Classes;
 
 public class PlayerAccount : IDisposable
 {

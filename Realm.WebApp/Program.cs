@@ -1,12 +1,10 @@
-using Microsoft.Extensions.DependencyInjection;
-using Realm.Server.Commands;
-using Realm.WebApp.Serilog.Sinks;
-
 var basePath = Path.GetDirectoryName(
       System.Reflection.Assembly.GetExecutingAssembly().GetName().CodeBase)[6..];
 
 var subscribableLogsSink = new SubscribableLogsSink();
-var logger = new Logger().WithSink(subscribableLogsSink).GetLogger();
+var logger = new Logger()
+    .ByExcluding<IDiscord>()
+    .WithSink(subscribableLogsSink).GetLogger();
 var builder = WebApplication.CreateBuilder(args);
 Realm.Configuration.ConfigurationProvider.AddRealmConfiguration(builder.Configuration, basePath);
 builder.Logging.ClearProviders();

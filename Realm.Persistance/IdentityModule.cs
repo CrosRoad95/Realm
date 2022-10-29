@@ -29,10 +29,5 @@ public class IdentityModule : IModule
         scriptingModuleInterface.AddHostObject("Identity", serviceProvider.GetRequiredService<IdentityFunctions>(), true);
     }
 
-    public void Reload()
-    {
-
-    }
-
     public int GetPriority() => 100;
 }
