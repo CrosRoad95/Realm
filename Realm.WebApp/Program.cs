@@ -1,10 +1,12 @@
 using Microsoft.Extensions.DependencyInjection;
 using Realm.Server.Commands;
+using Realm.WebApp.Serilog.Sinks;
 
 var basePath = Path.GetDirectoryName(
       System.Reflection.Assembly.GetExecutingAssembly().GetName().CodeBase)[6..];
 
-var logger = new Logger().GetLogger();
+var subscribableLogsSink = new SubscribableLogsSink();
+var logger = new Logger().WithSink(subscribableLogsSink).GetLogger();
 var builder = WebApplication.CreateBuilder(args);
 Realm.Configuration.ConfigurationProvider.AddRealmConfiguration(builder.Configuration, basePath);
 builder.Logging.ClearProviders();
@@ -17,6 +19,7 @@ builder.Services.AddTransient<SettingsService>();
 builder.Services.AddSingleton<ConsoleService>();
 builder.Services.AddTransient<JSRuntimeService>();
 
+builder.Services.AddSingleton(subscribableLogsSink);
 builder.Services.AddSingleton<SnackbarFunctions>();
 builder.Services.AddSingleton<WebPanelIntegration>();
 builder.Services.AddSingleton<WebPanelModule>();

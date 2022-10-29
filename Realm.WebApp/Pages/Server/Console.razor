@@ -24,6 +24,18 @@
         public string Command { get; set; } = "";
     }
 
+    protected override void OnInitialized()
+    {
+        _consoleService.LogAdded += () =>
+        {
+            InvokeAsync(() =>
+            {
+                StateHasChanged();
+            });
+        };
+        base.OnInitialized();
+    }
+
     private void OnValidSubmit(EditContext context)
     {
         var command = ((CommandFormModel)context.Model).Command;
