@@ -11,10 +11,12 @@ public partial class RPGServer : IRPGServer, IReloadable
     private readonly ILogger _logger;
     private readonly EventFunctions _eventFunctions;
     private readonly ElementFunctions _elementFunctions;
+    private readonly IElementCollection _elementCollection;
     private readonly IEnumerable<IModule> _modules;
     private readonly Dictionary<string, Func<LuaEvent, Task<object?>>> _eventHandlers = new();
 
     public event Action<Player>? PlayerJoined;
+    public event Action? ServerReloaded;
     public string MapName
     {
         get => _server.MapName;
@@ -44,6 +46,7 @@ public partial class RPGServer : IRPGServer, IReloadable
                     services.AddSingleton(configurationProvider);
                     services.AddSingleton(logger);
                     services.AddSingleton(this);
+                    services.AddSingleton<IReloadable>(this);
                     services.AddSingleton<IRPGServer>(this);
                     services.AddSingleton<ElementFunctions>();
 
@@ -65,6 +68,7 @@ public partial class RPGServer : IRPGServer, IReloadable
         var startup = _server.GetRequiredService<Startup>();
         _eventFunctions = _server.GetRequiredService<EventFunctions>();
         _elementFunctions = _server.GetRequiredService<ElementFunctions>();
+        _elementCollection = _server.GetRequiredService<IElementCollection>();
 
         var _ = Task.Run(startup.StartAsync);
 
@@ -107,6 +111,10 @@ public partial class RPGServer : IRPGServer, IReloadable
 
     private async void Server_PlayerJoined(RPGPlayer player)
     {
+        if (player.ResourceStartingLatch != null)
+            await player.ResourceStartingLatch;
+
+        player.ResourceStartingLatch = new();
         await _eventFunctions.InvokeEvent(new PlayerJoinedEvent
         {
             Player = player,
@@ -116,11 +124,11 @@ public partial class RPGServer : IRPGServer, IReloadable
     public void InitializeScripting(IScriptingModuleInterface scriptingModuleInterface)
     {
         // Events
-        _eventFunctions.RegisterEvent(FormContext.Name);
-        _eventFunctions.RegisterEvent(PlayerJoinedEvent.Name);
-        _eventFunctions.RegisterEvent(PlayerLoggedInEvent.Name);
-        _eventFunctions.RegisterEvent(PlayerLoggedOutEvent.Name);
-        _eventFunctions.RegisterEvent(PlayerSpawned.Name);
+        _eventFunctions.RegisterEvent(FormContext.EventName);
+        _eventFunctions.RegisterEvent(PlayerJoinedEvent.EventName);
+        _eventFunctions.RegisterEvent(PlayerLoggedInEvent.EventName);
+        _eventFunctions.RegisterEvent(PlayerLoggedOutEvent.EventName);
+        _eventFunctions.RegisterEvent(PlayerSpawned.EventName);
 
         // Functions
         scriptingModuleInterface.AddHostObject("Elements", _elementFunctions, true);
@@ -162,7 +170,13 @@ public partial class RPGServer : IRPGServer, IReloadable
 
     public Task Reload()
     {
+        var players = _elementCollection.GetByType<Player>().Cast<RPGPlayer>();
+        foreach (var player in players)
+            player.Reset();
+        foreach (var player in players)
+            Server_PlayerJoined(player);
 
+        ServerReloaded?.Invoke();
         return Task.CompletedTask;
     }
 

@@ -2,5 +2,5 @@
 
 public interface INamedLuaEvent
 {
-    abstract static string Name { get; }
+    abstract static string EventName { get; }
 }

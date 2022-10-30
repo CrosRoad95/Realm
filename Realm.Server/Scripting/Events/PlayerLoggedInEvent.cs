@@ -2,7 +2,7 @@
 
 public class PlayerLoggedInEvent : INamedLuaEvent
 {
-    public static string Name => "onPlayerLogin";
+    public static string EventName => "onPlayerLogin";
 
     public RPGPlayer Player { get; init; }
     public PlayerAccount Account { get; init; }

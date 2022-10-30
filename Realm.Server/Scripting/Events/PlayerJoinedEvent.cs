@@ -2,7 +2,7 @@
 
 public class PlayerJoinedEvent : INamedLuaEvent
 {
-    public static string Name => "onPlayerJoin";
+    public static string EventName => "onPlayerJoin";
 
     public RPGPlayer Player { get; set; }
 }

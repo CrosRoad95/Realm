@@ -2,7 +2,7 @@
 
 public class PlayerLoggedOutEvent : INamedLuaEvent
 {
-    public static string Name => "onPlayerLogout";
+    public static string EventName => "onPlayerLogout";
 
     public RPGPlayer Player { get; init; }
 }

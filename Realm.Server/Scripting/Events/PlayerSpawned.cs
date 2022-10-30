@@ -2,7 +2,7 @@
 
 public class PlayerSpawned : INamedLuaEvent
 {
-    public static string Name => "onPlayerSpawn";
+    public static string EventName => "onPlayerSpawn";
 
     public RPGPlayer Player { get; set; }
     public Spawn Spawn { get; set; }

@@ -16,6 +16,7 @@ internal class TestRPGServer : IReloadable, IRPGServer
     public string GameType { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
 
     public event Action<Player>? PlayerJoined;
+    public event Action? ServerReloaded;
 
     public TestRPGServer()
     {

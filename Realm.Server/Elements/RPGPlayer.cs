@@ -1,4 +1,6 @@
-﻿namespace Realm.Server.Elements;
+﻿using Realm.Common.Utilities;
+
+namespace Realm.Server.Elements;
 
 public class RPGPlayer : Player
 {
@@ -11,6 +13,8 @@ public class RPGPlayer : Player
     private readonly EventFunctions _eventFunctions;
     private readonly IdentityFunctions _identityFunctions;
 
+    [NoScriptAccess]
+    public Latch ResourceStartingLatch = new();
     [NoScriptAccess]
     public string? CurrentlyOpenGui { get; set; } = null;
     [NoScriptAccess]
@@ -60,6 +64,7 @@ public class RPGPlayer : Player
         CancellationToken = _cancellationTokenSource.Token;
         ResourceStarted += RPGPlayer_ResourceStarted;
         Disconnected += RPGPlayer_Disconnected;
+
     }
 
     private void RPGPlayer_Disconnected(Player sender, PlayerQuitEventArgs e)
@@ -69,6 +74,7 @@ public class RPGPlayer : Player
 
     private void RPGPlayer_ResourceStarted(Player sender, PlayerResourceStartedEventArgs e)
     {
+        ResourceStartingLatch.Decrement();
         ResourceReady?.Invoke((RPGPlayer)sender, e.NetId);
     }
 
@@ -206,6 +212,14 @@ public class RPGPlayer : Player
         TriggerClientEvent("internalUiOpenGui", CurrentlyOpenGui);
         return true;
     }
+
+    [NoScriptAccess]
+    public void Reset()
+    {
+        ;
+    }
+
+
 
     public override string ToString() => "Player";
 }
