@@ -1,5 +1,4 @@
-﻿using Realm.Server.Elements;
-using Realm.Server.Scripting;
+﻿using Realm.Server.Scripting;
 
 namespace Realm.Server;
 
@@ -168,6 +167,14 @@ public partial class RPGServer : IRPGServer, IReloadable
         await _semaphore.WaitAsync();
     }
 
+    private void RemoveAllElements()
+    {
+        foreach (var spawn in _elementFunctions.GetCollectionByType("spawn").Cast<Spawn>())
+            if(!spawn.IsPersistant() && _elementFunctions.IsElement(spawn))
+                _elementFunctions.DestroyElement(spawn);
+
+    }
+
     public Task Reload()
     {
         var players = _elementCollection.GetByType<Player>().Cast<RPGPlayer>();
@@ -176,6 +183,7 @@ public partial class RPGServer : IRPGServer, IReloadable
         foreach (var player in players)
             Server_PlayerJoined(player);
 
+        RemoveAllElements();
         ServerReloaded?.Invoke();
         return Task.CompletedTask;
     }

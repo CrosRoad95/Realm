@@ -11,6 +11,7 @@ global using Microsoft.ClearScript.JavaScript;
 global using Microsoft.ClearScript.V8;
 global using Microsoft.Extensions.DependencyInjection;
 global using Serilog;
+
 global using Realm.Scripting.Classes;
 global using Realm.Scripting.Extensions;
 global using Realm.Common.Extensions;
@@ -18,3 +19,4 @@ global using Realm.Common.Attributes;
 global using Realm.Interfaces.Extend;
 global using Realm.Scripting.ClearscriptExtensions;
 global using Realm.Scripting.Interfaces;
+global using Realm.Interfaces.Common;

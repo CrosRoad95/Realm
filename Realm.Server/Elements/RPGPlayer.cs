@@ -216,10 +216,12 @@ public class RPGPlayer : Player
     [NoScriptAccess]
     public void Reset()
     {
-        ;
+        Camera.Fade(CameraFade.Out, 0, System.Drawing.Color.Black);
+        Camera.Target = null;
+        CurrentlyOpenGui = null;
+        ClaimsPrincipal = null;
+        ResourceStartingLatch = new();
     }
-
-
 
     public override string ToString() => "Player";
 }

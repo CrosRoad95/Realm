@@ -9,7 +9,9 @@ public class ScriptingModule : IModule
     {
         services.AddSingleton<EventFunctions>();
         services.AddSingleton<ModulesFunctions>();
-        services.AddSingleton<IScriptingModuleInterface, JavascriptRuntime>();
+        services.AddSingleton<JavascriptRuntime>();
+        services.AddSingleton<IScriptingModuleInterface>(x => x.GetRequiredService<JavascriptRuntime>());
+        services.AddSingleton<IReloadable>(x => x.GetRequiredService<JavascriptRuntime>());
     }
 
     public void Init(IServiceProvider serviceProvider)
@@ -22,20 +24,11 @@ public class ScriptingModule : IModule
         if (_interface == null)
             throw new InvalidOperationException();
 
-        var path = serviceProvider.GetRequiredService<Func<string>>()();
         var logger = serviceProvider.GetRequiredService<ILogger>().ForContext<ScriptingModule>();
-        var fileName = Path.Join(path, "Server/startup.js");
 
-        logger.Information("Initializing startup.js: {fileName}", fileName);
         try
         {
-            var code = File.ReadAllText(fileName);
-            _interface.Execute(code, fileName);
-
-            var typescriptDefinitions = _interface.GetTypescriptDefinition();
-            var directory = Path.GetDirectoryName(fileName);
-            File.WriteAllText(Path.Join(directory, "types.ts"), typescriptDefinitions);
-            logger.Information("Scripting initialized, created types.js");
+            _interface.Start();
         }
         catch (Exception ex)
         {

@@ -1,6 +1,6 @@
 ﻿namespace Realm.Scripting.Classes;
 
-public class EventFunctions
+public class EventFunctions : IReloadable
 {
     private readonly HashSet<string> _supportedEventsNames = new();
     private readonly Dictionary<string, List<ScriptObject>> _events = new();
@@ -52,4 +52,12 @@ public class EventFunctions
     }
 
     public override string ToString() => "Event";
+
+    public Task Reload()
+    {
+        _events.Clear();
+        return Task.CompletedTask;
+    }
+
+    public int GetPriority() => 60;
 }

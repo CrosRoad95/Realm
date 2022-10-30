@@ -1,10 +1,11 @@
 ﻿namespace Realm.Scripting;
 
-internal class JavascriptRuntime : IScriptingModuleInterface
+internal class JavascriptRuntime : IScriptingModuleInterface, IReloadable
 {
     private readonly V8ScriptEngine _engine;
     private readonly TypescriptTypesGenerator _typescriptTypesGenerator;
     private readonly ILogger _logger;
+    private readonly Func<string?> _basePathFactory;
 
     public JavascriptRuntime(ILogger logger, Func<string?> basePathFactory, EventFunctions eventFunctions, ModulesFunctions modulesFunctions)
     {
@@ -27,6 +28,7 @@ internal class JavascriptRuntime : IScriptingModuleInterface
         AddHostObject("Logger", _logger.ForContext("javascript", true), false);
         AddHostObject("Events", eventFunctions, true);
         AddHostObject("Modules", modulesFunctions, true);
+        _basePathFactory = basePathFactory;
     }
 
     public string GetTypescriptDefinition()
@@ -60,7 +62,7 @@ internal class JavascriptRuntime : IScriptingModuleInterface
         return await _engine.Evaluate(documentInfo, code).ToTask();
     }
 
-    public void Execute(string code, string name)
+    public async Task<object?> Execute(string code, string name)
     {
         try
         {
@@ -68,12 +70,34 @@ internal class JavascriptRuntime : IScriptingModuleInterface
             {
                 Category = ModuleCategory.Standard
             };
-            _engine.Evaluate(documentInfo, code);
+            var result = _engine.Evaluate(documentInfo, code);
+            if (result.IsAsync(_engine))
+                return await result.ToTask();
+            return result;
+
         }
         catch (ScriptEngineException ex)
         {
             _logger.Error(ex, "Failed to execute");
         }
+
+        return null;
     }
 
+    public async Task Start()
+    {
+        const string fileName = "Server/startup.js";
+        _logger.Information("Initializing {fileName}", fileName);
+        var fullFileName = Path.Join(_basePathFactory(), fileName);
+        var code = File.ReadAllText(fullFileName);
+        await Execute(code, fileName);
+    }
+
+    public async Task Reload()
+    {
+        _engine.CollectGarbage(true);
+        await Start();
+    }
+
+    public int GetPriority() => 50;
 }

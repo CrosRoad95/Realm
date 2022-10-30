@@ -39,6 +39,7 @@ internal class TestRPGServer : IReloadable, IRPGServer
                 services.AddSingleton<IConsoleCommands, TestConsoleCommands>();
                 services.AddSingleton<IReloadable>(this);
                 services.AddSingleton<IRPGServer>(this);
+                services.AddSingleton<Func<string?>>(() => "");
                 services.AddSingleton(new Logger().GetLogger().ForContext<IRPGServer>());
 
                 if (modules != null)

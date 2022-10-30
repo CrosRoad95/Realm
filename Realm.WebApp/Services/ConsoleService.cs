@@ -1,5 +1,4 @@
-﻿using Realm.WebApp.Serilog.Sinks;
-using Serilog.Events;
+﻿using Serilog.Events;
 
 namespace Realm.WebApp.Services;
 

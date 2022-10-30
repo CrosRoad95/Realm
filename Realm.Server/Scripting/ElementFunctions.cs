@@ -20,7 +20,8 @@ public class ElementFunctions
         return spawn;
     }
 
-    private IEnumerable<object> GetCollectionByType(string type)
+    [NoScriptAccess]
+    public IEnumerable<object> GetCollectionByType(string type)
     {
         return type switch
         {
@@ -40,5 +41,33 @@ public class ElementFunctions
     {
         var elements = GetCollectionByType(type);
         return elements.Count();
+    }
+
+    public bool DestroyElement(Element element)
+    {
+        switch (element)
+        {
+            case Player _:
+                throw new Exception("Can not destroy persistant element.");
+            case Spawn spawn:
+                if (spawn.IsPersistant())
+                    throw new Exception("Can not destroy persistant element.");
+                break;
+        }
+
+        if (IsElement(element))
+        {
+            _elementCollection.Remove(element);
+            return true;
+        }
+
+        return false;
+    }
+
+    public bool IsElement(Element element)
+    {
+        if (_elementCollection.Get(element.Id) != null)
+            return true;
+        return _elementCollection.GetAll().Any(x => x == element);
     }
 }
