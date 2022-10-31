@@ -9,6 +9,9 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        version: ["Console", "WebApp"]
     steps:
       - name: Check out the repo
         uses: actions/checkout@v3
@@ -18,18 +21,11 @@ jobs:
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
-      - name: Build and push Console base Docker image
+      - name: Build and push ${{ matrix.version }} base Docker image
         uses: docker/build-push-action@ad44023a93711e3deb337508980b4b5e9bcdc5dc
         with:
           context: .
-          file: ./Realm.Console/Dockerfile
+          file: ./Realm.${{ matrix.version }}/Dockerfile
           push: true
-          tags: crosroad95/realm:latest
+          tags: crosroad95/realm:latest${{ matrix.version }}
           password: ${{ secrets.DOCKER_PASSWORD }}
-      - name: Build and push WebApp base Docker image
-        uses: docker/build-push-action@ad44023a93711e3deb337508980b4b5e9bcdc5dc
-        with:
-          context: .
-          file: ./Realm.WebApp/Dockerfile
-          push: true
-          tags: crosroad95/realms:latestweb
