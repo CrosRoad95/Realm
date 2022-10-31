@@ -40,7 +40,7 @@ internal class TestRPGServer : IReloadable, IRPGServer
                 services.AddSingleton<IReloadable>(this);
                 services.AddSingleton<IRPGServer>(this);
                 services.AddSingleton<Func<string?>>(() => "");
-                services.AddSingleton(new Logger().GetLogger().ForContext<IRPGServer>());
+                services.AddSingleton(new Logger().GetLogger());
 
                 if (modules != null)
                     foreach (var module in modules)

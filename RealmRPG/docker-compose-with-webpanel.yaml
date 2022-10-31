@@ -3,9 +3,10 @@ services:
   server:
     build:
       context: ../
-      dockerfile: ./Realm.Console/Dockerfile
+      dockerfile: ./Realm.WebApp/Dockerfile
     #image: "crosroad95/realm:latest"
     ports:
+      - "22010:22010"
       - "22003:22003/udp"
       - "22005:22005"
       - "22126:22126/udp"

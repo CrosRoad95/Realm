@@ -1,0 +1,11 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!--
+https://go.microsoft.com/fwlink/?LinkID=208121.
+-->
+<Project>
+  <PropertyGroup>
+    <_PublishTargetUrl>D:\Realm\Realm.WebApp\bin\Release\net6.0\publish\</_PublishTargetUrl>
+    <History>True|2022-10-31T05:35:00.8283028Z;True|2022-10-30T21:00:11.7425546+01:00;True|2022-10-30T20:59:09.1345616+01:00;True|2022-10-30T20:52:00.1016280+01:00;</History>
+    <LastFailureDetails />
+  </PropertyGroup>
+</Project>

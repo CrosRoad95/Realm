@@ -1,4 +1,8 @@
-var basePath = Path.GetDirectoryName(
+string basePath;
+if (Environment.GetEnvironmentVariable("DOTNET_RUNNING_IN_CONTAINER") == "true")
+    basePath = ".";
+else
+    basePath = Path.GetDirectoryName(
       System.Reflection.Assembly.GetExecutingAssembly().GetName().CodeBase)[6..];
 
 var subscribableLogsSink = new SubscribableLogsSink();
@@ -56,4 +60,6 @@ app.UseRouting();
 app.MapBlazorHub();
 app.MapFallbackToPage("/_Host");
 
+Console.WriteLine("BLAZOR");
 app.Run();
+Console.WriteLine("BLAZOR2");
