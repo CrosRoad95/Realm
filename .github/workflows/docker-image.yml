@@ -26,10 +26,10 @@ jobs:
           push: true
           tags: crosroad95/realm:latest
           password: ${{ secrets.DOCKER_PASSWORD }}
-      - name: Build and push WebPanel base Docker image
+      - name: Build and push WebApp base Docker image
         uses: docker/build-push-action@ad44023a93711e3deb337508980b4b5e9bcdc5dc
         with:
           context: .
-          file: ./Realm.WebPanel/Dockerfile
+          file: ./Realm.WebApp/Dockerfile
           push: true
           tags: crosroad95/realms:latestweb
