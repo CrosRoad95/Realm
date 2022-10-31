@@ -37,8 +37,7 @@ public partial class RPGServer : IRPGServer, IReloadable
             builder =>
             {
                 builder.ConfigureServer(configurationProvider.Configuration, basePath);
-                if (configureServerBuilder != null)
-                    configureServerBuilder(builder);
+                configureServerBuilder?.Invoke(builder);
 
                 builder.ConfigureServices(services =>
                 {

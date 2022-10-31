@@ -60,6 +60,4 @@ app.UseRouting();
 app.MapBlazorHub();
 app.MapFallbackToPage("/_Host");
 
-Console.WriteLine("BLAZOR");
 app.Run();
-Console.WriteLine("BLAZOR2");
