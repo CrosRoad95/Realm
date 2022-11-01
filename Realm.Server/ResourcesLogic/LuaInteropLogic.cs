@@ -1,13 +1,13 @@
 ﻿namespace Realm.Server.ResourcesLogic;
 
-internal class ClientInterfaceLogic
+internal class LuaInteropLogic
 {
     private readonly Resource _resource;
     private readonly List<RPGPlayer> _startedForPlayers = new();
 
-    public ClientInterfaceLogic(IResourceProvider resourceProvider, IRPGServer rpgServer)
+    public LuaInteropLogic(IResourceProvider resourceProvider, IRPGServer rpgServer)
     {
-        _resource = resourceProvider.GetResource("ClientInterface");
+        _resource = resourceProvider.GetResource("LuaInterop");
         _resource.AddGlobals();
 
         rpgServer.PlayerJoined += Start;

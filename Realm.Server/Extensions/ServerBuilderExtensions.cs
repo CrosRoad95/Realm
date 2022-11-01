@@ -29,7 +29,7 @@ public static class ServerBuilderExtensions
             services.AddSingleton<ICommand, ReloadCommand>();
         });
 
-        builder.AddLogic<ClientInterfaceLogic>();
+        builder.AddLogic<LuaInteropLogic>();
         builder.AddLogic<ClientUILogic>();
         builder.AddLogic<CommandsLogic>();
 
