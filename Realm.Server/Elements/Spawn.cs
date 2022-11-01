@@ -8,6 +8,7 @@ public class Spawn : Element, IDisposable
 
     private readonly bool _isPersistant = PersistantScope.IsPersistant;
     private readonly List<string> _requiredPolices = new();
+
     public Spawn(AuthorizationPoliciesProvider authorizationPoliciesProvider, string id, string name, Vector3 position, Vector3 rotation)
     {
         Name = name;

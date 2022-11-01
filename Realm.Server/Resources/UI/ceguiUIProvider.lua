@@ -11,13 +11,16 @@ local ceguiUIProvider = {
 		return guiCreateWindow(px, py, sx, sy, title, false)
 	end,
 	input = function(px, py, sx, sy, parent)
-		return guiCreateEdit(px, py + 20, sx, sy, "", false, parent)
+		return guiCreateEdit(px, py, sx, sy, "", false, parent)
 	end,
 	button = function(text, px, py, sx, sy, parent)
 		return guiCreateButton(px, py, sx, sy, text, false, parent)
 	end,
 	label = function(text, px, py, sx, sy, parent)
 		return guiCreateLabel(px, py, sx, sy, text, false, parent)
+	end,
+	checkbox = function(text, px, py, sx, sy, selected, parent)
+		return guiCreateCheckBox(px, py, sx, sy, text, selected, false, parent)
 	end,
 
 	-- Getters, setters
@@ -29,6 +32,19 @@ local ceguiUIProvider = {
 	end,
 	setMasked = function(elementHandle, enabled)
 		return guiEditSetMasked(elementHandle, true)
+	end,
+	getSelected = function(elementHandle)
+		if(isElement(elementHandle) and getElementType(elementHandle) == "gui-checkbox")then
+			return guiCheckBoxGetSelected(elementHandle)
+		end
+		return false;
+	end,
+	setSelected = function(elementHandle, selected)
+		if(isElement(elementHandle) and getElementType(elementHandle) == "gui-checkbox")then
+			guiCheckBoxSetSelected(elementHandle, selected)
+			return true;
+		end
+		return false;
 	end,
 
 	-- Events:

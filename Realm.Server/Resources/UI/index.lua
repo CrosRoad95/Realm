@@ -91,6 +91,12 @@ function createForm(name, fields)
 			};
 			return coroutine.yield();
 		end,
+		getFields = function()
+			return fields;
+		end,
+		getName = function()
+			return name;
+		end,
 	};
 end
 
@@ -99,8 +105,50 @@ local function internalCommonGuiProvider()
 		closeCurrentGui = function()
 			triggerServerEvent("internalRequestGuiClose", currentOpenedGui);
 		end,
+		tryLoadRememberedForm = function(form)
+			local name = form.getName()
+			local fileName = "@remember_"..name..".json";
+			if(not fileExists(fileName))then
+				return false;
+			end
+			local file = fileOpen(fileName)
+			local content = fileRead(file, fileGetSize(file))
+			fileClose(file)
+			local data = fromJSON(content)
+			if(not data or not type(data) == "table")then
+				return false;
+			end
+			
+			local fields = form.getFields()
+			for name, field in pairs(data)do
+				if(fields[name])then
+					currentGuiProvider.setValue(fields[name], field.value)
+				end
+			end
+		end,
+		rememberForm = function(form)
+			local name = form.getName()
+			local data = {}
+			for name,elementHandle in pairs(form.getFields())do
+				local value = currentGuiProvider.getValue(elementHandle)
+				if(string.len(toJSON(value)) > 1000)then
+					return false
+				end
+				data[name] = {
+					value = value,
+				}
+			end
+			local fileName = "@remember_"..name..".json";
+			if(fileExists(fileName))then
+				fileDelete(fileName)
+			end
+			local file = fileCreate(fileName)
+			fileWrite(file, toJSON(data))
+			fileClose(file)
+		end,
 	}
 end
+
 local function entrypoint()
 	currentGuiProvider = getCeguiUIProvider();
 	local internals = internalCommonGuiProvider()
@@ -127,4 +175,4 @@ local function entrypoint()
 		closeGui(guiName);
 	end)
 end
-addEventHandler("onClientResourceStart", resourceRoot, entrypoint,  true, "low");
+addEventHandler("onClientResourceStart", resourceRoot, entrypoint, true, "low");

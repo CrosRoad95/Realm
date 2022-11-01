@@ -1,9 +1,13 @@
 ﻿using Realm.Server.Scripting;
+using SlipeServer.Packets.Definitions.Lua.ElementRpc.Element;
+using SlipeServer.Server.Elements.Enums;
+using System.Reflection;
 
 namespace Realm.Server;
 
 public partial class RPGServer : IRPGServer, IReloadable
 {
+    private readonly string _serverId = "";
     private readonly SemaphoreSlim _semaphore = new(0);
     private readonly MtaServer<RPGPlayer> _server;
     private readonly SlipeServerConfiguration _serverConfiguration;
@@ -12,6 +16,7 @@ public partial class RPGServer : IRPGServer, IReloadable
     private readonly ElementFunctions _elementFunctions;
     private readonly IElementCollection _elementCollection;
     private readonly IEnumerable<IModule> _modules;
+    private readonly RootElement _rootElement;
     private readonly Dictionary<string, Func<LuaEvent, Task<object?>>> _eventHandlers = new();
 
     public event Action<Player>? PlayerJoined;
@@ -67,6 +72,7 @@ public partial class RPGServer : IRPGServer, IReloadable
         _eventFunctions = _server.GetRequiredService<EventFunctions>();
         _elementFunctions = _server.GetRequiredService<ElementFunctions>();
         _elementCollection = _server.GetRequiredService<IElementCollection>();
+        _rootElement = _server.GetRequiredService<RootElement>();
 
         var _ = Task.Run(startup.StartAsync);
 
