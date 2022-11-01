@@ -51,6 +51,17 @@ public class RPGPlayer : Player
         }
     }
 
+    [NoScriptAccess]
+    public event Action<RPGPlayer, bool>? DebugViewActiveChanged;
+    [NoScriptAccess]
+    private bool _debugViewActive = false;
+    public bool DebugViewActive { get => _debugViewActive; set
+        {
+            _debugViewActive = value;
+            DebugViewActiveChanged?.Invoke(this, value);
+        }
+    }
+
     public RPGPlayer(LuaValueMapper luaValueMapper, SignInManager<User> signInManager, UserManager<User> userManager, IAuthorizationService authorizationService, AuthorizationPoliciesProvider authorizationPoliciesProvider, EventFunctions eventFunctions, IdentityFunctions identityFunctions)
     {
         _luaValueMapper = luaValueMapper;
@@ -221,7 +232,8 @@ public class RPGPlayer : Player
         CurrentlyOpenGui = null;
         ClaimsPrincipal = null;
         ResourceStartingLatch = new();
+        DebugViewActive = false;
     }
 
-    public override string ToString() => "Player";
+    public override string ToString() => Name;
 }

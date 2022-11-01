@@ -36,7 +36,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="Resources\LuaInterop\hello.lua">
+    <None Update="Resources\LuaInterop\debugging.lua">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="Resources\UI\ceguiUIProvider.lua">

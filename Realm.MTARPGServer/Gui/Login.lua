@@ -46,4 +46,3 @@ end
 addEventHandler("onClientResourceStart", resourceRoot, function()
 	registerGui(createLoginWindow, "login")
 end)
-setDebugViewActive(true)
