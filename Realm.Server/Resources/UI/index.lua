@@ -105,6 +105,9 @@ local function internalCommonGuiProvider()
 		closeCurrentGui = function()
 			triggerServerEvent("internalRequestGuiClose", currentOpenedGui);
 		end,
+		navigateToGui = function(guiName)
+			triggerServerEvent("internalNavigateToGui", guiName);
+		end,
 		tryLoadRememberedForm = function(form)
 			local name = form.getName()
 			local fileName = "@remember_"..name..".json";
@@ -145,6 +148,12 @@ local function internalCommonGuiProvider()
 			local file = fileCreate(fileName)
 			fileWrite(file, toJSON(data))
 			fileClose(file)
+		end,
+		forgetForm = function(form)
+			local fileName = "@remember_"..name..".json";
+			if(fileExists(fileName))then
+				fileDelete(fileName)
+			end
 		end,
 	}
 end

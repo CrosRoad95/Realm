@@ -22,6 +22,7 @@ internal class ClientUILogic
 
         rpgServer.AddEventHandler("internalSubmitForm", InternalSubmitFormHandler);
         rpgServer.AddEventHandler("internalRequestGuiClose", InternalRequestGuiClose);
+        rpgServer.AddEventHandler("internalNavigateToGui", InternalNavigateToGui);
     }
 
     private async Task<object?> InternalSubmitFormHandler(LuaEvent luaEvent)
@@ -31,7 +32,7 @@ internal class ClientUILogic
         return new object?[] { formContext.Id, formContext.Name, formContext.IsSuccess, formContext.Response };
     }
 
-    private Task<object?> InternalRequestGuiClose(LuaEvent luaEvent)
+    private Task<object?> InternalNavigateToGui(LuaEvent luaEvent)
     {
         string? guiName = _fromLuaValueMapper.Map(typeof(string), luaEvent.Parameters[1]) as string;
         if (guiName == null)
@@ -39,6 +40,13 @@ internal class ClientUILogic
 
         var player = (RPGPlayer)luaEvent.Player;
         player.OpenGui(guiName);
+        return Task.FromResult<object?>(null);
+    }
+
+    private Task<object?> InternalRequestGuiClose(LuaEvent luaEvent)
+    {
+        var player = (RPGPlayer)luaEvent.Player;
+        player.CloseCurrentGui();
         return Task.FromResult<object?>(null);
     }
 
