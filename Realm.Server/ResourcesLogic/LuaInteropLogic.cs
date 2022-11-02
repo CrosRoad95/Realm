@@ -39,7 +39,7 @@ internal class LuaInteropLogic
         _resource.StartFor(player);
         _startedForPlayers.Add(rpgPlayer);
         rpgPlayer.Disconnected += RPGPlayerDisconnected;
-        rpgPlayer.DebugViewActiveChanged += RPGPlayerDebugViewActiveChanged;
+        rpgPlayer.DebugWorldChanged += RPGPlayerDebugWorldActiveChanged;
     }
 
     private void RPGPlayerDisconnected(Player player, PlayerQuitEventArgs e)
@@ -47,9 +47,9 @@ internal class LuaInteropLogic
         _startedForPlayers.Remove((RPGPlayer)player);
     }
 
-    private void RPGPlayerDebugViewActiveChanged(RPGPlayer player, bool active)
+    private void RPGPlayerDebugWorldActiveChanged(RPGPlayer player, bool active)
     {
-        player.TriggerClientEvent("internalSetDebuggingEnabled", active);
+        player.TriggerClientEvent("internalSetWorldDebuggingEnabled", active);
     }
 
     private Task<object?> InternalDebugMessage(LuaEvent luaEvent)

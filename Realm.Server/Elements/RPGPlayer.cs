@@ -1,4 +1,5 @@
 ﻿using Realm.Common.Utilities;
+using SlipeServer.Server.Services;
 
 namespace Realm.Server.Elements;
 
@@ -12,7 +13,7 @@ public class RPGPlayer : Player
     private readonly AuthorizationPoliciesProvider _authorizationPoliciesProvider;
     private readonly EventFunctions _eventFunctions;
     private readonly IdentityFunctions _identityFunctions;
-
+    private readonly DebugLog _debugLog;
     [NoScriptAccess]
     public Latch ResourceStartingLatch = new();
     [NoScriptAccess]
@@ -51,18 +52,33 @@ public class RPGPlayer : Player
         }
     }
 
+
     [NoScriptAccess]
-    public event Action<RPGPlayer, bool>? DebugViewActiveChanged;
+    public event Action<RPGPlayer, bool>? DebugWorldChanged;
     [NoScriptAccess]
-    private bool _debugViewActive = false;
-    public bool DebugViewActive { get => _debugViewActive; set
+    private bool _debugWorld = false;
+    public bool DebugWorld
+    {
+        get => _debugWorld; set
         {
-            _debugViewActive = value;
-            DebugViewActiveChanged?.Invoke(this, value);
+            _debugWorld = value;
+            DebugWorldChanged?.Invoke(this, value);
         }
     }
 
-    public RPGPlayer(LuaValueMapper luaValueMapper, SignInManager<User> signInManager, UserManager<User> userManager, IAuthorizationService authorizationService, AuthorizationPoliciesProvider authorizationPoliciesProvider, EventFunctions eventFunctions, IdentityFunctions identityFunctions)
+    [NoScriptAccess]
+    private bool _debugView = false;
+    public bool DebugView { get => _debugView; set
+        {
+            if(_debugView != value)
+            {
+                _debugView = value;
+                _debugLog.SetVisibleTo(this, value);
+            }
+        }
+    }
+
+    public RPGPlayer(LuaValueMapper luaValueMapper, SignInManager<User> signInManager, UserManager<User> userManager, IAuthorizationService authorizationService, AuthorizationPoliciesProvider authorizationPoliciesProvider, EventFunctions eventFunctions, IdentityFunctions identityFunctions, DebugLog debugLog)
     {
         _luaValueMapper = luaValueMapper;
         _signInManager = signInManager;
@@ -71,6 +87,7 @@ public class RPGPlayer : Player
         _authorizationPoliciesProvider = authorizationPoliciesProvider;
         _eventFunctions = eventFunctions;
         _identityFunctions = identityFunctions;
+        _debugLog = debugLog;
         _cancellationTokenSource = new CancellationTokenSource();
         CancellationToken = _cancellationTokenSource.Token;
         ResourceStarted += RPGPlayer_ResourceStarted;
@@ -232,7 +249,7 @@ public class RPGPlayer : Player
         CurrentlyOpenGui = null;
         ClaimsPrincipal = null;
         ResourceStartingLatch = new();
-        DebugViewActive = false;
+        DebugView = false;
     }
 
     public override string ToString() => Name;

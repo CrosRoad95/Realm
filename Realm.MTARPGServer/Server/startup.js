@@ -14,7 +14,8 @@ addEventHandler("onPlayerJoin", async ({ player }) => {
     Logger.information("player joined: {player} isLoggedIn={isLoggedIn}", player.name, player.isLoggedIn);
     let account = await findAccountByUserName("test")
     Logger.information("account = {account}", account);
-    player.debugViewActive = true;
+    player.debugView = true;
+    player.debugWorld = true;
     //const loggedIn = await player.logIn(account, "asdASD123!@#");
     //if (!loggedIn)
     //    Logger.warning("Fail to log in");
