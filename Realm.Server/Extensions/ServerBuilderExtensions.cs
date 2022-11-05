@@ -1,4 +1,6 @@
-﻿namespace Realm.Server.Extensions;
+﻿using SlipeServer.Resources.NoClip;
+
+namespace Realm.Server.Extensions;
 
 public static class ServerBuilderExtensions
 {
@@ -28,6 +30,8 @@ public static class ServerBuilderExtensions
             services.AddSingleton<ICommand, TestCommand>();
             services.AddSingleton<ICommand, ReloadCommand>();
         });
+
+        builder.AddNoClipResource();
 
         builder.AddLogic<LuaInteropLogic>();
         builder.AddLogic<ClientUILogic>();
