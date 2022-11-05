@@ -22,9 +22,7 @@
     <PackageReference Include="BCrypt.Net-Next" Version="4.0.3" />
     <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="6.0.0" />
     <PackageReference Include="Serilog" Version="2.12.0" />
-    <PackageReference Include="SlipeServer.Net" Version="0.1.0-CI-20221016-210941" />
-    <PackageReference Include="SlipeServer.Packets" Version="0.1.0-CI-20221016-210941" />
-    <PackageReference Include="SlipeServer.Server" Version="0.1.0-CI-20221016-210941" />
+    <PackageReference Include="SlipeServer.Server" Version="0.1.0-CI-20221104-230437" />
   </ItemGroup>
 
   <ItemGroup>
