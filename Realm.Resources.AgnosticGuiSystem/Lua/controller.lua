@@ -164,7 +164,6 @@ local function internalCommonGuiProvider()
 end
 
 local function entrypoint()
-iprint("common test", uuid)
 	currentGuiProvider = guiProviders["cegui"]
 	if(currentGuiProvider == nil)then
 		error("No gui provider found")

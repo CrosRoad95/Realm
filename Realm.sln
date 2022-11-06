@@ -42,13 +42,15 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Modules", "Modules", "{01E2
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Resources", "Resources", "{28944775-A0AF-46D4-9480-D6F4189002B7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Realm.Resources.AgnosticGuiSystem", "Realm.Resources.AgnosticGuiSystem\Realm.Resources.AgnosticGuiSystem.csproj", "{8866FE04-0132-45EB-8CCD-635B718627D1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Realm.Resources.AgnosticGuiSystem", "Realm.Resources.AgnosticGuiSystem\Realm.Resources.AgnosticGuiSystem.csproj", "{8866FE04-0132-45EB-8CCD-635B718627D1}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Addons", "Addons", "{9D22264B-12E5-4387-AD6F-BF9D4AE42C3C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Realm.Resources.Addons.AgnosticGuiSystem.CeGuiProvider", "Realm.Resources.Addons.AgnosticGuiSystem.CeGuiProvider\Realm.Resources.Addons.AgnosticGuiSystem.CeGuiProvider.csproj", "{E958D376-3262-432A-9589-4BB908D71839}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Realm.Resources.Addons.AgnosticGuiSystem.CeGuiProvider", "Realm.Resources.Addons.AgnosticGuiSystem.CeGuiProvider\Realm.Resources.Addons.AgnosticGuiSystem.CeGuiProvider.csproj", "{E958D376-3262-432A-9589-4BB908D71839}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Realm.Resources.Addons.Common", "Realm.Resources.Addons.Common\Realm.Resources.Addons.Common.csproj", "{4161187D-8196-4B54-AE91-D0A322D02D92}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Realm.Resources.Addons.Common", "Realm.Resources.Addons.Common\Realm.Resources.Addons.Common.csproj", "{4161187D-8196-4B54-AE91-D0A322D02D92}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Realm.Resources.LuaInterop", "Realm.Resources.LuaInterop\Realm.Resources.LuaInterop.csproj", "{F8E56A0F-1748-42F3-8854-05C8D47F0333}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -120,6 +122,10 @@ Global
 		{4161187D-8196-4B54-AE91-D0A322D02D92}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4161187D-8196-4B54-AE91-D0A322D02D92}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4161187D-8196-4B54-AE91-D0A322D02D92}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F8E56A0F-1748-42F3-8854-05C8D47F0333}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F8E56A0F-1748-42F3-8854-05C8D47F0333}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F8E56A0F-1748-42F3-8854-05C8D47F0333}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F8E56A0F-1748-42F3-8854-05C8D47F0333}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -135,6 +141,7 @@ Global
 		{9D22264B-12E5-4387-AD6F-BF9D4AE42C3C} = {28944775-A0AF-46D4-9480-D6F4189002B7}
 		{E958D376-3262-432A-9589-4BB908D71839} = {9D22264B-12E5-4387-AD6F-BF9D4AE42C3C}
 		{4161187D-8196-4B54-AE91-D0A322D02D92} = {9D22264B-12E5-4387-AD6F-BF9D4AE42C3C}
+		{F8E56A0F-1748-42F3-8854-05C8D47F0333} = {28944775-A0AF-46D4-9480-D6F4189002B7}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {3922BF34-8D0B-4DC1-9EFC-D4CFB948B3B8}

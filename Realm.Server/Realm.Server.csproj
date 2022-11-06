@@ -23,13 +23,7 @@
     <ProjectReference Include="..\Realm.Persistance\Realm.Persistance.csproj" />
     <ProjectReference Include="..\Realm.Resources.Addons.AgnosticGuiSystem.CeGuiProvider\Realm.Resources.Addons.AgnosticGuiSystem.CeGuiProvider.csproj" />
     <ProjectReference Include="..\Realm.Resources.AgnosticGuiSystem\Realm.Resources.AgnosticGuiSystem.csproj" />
+    <ProjectReference Include="..\Realm.Resources.LuaInterop\Realm.Resources.LuaInterop.csproj" />
     <ProjectReference Include="..\Realm.Scripting\Realm.Scripting.csproj" />
   </ItemGroup>
-
-  <ItemGroup>
-    <None Update="Resources\LuaInterop\debugging.lua">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-
 </Project>
