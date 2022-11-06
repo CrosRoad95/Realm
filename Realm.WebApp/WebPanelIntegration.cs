@@ -1,4 +1,6 @@
-﻿namespace Realm.WebApp;
+﻿using Realm.Scripting.Interfaces;
+
+namespace Realm.WebApp;
 
 public class WebPanelIntegration
 {

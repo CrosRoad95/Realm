@@ -6,6 +6,11 @@ public class Latch
     private int _count = 0;
     private Task Task => _taskCompletionSource.Task;
 
+    public Latch(int initialCounter = 0)
+    {
+        _count = initialCounter;
+    }
+
     public void Increment()
     {
         Interlocked.Increment(ref _count);

@@ -11,18 +11,26 @@ public static class ServerBuilderExtensions
         var options = new AgnosticGuiSystemOptions();
         optionsBuilder(options);
 
+        if (!options._providers.Any())
+            throw new Exception("No gui provider found");
+
         builder.AddBuildStep(server =>
         {
-            var resource = new AgnosticGuiSystemResource(server);
+            var resource = new AgnosticGuiSystemResource(server, options);
             if(commonResourceOptions != null)
                 commonResourceOptions.Configure(resource);
 
-            server.AddAdditionalResource(resource, resource.AdditionalFiles);
+            var additionalFiles = resource.AdditionalFiles
+                .Concat(options._providers)
+                .ToDictionary(x => x.Key, x => x.Value);
+            server.AddAdditionalResource(resource, additionalFiles);
         });
 
         builder.ConfigureServices(services =>
         {
             services.AddSingleton<AgnosticGuiSystemService>();
         });
+
+        builder.AddLogic<AgnosticGuiSystemLogic>();
     }
 }

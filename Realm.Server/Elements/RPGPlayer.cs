@@ -6,6 +6,7 @@ namespace Realm.Server.Elements;
 public class RPGPlayer : Player
 {
     private readonly CancellationTokenSource _cancellationTokenSource;
+    private readonly MtaServer _mtaServer;
     private readonly LuaValueMapper _luaValueMapper;
     private readonly SignInManager<User> _signInManager;
     private readonly UserManager<User> _userManager;
@@ -14,14 +15,11 @@ public class RPGPlayer : Player
     private readonly EventFunctions _eventFunctions;
     private readonly IdentityFunctions _identityFunctions;
     private readonly DebugLog _debugLog;
+    private readonly AgnosticGuiSystemService _agnosticGuiSystemService;
     [NoScriptAccess]
-    public Latch ResourceStartingLatch = new();
-    [NoScriptAccess]
-    public string? CurrentlyOpenGui { get; set; } = null;
+    public Latch ResourceStartingLatch = new(3); // TODO: remove hardcoded resources counter
     [NoScriptAccess]
     public CancellationToken CancellationToken { get; private set; }
-    [NoScriptAccess]
-    public event Action<RPGPlayer, int>? ResourceReady;
 
     [NoScriptAccess]
     public ClaimsPrincipal? ClaimsPrincipal { get; private set; }
@@ -78,8 +76,13 @@ public class RPGPlayer : Player
         }
     }
 
-    public RPGPlayer(LuaValueMapper luaValueMapper, SignInManager<User> signInManager, UserManager<User> userManager, IAuthorizationService authorizationService, AuthorizationPoliciesProvider authorizationPoliciesProvider, EventFunctions eventFunctions, IdentityFunctions identityFunctions, DebugLog debugLog)
+    public RPGPlayer(MtaServer mtaServer, LuaValueMapper luaValueMapper, SignInManager<User> signInManager,
+        UserManager<User> userManager, IAuthorizationService authorizationService,
+        AuthorizationPoliciesProvider authorizationPoliciesProvider, EventFunctions eventFunctions,
+        IdentityFunctions identityFunctions, DebugLog debugLog,
+        AgnosticGuiSystemService agnosticGuiSystemService)
     {
+        _mtaServer = mtaServer;
         _luaValueMapper = luaValueMapper;
         _signInManager = signInManager;
         _userManager = userManager;
@@ -88,11 +91,11 @@ public class RPGPlayer : Player
         _eventFunctions = eventFunctions;
         _identityFunctions = identityFunctions;
         _debugLog = debugLog;
+        _agnosticGuiSystemService = agnosticGuiSystemService;
         _cancellationTokenSource = new CancellationTokenSource();
         CancellationToken = _cancellationTokenSource.Token;
         ResourceStarted += RPGPlayer_ResourceStarted;
         Disconnected += RPGPlayer_Disconnected;
-
     }
 
     private void RPGPlayer_Disconnected(Player sender, PlayerQuitEventArgs e)
@@ -103,7 +106,6 @@ public class RPGPlayer : Player
     private void RPGPlayer_ResourceStarted(Player sender, PlayerResourceStartedEventArgs e)
     {
         ResourceStartingLatch.Decrement();
-        ResourceReady?.Invoke((RPGPlayer)sender, e.NetId);
     }
 
     public virtual async Task<bool> Spawn(Spawn spawn)
@@ -222,33 +224,17 @@ public class RPGPlayer : Player
         return result?.Succeeded ?? false;
     }
 
-    public bool CloseCurrentGui()
-    {
-        if (CurrentlyOpenGui != null)
-        {
-            TriggerClientEvent("internalUiCloseGui", CurrentlyOpenGui);
-            CurrentlyOpenGui = null;
-            return true;
-        }
-        return false;
-    }
-
-    public bool OpenGui(string guiName)
-    {
-        CloseCurrentGui();
-        CurrentlyOpenGui = guiName;
-        TriggerClientEvent("internalUiOpenGui", CurrentlyOpenGui);
-        return true;
-    }
+    public bool OpenGui(string gui) => _agnosticGuiSystemService.OpenGui(this, gui);
+    public bool CloseGui(string gui) => _agnosticGuiSystemService.CloseGui(this, gui);
+    public void CloseAllGuis() => _agnosticGuiSystemService.CloseAllGuis(this);
 
     [NoScriptAccess]
     public void Reset()
     {
         Camera.Fade(CameraFade.Out, 0, System.Drawing.Color.Black);
         Camera.Target = null;
-        CurrentlyOpenGui = null;
         ClaimsPrincipal = null;
-        ResourceStartingLatch = new();
+        ResourceStartingLatch = new(3); // TODO: remove hardcoded resources counter
         DebugView = false;
     }
 

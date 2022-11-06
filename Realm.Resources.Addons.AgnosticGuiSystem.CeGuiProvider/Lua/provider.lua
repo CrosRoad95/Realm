@@ -77,6 +77,6 @@
 	end,
 }
 
-addEventHandler("onResourceStart", resourceroot, function()
+addEventHandler("onClientResourceStart", resourceRoot, function()
 	registerGuiProvider("cegui", ceguiUIProvider)
 end)

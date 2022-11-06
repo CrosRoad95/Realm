@@ -15,7 +15,7 @@ internal class LuaInteropLogic
         rpgServer.PlayerJoined += Start;
         rpgServer.ServerReloaded += RPGServer_ServerReloaded;
 
-        rpgServer.AddEventHandler("internalDebugMessage", InternalDebugMessage);
+        //rpgServer.AddEventHandler("internalDebugMessage", InternalDebugMessage);
         _fromLuaValueMapper = fromLuaValueMapper;
     }
 
@@ -34,7 +34,6 @@ internal class LuaInteropLogic
     public void Start(Player player)
     {
         var rpgPlayer = (RPGPlayer)player;
-        rpgPlayer.ResourceStartingLatch.Increment();
         _resource.StartFor(player);
         _startedForPlayers.Add(rpgPlayer);
         rpgPlayer.Disconnected += RPGPlayerDisconnected;

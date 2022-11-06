@@ -1,4 +1,12 @@
-﻿using Realm.Persistance;
+﻿using Realm.Discord;
+using Realm.Interfaces.Common;
+using Realm.Interfaces.Extend;
+using Realm.Interfaces.Server;
+using Realm.Logging;
+using Realm.Persistance;
+using Realm.Server;
+using Realm.Server.Extensions;
+using Realm.Server.Interfaces;
 using Realm.Tests.Modules;
 using Realm.WebApp;
 using SlipeServer.Server.Elements;
@@ -29,7 +37,6 @@ internal class TestRPGServer : IReloadable, IRPGServer
         var configuration = new TestConfiguration().Configuration;
         TestServer = MtaServer.CreateWithDiSupport<TestRPGPlayer>(builder =>
         {
-            builder.AddGuiFilesLocation("Gui");
             builder.ConfigureServices(services =>
             {
                 services.AddSingleton(new Configuration.ConfigurationProvider());

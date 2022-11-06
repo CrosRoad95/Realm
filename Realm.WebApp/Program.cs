@@ -1,3 +1,10 @@
+using Realm.Discord;
+using Realm.Interfaces.Discord;
+using Realm.Interfaces.Extend;
+using Realm.Scripting;
+using Realm.Server;
+using Realm.Server.Interfaces;
+
 string basePath;
 if (Environment.GetEnvironmentVariable("DOTNET_RUNNING_IN_CONTAINER") == "true")
     basePath = ".";

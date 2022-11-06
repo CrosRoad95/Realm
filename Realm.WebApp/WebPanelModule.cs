@@ -1,4 +1,7 @@
-﻿namespace Realm.WebApp;
+﻿using Realm.Interfaces.Extend;
+using Realm.Scripting.Interfaces;
+
+namespace Realm.WebApp;
 
 public class WebPanelModule : IModule
 {

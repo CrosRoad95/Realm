@@ -2,6 +2,11 @@
 local currentOpenedGui = nil;
 local currentGuiProvider = nil;
 local pendingFormsSubmissions = {}
+local guiProviders = {}
+
+function registerGuiProvider(gui, provider)
+	guiProviders[gui] = provider
+end
 
 local function internalGetWindowHandleByName(name)
 	if(guis[name] == nil)then
@@ -159,7 +164,11 @@ local function internalCommonGuiProvider()
 end
 
 local function entrypoint()
-	currentGuiProvider = getCeguiUIProvider();
+iprint("common test", uuid)
+	currentGuiProvider = guiProviders["cegui"]
+	if(currentGuiProvider == nil)then
+		error("No gui provider found")
+	end
 	local internals = internalCommonGuiProvider()
 	for name, func in pairs(internals)do
 		currentGuiProvider[name] = func

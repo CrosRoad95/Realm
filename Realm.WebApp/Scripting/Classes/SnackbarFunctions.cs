@@ -1,4 +1,6 @@
-﻿namespace Realm.WebApp.Scripting.Classes;
+﻿using Microsoft.ClearScript;
+
+namespace Realm.WebApp.Scripting.Classes;
 
 public class SnackbarFunctions
 {

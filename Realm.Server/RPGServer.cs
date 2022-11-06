@@ -4,7 +4,6 @@ namespace Realm.Server;
 
 public partial class RPGServer : IRPGServer, IReloadable
 {
-    private readonly string _serverId = "";
     private readonly SemaphoreSlim _semaphore = new(0);
     private readonly MtaServer<RPGPlayer> _server;
     private readonly SlipeServerConfiguration _serverConfiguration;
@@ -13,8 +12,6 @@ public partial class RPGServer : IRPGServer, IReloadable
     private readonly ElementFunctions _elementFunctions;
     private readonly IElementCollection _elementCollection;
     private readonly IEnumerable<IModule> _modules;
-    private readonly RootElement _rootElement;
-    private readonly Dictionary<string, Func<LuaEvent, Task<object?>>> _eventHandlers = new();
 
     public event Action<Player>? PlayerJoined;
     public event Action? ServerReloaded;
@@ -69,7 +66,6 @@ public partial class RPGServer : IRPGServer, IReloadable
         _eventFunctions = _server.GetRequiredService<EventFunctions>();
         _elementFunctions = _server.GetRequiredService<ElementFunctions>();
         _elementCollection = _server.GetRequiredService<IElementCollection>();
-        _rootElement = _server.GetRequiredService<RootElement>();
 
         var _ = Task.Run(startup.StartAsync);
 
@@ -80,34 +76,11 @@ public partial class RPGServer : IRPGServer, IReloadable
         };
 
         _server.PlayerJoined += Server_PlayerJoined;
-
-
-        _server.LuaEventTriggered += async e =>
-        {
-            foreach (var pair in _eventHandlers)
-            {
-                if (pair.Key == e.Name)
-                {
-                    var response = await pair.Value(e);
-                    if(response != null)
-                    {
-                        ((RPGPlayer)e.Player).TriggerClientEvent($"{e.Name}Response", response);
-                    }
-                }
-            }
-        };
     }
 
     public void AssociateElement(Element element)
     {
         _server.AssociateElement(element);
-    }
-
-    public void AddEventHandler(string eventName, Func<LuaEvent, Task<object?>> callback)
-    {
-        if (_eventHandlers.ContainsKey(eventName))
-            throw new Exception("Event already handled");
-        _eventHandlers[eventName] = callback;
     }
 
     private async void Server_PlayerJoined(RPGPlayer player)

@@ -1,4 +1,5 @@
-﻿using Serilog.Events;
+﻿using Realm.Interfaces.Server;
+using Serilog.Events;
 
 namespace Realm.WebApp.Services;
 

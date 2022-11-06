@@ -1,5 +1,6 @@
 ﻿using SlipeServer.Resources.NoClip;
 using Realm.Resources.Addons.AgnosticGuiSystem.CeGuiProvider;
+using Realm.Resources.Addons.Common;
 
 namespace Realm.Server.Extensions;
 
@@ -36,7 +37,7 @@ public static class ServerBuilderExtensions
         builder.AddAgnosticGuiSystemResource(builder =>
         {
             builder.AddGuiProvider(CeGuiGuiProvider.Name, CeGuiGuiProvider.LuaCode);
-        });
+        }, new CommonResourceOptions());
 
         builder.AddLogic<LuaInteropLogic>();
         builder.AddLogic<ClientUILogic>();

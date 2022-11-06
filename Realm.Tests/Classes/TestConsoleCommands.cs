@@ -1,4 +1,6 @@
-﻿namespace Realm.Tests.Classes;
+﻿using Realm.Interfaces.Server;
+
+namespace Realm.Tests.Classes;
 
 internal class TestConsoleCommands : IConsoleCommands
 {

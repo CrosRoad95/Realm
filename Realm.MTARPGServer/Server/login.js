@@ -6,7 +6,7 @@
         if (await player.logIn(account, password)) {
             Logger.information("found account by username {login}: {account} password={password}", login, account, password);
             context.success();
-            player.closeCurrentGui()
+            player.closeGui("login")
         }
         else {
             context.error("Wrong password.");

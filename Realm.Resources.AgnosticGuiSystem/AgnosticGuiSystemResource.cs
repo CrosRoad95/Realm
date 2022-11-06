@@ -11,11 +11,17 @@ internal class AgnosticGuiSystemResource : Resource
         ["controller.lua"] = ResourceFiles.Controller,
     };
 
-    internal AgnosticGuiSystemResource(MtaServer server)
+    internal AgnosticGuiSystemResource(MtaServer server, AgnosticGuiSystemOptions agnosticGuiSystemOptions)
         : base(server, server.GetRequiredService<RootElement>(), "AgnosticGuiSystem")
     {
         foreach (var (path, content) in AdditionalFiles)
             Files.Add(ResourceFileFactory.FromBytes(content, path));
+        
+        foreach (var (path, content) in agnosticGuiSystemOptions._providers)
+            Files.Add(ResourceFileFactory.FromBytes(content, path));
+        
+        foreach (var (path, content) in agnosticGuiSystemOptions._guis)
+            NoClientScripts[$"{Name}/{path}"] = content;
 
         foreach (var (path, content) in GetGuiFiles())
             NoClientScripts[$"{Name}/{path}"] = content;

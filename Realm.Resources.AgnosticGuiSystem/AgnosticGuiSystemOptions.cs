@@ -7,9 +7,11 @@ public class AgnosticGuiSystemOptions
 
     public AgnosticGuiSystemOptions AddGuiProvider(string name, byte[] luaCode)
     {
-        if (_guis.ContainsKey(name))
+        name = $"{name}.lua";
+        if (_providers.ContainsKey(name))
             throw new ArgumentException(null, nameof(name));
 
+        _providers.Add(name, luaCode);
         return this;
     }
 
@@ -18,6 +20,7 @@ public class AgnosticGuiSystemOptions
         if (_guis.ContainsKey(name))
             throw new ArgumentException(null, nameof(name));
 
+        _guis.Add(name, luaCode);
         return this;
     }
 }

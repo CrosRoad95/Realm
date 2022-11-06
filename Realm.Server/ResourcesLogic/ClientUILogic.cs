@@ -4,7 +4,6 @@ internal class ClientUILogic
 {
     private readonly EventFunctions _eventFunctions;
     private readonly FromLuaValueMapper _fromLuaValueMapper;
-    private readonly List<RPGPlayer> _startedForPlayers = new();
 
     public ClientUILogic(AgnosticGuiSystemService agnosticGuiSystemService, EventFunctions eventFunctions, FromLuaValueMapper fromLuaValueMapper)
     {
@@ -23,13 +22,14 @@ internal class ClientUILogic
             throw new NullReferenceException(nameof(guiName));
 
         var player = (RPGPlayer)luaEvent.Player;
+        player.CloseAllGuis();
         player.OpenGui(guiName);
     }
 
     private void GuiCloseRequested(LuaEvent luaEvent)
     {
         var player = (RPGPlayer)luaEvent.Player;
-        player.CloseCurrentGui();
+        player.CloseAllGuis();
     }
 
     private async void FormSubmitted(LuaEvent luaEvent)
@@ -37,10 +37,5 @@ internal class ClientUILogic
         var formContext = new FormContext(luaEvent, _fromLuaValueMapper);
         await _eventFunctions.InvokeEvent(formContext);
         luaEvent.Response(formContext.Id, formContext.Name, formContext.IsSuccess, formContext.Response);
-    }
-
-    private void Player_Disconnected(Player player, PlayerQuitEventArgs e)
-    {
-        _startedForPlayers.Remove((RPGPlayer)player);
     }
 }
