@@ -9,16 +9,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="Resources\Globals.lua" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <EmbeddedResource Include="Resources\Globals.lua">
-      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-    </EmbeddedResource>
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="BCrypt.Net-Next" Version="4.0.3" />
     <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="6.0.0" />
     <PackageReference Include="Serilog" Version="2.12.0" />
@@ -31,17 +21,13 @@
     <ProjectReference Include="..\Realm.Discord\Realm.Discord.csproj" />
     <ProjectReference Include="..\Realm.Persistance.SQLite\Realm.Persistance.SQLite.csproj" />
     <ProjectReference Include="..\Realm.Persistance\Realm.Persistance.csproj" />
+    <ProjectReference Include="..\Realm.Resources.Addons.AgnosticGuiSystem.CeGuiProvider\Realm.Resources.Addons.AgnosticGuiSystem.CeGuiProvider.csproj" />
+    <ProjectReference Include="..\Realm.Resources.AgnosticGuiSystem\Realm.Resources.AgnosticGuiSystem.csproj" />
     <ProjectReference Include="..\Realm.Scripting\Realm.Scripting.csproj" />
   </ItemGroup>
 
   <ItemGroup>
     <None Update="Resources\LuaInterop\debugging.lua">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="Resources\UI\ceguiUIProvider.lua">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="Resources\UI\index.lua">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>

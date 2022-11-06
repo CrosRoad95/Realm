@@ -1,4 +1,5 @@
-﻿local random = math.random
+﻿outputChatBox("utilities")
+local random = math.random
 local template ='xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'
 
 local _triggerServerEvent = triggerServerEvent;

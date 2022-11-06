@@ -1,4 +1,6 @@
-﻿namespace Realm.MTARPGServer;
+﻿using Realm.Scripting.Scopes;
+
+namespace Realm.MTARPGServer;
 
 internal class ProvisioningServerBuilder
 {

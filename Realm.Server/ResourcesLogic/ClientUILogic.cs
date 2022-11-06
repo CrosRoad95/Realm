@@ -2,37 +2,21 @@
 
 internal class ClientUILogic
 {
-    private readonly Resource _resource;
     private readonly EventFunctions _eventFunctions;
     private readonly FromLuaValueMapper _fromLuaValueMapper;
     private readonly List<RPGPlayer> _startedForPlayers = new();
 
-    public ClientUILogic(IResourceProvider resourceProvider, IGuiFilesProvider guiFilesProvider, IRPGServer rpgServer, EventFunctions eventFunctions, FromLuaValueMapper fromLuaValueMapper)
+    public ClientUILogic(AgnosticGuiSystemService agnosticGuiSystemService, EventFunctions eventFunctions, FromLuaValueMapper fromLuaValueMapper)
     {
         _eventFunctions = eventFunctions;
         _fromLuaValueMapper = fromLuaValueMapper;
-        _resource = resourceProvider.GetResource("UI");
-        _resource.AddGlobals();
 
-        foreach (var pair in guiFilesProvider.GetFiles())
-            _resource.NoClientScripts[$"{_resource!.Name}/{pair.Item1}"] = pair.Item2;
-
-        rpgServer.PlayerJoined += Start;
-        rpgServer.ServerReloaded += RPGServer_ServerReloaded;
-
-        rpgServer.AddEventHandler("internalSubmitForm", InternalSubmitFormHandler);
-        rpgServer.AddEventHandler("internalRequestGuiClose", InternalRequestGuiClose);
-        rpgServer.AddEventHandler("internalNavigateToGui", InternalNavigateToGui);
+        agnosticGuiSystemService.FormSubmitted += FormSubmitted;
+        agnosticGuiSystemService.GuiCloseRequested += GuiCloseRequested;
+        agnosticGuiSystemService.GuiNavigationRequested += GuiNavigationRequested;
     }
 
-    private async Task<object?> InternalSubmitFormHandler(LuaEvent luaEvent)
-    {
-        var formContext = new FormContext(luaEvent, _fromLuaValueMapper);
-        await _eventFunctions.InvokeEvent(formContext);
-        return new object?[] { formContext.Id, formContext.Name, formContext.IsSuccess, formContext.Response };
-    }
-
-    private Task<object?> InternalNavigateToGui(LuaEvent luaEvent)
+    private void GuiNavigationRequested(LuaEvent luaEvent)
     {
         string? guiName = _fromLuaValueMapper.Map(typeof(string), luaEvent.Parameters[1]) as string;
         if (guiName == null)
@@ -40,37 +24,20 @@ internal class ClientUILogic
 
         var player = (RPGPlayer)luaEvent.Player;
         player.OpenGui(guiName);
-        return Task.FromResult<object?>(null);
     }
 
-    private Task<object?> InternalRequestGuiClose(LuaEvent luaEvent)
+    private void GuiCloseRequested(LuaEvent luaEvent)
     {
         var player = (RPGPlayer)luaEvent.Player;
         player.CloseCurrentGui();
-        return Task.FromResult<object?>(null);
     }
 
-    private void RPGServer_ServerReloaded()
+    private async void FormSubmitted(LuaEvent luaEvent)
     {
-        foreach (var player in _startedForPlayers)
-        {
-            _resource.StopFor(player);
-        }
-        foreach (var player in _startedForPlayers)
-        {
-            _resource.StartFor(player);
-        }
+        var formContext = new FormContext(luaEvent, _fromLuaValueMapper);
+        await _eventFunctions.InvokeEvent(formContext);
+        luaEvent.Response(formContext.Id, formContext.Name, formContext.IsSuccess, formContext.Response);
     }
-
-    public void Start(Player player)
-    {
-        var rpgPlayer = (RPGPlayer)player;
-        rpgPlayer.ResourceStartingLatch.Increment();
-        _resource.StartFor(player);
-        _startedForPlayers.Add(rpgPlayer);
-        player.Disconnected += Player_Disconnected;
-    }
-
 
     private void Player_Disconnected(Player player, PlayerQuitEventArgs e)
     {

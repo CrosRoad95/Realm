@@ -1,4 +1,5 @@
 ﻿using SlipeServer.Resources.NoClip;
+using Realm.Resources.Addons.AgnosticGuiSystem.CeGuiProvider;
 
 namespace Realm.Server.Extensions;
 
@@ -32,20 +33,15 @@ public static class ServerBuilderExtensions
         });
 
         builder.AddNoClipResource();
+        builder.AddAgnosticGuiSystemResource(builder =>
+        {
+            builder.AddGuiProvider(CeGuiGuiProvider.Name, CeGuiGuiProvider.LuaCode);
+        });
 
         builder.AddLogic<LuaInteropLogic>();
         builder.AddLogic<ClientUILogic>();
         builder.AddLogic<CommandsLogic>();
 
         return builder;
-    }
-
-    public static ServerBuilder AddGuiFilesLocation(this ServerBuilder serverBuilder, string path = "Gui")
-    {
-        serverBuilder.ConfigureServices(services =>
-        {
-            services.AddSingleton<IGuiFilesProvider>(new GuiFilesProvider(path));
-        });
-        return serverBuilder;
     }
 }

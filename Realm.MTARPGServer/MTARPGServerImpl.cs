@@ -19,7 +19,6 @@ public class MTARPGServerImpl
         _basePath = basePath;
         _rpgServer = new RPGServer(_configurationProvider, logger, modules, serverBuilder =>
         {
-            serverBuilder.AddGuiFilesLocation("Gui");
             serverBuilder.ConfigureServices(services =>
             {
                 services.AddSingleton(consoleCommands);
@@ -27,6 +26,7 @@ public class MTARPGServerImpl
                 services.AddSingleton<Func<string?>>(() => basePath);
             });
         }, basePath);
+
         Directory.SetCurrentDirectory(previousDirectory);
     }
 

@@ -1,0 +1,25 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="Lua\controller.lua" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Lua\controller.lua" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="SlipeServer.Resources.Base" Version="0.1.0-CI-20221104-171945" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Realm.Resources.Addons.Common\Realm.Resources.Addons.Common.csproj" />
+  </ItemGroup>
+
+</Project>

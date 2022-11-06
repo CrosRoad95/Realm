@@ -3,7 +3,6 @@ global using System.Collections.Generic;
 global using System.Linq;
 global using System.Numerics;
 global using System.Threading.Tasks;
-global using System.Reflection;
 global using System.Security.Claims;
 global using Microsoft.Extensions.Hosting;
 global using Microsoft.EntityFrameworkCore;
@@ -11,6 +10,7 @@ global using Microsoft.Extensions.DependencyInjection;
 global using Microsoft.Extensions.Configuration;
 global using Microsoft.AspNetCore.Identity;
 global using Microsoft.ClearScript;
+global using Microsoft.AspNetCore.Authorization;
 global using Serilog;
 
 global using SlipeServer.Server.Elements;
@@ -29,13 +29,11 @@ global using SlipeServerConfiguration = SlipeServer.Server.Configuration;
 global using Realm.Persistance;
 global using Realm.Persistance.SQLite;
 global using Realm.Server.Commands;
-global using Realm.Server.Gui;
 global using Realm.Interfaces.Server;
 global using Realm.Interfaces.Common;
 global using Realm.Server.ResourcesLogic;
 global using Realm.Server.Extensions;
 global using Realm.Configuration.Configurations;
-global using Realm.Common.Extensions;
 global using Realm.Interfaces.Server.Identity;
 global using Realm.Server.Identity;
 global using Realm.Interfaces.Extend;
@@ -48,6 +46,7 @@ global using Realm.Scripting.Classes;
 global using Realm.Server.Scripting.Events;
 global using Realm.Persistance.Data;
 global using Realm.Persistance.Scripting.Classes;
-global using Microsoft.AspNetCore.Authorization;
+
+global using Realm.Resources.AgnosticGuiSystem;
 
 global using ConfigurationProvider = Realm.Configuration.ConfigurationProvider;

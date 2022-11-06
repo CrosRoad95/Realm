@@ -1,11 +1,4 @@
-﻿local function centerCEGUIWindow(center_window)
-    local screenW, screenH = guiGetScreenSize()
-    local windowW, windowH = guiGetSize(center_window, false)
-    local x, y = (screenW - windowW) / 2, (screenH - windowH) / 2
-    return guiSetPosition(center_window, x, y, false)
-end
-
-local ceguiUIProvider = {
+﻿local ceguiUIProvider = {
 	-- Elements
 	window = function(title, px, py, sx, sy)
 		return guiCreateWindow(px, py, sx, sy, title, false)
@@ -76,10 +69,14 @@ local ceguiUIProvider = {
 		return true;
 	end,
 	centerWindow = function(windowHandle)
-		centerCEGUIWindow(windowHandle)
+	    local screenW, screenH = guiGetScreenSize()
+		local windowW, windowH = guiGetSize(windowHandle, false)
+		local x, y = (screenW - windowW) / 2, (screenH - windowH) / 2
+		guiSetPosition(windowHandle, x, y, false)
+		return true;
 	end,
 }
 
-function getCeguiUIProvider()
-	return ceguiUIProvider;
-end
+addEventHandler("onResourceStart", resourceroot, function()
+	registerGuiProvider("cegui", ceguiUIProvider)
+end)

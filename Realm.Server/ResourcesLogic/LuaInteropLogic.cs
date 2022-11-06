@@ -11,7 +11,6 @@ internal class LuaInteropLogic
     {
         _logger = logger.ForContext<LuaInteropLogic>();
         _resource = resourceProvider.GetResource("LuaInterop");
-        _resource.AddGlobals();
 
         rpgServer.PlayerJoined += Start;
         rpgServer.ServerReloaded += RPGServer_ServerReloaded;
