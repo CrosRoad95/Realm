@@ -16,6 +16,10 @@ COPY ["Realm.Common/Realm.Common.csproj", "Realm.Common/"]
 COPY ["Realm.Scripting/Realm.Scripting.csproj", "Realm.Scripting/"]
 COPY ["Realm.Persistance.SQLite/Realm.Persistance.SQLite.csproj", "Realm.Persistance.SQLite/"]
 COPY ["Realm.Persistance/Realm.Persistance.csproj", "Realm.Persistance/"]
+COPY ["Realm.Resources.Addons.AgnosticGuiSystem.CeGuiProvider/Realm.Resources.Addons.AgnosticGuiSystem.CeGuiProvider.csproj", "Realm.Resources.Addons.AgnosticGuiSystem.CeGuiProvider/"]
+COPY ["Realm.Resources.AgnosticGuiSystem/Realm.Resources.AgnosticGuiSystem.csproj", "Realm.Resources.AgnosticGuiSystem/"]
+COPY ["Realm.Resources.Addons.Common/Realm.Resources.Addons.Common.csproj", "Realm.Resources.Addons.Common/"]
+COPY ["Realm.Resources.LuaInterop/Realm.Resources.LuaInterop.csproj", "Realm.Resources.LuaInterop/"]
 RUN dotnet restore "Realm.WebApp/Realm.WebApp.csproj"
 COPY . .
 WORKDIR "/src/Realm.WebApp"
