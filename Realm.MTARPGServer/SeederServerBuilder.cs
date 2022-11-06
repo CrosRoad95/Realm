@@ -2,18 +2,18 @@
 
 namespace Realm.MTARPGServer;
 
-internal class ProvisioningServerBuilder
+internal class SeederServerBuilder
 {
     private readonly ElementFunctions _elementFunctions;
     private readonly IdentityFunctions _identityFunctions;
 
-    public ProvisioningServerBuilder(ElementFunctions elementFunctions, IdentityFunctions identityFunctions)
+    public SeederServerBuilder(ElementFunctions elementFunctions, IdentityFunctions identityFunctions)
     {
         _elementFunctions = elementFunctions;
         _identityFunctions = identityFunctions;
     }
 
-    private void BuildSpawns(Dictionary<string, Provisioning.Spawn> spawns)
+    private void BuildSpawns(Dictionary<string, Seed.Spawn> spawns)
     {
         foreach (var pair in spawns)
         {
@@ -31,7 +31,7 @@ internal class ProvisioningServerBuilder
         }
     }
 
-    private async Task BuildIdentityAccounts(Dictionary<string, Provisioning.Account> accounts)
+    private async Task BuildIdentityAccounts(Dictionary<string, Seed.Account> accounts)
     {
         foreach (var pair in accounts)
         {
@@ -42,15 +42,16 @@ internal class ProvisioningServerBuilder
             await account.RemoveAllClaims();
             await account.AddClaims(pair.Value.Claims);
             await account.AddRoles(pair.Value.Roles);
-            await account.AddClaim("provisioned", "true");
+            await account.AddClaim("seeded", "true");
+            await account.AddClaim("persistant", "true");
         }
     }
 
-    public async Task BuildFrom(Provisioning provisioning)
+    public async Task BuildFrom(Seed seed)
     {
         using var _ = new PersistantScope();
-        BuildSpawns(provisioning.Spawns);
-        await BuildIdentityRoles(provisioning.Roles);
-        await BuildIdentityAccounts(provisioning.Accounts);
+        BuildSpawns(seed.Spawns);
+        await BuildIdentityRoles(seed.Roles);
+        await BuildIdentityAccounts(seed.Accounts);
     }
 }

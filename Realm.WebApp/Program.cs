@@ -46,8 +46,9 @@ builder.Services.AddSingleton<IRPGServer>(x => x.GetRequiredService<MTARPGServer
 var app = builder.Build();
 
 var serverImpl = app.Services.GetRequiredService<MTARPGServerImpl>();
-var fileName = serverImpl.ConfigurationProvider.Get<string>("General:ProvisioningFile");
-await serverImpl.BuildFromProvisioningFile(fileName);
+var seedFileNames = serverImpl.ConfigurationProvider.Get<string[]>("General:SeedFiles");
+foreach(var seedFileName in seedFileNames)
+    await serverImpl.BuildFromSeedFile(seedFileName);
 serverImpl.Start();
 
 // Configure the HTTP request pipeline.

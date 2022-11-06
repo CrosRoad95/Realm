@@ -22,7 +22,7 @@ public class MTARPGServerImpl
             serverBuilder.ConfigureServices(services =>
             {
                 services.AddSingleton(consoleCommands);
-                services.AddSingleton<ProvisioningServerBuilder>();
+                services.AddSingleton<SeederServerBuilder>();
                 services.AddSingleton<Func<string?>>(() => basePath);
             });
         }, basePath);
@@ -30,10 +30,10 @@ public class MTARPGServerImpl
         Directory.SetCurrentDirectory(previousDirectory);
     }
 
-    public async Task BuildFromProvisioningFile(string provisioningFileName)
+    public async Task BuildFromSeedFile(string seedFileName)
     {
         var previousDirectory = Directory.GetCurrentDirectory();
-        var provisioningSource = await File.ReadAllTextAsync(Path.Join(_basePath, provisioningFileName));
+        var seedSource = await File.ReadAllTextAsync(Path.Join(_basePath, seedFileName));
         if (_basePath != null)
             Directory.SetCurrentDirectory(_basePath);
 
@@ -42,11 +42,11 @@ public class MTARPGServerImpl
             .WithTypeConverter(new Vector3Converter())
             .Build();
 
-        var provisioning = deserializer.Deserialize<Provisioning>(provisioningSource);
-        var provisioningValidator = new ProvisioningValidator();
-        await provisioningValidator.ValidateAndThrowAsync(provisioning);
-        var provisioningServerBuilder = _rpgServer.GetRequiredService<ProvisioningServerBuilder>();
-        await provisioningServerBuilder.BuildFrom(provisioning);
+        var seed = deserializer.Deserialize<Seed>(seedSource);
+        var seedValidator = new SeedValidator();
+        await seedValidator.ValidateAndThrowAsync(seed);
+        var seedServerBuilder = _rpgServer.GetRequiredService<SeederServerBuilder>();
+        await seedServerBuilder.BuildFrom(seed);
         Directory.SetCurrentDirectory(previousDirectory);
     }
 

@@ -20,7 +20,7 @@
     <None Update="Gui\Login.lua">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="provisioning.yaml">
+    <None Update="seed.yaml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="Server\discord.js">

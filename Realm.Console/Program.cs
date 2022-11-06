@@ -20,10 +20,11 @@ var server = new MTARPGServerImpl(serverConsole, logger, configurationProvider, 
             new ScriptingModule(),
             new ServerScriptingModule(),
         });
-var fileName = configurationProvider.Get<string>("General:ProvisioningFile");
+var seedFiles = configurationProvider.Get<string[]>("General:SeedFiles");
 try
 {
-    await server.BuildFromProvisioningFile(fileName);
+    foreach (var seedFile in seedFiles)
+        await server.BuildFromSeedFile(seedFile);
     server.Start();
     serverConsole.Start();
 }
