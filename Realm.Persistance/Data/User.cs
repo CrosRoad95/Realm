@@ -13,4 +13,5 @@ public sealed class User : IdentityUser<Guid>
     public short Skin { get; set; }
 
     public ICollection<UserData>? PlayerData { get; set; }
+    public ICollection<UserLicense>? Licenses { get; set; }
 }

@@ -1,7 +1,4 @@
-﻿using System.ComponentModel;
-using static System.Net.Mime.MediaTypeNames;
-
-namespace Realm.Persistance;
+﻿namespace Realm.Persistance;
 
 public abstract class Db<T> : IdentityDbContext<User, Role, Guid,
         IdentityUserClaim<Guid>,
@@ -11,6 +8,7 @@ public abstract class Db<T> : IdentityDbContext<User, Role, Guid,
         IdentityUserToken<Guid>>, IDb where T : Db<T>
 {
     public DbSet<UserData> UserData => Set<UserData>();
+    public DbSet<UserLicense> UserLicenses => Set<UserLicense>();
 
     public Db(DbContextOptions<T> options) : base(options)
     {
@@ -37,6 +35,17 @@ public abstract class Db<T> : IdentityDbContext<User, Role, Guid,
             entityBuilder
                 .HasOne(x => x.User)
                 .WithMany(x => x.PlayerData)
+                .HasForeignKey(x => x.UserId);
+        });
+
+        modelBuilder.Entity<UserLicense>(entityBuilder =>
+        {
+            entityBuilder
+                .ToTable("UserLicense")
+                .HasKey(x => new { x.UserId, x.LicenseId });
+            entityBuilder
+                .HasOne(x => x.User)
+                .WithMany(x => x.Licenses)
                 .HasForeignKey(x => x.UserId);
         });
     }
