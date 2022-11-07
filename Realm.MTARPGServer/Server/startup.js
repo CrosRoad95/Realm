@@ -44,13 +44,16 @@ addEventHandler("onPlayerLogin", async ({player, account}) => {
     Logger.information("player logged in: {player}, {account}", player, account)
     await player.spawn(spawn);
     Logger.information("is player authorized to admin? {isAuythorized}", await player.authorize("Admin"))
-    await player.setData("test", "sample value");
-    let has = await player.hasData("test")
-    let data = await player.getData("test");
-    Logger.information("hasData={has} test='{data}'", has, data);
-    let removed = await player.removeData("test");
-    has = await player.hasData("test")
-    Logger.information("removed={removed} hasData={has}", removed, has);
+    {
+        const playerAccount = await player.getAccount();
+        await playerAccount.setData("test", "sample value");
+        let has = await playerAccount.hasData("test")
+        let data = await playerAccount.getData("test");
+        Logger.information("hasData={has} test='{data}'", has, data);
+        let removed = await playerAccount.removeData("test");
+        has = await playerAccount.hasData("test")
+        Logger.information("removed={removed} hasData={has}", removed, has);
+    }
 })
 
 addEventHandler("onPlayerLogout", ({ player }) => {

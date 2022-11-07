@@ -4,18 +4,20 @@ public class PlayerAccount : IDisposable
 {
     private readonly User _user;
     private readonly UserManager<User> _userManager;
+    private readonly IDb _db;
     private bool _disposed;
 
     [NoScriptAccess]
     public User User => _user;
 
-    public string Id => _user.Id.ToString();
+    public string Id => _user.Id.ToString().ToUpper();
     public string UserName => _user.UserName;
     public DateTime? RegisterDateTime => _user.RegisteredDateTime;
-    public PlayerAccount(User user, UserManager<User> userManager)
+    public PlayerAccount(User user, UserManager<User> userManager, IDb db)
     {
         _user = user;
         _userManager = userManager;
+        _db = db;
     }
 
     public override string ToString() => _user.ToString();
@@ -139,6 +141,62 @@ public class PlayerAccount : IDisposable
         var result = await _userManager.RemoveClaimsAsync(_user, claims);
         return result.Succeeded;
     }
+
+    public async Task<bool> HasData(string key)
+    {
+        var playerData = await _db.UserData
+            .AsNoTrackingWithIdentityResolution()
+            .FirstOrDefaultAsync(x => x.UserId.ToString() == Id && x.Key == key);
+        return playerData != null;
+    }
+
+    public async Task<string?> GetData(string key)
+    {
+        var playerData = await _db.UserData
+            .AsNoTrackingWithIdentityResolution()
+            .FirstOrDefaultAsync(x => x.UserId.ToString() == Id && x.Key == key);
+        if (playerData == null)
+            return null;
+        return playerData.Value;
+    }
+
+    public async Task<bool> RemoveData(string key)
+    {
+        var playerData = await _db.UserData.FirstOrDefaultAsync(x => x.UserId.ToString() == Id && x.Key == key);
+        if (playerData == null)
+            return false;
+
+        _db.UserData.Remove(playerData);
+        var savedEntities = await _db.SaveChangesAsync();
+        return savedEntities == 1;
+    }
+
+    public async Task<bool> SetData(string key, string value)
+    {
+        int savedEntities;
+
+        var playerData = await _db.UserData.FirstOrDefaultAsync(x => x.UserId.ToString() == Id && x.Key == key);
+        if (playerData == null)
+        {
+            playerData = new UserData
+            {
+                Key = key,
+                UserId = Guid.Parse(Id),
+                Value = value
+            };
+            _db.UserData.Add(playerData);
+            savedEntities = await _db.SaveChangesAsync();
+            return savedEntities == 1;
+        }
+        if (playerData.Value == value)
+            return true;
+
+        playerData.Value = value;
+        _db.UserData.Update(playerData);
+        savedEntities = await _db.SaveChangesAsync();
+        return savedEntities == 1;
+    }
+
 
     [NoScriptAccess]
     public void Dispose()

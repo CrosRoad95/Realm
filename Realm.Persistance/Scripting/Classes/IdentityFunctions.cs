@@ -4,11 +4,13 @@ public class IdentityFunctions
 {
     private readonly UserManager<User> _userManager;
     private readonly RoleManager<Role> _roleManager;
+    private readonly IDb _db;
 
-    public IdentityFunctions(UserManager<User> userManager, RoleManager<Role> roleManager)
+    public IdentityFunctions(UserManager<User> userManager, RoleManager<Role> roleManager, IDb db)
     {
         _userManager = userManager;
         _roleManager = roleManager;
+        _db = db;
     }
 
     public async Task<PlayerAccount?> FindAccountById(string id)
@@ -18,7 +20,7 @@ public class IdentityFunctions
         if (user == null)
             return null;
 
-        return new PlayerAccount(user, _userManager);
+        return new PlayerAccount(user, _userManager, _db);
     }
     
     public async Task<PlayerAccount?> FindAccountByUserName(string username)
@@ -28,7 +30,7 @@ public class IdentityFunctions
         if (user == null)
             return null;
 
-        return new PlayerAccount(user, _userManager);
+        return new PlayerAccount(user, _userManager, _db);
     }
     
     public async Task<PlayerRole?> FindRoleByName(string name)
@@ -48,7 +50,7 @@ public class IdentityFunctions
     
     public async Task<List<PlayerAccount>> GetAllAccounts()
     {
-        return await _userManager.Users.Select(x => new PlayerAccount(x, _userManager)).ToListAsync();
+        return await _userManager.Users.Select(x => new PlayerAccount(x, _userManager, _db)).ToListAsync();
     }
 
     public async Task<PlayerAccount> CreateAccount(string username, string password)
