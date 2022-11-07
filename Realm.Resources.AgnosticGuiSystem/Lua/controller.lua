@@ -133,6 +133,7 @@ local function internalCommonGuiProvider()
 					currentGuiProvider.setValue(fields[name], field.value)
 				end
 			end
+			return true;
 		end,
 		rememberForm = function(form)
 			local name = form.getName()
