@@ -11,4 +11,6 @@ public sealed class User : IdentityUser<Guid>
     public string? LastIp { get; set; }
     public ulong PlayTime { get; set; }
     public short Skin { get; set; }
+
+    public ICollection<PlayerData>? PlayerData { get; set; }
 }

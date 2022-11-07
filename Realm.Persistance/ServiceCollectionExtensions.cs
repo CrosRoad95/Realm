@@ -22,7 +22,6 @@ public static class ServiceCollectionExtensions
     {
         services.AddDbContext<IDb, T>(dboptions, ServiceLifetime.Transient);
 
-        services.AddTransient<ITestRepository, TestRepository>();
         return services;
     }
 

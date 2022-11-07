@@ -8,6 +8,7 @@ public abstract class Db<T> : IdentityDbContext<User, Role, Guid,
         IdentityUserToken<Guid>>, IDb where T : Db<T>
 {
     public DbSet<Test> Tests => Set<Test>();
+    public DbSet<PlayerData> PlayerData => Set<PlayerData>();
 
     public Db(DbContextOptions<T> options) : base(options)
     {
@@ -30,5 +31,13 @@ public abstract class Db<T> : IdentityDbContext<User, Role, Guid,
         modelBuilder.Entity<IdentityUserLogin<Guid>>().ToTable("UserLogins");
         modelBuilder.Entity<IdentityRoleClaim<Guid>>().ToTable("RoleClaims");
         modelBuilder.Entity<IdentityUserToken<Guid>>().ToTable("UserTokens");
+
+        modelBuilder.Entity<PlayerData>()
+            .ToTable("PlayerData")
+            .HasKey(x => new { x.UserId, x.Key });
+        modelBuilder.Entity<PlayerData>()
+            .HasOne(x => x.User)
+            .WithMany(x => x.PlayerData)
+            .HasForeignKey(x => x.UserId);
     }
 }

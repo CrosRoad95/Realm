@@ -16,6 +16,7 @@ public class RPGPlayer : Player
     private readonly IdentityFunctions _identityFunctions;
     private readonly DebugLog _debugLog;
     private readonly AgnosticGuiSystemService _agnosticGuiSystemService;
+    private readonly IDb _db;
     [NoScriptAccess]
     public Latch ResourceStartingLatch = new(3); // TODO: remove hardcoded resources counter
     [NoScriptAccess]
@@ -80,7 +81,7 @@ public class RPGPlayer : Player
         UserManager<User> userManager, IAuthorizationService authorizationService,
         AuthorizationPoliciesProvider authorizationPoliciesProvider, EventFunctions eventFunctions,
         IdentityFunctions identityFunctions, DebugLog debugLog,
-        AgnosticGuiSystemService agnosticGuiSystemService)
+        AgnosticGuiSystemService agnosticGuiSystemService, IDb db)
     {
         _mtaServer = mtaServer;
         _luaValueMapper = luaValueMapper;
@@ -92,6 +93,7 @@ public class RPGPlayer : Player
         _identityFunctions = identityFunctions;
         _debugLog = debugLog;
         _agnosticGuiSystemService = agnosticGuiSystemService;
+        _db = db;
         _cancellationTokenSource = new CancellationTokenSource();
         CancellationToken = _cancellationTokenSource.Token;
         ResourceStarted += RPGPlayer_ResourceStarted;
@@ -174,6 +176,13 @@ public class RPGPlayer : Player
         return true;
     }
 
+    public string? GetAccountId()
+    {
+        if (!IsLoggedIn)
+            return null;
+
+        return ClaimsPrincipal.FindFirstValue(ClaimTypes.NameIdentifier);
+    }
     public async Task<PlayerAccount?> GetAccount()
     {
         if (!IsLoggedIn)
@@ -227,6 +236,77 @@ public class RPGPlayer : Player
     public bool OpenGui(string gui) => _agnosticGuiSystemService.OpenGui(this, gui);
     public bool CloseGui(string gui) => _agnosticGuiSystemService.CloseGui(this, gui);
     public void CloseAllGuis() => _agnosticGuiSystemService.CloseAllGuis(this);
+
+    public async Task<bool> HasData(string key)
+    {
+        if (!IsLoggedIn)
+            return false;
+
+        var nameIdentifier = ClaimsPrincipal.FindFirstValue(ClaimTypes.NameIdentifier).ToUpper();
+        var playerData = await _db.PlayerData
+            .AsNoTrackingWithIdentityResolution()
+            .FirstOrDefaultAsync(x => x.UserId.ToString() == nameIdentifier && x.Key == key);
+        return playerData != null;
+    }
+
+    public async Task<string?> GetData(string key)
+    {
+        if (!IsLoggedIn)
+            return null;
+
+        var nameIdentifier = ClaimsPrincipal.FindFirstValue(ClaimTypes.NameIdentifier).ToUpper();
+        var playerData = await _db.PlayerData
+            .AsNoTrackingWithIdentityResolution()
+            .FirstOrDefaultAsync(x => x.UserId.ToString() == nameIdentifier && x.Key == key);
+        if (playerData == null)
+            return null;
+        return playerData.Value;
+    }
+
+    public async Task<bool> RemoveData(string key)
+    {
+        if (!IsLoggedIn)
+            return false;
+
+        var nameIdentifier = ClaimsPrincipal.FindFirstValue(ClaimTypes.NameIdentifier).ToUpper();
+        var playerData = await _db.PlayerData.FirstOrDefaultAsync(x => x.UserId.ToString() == nameIdentifier && x.Key == key);
+        if (playerData == null)
+            return false;
+
+        _db.PlayerData.Remove(playerData);
+        var savedEntities = await _db.SaveChangesAsync();
+        return savedEntities == 1;
+    }
+
+    public async Task<bool> SetData(string key, string value)
+    {
+        if (!IsLoggedIn)
+            return false;
+
+        int savedEntities;
+
+        var nameIdentifier = ClaimsPrincipal.FindFirstValue(ClaimTypes.NameIdentifier).ToUpper();
+        var playerData = await _db.PlayerData.FirstOrDefaultAsync(x => x.UserId.ToString() == nameIdentifier && x.Key == key);
+        if (playerData == null)
+        {
+            playerData = new PlayerData
+            {
+                Key = key,
+                UserId = Guid.Parse(nameIdentifier),
+                Value = value
+            };
+            _db.PlayerData.Add(playerData);
+            savedEntities = await _db.SaveChangesAsync();
+            return savedEntities == 1;
+        }
+        if (playerData.Value == value)
+            return true;
+
+        playerData.Value = value;
+        _db.PlayerData.Update(playerData);
+        savedEntities = await _db.SaveChangesAsync();
+        return savedEntities == 1;
+    }
 
     [NoScriptAccess]
     public void Reset()
