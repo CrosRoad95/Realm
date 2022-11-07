@@ -8,7 +8,7 @@ public interface IDb
     DbSet<IdentityUserLogin<Guid>> UserLogins { get; }
     DbSet<IdentityRoleClaim<Guid>> RoleClaims { get; }
     DbSet<IdentityUserToken<Guid>> UserTokens { get; }
-    DbSet<PlayerData> PlayerData { get; }
+    DbSet<UserData> UserData { get; }
 
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
 }

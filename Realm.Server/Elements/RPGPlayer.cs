@@ -243,7 +243,7 @@ public class RPGPlayer : Player
             return false;
 
         var nameIdentifier = ClaimsPrincipal.FindFirstValue(ClaimTypes.NameIdentifier).ToUpper();
-        var playerData = await _db.PlayerData
+        var playerData = await _db.UserData
             .AsNoTrackingWithIdentityResolution()
             .FirstOrDefaultAsync(x => x.UserId.ToString() == nameIdentifier && x.Key == key);
         return playerData != null;
@@ -255,7 +255,7 @@ public class RPGPlayer : Player
             return null;
 
         var nameIdentifier = ClaimsPrincipal.FindFirstValue(ClaimTypes.NameIdentifier).ToUpper();
-        var playerData = await _db.PlayerData
+        var playerData = await _db.UserData
             .AsNoTrackingWithIdentityResolution()
             .FirstOrDefaultAsync(x => x.UserId.ToString() == nameIdentifier && x.Key == key);
         if (playerData == null)
@@ -269,11 +269,11 @@ public class RPGPlayer : Player
             return false;
 
         var nameIdentifier = ClaimsPrincipal.FindFirstValue(ClaimTypes.NameIdentifier).ToUpper();
-        var playerData = await _db.PlayerData.FirstOrDefaultAsync(x => x.UserId.ToString() == nameIdentifier && x.Key == key);
+        var playerData = await _db.UserData.FirstOrDefaultAsync(x => x.UserId.ToString() == nameIdentifier && x.Key == key);
         if (playerData == null)
             return false;
 
-        _db.PlayerData.Remove(playerData);
+        _db.UserData.Remove(playerData);
         var savedEntities = await _db.SaveChangesAsync();
         return savedEntities == 1;
     }
@@ -286,16 +286,16 @@ public class RPGPlayer : Player
         int savedEntities;
 
         var nameIdentifier = ClaimsPrincipal.FindFirstValue(ClaimTypes.NameIdentifier).ToUpper();
-        var playerData = await _db.PlayerData.FirstOrDefaultAsync(x => x.UserId.ToString() == nameIdentifier && x.Key == key);
+        var playerData = await _db.UserData.FirstOrDefaultAsync(x => x.UserId.ToString() == nameIdentifier && x.Key == key);
         if (playerData == null)
         {
-            playerData = new PlayerData
+            playerData = new UserData
             {
                 Key = key,
                 UserId = Guid.Parse(nameIdentifier),
                 Value = value
             };
-            _db.PlayerData.Add(playerData);
+            _db.UserData.Add(playerData);
             savedEntities = await _db.SaveChangesAsync();
             return savedEntities == 1;
         }
@@ -303,7 +303,7 @@ public class RPGPlayer : Player
             return true;
 
         playerData.Value = value;
-        _db.PlayerData.Update(playerData);
+        _db.UserData.Update(playerData);
         savedEntities = await _db.SaveChangesAsync();
         return savedEntities == 1;
     }

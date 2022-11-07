@@ -1,6 +1,6 @@
 ﻿namespace Realm.Persistance.Data;
 
-public sealed class PlayerData
+public sealed class UserData
 {
     public Guid UserId { get; set; }
     public string Key { get; set; }

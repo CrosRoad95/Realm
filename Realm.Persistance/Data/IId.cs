@@ -1,4 +1,4 @@
-﻿namespace Realm.Persistance.Entities;
+﻿namespace Realm.Persistance.Data;
 
 public interface IId
 {

@@ -1,4 +1,7 @@
-﻿namespace Realm.Persistance;
+﻿using System.ComponentModel;
+using static System.Net.Mime.MediaTypeNames;
+
+namespace Realm.Persistance;
 
 public abstract class Db<T> : IdentityDbContext<User, Role, Guid,
         IdentityUserClaim<Guid>,
@@ -7,8 +10,7 @@ public abstract class Db<T> : IdentityDbContext<User, Role, Guid,
         IdentityRoleClaim<Guid>,
         IdentityUserToken<Guid>>, IDb where T : Db<T>
 {
-    public DbSet<Test> Tests => Set<Test>();
-    public DbSet<PlayerData> PlayerData => Set<PlayerData>();
+    public DbSet<UserData> UserData => Set<UserData>();
 
     public Db(DbContextOptions<T> options) : base(options)
     {
@@ -19,11 +21,6 @@ public abstract class Db<T> : IdentityDbContext<User, Role, Guid,
     {
         base.OnModelCreating(modelBuilder);
 
-        modelBuilder.Entity<Test>(entityBuilder =>
-        {
-            entityBuilder.HasKey(x => x.Id);
-        });
-
         modelBuilder.Entity<User>().ToTable("Users");
         modelBuilder.Entity<Role>().ToTable("Roles");
         modelBuilder.Entity<IdentityUserClaim<Guid>>().ToTable("UserClaims");
@@ -32,12 +29,15 @@ public abstract class Db<T> : IdentityDbContext<User, Role, Guid,
         modelBuilder.Entity<IdentityRoleClaim<Guid>>().ToTable("RoleClaims");
         modelBuilder.Entity<IdentityUserToken<Guid>>().ToTable("UserTokens");
 
-        modelBuilder.Entity<PlayerData>()
-            .ToTable("PlayerData")
-            .HasKey(x => new { x.UserId, x.Key });
-        modelBuilder.Entity<PlayerData>()
-            .HasOne(x => x.User)
-            .WithMany(x => x.PlayerData)
-            .HasForeignKey(x => x.UserId);
+        modelBuilder.Entity<UserData>(entityBuilder =>
+        {
+            entityBuilder
+                .ToTable("UserData")
+                .HasKey(x => new { x.UserId, x.Key });
+            entityBuilder
+                .HasOne(x => x.User)
+                .WithMany(x => x.PlayerData)
+                .HasForeignKey(x => x.UserId);
+        });
     }
 }

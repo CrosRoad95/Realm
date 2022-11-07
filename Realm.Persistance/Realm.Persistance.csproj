@@ -16,6 +16,15 @@
     <LangVersion>preview</LangVersion>
   </PropertyGroup>
 
+  <ItemGroup>
+    <Compile Remove="Interfaces\**" />
+    <Compile Remove="Repositories\**" />
+    <EmbeddedResource Remove="Interfaces\**" />
+    <EmbeddedResource Remove="Repositories\**" />
+    <None Remove="Interfaces\**" />
+    <None Remove="Repositories\**" />
+  </ItemGroup>
+
 	<ItemGroup>
 		<PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="6.0.0" />
 		<PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="6.0.10" />
@@ -31,11 +40,6 @@
 	<ItemGroup>
 	  <ProjectReference Include="..\Realm.Interfaces\Realm.Interfaces.csproj" />
 	  <ProjectReference Include="..\Realm.Scripting\Realm.Scripting.csproj" />
-	</ItemGroup>
-
-	<ItemGroup>
-	  <Folder Include="Interfaces\" />
-	  <Folder Include="Repositories\" />
 	</ItemGroup>
 
 </Project>

@@ -12,5 +12,5 @@ public sealed class User : IdentityUser<Guid>
     public ulong PlayTime { get; set; }
     public short Skin { get; set; }
 
-    public ICollection<PlayerData>? PlayerData { get; set; }
+    public ICollection<UserData>? PlayerData { get; set; }
 }
