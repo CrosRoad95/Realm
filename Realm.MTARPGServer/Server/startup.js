@@ -90,12 +90,3 @@ addEventHandler("onPlayerLogout", ({ player }) => {
 addEventHandler("onPlayerSpawn", ({ player, spawn }) => {
     Logger.information("player spawned: {player}", player)
 });
-
-(async () => {
-    let account = await findAccountByUserName("test")
-    if (account === null) {
-        Logger.information("creating account...");
-        account = await createAccount("test", "asdASD123!@#")
-    }
-    Logger.information("account: {account} {username}", account, account.userName);
-})()
