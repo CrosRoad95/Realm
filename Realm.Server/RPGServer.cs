@@ -89,20 +89,18 @@ public partial class RPGServer : IRPGServer, IReloadable
             await player.ResourceStartingLatch;
 
         player.ResourceStartingLatch = new();
-        await _eventFunctions.InvokeEvent(new PlayerJoinedEvent
-        {
-            Player = player,
-        });
+        using var playerJoinedEvent = new PlayerJoinedEvent(player);
+        await _eventFunctions.InvokeEvent(playerJoinedEvent);
     }
 
     public void InitializeScripting(IScriptingModuleInterface scriptingModuleInterface)
     {
         // Events
-        _eventFunctions.RegisterEvent(FormContext.EventName);
+        _eventFunctions.RegisterEvent(FormContextEvent.EventName);
         _eventFunctions.RegisterEvent(PlayerJoinedEvent.EventName);
         _eventFunctions.RegisterEvent(PlayerLoggedInEvent.EventName);
         _eventFunctions.RegisterEvent(PlayerLoggedOutEvent.EventName);
-        _eventFunctions.RegisterEvent(PlayerSpawned.EventName);
+        _eventFunctions.RegisterEvent(PlayerSpawnedEvent.EventName);
 
         // Functions
         scriptingModuleInterface.AddHostObject("Elements", _elementFunctions, true);
@@ -111,11 +109,11 @@ public partial class RPGServer : IRPGServer, IReloadable
         scriptingModuleInterface.AddHostType(typeof(Claim));
         scriptingModuleInterface.AddHostType(typeof(RPGPlayer));
         scriptingModuleInterface.AddHostType(typeof(Spawn));
-        scriptingModuleInterface.AddHostType(typeof(FormContext));
+        scriptingModuleInterface.AddHostType(typeof(FormContextEvent));
         scriptingModuleInterface.AddHostType(typeof(PlayerJoinedEvent));
         scriptingModuleInterface.AddHostType(typeof(PlayerLoggedInEvent));
         scriptingModuleInterface.AddHostType(typeof(PlayerLoggedOutEvent));
-        scriptingModuleInterface.AddHostType(typeof(PlayerSpawned));
+        scriptingModuleInterface.AddHostType(typeof(PlayerSpawnedEvent));
     }
 
     public TService GetRequiredService<TService>() where TService: notnull

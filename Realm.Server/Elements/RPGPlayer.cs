@@ -1,4 +1,5 @@
 ﻿using Realm.Common.Utilities;
+using Realm.Server.Extensions;
 using SlipeServer.Server.Services;
 
 namespace Realm.Server.Elements;
@@ -117,11 +118,8 @@ public class RPGPlayer : Player
             Camera.Target = this;
             Camera.Fade(CameraFade.In);
             Spawn(spawn.Position, spawn.Rotation.Z, 0, 0, 0);
-            await _eventFunctions.InvokeEvent(new PlayerSpawned
-            {
-                Player = this,
-                Spawn = spawn,
-            });
+            using var playerSpawnedEvent = new PlayerSpawnedEvent(this, spawn);
+            await _eventFunctions.InvokeEvent(playerSpawnedEvent);
             return true;
         }
         return false;
@@ -153,11 +151,8 @@ public class RPGPlayer : Player
         {
             var claimsPrincipal = await _signInManager.CreateUserPrincipalAsync(account.User);
             ClaimsPrincipal = claimsPrincipal;
-            await _eventFunctions.InvokeEvent(new PlayerLoggedInEvent
-            {
-                Player = this,
-                Account = account,
-            });
+            using var playerLoggedInEvent = new PlayerLoggedInEvent(this, account);
+            await _eventFunctions.InvokeEvent(playerLoggedInEvent);
             return true;
         }
         return false;
@@ -169,10 +164,8 @@ public class RPGPlayer : Player
             return false;
 
         ClaimsPrincipal = null;
-        await _eventFunctions.InvokeEvent(new PlayerLoggedOutEvent
-        {
-            Player = this
-        });
+        using var playerLoggedOutEvent = new PlayerLoggedOutEvent(this);
+        await _eventFunctions.InvokeEvent(playerLoggedOutEvent);
         return true;
     }
 

@@ -34,7 +34,7 @@ internal class ClientUILogic
 
     private async void FormSubmitted(LuaEvent luaEvent)
     {
-        var formContext = new FormContext(luaEvent, _fromLuaValueMapper);
+        var formContext = new FormContextEvent(luaEvent, _fromLuaValueMapper);
         await _eventFunctions.InvokeEvent(formContext);
         luaEvent.Response(formContext.Id, formContext.Name, formContext.IsSuccess, formContext.Response);
     }

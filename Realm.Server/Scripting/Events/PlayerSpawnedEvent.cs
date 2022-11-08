@@ -1,11 +1,12 @@
 ﻿namespace Realm.Server.Scripting.Events;
 
-public class PlayerJoinedEvent : INamedLuaEvent, IDisposable
+public class PlayerSpawnedEvent : INamedLuaEvent, IDisposable
 {
     private bool _disposed = false;
-    private readonly RPGPlayer _player;
+    private RPGPlayer _player;
+    private Spawn _spawn;
 
-    public static string EventName => "onPlayerJoin";
+    public static string EventName => "onPlayerSpawn";
 
     public RPGPlayer Player
     {
@@ -16,9 +17,19 @@ public class PlayerJoinedEvent : INamedLuaEvent, IDisposable
         }
     }
 
-    public PlayerJoinedEvent(RPGPlayer player)
+    public Spawn Spawn
+    {
+        get
+        {
+            CheckIfDisposed();
+            return _spawn;
+        }
+    }
+
+    public PlayerSpawnedEvent(RPGPlayer player, Spawn spawn)
     {
         _player = player;
+        _spawn = spawn;
     }
 
     private void CheckIfDisposed()
