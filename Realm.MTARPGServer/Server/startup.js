@@ -44,8 +44,8 @@ addEventHandler("onPlayerLogin", async ({player, account}) => {
     Logger.information("player logged in: {player}, {account}", player, account)
     await player.spawn(spawn);
     Logger.information("is player authorized to admin? {isAuythorized}", await player.authorize("Admin"))
+    const playerAccount = await player.getAccount();
     {
-        const playerAccount = await player.getAccount();
         await playerAccount.setData("test", "sample value");
         let has = await playerAccount.hasData("test")
         let data = await playerAccount.getData("test");
@@ -53,6 +53,33 @@ addEventHandler("onPlayerLogin", async ({player, account}) => {
         let removed = await playerAccount.removeData("test");
         has = await playerAccount.hasData("test")
         Logger.information("removed={removed} hasData={has}", removed, has);
+    }
+
+    // License test
+    {
+        {
+            let added = await playerAccount.addLicense("B")
+            let licenses = await playerAccount.getAllLicenses()
+            let hasLicense = await playerAccount.hasLicense("B")
+            Logger.information("start hasLicense={hasLicense} added={added}, licenses={licenses}", hasLicense, added, licenses);
+        }
+
+        {
+            await playerAccount.suspendLicense("B", 10, "odwalanie2")
+            let isSuspended = await playerAccount.isLicenseSuspended("B")
+            let licenses = await playerAccount.getAllLicenses()
+            let hasLicense = await playerAccount.hasLicense("B")
+            Logger.information("suspended: isSuspended={isSuspended} licenses={licenses} hasLicense={hasLicense}", isSuspended, licenses, hasLicense);
+        }
+
+        {
+            await playerAccount.unSuspendLicense("B")
+            let isSuspended = await playerAccount.isLicenseSuspended("B")
+            let hasLicense = await playerAccount.hasLicense("B")
+            let licenses = await playerAccount.getAllLicenses()
+            Logger.information("unsuspended: isSuspended={isSuspended} licenses={licenses} hasLicenseB={hasLicense}", isSuspended, licenses, hasLicense);
+        }
+
     }
 })
 

@@ -1,4 +1,8 @@
-﻿namespace Realm.Persistance.Scripting.Classes;
+﻿using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using Newtonsoft.Json.Linq;
+using Realm.Persistance.Extensions;
+
+namespace Realm.Persistance.Scripting.Classes;
 
 public class PlayerAccount : IDisposable
 {
@@ -197,6 +201,97 @@ public class PlayerAccount : IDisposable
         return savedEntities == 1;
     }
 
+    public async Task<object> GetAllLicenses(bool includeSuspended = false)
+    {
+        var query = _db.UserLicenses
+            .AsNoTrackingWithIdentityResolution()
+            .Where(x => x.UserId.ToString() == Id);
+        if (includeSuspended)
+            query = query.IsSuspended();
+        else
+            query = query.NotSuspended();
+        var licenses = await query.Select(x => x.LicenseId).ToListAsync();
+        return licenses.ToArray().ToScriptArray();
+    }
+    
+    public async Task<bool> IsLicenseSuspended(string licenseId)
+    {
+        var isSuspended = await _db.UserLicenses
+            .AsNoTrackingWithIdentityResolution()
+            .IsSuspended()
+            .AnyAsync(x => x.UserId.ToString() == Id && x.LicenseId.ToLower() == licenseId.ToLower());
+
+        return isSuspended;
+    }
+    public async Task<string?> GetLastLicenseSuspensionReason()
+    {
+        var suspensionReason = await _db.UserLicenses
+            .AsNoTrackingWithIdentityResolution()
+            .Where(x => x.UserId.ToString() == Id)
+            .IsSuspended()
+            .Select(x => x.SuspendedReason)
+            .FirstOrDefaultAsync();
+
+        return suspensionReason;
+    }
+
+    public async Task<bool> AddLicense(string licenseId)
+    {
+        var userLicense = await _db.UserLicenses.FirstOrDefaultAsync(x => x.UserId.ToString() == Id && x.LicenseId.ToLower() == licenseId.ToLower());
+        if (userLicense != null)
+            return false;
+        userLicense = new UserLicense
+        {
+            LicenseId = licenseId,
+            UserId = Guid.Parse(Id),
+        };
+        _db.UserLicenses.Add(userLicense);
+        var savedEntities = await _db.SaveChangesAsync();
+        return savedEntities == 1;
+    }
+
+    public async Task<bool> HasLicense(string licenseId, bool includeSuspended = false)
+    {
+        var query = _db.UserLicenses
+            .AsNoTrackingWithIdentityResolution()
+            .Where(x => x.UserId.ToString() == Id && x.LicenseId.ToLower() == licenseId.ToLower());
+
+        if (!includeSuspended)
+            query = query.NotSuspended();
+        var all = await query.ToListAsync();
+        return await query.AnyAsync();
+    }
+
+    public async Task<bool> SuspendLicense(string licenseId, int timeInMinutes, string? reason = null)
+    {
+        if (timeInMinutes < 0)
+            return false;
+
+        var userLicense = await _db.UserLicenses
+            .FirstOrDefaultAsync(x => x.UserId.ToString() == Id && x.LicenseId.ToLower() == licenseId.ToLower());
+        if (userLicense == null)
+            return false;
+
+        userLicense.SuspendedUntil = DateTime.Now.AddMinutes(timeInMinutes);
+        userLicense.SuspendedReason = reason;
+        _db.UserLicenses.Update(userLicense);
+        var savedEntities = await _db.SaveChangesAsync();
+        return savedEntities == 1;
+    }
+
+    public async Task<bool> UnSuspendLicense(string licenseId)
+    {
+        var userLicense = await _db.UserLicenses
+            .IsSuspended()
+            .FirstOrDefaultAsync(x => x.UserId.ToString() == Id && x.LicenseId.ToLower() == licenseId.ToLower());
+        if (userLicense == null)
+            return false;
+
+        userLicense.SuspendedUntil = null;
+        _db.UserLicenses.Update(userLicense);
+        var savedEntities = await _db.SaveChangesAsync();
+        return savedEntities == 1;
+    }
 
     [NoScriptAccess]
     public void Dispose()

@@ -8,4 +8,6 @@ public class UserLicense
     public string? SuspendedReason { get; set; }
 
     public User? User { get; set; }
+
+    public bool IsSuspended() => SuspendedUntil != null && SuspendedUntil > DateTime.Now;
 }
