@@ -43,8 +43,8 @@ removeEventHandler("onPlayerJoin", func);
 addEventHandler("onPlayerLogin", async ({player, account}) => {
     Logger.information("player logged in: {player}, {account}", player, account)
     await player.spawn(spawn);
-    Logger.information("is player authorized to admin? {isAuythorized}", await player.authorize("Admin"))
-    const playerAccount = await player.getAccount();
+    Logger.information("is player authorized to admin policy? {isAuthorized}", await player.account.authorizePolicy("Admin"))
+    const playerAccount = player.account;
     {
         await playerAccount.setData("test", "sample value");
         let has = await playerAccount.hasData("test")

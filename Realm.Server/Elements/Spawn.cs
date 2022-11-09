@@ -53,17 +53,17 @@ public class Spawn : Element, IDisposable
         return true;
     }
 
-    public async Task<bool> Authorize(RPGPlayer player)
+    public async Task<bool> IsAuthorized(RPGPlayer player)
     {
         CheckIfDisposed();
+        if(player.Account == null)
+            return false;
+
         foreach (var policyName in _requiredPolices)
         {
-            var result = await player.AuthorizeInternal(policyName);
-            if (result == null)
+            var result = await player.Account.AuthorizePolicy(policyName);
+            if (!result)
                 return false;
-
-            if (!result.Succeeded)
-                throw new UnauthorizedAccessException($"Policy '{policyName}' failed, reason: {result}");
         }
         return true;
     }

@@ -1,5 +1,6 @@
 ﻿using Realm.Common.Utilities;
 using Realm.Server.Extensions;
+using Realm.Server.Services;
 using SlipeServer.Server.Services;
 
 namespace Realm.Server.Elements;
@@ -18,39 +19,39 @@ public class RPGPlayer : Player
     private readonly DebugLog _debugLog;
     private readonly AgnosticGuiSystemService _agnosticGuiSystemService;
     private readonly IDb _db;
+    private readonly AccountsInUseService _accountsInUseService;
     [NoScriptAccess]
     public Latch ResourceStartingLatch = new(3); // TODO: remove hardcoded resources counter
     [NoScriptAccess]
     public CancellationToken CancellationToken { get; private set; }
 
-    [NoScriptAccess]
-    public ClaimsPrincipal? ClaimsPrincipal { get; private set; }
+    public PlayerAccount? Account { get; private set; }
 
-    public bool IsLoggedIn => ClaimsPrincipal != null && ClaimsPrincipal.Identity != null && ClaimsPrincipal.Identity.IsAuthenticated;
+    public bool IsLoggedIn => Account != null && Account.IsAuthenticated;
 
-    public object? Claims
-    {
-        get
-        {
-            if (!IsLoggedIn)
-                return null;
+    //public object? Claims
+    //{
+    //    get
+    //    {
+    //        if (!IsLoggedIn)
+    //            return null;
 
-            return ClaimsPrincipal!.Claims.Select(x => x.Type).ToArray().ToScriptArray();
-        }
-    }
+    //        return ClaimsPrincipal!.Claims.Select(x => x.Type).ToArray().ToScriptArray();
+    //    }
+    //}
     
-    public object? Roles
-    {
-        get
-        {
-            if (!IsLoggedIn)
-                return null;
+    //public object? Roles
+    //{
+    //    get
+    //    {
+    //        if (!IsLoggedIn)
+    //            return null;
 
-            return ClaimsPrincipal!.Claims
-                .Where(c => c.Type == ClaimTypes.Role)
-                .Select(c => c.Value).ToArray().ToScriptArray();
-        }
-    }
+    //        return ClaimsPrincipal!.Claims
+    //            .Where(c => c.Type == ClaimTypes.Role)
+    //            .Select(c => c.Value).ToArray().ToScriptArray();
+    //    }
+    //}
 
 
     [NoScriptAccess]
@@ -79,22 +80,22 @@ public class RPGPlayer : Player
     }
 
     public RPGPlayer(MtaServer mtaServer, LuaValueMapper luaValueMapper, SignInManager<User> signInManager,
-        UserManager<User> userManager, IAuthorizationService authorizationService,
+        UserManager<User> userManager,
         AuthorizationPoliciesProvider authorizationPoliciesProvider, EventFunctions eventFunctions,
         IdentityFunctions identityFunctions, DebugLog debugLog,
-        AgnosticGuiSystemService agnosticGuiSystemService, IDb db)
+        AgnosticGuiSystemService agnosticGuiSystemService, IDb db, AccountsInUseService accountsInUseService)
     {
         _mtaServer = mtaServer;
         _luaValueMapper = luaValueMapper;
         _signInManager = signInManager;
         _userManager = userManager;
-        _authorizationService = authorizationService;
         _authorizationPoliciesProvider = authorizationPoliciesProvider;
         _eventFunctions = eventFunctions;
         _identityFunctions = identityFunctions;
         _debugLog = debugLog;
         _agnosticGuiSystemService = agnosticGuiSystemService;
         _db = db;
+        _accountsInUseService = accountsInUseService;
         _cancellationTokenSource = new CancellationTokenSource();
         CancellationToken = _cancellationTokenSource.Token;
         ResourceStarted += RPGPlayer_ResourceStarted;
@@ -113,7 +114,7 @@ public class RPGPlayer : Player
 
     public virtual async Task<bool> Spawn(Spawn spawn)
     {
-        if(await spawn.Authorize(this))
+        if(await spawn.IsAuthorized(this))
         {
             Camera.Target = this;
             Camera.Fade(CameraFade.In);
@@ -144,86 +145,34 @@ public class RPGPlayer : Player
 
     public async Task<bool> LogIn(PlayerAccount account, string password)
     {
-        if (ClaimsPrincipal != null)
+        if (IsLoggedIn)
             return false;
 
-        if (await _userManager.CheckPasswordAsync(account.User, password))
-        {
-            var claimsPrincipal = await _signInManager.CreateUserPrincipalAsync(account.User);
-            ClaimsPrincipal = claimsPrincipal;
-            using var playerLoggedInEvent = new PlayerLoggedInEvent(this, account);
-            await _eventFunctions.InvokeEvent(playerLoggedInEvent);
-            return true;
-        }
-        return false;
+        if (!await account.CheckPasswordAsync(password))
+            return false;
+
+        if (!_accountsInUseService.AssignPlayerToAccountId(this, account.Id))
+            return false;
+
+        await account.SignIn();
+
+        Account = account;
+        using var playerLoggedInEvent = new PlayerLoggedInEvent(this, account);
+        await _eventFunctions.InvokeEvent(playerLoggedInEvent);
+        return true;
     }
 
     public async Task<bool> LogOut()
     {
-        if (ClaimsPrincipal == null)
+        if (!IsLoggedIn)
             return false;
 
-        ClaimsPrincipal = null;
         using var playerLoggedOutEvent = new PlayerLoggedOutEvent(this);
         await _eventFunctions.InvokeEvent(playerLoggedOutEvent);
+        var id = Account!.Id;
+        Account = null;
+        _accountsInUseService.FreeAccountId(id);
         return true;
-    }
-
-    public string? GetAccountId()
-    {
-        if (!IsLoggedIn)
-            return null;
-
-        return ClaimsPrincipal.FindFirstValue(ClaimTypes.NameIdentifier);
-    }
-    public async Task<PlayerAccount?> GetAccount()
-    {
-        if (!IsLoggedIn)
-            return null;
-
-        var nameIdentifier = ClaimsPrincipal.FindFirstValue(ClaimTypes.NameIdentifier);
-        return await _identityFunctions.FindAccountById(nameIdentifier);
-    }
-
-    public bool IsInRole(string role)
-    {
-        if (!IsLoggedIn)
-            return false;
-        return ClaimsPrincipal!.IsInRole(role);
-    }
-
-    public bool HasClaim(string type)
-    {
-        if (!IsLoggedIn)
-            return false;
-        return ClaimsPrincipal!.HasClaim(x => x.Type == type);
-    }
-
-    public string? GetClaimValue(string type)
-    {
-        if (!IsLoggedIn || !HasClaim(type))
-            return null;
-
-        return ClaimsPrincipal!.Claims.First(x => x.Type == type).Value;
-    }
-
-    [NoScriptAccess]
-    public async Task<AuthorizationResult?> AuthorizeInternal(string policy)
-    {
-        _authorizationPoliciesProvider.ValidatePolicy(policy);
-        if (!IsLoggedIn)
-            return null;
-
-        var result = await _authorizationService.AuthorizeAsync(ClaimsPrincipal!, policy);
-
-        return result;
-    }
-
-    public async Task<bool> Authorize(string policy)
-    {
-        var result = await AuthorizeInternal(policy);
-
-        return result?.Succeeded ?? false;
     }
 
     public bool OpenGui(string gui) => _agnosticGuiSystemService.OpenGui(this, gui);
@@ -235,7 +184,7 @@ public class RPGPlayer : Player
     {
         Camera.Fade(CameraFade.Out, 0, System.Drawing.Color.Black);
         Camera.Target = null;
-        ClaimsPrincipal = null;
+        Account = null;
         ResourceStartingLatch = new(3); // TODO: remove hardcoded resources counter
         DebugView = false;
     }

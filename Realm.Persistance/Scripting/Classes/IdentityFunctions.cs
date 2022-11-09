@@ -1,16 +1,20 @@
-﻿namespace Realm.Persistance.Scripting.Classes;
+﻿using Realm.Persistance.Data;
+
+namespace Realm.Persistance.Scripting.Classes;
 
 public class IdentityFunctions
 {
     private readonly UserManager<User> _userManager;
     private readonly RoleManager<Role> _roleManager;
     private readonly IDb _db;
+    private readonly IServiceProvider _serviceProvider;
 
-    public IdentityFunctions(UserManager<User> userManager, RoleManager<Role> roleManager, IDb db)
+    public IdentityFunctions(UserManager<User> userManager, RoleManager<Role> roleManager, IDb db, IServiceProvider serviceProvider)
     {
         _userManager = userManager;
         _roleManager = roleManager;
         _db = db;
+        _serviceProvider = serviceProvider;
     }
 
     public async Task<PlayerAccount?> FindAccountById(string id)
@@ -19,8 +23,9 @@ public class IdentityFunctions
 
         if (user == null)
             return null;
-
-        return new PlayerAccount(user, _userManager, _db);
+        var playerAccount = _serviceProvider.GetRequiredService<PlayerAccount>();
+        playerAccount.SetUser(user);
+        return playerAccount;
     }
     
     public async Task<PlayerAccount?> FindAccountByUserName(string username)
@@ -30,7 +35,9 @@ public class IdentityFunctions
         if (user == null)
             return null;
 
-        return new PlayerAccount(user, _userManager, _db);
+        var playerAccount = _serviceProvider.GetRequiredService<PlayerAccount>();
+        playerAccount.SetUser(user);
+        return playerAccount;
     }
     
     public async Task<PlayerRole?> FindRoleByName(string name)
@@ -50,7 +57,12 @@ public class IdentityFunctions
     
     public async Task<List<PlayerAccount>> GetAllAccounts()
     {
-        return await _userManager.Users.Select(x => new PlayerAccount(x, _userManager, _db)).ToListAsync();
+        return (await _userManager.Users.ToListAsync()).Select(user =>
+        {
+            var playerAccount = _serviceProvider.GetRequiredService<PlayerAccount>();
+            playerAccount.SetUser(user);
+            return playerAccount;
+        }).ToList();
     }
 
     public async Task<PlayerAccount> CreateAccount(string username, string password)

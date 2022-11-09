@@ -35,6 +35,7 @@ public static class ServiceCollectionExtensions
            .AddDefaultTokenProviders();
 
         services.AddSingleton(new AuthorizationPoliciesProvider(configuration.Policies.Keys));
+        services.AddTransient<PlayerAccount>();
 
         services.AddAuthorization(options =>
         {

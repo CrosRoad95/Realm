@@ -1,4 +1,5 @@
 ﻿using Realm.Server.Scripting;
+using Realm.Server.Services;
 
 namespace Realm.Server;
 
@@ -46,6 +47,7 @@ public partial class RPGServer : IRPGServer, IReloadable
                     services.AddSingleton<IReloadable>(this);
                     services.AddSingleton<IRPGServer>(this);
                     services.AddSingleton<ElementFunctions>();
+                    services.AddSingleton<AccountsInUseService>();
 
                     if (modules != null)
                         foreach (var module in modules)

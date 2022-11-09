@@ -1,30 +1,75 @@
-﻿using Microsoft.EntityFrameworkCore.Metadata.Internal;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Newtonsoft.Json.Linq;
 using Realm.Persistance.Extensions;
+using System.Security.Principal;
 
 namespace Realm.Persistance.Scripting.Classes;
 
 public class PlayerAccount : IDisposable
 {
-    private readonly User _user;
+    private User? _user;
+    private readonly SignInManager<User> _signInManager;
     private readonly UserManager<User> _userManager;
     private readonly IDb _db;
+    private readonly IAuthorizationService _authorizationService;
     private bool _disposed;
-
-    [NoScriptAccess]
-    public User User => _user;
+    private ClaimsPrincipal? _claimsPrincipal;
 
     public string Id => _user.Id.ToString().ToUpper();
     public string UserName => _user.UserName;
     public DateTime? RegisterDateTime => _user.RegisteredDateTime;
-    public PlayerAccount(User user, UserManager<User> userManager, IDb db)
+    public PlayerAccount(SignInManager<User> signInManager, UserManager<User> userManager, IDb db, IAuthorizationService authorizationService)
     {
-        _user = user;
+        _signInManager = signInManager;
         _userManager = userManager;
         _db = db;
+        _authorizationService = authorizationService;
+    }
+
+    public void SetUser(User user)
+    {
+        if (_user != null)
+            throw new Exception("User already set.");
+        _user = user;
     }
 
     public override string ToString() => _user.ToString();
+
+    public bool IsAuthenticated => _claimsPrincipal != null && _claimsPrincipal.Identity != null && _claimsPrincipal.Identity.IsAuthenticated;
+
+    public async Task<bool> CheckPasswordAsync(string password)
+    {
+        return await _userManager.CheckPasswordAsync(_user, password);
+    }
+    
+    public async Task SignIn()
+    {
+        _claimsPrincipal = await _signInManager.CreateUserPrincipalAsync(_user);
+    }
+
+    public bool IsInRole(string role)
+    {
+        if (!IsAuthenticated)
+            return false;
+        return _claimsPrincipal!.IsInRole(role);
+    }
+
+    public bool HasClaim(string type)
+    {
+        if (!IsAuthenticated)
+            return false;
+        return _claimsPrincipal!.HasClaim(x => x.Type == type);
+    }
+
+    public string? GetClaimValue(string type)
+    {
+        if (!IsAuthenticated || !HasClaim(type))
+            return null;
+
+        return _claimsPrincipal!.Claims.First(x => x.Type == type).Value;
+    }
+
 
     public async Task<bool> Delete()
     {
@@ -291,6 +336,17 @@ public class PlayerAccount : IDisposable
         _db.UserLicenses.Update(userLicense);
         var savedEntities = await _db.SaveChangesAsync();
         return savedEntities == 1;
+    }
+
+
+    public async Task<bool> AuthorizePolicy(string policy)
+    {
+        if (!IsAuthenticated)
+            return false;
+
+        var result = await _authorizationService.AuthorizeAsync(_claimsPrincipal!, policy);
+
+        return result.Succeeded;
     }
 
     [NoScriptAccess]
