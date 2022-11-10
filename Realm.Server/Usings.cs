@@ -36,8 +36,6 @@ global using Realm.Interfaces.Common;
 global using Realm.Server.ResourcesLogic;
 global using Realm.Server.Extensions;
 global using Realm.Configuration.Configurations;
-global using Realm.Interfaces.Server.Identity;
-global using Realm.Server.Identity;
 global using Realm.Interfaces.Extend;
 global using Realm.Scripting.Scopes;
 global using Realm.Server.Elements;
