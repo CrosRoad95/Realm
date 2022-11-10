@@ -1,6 +1,6 @@
 ﻿namespace Realm.MTARPGServer;
 
-internal class Seed
+internal class SeedData
 {
     public class Spawn
     {
@@ -21,7 +21,7 @@ internal class Seed
     public Dictionary<string, Account> Accounts = new();
 }
 
-internal class SeedValidator : AbstractValidator<Seed>
+internal class SeedValidator : AbstractValidator<SeedData>
 {
     public SeedValidator()
     {

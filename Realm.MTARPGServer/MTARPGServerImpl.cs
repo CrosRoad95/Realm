@@ -1,10 +1,17 @@
-﻿namespace Realm.MTARPGServer;
+﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+
+namespace Realm.MTARPGServer;
 
 public class MTARPGServerImpl
 {
     private readonly RPGServer _rpgServer;
     private readonly Configuration.ConfigurationProvider _configurationProvider;
     private readonly string? _basePath;
+    private readonly IDeserializer _deserializer = new DeserializerBuilder()
+            .WithNamingConvention(CamelCaseNamingConvention.Instance)
+            .WithTypeConverter(new Vector3Converter())
+            .Build();
 
     public RPGServer Server => _rpgServer;
     public Configuration.ConfigurationProvider ConfigurationProvider => _configurationProvider;
@@ -30,23 +37,30 @@ public class MTARPGServerImpl
         Directory.SetCurrentDirectory(previousDirectory);
     }
 
-    public async Task BuildFromSeedFile(string seedFileName)
+    public async Task BuildFromSeedFiles(string[] seedFileNames)
     {
+        var result = new JObject();
+        var seedDatas = seedFileNames.Select(seedFileName => _deserializer.Deserialize<SeedData>(File.ReadAllText(Path.Join(_basePath, seedFileName))));
+        foreach(var sourceObject in seedDatas)
+        {
+            var @object = JObject.Parse(JsonConvert.SerializeObject(sourceObject));
+            result.Merge(@object, new JsonMergeSettings
+            {
+                MergeArrayHandling = MergeArrayHandling.Union
+            });
+        }
+        var seedData = result.ToObject<SeedData>();
+        if (seedData == null)
+            throw new Exception("Failed to load see data.");
+
         var previousDirectory = Directory.GetCurrentDirectory();
-        var seedSource = await File.ReadAllTextAsync(Path.Join(_basePath, seedFileName));
         if (_basePath != null)
             Directory.SetCurrentDirectory(_basePath);
 
-        var deserializer = new DeserializerBuilder()
-            .WithNamingConvention(CamelCaseNamingConvention.Instance)
-            .WithTypeConverter(new Vector3Converter())
-            .Build();
-
-        var seed = deserializer.Deserialize<Seed>(seedSource);
         var seedValidator = new SeedValidator();
-        await seedValidator.ValidateAndThrowAsync(seed);
+        await seedValidator.ValidateAndThrowAsync(seedData);
         var seedServerBuilder = _rpgServer.GetRequiredService<SeederServerBuilder>();
-        await seedServerBuilder.BuildFrom(seed);
+        await seedServerBuilder.BuildFrom(seedData);
         Directory.SetCurrentDirectory(previousDirectory);
     }
 

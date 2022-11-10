@@ -13,7 +13,7 @@ internal class SeederServerBuilder
         _identityFunctions = identityFunctions;
     }
 
-    private void BuildSpawns(Dictionary<string, Seed.Spawn> spawns)
+    private void BuildSpawns(Dictionary<string, SeedData.Spawn> spawns)
     {
         foreach (var pair in spawns)
         {
@@ -31,7 +31,7 @@ internal class SeederServerBuilder
         }
     }
 
-    private async Task BuildIdentityAccounts(Dictionary<string, Seed.Account> accounts)
+    private async Task BuildIdentityAccounts(Dictionary<string, SeedData.Account> accounts)
     {
         foreach (var pair in accounts)
         {
@@ -47,7 +47,7 @@ internal class SeederServerBuilder
         }
     }
 
-    public async Task BuildFrom(Seed seed)
+    public async Task BuildFrom(SeedData seed)
     {
         using var _ = new PersistantScope();
         BuildSpawns(seed.Spawns);

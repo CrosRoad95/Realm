@@ -17,6 +17,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Update="extraSpawns.yaml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="Gui\Login.lua">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
