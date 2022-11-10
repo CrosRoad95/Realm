@@ -7,12 +7,15 @@ using Realm.MTARPGServer;
 using Realm.Persistance;
 using Realm.Scripting;
 using Realm.Server;
+using Serilog;
 using Serilog.Events;
 
 var serverConsole = new ServerConsole();
-var logger = new Logger(LogEventLevel.Verbose)
-    .ByExcluding<IDiscord>()
-    .GetLogger();
+var serilogLogger = new Logger(LogEventLevel.Verbose)
+    .ByExcluding<IDiscord>();
+
+serilogLogger.GetSinkConfiguration().Seq("http://localhost:5341", controlLevelSwitch: serilogLogger.LevelSwitch);
+var logger = serilogLogger.GetLogger();
 var configurationProvider = new Realm.Configuration.ConfigurationProvider();
 var server = new MTARPGServerImpl(serverConsole, logger, configurationProvider, new IModule[]
         {
@@ -31,4 +34,8 @@ try
 catch (Exception ex)
 {
     logger.Error(ex, "Failed to start server.");
+}
+finally
+{
+    await Log.CloseAndFlushAsync();
 }

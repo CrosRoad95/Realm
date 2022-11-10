@@ -1,4 +1,5 @@
 ﻿using Serilog;
+using Serilog.Configuration;
 using Serilog.Core;
 using Serilog.Events;
 
@@ -7,13 +8,17 @@ namespace Realm.Logging;
 public class Logger
 {
     private LoggerConfiguration _loggerConfiguration;
+    private LoggingLevelSwitch levelSwitch = new LoggingLevelSwitch();
+
+    public LoggingLevelSwitch LevelSwitch => levelSwitch;
     public Logger(LogEventLevel logEventLevel = LogEventLevel.Debug)
     {
+        levelSwitch.MinimumLevel = logEventLevel;
         _loggerConfiguration = new LoggerConfiguration()
-            .MinimumLevel.Is(logEventLevel)
+            .MinimumLevel.ControlledBy(levelSwitch)
             .WriteTo.Console(
                 outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3}] {this}{padding}{Message:lj}{NewLine}{Exception}",
-                restrictedToMinimumLevel: logEventLevel)
+                levelSwitch: levelSwitch)
             .Enrich.FromLogContext();
     }
 
@@ -22,6 +27,8 @@ public class Logger
         _loggerConfiguration = _loggerConfiguration.WriteTo.Sink(sink);
         return this;
     }
+
+    public LoggerSinkConfiguration GetSinkConfiguration() => _loggerConfiguration.WriteTo;
 
     public Logger ByExcluding<T>()
     {

@@ -47,8 +47,7 @@ var app = builder.Build();
 
 var serverImpl = app.Services.GetRequiredService<MTARPGServerImpl>();
 var seedFileNames = serverImpl.ConfigurationProvider.Get<string[]>("General:SeedFiles");
-foreach(var seedFileName in seedFileNames)
-    await serverImpl.BuildFromSeedFile(seedFileName);
+await serverImpl.BuildFromSeedFiles(seedFileNames);
 serverImpl.Start();
 
 // Configure the HTTP request pipeline.
