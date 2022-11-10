@@ -20,6 +20,19 @@ public class ElementFunctions
         return spawn;
     }
 
+    public RPGVehicle CreateVehicle(string id, string name, ushort model, Vector3 position, Vector3? rotation = null)
+    {
+        var vehicle = _rpgServer.GetRequiredService<RPGVehicle>();
+        vehicle.AssignId(id);
+        vehicle.AssignName(name);
+        vehicle.Model = model;
+        vehicle.Position = position;
+        if(rotation != null)
+            vehicle.Rotation = rotation ?? Vector3.Zero;
+        _rpgServer.AssociateElement(vehicle);
+        return vehicle;
+    }
+
     [NoScriptAccess]
     public IEnumerable<object> GetCollectionByType(string type)
     {
@@ -27,6 +40,7 @@ public class ElementFunctions
         {
             "spawn" => _elementCollection.GetByType<Spawn>().Cast<object>(),
             "player" => _elementCollection.GetByType<Player>().Cast<object>(),
+            "vehicle" => _elementCollection.GetByType<RPGVehicle>().Cast<object>(),
             _ => throw new NotSupportedException($"Unsupported element type '{type}'")
         };
     }
@@ -51,6 +65,10 @@ public class ElementFunctions
                 throw new Exception("Can not destroy persistant element.");
             case Spawn spawn:
                 if (spawn.IsPersistant())
+                    throw new Exception("Can not destroy persistant element.");
+                break;
+            case RPGVehicle vehicle:
+                if (vehicle.IsPersistant())
                     throw new Exception("Can not destroy persistant element.");
                 break;
         }

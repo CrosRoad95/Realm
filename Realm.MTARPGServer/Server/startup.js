@@ -6,6 +6,8 @@ import "login.js"
 Logger.information("startup.js, TestModule: {TestModule}", TestModule);
 Logger.information("loaded modules: {modules}", JSON.stringify(getModules()));
 
+const testVehicle = createVehicle("test", "perek", 404, new Vector3(-10, -10, 3))
+Logger.information("spawned vehicle: {testVehicle}", testVehicle);
 const spawn = createSpawn("dynamicSpawn", "test", new Vector3(0, 20, 3));
 //spawn.addRequiredPolicy("Admin");
 
