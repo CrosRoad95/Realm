@@ -12,8 +12,8 @@ const spawn = createSpawn("dynamicSpawn", "test", new Vector3(0, 20, 3));
 Logger.information("createSpawn is persistant?: {persistant}", spawn.isPersistant());
 addEventHandler("onPlayerJoin", async ({ player }) => {
     Logger.information("player joined: {player} isLoggedIn={isLoggedIn}", player.name, player.isLoggedIn);
-    let account = await findAccountByUserName("test")
-    Logger.information("account = {account}", account);
+    let account = await findAccountByUserName("Admin")
+    Logger.information("account = {account}, is in use? {isInUse}", account, account.isInUse());
     player.debugView = true;
     player.debugWorld = true;
     //const loggedIn = await player.logIn(account, "asdASD123!@#");
@@ -41,7 +41,7 @@ addEventHandler("onPlayerJoin", func);
 removeEventHandler("onPlayerJoin", func);
 
 addEventHandler("onPlayerLogin", async ({player, account}) => {
-    Logger.information("player logged in: {player}, {account}", player, account)
+    Logger.information("player logged in: {player}, {account} is in use? {isInUse}", player, account, account.isInUse())
     await player.spawn(spawn);
     Logger.information("is player authorized to admin policy? {isAuthorized}", await player.account.authorizePolicy("Admin"))
     const playerAccount = player.account;

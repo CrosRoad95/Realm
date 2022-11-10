@@ -10,15 +10,9 @@ public class RPGPlayer : Player
     private readonly CancellationTokenSource _cancellationTokenSource;
     private readonly MtaServer _mtaServer;
     private readonly LuaValueMapper _luaValueMapper;
-    private readonly SignInManager<User> _signInManager;
-    private readonly UserManager<User> _userManager;
-    private readonly IAuthorizationService _authorizationService;
-    private readonly AuthorizationPoliciesProvider _authorizationPoliciesProvider;
     private readonly EventFunctions _eventFunctions;
-    private readonly IdentityFunctions _identityFunctions;
     private readonly DebugLog _debugLog;
     private readonly AgnosticGuiSystemService _agnosticGuiSystemService;
-    private readonly IDb _db;
     private readonly AccountsInUseService _accountsInUseService;
     [NoScriptAccess]
     public Latch ResourceStartingLatch = new(3); // TODO: remove hardcoded resources counter
@@ -29,33 +23,11 @@ public class RPGPlayer : Player
 
     public bool IsLoggedIn => Account != null && Account.IsAuthenticated;
 
-    //public object? Claims
-    //{
-    //    get
-    //    {
-    //        if (!IsLoggedIn)
-    //            return null;
-
-    //        return ClaimsPrincipal!.Claims.Select(x => x.Type).ToArray().ToScriptArray();
-    //    }
-    //}
-    
-    //public object? Roles
-    //{
-    //    get
-    //    {
-    //        if (!IsLoggedIn)
-    //            return null;
-
-    //        return ClaimsPrincipal!.Claims
-    //            .Where(c => c.Type == ClaimTypes.Role)
-    //            .Select(c => c.Value).ToArray().ToScriptArray();
-    //    }
-    //}
-
-
     [NoScriptAccess]
     public event Action<RPGPlayer, bool>? DebugWorldChanged;
+    [NoScriptAccess]
+    public event Action<RPGPlayer, string>? LoggedIn;
+    public event Action<RPGPlayer, string>? LoggedOut;
     [NoScriptAccess]
     private bool _debugWorld = false;
     public bool DebugWorld
@@ -79,22 +51,14 @@ public class RPGPlayer : Player
         }
     }
 
-    public RPGPlayer(MtaServer mtaServer, LuaValueMapper luaValueMapper, SignInManager<User> signInManager,
-        UserManager<User> userManager,
-        AuthorizationPoliciesProvider authorizationPoliciesProvider, EventFunctions eventFunctions,
-        IdentityFunctions identityFunctions, DebugLog debugLog,
-        AgnosticGuiSystemService agnosticGuiSystemService, IDb db, AccountsInUseService accountsInUseService)
+    public RPGPlayer(MtaServer mtaServer, LuaValueMapper luaValueMapper, EventFunctions eventFunctions,
+        DebugLog debugLog, AgnosticGuiSystemService agnosticGuiSystemService, AccountsInUseService accountsInUseService)
     {
         _mtaServer = mtaServer;
         _luaValueMapper = luaValueMapper;
-        _signInManager = signInManager;
-        _userManager = userManager;
-        _authorizationPoliciesProvider = authorizationPoliciesProvider;
         _eventFunctions = eventFunctions;
-        _identityFunctions = identityFunctions;
         _debugLog = debugLog;
         _agnosticGuiSystemService = agnosticGuiSystemService;
-        _db = db;
         _accountsInUseService = accountsInUseService;
         _cancellationTokenSource = new CancellationTokenSource();
         CancellationToken = _cancellationTokenSource.Token;
@@ -102,8 +66,9 @@ public class RPGPlayer : Player
         Disconnected += RPGPlayer_Disconnected;
     }
 
-    private void RPGPlayer_Disconnected(Player sender, PlayerQuitEventArgs e)
+    private async void RPGPlayer_Disconnected(Player sender, PlayerQuitEventArgs e)
     {
+        await LogOut();
         _cancellationTokenSource.Cancel();
     }
 
@@ -159,6 +124,7 @@ public class RPGPlayer : Player
         Account = account;
         using var playerLoggedInEvent = new PlayerLoggedInEvent(this, account);
         await _eventFunctions.InvokeEvent(playerLoggedInEvent);
+        LoggedIn?.Invoke(this, Account.Id);
         return true;
     }
 
@@ -171,7 +137,7 @@ public class RPGPlayer : Player
         await _eventFunctions.InvokeEvent(playerLoggedOutEvent);
         var id = Account!.Id;
         Account = null;
-        _accountsInUseService.FreeAccountId(id);
+        LoggedOut?.Invoke(this, id);
         return true;
     }
 

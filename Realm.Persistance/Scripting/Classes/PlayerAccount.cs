@@ -1,34 +1,61 @@
 ﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
-using Newtonsoft.Json.Linq;
+using Realm.Interfaces.Server.Services;
 using Realm.Persistance.Extensions;
-using System.Security.Principal;
 
 namespace Realm.Persistance.Scripting.Classes;
 
 public class PlayerAccount : IDisposable
 {
-    private User? _user;
+    private User _user;
     private readonly SignInManager<User> _signInManager;
     private readonly UserManager<User> _userManager;
     private readonly IDb _db;
     private readonly IAuthorizationService _authorizationService;
+    private readonly IAccountsInUseService _accountsInUseService;
     private bool _disposed;
     private ClaimsPrincipal? _claimsPrincipal;
 
-    public string Id => _user.Id.ToString().ToUpper();
-    public string UserName => _user.UserName;
-    public DateTime? RegisterDateTime => _user.RegisteredDateTime;
-    public PlayerAccount(SignInManager<User> signInManager, UserManager<User> userManager, IDb db, IAuthorizationService authorizationService)
+    public string Id
     {
+        get
+        {
+            CheckIfDisposed();
+            return _user.Id.ToString().ToUpper();
+        }
+    }
+
+    public string UserName
+    {
+        get
+        {
+            CheckIfDisposed();
+            return _user.UserName;
+        }
+    }
+
+    public DateTime? RegisterDateTime
+    {
+        get
+        {
+            CheckIfDisposed();
+            return _user.RegisteredDateTime;
+        }
+    }
+
+    public PlayerAccount(SignInManager<User> signInManager, UserManager<User> userManager, IDb db, IAuthorizationService authorizationService, IAccountsInUseService accountsInUseService)
+    {
+        _user = null!;
         _signInManager = signInManager;
         _userManager = userManager;
         _db = db;
         _authorizationService = authorizationService;
+        _accountsInUseService = accountsInUseService;
     }
 
     public void SetUser(User user)
     {
+        CheckIfDisposed();
+
         if (_user != null)
             throw new Exception("User already set.");
         _user = user;
@@ -36,20 +63,41 @@ public class PlayerAccount : IDisposable
 
     public override string ToString() => _user.ToString();
 
-    public bool IsAuthenticated => _claimsPrincipal != null && _claimsPrincipal.Identity != null && _claimsPrincipal.Identity.IsAuthenticated;
+    public bool IsAuthenticated
+    {
+        get
+        {
+            CheckIfDisposed();
+            return _claimsPrincipal != null && _claimsPrincipal.Identity != null && _claimsPrincipal.Identity.IsAuthenticated;
+        }
+    }
 
     public async Task<bool> CheckPasswordAsync(string password)
     {
+        CheckIfDisposed();
+
         return await _userManager.CheckPasswordAsync(_user, password);
     }
-    
+
+    public bool IsInUse()
+    {
+        CheckIfDisposed();
+
+        return _accountsInUseService.IsAccountIdInUse(Id);
+    }
+
+    [NoScriptAccess]
     public async Task SignIn()
     {
+        CheckIfDisposed();
+
         _claimsPrincipal = await _signInManager.CreateUserPrincipalAsync(_user);
     }
 
     public bool IsInRole(string role)
     {
+        CheckIfDisposed();
+
         if (!IsAuthenticated)
             return false;
         return _claimsPrincipal!.IsInRole(role);
@@ -57,6 +105,8 @@ public class PlayerAccount : IDisposable
 
     public bool HasClaim(string type)
     {
+        CheckIfDisposed();
+
         if (!IsAuthenticated)
             return false;
         return _claimsPrincipal!.HasClaim(x => x.Type == type);
@@ -64,6 +114,8 @@ public class PlayerAccount : IDisposable
 
     public string? GetClaimValue(string type)
     {
+        CheckIfDisposed();
+
         if (!IsAuthenticated || !HasClaim(type))
             return null;
 
@@ -73,11 +125,10 @@ public class PlayerAccount : IDisposable
 
     public async Task<bool> Delete()
     {
-        if (_disposed)
-            throw new ObjectDisposedException(GetType().ShortDisplayName());
+        CheckIfDisposed();
 
         var result = await _userManager.DeleteAsync(_user);
-        if(result.Succeeded)
+        if (result.Succeeded)
         {
             Dispose();
             return true;
@@ -87,8 +138,7 @@ public class PlayerAccount : IDisposable
 
     public async Task<bool> AddClaim(string type, string value)
     {
-        if (_disposed)
-            throw new ObjectDisposedException(GetType().ShortDisplayName());
+        CheckIfDisposed();
 
         var result = await _userManager.AddClaimAsync(_user, new Claim(type, value));
         return result.Succeeded;
@@ -96,8 +146,7 @@ public class PlayerAccount : IDisposable
 
     public async Task<bool> AddClaims(Dictionary<string, string> claims)
     {
-        if (_disposed)
-            throw new ObjectDisposedException(GetType().ShortDisplayName());
+        CheckIfDisposed();
 
         var result = await _userManager.AddClaimsAsync(_user, claims.Select(x => new Claim(x.Key, x.Value)));
         return result.Succeeded;
@@ -105,17 +154,15 @@ public class PlayerAccount : IDisposable
 
     public async Task<bool> AddRole(string role)
     {
-        if (_disposed)
-            throw new ObjectDisposedException(GetType().ShortDisplayName());
+        CheckIfDisposed();
 
         var result = await _userManager.AddToRoleAsync(_user, role);
         return result.Succeeded;
     }
-    
+
     public async Task<bool> AddRoles(IEnumerable<string> role)
     {
-        if (_disposed)
-            throw new ObjectDisposedException(GetType().ShortDisplayName());
+        CheckIfDisposed();
 
         var result = await _userManager.AddToRolesAsync(_user, role);
         return result.Succeeded;
@@ -123,8 +170,7 @@ public class PlayerAccount : IDisposable
 
     public async Task<object> GetClaims()
     {
-        if (_disposed)
-            throw new ObjectDisposedException(GetType().ShortDisplayName());
+        CheckIfDisposed();
 
         return (await _userManager.GetClaimsAsync(_user)).Select(x => x.Type).ToArray().ToScriptArray();
     }
@@ -132,34 +178,31 @@ public class PlayerAccount : IDisposable
     [NoScriptAccess]
     public async Task<string[]> InternalGetRoles()
     {
-        if (_disposed)
-            throw new ObjectDisposedException(GetType().ShortDisplayName());
+        CheckIfDisposed();
 
         return (await _userManager.GetRolesAsync(_user)).ToArray();
     }
-    
+
 
     [NoScriptAccess]
     public async Task<Claim[]> InternalGetClaims()
     {
-        if (_disposed)
-            throw new ObjectDisposedException(GetType().ShortDisplayName());
+        CheckIfDisposed();
 
         return (await _userManager.GetClaimsAsync(_user)).ToArray();
     }
 
     public async Task<object> GetRoles()
     {
-        if (_disposed)
-            throw new ObjectDisposedException(GetType().ShortDisplayName());
+        CheckIfDisposed();
 
         return (await InternalGetRoles()).ToScriptArray();
     }
 
     public async Task<bool> RemoveClaim(string type, string? value = null)
     {
-        if (_disposed)
-            throw new ObjectDisposedException(GetType().ShortDisplayName());
+        CheckIfDisposed();
+
         var claims = await _userManager.GetClaimsAsync(_user);
         Claim? claim;
         if (value != null)
@@ -167,7 +210,7 @@ public class PlayerAccount : IDisposable
         else
             claim = claims.FirstOrDefault(x => x.Type == type);
 
-        if(claim != null)
+        if (claim != null)
         {
             var result = await _userManager.RemoveClaimAsync(_user, claim);
             return result.Succeeded;
@@ -177,8 +220,7 @@ public class PlayerAccount : IDisposable
 
     public async Task<bool> RemoveRole(string role)
     {
-        if (_disposed)
-            throw new ObjectDisposedException(GetType().ShortDisplayName());
+        CheckIfDisposed();
 
         var result = await _userManager.RemoveFromRoleAsync(_user, role);
         return result.Succeeded;
@@ -186,6 +228,8 @@ public class PlayerAccount : IDisposable
 
     public async Task<bool> RemoveAllClaims()
     {
+        CheckIfDisposed();
+
         var claims = await _userManager.GetClaimsAsync(_user);
         var result = await _userManager.RemoveClaimsAsync(_user, claims);
         return result.Succeeded;
@@ -193,6 +237,8 @@ public class PlayerAccount : IDisposable
 
     public async Task<bool> HasData(string key)
     {
+        CheckIfDisposed();
+
         var playerData = await _db.UserData
             .AsNoTrackingWithIdentityResolution()
             .FirstOrDefaultAsync(x => x.UserId.ToString() == Id && x.Key == key);
@@ -201,6 +247,8 @@ public class PlayerAccount : IDisposable
 
     public async Task<string?> GetData(string key)
     {
+        CheckIfDisposed();
+
         var playerData = await _db.UserData
             .AsNoTrackingWithIdentityResolution()
             .FirstOrDefaultAsync(x => x.UserId.ToString() == Id && x.Key == key);
@@ -211,6 +259,8 @@ public class PlayerAccount : IDisposable
 
     public async Task<bool> RemoveData(string key)
     {
+        CheckIfDisposed();
+
         var playerData = await _db.UserData.FirstOrDefaultAsync(x => x.UserId.ToString() == Id && x.Key == key);
         if (playerData == null)
             return false;
@@ -222,6 +272,8 @@ public class PlayerAccount : IDisposable
 
     public async Task<bool> SetData(string key, string value)
     {
+        CheckIfDisposed();
+
         int savedEntities;
 
         var playerData = await _db.UserData.FirstOrDefaultAsync(x => x.UserId.ToString() == Id && x.Key == key);
@@ -248,6 +300,8 @@ public class PlayerAccount : IDisposable
 
     public async Task<object> GetAllLicenses(bool includeSuspended = false)
     {
+        CheckIfDisposed();
+
         var query = _db.UserLicenses
             .AsNoTrackingWithIdentityResolution()
             .Where(x => x.UserId.ToString() == Id);
@@ -258,9 +312,11 @@ public class PlayerAccount : IDisposable
         var licenses = await query.Select(x => x.LicenseId).ToListAsync();
         return licenses.ToArray().ToScriptArray();
     }
-    
+
     public async Task<bool> IsLicenseSuspended(string licenseId)
     {
+        CheckIfDisposed();
+
         var isSuspended = await _db.UserLicenses
             .AsNoTrackingWithIdentityResolution()
             .IsSuspended()
@@ -270,6 +326,8 @@ public class PlayerAccount : IDisposable
     }
     public async Task<string?> GetLastLicenseSuspensionReason()
     {
+        CheckIfDisposed();
+
         var suspensionReason = await _db.UserLicenses
             .AsNoTrackingWithIdentityResolution()
             .Where(x => x.UserId.ToString() == Id)
@@ -282,6 +340,8 @@ public class PlayerAccount : IDisposable
 
     public async Task<bool> AddLicense(string licenseId)
     {
+        CheckIfDisposed();
+
         var userLicense = await _db.UserLicenses.FirstOrDefaultAsync(x => x.UserId.ToString() == Id && x.LicenseId.ToLower() == licenseId.ToLower());
         if (userLicense != null)
             return false;
@@ -297,6 +357,8 @@ public class PlayerAccount : IDisposable
 
     public async Task<bool> HasLicense(string licenseId, bool includeSuspended = false)
     {
+        CheckIfDisposed();
+
         var query = _db.UserLicenses
             .AsNoTrackingWithIdentityResolution()
             .Where(x => x.UserId.ToString() == Id && x.LicenseId.ToLower() == licenseId.ToLower());
@@ -309,6 +371,8 @@ public class PlayerAccount : IDisposable
 
     public async Task<bool> SuspendLicense(string licenseId, int timeInMinutes, string? reason = null)
     {
+        CheckIfDisposed();
+
         if (timeInMinutes < 0)
             return false;
 
@@ -326,6 +390,8 @@ public class PlayerAccount : IDisposable
 
     public async Task<bool> UnSuspendLicense(string licenseId)
     {
+        CheckIfDisposed();
+
         var userLicense = await _db.UserLicenses
             .IsSuspended()
             .FirstOrDefaultAsync(x => x.UserId.ToString() == Id && x.LicenseId.ToLower() == licenseId.ToLower());
@@ -341,12 +407,21 @@ public class PlayerAccount : IDisposable
 
     public async Task<bool> AuthorizePolicy(string policy)
     {
+        CheckIfDisposed();
+
         if (!IsAuthenticated)
             return false;
 
         var result = await _authorizationService.AuthorizeAsync(_claimsPrincipal!, policy);
 
         return result.Succeeded;
+    }
+
+    [NoScriptAccess]
+    private void CheckIfDisposed()
+    {
+        if (_disposed)
+            throw new ObjectDisposedException(GetType().FullName);
     }
 
     [NoScriptAccess]

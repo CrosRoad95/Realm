@@ -1,8 +1,9 @@
-﻿using System.Collections.Concurrent;
+﻿using Realm.Interfaces.Server.Services;
+using System.Collections.Concurrent;
 
 namespace Realm.Server.Services;
 
-public class AccountsInUseService
+public class AccountsInUseService : IAccountsInUseService
 {
     private readonly ConcurrentDictionary<string, RPGPlayer> _playerByAccountId = new();
     public AccountsInUseService()
@@ -22,10 +23,16 @@ public class AccountsInUseService
 
     public bool AssignPlayerToAccountId(RPGPlayer player, string id)
     {
+        player.LoggedOut += Player_LoggedOut;
         return _playerByAccountId.TryAdd(id, player);
     }
 
-    public bool FreeAccountId(string id)
+    private void Player_LoggedOut(RPGPlayer rpgPlayer, string id)
+    {
+        FreeAccountId(id);
+    }
+
+    private bool FreeAccountId(string id)
     {
         return _playerByAccountId.TryRemove(id, out var _);
     }

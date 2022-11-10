@@ -1,4 +1,6 @@
-﻿using Realm.Server.Scripting;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Realm.Interfaces.Server.Services;
+using Realm.Server.Scripting;
 using Realm.Server.Services;
 
 namespace Realm.Server;
@@ -48,6 +50,7 @@ public partial class RPGServer : IRPGServer, IReloadable
                     services.AddSingleton<IRPGServer>(this);
                     services.AddSingleton<ElementFunctions>();
                     services.AddSingleton<AccountsInUseService>();
+                    services.AddSingleton<IAccountsInUseService>(x => x.GetRequiredService<AccountsInUseService>());
 
                     if (modules != null)
                         foreach (var module in modules)
