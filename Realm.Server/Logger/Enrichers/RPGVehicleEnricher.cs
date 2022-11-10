@@ -1,4 +1,6 @@
-﻿namespace Realm.Server.Logger.Enrichers;
+﻿using Realm.Server.Elements;
+
+namespace Realm.Server.Logger.Enrichers;
 
 internal class RPGVehicleEnricher : ILogEventEnricher
 {
@@ -11,7 +13,8 @@ internal class RPGVehicleEnricher : ILogEventEnricher
 
     public void Enrich(LogEvent logEvent, ILogEventPropertyFactory propertyFactory)
     {
-        logEvent.AddPropertyIfAbsent(propertyFactory.CreateProperty("this", _rpgVehicle));
+        logEvent.AddPropertyIfAbsent(propertyFactory.CreateProperty("vehicleId", _rpgVehicle.Id));
+        logEvent.AddPropertyIfAbsent(propertyFactory.CreateProperty("userFriendlyName", _rpgVehicle.LongUserFriendlyName()));
         logEvent.AddPropertyIfAbsent(propertyFactory.CreateProperty("padding", ": "));
     }
 }

@@ -18,12 +18,12 @@ serilogLogger.GetSinkConfiguration().Seq("http://localhost:5341", controlLevelSw
 var logger = serilogLogger.GetLogger();
 var configurationProvider = new Realm.Configuration.ConfigurationProvider();
 var server = new MTARPGServerImpl(serverConsole, logger, configurationProvider, new IModule[]
-        {
-            new DiscordModule(),
-            new IdentityModule(),
-            new ScriptingModule(),
-            new ServerScriptingModule(),
-        });
+    {
+        new DiscordModule(),
+        new IdentityModule(),
+        new ScriptingModule(),
+        new ServerScriptingModule(),
+    });
 var seedFiles = configurationProvider.Get<string[]>("General:SeedFiles");
 try
 {

@@ -198,5 +198,6 @@ public class RPGPlayer : Player
         DebugView = false;
     }
 
+    public string LongUserFriendlyName() => Name;
     public override string ToString() => Name;
 }

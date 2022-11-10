@@ -1,4 +1,6 @@
-﻿namespace Realm.Server.Scripting;
+﻿using SlipeServer.Server.Elements;
+
+namespace Realm.Server.Scripting;
 
 public class ElementFunctions
 {
@@ -15,7 +17,12 @@ public class ElementFunctions
 
     public Spawn CreateSpawn(string id, string name, Vector3 position, Vector3? rotation = null)
     {
-        var spawn = new Spawn(_authorizationPoliciesProvider, id, name, position, rotation ?? Vector3.Zero);
+        var spawn = _rpgServer.GetRequiredService<Spawn>();
+        spawn.AssignId(id);
+        spawn.Name = name;
+        spawn.Position = position;
+        if (rotation != null)
+            spawn.Rotation = rotation ?? Vector3.Zero;
         _rpgServer.AssociateElement(spawn);
         return spawn;
     }
@@ -24,7 +31,7 @@ public class ElementFunctions
     {
         var vehicle = _rpgServer.GetRequiredService<RPGVehicle>();
         vehicle.AssignId(id);
-        vehicle.AssignName(name);
+        vehicle.Name = name;
         vehicle.Model = model;
         vehicle.Position = position;
         if(rotation != null)

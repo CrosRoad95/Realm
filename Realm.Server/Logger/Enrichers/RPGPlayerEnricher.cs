@@ -11,7 +11,8 @@ internal class RPGPlayerEnricher : ILogEventEnricher
 
     public void Enrich(LogEvent logEvent, ILogEventPropertyFactory propertyFactory)
     {
-        logEvent.AddPropertyIfAbsent(propertyFactory.CreateProperty("this", _rpgPlayer));
+        logEvent.AddPropertyIfAbsent(propertyFactory.CreateProperty("playerId", _rpgPlayer.Id));
+        logEvent.AddPropertyIfAbsent(propertyFactory.CreateProperty("userFriendlyName", _rpgPlayer.LongUserFriendlyName()));
         logEvent.AddPropertyIfAbsent(propertyFactory.CreateProperty("padding", ": "));
     }
 }

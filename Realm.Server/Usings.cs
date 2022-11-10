@@ -47,6 +47,7 @@ global using Realm.Scripting.Classes;
 global using Realm.Server.Scripting.Events;
 global using Realm.Persistance.Data;
 global using Realm.Persistance.Scripting.Classes;
+global using Realm.Server.Logger.Enrichers;
 
 global using Realm.Resources.AgnosticGuiSystem;
 

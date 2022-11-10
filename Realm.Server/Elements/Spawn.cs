@@ -4,20 +4,30 @@ public class Spawn : Element, IDisposable
 {
     private bool _disposed = false;
     private readonly AuthorizationPoliciesProvider _authorizationPoliciesProvider;
-    private readonly string _id;
+    private string _id;
+    private ILogger _logger;
 
     private readonly bool _isPersistant = PersistantScope.IsPersistant;
     private readonly List<string> _requiredPolices = new();
 
-    public Spawn(AuthorizationPoliciesProvider authorizationPoliciesProvider, string id, string name, Vector3 position, Vector3 rotation)
+    public Spawn(AuthorizationPoliciesProvider authorizationPoliciesProvider, ILogger logger)
     {
-        Name = name;
         _authorizationPoliciesProvider = authorizationPoliciesProvider;
-        _id = id;
         Position = position;
         Rotation = rotation;
         Destroyed += e => Dispose();
+
+        _logger = logger
+            .ForContext<Spawn>()
+            .ForContext(new SpawnEnricher(this));
     }
+
+    [NoScriptAccess]
+    public void AssignId(string id)
+    {
+        _id = id;
+    }
+
 
     private void CheckIfDisposed()
     {
@@ -68,6 +78,7 @@ public class Spawn : Element, IDisposable
         return true;
     }
 
+    public string LongUserFriendlyName() => Name;
     public override string ToString() => Name;
 
     public void Dispose()

@@ -1,12 +1,9 @@
-﻿using Realm.Server.Logger.Enrichers;
-
-namespace Realm.Server.Elements;
+﻿namespace Realm.Server.Elements;
 
 public class RPGVehicle : Vehicle, IDisposable
 {
     private bool _disposed = false;
     private string _id = "";
-    private string _name = "";
     private readonly ILogger _logger;
     private readonly MtaServer _mtaServer;
     private readonly EventFunctions _eventFunctions;
@@ -26,12 +23,6 @@ public class RPGVehicle : Vehicle, IDisposable
     public void AssignId(string id)
     {
         _id = id;
-    }
-
-    [NoScriptAccess]
-    public void AssignName(string name)
-    {
-        _name = name;
     }
 
     public new bool Destroy()
@@ -65,6 +56,7 @@ public class RPGVehicle : Vehicle, IDisposable
         return _isPersistant;
     }
 
+    public string LongUserFriendlyName() => Name;
     public override string ToString() => Name;
 
     public void Dispose()

@@ -52,6 +52,8 @@ public partial class RPGServer : IRPGServer, IReloadable
                     services.AddSingleton<AccountsInUseService>();
                     services.AddSingleton<IAccountsInUseService>(x => x.GetRequiredService<AccountsInUseService>());
 
+                    // Elements
+                    services.AddTransient<Spawn>();
                     services.AddTransient<RPGVehicle>();
                     if (modules != null)
                         foreach (var module in modules)
