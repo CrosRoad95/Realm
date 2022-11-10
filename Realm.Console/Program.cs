@@ -7,9 +7,10 @@ using Realm.MTARPGServer;
 using Realm.Persistance;
 using Realm.Scripting;
 using Realm.Server;
+using Serilog.Events;
 
 var serverConsole = new ServerConsole();
-var logger = new Logger()
+var logger = new Logger(LogEventLevel.Verbose)
     .ByExcluding<IDiscord>()
     .GetLogger();
 var configurationProvider = new Realm.Configuration.ConfigurationProvider();

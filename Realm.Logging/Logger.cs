@@ -7,11 +7,14 @@ namespace Realm.Logging;
 public class Logger
 {
     private LoggerConfiguration _loggerConfiguration;
-    public Logger()
+    public Logger(LogEventLevel logEventLevel = LogEventLevel.Debug)
     {
         _loggerConfiguration = new LoggerConfiguration()
-            .MinimumLevel.Debug()
-            .WriteTo.Console(restrictedToMinimumLevel: LogEventLevel.Debug);
+            .MinimumLevel.Is(logEventLevel)
+            .WriteTo.Console(
+                outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3}] {this}{padding}{Message:lj}{NewLine}{Exception}",
+                restrictedToMinimumLevel: logEventLevel)
+            .Enrich.FromLogContext();
     }
 
     public Logger WithSink(ILogEventSink sink)

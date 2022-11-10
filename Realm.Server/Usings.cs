@@ -12,6 +12,8 @@ global using Microsoft.AspNetCore.Identity;
 global using Microsoft.ClearScript;
 global using Microsoft.AspNetCore.Authorization;
 global using Serilog;
+global using Serilog.Core;
+global using Serilog.Events;
 
 global using SlipeServer.Server.Elements;
 global using SlipeServer.Server;

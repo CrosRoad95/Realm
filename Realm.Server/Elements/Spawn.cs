@@ -68,7 +68,7 @@ public class Spawn : Element, IDisposable
         return true;
     }
 
-    public override string ToString() => "Spawn";
+    public override string ToString() => Name;
 
     public void Dispose()
     {
