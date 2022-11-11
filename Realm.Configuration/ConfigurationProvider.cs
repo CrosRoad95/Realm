@@ -22,9 +22,9 @@ public class ConfigurationProvider
             Directory.SetCurrentDirectory(basePath);
 
         configurationBuilder = configurationBuilder
-            .AddJsonFile(Path.Join(basePath, "appsettings.server.json"), false)
-            .AddJsonFile(Path.Join(basePath, "appsettings.server.development.json"), true, true)
-            .AddJsonFile(Path.Join(basePath, "appsettings.server.local.json"), true, true)
+            .AddJsonFile(Path.Join(basePath, "appsettingsServer.json"), false)
+            .AddJsonFile(Path.Join(basePath, "appsettingsServer.development.json"), true, true)
+            .AddJsonFile(Path.Join(basePath, "appsettingsServer.local.json"), true, true)
             .AddEnvironmentVariables();
         Directory.SetCurrentDirectory(previousDirectory);
         return configurationBuilder;

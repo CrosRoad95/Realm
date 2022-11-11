@@ -23,10 +23,10 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="appsettings.server.json">
+    <None Update="appsettingsServer.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="appsettings.server.local.json">
+    <None Update="appsettingsServer.local.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
