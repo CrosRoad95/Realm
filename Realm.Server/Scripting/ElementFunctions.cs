@@ -57,6 +57,7 @@ public class ElementFunctions
             "spawn" => _elementCollection.GetByType<Spawn>().Cast<object>(),
             "player" => _elementCollection.GetByType<Player>().Cast<object>(),
             "vehicle" => _elementCollection.GetByType<RPGVehicle>().Cast<object>(),
+            "blip" => _elementCollection.GetByType<RPGBlip>().Cast<object>(),
             _ => throw new NotSupportedException($"Unsupported element type '{type}'")
         };
     }
