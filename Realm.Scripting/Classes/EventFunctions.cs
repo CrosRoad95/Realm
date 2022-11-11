@@ -1,9 +1,17 @@
-﻿namespace Realm.Scripting.Classes;
+﻿using System;
+
+namespace Realm.Scripting.Classes;
 
 public class EventFunctions : IReloadable
 {
     private readonly HashSet<string> _supportedEventsNames = new();
     private readonly Dictionary<string, List<ScriptObject>> _events = new();
+    private readonly ILogger _logger;
+
+    public EventFunctions(ILogger logger)
+    {
+        _logger = logger.ForContext<EventFunctions>();
+    }
 
     [NoScriptAccess]
     public async Task InvokeEvent(string eventName, params object[] arguments)
@@ -13,12 +21,27 @@ public class EventFunctions : IReloadable
 
         if(_events.TryGetValue(eventName, out var events))
         {
+            using var _ = LogContext.PushProperty("eventName", eventName);
             foreach (var scriptObject in events)
             {
-                if (scriptObject.IsAsync())
-                    await (scriptObject.Invoke(false, arguments) as dynamic);
-                else
-                    scriptObject.Invoke(false, arguments);
+                try
+                {
+                    if (scriptObject.IsAsync())
+                        await (scriptObject.Invoke(false, arguments) as dynamic);
+                    else
+                        scriptObject.Invoke(false, arguments);
+                }
+                catch (ScriptEngineException scriptEngineException)
+                {
+                    var scriptException = scriptEngineException as IScriptEngineException;
+                    if (scriptException != null)
+                    {
+                        using var errorDetails = LogContext.PushProperty("errorDetails", scriptException.ErrorDetails);
+                        _logger.Error(scriptEngineException, "Exception thrown while executing event");
+                    }
+                    else
+                        _logger.Error(scriptEngineException, "Exception thrown while executing event");
+                }
             }
         }
     }

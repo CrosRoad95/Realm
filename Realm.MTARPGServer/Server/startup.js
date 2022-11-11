@@ -92,3 +92,7 @@ addEventHandler("onPlayerLogout", ({ player }) => {
 addEventHandler("onPlayerSpawn", ({ player, spawn }) => {
     Logger.information("player spawned: {player}", player)
 });
+
+//addEventHandler("onPlayerLogin", async ({ player, account }) => {
+//    foo(); // Test exception
+//});
