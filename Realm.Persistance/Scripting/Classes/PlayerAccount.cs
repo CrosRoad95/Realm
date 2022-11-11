@@ -87,6 +87,24 @@ public class PlayerAccount : IDisposable
         return _accountsInUseService.IsAccountIdInUse(Id);
     }
 
+    public ulong PlayTime
+    {
+        get
+        {
+            CheckIfDisposed();
+            return _user.PlayTime + (ulong)(DateTime.Now - _loginDateTime.Value).Seconds;
+        }
+    }
+    
+    public ulong CurrentSessionPlayTime
+    {
+        get
+        {
+            CheckIfDisposed();
+            return _user.PlayTime + (ulong)(DateTime.Now - _loginDateTime.Value).Seconds;
+        }
+    }
+
     [NoScriptAccess]
     public async Task SignIn(string? ip, string serial)
     {
