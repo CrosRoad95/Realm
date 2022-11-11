@@ -140,7 +140,7 @@ public class RPGPlayer : Player
         if (!_accountsInUseService.AssignPlayerToAccountId(this, account.Id))
             return false;
 
-        await account.SignIn();
+        await account.SignIn(Client.IPAddress?.ToString(), Client.Serial);
 
         Account = account;
         using var playerLoggedInEvent = new PlayerLoggedInEvent(this, account);
@@ -155,6 +155,7 @@ public class RPGPlayer : Player
         if (!IsLoggedIn || Account == null)
             return false;
 
+        await Account.Save();
         using var playerLoggedOutEvent = new PlayerLoggedOutEvent(this);
         await _eventFunctions.InvokeEvent(playerLoggedOutEvent);
         var account = Account;

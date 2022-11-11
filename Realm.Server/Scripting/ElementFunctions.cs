@@ -6,13 +6,11 @@ public class ElementFunctions
 {
     private readonly RPGServer _rpgServer;
     private readonly IElementCollection _elementCollection;
-    private readonly AuthorizationPoliciesProvider _authorizationPoliciesProvider;
 
-    public ElementFunctions(RPGServer rpgServer, IElementCollection elementCollection, AuthorizationPoliciesProvider authorizationPoliciesProvider)
+    public ElementFunctions(RPGServer rpgServer, IElementCollection elementCollection)
     {
         _rpgServer = rpgServer;
         _elementCollection = elementCollection;
-        _authorizationPoliciesProvider = authorizationPoliciesProvider;
     }
 
     public Spawn CreateSpawn(string id, string name, Vector3 position, Vector3? rotation = null)

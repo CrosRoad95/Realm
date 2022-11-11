@@ -8,9 +8,14 @@ global using Microsoft.AspNetCore.Identity;
 global using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 global using Microsoft.ClearScript;
 global using Microsoft.EntityFrameworkCore.Infrastructure;
+global using Microsoft.AspNetCore.Authorization;
+global using Serilog;
 
 global using Realm.Interfaces.Extend;
 global using Realm.Persistance.Scripting.Classes;
 global using Realm.Scripting.Interfaces;
 global using Realm.Persistance.Data;
 global using Realm.Scripting.Extensions;
+global using Realm.Interfaces.Server.Services;
+global using Realm.Persistance.Extensions;
+global using Realm.Server.Logger.Enrichers;

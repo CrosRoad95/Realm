@@ -1,18 +1,17 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Realm.Interfaces.Server.Services;
-using Realm.Persistance.Extensions;
-
-namespace Realm.Persistance.Scripting.Classes;
+﻿namespace Realm.Persistance.Scripting.Classes;
 
 public class PlayerAccount : IDisposable
 {
+    private bool _disposed;
     private User _user;
     private readonly SignInManager<User> _signInManager;
     private readonly UserManager<User> _userManager;
     private readonly IDb _db;
     private readonly IAuthorizationService _authorizationService;
     private readonly IAccountsInUseService _accountsInUseService;
-    private bool _disposed;
+    private readonly ILogger _logger;
+    private DateTime? _lastPlayTimeCounterStart;
+    private DateTime? _loginDateTime;
     private ClaimsPrincipal? _claimsPrincipal;
 
     public string Id
@@ -42,7 +41,8 @@ public class PlayerAccount : IDisposable
         }
     }
 
-    public PlayerAccount(SignInManager<User> signInManager, UserManager<User> userManager, IDb db, IAuthorizationService authorizationService, IAccountsInUseService accountsInUseService)
+    public PlayerAccount(SignInManager<User> signInManager, UserManager<User> userManager, IDb db, IAuthorizationService authorizationService,
+        IAccountsInUseService accountsInUseService, ILogger logger)
     {
         _user = null!;
         _signInManager = signInManager;
@@ -50,6 +50,9 @@ public class PlayerAccount : IDisposable
         _db = db;
         _authorizationService = authorizationService;
         _accountsInUseService = accountsInUseService;
+        _logger = logger
+            .ForContext<PlayerAccount>()
+            .ForContext(new PlayerAccountEnricher(this));
     }
 
     public void SetUser(User user)
@@ -60,8 +63,6 @@ public class PlayerAccount : IDisposable
             throw new Exception("User already set.");
         _user = user;
     }
-
-    public override string ToString() => _user.ToString();
 
     public bool IsAuthenticated
     {
@@ -87,11 +88,33 @@ public class PlayerAccount : IDisposable
     }
 
     [NoScriptAccess]
-    public async Task SignIn()
+    public async Task SignIn(string? ip, string serial)
     {
         CheckIfDisposed();
 
+        _loginDateTime = DateTime.Now;
+        _lastPlayTimeCounterStart = DateTime.Now;
+        if(_user.RegisterIp == null && ip != null)
+            _user.RegisterIp = ip;
+        if(_user.RegisterSerial == null)
+            _user.RegisterSerial = serial;
+
+        if(ip != null)
+            _user.LastIp = ip;
+        _user.LastSerial = serial;
         _claimsPrincipal = await _signInManager.CreateUserPrincipalAsync(_user);
+    }
+
+    [NoScriptAccess]
+    public async Task Save()
+    {
+        CheckIfDisposed();
+
+        if(_lastPlayTimeCounterStart != null)
+            _user.PlayTime += (ulong)(DateTime.Now - _lastPlayTimeCounterStart.Value).Seconds;
+        _lastPlayTimeCounterStart = DateTime.Now;
+        await _userManager.UpdateAsync(_user);
+        _logger.Verbose("Saved account");
     }
 
     public bool IsInRole(string role)
@@ -423,6 +446,10 @@ public class PlayerAccount : IDisposable
         if (_disposed)
             throw new ObjectDisposedException(GetType().FullName);
     }
+
+    public string LongUserFriendlyName() => ToString();
+    public override string ToString() => _user.ToString();
+
 
     [NoScriptAccess]
     public void Dispose()

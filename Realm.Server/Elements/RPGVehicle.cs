@@ -3,7 +3,7 @@
 public class RPGVehicle : Vehicle, IDisposable
 {
     private bool _disposed = false;
-    private string _id = "";
+    private string? _id = null;
     private readonly ILogger _logger;
     private readonly MtaServer _mtaServer;
     private readonly EventFunctions _eventFunctions;
