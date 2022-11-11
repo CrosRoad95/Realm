@@ -13,6 +13,7 @@ public partial class RPGServer : IRPGServer, IReloadable
     private readonly ILogger _logger;
     private readonly EventFunctions _eventFunctions;
     private readonly ElementFunctions _elementFunctions;
+    private readonly InputFunctions _inputFunctions;
     private readonly IElementCollection _elementCollection;
     private readonly IEnumerable<IModule> _modules;
 
@@ -49,6 +50,7 @@ public partial class RPGServer : IRPGServer, IReloadable
                     services.AddSingleton<IReloadable>(this);
                     services.AddSingleton<IRPGServer>(this);
                     services.AddSingleton<ElementFunctions>();
+                    services.AddSingleton<InputFunctions>();
                     services.AddSingleton<AccountsInUseService>();
                     services.AddSingleton<IAccountsInUseService>(x => x.GetRequiredService<AccountsInUseService>());
 
@@ -73,6 +75,7 @@ public partial class RPGServer : IRPGServer, IReloadable
         var startup = _server.GetRequiredService<Startup>();
         _eventFunctions = _server.GetRequiredService<EventFunctions>();
         _elementFunctions = _server.GetRequiredService<ElementFunctions>();
+        _inputFunctions = _server.GetRequiredService<InputFunctions>();
         _elementCollection = _server.GetRequiredService<IElementCollection>();
 
         var _ = Task.Run(startup.StartAsync);
@@ -112,6 +115,7 @@ public partial class RPGServer : IRPGServer, IReloadable
 
         // Functions
         scriptingModuleInterface.AddHostObject("Elements", _elementFunctions, true);
+        scriptingModuleInterface.AddHostObject("Input", _inputFunctions, true);
 
         // Classes & Events & Contextes
         scriptingModuleInterface.AddHostType(typeof(Claim));

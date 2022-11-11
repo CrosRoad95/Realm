@@ -6,4 +6,9 @@ public static class CollectionsExtensions
     {
         return ScriptEngine.Current.Script.Array.from(array);
     }
+
+    public static object ToScriptArray(this Array array, ScriptEngine scriptEngine)
+    {
+        return scriptEngine.Script.Array.from(array);
+    }
 }

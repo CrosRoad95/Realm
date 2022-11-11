@@ -96,3 +96,16 @@ addEventHandler("onPlayerSpawn", ({ player, spawn }) => {
 //addEventHandler("onPlayerLogin", async ({ player, account }) => {
 //    foo(); // Test exception
 //});
+
+addCommandHandler("foo", (player, args) => {
+    Logger.information("command foo executed {player} {commandArguments}")
+})
+
+addCommandHandler("playtime", (player, args) => {
+    if (player.isLoggedIn)
+        Logger.information("playtime: current session: {0}, in total: {1}", player.account.currentSessionPlayTime, player.account.playTime)
+})
+
+addCommandHandler("foo2", (player, args) => {
+    Logger.information("command foo2 executed {player} {commandArguments}")
+}, ["admin"])

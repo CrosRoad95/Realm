@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Realm.Scripting.Classes;
+﻿namespace Realm.Scripting.Classes;
 
 public class EventFunctions : IReloadable
 {

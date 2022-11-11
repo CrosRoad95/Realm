@@ -1,6 +1,4 @@
-﻿using SlipeServer.Server.Elements;
-
-namespace Realm.Server.Scripting;
+﻿namespace Realm.Server.Scripting;
 
 public class ElementFunctions
 {
