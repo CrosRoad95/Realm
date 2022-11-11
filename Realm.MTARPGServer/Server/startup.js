@@ -6,8 +6,11 @@ import "login.js"
 Logger.information("startup.js, TestModule: {TestModule}", TestModule);
 Logger.information("loaded modules: {modules}", JSON.stringify(getModules()));
 
-const testVehicle = createVehicle("test", "perek", 404, new Vector3(-10, -10, 3))
+const testVehicle = createVehicle(404, new Vector3(-10, -10, 3))
 Logger.information("spawned vehicle: {testVehicle}", testVehicle);
+
+const blip = createBlip(5, new Vector3(0, 0, 0));
+Logger.information("spawned blip: {blip}, icon: {blipIcon}", blip, blip.icon);
 const spawn = createSpawn("dynamicSpawn", "test", new Vector3(0, 20, 3));
 //spawn.addRequiredPolicy("Admin");
 

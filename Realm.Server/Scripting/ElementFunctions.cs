@@ -1,4 +1,7 @@
-﻿namespace Realm.Server.Scripting;
+﻿using Newtonsoft.Json.Linq;
+using System;
+
+namespace Realm.Server.Scripting;
 
 public class ElementFunctions
 {
@@ -23,17 +26,27 @@ public class ElementFunctions
         return spawn;
     }
 
-    public RPGVehicle CreateVehicle(string id, string name, ushort model, Vector3 position, Vector3? rotation = null)
+    public RPGVehicle CreateVehicle(ushort model, Vector3 position, Vector3? rotation = null)
     {
         var vehicle = _rpgServer.GetRequiredService<RPGVehicle>();
-        vehicle.AssignId(id);
-        vehicle.Name = name;
         vehicle.Model = model;
         vehicle.Position = position;
         if(rotation != null)
             vehicle.Rotation = rotation ?? Vector3.Zero;
         _rpgServer.AssociateElement(vehicle);
         return vehicle;
+    }
+    
+    public RPGBlip CreateBlip(int icon, Vector3 position)
+    {
+        if (!Enum.IsDefined(typeof(BlipIcon), icon))
+            throw new Exception("Invalid icon");
+
+        var blip = _rpgServer.GetRequiredService<RPGBlip>();
+        blip.Icon = (BlipIcon)icon;
+        blip.Position = position;
+        _rpgServer.AssociateElement(blip);
+        return blip;
     }
 
     [NoScriptAccess]
