@@ -92,6 +92,8 @@ public class PlayerAccount : IDisposable
         get
         {
             CheckIfDisposed();
+            if (_loginDateTime == null)
+                return 0;
             return _user.PlayTime + (ulong)(DateTime.Now - _loginDateTime.Value).Seconds;
         }
     }
@@ -101,7 +103,9 @@ public class PlayerAccount : IDisposable
         get
         {
             CheckIfDisposed();
-            return _user.PlayTime + (ulong)(DateTime.Now - _loginDateTime.Value).Seconds;
+            if (_loginDateTime == null)
+                return 0;
+            return (ulong)(DateTime.Now - _loginDateTime.Value).Seconds;
         }
     }
 
@@ -129,8 +133,10 @@ public class PlayerAccount : IDisposable
         CheckIfDisposed();
 
         if(_lastPlayTimeCounterStart != null)
+        {
             _user.PlayTime += (ulong)(DateTime.Now - _lastPlayTimeCounterStart.Value).Seconds;
-        _lastPlayTimeCounterStart = DateTime.Now;
+            _lastPlayTimeCounterStart = DateTime.Now;
+        }
         await _userManager.UpdateAsync(_user);
         _logger.Verbose("Saved account");
     }
