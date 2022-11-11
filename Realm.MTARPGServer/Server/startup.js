@@ -3,6 +3,7 @@ import "panel.js"
 import "discord.js"
 import "login.js"
 
+Logger.information("Gameplay: currency={currency}", Gameplay.currency);
 Logger.information("startup.js, TestModule: {TestModule}", TestModule);
 Logger.information("loaded modules: {modules}", JSON.stringify(getModules()));
 
