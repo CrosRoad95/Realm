@@ -131,7 +131,9 @@ addCommandHandler("discordpolacz", (player, args) => {
 
     const code = player.account.generateAndGetDiscordConnectionCode();
     player.sendChatMessage("Aby połączyć konto z serwera z kontem na discordzie podaj kod na kanele 'polacz' na discordzie:");
-    player.sendChatMessage(`Twój kod ważny przez 2 minuty: ${code}`);
+    player.sendChatMessage(`Twój kod ważny przez 2 minuty: '${code}'`);
+    player.sendChatMessage("Kod został skopiowany do twojego schowka.");
+    player.setClipboard(code);
 })
 
 addEventHandler("onPlayerDiscordConnected", async ({ player, discordUser }) => {

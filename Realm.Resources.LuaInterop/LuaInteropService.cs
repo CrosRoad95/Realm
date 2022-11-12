@@ -26,4 +26,11 @@ public class LuaInteropService
     {
         player.TriggerLuaEvent("internalSetWorldDebuggingEnabled", player, active);
     }
+
+    public void SetClipboard(Player player, string content)
+    {
+        player.TriggerLuaEvent("internalSetClipboard", player, content);
+    }
+
+
 }

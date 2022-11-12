@@ -217,6 +217,11 @@ public class RPGPlayer : Player
         _chatBox.ClearFor(this);
     }
 
+    public void SetClipboard(string content)
+    {
+        _luaInteropService.SetClipboard(this, content);
+    }
+
     [NoScriptAccess]
     public void Reset()
     {
