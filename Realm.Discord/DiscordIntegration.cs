@@ -1,19 +1,29 @@
-﻿namespace Realm.Discord;
+﻿using Discord.Interactions;
+using Realm.Discord.Services;
+using System.Reflection;
+
+namespace Realm.Discord;
 
 internal class DiscordIntegration : IDiscord
 {
     private readonly DiscordSocketClient _client;
     private readonly DiscordConfiguration _discordConfiguration;
     private readonly StatusChannel _statusChannel;
+    private readonly ServerConnectionChannel _serverConnectionChannel;
     private readonly EventFunctions _eventFunctions;
+    private readonly CommandHandler _commandHandler;
     private readonly ILogger _logger;
+    private IDiscordGuild? _discordGuild = null;
 
-    public DiscordIntegration(DiscordConfiguration discordConfiguration, StatusChannel statusChannel, ILogger logger, EventFunctions eventFunctions)
+    public DiscordIntegration(DiscordSocketClient discordSocketClient, DiscordConfiguration discordConfiguration, StatusChannel statusChannel, ServerConnectionChannel serverConnectionChannel,
+        ILogger logger, EventFunctions eventFunctions, CommandHandler commandHandler)
     {
-        _client = new DiscordSocketClient();
+        _client = discordSocketClient;
         _discordConfiguration = discordConfiguration;
         _statusChannel = statusChannel;
+        _serverConnectionChannel = serverConnectionChannel;
         _eventFunctions = eventFunctions;
+        _commandHandler = commandHandler;
         _logger = logger.ForContext<IDiscord>();
         _client.Ready += ClientReady;
         _client.Log += LogAsync;
@@ -29,6 +39,8 @@ internal class DiscordIntegration : IDiscord
     {
         await _client.LoginAsync(TokenType.Bot, _discordConfiguration.Token);
         await _client.StartAsync();
+
+        await Task.Delay(Timeout.Infinite);
     }
 
     private async Task ClientReady()
@@ -38,12 +50,26 @@ internal class DiscordIntegration : IDiscord
             throw new NullReferenceException(nameof(guild));
 
         BotIdProvider.BotId = _client.CurrentUser.Id;
-        await _statusChannel.StartAsync(new DiscordGuild(guild));
+        Task.Run(async () => await _statusChannel.StartAsync(new DiscordGuild(guild)));
+        Task.Run(async () => await _serverConnectionChannel.StartAsync(new DiscordGuild(guild)));
+
+        await _commandHandler.InitializeAsync();
     }
 
     private Task LogAsync(LogMessage log)
     {
         _logger.Information(log.ToString());
         return Task.CompletedTask;
+    }
+
+    public IDiscordGuild? GetGuild() => _discordGuild;
+
+    public async ValueTask<IDiscordUser?> GetUserAsync(ulong id)
+    {
+        var user = await _client.GetUserAsync(id);
+        if (user == null)
+            return null;
+
+        return new DiscordUser(user);
     }
 }

@@ -49,6 +49,10 @@ global using Realm.Server.Scripting.Events;
 global using Realm.Persistance.Data;
 global using Realm.Persistance.Scripting.Classes;
 global using Realm.Server.Logger.Enrichers;
+global using Realm.Discord.Interfaces;
+global using Realm.Interfaces.Server.Services;
+global using Realm.Server.Scripting;
+global using Realm.Server.Services;
 
 global using Realm.Resources.AgnosticGuiSystem;
 

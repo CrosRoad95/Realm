@@ -1,9 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using Realm.Interfaces.Server.Services;
-using Realm.Server.Scripting;
-using Realm.Server.Services;
-
-namespace Realm.Server;
+﻿namespace Realm.Server;
 
 public partial class RPGServer : IRPGServer, IReloadable
 {
@@ -46,20 +41,29 @@ public partial class RPGServer : IRPGServer, IReloadable
 
                 builder.ConfigureServices(services =>
                 {
+                    // Common
                     services.AddSingleton(configurationProvider);
                     services.AddSingleton(logger);
                     services.AddSingleton(this);
                     services.AddSingleton<IReloadable>(this);
                     services.AddSingleton<IRPGServer>(this);
 
+                    // Scripting
                     services.AddSingleton<GameplayFunctions>();
                     services.AddSingleton<LocalizationFunctions>();
                     services.AddSingleton<ElementFunctions>();
                     services.AddSingleton<InputFunctions>();
+
+                    // Services
                     services.AddSingleton<AccountsInUseService>();
                     services.AddSingleton<IAccountsInUseService>(x => x.GetRequiredService<AccountsInUseService>());
+                    services.AddSingleton<IDiscordVerificationHandler, DiscordVerificationHandler>();
+
+                    // Player specific
+                    services.AddTransient<DiscordUser>();
 
                     // Elements
+
                     services.AddTransient<Spawn>();
                     services.AddTransient<RPGVehicle>();
                     services.AddTransient<RPGBlip>();
@@ -120,6 +124,7 @@ public partial class RPGServer : IRPGServer, IReloadable
         _eventFunctions.RegisterEvent(PlayerLoggedInEvent.EventName);
         _eventFunctions.RegisterEvent(PlayerLoggedOutEvent.EventName);
         _eventFunctions.RegisterEvent(PlayerSpawnedEvent.EventName);
+        _eventFunctions.RegisterEvent(PlayerDiscordConnectedEvent.EventName);
 
         // Functions
         scriptingModuleInterface.AddHostObject("Elements", _elementFunctions, true);

@@ -114,3 +114,37 @@ addCommandHandler("playtime", (player, args) => {
 addCommandHandler("foo2", (player, args) => {
     Logger.information("command foo2 executed {player} {commandArguments}")
 }, ["admin"])
+
+addCommandHandler("discordpolacz", (player, args) => {
+    if (!player.isLoggedIn)
+        return;
+
+    if (player.account.isConnectedWithDiscordAccount()) {
+        player.sendChatMessage(`Twoje konto jest już połączone z kontem discord.`);
+        return;
+    }
+
+    if (player.account.hasPendingDiscordConnectionCode()) {
+        player.sendChatMessage(`Masz już jeden kod wygenerowany, odczekaj chwile zanim spróbujesz ponownie.`);
+        return;
+    }
+
+    const code = player.account.generateAndGetDiscordConnectionCode();
+    player.sendChatMessage("Aby połączyć konto z serwera z kontem na discordzie podaj kod na kanele 'polacz' na discordzie:");
+    player.sendChatMessage(`Twój kod ważny przez 2 minuty: ${code}`);
+})
+
+addEventHandler("onPlayerDiscordConnected", async ({ player, discordUser }) => {
+    player.sendChatMessage(`Pomyślnie połączyłeś konto na serwerze kontem na discordzie o id ${discordUser.id}`);
+
+    await discordUser.sendTextMessage(`Dziękujemy za połączenie konta discord ${discordUser.username}!`);
+});
+
+addCommandHandler("discord", (player, args) => {
+    if (!player.isLoggedIn)
+        return;
+
+    if (player.account.isConnectedWithDiscordAccount()) {
+        player.sendChatMessage(`Twoje konto jest już połączone z kontem discord o id ${player.account.id}`);
+    }
+})

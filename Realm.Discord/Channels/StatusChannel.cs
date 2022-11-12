@@ -2,7 +2,7 @@
 
 internal class StatusChannel
 {
-    private readonly DiscordConfiguration.StatusChannelConfiguration _configuration;
+    private readonly DiscordConfiguration.StatusChannelConfiguration? _configuration;
     private readonly IBotdIdProvider _botdIdProvider;
     private readonly EventFunctions _eventFunctions;
     private ILogger _logger;
@@ -20,10 +20,13 @@ internal class StatusChannel
 
     public async Task StartAsync(IDiscordGuild discordGuild)
     {
+        if (_configuration == null)
+            return;
+
         var channel = discordGuild.GetChannelById(_configuration.ChannelId);
         _statusDiscordMessage = await channel.GetLastMessageSendByUser(_botdIdProvider.Provide());
         if (_statusDiscordMessage == null)
-            _statusDiscordMessage = await channel.SendMessage("");
+            _statusDiscordMessage = await channel.SendMessage(string.Empty);
 
         await Update();
         while(true) // TODO: user periodic timer

@@ -19,3 +19,4 @@ global using Realm.Scripting.Extensions;
 global using Realm.Interfaces.Server.Services;
 global using Realm.Persistance.Extensions;
 global using Realm.Server.Logger.Enrichers;
+global using Realm.Interfaces.Discord;

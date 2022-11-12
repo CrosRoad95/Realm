@@ -1,7 +1,10 @@
-﻿namespace Realm.Persistance.Scripting.Classes;
+﻿using Realm.Scripting.Classes;
+
+namespace Realm.Persistance.Scripting.Classes;
 
 public class PlayerAccount : IDisposable
 {
+    private const string ClaimDiscordUserIdName = "discord.user.id";
     private bool _disposed;
     private User _user;
     private readonly SignInManager<User> _signInManager;
@@ -9,11 +12,16 @@ public class PlayerAccount : IDisposable
     private readonly IDb _db;
     private readonly IAuthorizationService _authorizationService;
     private readonly IAccountsInUseService _accountsInUseService;
+    private readonly EventFunctions _eventFunctions;
+    private readonly IServiceProvider _serviceProvider;
     private readonly ILogger _logger;
     private DateTime? _lastPlayTimeCounterStart;
     private DateTime? _loginDateTime;
     private ClaimsPrincipal? _claimsPrincipal;
-
+    private string? _discordConnectionCode = null;
+    private DateTime? _discordConnectionCodeValidUntil = null;
+    private DiscordUser? _discord = null;
+    
     public string Id
     {
         get
@@ -41,8 +49,17 @@ public class PlayerAccount : IDisposable
         }
     }
 
+    public DiscordUser? Discord
+    {
+        get
+        {
+            CheckIfDisposed();
+            return _discord;
+        }
+    }
+
     public PlayerAccount(SignInManager<User> signInManager, UserManager<User> userManager, IDb db, IAuthorizationService authorizationService,
-        IAccountsInUseService accountsInUseService, ILogger logger)
+        IAccountsInUseService accountsInUseService, ILogger logger, EventFunctions eventFunctions, IServiceProvider serviceProvider)
     {
         _user = null!;
         _signInManager = signInManager;
@@ -50,6 +67,8 @@ public class PlayerAccount : IDisposable
         _db = db;
         _authorizationService = authorizationService;
         _accountsInUseService = accountsInUseService;
+        _eventFunctions = eventFunctions;
+        _serviceProvider = serviceProvider;
         _logger = logger
             .ForContext<PlayerAccount>()
             .ForContext(new PlayerAccountEnricher(this));
@@ -124,7 +143,40 @@ public class PlayerAccount : IDisposable
         if(ip != null)
             _user.LastIp = ip;
         _user.LastSerial = serial;
+        await UpdateClaimsPrincipal();
+        try
+        {
+            await InitializeDiscordUser();
+        }
+        catch(Exception)
+        {
+
+        }
+    }
+
+    private async Task UpdateClaimsPrincipal()
+    {
         _claimsPrincipal = await _signInManager.CreateUserPrincipalAsync(_user);
+    }
+
+    [NoScriptAccess]
+    public async Task InitializeDiscordUser()
+    {
+        var claimValue = GetClaimValue(ClaimDiscordUserIdName);
+        if(claimValue != null && ulong.TryParse(claimValue, out ulong discordUserId))
+        {
+            _discord = _serviceProvider.GetRequiredService<DiscordUser>();
+            try
+            {
+                await _discord.InitializeById(discordUserId);
+            }
+            catch(Exception ex)
+            {
+                _discord = null;
+                _logger.Error(ex, "Failed to initialize discord user");
+                throw;
+            }
+        }
     }
 
     [NoScriptAccess]
@@ -188,6 +240,8 @@ public class PlayerAccount : IDisposable
         CheckIfDisposed();
 
         var result = await _userManager.AddClaimAsync(_user, new Claim(type, value));
+        if (result.Succeeded)
+            await UpdateClaimsPrincipal();
         return result.Succeeded;
     }
 
@@ -196,6 +250,8 @@ public class PlayerAccount : IDisposable
         CheckIfDisposed();
 
         var result = await _userManager.AddClaimsAsync(_user, claims.Select(x => new Claim(x.Key, x.Value)));
+        if (result.Succeeded)
+            await UpdateClaimsPrincipal();
         return result.Succeeded;
     }
 
@@ -204,6 +260,8 @@ public class PlayerAccount : IDisposable
         CheckIfDisposed();
 
         var result = await _userManager.AddToRoleAsync(_user, role);
+        if(result.Succeeded)
+            await UpdateClaimsPrincipal();
         return result.Succeeded;
     }
 
@@ -212,6 +270,8 @@ public class PlayerAccount : IDisposable
         CheckIfDisposed();
 
         var result = await _userManager.AddToRolesAsync(_user, role);
+        if (result.Succeeded)
+            await UpdateClaimsPrincipal();
         return result.Succeeded;
     }
 
@@ -260,6 +320,8 @@ public class PlayerAccount : IDisposable
         if (claim != null)
         {
             var result = await _userManager.RemoveClaimAsync(_user, claim);
+            if (result.Succeeded)
+                await UpdateClaimsPrincipal();
             return result.Succeeded;
         }
         return false;
@@ -270,6 +332,8 @@ public class PlayerAccount : IDisposable
         CheckIfDisposed();
 
         var result = await _userManager.RemoveFromRoleAsync(_user, role);
+        if (result.Succeeded)
+            await UpdateClaimsPrincipal();
         return result.Succeeded;
     }
 
@@ -279,6 +343,8 @@ public class PlayerAccount : IDisposable
 
         var claims = await _userManager.GetClaimsAsync(_user);
         var result = await _userManager.RemoveClaimsAsync(_user, claims);
+        if (result.Succeeded)
+            await UpdateClaimsPrincipal();
         return result.Succeeded;
     }
 
@@ -464,6 +530,73 @@ public class PlayerAccount : IDisposable
         return result.Succeeded;
     }
 
+    public bool IsConnectedWithDiscordAccount()
+    {
+        CheckIfDisposed();
+
+        return Discord != null;
+    }
+
+    public bool IsDiscordConnectionCodeValid(string code)
+    {
+        CheckIfDisposed();
+
+        if (!HasPendingDiscordConnectionCode())
+            return false;
+
+        return _discordConnectionCode == code;
+    }
+
+    public bool HasPendingDiscordConnectionCode()
+    {
+        CheckIfDisposed();
+
+        return _discordConnectionCodeValidUntil != null || _discordConnectionCodeValidUntil > DateTime.Now;
+    }
+
+    public void InvalidateDiscordConnectionCode()
+    {
+        CheckIfDisposed();
+
+        _discordConnectionCode = null;
+        _discordConnectionCodeValidUntil = null;
+    }
+
+    public string? GenerateAndGetDiscordConnectionCode(int validForMinutes = 2)
+    {
+        CheckIfDisposed();
+
+        if (IsConnectedWithDiscordAccount())
+            return null;
+
+        if (validForMinutes <= 0)
+            return null;
+        _discordConnectionCode = Guid.NewGuid().ToString();
+        _discordConnectionCodeValidUntil = DateTime.Now.AddMinutes(validForMinutes);
+        return _discordConnectionCode;
+    }
+
+    [NoScriptAccess]
+    public async Task SetDiscordUserId(ulong id)
+    {
+        CheckIfDisposed();
+
+        if (HasClaim(ClaimDiscordUserIdName))
+        {
+            await RemoveClaim(ClaimDiscordUserIdName);
+        }
+        await AddClaim(ClaimDiscordUserIdName, id.ToString());
+        try
+        {
+            await InitializeDiscordUser();
+        }
+        catch (Exception)
+        {
+            await RemoveClaim(ClaimDiscordUserIdName);
+            throw;
+        }
+    }
+
     [NoScriptAccess]
     private void CheckIfDisposed()
     {
@@ -474,10 +607,11 @@ public class PlayerAccount : IDisposable
     public string LongUserFriendlyName() => ToString();
     public override string ToString() => _user.ToString();
 
-
     [NoScriptAccess]
     public void Dispose()
     {
         _disposed = true;
+        if (Discord != null)
+            Discord.Dispose();
     }
 }

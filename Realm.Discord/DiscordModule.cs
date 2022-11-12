@@ -1,4 +1,8 @@
-﻿namespace Realm.Discord;
+﻿using Discord.Interactions;
+using Discord.WebSocket;
+using Realm.Discord.Services;
+
+namespace Realm.Discord;
 
 public class DiscordModule : IModule
 {
@@ -10,6 +14,9 @@ public class DiscordModule : IModule
         services.AddSingleton<DiscordIntegration>();
         services.AddSingleton<IDiscord>(x => x.GetRequiredService<DiscordIntegration>());
         services.AddSingleton<StatusChannel>();
+        services.AddSingleton<ServerConnectionChannel>();
+        services.AddSingleton<DiscordSocketClient>();
+        services.AddSingleton<CommandHandler>();
         services.AddSingleton<IBotdIdProvider, BotIdProvider>();
     }
 
