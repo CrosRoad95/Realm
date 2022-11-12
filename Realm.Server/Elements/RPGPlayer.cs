@@ -7,6 +7,7 @@ using Serilog;
 using SlipeServer.Packets.Definitions.Lua;
 using SlipeServer.Server.Services;
 using System;
+using System.Drawing;
 using System.Globalization;
 using System.Security.Principal;
 
@@ -22,6 +23,7 @@ public class RPGPlayer : Player
     private readonly AgnosticGuiSystemService _agnosticGuiSystemService;
     private readonly AccountsInUseService _accountsInUseService;
     private readonly LuaInteropService _luaInteropService;
+    private readonly ChatBox _chatBox;
     private readonly ILogger _logger;
     [NoScriptAccess]
     public Latch ResourceStartingLatch = new(3); // TODO: remove hardcoded resources counter
@@ -70,7 +72,7 @@ public class RPGPlayer : Player
 
     public RPGPlayer(MtaServer mtaServer, LuaValueMapper luaValueMapper, EventFunctions eventFunctions,
         DebugLog debugLog, AgnosticGuiSystemService agnosticGuiSystemService, AccountsInUseService accountsInUseService,
-        ILogger logger, LuaInteropService luaInteropService)
+        ILogger logger, LuaInteropService luaInteropService, ChatBox chatBox)
     {
         _mtaServer = mtaServer;
         _luaValueMapper = luaValueMapper;
@@ -79,6 +81,7 @@ public class RPGPlayer : Player
         _agnosticGuiSystemService = agnosticGuiSystemService;
         _accountsInUseService = accountsInUseService;
         _luaInteropService = luaInteropService;
+        _chatBox = chatBox;
         _logger = logger
             .ForContext<RPGPlayer>()
             .ForContext(new RPGPlayerEnricher(this));
@@ -204,10 +207,20 @@ public class RPGPlayer : Player
         _logger.Verbose("Closed all guis");
     }
 
+    public void SendChatMessage(string message, Color? color = null, bool isColorCoded = false)
+    {
+        _chatBox.Output(message, color, isColorCoded);
+    }
+    
+    public void ClearChatBox()
+    {
+        _chatBox.ClearFor(this);
+    }
+
     [NoScriptAccess]
     public void Reset()
     {
-        Camera.Fade(CameraFade.Out, 0, System.Drawing.Color.Black);
+        Camera.Fade(CameraFade.Out, 0, Color.Black);
         Camera.Target = null;
         Account = null;
         ResourceStartingLatch = new(3); // TODO: remove hardcoded resources counter
