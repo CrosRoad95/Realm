@@ -3,7 +3,7 @@ bin/
 obj/
 .vs/
 RealmRPG/Server/types.ts
-Realm.Configuration/appsettings.server.local.json
+Realm.Configuration/appsettingsServer.local.json
 *.db
 *.db-shm
 *.db-wal
