@@ -22,6 +22,7 @@ local function internalGetWindowHandleByName(name)
 end
 
 local function internalOpenGui(name)
+	waitForTranslations();
 	local result = currentGuiProvider.open(internalGetWindowHandleByName(name).handle)
 	if(result ~= true)then
 		error("Failed to open gui '"..tostring(name).."'");
@@ -54,7 +55,9 @@ function openGui(name)
 	end
 
 	currentOpenedGui = name;
-	internalOpenGui(name)
+	async(function()
+		internalOpenGui(name)
+	end)
 	showCursor(true)
 	return true;
 end
@@ -193,4 +196,8 @@ local function entrypoint()
 		closeGui(guiName);
 	end)
 end
-addEventHandler("onClientResourceStart", resourceRoot, entrypoint, true, "low");
+
+addEventHandler("onClientResourceStart", resourceRoot, function()
+	outputChatBox("START")
+	async(entrypoint)
+end, true, "low");

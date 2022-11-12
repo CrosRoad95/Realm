@@ -9,6 +9,7 @@ internal class LuaInteropResource : Resource
     internal Dictionary<string, byte[]> AdditionalFiles { get; } = new Dictionary<string, byte[]>()
     {
         ["debugging.lua"] = ResourceFiles.Debugging,
+        ["utility.lua"] = ResourceFiles.Utility,
     };
 
     internal LuaInteropResource(MtaServer server)

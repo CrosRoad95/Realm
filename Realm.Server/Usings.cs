@@ -14,6 +14,7 @@ global using Microsoft.AspNetCore.Authorization;
 global using Serilog;
 global using Serilog.Core;
 global using Serilog.Events;
+global using Newtonsoft.Json;
 
 global using SlipeServer.Server.Elements;
 global using SlipeServer.Server;

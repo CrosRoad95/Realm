@@ -4,6 +4,7 @@ import "discord.js"
 import "login.js"
 
 Logger.information("Gameplay: currency={currency}", Gameplay.currency);
+Logger.information("Localization: text={text}, try={text2}", Localization.translate("pl", "Test"), Localization.tryTranslate("pl", "doesn't exists", "test"));
 Logger.information("startup.js, TestModule: {TestModule}", TestModule);
 Logger.information("loaded modules: {modules}", JSON.stringify(getModules()));
 
@@ -17,7 +18,7 @@ const spawn = createSpawn("dynamicSpawn", "test", new Vector3(0, 20, 3));
 
 Logger.information("createSpawn is persistant?: {persistant}", spawn.isPersistant());
 addEventHandler("onPlayerJoin", async ({ player }) => {
-    Logger.information("player joined: {player} isLoggedIn={isLoggedIn}", player.name, player.isLoggedIn);
+    Logger.information("player joined: {player} isLoggedIn={isLoggedIn} language={language}", player.name, player.isLoggedIn, player.language);
     let account = await findAccountByUserName("Admin")
     Logger.information("account = {account}, is in use? {isInUse}", account, account.isInUse());
     player.debugView = true;
@@ -46,7 +47,7 @@ const func = () => Logger.information("you should not see this");
 addEventHandler("onPlayerJoin", func);
 removeEventHandler("onPlayerJoin", func);
 
-addEventHandler("onPlayerLogin", async ({player, account}) => {
+addEventHandler("onPlayerLogin", async ({ player, account }) => {
     Logger.information("player logged in: {player}, {account} is in use? {isInUse}", player, account, account.isInUse())
     await player.spawn(spawn);
     Logger.information("is player authorized to admin policy? {isAuthorized}", await player.account.authorizePolicy("Admin"))

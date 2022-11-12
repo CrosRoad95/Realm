@@ -1,5 +1,5 @@
 ﻿local function createLoginWindow(guiProvider)
-	local window = guiProvider.window("Logowanie", 0, 0, 300, 190);
+	local window = guiProvider.window(__("LoginWindow", "Login / Register"), 0, 0, 300, 190);
 	guiProvider.centerWindow(window)
 	local information = guiProvider.label("", 10, 20, 280, 25, window);
 	guiProvider.label("Login:", 10, 45, 90, 25, window);

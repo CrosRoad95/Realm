@@ -1,6 +1,4 @@
-﻿using Realm.Configuration;
-
-namespace Realm.Scripting.Classes;
+﻿namespace Realm.Server.Scripting;
 
 public class GameplayFunctions
 {

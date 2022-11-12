@@ -23,6 +23,12 @@
     <None Update="Gui\Login.lua">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Update="Localization\en.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Localization\pl.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="seed.yaml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

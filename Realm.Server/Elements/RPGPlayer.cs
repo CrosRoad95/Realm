@@ -1,4 +1,5 @@
 ﻿using Realm.Common.Utilities;
+using Realm.Resources.LuaInterop;
 using Realm.Server.Extensions;
 using Realm.Server.Logger.Enrichers;
 using Realm.Server.Services;
@@ -6,6 +7,7 @@ using Serilog;
 using SlipeServer.Packets.Definitions.Lua;
 using SlipeServer.Server.Services;
 using System;
+using System.Globalization;
 using System.Security.Principal;
 
 namespace Realm.Server.Elements;
@@ -19,6 +21,7 @@ public class RPGPlayer : Player
     private readonly DebugLog _debugLog;
     private readonly AgnosticGuiSystemService _agnosticGuiSystemService;
     private readonly AccountsInUseService _accountsInUseService;
+    private readonly LuaInteropService _luaInteropService;
     private readonly ILogger _logger;
     [NoScriptAccess]
     public Latch ResourceStartingLatch = new(3); // TODO: remove hardcoded resources counter
@@ -26,7 +29,7 @@ public class RPGPlayer : Player
     public CancellationToken CancellationToken { get; private set; }
 
     public PlayerAccount? Account { get; private set; }
-
+    public string Language { get; private set; } = "pl";
     public bool IsLoggedIn => Account != null && Account.IsAuthenticated;
 
     [NoScriptAccess]
@@ -67,7 +70,7 @@ public class RPGPlayer : Player
 
     public RPGPlayer(MtaServer mtaServer, LuaValueMapper luaValueMapper, EventFunctions eventFunctions,
         DebugLog debugLog, AgnosticGuiSystemService agnosticGuiSystemService, AccountsInUseService accountsInUseService,
-        ILogger logger)
+        ILogger logger, LuaInteropService luaInteropService)
     {
         _mtaServer = mtaServer;
         _luaValueMapper = luaValueMapper;
@@ -75,6 +78,7 @@ public class RPGPlayer : Player
         _debugLog = debugLog;
         _agnosticGuiSystemService = agnosticGuiSystemService;
         _accountsInUseService = accountsInUseService;
+        _luaInteropService = luaInteropService;
         _logger = logger
             .ForContext<RPGPlayer>()
             .ForContext(new RPGPlayerEnricher(this));
@@ -82,6 +86,17 @@ public class RPGPlayer : Player
         CancellationToken = _cancellationTokenSource.Token;
         ResourceStarted += RPGPlayer_ResourceStarted;
         Disconnected += RPGPlayer_Disconnected;
+
+        _luaInteropService.ClientCultureInfoUpdate += HandleClientCultureInfoUpdate;
+    }
+
+    private void HandleClientCultureInfoUpdate(Player player, CultureInfo culture)
+    {
+        if (player == this)
+        {
+            _luaInteropService.ClientCultureInfoUpdate -= HandleClientCultureInfoUpdate;
+            Language = culture.TwoLetterISOLanguageName;
+        }
     }
 
     private async void RPGPlayer_Disconnected(Player sender, PlayerQuitEventArgs e)
