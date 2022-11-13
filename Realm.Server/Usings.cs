@@ -53,6 +53,7 @@ global using Realm.Discord.Interfaces;
 global using Realm.Interfaces.Server.Services;
 global using Realm.Server.Scripting;
 global using Realm.Server.Services;
+global using Realm.Interfaces.Discord;
 
 global using Realm.Resources.AgnosticGuiSystem;
 

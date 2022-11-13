@@ -145,6 +145,11 @@ addEventHandler("onPlayerDiscordConnected", async ({ player, discordUser }) => {
     await discordUser.sendTextMessage(`Dziękujemy za połączenie konta discord ${discordUser.username}!`);
 });
 
+addEventHandler("onDiscordUserChange", async ({ account, discord }) => {
+    Logger.information("Konto discord: {discord} się zmieniło", discord.username)
+    //await discord.sendTextMessage(`Twoje konto discord się zmieniło`);
+});
+
 addCommandHandler("discord", (player, args) => {
     if (!player.isLoggedIn)
         return;

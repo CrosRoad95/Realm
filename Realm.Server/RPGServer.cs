@@ -60,6 +60,7 @@ public partial class RPGServer : IRPGServer, IReloadable
                     services.AddSingleton<AccountsInUseService>();
                     services.AddSingleton<IAccountsInUseService>(x => x.GetRequiredService<AccountsInUseService>());
                     services.AddSingleton<IDiscordVerificationHandler, DiscordVerificationHandler>();
+                    services.AddSingleton<IDiscordUserChangedHandler, DiscordUserChangedHandler>();
 
                     // Player specific
                     services.AddTransient<DiscordUser>();
@@ -127,6 +128,7 @@ public partial class RPGServer : IRPGServer, IReloadable
         _eventFunctions.RegisterEvent(PlayerLoggedOutEvent.EventName);
         _eventFunctions.RegisterEvent(PlayerSpawnedEvent.EventName);
         _eventFunctions.RegisterEvent(PlayerDiscordConnectedEvent.EventName);
+        _eventFunctions.RegisterEvent(DiscordUserChangedEvent.EventName);
 
         // Functions
         scriptingModuleInterface.AddHostObject("Elements", _elementFunctions, true);
@@ -145,6 +147,8 @@ public partial class RPGServer : IRPGServer, IReloadable
         scriptingModuleInterface.AddHostType(typeof(PlayerLoggedInEvent));
         scriptingModuleInterface.AddHostType(typeof(PlayerLoggedOutEvent));
         scriptingModuleInterface.AddHostType(typeof(PlayerSpawnedEvent));
+        scriptingModuleInterface.AddHostType(typeof(PlayerDiscordConnectedEvent));
+        scriptingModuleInterface.AddHostType(typeof(DiscordUserChangedEvent));
     }
 
     public TService GetRequiredService<TService>() where TService: notnull

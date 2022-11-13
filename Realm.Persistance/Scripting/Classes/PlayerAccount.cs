@@ -4,7 +4,8 @@ namespace Realm.Persistance.Scripting.Classes;
 
 public class PlayerAccount : IDisposable
 {
-    private const string ClaimDiscordUserIdName = "discord.user.id";
+    public const string ClaimDiscordUserIdName = "discord.user.id";
+
     private bool _disposed;
     private User _user;
     private readonly SignInManager<User> _signInManager;
@@ -146,7 +147,7 @@ public class PlayerAccount : IDisposable
         await UpdateClaimsPrincipal();
         try
         {
-            InitializeDiscordUser();
+            TryInitializeDiscordUser();
         }
         catch(Exception)
         {
@@ -154,13 +155,14 @@ public class PlayerAccount : IDisposable
         }
     }
 
-    private async Task UpdateClaimsPrincipal()
+    [NoScriptAccess]
+    public async Task UpdateClaimsPrincipal()
     {
         _claimsPrincipal = await _signInManager.CreateUserPrincipalAsync(_user);
     }
 
     [NoScriptAccess]
-    public void InitializeDiscordUser()
+    public void TryInitializeDiscordUser()
     {
         var claimValue = GetClaimValue(ClaimDiscordUserIdName);
         if(claimValue != null && ulong.TryParse(claimValue, out ulong discordUserId))
@@ -588,7 +590,7 @@ public class PlayerAccount : IDisposable
         await AddClaim(ClaimDiscordUserIdName, id.ToString());
         try
         {
-            InitializeDiscordUser();
+            TryInitializeDiscordUser();
         }
         catch (Exception)
         {

@@ -1,7 +1,4 @@
-﻿using Realm.Interfaces.Server.Services;
-using Serilog;
-using SlipeServer.Server.Elements;
-using System.Collections.Concurrent;
+﻿using System.Collections.Concurrent;
 
 namespace Realm.Server.Services;
 
@@ -18,6 +15,11 @@ public class AccountsInUseService : IAccountsInUseService
     public RPGPlayer GetPlayerByAccountId(string id)
     {
         return _playerByAccountId[id];
+    }
+    
+    public bool TryGetPlayerByAccountId(string id, out RPGPlayer? rpgPlayer)
+    {
+        return _playerByAccountId.TryGetValue(id, out rpgPlayer);
     }
     
     public bool IsAccountIdInUse(string id)

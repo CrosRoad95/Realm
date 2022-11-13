@@ -1,6 +1,4 @@
-﻿using Realm.Persistance.Data;
-
-namespace Realm.Persistance.Scripting.Classes;
+﻿namespace Realm.Persistance.Scripting.Classes;
 
 public class IdentityFunctions
 {

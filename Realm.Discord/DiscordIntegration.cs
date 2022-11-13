@@ -1,4 +1,5 @@
 ﻿using Discord.Interactions;
+using Realm.Discord.Interfaces;
 using Realm.Discord.Services;
 using System.Reflection;
 
@@ -12,11 +13,12 @@ internal class DiscordIntegration : IDiscord
     private readonly ServerConnectionChannel _serverConnectionChannel;
     private readonly EventFunctions _eventFunctions;
     private readonly CommandHandler _commandHandler;
+    private readonly IDiscordUserChangedHandler _discordUserChangedHandler;
     private readonly ILogger _logger;
     private IDiscordGuild? _discordGuild = null;
 
     public DiscordIntegration(DiscordSocketClient discordSocketClient, DiscordConfiguration discordConfiguration, StatusChannel statusChannel, ServerConnectionChannel serverConnectionChannel,
-        ILogger logger, EventFunctions eventFunctions, CommandHandler commandHandler)
+        ILogger logger, EventFunctions eventFunctions, CommandHandler commandHandler, IDiscordUserChangedHandler discordUserChangedHandler)
     {
         _client = discordSocketClient;
         _discordConfiguration = discordConfiguration;
@@ -24,9 +26,16 @@ internal class DiscordIntegration : IDiscord
         _serverConnectionChannel = serverConnectionChannel;
         _eventFunctions = eventFunctions;
         _commandHandler = commandHandler;
+        _discordUserChangedHandler = discordUserChangedHandler;
         _logger = logger.ForContext<IDiscord>();
         _client.Ready += ClientReady;
         _client.Log += LogAsync;
+        _client.GuildMemberUpdated += GuildMemberUpdated;
+    }
+
+    private async Task GuildMemberUpdated(Cacheable<SocketGuildUser, ulong> arg1, SocketGuildUser sockerGuildUser)
+    {
+        await _discordUserChangedHandler.Handle(new DiscordUser(sockerGuildUser));
     }
 
     public void InitializeScripting(IScriptingModuleInterface scriptingModuleInterface)
@@ -39,7 +48,6 @@ internal class DiscordIntegration : IDiscord
     {
         await _client.LoginAsync(TokenType.Bot, _discordConfiguration.Token);
         await _client.StartAsync();
-
         await Task.Delay(Timeout.Infinite);
     }
 
