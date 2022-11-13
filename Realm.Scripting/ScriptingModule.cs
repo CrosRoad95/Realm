@@ -9,6 +9,7 @@ public class ScriptingModule : IModule
     {
         services.AddSingleton<EventFunctions>();
         services.AddSingleton<ModulesFunctions>();
+        services.AddSingleton<UlitityFunctions>();
         services.AddSingleton<JavascriptRuntime>();
         services.AddSingleton<IScriptingModuleInterface>(x => x.GetRequiredService<JavascriptRuntime>());
         services.AddSingleton<IReloadable>(x => x.GetRequiredService<JavascriptRuntime>());
