@@ -31,12 +31,12 @@ public class DiscordUser : IDisposable
     }
 
     [NoScriptAccess]
-    public async Task InitializeById(ulong id)
+    public void InitializeById(ulong id)
     {
         CheckIfDisposed();
 
         _id = id;
-        _user = await _discord.GetUserAsync(id) ?? throw new Exception($"Failed to get discord by user id {id}");
+        _user = _discord.GetGuild()?.GetUserById(id) ?? throw new Exception($"Failed to get discord by user id {id}");
     }
 
     public void SendTextMessage(string text)

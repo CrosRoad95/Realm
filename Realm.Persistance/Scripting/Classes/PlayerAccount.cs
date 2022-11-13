@@ -146,7 +146,7 @@ public class PlayerAccount : IDisposable
         await UpdateClaimsPrincipal();
         try
         {
-            await InitializeDiscordUser();
+            InitializeDiscordUser();
         }
         catch(Exception)
         {
@@ -160,7 +160,7 @@ public class PlayerAccount : IDisposable
     }
 
     [NoScriptAccess]
-    public async Task InitializeDiscordUser()
+    public void InitializeDiscordUser()
     {
         var claimValue = GetClaimValue(ClaimDiscordUserIdName);
         if(claimValue != null && ulong.TryParse(claimValue, out ulong discordUserId))
@@ -168,7 +168,7 @@ public class PlayerAccount : IDisposable
             _discord = _serviceProvider.GetRequiredService<DiscordUser>();
             try
             {
-                await _discord.InitializeById(discordUserId);
+                _discord.InitializeById(discordUserId);
             }
             catch(Exception ex)
             {
@@ -588,7 +588,7 @@ public class PlayerAccount : IDisposable
         await AddClaim(ClaimDiscordUserIdName, id.ToString());
         try
         {
-            await InitializeDiscordUser();
+            InitializeDiscordUser();
         }
         catch (Exception)
         {

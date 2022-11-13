@@ -50,8 +50,9 @@ internal class DiscordIntegration : IDiscord
             throw new NullReferenceException(nameof(guild));
 
         BotIdProvider.BotId = _client.CurrentUser.Id;
-        Task.Run(async () => await _statusChannel.StartAsync(new DiscordGuild(guild)));
-        Task.Run(async () => await _serverConnectionChannel.StartAsync(new DiscordGuild(guild)));
+        _discordGuild = new DiscordGuild(guild);
+        _ = Task.Run(async () => await _statusChannel.StartAsync(_discordGuild));
+        _ = Task.Run(async () => await _serverConnectionChannel.StartAsync(_discordGuild));
 
         await _commandHandler.InitializeAsync();
     }
@@ -63,13 +64,4 @@ internal class DiscordIntegration : IDiscord
     }
 
     public IDiscordGuild? GetGuild() => _discordGuild;
-
-    public async ValueTask<IDiscordUser?> GetUserAsync(ulong id)
-    {
-        var user = await _client.GetUserAsync(id);
-        if (user == null)
-            return null;
-
-        return new DiscordUser(user);
-    }
 }

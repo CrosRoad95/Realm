@@ -2,10 +2,10 @@
 
 internal class DiscordUser : IDiscordUser
 {
-    private readonly IUser _user;
+    private readonly SocketGuildUser _user;
 
     public string Username => _user.Username;
-    public DiscordUser(IUser user)
+    public DiscordUser(SocketGuildUser user)
     {
         _user = user;
     }

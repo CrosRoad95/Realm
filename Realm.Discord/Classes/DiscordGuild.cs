@@ -13,4 +13,9 @@ internal class DiscordGuild : IDiscordGuild
     {
         return new DiscordChannel(_socketGuild.GetChannel(id));
     }
+
+    public IDiscordUser GetUserById(ulong id)
+    {
+        return new DiscordUser(_socketGuild.GetUser(id));
+    }
 }

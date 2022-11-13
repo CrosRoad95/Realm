@@ -3,4 +3,5 @@
 public interface IDiscordGuild
 {
     IDiscordChannel GetChannelById(ulong id);
+    IDiscordUser GetUserById(ulong id);
 }
