@@ -1,6 +1,4 @@
-﻿using Realm.Scripting.Scopes;
-
-namespace Realm.MTARPGServer;
+﻿namespace Realm.MTARPGServer;
 
 internal class SeederServerBuilder
 {

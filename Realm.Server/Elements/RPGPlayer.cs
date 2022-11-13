@@ -1,17 +1,4 @@
-﻿using Realm.Common.Utilities;
-using Realm.Resources.LuaInterop;
-using Realm.Server.Extensions;
-using Realm.Server.Logger.Enrichers;
-using Realm.Server.Services;
-using Serilog;
-using SlipeServer.Packets.Definitions.Lua;
-using SlipeServer.Server.Services;
-using System;
-using System.Drawing;
-using System.Globalization;
-using System.Security.Principal;
-
-namespace Realm.Server.Elements;
+﻿namespace Realm.Server.Elements;
 
 public class RPGPlayer : Player
 {

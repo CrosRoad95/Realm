@@ -1,6 +1,4 @@
-﻿using Realm.Resources.LuaInterop;
-
-namespace Realm.Server.ResourcesLogic;
+﻿namespace Realm.Server.ResourcesLogic;
 
 internal class LuaInteropLogic
 {

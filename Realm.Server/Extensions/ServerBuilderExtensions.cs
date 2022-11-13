@@ -1,9 +1,4 @@
-﻿using SlipeServer.Resources.NoClip;
-using Realm.Resources.Addons.AgnosticGuiSystem.CeGuiProvider;
-using Realm.Resources.Addons.Common;
-using Realm.Resources.LuaInterop;
-
-namespace Realm.Server.Extensions;
+﻿namespace Realm.Server.Extensions;
 
 public static class ServerBuilderExtensions
 {

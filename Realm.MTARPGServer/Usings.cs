@@ -16,3 +16,4 @@ global using Realm.Server.Scripting;
 global using Realm.Interfaces.Server;
 global using Realm.Server;
 global using Realm.Interfaces.Extend;
+global using Realm.Scripting.Scopes;

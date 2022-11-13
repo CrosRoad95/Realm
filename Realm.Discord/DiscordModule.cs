@@ -1,8 +1,4 @@
-﻿using Discord.Interactions;
-using Discord.WebSocket;
-using Realm.Discord.Services;
-
-namespace Realm.Discord;
+﻿namespace Realm.Discord;
 
 public class DiscordModule : IModule
 {

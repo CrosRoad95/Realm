@@ -1,6 +1,4 @@
-﻿using Discord.Interactions;
-
-namespace Realm.Discord.Channels;
+﻿namespace Realm.Discord.Channels;
 
 internal class ServerConnectionChannel
 {

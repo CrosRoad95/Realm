@@ -1,6 +1,4 @@
-﻿using Microsoft.ClearScript;
-using Serilog.Context;
-using SlipeServer.Server.Services;
+﻿using Serilog.Context;
 
 namespace Realm.Server.Scripting;
 

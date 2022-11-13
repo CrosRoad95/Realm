@@ -1,5 +1,4 @@
-﻿using Discord.Interactions;
-using Realm.Discord.Interfaces;
+﻿using Realm.Discord.Interfaces;
 
 namespace Realm.Discord.Commands;
 

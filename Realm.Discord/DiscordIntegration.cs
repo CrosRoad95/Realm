@@ -1,7 +1,4 @@
-﻿using Discord.Interactions;
-using Realm.Discord.Interfaces;
-using Realm.Discord.Services;
-using System.Reflection;
+﻿using Realm.Discord.Interfaces;
 
 namespace Realm.Discord;
 

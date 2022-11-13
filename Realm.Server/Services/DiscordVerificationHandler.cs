@@ -1,5 +1,4 @@
 ﻿using Realm.Discord;
-using Realm.Discord.Interfaces;
 
 namespace Realm.Server.Services;
 

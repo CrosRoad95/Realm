@@ -1,6 +1,4 @@
-﻿using Realm.Server.Elements;
-
-namespace Realm.Server.Logger.Enrichers;
+﻿namespace Realm.Server.Logger.Enrichers;
 
 internal class RPGVehicleEnricher : ILogEventEnricher
 {

@@ -1,7 +1,4 @@
-﻿using Realm.Resources.LuaInterop;
-using System.Globalization;
-
-namespace Realm.Server.Scripting;
+﻿namespace Realm.Server.Scripting;
 
 public class LocalizationFunctions
 {

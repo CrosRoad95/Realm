@@ -8,6 +8,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Server\Extensions\**" />
+    <EmbeddedResource Remove="Server\Extensions\**" />
+    <None Remove="Server\Extensions\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="YamlDotNet" Version="12.0.2" />
     <PackageReference Include="FluentValidation" Version="11.2.2" />
   </ItemGroup>
@@ -47,10 +53,6 @@
     <None Update="Server\Test\test.js">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Server\Extensions\" />
   </ItemGroup>
 
 </Project>

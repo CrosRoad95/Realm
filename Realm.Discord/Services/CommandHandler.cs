@@ -1,12 +1,4 @@
-﻿using Discord.Interactions;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Realm.Discord.Services;
+﻿namespace Realm.Discord.Services;
 
 public class CommandHandler
 {
