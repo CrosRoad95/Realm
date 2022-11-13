@@ -143,7 +143,11 @@ public class RPGPlayer : Player
         {
             luaValue = values.Select(_luaValueMapper.Map).ToArray();
         }
-        _logger.Verbose("Triggered client event {eventName} with arguments: {luaValue}", name, luaValue);
+
+        if(values.Any())
+            _logger.Verbose("Triggered client event {eventName} with arguments: {luaValue}.", name, luaValue);
+        else
+            _logger.Verbose("Triggered client event {eventName} with no arguments.", name);
         TriggerLuaEvent(name, this, luaValue);
     }
 

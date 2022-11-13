@@ -63,7 +63,10 @@ public class InputFunctions
                         return;
                     }
             }
-            _logger.Verbose("{player} executed command {commandName} with arguments {commandArguments}", player);
+            if(args.Arguments.Any())
+                _logger.Verbose("{player} executed command {commandName} with arguments {commandArguments}.", player);
+            else
+                _logger.Verbose("{player} executed command {commandName} with no arguments.", player);
             try
             {
                 if (callback.IsAsync())
