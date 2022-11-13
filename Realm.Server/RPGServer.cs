@@ -1,4 +1,6 @@
-﻿namespace Realm.Server;
+﻿using Realm.Server.Elements.Variants;
+
+namespace Realm.Server;
 
 public partial class RPGServer : IRPGServer, IReloadable
 {
@@ -136,6 +138,8 @@ public partial class RPGServer : IRPGServer, IReloadable
         scriptingModuleInterface.AddHostType(typeof(Claim));
         scriptingModuleInterface.AddHostType(typeof(RPGPlayer));
         scriptingModuleInterface.AddHostType(typeof(Spawn));
+        scriptingModuleInterface.AddHostType(typeof(RPGVehicle));
+        scriptingModuleInterface.AddHostType(typeof(RPGVariantBlip));
         scriptingModuleInterface.AddHostType(typeof(FormContextEvent));
         scriptingModuleInterface.AddHostType(typeof(PlayerJoinedEvent));
         scriptingModuleInterface.AddHostType(typeof(PlayerLoggedInEvent));

@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json.Linq;
+using Realm.Server.Elements.Variants;
 using System;
 
 namespace Realm.Server.Scripting;
@@ -47,6 +48,14 @@ public class ElementFunctions
         blip.Position = position;
         _rpgServer.AssociateElement(blip);
         return blip;
+    }
+
+    public RPGVariantBlip CreateVariantBlip(Vector3 position)
+    {
+        var blip = _rpgServer.GetRequiredService<RPGBlip>();
+        blip.SetIsVariant();
+        blip.Position = position;
+        return new RPGVariantBlip(blip);
     }
 
     [NoScriptAccess]

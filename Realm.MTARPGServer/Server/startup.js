@@ -88,6 +88,10 @@ addEventHandler("onPlayerLogin", async ({ player, account }) => {
         }
 
     }
+
+    const variantBlip = createVariantBlip(new Vector3(50, 50, 0));
+    variantBlip.createFor(player, 5)
+
 })
 
 addEventHandler("onPlayerLogout", ({ player }) => {
