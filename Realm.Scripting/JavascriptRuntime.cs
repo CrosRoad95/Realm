@@ -18,9 +18,10 @@ internal class JavascriptRuntime : IScriptingModuleInterface, IReloadable
         _engine.DocumentSettings.AccessFlags = DocumentAccessFlags.EnableAllLoading;
         _engine.Script.isAsyncFunc = _engine.Evaluate("const ctor = (async() => {}).constructor; x => x instanceof ctor");
         AddHostType(typeof(JavaScriptExtensions));
-        AddHostType(typeof(Vector4));
         AddHostType(typeof(Vector2));
         AddHostType(typeof(Vector3));
+        AddHostType(typeof(Vector4));
+        AddHostType(typeof(Color));
         AddHostType(typeof(Matrix4x4));
         AddHostType(typeof(Quaternion));
         AddHostType(typeof(Type));

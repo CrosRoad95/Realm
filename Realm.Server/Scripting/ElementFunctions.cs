@@ -62,6 +62,26 @@ public class ElementFunctions
         return new RPGVariantBlip(blip);
     }
 
+    public RPGRadarArea CreateRadarArea(Vector2 position, Vector2 size, Color color)
+    {
+        var radarArea = _rpgServer.GetRequiredService<RPGRadarArea>();
+        radarArea.Position2 = position;
+        radarArea.Size = size;
+        radarArea.Color = color;
+        _rpgServer.AssociateElement(radarArea);
+        return radarArea;
+    }
+    
+    public RPGVariantRadarArea CreateVariantRadarArea(Vector2 position, Vector2 size)
+    {
+        var variant = _rpgServer.GetRequiredService<RPGRadarArea>();
+        variant.Id = _elementIdGenerator.GetId();
+        variant.SetIsVariant();
+        variant.Position2 = position;
+        variant.Size = size;
+        return new RPGVariantRadarArea(variant);
+    }
+
     [NoScriptAccess]
     public IEnumerable<object> GetCollectionByType(string type)
     {
@@ -71,6 +91,7 @@ public class ElementFunctions
             "player" => _elementCollection.GetByType<Player>().Cast<object>(),
             "vehicle" => _elementCollection.GetByType<RPGVehicle>().Cast<object>(),
             "blip" => _elementCollection.GetByType<RPGBlip>().Cast<object>(),
+            "radararea" => _elementCollection.GetByType<RPGRadarArea>().Cast<object>(),
             _ => throw new NotSupportedException($"Unsupported element type '{type}'")
         };
     }

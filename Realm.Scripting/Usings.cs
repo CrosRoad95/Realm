@@ -5,6 +5,7 @@ global using System.Text;
 global using System.Threading.Tasks;
 global using System.Reflection;
 global using System.Numerics;
+global using System.Drawing;
 
 global using Microsoft.ClearScript;
 global using Microsoft.ClearScript.JavaScript;

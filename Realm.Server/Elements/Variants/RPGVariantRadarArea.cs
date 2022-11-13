@@ -1,35 +1,33 @@
 ﻿namespace Realm.Server.Elements.Variants;
 
-public class RPGVariantBlip
+public class RPGVariantRadarArea
 {
-    private readonly RPGBlip _rpgBlip;
+    private readonly RPGRadarArea _rpgRadarArea;
     private HashSet<RPGPlayer> _createdFor = new();
 
-    public RPGVariantBlip(RPGBlip rpgBlip)
+    public RPGVariantRadarArea(RPGRadarArea rpgRadarArea)
     {
-        _rpgBlip = rpgBlip;
+        _rpgRadarArea = rpgRadarArea;
     }
 
     public void DestroyFor(RPGPlayer player)
     {
         if (!_createdFor.Contains(player))
-            throw new Exception("Blip is already cleared for this player.");
+            throw new Exception("RadarArea is already cleared for this player.");
 
-        _rpgBlip.DestroyFor(player);
+        _rpgRadarArea.DestroyFor(player);
         _createdFor.Remove(player);
         player.Disconnected -= Player_Disconnected;
     }
 
-    public void CreateFor(RPGPlayer player, int icon)
+    public void CreateFor(RPGPlayer player, Color color, bool flashing = false)
     {
-        if (!Enum.IsDefined(typeof(BlipIcon), icon))
-            throw new Exception("Invalid icon.");
-
         if (_createdFor.Contains(player))
             DestroyFor(player);
 
-        _rpgBlip.Icon = (BlipIcon)icon;
-        _rpgBlip.CreateFor(player);
+        _rpgRadarArea.Color = color;
+        _rpgRadarArea.IsFlashing = flashing;
+        _rpgRadarArea.CreateFor(player);
         _createdFor.Add(player);
         player.Disconnected += Player_Disconnected;
     }

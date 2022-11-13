@@ -70,6 +70,7 @@ public partial class RPGServer : IRPGServer, IReloadable
                     services.AddTransient<Spawn>();
                     services.AddTransient<RPGVehicle>();
                     services.AddTransient<RPGBlip>();
+                    services.AddTransient<RPGRadarArea>();
                     if (modules != null)
                         foreach (var module in modules)
                         {

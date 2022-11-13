@@ -17,6 +17,9 @@ Logger.information("spawned blip: {blip}, icon: {blipIcon}", blip, blip.icon);
 const spawn = createSpawn("dynamicSpawn", "test", new Vector3(0, 20, 3));
 //spawn.addRequiredPolicy("Admin");
 
+const testRadarArea = createRadarArea(new Vector2(0, 0), new Vector2(50, 50), Color.fromArgb(255, 255, 0, 0));
+const testVariantRadarArea = createVariantRadarArea(new Vector2(50, 0), new Vector2(50, 50));
+
 Logger.information("createSpawn is persistant?: {persistant}", spawn.isPersistant());
 addEventHandler("onPlayerJoin", async ({ player }) => {
     Logger.information("player joined: {player} isLoggedIn={isLoggedIn} language={language}", player.name, player.isLoggedIn, player.language);
@@ -91,6 +94,7 @@ addEventHandler("onPlayerLogin", async ({ player, account }) => {
     }
 
     variantBlip.createFor(player, 5)
+    //testVariantRadarArea.createFor(player, Color.fromArgb(255, 0, 255, 0));
 })
 
 addEventHandler("onPlayerLogout", ({ player }) => {
