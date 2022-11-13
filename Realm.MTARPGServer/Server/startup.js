@@ -11,7 +11,8 @@ Logger.information("loaded modules: {modules}", JSON.stringify(getModules()));
 const testVehicle = createVehicle(404, new Vector3(-10, -10, 3))
 Logger.information("spawned vehicle: {testVehicle}", testVehicle);
 
-const blip = createBlip(5, new Vector3(0, 0, 0));
+const variantBlip = createVariantBlip(new Vector3(50, 50, 0));
+const blip = createBlip(6, new Vector3(0, 0, 0));
 Logger.information("spawned blip: {blip}, icon: {blipIcon}", blip, blip.icon);
 const spawn = createSpawn("dynamicSpawn", "test", new Vector3(0, 20, 3));
 //spawn.addRequiredPolicy("Admin");
@@ -89,9 +90,7 @@ addEventHandler("onPlayerLogin", async ({ player, account }) => {
 
     }
 
-    const variantBlip = createVariantBlip(new Vector3(50, 50, 0));
     variantBlip.createFor(player, 5)
-
 })
 
 addEventHandler("onPlayerLogout", ({ player }) => {

@@ -5,7 +5,6 @@ public class RPGVariantBlip
     private readonly RPGBlip _rpgBlip;
     private HashSet<RPGPlayer> _createdFor = new();
 
-    [NoScriptAccess]
     public RPGVariantBlip(RPGBlip rpgBlip)
     {
         _rpgBlip = rpgBlip;
@@ -30,10 +29,10 @@ public class RPGVariantBlip
             DestroyFor(player);
 
         _rpgBlip.Icon = (BlipIcon)icon;
-        //_rpgBlip.CreateFor(player);
+        _rpgBlip.CreateFor(player);
         _rpgBlip.Icon = BlipIcon.Marker;
         _createdFor.Add(player);
-        //player.Disconnected += Player_Disconnected;
+        player.Disconnected += Player_Disconnected;
     }
 
     private void Player_Disconnected(Player sender, PlayerQuitEventArgs e)

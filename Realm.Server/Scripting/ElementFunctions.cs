@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json.Linq;
 using Realm.Server.Elements.Variants;
+using SlipeServer.Server.Elements.IdGeneration;
 using System;
 
 namespace Realm.Server.Scripting;
@@ -8,11 +9,13 @@ public class ElementFunctions
 {
     private readonly RPGServer _rpgServer;
     private readonly IElementCollection _elementCollection;
+    private readonly IElementIdGenerator _elementIdGenerator;
 
-    public ElementFunctions(RPGServer rpgServer, IElementCollection elementCollection)
+    public ElementFunctions(RPGServer rpgServer, IElementCollection elementCollection, IElementIdGenerator elementIdGenerator)
     {
         _rpgServer = rpgServer;
         _elementCollection = elementCollection;
+        _elementIdGenerator = elementIdGenerator;
     }
 
     public Spawn CreateSpawn(string id, string name, Vector3 position, Vector3? rotation = null)
@@ -53,6 +56,7 @@ public class ElementFunctions
     public RPGVariantBlip CreateVariantBlip(Vector3 position)
     {
         var blip = _rpgServer.GetRequiredService<RPGBlip>();
+        blip.Id = _elementIdGenerator.GetId();
         blip.SetIsVariant();
         blip.Position = position;
         return new RPGVariantBlip(blip);
