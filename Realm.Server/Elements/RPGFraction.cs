@@ -1,0 +1,68 @@
+﻿using System.Linq;
+
+namespace Realm.Server.Elements;
+
+public class RPGFraction : IDisposable
+{
+    private bool _disposed;
+    private readonly bool _isPersistant = PersistantScope.IsPersistant;
+
+    public string Code { get; [NoScriptAccess] set; } = "";
+    public string Name { get; [NoScriptAccess] set; } = "";
+    public string MemberClaim { get; [NoScriptAccess] set; } = "";
+    public Vector3 Position { get; [NoScriptAccess] set; }
+
+    [NoScriptAccess]
+    private readonly HashSet<PlayerAccount> _members = new();
+
+    public RPGFraction()
+    {
+    }
+
+    public object GetMembers() => _members.ToArray().ToScriptArray();
+
+    public bool IsPersistant()
+    {
+        CheckIfDisposed();
+        return _isPersistant;
+    }
+
+    private void CheckIfDisposed()
+    {
+        if (_disposed)
+            throw new ObjectDisposedException(GetType().FullName);
+    }
+
+    public string GetMemberClaimName() => $"fraction.{Code}.member";
+    public string GetLeaderClaimName() => $"fraction.{Code}.leader";
+
+    public bool IsMember(PlayerAccount playerAccount) => playerAccount.HasClaim(GetMemberClaimName());
+
+    [NoScriptAccess]
+    public async Task<bool> InternalAddMember(PlayerAccount playerAccount, object[]? permissions)
+    {
+        string value = "";
+        if(permissions != null)
+        {
+            if (permissions.Any(x => x.ToString()?.Contains(",") ?? false))
+                return false;
+            value = string.Join(',', permissions.Select(x => x.ToString()));
+        }
+        await playerAccount.AddClaim(GetMemberClaimName(), value);
+
+        return true;
+    }
+
+    public async Task<bool> AddMember(PlayerAccount playerAccount, ScriptObject? permissions = null)
+    {
+        if (IsMember(playerAccount))
+            return false;
+
+        return await InternalAddMember(playerAccount, permissions.ConvertArray());
+    }
+
+    public void Dispose()
+    {
+        _disposed = true;
+    }
+}

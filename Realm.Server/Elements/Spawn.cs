@@ -28,13 +28,6 @@ public class Spawn : Element, IDisposable
         _id = id;
     }
 
-
-    private void CheckIfDisposed()
-    {
-        if (_disposed)
-            throw new ObjectDisposedException(GetType().FullName);
-    }
-
     public bool IsPersistant()
     {
         CheckIfDisposed();
@@ -80,6 +73,12 @@ public class Spawn : Element, IDisposable
 
     public string LongUserFriendlyName() => Name;
     public override string ToString() => Name;
+
+    private void CheckIfDisposed()
+    {
+        if (_disposed)
+            throw new ObjectDisposedException(GetType().FullName);
+    }
 
     public void Dispose()
     {

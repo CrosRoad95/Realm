@@ -13,28 +13,9 @@ public class InputFunctions
         _logger = logger.ForContext<InputFunctions>();
     }
 
-    private static object[]? ConvertArray(ScriptObject? arg)
-    {
-        if (arg == null)
-            return null;
-
-        dynamic scriptObject = arg;
-        if (scriptObject.constructor.name == "Array")
-        {
-            int length = Convert.ToInt32(scriptObject.length);
-            var array = new object[length];
-            for (var index = 0; index < length; ++index)
-            {
-                array[index] = scriptObject[index];
-            }
-            return array;
-        }
-        return null;
-    }
-
     public bool AddCommandHandler(string command, ScriptObject callback, ScriptObject? requiredPoliciesObject = null)
     {
-        object[]? requiredPolicies = ConvertArray(requiredPoliciesObject);
+        object[]? requiredPolicies = requiredPoliciesObject.ConvertArray();
         if (requiredPolicies != null)
             _logger.Verbose("Created command {commandName} with required policies: {requiredPolicies}", command, requiredPolicies);
         else

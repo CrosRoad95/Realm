@@ -9,6 +9,24 @@ internal class SeedData
         public Vector3 Rotation { get; set; }
     }
     
+    public class Blip
+    {
+        public int Icon { get; set; }
+        public Vector3 Position { get; set; }
+    }
+    
+    public class FractionMember
+    {
+        public string[]? Permissions { get; set; }
+    }
+
+    public class Fraction
+    {
+        public string Name { get; set; }
+        public Vector3 Position { get; set; }
+        public Dictionary<string, FractionMember> Members { get; set; }
+    }
+    
     public class Account
     {
         public string Password { get; set; }
@@ -17,6 +35,8 @@ internal class SeedData
     }
 
     public Dictionary<string, Spawn> Spawns = new();
+    public Dictionary<string, Blip> Blips = new();
+    public Dictionary<string, Fraction> Fractions = new();
     public List<string> Roles = new();
     public Dictionary<string, Account> Accounts = new();
 }

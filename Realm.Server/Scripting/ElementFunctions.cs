@@ -80,6 +80,15 @@ public class ElementFunctions
         return new RPGVariantRadarArea(variant);
     }
 
+    public RPGFraction CreateFraction(string code, string name, Vector3 position)
+    {
+        var fraction = _rpgServer.GetRequiredService<RPGFraction>();
+        fraction.Code = code;
+        fraction.Name = name;
+        fraction.Position = position;
+        return fraction;
+    }
+
     [NoScriptAccess]
     public IEnumerable<object> GetCollectionByType(string type)
     {

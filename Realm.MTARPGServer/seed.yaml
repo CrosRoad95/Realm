@@ -7,6 +7,17 @@
     name: "Test spawn B"
     position: [0, 10, 3]
     rotation: [0, 0, 0]
+blips:
+  sapdBlip:
+    icon: 30
+    position: [-50, -50, 0]
+fractions:
+  sapd:
+    name: "San andreas police department"
+    position: [10, 10, 10]
+    members:
+      admin:
+        permissions: [all]
 roles: ["admin"]
 accounts:
   admin:

@@ -1,14 +1,18 @@
-﻿namespace Realm.MTARPGServer;
+﻿using Serilog;
+
+namespace Realm.MTARPGServer;
 
 internal class SeederServerBuilder
 {
     private readonly ElementFunctions _elementFunctions;
     private readonly IdentityFunctions _identityFunctions;
-
-    public SeederServerBuilder(ElementFunctions elementFunctions, IdentityFunctions identityFunctions)
+    private readonly ILogger _logger;
+    private readonly Dictionary<string, PlayerAccount> _createdAccounts = new();
+    public SeederServerBuilder(ElementFunctions elementFunctions, IdentityFunctions identityFunctions, ILogger logger)
     {
         _elementFunctions = elementFunctions;
         _identityFunctions = identityFunctions;
+        _logger = logger.ForContext<SeederServerBuilder>();
     }
 
     private void BuildSpawns(Dictionary<string, SeedData.Spawn> spawns)
@@ -16,6 +20,38 @@ internal class SeederServerBuilder
         foreach (var pair in spawns)
         {
             _elementFunctions.CreateSpawn(pair.Key, pair.Value.Name, pair.Value.Position, pair.Value.Rotation);
+            _logger.Information("Seeder: Created spawn {spawnName} at {position}", pair.Value.Name, pair.Value.Position);
+        }
+    }
+    
+    private void BuildBlips(Dictionary<string, SeedData.Blip> blips)
+    {
+        foreach (var pair in blips)
+        {
+            _elementFunctions.CreateBlip(pair.Value.Icon, pair.Value.Position);
+            _logger.Information("Seeder: Created blip {blipIcon} at {position}", pair.Value.Icon, pair.Value.Position);
+        }
+    }
+    
+    private async Task BuildFractions(Dictionary<string, SeedData.Fraction> fractionsData)
+    {
+        foreach (var pair in fractionsData)
+        {
+            var fraction = _elementFunctions.CreateFraction(pair.Key, pair.Value.Name, pair.Value.Position);
+            if(pair.Value.Members != null)
+            {
+                _logger.Information("Seeder: Created fraction {fractionCode} with members:", pair.Key);
+                foreach (var memberPair in pair.Value.Members)
+                {
+                    if (!_createdAccounts.ContainsKey(memberPair.Key))
+                        throw new KeyNotFoundException($"Failed to find account name `{memberPair.Key}`");
+                    var account = _createdAccounts[memberPair.Key];
+                    await fraction.InternalAddMember(account, memberPair.Value.Permissions);
+                    _logger.Information("Seeder: Added member {accountName} to fraction {fractionCode} with permissions {permissions}", memberPair.Key, pair.Key, memberPair.Value.Permissions);
+                }
+            }
+            else
+                _logger.Information("Seeder: Created fraction {fractionCode} with no members", pair.Key);
         }
     }
 
@@ -42,14 +78,17 @@ internal class SeederServerBuilder
             await account.AddRoles(pair.Value.Roles);
             await account.AddClaim("seeded", "true");
             await account.AddClaim("persistant", "true");
+            _createdAccounts.Add(pair.Key, account);
         }
     }
 
     public async Task BuildFrom(SeedData seed)
     {
         using var _ = new PersistantScope();
-        BuildSpawns(seed.Spawns);
-        await BuildIdentityRoles(seed.Roles);
         await BuildIdentityAccounts(seed.Accounts);
+        BuildSpawns(seed.Spawns);
+        BuildBlips(seed.Blips);
+        await BuildFractions(seed.Fractions);
+        await BuildIdentityRoles(seed.Roles);
     }
 }
