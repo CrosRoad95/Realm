@@ -11,6 +11,10 @@ blips:
   sapdBlip:
     icon: 30
     position: [-50, -50, 0]
+pickups:
+  sapdStart:
+    model: 1314
+    position: [20, 5, 2]
 fractions:
   sapd:
     name: "San andreas police department"

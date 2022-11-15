@@ -15,6 +15,12 @@ internal class SeedData
         public Vector3 Position { get; set; }
     }
     
+    public class Pickup
+    {
+        public ushort Model { get; set; }
+        public Vector3 Position { get; set; }
+    }
+    
     public class FractionMember
     {
         public string[]? Permissions { get; set; }
@@ -36,6 +42,7 @@ internal class SeedData
 
     public Dictionary<string, Spawn> Spawns = new();
     public Dictionary<string, Blip> Blips = new();
+    public Dictionary<string, Pickup> Pickups = new();
     public Dictionary<string, Fraction> Fractions = new();
     public List<string> Roles = new();
     public Dictionary<string, Account> Accounts = new();

@@ -33,6 +33,15 @@ internal class SeederServerBuilder
         }
     }
     
+    private void BuildPickups(Dictionary<string, SeedData.Pickup> pickups)
+    {
+        foreach (var pair in pickups)
+        {
+            _elementFunctions.CreatePickup(pair.Value.Position, pair.Value.Model);
+            _logger.Information("Seeder: Created pickup {pickupModel} at {position}", pair.Value.Model, pair.Value.Position);
+        }
+    }
+    
     private async Task BuildFractions(Dictionary<string, SeedData.Fraction> fractionsData)
     {
         foreach (var pair in fractionsData)
@@ -88,6 +97,7 @@ internal class SeederServerBuilder
         await BuildIdentityAccounts(seed.Accounts);
         BuildSpawns(seed.Spawns);
         BuildBlips(seed.Blips);
+        BuildPickups(seed.Pickups);
         await BuildFractions(seed.Fractions);
         await BuildIdentityRoles(seed.Roles);
     }
