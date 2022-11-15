@@ -8,14 +8,14 @@ internal class DiscordIntegration : IDiscord
     private readonly DiscordConfiguration _discordConfiguration;
     private readonly StatusChannel _statusChannel;
     private readonly ServerConnectionChannel _serverConnectionChannel;
-    private readonly EventFunctions _eventFunctions;
+    private readonly EventScriptingFunctions _eventFunctions;
     private readonly CommandHandler _commandHandler;
     private readonly IDiscordUserChangedHandler _discordUserChangedHandler;
     private readonly ILogger _logger;
     private IDiscordGuild? _discordGuild = null;
 
     public DiscordIntegration(DiscordSocketClient discordSocketClient, DiscordConfiguration discordConfiguration, StatusChannel statusChannel, ServerConnectionChannel serverConnectionChannel,
-        ILogger logger, EventFunctions eventFunctions, CommandHandler commandHandler, IDiscordUserChangedHandler discordUserChangedHandler)
+        ILogger logger, EventScriptingFunctions eventFunctions, CommandHandler commandHandler, IDiscordUserChangedHandler discordUserChangedHandler)
     {
         _client = discordSocketClient;
         _discordConfiguration = discordConfiguration;

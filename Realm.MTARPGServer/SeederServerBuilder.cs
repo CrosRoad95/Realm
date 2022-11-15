@@ -4,11 +4,11 @@ namespace Realm.MTARPGServer;
 
 internal class SeederServerBuilder
 {
-    private readonly ElementFunctions _elementFunctions;
-    private readonly IdentityFunctions _identityFunctions;
+    private readonly ElementScriptingFunctions _elementFunctions;
+    private readonly IdentityScriptingFunctions _identityFunctions;
     private readonly ILogger _logger;
     private readonly Dictionary<string, PlayerAccount> _createdAccounts = new();
-    public SeederServerBuilder(ElementFunctions elementFunctions, IdentityFunctions identityFunctions, ILogger logger)
+    public SeederServerBuilder(ElementScriptingFunctions elementFunctions, IdentityScriptingFunctions identityFunctions, ILogger logger)
     {
         _elementFunctions = elementFunctions;
         _identityFunctions = identityFunctions;

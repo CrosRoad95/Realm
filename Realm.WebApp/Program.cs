@@ -29,7 +29,7 @@ builder.Services.AddSingleton<ConsoleService>();
 builder.Services.AddTransient<JSRuntimeService>();
 
 builder.Services.AddSingleton(subscribableLogsSink);
-builder.Services.AddSingleton<SnackbarFunctions>();
+builder.Services.AddSingleton<SnackbarScriptingFunctions>();
 builder.Services.AddSingleton<WebPanelIntegration>();
 builder.Services.AddSingleton<WebPanelModule>();
 builder.Services.AddSingleton<WeatherForecastService>();

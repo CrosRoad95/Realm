@@ -33,7 +33,7 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        var identityFunctions = _server.GetRequiredService<IdentityFunctions>();
+        var identityFunctions = _server.GetRequiredService<IdentityScriptingFunctions>();
         if(Guid.TryParse(Id, out Guid guidId))
         {
             var playerAccount = await identityFunctions.FindAccountById(guidId.ToString());

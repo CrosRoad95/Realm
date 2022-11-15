@@ -13,7 +13,7 @@ public class PlayerAccount : IDisposable
     private readonly IDb _db;
     private readonly IAuthorizationService _authorizationService;
     private readonly IAccountsInUseService _accountsInUseService;
-    private readonly EventFunctions _eventFunctions;
+    private readonly EventScriptingFunctions _eventFunctions;
     private readonly IServiceProvider _serviceProvider;
     private readonly ILogger _logger;
     private DateTime? _lastPlayTimeCounterStart;
@@ -60,7 +60,7 @@ public class PlayerAccount : IDisposable
     }
 
     public PlayerAccount(SignInManager<User> signInManager, UserManager<User> userManager, IDb db, IAuthorizationService authorizationService,
-        IAccountsInUseService accountsInUseService, ILogger logger, EventFunctions eventFunctions, IServiceProvider serviceProvider)
+        IAccountsInUseService accountsInUseService, ILogger logger, EventScriptingFunctions eventFunctions, IServiceProvider serviceProvider)
     {
         _user = null!;
         _signInManager = signInManager;

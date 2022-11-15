@@ -2,11 +2,11 @@
 
 namespace Realm.WebApp.Scripting.Classes;
 
-public class SnackbarFunctions
+public class SnackbarScriptingFunctions
 {
     [NoScriptAccess]
     public event Action<string>? SnackbarAdded;
-    public SnackbarFunctions()
+    public SnackbarScriptingFunctions()
     {
 
     }

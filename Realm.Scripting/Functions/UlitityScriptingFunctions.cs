@@ -1,8 +1,8 @@
 ﻿namespace Realm.Scripting.Classes;
 
-public class UlitityFunctions
+public class UlitityScriptingFunctions
 {
-    public UlitityFunctions()
+    public UlitityScriptingFunctions()
     {
 
     }

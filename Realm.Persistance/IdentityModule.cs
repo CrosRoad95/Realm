@@ -6,7 +6,7 @@ public class IdentityModule : IModule
 
     public void Configure(IServiceCollection services)
     {
-        services.AddSingleton<IdentityFunctions>();
+        services.AddSingleton<IdentityScriptingFunctions>();
     }
 
     public void Init(IServiceProvider serviceProvider)
@@ -27,7 +27,7 @@ public class IdentityModule : IModule
         scriptingModuleInterface.AddHostType(typeof(PlayerAccount));
         scriptingModuleInterface.AddHostType(typeof(PlayerRole));
         scriptingModuleInterface.AddHostType(typeof(DiscordUser));
-        scriptingModuleInterface.AddHostObject("Identity", serviceProvider.GetRequiredService<IdentityFunctions>(), true);
+        scriptingModuleInterface.AddHostObject("Identity", serviceProvider.GetRequiredService<IdentityScriptingFunctions>(), true);
     }
 
     public int GetPriority() => 100;

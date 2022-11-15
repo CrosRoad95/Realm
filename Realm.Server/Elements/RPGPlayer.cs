@@ -5,7 +5,7 @@ public class RPGPlayer : Player
     private readonly CancellationTokenSource _cancellationTokenSource;
     private readonly MtaServer _mtaServer;
     private readonly LuaValueMapper _luaValueMapper;
-    private readonly EventFunctions _eventFunctions;
+    private readonly EventScriptingFunctions _eventFunctions;
     private readonly DebugLog _debugLog;
     private readonly AgnosticGuiSystemService _agnosticGuiSystemService;
     private readonly AccountsInUseService _accountsInUseService;
@@ -57,7 +57,7 @@ public class RPGPlayer : Player
         }
     }
 
-    public RPGPlayer(MtaServer mtaServer, LuaValueMapper luaValueMapper, EventFunctions eventFunctions,
+    public RPGPlayer(MtaServer mtaServer, LuaValueMapper luaValueMapper, EventScriptingFunctions eventFunctions,
         DebugLog debugLog, AgnosticGuiSystemService agnosticGuiSystemService, AccountsInUseService accountsInUseService,
         ILogger logger, LuaInteropService luaInteropService, ChatBox chatBox)
     {

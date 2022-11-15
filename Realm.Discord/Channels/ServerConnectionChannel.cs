@@ -4,13 +4,13 @@ internal class ServerConnectionChannel
 {
     private readonly DiscordConfiguration.ConnectServerAccountConfiguration? _configuration;
     private readonly IBotdIdProvider _botdIdProvider;
-    private readonly EventFunctions _eventFunctions;
+    private readonly EventScriptingFunctions _eventFunctions;
     private ILogger _logger;
     private IDiscordMessage? _informationMessage;
 
     public delegate Task<string> GetStatusChannelContent();
 
-    public ServerConnectionChannel(DiscordConfiguration discordConfiguration, IBotdIdProvider botdIdProvider, ILogger logger, EventFunctions eventFunctions)
+    public ServerConnectionChannel(DiscordConfiguration discordConfiguration, IBotdIdProvider botdIdProvider, ILogger logger, EventScriptingFunctions eventFunctions)
     {
         _configuration = discordConfiguration.ConnectServerAccountChannel;
         _botdIdProvider = botdIdProvider;

@@ -3,13 +3,13 @@ using SlipeServer.Server.Elements.IdGeneration;
 
 namespace Realm.Server.Scripting;
 
-public class ElementFunctions
+public class ElementScriptingFunctions
 {
     private readonly RPGServer _rpgServer;
     private readonly IElementCollection _elementCollection;
     private readonly IElementIdGenerator _elementIdGenerator;
 
-    public ElementFunctions(RPGServer rpgServer, IElementCollection elementCollection, IElementIdGenerator elementIdGenerator)
+    public ElementScriptingFunctions(RPGServer rpgServer, IElementCollection elementCollection, IElementIdGenerator elementIdGenerator)
     {
         _rpgServer = rpgServer;
         _elementCollection = elementCollection;

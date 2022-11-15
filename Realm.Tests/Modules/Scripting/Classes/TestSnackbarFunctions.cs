@@ -2,6 +2,6 @@
 
 namespace Realm.Tests.Modules.Scripting.Classes;
 
-internal class TestSnackbarFunctions : SnackbarFunctions
+internal class TestSnackbarFunctions : SnackbarScriptingFunctions
 {
 }

@@ -1,10 +1,10 @@
 ﻿namespace Realm.Scripting.Classes;
 
-public class ModulesFunctions
+public class ModulesScriptingFunctions
 {
     private readonly List<IModule> _modules;
 
-    public ModulesFunctions(IEnumerable<IModule> modules)
+    public ModulesScriptingFunctions(IEnumerable<IModule> modules)
     {
         _modules = new List<IModule>(modules);
     }

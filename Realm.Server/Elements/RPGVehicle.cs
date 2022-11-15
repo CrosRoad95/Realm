@@ -6,10 +6,10 @@ public class RPGVehicle : Vehicle, IDisposable
     private string? _id = null;
     private readonly ILogger _logger;
     private readonly MtaServer _mtaServer;
-    private readonly EventFunctions _eventFunctions;
+    private readonly EventScriptingFunctions _eventFunctions;
     private readonly bool _isPersistant = PersistantScope.IsPersistant;
 
-    public RPGVehicle(MtaServer mtaServer, ILogger logger, EventFunctions eventFunctions) : base(404, new Vector3(0,0, 10000))
+    public RPGVehicle(MtaServer mtaServer, ILogger logger, EventScriptingFunctions eventFunctions) : base(404, new Vector3(0,0, 10000))
     {
         _mtaServer = mtaServer;
         _eventFunctions = eventFunctions;

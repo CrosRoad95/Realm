@@ -2,15 +2,15 @@
 
 namespace Realm.Server.Scripting;
 
-public class InputFunctions
+public class InputScriptingFunctions
 {
     private readonly CommandService _commandService;
     private readonly ILogger _logger;
 
-    public InputFunctions(CommandService commandService, ILogger logger)
+    public InputScriptingFunctions(CommandService commandService, ILogger logger)
     {
         _commandService = commandService;
-        _logger = logger.ForContext<InputFunctions>();
+        _logger = logger.ForContext<InputScriptingFunctions>();
     }
 
     public bool AddCommandHandler(string command, ScriptObject callback, ScriptObject? requiredPoliciesObject = null)

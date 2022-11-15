@@ -6,9 +6,9 @@ internal class DiscordVerificationHandler : IDiscordVerificationHandler
 {
     private readonly IElementCollection _elementCollection;
     private readonly DiscordConfiguration _discordConfiguration;
-    private readonly EventFunctions _eventFunctions;
+    private readonly EventScriptingFunctions _eventFunctions;
 
-    public DiscordVerificationHandler(IElementCollection elementCollection, DiscordConfiguration discordConfiguration, EventFunctions eventFunctions)
+    public DiscordVerificationHandler(IElementCollection elementCollection, DiscordConfiguration discordConfiguration, EventScriptingFunctions eventFunctions)
     {
         _elementCollection = elementCollection;
         _discordConfiguration = discordConfiguration;

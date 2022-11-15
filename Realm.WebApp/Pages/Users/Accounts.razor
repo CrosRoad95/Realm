@@ -43,7 +43,7 @@
 
     protected override async Task OnInitializedAsync()
     {
-        var identityFunctions = _server.GetRequiredService<IdentityFunctions>();
+        var identityFunctions = _server.GetRequiredService<IdentityScriptingFunctions>();
         var accounts = await identityFunctions.GetAllAccounts();
         foreach (var item in accounts)
         {

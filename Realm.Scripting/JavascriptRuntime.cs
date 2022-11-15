@@ -7,7 +7,7 @@ internal class JavascriptRuntime : IScriptingModuleInterface, IReloadable
     private readonly ILogger _logger;
     private readonly Func<string?> _basePathFactory;
 
-    public JavascriptRuntime(ILogger logger, Func<string?> basePathFactory, EventFunctions eventFunctions, ModulesFunctions modulesFunctions, UlitityFunctions ulitityFunctions)
+    public JavascriptRuntime(ILogger logger, Func<string?> basePathFactory, EventScriptingFunctions eventFunctions, ModulesScriptingFunctions modulesFunctions, UlitityScriptingFunctions ulitityFunctions)
     {
         HostSettings.CustomAttributeLoader = new LowercaseSymbolsLoader();
         _engine = new V8ScriptEngine(V8ScriptEngineFlags.EnableTaskPromiseConversion);

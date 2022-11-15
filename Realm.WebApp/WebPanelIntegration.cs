@@ -4,9 +4,9 @@ namespace Realm.WebApp;
 
 public class WebPanelIntegration
 {
-    private readonly SnackbarFunctions _snackbarFunctions;
+    private readonly SnackbarScriptingFunctions _snackbarFunctions;
 
-    public WebPanelIntegration(SnackbarFunctions snackbarFunctions)
+    public WebPanelIntegration(SnackbarScriptingFunctions snackbarFunctions)
     {
         _snackbarFunctions = snackbarFunctions;
     }

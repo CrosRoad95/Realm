@@ -1,13 +1,13 @@
 ﻿namespace Realm.Persistance.Scripting.Classes;
 
-public class IdentityFunctions
+public class IdentityScriptingFunctions
 {
     private readonly UserManager<User> _userManager;
     private readonly RoleManager<Role> _roleManager;
     private readonly IDb _db;
     private readonly IServiceProvider _serviceProvider;
 
-    public IdentityFunctions(UserManager<User> userManager, RoleManager<Role> roleManager, IDb db, IServiceProvider serviceProvider)
+    public IdentityScriptingFunctions(UserManager<User> userManager, RoleManager<Role> roleManager, IDb db, IServiceProvider serviceProvider)
     {
         _userManager = userManager;
         _roleManager = roleManager;

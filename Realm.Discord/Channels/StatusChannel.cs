@@ -4,13 +4,13 @@ internal class StatusChannel
 {
     private readonly DiscordConfiguration.StatusChannelConfiguration? _configuration;
     private readonly IBotdIdProvider _botdIdProvider;
-    private readonly EventFunctions _eventFunctions;
+    private readonly EventScriptingFunctions _eventFunctions;
     private ILogger _logger;
     private IDiscordMessage? _statusDiscordMessage;
 
     public delegate Task<string> GetStatusChannelContent();
 
-    public StatusChannel(DiscordConfiguration discordConfiguration, IBotdIdProvider botdIdProvider, ILogger logger, EventFunctions eventFunctions)
+    public StatusChannel(DiscordConfiguration discordConfiguration, IBotdIdProvider botdIdProvider, ILogger logger, EventScriptingFunctions eventFunctions)
     {
         _configuration = discordConfiguration.StatusChannel;
         _botdIdProvider = botdIdProvider;

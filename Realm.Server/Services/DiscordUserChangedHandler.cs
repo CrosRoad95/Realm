@@ -4,10 +4,10 @@ internal class DiscordUserChangedHandler : IDiscordUserChangedHandler
 {
     private readonly UserManager<User> _userManager;
     private readonly AccountsInUseService _accountsInUseService;
-    private readonly EventFunctions _eventFunctions;
-    private readonly IdentityFunctions _identityFunctions;
+    private readonly EventScriptingFunctions _eventFunctions;
+    private readonly IdentityScriptingFunctions _identityFunctions;
 
-    public DiscordUserChangedHandler(UserManager<User> userManager, AccountsInUseService accountsInUseService, EventFunctions eventFunctions, IdentityFunctions identityFunctions)
+    public DiscordUserChangedHandler(UserManager<User> userManager, AccountsInUseService accountsInUseService, EventScriptingFunctions eventFunctions, IdentityScriptingFunctions identityFunctions)
     {
         _userManager = userManager;
         _accountsInUseService = accountsInUseService;

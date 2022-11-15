@@ -8,11 +8,11 @@ public partial class RPGServer : IRPGServer, IReloadable
     private readonly MtaServer<RPGPlayer> _server;
     private readonly SlipeServerConfiguration _serverConfiguration;
     private readonly ILogger _logger;
-    private readonly EventFunctions _eventFunctions;
-    private readonly ElementFunctions _elementFunctions;
-    private readonly InputFunctions _inputFunctions;
-    private readonly GameplayFunctions _gameplayFunctions;
-    private readonly LocalizationFunctions _localizationFunctions;
+    private readonly EventScriptingFunctions _eventFunctions;
+    private readonly ElementScriptingFunctions _elementFunctions;
+    private readonly InputScriptingFunctions _inputFunctions;
+    private readonly GameplayScriptingFunctions _gameplayFunctions;
+    private readonly LocalizationScriptingFunctions _localizationFunctions;
     private readonly IElementCollection _elementCollection;
     private readonly IEnumerable<IModule> _modules;
 
@@ -51,10 +51,10 @@ public partial class RPGServer : IRPGServer, IReloadable
                     services.AddSingleton<IRPGServer>(this);
 
                     // Scripting
-                    services.AddSingleton<GameplayFunctions>();
-                    services.AddSingleton<LocalizationFunctions>();
-                    services.AddSingleton<ElementFunctions>();
-                    services.AddSingleton<InputFunctions>();
+                    services.AddSingleton<GameplayScriptingFunctions>();
+                    services.AddSingleton<LocalizationScriptingFunctions>();
+                    services.AddSingleton<ElementScriptingFunctions>();
+                    services.AddSingleton<InputScriptingFunctions>();
 
                     // Services
                     services.AddSingleton<AccountsInUseService>();
@@ -88,11 +88,11 @@ public partial class RPGServer : IRPGServer, IReloadable
         _server.PlayerJoined += e => PlayerJoined?.Invoke(e);
 
         var startup = _server.GetRequiredService<Startup>();
-        _eventFunctions = _server.GetRequiredService<EventFunctions>();
-        _gameplayFunctions = _server.GetRequiredService<GameplayFunctions>();
-        _localizationFunctions = _server.GetRequiredService<LocalizationFunctions>();
-        _elementFunctions = _server.GetRequiredService<ElementFunctions>();
-        _inputFunctions = _server.GetRequiredService<InputFunctions>();
+        _eventFunctions = _server.GetRequiredService<EventScriptingFunctions>();
+        _gameplayFunctions = _server.GetRequiredService<GameplayScriptingFunctions>();
+        _localizationFunctions = _server.GetRequiredService<LocalizationScriptingFunctions>();
+        _elementFunctions = _server.GetRequiredService<ElementScriptingFunctions>();
+        _inputFunctions = _server.GetRequiredService<InputScriptingFunctions>();
         _elementCollection = _server.GetRequiredService<IElementCollection>();
 
         var _ = Task.Run(startup.StartAsync);

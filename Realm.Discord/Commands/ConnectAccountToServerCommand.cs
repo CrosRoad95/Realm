@@ -6,9 +6,9 @@ public class ConnectAccountToServerCommand : InteractionModuleBase<SocketInterac
 {
     private readonly DiscordConfiguration _discordConfiguration;
     private readonly IDiscordVerificationHandler _discordVerificationHandler;
-    private readonly EventFunctions _eventFunctions;
+    private readonly EventScriptingFunctions _eventFunctions;
 
-    public ConnectAccountToServerCommand(DiscordConfiguration discordConfiguration, IDiscordVerificationHandler discordVerificationHandler, EventFunctions eventFunctions)
+    public ConnectAccountToServerCommand(DiscordConfiguration discordConfiguration, IDiscordVerificationHandler discordVerificationHandler, EventScriptingFunctions eventFunctions)
     {
         _discordConfiguration = discordConfiguration;
         _discordVerificationHandler = discordVerificationHandler;

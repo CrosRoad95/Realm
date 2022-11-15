@@ -2,10 +2,10 @@
 
 internal class ClientUILogic
 {
-    private readonly EventFunctions _eventFunctions;
+    private readonly EventScriptingFunctions _eventFunctions;
     private readonly FromLuaValueMapper _fromLuaValueMapper;
 
-    public ClientUILogic(AgnosticGuiSystemService agnosticGuiSystemService, EventFunctions eventFunctions, FromLuaValueMapper fromLuaValueMapper)
+    public ClientUILogic(AgnosticGuiSystemService agnosticGuiSystemService, EventScriptingFunctions eventFunctions, FromLuaValueMapper fromLuaValueMapper)
     {
         _eventFunctions = eventFunctions;
         _fromLuaValueMapper = fromLuaValueMapper;

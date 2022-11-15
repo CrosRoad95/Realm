@@ -1,13 +1,13 @@
 ﻿namespace Realm.Server.Scripting;
 
-public class LocalizationFunctions
+public class LocalizationScriptingFunctions
 {
     private readonly Func<string?> _basePathFactory;
     private readonly ConfigurationProvider _configurationProvider;
     private readonly LuaInteropService _luaInteropService;
     private readonly Dictionary<string, Dictionary<string, string>> _translations = new();
     private string _defaultLanguage = "pl";
-    public LocalizationFunctions(Func<string?> basePathFactory, ConfigurationProvider configurationProvider, LuaInteropService luaInteropService)
+    public LocalizationScriptingFunctions(Func<string?> basePathFactory, ConfigurationProvider configurationProvider, LuaInteropService luaInteropService)
     {
         _basePathFactory = basePathFactory;
         _configurationProvider = configurationProvider;

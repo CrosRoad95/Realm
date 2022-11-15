@@ -1,14 +1,14 @@
 ﻿namespace Realm.Scripting.Classes;
 
-public class EventFunctions : IReloadable
+public class EventScriptingFunctions : IReloadable
 {
     private readonly HashSet<string> _supportedEventsNames = new();
     private readonly Dictionary<string, List<ScriptObject>> _events = new();
     private readonly ILogger _logger;
 
-    public EventFunctions(ILogger logger)
+    public EventScriptingFunctions(ILogger logger)
     {
-        _logger = logger.ForContext<EventFunctions>();
+        _logger = logger.ForContext<EventScriptingFunctions>();
     }
 
     [NoScriptAccess]
