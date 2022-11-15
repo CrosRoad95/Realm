@@ -86,6 +86,28 @@ public class ElementScriptingFunctions
         variant.Size = size;
         return new RPGVariantRadarArea(variant);
     }
+    
+
+    [ScriptMember("createPickup")]
+    public RPGPickup CreatePickup(Vector3 position, ushort model)
+    {
+        var pickup = _rpgServer.GetRequiredService<RPGPickup>();
+        pickup.Position = position;
+        pickup.Model = model;
+        _rpgServer.AssociateElement(pickup);
+        return pickup;
+    }
+
+    [ScriptMember("createVariantRadarArea")]
+    public RPGVariantPickup CreateVariantRadarArea(Vector3 position, ushort model)
+    {
+        var variant = _rpgServer.GetRequiredService<RPGPickup>();
+        variant.Id = _elementIdGenerator.GetId();
+        variant.SetIsVariant();
+        variant.Position = position;
+        variant.Model = model;
+        return new RPGVariantPickup(variant);
+    }
 
     [ScriptMember("createFraction")]
     public RPGFraction CreateFraction(string code, string name, Vector3 position)
@@ -106,6 +128,7 @@ public class ElementScriptingFunctions
             "vehicle" => _elementCollection.GetByType<RPGVehicle>().Cast<object>(),
             "blip" => _elementCollection.GetByType<RPGBlip>().Cast<object>(),
             "radararea" => _elementCollection.GetByType<RPGRadarArea>().Cast<object>(),
+            "pickup" => _elementCollection.GetByType<RPGPickup>().Cast<object>(),
             _ => throw new NotSupportedException($"Unsupported element type '{type}'")
         };
     }

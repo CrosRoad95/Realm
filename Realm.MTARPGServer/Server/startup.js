@@ -13,6 +13,7 @@ Logger.information("spawned vehicle: {testVehicle}", testVehicle);
 
 const variantBlip = createVariantBlip(new Vector3(50, 50, 0));
 const blip = createBlip(6, new Vector3(0, 0, 0));
+const pickup = createPickup(new Vector3(10, 10, 4), 1240);
 Logger.information("spawned blip: {blip}, icon: {blipIcon}", blip, blip.icon);
 const spawn = createSpawn("dynamicSpawn", "test", new Vector3(0, 20, 3));
 //spawn.addRequiredPolicy("Admin");

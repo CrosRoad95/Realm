@@ -71,6 +71,7 @@ public partial class RPGServer : IRPGServer, IReloadable
                     services.AddTransient<RPGVehicle>();
                     services.AddTransient<RPGBlip>();
                     services.AddTransient<RPGRadarArea>();
+                    services.AddTransient<RPGPickup>();
                     services.AddTransient<RPGFraction>();
                     if (modules != null)
                         foreach (var module in modules)
@@ -146,6 +147,8 @@ public partial class RPGServer : IRPGServer, IReloadable
         scriptingModuleInterface.AddHostType(typeof(RPGVariantBlip));
         scriptingModuleInterface.AddHostType(typeof(RPGRadarArea));
         scriptingModuleInterface.AddHostType(typeof(RPGVariantRadarArea));
+        scriptingModuleInterface.AddHostType(typeof(RPGPickup));
+        scriptingModuleInterface.AddHostType(typeof(RPGVariantPickup));
         scriptingModuleInterface.AddHostType(typeof(RPGFraction));
         scriptingModuleInterface.AddHostType(typeof(FormContextEvent));
         scriptingModuleInterface.AddHostType(typeof(PlayerJoinedEvent));
