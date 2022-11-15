@@ -134,6 +134,8 @@ public class ElementScriptingFunctions
         if (IsElement(element))
         {
             _elementCollection.Remove(element);
+            if(element is IDisposable)
+                ((IDisposable)element).Dispose();
             return true;
         }
 
