@@ -1,5 +1,6 @@
 ﻿namespace Realm.Server.Elements;
 
+[NoDefaultScriptAccess]
 public class RPGRadarArea : RadarArea, IDisposable
 {
     private bool _disposed;
@@ -9,13 +10,13 @@ public class RPGRadarArea : RadarArea, IDisposable
     {
     }
 
-    [NoScriptAccess]
     public void SetIsVariant()
     {
         CheckIfDisposed();
         IsVariant = true;
     }
 
+    [ScriptMember("isPersistant")]
     public bool IsPersistant()
     {
         CheckIfDisposed();

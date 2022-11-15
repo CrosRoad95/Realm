@@ -1,5 +1,6 @@
 ﻿namespace Realm.Server.Scripting;
 
+[NoDefaultScriptAccess]
 public class LocalizationScriptingFunctions
 {
     private readonly Func<string?> _basePathFactory;
@@ -45,6 +46,7 @@ public class LocalizationScriptingFunctions
         }
     }
 
+    [ScriptMember("translationExists")]
     public bool TranslationExists(string langId, string name)
     {
         if (_translations.ContainsKey(langId))
@@ -52,11 +54,13 @@ public class LocalizationScriptingFunctions
         return false;
     }
 
+    [ScriptMember("getAvailiableLanguages")]
     public object GetAvailiableLanguages()
     {
         return _translations.Keys.ToArray().ToScriptArray();
     }
-    
+
+    [ScriptMember("getLanguageTranslations")]
     public object? GetLanguageTranslations(string langId)
     {
         if(_translations.ContainsKey(langId))
@@ -64,6 +68,7 @@ public class LocalizationScriptingFunctions
         return null;
     }
 
+    [ScriptMember("tryTranslate")]
     public string TryTranslate(string langId, string name, string @default)
     {
         Dictionary<string, string> translations;
@@ -78,6 +83,7 @@ public class LocalizationScriptingFunctions
         return @default;
     }
 
+    [ScriptMember("translate")]
     public string Translate(string langId, string name)
     {
         Dictionary<string, string> translations;
@@ -92,6 +98,7 @@ public class LocalizationScriptingFunctions
         throw new Exception($"Failed to find translation '{name}' for language '{langId}'");
     }
 
+    [ScriptMember("translateFor")]
     public string TranslateFor(RPGPlayer rpgPlayer, string name)
     {
         Dictionary<string, string> translations;

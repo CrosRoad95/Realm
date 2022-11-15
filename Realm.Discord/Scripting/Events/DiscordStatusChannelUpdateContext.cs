@@ -1,4 +1,5 @@
-﻿using Realm.Interfaces.Server;
+﻿using Microsoft.ClearScript;
+using Realm.Interfaces.Server;
 
 namespace Realm.Discord.Scripting.Events;
 
@@ -14,6 +15,7 @@ public class DiscordStatusChannelUpdateContext : INamedLuaEvent
 
     }
 
+    [ScriptMember("addLine")]
     public bool AddLine(string line)
     {
         _content.AppendLine(line);

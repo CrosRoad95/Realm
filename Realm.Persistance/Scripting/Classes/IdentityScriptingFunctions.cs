@@ -1,5 +1,6 @@
 ﻿namespace Realm.Persistance.Scripting.Classes;
 
+[NoDefaultScriptAccess]
 public class IdentityScriptingFunctions
 {
     private readonly UserManager<User> _userManager;
@@ -15,6 +16,7 @@ public class IdentityScriptingFunctions
         _serviceProvider = serviceProvider;
     }
 
+    [ScriptMember("findAccountById")]
     public async Task<PlayerAccount?> FindAccountById(string id)
     {
         var user = await _userManager.FindByIdAsync(id);
@@ -25,7 +27,8 @@ public class IdentityScriptingFunctions
         playerAccount.SetUser(user);
         return playerAccount;
     }
-    
+
+    [ScriptMember("findAccountByUserName")]
     public async Task<PlayerAccount?> FindAccountByUserName(string username)
     {
         var user = await _userManager.FindByNameAsync(username);
@@ -37,7 +40,8 @@ public class IdentityScriptingFunctions
         playerAccount.SetUser(user);
         return playerAccount;
     }
-    
+
+    [ScriptMember("findRoleByName")]
     public async Task<PlayerRole?> FindRoleByName(string name)
     {
         var role = await _roleManager.FindByNameAsync(name);
@@ -48,11 +52,13 @@ public class IdentityScriptingFunctions
         return new PlayerRole(role, _roleManager);
     }
 
+    [ScriptMember("getAllRoles")]
     public async Task<List<PlayerRole>> GetAllRoles()
     {
         return await _roleManager.Roles.Select(x => new PlayerRole(x, _roleManager)).ToListAsync();
     }
-    
+
+    [ScriptMember("getAllAccounts")]
     public async Task<List<PlayerAccount>> GetAllAccounts()
     {
         return (await _userManager.Users.ToListAsync()).Select(user =>
@@ -63,6 +69,7 @@ public class IdentityScriptingFunctions
         }).ToList();
     }
 
+    [ScriptMember("createAccount")]
     public async Task<PlayerAccount> CreateAccount(string username, string password)
     {
         var result = await _userManager.CreateAsync(new User
@@ -83,6 +90,7 @@ public class IdentityScriptingFunctions
         return account;
     }
 
+    [ScriptMember("createRole")]
     public async Task<PlayerRole> CreateRole(string name)
     {
         var result = await _roleManager.CreateAsync(new Role

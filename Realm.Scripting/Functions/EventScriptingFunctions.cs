@@ -1,5 +1,6 @@
 ﻿namespace Realm.Scripting.Classes;
 
+[NoDefaultScriptAccess]
 public class EventScriptingFunctions : IReloadable
 {
     private readonly HashSet<string> _supportedEventsNames = new();
@@ -11,7 +12,6 @@ public class EventScriptingFunctions : IReloadable
         _logger = logger.ForContext<EventScriptingFunctions>();
     }
 
-    [NoScriptAccess]
     public async Task InvokeEvent(string eventName, params object[] arguments)
     {
         if (!_supportedEventsNames.Contains(eventName))
@@ -44,12 +44,12 @@ public class EventScriptingFunctions : IReloadable
         }
     }
 
-    [NoScriptAccess]
     public void RegisterEvent(string eventName)
     {
         _supportedEventsNames.Add(eventName);
     }
 
+    [ScriptMember("addEventHandler")]
     public bool AddEventHandler(string eventName, ScriptObject callback)
     {
         if (!_supportedEventsNames.Contains(eventName))
@@ -61,6 +61,7 @@ public class EventScriptingFunctions : IReloadable
         return true;
     }
 
+    [ScriptMember("removeEventHandler")]
     public bool RemoveEventHandler(string eventName, ScriptObject callback)
     {
         if (!_supportedEventsNames.Contains(eventName) || !_events.ContainsKey(eventName))
@@ -72,6 +73,7 @@ public class EventScriptingFunctions : IReloadable
         return true;
     }
 
+    [ScriptMember("toString")]
     public override string ToString() => "Event";
 
     public Task Reload()

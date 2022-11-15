@@ -1,9 +1,9 @@
 ﻿namespace Realm.Server.Elements;
 
+[NoDefaultScriptAccess]
 public class RPGPlayer : Player
 {
     private readonly CancellationTokenSource _cancellationTokenSource;
-    private readonly MtaServer _mtaServer;
     private readonly LuaValueMapper _luaValueMapper;
     private readonly EventScriptingFunctions _eventFunctions;
     private readonly DebugLog _debugLog;
@@ -12,22 +12,23 @@ public class RPGPlayer : Player
     private readonly LuaInteropService _luaInteropService;
     private readonly ChatBox _chatBox;
     private readonly ILogger _logger;
-    [NoScriptAccess]
     public Latch ResourceStartingLatch = new(3); // TODO: remove hardcoded resources counter
-    [NoScriptAccess]
     public CancellationToken CancellationToken { get; private set; }
 
+
+    [ScriptMember("account", ScriptAccess.ReadOnly)]
     public PlayerAccount? Account { get; private set; }
+    [ScriptMember("language", ScriptAccess.ReadOnly)]
     public string Language { get; private set; } = "pl";
+    [ScriptMember("isLoggedIn", ScriptAccess.ReadOnly)]
     public bool IsLoggedIn => Account != null && Account.IsAuthenticated;
 
-    [NoScriptAccess]
     public event Action<RPGPlayer, bool>? DebugWorldChanged;
-    [NoScriptAccess]
     public event Action<RPGPlayer, string>? LoggedIn;
     public event Action<RPGPlayer, string>? LoggedOut;
-    [NoScriptAccess]
     private bool _debugWorld = false;
+
+    [ScriptMember("debugWorld")]
     public bool DebugWorld
     {
         get => _debugWorld; set
@@ -41,8 +42,8 @@ public class RPGPlayer : Player
         }
     }
 
-    [NoScriptAccess]
     private bool _debugView = false;
+    [ScriptMember("debugView")]
     public bool DebugView { get => _debugView; set
         {
             if(_debugView != value)
@@ -57,11 +58,10 @@ public class RPGPlayer : Player
         }
     }
 
-    public RPGPlayer(MtaServer mtaServer, LuaValueMapper luaValueMapper, EventScriptingFunctions eventFunctions,
+    public RPGPlayer(LuaValueMapper luaValueMapper, EventScriptingFunctions eventFunctions,
         DebugLog debugLog, AgnosticGuiSystemService agnosticGuiSystemService, AccountsInUseService accountsInUseService,
         ILogger logger, LuaInteropService luaInteropService, ChatBox chatBox)
     {
-        _mtaServer = mtaServer;
         _luaValueMapper = luaValueMapper;
         _eventFunctions = eventFunctions;
         _debugLog = debugLog;
@@ -101,6 +101,7 @@ public class RPGPlayer : Player
         ResourceStartingLatch.Decrement();
     }
 
+    [ScriptMember("spawn")]
     public virtual async Task<bool> Spawn(Spawn spawn)
     {
         if(await spawn.IsAuthorized(this))
@@ -116,9 +117,11 @@ public class RPGPlayer : Player
         return false;
     }
 
+    [ScriptMember("isPersistant")]
     public bool IsPersistant() => true;
 
     // TODO: improve
+    [ScriptMember("triggerClientEvent")]
     public void TriggerClientEvent(string name, params object[] values)
     {
         LuaValue luaValue;
@@ -138,6 +141,7 @@ public class RPGPlayer : Player
         TriggerLuaEvent(name, this, luaValue);
     }
 
+    [ScriptMember("logIn")]
     public async Task<bool> LogIn(PlayerAccount account, string password)
     {
         if (IsLoggedIn)
@@ -159,6 +163,7 @@ public class RPGPlayer : Player
         return true;
     }
 
+    [ScriptMember("logOut")]
     public async Task<bool> LogOut()
     {
         if (!IsLoggedIn || Account == null)
@@ -174,6 +179,7 @@ public class RPGPlayer : Player
         return true;
     }
 
+    [ScriptMember("openGui")]
     public bool OpenGui(string gui)
     {
         var success = _agnosticGuiSystemService.OpenGui(this, gui);
@@ -183,6 +189,8 @@ public class RPGPlayer : Player
             _logger.Verbose("Failed to open gui {gui}", gui);
         return success;
     }
+
+    [ScriptMember("closeGui")]
     public bool CloseGui(string gui)
     {
         var success =_agnosticGuiSystemService.CloseGui(this, gui);
@@ -192,28 +200,32 @@ public class RPGPlayer : Player
             _logger.Verbose("Failed to close gui {gui}", gui);
         return success;
     }
+
+    [ScriptMember("closeAllGuis")]
     public void CloseAllGuis()
     {
         _agnosticGuiSystemService.CloseAllGuis(this);
         _logger.Verbose("Closed all guis");
     }
 
+    [ScriptMember("sendChatMessage")]
     public void SendChatMessage(string message, Color? color = null, bool isColorCoded = false)
     {
         _chatBox.Output(message, color, isColorCoded);
     }
-    
+
+    [ScriptMember("clearChatBox")]
     public void ClearChatBox()
     {
         _chatBox.ClearFor(this);
     }
 
+    [ScriptMember("setClipboard")]
     public void SetClipboard(string content)
     {
         _luaInteropService.SetClipboard(this, content);
     }
 
-    [NoScriptAccess]
     public void Reset()
     {
         Camera.Fade(CameraFade.Out, 0, Color.Black);
@@ -223,6 +235,8 @@ public class RPGPlayer : Player
         DebugView = false;
     }
 
+    [ScriptMember("longUserFriendlyName")]
     public string LongUserFriendlyName() => Name;
+    [ScriptMember("toString")]
     public override string ToString() => Name;
 }

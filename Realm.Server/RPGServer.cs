@@ -135,7 +135,7 @@ public partial class RPGServer : IRPGServer, IReloadable
         // Functions
         scriptingModuleInterface.AddHostObject("Elements", _elementFunctions, true);
         scriptingModuleInterface.AddHostObject("Input", _inputFunctions, true);
-        scriptingModuleInterface.AddHostObject("Gameplay", _gameplayFunctions, true);
+        scriptingModuleInterface.AddHostObject("Gameplay", _gameplayFunctions);
         scriptingModuleInterface.AddHostObject("Localization", _localizationFunctions, true);
 
         // Classes & Events & Contextes

@@ -1,5 +1,6 @@
 ﻿namespace Realm.Server.Elements;
 
+[NoDefaultScriptAccess]
 public class RPGBlip : Blip, IDisposable
 {
     private bool _disposed;
@@ -9,12 +10,14 @@ public class RPGBlip : Blip, IDisposable
     {
     }
 
-    [NoScriptAccess]
     public void SetIsVariant()
     {
         CheckIfDisposed();
         IsVariant = true;
     }
+
+    [ScriptMember("isPersistant")]
+    public bool IsPersistant() => true;
 
     private void CheckIfDisposed()
     {

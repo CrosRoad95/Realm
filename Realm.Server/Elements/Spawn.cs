@@ -1,10 +1,11 @@
 ﻿namespace Realm.Server.Elements;
 
+[NoDefaultScriptAccess]
 public class Spawn : Element, IDisposable
 {
     private bool _disposed = false;
     private readonly AuthorizationPoliciesProvider _authorizationPoliciesProvider;
-    private string _id;
+    private string? _id;
     private ILogger _logger;
 
     private readonly bool _isPersistant = PersistantScope.IsPersistant;
@@ -22,18 +23,19 @@ public class Spawn : Element, IDisposable
             .ForContext(new SpawnEnricher(this));
     }
 
-    [NoScriptAccess]
     public void AssignId(string id)
     {
         _id = id;
     }
 
+    [ScriptMember("isPersistant")]
     public bool IsPersistant()
     {
         CheckIfDisposed();
         return _isPersistant;
     }
 
+    [ScriptMember("addRequiredPolicy")]
     public bool AddRequiredPolicy(string policy)
     {
         CheckIfDisposed();
@@ -45,6 +47,7 @@ public class Spawn : Element, IDisposable
         return true;
     }
 
+    [ScriptMember("removeRequiredPolicy")]
     public bool RemoveRequiredPolicy(string policy)
     {
         CheckIfDisposed();
@@ -56,6 +59,7 @@ public class Spawn : Element, IDisposable
         return true;
     }
 
+    [ScriptMember("isAuthorized")]
     public async Task<bool> IsAuthorized(RPGPlayer player)
     {
         CheckIfDisposed();
@@ -71,7 +75,9 @@ public class Spawn : Element, IDisposable
         return true;
     }
 
+    [ScriptMember("longUserFriendlyName")]
     public string LongUserFriendlyName() => Name;
+    [ScriptMember("toString")]
     public override string ToString() => Name;
 
     private void CheckIfDisposed()

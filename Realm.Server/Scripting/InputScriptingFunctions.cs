@@ -2,6 +2,7 @@
 
 namespace Realm.Server.Scripting;
 
+[NoDefaultScriptAccess]
 public class InputScriptingFunctions
 {
     private readonly CommandService _commandService;
@@ -13,6 +14,7 @@ public class InputScriptingFunctions
         _logger = logger.ForContext<InputScriptingFunctions>();
     }
 
+    [ScriptMember("addCommandHandler")]
     public bool AddCommandHandler(string command, ScriptObject callback, ScriptObject? requiredPoliciesObject = null)
     {
         object[]? requiredPolicies = requiredPoliciesObject.ConvertArray();

@@ -1,17 +1,16 @@
 ﻿namespace Realm.Server.Elements;
 
+[NoDefaultScriptAccess]
 public class RPGVehicle : Vehicle, IDisposable
 {
     private bool _disposed = false;
     private string? _id = null;
     private readonly ILogger _logger;
-    private readonly MtaServer _mtaServer;
     private readonly EventScriptingFunctions _eventFunctions;
     private readonly bool _isPersistant = PersistantScope.IsPersistant;
 
-    public RPGVehicle(MtaServer mtaServer, ILogger logger, EventScriptingFunctions eventFunctions) : base(404, new Vector3(0,0, 10000))
+    public RPGVehicle(ILogger logger, EventScriptingFunctions eventFunctions) : base(404, new Vector3(0,0, 10000))
     {
-        _mtaServer = mtaServer;
         _eventFunctions = eventFunctions;
         _logger = logger
             .ForContext<RPGVehicle>()
@@ -19,12 +18,12 @@ public class RPGVehicle : Vehicle, IDisposable
         IsFrozen = true;
     }
 
-    [NoScriptAccess]
     public void AssignId(string id)
     {
         _id = id;
     }
 
+    [ScriptMember("destroy")]
     public new bool Destroy()
     {
         if (_isPersistant)
@@ -34,7 +33,8 @@ public class RPGVehicle : Vehicle, IDisposable
         return base.Destroy();
     }
 
-    public virtual async Task<bool> Spawn(Spawn spawn)
+    [ScriptMember("spawn")]
+    public async Task<bool> Spawn(Spawn spawn)
     {
         Position = spawn.Position;
         Rotation = spawn.Rotation;
@@ -50,6 +50,7 @@ public class RPGVehicle : Vehicle, IDisposable
             throw new ObjectDisposedException(GetType().FullName);
     }
 
+    [ScriptMember("isPersistant")]
     public bool IsPersistant()
     {
         CheckIfDisposed();

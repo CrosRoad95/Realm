@@ -3,6 +3,7 @@ using SlipeServer.Server.Elements.IdGeneration;
 
 namespace Realm.Server.Scripting;
 
+[NoDefaultScriptAccess]
 public class ElementScriptingFunctions
 {
     private readonly RPGServer _rpgServer;
@@ -16,6 +17,7 @@ public class ElementScriptingFunctions
         _elementIdGenerator = elementIdGenerator;
     }
 
+    [ScriptMember("createSpawn")]
     public Spawn CreateSpawn(string id, string name, Vector3 position, Vector3? rotation = null)
     {
         var spawn = _rpgServer.GetRequiredService<Spawn>();
@@ -28,6 +30,7 @@ public class ElementScriptingFunctions
         return spawn;
     }
 
+    [ScriptMember("createVehicle")]
     public RPGVehicle CreateVehicle(ushort model, Vector3 position, Vector3? rotation = null)
     {
         var vehicle = _rpgServer.GetRequiredService<RPGVehicle>();
@@ -38,7 +41,8 @@ public class ElementScriptingFunctions
         _rpgServer.AssociateElement(vehicle);
         return vehicle;
     }
-    
+
+    [ScriptMember("createBlip")]
     public RPGBlip CreateBlip(int icon, Vector3 position)
     {
         if (!Enum.IsDefined(typeof(BlipIcon), icon))
@@ -51,6 +55,7 @@ public class ElementScriptingFunctions
         return blip;
     }
 
+    [ScriptMember("createVariantBlip")]
     public RPGVariantBlip CreateVariantBlip(Vector3 position)
     {
         var blip = _rpgServer.GetRequiredService<RPGBlip>();
@@ -60,6 +65,7 @@ public class ElementScriptingFunctions
         return new RPGVariantBlip(blip);
     }
 
+    [ScriptMember("createRadarArea")]
     public RPGRadarArea CreateRadarArea(Vector2 position, Vector2 size, Color color)
     {
         var radarArea = _rpgServer.GetRequiredService<RPGRadarArea>();
@@ -69,7 +75,8 @@ public class ElementScriptingFunctions
         _rpgServer.AssociateElement(radarArea);
         return radarArea;
     }
-    
+
+    [ScriptMember("createVariantRadarArea")]
     public RPGVariantRadarArea CreateVariantRadarArea(Vector2 position, Vector2 size)
     {
         var variant = _rpgServer.GetRequiredService<RPGRadarArea>();
@@ -80,6 +87,7 @@ public class ElementScriptingFunctions
         return new RPGVariantRadarArea(variant);
     }
 
+    [ScriptMember("createFraction")]
     public RPGFraction CreateFraction(string code, string name, Vector3 position)
     {
         var fraction = _rpgServer.GetRequiredService<RPGFraction>();
@@ -89,7 +97,6 @@ public class ElementScriptingFunctions
         return fraction;
     }
 
-    [NoScriptAccess]
     public IEnumerable<object> GetCollectionByType(string type)
     {
         return type switch
@@ -103,18 +110,21 @@ public class ElementScriptingFunctions
         };
     }
 
+    [ScriptMember("getElementsByType")]
     public object GetElementsByType(string type)
     {
         var elements = GetCollectionByType(type);
         return elements.ToArray().ToScriptArray();
     }
 
+    [ScriptMember("countElementsByType")]
     public int CountElementsByType(string type)
     {
         var elements = GetCollectionByType(type);
         return elements.Count();
     }
 
+    [ScriptMember("destroyElement")]
     public bool DestroyElement(Element element)
     {
         switch (element)
@@ -142,6 +152,7 @@ public class ElementScriptingFunctions
         return false;
     }
 
+    [ScriptMember("isElement")]
     public bool IsElement(Element element)
     {
         if (_elementCollection.Get(element.Id) != null)

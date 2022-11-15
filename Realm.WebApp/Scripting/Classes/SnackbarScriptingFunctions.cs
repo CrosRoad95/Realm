@@ -2,15 +2,16 @@
 
 namespace Realm.WebApp.Scripting.Classes;
 
+[NoDefaultScriptAccess]
 public class SnackbarScriptingFunctions
 {
-    [NoScriptAccess]
     public event Action<string>? SnackbarAdded;
     public SnackbarScriptingFunctions()
     {
 
     }
 
+    [ScriptMember("webPanelAddSnackbar")]
     public bool WebPanelAddSnackbar(string message)
     {
         SnackbarAdded?.Invoke(message);

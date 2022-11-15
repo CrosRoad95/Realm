@@ -1,7 +1,6 @@
-﻿using System.Linq;
+﻿namespace Realm.Server.Elements;
 
-namespace Realm.Server.Elements;
-
+[NoDefaultScriptAccess]
 public class RPGFraction : IDisposable
 {
     private bool _disposed;
@@ -19,8 +18,10 @@ public class RPGFraction : IDisposable
     {
     }
 
+    [ScriptMember("getMembers")]
     public object GetMembers() => _members.ToArray().ToScriptArray();
 
+    [ScriptMember("isPersistant")]
     public bool IsPersistant()
     {
         CheckIfDisposed();
@@ -33,12 +34,14 @@ public class RPGFraction : IDisposable
             throw new ObjectDisposedException(GetType().FullName);
     }
 
+    [ScriptMember("getMemberClaimName")]
     public string GetMemberClaimName() => $"fraction.{Code}.member";
+    [ScriptMember("getLeaderClaimName")]
     public string GetLeaderClaimName() => $"fraction.{Code}.leader";
 
+    [ScriptMember("isMember")]
     public bool IsMember(PlayerAccount playerAccount) => playerAccount.HasClaim(GetMemberClaimName());
 
-    [NoScriptAccess]
     public async Task<bool> InternalAddMember(PlayerAccount playerAccount, object[]? permissions)
     {
         string value = "";
@@ -53,6 +56,7 @@ public class RPGFraction : IDisposable
         return true;
     }
 
+    [ScriptMember("addMember")]
     public async Task<bool> AddMember(PlayerAccount playerAccount, ScriptObject? permissions = null)
     {
         if (IsMember(playerAccount))

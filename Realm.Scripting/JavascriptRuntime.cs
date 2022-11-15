@@ -26,7 +26,7 @@ internal class JavascriptRuntime : IScriptingModuleInterface, IReloadable
         AddHostType(typeof(Quaternion));
         AddHostType(typeof(Type));
 
-        AddHostObject("Logger", _logger.ForContext("javascript", true), false);
+        AddHostObject("Logger", new LoggerScriptingFunctions(_logger));
         AddHostObject("Events", eventFunctions, true);
         AddHostObject("Modules", modulesFunctions, true);
         AddHostObject("Utility", ulitityFunctions, true);
@@ -55,7 +55,7 @@ internal class JavascriptRuntime : IScriptingModuleInterface, IReloadable
             _engine.AddHostObject(name, @object);
     }
 
-    public async Task<object> ExecuteAsync(string code, string name)
+    public async Task<object?> ExecuteAsync(string code, string name)
     {
         var documentInfo = new DocumentInfo(name)
         {
