@@ -1,4 +1,6 @@
-﻿namespace Realm.Server.Elements;
+﻿using Realm.Server.Scripting.Sessions;
+
+namespace Realm.Server.Elements;
 
 [NoDefaultScriptAccess]
 public class RPGFraction : IDisposable
@@ -63,6 +65,17 @@ public class RPGFraction : IDisposable
             return false;
 
         return await InternalAddMember(playerAccount, permissions.ConvertArray());
+    }
+
+    [ScriptMember("startSession")]
+    public bool StartSession(RPGPlayer rpgPlayer)
+    {
+        if (rpgPlayer.IsDuringSession<FractionSession>())
+            return false;
+
+        var session = new FractionSession();
+        rpgPlayer.StartSession(session);
+        return true;
     }
 
     public void Dispose()

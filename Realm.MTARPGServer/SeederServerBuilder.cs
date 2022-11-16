@@ -1,4 +1,7 @@
-﻿using Serilog;
+﻿using Realm.Server.ElementCollections;
+using Serilog;
+using SlipeServer.Server.Elements;
+using static Realm.MTARPGServer.SeedData;
 
 namespace Realm.MTARPGServer;
 
@@ -6,21 +9,32 @@ internal class SeederServerBuilder
 {
     private readonly ElementScriptingFunctions _elementFunctions;
     private readonly IdentityScriptingFunctions _identityFunctions;
+    private readonly ElementByStringIdCollection _elementByStringIdCollection;
     private readonly ILogger _logger;
     private readonly Dictionary<string, PlayerAccount> _createdAccounts = new();
-    public SeederServerBuilder(ElementScriptingFunctions elementFunctions, IdentityScriptingFunctions identityFunctions, ILogger logger)
+    public SeederServerBuilder(ElementScriptingFunctions elementFunctions, IdentityScriptingFunctions identityFunctions, ILogger logger, ElementByStringIdCollection elementByStringIdCollection)
     {
         _elementFunctions = elementFunctions;
         _identityFunctions = identityFunctions;
+        _elementByStringIdCollection = elementByStringIdCollection;
         _logger = logger.ForContext<SeederServerBuilder>();
+    }
+
+    private void AssignElementToId(Element element, string id)
+    {
+        var succeed = _elementByStringIdCollection.AssignElementToId(element, id);
+        if (!succeed)
+            throw new Exception($"Failed to assign seeded element to id {id} because it is already in used.");
     }
 
     private void BuildSpawns(Dictionary<string, SeedData.Spawn> spawns)
     {
         foreach (var pair in spawns)
         {
-            _elementFunctions.CreateSpawn(pair.Key, pair.Value.Name, pair.Value.Position, pair.Value.Rotation);
-            _logger.Information("Seeder: Created spawn {spawnName} at {position}", pair.Value.Name, pair.Value.Position);
+            var spawn = _elementFunctions.CreateSpawn(pair.Value.Position, pair.Value.Rotation);
+            spawn.Name = pair.Value.Name;
+            AssignElementToId(spawn, pair.Key);
+            _logger.Information("Seeder: Created spawn of id {elementId} at {position}", pair.Key, pair.Value.Position);
         }
     }
     
@@ -28,8 +42,9 @@ internal class SeederServerBuilder
     {
         foreach (var pair in blips)
         {
-            _elementFunctions.CreateBlip(pair.Value.Icon, pair.Value.Position);
-            _logger.Information("Seeder: Created blip {blipIcon} at {position}", pair.Value.Icon, pair.Value.Position);
+            var blip = _elementFunctions.CreateBlip(pair.Value.Position, pair.Value.Icon);
+            AssignElementToId(blip, pair.Key);
+            _logger.Information("Seeder: Created blip of id {elementId} with icon {blipIcon} at {position}", pair.Key, pair.Value.Icon, pair.Value.Position);
         }
     }
     
@@ -37,8 +52,9 @@ internal class SeederServerBuilder
     {
         foreach (var pair in pickups)
         {
-            _elementFunctions.CreatePickup(pair.Value.Position, pair.Value.Model);
-            _logger.Information("Seeder: Created pickup {pickupModel} at {position}", pair.Value.Model, pair.Value.Position);
+            var pickup = _elementFunctions.CreatePickup(pair.Value.Position, pair.Value.Model);
+            AssignElementToId(pickup, pair.Key);
+            _logger.Information("Seeder: Created pickup of id {elementId} with icon {pickupModel} at {position}", pair.Key, pair.Value.Model, pair.Value.Position);
         }
     }
     

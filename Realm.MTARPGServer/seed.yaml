@@ -14,7 +14,7 @@ blips:
 pickups:
   sapdStart:
     model: 1314
-    position: [20, 5, 2]
+    position: [20, 5, 3]
 fractions:
   sapd:
     name: "San andreas police department"

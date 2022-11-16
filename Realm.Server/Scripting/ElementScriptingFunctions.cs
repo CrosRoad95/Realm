@@ -1,4 +1,5 @@
-﻿using Realm.Server.Elements.Variants;
+﻿using Realm.Server.ElementCollections;
+using Realm.Server.Elements.Variants;
 using SlipeServer.Server.Elements.IdGeneration;
 
 namespace Realm.Server.Scripting;
@@ -9,20 +10,38 @@ public class ElementScriptingFunctions
     private readonly RPGServer _rpgServer;
     private readonly IElementCollection _elementCollection;
     private readonly IElementIdGenerator _elementIdGenerator;
+    private readonly ElementByStringIdCollection _elementByStringIdCollection;
 
-    public ElementScriptingFunctions(RPGServer rpgServer, IElementCollection elementCollection, IElementIdGenerator elementIdGenerator)
+    public ElementScriptingFunctions(RPGServer rpgServer, IElementCollection elementCollection, IElementIdGenerator elementIdGenerator, ElementByStringIdCollection elementByStringIdCollection)
     {
         _rpgServer = rpgServer;
         _elementCollection = elementCollection;
         _elementIdGenerator = elementIdGenerator;
+        _elementByStringIdCollection = elementByStringIdCollection;
     }
 
+    [ScriptMember("setElementId")]
+    public bool SetElementId(Element element, string id)
+    {
+        return _elementByStringIdCollection.AssignElementToId(element, id);
+    }
+
+    [ScriptMember("getElementId")]
+    public string? GetElementId(Element element)
+    {
+        return _elementByStringIdCollection.GetElementId(element);
+    }
+
+    [ScriptMember("getElementId")]
+    public Element? GetElementById(string id)
+    {
+        return _elementByStringIdCollection.GetElementById(id);
+    }
+    
     [ScriptMember("createSpawn")]
-    public Spawn CreateSpawn(string id, string name, Vector3 position, Vector3? rotation = null)
+    public Spawn CreateSpawn(Vector3 position, Vector3? rotation = null)
     {
         var spawn = _rpgServer.GetRequiredService<Spawn>();
-        spawn.AssignId(id);
-        spawn.Name = name;
         spawn.Position = position;
         if (rotation != null)
             spawn.Rotation = rotation ?? Vector3.Zero;
@@ -43,7 +62,7 @@ public class ElementScriptingFunctions
     }
 
     [ScriptMember("createBlip")]
-    public RPGBlip CreateBlip(int icon, Vector3 position)
+    public RPGBlip CreateBlip(Vector3 position, int icon)
     {
         if (!Enum.IsDefined(typeof(BlipIcon), icon))
             throw new Exception("Invalid icon");

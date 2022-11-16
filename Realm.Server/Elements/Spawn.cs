@@ -23,11 +23,6 @@ public class Spawn : Element, IDisposable
             .ForContext(new SpawnEnricher(this));
     }
 
-    public void AssignId(string id)
-    {
-        _id = id;
-    }
-
     [ScriptMember("isPersistant")]
     public bool IsPersistant()
     {

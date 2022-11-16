@@ -1,4 +1,6 @@
-﻿namespace Realm.Server.Elements;
+﻿using Realm.Server.Scripting.Sessions;
+
+namespace Realm.Server.Elements;
 
 [NoDefaultScriptAccess]
 public class RPGPlayer : Player
@@ -14,7 +16,6 @@ public class RPGPlayer : Player
     private readonly ILogger _logger;
     public Latch ResourceStartingLatch = new(3); // TODO: remove hardcoded resources counter
     public CancellationToken CancellationToken { get; private set; }
-
 
     [ScriptMember("account", ScriptAccess.ReadOnly)]
     public PlayerAccount? Account { get; private set; }
@@ -57,6 +58,8 @@ public class RPGPlayer : Player
             }
         }
     }
+
+    private readonly List<SessionBase> _runningSessions = new();
 
     public RPGPlayer(LuaValueMapper luaValueMapper, EventScriptingFunctions eventFunctions,
         DebugLog debugLog, AgnosticGuiSystemService agnosticGuiSystemService, AccountsInUseService accountsInUseService,
@@ -226,6 +229,21 @@ public class RPGPlayer : Player
         _luaInteropService.SetClipboard(this, content);
     }
 
+    public void StartSession(SessionBase sessionBase)
+    {
+        _runningSessions.Add(sessionBase);
+    }
+
+    public bool IsDuringSession<T>() where T: SessionBase
+    {
+        return _runningSessions.OfType<T>().Any();
+    }
+    
+    public T? GetRunningSession<T>() where T: SessionBase
+    {
+        return _runningSessions.OfType<T>().FirstOrDefault();
+    }
+
     public void Reset()
     {
         Camera.Fade(CameraFade.Out, 0, Color.Black);
@@ -233,6 +251,7 @@ public class RPGPlayer : Player
         Account = null;
         ResourceStartingLatch = new(3); // TODO: remove hardcoded resources counter
         DebugView = false;
+        _runningSessions.Clear();
     }
 
     [ScriptMember("longUserFriendlyName")]

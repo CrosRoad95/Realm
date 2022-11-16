@@ -1,4 +1,5 @@
-﻿using Realm.Server.Elements.Variants;
+﻿using Realm.Server.ElementCollections;
+using Realm.Server.Elements.Variants;
 
 namespace Realm.Server;
 
@@ -49,6 +50,7 @@ public partial class RPGServer : IRPGServer, IReloadable
                     services.AddSingleton(this);
                     services.AddSingleton<IReloadable>(this);
                     services.AddSingleton<IRPGServer>(this);
+                    services.AddSingleton<ElementByStringIdCollection>();
 
                     // Scripting
                     services.AddSingleton<GameplayScriptingFunctions>();
@@ -66,7 +68,6 @@ public partial class RPGServer : IRPGServer, IReloadable
                     services.AddTransient<DiscordUser>();
 
                     // Elements
-
                     services.AddTransient<Spawn>();
                     services.AddTransient<RPGVehicle>();
                     services.AddTransient<RPGBlip>();
