@@ -32,7 +32,7 @@ public class ElementScriptingFunctions
         return _elementByStringIdCollection.GetElementId(element);
     }
 
-    [ScriptMember("getElementId")]
+    [ScriptMember("getElementById")]
     public Element? GetElementById(string id)
     {
         return _elementByStringIdCollection.GetElementById(id);
