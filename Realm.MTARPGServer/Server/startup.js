@@ -2,6 +2,7 @@
 import "panel.js"
 import "discord.js"
 import "login.js"
+import "fractions.js"
 
 Logger.information("Gameplay: currency={currency}", Gameplay.currency);
 Logger.information("Localization: text={text}, try={text2}", Localization.translate("pl", "Test"), Localization.tryTranslate("pl", "doesn't exists", "test"));

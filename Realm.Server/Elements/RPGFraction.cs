@@ -3,15 +3,25 @@
 namespace Realm.Server.Elements;
 
 [NoDefaultScriptAccess]
-public class RPGFraction : IDisposable
+public class RPGFraction : Element, IDisposable
 {
     private bool _disposed;
     private readonly bool _isPersistant = PersistantScope.IsPersistant;
 
     public string Code { get; [NoScriptAccess] set; } = "";
-    public string Name { get; [NoScriptAccess] set; } = "";
     public string MemberClaim { get; [NoScriptAccess] set; } = "";
-    public Vector3 Position { get; [NoScriptAccess] set; }
+    public new string Name { get => base.Name; [NoScriptAccess]
+        set
+        {
+            base.Name = value;
+        }
+    }
+    public new Vector3 Position { get => base.Position; [NoScriptAccess]
+        set
+        {
+            base.Position = position;
+        }
+    }
 
     [NoScriptAccess]
     private readonly HashSet<PlayerAccount> _members = new();

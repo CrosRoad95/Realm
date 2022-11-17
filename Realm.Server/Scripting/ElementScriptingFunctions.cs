@@ -148,6 +148,7 @@ public class ElementScriptingFunctions
             "blip" => _elementCollection.GetByType<RPGBlip>().Cast<object>(),
             "radararea" => _elementCollection.GetByType<RPGRadarArea>().Cast<object>(),
             "pickup" => _elementCollection.GetByType<RPGPickup>().Cast<object>(),
+            "fraction" => _elementCollection.GetByType<RPGFraction>().Cast<object>(),
             _ => throw new NotSupportedException($"Unsupported element type '{type}'")
         };
     }

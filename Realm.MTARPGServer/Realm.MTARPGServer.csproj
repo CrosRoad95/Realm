@@ -49,6 +49,9 @@
     <None Update="Server\discord.js">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Update="Server\fractions.js">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="Server\login.js">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

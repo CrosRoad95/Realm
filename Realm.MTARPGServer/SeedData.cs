@@ -28,6 +28,7 @@ internal class SeedData
 
     public class Fraction
     {
+        public string Code { get; set; }
         public string Name { get; set; }
         public Vector3 Position { get; set; }
         public Dictionary<string, FractionMember> Members { get; set; }

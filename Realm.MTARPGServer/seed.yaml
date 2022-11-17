@@ -16,7 +16,8 @@ pickups:
     model: 1314
     position: [20, 5, 3]
 fractions:
-  sapd:
+  fractionSapd:
+    code: "SAPD"
     name: "San andreas police department"
     position: [10, 10, 10]
     members:

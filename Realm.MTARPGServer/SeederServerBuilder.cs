@@ -62,7 +62,7 @@ internal class SeederServerBuilder
     {
         foreach (var pair in fractionsData)
         {
-            var fraction = _elementFunctions.CreateFraction(pair.Key, pair.Value.Name, pair.Value.Position);
+            var fraction = _elementFunctions.CreateFraction(pair.Value.Code, pair.Value.Name, pair.Value.Position);
             if(pair.Value.Members != null)
             {
                 _logger.Information("Seeder: Created fraction {fractionCode} with members:", pair.Key);
@@ -76,7 +76,8 @@ internal class SeederServerBuilder
                 }
             }
             else
-                _logger.Information("Seeder: Created fraction {fractionCode} with no members", pair.Key);
+                _logger.Information("Seeder: Created fraction of id {elementId} with name '{fractionName}' with no members", pair.Key, pair.Value.Name);
+            AssignElementToId(fraction, pair.Key);
         }
     }
 
@@ -110,11 +111,11 @@ internal class SeederServerBuilder
     public async Task BuildFrom(SeedData seed)
     {
         using var _ = new PersistantScope();
+        await BuildIdentityRoles(seed.Roles);
         await BuildIdentityAccounts(seed.Accounts);
         BuildSpawns(seed.Spawns);
         BuildBlips(seed.Blips);
         BuildPickups(seed.Pickups);
         await BuildFractions(seed.Fractions);
-        await BuildIdentityRoles(seed.Roles);
     }
 }
