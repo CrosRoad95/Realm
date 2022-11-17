@@ -73,11 +73,17 @@ function closeGui(name)
 end
 
 addEvent("internalSubmitFormResponse", true)
-addEventHandler("internalSubmitFormResponse", localPlayer, function(id, name, ...)
-	coroutine.resume(pendingFormsSubmissions[name].coroutine, ...)
-	setTimer(function()
-		pendingFormsSubmissions[name] = nil;
-	end, 200, 1)
+addEventHandler("internalSubmitFormResponse", localPlayer, function(data)
+	local id = table.remove(data, 1);
+	local name = table.remove(data, 1);
+	if(pendingFormsSubmissions[name])then
+		coroutine.resume(pendingFormsSubmissions[name].coroutine, unpack(data))
+		setTimer(function()
+			pendingFormsSubmissions[name] = nil;
+		end, 200, 1)
+	else
+		error("Form submission not found? a bug?")
+	end
 end)
 
 function createForm(name, fields)
@@ -198,6 +204,5 @@ local function entrypoint()
 end
 
 addEventHandler("onClientResourceStart", resourceRoot, function()
-	outputChatBox("START")
 	async(entrypoint)
 end, true, "low");
