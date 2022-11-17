@@ -1,4 +1,6 @@
-﻿using Realm.Scripting.Classes;
+﻿using Realm.Configuration;
+using Realm.Persistance.Services;
+using Realm.Scripting.Classes;
 
 namespace Realm.Persistance.Scripting.Classes;
 
@@ -15,6 +17,7 @@ public class PlayerAccount : IDisposable
     private readonly IAccountsInUseService _accountsInUseService;
     private readonly EventScriptingFunctions _eventFunctions;
     private readonly IServiceProvider _serviceProvider;
+    private readonly ConfigurationProvider _configurationProvider;
     private readonly ILogger _logger;
     private DateTime? _lastPlayTimeCounterStart;
     private DateTime? _loginDateTime;
@@ -59,8 +62,33 @@ public class PlayerAccount : IDisposable
         }
     }
 
+    public event Action<PlayerAccount>? DirtyNotify;
+    public event Action<PlayerAccount>? Disposed;
+
+    public double Money
+    {
+        get => _user.Money; set
+        {
+            CheckIfDisposed();
+            if (_user.Money == value)
+                return;
+
+            if(value < 0)
+                throw new Exception("Unable to set money, money can not get negative");
+
+            if (value > _configurationProvider.Get<double>("Gameplay:MoneyLimit"))
+                throw new Exception("Unable to set money, reached limit.");
+            var moneyPrecision = _configurationProvider.Get<int>("Gameplay:MoneyPrecision");
+            var old = _user.Money;
+            _user.Money = Math.Round(value, moneyPrecision);
+            DirtyNotify?.Invoke(this);
+
+            _logger.Verbose("Changed money from {oldMoney} to {money}", old, value);
+        }
+    }
+
     public PlayerAccount(SignInManager<User> signInManager, UserManager<User> userManager, IDb db, IAuthorizationService authorizationService,
-        IAccountsInUseService accountsInUseService, ILogger logger, EventScriptingFunctions eventFunctions, IServiceProvider serviceProvider)
+        IAccountsInUseService accountsInUseService, ILogger logger, EventScriptingFunctions eventFunctions, IServiceProvider serviceProvider, ConfigurationProvider configurationProvider, PeriodicEntitySaveService periodicEntitySaveService)
     {
         _user = null!;
         _signInManager = signInManager;
@@ -70,9 +98,26 @@ public class PlayerAccount : IDisposable
         _accountsInUseService = accountsInUseService;
         _eventFunctions = eventFunctions;
         _serviceProvider = serviceProvider;
+        _configurationProvider = configurationProvider;
         _logger = logger
             .ForContext<PlayerAccount>()
             .ForContext(new PlayerAccountEnricher(this));
+        periodicEntitySaveService.AccountCreated(this);
+    }
+
+    public bool GiveMoney(double amount)
+    {
+        CheckIfDisposed();
+
+        if (_user.Money < 0)
+            throw new ArgumentOutOfRangeException(nameof(amount), "Unable to set money, money can not get negative");
+
+        if (amount > _configurationProvider.Get<double>("Gameplay:MoneyLimit"))
+            throw new Exception("Unable to set money, reached limit.");
+
+        var moneyPrecision = _configurationProvider.Get<int>("Gameplay:MoneyPrecision");
+        Money = _user.Money + Math.Round(amount, moneyPrecision);
+        return true;
     }
 
     public void SetUser(User user)
@@ -184,15 +229,13 @@ public class PlayerAccount : IDisposable
     [NoScriptAccess]
     public async Task Save()
     {
-        CheckIfDisposed();
-
         if(_lastPlayTimeCounterStart != null)
         {
             _user.PlayTime += (ulong)(DateTime.Now - _lastPlayTimeCounterStart.Value).Seconds;
             _lastPlayTimeCounterStart = DateTime.Now;
         }
         await _userManager.UpdateAsync(_user);
-        _logger.Verbose("Saved account");
+        _logger.Verbose("Account saved.");
     }
 
     public bool IsInRole(string role)
@@ -612,6 +655,7 @@ public class PlayerAccount : IDisposable
     [NoScriptAccess]
     public void Dispose()
     {
+        Disposed?.Invoke(this);
         _disposed = true;
         if (Discord != null)
             Discord.Dispose();

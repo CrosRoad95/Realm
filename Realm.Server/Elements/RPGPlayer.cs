@@ -1,4 +1,5 @@
-﻿using Realm.Server.Scripting.Sessions;
+﻿using Newtonsoft.Json.Linq;
+using Realm.Server.Scripting.Sessions;
 
 namespace Realm.Server.Elements;
 
@@ -13,6 +14,7 @@ public class RPGPlayer : Player
     private readonly AccountsInUseService _accountsInUseService;
     private readonly LuaInteropService _luaInteropService;
     private readonly ChatBox _chatBox;
+    private readonly GameplayScriptingFunctions _gameplayScriptingFunctions;
     private readonly ILogger _logger;
     public Latch ResourceStartingLatch = new(3); // TODO: remove hardcoded resources counter
     public CancellationToken CancellationToken { get; private set; }
@@ -63,7 +65,7 @@ public class RPGPlayer : Player
 
     public RPGPlayer(LuaValueMapper luaValueMapper, EventScriptingFunctions eventFunctions,
         DebugLog debugLog, AgnosticGuiSystemService agnosticGuiSystemService, AccountsInUseService accountsInUseService,
-        ILogger logger, LuaInteropService luaInteropService, ChatBox chatBox)
+        ILogger logger, LuaInteropService luaInteropService, ChatBox chatBox, GameplayScriptingFunctions gameplayScriptingFunctions)
     {
         _luaValueMapper = luaValueMapper;
         _eventFunctions = eventFunctions;
@@ -72,6 +74,7 @@ public class RPGPlayer : Player
         _accountsInUseService = accountsInUseService;
         _luaInteropService = luaInteropService;
         _chatBox = chatBox;
+        _gameplayScriptingFunctions = gameplayScriptingFunctions;
         _logger = logger
             .ForContext<RPGPlayer>()
             .ForContext(new RPGPlayerEnricher(this));

@@ -120,6 +120,13 @@ addCommandHandler("playtime", (player, args) => {
         Logger.information("playtime: current session: {0}, in total: {1}", player.account.currentSessionPlayTime, player.account.playTime)
 })
 
+addCommandHandler("money", (player, args) => {
+    if (!player.isLoggedIn)
+        return;
+
+    player.account.money = player.account.money + 50;
+})
+
 addCommandHandler("foo2", (player, args) => {
     Logger.information("command foo2 executed {player} {commandArguments}")
 }, ["admin"])
