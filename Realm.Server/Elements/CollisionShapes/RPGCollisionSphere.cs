@@ -11,8 +11,9 @@ public class RPGCollisionSphere : CollisionSphere, IDisposable
     private ScriptObject? _elementEntered;
 
     public bool IsVariant { get; private set; }
-    public RPGCollisionSphere() : base(Vector3.Zero, 0)
+    public RPGCollisionSphere(ILogger logger) : base(Vector3.Zero, 0)
     {
+        _logger = logger.ForContext<RPGCollisionSphere>();
         ElementEntered += CollisionShape_ElementEntered;
     }
 
