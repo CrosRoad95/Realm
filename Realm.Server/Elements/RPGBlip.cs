@@ -17,7 +17,11 @@ public class RPGBlip : Blip, IDisposable
     }
 
     [ScriptMember("isPersistant")]
-    public bool IsPersistant() => true;
+    public bool IsPersistant()
+    {
+        CheckIfDisposed();
+        return _isPersistant;
+    }
 
     private void CheckIfDisposed()
     {
