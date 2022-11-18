@@ -1,5 +1,7 @@
 ﻿using Realm.Server.ElementCollections;
+using Realm.Server.Elements.CollisionShapes;
 using Realm.Server.Elements.Variants;
+using SlipeServer.Server.Elements.ColShapes;
 using SlipeServer.Server.Elements.IdGeneration;
 
 namespace Realm.Server.Scripting;
@@ -114,6 +116,7 @@ public class ElementScriptingFunctions
         pickup.Position = position;
         pickup.Model = model;
         _rpgServer.AssociateElement(pickup);
+        _rpgServer.AssociateElement(pickup.CollisionShape);
         return pickup;
     }
 
@@ -136,6 +139,17 @@ public class ElementScriptingFunctions
         fraction.Name = name;
         fraction.Position = position;
         return fraction;
+    }
+    
+
+    [ScriptMember("createColSphere")]
+    public RPGCollisionSphere CreateColSphere(Vector3 position, float radius)
+    {
+        var collisionSphere = _rpgServer.GetRequiredService<RPGCollisionSphere>();
+        collisionSphere.Position = position;
+        collisionSphere.Radius = radius;
+        collisionSphere.Position = position;
+        return collisionSphere;
     }
 
     public IEnumerable<object> GetCollectionByType(string type)

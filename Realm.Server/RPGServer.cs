@@ -1,4 +1,5 @@
 ﻿using Realm.Server.ElementCollections;
+using Realm.Server.Elements.CollisionShapes;
 using Realm.Server.Elements.Variants;
 
 namespace Realm.Server;
@@ -74,6 +75,7 @@ public partial class RPGServer : IRPGServer, IReloadable
                     services.AddTransient<RPGRadarArea>();
                     services.AddTransient<RPGPickup>();
                     services.AddTransient<RPGFraction>();
+                    services.AddTransient<RPGCollisionSphere>();
                     if (modules != null)
                         foreach (var module in modules)
                         {
@@ -151,6 +153,7 @@ public partial class RPGServer : IRPGServer, IReloadable
         scriptingModuleInterface.AddHostType(typeof(RPGPickup));
         scriptingModuleInterface.AddHostType(typeof(RPGVariantPickup));
         scriptingModuleInterface.AddHostType(typeof(RPGFraction));
+        scriptingModuleInterface.AddHostType(typeof(RPGCollisionSphere));
         scriptingModuleInterface.AddHostType(typeof(FormContextEvent));
         scriptingModuleInterface.AddHostType(typeof(PlayerJoinedEvent));
         scriptingModuleInterface.AddHostType(typeof(PlayerLoggedInEvent));
