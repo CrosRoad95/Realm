@@ -1,4 +1,7 @@
-﻿namespace Realm.Persistance;
+﻿using Realm.Persistance.Data.Helpers;
+using static Realm.Persistance.Data.Helpers.VehicleWheelStatus;
+
+namespace Realm.Persistance;
 
 public abstract class Db<T> : IdentityDbContext<User, Role, Guid,
         IdentityUserClaim<Guid>,
@@ -9,6 +12,8 @@ public abstract class Db<T> : IdentityDbContext<User, Role, Guid,
 {
     public DbSet<UserData> UserData => Set<UserData>();
     public DbSet<UserLicense> UserLicenses => Set<UserLicense>();
+    public DbSet<Vehicle> Vehicles => Set<Vehicle>();
+    public DbSet<VehicleData> VehicleData => Set<VehicleData>();
 
     public Db(DbContextOptions<T> options) : base(options)
     {
@@ -47,6 +52,100 @@ public abstract class Db<T> : IdentityDbContext<User, Role, Guid,
                 .HasOne(x => x.User)
                 .WithMany(x => x.Licenses)
                 .HasForeignKey(x => x.UserId);
+        });
+
+        modelBuilder.Entity<Vehicle>(entityBuilder =>
+        {
+            entityBuilder.ToTable("Vehicles")
+                .HasKey(x =>  x.Id);
+
+            entityBuilder.Property(x => x.Platetext)
+                .HasMaxLength(32)
+                .IsRequired();
+
+            entityBuilder.Property(x => x.TransformAndMotion)
+                .HasMaxLength(400)
+                .HasConversion(x => x.Serialize(), x => TransformAndMotion.CreateFromString(x))
+                .HasDefaultValue(new TransformAndMotion())
+                .IsRequired();
+
+            entityBuilder.Property(x => x.Color)
+                .HasMaxLength(300)
+                .HasConversion(x => x.Serialize(), x => VehicleColor.CreateFromString(x))
+                .HasDefaultValue(new VehicleColor())
+                .IsRequired();
+
+            entityBuilder.Property(x => x.Paintjob)
+                .HasDefaultValue(3)
+                .IsRequired();
+
+            entityBuilder.Property(x => x.Variant)
+                .HasMaxLength(50)
+                .HasConversion(x => x.Serialize(), x => VehicleVariant.CreateFromString(x))
+                .HasDefaultValue(new VehicleVariant())
+                .IsRequired();
+
+            entityBuilder.Property(x => x.DamageState)
+                .HasMaxLength(300)
+                .HasConversion(x => x.Serialize(), x => VehicleDamageState.CreateFromString(x))
+                .HasDefaultValue(new VehicleDamageState())
+                .IsRequired();
+
+            entityBuilder.Property(x => x.DoorOpenRatio)
+                .HasMaxLength(200)
+                .HasConversion(x => x.Serialize(), x => VehicleDoorOpenRatio.CreateFromString(x))
+                .HasDefaultValue(new VehicleDoorOpenRatio())
+                .IsRequired();
+            
+            entityBuilder.Property(x => x.WheelStatus)
+                .HasMaxLength(200)
+                .HasConversion(x => x.Serialize(), x => VehicleWheelStatus.CreateFromString(x))
+                .HasDefaultValue(new VehicleWheelStatus())
+                .IsRequired();
+
+            entityBuilder.Property(x => x.EngineState)
+                .HasDefaultValue(false)
+                .IsRequired();
+
+            entityBuilder.Property(x => x.LandingGearDown)
+                .HasDefaultValue(true)
+                .IsRequired();
+            
+            entityBuilder.Property(x => x.OverrideLights)
+                .HasDefaultValue(false)
+                .IsRequired();
+            
+            entityBuilder.Property(x => x.SirensState)
+                .HasDefaultValue(false)
+                .IsRequired();
+
+            entityBuilder.Property(x => x.Locked)
+                .HasDefaultValue(false)
+                .IsRequired();
+
+            entityBuilder.Property(x => x.TaxiLightState)
+                .HasDefaultValue(false)
+                .IsRequired();
+            
+            entityBuilder.Property(x => x.Health)
+                .HasDefaultValue(1000)
+                .IsRequired();
+
+            entityBuilder.Property(x => x.Removed)
+                .HasDefaultValue(false)
+                .IsRequired();
+        });
+
+        modelBuilder.Entity<VehicleData>(entityBuilder =>
+        {
+            entityBuilder
+                .ToTable("VehicleData")
+                .HasKey(x => new { x.VehicleId, x.Key });
+
+            entityBuilder
+                .HasOne(x => x.Vehicle)
+                .WithMany(x => x.VehicleData)
+                .HasForeignKey(x => x.VehicleId);
         });
     }
 }

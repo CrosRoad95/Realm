@@ -1,12 +1,10 @@
-﻿using Realm.Persistance.Scripting.Classes;
-using System.Threading;
-
-namespace Realm.Persistance.Services;
+﻿namespace Realm.Persistance.Services;
 
 public class PeriodicEntitySaveService
 {
     private readonly SemaphoreSlim semaphore = new(1);
-    private readonly HashSet<PlayerAccount> _playerAccountsToSave = new();
+    private readonly HashSet<ISavable> _playerAccountsToSave = new();
+    private readonly HashSet<ISavable> _persistantVehiclesToSave = new();
     private readonly ILogger _logger;
     public PeriodicEntitySaveService(ILogger logger)
     {
@@ -16,14 +14,16 @@ public class PeriodicEntitySaveService
 
     private async Task PeriodicSaveEntities()
     {
-        List<PlayerAccount> workingCopyOfPlayerAccounts = new();
+        List<ISavable> workingCopyOfPlayerAccounts = new();
+        List<ISavable> workingCopyOfPersistantVehicles = new();
         while(true)
         {
             await Task.Delay(TimeSpan.FromSeconds(10));
             await semaphore.WaitAsync();
             if (_playerAccountsToSave.Any())
             {
-                workingCopyOfPlayerAccounts = _playerAccountsToSave.ToList();
+                workingCopyOfPlayerAccounts = _playerAccountsToSave.Cast<ISavable>().ToList();
+                workingCopyOfPersistantVehicles = _persistantVehiclesToSave.Cast<ISavable>().ToList();
                 _playerAccountsToSave.Clear();
                 semaphore.Release();
             }
@@ -41,32 +41,61 @@ public class PeriodicEntitySaveService
                 workingCopyOfPlayerAccounts.Clear();
             }
 
+
+            if (workingCopyOfPersistantVehicles.Any())
+            {
+                foreach (var persistantVehicle in workingCopyOfPersistantVehicles)
+                {
+                    await persistantVehicle.Save();
+                }
+                _logger.Verbose("Saved {count} vehicles.", workingCopyOfPersistantVehicles.Count);
+                workingCopyOfPersistantVehicles.Clear();
+            }
         }
     }
 
     public void AccountCreated(PlayerAccount playerAccount)
     {
-        playerAccount.DirtyNotify += PlayerAccount_DirtyNotify;
+        playerAccount.NotifyNotSavedState += PlayerAccount_DirtyNotify;
         playerAccount.Disposed += PlayerAccount_Disposed;
+    }
+    
+    public void VehicleCreated(IPersistantVehicle persistantVehicle)
+    {
+        persistantVehicle.NotifyNotSavedState += PersistantVehicle_DirtyNotify;
+        persistantVehicle.Disposed += PersistantVehicle_Disposed;
+    }
+
+    private async void PlayerAccount_DirtyNotify(ISavable playerAccount)
+    {
+        await ScheduleAccountToSave(playerAccount);
+        _logger.Verbose("Scheduled account: {playerAccount} to save.", playerAccount);
     }
 
     private async void PlayerAccount_Disposed(PlayerAccount playerAccount)
     {
-        playerAccount.DirtyNotify -= PlayerAccount_DirtyNotify;
+        playerAccount.NotifyNotSavedState -= PlayerAccount_DirtyNotify;
         playerAccount.Disposed -= PlayerAccount_Disposed;
         await ScheduleAccountToSave(playerAccount);
     }
+    
+    private async void PersistantVehicle_DirtyNotify(ISavable persistantVehicle)
+    {
+        await ScheduleAccountToSave(persistantVehicle);
+        _logger.Verbose("Scheduled vehicle: {peristantVehicle} to save.", persistantVehicle);
+    }
 
-    private async Task ScheduleAccountToSave(PlayerAccount playerAccount)
+    private async void PersistantVehicle_Disposed(IPersistantVehicle playerAccount)
+    {
+        playerAccount.NotifyNotSavedState -= PersistantVehicle_DirtyNotify;
+        playerAccount.Disposed -= PersistantVehicle_Disposed;
+        await ScheduleAccountToSave(playerAccount);
+    }
+
+    private async Task ScheduleAccountToSave(ISavable playerAccount)
     {
         await semaphore.WaitAsync();
         _playerAccountsToSave.Add(playerAccount);
         semaphore.Release();
-    }
-
-    private async void PlayerAccount_DirtyNotify(PlayerAccount playerAccount)
-    {
-        await ScheduleAccountToSave(playerAccount);
-        _logger.Verbose("Scheduled account: {playerAccount} to save.", playerAccount);
     }
 }

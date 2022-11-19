@@ -10,6 +10,8 @@ public interface IDb
     DbSet<IdentityUserToken<Guid>> UserTokens { get; }
     DbSet<UserData> UserData { get; }
     DbSet<UserLicense> UserLicenses { get; }
+    DbSet<Vehicle> Vehicles { get; }
+    DbSet<VehicleData> VehicleData { get; }
 
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
 }

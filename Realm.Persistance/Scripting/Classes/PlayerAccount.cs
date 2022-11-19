@@ -1,10 +1,6 @@
-﻿using Realm.Configuration;
-using Realm.Persistance.Services;
-using Realm.Scripting.Classes;
+﻿namespace Realm.Persistance.Scripting.Classes;
 
-namespace Realm.Persistance.Scripting.Classes;
-
-public class PlayerAccount : IDisposable
+public class PlayerAccount : ISavable, IDisposable
 {
     public const string ClaimDiscordUserIdName = "discord.user.id";
 
@@ -62,7 +58,7 @@ public class PlayerAccount : IDisposable
         }
     }
 
-    public event Action<PlayerAccount>? DirtyNotify;
+    public event Action<PlayerAccount>? NotifyNotSavedState;
     public event Action<PlayerAccount>? Disposed;
 
     public double Money
@@ -81,7 +77,7 @@ public class PlayerAccount : IDisposable
             var moneyPrecision = _configurationProvider.Get<int>("Gameplay:MoneyPrecision");
             var old = _user.Money;
             _user.Money = Math.Round(value, moneyPrecision);
-            DirtyNotify?.Invoke(this);
+            NotifyNotSavedState?.Invoke(this);
 
             _logger.Verbose("Changed money from {oldMoney} to {money}", old, value);
         }

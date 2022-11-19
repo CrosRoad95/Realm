@@ -1,8 +1,10 @@
-﻿using Realm.Server.ElementCollections;
+﻿using Realm.Persistance.Services;
+using Realm.Server.ElementCollections;
 using Realm.Server.Elements.CollisionShapes;
 using Realm.Server.Elements.Variants;
 using SlipeServer.Server.Elements.ColShapes;
 using SlipeServer.Server.Elements.IdGeneration;
+using PersistantVehicleData = Realm.Persistance.Data.Vehicle;
 
 namespace Realm.Server.Scripting;
 
@@ -13,13 +15,20 @@ public class ElementScriptingFunctions
     private readonly IElementCollection _elementCollection;
     private readonly IElementIdGenerator _elementIdGenerator;
     private readonly ElementByStringIdCollection _elementByStringIdCollection;
+    private readonly PeriodicEntitySaveService _periodicEntitySaveService;
+    private readonly IDb _db;
+    private readonly ILogger _logger;
 
-    public ElementScriptingFunctions(RPGServer rpgServer, IElementCollection elementCollection, IElementIdGenerator elementIdGenerator, ElementByStringIdCollection elementByStringIdCollection)
+    public ElementScriptingFunctions(RPGServer rpgServer, IElementCollection elementCollection, IElementIdGenerator elementIdGenerator, ElementByStringIdCollection elementByStringIdCollection,
+        PeriodicEntitySaveService periodicEntitySaveService, IDb db, ILogger logger)
     {
         _rpgServer = rpgServer;
         _elementCollection = elementCollection;
         _elementIdGenerator = elementIdGenerator;
         _elementByStringIdCollection = elementByStringIdCollection;
+        _periodicEntitySaveService = periodicEntitySaveService;
+        _db = db;
+        _logger = logger.ForContext<ElementScriptingFunctions>();
     }
 
     [ScriptMember("setElementId")]
@@ -60,6 +69,58 @@ public class ElementScriptingFunctions
         if(rotation != null)
             vehicle.Rotation = rotation ?? Vector3.Zero;
         _rpgServer.AssociateElement(vehicle);
+        return vehicle;
+    }
+
+    [ScriptMember("createPersistantVehicle")]
+    public async Task<RPGVehicle?> CreatePersistantVehicle(string id, ushort model, Vector3 position, Vector3? rotation = null)
+    {
+        using var _ = new PersistantScope();
+        if (await _db.Vehicles.AnyAsync(x => x.Id == id))
+            return null;
+
+        var vehicleData = new PersistantVehicleData
+        {
+            Id = id,
+            Model = model,
+            TransformAndMotion = new Persistance.Data.Helpers.TransformAndMotion
+            {
+                Position = position,
+                Rotation = rotation ?? Vector3.Zero
+            },
+            CreatedAt = DateTime.Now,
+        };
+        _db.Vehicles.Add(vehicleData);
+        await _db.SaveChangesAsync();
+        _logger.Verbose("Created persistant vehicle {vehicleId}", id);
+
+        var vehicle = _rpgServer.GetRequiredService<RPGVehicle>();
+        vehicle.AssignId(id);
+        var loaded = await vehicle.Load();
+        if (!loaded)
+            throw new Exception("Failed to create persistant vehicle, bug?");
+        return vehicle;
+    }
+
+    [ScriptMember("spawnPersistantVehicle")]
+    public async Task<RPGVehicle?> SpawnPersistantVehicle(string id, Vector3? position = null, Vector3? rotation = null)
+    {
+        using var _ = new PersistantScope();
+        var vehicle = _rpgServer.GetRequiredService<RPGVehicle>();
+        vehicle.AssignId(id);
+        var loaded = await vehicle.Load();
+        if(!loaded)
+        {
+            vehicle.Dispose();
+            return null;
+        }
+        if (position != null)
+            vehicle.Position = position ?? Vector3.Zero;
+        if (rotation != null)
+            vehicle.Rotation = rotation ?? Vector3.Zero;
+        _periodicEntitySaveService.VehicleCreated(vehicle);
+        _rpgServer.AssociateElement(vehicle);
+        _logger.Verbose("Spawned persistant vehicle {vehicleId}", id);
         return vehicle;
     }
 
@@ -184,6 +245,7 @@ public class ElementScriptingFunctions
     [ScriptMember("destroyElement")]
     public bool DestroyElement(Element element)
     {
+        bool wasDestroyed = false;
         switch (element)
         {
             case Player _:
@@ -191,14 +253,17 @@ public class ElementScriptingFunctions
             case Spawn spawn:
                 if (spawn.IsPersistant())
                     throw new Exception("Can not destroy persistant element.");
+                wasDestroyed = true;
                 break;
             case RPGVehicle vehicle:
-                if (vehicle.IsPersistant())
-                    throw new Exception("Can not destroy persistant element.");
+                vehicle.Destroy();
+                if(vehicle.IsPersistant())
+                    _logger.Verbose("Destroyed persistant vehicle of id: {vehicleId}", vehicle.VehicleId);
+                wasDestroyed = true;
                 break;
         }
 
-        if (IsElement(element))
+        if (wasDestroyed && IsElement(element))
         {
             _elementCollection.Remove(element);
             if(element is IDisposable)

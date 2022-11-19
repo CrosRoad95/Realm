@@ -61,5 +61,6 @@ global using Realm.Resources.LuaInterop;
 global using Realm.Resources.AgnosticGuiSystem;
 global using Realm.Resources.Addons.AgnosticGuiSystem.CeGuiProvider;
 global using Realm.Resources.Addons.Common;
+global using Realm.Persistance.Interfaces;
 
 global using ConfigurationProvider = Realm.Configuration.ConfigurationProvider;
