@@ -73,16 +73,17 @@ public class ElementScriptingFunctions
     }
 
     [ScriptMember("createPersistantVehicle")]
-    public async Task<RPGVehicle?> CreatePersistantVehicle(string id, ushort model, Vector3 position, Vector3? rotation = null)
+    public async Task<bool> CreatePersistantVehicle(string id, ushort model, Vector3 position, Vector3? rotation = null)
     {
         using var _ = new PersistantScope();
         if (await _db.Vehicles.AnyAsync(x => x.Id == id))
-            return null;
+            return false;
 
         var vehicleData = new PersistantVehicleData
         {
             Id = id,
             Model = model,
+            Platetext = "",
             TransformAndMotion = new Persistance.Data.Helpers.TransformAndMotion
             {
                 Position = position,
@@ -93,13 +94,7 @@ public class ElementScriptingFunctions
         _db.Vehicles.Add(vehicleData);
         await _db.SaveChangesAsync();
         _logger.Verbose("Created persistant vehicle {vehicleId}", id);
-
-        var vehicle = _rpgServer.GetRequiredService<RPGVehicle>();
-        vehicle.AssignId(id);
-        var loaded = await vehicle.Load();
-        if (!loaded)
-            throw new Exception("Failed to create persistant vehicle, bug?");
-        return vehicle;
+        return true;
     }
 
     [ScriptMember("spawnPersistantVehicle")]
@@ -112,7 +107,7 @@ public class ElementScriptingFunctions
         if(!loaded)
         {
             vehicle.Dispose();
-            return null;
+            throw new Exception("Failed to create vehicle");
         }
         if (position != null)
             vehicle.Position = position ?? Vector3.Zero;

@@ -174,4 +174,15 @@ addCommandHandler("discord", (player, args) => {
     if (player.account.isConnectedWithDiscordAccount()) {
         player.sendChatMessage(`Twoje konto jest już połączone z kontem discord o id ${player.account.id}`);
     }
-})
+});
+
+(async () => {
+    try {
+        await createPersistantVehicle("foo", 404, new Vector3(0,-5,3));
+        let veh = await spawnPersistantVehicle("foo");
+        Logger.information("spawnPersistantVehicle: {veh}", veh);
+    }
+    catch (ex) {
+        Logger.information("spawnPersistantVehicle ex: {exception}", ex.message);
+    }
+})()

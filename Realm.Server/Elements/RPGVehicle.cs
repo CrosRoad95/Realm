@@ -64,6 +64,8 @@ public class RPGVehicle : Vehicle, IPersistantVehicle, IDisposable
             .FirstOrDefaultAsync();
         if(_vehicleData != null)
         {
+            Position = _vehicleData.TransformAndMotion.Position;
+            Rotation = _vehicleData.TransformAndMotion.Rotation;
 
         }
         return _vehicleData != null;
