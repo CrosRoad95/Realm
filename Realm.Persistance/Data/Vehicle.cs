@@ -21,6 +21,7 @@ public sealed class Vehicle
     public bool Locked { get; set; }
     public bool TaxiLightState { get; set; }
     public float Health { get; set; }
+    public bool IsFrozen { get; set; }
     public bool Removed { get; set; }
     public DateTime CreatedAt { get; set; }
 

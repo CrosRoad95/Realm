@@ -131,6 +131,10 @@ public abstract class Db<T> : IdentityDbContext<User, Role, Guid,
                 .HasDefaultValue(1000)
                 .IsRequired();
 
+            entityBuilder.Property(x => x.IsFrozen)
+                .HasDefaultValue(false)
+                .IsRequired();
+
             entityBuilder.Property(x => x.Removed)
                 .HasDefaultValue(false)
                 .IsRequired();
