@@ -1,4 +1,5 @@
-﻿using Realm.Server.ElementCollections;
+﻿using Realm.Server.Components;
+using Realm.Server.ElementCollections;
 using Realm.Server.Elements.CollisionShapes;
 using Realm.Server.Elements.Variants;
 
@@ -161,6 +162,9 @@ public partial class RPGServer : IRPGServer, IReloadable
         scriptingModuleInterface.AddHostType(typeof(PlayerSpawnedEvent));
         scriptingModuleInterface.AddHostType(typeof(PlayerDiscordConnectedEvent));
         scriptingModuleInterface.AddHostType(typeof(DiscordUserChangedEvent));
+
+        scriptingModuleInterface.AddHostType(typeof(ComponentSystem));
+        scriptingModuleInterface.AddHostType(typeof(VehicleFuelComponent));
     }
 
     public TService GetRequiredService<TService>() where TService: notnull

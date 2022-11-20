@@ -180,7 +180,9 @@ addCommandHandler("discord", (player, args) => {
     try {
         await createPersistantVehicle("foo", 404, new Vector3(0,-5,3));
         let veh = await spawnPersistantVehicle("foo");
-        Logger.information("spawnPersistantVehicle: {veh}", veh);
+        veh.components.addComponent(new VehicleFuelComponent(2, 20, 4, 2.5));
+        veh.isFrozen = false;
+        Logger.information("spawnPersistantVehicle: {veh} {components}", veh, veh.components);
     }
     catch (ex) {
         Logger.information("spawnPersistantVehicle ex: {exception}", ex.message);

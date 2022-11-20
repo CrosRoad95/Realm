@@ -1,5 +1,6 @@
 ﻿using Vehicle = SlipeServer.Server.Elements.Vehicle;
 using PersistantVehicleData = Realm.Persistance.Data.Vehicle;
+using Realm.Server.Components;
 
 namespace Realm.Server.Elements;
 
@@ -18,6 +19,24 @@ public class RPGVehicle : Vehicle, IPersistantVehicle, IDisposable
     public event Action<IPersistantVehicle>? Disposed;
     private PersistantVehicleData? _vehicleData;
 
+    [ScriptMember("components")]
+    public ComponentSystem Components;
+
+    [ScriptMember("isFrozen")]
+    public bool IsFrozen
+    {
+        get => base.IsFrozen;
+        set
+        {
+            base.IsFrozen = value;
+            if(_vehicleData != null)
+            {
+                _vehicleData.IsFrozen = value;
+                NotifyNotSavedState?.Invoke(this);
+            }
+        }
+    }
+
     public RPGVehicle(ILogger logger, EventScriptingFunctions eventFunctions, IDb db) : base(404, new Vector3(0,0, 10000))
     {
         _eventFunctions = eventFunctions;
@@ -26,6 +45,7 @@ public class RPGVehicle : Vehicle, IPersistantVehicle, IDisposable
             .ForContext<RPGVehicle>()
             .ForContext(new RPGVehicleEnricher(this));
         IsFrozen = true;
+        Components = new ComponentSystem(this, _logger);
     }
 
     public void AssignId(string id)
