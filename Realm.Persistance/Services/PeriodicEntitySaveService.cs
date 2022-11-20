@@ -23,12 +23,16 @@ public class PeriodicEntitySaveService
             if (_playerAccountsToSave.Any())
             {
                 workingCopyOfPlayerAccounts = _playerAccountsToSave.Cast<ISavable>().ToList();
-                workingCopyOfPersistantVehicles = _persistantVehiclesToSave.Cast<ISavable>().ToList();
                 _playerAccountsToSave.Clear();
-                semaphore.Release();
             }
-            else
-                semaphore.Release();
+            
+            if (_persistantVehiclesToSave.Any())
+            {
+                workingCopyOfPersistantVehicles = _persistantVehiclesToSave.Cast<ISavable>().ToList();
+                _persistantVehiclesToSave.Clear();
+            }
+
+            semaphore.Release();
 
             if(workingCopyOfPlayerAccounts.Any())
             {
@@ -69,7 +73,6 @@ public class PeriodicEntitySaveService
     private async void PlayerAccount_DirtyNotify(ISavable playerAccount)
     {
         await ScheduleAccountToSave(playerAccount);
-        _logger.Verbose("Scheduled account: {playerAccount} to save.", playerAccount);
     }
 
     private async void PlayerAccount_Disposed(PlayerAccount playerAccount)
@@ -81,8 +84,7 @@ public class PeriodicEntitySaveService
     
     private async void PersistantVehicle_DirtyNotify(ISavable persistantVehicle)
     {
-        await ScheduleAccountToSave(persistantVehicle);
-        _logger.Verbose("Scheduled vehicle: {peristantVehicle} to save.", persistantVehicle);
+        await ScheduleVehicleToSave(persistantVehicle);
     }
 
     private async void PersistantVehicle_Disposed(IPersistantVehicle playerAccount)
@@ -97,5 +99,14 @@ public class PeriodicEntitySaveService
         await semaphore.WaitAsync();
         _playerAccountsToSave.Add(playerAccount);
         semaphore.Release();
+        _logger.Verbose("Scheduled account: {playerAccount} to save.", playerAccount);
+    }
+
+    private async Task ScheduleVehicleToSave(ISavable persistantVehicle)
+    {
+        await semaphore.WaitAsync();
+        _persistantVehiclesToSave.Add(persistantVehicle);
+        semaphore.Release();
+        _logger.Verbose("Scheduled vehicle: {peristantVehicle} to save.", persistantVehicle);
     }
 }

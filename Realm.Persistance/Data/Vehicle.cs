@@ -24,6 +24,7 @@ public sealed class Vehicle
     public bool IsFrozen { get; set; }
     public bool Removed { get; set; }
     public DateTime CreatedAt { get; set; }
+    public string? Components { get; set; }
 
     public ICollection<VehicleData>? VehicleData { get; set; }
 }

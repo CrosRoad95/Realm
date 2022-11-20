@@ -86,7 +86,15 @@ public class RPGVehicle : Vehicle, IPersistantVehicle, IDisposable
         {
             Position = _vehicleData.TransformAndMotion.Position;
             Rotation = _vehicleData.TransformAndMotion.Rotation;
-
+            if(!string.IsNullOrEmpty(_vehicleData.Components))
+            {
+                Components = JsonConvert.DeserializeObject<ComponentSystem>(_vehicleData.Components, new JsonSerializerSettings
+                {
+                    TypeNameHandling = TypeNameHandling.Objects,
+                }) ?? throw new JsonSerializationException("Failed to deserialize Components");
+                Components.SetLogger(_logger);
+                Components.SetOwner(this);
+            }
         }
         return _vehicleData != null;
     }
@@ -95,6 +103,10 @@ public class RPGVehicle : Vehicle, IPersistantVehicle, IDisposable
     {
         if (_vehicleData == null)
             return;
+        _vehicleData.Components = JsonConvert.SerializeObject(Components, Formatting.None, new JsonSerializerSettings
+        {
+            TypeNameHandling = TypeNameHandling.Objects,
+        });
         _db.Vehicles.Update(_vehicleData);
         await _db.SaveChangesAsync();
     }
