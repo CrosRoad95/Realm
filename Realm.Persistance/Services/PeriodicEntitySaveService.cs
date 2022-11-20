@@ -45,7 +45,6 @@ public class PeriodicEntitySaveService
                 workingCopyOfPlayerAccounts.Clear();
             }
 
-
             if (workingCopyOfPersistantVehicles.Any())
             {
                 foreach (var persistantVehicle in workingCopyOfPersistantVehicles)

@@ -48,4 +48,40 @@ public class ComponentSystem : ISerializable
         _components.Add(component);
         _logger.Verbose("Added component {elementComponentName}", component.Name);
     }
+
+    [ScriptMember("hasComponent")]
+    public bool HasComponent(Type type)
+    {
+        return _components.Where(x => x.GetType() == type).Any();
+    }
+    
+    [ScriptMember("getComponent")]
+    public object? GetComponent(Type type)
+    {
+        return _components.Where(x => x.GetType() == type).FirstOrDefault();
+    }
+
+    [ScriptMember("getComponents")]
+    public object GetComponents(Type type)
+    {
+        return _components.Where(x => x.GetType() == type).ToArray().ToScriptArray();
+    }
+
+    [ScriptMember("getComponents")]
+    public object GetComponentsByName(string name)
+    {
+        return _components.Where(x => x.Name == name).ToArray().ToScriptArray();
+    }
+
+    [ScriptMember("hasComponentByName")]
+    public bool HasComponent(string name)
+    {
+        return _components.Where(x => x.Name == name).Any();
+    }
+
+    [ScriptMember("countComponents")]
+    public int CountComponent(Type type)
+    {
+        return _components.Where(x => x.GetType() == type).Count();
+    }
 }

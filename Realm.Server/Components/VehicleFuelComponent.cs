@@ -20,27 +20,30 @@ public class VehicleFuelComponent : IElementComponent
     [ScriptMember("minimumDistanceThresholdSquared")]
     public float MinimumDistanceThresholdSquared
     {
-        get => _minimumDistanceThresholdSquared; set
+        get => _minimumDistanceThresholdSquared;
+        set
         {
             if (value < 0.0f) value = 0.0f;
             _minimumDistanceThresholdSquared = value;
         }
     }
     
-    [ScriptMember("FuelConsumptionPerOneKm")]
+    [ScriptMember("fuelConsumptionPerOneKm")]
     public float FuelConsumptionPerOneKm
     {
-        get => _fuelConsumptionPerOneKm; set
+        get => _fuelConsumptionPerOneKm;
+        set
         {
             if (value < 0.0f) value = 0.0f;
             _fuelConsumptionPerOneKm = value;
         }
     }
 
-    [ScriptMember("value")]
+    [ScriptMember("amount")]
     public float Amount
     {
-        get => _amount; set
+        get => _amount;
+        set
         {
             if (value < 0.0f) value = 0.0f;
             if (value >= MaxCapacity) value = MaxCapacity;
@@ -52,7 +55,8 @@ public class VehicleFuelComponent : IElementComponent
     [ScriptMember("maxCapacity")]
     public float MaxCapacity
     {
-        get => _maxCapacity; set
+        get => _maxCapacity;
+        set
         {
             if (value < 0.0f)
                 _maxCapacity = 0;

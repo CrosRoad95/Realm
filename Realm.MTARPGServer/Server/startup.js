@@ -182,7 +182,10 @@ addCommandHandler("discord", (player, args) => {
         let veh = await spawnPersistantVehicle("foo");
         veh.components.addComponent(new VehicleFuelComponent(2, 20, 4, 2.5));
         veh.isFrozen = false;
-        Logger.information("spawnPersistantVehicle: {veh} {components}", veh, veh.components);
+        const hasFuelComponent = veh.components.hasComponent(host.typeOf(VehicleFuelComponent));
+        const fuelComp = veh.components.getComponent(host.typeOf(VehicleFuelComponent));
+        Logger.information("fuelComp: {fuelComp} {amount}", fuelComp, fuelComp.amount);
+        Logger.information("spawnPersistantVehicle: {veh} {components}, hasFuelComponent={hasFuelComponent}", veh, veh.components, hasFuelComponent);
     }
     catch (ex) {
         Logger.information("spawnPersistantVehicle ex: {exception}", ex.message);

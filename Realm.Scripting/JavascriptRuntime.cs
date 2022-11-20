@@ -14,6 +14,7 @@ internal class JavascriptRuntime : IScriptingModuleInterface, IReloadable
         _typescriptTypesGenerator = new TypescriptTypesGenerator();
         _logger = logger.ForContext<JavascriptRuntime>();
 
+        _engine.AllowReflection = true;
         _engine.DocumentSettings.Loader = new CustomDocumentLoader(basePathFactory());
         _engine.DocumentSettings.AccessFlags = DocumentAccessFlags.EnableAllLoading;
         _engine.Script.isAsyncFunc = _engine.Evaluate("const ctor = (async() => {}).constructor; x => x instanceof ctor");
@@ -26,6 +27,7 @@ internal class JavascriptRuntime : IScriptingModuleInterface, IReloadable
         AddHostType(typeof(Quaternion));
         AddHostType(typeof(Type));
 
+        AddHostObject("host", new HostFunctions());
         AddHostObject("Logger", new LoggerScriptingFunctions(_logger));
         AddHostObject("Events", eventFunctions, true);
         AddHostObject("Modules", modulesFunctions, true);
