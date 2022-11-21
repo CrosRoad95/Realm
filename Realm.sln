@@ -50,7 +50,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Realm.Resources.Addons.Agno
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Realm.Resources.Addons.Common", "Realm.Resources.Addons.Common\Realm.Resources.Addons.Common.csproj", "{4161187D-8196-4B54-AE91-D0A322D02D92}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Realm.Resources.LuaInterop", "Realm.Resources.LuaInterop\Realm.Resources.LuaInterop.csproj", "{F8E56A0F-1748-42F3-8854-05C8D47F0333}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Realm.Resources.LuaInterop", "Realm.Resources.LuaInterop\Realm.Resources.LuaInterop.csproj", "{F8E56A0F-1748-42F3-8854-05C8D47F0333}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Realm.Resources.ElementOutline", "RealmResources.ElementOutline\Realm.Resources.ElementOutline.csproj", "{619E271B-C4F4-4904-958E-5A90242E5001}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -126,6 +128,10 @@ Global
 		{F8E56A0F-1748-42F3-8854-05C8D47F0333}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F8E56A0F-1748-42F3-8854-05C8D47F0333}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F8E56A0F-1748-42F3-8854-05C8D47F0333}.Release|Any CPU.Build.0 = Release|Any CPU
+		{619E271B-C4F4-4904-958E-5A90242E5001}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{619E271B-C4F4-4904-958E-5A90242E5001}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{619E271B-C4F4-4904-958E-5A90242E5001}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{619E271B-C4F4-4904-958E-5A90242E5001}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -142,6 +148,7 @@ Global
 		{E958D376-3262-432A-9589-4BB908D71839} = {9D22264B-12E5-4387-AD6F-BF9D4AE42C3C}
 		{4161187D-8196-4B54-AE91-D0A322D02D92} = {9D22264B-12E5-4387-AD6F-BF9D4AE42C3C}
 		{F8E56A0F-1748-42F3-8854-05C8D47F0333} = {28944775-A0AF-46D4-9480-D6F4189002B7}
+		{619E271B-C4F4-4904-958E-5A90242E5001} = {28944775-A0AF-46D4-9480-D6F4189002B7}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {3922BF34-8D0B-4DC1-9EFC-D4CFB948B3B8}

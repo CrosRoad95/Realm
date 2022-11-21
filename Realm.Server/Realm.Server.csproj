@@ -31,5 +31,6 @@
     <ProjectReference Include="..\Realm.Resources.AgnosticGuiSystem\Realm.Resources.AgnosticGuiSystem.csproj" />
     <ProjectReference Include="..\Realm.Resources.LuaInterop\Realm.Resources.LuaInterop.csproj" />
     <ProjectReference Include="..\Realm.Scripting\Realm.Scripting.csproj" />
+    <ProjectReference Include="..\RealmResources.ElementOutline\Realm.Resources.ElementOutline.csproj" />
   </ItemGroup>
 </Project>

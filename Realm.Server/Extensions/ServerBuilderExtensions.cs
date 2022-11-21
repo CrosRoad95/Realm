@@ -1,4 +1,6 @@
-﻿namespace Realm.Server.Extensions;
+﻿using RealmResources.ElementOutline;
+
+namespace Realm.Server.Extensions;
 
 public static class ServerBuilderExtensions
 {
@@ -35,6 +37,7 @@ public static class ServerBuilderExtensions
             builder.AddGuiProvider(CeGuiGuiProvider.Name, CeGuiGuiProvider.LuaCode);
         }, commonOptions);
         builder.AddLuaInteropResource(commonOptions);
+        builder.AddElementOutlineResource();
 
         builder.AddLogic<LuaInteropLogic>();
         builder.AddLogic<ClientUILogic>();
