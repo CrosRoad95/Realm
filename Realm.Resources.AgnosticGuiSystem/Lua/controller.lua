@@ -174,7 +174,7 @@ local function internalCommonGuiProvider()
 end
 
 local function entrypoint()
-	currentGuiProvider = guiProviders["cegui"]
+	currentGuiProvider = guiProviders["dgs"]
 	if(currentGuiProvider == nil)then
 		error("No gui provider found")
 	end

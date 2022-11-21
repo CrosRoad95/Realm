@@ -1,4 +1,6 @@
-﻿using RealmResources.ElementOutline;
+﻿using Realm.Resources.Addons.AgnosticGuiSystem.DGSProvider;
+using RealmResources.ElementOutline;
+using SlipeServer.Resources.DGS;
 
 namespace Realm.Server.Extensions;
 
@@ -32,9 +34,11 @@ public static class ServerBuilderExtensions
 
         var commonOptions = new CommonResourceOptions();
         builder.AddNoClipResource();
+        builder.AddDGSResource(DGSVersion.Release_3_518);
         builder.AddAgnosticGuiSystemResource(builder =>
         {
             builder.AddGuiProvider(CeGuiGuiProvider.Name, CeGuiGuiProvider.LuaCode);
+            builder.AddGuiProvider(DGSGuiProvider.Name, DGSGuiProvider.LuaCode);
         }, commonOptions);
         builder.AddLuaInteropResource(commonOptions);
         builder.AddElementOutlineResource();

@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Realm.Resources.Addons.Common;
 using SlipeServer.Server.ServerBuilders;
+using SlipeServer.Resources.DGS;
 
 namespace Realm.Resources.AgnosticGuiSystem;
 
@@ -17,7 +18,8 @@ public static class ServerBuilderExtensions
         builder.AddBuildStep(server =>
         {
             var resource = new AgnosticGuiSystemResource(server, options);
-            if(commonResourceOptions != null)
+            resource.InjectDGSExportedFunctions();
+            if (commonResourceOptions != null)
                 commonResourceOptions.Configure(resource);
 
             var additionalFiles = resource.AdditionalFiles

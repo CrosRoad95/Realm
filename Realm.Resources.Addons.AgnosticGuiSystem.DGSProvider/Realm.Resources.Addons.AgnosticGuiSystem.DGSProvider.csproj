@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net7.0</TargetFramework>
@@ -24,7 +24,6 @@
   </ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="SlipeServer.Resources.Base" Version="0.1.0-CI-20221121-191810" />
+		<PackageReference Include="SlipeServer.Resources.DGS" Version="0.1.0-CI-20221121-191810" />
 	</ItemGroup>
-
 </Project>

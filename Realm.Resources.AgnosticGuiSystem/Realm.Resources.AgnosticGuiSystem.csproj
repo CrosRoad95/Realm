@@ -24,10 +24,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="SlipeServer.Resources.Base" Version="0.1.0-CI-20221104-171945" />
+    <PackageReference Include="SlipeServer.Resources.Base" Version="0.1.0-CI-20221121-191810" />
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Realm.Resources.Addons.AgnosticGuiSystem.DGSProvider\Realm.Resources.Addons.AgnosticGuiSystem.DGSProvider.csproj" />
     <ProjectReference Include="..\Realm.Resources.Addons.Common\Realm.Resources.Addons.Common.csproj" />
   </ItemGroup>
 
