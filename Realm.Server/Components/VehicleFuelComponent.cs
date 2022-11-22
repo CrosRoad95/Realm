@@ -13,6 +13,7 @@ public class VehicleFuelComponent : IElementComponent
     private float _maxCapacity = 0;
     private float _fuelConsumptionPerOneKm;
     private float _minimumDistanceThresholdSquared;
+    private string _fuelType;
 
     [ScriptMember("name")]
     public string Name => "FuelComponent";
@@ -68,7 +69,14 @@ public class VehicleFuelComponent : IElementComponent
         }
     }
 
-    public VehicleFuelComponent(double initialAmount, double maxCapacity, double fuelConsumptionPerOneKm, double minimumDistanceThreshold)
+    [ScriptMember("fuelType")]
+    public string FuelType
+    {
+        get => _fuelType;
+        set => _fuelType = value;
+    }
+
+    public VehicleFuelComponent(double initialAmount, double maxCapacity, double fuelConsumptionPerOneKm, double minimumDistanceThreshold, string fuelType)
     {
         if (initialAmount < 0) throw new ArgumentOutOfRangeException(nameof(initialAmount));
         if (minimumDistanceThreshold < 0) throw new ArgumentOutOfRangeException(nameof(minimumDistanceThreshold));
@@ -79,6 +87,7 @@ public class VehicleFuelComponent : IElementComponent
         _maxCapacity = (float)maxCapacity;
         _fuelConsumptionPerOneKm = (float)fuelConsumptionPerOneKm;
         _minimumDistanceThresholdSquared = (float)minimumDistanceThreshold * (float)minimumDistanceThreshold;
+        _fuelType = fuelType;
     }
 
     public VehicleFuelComponent(SerializationInfo info, StreamingContext context)
@@ -87,6 +96,7 @@ public class VehicleFuelComponent : IElementComponent
         _maxCapacity = (float?)info.GetValue("MaxCapacity", typeof(float)) ?? throw new SerializationException();
         _fuelConsumptionPerOneKm = (float?)info.GetValue("FuelConsumptionPerOneKm", typeof(float)) ?? throw new SerializationException();
         _minimumDistanceThresholdSquared = (float?)info.GetValue("MinimumDistanceThresholdSquared", typeof(float)) ?? throw new SerializationException();
+        _fuelType = (string?)info.GetValue("FuelType", typeof(string)) ?? throw new SerializationException();
     }
 
     [NoScriptAccess]
@@ -161,5 +171,6 @@ public class VehicleFuelComponent : IElementComponent
         info.AddValue("MaxCapacity", MaxCapacity);
         info.AddValue("FuelConsumptionPerOneKm", FuelConsumptionPerOneKm);
         info.AddValue("MinimumDistanceThresholdSquared", MinimumDistanceThresholdSquared);
+        info.AddValue("FuelType", FuelType);
     }
 }
