@@ -10,6 +10,7 @@ internal class AdminToolsResource : Resource
     {
         ["debugDraw.lua"] = ResourceFiles.DebugDraw,
         ["adminTools.lua"] = ResourceFiles.AdminTools,
+        ["tools/debugWorld.lua"] = ResourceFiles.ToolsDebugWorld,
     };
 
     internal AdminToolsResource(MtaServer server)
