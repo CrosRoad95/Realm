@@ -46,6 +46,13 @@ public class RPGVehicle : Vehicle, IPersistantVehicle, IDisposable
             .ForContext(new RPGVehicleEnricher(this));
         IsFrozen = true;
         Components = new ComponentSystem(this, _logger);
+        PedLeft += RPGVehicle_PedLeft;
+    }
+
+    private void RPGVehicle_PedLeft(Element sender, VehicleLeftEventArgs e)
+    {
+        if(e.Seat == 0)
+            NotifyNotSavedState?.Invoke(this);
     }
 
     public void AssignId(string id)
