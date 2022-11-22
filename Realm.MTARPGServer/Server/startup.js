@@ -32,7 +32,7 @@ addEventHandler("onPlayerJoin", async ({ player }) => {
     let account = await findAccountByUserName("Admin")
     Logger.information("account = {account}, is in use? {isInUse}", account, account.isInUse());
     player.debugView = true;
-    player.debugWorld = true;
+    player.adminTools = true;
     //const loggedIn = await player.logIn(account, "asdASD123!@#");
     //if (!loggedIn)
     //    Logger.warning("Fail to log in");

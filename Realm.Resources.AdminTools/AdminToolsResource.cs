@@ -9,6 +9,7 @@ internal class AdminToolsResource : Resource
     internal Dictionary<string, byte[]> AdditionalFiles { get; } = new Dictionary<string, byte[]>()
     {
         ["debugDraw.lua"] = ResourceFiles.DebugDraw,
+        ["adminTools.lua"] = ResourceFiles.AdminTools,
     };
 
     internal AdminToolsResource(MtaServer server)

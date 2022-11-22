@@ -26,24 +26,11 @@ public class RPGPlayer : Player
     [ScriptMember("isLoggedIn", ScriptAccess.ReadOnly)]
     public bool IsLoggedIn => Account != null && Account.IsAuthenticated;
 
-    public event Action<RPGPlayer, bool>? DebugWorldChanged;
+    public event Action<RPGPlayer, bool>? AdminToolsStateChanged;
     public event Action<RPGPlayer, string>? LoggedIn;
     public event Action<RPGPlayer, string>? LoggedOut;
     private bool _debugWorld = false;
-
-    [ScriptMember("debugWorld")]
-    public bool DebugWorld
-    {
-        get => _debugWorld; set
-        {
-            _debugWorld = value;
-            DebugWorldChanged?.Invoke(this, value);
-            if (value)
-                _logger.Verbose("Enabled world debug");
-            else
-                _logger.Verbose("Disabled world debug");
-        }
-    }
+    private bool _adminTools = false;
 
     private bool _debugView = false;
     [ScriptMember("debugView")]
@@ -58,6 +45,20 @@ public class RPGPlayer : Player
                 else
                     _logger.Verbose("Disabled debug view");
             }
+        }
+    }
+
+    [ScriptMember("adminTools")]
+    public bool AdminTools
+    {
+        get => _adminTools; set
+        {
+            _debugWorld = value;
+            AdminToolsStateChanged?.Invoke(this, value);
+            if (value)
+                _logger.Verbose("Enabled admin tools");
+            else
+                _logger.Verbose("Disabled admin tools");
         }
     }
 
