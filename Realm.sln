@@ -52,9 +52,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Realm.Resources.Addons.Comm
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Realm.Resources.LuaInterop", "Realm.Resources.LuaInterop\Realm.Resources.LuaInterop.csproj", "{F8E56A0F-1748-42F3-8854-05C8D47F0333}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Realm.Resources.ElementOutline", "RealmResources.ElementOutline\Realm.Resources.ElementOutline.csproj", "{619E271B-C4F4-4904-958E-5A90242E5001}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Realm.Resources.ElementOutline", "RealmResources.ElementOutline\Realm.Resources.ElementOutline.csproj", "{619E271B-C4F4-4904-958E-5A90242E5001}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Realm.Resources.Addons.AgnosticGuiSystem.DGSProvider", "Realm.Resources.Addons.AgnosticGuiSystem.DGSProvider\Realm.Resources.Addons.AgnosticGuiSystem.DGSProvider.csproj", "{0C2CED3B-543A-4F5B-8560-AC4F7EA06B61}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Realm.Resources.AdminTools", "Realm.Resources.AdminTools\Realm.Resources.AdminTools.csproj", "{D5A5D0C4-1A42-41AF-9C36-892D676B3070}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -138,6 +140,10 @@ Global
 		{0C2CED3B-543A-4F5B-8560-AC4F7EA06B61}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0C2CED3B-543A-4F5B-8560-AC4F7EA06B61}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0C2CED3B-543A-4F5B-8560-AC4F7EA06B61}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D5A5D0C4-1A42-41AF-9C36-892D676B3070}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D5A5D0C4-1A42-41AF-9C36-892D676B3070}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D5A5D0C4-1A42-41AF-9C36-892D676B3070}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D5A5D0C4-1A42-41AF-9C36-892D676B3070}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -156,6 +162,7 @@ Global
 		{F8E56A0F-1748-42F3-8854-05C8D47F0333} = {28944775-A0AF-46D4-9480-D6F4189002B7}
 		{619E271B-C4F4-4904-958E-5A90242E5001} = {28944775-A0AF-46D4-9480-D6F4189002B7}
 		{0C2CED3B-543A-4F5B-8560-AC4F7EA06B61} = {9D22264B-12E5-4387-AD6F-BF9D4AE42C3C}
+		{D5A5D0C4-1A42-41AF-9C36-892D676B3070} = {28944775-A0AF-46D4-9480-D6F4189002B7}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {3922BF34-8D0B-4DC1-9EFC-D4CFB948B3B8}

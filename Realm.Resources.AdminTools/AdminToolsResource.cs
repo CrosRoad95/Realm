@@ -1,0 +1,20 @@
+﻿using SlipeServer.Server;
+using SlipeServer.Server.Elements;
+using SlipeServer.Server.Resources;
+
+namespace Realm.Resources.AdminTools;
+
+internal class AdminToolsResource : Resource
+{
+    internal Dictionary<string, byte[]> AdditionalFiles { get; } = new Dictionary<string, byte[]>()
+    {
+        ["debugDraw.lua"] = ResourceFiles.DebugDraw,
+    };
+
+    internal AdminToolsResource(MtaServer server)
+        : base(server, server.GetRequiredService<RootElement>(), "AdminTools")
+    {
+        foreach (var (path, content) in AdditionalFiles)
+            Files.Add(ResourceFileFactory.FromBytes(content, path));
+    }
+}

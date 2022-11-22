@@ -16,7 +16,7 @@ public class RPGPlayer : Player
     private readonly ChatBox _chatBox;
     private readonly GameplayScriptingFunctions _gameplayScriptingFunctions;
     private readonly ILogger _logger;
-    public Latch ResourceStartingLatch = new(5); // TODO: remove hardcoded resources counter
+    public Latch ResourceStartingLatch = new(6); // TODO: remove hardcoded resources counter
     public CancellationToken CancellationToken { get; private set; }
 
     [ScriptMember("account", ScriptAccess.ReadOnly)]
@@ -252,7 +252,7 @@ public class RPGPlayer : Player
         Camera.Fade(CameraFade.Out, 0, Color.Black);
         Camera.Target = null;
         Account = null;
-        ResourceStartingLatch = new(5); // TODO: remove hardcoded resources counter
+        ResourceStartingLatch = new(6); // TODO: remove hardcoded resources counter
         DebugView = false;
         _runningSessions.Clear();
     }

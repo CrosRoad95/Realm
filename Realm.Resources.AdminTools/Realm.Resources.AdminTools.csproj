@@ -1,0 +1,21 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net7.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="Lua\debugDraw.lua" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Lua\debugDraw.lua" />
+  </ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="SlipeServer.Resources.Base" Version="0.1.0-CI-20221121-191810" />
+	</ItemGroup>
+
+</Project>
