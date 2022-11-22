@@ -1,4 +1,5 @@
 ﻿using Discord;
+using System.ComponentModel;
 using System.Runtime.Serialization;
 
 namespace Realm.Server.Components;
@@ -21,6 +22,16 @@ public class ComponentSystem : ISerializable
     public ComponentSystem(SerializationInfo info, StreamingContext context)
     {
         _components = (List<IElementComponent>?)info.GetValue("Components", typeof(List<IElementComponent>)) ?? throw new SerializationException();
+    }
+
+    public void AfterLoad()
+    {
+        foreach (var component in _components)
+        {
+            component.SetLogger(_logger);
+            component.SetOwner(_owner);
+        }
+        _logger.Verbose("Loaded {count} components: {componentNames}", _components.Count, _components.Select(x => x.Name));
     }
 
     public void SetLogger(ILogger logger)

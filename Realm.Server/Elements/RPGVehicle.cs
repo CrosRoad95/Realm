@@ -101,6 +101,7 @@ public class RPGVehicle : Vehicle, IPersistantVehicle, IDisposable
                 }) ?? throw new JsonSerializationException("Failed to deserialize Components");
                 Components.SetLogger(_logger);
                 Components.SetOwner(this);
+                Components.AfterLoad();
             }
         }
         return _vehicleData != null;

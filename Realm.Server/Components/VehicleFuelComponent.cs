@@ -12,20 +12,20 @@ public class VehicleFuelComponent : IElementComponent
     private float _amount = 0;
     private float _maxCapacity = 0;
     private float _fuelConsumptionPerOneKm;
-    private float _minimumDistanceThresholdSquared;
+    private float _minimumDistanceThreshold;
     private string _fuelType;
 
     [ScriptMember("name")]
     public string Name => "FuelComponent";
 
-    [ScriptMember("minimumDistanceThresholdSquared")]
-    public float MinimumDistanceThresholdSquared
+    [ScriptMember("minimumDistanceThreshold")]
+    public float MinimumDistanceThreshold
     {
-        get => _minimumDistanceThresholdSquared;
+        get => _minimumDistanceThreshold;
         set
         {
             if (value < 0.0f) value = 0.0f;
-            _minimumDistanceThresholdSquared = value;
+            _minimumDistanceThreshold = value;
         }
     }
     
@@ -86,7 +86,7 @@ public class VehicleFuelComponent : IElementComponent
         _amount = (float)initialAmount;
         _maxCapacity = (float)maxCapacity;
         _fuelConsumptionPerOneKm = (float)fuelConsumptionPerOneKm;
-        _minimumDistanceThresholdSquared = (float)minimumDistanceThreshold * (float)minimumDistanceThreshold;
+        _minimumDistanceThreshold = (float)minimumDistanceThreshold;
         _fuelType = fuelType;
     }
 
@@ -95,7 +95,7 @@ public class VehicleFuelComponent : IElementComponent
         _amount = (float?)info.GetValue("Amount", typeof(float)) ?? throw new SerializationException();
         _maxCapacity = (float?)info.GetValue("MaxCapacity", typeof(float)) ?? throw new SerializationException();
         _fuelConsumptionPerOneKm = (float?)info.GetValue("FuelConsumptionPerOneKm", typeof(float)) ?? throw new SerializationException();
-        _minimumDistanceThresholdSquared = (float?)info.GetValue("MinimumDistanceThresholdSquared", typeof(float)) ?? throw new SerializationException();
+        _minimumDistanceThreshold = (float?)info.GetValue("MinimumDistanceThreshold", typeof(float)) ?? throw new SerializationException();
         _fuelType = (string?)info.GetValue("FuelType", typeof(string)) ?? throw new SerializationException();
     }
 
@@ -152,7 +152,7 @@ public class VehicleFuelComponent : IElementComponent
             return;
 
         var traveledDistance = _rpgVehicle.Position - _lastPosition;
-        if (_minimumDistanceThresholdSquared > traveledDistance.LengthSquared() && !forceUpdate)
+        if (_minimumDistanceThreshold > traveledDistance.Length() && !forceUpdate)
             return;
         _lastPosition = _rpgVehicle.Position;
         var consumedFuel = (_fuelConsumptionPerOneKm / 1000.0f) * traveledDistance.Length();
@@ -170,7 +170,7 @@ public class VehicleFuelComponent : IElementComponent
         info.AddValue("Amount", Amount);
         info.AddValue("MaxCapacity", MaxCapacity);
         info.AddValue("FuelConsumptionPerOneKm", FuelConsumptionPerOneKm);
-        info.AddValue("MinimumDistanceThresholdSquared", MinimumDistanceThresholdSquared);
+        info.AddValue("MinimumDistanceThreshold", MinimumDistanceThreshold);
         info.AddValue("FuelType", FuelType);
     }
 }

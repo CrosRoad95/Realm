@@ -10,7 +10,7 @@ public class MileageCounterComponent : IElementComponent
 
     private Vector3 _lastPosition;
     private float _mileage;
-    private float _minimumDistanceThresholdSquared;
+    private float _minimumDistanceThreshold;
 
     [ScriptMember("name")]
     public string Name => "MileageCounter";
@@ -26,14 +26,14 @@ public class MileageCounterComponent : IElementComponent
         }
     }
 
-    [ScriptMember("minimumDistanceThresholdSquared")]
-    public float MinimumDistanceThresholdSquared
+    [ScriptMember("minimumDistanceThreshold")]
+    public float MinimumDistanceThreshold
     {
-        get => _minimumDistanceThresholdSquared;
+        get => _minimumDistanceThreshold;
         set
         {
             if (value < 0.0f) value = 0.0f;
-            _minimumDistanceThresholdSquared = value;
+            _minimumDistanceThreshold = value;
         }
     }
 
@@ -42,13 +42,13 @@ public class MileageCounterComponent : IElementComponent
         if (initialMileage < 0) throw new ArgumentOutOfRangeException(nameof(initialMileage));
 
         _mileage = (float)initialMileage;
-        _minimumDistanceThresholdSquared = (float)minimumDistanceThreshold * (float)minimumDistanceThreshold;
+        _minimumDistanceThreshold = (float)minimumDistanceThreshold;
     }
 
     public MileageCounterComponent(SerializationInfo info, StreamingContext context)
     {
         _mileage = (float?)info.GetValue("Mileage", typeof(float)) ?? throw new SerializationException();
-        _minimumDistanceThresholdSquared = (float?)info.GetValue("MinimumDistanceThresholdSquared", typeof(float)) ?? throw new SerializationException();
+        _minimumDistanceThreshold = (float?)info.GetValue("MinimumDistanceThreshold", typeof(float)) ?? throw new SerializationException();
     }
 
     [NoScriptAccess]
@@ -103,7 +103,7 @@ public class MileageCounterComponent : IElementComponent
             return;
 
         var traveledDistance = _rpgVehicle.Position - _lastPosition;
-        if (_minimumDistanceThresholdSquared > traveledDistance.LengthSquared())
+        if (_minimumDistanceThreshold > traveledDistance.Length())
             return;
         _lastPosition = _rpgVehicle.Position;
         _mileage += traveledDistance.Length();
@@ -112,6 +112,6 @@ public class MileageCounterComponent : IElementComponent
     public void GetObjectData(SerializationInfo info, StreamingContext context)
     {
         info.AddValue("Mileage", Mileage);
-        info.AddValue("MinimumDistanceThresholdSquared", MinimumDistanceThresholdSquared);
+        info.AddValue("MinimumDistanceThreshold", MinimumDistanceThreshold);
     }
 }
