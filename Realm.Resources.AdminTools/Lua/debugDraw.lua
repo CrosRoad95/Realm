@@ -96,6 +96,7 @@ addEventHandler("onClientResourceStart", resourceRoot, function()
 			unbindKey("space", "both", onToggleTool)
 			unbindKey("arrow_u", "down", navigation)
 			unbindKey("arrow_d", "down", navigation)
+			opened = false
 		end
 	end)
 end)

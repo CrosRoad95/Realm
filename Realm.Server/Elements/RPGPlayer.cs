@@ -29,7 +29,6 @@ public class RPGPlayer : Player
     public event Action<RPGPlayer, bool>? AdminToolsStateChanged;
     public event Action<RPGPlayer, string>? LoggedIn;
     public event Action<RPGPlayer, string>? LoggedOut;
-    private bool _debugWorld = false;
     private bool _adminTools = false;
 
     private bool _debugView = false;
@@ -53,7 +52,7 @@ public class RPGPlayer : Player
     {
         get => _adminTools; set
         {
-            _debugWorld = value;
+            _adminTools = value;
             AdminToolsStateChanged?.Invoke(this, value);
             if (value)
                 _logger.Verbose("Enabled admin tools");
