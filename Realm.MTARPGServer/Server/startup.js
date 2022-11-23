@@ -124,6 +124,10 @@ addCommandHandler("playtime", (player, args) => {
         Logger.information("playtime: current session: {0}, in total: {1}", player.account.currentSessionPlayTime, player.account.playTime)
 })
 
+addCommandHandler("noclip", (player, args) => {
+    player.noClip = !player.noClip
+})
+
 addCommandHandler("money", (player, args) => {
     if (!player.isLoggedIn)
         return;

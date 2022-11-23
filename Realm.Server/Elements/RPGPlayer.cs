@@ -27,9 +27,9 @@ public class RPGPlayer : Player
     public bool IsLoggedIn => Account != null && Account.IsAuthenticated;
 
     public event Action<RPGPlayer, bool>? AdminToolsStateChanged;
+    public event Action<RPGPlayer, bool>? NoClipStateChanged;
     public event Action<RPGPlayer, string>? LoggedIn;
     public event Action<RPGPlayer, string>? LoggedOut;
-    private bool _adminTools = false;
 
     private bool _debugView = false;
     [ScriptMember("debugView")]
@@ -47,6 +47,7 @@ public class RPGPlayer : Player
         }
     }
 
+    private bool _adminTools = false;
     [ScriptMember("adminTools")]
     public bool AdminTools
     {
@@ -58,6 +59,21 @@ public class RPGPlayer : Player
                 _logger.Verbose("Enabled admin tools");
             else
                 _logger.Verbose("Disabled admin tools");
+        }
+    }
+
+    private bool _noClip = false;
+    [ScriptMember("noClip")]
+    public bool NoClip
+    {
+        get => _noClip; set
+        {
+            _noClip = value;
+            NoClipStateChanged?.Invoke(this, value);
+            if (value)
+                _logger.Verbose("Enabled no clip");
+            else
+                _logger.Verbose("Disabled no clip");
         }
     }
 

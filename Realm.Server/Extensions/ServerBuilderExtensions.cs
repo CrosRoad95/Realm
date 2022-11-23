@@ -48,6 +48,7 @@ public static class ServerBuilderExtensions
         builder.AddLogic<LuaInteropLogic>();
         builder.AddLogic<ClientUILogic>();
         builder.AddLogic<AdminToolsLogic>();
+        builder.AddLogic<NoClipLogic>();
 
         builder.AddLogic<CommandsLogic>();
 
