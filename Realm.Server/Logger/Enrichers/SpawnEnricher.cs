@@ -2,9 +2,9 @@
 
 internal class SpawnEnricher : ILogEventEnricher
 {
-    private readonly Spawn _spawn;
+    private readonly RPGSpawn _spawn;
 
-    public SpawnEnricher(Spawn rpgVehicle)
+    public SpawnEnricher(RPGSpawn rpgVehicle)
     {
         _spawn = rpgVehicle;
     }

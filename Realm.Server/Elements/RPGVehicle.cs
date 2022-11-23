@@ -61,7 +61,7 @@ public class RPGVehicle : Vehicle, IPersistantVehicle, IDisposable
     }
 
     [ScriptMember("spawn")]
-    public async Task<bool> Spawn(Spawn spawn)
+    public async Task<bool> Spawn(RPGSpawn spawn)
     {
         Position = spawn.Position;
         Rotation = spawn.Rotation;

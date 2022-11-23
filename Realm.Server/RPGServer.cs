@@ -70,7 +70,7 @@ public partial class RPGServer : IRPGServer, IReloadable
                     services.AddTransient<DiscordUser>();
 
                     // Elements
-                    services.AddTransient<Spawn>();
+                    services.AddTransient<RPGSpawn>();
                     services.AddTransient<RPGVehicle>();
                     services.AddTransient<RPGBlip>();
                     services.AddTransient<RPGRadarArea>();
@@ -146,7 +146,7 @@ public partial class RPGServer : IRPGServer, IReloadable
         // Classes & Events & Contextes
         scriptingModuleInterface.AddHostType(typeof(Claim));
         scriptingModuleInterface.AddHostType(typeof(RPGPlayer));
-        scriptingModuleInterface.AddHostType(typeof(Spawn));
+        scriptingModuleInterface.AddHostType(typeof(RPGSpawn));
         scriptingModuleInterface.AddHostType(typeof(RPGVehicle));
         scriptingModuleInterface.AddHostType(typeof(RPGVariantBlip));
         scriptingModuleInterface.AddHostType(typeof(RPGRadarArea));
@@ -194,7 +194,7 @@ public partial class RPGServer : IRPGServer, IReloadable
 
     private void RemoveAllElements()
     {
-        foreach (var spawn in _elementFunctions.GetCollectionByType("spawn").Cast<Spawn>())
+        foreach (var spawn in _elementFunctions.GetCollectionByType("spawn").Cast<RPGSpawn>())
             if(!spawn.IsPersistant() && _elementFunctions.IsElement(spawn))
                 _elementFunctions.DestroyElement(spawn);
 

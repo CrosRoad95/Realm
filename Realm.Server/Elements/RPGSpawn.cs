@@ -1,7 +1,7 @@
 ﻿namespace Realm.Server.Elements;
 
 [NoDefaultScriptAccess]
-public class Spawn : Element, IDisposable
+public class RPGSpawn : Element, IDisposable
 {
     private bool _disposed = false;
     private readonly AuthorizationPoliciesProvider _authorizationPoliciesProvider;
@@ -11,7 +11,7 @@ public class Spawn : Element, IDisposable
     private readonly bool _isPersistant = PersistantScope.IsPersistant;
     private readonly List<string> _requiredPolices = new();
 
-    public Spawn(AuthorizationPoliciesProvider authorizationPoliciesProvider, ILogger logger)
+    public RPGSpawn(AuthorizationPoliciesProvider authorizationPoliciesProvider, ILogger logger)
     {
         _authorizationPoliciesProvider = authorizationPoliciesProvider;
         Position = position;
@@ -19,7 +19,7 @@ public class Spawn : Element, IDisposable
         Destroyed += e => Dispose();
 
         _logger = logger
-            .ForContext<Spawn>()
+            .ForContext<RPGSpawn>()
             .ForContext(new SpawnEnricher(this));
     }
 

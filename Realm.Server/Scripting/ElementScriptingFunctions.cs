@@ -50,9 +50,9 @@ public class ElementScriptingFunctions
     }
     
     [ScriptMember("createSpawn")]
-    public Spawn CreateSpawn(Vector3 position, Vector3? rotation = null)
+    public RPGSpawn CreateSpawn(Vector3 position, Vector3? rotation = null)
     {
-        var spawn = _rpgServer.GetRequiredService<Spawn>();
+        var spawn = _rpgServer.GetRequiredService<RPGSpawn>();
         spawn.Position = position;
         if (rotation != null)
             spawn.Rotation = rotation ?? Vector3.Zero;
@@ -212,7 +212,7 @@ public class ElementScriptingFunctions
     {
         return type switch
         {
-            "spawn" => _elementCollection.GetByType<Spawn>().Cast<object>(),
+            "spawn" => _elementCollection.GetByType<RPGSpawn>().Cast<object>(),
             "player" => _elementCollection.GetByType<Player>().Cast<object>(),
             "vehicle" => _elementCollection.GetByType<RPGVehicle>().Cast<object>(),
             "blip" => _elementCollection.GetByType<RPGBlip>().Cast<object>(),
@@ -245,7 +245,7 @@ public class ElementScriptingFunctions
         {
             case Player _:
                 throw new Exception("Can not destroy persistant element.");
-            case Spawn spawn:
+            case RPGSpawn spawn:
                 if (spawn.IsPersistant())
                     throw new Exception("Can not destroy persistant element.");
                 wasDestroyed = true;

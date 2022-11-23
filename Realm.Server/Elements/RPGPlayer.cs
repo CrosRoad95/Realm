@@ -124,7 +124,7 @@ public class RPGPlayer : Player
     }
 
     [ScriptMember("spawn")]
-    public virtual async Task<bool> Spawn(Spawn spawn)
+    public virtual async Task<bool> Spawn(RPGSpawn spawn)
     {
         if(await spawn.IsAuthorized(this))
         {

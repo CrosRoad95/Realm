@@ -4,7 +4,7 @@ public class PlayerSpawnedEvent : INamedLuaEvent, IDisposable
 {
     private bool _disposed = false;
     private RPGPlayer _player;
-    private Spawn _spawn;
+    private RPGSpawn _spawn;
 
     public static string EventName => "onPlayerSpawn";
 
@@ -17,7 +17,7 @@ public class PlayerSpawnedEvent : INamedLuaEvent, IDisposable
         }
     }
 
-    public Spawn Spawn
+    public RPGSpawn Spawn
     {
         get
         {
@@ -26,7 +26,7 @@ public class PlayerSpawnedEvent : INamedLuaEvent, IDisposable
         }
     }
 
-    public PlayerSpawnedEvent(RPGPlayer player, Spawn spawn)
+    public PlayerSpawnedEvent(RPGPlayer player, RPGSpawn spawn)
     {
         _player = player;
         _spawn = spawn;
