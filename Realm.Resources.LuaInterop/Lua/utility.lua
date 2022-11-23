@@ -1,4 +1,5 @@
-﻿setElementData(localPlayer, "translations", {}, false)
+﻿addEvent("onLoggedIn", true)
+setElementData(localPlayer, "translations", {}, false)
 triggerServerEvent("sendLocalizationCode", getLocalization().code)
 
 addEvent("updateTranslation", true)

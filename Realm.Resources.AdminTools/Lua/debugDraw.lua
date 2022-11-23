@@ -6,6 +6,8 @@ local itemHeight = 25;
 local rightOffset = 300;
 local animationStart = getTickCount() - animationTime
 local currentlySelectedTool = nil
+local loggedIn = false;
+
 local colors = {
 	disabled = tocolor(255, 255, 255, 255),
 	enabled = tocolor(0, 255, 0, 255),
@@ -68,6 +70,9 @@ local function navigation(key, state)
 end
 
 local function openCloseDialog(key, state)
+	if(not loggedIn)then
+		return;
+	end
 	if(state == "down")then
 		opened = true
 		bindKey("space", "down", toggling)
@@ -84,6 +89,9 @@ local function openCloseDialog(key, state)
 end
 
 addEventHandler("onClientResourceStart", resourceRoot, function()
+	addEventHandler("onLoggedIn", localPlayer, function()
+		loggedIn = true;
+	end)
 	addEventHandler("internalOnAdminToolsEnabled", localPlayer, function()
 		addEventHandler("onClientRender", root, render)
 		bindKey("lalt", "both", openCloseDialog)

@@ -179,6 +179,7 @@ public class RPGPlayer : Player
 
         Account = account;
         using var playerLoggedInEvent = new PlayerLoggedInEvent(this, account);
+        TriggerClientEvent("onLoggedIn");
         await _eventFunctions.InvokeEvent(playerLoggedInEvent);
         LoggedIn?.Invoke(this, Account.Id);
         _logger.Verbose("Logged in to the account: {account}", account);
