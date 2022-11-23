@@ -25,6 +25,9 @@ public class InputScriptingFunctions
         _commandService.AddCommand(command).Triggered += async (source, args) =>
         {
             var player = (RPGPlayer)args.Player;
+            if (!player.IsLoggedIn)
+                return;
+
             using var playerProperty = LogContext.PushProperty("player", player);
             using var commandNameProperty = LogContext.PushProperty("commandName", command);
             using var commandArgumentProperty = LogContext.PushProperty("commandArguments", args.Arguments);

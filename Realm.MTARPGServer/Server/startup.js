@@ -120,8 +120,7 @@ addCommandHandler("foo", (player, args) => {
 })
 
 addCommandHandler("playtime", (player, args) => {
-    if (player.isLoggedIn)
-        Logger.information("playtime: current session: {0}, in total: {1}", player.account.currentSessionPlayTime, player.account.playTime)
+    Logger.information("playtime: current session: {0}, in total: {1}", player.account.currentSessionPlayTime, player.account.playTime)
 })
 
 addCommandHandler("noclip", (player, args) => {
@@ -129,9 +128,6 @@ addCommandHandler("noclip", (player, args) => {
 })
 
 addCommandHandler("money", (player, args) => {
-    if (!player.isLoggedIn)
-        return;
-
     player.account.money = player.account.money + 50;
 })
 
@@ -140,9 +136,6 @@ addCommandHandler("foo2", (player, args) => {
 }, ["admin"])
 
 addCommandHandler("discordpolacz", (player, args) => {
-    if (!player.isLoggedIn)
-        return;
-
     if (player.account.isConnectedWithDiscordAccount()) {
         player.sendChatMessage(`Twoje konto jest już połączone z kontem discord.`);
         return;
@@ -172,9 +165,6 @@ addEventHandler("onDiscordUserChange", async ({ account, discord }) => {
 });
 
 addCommandHandler("discord", (player, args) => {
-    if (!player.isLoggedIn)
-        return;
-
     if (player.account.isConnectedWithDiscordAccount()) {
         player.sendChatMessage(`Twoje konto jest już połączone z kontem discord o id ${player.account.id}`);
     }
