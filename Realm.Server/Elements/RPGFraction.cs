@@ -16,10 +16,11 @@ public class RPGFraction : Element, IDisposable
             base.Name = value;
         }
     }
+
     public new Vector3 Position { get => base.Position; [NoScriptAccess]
         set
         {
-            base.Position = position;
+            base.Position = value;
         }
     }
 
@@ -87,6 +88,11 @@ public class RPGFraction : Element, IDisposable
         rpgPlayer.StartSession(session);
         return true;
     }
+
+    [ScriptMember("longUserFriendlyName")]
+    public string LongUserFriendlyName() => Name;
+    [ScriptMember("toString")]
+    public override string ToString() => Name;
 
     public void Dispose()
     {

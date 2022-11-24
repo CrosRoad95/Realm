@@ -2,6 +2,7 @@
 using Realm.Server.ElementCollections;
 using Realm.Server.Elements.CollisionShapes;
 using Realm.Server.Elements.Variants;
+using SlipeServer.Server.Elements;
 using SlipeServer.Server.Elements.ColShapes;
 using SlipeServer.Server.Elements.IdGeneration;
 using PersistantVehicleData = Realm.Persistance.Data.Vehicle;
@@ -194,6 +195,7 @@ public class ElementScriptingFunctions
         fraction.Code = code;
         fraction.Name = name;
         fraction.Position = position;
+        _rpgServer.AssociateElement(fraction);
         return fraction;
     }
     
@@ -212,13 +214,13 @@ public class ElementScriptingFunctions
     {
         return type switch
         {
-            "spawn" => _elementCollection.GetByType<RPGSpawn>().Cast<object>(),
+            "spawn" => _elementCollection.GetAll().Where(x => x is RPGSpawn).Cast<object>(),
             "player" => _elementCollection.GetByType<Player>().Cast<object>(),
             "vehicle" => _elementCollection.GetByType<RPGVehicle>().Cast<object>(),
             "blip" => _elementCollection.GetByType<RPGBlip>().Cast<object>(),
             "radararea" => _elementCollection.GetByType<RPGRadarArea>().Cast<object>(),
             "pickup" => _elementCollection.GetByType<RPGPickup>().Cast<object>(),
-            "fraction" => _elementCollection.GetByType<RPGFraction>().Cast<object>(),
+            "fraction" => _elementCollection.GetAll().Where(x => x is RPGFraction).Cast<object>(),
             _ => throw new NotSupportedException($"Unsupported element type '{type}'")
         };
     }
