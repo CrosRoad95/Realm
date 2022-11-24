@@ -1,11 +1,11 @@
-﻿local adminToolsEnabled = false;
+﻿local tools = {}
+local adminToolsEnabled = false;
 
 addEvent("internalSetAdminToolsEnabled", true)
 addEvent("internalOnAdminToolsEnabled", false)
 addEvent("internalOnAdminToolsDisabled", false)
 
 addEventHandler("internalSetAdminToolsEnabled", localPlayer, function(enabled)
-    outputChatBox("internalSetAdminToolsEnabled"..tostring(enabled))
     if(adminToolsEnabled == enabled)then
         return
     end
@@ -15,9 +15,6 @@ addEventHandler("internalSetAdminToolsEnabled", localPlayer, function(enabled)
         triggerEvent("internalOnAdminToolsDisabled", localPlayer)
     end
 end)
-
-local tools = {}
-
 function getTools()
     local toolsNames = {}
     for name in pairs(tools)do

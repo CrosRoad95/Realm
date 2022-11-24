@@ -1,11 +1,13 @@
 ﻿using Vehicle = SlipeServer.Server.Elements.Vehicle;
 using PersistantVehicleData = Realm.Persistance.Data.Vehicle;
 using Realm.Server.Components;
+using Realm.Resources.AdminTools.Interfaces;
+using Realm.Resources.AdminTools.Enums;
 
 namespace Realm.Server.Elements;
 
 [NoDefaultScriptAccess]
-public class RPGVehicle : Vehicle, IPersistantVehicle, IDisposable
+public class RPGVehicle : Vehicle, IPersistantVehicle, IWorldDebugData, IDisposable
 {
     private bool _disposed = false;
     private string? _vehicleId = null;
@@ -13,6 +15,13 @@ public class RPGVehicle : Vehicle, IPersistantVehicle, IDisposable
     private readonly EventScriptingFunctions _eventFunctions;
     private readonly IDb _db;
     private readonly bool _isPersistant = PersistantScope.IsPersistant;
+
+    private readonly Guid _debugId = Guid.NewGuid();
+    [ScriptMember("debugId")]
+    public Guid DebugId => _debugId;
+    public PreviewType PreviewType => PreviewType.None;
+    public Color PreviewColor => Color.FromArgb(100, 200, 0, 0);
+
     public string VehicleId { get => _vehicleId ?? throw new InvalidDataException(nameof(Id)); }
 
     public event Action<IPersistantVehicle>? NotifyNotSavedState;

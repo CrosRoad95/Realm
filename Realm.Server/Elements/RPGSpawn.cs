@@ -1,12 +1,21 @@
-﻿namespace Realm.Server.Elements;
+﻿using Realm.Resources.AdminTools.Enums;
+using Realm.Resources.AdminTools.Interfaces;
+
+namespace Realm.Server.Elements;
 
 [NoDefaultScriptAccess]
-public class RPGSpawn : Element, IDisposable
+public class RPGSpawn : Element, IDisposable, IWorldDebugData
 {
     private bool _disposed = false;
     private readonly AuthorizationPoliciesProvider _authorizationPoliciesProvider;
     private string? _id;
     private ILogger _logger;
+
+    private readonly Guid _debugId = Guid.NewGuid();
+    [ScriptMember("debugId")]
+    public Guid DebugId => _debugId;
+    public PreviewType PreviewType => PreviewType.BoxWireframe;
+    public Color PreviewColor => Color.FromArgb(100, 0, 200, 0);
 
     private readonly bool _isPersistant = PersistantScope.IsPersistant;
     private readonly List<string> _requiredPolices = new();

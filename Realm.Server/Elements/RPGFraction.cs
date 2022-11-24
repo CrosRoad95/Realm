@@ -1,12 +1,20 @@
-﻿using Realm.Server.Scripting.Sessions;
+﻿using Realm.Resources.AdminTools.Enums;
+using Realm.Resources.AdminTools.Interfaces;
+using Realm.Server.Scripting.Sessions;
 
 namespace Realm.Server.Elements;
 
 [NoDefaultScriptAccess]
-public class RPGFraction : Element, IDisposable
+public class RPGFraction : Element, IDisposable, IWorldDebugData
 {
     private bool _disposed;
     private readonly bool _isPersistant = PersistantScope.IsPersistant;
+
+    private readonly Guid _debugId = Guid.NewGuid();
+    [ScriptMember("debugId")]
+    public Guid DebugId => _debugId;
+    public PreviewType PreviewType => PreviewType.BoxWireframe;
+    public Color PreviewColor => Color.FromArgb(100, 0, 200, 200);
 
     public string Code { get; [NoScriptAccess] set; } = "";
     public string MemberClaim { get; [NoScriptAccess] set; } = "";
