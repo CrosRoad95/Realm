@@ -32,7 +32,6 @@
 
 	<ItemGroup>
 		<ProjectReference Include="..\Realm.Resources.Addons.Common\Realm.Resources.Addons.Common.csproj" />
-		<ProjectReference Include="..\Realm.Resources.AgnosticGuiSystem\Realm.Resources.AgnosticGuiSystem.csproj" />
 	</ItemGroup>
 
 </Project>
