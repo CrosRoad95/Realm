@@ -30,6 +30,7 @@
     <ProjectReference Include="..\Realm.Resources.Addons.AgnosticGuiSystem.CeGuiProvider\Realm.Resources.Addons.AgnosticGuiSystem.CeGuiProvider.csproj" />
     <ProjectReference Include="..\Realm.Resources.Addons.AgnosticGuiSystem.DGSProvider\Realm.Resources.Addons.AgnosticGuiSystem.DGSProvider.csproj" />
     <ProjectReference Include="..\Realm.Resources.AdminTools\Realm.Resources.AdminTools.csproj" />
+    <ProjectReference Include="..\Realm.Resources.AFK\Realm.Resources.AFK.csproj" />
     <ProjectReference Include="..\Realm.Resources.AgnosticGuiSystem\Realm.Resources.AgnosticGuiSystem.csproj" />
     <ProjectReference Include="..\Realm.Resources.LuaInterop\Realm.Resources.LuaInterop.csproj" />
     <ProjectReference Include="..\Realm.Scripting\Realm.Scripting.csproj" />

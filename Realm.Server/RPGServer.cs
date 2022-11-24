@@ -136,6 +136,7 @@ public partial class RPGServer : IRPGServer, IReloadable
         _eventFunctions.RegisterEvent(PlayerSpawnedEvent.EventName);
         _eventFunctions.RegisterEvent(PlayerDiscordConnectedEvent.EventName);
         _eventFunctions.RegisterEvent(DiscordUserChangedEvent.EventName);
+        _eventFunctions.RegisterEvent(PlayerAFKStateChangedEvent.EventName);
 
         // Functions
         scriptingModuleInterface.AddHostObject("Elements", _elementFunctions, true);
@@ -162,6 +163,7 @@ public partial class RPGServer : IRPGServer, IReloadable
         scriptingModuleInterface.AddHostType(typeof(PlayerSpawnedEvent));
         scriptingModuleInterface.AddHostType(typeof(PlayerDiscordConnectedEvent));
         scriptingModuleInterface.AddHostType(typeof(DiscordUserChangedEvent));
+        scriptingModuleInterface.AddHostType(typeof(PlayerAFKStateChangedEvent));
 
         scriptingModuleInterface.AddHostType(typeof(ComponentSystem));
         scriptingModuleInterface.AddHostType(typeof(VehicleFuelComponent));

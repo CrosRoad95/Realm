@@ -188,4 +188,8 @@ addCommandHandler("discord", (player, args) => {
     catch (ex) {
         Logger.information("spawnPersistantVehicle ex: {exception}", ex.message);
     }
-})()
+})();
+
+addEventHandler("onPlayerAFKStateChanged", ({ player, isAfk }) => {
+    Logger.information("player afk state: {player}, {isAfk}", player, isAfk);
+});

@@ -1,5 +1,6 @@
 ﻿using Realm.Resources.Addons.AgnosticGuiSystem.DGSProvider;
 using Realm.Resources.AdminTools;
+using Realm.Resources.AFK;
 using RealmResources.ElementOutline;
 using SlipeServer.Resources.DGS;
 
@@ -44,11 +45,13 @@ public static class ServerBuilderExtensions
         builder.AddLuaInteropResource(commonOptions);
         builder.AddElementOutlineResource();
         builder.AddAdminToolsResource();
+        builder.AddAFKResource();
 
         builder.AddLogic<LuaInteropLogic>();
         builder.AddLogic<ClientUILogic>();
         builder.AddLogic<AdminToolsLogic>();
         builder.AddLogic<NoClipLogic>();
+        builder.AddLogic<AFKLogic>();
 
         builder.AddLogic<CommandsLogic>();
 
