@@ -65,5 +65,7 @@ global using Realm.Persistance.Interfaces;
 global using Realm.Resources.AdminTools.Enums;
 global using Realm.Resources.AdminTools.Interfaces;
 global using Realm.Server.Scripting.Sessions;
+global using Realm.Scripting.Functions;
+global using Realm.Server.Components;
 
 global using ConfigurationProvider = Realm.Configuration.ConfigurationProvider;

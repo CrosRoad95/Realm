@@ -2,6 +2,7 @@
 using Realm.Resources.AdminTools;
 using Realm.Resources.AFK;
 using Realm.Resources.ElementOutline;
+using Realm.Server.Logic;
 using Realm.Server.Logic.Resources;
 using SlipeServer.Resources.DGS;
 
@@ -48,6 +49,9 @@ public static class ServerBuilderExtensions
         builder.AddAdminToolsResource();
         builder.AddAFKResource();
 
+        builder.AddLogic<RPGPlayerLogic>();
+
+        // Resources logics
         builder.AddLogic<LuaInteropLogic>();
         builder.AddLogic<ClientUILogic>();
         builder.AddLogic<AdminToolsLogic>();

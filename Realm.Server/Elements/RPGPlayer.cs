@@ -1,20 +1,15 @@
-﻿using Realm.Scripting.Functions;
-using Realm.Server.Components;
-
-namespace Realm.Server.Elements;
+﻿namespace Realm.Server.Elements;
 
 [NoDefaultScriptAccess]
 public class RPGPlayer : Player
 {
     private readonly CancellationTokenSource _cancellationTokenSource;
     private readonly LuaValueMapper _luaValueMapper;
-    private readonly EventScriptingFunctions _eventFunctions;
     private readonly DebugLog _debugLog;
     private readonly AgnosticGuiSystemService _agnosticGuiSystemService;
     private readonly AccountsInUseService _accountsInUseService;
     private readonly LuaInteropService _luaInteropService;
     private readonly ChatBox _chatBox;
-    private readonly GameplayScriptingFunctions _gameplayScriptingFunctions;
     private readonly ILogger _logger;
     public Latch ResourceStartingLatch = new(7); // TODO: remove hardcoded resources counter
     public CancellationToken CancellationToken { get; private set; }
@@ -28,7 +23,8 @@ public class RPGPlayer : Player
 
     public event Action<RPGPlayer, bool>? AdminToolsStateChanged;
     public event Action<RPGPlayer, bool>? NoClipStateChanged;
-    public event Action<RPGPlayer, string>? LoggedIn;
+    public new event Action<RPGPlayer, RPGSpawn>? Spawned;
+    public event Action<RPGPlayer, PlayerAccount>? LoggedIn;
     public event Action<RPGPlayer, string>? LoggedOut;
 
     [ScriptMember("components")]
@@ -82,18 +78,15 @@ public class RPGPlayer : Player
 
     private readonly List<SessionBase> _runningSessions = new();
 
-    public RPGPlayer(LuaValueMapper luaValueMapper, EventScriptingFunctions eventFunctions,
-        DebugLog debugLog, AgnosticGuiSystemService agnosticGuiSystemService, AccountsInUseService accountsInUseService,
-        ILogger logger, LuaInteropService luaInteropService, ChatBox chatBox, GameplayScriptingFunctions gameplayScriptingFunctions)
+    public RPGPlayer(LuaValueMapper luaValueMapper, DebugLog debugLog, AgnosticGuiSystemService agnosticGuiSystemService,
+        AccountsInUseService accountsInUseService, ILogger logger, LuaInteropService luaInteropService, ChatBox chatBox)
     {
         _luaValueMapper = luaValueMapper;
-        _eventFunctions = eventFunctions;
         _debugLog = debugLog;
         _agnosticGuiSystemService = agnosticGuiSystemService;
         _accountsInUseService = accountsInUseService;
         _luaInteropService = luaInteropService;
         _chatBox = chatBox;
-        _gameplayScriptingFunctions = gameplayScriptingFunctions;
         _logger = logger
             .ForContext<RPGPlayer>()
             .ForContext(new RPGPlayerEnricher(this));
@@ -135,8 +128,7 @@ public class RPGPlayer : Player
             Camera.Target = this;
             Camera.Fade(CameraFade.In);
             Spawn(spawn.Position, spawn.Rotation.Z, 0, 0, 0);
-            using var playerSpawnedEvent = new PlayerSpawnedEvent(this, spawn);
-            await _eventFunctions.InvokeEvent(playerSpawnedEvent);
+            Spawned?.Invoke(this, spawn);
             _logger.Verbose("Spawned at {spawn}", spawn);
             return true;
         }
@@ -184,9 +176,7 @@ public class RPGPlayer : Player
         Account = account;
         using var playerLoggedInEvent = new PlayerLoggedInEvent(this, account);
         TriggerClientEvent("onLoggedIn");
-        await _eventFunctions.InvokeEvent(playerLoggedInEvent);
-        LoggedIn?.Invoke(this, Account.Id);
-
+        LoggedIn?.Invoke(this, Account);
 
         if (!string.IsNullOrEmpty(account.ComponentsData))
         {
@@ -210,12 +200,9 @@ public class RPGPlayer : Player
             return false;
 
         await Save();
-        using var playerLoggedOutEvent = new PlayerLoggedOutEvent(this);
-        await _eventFunctions.InvokeEvent(playerLoggedOutEvent);
-        var account = Account;
+        LoggedOut?.Invoke(this, Account.Id);
+        _logger.Verbose("Logged out from account: {account}", Account);
         Account = null;
-        LoggedOut?.Invoke(this, account.Id);
-        _logger.Verbose("Logged out account: {account}", account);
         return true;
     }
 

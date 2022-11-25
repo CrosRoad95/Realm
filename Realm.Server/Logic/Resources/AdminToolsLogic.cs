@@ -2,7 +2,7 @@
 
 namespace Realm.Server.Logic.Resources;
 
-public class AdminToolsLogic
+internal class AdminToolsLogic
 {
     private readonly MtaServer _mtaServer;
     private readonly AdminToolsService _adminToolsService;
