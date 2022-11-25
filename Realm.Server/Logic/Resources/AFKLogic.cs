@@ -1,7 +1,8 @@
 ﻿using Realm.Resources.AFK;
+using Realm.Scripting.Functions;
 using Realm.Server.Elements;
 
-namespace Realm.Server.ResourcesLogic;
+namespace Realm.Server.Logic.Resources;
 
 internal class AFKLogic
 {

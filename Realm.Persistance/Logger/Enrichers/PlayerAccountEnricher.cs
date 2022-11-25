@@ -1,7 +1,7 @@
 ﻿using Serilog.Core;
 using Serilog.Events;
 
-namespace Realm.Server.Logger.Enrichers;
+namespace Realm.Persistance.Logger.Enrichers;
 
 internal class PlayerAccountEnricher : ILogEventEnricher
 {

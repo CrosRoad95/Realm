@@ -1,4 +1,6 @@
-﻿namespace Realm.Server.Extensions;
+﻿using Realm.Scripting.Functions;
+
+namespace Realm.Server.Extensions;
 
 internal static class EventFunctionsExtensions
 {

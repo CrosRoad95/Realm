@@ -4,7 +4,7 @@ using SlipeServer.Server.Mappers;
 using SlipeServer.Server.Services;
 using System.Drawing;
 
-namespace RealmResources.ElementOutline;
+namespace Realm.Resources.ElementOutline;
 
 internal class ElementOutlineLogic
 {

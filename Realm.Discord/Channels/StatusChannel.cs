@@ -1,4 +1,6 @@
-﻿namespace Realm.Discord.Channels;
+﻿using Realm.Scripting.Functions;
+
+namespace Realm.Discord.Channels;
 
 internal class StatusChannel
 {

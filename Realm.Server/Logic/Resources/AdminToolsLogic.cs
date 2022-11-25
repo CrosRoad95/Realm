@@ -1,6 +1,6 @@
 ﻿using Realm.Resources.AdminTools;
 
-namespace Realm.Server.ResourcesLogic;
+namespace Realm.Server.Logic.ResourcesLogic;
 
 public class AdminToolsLogic
 {

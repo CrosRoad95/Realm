@@ -1,4 +1,6 @@
-﻿namespace Realm.Scripting;
+﻿using Realm.Scripting.Functions;
+
+namespace Realm.Scripting;
 
 public class ScriptingModule : IModule
 {

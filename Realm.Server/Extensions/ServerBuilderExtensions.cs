@@ -1,7 +1,8 @@
 ﻿using Realm.Resources.Addons.AgnosticGuiSystem.DGSProvider;
 using Realm.Resources.AdminTools;
 using Realm.Resources.AFK;
-using RealmResources.ElementOutline;
+using Realm.Resources.ElementOutline;
+using Realm.Server.Logic.Resources;
 using SlipeServer.Resources.DGS;
 
 namespace Realm.Server.Extensions;

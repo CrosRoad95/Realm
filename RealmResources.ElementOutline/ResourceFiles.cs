@@ -1,7 +1,7 @@
 ﻿using SlipeServer.Resources.Base;
 using System.Reflection;
 
-namespace RealmResources.ElementOutline;
+namespace Realm.Resources.ElementOutline;
 
 internal class ResourceFiles
 {

@@ -1,4 +1,6 @@
-﻿namespace Realm.Server.ResourcesLogic;
+﻿using Realm.Scripting.Functions;
+
+namespace Realm.Server.Logic.Resources;
 
 internal class ClientUILogic
 {

@@ -1,4 +1,5 @@
 ﻿using Realm.Discord.Interfaces;
+using Realm.Scripting.Functions;
 
 namespace Realm.Discord;
 

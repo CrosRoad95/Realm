@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using SlipeServer.Server.ServerBuilders;
 
-namespace RealmResources.ElementOutline;
+namespace Realm.Resources.ElementOutline;
 
 public static class ServerBuilderExtensions
 {

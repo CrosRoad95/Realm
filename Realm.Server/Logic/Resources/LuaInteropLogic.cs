@@ -1,4 +1,4 @@
-﻿namespace Realm.Server.ResourcesLogic;
+﻿namespace Realm.Server.Logic.Resources;
 
 internal class LuaInteropLogic
 {

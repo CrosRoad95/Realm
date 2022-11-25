@@ -1,7 +1,7 @@
 ﻿using SlipeServer.Server.Elements;
 using System.Drawing;
 
-namespace RealmResources.ElementOutline;
+namespace Realm.Resources.ElementOutline;
 
 public class ElementOutlineService
 {

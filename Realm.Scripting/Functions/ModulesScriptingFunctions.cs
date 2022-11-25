@@ -1,4 +1,4 @@
-﻿namespace Realm.Scripting.Classes;
+﻿namespace Realm.Scripting.Functions;
 
 [NoDefaultScriptAccess]
 public class ModulesScriptingFunctions

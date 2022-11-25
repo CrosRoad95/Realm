@@ -2,7 +2,7 @@
 using SlipeServer.Server.Resources;
 using SlipeServer.Server;
 
-namespace RealmResources.ElementOutline;
+namespace Realm.Resources.ElementOutline;
 
 internal class ElementOutlineResource : Resource
 {

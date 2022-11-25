@@ -1,4 +1,4 @@
-﻿namespace Realm.Scripting.Classes;
+﻿namespace Realm.Scripting.Functions;
 
 [NoDefaultScriptAccess]
 public class EventScriptingFunctions : IReloadable
@@ -17,7 +17,7 @@ public class EventScriptingFunctions : IReloadable
         if (!_supportedEventsNames.Contains(eventName))
             throw new NotImplementedException();
 
-        if(_events.TryGetValue(eventName, out var events))
+        if (_events.TryGetValue(eventName, out var events))
         {
             using var _ = LogContext.PushProperty("eventName", eventName);
             foreach (var scriptObject in events)
