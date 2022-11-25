@@ -1,6 +1,4 @@
-﻿using Serilog.Context;
-
-namespace Realm.Server.Scripting;
+﻿namespace Realm.Server.Scripting;
 
 [NoDefaultScriptAccess]
 public class InputScriptingFunctions

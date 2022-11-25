@@ -1,8 +1,7 @@
 ﻿using Vehicle = SlipeServer.Server.Elements.Vehicle;
 using PersistantVehicleData = Realm.Persistance.Data.Vehicle;
 using Realm.Server.Components;
-using Realm.Resources.AdminTools.Interfaces;
-using Realm.Resources.AdminTools.Enums;
+using Realm.Scripting.Functions;
 
 namespace Realm.Server.Elements;
 

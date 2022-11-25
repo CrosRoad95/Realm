@@ -1,6 +1,4 @@
-﻿using Realm.Persistance.Services;
-
-namespace Realm.Persistance;
+﻿namespace Realm.Persistance;
 
 public class AuthorizationPoliciesProvider
 {

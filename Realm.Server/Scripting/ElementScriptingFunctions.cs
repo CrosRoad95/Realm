@@ -2,8 +2,6 @@
 using Realm.Server.ElementCollections;
 using Realm.Server.Elements.CollisionShapes;
 using Realm.Server.Elements.Variants;
-using SlipeServer.Server.Elements;
-using SlipeServer.Server.Elements.ColShapes;
 using SlipeServer.Server.Elements.IdGeneration;
 using PersistantVehicleData = Realm.Persistance.Data.Vehicle;
 

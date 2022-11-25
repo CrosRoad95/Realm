@@ -1,7 +1,4 @@
-﻿using Newtonsoft.Json;
-using System.Drawing;
-
-namespace Realm.Persistance.Data.Helpers;
+﻿namespace Realm.Persistance.Data.Helpers;
 
 public class VehicleColor
 {

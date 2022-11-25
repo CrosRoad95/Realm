@@ -1,8 +1,4 @@
-﻿using Realm.Resources.AdminTools.Enums;
-using Realm.Resources.AdminTools.Interfaces;
-using Realm.Server.Scripting.Sessions;
-
-namespace Realm.Server.Elements;
+﻿namespace Realm.Server.Elements;
 
 [NoDefaultScriptAccess]
 public class RPGFraction : Element, IDisposable, IWorldDebugData

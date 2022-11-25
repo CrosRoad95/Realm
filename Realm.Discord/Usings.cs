@@ -18,6 +18,5 @@ global using Realm.Discord.Providers;
 global using Realm.Configuration;
 global using Realm.Interfaces.Extend;
 global using Realm.Scripting.Interfaces;
-global using Realm.Scripting.Classes;
 global using Realm.Discord.Scripting.Events;
 global using Realm.Discord.Services;

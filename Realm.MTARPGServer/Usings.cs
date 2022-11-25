@@ -9,6 +9,7 @@ global using YamlDotNet.Serialization.NamingConventions;
 global using YamlDotNet.Serialization;
 global using YamlDotNet.Core;
 global using YamlDotNet.Core.Events;
+global using SlipeServer.Server.Elements;
 
 global using Realm.MTARPGServer.Serialization.Yaml;
 global using Realm.Persistance.Scripting.Classes;
@@ -17,3 +18,4 @@ global using Realm.Interfaces.Server;
 global using Realm.Server;
 global using Realm.Interfaces.Extend;
 global using Realm.Scripting.Scopes;
+global using Realm.Server.ElementCollections;

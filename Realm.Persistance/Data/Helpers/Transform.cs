@@ -1,6 +1,4 @@
-﻿using Newtonsoft.Json;
-
-namespace Realm.Persistance.Data.Helpers;
+﻿namespace Realm.Persistance.Data.Helpers;
 
 public class TransformAndMotion
 {

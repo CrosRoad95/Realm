@@ -1,7 +1,4 @@
-﻿using Serilog.Context;
-using SlipeServer.Server.Elements.ColShapes;
-
-namespace Realm.Server.Elements.CollisionShapes;
+﻿namespace Realm.Server.Elements.CollisionShapes;
 
 public class RPGCollisionSphere : CollisionSphere, IDisposable
 {

@@ -1,6 +1,4 @@
-﻿using Realm.Scripting.Functions;
-
-namespace Realm.Persistance.Scripting.Classes;
+﻿namespace Realm.Persistance.Scripting.Classes;
 
 public class PlayerAccount : ISavable, IDisposable
 {

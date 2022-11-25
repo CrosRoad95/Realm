@@ -1,7 +1,4 @@
-﻿using Realm.Resources.AdminTools;
-using SlipeServer.Resources.NoClip;
-
-namespace Realm.Server.Logic.Resources;
+﻿namespace Realm.Server.Logic.Resources;
 
 internal class NoClipLogic
 {

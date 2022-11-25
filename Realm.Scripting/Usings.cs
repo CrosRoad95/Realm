@@ -13,8 +13,6 @@ global using Microsoft.ClearScript.V8;
 global using Microsoft.Extensions.DependencyInjection;
 global using Serilog;
 global using Serilog.Context;
-
-global using Realm.Scripting.Classes;
 global using Realm.Scripting.Extensions;
 global using Realm.Common.Extensions;
 global using Realm.Common.Attributes;

@@ -1,6 +1,5 @@
 ﻿using Realm.Resources.AFK;
 using Realm.Scripting.Functions;
-using Realm.Server.Elements;
 
 namespace Realm.Server.Logic.Resources;
 
