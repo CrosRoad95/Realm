@@ -1,7 +1,5 @@
 ﻿using Vehicle = SlipeServer.Server.Elements.Vehicle;
 using PersistantVehicleData = Realm.Persistance.Data.Vehicle;
-using Realm.Server.Components;
-using Realm.Scripting.Functions;
 
 namespace Realm.Server.Elements;
 
@@ -11,9 +9,10 @@ public class RPGVehicle : Vehicle, IPersistantVehicle, IWorldDebugData, IDisposa
     private bool _disposed = false;
     private string? _vehicleId = null;
     private readonly ILogger _logger;
-    private readonly EventScriptingFunctions _eventFunctions;
     private readonly IDb _db;
     private readonly bool _isPersistant = PersistantScope.IsPersistant;
+
+    public event Action<RPGVehicle, RPGSpawn?>? Spawned;
 
     private readonly Guid _debugId = Guid.NewGuid();
     [ScriptMember("debugId")]
@@ -45,9 +44,8 @@ public class RPGVehicle : Vehicle, IPersistantVehicle, IWorldDebugData, IDisposa
         }
     }
 
-    public RPGVehicle(ILogger logger, EventScriptingFunctions eventFunctions, IDb db) : base(404, new Vector3(0,0, 10000))
+    public RPGVehicle(ILogger logger, IDb db) : base(404, new Vector3(0,0, 10000))
     {
-        _eventFunctions = eventFunctions;
         _db = db;
         _logger = logger
             .ForContext<RPGVehicle>()
@@ -69,13 +67,21 @@ public class RPGVehicle : Vehicle, IPersistantVehicle, IWorldDebugData, IDisposa
     }
 
     [ScriptMember("spawn")]
-    public async Task<bool> Spawn(RPGSpawn spawn)
+    public bool Spawn(RPGSpawn spawn)
     {
         Position = spawn.Position;
         Rotation = spawn.Rotation;
-        using var vehicleSpawnedEvent = new VehicleSpawnedEvent(this, spawn);
-        await _eventFunctions.InvokeEvent(vehicleSpawnedEvent);
+        Spawned?.Invoke(this, spawn);
         _logger.Verbose("Spawned at {spawn}", spawn);
+        return true;
+    }
+    
+    public new bool RawSpawn(Vector3 position, Vector3 rotation)
+    {
+        Position = position;
+        Rotation = rotation;
+        Spawned?.Invoke(this, null);
+        _logger.Verbose("Spawned at position: {position}, rotation: {rotation}", position, rotation);
         return true;
     }
 
@@ -99,8 +105,6 @@ public class RPGVehicle : Vehicle, IPersistantVehicle, IWorldDebugData, IDisposa
             .FirstOrDefaultAsync();
         if(_vehicleData != null)
         {
-            Position = _vehicleData.TransformAndMotion.Position;
-            Rotation = _vehicleData.TransformAndMotion.Rotation;
             if(!string.IsNullOrEmpty(_vehicleData.Components))
             {
                 Components = JsonConvert.DeserializeObject<ComponentSystem>(_vehicleData.Components, new JsonSerializerSettings
@@ -111,6 +115,7 @@ public class RPGVehicle : Vehicle, IPersistantVehicle, IWorldDebugData, IDisposa
                 Components.SetOwner(this);
                 Components.AfterLoad();
             }
+            RawSpawn(_vehicleData.TransformAndMotion.Position, _vehicleData.TransformAndMotion.Rotation);
         }
         return _vehicleData != null;
     }

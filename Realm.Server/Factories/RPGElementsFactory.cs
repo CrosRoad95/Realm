@@ -1,6 +1,5 @@
 ﻿using Realm.Persistance.Services;
-using Realm.Server.Elements.CollisionShapes;
-using Realm.Server.Elements.Variants;
+using Realm.Server.Elements;
 using SlipeServer.Server.Elements.IdGeneration;
 using PersistantVehicleData = Realm.Persistance.Data.Vehicle;
 
@@ -39,19 +38,17 @@ public class RPGElementsFactory
         return spawn;
     }
 
-    public RPGVehicle CreateVehicle(ushort model, Vector3 position, Vector3? rotation = null)
+    public RPGVehicle CreateVehicle(ushort model, RPGSpawn rpgSpawn)
     {
         var vehicle = _rpgServer.GetRequiredService<RPGVehicle>();
         vehicle.Model = model;
-        vehicle.Position = position;
-        if (rotation != null)
-            vehicle.Rotation = rotation ?? Vector3.Zero;
         _rpgServer.AssociateElement(vehicle);
         VehicleCreated?.Invoke(vehicle);
+        vehicle.Spawn(rpgSpawn);
         return vehicle;
     }
 
-    public async Task<RPGVehicle?> CreateNewPersistantVehicle(string id, ushort model, Vector3 position, Vector3? rotation = null)
+    public async Task<RPGVehicle?> CreateNewPersistantVehicle(string id, ushort model, RPGSpawn spawn)
     {
         using var _ = new PersistantScope();
         if (await _db.Vehicles.AnyAsync(x => x.Id == id))
@@ -64,18 +61,18 @@ public class RPGElementsFactory
             Platetext = "",
             TransformAndMotion = new Persistance.Data.Helpers.TransformAndMotion
             {
-                Position = position,
-                Rotation = rotation ?? Vector3.Zero
+                Position = spawn.Position,
+                Rotation = spawn.Rotation,
             },
             CreatedAt = DateTime.Now,
         };
         _db.Vehicles.Add(vehicleData);
         await _db.SaveChangesAsync();
         _logger.Verbose("Created new persistant vehicle {vehicleId}", id);
-        return await SpawnPersistantVehicle(id, position, rotation);
+        return await SpawnPersistantVehicle(id, spawn);
     }
 
-    public async Task<RPGVehicle?> SpawnPersistantVehicle(string id, Vector3? position = null, Vector3? rotation = null)
+    public async Task<RPGVehicle?> SpawnPersistantVehicle(string id, RPGSpawn spawn)
     {
         using var _ = new PersistantScope();
         var vehicle = _rpgServer.GetRequiredService<RPGVehicle>();
@@ -86,14 +83,11 @@ public class RPGElementsFactory
             vehicle.Dispose();
             throw new Exception("Failed to create vehicle");
         }
-        if (position != null)
-            vehicle.Position = position ?? Vector3.Zero;
-        if (rotation != null)
-            vehicle.Rotation = rotation ?? Vector3.Zero;
         _periodicEntitySaveService.VehicleCreated(vehicle);
         _rpgServer.AssociateElement(vehicle);
         _logger.Verbose("Spawned persistant vehicle {vehicleId}", id);
         VehicleCreated?.Invoke(vehicle);
+        vehicle.Spawn(spawn);
         return vehicle;
     }
 

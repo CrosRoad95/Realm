@@ -41,16 +41,16 @@ public class ElementScriptingFunctions
         => _rpgElementsFactory.CreateSpawn(position, rotation); 
 
     [ScriptMember("createVehicle")]
-    public RPGVehicle CreateVehicle(ushort model, Vector3 position, Vector3? rotation = null)
-        => _rpgElementsFactory.CreateVehicle(model, position, rotation);    
+    public RPGVehicle CreateVehicle(ushort model, RPGSpawn spawn)
+        => _rpgElementsFactory.CreateVehicle(model, spawn);    
 
     [ScriptMember("createNewPersistantVehicle")]
-    public async Task<RPGVehicle?> CreateNewPersistantVehicle(string id, ushort model, Vector3 position, Vector3? rotation = null)
-        => await _rpgElementsFactory.CreateNewPersistantVehicle(id, model, position, rotation);
+    public async Task<RPGVehicle?> CreateNewPersistantVehicle(string id, ushort model, RPGSpawn spawn)
+        => await _rpgElementsFactory.CreateNewPersistantVehicle(id, model, spawn);
 
     [ScriptMember("spawnPersistantVehicle")]
-    public async Task<RPGVehicle?> SpawnPersistantVehicle(string id, Vector3? position = null, Vector3? rotation = null)
-        => await _rpgElementsFactory.SpawnPersistantVehicle(id, position, rotation);
+    public async Task<RPGVehicle?> SpawnPersistantVehicle(string id, RPGSpawn spawn)
+        => await _rpgElementsFactory.SpawnPersistantVehicle(id, spawn);
 
     [ScriptMember("createBlip")]
     public RPGBlip CreateBlip(Vector3 position, int icon)

@@ -4,7 +4,7 @@ public class VehicleSpawnedEvent : INamedLuaEvent, IDisposable
 {
     private bool _disposed = false;
     private RPGVehicle _vehicle;
-    private RPGSpawn _spawn;
+    private RPGSpawn? _spawn;
 
     public static string EventName => "onVehicleSpawn";
 
@@ -17,7 +17,7 @@ public class VehicleSpawnedEvent : INamedLuaEvent, IDisposable
         }
     }
 
-    public RPGSpawn Spawn
+    public RPGSpawn? Spawn
     {
         get
         {
@@ -26,7 +26,7 @@ public class VehicleSpawnedEvent : INamedLuaEvent, IDisposable
         }
     }
 
-    public VehicleSpawnedEvent(RPGVehicle vehicle, RPGSpawn spawn)
+    public VehicleSpawnedEvent(RPGVehicle vehicle, RPGSpawn? spawn)
     {
         _vehicle = vehicle;
         _spawn = spawn;

@@ -9,7 +9,8 @@ Logger.information("Localization: text={text}, try={text2}", Localization.transl
 Logger.information("startup.js, TestModule: {TestModule}", TestModule);
 Logger.information("loaded modules: {modules}", JSON.stringify(getModules()));
 
-const testVehicle = createVehicle(404, new Vector3(-10, -10, 3))
+const spawnForTestVehicle = createSpawn(new Vector3(-10, -10, 3));
+const testVehicle = createVehicle(404, spawnForTestVehicle)
 Logger.information("spawned vehicle: {testVehicle}", testVehicle);
 
 const variantBlip = createVariantBlip(new Vector3(50, 50, 0));
@@ -172,8 +173,9 @@ addCommandHandler("discord", (player, args) => {
 
 (async () => {
     try {
-        await createPersistantVehicle("foo", 404, new Vector3(0,-5,3));
-        let veh = await spawnPersistantVehicle("foo");
+        let veh = await createNewPersistantVehicle("foo", 404, spawn);
+        if (veh == null)
+            veh = await spawnPersistantVehicle("foo", spawn);
 
         const hasFuelComponent = veh.components.hasComponent(host.typeOf(VehicleFuelComponent));
         if (!hasFuelComponent)

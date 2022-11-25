@@ -50,6 +50,7 @@ public static class ServerBuilderExtensions
         builder.AddAFKResource();
 
         builder.AddLogic<RPGPlayerLogic>();
+        builder.AddLogic<RPGVehicleLogic>();
 
         // Resources logics
         builder.AddLogic<LuaInteropLogic>();
