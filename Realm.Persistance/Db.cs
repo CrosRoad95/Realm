@@ -32,6 +32,14 @@ public abstract class Db<T> : IdentityDbContext<User, Role, Guid,
         modelBuilder.Entity<IdentityRoleClaim<Guid>>().ToTable("RoleClaims");
         modelBuilder.Entity<IdentityUserToken<Guid>>().ToTable("UserTokens");
 
+        modelBuilder.Entity<User>(entityBuilder =>
+        {
+            entityBuilder.Property(x => x.Components)
+                .HasDefaultValue(null)
+                .HasMaxLength(262140)
+                .IsRequired(false);
+        });
+
         modelBuilder.Entity<UserData>(entityBuilder =>
         {
             entityBuilder
