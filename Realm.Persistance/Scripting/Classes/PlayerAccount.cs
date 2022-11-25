@@ -57,6 +57,20 @@ public class PlayerAccount : ISavable, IDisposable
             return _discord;
         }
     }
+    
+    public string? ComponentsData
+    {
+        get
+        {
+            CheckIfDisposed();
+            return _user.Components;
+        }
+        set
+        {
+            CheckIfDisposed();
+            _user.Components = value;
+        }
+    }
 
     public event Action<PlayerAccount>? NotifyNotSavedState;
     public event Action<PlayerAccount>? Disposed;

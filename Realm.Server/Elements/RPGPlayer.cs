@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json.Linq;
+using Realm.Server.Components;
 using Realm.Server.Scripting.Sessions;
 
 namespace Realm.Server.Elements;
@@ -30,6 +31,9 @@ public class RPGPlayer : Player
     public event Action<RPGPlayer, bool>? NoClipStateChanged;
     public event Action<RPGPlayer, string>? LoggedIn;
     public event Action<RPGPlayer, string>? LoggedOut;
+
+    [ScriptMember("components")]
+    public ComponentSystem Components;
 
     private bool _debugView = false;
     [ScriptMember("debugView")]
@@ -96,6 +100,7 @@ public class RPGPlayer : Player
             .ForContext(new RPGPlayerEnricher(this));
         _cancellationTokenSource = new CancellationTokenSource();
         CancellationToken = _cancellationTokenSource.Token;
+        Components = new ComponentSystem(this, _logger);
         ResourceStarted += RPGPlayer_ResourceStarted;
         Disconnected += RPGPlayer_Disconnected;
 
@@ -182,6 +187,19 @@ public class RPGPlayer : Player
         TriggerClientEvent("onLoggedIn");
         await _eventFunctions.InvokeEvent(playerLoggedInEvent);
         LoggedIn?.Invoke(this, Account.Id);
+
+
+        if (!string.IsNullOrEmpty(account.ComponentsData))
+        {
+            Components = JsonConvert.DeserializeObject<ComponentSystem>(account.ComponentsData, new JsonSerializerSettings
+            {
+                TypeNameHandling = TypeNameHandling.Objects,
+            }) ?? throw new JsonSerializationException("Failed to deserialize Components");
+            Components.SetLogger(_logger);
+            Components.SetOwner(this);
+            Components.AfterLoad();
+        }
+
         _logger.Verbose("Logged in to the account: {account}", account);
         return true;
     }
@@ -192,7 +210,7 @@ public class RPGPlayer : Player
         if (!IsLoggedIn || Account == null)
             return false;
 
-        await Account.Save();
+        await Save();
         using var playerLoggedOutEvent = new PlayerLoggedOutEvent(this);
         await _eventFunctions.InvokeEvent(playerLoggedOutEvent);
         var account = Account;
@@ -200,6 +218,19 @@ public class RPGPlayer : Player
         LoggedOut?.Invoke(this, account.Id);
         _logger.Verbose("Logged out account: {account}", account);
         return true;
+    }
+
+    public async Task Save()
+    {
+        if (!IsLoggedIn || Account == null)
+            return;
+
+        await Account.Save();
+        Account.ComponentsData = JsonConvert.SerializeObject(Components, Formatting.None, new JsonSerializerSettings
+        {
+            TypeNameHandling = TypeNameHandling.Objects,
+        });
+        ;
     }
 
     [ScriptMember("openGui")]

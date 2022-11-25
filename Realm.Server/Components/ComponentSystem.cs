@@ -26,6 +26,9 @@ public class ComponentSystem : ISerializable
 
     public void AfterLoad()
     {
+        if (!_components.Any())
+            return;
+
         foreach (var component in _components)
         {
             component.SetLogger(_logger);
