@@ -3,6 +3,7 @@ using Realm.Server.Components;
 using Realm.Server.ElementCollections;
 using Realm.Server.Elements.CollisionShapes;
 using Realm.Server.Elements.Variants;
+using Realm.Server.Factories;
 
 namespace Realm.Server;
 
@@ -66,6 +67,9 @@ public partial class RPGServer : IRPGServer, IReloadable
                     services.AddSingleton<IAccountsInUseService>(x => x.GetRequiredService<AccountsInUseService>());
                     services.AddSingleton<IDiscordVerificationHandler, DiscordVerificationHandler>();
                     services.AddSingleton<IDiscordUserChangedHandler, DiscordUserChangedHandler>();
+
+                    // Factories
+                    services.AddSingleton<RPGElementsFactory>();
 
                     // Player specific
                     services.AddTransient<DiscordUser>();

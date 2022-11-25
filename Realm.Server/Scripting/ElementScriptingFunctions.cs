@@ -2,211 +2,87 @@
 using Realm.Server.ElementCollections;
 using Realm.Server.Elements.CollisionShapes;
 using Realm.Server.Elements.Variants;
-using SlipeServer.Server.Elements.IdGeneration;
-using PersistantVehicleData = Realm.Persistance.Data.Vehicle;
+using Realm.Server.Factories;
 
 namespace Realm.Server.Scripting;
 
 [NoDefaultScriptAccess]
 public class ElementScriptingFunctions
 {
-    private readonly RPGServer _rpgServer;
     private readonly IElementCollection _elementCollection;
-    private readonly IElementIdGenerator _elementIdGenerator;
     private readonly ElementByStringIdCollection _elementByStringIdCollection;
-    private readonly PeriodicEntitySaveService _periodicEntitySaveService;
-    private readonly IDb _db;
+    private readonly RPGElementsFactory _rpgElementsFactory;
     private readonly ILogger _logger;
 
-    public ElementScriptingFunctions(RPGServer rpgServer, IElementCollection elementCollection, IElementIdGenerator elementIdGenerator, ElementByStringIdCollection elementByStringIdCollection,
-        PeriodicEntitySaveService periodicEntitySaveService, IDb db, ILogger logger)
+    public ElementScriptingFunctions(IElementCollection elementCollection,
+        ElementByStringIdCollection elementByStringIdCollection,
+        ILogger logger, RPGElementsFactory rpgElementsFactory)
     {
-        _rpgServer = rpgServer;
         _elementCollection = elementCollection;
-        _elementIdGenerator = elementIdGenerator;
         _elementByStringIdCollection = elementByStringIdCollection;
-        _periodicEntitySaveService = periodicEntitySaveService;
-        _db = db;
+        _rpgElementsFactory = rpgElementsFactory;
         _logger = logger.ForContext<ElementScriptingFunctions>();
     }
 
     [ScriptMember("setElementId")]
     public bool SetElementId(Element element, string id)
-    {
-        return _elementByStringIdCollection.AssignElementToId(element, id);
-    }
+        => _elementByStringIdCollection.AssignElementToId(element, id);
 
     [ScriptMember("getElementId")]
     public string? GetElementId(Element element)
-    {
-        return _elementByStringIdCollection.GetElementId(element);
-    }
+        => _elementByStringIdCollection.GetElementId(element);
 
     [ScriptMember("getElementById")]
     public Element? GetElementById(string id)
-    {
-        return _elementByStringIdCollection.GetElementById(id);
-    }
-    
+        => _elementByStringIdCollection.GetElementById(id);
+
     [ScriptMember("createSpawn")]
     public RPGSpawn CreateSpawn(Vector3 position, Vector3? rotation = null)
-    {
-        var spawn = _rpgServer.GetRequiredService<RPGSpawn>();
-        spawn.Position = position;
-        if (rotation != null)
-            spawn.Rotation = rotation ?? Vector3.Zero;
-        _rpgServer.AssociateElement(spawn);
-        return spawn;
-    }
+        => _rpgElementsFactory.CreateSpawn(position, rotation); 
 
     [ScriptMember("createVehicle")]
     public RPGVehicle CreateVehicle(ushort model, Vector3 position, Vector3? rotation = null)
-    {
-        var vehicle = _rpgServer.GetRequiredService<RPGVehicle>();
-        vehicle.Model = model;
-        vehicle.Position = position;
-        if(rotation != null)
-            vehicle.Rotation = rotation ?? Vector3.Zero;
-        _rpgServer.AssociateElement(vehicle);
-        return vehicle;
-    }
+        => _rpgElementsFactory.CreateVehicle(model, position, rotation);    
 
-    [ScriptMember("createPersistantVehicle")]
-    public async Task<bool> CreatePersistantVehicle(string id, ushort model, Vector3 position, Vector3? rotation = null)
-    {
-        using var _ = new PersistantScope();
-        if (await _db.Vehicles.AnyAsync(x => x.Id == id))
-            return false;
-
-        var vehicleData = new PersistantVehicleData
-        {
-            Id = id,
-            Model = model,
-            Platetext = "",
-            TransformAndMotion = new Persistance.Data.Helpers.TransformAndMotion
-            {
-                Position = position,
-                Rotation = rotation ?? Vector3.Zero
-            },
-            CreatedAt = DateTime.Now,
-        };
-        _db.Vehicles.Add(vehicleData);
-        await _db.SaveChangesAsync();
-        _logger.Verbose("Created persistant vehicle {vehicleId}", id);
-        return true;
-    }
+    [ScriptMember("createNewPersistantVehicle")]
+    public async Task<RPGVehicle?> CreateNewPersistantVehicle(string id, ushort model, Vector3 position, Vector3? rotation = null)
+        => await _rpgElementsFactory.CreateNewPersistantVehicle(id, model, position, rotation);
 
     [ScriptMember("spawnPersistantVehicle")]
     public async Task<RPGVehicle?> SpawnPersistantVehicle(string id, Vector3? position = null, Vector3? rotation = null)
-    {
-        using var _ = new PersistantScope();
-        var vehicle = _rpgServer.GetRequiredService<RPGVehicle>();
-        vehicle.AssignId(id);
-        var loaded = await vehicle.Load();
-        if(!loaded)
-        {
-            vehicle.Dispose();
-            throw new Exception("Failed to create vehicle");
-        }
-        if (position != null)
-            vehicle.Position = position ?? Vector3.Zero;
-        if (rotation != null)
-            vehicle.Rotation = rotation ?? Vector3.Zero;
-        _periodicEntitySaveService.VehicleCreated(vehicle);
-        _rpgServer.AssociateElement(vehicle);
-        _logger.Verbose("Spawned persistant vehicle {vehicleId}", id);
-        return vehicle;
-    }
+        => await _rpgElementsFactory.SpawnPersistantVehicle(id, position, rotation);
 
     [ScriptMember("createBlip")]
     public RPGBlip CreateBlip(Vector3 position, int icon)
-    {
-        if (!Enum.IsDefined(typeof(BlipIcon), icon))
-            throw new Exception("Invalid icon");
-
-        var blip = _rpgServer.GetRequiredService<RPGBlip>();
-        blip.Icon = (BlipIcon)icon;
-        blip.Position = position;
-        _rpgServer.AssociateElement(blip);
-        return blip;
-    }
+        => _rpgElementsFactory.CreateBlip(position, icon);
 
     [ScriptMember("createVariantBlip")]
     public RPGVariantBlip CreateVariantBlip(Vector3 position)
-    {
-        var blip = _rpgServer.GetRequiredService<RPGBlip>();
-        blip.Id = _elementIdGenerator.GetId();
-        blip.SetIsVariant();
-        blip.Position = position;
-        return new RPGVariantBlip(blip);
-    }
+        => _rpgElementsFactory.CreateVariantBlip(position);
 
     [ScriptMember("createRadarArea")]
     public RPGRadarArea CreateRadarArea(Vector2 position, Vector2 size, Color color)
-    {
-        var radarArea = _rpgServer.GetRequiredService<RPGRadarArea>();
-        radarArea.Position2 = position;
-        radarArea.Size = size;
-        radarArea.Color = color;
-        _rpgServer.AssociateElement(radarArea);
-        return radarArea;
-    }
+        => _rpgElementsFactory.CreateRadarArea(position, size, color);
 
     [ScriptMember("createVariantRadarArea")]
     public RPGVariantRadarArea CreateVariantRadarArea(Vector2 position, Vector2 size)
-    {
-        var variant = _rpgServer.GetRequiredService<RPGRadarArea>();
-        variant.Id = _elementIdGenerator.GetId();
-        variant.SetIsVariant();
-        variant.Position2 = position;
-        variant.Size = size;
-        return new RPGVariantRadarArea(variant);
-    }
-    
+        => _rpgElementsFactory.CreateVariantRadarArea(position, size);
 
     [ScriptMember("createPickup")]
     public RPGPickup CreatePickup(Vector3 position, ushort model)
-    {
-        var pickup = _rpgServer.GetRequiredService<RPGPickup>();
-        pickup.Position = position;
-        pickup.Model = model;
-        _rpgServer.AssociateElement(pickup);
-        _rpgServer.AssociateElement(pickup.CollisionShape);
-        return pickup;
-    }
+        => _rpgElementsFactory.CreatePickup(position, model);
 
     [ScriptMember("createVariantRadarArea")]
     public RPGVariantPickup CreateVariantRadarArea(Vector3 position, ushort model)
-    {
-        var variant = _rpgServer.GetRequiredService<RPGPickup>();
-        variant.Id = _elementIdGenerator.GetId();
-        variant.SetIsVariant();
-        variant.Position = position;
-        variant.Model = model;
-        return new RPGVariantPickup(variant);
-    }
+        => _rpgElementsFactory.CreateVariantRadarArea(position, model);
 
     [ScriptMember("createFraction")]
     public RPGFraction CreateFraction(string code, string name, Vector3 position)
-    {
-        var fraction = _rpgServer.GetRequiredService<RPGFraction>();
-        fraction.Code = code;
-        fraction.Name = name;
-        fraction.Position = position;
-        _rpgServer.AssociateElement(fraction);
-        return fraction;
-    }
-    
+        => _rpgElementsFactory.CreateFraction(code, name, position);
 
     [ScriptMember("createColSphere")]
     public RPGCollisionSphere CreateColSphere(Vector3 position, float radius)
-    {
-        var collisionSphere = _rpgServer.GetRequiredService<RPGCollisionSphere>();
-        collisionSphere.Position = position;
-        collisionSphere.Radius = radius;
-        collisionSphere.Position = position;
-        return collisionSphere;
-    }
+        => _rpgElementsFactory.CreateColSphere(position, radius);
 
     public IEnumerable<object> GetCollectionByType(string type)
     {
