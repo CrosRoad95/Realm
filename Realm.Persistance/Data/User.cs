@@ -13,6 +13,7 @@ public sealed class User : IdentityUser<Guid>
     public short Skin { get; set; }
     public double Money { get; set; }
     public string? Components { get; set; }
+    public string? Inventory { get; set; }
 
     public ICollection<UserData>? PlayerData { get; set; }
     public ICollection<UserLicense>? Licenses { get; set; }

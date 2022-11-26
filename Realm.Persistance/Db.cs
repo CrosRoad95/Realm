@@ -37,6 +37,10 @@ public abstract class Db<T> : IdentityDbContext<User, Role, Guid,
                 .HasDefaultValue(null)
                 .HasMaxLength(262140)
                 .IsRequired(false);
+            entityBuilder.Property(x => x.Inventory)
+                .HasDefaultValue(null)
+                .HasMaxLength(262140)
+                .IsRequired(false);
         });
 
         modelBuilder.Entity<UserData>(entityBuilder =>
