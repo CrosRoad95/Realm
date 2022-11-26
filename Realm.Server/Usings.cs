@@ -6,6 +6,7 @@ global using System.Numerics;
 global using System.Threading.Tasks;
 global using System.Security.Claims;
 global using System.Globalization;
+global using System.Runtime.Serialization;
 global using Microsoft.Extensions.Hosting;
 global using Microsoft.EntityFrameworkCore;
 global using Microsoft.Extensions.DependencyInjection;
@@ -71,5 +72,6 @@ global using Realm.Server.ElementCollections;
 global using Realm.Server.Elements.CollisionShapes;
 global using Realm.Server.Elements.Variants;
 global using Realm.Server.Factories;
+global using Realm.Server.Concepts;
 
 global using ConfigurationProvider = Realm.Configuration.ConfigurationProvider;

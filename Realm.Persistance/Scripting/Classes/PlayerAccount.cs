@@ -71,6 +71,20 @@ public class PlayerAccount : ISavable, IDisposable
             _user.Components = value;
         }
     }
+    
+    public string? InventoryData
+    {
+        get
+        {
+            CheckIfDisposed();
+            return _user.Inventory;
+        }
+        set
+        {
+            CheckIfDisposed();
+            _user.Inventory = value;
+        }
+    }
 
     public event Action<PlayerAccount>? NotifyNotSavedState;
     public event Action<PlayerAccount>? Disposed;

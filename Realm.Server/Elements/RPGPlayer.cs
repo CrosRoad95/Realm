@@ -27,8 +27,12 @@ public class RPGPlayer : Player
     public event Action<RPGPlayer, PlayerAccount>? LoggedIn;
     public event Action<RPGPlayer, string>? LoggedOut;
 
+    public event Action<RPGPlayer>? NotifyNotSavedState;
+
     [ScriptMember("components")]
     public ComponentSystem Components;
+    [ScriptMember("inventory")]
+    public InventorySystem Inventory;
 
     private bool _debugView = false;
     [ScriptMember("debugView")]
@@ -93,10 +97,12 @@ public class RPGPlayer : Player
         _cancellationTokenSource = new CancellationTokenSource();
         CancellationToken = _cancellationTokenSource.Token;
         Components = new ComponentSystem(this, _logger);
+        Inventory = new InventorySystem(this, _logger);
         ResourceStarted += RPGPlayer_ResourceStarted;
         Disconnected += RPGPlayer_Disconnected;
 
         _luaInteropService.ClientCultureInfoUpdate += HandleClientCultureInfoUpdate;
+
     }
 
     private void HandleClientCultureInfoUpdate(Player player, CultureInfo culture)
@@ -188,6 +194,17 @@ public class RPGPlayer : Player
             Components.SetOwner(this);
             Components.AfterLoad();
         }
+        
+        if (!string.IsNullOrEmpty(account.InventoryData))
+        {
+            Inventory = JsonConvert.DeserializeObject<InventorySystem>(account.InventoryData, new JsonSerializerSettings
+            {
+                TypeNameHandling = TypeNameHandling.Objects,
+            }) ?? throw new JsonSerializationException("Failed to deserialize Inventory");
+            Inventory.SetLogger(_logger);
+            Inventory.SetOwner(this);
+            Inventory.AfterLoad();
+        }
 
         _logger.Verbose("Logged in to the account: {account}", account);
         return true;
@@ -211,12 +228,15 @@ public class RPGPlayer : Player
         if (!IsLoggedIn || Account == null)
             return;
 
-        await Account.Save();
         Account.ComponentsData = JsonConvert.SerializeObject(Components, Formatting.None, new JsonSerializerSettings
         {
             TypeNameHandling = TypeNameHandling.Objects,
         });
-        ;
+        Account.InventoryData = JsonConvert.SerializeObject(Inventory, Formatting.None, new JsonSerializerSettings
+        {
+            TypeNameHandling = TypeNameHandling.Objects,
+        });
+        await Account.Save();
     }
 
     [ScriptMember("openGui")]
@@ -280,6 +300,8 @@ public class RPGPlayer : Player
     {
         return _runningSessions.OfType<T>().FirstOrDefault();
     }
+
+
 
     public void Reset()
     {

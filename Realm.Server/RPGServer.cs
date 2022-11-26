@@ -175,6 +175,9 @@ public partial class RPGServer : IRPGServer, IReloadable
         scriptingModuleInterface.AddHostType(typeof(ComponentSystem));
         scriptingModuleInterface.AddHostType(typeof(VehicleFuelComponent));
         scriptingModuleInterface.AddHostType(typeof(MileageCounterComponent));
+
+        scriptingModuleInterface.AddHostType(typeof(InventorySystem));
+        scriptingModuleInterface.AddHostType(typeof(PlayerItem));
     }
 
     public TService GetRequiredService<TService>() where TService: notnull
@@ -203,7 +206,7 @@ public partial class RPGServer : IRPGServer, IReloadable
 
     private void RemoveAllElements()
     {
-        foreach (var spawn in _elementFunctions.GetCollectionByType("spawn").Cast<RPGSpawn>())
+        foreach (var spawn in _elementFunctions.GetCollectionByType("spawn").Cast<RPGSpawn>().ToList())
             if(!spawn.IsPersistant() && _elementFunctions.IsElement(spawn))
                 _elementFunctions.DestroyElement(spawn);
 

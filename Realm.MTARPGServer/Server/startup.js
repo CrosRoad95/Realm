@@ -195,3 +195,25 @@ addCommandHandler("discord", (player, args) => {
 addEventHandler("onPlayerAFKStateChanged", ({ player, isAfk }) => {
     Logger.information("player afk state: {player}, {isAfk}", player, isAfk);
 });
+
+
+let testItem = new PlayerItem(1, "test", 2);
+testItem.setMetadata("test", "testValue")
+testItem.setMetadata("test2", 1337)
+Logger.information("testItem {testItem}, test metadata: {metadataValue}", testItem, testItem.getMetadata("test"))
+
+addCommandHandler("items", (player, args) => {
+    const items = player.inventory.items;
+    for (const key in player.inventory.items) {
+        const item = items[key]
+        Logger.information("Item: {item}, metadatas: {a}, {b}", item, item.getMetadata("test"), item.getMetadata("test2"))
+    }
+});
+addCommandHandler("item", (player, args) => {
+    player.inventory.capacity = 5
+    Logger.information("inventory items {inventoryItems}", player.inventory.items)
+    if (!player.inventory.addItem(testItem)) {
+        Logger.information("inventory full")
+    }
+    Logger.information("inventory state {a}/{b}", player.inventory.usedCapacity, player.inventory.capacity)
+})

@@ -1,6 +1,4 @@
-﻿using System.Runtime.Serialization;
-
-namespace Realm.Server.Components;
+﻿namespace Realm.Server.Components;
 
 [Serializable]
 [NoDefaultScriptAccess]
