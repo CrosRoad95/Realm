@@ -1,13 +1,15 @@
-﻿namespace Realm.MTARPGServer;
+﻿using Realm.Server.Factories;
+
+namespace Realm.MTARPGServer;
 
 internal class SeederServerBuilder
 {
-    private readonly ElementScriptingFunctions _elementFunctions;
+    private readonly RPGElementsFactory _elementFunctions;
     private readonly IdentityScriptingFunctions _identityFunctions;
     private readonly ElementByStringIdCollection _elementByStringIdCollection;
     private readonly ILogger _logger;
     private readonly Dictionary<string, PlayerAccount> _createdAccounts = new();
-    public SeederServerBuilder(ElementScriptingFunctions elementFunctions, IdentityScriptingFunctions identityFunctions, ILogger logger, ElementByStringIdCollection elementByStringIdCollection)
+    public SeederServerBuilder(RPGElementsFactory elementFunctions, IdentityScriptingFunctions identityFunctions, ILogger logger, ElementByStringIdCollection elementByStringIdCollection)
     {
         _elementFunctions = elementFunctions;
         _identityFunctions = identityFunctions;
