@@ -27,12 +27,13 @@ public class RPGElementsFactory
         _elementIdGenerator = elementIdGenerator;
     }
 
-    public RPGSpawn CreateSpawn(Vector3 position, Vector3? rotation = null)
+    public RPGSpawn CreateSpawn(Vector3 position, Vector3? rotation = null, string? name = null)
     {
         var spawn = _rpgServer.GetRequiredService<RPGSpawn>();
         spawn.Position = position;
         if (rotation != null)
             spawn.Rotation = rotation ?? Vector3.Zero;
+        spawn.Name = name;
         _rpgServer.AssociateElement(spawn);
         SpawnCreated?.Invoke(spawn);
         return spawn;

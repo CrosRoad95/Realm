@@ -37,8 +37,8 @@ public class ElementScriptingFunctions
         => _elementByStringIdCollection.GetElementById(id);
 
     [ScriptMember("createSpawn")]
-    public RPGSpawn CreateSpawn(Vector3 position, Vector3? rotation = null)
-        => _rpgElementsFactory.CreateSpawn(position, rotation); 
+    public RPGSpawn CreateSpawn(Vector3 position, Vector3? rotation = null, string? name = null)
+        => _rpgElementsFactory.CreateSpawn(position, rotation, name);
 
     [ScriptMember("createVehicle")]
     public RPGVehicle CreateVehicle(ushort model, RPGSpawn spawn)

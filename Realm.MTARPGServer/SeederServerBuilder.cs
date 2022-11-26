@@ -26,8 +26,7 @@ internal class SeederServerBuilder
     {
         foreach (var pair in spawns)
         {
-            var spawn = _elementFunctions.CreateSpawn(pair.Value.Position, pair.Value.Rotation);
-            spawn.Name = pair.Value.Name;
+            var spawn = _elementFunctions.CreateSpawn(pair.Value.Position, pair.Value.Rotation, pair.Value.Name);
             AssignElementToId(spawn, pair.Key);
             _logger.Information("Seeder: Created spawn of id {elementId} at {position}", pair.Key, pair.Value.Position);
         }

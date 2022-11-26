@@ -9,7 +9,7 @@ Logger.information("Localization: text={text}, try={text2}", Localization.transl
 Logger.information("startup.js, TestModule: {TestModule}", TestModule);
 Logger.information("loaded modules: {modules}", JSON.stringify(getModules()));
 
-const spawnForTestVehicle = createSpawn(new Vector3(-10, -10, 3));
+const spawnForTestVehicle = createSpawn(new Vector3(-10, -10, 3), new Vector3(0,0,0), "spawnForTestVehicle");
 const testVehicle = createVehicle(404, spawnForTestVehicle)
 Logger.information("spawned vehicle: {testVehicle}", testVehicle);
 
@@ -21,7 +21,7 @@ pickupCollision.onEnter(e => {
     Logger.information("entered {element}", e)
 })
 Logger.information("spawned blip: {blip}, icon: {blipIcon}", blip, blip.icon);
-const spawn = createSpawn(new Vector3(0, 20, 3));
+const spawn = createSpawn(new Vector3(0, 20, 3), new Vector3(0, 0, 0), "second spawn");
 //spawn.addRequiredPolicy("Admin");
 
 const testRadarArea = createRadarArea(new Vector2(0, 0), new Vector2(50, 50), Color.fromArgb(255, 255, 0, 0));
