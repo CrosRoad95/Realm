@@ -1,6 +1,6 @@
 ﻿using System.Runtime.Serialization;
 
-namespace Realm.Server.Components;
+namespace Realm.Server.Concepts.Components;
 
 [Serializable]
 public class MileageCounterComponent : IElementComponent
@@ -99,7 +99,7 @@ public class MileageCounterComponent : IElementComponent
             _lastPosition = _rpgVehicle.Position;
             return;
         }
-        if ((!_rpgVehicle.IsEngineOn || _rpgVehicle.IsFrozen))
+        if (!_rpgVehicle.IsEngineOn || _rpgVehicle.IsFrozen)
             return;
 
         var traveledDistance = _rpgVehicle.Position - _lastPosition;

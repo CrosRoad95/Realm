@@ -1,6 +1,6 @@
 ﻿using System.Runtime.Serialization;
 
-namespace Realm.Server.Components;
+namespace Realm.Server.Concepts.Components;
 
 [Serializable]
 public class VehicleFuelComponent : IElementComponent
@@ -28,7 +28,7 @@ public class VehicleFuelComponent : IElementComponent
             _minimumDistanceThreshold = value;
         }
     }
-    
+
     [ScriptMember("fuelConsumptionPerOneKm")]
     public float FuelConsumptionPerOneKm
     {
@@ -155,9 +155,9 @@ public class VehicleFuelComponent : IElementComponent
         if (_minimumDistanceThreshold > traveledDistance.Length() && !forceUpdate)
             return;
         _lastPosition = _rpgVehicle.Position;
-        var consumedFuel = (_fuelConsumptionPerOneKm / 1000.0f) * traveledDistance.Length();
+        var consumedFuel = _fuelConsumptionPerOneKm / 1000.0f * traveledDistance.Length();
         _amount -= consumedFuel;
-        if(_amount <= 0)
+        if (_amount <= 0)
         {
             _amount = 0;
             _rpgVehicle.IsEngineOn = false;

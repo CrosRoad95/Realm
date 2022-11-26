@@ -1,4 +1,4 @@
-﻿namespace Realm.Server.Components;
+﻿namespace Realm.Server.Concepts;
 
 [Serializable]
 [NoDefaultScriptAccess]
@@ -64,7 +64,7 @@ public class ComponentSystem : ISerializable
     {
         return _components.Where(x => x.GetType() == type).Any();
     }
-    
+
     [ScriptMember("getComponent")]
     public object? GetComponent(Type type)
     {
