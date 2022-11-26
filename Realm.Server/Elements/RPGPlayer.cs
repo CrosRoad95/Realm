@@ -3,6 +3,7 @@
 [NoDefaultScriptAccess]
 public class RPGPlayer : Player
 {
+    private const int RESOURCE_COUNT = 8;
     private readonly CancellationTokenSource _cancellationTokenSource;
     private readonly LuaValueMapper _luaValueMapper;
     private readonly DebugLog _debugLog;
@@ -11,7 +12,7 @@ public class RPGPlayer : Player
     private readonly LuaInteropService _luaInteropService;
     private readonly ChatBox _chatBox;
     private readonly ILogger _logger;
-    public Latch ResourceStartingLatch = new(7); // TODO: remove hardcoded resources counter
+    public Latch ResourceStartingLatch = new(RESOURCE_COUNT); // TODO: remove hardcoded resources counter
     public CancellationToken CancellationToken { get; private set; }
 
     [ScriptMember("account", ScriptAccess.ReadOnly)]
@@ -308,7 +309,7 @@ public class RPGPlayer : Player
         Camera.Fade(CameraFade.Out, 0, Color.Black);
         Camera.Target = null;
         Account = null;
-        ResourceStartingLatch = new(7); // TODO: remove hardcoded resources counter
+        ResourceStartingLatch = new(RESOURCE_COUNT); // TODO: remove hardcoded resources counter
         DebugView = false;
         _runningSessions.Clear();
     }

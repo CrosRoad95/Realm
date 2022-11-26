@@ -2,6 +2,7 @@
 using Realm.Resources.AdminTools;
 using Realm.Resources.AFK;
 using Realm.Resources.ElementOutline;
+using Realm.Resources.StatisticsCounter;
 using Realm.Server.Logic;
 using Realm.Server.Logic.Resources;
 using SlipeServer.Resources.DGS;
@@ -48,6 +49,7 @@ public static class ServerBuilderExtensions
         builder.AddElementOutlineResource();
         builder.AddAdminToolsResource();
         builder.AddAFKResource();
+        builder.AddStatisticsCounterResource();
 
         builder.AddLogic<RPGPlayerLogic>();
         builder.AddLogic<RPGVehicleLogic>();
