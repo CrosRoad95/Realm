@@ -6,6 +6,7 @@ using Realm.Logging;
 using Realm.Persistance;
 using Realm.Server;
 using Realm.Server.Extensions;
+using Realm.Server.Factories;
 using Realm.Server.Interfaces;
 using Realm.Tests.Modules;
 using Realm.WebApp;
@@ -45,6 +46,8 @@ internal class TestRPGServer : IReloadable, IRPGServer
                 services.AddSingleton<IRPGServer>(this);
                 services.AddSingleton<Func<string?>>(() => "");
                 services.AddSingleton(new Logger().GetLogger());
+
+                services.AddSingleton<RPGElementsFactory>();
 
                 if (modules != null)
                     foreach (var module in modules)

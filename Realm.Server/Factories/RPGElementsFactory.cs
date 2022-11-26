@@ -7,7 +7,7 @@ namespace Realm.Server.Factories;
 
 public class RPGElementsFactory
 {
-    private readonly RPGServer _rpgServer;
+    private readonly IRPGServer _rpgServer;
     private readonly IDb _db;
     private readonly ILogger _logger;
     private readonly PeriodicEntitySaveService _periodicEntitySaveService;
@@ -17,7 +17,7 @@ public class RPGElementsFactory
     public event Action<RPGVehicle>? VehicleCreated;
     public event Action<RPGBlip>? BlipCreated;
 
-    public RPGElementsFactory(RPGServer rpgServer, IDb db, ILogger logger, PeriodicEntitySaveService periodicEntitySaveService,
+    public RPGElementsFactory(IRPGServer rpgServer, IDb db, ILogger logger, PeriodicEntitySaveService periodicEntitySaveService,
         IElementIdGenerator elementIdGenerator)
     {
         _rpgServer = rpgServer;
@@ -33,7 +33,7 @@ public class RPGElementsFactory
         spawn.Position = position;
         if (rotation != null)
             spawn.Rotation = rotation ?? Vector3.Zero;
-        spawn.Name = name;
+        spawn.Name = name ?? "";
         _rpgServer.AssociateElement(spawn);
         SpawnCreated?.Invoke(spawn);
         return spawn;
