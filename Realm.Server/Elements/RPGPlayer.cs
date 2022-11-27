@@ -1,4 +1,6 @@
-﻿namespace Realm.Server.Elements;
+﻿using Realm.Server.Concepts.Components;
+
+namespace Realm.Server.Elements;
 
 [NoDefaultScriptAccess]
 public class RPGPlayer : Player
@@ -11,9 +13,12 @@ public class RPGPlayer : Player
     private readonly AccountsInUseService _accountsInUseService;
     private readonly LuaInteropService _luaInteropService;
     private readonly ChatBox _chatBox;
+    private readonly MtaServer _mtaServer;
     private readonly ILogger _logger;
     public Latch ResourceStartingLatch = new(RESOURCE_COUNT); // TODO: remove hardcoded resources counter
     public CancellationToken CancellationToken { get; private set; }
+
+    public MtaServer MtaServer => _mtaServer;
 
     [ScriptMember("account", ScriptAccess.ReadOnly)]
     public PlayerAccount? Account { get; private set; }
@@ -84,7 +89,8 @@ public class RPGPlayer : Player
     private readonly List<SessionBase> _runningSessions = new();
 
     public RPGPlayer(LuaValueMapper luaValueMapper, DebugLog debugLog, AgnosticGuiSystemService agnosticGuiSystemService,
-        AccountsInUseService accountsInUseService, ILogger logger, LuaInteropService luaInteropService, ChatBox chatBox)
+        AccountsInUseService accountsInUseService, ILogger logger, LuaInteropService luaInteropService, ChatBox chatBox,
+        MtaServer mtaServer)
     {
         _luaValueMapper = luaValueMapper;
         _debugLog = debugLog;
@@ -92,6 +98,7 @@ public class RPGPlayer : Player
         _accountsInUseService = accountsInUseService;
         _luaInteropService = luaInteropService;
         _chatBox = chatBox;
+        _mtaServer = mtaServer;
         _logger = logger
             .ForContext<RPGPlayer>()
             .ForContext(new RPGPlayerEnricher(this));
@@ -301,8 +308,6 @@ public class RPGPlayer : Player
     {
         return _runningSessions.OfType<T>().FirstOrDefault();
     }
-
-
 
     public void Reset()
     {

@@ -216,4 +216,8 @@ addCommandHandler("item", (player, args) => {
         Logger.information("inventory full")
     }
     Logger.information("inventory state {a}/{b}", player.inventory.usedCapacity, player.inventory.capacity)
+});
+
+addCommandHandler("statcomp", (player, args) => {
+    player.components.addComponent(new StatisticsCounterComponent());
 })

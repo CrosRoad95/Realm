@@ -175,6 +175,7 @@ public partial class RPGServer : IRPGServer, IReloadable
         scriptingModuleInterface.AddHostType(typeof(ComponentSystem));
         scriptingModuleInterface.AddHostType(typeof(VehicleFuelComponent));
         scriptingModuleInterface.AddHostType(typeof(MileageCounterComponent));
+        scriptingModuleInterface.AddHostType(typeof(StatisticsCounterComponent));
 
         scriptingModuleInterface.AddHostType(typeof(InventorySystem));
         scriptingModuleInterface.AddHostType(typeof(PlayerItem));
