@@ -1,5 +1,6 @@
 ﻿namespace Realm.Persistance.Scripting.Classes;
 
+[NoDefaultScriptAccess]
 public class PlayerAccount : ISavable, IDisposable
 {
     public const string ClaimDiscordUserIdName = "discord.user.id";
@@ -11,9 +12,8 @@ public class PlayerAccount : ISavable, IDisposable
     private readonly IDb _db;
     private readonly IAuthorizationService _authorizationService;
     private readonly IAccountsInUseService _accountsInUseService;
-    private readonly EventScriptingFunctions _eventFunctions;
     private readonly IServiceProvider _serviceProvider;
-    private readonly ConfigurationProvider _configurationProvider;
+    private readonly RealmConfigurationProvider _configurationProvider;
     private readonly ILogger _logger;
     private DateTime? _lastPlayTimeCounterStart;
     private DateTime? _loginDateTime;
@@ -21,7 +21,12 @@ public class PlayerAccount : ISavable, IDisposable
     private string? _discordConnectionCode = null;
     private DateTime? _discordConnectionCodeValidUntil = null;
     private DiscordUser? _discord = null;
-    
+
+
+    public event Action<PlayerAccount>? NotifyNotSavedState;
+    public event Action<PlayerAccount>? Disposed;
+
+    [ScriptMember("id")]
     public string Id
     {
         get
@@ -31,7 +36,8 @@ public class PlayerAccount : ISavable, IDisposable
         }
     }
 
-    public string UserName
+    [ScriptMember("userName")]
+    public string? UserName
     {
         get
         {
@@ -40,6 +46,7 @@ public class PlayerAccount : ISavable, IDisposable
         }
     }
 
+    [ScriptMember("registerDateTime")]
     public DateTime? RegisterDateTime
     {
         get
@@ -49,6 +56,7 @@ public class PlayerAccount : ISavable, IDisposable
         }
     }
 
+    [ScriptMember("discord")]
     public DiscordUser? Discord
     {
         get
@@ -57,7 +65,7 @@ public class PlayerAccount : ISavable, IDisposable
             return _discord;
         }
     }
-    
+
     public string? ComponentsData
     {
         get
@@ -71,7 +79,7 @@ public class PlayerAccount : ISavable, IDisposable
             _user.Components = value;
         }
     }
-    
+
     public string? InventoryData
     {
         get
@@ -86,9 +94,7 @@ public class PlayerAccount : ISavable, IDisposable
         }
     }
 
-    public event Action<PlayerAccount>? NotifyNotSavedState;
-    public event Action<PlayerAccount>? Disposed;
-
+    [ScriptMember("money")]
     public double Money
     {
         get => _user.Money; set
@@ -97,12 +103,12 @@ public class PlayerAccount : ISavable, IDisposable
             if (_user.Money == value)
                 return;
 
-            if(value < 0)
+            if (value < 0)
                 throw new Exception("Unable to set money, money can not get negative");
 
-            if (value > _configurationProvider.Get<double>("Gameplay:MoneyLimit"))
+            if (value > _configurationProvider.GetRequired<double>("Gameplay:MoneyLimit"))
                 throw new Exception("Unable to set money, reached limit.");
-            var moneyPrecision = _configurationProvider.Get<int>("Gameplay:MoneyPrecision");
+            var moneyPrecision = _configurationProvider.GetRequired<int>("Gameplay:MoneyPrecision");
             var old = _user.Money;
             _user.Money = Math.Round(value, moneyPrecision);
             NotifyNotSavedState?.Invoke(this);
@@ -111,8 +117,32 @@ public class PlayerAccount : ISavable, IDisposable
         }
     }
 
+    [ScriptMember("playTime")]
+    public ulong PlayTime
+    {
+        get
+        {
+            CheckIfDisposed();
+            if (_loginDateTime == null)
+                return 0;
+            return _user.PlayTime + (ulong)(DateTime.Now - _loginDateTime.Value).Seconds;
+        }
+    }
+
+    [ScriptMember("currentSessionPlayTime")]
+    public ulong CurrentSessionPlayTime
+    {
+        get
+        {
+            CheckIfDisposed();
+            if (_loginDateTime == null)
+                return 0;
+            return (ulong)(DateTime.Now - _loginDateTime.Value).Seconds;
+        }
+    }
+
     public PlayerAccount(SignInManager<User> signInManager, UserManager<User> userManager, IDb db, IAuthorizationService authorizationService,
-        IAccountsInUseService accountsInUseService, ILogger logger, EventScriptingFunctions eventFunctions, IServiceProvider serviceProvider, ConfigurationProvider configurationProvider, PeriodicEntitySaveService periodicEntitySaveService)
+        IAccountsInUseService accountsInUseService, ILogger logger, IServiceProvider serviceProvider, RealmConfigurationProvider configurationProvider, PeriodicEntitySaveService periodicEntitySaveService)
     {
         _user = null!;
         _signInManager = signInManager;
@@ -120,13 +150,26 @@ public class PlayerAccount : ISavable, IDisposable
         _db = db;
         _authorizationService = authorizationService;
         _accountsInUseService = accountsInUseService;
-        _eventFunctions = eventFunctions;
         _serviceProvider = serviceProvider;
         _configurationProvider = configurationProvider;
         _logger = logger
             .ForContext<PlayerAccount>()
             .ForContext(new PlayerAccountEnricher(this));
         periodicEntitySaveService.AccountCreated(this);
+    }
+
+    public async Task<string[]> InternalGetRoles()
+    {
+        CheckIfDisposed();
+
+        return (await _userManager.GetRolesAsync(_user)).ToArray();
+    }
+
+    public async Task<Claim[]> InternalGetClaims()
+    {
+        CheckIfDisposed();
+
+        return (await _userManager.GetClaimsAsync(_user)).ToArray();
     }
 
     public bool GiveMoney(double amount)
@@ -136,10 +179,10 @@ public class PlayerAccount : ISavable, IDisposable
         if (_user.Money < 0)
             throw new ArgumentOutOfRangeException(nameof(amount), "Unable to set money, money can not get negative");
 
-        if (amount > _configurationProvider.Get<double>("Gameplay:MoneyLimit"))
+        if (amount > _configurationProvider.GetRequired<double>("Gameplay:MoneyLimit"))
             throw new Exception("Unable to set money, reached limit.");
 
-        var moneyPrecision = _configurationProvider.Get<int>("Gameplay:MoneyPrecision");
+        var moneyPrecision = _configurationProvider.GetRequired<int>("Gameplay:MoneyPrecision");
         Money = _user.Money + Math.Round(amount, moneyPrecision);
         return true;
     }
@@ -176,28 +219,6 @@ public class PlayerAccount : ISavable, IDisposable
         return _accountsInUseService.IsAccountIdInUse(Id);
     }
 
-    public ulong PlayTime
-    {
-        get
-        {
-            CheckIfDisposed();
-            if (_loginDateTime == null)
-                return 0;
-            return _user.PlayTime + (ulong)(DateTime.Now - _loginDateTime.Value).Seconds;
-        }
-    }
-    
-    public ulong CurrentSessionPlayTime
-    {
-        get
-        {
-            CheckIfDisposed();
-            if (_loginDateTime == null)
-                return 0;
-            return (ulong)(DateTime.Now - _loginDateTime.Value).Seconds;
-        }
-    }
-
     [NoScriptAccess]
     public async Task SignIn(string? ip, string serial)
     {
@@ -205,12 +226,11 @@ public class PlayerAccount : ISavable, IDisposable
 
         _loginDateTime = DateTime.Now;
         _lastPlayTimeCounterStart = DateTime.Now;
-        if(_user.RegisterIp == null && ip != null)
+        if (_user.RegisterIp == null && ip != null)
             _user.RegisterIp = ip;
-        if(_user.RegisterSerial == null)
-            _user.RegisterSerial = serial;
+        _user.RegisterSerial ??= serial;
 
-        if(ip != null)
+        if (ip != null)
             _user.LastIp = ip;
         _user.LastSerial = serial;
         await UpdateClaimsPrincipal();
@@ -218,30 +238,28 @@ public class PlayerAccount : ISavable, IDisposable
         {
             TryInitializeDiscordUser();
         }
-        catch(Exception)
+        catch (Exception)
         {
 
         }
     }
 
-    [NoScriptAccess]
     public async Task UpdateClaimsPrincipal()
     {
         _claimsPrincipal = await _signInManager.CreateUserPrincipalAsync(_user);
     }
 
-    [NoScriptAccess]
     public void TryInitializeDiscordUser()
     {
         var claimValue = GetClaimValue(ClaimDiscordUserIdName);
-        if(claimValue != null && ulong.TryParse(claimValue, out ulong discordUserId))
+        if (claimValue != null && ulong.TryParse(claimValue, out ulong discordUserId))
         {
             _discord = _serviceProvider.GetRequiredService<DiscordUser>();
             try
             {
                 _discord.InitializeById(discordUserId);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 _discord = null;
                 _logger.Error(ex, "Failed to initialize discord user");
@@ -250,10 +268,9 @@ public class PlayerAccount : ISavable, IDisposable
         }
     }
 
-    [NoScriptAccess]
     public async Task Save()
     {
-        if(_lastPlayTimeCounterStart != null)
+        if (_lastPlayTimeCounterStart != null)
         {
             _user.PlayTime += (ulong)(DateTime.Now - _lastPlayTimeCounterStart.Value).Seconds;
             _lastPlayTimeCounterStart = DateTime.Now;
@@ -262,6 +279,7 @@ public class PlayerAccount : ISavable, IDisposable
         _logger.Verbose("Account saved.");
     }
 
+    [ScriptMember("isInRole")]
     public bool IsInRole(string role)
     {
         CheckIfDisposed();
@@ -271,6 +289,7 @@ public class PlayerAccount : ISavable, IDisposable
         return _claimsPrincipal!.IsInRole(role);
     }
 
+    [ScriptMember("hasClaim")]
     public bool HasClaim(string type)
     {
         CheckIfDisposed();
@@ -280,6 +299,7 @@ public class PlayerAccount : ISavable, IDisposable
         return _claimsPrincipal!.HasClaim(x => x.Type == type);
     }
 
+    [ScriptMember("getClaimValue")]
     public string? GetClaimValue(string type)
     {
         CheckIfDisposed();
@@ -290,7 +310,7 @@ public class PlayerAccount : ISavable, IDisposable
         return _claimsPrincipal!.Claims.First(x => x.Type == type).Value;
     }
 
-
+    [ScriptMember("delete")]
     public async Task<bool> Delete()
     {
         CheckIfDisposed();
@@ -304,6 +324,7 @@ public class PlayerAccount : ISavable, IDisposable
         return false;
     }
 
+    [ScriptMember("addClaim")]
     public async Task<bool> AddClaim(string type, string value)
     {
         CheckIfDisposed();
@@ -314,6 +335,7 @@ public class PlayerAccount : ISavable, IDisposable
         return result.Succeeded;
     }
 
+    [ScriptMember("addClaims")]
     public async Task<bool> AddClaims(Dictionary<string, string> claims)
     {
         CheckIfDisposed();
@@ -324,16 +346,18 @@ public class PlayerAccount : ISavable, IDisposable
         return result.Succeeded;
     }
 
+    [ScriptMember("addRole")]
     public async Task<bool> AddRole(string role)
     {
         CheckIfDisposed();
 
         var result = await _userManager.AddToRoleAsync(_user, role);
-        if(result.Succeeded)
+        if (result.Succeeded)
             await UpdateClaimsPrincipal();
         return result.Succeeded;
     }
 
+    [ScriptMember("addRoles")]
     public async Task<bool> AddRoles(IEnumerable<string> role)
     {
         CheckIfDisposed();
@@ -344,6 +368,7 @@ public class PlayerAccount : ISavable, IDisposable
         return result.Succeeded;
     }
 
+    [ScriptMember("getClaims")]
     public async Task<object> GetClaims()
     {
         CheckIfDisposed();
@@ -351,23 +376,7 @@ public class PlayerAccount : ISavable, IDisposable
         return (await _userManager.GetClaimsAsync(_user)).Select(x => x.Type).ToArray().ToScriptArray();
     }
 
-    [NoScriptAccess]
-    public async Task<string[]> InternalGetRoles()
-    {
-        CheckIfDisposed();
-
-        return (await _userManager.GetRolesAsync(_user)).ToArray();
-    }
-
-
-    [NoScriptAccess]
-    public async Task<Claim[]> InternalGetClaims()
-    {
-        CheckIfDisposed();
-
-        return (await _userManager.GetClaimsAsync(_user)).ToArray();
-    }
-
+    [ScriptMember("getRoles")]
     public async Task<object> GetRoles()
     {
         CheckIfDisposed();
@@ -375,6 +384,7 @@ public class PlayerAccount : ISavable, IDisposable
         return (await InternalGetRoles()).ToScriptArray();
     }
 
+    [ScriptMember("removeClaim")]
     public async Task<bool> RemoveClaim(string type, string? value = null)
     {
         CheckIfDisposed();
@@ -396,6 +406,7 @@ public class PlayerAccount : ISavable, IDisposable
         return false;
     }
 
+    [ScriptMember("removeRole")]
     public async Task<bool> RemoveRole(string role)
     {
         CheckIfDisposed();
@@ -406,6 +417,7 @@ public class PlayerAccount : ISavable, IDisposable
         return result.Succeeded;
     }
 
+    [ScriptMember("removeAllClaims")]
     public async Task<bool> RemoveAllClaims()
     {
         CheckIfDisposed();
@@ -417,6 +429,7 @@ public class PlayerAccount : ISavable, IDisposable
         return result.Succeeded;
     }
 
+    [ScriptMember("hasData")]
     public async Task<bool> HasData(string key)
     {
         CheckIfDisposed();
@@ -427,6 +440,7 @@ public class PlayerAccount : ISavable, IDisposable
         return playerData != null;
     }
 
+    [ScriptMember("getData")]
     public async Task<string?> GetData(string key)
     {
         CheckIfDisposed();
@@ -439,6 +453,7 @@ public class PlayerAccount : ISavable, IDisposable
         return playerData.Value;
     }
 
+    [ScriptMember("removeData")]
     public async Task<bool> RemoveData(string key)
     {
         CheckIfDisposed();
@@ -452,6 +467,7 @@ public class PlayerAccount : ISavable, IDisposable
         return savedEntities == 1;
     }
 
+    [ScriptMember("setData")]
     public async Task<bool> SetData(string key, string value)
     {
         CheckIfDisposed();
@@ -480,6 +496,7 @@ public class PlayerAccount : ISavable, IDisposable
         return savedEntities == 1;
     }
 
+    [ScriptMember("getAllLicenses")]
     public async Task<object> GetAllLicenses(bool includeSuspended = false)
     {
         CheckIfDisposed();
@@ -495,6 +512,7 @@ public class PlayerAccount : ISavable, IDisposable
         return licenses.ToArray().ToScriptArray();
     }
 
+    [ScriptMember("isLicenseSuspended")]
     public async Task<bool> IsLicenseSuspended(string licenseId)
     {
         CheckIfDisposed();
@@ -506,6 +524,8 @@ public class PlayerAccount : ISavable, IDisposable
 
         return isSuspended;
     }
+
+    [ScriptMember("getLastLicenseSuspensionReason")]
     public async Task<string?> GetLastLicenseSuspensionReason()
     {
         CheckIfDisposed();
@@ -520,6 +540,7 @@ public class PlayerAccount : ISavable, IDisposable
         return suspensionReason;
     }
 
+    [ScriptMember("addLicense")]
     public async Task<bool> AddLicense(string licenseId)
     {
         CheckIfDisposed();
@@ -537,6 +558,7 @@ public class PlayerAccount : ISavable, IDisposable
         return savedEntities == 1;
     }
 
+    [ScriptMember("hasLicense")]
     public async Task<bool> HasLicense(string licenseId, bool includeSuspended = false)
     {
         CheckIfDisposed();
@@ -551,6 +573,7 @@ public class PlayerAccount : ISavable, IDisposable
         return await query.AnyAsync();
     }
 
+    [ScriptMember("suspendLicense")]
     public async Task<bool> SuspendLicense(string licenseId, int timeInMinutes, string? reason = null)
     {
         CheckIfDisposed();
@@ -570,6 +593,7 @@ public class PlayerAccount : ISavable, IDisposable
         return savedEntities == 1;
     }
 
+    [ScriptMember("unSuspendLicense")]
     public async Task<bool> UnSuspendLicense(string licenseId)
     {
         CheckIfDisposed();
@@ -586,7 +610,7 @@ public class PlayerAccount : ISavable, IDisposable
         return savedEntities == 1;
     }
 
-
+    [ScriptMember("authorizePolicy")]
     public async Task<bool> AuthorizePolicy(string policy)
     {
         CheckIfDisposed();
@@ -599,6 +623,7 @@ public class PlayerAccount : ISavable, IDisposable
         return result.Succeeded;
     }
 
+    [ScriptMember("isConnectedWithDiscordAccount")]
     public bool IsConnectedWithDiscordAccount()
     {
         CheckIfDisposed();
@@ -606,6 +631,7 @@ public class PlayerAccount : ISavable, IDisposable
         return Discord != null;
     }
 
+    [ScriptMember("isDiscordConnectionCodeValid")]
     public bool IsDiscordConnectionCodeValid(string code)
     {
         CheckIfDisposed();
@@ -616,6 +642,7 @@ public class PlayerAccount : ISavable, IDisposable
         return _discordConnectionCode == code;
     }
 
+    [ScriptMember("hasPendingDiscordConnectionCode")]
     public bool HasPendingDiscordConnectionCode()
     {
         CheckIfDisposed();
@@ -623,6 +650,7 @@ public class PlayerAccount : ISavable, IDisposable
         return _discordConnectionCodeValidUntil != null || _discordConnectionCodeValidUntil > DateTime.Now;
     }
 
+    [ScriptMember("invalidateDiscordConnectionCode")]
     public void InvalidateDiscordConnectionCode()
     {
         CheckIfDisposed();
@@ -631,6 +659,7 @@ public class PlayerAccount : ISavable, IDisposable
         _discordConnectionCodeValidUntil = null;
     }
 
+    [ScriptMember("generateAndGetDiscordConnectionCode")]
     public string? GenerateAndGetDiscordConnectionCode(int validForMinutes = 2)
     {
         CheckIfDisposed();
@@ -645,7 +674,6 @@ public class PlayerAccount : ISavable, IDisposable
         return _discordConnectionCode;
     }
 
-    [NoScriptAccess]
     public async Task SetDiscordUserId(ulong id)
     {
         CheckIfDisposed();
@@ -666,22 +694,18 @@ public class PlayerAccount : ISavable, IDisposable
         }
     }
 
-    [NoScriptAccess]
     private void CheckIfDisposed()
     {
         if (_disposed)
             throw new ObjectDisposedException(GetType().FullName);
     }
 
-    public string LongUserFriendlyName() => ToString();
     public override string ToString() => _user.ToString();
 
-    [NoScriptAccess]
     public void Dispose()
     {
         Disposed?.Invoke(this);
         _disposed = true;
-        if (Discord != null)
-            Discord.Dispose();
+        Discord?.Dispose();
     }
 }

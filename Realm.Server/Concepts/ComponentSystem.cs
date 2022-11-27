@@ -7,7 +7,6 @@ public class ComponentSystem : ISerializable
     private Element _owner = default!;
     private ILogger _logger = default!;
     private readonly List<IElementComponent> _components = new();
-    public event Action<ComponentSystem>? NotifyNotSavedState;
 
     public ComponentSystem(Element owner, ILogger logger)
     {

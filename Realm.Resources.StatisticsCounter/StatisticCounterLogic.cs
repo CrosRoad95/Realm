@@ -2,7 +2,6 @@
 using SlipeServer.Server.Elements;
 using SlipeServer.Server.Elements.Events;
 using SlipeServer.Server.Events;
-using SlipeServer.Server.Mappers;
 using SlipeServer.Server.Services;
 
 namespace Realm.Resources.StatisticsCounter;

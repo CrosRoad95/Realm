@@ -1,5 +1,6 @@
 ﻿namespace Realm.Persistance.Scripting.Classes;
 
+[NoDefaultScriptAccess]
 public class DiscordUser : IDisposable
 {
     private bool _disposed;
@@ -7,6 +8,7 @@ public class DiscordUser : IDisposable
     private readonly IDiscord _discord;
     private IDiscordUser _user = default!;
 
+    [ScriptMember("id")]
     public ulong Id
     {
         get
@@ -16,6 +18,7 @@ public class DiscordUser : IDisposable
         }
     }
 
+    [ScriptMember("username")]
     public string Username
     {
         get
@@ -30,7 +33,6 @@ public class DiscordUser : IDisposable
         _discord = discord;
     }
 
-    [NoScriptAccess]
     public void InitializeById(ulong id)
     {
         CheckIfDisposed();
@@ -39,6 +41,7 @@ public class DiscordUser : IDisposable
         _user = _discord.GetGuild()?.GetUserById(id) ?? throw new Exception($"Failed to get discord by user id {id}");
     }
 
+    [ScriptMember("sendTextMessage")]
     public void SendTextMessage(string text)
     {
         CheckIfDisposed();
@@ -46,17 +49,15 @@ public class DiscordUser : IDisposable
         _user.SendTextMessage(text);
     }
 
-    [NoScriptAccess]
     private void CheckIfDisposed()
     {
         if (_disposed)
             throw new ObjectDisposedException(GetType().FullName);
     }
 
-    public string LongUserFriendlyName() => ToString();
+    [ScriptMember("toString")]
     public override string ToString() => "";
 
-    [NoScriptAccess]
     public void Dispose()
     {
         _disposed = true;

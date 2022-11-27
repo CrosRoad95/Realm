@@ -1,11 +1,9 @@
-﻿using Realm.Server.Concepts.Components;
-
-namespace Realm.Server.Elements;
+﻿namespace Realm.Server.Elements;
 
 [NoDefaultScriptAccess]
 public class RPGPlayer : Player
 {
-    private const int RESOURCE_COUNT = 8;
+    private const int _RESOURCE_COUNT = 8;
     private readonly CancellationTokenSource _cancellationTokenSource;
     private readonly LuaValueMapper _luaValueMapper;
     private readonly DebugLog _debugLog;
@@ -15,7 +13,7 @@ public class RPGPlayer : Player
     private readonly ChatBox _chatBox;
     private readonly MtaServer _mtaServer;
     private readonly ILogger _logger;
-    public Latch ResourceStartingLatch = new(RESOURCE_COUNT); // TODO: remove hardcoded resources counter
+    public Latch ResourceStartingLatch = new(_RESOURCE_COUNT); // TODO: remove hardcoded resources counter
     public CancellationToken CancellationToken { get; private set; }
 
     public MtaServer MtaServer => _mtaServer;
@@ -185,11 +183,10 @@ public class RPGPlayer : Player
         if (!_accountsInUseService.AssignPlayerToAccountId(this, account.Id))
             return false;
 
-        await account.SignIn(Client.IPAddress?.ToString(), Client.Serial);
+        await account.SignIn(Client.IPAddress?.ToString(), Client.Serial!);
 
         Account = account;
         using var playerLoggedInEvent = new PlayerLoggedInEvent(this, account);
-        TriggerClientEvent("onLoggedIn");
         LoggedIn?.Invoke(this, Account);
 
         if (!string.IsNullOrEmpty(account.ComponentsData))
@@ -314,13 +311,11 @@ public class RPGPlayer : Player
         Camera.Fade(CameraFade.Out, 0, Color.Black);
         Camera.Target = null;
         Account = null;
-        ResourceStartingLatch = new(RESOURCE_COUNT); // TODO: remove hardcoded resources counter
+        ResourceStartingLatch = new(_RESOURCE_COUNT); // TODO: remove hardcoded resources counter
         DebugView = false;
         _runningSessions.Clear();
     }
 
-    [ScriptMember("longUserFriendlyName")]
-    public string LongUserFriendlyName() => Name;
     [ScriptMember("toString")]
     public override string ToString() => Name;
 }

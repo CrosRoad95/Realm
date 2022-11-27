@@ -1,6 +1,4 @@
-﻿using Realm.Scripting.Functions;
-
-namespace Realm.Server.Services;
+﻿namespace Realm.Server.Services;
 
 internal class DiscordUserChangedHandler : IDiscordUserChangedHandler
 {

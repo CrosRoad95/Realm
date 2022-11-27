@@ -3,16 +3,16 @@
 [NoDefaultScriptAccess]
 public class GameplayScriptingFunctions
 {
-    private readonly ConfigurationProvider _configurationProvider;
+    private readonly RealmConfigurationProvider _configurationProvider;
 
     [ScriptMember("currency")]
-    public string Currency { get => _configurationProvider.Get<string>("Gameplay:Currency"); }
+    public string Currency { get => _configurationProvider.GetRequired<string>("Gameplay:Currency"); }
 
     [ScriptMember("moneyPrecision")]
-    public int MoneyPrecision { get => _configurationProvider.Get<int>("Gameplay:MoneyPrecision"); }
+    public int MoneyPrecision { get => _configurationProvider.GetRequired<int>("Gameplay:MoneyPrecision"); }
     [ScriptMember("moneyLimit")]
-    public double MoneyLimit { get => _configurationProvider.Get<double>("Gameplay:MoneyLimit"); }
-    public GameplayScriptingFunctions(ConfigurationProvider configurationProvider)
+    public double MoneyLimit { get => _configurationProvider.GetRequired<double>("Gameplay:MoneyLimit"); }
+    public GameplayScriptingFunctions(RealmConfigurationProvider configurationProvider)
     {
         _configurationProvider = configurationProvider;
     }

@@ -1,10 +1,4 @@
-﻿using Realm.Persistance.Services;
-using Realm.Server.ElementCollections;
-using Realm.Server.Elements.CollisionShapes;
-using Realm.Server.Elements.Variants;
-using Realm.Server.Factories;
-
-namespace Realm.Server.Scripting;
+﻿namespace Realm.Server.Scripting;
 
 [NoDefaultScriptAccess]
 public class ElementScriptingFunctions

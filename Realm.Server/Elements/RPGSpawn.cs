@@ -5,7 +5,6 @@ public class RPGSpawn : Element, IDisposable, IWorldDebugData
 {
     private bool _disposed = false;
     private readonly AuthorizationPoliciesProvider _authorizationPoliciesProvider;
-    private string? _id;
     private ILogger _logger;
 
     private readonly Guid _debugId = Guid.NewGuid();
@@ -76,8 +75,6 @@ public class RPGSpawn : Element, IDisposable, IWorldDebugData
         return true;
     }
 
-    [ScriptMember("longUserFriendlyName")]
-    public string LongUserFriendlyName() => Name;
     [ScriptMember("toString")]
     public override string ToString() => Name;
 

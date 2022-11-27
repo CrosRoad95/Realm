@@ -1,19 +1,21 @@
 ﻿namespace Realm.Configuration;
 
-public class ConfigurationProvider
+public class RealmConfigurationProvider
 {
     public readonly IConfiguration Configuration;
-    public ConfigurationProvider(IConfiguration configuration)
+    public RealmConfigurationProvider(IConfiguration configuration)
     {
         Configuration = configuration;
     }
 
-    public ConfigurationProvider()
+    public RealmConfigurationProvider()
     {
         Configuration = AddRealmConfiguration(new ConfigurationBuilder()).Build();
     }
 
-    public T Get<T>(string name) => Configuration.GetSection(name).Get<T>();
+    public T? Get<T>(string name) => Configuration.GetSection(name).Get<T>();
+    public T GetRequired<T>(string name) => Configuration.GetSection(name).Get<T>() ??
+        throw new Exception($"Missing configuration '{name}'");
 
     public static IConfigurationBuilder AddRealmConfiguration(IConfigurationBuilder configurationBuilder, string? basePath = null)
     {

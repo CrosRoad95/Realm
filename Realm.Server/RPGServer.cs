@@ -1,11 +1,4 @@
-﻿using Realm.Scripting.Functions;
-using Realm.Server.Concepts.Components;
-using Realm.Server.ElementCollections;
-using Realm.Server.Elements.CollisionShapes;
-using Realm.Server.Elements.Variants;
-using Realm.Server.Factories;
-
-namespace Realm.Server;
+﻿namespace Realm.Server;
 
 public partial class RPGServer : IRPGServer, IReloadable
 {
@@ -35,7 +28,7 @@ public partial class RPGServer : IRPGServer, IReloadable
         set => _server.GameType = value;
     }
 
-    public RPGServer(ConfigurationProvider configurationProvider, ILogger logger, IEnumerable<IModule> modules, Action<ServerBuilder>? configureServerBuilder = null, string? basePath = null)
+    public RPGServer(RealmConfigurationProvider configurationProvider, ILogger logger, IEnumerable<IModule> modules, Action<ServerBuilder>? configureServerBuilder = null, string? basePath = null)
     {
         _modules = modules;
         _logger = logger.ForContext<IRPGServer>();
@@ -97,15 +90,12 @@ public partial class RPGServer : IRPGServer, IReloadable
         _server.MapName = serverListConfiguration.MapName;
         _server.PlayerJoined += e => PlayerJoined?.Invoke(e);
 
-        var startup = _server.GetRequiredService<Startup>();
         _eventFunctions = _server.GetRequiredService<EventScriptingFunctions>();
         _gameplayFunctions = _server.GetRequiredService<GameplayScriptingFunctions>();
         _localizationFunctions = _server.GetRequiredService<LocalizationScriptingFunctions>();
         _elementFunctions = _server.GetRequiredService<ElementScriptingFunctions>();
         _inputFunctions = _server.GetRequiredService<InputScriptingFunctions>();
         _elementCollection = _server.GetRequiredService<IElementCollection>();
-
-        var _ = Task.Run(startup.StartAsync);
 
         Console.CancelKeyPress += (sender, args) =>
         {

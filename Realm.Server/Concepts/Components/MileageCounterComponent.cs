@@ -1,6 +1,4 @@
-﻿using System.Runtime.Serialization;
-
-namespace Realm.Server.Concepts.Components;
+﻿namespace Realm.Server.Concepts.Components;
 
 [Serializable]
 public class MileageCounterComponent : IElementComponent

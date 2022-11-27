@@ -40,7 +40,7 @@ internal class TestRPGServer : IReloadable, IRPGServer
         {
             builder.ConfigureServices(services =>
             {
-                services.AddSingleton(new Configuration.ConfigurationProvider());
+                services.AddSingleton(new Configuration.RealmConfigurationProvider());
                 services.AddSingleton<IConsoleCommands, TestConsoleCommands>();
                 services.AddSingleton<IReloadable>(this);
                 services.AddSingleton<IRPGServer>(this);

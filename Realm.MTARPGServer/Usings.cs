@@ -13,7 +13,6 @@ global using SlipeServer.Server.Elements;
 
 global using Realm.MTARPGServer.Serialization.Yaml;
 global using Realm.Persistance.Scripting.Classes;
-global using Realm.Server.Scripting;
 global using Realm.Interfaces.Server;
 global using Realm.Server;
 global using Realm.Interfaces.Extend;

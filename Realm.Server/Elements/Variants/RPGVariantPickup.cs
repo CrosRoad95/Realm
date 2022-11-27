@@ -1,6 +1,4 @@
-﻿using SlipeServer.Server.Elements.Enums;
-
-namespace Realm.Server.Elements.Variants;
+﻿namespace Realm.Server.Elements.Variants;
 
 public class RPGVariantPickup
 {

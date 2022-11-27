@@ -1,12 +1,14 @@
 ﻿namespace Realm.Persistance.Scripting.Classes;
 
+[NoDefaultScriptAccess]
 public class PlayerRole : IDisposable
 {
     private readonly Role _role;
     private readonly RoleManager<Role> _roleManager;
     private bool _disposed;
 
-    public string Name => _role.Name;
+    [ScriptMember("name")]
+    public string? Name => _role.Name;
 
     public PlayerRole(Role role, RoleManager<Role> roleManager)
     {
@@ -14,6 +16,7 @@ public class PlayerRole : IDisposable
         _roleManager = roleManager;
     }
 
+    [ScriptMember("delete")]
     public async Task<bool> Delete()
     {
         if (_disposed)
@@ -28,8 +31,6 @@ public class PlayerRole : IDisposable
         return false;
     }
 
-
-    [NoScriptAccess]
     public void Dispose()
     {
         _disposed = true;

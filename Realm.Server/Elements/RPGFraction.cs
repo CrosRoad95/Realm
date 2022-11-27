@@ -93,8 +93,6 @@ public class RPGFraction : Element, IDisposable, IWorldDebugData
         return true;
     }
 
-    [ScriptMember("longUserFriendlyName")]
-    public string LongUserFriendlyName() => Name;
     [ScriptMember("toString")]
     public override string ToString() => Name;
 

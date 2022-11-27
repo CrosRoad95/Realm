@@ -6,7 +6,7 @@ namespace Realm.MTARPGServer;
 public class MTARPGServerImpl
 {
     private readonly RPGServer _rpgServer;
-    private readonly Configuration.ConfigurationProvider _configurationProvider;
+    private readonly Configuration.RealmConfigurationProvider _configurationProvider;
     private readonly string? _basePath;
     private readonly IDeserializer _deserializer = new DeserializerBuilder()
             .WithNamingConvention(CamelCaseNamingConvention.Instance)
@@ -14,9 +14,9 @@ public class MTARPGServerImpl
             .Build();
 
     public RPGServer Server => _rpgServer;
-    public Configuration.ConfigurationProvider ConfigurationProvider => _configurationProvider;
+    public Configuration.RealmConfigurationProvider ConfigurationProvider => _configurationProvider;
 
-    public MTARPGServerImpl(IConsoleCommands consoleCommands, ILogger logger, Realm.Configuration.ConfigurationProvider configurationProvider, IModule[] modules, string? basePath = null)
+    public MTARPGServerImpl(IConsoleCommands consoleCommands, ILogger logger, Realm.Configuration.RealmConfigurationProvider configurationProvider, IModule[] modules, string? basePath = null)
     {
         var previousDirectory = Directory.GetCurrentDirectory();
         if(basePath != null)

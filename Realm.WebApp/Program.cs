@@ -17,7 +17,7 @@ var logger = new Logger()
     .ByExcluding<IDiscord>()
     .WithSink(subscribableLogsSink).GetLogger();
 var builder = WebApplication.CreateBuilder(args);
-Realm.Configuration.ConfigurationProvider.AddRealmConfiguration(builder.Configuration, basePath);
+Realm.Configuration.RealmConfigurationProvider.AddRealmConfiguration(builder.Configuration, basePath);
 builder.Logging.ClearProviders();
 // Add services to the container.
 builder.Services.AddRazorPages();
@@ -33,7 +33,7 @@ builder.Services.AddSingleton<SnackbarScriptingFunctions>();
 builder.Services.AddSingleton<WebPanelIntegration>();
 builder.Services.AddSingleton<WebPanelModule>();
 builder.Services.AddSingleton<WeatherForecastService>();
-builder.Services.AddSingleton(x => new MTARPGServerImpl(x.GetRequiredService<ConsoleService>(), logger, new Realm.Configuration.ConfigurationProvider(x.GetRequiredService<IConfiguration>()), new IModule[]
+builder.Services.AddSingleton(x => new MTARPGServerImpl(x.GetRequiredService<ConsoleService>(), logger, new Realm.Configuration.RealmConfigurationProvider(x.GetRequiredService<IConfiguration>()), new IModule[]
         {
             new DiscordModule(),
             new IdentityModule(),
@@ -46,7 +46,9 @@ builder.Services.AddSingleton<IRPGServer>(x => x.GetRequiredService<MTARPGServer
 var app = builder.Build();
 
 var serverImpl = app.Services.GetRequiredService<MTARPGServerImpl>();
-var seedFileNames = serverImpl.ConfigurationProvider.Get<string[]>("General:SeedFiles");
+
+// TODO: make seed files optional
+var seedFileNames = serverImpl.ConfigurationProvider.GetRequired<string[]>("General:SeedFiles");
 await serverImpl.BuildFromSeedFiles(seedFileNames);
 serverImpl.Start();
 

@@ -4,16 +4,16 @@
 public class LocalizationScriptingFunctions
 {
     private readonly Func<string?> _basePathFactory;
-    private readonly ConfigurationProvider _configurationProvider;
+    private readonly RealmConfigurationProvider _configurationProvider;
     private readonly LuaInteropService _luaInteropService;
     private readonly Dictionary<string, Dictionary<string, string>> _translations = new();
     private string _defaultLanguage = "pl";
-    public LocalizationScriptingFunctions(Func<string?> basePathFactory, ConfigurationProvider configurationProvider, LuaInteropService luaInteropService)
+    public LocalizationScriptingFunctions(Func<string?> basePathFactory, RealmConfigurationProvider configurationProvider, LuaInteropService luaInteropService)
     {
         _basePathFactory = basePathFactory;
         _configurationProvider = configurationProvider;
         _luaInteropService = luaInteropService;
-        _defaultLanguage = _configurationProvider.Get<string>("Gameplay:DefaultLanguage");
+        _defaultLanguage = _configurationProvider.GetRequired<string>("Gameplay:DefaultLanguage");
         _luaInteropService.ClientCultureInfoUpdate += HandleClientSendLocalizationCode;
         Reload().Wait();
     }
@@ -30,8 +30,9 @@ public class LocalizationScriptingFunctions
 
     public async Task Reload()
     {
+        // TODO: Add default language
         // TODO: improve exceptions, error handling
-        _defaultLanguage = _configurationProvider.Get<string>("Gameplay:DefaultLanguage");
+        _defaultLanguage = _configurationProvider.GetRequired<string>("Gameplay:DefaultLanguage");
         _translations.Clear();
         var files = Directory.GetFiles(Path.Join(_basePathFactory(), "Localization"));
         foreach (var item in files)

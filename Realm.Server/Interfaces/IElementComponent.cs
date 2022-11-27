@@ -1,6 +1,4 @@
-﻿using System.Runtime.Serialization;
-
-namespace Realm.Server.Interfaces;
+﻿namespace Realm.Server.Interfaces;
 
 public interface IElementComponent : ISerializable
 {

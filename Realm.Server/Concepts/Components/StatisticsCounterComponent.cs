@@ -1,6 +1,4 @@
-﻿using Realm.Resources.StatisticsCounter;
-
-namespace Realm.Server.Concepts.Components;
+﻿namespace Realm.Server.Concepts.Components;
 
 [Serializable]
 public class StatisticsCounterComponent : IElementComponent

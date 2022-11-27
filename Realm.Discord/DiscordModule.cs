@@ -6,7 +6,7 @@ public class DiscordModule : IModule
 
     public void Configure(IServiceCollection services)
     {
-        services.AddSingleton(x => x.GetRequiredService<ConfigurationProvider>().Get<DiscordConfiguration>("discord"));
+        services.AddSingleton(x => x.GetRequiredService<RealmConfigurationProvider>().Get<DiscordConfiguration>("discord"));
         services.AddSingleton<DiscordIntegration>();
         services.AddSingleton<IDiscord>(x => x.GetRequiredService<DiscordIntegration>());
         services.AddSingleton<StatusChannel>();

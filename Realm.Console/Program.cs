@@ -16,7 +16,7 @@ var serilogLogger = new Logger(LogEventLevel.Verbose)
 
 serilogLogger.GetSinkConfiguration().Seq("http://localhost:5341", controlLevelSwitch: serilogLogger.LevelSwitch);
 var logger = serilogLogger.GetLogger();
-var configurationProvider = new Realm.Configuration.ConfigurationProvider();
+var configurationProvider = new Realm.Configuration.RealmConfigurationProvider();
 var server = new MTARPGServerImpl(serverConsole, logger, configurationProvider, new IModule[]
     {
         new DiscordModule(),

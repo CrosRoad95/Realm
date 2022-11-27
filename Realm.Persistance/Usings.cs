@@ -28,4 +28,3 @@ global using Realm.Persistance.Interfaces;
 global using Realm.Configuration;
 global using Realm.Persistance.Services;
 global using Realm.Persistance.Logger.Enrichers;
-global using Realm.Scripting.Functions;

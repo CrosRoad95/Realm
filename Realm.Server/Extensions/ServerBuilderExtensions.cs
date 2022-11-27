@@ -1,13 +1,4 @@
-﻿using Realm.Resources.Addons.AgnosticGuiSystem.DGSProvider;
-using Realm.Resources.AdminTools;
-using Realm.Resources.AFK;
-using Realm.Resources.ElementOutline;
-using Realm.Resources.StatisticsCounter;
-using Realm.Server.Logic;
-using Realm.Server.Logic.Resources;
-using SlipeServer.Resources.DGS;
-
-namespace Realm.Server.Extensions;
+﻿namespace Realm.Server.Extensions;
 
 public static class ServerBuilderExtensions
 {
@@ -27,7 +18,6 @@ public static class ServerBuilderExtensions
         builder.ConfigureServices(services =>
         {
             services.AddSingleton(configuration);
-            services.AddSingleton<Startup>();
 
             services.AddPersistance<SQLiteDb>(db => db.UseSqlite("Filename=./server.db"));
             services.AddRealmIdentity<SQLiteDb>(configuration.GetSection("Identity").Get<IdentityConfiguration>());
@@ -37,7 +27,9 @@ public static class ServerBuilderExtensions
             services.AddSingleton<ICommand, ReloadCommand>();
         });
 
+        // Resource
         var commonOptions = new CommonResourceOptions();
+
         builder.AddNoClipResource();
         builder.AddDGSResource(DGSVersion.Release_3_518);
         builder.AddAgnosticGuiSystemResource(builder =>
@@ -51,9 +43,6 @@ public static class ServerBuilderExtensions
         builder.AddAFKResource();
         builder.AddStatisticsCounterResource();
 
-        builder.AddLogic<RPGPlayerLogic>();
-        builder.AddLogic<RPGVehicleLogic>();
-
         // Resources logics
         builder.AddLogic<LuaInteropLogic>();
         builder.AddLogic<ClientUILogic>();
@@ -61,6 +50,12 @@ public static class ServerBuilderExtensions
         builder.AddLogic<NoClipLogic>();
         builder.AddLogic<AFKLogic>();
 
+
+        // Elements logic
+        builder.AddLogic<RPGPlayerLogic>();
+        builder.AddLogic<RPGVehicleLogic>();
+
+        // Miscellaneous logic
         builder.AddLogic<CommandsLogic>();
 
         return builder;

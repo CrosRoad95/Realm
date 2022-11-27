@@ -4,6 +4,7 @@ namespace Realm.Persistance.Data;
 
 public sealed class Vehicle
 {
+#pragma warning disable CS8618
     public string Id { get; set; }
     public ushort Model { get; set; }
     public TransformAndMotion TransformAndMotion { get; set; }
@@ -25,6 +26,7 @@ public sealed class Vehicle
     public bool Removed { get; set; }
     public DateTime CreatedAt { get; set; }
     public string? Components { get; set; }
+#pragma warning restore CS8618
 
     public ICollection<VehicleData>? VehicleData { get; set; }
 }

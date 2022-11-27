@@ -32,6 +32,7 @@ internal class RPGPlayerLogic
 
     private async void RpgPlayer_LoggedIn(RPGPlayer player, PlayerAccount account)
     {
+        player.TriggerClientEvent(ClientEventsNames.ON_LOGGED_IN);
         using var playerLoggedInEvent = new PlayerLoggedInEvent(player, account);
         await _eventFunctions.InvokeEvent(playerLoggedInEvent);
     }

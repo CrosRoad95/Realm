@@ -1,6 +1,5 @@
 ﻿using Vehicle = SlipeServer.Server.Elements.Vehicle;
 using PersistantVehicleData = Realm.Persistance.Data.Vehicle;
-using Realm.Server.Concepts.Components;
 
 namespace Realm.Server.Elements;
 
@@ -31,7 +30,7 @@ public class RPGVehicle : Vehicle, IPersistantVehicle, IWorldDebugData, IDisposa
     public ComponentSystem Components;
 
     [ScriptMember("isFrozen")]
-    public bool IsFrozen
+    public new bool IsFrozen
     {
         get => base.IsFrozen;
         set
@@ -133,7 +132,7 @@ public class RPGVehicle : Vehicle, IPersistantVehicle, IWorldDebugData, IDisposa
         await _db.SaveChangesAsync();
     }
 
-    public string LongUserFriendlyName() => Name;
+    [ScriptMember("toString")]
     public override string ToString() => Name;
 
     public void Dispose()

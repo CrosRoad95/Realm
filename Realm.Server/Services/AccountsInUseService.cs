@@ -1,6 +1,4 @@
-﻿using System.Collections.Concurrent;
-
-namespace Realm.Server.Services;
+﻿namespace Realm.Server.Services;
 
 public class AccountsInUseService : IAccountsInUseService
 {
