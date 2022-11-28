@@ -37,6 +37,9 @@ public class DailyVisitsCounter : IElementComponent
 
     private void Update()
     {
+        if (LastVisit.Date == DateTime.Now.Date)
+            return;
+
         bool reseted = false;
 
         if (LastVisit.Date.AddDays(1) == DateTime.Now.Date)
