@@ -56,6 +56,7 @@ public partial class RPGServer : IRPGServer, IReloadable
                     services.AddSingleton<InputScriptingFunctions>();
 
                     // Services
+                    services.AddSingleton<RPGPlayerService>();
                     services.AddSingleton<AccountsInUseService>();
                     services.AddSingleton<IAccountsInUseService>(x => x.GetRequiredService<AccountsInUseService>());
                     services.AddSingleton<IDiscordVerificationHandler, DiscordVerificationHandler>();
@@ -133,6 +134,7 @@ public partial class RPGServer : IRPGServer, IReloadable
         _eventFunctions.RegisterEvent(DiscordUserChangedEvent.EventName);
         _eventFunctions.RegisterEvent(PlayerAFKStateChangedEvent.EventName);
         _eventFunctions.RegisterEvent(VehicleSpawnedEvent.EventName);
+        _eventFunctions.RegisterEvent(PlayerDailyVisitEvent.EventName);
 
         // Functions
         scriptingModuleInterface.AddHostObject("Elements", _elementFunctions, true);
@@ -161,11 +163,13 @@ public partial class RPGServer : IRPGServer, IReloadable
         scriptingModuleInterface.AddHostType(typeof(DiscordUserChangedEvent));
         scriptingModuleInterface.AddHostType(typeof(PlayerAFKStateChangedEvent));
         scriptingModuleInterface.AddHostType(typeof(VehicleSpawnedEvent));
+        scriptingModuleInterface.AddHostType(typeof(PlayerDailyVisitEvent));
 
         scriptingModuleInterface.AddHostType(typeof(ComponentSystem));
         scriptingModuleInterface.AddHostType(typeof(VehicleFuelComponent));
         scriptingModuleInterface.AddHostType(typeof(MileageCounterComponent));
         scriptingModuleInterface.AddHostType(typeof(StatisticsCounterComponent));
+        scriptingModuleInterface.AddHostType(typeof(DailyVisitsCounter));
 
         scriptingModuleInterface.AddHostType(typeof(InventorySystem));
         scriptingModuleInterface.AddHostType(typeof(PlayerItem));

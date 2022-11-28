@@ -196,6 +196,7 @@ public class PlayerAccount : ISavable, IDisposable
         _user = user;
     }
 
+    [ScriptMember("isAuthenticated")]
     public bool IsAuthenticated
     {
         get
@@ -205,6 +206,7 @@ public class PlayerAccount : ISavable, IDisposable
         }
     }
 
+    [ScriptMember("checkPasswordAsync")]
     public async Task<bool> CheckPasswordAsync(string password)
     {
         CheckIfDisposed();
@@ -212,6 +214,7 @@ public class PlayerAccount : ISavable, IDisposable
         return await _userManager.CheckPasswordAsync(_user, password);
     }
 
+    [ScriptMember("isInUse")]
     public bool IsInUse()
     {
         CheckIfDisposed();
@@ -219,7 +222,6 @@ public class PlayerAccount : ISavable, IDisposable
         return _accountsInUseService.IsAccountIdInUse(Id);
     }
 
-    [NoScriptAccess]
     public async Task SignIn(string? ip, string serial)
     {
         CheckIfDisposed();

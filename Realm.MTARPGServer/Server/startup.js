@@ -196,7 +196,6 @@ addEventHandler("onPlayerAFKStateChanged", ({ player, isAfk }) => {
     Logger.information("player afk state: {player}, {isAfk}", player, isAfk);
 });
 
-
 let testItem = new PlayerItem(1, "test", 2);
 testItem.setMetadata("test", "testValue")
 testItem.setMetadata("test2", 1337)
@@ -221,3 +220,11 @@ addCommandHandler("item", (player, args) => {
 addCommandHandler("statcomp", (player, args) => {
     player.components.addComponent(new StatisticsCounterComponent());
 })
+
+addCommandHandler("dailycomp", (player, args) => {
+    player.components.addComponent(new DailyVisitsCounter());
+})
+
+addEventHandler("onPlayerDailyVisit", ({ player, visitsInRow, reseted }) => {
+    Logger.information("player visit: {player}, {visitsInRow}, {reseted}", player, visitsInRow, reseted);
+});
