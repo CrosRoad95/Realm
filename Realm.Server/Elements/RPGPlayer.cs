@@ -291,9 +291,14 @@ public class RPGPlayer : Player
         _luaInteropService.SetClipboard(this, content);
     }
 
-    public void StartSession(SessionBase sessionBase)
+    public void AddSession(SessionBase sessionBase)
     {
         _runningSessions.Add(sessionBase);
+    }
+
+    public void RemoveSession(SessionBase sessionBase)
+    {
+        _runningSessions.Remove(sessionBase);
     }
 
     public bool IsDuringSession<T>() where T: SessionBase
@@ -301,9 +306,15 @@ public class RPGPlayer : Player
         return _runningSessions.OfType<T>().Any();
     }
     
-    public T? GetRunningSession<T>() where T: SessionBase
+    public T GetRequiredSession<T>() where T: SessionBase
     {
-        return _runningSessions.OfType<T>().FirstOrDefault();
+        return _runningSessions.OfType<T>().First();
+    }
+
+    [ScriptMember("getSession", ScriptMemberFlags.ExposeRuntimeType)]
+    public SessionBase? GetSession(Type type)
+    {
+        return _runningSessions.Where(x => x.GetType() == type).FirstOrDefault();
     }
 
     public void Reset()

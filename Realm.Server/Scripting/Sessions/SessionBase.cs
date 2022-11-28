@@ -5,10 +5,19 @@ public abstract class SessionBase
     private readonly DateTime _startTime = DateTime.Now;
     private readonly Stopwatch _stopwatch = new Stopwatch();
     private readonly string _sessionId = Guid.NewGuid().ToString();
-    [ScriptMember("sessionId")]
-    public string SessionId { [ScriptUsage()] get => _sessionId; }
+    private readonly string _code;
 
-    public TimeSpan Elapsed => _stopwatch.Elapsed;
+    [ScriptMember("sessionId")]
+    public string SessionId { [ScriptUsage] get => _sessionId; }
+    [ScriptMember("code")]
+    public string Code { [ScriptUsage] get => _code; }
+    [ScriptMember("elapsed")]
+    public double Elapsed { [ScriptUsage] get => _stopwatch.ElapsedMilliseconds; }
+
+    public SessionBase(string code)
+    {
+        _code = code;
+    }
 
     public void Start()
     {

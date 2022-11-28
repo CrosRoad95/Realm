@@ -54,6 +54,7 @@ public static class ServerBuilderExtensions
         // Elements logic
         builder.AddLogic<RPGPlayerLogic>();
         builder.AddLogic<RPGVehicleLogic>();
+        builder.AddLogic<RPGFractionLogic>();
 
         // Miscellaneous logic
         builder.AddLogic<CommandsLogic>();

@@ -13,6 +13,7 @@ public class RPGElementsFactory
     public event Action<RPGSpawn>? SpawnCreated;
     public event Action<RPGVehicle>? VehicleCreated;
     public event Action<RPGBlip>? BlipCreated;
+    public event Action<RPGFraction>? FractionCreated;
 
     public RPGElementsFactory(IRPGServer rpgServer, IDb db, ILogger logger, PeriodicEntitySaveService periodicEntitySaveService,
         IElementIdGenerator elementIdGenerator)
@@ -158,6 +159,7 @@ public class RPGElementsFactory
         fraction.Name = name;
         fraction.Position = position;
         _rpgServer.AssociateElement(fraction);
+        FractionCreated?.Invoke(fraction);
         return fraction;
     }
 

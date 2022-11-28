@@ -1,4 +1,6 @@
-﻿namespace Realm.Server.Elements;
+﻿using SlipeServer.Packets.Definitions.Sync;
+
+namespace Realm.Server.Elements;
 
 [NoDefaultScriptAccess]
 public class RPGFraction : Element, IDisposable, IWorldDebugData
@@ -31,6 +33,8 @@ public class RPGFraction : Element, IDisposable, IWorldDebugData
     [NoScriptAccess]
     private readonly HashSet<PlayerAccount> _members = new();
 
+    public event Action<Player, FractionSession>? SessionStarted;
+    public event Action<Player, FractionSession>? SessionStopped;
     public RPGFraction()
     {
     }
@@ -52,9 +56,18 @@ public class RPGFraction : Element, IDisposable, IWorldDebugData
     }
 
     [ScriptMember("getMemberClaimName")]
-    public string GetMemberClaimName() => $"fraction.{Code}.member";
+    public string GetMemberClaimName()
+    {
+        CheckIfDisposed();
+        return $"fraction.{Code}.member";
+    }
+
     [ScriptMember("getLeaderClaimName")]
-    public string GetLeaderClaimName() => $"fraction.{Code}.leader";
+    public string GetLeaderClaimName()
+    {
+        CheckIfDisposed();
+        return $"fraction.{Code}.leader";
+    } 
 
     [ScriptMember("isMember")]
     public bool IsMember(PlayerAccount playerAccount) => playerAccount.HasClaim(GetMemberClaimName());
@@ -83,14 +96,35 @@ public class RPGFraction : Element, IDisposable, IWorldDebugData
     }
 
     [ScriptMember("startSession")]
-    public bool StartSession(RPGPlayer rpgPlayer)
+    public FractionSession? StartSession(RPGPlayer player)
     {
-        if (rpgPlayer.IsDuringSession<FractionSession>())
-            return false;
+        if (player.IsDuringSession<FractionSession>())
+            return null;
 
-        var session = new FractionSession();
-        rpgPlayer.StartSession(session);
+        var fractionSession = new FractionSession(Code, player);
+        player.AddSession(fractionSession);
+        fractionSession.Start();
+        SessionStarted?.Invoke(player, fractionSession);
+        player.Disconnected += Player_Disconnected;
+        return fractionSession;
+    }
+
+    [ScriptMember("stopSession")]
+    public bool StopSession(RPGPlayer player, FractionSession fractionSession)
+    {
+        if (!player.IsDuringSession<FractionSession>())
+            return false;
+        SessionStopped?.Invoke(player, fractionSession);
+        fractionSession.Stop();
+        player.RemoveSession(fractionSession);
+        player.Disconnected -= Player_Disconnected;
         return true;
+    }
+
+    private void Player_Disconnected(Player player, PlayerQuitEventArgs e)
+    {
+        var fractionSession = ((RPGPlayer)player).GetRequiredSession<FractionSession>();
+        StopSession((RPGPlayer)player, fractionSession);
     }
 
     [ScriptMember("toString")]

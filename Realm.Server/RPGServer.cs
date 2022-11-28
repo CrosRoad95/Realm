@@ -135,6 +135,8 @@ public partial class RPGServer : IRPGServer, IReloadable
         _eventFunctions.RegisterEvent(PlayerAFKStateChangedEvent.EventName);
         _eventFunctions.RegisterEvent(VehicleSpawnedEvent.EventName);
         _eventFunctions.RegisterEvent(PlayerDailyVisitEvent.EventName);
+        _eventFunctions.RegisterEvent(PlayerSessionStartedEvent.EventName);
+        _eventFunctions.RegisterEvent(PlayerSessionStoppedEvent.EventName);
 
         // Functions
         scriptingModuleInterface.AddHostObject("Elements", _elementFunctions, true);
@@ -164,12 +166,16 @@ public partial class RPGServer : IRPGServer, IReloadable
         scriptingModuleInterface.AddHostType(typeof(PlayerAFKStateChangedEvent));
         scriptingModuleInterface.AddHostType(typeof(VehicleSpawnedEvent));
         scriptingModuleInterface.AddHostType(typeof(PlayerDailyVisitEvent));
+        scriptingModuleInterface.AddHostType(typeof(PlayerSessionStartedEvent));
+        scriptingModuleInterface.AddHostType(typeof(PlayerSessionStoppedEvent));
 
         scriptingModuleInterface.AddHostType(typeof(ComponentSystem));
         scriptingModuleInterface.AddHostType(typeof(VehicleFuelComponent));
         scriptingModuleInterface.AddHostType(typeof(MileageCounterComponent));
         scriptingModuleInterface.AddHostType(typeof(StatisticsCounterComponent));
         scriptingModuleInterface.AddHostType(typeof(DailyVisitsCounter));
+
+        scriptingModuleInterface.AddHostType(typeof(FractionSession));
 
         scriptingModuleInterface.AddHostType(typeof(InventorySystem));
         scriptingModuleInterface.AddHostType(typeof(PlayerItem));
