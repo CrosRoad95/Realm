@@ -5,7 +5,6 @@
 public class InventorySystem : ISerializable
 {
     private Element _owner = default!;
-    private ILogger _logger = default!;
     private readonly List<PlayerItem> _items = new();
     public event Action<InventorySystem>? NotifyNotSavedState;
 
@@ -16,28 +15,15 @@ public class InventorySystem : ISerializable
 
     [ScriptMember("items")]
     public object Items => _items.ToArray().ToScriptArray();
-    public InventorySystem(Element owner, ILogger logger)
+
+    public InventorySystem()
     {
-        _owner = owner;
-        _logger = logger;
     }
+
 
     public InventorySystem(SerializationInfo info, StreamingContext context)
     {
         _items = (List<PlayerItem>?)info.GetValue("Items", typeof(List<PlayerItem>)) ?? throw new SerializationException();
-    }
-
-    public void AfterLoad()
-    {
-        if (!_items.Any())
-            return;
-
-        _logger.Verbose("Loaded {count} items.", _items.Count);
-    }
-
-    public void SetLogger(ILogger logger)
-    {
-        _logger = logger;
     }
 
     public void SetOwner(Element element)
@@ -64,4 +50,12 @@ public class InventorySystem : ISerializable
 
     [ScriptMember("toString")]
     public override string ToString() => "Inventory";
+
+    public static InventorySystem CreateFromString(string str)
+    {
+        return JsonConvert.DeserializeObject<InventorySystem>(str, new JsonSerializerSettings
+        {
+            TypeNameHandling = TypeNameHandling.Objects,
+        }) ?? throw new JsonSerializationException("Failed to deserialize InventorySystem");
+    }
 }

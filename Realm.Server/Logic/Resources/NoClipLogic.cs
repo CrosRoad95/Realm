@@ -1,14 +1,18 @@
-﻿namespace Realm.Server.Logic.Resources;
+﻿using Newtonsoft.Json.Linq;
+
+namespace Realm.Server.Logic.Resources;
 
 internal class NoClipLogic
 {
     private readonly MtaServer _mtaServer;
     private readonly NoClipService _noClipService;
+    private readonly ILogger _logger;
 
-    public NoClipLogic(MtaServer mtaServer, NoClipService noClipService)
+    public NoClipLogic(MtaServer mtaServer, NoClipService noClipService, ILogger logger)
     {
         _mtaServer = mtaServer;
         _noClipService = noClipService;
+        _logger = logger;
         _mtaServer.PlayerJoined += MtaServer_PlayerJoined;
     }
 
@@ -19,6 +23,10 @@ internal class NoClipLogic
 
     private void NoClipLogic_NoClipStateChanged(RPGPlayer player, bool enabled)
     {
+        if (enabled)
+            _logger.Verbose("Enabled no clip");
+        else
+            _logger.Verbose("Disabled no clip");
         _noClipService.SetEnabledTo(player, enabled);
     }
 }

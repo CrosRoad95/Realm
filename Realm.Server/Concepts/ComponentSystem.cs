@@ -1,17 +1,17 @@
-﻿namespace Realm.Server.Concepts;
+﻿using System.Security.Principal;
+
+namespace Realm.Server.Concepts;
 
 [Serializable]
 [NoDefaultScriptAccess]
 public class ComponentSystem : ISerializable
 {
-    private Element _owner = default!;
-    private ILogger _logger = default!;
     private readonly List<IElementComponent> _components = new();
+    private Element _owner = default!;
 
-    public ComponentSystem(Element owner, ILogger logger)
+    public event Action<IElementComponent>? ComponentAdded;
+    public ComponentSystem()
     {
-        _owner = owner;
-        _logger = logger;
     }
 
     public ComponentSystem(SerializationInfo info, StreamingContext context)
@@ -19,29 +19,15 @@ public class ComponentSystem : ISerializable
         _components = (List<IElementComponent>?)info.GetValue("Components", typeof(List<IElementComponent>)) ?? throw new SerializationException();
     }
 
-    public void AfterLoad()
-    {
-        if (!_components.Any())
-            return;
-
-        foreach (var component in _components)
-        {
-            component.SetLogger(_logger);
-            component.SetOwner(_owner);
-        }
-        _logger.Verbose("Loaded {count} components: {componentNames}", _components.Count, _components.Select(x => x.Name));
-    }
-
-    public void SetLogger(ILogger logger)
-    {
-        _logger = logger;
-    }
-
     public void SetOwner(Element element)
     {
         if (_owner != null)
             throw new Exception("Component system already have an owner.");
         _owner = element;
+        foreach (var component in _components)
+        {
+            component.SetOwner(_owner);
+        }
     }
 
     public void GetObjectData(SerializationInfo info, StreamingContext context)
@@ -52,10 +38,9 @@ public class ComponentSystem : ISerializable
     [ScriptMember("addComponent")]
     public void AddComponent(IElementComponent component)
     {
-        component.SetLogger(_logger);
         component.SetOwner(_owner);
         _components.Add(component);
-        _logger.Verbose("Added component {elementComponentName}", component.Name);
+        ComponentAdded?.Invoke(component);
     }
 
     [ScriptMember("hasComponent")]
@@ -92,5 +77,13 @@ public class ComponentSystem : ISerializable
     public int CountComponent(Type type)
     {
         return _components.Where(x => x.GetType() == type).Count();
+    }
+
+    public static ComponentSystem CreateFromString(string str)
+    {
+        return JsonConvert.DeserializeObject<ComponentSystem>(str, new JsonSerializerSettings
+        {
+            TypeNameHandling = TypeNameHandling.Objects,
+        }) ?? throw new JsonSerializationException("Failed to deserialize ComponentSystem");
     }
 }

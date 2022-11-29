@@ -4,7 +4,6 @@
 public class StatisticsCounterComponent : IElementComponent
 {
     private RPGPlayer _player = default!;
-    private ILogger _logger = default!;
     private StatisticsCounterService _statisticsCounterService = default!;
 
     [ScriptMember("name")]
@@ -75,12 +74,6 @@ public class StatisticsCounterComponent : IElementComponent
     {
         _player.LoggedOut -= LoggedOut;
         _statisticsCounterService.SetCounterEnabledFor(_player, false);
-    }
-
-    [NoScriptAccess]
-    public void SetLogger(ILogger logger)
-    {
-        _logger = logger.ForContext<VehicleFuelComponent>();
     }
 
     public void GetObjectData(SerializationInfo info, StreamingContext context)

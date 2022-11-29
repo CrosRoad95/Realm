@@ -22,7 +22,6 @@ public class PlayerAccount : ISavable, IDisposable
     private DateTime? _discordConnectionCodeValidUntil = null;
     private DiscordUser? _discord = null;
 
-
     public event Action<PlayerAccount>? NotifyNotSavedState;
     public event Action<PlayerAccount>? Disposed;
 

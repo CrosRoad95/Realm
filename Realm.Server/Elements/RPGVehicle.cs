@@ -51,7 +51,8 @@ public class RPGVehicle : Vehicle, IPersistantVehicle, IWorldDebugData, IDisposa
             .ForContext<RPGVehicle>()
             .ForContext(new RPGVehicleEnricher(this));
         IsFrozen = true;
-        Components = new ComponentSystem(this, _logger);
+        Components = new ComponentSystem();
+        Components.SetOwner(this);
         PedLeft += RPGVehicle_PedLeft;
     }
 
@@ -107,13 +108,8 @@ public class RPGVehicle : Vehicle, IPersistantVehicle, IWorldDebugData, IDisposa
         {
             if(!string.IsNullOrEmpty(_vehicleData.Components))
             {
-                Components = JsonConvert.DeserializeObject<ComponentSystem>(_vehicleData.Components, new JsonSerializerSettings
-                {
-                    TypeNameHandling = TypeNameHandling.Objects,
-                }) ?? throw new JsonSerializationException("Failed to deserialize Components");
-                Components.SetLogger(_logger);
+                Components = ComponentSystem.CreateFromString(_vehicleData.Components);
                 Components.SetOwner(this);
-                Components.AfterLoad();
             }
             RawSpawn(_vehicleData.TransformAndMotion.Position, _vehicleData.TransformAndMotion.Rotation);
         }

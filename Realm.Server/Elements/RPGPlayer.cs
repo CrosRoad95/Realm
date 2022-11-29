@@ -5,14 +5,13 @@ public class RPGPlayer : Player
 {
     private const int _RESOURCE_COUNT = 8;
     private readonly CancellationTokenSource _cancellationTokenSource;
-    private readonly LuaValueMapper _luaValueMapper;
-    private readonly DebugLog _debugLog;
     private readonly AgnosticGuiSystemService _agnosticGuiSystemService;
     private readonly AccountsInUseService _accountsInUseService;
     private readonly LuaInteropService _luaInteropService;
-    private readonly ChatBox _chatBox;
     private readonly MtaServer _mtaServer;
-    private readonly ILogger _logger;
+    private readonly List<SessionBase> _runningSessions = new();
+    public ComponentSystem? _componentsSystem;
+    public InventorySystem? _inventorySystem;
     public Latch ResourceStartingLatch = new(_RESOURCE_COUNT); // TODO: remove hardcoded resources counter
     public CancellationToken CancellationToken { get; private set; }
 
@@ -24,19 +23,26 @@ public class RPGPlayer : Player
     public string Language { get; private set; } = "pl";
     [ScriptMember("isLoggedIn", ScriptAccess.ReadOnly)]
     public bool IsLoggedIn => Account != null && Account.IsAuthenticated;
-
-    public event Action<RPGPlayer, bool>? AdminToolsStateChanged;
-    public event Action<RPGPlayer, bool>? NoClipStateChanged;
-    public new event Action<RPGPlayer, RPGSpawn>? Spawned;
-    public event Action<RPGPlayer, PlayerAccount>? LoggedIn;
-    public event Action<RPGPlayer, string>? LoggedOut;
-
-    public event Action<RPGPlayer>? NotifyNotSavedState;
-
     [ScriptMember("components")]
-    public ComponentSystem Components;
+    public ComponentSystem Components
+    {
+        get
+        {
+            if(_componentsSystem != null)
+                return _componentsSystem;
+            throw new Exception();
+        }
+    }
     [ScriptMember("inventory")]
-    public InventorySystem Inventory;
+    public InventorySystem Inventory
+    {
+        get
+        {
+            if (_inventorySystem != null)
+                return _inventorySystem;
+            throw new Exception();
+        }
+    }
 
     private bool _debugView = false;
     [ScriptMember("debugView")]
@@ -45,11 +51,7 @@ public class RPGPlayer : Player
             if(_debugView != value)
             {
                 _debugView = value;
-                _debugLog.SetVisibleTo(this, value);
-                if(value)
-                    _logger.Verbose("Enabled debug view");
-                else
-                    _logger.Verbose("Disabled debug view");
+                DebugViewStateChanged?.Invoke(this, value);
             }
         }
     }
@@ -60,12 +62,11 @@ public class RPGPlayer : Player
     {
         get => _adminTools; set
         {
-            _adminTools = value;
-            AdminToolsStateChanged?.Invoke(this, value);
-            if (value)
-                _logger.Verbose("Enabled admin tools");
-            else
-                _logger.Verbose("Disabled admin tools");
+            if(_adminTools != value)
+            {
+                _adminTools = value;
+                AdminToolsStateChanged?.Invoke(this, value);
+            }
         }
     }
 
@@ -75,40 +76,41 @@ public class RPGPlayer : Player
     {
         get => _noClip; set
         {
-            _noClip = value;
-            NoClipStateChanged?.Invoke(this, value);
-            if (value)
-                _logger.Verbose("Enabled no clip");
-            else
-                _logger.Verbose("Disabled no clip");
+            if(_noClip != value)
+            {
+                _noClip = value;
+                NoClipStateChanged?.Invoke(this, value);
+            }
         }
     }
 
-    private readonly List<SessionBase> _runningSessions = new();
+    public event Action<RPGPlayer, bool>? AdminToolsStateChanged;
+    public event Action<RPGPlayer, bool>? NoClipStateChanged;
+    public new event Action<RPGPlayer, RPGSpawn>? Spawned;
+    public event Action<RPGPlayer, PlayerAccount>? LoggedIn;
+    public event Action<RPGPlayer, string>? LoggedOut;
+    public event Action<RPGPlayer, string>? ClipboardChanged;
+    public event Action<RPGPlayer, bool>? DebugViewStateChanged;
+    public event Action<RPGPlayer, string, object[]>? EventTriggered;
+    public event Action<RPGPlayer, string, Color?, bool?>? ChatMessageSend;
+    public event Action<RPGPlayer>? ClearChatRequested;
+    public event Action<RPGPlayer, string>? GuiOpened;
+    public event Action<RPGPlayer, string>? GuiClosed;
+    public event Action<RPGPlayer>? AllGuiClosed;
 
-    public RPGPlayer(LuaValueMapper luaValueMapper, DebugLog debugLog, AgnosticGuiSystemService agnosticGuiSystemService,
-        AccountsInUseService accountsInUseService, ILogger logger, LuaInteropService luaInteropService, ChatBox chatBox,
+    public RPGPlayer(AgnosticGuiSystemService agnosticGuiSystemService,
+        AccountsInUseService accountsInUseService, LuaInteropService luaInteropService,
         MtaServer mtaServer)
     {
-        _luaValueMapper = luaValueMapper;
-        _debugLog = debugLog;
         _agnosticGuiSystemService = agnosticGuiSystemService;
         _accountsInUseService = accountsInUseService;
         _luaInteropService = luaInteropService;
-        _chatBox = chatBox;
         _mtaServer = mtaServer;
-        _logger = logger
-            .ForContext<RPGPlayer>()
-            .ForContext(new RPGPlayerEnricher(this));
         _cancellationTokenSource = new CancellationTokenSource();
         CancellationToken = _cancellationTokenSource.Token;
-        Components = new ComponentSystem(this, _logger);
-        Inventory = new InventorySystem(this, _logger);
         ResourceStarted += RPGPlayer_ResourceStarted;
-        Disconnected += RPGPlayer_Disconnected;
 
         _luaInteropService.ClientCultureInfoUpdate += HandleClientCultureInfoUpdate;
-
     }
 
     private void HandleClientCultureInfoUpdate(Player player, CultureInfo culture)
@@ -118,13 +120,6 @@ public class RPGPlayer : Player
             _luaInteropService.ClientCultureInfoUpdate -= HandleClientCultureInfoUpdate;
             Language = culture.TwoLetterISOLanguageName;
         }
-    }
-
-    private async void RPGPlayer_Disconnected(Player sender, PlayerQuitEventArgs e)
-    {
-        await LogOut();
-        _cancellationTokenSource.Cancel();
-        _logger.Verbose("Disconnected");
     }
 
     private void RPGPlayer_ResourceStarted(Player sender, PlayerResourceStartedEventArgs e)
@@ -141,7 +136,6 @@ public class RPGPlayer : Player
             Camera.Fade(CameraFade.In);
             Spawn(spawn.Position, spawn.Rotation.Z, 0, 0, 0);
             Spawned?.Invoke(this, spawn);
-            _logger.Verbose("Spawned at {spawn}", spawn);
             return true;
         }
         return false;
@@ -150,25 +144,10 @@ public class RPGPlayer : Player
     [ScriptMember("isPersistant")]
     public bool IsPersistant() => true;
 
-    // TODO: improve
     [ScriptMember("triggerClientEvent")]
     public void TriggerClientEvent(string name, params object[] values)
     {
-        LuaValue luaValue;
-        if (values.Length == 1 && values[0].GetType() == typeof(object[]))
-        {
-            luaValue = ((object[])values[0]).Select(_luaValueMapper.Map).ToArray();
-        }
-        else
-        {
-            luaValue = values.Select(_luaValueMapper.Map).ToArray();
-        }
-
-        if(values.Any())
-            _logger.Verbose("Triggered client event {eventName} with arguments: {luaValue}.", name, luaValue);
-        else
-            _logger.Verbose("Triggered client event {eventName} with no arguments.", name);
-        TriggerLuaEvent(name, this, luaValue);
+        EventTriggered?.Invoke(this, name, values);
     }
 
     [ScriptMember("logIn")]
@@ -191,27 +170,16 @@ public class RPGPlayer : Player
 
         if (!string.IsNullOrEmpty(account.ComponentsData))
         {
-            Components = JsonConvert.DeserializeObject<ComponentSystem>(account.ComponentsData, new JsonSerializerSettings
-            {
-                TypeNameHandling = TypeNameHandling.Objects,
-            }) ?? throw new JsonSerializationException("Failed to deserialize Components");
-            Components.SetLogger(_logger);
-            Components.SetOwner(this);
-            Components.AfterLoad();
+            _componentsSystem = ComponentSystem.CreateFromString(account.ComponentsData);
+            _componentsSystem.SetOwner(this);
         }
         
         if (!string.IsNullOrEmpty(account.InventoryData))
         {
-            Inventory = JsonConvert.DeserializeObject<InventorySystem>(account.InventoryData, new JsonSerializerSettings
-            {
-                TypeNameHandling = TypeNameHandling.Objects,
-            }) ?? throw new JsonSerializationException("Failed to deserialize Inventory");
-            Inventory.SetLogger(_logger);
-            Inventory.SetOwner(this);
-            Inventory.AfterLoad();
+            _inventorySystem = InventorySystem.CreateFromString(account.InventoryData);
+            _inventorySystem.SetOwner(this);
         }
 
-        _logger.Verbose("Logged in to the account: {account}", account);
         return true;
     }
 
@@ -223,7 +191,7 @@ public class RPGPlayer : Player
 
         await Save();
         LoggedOut?.Invoke(this, Account.Id);
-        _logger.Verbose("Logged out from account: {account}", Account);
+        _cancellationTokenSource.Cancel();
         Account = null;
         return true;
     }
@@ -245,50 +213,39 @@ public class RPGPlayer : Player
     }
 
     [ScriptMember("openGui")]
-    public bool OpenGui(string gui)
+    public void OpenGui(string guiName)
     {
-        var success = _agnosticGuiSystemService.OpenGui(this, gui);
-        if(success)
-            _logger.Verbose("Opened gui {gui}", gui);
-        else
-            _logger.Verbose("Failed to open gui {gui}", gui);
-        return success;
+        GuiOpened?.Invoke(this, guiName);
     }
 
     [ScriptMember("closeGui")]
-    public bool CloseGui(string gui)
+    public void CloseGui(string gui)
     {
-        var success =_agnosticGuiSystemService.CloseGui(this, gui);
-        if (success)
-            _logger.Verbose("Closed gui {gui}", gui);
-        else
-            _logger.Verbose("Failed to close gui {gui}", gui);
-        return success;
+        GuiClosed?.Invoke(this, gui);
     }
 
     [ScriptMember("closeAllGuis")]
     public void CloseAllGuis()
     {
-        _agnosticGuiSystemService.CloseAllGuis(this);
-        _logger.Verbose("Closed all guis");
+        AllGuiClosed?.Invoke(this);
     }
 
     [ScriptMember("sendChatMessage")]
     public void SendChatMessage(string message, Color? color = null, bool isColorCoded = false)
     {
-        _chatBox.Output(message, color, isColorCoded);
+        ChatMessageSend?.Invoke(this, message, color, isColorCoded);
     }
 
     [ScriptMember("clearChatBox")]
     public void ClearChatBox()
     {
-        _chatBox.ClearFor(this);
+        ClearChatRequested?.Invoke(this);
     }
 
     [ScriptMember("setClipboard")]
     public void SetClipboard(string content)
     {
-        _luaInteropService.SetClipboard(this, content);
+        ClipboardChanged?.Invoke(this, content);
     }
 
     public void AddSession(SessionBase sessionBase)
