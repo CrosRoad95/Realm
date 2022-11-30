@@ -1,7 +1,7 @@
 ﻿namespace Realm.Server.Concepts.Components;
 
 [Serializable]
-public class DailyVisitsCounter : IElementComponent
+public class DailyVisitsCounterComponent : IElementComponent
 {
     private RPGPlayer _player = default!;
     private ILogger _logger = default!;
@@ -13,11 +13,11 @@ public class DailyVisitsCounter : IElementComponent
     public DateTime LastVisit { get; set; } = DateTime.MinValue;
     [ScriptMember("visitsInRow")]
     public int VisitsInRow { get; set; }
-    public DailyVisitsCounter()
+    public DailyVisitsCounterComponent()
     {
     }
 
-    public DailyVisitsCounter(SerializationInfo info, StreamingContext context)
+    public DailyVisitsCounterComponent(SerializationInfo info, StreamingContext context)
     {
         LastVisit = info.GetDateTime(nameof(LastVisit));
         VisitsInRow = info.GetInt32(nameof(VisitsInRow));
