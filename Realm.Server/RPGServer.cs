@@ -174,6 +174,7 @@ public partial class RPGServer : IRPGServer, IReloadable
         scriptingModuleInterface.AddHostType(typeof(MileageCounterComponent));
         scriptingModuleInterface.AddHostType(typeof(StatisticsCounterComponent));
         scriptingModuleInterface.AddHostType(typeof(DailyVisitsCounterComponent));
+        scriptingModuleInterface.AddHostType(typeof(LastPositionComponent));
 
         scriptingModuleInterface.AddHostType(typeof(FractionSession));
 

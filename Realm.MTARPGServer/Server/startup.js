@@ -60,7 +60,19 @@ removeEventHandler("onPlayerJoin", func);
 
 addEventHandler("onPlayerLogin", async ({ player, account }) => {
     Logger.information("player logged in: {player}, {account} is in use? {isInUse}", player, account, account.isInUse())
-    await player.spawn(spawn);
+    const lastPositionComponent = player.components.hasComponent(host.typeOf(LastPositionComponent));
+    if (!lastPositionComponent) {
+        Logger.information("no last position position found, spawning on default spawn + adding last position component")
+        await player.spawn(spawn);
+        player.components.addComponent(new LastPositionComponent());
+    }
+    else {
+        Logger.information("spawning at last position...")
+        if (!player.components.getComponent(host.typeOf(LastPositionComponent)).trySpawn()) {
+            Logger.information("unable to spawn at last postion, spawning on default spawn")
+            await player.spawn(spawn);
+        }
+    }
     Logger.information("is player authorized to admin policy? {isAuthorized}", await player.account.authorizePolicy("Admin"))
     const playerAccount = player.account;
     {

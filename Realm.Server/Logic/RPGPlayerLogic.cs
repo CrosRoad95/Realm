@@ -37,6 +37,7 @@ internal class RPGPlayerLogic
         rpgPlayer.LoggedIn += RpgPlayer_LoggedIn;
         rpgPlayer.LoggedOut += RpgPlayer_LoggedOut;
         rpgPlayer.Spawned += RpgPlayer_Spawned;
+        rpgPlayer.SpawnedAtPosition += RpgPlayer_SpawnedAtPosition;
         rpgPlayer.DebugViewStateChanged += RpgPlayer_DebugViewStateChanged;
         rpgPlayer.EventTriggered += RpgPlayer_EventTriggered;
         rpgPlayer.Disconnected += RpgPlayer_Disconnected;
@@ -109,6 +110,14 @@ internal class RPGPlayerLogic
         using var playerSpawnedEvent = new PlayerSpawnedEvent(rpgPlayer, spawn);
         await _eventFunctions.InvokeEvent(playerSpawnedEvent);
         _logger.Verbose("Spawned at {spawn}", spawn);
+    }
+    
+    private async void RpgPlayer_SpawnedAtPosition(RPGPlayer rpgPlayer, Vector3 position)
+    {
+        using var _ = LogContext.Push(new RPGPlayerEnricher(rpgPlayer));
+        using var playerSpawnedEvent = new PlayerSpawnedEvent(rpgPlayer, position);
+        await _eventFunctions.InvokeEvent(playerSpawnedEvent);
+        _logger.Verbose("Spawned at {position}", position);
     }
 
     private async void RpgPlayer_LoggedOut(RPGPlayer rpgPlayer, string id)

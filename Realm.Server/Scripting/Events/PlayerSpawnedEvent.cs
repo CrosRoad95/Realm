@@ -4,7 +4,8 @@ public class PlayerSpawnedEvent : INamedLuaEvent, IDisposable
 {
     private bool _disposed = false;
     private RPGPlayer _player;
-    private RPGSpawn _spawn;
+    private RPGSpawn? _spawn;
+    private Vector3 _position;
 
     public static string EventName => "onPlayerSpawn";
 
@@ -17,7 +18,7 @@ public class PlayerSpawnedEvent : INamedLuaEvent, IDisposable
         }
     }
 
-    public RPGSpawn Spawn
+    public RPGSpawn? Spawn
     {
         get
         {
@@ -26,10 +27,25 @@ public class PlayerSpawnedEvent : INamedLuaEvent, IDisposable
         }
     }
 
+    public Vector3 Position
+    {
+        get
+        {
+            CheckIfDisposed();
+            return _position;
+        }
+    }
+
     public PlayerSpawnedEvent(RPGPlayer player, RPGSpawn spawn)
     {
         _player = player;
         _spawn = spawn;
+    }
+    
+    public PlayerSpawnedEvent(RPGPlayer player, Vector3 position)
+    {
+        _player = player;
+        _position = position;
     }
 
     private void CheckIfDisposed()

@@ -87,6 +87,7 @@ public class RPGPlayer : Player
     public event Action<RPGPlayer, bool>? AdminToolsStateChanged;
     public event Action<RPGPlayer, bool>? NoClipStateChanged;
     public new event Action<RPGPlayer, RPGSpawn>? Spawned;
+    public event Action<RPGPlayer, Vector3>? SpawnedAtPosition;
     public event Action<RPGPlayer, PlayerAccount>? LoggedIn;
     public event Action<RPGPlayer, string>? LoggedOut;
     public event Action<RPGPlayer, string>? ClipboardChanged;
@@ -128,7 +129,7 @@ public class RPGPlayer : Player
     }
 
     [ScriptMember("spawn")]
-    public virtual async Task<bool> Spawn(RPGSpawn spawn)
+    public async Task<bool> Spawn(RPGSpawn spawn)
     {
         if(await spawn.IsAuthorized(this))
         {
@@ -139,6 +140,15 @@ public class RPGPlayer : Player
             return true;
         }
         return false;
+    }
+    
+    [ScriptMember("spawn")]
+    public void Spawn(Vector3 position, Vector3? rotation = null)
+    {
+        Camera.Target = this;
+        Camera.Fade(CameraFade.In);
+        Spawn(position, rotation?.Z ?? 0, 0, 0, 0);
+        SpawnedAtPosition?.Invoke(this, position);
     }
 
     [ScriptMember("isPersistant")]
@@ -166,20 +176,21 @@ public class RPGPlayer : Player
 
         Account = account;
         using var playerLoggedInEvent = new PlayerLoggedInEvent(this, account);
-        LoggedIn?.Invoke(this, Account);
 
         if (!string.IsNullOrEmpty(account.ComponentsData))
-        {
             _componentsSystem = ComponentSystem.CreateFromString(account.ComponentsData);
-            _componentsSystem.SetOwner(this);
-        }
-        
-        if (!string.IsNullOrEmpty(account.InventoryData))
-        {
-            _inventorySystem = InventorySystem.CreateFromString(account.InventoryData);
-            _inventorySystem.SetOwner(this);
-        }
+        else
+            _componentsSystem = new ComponentSystem();
 
+        if (!string.IsNullOrEmpty(account.InventoryData))
+            _inventorySystem = InventorySystem.CreateFromString(account.InventoryData);
+        else
+            _inventorySystem = new InventorySystem();
+
+        _inventorySystem.SetOwner(this);
+        _componentsSystem.SetOwner(this);
+
+        LoggedIn?.Invoke(this, Account);
         return true;
     }
 

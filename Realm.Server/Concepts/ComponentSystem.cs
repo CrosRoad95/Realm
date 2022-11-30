@@ -49,8 +49,8 @@ public class ComponentSystem : ISerializable
         return _components.Where(x => x.GetType() == type).Any();
     }
 
-    [ScriptMember("getComponent")]
-    public object? GetComponent(Type type)
+    [ScriptMember("getComponent", ScriptMemberFlags.ExposeRuntimeType)]
+    public IElementComponent? GetComponent(Type type)
     {
         return _components.Where(x => x.GetType() == type).FirstOrDefault();
     }
