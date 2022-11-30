@@ -5,7 +5,6 @@ public class RPGSpawn : Element, IDisposable, IWorldDebugData
 {
     private bool _disposed = false;
     private readonly AuthorizationPoliciesProvider _authorizationPoliciesProvider;
-    private ILogger _logger;
 
     private readonly Guid _debugId = Guid.NewGuid();
     [ScriptMember("debugId")]
@@ -16,16 +15,12 @@ public class RPGSpawn : Element, IDisposable, IWorldDebugData
     private readonly bool _isPersistant = PersistantScope.IsPersistant;
     private readonly List<string> _requiredPolices = new();
 
-    public RPGSpawn(AuthorizationPoliciesProvider authorizationPoliciesProvider, ILogger logger)
+    public RPGSpawn(AuthorizationPoliciesProvider authorizationPoliciesProvider)
     {
         _authorizationPoliciesProvider = authorizationPoliciesProvider;
         Position = position;
         Rotation = rotation;
         Destroyed += e => Dispose();
-
-        _logger = logger
-            .ForContext<RPGSpawn>()
-            .ForContext(new SpawnEnricher(this));
     }
 
     [ScriptMember("isPersistant")]
