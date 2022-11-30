@@ -4,7 +4,6 @@
 public class DailyVisitsCounterComponent : IElementComponent
 {
     private RPGPlayer _player = default!;
-    private ILogger _logger = default!;
 
     [ScriptMember("name")]
     public string Name => "DailyVisits";
@@ -59,12 +58,6 @@ public class DailyVisitsCounterComponent : IElementComponent
     private void LoggedOut(RPGPlayer player, string accountId)
     {
         _player.LoggedOut -= LoggedOut;
-    }
-
-    [NoScriptAccess]
-    public void SetLogger(ILogger logger)
-    {
-        _logger = logger.ForContext<VehicleFuelComponent>();
     }
 
     public void GetObjectData(SerializationInfo info, StreamingContext context)

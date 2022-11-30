@@ -4,7 +4,8 @@
 public class VehicleFuelComponent : IElementComponent
 {
     private RPGVehicle _rpgVehicle = default!;
-    private ILogger _logger = default!;
+
+    public event Action<VehicleFuelComponent>? FuelRanOut;
 
     private Vector3 _lastPosition;
     private float _amount = 0;
@@ -111,12 +112,6 @@ public class VehicleFuelComponent : IElementComponent
         Update(true);
     }
 
-    [NoScriptAccess]
-    public void SetLogger(ILogger logger)
-    {
-        _logger = logger.ForContext<VehicleFuelComponent>();
-    }
-
     private void Disposed(IPersistantVehicle obj)
     {
         UnregisterEvents();
@@ -159,7 +154,7 @@ public class VehicleFuelComponent : IElementComponent
         {
             _amount = 0;
             _rpgVehicle.IsEngineOn = false;
-            _logger.Verbose("Fuel ran out, turning off engine.");
+            FuelRanOut?.Invoke(this);
         }
     }
 

@@ -4,7 +4,6 @@
 public class MileageCounterComponent : IElementComponent
 {
     private RPGVehicle _rpgVehicle = default!;
-    private ILogger _logger = default!;
 
     private Vector3 _lastPosition;
     private float _mileage;
@@ -60,12 +59,6 @@ public class MileageCounterComponent : IElementComponent
         _rpgVehicle.Disposed += Disposed;
         _lastPosition = _rpgVehicle.Position;
         RegisterEvents();
-    }
-
-    [NoScriptAccess]
-    public void SetLogger(ILogger logger)
-    {
-        _logger = logger.ForContext<VehicleFuelComponent>();
     }
 
     private void Disposed(IPersistantVehicle obj)
