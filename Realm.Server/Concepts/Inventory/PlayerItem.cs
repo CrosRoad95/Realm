@@ -1,4 +1,4 @@
-﻿namespace Realm.Server.Concepts;
+﻿namespace Realm.Server.Concepts.Inventory;
 
 public class PlayerItem : ISerializable
 {
@@ -18,7 +18,7 @@ public class PlayerItem : ISerializable
 
     public PlayerItem(int id, string name, int size)
     {
-        if(size < 0)
+        if (size < 0)
             throw new ArgumentOutOfRangeException(nameof(size));
         UniqueId = Guid.NewGuid().ToString();
         Id = id;

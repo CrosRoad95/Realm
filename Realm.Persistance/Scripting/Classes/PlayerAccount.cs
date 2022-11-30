@@ -1,4 +1,6 @@
-﻿namespace Realm.Persistance.Scripting.Classes;
+﻿using Realm.Common.Exceptions;
+
+namespace Realm.Persistance.Scripting.Classes;
 
 [NoDefaultScriptAccess]
 public class PlayerAccount : ISavable, IDisposable
@@ -103,10 +105,10 @@ public class PlayerAccount : ISavable, IDisposable
                 return;
 
             if (value < 0)
-                throw new Exception("Unable to set money, money can not get negative");
+                throw new GameplayException("Unable to set money, money can not get negative");
 
             if (value > _configurationProvider.GetRequired<double>("Gameplay:MoneyLimit"))
-                throw new Exception("Unable to set money, reached limit.");
+                throw new GameplayException("Unable to set money, reached limit.");
             var moneyPrecision = _configurationProvider.GetRequired<int>("Gameplay:MoneyPrecision");
             var old = _user.Money;
             _user.Money = Math.Round(value, moneyPrecision);
@@ -171,15 +173,16 @@ public class PlayerAccount : ISavable, IDisposable
         return (await _userManager.GetClaimsAsync(_user)).ToArray();
     }
 
+    [ScriptMember("giveMoney")]
     public bool GiveMoney(double amount)
     {
         CheckIfDisposed();
 
         if (_user.Money < 0)
-            throw new ArgumentOutOfRangeException(nameof(amount), "Unable to set money, money can not get negative");
+            throw new GameplayException("Unable to set money, money can not get negative");
 
         if (amount > _configurationProvider.GetRequired<double>("Gameplay:MoneyLimit"))
-            throw new Exception("Unable to set money, reached limit.");
+            throw new GameplayException("Unable to set money, reached limit.");
 
         var moneyPrecision = _configurationProvider.GetRequired<int>("Gameplay:MoneyPrecision");
         Money = _user.Money + Math.Round(amount, moneyPrecision);
@@ -191,7 +194,7 @@ public class PlayerAccount : ISavable, IDisposable
         CheckIfDisposed();
 
         if (_user != null)
-            throw new Exception("User already set.");
+            throw new GameplayException("User already set.");
         _user = user;
     }
 
@@ -570,7 +573,6 @@ public class PlayerAccount : ISavable, IDisposable
 
         if (!includeSuspended)
             query = query.NotSuspended();
-        var all = await query.ToListAsync();
         return await query.AnyAsync();
     }
 

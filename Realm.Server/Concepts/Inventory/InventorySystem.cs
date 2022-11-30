@@ -1,4 +1,4 @@
-﻿namespace Realm.Server.Concepts;
+﻿namespace Realm.Server.Concepts.Inventory;
 
 [Serializable]
 [NoDefaultScriptAccess]

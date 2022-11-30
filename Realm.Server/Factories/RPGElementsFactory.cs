@@ -31,7 +31,7 @@ public class RPGElementsFactory
         spawn.Position = position;
         if (rotation != null)
             spawn.Rotation = rotation ?? Vector3.Zero;
-        spawn.Name = name ?? "";
+        spawn.Name = name ?? Guid.NewGuid().ToString();
         _rpgServer.AssociateElement(spawn);
         SpawnCreated?.Invoke(spawn);
         return spawn;
@@ -47,12 +47,12 @@ public class RPGElementsFactory
         return vehicle;
     }
 
-    public async Task<RPGVehicle?> CreateNewPersistantVehicle(string id, ushort model, RPGSpawn spawn)
+    public async Task<RPGVehicle> CreateNewPersistantVehicle(string id, ushort model, RPGSpawn spawn)
     {
-        using var _ = new PersistantScope();
         if (await _db.Vehicles.AnyAsync(x => x.Id == id))
-            return null;
+            throw new UnableToCreateElementException($"Vehicle of id '{id}' already exists.", nameof(RPGVehicle));
 
+        using var _ = new PersistantScope();
         var vehicleData = new PersistantVehicleData
         {
             Id = id,
@@ -71,17 +71,15 @@ public class RPGElementsFactory
         return await SpawnPersistantVehicle(id, spawn);
     }
 
-    public async Task<RPGVehicle?> SpawnPersistantVehicle(string id, RPGSpawn spawn)
+    public async Task<RPGVehicle> SpawnPersistantVehicle(string id, RPGSpawn spawn)
     {
+        if (await _db.Vehicles.AnyAsync(x => x.Id == id))
+            throw new UnableToCreateElementException($"Vehicle of id '{id}' doesn't exists.", nameof(RPGVehicle));
+
         using var _ = new PersistantScope();
         var vehicle = _rpgServer.GetRequiredService<RPGVehicle>();
         vehicle.AssignId(id);
         var loaded = await vehicle.Load();
-        if (!loaded)
-        {
-            vehicle.Dispose();
-            throw new Exception("Failed to create vehicle");
-        }
         _periodicEntitySaveService.VehicleCreated(vehicle);
         _rpgServer.AssociateElement(vehicle);
         _logger.Verbose("Spawned persistant vehicle {vehicleId}", id);
@@ -93,7 +91,7 @@ public class RPGElementsFactory
     public RPGBlip CreateBlip(Vector3 position, int icon)
     {
         if (!Enum.IsDefined(typeof(BlipIcon), icon))
-            throw new Exception("Invalid icon");
+            throw new UnableToCreateElementException($"Icon id {icon} is invalid.", nameof(RPGBlip));
 
         var blip = _rpgServer.GetRequiredService<RPGBlip>();
         blip.Icon = (BlipIcon)icon;

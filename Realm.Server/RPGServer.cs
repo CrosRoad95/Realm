@@ -1,4 +1,6 @@
-﻿namespace Realm.Server;
+﻿using Realm.Server.Concepts.Inventory;
+
+namespace Realm.Server;
 
 public partial class RPGServer : IRPGServer, IReloadable
 {

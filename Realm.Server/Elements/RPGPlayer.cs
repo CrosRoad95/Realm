@@ -1,4 +1,6 @@
-﻿namespace Realm.Server.Elements;
+﻿using Realm.Server.Concepts.Inventory;
+
+namespace Realm.Server.Elements;
 
 [NoDefaultScriptAccess]
 public class RPGPlayer : Player
