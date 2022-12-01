@@ -59,6 +59,7 @@ addEventHandler("onPlayerJoin", func);
 removeEventHandler("onPlayerJoin", func);
 
 addEventHandler("onPlayerLogin", async ({ player, account }) => {
+    player.addNotification("Witamy na serwerze")
     Logger.information("player logged in: {player}, {account} is in use? {isInUse}", player, account, account.isInUse())
     const lastPositionComponent = player.components.hasComponent(host.typeOf(LastPositionComponent));
     if (!lastPositionComponent) {

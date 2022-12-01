@@ -100,6 +100,7 @@ public class RPGPlayer : Player
     public event Action<RPGPlayer, string>? GuiOpened;
     public event Action<RPGPlayer, string>? GuiClosed;
     public event Action<RPGPlayer>? AllGuiClosed;
+    public event Action<RPGPlayer, string>? NotificationAdded;
 
     public RPGPlayer(AgnosticGuiSystemService agnosticGuiSystemService,
         AccountsInUseService accountsInUseService, LuaInteropService luaInteropService,
@@ -286,6 +287,14 @@ public class RPGPlayer : Player
     {
         return _runningSessions.Where(x => x.GetType() == type).FirstOrDefault();
     }
+
+    #region Overlay resource
+    [ScriptMember("addNotification")]
+    public void AddNotification(string message)
+    {
+        NotificationAdded?.Invoke(this, message);
+    }
+    #endregion
 
     public void Reset()
     {
