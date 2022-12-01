@@ -66,6 +66,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Realm.Resources.Overlay", "
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Realm.Resources.Assets", "Realm.Resources.Assets\Realm.Resources.Assets.csproj", "{0F9B6AB9-65CA-486F-82C5-89B7F792BA9E}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Realm.Assets", "Realm.Assets\Realm.Assets.csproj", "{367F717A-6E40-47C8-B997-53515335A724}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -168,6 +170,10 @@ Global
 		{0F9B6AB9-65CA-486F-82C5-89B7F792BA9E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0F9B6AB9-65CA-486F-82C5-89B7F792BA9E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0F9B6AB9-65CA-486F-82C5-89B7F792BA9E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{367F717A-6E40-47C8-B997-53515335A724}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{367F717A-6E40-47C8-B997-53515335A724}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{367F717A-6E40-47C8-B997-53515335A724}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{367F717A-6E40-47C8-B997-53515335A724}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
