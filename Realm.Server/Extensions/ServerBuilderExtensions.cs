@@ -1,4 +1,5 @@
 ﻿using Realm.Resources.Overlay;
+using Realm.Resources.Assets;
 
 namespace Realm.Server.Extensions;
 
@@ -45,6 +46,7 @@ public static class ServerBuilderExtensions
         builder.AddAFKResource();
         builder.AddStatisticsCounterResource();
         builder.AddOverlayResource();
+        builder.AddAssetsResource();
 
         // Resources logics
         builder.AddLogic<LuaInteropLogic>();

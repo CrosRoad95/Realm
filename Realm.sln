@@ -62,7 +62,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Realm.Resources.AFK", "Real
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Realm.Resources.StatisticsCounter", "Realm.Resources.StatisticsCounter\Realm.Resources.StatisticsCounter.csproj", "{34ECCF24-BDCA-487E-8B15-6329EBDFBED9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Realm.Resources.Overlay", "Realm.Resources.Overlay\Realm.Resources.Overlay.csproj", "{D8BBA8C9-6737-48A3-8365-4471712A1801}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Realm.Resources.Overlay", "Realm.Resources.Overlay\Realm.Resources.Overlay.csproj", "{D8BBA8C9-6737-48A3-8365-4471712A1801}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Realm.Resources.Assets", "Realm.Resources.Assets\Realm.Resources.Assets.csproj", "{0F9B6AB9-65CA-486F-82C5-89B7F792BA9E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -162,6 +164,10 @@ Global
 		{D8BBA8C9-6737-48A3-8365-4471712A1801}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D8BBA8C9-6737-48A3-8365-4471712A1801}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D8BBA8C9-6737-48A3-8365-4471712A1801}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0F9B6AB9-65CA-486F-82C5-89B7F792BA9E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0F9B6AB9-65CA-486F-82C5-89B7F792BA9E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0F9B6AB9-65CA-486F-82C5-89B7F792BA9E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0F9B6AB9-65CA-486F-82C5-89B7F792BA9E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -184,6 +190,7 @@ Global
 		{A2BD590D-31F8-46CE-861E-D6412B1867E5} = {28944775-A0AF-46D4-9480-D6F4189002B7}
 		{34ECCF24-BDCA-487E-8B15-6329EBDFBED9} = {28944775-A0AF-46D4-9480-D6F4189002B7}
 		{D8BBA8C9-6737-48A3-8365-4471712A1801} = {28944775-A0AF-46D4-9480-D6F4189002B7}
+		{0F9B6AB9-65CA-486F-82C5-89B7F792BA9E} = {28944775-A0AF-46D4-9480-D6F4189002B7}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {3922BF34-8D0B-4DC1-9EFC-D4CFB948B3B8}
