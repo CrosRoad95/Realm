@@ -64,6 +64,7 @@ public static class ServerBuilderExtensions
 
         // Miscellaneous logic
         builder.AddLogic<CommandsLogic>();
+        builder.AddLogic<AssetsLogic>();
 
         return builder;
     }
