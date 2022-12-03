@@ -1,4 +1,5 @@
-﻿using Realm.Scripting.Functions;
+﻿using Microsoft.ClearScript;
+using Realm.Scripting.Functions;
 
 namespace Realm.Scripting;
 
@@ -82,9 +83,15 @@ internal class JavascriptRuntime : IScriptingModuleInterface, IReloadable
             return result;
 
         }
-        catch (ScriptEngineException ex)
+        catch (ScriptEngineException scriptEngineException)
         {
-            _logger.Error(ex, "Failed to execute");
+            var scriptException = scriptEngineException as IScriptEngineException;
+            if (scriptException != null)
+            {
+                _logger.Error("Exception thrown while executing script: {errorDetails}", scriptException.ErrorDetails);
+            }
+            else
+                _logger.Error("Exception thrown while executing event");
         }
 
         return null;
