@@ -3,15 +3,12 @@ import "panel.js"
 import "discord.js"
 import "login.js"
 import "fractions.js"
+import "vehicles.js"
 
 Logger.information("Gameplay: currency={currency}", Gameplay.currency);
 Logger.information("Localization: text={text}, try={text2}", Localization.translate("pl", "Test"), Localization.tryTranslate("pl", "doesn't exists", "test"));
 Logger.information("startup.js, TestModule: {TestModule}", TestModule);
 Logger.information("loaded modules: {modules}", JSON.stringify(getModules()));
-
-const spawnForTestVehicle = createSpawn(new Vector3(-10, -10, 3), new Vector3(0,0,0), "spawnForTestVehicle");
-const testVehicle = createVehicle(404, spawnForTestVehicle)
-Logger.information("spawned vehicle: {testVehicle}", testVehicle);
 
 const variantBlip = createVariantBlip(new Vector3(50, 50, 0));
 const blip = createBlip(new Vector3(0, 0, 0), 6);
@@ -183,27 +180,6 @@ addCommandHandler("discord", (player, args) => {
         player.sendChatMessage(`Twoje konto jest już połączone z kontem discord o id ${player.account.id}`);
     }
 });
-
-(async () => {
-    try {
-        let veh = await createNewPersistantVehicle("foo", 404, spawn);
-        if (veh == null)
-            veh = await spawnPersistantVehicle("foo", spawn);
-
-        const hasFuelComponent = veh.components.hasComponent(host.typeOf(VehicleFuelComponent));
-        if (!hasFuelComponent)
-            veh.components.addComponent(new VehicleFuelComponent(2, 20, 4, 2.5, "petrol"));
-
-        const hasMileageComponent = veh.components.hasComponent(host.typeOf(MileageCounterComponent));
-        if (!hasMileageComponent)
-            veh.components.addComponent(new MileageCounterComponent(2.5));
-
-        veh.isFrozen = false;
-    }
-    catch (ex) {
-        Logger.information("spawnPersistantVehicle ex: {exception}", ex.message);
-    }
-})();
 
 addEventHandler("onPlayerAFKStateChanged", ({ player, isAfk }) => {
     Logger.information("player afk state: {player}, {isAfk}", player, isAfk);

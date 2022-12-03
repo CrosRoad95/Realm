@@ -71,9 +71,14 @@ public class RPGElementsFactory
         return await SpawnPersistantVehicle(id, spawn);
     }
 
+    public async Task<bool> IsVehicleIdAvailiable(string id)
+    {
+        return await _db.Vehicles.AnyAsync(x => x.Id == id);
+    }
+
     public async Task<RPGVehicle> SpawnPersistantVehicle(string id, RPGSpawn spawn)
     {
-        if (await _db.Vehicles.AnyAsync(x => x.Id == id))
+        if (!await _db.Vehicles.AnyAsync(x => x.Id == id))
             throw new UnableToCreateElementException($"Vehicle of id '{id}' doesn't exists.", nameof(RPGVehicle));
 
         using var _ = new PersistantScope();

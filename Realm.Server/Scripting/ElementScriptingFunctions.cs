@@ -42,6 +42,10 @@ public class ElementScriptingFunctions
     public RPGVehicle CreateVehicle(ushort model, RPGSpawn spawn)
         => _rpgElementsFactory.CreateVehicle(model, spawn);    
 
+    [ScriptMember("isVehicleIdAvailiable")]
+    public async Task<bool> IsVehicleIdAvailiable(string id)
+        => await _rpgElementsFactory.IsVehicleIdAvailiable(id);
+
     [ScriptMember("createNewPersistantVehicle")]
     public async Task<RPGVehicle?> CreateNewPersistantVehicle(string id, ushort model, RPGSpawn spawn)
         => await _rpgElementsFactory.CreateNewPersistantVehicle(id, model, spawn);
