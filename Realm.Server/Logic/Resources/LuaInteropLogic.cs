@@ -26,6 +26,18 @@ internal class LuaInteropLogic
 
     private void _luaInteropService_ClientErrorMessage(Player player, string message, int level, string file, int line)
     {
-        _logger.Warning("Clientside error on player {player} ({level}): {message} in {file}:{line}", (RPGPlayer)player, level, message, file, line);
+        switch (level)
+        {
+            case 0: // Custom
+            case 3: // Information
+                _logger.Information("Clientside: {player} ({level}): {message} in {file}:{line}", (RPGPlayer)player, level, message, file, line);
+                break;
+            case 2: // Warning
+                _logger.Warning("Clientside: {player} ({level}): {message} in {file}:{line}", (RPGPlayer)player, level, message, file, line);
+                break;
+            default: // Error or something else
+                _logger.Error("Clientside: {player} ({level}): {message} in {file}:{line}", (RPGPlayer)player, level, message, file, line);
+                break;
+        }
     }
 }
