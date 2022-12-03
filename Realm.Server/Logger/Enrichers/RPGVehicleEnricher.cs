@@ -13,6 +13,5 @@ internal class RPGVehicleEnricher : ILogEventEnricher
     {
         logEvent.AddPropertyIfAbsent(propertyFactory.CreateProperty("vehicleId", _rpgVehicle.Id));
         logEvent.AddPropertyIfAbsent(propertyFactory.CreateProperty("vehicleName", _rpgVehicle.Name));
-        logEvent.AddPropertyIfAbsent(propertyFactory.CreateProperty("padding", ": "));
     }
 }

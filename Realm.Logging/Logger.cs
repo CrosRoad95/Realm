@@ -17,7 +17,7 @@ public class Logger
         _loggerConfiguration = new LoggerConfiguration()
             .MinimumLevel.ControlledBy(levelSwitch)
             .WriteTo.Console(
-                outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3}] {userFriendlyName}{@padding}{Message:lj}{NewLine}{Exception}",
+                outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3}] {Message:lj}{NewLine}{Exception}",
                 levelSwitch: levelSwitch)
             .Enrich.FromLogContext();
     }

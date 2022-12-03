@@ -17,6 +17,5 @@ internal class RPGPlayerEnricher : ILogEventEnricher
         logEvent.AddPropertyIfAbsent(propertyFactory.CreateProperty("ip", _rpgPlayer.Client.IPAddress));
         logEvent.AddPropertyIfAbsent(propertyFactory.CreateProperty("playerId", _rpgPlayer.Id));
         logEvent.AddPropertyIfAbsent(propertyFactory.CreateProperty("playerName", _rpgPlayer.Name));
-        logEvent.AddPropertyIfAbsent(propertyFactory.CreateProperty("padding", ": "));
     }
 }

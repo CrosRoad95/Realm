@@ -13,6 +13,5 @@ internal class PlayerAccountEnricher : ILogEventEnricher
     {
         logEvent.AddPropertyIfAbsent(propertyFactory.CreateProperty("accountId", _playerAccount.Id));
         logEvent.AddPropertyIfAbsent(propertyFactory.CreateProperty("accountName", _playerAccount.ToString()));
-        logEvent.AddPropertyIfAbsent(propertyFactory.CreateProperty("padding", ": "));
     }
 }

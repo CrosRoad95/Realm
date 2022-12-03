@@ -73,7 +73,7 @@ public class RPGVehicle : Vehicle, IPersistantVehicle, IWorldDebugData, IDisposa
         Position = spawn.Position;
         Rotation = spawn.Rotation;
         Spawned?.Invoke(this, spawn);
-        _logger.Verbose("Spawned at {spawn}", spawn);
+        _logger.Verbose("{player} spawned at {spawn}", this, spawn);
         return true;
     }
     
@@ -82,7 +82,7 @@ public class RPGVehicle : Vehicle, IPersistantVehicle, IWorldDebugData, IDisposa
         Position = position;
         Rotation = rotation;
         Spawned?.Invoke(this, null);
-        _logger.Verbose("Spawned at position: {position}, rotation: {rotation}", position, rotation);
+        _logger.Verbose("{vehicle} spawned at position: {position}, rotation: {rotation}", this, position, rotation);
         return true;
     }
 

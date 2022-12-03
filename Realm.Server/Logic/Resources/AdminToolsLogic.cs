@@ -25,12 +25,12 @@ internal class AdminToolsLogic
     {
         if (enabled)
         {
-            _logger.Verbose("Enabled admin tools");
+            _logger.Verbose("{player} enabled admin tools", player);
             _adminToolsService.EnableAdminToolsForPlayer(player);
         }
         else
         {
-            _logger.Verbose("Disabled admin tools");
+            _logger.Verbose("{player} disabled admin tools", player);
             _adminToolsService.DisableAdminToolsForPlayer(player);
         }
     }

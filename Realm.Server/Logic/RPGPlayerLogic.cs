@@ -51,25 +51,25 @@ internal class RPGPlayerLogic
     private void RpgPlayer_AllGuiClosed(RPGPlayer rpgPlayer)
     {
         _agnosticGuiSystemService.CloseAllGuis(rpgPlayer);
-        _logger.Verbose("Closed all guis");
+        _logger.Verbose("{player} closed all guis", rpgPlayer);
     }
 
     private void RpgPlayer_GuiClosed(RPGPlayer rpgPlayer, string guiName)
     {
         var success = _agnosticGuiSystemService.CloseGui(rpgPlayer, guiName);
         if (success)
-            _logger.Verbose("Closed gui {gui}", guiName);
+            _logger.Verbose("{player} closed gui {gui}", rpgPlayer, guiName);
         else
-            _logger.Verbose("Failed to close gui {gui}", guiName);
+            _logger.Verbose("{player} failed to close gui {gui}", rpgPlayer, guiName);
     }
 
     private void RpgPlayer_GuiOpened(RPGPlayer rpgPlayer, string guiName)
     {
         var success = _agnosticGuiSystemService.OpenGui(rpgPlayer, guiName);
         if (success)
-            _logger.Verbose("Opened gui {gui}", guiName);
+            _logger.Verbose("{player} opened gui {gui}", rpgPlayer, guiName);
         else
-            _logger.Verbose("Failed to open gui {gui}", guiName);
+            _logger.Verbose("{player} failed to open gui {gui}", guiName, rpgPlayer);
     }
 
     private void RpgPlayer_ChatMessageSend(RPGPlayer player, string message, Color? color, bool? colorCoded)
@@ -88,9 +88,9 @@ internal class RPGPlayerLogic
         using var _ = LogContext.Push(new RPGPlayerEnricher(rpgPlayer));
         if (await rpgPlayer.LogOut())
         {
-            _logger.Verbose("Logged out from account: {account}", rpgPlayer.Account);
+            _logger.Verbose("{player} logged out from account: {account}", rpgPlayer, rpgPlayer.Account);
         }
-        _logger.Verbose("Disconnected");
+        _logger.Verbose("{player} disconnected", rpgPlayer);
     }
 
 
@@ -98,9 +98,9 @@ internal class RPGPlayerLogic
     {
         using var _ = LogContext.Push(new RPGPlayerEnricher(rpgPlayer));
         if (enabled)
-            _logger.Verbose("Enabled debug view");
+            _logger.Verbose("{player} enabled debug view", rpgPlayer);
         else
-            _logger.Verbose("Disabled debug view");
+            _logger.Verbose("{player} disabled debug view", rpgPlayer);
         _debugLog.SetVisibleTo(rpgPlayer, enabled);
     }
 
@@ -109,7 +109,7 @@ internal class RPGPlayerLogic
         using var _ = LogContext.Push(new RPGPlayerEnricher(rpgPlayer));
         using var playerSpawnedEvent = new PlayerSpawnedEvent(rpgPlayer, spawn);
         await _eventFunctions.InvokeEvent(playerSpawnedEvent);
-        _logger.Verbose("Spawned at {spawn}", spawn);
+        _logger.Verbose("{player} spawned at {spawn}", rpgPlayer, spawn);
     }
     
     private async void RpgPlayer_SpawnedAtPosition(RPGPlayer rpgPlayer, Vector3 position)
@@ -117,7 +117,7 @@ internal class RPGPlayerLogic
         using var _ = LogContext.Push(new RPGPlayerEnricher(rpgPlayer));
         using var playerSpawnedEvent = new PlayerSpawnedEvent(rpgPlayer, position);
         await _eventFunctions.InvokeEvent(playerSpawnedEvent);
-        _logger.Verbose("Spawned at {position}", position);
+        _logger.Verbose("{player} spawned at {position}", rpgPlayer, position);
     }
 
     private async void RpgPlayer_LoggedOut(RPGPlayer rpgPlayer, string id)
@@ -133,7 +133,7 @@ internal class RPGPlayerLogic
         rpgPlayer.TriggerClientEvent(ClientEventsNames.ON_LOGGED_IN);
         using var playerLoggedInEvent = new PlayerLoggedInEvent(rpgPlayer, account);
         await _eventFunctions.InvokeEvent(playerLoggedInEvent);
-        _logger.Verbose("Logged in to the account: {account}", account);
+        _logger.Verbose("{player} logged in to the account: {account}", rpgPlayer, account);
     }
 
     // TODO: improve
@@ -151,9 +151,9 @@ internal class RPGPlayerLogic
         }
 
         if (values.Any())
-            _logger.Verbose("Triggered client event {eventName} with arguments: {luaValue}.", name, luaValue);
+            _logger.Verbose("{player} triggered client event {eventName} with arguments: {luaValue}.", rpgPlayer, name, luaValue);
         else
-            _logger.Verbose("Triggered client event {eventName} with no arguments.", name);
+            _logger.Verbose("{player} triggered client event {eventName} with no arguments.", rpgPlayer, name);
         _luaEventService.TriggerEventFor(rpgPlayer, name, rpgPlayer, luaValue);
     }
 }

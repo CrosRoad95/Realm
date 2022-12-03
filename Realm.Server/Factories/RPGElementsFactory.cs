@@ -87,7 +87,7 @@ public class RPGElementsFactory
         var loaded = await vehicle.Load();
         _periodicEntitySaveService.VehicleCreated(vehicle);
         _rpgServer.AssociateElement(vehicle);
-        _logger.Verbose("Spawned persistant vehicle {vehicleId}", id);
+        _logger.Verbose("{vehicle} spawned persistant vehicle", vehicle);
         VehicleCreated?.Invoke(vehicle);
         vehicle.Spawn(spawn);
         return vehicle;

@@ -13,6 +13,5 @@ internal class SpawnEnricher : ILogEventEnricher
     {
         logEvent.AddPropertyIfAbsent(propertyFactory.CreateProperty("vehicleId", _spawn.Id));
         logEvent.AddPropertyIfAbsent(propertyFactory.CreateProperty("spawnName", _spawn.Name));
-        logEvent.AddPropertyIfAbsent(propertyFactory.CreateProperty("padding", ": "));
     }
 }
