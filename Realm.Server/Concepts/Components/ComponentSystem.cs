@@ -1,6 +1,6 @@
 ﻿using System.Security.Principal;
 
-namespace Realm.Server.Concepts;
+namespace Realm.Server.Concepts.Components;
 
 [Serializable]
 [NoDefaultScriptAccess]
