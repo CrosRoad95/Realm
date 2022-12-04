@@ -1,4 +1,7 @@
-﻿namespace Realm.Server.Scripting;
+﻿using Microsoft.ClearScript;
+using Realm.Server.Concepts.Handling;
+
+namespace Realm.Server.Scripting;
 
 [NoDefaultScriptAccess]
 public class ElementScriptingFunctions

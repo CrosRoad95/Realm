@@ -3,6 +3,10 @@ const spawnForTestVehicle2 = createSpawn(new Vector3(-20, 10, 3), new Vector3(0,
 const testVehicle = createVehicle(404, spawnForTestVehicle)
 Logger.information("spawned vehicle: {testVehicle}", testVehicle);
 
+var fasterCar = new VehicleUpgrade()
+fasterCar.maxVelocity = new UpgradeDescription(100, 2);
+fasterCar.engineAcceleration = new UpgradeDescription(100, 2);
+
 (async () => {
     try {
         let veh;
@@ -12,6 +16,8 @@ Logger.information("spawned vehicle: {testVehicle}", testVehicle);
         else {
             veh = await spawnPersistantVehicle("foo", spawnForTestVehicle2);
         }
+        veh.addUpgrade(fasterCar)
+        veh.isFrozen = false;
 
         const hasFuelComponent = veh.components.hasComponent(host.typeOf(VehicleFuelComponent));
         if (!hasFuelComponent)
