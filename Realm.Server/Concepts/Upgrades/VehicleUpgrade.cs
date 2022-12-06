@@ -6,9 +6,11 @@ public class VehicleUpgrade
     public class UpgradeDescription
     {
         [NoScriptAccess]
-        public float IncreaseByUnits { get; private set; }
+        public float IncreaseByUnits { get; set; }
         [NoScriptAccess]
-        public float MultipleBy { get; private set; }
+        public float MultipleBy { get; set; }
+
+        [JsonConstructor]
         public UpgradeDescription(float increaseByUnits, float multipleBy = 1)
         {
             IncreaseByUnits = increaseByUnits;

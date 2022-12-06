@@ -46,8 +46,6 @@ public class RPGVehicle : Vehicle, IPersistantVehicle, IWorldDebugData, IDisposa
         }
     }
 
-    private readonly List<VehicleUpgrade> _upgrades = new();
-
     public RPGVehicle(ILogger logger, IDb db) : base(404, new Vector3(0,0, 10000))
     {
         _db = db;
@@ -79,32 +77,6 @@ public class RPGVehicle : Vehicle, IPersistantVehicle, IWorldDebugData, IDisposa
         Spawned?.Invoke(this, spawn);
         _logger.Verbose("{player} spawned at {spawn}", this, spawn);
         return true;
-    }
-
-    [ScriptMember("addUpgrade")]
-    public bool AddUpgrade(VehicleUpgrade upgrade, bool rebuild = true)
-    {
-        _upgrades.Add(upgrade);
-        if(rebuild)
-            RebuildUpgrades();
-        return true;
-    }
-
-    private void RebuildUpgrades()
-    {
-        var handling = VehicleHandlingConstants.DefaultVehicleHandling[model];
-        foreach (var upgrade in _upgrades.Select(x => x.MaxVelocity).Where(x => x != null))
-        {
-            handling.MaxVelocity += upgrade.IncreaseByUnits;
-            handling.MaxVelocity *= upgrade.MultipleBy;
-        }
-        foreach (var upgrade in _upgrades.Select(x => x.EngineAcceleration).Where(x => x != null))
-        {
-            handling.EngineAcceleration += upgrade.IncreaseByUnits;
-            handling.EngineAcceleration *= upgrade.MultipleBy;
-        }
-
-        Handling = handling;
     }
     
     public bool RawSpawn(Vector3 position, Vector3 rotation)
