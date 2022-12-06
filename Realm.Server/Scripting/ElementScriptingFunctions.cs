@@ -1,5 +1,6 @@
 ﻿using Microsoft.ClearScript;
-using Realm.Server.Concepts.Handling;
+using Realm.Server.Collections;
+using VehicleUpgrade = Realm.Server.Concepts.Upgrades.VehicleUpgrade;
 
 namespace Realm.Server.Scripting;
 
@@ -8,15 +9,18 @@ public class ElementScriptingFunctions
 {
     private readonly IElementCollection _elementCollection;
     private readonly ElementByStringIdCollection _elementByStringIdCollection;
+    private readonly VehicleUpgradeByStringCollection _vehicleUpgradeByStringCollection;
     private readonly RPGElementsFactory _rpgElementsFactory;
     private readonly ILogger _logger;
 
     public ElementScriptingFunctions(IElementCollection elementCollection,
         ElementByStringIdCollection elementByStringIdCollection,
+        VehicleUpgradeByStringCollection vehicleUpgradeByStringCollection,
         ILogger logger, RPGElementsFactory rpgElementsFactory)
     {
         _elementCollection = elementCollection;
         _elementByStringIdCollection = elementByStringIdCollection;
+        _vehicleUpgradeByStringCollection = vehicleUpgradeByStringCollection;
         _rpgElementsFactory = rpgElementsFactory;
         _logger = logger.ForContext<ElementScriptingFunctions>();
     }
@@ -149,6 +153,9 @@ public class ElementScriptingFunctions
 
         return false;
     }
+
+    [ScriptMember("getVehicleUpgradeByName")]
+    public VehicleUpgrade? GetVehicleUpgradeByName(string name) => _vehicleUpgradeByStringCollection.GetElementById(name);
 
     [ScriptMember("isElement")]
     public bool IsElement(Element element)

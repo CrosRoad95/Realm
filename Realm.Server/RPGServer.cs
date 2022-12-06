@@ -1,6 +1,6 @@
-﻿using Realm.Server.Concepts.Handling;
+﻿using Realm.Server.Collections;
 using Realm.Server.Concepts.Inventory;
-using static Realm.Server.Concepts.Handling.VehicleUpgrade;
+using static Realm.Server.Concepts.Upgrades.VehicleUpgrade;
 
 namespace Realm.Server;
 
@@ -52,6 +52,7 @@ public partial class RPGServer : IRPGServer, IReloadable
                     services.AddSingleton<IReloadable>(this);
                     services.AddSingleton<IRPGServer>(this);
                     services.AddSingleton<ElementByStringIdCollection>();
+                    services.AddSingleton<VehicleUpgradeByStringCollection>();
 
                     // Scripting
                     services.AddSingleton<GameplayScriptingFunctions>();
@@ -182,7 +183,7 @@ public partial class RPGServer : IRPGServer, IReloadable
 
         scriptingModuleInterface.AddHostType(typeof(FractionSession));
 
-        scriptingModuleInterface.AddHostType(typeof(Concepts.Handling.VehicleUpgrade));
+        scriptingModuleInterface.AddHostType(typeof(Concepts.Upgrades.VehicleUpgrade));
         scriptingModuleInterface.AddHostType(typeof(UpgradeDescription));
 
         scriptingModuleInterface.AddHostType(typeof(InventorySystem));

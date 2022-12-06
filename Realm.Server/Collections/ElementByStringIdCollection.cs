@@ -1,4 +1,4 @@
-﻿namespace Realm.Server.ElementCollections;
+﻿namespace Realm.Server.Collections;
 
 public sealed class ElementByStringIdCollection
 {
@@ -7,7 +7,7 @@ public sealed class ElementByStringIdCollection
 
     public bool AssignElementToId(Element element, string id)
     {
-        if(_elementsById.ContainsKey(id))
+        if (_elementsById.ContainsKey(id))
             return false;
         _elementsById[id] = element;
         _idByElement[element] = id;

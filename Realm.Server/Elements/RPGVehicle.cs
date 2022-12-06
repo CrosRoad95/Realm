@@ -1,6 +1,6 @@
 ﻿using Vehicle = SlipeServer.Server.Elements.Vehicle;
 using PersistantVehicleData = Realm.Persistance.Data.Vehicle;
-using VehicleUpgrade = Realm.Server.Concepts.Handling.VehicleUpgrade;
+using VehicleUpgrade = Realm.Server.Concepts.Upgrades.VehicleUpgrade;
 using SlipeServer.Server.Constants;
 
 namespace Realm.Server.Elements;

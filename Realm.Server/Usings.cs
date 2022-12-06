@@ -70,7 +70,7 @@ global using Realm.Resources.AdminTools.Enums;
 global using Realm.Resources.AdminTools.Interfaces;
 global using Realm.Server.Scripting.Sessions;
 global using Realm.Scripting.Functions;
-global using Realm.Server.ElementCollections;
+global using Realm.Server.Collections;
 global using Realm.Server.Elements.CollisionShapes;
 global using Realm.Server.Elements.Variants;
 global using Realm.Server.Factories;

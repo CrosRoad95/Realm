@@ -40,6 +40,12 @@ internal class SeedData
         public Dictionary<string, string> Claims { get; set; }
         public List<string> Roles { get; set; }
     }
+    
+    public class VehicleUpgradeDescription
+    {
+        public float[] MaxVelocity { get; set; }
+        public float[] EngineAcceleration { get; set; }
+    }
 
     public Dictionary<string, Spawn> Spawns = new();
     public Dictionary<string, Blip> Blips = new();
@@ -47,6 +53,7 @@ internal class SeedData
     public Dictionary<string, Fraction> Fractions = new();
     public List<string> Roles = new();
     public Dictionary<string, Account> Accounts = new();
+    public Dictionary<string, VehicleUpgradeDescription> Upgrades = new();
 }
 
 internal class SeedValidator : AbstractValidator<SeedData>

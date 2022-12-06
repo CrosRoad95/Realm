@@ -1,5 +1,6 @@
-﻿namespace Realm.Server.Concepts.Handling;
+﻿namespace Realm.Server.Concepts.Upgrades;
 
+// TODO: rename
 public class VehicleUpgrade
 {
     public class UpgradeDescription
@@ -12,6 +13,11 @@ public class VehicleUpgrade
         {
             IncreaseByUnits = increaseByUnits;
             MultipleBy = multipleBy;
+        }
+        public UpgradeDescription(float[] values)
+        {
+            IncreaseByUnits = values[0];
+            MultipleBy = values[1];
         }
     }
 

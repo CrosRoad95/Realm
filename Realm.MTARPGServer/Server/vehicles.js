@@ -6,6 +6,8 @@ Logger.information("spawned vehicle: {testVehicle}", testVehicle);
 var fasterCar = new VehicleUpgrade()
 fasterCar.maxVelocity = new UpgradeDescription(100, 2);
 fasterCar.engineAcceleration = new UpgradeDescription(100, 2);
+var seededFasterCarUpgrade = getVehicleUpgradeByName("fasterCar");
+Logger.information("seededFasterCarUpgrade {seededFasterCarUpgrade}", seededFasterCarUpgrade);
 
 (async () => {
     try {

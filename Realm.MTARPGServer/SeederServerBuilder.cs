@@ -1,19 +1,25 @@
-﻿using Realm.Server.Factories;
+﻿using Realm.Server.Collections;
+using Realm.Server.Factories;
+using static Realm.MTARPGServer.SeedData;
+using VehicleUpgrade = Realm.Server.Concepts.Upgrades.VehicleUpgrade;
 
 namespace Realm.MTARPGServer;
 
-internal class SeederServerBuilder
+internal sealed class SeederServerBuilder
 {
     private readonly RPGElementsFactory _elementFunctions;
     private readonly IdentityScriptingFunctions _identityFunctions;
     private readonly ElementByStringIdCollection _elementByStringIdCollection;
+    private readonly VehicleUpgradeByStringCollection _vehicleUpgradeByStringCollection;
     private readonly ILogger _logger;
     private readonly Dictionary<string, PlayerAccount> _createdAccounts = new();
-    public SeederServerBuilder(RPGElementsFactory elementFunctions, IdentityScriptingFunctions identityFunctions, ILogger logger, ElementByStringIdCollection elementByStringIdCollection)
+    public SeederServerBuilder(RPGElementsFactory elementFunctions, IdentityScriptingFunctions identityFunctions, ILogger logger,
+        ElementByStringIdCollection elementByStringIdCollection, VehicleUpgradeByStringCollection vehicleUpgradeByStringCollection)
     {
         _elementFunctions = elementFunctions;
         _identityFunctions = identityFunctions;
         _elementByStringIdCollection = elementByStringIdCollection;
+        _vehicleUpgradeByStringCollection = vehicleUpgradeByStringCollection;
         _logger = logger.ForContext<SeederServerBuilder>();
     }
 
@@ -104,9 +110,28 @@ internal class SeederServerBuilder
         }
     }
 
+
+    private void BuildUpgrades(Dictionary<string, VehicleUpgradeDescription> upgradePairs)
+    {
+        foreach (var upgradePair in upgradePairs)
+        {
+            var upgrade = new VehicleUpgrade
+            {
+                MaxVelocity = new VehicleUpgrade.UpgradeDescription(upgradePair.Value.MaxVelocity),
+                EngineAcceleration = new VehicleUpgrade.UpgradeDescription(upgradePair.Value.EngineAcceleration),
+            };
+            if(!_vehicleUpgradeByStringCollection.AssignElementToId(upgrade, upgradePair.Key))
+            {
+                _logger.Warning("Found duplicated upgrade: {upgradeName}", upgradePair.Key);
+            }
+        }
+    }
+
+
     public async Task BuildFrom(SeedData seed)
     {
         using var _ = new PersistantScope();
+        BuildUpgrades(seed.Upgrades);
         await BuildIdentityRoles(seed.Roles);
         await BuildIdentityAccounts(seed.Accounts);
         BuildSpawns(seed.Spawns);
