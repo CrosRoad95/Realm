@@ -1,5 +1,6 @@
 ﻿using Realm.Console;
 using Realm.Discord;
+using Realm.GRpc;
 using Realm.Interfaces.Discord;
 using Realm.Interfaces.Extend;
 using Realm.Logging;
@@ -23,6 +24,7 @@ var server = new MTARPGServerImpl(serverConsole, logger, configurationProvider, 
         new IdentityModule(),
         new ScriptingModule(),
         new ServerScriptingModule(),
+        new GrpcModule(),
     });
 var seedFiles = configurationProvider.Get<string[]>("General:SeedFiles");
 try
