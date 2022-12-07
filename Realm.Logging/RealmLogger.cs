@@ -5,13 +5,13 @@ using Serilog.Events;
 
 namespace Realm.Logging;
 
-public class Logger
+public class RealmLogger
 {
     private LoggerConfiguration _loggerConfiguration;
     private LoggingLevelSwitch levelSwitch = new LoggingLevelSwitch();
 
     public LoggingLevelSwitch LevelSwitch => levelSwitch;
-    public Logger(LogEventLevel logEventLevel = LogEventLevel.Debug)
+    public RealmLogger(LogEventLevel logEventLevel = LogEventLevel.Debug)
     {
         levelSwitch.MinimumLevel = logEventLevel;
         _loggerConfiguration = new LoggerConfiguration()
@@ -22,15 +22,19 @@ public class Logger
             .Enrich.FromLogContext();
     }
 
-    public Logger WithSink(ILogEventSink sink)
+    public RealmLogger WithSink(ILogEventSink sink)
     {
         _loggerConfiguration = _loggerConfiguration.WriteTo.Sink(sink);
         return this;
     }
 
-    public LoggerSinkConfiguration GetSinkConfiguration() => _loggerConfiguration.WriteTo;
+    public RealmLogger AddSeq()
+    {
+        _loggerConfiguration.WriteTo.Seq("http://localhost:5341", controlLevelSwitch: LevelSwitch);
+        return this;
+    }
 
-    public Logger ByExcluding<T>()
+    public RealmLogger ByExcluding<T>()
     {
         _loggerConfiguration = _loggerConfiguration
             .Filter.ByExcluding(le => SourceContextEquals(le, typeof(T)));

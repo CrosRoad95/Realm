@@ -45,7 +45,7 @@ internal class TestRPGServer : IReloadable, IRPGServer
                 services.AddSingleton<IReloadable>(this);
                 services.AddSingleton<IRPGServer>(this);
                 services.AddSingleton<Func<string?>>(() => "");
-                services.AddSingleton(new Logger().GetLogger());
+                services.AddSingleton(new RealmLogger().GetLogger());
 
                 services.AddSingleton<RPGElementsFactory>();
 

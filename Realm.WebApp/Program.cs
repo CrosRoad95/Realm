@@ -13,7 +13,7 @@ else
       System.Reflection.Assembly.GetExecutingAssembly().GetName().CodeBase)[6..];
 
 var subscribableLogsSink = new SubscribableLogsSink();
-var logger = new Logger()
+var logger = new RealmLogger()
     .ByExcluding<IDiscord>()
     .WithSink(subscribableLogsSink).GetLogger();
 var builder = WebApplication.CreateBuilder(args);

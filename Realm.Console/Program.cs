@@ -12,10 +12,10 @@ using Serilog;
 using Serilog.Events;
 
 var serverConsole = new ServerConsole();
-var serilogLogger = new Logger(LogEventLevel.Verbose)
+var serilogLogger = new RealmLogger(LogEventLevel.Verbose)
+    .AddSeq()
     .ByExcluding<IDiscord>();
 
-serilogLogger.GetSinkConfiguration().Seq("http://localhost:5341", controlLevelSwitch: serilogLogger.LevelSwitch);
 var logger = serilogLogger.GetLogger();
 var configurationProvider = new Realm.Configuration.RealmConfigurationProvider();
 var server = new MTARPGServerImpl(serverConsole, logger, configurationProvider, new IModule[]
