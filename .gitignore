@@ -8,3 +8,4 @@ Realm.Configuration/appsettingsServer.local.json
 *.db-shm
 *.db-wal
 RealmRPG/
+local.json
