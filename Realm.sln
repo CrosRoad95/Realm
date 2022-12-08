@@ -70,6 +70,12 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Realm.GRpc", "Realm.GRpc\Re
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Realm.Grpc.Proto", "Realm.Grpc.Proto\Realm.Grpc.Proto.csproj", "{C4F530B4-1378-4E0A-BB47-044455AA8B99}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Services", "Services", "{1B4D0935-5736-4E56-B65E-0CACF26B17DD}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Realm.Services.DiscordBot", "Realm.Services.DiscordBot\Realm.Services.DiscordBot.csproj", "{439C6299-2B3A-49F9-9DED-F297F44C355B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Realm.Domain", "Realm.Domain\Realm.Domain.csproj", "{9A2A0372-C197-4759-8718-78AEA2F1907B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -184,6 +190,14 @@ Global
 		{C4F530B4-1378-4E0A-BB47-044455AA8B99}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C4F530B4-1378-4E0A-BB47-044455AA8B99}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C4F530B4-1378-4E0A-BB47-044455AA8B99}.Release|Any CPU.Build.0 = Release|Any CPU
+		{439C6299-2B3A-49F9-9DED-F297F44C355B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{439C6299-2B3A-49F9-9DED-F297F44C355B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{439C6299-2B3A-49F9-9DED-F297F44C355B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{439C6299-2B3A-49F9-9DED-F297F44C355B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9A2A0372-C197-4759-8718-78AEA2F1907B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9A2A0372-C197-4759-8718-78AEA2F1907B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9A2A0372-C197-4759-8718-78AEA2F1907B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9A2A0372-C197-4759-8718-78AEA2F1907B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -207,6 +221,7 @@ Global
 		{0F9B6AB9-65CA-486F-82C5-89B7F792BA9E} = {28944775-A0AF-46D4-9480-D6F4189002B7}
 		{F4A7AEA2-542D-4C5E-9FF1-A6862D9C2154} = {01E2DC68-5BB7-4131-9F15-7669E28F8330}
 		{C4F530B4-1378-4E0A-BB47-044455AA8B99} = {01E2DC68-5BB7-4131-9F15-7669E28F8330}
+		{439C6299-2B3A-49F9-9DED-F297F44C355B} = {1B4D0935-5736-4E56-B65E-0CACF26B17DD}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {3922BF34-8D0B-4DC1-9EFC-D4CFB948B3B8}

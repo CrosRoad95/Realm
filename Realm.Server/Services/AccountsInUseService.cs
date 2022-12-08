@@ -1,4 +1,6 @@
-﻿namespace Realm.Server.Services;
+﻿using Realm.Domain.Elements;
+
+namespace Realm.Server.Services;
 
 public class AccountsInUseService : IAccountsInUseService
 {

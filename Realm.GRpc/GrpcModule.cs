@@ -1,17 +1,37 @@
-﻿namespace Realm.GRpc;
+﻿using Realm.GRpc.Stubs.Discord;
+
+namespace Realm.GRpc;
 
 public class GrpcModule : IModule
 {
-    private readonly Server _grpcServer;
+    private Server? _grpcServer;
 
     public GrpcModule()
     {
-        var greeterServiceStub = new GreeterServiceStub();
+    }
+
+    public string Name => "Grpc";
+    private IGrpcModuleInterface? _interface;
+
+    public void Configure(IServiceCollection services)
+    {
+        services.AddSingleton<GreeterServiceStub>();
+        services.AddSingleton<DiscordHandshakeServiceStub>();
+        services.AddSingleton<DiscordStatusChannelServiceStub>();
+    }
+
+    public void Init(IServiceProvider serviceProvider)
+    {
+        Start();
+        _interface = serviceProvider.GetRequiredService<IGrpcModuleInterface>();
+
         _grpcServer = new Server
         {
             Services =
             {
-                Greet.Greeter.BindService(greeterServiceStub)
+                Greet.Greeter.BindService(serviceProvider.GetRequiredService<GreeterServiceStub>()),
+                Discord.Handshake.BindService(serviceProvider.GetRequiredService<DiscordHandshakeServiceStub>()),
+                Discord.StatusChannel.BindService(serviceProvider.GetRequiredService<DiscordStatusChannelServiceStub>()),
             },
             Ports =
             {
@@ -20,23 +40,11 @@ public class GrpcModule : IModule
         };
     }
 
-    public string Name => "Grpc";
-    private IGrpcModuleInterface? _interface;
-
-    public void Configure(IServiceCollection services)
-    {
-    }
-
-    public void Init(IServiceProvider serviceProvider)
-    {
-        Start();
-        _interface = serviceProvider.GetRequiredService<IGrpcModuleInterface>();
-    }
-
     public void PostInit(IServiceProvider serviceProvider)
     {
         if (_interface == null)
             throw new InvalidOperationException();
+        Start();
 
         var logger = serviceProvider.GetRequiredService<ILogger>().ForContext<GrpcModule>();
     }
@@ -58,12 +66,14 @@ public class GrpcModule : IModule
 
     private void Start()
     {
-        _grpcServer.Start();
+        if(_grpcServer != null)
+            _grpcServer.Start();
     }
 
     private void Shutdown()
     {
-        _grpcServer.ShutdownAsync().Wait();
+        if (_grpcServer != null)
+            _grpcServer.ShutdownAsync().Wait();
     }
 
     public void Reload()

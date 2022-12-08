@@ -1,4 +1,6 @@
-﻿namespace Realm.Server.Scripting.Events;
+﻿using Realm.Domain.Elements;
+
+namespace Realm.Server.Scripting.Events;
 
 public class PlayerSpawnedEvent : INamedLuaEvent, IDisposable
 {

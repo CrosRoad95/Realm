@@ -17,18 +17,14 @@ public class RealmConfigurationProvider
     public T GetRequired<T>(string name) => Configuration.GetSection(name).Get<T>() ??
         throw new Exception($"Missing configuration '{name}'");
 
-    public static IConfigurationBuilder AddRealmConfiguration(IConfigurationBuilder configurationBuilder, string? basePath = null)
+    public static IConfigurationBuilder AddRealmConfiguration(IConfigurationBuilder configurationBuilder)
     {
-        var previousDirectory = Directory.GetCurrentDirectory();
-        if(basePath != null)
-            Directory.SetCurrentDirectory(basePath);
-
         configurationBuilder = configurationBuilder
-            .AddJsonFile(Path.Join(basePath, "appsettingsServer.json"), false)
-            .AddJsonFile(Path.Join(basePath, "appsettingsServer.development.json"), true, true)
-            .AddJsonFile(Path.Join(basePath, "appsettingsServer.local.json"), true, true)
+            .AddJsonFile("appsettingsServer.json", false)
+            .AddJsonFile("appsettingsServer.development.json", true, true)
+            .AddJsonFile("appsettingsServer.local.json", true, true)
             .AddEnvironmentVariables();
-        Directory.SetCurrentDirectory(previousDirectory);
+
         return configurationBuilder;
     }
 }

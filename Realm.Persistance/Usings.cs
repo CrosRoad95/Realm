@@ -23,7 +23,6 @@ global using Realm.Persistance.Data;
 global using Realm.Scripting.Extensions;
 global using Realm.Interfaces.Server.Services;
 global using Realm.Persistance.Extensions;
-global using Realm.Interfaces.Discord;
 global using Realm.Persistance.Interfaces;
 global using Realm.Configuration;
 global using Realm.Persistance.Services;

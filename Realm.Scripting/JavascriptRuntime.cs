@@ -1,5 +1,4 @@
-﻿using Microsoft.ClearScript;
-using Realm.Scripting.Functions;
+﻿using Realm.Scripting.Functions;
 
 namespace Realm.Scripting;
 
@@ -8,9 +7,8 @@ internal class JavascriptRuntime : IScriptingModuleInterface, IReloadable
     private readonly V8ScriptEngine _engine;
     private readonly TypescriptTypesGenerator _typescriptTypesGenerator;
     private readonly ILogger _logger;
-    private readonly Func<string?> _basePathFactory;
 
-    public JavascriptRuntime(ILogger logger, Func<string?> basePathFactory, EventScriptingFunctions eventFunctions, ModulesScriptingFunctions modulesFunctions, UlitityScriptingFunctions ulitityFunctions)
+    public JavascriptRuntime(ILogger logger, EventScriptingFunctions eventFunctions, ModulesScriptingFunctions modulesFunctions, UlitityScriptingFunctions ulitityFunctions)
     {
         HostSettings.CustomAttributeLoader = new LowercaseSymbolsLoader();
         _engine = new V8ScriptEngine(V8ScriptEngineFlags.EnableTaskPromiseConversion);
@@ -18,7 +16,7 @@ internal class JavascriptRuntime : IScriptingModuleInterface, IReloadable
         _logger = logger.ForContext<JavascriptRuntime>();
 
         _engine.AllowReflection = true;
-        _engine.DocumentSettings.Loader = new CustomDocumentLoader(basePathFactory());
+        _engine.DocumentSettings.Loader = new CustomDocumentLoader();
         _engine.DocumentSettings.AccessFlags = DocumentAccessFlags.EnableAllLoading;
         _engine.Script.isAsyncFunc = _engine.Evaluate("const ctor = (async() => {}).constructor; x => x instanceof ctor");
         AddHostType(typeof(JavaScriptExtensions));
@@ -35,7 +33,6 @@ internal class JavascriptRuntime : IScriptingModuleInterface, IReloadable
         AddHostObject("Events", eventFunctions, true);
         AddHostObject("Modules", modulesFunctions, true);
         AddHostObject("Utility", ulitityFunctions, true);
-        _basePathFactory = basePathFactory;
     }
 
     public string GetTypescriptDefinition()
@@ -101,8 +98,7 @@ internal class JavascriptRuntime : IScriptingModuleInterface, IReloadable
     {
         const string fileName = "Server/startup.js";
         _logger.Information("Initializing {fileName}", fileName);
-        var fullFileName = Path.Join(_basePathFactory(), fileName);
-        var code = File.ReadAllText(fullFileName);
+        var code = File.ReadAllText(fileName);
         await Execute(code, fileName);
     }
 

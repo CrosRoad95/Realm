@@ -1,7 +1,6 @@
 ﻿using Realm.Console;
 using Realm.Discord;
 using Realm.GRpc;
-using Realm.Interfaces.Discord;
 using Realm.Interfaces.Extend;
 using Realm.Logging;
 using Realm.MTARPGServer;
@@ -13,8 +12,7 @@ using Serilog.Events;
 
 var serverConsole = new ServerConsole();
 var serilogLogger = new RealmLogger(LogEventLevel.Verbose)
-    .AddSeq()
-    .ByExcluding<IDiscord>();
+    .AddSeq();
 
 var logger = serilogLogger.GetLogger();
 var configurationProvider = new Realm.Configuration.RealmConfigurationProvider();

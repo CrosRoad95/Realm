@@ -1,4 +1,6 @@
-﻿namespace Realm.Server.Logger.Enrichers;
+﻿using Realm.Domain.Elements;
+
+namespace Realm.Server.Logger.Enrichers;
 
 internal class SpawnEnricher : ILogEventEnricher
 {

@@ -1,4 +1,7 @@
-﻿namespace Realm.Server.Scripting.Events;
+﻿using Realm.Domain.Elements;
+using Realm.Domain.Sessions;
+
+namespace Realm.Server.Scripting.Events;
 
 public class PlayerSessionStartedEvent : INamedLuaEvent, IDisposable
 {

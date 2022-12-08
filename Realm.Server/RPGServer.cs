@@ -1,6 +1,10 @@
-﻿using Realm.Server.Collections;
-using Realm.Server.Concepts.Inventory;
-using static Realm.Server.Concepts.Upgrades.VehicleUpgrade;
+﻿using Realm.Domain.Components;
+using Realm.Domain.Elements;
+using Realm.Domain.Elements.CollisionShapes;
+using Realm.Domain.Elements.Variants;
+using Realm.Domain.Inventory;
+using Realm.Domain.Sessions;
+using static Realm.Domain.Upgrades.VehicleUpgrade;
 
 namespace Realm.Server;
 
@@ -64,8 +68,6 @@ public partial class RPGServer : IRPGServer, IReloadable
                     services.AddSingleton<RPGPlayerService>();
                     services.AddSingleton<AccountsInUseService>();
                     services.AddSingleton<IAccountsInUseService>(x => x.GetRequiredService<AccountsInUseService>());
-                    services.AddSingleton<IDiscordVerificationHandler, DiscordVerificationHandler>();
-                    services.AddSingleton<IDiscordUserChangedHandler, DiscordUserChangedHandler>();
 
                     // Factories
                     services.AddSingleton<RPGElementsFactory>();
@@ -135,8 +137,6 @@ public partial class RPGServer : IRPGServer, IReloadable
         _eventFunctions.RegisterEvent(PlayerLoggedInEvent.EventName);
         _eventFunctions.RegisterEvent(PlayerLoggedOutEvent.EventName);
         _eventFunctions.RegisterEvent(PlayerSpawnedEvent.EventName);
-        _eventFunctions.RegisterEvent(PlayerDiscordConnectedEvent.EventName);
-        _eventFunctions.RegisterEvent(DiscordUserChangedEvent.EventName);
         _eventFunctions.RegisterEvent(PlayerAFKStateChangedEvent.EventName);
         _eventFunctions.RegisterEvent(VehicleSpawnedEvent.EventName);
         _eventFunctions.RegisterEvent(PlayerDailyVisitEvent.EventName);
@@ -166,8 +166,6 @@ public partial class RPGServer : IRPGServer, IReloadable
         scriptingModuleInterface.AddHostType(typeof(PlayerLoggedInEvent));
         scriptingModuleInterface.AddHostType(typeof(PlayerLoggedOutEvent));
         scriptingModuleInterface.AddHostType(typeof(PlayerSpawnedEvent));
-        scriptingModuleInterface.AddHostType(typeof(PlayerDiscordConnectedEvent));
-        scriptingModuleInterface.AddHostType(typeof(DiscordUserChangedEvent));
         scriptingModuleInterface.AddHostType(typeof(PlayerAFKStateChangedEvent));
         scriptingModuleInterface.AddHostType(typeof(VehicleSpawnedEvent));
         scriptingModuleInterface.AddHostType(typeof(PlayerDailyVisitEvent));
@@ -184,7 +182,7 @@ public partial class RPGServer : IRPGServer, IReloadable
 
         scriptingModuleInterface.AddHostType(typeof(FractionSession));
 
-        scriptingModuleInterface.AddHostType(typeof(Concepts.Upgrades.VehicleUpgrade));
+        scriptingModuleInterface.AddHostType(typeof(Domain.Upgrades.VehicleUpgrade));
         scriptingModuleInterface.AddHostType(typeof(UpgradeDescription));
 
         scriptingModuleInterface.AddHostType(typeof(InventorySystem));

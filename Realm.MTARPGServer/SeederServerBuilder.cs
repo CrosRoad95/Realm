@@ -1,7 +1,6 @@
-﻿using Realm.Server.Collections;
-using Realm.Server.Factories;
+﻿using Realm.Server.Factories;
 using static Realm.MTARPGServer.SeedData;
-using VehicleUpgrade = Realm.Server.Concepts.Upgrades.VehicleUpgrade;
+using VehicleUpgrade = Realm.Domain.Upgrades.VehicleUpgrade;
 
 namespace Realm.MTARPGServer;
 

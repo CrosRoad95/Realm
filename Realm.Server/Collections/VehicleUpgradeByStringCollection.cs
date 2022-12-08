@@ -1,4 +1,4 @@
-﻿using VehicleUpgrade = Realm.Server.Concepts.Upgrades.VehicleUpgrade;
+﻿using VehicleUpgrade = Realm.Domain.Upgrades.VehicleUpgrade;
 
 namespace Realm.Server.Collections;
 

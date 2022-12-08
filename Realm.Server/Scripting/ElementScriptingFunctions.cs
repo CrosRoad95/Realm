@@ -1,6 +1,7 @@
-﻿using Microsoft.ClearScript;
-using Realm.Server.Collections;
-using VehicleUpgrade = Realm.Server.Concepts.Upgrades.VehicleUpgrade;
+﻿using Realm.Domain.Elements;
+using Realm.Domain.Elements.CollisionShapes;
+using Realm.Domain.Elements.Variants;
+using VehicleUpgrade = Realm.Domain.Upgrades.VehicleUpgrade;
 
 namespace Realm.Server.Scripting;
 

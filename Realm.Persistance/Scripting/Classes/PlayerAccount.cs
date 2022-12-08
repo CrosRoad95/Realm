@@ -261,7 +261,7 @@ public class PlayerAccount : ISavable, IDisposable
             _discord = _serviceProvider.GetRequiredService<DiscordUser>();
             try
             {
-                _discord.InitializeById(discordUserId);
+                //_discord.InitializeById(discordUserId);
             }
             catch (Exception ex)
             {
@@ -709,6 +709,5 @@ public class PlayerAccount : ISavable, IDisposable
     {
         Disposed?.Invoke(this);
         _disposed = true;
-        Discord?.Dispose();
     }
 }

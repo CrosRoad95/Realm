@@ -1,0 +1,27 @@
+﻿syntax = "proto3";
+
+package discord;
+
+service Handshake {
+  rpc DoHandshake (HandshakeRequest) returns (HandshakeReply);
+}
+
+service StatusChannel {
+  rpc Update (ContentRequest) returns (ContentResponse);
+}
+
+message HandshakeRequest {
+  string message = 1;
+}
+
+message HandshakeReply {
+  string message = 1;
+}
+
+message ContentRequest {
+  bool _unused = 1;
+}
+
+message ContentResponse {
+  string message = 1;
+}

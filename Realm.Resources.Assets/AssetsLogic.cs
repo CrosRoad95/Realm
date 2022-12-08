@@ -2,7 +2,6 @@
 using SlipeServer.Server;
 using SlipeServer.Server.Services;
 using SlipeServer.Server.Events;
-using SlipeServer.Packets.Definitions.Lua;
 using Newtonsoft.Json;
 
 namespace Realm.Resources.Assets;

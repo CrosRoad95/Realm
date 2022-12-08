@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net7.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Realm.Persistance\Realm.Persistance.csproj" />
+    <ProjectReference Include="..\Realm.Resources.AdminTools\Realm.Resources.AdminTools.csproj" />
+    <ProjectReference Include="..\Realm.Resources.AgnosticGuiSystem\Realm.Resources.AgnosticGuiSystem.csproj" />
+    <ProjectReference Include="..\Realm.Resources.StatisticsCounter\Realm.Resources.StatisticsCounter.csproj" />
+    <ProjectReference Include="..\Realm.Scripting\Realm.Scripting.csproj" />
+  </ItemGroup>
+
+</Project>

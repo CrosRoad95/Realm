@@ -1,4 +1,6 @@
-﻿namespace Realm.Server.Logic.Resources;
+﻿using Realm.Domain.Elements;
+
+namespace Realm.Server.Logic.Resources;
 
 internal class AFKLogic
 {

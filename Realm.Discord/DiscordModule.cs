@@ -1,4 +1,6 @@
-﻿namespace Realm.Discord;
+﻿using Realm.Server.Services;
+
+namespace Realm.Discord;
 
 public class DiscordModule : IModule
 {
@@ -6,20 +8,15 @@ public class DiscordModule : IModule
 
     public void Configure(IServiceCollection services)
     {
-        services.AddSingleton(x => x.GetRequiredService<RealmConfigurationProvider>().Get<DiscordConfiguration>("discord"));
         services.AddSingleton<DiscordIntegration>();
-        services.AddSingleton<IDiscord>(x => x.GetRequiredService<DiscordIntegration>());
-        services.AddSingleton<StatusChannel>();
-        services.AddSingleton<ServerConnectionChannel>();
-        services.AddSingleton(new DiscordSocketClient(new DiscordSocketConfig { GatewayIntents = GatewayIntents.AllUnprivileged | GatewayIntents.GuildMembers }));
-        services.AddSingleton<CommandHandler>();
-        services.AddSingleton<IBotdIdProvider, BotIdProvider>();
+
+        services.AddSingleton<DiscordVerificationHandler>();
+        services.AddSingleton<DiscordUserChangedHandler>();
     }
 
     public void Init(IServiceProvider serviceProvider)
     {
         var discordIntegration = serviceProvider.GetRequiredService<DiscordIntegration>();
-        var _ = Task.Run(discordIntegration.StartAsync);
     }
 
     public T GetInterface<T>() where T : class => throw new NotSupportedException();

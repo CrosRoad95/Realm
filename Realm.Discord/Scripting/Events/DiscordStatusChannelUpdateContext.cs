@@ -1,7 +1,4 @@
-﻿using Microsoft.ClearScript;
-using Realm.Interfaces.Server;
-
-namespace Realm.Discord.Scripting.Events;
+﻿namespace Realm.Services.DiscordBot.Scripting.Events;
 
 public class DiscordStatusChannelUpdateContext : INamedLuaEvent
 {

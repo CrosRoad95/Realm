@@ -1,16 +1,16 @@
-﻿namespace Realm.Server.Scripting;
+﻿using Realm.Domain.Elements;
+
+namespace Realm.Server.Scripting;
 
 [NoDefaultScriptAccess]
 public class LocalizationScriptingFunctions
 {
-    private readonly Func<string?> _basePathFactory;
     private readonly RealmConfigurationProvider _configurationProvider;
     private readonly LuaInteropService _luaInteropService;
     private readonly Dictionary<string, Dictionary<string, string>> _translations = new();
     private string _defaultLanguage = "pl";
-    public LocalizationScriptingFunctions(Func<string?> basePathFactory, RealmConfigurationProvider configurationProvider, LuaInteropService luaInteropService)
+    public LocalizationScriptingFunctions(RealmConfigurationProvider configurationProvider, LuaInteropService luaInteropService)
     {
-        _basePathFactory = basePathFactory;
         _configurationProvider = configurationProvider;
         _luaInteropService = luaInteropService;
         _defaultLanguage = _configurationProvider.GetRequired<string>("Gameplay:DefaultLanguage");
@@ -34,7 +34,7 @@ public class LocalizationScriptingFunctions
         // TODO: improve exceptions, error handling
         _defaultLanguage = _configurationProvider.GetRequired<string>("Gameplay:DefaultLanguage");
         _translations.Clear();
-        var files = Directory.GetFiles(Path.Join(_basePathFactory(), "Localization"));
+        var files = Directory.GetFiles("Localization");
         foreach (var item in files)
         {
             var id = Path.GetFileNameWithoutExtension(item);

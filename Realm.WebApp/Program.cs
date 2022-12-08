@@ -1,23 +1,14 @@
 using Realm.Discord;
-using Realm.Interfaces.Discord;
 using Realm.Interfaces.Extend;
 using Realm.Scripting;
 using Realm.Server;
 using Realm.Server.Interfaces;
 
-string basePath;
-if (Environment.GetEnvironmentVariable("DOTNET_RUNNING_IN_CONTAINER") == "true")
-    basePath = ".";
-else
-    basePath = Path.GetDirectoryName(
-      System.Reflection.Assembly.GetExecutingAssembly().GetName().CodeBase)[6..];
-
 var subscribableLogsSink = new SubscribableLogsSink();
 var logger = new RealmLogger()
-    .ByExcluding<IDiscord>()
     .WithSink(subscribableLogsSink).GetLogger();
 var builder = WebApplication.CreateBuilder(args);
-Realm.Configuration.RealmConfigurationProvider.AddRealmConfiguration(builder.Configuration, basePath);
+Realm.Configuration.RealmConfigurationProvider.AddRealmConfiguration(builder.Configuration);
 builder.Logging.ClearProviders();
 // Add services to the container.
 builder.Services.AddRazorPages();
@@ -40,7 +31,7 @@ builder.Services.AddSingleton(x => new MTARPGServerImpl(x.GetRequiredService<Con
             new ScriptingModule(),
             x.GetRequiredService<WebPanelModule>(),
             new ServerScriptingModule(),
-        }, basePath));
+        }));
 builder.Services.AddSingleton<IRPGServer>(x => x.GetRequiredService<MTARPGServerImpl>().Server);
 
 var app = builder.Build();

@@ -22,6 +22,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Protobuf Include="..\Realm.Grpc.Proto\discord.proto" GrpcServices="Server">
+      <Link>Protos\discord.proto</Link>
+    </Protobuf>
     <Protobuf Include="..\Realm.Grpc.Proto\greet.proto" GrpcServices="Server">
       <Link>Protos\greet.proto</Link>
     </Protobuf>

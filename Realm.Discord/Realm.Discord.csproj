@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net7.0</TargetFramework>
@@ -16,14 +16,14 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Discord.Net" Version="3.8.1" />
     <PackageReference Include="Serilog" Version="2.12.0" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Realm.Configuration\Realm.Configuration.csproj" />
+    <ProjectReference Include="..\Realm.Domain\Realm.Domain.csproj" />
     <ProjectReference Include="..\Realm.Interfaces\Realm.Interfaces.csproj" />
+    <ProjectReference Include="..\Realm.Persistance\Realm.Persistance.csproj" />
     <ProjectReference Include="..\Realm.Scripting\Realm.Scripting.csproj" />
   </ItemGroup>
-
 </Project>
