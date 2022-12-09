@@ -1,4 +1,4 @@
-﻿namespace Realm.Services.DiscordBot.Scripting.Events;
+﻿namespace Realm.Module.Discord.Scripting.Events;
 
 public class DiscordStatusChannelUpdateContext : INamedLuaEvent
 {

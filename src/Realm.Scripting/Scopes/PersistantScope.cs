@@ -1,4 +1,4 @@
-﻿namespace Realm.Scripting.Scopes;
+﻿namespace Realm.Module.Scripting.Scopes;
 
 public class PersistantScope : IDisposable
 {

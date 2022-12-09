@@ -1,4 +1,4 @@
-﻿using Realm.Scripting.Extensions;
+﻿using Realm.Module.Scripting.Extensions;
 
 namespace Realm.Domain.Inventory;
 

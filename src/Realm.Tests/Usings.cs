@@ -12,4 +12,4 @@ global using SlipeServer.Server.TestTools;
 global using Realm.Tests.Classes;
 global using Realm.Tests.Fixtures;
 global using Realm.Tests.TestServers;
-global using Realm.Scripting;
+global using Realm.Module.Scripting;

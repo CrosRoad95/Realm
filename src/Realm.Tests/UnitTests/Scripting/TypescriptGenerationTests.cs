@@ -1,4 +1,6 @@
-﻿namespace Realm.Tests.UnitTests.Scripting;
+﻿using Realm.Module.Scripting;
+
+namespace Realm.Tests.UnitTests.Scripting;
 
 
 [CollectionDefinition("Non-Parallel Collection", DisableParallelization = true)]

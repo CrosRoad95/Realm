@@ -1,6 +1,7 @@
 ﻿using Realm.Domain.Sessions;
+using Realm.Module.Scripting.Extensions;
+using Realm.Module.Scripting.Scopes;
 using Realm.Persistance.Scripting.Classes;
-using Realm.Scripting.Extensions;
 using SlipeServer.Server.Elements.Events;
 
 namespace Realm.Domain.Elements;

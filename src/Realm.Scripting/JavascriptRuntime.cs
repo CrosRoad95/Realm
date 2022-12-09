@@ -1,6 +1,8 @@
-﻿using Realm.Scripting.Functions;
+﻿using Realm.Module.Scripting.Extensions;
+using Realm.Module.Scripting.Functions;
+using Realm.Module.Scripting.Interfaces;
 
-namespace Realm.Scripting;
+namespace Realm.Module.Scripting;
 
 internal class JavascriptRuntime : IScriptingModuleInterface, IReloadable
 {
@@ -51,7 +53,7 @@ internal class JavascriptRuntime : IScriptingModuleInterface, IReloadable
 
     public void AddHostObject(string name, object @object, bool exposeGlobalMembers = false)
     {
-        if(exposeGlobalMembers)
+        if (exposeGlobalMembers)
             _engine.AddHostObject(name, HostItemFlags.GlobalMembers, @object);
         else
             _engine.AddHostObject(name, @object);

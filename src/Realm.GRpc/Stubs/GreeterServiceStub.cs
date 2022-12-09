@@ -1,4 +1,4 @@
-﻿namespace Realm.GRpc.Stubs;
+﻿namespace Realm.Module.Grpc.Stubs;
 
 public sealed class GreeterServiceStub : Greeter.GreeterBase
 {

@@ -1,7 +1,7 @@
 ﻿using Realm.Interfaces.Server;
-using Realm.Scripting.Functions;
+using Realm.Module.Scripting.Functions;
 
-namespace Realm.Scripting.Extensions;
+namespace Realm.Module.Scripting.Extensions;
 
 public static class EventFunctionsExtensions
 {

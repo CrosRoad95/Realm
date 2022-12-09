@@ -1,4 +1,4 @@
-﻿namespace Realm.Scripting.Interfaces;
+﻿namespace Realm.Module.Scripting.Interfaces;
 
 public interface IScriptingModuleInterface
 {

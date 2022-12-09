@@ -1,6 +1,6 @@
 ﻿using Realm.Domain.Elements;
 
-namespace Realm.Server.Scripting.Events;
+namespace Realm.Module.Discord.Scripting.Events;
 
 public class DiscordPlayerConnectedEvent : INamedLuaEvent, IDisposable
 {
@@ -18,7 +18,7 @@ public class DiscordPlayerConnectedEvent : INamedLuaEvent, IDisposable
             return _rpgPlayer;
         }
     }
-    
+
     public DiscordUser DiscordUser
     {
         get

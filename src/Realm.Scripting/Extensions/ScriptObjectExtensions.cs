@@ -1,4 +1,4 @@
-﻿namespace Realm.Scripting.Extensions;
+﻿namespace Realm.Module.Scripting.Extensions;
 
 public static class ScriptObjectExtensions
 {

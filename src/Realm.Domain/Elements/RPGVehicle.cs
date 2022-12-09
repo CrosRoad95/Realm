@@ -1,4 +1,6 @@
-﻿namespace Realm.Domain.Elements;
+﻿using Realm.Module.Scripting.Scopes;
+
+namespace Realm.Domain.Elements;
 
 [NoDefaultScriptAccess]
 public class RPGVehicle : Vehicle, IWorldDebugData, IDisposable

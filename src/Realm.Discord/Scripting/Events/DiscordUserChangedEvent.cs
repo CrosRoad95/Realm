@@ -1,4 +1,4 @@
-﻿namespace Realm.Server.Scripting.Events;
+﻿namespace Realm.Module.Discord.Scripting.Events;
 
 public class DiscordUserChangedEvent : INamedLuaEvent, IDisposable
 {
@@ -16,7 +16,7 @@ public class DiscordUserChangedEvent : INamedLuaEvent, IDisposable
             return _account;
         }
     }
-    
+
     public DiscordUser Discord
     {
         get

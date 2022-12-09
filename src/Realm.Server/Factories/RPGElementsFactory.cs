@@ -1,5 +1,6 @@
 ﻿using Realm.Domain.Elements.CollisionShapes;
 using Realm.Domain.Elements.Variants;
+using Realm.Module.Scripting.Scopes;
 using PersistantVehicleData = Realm.Persistance.Data.Vehicle;
 
 namespace Realm.Server.Factories;

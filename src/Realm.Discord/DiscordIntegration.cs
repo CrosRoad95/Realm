@@ -1,7 +1,9 @@
 ﻿using Realm.Interfaces.Grpc;
-using Realm.Server.Scripting.Events;
+using Realm.Module.Discord.Scripting.Events;
+using Realm.Module.Scripting.Functions;
+using Realm.Module.Scripting.Interfaces;
 
-namespace Realm.Discord;
+namespace Realm.Module.Discord;
 
 internal class DiscordIntegration
 {

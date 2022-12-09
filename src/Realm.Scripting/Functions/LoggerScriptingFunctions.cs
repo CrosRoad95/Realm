@@ -1,4 +1,4 @@
-﻿namespace Realm.Scripting.Functions;
+﻿namespace Realm.Module.Scripting.Functions;
 
 [NoDefaultScriptAccess]
 public class LoggerScriptingFunctions

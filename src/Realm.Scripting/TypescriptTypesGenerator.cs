@@ -1,4 +1,4 @@
-﻿namespace Realm.Scripting;
+﻿namespace Realm.Module.Scripting;
 
 public class TypescriptTypesGenerator
 {
@@ -63,7 +63,7 @@ public class TypescriptTypesGenerator
     {
         var isNullable = propertyInfo.IsNullable();
 
-        return $"{propertyInfo.Name.ToTypescriptName()}{(isNullable? "?" : "")}";
+        return $"{propertyInfo.Name.ToTypescriptName()}{(isNullable ? "?" : "")}";
     }
 
     private string ResolveParameterInfoName(ParameterInfo parameterInfo, ref bool wasNullable)

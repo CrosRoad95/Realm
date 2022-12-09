@@ -1,4 +1,6 @@
 ﻿using Realm.Domain.Sessions;
+using Realm.Module.Scripting.Extensions;
+using Realm.Module.Scripting.Functions;
 
 namespace Realm.Server.Logic;
 

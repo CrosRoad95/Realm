@@ -1,4 +1,6 @@
-﻿namespace Realm.Server.Scripting;
+﻿using Realm.Module.Scripting.Extensions;
+
+namespace Realm.Server.Scripting;
 
 [NoDefaultScriptAccess]
 public class InputScriptingFunctions

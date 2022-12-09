@@ -1,4 +1,4 @@
-﻿namespace Realm.GRpc.Services;
+﻿namespace Realm.Module.Grpc.Services;
 
 internal class DiscordService : IGrpcDiscord
 {

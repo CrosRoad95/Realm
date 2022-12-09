@@ -1,10 +1,11 @@
 ﻿using Realm.Domain.Elements;
-using Realm.Server.Scripting.Events;
 using SlipeServer.Server.ElementCollections;
 using SlipeServer.Server.Elements;
-using Realm.Scripting.Extensions;
+using Realm.Module.Scripting.Functions;
+using Realm.Module.Scripting.Extensions;
+using Realm.Module.Discord.Scripting.Events;
 
-namespace Realm.Server.Services;
+namespace Realm.Module.Discord;
 
 internal class DiscordVerificationHandler
 {
@@ -21,9 +22,9 @@ internal class DiscordVerificationHandler
     {
         foreach (var rpgPlayer in _elementCollection.GetByType<Player>().Cast<RPGPlayer>())
         {
-            if(rpgPlayer.IsLoggedIn && rpgPlayer.Account != null)
+            if (rpgPlayer.IsLoggedIn && rpgPlayer.Account != null)
             {
-                if(rpgPlayer.Account.IsDiscordConnectionCodeValid(code))
+                if (rpgPlayer.Account.IsDiscordConnectionCodeValid(code))
                 {
                     try
                     {
@@ -35,7 +36,7 @@ internal class DiscordVerificationHandler
                         await _eventFunctions.InvokeEvent(@event);
                         return "Pomyślnie połączyłeś konto discord z serwerem";
                     }
-                    catch(Exception)
+                    catch (Exception)
                     {
                         return null;
                     }

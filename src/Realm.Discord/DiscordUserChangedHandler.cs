@@ -1,10 +1,10 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Realm.Persistance.Data;
-using Realm.Server.Scripting.Events;
 using System.Security.Claims;
-using Realm.Scripting.Extensions;
+using Realm.Module.Scripting.Extensions;
+using Realm.Module.Discord.Scripting.Events;
 
-namespace Realm.Server.Services;
+namespace Realm.Module.Discord;
 
 internal class DiscordUserChangedHandler
 {

@@ -1,4 +1,4 @@
-﻿namespace Realm.Scripting.ClearscriptExtensions;
+﻿namespace Realm.Module.Scripting.ClearscriptExtensions;
 
 internal class LowercaseSymbolsLoader : CustomAttributeLoader
 {

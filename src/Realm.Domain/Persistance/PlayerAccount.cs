@@ -3,8 +3,8 @@ using Microsoft.EntityFrameworkCore;
 using Realm.Common.Exceptions;
 using Realm.Configuration;
 using Realm.Interfaces.Server.Services;
+using Realm.Module.Scripting.Extensions;
 using Realm.Persistance.Extensions;
-using Realm.Scripting.Extensions;
 using System.Security.Claims;
 
 namespace Realm.Persistance.Scripting.Classes;

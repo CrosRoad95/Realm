@@ -1,7 +1,8 @@
-﻿using Realm.GRpc.Services;
-using Realm.GRpc.Stubs.Discord;
+﻿using Realm.Module.Grpc.Services;
+using Realm.Module.Grpc.Stubs;
+using Realm.Module.Grpc.Stubs.Discord;
 
-namespace Realm.GRpc;
+namespace Realm.Module.Grpc;
 
 public class GrpcModule : IModule
 {
@@ -53,7 +54,7 @@ public class GrpcModule : IModule
 
     private void Start()
     {
-        if(_grpcServer != null)
+        if (_grpcServer != null)
             _grpcServer.Start();
     }
 

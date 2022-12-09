@@ -1,6 +1,6 @@
-﻿using Realm.Server.Services;
+﻿using Realm.Module.Scripting.Interfaces;
 
-namespace Realm.Discord;
+namespace Realm.Module.Discord;
 
 public class DiscordModule : IModule
 {

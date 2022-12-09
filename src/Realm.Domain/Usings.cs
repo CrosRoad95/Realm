@@ -1,7 +1,7 @@
 ﻿global using Microsoft.ClearScript;
 global using Realm.Resources.AdminTools.Enums;
 global using Realm.Resources.AdminTools.Interfaces;
-global using Realm.Scripting.Scopes;
+global using Realm.Module.Scripting.Scopes;
 global using SlipeServer.Server.Elements;
 global using System.Drawing;
 global using System.Numerics;

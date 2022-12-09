@@ -1,6 +1,7 @@
-﻿using Realm.Scripting.Functions;
+﻿using Realm.Module.Scripting.Functions;
+using Realm.Module.Scripting.Interfaces;
 
-namespace Realm.Scripting;
+namespace Realm.Module.Scripting;
 
 public class ScriptingModule : IModule
 {
@@ -47,7 +48,7 @@ public class ScriptingModule : IModule
         if (typeof(T) == typeof(IScriptingModuleInterface))
         {
             var @interface = _interface as T;
-            if(@interface == null)
+            if (@interface == null)
                 throw new InvalidOperationException();
             return @interface;
         }

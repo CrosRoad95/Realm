@@ -1,6 +1,6 @@
 ﻿using Discord;
 
-namespace Realm.GRpc.Stubs.Discord;
+namespace Realm.Module.Grpc.Stubs.Discord;
 
 public sealed class DiscordStatusChannelServiceStub : StatusChannel.StatusChannelBase
 {
