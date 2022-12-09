@@ -14,9 +14,9 @@ const variantBlip = createVariantBlip(new Vector3(50, 50, 0));
 const blip = createBlip(new Vector3(0, 0, 0), 6);
 const pickup = createPickup(new Vector3(10, 10, 4), 1240);
 const pickupCollision = createColSphere(new Vector3(10, 10, 4), 2);
-pickupCollision.onEnter(e => {
-    Logger.information("entered {element}", e)
-})
+//pickupCollision.onEnter(e => {
+//    Logger.information("entered {element}", e)
+//})
 Logger.information("spawned blip: {blip}, icon: {blipIcon}", blip, blip.icon);
 const spawn = createSpawn(new Vector3(0, 20, 3), new Vector3(0, 0, 0), "second spawn");
 //spawn.addRequiredPolicy("Admin");

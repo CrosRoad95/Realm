@@ -2,7 +2,7 @@
 
 namespace Realm.Console;
 
-internal class ServerConsole : IConsoleCommands
+internal class ServerConsole : IConsole
 {
     public event Action<string?>? CommandExecuted;
 

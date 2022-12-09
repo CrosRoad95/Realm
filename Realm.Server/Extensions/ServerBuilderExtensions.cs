@@ -5,12 +5,10 @@ namespace Realm.Server.Extensions;
 
 public static class ServerBuilderExtensions
 {
-    public static ServerBuilder ConfigureServer(this ServerBuilder builder, IConfiguration configuration, string? basePath = null)
+    public static ServerBuilder ConfigureServer(this ServerBuilder builder, RealmConfigurationProvider realmConfigurationProvider)
     {
-        var _serverConfiguration = configuration.GetSection("server").Get<SlipeServerConfiguration>();
-        var _scriptingConfiguration = configuration.GetSection("scripting").Get<ScriptingConfiguration>();
-        if (basePath != null)
-            _serverConfiguration.ResourceDirectory = Path.Join(basePath, _serverConfiguration.ResourceDirectory);
+        var _serverConfiguration = realmConfigurationProvider.GetRequired<SlipeServerConfiguration>("Server");
+        var _scriptingConfiguration = realmConfigurationProvider.GetRequired<ScriptingConfiguration>("Scripting");
         builder.UseConfiguration(_serverConfiguration);
 #if DEBUG
         builder.AddDefaults(exceptBehaviours: ServerBuilderDefaultBehaviours.MasterServerAnnouncementBehaviour);
@@ -20,10 +18,10 @@ public static class ServerBuilderExtensions
 
         builder.ConfigureServices(services =>
         {
-            services.AddSingleton(configuration);
+            services.AddSingleton(realmConfigurationProvider);
 
             services.AddPersistance<SQLiteDb>(db => db.UseSqlite("Filename=./server.db"));
-            services.AddRealmIdentity<SQLiteDb>(configuration.GetSection("Identity").Get<IdentityConfiguration>());
+            services.AddRealmIdentity<SQLiteDb>(realmConfigurationProvider.GetRequired<IdentityConfiguration>("Identity"));
 
             services.AddSingleton<HelpCommand>();
             services.AddSingleton<ICommand, TestCommand>();

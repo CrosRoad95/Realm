@@ -1,6 +1,6 @@
 ﻿namespace Realm.Interfaces.Server;
 
-public interface IConsoleCommands
+public interface IConsole
 {
     event Action<string?>? CommandExecuted;
 }

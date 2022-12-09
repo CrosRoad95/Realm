@@ -2,7 +2,7 @@
 
 namespace Realm.Tests.Classes;
 
-internal class TestConsoleCommands : IConsoleCommands
+internal class TestConsoleCommands : IConsole
 {
     public event Action<string?>? CommandExecuted;
 }

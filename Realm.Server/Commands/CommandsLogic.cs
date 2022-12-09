@@ -2,10 +2,10 @@
 
 internal class CommandsLogic
 {
-    private readonly IConsoleCommands _consoleCommands;
+    private readonly IConsole _consoleCommands;
     private readonly List<ICommand> _commands;
 
-    public CommandsLogic(IConsoleCommands consoleCommands, IEnumerable<ICommand> commands, HelpCommand helpCommand)
+    public CommandsLogic(IConsole consoleCommands, IEnumerable<ICommand> commands, HelpCommand helpCommand)
     {
         _consoleCommands = consoleCommands;
         _commands = commands.ToList();

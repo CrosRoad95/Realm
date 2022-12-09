@@ -1,26 +1,33 @@
-﻿using Realm.Domain.Components;
+﻿using FluentValidation;
+using Microsoft.AspNetCore.Hosting.Server;
+using Realm.Configuration;
+using Realm.Domain.Components;
 using Realm.Domain.Elements;
 using Realm.Domain.Elements.CollisionShapes;
 using Realm.Domain.Elements.Variants;
 using Realm.Domain.Inventory;
 using Realm.Domain.Sessions;
+using Realm.Server.Interfaces;
+using Realm.Server.Serialization.Yaml;
+using YamlDotNet.Serialization.NamingConventions;
 using static Realm.Domain.Upgrades.VehicleUpgrade;
 
 namespace Realm.Server;
 
 public partial class RPGServer : IRPGServer, IReloadable
 {
-    private readonly SemaphoreSlim _semaphore = new(0);
+    private readonly IDeserializer _deserializer = new DeserializerBuilder()
+            .WithNamingConvention(CamelCaseNamingConvention.Instance)
+            .WithTypeConverter(new Vector3Converter())
+            .Build();
+
     private readonly MtaServer<RPGPlayer> _server;
-    private readonly SlipeServerConfiguration _serverConfiguration;
-    private readonly ILogger _logger;
     private readonly EventScriptingFunctions _eventFunctions;
     private readonly ElementScriptingFunctions _elementFunctions;
     private readonly InputScriptingFunctions _inputFunctions;
     private readonly GameplayScriptingFunctions _gameplayFunctions;
     private readonly LocalizationScriptingFunctions _localizationFunctions;
     private readonly IElementCollection _elementCollection;
-    private readonly IEnumerable<IModule> _modules;
 
     public event Action<Player>? PlayerJoined;
     public event Action? ServerReloaded;
@@ -36,26 +43,22 @@ public partial class RPGServer : IRPGServer, IReloadable
         set => _server.GameType = value;
     }
 
-    public RPGServer(RealmConfigurationProvider configurationProvider, ILogger logger, IEnumerable<IModule> modules, Action<ServerBuilder>? configureServerBuilder = null, string? basePath = null)
+    public RPGServer(RealmConfigurationProvider realmConfigurationProvider, IEnumerable<IModule> modules, Action<ServerBuilder>? configureServerBuilder = null)
     {
-        _modules = modules;
-        _logger = logger.ForContext<IRPGServer>();
-        _serverConfiguration = configurationProvider.Get<SlipeServerConfiguration>("Server");
         _server = MtaServer.CreateWithDiSupport<RPGPlayer>(
             builder =>
             {
-                builder.ConfigureServer(configurationProvider.Configuration, basePath);
+                builder.ConfigureServer(realmConfigurationProvider);
                 configureServerBuilder?.Invoke(builder);
 
                 builder.ConfigureServices(services =>
                 {
                     // Common
-                    services.AddSingleton(configurationProvider);
-                    services.AddSingleton(logger);
-                    services.AddSingleton(this);
+                    services.AddSingleton(realmConfigurationProvider);
                     services.AddSingleton<IReloadable>(this);
                     services.AddSingleton<IRPGServer>(this);
                     services.AddSingleton<ElementByStringIdCollection>();
+                    services.AddSingleton<SeederServerBuilder>();
                     services.AddSingleton<VehicleUpgradeByStringCollection>();
 
                     // Scripting
@@ -97,7 +100,7 @@ public partial class RPGServer : IRPGServer, IReloadable
             }
         );
 
-        var serverListConfiguration = configurationProvider.Get<ServerListConfiguration>("ServerList");
+        var serverListConfiguration = realmConfigurationProvider.GetRequired<ServerListConfiguration>("ServerList");
         _server.GameType = serverListConfiguration.GameType;
         _server.MapName = serverListConfiguration.MapName;
         _server.PlayerJoined += e => PlayerJoined?.Invoke(e);
@@ -108,12 +111,6 @@ public partial class RPGServer : IRPGServer, IReloadable
         _elementFunctions = _server.GetRequiredService<ElementScriptingFunctions>();
         _inputFunctions = _server.GetRequiredService<InputScriptingFunctions>();
         _elementCollection = _server.GetRequiredService<IElementCollection>();
-
-        Console.CancelKeyPress += (sender, args) =>
-        {
-            _server.Stop();
-            _semaphore.Release();
-        };
 
         _server.PlayerJoined += Server_PlayerJoined;
     }
@@ -200,21 +197,48 @@ public partial class RPGServer : IRPGServer, IReloadable
 
     public async Task Start()
     {
-        _logger.Information("Initializing modules: {modules}", string.Join(", ", _modules.Select(x => x.Name)));
+        await BuildFromSeedFiles();
+        var modules = GetRequiredService<IEnumerable<IModule>>().ToArray();
         var serviceProvider = _server.GetRequiredService<IServiceProvider>();
-        foreach (var module in _modules)
+        foreach (var module in modules)
             module.Init(serviceProvider);
 
-        var scriptingModule = _modules.FirstOrDefault(x => x.Name == "Scripting");
+        var scriptingModule = modules.FirstOrDefault(x => x.Name == "Scripting");
         if (scriptingModule != null)
             InitializeScripting(scriptingModule.GetInterface<IScriptingModuleInterface>());
 
-        foreach (var module in _modules)
+        foreach (var module in modules)
             module.PostInit(serviceProvider);
 
-        _logger.Information("Server started at port: {port}", _serverConfiguration.Port);
         _server.Start();
-        await _semaphore.WaitAsync();
+    }
+
+    private async Task BuildFromSeedFiles()
+    {
+        var basePath = "Seed";
+        var result = new JObject();
+        var seedDatas = Directory.GetFiles(basePath).Select(seedFileName => _deserializer.Deserialize<SeedData>(File.ReadAllText(seedFileName)));
+        foreach (var sourceObject in seedDatas)
+        {
+            var @object = JObject.Parse(JsonConvert.SerializeObject(sourceObject));
+            result.Merge(@object, new JsonMergeSettings
+            {
+                MergeArrayHandling = MergeArrayHandling.Union
+            });
+        }
+        var seedData = result.ToObject<SeedData>();
+        if (seedData == null)
+            throw new Exception("Failed to load seed data.");
+
+        var seedValidator = new SeedValidator();
+        await seedValidator.ValidateAndThrowAsync(seedData);
+        var seedServerBuilder = GetRequiredService<SeederServerBuilder>();
+        await seedServerBuilder.BuildFrom(seedData);
+    }
+
+    public async Task Stop()
+    {
+        _server.Stop(); // TODO: save everything
     }
 
     private void RemoveAllElements()
@@ -222,7 +246,6 @@ public partial class RPGServer : IRPGServer, IReloadable
         foreach (var spawn in _elementFunctions.GetCollectionByType("spawn").Cast<RPGSpawn>().ToList())
             if(!spawn.IsPersistant() && _elementFunctions.IsElement(spawn))
                 _elementFunctions.DestroyElement(spawn);
-
     }
 
     public Task Reload()

@@ -10,4 +10,5 @@ public interface IRPGServer
 
     void AssociateElement(Element element);
     TService GetRequiredService<TService>() where TService : notnull;
+    void InitializeScripting(IScriptingModuleInterface scriptingModuleInterface);
 }

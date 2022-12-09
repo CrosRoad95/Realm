@@ -34,16 +34,15 @@ internal class TestRPGServer : IReloadable, IRPGServer
             new ServerScriptingModule(),
         };
 
-        var configuration = new TestConfiguration().Configuration;
+        var configuration = new TestConfigurationProvider();
         TestServer = MtaServer.CreateWithDiSupport<TestRPGPlayer>(builder =>
         {
             builder.ConfigureServices(services =>
             {
-                services.AddSingleton(new Configuration.RealmConfigurationProvider());
-                services.AddSingleton<IConsoleCommands, TestConsoleCommands>();
+                services.AddSingleton(configuration);
+                services.AddSingleton<IConsole, TestConsoleCommands>();
                 services.AddSingleton<IReloadable>(this);
                 services.AddSingleton<IRPGServer>(this);
-                services.AddSingleton<Func<string?>>(() => "");
                 services.AddSingleton(new RealmLogger().GetLogger());
 
                 services.AddSingleton<RPGElementsFactory>();

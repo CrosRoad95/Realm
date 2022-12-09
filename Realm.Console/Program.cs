@@ -8,32 +8,34 @@ using Realm.Server;
 using Realm.Server.Modules;
 using Serilog;
 using Serilog.Events;
+using Realm.Configuration;
+using Realm.Server.Interfaces;
 
-var serverConsole = new ServerConsole();
-var serilogLogger = new RealmLogger(LogEventLevel.Verbose)
-    .AddSeq();
+var logger = new RealmLogger(LogEventLevel.Verbose)
+    .AddSeq()
+    .GetLogger();
 
-var logger = serilogLogger.GetLogger();
-var configurationProvider = new Realm.Configuration.RealmConfigurationProvider();
-var server = new MTARPGServerImpl(serverConsole, logger, configurationProvider, new IModule[]
-    {
-        new DiscordModule(),
-        new IdentityModule(),
-        new ScriptingModule(),
-        new ServerScriptingModule(),
-        new GrpcModule(),
-    });
-try
+var configurationProvider = new RealmConfigurationProvider();
+
+var builder = new RPGServerBuilder();
+builder.AddModule<DiscordModule>();
+builder.AddModule<IdentityModule>();
+builder.AddModule<ScriptingModule>();
+builder.AddModule<ServerScriptingModule>();
+builder.AddModule<GrpcModule>();
+builder.AddLogger(logger);
+builder.AddConsole(new ServerConsole());
+builder.AddConfiguration(configurationProvider);
+
+SemaphoreSlim semaphore = new(0);
+var server = builder.Build();
+Console.CancelKeyPress += async (sender, args) =>
 {
-    await server.BuildFromSeedFiles();
-    server.Start();
-    serverConsole.Start();
-}
-catch (Exception ex)
-{
-    logger.Error(ex, "Failed to start server.");
-}
-finally
-{
-    await Log.CloseAndFlushAsync();
-}
+    await server.Stop();
+    semaphore.Release();
+};
+
+await server.Start();
+await semaphore.WaitAsync();
+
+

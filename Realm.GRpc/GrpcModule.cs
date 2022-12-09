@@ -1,4 +1,5 @@
-﻿using Realm.GRpc.Stubs.Discord;
+﻿using Realm.GRpc.Services;
+using Realm.GRpc.Stubs.Discord;
 
 namespace Realm.GRpc;
 
@@ -11,20 +12,17 @@ public class GrpcModule : IModule
     }
 
     public string Name => "Grpc";
-    private IGrpcModuleInterface? _interface;
 
     public void Configure(IServiceCollection services)
     {
         services.AddSingleton<GreeterServiceStub>();
         services.AddSingleton<DiscordHandshakeServiceStub>();
         services.AddSingleton<DiscordStatusChannelServiceStub>();
+        services.AddSingleton<IGrpcDiscord, DiscordService>();
     }
 
     public void Init(IServiceProvider serviceProvider)
     {
-        Start();
-        _interface = serviceProvider.GetRequiredService<IGrpcModuleInterface>();
-
         _grpcServer = new Server
         {
             Services =
@@ -35,15 +33,13 @@ public class GrpcModule : IModule
             },
             Ports =
             {
-                new ServerPort("0.0.0.0", 22010, ServerCredentials.Insecure)
+                new ServerPort("localhost", 22010, ServerCredentials.Insecure)
             },
         };
     }
 
     public void PostInit(IServiceProvider serviceProvider)
     {
-        if (_interface == null)
-            throw new InvalidOperationException();
         Start();
 
         var logger = serviceProvider.GetRequiredService<ILogger>().ForContext<GrpcModule>();
@@ -51,16 +47,7 @@ public class GrpcModule : IModule
 
     public T GetInterface<T>() where T : class
     {
-        if (_interface == null)
-            throw new InvalidOperationException();
 
-        if (typeof(T) == typeof(IGrpcModuleInterface))
-        {
-            var @interface = _interface as T;
-            if (@interface == null)
-                throw new InvalidOperationException();
-            return @interface;
-        }
         throw new ArgumentException();
     }
 

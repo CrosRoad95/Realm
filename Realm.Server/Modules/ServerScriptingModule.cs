@@ -21,7 +21,7 @@ public class ServerScriptingModule : IModule
 
     public void PostInit(IServiceProvider serviceProvider)
     {
-        var discordIntegration = serviceProvider.GetRequiredService<RPGServer>();
+        var discordIntegration = serviceProvider.GetRequiredService<IRPGServer>();
 
         var scriptingModule = serviceProvider.GetRequiredService<IEnumerable<IModule>>().FirstOrDefault(x => x.Name == "Scripting");
         if (scriptingModule != null)

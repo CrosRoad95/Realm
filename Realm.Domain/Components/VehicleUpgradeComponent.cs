@@ -48,6 +48,8 @@ public class VehicleUpgradeComponent : IElementComponent
     [ScriptMember("addUpgrade")]
     public bool AddUpgrade(VehicleUpgrade upgrade, bool rebuild = true)
     {
+        if(upgrade == null)
+            throw new NullReferenceException(nameof(upgrade));
         Upgrades.Add(upgrade);
         if (rebuild)
             RebuildUpgrades();

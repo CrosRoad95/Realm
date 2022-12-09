@@ -1,9 +1,11 @@
-﻿namespace Realm.Tests;
+﻿using Realm.Configuration;
 
-internal class TestConfiguration
+namespace Realm.Tests;
+
+internal class TestConfigurationProvider : RealmConfigurationProvider
 {
     public IConfiguration Configuration { get; private set; }
-    public TestConfiguration()
+    public TestConfigurationProvider()
     {
         Configuration = new ConfigurationBuilder()
             .AddInMemoryCollection(new Dictionary<string, string>
