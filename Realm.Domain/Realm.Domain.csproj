@@ -14,4 +14,8 @@
     <ProjectReference Include="..\Realm.Scripting\Realm.Scripting.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Persistance\" />
+  </ItemGroup>
+
 </Project>

@@ -1,8 +1,8 @@
 using Realm.Discord;
 using Realm.Interfaces.Extend;
 using Realm.Scripting;
-using Realm.Server;
 using Realm.Server.Interfaces;
+using Realm.Server.Modules;
 
 var subscribableLogsSink = new SubscribableLogsSink();
 var logger = new RealmLogger()

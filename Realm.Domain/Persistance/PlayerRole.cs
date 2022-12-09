@@ -1,4 +1,6 @@
-﻿namespace Realm.Persistance.Scripting.Classes;
+﻿using Microsoft.EntityFrameworkCore.Infrastructure;
+
+namespace Realm.Persistance.Scripting.Classes;
 
 [NoDefaultScriptAccess]
 public class PlayerRole : IDisposable

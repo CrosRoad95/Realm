@@ -1,6 +1,4 @@
-﻿using Realm.Domain.Elements;
-
-namespace Realm.Domain.Sessions;
+﻿namespace Realm.Domain.Sessions;
 
 [NoDefaultScriptAccess]
 public class FractionSession : SessionBase

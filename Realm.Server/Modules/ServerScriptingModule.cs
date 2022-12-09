@@ -1,4 +1,4 @@
-﻿namespace Realm.Server;
+﻿namespace Realm.Server.Modules;
 
 public class ServerScriptingModule : IModule
 {

@@ -35,8 +35,6 @@ public static class ServiceCollectionExtensions
            .AddDefaultTokenProviders();
 
         services.AddSingleton(new AuthorizationPoliciesProvider(configuration.Policies.Keys));
-        services.AddSingleton<PeriodicEntitySaveService>();
-        services.AddTransient<PlayerAccount>();
 
         services.AddAuthorization(options =>
         {

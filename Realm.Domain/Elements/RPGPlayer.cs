@@ -7,7 +7,6 @@ using Realm.Resources.AgnosticGuiSystem;
 using SlipeServer.Packets.Lua.Camera;
 using SlipeServer.Server;
 using SlipeServer.Server.Elements.Events;
-using System.Globalization;
 
 namespace Realm.Domain.Elements;
 

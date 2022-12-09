@@ -1,7 +1,7 @@
 ﻿namespace Realm.Domain.Elements;
 
 [NoDefaultScriptAccess]
-public class RPGVehicle : Vehicle, IPersistantVehicle, IWorldDebugData, IDisposable
+public class RPGVehicle : Vehicle, IWorldDebugData, IDisposable
 {
     private bool _disposed = false;
     private string? _vehicleId = null;
@@ -17,8 +17,8 @@ public class RPGVehicle : Vehicle, IPersistantVehicle, IWorldDebugData, IDisposa
 
     public string VehicleId { get => _vehicleId ?? throw new InvalidDataException(nameof(Id)); }
 
-    public event Action<IPersistantVehicle>? NotifyNotSavedState;
-    public event Action<IPersistantVehicle>? Disposed;
+    public event Action<RPGVehicle>? NotifyNotSavedState;
+    public event Action<RPGVehicle>? Disposed;
     private PersistantVehicleData? _vehicleData;
 
     [ScriptMember("components")]

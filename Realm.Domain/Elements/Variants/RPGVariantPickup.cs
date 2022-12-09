@@ -1,5 +1,4 @@
-﻿using Realm.Domain.Elements;
-using SlipeServer.Server.Elements.Enums;
+﻿using SlipeServer.Server.Elements.Enums;
 using SlipeServer.Server.Elements.Events;
 
 namespace Realm.Domain.Elements.Variants;

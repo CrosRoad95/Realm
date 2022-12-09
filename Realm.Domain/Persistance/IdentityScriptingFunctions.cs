@@ -1,4 +1,6 @@
-﻿namespace Realm.Persistance.Scripting.Classes;
+﻿using Microsoft.EntityFrameworkCore;
+
+namespace Realm.Persistance.Scripting.Classes;
 
 [NoDefaultScriptAccess]
 public class IdentityScriptingFunctions

@@ -63,7 +63,7 @@ public class MileageCounterComponent : IElementComponent
         RegisterEvents();
     }
 
-    private void Disposed(IPersistantVehicle obj)
+    private void Disposed(RPGVehicle _)
     {
         UnregisterEvents();
         _rpgVehicle.Disposed -= Disposed;

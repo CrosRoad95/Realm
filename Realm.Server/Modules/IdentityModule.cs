@@ -1,4 +1,4 @@
-﻿namespace Realm.Persistance;
+﻿namespace Realm.Server.Modules;
 
 public class IdentityModule : IModule
 {

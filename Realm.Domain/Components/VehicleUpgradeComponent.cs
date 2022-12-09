@@ -34,7 +34,7 @@ public class VehicleUpgradeComponent : IElementComponent
         RebuildUpgrades();
     }
 
-    private void Disposed(IPersistantVehicle obj)
+    private void Disposed(RPGVehicle vehicle)
     {
         _rpgVehicle.Disposed -= Disposed;
     }

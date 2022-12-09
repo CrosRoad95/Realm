@@ -1,4 +1,6 @@
-﻿namespace Realm.WebApp.Classes;
+﻿using Realm.Persistance.Scripting.Classes;
+
+namespace Realm.WebApp.Classes;
 
 public class Account
 {

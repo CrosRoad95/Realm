@@ -1,10 +1,12 @@
-﻿namespace Realm.Persistance.Services;
+﻿using Realm.Domain.Elements;
+
+namespace Realm.Server.Services;
 
 public class PeriodicEntitySaveService
 {
     private readonly SemaphoreSlim semaphore = new(1);
-    private readonly HashSet<ISavable> _playerAccountsToSave = new();
-    private readonly HashSet<ISavable> _persistantVehiclesToSave = new();
+    private readonly HashSet<PlayerAccount> _playerAccountsToSave = new();
+    private readonly HashSet<RPGVehicle> _persistantVehiclesToSave = new();
     private readonly ILogger _logger;
     public PeriodicEntitySaveService(ILogger logger)
     {
@@ -14,27 +16,27 @@ public class PeriodicEntitySaveService
 
     private async Task PeriodicSaveEntities()
     {
-        List<ISavable> workingCopyOfPlayerAccounts = new();
-        List<ISavable> workingCopyOfPersistantVehicles = new();
-        while(true)
+        List<PlayerAccount> workingCopyOfPlayerAccounts = new();
+        List<RPGVehicle> workingCopyOfPersistantVehicles = new();
+        while (true)
         {
             await Task.Delay(TimeSpan.FromSeconds(10));
             await semaphore.WaitAsync();
             if (_playerAccountsToSave.Any())
             {
-                workingCopyOfPlayerAccounts = _playerAccountsToSave.Cast<ISavable>().ToList();
+                workingCopyOfPlayerAccounts = _playerAccountsToSave.Cast<PlayerAccount>().ToList();
                 _playerAccountsToSave.Clear();
             }
-            
+
             if (_persistantVehiclesToSave.Any())
             {
-                workingCopyOfPersistantVehicles = _persistantVehiclesToSave.Cast<ISavable>().ToList();
+                workingCopyOfPersistantVehicles = _persistantVehiclesToSave.Cast<RPGVehicle>().ToList();
                 _persistantVehiclesToSave.Clear();
             }
 
             semaphore.Release();
 
-            if(workingCopyOfPlayerAccounts.Any())
+            if (workingCopyOfPlayerAccounts.Any())
             {
                 // Save account in try catch, report errors, maybe reschedule save
                 foreach (var playerAccount in workingCopyOfPlayerAccounts)
@@ -62,14 +64,14 @@ public class PeriodicEntitySaveService
         playerAccount.NotifyNotSavedState += PlayerAccount_DirtyNotify;
         playerAccount.Disposed += PlayerAccount_Disposed;
     }
-    
-    public void VehicleCreated(IPersistantVehicle persistantVehicle)
+
+    public void VehicleCreated(RPGVehicle persistantVehicle)
     {
         persistantVehicle.NotifyNotSavedState += PersistantVehicle_DirtyNotify;
         persistantVehicle.Disposed += PersistantVehicle_Disposed;
     }
 
-    private async void PlayerAccount_DirtyNotify(ISavable playerAccount)
+    private async void PlayerAccount_DirtyNotify(PlayerAccount playerAccount)
     {
         await ScheduleAccountToSave(playerAccount);
     }
@@ -80,20 +82,20 @@ public class PeriodicEntitySaveService
         playerAccount.Disposed -= PlayerAccount_Disposed;
         await ScheduleAccountToSave(playerAccount);
     }
-    
-    private async void PersistantVehicle_DirtyNotify(ISavable persistantVehicle)
+
+    private async void PersistantVehicle_DirtyNotify(RPGVehicle persistantVehicle)
     {
         await ScheduleVehicleToSave(persistantVehicle);
     }
 
-    private async void PersistantVehicle_Disposed(IPersistantVehicle playerAccount)
+    private async void PersistantVehicle_Disposed(RPGVehicle rpgVehicle)
     {
-        playerAccount.NotifyNotSavedState -= PersistantVehicle_DirtyNotify;
-        playerAccount.Disposed -= PersistantVehicle_Disposed;
-        await ScheduleAccountToSave(playerAccount);
+        rpgVehicle.NotifyNotSavedState -= PersistantVehicle_DirtyNotify;
+        rpgVehicle.Disposed -= PersistantVehicle_Disposed;
+        await ScheduleVehicleToSave(rpgVehicle);
     }
 
-    private async Task ScheduleAccountToSave(ISavable playerAccount)
+    private async Task ScheduleAccountToSave(PlayerAccount playerAccount)
     {
         await semaphore.WaitAsync();
         _playerAccountsToSave.Add(playerAccount);
@@ -101,7 +103,7 @@ public class PeriodicEntitySaveService
         _logger.Verbose("Scheduled account: {playerAccount} to save.", playerAccount);
     }
 
-    private async Task ScheduleVehicleToSave(ISavable persistantVehicle)
+    private async Task ScheduleVehicleToSave(RPGVehicle persistantVehicle)
     {
         await semaphore.WaitAsync();
         _persistantVehiclesToSave.Add(persistantVehicle);

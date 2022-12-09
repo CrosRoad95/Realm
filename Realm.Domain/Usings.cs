@@ -7,11 +7,12 @@ global using System.Drawing;
 global using System.Numerics;
 global using Vehicle = SlipeServer.Server.Elements.Vehicle;
 global using PersistantVehicleData = Realm.Persistance.Data.Vehicle;
-global using Realm.Persistance.Interfaces;
 global using Newtonsoft.Json;
 global using Realm.Domain.Components;
 global using System.Runtime.Serialization;
-
+global using Microsoft.AspNetCore.Identity;
+global using Microsoft.Extensions.DependencyInjection;
 global using Realm.Domain.Elements;
 global using Realm.Resources.StatisticsCounter;
 global using Realm.Server.Interfaces;
+global using Realm.Persistance.Data;

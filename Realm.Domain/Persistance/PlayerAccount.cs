@@ -1,9 +1,16 @@
-﻿using Realm.Common.Exceptions;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.EntityFrameworkCore;
+using Realm.Common.Exceptions;
+using Realm.Configuration;
+using Realm.Interfaces.Server.Services;
+using Realm.Persistance.Extensions;
+using Realm.Scripting.Extensions;
+using System.Security.Claims;
 
 namespace Realm.Persistance.Scripting.Classes;
 
 [NoDefaultScriptAccess]
-public class PlayerAccount : ISavable, IDisposable
+public class PlayerAccount : IDisposable
 {
     public const string ClaimDiscordUserIdName = "discord.user.id";
 
@@ -16,7 +23,6 @@ public class PlayerAccount : ISavable, IDisposable
     private readonly IAccountsInUseService _accountsInUseService;
     private readonly IServiceProvider _serviceProvider;
     private readonly RealmConfigurationProvider _configurationProvider;
-    private readonly ILogger _logger;
     private DateTime? _lastPlayTimeCounterStart;
     private DateTime? _loginDateTime;
     private ClaimsPrincipal? _claimsPrincipal;
@@ -113,8 +119,6 @@ public class PlayerAccount : ISavable, IDisposable
             var old = _user.Money;
             _user.Money = Math.Round(value, moneyPrecision);
             NotifyNotSavedState?.Invoke(this);
-
-            _logger.Verbose("Changed money from {oldMoney} to {money}", old, value);
         }
     }
 
@@ -143,7 +147,7 @@ public class PlayerAccount : ISavable, IDisposable
     }
 
     public PlayerAccount(SignInManager<User> signInManager, UserManager<User> userManager, IDb db, IAuthorizationService authorizationService,
-        IAccountsInUseService accountsInUseService, ILogger logger, IServiceProvider serviceProvider, RealmConfigurationProvider configurationProvider, PeriodicEntitySaveService periodicEntitySaveService)
+        IAccountsInUseService accountsInUseService, IServiceProvider serviceProvider, RealmConfigurationProvider configurationProvider)
     {
         _user = null!;
         _signInManager = signInManager;
@@ -153,10 +157,6 @@ public class PlayerAccount : ISavable, IDisposable
         _accountsInUseService = accountsInUseService;
         _serviceProvider = serviceProvider;
         _configurationProvider = configurationProvider;
-        _logger = logger
-            .ForContext<PlayerAccount>()
-            .ForContext(new PlayerAccountEnricher(this));
-        periodicEntitySaveService.AccountCreated(this);
     }
 
     public async Task<string[]> InternalGetRoles()
@@ -266,7 +266,6 @@ public class PlayerAccount : ISavable, IDisposable
             catch (Exception ex)
             {
                 _discord = null;
-                _logger.Error(ex, "Failed to initialize discord user");
                 throw;
             }
         }
@@ -280,7 +279,6 @@ public class PlayerAccount : ISavable, IDisposable
             _lastPlayTimeCounterStart = DateTime.Now;
         }
         await _userManager.UpdateAsync(_user);
-        _logger.Verbose("Account saved.");
     }
 
     [ScriptMember("isInRole")]

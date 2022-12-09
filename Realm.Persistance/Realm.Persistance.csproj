@@ -29,6 +29,7 @@
 		  <PrivateAssets>all</PrivateAssets>
 		  <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
+		<PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
         <PackageReference Include="Serilog" Version="2.12.0" />
 		<PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="7.0.0">
 		  <PrivateAssets>all</PrivateAssets>
@@ -39,7 +40,6 @@
 
 	<ItemGroup>
 	  <ProjectReference Include="..\Realm.Interfaces\Realm.Interfaces.csproj" />
-	  <ProjectReference Include="..\Realm.Scripting\Realm.Scripting.csproj" />
 	</ItemGroup>
 
 </Project>

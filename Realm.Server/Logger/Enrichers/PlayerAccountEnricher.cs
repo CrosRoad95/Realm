@@ -1,4 +1,4 @@
-﻿namespace Realm.Persistance.Logger.Enrichers;
+﻿namespace Realm.Server.Logger.Enrichers;
 
 internal class PlayerAccountEnricher : ILogEventEnricher
 {
