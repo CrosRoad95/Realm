@@ -25,8 +25,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Realm.Common", "Realm.Commo
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Realm.Configuration", "Realm.Configuration\Realm.Configuration.csproj", "{22B462AD-74A2-44F2-9D20-6B4C78CF4681}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Realm.MTARPGServer", "Realm.MTARPGServer\Realm.MTARPGServer.csproj", "{6AD80302-4597-4F95-94F2-F6F6076C9127}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Realm.WebApp", "Realm.WebApp\Realm.WebApp.csproj", "{F0BAB8CC-D627-46C1-BEEB-86ED7E3B090F}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Realm.Logging", "Realm.Logging\Realm.Logging.csproj", "{BBE03435-D579-40C6-8107-1DE73AEFE697}"
@@ -122,10 +120,6 @@ Global
 		{22B462AD-74A2-44F2-9D20-6B4C78CF4681}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{22B462AD-74A2-44F2-9D20-6B4C78CF4681}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{22B462AD-74A2-44F2-9D20-6B4C78CF4681}.Release|Any CPU.Build.0 = Release|Any CPU
-		{6AD80302-4597-4F95-94F2-F6F6076C9127}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{6AD80302-4597-4F95-94F2-F6F6076C9127}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{6AD80302-4597-4F95-94F2-F6F6076C9127}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{6AD80302-4597-4F95-94F2-F6F6076C9127}.Release|Any CPU.Build.0 = Release|Any CPU
 		{F0BAB8CC-D627-46C1-BEEB-86ED7E3B090F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{F0BAB8CC-D627-46C1-BEEB-86ED7E3B090F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F0BAB8CC-D627-46C1-BEEB-86ED7E3B090F}.Release|Any CPU.ActiveCfg = Release|Any CPU

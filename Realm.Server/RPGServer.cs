@@ -1,13 +1,9 @@
 ﻿using FluentValidation;
-using Microsoft.AspNetCore.Hosting.Server;
-using Realm.Configuration;
 using Realm.Domain.Components;
-using Realm.Domain.Elements;
 using Realm.Domain.Elements.CollisionShapes;
 using Realm.Domain.Elements.Variants;
 using Realm.Domain.Inventory;
 using Realm.Domain.Sessions;
-using Realm.Server.Interfaces;
 using Realm.Server.Serialization.Yaml;
 using YamlDotNet.Serialization.NamingConventions;
 using static Realm.Domain.Upgrades.VehicleUpgrade;
@@ -16,11 +12,6 @@ namespace Realm.Server;
 
 public partial class RPGServer : IRPGServer, IReloadable
 {
-    private readonly IDeserializer _deserializer = new DeserializerBuilder()
-            .WithNamingConvention(CamelCaseNamingConvention.Instance)
-            .WithTypeConverter(new Vector3Converter())
-            .Build();
-
     private readonly MtaServer<RPGPlayer> _server;
     private readonly EventScriptingFunctions _eventFunctions;
     private readonly ElementScriptingFunctions _elementFunctions;
@@ -28,6 +19,7 @@ public partial class RPGServer : IRPGServer, IReloadable
     private readonly GameplayScriptingFunctions _gameplayFunctions;
     private readonly LocalizationScriptingFunctions _localizationFunctions;
     private readonly IElementCollection _elementCollection;
+    private readonly ILogger _logger;
 
     public event Action<Player>? PlayerJoined;
     public event Action? ServerReloaded;
@@ -43,7 +35,7 @@ public partial class RPGServer : IRPGServer, IReloadable
         set => _server.GameType = value;
     }
 
-    public RPGServer(RealmConfigurationProvider realmConfigurationProvider, IEnumerable<IModule> modules, Action<ServerBuilder>? configureServerBuilder = null)
+    public RPGServer(RealmConfigurationProvider realmConfigurationProvider, List<IModule> modules, Action<ServerBuilder>? configureServerBuilder = null)
     {
         _server = MtaServer.CreateWithDiSupport<RPGPlayer>(
             builder =>
@@ -100,6 +92,11 @@ public partial class RPGServer : IRPGServer, IReloadable
             }
         );
 
+        _logger = GetRequiredService<ILogger>().ForContext<RPGServer>();
+
+        _logger.Information("Startin server:");
+        _logger.Information("Modules: {modules}", string.Join(", ", modules.Select(x => x.Name)));
+
         var serverListConfiguration = realmConfigurationProvider.GetRequired<ServerListConfiguration>("ServerList");
         _server.GameType = serverListConfiguration.GameType;
         _server.MapName = serverListConfiguration.MapName;
@@ -112,7 +109,7 @@ public partial class RPGServer : IRPGServer, IReloadable
         _inputFunctions = _server.GetRequiredService<InputScriptingFunctions>();
         _elementCollection = _server.GetRequiredService<IElementCollection>();
 
-        _server.PlayerJoined += Server_PlayerJoined;
+        _server.PlayerJoined += HandlePlayerJoined;
     }
 
     public void AssociateElement(Element element)
@@ -120,7 +117,7 @@ public partial class RPGServer : IRPGServer, IReloadable
         _server.AssociateElement(element);
     }
 
-    private async void Server_PlayerJoined(RPGPlayer player)
+    private async void HandlePlayerJoined(RPGPlayer player)
     {
         if (player.ResourceStartingLatch != null)
             await player.ResourceStartingLatch;
@@ -151,7 +148,6 @@ public partial class RPGServer : IRPGServer, IReloadable
         scriptingModuleInterface.AddHostObject("Localization", _localizationFunctions, true);
 
         // Classes & Events & Contextes
-        scriptingModuleInterface.AddHostType(typeof(Claim));
         scriptingModuleInterface.AddHostType(typeof(RPGPlayer));
         scriptingModuleInterface.AddHostType(typeof(RPGSpawn));
         scriptingModuleInterface.AddHostType(typeof(RPGVehicle));
@@ -211,11 +207,17 @@ public partial class RPGServer : IRPGServer, IReloadable
             module.PostInit(serviceProvider);
 
         _server.Start();
+        _logger.Information("Server started.");
     }
 
     private async Task BuildFromSeedFiles()
     {
         var basePath = "Seed";
+        IDeserializer _deserializer = new DeserializerBuilder()
+            .WithNamingConvention(CamelCaseNamingConvention.Instance)
+            .WithTypeConverter(new Vector3Converter())
+            .Build();
+
         var result = new JObject();
         var seedDatas = Directory.GetFiles(basePath).Select(seedFileName => _deserializer.Deserialize<SeedData>(File.ReadAllText(seedFileName)));
         foreach (var sourceObject in seedDatas)
@@ -254,7 +256,7 @@ public partial class RPGServer : IRPGServer, IReloadable
         foreach (var player in players)
             player.Reset();
         foreach (var player in players)
-            Server_PlayerJoined(player);
+            HandlePlayerJoined(player);
 
         RemoveAllElements();
         ServerReloaded?.Invoke();

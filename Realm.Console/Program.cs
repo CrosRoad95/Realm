@@ -1,15 +1,12 @@
 ﻿using Realm.Console;
 using Realm.Discord;
 using Realm.GRpc;
-using Realm.Interfaces.Extend;
 using Realm.Logging;
 using Realm.Scripting;
 using Realm.Server;
 using Realm.Server.Modules;
-using Serilog;
 using Serilog.Events;
 using Realm.Configuration;
-using Realm.Server.Interfaces;
 
 var logger = new RealmLogger(LogEventLevel.Verbose)
     .AddSeq()

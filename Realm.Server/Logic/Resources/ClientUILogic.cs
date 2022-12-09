@@ -1,6 +1,4 @@
-﻿using Realm.Domain.Elements;
-
-namespace Realm.Server.Logic.Resources;
+﻿namespace Realm.Server.Logic.Resources;
 
 internal class ClientUILogic
 {

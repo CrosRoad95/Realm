@@ -1,19 +1,16 @@
-﻿using Realm.Assets;
-using Realm.Resources.Overlay;
-
-namespace Realm.Server.Extensions;
+﻿namespace Realm.Server.Extensions;
 
 public static class ServerBuilderExtensions
 {
     public static ServerBuilder ConfigureServer(this ServerBuilder builder, RealmConfigurationProvider realmConfigurationProvider)
     {
-        var _serverConfiguration = realmConfigurationProvider.GetRequired<SlipeServerConfiguration>("Server");
+        var _serverConfiguration = realmConfigurationProvider.GetRequired<SlipeServer.Server.Configuration>("Server");
         var _scriptingConfiguration = realmConfigurationProvider.GetRequired<ScriptingConfiguration>("Scripting");
         builder.UseConfiguration(_serverConfiguration);
 #if DEBUG
         builder.AddDefaults(exceptBehaviours: ServerBuilderDefaultBehaviours.MasterServerAnnouncementBehaviour);
 #else
-                builder.AddDefaults();
+        builder.AddDefaults();
 #endif
 
         builder.ConfigureServices(services =>

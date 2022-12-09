@@ -1,7 +1,4 @@
-﻿using Realm.Domain.Elements;
-using static Realm.Server.Seeding.SeedData;
-
-namespace Realm.Server.Logic;
+﻿namespace Realm.Server.Logic;
 
 internal class RPGPlayerLogic
 {

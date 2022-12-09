@@ -3,6 +3,7 @@ using Realm.Interfaces.Common;
 using Realm.Interfaces.Extend;
 using Realm.Interfaces.Server;
 using Realm.Logging;
+using Realm.Scripting.Interfaces;
 using Realm.Server.Extensions;
 using Realm.Server.Factories;
 using Realm.Server.Interfaces;
@@ -77,6 +78,11 @@ internal class TestRPGServer : IReloadable, IRPGServer
     }
 
     public void AddEventHandler(string eventName, Func<LuaEvent, Task<object?>> callback)
+    {
+        //throw new NotImplementedException();
+    }
+
+    public void InitializeScripting(IScriptingModuleInterface scriptingModuleInterface)
     {
         //throw new NotImplementedException();
     }

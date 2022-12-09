@@ -1,6 +1,4 @@
-﻿using Realm.Domain.Elements;
-
-namespace Realm.Server.Logic;
+﻿namespace Realm.Server.Logic;
 
 internal class RPGVehicleLogic
 {

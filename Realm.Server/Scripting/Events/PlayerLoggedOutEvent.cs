@@ -1,6 +1,4 @@
-﻿using Realm.Domain.Elements;
-
-namespace Realm.Server.Scripting.Events;
+﻿namespace Realm.Server.Scripting.Events;
 
 public class PlayerLoggedOutEvent : INamedLuaEvent, IDisposable
 {

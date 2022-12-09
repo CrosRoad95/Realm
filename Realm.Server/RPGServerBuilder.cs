@@ -1,6 +1,4 @@
-﻿using Realm.Configuration;
-
-namespace Realm.Server;
+﻿namespace Realm.Server;
 
 public class RPGServerBuilder
 {
@@ -42,8 +40,6 @@ public class RPGServerBuilder
         if (_realmConfigurationProvider == null)
             throw new Exception();
 
-        _logger.Information("Startin server:");
-        _logger.Information("Modules: {modules}", string.Join(", ", _modules.Select(x => x.Name)));
         return new RPGServer(_realmConfigurationProvider, _modules, serverBuilder =>
         {
             serverBuilder.ConfigureServices(services =>

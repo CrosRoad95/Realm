@@ -1,6 +1,4 @@
-﻿using Realm.Domain.Elements;
-
-namespace Realm.Server.Scripting.Events;
+﻿namespace Realm.Server.Scripting.Events;
 
 [NoDefaultScriptAccess]
 public class PlayerDailyVisitEvent : INamedLuaEvent, IDisposable

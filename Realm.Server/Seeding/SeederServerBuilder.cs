@@ -1,5 +1,4 @@
-﻿using Realm.Server.Factories;
-using static Realm.Server.Seeding.SeedData;
+﻿using static Realm.Server.Seeding.SeedData;
 using VehicleUpgrade = Realm.Domain.Upgrades.VehicleUpgrade;
 
 namespace Realm.Server.Seeding;

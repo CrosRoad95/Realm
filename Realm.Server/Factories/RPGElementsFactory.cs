@@ -1,5 +1,4 @@
-﻿using Realm.Domain.Elements;
-using Realm.Domain.Elements.CollisionShapes;
+﻿using Realm.Domain.Elements.CollisionShapes;
 using Realm.Domain.Elements.Variants;
 using PersistantVehicleData = Realm.Persistance.Data.Vehicle;
 

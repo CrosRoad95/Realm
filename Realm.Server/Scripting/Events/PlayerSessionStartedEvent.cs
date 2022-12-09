@@ -1,5 +1,4 @@
-﻿using Realm.Domain.Elements;
-using Realm.Domain.Sessions;
+﻿using Realm.Domain.Sessions;
 
 namespace Realm.Server.Scripting.Events;
 
