@@ -24,7 +24,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Realm.Logging\Realm.Logging.csproj" />
-    <ProjectReference Include="..\Realm.MTARPGServer\Realm.MTARPGServer.csproj" />
   </ItemGroup>
 
 </Project>

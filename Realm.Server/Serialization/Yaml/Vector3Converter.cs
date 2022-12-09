@@ -1,4 +1,7 @@
-﻿namespace Realm.MTARPGServer.Serialization.Yaml;
+﻿using YamlDotNet.Core;
+using YamlDotNet.Core.Events;
+
+namespace Realm.Server.Serialization.Yaml;
 
 public class Vector3Converter : IYamlTypeConverter
 {

@@ -1,4 +1,5 @@
 ﻿using Realm.Domain.Elements;
+using static Realm.Server.Seeding.SeedData;
 
 namespace Realm.Server.Logic;
 
@@ -10,10 +11,11 @@ internal class RPGPlayerLogic
     private readonly LuaEventService _luaEventService;
     private readonly ChatBox _chatBox;
     private readonly AgnosticGuiSystemService _agnosticGuiSystemService;
+    private readonly AccountsInUseService _accountsInUseService;
     private readonly ILogger _logger;
 
     public RPGPlayerLogic(MtaServer mtaServer, EventScriptingFunctions eventFunctions, DebugLog debugLog, ILogger logger,
-            LuaValueMapper luaValueMapper, LuaEventService luaEventService, ChatBox chatBox, AgnosticGuiSystemService agnosticGuiSystemService)
+            LuaValueMapper luaValueMapper, LuaEventService luaEventService, ChatBox chatBox, AgnosticGuiSystemService agnosticGuiSystemService, AccountsInUseService accountsInUseService)
     {
         mtaServer.PlayerJoined += MtaServer_PlayerJoined;
         _eventFunctions = eventFunctions;
@@ -22,6 +24,7 @@ internal class RPGPlayerLogic
         _luaEventService = luaEventService;
         _chatBox = chatBox;
         _agnosticGuiSystemService = agnosticGuiSystemService;
+        _accountsInUseService = accountsInUseService;
         _logger = logger.ForContext<RPGPlayerLogic>();
     }
 
@@ -123,6 +126,7 @@ internal class RPGPlayerLogic
 
     private async void RpgPlayer_LoggedIn(RPGPlayer rpgPlayer, PlayerAccount account)
     {
+        _accountsInUseService.AssignPlayerToAccountId(rpgPlayer, account.Id);
         using var _ = LogContext.Push(new RPGPlayerEnricher(rpgPlayer));
         rpgPlayer.TriggerClientEvent(ClientEventsNames.ON_LOGGED_IN);
         using var playerLoggedInEvent = new PlayerLoggedInEvent(rpgPlayer, account);

@@ -1,4 +1,6 @@
-﻿namespace Realm.MTARPGServer;
+﻿using FluentValidation;
+
+namespace Realm.Server.Seeding;
 
 internal class SeedData
 {
@@ -8,19 +10,19 @@ internal class SeedData
         public Vector3 Position { get; set; }
         public Vector3 Rotation { get; set; }
     }
-    
+
     public class Blip
     {
         public int Icon { get; set; }
         public Vector3 Position { get; set; }
     }
-    
+
     public class Pickup
     {
         public ushort Model { get; set; }
         public Vector3 Position { get; set; }
     }
-    
+
     public class FractionMember
     {
         public string[]? Permissions { get; set; }
@@ -33,14 +35,14 @@ internal class SeedData
         public Vector3 Position { get; set; }
         public Dictionary<string, FractionMember> Members { get; set; }
     }
-    
+
     public class Account
     {
         public string Password { get; set; }
         public Dictionary<string, string> Claims { get; set; }
         public List<string> Roles { get; set; }
     }
-    
+
     public class VehicleUpgradeDescription
     {
         public float[] MaxVelocity { get; set; }

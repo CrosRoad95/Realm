@@ -1,8 +1,8 @@
 ﻿using Realm.Server.Factories;
-using static Realm.MTARPGServer.SeedData;
+using static Realm.Server.Seeding.SeedData;
 using VehicleUpgrade = Realm.Domain.Upgrades.VehicleUpgrade;
 
-namespace Realm.MTARPGServer;
+namespace Realm.Server.Seeding;
 
 internal sealed class SeederServerBuilder
 {
@@ -29,7 +29,7 @@ internal sealed class SeederServerBuilder
             throw new Exception($"Failed to assign seeded element to id {id} because it is already in used.");
     }
 
-    private void BuildSpawns(Dictionary<string, SeedData.Spawn> spawns)
+    private void BuildSpawns(Dictionary<string, Spawn> spawns)
     {
         foreach (var pair in spawns)
         {
@@ -38,7 +38,7 @@ internal sealed class SeederServerBuilder
             _logger.Information("Seeder: Created spawn of id {elementId} at {position}", pair.Key, pair.Value.Position);
         }
     }
-    
+
     private void BuildBlips(Dictionary<string, SeedData.Blip> blips)
     {
         foreach (var pair in blips)
@@ -48,7 +48,7 @@ internal sealed class SeederServerBuilder
             _logger.Information("Seeder: Created blip of id {elementId} with icon {blipIcon} at {position}", pair.Key, pair.Value.Icon, pair.Value.Position);
         }
     }
-    
+
     private void BuildPickups(Dictionary<string, SeedData.Pickup> pickups)
     {
         foreach (var pair in pickups)
@@ -58,13 +58,13 @@ internal sealed class SeederServerBuilder
             _logger.Information("Seeder: Created pickup of id {elementId} with icon {pickupModel} at {position}", pair.Key, pair.Value.Model, pair.Value.Position);
         }
     }
-    
-    private async Task BuildFractions(Dictionary<string, SeedData.Fraction> fractionsData)
+
+    private async Task BuildFractions(Dictionary<string, Fraction> fractionsData)
     {
         foreach (var pair in fractionsData)
         {
             var fraction = _elementFunctions.CreateFraction(pair.Value.Code, pair.Value.Name, pair.Value.Position);
-            if(pair.Value.Members != null)
+            if (pair.Value.Members != null)
             {
                 _logger.Information("Seeder: Created fraction {fractionCode} with members:", pair.Key);
                 foreach (var memberPair in pair.Value.Members)
@@ -87,12 +87,12 @@ internal sealed class SeederServerBuilder
         var existingRoles = await _identityFunctions.GetAllRoles();
         foreach (var roleName in roles)
         {
-            if(!existingRoles.Any(x => x.Name == roleName))
+            if (!existingRoles.Any(x => x.Name == roleName))
                 await _identityFunctions.CreateRole(roleName);
         }
     }
 
-    private async Task BuildIdentityAccounts(Dictionary<string, SeedData.Account> accounts)
+    private async Task BuildIdentityAccounts(Dictionary<string, Account> accounts)
     {
         foreach (var pair in accounts)
         {
@@ -119,7 +119,7 @@ internal sealed class SeederServerBuilder
                 MaxVelocity = new VehicleUpgrade.UpgradeDescription(upgradePair.Value.MaxVelocity),
                 EngineAcceleration = new VehicleUpgrade.UpgradeDescription(upgradePair.Value.EngineAcceleration),
             };
-            if(!_vehicleUpgradeByStringCollection.AssignElementToId(upgrade, upgradePair.Key))
+            if (!_vehicleUpgradeByStringCollection.AssignElementToId(upgrade, upgradePair.Key))
             {
                 _logger.Warning("Found duplicated upgrade: {upgradeName}", upgradePair.Key);
             }

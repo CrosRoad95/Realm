@@ -3,8 +3,8 @@ using Realm.Discord;
 using Realm.GRpc;
 using Realm.Interfaces.Extend;
 using Realm.Logging;
-using Realm.MTARPGServer;
 using Realm.Scripting;
+using Realm.Server;
 using Realm.Server.Modules;
 using Serilog;
 using Serilog.Events;
@@ -23,10 +23,9 @@ var server = new MTARPGServerImpl(serverConsole, logger, configurationProvider, 
         new ServerScriptingModule(),
         new GrpcModule(),
     });
-var seedFiles = configurationProvider.Get<string[]>("General:SeedFiles");
 try
 {
-    await server.BuildFromSeedFiles(seedFiles);
+    await server.BuildFromSeedFiles();
     server.Start();
     serverConsole.Start();
 }

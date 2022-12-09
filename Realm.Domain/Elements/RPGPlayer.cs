@@ -15,8 +15,6 @@ public class RPGPlayer : Player
 {
     private const int _RESOURCE_COUNT = 8;
     private readonly CancellationTokenSource _cancellationTokenSource;
-    private readonly AgnosticGuiSystemService _agnosticGuiSystemService;
-    private readonly IAccountsInUseService _accountsInUseService;
     private readonly MtaServer _mtaServer;
     private readonly List<SessionBase> _runningSessions = new();
     public ComponentSystem? _componentsSystem;
@@ -111,12 +109,8 @@ public class RPGPlayer : Player
     public event Action<RPGPlayer>? AllGuiClosed;
     public event Action<RPGPlayer, string>? NotificationAdded;
 
-    public RPGPlayer(AgnosticGuiSystemService agnosticGuiSystemService,
-        IAccountsInUseService accountsInUseService,
-        MtaServer mtaServer)
+    public RPGPlayer(MtaServer mtaServer)
     {
-        _agnosticGuiSystemService = agnosticGuiSystemService;
-        _accountsInUseService = accountsInUseService;
         _mtaServer = mtaServer;
         _cancellationTokenSource = new CancellationTokenSource();
         CancellationToken = _cancellationTokenSource.Token;
@@ -154,7 +148,6 @@ public class RPGPlayer : Player
     [ScriptMember("isPersistant")]
     public bool IsPersistant() => true;
 
-    [ScriptMember("triggerClientEvent")]
     public void TriggerClientEvent(string name, params object[] values)
     {
         EventTriggered?.Invoke(this, name, values);

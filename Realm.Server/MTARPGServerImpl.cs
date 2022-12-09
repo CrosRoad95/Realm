@@ -1,21 +1,22 @@
-﻿using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
+﻿using FluentValidation;
+using Realm.Server.Serialization.Yaml;
+using YamlDotNet.Serialization.NamingConventions;
 
-namespace Realm.MTARPGServer;
+namespace Realm.Server;
 
 public class MTARPGServerImpl
 {
     private readonly RPGServer _rpgServer;
-    private readonly Configuration.RealmConfigurationProvider _configurationProvider;
+    private readonly RealmConfigurationProvider _configurationProvider;
     private readonly IDeserializer _deserializer = new DeserializerBuilder()
             .WithNamingConvention(CamelCaseNamingConvention.Instance)
             .WithTypeConverter(new Vector3Converter())
             .Build();
 
     public RPGServer Server => _rpgServer;
-    public Configuration.RealmConfigurationProvider ConfigurationProvider => _configurationProvider;
+    public RealmConfigurationProvider ConfigurationProvider => _configurationProvider;
 
-    public MTARPGServerImpl(IConsoleCommands consoleCommands, ILogger logger, Realm.Configuration.RealmConfigurationProvider configurationProvider, IModule[] modules)
+    public MTARPGServerImpl(IConsoleCommands consoleCommands, ILogger logger, RealmConfigurationProvider configurationProvider, IModule[] modules)
     {
         logger.Information("Starting server");
         _configurationProvider = configurationProvider;
@@ -29,11 +30,12 @@ public class MTARPGServerImpl
         });
     }
 
-    public async Task BuildFromSeedFiles(string[] seedFileNames)
+    public async Task BuildFromSeedFiles()
     {
+        var basePath = "Seed";
         var result = new JObject();
-        var seedDatas = seedFileNames.Select(seedFileName => _deserializer.Deserialize<SeedData>(File.ReadAllText(seedFileName)));
-        foreach(var sourceObject in seedDatas)
+        var seedDatas = Directory.GetFiles(basePath).Select(seedFileName => _deserializer.Deserialize<SeedData>(File.ReadAllText(seedFileName)));
+        foreach (var sourceObject in seedDatas)
         {
             var @object = JObject.Parse(JsonConvert.SerializeObject(sourceObject));
             result.Merge(@object, new JsonMergeSettings
@@ -43,7 +45,7 @@ public class MTARPGServerImpl
         }
         var seedData = result.ToObject<SeedData>();
         if (seedData == null)
-            throw new Exception("Failed to load see data.");
+            throw new Exception("Failed to load seed data.");
 
         var seedValidator = new SeedValidator();
         await seedValidator.ValidateAndThrowAsync(seedData);

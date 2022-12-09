@@ -84,6 +84,9 @@ public partial class RPGServer : IRPGServer, IReloadable
                     services.AddTransient<RPGPickup>();
                     services.AddTransient<RPGFraction>();
                     services.AddTransient<RPGCollisionSphere>();
+
+                    // Persistance
+                    services.AddTransient<PlayerAccount>();
                     if (modules != null)
                         foreach (var module in modules)
                         {
