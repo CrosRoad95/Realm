@@ -61,9 +61,8 @@ public partial class RPGServer : IRPGServer, IReloadable
 
                     // Services
                     services.AddSingleton<RPGPlayerService>();
-                    services.AddSingleton<AccountsInUseService>();
-                    services.AddSingleton<IAccountsInUseService>(x => x.GetRequiredService<AccountsInUseService>());
-                    services.AddSingleton<PeriodicEntitySaveService>();
+                    services.AddSingleton<IAccountsInUseService, AccountsInUseService>();
+                    services.AddSingleton<IPeriodicEntitySaveService, PeriodicEntitySaveService>();
 
                     // Factories
                     services.AddSingleton<RPGElementsFactory>();

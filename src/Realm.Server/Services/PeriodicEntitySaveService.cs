@@ -1,6 +1,6 @@
 ﻿namespace Realm.Server.Services;
 
-public class PeriodicEntitySaveService
+internal sealed class PeriodicEntitySaveService : IPeriodicEntitySaveService
 {
     private readonly SemaphoreSlim semaphore = new(1);
     private readonly HashSet<PlayerAccount> _playerAccountsToSave = new();

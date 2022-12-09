@@ -5,18 +5,18 @@ using VehicleUpgrade = Realm.Domain.Upgrades.VehicleUpgrade;
 namespace Realm.Server.Scripting;
 
 [NoDefaultScriptAccess]
-public class ElementScriptingFunctions
+internal class ElementScriptingFunctions
 {
     private readonly IElementCollection _elementCollection;
     private readonly ElementByStringIdCollection _elementByStringIdCollection;
     private readonly VehicleUpgradeByStringCollection _vehicleUpgradeByStringCollection;
-    private readonly RPGElementsFactory _rpgElementsFactory;
+    private readonly IRPGElementsFactory _rpgElementsFactory;
     private readonly ILogger _logger;
 
     public ElementScriptingFunctions(IElementCollection elementCollection,
         ElementByStringIdCollection elementByStringIdCollection,
         VehicleUpgradeByStringCollection vehicleUpgradeByStringCollection,
-        ILogger logger, RPGElementsFactory rpgElementsFactory)
+        ILogger logger, IRPGElementsFactory rpgElementsFactory)
     {
         _elementCollection = elementCollection;
         _elementByStringIdCollection = elementByStringIdCollection;

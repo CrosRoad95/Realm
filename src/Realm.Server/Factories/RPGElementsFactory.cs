@@ -4,12 +4,12 @@ using PersistantVehicleData = Realm.Persistance.Data.Vehicle;
 
 namespace Realm.Server.Factories;
 
-public class RPGElementsFactory
+internal sealed class RPGElementsFactory : IRPGElementsFactory
 {
     private readonly IRPGServer _rpgServer;
     private readonly IDb _db;
     private readonly ILogger _logger;
-    private readonly PeriodicEntitySaveService _periodicEntitySaveService;
+    private readonly IPeriodicEntitySaveService _periodicEntitySaveService;
     private readonly IElementIdGenerator _elementIdGenerator;
 
     public event Action<RPGSpawn>? SpawnCreated;
@@ -17,7 +17,7 @@ public class RPGElementsFactory
     public event Action<RPGBlip>? BlipCreated;
     public event Action<RPGFraction>? FractionCreated;
 
-    public RPGElementsFactory(IRPGServer rpgServer, IDb db, ILogger logger, PeriodicEntitySaveService periodicEntitySaveService,
+    public RPGElementsFactory(IRPGServer rpgServer, IDb db, ILogger logger, IPeriodicEntitySaveService periodicEntitySaveService,
         IElementIdGenerator elementIdGenerator)
     {
         _rpgServer = rpgServer;

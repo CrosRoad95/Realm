@@ -1,6 +1,6 @@
 ﻿namespace Realm.Server.Services;
 
-public class AccountsInUseService : IAccountsInUseService
+internal class AccountsInUseService : IAccountsInUseService
 {
     private readonly ConcurrentDictionary<string, RPGPlayer> _playerByAccountId = new();
     private readonly ILogger _logger;

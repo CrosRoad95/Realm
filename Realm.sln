@@ -3,31 +3,31 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.3.32819.101
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Realm.Console", "Realm.Console\Realm.Console.csproj", "{45D93C1E-8D67-4CD3-B40A-1B5A19D4BC38}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Realm.Console", "src\Realm.Console\Realm.Console.csproj", "{45D93C1E-8D67-4CD3-B40A-1B5A19D4BC38}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Realm.Server", "Realm.Server\Realm.Server.csproj", "{2F28E678-3F92-4314-8DBA-543C494DCEE2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Realm.Server", "src\Realm.Server\Realm.Server.csproj", "{2F28E678-3F92-4314-8DBA-543C494DCEE2}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Infrastructure", "Infrastructure", "{FF8A52BA-23E6-4192-A37D-7693642A9BCE}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Realm.Persistance", "Realm.Persistance\Realm.Persistance.csproj", "{7DDBEF8D-43FF-4778-9CB3-158DDFEF6EDA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Realm.Persistance", "src\Realm.Persistance\Realm.Persistance.csproj", "{7DDBEF8D-43FF-4778-9CB3-158DDFEF6EDA}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Realm.Persistance.SQLite", "Realm.Persistance.SQLite\Realm.Persistance.SQLite.csproj", "{21D5188B-9C09-4372-B143-8E99C917CC02}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Realm.Persistance.SQLite", "src\Realm.Persistance.SQLite\Realm.Persistance.SQLite.csproj", "{21D5188B-9C09-4372-B143-8E99C917CC02}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Realm.Scripting", "Realm.Scripting\Realm.Scripting.csproj", "{03AFE959-37FE-49F8-B86F-8D44A0BB5CBE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Realm.Scripting", "src\Realm.Scripting\Realm.Scripting.csproj", "{03AFE959-37FE-49F8-B86F-8D44A0BB5CBE}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Realm.Discord", "Realm.Discord\Realm.Discord.csproj", "{0BCE6CE9-657D-4BEB-A1C7-94CF6E631BD2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Realm.Discord", "src\Realm.Discord\Realm.Discord.csproj", "{0BCE6CE9-657D-4BEB-A1C7-94CF6E631BD2}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Realm.Interfaces", "Realm.Interfaces\Realm.Interfaces.csproj", "{83778BBA-6B63-480F-8946-8986396C2756}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Realm.Interfaces", "src\Realm.Interfaces\Realm.Interfaces.csproj", "{83778BBA-6B63-480F-8946-8986396C2756}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Realm.Tests", "Realm.Tests\Realm.Tests.csproj", "{34808A81-F2EA-4B91-A69C-8B0D47AA02F4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Realm.Tests", "src\Realm.Tests\Realm.Tests.csproj", "{34808A81-F2EA-4B91-A69C-8B0D47AA02F4}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Realm.Common", "Realm.Common\Realm.Common.csproj", "{DB48C5CE-FDDA-4790-8D40-97320F39F65C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Realm.Common", "src\Realm.Common\Realm.Common.csproj", "{DB48C5CE-FDDA-4790-8D40-97320F39F65C}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Realm.Configuration", "Realm.Configuration\Realm.Configuration.csproj", "{22B462AD-74A2-44F2-9D20-6B4C78CF4681}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Realm.Configuration", "src\Realm.Configuration\Realm.Configuration.csproj", "{22B462AD-74A2-44F2-9D20-6B4C78CF4681}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Realm.WebApp", "Realm.WebApp\Realm.WebApp.csproj", "{F0BAB8CC-D627-46C1-BEEB-86ED7E3B090F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Realm.WebApp", "src\Realm.WebApp\Realm.WebApp.csproj", "{F0BAB8CC-D627-46C1-BEEB-86ED7E3B090F}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Realm.Logging", "Realm.Logging\Realm.Logging.csproj", "{BBE03435-D579-40C6-8107-1DE73AEFE697}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Realm.Logging", "src\Realm.Logging\Realm.Logging.csproj", "{BBE03435-D579-40C6-8107-1DE73AEFE697}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{1B9BCE9B-D077-4408-820D-BCA7AC3C5400}"
 	ProjectSection(SolutionItems) = preProject
@@ -38,41 +38,41 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Modules", "Modules", "{01E2
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Resources", "Resources", "{28944775-A0AF-46D4-9480-D6F4189002B7}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Realm.Resources.AgnosticGuiSystem", "Realm.Resources.AgnosticGuiSystem\Realm.Resources.AgnosticGuiSystem.csproj", "{8866FE04-0132-45EB-8CCD-635B718627D1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Realm.Resources.AgnosticGuiSystem", "src\Realm.Resources.AgnosticGuiSystem\Realm.Resources.AgnosticGuiSystem.csproj", "{8866FE04-0132-45EB-8CCD-635B718627D1}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Addons", "Addons", "{9D22264B-12E5-4387-AD6F-BF9D4AE42C3C}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Realm.Resources.Addons.AgnosticGuiSystem.CeGuiProvider", "Realm.Resources.Addons.AgnosticGuiSystem.CeGuiProvider\Realm.Resources.Addons.AgnosticGuiSystem.CeGuiProvider.csproj", "{E958D376-3262-432A-9589-4BB908D71839}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Realm.Resources.Addons.AgnosticGuiSystem.CeGuiProvider", "src\Realm.Resources.Addons.AgnosticGuiSystem.CeGuiProvider\Realm.Resources.Addons.AgnosticGuiSystem.CeGuiProvider.csproj", "{E958D376-3262-432A-9589-4BB908D71839}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Realm.Resources.Addons.Common", "Realm.Resources.Addons.Common\Realm.Resources.Addons.Common.csproj", "{4161187D-8196-4B54-AE91-D0A322D02D92}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Realm.Resources.Addons.Common", "src\Realm.Resources.Addons.Common\Realm.Resources.Addons.Common.csproj", "{4161187D-8196-4B54-AE91-D0A322D02D92}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Realm.Resources.LuaInterop", "Realm.Resources.LuaInterop\Realm.Resources.LuaInterop.csproj", "{F8E56A0F-1748-42F3-8854-05C8D47F0333}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Realm.Resources.LuaInterop", "src\Realm.Resources.LuaInterop\Realm.Resources.LuaInterop.csproj", "{F8E56A0F-1748-42F3-8854-05C8D47F0333}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Realm.Resources.ElementOutline", "RealmResources.ElementOutline\Realm.Resources.ElementOutline.csproj", "{619E271B-C4F4-4904-958E-5A90242E5001}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Realm.Resources.ElementOutline", "src\RealmResources.ElementOutline\Realm.Resources.ElementOutline.csproj", "{619E271B-C4F4-4904-958E-5A90242E5001}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Realm.Resources.Addons.AgnosticGuiSystem.DGSProvider", "Realm.Resources.Addons.AgnosticGuiSystem.DGSProvider\Realm.Resources.Addons.AgnosticGuiSystem.DGSProvider.csproj", "{0C2CED3B-543A-4F5B-8560-AC4F7EA06B61}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Realm.Resources.Addons.AgnosticGuiSystem.DGSProvider", "src\Realm.Resources.Addons.AgnosticGuiSystem.DGSProvider\Realm.Resources.Addons.AgnosticGuiSystem.DGSProvider.csproj", "{0C2CED3B-543A-4F5B-8560-AC4F7EA06B61}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Realm.Resources.AdminTools", "Realm.Resources.AdminTools\Realm.Resources.AdminTools.csproj", "{D5A5D0C4-1A42-41AF-9C36-892D676B3070}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Realm.Resources.AdminTools", "src\Realm.Resources.AdminTools\Realm.Resources.AdminTools.csproj", "{D5A5D0C4-1A42-41AF-9C36-892D676B3070}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Realm.Resources.AFK", "Realm.Resources.AFK\Realm.Resources.AFK.csproj", "{A2BD590D-31F8-46CE-861E-D6412B1867E5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Realm.Resources.AFK", "src\Realm.Resources.AFK\Realm.Resources.AFK.csproj", "{A2BD590D-31F8-46CE-861E-D6412B1867E5}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Realm.Resources.StatisticsCounter", "Realm.Resources.StatisticsCounter\Realm.Resources.StatisticsCounter.csproj", "{34ECCF24-BDCA-487E-8B15-6329EBDFBED9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Realm.Resources.StatisticsCounter", "src\Realm.Resources.StatisticsCounter\Realm.Resources.StatisticsCounter.csproj", "{34ECCF24-BDCA-487E-8B15-6329EBDFBED9}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Realm.Resources.Overlay", "Realm.Resources.Overlay\Realm.Resources.Overlay.csproj", "{D8BBA8C9-6737-48A3-8365-4471712A1801}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Realm.Resources.Overlay", "src\Realm.Resources.Overlay\Realm.Resources.Overlay.csproj", "{D8BBA8C9-6737-48A3-8365-4471712A1801}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Realm.Resources.Assets", "Realm.Resources.Assets\Realm.Resources.Assets.csproj", "{0F9B6AB9-65CA-486F-82C5-89B7F792BA9E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Realm.Resources.Assets", "src\Realm.Resources.Assets\Realm.Resources.Assets.csproj", "{0F9B6AB9-65CA-486F-82C5-89B7F792BA9E}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Realm.Assets", "Realm.Assets\Realm.Assets.csproj", "{367F717A-6E40-47C8-B997-53515335A724}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Realm.Assets", "src\Realm.Assets\Realm.Assets.csproj", "{367F717A-6E40-47C8-B997-53515335A724}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Realm.GRpc", "Realm.GRpc\Realm.GRpc.csproj", "{F4A7AEA2-542D-4C5E-9FF1-A6862D9C2154}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Realm.GRpc", "src\Realm.GRpc\Realm.GRpc.csproj", "{F4A7AEA2-542D-4C5E-9FF1-A6862D9C2154}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Realm.Grpc.Proto", "Realm.Grpc.Proto\Realm.Grpc.Proto.csproj", "{C4F530B4-1378-4E0A-BB47-044455AA8B99}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Realm.Grpc.Proto", "src\Realm.Grpc.Proto\Realm.Grpc.Proto.csproj", "{C4F530B4-1378-4E0A-BB47-044455AA8B99}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Services", "Services", "{1B4D0935-5736-4E56-B65E-0CACF26B17DD}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Realm.Services.DiscordBot", "Realm.Services.DiscordBot\Realm.Services.DiscordBot.csproj", "{439C6299-2B3A-49F9-9DED-F297F44C355B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Realm.Services.DiscordBot", "src\Realm.Services.DiscordBot\Realm.Services.DiscordBot.csproj", "{439C6299-2B3A-49F9-9DED-F297F44C355B}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Realm.Domain", "Realm.Domain\Realm.Domain.csproj", "{9A2A0372-C197-4759-8718-78AEA2F1907B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Realm.Domain", "src\Realm.Domain\Realm.Domain.csproj", "{9A2A0372-C197-4759-8718-78AEA2F1907B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

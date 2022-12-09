@@ -3,9 +3,9 @@
 internal class RPGVehicleLogic
 {
     private readonly EventScriptingFunctions _eventFunctions;
-    private readonly RPGElementsFactory _rpgElementsFactory;
+    private readonly IRPGElementsFactory _rpgElementsFactory;
 
-    public RPGVehicleLogic(EventScriptingFunctions eventFunctions, RPGElementsFactory rpgElementsFactory)
+    public RPGVehicleLogic(EventScriptingFunctions eventFunctions, IRPGElementsFactory rpgElementsFactory)
     {
         _eventFunctions = eventFunctions;
         _rpgElementsFactory = rpgElementsFactory;

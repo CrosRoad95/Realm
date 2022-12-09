@@ -5,9 +5,9 @@ namespace Realm.Server.Logic;
 internal class RPGFractionLogic
 {
     private readonly EventScriptingFunctions _eventFunctions;
-    private readonly RPGElementsFactory _rpgElementsFactory;
+    private readonly IRPGElementsFactory _rpgElementsFactory;
 
-    public RPGFractionLogic(EventScriptingFunctions eventFunctions, RPGElementsFactory rpgElementsFactory)
+    public RPGFractionLogic(EventScriptingFunctions eventFunctions, IRPGElementsFactory rpgElementsFactory)
     {
         _eventFunctions = eventFunctions;
         _rpgElementsFactory = rpgElementsFactory;

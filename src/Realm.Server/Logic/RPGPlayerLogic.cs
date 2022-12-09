@@ -8,11 +8,12 @@ internal class RPGPlayerLogic
     private readonly LuaEventService _luaEventService;
     private readonly ChatBox _chatBox;
     private readonly AgnosticGuiSystemService _agnosticGuiSystemService;
-    private readonly AccountsInUseService _accountsInUseService;
+    private readonly IAccountsInUseService _accountsInUseService;
     private readonly ILogger _logger;
 
     public RPGPlayerLogic(MtaServer mtaServer, EventScriptingFunctions eventFunctions, DebugLog debugLog, ILogger logger,
-            LuaValueMapper luaValueMapper, LuaEventService luaEventService, ChatBox chatBox, AgnosticGuiSystemService agnosticGuiSystemService, AccountsInUseService accountsInUseService)
+            LuaValueMapper luaValueMapper, LuaEventService luaEventService, ChatBox chatBox, AgnosticGuiSystemService agnosticGuiSystemService,
+            IAccountsInUseService accountsInUseService)
     {
         mtaServer.PlayerJoined += MtaServer_PlayerJoined;
         _eventFunctions = eventFunctions;
@@ -123,7 +124,8 @@ internal class RPGPlayerLogic
 
     private async void RpgPlayer_LoggedIn(RPGPlayer rpgPlayer, PlayerAccount account)
     {
-        _accountsInUseService.AssignPlayerToAccountId(rpgPlayer, account.Id);
+        // TODO: Improve
+        //_accountsInUseService.AssignPlayerToAccountId(rpgPlayer, account.Id);
         using var _ = LogContext.Push(new RPGPlayerEnricher(rpgPlayer));
         rpgPlayer.TriggerClientEvent(ClientEventsNames.ON_LOGGED_IN);
         using var playerLoggedInEvent = new PlayerLoggedInEvent(rpgPlayer, account);

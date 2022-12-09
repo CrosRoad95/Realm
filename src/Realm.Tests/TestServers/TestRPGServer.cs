@@ -2,14 +2,14 @@
 using Realm.Interfaces.Common;
 using Realm.Interfaces.Extend;
 using Realm.Interfaces.Server;
+using Realm.Interfaces.Server.Services;
 using Realm.Logging;
 using Realm.Scripting.Interfaces;
 using Realm.Server.Extensions;
 using Realm.Server.Factories;
 using Realm.Server.Interfaces;
 using Realm.Server.Modules;
-using Realm.Tests.Modules;
-using Realm.WebApp;
+using Realm.Server.Services;
 using SlipeServer.Server.Elements;
 using SlipeServer.Server.Events;
 
@@ -30,7 +30,6 @@ internal class TestRPGServer : IReloadable, IRPGServer
         {
             new DiscordModule(),
             new IdentityModule(),
-            new WebPanelModule(new TestWebPanelIntegration()),
             new ScriptingModule(),
             new ServerScriptingModule(),
         };
@@ -42,11 +41,12 @@ internal class TestRPGServer : IReloadable, IRPGServer
             {
                 services.AddSingleton(configuration);
                 services.AddSingleton<IConsole, TestConsoleCommands>();
+                services.AddSingleton<IAccountsInUseService, TestAccountsInUseService>();
                 services.AddSingleton<IReloadable>(this);
                 services.AddSingleton<IRPGServer>(this);
                 services.AddSingleton(new RealmLogger().GetLogger());
 
-                services.AddSingleton<RPGElementsFactory>();
+                services.AddSingleton<IRPGElementsFactory, TestRPGElementsFactory>();
 
                 if (modules != null)
                     foreach (var module in modules)
