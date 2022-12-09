@@ -10,10 +10,10 @@ internal class CommandsLogic
         _consoleCommands = consoleCommands;
         _commands = commands.ToList();
         _commands.Add(helpCommand);
-        _consoleCommands.CommandExecuted += CommandExecuted;
+        _consoleCommands.CommandExecuted += HandleCommandExecuted;
     }
 
-    private void CommandExecuted(string? line)
+    private void HandleCommandExecuted(string? line)
     {
         if (line == null)
             return;

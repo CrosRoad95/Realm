@@ -5,17 +5,17 @@ namespace Realm.Server.Scripting.Events;
 public class DiscordPlayerConnectedEvent : INamedLuaEvent, IDisposable
 {
     private bool _disposed = false;
-    private readonly RPGPlayer _player;
+    private readonly RPGPlayer _rpgPlayer;
     private readonly DiscordUser _discordUser;
 
     public static string EventName => "onPlayerDiscordConnected";
 
-    public RPGPlayer Player
+    public RPGPlayer rpgPlayer
     {
         get
         {
             CheckIfDisposed();
-            return _player;
+            return _rpgPlayer;
         }
     }
     
@@ -28,9 +28,9 @@ public class DiscordPlayerConnectedEvent : INamedLuaEvent, IDisposable
         }
     }
 
-    public DiscordPlayerConnectedEvent(RPGPlayer player, DiscordUser discordUser)
+    public DiscordPlayerConnectedEvent(RPGPlayer rpgPlayer, DiscordUser discordUser)
     {
-        _player = player;
+        _rpgPlayer = rpgPlayer;
         _discordUser = discordUser;
     }
 

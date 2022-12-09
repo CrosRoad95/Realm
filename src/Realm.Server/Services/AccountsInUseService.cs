@@ -25,18 +25,18 @@ internal class AccountsInUseService : IAccountsInUseService
         return _playerByAccountId.ContainsKey(id);
     }
 
-    public bool AssignPlayerToAccountId(RPGPlayer player, string id)
+    public bool AssignPlayerToAccountId(RPGPlayer rpgPlayer, string id)
     {
-        player.LoggedOut += Player_LoggedOut;
-        var success = _playerByAccountId.TryAdd(id, player);
+        rpgPlayer.LoggedOut += HandlePlayerLoggedOut;
+        var success = _playerByAccountId.TryAdd(id, rpgPlayer);
         if (success)
-            _logger.Verbose("Locked player {player} to {id} account id.", player, id);
+            _logger.Verbose("Locked player {player} to {id} account id.", rpgPlayer, id);
         else
-            _logger.Verbose("Failed to lock player {player} to {id} account id.", player, id);
+            _logger.Verbose("Failed to lock player {player} to {id} account id.", rpgPlayer, id);
         return success;
     }
 
-    private void Player_LoggedOut(RPGPlayer rpgPlayer, string id)
+    private void HandlePlayerLoggedOut(RPGPlayer rpgPlayer, string id)
     {
         FreeAccountId(id);
     }

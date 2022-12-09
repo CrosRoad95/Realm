@@ -11,20 +11,20 @@ internal class NoClipLogic
         _mtaServer = mtaServer;
         _noClipService = noClipService;
         _logger = logger;
-        _mtaServer.PlayerJoined += MtaServer_PlayerJoined;
+        _mtaServer.PlayerJoined += HandlePlayerJoined;
     }
 
-    private void MtaServer_PlayerJoined(Player player)
+    private void HandlePlayerJoined(Player player)
     {
-        ((RPGPlayer)player).NoClipStateChanged += NoClipLogic_NoClipStateChanged;
+        ((RPGPlayer)player).NoClipStateChanged += HandleNoClipStateChanged;
     }
 
-    private void NoClipLogic_NoClipStateChanged(RPGPlayer player, bool enabled)
+    private void HandleNoClipStateChanged(RPGPlayer rpgPlayer, bool enabled)
     {
         if (enabled)
             _logger.Verbose("Enabled no clip");
         else
             _logger.Verbose("Disabled no clip");
-        _noClipService.SetEnabledTo(player, enabled);
+        _noClipService.SetEnabledTo(rpgPlayer, enabled);
     }
 }

@@ -21,13 +21,13 @@ internal class AdminToolsLogic
         _resource = mtaServer.GetAdditionalResource<AdminToolsResource>();
         _luaEventService = luaEventService;
         _elementCollection = elementCollection;
-        adminToolsService.AdminToolsDisabled += AdminToolsService_AdminToolsDisabled;
-        adminToolsService.AdminToolsEnabled += AdminToolsService_AdminToolsEnabled;
-        mtaServer.LuaEventTriggered += MtaServer_LuaEventTriggered;
-        mtaServer.ElementCreated += MtaServer_ElementCreated;
+        adminToolsService.AdminToolsDisabled += HandleAdminToolsDisabled;
+        adminToolsService.AdminToolsEnabled += HandleAdminToolsEnabled;
+        mtaServer.LuaEventTriggered += HandleLuaEventTriggered;
+        mtaServer.ElementCreated += HandleElementCreated;
     }
 
-    private void MtaServer_ElementCreated(Element element)
+    private void HandleElementCreated(Element element)
     {
         SendElementsDebugInfoToPlayers(element);
     }
@@ -68,7 +68,7 @@ internal class AdminToolsLogic
         if (_debugWorldSubscribers.Contains(player))
             return;
         _debugWorldSubscribers.Add(player);
-        player.Disconnected += Player_Disconnected;
+        player.Disconnected += HandlePlayerDisconnected;
         SendAllElementsDebugInfoToPlayer(player);
     }
     
@@ -77,15 +77,15 @@ internal class AdminToolsLogic
         if (!_debugWorldSubscribers.Contains(player))
             return;
         _debugWorldSubscribers.Remove(player);
-        player.Disconnected -= Player_Disconnected;
+        player.Disconnected -= HandlePlayerDisconnected;
     }
 
-    private void Player_Disconnected(Player sender, SlipeServer.Server.Elements.Events.PlayerQuitEventArgs e)
+    private void HandlePlayerDisconnected(Player sender, SlipeServer.Server.Elements.Events.PlayerQuitEventArgs e)
     {
         UnsubscribeToDrawWorld(sender);
     }
 
-    private void MtaServer_LuaEventTriggered(LuaEvent luaEvent)
+    private void HandleLuaEventTriggered(LuaEvent luaEvent)
     {
         switch(luaEvent.Name)
         {
@@ -98,12 +98,12 @@ internal class AdminToolsLogic
         }
     }
 
-    private void AdminToolsService_AdminToolsEnabled(Player player)
+    private void HandleAdminToolsEnabled(Player player)
     {
         _luaEventService.TriggerEventFor(player, "internalSetAdminToolsEnabled", player, true);
     }
 
-    private void AdminToolsService_AdminToolsDisabled(Player player)
+    private void HandleAdminToolsDisabled(Player player)
     {
         _luaEventService.TriggerEventFor(player, "internalSetAdminToolsEnabled", player, false);
     }

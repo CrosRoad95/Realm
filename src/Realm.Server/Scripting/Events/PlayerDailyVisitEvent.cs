@@ -4,19 +4,19 @@
 public class PlayerDailyVisitEvent : INamedLuaEvent, IDisposable
 {
     private bool _disposed = false;
-    private readonly RPGPlayer _player;
+    private readonly RPGPlayer _rpgPlayer;
     private readonly int _visitsInRow;
     private readonly bool _reseted;
 
     public static string EventName => "onPlayerDailyVisit";
 
     [ScriptMember("player")]
-    public RPGPlayer Player
+    public RPGPlayer rpgPlayer
     {
         get
         {
             CheckIfDisposed();
-            return _player;
+            return _rpgPlayer;
         }
     }
 
@@ -41,9 +41,9 @@ public class PlayerDailyVisitEvent : INamedLuaEvent, IDisposable
         }
     }
 
-    public PlayerDailyVisitEvent(RPGPlayer player, int visitsInRow, bool reseted)
+    public PlayerDailyVisitEvent(RPGPlayer rpgPlayer, int visitsInRow, bool reseted)
     {
-        _player = player;
+        _rpgPlayer = rpgPlayer;
         _visitsInRow = visitsInRow;
         _reseted = reseted;
     }

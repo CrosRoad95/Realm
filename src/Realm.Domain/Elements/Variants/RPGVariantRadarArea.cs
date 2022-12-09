@@ -12,29 +12,29 @@ public class RPGVariantRadarArea
         _rpgRadarArea = rpgRadarArea;
     }
 
-    public void DestroyFor(RPGPlayer player)
+    public void DestroyFor(RPGPlayer rpgPlayer)
     {
-        if (!_createdFor.Contains(player))
+        if (!_createdFor.Contains(rpgPlayer))
             throw new Exception("RadarArea is already cleared for this player.");
 
-        _rpgRadarArea.DestroyFor(player);
-        _createdFor.Remove(player);
-        player.Disconnected -= Player_Disconnected;
+        _rpgRadarArea.DestroyFor(rpgPlayer);
+        _createdFor.Remove(rpgPlayer);
+        rpgPlayer.Disconnected -= HandlePlayerDisconnected;
     }
 
-    public void CreateFor(RPGPlayer player, Color color, bool flashing = false)
+    public void CreateFor(RPGPlayer rpgPlayer, Color color, bool flashing = false)
     {
-        if (_createdFor.Contains(player))
-            DestroyFor(player);
+        if (_createdFor.Contains(rpgPlayer))
+            DestroyFor(rpgPlayer);
 
         _rpgRadarArea.Color = color;
         _rpgRadarArea.IsFlashing = flashing;
-        _rpgRadarArea.CreateFor(player);
-        _createdFor.Add(player);
-        player.Disconnected += Player_Disconnected;
+        _rpgRadarArea.CreateFor(rpgPlayer);
+        _createdFor.Add(rpgPlayer);
+        rpgPlayer.Disconnected += HandlePlayerDisconnected;
     }
 
-    private void Player_Disconnected(Player sender, PlayerQuitEventArgs e)
+    private void HandlePlayerDisconnected(Player sender, PlayerQuitEventArgs e)
     {
         DestroyFor((RPGPlayer)sender);
     }

@@ -25,13 +25,13 @@ internal class DiscordClient
         _commandHandler = commandHandler;
         _botIdProvider = botIdProvider;
         _logger = logger;
-        _client.Ready += ClientReady;
-        _client.Log += LogAsync;
-        _client.GuildMemberUpdated += GuildMemberUpdated;
+        _client.Ready += HandleReady;
+        _client.Log += HandleLog;
+        _client.GuildMemberUpdated += HandleGuildMemberUpdated;
         _handshakeClient = new(grpcChannel);
     }
 
-    private async Task GuildMemberUpdated(Cacheable<SocketGuildUser, ulong> arg1, SocketGuildUser sockerGuildUser)
+    private async Task HandleGuildMemberUpdated(Cacheable<SocketGuildUser, ulong> arg1, SocketGuildUser sockerGuildUser)
     {
         //await _discordUserChangedHandler.Handle(new DiscordUser(sockerGuildUser));
     }
@@ -42,7 +42,7 @@ internal class DiscordClient
         await _client.StartAsync();
     }
 
-    private async Task ClientReady()
+    private async Task HandleReady()
     {
         var guild = _client.GetGuild(_discordConfiguration.Guild);
         if (guild == null)
@@ -56,7 +56,7 @@ internal class DiscordClient
         await _commandHandler.InitializeAsync();
     }
 
-    private Task LogAsync(LogMessage log)
+    private Task HandleLog(LogMessage log)
     {
         _logger.Information(log.ToString());
         return Task.CompletedTask;

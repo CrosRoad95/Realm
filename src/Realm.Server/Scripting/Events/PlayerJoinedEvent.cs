@@ -3,22 +3,22 @@
 public class PlayerJoinedEvent : INamedLuaEvent, IDisposable
 {
     private bool _disposed = false;
-    private readonly RPGPlayer _player;
+    private readonly RPGPlayer _rpgPlayer;
 
     public static string EventName => "onPlayerJoin";
 
-    public RPGPlayer Player
+    public RPGPlayer rpgPlayer
     {
         get
         {
             CheckIfDisposed();
-            return _player;
+            return _rpgPlayer;
         }
     }
 
-    public PlayerJoinedEvent(RPGPlayer player)
+    public PlayerJoinedEvent(RPGPlayer rpgPlayer)
     {
-        _player = player;
+        _rpgPlayer = rpgPlayer;
     }
 
     private void CheckIfDisposed()

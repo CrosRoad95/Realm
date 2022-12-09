@@ -21,11 +21,11 @@ internal class StatisticCounterLogic
         server.PlayerJoined += HandlePlayerJoin;
 
         _resource = server.GetAdditionalResource<StatisticsCounterResource>();
-        _statisticsCounterService.CounterStateChanged += StatisticsCounterResource_CounterStateChanged;
+        _statisticsCounterService.CounterStateChanged += HandleCounterStateChanged;
         luaEventService.AddEventHandler("internalCollectStatistics", HandleCollectStatistics);
     }
 
-    private void StatisticsCounterResource_CounterStateChanged(Player player, bool enabled)
+    private void HandleCounterStateChanged(Player player, bool enabled)
     {
         if (enabled)
         {

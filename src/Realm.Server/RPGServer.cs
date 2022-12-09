@@ -116,13 +116,13 @@ public partial class RPGServer : IRPGServer, IReloadable
         _server.AssociateElement(element);
     }
 
-    private async void HandlePlayerJoined(RPGPlayer player)
+    private async void HandlePlayerJoined(RPGPlayer rpgPlayer)
     {
-        if (player.ResourceStartingLatch != null)
-            await player.ResourceStartingLatch;
+        if (rpgPlayer.ResourceStartingLatch != null)
+            await rpgPlayer.ResourceStartingLatch;
 
-        player.ResourceStartingLatch = new();
-        using var playerJoinedEvent = new PlayerJoinedEvent(player);
+        rpgPlayer.ResourceStartingLatch = new();
+        using var playerJoinedEvent = new PlayerJoinedEvent(rpgPlayer);
         await _eventFunctions.InvokeEvent(playerJoinedEvent);
     }
 

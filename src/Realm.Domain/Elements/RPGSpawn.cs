@@ -57,15 +57,15 @@ public class RPGSpawn : Element, IDisposable, IWorldDebugData
     }
 
     [ScriptMember("isAuthorized")]
-    public async Task<bool> IsAuthorized(RPGPlayer player)
+    public async Task<bool> IsAuthorized(RPGPlayer rpgPlayer)
     {
         CheckIfDisposed();
-        if (player.Account == null)
+        if (rpgPlayer.Account == null)
             return false;
 
         foreach (var policyName in _requiredPolices)
         {
-            var result = await player.Account.AuthorizePolicy(policyName);
+            var result = await rpgPlayer.Account.AuthorizePolicy(policyName);
             if (!result)
                 return false;
         }

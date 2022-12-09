@@ -9,20 +9,20 @@ internal class RPGVehicleLogic
     {
         _eventFunctions = eventFunctions;
         _rpgElementsFactory = rpgElementsFactory;
-        _rpgElementsFactory.VehicleCreated += RPGElementsFactory_VehicleCreated;
+        _rpgElementsFactory.VehicleCreated += HandleVehicleCreated;
     }
 
-    private void RPGElementsFactory_VehicleCreated(RPGVehicle rpgVehicle)
+    private void HandleVehicleCreated(RPGVehicle rpgVehicle)
     {
-        rpgVehicle.Spawned += RPGVehicle_Spawned;
+        rpgVehicle.Spawned += HandleSpawned;
 
         rpgVehicle.Destroyed += e =>
         {
-            rpgVehicle.Spawned -= RPGVehicle_Spawned;
+            rpgVehicle.Spawned -= HandleSpawned;
         };
     }
 
-    private async void RPGVehicle_Spawned(RPGVehicle vehicle, RPGSpawn? spawn)
+    private async void HandleSpawned(RPGVehicle vehicle, RPGSpawn? spawn)
     {
         using var vehicleSpawnedEvent = new VehicleSpawnedEvent(vehicle, spawn);
         await _eventFunctions.InvokeEvent(vehicleSpawnedEvent);

@@ -25,12 +25,12 @@ public class CommandHandler
         _client.InteractionCreated += HandleInteraction;
 
         // process the command execution results 
-        _interactionService.SlashCommandExecuted += SlashCommandExecuted;
-        _interactionService.ContextCommandExecuted += ContextCommandExecuted;
-        _interactionService.ComponentCommandExecuted += ComponentCommandExecuted;
+        _interactionService.SlashCommandExecuted += HandleSlashCommandExecuted;
+        _interactionService.ContextCommandExecuted += HandleContextCommandExecuted;
+        _interactionService.ComponentCommandExecuted += HandleComponentCommandExecuted;
     }
 
-    private Task ComponentCommandExecuted(ComponentCommandInfo arg1, IInteractionContext arg2, IResult arg3)
+    private Task HandleComponentCommandExecuted(ComponentCommandInfo arg1, IInteractionContext arg2, IResult arg3)
     {
         if (!arg3.IsSuccess)
         {
@@ -59,7 +59,7 @@ public class CommandHandler
         return Task.CompletedTask;
     }
 
-    private Task ContextCommandExecuted(ContextCommandInfo arg1, IInteractionContext arg2, IResult arg3)
+    private Task HandleContextCommandExecuted(ContextCommandInfo arg1, IInteractionContext arg2, IResult arg3)
     {
         if (!arg3.IsSuccess)
         {
@@ -88,7 +88,7 @@ public class CommandHandler
         return Task.CompletedTask;
     }
 
-    private Task SlashCommandExecuted(SlashCommandInfo arg1, IInteractionContext arg2, IResult arg3)
+    private Task HandleSlashCommandExecuted(SlashCommandInfo arg1, IInteractionContext arg2, IResult arg3)
     {
         if (!arg3.IsSuccess)
         {

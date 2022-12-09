@@ -3,9 +3,9 @@
 [NoDefaultScriptAccess]
 public class FractionSession : SessionBase
 {
-    private readonly RPGPlayer _player;
-    public FractionSession(string code, RPGPlayer player) : base(code)
+    private readonly RPGPlayer _rpgPlayer;
+    public FractionSession(string code, RPGPlayer rpgPlayer) : base(code)
     {
-        _player = player;
+        _rpgPlayer = rpgPlayer;
     }
 }

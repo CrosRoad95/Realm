@@ -11,17 +11,17 @@ internal class OverlayLogic
     {
         _mtaServer = mtaServer;
         _overlayNotificationsService = overlayNotificationsService;
-        _mtaServer.PlayerJoined += MtaServer_PlayerJoined;
+        _mtaServer.PlayerJoined += HandlePlayerJoined;
     }
 
-    private void MtaServer_PlayerJoined(Player player)
+    private void HandlePlayerJoined(Player player)
     {
         RPGPlayer rpgPlayer = (RPGPlayer)player;
-        rpgPlayer.NotificationAdded += rpgPlayer_NotificationAdded;
+        rpgPlayer.NotificationAdded += HandleNotificationAdded;
     }
 
-    private void rpgPlayer_NotificationAdded(RPGPlayer player, string message)
+    private void HandleNotificationAdded(RPGPlayer rpgPlayer, string message)
     {
-        _overlayNotificationsService.AddNotification(player, message);
+        _overlayNotificationsService.AddNotification(rpgPlayer, message);
     }
 }

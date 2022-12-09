@@ -3,17 +3,17 @@
 public class PlayerLoggedInEvent : INamedLuaEvent, IDisposable
 {
     private bool _disposed = false;
-    private readonly RPGPlayer _player;
+    private readonly RPGPlayer _rpgPlayer;
     private readonly PlayerAccount _account;
 
     public static string EventName => "onPlayerLogin";
 
-    public RPGPlayer Player
+    public RPGPlayer rpgPlayer
     {
         get
         {
             CheckIfDisposed();
-            return _player;
+            return _rpgPlayer;
         }
     }
 
@@ -26,9 +26,9 @@ public class PlayerLoggedInEvent : INamedLuaEvent, IDisposable
         }
     }
 
-    public PlayerLoggedInEvent(RPGPlayer player, PlayerAccount account)
+    public PlayerLoggedInEvent(RPGPlayer rpgPlayer, PlayerAccount account)
     {
-        _player = player;
+        _rpgPlayer = rpgPlayer;
         _account = account;
     }
 

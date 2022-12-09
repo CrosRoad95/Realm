@@ -30,11 +30,11 @@ public class AdminToolsService
         if(succeed)
         {
             AdminToolsEnabled?.Invoke(player);
-            player.Disconnected += Player_Disconnected;
+            player.Disconnected += HandlePlayerDisconnected;
         }
     }
 
-    private void Player_Disconnected(Player player, PlayerQuitEventArgs e)
+    private void HandlePlayerDisconnected(Player player, PlayerQuitEventArgs e)
     {
         _semaphoreSlim.Wait();
         _enabledForPlayers.Remove(player);
@@ -50,7 +50,7 @@ public class AdminToolsService
         if(succeed)
         {
             AdminToolsDisabled?.Invoke(player);
-            player.Disconnected -= Player_Disconnected;
+            player.Disconnected -= HandlePlayerDisconnected;
         }
     }
 }

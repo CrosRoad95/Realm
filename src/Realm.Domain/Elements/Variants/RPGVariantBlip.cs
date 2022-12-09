@@ -12,31 +12,31 @@ public class RPGVariantBlip
         _rpgBlip = rpgBlip;
     }
 
-    public void DestroyFor(RPGPlayer player)
+    public void DestroyFor(RPGPlayer rpgPlayer)
     {
-        if (!_createdFor.Contains(player))
+        if (!_createdFor.Contains(rpgPlayer))
             throw new Exception("Blip is already cleared for this player.");
 
-        _rpgBlip.DestroyFor(player);
-        _createdFor.Remove(player);
-        player.Disconnected -= Player_Disconnected;
+        _rpgBlip.DestroyFor(rpgPlayer);
+        _createdFor.Remove(rpgPlayer);
+        rpgPlayer.Disconnected -= HandlePlayerDisconnected;
     }
 
-    public void CreateFor(RPGPlayer player, int icon)
+    public void CreateFor(RPGPlayer rpgPlayer, int icon)
     {
         if (!Enum.IsDefined(typeof(BlipIcon), icon))
             throw new Exception("Invalid icon.");
 
-        if (_createdFor.Contains(player))
-            DestroyFor(player);
+        if (_createdFor.Contains(rpgPlayer))
+            DestroyFor(rpgPlayer);
 
         _rpgBlip.Icon = (BlipIcon)icon;
-        _rpgBlip.CreateFor(player);
-        _createdFor.Add(player);
-        player.Disconnected += Player_Disconnected;
+        _rpgBlip.CreateFor(rpgPlayer);
+        _createdFor.Add(rpgPlayer);
+        rpgPlayer.Disconnected += HandlePlayerDisconnected;
     }
 
-    private void Player_Disconnected(Player sender, PlayerQuitEventArgs e)
+    private void HandlePlayerDisconnected(Player sender, PlayerQuitEventArgs e)
     {
         DestroyFor((RPGPlayer)sender);
     }

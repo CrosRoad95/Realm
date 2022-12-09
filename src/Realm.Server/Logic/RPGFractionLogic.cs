@@ -11,22 +11,22 @@ internal class RPGFractionLogic
     {
         _eventFunctions = eventFunctions;
         _rpgElementsFactory = rpgElementsFactory;
-        _rpgElementsFactory.FractionCreated += RPGElementsFactory_FractionCreated;
+        _rpgElementsFactory.FractionCreated += HandleFractionCreated;
     }
 
-    private void RPGElementsFactory_FractionCreated(RPGFraction fraction)
+    private void HandleFractionCreated(RPGFraction fraction)
     {
-        fraction.SessionStarted += Fraction_SessionStarted;
-        fraction.SessionStopped += Fraction_SessionStopped;
+        fraction.SessionStarted += HandleSessionStarted;
+        fraction.SessionStopped += HandleSessionStopped;
     }
 
-    private async void Fraction_SessionStarted(Player player, FractionSession session)
+    private async void HandleSessionStarted(Player player, FractionSession session)
     {
         using var playerSessionStarted = new PlayerSessionStartedEvent((RPGPlayer)player, session);
         await _eventFunctions.InvokeEvent(playerSessionStarted);
     }
 
-    private async void Fraction_SessionStopped(Player player, FractionSession session)
+    private async void HandleSessionStopped(Player player, FractionSession session)
     {
         using var playerSessionStarted = new PlayerSessionStoppedEvent((RPGPlayer)player, session);
         await _eventFunctions.InvokeEvent(playerSessionStarted);

@@ -71,15 +71,15 @@ public class MileageCounterComponent : IElementComponent
 
     private void RegisterEvents()
     {
-        _rpgVehicle.PositionChanged += PositionChanged;
+        _rpgVehicle.PositionChanged += HandlePositionChanged;
     }
 
     private void UnregisterEvents()
     {
-        _rpgVehicle.PositionChanged -= PositionChanged;
+        _rpgVehicle.PositionChanged -= HandlePositionChanged;
     }
 
-    private void PositionChanged(Element sender, ElementChangedEventArgs<Vector3> args)
+    private void HandlePositionChanged(Element sender, ElementChangedEventArgs<Vector3> args)
     {
         if (args.IsSync)
             Update();

@@ -5,17 +5,17 @@ namespace Realm.Server.Scripting.Events;
 public class PlayerSessionStoppedEvent : INamedLuaEvent, IDisposable
 {
     private bool _disposed = false;
-    private readonly RPGPlayer _player;
+    private readonly RPGPlayer _rpgPlayer;
     private readonly SessionBase _session;
 
     public static string EventName => "onPlayerSessionStopped";
 
-    public RPGPlayer Player
+    public RPGPlayer rpgPlayer
     {
         get
         {
             CheckIfDisposed();
-            return _player;
+            return _rpgPlayer;
         }
     }
     
@@ -28,9 +28,9 @@ public class PlayerSessionStoppedEvent : INamedLuaEvent, IDisposable
         }
     }
 
-    public PlayerSessionStoppedEvent(RPGPlayer player, SessionBase session)
+    public PlayerSessionStoppedEvent(RPGPlayer rpgPlayer, SessionBase session)
     {
-        _player = player;
+        _rpgPlayer = rpgPlayer;
         _session = session;
     }
 

@@ -8,7 +8,7 @@ public class FormContextEvent : INamedLuaEvent, IDisposable
 
     public static string EventName => "onFormSubmit";
 
-    public RPGPlayer Player
+    public RPGPlayer rpgPlayer
     {
         get
         {

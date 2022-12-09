@@ -13,31 +13,31 @@ public class RPGVariantPickup
         _rpgPickup = rpgPickup;
     }
 
-    public void DestroyFor(RPGPlayer player)
+    public void DestroyFor(RPGPlayer rpgPlayer)
     {
-        if (!_createdFor.Contains(player))
+        if (!_createdFor.Contains(rpgPlayer))
             throw new Exception("Pickup is already cleared for this player.");
 
-        _rpgPickup.DestroyFor(player);
-        _createdFor.Remove(player);
-        player.Disconnected -= Player_Disconnected;
+        _rpgPickup.DestroyFor(rpgPlayer);
+        _createdFor.Remove(rpgPlayer);
+        rpgPlayer.Disconnected -= HandlePlayerDisconnected;
     }
 
-    public void CreateFor(RPGPlayer player, ushort model)
+    public void CreateFor(RPGPlayer rpgPlayer, ushort model)
     {
         if (!Enum.IsDefined(typeof(PickupModel), model))
             throw new Exception("Invalid pickup model.");
 
-        if (_createdFor.Contains(player))
-            DestroyFor(player);
+        if (_createdFor.Contains(rpgPlayer))
+            DestroyFor(rpgPlayer);
 
         _rpgPickup.Model = model;
-        _rpgPickup.CreateFor(player);
-        _createdFor.Add(player);
-        player.Disconnected += Player_Disconnected;
+        _rpgPickup.CreateFor(rpgPlayer);
+        _createdFor.Add(rpgPlayer);
+        rpgPlayer.Disconnected += HandlePlayerDisconnected;
     }
 
-    private void Player_Disconnected(Player sender, PlayerQuitEventArgs e)
+    private void HandlePlayerDisconnected(Player sender, PlayerQuitEventArgs e)
     {
         DestroyFor((RPGPlayer)sender);
     }

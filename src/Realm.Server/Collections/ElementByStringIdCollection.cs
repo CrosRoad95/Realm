@@ -11,16 +11,16 @@ public sealed class ElementByStringIdCollection
             return false;
         _elementsById[id] = element;
         _idByElement[element] = id;
-        element.Destroyed += Element_Destroyed;
+        element.Destroyed += HandleDestroyed;
         return true;
     }
 
-    private void Element_Destroyed(Element element)
+    private void HandleDestroyed(Element element)
     {
         var id = GetElementId(element);
         _elementsById.Remove(id);
         _idByElement.Remove(element);
-        element.Destroyed -= Element_Destroyed;
+        element.Destroyed -= HandleDestroyed;
     }
 
     public string? GetElementId(Element element)

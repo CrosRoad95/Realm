@@ -44,13 +44,13 @@ public class StatisticsCounterComponent : IElementComponent
         if (element is not RPGPlayer rpgPlayer)
             throw new Exception("Not supported element type, expected: RPGPlayer");
         _player = rpgPlayer;
-        _player.LoggedOut += LoggedOut;
+        _player.LoggedOut += HandleLoggedOut;
         _statisticsCounterService = rpgPlayer.MtaServer.GetRequiredService<StatisticsCounterService>();
         _statisticsCounterService.SetCounterEnabledFor(_player, true);
-        _statisticsCounterService.StatisticsCollected += StatisticsCounterService_StatisticsCollected;
+        _statisticsCounterService.StatisticsCollected += HandleStatisticsCollected;
     }
 
-    private void StatisticsCounterService_StatisticsCollected(Player player, Dictionary<string, float> statistics)
+    private void HandleStatisticsCollected(Player player, Dictionary<string, float> statistics)
     {
         if (player != _player)
             return;
@@ -70,9 +70,9 @@ public class StatisticsCounterComponent : IElementComponent
             TraveledDistanceInAir += value;
     }
 
-    private void LoggedOut(RPGPlayer player, string accountId)
+    private void HandleLoggedOut(RPGPlayer rpgPlayer, string accountId)
     {
-        _player.LoggedOut -= LoggedOut;
+        _player.LoggedOut -= HandleLoggedOut;
         _statisticsCounterService.SetCounterEnabledFor(_player, false);
     }
 

@@ -11,25 +11,25 @@ internal class AdminToolsLogic
         _mtaServer = mtaServer;
         _adminToolsService = adminToolsService;
         _logger = logger;
-        _mtaServer.PlayerJoined += _mtaServer_PlayerJoined;
+        _mtaServer.PlayerJoined += HandlePlayerJoined;
     }
 
-    private void _mtaServer_PlayerJoined(Player player)
+    private void HandlePlayerJoined(Player player)
     {
-        ((RPGPlayer)player).AdminToolsStateChanged += AdminToolsLogic_AdminToolsStateChanged;
+        ((RPGPlayer)player).AdminToolsStateChanged += HandleAdminToolsStateChanged;
     }
 
-    private void AdminToolsLogic_AdminToolsStateChanged(RPGPlayer player, bool enabled)
+    private void HandleAdminToolsStateChanged(RPGPlayer rpgPlayer, bool enabled)
     {
         if (enabled)
         {
-            _logger.Verbose("{player} enabled admin tools", player);
-            _adminToolsService.EnableAdminToolsForPlayer(player);
+            _logger.Verbose("{player} enabled admin tools", rpgPlayer);
+            _adminToolsService.EnableAdminToolsForPlayer(rpgPlayer);
         }
         else
         {
-            _logger.Verbose("{player} disabled admin tools", player);
-            _adminToolsService.DisableAdminToolsForPlayer(player);
+            _logger.Verbose("{player} disabled admin tools", rpgPlayer);
+            _adminToolsService.DisableAdminToolsForPlayer(rpgPlayer);
         }
     }
 }

@@ -10,12 +10,12 @@ internal class ClientUILogic
         _eventFunctions = eventFunctions;
         _fromLuaValueMapper = fromLuaValueMapper;
 
-        agnosticGuiSystemService.FormSubmitted += FormSubmitted;
-        agnosticGuiSystemService.GuiCloseRequested += GuiCloseRequested;
-        agnosticGuiSystemService.GuiNavigationRequested += GuiNavigationRequested;
+        agnosticGuiSystemService.FormSubmitted += HandleFormSubmitted;
+        agnosticGuiSystemService.GuiCloseRequested += HandleGuiCloseRequested;
+        agnosticGuiSystemService.GuiNavigationRequested += HandleGuiNavigationRequested;
     }
 
-    private void GuiNavigationRequested(LuaEvent luaEvent)
+    private void HandleGuiNavigationRequested(LuaEvent luaEvent)
     {
         string? guiName = _fromLuaValueMapper.Map(typeof(string), luaEvent.Parameters[1]) as string;
         if (guiName == null)
@@ -26,13 +26,13 @@ internal class ClientUILogic
         player.OpenGui(guiName);
     }
 
-    private void GuiCloseRequested(LuaEvent luaEvent)
+    private void HandleGuiCloseRequested(LuaEvent luaEvent)
     {
         var player = (RPGPlayer)luaEvent.Player;
         player.CloseAllGuis();
     }
 
-    private async void FormSubmitted(LuaEvent luaEvent)
+    private async void HandleFormSubmitted(LuaEvent luaEvent)
     {
         var formContext = new FormContextEvent(luaEvent, _fromLuaValueMapper);
         await _eventFunctions.InvokeEvent(formContext);

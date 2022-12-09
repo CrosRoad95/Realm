@@ -59,37 +59,37 @@ internal sealed class PeriodicEntitySaveService : IPeriodicEntitySaveService
 
     public void AccountCreated(PlayerAccount playerAccount)
     {
-        playerAccount.NotifyNotSavedState += PlayerAccount_DirtyNotify;
-        playerAccount.Disposed += PlayerAccount_Disposed;
+        playerAccount.NotifyNotSavedState += HandleDirtyNotify;
+        playerAccount.Disposed += HandleDisposed;
     }
 
     public void VehicleCreated(RPGVehicle persistantVehicle)
     {
-        persistantVehicle.NotifyNotSavedState += PersistantVehicle_DirtyNotify;
-        persistantVehicle.Disposed += PersistantVehicle_Disposed;
+        persistantVehicle.NotifyNotSavedState += HandleDirtyNotify;
+        persistantVehicle.Disposed += HandleDisposed;
     }
 
-    private async void PlayerAccount_DirtyNotify(PlayerAccount playerAccount)
+    private async void HandleDirtyNotify(PlayerAccount playerAccount)
     {
         await ScheduleAccountToSave(playerAccount);
     }
 
-    private async void PlayerAccount_Disposed(PlayerAccount playerAccount)
+    private async void HandleDisposed(PlayerAccount playerAccount)
     {
-        playerAccount.NotifyNotSavedState -= PlayerAccount_DirtyNotify;
-        playerAccount.Disposed -= PlayerAccount_Disposed;
+        playerAccount.NotifyNotSavedState -= HandleDirtyNotify;
+        playerAccount.Disposed -= HandleDisposed;
         await ScheduleAccountToSave(playerAccount);
     }
 
-    private async void PersistantVehicle_DirtyNotify(RPGVehicle persistantVehicle)
+    private async void HandleDirtyNotify(RPGVehicle persistantVehicle)
     {
         await ScheduleVehicleToSave(persistantVehicle);
     }
 
-    private async void PersistantVehicle_Disposed(RPGVehicle rpgVehicle)
+    private async void HandleDisposed(RPGVehicle rpgVehicle)
     {
-        rpgVehicle.NotifyNotSavedState -= PersistantVehicle_DirtyNotify;
-        rpgVehicle.Disposed -= PersistantVehicle_Disposed;
+        rpgVehicle.NotifyNotSavedState -= HandleDirtyNotify;
+        rpgVehicle.Disposed -= HandleDisposed;
         await ScheduleVehicleToSave(rpgVehicle);
     }
 

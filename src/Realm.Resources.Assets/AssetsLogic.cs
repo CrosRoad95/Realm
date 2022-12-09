@@ -20,12 +20,12 @@ internal class AssetsLogic
         _resource = server.GetAdditionalResource<AssetsResource>();
         _assetsService = assetsService;
         _luaEventService = luaEventService;
-        _assetsService.ModelAdded += AssetsService_ModelAdded;
+        _assetsService.ModelAdded += HandleModelAdded;
         luaEventService.AddEventHandler("internalRequestChecksums", HandleRequestChecksums);
         luaEventService.AddEventHandler("internalRequestAsset", HandleRequestAsset);
     }
 
-    private void AssetsService_ModelAdded(string name, IModel model)
+    private void HandleModelAdded(string name, IModel model)
     {
         _assetsRegistry[name] = ("model", new string[] { Convert.ToBase64String(model.Dff), Convert.ToBase64String(model.Col) });
         _assetsChecksums[name] = ("model", new string[] { GetMD5checksum(model.Dff), GetMD5checksum(model.Col) });

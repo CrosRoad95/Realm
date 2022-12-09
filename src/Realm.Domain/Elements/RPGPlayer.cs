@@ -112,10 +112,10 @@ public class RPGPlayer : Player
         _mtaServer = mtaServer;
         _cancellationTokenSource = new CancellationTokenSource();
         CancellationToken = _cancellationTokenSource.Token;
-        ResourceStarted += RPGPlayer_ResourceStarted;
+        ResourceStarted += HandleResourceStarted;
     }
 
-    private void RPGPlayer_ResourceStarted(Player sender, PlayerResourceStartedEventArgs e)
+    private void HandleResourceStarted(Player sender, PlayerResourceStartedEventArgs e)
     {
         ResourceStartingLatch.Decrement();
     }

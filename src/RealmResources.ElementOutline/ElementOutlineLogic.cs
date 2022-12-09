@@ -20,8 +20,8 @@ internal class ElementOutlineLogic
 
         _resource = server.GetAdditionalResource<ElementOutlineResource>();
         _elementOutlineService = elementOutlineService;
-        _elementOutlineService.OutlineChanged += ElementOutlineService_OutlineChanged;
-        _elementOutlineService.OutlineRemoved += ElementOutlineService_OutlineRemoved;
+        _elementOutlineService.OutlineChanged += HandleOutlineChanged;
+        _elementOutlineService.OutlineRemoved += HandleOutlineRemoved;
     }
 
     private void HandlePlayerJoin(Player player)
@@ -29,12 +29,12 @@ internal class ElementOutlineLogic
         _resource.StartFor(player);
     }
 
-    private void ElementOutlineService_OutlineChanged(Player player, Element target, Color color)
+    private void HandleOutlineChanged(Player player, Element target, Color color)
     {
         _luaEventService.TriggerEventFor(player, "internalSetOutline", player, target, color);
     }
 
-    private void ElementOutlineService_OutlineRemoved(Player player, Element target)
+    private void HandleOutlineRemoved(Player player, Element target)
     {
         _luaEventService.TriggerEventFor(player, "internalRemoveOutline", player, target);
     }

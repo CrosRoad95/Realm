@@ -23,10 +23,10 @@ internal class OverlayLogic
 
         _resource = server.GetAdditionalResource<OverlayResource>();
 
-        _overlayService.NotificationAdded += OverlayService_NotificationAdded;
+        _overlayService.NotificationAdded += HandleNotificationAdded;
     }
 
-    private void OverlayService_NotificationAdded(AddNotificationEvent addNotification)
+    private void HandleNotificationAdded(AddNotificationEvent addNotification)
     {
         _luaEventService.TriggerEventFor(addNotification.Player, "addNotification", addNotification.Player, addNotification.Message);
     }

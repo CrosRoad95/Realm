@@ -32,7 +32,7 @@ public class DailyVisitsCounterComponent : IElementComponent
         if (element is not RPGPlayer rpgPlayer)
             throw new Exception("Not supported element type, expected: RPGPlayer");
         _player = rpgPlayer;
-        _player.LoggedOut += LoggedOut;
+        _player.LoggedOut += HandleLoggedOut;
         Update();
     }
 
@@ -56,9 +56,9 @@ public class DailyVisitsCounterComponent : IElementComponent
         LastVisit = DateTime.Now;
     }
 
-    private void LoggedOut(RPGPlayer player, string accountId)
+    private void HandleLoggedOut(RPGPlayer rpgPlayer, string accountId)
     {
-        _player.LoggedOut -= LoggedOut;
+        _player.LoggedOut -= HandleLoggedOut;
     }
 
     public void GetObjectData(SerializationInfo info, StreamingContext context)

@@ -4,18 +4,18 @@
 public class PlayerAFKStateChangedEvent : INamedLuaEvent, IDisposable
 {
     private bool _disposed = false;
-    private readonly RPGPlayer _player;
+    private readonly RPGPlayer _rpgPlayer;
     private readonly bool _afk;
 
     public static string EventName => "onPlayerAFKStateChanged";
 
     [ScriptMember("player")]
-    public RPGPlayer Player
+    public RPGPlayer rpgPlayer
     {
         get
         {
             CheckIfDisposed();
-            return _player;
+            return _rpgPlayer;
         }
     }
 
@@ -29,9 +29,9 @@ public class PlayerAFKStateChangedEvent : INamedLuaEvent, IDisposable
         }
     }
 
-    public PlayerAFKStateChangedEvent(RPGPlayer player, bool afk)
+    public PlayerAFKStateChangedEvent(RPGPlayer rpgPlayer, bool afk)
     {
-        _player = player;
+        _rpgPlayer = rpgPlayer;
         _afk = afk;
     }
 
