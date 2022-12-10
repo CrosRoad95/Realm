@@ -1,5 +1,6 @@
 ﻿using Realm.Interfaces.Grpc;
 using Realm.Module.Discord.Scripting.Events;
+using Realm.Module.Scripting.Extensions;
 using Realm.Module.Scripting.Functions;
 using Realm.Module.Scripting.Interfaces;
 
@@ -12,12 +13,14 @@ internal class DiscordIntegration
     public DiscordIntegration(EventScriptingFunctions eventScriptingFunctions, IGrpcDiscord grpcDiscord)
     {
         _eventScriptingFunctions = eventScriptingFunctions;
-        grpcDiscord.UpdateStatusChannel = UpdateStatusChannel;
+        grpcDiscord.UpdateStatusChannel = HandleUpdateStatusChannel;
     }
 
-    public async Task<string> UpdateStatusChannel()
+    public async Task<string> HandleUpdateStatusChannel()
     {
-        return "test...";
+        using var @event = new DiscordStatusChannelUpdateContext();
+        await _eventScriptingFunctions.InvokeEvent(DiscordStatusChannelUpdateContext.EventName, @event);
+        return @event.Content;
     }
 
     public void InitializeScripting(IScriptingModuleInterface scriptingModuleInterface)
@@ -25,6 +28,7 @@ internal class DiscordIntegration
         // Events
         _eventScriptingFunctions.RegisterEvent(DiscordPlayerConnectedEvent.EventName);
         _eventScriptingFunctions.RegisterEvent(DiscordUserChangedEvent.EventName);
+        _eventScriptingFunctions.RegisterEvent(DiscordStatusChannelUpdateContext.EventName);
 
         // Javascript types
         scriptingModuleInterface.AddHostType(typeof(DiscordPlayerConnectedEvent));

@@ -23,7 +23,7 @@ servicesCollection.AddSingleton<DiscordClient>();
 servicesCollection.AddSingleton(new DiscordSocketClient(new DiscordSocketConfig { GatewayIntents = GatewayIntents.AllUnprivileged | GatewayIntents.GuildMembers }));
 servicesCollection.AddSingleton<CommandHandler>();
 servicesCollection.AddSingleton<BotIdProvider>();
-servicesCollection.AddSingleton(GrpcChannel.ForAddress("https://localhost:22010"));
+servicesCollection.AddSingleton(GrpcChannel.ForAddress("http://localhost:22010"));
 
 // Channels:
 servicesCollection.AddSingleton<DiscordStatusChannel>();

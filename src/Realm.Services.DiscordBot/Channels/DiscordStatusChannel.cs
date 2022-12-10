@@ -35,7 +35,7 @@ internal class DiscordStatusChannel
         await Update();
         while(true) // TODO: user periodic timer
         {
-            await Task.Delay(TimeSpan.FromSeconds(6));
+            await Task.Delay(TimeSpan.FromSeconds(10));
             await Update();
         }
     }

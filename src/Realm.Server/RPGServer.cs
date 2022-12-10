@@ -68,7 +68,7 @@ public partial class RPGServer : IRPGServer, IReloadable
                     services.AddSingleton<IPeriodicEntitySaveService, PeriodicEntitySaveService>();
 
                     // Factories
-                    services.AddSingleton<RPGElementsFactory>();
+                    services.AddSingleton<IRPGElementsFactory, RPGElementsFactory>();
 
                     // Player specific
                     services.AddTransient<DiscordUser>();

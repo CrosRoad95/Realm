@@ -5,13 +5,13 @@ namespace Realm.Server.Seeding;
 
 internal sealed class SeederServerBuilder
 {
-    private readonly RPGElementsFactory _elementFunctions;
+    private readonly IRPGElementsFactory _elementFunctions;
     private readonly IdentityScriptingFunctions _identityFunctions;
     private readonly ElementByStringIdCollection _elementByStringIdCollection;
     private readonly VehicleUpgradeByStringCollection _vehicleUpgradeByStringCollection;
     private readonly ILogger _logger;
     private readonly Dictionary<string, PlayerAccount> _createdAccounts = new();
-    public SeederServerBuilder(RPGElementsFactory elementFunctions, IdentityScriptingFunctions identityFunctions, ILogger logger,
+    public SeederServerBuilder(IRPGElementsFactory elementFunctions, IdentityScriptingFunctions identityFunctions, ILogger logger,
         ElementByStringIdCollection elementByStringIdCollection, VehicleUpgradeByStringCollection vehicleUpgradeByStringCollection)
     {
         _elementFunctions = elementFunctions;
