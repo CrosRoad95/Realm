@@ -6,7 +6,7 @@ using VehicleUpgrade = Realm.Domain.Upgrades.VehicleUpgrade;
 namespace Realm.Server.Scripting;
 
 [NoDefaultScriptAccess]
-internal class ElementScriptingFunctions
+public class ElementScriptingFunctions
 {
     private readonly IElementCollection _elementCollection;
     private readonly ElementByStringIdCollection _elementByStringIdCollection;
