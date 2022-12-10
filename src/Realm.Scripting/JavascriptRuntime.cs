@@ -8,16 +8,16 @@ namespace Realm.Module.Scripting;
 internal class JavascriptRuntime : IScriptingModuleInterface, IReloadable
 {
     private readonly V8ScriptEngine _engine;
-    private readonly TypescriptTypesGenerator _typescriptTypesGenerator;
     private readonly ILogger _logger;
     private readonly IServerFilesProvider _serverFilesProvider;
+
+    public event Action<Type, bool>? HostTypeAdded;
 
     public JavascriptRuntime(ILogger logger, EventScriptingFunctions eventFunctions, ModulesScriptingFunctions modulesFunctions,
         UlitityScriptingFunctions ulitityFunctions, IServerFilesProvider serverFilesProvider)
     {
         HostSettings.CustomAttributeLoader = new LowercaseSymbolsLoader();
         _engine = new V8ScriptEngine(V8ScriptEngineFlags.EnableTaskPromiseConversion);
-        _typescriptTypesGenerator = new TypescriptTypesGenerator();
         _logger = logger.ForContext<JavascriptRuntime>();
 
         _engine.AllowReflection = true;
@@ -41,18 +41,13 @@ internal class JavascriptRuntime : IScriptingModuleInterface, IReloadable
         _serverFilesProvider = serverFilesProvider;
     }
 
-    public string GetTypescriptDefinition()
-    {
-        return _typescriptTypesGenerator.Build();
-    }
-
     public void AddHostType(Type type, bool exposeGlobalMembers = false)
     {
         if (exposeGlobalMembers)
             _engine.AddHostType(HostItemFlags.GlobalMembers, type);
         else
             _engine.AddHostType(type.Name, type);
-        _typescriptTypesGenerator.AddType(type);
+        HostTypeAdded?.Invoke(type, exposeGlobalMembers);
     }
 
     public void AddHostObject(string name, object @object, bool exposeGlobalMembers = false)

@@ -13,6 +13,8 @@ using Realm.Server.Services;
 using SlipeServer.Server.Elements;
 using SlipeServer.Server.Events;
 using Realm.Module.Scripting;
+using Realm.Interfaces.Providers;
+using Realm.Server.Providers;
 
 namespace Realm.Tests.TestServers;
 
@@ -45,6 +47,7 @@ internal class TestRPGServer : IReloadable, IRPGServer
                 services.AddSingleton<IAccountsInUseService, TestAccountsInUseService>();
                 services.AddSingleton<IReloadable>(this);
                 services.AddSingleton<IRPGServer>(this);
+                services.AddSingleton<IServerFilesProvider>(NullServerFilesProvider.Instance);
                 services.AddSingleton(new RealmLogger().GetLogger());
 
                 services.AddSingleton<IRPGElementsFactory, TestRPGElementsFactory>();

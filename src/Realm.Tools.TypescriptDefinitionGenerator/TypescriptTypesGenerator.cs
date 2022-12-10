@@ -1,4 +1,10 @@
-﻿namespace Realm.Module.Scripting;
+﻿using Realm.Common.Attributes;
+using Realm.Common.Extensions;
+using System.Numerics;
+using System.Reflection;
+using System.Text;
+
+namespace Realm.Tools.TypescriptDefinitionGenerator;
 
 public class TypescriptTypesGenerator
 {

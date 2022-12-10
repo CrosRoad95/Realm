@@ -1,4 +1,4 @@
-﻿using Realm.Module.Scripting;
+﻿using Realm.Tools.TypescriptDefinitionGenerator;
 
 namespace Realm.Tests.UnitTests.Scripting;
 

@@ -13,8 +13,11 @@ internal class ServerFilesProvider : IServerFilesProvider
         return Directory.GetFiles(Path.Combine(_basePath, path));
     }
 
-    public async Task<string> ReadAllText(string path)
+    public async Task<string?> ReadAllText(string path)
     {
-        return await File.ReadAllTextAsync(Path.Combine(_basePath, path));
+        var fullPath = Path.Combine(_basePath, path);
+        if (File.Exists(fullPath))
+            return await File.ReadAllTextAsync(fullPath);
+        return null;
     }
 }

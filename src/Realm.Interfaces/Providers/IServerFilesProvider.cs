@@ -3,5 +3,5 @@
 public interface IServerFilesProvider
 {
     string[] GetFiles(string path);
-    Task<string> ReadAllText(string path);
+    Task<string?> ReadAllText(string path);
 }

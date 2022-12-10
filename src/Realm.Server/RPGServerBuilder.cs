@@ -31,7 +31,7 @@ public class RPGServerBuilder
         return this;
     }
 
-    public RPGServer Build()
+    public RPGServer Build(IServerFilesProvider? serverFilesProvider = null)
     {
         if (_logger == null)
             throw new Exception();
@@ -47,10 +47,11 @@ public class RPGServerBuilder
                 services.AddSingleton(_logger);
                 services.AddSingleton(_console);
 #if DEBUG
-                services.AddSingleton<IServerFilesProvider>(new ServerFilesProvider("../../../Server"));
+                serverFilesProvider ??= new ServerFilesProvider("../../../Server");
 #else
-                services.AddSingleton(new ServerFilesProvider("Server"));
+                serverFilesProvider ??= new ServerFilesProvider("Server");
 #endif
+                services.AddSingleton(serverFilesProvider);
             });
         });
     }

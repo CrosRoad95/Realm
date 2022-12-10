@@ -46,7 +46,7 @@ public class LocalizationScriptingFunctions
         }
         if(!_translations.ContainsKey(_defaultLanguage))
         {
-            throw new Exception("Could not find a default language translation file!");
+            // throw new Exception("Could not find a default language translation file!");
         }
     }
 
