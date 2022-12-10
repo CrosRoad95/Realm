@@ -68,3 +68,5 @@ global using Realm.Persistance.Scripting.Classes;
 global using Realm.Server.Seeding;
 global using Realm.Assets;
 global using Realm.Resources.Overlay;
+global using Realm.Server.Providers;
+global using Realm.Interfaces.Providers;

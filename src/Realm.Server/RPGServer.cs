@@ -214,30 +214,8 @@ public partial class RPGServer : IRPGServer, IReloadable
 
     private async Task BuildFromSeedFiles()
     {
-        var basePath = "Seed";
-        IDeserializer _deserializer = new DeserializerBuilder()
-            .WithNamingConvention(CamelCaseNamingConvention.Instance)
-            .WithTypeConverter(new Vector3Converter())
-            .Build();
-
-        var result = new JObject();
-        var seedDatas = Directory.GetFiles(basePath).Select(seedFileName => _deserializer.Deserialize<SeedData>(File.ReadAllText(seedFileName)));
-        foreach (var sourceObject in seedDatas)
-        {
-            var @object = JObject.Parse(JsonConvert.SerializeObject(sourceObject));
-            result.Merge(@object, new JsonMergeSettings
-            {
-                MergeArrayHandling = MergeArrayHandling.Union
-            });
-        }
-        var seedData = result.ToObject<SeedData>();
-        if (seedData == null)
-            throw new Exception("Failed to load seed data.");
-
-        var seedValidator = new SeedValidator();
-        await seedValidator.ValidateAndThrowAsync(seedData);
         var seedServerBuilder = GetRequiredService<SeederServerBuilder>();
-        await seedServerBuilder.BuildFrom(seedData);
+        await seedServerBuilder.Build();
     }
 
     public async Task Stop()

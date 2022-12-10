@@ -46,6 +46,11 @@ public class RPGServerBuilder
             {
                 services.AddSingleton(_logger);
                 services.AddSingleton(_console);
+#if DEBUG
+                services.AddSingleton<IServerFilesProvider>(new ServerFilesProvider("../../../Server"));
+#else
+                services.AddSingleton(new ServerFilesProvider("Server"));
+#endif
             });
         });
     }

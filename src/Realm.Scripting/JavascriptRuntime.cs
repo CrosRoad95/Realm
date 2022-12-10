@@ -1,4 +1,5 @@
-﻿using Realm.Module.Scripting.Extensions;
+﻿using Realm.Interfaces.Providers;
+using Realm.Module.Scripting.Extensions;
 using Realm.Module.Scripting.Functions;
 using Realm.Module.Scripting.Interfaces;
 
@@ -9,8 +10,10 @@ internal class JavascriptRuntime : IScriptingModuleInterface, IReloadable
     private readonly V8ScriptEngine _engine;
     private readonly TypescriptTypesGenerator _typescriptTypesGenerator;
     private readonly ILogger _logger;
+    private readonly IServerFilesProvider _serverFilesProvider;
 
-    public JavascriptRuntime(ILogger logger, EventScriptingFunctions eventFunctions, ModulesScriptingFunctions modulesFunctions, UlitityScriptingFunctions ulitityFunctions)
+    public JavascriptRuntime(ILogger logger, EventScriptingFunctions eventFunctions, ModulesScriptingFunctions modulesFunctions,
+        UlitityScriptingFunctions ulitityFunctions, IServerFilesProvider serverFilesProvider)
     {
         HostSettings.CustomAttributeLoader = new LowercaseSymbolsLoader();
         _engine = new V8ScriptEngine(V8ScriptEngineFlags.EnableTaskPromiseConversion);
@@ -18,7 +21,7 @@ internal class JavascriptRuntime : IScriptingModuleInterface, IReloadable
         _logger = logger.ForContext<JavascriptRuntime>();
 
         _engine.AllowReflection = true;
-        _engine.DocumentSettings.Loader = new CustomDocumentLoader();
+        _engine.DocumentSettings.Loader = new CustomDocumentLoader(serverFilesProvider);
         _engine.DocumentSettings.AccessFlags = DocumentAccessFlags.EnableAllLoading;
         _engine.Script.isAsyncFunc = _engine.Evaluate("const ctor = (async() => {}).constructor; x => x instanceof ctor");
         AddHostType(typeof(JavaScriptExtensions));
@@ -35,6 +38,7 @@ internal class JavascriptRuntime : IScriptingModuleInterface, IReloadable
         AddHostObject("Events", eventFunctions, true);
         AddHostObject("Modules", modulesFunctions, true);
         AddHostObject("Utility", ulitityFunctions, true);
+        _serverFilesProvider = serverFilesProvider;
     }
 
     public string GetTypescriptDefinition()
@@ -98,10 +102,18 @@ internal class JavascriptRuntime : IScriptingModuleInterface, IReloadable
 
     public async Task Start()
     {
-        const string fileName = "Server/startup.js";
+        const string fileName = "Scripts/startup.js";
         _logger.Information("Initializing {fileName}", fileName);
-        var code = File.ReadAllText(fileName);
-        await Execute(code, fileName);
+        try
+        {
+            var code = await _serverFilesProvider.ReadAllText(fileName);
+            await Execute(code, fileName);
+        }
+        catch(Exception)
+        {
+            _logger.Information("Failed to initialize {fileName}", fileName);
+            throw;
+        }
     }
 
     public async Task Reload()

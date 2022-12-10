@@ -1,23 +1,36 @@
-﻿using static Realm.Server.Seeding.SeedData;
+﻿using FluentValidation;
+using Realm.Server.Serialization.Yaml;
+using System.Runtime.CompilerServices;
+using YamlDotNet.Serialization.NamingConventions;
+using static Realm.Server.Seeding.SeedData;
 using VehicleUpgrade = Realm.Domain.Upgrades.VehicleUpgrade;
 
 namespace Realm.Server.Seeding;
 
 internal sealed class SeederServerBuilder
 {
+    private const string _basePath = "Seed";
     private readonly IRPGElementsFactory _elementFunctions;
     private readonly IdentityScriptingFunctions _identityFunctions;
     private readonly ElementByStringIdCollection _elementByStringIdCollection;
     private readonly VehicleUpgradeByStringCollection _vehicleUpgradeByStringCollection;
+    private readonly IServerFilesProvider _serverFilesProvider;
     private readonly ILogger _logger;
+    private readonly IDeserializer _deserializer = new DeserializerBuilder()
+        .WithNamingConvention(CamelCaseNamingConvention.Instance)
+        .WithTypeConverter(new Vector3Converter())
+        .Build();
+
     private readonly Dictionary<string, PlayerAccount> _createdAccounts = new();
     public SeederServerBuilder(IRPGElementsFactory elementFunctions, IdentityScriptingFunctions identityFunctions, ILogger logger,
-        ElementByStringIdCollection elementByStringIdCollection, VehicleUpgradeByStringCollection vehicleUpgradeByStringCollection)
+        ElementByStringIdCollection elementByStringIdCollection, VehicleUpgradeByStringCollection vehicleUpgradeByStringCollection,
+        IServerFilesProvider serverFilesProvider)
     {
         _elementFunctions = elementFunctions;
         _identityFunctions = identityFunctions;
         _elementByStringIdCollection = elementByStringIdCollection;
         _vehicleUpgradeByStringCollection = vehicleUpgradeByStringCollection;
+        _serverFilesProvider = serverFilesProvider;
         _logger = logger.ForContext<SeederServerBuilder>();
     }
 
@@ -125,16 +138,37 @@ internal sealed class SeederServerBuilder
         }
     }
 
+    public async Task Build()
+    {
+        var result = new JObject();
+        var seedDatas = _serverFilesProvider.GetFiles(_basePath).Select(seedFileName => _deserializer.Deserialize<SeedData>(File.ReadAllText(seedFileName)));
+        foreach (var sourceObject in seedDatas)
+        {
+            var @object = JObject.Parse(JsonConvert.SerializeObject(sourceObject));
+            result.Merge(@object, new JsonMergeSettings
+            {
+                MergeArrayHandling = MergeArrayHandling.Union
+            });
+        }
 
-    public async Task BuildFrom(SeedData seed)
+        var seedData = result.ToObject<SeedData>();
+        if (seedData == null)
+            throw new Exception("Failed to load seed data.");
+
+        var seedValidator = new SeedValidator();
+        await seedValidator.ValidateAndThrowAsync(seedData);
+        await BuildFrom(seedData);
+    }
+    
+    private async Task BuildFrom(SeedData seedData)
     {
         using var _ = new PersistantScope();
-        BuildUpgrades(seed.Upgrades);
-        await BuildIdentityRoles(seed.Roles);
-        await BuildIdentityAccounts(seed.Accounts);
-        BuildSpawns(seed.Spawns);
-        BuildBlips(seed.Blips);
-        BuildPickups(seed.Pickups);
-        await BuildFractions(seed.Fractions);
+        BuildUpgrades(seedData.Upgrades);
+        await BuildIdentityRoles(seedData.Roles);
+        await BuildIdentityAccounts(seedData.Accounts);
+        BuildSpawns(seedData.Spawns);
+        BuildBlips(seedData.Blips);
+        BuildPickups(seedData.Pickups);
+        await BuildFractions(seedData.Fractions);
     }
 }

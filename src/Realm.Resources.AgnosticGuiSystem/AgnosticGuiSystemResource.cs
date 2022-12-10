@@ -1,11 +1,13 @@
 ﻿using SlipeServer.Server.Elements;
 using SlipeServer.Server.Resources;
 using SlipeServer.Server;
+using Realm.Interfaces.Providers;
 
 namespace Realm.Resources.AgnosticGuiSystem;
 
 internal class AgnosticGuiSystemResource : Resource
 {
+    private readonly IServerFilesProvider _serverFilesProvider;
     internal Dictionary<string, byte[]> AdditionalFiles { get; } = new Dictionary<string, byte[]>()
     {
         ["controller.lua"] = ResourceFiles.Controller,
@@ -14,6 +16,7 @@ internal class AgnosticGuiSystemResource : Resource
     internal AgnosticGuiSystemResource(MtaServer server, AgnosticGuiSystemOptions agnosticGuiSystemOptions)
         : base(server, server.GetRequiredService<RootElement>(), "AgnosticGuiSystem")
     {
+        _serverFilesProvider = server.GetRequiredService<IServerFilesProvider>();
         foreach (var (path, content) in AdditionalFiles)
             Files.Add(ResourceFileFactory.FromBytes(content, path));
         
@@ -29,7 +32,7 @@ internal class AgnosticGuiSystemResource : Resource
 
     private IEnumerable<(string, byte[])> GetGuiFiles()
     {
-        var files = Directory.GetFiles("Gui");
+        var files = _serverFilesProvider.GetFiles("Gui");
         foreach (var item in files)
         {
             yield return (item, File.ReadAllBytes(item));

@@ -7,12 +7,15 @@ public class LocalizationScriptingFunctions
 {
     private readonly RealmConfigurationProvider _configurationProvider;
     private readonly LuaInteropService _luaInteropService;
+    private readonly IServerFilesProvider _serverFilesProvider;
     private readonly Dictionary<string, Dictionary<string, string>> _translations = new();
     private string _defaultLanguage = "pl";
-    public LocalizationScriptingFunctions(RealmConfigurationProvider configurationProvider, LuaInteropService luaInteropService)
+    public LocalizationScriptingFunctions(RealmConfigurationProvider configurationProvider, LuaInteropService luaInteropService,
+        IServerFilesProvider serverFilesProvider)
     {
         _configurationProvider = configurationProvider;
         _luaInteropService = luaInteropService;
+        _serverFilesProvider = serverFilesProvider;
         _defaultLanguage = _configurationProvider.GetRequired<string>("Gameplay:DefaultLanguage");
         _luaInteropService.ClientCultureInfoUpdate += HandleClientSendLocalizationCode;
         Reload().Wait();
@@ -34,7 +37,7 @@ public class LocalizationScriptingFunctions
         // TODO: improve exceptions, error handling
         _defaultLanguage = _configurationProvider.GetRequired<string>("Gameplay:DefaultLanguage");
         _translations.Clear();
-        var files = Directory.GetFiles("Localization");
+        var files = _serverFilesProvider.GetFiles("Localization");
         foreach (var item in files)
         {
             var id = Path.GetFileNameWithoutExtension(item);
