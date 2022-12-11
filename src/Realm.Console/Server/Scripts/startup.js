@@ -2,6 +2,7 @@
 
 Logger.information("test");
 
+import "utilities.js"
 import "panel.js"
 import "discord.js"
 import "login.js"
@@ -128,22 +129,6 @@ addEventHandler("onPlayerSpawn", ({ player, spawn }) => {
 //addEventHandler("onPlayerLogin", async ({ player, account }) => {
 //    foo(); // Test exception
 //});
-
-addCommandHandler("foo", (player, args) => {
-    Logger.information("command foo executed {player} {commandArguments}")
-})
-
-addCommandHandler("playtime", (player, args) => {
-    Logger.information("playtime: current session: {0}, in total: {1}", player.account.currentSessionPlayTime, player.account.playTime)
-})
-
-addCommandHandler("noclip", (player, args) => {
-    player.noClip = !player.noClip
-})
-
-addCommandHandler("money", (player, args) => {
-    player.account.money = player.account.money + 50;
-})
 
 addCommandHandler("foo2", (player, args) => {
     Logger.information("command foo2 executed {player} {commandArguments}")
