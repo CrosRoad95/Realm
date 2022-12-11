@@ -1,6 +1,5 @@
 ﻿using Realm.Domain.Elements.CollisionShapes;
 using Realm.Domain.Elements.Variants;
-using Realm.Module.Scripting.Extensions;
 using VehicleUpgrade = Realm.Domain.Upgrades.VehicleUpgrade;
 
 namespace Realm.Server.Scripting;

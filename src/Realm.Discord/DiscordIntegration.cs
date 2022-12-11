@@ -1,8 +1,5 @@
 ﻿using Realm.Interfaces.Grpc;
 using Realm.Module.Discord.Scripting.Events;
-using Realm.Module.Scripting.Extensions;
-using Realm.Module.Scripting.Functions;
-using Realm.Module.Scripting.Interfaces;
 
 namespace Realm.Module.Discord;
 

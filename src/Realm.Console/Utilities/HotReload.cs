@@ -1,6 +1,4 @@
-﻿using Realm.Server;
-
-namespace Realm.Console.Utilities;
+﻿namespace Realm.Console.Utilities;
 
 internal class HotReload
 {

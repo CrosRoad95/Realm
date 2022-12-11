@@ -1,6 +1,4 @@
-﻿using Serilog.Events;
-
-namespace Realm.WebApp.Services;
+﻿namespace Realm.WebApp.Services;
 
 public class ConsoleService
 {

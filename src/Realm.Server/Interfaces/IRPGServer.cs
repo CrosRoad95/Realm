@@ -1,6 +1,4 @@
-﻿using Realm.Module.Scripting.Interfaces;
-
-namespace Realm.Server.Interfaces;
+﻿namespace Realm.Server.Interfaces;
 
 public interface IRPGServer
 {

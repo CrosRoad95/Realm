@@ -1,5 +1,4 @@
-﻿using Realm.Module.Scripting.Scopes;
-using SlipeServer.Server.Elements.ColShapes;
+﻿using SlipeServer.Server.Elements.ColShapes;
 
 namespace Realm.Domain.Elements.CollisionShapes;
 

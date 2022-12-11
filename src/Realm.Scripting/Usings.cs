@@ -1,7 +1,6 @@
 ﻿global using System;
 global using System.Collections.Generic;
 global using System.Linq;
-global using System.Text;
 global using System.Threading.Tasks;
 global using System.Reflection;
 global using System.Numerics;
@@ -15,7 +14,6 @@ global using Serilog;
 global using Serilog.Context;
 global using Realm.Module.Scripting.Extensions;
 global using Realm.Common.Extensions;
-global using Realm.Common.Attributes;
 global using Realm.Interfaces.Extend;
 global using Realm.Module.Scripting.ClearscriptExtensions;
 global using Realm.Module.Scripting.Interfaces;

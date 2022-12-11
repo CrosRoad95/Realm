@@ -1,7 +1,4 @@
-﻿using Realm.Module.Scripting.Extensions;
-using Realm.Module.Scripting.Functions;
-
-namespace Realm.Server.Logic;
+﻿namespace Realm.Server.Logic;
 
 internal class RPGPlayerLogic
 {

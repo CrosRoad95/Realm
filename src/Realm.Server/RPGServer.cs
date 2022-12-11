@@ -1,14 +1,8 @@
-﻿using FluentValidation;
-using Realm.Domain.Components;
+﻿using Realm.Domain.Components;
 using Realm.Domain.Elements.CollisionShapes;
 using Realm.Domain.Elements.Variants;
 using Realm.Domain.Inventory;
 using Realm.Domain.Sessions;
-using Realm.Module.Scripting.Extensions;
-using Realm.Module.Scripting.Functions;
-using Realm.Module.Scripting.Interfaces;
-using Realm.Server.Serialization.Yaml;
-using YamlDotNet.Serialization.NamingConventions;
 using static Realm.Domain.Upgrades.VehicleUpgrade;
 
 namespace Realm.Server;

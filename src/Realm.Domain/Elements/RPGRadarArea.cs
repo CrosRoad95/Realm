@@ -1,6 +1,4 @@
-﻿using Realm.Module.Scripting.Scopes;
-
-namespace Realm.Domain.Elements;
+﻿namespace Realm.Domain.Elements;
 
 [NoDefaultScriptAccess]
 public class RPGRadarArea : RadarArea, IDisposable

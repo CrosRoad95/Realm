@@ -1,6 +1,5 @@
 ﻿using FluentValidation;
 using Realm.Server.Serialization.Yaml;
-using System.Runtime.CompilerServices;
 using YamlDotNet.Serialization.NamingConventions;
 using static Realm.Server.Seeding.SeedData;
 using VehicleUpgrade = Realm.Domain.Upgrades.VehicleUpgrade;

@@ -1,8 +1,4 @@
-﻿using System;
-using Microsoft.Extensions.DependencyInjection;
-using Serilog;
-using Serilog.Core;
-using Serilog.Events;
+﻿using Serilog.Core;
 
 using Realm.Configuration;
 using Realm.Module.Discord;

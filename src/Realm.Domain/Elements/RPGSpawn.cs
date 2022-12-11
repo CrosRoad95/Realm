@@ -1,5 +1,4 @@
-﻿using Realm.Module.Scripting.Scopes;
-using Realm.Persistance;
+﻿using Realm.Persistance;
 
 namespace Realm.Domain.Elements;
 

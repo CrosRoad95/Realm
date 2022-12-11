@@ -1,6 +1,4 @@
-﻿using Realm.Module.Scripting.Extensions;
-
-namespace Realm.Module.Scripting.Functions;
+﻿namespace Realm.Module.Scripting.Functions;
 
 [NoDefaultScriptAccess]
 public class ModulesScriptingFunctions

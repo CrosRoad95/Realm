@@ -1,7 +1,5 @@
 ﻿using Realm.Interfaces.Providers;
-using Realm.Module.Scripting.Extensions;
 using Realm.Module.Scripting.Functions;
-using Realm.Module.Scripting.Interfaces;
 
 namespace Realm.Module.Scripting;
 

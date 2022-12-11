@@ -1,6 +1,4 @@
-﻿using Realm.Module.Scripting.Interfaces;
-
-namespace Realm.Server.Modules;
+﻿namespace Realm.Server.Modules;
 
 public class ServerScriptingModule : IModule
 {

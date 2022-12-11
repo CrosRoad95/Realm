@@ -1,7 +1,4 @@
-﻿using Realm.Module.Scripting.Extensions;
-using Realm.Module.Scripting.Functions;
-
-namespace Realm.Server.Services;
+﻿namespace Realm.Server.Services;
 
 internal class RPGPlayerService
 {

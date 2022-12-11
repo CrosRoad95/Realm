@@ -1,7 +1,6 @@
 ﻿using Realm.Domain.Elements;
 using SlipeServer.Server.ElementCollections;
 using SlipeServer.Server.Elements;
-using Realm.Module.Scripting.Functions;
 using Realm.Module.Scripting.Extensions;
 using Realm.Module.Discord.Scripting.Events;
 

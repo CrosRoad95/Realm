@@ -1,7 +1,4 @@
-﻿using Realm.Module.Scripting.Extensions;
-using Realm.Module.Scripting.Functions;
-
-namespace Realm.Server.Logic.Resources;
+﻿namespace Realm.Server.Logic.Resources;
 
 internal class AFKLogic
 {

@@ -6,13 +6,10 @@ using Realm.Interfaces.Server.Services;
 using Realm.Logging;
 using Realm.Module.Scripting.Interfaces;
 using Realm.Server.Extensions;
-using Realm.Server.Factories;
 using Realm.Server.Interfaces;
 using Realm.Server.Modules;
-using Realm.Server.Services;
 using SlipeServer.Server.Elements;
 using SlipeServer.Server.Events;
-using Realm.Module.Scripting;
 using Realm.Interfaces.Providers;
 using Realm.Server.Providers;
 

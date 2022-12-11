@@ -1,6 +1,4 @@
-﻿using Realm.Module.Scripting.Interfaces;
-
-namespace Realm.Module.Discord;
+﻿namespace Realm.Module.Discord;
 
 public class DiscordModule : IModule
 {

@@ -8,9 +8,7 @@ using Realm.Configuration;
 using Realm.Module.Grpc;
 using Realm.Module.Discord;
 using Realm.Console.Utilities;
-using Grpc.Core.Logging;
 using System.Diagnostics;
-using Realm.Interfaces.Providers;
 using Realm.Interfaces.Common;
 
 var console = new ServerConsole();

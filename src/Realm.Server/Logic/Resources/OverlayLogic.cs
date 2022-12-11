@@ -1,6 +1,4 @@
-﻿using Realm.Resources.Overlay;
-
-namespace Realm.Server.Logic.Resources;
+﻿namespace Realm.Server.Logic.Resources;
 
 internal class OverlayLogic
 {
