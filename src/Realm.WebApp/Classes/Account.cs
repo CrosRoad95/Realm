@@ -1,22 +1,20 @@
-﻿using Realm.Persistance.Scripting.Classes;
-
-namespace Realm.WebApp.Classes;
+﻿namespace Realm.WebApp.Classes;
 
 public class Account
 {
-    public PlayerAccount PlayerAccount { get; }
+    public string Id { get; }
+    public string UserName { get; }
+    public DateTime RegisterDateTime { get; }
     public string[] Roles { get; }
     public Claim[] Claims { get; }
 
-    private Account(PlayerAccount playerAccount, string[] roles, Claim[] claims)
+    public Account(string id, string userName, DateTime registerDateTime, string[] roles, Claim[] claims)
     {
-        PlayerAccount = playerAccount;
+        Id = id;
+        UserName = userName;
+        RegisterDateTime = registerDateTime;
         Roles = roles;
         Claims = claims;
     }
 
-    public static async Task<Account> CreateAsync(PlayerAccount playerAccount)
-    {
-        return new Account(playerAccount, await playerAccount.InternalGetRoles(), await playerAccount.InternalGetClaims());
-    }
 }

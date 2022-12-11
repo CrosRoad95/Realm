@@ -14,6 +14,7 @@ using Realm.Server.Console;
 using Realm.Tools.TypescriptDefinitionGenerator;
 using Realm.Server.Modules;
 using Realm.Server.Providers;
+using Realm.Module.WebApp;
 
 var typescriptGenerator = new TypescriptTypesGenerator();
 
@@ -24,6 +25,7 @@ builder.AddModule<DiscordModule>();
 builder.AddModule<IdentityModule>();
 builder.AddModule<ScriptingModule>();
 builder.AddModule<ServerScriptingModule>();
+builder.AddModule<WebAppModule>();
 builder.AddModule<GrpcModule>();
 builder.AddLogger(Logger.None);
 builder.AddConsole(EmptyServerConsole.Instance);

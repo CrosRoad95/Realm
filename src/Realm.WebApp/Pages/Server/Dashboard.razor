@@ -1,5 +1,5 @@
 ﻿@page "/server/dashboard"
-@inject IRPGServer _server;
+@inject ServerService _serverService;
 <PageTitle>Index</PageTitle>
 
 <h1>Gracze:</h1>
@@ -25,7 +25,7 @@
 
     protected override void OnInitialized()
     {
-        _server.PlayerJoined += PlayerJoined;
+        _serverService.PlayerJoined += PlayerJoined;
         base.OnInitialized();
     }
 

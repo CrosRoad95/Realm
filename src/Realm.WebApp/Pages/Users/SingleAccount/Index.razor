@@ -1,5 +1,5 @@
 ﻿@page "/users/account/{id}"
-@inject IRPGServer _server;
+@inject IdentityService _identityService;
 
 <MudBreadcrumbs Items="_items">
     <ItemTemplate Context="item">
@@ -33,15 +33,7 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        var identityFunctions = _server.GetRequiredService<IdentityScriptingFunctions>();
-        if(Guid.TryParse(Id, out Guid guidId))
-        {
-            var playerAccount = await identityFunctions.FindAccountById(guidId.ToString());
-            if (playerAccount != null)
-                account = await Account.CreateAsync(playerAccount);
-        }
 
-        _loading = false;
         await base.OnInitializedAsync();
     }
 }

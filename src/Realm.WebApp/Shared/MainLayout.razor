@@ -1,6 +1,5 @@
 ﻿@inherits LayoutComponentBase
 @inject ISnackbar Snackbar
-@inject SnackbarScriptingFunctions SnackbarFunctions
 
 <MudThemeProvider IsDarkMode="true"/>
 <MudDialogProvider/>
@@ -26,9 +25,6 @@
 </MudLayout>
 
 @code {
-    [Inject]
-    protected IRPGServer _server { get; set; }
-
     bool _drawerOpen = true;
 
     void DrawerToggle()
@@ -43,7 +39,6 @@
 
     protected override void OnInitialized()
     {
-        SnackbarFunctions.SnackbarAdded += AddSnackbar;
         base.OnInitialized();
     }
 }

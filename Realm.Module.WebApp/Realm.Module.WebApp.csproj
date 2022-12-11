@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net7.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\src\Realm.Interfaces\Realm.Interfaces.csproj" />
+    <ProjectReference Include="..\src\Realm.Scripting\Realm.Module.Scripting.csproj" />
+  </ItemGroup>
+
+</Project>
