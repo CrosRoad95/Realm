@@ -1,10 +1,5 @@
 ﻿import * as TestModule from "Test/test.js"
 
-const asdf23 = createPickup(new Vector3(0, 0, 0), 1337)
-Logger.information("asdf23 {asdf23}", asdf23);
-const plrs = countElementsByType("player")
-Logger.information("plrs {asd}", plrs);
-
 import "panel.js"
 import "discord.js"
 import "login.js"

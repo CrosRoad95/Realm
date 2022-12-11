@@ -8,6 +8,7 @@ using Realm.Configuration;
 using Realm.Module.Grpc;
 using Realm.Module.Discord;
 
+var console = new ServerConsole();
 var logger = new RealmLogger(LogEventLevel.Verbose)
     .AddSeq()
     .GetLogger();
@@ -21,7 +22,7 @@ builder.AddModule<ScriptingModule>();
 builder.AddModule<ServerScriptingModule>();
 builder.AddModule<GrpcModule>();
 builder.AddLogger(logger);
-builder.AddConsole(new ServerConsole());
+builder.AddConsole(console);
 builder.AddConfiguration(configurationProvider);
 
 SemaphoreSlim semaphore = new(0);
@@ -33,6 +34,7 @@ Console.CancelKeyPress += async (sender, args) =>
 };
 
 await server.Start();
+console.Start();
 await semaphore.WaitAsync();
 
 
