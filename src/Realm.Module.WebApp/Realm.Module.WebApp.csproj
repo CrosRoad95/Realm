@@ -7,8 +7,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\src\Realm.Interfaces\Realm.Interfaces.csproj" />
-    <ProjectReference Include="..\src\Realm.Scripting\Realm.Module.Scripting.csproj" />
+    <ProjectReference Include="..\Realm.Interfaces\Realm.Interfaces.csproj" />
+    <ProjectReference Include="..\Realm.Scripting\Realm.Module.Scripting.csproj" />
   </ItemGroup>
 
 </Project>

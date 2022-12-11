@@ -78,7 +78,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tools", "Tools", "{27CC0F2A
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Realm.Tools.TypescriptDefinitionGenerator", "src\Realm.Tools.TypescriptDefinitionGenerator\Realm.Tools.TypescriptDefinitionGenerator.csproj", "{EF78464C-07F9-4BE7-ABAF-D672B91869AA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Realm.Module.WebApp", "Realm.Module.WebApp\Realm.Module.WebApp.csproj", "{8060B5A2-41BA-46ED-B46E-35B13D59D429}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Realm.Module.WebApp", "src\Realm.Module.WebApp\Realm.Module.WebApp.csproj", "{8060B5A2-41BA-46ED-B46E-35B13D59D429}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
