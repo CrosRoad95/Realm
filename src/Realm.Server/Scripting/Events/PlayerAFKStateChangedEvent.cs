@@ -10,7 +10,7 @@ public class PlayerAFKStateChangedEvent : INamedLuaEvent, IDisposable
     public static string EventName => "onPlayerAFKStateChanged";
 
     [ScriptMember("player")]
-    public RPGPlayer rpgPlayer
+    public RPGPlayer RPGPlayer
     {
         get
         {

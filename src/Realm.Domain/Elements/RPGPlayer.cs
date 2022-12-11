@@ -24,10 +24,13 @@ public class RPGPlayer : Player
 
     [ScriptMember("account", ScriptAccess.ReadOnly)]
     public PlayerAccount? Account { get; private set; }
+
     [ScriptMember("language", ScriptAccess.ReadOnly)]
     public string Language { get; private set; } = "pl";
+
     [ScriptMember("isLoggedIn", ScriptAccess.ReadOnly)]
     public bool IsLoggedIn => Account != null && Account.IsAuthenticated;
+
     [ScriptMember("components")]
     public ComponentSystem Components
     {
@@ -38,6 +41,7 @@ public class RPGPlayer : Player
             throw new Exception();
         }
     }
+
     [ScriptMember("inventory")]
     public InventorySystem Inventory
     {
@@ -91,6 +95,13 @@ public class RPGPlayer : Player
         }
     }
 
+    #region Proxy to parent class
+
+    [ScriptMember("name")]
+    public string Name { get => base.Name; set => base.Name = value; }
+    #endregion
+
+    #region Events
     public event Action<RPGPlayer, bool>? AdminToolsStateChanged;
     public event Action<RPGPlayer, bool>? NoClipStateChanged;
     public new event Action<RPGPlayer, RPGSpawn>? Spawned;
@@ -106,6 +117,7 @@ public class RPGPlayer : Player
     public event Action<RPGPlayer, string>? GuiClosed;
     public event Action<RPGPlayer>? AllGuiClosed;
     public event Action<RPGPlayer, string>? NotificationAdded;
+    #endregion
 
     public RPGPlayer(MtaServer mtaServer)
     {

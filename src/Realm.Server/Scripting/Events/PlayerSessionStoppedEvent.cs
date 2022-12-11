@@ -2,6 +2,7 @@
 
 namespace Realm.Server.Scripting.Events;
 
+[NoDefaultScriptAccess]
 public class PlayerSessionStoppedEvent : INamedLuaEvent, IDisposable
 {
     private bool _disposed = false;
@@ -10,7 +11,8 @@ public class PlayerSessionStoppedEvent : INamedLuaEvent, IDisposable
 
     public static string EventName => "onPlayerSessionStopped";
 
-    public RPGPlayer rpgPlayer
+    [ScriptMember("player")]
+    public RPGPlayer RPGPlayer
     {
         get
         {
@@ -18,7 +20,8 @@ public class PlayerSessionStoppedEvent : INamedLuaEvent, IDisposable
             return _rpgPlayer;
         }
     }
-    
+
+    [ScriptMember("session", ScriptMemberFlags.ExposeRuntimeType)]
     public SessionBase Session
     {
         get
@@ -40,7 +43,6 @@ public class PlayerSessionStoppedEvent : INamedLuaEvent, IDisposable
             throw new ObjectDisposedException(GetType().FullName);
     }
 
-    [NoScriptAccess]
     public void Dispose()
     {
         _disposed = true;

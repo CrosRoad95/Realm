@@ -11,7 +11,7 @@ public class PlayerDailyVisitEvent : INamedLuaEvent, IDisposable
     public static string EventName => "onPlayerDailyVisit";
 
     [ScriptMember("player")]
-    public RPGPlayer rpgPlayer
+    public RPGPlayer RPGPlayer
     {
         get
         {

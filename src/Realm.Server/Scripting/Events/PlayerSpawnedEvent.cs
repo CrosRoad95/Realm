@@ -1,5 +1,6 @@
 ﻿namespace Realm.Server.Scripting.Events;
 
+[NoDefaultScriptAccess]
 public class PlayerSpawnedEvent : INamedLuaEvent, IDisposable
 {
     private bool _disposed = false;
@@ -9,7 +10,9 @@ public class PlayerSpawnedEvent : INamedLuaEvent, IDisposable
 
     public static string EventName => "onPlayerSpawn";
 
-    public RPGPlayer rpgPlayer
+    [ScriptMember("player")]
+    public RPGPlayer RPGPlayer
+
     {
         get
         {
@@ -18,6 +21,7 @@ public class PlayerSpawnedEvent : INamedLuaEvent, IDisposable
         }
     }
 
+    [ScriptMember("spawn")]
     public RPGSpawn? Spawn
     {
         get
@@ -27,6 +31,7 @@ public class PlayerSpawnedEvent : INamedLuaEvent, IDisposable
         }
     }
 
+    [ScriptMember("position")]
     public Vector3 Position
     {
         get
@@ -54,7 +59,6 @@ public class PlayerSpawnedEvent : INamedLuaEvent, IDisposable
             throw new ObjectDisposedException(GetType().FullName);
     }
 
-    [NoScriptAccess]
     public void Dispose()
     {
         _disposed = true;

@@ -1,5 +1,6 @@
 ﻿namespace Realm.Server.Scripting.Events;
 
+[NoDefaultScriptAccess]
 public class FormContextEvent : INamedLuaEvent, IDisposable
 {
     private bool _disposed = false;
@@ -8,7 +9,8 @@ public class FormContextEvent : INamedLuaEvent, IDisposable
 
     public static string EventName => "onFormSubmit";
 
-    public RPGPlayer rpgPlayer
+    [ScriptMember("player")]
+    public RPGPlayer RPGPlayer
     {
         get
         {
@@ -16,6 +18,8 @@ public class FormContextEvent : INamedLuaEvent, IDisposable
             return (RPGPlayer)_luaEvent.Player;
         }
     }
+
+    [ScriptMember("id")]
     public string Id
     {
         get
@@ -24,6 +28,8 @@ public class FormContextEvent : INamedLuaEvent, IDisposable
             return _luaEvent.Parameters[0].StringValue ?? throw new InvalidOperationException();
         }
     }
+
+    [ScriptMember("name")]
     public string Name
     {
         get
@@ -33,11 +39,10 @@ public class FormContextEvent : INamedLuaEvent, IDisposable
         }
     }
 
-    [NoScriptAccess]
     public bool IsSuccess { get; private set; } = false;
-    [NoScriptAccess]
     public string? Response { get; private set; } = null;
 
+    [ScriptMember("form")]
     public PropertyBag Form
     {
         get
@@ -56,12 +61,14 @@ public class FormContextEvent : INamedLuaEvent, IDisposable
         _fromLuaValueMapper = fromLuaValueMapper;
     }
 
+    [ScriptMember("success")]
     public void Success()
     {
         CheckIfDisposed();
         IsSuccess = true;
     }
 
+    [ScriptMember("success")]
     public void Success(string response)
     {
         CheckIfDisposed();
@@ -69,6 +76,7 @@ public class FormContextEvent : INamedLuaEvent, IDisposable
         Response = response;
     }
 
+    [ScriptMember("error")]
     public void Error(string errorMessage)
     {
         CheckIfDisposed();
@@ -82,7 +90,6 @@ public class FormContextEvent : INamedLuaEvent, IDisposable
             throw new ObjectDisposedException(GetType().FullName);
     }
 
-    [NoScriptAccess]
     public void Dispose()
     {
         _disposed = true;

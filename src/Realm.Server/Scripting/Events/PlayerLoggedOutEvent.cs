@@ -1,5 +1,6 @@
 ﻿namespace Realm.Server.Scripting.Events;
 
+[NoDefaultScriptAccess]
 public class PlayerLoggedOutEvent : INamedLuaEvent, IDisposable
 {
     private bool _disposed = false;
@@ -7,7 +8,8 @@ public class PlayerLoggedOutEvent : INamedLuaEvent, IDisposable
 
     public static string EventName => "onPlayerLogout";
 
-    public RPGPlayer rpgPlayer
+    [ScriptMember("player")]
+    public RPGPlayer RPGPlayer
     {
         get
         {
@@ -27,7 +29,6 @@ public class PlayerLoggedOutEvent : INamedLuaEvent, IDisposable
             throw new ObjectDisposedException(GetType().FullName);
     }
 
-    [NoScriptAccess]
     public void Dispose()
     {
         _disposed = true;

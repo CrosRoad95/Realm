@@ -1,22 +1,25 @@
 ﻿namespace Realm.Server.Scripting.Events;
 
+[NoDefaultScriptAccess]
 public class VehicleSpawnedEvent : INamedLuaEvent, IDisposable
 {
     private bool _disposed = false;
-    private RPGVehicle _vehicle;
+    private RPGVehicle _rpgVehicle;
     private RPGSpawn? _spawn;
 
     public static string EventName => "onVehicleSpawn";
 
-    public RPGVehicle Vehicle
+    [ScriptMember("vehicle")]
+    public RPGVehicle RPGVehicle
     {
         get
         {
             CheckIfDisposed();
-            return _vehicle;
+            return _rpgVehicle;
         }
     }
 
+    [ScriptMember("spawn")]
     public RPGSpawn? Spawn
     {
         get
@@ -28,7 +31,7 @@ public class VehicleSpawnedEvent : INamedLuaEvent, IDisposable
 
     public VehicleSpawnedEvent(RPGVehicle vehicle, RPGSpawn? spawn)
     {
-        _vehicle = vehicle;
+        _rpgVehicle = vehicle;
         _spawn = spawn;
     }
 
@@ -38,7 +41,6 @@ public class VehicleSpawnedEvent : INamedLuaEvent, IDisposable
             throw new ObjectDisposedException(GetType().FullName);
     }
 
-    [NoScriptAccess]
     public void Dispose()
     {
         _disposed = true;
