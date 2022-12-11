@@ -12,7 +12,7 @@ internal class HotReload
     public HotReload(string path)
     {
         _fileSystemWatcher = new FileSystemWatcher();
-        _fileSystemWatcher.Path = path;//Path.Combine(Directory.GetCurrentDirectory(), path);
+        _fileSystemWatcher.Path = path;
         _fileSystemWatcher.NotifyFilter = NotifyFilters.FileName | NotifyFilters.Size;
         _fileSystemWatcher.IncludeSubdirectories = true;
         _fileSystemWatcher.Filters.Add("*.js");
