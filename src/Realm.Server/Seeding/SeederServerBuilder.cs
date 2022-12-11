@@ -170,5 +170,6 @@ internal sealed class SeederServerBuilder
         BuildBlips(seedData.Blips);
         BuildPickups(seedData.Pickups);
         await BuildFractions(seedData.Fractions);
+        _createdAccounts.Clear();
     }
 }

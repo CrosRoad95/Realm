@@ -239,6 +239,7 @@ public partial class RPGServer : IRPGServer, IReloadable
             HandlePlayerJoined(player);
 
         RemoveAllElements();
+
         ServerReloaded?.Invoke();
         return Task.CompletedTask;
     }

@@ -1,5 +1,7 @@
 ﻿import * as TestModule from "Test/test.js"
 
+Logger.information("test");
+
 import "panel.js"
 import "discord.js"
 import "login.js"
