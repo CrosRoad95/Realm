@@ -125,7 +125,7 @@ public class ElementScriptingFunctions
     [ScriptMember("destroyElement")]
     public bool DestroyElement(Element element)
     {
-        bool wasDestroyed = false;
+        bool canBeDestroyed = false;
         switch (element)
         {
             case Player _:
@@ -133,21 +133,19 @@ public class ElementScriptingFunctions
             case RPGSpawn spawn:
                 if (spawn.IsPersistant())
                     throw new Exception("Can not destroy persistant element.");
-                wasDestroyed = true;
+                canBeDestroyed = true;
                 break;
             case RPGVehicle vehicle:
                 vehicle.Destroy();
                 if(vehicle.IsPersistant())
                     _logger.Verbose("Destroyed persistant vehicle of id: {vehicleId}", vehicle.VehicleId);
-                wasDestroyed = true;
+                canBeDestroyed = true;
                 break;
         }
 
-        if (wasDestroyed && IsElement(element))
+        if (canBeDestroyed)
         {
-            _elementCollection.Remove(element);
-            if(element is IDisposable)
-                ((IDisposable)element).Dispose();
+            _elementCollection.TryDestroyAndDispose(element);
             return true;
         }
 
@@ -158,10 +156,5 @@ public class ElementScriptingFunctions
     public VehicleUpgrade? GetVehicleUpgradeByName(string name) => _vehicleUpgradeByStringCollection.GetElementById(name);
 
     [ScriptMember("isElement")]
-    public bool IsElement(Element element)
-    {
-        if (_elementCollection.Get(element.Id) != null)
-            return true;
-        return _elementCollection.GetAll().Any(x => x == element);
-    }
+    public bool IsElement(Element element) => _elementCollection.IsElement(element);
 }

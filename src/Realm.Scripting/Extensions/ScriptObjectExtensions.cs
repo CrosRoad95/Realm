@@ -24,4 +24,23 @@ public static class ScriptObjectExtensions
         }
         return null;
     }
+
+    public static string[]? ConvertToArrayString(this ScriptObject? arg)
+    {
+        if (arg == null)
+            return null;
+
+        dynamic scriptObject = arg;
+        if (scriptObject.constructor.name == "Array")
+        {
+            int length = Convert.ToInt32(scriptObject.length);
+            var array = new string[length];
+            for (var index = 0; index < length; ++index)
+            {
+                array[index] = ((scriptObject[index]) as object).ToString();
+            }
+            return array;
+        }
+        return null;
+    }
 }

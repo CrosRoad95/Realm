@@ -3,5 +3,6 @@
 public interface IPeriodicEntitySaveService
 {
     void AccountCreated(PlayerAccount playerAccount);
+    Task Flush();
     void VehicleCreated(RPGVehicle persistantVehicle);
 }

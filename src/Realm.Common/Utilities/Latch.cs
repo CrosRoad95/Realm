@@ -26,6 +26,8 @@ public class Latch
 
     public TaskAwaiter GetAwaiter()
     {
+        if (_count == 0)
+            _taskCompletionSource.TrySetResult(new object());
         return Task.GetAwaiter();
     }
 }

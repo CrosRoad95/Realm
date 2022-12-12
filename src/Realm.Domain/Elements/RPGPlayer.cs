@@ -300,7 +300,7 @@ public class RPGPlayer : Player
         Camera.Fade(CameraFade.Out, 0, Color.Black);
         Camera.Target = null;
         Account = null;
-        ResourceStartingLatch = new(_RESOURCE_COUNT); // TODO: remove hardcoded resources counter
+        ResourceStartingLatch = new(0);
         DebugView = false;
         _runningSessions.Clear();
     }

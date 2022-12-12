@@ -14,46 +14,51 @@ internal sealed class PeriodicEntitySaveService : IPeriodicEntitySaveService
 
     private async Task PeriodicSaveEntities()
     {
-        List<PlayerAccount> workingCopyOfPlayerAccounts = new();
-        List<RPGVehicle> workingCopyOfPersistantVehicles = new();
         while (true)
         {
             await Task.Delay(TimeSpan.FromSeconds(10));
-            await semaphore.WaitAsync();
-            if (_playerAccountsToSave.Any())
-            {
-                workingCopyOfPlayerAccounts = _playerAccountsToSave.Cast<PlayerAccount>().ToList();
-                _playerAccountsToSave.Clear();
-            }
+            await Flush();
+        }
+    }
 
-            if (_persistantVehiclesToSave.Any())
-            {
-                workingCopyOfPersistantVehicles = _persistantVehiclesToSave.Cast<RPGVehicle>().ToList();
-                _persistantVehiclesToSave.Clear();
-            }
+    public async Task Flush()
+    {
+        List<PlayerAccount> workingCopyOfPlayerAccounts = new();
+        List<RPGVehicle> workingCopyOfPersistantVehicles = new();
+        await semaphore.WaitAsync();
+        if (_playerAccountsToSave.Any())
+        {
+            workingCopyOfPlayerAccounts = _playerAccountsToSave.Cast<PlayerAccount>().ToList();
+            _playerAccountsToSave.Clear();
+        }
 
-            semaphore.Release();
+        if (_persistantVehiclesToSave.Any())
+        {
+            workingCopyOfPersistantVehicles = _persistantVehiclesToSave.Cast<RPGVehicle>().ToList();
+            _persistantVehiclesToSave.Clear();
+        }
 
-            if (workingCopyOfPlayerAccounts.Any())
-            {
-                // Save account in try catch, report errors, maybe reschedule save
-                foreach (var playerAccount in workingCopyOfPlayerAccounts)
-                {
-                    await playerAccount.Save();
-                }
-                _logger.Verbose("Saved {count} accounts.", workingCopyOfPlayerAccounts.Count);
-                workingCopyOfPlayerAccounts.Clear();
-            }
+        semaphore.Release();
 
-            if (workingCopyOfPersistantVehicles.Any())
+        if (workingCopyOfPlayerAccounts.Any())
+        {
+            // Save account in try catch, report errors, maybe reschedule save
+            foreach (var playerAccount in workingCopyOfPlayerAccounts)
             {
-                foreach (var persistantVehicle in workingCopyOfPersistantVehicles)
-                {
-                    await persistantVehicle.Save();
-                }
-                _logger.Verbose("Saved {count} vehicles.", workingCopyOfPersistantVehicles.Count);
-                workingCopyOfPersistantVehicles.Clear();
+                await playerAccount.Save();
             }
+            _logger.Verbose("Saved {count} accounts.", workingCopyOfPlayerAccounts.Count);
+            workingCopyOfPlayerAccounts.Clear();
+        }
+
+        if (workingCopyOfPersistantVehicles.Any())
+        {
+            foreach (var persistantVehicle in workingCopyOfPersistantVehicles)
+            {
+                await persistantVehicle.Save();
+            }
+            _logger.Verbose("Saved {count} vehicles.", workingCopyOfPersistantVehicles.Count);
+            workingCopyOfPersistantVehicles.Clear();
         }
     }
 

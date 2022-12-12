@@ -10,6 +10,7 @@ using Realm.Module.Discord;
 using Realm.Console.Utilities;
 using System.Diagnostics;
 using Realm.Interfaces.Common;
+using Realm.Server.Interfaces;
 
 var console = new ServerConsole();
 var logger = new RealmLogger(LogEventLevel.Verbose)
@@ -45,10 +46,7 @@ var hotReload = new HotReload("../../../Server");
         var stopwatch = Stopwatch.StartNew();
         logger.Information("\n\n\n");
         logger.Information("Changes detected, reloading server:");
-
-        var reloadable = server.GetRequiredService<IEnumerable<IReloadable>>();
-        foreach (var item in reloadable)
-            await item.Reload();
+        await server.DoReload();
         logger.Information("Server reloaded in: {time}ms", stopwatch.ElapsedMilliseconds);
     };
 #endif

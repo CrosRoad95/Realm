@@ -4,21 +4,19 @@ internal class ReloadCommand : ICommand
 {
     public string CommandName => "reload";
 
-    private readonly IReloadable[] _reloadable;
+    private readonly IRPGServer _rpgServer;
     private readonly ILogger _logger;
 
-    public ReloadCommand(IEnumerable<IReloadable> reloadable, ILogger logger)
+    public ReloadCommand(IRPGServer rpgServer, ILogger logger)
     {
-        _reloadable = reloadable.ToArray();
+        _rpgServer = rpgServer;
         _logger = logger.ForContext<ReloadCommand>();
     }
 
-    public void HandleCommand(string command)
+    public async void HandleCommand(string command)
     {
         _logger.Information("Reloading server...");
-        foreach (var reloadable in _reloadable.OrderBy(x => x.GetPriority()))
-            reloadable.Reload();
+        await _rpgServer.DoReload();
         _logger.Information("Server reloaded");
-
     }
 }

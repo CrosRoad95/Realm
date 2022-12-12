@@ -87,4 +87,9 @@ internal class TestRPGServer : IReloadable, IRPGServer
     {
         //throw new NotImplementedException();
     }
+
+    public Task DoReload()
+    {
+        throw new NotImplementedException();
+    }
 }

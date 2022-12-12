@@ -115,5 +115,5 @@ internal class JavascriptRuntime : IScriptingModuleInterface, IReloadable
         await Start();
     }
 
-    public int GetPriority() => 50;
+    public int GetPriority() => 1000;
 }

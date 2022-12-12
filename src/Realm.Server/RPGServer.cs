@@ -1,8 +1,11 @@
-﻿using Realm.Domain.Components;
+﻿using Microsoft.AspNetCore.Hosting.Server;
+using Microsoft.Extensions.DependencyInjection;
+using Realm.Domain.Components;
 using Realm.Domain.Elements.CollisionShapes;
 using Realm.Domain.Elements.Variants;
 using Realm.Domain.Inventory;
 using Realm.Domain.Sessions;
+using Realm.Interfaces.Common;
 using static Realm.Domain.Upgrades.VehicleUpgrade;
 
 namespace Realm.Server;
@@ -57,7 +60,9 @@ public partial class RPGServer : IRPGServer, IReloadable
                     services.AddSingleton<InputScriptingFunctions>();
 
                     // Services
+                    services.AddSingleton<RPGCommandService>();
                     services.AddSingleton<RPGPlayerService>();
+                    services.AddSingleton<IReloadable>(x => x.GetRequiredService<RPGCommandService>());
                     services.AddSingleton<IAccountsInUseService, AccountsInUseService>();
                     services.AddSingleton<IPeriodicEntitySaveService, PeriodicEntitySaveService>();
 
@@ -118,9 +123,9 @@ public partial class RPGServer : IRPGServer, IReloadable
         if (rpgPlayer.ResourceStartingLatch != null)
             await rpgPlayer.ResourceStartingLatch;
 
-        rpgPlayer.ResourceStartingLatch = new();
         using var playerJoinedEvent = new PlayerJoinedEvent(rpgPlayer);
         await _eventFunctions.InvokeEvent(playerJoinedEvent);
+
     }
 
     public void InitializeScripting(IScriptingModuleInterface scriptingModuleInterface)
@@ -187,6 +192,26 @@ public partial class RPGServer : IRPGServer, IReloadable
         return _server.GetRequiredService<TService>();
     }
 
+    public async Task DoReload()
+    {
+        await GetRequiredService<IPeriodicEntitySaveService>().Flush();
+        var reloadable = GetRequiredService<IEnumerable<IReloadable>>();
+        foreach (var item in reloadable.OrderBy(x => x.GetPriority()))
+            await item.Reload();
+
+        var players = _elementCollection.GetByType<Player>().Cast<RPGPlayer>();
+        foreach (var player in players)
+            player.Reset();
+
+        foreach (var player in players)
+            HandlePlayerJoined(player);
+    }
+
+    public async Task Save()
+    {
+
+    }
+
     public async Task Start()
     {
         await BuildFromSeedFiles();
@@ -220,23 +245,18 @@ public partial class RPGServer : IRPGServer, IReloadable
     private void RemoveAllElements()
     {
         foreach (var spawn in _elementFunctions.GetCollectionByType("spawn").Cast<RPGSpawn>().ToList())
-            if(!spawn.IsPersistant() && _elementFunctions.IsElement(spawn))
-                _elementFunctions.DestroyElement(spawn);
+            _elementCollection.TryDestroyAndDispose(spawn);
+        foreach (var vehicle in _elementFunctions.GetCollectionByType("vehicle").Cast<RPGVehicle>().ToList())
+            _elementCollection.TryDestroyAndDispose(vehicle);
     }
 
     public Task Reload()
     {
-        var players = _elementCollection.GetByType<Player>().Cast<RPGPlayer>();
-        foreach (var player in players)
-            player.Reset();
-        foreach (var player in players)
-            HandlePlayerJoined(player);
-
         RemoveAllElements();
 
         ServerReloaded?.Invoke();
         return Task.CompletedTask;
     }
 
-    public int GetPriority() => 0;
+    public int GetPriority() => 40;
 }

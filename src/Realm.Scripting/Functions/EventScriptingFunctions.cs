@@ -82,5 +82,5 @@ public class EventScriptingFunctions : IReloadable
         return Task.CompletedTask;
     }
 
-    public int GetPriority() => 60;
+    public int GetPriority() => -100;
 }

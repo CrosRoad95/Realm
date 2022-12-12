@@ -9,6 +9,7 @@ public interface IRPGServer
     event Action? ServerReloaded;
 
     void AssociateElement(Element element);
+    Task DoReload();
     TService GetRequiredService<TService>() where TService : notnull;
     void InitializeScripting(IScriptingModuleInterface scriptingModuleInterface);
 }
