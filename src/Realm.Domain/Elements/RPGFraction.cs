@@ -1,6 +1,7 @@
 ﻿using Realm.Domain.Sessions;
 using Realm.Module.Scripting.Extensions;
 using Realm.Persistance.Scripting.Classes;
+using Realm.Resources.AdminTools.Data;
 using SlipeServer.Server.Elements.Events;
 
 namespace Realm.Domain.Elements;
@@ -11,11 +12,7 @@ public class RPGFraction : Element, IDisposable, IWorldDebugData
     private bool _disposed;
     private readonly bool _isPersistant = PersistantScope.IsPersistant;
 
-    private readonly Guid _debugId = Guid.NewGuid();
-    [ScriptMember("debugId")]
-    public Guid DebugId => _debugId;
-    public PreviewType PreviewType => PreviewType.BoxWireframe;
-    public Color PreviewColor => Color.FromArgb(100, 0, 200, 200);
+    public DebugData DebugData => new(PreviewType.BoxWireframe, Color.FromArgb(100, 0, 200, 0));
 
     public string Code { get; [NoScriptAccess] set; } = "";
     public string MemberClaim { get; [NoScriptAccess] set; } = "";

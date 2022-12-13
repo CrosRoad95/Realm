@@ -94,7 +94,7 @@ public class RPGPlayer : Player
             }
         }
     }
-
+    
     #region Proxy to parent class
 
     [ScriptMember("name")]

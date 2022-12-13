@@ -1,4 +1,6 @@
-﻿namespace Realm.Domain.Elements;
+﻿using Realm.Resources.AdminTools.Data;
+
+namespace Realm.Domain.Elements;
 
 [NoDefaultScriptAccess]
 public class RPGVehicle : Vehicle, IWorldDebugData, IDisposable
@@ -9,12 +11,7 @@ public class RPGVehicle : Vehicle, IWorldDebugData, IDisposable
 
     public event Action<RPGVehicle, RPGSpawn?>? Spawned;
 
-    private readonly Guid _debugId = Guid.NewGuid();
-    [ScriptMember("debugId")]
-    public Guid DebugId => _debugId;
-    public PreviewType PreviewType => PreviewType.None;
-    public Color PreviewColor => Color.FromArgb(100, 200, 0, 0);
-
+    public DebugData DebugData => new(PreviewType.None, Color.FromArgb(100, 200, 0, 0));
     public string VehicleId { get => _vehicleId ?? throw new InvalidDataException(nameof(Id)); }
 
     public event Action<RPGVehicle>? NotifyNotSavedState;

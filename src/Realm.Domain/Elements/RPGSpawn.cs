@@ -1,4 +1,5 @@
 ﻿using Realm.Persistance;
+using Realm.Resources.AdminTools.Data;
 
 namespace Realm.Domain.Elements;
 
@@ -7,15 +8,9 @@ public class RPGSpawn : Element, IDisposable, IWorldDebugData
 {
     private bool _disposed = false;
     private readonly AuthorizationPoliciesProvider _authorizationPoliciesProvider;
-
-    private readonly Guid _debugId = Guid.NewGuid();
-    [ScriptMember("debugId")]
-    public Guid DebugId => _debugId;
-    public PreviewType PreviewType => PreviewType.BoxWireframe;
-    public Color PreviewColor => Color.FromArgb(100, 0, 200, 0);
-
     private readonly bool _isPersistant = PersistantScope.IsPersistant;
     private readonly List<string> _requiredPolices = new();
+    public DebugData DebugData => new(PreviewType.BoxWireframe, Color.FromArgb(100, 0, 200, 0));
 
     public RPGSpawn(AuthorizationPoliciesProvider authorizationPoliciesProvider)
     {

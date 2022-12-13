@@ -1,4 +1,6 @@
-﻿namespace Realm.Domain.Elements;
+﻿using Realm.Resources.AdminTools.Data;
+
+namespace Realm.Domain.Elements;
 
 [NoDefaultScriptAccess]
 public class RPGPickup : Pickup, IDisposable, IWorldDebugData
@@ -6,12 +8,7 @@ public class RPGPickup : Pickup, IDisposable, IWorldDebugData
     private bool _disposed;
     private readonly bool _isPersistant = PersistantScope.IsPersistant;
 
-    private readonly Guid _debugId = Guid.NewGuid();
-    [ScriptMember("debugId")]
-    public Guid DebugId => _debugId;
-    public PreviewType PreviewType => PreviewType.None;
-    public Color PreviewColor => Color.FromArgb(100, 200, 0, 0);
-
+    public DebugData DebugData => new(PreviewType.None, Color.FromArgb(100, 200, 0, 0));
     public bool IsVariant { get; private set; }
     public RPGPickup() : base(Vector3.Zero, SlipeServer.Server.Elements.Enums.PickupModel.InfoIcon)
     {

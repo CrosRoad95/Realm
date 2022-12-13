@@ -35,14 +35,14 @@ internal class AdminToolsLogic
     private LuaValue ElementToLuaValue(Element element)
     {
         var worldDebugData = element as IWorldDebugData;
-
+        var debugData = worldDebugData.DebugData;
         return new LuaValue(new Dictionary<LuaValue, LuaValue>
         {
             ["element"] = element,
-            ["debugId"] = worldDebugData.DebugId.ToString(),
+            ["debugId"] = debugData.DebugId.ToString(),
             ["name"] = element.ToString(),
-            ["previewType"] = (int)worldDebugData.PreviewType,
-            ["color"] = new LuaValue(new LuaValue[] { (int)worldDebugData.PreviewColor.R, (int)worldDebugData.PreviewColor.G, (int)worldDebugData.PreviewColor.B, (int)worldDebugData.PreviewColor.A }),
+            ["previewType"] = (int)debugData.PreviewType,
+            ["color"] = new LuaValue(new LuaValue[] { (int)debugData.PreviewColor.R, (int)debugData.PreviewColor.G, (int)debugData.PreviewColor.B, (int)debugData.PreviewColor.A }),
             ["type"] = element.GetType().Name,
             ["position"] = new LuaValue(new LuaValue[] { worldDebugData.Position.X, worldDebugData.Position.Y, worldDebugData.Position.Z }),
         });
