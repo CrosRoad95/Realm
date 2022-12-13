@@ -4,5 +4,5 @@ addEventHandler("internalSetWorldDebuggingEnabled", localPlayer, function(enable
 end)
 
 addEventHandler("onClientDebugMessage", root, function(message, level, file, line)
-	triggerServerEvent("internalDebugMessage", message, level, file, line)
+	triggerServerEventWithId("internalDebugMessage", message, level, file, line)
 end)

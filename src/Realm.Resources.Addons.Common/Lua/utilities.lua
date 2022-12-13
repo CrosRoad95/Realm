@@ -1,8 +1,6 @@
 ﻿local random = math.random
 local template ='xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'
 
-local _triggerServerEvent = triggerServerEvent;
-
 function uuid()
     local result = string.gsub(template, '[xy]', function (c)
         local v = (c == 'x') and random(0, 0xf) or random(8, 0xb)
@@ -16,9 +14,9 @@ function async(calledFunction, ...)
     coroutine.resume(co, ...)
 end 
 
-function triggerServerEvent(eventName, ...)
+function triggerServerEventWithId(eventName, ...)
     local id = uuid();
-    _triggerServerEvent(eventName, resourceRoot, id, ...)
+    triggerServerEvent(eventName, resourceRoot, id, ...)
     return id
 end
 

@@ -98,7 +98,7 @@ function createForm(name, fields)
 				data[name] = currentGuiProvider.getValue(elementHandle)
 			end
 
-			local id = triggerServerEvent("internalSubmitForm", name, data);
+			local id = triggerServerEventWithId("internalSubmitForm", name, data);
 			pendingFormsSubmissions[name] = {
 				id = id,
 				coroutine = coroutine.running()
@@ -117,10 +117,10 @@ end
 local function internalCommonGuiProvider()
 	return {
 		closeCurrentGui = function()
-			triggerServerEvent("internalRequestGuiClose", currentOpenedGui);
+			triggerServerEventWithId("internalRequestGuiClose", currentOpenedGui);
 		end,
 		navigateToGui = function(guiName)
-			triggerServerEvent("internalNavigateToGui", guiName);
+			triggerServerEventWithId("internalNavigateToGui", guiName);
 		end,
 		tryLoadRememberedForm = function(form)
 			local name = form.getName()
