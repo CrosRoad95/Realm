@@ -205,3 +205,7 @@ addCommandHandler("dailycomp", (player, args) => {
 addEventHandler("onPlayerDailyVisit", ({ player, visitsInRow, reseted }) => {
     Logger.information("player visit: {player}, {visitsInRow}, {reseted}", player, visitsInRow, reseted);
 });
+
+addEventHandler("onServerReloaded", () => {
+    Logger.information("SERVER RELOADED")
+});

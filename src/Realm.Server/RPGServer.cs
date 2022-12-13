@@ -6,6 +6,7 @@ using Realm.Domain.Elements.Variants;
 using Realm.Domain.Inventory;
 using Realm.Domain.Sessions;
 using Realm.Interfaces.Common;
+using Realm.Server.Scripting.Events;
 using static Realm.Domain.Upgrades.VehicleUpgrade;
 
 namespace Realm.Server;
@@ -141,6 +142,7 @@ public partial class RPGServer : IRPGServer, IReloadable
         _eventFunctions.RegisterEvent(PlayerDailyVisitEvent.EventName);
         _eventFunctions.RegisterEvent(PlayerSessionStartedEvent.EventName);
         _eventFunctions.RegisterEvent(PlayerSessionStoppedEvent.EventName);
+        _eventFunctions.RegisterEvent(ServerReloadedEvent.EventName);
 
         // Functions
         scriptingModuleInterface.AddHostObject("Elements", _elementFunctions, true);
@@ -169,6 +171,7 @@ public partial class RPGServer : IRPGServer, IReloadable
         scriptingModuleInterface.AddHostType(typeof(PlayerDailyVisitEvent));
         scriptingModuleInterface.AddHostType(typeof(PlayerSessionStartedEvent));
         scriptingModuleInterface.AddHostType(typeof(PlayerSessionStoppedEvent));
+        scriptingModuleInterface.AddHostType(typeof(ServerReloadedEvent));
 
         scriptingModuleInterface.AddHostType(typeof(ComponentSystem));
         scriptingModuleInterface.AddHostType(typeof(VehicleFuelComponent));
@@ -205,6 +208,9 @@ public partial class RPGServer : IRPGServer, IReloadable
 
         foreach (var player in players)
             HandlePlayerJoined(player);
+
+        using var serverReloadedEvent = new ServerReloadedEvent();
+        await _eventFunctions.InvokeEvent(serverReloadedEvent);
     }
 
     public async Task Save()
