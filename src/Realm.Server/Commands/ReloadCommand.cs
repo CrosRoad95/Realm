@@ -4,10 +4,10 @@ internal class ReloadCommand : ICommand
 {
     public string CommandName => "reload";
 
-    private readonly IRPGServer _rpgServer;
+    private readonly Interfaces.IInternalRPGServer _rpgServer;
     private readonly ILogger _logger;
 
-    public ReloadCommand(IRPGServer rpgServer, ILogger logger)
+    public ReloadCommand(Interfaces.IInternalRPGServer rpgServer, ILogger logger)
     {
         _rpgServer = rpgServer;
         _logger = logger.ForContext<ReloadCommand>();

@@ -6,7 +6,7 @@ namespace Realm.Server.Factories;
 
 internal sealed class RPGElementsFactory : IRPGElementsFactory
 {
-    private readonly IRPGServer _rpgServer;
+    private readonly Interfaces.IInternalRPGServer _rpgServer;
     private readonly IDb _db;
     private readonly ILogger _logger;
     private readonly IPeriodicEntitySaveService _periodicEntitySaveService;
@@ -17,7 +17,7 @@ internal sealed class RPGElementsFactory : IRPGElementsFactory
     public event Action<RPGBlip>? BlipCreated;
     public event Action<RPGFraction>? FractionCreated;
 
-    public RPGElementsFactory(IRPGServer rpgServer, IDb db, ILogger logger, IPeriodicEntitySaveService periodicEntitySaveService,
+    public RPGElementsFactory(Interfaces.IInternalRPGServer rpgServer, IDb db, ILogger logger, IPeriodicEntitySaveService periodicEntitySaveService,
         IElementIdGenerator elementIdGenerator)
     {
         _rpgServer = rpgServer;

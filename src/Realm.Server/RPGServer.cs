@@ -1,17 +1,21 @@
 ﻿using Microsoft.AspNetCore.Hosting.Server;
 using Microsoft.Extensions.DependencyInjection;
+using Realm.Domain;
 using Realm.Domain.Components;
 using Realm.Domain.Elements.CollisionShapes;
 using Realm.Domain.Elements.Variants;
 using Realm.Domain.Inventory;
+using Realm.Domain.New;
 using Realm.Domain.Sessions;
 using Realm.Interfaces.Common;
+using Realm.Server.Interfaces;
+using Realm.Server.Scripting;
 using Realm.Server.Scripting.Events;
 using static Realm.Domain.Upgrades.VehicleUpgrade;
 
 namespace Realm.Server;
 
-public partial class RPGServer : IRPGServer, IReloadable
+public partial class RPGServer : IInternalRPGServer, IRPGServer, IReloadable
 {
     private readonly MtaServer<RPGPlayer> _server;
     private readonly EventScriptingFunctions _eventFunctions;
@@ -19,11 +23,14 @@ public partial class RPGServer : IRPGServer, IReloadable
     private readonly InputScriptingFunctions _inputFunctions;
     private readonly GameplayScriptingFunctions _gameplayFunctions;
     private readonly LocalizationScriptingFunctions _localizationFunctions;
+    private readonly ServerScriptingFunctions _serverScriptingFunctions;
     private readonly IElementCollection _elementCollection;
     private readonly ILogger _logger;
 
     public event Action<Player>? PlayerJoined;
     public event Action? ServerReloaded;
+
+    private readonly List<Entity> _entities = new();
     public string MapName
     {
         get => _server.MapName;
@@ -48,8 +55,8 @@ public partial class RPGServer : IRPGServer, IReloadable
                 {
                     // Common
                     services.AddSingleton(realmConfigurationProvider);
-                    services.AddSingleton<IReloadable>(this);
-                    services.AddSingleton<IRPGServer>(this);
+                    services.AddSingleton((IReloadable)this);
+                    services.AddSingleton((Interfaces.IInternalRPGServer)this);
                     services.AddSingleton<ElementByStringIdCollection>();
                     services.AddSingleton<SeederServerBuilder>();
                     services.AddSingleton<VehicleUpgradeByStringCollection>();
@@ -59,11 +66,12 @@ public partial class RPGServer : IRPGServer, IReloadable
                     services.AddSingleton<LocalizationScriptingFunctions>();
                     services.AddSingleton<ElementScriptingFunctions>();
                     services.AddSingleton<InputScriptingFunctions>();
+                    services.AddSingleton<ServerScriptingFunctions>();
 
                     // Services
                     services.AddSingleton<RPGCommandService>();
                     services.AddSingleton<RPGPlayerService>();
-                    services.AddSingleton<IReloadable>(x => x.GetRequiredService<RPGCommandService>());
+                    services.AddSingleton((Func<IServiceProvider, IReloadable>)(x => x.GetRequiredService<RPGCommandService>()));
                     services.AddSingleton<IAccountsInUseService, AccountsInUseService>();
                     services.AddSingleton<IPeriodicEntitySaveService, PeriodicEntitySaveService>();
 
@@ -109,6 +117,7 @@ public partial class RPGServer : IRPGServer, IReloadable
         _localizationFunctions = _server.GetRequiredService<LocalizationScriptingFunctions>();
         _elementFunctions = _server.GetRequiredService<ElementScriptingFunctions>();
         _inputFunctions = _server.GetRequiredService<InputScriptingFunctions>();
+        _serverScriptingFunctions = _server.GetRequiredService<ServerScriptingFunctions>();
         _elementCollection = _server.GetRequiredService<IElementCollection>();
 
         _server.PlayerJoined += HandlePlayerJoined;
@@ -149,6 +158,7 @@ public partial class RPGServer : IRPGServer, IReloadable
         scriptingModuleInterface.AddHostObject("Input", _inputFunctions, true);
         scriptingModuleInterface.AddHostObject("Gameplay", _gameplayFunctions);
         scriptingModuleInterface.AddHostObject("Localization", _localizationFunctions, true);
+        scriptingModuleInterface.AddHostObject("Server", _serverScriptingFunctions, true);
 
         // Classes & Events & Contextes
         scriptingModuleInterface.AddHostType(typeof(RPGPlayer));
@@ -188,6 +198,12 @@ public partial class RPGServer : IRPGServer, IReloadable
 
         scriptingModuleInterface.AddHostType(typeof(InventorySystem));
         scriptingModuleInterface.AddHostType(typeof(PlayerItem));
+
+        // New Api
+        scriptingModuleInterface.AddHostType(typeof(Entity));
+        scriptingModuleInterface.AddHostType(typeof(TestComponent));
+        scriptingModuleInterface.AddHostType(typeof(PlayerElementCompoent));
+
     }
 
     public TService GetRequiredService<TService>() where TService: notnull
@@ -262,6 +278,11 @@ public partial class RPGServer : IRPGServer, IReloadable
 
         ServerReloaded?.Invoke();
         return Task.CompletedTask;
+    }
+
+    public Entity CreateEntity(string name)
+    {
+        return new Entity(this, name);
     }
 
     public int GetPriority() => 40;

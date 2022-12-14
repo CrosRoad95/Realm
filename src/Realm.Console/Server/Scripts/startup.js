@@ -1,7 +1,6 @@
 ﻿import * as TestModule from "Test/test.js"
 
-Logger.information("test");
-
+import "newapi.js"
 import "utilities.js"
 import "panel.js"
 import "discord.js"

@@ -15,7 +15,7 @@ using Realm.Server.Providers;
 
 namespace Realm.Tests.TestServers;
 
-internal class TestRPGServer : IReloadable, IRPGServer
+internal class TestRPGServer : IReloadable, Server.Interfaces.IInternalRPGServer
 {
     public MtaServer<TestRPGPlayer> TestServer { get; private set; }
     public string MapName { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
@@ -42,9 +42,9 @@ internal class TestRPGServer : IReloadable, IRPGServer
                 services.AddSingleton(configuration);
                 services.AddSingleton<IConsole, TestConsoleCommands>();
                 services.AddSingleton<IAccountsInUseService, TestAccountsInUseService>();
-                services.AddSingleton<IReloadable>(this);
-                services.AddSingleton<IRPGServer>(this);
-                services.AddSingleton<IServerFilesProvider>(NullServerFilesProvider.Instance);
+                services.AddSingleton((IReloadable)this);
+                services.AddSingleton((Server.Interfaces.IInternalRPGServer)this);
+                services.AddSingleton((IServerFilesProvider)NullServerFilesProvider.Instance);
                 services.AddSingleton(new RealmLogger().GetLogger());
 
                 services.AddSingleton<IRPGElementsFactory, TestRPGElementsFactory>();
