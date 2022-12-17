@@ -14,7 +14,7 @@ internal sealed class SeederServerBuilder
     private readonly EntityByStringIdCollection _elementByStringIdCollection;
     private readonly VehicleUpgradeByStringCollection _vehicleUpgradeByStringCollection;
     private readonly IServerFilesProvider _serverFilesProvider;
-    private readonly RPGServer _rpgServer;
+    private readonly IInternalRPGServer _rpgServer;
     private readonly ILogger _logger;
     private readonly IDeserializer _deserializer = new DeserializerBuilder()
         .WithNamingConvention(CamelCaseNamingConvention.Instance)
@@ -24,7 +24,7 @@ internal sealed class SeederServerBuilder
     private readonly Dictionary<string, AccountComponent> _createdAccounts = new();
     public SeederServerBuilder(IdentityScriptingFunctions identityFunctions, ILogger logger,
         EntityByStringIdCollection elementByStringIdCollection, VehicleUpgradeByStringCollection vehicleUpgradeByStringCollection,
-        IServerFilesProvider serverFilesProvider, RPGServer rpgServer)
+        IServerFilesProvider serverFilesProvider, IInternalRPGServer rpgServer)
     {
         _identityFunctions = identityFunctions;
         _elementByStringIdCollection = elementByStringIdCollection;

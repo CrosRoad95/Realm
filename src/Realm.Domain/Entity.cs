@@ -20,6 +20,10 @@ public class Entity
     [ScriptMember("transform")]
     public Transform Transform { get; private set; }
     public IRPGServer Server => _rpgServer;
+
+
+    public event Action<Entity>? Destroyed;
+
     public Entity(IRPGServer rpgServer, ServicesComponent servicesComponent, string name = "")
     {
         _rpgServer = rpgServer;
@@ -65,8 +69,6 @@ public class Entity
     {
         Destroyed?.Invoke(this);
     }
-
-    public event Action<Entity> Destroyed;
 
     public override string ToString() => Name;
 }

@@ -1,4 +1,5 @@
 ﻿using Realm.Interfaces.Server;
+using SlipeServer.Server.Elements;
 
 namespace Realm.Domain.New;
 
@@ -8,7 +9,7 @@ public class PickupElementComponent : Component
 
     public PickupElementComponent(ushort model)
     {
-        _pickup = new Pickup(Entity.Transform.Position, model);
+        _pickup = new Pickup(Vector3.Zero, model);
     }
 
     private void HandleDestroyed(Entity entity)
@@ -18,6 +19,7 @@ public class PickupElementComponent : Component
 
     public override Task Load()
     {
+        _pickup.Position = Entity.Transform.Position;
         Entity.GetRequiredService<IRPGServer>().AssociateElement(new ElementHandle(_pickup));
         Entity.Destroyed += HandleDestroyed;
         return Task.CompletedTask;

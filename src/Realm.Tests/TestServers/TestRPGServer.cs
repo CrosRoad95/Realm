@@ -17,7 +17,7 @@ namespace Realm.Tests.TestServers;
 
 internal class TestRPGServer : IReloadable, IInternalRPGServer
 {
-    public MtaServer<TestRPGPlayer> TestServer { get; private set; }
+    public MtaServer<RealmTestingPlayer> TestServer { get; private set; }
     public string MapName { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
     public string GameType { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
 
@@ -35,7 +35,7 @@ internal class TestRPGServer : IReloadable, IInternalRPGServer
         };
 
         var configuration = new TestConfigurationProvider();
-        TestServer = MtaServer.CreateWithDiSupport<TestRPGPlayer>(builder =>
+        TestServer = MtaServer.CreateWithDiSupport<RealmTestingPlayer>(builder =>
         {
             builder.ConfigureServices(services =>
             {

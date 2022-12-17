@@ -4,11 +4,11 @@ namespace Realm.Domain.New;
 
 public class BlipElementComponent : Component
 {
-    private Blip _blip;
+    private readonly Blip _blip;
 
     public BlipElementComponent(BlipIcon icon)
     {
-        _blip = new Blip(Entity.Transform.Position, icon);
+        _blip = new Blip(Vector3.Zero, icon);
     }
 
     private void HandleDestroyed(Entity entity)
@@ -18,6 +18,7 @@ public class BlipElementComponent : Component
 
     public override Task Load()
     {
+        _blip.Position = Entity.Transform.Position;
         Entity.GetRequiredService<IRPGServer>().AssociateElement(new ElementHandle(_blip));
         Entity.Destroyed += HandleDestroyed;
         return Task.CompletedTask;

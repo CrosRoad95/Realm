@@ -22,5 +22,8 @@ public class ServicesComponent : Component
         _serviceProvider = serviceProvider;
     }
 
-    public T GetRequiredService<T>() => _serviceProvider.GetRequiredService<T>();
+    public T GetRequiredService<T>() where T : notnull
+    {
+        return _serviceProvider.GetRequiredService<T>();
+    }
 }

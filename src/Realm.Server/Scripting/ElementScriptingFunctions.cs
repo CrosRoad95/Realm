@@ -8,17 +8,17 @@ public class ElementScriptingFunctions
     private readonly IElementCollection _elementCollection;
     private readonly EntityByStringIdCollection _entityByStringIdCollection;
     private readonly VehicleUpgradeByStringCollection _vehicleUpgradeByStringCollection;
-    private readonly ILogger _logger;
+    private readonly EntityElementFactory _entityElementFactory;
 
     public ElementScriptingFunctions(IElementCollection elementCollection,
         EntityByStringIdCollection entityByStringIdCollection,
         VehicleUpgradeByStringCollection vehicleUpgradeByStringCollection,
-        ILogger logger)
+        EntityElementFactory entityElementFactory)
     {
         _elementCollection = elementCollection;
         _entityByStringIdCollection = entityByStringIdCollection;
         _vehicleUpgradeByStringCollection = vehicleUpgradeByStringCollection;
-        _logger = logger.ForContext<ElementScriptingFunctions>();
+        _entityElementFactory = entityElementFactory;
     }
 
     [ScriptMember("getEntityId")]
@@ -34,4 +34,10 @@ public class ElementScriptingFunctions
 
     [ScriptMember("isElement")]
     public bool IsElement(Element element) => _elementCollection.IsElement(element);
+
+    [ScriptMember("createVehicle")]
+    public Entity CreateVehicle(ushort model, Vector3 position, Vector3? rotation = null)
+    {
+        return _entityElementFactory.CreateVehicle(model, position, rotation ?? Vector3.Zero);
+    }
 }

@@ -4,7 +4,7 @@
 public class PlayerDailyVisitEvent : INamedLuaEvent, IDisposable
 {
     private bool _disposed = false;
-    private readonly Player _rpgPlayer;
+    private readonly Player _player;
     private readonly int _visitsInRow;
     private readonly bool _reseted;
 
@@ -16,7 +16,7 @@ public class PlayerDailyVisitEvent : INamedLuaEvent, IDisposable
         get
         {
             CheckIfDisposed();
-            return _rpgPlayer;
+            return _player;
         }
     }
 
@@ -43,7 +43,7 @@ public class PlayerDailyVisitEvent : INamedLuaEvent, IDisposable
 
     public PlayerDailyVisitEvent(Player player, int visitsInRow, bool reseted)
     {
-        _rpgPlayer = player;
+        _player = player;
         _visitsInRow = visitsInRow;
         _reseted = reseted;
     }

@@ -1,6 +1,6 @@
 ﻿namespace Realm.Tests;
 
-public class TestRPGPlayer : TestingPlayer
+public class RealmTestingPlayer : TestingPlayer
 {
     public CancellationToken CancellationToken { get; private set; }
 
@@ -10,7 +10,7 @@ public class TestRPGPlayer : TestingPlayer
 
     private readonly CancellationTokenSource _cancellationTokenSource;
 
-    public TestRPGPlayer()
+    public RealmTestingPlayer()
     {
         _cancellationTokenSource = new CancellationTokenSource();
         CancellationToken = _cancellationTokenSource.Token;

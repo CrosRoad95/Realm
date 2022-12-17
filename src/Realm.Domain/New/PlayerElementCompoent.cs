@@ -14,9 +14,9 @@ namespace Realm.Domain.New;
 [NoDefaultScriptAccess]
 public sealed class PlayerElementCompoent : Component
 {
-    private readonly Player _rpgPlayer;
+    private readonly Player _player;
 
-    public Player Player => _rpgPlayer;
+    public Player Player => _player;
 
     private const int _RESOURCE_COUNT = 8;
 
@@ -28,42 +28,43 @@ public sealed class PlayerElementCompoent : Component
 
     public PlayerElementCompoent(Player player)
     {
-        _rpgPlayer = player;
+        _player = player;
+    }
+
+    public override Task Load()
+    {
+        Entity.Transform.Bind(_player);
+        return Task.CompletedTask;
     }
 
     [ScriptMember("spawn")]
     public void Spawn(Vector3 position, Vector3? rotation = null)
     {
-        var player = Entity.InternalGetRequiredComponent<PlayerElementCompoent>().Player;
-
-        player.Camera.Target = player;
-        player.Camera.Fade(CameraFade.In);
-        player.Spawn(position, rotation?.Z ?? 0, 0, 0, 0);
+        _player.Camera.Target = _player;
+        _player.Camera.Fade(CameraFade.In);
+        _player.Spawn(position, rotation?.Z ?? 0, 0, 0, 0);
     }
 
     [ScriptMember("sendChatMessage")]
     public void SendChatMessage(string message, Color? color = null, bool isColorCoded = false)
     {
-        var player = Entity.InternalGetRequiredComponent<PlayerElementCompoent>().Player;
         var chatbox = Entity.GetRequiredService<ChatBox>();
-        chatbox.OutputTo(player, message, color ?? Color.White, isColorCoded);
+        chatbox.OutputTo(_player, message, color ?? Color.White, isColorCoded);
     }
 
     [ScriptMember("clearChatBox")]
     public void ClearChatBox()
     {
-        var player = Entity.InternalGetRequiredComponent<PlayerElementCompoent>().Player;
         var chatbox = Entity.GetRequiredService<ChatBox>();
-        chatbox.ClearFor(player);
+        chatbox.ClearFor(_player);
     }
 
     #region LuaInterop resource
     [ScriptMember("setClipboard")]
     public void SetClipboard(string content)
     {
-        var player = Entity.InternalGetRequiredComponent<PlayerElementCompoent>().Player;
         var luaInteropService = Entity.GetRequiredService<LuaInteropService>();
-        luaInteropService.SetClipboard(player, content);
+        luaInteropService.SetClipboard(_player, content);
     }
     #endregion
 
@@ -71,9 +72,8 @@ public sealed class PlayerElementCompoent : Component
     [ScriptMember("addNotification")]
     public void AddNotification(string message)
     {
-        var player = Entity.InternalGetRequiredComponent<PlayerElementCompoent>().Player;
         var overlayNotificationsService = Entity.GetRequiredService<OverlayNotificationsService>();
-        overlayNotificationsService.AddNotification(player,message);
+        overlayNotificationsService.AddNotification(_player, message);
     }
     #endregion
 
@@ -82,7 +82,6 @@ public sealed class PlayerElementCompoent : Component
     {
         var luaValueMapper = Entity.GetRequiredService<LuaValueMapper>();
         var luaEventService = Entity.GetRequiredService<LuaEventService>();
-        var player = Entity.InternalGetRequiredComponent<PlayerElementCompoent>().Player;
         LuaValue luaValue;
         if (values.Length == 1 && values[0].GetType() == typeof(object[]))
         {
@@ -93,6 +92,6 @@ public sealed class PlayerElementCompoent : Component
             luaValue = values.Select(luaValueMapper.Map).ToArray();
         }
 
-        luaEventService.TriggerEventFor(player, name, player, luaValue);
+        luaEventService.TriggerEventFor(_player, name, _player, luaValue);
     }
 }

@@ -4,7 +4,7 @@
 public class PlayerAFKStateChangedEvent : INamedLuaEvent, IDisposable
 {
     private bool _disposed = false;
-    private readonly Player _rpgPlayer;
+    private readonly Player _player;
     private readonly bool _afk;
 
     public static string EventName => "onPlayerAFKStateChanged";
@@ -15,7 +15,7 @@ public class PlayerAFKStateChangedEvent : INamedLuaEvent, IDisposable
         get
         {
             CheckIfDisposed();
-            return _rpgPlayer;
+            return _player;
         }
     }
 
@@ -31,7 +31,7 @@ public class PlayerAFKStateChangedEvent : INamedLuaEvent, IDisposable
 
     public PlayerAFKStateChangedEvent(Player player, bool afk)
     {
-        _rpgPlayer = player;
+        _player = player;
         _afk = afk;
     }
 

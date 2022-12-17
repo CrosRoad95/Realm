@@ -1,4 +1,7 @@
-﻿namespace Realm.Domain.New;
+﻿using Realm.Interfaces.Server;
+using SlipeServer.Server.Elements;
+
+namespace Realm.Domain.New;
 
 [NoDefaultScriptAccess]
 public sealed class VehicleElementComponent : Component
@@ -7,8 +10,21 @@ public sealed class VehicleElementComponent : Component
 
     public Vehicle Vehicle => _vehicle;
 
-    public VehicleElementComponent(Vehicle vehicle)
+    public VehicleElementComponent(ushort model)
     {
-        _vehicle = vehicle;
+        _vehicle = new Vehicle(model, Vector3.Zero);
+    }
+
+    private void HandleDestroyed(Entity entity)
+    {
+        _vehicle.Destroy();
+    }
+
+    public override Task Load()
+    {
+        Entity.GetRequiredService<IRPGServer>().AssociateElement(new ElementHandle(_vehicle));
+        Entity.Destroyed += HandleDestroyed;
+        Entity.Transform.Bind(_vehicle);
+        return Task.CompletedTask;
     }
 }

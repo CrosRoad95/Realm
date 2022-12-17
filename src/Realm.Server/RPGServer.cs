@@ -53,7 +53,8 @@ public partial class RPGServer : IInternalRPGServer, IRPGServer, IReloadable
                     // Common
                     services.AddSingleton(realmConfigurationProvider);
                     services.AddSingleton((IReloadable)this);
-                    services.AddSingleton((Interfaces.IInternalRPGServer)this);
+                    services.AddSingleton((IInternalRPGServer)this);
+                    services.AddSingleton((IRPGServer)this);
                     services.AddSingleton<EntityByStringIdCollection>();
                     services.AddSingleton<SeederServerBuilder>();
                     services.AddSingleton<VehicleUpgradeByStringCollection>();
@@ -72,7 +73,8 @@ public partial class RPGServer : IInternalRPGServer, IRPGServer, IReloadable
                     // Player specific
                     services.AddTransient<DiscordUser>();
 
-                    services.AddSingleton<ServicesComponent>();
+                    services.AddTransient<ServicesComponent>();
+                    services.AddTransient<EntityElementFactory>();
 
                     if (modules != null)
                         foreach (var module in modules)
@@ -116,7 +118,6 @@ public partial class RPGServer : IInternalRPGServer, IRPGServer, IReloadable
         playerEntity.AddComponent(new PlayerElementCompoent(player));
         using var playerJoinedEvent = new PlayerJoinedEvent(playerEntity);
         await _eventFunctions.InvokeEvent(playerJoinedEvent);
-
     }
 
     public void InitializeScripting(IScriptingModuleInterface scriptingModuleInterface)
@@ -249,7 +250,9 @@ public partial class RPGServer : IInternalRPGServer, IRPGServer, IReloadable
 
     public Entity CreateEntity(string name)
     {
-        return new Entity(this, GetRequiredService<ServicesComponent>(), name);
+        var newlyCreatedEntity = new Entity(this, GetRequiredService<ServicesComponent>(), name);
+        _entities.Add(newlyCreatedEntity);
+        return newlyCreatedEntity;
     }
 
     public int GetPriority() => 40;
