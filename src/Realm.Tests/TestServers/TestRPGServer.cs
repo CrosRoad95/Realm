@@ -2,7 +2,6 @@
 using Realm.Interfaces.Common;
 using Realm.Interfaces.Extend;
 using Realm.Interfaces.Server;
-using Realm.Interfaces.Server.Services;
 using Realm.Logging;
 using Realm.Module.Scripting.Interfaces;
 using Realm.Server.Extensions;
@@ -12,10 +11,11 @@ using SlipeServer.Server.Elements;
 using SlipeServer.Server.Events;
 using Realm.Interfaces.Providers;
 using Realm.Server.Providers;
+using Realm.Domain;
 
 namespace Realm.Tests.TestServers;
 
-internal class TestRPGServer : IReloadable, Server.Interfaces.IInternalRPGServer
+internal class TestRPGServer : IReloadable, IInternalRPGServer
 {
     public MtaServer<TestRPGPlayer> TestServer { get; private set; }
     public string MapName { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
@@ -41,13 +41,10 @@ internal class TestRPGServer : IReloadable, Server.Interfaces.IInternalRPGServer
             {
                 services.AddSingleton(configuration);
                 services.AddSingleton<IConsole, TestConsoleCommands>();
-                services.AddSingleton<IAccountsInUseService, TestAccountsInUseService>();
                 services.AddSingleton((IReloadable)this);
                 services.AddSingleton((Server.Interfaces.IInternalRPGServer)this);
                 services.AddSingleton((IServerFilesProvider)NullServerFilesProvider.Instance);
                 services.AddSingleton(new RealmLogger().GetLogger());
-
-                services.AddSingleton<IRPGElementsFactory, TestRPGElementsFactory>();
 
                 if (modules != null)
                     foreach (var module in modules)
@@ -89,6 +86,11 @@ internal class TestRPGServer : IReloadable, Server.Interfaces.IInternalRPGServer
     }
 
     public Task DoReload()
+    {
+        throw new NotImplementedException();
+    }
+
+    public Entity CreateEntity(string name)
     {
         throw new NotImplementedException();
     }

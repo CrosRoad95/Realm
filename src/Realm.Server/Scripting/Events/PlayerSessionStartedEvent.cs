@@ -6,13 +6,13 @@ namespace Realm.Server.Scripting.Events;
 public class PlayerSessionStartedEvent : INamedLuaEvent, IDisposable
 {
     private bool _disposed = false;
-    private readonly RPGPlayer _rpgPlayer;
+    private readonly Player _rpgPlayer;
     private readonly SessionBase _session;
 
     public static string EventName => "onPlayerSessionStarted";
 
     [ScriptMember("player")]
-    public RPGPlayer RPGPlayer
+    public Player Player
     {
         get
         {
@@ -31,9 +31,9 @@ public class PlayerSessionStartedEvent : INamedLuaEvent, IDisposable
         }
     }
 
-    public PlayerSessionStartedEvent(RPGPlayer rpgPlayer, SessionBase session)
+    public PlayerSessionStartedEvent(Player player, SessionBase session)
     {
-        _rpgPlayer = rpgPlayer;
+        _rpgPlayer = player;
         _session = session;
     }
 

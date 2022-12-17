@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net7.0</TargetFramework>
@@ -7,11 +7,17 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Realm.Assets\Realm.Assets.csproj" />
     <ProjectReference Include="..\Realm.Persistance\Realm.Persistance.csproj" />
     <ProjectReference Include="..\Realm.Resources.AdminTools\Realm.Resources.AdminTools.csproj" />
+    <ProjectReference Include="..\Realm.Resources.AFK\Realm.Resources.AFK.csproj" />
     <ProjectReference Include="..\Realm.Resources.AgnosticGuiSystem\Realm.Resources.AgnosticGuiSystem.csproj" />
+    <ProjectReference Include="..\Realm.Resources.Assets\Realm.Resources.Assets.csproj" />
+    <ProjectReference Include="..\Realm.Resources.LuaInterop\Realm.Resources.LuaInterop.csproj" />
+    <ProjectReference Include="..\Realm.Resources.Overlay\Realm.Resources.Overlay.csproj" />
     <ProjectReference Include="..\Realm.Resources.StatisticsCounter\Realm.Resources.StatisticsCounter.csproj" />
     <ProjectReference Include="..\Realm.Scripting\Realm.Module.Scripting.csproj" />
+	  <PackageReference Include="SlipeServer.Resources.NoClip" Version="0.1.0-CI-20221121-170436" />
   </ItemGroup>
 
   <ItemGroup>

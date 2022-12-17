@@ -2,4 +2,5 @@
 
 public interface IRPGServer
 {
+    void AssociateElement(IElementHandle elementHandle);
 }

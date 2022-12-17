@@ -10,12 +10,12 @@ public class FormContextEvent : INamedLuaEvent, IDisposable
     public static string EventName => "onFormSubmit";
 
     [ScriptMember("player")]
-    public RPGPlayer RPGPlayer
+    public Player Player
     {
         get
         {
             CheckIfDisposed();
-            return (RPGPlayer)_luaEvent.Player;
+            return (Player)_luaEvent.Player;
         }
     }
 

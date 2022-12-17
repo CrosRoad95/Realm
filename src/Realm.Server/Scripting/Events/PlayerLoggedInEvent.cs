@@ -1,38 +1,28 @@
-﻿namespace Realm.Server.Scripting.Events;
+﻿using Realm.Domain.New;
+
+namespace Realm.Server.Scripting.Events;
 
 [NoDefaultScriptAccess]
 public class PlayerLoggedInEvent : INamedLuaEvent, IDisposable
 {
     private bool _disposed = false;
-    private readonly RPGPlayer _rpgPlayer;
-    private readonly PlayerAccount _account;
+    private readonly AccountComponent _accountComponent;
 
     public static string EventName => "onPlayerLogin";
 
-    [ScriptMember("player")]
-    public RPGPlayer RPGPlayer
+    [ScriptMember("accountComponent")]
+    public AccountComponent AccountComponent
     {
         get
         {
             CheckIfDisposed();
-            return _rpgPlayer;
+            return _accountComponent;
         }
     }
 
-    [ScriptMember("account")]
-    public PlayerAccount Account
+    public PlayerLoggedInEvent(AccountComponent accountComponent)
     {
-        get
-        {
-            CheckIfDisposed();
-            return _account;
-        }
-    }
-
-    public PlayerLoggedInEvent(RPGPlayer rpgPlayer, PlayerAccount account)
-    {
-        _rpgPlayer = rpgPlayer;
-        _account = account;
+        _accountComponent = accountComponent;
     }
 
     private void CheckIfDisposed()

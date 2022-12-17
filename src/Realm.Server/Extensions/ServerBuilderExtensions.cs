@@ -45,21 +45,9 @@ public static class ServerBuilderExtensions
 
         // Resources logics
         builder.AddLogic<LuaInteropLogic>();
-        builder.AddLogic<ClientUILogic>();
-        builder.AddLogic<AdminToolsLogic>();
-        builder.AddLogic<NoClipLogic>();
-        builder.AddLogic<AFKLogic>();
-        builder.AddLogic<OverlayLogic>();
-
-
-        // Elements logic
-        builder.AddLogic<RPGPlayerLogic>();
-        builder.AddLogic<RPGVehicleLogic>();
-        builder.AddLogic<RPGFractionLogic>();
 
         // Miscellaneous logic
         builder.AddLogic<CommandsLogic>();
-        builder.AddLogic<AssetsLogic>();
 
         return builder;
     }

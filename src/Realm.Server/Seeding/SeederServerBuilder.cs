@@ -1,4 +1,5 @@
 ﻿using FluentValidation;
+using Realm.Domain.New;
 using Realm.Server.Serialization.Yaml;
 using YamlDotNet.Serialization.NamingConventions;
 using static Realm.Server.Seeding.SeedData;
@@ -9,43 +10,51 @@ namespace Realm.Server.Seeding;
 internal sealed class SeederServerBuilder
 {
     private const string _basePath = "Seed";
-    private readonly IRPGElementsFactory _elementFunctions;
     private readonly IdentityScriptingFunctions _identityFunctions;
-    private readonly ElementByStringIdCollection _elementByStringIdCollection;
+    private readonly EntityByStringIdCollection _elementByStringIdCollection;
     private readonly VehicleUpgradeByStringCollection _vehicleUpgradeByStringCollection;
     private readonly IServerFilesProvider _serverFilesProvider;
+    private readonly RPGServer _rpgServer;
     private readonly ILogger _logger;
     private readonly IDeserializer _deserializer = new DeserializerBuilder()
         .WithNamingConvention(CamelCaseNamingConvention.Instance)
         .WithTypeConverter(new Vector3Converter())
         .Build();
 
-    private readonly Dictionary<string, PlayerAccount> _createdAccounts = new();
-    public SeederServerBuilder(IRPGElementsFactory elementFunctions, IdentityScriptingFunctions identityFunctions, ILogger logger,
-        ElementByStringIdCollection elementByStringIdCollection, VehicleUpgradeByStringCollection vehicleUpgradeByStringCollection,
-        IServerFilesProvider serverFilesProvider)
+    private readonly Dictionary<string, AccountComponent> _createdAccounts = new();
+    public SeederServerBuilder(IdentityScriptingFunctions identityFunctions, ILogger logger,
+        EntityByStringIdCollection elementByStringIdCollection, VehicleUpgradeByStringCollection vehicleUpgradeByStringCollection,
+        IServerFilesProvider serverFilesProvider, RPGServer rpgServer)
     {
-        _elementFunctions = elementFunctions;
         _identityFunctions = identityFunctions;
         _elementByStringIdCollection = elementByStringIdCollection;
         _vehicleUpgradeByStringCollection = vehicleUpgradeByStringCollection;
         _serverFilesProvider = serverFilesProvider;
+        _rpgServer = rpgServer;
         _logger = logger.ForContext<SeederServerBuilder>();
     }
 
-    private void AssignElementToId(Element element, string id)
+    private void AssignElementToId(Entity entity, string id)
     {
-        var succeed = _elementByStringIdCollection.AssignElementToId(element, id);
+        var succeed = _elementByStringIdCollection.AssignEntityToId(entity, id);
         if (!succeed)
             throw new Exception($"Failed to assign seeded element to id {id} because it is already in used.");
+    }
+
+    private Entity CreateEntity(string key)
+    {
+        var entity = _rpgServer.CreateEntity(key);
+        AssignElementToId(entity, key);
+        return entity;
     }
 
     private void BuildSpawns(Dictionary<string, Spawn> spawns)
     {
         foreach (var pair in spawns)
         {
-            var spawn = _elementFunctions.CreateSpawn(pair.Value.Position, pair.Value.Rotation, pair.Value.Name);
-            AssignElementToId(spawn, pair.Key);
+            var spawnEntity = CreateEntity(pair.Key);
+            spawnEntity.Transform.Position = pair.Value.Position;
+            spawnEntity.Transform.Rotation = pair.Value.Rotation;
             _logger.Information("Seeder: Created spawn of id {elementId} at {position}", pair.Key, pair.Value.Position);
         }
     }
@@ -54,8 +63,9 @@ internal sealed class SeederServerBuilder
     {
         foreach (var pair in blips)
         {
-            var blip = _elementFunctions.CreateBlip(pair.Value.Position, pair.Value.Icon);
-            AssignElementToId(blip, pair.Key);
+            var blipEntity = CreateEntity(pair.Key);
+            blipEntity.Transform.Position = pair.Value.Position;
+            blipEntity.AddComponent(new BlipElementComponent((BlipIcon)pair.Value.Icon));
             _logger.Information("Seeder: Created blip of id {elementId} with icon {blipIcon} at {position}", pair.Key, pair.Value.Icon, pair.Value.Position);
         }
     }
@@ -64,32 +74,10 @@ internal sealed class SeederServerBuilder
     {
         foreach (var pair in pickups)
         {
-            var pickup = _elementFunctions.CreatePickup(pair.Value.Position, pair.Value.Model);
-            AssignElementToId(pickup, pair.Key);
+            var blipEntity = CreateEntity(pair.Key);
+            blipEntity.Transform.Position = pair.Value.Position;
+            blipEntity.AddComponent(new PickupElementComponent(pair.Value.Model));
             _logger.Information("Seeder: Created pickup of id {elementId} with icon {pickupModel} at {position}", pair.Key, pair.Value.Model, pair.Value.Position);
-        }
-    }
-
-    private async Task BuildFractions(Dictionary<string, Fraction> fractionsData)
-    {
-        foreach (var pair in fractionsData)
-        {
-            var fraction = _elementFunctions.CreateFraction(pair.Value.Code, pair.Value.Name, pair.Value.Position);
-            if (pair.Value.Members != null)
-            {
-                _logger.Information("Seeder: Created fraction {fractionCode} with members:", pair.Key);
-                foreach (var memberPair in pair.Value.Members)
-                {
-                    if (!_createdAccounts.ContainsKey(memberPair.Key))
-                        throw new KeyNotFoundException($"Failed to find account name `{memberPair.Key}`");
-                    var account = _createdAccounts[memberPair.Key];
-                    await fraction.InternalAddMember(account, memberPair.Value.Permissions);
-                    _logger.Information("Seeder: Added member {accountName} to fraction {fractionCode} with permissions {permissions}", memberPair.Key, pair.Key, memberPair.Value.Permissions);
-                }
-            }
-            else
-                _logger.Information("Seeder: Created fraction of id {elementId} with name '{fractionName}' with no members", pair.Key, pair.Value.Name);
-            AssignElementToId(fraction, pair.Key);
         }
     }
 
@@ -111,12 +99,12 @@ internal sealed class SeederServerBuilder
             if (account == null)
                 account = await _identityFunctions.CreateAccount(pair.Key, pair.Value.Password);
 
-            await account.RemoveAllClaims();
-            await account.AddClaims(pair.Value.Claims);
-            await account.AddRoles(pair.Value.Roles);
-            await account.AddClaim("seeded", "true");
-            await account.AddClaim("persistant", "true");
-            _createdAccounts.Add(pair.Key, account);
+            //await account.RemoveAllClaims();
+            //await account.AddClaims(pair.Value.Claims);
+            //await account.AddRoles(pair.Value.Roles);
+            //await account.AddClaim("seeded", "true");
+            //await account.AddClaim("persistant", "true");
+            //_createdAccounts.Add(pair.Key, account);
         }
     }
 
@@ -168,7 +156,6 @@ internal sealed class SeederServerBuilder
         BuildSpawns(seedData.Spawns);
         BuildBlips(seedData.Blips);
         BuildPickups(seedData.Pickups);
-        await BuildFractions(seedData.Fractions);
         _createdAccounts.Clear();
     }
 }

@@ -1,5 +1,4 @@
-﻿using Realm.Domain.Elements;
-using SlipeServer.Server.ElementCollections;
+﻿using SlipeServer.Server.ElementCollections;
 using SlipeServer.Server.Elements;
 using Realm.Module.Scripting.Extensions;
 using Realm.Module.Discord.Scripting.Events;
@@ -19,29 +18,29 @@ internal class DiscordVerificationHandler
 
     public async Task<string?> VerifyCodeWithResponse(string code, ulong discordAccountId)
     {
-        foreach (var rpgPlayer in _elementCollection.GetByType<Player>().Cast<RPGPlayer>())
-        {
-            if (rpgPlayer.IsLoggedIn && rpgPlayer.Account != null)
-            {
-                if (rpgPlayer.Account.IsDiscordConnectionCodeValid(code))
-                {
-                    try
-                    {
-                        await rpgPlayer.Account.SetDiscordUserId(discordAccountId);
-                        if (rpgPlayer.Account.Discord == null)
-                            return null;
+        //foreach (var player in _elementCollection.GetByType<Player>())
+        //{
+        //    if (player.IsLoggedIn && player.Account != null)
+        //    {
+        //        if (player.Account.IsDiscordConnectionCodeValid(code))
+        //        {
+        //            try
+        //            {
+        //                await player.Account.SetDiscordUserId(discordAccountId);
+        //                if (player.Account.Discord == null)
+        //                    return null;
 
-                        using var @event = new DiscordPlayerConnectedEvent(rpgPlayer, rpgPlayer.Account.Discord);
-                        await _eventFunctions.InvokeEvent(@event);
-                        return "Pomyślnie połączyłeś konto discord z serwerem";
-                    }
-                    catch (Exception)
-                    {
-                        return null;
-                    }
-                }
-            }
-        }
+        //                using var @event = new DiscordPlayerConnectedEvent(player, player.Account.Discord);
+        //                await _eventFunctions.InvokeEvent(@event);
+        //                return "Pomyślnie połączyłeś konto discord z serwerem";
+        //            }
+        //            catch (Exception)
+        //            {
+        //                return null;
+        //            }
+        //        }
+        //    }
+        //}
         return null;
     }
 }

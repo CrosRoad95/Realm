@@ -1,16 +1,16 @@
-﻿using Realm.Domain.Elements;
+﻿using SlipeServer.Server.Elements;
 
 namespace Realm.Module.Discord.Scripting.Events;
 
 public class DiscordPlayerConnectedEvent : INamedLuaEvent, IDisposable
 {
     private bool _disposed = false;
-    private readonly RPGPlayer _rpgPlayer;
+    private readonly Player _rpgPlayer;
     private readonly DiscordUser _discordUser;
 
     public static string EventName => "onPlayerDiscordConnected";
 
-    public RPGPlayer rpgPlayer
+    public Player player
     {
         get
         {
@@ -28,9 +28,9 @@ public class DiscordPlayerConnectedEvent : INamedLuaEvent, IDisposable
         }
     }
 
-    public DiscordPlayerConnectedEvent(RPGPlayer rpgPlayer, DiscordUser discordUser)
+    public DiscordPlayerConnectedEvent(Player player, DiscordUser discordUser)
     {
-        _rpgPlayer = rpgPlayer;
+        _rpgPlayer = player;
         _discordUser = discordUser;
     }
 

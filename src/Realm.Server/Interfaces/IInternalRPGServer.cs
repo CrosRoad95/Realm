@@ -10,7 +10,6 @@ public interface IInternalRPGServer
     event Action<Player>? PlayerJoined;
     event Action? ServerReloaded;
 
-    void AssociateElement(Element element);
     Entity CreateEntity(string name);
     Task DoReload();
     TService GetRequiredService<TService>() where TService : notnull;

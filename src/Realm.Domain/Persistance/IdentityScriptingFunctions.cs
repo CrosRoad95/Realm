@@ -17,60 +17,37 @@ public class IdentityScriptingFunctions
     }
 
     [ScriptMember("findAccountById")]
-    public async Task<PlayerAccount?> FindAccountById(string id)
+    public async Task<User?> FindAccountById(string id)
     {
-        var user = await _userManager.FindByIdAsync(id);
-
-        if (user == null)
-            return null;
-        var playerAccount = _serviceProvider.GetRequiredService<PlayerAccount>();
-        playerAccount.SetUser(user);
-        return playerAccount;
+        return await _userManager.FindByIdAsync(id);
     }
 
     [ScriptMember("findAccountByUserName")]
-    public async Task<PlayerAccount?> FindAccountByUserName(string username)
+    public async Task<User?> FindAccountByUserName(string username)
     {
-        var user = await _userManager.FindByNameAsync(username);
-
-        if (user == null)
-            return null;
-
-        var playerAccount = _serviceProvider.GetRequiredService<PlayerAccount>();
-        playerAccount.SetUser(user);
-        return playerAccount;
+        return await _userManager.FindByNameAsync(username);
     }
 
     [ScriptMember("findRoleByName")]
-    public async Task<PlayerRole?> FindRoleByName(string name)
+    public async Task<Role?> FindRoleByName(string name)
     {
-        var role = await _roleManager.FindByNameAsync(name);
-
-        if (role == null)
-            return null;
-
-        return new PlayerRole(role, _roleManager);
+        return await _roleManager.FindByNameAsync(name);
     }
 
     [ScriptMember("getAllRoles")]
-    public async Task<List<PlayerRole>> GetAllRoles()
+    public async Task<List<Role>> GetAllRoles()
     {
-        return await _roleManager.Roles.Select(x => new PlayerRole(x, _roleManager)).ToListAsync();
+        return await _roleManager.Roles.ToListAsync();
     }
 
     [ScriptMember("getAllAccounts")]
-    public async Task<List<PlayerAccount>> GetAllAccounts()
+    public async Task<List<User>> GetAllAccounts()
     {
-        return (await _userManager.Users.ToListAsync()).Select(user =>
-        {
-            var playerAccount = _serviceProvider.GetRequiredService<PlayerAccount>();
-            playerAccount.SetUser(user);
-            return playerAccount;
-        }).ToList();
+        return await _userManager.Users.ToListAsync();
     }
 
     [ScriptMember("createAccount")]
-    public async Task<PlayerAccount> CreateAccount(string username, string password)
+    public async Task<User> CreateAccount(string username, string password)
     {
         var result = await _userManager.CreateAsync(new User
         {
@@ -91,7 +68,7 @@ public class IdentityScriptingFunctions
     }
 
     [ScriptMember("createRole")]
-    public async Task<PlayerRole> CreateRole(string name)
+    public async Task<Role> CreateRole(string name)
     {
         var result = await _roleManager.CreateAsync(new Role
         {

@@ -24,8 +24,6 @@ public class IdentityModule : IModule
 
     private void InitializeScripting(IScriptingModuleInterface scriptingModuleInterface, IServiceProvider serviceProvider)
     {
-        scriptingModuleInterface.AddHostType(typeof(PlayerAccount));
-        scriptingModuleInterface.AddHostType(typeof(PlayerRole));
         scriptingModuleInterface.AddHostType(typeof(DiscordUser));
         scriptingModuleInterface.AddHostObject("Identity", serviceProvider.GetRequiredService<IdentityScriptingFunctions>(), true);
     }

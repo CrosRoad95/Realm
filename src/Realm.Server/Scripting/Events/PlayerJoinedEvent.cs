@@ -4,23 +4,23 @@
 public class PlayerJoinedEvent : INamedLuaEvent, IDisposable
 {
     private bool _disposed = false;
-    private readonly RPGPlayer _rpgPlayer;
+    private readonly Entity _entity;
 
     public static string EventName => "onPlayerJoin";
 
-    [ScriptMember("player")]
-    public RPGPlayer RPGPlayer
+    [ScriptMember("entity")]
+    public Entity Entity
     {
         get
         {
             CheckIfDisposed();
-            return _rpgPlayer;
+            return _entity;
         }
     }
 
-    public PlayerJoinedEvent(RPGPlayer rpgPlayer)
+    public PlayerJoinedEvent(Entity entity)
     {
-        _rpgPlayer = rpgPlayer;
+        _entity = entity;
     }
 
     private void CheckIfDisposed()

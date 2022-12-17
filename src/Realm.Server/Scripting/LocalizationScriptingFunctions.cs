@@ -1,4 +1,6 @@
-﻿namespace Realm.Server.Scripting;
+﻿using Realm.Domain.New;
+
+namespace Realm.Server.Scripting;
 
 [NoDefaultScriptAccess]
 public class LocalizationScriptingFunctions
@@ -6,14 +8,16 @@ public class LocalizationScriptingFunctions
     private readonly RealmConfigurationProvider _configurationProvider;
     private readonly LuaInteropService _luaInteropService;
     private readonly IServerFilesProvider _serverFilesProvider;
+    private readonly LuaEventService _luaEventService;
     private readonly Dictionary<string, Dictionary<string, string>> _translations = new();
     private string _defaultLanguage = "pl";
     public LocalizationScriptingFunctions(RealmConfigurationProvider configurationProvider, LuaInteropService luaInteropService,
-        IServerFilesProvider serverFilesProvider)
+        IServerFilesProvider serverFilesProvider, LuaEventService luaEventService)
     {
         _configurationProvider = configurationProvider;
         _luaInteropService = luaInteropService;
         _serverFilesProvider = serverFilesProvider;
+        _luaEventService = luaEventService;
         _defaultLanguage = _configurationProvider.GetRequired<string>("Gameplay:DefaultLanguage");
         _luaInteropService.ClientCultureInfoUpdate += HandleClientSendLocalizationCode;
         Reload().Wait();
@@ -26,7 +30,7 @@ public class LocalizationScriptingFunctions
             translations = _translations[culture.TwoLetterISOLanguageName];
         else
             translations = _translations[_defaultLanguage];
-        ((RPGPlayer)player).TriggerClientEvent("updateTranslation", translations);
+        _luaEventService.TriggerEventFor(player, "updateTranslation", player, translations);
     }
 
     public async Task Reload()
@@ -101,17 +105,17 @@ public class LocalizationScriptingFunctions
     }
 
     [ScriptMember("translateFor")]
-    public string TranslateFor(RPGPlayer rpgPlayer, string name)
+    public string TranslateFor(PlayerElementCompoent playerElementComponent, string name)
     {
         Dictionary<string, string> translations;
-        if (_translations.ContainsKey(rpgPlayer.Language))
-            translations = _translations[rpgPlayer.Language];
+        if (_translations.ContainsKey(playerElementComponent.Language))
+            translations = _translations[playerElementComponent.Language];
         else
             translations = _translations[_defaultLanguage];
 
         if (translations.TryGetValue(name, out var translation))
             return translation;
 
-        throw new Exception($"Failed to find translation '{name}' for player language '{rpgPlayer.Language}'");
+        throw new Exception($"Failed to find translation '{name}' for player language '{playerElementComponent.Language}'");
     }
 }

@@ -14,7 +14,7 @@ public class RPGCommandService : IReloadable
         _logger = logger.ForContext<RPGCommandService>();
     }
 
-    public bool AddCommandHandler(string commandName, Func<RPGPlayer, string[], Task> callback, string[]? requiredPolicies = null)
+    public bool AddCommandHandler(string commandName, Func<Player, string[], Task> callback, string[]? requiredPolicies = null)
     {
         if(_commands.Any(x => string.Equals(x.CommandText, commandName, StringComparison.OrdinalIgnoreCase))) {
             throw new Exception($"Command with name '{commandName}' already exists");
@@ -29,28 +29,25 @@ public class RPGCommandService : IReloadable
         _commands.Add(command);
         command.Triggered += async (source, args) =>
         {
-            var player = (RPGPlayer)args.Player;
-            if (!player.IsLoggedIn)
-                return;
-
+            var player = args.Player;
             using var playerProperty = LogContext.PushProperty("player", player);
             using var commandNameProperty = LogContext.PushProperty("commandName", commandName);
             using var commandArgumentProperty = LogContext.PushProperty("commandArguments", args.Arguments);
             if (requiredPolicies != null)
             {
-                var account = player.Account;
-                if (account == null)
-                {
-                    _logger.Verbose("{player} failed to execute command {commandName} player is not logged in", player, commandName);
-                    return;
-                }
+                //var account = player.Account;
+                //if (account == null)
+                //{
+                //    _logger.Verbose("{player} failed to execute command {commandName} player is not logged in", player, commandName);
+                //    return;
+                //}
 
-                foreach (var policy in requiredPolicies)
-                    if (!await account.AuthorizePolicy(policy.ToString()))
-                    {
-                        _logger.Verbose("{player} failed to execute command {commandName} because failed to authorize for policy {policy}", player, commandName, policy);
-                        return;
-                    }
+                //foreach (var policy in requiredPolicies)
+                //    if (!await account.AuthorizePolicy(policy.ToString()))
+                //    {
+                //        _logger.Verbose("{player} failed to execute command {commandName} because failed to authorize for policy {policy}", player, commandName, policy);
+                //        return;
+                //    }
             }
             if (args.Arguments.Any())
                 _logger.Verbose("{player} executed command {commandName} with arguments {commandArguments}.", player);

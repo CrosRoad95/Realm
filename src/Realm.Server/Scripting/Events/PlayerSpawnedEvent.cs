@@ -4,30 +4,19 @@
 public class PlayerSpawnedEvent : INamedLuaEvent, IDisposable
 {
     private bool _disposed = false;
-    private readonly RPGPlayer _rpgPlayer;
-    private readonly RPGSpawn? _spawn;
+    private readonly Player _rpgPlayer;
     private readonly Vector3 _position;
 
     public static string EventName => "onPlayerSpawn";
 
     [ScriptMember("player")]
-    public RPGPlayer RPGPlayer
+    public Player Player
 
     {
         get
         {
             CheckIfDisposed();
             return _rpgPlayer;
-        }
-    }
-
-    [ScriptMember("spawn")]
-    public RPGSpawn? Spawn
-    {
-        get
-        {
-            CheckIfDisposed();
-            return _spawn;
         }
     }
 
@@ -41,15 +30,9 @@ public class PlayerSpawnedEvent : INamedLuaEvent, IDisposable
         }
     }
 
-    public PlayerSpawnedEvent(RPGPlayer rpgPlayer, RPGSpawn spawn)
+    public PlayerSpawnedEvent(Player player, Vector3 position)
     {
-        _rpgPlayer = rpgPlayer;
-        _spawn = spawn;
-    }
-    
-    public PlayerSpawnedEvent(RPGPlayer rpgPlayer, Vector3 position)
-    {
-        _rpgPlayer = rpgPlayer;
+        _rpgPlayer = player;
         _position = position;
     }
 

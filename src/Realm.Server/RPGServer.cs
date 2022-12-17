@@ -1,9 +1,6 @@
 ﻿using Microsoft.AspNetCore.Hosting.Server;
 using Microsoft.Extensions.DependencyInjection;
 using Realm.Domain;
-using Realm.Domain.Components;
-using Realm.Domain.Elements.CollisionShapes;
-using Realm.Domain.Elements.Variants;
 using Realm.Domain.Inventory;
 using Realm.Domain.New;
 using Realm.Domain.Sessions;
@@ -17,7 +14,7 @@ namespace Realm.Server;
 
 public partial class RPGServer : IInternalRPGServer, IRPGServer, IReloadable
 {
-    private readonly MtaServer<RPGPlayer> _server;
+    private readonly MtaServer<Player> _server;
     private readonly EventScriptingFunctions _eventFunctions;
     private readonly ElementScriptingFunctions _elementFunctions;
     private readonly InputScriptingFunctions _inputFunctions;
@@ -45,7 +42,7 @@ public partial class RPGServer : IInternalRPGServer, IRPGServer, IReloadable
 
     public RPGServer(RealmConfigurationProvider realmConfigurationProvider, List<IModule> modules, Action<ServerBuilder>? configureServerBuilder = null)
     {
-        _server = MtaServer.CreateWithDiSupport<RPGPlayer>(
+        _server = MtaServer.CreateWithDiSupport<Player>(
             builder =>
             {
                 builder.ConfigureServer(realmConfigurationProvider);
@@ -57,7 +54,7 @@ public partial class RPGServer : IInternalRPGServer, IRPGServer, IReloadable
                     services.AddSingleton(realmConfigurationProvider);
                     services.AddSingleton((IReloadable)this);
                     services.AddSingleton((Interfaces.IInternalRPGServer)this);
-                    services.AddSingleton<ElementByStringIdCollection>();
+                    services.AddSingleton<EntityByStringIdCollection>();
                     services.AddSingleton<SeederServerBuilder>();
                     services.AddSingleton<VehicleUpgradeByStringCollection>();
 
@@ -70,28 +67,13 @@ public partial class RPGServer : IInternalRPGServer, IRPGServer, IReloadable
 
                     // Services
                     services.AddSingleton<RPGCommandService>();
-                    services.AddSingleton<RPGPlayerService>();
                     services.AddSingleton((Func<IServiceProvider, IReloadable>)(x => x.GetRequiredService<RPGCommandService>()));
-                    services.AddSingleton<IAccountsInUseService, AccountsInUseService>();
-                    services.AddSingleton<IPeriodicEntitySaveService, PeriodicEntitySaveService>();
-
-                    // Factories
-                    services.AddSingleton<IRPGElementsFactory, RPGElementsFactory>();
 
                     // Player specific
                     services.AddTransient<DiscordUser>();
 
-                    // Elements
-                    services.AddTransient<RPGSpawn>();
-                    services.AddTransient<RPGVehicle>();
-                    services.AddTransient<RPGBlip>();
-                    services.AddTransient<RPGRadarArea>();
-                    services.AddTransient<RPGPickup>();
-                    services.AddTransient<RPGFraction>();
-                    services.AddTransient<RPGCollisionSphere>();
+                    services.AddSingleton<ServicesComponent>();
 
-                    // Persistance
-                    services.AddTransient<PlayerAccount>();
                     if (modules != null)
                         foreach (var module in modules)
                         {
@@ -123,17 +105,16 @@ public partial class RPGServer : IInternalRPGServer, IRPGServer, IReloadable
         _server.PlayerJoined += HandlePlayerJoined;
     }
 
-    public void AssociateElement(Element element)
+    public void AssociateElement(IElementHandle elementHandle)
     {
-        _server.AssociateElement(element);
+        _server.AssociateElement((Element)elementHandle.GetElement());
     }
 
-    private async void HandlePlayerJoined(RPGPlayer rpgPlayer)
+    private async void HandlePlayerJoined(Player player)
     {
-        if (rpgPlayer.ResourceStartingLatch != null)
-            await rpgPlayer.ResourceStartingLatch;
-
-        using var playerJoinedEvent = new PlayerJoinedEvent(rpgPlayer);
+        var playerEntity = CreateEntity("Player " + player.Name);
+        playerEntity.AddComponent(new PlayerElementCompoent(player));
+        using var playerJoinedEvent = new PlayerJoinedEvent(playerEntity);
         await _eventFunctions.InvokeEvent(playerJoinedEvent);
 
     }
@@ -161,16 +142,7 @@ public partial class RPGServer : IInternalRPGServer, IRPGServer, IReloadable
         scriptingModuleInterface.AddHostObject("Server", _serverScriptingFunctions, true);
 
         // Classes & Events & Contextes
-        scriptingModuleInterface.AddHostType(typeof(RPGPlayer));
-        scriptingModuleInterface.AddHostType(typeof(RPGSpawn));
-        scriptingModuleInterface.AddHostType(typeof(RPGVehicle));
-        scriptingModuleInterface.AddHostType(typeof(RPGVariantBlip));
-        scriptingModuleInterface.AddHostType(typeof(RPGRadarArea));
-        scriptingModuleInterface.AddHostType(typeof(RPGVariantRadarArea));
-        scriptingModuleInterface.AddHostType(typeof(RPGPickup));
-        scriptingModuleInterface.AddHostType(typeof(RPGVariantPickup));
-        scriptingModuleInterface.AddHostType(typeof(RPGFraction));
-        scriptingModuleInterface.AddHostType(typeof(RPGCollisionSphere));
+        scriptingModuleInterface.AddHostType(typeof(Player));
         scriptingModuleInterface.AddHostType(typeof(FormContextEvent));
         scriptingModuleInterface.AddHostType(typeof(PlayerJoinedEvent));
         scriptingModuleInterface.AddHostType(typeof(PlayerLoggedInEvent));
@@ -183,7 +155,6 @@ public partial class RPGServer : IInternalRPGServer, IRPGServer, IReloadable
         scriptingModuleInterface.AddHostType(typeof(PlayerSessionStoppedEvent));
         scriptingModuleInterface.AddHostType(typeof(ServerReloadedEvent));
 
-        scriptingModuleInterface.AddHostType(typeof(ComponentSystem));
         scriptingModuleInterface.AddHostType(typeof(VehicleFuelComponent));
         scriptingModuleInterface.AddHostType(typeof(MileageCounterComponent));
         scriptingModuleInterface.AddHostType(typeof(StatisticsCounterComponent));
@@ -213,14 +184,12 @@ public partial class RPGServer : IInternalRPGServer, IRPGServer, IReloadable
 
     public async Task DoReload()
     {
-        await GetRequiredService<IPeriodicEntitySaveService>().Flush();
+        Save();
         var reloadable = GetRequiredService<IEnumerable<IReloadable>>();
         foreach (var item in reloadable.OrderBy(x => x.GetPriority()))
             await item.Reload();
 
-        var players = _elementCollection.GetByType<Player>().Cast<RPGPlayer>();
-        foreach (var player in players)
-            player.Reset();
+        var players = _elementCollection.GetByType<Player>();
 
         foreach (var player in players)
             HandlePlayerJoined(player);
@@ -264,17 +233,15 @@ public partial class RPGServer : IInternalRPGServer, IRPGServer, IReloadable
         _server.Stop(); // TODO: save everything
     }
 
-    private void RemoveAllElements()
+    private void RemoveAllEntities()
     {
-        foreach (var spawn in _elementFunctions.GetCollectionByType("spawn").Cast<RPGSpawn>().ToList())
-            _elementCollection.TryDestroyAndDispose(spawn);
-        foreach (var vehicle in _elementFunctions.GetCollectionByType("vehicle").Cast<RPGVehicle>().ToList())
-            _elementCollection.TryDestroyAndDispose(vehicle);
+        foreach (var entity in _entities)
+            entity.Destroy();
     }
 
     public Task Reload()
     {
-        RemoveAllElements();
+        RemoveAllEntities();
 
         ServerReloaded?.Invoke();
         return Task.CompletedTask;
@@ -282,7 +249,7 @@ public partial class RPGServer : IInternalRPGServer, IRPGServer, IReloadable
 
     public Entity CreateEntity(string name)
     {
-        return new Entity(this, name);
+        return new Entity(this, GetRequiredService<ServicesComponent>(), name);
     }
 
     public int GetPriority() => 40;

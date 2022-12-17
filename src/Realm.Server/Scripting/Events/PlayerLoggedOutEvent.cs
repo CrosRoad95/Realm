@@ -4,12 +4,12 @@
 public class PlayerLoggedOutEvent : INamedLuaEvent, IDisposable
 {
     private bool _disposed = false;
-    private readonly RPGPlayer _rpgPlayer;
+    private readonly Player _rpgPlayer;
 
     public static string EventName => "onPlayerLogout";
 
     [ScriptMember("player")]
-    public RPGPlayer RPGPlayer
+    public Player Player
     {
         get
         {
@@ -18,9 +18,9 @@ public class PlayerLoggedOutEvent : INamedLuaEvent, IDisposable
         }
     }
 
-    public PlayerLoggedOutEvent(RPGPlayer rpgPlayer)
+    public PlayerLoggedOutEvent(Player player)
     {
-        _rpgPlayer = rpgPlayer;
+        _rpgPlayer = player;
     }
 
     private void CheckIfDisposed()

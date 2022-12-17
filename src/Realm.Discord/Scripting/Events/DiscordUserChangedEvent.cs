@@ -1,35 +1,28 @@
-﻿namespace Realm.Module.Discord.Scripting.Events;
+﻿using Realm.Domain.New;
 
+namespace Realm.Module.Discord.Scripting.Events;
+
+[NoDefaultScriptAccess]
 public class DiscordUserChangedEvent : INamedLuaEvent, IDisposable
 {
     private bool _disposed = false;
-    private readonly PlayerAccount _account;
-    private readonly DiscordUser _discordUser;
+    private readonly DiscordComponent _discordComponent;
 
     public static string EventName => "onDiscordUserChange";
 
-    public PlayerAccount Account
+    [ScriptMember("discordComponent")]
+    public DiscordComponent DiscordComponent
     {
         get
         {
             CheckIfDisposed();
-            return _account;
+            return _discordComponent;
         }
     }
 
-    public DiscordUser Discord
+    public DiscordUserChangedEvent(DiscordComponent discordComponent)
     {
-        get
-        {
-            CheckIfDisposed();
-            return _discordUser;
-        }
-    }
-
-    public DiscordUserChangedEvent(PlayerAccount account, DiscordUser discordUser)
-    {
-        _account = account;
-        _discordUser = discordUser;
+        _discordComponent = discordComponent;
     }
 
     private void CheckIfDisposed()

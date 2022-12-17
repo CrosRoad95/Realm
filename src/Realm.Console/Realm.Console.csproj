@@ -16,6 +16,7 @@
     <ProjectReference Include="..\Realm.GRpc\Realm.Module.Grpc.csproj" />
     <ProjectReference Include="..\Realm.Logging\Realm.Logging.csproj" />
     <ProjectReference Include="..\Realm.Server\Realm.Server.csproj" />
+	<PackageReference Include="SlipeServer.Resources.NoClip" Version="0.1.0-CI-20221121-170436" />
   </ItemGroup>
   <ItemGroup>
     <None Update="appsettings.json">

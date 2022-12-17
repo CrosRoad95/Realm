@@ -4,35 +4,35 @@
 public class VehicleSpawnedEvent : INamedLuaEvent, IDisposable
 {
     private bool _disposed = false;
-    private RPGVehicle _rpgVehicle;
-    private RPGSpawn? _spawn;
+    private Vehicle _vehicle;
+    private Vector3 _position;
 
     public static string EventName => "onVehicleSpawn";
 
     [ScriptMember("vehicle")]
-    public RPGVehicle RPGVehicle
+    public Vehicle RPGVehicle
     {
         get
         {
             CheckIfDisposed();
-            return _rpgVehicle;
+            return _vehicle;
         }
     }
 
     [ScriptMember("spawn")]
-    public RPGSpawn? Spawn
+    public Vector3 Spawn
     {
         get
         {
             CheckIfDisposed();
-            return _spawn;
+            return _position;
         }
     }
 
-    public VehicleSpawnedEvent(RPGVehicle vehicle, RPGSpawn? spawn)
+    public VehicleSpawnedEvent(Vehicle vehicle, Vector3 position)
     {
-        _rpgVehicle = vehicle;
-        _spawn = spawn;
+        _vehicle = vehicle;
+        _position = position;
     }
 
     private void CheckIfDisposed()
