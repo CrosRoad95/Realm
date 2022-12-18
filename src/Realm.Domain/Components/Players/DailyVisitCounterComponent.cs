@@ -1,4 +1,6 @@
-﻿namespace Realm.Domain.New;
+﻿using Realm.Domain.Components.Elements;
+
+namespace Realm.Domain.Components.Players;
 
 [Serializable]
 public class DailyVisitsCounterComponent : Component

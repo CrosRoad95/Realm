@@ -1,7 +1,7 @@
 ﻿using Realm.Common.Exceptions;
 using Realm.Configuration;
 
-namespace Realm.Domain.New;
+namespace Realm.Domain.Components.Players;
 
 public class MoneyComponent : Component
 {

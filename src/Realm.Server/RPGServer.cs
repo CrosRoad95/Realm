@@ -1,5 +1,9 @@
-﻿using Realm.Domain.Inventory;
-using Realm.Domain.New;
+﻿using Realm.Domain.Components.Common;
+using Realm.Domain.Components.Elements;
+using Realm.Domain.Components.Players;
+using Realm.Domain.Components.Vehicles;
+using Realm.Domain.Inventory;
+using Realm.Domain.Persistance;
 using Realm.Domain.Sessions;
 using static Realm.Domain.Upgrades.VehicleUpgrade;
 
@@ -154,15 +158,15 @@ public partial class RPGServer : IInternalRPGServer, IRPGServer, IReloadable
         scriptingModuleInterface.AddHostType(typeof(StatisticsCounterComponent));
         scriptingModuleInterface.AddHostType(typeof(DailyVisitsCounterComponent));
         scriptingModuleInterface.AddHostType(typeof(LastPositionComponent));
-        scriptingModuleInterface.AddHostType(typeof(VehicleUpgradeComponent));
+        scriptingModuleInterface.AddHostType(typeof(VehicleUpgradeBuilderComponent));
 
         scriptingModuleInterface.AddHostType(typeof(FractionSession));
 
         scriptingModuleInterface.AddHostType(typeof(Domain.Upgrades.VehicleUpgrade));
         scriptingModuleInterface.AddHostType(typeof(UpgradeDescription));
 
-        scriptingModuleInterface.AddHostType(typeof(InventorySystem));
-        scriptingModuleInterface.AddHostType(typeof(PlayerItem));
+        scriptingModuleInterface.AddHostType(typeof(InventoryComponent));
+        scriptingModuleInterface.AddHostType(typeof(Item));
 
         // New Api
         scriptingModuleInterface.AddHostType(typeof(Entity));

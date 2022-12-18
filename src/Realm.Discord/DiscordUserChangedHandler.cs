@@ -2,7 +2,8 @@
 using Realm.Persistance.Data;
 using Realm.Module.Scripting.Extensions;
 using Realm.Module.Discord.Scripting.Events;
-using Realm.Domain.New;
+using Realm.Domain.Persistance;
+using Realm.Domain.Components.Players;
 
 namespace Realm.Module.Discord;
 

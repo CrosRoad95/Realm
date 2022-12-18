@@ -5,7 +5,7 @@ using SlipeServer.Packets.Lua.Camera;
 using SlipeServer.Server.Mappers;
 using SlipeServer.Server.Services;
 
-namespace Realm.Domain.New;
+namespace Realm.Domain.Components.Elements;
 
 [NoDefaultScriptAccess]
 public sealed class PlayerElementCompoent : Component

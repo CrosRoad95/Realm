@@ -1,4 +1,4 @@
-﻿namespace Realm.Domain.New;
+﻿namespace Realm.Domain.Components.Common;
 
 public sealed class TestComponent : Component
 {

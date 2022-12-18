@@ -1,11 +1,11 @@
 ﻿using Realm.Assets.Factories;
 using Realm.Resources.Assets;
 
-namespace Realm.Domain.New;
+namespace Realm.Domain.Components.Elements;
 
-public class ProceduralObjectElement : Component
+public class ProceduralObjectElementComponent : Component
 {
-    ProceduralObjectElement()
+    ProceduralObjectElementComponent()
     {
     }
 

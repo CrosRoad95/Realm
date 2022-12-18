@@ -1,6 +1,6 @@
-﻿using Realm.Persistance.Scripting.Classes;
+﻿using Realm.Domain.Persistance;
 
-namespace Realm.Domain.New;
+namespace Realm.Domain.Components.Players;
 
 public class DiscordComponent : Component
 {

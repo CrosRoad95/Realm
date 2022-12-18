@@ -1,7 +1,8 @@
-﻿using Realm.Resources.AdminTools;
+﻿using Realm.Domain.Components.Elements;
+using Realm.Resources.AdminTools;
 using SlipeServer.Resources.NoClip;
 
-namespace Realm.Domain.New;
+namespace Realm.Domain.Components.Players;
 
 public class AdminComponent : Component
 {
@@ -28,7 +29,7 @@ public class AdminComponent : Component
             {
                 _adminTools = value;
                 var player = Entity.InternalGetRequiredComponent<PlayerElementCompoent>().Player;
-                if(value)
+                if (value)
                 {
                     Entity.GetRequiredService<AdminToolsService>().EnableAdminToolsForPlayer(player);
                 }

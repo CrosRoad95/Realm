@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 
-namespace Realm.Persistance.Scripting.Classes;
+namespace Realm.Domain.Persistance;
 
 [NoDefaultScriptAccess]
 public class IdentityScriptingFunctions
@@ -56,7 +56,7 @@ public class IdentityScriptingFunctions
             UserName = username,
         }, password);
 
-        if(!result.Succeeded)
+        if (!result.Succeeded)
         {
             throw new Exception(result.ToString());
         }

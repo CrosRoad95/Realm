@@ -1,14 +1,14 @@
 ﻿using Realm.Domain.Inventory;
 using Realm.Module.Scripting.Extensions;
 
-namespace Realm.Domain.New;
+namespace Realm.Domain.Components.Common;
 
 [NoDefaultScriptAccess]
-public class InventorySystem : Component
+public class InventoryComponent : Component
 {
     private Element _owner = default!;
-    private readonly List<PlayerItem> _items = new();
-    public event Action<InventorySystem>? NotifyNotSavedState;
+    private readonly List<Item> _items = new();
+    public event Action<InventoryComponent>? NotifyNotSavedState;
 
     [ScriptMember("capacity")]
     public int Capacity { get; set; }
@@ -18,12 +18,12 @@ public class InventorySystem : Component
     [ScriptMember("items")]
     public object Items => _items.ToArray().ToScriptArray();
 
-    public InventorySystem()
+    public InventoryComponent()
     {
     }
 
     [ScriptMember("addItem")]
-    public bool AddItem(PlayerItem item)
+    public bool AddItem(Item item)
     {
         if (item.Size + UsedCapacity > Capacity)
             return false;

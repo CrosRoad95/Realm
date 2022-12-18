@@ -2,7 +2,7 @@
 using Realm.Module.Scripting.Extensions;
 using Realm.Persistance;
 
-namespace Realm.Domain.New;
+namespace Realm.Domain.Components.Players;
 
 public class LicensesComponent : Component
 {

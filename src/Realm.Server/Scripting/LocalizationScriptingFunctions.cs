@@ -1,4 +1,4 @@
-﻿using Realm.Domain.New;
+﻿using Realm.Domain.Components.Elements;
 
 namespace Realm.Server.Scripting;
 

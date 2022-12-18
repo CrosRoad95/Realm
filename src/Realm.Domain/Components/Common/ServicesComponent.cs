@@ -1,4 +1,4 @@
-﻿namespace Realm.Domain.New;
+﻿namespace Realm.Domain.Components.Common;
 
 [NoDefaultScriptAccess]
 public class ServicesComponent : Component

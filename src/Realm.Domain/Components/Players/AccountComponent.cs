@@ -3,7 +3,7 @@ using Realm.Module.Scripting.Extensions;
 using Realm.Persistance;
 using System.Security.Claims;
 
-namespace Realm.Domain.New;
+namespace Realm.Domain.Components.Players;
 
 [NoDefaultScriptAccess]
 public class AccountComponent : Component

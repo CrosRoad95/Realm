@@ -10,4 +10,3 @@ global using Realm.Interfaces.Server;
 global using Realm.Interfaces.Extend;
 global using Realm.Module.Scripting.Interfaces;
 global using Realm.Module.Scripting.Functions;
-global using Realm.Persistance.Scripting.Classes;

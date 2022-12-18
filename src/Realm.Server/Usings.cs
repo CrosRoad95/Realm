@@ -54,7 +54,6 @@ global using Realm.Resources.Addons.AgnosticGuiSystem.DGSProvider;
 global using Realm.Resources.ElementOutline;
 global using Realm.Resources.StatisticsCounter;
 global using Realm.Server.Logic.Resources;
-global using Realm.Persistance.Scripting.Classes;
 global using Realm.Server.Seeding;
 global using Realm.Assets;
 global using Realm.Resources.Overlay;

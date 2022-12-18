@@ -1,4 +1,4 @@
-﻿namespace Realm.Persistance.Scripting.Classes;
+﻿namespace Realm.Domain.Persistance;
 
 public class DiscordUser
 {

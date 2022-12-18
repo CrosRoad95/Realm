@@ -1,4 +1,4 @@
-﻿using Realm.Domain.New;
+﻿using Realm.Domain.Components.Players;
 
 namespace Realm.Server.Scripting.Events;
 

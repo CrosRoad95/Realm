@@ -1,4 +1,4 @@
-﻿using Realm.Domain.New;
+﻿using Realm.Domain.Components.Common;
 using Realm.Interfaces.Server;
 using Realm.Module.Scripting.Extensions;
 
@@ -61,8 +61,10 @@ public class Entity
 
     public List<Component> InternalGetComponents() => _components;
 
-    public T GetRequiredService<T>() =>
-        InternalGetRequiredComponent<ServicesComponent>().GetRequiredService<T>();
+    public T GetRequiredService<T>() where T: notnull
+    {
+        return InternalGetRequiredComponent<ServicesComponent>().GetRequiredService<T>();
+    }
     #endregion
 
     public virtual void Destroy()

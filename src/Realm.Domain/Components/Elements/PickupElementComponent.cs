@@ -1,6 +1,6 @@
 ﻿using Realm.Interfaces.Server;
 
-namespace Realm.Domain.New;
+namespace Realm.Domain.Components.Elements;
 
 public class PickupElementComponent : Component
 {

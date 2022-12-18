@@ -1,6 +1,6 @@
 ﻿using SlipeServer.Server.Elements.Events;
 
-namespace Realm.Domain.New;
+namespace Realm.Domain.Components.Common;
 
 [NoDefaultScriptAccess]
 public sealed class Transform
@@ -18,7 +18,7 @@ public sealed class Transform
     {
         get => _position; set
         {
-            if(_position != value)
+            if (_position != value)
             {
                 PositionChanged?.Invoke(this);
                 _position = value;
@@ -30,7 +30,7 @@ public sealed class Transform
     {
         get => _rotation; set
         {
-            if(_rotation != value)
+            if (_rotation != value)
             {
                 RotationChanged?.Invoke(this);
                 _rotation = value;
@@ -42,7 +42,7 @@ public sealed class Transform
     {
         get => _interior; set
         {
-            if(_interior != value)
+            if (_interior != value)
             {
                 InteriorChanged?.Invoke(this);
                 _interior = value;
@@ -54,7 +54,7 @@ public sealed class Transform
     {
         get => _dimension; set
         {
-            if(_dimension != value)
+            if (_dimension != value)
             {
                 DimensionChanged?.Invoke(this);
                 _dimension = value;

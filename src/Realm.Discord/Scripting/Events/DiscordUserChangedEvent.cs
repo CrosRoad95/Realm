@@ -1,4 +1,4 @@
-﻿using Realm.Domain.New;
+﻿using Realm.Domain.Components.Players;
 
 namespace Realm.Module.Discord.Scripting.Events;
 

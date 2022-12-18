@@ -1,4 +1,4 @@
-﻿namespace Realm.Domain.New;
+﻿namespace Realm.Domain.Components.Players;
 
 public class PlayTimeComponent
 {

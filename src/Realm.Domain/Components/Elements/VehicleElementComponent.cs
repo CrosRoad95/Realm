@@ -1,6 +1,6 @@
 ﻿using Realm.Interfaces.Server;
 
-namespace Realm.Domain.New;
+namespace Realm.Domain.Components.Elements;
 
 [NoDefaultScriptAccess]
 public sealed class VehicleElementComponent : Component
