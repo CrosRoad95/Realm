@@ -1,8 +1,6 @@
-﻿using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Realm.Module.Scripting.Extensions;
 using Realm.Persistance;
-using Realm.Persistance.Scripting.Classes;
 using System.Security.Claims;
 
 namespace Realm.Domain.New;

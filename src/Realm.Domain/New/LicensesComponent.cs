@@ -1,7 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Realm.Module.Scripting.Extensions;
 using Realm.Persistance;
-using Realm.Resources.LuaInterop;
 
 namespace Realm.Domain.New;
 

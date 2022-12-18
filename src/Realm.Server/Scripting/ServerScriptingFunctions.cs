@@ -1,7 +1,4 @@
-﻿using Realm.Domain;
-using Realm.Domain.New;
-
-namespace Realm.Server.Scripting;
+﻿namespace Realm.Server.Scripting;
 
 [NoDefaultScriptAccess]
 public class ServerScriptingFunctions

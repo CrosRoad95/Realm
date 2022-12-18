@@ -1,7 +1,4 @@
 ﻿using SlipeServer.Server.ElementCollections;
-using SlipeServer.Server.Elements;
-using Realm.Module.Scripting.Extensions;
-using Realm.Module.Discord.Scripting.Events;
 
 namespace Realm.Module.Discord;
 

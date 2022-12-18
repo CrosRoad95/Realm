@@ -1,6 +1,4 @@
-﻿using Microsoft.ClearScript;
-
-namespace Realm.Domain.New;
+﻿namespace Realm.Domain.New;
 
 public sealed class TestComponent : Component
 {

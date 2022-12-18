@@ -1,13 +1,9 @@
-﻿using Realm.Common.Utilities;
-using Realm.Resources.AdminTools;
-using Realm.Resources.LuaInterop;
+﻿using Realm.Resources.LuaInterop;
 using Realm.Resources.Overlay;
-using Serilog.Context;
 using SlipeServer.Packets.Definitions.Lua;
 using SlipeServer.Packets.Lua.Camera;
 using SlipeServer.Server.Mappers;
 using SlipeServer.Server.Services;
-using System.Drawing;
 
 namespace Realm.Domain.New;
 
@@ -17,8 +13,6 @@ public sealed class PlayerElementCompoent : Component
     private readonly Player _player;
 
     public Player Player => _player;
-
-    private const int _RESOURCE_COUNT = 8;
 
     [ScriptMember("name")]
     public string Name { get => Player.Name; set => Player.Name = value; }

@@ -9,8 +9,6 @@ using Realm.Module.Grpc;
 using Realm.Module.Discord;
 using Realm.Console.Utilities;
 using System.Diagnostics;
-using Realm.Interfaces.Common;
-using Realm.Server.Interfaces;
 
 var console = new ServerConsole();
 var logger = new RealmLogger(LogEventLevel.Verbose)

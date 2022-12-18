@@ -1,5 +1,4 @@
-﻿using Realm.Configuration;
-using Realm.Resources.AFK;
+﻿using Realm.Resources.AFK;
 
 namespace Realm.Domain.New;
 

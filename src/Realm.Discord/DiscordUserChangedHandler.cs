@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Realm.Persistance.Data;
-using System.Security.Claims;
 using Realm.Module.Scripting.Extensions;
 using Realm.Module.Discord.Scripting.Events;
 using Realm.Domain.New;

@@ -1,6 +1,4 @@
-﻿using Realm.Domain;
-
-namespace Realm.Server.Interfaces;
+﻿namespace Realm.Server.Interfaces;
 
 public interface IInternalRPGServer
 {

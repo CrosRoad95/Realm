@@ -1,5 +1,4 @@
 ﻿using Realm.Assets.Factories;
-using Realm.Resources.AFK;
 using Realm.Resources.Assets;
 
 namespace Realm.Domain.New;
