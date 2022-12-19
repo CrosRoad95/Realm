@@ -2,7 +2,6 @@
 
 namespace Realm.Domain.Components.Common;
 
-[NoDefaultScriptAccess]
 public sealed class Transform
 {
     private Vector3 _position;
@@ -11,9 +10,8 @@ public sealed class Transform
     private ushort _dimension;
     private bool _isBounded = false;
 
-    [ScriptMember("entity", ScriptAccess.ReadOnly)]
     public Entity Entity { get; private set; }
-    [ScriptMember("position")]
+
     public Vector3 Position
     {
         get => _position; set
@@ -25,7 +23,7 @@ public sealed class Transform
             }
         }
     }
-    [ScriptMember("rotation")]
+
     public Vector3 Rotation
     {
         get => _rotation; set
@@ -37,7 +35,7 @@ public sealed class Transform
             }
         }
     }
-    [ScriptMember("interior")]
+
     public byte Interior
     {
         get => _interior; set
@@ -49,7 +47,7 @@ public sealed class Transform
             }
         }
     }
-    [ScriptMember("dimension")]
+
     public ushort Dimension
     {
         get => _dimension; set

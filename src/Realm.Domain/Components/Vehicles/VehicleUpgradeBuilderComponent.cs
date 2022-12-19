@@ -14,13 +14,11 @@ public class VehicleUpgradeBuilderComponent : Component
     {
     }
 
-    [ScriptMember("getUpgradesCount")]
     public int GetUpgradesCount()
     {
         return Upgrades.Count;
     }
 
-    [ScriptMember("addUpgrade")]
     public bool AddUpgrade(VehicleUpgrade upgrade, bool rebuild = true)
     {
         if (upgrade == null)

@@ -8,6 +8,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Realm.Assets\Realm.Assets.csproj" />
+    <ProjectReference Include="..\Realm.Configuration\Realm.Configuration.csproj" />
     <ProjectReference Include="..\Realm.Persistance\Realm.Persistance.csproj" />
     <ProjectReference Include="..\Realm.Resources.AdminTools\Realm.Resources.AdminTools.csproj" />
     <ProjectReference Include="..\Realm.Resources.AFK\Realm.Resources.AFK.csproj" />
@@ -16,7 +17,6 @@
     <ProjectReference Include="..\Realm.Resources.LuaInterop\Realm.Resources.LuaInterop.csproj" />
     <ProjectReference Include="..\Realm.Resources.Overlay\Realm.Resources.Overlay.csproj" />
     <ProjectReference Include="..\Realm.Resources.StatisticsCounter\Realm.Resources.StatisticsCounter.csproj" />
-    <ProjectReference Include="..\Realm.Scripting\Realm.Module.Scripting.csproj" />
 	  <PackageReference Include="SlipeServer.Resources.NoClip" Version="0.1.0-CI-20221121-170436" />
   </ItemGroup>
 

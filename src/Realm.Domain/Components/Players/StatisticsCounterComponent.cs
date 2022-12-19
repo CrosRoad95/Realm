@@ -8,18 +8,12 @@ public class StatisticsCounterComponent : Component
     private Player _player = default!;
     private StatisticsCounterService _statisticsCounterService = default!;
 
-    [ScriptMember("traveledDistanceInVehicleAsDriver")]
     public float TraveledDistanceInVehicleAsDriver { get; set; }
-    [ScriptMember("traveledDistanceInVehicleAsPassager")]
     public float TraveledDistanceInVehicleAsPassager { get; set; }
-    [ScriptMember("traveledDistanceSwimming")]
     public float TraveledDistanceSwimming { get; set; }
-    [ScriptMember("traveledDistanceByFoot")]
     public float TraveledDistanceByFoot { get; set; }
-    [ScriptMember("traveledDistanceInAir")]
     public float TraveledDistanceInAir { get; set; }
 
-    [ScriptMember("totalTraveledDistance")]
     public float TotalTraveledDistance => TraveledDistanceInVehicleAsDriver + TraveledDistanceInVehicleAsPassager +
         TraveledDistanceSwimming + TraveledDistanceByFoot + TraveledDistanceInAir;
     public StatisticsCounterComponent()
@@ -28,7 +22,7 @@ public class StatisticsCounterComponent : Component
 
     public override Task Load()
     {
-        var player = Entity.InternalGetRequiredComponent<PlayerElementCompoent>().Player;
+        var player = Entity.InternalGetRequiredComponent<PlayerElementComponent>().Player;
         player.Disconnected += HandlePlayerDisconnected;
         return Task.CompletedTask;
     }
@@ -40,7 +34,7 @@ public class StatisticsCounterComponent : Component
 
     private void HandleStatisticsCollected(Player statisticsOfPlayer, Dictionary<string, float> statistics)
     {
-        var player = Entity.InternalGetRequiredComponent<PlayerElementCompoent>().Player;
+        var player = Entity.InternalGetRequiredComponent<PlayerElementComponent>().Player;
         if (player != statisticsOfPlayer)
             return;
 #pragma warning disable IDE0018 // Inline variable declaration

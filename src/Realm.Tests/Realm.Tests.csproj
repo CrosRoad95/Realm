@@ -31,9 +31,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Realm.Console\Realm.Console.csproj" />
-    <ProjectReference Include="..\Realm.Scripting\Realm.Module.Scripting.csproj" />
     <ProjectReference Include="..\Realm.Server\Realm.Server.csproj" />
-    <ProjectReference Include="..\Realm.Tools.TypescriptDefinitionGenerator\Realm.Tools.TypescriptDefinitionGenerator.csproj" />
   </ItemGroup>
 
 </Project>

@@ -5,12 +5,10 @@ namespace Realm.Module.Discord;
 internal class DiscordVerificationHandler
 {
     private readonly IElementCollection _elementCollection;
-    private readonly EventScriptingFunctions _eventFunctions;
 
-    public DiscordVerificationHandler(IElementCollection elementCollection, EventScriptingFunctions eventFunctions)
+    public DiscordVerificationHandler(IElementCollection elementCollection)
     {
         _elementCollection = elementCollection;
-        _eventFunctions = eventFunctions;
     }
 
     public async Task<string?> VerifyCodeWithResponse(string code, ulong discordAccountId)

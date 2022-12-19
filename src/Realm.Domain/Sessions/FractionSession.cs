@@ -1,6 +1,5 @@
 ﻿namespace Realm.Domain.Sessions;
 
-[NoDefaultScriptAccess]
 public class FractionSession : SessionBase
 {
     private readonly Player _player;

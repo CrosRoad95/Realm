@@ -2,7 +2,6 @@
 
 namespace Realm.Domain.Components.Elements;
 
-[NoDefaultScriptAccess]
 public sealed class VehicleElementComponent : Component
 {
     private readonly Vehicle _vehicle;

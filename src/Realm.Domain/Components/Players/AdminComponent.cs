@@ -7,7 +7,6 @@ namespace Realm.Domain.Components.Players;
 public class AdminComponent : Component
 {
     private bool _debugView = false;
-    [ScriptMember("debugView")]
     public bool DebugView
     {
         get => _debugView; set
@@ -20,7 +19,6 @@ public class AdminComponent : Component
     }
 
     private bool _adminTools = false;
-    [ScriptMember("adminTools")]
     public bool AdminTools
     {
         get => _adminTools; set
@@ -28,7 +26,7 @@ public class AdminComponent : Component
             if (_adminTools != value)
             {
                 _adminTools = value;
-                var player = Entity.InternalGetRequiredComponent<PlayerElementCompoent>().Player;
+                var player = Entity.InternalGetRequiredComponent<PlayerElementComponent>().Player;
                 if (value)
                 {
                     Entity.GetRequiredService<AdminToolsService>().EnableAdminToolsForPlayer(player);
@@ -42,7 +40,6 @@ public class AdminComponent : Component
     }
 
     private bool _noClip = false;
-    [ScriptMember("noClip")]
     public bool NoClip
     {
         get => _noClip; set
@@ -50,7 +47,7 @@ public class AdminComponent : Component
             if (_noClip != value)
             {
                 _noClip = value;
-                var player = Entity.InternalGetRequiredComponent<PlayerElementCompoent>().Player;
+                var player = Entity.InternalGetRequiredComponent<PlayerElementComponent>().Player;
                 Entity.GetRequiredService<NoClipService>().SetEnabledTo(player, value);
             }
         }

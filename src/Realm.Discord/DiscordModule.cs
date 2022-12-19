@@ -18,20 +18,4 @@ public class DiscordModule : IModule
     }
 
     public T GetInterface<T>() where T : class => throw new NotSupportedException();
-
-    public void PostInit(IServiceProvider serviceProvider)
-    {
-        var discordIntegration = serviceProvider.GetRequiredService<DiscordIntegration>();
-
-        var scriptingModule = serviceProvider.GetRequiredService<IEnumerable<IModule>>().FirstOrDefault(x => x.Name == "Scripting");
-        if (scriptingModule != null)
-            discordIntegration.InitializeScripting(scriptingModule.GetInterface<IScriptingModuleInterface>());
-    }
-
-    public void Reload()
-    {
-
-    }
-
-    public int GetPriority() => 100;
 }

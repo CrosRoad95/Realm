@@ -42,8 +42,6 @@ public class GrpcModule : IModule
     public void PostInit(IServiceProvider serviceProvider)
     {
         Start();
-
-        var logger = serviceProvider.GetRequiredService<ILogger>().ForContext<GrpcModule>();
     }
 
     public T GetInterface<T>() where T : class
@@ -63,12 +61,4 @@ public class GrpcModule : IModule
         if (_grpcServer != null)
             _grpcServer.ShutdownAsync().Wait();
     }
-
-    public void Reload()
-    {
-        Shutdown();
-        Start();
-    }
-
-    public int GetPriority() => -100;
 }

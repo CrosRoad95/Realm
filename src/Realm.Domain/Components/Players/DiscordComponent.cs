@@ -14,13 +14,11 @@ public class DiscordComponent : Component
     {
     }
 
-    [ScriptMember("isConnectedWithDiscordAccount")]
     public bool IsConnectedWithDiscordAccount()
     {
         return Discord != null;
     }
 
-    [ScriptMember("isDiscordConnectionCodeValid")]
     public bool IsDiscordConnectionCodeValid(string code)
     {
         if (!HasPendingDiscordConnectionCode())
@@ -29,20 +27,17 @@ public class DiscordComponent : Component
         return _discordConnectionCode == code;
     }
 
-    [ScriptMember("hasPendingDiscordConnectionCode")]
     public bool HasPendingDiscordConnectionCode()
     {
         return _discordConnectionCodeValidUntil != null || _discordConnectionCodeValidUntil > DateTime.Now;
     }
 
-    [ScriptMember("invalidateDiscordConnectionCode")]
     public void InvalidateDiscordConnectionCode()
     {
         _discordConnectionCode = null;
         _discordConnectionCodeValidUntil = null;
     }
 
-    [ScriptMember("generateAndGetDiscordConnectionCode")]
     public string? GenerateAndGetDiscordConnectionCode(int validForMinutes = 2)
     {
         if (IsConnectedWithDiscordAccount())

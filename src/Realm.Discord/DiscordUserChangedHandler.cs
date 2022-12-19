@@ -1,28 +1,20 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Realm.Persistance.Data;
-using Realm.Module.Scripting.Extensions;
-using Realm.Module.Discord.Scripting.Events;
 using Realm.Domain.Persistance;
-using Realm.Domain.Components.Players;
 
 namespace Realm.Module.Discord;
 
 internal class DiscordUserChangedHandler
 {
     private readonly UserManager<User> _userManager;
-    private readonly EventScriptingFunctions _eventFunctions;
-    private readonly IdentityScriptingFunctions _identityFunctions;
 
-    public DiscordUserChangedHandler(UserManager<User> userManager, EventScriptingFunctions eventFunctions, IdentityScriptingFunctions identityFunctions)
+    public DiscordUserChangedHandler(UserManager<User> userManager)
     {
         _userManager = userManager;
-        _eventFunctions = eventFunctions;
-        _identityFunctions = identityFunctions;
     }
 
     public async Task Handle(DiscordUser discordUser)
     {
-        using var discord = new DiscordUserChangedEvent(new DiscordComponent());
-        await _eventFunctions.InvokeEvent(discord);
+
     }
 }

@@ -3,6 +3,7 @@
 public class RPGServerBuilder
 {
     private readonly List<IModule> _modules = new();
+    private readonly List<Action<MtaServer>> _buildSteps = new();
     private ILogger? _logger;
     private IConsole? _console;
     private RealmConfigurationProvider? _realmConfigurationProvider;
@@ -31,7 +32,7 @@ public class RPGServerBuilder
         return this;
     }
 
-    public RPGServer Build(IServerFilesProvider? serverFilesProvider = null, string? basePath = null)
+    public RPGServer Build(IServerFilesProvider? serverFilesProvider = null, string? basePath = null, Action<ServerBuilder>? extraBuilderSteps = null)
     {
         if (_logger == null)
             throw new Exception();
@@ -42,6 +43,8 @@ public class RPGServerBuilder
 
         return new RPGServer(_realmConfigurationProvider, _modules, serverBuilder =>
         {
+            if (extraBuilderSteps != null)
+                extraBuilderSteps(serverBuilder);
             serverBuilder.ConfigureServices(services =>
             {
                 services.AddSingleton(_logger);

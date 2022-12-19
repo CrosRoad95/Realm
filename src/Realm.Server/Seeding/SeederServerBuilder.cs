@@ -1,8 +1,10 @@
 ﻿using FluentValidation;
+using Microsoft.AspNetCore.Identity;
 using Realm.Domain.Components.Elements;
 using Realm.Domain.Components.Players;
-using Realm.Domain.Persistance;
+using Realm.Persistance.Data;
 using Realm.Server.Serialization.Yaml;
+using System.Security.Claims;
 using YamlDotNet.Serialization.NamingConventions;
 using static Realm.Server.Seeding.SeedData;
 using VehicleUpgrade = Realm.Domain.Upgrades.VehicleUpgrade;
@@ -12,27 +14,29 @@ namespace Realm.Server.Seeding;
 internal sealed class SeederServerBuilder
 {
     private const string _basePath = "Seed";
-    private readonly IdentityScriptingFunctions _identityFunctions;
     private readonly EntityByStringIdCollection _elementByStringIdCollection;
     private readonly VehicleUpgradeByStringCollection _vehicleUpgradeByStringCollection;
     private readonly IServerFilesProvider _serverFilesProvider;
     private readonly IInternalRPGServer _rpgServer;
+    private readonly UserManager<User> _userManager;
+    private readonly RoleManager<Role> _roleManager;
     private readonly ILogger _logger;
     private readonly IDeserializer _deserializer = new DeserializerBuilder()
         .WithNamingConvention(CamelCaseNamingConvention.Instance)
         .WithTypeConverter(new Vector3Converter())
         .Build();
 
-    private readonly Dictionary<string, AccountComponent> _createdAccounts = new();
-    public SeederServerBuilder(IdentityScriptingFunctions identityFunctions, ILogger logger,
+    private readonly Dictionary<string, User> _createdUsers = new();
+    public SeederServerBuilder(ILogger logger,
         EntityByStringIdCollection elementByStringIdCollection, VehicleUpgradeByStringCollection vehicleUpgradeByStringCollection,
-        IServerFilesProvider serverFilesProvider, IInternalRPGServer rpgServer)
+        IServerFilesProvider serverFilesProvider, IInternalRPGServer rpgServer, UserManager<User> userManager, RoleManager<Role> roleManager)
     {
-        _identityFunctions = identityFunctions;
         _elementByStringIdCollection = elementByStringIdCollection;
         _vehicleUpgradeByStringCollection = vehicleUpgradeByStringCollection;
         _serverFilesProvider = serverFilesProvider;
         _rpgServer = rpgServer;
+        _userManager = userManager;
+        _roleManager = roleManager;
         _logger = logger.ForContext<SeederServerBuilder>();
     }
 
@@ -85,11 +89,14 @@ internal sealed class SeederServerBuilder
 
     private async Task BuildIdentityRoles(List<string> roles)
     {
-        var existingRoles = await _identityFunctions.GetAllRoles();
+        var existingRoles = await _roleManager.Roles.ToListAsync();
         foreach (var roleName in roles)
         {
             if (!existingRoles.Any(x => x.Name == roleName))
-                await _identityFunctions.CreateRole(roleName);
+                await _roleManager.CreateAsync(new Role
+                {
+                    Name = roleName
+                });
         }
     }
 
@@ -97,16 +104,35 @@ internal sealed class SeederServerBuilder
     {
         foreach (var pair in accounts)
         {
-            var account = await _identityFunctions.FindAccountByUserName(pair.Key);
-            if (account == null)
-                account = await _identityFunctions.CreateAccount(pair.Key, pair.Value.Password);
+            var user = await _userManager.FindByNameAsync(pair.Key);
+            if (user == null)
+            {
+                var identityResult = await _userManager.CreateAsync(new User
+                {
+                    UserName = pair.Key,
+                }, pair.Value.Password);
+                if(identityResult.Succeeded)
+                {
+                    user = await _userManager.FindByNameAsync(pair.Key);
+                }
+                else
+                {
+                    throw new Exception();
+                }
+            }
 
-            //await account.RemoveAllClaims();
-            //await account.AddClaims(pair.Value.Claims);
-            //await account.AddRoles(pair.Value.Roles);
-            //await account.AddClaim("seeded", "true");
-            //await account.AddClaim("persistant", "true");
-            //_createdAccounts.Add(pair.Key, account);
+            var claims = pair.Value.Claims.Select(x => new Claim(x.Key, x.Value))
+                .Concat(new List<Claim>
+                {
+                    new("seeded", "true"),
+                    new("persistant", "true"),
+                });
+
+            await _userManager.RemoveClaimsAsync(user, await _userManager.GetClaimsAsync(user));
+            await _userManager.AddClaimsAsync(user, claims);
+            await _userManager.AddToRolesAsync(user, pair.Value.Roles);
+
+            _createdUsers.Add(pair.Key, user);
         }
     }
 
@@ -151,13 +177,12 @@ internal sealed class SeederServerBuilder
     
     private async Task BuildFrom(SeedData seedData)
     {
-        using var _ = new PersistantScope();
         BuildUpgrades(seedData.Upgrades);
         await BuildIdentityRoles(seedData.Roles);
         await BuildIdentityAccounts(seedData.Accounts);
         BuildSpawns(seedData.Spawns);
         BuildBlips(seedData.Blips);
         BuildPickups(seedData.Pickups);
-        _createdAccounts.Clear();
+        _createdUsers.Clear();
     }
 }

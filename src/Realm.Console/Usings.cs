@@ -1,0 +1,19 @@
+﻿global using System;
+global using System.Collections.Generic;
+global using System.Linq;
+global using System.Text;
+global using System.Threading.Tasks;
+global using System.Diagnostics;
+global using System.Numerics;
+global using Serilog.Events;
+
+global using Realm.Console;
+global using Realm.Logging;
+global using Realm.Server;
+global using Realm.Server.Modules;
+global using Realm.Configuration;
+global using Realm.Module.Grpc;
+global using Realm.Module.Discord;
+global using Realm.Console.Logic;
+global using Realm.Domain;
+global using Realm.Domain.Components.Elements;

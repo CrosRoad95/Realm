@@ -5,7 +5,6 @@ public static class ServerBuilderExtensions
     public static ServerBuilder ConfigureServer(this ServerBuilder builder, RealmConfigurationProvider realmConfigurationProvider)
     {
         var _serverConfiguration = realmConfigurationProvider.GetRequired<SlipeServer.Server.Configuration>("Server");
-        var _scriptingConfiguration = realmConfigurationProvider.GetRequired<ScriptingConfiguration>("Scripting");
         builder.UseConfiguration(_serverConfiguration);
 #if DEBUG
         builder.AddDefaults(exceptBehaviours: ServerBuilderDefaultBehaviours.MasterServerAnnouncementBehaviour);
@@ -22,7 +21,6 @@ public static class ServerBuilderExtensions
 
             services.AddSingleton<HelpCommand>();
             services.AddSingleton<ICommand, TestCommand>();
-            services.AddSingleton<ICommand, ReloadCommand>();
         });
 
         // Resource

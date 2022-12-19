@@ -5,9 +5,7 @@ public class VehicleUpgrade
 {
     public class UpgradeDescription
     {
-        [NoScriptAccess]
         public float IncreaseByUnits { get; set; }
-        [NoScriptAccess]
         public float MultipleBy { get; set; }
 
         [JsonConstructor]
@@ -23,9 +21,7 @@ public class VehicleUpgrade
         }
     }
 
-    [ScriptMember("maxVelocity")]
     public UpgradeDescription? MaxVelocity { get; set; } = null;
-    [ScriptMember("engineAcceleration")]
     public UpgradeDescription? EngineAcceleration { get; set; } = null;
 
     public VehicleUpgrade()

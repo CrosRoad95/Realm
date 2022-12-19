@@ -9,12 +9,9 @@ public abstract class SessionBase
     private readonly string _sessionId = Guid.NewGuid().ToString();
     private readonly string _code;
 
-    [ScriptMember("sessionId")]
-    public string SessionId { [ScriptUsage] get => _sessionId; }
-    [ScriptMember("code")]
-    public string Code { [ScriptUsage] get => _code; }
-    [ScriptMember("elapsed")]
-    public double Elapsed { [ScriptUsage] get => _stopwatch.ElapsedMilliseconds; }
+    public string SessionId { get => _sessionId; }
+    public string Code { get => _code; }
+    public double Elapsed { get => _stopwatch.ElapsedMilliseconds; }
 
     public SessionBase(string code)
     {

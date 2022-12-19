@@ -5,9 +5,7 @@ namespace Realm.Domain.Components.Players;
 [Serializable]
 public class DailyVisitsCounterComponent : Component
 {
-    [ScriptMember("lastVisit")]
     public DateTime LastVisit { get; set; } = DateTime.MinValue;
-    [ScriptMember("visitsInRow")]
     public int VisitsInRow { get; set; }
 
     public event Action<Player, int, bool>? PlayerVisited;
@@ -38,7 +36,7 @@ public class DailyVisitsCounterComponent : Component
             reseted = true;
         }
 
-        var player = Entity.InternalGetRequiredComponent<PlayerElementCompoent>().Player;
+        var player = Entity.InternalGetRequiredComponent<PlayerElementComponent>().Player;
         PlayerVisited?.Invoke(player, VisitsInRow, reseted);
         LastVisit = DateTime.Now;
     }

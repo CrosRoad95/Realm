@@ -1,23 +1,18 @@
 ﻿using Realm.Domain.Components.Common;
+using Realm.Domain.Components.Elements;
 using Realm.Interfaces.Server;
-using Realm.Module.Scripting.Extensions;
 
 namespace Realm.Domain;
 
-[NoDefaultScriptAccess]
 public class Entity
 {
-    [ScriptMember("id")]
     public string Id { get; set; } = Guid.NewGuid().ToString();
-    [ScriptMember("tag")]
     public string Tag { get; set; } = "";
-    [ScriptMember("name")]
     public string Name { get; set; } = "";
 
     private readonly List<Component> _components = new();
     private readonly IRPGServer _rpgServer;
 
-    [ScriptMember("transform")]
     public Transform Transform { get; private set; }
     public IRPGServer Server => _rpgServer;
 
@@ -32,7 +27,6 @@ public class Entity
         AddComponent(servicesComponent);
     }
 
-    [ScriptMember("addComponent")]
     public TComponent AddComponent<TComponent>(TComponent component) where TComponent : Component
     {
         if (component.Entity != null)
@@ -45,12 +39,13 @@ public class Entity
         return component;
     }
 
-    [ScriptMember("getComponent", ScriptMemberFlags.ExposeRuntimeType)]
-    public Component? GetComponent(Type type)
-        => _components.Where(x => x.GetType() == type).FirstOrDefault();
+    public TComponent? GetComponent<TComponent>() where TComponent : Component
+        => _components.OfType<TComponent>().FirstOrDefault();
 
-    [ScriptMember("getComponents", ScriptMemberFlags.ExposeRuntimeType)]
-    public object GetComponents() => _components.ToArray().ToScriptArray();
+    public TComponent GetRequiredComponent<TComponent>() where TComponent : Component
+        => _components.OfType<TComponent>().First();
+
+    public IEnumerable<Component> GetComponents() => _components;
 
     #region Internal
     public TComponent? InternalGetComponent<TComponent>()

@@ -15,8 +15,6 @@ public class VehicleFuelComponent : Component
     private float _minimumDistanceThreshold;
     private string _fuelType;
 
-
-    [ScriptMember("minimumDistanceThreshold")]
     public float MinimumDistanceThreshold
     {
         get => _minimumDistanceThreshold;
@@ -27,7 +25,6 @@ public class VehicleFuelComponent : Component
         }
     }
 
-    [ScriptMember("fuelConsumptionPerOneKm")]
     public float FuelConsumptionPerOneKm
     {
         get => _fuelConsumptionPerOneKm;
@@ -38,7 +35,6 @@ public class VehicleFuelComponent : Component
         }
     }
 
-    [ScriptMember("amount")]
     public float Amount
     {
         get => _amount;
@@ -51,7 +47,6 @@ public class VehicleFuelComponent : Component
         }
     }
 
-    [ScriptMember("maxCapacity")]
     public float MaxCapacity
     {
         get => _maxCapacity;
@@ -67,7 +62,6 @@ public class VehicleFuelComponent : Component
         }
     }
 
-    [ScriptMember("fuelType")]
     public string FuelType
     {
         get => _fuelType;

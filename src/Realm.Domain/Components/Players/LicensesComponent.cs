@@ -1,5 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Realm.Module.Scripting.Extensions;
 using Realm.Persistance;
 
 namespace Realm.Domain.Components.Players;
@@ -29,13 +28,11 @@ public class LicensesComponent : Component
         return _userLicenses.Where(x => x.LicenseId.ToLower() == licenseId.ToLower()).FirstOrDefault();
     }
 
-    [ScriptMember("getAllLicenses")]
-    public object GetAllLicenses(bool includeSuspended = false)
+    public IEnumerable<UserLicense> GetAllLicenses(bool includeSuspended = false)
     {
-        return _userLicenses.ToArray().ToScriptArray();
+        return _userLicenses.ToArray();
     }
 
-    [ScriptMember("isLicenseSuspended")]
     public bool IsLicenseSuspended(string licenseId)
     {
         var isSuspended = _userLicenses.Where(x => x.LicenseId == licenseId && x.IsSuspended())
@@ -44,7 +41,6 @@ public class LicensesComponent : Component
         return isSuspended;
     }
 
-    [ScriptMember("getLastLicenseSuspensionReason")]
     public string? GetLastLicenseSuspensionReason(string licenseId)
     {
         var suspensionReason = _userLicenses
@@ -55,7 +51,6 @@ public class LicensesComponent : Component
         return suspensionReason;
     }
 
-    [ScriptMember("addLicense")]
     public bool AddLicense(string licenseId)
     {
         if (HasLicense(licenseId, true))
@@ -69,7 +64,6 @@ public class LicensesComponent : Component
         return true;
     }
 
-    [ScriptMember("hasLicense")]
     public bool HasLicense(string licenseId, bool includeSuspended = false)
     {
         var query = _userLicenses
@@ -80,7 +74,6 @@ public class LicensesComponent : Component
         return query.Any();
     }
 
-    [ScriptMember("suspendLicense")]
     public bool SuspendLicense(string licenseId, int timeInMinutes, string? reason = null)
     {
         if (timeInMinutes < 0)
@@ -95,7 +88,6 @@ public class LicensesComponent : Component
         return true;
     }
 
-    [ScriptMember("unSuspendLicense")]
     public async Task<bool> UnSuspendLicense(string licenseId)
     {
         var userLicense = GetLicense(licenseId);
@@ -105,5 +97,4 @@ public class LicensesComponent : Component
         userLicense.SuspendedUntil = null;
         return true;
     }
-
 }

@@ -24,6 +24,5 @@
     <ProjectReference Include="..\Realm.Domain\Realm.Domain.csproj" />
     <ProjectReference Include="..\Realm.Interfaces\Realm.Interfaces.csproj" />
     <ProjectReference Include="..\Realm.Persistance\Realm.Persistance.csproj" />
-    <ProjectReference Include="..\Realm.Scripting\Realm.Module.Scripting.csproj" />
   </ItemGroup>
 </Project>

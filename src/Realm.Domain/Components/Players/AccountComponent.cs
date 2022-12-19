@@ -1,24 +1,18 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Realm.Module.Scripting.Extensions;
 using Realm.Persistance;
 using System.Security.Claims;
 
 namespace Realm.Domain.Components.Players;
 
-[NoDefaultScriptAccess]
 public class AccountComponent : Component
 {
     private readonly User _user;
     private ClaimsPrincipal _claimsPrincipal;
 
-
-    [ScriptMember("id")]
     public string Id => _user.Id.ToString().ToUpper();
 
-    [ScriptMember("userName")]
     public string? UserName => _user.UserName;
 
-    [ScriptMember("registerDateTime")]
     public DateTime? RegisterDateTime => _user.RegisteredDateTime;
 
     public AccountComponent(User user, ClaimsPrincipal claimsPrincipal)
@@ -33,25 +27,21 @@ public class AccountComponent : Component
         _claimsPrincipal = await signInManager.CreateUserPrincipalAsync(_user);
     }
 
-    [ScriptMember("isInRole")]
     public bool IsInRole(string role)
     {
         return _claimsPrincipal!.IsInRole(role);
     }
 
-    [ScriptMember("hasClaim")]
     public bool HasClaim(string type)
     {
         return _claimsPrincipal!.HasClaim(x => x.Type == type);
     }
 
-    [ScriptMember("getClaimValue")]
     public string? GetClaimValue(string type)
     {
         return _claimsPrincipal!.Claims.First(x => x.Type == type).Value;
     }
 
-    [ScriptMember("addClaim")]
     public async Task<bool> AddClaim(string type, string value)
     {
         var userManager = Entity.GetRequiredService<UserManager<User>>();
@@ -62,7 +52,6 @@ public class AccountComponent : Component
         return result.Succeeded;
     }
 
-    [ScriptMember("addClaims")]
     public async Task<bool> AddClaims(Dictionary<string, string> claims)
     {
         var userManager = Entity.GetRequiredService<UserManager<User>>();
@@ -73,7 +62,6 @@ public class AccountComponent : Component
         return result.Succeeded;
     }
 
-    [ScriptMember("addRole")]
     public async Task<bool> AddRole(string role)
     {
         var userManager = Entity.GetRequiredService<UserManager<User>>();
@@ -84,7 +72,6 @@ public class AccountComponent : Component
         return result.Succeeded;
     }
 
-    [ScriptMember("addRoles")]
     public async Task<bool> AddRoles(IEnumerable<string> role)
     {
         var userManager = Entity.GetRequiredService<UserManager<User>>();
@@ -95,23 +82,20 @@ public class AccountComponent : Component
         return result.Succeeded;
     }
 
-    [ScriptMember("getClaims")]
-    public async Task<object> GetClaims()
+    public async Task<IEnumerable<string>> GetClaims()
     {
         var userManager = Entity.GetRequiredService<UserManager<User>>();
 
-        return (await userManager.GetClaimsAsync(_user)).Select(x => x.Type).ToArray().ToScriptArray();
+        return (await userManager.GetClaimsAsync(_user)).Select(x => x.Type).ToList();
     }
 
-    [ScriptMember("getRoles")]
-    public async Task<object> GetRoles()
+    public async Task<IEnumerable<string>> GetRoles()
     {
         var userManager = Entity.GetRequiredService<UserManager<User>>();
 
-        return (await userManager.GetRolesAsync(_user)).ToArray().ToScriptArray();
+        return (await userManager.GetRolesAsync(_user)).ToList();
     }
 
-    [ScriptMember("removeClaim")]
     public async Task<bool> RemoveClaim(string type, string? value = null)
     {
         var userManager = Entity.GetRequiredService<UserManager<User>>();
@@ -133,7 +117,6 @@ public class AccountComponent : Component
         return false;
     }
 
-    [ScriptMember("removeRole")]
     public async Task<bool> RemoveRole(string role)
     {
         var userManager = Entity.GetRequiredService<UserManager<User>>();
@@ -144,7 +127,6 @@ public class AccountComponent : Component
         return result.Succeeded;
     }
 
-    [ScriptMember("removeAllClaims")]
     public async Task<bool> RemoveAllClaims()
     {
         var userManager = Entity.GetRequiredService<UserManager<User>>();
@@ -156,7 +138,6 @@ public class AccountComponent : Component
         return result.Succeeded;
     }
 
-    [ScriptMember("hasData")]
     public async Task<bool> HasData(string key)
     {
         var db = Entity.GetRequiredService<IDb>();
@@ -165,61 +146,5 @@ public class AccountComponent : Component
             .AsNoTrackingWithIdentityResolution()
             .FirstOrDefaultAsync(x => x.UserId.ToString() == Id && x.Key == key);
         return playerData != null;
-    }
-
-    [ScriptMember("getData")]
-    public async Task<string?> GetData(string key)
-    {
-        var db = Entity.GetRequiredService<IDb>();
-
-        var playerData = await db.UserData
-            .AsNoTrackingWithIdentityResolution()
-            .FirstOrDefaultAsync(x => x.UserId.ToString() == Id && x.Key == key);
-        if (playerData == null)
-            return null;
-        return playerData.Value;
-    }
-
-    [ScriptMember("removeData")]
-    public async Task<bool> RemoveData(string key)
-    {
-        var db = Entity.GetRequiredService<IDb>();
-
-        var playerData = await db.UserData.FirstOrDefaultAsync(x => x.UserId.ToString() == Id && x.Key == key);
-        if (playerData == null)
-            return false;
-
-        db.UserData.Remove(playerData);
-        var savedEntities = await db.SaveChangesAsync();
-        return savedEntities == 1;
-    }
-
-    [ScriptMember("setData")]
-    public async Task<bool> SetData(string key, string value)
-    {
-        var db = Entity.GetRequiredService<IDb>();
-
-        int savedEntities;
-
-        var playerData = await db.UserData.FirstOrDefaultAsync(x => x.UserId.ToString() == Id && x.Key == key);
-        if (playerData == null)
-        {
-            playerData = new UserData
-            {
-                Key = key,
-                UserId = Guid.Parse(Id),
-                Value = value
-            };
-            db.UserData.Add(playerData);
-            savedEntities = await db.SaveChangesAsync();
-            return savedEntities == 1;
-        }
-        if (playerData.Value == value)
-            return true;
-
-        playerData.Value = value;
-        db.UserData.Update(playerData);
-        savedEntities = await db.SaveChangesAsync();
-        return savedEntities == 1;
     }
 }

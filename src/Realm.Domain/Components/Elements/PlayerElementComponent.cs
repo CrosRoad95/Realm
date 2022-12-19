@@ -7,20 +7,17 @@ using SlipeServer.Server.Services;
 
 namespace Realm.Domain.Components.Elements;
 
-[NoDefaultScriptAccess]
-public sealed class PlayerElementCompoent : Component
+public sealed class PlayerElementComponent : Component
 {
     private readonly Player _player;
 
     public Player Player => _player;
 
-    [ScriptMember("name")]
     public string Name { get => Player.Name; set => Player.Name = value; }
 
-    [ScriptMember("language", ScriptAccess.ReadOnly)]
     public string Language { get; private set; } = "pl";
 
-    public PlayerElementCompoent(Player player)
+    public PlayerElementComponent(Player player)
     {
         _player = player;
     }
@@ -31,7 +28,6 @@ public sealed class PlayerElementCompoent : Component
         return Task.CompletedTask;
     }
 
-    [ScriptMember("spawn")]
     public void Spawn(Vector3 position, Vector3? rotation = null)
     {
         _player.Camera.Target = _player;
@@ -39,14 +35,12 @@ public sealed class PlayerElementCompoent : Component
         _player.Spawn(position, rotation?.Z ?? 0, 0, 0, 0);
     }
 
-    [ScriptMember("sendChatMessage")]
     public void SendChatMessage(string message, Color? color = null, bool isColorCoded = false)
     {
         var chatbox = Entity.GetRequiredService<ChatBox>();
         chatbox.OutputTo(_player, message, color ?? Color.White, isColorCoded);
     }
 
-    [ScriptMember("clearChatBox")]
     public void ClearChatBox()
     {
         var chatbox = Entity.GetRequiredService<ChatBox>();
@@ -54,7 +48,6 @@ public sealed class PlayerElementCompoent : Component
     }
 
     #region LuaInterop resource
-    [ScriptMember("setClipboard")]
     public void SetClipboard(string content)
     {
         var luaInteropService = Entity.GetRequiredService<LuaInteropService>();
@@ -63,7 +56,6 @@ public sealed class PlayerElementCompoent : Component
     #endregion
 
     #region Overlay resource
-    [ScriptMember("addNotification")]
     public void AddNotification(string message)
     {
         var overlayNotificationsService = Entity.GetRequiredService<OverlayNotificationsService>();

@@ -10,7 +10,6 @@ public class MileageCounterComponent : Component
     private float _mileage;
     private float _minimumDistanceThreshold;
 
-    [ScriptMember("mileage")]
     public float Mileage
     {
         get => _mileage;
@@ -21,7 +20,6 @@ public class MileageCounterComponent : Component
         }
     }
 
-    [ScriptMember("minimumDistanceThreshold")]
     public float MinimumDistanceThreshold
     {
         get => _minimumDistanceThreshold;

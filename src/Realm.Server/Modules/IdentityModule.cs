@@ -1,6 +1,4 @@
-﻿using Realm.Domain.Persistance;
-
-namespace Realm.Server.Modules;
+﻿namespace Realm.Server.Modules;
 
 public class IdentityModule : IModule
 {
@@ -8,7 +6,6 @@ public class IdentityModule : IModule
 
     public void Configure(IServiceCollection services)
     {
-        services.AddSingleton<IdentityScriptingFunctions>();
     }
 
     public void Init(IServiceProvider serviceProvider)
@@ -19,15 +16,6 @@ public class IdentityModule : IModule
 
     public void PostInit(IServiceProvider serviceProvider)
     {
-        var scriptingModule = serviceProvider.GetRequiredService<IEnumerable<IModule>>().FirstOrDefault(x => x.Name == "Scripting");
-        if (scriptingModule != null)
-            InitializeScripting(scriptingModule.GetInterface<IScriptingModuleInterface>(), serviceProvider);
-    }
-
-    private void InitializeScripting(IScriptingModuleInterface scriptingModuleInterface, IServiceProvider serviceProvider)
-    {
-        scriptingModuleInterface.AddHostType(typeof(DiscordUser));
-        scriptingModuleInterface.AddHostObject("Identity", serviceProvider.GetRequiredService<IdentityScriptingFunctions>(), true);
     }
 
     public int GetPriority() => 100;

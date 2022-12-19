@@ -7,7 +7,6 @@ public class MoneyComponent : Component
 {
     private double _money = 0;
 
-    [ScriptMember("money")]
     public double Money
     {
         get => _money; set
@@ -32,7 +31,6 @@ public class MoneyComponent : Component
         _money = initialMoney;
     }
 
-    [ScriptMember("giveMoney")]
     public bool GiveMoney(double amount)
     {
         var configurationProvider = Entity.GetRequiredService<RealmConfigurationProvider>();

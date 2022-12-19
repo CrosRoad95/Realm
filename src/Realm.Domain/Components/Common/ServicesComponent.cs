@@ -1,6 +1,5 @@
 ﻿namespace Realm.Domain.Components.Common;
 
-[NoDefaultScriptAccess]
 public class ServicesComponent : Component
 {
     private readonly IServiceProvider _serviceProvider;

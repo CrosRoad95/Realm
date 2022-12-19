@@ -4,7 +4,6 @@ public class PlayTimeComponent
 {
     private DateTime? _startDateTime;
 
-    [ScriptMember("playTime")]
     public ulong PlayTime
     {
         get
@@ -20,7 +19,6 @@ public class PlayTimeComponent
         _startDateTime = DateTime.Now;
     }
 
-    [ScriptMember("reset")]
     public void Reset()
     {
         _startDateTime = DateTime.Now;

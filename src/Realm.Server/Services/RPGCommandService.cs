@@ -2,7 +2,7 @@
 
 namespace Realm.Server.Services;
 
-public class RPGCommandService : IReloadable
+public class RPGCommandService
 {
     private readonly CommandService _commandService;
     private readonly ILogger _logger;
@@ -57,28 +57,11 @@ public class RPGCommandService : IReloadable
             {
                 await callback(player, args.Arguments);
             }
-            catch (ScriptEngineException scriptEngineException)
+            catch (Exception ex)
             {
-                var scriptException = scriptEngineException as IScriptEngineException;
-                if (scriptException != null)
-                {
-                    using var errorDetails = LogContext.PushProperty("errorDetails", scriptException.ErrorDetails);
-                    _logger.Error(scriptEngineException, "Exception thrown while executing command");
-                }
-                else
-                    _logger.Error(scriptEngineException, "Exception thrown while executing command");
+                _logger.Error(ex, "Exception thrown while executing command");
             }
         };
         return true;
-    }
-
-    public int GetPriority() => 39;
-
-    public Task Reload()
-    {
-        foreach (var item in _commands)
-            _commandService.RemoveCommand(item);
-        _commands.Clear();
-        return Task.CompletedTask;
     }
 }
