@@ -3,6 +3,7 @@ local currentOpenedGui = nil;
 local currentGuiProvider = nil;
 local pendingFormsSubmissions = {}
 local guiProviders = {}
+local currentGui = nil
 
 function registerGuiProvider(gui, provider)
 	guiProviders[gui] = provider
@@ -13,7 +14,9 @@ local function internalGetWindowHandleByName(name)
 		error("Gui of name '"..tostring(name).."' doesn't' exists!")
 	end
 	if(guis[name].handle == false)then
+		currentGui = name;
 		local handle, setStateCallback = guis[name].callback(currentGuiProvider);
+		currentGui = nil;
 		guis[name].handle = handle;
 		guis[name].stateChanged = setStateCallback;
 	end
@@ -87,6 +90,10 @@ addEventHandler("internalSubmitFormResponse", localPlayer, function(data)
 end)
 
 function createForm(name, fields)
+	if(currentGui == nil)then
+		error("Can't use createFrom outside gui constructor.'")
+	end
+	local currentGuiName = currentGui;
 	return {
 		submit = function()
 			if(pendingFormsSubmissions[name])then
@@ -98,7 +105,7 @@ function createForm(name, fields)
 				data[name] = currentGuiProvider.getValue(elementHandle)
 			end
 
-			local id = triggerServerEventWithId("internalSubmitForm", name, data);
+			local id = triggerServerEventWithId("internalSubmitForm", currentGuiName, name, data);
 			pendingFormsSubmissions[name] = {
 				id = id,
 				coroutine = coroutine.running()

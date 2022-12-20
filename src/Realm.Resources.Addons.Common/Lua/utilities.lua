@@ -36,7 +36,8 @@ local function hasTranslations()
         hadTranslations = true
         return true;
     end
-    return false;
+    return true -- TODO: temp
+    --return false;
 end
 
 function waitForTranslations()

@@ -1,4 +1,6 @@
-﻿using Realm.Server.Interfaces;
+﻿using Realm.Domain.Components.Players;
+using Realm.Domain.Components.Players.Gui;
+using Realm.Server.Interfaces;
 
 namespace Realm.Console.Logic;
 
@@ -15,6 +17,9 @@ internal class PlayerJoinedLogic
 
     private void HandlePlayerJoined(Entity entity)
     {
-        entity.GetRequiredComponent<PlayerElementComponent>().Spawn(new Vector3(0,0, 4));
+        var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();
+        entity.AddComponent(new AdminComponent()).DebugView = true;
+        playerElementComponent.Spawn(new Vector3(0,0, 4));
+        entity.AddComponent(new LoginGuiComponent());
     }
 }

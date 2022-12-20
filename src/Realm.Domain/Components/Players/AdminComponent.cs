@@ -7,6 +7,9 @@ namespace Realm.Domain.Components.Players;
 public class AdminComponent : Component
 {
     private bool _debugView = false;
+    private bool _adminTools = false;
+    private bool _noClip = false;
+
     public bool DebugView
     {
         get => _debugView; set
@@ -18,7 +21,6 @@ public class AdminComponent : Component
         }
     }
 
-    private bool _adminTools = false;
     public bool AdminTools
     {
         get => _adminTools; set
@@ -39,7 +41,6 @@ public class AdminComponent : Component
         }
     }
 
-    private bool _noClip = false;
     public bool NoClip
     {
         get => _noClip; set
