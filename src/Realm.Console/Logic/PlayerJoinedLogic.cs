@@ -1,10 +1,6 @@
-﻿using Realm.Domain.Components.Players;
-using Realm.Domain.Components.Players.Gui;
-using Realm.Server.Interfaces;
+﻿namespace Realm.Console.Logic;
 
-namespace Realm.Console.Logic;
-
-internal class PlayerJoinedLogic
+internal sealed class PlayerJoinedLogic
 {
     private readonly IInternalRPGServer _rpgServer;
 

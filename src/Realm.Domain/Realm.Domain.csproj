@@ -21,6 +21,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="Components\Players\Gui\" />
     <Folder Include="Persistance\" />
   </ItemGroup>
 

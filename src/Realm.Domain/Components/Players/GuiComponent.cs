@@ -1,4 +1,5 @@
 ﻿using Realm.Domain.Components.Elements;
+using Realm.Domain.Contextes;
 using Realm.Resources.AgnosticGuiSystem;
 using SlipeServer.Packets.Definitions.Lua;
 using SlipeServer.Server.Events;
@@ -33,9 +34,9 @@ public abstract class GuiComponent : Component
         if(guiName == _name)
         {
             string formName = luaEvent.Parameters[2].StringValue ?? throw new Exception();
-            await HandleForm(formName, luaEvent.Parameters[2]);
+            await HandleForm(new FormContext(formName, luaEvent.Parameters[3]));
         }
     }
 
-    protected abstract Task HandleForm(string formName, LuaValue data);
+    protected abstract Task HandleForm(IFormContext formContext);
 }
