@@ -2,9 +2,9 @@
 
 namespace Realm.Console.Components.Gui;
 
-public sealed class LoginGuiComponent : GuiComponent
+public sealed class RegisterGuiComponent : GuiComponent
 {
-    public LoginGuiComponent() : base("login")
+    public RegisterGuiComponent() : base("register")
     {
 
     }
@@ -13,8 +13,8 @@ public sealed class LoginGuiComponent : GuiComponent
     {
         switch (formContext.FormName)
         {
-            case "login":
-                var loginData = formContext.GetData<LoginData>();
+            case "register":
+                var registerData = formContext.GetData<RegisterData>();
                 break;
             default:
                 throw new NotImplementedException();
@@ -23,10 +23,10 @@ public sealed class LoginGuiComponent : GuiComponent
 
     protected override async Task HandleAction(IActionContext actionContext)
     {
-        switch(actionContext.ActionName)
+        switch (actionContext.ActionName)
         {
-            case "navigateToRegister":
-                Entity.AddComponent(new RegisterGuiComponent());
+            case "navigateToLogin":
+                Entity.AddComponent(new LoginGuiComponent());
                 Entity.DestroyComponent(this);
                 break;
             default:

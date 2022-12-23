@@ -1,43 +1,56 @@
-﻿using SlipeServer.Server.Elements;
+﻿using SlipeServer.Server;
+using SlipeServer.Server.Elements;
 using SlipeServer.Server.Events;
+using SlipeServer.Server.Resources;
+using System.Diagnostics;
 
 namespace Realm.Resources.AgnosticGuiSystem;
 
 public class AgnosticGuiSystemService
 {
-    public event Action<LuaEvent>? FormSubmitted;
-    public event Action<LuaEvent>? GuiCloseRequested;
-    public event Action<LuaEvent>? GuiNavigationRequested;
-    private Dictionary<Player, HashSet<string>> _playersGuis = new();
-    public AgnosticGuiSystemService()
-    {
+    public delegate Task GuiChangedDelegate();
 
+    public GuiChangedDelegate? GuiFilesChanged;
+
+    private readonly AgnosticGuiSystemResource _resource;
+    public event Action<LuaEvent>? FormSubmitted;
+    public event Action<LuaEvent>? ActionExecuted;
+    private readonly Dictionary<Player, HashSet<string>> _playersGuis = new();
+
+    public AgnosticGuiSystemService(MtaServer server)
+    {
+        _resource = server.GetAdditionalResource<AgnosticGuiSystemResource>();
     }
 
     internal void HandleInternalSubmitForm(LuaEvent luaEvent)
     {
         FormSubmitted?.Invoke(luaEvent);
     }
-
-    internal void HandleInternalRequestGuiClose(LuaEvent luaEvent)
+    
+    internal void HandleInternalActionExecuted(LuaEvent luaEvent)
     {
-        GuiCloseRequested?.Invoke(luaEvent);
+        ActionExecuted?.Invoke(luaEvent);
     }
 
-    internal void HandleInternalNavigateToGui(LuaEvent luaEvent)
-    {
-        GuiNavigationRequested?.Invoke(luaEvent);
-    }
-
-    private void EnsurePlayerGuisAreInitialized(Player player)
+    private bool EnsurePlayerGuisAreInitialized(Player player)
     {
         if (!_playersGuis.ContainsKey(player))
+        {
             _playersGuis[player] = new();
+            return true;
+        }
+        return false;
     }
 
-    public bool OpenGui(Player player, string gui)
+    private async ValueTask EnsureGuiResourceIsRunning(Player player)
     {
-        EnsurePlayerGuisAreInitialized(player);
+        await _resource.StartForAsync(player);
+    }
+
+    public async ValueTask<bool> OpenGui(Player player, string gui)
+    {
+        if(EnsurePlayerGuisAreInitialized(player))
+            await EnsureGuiResourceIsRunning(player);
 
         if (_playersGuis[player].Contains(gui))
             return false;
@@ -49,7 +62,7 @@ public class AgnosticGuiSystemService
 
     public bool CloseGui(Player player, string gui)
     {
-        EnsurePlayerGuisAreInitialized(player);
+        Debug.Assert(!EnsurePlayerGuisAreInitialized(player));
 
         if (!_playersGuis[player].Contains(gui))
             return false;
@@ -61,9 +74,26 @@ public class AgnosticGuiSystemService
 
     public void CloseAllGuis(Player player)
     {
-        EnsurePlayerGuisAreInitialized(player);
+        Debug.Assert(!EnsurePlayerGuisAreInitialized(player));
 
         foreach (var gui in _playersGuis[player])
             player.TriggerLuaEvent("internalUiCloseGui", player, gui);
+        _playersGuis[player].Clear();
+    }
+
+    public async Task UpdateGuiFiles()
+    {
+        _resource.UpdateGuiFiles();
+        var players = _playersGuis.Keys;
+        foreach (var player in players)
+        {
+            CloseAllGuis(player);
+            _resource.StopFor(player);
+        }
+
+        if (GuiFilesChanged != null)
+            await GuiFilesChanged();
+
+        _playersGuis.Clear();
     }
 }

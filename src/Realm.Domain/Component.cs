@@ -6,4 +6,5 @@ public abstract class Component
 
     public virtual Task Load() => Task.CompletedTask;
 
+    public virtual void Destroy() { }
 }

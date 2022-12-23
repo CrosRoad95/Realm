@@ -45,6 +45,23 @@ public class Entity
     public TComponent GetRequiredComponent<TComponent>() where TComponent : Component
         => _components.OfType<TComponent>().First();
 
+    public void RemoveComponent<TComponent>(TComponent component) where TComponent: Component
+    {
+        if (component.Entity == this)
+        {
+            _components.Remove(component);
+            component.Entity = null!;
+        }
+        else
+            throw new Exception();
+    }
+
+    public void DestroyComponent<TComponent>(TComponent component) where TComponent: Component
+    {
+        component.Destroy();
+        RemoveComponent(component);
+    }
+
     public IEnumerable<Component> GetComponents() => _components;
 
     #region Internal

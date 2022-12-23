@@ -76,6 +76,9 @@ local dgsUIProvider = {
 		dgsSetPosition(windowHandle, x, y, false)
 		return true;
 	end,
+	setHorizontalAlign = function(labelHandle, align, wordWrap)
+		dgsLabelSetHorizontalAlign(labelHandle, align, wordWrap)
+	end
 }
 
 addEventHandler("onClientResourceStart", resourceRoot, function()

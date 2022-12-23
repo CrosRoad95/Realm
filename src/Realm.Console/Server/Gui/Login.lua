@@ -1,5 +1,5 @@
 ﻿local function createLoginWindow(guiProvider)
-	local window = guiProvider.window(__("LoginWindow", "Login / Register"), 0, 0, 300, 190);
+	local window = guiProvider.window(__("LoginWindow", "Login"), 0, 0, 300, 190);
 	guiProvider.centerWindow(window)
 	local information = guiProvider.label("", 10, 20, 280, 25, window);
 	guiProvider.label("Login:", 10, 45, 90, 25, window);
@@ -8,7 +8,7 @@
 	local passwordInput = guiProvider.input(100, 80, 180, 25, window);
 	local rememberPassword = guiProvider.checkbox("Zapamiętaj", 10, 120, 100, 20, false, window);
 	local navigateToRegister = guiProvider.button("Nie mam konta", 10, 150, 100, 20, window);
-	local loginButton = guiProvider.button("Zaloguj", 120, 150, 180, 20, window);
+	local loginButton = guiProvider.button("Zaloguj", 120, 150, 160, 20, window);
 
 	guiProvider.setMasked(passwordInput, true)
 	local form = createForm("login", {
@@ -21,7 +21,7 @@
 	end
 
 	guiProvider.onClick(navigateToRegister, function()
-		guiProvider.navigateToGui("register")
+		guiProvider.invokeAction("navigateToRegister")
 	end)
 
 	guiProvider.onClick(loginButton, function()

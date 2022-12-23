@@ -1,4 +1,6 @@
-﻿var console = new ServerConsole();
+﻿using Realm.Resources.AgnosticGuiSystem;
+
+var console = new ServerConsole();
 var logger = new RealmLogger(LogEventLevel.Verbose)
     .AddSeq()
     .GetLogger();
@@ -25,6 +27,17 @@ Console.CancelKeyPress += async (sender, args) =>
     await server.Stop();
     semaphore.Release();
 };
+
+
+#if DEBUG
+var hotReload = new HotReload("../../../Server/Gui");
+hotReload.OnReload += async () =>
+{
+    var stopwatch = Stopwatch.StartNew();
+    await server.GetRequiredService<AgnosticGuiSystemService>().UpdateGuiFiles();
+    logger.Information("Updated guis in: {time}ms", stopwatch.ElapsedMilliseconds);
+};
+#endif
 
 await server.Start();
 console.Start();

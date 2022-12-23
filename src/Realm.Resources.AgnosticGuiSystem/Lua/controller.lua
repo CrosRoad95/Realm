@@ -1,12 +1,27 @@
 ﻿local guis = {};
-local currentOpenedGui = nil;
+local guiRefs = 0
+local currentOpenedGui = {};
 local currentGuiProvider = nil;
 local pendingFormsSubmissions = {}
 local guiProviders = {}
 local currentGui = nil
+local lastCreatedWindow = nil
+local cooldown = {}
+
+function getCurrentGuiName()
+	return currentGui;
+end
 
 function registerGuiProvider(gui, provider)
 	guiProviders[gui] = provider
+end
+
+local function createErrorGui(guiProvider, err, guiName)
+	local window = guiProvider.window("Błąd w gui: "..tostring(guiName), 0, 0, 500, 200);
+	guiProvider.centerWindow(window)
+	local errorLabel = guiProvider.label(err, 20, 30, 260, 160, window);
+	guiProvider.setHorizontalAlign(errorLabel, "left", true)
+	return window
 end
 
 local function internalGetWindowHandleByName(name)
@@ -15,10 +30,23 @@ local function internalGetWindowHandleByName(name)
 	end
 	if(guis[name].handle == false)then
 		currentGui = name;
-		local handle, setStateCallback = guis[name].callback(currentGuiProvider);
+		currentGuiProvider.currentGui = currentGui;
+		local status, retval = pcall(function()
+			local windowHandle, setStateCallback = guis[name].callback(currentGuiProvider);
+			guis[name].handle = windowHandle;
+			guis[name].stateChanged = setStateCallback;
+			return true
+		end)
+		if(not status)then
+			if(lastCreatedWindow ~= nil)then
+				currentGuiProvider.close(lastCreatedWindow)
+				lastCreatedWindow = nil
+			end
+			local windowHandle = createErrorGui(currentGuiProvider, retval, name)
+			guis[name].handle = windowHandle;
+			guis[name].stateChanged = function()end
+		end
 		currentGui = nil;
-		guis[name].handle = handle;
-		guis[name].stateChanged = setStateCallback;
 	end
 
 	return guis[name];
@@ -48,16 +76,18 @@ function registerGui(callback, name)
 	end
 	guis[name] = {
 		callback = callback,
+		name = name,
 		handle = false,
 	};
 end
 
+local currentOpenedGui = {}
 function openGui(name)
-	if(currentOpenedGui)then
-		return false;
+	if(currentOpenedGui[name])then
+		error("Gui: "..tostring(name).." already opened");
 	end
-
-	currentOpenedGui = name;
+	currentOpenedGui[name] = true
+	guiRefs = guiRefs + 1
 	async(function()
 		internalOpenGui(name)
 	end)
@@ -66,13 +96,16 @@ function openGui(name)
 end
 
 function closeGui(name)
-	if(not currentOpenedGui)then
+	if(not currentOpenedGui[name])then
 		return false
 	end
 	
 	internalCloseGui(name)
-	showCursor(false)
-	currentOpenedGui = nil;
+	currentOpenedGui[name] = nil;
+	guiRefs = guiRefs - 1
+	if(guiRefs == 0)then
+		showCursor(false)
+	end
 end
 
 addEvent("internalSubmitFormResponse", true)
@@ -93,7 +126,7 @@ function createForm(name, fields)
 	if(currentGui == nil)then
 		error("Can't use createFrom outside gui constructor.'")
 	end
-	local currentGuiName = currentGui;
+	local _currentGuiName = currentGui;
 	return {
 		submit = function()
 			if(pendingFormsSubmissions[name])then
@@ -105,7 +138,7 @@ function createForm(name, fields)
 				data[name] = currentGuiProvider.getValue(elementHandle)
 			end
 
-			local id = triggerServerEventWithId("internalSubmitForm", currentGuiName, name, data);
+			local id = triggerServerEventWithId("internalSubmitForm", _currentGuiName, name, data);
 			pendingFormsSubmissions[name] = {
 				id = id,
 				coroutine = coroutine.running()
@@ -121,13 +154,22 @@ function createForm(name, fields)
 	};
 end
 
+function cooldownCheck(key, time)
+  if( cooldown[key] and cooldown[key] > getTickCount())then
+    return false
+  else
+    cooldown[key] = getTickCount() + time
+    return true
+  end
+end
+
 local function internalCommonGuiProvider()
+	local _currentGuiName = currentGui;
 	return {
-		closeCurrentGui = function()
-			triggerServerEventWithId("internalRequestGuiClose", currentOpenedGui);
-		end,
-		navigateToGui = function(guiName)
-			triggerServerEventWithId("internalNavigateToGui", guiName);
+		invokeAction = function(actionName, data)
+			if(cooldownCheck(actionName, 600))then
+				triggerServerEventWithId("internalActionExecuted", getCurrentGuiName(), actionName, data);
+			end
 		end,
 		tryLoadRememberedForm = function(form)
 			local name = form.getName()
@@ -176,7 +218,7 @@ local function internalCommonGuiProvider()
 			if(fileExists(fileName))then
 				fileDelete(fileName)
 			end
-		end,
+		end
 	}
 end
 
@@ -190,12 +232,30 @@ local function entrypoint()
 		currentGuiProvider[name] = func
 	end
 
+	local _onClick = currentGuiProvider.onClick;
+	local _window = currentGuiProvider.window;
+	currentGuiProvider.window = function(...)
+		lastCreatedWindow = _window(...)
+		return lastCreatedWindow
+	end
+	currentGuiProvider.onClick = function(elementHandle, callback)
+		if(currentGui == nil)then
+			error("Can't use onClick outside gui constructor.'")
+		end
+		local _currentGui = getCurrentGuiName();
+		_onClick(elementHandle, function(...)
+			currentGui = _currentGui;
+			callback(...)
+			currentGui = nil;
+		end)
+	end
+
 	addEvent("internalUiStatechanged", true)
 	addEventHandler("internalUiStatechanged", localPlayer, function(data)
 		local guiName, payloadKey, payloadValue = unpack(data);
-		local currentGui = internalGetWindowHandleByName(guiName)
-		if(currentGui)then
-			currentGui.stateChanged(payloadKey, payloadValue);
+		local currentGuiHandle = internalGetWindowHandleByName(guiName)
+		if(currentGuiHandle)then
+			currentGuiHandle.stateChanged(payloadKey, payloadValue);
 		end
 	end)
 

@@ -26,8 +26,7 @@ internal class AgnosticGuiSystemResource : Resource
         foreach (var (path, content) in agnosticGuiSystemOptions._guis)
             NoClientScripts[$"{Name}/{path}"] = content;
 
-        foreach (var (path, content) in GetGuiFiles())
-            NoClientScripts[$"{Name}/{path}"] = content;
+        UpdateGuiFiles();
     }
 
     private IEnumerable<(string, byte[])> GetGuiFiles()
@@ -37,5 +36,11 @@ internal class AgnosticGuiSystemResource : Resource
         {
             yield return (item, File.ReadAllBytes(item));
         }
+    }
+
+    public void UpdateGuiFiles()
+    {
+        foreach (var (path, content) in GetGuiFiles())
+            NoClientScripts[$"{Name}/{path}"] = content;
     }
 }

@@ -75,6 +75,9 @@
 		guiSetPosition(windowHandle, x, y, false)
 		return true;
 	end,
+	setHorizontalAlign = function(labelHandle, align, wordWrap)
+		guiLabelSetHorizontalAlign(labelHandle, align, wordWrap)
+	end
 }
 
 addEventHandler("onClientResourceStart", resourceRoot, function()

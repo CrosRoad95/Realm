@@ -1,6 +1,7 @@
 ﻿using Realm.Domain.Components.Elements;
 using Realm.Domain.Contextes;
 using Realm.Resources.AgnosticGuiSystem;
+using Serilog.Events;
 using SlipeServer.Packets.Definitions.Lua;
 using SlipeServer.Server.Events;
 using SlipeServer.Server.Mappers;
@@ -16,15 +17,25 @@ public abstract class GuiComponent : Component
         _name = name;
     }
 
-    public override Task Load()
+    public override async Task Load()
     {
-        var _agnosticGuiSystemService = Entity.GetRequiredService<AgnosticGuiSystemService>();
-        var luaEventService = Entity.GetRequiredService<LuaEventService>();
-        _agnosticGuiSystemService.FormSubmitted += HandleFormSubmitted;
+        var agnosticGuiSystemService = Entity.GetRequiredService<AgnosticGuiSystemService>();
+        agnosticGuiSystemService.FormSubmitted += HandleFormSubmitted;
+        agnosticGuiSystemService.ActionExecuted += HandleActionExecuted;
 
         var playerElementComponent = Entity.GetRequiredComponent<PlayerElementComponent>();
-        luaEventService.TriggerEventFor(playerElementComponent.Player, "internalUiOpenGui", playerElementComponent.Player, _name);
-        return Task.CompletedTask;
+        await agnosticGuiSystemService.OpenGui(playerElementComponent.Player, _name);
+    }
+
+    private async void HandleActionExecuted(LuaEvent luaEvent)
+    {
+        //string id = luaEvent.Parameters[0].StringValue ?? throw new Exception();
+        string guiName = luaEvent.Parameters[1].StringValue ?? throw new Exception();
+        if (guiName == _name)
+        {
+            string actionName = luaEvent.Parameters[2].StringValue ?? throw new Exception();
+            await HandleAction(new ActionContext(actionName, luaEvent.Parameters[3]));
+        }
     }
 
     private async void HandleFormSubmitted(LuaEvent luaEvent)
@@ -39,4 +50,20 @@ public abstract class GuiComponent : Component
     }
 
     protected abstract Task HandleForm(IFormContext formContext);
+    protected abstract Task HandleAction(IActionContext actionContext);
+
+    public void Close()
+    {
+        var agnosticGuiSystemService = Entity.GetRequiredService<AgnosticGuiSystemService>();
+        agnosticGuiSystemService.FormSubmitted -= HandleFormSubmitted;
+        agnosticGuiSystemService.ActionExecuted -= HandleActionExecuted;
+
+        var playerElementComponent = Entity.GetRequiredComponent<PlayerElementComponent>();
+        agnosticGuiSystemService.CloseGui(playerElementComponent.Player, _name);
+    }
+
+    public override void Destroy()
+    {
+        Close();
+    }
 }

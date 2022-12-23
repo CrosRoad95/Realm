@@ -1,4 +1,7 @@
-﻿namespace Realm.Console.Logic;
+﻿using Microsoft.EntityFrameworkCore;
+using Realm.Persistance;
+
+namespace Realm.Console.Logic;
 
 internal sealed class PlayerJoinedLogic
 {

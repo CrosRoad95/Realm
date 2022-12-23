@@ -1,5 +1,6 @@
 ﻿using Realm.Domain.Components.Common;
 using Realm.Domain.Components.Elements;
+using Realm.Domain.Components.Players;
 using Realm.Domain.Persistance;
 
 namespace Realm.Server;
@@ -98,6 +99,26 @@ public partial class RPGServer : IInternalRPGServer, IRPGServer
 
     }
 
+    private Task HandleGuiFilesChanged()
+    {
+        foreach (var entity in _entities)
+        {
+            var guiComponents = entity.GetComponents().OfType<GuiComponent>().ToList();
+            foreach (var guiComponent in guiComponents)
+            {
+                guiComponent.Close();
+                entity.RemoveComponent(guiComponent);
+                entity.AddComponent(guiComponent);
+                ;
+            }
+            if(guiComponents.Count > 0)
+            {
+                ;
+            }
+        }
+        return Task.CompletedTask;
+    }
+
     public async Task Start()
     {
         await BuildFromSeedFiles();
@@ -105,6 +126,8 @@ public partial class RPGServer : IInternalRPGServer, IRPGServer
         var serviceProvider = _server.GetRequiredService<IServiceProvider>();
         foreach (var module in modules)
             module.Init(serviceProvider);
+
+        GetRequiredService<AgnosticGuiSystemService>().GuiFilesChanged = HandleGuiFilesChanged;
 
         _server.Start();
         _logger.Information("Server started.");
