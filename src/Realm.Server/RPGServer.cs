@@ -96,7 +96,13 @@ public partial class RPGServer : IInternalRPGServer, IRPGServer
 
     public async Task Save()
     {
-
+        foreach (var entity in _entities)
+        {
+            if(entity.TryGetComponent(out AccountComponent accountComponent))
+            {
+                ;
+            }
+        }
     }
 
     private Task HandleGuiFilesChanged()
@@ -109,11 +115,6 @@ public partial class RPGServer : IInternalRPGServer, IRPGServer
                 guiComponent.Close();
                 entity.RemoveComponent(guiComponent);
                 entity.AddComponent(guiComponent);
-                ;
-            }
-            if(guiComponents.Count > 0)
-            {
-                ;
             }
         }
         return Task.CompletedTask;
@@ -142,12 +143,6 @@ public partial class RPGServer : IInternalRPGServer, IRPGServer
     public async Task Stop()
     {
         _server.Stop(); // TODO: save everything
-    }
-
-    private void RemoveAllEntities()
-    {
-        foreach (var entity in _entities)
-            entity.Destroy();
     }
 
     public Entity CreateEntity(string name)

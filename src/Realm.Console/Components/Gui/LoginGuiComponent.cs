@@ -1,4 +1,6 @@
-﻿using Realm.Console.Data;
+﻿using Microsoft.AspNetCore.Identity;
+using Realm.Console.Data;
+using Realm.Persistance.Data;
 
 namespace Realm.Console.Components.Gui;
 
@@ -15,6 +17,23 @@ public sealed class LoginGuiComponent : GuiComponent
         {
             case "login":
                 var loginData = formContext.GetData<LoginData>();
+                var userManager = Entity.GetRequiredService<UserManager<User>>();
+                var user = await userManager.FindByNameAsync(loginData.Login);
+                if(user == null)
+                {
+                    formContext.ErrorResponse("Login lub hasło jest niepoprawne.");
+                    return;
+                }
+
+                if(!await userManager.CheckPasswordAsync(user, loginData.Password))
+                {
+                    formContext.ErrorResponse("Login lub hasło jest niepoprawne.");
+                    return;
+                }
+
+                await Entity.AddComponentAsync(new AccountComponent(user));
+                Entity.DestroyComponent(this);
+                formContext.SuccessResponse();
                 break;
             default:
                 throw new NotImplementedException();

@@ -8,10 +8,8 @@ public interface IDb
     DbSet<IdentityUserLogin<Guid>> UserLogins { get; }
     DbSet<IdentityRoleClaim<Guid>> RoleClaims { get; }
     DbSet<IdentityUserToken<Guid>> UserTokens { get; }
-    DbSet<UserData> UserData { get; }
     DbSet<UserLicense> UserLicenses { get; }
     DbSet<Vehicle> Vehicles { get; }
-    DbSet<VehicleData> VehicleData { get; }
 
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
 }

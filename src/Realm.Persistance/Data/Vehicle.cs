@@ -27,6 +27,4 @@ public sealed class Vehicle
     public DateTime CreatedAt { get; set; }
     public string? Components { get; set; }
 #pragma warning restore CS8618
-
-    public ICollection<VehicleData>? VehicleData { get; set; }
 }

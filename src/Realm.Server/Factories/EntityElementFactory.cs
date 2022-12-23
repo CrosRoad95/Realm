@@ -14,7 +14,7 @@ public class EntityElementFactory
     public Entity CreateVehicle(ushort model, Vector3 position, Vector3 rotation)
     {
         var vehicle = _internalRPGServer.CreateEntity("vehicle");
-        vehicle.AddComponent(new VehicleElementComponent(model));
+        vehicle.AddComponent(new VehicleElementComponent(new Vehicle(model, position)));
         vehicle.Transform.Position = position;
         vehicle.Transform.Rotation = rotation;
         return vehicle;

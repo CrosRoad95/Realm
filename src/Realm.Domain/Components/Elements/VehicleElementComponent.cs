@@ -8,13 +8,14 @@ public sealed class VehicleElementComponent : Component
 
     public Vehicle Vehicle => _vehicle;
 
-    public VehicleElementComponent(ushort model)
+    public VehicleElementComponent(Vehicle vehicle)
     {
-        _vehicle = new Vehicle(model, Vector3.Zero);
+        _vehicle = vehicle;
     }
 
     private void HandleDestroyed(Entity entity)
     {
+        Entity.Destroyed -= HandleDestroyed;
         _vehicle.Destroy();
     }
 

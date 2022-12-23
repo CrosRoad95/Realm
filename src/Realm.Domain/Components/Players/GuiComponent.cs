@@ -45,7 +45,7 @@ public abstract class GuiComponent : Component
         if(guiName == _name)
         {
             string formName = luaEvent.Parameters[2].StringValue ?? throw new Exception();
-            await HandleForm(new FormContext(formName, luaEvent.Parameters[3]));
+            await HandleForm(new FormContext(luaEvent.Player, formName, luaEvent.Parameters[3], Entity.GetRequiredService<AgnosticGuiSystemService>()));
         }
     }
 

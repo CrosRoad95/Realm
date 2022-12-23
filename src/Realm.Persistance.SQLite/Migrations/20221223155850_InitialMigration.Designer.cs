@@ -11,13 +11,14 @@ using Realm.Persistance.SQLite;
 namespace Realm.Persistance.SQLite.Migrations
 {
     [DbContext(typeof(SQLiteDb))]
-    [Migration("20221120140313_AddComponentPropertyToVehiclesTable")]
-    partial class AddComponentPropertyToVehiclesTable
+    [Migration("20221223155850_InitialMigration")]
+    partial class InitialMigration
     {
+        /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
-            modelBuilder.HasAnnotation("ProductVersion", "6.0.9");
+            modelBuilder.HasAnnotation("ProductVersion", "7.0.0");
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<System.Guid>", b =>
                 {
@@ -154,6 +155,10 @@ namespace Realm.Persistance.SQLite.Migrations
                     b.Property<int>("AccessFailedCount")
                         .HasColumnType("INTEGER");
 
+                    b.Property<string>("Components")
+                        .HasMaxLength(262140)
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken()
                         .HasColumnType("TEXT");
@@ -164,6 +169,10 @@ namespace Realm.Persistance.SQLite.Migrations
 
                     b.Property<bool>("EmailConfirmed")
                         .HasColumnType("INTEGER");
+
+                    b.Property<string>("Inventory")
+                        .HasMaxLength(262140)
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("LastIp")
                         .HasColumnType("TEXT");
@@ -184,7 +193,6 @@ namespace Realm.Persistance.SQLite.Migrations
                         .HasColumnType("REAL");
 
                     b.Property<string>("Nick")
-                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.Property<string>("NormalizedEmail")
@@ -239,23 +247,6 @@ namespace Realm.Persistance.SQLite.Migrations
                         .HasDatabaseName("UserNameIndex");
 
                     b.ToTable("Users", (string)null);
-                });
-
-            modelBuilder.Entity("Realm.Persistance.Data.UserData", b =>
-                {
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("Key")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("Value")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.HasKey("UserId", "Key");
-
-                    b.ToTable("UserData", (string)null);
                 });
 
             modelBuilder.Entity("Realm.Persistance.Data.UserLicense", b =>
@@ -394,23 +385,6 @@ namespace Realm.Persistance.SQLite.Migrations
                     b.ToTable("Vehicles", (string)null);
                 });
 
-            modelBuilder.Entity("VehicleData", b =>
-                {
-                    b.Property<string>("VehicleId")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("Key")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("Value")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.HasKey("VehicleId", "Key");
-
-                    b.ToTable("VehicleData", (string)null);
-                });
-
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<System.Guid>", b =>
                 {
                     b.HasOne("Realm.Persistance.Data.Role", null)
@@ -462,17 +436,6 @@ namespace Realm.Persistance.SQLite.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Realm.Persistance.Data.UserData", b =>
-                {
-                    b.HasOne("Realm.Persistance.Data.User", "User")
-                        .WithMany("PlayerData")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("User");
-                });
-
             modelBuilder.Entity("Realm.Persistance.Data.UserLicense", b =>
                 {
                     b.HasOne("Realm.Persistance.Data.User", "User")
@@ -484,27 +447,9 @@ namespace Realm.Persistance.SQLite.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("VehicleData", b =>
-                {
-                    b.HasOne("Realm.Persistance.Data.Vehicle", "Vehicle")
-                        .WithMany("VehicleData")
-                        .HasForeignKey("VehicleId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Vehicle");
-                });
-
             modelBuilder.Entity("Realm.Persistance.Data.User", b =>
                 {
                     b.Navigation("Licenses");
-
-                    b.Navigation("PlayerData");
-                });
-
-            modelBuilder.Entity("Realm.Persistance.Data.Vehicle", b =>
-                {
-                    b.Navigation("VehicleData");
                 });
 #pragma warning restore 612, 618
         }

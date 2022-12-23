@@ -9,10 +9,8 @@ public abstract class Db<T> : IdentityDbContext<User, Role, Guid,
         IdentityRoleClaim<Guid>,
         IdentityUserToken<Guid>>, IDb where T : Db<T>
 {
-    public DbSet<UserData> UserData => Set<UserData>();
     public DbSet<UserLicense> UserLicenses => Set<UserLicense>();
     public DbSet<Vehicle> Vehicles => Set<Vehicle>();
-    public DbSet<VehicleData> VehicleData => Set<VehicleData>();
 
     public Db(DbContextOptions<T> options) : base(options)
     {
@@ -41,17 +39,6 @@ public abstract class Db<T> : IdentityDbContext<User, Role, Guid,
                 .HasDefaultValue(null)
                 .HasMaxLength(262140)
                 .IsRequired(false);
-        });
-
-        modelBuilder.Entity<UserData>(entityBuilder =>
-        {
-            entityBuilder
-                .ToTable("UserData")
-                .HasKey(x => new { x.UserId, x.Key });
-            entityBuilder
-                .HasOne(x => x.User)
-                .WithMany(x => x.PlayerData)
-                .HasForeignKey(x => x.UserId);
         });
 
         modelBuilder.Entity<UserLicense>(entityBuilder =>
@@ -154,18 +141,6 @@ public abstract class Db<T> : IdentityDbContext<User, Role, Guid,
                 .HasDefaultValue(null)
                 .HasMaxLength(65535)
                 .IsRequired(false);
-        });
-
-        modelBuilder.Entity<VehicleData>(entityBuilder =>
-        {
-            entityBuilder
-                .ToTable("VehicleData")
-                .HasKey(x => new { x.VehicleId, x.Key });
-
-            entityBuilder
-                .HasOne(x => x.Vehicle)
-                .WithMany(x => x.VehicleData)
-                .HasForeignKey(x => x.VehicleId);
         });
     }
 }

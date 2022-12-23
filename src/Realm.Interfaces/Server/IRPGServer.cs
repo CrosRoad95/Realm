@@ -3,4 +3,5 @@
 public interface IRPGServer
 {
     void AssociateElement(IElementHandle elementHandle);
+    Task Save();
 }

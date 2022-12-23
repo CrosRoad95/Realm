@@ -7,21 +7,24 @@ public class LicensesComponent : Component
 {
     private List<UserLicense> _userLicenses = new();
     private string? userId;
-    public LicensesComponent()
-    {
 
+    public List<UserLicense> UserLicenses { get => _userLicenses; set => _userLicenses = value; }
+
+    public LicensesComponent(List<UserLicense> userLicenses)
+    {
+        UserLicenses = userLicenses;    
     }
 
-    public override async Task Load()
-    {
-        var id = Entity.InternalGetRequiredComponent<AccountComponent>().Id;
-        var db = Entity.GetRequiredService<IDb>();
+    //public override async Task Load()
+    //{
+    //    var id = Entity.InternalGetRequiredComponent<AccountComponent>().Id;
+    //    var db = Entity.GetRequiredService<IDb>();
 
-        userId = id;
-        _userLicenses = await db.UserLicenses
-            .Where(x => x.UserId.ToString() == id)
-            .ToListAsync();
-    }
+    //    userId = id;
+    //    _userLicenses = await db.UserLicenses
+    //        .Where(x => x.UserId.ToString() == id)
+    //        .ToListAsync();
+    //}
 
     public UserLicense? GetLicense(string licenseId)
     {

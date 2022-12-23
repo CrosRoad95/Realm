@@ -7,7 +7,7 @@ namespace Realm.Domain.Components.Players;
 public class AccountComponent : Component
 {
     private readonly User _user;
-    private ClaimsPrincipal _claimsPrincipal;
+    private ClaimsPrincipal? _claimsPrincipal;
 
     public string Id => _user.Id.ToString().ToUpper();
 
@@ -15,10 +15,14 @@ public class AccountComponent : Component
 
     public DateTime? RegisterDateTime => _user.RegisteredDateTime;
 
-    public AccountComponent(User user, ClaimsPrincipal claimsPrincipal)
+    public AccountComponent(User user)
     {
         _user = user;
-        _claimsPrincipal = claimsPrincipal;
+    }
+
+    public override async Task Load()
+    {
+        await UpdateClaimsPrincipal();
     }
 
     public async Task UpdateClaimsPrincipal()
@@ -136,15 +140,5 @@ public class AccountComponent : Component
         if (result.Succeeded)
             await UpdateClaimsPrincipal();
         return result.Succeeded;
-    }
-
-    public async Task<bool> HasData(string key)
-    {
-        var db = Entity.GetRequiredService<IDb>();
-
-        var playerData = await db.UserData
-            .AsNoTrackingWithIdentityResolution()
-            .FirstOrDefaultAsync(x => x.UserId.ToString() == Id && x.Key == key);
-        return playerData != null;
     }
 }

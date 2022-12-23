@@ -1,6 +1,7 @@
 ﻿using SlipeServer.Server;
 using SlipeServer.Server.Elements;
 using SlipeServer.Server.Events;
+using SlipeServer.Server.Mappers;
 using SlipeServer.Server.Resources;
 using System.Diagnostics;
 
@@ -16,10 +17,12 @@ public class AgnosticGuiSystemService
     public event Action<LuaEvent>? FormSubmitted;
     public event Action<LuaEvent>? ActionExecuted;
     private readonly Dictionary<Player, HashSet<string>> _playersGuis = new();
+    private readonly LuaValueMapper _luaValueMapper;
 
-    public AgnosticGuiSystemService(MtaServer server)
+    public AgnosticGuiSystemService(MtaServer server, LuaValueMapper luaValueMapper)
     {
         _resource = server.GetAdditionalResource<AgnosticGuiSystemResource>();
+        _luaValueMapper = luaValueMapper;
     }
 
     internal void HandleInternalSubmitForm(LuaEvent luaEvent)
@@ -76,9 +79,17 @@ public class AgnosticGuiSystemService
     {
         Debug.Assert(!EnsurePlayerGuisAreInitialized(player));
 
-        foreach (var gui in _playersGuis[player])
+        foreach (var gui in _playersGuis[player]) 
             player.TriggerLuaEvent("internalUiCloseGui", player, gui);
         _playersGuis[player].Clear();
+    }
+    
+    public void SendFormResponse(Player player, string id, string name, params object[] values)
+    {
+        Debug.Assert(!EnsurePlayerGuisAreInitialized(player));
+
+        var luaValues = values.Select(_luaValueMapper.Map).ToArray();
+        player.TriggerLuaEvent("internalSubmitFormResponse", player, id, name, luaValues);
     }
 
     public async Task UpdateGuiFiles()

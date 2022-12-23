@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Realm.Domain;
 using Realm.Persistance;
 
 namespace Realm.Console.Logic;
@@ -18,7 +19,17 @@ internal sealed class PlayerJoinedLogic
     {
         var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();
         entity.AddComponent(new AdminComponent()).DebugView = true;
-        playerElementComponent.Spawn(new Vector3(0,0, 4));
         entity.AddComponent(new LoginGuiComponent());
+
+        entity.ComponentAdded += HandleComponentAdded;
+    }
+
+    private void HandleComponentAdded(Component component)
+    {
+        if(component is AccountComponent)
+        {
+            var playerElementComponent = component.Entity.GetRequiredComponent<PlayerElementComponent>();
+            playerElementComponent.Spawn(new Vector3(0, 0, 4));
+        }
     }
 }

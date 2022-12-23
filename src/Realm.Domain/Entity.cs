@@ -16,6 +16,8 @@ public class Entity
     public Transform Transform { get; private set; }
     public IRPGServer Server => _rpgServer;
 
+    public event Action<Component>? ComponentAdded;
+
 
     public event Action<Entity>? Destroyed;
 
@@ -36,11 +38,31 @@ public class Entity
         component.Entity = this;
         _components.Add(component);
         Task.Run(component.Load);
+        ComponentAdded?.Invoke(component);
+        return component;
+    }
+    
+    public async Task<TComponent> AddComponentAsync<TComponent>(TComponent component) where TComponent : Component
+    {
+        if (component.Entity != null)
+        {
+            throw new Exception("Component already attached to other entity");
+        }
+        component.Entity = this;
+        _components.Add(component);
+        await component.Load();
+        ComponentAdded?.Invoke(component);
         return component;
     }
 
     public TComponent? GetComponent<TComponent>() where TComponent : Component
         => _components.OfType<TComponent>().FirstOrDefault();
+    
+    public bool TryGetComponent<TComponent>(out TComponent component) where TComponent : Component
+    {
+        component = GetComponent<TComponent>();
+        return component != null;
+    }
 
     public TComponent GetRequiredComponent<TComponent>() where TComponent : Component
         => _components.OfType<TComponent>().First();

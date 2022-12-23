@@ -109,11 +109,10 @@ function closeGui(name)
 end
 
 addEvent("internalSubmitFormResponse", true)
-addEventHandler("internalSubmitFormResponse", localPlayer, function(data)
-	local id = table.remove(data, 1);
-	local name = table.remove(data, 1);
+addEventHandler("internalSubmitFormResponse", localPlayer, function(id, name, data)
 	if(pendingFormsSubmissions[name])then
-		coroutine.resume(pendingFormsSubmissions[name].coroutine, unpack(data))
+		local success, result = unpack(data)
+		coroutine.resume(pendingFormsSubmissions[name].coroutine, success, unpack(result))
 		setTimer(function()
 			pendingFormsSubmissions[name] = nil;
 		end, 200, 1)
