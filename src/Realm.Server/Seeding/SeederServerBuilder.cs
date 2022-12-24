@@ -1,7 +1,5 @@
 ﻿using FluentValidation;
 using Microsoft.AspNetCore.Identity;
-using Realm.Domain.Components.Elements;
-using Realm.Domain.Components.Players;
 using Realm.Persistance.Data;
 using Realm.Server.Serialization.Yaml;
 using System.Security.Claims;

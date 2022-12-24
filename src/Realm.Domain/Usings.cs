@@ -7,3 +7,6 @@ global using Microsoft.AspNetCore.Identity;
 global using Microsoft.Extensions.DependencyInjection;
 global using Realm.Resources.StatisticsCounter;
 global using Realm.Persistance.Data;
+global using System.Security.Claims;
+global using Realm.Interfaces.Server;
+global using Realm.Domain.Components.Common;

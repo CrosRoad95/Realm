@@ -1,6 +1,4 @@
-﻿using Realm.Interfaces.Server;
-
-namespace Realm.Domain.Components.Elements;
+﻿namespace Realm.Domain.Components.Elements;
 
 public class BlipElementComponent : Component
 {

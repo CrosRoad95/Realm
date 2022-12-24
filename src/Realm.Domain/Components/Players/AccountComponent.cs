@@ -1,8 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Realm.Persistance;
-using System.Security.Claims;
-
-namespace Realm.Domain.Components.Players;
+﻿namespace Realm.Domain.Components.Players;
 
 public class AccountComponent : Component
 {

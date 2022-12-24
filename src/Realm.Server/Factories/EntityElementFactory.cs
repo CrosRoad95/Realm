@@ -1,6 +1,4 @@
-﻿using Realm.Domain.Components.Elements;
-
-namespace Realm.Server.Factories;
+﻿namespace Realm.Server.Factories;
 
 public class EntityElementFactory
 {

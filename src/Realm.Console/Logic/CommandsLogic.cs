@@ -1,6 +1,5 @@
 ﻿using Realm.Server.Services;
 using Serilog;
-using SlipeServer.Server.Services;
 
 namespace Realm.Console.Logic;
 

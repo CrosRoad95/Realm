@@ -49,3 +49,7 @@ global using Realm.Resources.Overlay;
 global using Realm.Server.Providers;
 global using Realm.Interfaces.Providers;
 global using Realm.Domain;
+global using Realm.Domain.Components.Common;
+global using Realm.Domain.Components.Elements;
+global using Realm.Domain.Components.Players;
+global using Realm.Domain.Persistance;

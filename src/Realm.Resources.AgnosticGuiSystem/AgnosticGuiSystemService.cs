@@ -2,7 +2,6 @@
 using SlipeServer.Server.Elements;
 using SlipeServer.Server.Events;
 using SlipeServer.Server.Mappers;
-using SlipeServer.Server.Resources;
 using System.Diagnostics;
 
 namespace Realm.Resources.AgnosticGuiSystem;

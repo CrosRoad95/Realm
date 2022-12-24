@@ -1,7 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Realm.Persistance;
-
-namespace Realm.Domain.Components.Players;
+﻿namespace Realm.Domain.Components.Players;
 
 public class LicensesComponent : Component
 {
