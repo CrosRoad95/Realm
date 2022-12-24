@@ -64,4 +64,9 @@ internal class TestRPGServer : IInternalRPGServer
     {
         throw new NotImplementedException();
     }
+
+    public Entity GetEntityByPlayer(Player player)
+    {
+        throw new NotImplementedException();
+    }
 }

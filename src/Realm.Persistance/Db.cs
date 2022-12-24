@@ -31,14 +31,11 @@ public abstract class Db<T> : IdentityDbContext<User, Role, Guid,
 
         modelBuilder.Entity<User>(entityBuilder =>
         {
-            entityBuilder.Property(x => x.Components)
-                .HasDefaultValue(null)
-                .HasMaxLength(262140)
-                .IsRequired(false);
-            entityBuilder.Property(x => x.Inventory)
-                .HasDefaultValue(null)
-                .HasMaxLength(262140)
-                .IsRequired(false);
+            entityBuilder.Property(x => x.LastTransformAndMotion)
+                .HasMaxLength(400)
+                .HasConversion(x => x.Serialize(), x => TransformAndMotion.CreateFromString(x))
+                .HasDefaultValue(new TransformAndMotion())
+                .IsRequired();
         });
 
         modelBuilder.Entity<UserLicense>(entityBuilder =>

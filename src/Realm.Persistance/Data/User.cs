@@ -1,4 +1,6 @@
-﻿namespace Realm.Persistance.Data;
+﻿using Realm.Persistance.Data.Helpers;
+
+namespace Realm.Persistance.Data;
 
 public sealed class User : IdentityUser<Guid>
 {
@@ -13,8 +15,8 @@ public sealed class User : IdentityUser<Guid>
     public ulong PlayTime { get; set; }
     public short Skin { get; set; }
     public double Money { get; set; }
-    public string? Components { get; set; }
-    public string? Inventory { get; set; }
+
+    public TransformAndMotion? LastTransformAndMotion { get; set; }
 #pragma warning restore CS8618
 
     public ICollection<UserLicense>? Licenses { get; set; }

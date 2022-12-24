@@ -152,10 +152,6 @@ namespace Realm.Persistance.SQLite.Migrations
                     b.Property<int>("AccessFailedCount")
                         .HasColumnType("INTEGER");
 
-                    b.Property<string>("Components")
-                        .HasMaxLength(262140)
-                        .HasColumnType("TEXT");
-
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken()
                         .HasColumnType("TEXT");
@@ -167,10 +163,6 @@ namespace Realm.Persistance.SQLite.Migrations
                     b.Property<bool>("EmailConfirmed")
                         .HasColumnType("INTEGER");
 
-                    b.Property<string>("Inventory")
-                        .HasMaxLength(262140)
-                        .HasColumnType("TEXT");
-
                     b.Property<string>("LastIp")
                         .HasColumnType("TEXT");
 
@@ -179,6 +171,13 @@ namespace Realm.Persistance.SQLite.Migrations
 
                     b.Property<string>("LastSerial")
                         .HasColumnType("TEXT");
+
+                    b.Property<string>("LastTransformAndMotion")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(400)
+                        .HasColumnType("TEXT")
+                        .HasDefaultValue("{\"Position\":{\"X\":0.0,\"Y\":0.0,\"Z\":0.0},\"Rotation\":{\"X\":0.0,\"Y\":0.0,\"Z\":0.0},\"Interior\":0,\"Dimension\":0,\"Velocity\":{\"X\":0.0,\"Y\":0.0,\"Z\":0.0},\"AngularVelocity\":{\"X\":0.0,\"Y\":0.0,\"Z\":0.0}}");
 
                     b.Property<bool>("LockoutEnabled")
                         .HasColumnType("INTEGER");
