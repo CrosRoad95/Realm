@@ -5,6 +5,15 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
 	<LangVersion>10.0</LangVersion>
+
+	  <Version>0.0.1</Version>
+	  <Authors>Sebastian Jura</Authors>
+	  <Company></Company>
+	  <Product>Realm Server</Product>
+	  <PackageProjectUrl>https://github.com/CrosRoad95/Realms</PackageProjectUrl>
+	  <RepositoryUrl>https://github.com/CrosRoad95/Realm</RepositoryUrl>
+	  <RepositoryType>git</RepositoryType>
+	  <Description>RPG Server for mta sa based on slipe-server</Description>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
