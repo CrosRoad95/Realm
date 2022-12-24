@@ -13,7 +13,6 @@
 	  <PackageProjectUrl>https://github.com/CrosRoad95/Realms</PackageProjectUrl>
 	  <RepositoryUrl>https://github.com/CrosRoad95/Realm</RepositoryUrl>
 	  <RepositoryType>git</RepositoryType>
-	  <PackageLicenseFile>LICENSE</PackageLicenseFile>
 	  <Description>RPG Server for mta sa based on slipe-server</Description>
   </PropertyGroup>
 
