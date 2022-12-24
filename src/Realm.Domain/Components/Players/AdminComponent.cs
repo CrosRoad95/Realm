@@ -1,6 +1,7 @@
 ﻿using Realm.Domain.Components.Elements;
 using Realm.Resources.AdminTools;
 using SlipeServer.Resources.NoClip;
+using SlipeServer.Server.Services;
 
 namespace Realm.Domain.Components.Players;
 
@@ -16,6 +17,8 @@ public class AdminComponent : Component
         {
             if (_debugView != value)
             {
+                var player = Entity.InternalGetRequiredComponent<PlayerElementComponent>().Player;
+                Entity.GetRequiredService<DebugLog>().SetVisibleTo(player, value);
                 _debugView = value;
             }
         }
