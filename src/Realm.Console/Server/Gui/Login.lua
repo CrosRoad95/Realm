@@ -3,12 +3,12 @@
 	guiProvider.centerWindow(window)
 	local information = guiProvider.label("", 10, 20, 280, 25, window);
 	guiProvider.label("Login:", 10, 45, 90, 25, window);
-	local loginInput = guiProvider.input(100, 45, 180, 25, window);
+	local loginInput = guiProvider.input(100, 45, 190, 25, window);
 	guiProvider.label("Hasło:", 10, 80, 90, 25, window);
-	local passwordInput = guiProvider.input(100, 80, 180, 25, window);
+	local passwordInput = guiProvider.input(100, 80, 190, 25, window);
 	local rememberPassword = guiProvider.checkbox("Zapamiętaj", 10, 120, 100, 20, false, window);
 	local navigateToRegister = guiProvider.button("Nie mam konta", 10, 150, 100, 20, window);
-	local loginButton = guiProvider.button("Zaloguj", 120, 150, 160, 20, window);
+	local loginButton = guiProvider.button("Zaloguj", 130, 150, 160, 20, window);
 
 	guiProvider.setMasked(passwordInput, true)
 	local form = createForm("login", {
