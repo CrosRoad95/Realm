@@ -14,7 +14,7 @@ internal sealed class CommandsLogic
         _logger = logger;
         _commandService.AddCommandHandler("gp", (entity, args) =>
         {
-            logger.Information("{position}", entity.Transform.Position);
+            logger.Information("{position}, {rotation}", entity.Transform.Position, entity.Transform.Rotation);
             return Task.CompletedTask;
         });
     }

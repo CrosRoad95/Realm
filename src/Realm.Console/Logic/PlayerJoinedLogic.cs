@@ -22,10 +22,14 @@ internal sealed class PlayerJoinedLogic
 
     private void HandleComponentAdded(Component component)
     {
-        if(component is AccountComponent)
+        if (component is AccountComponent)
         {
             var playerElementComponent = component.Entity.GetRequiredComponent<PlayerElementComponent>();
-            playerElementComponent.Spawn(new Vector3(0, 0, 4));
+            if (!playerElementComponent.TrySpawnAtLastPosition())
+            {
+                playerElementComponent.Spawn(new Vector3(362.58f + (float)Random.Shared.NextDouble() * 3, -91.07f + (float)Random.Shared.NextDouble() * 3, 1.38f),
+                    new Vector3(0, 0, 90));
+            }
         }
     }
 }

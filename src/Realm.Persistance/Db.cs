@@ -34,8 +34,7 @@ public abstract class Db<T> : IdentityDbContext<User, Role, Guid,
             entityBuilder.Property(x => x.LastTransformAndMotion)
                 .HasMaxLength(400)
                 .HasConversion(x => x.Serialize(), x => TransformAndMotion.CreateFromString(x))
-                .HasDefaultValue(new TransformAndMotion())
-                .IsRequired();
+                .HasDefaultValue(null);
         });
 
         modelBuilder.Entity<UserLicense>(entityBuilder =>

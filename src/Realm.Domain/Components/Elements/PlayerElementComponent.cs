@@ -1,4 +1,5 @@
-﻿using Realm.Resources.LuaInterop;
+﻿using Realm.Domain.Components.Players;
+using Realm.Resources.LuaInterop;
 using Realm.Resources.Overlay;
 using SlipeServer.Packets.Definitions.Lua;
 using SlipeServer.Packets.Lua.Camera;
@@ -28,11 +29,28 @@ public sealed class PlayerElementComponent : Component
         return Task.CompletedTask;
     }
 
+    public bool TrySpawnAtLastPosition()
+    {
+        var accountComponent = Entity.GetComponent<AccountComponent>();
+        if (accountComponent != null)
+        {
+            var lastTransformAndMotion = accountComponent.User.LastTransformAndMotion;
+            if (lastTransformAndMotion != null)
+            {
+                Spawn(lastTransformAndMotion.Position, lastTransformAndMotion.Rotation);
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     public void Spawn(Vector3 position, Vector3? rotation = null)
     {
         _player.Camera.Target = _player;
         _player.Camera.Fade(CameraFade.In);
         _player.Spawn(position, rotation?.Z ?? 0, 0, 0, 0);
+        _player.Rotation = rotation ?? Vector3.Zero;
     }
 
     public void SendChatMessage(string message, Color? color = null, bool isColorCoded = false)

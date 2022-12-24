@@ -11,6 +11,8 @@ public class AccountComponent : Component
 
     public DateTime? RegisterDateTime => _user.RegisteredDateTime;
 
+    public User User => _user;
+
     public AccountComponent(User user)
     {
         _user = user;

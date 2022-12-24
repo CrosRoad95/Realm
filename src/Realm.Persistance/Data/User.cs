@@ -16,7 +16,7 @@ public sealed class User : IdentityUser<Guid>
     public short Skin { get; set; }
     public double Money { get; set; }
 
-    public TransformAndMotion? LastTransformAndMotion { get; set; }
+    public TransformAndMotion? LastTransformAndMotion { get; set; } = null;
 #pragma warning restore CS8618
 
     public ICollection<UserLicense>? Licenses { get; set; }
