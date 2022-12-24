@@ -1,13 +1,4 @@
-﻿spawns:
-  spawnA:
-    name: "Test spawn A"
-    position: [0, 2, 3]
-    rotation: [0, 0, 0]
-  spawnB:
-    name: "Test spawn B"
-    position: [0, 10, 3]
-    rotation: [0, 0, 0]
-blips:
+﻿blips:
   sapdBlip:
     icon: 30
     position: [-50, -50, 0]
@@ -15,6 +6,9 @@ pickups:
   sapdStart:
     model: 1314
     position: [20, 5, 3]
+  help:
+    model: 1239
+    position: [348.7744, -87.57617, 1.3628025]
 fractions:
   fractionSapd:
     code: "SAPD"

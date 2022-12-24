@@ -4,9 +4,9 @@ public class PickupElementComponent : Component
 {
     private Pickup _pickup;
 
-    public PickupElementComponent(ushort model)
+    public PickupElementComponent(Pickup pickup)
     {
-        _pickup = new Pickup(Vector3.Zero, model);
+        _pickup = pickup;
     }
 
     private void HandleDestroyed(Entity entity)

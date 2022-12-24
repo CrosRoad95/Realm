@@ -4,58 +4,50 @@ namespace Realm.Server.Seeding;
 
 internal class SeedData
 {
-    public class Spawn
-    {
-        public string Name { get; set; }
-        public Vector3 Position { get; set; }
-        public Vector3 Rotation { get; set; }
-    }
-
-    public class Blip
+    public class BlipSeedData
     {
         public int Icon { get; set; }
         public Vector3 Position { get; set; }
     }
 
-    public class Pickup
+    public class PickupSeedData
     {
         public ushort Model { get; set; }
         public Vector3 Position { get; set; }
     }
 
-    public class FractionMember
+    public class FractionMemberSeedData
     {
         public string[]? Permissions { get; set; }
     }
 
-    public class Fraction
+    public class FractionSeedData
     {
         public string Code { get; set; }
         public string Name { get; set; }
         public Vector3 Position { get; set; }
-        public Dictionary<string, FractionMember> Members { get; set; }
+        public Dictionary<string, FractionMemberSeedData> Members { get; set; }
     }
 
-    public class Account
+    public class AccountSeedData
     {
         public string Password { get; set; }
         public Dictionary<string, string> Claims { get; set; }
         public List<string> Roles { get; set; }
     }
 
-    public class VehicleUpgradeDescription
+    public class VehicleUpgradeDescriptionSeedData
     {
         public float[] MaxVelocity { get; set; }
         public float[] EngineAcceleration { get; set; }
     }
 
-    public Dictionary<string, Spawn> Spawns = new();
-    public Dictionary<string, Blip> Blips = new();
-    public Dictionary<string, Pickup> Pickups = new();
-    public Dictionary<string, Fraction> Fractions = new();
+    public Dictionary<string, BlipSeedData> Blips = new();
+    public Dictionary<string, PickupSeedData> Pickups = new();
+    public Dictionary<string, FractionSeedData> Fractions = new();
     public List<string> Roles = new();
-    public Dictionary<string, Account> Accounts = new();
-    public Dictionary<string, VehicleUpgradeDescription> Upgrades = new();
+    public Dictionary<string, AccountSeedData> Accounts = new();
+    public Dictionary<string, VehicleUpgradeDescriptionSeedData> Upgrades = new();
 }
 
 internal class SeedValidator : AbstractValidator<SeedData>

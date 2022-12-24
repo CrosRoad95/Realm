@@ -4,9 +4,9 @@ public class BlipElementComponent : Component
 {
     private readonly Blip _blip;
 
-    public BlipElementComponent(BlipIcon icon)
+    public BlipElementComponent(Blip blip)
     {
-        _blip = new Blip(Vector3.Zero, icon);
+        _blip = blip;
     }
 
     private void HandleDestroyed(Entity entity)

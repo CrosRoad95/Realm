@@ -52,35 +52,24 @@ internal sealed class SeederServerBuilder
         return entity;
     }
 
-    private void BuildSpawns(Dictionary<string, Spawn> spawns)
-    {
-        foreach (var pair in spawns)
-        {
-            var spawnEntity = CreateEntity(pair.Key);
-            spawnEntity.Transform.Position = pair.Value.Position;
-            spawnEntity.Transform.Rotation = pair.Value.Rotation;
-            _logger.Information("Seeder: Created spawn of id {elementId} at {position}", pair.Key, pair.Value.Position);
-        }
-    }
-
-    private void BuildBlips(Dictionary<string, SeedData.Blip> blips)
+    private void BuildBlips(Dictionary<string, BlipSeedData> blips)
     {
         foreach (var pair in blips)
         {
             var blipEntity = CreateEntity(pair.Key);
+            blipEntity.AddComponent(new BlipElementComponent(new Blip(Vector3.Zero, (BlipIcon)pair.Value.Icon, 250)));
             blipEntity.Transform.Position = pair.Value.Position;
-            blipEntity.AddComponent(new BlipElementComponent((BlipIcon)pair.Value.Icon));
             _logger.Information("Seeder: Created blip of id {elementId} with icon {blipIcon} at {position}", pair.Key, pair.Value.Icon, pair.Value.Position);
         }
     }
 
-    private void BuildPickups(Dictionary<string, SeedData.Pickup> pickups)
+    private void BuildPickups(Dictionary<string, PickupSeedData> pickups)
     {
         foreach (var pair in pickups)
         {
             var blipEntity = CreateEntity(pair.Key);
+            blipEntity.AddComponent(new PickupElementComponent(new Pickup(Vector3.Zero, pair.Value.Model)));
             blipEntity.Transform.Position = pair.Value.Position;
-            blipEntity.AddComponent(new PickupElementComponent(pair.Value.Model));
             _logger.Information("Seeder: Created pickup of id {elementId} with icon {pickupModel} at {position}", pair.Key, pair.Value.Model, pair.Value.Position);
         }
     }
@@ -98,7 +87,7 @@ internal sealed class SeederServerBuilder
         }
     }
 
-    private async Task BuildIdentityAccounts(Dictionary<string, Account> accounts)
+    private async Task BuildIdentityAccounts(Dictionary<string, AccountSeedData> accounts)
     {
         foreach (var pair in accounts)
         {
@@ -135,7 +124,7 @@ internal sealed class SeederServerBuilder
     }
 
 
-    private void BuildUpgrades(Dictionary<string, VehicleUpgradeDescription> upgradePairs)
+    private void BuildUpgrades(Dictionary<string, VehicleUpgradeDescriptionSeedData> upgradePairs)
     {
         foreach (var upgradePair in upgradePairs)
         {
@@ -178,7 +167,6 @@ internal sealed class SeederServerBuilder
         BuildUpgrades(seedData.Upgrades);
         await BuildIdentityRoles(seedData.Roles);
         await BuildIdentityAccounts(seedData.Accounts);
-        BuildSpawns(seedData.Spawns);
         BuildBlips(seedData.Blips);
         BuildPickups(seedData.Pickups);
         _createdUsers.Clear();

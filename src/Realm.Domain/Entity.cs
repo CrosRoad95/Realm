@@ -106,7 +106,6 @@ public class Entity
 
         foreach (var component in _components.AsEnumerable().Reverse())
             DestroyComponent(component);
-
     }
 
     public override string ToString() => Name;

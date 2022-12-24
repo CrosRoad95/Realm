@@ -10,6 +10,7 @@ public partial class RPGServer : IInternalRPGServer, IRPGServer
 
     private readonly List<Entity> _entities = new();
     private readonly Dictionary<Player, Entity> _entityByPlayer = new();
+    private readonly Dictionary<string, Entity> _entityByName = new();
 
     public string MapName
     {
@@ -149,8 +150,12 @@ public partial class RPGServer : IInternalRPGServer, IRPGServer
 
     public Entity CreateEntity(string name)
     {
+        if (_entityByName.ContainsKey(name))
+            throw new Exception($"Entity of name {name} already exists");
+
         var newlyCreatedEntity = new Entity(this, GetRequiredService<ServicesComponent>(), name);
         _entities.Add(newlyCreatedEntity);
+        _entityByName[name] = newlyCreatedEntity;
         newlyCreatedEntity.ComponentAdded += HandleComponentAdded;
         newlyCreatedEntity.Destroyed += HandleEntityDestroyed;
         return newlyCreatedEntity;
@@ -158,6 +163,9 @@ public partial class RPGServer : IInternalRPGServer, IRPGServer
 
     private void HandleEntityDestroyed(Entity entity)
     {
+        _entityByName.Remove(entity.Name);
+        _entities.Remove(entity);
+
         entity.ComponentAdded -= HandleComponentAdded;
     }
 
@@ -165,9 +173,17 @@ public partial class RPGServer : IInternalRPGServer, IRPGServer
     {
         if(component is PlayerElementComponent playerElementComponent)
         {
+            var player = playerElementComponent.Player;
             _entityByPlayer[playerElementComponent.Player] = component.Entity;
             component.Entity.Destroyed += HandlePlayerEntityDestroyed;
+            player.Disconnected += HandlePlayerDisconnected;
         }
+    }
+
+    private void HandlePlayerDisconnected(Player player, SlipeServer.Server.Elements.Events.PlayerQuitEventArgs e)
+    {
+        var playerEntity = _entityByPlayer[player];
+        playerEntity.Destroy();
     }
 
     private void HandlePlayerEntityDestroyed(Entity playerEntity)
