@@ -13,10 +13,4 @@ public class IdentityModule : IModule
     }
 
     public T GetInterface<T>() where T : class => throw new NotSupportedException();
-
-    public void PostInit(IServiceProvider serviceProvider)
-    {
-    }
-
-    public int GetPriority() => 100;
 }

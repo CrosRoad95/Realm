@@ -1,20 +1,24 @@
-﻿using SlipeServer.Server.Concepts;
+﻿using Realm.Domain.Components.Players;
+using Realm.Interfaces.Server;
+using SlipeServer.Server.Concepts;
 
 namespace Realm.Server.Services;
 
 public class RPGCommandService
 {
     private readonly CommandService _commandService;
+    private readonly IInternalRPGServer _rpgServer;
     private readonly ILogger _logger;
 
     private readonly List<Command> _commands = new();
-    public RPGCommandService(CommandService commandService, ILogger logger)
+    public RPGCommandService(CommandService commandService, ILogger logger, IInternalRPGServer rpgServer)
     {
         _commandService = commandService;
+        _rpgServer = rpgServer;
         _logger = logger.ForContext<RPGCommandService>();
     }
 
-    public bool AddCommandHandler(string commandName, Func<Player, string[], Task> callback, string[]? requiredPolicies = null)
+    public bool AddCommandHandler(string commandName, Func<Entity, string[], Task> callback, string[]? requiredPolicies = null)
     {
         if(_commands.Any(x => string.Equals(x.CommandText, commandName, StringComparison.OrdinalIgnoreCase))) {
             throw new Exception($"Command with name '{commandName}' already exists");
@@ -30,6 +34,7 @@ public class RPGCommandService
         command.Triggered += async (source, args) =>
         {
             var player = args.Player;
+            var entity = _rpgServer.GetEntityByPlayer(player);
             using var playerProperty = LogContext.PushProperty("player", player);
             using var commandNameProperty = LogContext.PushProperty("commandName", commandName);
             using var commandArgumentProperty = LogContext.PushProperty("commandArguments", args.Arguments);
@@ -55,7 +60,10 @@ public class RPGCommandService
                 _logger.Verbose("{player} executed command {commandName} with no arguments.", player);
             try
             {
-                await callback(player, args.Arguments);
+                if(entity.HasComponent<AccountComponent>())
+                    await callback(entity, args.Arguments);
+                else
+                    _logger.Verbose("{player} executed command {commandName} with no arguments.", player);
             }
             catch (Exception ex)
             {

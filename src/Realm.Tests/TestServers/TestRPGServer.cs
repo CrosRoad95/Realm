@@ -50,8 +50,6 @@ internal class TestRPGServer : IInternalRPGServer
         });
     }
 
-    public int GetPriority() => int.MaxValue;
-
     public TService GetRequiredService<TService>() where TService : notnull
     {
         return TestServer.GetRequiredService<TService>();

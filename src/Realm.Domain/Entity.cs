@@ -58,6 +58,9 @@ public class Entity
     public TComponent? GetComponent<TComponent>() where TComponent : Component
         => _components.OfType<TComponent>().FirstOrDefault();
     
+    public bool HasComponent<TComponent>() where TComponent : Component
+        => _components.OfType<TComponent>().Any();
+    
     public bool TryGetComponent<TComponent>(out TComponent component) where TComponent : Component
     {
         component = GetComponent<TComponent>();
@@ -104,6 +107,10 @@ public class Entity
     public virtual void Destroy()
     {
         Destroyed?.Invoke(this);
+
+        foreach (var component in _components.AsEnumerable().Reverse())
+            DestroyComponent(component);
+
     }
 
     public override string ToString() => Name;

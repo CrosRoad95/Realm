@@ -20,6 +20,7 @@ SemaphoreSlim semaphore = new(0);
 var server = builder.Build(null, extraBuilderSteps: serverBuilder =>
 {
     serverBuilder.AddLogic<PlayerJoinedLogic>();
+    serverBuilder.AddLogic<CommandsLogic>();
 });
 
 Console.CancelKeyPress += async (sender, args) =>

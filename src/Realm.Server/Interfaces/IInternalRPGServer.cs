@@ -8,5 +8,6 @@ public interface IInternalRPGServer
     event Action<Entity>? PlayerJoined;
 
     Entity CreateEntity(string name);
+    Entity GetEntityByPlayer(Player player);
     TService GetRequiredService<TService>() where TService : notnull;
 }

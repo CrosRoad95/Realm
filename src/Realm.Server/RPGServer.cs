@@ -14,6 +14,8 @@ public partial class RPGServer : IInternalRPGServer, IRPGServer
     public event Action<Entity>? PlayerJoined;
 
     private readonly List<Entity> _entities = new();
+    private readonly Dictionary<Player, Entity> _entityByPlayer = new();
+
     public string MapName
     {
         get => _server.MapName;
@@ -64,8 +66,8 @@ public partial class RPGServer : IInternalRPGServer, IRPGServer
         );
 
         _logger = GetRequiredService<ILogger>().ForContext<RPGServer>();
+        _logger.Information("Starting server:");
 
-        _logger.Information("Startin server:");
         _logger.Information("Modules: {modules}", string.Join(", ", modules.Select(x => x.Name)));
 
         var serverListConfiguration = realmConfigurationProvider.GetRequired<ServerListConfiguration>("ServerList");
@@ -80,6 +82,11 @@ public partial class RPGServer : IInternalRPGServer, IRPGServer
     public void AssociateElement(IElementHandle elementHandle)
     {
         _server.AssociateElement((Element)elementHandle.GetElement());
+    }
+
+    public Entity GetEntityByPlayer(Player player)
+    {
+        return _entityByPlayer[player];
     }
 
     private void HandlePlayerJoined(Player player)
@@ -149,8 +156,29 @@ public partial class RPGServer : IInternalRPGServer, IRPGServer
     {
         var newlyCreatedEntity = new Entity(this, GetRequiredService<ServicesComponent>(), name);
         _entities.Add(newlyCreatedEntity);
+        newlyCreatedEntity.ComponentAdded += HandleComponentAdded;
+        newlyCreatedEntity.Destroyed += HandleEntityDestroyed;
         return newlyCreatedEntity;
     }
 
-    public int GetPriority() => 40;
+    private void HandleEntityDestroyed(Entity entity)
+    {
+        entity.ComponentAdded -= HandleComponentAdded;
+    }
+
+    private void HandleComponentAdded(Component component)
+    {
+        if(component is PlayerElementComponent playerElementComponent)
+        {
+            _entityByPlayer[playerElementComponent.Player] = component.Entity;
+            component.Entity.Destroyed += HandlePlayerEntityDestroyed;
+        }
+    }
+
+    private void HandlePlayerEntityDestroyed(Entity playerEntity)
+    {
+        playerEntity.Destroyed += HandlePlayerEntityDestroyed;
+        var playerComponent = playerEntity.GetRequiredComponent<PlayerElementComponent>();
+        _entityByPlayer.Remove(playerComponent.Player);
+    }
 }
