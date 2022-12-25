@@ -18,4 +18,4 @@ jobs:
         nuget-version: '5.x'
     - run: | 
         nuget pack src/Realm.Server/Realm.Server.csproj -IncludeReferencedProjects -OutputFileNamesWithoutVersion -Version ${{github.ref_name}} \
-        nuget push MTARealm.Server.nupkg -ApiKey ${{ secrets.NUGET_API_KEY }} -Source https://api.nuget.org/v3/index.json
+        nuget push MTARealm.Server.nupkg
