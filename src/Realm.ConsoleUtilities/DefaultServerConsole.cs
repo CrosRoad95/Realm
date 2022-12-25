@@ -1,8 +1,8 @@
 ﻿using Realm.Interfaces.Server;
 
-namespace Realm.Console;
+namespace Realm.ConsoleUtilities;
 
-internal class ServerConsole : IConsole
+internal class DefaultServerConsole : IConsole
 {
     public event Action<string?>? CommandExecuted;
 
@@ -12,7 +12,7 @@ internal class ServerConsole : IConsole
         {
             while (true)
             {
-                var line = System.Console.ReadLine();
+                var line = Console.ReadLine();
                 CommandExecuted?.Invoke(line);
             }
         }

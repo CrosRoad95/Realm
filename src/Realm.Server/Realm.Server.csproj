@@ -5,15 +5,6 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
 	<LangVersion>10.0</LangVersion>
-
-	  <Version>0.0.1</Version>
-	  <Authors>Sebastian Jura</Authors>
-	  <Company></Company>
-	  <Product>Realm Server</Product>
-	  <PackageProjectUrl>https://github.com/CrosRoad95/Realms</PackageProjectUrl>
-	  <RepositoryUrl>https://github.com/CrosRoad95/Realm</RepositoryUrl>
-	  <RepositoryType>git</RepositoryType>
-	  <Description>RPG Server for mta sa based on slipe-server</Description>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
@@ -54,29 +45,9 @@
     <ProjectReference Include="..\Realm.Resources.Overlay\Realm.Resources.Overlay.csproj" />
     <ProjectReference Include="..\Realm.Resources.StatisticsCounter\Realm.Resources.StatisticsCounter.csproj" />
     <ProjectReference Include="..\RealmResources.ElementOutline\Realm.Resources.ElementOutline.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Update="Server\discord.js">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="Server\fractions.js">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="Server\login.js">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="Server\panel.js">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="Server\startup.js">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="Server\Test\test.js">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="Server\vehicles.js">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
+	<ProjectReference Include="..\Realm.GRpc\Realm.Module.Grpc.csproj" />
+	<ProjectReference Include="..\Realm.Logging\Realm.Logging.csproj" />
+	<ProjectReference Include="..\Realm.ConsoleUtilities\Realm.ConsoleUtilities.csproj" />
+    <PackageReference Include="SlipeServer.Resources.NoClip" Version="0.1.0-CI-20221121-170436" />
   </ItemGroup>
 </Project>

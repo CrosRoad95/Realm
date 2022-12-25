@@ -1,19 +1,11 @@
-﻿using Realm.Resources.AgnosticGuiSystem;
-
-var console = new ServerConsole();
-var logger = new RealmLogger(LogEventLevel.Verbose)
-    .AddSeq()
-    .GetLogger();
-
-var configurationProvider = new RealmConfigurationProvider();
+﻿using Realm.ConsoleUtilities;
+using Realm.Interfaces.Server;
 
 var builder = new RPGServerBuilder();
-builder.AddModule<DiscordModule>();
-builder.AddModule<IdentityModule>();
-builder.AddModule<GrpcModule>();
-builder.AddLogger(logger);
-builder.AddConsole(console);
-builder.AddConfiguration(configurationProvider);
+builder.AddDefaultModules()
+    .AddDefaultLogger()
+    .AddDefaultConsole()
+    .AddDefaultConfiguration();
 
 SemaphoreSlim semaphore = new(0);
 
@@ -21,6 +13,9 @@ var server = builder.Build(null, extraBuilderSteps: serverBuilder =>
 {
     serverBuilder.AddLogic<PlayerJoinedLogic>();
     serverBuilder.AddLogic<CommandsLogic>();
+#if DEBUG
+    serverBuilder.AddLogic<HotReloadLogic>("../../../Server/Gui");
+#endif
 });
 
 Console.CancelKeyPress += async (sender, args) =>
@@ -29,19 +24,8 @@ Console.CancelKeyPress += async (sender, args) =>
     semaphore.Release();
 };
 
-
-#if DEBUG
-var hotReload = new HotReload("../../../Server/Gui");
-hotReload.OnReload += async () =>
-{
-    var stopwatch = Stopwatch.StartNew();
-    await server.GetRequiredService<AgnosticGuiSystemService>().UpdateGuiFiles();
-    logger.Information("Updated guis in: {time}ms", stopwatch.ElapsedMilliseconds);
-};
-#endif
-
 await server.Start();
-console.Start();
+server.GetRequiredService<IConsole>().Start();
 await semaphore.WaitAsync();
 
 

@@ -1,0 +1,21 @@
+name: Push nuge
+
+
+on:
+  push:
+    tags:
+      - '*'
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@master
+    - uses: nuget/setup-nuget@v1
+      with:
+        nuget-api-key: ${{ secrets.NUGET_API_KEY }}
+        nuget-version: '5.x'
+    - run: | 
+      nuget pack src/Realm.Server/Realm.Server.csproj -IncludeReferencedProjects -OutputFileNamesWithoutVersion -Version ${{github.ref_name}}
+      nuget push MTARealm.Server.nupkg -ApiKey ${{ secrets.NUGET_API_KEY }} -Source https://api.nuget.org/v3/index.json

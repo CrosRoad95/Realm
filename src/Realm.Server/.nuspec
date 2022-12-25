@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+    <metadata>
+        <id>MTARealm.Server</id>
+        <version>0.0.0</version>
+        <description>RPG Server Base for mta sa based on slipe-server</description>
+        <authors>Sebastian Jura</authors>
+    </metadata>
+</package>

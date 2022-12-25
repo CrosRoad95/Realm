@@ -1,6 +1,6 @@
-﻿namespace Realm.Console;
+﻿namespace Realm.ConsoleUtilities;
 
-internal class HotReload
+internal sealed class HotReload
 {
     public event Action? OnReload;
     private readonly FileSystemWatcher _fileSystemWatcher;

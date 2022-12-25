@@ -8,3 +8,5 @@ RealmRPG/Server/types.ts
 *.db-wal
 RealmRPG/
 *.local.json
+*.nupkg
+*.exe
