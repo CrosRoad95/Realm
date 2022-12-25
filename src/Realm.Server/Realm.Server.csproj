@@ -27,6 +27,7 @@
     <ProjectReference Include="..\Realm.Configuration\Realm.Configuration.csproj" />
     <ProjectReference Include="..\Realm.Discord\Realm.Module.Discord.csproj" />
     <ProjectReference Include="..\Realm.Domain\Realm.Domain.csproj" />
+    <ProjectReference Include="..\Realm.Persistance.MySql\Realm.Persistance.MySql.csproj" />
     <ProjectReference Include="..\Realm.Persistance.SQLite\Realm.Persistance.SQLite.csproj" />
     <ProjectReference Include="..\Realm.Persistance\Realm.Persistance.csproj" />
     <ProjectReference Include="..\Realm.Resources.Addons.AgnosticGuiSystem.CeGuiProvider\Realm.Resources.Addons.AgnosticGuiSystem.CeGuiProvider.csproj" />

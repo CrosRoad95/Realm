@@ -1,4 +1,6 @@
-﻿namespace Realm.Server.Extensions;
+﻿using Realm.Persistance.MySql;
+
+namespace Realm.Server.Extensions;
 
 public static class ServerBuilderExtensions
 {
@@ -15,9 +17,20 @@ public static class ServerBuilderExtensions
         builder.ConfigureServices(services =>
         {
             services.AddSingleton(realmConfigurationProvider);
-
-            services.AddPersistance<SQLiteDb>(db => db.UseSqlite("Filename=./server.db"));
-            services.AddRealmIdentity<SQLiteDb>(realmConfigurationProvider.GetRequired<IdentityConfiguration>("Identity"));
+            switch(realmConfigurationProvider.Get<string>("Database:Provider"))
+            {
+                case "MySql":
+                    var connectionString = "server=localhost;port=3306;database=realm;uid=root;password=password";
+                    services.AddPersistance<MySqlDb>(db => db.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString)));
+                    services.AddRealmIdentity<MySqlDb>(realmConfigurationProvider.GetRequired<IdentityConfiguration>("Identity"));
+                    break;
+                case "SqlLite":
+                    services.AddPersistance<SQLiteDb>(db => db.UseSqlite("Filename=./server.db"));
+                    services.AddRealmIdentity<SQLiteDb>(realmConfigurationProvider.GetRequired<IdentityConfiguration>("Identity"));
+                    break;
+                default:
+                    throw new NotImplementedException();
+            }
 
             services.AddSingleton<HelpCommand>();
             services.AddSingleton<ICommand, TestCommand>();

@@ -18,9 +18,16 @@ public class AuthorizationPoliciesProvider
 public static class ServiceCollectionExtensions
 {
     public static IServiceCollection AddPersistance<T>(this IServiceCollection services,
-    Action<DbContextOptionsBuilder> dboptions) where T : DbContext, IDb
+        Action<DbContextOptionsBuilder> dboptions) where T : DbContext, IDb
     {
         services.AddDbContext<IDb, T>(dboptions, ServiceLifetime.Transient);
+
+        return services;
+    }
+    
+    public static IServiceCollection AddPersistance<T>(this IServiceCollection services) where T : DbContext, IDb
+    {
+        services.AddDbContext<IDb, T>(ServiceLifetime.Transient);
 
         return services;
     }
