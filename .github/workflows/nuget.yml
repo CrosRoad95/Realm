@@ -16,6 +16,5 @@ jobs:
       with:
         nuget-api-key: ${{ secrets.NUGET_API_KEY }}
         nuget-version: '5.x'
-    - run: | 
-        nuget pack src/Realm.Server/Realm.Server.csproj -IncludeReferencedProjects -OutputFileNamesWithoutVersion -Version ${{github.ref_name}} \
-        nuget push MTARealm.Server.nupkg
+    - run: nuget pack src/Realm.Server/Realm.Server.csproj -IncludeReferencedProjects -OutputFileNamesWithoutVersion -Version ${{github.ref_name}}
+    - run: nuget push MTARealm.Server.nupkg
