@@ -12,9 +12,17 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@master
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: 7.0.x
+    - name: Restore dependencies
+      run: dotnet restore
+    - name: Build
+      run: dotnet build --no-restore
     - uses: nuget/setup-nuget@v1
       with:
         nuget-api-key: ${{ secrets.NUGET_API_KEY }}
         nuget-version: '5.x'
-    - run: nuget pack src/Realm.Server/Realm.Server.csproj -Build -IncludeReferencedProjects -OutputFileNamesWithoutVersion -Version ${{github.ref_name}}
+    - run: nuget pack src/Realm.Server/Realm.Server.csproj -IncludeReferencedProjects -OutputFileNamesWithoutVersion -Version ${{github.ref_name}}
     - run: nuget push MTARealm.Server.nupkg
