@@ -47,7 +47,6 @@
     <ProjectReference Include="..\RealmResources.ElementOutline\Realm.Resources.ElementOutline.csproj" />
 	<ProjectReference Include="..\Realm.GRpc\Realm.Module.Grpc.csproj" />
 	<ProjectReference Include="..\Realm.Logging\Realm.Logging.csproj" />
-	<ProjectReference Include="..\Realm.ConsoleUtilities\Realm.ConsoleUtilities.csproj" />
     <PackageReference Include="SlipeServer.Resources.NoClip" Version="0.1.0-CI-20221121-170436" />
   </ItemGroup>
 </Project>
