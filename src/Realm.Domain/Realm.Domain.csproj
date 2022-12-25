@@ -1,33 +1,23 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFramework>net7.0</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
-  </PropertyGroup>
+	<PropertyGroup>
+		<TargetFramework>net7.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <Compile Remove="Components\Players\Gui\**" />
-    <EmbeddedResource Remove="Components\Players\Gui\**" />
-    <None Remove="Components\Players\Gui\**" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\Realm.Assets\Realm.Assets.csproj" />
-    <ProjectReference Include="..\Realm.Configuration\Realm.Configuration.csproj" />
-    <ProjectReference Include="..\Realm.Persistance\Realm.Persistance.csproj" />
-    <ProjectReference Include="..\Realm.Resources.AdminTools\Realm.Resources.AdminTools.csproj" />
-    <ProjectReference Include="..\Realm.Resources.AFK\Realm.Resources.AFK.csproj" />
-    <ProjectReference Include="..\Realm.Resources.AgnosticGuiSystem\Realm.Resources.AgnosticGuiSystem.csproj" />
-    <ProjectReference Include="..\Realm.Resources.Assets\Realm.Resources.Assets.csproj" />
-    <ProjectReference Include="..\Realm.Resources.LuaInterop\Realm.Resources.LuaInterop.csproj" />
-    <ProjectReference Include="..\Realm.Resources.Overlay\Realm.Resources.Overlay.csproj" />
-    <ProjectReference Include="..\Realm.Resources.StatisticsCounter\Realm.Resources.StatisticsCounter.csproj" />
-	  <PackageReference Include="SlipeServer.Resources.NoClip" Version="0.1.0-CI-20221121-170436" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Persistance\" />
-  </ItemGroup>
-
+	<ItemGroup>
+		<ProjectReference Include="..\Realm.Assets\Realm.Assets.csproj" />
+		<ProjectReference Include="..\Realm.Configuration\Realm.Configuration.csproj" />
+		<ProjectReference Include="..\Realm.Persistance\Realm.Persistance.csproj" />
+		<ProjectReference Include="..\Realm.Resources.AdminTools\Realm.Resources.AdminTools.csproj" />
+		<ProjectReference Include="..\Realm.Resources.AFK\Realm.Resources.AFK.csproj" />
+		<ProjectReference Include="..\Realm.Resources.AgnosticGuiSystem\Realm.Resources.AgnosticGuiSystem.csproj" />
+		<ProjectReference Include="..\Realm.Resources.Assets\Realm.Resources.Assets.csproj" />
+		<ProjectReference Include="..\Realm.Resources.LuaInterop\Realm.Resources.LuaInterop.csproj" />
+		<ProjectReference Include="..\Realm.Resources.Overlay\Realm.Resources.Overlay.csproj" />
+		<ProjectReference Include="..\Realm.Resources.StatisticsCounter\Realm.Resources.StatisticsCounter.csproj" />
+		<PackageReference Include="SlipeServer.Resources.NoClip" Version="0.1.0-CI-20221121-170436" />
+	</ItemGroup>
+	
 </Project>

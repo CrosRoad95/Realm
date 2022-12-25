@@ -6,14 +6,6 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <UserSecretsId>d018fff1-b16d-4ace-bfca-514f1c9a4af7</UserSecretsId>
     <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
-	  <LangVersion>10.0</LangVersion>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <LangVersion>preview</LangVersion>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <LangVersion>preview</LangVersion>
   </PropertyGroup>
 

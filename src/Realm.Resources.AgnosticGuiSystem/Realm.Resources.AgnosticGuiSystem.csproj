@@ -4,27 +4,15 @@
     <TargetFramework>net7.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-	  <LangVersion>10.0</LangVersion>
+	<LangVersion>preview</LangVersion>
   </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <LangVersion>preview</LangVersion>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <LangVersion>preview</LangVersion>
-  </PropertyGroup>
-
-  <ItemGroup>
-    <None Remove="Lua\controller.lua" />
-  </ItemGroup>
 
   <ItemGroup>
     <EmbeddedResource Include="Lua\controller.lua" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="SlipeServer.Resources.Base" Version="0.1.0-CI-20221213-172905" />
+	  <ProjectReference Include="..\Realm.Resources.Addons.Common\Realm.Resources.Addons.Common.csproj" />
   </ItemGroup>
 
   <ItemGroup>

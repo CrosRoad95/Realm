@@ -4,15 +4,8 @@
     <TargetFramework>net7.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-	<LangVersion>10.0</LangVersion>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <LangVersion>preview</LangVersion>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <LangVersion>preview</LangVersion>
+	<LangVersion>preview</LangVersion>
+	<SignAssembly>False</SignAssembly>
   </PropertyGroup>
 
   <ItemGroup>
@@ -47,6 +40,5 @@
     <ProjectReference Include="..\RealmResources.ElementOutline\Realm.Resources.ElementOutline.csproj" />
 	<ProjectReference Include="..\Realm.GRpc\Realm.Module.Grpc.csproj" />
 	<ProjectReference Include="..\Realm.Logging\Realm.Logging.csproj" />
-    <PackageReference Include="SlipeServer.Resources.NoClip" Version="0.1.0-CI-20221121-170436" />
   </ItemGroup>
 </Project>

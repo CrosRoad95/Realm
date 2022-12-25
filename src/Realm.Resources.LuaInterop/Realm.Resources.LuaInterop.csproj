@@ -4,15 +4,7 @@
 		<TargetFramework>net7.0</TargetFramework>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
-	<LangVersion>10.0</LangVersion>		
-	</PropertyGroup>
-
-	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-	  <LangVersion>preview</LangVersion>
-	</PropertyGroup>
-
-	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-	  <LangVersion>preview</LangVersion>
+		<LangVersion>preview</LangVersion>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -24,11 +16,6 @@
 		<EmbeddedResource Include="Lua\debugging.lua" />
 		<EmbeddedResource Include="Lua\utility.lua" />
 	</ItemGroup>
-
-	<ItemGroup>
-		<PackageReference Include="Serilog" Version="2.12.0" />
-	</ItemGroup>
-
 
 	<ItemGroup>
 		<ProjectReference Include="..\Realm.Resources.Addons.Common\Realm.Resources.Addons.Common.csproj" />

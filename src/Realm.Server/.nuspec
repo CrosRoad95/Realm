@@ -5,5 +5,38 @@
         <version>0.0.0</version>
         <description>RPG Server Base for mta sa based on slipe-server</description>
         <authors>Sebastian Jura</authors>
+        <dependencies>
+            <dependency id="BCrypt.Net-Next" version="4.0.3" />  
+            <dependency id="FluentValidation" version="11.2.2" />
+            <dependency id="Microsoft.Extensions.Hosting.Abstractions" version="7.0.0" /> 
+            <dependency id="YamlDotNet" version="12.0.2" />
+            <dependency id="Microsoft.AspNetCore.Identity.EntityFrameworkCore" version="7.0.0" />
+            <dependency id="Microsoft.AspNetCore.Identity.UI" version="7.0.0" />
+            <dependency id="Microsoft.EntityFrameworkCore" version="7.0.0" />
+            <dependency id="Microsoft.EntityFrameworkCore.Design" version="7.0.0" />
+            <dependency id="Microsoft.EntityFrameworkCore.Tools" version="7.0.0" />
+            <dependency id="Microsoft.Extensions.Identity.Stores" version="7.0.0" />
+            <dependency id="Newtonsoft.Json" version="13.0.1" />
+            <dependency id="Microsoft.EntityFrameworkCore.Sqlite" version="7.0.0" />
+            <dependency id="Microsoft.Extensions.DependencyInjection.Abstractions" version="7.0.0" />
+            <dependency id="Microsoft.Extensions.Configuration" version="7.0.0" />
+            <dependency id="Microsoft.Extensions.Configuration.Abstractions" version="7.0.0 " />
+            <dependency id="Microsoft.Extensions.Configuration.Binder" version="7.0.0" />
+            <dependency id="Microsoft.Extensions.Configuration.EnvironmentVariables" version="7.0.0" />
+            <dependency id="Microsoft.Extensions.Configuration.Json" version="7.0.0" />
+            <dependency id="Serilog" version="2.12.0" />       
+            <dependency id="Serilog.Sinks.Console" version="4.1.1-dev-00896" />
+            <dependency id="Serilog.Sinks.Seq" version="5.2.1" />  
+            <dependency id="SlipeServer.Resources.Base" version="0.1.0-CI-20221213-172905" />    
+            <dependency id="SlipeServer.Resources.DGS" version="0.1.0-CI-20221213-172905" />   
+            <dependency id="RenderWareBuilders" version="0.1.0-CI-20221009-163717" />
+            <dependency id="RenderWareIo" version="0.1.0-CI-20221009-163717" />
+            <dependency id="Silk.NET.Assimp" version="2.16.0" />
+            <dependency id="Google.Protobuf" version="3.21.5 " />
+            <dependency id="Grpc.AspNetCore.Server" version="2.49.0" />
+            <dependency id="Grpc.Core" version="2.46.5" />
+            <dependency id="Grpc.Tools" version="2.49.0" />
+            <dependency id="SlipeServer.Resources.NoClip" version="0.1.0-CI-20221121-170436" />
+        </dependencies>
     </metadata>
 </package>
