@@ -9,6 +9,7 @@ using SlipeServer.Server.Elements;
 using Realm.Interfaces.Providers;
 using Realm.Server.Providers;
 using Realm.Domain;
+using Realm.Server;
 
 namespace Realm.Tests.TestServers;
 
@@ -17,6 +18,8 @@ internal class TestRPGServer : IInternalRPGServer
     public MtaServer<RealmTestingPlayer> TestServer { get; private set; }
     public string MapName { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
     public string GameType { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+
+    public ECS ECS => throw new NotImplementedException();
 
     public event Action<Entity>? PlayerJoined;
 
