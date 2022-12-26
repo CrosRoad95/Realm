@@ -5,12 +5,10 @@ public partial class RPGServer : IInternalRPGServer, IRPGServer
     private readonly MtaServer<Player> _server;
     private readonly IElementCollection _elementCollection;
     private readonly ILogger _logger;
+    private readonly ECS _ecs;
 
+    public ECS ECS => _ecs;
     public event Action<Entity>? PlayerJoined;
-
-    private readonly List<Entity> _entities = new();
-    private readonly Dictionary<Player, Entity> _entityByPlayer = new();
-    private readonly Dictionary<string, Entity> _entityByName = new();
 
     public string MapName
     {
@@ -39,6 +37,7 @@ public partial class RPGServer : IInternalRPGServer, IRPGServer
                     services.AddSingleton((IInternalRPGServer)this);
                     services.AddSingleton((IRPGServer)this);
                     services.AddSingleton<EntityByStringIdCollection>();
+                    services.AddSingleton<ECS>(x => _ecs);
                     services.AddSingleton<SeederServerBuilder>();
                     services.AddSingleton<VehicleUpgradeByStringCollection>();
 
@@ -61,6 +60,7 @@ public partial class RPGServer : IInternalRPGServer, IRPGServer
             }
         );
 
+        _ecs = new ECS(this);
         _logger = GetRequiredService<ILogger>().ForContext<RPGServer>();
         _logger.Information("Starting server:");
 
@@ -80,14 +80,9 @@ public partial class RPGServer : IInternalRPGServer, IRPGServer
         _server.AssociateElement((Element)elementHandle.GetElement());
     }
 
-    public Entity GetEntityByPlayer(Player player)
-    {
-        return _entityByPlayer[player];
-    }
-
     private void HandlePlayerJoined(Player player)
     {
-        var playerEntity = CreateEntity("Player " + player.Name);
+        var playerEntity = _ecs.CreateEntity("Player " + player.Name);
         playerEntity.AddComponent(new PlayerElementComponent(player));
         PlayerJoined?.Invoke(playerEntity);
     }
@@ -99,7 +94,7 @@ public partial class RPGServer : IInternalRPGServer, IRPGServer
 
     public async Task Save()
     {
-        foreach (var entity in _entities)
+        foreach (var entity in _ecs.Entities)
         {
             if(entity.TryGetComponent(out AccountComponent accountComponent))
             {
@@ -110,7 +105,7 @@ public partial class RPGServer : IInternalRPGServer, IRPGServer
 
     private Task HandleGuiFilesChanged()
     {
-        foreach (var entity in _entities)
+        foreach (var entity in _ecs.Entities)
         {
             var guiComponents = entity.GetComponents().OfType<GuiComponent>().ToList();
             foreach (var guiComponent in guiComponents)
@@ -146,50 +141,5 @@ public partial class RPGServer : IInternalRPGServer, IRPGServer
     public async Task Stop()
     {
         _server.Stop(); // TODO: save everything
-    }
-
-    public Entity CreateEntity(string name)
-    {
-        if (_entityByName.ContainsKey(name))
-            throw new Exception($"Entity of name {name} already exists");
-
-        var newlyCreatedEntity = new Entity(this, GetRequiredService<ServicesComponent>(), name);
-        _entities.Add(newlyCreatedEntity);
-        _entityByName[name] = newlyCreatedEntity;
-        newlyCreatedEntity.ComponentAdded += HandleComponentAdded;
-        newlyCreatedEntity.Destroyed += HandleEntityDestroyed;
-        return newlyCreatedEntity;
-    }
-
-    private void HandleEntityDestroyed(Entity entity)
-    {
-        _entityByName.Remove(entity.Name);
-        _entities.Remove(entity);
-
-        entity.ComponentAdded -= HandleComponentAdded;
-    }
-
-    private void HandleComponentAdded(Component component)
-    {
-        if(component is PlayerElementComponent playerElementComponent)
-        {
-            var player = playerElementComponent.Player;
-            _entityByPlayer[playerElementComponent.Player] = component.Entity;
-            component.Entity.Destroyed += HandlePlayerEntityDestroyed;
-            player.Disconnected += HandlePlayerDisconnected;
-        }
-    }
-
-    private void HandlePlayerDisconnected(Player player, SlipeServer.Server.Elements.Events.PlayerQuitEventArgs e)
-    {
-        var playerEntity = _entityByPlayer[player];
-        playerEntity.Destroy();
-    }
-
-    private void HandlePlayerEntityDestroyed(Entity playerEntity)
-    {
-        playerEntity.Destroyed += HandlePlayerEntityDestroyed;
-        var playerComponent = playerEntity.GetRequiredComponent<PlayerElementComponent>();
-        _entityByPlayer.Remove(playerComponent.Player);
     }
 }

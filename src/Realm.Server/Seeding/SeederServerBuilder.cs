@@ -47,7 +47,7 @@ internal sealed class SeederServerBuilder
 
     private Entity CreateEntity(string key)
     {
-        var entity = _rpgServer.CreateEntity(key);
+        var entity = _rpgServer.ECS.CreateEntity(key);
         AssignElementToId(entity, key);
         return entity;
     }

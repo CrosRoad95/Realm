@@ -32,7 +32,7 @@ public class RPGCommandService
         command.Triggered += async (source, args) =>
         {
             var player = args.Player;
-            var entity = _rpgServer.GetEntityByPlayer(player);
+            var entity = _rpgServer.ECS.GetEntityByPlayer(player);
             using var playerProperty = LogContext.PushProperty("player", player);
             using var commandNameProperty = LogContext.PushProperty("commandName", commandName);
             using var commandArgumentProperty = LogContext.PushProperty("commandArguments", args.Arguments);
