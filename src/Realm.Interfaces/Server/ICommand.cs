@@ -4,5 +4,5 @@ public interface ICommand
 {
     string CommandName { get; }
 
-    void HandleCommand(string command);
+    Task HandleCommand(string command);
 }

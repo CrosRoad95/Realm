@@ -2,6 +2,11 @@
 
 public class Entity
 {
+    public const string PlayerTag = "player";
+    public const string VehicleTag = "vehicle";
+    public const string BlipTag = "blip";
+    public const string PickupTag = "pickup";
+
     public string Id { get; set; } = Guid.NewGuid().ToString();
     public string Tag { get; set; } = "";
     public string Name { get; set; } = "";
@@ -17,10 +22,11 @@ public class Entity
 
     public event Action<Entity>? Destroyed;
 
-    public Entity(IRPGServer rpgServer, ServicesComponent servicesComponent, string name = "")
+    public Entity(IRPGServer rpgServer, ServicesComponent servicesComponent, string name = "", string tag = "")
     {
         _rpgServer = rpgServer;
         Name = name;
+        Tag = tag;
         Transform = new Transform(this);
         AddComponent(servicesComponent);
     }

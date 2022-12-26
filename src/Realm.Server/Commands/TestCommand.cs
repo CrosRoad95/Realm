@@ -9,8 +9,9 @@ internal class TestCommand : ICommand
         _logger = logger.ForContext<TestCommand>();
     }
 
-    public void HandleCommand(string command)
+    public Task HandleCommand(string command)
     {
         _logger.Information("Test command executed");
+        return Task.CompletedTask;
     }
 }

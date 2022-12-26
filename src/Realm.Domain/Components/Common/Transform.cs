@@ -1,4 +1,5 @@
-﻿using SlipeServer.Server.Elements.Events;
+﻿using Realm.Persistance.Data.Helpers;
+using SlipeServer.Server.Elements.Events;
 
 namespace Realm.Domain.Components.Common;
 
@@ -111,5 +112,16 @@ public sealed class Transform
         element.RotationChanged -= HandleRotationChanged;
         element.InteriorChanged -= InteriorInteriorChanged;
         element.DimensionChanged -= HandleDimensionChanged;
+    }
+
+    public TransformAndMotion GetTransformAndMotion()
+    {
+        return new TransformAndMotion
+        {
+            Position = _position,
+            Rotation = _rotation,
+            Interior = _interior,
+            Dimension = _dimension,
+        };
     }
 }

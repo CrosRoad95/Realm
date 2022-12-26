@@ -1,4 +1,9 @@
-﻿namespace Realm.Server;
+﻿using Microsoft.AspNetCore.Identity;
+using Realm.Domain.Components.Vehicles;
+using Realm.Persistance.Data;
+using SlipeServer.Packets.Enums;
+
+namespace Realm.Server;
 
 public partial class RPGServer : IInternalRPGServer, IRPGServer
 {
@@ -82,7 +87,7 @@ public partial class RPGServer : IInternalRPGServer, IRPGServer
 
     private void HandlePlayerJoined(Player player)
     {
-        var playerEntity = _ecs.CreateEntity("Player " + player.Name);
+        var playerEntity = _ecs.CreateEntity("Player " + player.Name, Entity.PlayerTag);
         playerEntity.AddComponent(new PlayerElementComponent(player));
         PlayerJoined?.Invoke(playerEntity);
     }
@@ -90,17 +95,6 @@ public partial class RPGServer : IInternalRPGServer, IRPGServer
     public TService GetRequiredService<TService>() where TService: notnull
     {
         return _server.GetRequiredService<TService>();
-    }
-
-    public async Task Save()
-    {
-        foreach (var entity in _ecs.Entities)
-        {
-            if(entity.TryGetComponent(out AccountComponent accountComponent))
-            {
-                ;
-            }
-        }
     }
 
     private Task HandleGuiFilesChanged()

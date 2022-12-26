@@ -2,17 +2,17 @@
 
 internal class SaveCommand : ICommand
 {
-    private readonly IRPGServer _rpgServer;
+    private readonly IInternalRPGServer _rpgServer;
 
     public string CommandName => "save";
 
-    public SaveCommand(IRPGServer rpgServer)
+    public SaveCommand(IInternalRPGServer rpgServer)
     {
         _rpgServer = rpgServer;
     }
 
-    public void HandleCommand(string command)
+    public async Task HandleCommand(string command)
     {
-        _rpgServer.Save();
+        await _rpgServer.ECS.SaveAll();
     }
 }

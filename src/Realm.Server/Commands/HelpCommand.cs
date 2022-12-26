@@ -13,9 +13,10 @@ public class HelpCommand : ICommand
         _logger = logger.ForContext<HelpCommand>();
     }
 
-    public void HandleCommand(string command)
+    public Task HandleCommand(string command)
     {
         _logger.Information("Commands:");
         _logger.Information($"\t{string.Join('\t', _commands.Select(x => x.CommandName))}");
+        return Task.CompletedTask;
     }
 }
