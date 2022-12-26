@@ -2,7 +2,7 @@
 
 public class BlipElementComponent : Component
 {
-    private readonly Blip _blip;
+    protected readonly Blip _blip;
 
     public BlipElementComponent(Blip blip)
     {

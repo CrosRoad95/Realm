@@ -2,7 +2,7 @@
 
 public class PickupElementComponent : Component
 {
-    private Pickup _pickup;
+    protected readonly Pickup _pickup;
 
     public PickupElementComponent(Pickup pickup)
     {

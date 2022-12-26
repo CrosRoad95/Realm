@@ -275,10 +275,6 @@ namespace Realm.Persistance.MySql.Migrations
                         .HasColumnType("varchar(300)")
                         .HasDefaultValue("{\"Color1\":\"White\",\"Color2\":\"White\",\"Color3\":\"White\",\"Color4\":\"White\",\"HeadLightColor\":\"White\"}");
 
-                    b.Property<string>("Components")
-                        .HasMaxLength(65535)
-                        .HasColumnType("longtext");
-
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime(6)");
 

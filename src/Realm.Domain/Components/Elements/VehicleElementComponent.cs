@@ -2,7 +2,7 @@
 
 public class VehicleElementComponent : Component
 {
-    private readonly Vehicle _vehicle;
+    protected readonly Vehicle _vehicle;
 
     public Vehicle Vehicle => _vehicle;
 

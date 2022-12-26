@@ -132,11 +132,6 @@ public abstract class Db<T> : IdentityDbContext<User, Role, Guid,
             entityBuilder.Property(x => x.Removed)
                 .HasDefaultValue(false)
                 .IsRequired();
-
-            entityBuilder.Property(x => x.Components)
-                .HasDefaultValue(null)
-                .HasMaxLength(65535)
-                .IsRequired(false);
         });
     }
 }
