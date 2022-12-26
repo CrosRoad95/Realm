@@ -1,4 +1,5 @@
 ﻿using Realm.Persistance.MySql;
+using SlipeServer.Resources.Text3d;
 
 namespace Realm.Server.Extensions;
 
@@ -54,6 +55,7 @@ public static class ServerBuilderExtensions
         builder.AddStatisticsCounterResource();
         builder.AddOverlayResource();
         builder.AddAssets();
+        builder.AddText3dResource();
 
         // Resources logics
         builder.AddLogic<LuaInteropLogic>();

@@ -13,10 +13,11 @@ public sealed class ECS
     private readonly UserManager<User> _userManager;
     public IEnumerable<Entity> Entities => _entities;
 
-    public ECS(RPGServer server)
+    public event Action<Entity> EntityCreated;
+    public ECS(RPGServer server, UserManager<User> userManager)
     {
         _server = server;
-        _userManager = _server.GetRequiredService<UserManager<User>>();
+        _userManager = userManager;
     }
 
     public Entity GetEntityByPlayer(Player player)
@@ -34,6 +35,7 @@ public sealed class ECS
         _entityByName[name] = newlyCreatedEntity;
         newlyCreatedEntity.ComponentAdded += HandleComponentAdded;
         newlyCreatedEntity.Destroyed += HandleEntityDestroyed;
+        EntityCreated?.Invoke(newlyCreatedEntity);
         return newlyCreatedEntity;
     }
 
@@ -70,7 +72,7 @@ public sealed class ECS
         _entityByPlayer.Remove(playerComponent.Player);
     }
 
-    public async ValueTask Save(Entity entity)
+    public async ValueTask<bool> Save(Entity entity)
     {
         switch (entity.Tag)
         {
@@ -79,6 +81,7 @@ public sealed class ECS
                 {
                     accountComponent.User.LastTransformAndMotion = entity.Transform.GetTransformAndMotion();
                     await _userManager.UpdateAsync(accountComponent.User);
+                    return true;
                 }
                 break;
             case Entity.VehicleTag:
@@ -88,6 +91,7 @@ public sealed class ECS
                 }
                 break;
         }
+        return false;
     }
 
     public async Task SaveAll()

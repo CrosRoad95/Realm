@@ -41,8 +41,9 @@ public partial class RPGServer : IInternalRPGServer, IRPGServer
                     services.AddSingleton(realmConfigurationProvider);
                     services.AddSingleton((IInternalRPGServer)this);
                     services.AddSingleton((IRPGServer)this);
+                    services.AddSingleton(this);
                     services.AddSingleton<EntityByStringIdCollection>();
-                    services.AddSingleton<ECS>(x => _ecs);
+                    services.AddSingleton<ECS>();
                     services.AddSingleton<SeederServerBuilder>();
                     services.AddSingleton<VehicleUpgradeByStringCollection>();
 
@@ -65,7 +66,7 @@ public partial class RPGServer : IInternalRPGServer, IRPGServer
             }
         );
 
-        _ecs = new ECS(this);
+        _ecs = GetRequiredService<ECS>();
         _logger = GetRequiredService<ILogger>().ForContext<RPGServer>();
         _logger.Information("Starting server:");
 

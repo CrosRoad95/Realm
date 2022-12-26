@@ -67,7 +67,7 @@ internal sealed class SeederServerBuilder
     {
         foreach (var pair in pickups)
         {
-            var blipEntity = CreateEntity(pair.Key, Entity.BlipTag);
+            var blipEntity = CreateEntity(pair.Key, Entity.PickupTag);
             blipEntity.AddComponent(new PickupElementComponent(new Pickup(Vector3.Zero, pair.Value.Model)));
             blipEntity.Transform.Position = pair.Value.Position;
             _logger.Information("Seeder: Created pickup of id {elementId} with icon {pickupModel} at {position}", pair.Key, pair.Value.Model, pair.Value.Position);

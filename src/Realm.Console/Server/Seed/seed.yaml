@@ -6,7 +6,7 @@ pickups:
   sapdStart:
     model: 1314
     position: [20, 5, 3]
-  help:
+  help1:
     model: 1239
     position: [348.7744, -87.57617, 1.3628025]
 fractions:
