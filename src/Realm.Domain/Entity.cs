@@ -18,7 +18,7 @@ public class Entity
     public IRPGServer Server => _rpgServer;
 
     public event Action<Component>? ComponentAdded;
-
+    public event Action<Component>? ComponentRemoved;
 
     public event Action<Entity>? Destroyed;
 
@@ -78,6 +78,7 @@ public class Entity
         {
             _components.Remove(component);
             component.Entity = null!;
+            ComponentRemoved?.Invoke(component);
         }
         else
             throw new Exception();

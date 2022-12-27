@@ -8,7 +8,7 @@ using SlipeServer.Server.Services;
 
 namespace Realm.Domain.Components.Elements;
 
-public sealed class PlayerElementComponent : Component
+public sealed class PlayerElementComponent : ElementComponent
 {
     private readonly Player _player;
 
@@ -17,6 +17,8 @@ public sealed class PlayerElementComponent : Component
     public string Name { get => Player.Name; set => Player.Name = value; }
 
     public string Language { get; private set; } = "pl";
+
+    public override Element Element => _player;
 
     public PlayerElementComponent(Player player)
     {

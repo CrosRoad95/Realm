@@ -1,13 +1,15 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Realm.Domain.Components.Vehicles;
+using Realm.Domain.Interfaces;
 using Realm.Persistance.Data;
 
 namespace Realm.Server;
 
-public sealed class ECS
+public sealed class ECS : IEntityByElement
 {
     private readonly List<Entity> _entities = new();
     private readonly Dictionary<Player, Entity> _entityByPlayer = new();
+    private readonly Dictionary<Element, Entity> _entityByElement = new();
     private readonly Dictionary<string, Entity> _entityByName = new();
     private readonly RPGServer _server;
     private readonly UserManager<User> _userManager;
@@ -25,7 +27,12 @@ public sealed class ECS
         return _entityByPlayer[player];
     }
 
-    public Entity CreateEntity(string name, string tag)
+    public Entity GetByElement(Element element)
+    {
+        return _entityByElement[element];
+    }
+
+    public Entity CreateEntity(string name, string tag, Action<Entity>? entityBuilder = null)
     {
         if (_entityByName.ContainsKey(name))
             throw new Exception($"Entity of name {name} already exists");
@@ -33,6 +40,8 @@ public sealed class ECS
         var newlyCreatedEntity = new Entity(_server, _server.GetRequiredService<ServicesComponent>(), name, tag);
         _entities.Add(newlyCreatedEntity);
         _entityByName[name] = newlyCreatedEntity;
+        if (entityBuilder != null)
+            entityBuilder(newlyCreatedEntity);
         newlyCreatedEntity.ComponentAdded += HandleComponentAdded;
         newlyCreatedEntity.Destroyed += HandleEntityDestroyed;
         EntityCreated?.Invoke(newlyCreatedEntity);
@@ -50,6 +59,11 @@ public sealed class ECS
 
     private void HandleComponentAdded(Component component)
     {
+        if(component is ElementComponent elementComponent)
+        {
+            _entityByElement[elementComponent.Element] = component.Entity;
+            component.Entity.ComponentRemoved += HandleElementComponentRemoved;
+        }
         if (component is PlayerElementComponent playerElementComponent)
         {
             var player = playerElementComponent.Player;
@@ -57,6 +71,13 @@ public sealed class ECS
             component.Entity.Destroyed += HandlePlayerEntityDestroyed;
             player.Disconnected += HandlePlayerDisconnected;
         }
+    }
+
+    private void HandleElementComponentRemoved(Component component)
+    {
+        if (component is not ElementComponent elementComponent)
+            return;
+        _entityByElement.Remove(elementComponent.Element);
     }
 
     private void HandlePlayerDisconnected(Player player, SlipeServer.Server.Elements.Events.PlayerQuitEventArgs e)

@@ -45,9 +45,9 @@ internal sealed class SeederServerBuilder
             throw new Exception($"Failed to assign seeded element to id {id} because it is already in used.");
     }
 
-    private Entity CreateEntity(string key, string tag)
+    private Entity CreateEntity(string key, string tag, Action<Entity> entityBuilder)
     {
-        var entity = _rpgServer.ECS.CreateEntity(key, tag);
+        var entity = _rpgServer.ECS.CreateEntity(key, tag, entityBuilder);
         AssignElementToId(entity, key);
         return entity;
     }
@@ -56,9 +56,11 @@ internal sealed class SeederServerBuilder
     {
         foreach (var pair in blips)
         {
-            var blipEntity = CreateEntity(pair.Key, Entity.BlipTag);
-            blipEntity.AddComponent(new BlipElementComponent(new Blip(Vector3.Zero, (BlipIcon)pair.Value.Icon, 250)));
-            blipEntity.Transform.Position = pair.Value.Position;
+            var blipEntity = CreateEntity(pair.Key, Entity.BlipTag, entity =>
+            {
+                entity.AddComponent(new BlipElementComponent(new Blip(Vector3.Zero, (BlipIcon)pair.Value.Icon, 250)));
+                entity.Transform.Position = pair.Value.Position;
+            });
             _logger.Information("Seeder: Created blip of id {elementId} with icon {blipIcon} at {position}", pair.Key, pair.Value.Icon, pair.Value.Position);
         }
     }
@@ -67,9 +69,11 @@ internal sealed class SeederServerBuilder
     {
         foreach (var pair in pickups)
         {
-            var blipEntity = CreateEntity(pair.Key, Entity.PickupTag);
-            blipEntity.AddComponent(new PickupElementComponent(new Pickup(Vector3.Zero, pair.Value.Model)));
-            blipEntity.Transform.Position = pair.Value.Position;
+            var blipEntity = CreateEntity(pair.Key, Entity.PickupTag, entity =>
+            {
+                entity.AddComponent(new PickupElementComponent(new Pickup(Vector3.Zero, pair.Value.Model)));
+                entity.Transform.Position = pair.Value.Position;
+            });
             _logger.Information("Seeder: Created pickup of id {elementId} with icon {pickupModel} at {position}", pair.Key, pair.Value.Model, pair.Value.Position);
         }
     }

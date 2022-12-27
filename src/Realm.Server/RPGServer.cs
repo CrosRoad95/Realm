@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Realm.Domain.Components.Vehicles;
+using Realm.Domain.Interfaces;
 using Realm.Persistance.Data;
 using SlipeServer.Packets.Enums;
 
@@ -44,6 +45,7 @@ public partial class RPGServer : IInternalRPGServer, IRPGServer
                     services.AddSingleton(this);
                     services.AddSingleton<EntityByStringIdCollection>();
                     services.AddSingleton<ECS>();
+                    services.AddSingleton<IEntityByElement>(x => x.GetRequiredService<ECS>());
                     services.AddSingleton<SeederServerBuilder>();
                     services.AddSingleton<VehicleUpgradeByStringCollection>();
 

@@ -13,7 +13,7 @@ var server = builder.Build(null, extraBuilderSteps: serverBuilder =>
 {
     serverBuilder.AddLogic<PlayerJoinedLogic>();
     serverBuilder.AddLogic<CommandsLogic>();
-    serverBuilder.AddLogic<HelpPickupsLogic>();
+    serverBuilder.AddLogic<SamplePickupsLogic>();
 #if DEBUG
     serverBuilder.AddLogic<HotReloadLogic>("../../../Server/Gui");
 #endif

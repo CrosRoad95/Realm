@@ -75,15 +75,15 @@ public sealed class Transform
         if (_isBounded)
             throw new Exception("Transform already bounded");
         _isBounded = true;
+        element.Position = _position;
+        element.Rotation = _rotation;
+        element.Interior = _interior;
+        element.Dimension = _dimension;
         element.PositionChanged += HandlePositionChanged;
         element.RotationChanged += HandleRotationChanged;
         element.InteriorChanged += InteriorInteriorChanged;
         element.DimensionChanged += HandleDimensionChanged;
         element.Destroyed += HandleDestroyed;
-        element.Position = Position;
-        element.Rotation = Rotation;
-        element.Interior = Interior;
-        element.Dimension = Dimension;
     }
 
     private void HandlePositionChanged(Element _, ElementChangedEventArgs<Vector3> args)
