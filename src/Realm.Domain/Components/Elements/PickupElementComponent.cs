@@ -1,7 +1,4 @@
-﻿using Realm.Domain.Interfaces;
-using SlipeServer.Server.Elements;
-
-namespace Realm.Domain.Components.Elements;
+﻿namespace Realm.Domain.Components.Elements;
 
 public class PickupElementComponent : ElementComponent
 {

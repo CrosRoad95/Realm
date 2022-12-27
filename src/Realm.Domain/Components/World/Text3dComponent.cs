@@ -1,5 +1,4 @@
 ﻿using SlipeServer.Resources.Text3d;
-using System.Diagnostics;
 
 namespace Realm.Domain.Components.World;
 

@@ -1,8 +1,4 @@
-﻿using Microsoft.AspNetCore.Identity;
-using Realm.Console.Data;
-using Realm.Persistance.Data;
-
-namespace Realm.Console.Components.Gui;
+﻿namespace Realm.Console.Components.Gui;
 
 public sealed class TestWindowComponent : GuiComponent
 {

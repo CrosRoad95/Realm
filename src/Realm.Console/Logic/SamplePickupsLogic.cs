@@ -1,6 +1,4 @@
 ﻿using Realm.Domain.Components.World;
-using SlipeServer.Resources.Text3d;
-using SlipeServer.Server.Elements;
 
 namespace Realm.Console.Logic;
 
