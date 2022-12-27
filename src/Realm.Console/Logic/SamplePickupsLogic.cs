@@ -23,7 +23,7 @@ internal class SamplePickupsLogic
             {
                 if(entity.Tag == Entity.PlayerTag)
                 {
-                    if(!entity.HasComponent<TestWindowComponent>())
+                    if(!entity.HasComponent<GuiComponent>())
                         entity.AddComponent(new TestWindowComponent());
                 }
             };

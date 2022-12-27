@@ -3,6 +3,7 @@ using Realm.Resources.LuaInterop;
 using Realm.Resources.Overlay;
 using SlipeServer.Packets.Definitions.Lua;
 using SlipeServer.Packets.Lua.Camera;
+using SlipeServer.Server.Elements.Enums;
 using SlipeServer.Server.Mappers;
 using SlipeServer.Server.Services;
 
@@ -11,6 +12,8 @@ namespace Realm.Domain.Components.Elements;
 public sealed class PlayerElementComponent : ElementComponent
 {
     private readonly Player _player;
+    private readonly Dictionary<string, Func<Entity, Task>> _binds = new();
+    private readonly Dictionary<string, DateTime> _bindsCooldown = new();
 
     public Player Player => _player;
 
@@ -19,6 +22,7 @@ public sealed class PlayerElementComponent : ElementComponent
     public string Language { get; private set; } = "pl";
 
     public override Element Element => _player;
+
 
     public PlayerElementComponent(Player player)
     {
@@ -99,5 +103,27 @@ public sealed class PlayerElementComponent : ElementComponent
         }
 
         luaEventService.TriggerEventFor(_player, name, _player, luaValue);
+    }
+
+    public void SetBind(string key, Func<Entity, Task> callback)
+    {
+        if (_binds.ContainsKey(key))
+            throw new Exception();
+
+        _player.SetBind(key, KeyState.Up);
+        _binds[key] = callback;
+        _player.BindExecuted += HandleBindExecuted;
+    }
+
+    private async void HandleBindExecuted(Player sender, SlipeServer.Server.Elements.Events.PlayerBindExecutedEventArgs e)
+    {
+        if(_bindsCooldown.TryGetValue(e.Key, out var cooldownUntil))
+        {
+            if (cooldownUntil > DateTime.Now)
+                return;
+        }
+        _bindsCooldown[e.Key] = DateTime.MaxValue; // Lock bind indefinitly in case of bind takes a long time to execute
+        await _binds[e.Key](Entity);
+        _bindsCooldown[e.Key] = DateTime.Now.AddMilliseconds(750);
     }
 }
