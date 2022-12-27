@@ -49,7 +49,7 @@ public class AgnosticGuiSystemService
         await _resource.StartForAsync(player);
     }
 
-    public async ValueTask<bool> OpenGui(Player player, string gui)
+    public async ValueTask<bool> OpenGui(Player player, string gui, bool cursorless)
     {
         if(EnsurePlayerGuisAreInitialized(player))
             await EnsureGuiResourceIsRunning(player);
@@ -58,7 +58,7 @@ public class AgnosticGuiSystemService
             return false;
 
         _playersGuis[player].Add(gui);
-        player.TriggerLuaEvent("internalUiOpenGui", player, gui);
+        player.TriggerLuaEvent("internalUiOpenGui", player, gui, cursorless);
         return true;
     }
 

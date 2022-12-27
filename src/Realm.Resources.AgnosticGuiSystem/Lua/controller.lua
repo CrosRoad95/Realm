@@ -82,16 +82,20 @@ function registerGui(callback, name)
 end
 
 local currentOpenedGui = {}
-function openGui(name)
+function openGui(name, cursorless)
 	if(currentOpenedGui[name])then
 		error("Gui: "..tostring(name).." already opened");
 	end
 	currentOpenedGui[name] = true
-	guiRefs = guiRefs + 1
+	if(not cursorless)then
+		guiRefs = guiRefs + 1
+	end
 	async(function()
 		internalOpenGui(name)
 	end)
-	showCursor(true)
+	if(guiRefs > 0)then
+		showCursor(true)
+	end
 	return true;
 end
 
@@ -259,8 +263,8 @@ local function entrypoint()
 	end)
 
 	addEvent("internalUiOpenGui", true)
-	addEventHandler("internalUiOpenGui", localPlayer, function(guiName)
-		openGui(guiName);
+	addEventHandler("internalUiOpenGui", localPlayer, function(guiName, cursorless)
+		openGui(guiName, cursorless);
 	end)
 	
 	addEvent("internalUiCloseGui", true)

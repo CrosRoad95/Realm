@@ -2,7 +2,7 @@
 local dgsUIProvider = {
 	-- Elements
 	window = function(title, px, py, sx, sy)
-		return dgsCreateWindow(px, py, sx, sy, title, false)
+		return dgsCreateWindow(px, py, sx, sy, title, false, 0xFFFFFFFF, 25, nil, 0xC8141414, nil, 0x96141414, 5, true)
 	end,
 	input = function(px, py, sx, sy, parent)
 		return dgsCreateEdit(px, py + offset, sx, sy, "", false, parent)

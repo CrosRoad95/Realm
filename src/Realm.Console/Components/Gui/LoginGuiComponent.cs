@@ -6,7 +6,7 @@ namespace Realm.Console.Components.Gui;
 
 public sealed class LoginGuiComponent : GuiComponent
 {
-    public LoginGuiComponent() : base("login")
+    public LoginGuiComponent() : base("login", false)
     {
 
     }

@@ -8,9 +8,12 @@ namespace Realm.Domain.Components.Players;
 public abstract class GuiComponent : Component
 {
     private readonly string _name;
-    public GuiComponent(string name)
+    private readonly bool _cursorless;
+
+    public GuiComponent(string name, bool cursorless)
     {
         _name = name;
+        _cursorless = cursorless;
     }
 
     public override async Task Load()
@@ -20,7 +23,7 @@ public abstract class GuiComponent : Component
         agnosticGuiSystemService.ActionExecuted += HandleActionExecuted;
 
         var playerElementComponent = Entity.GetRequiredComponent<PlayerElementComponent>();
-        await agnosticGuiSystemService.OpenGui(playerElementComponent.Player, _name);
+        await agnosticGuiSystemService.OpenGui(playerElementComponent.Player, _name, _cursorless);
     }
 
     private async void HandleActionExecuted(LuaEvent luaEvent)

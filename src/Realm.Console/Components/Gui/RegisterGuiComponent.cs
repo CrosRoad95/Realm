@@ -4,7 +4,7 @@ namespace Realm.Console.Components.Gui;
 
 public sealed class RegisterGuiComponent : GuiComponent
 {
-    public RegisterGuiComponent() : base("register")
+    public RegisterGuiComponent() : base("register", false)
     {
 
     }

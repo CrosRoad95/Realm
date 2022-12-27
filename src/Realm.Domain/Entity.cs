@@ -72,7 +72,12 @@ public class Entity
     public TComponent GetRequiredComponent<TComponent>() where TComponent : Component
         => _components.OfType<TComponent>().First();
 
-    public void RemoveComponent<TComponent>(TComponent component) where TComponent: Component
+    public void DetachComponent<TComponent>() where TComponent: Component
+    {
+        DetachComponent(GetRequiredComponent<TComponent>());
+    }
+
+    public void DetachComponent<TComponent>(TComponent component) where TComponent: Component
     {
         if (component.Entity == this)
         {
@@ -87,7 +92,14 @@ public class Entity
     public void DestroyComponent<TComponent>(TComponent component) where TComponent: Component
     {
         component.Destroy();
-        RemoveComponent(component);
+        DetachComponent(component);
+    }
+
+    public void DestroyComponent<TComponent>() where TComponent: Component
+    {
+        var component = GetRequiredComponent<TComponent>();
+        component.Destroy();
+        DetachComponent(component);
     }
 
     public IEnumerable<Component> GetComponents() => _components;

@@ -19,9 +19,23 @@ internal class SamplePickupsLogic
         if (entity.Tag == Entity.PickupTag && entity.Name.StartsWith("withText3d"))
         {
             entity.AddComponent(new Text3dComponent("Example text 3d", new Vector3(0, 0, 0.75f)));
-            entity.GetRequiredComponent<PickupElementComponent>().EntityEntered = entity =>
+            var pickupElementComponent = entity.GetRequiredComponent<PickupElementComponent>();
+
+            pickupElementComponent.EntityEntered = entity =>
             {
-                ;
+                if(entity.Tag == Entity.PlayerTag)
+                {
+                    if(!entity.HasComponent<TestWindowComponent>())
+                        entity.AddComponent(new TestWindowComponent());
+                }
+            };
+            pickupElementComponent.EntityLeft = entity =>
+            {
+                if(entity.Tag == Entity.PlayerTag)
+                {
+                    if (entity.HasComponent<TestWindowComponent>())
+                        entity.DestroyComponent<TestWindowComponent>();
+                }
             };
         }
     }

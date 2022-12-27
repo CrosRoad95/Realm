@@ -108,7 +108,7 @@ public partial class RPGServer : IInternalRPGServer, IRPGServer
             foreach (var guiComponent in guiComponents)
             {
                 guiComponent.Close();
-                entity.RemoveComponent(guiComponent);
+                entity.DetachComponent(guiComponent);
                 entity.AddComponent(guiComponent);
             }
         }
