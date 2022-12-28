@@ -9,12 +9,12 @@ internal sealed class HotReload
 
     public HotReload(string path)
     {
-        _fileSystemWatcher = new FileSystemWatcher();
-        _fileSystemWatcher.Path = path;
-        _fileSystemWatcher.NotifyFilter = NotifyFilters.FileName | NotifyFilters.Size;
+        _fileSystemWatcher = new();
+        _fileSystemWatcher.Path = Path.Join(Directory.GetCurrentDirectory(), path);
+        _fileSystemWatcher.NotifyFilter = NotifyFilters.LastWrite;
         _fileSystemWatcher.IncludeSubdirectories = true;
-        _fileSystemWatcher.Filters.Add("*.lua");
-        _fileSystemWatcher.Changed += new FileSystemEventHandler(OnChanged);
+        _fileSystemWatcher.Filter = "*.lua";
+        _fileSystemWatcher.Changed += OnChanged;
         _fileSystemWatcher.EnableRaisingEvents = true;
     }
 
