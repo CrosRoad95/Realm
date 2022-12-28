@@ -7,8 +7,8 @@ namespace Realm.Domain.Components.Players;
 
 public abstract class GuiComponent : Component
 {
-    private readonly string _name;
-    private readonly bool _cursorless;
+    protected readonly string _name;
+    protected readonly bool _cursorless;
 
     public GuiComponent(string name, bool cursorless)
     {
@@ -21,7 +21,12 @@ public abstract class GuiComponent : Component
         var agnosticGuiSystemService = Entity.GetRequiredService<AgnosticGuiSystemService>();
         agnosticGuiSystemService.FormSubmitted += HandleFormSubmitted;
         agnosticGuiSystemService.ActionExecuted += HandleActionExecuted;
+        await OpenGui();
+    }
 
+    protected virtual async Task OpenGui()
+    {
+        var agnosticGuiSystemService = Entity.GetRequiredService<AgnosticGuiSystemService>();
         var playerElementComponent = Entity.GetRequiredComponent<PlayerElementComponent>();
         await agnosticGuiSystemService.OpenGui(playerElementComponent.Player, _name, _cursorless);
     }

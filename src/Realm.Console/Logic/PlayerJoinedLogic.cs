@@ -1,4 +1,6 @@
-﻿namespace Realm.Console.Logic;
+﻿using Microsoft.EntityFrameworkCore.Infrastructure;
+
+namespace Realm.Console.Logic;
 
 internal sealed class PlayerJoinedLogic
 {
@@ -11,10 +13,11 @@ internal sealed class PlayerJoinedLogic
         _rpgServer.PlayerJoined += HandlePlayerJoined;
     }
 
-    private void HandlePlayerJoined(Entity entity)
+    private async void HandlePlayerJoined(Entity entity)
     {
         var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();
-        entity.AddComponent(new AdminComponent()).DebugView = true;
+        var adminComp = await entity.AddComponentAsync(new AdminComponent());
+        adminComp.DebugView = true;
         entity.AddComponent(new LoginGuiComponent());
 
         entity.ComponentAdded += HandleComponentAdded;

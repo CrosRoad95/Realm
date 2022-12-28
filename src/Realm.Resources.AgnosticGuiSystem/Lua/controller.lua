@@ -7,6 +7,7 @@ local guiProviders = {}
 local currentGui = nil
 local lastCreatedWindow = nil
 local cooldown = {}
+local currentOpenedGui = {}
 
 function getCurrentGuiName()
 	return currentGui;
@@ -24,7 +25,7 @@ local function createErrorGui(guiProvider, err, guiName)
 	return window
 end
 
-local function internalGetWindowHandleByName(name)
+local function internalGetWindowHandleByName(name, defaultState)
 	if(guis[name] == nil)then
 		error("Gui of name '"..tostring(name).."' doesn't' exists!")
 	end
@@ -32,7 +33,7 @@ local function internalGetWindowHandleByName(name)
 		currentGui = name;
 		currentGuiProvider.currentGui = currentGui;
 		local status, retval = pcall(function()
-			local windowHandle, setStateCallback = guis[name].callback(currentGuiProvider);
+			local windowHandle, setStateCallback = guis[name].callback(currentGuiProvider, defaultState);
 			guis[name].handle = windowHandle;
 			guis[name].stateChanged = setStateCallback;
 			return true
@@ -52,16 +53,16 @@ local function internalGetWindowHandleByName(name)
 	return guis[name];
 end
 
-local function internalOpenGui(name)
+local function internalOpenGui(name, defaultState)
 	waitForTranslations();
-	local result = currentGuiProvider.open(internalGetWindowHandleByName(name).handle)
+	local result = currentGuiProvider.open(internalGetWindowHandleByName(name, defaultState).handle)
 	if(result ~= true)then
 		error("Failed to open gui '"..tostring(name).."'");
 	end
 end
 
 local function internalCloseGui(name)
-	local result = currentGuiProvider.close(internalGetWindowHandleByName(name).handle)
+	local result = currentGuiProvider.close(internalGetWindowHandleByName(name, {}).handle)
 	if(result ~= true)then
 		error("Failed to close gui '"..tostring(name).."'");
 	end
@@ -81,8 +82,7 @@ function registerGui(callback, name)
 	};
 end
 
-local currentOpenedGui = {}
-function openGui(name, cursorless)
+function openGui(name, cursorless, defaultState)
 	if(currentOpenedGui[name])then
 		error("Gui: "..tostring(name).." already opened");
 	end
@@ -91,7 +91,7 @@ function openGui(name, cursorless)
 		guiRefs = guiRefs + 1
 	end
 	async(function()
-		internalOpenGui(name)
+		internalOpenGui(name, defaultState)
 	end)
 	if(guiRefs > 0)then
 		showCursor(true)
@@ -253,18 +253,19 @@ local function entrypoint()
 		end)
 	end
 
-	addEvent("internalUiStatechanged", true)
-	addEventHandler("internalUiStatechanged", localPlayer, function(data)
-		local guiName, payloadKey, payloadValue = unpack(data);
+	addEvent("internalUiStateChanged", true)
+	addEventHandler("internalUiStateChanged", localPlayer, function(guiName, changes)
 		local currentGuiHandle = internalGetWindowHandleByName(guiName)
 		if(currentGuiHandle)then
-			currentGuiHandle.stateChanged(payloadKey, payloadValue);
+			for k,v in pairs(changes)do
+				currentGuiHandle.stateChanged(k, v);
+			end
 		end
 	end)
 
 	addEvent("internalUiOpenGui", true)
-	addEventHandler("internalUiOpenGui", localPlayer, function(guiName, cursorless)
-		openGui(guiName, cursorless);
+	addEventHandler("internalUiOpenGui", localPlayer, function(guiName, cursorless, defaultState)
+		openGui(guiName, cursorless, defaultState);
 	end)
 	
 	addEvent("internalUiCloseGui", true)

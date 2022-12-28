@@ -31,7 +31,7 @@ public class Entity
         AddComponent(servicesComponent);
     }
 
-    public TComponent AddComponent<TComponent>(TComponent component) where TComponent : Component
+    public void AddComponent<TComponent>(TComponent component) where TComponent : Component
     {
         if (component.Entity != null)
         {
@@ -39,9 +39,11 @@ public class Entity
         }
         component.Entity = this;
         _components.Add(component);
-        Task.Run(component.Load);
-        ComponentAdded?.Invoke(component);
-        return component;
+        Task.Run(async () =>
+        {
+            await component.Load();
+            ComponentAdded?.Invoke(component);
+        });
     }
     
     public async Task<TComponent> AddComponentAsync<TComponent>(TComponent component) where TComponent : Component

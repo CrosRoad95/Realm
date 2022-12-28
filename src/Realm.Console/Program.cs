@@ -1,5 +1,6 @@
 ﻿using Realm.ConsoleUtilities;
 using Realm.Interfaces.Server;
+using SlipeServer.Server.Mappers;
 
 var builder = new RPGServerBuilder();
 builder.AddDefaultModules()

@@ -1,8 +1,18 @@
-﻿namespace Realm.Console.Components.Gui;
+﻿using Realm.Domain.Components.Players;
 
-public sealed class DashboardGuiComponent : GuiComponent
+namespace Realm.Console.Components.Gui;
+
+public sealed class DashboardGuiComponent : StatefulGuiComponent<DashboardGuiComponent.DashboardState>
 {
-    public DashboardGuiComponent() : base("dashboard", false)
+    public class DashboardState
+    {
+        public string A { get; set; } = "A";
+        public string B { get; set; } = "B";
+        public string C { get; set; } = "C";
+        public int Counter { get; set; }
+    }
+
+    public DashboardGuiComponent() : base("dashboard", false, new DashboardState())
     {
 
     }
@@ -13,5 +23,11 @@ public sealed class DashboardGuiComponent : GuiComponent
 
     protected override async Task HandleAction(IActionContext actionContext)
     {
+        switch(actionContext.ActionName)
+        {
+            case "counter":
+                ChangeState(x => x.Counter, GetStateValue(x => x.Counter) + 1);
+                break;
+        }
     }
 }

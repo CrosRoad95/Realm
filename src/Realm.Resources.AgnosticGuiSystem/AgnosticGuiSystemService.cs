@@ -1,4 +1,6 @@
-﻿using SlipeServer.Server;
+﻿using Newtonsoft.Json.Linq;
+using SlipeServer.Packets.Definitions.Lua;
+using SlipeServer.Server;
 using SlipeServer.Server.Elements;
 using SlipeServer.Server.Events;
 using SlipeServer.Server.Mappers;
@@ -49,7 +51,7 @@ public class AgnosticGuiSystemService
         await _resource.StartForAsync(player);
     }
 
-    public async ValueTask<bool> OpenGui(Player player, string gui, bool cursorless)
+    public async ValueTask<bool> OpenGui(Player player, string gui, bool cursorless, LuaValue? arg1 = null)
     {
         if(EnsurePlayerGuisAreInitialized(player))
             await EnsureGuiResourceIsRunning(player);
@@ -58,7 +60,7 @@ public class AgnosticGuiSystemService
             return false;
 
         _playersGuis[player].Add(gui);
-        player.TriggerLuaEvent("internalUiOpenGui", player, gui, cursorless);
+        player.TriggerLuaEvent("internalUiOpenGui", player, gui, cursorless, arg1 ?? new LuaValue());
         return true;
     }
 
@@ -89,6 +91,13 @@ public class AgnosticGuiSystemService
 
         var luaValues = values.Select(_luaValueMapper.Map).ToArray();
         player.TriggerLuaEvent("internalSubmitFormResponse", player, id, name, luaValues);
+    }
+
+    public void SendStateChanged(Player player, string guiName, Dictionary<LuaValue, LuaValue> changes)
+    {
+        Debug.Assert(!EnsurePlayerGuisAreInitialized(player));
+
+        player.TriggerLuaEvent("internalUiStateChanged", player, guiName, new LuaValue(changes));
     }
 
     public async Task UpdateGuiFiles()
