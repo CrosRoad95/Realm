@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Realm.Console.Data;
+using Realm.Domain.Components.Common;
 using Realm.Persistance.Data;
 
 namespace Realm.Console.Components.Gui;
@@ -18,7 +20,11 @@ public sealed class LoginGuiComponent : GuiComponent
             case "login":
                 var loginData = formContext.GetData<LoginData>();
                 var userManager = Entity.GetRequiredService<UserManager<User>>();
-                var user = await userManager.FindByNameAsync(loginData.Login);
+                var user = await userManager.Users
+                    .Include(u => u.Inventory)
+                    .ThenInclude(x => x.InventoryItems)
+                    .FirstOrDefaultAsync(u => u.UserName == loginData.Login);
+
                 if(user == null)
                 {
                     formContext.ErrorResponse("Login lub hasło jest niepoprawne.");
@@ -32,6 +38,11 @@ public sealed class LoginGuiComponent : GuiComponent
                 }
 
                 await Entity.AddComponentAsync(new AccountComponent(user));
+                if(user.Inventory != null)
+                    await Entity.AddComponentAsync(new InventoryComponent(user.Inventory));
+                else
+                    await Entity.AddComponentAsync(new InventoryComponent(20));
+
                 Entity.DestroyComponent(this);
                 formContext.SuccessResponse();
                 break;

@@ -16,6 +16,7 @@ var server = builder.Build(null, extraBuilderSteps: serverBuilder =>
     serverBuilder.AddLogic<CommandsLogic>();
     serverBuilder.AddLogic<SamplePickupsLogic>();
     serverBuilder.AddLogic<PlayerBindsLogic>();
+    serverBuilder.AddLogic<ItemsLogic>();
 #if DEBUG
     serverBuilder.AddLogic<HotReloadLogic>("../../../Server/Gui");
 #endif

@@ -1,25 +1,44 @@
-﻿namespace Realm.Domain.Inventory;
+﻿using Realm.Domain.Registries;
+
+namespace Realm.Domain.Inventory;
 
 public class Item
 {
-    public string UniqueId { get; private set; }
-    public int Id { get; set; }
-    public string Name { get; set; }
-    public int Size { get; set; }
+    public string? Id { get; set; }
+    public uint ItemId { get; private set; }
+    public uint Number { get; set; } = 1;
+
+    public string Name => InventoryComponent!.GetItemRegistryEntry(ItemId).Name;
+    public uint Size { get; set; } = 1;
 
     private Dictionary<string, object> _metadata;
 
     public Dictionary<string, object> MetaData { get => _metadata; set { _metadata = value; } }
-
-    public Item(int id, string name, int size)
+    public InventoryComponent? InventoryComponent { get; set; }
+    public Item(ItemRegistryEntry itemRegistryEntry, uint number = 1)
     {
-        if (size < 0)
-            throw new ArgumentOutOfRangeException(nameof(size));
-        UniqueId = Guid.NewGuid().ToString();
-        Id = id;
-        Name = name;
-        Size = size;
+        ItemId = itemRegistryEntry.StackSize;
+        Size = itemRegistryEntry.Size;
+        Number = number;
         _metadata = new();
+    }
+    
+    public Item(InventoryItem inventoryItem)
+    {
+        ItemId = inventoryItem.ItemId;
+        Number = inventoryItem.Number;
+        try
+        {
+            var metadata = JsonConvert.DeserializeObject<Dictionary<string, object>>(inventoryItem.MetaData);
+            if(metadata != null)
+            {
+                _metadata = metadata;
+            }
+        }
+        finally
+        {
+            // TODO: catch exception
+        }
     }
 
     public bool SetMetadata(string key, object value)

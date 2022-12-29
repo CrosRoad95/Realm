@@ -1,4 +1,5 @@
 ﻿using Realm.Domain.Interfaces;
+using Realm.Domain.Registries;
 
 namespace Realm.Server;
 
@@ -44,6 +45,7 @@ public partial class RPGServer : IInternalRPGServer, IRPGServer
                     services.AddSingleton<IEntityByElement>(x => x.GetRequiredService<ECS>());
                     services.AddSingleton<SeederServerBuilder>();
                     services.AddSingleton<VehicleUpgradeByStringCollection>();
+                    services.AddSingleton<ItemsRegistry>();
 
                     // Services
                     services.AddSingleton<RPGCommandService>();

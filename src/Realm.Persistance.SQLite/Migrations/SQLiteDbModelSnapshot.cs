@@ -116,6 +116,47 @@ namespace Realm.Persistance.SQLite.Migrations
                     b.ToTable("UserTokens", (string)null);
                 });
 
+            modelBuilder.Entity("Realm.Persistance.Data.Inventory", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasMaxLength(36)
+                        .HasColumnType("TEXT");
+
+                    b.Property<uint>("Size")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Inventories", (string)null);
+                });
+
+            modelBuilder.Entity("Realm.Persistance.Data.InventoryItem", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasMaxLength(36)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("InventoryId")
+                        .HasMaxLength(36)
+                        .HasColumnType("TEXT");
+
+                    b.Property<uint>("ItemId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("MetaData")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<uint>("Number")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("Id", "InventoryId");
+
+                    b.HasIndex("InventoryId");
+
+                    b.ToTable("InventoryItems", (string)null);
+                });
+
             modelBuilder.Entity("Realm.Persistance.Data.Role", b =>
                 {
                     b.Property<Guid>("Id")
@@ -162,6 +203,9 @@ namespace Realm.Persistance.SQLite.Migrations
 
                     b.Property<bool>("EmailConfirmed")
                         .HasColumnType("INTEGER");
+
+                    b.Property<string>("InventoryId")
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("LastIp")
                         .HasColumnType("TEXT");
@@ -231,6 +275,8 @@ namespace Realm.Persistance.SQLite.Migrations
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("InventoryId");
 
                     b.HasIndex("NormalizedEmail")
                         .HasDatabaseName("EmailIndex");
@@ -425,6 +471,26 @@ namespace Realm.Persistance.SQLite.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("Realm.Persistance.Data.InventoryItem", b =>
+                {
+                    b.HasOne("Realm.Persistance.Data.Inventory", "Inventory")
+                        .WithMany("InventoryItems")
+                        .HasForeignKey("InventoryId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Inventory");
+                });
+
+            modelBuilder.Entity("Realm.Persistance.Data.User", b =>
+                {
+                    b.HasOne("Realm.Persistance.Data.Inventory", "Inventory")
+                        .WithMany()
+                        .HasForeignKey("InventoryId");
+
+                    b.Navigation("Inventory");
+                });
+
             modelBuilder.Entity("Realm.Persistance.Data.UserLicense", b =>
                 {
                     b.HasOne("Realm.Persistance.Data.User", "User")
@@ -434,6 +500,11 @@ namespace Realm.Persistance.SQLite.Migrations
                         .IsRequired();
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Realm.Persistance.Data.Inventory", b =>
+                {
+                    b.Navigation("InventoryItems");
                 });
 
             modelBuilder.Entity("Realm.Persistance.Data.User", b =>

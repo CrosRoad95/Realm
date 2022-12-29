@@ -1,7 +1,10 @@
-﻿namespace Realm.Persistance;
+﻿using Microsoft.EntityFrameworkCore.ChangeTracking;
+
+namespace Realm.Persistance;
 
 public interface IDb
 {
+    ChangeTracker ChangeTracker { get; }
     DbSet<User> Users { get; }
     DbSet<Role> Roles { get; }
     DbSet<IdentityUserClaim<Guid>> UserClaims { get; }
@@ -10,6 +13,8 @@ public interface IDb
     DbSet<IdentityUserToken<Guid>> UserTokens { get; }
     DbSet<UserLicense> UserLicenses { get; }
     DbSet<Vehicle> Vehicles { get; }
+    DbSet<Inventory> Inventories { get; }
+    DbSet<InventoryItem> InventoryItems { get; }
 
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
 }

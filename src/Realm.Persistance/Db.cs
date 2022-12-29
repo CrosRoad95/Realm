@@ -11,6 +11,8 @@ public abstract class Db<T> : IdentityDbContext<User, Role, Guid,
 {
     public DbSet<UserLicense> UserLicenses => Set<UserLicense>();
     public DbSet<Vehicle> Vehicles => Set<Vehicle>();
+    public DbSet<Inventory> Inventories => Set<Inventory>();
+    public DbSet<InventoryItem> InventoryItems => Set<InventoryItem>();
 
     public Db(DbContextOptions<T> options) : base(options)
     {
@@ -35,6 +37,35 @@ public abstract class Db<T> : IdentityDbContext<User, Role, Guid,
                 .HasMaxLength(400)
                 .HasConversion(x => x.Serialize(), x => TransformAndMotion.CreateFromString(x))
                 .HasDefaultValue(null);
+        });
+
+        modelBuilder.Entity<Inventory>(entityBuilder =>
+        {
+            entityBuilder
+                .ToTable("Inventories")
+                .HasKey(x => x.Id);
+
+            entityBuilder
+                .HasMany(x => x.InventoryItems)
+                .WithOne(x => x.Inventory)
+                .HasForeignKey(x => x.InventoryId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            entityBuilder.Property(x => x.Id)
+                .HasMaxLength(36);
+        });
+        
+        modelBuilder.Entity<InventoryItem>(entityBuilder =>
+        {
+            entityBuilder
+                .ToTable("InventoryItems")
+                .HasKey(x => new { x.Id, x.InventoryId });
+
+            entityBuilder.Property(x => x.Id)
+                .HasMaxLength(36);
+
+            entityBuilder.Property(x => x.InventoryId)
+                .HasMaxLength(36);
         });
 
         modelBuilder.Entity<UserLicense>(entityBuilder =>

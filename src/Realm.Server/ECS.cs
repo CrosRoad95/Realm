@@ -1,7 +1,10 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using Realm.Domain.Components.Common;
 using Realm.Domain.Components.Vehicles;
 using Realm.Domain.Interfaces;
+using Realm.Domain.Inventory;
 using Realm.Persistance.Data;
+using System.Linq;
 
 namespace Realm.Server;
 
@@ -95,13 +98,46 @@ public sealed class ECS : IEntityByElement
 
     public async ValueTask<bool> Save(Entity entity)
     {
+        var context = entity.GetRequiredService<IDb>();
         switch (entity.Tag)
         {
             case Entity.PlayerTag:
                 if (entity.TryGetComponent(out AccountComponent accountComponent))
                 {
-                    accountComponent.User.LastTransformAndMotion = entity.Transform.GetTransformAndMotion();
-                    await _userManager.UpdateAsync(accountComponent.User);
+                    var user = accountComponent.User;
+                    if (entity.TryGetComponent(out InventoryComponent inventoryComponent))
+                    {
+                        bool updateInventory = true;
+                        if (user.Inventory == null)
+                        {
+                            user.Inventory = new Inventory
+                            {
+                                Size = inventoryComponent.Size,
+                                Id = inventoryComponent.Id,
+                                InventoryItems = new List<InventoryItem>()
+                            };
+                            updateInventory = false;
+                            context.Inventories.Add(user.Inventory);
+                        }
+
+                        user.Inventory.Size = inventoryComponent.Size;
+                        user.Inventory.InventoryItems = inventoryComponent.Items.Select(item => new InventoryItem
+                        {
+                            Id = item.Id ?? Guid.NewGuid().ToString(),
+                            Inventory = user.Inventory,
+                            InventoryId = user.Inventory.Id,
+                            ItemId = item.ItemId,
+                            Number = item.Number,
+                            MetaData = JsonConvert.SerializeObject(item.MetaData, Formatting.None),
+                        }).ToList();
+                        if(updateInventory)
+                        {
+                            user.Inventory.Id = inventoryComponent.Id;
+                            context.Inventories.Update(user.Inventory);
+                        }
+                    }
+                    user.LastTransformAndMotion = entity.Transform.GetTransformAndMotion();
+                    await _userManager.UpdateAsync(user);
                     return true;
                 }
                 break;
@@ -119,7 +155,16 @@ public sealed class ECS : IEntityByElement
     {
         foreach (var entity in _entities)
         {
+            try
+            {
+
             await Save(entity);
+            }
+            catch(Exception ex)
+            {
+                ;
+                throw;
+            }
         }
     }
 }
