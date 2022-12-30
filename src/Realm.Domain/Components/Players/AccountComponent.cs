@@ -1,4 +1,6 @@
-﻿namespace Realm.Domain.Components.Players;
+﻿using Realm.Domain.Components.Elements;
+
+namespace Realm.Domain.Components.Players;
 
 public class AccountComponent : Component
 {
@@ -9,8 +11,6 @@ public class AccountComponent : Component
 
     public string? UserName => _user.UserName;
 
-    public DateTime? RegisterDateTime => _user.RegisteredDateTime;
-
     public User User => _user;
 
     public AccountComponent(User user)
@@ -20,6 +20,21 @@ public class AccountComponent : Component
 
     public override async Task Load()
     {
+        if(Entity.TryGetComponent(out PlayerElementComponent playerElementComponent))
+        {
+            var client = playerElementComponent.Player.Client;
+            _user.LastLogindDateTime = DateTime.Now;
+            _user.LastIp = client.IPAddress?.ToString();
+            _user.LastSerial = client.Serial;
+            if(_user.RegisterSerial == null)
+                _user.RegisterSerial = client.Serial;
+            
+            if(_user.RegisterIp == null)
+                _user.RegisterIp = _user.LastIp;
+
+            var userManager = Entity.GetRequiredService<UserManager<User>>();
+            await userManager.UpdateAsync(_user);
+        }
         await UpdateClaimsPrincipal();
     }
 
