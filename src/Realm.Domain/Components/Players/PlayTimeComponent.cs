@@ -1,6 +1,6 @@
 ﻿namespace Realm.Domain.Components.Players;
 
-public class PlayTimeComponent
+public class PlayTimeComponent : Component
 {
     private DateTime? _startDateTime;
 
@@ -11,6 +11,19 @@ public class PlayTimeComponent
             if (_startDateTime == null)
                 return 0;
             return (ulong)(DateTime.Now - _startDateTime.Value).Seconds;
+        }
+    }
+
+    public ulong TotalPlayTime
+    {
+        get
+        {
+            ulong totalPlayTime = PlayTime;
+            if(Entity.TryGetComponent(out AccountComponent accountComponent))
+            {
+                totalPlayTime += accountComponent.User.PlayTime;
+            }
+            return totalPlayTime;
         }
     }
 

@@ -109,6 +109,12 @@ public sealed class ECS : IEntityByElement
                     if (entity.TryGetComponent(out LicensesComponent licensesComponent))
                         user.Licenses = licensesComponent.Licenses;
 
+                    if (entity.TryGetComponent(out PlayTimeComponent playTimeComponent))
+                    {
+                        user.PlayTime += playTimeComponent.PlayTime;
+                        playTimeComponent.Reset();
+                    }
+
                     if (entity.TryGetComponent(out InventoryComponent inventoryComponent))
                     {
                         bool updateInventory = true;

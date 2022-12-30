@@ -75,6 +75,15 @@ internal sealed class CommandsLogic
             }
             return Task.CompletedTask;
         });
+        
+        _commandService.AddCommandHandler("playtime", (entity, args) =>
+        {
+            if (entity.TryGetComponent(out PlayTimeComponent playTimeComponent))
+            {
+                entity.GetRequiredComponent<PlayerElementComponent>().SendChatMessage($"playtime: {playTimeComponent.PlayTime}, total play time: {playTimeComponent.TotalPlayTime}");
+            }
+            return Task.CompletedTask;
+        });
 
     }
 }

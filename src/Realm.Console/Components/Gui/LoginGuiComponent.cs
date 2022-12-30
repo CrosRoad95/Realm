@@ -44,6 +44,7 @@ public sealed class LoginGuiComponent : GuiComponent
                     await Entity.AddComponentAsync(new InventoryComponent(20));
 
                 Entity.AddComponent(new LicensesComponent(user.Licenses, user.Id));
+                Entity.AddComponent(new PlayTimeComponent());
                 Entity.DestroyComponent(this);
                 formContext.SuccessResponse();
                 break;
