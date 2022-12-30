@@ -19,6 +19,6 @@ public sealed class User : IdentityUser<Guid>
     public TransformAndMotion? LastTransformAndMotion { get; set; } = null;
 #pragma warning restore CS8618
 
-    public ICollection<UserLicense>? Licenses { get; set; }
+    public ICollection<UserLicense> Licenses { get; set; } = new List<UserLicense>();
     public Inventory? Inventory { get; set; }
 }

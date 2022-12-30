@@ -34,6 +34,7 @@ internal sealed class CommandsLogic
             }
             return Task.CompletedTask;
         });
+
         _commandService.AddCommandHandler("giveitem", (entity, args) =>
         {
             if(entity.TryGetComponent(out InventoryComponent inventoryComponent))
@@ -46,5 +47,34 @@ internal sealed class CommandsLogic
             }
             return Task.CompletedTask;
         });
+
+        _commandService.AddCommandHandler("licenses", (entity, args) =>
+        {
+            if (entity.TryGetComponent(out LicensesComponent licenseComponent))
+            {
+                var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();
+                playerElementComponent.SendChatMessage($"Licenses");
+                foreach (var license in licenseComponent.Licenses)
+                {
+                    playerElementComponent.SendChatMessage($"License: {license.LicenseId} = {license.IsSuspended()}");
+                }
+
+            }
+            return Task.CompletedTask;
+        });
+
+        _commandService.AddCommandHandler("givelicense", (entity, args) =>
+        {
+            if (entity.TryGetComponent(out LicensesComponent licenseComponent))
+            {
+                var license = args.First();
+                if (licenseComponent.AddLicense(license))
+                {
+                    entity.GetRequiredComponent<PlayerElementComponent>().SendChatMessage($"license added: {license}");
+                }
+            }
+            return Task.CompletedTask;
+        });
+
     }
 }

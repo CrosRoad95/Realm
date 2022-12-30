@@ -18,7 +18,7 @@ public sealed class ECS : IEntityByElement
     private readonly UserManager<User> _userManager;
     public IEnumerable<Entity> Entities => _entities;
 
-    public event Action<Entity> EntityCreated;
+    public event Action<Entity>? EntityCreated;
     public ECS(RPGServer server, UserManager<User> userManager)
     {
         _server = server;
@@ -105,6 +105,10 @@ public sealed class ECS : IEntityByElement
                 if (entity.TryGetComponent(out AccountComponent accountComponent))
                 {
                     var user = accountComponent.User;
+                    
+                    if (entity.TryGetComponent(out LicensesComponent licensesComponent))
+                        user.Licenses = licensesComponent.Licenses;
+
                     if (entity.TryGetComponent(out InventoryComponent inventoryComponent))
                     {
                         bool updateInventory = true;

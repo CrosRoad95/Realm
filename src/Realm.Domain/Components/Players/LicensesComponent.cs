@@ -2,40 +2,35 @@
 
 public class LicensesComponent : Component
 {
-    private List<UserLicense> _userLicenses = new();
-    private string? userId;
+    private readonly List<UserLicense> _licenses = new();
+    private readonly Guid _userId;
 
-    public List<UserLicense> UserLicenses { get => _userLicenses; set => _userLicenses = value; }
+    public List<UserLicense> Licenses => _licenses;
 
-    public LicensesComponent(List<UserLicense> userLicenses)
+    public LicensesComponent(Guid userId)
     {
-        UserLicenses = userLicenses;    
+        _userId = userId;
     }
 
-    //public override async Task Load()
-    //{
-    //    var id = Entity.InternalGetRequiredComponent<AccountComponent>().Id;
-    //    var db = Entity.GetRequiredService<IDb>();
-
-    //    userId = id;
-    //    _userLicenses = await db.UserLicenses
-    //        .Where(x => x.UserId.ToString() == id)
-    //        .ToListAsync();
-    //}
+    public LicensesComponent(IEnumerable<UserLicense> userLicenses, Guid userId)
+    {
+        _licenses = userLicenses.ToList();
+        _userId = userId;
+    }
 
     public UserLicense? GetLicense(string licenseId)
     {
-        return _userLicenses.Where(x => x.LicenseId.ToLower() == licenseId.ToLower()).FirstOrDefault();
+        return _licenses.Where(x => x.LicenseId.ToLower() == licenseId.ToLower()).FirstOrDefault();
     }
 
     public IEnumerable<UserLicense> GetAllLicenses(bool includeSuspended = false)
     {
-        return _userLicenses.ToArray();
+        return _licenses.ToArray();
     }
 
     public bool IsLicenseSuspended(string licenseId)
     {
-        var isSuspended = _userLicenses.Where(x => x.LicenseId == licenseId && x.IsSuspended())
+        var isSuspended = _licenses.Where(x => x.LicenseId == licenseId && x.IsSuspended())
             .Any();
 
         return isSuspended;
@@ -43,7 +38,7 @@ public class LicensesComponent : Component
 
     public string? GetLastLicenseSuspensionReason(string licenseId)
     {
-        var suspensionReason = _userLicenses
+        var suspensionReason = _licenses
             .Where(x => x.LicenseId == licenseId)
             .Select(x => x.SuspendedReason)
             .FirstOrDefault();
@@ -58,15 +53,15 @@ public class LicensesComponent : Component
         var userLicense = new UserLicense
         {
             LicenseId = licenseId,
-            UserId = Guid.Parse(userId),
+            UserId = _userId,
         };
-        _userLicenses.Add(userLicense);
+        _licenses.Add(userLicense);
         return true;
     }
 
     public bool HasLicense(string licenseId, bool includeSuspended = false)
     {
-        var query = _userLicenses
+        var query = _licenses
             .Where(x => x.LicenseId.ToLower() == licenseId.ToLower());
 
         if (includeSuspended)

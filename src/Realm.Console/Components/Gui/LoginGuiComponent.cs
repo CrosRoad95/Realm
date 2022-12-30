@@ -43,6 +43,7 @@ public sealed class LoginGuiComponent : GuiComponent
                 else
                     await Entity.AddComponentAsync(new InventoryComponent(20));
 
+                Entity.AddComponent(new LicensesComponent(user.Licenses, user.Id));
                 Entity.DestroyComponent(this);
                 formContext.SuccessResponse();
                 break;
