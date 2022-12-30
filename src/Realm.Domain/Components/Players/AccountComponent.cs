@@ -7,7 +7,7 @@ public class AccountComponent : Component
     private readonly User _user;
     private ClaimsPrincipal? _claimsPrincipal;
 
-    public string Id => _user.Id.ToString().ToUpper();
+    public Guid Id => _user.Id;
 
     public string? UserName => _user.UserName;
 

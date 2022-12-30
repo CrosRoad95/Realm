@@ -97,6 +97,17 @@ public class Entity
         DetachComponent(component);
     }
 
+    public bool TryDestroyComponent<TComponent>() where TComponent: Component
+    {
+        var component = GetRequiredComponent<TComponent>();
+        if(component != null)
+        {
+            component.Destroy();
+            DetachComponent(component);
+            return true;
+        }
+        return false;
+    }
     public void DestroyComponent<TComponent>() where TComponent: Component
     {
         var component = GetRequiredComponent<TComponent>();

@@ -36,17 +36,13 @@ public sealed class LoginGuiComponent : GuiComponent
                     formContext.ErrorResponse("Login lub hasło jest niepoprawne.");
                     return;
                 }
-
-                await Entity.AddComponentAsync(new AccountComponent(user));
-                if(user.Inventory != null)
-                    await Entity.AddComponentAsync(new InventoryComponent(user.Inventory));
-                else
-                    await Entity.AddComponentAsync(new InventoryComponent(20));
-
-                Entity.AddComponent(new LicensesComponent(user.Licenses, user.Id));
-                Entity.AddComponent(new PlayTimeComponent());
-                Entity.DestroyComponent(this);
-                formContext.SuccessResponse();
+                var signInService = Entity.GetRequiredService<ISignInService>();
+                if(await signInService.SignIn(Entity, user))
+                {
+                    Entity.DestroyComponent(this);
+                    formContext.SuccessResponse();
+                }
+                formContext.ErrorResponse("Błąd podczas logowania.");
                 break;
             default:
                 throw new NotImplementedException();

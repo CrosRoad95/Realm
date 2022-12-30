@@ -49,6 +49,7 @@ public partial class RPGServer : IInternalRPGServer, IRPGServer
 
                     // Services
                     services.AddSingleton<RPGCommandService>();
+                    services.AddSingleton<ISignInService, SignInService>();
 
                     // Player specific
                     services.AddTransient<DiscordUser>();
