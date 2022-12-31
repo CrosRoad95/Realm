@@ -32,6 +32,9 @@ public class AccountComponent : Component
             if(_user.RegisterIp == null)
                 _user.RegisterIp = _user.LastIp;
 
+            if(_user.RegisteredDateTime == null)
+                _user.RegisteredDateTime = DateTime.Now;
+
             var userManager = Entity.GetRequiredService<UserManager<User>>();
             await userManager.UpdateAsync(_user);
         }
