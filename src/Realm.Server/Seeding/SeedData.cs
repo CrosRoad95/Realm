@@ -1,4 +1,5 @@
 ﻿using FluentValidation;
+using System.Drawing;
 
 namespace Realm.Server.Seeding;
 
@@ -14,6 +15,14 @@ internal class SeedData
     {
         public ushort Model { get; set; }
         public Vector3 Position { get; set; }
+    }
+
+    public class MarkerSeedData
+    {
+        public Vector3 Position { get; set; }
+        public float Size { get; set; } = 1;
+        public Color Color { get; set; }
+        public MarkerType MarkerType { get; set; } = MarkerType.Cylinder;
     }
 
     public class FractionMemberSeedData
@@ -44,6 +53,7 @@ internal class SeedData
 
     public Dictionary<string, BlipSeedData> Blips = new();
     public Dictionary<string, PickupSeedData> Pickups = new();
+    public Dictionary<string, MarkerSeedData> Markers = new();
     public Dictionary<string, FractionSeedData> Fractions = new();
     public List<string> Roles = new();
     public Dictionary<string, AccountSeedData> Accounts = new();

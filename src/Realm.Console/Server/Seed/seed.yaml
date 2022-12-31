@@ -9,6 +9,10 @@ pickups:
   withText3d:
     model: 1239
     position: [348.7744, -87.57617, 1.3628025]
+markers:
+  testMarker:
+    position: [357.81, -79.58, 1.07]
+    color: "red"
 fractions:
   fractionSapd:
     code: "SAPD"

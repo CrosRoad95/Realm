@@ -77,6 +77,22 @@ internal sealed class SeederServerBuilder
             _logger.Information("Seeder: Created pickup of id {elementId} with icon {pickupModel} at {position}", pair.Key, pair.Value.Model, pair.Value.Position);
         }
     }
+    
+    private void BuildMarkers(Dictionary<string, MarkerSeedData> markers)
+    {
+        foreach (var pair in markers)
+        {
+            var blipEntity = CreateEntity(pair.Key, Entity.MarkerTag, entity =>
+            {
+                var marker = new Marker(Vector3.Zero, pair.Value.MarkerType);
+                marker.Color = pair.Value.Color;
+                marker.Size = pair.Value.Size;
+                entity.AddComponent(new MarkerElementComponent(marker));
+                entity.Transform.Position = pair.Value.Position;
+            });
+            _logger.Information("Seeder: Created marker of id {elementId} at {position}", pair.Key, pair.Value.Position);
+        }
+    }
 
     private async Task BuildIdentityRoles(List<string> roles)
     {
@@ -173,6 +189,7 @@ internal sealed class SeederServerBuilder
         await BuildIdentityAccounts(seedData.Accounts);
         BuildBlips(seedData.Blips);
         BuildPickups(seedData.Pickups);
+        BuildMarkers(seedData.Markers);
         _createdUsers.Clear();
     }
 }
