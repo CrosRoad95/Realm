@@ -84,6 +84,47 @@ internal sealed class CommandsLogic
             }
             return Task.CompletedTask;
         });
-
+        
+        _commandService.AddCommandHandler("givemoney", (entity, args) =>
+        {
+            if (entity.TryGetComponent(out MoneyComponent moneyComponent))
+            {
+                var amount = decimal.Parse(args.First());
+                moneyComponent.GiveMoney(amount);
+                entity.GetRequiredComponent<PlayerElementComponent>().SendChatMessage($"gave money: {amount}, total money: {moneyComponent.Money}");
+            }
+            return Task.CompletedTask;
+        });
+        
+        _commandService.AddCommandHandler("takemoney", (entity, args) =>
+        {
+            if (entity.TryGetComponent(out MoneyComponent moneyComponent))
+            {
+                var amount = decimal.Parse(args.First());
+                moneyComponent.TakeMoney(amount);
+                entity.GetRequiredComponent<PlayerElementComponent>().SendChatMessage($"taken money: {amount}, total money: {moneyComponent.Money}");
+            }
+            return Task.CompletedTask;
+        });
+        
+        _commandService.AddCommandHandler("setmoney", (entity, args) =>
+        {
+            if (entity.TryGetComponent(out MoneyComponent moneyComponent))
+            {
+                var amount = decimal.Parse(args.First());
+                moneyComponent.Money = amount;
+                entity.GetRequiredComponent<PlayerElementComponent>().SendChatMessage($"taken money: {amount}, total money: {moneyComponent.Money}");
+            }
+            return Task.CompletedTask;
+        });
+        
+        _commandService.AddCommandHandler("money", (entity, args) =>
+        {
+            if (entity.TryGetComponent(out MoneyComponent moneyComponent))
+            {
+                entity.GetRequiredComponent<PlayerElementComponent>().SendChatMessage($"total money: {moneyComponent.Money}");
+            }
+            return Task.CompletedTask;
+        });
     }
 }

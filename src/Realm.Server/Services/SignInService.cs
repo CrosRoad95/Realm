@@ -31,6 +31,7 @@ internal class SignInService : ISignInService
 
             entity.AddComponent(new LicensesComponent(user.Licenses, user.Id));
             entity.AddComponent(new PlayTimeComponent());
+            entity.AddComponent(new MoneyComponent(user.Money));
             entity.Destroyed += HandleDestroyed;
         }
         catch (Exception ex)
@@ -41,6 +42,7 @@ internal class SignInService : ISignInService
             entity.TryDestroyComponent<InventoryComponent>();
             entity.TryDestroyComponent<LicensesComponent>();
             entity.TryDestroyComponent<PlayTimeComponent>();
+            entity.TryDestroyComponent<MoneyComponent>();
         }
         finally
         {

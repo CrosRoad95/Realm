@@ -105,7 +105,11 @@ public sealed class ECS : IEntityByElement
                 if (entity.TryGetComponent(out AccountComponent accountComponent))
                 {
                     var user = accountComponent.User;
-                    
+
+
+                    if (entity.TryGetComponent(out MoneyComponent moneyComponent))
+                        user.Money = moneyComponent.Money;
+
                     if (entity.TryGetComponent(out LicensesComponent licensesComponent))
                         user.Licenses = licensesComponent.Licenses;
 

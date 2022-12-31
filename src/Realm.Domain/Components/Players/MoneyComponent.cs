@@ -1,13 +1,18 @@
-﻿using Realm.Common.Exceptions;
+﻿using Microsoft.Extensions.Configuration;
+using Newtonsoft.Json.Linq;
+using Realm.Common.Exceptions;
 using Realm.Configuration;
 
 namespace Realm.Domain.Components.Players;
 
 public class MoneyComponent : Component
 {
-    private double _money = 0;
+    private decimal _money = 0;
 
-    public double Money
+    public event Action<decimal>? MoneySet;
+    public event Action<decimal>? MoneyAdded;
+    public event Action<decimal>? MoneyRemoved;
+    public decimal Money
     {
         get => _money; set
         {
@@ -19,30 +24,55 @@ public class MoneyComponent : Component
 
             var configurationProvider = Entity.GetRequiredService<RealmConfigurationProvider>();
 
-            if (value > configurationProvider.GetRequired<double>("Gameplay:MoneyLimit"))
+            if (value > configurationProvider.GetRequired<decimal>("Gameplay:MoneyLimit"))
                 throw new GameplayException("Unable to set money, reached limit.");
-            var moneyPrecision = configurationProvider.GetRequired<int>("Gameplay:MoneyPrecision");
-            _money = Math.Round(value, moneyPrecision);
+            _money = Normalize(value);
+            MoneySet?.Invoke(_money);
         }
     }
 
-    public MoneyComponent(double initialMoney = 0.0)
+    public MoneyComponent()
+    {
+        _money = 0;
+    }
+    
+    public MoneyComponent(decimal initialMoney)
     {
         _money = initialMoney;
     }
 
-    public bool GiveMoney(double amount)
+    private decimal Normalize(decimal amount)
+    {
+        var configurationProvider = Entity.GetRequiredService<RealmConfigurationProvider>();
+        var moneyPrecision = configurationProvider.GetRequired<int>("Gameplay:MoneyPrecision");
+        return Math.Round(amount, moneyPrecision, MidpointRounding.AwayFromZero);
+    }
+
+    public bool GiveMoney(decimal amount)
     {
         var configurationProvider = Entity.GetRequiredService<RealmConfigurationProvider>();
 
         if (_money < 0)
-            throw new GameplayException("Unable to set money, money can not get negative");
+            throw new GameplayException("Unable to give money, money can not get negative");
 
-        if (amount > configurationProvider.GetRequired<double>("Gameplay:MoneyLimit"))
-            throw new GameplayException("Unable to set money, reached limit.");
+        if (amount > configurationProvider.GetRequired<decimal>("Gameplay:MoneyLimit"))
+            throw new GameplayException("Unable to give money, reached limit.");
+
+        _money += Normalize(amount);
+        MoneyAdded?.Invoke(_money);
+        return true;
+    }
+
+    public bool TakeMoney(decimal amount)
+    {
+        var configurationProvider = Entity.GetRequiredService<RealmConfigurationProvider>();
+
+        if (_money > 0)
+            throw new GameplayException("Unable to give money, money can not get negative");
 
         var moneyPrecision = configurationProvider.GetRequired<int>("Gameplay:MoneyPrecision");
-        _money = _money + Math.Round(amount, moneyPrecision);
+        _money -= Normalize(amount);
+        MoneyRemoved?.Invoke(_money);
         return true;
     }
 }

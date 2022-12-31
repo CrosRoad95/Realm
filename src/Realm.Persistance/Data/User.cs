@@ -14,7 +14,7 @@ public sealed class User : IdentityUser<Guid>
     public string? LastIp { get; set; }
     public ulong PlayTime { get; set; }
     public short Skin { get; set; }
-    public double Money { get; set; }
+    public decimal Money { get; set; }
 
     public TransformAndMotion? LastTransformAndMotion { get; set; } = null;
 #pragma warning restore CS8618
