@@ -4,7 +4,7 @@ namespace Realm.Domain.Components.Players;
 
 public abstract class SessionComponent : Component
 {
-    private Stopwatch _stopwatch = new();
+    private readonly Stopwatch _stopwatch = new();
 
     public event Action<Entity>? SessionStarted;
     public event Action<Entity>? SessionEnded;
@@ -17,13 +17,22 @@ public abstract class SessionComponent : Component
 
     public void Start()
     {
+        if (IsRunning)
+            throw new Exception("Session already started");
         _stopwatch.Reset();
         _stopwatch.Start();
         SessionStarted?.Invoke(Entity);
+        Entity.Destroyed += HandleDestroyed;
+    }
+
+    private void HandleDestroyed(Entity entity)
+    {
+        End();
     }
 
     public void End()
     {
+        Entity.Destroyed -= HandleDestroyed;
         SessionEnded?.Invoke(Entity);
         _stopwatch.Stop();
     }
