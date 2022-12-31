@@ -3,12 +3,12 @@
     icon: 30
     position: [-50, -50, 0]
 pickups:
-  sapdStart:
-    model: 1314
-    position: [20, 5, 3]
   withText3d:
     model: 1239
     position: [348.7744, -87.57617, 1.3628025]
+  fractionTestPickup:
+    model: 1275
+    position: [353.39062, -100.552734, 1.3182049]
 markers:
   testMarker:
     position: [357.81, -79.58, 1.07]
