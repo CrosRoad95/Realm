@@ -53,15 +53,15 @@ public class RPGCommandService
                 //    }
             }
             if (args.Arguments.Any())
-                _logger.Verbose("{player} executed command {commandName} with arguments {commandArguments}.", player);
+                _logger.Verbose("{player} executed command {commandName} with arguments {commandArguments}.", entity);
             else
-                _logger.Verbose("{player} executed command {commandName} with no arguments.", player);
+                _logger.Verbose("{player} executed command {commandName} with no arguments.", entity);
             try
             {
                 if(entity.HasComponent<AccountComponent>())
                     await callback(entity, args.Arguments);
                 else
-                    _logger.Verbose("{player} executed command {commandName} with no arguments.", player);
+                    _logger.Verbose("{player} executed command {commandName} with no arguments.", entity);
             }
             catch (Exception ex)
             {
