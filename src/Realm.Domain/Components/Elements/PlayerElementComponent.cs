@@ -117,6 +117,9 @@ public sealed class PlayerElementComponent : ElementComponent
 
     private async void HandleBindExecuted(Player sender, SlipeServer.Server.Elements.Events.PlayerBindExecutedEventArgs e)
     {
+        if (!_binds.ContainsKey(e.Key))
+            return;
+
         if(_bindsCooldown.TryGetValue(e.Key, out var cooldownUntil))
         {
             if (cooldownUntil > DateTime.Now)
