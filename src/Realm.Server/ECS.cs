@@ -156,7 +156,7 @@ public sealed class ECS : IEntityByElement
                 }
                 break;
             case Entity.VehicleTag:
-                if (entity.TryGetComponent(out PersistantVehicleComponent persistantVehicleComponent))
+                if (entity.TryGetComponent(out VehicleComponent persistantVehicleComponent))
                 {
                     ;
                 }

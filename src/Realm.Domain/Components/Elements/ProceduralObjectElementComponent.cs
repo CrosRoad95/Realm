@@ -1,10 +1,13 @@
 ﻿using Realm.Assets.Factories;
 using Realm.Resources.Assets;
+using SlipeServer.Server.Elements;
 
 namespace Realm.Domain.Components.Elements;
 
-public class ProceduralObjectElementComponent : Component
+public class ProceduralObjectElementComponent : ElementComponent
 {
+    public override Element Element => throw new NotImplementedException();
+
     ProceduralObjectElementComponent()
     {
     }

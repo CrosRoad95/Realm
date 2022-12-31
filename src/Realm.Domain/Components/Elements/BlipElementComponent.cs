@@ -1,8 +1,10 @@
 ﻿namespace Realm.Domain.Components.Elements;
 
-public class BlipElementComponent : Component
+public class BlipElementComponent : ElementComponent
 {
     protected readonly Blip _blip;
+
+    public override Element Element => _blip;
 
     public BlipElementComponent(Blip blip)
     {
