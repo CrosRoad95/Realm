@@ -25,5 +25,6 @@ public sealed class Vehicle
     public bool IsFrozen { get; set; }
     public bool Removed { get; set; }
     public DateTime CreatedAt { get; set; }
+    public bool Spawned { get; set; }
 #pragma warning restore CS8618
 }

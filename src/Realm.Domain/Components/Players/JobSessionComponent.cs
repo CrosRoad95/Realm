@@ -1,12 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿namespace Realm.Domain.Components.Players;
 
-namespace Realm.Domain.Components.Players
+public class JobSessionComponent : SessionComponent
 {
-    internal class JobSessionComponent
+    public JobSessionComponent()
     {
+
     }
 }

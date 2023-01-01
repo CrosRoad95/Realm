@@ -1,5 +1,7 @@
 ﻿using Realm.Domain;
 using Realm.Domain.Components.Common;
+using Realm.Domain.Components.Vehicles;
+using Realm.Persistance;
 using Realm.Server.Services;
 using Serilog;
 
@@ -9,11 +11,17 @@ internal sealed class CommandsLogic
 {
     private readonly RPGCommandService _commandService;
     private readonly ILogger _logger;
+    private readonly IEntityFactory _entityFactory;
+    private readonly ILoadAndSaveService _loadAndSaveService;
+    private readonly RepositoryFactory _repositoryFactory;
 
-    public CommandsLogic(RPGCommandService commandService, ILogger logger)
+    public CommandsLogic(RPGCommandService commandService, ILogger logger, IEntityFactory entityFactory, ILoadAndSaveService loadAndSaveService, RepositoryFactory repositoryFactory)
     {
         _commandService = commandService;
         _logger = logger;
+        _entityFactory = entityFactory;
+        _loadAndSaveService = loadAndSaveService;
+        _repositoryFactory = repositoryFactory;
         _commandService.AddCommandHandler("gp", (entity, args) =>
         {
             logger.Information("{position}, {rotation}", entity.Transform.Position, entity.Transform.Rotation);
@@ -125,6 +133,13 @@ internal sealed class CommandsLogic
                 entity.GetRequiredComponent<PlayerElementComponent>().SendChatMessage($"total money: {moneyComponent.Money}");
             }
             return Task.CompletedTask;
+        });
+
+        _commandService.AddCommandHandler("cv", async (entity, args) =>
+        {
+            using var vehicleRepository = _repositoryFactory.GetVehicleRepository();
+            var vehicleEntity = _entityFactory.CreateVehicle(404, entity.Transform.Position + new Vector3(4, 0, 0), entity.Transform.Rotation);
+            vehicleEntity.AddComponent(new PrivateVehicleComponent(await vehicleRepository.CreateNewVehicle()));
         });
     }
 }

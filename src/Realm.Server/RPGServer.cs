@@ -50,12 +50,13 @@ public partial class RPGServer : IInternalRPGServer, IRPGServer
                     // Services
                     services.AddSingleton<RPGCommandService>();
                     services.AddSingleton<ISignInService, SignInService>();
+                    services.AddSingleton<ILoadAndSaveService, LoadAndSaveService>();
 
                     // Player specific
                     services.AddTransient<DiscordUser>();
 
                     services.AddTransient<ServicesComponent>();
-                    services.AddTransient<EntityElementFactory>();
+                    services.AddTransient<IEntityFactory, EntityFactory>();
 
                     if (modules != null)
                         foreach (var module in modules)
@@ -84,7 +85,8 @@ public partial class RPGServer : IInternalRPGServer, IRPGServer
 
     public void AssociateElement(IElementHandle elementHandle)
     {
-        _server.AssociateElement((Element)elementHandle.GetElement());
+        var element = (Element)elementHandle.GetElement();
+        _server.AssociateElement(element);
     }
 
     private void HandlePlayerJoined(Player player)
@@ -125,6 +127,8 @@ public partial class RPGServer : IInternalRPGServer, IRPGServer
         GetRequiredService<AgnosticGuiSystemService>().GuiFilesChanged = HandleGuiFilesChanged;
 
         _server.Start();
+        await GetRequiredService<ILoadAndSaveService>().LoadAll();
+
         _logger.Information("Server started.");
     }
 

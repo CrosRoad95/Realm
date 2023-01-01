@@ -226,8 +226,8 @@ namespace Realm.Persistance.SQLite.Migrations
                     b.Property<DateTimeOffset?>("LockoutEnd")
                         .HasColumnType("TEXT");
 
-                    b.Property<double>("Money")
-                        .HasColumnType("REAL");
+                    b.Property<decimal>("Money")
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("Nick")
                         .HasColumnType("TEXT");
@@ -385,6 +385,11 @@ namespace Realm.Persistance.SQLite.Migrations
                         .HasDefaultValue(false);
 
                     b.Property<bool>("SirensState")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER")
+                        .HasDefaultValue(false);
+
+                    b.Property<bool>("Spawned")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER")
                         .HasDefaultValue(false);

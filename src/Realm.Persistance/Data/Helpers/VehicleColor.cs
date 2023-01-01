@@ -8,6 +8,16 @@ public class VehicleColor
     public Color Color4 { get; set; } = Color.White;
     public Color HeadLightColor { get; set; } = Color.White;
 
+    public VehicleColor() { }
+    public VehicleColor(Color color1, Color color2, Color color3, Color color4, Color headLightColor)
+    {
+        Color1 = color1;
+        Color2 = color2;
+        Color3 = color3;
+        Color4 = color4;
+        HeadLightColor = headLightColor;
+    }
+
     public string Serialize()
     {
         return JsonConvert.SerializeObject(this, Formatting.None);

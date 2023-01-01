@@ -15,14 +15,12 @@ public sealed class ECS : IEntityByElement
     private readonly Dictionary<Element, Entity> _entityByElement = new();
     private readonly Dictionary<string, Entity> _entityByName = new();
     private readonly RPGServer _server;
-    private readonly UserManager<User> _userManager;
     public IEnumerable<Entity> Entities => _entities;
 
     public event Action<Entity>? EntityCreated;
-    public ECS(RPGServer server, UserManager<User> userManager)
+    public ECS(RPGServer server)
     {
         _server = server;
-        _userManager = userManager;
     }
 
     public Entity GetEntityByPlayer(Player player)
@@ -35,6 +33,22 @@ public sealed class ECS : IEntityByElement
         return _entityByElement[element];
     }
 
+    public async Task<Entity> CreateEntityAsync(string name, string tag, Func<Entity, Task>? entityBuilder = null)
+    {
+        if (_entityByName.ContainsKey(name))
+            throw new Exception($"Entity of name {name} already exists");
+
+        var newlyCreatedEntity = new Entity(_server, _server.GetRequiredService<ServicesComponent>(), name, tag);
+        _entities.Add(newlyCreatedEntity);
+        _entityByName[name] = newlyCreatedEntity;
+        if (entityBuilder != null)
+            await entityBuilder(newlyCreatedEntity);
+        newlyCreatedEntity.ComponentAdded += HandleComponentAdded;
+        newlyCreatedEntity.Destroyed += HandleEntityDestroyed;
+        EntityCreated?.Invoke(newlyCreatedEntity);
+        return newlyCreatedEntity;
+    }
+    
     public Entity CreateEntity(string name, string tag, Action<Entity>? entityBuilder = null)
     {
         if (_entityByName.ContainsKey(name))
@@ -51,9 +65,8 @@ public sealed class ECS : IEntityByElement
         return newlyCreatedEntity;
     }
 
-    private async void HandleEntityDestroyed(Entity entity)
+    private void HandleEntityDestroyed(Entity entity)
     {
-        await Save(entity);
         _entityByName.Remove(entity.Name);
         _entities.Remove(entity);
 
@@ -94,91 +107,5 @@ public sealed class ECS : IEntityByElement
         playerEntity.Destroyed += HandlePlayerEntityDestroyed;
         var playerComponent = playerEntity.GetRequiredComponent<PlayerElementComponent>();
         _entityByPlayer.Remove(playerComponent.Player);
-    }
-
-    public async ValueTask<bool> Save(Entity entity)
-    {
-        var context = entity.GetRequiredService<IDb>();
-        switch (entity.Tag)
-        {
-            case Entity.PlayerTag:
-                if (entity.TryGetComponent(out AccountComponent accountComponent))
-                {
-                    var user = accountComponent.User;
-
-
-                    if (entity.TryGetComponent(out MoneyComponent moneyComponent))
-                        user.Money = moneyComponent.Money;
-
-                    if (entity.TryGetComponent(out LicensesComponent licensesComponent))
-                        user.Licenses = licensesComponent.Licenses;
-
-                    if (entity.TryGetComponent(out PlayTimeComponent playTimeComponent))
-                    {
-                        user.PlayTime += playTimeComponent.PlayTime;
-                        playTimeComponent.Reset();
-                    }
-
-                    if (entity.TryGetComponent(out InventoryComponent inventoryComponent))
-                    {
-                        bool updateInventory = true;
-                        if (user.Inventory == null)
-                        {
-                            user.Inventory = new Inventory
-                            {
-                                Size = inventoryComponent.Size,
-                                Id = inventoryComponent.Id,
-                                InventoryItems = new List<InventoryItem>()
-                            };
-                            updateInventory = false;
-                            context.Inventories.Add(user.Inventory);
-                        }
-
-                        user.Inventory.Size = inventoryComponent.Size;
-                        user.Inventory.InventoryItems = inventoryComponent.Items.Select(item => new InventoryItem
-                        {
-                            Id = item.Id ?? Guid.NewGuid().ToString(),
-                            Inventory = user.Inventory,
-                            InventoryId = user.Inventory.Id,
-                            ItemId = item.ItemId,
-                            Number = item.Number,
-                            MetaData = JsonConvert.SerializeObject(item.MetaData, Formatting.None),
-                        }).ToList();
-                        if(updateInventory)
-                        {
-                            user.Inventory.Id = inventoryComponent.Id;
-                            context.Inventories.Update(user.Inventory);
-                        }
-                    }
-                    user.LastTransformAndMotion = entity.Transform.GetTransformAndMotion();
-                    await _userManager.UpdateAsync(user);
-                    return true;
-                }
-                break;
-            case Entity.VehicleTag:
-                if (entity.TryGetComponent(out VehicleComponent persistantVehicleComponent))
-                {
-                    ;
-                }
-                break;
-        }
-        return false;
-    }
-
-    public async Task SaveAll()
-    {
-        foreach (var entity in _entities)
-        {
-            try
-            {
-
-            await Save(entity);
-            }
-            catch(Exception ex)
-            {
-                ;
-                throw;
-            }
-        }
     }
 }

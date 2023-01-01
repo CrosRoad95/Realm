@@ -2,7 +2,7 @@
 
 namespace Realm.Persistance;
 
-public interface IDb
+public interface IDb : IDisposable
 {
     ChangeTracker ChangeTracker { get; }
     DbSet<User> Users { get; }

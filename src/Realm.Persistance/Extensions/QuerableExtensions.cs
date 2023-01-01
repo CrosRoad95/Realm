@@ -11,4 +11,9 @@ public static class QuerableExtensions
     {
         return query.Where(x => x.SuspendedUntil != null && x.SuspendedUntil > DateTime.Now);
     }
+
+    public static IQueryable<Vehicle> IsNotRemoved(this IQueryable<Vehicle> query)
+    {
+        return query.Where(x => !x.Removed);
+    }
 }

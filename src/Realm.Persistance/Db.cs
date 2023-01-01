@@ -163,6 +163,10 @@ public abstract class Db<T> : IdentityDbContext<User, Role, Guid,
             entityBuilder.Property(x => x.Removed)
                 .HasDefaultValue(false)
                 .IsRequired();
+
+            entityBuilder.Property(x => x.Spawned)
+                .HasDefaultValue(false)
+                .IsRequired();
         });
     }
 }

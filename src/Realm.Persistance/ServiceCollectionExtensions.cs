@@ -1,4 +1,7 @@
-﻿namespace Realm.Persistance;
+﻿using Realm.Persistance.Interfaces;
+using Realm.Persistance.Repository;
+
+namespace Realm.Persistance;
 
 public class AuthorizationPoliciesProvider
 {
@@ -20,6 +23,11 @@ public static class ServiceCollectionExtensions
     public static IServiceCollection AddPersistance<T>(this IServiceCollection services,
         Action<DbContextOptionsBuilder> dboptions) where T : DbContext, IDb
     {
+        services.AddSingleton<RealmDbContextFactory>();
+        services.AddSingleton<RepositoryFactory>();
+
+        services.AddTransient<IVehicleRepository, VehicleRepository>();
+
         services.AddDbContext<IDb, T>(dboptions, ServiceLifetime.Transient);
 
         return services;

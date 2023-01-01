@@ -7,7 +7,7 @@ public class VehicleWheelStatus
         Inflated,
         Flat,
         FallenOff,
-        Collisionless,
+        Collisionless
     }
 
     public WheelStatus FrontLeft { get; set; }
