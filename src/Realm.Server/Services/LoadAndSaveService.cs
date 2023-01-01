@@ -3,6 +3,7 @@ using Realm.Domain;
 using Realm.Domain.Components.Vehicles;
 using Realm.Persistance.Data;
 using Realm.Persistance.Extensions;
+using static Realm.Persistance.Data.Helpers.VehicleDamageState;
 using static Realm.Persistance.Data.Helpers.VehicleWheelStatus;
 using Vehicle = SlipeServer.Server.Elements.Vehicle;
 
@@ -110,7 +111,23 @@ internal class LoadAndSaveService : ILoadAndSaveService
                     vehicleData.Variant = new Persistance.Data.Helpers.VehicleVariant(vehicle.Variants.Variant1, vehicle.Variants.Variant2);
                     vehicleData.DamageState = new Persistance.Data.Helpers.VehicleDamageState
                     {
-
+                        FrontLeftLight = (LightState)vehicle.Damage.Lights[0],
+                        FrontRightLight = (LightState)vehicle.Damage.Lights[1],
+                        RearLeftLight = (LightState)vehicle.Damage.Lights[2],
+                        RearRightLight = (LightState)vehicle.Damage.Lights[3],
+                        FrontLeftPanel = (PanelState)vehicle.Damage.Panels[0],
+                        FrontRightPanel = (PanelState)vehicle.Damage.Panels[1],
+                        RearLeftPanel = (PanelState)vehicle.Damage.Panels[2],
+                        RearRightPanel = (PanelState)vehicle.Damage.Panels[3],
+                        Windscreen = (PanelState)vehicle.Damage.Panels[4],
+                        FrontBumper = (PanelState)vehicle.Damage.Panels[5],
+                        RearBumper = (PanelState)vehicle.Damage.Panels[6],
+                        Hood = (DoorState)vehicle.Damage.Doors[0],
+                        Trunk = (DoorState)vehicle.Damage.Doors[1],
+                        FrontLeftDoor = (DoorState)vehicle.Damage.Doors[2],
+                        FrontRightDoor = (DoorState)vehicle.Damage.Doors[3],
+                        RearLeftDoor = (DoorState)vehicle.Damage.Doors[4],
+                        RearRightDoor = (DoorState)vehicle.Damage.Doors[5],
                     };
                     vehicleData.DoorOpenRatio = new Persistance.Data.Helpers.VehicleDoorOpenRatio
                     {
