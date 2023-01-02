@@ -71,6 +71,11 @@ public sealed class PlayerElementComponent : ElementComponent
         ChatBox.ClearFor(_player);
     }
 
+    public void SetChatVisible(bool visible)
+    {
+        ChatBox.SetVisibleFor(_player, visible);
+    }
+
     #region LuaInterop resource
     public void SetClipboard(string content)
     {

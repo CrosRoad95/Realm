@@ -14,6 +14,8 @@ internal sealed class PlayerJoinedLogic
     private async void HandlePlayerJoined(Entity entity)
     {
         var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();
+        playerElementComponent.SetChatVisible(false);
+        playerElementComponent.ClearChatBox();
         var adminComp = await entity.AddComponentAsync(new AdminComponent());
         adminComp.DebugView = true;
         entity.AddComponent(new LoginGuiComponent());
@@ -26,6 +28,8 @@ internal sealed class PlayerJoinedLogic
         if (component is AccountComponent)
         {
             var playerElementComponent = component.Entity.GetRequiredComponent<PlayerElementComponent>();
+            playerElementComponent.SetChatVisible(true);
+            playerElementComponent.ClearChatBox();
             if (!playerElementComponent.TrySpawnAtLastPosition())
             {
                 playerElementComponent.Spawn(new Vector3(362.58f + (float)Random.Shared.NextDouble() * 3, -91.07f + (float)Random.Shared.NextDouble() * 3, 1.38f),
