@@ -3,4 +3,5 @@
 public interface IEntityByElement
 {
     Entity GetByElement(Element element);
+    Entity? TryGetByElement(Element element);
 }

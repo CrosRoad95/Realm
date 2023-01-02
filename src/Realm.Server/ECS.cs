@@ -27,6 +27,13 @@ public sealed class ECS : IEntityByElement
         return _entityByElement[element];
     }
 
+    public Entity? TryGetByElement(Element element)
+    {
+        Entity? result;
+        _entityByElement.TryGetValue(element, out result);
+        return result;
+    }
+
     public async Task<Entity> CreateEntityAsync(string name, string tag, Func<Entity, Task>? entityBuilder = null)
     {
         if (_entityByName.ContainsKey(name))

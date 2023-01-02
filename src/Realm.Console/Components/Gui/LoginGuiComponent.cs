@@ -40,6 +40,7 @@ public sealed class LoginGuiComponent : GuiComponent
                 {
                     Entity.DestroyComponent(this);
                     formContext.SuccessResponse();
+                    return;
                 }
                 formContext.ErrorResponse("Błąd podczas logowania.");
                 break;

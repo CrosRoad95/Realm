@@ -4,6 +4,7 @@ namespace Realm.Domain.Contextes;
 
 internal class FormContext : IFormContext
 {
+    private bool _responsed = false;
     private readonly Player _player;
     private readonly string _formName;
     private readonly LuaValue _data;
@@ -27,11 +28,19 @@ internal class FormContext : IFormContext
 
     public void SuccessResponse(params object[] data)
     {
+        if (_responsed)
+            throw new Exception("Form already got response.");
+
         _agnosticGuiSystemService.SendFormResponse(_player, "", FormName, true, data);
+        _responsed = true;
     }
 
     public void ErrorResponse(params object[] data)
     {
+        if (_responsed)
+            throw new Exception("Form already got response.");
+
         _agnosticGuiSystemService.SendFormResponse(_player, "", FormName, false, data);
+        _responsed = true;
     }
 }

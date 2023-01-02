@@ -115,11 +115,15 @@ end
 addEvent("internalSubmitFormResponse", true)
 addEventHandler("internalSubmitFormResponse", localPlayer, function(id, name, data)
 	if(pendingFormsSubmissions[name])then
-		local success, result = unpack(data)
-		coroutine.resume(pendingFormsSubmissions[name].coroutine, success, unpack(result))
-		setTimer(function()
-			pendingFormsSubmissions[name] = nil;
-		end, 200, 1)
+		if(coroutine.status(pendingFormsSubmissions[name].coroutine) == "suspended")then
+			local success, result = unpack(data)
+			coroutine.resume(pendingFormsSubmissions[name].coroutine, success, unpack(result))
+			setTimer(function()
+				pendingFormsSubmissions[name] = nil;
+			end, 200, 1)
+		else
+			error("Failed to response to form "..tostring(name)..". Probably already responded.");
+		end
 	else
 		error("Form submission not found? a bug?")
 	end
