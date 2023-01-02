@@ -17,7 +17,7 @@
 		<ProjectReference Include="..\Realm.Resources.LuaInterop\Realm.Resources.LuaInterop.csproj" />
 		<ProjectReference Include="..\Realm.Resources.Overlay\Realm.Resources.Overlay.csproj" />
 		<ProjectReference Include="..\Realm.Resources.StatisticsCounter\Realm.Resources.StatisticsCounter.csproj" />
-		<PackageReference Include="SlipeServer.Resources.NoClip" Version="0.1.0-CI-20221121-170436" />
+		<PackageReference Include="SlipeServer.Resources.NoClip" Version="0.1.0-CI-20221213-172905" />
 		<PackageReference Include="SlipeServer.Resources.Text3d" Version="0.1.0-CI-20221213-172905" />
 	</ItemGroup>
 	
