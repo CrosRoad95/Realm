@@ -1,8 +1,4 @@
-﻿using Realm.Domain.Inventory;
-using Realm.Domain.Registries;
-using InventoryData = Realm.Persistance.Data.Inventory;
-
-namespace Realm.Domain.Components.Common;
+﻿namespace Realm.Domain.Components.Common;
 
 public class InventoryComponent : Component
 {
@@ -20,10 +16,10 @@ public class InventoryComponent : Component
         Size = size;
     }
 
-    public InventoryComponent(InventoryData? inventory)
+    public InventoryComponent(InventoryData inventory)
     {
         if (inventory == null)
-            throw new ArgumentNullException();
+            throw new ArgumentNullException(nameof(inventory));
 
         Size = inventory.Size;
         Id = inventory.Id;

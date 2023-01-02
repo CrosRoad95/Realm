@@ -1,6 +1,4 @@
-﻿using Realm.Domain.Registries;
-
-namespace Realm.Console.Logic;
+﻿namespace Realm.Console.Logic;
 
 public class ItemsLogic
 {

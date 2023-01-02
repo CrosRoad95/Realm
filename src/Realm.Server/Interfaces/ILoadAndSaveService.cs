@@ -3,5 +3,5 @@
 public interface ILoadAndSaveService
 {
     Task LoadAll();
-    Task SaveAll();
+    Task<int> SaveAll();
 }

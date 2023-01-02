@@ -1,11 +1,4 @@
-﻿using Realm.Domain;
-using Realm.Domain.Components.Common;
-using Realm.Domain.Components.Vehicles;
-using Realm.Persistance;
-using Realm.Server.Services;
-using Serilog;
-
-namespace Realm.Console.Logic;
+﻿namespace Realm.Console.Logic;
 
 internal sealed class CommandsLogic
 {

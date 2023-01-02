@@ -34,7 +34,7 @@ internal class SignInService : ISignInService
             entity.AddComponent(new MoneyComponent(user.Money));
             entity.Destroyed += HandleDestroyed;
         }
-        catch (Exception ex)
+        catch (Exception)
         {
             // TODO: add Entity component add scope thing
             _usedAccountsIds.Remove(user.Id);

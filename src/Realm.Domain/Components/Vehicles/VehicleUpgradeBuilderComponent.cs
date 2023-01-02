@@ -1,5 +1,4 @@
-﻿using Realm.Domain.Components.Elements;
-using SlipeServer.Server.Constants;
+﻿using SlipeServer.Server.Constants;
 using VehicleUpgrade = Realm.Domain.Upgrades.VehicleUpgrade;
 
 namespace Realm.Domain.Components.Vehicles;
@@ -33,12 +32,12 @@ public class VehicleUpgradeBuilderComponent : Component
     {
         var vehicle = Entity.InternalGetRequiredComponent<VehicleElementComponent>().Vehicle;
         var handling = VehicleHandlingConstants.DefaultVehicleHandling[vehicle.Model];
-        foreach (var upgrade in Upgrades.Select(x => x.MaxVelocity).Where(x => x != null))
+        foreach (var upgrade in Upgrades.Select(x => x.MaxVelocity).Where(x => x != null).Select(x => x!))
         {
             handling.MaxVelocity += upgrade.IncreaseByUnits;
             handling.MaxVelocity *= upgrade.MultipleBy;
         }
-        foreach (var upgrade in Upgrades.Select(x => x.EngineAcceleration).Where(x => x != null))
+        foreach (var upgrade in Upgrades.Select(x => x.EngineAcceleration).Where(x => x != null).Select(x => x!))
         {
             handling.EngineAcceleration += upgrade.IncreaseByUnits;
             handling.EngineAcceleration *= upgrade.MultipleBy;

@@ -1,9 +1,4 @@
-﻿using Microsoft.Extensions.Configuration;
-using Newtonsoft.Json.Linq;
-using Realm.Common.Exceptions;
-using Realm.Configuration;
-
-namespace Realm.Domain.Components.Players;
+﻿namespace Realm.Domain.Components.Players;
 
 public class MoneyComponent : Component
 {

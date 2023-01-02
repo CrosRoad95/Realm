@@ -1,6 +1,4 @@
-﻿using Realm.Domain.Components.Elements;
-using SlipeServer.Packets.Enums;
-using VehicleData = Realm.Persistance.Data.Vehicle;
+﻿using VehicleData = Realm.Persistance.Data.Vehicle;
 
 namespace Realm.Domain.Components.Vehicles;
 

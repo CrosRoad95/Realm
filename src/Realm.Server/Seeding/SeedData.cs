@@ -3,6 +3,8 @@ using System.Drawing;
 
 namespace Realm.Server.Seeding;
 
+#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
+
 internal class SeedData
 {
     public class BlipSeedData
@@ -67,3 +69,5 @@ internal class SeedValidator : AbstractValidator<SeedData>
 
     }
 }
+
+#pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.

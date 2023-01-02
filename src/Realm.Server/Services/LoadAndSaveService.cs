@@ -1,11 +1,8 @@
 ﻿using Microsoft.AspNetCore.Identity;
-using Realm.Domain;
 using Realm.Domain.Components.Vehicles;
 using Realm.Persistance.Data;
-using Realm.Persistance.Extensions;
 using static Realm.Persistance.Data.Helpers.VehicleDamageState;
 using static Realm.Persistance.Data.Helpers.VehicleWheelStatus;
-using Vehicle = SlipeServer.Server.Elements.Vehicle;
 
 namespace Realm.Server.Services;
 
@@ -162,21 +159,16 @@ internal class LoadAndSaveService : ILoadAndSaveService
         return false;
     }
 
-    public async Task SaveAll()
+    public async Task<int> SaveAll()
     {
+        int savedEntities = 0;
         using var context = _dbContextFactory.CreateDbContext();
         foreach (var entity in _ecs.Entities)
         {
-            try
-            {
-                await Save(entity, context);
-            }
-            catch (Exception ex)
-            {
-                ;
-                throw;
-            }
+            await Save(entity, context);
+            savedEntities++;
         }
+        return savedEntities;
     }
 
     public async Task LoadAll()

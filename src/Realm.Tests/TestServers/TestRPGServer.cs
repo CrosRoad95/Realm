@@ -4,7 +4,6 @@ using Realm.Interfaces.Server;
 using Realm.Logging;
 using Realm.Server.Extensions;
 using Realm.Server.Interfaces;
-using Realm.Server.Modules;
 using SlipeServer.Server.Elements;
 using Realm.Interfaces.Providers;
 using Realm.Server.Providers;
@@ -28,7 +27,6 @@ internal class TestRPGServer : IInternalRPGServer
         var modules = new IModule[]
         {
             new DiscordModule(),
-            new IdentityModule()
         };
 
         var configuration = new TestConfigurationProvider();

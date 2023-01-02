@@ -1,7 +1,4 @@
-﻿using SlipeServer.Packets.Definitions.Lua;
-using SlipeServer.Server.Mappers;
-
-namespace Realm.Domain.Extensions;
+﻿namespace Realm.Domain.Extensions;
 
 internal static class LuaValueMapperExtensions
 {

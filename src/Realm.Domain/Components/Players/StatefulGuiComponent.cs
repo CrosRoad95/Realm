@@ -1,14 +1,4 @@
-﻿using Realm.Domain.Components.Elements;
-using Realm.Domain.Contextes;
-using Realm.Resources.AgnosticGuiSystem;
-using SlipeServer.Server.Mappers;
-using Realm.Common.Extensions;
-using Realm.Domain.Extensions;
-using System.Linq.Expressions;
-using SlipeServer.Packets.Definitions.Lua;
-using System.Reflection;
-
-namespace Realm.Domain.Components.Players;
+﻿namespace Realm.Domain.Components.Players;
 
 public abstract class StatefulGuiComponent<TState> : GuiComponent
 {
@@ -36,7 +26,7 @@ public abstract class StatefulGuiComponent<TState> : GuiComponent
         _stateChange.Clear();
     }
 
-    protected TValue GetStateValue<TValue>(Expression<Func<TState, TValue>> exp)
+    protected TValue? GetStateValue<TValue>(Expression<Func<TState, TValue>> exp)
     {
         if (exp.Body is not MemberExpression memberExpression)
             throw new Exception();

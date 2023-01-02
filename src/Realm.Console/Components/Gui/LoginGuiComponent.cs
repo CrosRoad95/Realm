@@ -1,10 +1,4 @@
-﻿using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
-using Realm.Console.Data;
-using Realm.Domain.Components.Common;
-using Realm.Persistance.Data;
-
-namespace Realm.Console.Components.Gui;
+﻿namespace Realm.Console.Components.Gui;
 
 public sealed class LoginGuiComponent : GuiComponent
 {
@@ -22,7 +16,7 @@ public sealed class LoginGuiComponent : GuiComponent
                 var userManager = Entity.GetRequiredService<UserManager<User>>();
                 var user = await userManager.Users
                     .Include(u => u.Inventory)
-                    .ThenInclude(x => x.InventoryItems)
+                    .ThenInclude(x => x!.InventoryItems)
                     .FirstOrDefaultAsync(u => u.UserName == loginData.Login);
 
                 if(user == null)

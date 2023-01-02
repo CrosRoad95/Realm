@@ -1,5 +1,4 @@
-﻿using Realm.Domain.Components.Elements;
-using SlipeServer.Server.Elements.Events;
+﻿using SlipeServer.Server.Elements.Events;
 
 namespace Realm.Domain.Components.Vehicles;
 

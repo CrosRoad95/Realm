@@ -122,11 +122,10 @@ internal sealed class SeederServerBuilder
                 {
                     user = await _userManager.FindByNameAsync(pair.Key);
                 }
-                else
-                {
-                    throw new Exception();
-                }
             }
+
+            if(user == null)
+                throw new Exception($"Failed to create user account '{pair.Key}'");
 
             var claims = pair.Value.Claims.Select(x => new Claim(x.Key, x.Value))
                 .Concat(new List<Claim>

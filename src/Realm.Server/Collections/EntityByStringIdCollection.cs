@@ -18,6 +18,9 @@ public sealed class EntityByStringIdCollection
     private void HandleDestroyed(Entity entity)
     {
         var id = GetEntityId(entity);
+        if (id == null)
+            throw new Exception("Failed to find entity id while destroying. A Bug?");
+
         _entitiesById.Remove(id);
         _idByEntity.Remove(entity);
         entity.Destroyed -= HandleDestroyed;

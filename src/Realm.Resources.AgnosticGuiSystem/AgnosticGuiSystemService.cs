@@ -1,5 +1,4 @@
-﻿using Newtonsoft.Json.Linq;
-using SlipeServer.Packets.Definitions.Lua;
+﻿using SlipeServer.Packets.Definitions.Lua;
 using SlipeServer.Server;
 using SlipeServer.Server.Elements;
 using SlipeServer.Server.Events;

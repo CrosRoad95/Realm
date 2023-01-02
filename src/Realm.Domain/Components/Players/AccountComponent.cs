@@ -1,6 +1,4 @@
-﻿using Realm.Domain.Components.Elements;
-
-namespace Realm.Domain.Components.Players;
+﻿namespace Realm.Domain.Components.Players;
 
 public class AccountComponent : Component
 {

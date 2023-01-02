@@ -1,13 +1,4 @@
-﻿using Realm.Domain.Components.Players;
-using Realm.Resources.LuaInterop;
-using Realm.Resources.Overlay;
-using SlipeServer.Packets.Definitions.Lua;
-using SlipeServer.Packets.Lua.Camera;
-using SlipeServer.Server.Elements.Enums;
-using SlipeServer.Server.Mappers;
-using SlipeServer.Server.Services;
-
-namespace Realm.Domain.Components.Elements;
+﻿namespace Realm.Domain.Components.Elements;
 
 public sealed class PlayerElementComponent : ElementComponent
 {

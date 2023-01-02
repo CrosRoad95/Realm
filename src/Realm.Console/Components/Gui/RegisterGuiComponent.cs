@@ -1,6 +1,4 @@
-﻿using Realm.Console.Data;
-
-namespace Realm.Console.Components.Gui;
+﻿namespace Realm.Console.Components.Gui;
 
 public sealed class RegisterGuiComponent : GuiComponent
 {

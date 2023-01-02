@@ -1,6 +1,4 @@
-﻿using Realm.Domain.Components.Elements;
-
-namespace Realm.Domain.Components.Common;
+﻿namespace Realm.Domain.Components.Common;
 
 public class LastPositionComponent : Component
 {

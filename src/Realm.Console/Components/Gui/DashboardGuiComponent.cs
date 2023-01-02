@@ -1,6 +1,4 @@
-﻿using Realm.Domain.Components.Players;
-
-namespace Realm.Console.Components.Gui;
+﻿namespace Realm.Console.Components.Gui;
 
 public sealed class DashboardGuiComponent : StatefulGuiComponent<DashboardGuiComponent.DashboardState>
 {

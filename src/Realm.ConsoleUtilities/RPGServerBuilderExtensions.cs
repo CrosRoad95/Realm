@@ -3,7 +3,6 @@ using Realm.Logging;
 using Realm.Module.Discord;
 using Realm.Module.Grpc;
 using Realm.Server;
-using Realm.Server.Modules;
 using Serilog.Events;
 
 namespace Realm.ConsoleUtilities;
@@ -28,7 +27,6 @@ public static class RPGServerBuilderExtensions
     public static RPGServerBuilder AddDefaultModules(this RPGServerBuilder serverBuilder)
     {
         serverBuilder.AddModule<DiscordModule>();
-        serverBuilder.AddModule<IdentityModule>();
         serverBuilder.AddModule<GrpcModule>();
         return serverBuilder;
     }
