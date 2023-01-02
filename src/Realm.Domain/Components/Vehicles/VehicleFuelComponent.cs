@@ -83,13 +83,13 @@ public class VehicleFuelComponent : Component
 
     private void RegisterEvents()
     {
-        var vehicle = Entity.InternalGetRequiredComponent<VehicleElementComponent>().Vehicle;
+        var vehicle = Entity.GetRequiredComponent<VehicleElementComponent>().Vehicle;
         vehicle.PositionChanged += HandlePositionChanged;
     }
 
     private void UnregisterEvents()
     {
-        var vehicle = Entity.InternalGetRequiredComponent<VehicleElementComponent>().Vehicle;
+        var vehicle = Entity.GetRequiredComponent<VehicleElementComponent>().Vehicle;
         vehicle.PositionChanged -= HandlePositionChanged;
     }
 
@@ -101,7 +101,7 @@ public class VehicleFuelComponent : Component
 
     private void Update(bool forceUpdate = false)
     {
-        var vehicle = Entity.InternalGetRequiredComponent<VehicleElementComponent>().Vehicle;
+        var vehicle = Entity.GetRequiredComponent<VehicleElementComponent>().Vehicle;
         if (!vehicle.IsEngineOn && !forceUpdate)
         {
             _lastPosition = vehicle.Position;

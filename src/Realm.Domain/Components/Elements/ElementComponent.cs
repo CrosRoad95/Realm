@@ -4,13 +4,8 @@ namespace Realm.Domain.Components.Elements;
 
 public abstract class ElementComponent : Component
 {
-    private IEntityByElement? _elementById;
-    protected IEntityByElement ElementById => _elementById ?? throw new Exception();
-    abstract public Element Element { get; }
+    [Inject]
+    protected IEntityByElement EntityByElement { get; set; } = default!;
 
-    public override Task Load()
-    {
-        _elementById = Entity.GetRequiredService<IEntityByElement>();
-        return Task.CompletedTask;
-    }
+    abstract public Element Element { get; }
 }

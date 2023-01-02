@@ -13,7 +13,7 @@ public class LastPositionComponent : Component
         if (LastPosition == null || LastRotation == null)
             return false;
 
-        var player = Entity.InternalGetRequiredComponent<PlayerElementComponent>().Player;
+        var player = Entity.GetRequiredComponent<PlayerElementComponent>().Player;
         player.Spawn(LastPosition.Value, LastRotation.Value.X, player.Model, 0, 0);
         return true;
     }

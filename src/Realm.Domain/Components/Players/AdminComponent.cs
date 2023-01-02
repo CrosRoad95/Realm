@@ -1,10 +1,21 @@
-﻿using Realm.Resources.AdminTools;
+﻿using Microsoft.AspNetCore.Components;
+using Realm.Resources.AdminTools;
+using RenderWareIo.Structs.Ide;
 using SlipeServer.Resources.NoClip;
 
 namespace Realm.Domain.Components.Players;
 
 public class AdminComponent : Component
 {
+    [Inject]
+    private NoClipService NoClipService { get; set; } = default!;
+
+    [Inject]
+    private DebugLog DebugLog { get; set; } = default!;
+
+    [Inject]
+    private AdminToolsService AdminToolsService { get; set; } = default!;
+
     private bool _debugView = false;
     private bool _adminTools = false;
     private bool _noClip = false;
@@ -15,8 +26,8 @@ public class AdminComponent : Component
         {
             if (_debugView != value)
             {
-                var player = Entity.InternalGetRequiredComponent<PlayerElementComponent>().Player;
-                Entity.GetRequiredService<DebugLog>().SetVisibleTo(player, value);
+                var player = Entity.GetRequiredComponent<PlayerElementComponent>().Player;
+                DebugLog.SetVisibleTo(player, value);
                 _debugView = value;
             }
         }
@@ -29,14 +40,14 @@ public class AdminComponent : Component
             if (_adminTools != value)
             {
                 _adminTools = value;
-                var player = Entity.InternalGetRequiredComponent<PlayerElementComponent>().Player;
+                var player = Entity.GetRequiredComponent<PlayerElementComponent>().Player;
                 if (value)
                 {
-                    Entity.GetRequiredService<AdminToolsService>().EnableAdminToolsForPlayer(player);
+                    AdminToolsService.EnableAdminToolsForPlayer(player);
                 }
                 else
                 {
-                    Entity.GetRequiredService<AdminToolsService>().DisableAdminToolsForPlayer(player);
+                    AdminToolsService.DisableAdminToolsForPlayer(player);
                 }
             }
         }
@@ -49,8 +60,8 @@ public class AdminComponent : Component
             if (_noClip != value)
             {
                 _noClip = value;
-                var player = Entity.InternalGetRequiredComponent<PlayerElementComponent>().Player;
-                Entity.GetRequiredService<NoClipService>().SetEnabledTo(player, value);
+                var player = Entity.GetRequiredComponent<PlayerElementComponent>().Player;
+                NoClipService.SetEnabledTo(player, value);
             }
         }
     }

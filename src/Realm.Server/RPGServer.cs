@@ -9,6 +9,7 @@ public partial class RPGServer : IInternalRPGServer, IRPGServer
     private readonly IElementCollection _elementCollection;
     private readonly ILogger _logger;
     private readonly ECS _ecs;
+    private readonly IServiceProvider _serviceProvider;
 
     public ECS ECS => _ecs;
     public event Action<Entity>? PlayerJoined;
@@ -55,7 +56,6 @@ public partial class RPGServer : IInternalRPGServer, IRPGServer
                     // Player specific
                     services.AddTransient<DiscordUser>();
 
-                    services.AddTransient<ServicesComponent>();
                     services.AddTransient<IEntityFactory, EntityFactory>();
 
                     if (modules != null)
@@ -69,6 +69,7 @@ public partial class RPGServer : IInternalRPGServer, IRPGServer
         );
 
         _ecs = GetRequiredService<ECS>();
+        _serviceProvider = GetRequiredService<IServiceProvider>();
         _logger = GetRequiredService<ILogger>().ForContext<RPGServer>();
         _logger.Information("Starting server:");
 
@@ -99,6 +100,11 @@ public partial class RPGServer : IInternalRPGServer, IRPGServer
     public TService GetRequiredService<TService>() where TService: notnull
     {
         return _server.GetRequiredService<TService>();
+    }
+    
+    public object GetRequiredService(Type type)
+    {
+        return _serviceProvider.GetRequiredService(type);
     }
 
     private Task HandleGuiFilesChanged()

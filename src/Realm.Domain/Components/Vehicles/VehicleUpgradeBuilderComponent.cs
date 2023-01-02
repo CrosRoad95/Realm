@@ -30,7 +30,7 @@ public class VehicleUpgradeBuilderComponent : Component
 
     private void RebuildUpgrades()
     {
-        var vehicle = Entity.InternalGetRequiredComponent<VehicleElementComponent>().Vehicle;
+        var vehicle = Entity.GetRequiredComponent<VehicleElementComponent>().Vehicle;
         var handling = VehicleHandlingConstants.DefaultVehicleHandling[vehicle.Model];
         foreach (var upgrade in Upgrades.Select(x => x.MaxVelocity).Where(x => x != null).Select(x => x!))
         {

@@ -4,7 +4,9 @@
 public class StatisticsCounterComponent : Component
 {
     private Player _player = default!;
-    private StatisticsCounterService _statisticsCounterService = default!;
+
+    [Inject]
+    private StatisticsCounterService StatisticsCounterService { get; set; } = default!;
 
     public float TraveledDistanceInVehicleAsDriver { get; set; }
     public float TraveledDistanceInVehicleAsPassager { get; set; }
@@ -20,19 +22,19 @@ public class StatisticsCounterComponent : Component
 
     public override Task Load()
     {
-        var player = Entity.InternalGetRequiredComponent<PlayerElementComponent>().Player;
+        var player = Entity.GetRequiredComponent<PlayerElementComponent>().Player;
         player.Disconnected += HandlePlayerDisconnected;
         return Task.CompletedTask;
     }
 
     private void HandlePlayerDisconnected(Player sender, SlipeServer.Server.Elements.Events.PlayerQuitEventArgs e)
     {
-        _statisticsCounterService.SetCounterEnabledFor(_player, false);
+        StatisticsCounterService.SetCounterEnabledFor(_player, false);
     }
 
     private void HandleStatisticsCollected(Player statisticsOfPlayer, Dictionary<string, float> statistics)
     {
-        var player = Entity.InternalGetRequiredComponent<PlayerElementComponent>().Player;
+        var player = Entity.GetRequiredComponent<PlayerElementComponent>().Player;
         if (player != statisticsOfPlayer)
             return;
 #pragma warning disable IDE0018 // Inline variable declaration

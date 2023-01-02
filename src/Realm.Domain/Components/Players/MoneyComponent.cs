@@ -2,6 +2,9 @@
 
 public class MoneyComponent : Component
 {
+    [Inject]
+    private RealmConfigurationProvider RealmConfigurationProvider { get; set; } = default!;
+
     private decimal _money = 0;
 
     public event Action<decimal>? MoneySet;
@@ -17,9 +20,7 @@ public class MoneyComponent : Component
             if (value < 0)
                 throw new GameplayException("Unable to set money, money can not get negative");
 
-            var configurationProvider = Entity.GetRequiredService<RealmConfigurationProvider>();
-
-            if (value > configurationProvider.GetRequired<decimal>("Gameplay:MoneyLimit"))
+            if (value > RealmConfigurationProvider.GetRequired<decimal>("Gameplay:MoneyLimit"))
                 throw new GameplayException("Unable to set money, reached limit.");
             _money = Normalize(value);
             MoneySet?.Invoke(_money);
@@ -38,19 +39,17 @@ public class MoneyComponent : Component
 
     private decimal Normalize(decimal amount)
     {
-        var configurationProvider = Entity.GetRequiredService<RealmConfigurationProvider>();
-        var moneyPrecision = configurationProvider.GetRequired<int>("Gameplay:MoneyPrecision");
+        var moneyPrecision = RealmConfigurationProvider.GetRequired<int>("Gameplay:MoneyPrecision");
         return Math.Round(amount, moneyPrecision, MidpointRounding.AwayFromZero);
     }
 
     public bool GiveMoney(decimal amount)
     {
-        var configurationProvider = Entity.GetRequiredService<RealmConfigurationProvider>();
 
         if (_money < 0)
             throw new GameplayException("Unable to give money, money can not get negative");
 
-        if (amount > configurationProvider.GetRequired<decimal>("Gameplay:MoneyLimit"))
+        if (amount > RealmConfigurationProvider.GetRequired<decimal>("Gameplay:MoneyLimit"))
             throw new GameplayException("Unable to give money, reached limit.");
 
         _money += Normalize(amount);
@@ -60,12 +59,10 @@ public class MoneyComponent : Component
 
     public bool TakeMoney(decimal amount)
     {
-        var configurationProvider = Entity.GetRequiredService<RealmConfigurationProvider>();
-
         if (_money > 0)
             throw new GameplayException("Unable to give money, money can not get negative");
 
-        var moneyPrecision = configurationProvider.GetRequired<int>("Gameplay:MoneyPrecision");
+        var moneyPrecision = RealmConfigurationProvider.GetRequired<int>("Gameplay:MoneyPrecision");
         _money -= Normalize(amount);
         MoneyRemoved?.Invoke(_money);
         return true;

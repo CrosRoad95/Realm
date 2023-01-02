@@ -2,12 +2,15 @@
 
 public class InventoryComponent : Component
 {
+
+    [Inject]
+    private ItemsRegistry ItemsRegistry { get; set; } = default!;
+
     private readonly List<Item> _items = new();
     public event Action<InventoryComponent, Item>? ItemAdded;
-    private ItemsRegistry? _itemsRegistry;
     public string Id { get; private set; } = Guid.NewGuid().ToString();
     public uint Size { get; set; }
-    public uint Number => (uint)_items.Sum(x => _itemsRegistry!.Get(x.ItemId).Size * x.Number);
+    public uint Number => (uint)_items.Sum(x => ItemsRegistry!.Get(x.ItemId).Size * x.Number);
 
     public IEnumerable<Item> Items => _items;
 
@@ -27,14 +30,7 @@ public class InventoryComponent : Component
         foreach (var item in _items)
             item.InventoryComponent = this;
     }
-
-    public ItemRegistryEntry GetItemRegistryEntry(uint id) => _itemsRegistry!.Get(id);
-
-    public override Task Load()
-    {
-        _itemsRegistry = Entity.GetRequiredService<ItemsRegistry>();
-        return Task.CompletedTask;
-    }
+    public ItemRegistryEntry GetItemRegistryEntry(uint id) => ItemsRegistry!.Get(id);
 
     public bool HasItem(uint itemId)
     {
@@ -43,7 +39,7 @@ public class InventoryComponent : Component
 
     public Item? AddItem(uint itemId)
     {
-        var itemRegistryEntry = _itemsRegistry.Get(itemId);
+        var itemRegistryEntry = ItemsRegistry.Get(itemId);
         var item = new Item(itemRegistryEntry);
         AddItem(item);
         return item;

@@ -3,4 +3,5 @@
 public interface IRPGServer
 {
     void AssociateElement(IElementHandle elementHandle);
+    object GetRequiredService(Type type);
 }

@@ -5,6 +5,9 @@ namespace Realm.Domain.Components.Elements;
 
 public class ProceduralObjectElementComponent : ElementComponent
 {
+    [Inject]
+    private AssetsService AssetsService { get; set; } = default!;
+
     public override Element Element => throw new NotImplementedException();
 
     ProceduralObjectElementComponent()
@@ -13,10 +16,9 @@ public class ProceduralObjectElementComponent : ElementComponent
 
     public override Task Load()
     {
-        var assetsService = Entity.GetRequiredService<AssetsService>();
         var modelFactory = new ModelFactory();
         modelFactory.AddTriangle(new Vector3(0, 0, 0), new Vector3(0, 10, 0), new Vector3(10, 10, 0));
-        assetsService.AddModel("test", modelFactory.Build());
+        AssetsService.AddModel("test", modelFactory.Build());
         return Task.CompletedTask;
     }
 }

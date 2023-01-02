@@ -2,6 +2,17 @@
 
 public sealed class PlayerElementComponent : ElementComponent
 {
+    [Inject]
+    private ChatBox ChatBox { get; set; } = default!;
+    [Inject]
+    private OverlayNotificationsService OverlayNotificationsService { get; set; } = default!;
+    [Inject]
+    private LuaInteropService LuaInteropService { get; set; } = default!;
+    [Inject]
+    private LuaValueMapper LuaValueMapper { get; set; } = default!;
+    [Inject]
+    private LuaEventService LuaEventService { get; set; } = default!;
+
     private readonly Player _player;
     private readonly Dictionary<string, Func<Entity, Task>> _binds = new();
     private readonly Dictionary<string, DateTime> _bindsCooldown = new();
@@ -52,48 +63,42 @@ public sealed class PlayerElementComponent : ElementComponent
 
     public void SendChatMessage(string message, Color? color = null, bool isColorCoded = false)
     {
-        var chatbox = Entity.GetRequiredService<ChatBox>();
-        chatbox.OutputTo(_player, message, color ?? Color.White, isColorCoded);
+        ChatBox.OutputTo(_player, message, color ?? Color.White, isColorCoded);
     }
 
     public void ClearChatBox()
     {
-        var chatbox = Entity.GetRequiredService<ChatBox>();
-        chatbox.ClearFor(_player);
+        ChatBox.ClearFor(_player);
     }
 
     #region LuaInterop resource
     public void SetClipboard(string content)
     {
-        var luaInteropService = Entity.GetRequiredService<LuaInteropService>();
-        luaInteropService.SetClipboard(_player, content);
+        LuaInteropService.SetClipboard(_player, content);
     }
     #endregion
 
     #region Overlay resource
     public void AddNotification(string message)
     {
-        var overlayNotificationsService = Entity.GetRequiredService<OverlayNotificationsService>();
-        overlayNotificationsService.AddNotification(_player, message);
+        OverlayNotificationsService.AddNotification(_player, message);
     }
     #endregion
 
     // TODO: improve
     public void TriggerClientEvent(string name, object[] values)
     {
-        var luaValueMapper = Entity.GetRequiredService<LuaValueMapper>();
-        var luaEventService = Entity.GetRequiredService<LuaEventService>();
         LuaValue luaValue;
         if (values.Length == 1 && values[0].GetType() == typeof(object[]))
         {
-            luaValue = ((object[])values[0]).Select(luaValueMapper.Map).ToArray();
+            luaValue = ((object[])values[0]).Select(LuaValueMapper.Map).ToArray();
         }
         else
         {
-            luaValue = values.Select(luaValueMapper.Map).ToArray();
+            luaValue = values.Select(LuaValueMapper.Map).ToArray();
         }
 
-        luaEventService.TriggerEventFor(_player, name, _player, luaValue);
+        LuaEventService.TriggerEventFor(_player, name, _player, luaValue);
     }
 
     public void SetBind(string key, Func<Entity, Task> callback)

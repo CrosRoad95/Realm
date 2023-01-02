@@ -2,6 +2,10 @@
 
 public class MarkerElementComponent : ElementComponent
 {
+
+    [Inject]
+    private IRPGServer _rpgServer { get; set; } = default!;
+
     protected readonly Marker _marker;
     public Action<Entity>? EntityEntered { get; set; }
     public Action<Entity>? EntityLeft { get; set; }
@@ -16,13 +20,13 @@ public class MarkerElementComponent : ElementComponent
     private void HandleElementEntered(Element element)
     {
         if(EntityEntered != null)
-            EntityEntered(ElementById.GetByElement(element));
+            EntityEntered(EntityByElement.GetByElement(element));
     }
 
     private void HandleElementLeft(Element element)
     {
         if(EntityLeft != null)
-            EntityLeft(ElementById.GetByElement(element));
+            EntityLeft(EntityByElement.GetByElement(element));
     }
 
     private void HandleDestroyed(Entity entity)
@@ -35,8 +39,7 @@ public class MarkerElementComponent : ElementComponent
         base.Load();
         Entity.Transform.Bind(_marker);
         _marker.Position = _marker.Position;
-        var server = Entity.GetRequiredService<IRPGServer>();
-        server.AssociateElement(new ElementHandle(_marker));
+        _rpgServer.AssociateElement(new ElementHandle(_marker));
         Entity.Destroyed += HandleDestroyed;
         return Task.CompletedTask;
     }

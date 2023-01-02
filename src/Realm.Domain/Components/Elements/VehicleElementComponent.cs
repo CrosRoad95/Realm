@@ -2,6 +2,9 @@
 
 public class VehicleElementComponent : ElementComponent
 {
+    [Inject]
+    private IRPGServer rpgServer { get; set; } = default!;
+
     protected readonly Vehicle _vehicle;
 
     public Vehicle Vehicle => _vehicle;
@@ -21,7 +24,7 @@ public class VehicleElementComponent : ElementComponent
 
     public override Task Load()
     {
-        Entity.GetRequiredService<IRPGServer>().AssociateElement(new ElementHandle(_vehicle));
+        rpgServer.AssociateElement(new ElementHandle(_vehicle));
         Entity.Destroyed += HandleDestroyed;
         Entity.Transform.Bind(_vehicle);
         return Task.CompletedTask;

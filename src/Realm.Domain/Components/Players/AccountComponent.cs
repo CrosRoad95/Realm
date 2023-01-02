@@ -2,6 +2,12 @@
 
 public class AccountComponent : Component
 {
+    [Inject]
+    private UserManager<User> UserManager { get; set; } = default!;
+
+    [Inject]
+    private SignInManager<User> SignInManager { get; set; } = default!;
+
     private readonly User _user;
     private ClaimsPrincipal? _claimsPrincipal;
 
@@ -33,16 +39,14 @@ public class AccountComponent : Component
             if(_user.RegisteredDateTime == null)
                 _user.RegisteredDateTime = DateTime.Now;
 
-            var userManager = Entity.GetRequiredService<UserManager<User>>();
-            await userManager.UpdateAsync(_user);
+            await UserManager.UpdateAsync(_user);
         }
         await UpdateClaimsPrincipal();
     }
 
     public async Task UpdateClaimsPrincipal()
     {
-        var signInManager = Entity.GetRequiredService<SignInManager<User>>();
-        _claimsPrincipal = await signInManager.CreateUserPrincipalAsync(_user);
+        _claimsPrincipal = await SignInManager.CreateUserPrincipalAsync(_user);
     }
 
     public bool IsInRole(string role)
@@ -62,9 +66,7 @@ public class AccountComponent : Component
 
     public async Task<bool> AddClaim(string type, string value)
     {
-        var userManager = Entity.GetRequiredService<UserManager<User>>();
-
-        var result = await userManager.AddClaimAsync(_user, new Claim(type, value));
+        var result = await UserManager.AddClaimAsync(_user, new Claim(type, value));
         if (result.Succeeded)
             await UpdateClaimsPrincipal();
         return result.Succeeded;
@@ -72,9 +74,7 @@ public class AccountComponent : Component
 
     public async Task<bool> AddClaims(Dictionary<string, string> claims)
     {
-        var userManager = Entity.GetRequiredService<UserManager<User>>();
-
-        var result = await userManager.AddClaimsAsync(_user, claims.Select(x => new Claim(x.Key, x.Value)));
+        var result = await UserManager.AddClaimsAsync(_user, claims.Select(x => new Claim(x.Key, x.Value)));
         if (result.Succeeded)
             await UpdateClaimsPrincipal();
         return result.Succeeded;
@@ -82,9 +82,7 @@ public class AccountComponent : Component
 
     public async Task<bool> AddRole(string role)
     {
-        var userManager = Entity.GetRequiredService<UserManager<User>>();
-
-        var result = await userManager.AddToRoleAsync(_user, role);
+        var result = await UserManager.AddToRoleAsync(_user, role);
         if (result.Succeeded)
             await UpdateClaimsPrincipal();
         return result.Succeeded;
@@ -92,9 +90,7 @@ public class AccountComponent : Component
 
     public async Task<bool> AddRoles(IEnumerable<string> role)
     {
-        var userManager = Entity.GetRequiredService<UserManager<User>>();
-
-        var result = await userManager.AddToRolesAsync(_user, role);
+        var result = await UserManager.AddToRolesAsync(_user, role);
         if (result.Succeeded)
             await UpdateClaimsPrincipal();
         return result.Succeeded;
@@ -102,23 +98,17 @@ public class AccountComponent : Component
 
     public async Task<IEnumerable<string>> GetClaims()
     {
-        var userManager = Entity.GetRequiredService<UserManager<User>>();
-
-        return (await userManager.GetClaimsAsync(_user)).Select(x => x.Type).ToList();
+        return (await UserManager.GetClaimsAsync(_user)).Select(x => x.Type).ToList();
     }
 
     public async Task<IEnumerable<string>> GetRoles()
     {
-        var userManager = Entity.GetRequiredService<UserManager<User>>();
-
-        return (await userManager.GetRolesAsync(_user)).ToList();
+        return (await UserManager.GetRolesAsync(_user)).ToList();
     }
 
     public async Task<bool> RemoveClaim(string type, string? value = null)
     {
-        var userManager = Entity.GetRequiredService<UserManager<User>>();
-
-        var claims = await userManager.GetClaimsAsync(_user);
+        var claims = await UserManager.GetClaimsAsync(_user);
         Claim? claim;
         if (value != null)
             claim = claims.FirstOrDefault(x => x.Type == type && x.Value == value);
@@ -127,7 +117,7 @@ public class AccountComponent : Component
 
         if (claim != null)
         {
-            var result = await userManager.RemoveClaimAsync(_user, claim);
+            var result = await UserManager.RemoveClaimAsync(_user, claim);
             if (result.Succeeded)
                 await UpdateClaimsPrincipal();
             return result.Succeeded;
@@ -137,9 +127,7 @@ public class AccountComponent : Component
 
     public async Task<bool> RemoveRole(string role)
     {
-        var userManager = Entity.GetRequiredService<UserManager<User>>();
-
-        var result = await userManager.RemoveFromRoleAsync(_user, role);
+        var result = await UserManager.RemoveFromRoleAsync(_user, role);
         if (result.Succeeded)
             await UpdateClaimsPrincipal();
         return result.Succeeded;
@@ -147,10 +135,8 @@ public class AccountComponent : Component
 
     public async Task<bool> RemoveAllClaims()
     {
-        var userManager = Entity.GetRequiredService<UserManager<User>>();
-
-        var claims = await userManager.GetClaimsAsync(_user);
-        var result = await userManager.RemoveClaimsAsync(_user, claims);
+        var claims = await UserManager.GetClaimsAsync(_user);
+        var result = await UserManager.RemoveClaimsAsync(_user, claims);
         if (result.Succeeded)
             await UpdateClaimsPrincipal();
         return result.Succeeded;

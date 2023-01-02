@@ -2,6 +2,9 @@
 
 public class BlipElementComponent : ElementComponent
 {
+    [Inject]
+    private IRPGServer rpgServer { get; set; } = default!;
+
     protected readonly Blip _blip;
 
     public override Element Element => _blip;
@@ -19,7 +22,7 @@ public class BlipElementComponent : ElementComponent
     public override Task Load()
     {
         _blip.Position = Entity.Transform.Position;
-        Entity.GetRequiredService<IRPGServer>().AssociateElement(new ElementHandle(_blip));
+        rpgServer.AssociateElement(new ElementHandle(_blip));
         Entity.Destroyed += HandleDestroyed;
         return Task.CompletedTask;
     }

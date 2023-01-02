@@ -1,4 +1,6 @@
-﻿using System.Diagnostics.CodeAnalysis;
+﻿using Microsoft.AspNetCore.Components;
+using System.Diagnostics.CodeAnalysis;
+using System.Reflection;
 
 namespace Realm.Domain;
 
@@ -25,13 +27,34 @@ public class Entity
 
     public event Action<Entity>? Destroyed;
 
-    public Entity(IRPGServer rpgServer, ServicesComponent servicesComponent, string name = "", string tag = "")
+    public Entity(IRPGServer rpgServer, string name = "", string tag = "")
     {
         _rpgServer = rpgServer;
         Name = name;
         Tag = tag;
         Transform = new Transform(this);
-        AddComponent(servicesComponent);
+    }
+
+    private void InjectProperties<TComponent>(TComponent component) where TComponent : Component
+    {
+        Action<Type, object> inject = default!;
+        inject = (Type type, object obj) =>
+        {
+            foreach (var property in type.GetProperties(BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.FlattenHierarchy))
+            {
+                if (property.GetCustomAttribute<InjectAttribute>() != null)
+                {
+                    property.SetValue(component, _rpgServer.GetRequiredService(property.PropertyType));
+                }
+            }
+
+            if (type != typeof(object))
+            {
+                inject(type.BaseType, obj);
+            }
+        };
+
+        inject(typeof(TComponent), component);
     }
 
     public TComponent AddComponent<TComponent>(TComponent component) where TComponent : Component
@@ -40,6 +63,7 @@ public class Entity
         {
             throw new Exception("Component already attached to other entity");
         }
+        InjectProperties(component);
         component.Entity = this;
         _components.Add(component);
         Task.Run(async () =>
@@ -56,6 +80,7 @@ public class Entity
         {
             throw new Exception("Component already attached to other entity");
         }
+        InjectProperties(component);
         component.Entity = this;
         _components.Add(component);
         await component.Load();
@@ -78,10 +103,8 @@ public class Entity
     public TComponent GetRequiredComponent<TComponent>() where TComponent : Component
         => _components.OfType<TComponent>().First();
 
-    public void DetachComponent<TComponent>() where TComponent: Component
-    {
-        DetachComponent(GetRequiredComponent<TComponent>());
-    }
+    public void DetachComponent<TComponent>() where TComponent : Component
+        => DetachComponent(GetRequiredComponent<TComponent>());
 
     public void DetachComponent<TComponent>(TComponent component) where TComponent: Component
     {
@@ -120,21 +143,6 @@ public class Entity
     }
 
     public IEnumerable<Component> GetComponents() => _components;
-
-    #region Internal
-    public TComponent? InternalGetComponent<TComponent>()
-        => _components.OfType<TComponent>().FirstOrDefault();
-
-    public TComponent InternalGetRequiredComponent<TComponent>()
-        => _components.OfType<TComponent>().First();
-
-    public List<Component> InternalGetComponents() => _components;
-
-    public T GetRequiredService<T>() where T: notnull
-    {
-        return InternalGetRequiredComponent<ServicesComponent>().GetRequiredService<T>();
-    }
-    #endregion
 
     public virtual void Destroy()
     {

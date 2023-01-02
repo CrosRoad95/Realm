@@ -2,6 +2,9 @@
 
 public class PickupElementComponent : ElementComponent
 {
+    [Inject]
+    private IRPGServer rpgServer { get; set; } = default!;
+
     protected readonly Pickup _pickup;
     public Action<Entity>? EntityEntered { get; set; }
     public Action<Entity>? EntityLeft { get; set; }
@@ -17,13 +20,13 @@ public class PickupElementComponent : ElementComponent
     private void HandleElementEntered(Element element)
     {
         if(EntityEntered != null)
-            EntityEntered(ElementById.GetByElement(element));
+            EntityEntered(EntityByElement.GetByElement(element));
     }
 
     private void HandleElementLeft(Element element)
     {
         if(EntityLeft != null)
-            EntityLeft(ElementById.GetByElement(element));
+            EntityLeft(EntityByElement.GetByElement(element));
     }
 
     private void HandleDestroyed(Entity entity)
@@ -39,9 +42,8 @@ public class PickupElementComponent : ElementComponent
         base.Load();
         Entity.Transform.Bind(_pickup);
         _pickup.CollisionShape.Position = _pickup.Position;
-        var server = Entity.GetRequiredService<IRPGServer>();
-        server.AssociateElement(new ElementHandle(_pickup));
-        server.AssociateElement(new ElementHandle(_pickup.CollisionShape));
+        rpgServer.AssociateElement(new ElementHandle(_pickup));
+        rpgServer.AssociateElement(new ElementHandle(_pickup.CollisionShape));
         Entity.Destroyed += HandleDestroyed;
         _pickup.CollisionShape.ElementEntered += HandleElementEntered;
         _pickup.CollisionShape.ElementLeft += HandleElementLeft;

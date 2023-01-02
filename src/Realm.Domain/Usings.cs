@@ -31,3 +31,4 @@ global using Realm.Configuration;
 global using Realm.Domain.Registries;
 global using Realm.Domain.Inventory;
 global using InventoryData = Realm.Persistance.Data.Inventory;
+global using Microsoft.AspNetCore.Components;

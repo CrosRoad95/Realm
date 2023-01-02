@@ -5,6 +5,8 @@ namespace Realm.Domain.Components.Players;
 
 public abstract class GuiComponent : Component
 {
+    [Inject]
+    private AgnosticGuiSystemService AgnosticGuiSystemService { get; set; } = default!;
     protected readonly string _name;
     protected readonly bool _cursorless;
 
@@ -16,17 +18,15 @@ public abstract class GuiComponent : Component
 
     public override async Task Load()
     {
-        var agnosticGuiSystemService = Entity.GetRequiredService<AgnosticGuiSystemService>();
-        agnosticGuiSystemService.FormSubmitted += HandleFormSubmitted;
-        agnosticGuiSystemService.ActionExecuted += HandleActionExecuted;
+        AgnosticGuiSystemService.FormSubmitted += HandleFormSubmitted;
+        AgnosticGuiSystemService.ActionExecuted += HandleActionExecuted;
         await OpenGui();
     }
 
     protected virtual async Task OpenGui()
     {
-        var agnosticGuiSystemService = Entity.GetRequiredService<AgnosticGuiSystemService>();
         var playerElementComponent = Entity.GetRequiredComponent<PlayerElementComponent>();
-        await agnosticGuiSystemService.OpenGui(playerElementComponent.Player, _name, _cursorless);
+        await AgnosticGuiSystemService.OpenGui(playerElementComponent.Player, _name, _cursorless);
     }
 
     private async void HandleActionExecuted(LuaEvent luaEvent)
@@ -47,7 +47,7 @@ public abstract class GuiComponent : Component
         if(guiName == _name)
         {
             string formName = luaEvent.Parameters[2].StringValue ?? throw new Exception();
-            await HandleForm(new FormContext(luaEvent.Player, formName, luaEvent.Parameters[3], Entity.GetRequiredService<AgnosticGuiSystemService>()));
+            await HandleForm(new FormContext(luaEvent.Player, formName, luaEvent.Parameters[3], AgnosticGuiSystemService));
         }
     }
 
@@ -56,12 +56,11 @@ public abstract class GuiComponent : Component
 
     public void Close()
     {
-        var agnosticGuiSystemService = Entity.GetRequiredService<AgnosticGuiSystemService>();
-        agnosticGuiSystemService.FormSubmitted -= HandleFormSubmitted;
-        agnosticGuiSystemService.ActionExecuted -= HandleActionExecuted;
+        AgnosticGuiSystemService.FormSubmitted -= HandleFormSubmitted;
+        AgnosticGuiSystemService.ActionExecuted -= HandleActionExecuted;
 
         var playerElementComponent = Entity.GetRequiredComponent<PlayerElementComponent>();
-        agnosticGuiSystemService.CloseGui(playerElementComponent.Player, _name);
+        AgnosticGuiSystemService.CloseGui(playerElementComponent.Player, _name);
     }
 
     public override void Destroy()

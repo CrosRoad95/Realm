@@ -31,7 +31,7 @@ public class MileageCounterComponent : Component
 
     public override Task Load()
     {
-        var vehicle = Entity.InternalGetRequiredComponent<VehicleElementComponent>().Vehicle;
+        var vehicle = Entity.GetRequiredComponent<VehicleElementComponent>().Vehicle;
         vehicle.PositionChanged += HandlePositionChanged;
         return Task.CompletedTask;
     }
@@ -44,7 +44,7 @@ public class MileageCounterComponent : Component
 
     private void Update()
     {
-        var vehicle = Entity.InternalGetRequiredComponent<VehicleElementComponent>().Vehicle;
+        var vehicle = Entity.GetRequiredComponent<VehicleElementComponent>().Vehicle;
         if (!vehicle.IsEngineOn)
         {
             _lastPosition = vehicle.Position;

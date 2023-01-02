@@ -32,7 +32,7 @@ public sealed class ECS : IEntityByElement
         if (_entityByName.ContainsKey(name))
             throw new Exception($"Entity of name {name} already exists");
 
-        var newlyCreatedEntity = new Entity(_server, _server.GetRequiredService<ServicesComponent>(), name, tag);
+        var newlyCreatedEntity = new Entity(_server, name, tag);
         _entities.Add(newlyCreatedEntity);
         _entityByName[name] = newlyCreatedEntity;
         if (entityBuilder != null)
@@ -48,7 +48,7 @@ public sealed class ECS : IEntityByElement
         if (_entityByName.ContainsKey(name))
             throw new Exception($"Entity of name {name} already exists");
 
-        var newlyCreatedEntity = new Entity(_server, _server.GetRequiredService<ServicesComponent>(), name, tag);
+        var newlyCreatedEntity = new Entity(_server, name, tag);
         _entities.Add(newlyCreatedEntity);
         _entityByName[name] = newlyCreatedEntity;
         if (entityBuilder != null)

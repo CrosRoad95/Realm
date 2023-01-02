@@ -4,6 +4,9 @@ namespace Realm.Domain.Components.World;
 
 public sealed class Text3dComponent : Component
 {
+    [Inject]
+    private Text3dService Text3dService { get; set; } = default!;
+
     private readonly string _text;
     private readonly Vector3? _offset;
     private int? _text3dId = null;
@@ -16,8 +19,7 @@ public sealed class Text3dComponent : Component
 
     public override Task Load()
     {
-        var text3DService = Entity.GetRequiredService<Text3dService>();
-        _text3dId = text3DService.CreateText3d(Entity.Transform.Position + _offset ?? Vector3.Zero, _text);
+        _text3dId = Text3dService.CreateText3d(Entity.Transform.Position + _offset ?? Vector3.Zero, _text);
         return Task.CompletedTask;
     }
 
@@ -25,7 +27,6 @@ public sealed class Text3dComponent : Component
     {
         if (_text3dId == null)
             throw new Exception("Bug?");
-        var text3DService = Entity.GetRequiredService<Text3dService>();
-        text3DService.RemoveText3d(_text3dId.Value);
+        Text3dService.RemoveText3d(_text3dId.Value);
     }
 }

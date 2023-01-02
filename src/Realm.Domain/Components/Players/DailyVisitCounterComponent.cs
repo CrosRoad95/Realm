@@ -34,7 +34,7 @@ public class DailyVisitsCounterComponent : Component
             reseted = true;
         }
 
-        var player = Entity.InternalGetRequiredComponent<PlayerElementComponent>().Player;
+        var player = Entity.GetRequiredComponent<PlayerElementComponent>().Player;
         PlayerVisited?.Invoke(player, VisitsInRow, reseted);
         LastVisit = DateTime.Now;
     }
