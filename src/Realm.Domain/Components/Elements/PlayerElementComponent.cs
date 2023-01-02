@@ -59,6 +59,17 @@ public sealed class PlayerElementComponent : ElementComponent
         _player.Camera.Fade(CameraFade.In);
         _player.Spawn(position, rotation?.Z ?? 0, 0, 0, 0);
         _player.Rotation = rotation ?? Vector3.Zero;
+        if(position != Vector3.Zero)
+        {
+            Task.Run(async () =>
+            {
+                await Task.Delay(250);
+                if(Entity.Transform.Position.LengthSquared() < 7)
+                {
+                    Entity.Transform.Position = position;
+                }
+            });
+        }
     }
 
     public void SendChatMessage(string message, Color? color = null, bool isColorCoded = false)

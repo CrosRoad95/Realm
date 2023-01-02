@@ -427,6 +427,34 @@ namespace Realm.Persistance.MySql.Migrations
                     b.ToTable("Vehicles", (string)null);
                 });
 
+            modelBuilder.Entity("Realm.Persistance.Data.VehicleAccess", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("longtext")
+                        .HasDefaultValue("{\"Ownership\":false}");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("char(36)");
+
+                    b.Property<string>("VehicleId")
+                        .IsRequired()
+                        .HasColumnType("varchar(255)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.HasIndex("VehicleId");
+
+                    b.ToTable("VehicleAccesses", (string)null);
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<System.Guid>", b =>
                 {
                     b.HasOne("Realm.Persistance.Data.Role", null)
@@ -509,6 +537,25 @@ namespace Realm.Persistance.MySql.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("Realm.Persistance.Data.VehicleAccess", b =>
+                {
+                    b.HasOne("Realm.Persistance.Data.User", "User")
+                        .WithMany("VehicleAccesses")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Realm.Persistance.Data.Vehicle", "Vehicle")
+                        .WithMany("VehicleAccesses")
+                        .HasForeignKey("VehicleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+
+                    b.Navigation("Vehicle");
+                });
+
             modelBuilder.Entity("Realm.Persistance.Data.Inventory", b =>
                 {
                     b.Navigation("InventoryItems");
@@ -517,6 +564,13 @@ namespace Realm.Persistance.MySql.Migrations
             modelBuilder.Entity("Realm.Persistance.Data.User", b =>
                 {
                     b.Navigation("Licenses");
+
+                    b.Navigation("VehicleAccesses");
+                });
+
+            modelBuilder.Entity("Realm.Persistance.Data.Vehicle", b =>
+                {
+                    b.Navigation("VehicleAccesses");
                 });
 #pragma warning restore 612, 618
         }

@@ -37,6 +37,11 @@ public abstract class Db<T> : IdentityDbContext<User, Role, Guid,
                 .HasMaxLength(400)
                 .HasConversion(x => x.Serialize(), x => TransformAndMotion.CreateFromString(x))
                 .HasDefaultValue(null);
+
+            entityBuilder
+                .HasMany(x => x.VehicleAccesses)
+                .WithOne(x => x.User)
+                .HasForeignKey(x => x.UserId);
         });
 
         modelBuilder.Entity<Inventory>(entityBuilder =>
@@ -167,6 +172,37 @@ public abstract class Db<T> : IdentityDbContext<User, Role, Guid,
             entityBuilder.Property(x => x.Spawned)
                 .HasDefaultValue(false)
                 .IsRequired();
+
+            entityBuilder
+                .HasMany(x => x.VehicleAccesses)
+                .WithOne(x => x.Vehicle)
+                .HasForeignKey(x => x.VehicleId);
+        });
+
+        modelBuilder.Entity<VehicleAccess>(entityBuilder =>
+        {
+            entityBuilder
+                .ToTable("VehicleAccesses")
+                .HasKey(x => x.Id);
+
+            entityBuilder
+                .Property(x => x.Id)
+                .ValueGeneratedOnAdd();
+
+            entityBuilder.Property(x => x.Description)
+                .HasConversion(x => x.Serialize(), x => VehicleAccessDescription.CreateFromString(x))
+                .HasDefaultValue(new VehicleAccessDescription())
+                .IsRequired();
+
+            entityBuilder
+                .HasOne(x => x.User)
+                .WithMany(x => x.VehicleAccesses)
+                .HasForeignKey(x => x.UserId);
+
+            entityBuilder
+                .HasOne(x => x.Vehicle)
+                .WithMany(x => x.VehicleAccesses)
+                .HasForeignKey(x => x.VehicleId);
         });
     }
 }

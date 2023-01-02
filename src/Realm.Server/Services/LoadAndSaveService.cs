@@ -70,7 +70,7 @@ internal class LoadAndSaveService : ILoadAndSaveService
                                 InventoryItems = new List<InventoryItem>()
                             };
                             updateInventory = false;
-                            context.Inventories.Add(user.Inventory);
+                            //context.Inventories.Add(user.Inventory);
                         }
 
                         user.Inventory.Size = inventoryComponent.Size;
@@ -86,7 +86,7 @@ internal class LoadAndSaveService : ILoadAndSaveService
                         if (updateInventory)
                         {
                             user.Inventory.Id = inventoryComponent.Id;
-                            context.Inventories.Update(user.Inventory);
+                            //context.Inventories.Update(user.Inventory);
                         }
                     }
                     user.LastTransformAndMotion = entity.Transform.GetTransformAndMotion();
@@ -152,7 +152,7 @@ internal class LoadAndSaveService : ILoadAndSaveService
                     vehicleData.IsFrozen = vehicle.IsFrozen;
                     vehicleData.TransformAndMotion = entity.Transform.GetTransformAndMotion();
                     context.Vehicles.Update(vehicleData);
-                    await context.SaveChangesAsync();
+                    System.Diagnostics.Debug.Assert(await context.SaveChangesAsync() == 1);
                 }
                 break;
         }
