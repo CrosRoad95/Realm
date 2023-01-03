@@ -151,8 +151,19 @@ internal class LoadAndSaveService : ILoadAndSaveService
                     vehicleData.Health = vehicle.Health;
                     vehicleData.IsFrozen = vehicle.IsFrozen;
                     vehicleData.TransformAndMotion = entity.Transform.GetTransformAndMotion();
+                    vehicleData.VehicleAccesses = privateVehicleComponent.VehicleAccesses.Select(x => new VehicleAccess
+                    {
+                        Id= x.Id,
+                        UserId = x.UserId,
+                        VehicleId = vehicleData.Id,
+                        Vehicle = vehicleData,
+                        Description = new Persistance.Data.Helpers.VehicleAccessDescription
+                        {
+                            Ownership = x.Ownership,
+                        },
+                    }).ToList();
                     context.Vehicles.Update(vehicleData);
-                    System.Diagnostics.Debug.Assert(await context.SaveChangesAsync() == 1);
+                    await context.SaveChangesAsync();
                 }
                 break;
         }
@@ -176,12 +187,17 @@ internal class LoadAndSaveService : ILoadAndSaveService
         // Load vehicles
         {
             using var vehicleRepository = _repositoryFactory.GetVehicleRepository();
-            foreach (var vehicleData in await vehicleRepository.GetAll().AsNoTrackingWithIdentityResolution().ToListAsync())
+            var results = await vehicleRepository
+                .GetAll()
+                .Include(x => x.VehicleAccesses)
+                .ThenInclude(x => x.User)
+                .AsNoTrackingWithIdentityResolution()
+                .ToListAsync();
+            foreach (var vehicleData in results)
             {
                 var entity = _entityFactory.CreateVehicle(vehicleData.Model, vehicleData.TransformAndMotion.Position, vehicleData.TransformAndMotion.Rotation, vehicleData.TransformAndMotion.Interior, vehicleData.TransformAndMotion.Dimension, $"vehicle {vehicleData.Id}");
                 entity.AddComponent(new PrivateVehicleComponent(vehicleData));
             }
         }
     }
-
 }

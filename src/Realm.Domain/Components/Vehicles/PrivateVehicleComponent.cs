@@ -1,4 +1,6 @@
 ﻿using VehicleData = Realm.Persistance.Data.Vehicle;
+using VehicleAccessData = Realm.Persistance.Data.VehicleAccess;
+using VehicleAccess = Realm.Domain.Concepts.VehicleAccess;
 
 namespace Realm.Domain.Components.Vehicles;
 
@@ -7,6 +9,10 @@ public class PrivateVehicleComponent : Component
     private readonly VehicleData _vehicleData;
 
     public VehicleData VehicleData => _vehicleData;
+
+    private List<VehicleAccess> _vehicleAccesses = new();
+    public IEnumerable<VehicleAccess> VehicleAccesses => _vehicleAccesses;
+
     public PrivateVehicleComponent(VehicleData vehicleData)
     {
         _vehicleData = vehicleData;
@@ -58,6 +64,33 @@ public class PrivateVehicleComponent : Component
         vehicle.IsTaxiLightOn = _vehicleData.TaxiLightState;
         vehicle.Health = _vehicleData.Health;
         vehicle.IsFrozen = _vehicleData.IsFrozen;
+        _vehicleAccesses = _vehicleData.VehicleAccesses.Select(x => new VehicleAccess
+        {
+            Id = x.Id,
+            UserId = x.User.Id,
+            Ownership = x.Description.Ownership
+        }).ToList();
+
         return Task.CompletedTask;
+    }
+
+    public VehicleAccess? TryGetAccess(Entity entity)
+    {
+        var userId = entity.GetRequiredComponent<AccountComponent>().Id;
+        return _vehicleAccesses.FirstOrDefault(x => x.UserId == userId);
+    }
+
+    public VehicleAccess AddOwner(Entity entity)
+    {
+        if (TryGetAccess(entity) != null)
+            throw new Exception("Entity already have defined access.");
+
+        var vehicleAccess = new VehicleAccess
+        {
+            UserId = entity.GetRequiredComponent<AccountComponent>().Id,
+            Ownership = true,
+        };
+        _vehicleAccesses.Add(vehicleAccess);
+        return vehicleAccess;
     }
 }

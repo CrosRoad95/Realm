@@ -1,4 +1,6 @@
-﻿namespace Realm.Console.Logic;
+﻿using Realm.Domain.Components.Players;
+
+namespace Realm.Console.Logic;
 
 internal sealed class CommandsLogic
 {
@@ -133,6 +135,32 @@ internal sealed class CommandsLogic
             using var vehicleRepository = _repositoryFactory.GetVehicleRepository();
             var vehicleEntity = _entityFactory.CreateVehicle(404, entity.Transform.Position + new Vector3(4, 0, 0), entity.Transform.Rotation);
             vehicleEntity.AddComponent(new PrivateVehicleComponent(await vehicleRepository.CreateNewVehicle()));
+        });
+
+        _commandService.AddCommandHandler("addmeasowner", async (entity, args) =>
+        {
+            var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();
+            var veh = playerElementComponent.OccupiedVehicle;
+            veh.GetRequiredComponent<PrivateVehicleComponent>().AddOwner(entity);
+        });
+
+        _commandService.AddCommandHandler("accessinfo", async (entity, args) =>
+        {
+            var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();
+            var veh = playerElementComponent.OccupiedVehicle;
+            if(veh == null)
+            {
+                playerElementComponent.SendChatMessage("Enter vehicle!");
+                return;
+            }
+
+            var privateVehicleComponent = veh.GetRequiredComponent<PrivateVehicleComponent>();
+            playerElementComponent.SendChatMessage("Access info:");
+
+            foreach (var vehicleAccess in privateVehicleComponent.VehicleAccesses)
+            {
+                playerElementComponent.SendChatMessage($"Access: ({vehicleAccess.UserId}) = Ownership={vehicleAccess.Ownership}");
+            }
         });
     }
 }

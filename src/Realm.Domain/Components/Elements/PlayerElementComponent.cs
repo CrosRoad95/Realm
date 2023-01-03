@@ -1,4 +1,6 @@
-﻿namespace Realm.Domain.Components.Elements;
+﻿using Realm.Domain.Interfaces;
+
+namespace Realm.Domain.Components.Elements;
 
 public sealed class PlayerElementComponent : ElementComponent
 {
@@ -12,6 +14,8 @@ public sealed class PlayerElementComponent : ElementComponent
     private LuaValueMapper LuaValueMapper { get; set; } = default!;
     [Inject]
     private LuaEventService LuaEventService { get; set; } = default!;
+    [Inject]
+    private IEntityByElement EntityByElement { get; set; } = default!;
 
     private readonly Player _player;
     private readonly Dictionary<string, Func<Entity, Task>> _binds = new();
@@ -25,6 +29,15 @@ public sealed class PlayerElementComponent : ElementComponent
 
     public override Element Element => _player;
 
+    public Entity? OccupiedVehicle
+    {
+        get
+        {
+            if (_player.Vehicle == null)
+                return null;
+            return EntityByElement.TryGetByElement(_player.Vehicle);
+        }
+    }
 
     public PlayerElementComponent(Player player)
     {
