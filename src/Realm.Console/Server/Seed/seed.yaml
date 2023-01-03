@@ -9,6 +9,9 @@ pickups:
   fractionTestPickup:
     model: 1275
     position: [353.39062, -100.552734, 1.3182049]
+  jobTestPickup:
+    model: 1274
+    position: [360.39062, -100.552734, 1.3182049]
 markers:
   testMarker:
     position: [357.81, -79.58, 1.07]

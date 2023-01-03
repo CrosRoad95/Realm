@@ -11,6 +11,7 @@ public class Entity
     public const string BlipTag = "blip";
     public const string PickupTag = "pickup";
     public const string MarkerTag = "marker";
+    public const string CollisionShape = "collisionShape";
 
     public string Id { get; set; } = Guid.NewGuid().ToString();
     public string Tag { get; set; } = "";
