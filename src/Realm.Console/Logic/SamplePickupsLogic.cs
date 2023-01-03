@@ -61,8 +61,8 @@ internal class SamplePickupsLogic
                     playerElementComponent.SendChatMessage($"Session started");
                     jobSessionComponent.Start();
 
-                    var marker = _entityFactory.CreateMarker(MarkerType.Arrow, new Vector3(383.6543f, -82.01953f, 3.914598f));
-                    var collisionSphere = _entityFactory.CreateCollisionSphere(new Vector3(383.6543f, -82.01953f, 3.914598f), 2);
+                    var marker = _entityFactory.CreateMarkerFor(entity,  MarkerType.Arrow, new Vector3(383.6543f, -82.01953f, 3.914598f));
+                    var collisionSphere = _entityFactory.CreateCollisionSphereFor(entity, new Vector3(383.6543f, -82.01953f, 3.914598f), 2);
                     var objective = jobSessionComponent.AddObjective(new MarkerEnterObjective(marker, collisionSphere));
                     objective.Completed += e =>
                     {

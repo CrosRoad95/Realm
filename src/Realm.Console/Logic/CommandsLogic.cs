@@ -1,4 +1,5 @@
 ﻿using Realm.Domain.Components.Players;
+using SlipeServer.Server.Elements;
 
 namespace Realm.Console.Logic;
 
@@ -135,6 +136,13 @@ internal sealed class CommandsLogic
             using var vehicleRepository = _repositoryFactory.GetVehicleRepository();
             var vehicleEntity = _entityFactory.CreateVehicle(404, entity.Transform.Position + new Vector3(4, 0, 0), entity.Transform.Rotation);
             vehicleEntity.AddComponent(new PrivateVehicleComponent(await vehicleRepository.CreateNewVehicle()));
+        });
+        
+        _commandService.AddCommandHandler("privateblip", (entity, args) =>
+        {
+            using var vehicleRepository = _repositoryFactory.GetVehicleRepository();
+            var blipEntity = _entityFactory.CreateBlipFor(entity, BlipIcon.Pizza, entity.Transform.Position);
+            return Task.CompletedTask;
         });
 
         _commandService.AddCommandHandler("addmeasowner", async (entity, args) =>
