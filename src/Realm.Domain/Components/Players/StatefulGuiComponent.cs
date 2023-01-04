@@ -1,4 +1,6 @@
-﻿namespace Realm.Domain.Components.Players;
+﻿using System.Data;
+
+namespace Realm.Domain.Components.Players;
 
 public abstract class StatefulGuiComponent<TState> : GuiComponent
 {
@@ -31,7 +33,8 @@ public abstract class StatefulGuiComponent<TState> : GuiComponent
     protected TValue? GetStateValue<TValue>(Expression<Func<TState, TValue>> exp)
     {
         if (exp.Body is not MemberExpression memberExpression)
-            throw new Exception();
+            throw new InvalidExpressionException();
+
         var property = (PropertyInfo)memberExpression.Member;
         return (TValue?)property.GetValue(_state);
     }
@@ -39,7 +42,8 @@ public abstract class StatefulGuiComponent<TState> : GuiComponent
     protected void ChangeState<TValue>(Expression<Func<TState, TValue>> exp, TValue value)
     {
         if (exp.Body is not MemberExpression memberExpression)
-            throw new Exception();
+            throw new InvalidExpressionException();
+
         var property = (PropertyInfo)memberExpression.Member;
         if(property.GetValue(_state) != value as object)
         {

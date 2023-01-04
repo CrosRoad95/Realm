@@ -1,4 +1,5 @@
-﻿using Realm.Domain.Interfaces;
+﻿using Realm.Domain.Exceptions;
+using Realm.Domain.Interfaces;
 
 namespace Realm.Domain.Components.Elements;
 
@@ -14,8 +15,6 @@ public sealed class PlayerElementComponent : ElementComponent
     private LuaValueMapper LuaValueMapper { get; set; } = default!;
     [Inject]
     private LuaEventService LuaEventService { get; set; } = default!;
-    [Inject]
-    private IEntityByElement EntityByElement { get; set; } = default!;
 
     private readonly Player _player;
     private readonly Dictionary<string, Func<Entity, Task>> _binds = new();
@@ -133,14 +132,19 @@ public sealed class PlayerElementComponent : ElementComponent
     public void SetBind(string key, Func<Entity, Task> callback)
     {
         if (_binds.ContainsKey(key))
-            throw new Exception();
+            throw new BindAlreadyExistsException(key);
 
         _player.SetBind(key, KeyState.Up);
         _binds[key] = callback;
         _player.BindExecuted += HandleBindExecuted;
     }
 
-    private async void HandleBindExecuted(Player sender, SlipeServer.Server.Elements.Events.PlayerBindExecutedEventArgs e)
+    public void ResetCooldown(string key)
+    {
+        _bindsCooldown.Remove(key);
+    }
+
+    private async void HandleBindExecuted(Player sender, PlayerBindExecutedEventArgs e)
     {
         if (!_binds.ContainsKey(e.Key))
             return;

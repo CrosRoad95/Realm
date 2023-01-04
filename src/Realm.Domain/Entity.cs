@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Components;
+using Realm.Domain.Exceptions;
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 
@@ -18,19 +19,20 @@ public class Entity
     public string Name { get; set; } = "";
 
     private readonly List<Component> _components = new();
-    private readonly IRPGServer _rpgServer;
+    public IEnumerable<Component> Components => _components;
+
+    private readonly IServiceProvider _serviceProvider;
 
     public Transform Transform { get; private set; }
-    public IRPGServer Server => _rpgServer;
 
     public event Action<Component>? ComponentAdded;
     public event Action<Component>? ComponentRemoved;
 
     public event Action<Entity>? Destroyed;
 
-    public Entity(IRPGServer rpgServer, string name = "", string tag = "")
+    public Entity(IServiceProvider serviceProvider, string name = "", string tag = "")
     {
-        _rpgServer = rpgServer;
+        _serviceProvider = serviceProvider;
         Name = name;
         Tag = tag;
         Transform = new Transform(this);
@@ -45,7 +47,7 @@ public class Entity
             {
                 if (property.GetCustomAttribute<InjectAttribute>() != null)
                 {
-                    property.SetValue(component, _rpgServer.GetRequiredService(property.PropertyType));
+                    property.SetValue(component, _serviceProvider.GetRequiredService(property.PropertyType));
                 }
             }
 
@@ -95,14 +97,19 @@ public class Entity
     public bool HasComponent<TComponent>() where TComponent : Component
         => _components.OfType<TComponent>().Any();
     
-    public bool TryGetComponent<TComponent>([NotNullWhen(true)] out TComponent component) where TComponent : Component
+    public bool TryGetComponent<TComponent>([NotNullWhen(true)] out TComponent? component) where TComponent : Component
     {
         component = GetComponent<TComponent>();
         return component != null;
     }
 
     public TComponent GetRequiredComponent<TComponent>() where TComponent : Component
-        => _components.OfType<TComponent>().First();
+    {
+        var component = GetComponent<TComponent>();
+        if (component == null)
+            throw new ComponentNotFoundException<TComponent>();
+        return component;
+    }
 
     public void DetachComponent<TComponent>() where TComponent : Component
         => DetachComponent(GetRequiredComponent<TComponent>());
@@ -116,7 +123,7 @@ public class Entity
             ComponentRemoved?.Invoke(component);
         }
         else
-            throw new Exception();
+            throw new InvalidOperationException("Component is not attached to this entity");
     }
 
     public void DestroyComponent<TComponent>(TComponent component) where TComponent: Component
@@ -127,7 +134,7 @@ public class Entity
 
     public bool TryDestroyComponent<TComponent>() where TComponent: Component
     {
-        var component = GetRequiredComponent<TComponent>();
+        var component = GetComponent<TComponent>();
         if(component != null)
         {
             component.Destroy();
@@ -136,14 +143,13 @@ public class Entity
         }
         return false;
     }
+
     public void DestroyComponent<TComponent>() where TComponent: Component
     {
         var component = GetRequiredComponent<TComponent>();
         component.Destroy();
         DetachComponent(component);
     }
-
-    public IEnumerable<Component> GetComponents() => _components;
 
     public virtual void Destroy()
     {

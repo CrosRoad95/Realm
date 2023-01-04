@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿using Realm.Domain.Exceptions;
+using System.Diagnostics;
 
 namespace Realm.Domain.Components.Players;
 
@@ -18,7 +19,7 @@ public abstract class SessionComponent : Component
     public void Start()
     {
         if (IsRunning)
-            throw new Exception("Session already started");
+            throw new SessionAlreadyRunningException();
         _stopwatch.Reset();
         _stopwatch.Start();
         SessionStarted?.Invoke(Entity);

@@ -37,6 +37,7 @@ internal sealed class PlayerBindsLogic
                 }
 
                 entity.AddComponent(new DashboardGuiComponent());
+                playerElementComponent.ResetCooldown("F1");
                 return Task.CompletedTask;
             });
         }

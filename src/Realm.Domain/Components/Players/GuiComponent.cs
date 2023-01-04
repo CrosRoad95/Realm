@@ -31,22 +31,22 @@ public abstract class GuiComponent : Component
 
     private async void HandleActionExecuted(LuaEvent luaEvent)
     {
-        //string id = luaEvent.Parameters[0].StringValue ?? throw new Exception();
-        string guiName = luaEvent.Parameters[1].StringValue ?? throw new Exception();
+        //string id = luaEvent.Parameters[0].StringValue ?? throw new InvalidOperationException();
+        string guiName = luaEvent.Parameters[1].StringValue ?? throw new InvalidOperationException();
         if (guiName == _name)
         {
-            string actionName = luaEvent.Parameters[2].StringValue ?? throw new Exception();
+            string actionName = luaEvent.Parameters[2].StringValue ?? throw new InvalidOperationException();
             await HandleAction(new ActionContext(actionName, luaEvent.Parameters[3]));
         }
     }
 
     private async void HandleFormSubmitted(LuaEvent luaEvent)
     {
-        //string id = luaEvent.Parameters[0].StringValue ?? throw new Exception();
-        string guiName = luaEvent.Parameters[1].StringValue ?? throw new Exception();
+        //string id = luaEvent.Parameters[0].StringValue ?? throw new InvalidOperationException();
+        string guiName = luaEvent.Parameters[1].StringValue ?? throw new InvalidOperationException();
         if(guiName == _name)
         {
-            string formName = luaEvent.Parameters[2].StringValue ?? throw new Exception();
+            string formName = luaEvent.Parameters[2].StringValue ?? throw new InvalidOperationException();
             await HandleForm(new FormContext(luaEvent.Player, formName, luaEvent.Parameters[3], AgnosticGuiSystemService));
         }
     }

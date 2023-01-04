@@ -1,6 +1,7 @@
 ﻿using VehicleData = Realm.Persistance.Data.Vehicle;
 using VehicleAccessData = Realm.Persistance.Data.VehicleAccess;
 using VehicleAccess = Realm.Domain.Concepts.VehicleAccess;
+using Realm.Domain.Exceptions;
 
 namespace Realm.Domain.Components.Vehicles;
 
@@ -83,7 +84,7 @@ public class PrivateVehicleComponent : Component
     public VehicleAccess AddOwner(Entity entity)
     {
         if (TryGetAccess(entity) != null)
-            throw new Exception("Entity already have defined access.");
+            throw new EntityAccessDefinedException();
 
         var vehicleAccess = new VehicleAccess
         {

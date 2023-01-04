@@ -1,4 +1,5 @@
-﻿using Realm.Domain.Interfaces;
+﻿using Realm.Domain.Exceptions;
+using Realm.Domain.Interfaces;
 
 namespace Realm.Server;
 
@@ -29,33 +30,16 @@ public sealed class ECS : IEntityByElement
 
     public Entity? TryGetByElement(Element element)
     {
-        Entity? result;
-        _entityByElement.TryGetValue(element, out result);
+        _entityByElement.TryGetValue(element, out Entity? result);
         return result;
-    }
-
-    public async Task<Entity> CreateEntityAsync(string name, string tag, Func<Entity, Task>? entityBuilder = null)
-    {
-        if (_entityByName.ContainsKey(name))
-            throw new Exception($"Entity of name {name} already exists");
-
-        var newlyCreatedEntity = new Entity(_server, name, tag);
-        _entities.Add(newlyCreatedEntity);
-        _entityByName[name] = newlyCreatedEntity;
-        if (entityBuilder != null)
-            await entityBuilder(newlyCreatedEntity);
-        newlyCreatedEntity.ComponentAdded += HandleComponentAdded;
-        newlyCreatedEntity.Destroyed += HandleEntityDestroyed;
-        EntityCreated?.Invoke(newlyCreatedEntity);
-        return newlyCreatedEntity;
     }
     
     public Entity CreateEntity(string name, string tag, Action<Entity>? entityBuilder = null)
     {
         if (_entityByName.ContainsKey(name))
-            throw new Exception($"Entity of name {name} already exists");
+            throw new EntityAlreadyExistsException(name);
 
-        var newlyCreatedEntity = new Entity(_server, name, tag);
+        var newlyCreatedEntity = new Entity(_server.GetRequiredService<IServiceProvider>(), name, tag);
         _entities.Add(newlyCreatedEntity);
         _entityByName[name] = newlyCreatedEntity;
         if (entityBuilder != null)
@@ -81,6 +65,7 @@ public sealed class ECS : IEntityByElement
             _entityByElement[elementComponent.Element] = component.Entity;
             component.Entity.ComponentRemoved += HandleElementComponentRemoved;
         }
+
         if (component is PlayerElementComponent playerElementComponent)
         {
             var player = playerElementComponent.Player;
@@ -92,9 +77,8 @@ public sealed class ECS : IEntityByElement
 
     private void HandleElementComponentRemoved(Component component)
     {
-        if (component is not ElementComponent elementComponent)
-            return;
-        _entityByElement.Remove(elementComponent.Element);
+        if (component is ElementComponent elementComponent)
+            _entityByElement.Remove(elementComponent.Element);
     }
 
     private void HandlePlayerDisconnected(Player player, SlipeServer.Server.Elements.Events.PlayerQuitEventArgs e)

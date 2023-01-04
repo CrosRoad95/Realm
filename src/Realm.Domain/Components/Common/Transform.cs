@@ -1,4 +1,6 @@
-﻿namespace Realm.Domain.Components.Common;
+﻿using Realm.Domain.Exceptions;
+
+namespace Realm.Domain.Components.Common;
 
 public sealed class Transform
 {
@@ -70,7 +72,7 @@ public sealed class Transform
     public void Bind(Element element)
     {
         if (_isBounded)
-            throw new Exception("Transform already bounded");
+            throw new TransformAlreadyBoundException();
         _isBounded = true;
         element.Position = _position;
         if(element.ElementType != ElementType.Pickup)

@@ -111,7 +111,7 @@ public partial class RPGServer : IInternalRPGServer, IRPGServer
     {
         foreach (var entity in _ecs.Entities)
         {
-            var guiComponents = entity.GetComponents().OfType<GuiComponent>().ToList();
+            var guiComponents = entity.Components.OfType<GuiComponent>().ToList();
             foreach (var guiComponent in guiComponents)
             {
                 guiComponent.Close();
