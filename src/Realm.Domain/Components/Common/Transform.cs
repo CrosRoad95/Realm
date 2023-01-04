@@ -73,7 +73,8 @@ public sealed class Transform
             throw new Exception("Transform already bounded");
         _isBounded = true;
         element.Position = _position;
-        element.Rotation = _rotation;
+        if(element.ElementType != ElementType.Pickup)
+            element.Rotation = _rotation;
         element.Interior = _interior;
         element.Dimension = _dimension;
         element.PositionChanged += HandlePositionChanged;
