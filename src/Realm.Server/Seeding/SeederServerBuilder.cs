@@ -15,7 +15,7 @@ internal sealed class SeederServerBuilder
     private readonly EntityByStringIdCollection _elementByStringIdCollection;
     private readonly VehicleUpgradeByStringCollection _vehicleUpgradeByStringCollection;
     private readonly IServerFilesProvider _serverFilesProvider;
-    private readonly IInternalRPGServer _rpgServer;
+    private readonly ECS _ecs;
     private readonly UserManager<User> _userManager;
     private readonly RoleManager<Role> _roleManager;
     private readonly ILogger _logger;
@@ -27,12 +27,12 @@ internal sealed class SeederServerBuilder
     private readonly Dictionary<string, User> _createdUsers = new();
     public SeederServerBuilder(ILogger logger,
         EntityByStringIdCollection elementByStringIdCollection, VehicleUpgradeByStringCollection vehicleUpgradeByStringCollection,
-        IServerFilesProvider serverFilesProvider, IInternalRPGServer rpgServer, UserManager<User> userManager, RoleManager<Role> roleManager)
+        IServerFilesProvider serverFilesProvider, ECS ecs, UserManager<User> userManager, RoleManager<Role> roleManager)
     {
         _elementByStringIdCollection = elementByStringIdCollection;
         _vehicleUpgradeByStringCollection = vehicleUpgradeByStringCollection;
         _serverFilesProvider = serverFilesProvider;
-        _rpgServer = rpgServer;
+        _ecs = ecs;
         _userManager = userManager;
         _roleManager = roleManager;
         _logger = logger.ForContext<SeederServerBuilder>();
@@ -47,7 +47,7 @@ internal sealed class SeederServerBuilder
 
     private Entity CreateEntity(string key, string tag, Action<Entity> entityBuilder)
     {
-        var entity = _rpgServer.ECS.CreateEntity(key, tag, entityBuilder);
+        var entity = _ecs.CreateEntity(key, tag, entityBuilder);
         AssignElementToId(entity, key);
         return entity;
     }

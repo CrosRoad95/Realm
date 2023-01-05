@@ -2,7 +2,7 @@
 
 public abstract class Component
 {
-    public Entity Entity { get; set; } = default!;
+    public Entity Entity { get; internal set; } = default!;
 
     public virtual Task Load() => Task.CompletedTask;
 

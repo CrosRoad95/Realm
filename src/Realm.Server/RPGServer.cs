@@ -3,28 +3,14 @@ using Realm.Domain.Registries;
 
 namespace Realm.Server;
 
-public partial class RPGServer : IInternalRPGServer, IRPGServer
+public partial class RPGServer : IRPGServer
 {
     private readonly MtaServer<Player> _server;
-    private readonly IElementCollection _elementCollection;
     private readonly ILogger _logger;
     private readonly ECS _ecs;
     private readonly IServiceProvider _serviceProvider;
 
     public ECS ECS => _ecs;
-    public event Action<Entity>? PlayerJoined;
-
-    public string MapName
-    {
-        get => _server.MapName;
-        set => _server.MapName = value;
-    }
-
-    public string GameType
-    {
-        get => _server.GameType;
-        set => _server.GameType = value;
-    }
 
     public RPGServer(RealmConfigurationProvider realmConfigurationProvider, List<IModule> modules, Action<ServerBuilder>? configureServerBuilder = null)
     {
@@ -38,7 +24,6 @@ public partial class RPGServer : IInternalRPGServer, IRPGServer
                 {
                     // Common
                     services.AddSingleton(realmConfigurationProvider);
-                    services.AddSingleton((IInternalRPGServer)this);
                     services.AddSingleton((IRPGServer)this);
                     services.AddSingleton(this);
                     services.AddSingleton<EntityByStringIdCollection>();
@@ -79,8 +64,6 @@ public partial class RPGServer : IInternalRPGServer, IRPGServer
         _server.GameType = serverListConfiguration.GameType;
         _server.MapName = serverListConfiguration.MapName;
 
-        _elementCollection = _server.GetRequiredService<IElementCollection>();
-
         _server.PlayerJoined += HandlePlayerJoined;
     }
 
@@ -92,9 +75,10 @@ public partial class RPGServer : IInternalRPGServer, IRPGServer
 
     private void HandlePlayerJoined(Player player)
     {
-        var playerEntity = _ecs.CreateEntity("Player " + player.Name, Entity.PlayerTag);
-        playerEntity.AddComponent(new PlayerElementComponent(player));
-        PlayerJoined?.Invoke(playerEntity);
+        _ecs.CreateEntity("Player " + player.Name, Entity.PlayerTag, entity =>
+        {
+            entity.AddComponent(new PlayerElementComponent(player));
+        });
     }
 
     public TService GetRequiredService<TService>() where TService: notnull

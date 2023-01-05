@@ -1,9 +1,8 @@
 ﻿using Realm.Domain.Concepts.Objectives;
-using System.Collections.Generic;
 
-namespace Realm.Domain.Components.Players;
+namespace Realm.Domain.Components.Players.Jobs;
 
-public class JobSessionComponent : SessionComponent
+public abstract class JobSessionComponent : SessionComponent
 {
     private readonly List<Objective> _objectives = new();
     public IEnumerable<Objective> Objectives => _objectives;
@@ -14,7 +13,7 @@ public class JobSessionComponent : SessionComponent
 
     public void RemoveObjective(Objective objective)
     {
-        if(!objective.IsFulfilled)
+        if (!objective.IsFulfilled)
             objective.Incomplete();
         objective.Dispose();
         _objectives.Remove(objective);
@@ -35,7 +34,7 @@ public class JobSessionComponent : SessionComponent
 
     public override void Destroy()
     {
-        while(_objectives.Count > 0)
+        while (_objectives.Count > 0)
         {
             RemoveObjective(_objectives.Last());
         }

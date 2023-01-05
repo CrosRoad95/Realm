@@ -1,7 +1,4 @@
-﻿using Realm.Assets.Factories;
-using Realm.Resources.Assets;
-
-namespace Realm.Domain.Components.Elements;
+﻿namespace Realm.Domain.Components.Elements;
 
 public class ProceduralObjectElementComponent : ElementComponent
 {

@@ -1,6 +1,4 @@
-﻿using RenderWareIo.Structs.Dff;
-using SlipeServer.Server.Elements;
-using SlipeServer.Server.Elements.ColShapes;
+﻿using SlipeServer.Server.Elements.ColShapes;
 using SlipeServer.Server.Elements.IdGeneration;
 
 namespace Realm.Server.Factories;

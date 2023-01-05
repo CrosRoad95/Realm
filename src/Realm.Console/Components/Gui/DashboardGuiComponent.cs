@@ -26,6 +26,8 @@ public sealed class DashboardGuiComponent : StatefulGuiComponent<DashboardGuiCom
             case "counter":
                 ChangeState(x => x.Counter, GetStateValue(x => x.Counter) + 1);
                 break;
+            default:
+                throw new NotImplementedException();
         }
     }
 }

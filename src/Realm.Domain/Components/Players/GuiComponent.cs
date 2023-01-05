@@ -1,7 +1,4 @@
-﻿using Realm.Domain.Contextes;
-using SlipeServer.Server.Events;
-
-namespace Realm.Domain.Components.Players;
+﻿namespace Realm.Domain.Components.Players;
 
 public abstract class GuiComponent : Component
 {
@@ -36,7 +33,14 @@ public abstract class GuiComponent : Component
         if (guiName == _name)
         {
             string actionName = luaEvent.Parameters[2].StringValue ?? throw new InvalidOperationException();
-            await HandleAction(new ActionContext(actionName, luaEvent.Parameters[3]));
+            try
+            {
+                await HandleAction(new ActionContext(actionName, luaEvent.Parameters[3]));
+            }
+            catch(Exception ex)
+            {
+                throw; // TODO: Handle exception
+            }
         }
     }
 
@@ -47,12 +51,16 @@ public abstract class GuiComponent : Component
         if(guiName == _name)
         {
             string formName = luaEvent.Parameters[2].StringValue ?? throw new InvalidOperationException();
-            await HandleForm(new FormContext(luaEvent.Player, formName, luaEvent.Parameters[3], AgnosticGuiSystemService));
+            try
+            {
+                await HandleForm(new FormContext(luaEvent.Player, formName, luaEvent.Parameters[3], AgnosticGuiSystemService));
+            }
+            catch(Exception ex)
+            {
+                throw; // TODO: Handle exception
+            }
         }
     }
-
-    protected abstract Task HandleForm(IFormContext formContext);
-    protected abstract Task HandleAction(IActionContext actionContext);
 
     public void Close()
     {
@@ -67,4 +75,7 @@ public abstract class GuiComponent : Component
     {
         Close();
     }
+
+    protected abstract Task HandleForm(IFormContext formContext);
+    protected abstract Task HandleAction(IActionContext actionContext);
 }

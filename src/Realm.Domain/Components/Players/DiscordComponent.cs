@@ -1,6 +1,4 @@
-﻿using Realm.Domain.Persistance;
-
-namespace Realm.Domain.Components.Players;
+﻿namespace Realm.Domain.Components.Players;
 
 public class DiscordComponent : Component
 {

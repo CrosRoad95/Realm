@@ -1,8 +1,4 @@
-﻿using Realm.Domain.Components.World;
-using Realm.Domain.Concepts.Objectives;
-using SlipeServer.Server.Elements;
-
-namespace Realm.Console.Logic;
+﻿namespace Realm.Console.Logic;
 
 internal class SamplePickupsLogic
 {
@@ -65,7 +61,7 @@ internal class SamplePickupsLogic
                 }
                 else
                 {
-                    var jobSessionComponent = await entity.AddComponentAsync(new JobSessionComponent());
+                    var jobSessionComponent = await entity.AddComponentAsync(new TestJobComponent());
                     playerElementComponent.SendChatMessage($"Session started");
                     jobSessionComponent.Start();
 

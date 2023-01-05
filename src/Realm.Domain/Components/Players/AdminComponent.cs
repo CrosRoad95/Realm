@@ -1,6 +1,4 @@
-﻿using Microsoft.AspNetCore.Components;
-using Realm.Resources.AdminTools;
-using RenderWareIo.Structs.Ide;
+﻿using Realm.Resources.AdminTools;
 using SlipeServer.Resources.NoClip;
 
 namespace Realm.Domain.Components.Players;

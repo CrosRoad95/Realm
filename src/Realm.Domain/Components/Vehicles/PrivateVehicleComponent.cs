@@ -1,5 +1,4 @@
 ﻿using VehicleData = Realm.Persistance.Data.Vehicle;
-using VehicleAccessData = Realm.Persistance.Data.VehicleAccess;
 using VehicleAccess = Realm.Domain.Concepts.VehicleAccess;
 using Realm.Domain.Exceptions;
 

@@ -5,14 +5,14 @@ namespace Realm.Server.Services;
 public class RPGCommandService
 {
     private readonly CommandService _commandService;
-    private readonly IInternalRPGServer _rpgServer;
+    private readonly ECS _ecs;
     private readonly ILogger _logger;
 
     private readonly List<Command> _commands = new();
-    public RPGCommandService(CommandService commandService, ILogger logger, IInternalRPGServer rpgServer)
+    public RPGCommandService(CommandService commandService, ILogger logger, ECS ecs)
     {
         _commandService = commandService;
-        _rpgServer = rpgServer;
+        _ecs = ecs;
         _logger = logger.ForContext<RPGCommandService>();
     }
 
@@ -32,7 +32,7 @@ public class RPGCommandService
         command.Triggered += async (source, args) =>
         {
             var player = args.Player;
-            var entity = _rpgServer.ECS.GetEntityByPlayer(player);
+            var entity = _ecs.GetEntityByPlayer(player);
             using var playerProperty = LogContext.PushProperty("player", player);
             using var commandNameProperty = LogContext.PushProperty("commandName", commandName);
             using var commandArgumentProperty = LogContext.PushProperty("commandArguments", args.Arguments);

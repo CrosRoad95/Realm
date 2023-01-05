@@ -1,7 +1,4 @@
-﻿using SlipeServer.Server.Constants;
-using VehicleUpgrade = Realm.Domain.Upgrades.VehicleUpgrade;
-
-namespace Realm.Domain.Components.Vehicles;
+﻿namespace Realm.Domain.Components.Vehicles;
 
 [Serializable]
 public class VehicleUpgradeBuilderComponent : Component

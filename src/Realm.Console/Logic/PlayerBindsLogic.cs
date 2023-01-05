@@ -2,18 +2,19 @@
 
 internal sealed class PlayerBindsLogic
 {
-    private readonly IInternalRPGServer _rpgServer;
+    private readonly ECS _ecs;
 
-    public PlayerBindsLogic(IInternalRPGServer rpgServer)
+    public PlayerBindsLogic(ECS ecs)
     {
-        _rpgServer = rpgServer;
+        _ecs = ecs;
 
-        _rpgServer.PlayerJoined += HandlePlayerJoined;
+        _ecs.EntityCreated += HandleEntityCreated;
     }
 
-    private void HandlePlayerJoined(Entity entity)
+    private void HandleEntityCreated(Entity entity)
     {
-        entity.ComponentAdded += HandleComponentAdded;
+        if(entity.Tag == Entity.PlayerTag)
+            entity.ComponentAdded += HandleComponentAdded;
     }
 
     private void HandleComponentAdded(Component component)

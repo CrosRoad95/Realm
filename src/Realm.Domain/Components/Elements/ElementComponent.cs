@@ -1,8 +1,4 @@
-﻿using Realm.Domain.Interfaces;
-using Realm.Interfaces.Server;
-using SlipeServer.Server.Elements;
-
-namespace Realm.Domain.Components.Elements;
+﻿namespace Realm.Domain.Components.Elements;
 
 public abstract class ElementComponent : Component
 {

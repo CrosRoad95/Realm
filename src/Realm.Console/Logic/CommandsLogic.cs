@@ -1,5 +1,4 @@
-﻿using Realm.Domain.Components.Players;
-using SlipeServer.Server.Elements;
+﻿using SlipeServer.Server.Elements;
 
 namespace Realm.Console.Logic;
 

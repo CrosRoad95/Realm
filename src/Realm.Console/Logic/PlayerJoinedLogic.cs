@@ -2,17 +2,20 @@
 
 internal sealed class PlayerJoinedLogic
 {
-    private readonly IInternalRPGServer _rpgServer;
+    private readonly ECS _ecs;
 
-    public PlayerJoinedLogic(IInternalRPGServer rpgServer)
+    public PlayerJoinedLogic(ECS ecs)
     {
-        _rpgServer = rpgServer;
+        _ecs = ecs;
 
-        _rpgServer.PlayerJoined += HandlePlayerJoined;
+        _ecs.EntityCreated += HandleEntityCreated;
     }
 
-    private async void HandlePlayerJoined(Entity entity)
+    private async void HandleEntityCreated(Entity entity)
     {
+        if (entity.Tag != Entity.PlayerTag)
+            return;
+
         var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();
         playerElementComponent.SetChatVisible(false);
         playerElementComponent.ClearChatBox();

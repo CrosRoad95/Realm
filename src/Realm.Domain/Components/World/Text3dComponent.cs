@@ -1,6 +1,4 @@
-﻿using SlipeServer.Resources.Text3d;
-
-namespace Realm.Domain.Components.World;
+﻿namespace Realm.Domain.Components.World;
 
 public sealed class Text3dComponent : Component
 {

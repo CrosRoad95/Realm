@@ -9,4 +9,5 @@ global using Microsoft.AspNetCore.Identity;
 global using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 global using Realm.Persistance.Data;
 global using Newtonsoft.Json;
+global using Realm.Persistance.Data.Helpers;
 

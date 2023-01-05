@@ -1,7 +1,4 @@
-﻿using SlipeServer.Server.Elements;
-using SlipeServer.Server.Elements.ColShapes;
-
-namespace Realm.Domain.Components.Elements;
+﻿namespace Realm.Domain.Components.Elements;
 
 public class CollisionSphereElementComponent : ElementComponent
 {

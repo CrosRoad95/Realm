@@ -12,12 +12,9 @@ using Realm.Server;
 
 namespace Realm.Tests.TestServers;
 
-internal class TestRPGServer : IInternalRPGServer
+internal class TestRPGServer : IRPGServer
 {
     public MtaServer<RealmTestingPlayer> TestServer { get; private set; }
-    public string MapName { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-    public string GameType { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-
     public ECS ECS => throw new NotImplementedException();
 
     public event Action<Entity>? PlayerJoined;
@@ -36,7 +33,6 @@ internal class TestRPGServer : IInternalRPGServer
             {
                 services.AddSingleton(configuration);
                 services.AddSingleton<IConsole, TestConsoleCommands>();
-                services.AddSingleton((IInternalRPGServer)this);
                 services.AddSingleton((IServerFilesProvider)NullServerFilesProvider.Instance);
                 services.AddSingleton(new RealmLogger().GetLogger());
 
@@ -67,6 +63,16 @@ internal class TestRPGServer : IInternalRPGServer
     }
 
     public Entity GetEntityByPlayer(Player player)
+    {
+        throw new NotImplementedException();
+    }
+
+    public void AssociateElement(IElementHandle elementHandle)
+    {
+        throw new NotImplementedException();
+    }
+
+    public object GetRequiredService(Type type)
     {
         throw new NotImplementedException();
     }

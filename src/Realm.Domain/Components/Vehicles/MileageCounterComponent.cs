@@ -1,6 +1,4 @@
-﻿using SlipeServer.Server.Elements.Events;
-
-namespace Realm.Domain.Components.Vehicles;
+﻿namespace Realm.Domain.Components.Vehicles;
 
 [Serializable]
 public class MileageCounterComponent : Component

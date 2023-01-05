@@ -1,7 +1,4 @@
-﻿using Realm.Domain.Exceptions;
-using Realm.Domain.Interfaces;
-
-namespace Realm.Domain.Components.Elements;
+﻿namespace Realm.Domain.Components.Elements;
 
 public sealed class PlayerElementComponent : ElementComponent
 {

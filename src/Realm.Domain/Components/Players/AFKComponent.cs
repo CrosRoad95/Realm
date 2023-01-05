@@ -1,6 +1,4 @@
-﻿using Realm.Resources.AFK;
-
-namespace Realm.Domain.Components.Players;
+﻿namespace Realm.Domain.Components.Players;
 
 public class AFKComponent : Component
 {

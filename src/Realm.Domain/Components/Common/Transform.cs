@@ -8,7 +8,7 @@ public sealed class Transform
     private Vector3 _rotation;
     private byte _interior;
     private ushort _dimension;
-    private bool _isBounded = false;
+    private bool _isBound = false;
 
     public Entity Entity { get; private set; }
 
@@ -71,9 +71,9 @@ public sealed class Transform
 
     public void Bind(Element element)
     {
-        if (_isBounded)
+        if (_isBound)
             throw new TransformAlreadyBoundException();
-        _isBounded = true;
+        _isBound = true;
         element.Position = _position;
         if(element.ElementType != ElementType.Pickup)
             element.Rotation = _rotation;
