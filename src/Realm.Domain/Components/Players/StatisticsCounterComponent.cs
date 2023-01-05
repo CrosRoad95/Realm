@@ -3,8 +3,6 @@
 [Serializable]
 public class StatisticsCounterComponent : Component
 {
-    private Player _player = default!;
-
     [Inject]
     private StatisticsCounterService StatisticsCounterService { get; set; } = default!;
 
@@ -16,24 +14,38 @@ public class StatisticsCounterComponent : Component
 
     public float TotalTraveledDistance => TraveledDistanceInVehicleAsDriver + TraveledDistanceInVehicleAsPassager +
         TraveledDistanceSwimming + TraveledDistanceByFoot + TraveledDistanceInAir;
+
     public StatisticsCounterComponent()
     {
+    }
+    
+    public StatisticsCounterComponent(Statistics statistics)
+    {
+        TraveledDistanceInVehicleAsDriver = statistics.TraveledDistanceInVehicleAsDriver;
+        TraveledDistanceInVehicleAsPassager = statistics.TraveledDistanceInVehicleAsPassager;
+        TraveledDistanceSwimming = statistics.TraveledDistanceSwimming;
+        TraveledDistanceByFoot = statistics.TraveledDistanceByFoot;
+        TraveledDistanceInAir = statistics.TraveledDistanceInAir;
     }
 
     public override Task Load()
     {
         var player = Entity.GetRequiredComponent<PlayerElementComponent>().Player;
-        player.Disconnected += HandlePlayerDisconnected;
+        StatisticsCounterService.StatisticsCollected += HandleStatisticsCollected;
+        StatisticsCounterService.SetCounterEnabledFor(player, true);
         return Task.CompletedTask;
     }
 
-    private void HandlePlayerDisconnected(Player sender, SlipeServer.Server.Elements.Events.PlayerQuitEventArgs e)
+    public override void Destroy()
     {
-        StatisticsCounterService.SetCounterEnabledFor(_player, false);
+        var player = Entity.GetRequiredComponent<PlayerElementComponent>().Player;
+        StatisticsCounterService.StatisticsCollected -= HandleStatisticsCollected;
+        StatisticsCounterService.SetCounterEnabledFor(player, false);
     }
 
     private void HandleStatisticsCollected(Player statisticsOfPlayer, Dictionary<string, float> statistics)
     {
+        Entity.GetRequiredComponent<PlayerElementComponent>().Compare(statisticsOfPlayer);
         var player = Entity.GetRequiredComponent<PlayerElementComponent>().Player;
         if (player != statisticsOfPlayer)
             return;

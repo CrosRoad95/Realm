@@ -126,7 +126,7 @@ namespace Realm.Persistance.MySql.Migrations
                     b.Property<DateTime>("LastVisit")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime(6)")
-                        .HasDefaultValue(new DateTime(2023, 1, 5, 16, 59, 26, 395, DateTimeKind.Local).AddTicks(9930));
+                        .HasDefaultValue(new DateTime(2023, 1, 5, 21, 55, 6, 760, DateTimeKind.Local).AddTicks(659));
 
                     b.Property<int>("VisitsInRow")
                         .HasColumnType("int");
@@ -205,6 +205,31 @@ namespace Realm.Persistance.MySql.Migrations
                         .HasDatabaseName("RoleNameIndex");
 
                     b.ToTable("Roles", (string)null);
+                });
+
+            modelBuilder.Entity("Realm.Persistance.Data.Statistics", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("char(36)");
+
+                    b.Property<float>("TraveledDistanceByFoot")
+                        .HasColumnType("float");
+
+                    b.Property<float>("TraveledDistanceInAir")
+                        .HasColumnType("float");
+
+                    b.Property<float>("TraveledDistanceInVehicleAsDriver")
+                        .HasColumnType("float");
+
+                    b.Property<float>("TraveledDistanceInVehicleAsPassager")
+                        .HasColumnType("float");
+
+                    b.Property<float>("TraveledDistanceSwimming")
+                        .HasColumnType("float");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Statistics", (string)null);
                 });
 
             modelBuilder.Entity("Realm.Persistance.Data.User", b =>
@@ -549,6 +574,17 @@ namespace Realm.Persistance.MySql.Migrations
                     b.Navigation("Inventory");
                 });
 
+            modelBuilder.Entity("Realm.Persistance.Data.Statistics", b =>
+                {
+                    b.HasOne("Realm.Persistance.Data.User", "User")
+                        .WithOne("Statistics")
+                        .HasForeignKey("Realm.Persistance.Data.Statistics", "Id")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("Realm.Persistance.Data.User", b =>
                 {
                     b.HasOne("Realm.Persistance.Data.Inventory", "Inventory")
@@ -598,6 +634,8 @@ namespace Realm.Persistance.MySql.Migrations
                     b.Navigation("DailyVisits");
 
                     b.Navigation("Licenses");
+
+                    b.Navigation("Statistics");
 
                     b.Navigation("VehicleAccesses");
                 });

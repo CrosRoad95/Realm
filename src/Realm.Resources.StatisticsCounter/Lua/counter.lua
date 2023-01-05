@@ -11,6 +11,7 @@ end
 local function updateCounter()
 	local traveledDistance = getDistanceBetweenPoints3D(lastX, lastY, lastZ, getElementPosition(localPlayer))
 	if(traveledDistance > 40 or traveledDistance < 0.1)then
+		lastX, lastY, lastZ = getElementPosition(localPlayer)
 		return; -- Possibly teleported or moved not too enough
 	end
 	local occupiedSeat = getPedOccupiedVehicleSeat(localPlayer)
@@ -42,6 +43,7 @@ end
 addEvent("internalSetCounterEnabled", true)
 addEventHandler("internalSetCounterEnabled", localPlayer, function(enabled)
 	counters = {}
+	lastX, lastY, lastZ = getElementPosition(localPlayer)
 	if(enabled)then
 		lastCollectionTick = getTickCount()
 		lastX, lastY, lastZ = getElementPosition(localPlayer)

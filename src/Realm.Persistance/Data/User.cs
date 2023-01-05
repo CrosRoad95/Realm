@@ -21,4 +21,5 @@ public sealed class User : IdentityUser<Guid>
     public ICollection<VehicleAccess> VehicleAccesses { get; set; } = new List<VehicleAccess>();
     public Inventory? Inventory { get; set; }
     public DailyVisits? DailyVisits { get; set; }
+    public Statistics? Statistics { get; set; }
 }

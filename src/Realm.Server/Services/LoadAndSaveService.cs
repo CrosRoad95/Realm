@@ -101,6 +101,20 @@ internal class LoadAndSaveService : ILoadAndSaveService
                             VisitsInRowRecord = dailyVisitsCounterComponent.VisitsInRowRecord,
                         };
                     }
+                    
+                    if (entity.TryGetComponent(out StatisticsCounterComponent statisticsCounterComponent))
+                    {
+                        user.Statistics = new Statistics
+                        {
+                            Id = user.Id,
+                            User = user,
+                            TraveledDistanceByFoot = statisticsCounterComponent.TraveledDistanceByFoot,
+                            TraveledDistanceInAir = statisticsCounterComponent.TraveledDistanceInAir,
+                            TraveledDistanceInVehicleAsDriver = statisticsCounterComponent.TraveledDistanceInVehicleAsDriver,
+                            TraveledDistanceInVehicleAsPassager = statisticsCounterComponent.TraveledDistanceInVehicleAsPassager,
+                            TraveledDistanceSwimming = statisticsCounterComponent.TraveledDistanceSwimming,
+                        };
+                    }
 
                     user.LastTransformAndMotion = entity.Transform.GetTransformAndMotion();
                     await _userManager.UpdateAsync(user);

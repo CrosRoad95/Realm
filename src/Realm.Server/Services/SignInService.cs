@@ -33,6 +33,11 @@ internal class SignInService : ISignInService
                 await entity.AddComponentAsync(new DailyVisitsCounterComponent(user.DailyVisits));
             else
                 await entity.AddComponentAsync(new DailyVisitsCounterComponent());
+            
+            if (user.Statistics != null)
+                await entity.AddComponentAsync(new StatisticsCounterComponent(user.Statistics));
+            else
+                await entity.AddComponentAsync(new StatisticsCounterComponent());
 
             entity.AddComponent(new LicensesComponent(user.Licenses, user.Id));
             entity.AddComponent(new PlayTimeComponent());
@@ -53,6 +58,7 @@ internal class SignInService : ISignInService
             entity.TryDestroyComponent<PlayTimeComponent>();
             entity.TryDestroyComponent<MoneyComponent>();
             entity.TryDestroyComponent<DailyVisitsCounterComponent>();
+            entity.TryDestroyComponent<StatisticsCounterComponent>();
         }
         finally
         {
