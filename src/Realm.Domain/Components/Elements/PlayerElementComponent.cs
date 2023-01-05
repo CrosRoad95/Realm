@@ -49,6 +49,8 @@ public sealed class PlayerElementComponent : ElementComponent
         return Task.CompletedTask;
     }
 
+    public bool Compare(Player player) => _player == player;
+
     public bool TrySpawnAtLastPosition()
     {
         var accountComponent = Entity.GetComponent<AccountComponent>();

@@ -32,6 +32,10 @@ internal class SignInService : ISignInService
             entity.AddComponent(new LicensesComponent(user.Licenses, user.Id));
             entity.AddComponent(new PlayTimeComponent());
             entity.AddComponent(new MoneyComponent(user.Money));
+            entity.AddComponent(new AFKComponent()).StateChanged += (entity, wentAfk, time) =>
+            {
+                System.Console.WriteLine("Afk state: {0}", wentAfk);
+            };
             entity.Destroyed += HandleDestroyed;
         }
         catch (Exception)
