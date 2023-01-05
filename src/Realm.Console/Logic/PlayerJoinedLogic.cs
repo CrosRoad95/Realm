@@ -32,6 +32,7 @@ internal sealed class PlayerJoinedLogic
         {
             var playerElementComponent = component.Entity.GetRequiredComponent<PlayerElementComponent>();
             playerElementComponent.SetChatVisible(true);
+            playerElementComponent.SetGuiDebugToolsEnabled(true);
             playerElementComponent.ClearChatBox();
             if (!playerElementComponent.TrySpawnAtLastPosition())
             {

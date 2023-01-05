@@ -68,6 +68,12 @@
 		destroyElement(elementHandle)
 		return true;
 	end,
+	getSize = function(elementHandle)
+		return guiGetSize(elementHandle)
+	end,
+	setWindowPosition = function(windowHandle, x, y)
+		guiSetPosition(windowHandle, x, y, false)
+	end,
 	centerWindow = function(windowHandle)
 	    local screenW, screenH = guiGetScreenSize()
 		local windowW, windowH = guiGetSize(windowHandle, false)

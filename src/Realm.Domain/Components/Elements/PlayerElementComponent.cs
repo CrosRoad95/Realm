@@ -12,6 +12,8 @@ public sealed class PlayerElementComponent : ElementComponent
     private LuaValueMapper LuaValueMapper { get; set; } = default!;
     [Inject]
     private LuaEventService LuaEventService { get; set; } = default!;
+    [Inject]
+    private AgnosticGuiSystemService AgnosticGuiSystemService { get; set; } = default!;
 
     private readonly Player _player;
     private readonly Dictionary<string, Func<Entity, Task>> _binds = new();
@@ -155,5 +157,10 @@ public sealed class PlayerElementComponent : ElementComponent
         await _binds[e.Key](Entity);
         if(_bindsCooldown.ContainsKey(e.Key)) // Wasn't bind cooldown reset?
             _bindsCooldown[e.Key] = DateTime.Now.AddMilliseconds(400);
+    }
+
+    public void SetGuiDebugToolsEnabled(bool enabled)
+    {
+        AgnosticGuiSystemService.SetDebugToolsEnabled(_player, enabled);
     }
 }

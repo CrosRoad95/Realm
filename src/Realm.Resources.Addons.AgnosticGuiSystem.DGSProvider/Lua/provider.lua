@@ -69,6 +69,12 @@ local dgsUIProvider = {
 		destroyElement(elementHandle)
 		return true;
 	end,
+	getSize = function(elementHandle)
+		return dgsGetSize(elementHandle)
+	end,
+	setWindowPosition = function(windowHandle, x, y)
+		dgsSetPosition(windowHandle, x, y, false)
+	end,
 	centerWindow = function(windowHandle)
 	    local screenW, screenH = guiGetScreenSize()
 		local windowW, windowH = dgsGetSize(windowHandle, false)

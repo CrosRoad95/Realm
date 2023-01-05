@@ -84,6 +84,11 @@ public class AgnosticGuiSystemService
         _playersGuis[player].Clear();
     }
     
+    public void SetDebugToolsEnabled(Player player, bool enabled)
+    {
+        player.TriggerLuaEvent("internalUiDebugToolsEnabled", player, enabled);
+    }
+    
     public void SendFormResponse(Player player, string id, string name, params object[] values)
     {
         Debug.Assert(!EnsurePlayerGuisAreInitialized(player));

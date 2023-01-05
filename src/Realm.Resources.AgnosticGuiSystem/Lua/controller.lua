@@ -8,6 +8,26 @@ local currentGui = nil
 local lastCreatedWindow = nil
 local cooldown = {}
 local currentOpenedGui = {}
+local debugToolsEnabledState = false;
+local screenX, screenY = guiGetScreenSize();
+local sx,sy = screenX, screenY
+local originalScreenX, originalScreenY = screenX, screenY;
+local dockingAreasRendering = false
+local dockingAreas = {
+	["topLeft"] = {0, 0, 500, 400},
+	["topCenter"] = {sx / 4, 0, sx / 2, 300},
+	["topRight"] = {sx - 500, 0, 500, 400},
+	["leftCenter"] = {50,sy / 2 - 300,300,600},
+	["center"] = {sx / 2 - 400, sy / 2 - 300, 800, 600},
+	["rightCenter"] = {sx - 300 - 50, sy / 2 - 300,300,600},
+	["leftBottom"] = {0, sy - 400, 500, 400},
+	["centerBottom"] = {sx / 4, sy - 300, sx / 2, 300},
+	["rightBottom"] = {sx - 500, sy - 400, 500, 400},
+}
+
+function guiGetScreenSize()
+	return screenX, screenY;
+end
 
 function getCurrentGuiName()
 	return currentGui;
@@ -18,7 +38,7 @@ function registerGuiProvider(gui, provider)
 end
 
 local function createErrorGui(guiProvider, err, guiName)
-	local window = guiProvider.window("Błąd w gui: "..tostring(guiName), 0, 0, 500, 200);
+	local window = guiProvider.window("Error in gui: "..tostring(guiName), 0, 0, 500, 200);
 	guiProvider.centerWindow(window)
 	local errorLabel = guiProvider.label(err, 20, 30, 260, 160, window);
 	guiProvider.setHorizontalAlign(errorLabel, "left", true)
@@ -110,6 +130,35 @@ function closeGui(name)
 	if(guiRefs == 0)then
 		showCursor(false)
 	end
+end
+
+function renderDockingAreas()
+	for k,v in pairs(dockingAreas)do
+		dxDrawRectangle(v[1], v[2], v[3], v[4], tocolor(255,0,0,50))
+		dxDrawText(string.format("%s - %ix%i", k, v[3], v[4]), v[1], v[2], v[1] + v[3], v[2] + v[4])
+	end
+end
+
+function setRenderDockingAreasEnabled(enabled)
+	dockingAreasRendering = not dockingAreasRendering
+	if(dockingAreasRendering)then
+		addEventHandler("onClientRender", root, renderDockingAreas)
+	else
+		removeEventHandler("onClientRender", root, renderDockingAreas)
+	end
+end
+
+function toggleRenderDockingAreasEnabled()
+	setRenderDockingAreasEnabled(not dockingAreasRendering)
+end
+
+function enableDebugTools()
+	bindKey("o", "down", toggleRenderDockingAreasEnabled)
+end
+
+function disableDebugTools()
+	setRenderDockingAreasEnabled(false)
+	unbindKey("o", "down", toggleRenderDockingAreasEnabled)
 end
 
 addEvent("internalSubmitFormResponse", true)
@@ -225,7 +274,26 @@ local function internalCommonGuiProvider()
 			if(fileExists(fileName))then
 				fileDelete(fileName)
 			end
-		end
+		end,
+		createCenteredWindow = function(title, sx, sy)
+			local window = currentGuiProvider.window(title, 0, 0, sx, sy);
+			currentGuiProvider.centerWindow(window)
+			return window;
+		end,
+		dockWindow = function(windowHandle, dockName, positionName)
+			if(dockingAreas[dockName])then
+				local dock = dockingAreas[dockName]
+				local wx,wy = currentGuiProvider.getSize(windowHandle)
+				local dockCenterX, dockCenterY = dock[1] + dock[3] / 2, dock[2] + dock[4] / 2;
+				if(positionName == "center")then
+					currentGuiProvider.setWindowPosition(windowHandle, dockCenterX - wx / 2, dockCenterY - wy / 2)
+				else
+					error("Docking area position: '"..tostring(positionName).."' is not supported")
+				end
+			else
+				error("Docking area: '"..tostring(dockName).."' not found")
+			end
+		end,
 	}
 end
 
@@ -275,6 +343,18 @@ local function entrypoint()
 	addEvent("internalUiCloseGui", true)
 	addEventHandler("internalUiCloseGui", localPlayer, function(guiName)
 		closeGui(guiName);
+	end)
+	
+	addEvent("internalUiDebugToolsEnabled", true)
+	addEventHandler("internalUiDebugToolsEnabled", localPlayer, function(enabled)
+		if(debugToolsEnabledState ~= enabled)then
+			if(enabled)then
+				enableDebugTools()
+			else
+				disableDebugTools()
+			end
+			debugToolsEnabledState = enabled
+		end
 	end)
 end
 
