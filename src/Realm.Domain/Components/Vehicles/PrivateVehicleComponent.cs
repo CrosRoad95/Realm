@@ -1,6 +1,5 @@
 ﻿using VehicleData = Realm.Persistance.Data.Vehicle;
 using VehicleAccess = Realm.Domain.Concepts.VehicleAccess;
-using Realm.Domain.Exceptions;
 
 namespace Realm.Domain.Components.Vehicles;
 

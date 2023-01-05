@@ -1,5 +1,4 @@
-﻿using Realm.Domain.Exceptions;
-using System.Diagnostics.CodeAnalysis;
+﻿using System.Diagnostics.CodeAnalysis;
 
 namespace Realm.Domain;
 

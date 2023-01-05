@@ -1,6 +1,4 @@
-﻿using Realm.Domain.Components.Elements;
-
-namespace Realm.Console.Logic;
+﻿namespace Realm.Console.Logic;
 
 internal sealed class PlayerBindsLogic
 {

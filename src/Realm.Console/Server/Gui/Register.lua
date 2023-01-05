@@ -13,6 +13,7 @@
 	local registerButton = guiProvider.button("Zarejestruj", 120, 185, 170, 20, window);
 
 	guiProvider.setMasked(passwordInput, true)
+	guiProvider.setMasked(repeatPasswordInput, true)
 	local form = createForm("register", {
 		["login"] = loginInput,
 		["password"] = passwordInput,

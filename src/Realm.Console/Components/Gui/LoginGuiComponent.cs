@@ -1,6 +1,4 @@
-﻿using Microsoft.AspNetCore.Components;
-
-namespace Realm.Console.Components.Gui;
+﻿namespace Realm.Console.Components.Gui;
 
 public sealed class LoginGuiComponent : GuiComponent
 {

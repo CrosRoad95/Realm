@@ -1,6 +1,4 @@
-﻿using Realm.Persistance.Data.Helpers;
-
-namespace Realm.Persistance.Data;
+﻿namespace Realm.Persistance.Data;
 
 public sealed class User : IdentityUser<Guid>
 {

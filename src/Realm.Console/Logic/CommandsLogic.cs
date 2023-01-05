@@ -1,6 +1,4 @@
-﻿using SlipeServer.Server.Elements;
-
-namespace Realm.Console.Logic;
+﻿namespace Realm.Console.Logic;
 
 internal sealed class CommandsLogic
 {

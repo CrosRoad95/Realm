@@ -28,3 +28,4 @@ global using Realm.Domain.Concepts.Objectives;
 global using SlipeServer.Server.Elements;
 global using Realm.ConsoleUtilities;
 global using Realm.Interfaces.Server;
+global using Microsoft.AspNetCore.Components;

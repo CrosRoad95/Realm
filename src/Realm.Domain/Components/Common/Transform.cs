@@ -1,6 +1,4 @@
-﻿using Realm.Domain.Exceptions;
-
-namespace Realm.Domain.Components.Common;
+﻿namespace Realm.Domain.Components.Common;
 
 public sealed class Transform
 {
