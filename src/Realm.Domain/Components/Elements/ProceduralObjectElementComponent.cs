@@ -5,9 +5,9 @@ public class ProceduralObjectElementComponent : ElementComponent
     [Inject]
     private AssetsService AssetsService { get; set; } = default!;
 
-    public override Element Element => throw new NotImplementedException();
+    internal override Element Element => throw new NotImplementedException();
 
-    ProceduralObjectElementComponent()
+    public ProceduralObjectElementComponent()
     {
     }
 

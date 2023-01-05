@@ -19,13 +19,13 @@ public sealed class PlayerElementComponent : ElementComponent
     private readonly Dictionary<string, Func<Entity, Task>> _binds = new();
     private readonly Dictionary<string, DateTime> _bindsCooldown = new();
 
-    public Player Player => _player;
+    internal Player Player => _player;
 
     public string Name { get => Player.Name; set => Player.Name = value; }
 
     public string Language { get; private set; } = "pl";
 
-    public override Element Element => _player;
+    internal override Element Element => _player;
 
     public Entity? OccupiedVehicle
     {
@@ -37,7 +37,7 @@ public sealed class PlayerElementComponent : ElementComponent
         }
     }
 
-    public PlayerElementComponent(Player player)
+    internal PlayerElementComponent(Player player)
     {
         _player = player;
     }
@@ -93,10 +93,32 @@ public sealed class PlayerElementComponent : ElementComponent
     {
         ChatBox.ClearFor(_player);
     }
+    
+    public void SetCameraMatrix(Vector3 from, Vector3 to)
+    {
+        _player.Camera.SetMatrix(from, to);
+    }
+
+    public void FadeCamera(CameraFade cameraFade, float fadeTime = 0.5f)
+    {
+        _player.Camera.Fade(cameraFade, fadeTime);
+    }
+
+    public Task FadeCameraAsync(CameraFade cameraFade, float fadeTime = 0.5f)
+    {
+        _player.Camera.Fade(cameraFade, fadeTime);
+        return Task.Delay(TimeSpan.FromSeconds(fadeTime));
+    }
 
     public void SetChatVisible(bool visible)
     {
         ChatBox.SetVisibleFor(_player, visible);
+    }
+    
+    public void SetCameraTarget(Entity entity)
+    {
+        var elementComponent = entity.GetRequiredComponent<ElementComponent>();
+        _player.Camera.Target = elementComponent.Element;
     }
 
     #region LuaInterop resource

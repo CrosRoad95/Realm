@@ -44,3 +44,6 @@ global using SlipeServer.Server.Events;
 global using SlipeServer.Server.Constants;
 global using VehicleUpgrade = Realm.Domain.Upgrades.VehicleUpgrade;
 global using SlipeServer.Resources.Text3d;
+global using System.Runtime.CompilerServices;
+
+[assembly: InternalsVisibleTo("Realm.Server")]

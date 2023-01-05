@@ -7,7 +7,7 @@ public class CollisionSphereElementComponent : ElementComponent
     public Action<Entity>? EntityEntered { get; set; }
     public Action<Entity>? EntityLeft { get; set; }
 
-    public override Element Element => _collisionSphere;
+    internal override Element Element => _collisionSphere;
 
     public CollisionSphereElementComponent(CollisionSphere collisionSphere, Entity? createForEntity = null) : base(createForEntity)
     {

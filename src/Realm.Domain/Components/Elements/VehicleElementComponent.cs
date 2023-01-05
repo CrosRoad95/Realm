@@ -7,9 +7,9 @@ public class VehicleElementComponent : ElementComponent
 
     protected readonly Vehicle _vehicle;
 
-    public Vehicle Vehicle => _vehicle;
+    internal Vehicle Vehicle => _vehicle;
 
-    public override Element Element => _vehicle;
+    internal override Element Element => _vehicle;
 
     public VehicleElementComponent(Vehicle vehicle)
     {

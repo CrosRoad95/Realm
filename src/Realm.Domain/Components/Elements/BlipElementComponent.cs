@@ -4,7 +4,7 @@ public class BlipElementComponent : ElementComponent
 {
     protected readonly Blip _blip;
 
-    public override Element Element => _blip;
+    internal override Element Element => _blip;
 
     public BlipElementComponent(Blip blip, Entity? createForEntity = null) : base(createForEntity)
     {

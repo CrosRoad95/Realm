@@ -7,7 +7,7 @@ public abstract class ElementComponent : Component
     [Inject]
     protected IRPGServer _rpgServer { get; set; } = default!;
 
-    abstract public Element Element { get; }
+    abstract internal Element Element { get; }
 
     protected readonly Entity? _createForEntity;
 

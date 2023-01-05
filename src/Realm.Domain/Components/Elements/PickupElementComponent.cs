@@ -6,7 +6,7 @@ public class PickupElementComponent : ElementComponent
     public Action<Entity>? EntityEntered { get; set; }
     public Action<Entity>? EntityLeft { get; set; }
 
-    public override Element Element => _pickup;
+    internal override Element Element => _pickup;
 
     public PickupElementComponent(Pickup pickup)
     {
