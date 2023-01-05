@@ -1,7 +1,4 @@
-﻿using Realm.ConsoleUtilities;
-using Realm.Interfaces.Server;
-
-var builder = new RPGServerBuilder();
+﻿var builder = new RPGServerBuilder();
 builder.AddDefaultModules()
     .AddDefaultLogger()
     .AddDefaultConsole()

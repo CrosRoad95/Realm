@@ -69,6 +69,8 @@ public class Entity
         _components.Add(component);
         Task.Run(async () =>
         {
+            if(component.Entity == null)
+                throw new Exception("Bug?");
             await component.Load();
             ComponentAdded?.Invoke(component);
         });

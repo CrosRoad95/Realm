@@ -43,6 +43,7 @@ public sealed class PlayerElementComponent : ElementComponent
     public override Task Load()
     {
         Entity.Transform.Bind(_player);
+        _player.BindExecuted += HandleBindExecuted;
         return Task.CompletedTask;
     }
 
@@ -133,7 +134,6 @@ public sealed class PlayerElementComponent : ElementComponent
 
         _player.SetBind(key, KeyState.Up);
         _binds[key] = callback;
-        _player.BindExecuted += HandleBindExecuted;
     }
 
     public void ResetCooldown(string key)
@@ -153,6 +153,7 @@ public sealed class PlayerElementComponent : ElementComponent
         }
         _bindsCooldown[e.Key] = DateTime.MaxValue; // Lock bind indefinitly in case of bind takes a long time to execute
         await _binds[e.Key](Entity);
-        _bindsCooldown[e.Key] = DateTime.Now.AddMilliseconds(750);
+        if(_bindsCooldown.ContainsKey(e.Key)) // Wasn't bind cooldown reset?
+            _bindsCooldown[e.Key] = DateTime.Now.AddMilliseconds(400);
     }
 }
