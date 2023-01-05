@@ -1,4 +1,6 @@
-﻿namespace Realm.Persistance;
+﻿using Realm.Persistance.Data;
+
+namespace Realm.Persistance;
 
 public abstract class Db<T> : IdentityDbContext<User, Role, Guid,
         IdentityUserClaim<Guid>,
@@ -40,6 +42,11 @@ public abstract class Db<T> : IdentityDbContext<User, Role, Guid,
                 .HasMany(x => x.VehicleAccesses)
                 .WithOne(x => x.User)
                 .HasForeignKey(x => x.UserId);
+
+            entityBuilder
+                .HasOne(x => x.DailyVisits)
+                .WithOne(x => x.User)
+                .HasForeignKey<DailyVisits>(x => x.Id);
         });
 
         modelBuilder.Entity<Inventory>(entityBuilder =>
@@ -56,6 +63,17 @@ public abstract class Db<T> : IdentityDbContext<User, Role, Guid,
 
             entityBuilder.Property(x => x.Id)
                 .HasMaxLength(36);
+        });
+        
+
+        modelBuilder.Entity<DailyVisits>(entityBuilder =>
+        {
+            entityBuilder
+                .ToTable("DailyVisits")
+                .HasKey(x => x.Id);
+
+            entityBuilder.Property(x => x.LastVisit)
+                .HasDefaultValue(DateTime.Now);
         });
         
         modelBuilder.Entity<InventoryItem>(entityBuilder =>

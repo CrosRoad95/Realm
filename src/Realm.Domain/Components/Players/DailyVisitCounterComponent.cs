@@ -5,8 +5,18 @@ public class DailyVisitsCounterComponent : Component
 {
     public DateTime LastVisit { get; set; } = DateTime.MinValue;
     public int VisitsInRow { get; set; }
+    public int VisitsInRowRecord { get; set; }
 
-    public event Action<Player, int, bool>? PlayerVisited;
+    public event Action<Entity, int, bool>? PlayerVisited;
+    public event Action<Entity, int>? PlayerVisitsRecord;
+
+    public DailyVisitsCounterComponent(DailyVisits dailyVisits)
+    {
+        LastVisit = dailyVisits.LastVisit;
+        VisitsInRow = dailyVisits.VisitsInRow;
+        VisitsInRowRecord = dailyVisits.VisitsInRowRecord;
+    }
+
     public DailyVisitsCounterComponent()
     {
     }
@@ -34,8 +44,13 @@ public class DailyVisitsCounterComponent : Component
             reseted = true;
         }
 
-        var player = Entity.GetRequiredComponent<PlayerElementComponent>().Player;
-        PlayerVisited?.Invoke(player, VisitsInRow, reseted);
+        if (VisitsInRow > VisitsInRowRecord) // Doesn't check if day passed because value can be arbitrarily changed
+        {
+            VisitsInRowRecord = VisitsInRow;
+            PlayerVisitsRecord?.Invoke(Entity, VisitsInRowRecord);
+        }
+
+        PlayerVisited?.Invoke(Entity, VisitsInRow, reseted);
         LastVisit = DateTime.Now;
     }
 }

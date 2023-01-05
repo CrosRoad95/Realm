@@ -18,12 +18,15 @@ public sealed class LoginGuiComponent : GuiComponent
         {
             case "login":
                 var loginData = formContext.GetData<LoginData>();
-                var user = await UserManager.Users
-                    .Include(u => u.Inventory)
-                    .ThenInclude(x => x!.InventoryItems)
-                    .FirstOrDefaultAsync(u => u.UserName == loginData.Login);
 
-                if(user == null)
+                var user = await UserManager.Users
+                    .Include(x => x.DailyVisits)
+                    .Include(x => x.Inventory)
+                    .ThenInclude(x => x!.InventoryItems)
+                    .Where(u => u.UserName == loginData.Login)
+                    .FirstOrDefaultAsync();
+
+                if (user == null)
                 {
                     formContext.ErrorResponse("Login lub hasło jest niepoprawne.");
                     return;

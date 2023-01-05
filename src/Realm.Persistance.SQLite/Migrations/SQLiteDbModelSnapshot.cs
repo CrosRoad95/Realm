@@ -116,6 +116,27 @@ namespace Realm.Persistance.SQLite.Migrations
                     b.ToTable("UserTokens", (string)null);
                 });
 
+            modelBuilder.Entity("Realm.Persistance.Data.DailyVisits", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("LastVisit")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("TEXT")
+                        .HasDefaultValue(new DateTime(2023, 1, 5, 17, 0, 26, 636, DateTimeKind.Local).AddTicks(7849));
+
+                    b.Property<int>("VisitsInRow")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("VisitsInRowRecord")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("DailyVisits", (string)null);
+                });
+
             modelBuilder.Entity("Realm.Persistance.Data.Inventory", b =>
                 {
                     b.Property<string>("Id")
@@ -504,6 +525,17 @@ namespace Realm.Persistance.SQLite.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("Realm.Persistance.Data.DailyVisits", b =>
+                {
+                    b.HasOne("Realm.Persistance.Data.User", "User")
+                        .WithOne("DailyVisits")
+                        .HasForeignKey("Realm.Persistance.Data.DailyVisits", "Id")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("Realm.Persistance.Data.InventoryItem", b =>
                 {
                     b.HasOne("Realm.Persistance.Data.Inventory", "Inventory")
@@ -561,6 +593,8 @@ namespace Realm.Persistance.SQLite.Migrations
 
             modelBuilder.Entity("Realm.Persistance.Data.User", b =>
                 {
+                    b.Navigation("DailyVisits");
+
                     b.Navigation("Licenses");
 
                     b.Navigation("VehicleAccesses");

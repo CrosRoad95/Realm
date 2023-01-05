@@ -57,7 +57,7 @@ internal class LoadAndSaveService : ILoadAndSaveService
                         user.PlayTime += playTimeComponent.PlayTime;
                         playTimeComponent.Reset();
                     }
-
+                    
                     if (entity.TryGetComponent(out InventoryComponent inventoryComponent))
                     {
                         bool updateInventory = true;
@@ -89,6 +89,19 @@ internal class LoadAndSaveService : ILoadAndSaveService
                             //context.Inventories.Update(user.Inventory);
                         }
                     }
+
+                    if (entity.TryGetComponent(out DailyVisitsCounterComponent dailyVisitsCounterComponent))
+                    {
+                        user.DailyVisits = new DailyVisits
+                        {
+                            Id = user.Id,
+                            User = user,
+                            LastVisit = dailyVisitsCounterComponent.LastVisit,
+                            VisitsInRow = dailyVisitsCounterComponent.VisitsInRow,
+                            VisitsInRowRecord = dailyVisitsCounterComponent.VisitsInRowRecord,
+                        };
+                    }
+
                     user.LastTransformAndMotion = entity.Transform.GetTransformAndMotion();
                     await _userManager.UpdateAsync(user);
                     return true;
