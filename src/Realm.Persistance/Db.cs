@@ -42,6 +42,11 @@ public abstract class Db<T> : IdentityDbContext<User, Role, Guid,
                 .HasMany(x => x.VehicleAccesses)
                 .WithOne(x => x.User)
                 .HasForeignKey(x => x.UserId);
+            
+            entityBuilder
+                .HasMany(x => x.Achievements)
+                .WithOne(x => x.User)
+                .HasForeignKey(x => x.UserId);
 
             entityBuilder
                 .HasOne(x => x.DailyVisits)
@@ -77,7 +82,7 @@ public abstract class Db<T> : IdentityDbContext<User, Role, Guid,
                 .HasKey(x => x.Id);
 
             entityBuilder.Property(x => x.LastVisit)
-                .HasDefaultValue(DateTime.Now);
+                .HasDefaultValue(DateTime.MinValue);
         });
         
         modelBuilder.Entity<Statistics>(entityBuilder =>
@@ -85,6 +90,16 @@ public abstract class Db<T> : IdentityDbContext<User, Role, Guid,
             entityBuilder
                 .ToTable("Statistics")
                 .HasKey(x => x.Id);
+        });
+        
+        modelBuilder.Entity<Achievement>(entityBuilder =>
+        {
+            entityBuilder
+                .ToTable("Achievements")
+                .HasKey(x => new { x.UserId, x.Name });
+
+            entityBuilder.Property(x => x.Value)
+                .HasMaxLength(255);
         });
         
         modelBuilder.Entity<InventoryItem>(entityBuilder =>

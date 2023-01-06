@@ -1,4 +1,6 @@
-﻿namespace Realm.Console.Logic;
+﻿using Realm.Domain.Components.Players;
+
+namespace Realm.Console.Logic;
 
 internal sealed class CommandsLogic
 {
@@ -167,5 +169,13 @@ internal sealed class CommandsLogic
                 playerElementComponent.SendChatMessage($"Access: ({vehicleAccess.UserId}) = Ownership={vehicleAccess.Ownership}");
             }
         });
+
+        _commandService.AddCommandHandler("testachievement", async (entity, args) =>
+        {
+            var achievementsComponent = entity.GetRequiredComponent<AchievementsComponent>();
+            achievementsComponent.UpdateProgress("test", 2, 10);
+            entity.GetRequiredComponent<PlayerElementComponent>().SendChatMessage($"progressed achieviement 'test'");
+        });
+
     }
 }

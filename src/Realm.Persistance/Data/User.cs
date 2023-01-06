@@ -22,4 +22,5 @@ public sealed class User : IdentityUser<Guid>
     public Inventory? Inventory { get; set; }
     public DailyVisits? DailyVisits { get; set; }
     public Statistics? Statistics { get; set; }
+    public ICollection<Achievement> Achievements { get; set; } = new List<Achievement>();
 }

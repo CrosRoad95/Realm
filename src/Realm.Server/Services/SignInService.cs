@@ -38,6 +38,11 @@ internal class SignInService : ISignInService
                 await entity.AddComponentAsync(new StatisticsCounterComponent(user.Statistics));
             else
                 await entity.AddComponentAsync(new StatisticsCounterComponent());
+            
+            if (user.Achievements != null)
+                await entity.AddComponentAsync(new AchievementsComponent(user.Achievements));
+            else
+                await entity.AddComponentAsync(new AchievementsComponent());
 
             entity.AddComponent(new LicensesComponent(user.Licenses, user.Id));
             entity.AddComponent(new PlayTimeComponent());

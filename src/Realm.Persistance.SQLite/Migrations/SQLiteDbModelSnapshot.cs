@@ -116,6 +116,29 @@ namespace Realm.Persistance.SQLite.Migrations
                     b.ToTable("UserTokens", (string)null);
                 });
 
+            modelBuilder.Entity("Realm.Persistance.Data.Achievement", b =>
+                {
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("TEXT");
+
+                    b.Property<bool>("PrizeReceived")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<float>("Progress")
+                        .HasColumnType("REAL");
+
+                    b.Property<string>("Value")
+                        .HasMaxLength(255)
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("UserId", "Name");
+
+                    b.ToTable("Achievements", (string)null);
+                });
+
             modelBuilder.Entity("Realm.Persistance.Data.DailyVisits", b =>
                 {
                     b.Property<Guid>("Id")
@@ -124,7 +147,7 @@ namespace Realm.Persistance.SQLite.Migrations
                     b.Property<DateTime>("LastVisit")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("TEXT")
-                        .HasDefaultValue(new DateTime(2023, 1, 5, 21, 54, 30, 226, DateTimeKind.Local).AddTicks(1008));
+                        .HasDefaultValue(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified));
 
                     b.Property<int>("VisitsInRow")
                         .HasColumnType("INTEGER");
@@ -550,6 +573,17 @@ namespace Realm.Persistance.SQLite.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("Realm.Persistance.Data.Achievement", b =>
+                {
+                    b.HasOne("Realm.Persistance.Data.User", "User")
+                        .WithMany("Achievements")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("Realm.Persistance.Data.DailyVisits", b =>
                 {
                     b.HasOne("Realm.Persistance.Data.User", "User")
@@ -629,6 +663,8 @@ namespace Realm.Persistance.SQLite.Migrations
 
             modelBuilder.Entity("Realm.Persistance.Data.User", b =>
                 {
+                    b.Navigation("Achievements");
+
                     b.Navigation("DailyVisits");
 
                     b.Navigation("Licenses");

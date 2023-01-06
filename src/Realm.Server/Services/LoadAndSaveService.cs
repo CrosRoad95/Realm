@@ -115,6 +115,19 @@ internal class LoadAndSaveService : ILoadAndSaveService
                             TraveledDistanceSwimming = statisticsCounterComponent.TraveledDistanceSwimming,
                         };
                     }
+                    
+                    if (entity.TryGetComponent(out AchievementsComponent achievementsComponent))
+                    {
+                        user.Achievements = achievementsComponent.Achievements.Select(x => new Achievement
+                        {
+                            UserId = user.Id,
+                            User = user,
+                            Name = x.Key,
+                            Value = JsonConvert.SerializeObject(x.Value.Value, Formatting.None),
+                            PrizeReceived = x.Value.PrizeReceived,
+                            Progress = x.Value.Progress,
+                        }).ToList();
+                    }
 
                     user.LastTransformAndMotion = entity.Transform.GetTransformAndMotion();
                     await _userManager.UpdateAsync(user);
