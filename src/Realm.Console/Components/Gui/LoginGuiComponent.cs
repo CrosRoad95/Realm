@@ -20,6 +20,7 @@ public sealed class LoginGuiComponent : GuiComponent
                 var loginData = formContext.GetData<LoginData>();
 
                 var user = await UserManager.Users
+                    .Include(x => x.JobUpgrades)
                     .Include(x => x.Achievements)
                     .Include(x => x.DailyVisits)
                     .Include(x => x.Inventory)

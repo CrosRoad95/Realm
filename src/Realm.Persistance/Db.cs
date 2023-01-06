@@ -49,6 +49,11 @@ public abstract class Db<T> : IdentityDbContext<User, Role, Guid,
                 .HasForeignKey(x => x.UserId);
 
             entityBuilder
+                .HasMany(x => x.JobUpgrades)
+                .WithOne(x => x.User)
+                .HasForeignKey(x => x.UserId);
+
+            entityBuilder
                 .HasOne(x => x.DailyVisits)
                 .WithOne(x => x.User)
                 .HasForeignKey<DailyVisits>(x => x.Id);
@@ -99,6 +104,16 @@ public abstract class Db<T> : IdentityDbContext<User, Role, Guid,
                 .HasKey(x => new { x.UserId, x.Name });
 
             entityBuilder.Property(x => x.Value)
+                .HasMaxLength(255);
+        });
+        
+        modelBuilder.Entity<JobUpgrade>(entityBuilder =>
+        {
+            entityBuilder
+                .ToTable("JobUpgrades")
+                .HasKey(x => new { x.UserId, x.JobId, x.Name });
+
+            entityBuilder.Property(x => x.Name)
                 .HasMaxLength(255);
         });
         

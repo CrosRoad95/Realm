@@ -1,4 +1,6 @@
-﻿namespace Realm.Domain.Components.Players;
+﻿using System.Collections.Generic;
+
+namespace Realm.Domain.Components.Players;
 
 public class AccountComponent : Component
 {
@@ -11,12 +13,12 @@ public class AccountComponent : Component
     private readonly User _user;
     private ClaimsPrincipal? _claimsPrincipal;
 
+    internal User User => _user;
     public Guid Id => _user.Id;
-
     public string? UserName => _user.UserName;
+    public IEnumerable<string> JobUpgrades => _user.JobUpgrades.Select(x => x.Name);
 
-    public User User => _user;
-
+    public event Action<Entity, short, string>? JobUpgradeAdded;
     public AccountComponent(User user)
     {
         _user = user;
@@ -140,5 +142,23 @@ public class AccountComponent : Component
         if (result.Succeeded)
             await UpdateClaimsPrincipal();
         return result.Succeeded;
+    }
+
+    public bool HasJobUpgrade(short jobId, string upgradeName) => _user.JobUpgrades.Any(x => x.JobId == jobId && x.Name == upgradeName);
+
+    public void AddJobUpgrade(short jobId, string upgradeName)
+    {
+        if (HasJobUpgrade(jobId, upgradeName))
+            throw new UpgradeAlreadyExistsException(jobId, upgradeName);
+
+        _user.JobUpgrades.Add(new JobUpgrade
+        {
+            UserId = _user.Id,
+            User = _user,
+            JobId = jobId,
+            Name = upgradeName,
+        });
+
+        JobUpgradeAdded?.Invoke(Entity, jobId, upgradeName);
     }
 }

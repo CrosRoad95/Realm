@@ -1,4 +1,5 @@
-﻿using Realm.Domain.Components.Players;
+﻿using Realm.Domain.Components.Elements;
+using Realm.Domain.Components.Players;
 
 namespace Realm.Console.Logic;
 
@@ -175,6 +176,20 @@ internal sealed class CommandsLogic
             var achievementsComponent = entity.GetRequiredComponent<AchievementsComponent>();
             achievementsComponent.UpdateProgress("test", 2, 10);
             entity.GetRequiredComponent<PlayerElementComponent>().SendChatMessage($"progressed achieviement 'test'");
+        });
+
+        _commandService.AddCommandHandler("addupgrade", async (entity, args) =>
+        {
+            var achievementsComponent = entity.GetRequiredComponent<AccountComponent>();
+            try
+            {
+                achievementsComponent.AddJobUpgrade(1, "foo");
+                entity.GetRequiredComponent<PlayerElementComponent>().SendChatMessage("Upgrade added");
+            }
+            catch (Exception ex)
+            {
+                entity.GetRequiredComponent<PlayerElementComponent>().SendChatMessage($"Failed to add upgrade: {ex.Message}");
+            }
         });
 
     }
