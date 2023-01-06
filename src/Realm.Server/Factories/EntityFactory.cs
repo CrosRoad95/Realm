@@ -1,4 +1,5 @@
-﻿using SlipeServer.Server.Elements.ColShapes;
+﻿using Realm.Domain.Components.Vehicles;
+using SlipeServer.Server.Elements.ColShapes;
 using SlipeServer.Server.Elements.IdGeneration;
 
 namespace Realm.Server.Factories;

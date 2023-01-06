@@ -15,6 +15,7 @@ public interface IDb : IDisposable
     DbSet<Vehicle> Vehicles { get; }
     DbSet<Inventory> Inventories { get; }
     DbSet<InventoryItem> InventoryItems { get; }
+    DbSet<VehicleUpgrade> VehicleUpgrades { get; }
 
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
 }

@@ -5,7 +5,6 @@ using Realm.Server.Serialization.Yaml;
 using System.Security.Claims;
 using YamlDotNet.Serialization.NamingConventions;
 using static Realm.Server.Seeding.SeedData;
-using VehicleUpgrade = Realm.Domain.Upgrades.VehicleUpgrade;
 
 namespace Realm.Server.Seeding;
 
@@ -13,7 +12,6 @@ internal sealed class SeederServerBuilder
 {
     private const string _basePath = "Seed";
     private readonly EntityByStringIdCollection _elementByStringIdCollection;
-    private readonly VehicleUpgradeByStringCollection _vehicleUpgradeByStringCollection;
     private readonly IServerFilesProvider _serverFilesProvider;
     private readonly ECS _ecs;
     private readonly UserManager<User> _userManager;
@@ -26,11 +24,10 @@ internal sealed class SeederServerBuilder
 
     private readonly Dictionary<string, User> _createdUsers = new();
     public SeederServerBuilder(ILogger logger,
-        EntityByStringIdCollection elementByStringIdCollection, VehicleUpgradeByStringCollection vehicleUpgradeByStringCollection,
+        EntityByStringIdCollection elementByStringIdCollection,
         IServerFilesProvider serverFilesProvider, ECS ecs, UserManager<User> userManager, RoleManager<Role> roleManager)
     {
         _elementByStringIdCollection = elementByStringIdCollection;
-        _vehicleUpgradeByStringCollection = vehicleUpgradeByStringCollection;
         _serverFilesProvider = serverFilesProvider;
         _ecs = ecs;
         _userManager = userManager;
@@ -142,23 +139,6 @@ internal sealed class SeederServerBuilder
         }
     }
 
-
-    private void BuildUpgrades(Dictionary<string, VehicleUpgradeDescriptionSeedData> upgradePairs)
-    {
-        foreach (var upgradePair in upgradePairs)
-        {
-            var upgrade = new VehicleUpgrade
-            {
-                MaxVelocity = new VehicleUpgrade.UpgradeDescription(upgradePair.Value.MaxVelocity),
-                EngineAcceleration = new VehicleUpgrade.UpgradeDescription(upgradePair.Value.EngineAcceleration),
-            };
-            if (!_vehicleUpgradeByStringCollection.AssignElementToId(upgrade, upgradePair.Key))
-            {
-                _logger.Warning("Found duplicated upgrade: {upgradeName}", upgradePair.Key);
-            }
-        }
-    }
-
     public async Task Build()
     {
         var result = new JObject();
@@ -183,7 +163,6 @@ internal sealed class SeederServerBuilder
     
     private async Task BuildFrom(SeedData seedData)
     {
-        BuildUpgrades(seedData.Upgrades);
         await BuildIdentityRoles(seedData.Roles);
         await BuildIdentityAccounts(seedData.Accounts);
         BuildBlips(seedData.Blips);

@@ -202,6 +202,19 @@ internal class LoadAndSaveService : ILoadAndSaveService
                             Ownership = x.Ownership,
                         },
                     }).ToList();
+
+                    if (entity.TryGetComponent(out VehicleUpgradesComponent vehicleUpgradesComponent))
+                    {
+                        await context.VehicleUpgrades.Where(x => x.VehicleId == vehicleData.Id).ExecuteDeleteAsync();
+                        vehicleData.Upgrades = vehicleUpgradesComponent.Upgrades.Select(x => new Persistance.Data.VehicleUpgrade
+                        {
+                            UpgradeId = x,
+                            Vehicle = vehicleData,
+                            VehicleId = vehicleData.Id
+                        }).ToList();
+                        context.VehicleUpgrades.AddRange(vehicleData.Upgrades);
+                    }
+
                     context.Vehicles.Update(vehicleData);
                     await context.SaveChangesAsync();
                 }
@@ -229,14 +242,17 @@ internal class LoadAndSaveService : ILoadAndSaveService
             using var vehicleRepository = _repositoryFactory.GetVehicleRepository();
             var results = await vehicleRepository
                 .GetAll()
+                .Include(x => x.Upgrades)
                 .Include(x => x.VehicleAccesses)
                 .ThenInclude(x => x.User)
                 .AsNoTrackingWithIdentityResolution()
                 .ToListAsync();
+
             foreach (var vehicleData in results)
             {
                 var entity = _entityFactory.CreateVehicle(vehicleData.Model, vehicleData.TransformAndMotion.Position, vehicleData.TransformAndMotion.Rotation, vehicleData.TransformAndMotion.Interior, vehicleData.TransformAndMotion.Dimension, $"vehicle {vehicleData.Id}");
                 entity.AddComponent(new PrivateVehicleComponent(vehicleData));
+                entity.AddComponent(new VehicleUpgradesComponent(vehicleData.Upgrades));
             }
         }
     }

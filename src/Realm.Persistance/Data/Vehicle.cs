@@ -26,5 +26,6 @@ public sealed class Vehicle
     public bool Spawned { get; set; }
 
     public ICollection<VehicleAccess> VehicleAccesses { get; set; } = new List<VehicleAccess>();
+    public ICollection<VehicleUpgrade> Upgrades { get; set; } = new List<VehicleUpgrade>();
 #pragma warning restore CS8618
 }

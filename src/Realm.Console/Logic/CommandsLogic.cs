@@ -135,6 +135,7 @@ internal sealed class CommandsLogic
         {
             using var vehicleRepository = _repositoryFactory.GetVehicleRepository();
             var vehicleEntity = _entityFactory.CreateVehicle(404, entity.Transform.Position + new Vector3(4, 0, 0), entity.Transform.Rotation);
+            vehicleEntity.AddComponent(new VehicleUpgradesComponent());
             vehicleEntity.AddComponent(new PrivateVehicleComponent(await vehicleRepository.CreateNewVehicle()));
         });
         
@@ -190,6 +191,26 @@ internal sealed class CommandsLogic
             {
                 entity.GetRequiredComponent<PlayerElementComponent>().SendChatMessage($"Failed to add upgrade: {ex.Message}");
             }
+        });
+
+        _commandService.AddCommandHandler("addvehicleupgrade", async (entity, args) =>
+        {
+            var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();
+            var veh = playerElementComponent.OccupiedVehicle;
+            if (veh == null)
+            {
+                playerElementComponent.SendChatMessage("Enter vehicle!");
+                return;
+            }
+
+            var vehicleUpgradeComponent = veh.GetRequiredComponent<VehicleUpgradesComponent>();
+            if(vehicleUpgradeComponent.HasUpgrade(1))
+            {
+                playerElementComponent.SendChatMessage("You already have a upgrade!");
+                return;
+            }
+            vehicleUpgradeComponent.AddUpgrade(1);
+            playerElementComponent.SendChatMessage("Upgrade added");
         });
 
     }

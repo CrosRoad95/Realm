@@ -541,6 +541,19 @@ namespace Realm.Persistance.MySql.Migrations
                     b.ToTable("VehicleAccesses", (string)null);
                 });
 
+            modelBuilder.Entity("Realm.Persistance.Data.VehicleUpgrade", b =>
+                {
+                    b.Property<string>("VehicleId")
+                        .HasColumnType("varchar(255)");
+
+                    b.Property<uint>("UpgradeId")
+                        .HasColumnType("int unsigned");
+
+                    b.HasKey("VehicleId", "UpgradeId");
+
+                    b.ToTable("VehicleUpgrades", (string)null);
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<System.Guid>", b =>
                 {
                     b.HasOne("Realm.Persistance.Data.Role", null)
@@ -686,6 +699,17 @@ namespace Realm.Persistance.MySql.Migrations
                     b.Navigation("Vehicle");
                 });
 
+            modelBuilder.Entity("Realm.Persistance.Data.VehicleUpgrade", b =>
+                {
+                    b.HasOne("Realm.Persistance.Data.Vehicle", "Vehicle")
+                        .WithMany("Upgrades")
+                        .HasForeignKey("VehicleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Vehicle");
+                });
+
             modelBuilder.Entity("Realm.Persistance.Data.Inventory", b =>
                 {
                     b.Navigation("InventoryItems");
@@ -708,6 +732,8 @@ namespace Realm.Persistance.MySql.Migrations
 
             modelBuilder.Entity("Realm.Persistance.Data.Vehicle", b =>
                 {
+                    b.Navigation("Upgrades");
+
                     b.Navigation("VehicleAccesses");
                 });
 #pragma warning restore 612, 618

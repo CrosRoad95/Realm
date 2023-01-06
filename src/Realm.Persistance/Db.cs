@@ -13,6 +13,7 @@ public abstract class Db<T> : IdentityDbContext<User, Role, Guid,
     public DbSet<Vehicle> Vehicles => Set<Vehicle>();
     public DbSet<Inventory> Inventories => Set<Inventory>();
     public DbSet<InventoryItem> InventoryItems => Set<InventoryItem>();
+    public DbSet<VehicleUpgrade> VehicleUpgrades => Set<VehicleUpgrade>();
 
     public Db(DbContextOptions<T> options) : base(options)
     {
@@ -140,6 +141,14 @@ public abstract class Db<T> : IdentityDbContext<User, Role, Guid,
                 .WithMany(x => x.Licenses)
                 .HasForeignKey(x => x.UserId);
         });
+        
+
+        modelBuilder.Entity<VehicleUpgrade>(entityBuilder =>
+        {
+            entityBuilder
+                .ToTable("VehicleUpgrades")
+                .HasKey(x => new { x.VehicleId, x.UpgradeId });
+        });
 
         modelBuilder.Entity<Vehicle>(entityBuilder =>
         {
@@ -232,6 +241,11 @@ public abstract class Db<T> : IdentityDbContext<User, Role, Guid,
 
             entityBuilder
                 .HasMany(x => x.VehicleAccesses)
+                .WithOne(x => x.Vehicle)
+                .HasForeignKey(x => x.VehicleId);
+
+            entityBuilder
+                .HasMany(x => x.Upgrades)
                 .WithOne(x => x.Vehicle)
                 .HasForeignKey(x => x.VehicleId);
         });

@@ -30,8 +30,8 @@ public partial class RPGServer : IRPGServer
                     services.AddSingleton<ECS>();
                     services.AddSingleton<IEntityByElement>(x => x.GetRequiredService<ECS>());
                     services.AddSingleton<SeederServerBuilder>();
-                    services.AddSingleton<VehicleUpgradeByStringCollection>();
                     services.AddSingleton<ItemsRegistry>();
+                    services.AddSingleton<VehicleUpgradeRegistry>();
 
                     // Services
                     services.AddSingleton<RPGCommandService>();
