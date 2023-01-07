@@ -14,6 +14,7 @@ public abstract class Db<T> : IdentityDbContext<User, Role, Guid,
     public DbSet<Inventory> Inventories => Set<Inventory>();
     public DbSet<InventoryItem> InventoryItems => Set<InventoryItem>();
     public DbSet<VehicleUpgrade> VehicleUpgrades => Set<VehicleUpgrade>();
+    public DbSet<VehicleFuel> VehicleFuels => Set<VehicleFuel>();
 
     public Db(DbContextOptions<T> options) : base(options)
     {
@@ -248,6 +249,11 @@ public abstract class Db<T> : IdentityDbContext<User, Role, Guid,
                 .HasMany(x => x.Upgrades)
                 .WithOne(x => x.Vehicle)
                 .HasForeignKey(x => x.VehicleId);
+
+            entityBuilder
+                .HasMany(x => x.Fuels)
+                .WithOne(x => x.Vehicle)
+                .HasForeignKey(x => x.VehicleId);
         });
 
         modelBuilder.Entity<VehicleAccess>(entityBuilder =>
@@ -275,5 +281,16 @@ public abstract class Db<T> : IdentityDbContext<User, Role, Guid,
                 .WithMany(x => x.VehicleAccesses)
                 .HasForeignKey(x => x.VehicleId);
         });
+
+        modelBuilder.Entity<VehicleFuel>(entityBuilder =>
+        {
+            entityBuilder
+                .ToTable(nameof(VehicleFuels))
+                .HasKey(x => new { x.VehicleId, x.FuelType });
+
+            entityBuilder.Property(x => x.FuelType)
+                .HasMaxLength(16);
+        });
+
     }
 }

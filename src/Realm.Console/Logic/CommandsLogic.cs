@@ -1,5 +1,6 @@
 ﻿using Realm.Domain.Components.Elements;
 using Realm.Domain.Components.Players;
+using Realm.Persistance.Data;
 
 namespace Realm.Console.Logic;
 
@@ -137,15 +138,14 @@ internal sealed class CommandsLogic
             var vehicleEntity = _entityFactory.CreateVehicle(404, entity.Transform.Position + new Vector3(4, 0, 0), entity.Transform.Rotation);
             vehicleEntity.AddComponent(new VehicleUpgradesComponent());
             vehicleEntity.AddComponent(new PrivateVehicleComponent(await vehicleRepository.CreateNewVehicle()));
+            vehicleEntity.AddComponent(new VehicleFuelComponent("default", 20, 20, 0.01, 2)).Active = true;
         });
-        
         _commandService.AddCommandHandler("privateblip", (entity, args) =>
         {
             using var vehicleRepository = _repositoryFactory.GetVehicleRepository();
             var blipEntity = _entityFactory.CreateBlipFor(entity, BlipIcon.Pizza, entity.Transform.Position);
             return Task.CompletedTask;
         });
-
         _commandService.AddCommandHandler("addmeasowner", async (entity, args) =>
         {
             var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();

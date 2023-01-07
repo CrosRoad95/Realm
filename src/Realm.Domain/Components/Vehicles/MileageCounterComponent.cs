@@ -1,6 +1,5 @@
 ﻿namespace Realm.Domain.Components.Vehicles;
 
-[Serializable]
 public class MileageCounterComponent : Component
 {
     private Vector3 _lastPosition;

@@ -539,6 +539,35 @@ namespace Realm.Persistance.SQLite.Migrations
                     b.ToTable("VehicleAccesses", (string)null);
                 });
 
+            modelBuilder.Entity("Realm.Persistance.Data.VehicleFuel", b =>
+                {
+                    b.Property<string>("VehicleId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("FuelType")
+                        .HasMaxLength(16)
+                        .HasColumnType("TEXT");
+
+                    b.Property<bool>("Active")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<float>("Amount")
+                        .HasColumnType("REAL");
+
+                    b.Property<float>("FuelConsumptionPerOneKm")
+                        .HasColumnType("REAL");
+
+                    b.Property<float>("MaxCapacity")
+                        .HasColumnType("REAL");
+
+                    b.Property<float>("MinimumDistanceThreshold")
+                        .HasColumnType("REAL");
+
+                    b.HasKey("VehicleId", "FuelType");
+
+                    b.ToTable("VehicleFuels", (string)null);
+                });
+
             modelBuilder.Entity("Realm.Persistance.Data.VehicleUpgrade", b =>
                 {
                     b.Property<string>("VehicleId")
@@ -697,6 +726,17 @@ namespace Realm.Persistance.SQLite.Migrations
                     b.Navigation("Vehicle");
                 });
 
+            modelBuilder.Entity("Realm.Persistance.Data.VehicleFuel", b =>
+                {
+                    b.HasOne("Realm.Persistance.Data.Vehicle", "Vehicle")
+                        .WithMany("Fuels")
+                        .HasForeignKey("VehicleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Vehicle");
+                });
+
             modelBuilder.Entity("Realm.Persistance.Data.VehicleUpgrade", b =>
                 {
                     b.HasOne("Realm.Persistance.Data.Vehicle", "Vehicle")
@@ -730,6 +770,8 @@ namespace Realm.Persistance.SQLite.Migrations
 
             modelBuilder.Entity("Realm.Persistance.Data.Vehicle", b =>
                 {
+                    b.Navigation("Fuels");
+
                     b.Navigation("Upgrades");
 
                     b.Navigation("VehicleAccesses");

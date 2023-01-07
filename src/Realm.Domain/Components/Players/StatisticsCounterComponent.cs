@@ -1,6 +1,5 @@
 ﻿namespace Realm.Domain.Components.Players;
 
-[Serializable]
 public class StatisticsCounterComponent : Component
 {
     [Inject]

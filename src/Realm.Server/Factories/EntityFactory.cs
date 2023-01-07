@@ -8,11 +8,13 @@ internal class EntityFactory : IEntityFactory
 {
     private readonly ECS _ecs;
     private readonly IElementIdGenerator _elementIdGenerator;
+    private readonly ILogger _logger;
 
-    public EntityFactory(ECS ecs, IElementIdGenerator elementIdGenerator)
+    public EntityFactory(ECS ecs, IElementIdGenerator elementIdGenerator, ILogger logger)
     {
         _ecs = ecs;
         _elementIdGenerator = elementIdGenerator;
+        _logger = logger;
     }
 
     public Entity CreateBlipFor(Entity createForEntity, BlipIcon blipIcon, Vector3 position, byte interior = 0, ushort dimension = 0, string? id = null, Action<Entity>? entityBuilder = null)
@@ -36,7 +38,7 @@ internal class EntityFactory : IEntityFactory
     {
         return _ecs.CreateEntity(id ?? $"vehicle {Guid.NewGuid()}", Entity.VehicleTag, entity =>
         {
-            var vehicle = new Vehicle(model, new Vector3(0,0,1000));
+            var vehicle = new Vehicle(model, position);
             var vehicleElementComponent = entity.AddComponent(new VehicleElementComponent(vehicle));
 
             entity.Transform.Position = position;

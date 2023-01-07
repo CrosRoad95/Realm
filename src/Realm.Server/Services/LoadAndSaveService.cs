@@ -13,14 +13,17 @@ internal class LoadAndSaveService : ILoadAndSaveService
     private readonly IEntityFactory _entityFactory;
     private readonly UserManager<User> _userManager;
     private readonly ECS _ecs;
+    private readonly ILogger _logger;
 
-    public LoadAndSaveService(RealmDbContextFactory dbContextFactory, RepositoryFactory repositoryFactory, IEntityFactory entityFactory, UserManager<User> userManager, ECS ecs)
+    public LoadAndSaveService(RealmDbContextFactory dbContextFactory, RepositoryFactory repositoryFactory, IEntityFactory entityFactory, UserManager<User> userManager, ECS ecs,
+        ILogger logger)
     {
         _dbContextFactory = dbContextFactory;
         _repositoryFactory = repositoryFactory;
         _entityFactory = entityFactory;
         _userManager = userManager;
         _ecs = ecs;
+        _logger = logger;
         _ecs.EntityCreated += HandleEntityCreated;
     }
 
@@ -203,9 +206,9 @@ internal class LoadAndSaveService : ILoadAndSaveService
                         },
                     }).ToList();
 
+                    await context.VehicleUpgrades.Where(x => x.VehicleId == vehicleData.Id).ExecuteDeleteAsync();
                     if (entity.TryGetComponent(out VehicleUpgradesComponent vehicleUpgradesComponent))
                     {
-                        await context.VehicleUpgrades.Where(x => x.VehicleId == vehicleData.Id).ExecuteDeleteAsync();
                         vehicleData.Upgrades = vehicleUpgradesComponent.Upgrades.Select(x => new Persistance.Data.VehicleUpgrade
                         {
                             UpgradeId = x,
@@ -214,6 +217,21 @@ internal class LoadAndSaveService : ILoadAndSaveService
                         }).ToList();
                         context.VehicleUpgrades.AddRange(vehicleData.Upgrades);
                     }
+
+                    await context.VehicleFuels.Where(x => x.VehicleId == vehicleData.Id).ExecuteDeleteAsync();
+                    var fuelComponents = entity.Components.OfType<VehicleFuelComponent>();
+                    vehicleData.Fuels = fuelComponents.Select(x => new VehicleFuel
+                    {
+                        Vehicle = vehicleData,
+                        VehicleId = vehicleData.Id,
+                        FuelType = x.FuelType,
+                        Active = x.Active,
+                        Amount= x.Amount,
+                        FuelConsumptionPerOneKm = x.FuelConsumptionPerOneKm,
+                        MaxCapacity = x.MaxCapacity,
+                        MinimumDistanceThreshold = x.MinimumDistanceThreshold,
+                    }).ToList();
+                    context.VehicleFuels.AddRange(vehicleData.Fuels);
 
                     context.Vehicles.Update(vehicleData);
                     await context.SaveChangesAsync();
@@ -242,6 +260,7 @@ internal class LoadAndSaveService : ILoadAndSaveService
             using var vehicleRepository = _repositoryFactory.GetVehicleRepository();
             var results = await vehicleRepository
                 .GetAll()
+                .Include(x => x.Fuels)
                 .Include(x => x.Upgrades)
                 .Include(x => x.VehicleAccesses)
                 .ThenInclude(x => x.User)
@@ -250,10 +269,25 @@ internal class LoadAndSaveService : ILoadAndSaveService
 
             foreach (var vehicleData in results)
             {
-                var entity = _entityFactory.CreateVehicle(vehicleData.Model, vehicleData.TransformAndMotion.Position, vehicleData.TransformAndMotion.Rotation, vehicleData.TransformAndMotion.Interior, vehicleData.TransformAndMotion.Dimension, $"vehicle {vehicleData.Id}");
-                entity.AddComponent(new PrivateVehicleComponent(vehicleData));
-                entity.AddComponent(new VehicleUpgradesComponent(vehicleData.Upgrades));
+                try
+                {
+                    await Task.Delay(200);
+                    var entity = _entityFactory.CreateVehicle(vehicleData.Model, vehicleData.TransformAndMotion.Position, vehicleData.TransformAndMotion.Rotation, vehicleData.TransformAndMotion.Interior, vehicleData.TransformAndMotion.Dimension, $"vehicle {vehicleData.Id}",
+                        entity =>
+                        {
+                            entity.AddComponent(new PrivateVehicleComponent(vehicleData));
+                            entity.AddComponent(new VehicleUpgradesComponent(vehicleData.Upgrades));
+                            foreach (var vehicleFuel in vehicleData.Fuels)
+                                entity.AddComponent(new VehicleFuelComponent(vehicleFuel.FuelType, vehicleFuel.Amount, vehicleFuel.MaxCapacity, vehicleFuel.FuelConsumptionPerOneKm, vehicleFuel.MinimumDistanceThreshold)).Active = vehicleFuel.Active;
+                        }); 
+                }
+                catch (Exception ex)
+                {
+                    throw;
+                }
             }
+            _logger.Information("Loaded: {amount} vehicles", results.Count);
+
         }
     }
 }

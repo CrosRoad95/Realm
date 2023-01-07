@@ -1,6 +1,5 @@
 ﻿namespace Realm.Domain.Components.Players;
 
-[Serializable]
 public class DailyVisitsCounterComponent : Component
 {
     public DateTime LastVisit { get; set; } = DateTime.MinValue;

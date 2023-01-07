@@ -1,6 +1,5 @@
 ﻿namespace Realm.Domain.Components.Vehicles;
 
-[Serializable]
 public class VehicleFuelComponent : Component
 {
     public event Action<VehicleFuelComponent>? FuelRanOut;
@@ -11,6 +10,25 @@ public class VehicleFuelComponent : Component
     private float _fuelConsumptionPerOneKm;
     private float _minimumDistanceThreshold;
     private string _fuelType;
+    private bool _active;
+
+    public bool Active
+    {
+        get => _active;
+        set
+        {
+            if (value)
+                Update(true);
+
+            _active = value;
+        }
+    }
+
+    public string FuelType
+    {
+        get => _fuelType;
+        set => _fuelType = value;
+    }
 
     public float MinimumDistanceThreshold
     {
@@ -59,14 +77,9 @@ public class VehicleFuelComponent : Component
         }
     }
 
-    public string FuelType
+    public VehicleFuelComponent(string fuelType, double initialAmount, double maxCapacity, double fuelConsumptionPerOneKm, double minimumDistanceThreshold)
     {
-        get => _fuelType;
-        set => _fuelType = value;
-    }
-
-    public VehicleFuelComponent(double initialAmount, double maxCapacity, double fuelConsumptionPerOneKm, double minimumDistanceThreshold, string fuelType)
-    {
+        if(fuelType.Length < 1 || fuelType.Length > 15) throw new ArgumentOutOfRangeException(nameof(fuelType));
         if (initialAmount < 0) throw new ArgumentOutOfRangeException(nameof(initialAmount));
         if (minimumDistanceThreshold < 0) throw new ArgumentOutOfRangeException(nameof(minimumDistanceThreshold));
         if (fuelConsumptionPerOneKm < 0) throw new ArgumentOutOfRangeException(nameof(fuelConsumptionPerOneKm));
@@ -79,13 +92,20 @@ public class VehicleFuelComponent : Component
         _fuelType = fuelType;
     }
 
-    private void RegisterEvents()
+    public override Task Load()
     {
         var vehicle = Entity.GetRequiredComponent<VehicleElementComponent>().Vehicle;
         vehicle.PositionChanged += HandlePositionChanged;
+        if(_active)
+        {
+            // Turn off other fuel components if this is active.
+            foreach (var item in Entity.Components.OfType<VehicleFuelComponent>().Where(x => x != this))
+                item.Active = false;
+        }
+        return Task.CompletedTask;
     }
 
-    private void UnregisterEvents()
+    public override void Destroy()
     {
         var vehicle = Entity.GetRequiredComponent<VehicleElementComponent>().Vehicle;
         vehicle.PositionChanged -= HandlePositionChanged;
