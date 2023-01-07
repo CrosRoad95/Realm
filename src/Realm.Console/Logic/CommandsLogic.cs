@@ -140,12 +140,14 @@ internal sealed class CommandsLogic
             vehicleEntity.AddComponent(new PrivateVehicleComponent(await vehicleRepository.CreateNewVehicle()));
             vehicleEntity.AddComponent(new VehicleFuelComponent("default", 20, 20, 0.01, 2)).Active = true;
         });
+
         _commandService.AddCommandHandler("privateblip", (entity, args) =>
         {
             using var vehicleRepository = _repositoryFactory.GetVehicleRepository();
             var blipEntity = _entityFactory.CreateBlipFor(entity, BlipIcon.Pizza, entity.Transform.Position);
             return Task.CompletedTask;
         });
+
         _commandService.AddCommandHandler("addmeasowner", async (entity, args) =>
         {
             var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();
@@ -213,5 +215,14 @@ internal sealed class CommandsLogic
             playerElementComponent.SendChatMessage("Upgrade added");
         });
 
+        _commandService.AddCommandHandler("comps", async (entity, args) =>
+        {
+            var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();
+            playerElementComponent.SendChatMessage("Components:");
+            foreach (var component in entity.Components)
+            {
+                playerElementComponent.SendChatMessage($"> {component}");
+            }
+        });
     }
 }

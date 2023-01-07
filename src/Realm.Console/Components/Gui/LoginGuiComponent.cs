@@ -23,7 +23,7 @@ public sealed class LoginGuiComponent : GuiComponent
                     .Include(x => x.JobUpgrades)
                     .Include(x => x.Achievements)
                     .Include(x => x.DailyVisits)
-                    .Include(x => x.Inventory)
+                    .Include(x => x.Inventories)
                     .ThenInclude(x => x!.InventoryItems)
                     .Where(u => u.UserName == loginData.Login)
                     .FirstOrDefaultAsync();

@@ -17,6 +17,9 @@ public interface IDb : IDisposable
     DbSet<InventoryItem> InventoryItems { get; }
     DbSet<VehicleUpgrade> VehicleUpgrades { get; }
     DbSet<VehicleFuel> VehicleFuels { get; }
+    DbSet<DailyVisits> DailyVisits { get; }
+    DbSet<Statistics> Statistics { get; }
 
+    Task MigrateAsync();
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
 }

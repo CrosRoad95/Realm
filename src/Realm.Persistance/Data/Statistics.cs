@@ -2,7 +2,7 @@
 
 public class Statistics
 {
-    public Guid Id { get; set; }
+    public Guid UserId { get; set; }
     public float TraveledDistanceInVehicleAsDriver { get; set; }
     public float TraveledDistanceInVehicleAsPassager { get; set; }
     public float TraveledDistanceSwimming { get; set; }

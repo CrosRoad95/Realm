@@ -143,7 +143,7 @@ namespace Realm.Persistance.MySql.Migrations
 
             modelBuilder.Entity("Realm.Persistance.Data.DailyVisits", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<Guid>("UserId")
                         .HasColumnType("char(36)");
 
                     b.Property<DateTime>("LastVisit")
@@ -157,21 +157,26 @@ namespace Realm.Persistance.MySql.Migrations
                     b.Property<int>("VisitsInRowRecord")
                         .HasColumnType("int");
 
-                    b.HasKey("Id");
+                    b.HasKey("UserId");
 
                     b.ToTable("DailyVisits", (string)null);
                 });
 
             modelBuilder.Entity("Realm.Persistance.Data.Inventory", b =>
                 {
-                    b.Property<string>("Id")
-                        .HasMaxLength(36)
-                        .HasColumnType("varchar(36)");
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("char(36)");
 
                     b.Property<uint>("Size")
                         .HasColumnType("int unsigned");
 
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("char(36)");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("UserId");
 
                     b.ToTable("Inventories", (string)null);
                 });
@@ -182,9 +187,8 @@ namespace Realm.Persistance.MySql.Migrations
                         .HasMaxLength(36)
                         .HasColumnType("varchar(36)");
 
-                    b.Property<string>("InventoryId")
-                        .HasMaxLength(36)
-                        .HasColumnType("varchar(36)");
+                    b.Property<Guid>("InventoryId")
+                        .HasColumnType("char(36)");
 
                     b.Property<uint>("ItemId")
                         .HasColumnType("int unsigned");
@@ -249,7 +253,7 @@ namespace Realm.Persistance.MySql.Migrations
 
             modelBuilder.Entity("Realm.Persistance.Data.Statistics", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<Guid>("UserId")
                         .HasColumnType("char(36)");
 
                     b.Property<float>("TraveledDistanceByFoot")
@@ -267,7 +271,7 @@ namespace Realm.Persistance.MySql.Migrations
                     b.Property<float>("TraveledDistanceSwimming")
                         .HasColumnType("float");
 
-                    b.HasKey("Id");
+                    b.HasKey("UserId");
 
                     b.ToTable("Statistics", (string)null);
                 });
@@ -291,9 +295,6 @@ namespace Realm.Persistance.MySql.Migrations
 
                     b.Property<bool>("EmailConfirmed")
                         .HasColumnType("tinyint(1)");
-
-                    b.Property<string>("InventoryId")
-                        .HasColumnType("varchar(36)");
 
                     b.Property<string>("LastIp")
                         .HasColumnType("longtext");
@@ -364,8 +365,6 @@ namespace Realm.Persistance.MySql.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("InventoryId");
-
                     b.HasIndex("NormalizedEmail")
                         .HasDatabaseName("EmailIndex");
 
@@ -397,7 +396,7 @@ namespace Realm.Persistance.MySql.Migrations
 
             modelBuilder.Entity("Realm.Persistance.Data.Vehicle", b =>
                 {
-                    b.Property<string>("Id")
+                    b.Property<string>("UserId")
                         .HasColumnType("varchar(255)");
 
                     b.Property<string>("Color")
@@ -508,7 +507,7 @@ namespace Realm.Persistance.MySql.Migrations
                         .HasColumnType("varchar(200)")
                         .HasDefaultValue("{\"FrontLeft\":0,\"RearLeft\":0,\"FrontRight\":0,\"RearRight\":0}");
 
-                    b.HasKey("Id");
+                    b.HasKey("UserId");
 
                     b.ToTable("Vehicles", (string)null);
                 });
@@ -649,7 +648,18 @@ namespace Realm.Persistance.MySql.Migrations
                 {
                     b.HasOne("Realm.Persistance.Data.User", "User")
                         .WithOne("DailyVisits")
-                        .HasForeignKey("Realm.Persistance.Data.DailyVisits", "Id")
+                        .HasForeignKey("Realm.Persistance.Data.DailyVisits", "UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Realm.Persistance.Data.Inventory", b =>
+                {
+                    b.HasOne("Realm.Persistance.Data.User", "User")
+                        .WithMany("Inventories")
+                        .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -682,20 +692,11 @@ namespace Realm.Persistance.MySql.Migrations
                 {
                     b.HasOne("Realm.Persistance.Data.User", "User")
                         .WithOne("Statistics")
-                        .HasForeignKey("Realm.Persistance.Data.Statistics", "Id")
+                        .HasForeignKey("Realm.Persistance.Data.Statistics", "UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("User");
-                });
-
-            modelBuilder.Entity("Realm.Persistance.Data.User", b =>
-                {
-                    b.HasOne("Realm.Persistance.Data.Inventory", "Inventory")
-                        .WithMany()
-                        .HasForeignKey("InventoryId");
-
-                    b.Navigation("Inventory");
                 });
 
             modelBuilder.Entity("Realm.Persistance.Data.UserLicense", b =>
@@ -760,6 +761,8 @@ namespace Realm.Persistance.MySql.Migrations
                     b.Navigation("Achievements");
 
                     b.Navigation("DailyVisits");
+
+                    b.Navigation("Inventories");
 
                     b.Navigation("JobUpgrades");
 

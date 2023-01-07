@@ -34,11 +34,12 @@ public class PickupElementComponent : ElementComponent
         }
     }
 
-    private void HandleDestroyed(Entity entity)
+    private Task HandleDestroyed(Entity entity)
     {
         _pickup.CollisionShape.ElementEntered -= HandleElementEntered;
         _pickup.CollisionShape.ElementLeft -= HandleElementLeft;
         _pickup.CollisionShape.Destroy();
+        return Task.CompletedTask;
     }
 
     public override Task Load()

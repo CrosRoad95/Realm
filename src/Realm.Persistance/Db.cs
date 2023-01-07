@@ -1,6 +1,4 @@
-﻿using Realm.Persistance.Data;
-
-namespace Realm.Persistance;
+﻿namespace Realm.Persistance;
 
 public abstract class Db<T> : IdentityDbContext<User, Role, Guid,
         IdentityUserClaim<Guid>,
@@ -15,10 +13,16 @@ public abstract class Db<T> : IdentityDbContext<User, Role, Guid,
     public DbSet<InventoryItem> InventoryItems => Set<InventoryItem>();
     public DbSet<VehicleUpgrade> VehicleUpgrades => Set<VehicleUpgrade>();
     public DbSet<VehicleFuel> VehicleFuels => Set<VehicleFuel>();
+    public DbSet<DailyVisits> DailyVisits => Set<DailyVisits>();
+    public DbSet<Statistics> Statistics => Set<Statistics>();
 
     public Db(DbContextOptions<T> options) : base(options)
     {
-        Database.Migrate();
+    }
+
+    public async Task MigrateAsync()
+    {
+        await Database.MigrateAsync();
     }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -43,27 +47,38 @@ public abstract class Db<T> : IdentityDbContext<User, Role, Guid,
             entityBuilder
                 .HasMany(x => x.VehicleAccesses)
                 .WithOne(x => x.User)
-                .HasForeignKey(x => x.UserId);
-            
+                .HasForeignKey(x => x.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+
             entityBuilder
                 .HasMany(x => x.Achievements)
                 .WithOne(x => x.User)
-                .HasForeignKey(x => x.UserId);
+                .HasForeignKey(x => x.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
 
             entityBuilder
                 .HasMany(x => x.JobUpgrades)
                 .WithOne(x => x.User)
-                .HasForeignKey(x => x.UserId);
+                .HasForeignKey(x => x.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
 
             entityBuilder
                 .HasOne(x => x.DailyVisits)
                 .WithOne(x => x.User)
-                .HasForeignKey<DailyVisits>(x => x.Id);
+                .HasForeignKey<DailyVisits>(x => x.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
 
             entityBuilder
                 .HasOne(x => x.Statistics)
                 .WithOne(x => x.User)
-                .HasForeignKey<Statistics>(x => x.Id);
+                .HasForeignKey<Statistics>(x => x.UserId);
+                //.OnDelete(DeleteBehavior.Cascade);
+
+            entityBuilder
+                .HasMany(x => x.Inventories)
+                .WithOne(x => x.User)
+                .HasForeignKey(x => x.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
         });
 
         modelBuilder.Entity<Inventory>(entityBuilder =>
@@ -77,16 +92,13 @@ public abstract class Db<T> : IdentityDbContext<User, Role, Guid,
                 .WithOne(x => x.Inventory)
                 .HasForeignKey(x => x.InventoryId)
                 .OnDelete(DeleteBehavior.Cascade);
-
-            entityBuilder.Property(x => x.Id)
-                .HasMaxLength(36);
         });
         
         modelBuilder.Entity<DailyVisits>(entityBuilder =>
         {
             entityBuilder
                 .ToTable("DailyVisits")
-                .HasKey(x => x.Id);
+                .HasKey(x => x.UserId);
 
             entityBuilder.Property(x => x.LastVisit)
                 .HasDefaultValue(DateTime.MinValue);
@@ -96,7 +108,7 @@ public abstract class Db<T> : IdentityDbContext<User, Role, Guid,
         {
             entityBuilder
                 .ToTable("Statistics")
-                .HasKey(x => x.Id);
+                .HasKey(x => x.UserId);
         });
         
         modelBuilder.Entity<Achievement>(entityBuilder =>
@@ -127,9 +139,6 @@ public abstract class Db<T> : IdentityDbContext<User, Role, Guid,
 
             entityBuilder.Property(x => x.Id)
                 .HasMaxLength(36);
-
-            entityBuilder.Property(x => x.InventoryId)
-                .HasMaxLength(36);
         });
 
         modelBuilder.Entity<UserLicense>(entityBuilder =>
@@ -154,7 +163,7 @@ public abstract class Db<T> : IdentityDbContext<User, Role, Guid,
         modelBuilder.Entity<Vehicle>(entityBuilder =>
         {
             entityBuilder.ToTable("Vehicles")
-                .HasKey(x =>  x.Id);
+                .HasKey(x =>  x.UserId);
 
             entityBuilder.Property(x => x.Platetext)
                 .HasMaxLength(32)

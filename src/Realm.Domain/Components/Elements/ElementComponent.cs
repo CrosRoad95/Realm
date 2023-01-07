@@ -18,14 +18,16 @@ public abstract class ElementComponent : Component
             _createForEntity.Destroyed += HandleCreateForEntityDestroyed;
     }
 
-    private void HandleCreateForEntityDestroyed(Entity entity)
+    private Task HandleCreateForEntityDestroyed(Entity entity)
     {
         Destroy();
+        return Task.CompletedTask;
     }
 
-    private void HandleDestroyed(Entity entity)
+    private Task HandleDestroyed(Entity entity)
     {
         Element.Destroy();
+        return Task.CompletedTask;
     }
 
     public override Task Load()

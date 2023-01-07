@@ -47,7 +47,8 @@ public static class ServiceCollectionExtensions
             setup.SignIn.RequireConfirmedAccount = true;
         })
            .AddEntityFrameworkStores<T>()
-           .AddDefaultTokenProviders();
+           .AddDefaultTokenProviders()
+           .AddClaimsPrincipalFactory<UserClaimsPrincipalFactory<User>>();
 
         services.AddSingleton(new AuthorizationPoliciesProvider(configuration.Policies.Keys));
 

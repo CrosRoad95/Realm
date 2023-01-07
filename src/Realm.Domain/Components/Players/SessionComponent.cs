@@ -25,9 +25,10 @@ public abstract class SessionComponent : Component
         Entity.Destroyed += HandleDestroyed;
     }
 
-    private void HandleDestroyed(Entity entity)
+    private Task HandleDestroyed(Entity entity)
     {
         End();
+        return Task.CompletedTask;
     }
 
     public void End()

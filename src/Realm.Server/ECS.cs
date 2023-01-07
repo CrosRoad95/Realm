@@ -10,6 +10,7 @@ public sealed class ECS : IEntityByElement
     private readonly Dictionary<Element, Entity> _entityByElement = new();
     private readonly Dictionary<string, Entity> _entityByName = new();
     private readonly RPGServer _server;
+
     public IEnumerable<Entity> Entities => _entities;
 
     public event Action<Entity>? EntityCreated;
@@ -50,12 +51,13 @@ public sealed class ECS : IEntityByElement
         return newlyCreatedEntity;
     }
 
-    private void HandleEntityDestroyed(Entity entity)
+    private Task HandleEntityDestroyed(Entity entity)
     {
         _entityByName.Remove(entity.Name);
         _entities.Remove(entity);
 
         entity.ComponentAdded -= HandleComponentAdded;
+        return Task.CompletedTask;
     }
 
     private void HandleComponentAdded(Component component)
@@ -71,7 +73,6 @@ public sealed class ECS : IEntityByElement
             var player = playerElementComponent.Player;
             _entityByPlayer[playerElementComponent.Player] = component.Entity;
             component.Entity.Destroyed += HandlePlayerEntityDestroyed;
-            player.Disconnected += HandlePlayerDisconnected;
         }
     }
 
@@ -81,16 +82,11 @@ public sealed class ECS : IEntityByElement
             _entityByElement.Remove(elementComponent.Element);
     }
 
-    private void HandlePlayerDisconnected(Player player, SlipeServer.Server.Elements.Events.PlayerQuitEventArgs e)
-    {
-        var playerEntity = _entityByPlayer[player];
-        playerEntity.Destroy();
-    }
-
-    private void HandlePlayerEntityDestroyed(Entity playerEntity)
+    private Task HandlePlayerEntityDestroyed(Entity playerEntity)
     {
         playerEntity.Destroyed += HandlePlayerEntityDestroyed;
         var playerComponent = playerEntity.GetRequiredComponent<PlayerElementComponent>();
         _entityByPlayer.Remove(playerComponent.Player);
+        return Task.CompletedTask;
     }
 }

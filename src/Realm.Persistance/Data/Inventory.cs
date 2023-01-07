@@ -2,8 +2,11 @@
 
 public class Inventory
 {
-    public string Id { get; set; }
+    public Guid Id { get; set; }
+    public Guid UserId { get; set; }
     public uint Size { get; set; }
 
     public ICollection<InventoryItem> InventoryItems = new List<InventoryItem>();
+
+    public User? User { get; set; }
 }

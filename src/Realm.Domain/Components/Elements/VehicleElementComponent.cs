@@ -16,10 +16,11 @@ public class VehicleElementComponent : ElementComponent
         _vehicle = vehicle;
     }
 
-    private void HandleDestroyed(Entity entity)
+    private Task HandleDestroyed(Entity entity)
     {
         Entity.Destroyed -= HandleDestroyed;
         _vehicle.Destroy();
+        return Task.CompletedTask;
     }
 
     public override Task Load()

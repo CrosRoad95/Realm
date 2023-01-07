@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Realm.Domain.Components.Vehicles;
 using Realm.Persistance.Data;
+using System.Runtime.ConstrainedExecution;
 using static Realm.Persistance.Data.Helpers.VehicleDamageState;
 using static Realm.Persistance.Data.Helpers.VehicleWheelStatus;
 
@@ -11,30 +13,15 @@ internal class LoadAndSaveService : ILoadAndSaveService
     private readonly RealmDbContextFactory _dbContextFactory;
     private readonly RepositoryFactory _repositoryFactory;
     private readonly IEntityFactory _entityFactory;
-    private readonly UserManager<User> _userManager;
-    private readonly ECS _ecs;
     private readonly ILogger _logger;
 
-    public LoadAndSaveService(RealmDbContextFactory dbContextFactory, RepositoryFactory repositoryFactory, IEntityFactory entityFactory, UserManager<User> userManager, ECS ecs,
+    public LoadAndSaveService(RealmDbContextFactory dbContextFactory, RepositoryFactory repositoryFactory, IEntityFactory entityFactory,
         ILogger logger)
     {
         _dbContextFactory = dbContextFactory;
         _repositoryFactory = repositoryFactory;
         _entityFactory = entityFactory;
-        _userManager = userManager;
-        _ecs = ecs;
         _logger = logger;
-        _ecs.EntityCreated += HandleEntityCreated;
-    }
-
-    private void HandleEntityCreated(Entity entity)
-    {
-        entity.Destroyed += HandleEntityDestroyed;
-    }
-
-    private async void HandleEntityDestroyed(Entity entity)
-    {
-        await Save(entity);
     }
 
     public async ValueTask<bool> Save(Entity entity, IDb? context = null)
@@ -48,68 +35,60 @@ internal class LoadAndSaveService : ILoadAndSaveService
                 if (entity.TryGetComponent(out AccountComponent accountComponent))
                 {
                     var user = accountComponent.User;
-
+                    await context.Users.Where(x => x.Id == user.Id).ExecuteDeleteAsync();
                     if (entity.TryGetComponent(out MoneyComponent moneyComponent))
                         user.Money = moneyComponent.Money;
+                    else
+                        user.Money = 0;
 
+                    await context.UserLicenses.Where(x => x.UserId == user.Id).ExecuteDeleteAsync();
                     if (entity.TryGetComponent(out LicensesComponent licensesComponent))
+                    {
                         user.Licenses = licensesComponent.Licenses;
+                        context.UserLicenses.AddRange(user.Licenses);
+                    }
 
                     if (entity.TryGetComponent(out PlayTimeComponent playTimeComponent))
                     {
-                        user.PlayTime += playTimeComponent.PlayTime;
+                        user.PlayTime = playTimeComponent.TotalPlayTime;
                         playTimeComponent.Reset();
                     }
-                    
-                    if (entity.TryGetComponent(out InventoryComponent inventoryComponent))
-                    {
-                        bool updateInventory = true;
-                        if (user.Inventory == null)
-                        {
-                            user.Inventory = new Inventory
-                            {
-                                Size = inventoryComponent.Size,
-                                Id = inventoryComponent.Id,
-                                InventoryItems = new List<InventoryItem>()
-                            };
-                            updateInventory = false;
-                            //context.Inventories.Add(user.Inventory);
-                        }
+                    else
+                        user.PlayTime = 0;
 
-                        user.Inventory.Size = inventoryComponent.Size;
-                        user.Inventory.InventoryItems = inventoryComponent.Items.Select(item => new InventoryItem
+                    var inventoryComponents = entity.Components.OfType<InventoryComponent>().ToList();
+                    user.Inventories = inventoryComponents.Select(x => new Inventory
+                    {
+                        Size = x.Size,
+                        Id = x.Id,
+                        InventoryItems = x.Items.Select(item => new InventoryItem
                         {
                             Id = item.Id ?? Guid.NewGuid().ToString(),
-                            Inventory = user.Inventory,
-                            InventoryId = user.Inventory.Id,
+                            InventoryId = x.Id,
                             ItemId = item.ItemId,
                             Number = item.Number,
                             MetaData = JsonConvert.SerializeObject(item.MetaData, Formatting.None),
-                        }).ToList();
-                        if (updateInventory)
-                        {
-                            user.Inventory.Id = inventoryComponent.Id;
-                            //context.Inventories.Update(user.Inventory);
-                        }
-                    }
+                        }).ToList()
+                    }).ToList();
+                    context.Inventories.AddRange(user.Inventories);
 
                     if (entity.TryGetComponent(out DailyVisitsCounterComponent dailyVisitsCounterComponent))
                     {
                         user.DailyVisits = new DailyVisits
                         {
-                            Id = user.Id,
+                            UserId = user.Id,
                             User = user,
                             LastVisit = dailyVisitsCounterComponent.LastVisit,
                             VisitsInRow = dailyVisitsCounterComponent.VisitsInRow,
                             VisitsInRowRecord = dailyVisitsCounterComponent.VisitsInRowRecord,
                         };
                     }
-                    
+
                     if (entity.TryGetComponent(out StatisticsCounterComponent statisticsCounterComponent))
                     {
                         user.Statistics = new Statistics
                         {
-                            Id = user.Id,
+                            UserId = user.Id,
                             User = user,
                             TraveledDistanceByFoot = statisticsCounterComponent.TraveledDistanceByFoot,
                             TraveledDistanceInAir = statisticsCounterComponent.TraveledDistanceInAir,
@@ -118,7 +97,7 @@ internal class LoadAndSaveService : ILoadAndSaveService
                             TraveledDistanceSwimming = statisticsCounterComponent.TraveledDistanceSwimming,
                         };
                     }
-                    
+
                     if (entity.TryGetComponent(out AchievementsComponent achievementsComponent))
                     {
                         user.Achievements = achievementsComponent.Achievements.Select(x => new Achievement
@@ -131,9 +110,9 @@ internal class LoadAndSaveService : ILoadAndSaveService
                             Progress = x.Value.Progress,
                         }).ToList();
                     }
-
                     user.LastTransformAndMotion = entity.Transform.GetTransformAndMotion();
-                    await _userManager.UpdateAsync(user);
+                    context.Users.Add(user);
+                    var i = await context.SaveChangesAsync();
                     return true;
                 }
                 break;
@@ -198,7 +177,7 @@ internal class LoadAndSaveService : ILoadAndSaveService
                     {
                         Id= x.Id,
                         UserId = x.UserId,
-                        VehicleId = vehicleData.Id,
+                        VehicleId = vehicleData.UserId,
                         Vehicle = vehicleData,
                         Description = new Persistance.Data.Helpers.VehicleAccessDescription
                         {
@@ -206,24 +185,24 @@ internal class LoadAndSaveService : ILoadAndSaveService
                         },
                     }).ToList();
 
-                    await context.VehicleUpgrades.Where(x => x.VehicleId == vehicleData.Id).ExecuteDeleteAsync();
+                    await context.VehicleUpgrades.Where(x => x.VehicleId == vehicleData.UserId).ExecuteDeleteAsync();
                     if (entity.TryGetComponent(out VehicleUpgradesComponent vehicleUpgradesComponent))
                     {
                         vehicleData.Upgrades = vehicleUpgradesComponent.Upgrades.Select(x => new Persistance.Data.VehicleUpgrade
                         {
                             UpgradeId = x,
                             Vehicle = vehicleData,
-                            VehicleId = vehicleData.Id
+                            VehicleId = vehicleData.UserId
                         }).ToList();
                         context.VehicleUpgrades.AddRange(vehicleData.Upgrades);
                     }
 
-                    await context.VehicleFuels.Where(x => x.VehicleId == vehicleData.Id).ExecuteDeleteAsync();
+                    await context.VehicleFuels.Where(x => x.VehicleId == vehicleData.UserId).ExecuteDeleteAsync();
                     var fuelComponents = entity.Components.OfType<VehicleFuelComponent>();
                     vehicleData.Fuels = fuelComponents.Select(x => new VehicleFuel
                     {
                         Vehicle = vehicleData,
-                        VehicleId = vehicleData.Id,
+                        VehicleId = vehicleData.UserId,
                         FuelType = x.FuelType,
                         Active = x.Active,
                         Amount= x.Amount,
@@ -239,18 +218,6 @@ internal class LoadAndSaveService : ILoadAndSaveService
                 break;
         }
         return false;
-    }
-
-    public async Task<int> SaveAll()
-    {
-        int savedEntities = 0;
-        using var context = _dbContextFactory.CreateDbContext();
-        foreach (var entity in _ecs.Entities)
-        {
-            await Save(entity, context);
-            savedEntities++;
-        }
-        return savedEntities;
     }
 
     public async Task LoadAll()
@@ -272,7 +239,7 @@ internal class LoadAndSaveService : ILoadAndSaveService
                 try
                 {
                     await Task.Delay(200);
-                    var entity = _entityFactory.CreateVehicle(vehicleData.Model, vehicleData.TransformAndMotion.Position, vehicleData.TransformAndMotion.Rotation, vehicleData.TransformAndMotion.Interior, vehicleData.TransformAndMotion.Dimension, $"vehicle {vehicleData.Id}",
+                    var entity = _entityFactory.CreateVehicle(vehicleData.Model, vehicleData.TransformAndMotion.Position, vehicleData.TransformAndMotion.Rotation, vehicleData.TransformAndMotion.Interior, vehicleData.TransformAndMotion.Dimension, $"vehicle {vehicleData.UserId}",
                         entity =>
                         {
                             entity.AddComponent(new PrivateVehicleComponent(vehicleData));

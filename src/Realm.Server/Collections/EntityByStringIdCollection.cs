@@ -15,7 +15,7 @@ public sealed class EntityByStringIdCollection
         return true;
     }
 
-    private void HandleDestroyed(Entity entity)
+    private Task HandleDestroyed(Entity entity)
     {
         var id = GetEntityId(entity);
         if (id == null)
@@ -24,6 +24,7 @@ public sealed class EntityByStringIdCollection
         _entitiesById.Remove(id);
         _idByEntity.Remove(entity);
         entity.Destroyed -= HandleDestroyed;
+        return Task.CompletedTask;
     }
 
     public string? GetEntityId(Entity entity)

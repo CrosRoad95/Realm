@@ -24,8 +24,13 @@ internal class SignInService : ISignInService
                 return false;
 
             await entity.AddComponentAsync(new AccountComponent(user));
-            if (user.Inventory != null)
-                await entity.AddComponentAsync(new InventoryComponent(user.Inventory));
+            if (user.Inventories != null)
+            {
+                foreach (var inventory in user.Inventories)
+                {
+                    await entity.AddComponentAsync(new InventoryComponent(inventory));
+                }
+            }
             else
                 await entity.AddComponentAsync(new InventoryComponent(20));
 
@@ -72,7 +77,7 @@ internal class SignInService : ISignInService
         return true;
     }
 
-    private async void HandleDestroyed(Entity entity)
+    private async Task HandleDestroyed(Entity entity)
     {
         await _lock.WaitAsync();
         try

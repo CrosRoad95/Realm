@@ -25,7 +25,7 @@ public class Entity
     public event Action<Component>? ComponentAdded;
     public event Action<Component>? ComponentRemoved;
 
-    public event Action<Entity>? Destroyed;
+    public event Func<Entity, Task>? Destroyed;
 
     public Entity(IServiceProvider serviceProvider, string name = "", string tag = "")
     {
@@ -150,9 +150,10 @@ public class Entity
         DetachComponent(component);
     }
 
-    public virtual void Destroy()
+    public virtual async Task Destroy()
     {
-        Destroyed?.Invoke(this);
+        if(Destroyed != null)
+            await Destroyed.Invoke(this);
 
         foreach (var component in _components.AsEnumerable().Reverse())
             DestroyComponent(component);

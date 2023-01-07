@@ -1,5 +1,6 @@
 ﻿using Realm.Domain.Interfaces;
 using Realm.Domain.Registries;
+using Realm.Server.Logic;
 
 namespace Realm.Server;
 
@@ -17,6 +18,7 @@ public partial class RPGServer : IRPGServer
         _server = MtaServer.CreateWithDiSupport<Player>(
             builder =>
             {
+                builder.AddLogic<SaveEntitiesLogic>();
                 builder.ConfigureServer(realmConfigurationProvider);
                 configureServerBuilder?.Invoke(builder);
 
@@ -108,6 +110,7 @@ public partial class RPGServer : IRPGServer
 
     public async Task Start()
     {
+        await GetRequiredService<IDb>().MigrateAsync();
         await BuildFromSeedFiles();
         var modules = GetRequiredService<IEnumerable<IModule>>().ToArray();
         var serviceProvider = _server.GetRequiredService<IServiceProvider>();
