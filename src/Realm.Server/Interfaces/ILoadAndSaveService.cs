@@ -3,5 +3,5 @@
 public interface ILoadAndSaveService
 {
     Task LoadAll();
-    ValueTask<bool> Save(Entity entity, IDb? context = null);
+    ValueTask<bool> Save(Entity entity, IDb context);
 }

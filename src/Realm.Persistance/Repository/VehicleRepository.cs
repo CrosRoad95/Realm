@@ -16,7 +16,7 @@ internal class VehicleRepository : IVehicleRepository
     {
         var vehicle = new Vehicle
         {
-            UserId = Guid.NewGuid().ToString(),
+            Id = Guid.NewGuid(),
             Platetext = Guid.NewGuid().ToString()[..8],
             CreatedAt = DateTime.Now,
         };

@@ -1,5 +1,4 @@
-﻿using Realm.Domain.Components.Vehicles;
-using SlipeServer.Server.Elements.ColShapes;
+﻿using SlipeServer.Server.Elements.ColShapes;
 using SlipeServer.Server.Elements.IdGeneration;
 
 namespace Realm.Server.Factories;
@@ -38,7 +37,7 @@ internal class EntityFactory : IEntityFactory
     {
         return _ecs.CreateEntity(id ?? $"vehicle {Guid.NewGuid()}", Entity.VehicleTag, entity =>
         {
-            var vehicle = new Vehicle(model, position);
+            var vehicle = new SlipeServer.Server.Elements.Vehicle(model, position);
             var vehicleElementComponent = entity.AddComponent(new VehicleElementComponent(vehicle));
 
             entity.Transform.Position = position;

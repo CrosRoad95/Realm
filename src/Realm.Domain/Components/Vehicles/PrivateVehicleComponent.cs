@@ -7,7 +7,8 @@ public class PrivateVehicleComponent : Component
 {
     private readonly VehicleData _vehicleData;
 
-    public VehicleData VehicleData => _vehicleData;
+    internal VehicleData VehicleData => _vehicleData;
+    internal Guid Id => _vehicleData.Id;
 
     private List<VehicleAccess> _vehicleAccesses = new();
     public IEnumerable<VehicleAccess> VehicleAccesses => _vehicleAccesses;
@@ -73,15 +74,22 @@ public class PrivateVehicleComponent : Component
         return Task.CompletedTask;
     }
 
-    public VehicleAccess? TryGetAccess(Entity entity)
+    public bool TryGetAccess(Entity entity, out VehicleAccess vehicleAccess)
     {
         var userId = entity.GetRequiredComponent<AccountComponent>().Id;
-        return _vehicleAccesses.FirstOrDefault(x => x.UserId == userId);
+        var index = _vehicleAccesses.FindIndex(x => x.UserId == userId);
+        if(index >= 0)
+        {
+            vehicleAccess = _vehicleAccesses[index];
+            return true;
+        }
+        vehicleAccess = default;
+        return false;
     }
 
     public VehicleAccess AddOwner(Entity entity)
     {
-        if (TryGetAccess(entity) != null)
+        if (TryGetAccess(entity, out var _))
             throw new EntityAccessDefinedException();
 
         var vehicleAccess = new VehicleAccess

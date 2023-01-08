@@ -1,18 +1,9 @@
-﻿using Silk.NET.Core.Native;
-using SlipeServer.Server.Elements.Structs;
-using System;
+﻿using License = Realm.Domain.Concepts.License;
 
 namespace Realm.Domain.Components.Players;
 
 public class LicensesComponent : Component
 {
-    public struct License
-    {
-        public string licenseId;
-        public DateTime? suspendedUntil;
-        public string? suspendedReason;
-        public bool IsSuspended => suspendedUntil != null && suspendedUntil > DateTime.Now;
-    }
     private readonly List<License> _licenses = new();
 
     public IEnumerable<License> Licenses => _licenses;

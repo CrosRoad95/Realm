@@ -1,6 +1,4 @@
-﻿using Realm.Persistance.Data;
-
-namespace Realm.Persistance;
+﻿namespace Realm.Persistance;
 
 public abstract class Db<T> : IdentityDbContext<User, Role, Guid,
         IdentityUserClaim<Guid>,
@@ -164,7 +162,7 @@ public abstract class Db<T> : IdentityDbContext<User, Role, Guid,
         modelBuilder.Entity<Vehicle>(entityBuilder =>
         {
             entityBuilder.ToTable("Vehicles")
-                .HasKey(x =>  x.UserId);
+                .HasKey(x =>  x.Id);
 
             entityBuilder.Property(x => x.Platetext)
                 .HasMaxLength(32)
@@ -273,7 +271,7 @@ public abstract class Db<T> : IdentityDbContext<User, Role, Guid,
                 .HasKey(x => x.Id);
 
             entityBuilder
-                .Property(x => x.Id)
+                .Property(x => x.VehicleId)
                 .ValueGeneratedOnAdd();
 
             entityBuilder.Property(x => x.Description)

@@ -1,15 +1,12 @@
-﻿namespace Realm.Domain.Components.Players;
+﻿using JobUpgrade = Realm.Domain.Concepts.JobUpgrade;
+using JobUpgradeData = Realm.Persistance.Data.JobUpgrade;
+
+namespace Realm.Domain.Components.Players;
 
 public class JobUpgradesComponent : Component
 {
-    public struct SingleJobUpgrade
-    {
-        public short jobId;
-        public string name;
-    }
-
-    private readonly List<SingleJobUpgrade> _upgrades = new();
-    public IEnumerable<SingleJobUpgrade> Upgrades => _upgrades;
+    private readonly List<JobUpgrade> _upgrades = new();
+    public IEnumerable<JobUpgrade> Upgrades => _upgrades;
 
     public event Action<Entity, short, string>? JobUpgradeAdded;
 
@@ -18,9 +15,9 @@ public class JobUpgradesComponent : Component
 
     }
 
-    public JobUpgradesComponent(ICollection<JobUpgrade> jobUpgrades)
+    public JobUpgradesComponent(ICollection<JobUpgradeData> jobUpgrades)
     {
-        _upgrades = jobUpgrades.Select(x => new SingleJobUpgrade
+        _upgrades = jobUpgrades.Select(x => new JobUpgrade
         {
             jobId = x.JobId,
             name = x.Name,
@@ -33,7 +30,7 @@ public class JobUpgradesComponent : Component
     {
         if (HasJobUpgrade(jobId, upgradeName))
             throw new UpgradeAlreadyExistsException(jobId, upgradeName);
-        _upgrades.Add(new SingleJobUpgrade
+        _upgrades.Add(new JobUpgrade
         {
             jobId = jobId,
             name = upgradeName,

@@ -1,6 +1,4 @@
-﻿using Microsoft.AspNetCore.Identity;
-using Realm.Domain.Interfaces;
-using Realm.Persistance.Data;
+﻿using Realm.Domain.Interfaces;
 
 namespace Realm.Server.Logic;
 

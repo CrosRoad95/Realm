@@ -1,47 +1,31 @@
-﻿using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
-using Realm.Domain.Components.Vehicles;
-using Realm.Persistance.Data;
-using System.Runtime.ConstrainedExecution;
-using static Realm.Persistance.Data.Helpers.VehicleDamageState;
+﻿using static Realm.Persistance.Data.Helpers.VehicleDamageState;
 using static Realm.Persistance.Data.Helpers.VehicleWheelStatus;
 
 namespace Realm.Server.Services;
 
 internal class LoadAndSaveService : ILoadAndSaveService
 {
-    private readonly RealmDbContextFactory _dbContextFactory;
     private readonly RepositoryFactory _repositoryFactory;
     private readonly IEntityFactory _entityFactory;
     private readonly ILogger _logger;
 
-    public LoadAndSaveService(RealmDbContextFactory dbContextFactory, RepositoryFactory repositoryFactory, IEntityFactory entityFactory,
+    public LoadAndSaveService(RepositoryFactory repositoryFactory, IEntityFactory entityFactory,
         ILogger logger)
     {
-        _dbContextFactory = dbContextFactory;
         _repositoryFactory = repositoryFactory;
         _entityFactory = entityFactory;
         _logger = logger;
     }
 
-    public async ValueTask<bool> Save(Entity entity, IDb? context = null)
+    public async ValueTask<bool> Save(Entity entity, IDb context)
     {
-        if (context == null)
-            context = _dbContextFactory.CreateDbContext();
-
         switch (entity.Tag)
         {
             case Entity.PlayerTag:
                 if (entity.TryGetComponent(out AccountComponent accountComponent))
                 {
                     var user = await context.Users
-                        .Include(x => x.Licenses)
-                        .Include(x => x.JobUpgrades)
-                        .Include(x => x.Achievements)
-                        .Include(x => x.DailyVisits)
-                        .Include(x => x.Statistics)
-                        .Include(x => x.Inventories)
-                        .ThenInclude(x => x!.InventoryItems)
+                        .IncludeAll()
                         .Where(x => x.Id == accountComponent.Id).FirstAsync();
                     user.LastTransformAndMotion = entity.Transform.GetTransformAndMotion();
 
@@ -92,7 +76,6 @@ internal class LoadAndSaveService : ILoadAndSaveService
                         return inventory;
                     }).ToList();
 
-
                     if (entity.TryGetComponent(out DailyVisitsCounterComponent dailyVisitsCounterComponent))
                     {
                         user.DailyVisits = new DailyVisits
@@ -126,9 +109,9 @@ internal class LoadAndSaveService : ILoadAndSaveService
                         user.Achievements = achievementsComponent.Achievements.Select(x => new Achievement
                         {
                             Name = x.Key,
-                            Value = JsonConvert.SerializeObject(x.Value.Value, Formatting.None),
-                            PrizeReceived = x.Value.PrizeReceived,
-                            Progress = x.Value.Progress,
+                            Value = JsonConvert.SerializeObject(x.Value.value, Formatting.None),
+                            PrizeReceived = x.Value.prizeReceived,
+                            Progress = x.Value.progress,
                         }).ToList();
                     }
                     else
@@ -144,17 +127,18 @@ internal class LoadAndSaveService : ILoadAndSaveService
                     }
                     else
                         user.JobUpgrades = new List<JobUpgrade>();
-
-                    await context.SaveChangesAsync();
                     return true;
                 }
                 break;
             case Entity.VehicleTag:
                 if (entity.TryGetComponent(out PrivateVehicleComponent privateVehicleComponent))
                 {
+                    var vehicleData = await context.Vehicles
+                        .IncludeAll()
+                        .Where(x => x.Id == privateVehicleComponent.Id).FirstAsync();
+
                     var vehicleElementComponent = entity.GetRequiredComponent<VehicleElementComponent>();
                     var vehicle = vehicleElementComponent.Vehicle;
-                    var vehicleData = privateVehicleComponent.VehicleData;
 
                     vehicleData.Model = vehicle.Model;
                     vehicleData.Color = new Persistance.Data.Helpers.VehicleColor(vehicle.Colors.Primary, vehicle.Colors.Secondary, vehicle.Colors.Color3, vehicle.Colors.Color4, vehicle.HeadlightColor);
@@ -208,9 +192,9 @@ internal class LoadAndSaveService : ILoadAndSaveService
                     vehicleData.TransformAndMotion = entity.Transform.GetTransformAndMotion();
                     vehicleData.VehicleAccesses = privateVehicleComponent.VehicleAccesses.Select(x => new VehicleAccess
                     {
-                        Id = x.Id,
+                        Id = x.Id ?? Guid.Empty,
                         UserId = x.UserId,
-                        VehicleId = vehicleData.UserId,
+                        VehicleId = vehicleData.Id,
                         Vehicle = vehicleData,
                         Description = new Persistance.Data.Helpers.VehicleAccessDescription
                         {
@@ -218,35 +202,30 @@ internal class LoadAndSaveService : ILoadAndSaveService
                         },
                     }).ToList();
 
-                    await context.VehicleUpgrades.Where(x => x.VehicleId == vehicleData.UserId).ExecuteDeleteAsync();
                     if (entity.TryGetComponent(out VehicleUpgradesComponent vehicleUpgradesComponent))
                     {
                         vehicleData.Upgrades = vehicleUpgradesComponent.Upgrades.Select(x => new Persistance.Data.VehicleUpgrade
                         {
                             UpgradeId = x,
                             Vehicle = vehicleData,
-                            VehicleId = vehicleData.UserId
+                            VehicleId = vehicleData.Id
                         }).ToList();
-                        context.VehicleUpgrades.AddRange(vehicleData.Upgrades);
                     }
 
-                    await context.VehicleFuels.Where(x => x.VehicleId == vehicleData.UserId).ExecuteDeleteAsync();
-                    var fuelComponents = entity.Components.OfType<VehicleFuelComponent>();
-                    vehicleData.Fuels = fuelComponents.Select(x => new VehicleFuel
                     {
-                        Vehicle = vehicleData,
-                        VehicleId = vehicleData.UserId,
-                        FuelType = x.FuelType,
-                        Active = x.Active,
-                        Amount = x.Amount,
-                        FuelConsumptionPerOneKm = x.FuelConsumptionPerOneKm,
-                        MaxCapacity = x.MaxCapacity,
-                        MinimumDistanceThreshold = x.MinimumDistanceThreshold,
-                    }).ToList();
-                    context.VehicleFuels.AddRange(vehicleData.Fuels);
-
-                    context.Vehicles.Update(vehicleData);
-                    await context.SaveChangesAsync();
+                        var fuelComponents = entity.Components.OfType<VehicleFuelComponent>();
+                        vehicleData.Fuels = fuelComponents.Select(x => new VehicleFuel
+                        {
+                            Vehicle = vehicleData,
+                            VehicleId = vehicleData.Id,
+                            FuelType = x.FuelType,
+                            Active = x.Active,
+                            Amount = x.Amount,
+                            FuelConsumptionPerOneKm = x.FuelConsumptionPerOneKm,
+                            MaxCapacity = x.MaxCapacity,
+                            MinimumDistanceThreshold = x.MinimumDistanceThreshold,
+                        }).ToList();
+                    }
                 }
                 break;
         }
@@ -260,10 +239,8 @@ internal class LoadAndSaveService : ILoadAndSaveService
             using var vehicleRepository = _repositoryFactory.GetVehicleRepository();
             var results = await vehicleRepository
                 .GetAll()
-                .Include(x => x.Fuels)
-                .Include(x => x.Upgrades)
-                .Include(x => x.VehicleAccesses)
-                .ThenInclude(x => x.User)
+                .IncludeAll()
+                //.Where(x => x.Spawned)
                 .AsNoTrackingWithIdentityResolution()
                 .ToListAsync();
 
@@ -272,7 +249,7 @@ internal class LoadAndSaveService : ILoadAndSaveService
                 try
                 {
                     await Task.Delay(200);
-                    var entity = _entityFactory.CreateVehicle(vehicleData.Model, vehicleData.TransformAndMotion.Position, vehicleData.TransformAndMotion.Rotation, vehicleData.TransformAndMotion.Interior, vehicleData.TransformAndMotion.Dimension, $"vehicle {vehicleData.UserId}",
+                    var entity = _entityFactory.CreateVehicle(vehicleData.Model, vehicleData.TransformAndMotion.Position, vehicleData.TransformAndMotion.Rotation, vehicleData.TransformAndMotion.Interior, vehicleData.TransformAndMotion.Dimension, $"vehicle {vehicleData.Id}",
                         entity =>
                         {
                             entity.AddComponent(new PrivateVehicleComponent(vehicleData));

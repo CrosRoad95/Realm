@@ -1,6 +1,4 @@
-﻿using Realm.Domain.Components.Elements;
-using Realm.Domain.Components.Players;
-using Realm.Persistance.Data;
+﻿using Realm.Domain.Components.Players;
 
 namespace Realm.Console.Logic;
 
@@ -187,10 +185,10 @@ internal sealed class CommandsLogic
 
         _commandService.AddCommandHandler("addupgrade", async (entity, args) =>
         {
-            var achievementsComponent = entity.GetRequiredComponent<JobUpgradesComponent>();
+            var jobUpgradesComponent = entity.GetRequiredComponent<JobUpgradesComponent>();
             try
             {
-                achievementsComponent.AddJobUpgrade(1, "foo");
+                jobUpgradesComponent.AddJobUpgrade(1, "foo");
                 entity.GetRequiredComponent<PlayerElementComponent>().SendChatMessage("Upgrade added");
             }
             catch (Exception ex)
@@ -226,6 +224,48 @@ internal sealed class CommandsLogic
             foreach (var component in entity.Components)
             {
                 playerElementComponent.SendChatMessage($"> {component}");
+            }
+        });
+
+        _commandService.AddCommandHandler("addtestdata", async (entity, args) =>
+        {
+            if (entity.TryGetComponent(out JobUpgradesComponent jobUpgradesComponent))
+            {
+                jobUpgradesComponent.AddJobUpgrade(1, "foo");
+                entity.GetRequiredComponent<PlayerElementComponent>().SendChatMessage($"Job upgrade added");
+            }
+            
+            if (entity.TryGetComponent(out InventoryComponent inventoryComponent))
+            {
+                if (inventoryComponent.AddItem(1) != null)
+                    entity.GetRequiredComponent<PlayerElementComponent>().SendChatMessage($"Test item added");
+            }
+
+            if (entity.TryGetComponent(out LicensesComponent licenseComponent))
+            {
+                if (licenseComponent.AddLicense("test123"))
+                    entity.GetRequiredComponent<PlayerElementComponent>().SendChatMessage($"Test license added: 'test123'");
+            }
+
+            if (entity.TryGetComponent(out MoneyComponent moneyComponent))
+            {
+                moneyComponent.Money = (decimal)Random.Shared.NextDouble() * 1000;
+                entity.GetRequiredComponent<PlayerElementComponent>().SendChatMessage($"Set money to: {moneyComponent.Money}");
+            }
+            
+
+            if (entity.TryGetComponent(out AchievementsComponent achievementsComponent))
+            {
+                achievementsComponent.UpdateProgress("test", 2, 10);
+                entity.GetRequiredComponent<PlayerElementComponent>().SendChatMessage($"Updated achievement 'test' progress to 2");
+            }
+
+            {
+                using var vehicleRepository = _repositoryFactory.GetVehicleRepository();
+                var vehicleEntity = _entityFactory.CreateVehicle(404, entity.Transform.Position + new Vector3(4, 0, 0), entity.Transform.Rotation);
+                vehicleEntity.AddComponent(new VehicleUpgradesComponent()).AddUpgrade(1);
+                vehicleEntity.AddComponent(new PrivateVehicleComponent(await vehicleRepository.CreateNewVehicle())).AddOwner(entity);
+                vehicleEntity.AddComponent(new VehicleFuelComponent("default", 20, 20, 0.01, 2)).Active = true;
             }
         });
     }

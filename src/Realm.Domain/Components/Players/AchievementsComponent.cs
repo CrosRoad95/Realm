@@ -1,17 +1,10 @@
-﻿using Newtonsoft.Json.Linq;
-using AchievementData = Realm.Persistance.Data.Achievement;
+﻿using AchievementData = Realm.Persistance.Data.Achievement;
+using Achievement = Realm.Domain.Concepts.Achievement;
 
 namespace Realm.Domain.Components.Players;
 
 public class AchievementsComponent : Component
 {
-    public class Achievement
-    {
-        public float Progress { get; set; }
-        public object? Value { get; set; }
-        public bool PrizeReceived { get; set; }
-    }
-
     private readonly Dictionary<string, Achievement> _achievements = new();
     public IReadOnlyDictionary<string, Achievement> Achievements => _achievements;
 
@@ -26,9 +19,9 @@ public class AchievementsComponent : Component
     {
         _achievements = achievements.ToDictionary(x => x.Name, x => new Achievement
         {
-            Progress = x.Progress,
-            Value = JsonConvert.DeserializeObject(x.Value),
-            PrizeReceived = x.PrizeReceived,
+            progress = x.Progress,
+            value = JsonConvert.DeserializeObject(x.Value),
+            prizeReceived = x.PrizeReceived,
         });
     }
 
@@ -42,14 +35,16 @@ public class AchievementsComponent : Component
     {
         TryInitializeAchievement(achievementName);
 
-        _achievements[achievementName].Value = value;
+        var achievement = _achievements[achievementName];
+        achievement.value = value;
+        _achievements[achievementName] = achievement;
     }
     
     public T? GetAchievementValue<T>(string achievementName)
     {
         TryInitializeAchievement(achievementName);
 
-        var value = _achievements[achievementName].Value;
+        var value = _achievements[achievementName].value;
         return (T?)value;
     }
     
@@ -57,14 +52,14 @@ public class AchievementsComponent : Component
     {
         TryInitializeAchievement(achievementName);
 
-        return _achievements[achievementName].Progress;
+        return _achievements[achievementName].progress;
     }
     
     public bool HasProgress(string achievementName, float progress)
     {
         TryInitializeAchievement(achievementName);
 
-        return progress <= _achievements[achievementName].Progress;
+        return progress <= _achievements[achievementName].progress;
     }
 
     public async Task<bool> TryReceiveReward(string achievementName, Func<Task> action)
@@ -72,10 +67,10 @@ public class AchievementsComponent : Component
         TryInitializeAchievement(achievementName);
 
         var achievement = _achievements[achievementName];
-        if (achievement.PrizeReceived)
+        if (achievement.prizeReceived)
             return false;
 
-        achievement.PrizeReceived = true;
+        achievement.prizeReceived = true;
         await action();
         return true;
     }
@@ -87,10 +82,10 @@ public class AchievementsComponent : Component
         if (!_achievements.ContainsKey(achievementName))
             _achievements[achievementName] = new();
         var achievement = _achievements[achievementName];
-        if (achievement.PrizeReceived || HasProgress(achievementName, maximumProgress))
+        if (achievement.prizeReceived || HasProgress(achievementName, maximumProgress))
             return false;
 
-        achievement.Progress = Math.Min(progress + achievement.Progress, maximumProgress);
+        achievement.progress = Math.Min(progress + achievement.progress, maximumProgress);
         if (HasProgress(achievementName, maximumProgress))
             AchievementUnlocked?.Invoke(Entity, achievementName);
 

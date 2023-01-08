@@ -1,7 +1,4 @@
-﻿using Realm.Persistance;
-using System.Collections.Generic;
-
-namespace Realm.Domain.Components.Players;
+﻿namespace Realm.Domain.Components.Players;
 
 public class AccountComponent : Component
 {
@@ -17,7 +14,7 @@ public class AccountComponent : Component
     internal User User => _user;
     public Guid Id => _user.Id;
     public string? UserName => _user.UserName;
-    public AccountComponent(User user)
+    internal AccountComponent(User user)
     {
         _user = user;
     }
@@ -27,7 +24,7 @@ public class AccountComponent : Component
         await UpdateClaimsPrincipal();
     }
 
-    public async Task UpdateClaimsPrincipal()
+    private async Task UpdateClaimsPrincipal()
     {
         _claimsPrincipal = await SignInManager.CreateUserPrincipalAsync(_user);
     }

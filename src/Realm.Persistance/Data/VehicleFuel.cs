@@ -2,7 +2,7 @@
 
 public class VehicleFuel
 {
-    public string VehicleId { get; set; }
+    public Guid VehicleId { get; set; }
     public string FuelType { get; set; }
     public float MinimumDistanceThreshold { get; set; }
     public float FuelConsumptionPerOneKm { get; set; }

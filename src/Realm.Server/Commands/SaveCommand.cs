@@ -31,5 +31,6 @@ internal class SaveCommand : ICommand
                 ;
             }
         }
+        await context.SaveChangesAsync();
     }
 }

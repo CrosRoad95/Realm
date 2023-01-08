@@ -16,4 +16,23 @@ public static class QuerableExtensions
     {
         return query.Where(x => !x.Removed);
     }
+
+    public static IQueryable<User> IncludeAll(this IQueryable<User> query)
+    {
+        return query.Include(x => x.Licenses)
+            .Include(x => x.JobUpgrades)
+            .Include(x => x.Achievements)
+            .Include(x => x.DailyVisits)
+            .Include(x => x.Statistics)
+            .Include(x => x.Inventories)
+            .ThenInclude(x => x!.InventoryItems);
+    }
+
+    public static IQueryable<Vehicle> IncludeAll(this IQueryable<Vehicle> query)
+    {
+        return query.Include(x => x.Fuels)
+            .Include(x => x.Upgrades)
+            .Include(x => x.VehicleAccesses)
+            .ThenInclude(x => x.User);
+    }
 }

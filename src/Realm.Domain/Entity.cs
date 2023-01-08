@@ -96,7 +96,7 @@ public class Entity
     public bool HasComponent<TComponent>() where TComponent : Component
         => _components.OfType<TComponent>().Any();
     
-    public bool TryGetComponent<TComponent>([NotNullWhen(true)] out TComponent? component) where TComponent : Component
+    public bool TryGetComponent<TComponent>([NotNullWhen(true)] out TComponent component) where TComponent : Component
     {
         component = GetComponent<TComponent>();
         return component != null;
