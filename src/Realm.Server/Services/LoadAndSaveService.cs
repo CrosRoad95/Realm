@@ -226,6 +226,10 @@ internal class LoadAndSaveService : ILoadAndSaveService
                             MinimumDistanceThreshold = x.MinimumDistanceThreshold,
                         }).ToList();
                     }
+                    if (entity.TryGetComponent(out MileageCounterComponent mileageCounterComponent))
+                    {
+                        vehicleData.Mileage = mileageCounterComponent.Mileage;
+                    }
                 }
                 break;
         }
@@ -254,6 +258,7 @@ internal class LoadAndSaveService : ILoadAndSaveService
                         {
                             entity.AddComponent(new PrivateVehicleComponent(vehicleData));
                             entity.AddComponent(new VehicleUpgradesComponent(vehicleData.Upgrades));
+                            entity.AddComponent(new MileageCounterComponent(vehicleData.Mileage));
                             foreach (var vehicleFuel in vehicleData.Fuels)
                                 entity.AddComponent(new VehicleFuelComponent(vehicleFuel.FuelType, vehicleFuel.Amount, vehicleFuel.MaxCapacity, vehicleFuel.FuelConsumptionPerOneKm, vehicleFuel.MinimumDistanceThreshold)).Active = vehicleFuel.Active;
                         });

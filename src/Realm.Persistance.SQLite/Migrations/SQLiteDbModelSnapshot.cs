@@ -447,6 +447,9 @@ namespace Realm.Persistance.SQLite.Migrations
                         .HasColumnType("INTEGER")
                         .HasDefaultValue(false);
 
+                    b.Property<float>("Mileage")
+                        .HasColumnType("REAL");
+
                     b.Property<ushort>("Model")
                         .HasColumnType("INTEGER");
 

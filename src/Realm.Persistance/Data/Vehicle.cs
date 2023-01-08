@@ -24,6 +24,7 @@ public sealed class Vehicle
     public bool Removed { get; set; }
     public DateTime CreatedAt { get; set; }
     public bool Spawned { get; set; }
+    public float Mileage { get; set; }
 
     public ICollection<VehicleAccess> VehicleAccesses { get; set; } = new List<VehicleAccess>();
     public ICollection<VehicleUpgrade> Upgrades { get; set; } = new List<VehicleUpgrade>();

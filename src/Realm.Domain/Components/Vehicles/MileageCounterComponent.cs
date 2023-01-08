@@ -26,34 +26,49 @@ public class MileageCounterComponent : Component
         }
     }
 
+    public MileageCounterComponent()
+    {
+        _mileage = 0.0f;
+        _minimumDistanceThreshold = 2.0f;
+    }
+
+    public MileageCounterComponent(float mileage, float minimumDistanceThreshold = 2.0f)
+    {
+        _mileage = mileage;
+        _minimumDistanceThreshold = minimumDistanceThreshold;
+    }
+
     public override Task Load()
     {
-        var vehicle = Entity.GetRequiredComponent<VehicleElementComponent>().Vehicle;
-        vehicle.PositionChanged += HandlePositionChanged;
+        Entity.Transform.PositionChanged += HandlePositionChanged;
         return Task.CompletedTask;
     }
 
-    private void HandlePositionChanged(Element sender, ElementChangedEventArgs<Vector3> args)
+    public override void Destroy()
     {
-        if (args.IsSync)
-            Update();
+        Entity.Transform.PositionChanged -= HandlePositionChanged;
+    }
+
+    private void HandlePositionChanged(Transform transform)
+    {
+        Update();
     }
 
     private void Update()
     {
-        var vehicle = Entity.GetRequiredComponent<VehicleElementComponent>().Vehicle;
+        var vehicle = Entity.GetRequiredComponent<VehicleElementComponent>();
         if (!vehicle.IsEngineOn)
         {
-            _lastPosition = vehicle.Position;
+            _lastPosition = Entity.Transform.Position;
             return;
         }
         if (!vehicle.IsEngineOn || vehicle.IsFrozen)
             return;
 
-        var traveledDistance = vehicle.Position - _lastPosition;
+        var traveledDistance = Entity.Transform.Position - _lastPosition;
         if (_minimumDistanceThreshold > traveledDistance.Length())
             return;
-        _lastPosition = vehicle.Position;
+        _lastPosition = Entity.Transform.Position;
         _mileage += traveledDistance.Length();
     }
 }
