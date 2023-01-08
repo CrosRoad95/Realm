@@ -1,7 +1,8 @@
 ﻿namespace Realm.Domain.Concepts.Objectives;
 
-public abstract class Objective : IDisposable
+public abstract class Objective : IAsyncDisposable
 {
+    private bool _disposed = false;
     private bool _isFulfilled = false;
     private Entity? _entity;
 
@@ -12,8 +13,10 @@ public abstract class Objective : IDisposable
 
     public Entity Entity { get => _entity ?? throw new InvalidOperationException(); internal set => _entity = value; }
 
-    public void Complete()
+    protected void Complete()
     {
+        ThrowIfDisposed();
+
         if (Entity == null)
             throw new ArgumentNullException(nameof(Entity), "Entity cannot be null.");
 
@@ -26,6 +29,8 @@ public abstract class Objective : IDisposable
 
     public void Incomplete()
     {
+        ThrowIfDisposed();
+
         if (Entity == null)
             throw new ArgumentNullException(nameof(Entity), "Entity cannot be null.");
 
@@ -36,13 +41,18 @@ public abstract class Objective : IDisposable
         _isFulfilled = true;
     }
 
-    public abstract void Dispose();
-}
-
-public class ObjectiveAlreadyFulfilledException : Exception
-{
-    public ObjectiveAlreadyFulfilledException()
-        : base("Objective has already been fulfilled.")
+    protected void ThrowIfDisposed()
     {
+        if (_disposed)
+            throw new ObjectDisposedException(nameof(Objective));
+
+        _disposed = true;
+    }
+
+    public virtual ValueTask DisposeAsync()
+    {
+        ThrowIfDisposed();
+        _disposed = true;
+        return ValueTask.CompletedTask;
     }
 }

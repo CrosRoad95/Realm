@@ -1,4 +1,6 @@
-﻿namespace Realm.Domain.Components.Elements;
+﻿using Realm.Domain.Rules;
+
+namespace Realm.Domain.Components.Elements;
 
 public class PickupElementComponent : ElementComponent
 {
@@ -8,10 +10,17 @@ public class PickupElementComponent : ElementComponent
 
     internal override Element Element => _pickup;
 
-    public PickupElementComponent(Pickup pickup)
+    private readonly List<IEntityRule> _entityRules = new();
+
+    internal PickupElementComponent(Pickup pickup)
     {
         _pickup = pickup;
         _pickup.RespawnTime = 500;
+    }
+
+    public void AddRule(IEntityRule entityRule)
+    {
+        _entityRules.Add(entityRule);
     }
 
     private void HandleElementEntered(Element element)
@@ -20,7 +29,10 @@ public class PickupElementComponent : ElementComponent
         {
             var entity = EntityByElement.TryGetByElement(element);
             if(entity != null)
-                EntityEntered(entity);
+            {
+                if(_entityRules.All(x => x.Check(entity)))
+                    EntityEntered(entity);
+            }
         }
     }
 
@@ -30,7 +42,8 @@ public class PickupElementComponent : ElementComponent
         {
             var entity = EntityByElement.TryGetByElement(element);
             if (entity != null)
-                EntityLeft(entity);
+                if (_entityRules.All(x => x.Check(entity)))
+                    EntityLeft(entity);
         }
     }
 

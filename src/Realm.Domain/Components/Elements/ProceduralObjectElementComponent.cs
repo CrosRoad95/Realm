@@ -7,7 +7,7 @@ public class ProceduralObjectElementComponent : ElementComponent
 
     internal override Element Element => throw new NotImplementedException();
 
-    public ProceduralObjectElementComponent()
+    internal ProceduralObjectElementComponent()
     {
     }
 

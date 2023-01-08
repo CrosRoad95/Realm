@@ -1,4 +1,6 @@
-﻿namespace Realm.Console.Logic;
+﻿using Realm.Domain.Rules;
+
+namespace Realm.Console.Logic;
 
 internal class SamplePickupsLogic
 {
@@ -80,22 +82,17 @@ internal class SamplePickupsLogic
         {
             entity.AddComponent(new Text3dComponent("Example text 3d", new Vector3(0, 0, 0.75f)));
             var pickupElementComponent = entity.GetRequiredComponent<PickupElementComponent>();
+            pickupElementComponent.AddRule(new MustBePlayerOnFootOnlyRule());
 
             pickupElementComponent.EntityEntered = entity =>
             {
-                if(entity.Tag == Entity.PlayerTag)
-                {
-                    if(!entity.HasComponent<GuiComponent>())
-                        entity.AddComponent(new TestWindowComponent());
-                }
+                if(!entity.HasComponent<GuiComponent>())
+                    entity.AddComponent(new TestWindowComponent());
             };
             pickupElementComponent.EntityLeft = entity =>
             {
-                if(entity.Tag == Entity.PlayerTag)
-                {
-                    if (entity.HasComponent<TestWindowComponent>())
-                        entity.DestroyComponent<TestWindowComponent>();
-                }
+                if (entity.HasComponent<TestWindowComponent>())
+                    entity.DestroyComponent<TestWindowComponent>();
             };
         }
     }

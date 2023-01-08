@@ -9,7 +9,7 @@ public class CollisionSphereElementComponent : ElementComponent
 
     internal override Element Element => _collisionSphere;
 
-    public CollisionSphereElementComponent(CollisionSphere collisionSphere, Entity? createForEntity = null) : base(createForEntity)
+    internal CollisionSphereElementComponent(CollisionSphere collisionSphere, Entity? createForEntity = null) : base(createForEntity)
     {
         _collisionSphere = collisionSphere;
         _collisionSphere.ElementEntered += HandleElementEntered;

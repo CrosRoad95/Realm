@@ -19,9 +19,9 @@ public class MarkerEnterObjective : Objective
             Complete();
     }
 
-    public override void Dispose()
+    public override async ValueTask DisposeAsync()
     {
-        _markerEntity.Destroy();
-        _collisionShapeEntity.Destroy();
+        await _markerEntity.Destroy();
+        await _collisionShapeEntity.Destroy();
     }
 }

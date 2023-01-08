@@ -11,7 +11,7 @@ public class VehicleElementComponent : ElementComponent
 
     internal override Element Element => _vehicle;
 
-    public VehicleElementComponent(Vehicle vehicle)
+    internal VehicleElementComponent(Vehicle vehicle)
     {
         _vehicle = vehicle;
     }

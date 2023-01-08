@@ -15,7 +15,7 @@ public abstract class JobSessionComponent : SessionComponent
     {
         if (!objective.IsFulfilled)
             objective.Incomplete();
-        objective.Dispose();
+        objective.DisposeAsync();
         _objectives.Remove(objective);
     }
 
@@ -31,6 +31,7 @@ public abstract class JobSessionComponent : SessionComponent
     {
         RemoveObjective(objective);
     }
+
 
     public override void Destroy()
     {
