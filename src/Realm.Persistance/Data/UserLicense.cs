@@ -9,7 +9,5 @@ public class UserLicense
     public string? SuspendedReason { get; set; }
 #pragma warning restore CS8618
 
-    public User? User { get; set; }
-
-    public bool IsSuspended() => SuspendedUntil != null && SuspendedUntil > DateTime.Now;
+    public virtual User? User { get; set; }
 }

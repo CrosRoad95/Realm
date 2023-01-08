@@ -8,7 +8,7 @@ public class InventoryComponent : Component
 
     private readonly List<Item> _items = new();
     public event Action<InventoryComponent, Item>? ItemAdded;
-    public Guid Id { get; private set; } = Guid.NewGuid();
+    public Guid? Id { get; private set; } = null;
     public uint Size { get; set; }
     public uint Number => (uint)_items.Sum(x => ItemsRegistry!.Get(x.ItemId).Size * x.Number);
 

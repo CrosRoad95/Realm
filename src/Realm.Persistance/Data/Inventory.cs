@@ -8,5 +8,5 @@ public class Inventory
 
     public ICollection<InventoryItem> InventoryItems = new List<InventoryItem>();
 
-    public User? User { get; set; }
+    public virtual User? User { get; set; }
 }

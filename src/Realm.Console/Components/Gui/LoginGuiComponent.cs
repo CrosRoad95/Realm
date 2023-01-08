@@ -20,12 +20,15 @@ public sealed class LoginGuiComponent : GuiComponent
                 var loginData = formContext.GetData<LoginData>();
 
                 var user = await UserManager.Users
+                    .Include(x => x.Licenses)
                     .Include(x => x.JobUpgrades)
                     .Include(x => x.Achievements)
                     .Include(x => x.DailyVisits)
+                    .Include(x => x.Statistics)
                     .Include(x => x.Inventories)
                     .ThenInclude(x => x!.InventoryItems)
                     .Where(u => u.UserName == loginData.Login)
+                    .AsNoTrackingWithIdentityResolution()
                     .FirstOrDefaultAsync();
 
                 if (user == null)

@@ -61,7 +61,7 @@ internal sealed class CommandsLogic
                 playerElementComponent.SendChatMessage($"Licenses");
                 foreach (var license in licenseComponent.Licenses)
                 {
-                    playerElementComponent.SendChatMessage($"License: {license.LicenseId} = {license.IsSuspended()}");
+                    playerElementComponent.SendChatMessage($"License: {license.licenseId} = {license.IsSuspended}");
                 }
 
             }
@@ -75,7 +75,11 @@ internal sealed class CommandsLogic
                 var license = args.First();
                 if (licenseComponent.AddLicense(license))
                 {
-                    entity.GetRequiredComponent<PlayerElementComponent>().SendChatMessage($"license added: {license}");
+                    entity.GetRequiredComponent<PlayerElementComponent>().SendChatMessage($"license added: '{license}'");
+                }
+                else
+                {
+                    entity.GetRequiredComponent<PlayerElementComponent>().SendChatMessage($"failed to add license: '{license}'");
                 }
             }
             return Task.CompletedTask;
@@ -183,7 +187,7 @@ internal sealed class CommandsLogic
 
         _commandService.AddCommandHandler("addupgrade", async (entity, args) =>
         {
-            var achievementsComponent = entity.GetRequiredComponent<AccountComponent>();
+            var achievementsComponent = entity.GetRequiredComponent<JobUpgradesComponent>();
             try
             {
                 achievementsComponent.AddJobUpgrade(1, "foo");

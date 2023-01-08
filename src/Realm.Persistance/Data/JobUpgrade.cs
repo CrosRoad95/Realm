@@ -6,5 +6,5 @@ public class JobUpgrade
     public short JobId { get; set; }
     public string Name { get; set; }
 
-    public User User { get; set; }
+    public virtual User User { get; set; }
 }

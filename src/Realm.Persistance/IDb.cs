@@ -5,6 +5,7 @@ namespace Realm.Persistance;
 public interface IDb : IDisposable
 {
     ChangeTracker ChangeTracker { get; }
+    EntityEntry Attach(object entity);
     DbSet<User> Users { get; }
     DbSet<Role> Roles { get; }
     DbSet<IdentityUserClaim<Guid>> UserClaims { get; }
@@ -19,6 +20,8 @@ public interface IDb : IDisposable
     DbSet<VehicleFuel> VehicleFuels { get; }
     DbSet<DailyVisits> DailyVisits { get; }
     DbSet<Statistics> Statistics { get; }
+    DbSet<JobUpgrade> JobUpgrades { get; }
+    DbSet<Achievement> Achievements { get; }
 
     Task MigrateAsync();
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);

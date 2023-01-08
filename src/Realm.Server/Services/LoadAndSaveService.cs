@@ -34,18 +34,35 @@ internal class LoadAndSaveService : ILoadAndSaveService
             case Entity.PlayerTag:
                 if (entity.TryGetComponent(out AccountComponent accountComponent))
                 {
-                    var user = accountComponent.User;
-                    await context.Users.Where(x => x.Id == user.Id).ExecuteDeleteAsync();
+                    var user = await context.Users
+                        .Include(x => x.Licenses)
+                        .Include(x => x.JobUpgrades)
+                        .Include(x => x.Achievements)
+                        .Include(x => x.DailyVisits)
+                        .Include(x => x.Statistics)
+                        .Include(x => x.Inventories)
+                        .ThenInclude(x => x!.InventoryItems)
+                        .Where(x => x.Id == accountComponent.Id).FirstAsync();
+                    user.LastTransformAndMotion = entity.Transform.GetTransformAndMotion();
+
                     if (entity.TryGetComponent(out MoneyComponent moneyComponent))
                         user.Money = moneyComponent.Money;
                     else
                         user.Money = 0;
 
-                    await context.UserLicenses.Where(x => x.UserId == user.Id).ExecuteDeleteAsync();
                     if (entity.TryGetComponent(out LicensesComponent licensesComponent))
                     {
-                        user.Licenses = licensesComponent.Licenses;
-                        context.UserLicenses.AddRange(user.Licenses);
+                        user.Licenses = licensesComponent.Licenses.Select(x => new UserLicense
+                        {
+                            User = user,
+                            LicenseId = x.licenseId,
+                            SuspendedReason = x.suspendedReason,
+                            SuspendedUntil = x.suspendedUntil,
+                        }).ToList();
+                    }
+                    else
+                    {
+                        user.Licenses = new List<UserLicense>();
                     }
 
                     if (entity.TryGetComponent(out PlayTimeComponent playTimeComponent))
@@ -57,39 +74,43 @@ internal class LoadAndSaveService : ILoadAndSaveService
                         user.PlayTime = 0;
 
                     var inventoryComponents = entity.Components.OfType<InventoryComponent>().ToList();
-                    user.Inventories = inventoryComponents.Select(x => new Inventory
+                    user.Inventories = inventoryComponents.Select(x =>
                     {
-                        Size = x.Size,
-                        Id = x.Id,
-                        InventoryItems = x.Items.Select(item => new InventoryItem
+                        var inventory = new Inventory
+                        {
+                            Size = x.Size,
+                            Id = x.Id ?? Guid.Empty,
+                        };
+                        inventory.InventoryItems = x.Items.Select(item => new InventoryItem
                         {
                             Id = item.Id ?? Guid.NewGuid().ToString(),
-                            InventoryId = x.Id,
                             ItemId = item.ItemId,
                             Number = item.Number,
+                            Inventory = inventory,
                             MetaData = JsonConvert.SerializeObject(item.MetaData, Formatting.None),
-                        }).ToList()
+                        }).ToList();
+                        return inventory;
                     }).ToList();
-                    context.Inventories.AddRange(user.Inventories);
+
 
                     if (entity.TryGetComponent(out DailyVisitsCounterComponent dailyVisitsCounterComponent))
                     {
                         user.DailyVisits = new DailyVisits
                         {
-                            UserId = user.Id,
-                            User = user,
+                            UserId = user.DailyVisits?.UserId ?? Guid.Empty,
                             LastVisit = dailyVisitsCounterComponent.LastVisit,
                             VisitsInRow = dailyVisitsCounterComponent.VisitsInRow,
                             VisitsInRowRecord = dailyVisitsCounterComponent.VisitsInRowRecord,
                         };
                     }
+                    else
+                        user.DailyVisits = null;
 
                     if (entity.TryGetComponent(out StatisticsCounterComponent statisticsCounterComponent))
                     {
                         user.Statistics = new Statistics
                         {
-                            UserId = user.Id,
-                            User = user,
+                            UserId = user.Statistics?.UserId ?? Guid.Empty,
                             TraveledDistanceByFoot = statisticsCounterComponent.TraveledDistanceByFoot,
                             TraveledDistanceInAir = statisticsCounterComponent.TraveledDistanceInAir,
                             TraveledDistanceInVehicleAsDriver = statisticsCounterComponent.TraveledDistanceInVehicleAsDriver,
@@ -97,22 +118,34 @@ internal class LoadAndSaveService : ILoadAndSaveService
                             TraveledDistanceSwimming = statisticsCounterComponent.TraveledDistanceSwimming,
                         };
                     }
+                    else
+                        user.Statistics = null;
 
                     if (entity.TryGetComponent(out AchievementsComponent achievementsComponent))
                     {
                         user.Achievements = achievementsComponent.Achievements.Select(x => new Achievement
                         {
-                            UserId = user.Id,
-                            User = user,
                             Name = x.Key,
                             Value = JsonConvert.SerializeObject(x.Value.Value, Formatting.None),
                             PrizeReceived = x.Value.PrizeReceived,
                             Progress = x.Value.Progress,
                         }).ToList();
                     }
-                    user.LastTransformAndMotion = entity.Transform.GetTransformAndMotion();
-                    context.Users.Add(user);
-                    var i = await context.SaveChangesAsync();
+                    else
+                        user.Achievements = new List<Achievement>();
+
+                    if (entity.TryGetComponent(out JobUpgradesComponent jobUpgradesComponent))
+                    {
+                        user.JobUpgrades = jobUpgradesComponent.Upgrades.Select(x => new JobUpgrade
+                        {
+                            Name = x.name,
+                            JobId = x.jobId,
+                        }).ToList();
+                    }
+                    else
+                        user.JobUpgrades = new List<JobUpgrade>();
+
+                    await context.SaveChangesAsync();
                     return true;
                 }
                 break;
@@ -175,7 +208,7 @@ internal class LoadAndSaveService : ILoadAndSaveService
                     vehicleData.TransformAndMotion = entity.Transform.GetTransformAndMotion();
                     vehicleData.VehicleAccesses = privateVehicleComponent.VehicleAccesses.Select(x => new VehicleAccess
                     {
-                        Id= x.Id,
+                        Id = x.Id,
                         UserId = x.UserId,
                         VehicleId = vehicleData.UserId,
                         Vehicle = vehicleData,
@@ -205,7 +238,7 @@ internal class LoadAndSaveService : ILoadAndSaveService
                         VehicleId = vehicleData.UserId,
                         FuelType = x.FuelType,
                         Active = x.Active,
-                        Amount= x.Amount,
+                        Amount = x.Amount,
                         FuelConsumptionPerOneKm = x.FuelConsumptionPerOneKm,
                         MaxCapacity = x.MaxCapacity,
                         MinimumDistanceThreshold = x.MinimumDistanceThreshold,
@@ -246,7 +279,7 @@ internal class LoadAndSaveService : ILoadAndSaveService
                             entity.AddComponent(new VehicleUpgradesComponent(vehicleData.Upgrades));
                             foreach (var vehicleFuel in vehicleData.Fuels)
                                 entity.AddComponent(new VehicleFuelComponent(vehicleFuel.FuelType, vehicleFuel.Amount, vehicleFuel.MaxCapacity, vehicleFuel.FuelConsumptionPerOneKm, vehicleFuel.MinimumDistanceThreshold)).Active = vehicleFuel.Active;
-                        }); 
+                        });
                 }
                 catch (Exception ex)
                 {

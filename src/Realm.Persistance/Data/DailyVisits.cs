@@ -7,5 +7,5 @@ public class DailyVisits
     public int VisitsInRow { get; set; }
     public int VisitsInRowRecord { get; set; }
 
-    public User User { get; set; }
+    public virtual User User { get; set; }
 }

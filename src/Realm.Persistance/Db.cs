@@ -1,4 +1,6 @@
-﻿namespace Realm.Persistance;
+﻿using Realm.Persistance.Data;
+
+namespace Realm.Persistance;
 
 public abstract class Db<T> : IdentityDbContext<User, Role, Guid,
         IdentityUserClaim<Guid>,
@@ -15,6 +17,8 @@ public abstract class Db<T> : IdentityDbContext<User, Role, Guid,
     public DbSet<VehicleFuel> VehicleFuels => Set<VehicleFuel>();
     public DbSet<DailyVisits> DailyVisits => Set<DailyVisits>();
     public DbSet<Statistics> Statistics => Set<Statistics>();
+    public DbSet<JobUpgrade> JobUpgrades => Set<JobUpgrade>();
+    public DbSet<Achievement> Achievements => Set<Achievement>();
 
     public Db(DbContextOptions<T> options) : base(options)
     {
@@ -45,28 +49,29 @@ public abstract class Db<T> : IdentityDbContext<User, Role, Guid,
                 .HasDefaultValue(null);
 
             entityBuilder
+                .HasMany(x => x.Licenses)
+                .WithOne(x => x.User)
+                .HasForeignKey(x => x.UserId);
+
+            entityBuilder
                 .HasMany(x => x.VehicleAccesses)
                 .WithOne(x => x.User)
-                .HasForeignKey(x => x.UserId)
-                .OnDelete(DeleteBehavior.Cascade);
+                .HasForeignKey(x => x.UserId);
 
             entityBuilder
                 .HasMany(x => x.Achievements)
                 .WithOne(x => x.User)
-                .HasForeignKey(x => x.UserId)
-                .OnDelete(DeleteBehavior.Cascade);
+                .HasForeignKey(x => x.UserId);
 
             entityBuilder
                 .HasMany(x => x.JobUpgrades)
                 .WithOne(x => x.User)
-                .HasForeignKey(x => x.UserId)
-                .OnDelete(DeleteBehavior.Cascade);
+                .HasForeignKey(x => x.UserId);
 
             entityBuilder
                 .HasOne(x => x.DailyVisits)
                 .WithOne(x => x.User)
-                .HasForeignKey<DailyVisits>(x => x.UserId)
-                .OnDelete(DeleteBehavior.Cascade);
+                .HasForeignKey<DailyVisits>(x => x.UserId);
 
             entityBuilder
                 .HasOne(x => x.Statistics)
@@ -146,10 +151,6 @@ public abstract class Db<T> : IdentityDbContext<User, Role, Guid,
             entityBuilder
                 .ToTable("UserLicense")
                 .HasKey(x => new { x.UserId, x.LicenseId });
-            entityBuilder
-                .HasOne(x => x.User)
-                .WithMany(x => x.Licenses)
-                .HasForeignKey(x => x.UserId);
         });
         
 

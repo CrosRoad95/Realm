@@ -10,5 +10,5 @@ public class VehicleFuel
     public float MaxCapacity { get; set; }
     public bool Active { get; set; }
 
-    public Vehicle Vehicle { get; set; }
+    public virtual Vehicle Vehicle { get; set; }
 }

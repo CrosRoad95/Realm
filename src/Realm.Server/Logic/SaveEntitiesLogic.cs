@@ -61,17 +61,16 @@ internal class SaveEntitiesLogic
                 if (user.RegisteredDateTime == null)
                     user.RegisteredDateTime = DateTime.Now;
                 context.Users.Update(user);
-                var i = await context.SaveChangesAsync();
-                ;
+                await context.SaveChangesAsync();
             }
         }
     }
 
     private async void HandlePlayerDisconnected(Player player, SlipeServer.Server.Elements.Events.PlayerQuitEventArgs e)
     {
+        using var context = _realmDbContextFactory.CreateDbContext();
         var playerEntity = _entityByElement.GetByElement(player) ?? throw new InvalidOperationException();
-        await _loadAndSaveService.Save(playerEntity);
+        await _loadAndSaveService.Save(playerEntity, context);
         await playerEntity.Destroy();
     }
-
 }

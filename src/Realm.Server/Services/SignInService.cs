@@ -24,12 +24,10 @@ internal class SignInService : ISignInService
                 return false;
 
             await entity.AddComponentAsync(new AccountComponent(user));
-            if (user.Inventories != null)
+            if (user.Inventories.Any())
             {
                 foreach (var inventory in user.Inventories)
-                {
                     await entity.AddComponentAsync(new InventoryComponent(inventory));
-                }
             }
             else
                 await entity.AddComponentAsync(new InventoryComponent(20));
@@ -48,8 +46,13 @@ internal class SignInService : ISignInService
                 await entity.AddComponentAsync(new AchievementsComponent(user.Achievements));
             else
                 await entity.AddComponentAsync(new AchievementsComponent());
+            
+            if (user.JobUpgrades != null)
+                await entity.AddComponentAsync(new JobUpgradesComponent(user.JobUpgrades));
+            else
+                await entity.AddComponentAsync(new JobUpgradesComponent());
 
-            entity.AddComponent(new LicensesComponent(user.Licenses, user.Id));
+            entity.AddComponent(new LicensesComponent(user.Licenses));
             entity.AddComponent(new PlayTimeComponent());
             entity.AddComponent(new MoneyComponent(user.Money));
             entity.AddComponent(new AFKComponent()).StateChanged += (entity, wentAfk, time) =>
@@ -58,7 +61,7 @@ internal class SignInService : ISignInService
             };
             entity.Destroyed += HandleDestroyed;
         }
-        catch (Exception)
+        catch (Exception ex)
         {
             // TODO: add Entity component add scope thing
             _usedAccountsIds.Remove(user.Id);

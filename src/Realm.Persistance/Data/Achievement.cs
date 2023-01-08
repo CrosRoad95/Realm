@@ -8,5 +8,5 @@ public class Achievement
     public string? Value { get; set; }
     public bool PrizeReceived { get; set; }
 
-    public User User { get; set; }
+    public virtual User User { get; set; }
 }

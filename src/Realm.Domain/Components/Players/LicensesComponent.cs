@@ -1,36 +1,44 @@
-﻿namespace Realm.Domain.Components.Players;
+﻿using Silk.NET.Core.Native;
+using SlipeServer.Server.Elements.Structs;
+using System;
+
+namespace Realm.Domain.Components.Players;
 
 public class LicensesComponent : Component
 {
-    private readonly List<UserLicense> _licenses = new();
-    private readonly Guid _userId;
-
-    public List<UserLicense> Licenses => _licenses;
-
-    public LicensesComponent(Guid userId)
+    public struct License
     {
-        _userId = userId;
+        public string licenseId;
+        public DateTime? suspendedUntil;
+        public string? suspendedReason;
+        public bool IsSuspended => suspendedUntil != null && suspendedUntil > DateTime.Now;
+    }
+    private readonly List<License> _licenses = new();
+
+    public IEnumerable<License> Licenses => _licenses;
+
+    public LicensesComponent()
+    {
     }
 
-    public LicensesComponent(IEnumerable<UserLicense> userLicenses, Guid userId)
+    public LicensesComponent(IEnumerable<UserLicense> userLicenses)
     {
-        _licenses = userLicenses.ToList();
-        _userId = userId;
+        _licenses = userLicenses.Select(x => new License
+        {
+            licenseId = x.LicenseId,
+            suspendedReason = x.SuspendedReason,
+            suspendedUntil = x.SuspendedUntil,
+        }).ToList();
     }
 
-    public UserLicense? GetLicense(string licenseId)
+    public License? GetLicense(string licenseId)
     {
-        return _licenses.Where(x => x.LicenseId.ToLower() == licenseId.ToLower()).FirstOrDefault();
-    }
-
-    public IEnumerable<UserLicense> GetAllLicenses(bool includeSuspended = false)
-    {
-        return _licenses.ToArray();
+        return _licenses.Where(x => x.licenseId.ToLower() == licenseId.ToLower()).FirstOrDefault();
     }
 
     public bool IsLicenseSuspended(string licenseId)
     {
-        var isSuspended = _licenses.Where(x => x.LicenseId == licenseId && x.IsSuspended())
+        var isSuspended = _licenses.Where(x => x.licenseId == licenseId && x.IsSuspended)
             .Any();
 
         return isSuspended;
@@ -39,8 +47,8 @@ public class LicensesComponent : Component
     public string? GetLastLicenseSuspensionReason(string licenseId)
     {
         var suspensionReason = _licenses
-            .Where(x => x.LicenseId == licenseId)
-            .Select(x => x.SuspendedReason)
+            .Where(x => x.licenseId == licenseId)
+            .Select(x => x.suspendedReason)
             .FirstOrDefault();
 
         return suspensionReason;
@@ -50,10 +58,9 @@ public class LicensesComponent : Component
     {
         if (HasLicense(licenseId, true))
             return false;
-        var userLicense = new UserLicense
+        var userLicense = new License
         {
-            LicenseId = licenseId,
-            UserId = _userId,
+            licenseId = licenseId,
         };
         _licenses.Add(userLicense);
         return true;
@@ -61,35 +68,38 @@ public class LicensesComponent : Component
 
     public bool HasLicense(string licenseId, bool includeSuspended = false)
     {
-        var query = _licenses
-            .Where(x => x.LicenseId.ToLower() == licenseId.ToLower());
+        var query = _licenses.Where(x => x.licenseId == licenseId);
 
         if (includeSuspended)
-            query = query.Where(x => x.IsSuspended());
+            query = query.Where(x => !x.IsSuspended);
         return query.Any();
     }
 
-    public bool SuspendLicense(string licenseId, int timeInMinutes, string? reason = null)
+    public bool SuspendLicense(string licenseId, TimeSpan timeSpan, string? reason = null)
     {
-        if (timeInMinutes < 0)
-            return false;
+        if (timeSpan.Ticks <= 0)
+            throw new Exception();
 
-        var userLicense = GetLicense(licenseId);
-        if (userLicense == null)
-            return false;
+        var index = _licenses.FindIndex(x => x.licenseId == licenseId);
+        if (index == -1)
+            throw new Exception();
 
-        userLicense.SuspendedUntil = DateTime.Now.AddMinutes(timeInMinutes);
-        userLicense.SuspendedReason = reason;
+        var previous = _licenses[index];
+        previous.suspendedUntil = DateTime.Now + timeSpan;
+        previous.suspendedReason = reason;
+        _licenses[index] = previous;
         return true;
     }
 
     public async Task<bool> UnSuspendLicense(string licenseId)
     {
-        var userLicense = GetLicense(licenseId);
-        if (userLicense == null)
-            return false;
+        var index = _licenses.FindIndex(x => x.licenseId == licenseId);
+        if (index == -1)
+            throw new Exception();
 
-        userLicense.SuspendedUntil = null;
+        var previous = _licenses[index];
+        previous.suspendedUntil = null;
+        _licenses[index] = previous;
         return true;
     }
 }

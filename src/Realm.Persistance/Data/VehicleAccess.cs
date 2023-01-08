@@ -7,6 +7,6 @@ public class VehicleAccess
     public Guid UserId { get; set; }
     public VehicleAccessDescription Description { get; set; }
 
-    public Vehicle Vehicle { get; set; }
-    public User User { get; set; }
+    public virtual Vehicle Vehicle { get; set; }
+    public virtual User User { get; set; }
 }

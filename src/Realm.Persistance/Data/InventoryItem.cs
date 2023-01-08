@@ -8,5 +8,5 @@ public class InventoryItem
     public Guid InventoryId { get; set; }
     public string MetaData { get; set; }
 
-    public Inventory? Inventory { get; set; }
+    public virtual Inventory? Inventory { get; set; }
 }
