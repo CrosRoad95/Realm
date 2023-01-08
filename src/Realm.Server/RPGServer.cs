@@ -8,17 +8,17 @@ public partial class RPGServer : IRPGServer
 {
     private readonly MtaServer<Player> _server;
     private readonly ILogger _logger;
-    private readonly ECS _ecs;
     private readonly IServiceProvider _serviceProvider;
 
-    public ECS ECS => _ecs;
+    public event Action? ServerStarted;
 
     public RPGServer(RealmConfigurationProvider realmConfigurationProvider, List<IModule> modules, Action<ServerBuilder>? configureServerBuilder = null)
     {
         _server = MtaServer.CreateWithDiSupport<Player>(
             builder =>
             {
-                builder.AddLogic<SaveEntitiesLogic>();
+                builder.AddLogic<PlayersLogic>();
+                builder.AddLogic<GuisLogic>();
                 builder.ConfigureServer(realmConfigurationProvider);
                 configureServerBuilder?.Invoke(builder);
 
@@ -38,7 +38,8 @@ public partial class RPGServer : IRPGServer
                     // Services
                     services.AddSingleton<RPGCommandService>();
                     services.AddSingleton<ISignInService, SignInService>();
-                    services.AddSingleton<ILoadAndSaveService, LoadAndSaveService>();
+                    services.AddTransient<ISaveService, SaveService>();
+                    services.AddTransient<ILoadService, LoadService>();
 
                     // Player specific
                     services.AddTransient<DiscordUser>();
@@ -55,7 +56,6 @@ public partial class RPGServer : IRPGServer
             }
         );
 
-        _ecs = GetRequiredService<ECS>();
         _serviceProvider = GetRequiredService<IServiceProvider>();
         _logger = GetRequiredService<ILogger>().ForContext<RPGServer>();
         _logger.Information("Starting server:");
@@ -65,22 +65,12 @@ public partial class RPGServer : IRPGServer
         var serverListConfiguration = realmConfigurationProvider.GetRequired<ServerListConfiguration>("ServerList");
         _server.GameType = serverListConfiguration.GameType;
         _server.MapName = serverListConfiguration.MapName;
-
-        _server.PlayerJoined += HandlePlayerJoined;
     }
 
     public void AssociateElement(IElementHandle elementHandle)
     {
         var element = (Element)elementHandle.GetElement();
         _server.AssociateElement(element);
-    }
-
-    private void HandlePlayerJoined(Player player)
-    {
-        _ecs.CreateEntity("Player " + player.Name, Entity.PlayerTag, entity =>
-        {
-            entity.AddComponent(new PlayerElementComponent(player));
-        });
     }
 
     public TService GetRequiredService<TService>() where TService: notnull
@@ -93,21 +83,6 @@ public partial class RPGServer : IRPGServer
         return _serviceProvider.GetRequiredService(type);
     }
 
-    private Task HandleGuiFilesChanged()
-    {
-        foreach (var entity in _ecs.Entities)
-        {
-            var guiComponents = entity.Components.OfType<GuiComponent>().ToList();
-            foreach (var guiComponent in guiComponents)
-            {
-                guiComponent.Close();
-                entity.DetachComponent(guiComponent);
-                entity.AddComponent(guiComponent);
-            }
-        }
-        return Task.CompletedTask;
-    }
-
     public async Task Start()
     {
         await GetRequiredService<IDb>().MigrateAsync();
@@ -117,11 +92,10 @@ public partial class RPGServer : IRPGServer
         foreach (var module in modules)
             module.Init(serviceProvider);
 
-        GetRequiredService<AgnosticGuiSystemService>().GuiFilesChanged = HandleGuiFilesChanged;
-
         _server.Start();
-        await GetRequiredService<ILoadAndSaveService>().LoadAll();
+        await GetRequiredService<ILoadService>().LoadAll();
 
+        ServerStarted?.Invoke();
         _logger.Information("Server started.");
     }
 

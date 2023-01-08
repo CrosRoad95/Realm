@@ -2,20 +2,32 @@
 
 namespace Realm.Server.Logic;
 
-internal class SaveEntitiesLogic
+internal class PlayersLogic
 {
     private readonly ECS _ecs;
-    private readonly ILoadAndSaveService _loadAndSaveService;
+    private readonly IServiceProvider _serviceProvider;
     private readonly IEntityByElement _entityByElement;
     private readonly RealmDbContextFactory _realmDbContextFactory;
+    private readonly MtaServer _mtaServer;
 
-    public SaveEntitiesLogic(ECS ecs, ILoadAndSaveService loadAndSaveService, IEntityByElement entityByElement, RealmDbContextFactory realmDbContextFactory)
+    public PlayersLogic(ECS ecs, IServiceProvider serviceProvider, IEntityByElement entityByElement,
+        RealmDbContextFactory realmDbContextFactory, MtaServer mtaServer)
     {
         _ecs = ecs;
-        _loadAndSaveService = loadAndSaveService;
+        _serviceProvider = serviceProvider;
         _entityByElement = entityByElement;
         _realmDbContextFactory = realmDbContextFactory;
+        _mtaServer = mtaServer;
         _ecs.EntityCreated += HandleEntityCreated;
+        _mtaServer.PlayerJoined += HandlePlayerJoined;
+    }
+
+    private void HandlePlayerJoined(Player player)
+    {
+        _ecs.CreateEntity("Player " + player.Name, Entity.PlayerTag, entity =>
+        {
+            entity.AddComponent(new PlayerElementComponent(player));
+        });
     }
 
     private void HandleEntityCreated(Entity entity)
@@ -66,9 +78,10 @@ internal class SaveEntitiesLogic
 
     private async void HandlePlayerDisconnected(Player player, SlipeServer.Server.Elements.Events.PlayerQuitEventArgs e)
     {
-        using var context = _realmDbContextFactory.CreateDbContext();
+        var saveService = _serviceProvider.GetRequiredService<ISaveService>();
         var playerEntity = _entityByElement.GetByElement(player) ?? throw new InvalidOperationException();
-        await _loadAndSaveService.Save(playerEntity, context);
+        await saveService.Save(playerEntity);
+        await saveService.Commit();
         await playerEntity.Destroy();
     }
 }

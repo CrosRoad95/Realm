@@ -7,15 +7,13 @@ internal sealed class CommandsLogic
     private readonly RPGCommandService _commandService;
     private readonly ILogger _logger;
     private readonly IEntityFactory _entityFactory;
-    private readonly ILoadAndSaveService _loadAndSaveService;
     private readonly RepositoryFactory _repositoryFactory;
 
-    public CommandsLogic(RPGCommandService commandService, ILogger logger, IEntityFactory entityFactory, ILoadAndSaveService loadAndSaveService, RepositoryFactory repositoryFactory)
+    public CommandsLogic(RPGCommandService commandService, ILogger logger, IEntityFactory entityFactory, RepositoryFactory repositoryFactory)
     {
         _commandService = commandService;
         _logger = logger;
         _entityFactory = entityFactory;
-        _loadAndSaveService = loadAndSaveService;
         _repositoryFactory = repositoryFactory;
         _commandService.AddCommandHandler("gp", (entity, args) =>
         {

@@ -3,27 +3,24 @@
 internal class SaveCommand : ICommand
 {
     private readonly ECS _ecs;
-    private readonly RealmDbContextFactory _realmDbContextFactory;
-    private readonly ILoadAndSaveService _loadAndSaveService;
+    private readonly ISaveService _saveService;
 
     public string CommandName => "save";
 
-    public SaveCommand(ECS ecs, RealmDbContextFactory realmDbContextFactory, ILoadAndSaveService loadAndSaveService)
+    public SaveCommand(ECS ecs, ISaveService saveService)
     {
         _ecs = ecs;
-        _realmDbContextFactory = realmDbContextFactory;
-        _loadAndSaveService = loadAndSaveService;
+        _saveService = saveService;
     }
 
     public async Task HandleCommand(string command)
     {
         int savedEntities = 0;
-        using var context = _realmDbContextFactory.CreateDbContext();
         foreach (var entity in _ecs.Entities)
         {
             try
             {
-                await _loadAndSaveService.Save(entity, context);
+                await _saveService.Save(entity);
                 savedEntities++;
             }
             catch (Exception ex)
@@ -31,6 +28,6 @@ internal class SaveCommand : ICommand
                 ;
             }
         }
-        await context.SaveChangesAsync();
+        await _saveService.Commit();
     }
 }

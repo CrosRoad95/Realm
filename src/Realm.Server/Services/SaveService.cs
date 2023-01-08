@@ -3,28 +3,23 @@ using static Realm.Persistance.Data.Helpers.VehicleWheelStatus;
 
 namespace Realm.Server.Services;
 
-internal class LoadAndSaveService : ILoadAndSaveService
+internal class SaveService : ISaveService
 {
-    private readonly RepositoryFactory _repositoryFactory;
-    private readonly IEntityFactory _entityFactory;
-    private readonly ILogger _logger;
+    private readonly IDb _dbContext;
 
-    public LoadAndSaveService(RepositoryFactory repositoryFactory, IEntityFactory entityFactory,
-        ILogger logger)
+    public SaveService(RealmDbContextFactory realmDbContextFactory)
     {
-        _repositoryFactory = repositoryFactory;
-        _entityFactory = entityFactory;
-        _logger = logger;
+        _dbContext = realmDbContextFactory.CreateDbContext();
     }
 
-    public async ValueTask<bool> Save(Entity entity, IDb context)
+    public async Task<bool> Save(Entity entity)
     {
         switch (entity.Tag)
         {
             case Entity.PlayerTag:
                 if (entity.TryGetComponent(out AccountComponent accountComponent))
                 {
-                    var user = await context.Users
+                    var user = await _dbContext.Users
                         .IncludeAll()
                         .Where(x => x.Id == accountComponent.Id).FirstAsync();
                     user.LastTransformAndMotion = entity.Transform.GetTransformAndMotion();
@@ -133,7 +128,7 @@ internal class LoadAndSaveService : ILoadAndSaveService
             case Entity.VehicleTag:
                 if (entity.TryGetComponent(out PrivateVehicleComponent privateVehicleComponent))
                 {
-                    var vehicleData = await context.Vehicles
+                    var vehicleData = await _dbContext.Vehicles
                         .IncludeAll()
                         .Where(x => x.Id == privateVehicleComponent.Id).FirstAsync();
 
@@ -236,40 +231,9 @@ internal class LoadAndSaveService : ILoadAndSaveService
         return false;
     }
 
-    public async Task LoadAll()
+    public async Task Commit()
     {
-        // Load vehicles
-        {
-            using var vehicleRepository = _repositoryFactory.GetVehicleRepository();
-            var results = await vehicleRepository
-                .GetAll()
-                .IncludeAll()
-                //.Where(x => x.Spawned)
-                .AsNoTrackingWithIdentityResolution()
-                .ToListAsync();
-
-            foreach (var vehicleData in results)
-            {
-                try
-                {
-                    await Task.Delay(200);
-                    var entity = _entityFactory.CreateVehicle(vehicleData.Model, vehicleData.TransformAndMotion.Position, vehicleData.TransformAndMotion.Rotation, vehicleData.TransformAndMotion.Interior, vehicleData.TransformAndMotion.Dimension, $"vehicle {vehicleData.Id}",
-                        entity =>
-                        {
-                            entity.AddComponent(new PrivateVehicleComponent(vehicleData));
-                            entity.AddComponent(new VehicleUpgradesComponent(vehicleData.Upgrades));
-                            entity.AddComponent(new MileageCounterComponent(vehicleData.Mileage));
-                            foreach (var vehicleFuel in vehicleData.Fuels)
-                                entity.AddComponent(new VehicleFuelComponent(vehicleFuel.FuelType, vehicleFuel.Amount, vehicleFuel.MaxCapacity, vehicleFuel.FuelConsumptionPerOneKm, vehicleFuel.MinimumDistanceThreshold)).Active = vehicleFuel.Active;
-                        });
-                }
-                catch (Exception ex)
-                {
-                    throw;
-                }
-            }
-            _logger.Information("Loaded: {amount} vehicles", results.Count);
-
-        }
+        await _dbContext.SaveChangesAsync();
     }
+
 }

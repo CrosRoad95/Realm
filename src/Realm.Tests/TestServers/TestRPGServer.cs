@@ -17,6 +17,7 @@ internal class TestRPGServer : IRPGServer
     public ECS ECS => throw new NotImplementedException();
 
     public event Action<Entity>? PlayerJoined;
+    public event Action? ServerStarted;
 
     public TestRPGServer()
     {
