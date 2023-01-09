@@ -32,7 +32,7 @@ public class RPGServerBuilder
         return this;
     }
 
-    public RPGServer Build(IServerFilesProvider? serverFilesProvider = null, string? basePath = null, Action<ServerBuilder>? extraBuilderSteps = null)
+    public IRPGServer Build(IServerFilesProvider? serverFilesProvider = null, string? basePath = null, Action<ServerBuilder>? extraBuilderSteps = null)
     {
         if (_logger == null)
             throw new Exception();

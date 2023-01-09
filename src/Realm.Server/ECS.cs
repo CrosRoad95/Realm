@@ -9,14 +9,14 @@ public sealed class ECS : IEntityByElement
     private readonly Dictionary<Player, Entity> _entityByPlayer = new();
     private readonly Dictionary<Element, Entity> _entityByElement = new();
     private readonly Dictionary<string, Entity> _entityByName = new();
-    private readonly RPGServer _server;
+    private readonly IServiceProvider _serviceProvider;
 
     public IEnumerable<Entity> Entities => _entities;
 
     public event Action<Entity>? EntityCreated;
-    public ECS(RPGServer server)
+    public ECS(IServiceProvider serviceProvider)
     {
-        _server = server;
+        _serviceProvider = serviceProvider;
     }
 
     public Entity GetEntityByPlayer(Player player)
@@ -40,7 +40,7 @@ public sealed class ECS : IEntityByElement
         if (_entityByName.ContainsKey(name))
             throw new EntityAlreadyExistsException(name);
 
-        var newlyCreatedEntity = new Entity(_server.GetRequiredService<IServiceProvider>(), name, tag);
+        var newlyCreatedEntity = new Entity(_serviceProvider, name, tag);
         _entities.Add(newlyCreatedEntity);
         _entityByName[name] = newlyCreatedEntity;
         if (entityBuilder != null)

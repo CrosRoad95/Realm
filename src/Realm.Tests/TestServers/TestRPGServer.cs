@@ -76,4 +76,14 @@ internal class TestRPGServer : IRPGServer
     {
         throw new NotImplementedException();
     }
+
+    public Task Start()
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task Stop()
+    {
+        throw new NotImplementedException();
+    }
 }
