@@ -10,10 +10,11 @@ public static class ServerBuilderExtensions
     {
         var _serverConfiguration = realmConfigurationProvider.GetRequired<SlipeServer.Server.Configuration>("Server");
         builder.UseConfiguration(_serverConfiguration);
+        var exceptBehaviours = ServerBuilderDefaultBehaviours.DefaultChatBehaviour;
 #if DEBUG
-        builder.AddDefaults(exceptBehaviours: ServerBuilderDefaultBehaviours.MasterServerAnnouncementBehaviour);
+        builder.AddDefaults(exceptBehaviours: ServerBuilderDefaultBehaviours.MasterServerAnnouncementBehaviour | exceptBehaviours);
 #else
-        builder.AddDefaults();
+        builder.AddDefaults(exceptBehaviours: exceptBehaviours);
 #endif
 
         builder.ConfigureServices(services =>
