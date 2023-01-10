@@ -1,4 +1,5 @@
 ﻿using Realm.Domain.Rules;
+using Realm.Server.Extensions;
 
 namespace Realm.Console.Logic;
 
@@ -80,17 +81,14 @@ internal class SamplePickupsLogic
         {
             var pickupElementComponent = entity.GetRequiredComponent<PickupElementComponent>();
             pickupElementComponent.AddRule(new MustBePlayerOnFootOnlyRule());
+            pickupElementComponent.AddOpenGuiLogic<TestWindowComponent>();
+        }
 
-            pickupElementComponent.EntityEntered = entity =>
-            {
-                if(!entity.HasComponent<GuiComponent>())
-                    entity.AddComponent(new TestWindowComponent());
-            };
-            pickupElementComponent.EntityLeft = entity =>
-            {
-                if (entity.HasComponent<TestWindowComponent>())
-                    entity.DestroyComponent<TestWindowComponent>();
-            };
+        if (entity.Tag == Entity.PickupTag && entity.Name.StartsWith("exampleShopPickup"))
+        {
+            var pickupElementComponent = entity.GetRequiredComponent<PickupElementComponent>();
+            pickupElementComponent.AddRule(new MustBePlayerOnFootOnlyRule());
+            pickupElementComponent.AddOpenGuiLogic<TestShopGuiComponent>();
         }
     }
 }

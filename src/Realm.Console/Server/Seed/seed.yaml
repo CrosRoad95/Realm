@@ -15,6 +15,10 @@ pickups:
     model: 1274
     position: [360.39062, -100.552734, 1.3182049]
     text3d: "Example job"
+  exampleShopPickup:
+    model: 1274
+    position: [340.16406, -101.85547, 1.4429606]
+    text3d: "Sample shop"
 markers:
   testMarker:
     position: [357.81, -79.58, 1.07]
