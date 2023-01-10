@@ -1,5 +1,6 @@
 ﻿using Realm.Domain.Exceptions;
 using Realm.Domain.Interfaces;
+using SlipeServer.Server.Elements;
 
 namespace Realm.Server;
 
@@ -27,6 +28,12 @@ public sealed class ECS : IEntityByElement
     public Entity GetByElement(Element element)
     {
         return _entityByElement[element];
+    }
+
+    public Entity? TryGetEntityByPlayer(Player player)
+    {
+        _entityByPlayer.TryGetValue(player, out Entity? result);
+        return result;
     }
 
     public Entity? TryGetByElement(Element element)

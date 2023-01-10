@@ -21,7 +21,7 @@ internal sealed class PlayerJoinedLogic
         var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();
         playerElementComponent.SetChatVisible(false);
         playerElementComponent.ClearChatBox();
-        await playerElementComponent.FadeCameraAsync(CameraFade.In);
+        playerElementComponent.FadeCamera(CameraFade.In);
         playerElementComponent.SetCameraMatrix(new Vector3(379.89844f, -92.6416f, 10.950561f), new Vector3(336.75684f, -93.018555f, 1.3956465f));
         var adminComp = await entity.AddComponentAsync(new AdminComponent());
         adminComp.DebugView = true;

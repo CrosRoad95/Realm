@@ -1,14 +1,18 @@
-﻿using Realm.Domain.Interfaces;
+﻿using Realm.Common.Utilities;
+using Realm.Domain.Interfaces;
+using System.Collections.Concurrent;
 
 namespace Realm.Server.Logic;
 
 internal class PlayersLogic
 {
+    const int RESOURCES_COUNT = 10;
     private readonly ECS _ecs;
     private readonly IServiceProvider _serviceProvider;
     private readonly IEntityByElement _entityByElement;
     private readonly RealmDbContextFactory _realmDbContextFactory;
     private readonly MtaServer _mtaServer;
+    private readonly ConcurrentDictionary<Player, Latch> _playerResources = new();
 
     public PlayersLogic(ECS ecs, IServiceProvider serviceProvider, IEntityByElement entityByElement,
         RealmDbContextFactory realmDbContextFactory, MtaServer mtaServer)
@@ -22,12 +26,35 @@ internal class PlayersLogic
         _mtaServer.PlayerJoined += HandlePlayerJoined;
     }
 
-    private void HandlePlayerJoined(Player player)
+    private async void HandlePlayerJoined(Player player)
     {
+        _playerResources[player] = new Latch(RESOURCES_COUNT, TimeSpan.FromSeconds(60));
+        player.ResourceStarted += HandlePlayerResourceStarted;
+        player.Disconnected += HandlePlayerDisconnected;
+        try
+        {
+            await _playerResources[player].WaitAsync();
+        }
+        catch (Exception)
+        {
+            player.Kick("Resources took to long to load. Please reconnect.");
+            return;
+        }
+        finally
+        {
+            player.ResourceStarted -= HandlePlayerResourceStarted;
+            _playerResources.TryRemove(player, out var _);
+        }
+
         _ecs.CreateEntity("Player " + player.Name, Entity.PlayerTag, entity =>
         {
             entity.AddComponent(new PlayerElementComponent(player));
         });
+    }
+
+    private void HandlePlayerResourceStarted(Player player, SlipeServer.Server.Elements.Events.PlayerResourceStartedEventArgs e)
+    {
+        _playerResources[player].Decrement();
     }
 
     private void HandleEntityCreated(Entity entity)
@@ -49,7 +76,6 @@ internal class PlayersLogic
             if (component is PlayerElementComponent playerElementComponent)
             {
                 var player = playerElementComponent.Player;
-                player.Disconnected += HandlePlayerDisconnected;
             }
         }
         if (component is AccountComponent accountComponent)
@@ -78,10 +104,15 @@ internal class PlayersLogic
 
     private async void HandlePlayerDisconnected(Player player, SlipeServer.Server.Elements.Events.PlayerQuitEventArgs e)
     {
-        var saveService = _serviceProvider.GetRequiredService<ISaveService>();
-        var playerEntity = _entityByElement.GetByElement(player) ?? throw new InvalidOperationException();
-        await saveService.Save(playerEntity);
-        await saveService.Commit();
-        await playerEntity.Destroy();
+        player.Disconnected -= HandlePlayerDisconnected;
+        _playerResources.TryRemove(player, out var _);
+        var playerEntity = _entityByElement.TryGetEntityByPlayer(player);
+        if(playerEntity != null)
+        {
+            var saveService = _serviceProvider.GetRequiredService<ISaveService>();
+            await saveService.Save(playerEntity);
+            await saveService.Commit();
+            await playerEntity.Destroy();
+        }
     }
 }
