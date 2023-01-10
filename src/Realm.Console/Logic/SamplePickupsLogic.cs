@@ -18,7 +18,6 @@ internal class SamplePickupsLogic
     {
         if (entity.Tag == Entity.PickupTag && entity.Name.StartsWith("fractionTestPickup"))
         {
-            entity.AddComponent(new Text3dComponent("Example fraction pickup", new Vector3(0, 0, 0.75f)));
             var pickupElementComponent = entity.GetRequiredComponent<PickupElementComponent>();
             pickupElementComponent.EntityEntered = async entity =>
             {
@@ -45,7 +44,6 @@ internal class SamplePickupsLogic
         
         if (entity.Tag == Entity.PickupTag && entity.Name.StartsWith("jobTestPickup"))
         {
-            entity.AddComponent(new Text3dComponent("Example job", new Vector3(0, 0, 0.75f)));
             var pickupElementComponent = entity.GetRequiredComponent<PickupElementComponent>();
             pickupElementComponent.EntityEntered = async entity =>
             {
@@ -80,7 +78,6 @@ internal class SamplePickupsLogic
 
         if (entity.Tag == Entity.PickupTag && entity.Name.StartsWith("withText3d"))
         {
-            entity.AddComponent(new Text3dComponent("Example text 3d", new Vector3(0, 0, 0.75f)));
             var pickupElementComponent = entity.GetRequiredComponent<PickupElementComponent>();
             pickupElementComponent.AddRule(new MustBePlayerOnFootOnlyRule());
 

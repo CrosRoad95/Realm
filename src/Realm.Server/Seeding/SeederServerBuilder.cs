@@ -1,5 +1,6 @@
 ﻿using FluentValidation;
 using Microsoft.AspNetCore.Identity;
+using Realm.Domain.Components.World;
 using Realm.Persistance.Data;
 using Realm.Server.Serialization.Yaml;
 using System.Security.Claims;
@@ -70,6 +71,10 @@ internal sealed class SeederServerBuilder
             {
                 entity.AddComponent(new PickupElementComponent(new Pickup(Vector3.Zero, pair.Value.Model)));
                 entity.Transform.Position = pair.Value.Position;
+                if(pair.Value.Text3d != null)
+                {
+                    entity.AddComponent(new Text3dComponent(pair.Value.Text3d, new Vector3(0, 0, 0.75f)));
+                }
             });
             _logger.Information("Seeder: Created pickup of id {elementId} with icon {pickupModel} at {position}", pair.Key, pair.Value.Model, pair.Value.Position);
         }

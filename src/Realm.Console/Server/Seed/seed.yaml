@@ -6,12 +6,15 @@ pickups:
   withText3d:
     model: 1239
     position: [348.7744, -87.57617, 1.3628025]
+    text3d: "Example text 3d seeded"
   fractionTestPickup:
     model: 1275
     position: [353.39062, -100.552734, 1.3182049]
+    text3d: "Example fraction pickup"
   jobTestPickup:
     model: 1274
     position: [360.39062, -100.552734, 1.3182049]
+    text3d: "Example job"
 markers:
   testMarker:
     position: [357.81, -79.58, 1.07]

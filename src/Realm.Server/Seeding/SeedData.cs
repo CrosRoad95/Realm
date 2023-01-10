@@ -17,6 +17,7 @@ internal class SeedData
     {
         public ushort Model { get; set; }
         public Vector3 Position { get; set; }
+        public string? Text3d { get; set; }
     }
 
     public class MarkerSeedData
