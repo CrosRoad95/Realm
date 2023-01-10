@@ -6,7 +6,7 @@ local function createInventoryWindow(guiProvider, defaultState)
 	local sampleLabel = guiProvider.label(inspect(state), 10, 20, 280, 25, window);
 
 	function stateChanged(key, value)
-
+		iprint("stateChanged", key, value)
 	end
 	return window, stateChanged
 end

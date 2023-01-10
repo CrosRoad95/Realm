@@ -11,14 +11,18 @@ public abstract class StatefulGuiComponent<TState> : GuiComponent
 
     private readonly TState _state;
     private readonly Dictionary<LuaValue, LuaValue> _stateChange = new();
+
     public StatefulGuiComponent(string name, bool cursorless, TState initialState)
         : base(name, cursorless)
     {
         _state = initialState;
     }
 
+    protected virtual void PreGuiOpen(TState state) { }
+
     protected override async Task OpenGui()
     {
+        PreGuiOpen(_state);
         var playerElementComponent = Entity.GetRequiredComponent<PlayerElementComponent>();
         await AgnosticGuiSystemService.OpenGui(playerElementComponent.Player, _name, _cursorless, LuaValueMapper.UniversalMap(_state));
     }

@@ -34,7 +34,7 @@ internal sealed class PlayerBindsLogic
                 return;
             }
 
-            await entity.AddComponentAsync(new TGuiComponent());
+            var guiComponent = await entity.AddComponentAsync(new TGuiComponent());
             playerElementComponent.ResetCooldown(bind);
         });
     }
