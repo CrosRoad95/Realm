@@ -122,6 +122,15 @@ internal class SaveService : ISaveService
                     }
                     else
                         user.JobUpgrades = new List<JobUpgrade>();
+
+                    if (entity.TryGetComponent(out DiscoveriesComponent discoveriesComponent))
+                    {
+                        user.Discoveries = discoveriesComponent.Discoveries.Select(x => new Discovery
+                        {
+                            DiscoveryId = x,
+                        }).ToList();
+                    }
+
                     return true;
                 }
                 break;

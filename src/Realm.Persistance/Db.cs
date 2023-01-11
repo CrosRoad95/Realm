@@ -17,6 +17,7 @@ public abstract class Db<T> : IdentityDbContext<User, Role, Guid,
     public DbSet<Statistics> Statistics => Set<Statistics>();
     public DbSet<JobUpgrade> JobUpgrades => Set<JobUpgrade>();
     public DbSet<Achievement> Achievements => Set<Achievement>();
+    public DbSet<Discovery> Discoveries => Set<Discovery>();
 
     public Db(DbContextOptions<T> options) : base(options)
     {
@@ -79,6 +80,12 @@ public abstract class Db<T> : IdentityDbContext<User, Role, Guid,
 
             entityBuilder
                 .HasMany(x => x.Inventories)
+                .WithOne(x => x.User)
+                .HasForeignKey(x => x.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            entityBuilder
+                .HasMany(x => x.Discoveries)
                 .WithOne(x => x.User)
                 .HasForeignKey(x => x.UserId)
                 .OnDelete(DeleteBehavior.Cascade);
@@ -298,6 +305,16 @@ public abstract class Db<T> : IdentityDbContext<User, Role, Guid,
 
             entityBuilder.Property(x => x.FuelType)
                 .HasMaxLength(16);
+        });
+        
+        modelBuilder.Entity<Discovery>(entityBuilder =>
+        {
+            entityBuilder
+                .ToTable(nameof(Discoveries))
+                .HasKey(x => new { x.UserId, x.DiscoveryId });
+
+            entityBuilder.Property(x => x.DiscoveryId)
+                .HasMaxLength(32);
         });
 
     }

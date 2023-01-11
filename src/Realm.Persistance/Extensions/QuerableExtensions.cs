@@ -24,6 +24,7 @@ public static class QuerableExtensions
             .Include(x => x.Achievements)
             .Include(x => x.DailyVisits)
             .Include(x => x.Statistics)
+            .Include(x => x.Discoveries)
             .Include(x => x.Inventories)
             .ThenInclude(x => x!.InventoryItems);
     }

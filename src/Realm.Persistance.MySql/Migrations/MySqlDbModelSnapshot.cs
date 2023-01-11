@@ -162,6 +162,20 @@ namespace Realm.Persistance.MySql.Migrations
                     b.ToTable("DailyVisits", (string)null);
                 });
 
+            modelBuilder.Entity("Realm.Persistance.Data.Discovery", b =>
+                {
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("char(36)");
+
+                    b.Property<string>("DiscoveryId")
+                        .HasMaxLength(32)
+                        .HasColumnType("varchar(32)");
+
+                    b.HasKey("UserId", "DiscoveryId");
+
+                    b.ToTable("Discoveries", (string)null);
+                });
+
             modelBuilder.Entity("Realm.Persistance.Data.Inventory", b =>
                 {
                     b.Property<Guid>("Id")
@@ -659,6 +673,17 @@ namespace Realm.Persistance.MySql.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("Realm.Persistance.Data.Discovery", b =>
+                {
+                    b.HasOne("Realm.Persistance.Data.User", "User")
+                        .WithMany("Discoveries")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("Realm.Persistance.Data.Inventory", b =>
                 {
                     b.HasOne("Realm.Persistance.Data.User", "User")
@@ -763,6 +788,8 @@ namespace Realm.Persistance.MySql.Migrations
                     b.Navigation("Achievements");
 
                     b.Navigation("DailyVisits");
+
+                    b.Navigation("Discoveries");
 
                     b.Navigation("Inventories");
 
