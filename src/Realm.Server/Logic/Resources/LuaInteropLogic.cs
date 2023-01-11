@@ -2,19 +2,19 @@
 
 namespace Realm.Server.Logic.Resources;
 
-internal class LuaInteropLogic
+internal class ClientInterfaceLogic
 {
     private readonly ILogger _logger;
-    private readonly LuaInteropService _luaInteropService;
+    private readonly ClientInterfaceService _ClientInterfaceService;
     private readonly IEntityByElement _entityByElement;
 
-    public LuaInteropLogic(LuaInteropService luaInteropService, ILogger logger, IEntityByElement entityByElement)
+    public ClientInterfaceLogic(ClientInterfaceService ClientInterfaceService, ILogger logger, IEntityByElement entityByElement)
     {
-        _luaInteropService = luaInteropService;
+        _ClientInterfaceService = ClientInterfaceService;
         _entityByElement = entityByElement;
-        _logger = logger.ForContext<LuaInteropLogic>();
+        _logger = logger.ForContext<ClientInterfaceLogic>();
 
-        _luaInteropService.ClientErrorMessage += HandleClientErrorMessage;
+        _ClientInterfaceService.ClientErrorMessage += HandleClientErrorMessage;
     }
 
     private void HandleClientErrorMessage(Player player, string message, int level, string file, int line)

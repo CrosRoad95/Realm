@@ -18,7 +18,7 @@ global using System.Linq.Expressions;
 global using SlipeServer.Packets.Definitions.Lua;
 global using System.Reflection;
 global using Realm.Domain.Components.Players;
-global using Realm.Resources.LuaInterop;
+global using Realm.Resources.ClientInterface;
 global using Realm.Resources.Overlay;
 global using SlipeServer.Packets.Lua.Camera;
 global using SlipeServer.Server.Elements.Enums;

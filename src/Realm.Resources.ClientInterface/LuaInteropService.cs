@@ -1,13 +1,13 @@
 ﻿using SlipeServer.Server.Elements;
 using System.Globalization;
 
-namespace Realm.Resources.LuaInterop;
+namespace Realm.Resources.ClientInterface;
 
-public class LuaInteropService
+public class ClientInterfaceService
 {
     public event Action<Player, string, int, string, int>? ClientErrorMessage;
     public event Action<Player, CultureInfo>? ClientCultureInfoUpdate;
-    public LuaInteropService()
+    public ClientInterfaceService()
     {
 
     }

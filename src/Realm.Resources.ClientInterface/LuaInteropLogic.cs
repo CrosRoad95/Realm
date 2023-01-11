@@ -5,24 +5,24 @@ using SlipeServer.Server.Events;
 using SlipeServer.Server.Mappers;
 using SlipeServer.Server.Services;
 
-namespace Realm.Resources.LuaInterop;
+namespace Realm.Resources.ClientInterface;
 
-internal class LuaInteropLogic
+internal class ClientInterfaceLogic
 {
     private readonly FromLuaValueMapper _fromLuaValueMapper;
-    private readonly LuaInteropService _luaInteropService;
+    private readonly ClientInterfaceService _ClientInterfaceService;
     private readonly ILogger _logger;
-    private readonly LuaInteropResource _resource;
+    private readonly ClientInterfaceResource _resource;
 
-    public LuaInteropLogic(MtaServer server, LuaEventService luaEventService, FromLuaValueMapper fromLuaValueMapper,
-        LuaInteropService luaInteropService, ILogger logger)
+    public ClientInterfaceLogic(MtaServer server, LuaEventService luaEventService, FromLuaValueMapper fromLuaValueMapper,
+        ClientInterfaceService ClientInterfaceService, ILogger logger)
     {
         _fromLuaValueMapper = fromLuaValueMapper;
-        _luaInteropService = luaInteropService;
-        _logger = logger.ForContext<LuaInteropLogic>();
+        _ClientInterfaceService = ClientInterfaceService;
+        _logger = logger.ForContext<ClientInterfaceLogic>();
         server.PlayerJoined += HandlePlayerJoin;
 
-        _resource = server.GetAdditionalResource<LuaInteropResource>();
+        _resource = server.GetAdditionalResource<ClientInterfaceResource>();
         luaEventService.AddEventHandler("internalDebugMessage", HandleInternalDebugMessage);
         luaEventService.AddEventHandler("sendLocalizationCode", HandleLocalizationCode);
     }
@@ -37,7 +37,7 @@ internal class LuaInteropLogic
         var code = luaEvent.Parameters[1].StringValue;
         if(code != null)
         {
-            _luaInteropService.BroadcastPlayerLocalizationCode(luaEvent.Player, code);
+            _ClientInterfaceService.BroadcastPlayerLocalizationCode(luaEvent.Player, code);
         }
         else
         {
@@ -51,6 +51,6 @@ internal class LuaInteropLogic
         var level = (int)_fromLuaValueMapper.Map(typeof(int), luaEvent.Parameters[2]);
         var file = _fromLuaValueMapper.Map(typeof(string), luaEvent.Parameters[3]) as string;
         var line = (int)_fromLuaValueMapper.Map(typeof(int), luaEvent.Parameters[4]);
-        _luaInteropService.BroadcastClientErrorMessage(luaEvent.Player, message, level, file, line);    
+        _ClientInterfaceService.BroadcastClientErrorMessage(luaEvent.Player, message, level, file, line);    
     }
 }

@@ -30,7 +30,7 @@ global using Realm.Configuration.Configurations;
 global using Realm.Interfaces.Extend;
 global using Realm.Server.Interfaces;
 global using Realm.Server.Services;
-global using Realm.Resources.LuaInterop;
+global using Realm.Resources.ClientInterface;
 global using Realm.Resources.AgnosticGuiSystem;
 global using Realm.Resources.Addons.AgnosticGuiSystem.CeGuiProvider;
 global using Realm.Resources.Addons.Common;

@@ -50,7 +50,7 @@ public static class ServerBuilderExtensions
             builder.AddGuiProvider(CeGuiGuiProvider.Name, CeGuiGuiProvider.LuaCode);
             builder.AddGuiProvider(DGSGuiProvider.Name, DGSGuiProvider.LuaCode);
         }, commonOptions);
-        builder.AddLuaInteropResource(commonOptions);
+        builder.AddClientInterfaceResource(commonOptions);
         builder.AddElementOutlineResource();
         builder.AddAdminToolsResource();
         builder.AddAFKResource();
@@ -60,7 +60,7 @@ public static class ServerBuilderExtensions
         builder.AddText3dResource();
 
         // Resources logics
-        builder.AddLogic<LuaInteropLogic>();
+        builder.AddLogic<ClientInterfaceLogic>();
 
         // Miscellaneous logic
         builder.AddLogic<CommandsLogic>();

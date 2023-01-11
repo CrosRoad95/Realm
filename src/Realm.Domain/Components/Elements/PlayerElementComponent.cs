@@ -7,7 +7,7 @@ public sealed class PlayerElementComponent : ElementComponent
     [Inject]
     private OverlayNotificationsService OverlayNotificationsService { get; set; } = default!;
     [Inject]
-    private LuaInteropService LuaInteropService { get; set; } = default!;
+    private ClientInterfaceService ClientInterfaceService { get; set; } = default!;
     [Inject]
     private LuaValueMapper LuaValueMapper { get; set; } = default!;
     [Inject]
@@ -123,10 +123,10 @@ public sealed class PlayerElementComponent : ElementComponent
         _player.Camera.Target = elementComponent.Element;
     }
 
-    #region LuaInterop resource
+    #region ClientInterface resource
     public void SetClipboard(string content)
     {
-        LuaInteropService.SetClipboard(_player, content);
+        ClientInterfaceService.SetClipboard(_player, content);
     }
     #endregion
 

@@ -2,15 +2,15 @@
 using Realm.Resources.Addons.Common;
 using SlipeServer.Server.ServerBuilders;
 
-namespace Realm.Resources.LuaInterop;
+namespace Realm.Resources.ClientInterface;
 
 public static class ServerBuilderExtensions
 {
-    public static void AddLuaInteropResource(this ServerBuilder builder, CommonResourceOptions? commonResourceOptions = null)
+    public static void AddClientInterfaceResource(this ServerBuilder builder, CommonResourceOptions? commonResourceOptions = null)
     {
         builder.AddBuildStep(server =>
         {
-            var resource = new LuaInteropResource(server);
+            var resource = new ClientInterfaceResource(server);
             if (commonResourceOptions != null)
                 commonResourceOptions.Configure(resource);
 
@@ -19,9 +19,9 @@ public static class ServerBuilderExtensions
 
         builder.ConfigureServices(services =>
         {
-            services.AddSingleton<LuaInteropService>();
+            services.AddSingleton<ClientInterfaceService>();
         });
 
-        builder.AddLogic<LuaInteropLogic>();
+        builder.AddLogic<ClientInterfaceLogic>();
     }
 }
