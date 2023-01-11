@@ -20,8 +20,8 @@ internal class WorldLogic
         var ent2 = _entityFactory.CreateCollisionSphere(new Vector3(307.69336f, -71.15039f, 1.4296875f), 8);
         var ent3 = _entityFactory.CreateCollisionSphere(new Vector3(283.7129f, -71.95996f, 1.4339179f), 8);
         AttachDiscovery(ent1, "loc-1", HandlePlayerDiscover);
-        AttachDiscovery(ent1, "loc-2", HandlePlayerDiscover);
-        AttachDiscovery(ent1, "loc-3", HandlePlayerDiscover);
+        AttachDiscovery(ent2, "loc-2", HandlePlayerDiscover);
+        AttachDiscovery(ent3, "loc-3", HandlePlayerDiscover);
     }
 
     private void HandlePlayerDiscover(Entity entity, string discoverId)
@@ -33,7 +33,7 @@ internal class WorldLogic
     {
         var collisionSphereElementComponent = entity.GetRequiredComponent<CollisionSphereElementComponent>();
         collisionSphereElementComponent.AddRule(new MustBePlayerOnFootOnlyRule());
-        entity.GetRequiredComponent<CollisionSphereElementComponent>().EntityEntered = enteredEntity =>
+        collisionSphereElementComponent.EntityEntered = enteredEntity =>
         {
             if (enteredEntity.GetRequiredComponent<DiscoveriesComponent>().TryDiscover(discoveryName))
             {

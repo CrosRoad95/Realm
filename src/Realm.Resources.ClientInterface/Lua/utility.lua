@@ -11,3 +11,8 @@ addEvent("internalSetClipboard", true)
 addEventHandler("internalSetClipboard", localPlayer, function(content)
 	setClipboard(content)
 end)
+
+addEvent("internalSetDevelopmentModeEnabled", true)
+addEventHandler("internalSetDevelopmentModeEnabled", localPlayer, function(enabled)
+	setDevelopmentMode(enabled)
+end)

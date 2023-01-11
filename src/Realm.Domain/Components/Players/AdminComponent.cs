@@ -7,17 +7,31 @@ public class AdminComponent : Component
 {
     [Inject]
     private NoClipService NoClipService { get; set; } = default!;
-
     [Inject]
     private DebugLog DebugLog { get; set; } = default!;
-
     [Inject]
     private AdminToolsService AdminToolsService { get; set; } = default!;
+    [Inject]
+    private ClientInterfaceService ClientInterfaceService { get; set; } = default!;
 
     private bool _debugView = false;
     private bool _adminTools = false;
     private bool _noClip = false;
+    private bool _developmentMode = false;
 
+    public bool DevelopmentMode
+    {
+        get => _developmentMode; set
+        {
+            if (_developmentMode != value)
+            {
+                var player = Entity.GetRequiredComponent<PlayerElementComponent>().Player;
+                ClientInterfaceService.SetDevelopmentModeEnabled(player, value);
+                _developmentMode = value;
+            }
+        }
+    }
+    
     public bool DebugView
     {
         get => _debugView; set

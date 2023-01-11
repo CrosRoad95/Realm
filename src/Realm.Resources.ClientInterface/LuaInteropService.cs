@@ -31,6 +31,9 @@ public class ClientInterfaceService
     {
         player.TriggerLuaEvent("internalSetClipboard", player, content);
     }
-
-
+    
+    public void SetDevelopmentModeEnabled(Player player, bool enabled)
+    {
+        player.TriggerLuaEvent("internalSetDevelopmentModeEnabled", player, enabled);
+    }
 }
