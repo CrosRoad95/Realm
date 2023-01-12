@@ -1,6 +1,4 @@
-﻿using SlipeServer.Packets.Lua.Camera;
-
-namespace Realm.Console.Logic;
+﻿namespace Realm.Console.Logic;
 
 internal sealed class PlayerJoinedLogic
 {
@@ -46,6 +44,7 @@ internal sealed class PlayerJoinedLogic
                 playerElementComponent.Spawn(new Vector3(362.58f + (float)Random.Shared.NextDouble() * 3, -91.07f + (float)Random.Shared.NextDouble() * 3, 1.38f),
                     new Vector3(0, 0, 90));
             }
+            await Task.Delay(300);
             await playerElementComponent.FadeCameraAsync(CameraFade.In);
         }
     }

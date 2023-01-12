@@ -1,6 +1,4 @@
-﻿using Realm.Persistance.Data;
-
-namespace Realm.Server.Interfaces;
+﻿namespace Realm.Server.Interfaces;
 
 public interface ISignInService
 {

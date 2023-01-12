@@ -70,7 +70,6 @@ public sealed class PlayerElementComponent : ElementComponent
     public void Spawn(Vector3 position, Vector3? rotation = null)
     {
         _player.Camera.Target = _player;
-        _player.Camera.Fade(CameraFade.In);
         _player.Spawn(position, rotation?.Z ?? 0, 0, 0, 0);
         _player.Rotation = rotation ?? Vector3.Zero;
         if(position != Vector3.Zero)

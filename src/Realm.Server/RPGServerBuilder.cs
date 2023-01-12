@@ -3,7 +3,6 @@
 public class RPGServerBuilder
 {
     private readonly List<IModule> _modules = new();
-    private readonly List<Action<MtaServer>> _buildSteps = new();
     private ILogger? _logger;
     private IConsole? _console;
     private RealmConfigurationProvider? _realmConfigurationProvider;
@@ -43,8 +42,8 @@ public class RPGServerBuilder
 
         return new RPGServer(_realmConfigurationProvider, _modules, serverBuilder =>
         {
-            if (extraBuilderSteps != null)
-                extraBuilderSteps(serverBuilder);
+            extraBuilderSteps?.Invoke(serverBuilder);
+
             serverBuilder.ConfigureServices(services =>
             {
                 services.AddSingleton(_logger);

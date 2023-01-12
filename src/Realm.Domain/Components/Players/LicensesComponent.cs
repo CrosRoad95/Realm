@@ -82,7 +82,7 @@ public class LicensesComponent : Component
         return true;
     }
 
-    public async Task<bool> UnSuspendLicense(string licenseId)
+    public bool UnSuspendLicense(string licenseId)
     {
         var index = _licenses.FindIndex(x => x.licenseId == licenseId);
         if (index == -1)

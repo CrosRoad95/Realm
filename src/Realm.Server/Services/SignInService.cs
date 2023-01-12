@@ -1,10 +1,8 @@
-﻿using Realm.Persistance.Data;
-
-namespace Realm.Server.Services;
+﻿namespace Realm.Server.Services;
 
 internal class SignInService : ISignInService
 {
-    private readonly SemaphoreSlim _lock = new SemaphoreSlim(1);
+    private readonly SemaphoreSlim _lock = new(1);
 
     private readonly HashSet<Guid> _usedAccountsIds = new();
     public SignInService()
@@ -24,7 +22,7 @@ internal class SignInService : ISignInService
                 return false;
 
             await entity.AddComponentAsync(new AccountComponent(user));
-            if (user.Inventories.Any())
+            if (user.Inventories != null && user.Inventories.Any())
             {
                 foreach (var inventory in user.Inventories)
                     await entity.AddComponentAsync(new InventoryComponent(inventory));

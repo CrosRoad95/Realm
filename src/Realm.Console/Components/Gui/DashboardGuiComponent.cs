@@ -15,10 +15,6 @@ public sealed class DashboardGuiComponent : StatefulGuiComponent<DashboardGuiCom
 
     }
 
-    protected override async Task HandleForm(IFormContext formContext)
-    {
-    }
-
     protected override async Task HandleAction(IActionContext actionContext)
     {
         switch(actionContext.ActionName)

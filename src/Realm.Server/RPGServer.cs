@@ -1,5 +1,4 @@
-﻿using Realm.Configuration;
-using Realm.Domain.Interfaces;
+﻿using Realm.Domain.Interfaces;
 using Realm.Domain.Registries;
 using Realm.Server.Logic;
 

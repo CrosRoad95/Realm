@@ -76,6 +76,13 @@ public abstract class GuiComponent : Component
         Close();
     }
 
-    protected abstract Task HandleForm(IFormContext formContext);
-    protected abstract Task HandleAction(IActionContext actionContext);
+    protected virtual Task HandleForm(IFormContext formContext)
+    {
+        throw new NotImplementedException();
+    }
+
+    protected virtual Task HandleAction(IActionContext actionContext)
+    {
+        throw new NotImplementedException();
+    }
 }

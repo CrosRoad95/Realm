@@ -1,6 +1,4 @@
-﻿using Realm.Resources.AgnosticGuiSystem;
-
-namespace Realm.Server.Logic;
+﻿namespace Realm.Server.Logic;
 
 internal class GuisLogic
 {

@@ -1,6 +1,4 @@
-﻿using Realm.Domain.Components.Players;
-
-namespace Realm.Console.Logic;
+﻿namespace Realm.Console.Logic;
 
 internal sealed class CommandsLogic
 {
