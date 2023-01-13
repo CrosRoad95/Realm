@@ -21,14 +21,19 @@ var server = builder.Build(null, extraBuilderSteps: serverBuilder =>
 #endif
 });
 
-Console.CancelKeyPress += async (sender, args) =>
+Console.CancelKeyPress += (sender, args) =>
 {
-    await server.Stop();
-    semaphore.Release();
+    try
+    {
+        server.Stop().Wait();
+    }
+    finally
+    {
+        semaphore.Release();
+    }
 };
 
 await server.Start();
 server.GetRequiredService<IConsole>().Start();
 await semaphore.WaitAsync();
-
-
+Console.WriteLine("Server stopped.");

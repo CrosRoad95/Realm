@@ -96,6 +96,39 @@ internal sealed class RPGServer : IRPGServer
 
     public async Task Stop()
     {
-        _server.Stop(); // TODO: save everything
+        _logger.Information("Server stopping.");
+        int i = 0;
+        var saveService = GetRequiredService<ISaveService>();
+
+        var ecs = GetRequiredService<ECS>();
+        var entities = ecs.Entities.ToList();
+        foreach (var entity in entities)
+        {
+            try
+            {
+                if (await saveService.Save(entity))
+                    i++;
+            }
+            catch (Exception ex)
+            {
+                _logger.Error(ex, "Failed to save entity.");
+            }
+            finally
+            {
+                await ecs.Destroy(entity);
+            }
+        }
+        try
+        {
+            await saveService.Commit();
+        }
+        catch (Exception ex)
+        {
+            _logger.Error(ex, "Failed to save entities.");
+        }
+
+        await Task.Delay(500);
+        _server.Stop();
+        _logger.Information("Server stopped, saved: {amount} entities.", i);
     }
 }

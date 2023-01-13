@@ -13,12 +13,14 @@ internal class DefaultServerConsole : IConsole
             while (true)
             {
                 var line = Console.ReadLine();
+                if (line == null)
+                    break;
                 CommandExecuted?.Invoke(line);
             }
         }
         finally
         {
-
+            ;
         }
     }
 }

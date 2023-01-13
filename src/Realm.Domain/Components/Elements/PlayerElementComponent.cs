@@ -49,6 +49,12 @@ public sealed class PlayerElementComponent : ElementComponent
         return Task.CompletedTask;
     }
 
+    public override void Destroy()
+    {
+        _player.Kick(PlayerDisconnectType.SHUTDOWN);
+        base.Destroy();
+    }
+
     public bool Compare(Player player) => _player == player;
 
     public bool TrySpawnAtLastPosition()

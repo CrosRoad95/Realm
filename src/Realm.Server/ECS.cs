@@ -68,6 +68,11 @@ public sealed class ECS : IEntityByElement
         return Task.CompletedTask;
     }
 
+    public Task Destroy(Entity entity)
+    {
+        return entity.Destroy();
+    }
+
     private void HandleComponentAdded(Component component)
     {
         if(component is ElementComponent elementComponent)
