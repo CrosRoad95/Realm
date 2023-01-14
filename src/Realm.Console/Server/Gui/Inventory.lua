@@ -12,20 +12,24 @@
 		scrollPane = guiProvider.scrollPane(0,0, 300, 375, window)
 		for i,item in ipairs(state.Items)do
 			local y = 5 + i * 25
-			local nameLabel = guiProvider.label(string.format("(%i) %s x%i", item.id, item.name, item.number), 10, y, 200, 25, scrollPane);
+			local nameLabel = guiProvider.label(string.format("(%i) %s x%i", item.id, item.name, item.number), 10, y, 200, 24, scrollPane);
 			guiProvider.setVerticalAlign(nameLabel, "center");
-			local useButton = guiProvider.button("Use", 235, y, 50, 25, scrollPane);
-			guiProvider.onClick(useButton, function()
-				guiProvider.invokeAction("use", {
-					id = item.id,
-				})
-			end)
+			if(bitAnd(item.actions, 1))then
+				local useButton = guiProvider.button("Use", 235, y, 50, 24, scrollPane);
+				guiProvider.onClick(useButton, function()
+					guiProvider.invokeAction("doItemAction", {
+						id = item.id,
+						action = 1,
+					})
+				end)
+			end
 		end
 	end
-
+	
 	window = guiProvider.window(string.format("Inventory %.2f/%.2f", state.Number, state.Size), 0,0, 300, 400);
 	guiProvider.dockWindow(window, "rightCenter", "center")
-
+	
+  --local sampleLabel = guiProvider.label(inspect(state), 10, 20, 280, 25, window);
 	createItems();
 
 	function stateChanged(key, value)

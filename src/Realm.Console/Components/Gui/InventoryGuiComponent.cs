@@ -1,4 +1,5 @@
 ﻿using Realm.Domain.Inventory;
+using Realm.Persistance.Data;
 
 namespace Realm.Console.Components.Gui;
 
@@ -34,14 +35,25 @@ public sealed class InventoryGuiComponent : StatefulGuiComponent<InventoryGuiCom
         return base.Load();
     }
 
+    public override void Destroy()
+    {
+        var inventory = Entity.GetRequiredComponent<InventoryComponent>();
+        inventory.ItemAdded -= HandleItemAdded;
+        inventory.ItemRemoved -= HandleItemRemoved;
+        inventory.ItemChanged -= HandleItemChanged;
+        base.Destroy();
+    }
+
     private void HandleItemAdded(InventoryComponent inventoryComponent, Item item)
     {
         ChangeState(x => x.Items, MapItems().ToList());
+        ChangeState(x => x.Number, inventoryComponent.Number);
     }
     
     private void HandleItemRemoved(InventoryComponent inventoryComponent, Item item)
     {
         ChangeState(x => x.Items, MapItems().ToList());
+        ChangeState(x => x.Number, inventoryComponent.Number);
     }
     
     private void HandleItemChanged(InventoryComponent inventoryComponent, Item item)
@@ -80,13 +92,10 @@ public sealed class InventoryGuiComponent : StatefulGuiComponent<InventoryGuiCom
     {
         switch(actionContext.ActionName)
         {
-            case "use":
+            case "doItemAction":
                 var useItemData = actionContext.GetData<UseItemData>();
                 var inventory = Entity.GetRequiredComponent<InventoryComponent>();
-                if(await inventory.TryUseItem(useItemData.ItemId, ItemRegistryEntry.ItemAction.DefaultUse))
-                {
-                    ;
-                }
+                await inventory.TryUseItem(useItemData.ItemId, useItemData.ItemAction);
                 break;
             default:
                 throw new NotImplementedException();

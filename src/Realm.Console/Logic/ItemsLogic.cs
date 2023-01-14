@@ -10,10 +10,17 @@ public class ItemsLogic
         itemsRegistry.UseCallback = Use;
         itemsRegistry.AddItem(1, new ItemRegistryEntry
         {
-            Size= 1,
+            Size = 1,
             StackSize = 10,
             Name = "Test item id 1",
-            AvailiableActions = ItemAction.DefaultUse,
+            AvailiableActions = ItemAction.Use,
+        });
+        itemsRegistry.AddItem(2, new ItemRegistryEntry
+        {
+            Size = 2,
+            StackSize = 10,
+            Name = "Foo item id 2",
+            AvailiableActions = ItemAction.Use,
         });
     }
 
@@ -21,7 +28,8 @@ public class ItemsLogic
     {
         switch(action)
         {
-            case ItemAction.DefaultUse:
+            case ItemAction.Use:
+                inventoryComponent.Entity.GetRequiredComponent<PlayerElementComponent>().SendChatMessage($"Item used: {item.Name}");
                 inventoryComponent.RemoveItem(item);
                 break;
         }

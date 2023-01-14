@@ -50,7 +50,7 @@ public class InventoryComponent : Component
     {
         var itemRegistryEntry = ItemsRegistry.Get(itemId);
         var item = new Item(itemRegistryEntry);
-        item.Number = Math.Max(itemRegistryEntry.StackSize, number);
+        item.Number = Math.Min(itemRegistryEntry.StackSize, number);
         AddItem(item);
         item.Changed += HandleItemChanged;
         ItemAdded?.Invoke(this, item);

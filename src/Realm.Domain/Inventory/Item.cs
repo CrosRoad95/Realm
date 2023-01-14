@@ -19,7 +19,7 @@ public class Item
 
     public Item(ItemRegistryEntry itemRegistryEntry, uint number = 1)
     {
-        ItemId = itemRegistryEntry.StackSize;
+        ItemId = itemRegistryEntry.Id;
         Size = itemRegistryEntry.Size;
         Number = number;
         _metadata = new();

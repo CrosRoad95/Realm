@@ -5,7 +5,7 @@ public class ItemRegistryEntry
     public enum ItemAction
     {
         None = 0,
-        DefaultUse = 1,
+        Use = 1,
     }
 
     public uint Id { get; set; }
