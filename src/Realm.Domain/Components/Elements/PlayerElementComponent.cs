@@ -18,6 +18,7 @@ public sealed class PlayerElementComponent : ElementComponent
     private readonly Player _player;
     private readonly Dictionary<string, Func<Entity, Task>> _binds = new();
     private readonly Dictionary<string, DateTime> _bindsCooldown = new();
+    private readonly HashSet<string> _enableFightFlags = new();
 
     internal Player Player => _player;
 
@@ -46,7 +47,28 @@ public sealed class PlayerElementComponent : ElementComponent
     {
         Entity.Transform.Bind(_player);
         _player.BindExecuted += HandleBindExecuted;
+        _player.Controls.FireEnabled = false;
         return Task.CompletedTask;
+    }
+
+    public bool AddEnableFightFlag(string flag)
+    {
+        if(_enableFightFlags.Add(flag))
+        {
+            _player.Controls.FireEnabled = _enableFightFlags.Any();
+            return true;
+        }
+        return false;
+    }
+    
+    public bool RemoveEnableFightFlag(string flag)
+    {
+        if(_enableFightFlags.Remove(flag))
+        {
+            _player.Controls.FireEnabled = _enableFightFlags.Any();
+            return true;
+        }
+        return false;
     }
 
     public override void Destroy()
