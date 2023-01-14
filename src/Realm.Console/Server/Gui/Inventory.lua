@@ -26,6 +26,7 @@
 		end
 	end
 	
+	
 	window = guiProvider.window(string.format("Inventory %.2f/%.2f", state.Number, state.Size), 0,0, 300, 400);
 	guiProvider.dockWindow(window, "rightCenter", "center")
 	

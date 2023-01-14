@@ -63,7 +63,7 @@ public class AgnosticGuiSystemService
         return true;
     }
 
-    public bool CloseGui(Player player, string gui)
+    public bool CloseGui(Player player, string gui, bool cursorless)
     {
         Debug.Assert(!EnsurePlayerGuisAreInitialized(player));
 
@@ -71,7 +71,7 @@ public class AgnosticGuiSystemService
             return false;
 
         _playersGuis[player].Remove(gui);
-        player.TriggerLuaEvent("internalUiCloseGui", player, gui);
+        player.TriggerLuaEvent("internalUiCloseGui", player, gui, cursorless);
         return true;
     }
 
@@ -80,7 +80,7 @@ public class AgnosticGuiSystemService
         Debug.Assert(!EnsurePlayerGuisAreInitialized(player));
 
         foreach (var gui in _playersGuis[player]) 
-            player.TriggerLuaEvent("internalUiCloseGui", player, gui);
+            player.TriggerLuaEvent("internalUiCloseGui", player, gui, false);
         _playersGuis[player].Clear();
     }
     

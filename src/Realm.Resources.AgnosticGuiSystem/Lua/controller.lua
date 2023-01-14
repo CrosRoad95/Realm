@@ -114,21 +114,24 @@ function openGui(name, cursorless, defaultState)
 		internalOpenGui(name, defaultState)
 	end)
 	if(guiRefs > 0)then
-		showCursor(true)
+		showCursor(true, false)
 	end
 	return true;
 end
 
-function closeGui(name)
+function closeGui(name, cursorless)
 	if(not currentOpenedGui[name])then
 		return false
 	end
 	
 	internalCloseGui(name)
 	currentOpenedGui[name] = nil;
-	guiRefs = guiRefs - 1
-	if(guiRefs == 0)then
-		showCursor(false)
+	if(not cursorless)then
+		guiRefs = guiRefs - 1
+		if(guiRefs <= 0)then
+			showCursor(false)
+			guiRefs = 0
+		end
 	end
 end
 
@@ -343,8 +346,8 @@ local function entrypoint()
 	end)
 	
 	addEvent("internalUiCloseGui", true)
-	addEventHandler("internalUiCloseGui", localPlayer, function(guiName)
-		closeGui(guiName);
+	addEventHandler("internalUiCloseGui", localPlayer, function(guiName, cursorless)
+		closeGui(guiName, cursorless);
 	end)
 	
 	addEvent("internalUiDebugToolsEnabled", true)

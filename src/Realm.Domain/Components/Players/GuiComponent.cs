@@ -68,7 +68,7 @@ public abstract class GuiComponent : Component
         AgnosticGuiSystemService.ActionExecuted -= HandleActionExecuted;
 
         var playerElementComponent = Entity.GetRequiredComponent<PlayerElementComponent>();
-        AgnosticGuiSystemService.CloseGui(playerElementComponent.Player, _name);
+        AgnosticGuiSystemService.CloseGui(playerElementComponent.Player, _name, _cursorless);
     }
 
     public override void Destroy()

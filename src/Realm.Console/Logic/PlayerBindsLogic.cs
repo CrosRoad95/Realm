@@ -2,6 +2,11 @@
 
 internal sealed class PlayerBindsLogic
 {
+    public struct GuiOpenOptions
+    {
+        public List<Type>? allowToOpenWithGui;
+    }
+
     private readonly ECS _ecs;
 
     public PlayerBindsLogic(ECS ecs)
@@ -17,7 +22,7 @@ internal sealed class PlayerBindsLogic
             entity.ComponentAdded += HandleComponentAdded;
     }
 
-    private void OpenCloseGuiHelper<TGuiComponent>(Entity entity, string bind) where TGuiComponent: GuiComponent, new()
+    private void OpenCloseGuiHelper<TGuiComponent>(Entity entity, string bind, GuiOpenOptions options = default) where TGuiComponent: GuiComponent, new()
     {
         var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();
         playerElementComponent.SetBind(bind, async entity =>
@@ -29,10 +34,7 @@ internal sealed class PlayerBindsLogic
             }
 
             if (entity.HasComponent<GuiComponent>())
-            {
-                playerElementComponent.AddNotification("Nie możesz otworzyć tego panelu ponieważ masz inne gui aktywne.");
-                return;
-            }
+                entity.DestroyComponent<GuiComponent>();
 
             var guiComponent = await entity.AddComponentAsync(new TGuiComponent());
             playerElementComponent.ResetCooldown(bind);

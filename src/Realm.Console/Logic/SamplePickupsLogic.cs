@@ -88,7 +88,7 @@ internal class SamplePickupsLogic
         {
             var pickupElementComponent = entity.GetRequiredComponent<PickupElementComponent>();
             pickupElementComponent.AddRule(new MustBePlayerOnFootOnlyRule());
-            pickupElementComponent.AddOpenGuiLogic<TestShopGuiComponent>();
+            pickupElementComponent.AddOpenGuiLogic<TestShopGuiComponent, InventoryGuiComponent>();
         }
     }
 }
