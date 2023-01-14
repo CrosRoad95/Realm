@@ -1,11 +1,15 @@
-﻿namespace Realm.Domain.Registries;
+﻿using static Realm.Domain.Registries.ItemRegistryEntry;
+
+namespace Realm.Domain.Registries;
 
 public class ItemsRegistry
 {
     private readonly Dictionary<uint, ItemRegistryEntry> _itemRegistryEntries = new();
+
+    public Func<InventoryComponent, Item, ItemAction, Task> UseCallback { get; set; } = default!;
+
     public ItemsRegistry()
     {
-
     }
 
     public ItemRegistryEntry Get(uint id)

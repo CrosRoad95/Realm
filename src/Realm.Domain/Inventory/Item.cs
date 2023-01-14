@@ -7,12 +7,16 @@ public class Item
     public uint Number { get; set; } = 1;
 
     public string Name => InventoryComponent!.GetItemRegistryEntry(ItemId).Name;
+    public ItemRegistryEntry.ItemAction AvailiableActions => InventoryComponent!.GetItemRegistryEntry(ItemId).AvailiableActions;
     public uint Size { get; set; } = 1;
 
     private Dictionary<string, object> _metadata;
 
     public Dictionary<string, object> MetaData { get => _metadata; set { _metadata = value; } }
     public InventoryComponent? InventoryComponent { get; set; }
+
+    public event Action<Item>? Changed;
+
     public Item(ItemRegistryEntry itemRegistryEntry, uint number = 1)
     {
         ItemId = itemRegistryEntry.StackSize;
@@ -32,6 +36,10 @@ public class Item
             {
                 _metadata = metadata;
             }
+            else
+            {
+                _metadata = new();
+            }
         }
         finally
         {
@@ -44,6 +52,7 @@ public class Item
         if (value is string or double or int)
         {
             _metadata[key] = value;
+            Changed?.Invoke(this);
             return true;
         }
         return false;

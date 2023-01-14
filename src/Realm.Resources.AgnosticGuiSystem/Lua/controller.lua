@@ -329,9 +329,11 @@ local function entrypoint()
 	addEventHandler("internalUiStateChanged", localPlayer, function(guiName, changes)
 		local currentGuiHandle = internalGetWindowHandleByName(guiName)
 		if(currentGuiHandle)then
+			currentGui = guiName;
 			for k,v in pairs(changes)do
 				currentGuiHandle.stateChanged(k, v);
 			end
+			currentGui = nil;
 		end
 	end)
 

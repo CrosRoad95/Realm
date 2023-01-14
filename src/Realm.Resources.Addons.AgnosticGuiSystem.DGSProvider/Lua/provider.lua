@@ -16,6 +16,9 @@ local dgsUIProvider = {
 	checkbox = function(text, px, py, sx, sy, selected, parent)
 		return dgsCreateCheckBox(px, py + offset, sx, sy, text, selected, false, parent)
 	end,
+	scrollPane = function(x, y, width, height, parent)
+		return dgsCreateScrollPane(x, y, width, height, false, parent)
+	end,
 
 	-- Getters, setters
 	getValue = function(elementHandle)
@@ -84,7 +87,10 @@ local dgsUIProvider = {
 	end,
 	setHorizontalAlign = function(labelHandle, align, wordWrap)
 		dgsLabelSetHorizontalAlign(labelHandle, align, wordWrap)
-	end
+	end,
+	setVerticalAlign = function(labelHandle, align)
+		dgsLabelSetVerticalAlign(labelHandle, align)
+	end,
 }
 
 addEventHandler("onClientResourceStart", resourceRoot, function()

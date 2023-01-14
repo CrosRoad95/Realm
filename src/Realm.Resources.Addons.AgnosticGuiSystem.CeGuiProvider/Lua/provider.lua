@@ -15,6 +15,9 @@
 	checkbox = function(text, px, py, sx, sy, selected, parent)
 		return guiCreateCheckBox(px, py, sx, sy, text, selected, false, parent)
 	end,
+	scrollPane = function(x, y, width, height, parent)
+		return guiCreateScrollPane(x, y, width, height, false, parent)
+	end,
 
 	-- Getters, setters
 	getValue = function(elementHandle)
@@ -83,7 +86,10 @@
 	end,
 	setHorizontalAlign = function(labelHandle, align, wordWrap)
 		guiLabelSetHorizontalAlign(labelHandle, align, wordWrap)
-	end
+	end,
+	setVerticalAlign = function(labelHandle, align)
+		guiLabelSetHorizontalAlign(labelHandle, align)
+	end,
 }
 
 addEventHandler("onClientResourceStart", resourceRoot, function()

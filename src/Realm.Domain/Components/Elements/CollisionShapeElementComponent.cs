@@ -29,8 +29,8 @@ public abstract class CollisionShapeElementComponent : ElementComponent
     {
         if (EntityEntered != null)
         {
-            var entity = EntityByElement.GetByElement(element);
-            if (_entityRules.All(x => x.Check(entity)))
+            var entity = EntityByElement.TryGetByElement(element);
+            if (entity != null && _entityRules.All(x => x.Check(entity)))
                 EntityEntered(entity);
         }
     }
@@ -39,8 +39,8 @@ public abstract class CollisionShapeElementComponent : ElementComponent
     {
         if (EntityLeft != null)
         {
-            var entity = EntityByElement.GetByElement(element);
-            if (_entityRules.All(x => x.Check(entity)))
+            var entity = EntityByElement.TryGetByElement(element);
+            if (entity != null && _entityRules.All(x => x.Check(entity)))
                 EntityLeft(entity);
         }
     }
