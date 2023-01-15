@@ -164,22 +164,6 @@ public sealed class PlayerElementComponent : ElementComponent
     }
     #endregion
 
-    // TODO: improve
-    public void TriggerClientEvent(string name, object[] values)
-    {
-        LuaValue luaValue;
-        if (values.Length == 1 && values[0].GetType() == typeof(object[]))
-        {
-            luaValue = ((object[])values[0]).Select(LuaValueMapper.Map).ToArray();
-        }
-        else
-        {
-            luaValue = values.Select(LuaValueMapper.Map).ToArray();
-        }
-
-        LuaEventService.TriggerEventFor(_player, name, _player, luaValue);
-    }
-
     public void SetBind(string key, Func<Entity, Task> callback)
     {
         if (_binds.ContainsKey(key))

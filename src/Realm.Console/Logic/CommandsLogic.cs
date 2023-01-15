@@ -27,7 +27,7 @@ internal sealed class CommandsLogic
                 playerElementComponent.SendChatMessage($"Inventory, {inventoryComponent.Number}/{inventoryComponent.Size}");
                 foreach (var item in inventoryComponent.Items)
                 {
-                    playerElementComponent.SendChatMessage($"Item, {item.Id} = {item.Name}");
+                    playerElementComponent.SendChatMessage($"Item, {item.ItemId} = {item.Name}");
                 }
 
             }
@@ -38,11 +38,10 @@ internal sealed class CommandsLogic
         {
             if(entity.TryGetComponent(out InventoryComponent inventoryComponent))
             {
-                uint itemId = uint.Parse(args.FirstOrDefault("1"));
-                if(inventoryComponent.AddItem(itemId) != null)
-                {
-                    entity.GetRequiredComponent<PlayerElementComponent>().SendChatMessage($"Item added, {inventoryComponent.Number}/{inventoryComponent.Size}");
-                }
+                uint itemId = uint.Parse(args.ElementAtOrDefault(0) ?? "1");
+                uint count = uint.Parse(args.ElementAtOrDefault(1) ?? "1");
+                inventoryComponent.AddItem(itemId, count);
+                entity.GetRequiredComponent<PlayerElementComponent>().SendChatMessage($"Item added, {inventoryComponent.Number}/{inventoryComponent.Size}");
             }
             return Task.CompletedTask;
         });
@@ -234,8 +233,8 @@ internal sealed class CommandsLogic
             
             if (entity.TryGetComponent(out InventoryComponent inventoryComponent))
             {
-                if (inventoryComponent.AddItem(1) != null)
-                    entity.GetRequiredComponent<PlayerElementComponent>().SendChatMessage($"Test item added");
+                inventoryComponent.AddItem(1);
+                entity.GetRequiredComponent<PlayerElementComponent>().SendChatMessage($"Test item added");
             }
 
             if (entity.TryGetComponent(out LicensesComponent licenseComponent))

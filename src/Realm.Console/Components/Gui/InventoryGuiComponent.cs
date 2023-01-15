@@ -9,6 +9,7 @@ public sealed class InventoryGuiComponent : StatefulGuiComponent<InventoryGuiCom
     {
         public struct InventoryItem
         {
+            public string localId;
             public double id;
             public string name;
             public double number;
@@ -67,6 +68,7 @@ public sealed class InventoryGuiComponent : StatefulGuiComponent<InventoryGuiCom
         var inventory = Entity.GetRequiredComponent<InventoryComponent>();
         return inventory.Items.Select(x => new InventoryState.InventoryItem
         {
+            localId = x.LocalId,
             id = x.ItemId,
             name = x.Name,
             number = x.Number,
@@ -95,7 +97,8 @@ public sealed class InventoryGuiComponent : StatefulGuiComponent<InventoryGuiCom
             case "doItemAction":
                 var useItemData = actionContext.GetData<UseItemData>();
                 var inventory = Entity.GetRequiredComponent<InventoryComponent>();
-                await inventory.TryUseItem(useItemData.ItemId, useItemData.ItemAction);
+                if(inventory.TryGetByLocalId(useItemData.LocalId, out Item item))
+                    await inventory.TryUseItem(item, useItemData.ItemAction);
                 break;
             default:
                 throw new NotImplementedException();

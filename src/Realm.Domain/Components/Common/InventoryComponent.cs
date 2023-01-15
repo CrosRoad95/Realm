@@ -29,9 +29,7 @@ public class InventoryComponent : Component
 
         Size = inventory.Size;
         Id = inventory.Id;
-        _items = inventory.InventoryItems.Select(x => new Item(x)).ToList();
-        foreach (var item in _items)
-            item.InventoryComponent = this;
+        _items = inventory.InventoryItems.Select(x => new Item(x, ItemsRegistry.Get(x.ItemId))).ToList();
     }
     public ItemRegistryEntry GetItemRegistryEntry(uint id) => ItemsRegistry!.Get(id);
 
@@ -40,21 +38,71 @@ public class InventoryComponent : Component
         return _items.Any(x => x.ItemId == itemId);
     }
 
-    public bool TryGetById(uint itemId, out Item item)
+    public bool TryGetByLocalId(string localId, out Item item)
+    {
+        item = _items.FirstOrDefault(x => x.LocalId == localId)!;
+        return item != null;
+    }
+    
+    public bool TryGetByItemId(uint itemId, out Item item)
     {
         item = _items.FirstOrDefault(x => x.ItemId == itemId)!;
         return item != null;
     }
 
-    public Item? AddItem(uint itemId, uint number = 1)
+    public bool TryGetByIdAndMetadata(uint itemId, Dictionary<string, object> metadata, out Item item)
     {
+        item = _items.FirstOrDefault(x => x.ItemId == itemId && x.Equals(metadata))!;
+        return item != null;
+    }
+
+    public void AddItem(uint itemId, uint number = 1, Dictionary<string, object>? metadata = null, bool tryStack = true, bool force = false)
+    {
+        if (number == 0)
+            return;
+
         var itemRegistryEntry = ItemsRegistry.Get(itemId);
-        var item = new Item(itemRegistryEntry);
-        item.Number = Math.Min(itemRegistryEntry.StackSize, number);
-        AddItem(item);
-        item.Changed += HandleItemChanged;
-        ItemAdded?.Invoke(this, item);
-        return item;
+        if (Number + itemRegistryEntry.Size * number > Size && !force)
+            throw new InventoryDoNotEnoughSpaceException();
+
+        List<Item> newItems = new();
+        if (tryStack)
+        {
+            foreach (var item in _items.Where(x => x.ItemId == itemId))
+            {
+                if(metadata != null)
+                {
+                    if (!item.Equals(metadata))
+                        break;
+                }
+
+                var added = Math.Min(number, itemRegistryEntry.StackSize - item.Number);
+                item.Number += added;
+                number -= added;
+            }
+        }
+        else
+        {
+            var item = new Item(itemRegistryEntry);
+            newItems.Add(item);
+        }
+
+        while (number > 0)
+        {
+            var thisItemNumber = Math.Min(number, itemRegistryEntry.StackSize);
+            number -= thisItemNumber;
+            var item = new Item(itemRegistryEntry);
+            item.Number = thisItemNumber;
+            newItems.Add(item);
+            ;
+        }
+
+        foreach (var newItem in newItems)
+        {
+            newItem.Changed += HandleItemChanged;
+            _items.Add(newItem);
+            ItemAdded?.Invoke(this, newItem);
+        }
     }
 
     private void HandleItemChanged(Item item)
@@ -78,28 +126,12 @@ public class InventoryComponent : Component
         }
     }
 
-    public Item? AddItem(Item item)
+    public async Task<bool> TryUseItem(Item item, ItemRegistryEntry.ItemAction action)
     {
-        if (item.InventoryComponent != null)
-            throw new Exception("Item already used in other inventory component");
-
-        if (item.Size + Number > Size)
-            return null;
-        _items.Add(item);
-        item.InventoryComponent = this;
-        ItemAdded?.Invoke(this, item);
-        return item;
-    }
-
-    public async Task<bool> TryUseItem(uint itemId, ItemRegistryEntry.ItemAction action)
-    {
-        if(TryGetById(itemId, out var item)){
-            var itemEntry = ItemsRegistry.Get(itemId);
-            if(itemEntry.AvailiableActions.HasFlag(action))
-            {
-                await ItemsRegistry.UseCallback(this, item, action);
-                return true;
-            }
+        if (item.AvailiableActions.HasFlag(action))
+        {
+            await ItemsRegistry.UseCallback(this, item, action);
+            return true;
         }
 
         return false;

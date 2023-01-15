@@ -19,6 +19,7 @@
 				guiProvider.onClick(useButton, function()
 					guiProvider.invokeAction("doItemAction", {
 						id = item.id,
+						localId = item.localId,
 						action = 1,
 					})
 				end)

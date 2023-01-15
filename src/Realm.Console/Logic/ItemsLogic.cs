@@ -11,14 +11,14 @@ public class ItemsLogic
         itemsRegistry.AddItem(1, new ItemRegistryEntry
         {
             Size = 1,
-            StackSize = 10,
+            StackSize = 4,
             Name = "Test item id 1",
             AvailiableActions = ItemAction.Use,
         });
         itemsRegistry.AddItem(2, new ItemRegistryEntry
         {
             Size = 2,
-            StackSize = 10,
+            StackSize = 4,
             Name = "Foo item id 2",
             AvailiableActions = ItemAction.Use,
         });
