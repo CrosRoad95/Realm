@@ -1,13 +1,17 @@
-﻿namespace Realm.Server.Services;
+﻿using Realm.Domain.Registries;
+
+namespace Realm.Server.Services;
 
 internal class SignInService : ISignInService
 {
     private readonly SemaphoreSlim _lock = new(1);
 
     private readonly HashSet<Guid> _usedAccountsIds = new();
-    public SignInService()
-    {
+    private readonly ItemsRegistry _itemsRegistry;
 
+    public SignInService(ItemsRegistry itemsRegistry)
+    {
+        _itemsRegistry = itemsRegistry;
     }
 
     public async Task<bool> SignIn(Entity entity, User user)
@@ -25,7 +29,7 @@ internal class SignInService : ISignInService
             if (user.Inventories != null && user.Inventories.Any())
             {
                 foreach (var inventory in user.Inventories)
-                    await entity.AddComponentAsync(new InventoryComponent(inventory));
+                    await entity.AddComponentAsync(new InventoryComponent(inventory, _itemsRegistry));
             }
             else
                 await entity.AddComponentAsync(new InventoryComponent(20));

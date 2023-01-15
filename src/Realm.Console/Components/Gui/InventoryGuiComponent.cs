@@ -74,7 +74,7 @@ public sealed class InventoryGuiComponent : StatefulGuiComponent<InventoryGuiCom
             number = x.Number,
             actions = (double)x.AvailiableActions,
             metaData = x.MetaData
-        });
+        }).OrderBy(x => x.id).ThenByDescending(x => x.number);
     }
 
     protected override void PreGuiOpen(InventoryState state)

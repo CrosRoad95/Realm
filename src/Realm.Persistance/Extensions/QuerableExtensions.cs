@@ -36,4 +36,9 @@ public static class QuerableExtensions
             .Include(x => x.VehicleAccesses)
             .ThenInclude(x => x.User);
     }
+
+    public static IQueryable<Vehicle> IsSpawned(this IQueryable<Vehicle> query)
+    {
+        return query.Where(x => x.Spawned);
+    }
 }

@@ -168,7 +168,7 @@ internal class SaveService : ISaveService
                 };
                 inventory.InventoryItems = x.Items.Select(item => new InventoryItem
                 {
-                    Id = item.Id ?? Guid.NewGuid().ToString(),
+                    Id = Guid.NewGuid().ToString(),
                     ItemId = item.ItemId,
                     Number = item.Number,
                     Inventory = inventory,

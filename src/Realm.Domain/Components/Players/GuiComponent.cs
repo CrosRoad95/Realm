@@ -4,10 +4,13 @@ public abstract class GuiComponent : Component
 {
     [Inject]
     private AgnosticGuiSystemService AgnosticGuiSystemService { get; set; } = default!;
+    [Inject]
+    private ILogger Logger { get; set; } = default!;
+
     protected readonly string _name;
     protected readonly bool _cursorless;
 
-    public GuiComponent(string name, bool cursorless)
+    protected GuiComponent(string name, bool cursorless)
     {
         _name = name;
         _cursorless = cursorless;
@@ -39,7 +42,7 @@ public abstract class GuiComponent : Component
             }
             catch(Exception ex)
             {
-                throw; // TODO: Handle exception
+                Logger.Error(ex, "Failed to execute action {actionName}.", actionName);
             }
         }
     }
@@ -57,7 +60,7 @@ public abstract class GuiComponent : Component
             }
             catch(Exception ex)
             {
-                throw; // TODO: Handle exception
+                Logger.Error(ex, "Failed to handle form {formName}.", formName);
             }
         }
     }

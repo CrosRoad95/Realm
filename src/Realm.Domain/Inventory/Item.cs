@@ -42,21 +42,14 @@ public class Item : IEquatable<Item>, IEquatable<Dictionary<string, object>>
         Id = inventoryItem.Id;
         ItemId = inventoryItem.ItemId;
         Number = inventoryItem.Number;
-        try
+        var metadata = JsonConvert.DeserializeObject<Dictionary<string, object>>(inventoryItem.MetaData);
+        if (metadata != null)
         {
-            var metadata = JsonConvert.DeserializeObject<Dictionary<string, object>>(inventoryItem.MetaData);
-            if (metadata != null)
-            {
-                _metadata = metadata;
-            }
-            else
-            {
-                _metadata = new();
-            }
+            _metadata = metadata;
         }
-        finally
+        else
         {
-            // TODO: catch exception
+            _metadata = new();
         }
     }
 

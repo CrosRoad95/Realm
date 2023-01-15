@@ -1,12 +1,15 @@
-﻿namespace Realm.Domain.Components.Players;
+﻿using Microsoft.AspNetCore.Authorization;
+
+namespace Realm.Domain.Components.Players;
 
 public class AccountComponent : Component
 {
     [Inject]
     private UserManager<User> UserManager { get; set; } = default!;
-
     [Inject]
     private SignInManager<User> SignInManager { get; set; } = default!;
+    [Inject]
+    private IAuthorizationService AuthorizationService { get; set; } = default!;
 
     private readonly User _user;
     private ClaimsPrincipal? _claimsPrincipal;
@@ -119,6 +122,12 @@ public class AccountComponent : Component
         var result = await UserManager.RemoveClaimsAsync(_user, claims);
         if (result.Succeeded)
             await UpdateClaimsPrincipal();
+        return result.Succeeded;
+    }
+
+    public async Task<bool> AuthorizePolicy(string policy)
+    {
+        var result = await AuthorizationService.AuthorizeAsync(_claimsPrincipal, policy);
         return result.Succeeded;
     }
 }

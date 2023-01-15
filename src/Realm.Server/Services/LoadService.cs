@@ -11,40 +11,45 @@ internal class LoadService : ILoadService
         _entityFactory = entityFactory;
         _logger = logger;
     }
+
     public async Task LoadAll()
     {
-        // Load vehicles
+        await LoadAllVehicles();
+    }
+
+    private async Task LoadAllVehicles()
+    {
+        using var vehicleRepository = _repositoryFactory.GetVehicleRepository();
+        var results = await vehicleRepository
+            .GetAll()
+            .IncludeAll()
+            .IsSpawned()
+            .AsNoTrackingWithIdentityResolution()
+            .ToListAsync();
+
+        int i = 0;
+        foreach (var vehicleData in results)
         {
-            using var vehicleRepository = _repositoryFactory.GetVehicleRepository();
-            var results = await vehicleRepository
-                .GetAll()
-                .IncludeAll()
-                //.Where(x => x.Spawned)
-                .AsNoTrackingWithIdentityResolution()
-                .ToListAsync();
-
-            foreach (var vehicleData in results)
+            try
             {
-                try
-                {
-                    await Task.Delay(200);
-                    var entity = _entityFactory.CreateVehicle(vehicleData.Model, vehicleData.TransformAndMotion.Position, vehicleData.TransformAndMotion.Rotation, vehicleData.TransformAndMotion.Interior, vehicleData.TransformAndMotion.Dimension, $"vehicle {vehicleData.Id}",
-                        entity =>
-                        {
-                            entity.AddComponent(new PrivateVehicleComponent(vehicleData));
-                            entity.AddComponent(new VehicleUpgradesComponent(vehicleData.Upgrades));
-                            entity.AddComponent(new MileageCounterComponent(vehicleData.Mileage));
-                            foreach (var vehicleFuel in vehicleData.Fuels)
-                                entity.AddComponent(new VehicleFuelComponent(vehicleFuel.FuelType, vehicleFuel.Amount, vehicleFuel.MaxCapacity, vehicleFuel.FuelConsumptionPerOneKm, vehicleFuel.MinimumDistanceThreshold)).Active = vehicleFuel.Active;
-                        });
-                }
-                catch (Exception ex)
-                {
-                    throw;
-                }
+                await Task.Delay(200);
+                var entity = _entityFactory.CreateVehicle(vehicleData.Model, vehicleData.TransformAndMotion.Position, vehicleData.TransformAndMotion.Rotation, vehicleData.TransformAndMotion.Interior, vehicleData.TransformAndMotion.Dimension, $"vehicle {vehicleData.Id}",
+                    entity =>
+                    {
+                        entity.AddComponent(new PrivateVehicleComponent(vehicleData));
+                        entity.AddComponent(new VehicleUpgradesComponent(vehicleData.Upgrades));
+                        entity.AddComponent(new MileageCounterComponent(vehicleData.Mileage));
+                        foreach (var vehicleFuel in vehicleData.Fuels)
+                            entity.AddComponent(new VehicleFuelComponent(vehicleFuel.FuelType, vehicleFuel.Amount, vehicleFuel.MaxCapacity, vehicleFuel.FuelConsumptionPerOneKm, vehicleFuel.MinimumDistanceThreshold)).Active = vehicleFuel.Active;
+                    });
+                i++;
             }
-            _logger.Information("Loaded: {amount} vehicles", results.Count);
-
+            catch (Exception ex)
+            {
+                _logger.Error(ex, "Failed to spawn vehicle: {id}", vehicleData.Id);
+            }
         }
+        if (i > 0)
+            _logger.Information("Loaded: {amount} vehicles", i);
     }
 }

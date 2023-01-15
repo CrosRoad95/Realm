@@ -1,6 +1,7 @@
 ﻿global using SlipeServer.Server.Elements;
 global using System.Drawing;
 global using System.Numerics;
+global using Serilog;
 global using Vehicle = SlipeServer.Server.Elements.Vehicle;
 global using Newtonsoft.Json;
 global using Microsoft.AspNetCore.Identity;

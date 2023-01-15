@@ -4,6 +4,8 @@ public class InventoryComponent : Component
 {
     [Inject]
     private ItemsRegistry ItemsRegistry { get; set; } = default!;
+    [Inject]
+    private ILogger Logger { get; set; } = default!;
 
     private readonly List<Item> _items = new();
     public event Action<InventoryComponent, Item>? ItemAdded;
@@ -16,21 +18,32 @@ public class InventoryComponent : Component
 
     public IEnumerable<Item> Items => _items;
 
-
     public InventoryComponent(uint size)
     {
         Size = size;
     }
 
-    internal InventoryComponent(InventoryData inventory)
+    internal InventoryComponent(InventoryData inventory, ItemsRegistry itemsRegistry)
     {
         if (inventory == null)
             throw new ArgumentNullException(nameof(inventory));
 
         Size = inventory.Size;
         Id = inventory.Id;
-        _items = inventory.InventoryItems.Select(x => new Item(x, ItemsRegistry.Get(x.ItemId))).ToList();
+
+        foreach (var item in inventory.InventoryItems)
+        {
+            try
+            {
+                _items.Add(new Item(item, itemsRegistry.Get(item.ItemId)));
+            }
+            catch(Exception ex)
+            {
+                Logger.Error(ex, "Failed to load item {item}", item.Id);
+            }
+        }
     }
+
     public ItemRegistryEntry GetItemRegistryEntry(uint id) => ItemsRegistry!.Get(id);
 
     public bool HasItem(uint itemId)

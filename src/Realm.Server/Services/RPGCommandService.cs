@@ -33,39 +33,33 @@ public class RPGCommandService
         {
             var player = args.Player;
             var entity = _ecs.GetEntityByPlayer(player);
+            if (!entity.TryGetComponent<AccountComponent>(out var accountComponent))
+                return;
+
             using var playerProperty = LogContext.PushProperty("player", player);
             using var commandNameProperty = LogContext.PushProperty("commandName", commandName);
             using var commandArgumentProperty = LogContext.PushProperty("commandArguments", args.Arguments);
             if (requiredPolicies != null)
             {
-                //var account = player.Account;
-                //if (account == null)
-                //{
-                //    _logger.Verbose("{player} failed to execute command {commandName} player is not logged in", player, commandName);
-                //    return;
-                //}
-
-                //foreach (var policy in requiredPolicies)
-                //    if (!await account.AuthorizePolicy(policy.ToString()))
-                //    {
-                //        _logger.Verbose("{player} failed to execute command {commandName} because failed to authorize for policy {policy}", player, commandName, policy);
-                //        return;
-                //    }
+                foreach (var policy in requiredPolicies)
+                    if (!await accountComponent.AuthorizePolicy(policy))
+                    {
+                        _logger.Verbose("{player} failed to execute command {commandName} because failed to authorize for policy {policy}", player, commandName, policy);
+                        return;
+                    }
             }
+
             if (args.Arguments.Any())
                 _logger.Verbose("{player} executed command {commandName} with arguments {commandArguments}.", entity);
             else
                 _logger.Verbose("{player} executed command {commandName} with no arguments.", entity);
             try
             {
-                if(entity.HasComponent<AccountComponent>())
-                    await callback(entity, args.Arguments);
-                else
-                    _logger.Verbose("{player} executed command {commandName} with no arguments.", entity);
+                await callback(entity, args.Arguments);
             }
             catch (Exception ex)
             {
-                _logger.Error(ex, "Exception thrown while executing command");
+                _logger.Error(ex, "Exception thrown while executing command {commandName} with arguments {commandArguments}");
             }
         };
         return true;

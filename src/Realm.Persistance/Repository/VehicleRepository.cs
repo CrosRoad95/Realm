@@ -19,6 +19,7 @@ internal class VehicleRepository : IVehicleRepository
             Id = Guid.NewGuid(),
             Platetext = Guid.NewGuid().ToString()[..8],
             CreatedAt = DateTime.Now,
+            Spawned = true,
         };
         _db.Vehicles.Add(vehicle);
         await _db.SaveChangesAsync();
