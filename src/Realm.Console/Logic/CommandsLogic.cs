@@ -263,5 +263,16 @@ internal sealed class CommandsLogic
                 vehicleEntity.AddComponent(new VehicleFuelComponent("default", 20, 20, 0.01, 2)).Active = true;
             }
         });
+
+        _commandService.AddCommandHandler("giveexperience", (entity, args) =>
+        {
+            if (entity.TryGetComponent(out LevelComponent levelComponent))
+            {
+                var amount = uint.Parse(args.First());
+                levelComponent.GiveExperience(amount);
+                entity.GetRequiredComponent<PlayerElementComponent>().SendChatMessage($"gave experience: {amount}, level: {levelComponent.Level}, experience: {levelComponent.Experience}");
+            }
+            return Task.CompletedTask;
+        });
     }
 }

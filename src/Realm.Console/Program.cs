@@ -16,6 +16,7 @@ var server = builder.Build(null, extraBuilderSteps: serverBuilder =>
     serverBuilder.AddLogic<VehicleUpgradesLogic>();
     serverBuilder.AddLogic<AchievementsLogic>();
     serverBuilder.AddLogic<WorldLogic>();
+    serverBuilder.AddLogic<LevelsLogic>();
 #if DEBUG
     serverBuilder.AddLogic<HotReloadLogic>("../../../Server/Gui");
 #endif

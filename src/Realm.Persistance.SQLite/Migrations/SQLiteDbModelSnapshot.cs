@@ -308,6 +308,9 @@ namespace Realm.Persistance.SQLite.Migrations
                     b.Property<bool>("EmailConfirmed")
                         .HasColumnType("INTEGER");
 
+                    b.Property<uint>("Experience")
+                        .HasColumnType("INTEGER");
+
                     b.Property<string>("LastIp")
                         .HasColumnType("TEXT");
 
@@ -320,6 +323,9 @@ namespace Realm.Persistance.SQLite.Migrations
                     b.Property<string>("LastTransformAndMotion")
                         .HasMaxLength(400)
                         .HasColumnType("TEXT");
+
+                    b.Property<uint>("Level")
+                        .HasColumnType("INTEGER");
 
                     b.Property<bool>("LockoutEnabled")
                         .HasColumnType("INTEGER");

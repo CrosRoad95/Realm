@@ -3,11 +3,12 @@
 internal sealed class PlayerJoinedLogic
 {
     private readonly ECS _ecs;
+    private readonly ILogger _logger;
 
-    public PlayerJoinedLogic(ECS ecs)
+    public PlayerJoinedLogic(ECS ecs, ILogger logger)
     {
         _ecs = ecs;
-
+        _logger = logger.ForContext<PlayerJoinedLogic>();
         _ecs.EntityCreated += HandleEntityCreated;
     }
 
@@ -46,6 +47,14 @@ internal sealed class PlayerJoinedLogic
             }
             await Task.Delay(300);
             await playerElementComponent.FadeCameraAsync(CameraFade.In);
+        }
+
+        if (component is LevelComponent levelComponent)
+        {
+            levelComponent.LevelChanged += (self, level) =>
+            {
+                _logger.Information("Player leveled up: {level}", level);
+            };
         }
     }
 }

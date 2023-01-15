@@ -45,12 +45,14 @@ internal sealed class RPGServer : IRPGServer
         services.AddSingleton<SeederServerBuilder>();
         services.AddSingleton<ItemsRegistry>();
         services.AddSingleton<VehicleUpgradeRegistry>();
+        services.AddSingleton<LevelsRegistry>();
 
         // Services
         services.AddSingleton<RPGCommandService>();
         services.AddSingleton<ISignInService, SignInService>();
         services.AddTransient<ISaveService, SaveService>();
         services.AddTransient<ILoadService, LoadService>();
+        services.AddTransient<VehiclesService>();
 
         // Player specific
         services.AddTransient<DiscordUser>();

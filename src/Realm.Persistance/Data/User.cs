@@ -13,6 +13,8 @@ public sealed class User : IdentityUser<Guid>
     public ulong PlayTime { get; set; }
     public short Skin { get; set; }
     public decimal Money { get; set; }
+    public uint Level { get; set; }
+    public uint Experience { get; set; }
 
     public TransformAndMotion? LastTransformAndMotion { get; set; } = null;
 #pragma warning restore CS8618

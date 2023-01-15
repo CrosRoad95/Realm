@@ -61,6 +61,7 @@ internal class SignInService : ISignInService
 
             entity.AddComponent(new LicensesComponent(user.Licenses));
             entity.AddComponent(new PlayTimeComponent());
+            entity.AddComponent(new LevelComponent(user.Level, user.Experience));
             entity.AddComponent(new MoneyComponent(user.Money));
             entity.AddComponent(new AFKComponent()).StateChanged += (entity, wentAfk, time) =>
             {
@@ -77,6 +78,7 @@ internal class SignInService : ISignInService
             entity.TryDestroyComponent<LicensesComponent>();
             entity.TryDestroyComponent<PlayTimeComponent>();
             entity.TryDestroyComponent<MoneyComponent>();
+            entity.TryDestroyComponent<LevelComponent>();
             entity.TryDestroyComponent<DailyVisitsCounterComponent>();
             entity.TryDestroyComponent<StatisticsCounterComponent>();
             entity.TryDestroyComponent<DiscoveriesComponent>();

@@ -123,119 +123,130 @@ internal class SaveService : ISaveService
 
     private async Task SavePlayer(Entity entity)
     {
-        if (entity.TryGetComponent(out AccountComponent accountComponent))
+        if (!entity.TryGetComponent(out AccountComponent accountComponent))
+            return;
+
+        var user = await _dbContext.Users
+            .IncludeAll()
+            .Where(x => x.Id == accountComponent.Id).FirstAsync();
+        user.LastTransformAndMotion = entity.Transform.GetTransformAndMotion();
+
+        if (entity.TryGetComponent(out MoneyComponent moneyComponent))
+            user.Money = moneyComponent.Money;
+        else
+            user.Money = 0;
+            
+        if (entity.TryGetComponent(out LicensesComponent licensesComponent))
         {
-            var user = await _dbContext.Users
-                .IncludeAll()
-                .Where(x => x.Id == accountComponent.Id).FirstAsync();
-            user.LastTransformAndMotion = entity.Transform.GetTransformAndMotion();
-
-            if (entity.TryGetComponent(out MoneyComponent moneyComponent))
-                user.Money = moneyComponent.Money;
-            else
-                user.Money = 0;
-
-            if (entity.TryGetComponent(out LicensesComponent licensesComponent))
+            user.Licenses = licensesComponent.Licenses.Select(x => new UserLicense
             {
-                user.Licenses = licensesComponent.Licenses.Select(x => new UserLicense
-                {
-                    User = user,
-                    LicenseId = x.licenseId,
-                    SuspendedReason = x.suspendedReason,
-                    SuspendedUntil = x.suspendedUntil,
-                }).ToList();
-            }
-            else
-            {
-                user.Licenses = new List<UserLicense>();
-            }
-
-            if (entity.TryGetComponent(out PlayTimeComponent playTimeComponent))
-            {
-                user.PlayTime = playTimeComponent.TotalPlayTime;
-                playTimeComponent.Reset();
-            }
-            else
-                user.PlayTime = 0;
-
-            var inventoryComponents = entity.Components.OfType<InventoryComponent>().ToList();
-            user.Inventories = inventoryComponents.Select(x =>
-            {
-                var inventory = new Inventory
-                {
-                    Size = x.Size,
-                    Id = x.Id ?? Guid.Empty,
-                };
-                inventory.InventoryItems = x.Items.Select(item => new InventoryItem
-                {
-                    Id = Guid.NewGuid().ToString(),
-                    ItemId = item.ItemId,
-                    Number = item.Number,
-                    Inventory = inventory,
-                    MetaData = JsonConvert.SerializeObject(item.MetaData, Formatting.None),
-                }).ToList();
-                return inventory;
+                User = user,
+                LicenseId = x.licenseId,
+                SuspendedReason = x.suspendedReason,
+                SuspendedUntil = x.suspendedUntil,
             }).ToList();
+        }
+        else
+        {
+            user.Licenses = new List<UserLicense>();
+        }
 
-            if (entity.TryGetComponent(out DailyVisitsCounterComponent dailyVisitsCounterComponent))
-            {
-                user.DailyVisits = new DailyVisits
-                {
-                    UserId = user.DailyVisits?.UserId ?? Guid.Empty,
-                    LastVisit = dailyVisitsCounterComponent.LastVisit,
-                    VisitsInRow = dailyVisitsCounterComponent.VisitsInRow,
-                    VisitsInRowRecord = dailyVisitsCounterComponent.VisitsInRowRecord,
-                };
-            }
-            else
-                user.DailyVisits = null;
+        if (entity.TryGetComponent(out PlayTimeComponent playTimeComponent))
+        {
+            user.PlayTime = playTimeComponent.TotalPlayTime;
+            playTimeComponent.Reset();
+        }
+        else
+            user.PlayTime = 0;
 
-            if (entity.TryGetComponent(out StatisticsCounterComponent statisticsCounterComponent))
+        var inventoryComponents = entity.Components.OfType<InventoryComponent>().ToList();
+        user.Inventories = inventoryComponents.Select(x =>
+        {
+            var inventory = new Inventory
             {
-                user.Statistics = new Statistics
-                {
-                    UserId = user.Statistics?.UserId ?? Guid.Empty,
-                    TraveledDistanceByFoot = statisticsCounterComponent.TraveledDistanceByFoot,
-                    TraveledDistanceInAir = statisticsCounterComponent.TraveledDistanceInAir,
-                    TraveledDistanceInVehicleAsDriver = statisticsCounterComponent.TraveledDistanceInVehicleAsDriver,
-                    TraveledDistanceInVehicleAsPassager = statisticsCounterComponent.TraveledDistanceInVehicleAsPassager,
-                    TraveledDistanceSwimming = statisticsCounterComponent.TraveledDistanceSwimming,
-                };
-            }
-            else
-                user.Statistics = null;
+                Size = x.Size,
+                Id = x.Id ?? Guid.Empty,
+            };
+            inventory.InventoryItems = x.Items.Select(item => new InventoryItem
+            {
+                Id = Guid.NewGuid().ToString(),
+                ItemId = item.ItemId,
+                Number = item.Number,
+                Inventory = inventory,
+                MetaData = JsonConvert.SerializeObject(item.MetaData, Formatting.None),
+            }).ToList();
+            return inventory;
+        }).ToList();
 
-            if (entity.TryGetComponent(out AchievementsComponent achievementsComponent))
+        if (entity.TryGetComponent(out DailyVisitsCounterComponent dailyVisitsCounterComponent))
+        {
+            user.DailyVisits = new DailyVisits
             {
-                user.Achievements = achievementsComponent.Achievements.Select(x => new Achievement
-                {
-                    Name = x.Key,
-                    Value = JsonConvert.SerializeObject(x.Value.value, Formatting.None),
-                    PrizeReceived = x.Value.prizeReceived,
-                    Progress = x.Value.progress,
-                }).ToList();
-            }
-            else
-                user.Achievements = new List<Achievement>();
+                UserId = user.DailyVisits?.UserId ?? Guid.Empty,
+                LastVisit = dailyVisitsCounterComponent.LastVisit,
+                VisitsInRow = dailyVisitsCounterComponent.VisitsInRow,
+                VisitsInRowRecord = dailyVisitsCounterComponent.VisitsInRowRecord,
+            };
+        }
+        else
+            user.DailyVisits = null;
 
-            if (entity.TryGetComponent(out JobUpgradesComponent jobUpgradesComponent))
+        if (entity.TryGetComponent(out StatisticsCounterComponent statisticsCounterComponent))
+        {
+            user.Statistics = new Statistics
             {
-                user.JobUpgrades = jobUpgradesComponent.Upgrades.Select(x => new JobUpgrade
-                {
-                    Name = x.name,
-                    JobId = x.jobId,
-                }).ToList();
-            }
-            else
-                user.JobUpgrades = new List<JobUpgrade>();
+                UserId = user.Statistics?.UserId ?? Guid.Empty,
+                TraveledDistanceByFoot = statisticsCounterComponent.TraveledDistanceByFoot,
+                TraveledDistanceInAir = statisticsCounterComponent.TraveledDistanceInAir,
+                TraveledDistanceInVehicleAsDriver = statisticsCounterComponent.TraveledDistanceInVehicleAsDriver,
+                TraveledDistanceInVehicleAsPassager = statisticsCounterComponent.TraveledDistanceInVehicleAsPassager,
+                TraveledDistanceSwimming = statisticsCounterComponent.TraveledDistanceSwimming,
+            };
+        }
+        else
+            user.Statistics = null;
 
-            if (entity.TryGetComponent(out DiscoveriesComponent discoveriesComponent))
+        if (entity.TryGetComponent(out AchievementsComponent achievementsComponent))
+        {
+            user.Achievements = achievementsComponent.Achievements.Select(x => new Achievement
             {
-                user.Discoveries = discoveriesComponent.Discoveries.Select(x => new Discovery
-                {
-                    DiscoveryId = x,
-                }).ToList();
-            }
+                Name = x.Key,
+                Value = JsonConvert.SerializeObject(x.Value.value, Formatting.None),
+                PrizeReceived = x.Value.prizeReceived,
+                Progress = x.Value.progress,
+            }).ToList();
+        }
+        else
+            user.Achievements = new List<Achievement>();
+
+        if (entity.TryGetComponent(out JobUpgradesComponent jobUpgradesComponent))
+        {
+            user.JobUpgrades = jobUpgradesComponent.Upgrades.Select(x => new JobUpgrade
+            {
+                Name = x.name,
+                JobId = x.jobId,
+            }).ToList();
+        }
+        else
+            user.JobUpgrades = new List<JobUpgrade>();
+
+        if (entity.TryGetComponent(out DiscoveriesComponent discoveriesComponent))
+        {
+            user.Discoveries = discoveriesComponent.Discoveries.Select(x => new Discovery
+            {
+                DiscoveryId = x,
+            }).ToList();
+        }
+
+        if (entity.TryGetComponent(out LevelComponent levelComponent))
+        {
+            user.Level = levelComponent.Level;
+            user.Experience = levelComponent.Experience;
+        }
+        else
+        {
+            user.Level = 0;
+            user.Experience = 0;
         }
     }
 
