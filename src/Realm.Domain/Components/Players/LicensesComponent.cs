@@ -12,7 +12,7 @@ public class LicensesComponent : Component
     {
     }
 
-    public LicensesComponent(IEnumerable<UserLicense> userLicenses)
+    internal LicensesComponent(IEnumerable<UserLicense> userLicenses)
     {
         _licenses = userLicenses.Select(x => new License
         {

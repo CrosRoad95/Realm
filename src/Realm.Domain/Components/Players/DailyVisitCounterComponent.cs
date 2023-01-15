@@ -9,15 +9,15 @@ public class DailyVisitsCounterComponent : Component
     public event Action<Entity, int, bool>? PlayerVisited;
     public event Action<Entity, int>? PlayerVisitsRecord;
 
-    public DailyVisitsCounterComponent(DailyVisits dailyVisits)
+    public DailyVisitsCounterComponent()
+    {
+    }
+
+    internal DailyVisitsCounterComponent(DailyVisits dailyVisits)
     {
         LastVisit = dailyVisits.LastVisit;
         VisitsInRow = dailyVisits.VisitsInRow;
         VisitsInRowRecord = dailyVisits.VisitsInRowRecord;
-    }
-
-    public DailyVisitsCounterComponent()
-    {
     }
 
     public override Task Load()

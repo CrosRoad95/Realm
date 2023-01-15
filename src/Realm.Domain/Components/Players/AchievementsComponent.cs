@@ -15,7 +15,7 @@ public class AchievementsComponent : Component
 
     }
 
-    public AchievementsComponent(ICollection<AchievementData> achievements)
+    internal AchievementsComponent(ICollection<AchievementData> achievements)
     {
         _achievements = achievements.ToDictionary(x => x.Name, x => new Achievement
         {

@@ -15,7 +15,7 @@ public class JobUpgradesComponent : Component
 
     }
 
-    public JobUpgradesComponent(ICollection<JobUpgradeData> jobUpgrades)
+    internal JobUpgradesComponent(ICollection<JobUpgradeData> jobUpgrades)
     {
         _upgrades = jobUpgrades.Select(x => new JobUpgrade
         {

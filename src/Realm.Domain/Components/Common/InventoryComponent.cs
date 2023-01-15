@@ -22,7 +22,7 @@ public class InventoryComponent : Component
         Size = size;
     }
 
-    public InventoryComponent(InventoryData inventory)
+    internal InventoryComponent(InventoryData inventory)
     {
         if (inventory == null)
             throw new ArgumentNullException(nameof(inventory));

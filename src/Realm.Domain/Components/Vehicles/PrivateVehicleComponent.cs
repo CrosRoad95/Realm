@@ -13,7 +13,7 @@ public class PrivateVehicleComponent : Component
     private List<VehicleAccess> _vehicleAccesses = new();
     public IEnumerable<VehicleAccess> VehicleAccesses => _vehicleAccesses;
 
-    public PrivateVehicleComponent(VehicleData vehicleData)
+    internal PrivateVehicleComponent(VehicleData vehicleData)
     {
         _vehicleData = vehicleData;
     }

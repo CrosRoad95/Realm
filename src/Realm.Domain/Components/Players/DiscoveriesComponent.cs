@@ -9,7 +9,7 @@ public class DiscoveriesComponent : Component
 
     public DiscoveriesComponent() { }
 
-    public DiscoveriesComponent(ICollection<Discovery> discoveries)
+    internal DiscoveriesComponent(ICollection<Discovery> discoveries)
     {
         _discoveries = discoveries.Select(x => x.DiscoveryId).ToHashSet();
     }

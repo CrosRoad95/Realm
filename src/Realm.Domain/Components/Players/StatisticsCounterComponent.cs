@@ -18,7 +18,7 @@ public class StatisticsCounterComponent : Component
     {
     }
     
-    public StatisticsCounterComponent(Statistics statistics)
+    internal StatisticsCounterComponent(Statistics statistics)
     {
         TraveledDistanceInVehicleAsDriver = statistics.TraveledDistanceInVehicleAsDriver;
         TraveledDistanceInVehicleAsPassager = statistics.TraveledDistanceInVehicleAsPassager;

@@ -1,4 +1,5 @@
-﻿using SlipeServer.Server.Elements.ColShapes;
+﻿using Realm.Persistance.Interfaces;
+using SlipeServer.Server.Elements.ColShapes;
 using SlipeServer.Server.Elements.IdGeneration;
 
 namespace Realm.Server.Factories;
@@ -8,12 +9,14 @@ internal class EntityFactory : IEntityFactory
     private readonly ECS _ecs;
     private readonly IElementIdGenerator _elementIdGenerator;
     private readonly ILogger _logger;
+    private readonly IVehicleRepository _vehicleRepository;
 
-    public EntityFactory(ECS ecs, IElementIdGenerator elementIdGenerator, ILogger logger)
+    public EntityFactory(ECS ecs, IElementIdGenerator elementIdGenerator, ILogger logger, IVehicleRepository vehicleRepository)
     {
         _ecs = ecs;
         _elementIdGenerator = elementIdGenerator;
         _logger = logger;
+        _vehicleRepository = vehicleRepository;
     }
 
     public Entity CreateBlipFor(Entity createForEntity, BlipIcon blipIcon, Vector3 position, byte interior = 0, ushort dimension = 0, string? id = null, Action<Entity>? entityBuilder = null)
@@ -47,6 +50,24 @@ internal class EntityFactory : IEntityFactory
 
             entityBuilder?.Invoke(entity);
         });
+    }
+    
+    public async Task<Entity> CreateNewPrivateVehicle(ushort model, Vector3 position, Vector3 rotation, byte interior = 0, ushort dimension = 0, string? id = null, Action<Entity>? entityBuilder = null)
+    {
+        var vehicleEntity = _ecs.CreateEntity(id ?? $"vehicle {Guid.NewGuid()}", Entity.VehicleTag, entity =>
+        {
+            var vehicle = new SlipeServer.Server.Elements.Vehicle(model, position);
+            var vehicleElementComponent = entity.AddComponent(new VehicleElementComponent(vehicle));
+
+            entity.Transform.Position = position;
+            entity.Transform.Rotation = rotation;
+            entity.Transform.Interior = interior;
+            entity.Transform.Dimension = dimension;
+
+            entityBuilder?.Invoke(entity);
+        });
+        vehicleEntity.AddComponent(new PrivateVehicleComponent(await _vehicleRepository.CreateNewVehicle()));
+        return vehicleEntity;
     }
 
     public Entity CreateMarkerFor(Entity createForEntity, MarkerType markerType, Vector3 position, byte interior = 0, ushort dimension = 0, string? id = null, Action<Entity>? entityBuilder = null)

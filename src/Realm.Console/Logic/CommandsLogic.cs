@@ -132,9 +132,8 @@ internal sealed class CommandsLogic
         _commandService.AddCommandHandler("cv", async (entity, args) =>
         {
             using var vehicleRepository = _repositoryFactory.GetVehicleRepository();
-            var vehicleEntity = _entityFactory.CreateVehicle(404, entity.Transform.Position + new Vector3(4, 0, 0), entity.Transform.Rotation);
+            var vehicleEntity = await _entityFactory.CreateNewPrivateVehicle(404, entity.Transform.Position + new Vector3(4, 0, 0), entity.Transform.Rotation);
             vehicleEntity.AddComponent(new VehicleUpgradesComponent());
-            vehicleEntity.AddComponent(new PrivateVehicleComponent(await vehicleRepository.CreateNewVehicle()));
             vehicleEntity.AddComponent(new MileageCounterComponent());
             vehicleEntity.AddComponent(new VehicleFuelComponent("default", 20, 20, 0.01, 2)).Active = true;
         });
@@ -258,10 +257,9 @@ internal sealed class CommandsLogic
 
             {
                 using var vehicleRepository = _repositoryFactory.GetVehicleRepository();
-                var vehicleEntity = _entityFactory.CreateVehicle(404, entity.Transform.Position + new Vector3(4, 0, 0), entity.Transform.Rotation);
+                var vehicleEntity = await _entityFactory.CreateNewPrivateVehicle(404, entity.Transform.Position + new Vector3(4, 0, 0), entity.Transform.Rotation);
                 vehicleEntity.AddComponent(new VehicleUpgradesComponent()).AddUpgrade(1);
                 vehicleEntity.AddComponent(new MileageCounterComponent());
-                vehicleEntity.AddComponent(new PrivateVehicleComponent(await vehicleRepository.CreateNewVehicle())).AddOwner(entity);
                 vehicleEntity.AddComponent(new VehicleFuelComponent("default", 20, 20, 0.01, 2)).Active = true;
             }
         });

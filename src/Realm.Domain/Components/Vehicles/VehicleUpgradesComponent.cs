@@ -14,7 +14,7 @@ public class VehicleUpgradesComponent : Component
     {
     }
     
-    public VehicleUpgradesComponent(ICollection<VehicleUpgradeData> vehicleUpgrades)
+    internal VehicleUpgradesComponent(ICollection<VehicleUpgradeData> vehicleUpgrades)
     {
         _upgrades = vehicleUpgrades.Select(x => x.UpgradeId).ToList();
     }
