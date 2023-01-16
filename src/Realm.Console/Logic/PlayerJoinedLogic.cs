@@ -18,6 +18,7 @@ internal sealed class PlayerJoinedLogic
             return;
 
         var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();
+        playerElementComponent.SetRenderingEnabled(false);
         playerElementComponent.SetChatVisible(false);
         playerElementComponent.ClearChatBox();
         playerElementComponent.FadeCamera(CameraFade.In);
@@ -47,6 +48,7 @@ internal sealed class PlayerJoinedLogic
             }
             await Task.Delay(300);
             await playerElementComponent.FadeCameraAsync(CameraFade.In);
+            playerElementComponent.SetRenderingEnabled(true);
         }
 
         if (component is LevelComponent levelComponent)

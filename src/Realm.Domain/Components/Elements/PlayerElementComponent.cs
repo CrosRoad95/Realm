@@ -14,6 +14,8 @@ public sealed class PlayerElementComponent : ElementComponent
     private LuaEventService LuaEventService { get; set; } = default!;
     [Inject]
     private AgnosticGuiSystemService AgnosticGuiSystemService { get; set; } = default!;
+    [Inject]
+    private Text3dService Text3dService { get; set; } = default!;
 
     private readonly Player _player;
     private readonly Dictionary<string, Func<Entity, Task>> _binds = new();
@@ -197,5 +199,10 @@ public sealed class PlayerElementComponent : ElementComponent
     public void SetGuiDebugToolsEnabled(bool enabled)
     {
         AgnosticGuiSystemService.SetDebugToolsEnabled(_player, enabled);
+    }
+
+    public void SetRenderingEnabled(bool enabled)
+    {
+        Text3dService.SetRenderingEnabled(_player, enabled);
     }
 }
