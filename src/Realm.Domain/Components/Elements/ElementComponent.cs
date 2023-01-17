@@ -16,13 +16,15 @@ public abstract class ElementComponent : Component
 
     private Task HandleDestroyed(Entity entity)
     {
-        Entity.Destroyed -= HandleDestroyed;
         if (Player != null)
         {
             Element.DestroyFor(Player);
         }
         else
+        {
+            Entity.Destroyed -= HandleDestroyed;
             Element.Destroy();
+        }
         return Task.CompletedTask;
     }
 
@@ -44,8 +46,8 @@ public abstract class ElementComponent : Component
         {
             Entity.Transform.Bind(Element);
             _rpgServer.AssociateElement(new ElementHandle(Element));
+            Entity.Destroyed += HandleDestroyed;
         }
-        Entity.Destroyed += HandleDestroyed;
         return Task.CompletedTask;
     }
 }

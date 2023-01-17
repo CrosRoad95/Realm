@@ -1,4 +1,5 @@
-﻿using System.Diagnostics.CodeAnalysis;
+﻿using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Realm.Domain;
 
@@ -119,10 +120,8 @@ public class Entity
         {
             _components.Remove(component);
             component.Entity = null!;
-            ComponentRemoved?.Invoke(component);
         }
-        else
-            throw new InvalidOperationException("Component is not attached to this entity");
+        ComponentRemoved?.Invoke(component);
     }
 
     public void DestroyComponent<TComponent>(TComponent component) where TComponent: Component
