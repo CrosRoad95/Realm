@@ -8,39 +8,43 @@ public abstract class ElementComponent : Component
     protected IRPGServer _rpgServer { get; set; } = default!;
 
     abstract internal Element Element { get; }
+    private Player? Player { get; set; }
 
-    protected readonly Entity? _createForEntity;
-
-    protected ElementComponent(Entity? createForEntity = null)
+    protected ElementComponent()
     {
-        _createForEntity = createForEntity;
-        if (_createForEntity != null)
-            _createForEntity.Destroyed += HandleCreateForEntityDestroyed;
-    }
-
-    private Task HandleCreateForEntityDestroyed(Entity entity)
-    {
-        Destroy();
-        return Task.CompletedTask;
     }
 
     private Task HandleDestroyed(Entity entity)
     {
-        Element.Destroy();
+        Entity.Destroyed -= HandleDestroyed;
+        if (Player != null)
+        {
+            Element.DestroyFor(Player);
+        }
+        else
+            Element.Destroy();
         return Task.CompletedTask;
+    }
+
+    public override void Destroy()
+    {
+        HandleDestroyed(Entity);
     }
 
     public override Task Load()
     {
         base.Load();
-        Entity.Transform.Bind(Element);
-        if (_createForEntity != null)
+        if(Entity.TryGetComponent(out PlayerElementComponent playerElementComponent))
         {
-            var player = _createForEntity.GetRequiredComponent<PlayerElementComponent>().Player;
-            Element.CreateFor(player);
+            Player = playerElementComponent.Player;
+            Element.Id = playerElementComponent.MapIdGenerator.GetId();
+            Element.CreateFor(Player);
         }
         else
+        {
+            Entity.Transform.Bind(Element);
             _rpgServer.AssociateElement(new ElementHandle(Element));
+        }
         Entity.Destroyed += HandleDestroyed;
         return Task.CompletedTask;
     }

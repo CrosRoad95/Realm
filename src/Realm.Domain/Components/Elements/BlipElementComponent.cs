@@ -6,7 +6,7 @@ public class BlipElementComponent : ElementComponent
 
     internal override Element Element => _blip;
 
-    internal BlipElementComponent(Blip blip, Entity? createForEntity = null) : base(createForEntity)
+    internal BlipElementComponent(Blip blip)
     {
         _blip = blip;
     }

@@ -13,7 +13,7 @@ public abstract class CollisionShapeElementComponent : ElementComponent
 
     private readonly List<IEntityRule> _entityRules = new();
 
-    protected CollisionShapeElementComponent(CollisionShape collisionShape, Entity? createForEntity = null) : base(createForEntity)
+    protected CollisionShapeElementComponent(CollisionShape collisionShape)
     {
         _collisionShape = collisionShape;
         _collisionShape.ElementEntered += HandleElementEntered;

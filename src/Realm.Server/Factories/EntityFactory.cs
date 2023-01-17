@@ -1,4 +1,6 @@
-﻿using Realm.Persistance.Interfaces;
+﻿using Realm.Domain;
+using Realm.Persistance.Interfaces;
+using SlipeServer.Server.Elements;
 using SlipeServer.Server.Elements.ColShapes;
 using SlipeServer.Server.Elements.IdGeneration;
 
@@ -7,35 +9,14 @@ namespace Realm.Server.Factories;
 internal class EntityFactory : IEntityFactory
 {
     private readonly ECS _ecs;
-    private readonly IElementIdGenerator _elementIdGenerator;
-    private readonly ILogger _logger;
     private readonly IVehicleRepository _vehicleRepository;
 
-    public EntityFactory(ECS ecs, IElementIdGenerator elementIdGenerator, ILogger logger, IVehicleRepository vehicleRepository)
+    public EntityFactory(ECS ecs, IVehicleRepository vehicleRepository)
     {
         _ecs = ecs;
-        _elementIdGenerator = elementIdGenerator;
-        _logger = logger;
         _vehicleRepository = vehicleRepository;
     }
 
-    public Entity CreateBlipFor(Entity createForEntity, BlipIcon blipIcon, Vector3 position, byte interior = 0, ushort dimension = 0, string? id = null, Action<Entity>? entityBuilder = null)
-    {
-        return _ecs.CreateEntity(id ?? $"vehicle {Guid.NewGuid()}", Entity.BlipTag, entity =>
-        {
-            var blip = new Blip(new Vector3(0,0,1000), blipIcon);
-            blip.Id = _elementIdGenerator.GetId();
-            blip.VisibleDistance = 250;
-            var vehicleElementComponent = entity.AddComponent(new BlipElementComponent(blip, createForEntity));
-
-            entity.Transform.Position = position;
-            entity.Transform.Interior = interior;
-            entity.Transform.Dimension = dimension;
-
-            entityBuilder?.Invoke(entity);
-        });
-    }
-    
     public Entity CreateVehicle(ushort model, Vector3 position, Vector3 rotation, byte interior = 0, ushort dimension = 0, string? id = null, Action<Entity>? entityBuilder = null)
     {
         return _ecs.CreateEntity(id ?? $"vehicle {Guid.NewGuid()}", Entity.VehicleTag, entity =>
@@ -70,27 +51,6 @@ internal class EntityFactory : IEntityFactory
         return vehicleEntity;
     }
 
-    public Entity CreateMarkerFor(Entity createForEntity, MarkerType markerType, Vector3 position, byte interior = 0, ushort dimension = 0, string? id = null, Action<Entity>? entityBuilder = null)
-    {
-        if (createForEntity.Tag != Entity.PlayerTag)
-            throw new Exception("Entity must be player entity.");
-
-        return _ecs.CreateEntity(id ?? $"marker {Guid.NewGuid()}", Entity.MarkerTag, entity =>
-        {
-            var marker = new Marker(new Vector3(0,0,1000), markerType);
-            marker.Id = _elementIdGenerator.GetId();
-            marker.Color = System.Drawing.Color.White;
-            var markerElementComponent = entity.AddComponent(new MarkerElementComponent(marker, createForEntity));
-
-            entity.Transform.Position = position;
-            entity.Transform.Interior = interior;
-            entity.Transform.Dimension = dimension;
-
-            entityBuilder?.Invoke(entity);
-        });
-    }
-    
-
     public Entity CreateMarker(MarkerType markerType, Vector3 position, byte interior = 0, ushort dimension = 0, string? id = null, Action<Entity>? entityBuilder = null)
     {
         return _ecs.CreateEntity(id ?? $"marker {Guid.NewGuid()}", Entity.MarkerTag, entity =>
@@ -122,22 +82,33 @@ internal class EntityFactory : IEntityFactory
         });
     }
 
-    public Entity CreateCollisionSphereFor(Entity createForEntity, Vector3 position, float radius, byte interior = 0, ushort dimension = 0, string? id = null, Action<Entity>? entityBuilder = null)
+    public BlipElementComponent CreateBlipFor(Entity entity, BlipIcon blipIcon, Vector3 position)
     {
-        if (createForEntity.Tag != Entity.PlayerTag)
-            throw new Exception("Entity must be player entity.");
+        if(entity.Tag != Entity.PlayerTag)
+            throw new ArgumentException("Entity must be a player entity");
 
-        return _ecs.CreateEntity(id ?? $"collision sphere {Guid.NewGuid()}", Entity.CollisionShape, entity =>
-        {
-            var collisionSphere = new CollisionSphere(new Vector3(0,0,1000), radius);
-            collisionSphere.Id = _elementIdGenerator.GetId();
-            var markerElementComponent = entity.AddComponent(new CollisionSphereElementComponent(collisionSphere, createForEntity));
+        var blip = new Blip(position, blipIcon, 250);
+        var blipElementComponent = entity.AddComponent(new BlipElementComponent(blip));
+        return blipElementComponent;
+    }
 
-            entity.Transform.Position = position;
-            entity.Transform.Interior = interior;
-            entity.Transform.Dimension = dimension;
+    public CollisionSphereElementComponent CreateCollisionSphereFor(Entity entity, Vector3 position, float radius)
+    {
+        if (entity.Tag != Entity.PlayerTag)
+            throw new ArgumentException("Entity must be a player entity");
 
-            entityBuilder?.Invoke(entity);
-        });
+        var collisionSphere = new CollisionSphere(position, radius);
+        var collisionSphereElementComponent = entity.AddComponent(new CollisionSphereElementComponent(collisionSphere));
+        return collisionSphereElementComponent;
+    }
+
+    public MarkerElementComponent CreateMarkerFor(Entity entity, Vector3 position, MarkerType markerType)
+    {
+        if (entity.Tag != Entity.PlayerTag)
+            throw new ArgumentException("Entity must be a player entity");
+
+        var marker = new Marker(position, markerType);
+        var markerElementComponent = entity.AddComponent(new MarkerElementComponent(marker));
+        return markerElementComponent;
     }
 }

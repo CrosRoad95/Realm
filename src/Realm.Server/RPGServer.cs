@@ -1,6 +1,8 @@
-﻿using Realm.Domain.Interfaces;
+﻿using Realm.Domain.IdGenerators;
+using Realm.Domain.Interfaces;
 using Realm.Domain.Registries;
 using Realm.Server.Logic;
+using SlipeServer.Server.Elements.IdGeneration;
 
 namespace Realm.Server;
 
@@ -58,6 +60,10 @@ internal sealed class RPGServer : IRPGServer
         services.AddTransient<DiscordUser>();
 
         services.AddTransient<IEntityFactory, EntityFactory>();
+
+        services.AddSingleton<IElementIdGenerator, RangedCollectionBasedElementIdGenerator>(x =>
+            new RangedCollectionBasedElementIdGenerator(x.GetRequiredService<IElementCollection>(), IdGeneratorConstants.PlayerIdStart, IdGeneratorConstants.PlayerIdStop)
+        );
 
         if (_modules != null)
             foreach (var module in _modules)

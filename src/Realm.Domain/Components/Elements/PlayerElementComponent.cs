@@ -1,4 +1,6 @@
-﻿namespace Realm.Domain.Components.Elements;
+﻿using Realm.Domain.IdGenerators;
+
+namespace Realm.Domain.Components.Elements;
 
 public sealed class PlayerElementComponent : ElementComponent
 {
@@ -9,10 +11,6 @@ public sealed class PlayerElementComponent : ElementComponent
     [Inject]
     private ClientInterfaceService ClientInterfaceService { get; set; } = default!;
     [Inject]
-    private LuaValueMapper LuaValueMapper { get; set; } = default!;
-    [Inject]
-    private LuaEventService LuaEventService { get; set; } = default!;
-    [Inject]
     private AgnosticGuiSystemService AgnosticGuiSystemService { get; set; } = default!;
     [Inject]
     private Text3dService Text3dService { get; set; } = default!;
@@ -21,6 +19,7 @@ public sealed class PlayerElementComponent : ElementComponent
     private readonly Dictionary<string, Func<Entity, Task>> _binds = new();
     private readonly Dictionary<string, DateTime> _bindsCooldown = new();
     private readonly HashSet<string> _enableFightFlags = new();
+    private readonly MapIdGenerator _mapIdGenerator = new(IdGeneratorConstants.MapIdStart, IdGeneratorConstants.MapIdStop);
 
     internal Player Player => _player;
 
@@ -29,6 +28,7 @@ public sealed class PlayerElementComponent : ElementComponent
     public string Language { get; private set; } = "pl";
 
     internal override Element Element => _player;
+    internal MapIdGenerator MapIdGenerator => _mapIdGenerator;
 
     public Entity? OccupiedVehicle
     {

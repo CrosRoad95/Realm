@@ -138,11 +138,12 @@ internal sealed class CommandsLogic
             vehicleEntity.AddComponent(new VehicleFuelComponent("default", 20, 20, 0.01, 2)).Active = true;
         });
 
-        _commandService.AddCommandHandler("privateblip", (entity, args) =>
+        _commandService.AddCommandHandler("privateblip", async (entity, args) =>
         {
             using var vehicleRepository = _repositoryFactory.GetVehicleRepository();
-            var blipEntity = _entityFactory.CreateBlipFor(entity, BlipIcon.Pizza, entity.Transform.Position);
-            return Task.CompletedTask;
+            var blipElementComponent = _entityFactory.CreateBlipFor(entity, BlipIcon.Pizza, entity.Transform.Position);
+            await Task.Delay(1000);
+            entity.DestroyComponent(blipElementComponent);
         });
 
         _commandService.AddCommandHandler("addmeasowner", async (entity, args) =>
