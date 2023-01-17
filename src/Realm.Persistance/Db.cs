@@ -15,6 +15,7 @@ public abstract class Db<T> : IdentityDbContext<User, Role, Guid,
     public DbSet<VehicleFuel> VehicleFuels => Set<VehicleFuel>();
     public DbSet<DailyVisits> DailyVisits => Set<DailyVisits>();
     public DbSet<Statistics> Statistics => Set<Statistics>();
+    public DbSet<JobStatistics> JobPoints => Set<JobStatistics>();
     public DbSet<JobUpgrade> JobUpgrades => Set<JobUpgrade>();
     public DbSet<Achievement> Achievements => Set<Achievement>();
     public DbSet<Discovery> Discoveries => Set<Discovery>();
@@ -64,6 +65,11 @@ public abstract class Db<T> : IdentityDbContext<User, Role, Guid,
 
             entityBuilder
                 .HasMany(x => x.JobUpgrades)
+                .WithOne(x => x.User)
+                .HasForeignKey(x => x.UserId);
+            
+            entityBuilder
+                .HasMany(x => x.JobStatistics)
                 .WithOne(x => x.User)
                 .HasForeignKey(x => x.UserId);
 
@@ -139,6 +145,13 @@ public abstract class Db<T> : IdentityDbContext<User, Role, Guid,
 
             entityBuilder.Property(x => x.Name)
                 .HasMaxLength(255);
+        });
+        
+        modelBuilder.Entity<JobStatistics>(entityBuilder =>
+        {
+            entityBuilder
+                .ToTable("JobPoints")
+                .HasKey(x => new { x.UserId, x.JobId });
         });
         
         modelBuilder.Entity<InventoryItem>(entityBuilder =>

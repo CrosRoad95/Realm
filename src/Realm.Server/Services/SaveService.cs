@@ -223,12 +223,24 @@ internal class SaveService : ISaveService
         {
             user.JobUpgrades = jobUpgradesComponent.Upgrades.Select(x => new JobUpgrade
             {
-                Name = x.name,
                 JobId = x.jobId,
+                Name = x.name,
             }).ToList();
         }
         else
             user.JobUpgrades = new List<JobUpgrade>();
+
+        if (entity.TryGetComponent(out JobStatisticsComponent jobStatisticsComponent))
+        {
+            user.JobStatistics = jobStatisticsComponent.JobStatistics.Select(x => new JobStatistics
+            {
+                JobId = x.Key,
+                Points = x.Value.points,
+                TimePlayed = x.Value.timePlayed,
+            }).ToList();
+        }
+        else
+            user.JobStatistics = new List<JobStatistics>();
 
         if (entity.TryGetComponent(out DiscoveriesComponent discoveriesComponent))
         {

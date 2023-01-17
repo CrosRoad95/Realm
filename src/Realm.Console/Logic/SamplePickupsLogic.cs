@@ -59,6 +59,7 @@ internal class SamplePickupsLogic
                     var jobSessionComponent = entity.GetRequiredComponent<JobSessionComponent>();
                     jobSessionComponent.End();
                     playerElementComponent.SendChatMessage($"Session ended in: {jobSessionComponent.Elapsed}");
+                    entity.GetRequiredComponent<JobStatisticsComponent>().AddTimePlayed(1, (ulong)jobSessionComponent.Elapsed.Seconds);
                     entity.DestroyComponent(jobSessionComponent);
                 }
                 else
@@ -70,6 +71,7 @@ internal class SamplePickupsLogic
                     var objective = jobSessionComponent.AddObjective(new MarkerEnterObjective(new Vector3(383.6543f, -82.01953f, 3.914598f)));
                     objective.Completed += e =>
                     {
+                        e.Entity.GetRequiredComponent<JobStatisticsComponent>().AddPoints(1, 1);
                         e.Entity.GetRequiredComponent<PlayerElementComponent>().SendChatMessage("kk");
                     };
                 }

@@ -28,7 +28,6 @@ public class MarkerEnterObjective : Objective
     private void HandleElapsed(object? sender, System.Timers.ElapsedEventArgs e)
     {
         _collisionSphereElementComponent.CheckCollisionWith(_playerEntity);
-        _markerElementComponent.Color = Color.White;
     }
 
     private void EntityEntered(Entity entity)

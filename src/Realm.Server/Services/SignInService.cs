@@ -54,6 +54,11 @@ internal class SignInService : ISignInService
             else
                 await entity.AddComponentAsync(new JobUpgradesComponent());
             
+            if (user.JobStatistics != null)
+                await entity.AddComponentAsync(new JobStatisticsComponent(user.JobStatistics));
+            else
+                await entity.AddComponentAsync(new JobStatisticsComponent());
+            
             if (user.Discoveries != null)
                 await entity.AddComponentAsync(new DiscoveriesComponent(user.Discoveries));
             else
@@ -79,6 +84,8 @@ internal class SignInService : ISignInService
             entity.TryDestroyComponent<PlayTimeComponent>();
             entity.TryDestroyComponent<MoneyComponent>();
             entity.TryDestroyComponent<LevelComponent>();
+            entity.TryDestroyComponent<JobUpgradesComponent>();
+            entity.TryDestroyComponent<JobStatisticsComponent>();
             entity.TryDestroyComponent<DailyVisitsCounterComponent>();
             entity.TryDestroyComponent<StatisticsCounterComponent>();
             entity.TryDestroyComponent<DiscoveriesComponent>();

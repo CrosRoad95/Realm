@@ -221,6 +221,25 @@ namespace Realm.Persistance.MySql.Migrations
                     b.ToTable("InventoryItems", (string)null);
                 });
 
+            modelBuilder.Entity("Realm.Persistance.Data.JobStatistics", b =>
+                {
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("char(36)");
+
+                    b.Property<short>("JobId")
+                        .HasColumnType("smallint");
+
+                    b.Property<ulong>("Points")
+                        .HasColumnType("bigint unsigned");
+
+                    b.Property<ulong>("TimePlayed")
+                        .HasColumnType("bigint unsigned");
+
+                    b.HasKey("UserId", "JobId");
+
+                    b.ToTable("JobPoints", (string)null);
+                });
+
             modelBuilder.Entity("Realm.Persistance.Data.JobUpgrade", b =>
                 {
                     b.Property<Guid>("UserId")
@@ -712,6 +731,17 @@ namespace Realm.Persistance.MySql.Migrations
                     b.Navigation("Inventory");
                 });
 
+            modelBuilder.Entity("Realm.Persistance.Data.JobStatistics", b =>
+                {
+                    b.HasOne("Realm.Persistance.Data.User", "User")
+                        .WithMany("JobStatistics")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("Realm.Persistance.Data.JobUpgrade", b =>
                 {
                     b.HasOne("Realm.Persistance.Data.User", "User")
@@ -798,6 +828,8 @@ namespace Realm.Persistance.MySql.Migrations
                     b.Navigation("Discoveries");
 
                     b.Navigation("Inventories");
+
+                    b.Navigation("JobStatistics");
 
                     b.Navigation("JobUpgrades");
 
