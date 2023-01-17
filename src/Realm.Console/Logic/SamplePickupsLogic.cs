@@ -1,4 +1,5 @@
-﻿using Realm.Domain.Rules;
+﻿using Realm.Domain.Interfaces;
+using Realm.Domain.Rules;
 using Realm.Server.Extensions;
 
 namespace Realm.Console.Logic;
@@ -66,9 +67,7 @@ internal class SamplePickupsLogic
                     playerElementComponent.SendChatMessage($"Session started");
                     jobSessionComponent.Start();
 
-                    var marker = _entityFactory.CreateMarker(MarkerType.Arrow, new Vector3(383.6543f, -82.01953f, 3.914598f));
-                    var collisionSphere = _entityFactory.CreateCollisionSphere(new Vector3(383.6543f, -82.01953f, 3.914598f), 2);
-                    var objective = jobSessionComponent.AddObjective(new MarkerEnterObjective(marker, collisionSphere));
+                    var objective = jobSessionComponent.AddObjective(new MarkerEnterObjective(new Vector3(383.6543f, -82.01953f, 3.914598f)));
                     objective.Completed += e =>
                     {
                         e.Entity.GetRequiredComponent<PlayerElementComponent>().SendChatMessage("kk");

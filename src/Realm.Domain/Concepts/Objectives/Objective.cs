@@ -1,6 +1,6 @@
 ﻿namespace Realm.Domain.Concepts.Objectives;
 
-public abstract class Objective : IAsyncDisposable
+public abstract class Objective : IDisposable
 {
     private bool _disposed = false;
     private bool _isFulfilled = false;
@@ -12,6 +12,8 @@ public abstract class Objective : IAsyncDisposable
     public event Action<Objective>? Incompleted;
 
     public Entity Entity { get => _entity ?? throw new InvalidOperationException(); internal set => _entity = value; }
+
+    public abstract void Load(IEntityFactory entityFactory, Entity playerEntity);
 
     protected void Complete()
     {
@@ -45,14 +47,11 @@ public abstract class Objective : IAsyncDisposable
     {
         if (_disposed)
             throw new ObjectDisposedException(nameof(Objective));
-
-        _disposed = true;
     }
 
-    public virtual ValueTask DisposeAsync()
+    public virtual void Dispose()
     {
         ThrowIfDisposed();
         _disposed = true;
-        return ValueTask.CompletedTask;
     }
 }

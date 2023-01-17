@@ -1,5 +1,7 @@
 ﻿using Realm.Domain;
+using Realm.Domain.Interfaces;
 using Realm.Persistance.Interfaces;
+using RenderWareIo.Structs.Dff;
 using SlipeServer.Server.Elements;
 using SlipeServer.Server.Elements.ColShapes;
 using SlipeServer.Server.Elements.IdGeneration;
@@ -102,12 +104,13 @@ internal class EntityFactory : IEntityFactory
         return collisionSphereElementComponent;
     }
 
-    public MarkerElementComponent CreateMarkerFor(Entity entity, Vector3 position, MarkerType markerType)
+    public MarkerElementComponent CreateMarkerFor(Entity entity, Vector3 position, MarkerType markerType, System.Drawing.Color? color = null)
     {
         if (entity.Tag != Entity.PlayerTag)
             throw new ArgumentException("Entity must be a player entity");
 
         var marker = new Marker(position, markerType);
+        marker.Color = color ?? System.Drawing.Color.White;
         var markerElementComponent = entity.AddComponent(new MarkerElementComponent(marker));
         return markerElementComponent;
     }

@@ -4,6 +4,9 @@ namespace Realm.Domain.Components.Players.Jobs;
 
 public abstract class JobSessionComponent : SessionComponent
 {
+    [Inject]
+    private IEntityFactory EntityFactory { get; set; } = default!;
+
     private readonly List<Objective> _objectives = new();
     public IEnumerable<Objective> Objectives => _objectives;
     public JobSessionComponent()
@@ -15,7 +18,7 @@ public abstract class JobSessionComponent : SessionComponent
     {
         if (!objective.IsFulfilled)
             objective.Incomplete();
-        objective.DisposeAsync();
+        objective.Dispose();
         _objectives.Remove(objective);
     }
 
@@ -23,6 +26,7 @@ public abstract class JobSessionComponent : SessionComponent
     {
         objective.Entity = Entity;
         _objectives.Add(objective);
+        objective.Load(EntityFactory, Entity);
         objective.Completed += HandleCompleted;
         return objective;
     }

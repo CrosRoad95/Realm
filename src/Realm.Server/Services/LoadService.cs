@@ -1,4 +1,6 @@
-﻿namespace Realm.Server.Services;
+﻿using Realm.Domain.Interfaces;
+
+namespace Realm.Server.Services;
 
 internal class LoadService : ILoadService
 {

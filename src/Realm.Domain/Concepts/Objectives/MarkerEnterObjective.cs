@@ -2,15 +2,33 @@
 
 public class MarkerEnterObjective : Objective
 {
-    private readonly Entity _markerEntity;
-    private readonly Entity _collisionShapeEntity;
+    private readonly Vector3 _position;
+    
+    private MarkerElementComponent _markerElementComponent = default!;
+    private CollisionSphereElementComponent _collisionSphereElementComponent = default!;
+    private Entity _playerEntity = default!;
+    private System.Timers.Timer _checkEnteredTimer = default!;
 
-    public MarkerEnterObjective(Entity markerEntity, Entity collisionShapeEntity)
+    public MarkerEnterObjective(Vector3 position)
     {
-        _markerEntity = markerEntity;
-        _collisionShapeEntity = collisionShapeEntity;
-        _collisionShapeEntity.Transform.Position = _markerEntity.Transform.Position;
-        _collisionShapeEntity.GetRequiredComponent<CollisionSphereElementComponent>().EntityEntered += EntityEntered;
+        _position = position;
+    }
+
+    public override void Load(IEntityFactory entityFactory, Entity playerEntity)
+    {
+        _playerEntity = playerEntity;
+        _markerElementComponent = entityFactory.CreateMarkerFor(playerEntity, _position, MarkerType.Arrow, Color.White);
+        _collisionSphereElementComponent = entityFactory.CreateCollisionSphereFor(playerEntity, _position, 2);
+        _collisionSphereElementComponent.EntityEntered = EntityEntered;
+        _checkEnteredTimer = new System.Timers.Timer(TimeSpan.FromSeconds(0.25f));
+        _checkEnteredTimer.Elapsed += HandleElapsed;
+        _checkEnteredTimer.Start();
+    }
+
+    private void HandleElapsed(object? sender, System.Timers.ElapsedEventArgs e)
+    {
+        _collisionSphereElementComponent.CheckCollisionWith(_playerEntity);
+        _markerElementComponent.Color = Color.White;
     }
 
     private void EntityEntered(Entity entity)
@@ -19,9 +37,12 @@ public class MarkerEnterObjective : Objective
             Complete();
     }
 
-    public override async ValueTask DisposeAsync()
+    public override void Dispose()
     {
-        await _markerEntity.Destroy();
-        await _collisionShapeEntity.Destroy();
+        _checkEnteredTimer.Dispose();
+        _collisionSphereElementComponent.EntityEntered = null;
+        _playerEntity.DestroyComponent(_markerElementComponent);
+        _playerEntity.DestroyComponent(_collisionSphereElementComponent);
+        base.Dispose();
     }
 }

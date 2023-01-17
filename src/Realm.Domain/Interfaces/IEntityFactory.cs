@@ -1,4 +1,4 @@
-﻿namespace Realm.Server.Interfaces;
+﻿namespace Realm.Domain.Interfaces;
 
 public interface IEntityFactory
 {
@@ -8,5 +8,5 @@ public interface IEntityFactory
     Entity CreateVehicle(ushort model, Vector3 position, Vector3 rotation, byte interior = 0, ushort dimension = 0, string? id = null, Action<Entity>? entityBuilder = null);
     BlipElementComponent CreateBlipFor(Entity entity, BlipIcon blipIcon, Vector3 position);
     CollisionSphereElementComponent CreateCollisionSphereFor(Entity entity, Vector3 position, float radius);
-    MarkerElementComponent CreateMarkerFor(Entity entity, Vector3 position, MarkerType markerType);
+    MarkerElementComponent CreateMarkerFor(Entity entity, Vector3 position, MarkerType markerType, System.Drawing.Color? color = null);
 }

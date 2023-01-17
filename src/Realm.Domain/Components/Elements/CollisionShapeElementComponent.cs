@@ -20,6 +20,14 @@ public abstract class CollisionShapeElementComponent : ElementComponent
         _collisionShape.ElementLeft += HandleElementLeft;
     }
 
+    public void CheckCollisionWith(Entity entity)
+    {
+        if(entity.TryGetComponent(out ElementComponent elementComponent))
+        {
+            _collisionShape.CheckElementWithin(elementComponent.Element);
+        }
+    }
+
     public void AddRule(IEntityRule entityRule)
     {
         _entityRules.Add(entityRule);

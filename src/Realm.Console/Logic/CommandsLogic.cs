@@ -1,4 +1,6 @@
-﻿namespace Realm.Console.Logic;
+﻿using Realm.Domain.Interfaces;
+
+namespace Realm.Console.Logic;
 
 internal sealed class CommandsLogic
 {
