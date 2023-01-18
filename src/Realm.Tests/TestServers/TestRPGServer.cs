@@ -7,7 +7,6 @@ using SlipeServer.Server.Elements;
 using Realm.Interfaces.Providers;
 using Realm.Server.Providers;
 using Realm.Domain;
-using Realm.Server;
 
 namespace Realm.Tests.TestServers;
 

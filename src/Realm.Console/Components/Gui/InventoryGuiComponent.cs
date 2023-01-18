@@ -36,13 +36,14 @@ public sealed class InventoryGuiComponent : StatefulGuiComponent<InventoryGuiCom
         return base.Load();
     }
 
-    public override void Destroy()
+    public override void Dispose()
     {
+        base.Dispose();
         var inventory = Entity.GetRequiredComponent<InventoryComponent>();
         inventory.ItemAdded -= HandleItemAdded;
         inventory.ItemRemoved -= HandleItemRemoved;
         inventory.ItemChanged -= HandleItemChanged;
-        base.Destroy();
+        Close();
     }
 
     private void HandleItemAdded(InventoryComponent inventoryComponent, Item item)

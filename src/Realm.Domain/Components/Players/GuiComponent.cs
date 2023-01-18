@@ -74,8 +74,9 @@ public abstract class GuiComponent : Component
         AgnosticGuiSystemService.CloseGui(playerElementComponent.Player, _name, _cursorless);
     }
 
-    public override void Destroy()
+    public override void Dispose()
     {
+        base.Dispose();
         Close();
     }
 

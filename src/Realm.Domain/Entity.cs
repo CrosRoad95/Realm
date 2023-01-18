@@ -1,9 +1,11 @@
-﻿using System.ComponentModel;
+﻿using Microsoft.AspNetCore.Components;
+using Realm.Domain.Concepts.Objectives;
+using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 
 namespace Realm.Domain;
 
-public class Entity
+public class Entity : IDisposable
 {
     public const string PlayerTag = "player";
     public const string VehicleTag = "vehicle";
@@ -12,21 +14,24 @@ public class Entity
     public const string MarkerTag = "marker";
     public const string CollisionShape = "collisionShape";
 
-    public string Id { get; set; } = Guid.NewGuid().ToString();
+    private bool _disposed = false;
+
+    public string Id { get; } = Guid.NewGuid().ToString();
     public string Tag { get; set; } = "";
     public string Name { get; set; } = "";
 
+    private readonly ReaderWriterLockSlim _componentsLock = new();
     private readonly List<Component> _components = new();
-    public IEnumerable<Component> Components => _components;
+    public IReadOnlyCollection<Component> Components => _components;
 
     private readonly IServiceProvider _serviceProvider;
 
     public Transform Transform { get; private set; }
 
     public event Action<Component>? ComponentAdded;
-    public event Action<Component>? ComponentRemoved;
+    public event Action<Component>? ComponentDetached;
 
-    public event Func<Entity, Task>? Destroyed;
+    public event Action<Entity>? Destroyed;
 
     public Entity(IServiceProvider serviceProvider, string name = "", string tag = "")
     {
@@ -38,6 +43,8 @@ public class Entity
 
     private void InjectProperties<TComponent>(TComponent component) where TComponent : Component
     {
+        ThrowIfDisposed();
+
         Action<Type, object> inject = default!;
         inject = (Type type, object obj) =>
         {
@@ -58,44 +65,83 @@ public class Entity
         inject(typeof(TComponent), component);
     }
 
+    private void InternalAddComponent<TComponent>(TComponent component) where TComponent : Component
+    {
+        _componentsLock.EnterWriteLock();
+        try
+        {
+            _components.Add(component);
+        }
+        finally
+        {
+            _componentsLock.ExitWriteLock();
+        }
+    }
+
     public TComponent AddComponent<TComponent>(TComponent component) where TComponent : Component
     {
+        ThrowIfDisposed();
+
         if (component.Entity != null)
         {
             throw new Exception("Component already attached to other entity");
         }
         InjectProperties(component);
         component.Entity = this;
-        _components.Add(component);
-        Task.Run(async () =>
-        {
-            if(component.Entity == null)
-                throw new Exception("Bug?");
-            await component.Load();
-            ComponentAdded?.Invoke(component);
-        });
+        InternalAddComponent(component);
+        Task.Run(component.Load);
+        ComponentAdded?.Invoke(component);
         return component;
     }
     
     public async Task<TComponent> AddComponentAsync<TComponent>(TComponent component) where TComponent : Component
     {
+        ThrowIfDisposed();
         if (component.Entity != null)
         {
             throw new Exception("Component already attached to other entity");
         }
         InjectProperties(component);
         component.Entity = this;
-        _components.Add(component);
+        InternalAddComponent(component);
         await component.Load();
         ComponentAdded?.Invoke(component);
         return component;
     }
 
     public TComponent? GetComponent<TComponent>() where TComponent : Component
-        => _components.OfType<TComponent>().FirstOrDefault();
+    {
+        ThrowIfDisposed();
+
+        TComponent? element;
+        _componentsLock.EnterReadLock();
+        try
+        {
+            element = _components.OfType<TComponent>().FirstOrDefault();
+        }
+        finally
+        {
+            _componentsLock.ExitReadLock();
+        }
+        return element;
+    }
     
     public bool HasComponent<TComponent>() where TComponent : Component
-        => _components.OfType<TComponent>().Any();
+    {
+        ThrowIfDisposed();
+        bool has;
+
+        _componentsLock.EnterReadLock();
+        try
+        {
+            has = _components.OfType<TComponent>().Any();
+        }
+        finally
+        {
+            _componentsLock.ExitReadLock();
+        }
+        return has;
+    }
     
     public bool TryGetComponent<TComponent>([NotNullWhen(true)] out TComponent component) where TComponent : Component
     {
@@ -112,30 +158,45 @@ public class Entity
     }
 
     public void DetachComponent<TComponent>() where TComponent : Component
-        => DetachComponent(GetRequiredComponent<TComponent>());
+    {
+        ThrowIfDisposed();
+        DetachComponent(GetRequiredComponent<TComponent>());
+    }
 
     public void DetachComponent<TComponent>(TComponent component) where TComponent: Component
     {
+        ThrowIfDisposed();
+
         if (component.Entity == this)
         {
-            _components.Remove(component);
+            _componentsLock.EnterWriteLock();
+            try
+            {
+                _components.Remove(component);
+            }
+            finally
+            {
+                _componentsLock.ExitWriteLock();
+            }
             component.Entity = null!;
         }
-        ComponentRemoved?.Invoke(component);
+        ComponentDetached?.Invoke(component);
     }
 
     public void DestroyComponent<TComponent>(TComponent component) where TComponent: Component
     {
-        component.Destroy();
+        ThrowIfDisposed();
+        component.Dispose();
         DetachComponent(component);
     }
 
     public bool TryDestroyComponent<TComponent>() where TComponent: Component
     {
+        ThrowIfDisposed();
         var component = GetComponent<TComponent>();
         if(component != null)
         {
-            component.Destroy();
+            component.Dispose();
             DetachComponent(component);
             return true;
         }
@@ -144,19 +205,41 @@ public class Entity
 
     public void DestroyComponent<TComponent>() where TComponent: Component
     {
+        ThrowIfDisposed();
         var component = GetRequiredComponent<TComponent>();
-        component.Destroy();
+        component.Dispose();
         DetachComponent(component);
     }
 
-    public virtual async Task Destroy()
+    private void Destroy()
     {
-        if(Destroyed != null)
-            await Destroyed.Invoke(this);
+        if (Destroyed != null)
+            Destroyed.Invoke(this);
 
-        foreach (var component in _components.AsEnumerable().Reverse())
-            DestroyComponent(component);
+        _componentsLock.EnterWriteLock();
+        try
+        {
+            foreach (var component in _components.AsEnumerable().Reverse())
+                DestroyComponent(component);
+        }
+        finally
+        {
+            _componentsLock.ExitWriteLock();
+        }
     }
 
     public override string ToString() => Name;
+
+    protected void ThrowIfDisposed()
+    {
+        if (_disposed)
+            throw new ObjectDisposedException(nameof(Objective));
+    }
+
+    public virtual void Dispose()
+    {
+        ThrowIfDisposed();
+        Destroy();
+        _disposed = true;
+    }
 }

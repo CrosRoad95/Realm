@@ -36,9 +36,9 @@ public abstract class JobSessionComponent : SessionComponent
         RemoveObjective(objective);
     }
 
-
-    public override void Destroy()
+    public override void Dispose()
     {
+        base.Dispose();
         while (_objectives.Count > 0)
         {
             RemoveObjective(_objectives.Last());

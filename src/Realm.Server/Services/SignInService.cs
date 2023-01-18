@@ -97,7 +97,7 @@ internal class SignInService : ISignInService
         return true;
     }
 
-    private async Task HandleDestroyed(Entity entity)
+    private async void HandleDestroyed(Entity entity)
     {
         await _lock.WaitAsync();
         try

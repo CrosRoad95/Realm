@@ -105,8 +105,9 @@ public class VehicleFuelComponent : Component
         return Task.CompletedTask;
     }
 
-    public override void Destroy()
+    public override void Dispose()
     {
+        base.Dispose();
         var vehicle = Entity.GetRequiredComponent<VehicleElementComponent>().Vehicle;
         vehicle.PositionChanged -= HandlePositionChanged;
     }

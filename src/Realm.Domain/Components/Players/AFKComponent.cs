@@ -20,8 +20,9 @@ public class AFKComponent : Component
         return Task.CompletedTask;
     }
 
-    public override void Destroy()
+    public override void Dispose()
     {
+        base.Dispose();
         AFKService.PlayerAFKStarted -= HandlePlayerAFKStarted;
         AFKService.PlayerAFKSStopped -= HandlePlayerAFKSStopped;
     }

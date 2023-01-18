@@ -123,7 +123,7 @@ internal sealed class RPGServer : IRPGServer
             }
             finally
             {
-                await ecs.Destroy(entity);
+                ecs.Destroy(entity);
             }
         }
         try

@@ -1,17 +1,21 @@
 ﻿using Realm.Domain.Exceptions;
 using Realm.Domain.Interfaces;
+using System.Collections.Concurrent;
+using System.Collections.ObjectModel;
+using System.Threading;
 
 namespace Realm.Server;
 
 public sealed class ECS : IEntityByElement
 {
+    private readonly ReaderWriterLockSlim _entitiesLock = new();
     private readonly List<Entity> _entities = new();
-    private readonly Dictionary<Player, Entity> _entityByPlayer = new();
-    private readonly Dictionary<Element, Entity> _entityByElement = new();
-    private readonly Dictionary<string, Entity> _entityByName = new();
+    private readonly ConcurrentDictionary<Player, Entity> _entityByPlayer = new();
+    private readonly ConcurrentDictionary<Element, Entity> _entityByElement = new();
+    private readonly ConcurrentDictionary<string, Entity> _entityByName = new();
     private readonly IServiceProvider _serviceProvider;
 
-    public IEnumerable<Entity> Entities => _entities;
+    public IReadOnlyCollection<Entity> Entities => _entities;
 
     public event Action<Entity>? EntityCreated;
     public ECS(IServiceProvider serviceProvider)
@@ -49,28 +53,43 @@ public sealed class ECS : IEntityByElement
             throw new EntityAlreadyExistsException(name);
 
         var newlyCreatedEntity = new Entity(_serviceProvider, name, tag);
-        _entities.Add(newlyCreatedEntity);
+        _entitiesLock.EnterWriteLock();
+        try
+        {
+            _entities.Add(newlyCreatedEntity);
+        }
+        finally
+        {
+            _entitiesLock.ExitWriteLock();
+        }
         _entityByName[name] = newlyCreatedEntity;
-        if (entityBuilder != null)
-            entityBuilder(newlyCreatedEntity);
         newlyCreatedEntity.ComponentAdded += HandleComponentAdded;
         newlyCreatedEntity.Destroyed += HandleEntityDestroyed;
+        if (entityBuilder != null)
+            entityBuilder(newlyCreatedEntity);
         EntityCreated?.Invoke(newlyCreatedEntity);
         return newlyCreatedEntity;
     }
 
-    private Task HandleEntityDestroyed(Entity entity)
+    private void HandleEntityDestroyed(Entity entity)
     {
-        _entityByName.Remove(entity.Name);
-        _entities.Remove(entity);
+        _entityByName.Remove(entity.Name, out var _);
+        _entitiesLock.EnterWriteLock();
+        try
+        {
+            _entities.Remove(entity);
+        }
+        finally
+        {
+            _entitiesLock.ExitWriteLock();
+        }
 
         entity.ComponentAdded -= HandleComponentAdded;
-        return Task.CompletedTask;
     }
 
-    public Task Destroy(Entity entity)
+    public void Destroy(Entity entity)
     {
-        return entity.Destroy();
+        entity.Dispose();
     }
 
     private void HandleComponentAdded(Component component)
@@ -78,7 +97,7 @@ public sealed class ECS : IEntityByElement
         if(component is ElementComponent elementComponent)
         {
             _entityByElement[elementComponent.Element] = component.Entity;
-            component.Entity.ComponentRemoved += HandleElementComponentRemoved;
+            component.Entity.ComponentDetached += HandleElementComponentRemoved;
         }
 
         if (component is PlayerElementComponent playerElementComponent)
@@ -92,14 +111,13 @@ public sealed class ECS : IEntityByElement
     private void HandleElementComponentRemoved(Component component)
     {
         if (component is ElementComponent elementComponent)
-            _entityByElement.Remove(elementComponent.Element);
+            _entityByElement.Remove(elementComponent.Element, out var _);
     }
 
-    private Task HandlePlayerEntityDestroyed(Entity playerEntity)
+    private void HandlePlayerEntityDestroyed(Entity playerEntity)
     {
         playerEntity.Destroyed += HandlePlayerEntityDestroyed;
         var playerComponent = playerEntity.GetRequiredComponent<PlayerElementComponent>();
-        _entityByPlayer.Remove(playerComponent.Player);
-        return Task.CompletedTask;
+        _entityByPlayer.Remove(playerComponent.Player, out var _);
     }
 }

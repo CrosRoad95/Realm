@@ -73,10 +73,10 @@ public sealed class PlayerElementComponent : ElementComponent
         return false;
     }
 
-    public override void Destroy()
+    public override void Dispose()
     {
+        base.Dispose();
         _player.Kick(PlayerDisconnectType.SHUTDOWN);
-        base.Destroy();
     }
 
     public bool Compare(Player player) => _player == player;

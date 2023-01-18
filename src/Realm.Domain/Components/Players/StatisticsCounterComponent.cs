@@ -35,8 +35,9 @@ public class StatisticsCounterComponent : Component
         return Task.CompletedTask;
     }
 
-    public override void Destroy()
+    public override void Dispose()
     {
+        base.Dispose();
         var player = Entity.GetRequiredComponent<PlayerElementComponent>().Player;
         StatisticsCounterService.StatisticsCollected -= HandleStatisticsCollected;
         StatisticsCounterService.SetCounterEnabledFor(player, false);

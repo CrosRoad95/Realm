@@ -44,8 +44,9 @@ public class MileageCounterComponent : Component
         return Task.CompletedTask;
     }
 
-    public override void Destroy()
+    public override void Dispose()
     {
+        base.Dispose();
         Entity.Transform.PositionChanged -= HandlePositionChanged;
     }
 

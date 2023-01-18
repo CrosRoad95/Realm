@@ -21,8 +21,9 @@ public sealed class Text3dComponent : Component
         return Task.CompletedTask;
     }
 
-    public override void Destroy()
+    public override void Dispose()
     {
+        base.Dispose();
         if (_text3dId == null)
             throw new Exception("Bug?");
         Text3dService.RemoveText3d(_text3dId.Value);

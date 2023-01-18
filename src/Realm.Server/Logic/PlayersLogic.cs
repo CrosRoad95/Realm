@@ -63,10 +63,9 @@ internal class PlayersLogic
         entity.ComponentAdded += HandleComponentAdded;
     }
 
-    private Task HandleEntityDestroyed(Entity entity)
+    private void HandleEntityDestroyed(Entity entity)
     {
         entity.ComponentAdded -= HandleComponentAdded;
-        return Task.CompletedTask;
     }
 
     private async void HandleComponentAdded(Component component)
@@ -112,7 +111,7 @@ internal class PlayersLogic
             var saveService = _serviceProvider.GetRequiredService<ISaveService>();
             await saveService.Save(playerEntity);
             await saveService.Commit();
-            await playerEntity.Destroy();
+            playerEntity.Dispose();
         }
     }
 }

@@ -14,7 +14,7 @@ public abstract class ElementComponent : Component
     {
     }
 
-    private Task HandleDestroyed(Entity entity)
+    private void HandleDestroyed(Entity entity)
     {
         if (Player != null)
         {
@@ -25,11 +25,11 @@ public abstract class ElementComponent : Component
             Entity.Destroyed -= HandleDestroyed;
             Element.Destroy();
         }
-        return Task.CompletedTask;
     }
 
-    public override void Destroy()
+    public override void Dispose()
     {
+        base.Dispose();
         HandleDestroyed(Entity);
     }
 
