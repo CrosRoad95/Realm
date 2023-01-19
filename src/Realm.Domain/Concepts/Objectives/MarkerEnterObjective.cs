@@ -40,8 +40,8 @@ public class MarkerEnterObjective : Objective
     {
         _checkEnteredTimer.Dispose();
         _collisionSphereElementComponent.EntityEntered = null;
-        _playerEntity.DestroyComponent(_markerElementComponent);
-        _playerEntity.DestroyComponent(_collisionSphereElementComponent);
+        _playerEntity.TryDestroyComponent(_markerElementComponent);
+        _playerEntity.TryDestroyComponent(_collisionSphereElementComponent);
         base.Dispose();
     }
 }

@@ -143,6 +143,23 @@ public class Entity : IDisposable
         return has;
     }
     
+    public bool HasComponent<TComponent>(TComponent component) where TComponent : Component
+    {
+        ThrowIfDisposed();
+        bool has;
+
+        _componentsLock.EnterReadLock();
+        try
+        {
+            has = _components.Contains(component);
+        }
+        finally
+        {
+            _componentsLock.ExitReadLock();
+        }
+        return has;
+    }
+    
     public bool TryGetComponent<TComponent>([NotNullWhen(true)] out TComponent component) where TComponent : Component
     {
         component = GetComponent<TComponent>();
@@ -189,6 +206,20 @@ public class Entity : IDisposable
         component.Dispose();
         DetachComponent(component);
     }
+    
+    public bool TryDestroyComponent<TComponent>(TComponent component) where TComponent: Component
+    {
+        ThrowIfDisposed();
+
+        if(HasComponent(component))
+        {
+            component.Dispose();
+            DetachComponent(component);
+            return true;
+        }
+
+        return false;
+    }
 
     public bool TryDestroyComponent<TComponent>() where TComponent: Component
     {
@@ -216,16 +247,19 @@ public class Entity : IDisposable
         if (Destroyed != null)
             Destroyed.Invoke(this);
 
-        _componentsLock.EnterWriteLock();
+        List<Component> componentsToDestroy;
+        _componentsLock.EnterReadLock();
         try
         {
-            foreach (var component in _components.AsEnumerable().Reverse())
-                DestroyComponent(component);
+            componentsToDestroy = _components.AsEnumerable().Reverse().ToList();
         }
         finally
         {
-            _componentsLock.ExitWriteLock();
+            _componentsLock.ExitReadLock();
         }
+
+        foreach (var component in componentsToDestroy)
+            DestroyComponent(component);
     }
 
     public override string ToString() => Name;

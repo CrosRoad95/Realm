@@ -52,6 +52,9 @@ public abstract class Objective : IDisposable
     public virtual void Dispose()
     {
         ThrowIfDisposed();
+        if (!_isFulfilled)
+            Incomplete();
+
         _disposed = true;
     }
 }
