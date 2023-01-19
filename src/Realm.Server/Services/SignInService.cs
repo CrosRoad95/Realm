@@ -8,10 +8,12 @@ internal class SignInService : ISignInService
 
     private readonly HashSet<Guid> _usedAccountsIds = new();
     private readonly ItemsRegistry _itemsRegistry;
+    private readonly ILogger _logger;
 
-    public SignInService(ItemsRegistry itemsRegistry)
+    public SignInService(ItemsRegistry itemsRegistry, ILogger logger)
     {
         _itemsRegistry = itemsRegistry;
+        _logger = logger;
     }
 
     public async Task<bool> SignIn(Entity entity, User user)
@@ -29,7 +31,7 @@ internal class SignInService : ISignInService
             if (user.Inventories != null && user.Inventories.Any())
             {
                 foreach (var inventory in user.Inventories)
-                    await entity.AddComponentAsync(new InventoryComponent(inventory, _itemsRegistry));
+                    await entity.AddComponentAsync(new InventoryComponent(inventory, _itemsRegistry, _logger));
             }
             else
                 await entity.AddComponentAsync(new InventoryComponent(20));

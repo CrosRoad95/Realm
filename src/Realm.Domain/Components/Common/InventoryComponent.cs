@@ -23,7 +23,7 @@ public class InventoryComponent : Component
         Size = size;
     }
 
-    internal InventoryComponent(InventoryData inventory, ItemsRegistry itemsRegistry)
+    internal InventoryComponent(InventoryData inventory, ItemsRegistry itemsRegistry, ILogger logger)
     {
         if (inventory == null)
             throw new ArgumentNullException(nameof(inventory));
@@ -39,7 +39,7 @@ public class InventoryComponent : Component
             }
             catch(Exception ex)
             {
-                Logger.Error(ex, "Failed to load item {item}", item.Id);
+                logger.Error(ex, "Failed to load item {item}", item.Id);
             }
         }
     }
