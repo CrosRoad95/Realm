@@ -39,7 +39,7 @@ public class InventoryComponent : Component
             }
             catch(Exception ex)
             {
-                logger.Error(ex, "Failed to load item {item}", item.Id);
+                logger.Error(ex, "Failed to load item id: {itemId}. Item probably doesn't exists.", item.Id);
             }
         }
     }
