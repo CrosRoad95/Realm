@@ -12,7 +12,7 @@
   </ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="SlipeServer.Resources.Base" Version="0.1.0-CI-20230116-164628" />
+	  <ProjectReference Include="..\Realm.Resources.Addons.Common\Realm.Resources.Addons.Common.csproj" />
 	</ItemGroup>
 
 </Project>
