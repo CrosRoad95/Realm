@@ -7,10 +7,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="Lua\assets.lua" />
-  </ItemGroup>
-
-  <ItemGroup>
     <EmbeddedResource Include="Lua\assets.lua" />
   </ItemGroup>
 

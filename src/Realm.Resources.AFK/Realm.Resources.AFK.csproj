@@ -7,10 +7,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="Lua\afk.lua" />
-  </ItemGroup>
-
-  <ItemGroup>
     <EmbeddedResource Include="Lua\afk.lua" />
   </ItemGroup>
 

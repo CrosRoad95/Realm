@@ -8,11 +8,6 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<None Remove="Lua\debugging.lua" />
-		<None Remove="Lua\utility.lua" />
-	</ItemGroup>
-
-	<ItemGroup>
 		<EmbeddedResource Include="Lua\debugging.lua" />
 		<EmbeddedResource Include="Lua\utility.lua" />
 	</ItemGroup>
