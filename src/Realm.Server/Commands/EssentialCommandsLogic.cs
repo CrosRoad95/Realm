@@ -1,11 +1,11 @@
 ﻿namespace Realm.Server.Commands;
 
-internal class CommandsLogic
+internal class EssentialCommandsLogic
 {
     private readonly IConsole _consoleCommands;
     private readonly List<ICommand> _commands;
 
-    public CommandsLogic(IConsole consoleCommands, IEnumerable<ICommand> commands, HelpCommand helpCommand)
+    public EssentialCommandsLogic(IConsole consoleCommands, IEnumerable<ICommand> commands, HelpCommand helpCommand)
     {
         _consoleCommands = consoleCommands;
         _commands = commands.ToList();

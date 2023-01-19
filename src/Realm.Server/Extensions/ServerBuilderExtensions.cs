@@ -19,10 +19,13 @@ public static class ServerBuilderExtensions
         builder.ConfigureServices(services =>
         {
             services.AddSingleton(realmConfigurationProvider);
-            switch(realmConfigurationProvider.Get<string>("Database:Provider"))
+            var databaseProvider = realmConfigurationProvider.Get<string>("Database:Provider");
+            switch (databaseProvider)
             {
                 case "MySql":
-                    var connectionString = "server=localhost;port=3306;database=realm;uid=root;password=password";
+                    var connectionString = realmConfigurationProvider.Get<string>("Database:ConnectionString");
+                    if (string.IsNullOrEmpty(connectionString))
+                        throw new Exception("Connection string not found or empty.");
                     services.AddPersistance<MySqlDb>(db => db.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString)));
                     services.AddRealmIdentity<MySqlDb>(realmConfigurationProvider.GetRequired<IdentityConfiguration>("Identity"));
                     break;
@@ -31,7 +34,7 @@ public static class ServerBuilderExtensions
                     services.AddRealmIdentity<SQLiteDb>(realmConfigurationProvider.GetRequired<IdentityConfiguration>("Identity"));
                     break;
                 default:
-                    throw new NotImplementedException();
+                    throw new NotImplementedException($"Database provider '{databaseProvider}' is not supported. use 'MySql' or 'SqlLite'.");
             }
 
             services.AddSingleton<HelpCommand>();
@@ -62,7 +65,7 @@ public static class ServerBuilderExtensions
         builder.AddLogic<ClientInterfaceLogic>();
 
         // Miscellaneous logic
-        builder.AddLogic<CommandsLogic>();
+        builder.AddLogic<EssentialCommandsLogic>();
 
         return builder;
     }
