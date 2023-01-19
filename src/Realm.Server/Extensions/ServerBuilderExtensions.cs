@@ -38,7 +38,6 @@ public static class ServerBuilderExtensions
             }
 
             services.AddSingleton<HelpCommand>();
-            services.AddSingleton<ICommand, TestCommand>();
             services.AddSingleton<ICommand, SaveCommand>();
         });
 
