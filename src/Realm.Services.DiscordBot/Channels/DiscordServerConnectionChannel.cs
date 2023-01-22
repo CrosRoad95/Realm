@@ -1,6 +1,6 @@
 ﻿using Grpc.Net.Client;
 
-namespace Realm.Services.DiscordBot.Channels;
+namespace Realm.DiscordBot.Channels;
 
 internal class DiscordServerConnectionChannel
 {

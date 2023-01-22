@@ -1,6 +1,6 @@
 ﻿using Grpc.Net.Client;
 
-namespace Realm.Services.DiscordBot;
+namespace Realm.DiscordBot;
 
 internal class DiscordClient
 {

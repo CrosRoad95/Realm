@@ -66,7 +66,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Realm.Module.GRPC.Proto", "
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Services", "Services", "{1B4D0935-5736-4E56-B65E-0CACF26B17DD}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Realm.Services.DiscordBot", "src\Realm.Services.DiscordBot\Realm.Services.DiscordBot.csproj", "{439C6299-2B3A-49F9-9DED-F297F44C355B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Realm.DiscordBot", "src\Realm.Services.DiscordBot\Realm.DiscordBot.csproj", "{439C6299-2B3A-49F9-9DED-F297F44C355B}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Realm.Domain", "src\Realm.Domain\Realm.Domain.csproj", "{9A2A0372-C197-4759-8718-78AEA2F1907B}"
 EndProject

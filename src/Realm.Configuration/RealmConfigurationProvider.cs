@@ -20,9 +20,9 @@ public class RealmConfigurationProvider
     public static IConfigurationBuilder AddRealmConfiguration(IConfigurationBuilder configurationBuilder)
     {
         configurationBuilder = configurationBuilder
-            .AddJsonFile("appsettingsServer.json", false)
-            .AddJsonFile("appsettingsServer.development.json", true, true)
-            .AddJsonFile("appsettingsServer.local.json", true, true)
+            .AddJsonFile("appsettings.json", false)
+            .AddJsonFile("appsettings.development.json", true, true)
+            .AddJsonFile("appsettings.local.json", true, true)
             .AddEnvironmentVariables();
 
         return configurationBuilder;

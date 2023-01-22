@@ -1,4 +1,4 @@
-﻿using Realm.Services.DiscordBot;
+﻿using Realm.DiscordBot;
 using Realm.Configuration;
 using Microsoft.Extensions.Configuration;
 using Realm.Logging;

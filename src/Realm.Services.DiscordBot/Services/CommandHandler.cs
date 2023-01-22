@@ -1,4 +1,4 @@
-﻿namespace Realm.Services.DiscordBot.Services;
+﻿namespace Realm.DiscordBot.Services;
 
 public class CommandHandler
 {

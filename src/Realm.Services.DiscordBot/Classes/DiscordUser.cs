@@ -1,4 +1,4 @@
-﻿namespace Realm.Services.DiscordBot.Classes;
+﻿namespace Realm.DiscordBot.Classes;
 
 internal class DiscordUser
 {

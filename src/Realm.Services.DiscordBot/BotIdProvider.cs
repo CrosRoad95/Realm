@@ -1,4 +1,4 @@
-﻿namespace Realm.Services.DiscordBot;
+﻿namespace Realm.DiscordBot;
 
 internal class BotIdProvider
 {

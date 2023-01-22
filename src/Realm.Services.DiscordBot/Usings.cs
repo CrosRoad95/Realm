@@ -10,6 +10,6 @@ global using Discord;
 global using Discord.WebSocket;
 global using Discord.Interactions;
 
-global using Realm.Services.DiscordBot.Channels;
-global using Realm.Services.DiscordBot.Classes;
-global using Realm.Services.DiscordBot.Services;
+global using Realm.DiscordBot.Channels;
+global using Realm.DiscordBot.Classes;
+global using Realm.DiscordBot.Services;

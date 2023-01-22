@@ -1,4 +1,4 @@
-﻿namespace Realm.Services.DiscordBot.Commands;
+﻿namespace Realm.DiscordBot.Commands;
 
 public class ConnectAccountToServerCommand : InteractionModuleBase<SocketInteractionContext>
 {
