@@ -104,7 +104,7 @@ public class MoneyComponent : Component
         }
     }
 
-    public void TakeMoney(decimal amount)
+    public void TakeMoney(decimal amount, bool force = false)
     {
         ThrowIfDisposed();
 
@@ -121,6 +121,9 @@ public class MoneyComponent : Component
         {
             if (Math.Abs(_money) + amount > RealmConfigurationProvider.GetRequired<decimal>("Gameplay:MoneyLimit"))
                 throw new GameplayException("Unable to take money beyond limit.");
+
+            if(_money - amount < 0 && !force)
+                throw new GameplayException("Unable to take money, not enough money.");
 
             _money -= amount;
             MoneyTaken?.Invoke(amount);

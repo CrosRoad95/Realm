@@ -111,4 +111,28 @@ public class MoneyComponentTests
 
         _moneyComponent.Money.Should().Be(0);
     }
+
+    [Fact]
+    public void YouShouldNotBeAbleToTakeMoneyIfThereIsNotEnoughOfThem()
+    {
+        _moneyComponent.Money = 15;
+        Action take = () => { _moneyComponent.TakeMoney(10); };
+
+        take.Should().NotThrow<GameplayException>();
+        take.Should().Throw<GameplayException>()
+            .WithMessage("Unable to take money, not enough money.");
+        _moneyComponent.Money.Should().Be(5);
+    }
+    
+    [Fact]
+    public void YouShouldBeAbleToForceTakeMoneyIfThereIsNotEnoughOfThem()
+    {
+        _moneyComponent.Money = 15;
+        Action take = () => { _moneyComponent.TakeMoney(10, true); };
+
+        take.Should().NotThrow<GameplayException>();
+        take.Should().NotThrow<GameplayException>();
+        _moneyComponent.Money.Should().Be(-5);
+    }
+
 }
