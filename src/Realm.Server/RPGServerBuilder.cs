@@ -34,11 +34,11 @@ public class RPGServerBuilder
     public IRPGServer Build(IServerFilesProvider? serverFilesProvider = null, string? basePath = null, Action<ServerBuilder>? extraBuilderSteps = null)
     {
         if (_logger == null)
-            throw new Exception();
+            throw new Exception("Logger not configured.");
         if (_console == null)
-            throw new Exception();
+            throw new Exception("Console not configured.");
         if (_realmConfigurationProvider == null)
-            throw new Exception();
+            throw new Exception("RealmConfigurationProvider not configured.");
 
         return new RPGServer(_realmConfigurationProvider, _modules, serverBuilder =>
         {
