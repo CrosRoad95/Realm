@@ -1,4 +1,5 @@
 ﻿using FluentAssertions;
+using Realm.Tests.Helpers;
 
 namespace Realm.Tests.Tests;
 
@@ -33,27 +34,18 @@ public class ECSTests
     [Fact]
     public async Task TestThreadSafety()
     {
-        #region Arrange
+        #region Arrange & Act
         int createdEntities = 0;
         _ecs.EntityCreated += e =>
         {
             Interlocked.Increment(ref createdEntities);
         };
 
-        var tasks = Enumerable.Range(0, 8).Select(x =>
-            Task.Run(() =>
-            {
-                for (int i = 0; i < 100; i++)
-                {
-                    var entity = _ecs.CreateEntity($"foo{x}{i}", "test");
-                    entity.Dispose();
-                }
-            })
-        );
-        #endregion
-
-        #region Act
-        await Task.WhenAll(tasks);
+        await ParallelHelpers.Run((x,i) =>
+        {
+            var entity = _ecs.CreateEntity($"foo{x}{i}", "test");
+            entity.Dispose();
+        });
         #endregion
 
         #region Assert

@@ -1,6 +1,7 @@
 ﻿using FluentAssertions;
 using Realm.Domain;
 using Realm.Tests.Classes.Components;
+using Realm.Tests.Helpers;
 
 namespace Realm.Tests.Tests;
 
@@ -44,7 +45,7 @@ public class EntityTests
     [Fact]
     public async Task TestThreadSafety()
     {
-        #region Arrange
+        #region Arrange & Act
         int addedComponents = 0;
         var entity = new Entity(_serviceProvider, "foo", "test");
         entity.ComponentAdded += e =>
@@ -52,22 +53,14 @@ public class EntityTests
             Interlocked.Increment(ref addedComponents);
         };
 
-        var tasks = Enumerable.Range(0, 8).Select(x =>
-            Task.Run(() =>
-            {
-                for (int i = 0; i < 100; i++)
-                {
-                    var component = new TestComponent();
-                    entity.AddComponent(component);
-                    entity.DestroyComponent(component);
-                }
-            })
-        );
+        await ParallelHelpers.Run(() =>
+        {
+            var component = new TestComponent();
+            entity.AddComponent(component);
+            entity.DestroyComponent(component);
+        });
         #endregion
 
-        #region Act
-        await Task.WhenAll(tasks);
-        #endregion
 
         #region Assert
         addedComponents.Should().Be(8 * 100);
