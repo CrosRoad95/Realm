@@ -1,4 +1,7 @@
-﻿var builder = new RPGServerBuilder();
+﻿
+Directory.SetCurrentDirectory(Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly()!.Location)!);
+
+var builder = new RPGServerBuilder();
 builder.AddDefaultModules()
     .AddDefaultLogger()
     .AddDefaultConsole()
