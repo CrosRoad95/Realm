@@ -16,6 +16,7 @@ internal sealed class RPGServer : IRPGServer
 
     public RPGServer(RealmConfigurationProvider realmConfigurationProvider, List<IModule> modules, Action<ServerBuilder>? configureServerBuilder = null)
     {
+        _modules = modules;
         _server = new MtaServer(
             builder =>
             {
@@ -33,7 +34,6 @@ internal sealed class RPGServer : IRPGServer
 
         _logger = GetRequiredService<ILogger>().ForContext<RPGServer>();
         _logger.Information("Starting server:");
-        _modules = modules;
     }
 
     private void ConfigureServices(IServiceCollection services)
