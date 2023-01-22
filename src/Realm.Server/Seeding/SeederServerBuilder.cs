@@ -1,9 +1,7 @@
 ﻿using FluentValidation;
 using Microsoft.AspNetCore.Identity;
 using Realm.Domain.Components.World;
-using Realm.Server.Serialization.Yaml;
 using System.Security.Claims;
-using YamlDotNet.Serialization.NamingConventions;
 using static Realm.Server.Seeding.SeedData;
 
 namespace Realm.Server.Seeding;
@@ -17,10 +15,6 @@ internal sealed class SeederServerBuilder
     private readonly UserManager<User> _userManager;
     private readonly RoleManager<Role> _roleManager;
     private readonly ILogger _logger;
-    private readonly IDeserializer _deserializer = new DeserializerBuilder()
-        .WithNamingConvention(CamelCaseNamingConvention.Instance)
-        .WithTypeConverter(new Vector3Converter())
-        .Build();
 
     private readonly Dictionary<string, User> _createdUsers = new();
     public SeederServerBuilder(ILogger logger,
@@ -146,7 +140,7 @@ internal sealed class SeederServerBuilder
     public async Task Build()
     {
         var result = new JObject();
-        var seedDatas = _serverFilesProvider.GetFiles(_basePath).Select(seedFileName => _deserializer.Deserialize<SeedData>(File.ReadAllText(seedFileName)));
+        var seedDatas = _serverFilesProvider.GetFiles(_basePath).Select(seedFileName => JsonConvert.DeserializeObject<SeedData>(File.ReadAllText(seedFileName)));
         foreach (var sourceObject in seedDatas)
         {
             var @object = JObject.Parse(JsonConvert.SerializeObject(sourceObject));

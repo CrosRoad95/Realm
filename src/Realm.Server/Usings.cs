@@ -9,7 +9,6 @@ global using Serilog;
 global using Serilog.Context;
 global using Newtonsoft.Json;
 global using Newtonsoft.Json.Linq;
-global using YamlDotNet.Serialization;
 
 global using SlipeServer.Server.Elements;
 global using SlipeServer.Server;
