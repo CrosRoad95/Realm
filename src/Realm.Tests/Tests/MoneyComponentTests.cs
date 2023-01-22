@@ -3,6 +3,7 @@ using Realm.Common.Exceptions;
 using Realm.Configuration;
 using Realm.Domain;
 using Realm.Domain.Components.Players;
+using Realm.Tests.Helpers;
 
 namespace Realm.Tests.Tests;
 
@@ -91,5 +92,23 @@ public class MoneyComponentTests
         }
         actSetMoney.Should().Throw<GameplayException>()
             .WithMessage("Unable to set money beyond limit.");
+    }
+
+    [Fact]
+    public async Task TestIfMoneyComponentIsThreadSafe()
+    {
+        await ParallelHelpers.Run(() =>
+        {
+            _moneyComponent.GiveMoney(1);
+        });
+
+        _moneyComponent.Money.Should().Be(800);
+
+        await ParallelHelpers.Run(() =>
+        {
+            _moneyComponent.TakeMoney(1);
+        });
+
+        _moneyComponent.Money.Should().Be(0);
     }
 }
