@@ -70,7 +70,7 @@ internal class SignInService : ISignInService
             entity.AddComponent(new PlayTimeComponent());
             entity.AddComponent(new LevelComponent(user.Level, user.Experience));
             entity.AddComponent(new MoneyComponent(user.Money));
-            entity.AddComponent(new AFKComponent())
+            entity.AddComponent(new AFKComponent());
             entity.Destroyed += HandleDestroyed;
         }
         catch (Exception ex)
