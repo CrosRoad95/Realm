@@ -1,12 +1,9 @@
-﻿namespace Realm.Domain.Components.Common;
+﻿using static Realm.Domain.Registries.ItemRegistryEntry;
+
+namespace Realm.Domain.Components.Common;
 
 public class InventoryComponent : Component
 {
-    [Inject]
-    private ItemsRegistry ItemsRegistry { get; set; } = default!;
-    [Inject]
-    private ILogger Logger { get; set; } = default!;
-
     private readonly List<Item> _items = new();
     public event Action<InventoryComponent, Item>? ItemAdded;
     public event Action<InventoryComponent, Item>? ItemRemoved;
@@ -14,37 +11,23 @@ public class InventoryComponent : Component
 
     public Guid? Id { get; private set; } = null;
     public uint Size { get; set; }
-    public uint Number => (uint)_items.Sum(x => ItemsRegistry!.Get(x.ItemId).Size * x.Number);
+    public uint Number => (uint)_items.Sum(x => x.Size * x.Number);
 
     public IEnumerable<Item> Items => _items;
+
+    public Func<InventoryComponent, Item, ItemAction, Task> UseCallback { get; set; } = default!;
 
     public InventoryComponent(uint size)
     {
         Size = size;
     }
 
-    internal InventoryComponent(InventoryData inventory, ItemsRegistry itemsRegistry, ILogger logger)
+    internal InventoryComponent(uint size, Guid id, IEnumerable<Item> items)
     {
-        if (inventory == null)
-            throw new ArgumentNullException(nameof(inventory));
-
-        Size = inventory.Size;
-        Id = inventory.Id;
-
-        foreach (var item in inventory.InventoryItems)
-        {
-            try
-            {
-                _items.Add(new Item(item, itemsRegistry.Get(item.ItemId)));
-            }
-            catch(Exception ex)
-            {
-                logger.Error(ex, "Failed to load item id: {itemId}. Item probably doesn't exists.", item.Id);
-            }
-        }
+        Size = size;
+        Id = id;
+        _items = items.ToList();
     }
-
-    public ItemRegistryEntry GetItemRegistryEntry(uint id) => ItemsRegistry!.Get(id);
 
     public bool HasItem(uint itemId)
     {
@@ -69,12 +52,12 @@ public class InventoryComponent : Component
         return item != null;
     }
 
-    public void AddItem(uint itemId, uint number = 1, Dictionary<string, object>? metadata = null, bool tryStack = true, bool force = false)
+    public void AddItem(ItemsRegistry itemsRegistry, uint itemId, uint number = 1, Dictionary<string, object>? metadata = null, bool tryStack = true, bool force = false)
     {
         if (number == 0)
             return;
 
-        var itemRegistryEntry = ItemsRegistry.Get(itemId);
+        var itemRegistryEntry = itemsRegistry.Get(itemId);
         if (Number + itemRegistryEntry.Size * number > Size && !force)
             throw new InventoryDoNotEnoughSpaceException();
 
@@ -96,7 +79,7 @@ public class InventoryComponent : Component
         }
         else
         {
-            var item = new Item(itemRegistryEntry);
+            var item = new Item(itemRegistryEntry, number, metadata);
             newItems.Add(item);
         }
 
@@ -104,10 +87,9 @@ public class InventoryComponent : Component
         {
             var thisItemNumber = Math.Min(number, itemRegistryEntry.StackSize);
             number -= thisItemNumber;
-            var item = new Item(itemRegistryEntry);
+            var item = new Item(itemRegistryEntry, number, metadata);
             item.Number = thisItemNumber;
             newItems.Add(item);
-            ;
         }
 
         foreach (var newItem in newItems)
@@ -143,7 +125,7 @@ public class InventoryComponent : Component
     {
         if (item.AvailiableActions.HasFlag(action))
         {
-            await ItemsRegistry.UseCallback(this, item, action);
+            await UseCallback(this, item, action);
             return true;
         }
 

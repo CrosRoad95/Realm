@@ -1,13 +1,13 @@
-﻿namespace Realm.Domain.Inventory;
+﻿using static Realm.Domain.Registries.ItemRegistryEntry;
+
+namespace Realm.Domain.Inventory;
 
 public class Item : IEquatable<Item>, IEquatable<Dictionary<string, object>>
 {
-    private readonly ItemRegistryEntry _itemRegistryEntry;
-    private uint _number = 0;
-
-    internal string? Id { get; set; }
     public string LocalId { get; } = Guid.NewGuid().ToString();
     public uint ItemId { get; private set; }
+
+    private uint _number = 0;
     public uint Number { get => _number; set
         {
             var old = _number;
@@ -18,38 +18,28 @@ public class Item : IEquatable<Item>, IEquatable<Dictionary<string, object>>
             }
         }
     }
-    public string Name => _itemRegistryEntry.Name;
-    public uint Size => _itemRegistryEntry.Size;
-    public ItemRegistryEntry.ItemAction AvailiableActions => _itemRegistryEntry.AvailiableActions;
-
-    private Dictionary<string, object> _metadata;
-
-    public Dictionary<string, object> MetaData { get => _metadata; set { _metadata = value; } }
-
+    public string Name { get; init; }
+    public uint Size { get; init; }
+    public ItemRegistryEntry.ItemAction AvailiableActions { get; init; }
+    public Dictionary<string, object> MetaData { get; init; }
+    
     public event Action<Item, uint, uint>? NumberChanged;
     public event Action<Item>? Changed;
 
-    internal Item(ItemRegistryEntry itemRegistryEntry)
+    internal Item(ItemRegistryEntry itemRegistryEntry, uint number, Dictionary<string, object>? metaData = null)
     {
-        _itemRegistryEntry = itemRegistryEntry;
+        AvailiableActions = itemRegistryEntry.AvailiableActions;
+        Size = itemRegistryEntry.Size;
+        Name = itemRegistryEntry.Name;
         ItemId = itemRegistryEntry.Id;
-        _metadata = new();
-    }
-
-    internal Item(InventoryItem inventoryItem, ItemRegistryEntry itemRegistryEntry)
-    {
-        _itemRegistryEntry = itemRegistryEntry;
-        Id = inventoryItem.Id;
-        ItemId = inventoryItem.ItemId;
-        Number = inventoryItem.Number;
-        var metadata = JsonConvert.DeserializeObject<Dictionary<string, object>>(inventoryItem.MetaData);
-        if (metadata != null)
+        _number = number;
+        if (metaData != null)
         {
-            _metadata = metadata;
+            MetaData = metaData;
         }
         else
         {
-            _metadata = new();
+            MetaData = new();
         }
     }
 
@@ -57,7 +47,7 @@ public class Item : IEquatable<Item>, IEquatable<Dictionary<string, object>>
     {
         if (value is string or double or int)
         {
-            _metadata[key] = value;
+            MetaData[key] = value;
             Changed?.Invoke(this);
             return true;
         }
@@ -66,7 +56,7 @@ public class Item : IEquatable<Item>, IEquatable<Dictionary<string, object>>
 
     public object? GetMetadata(string key)
     {
-        if (_metadata.TryGetValue(key, out var value))
+        if (MetaData.TryGetValue(key, out var value))
             return value;
         return null;
     }

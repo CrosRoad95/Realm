@@ -1,4 +1,5 @@
 ﻿using Realm.Domain.Interfaces;
+using Realm.Domain.Registries;
 
 namespace Realm.Console.Logic;
 
@@ -8,13 +9,16 @@ internal sealed class CommandsLogic
     private readonly ILogger _logger;
     private readonly IEntityFactory _entityFactory;
     private readonly RepositoryFactory _repositoryFactory;
+    private readonly ItemsRegistry _itemsRegistry;
 
-    public CommandsLogic(RPGCommandService commandService, ILogger logger, IEntityFactory entityFactory, RepositoryFactory repositoryFactory)
+    public CommandsLogic(RPGCommandService commandService, ILogger logger, IEntityFactory entityFactory, RepositoryFactory repositoryFactory,
+        ItemsRegistry itemsRegistry)
     {
         _commandService = commandService;
         _logger = logger;
         _entityFactory = entityFactory;
         _repositoryFactory = repositoryFactory;
+        _itemsRegistry = itemsRegistry;
         _commandService.AddCommandHandler("gp", (entity, args) =>
         {
             logger.Information("{position}, {rotation}", entity.Transform.Position, entity.Transform.Rotation);
@@ -42,7 +46,7 @@ internal sealed class CommandsLogic
             {
                 uint itemId = uint.Parse(args.ElementAtOrDefault(0) ?? "1");
                 uint count = uint.Parse(args.ElementAtOrDefault(1) ?? "1");
-                inventoryComponent.AddItem(itemId, count);
+                inventoryComponent.AddItem(_itemsRegistry, itemId, count);
                 entity.GetRequiredComponent<PlayerElementComponent>().SendChatMessage($"Item added, {inventoryComponent.Number}/{inventoryComponent.Size}");
             }
             return Task.CompletedTask;
@@ -235,7 +239,7 @@ internal sealed class CommandsLogic
             
             if (entity.TryGetComponent(out InventoryComponent inventoryComponent))
             {
-                inventoryComponent.AddItem(1);
+                inventoryComponent.AddItem(_itemsRegistry, 1);
                 entity.GetRequiredComponent<PlayerElementComponent>().SendChatMessage($"Test item added");
             }
 

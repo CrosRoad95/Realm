@@ -1,4 +1,6 @@
-﻿using Realm.Domain.Registries;
+﻿using Realm.Domain.Inventory;
+using Realm.Domain.Registries;
+using System.Linq;
 
 namespace Realm.Server.Services;
 
@@ -31,7 +33,14 @@ internal class SignInService : ISignInService
             if (user.Inventories != null && user.Inventories.Any())
             {
                 foreach (var inventory in user.Inventories)
-                    await entity.AddComponentAsync(new InventoryComponent(inventory, _itemsRegistry, _logger));
+                {
+                    var items = inventory.InventoryItems
+                        .Select(x =>
+                            new Item(_itemsRegistry.Get(x.ItemId), x.Number, JsonConvert.DeserializeObject<Dictionary<string, object>>(x.MetaData))
+                        )
+                        .ToList();
+                    await entity.AddComponentAsync(new InventoryComponent(inventory.Size, inventory.Id, items));
+                }
             }
             else
                 await entity.AddComponentAsync(new InventoryComponent(20));
