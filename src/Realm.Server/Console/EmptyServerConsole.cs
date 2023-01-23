@@ -2,7 +2,7 @@
 
 public class EmptyServerConsole : IConsole
 {
-    private EmptyServerConsole()
+    public EmptyServerConsole()
     {
 
     }

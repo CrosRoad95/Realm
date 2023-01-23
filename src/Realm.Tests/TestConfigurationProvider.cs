@@ -21,6 +21,7 @@ internal class TestConfigurationProvider : RealmConfigurationProvider
                 ["Identity:Policies:Admin:RequireClaims:Test"] = "true",
                 ["Gameplay:MoneyLimit"] = "10000",
                 ["Gameplay:MoneyPrecision"] = "4",
+                ["Database:Provider"] = "InMemory",
             }).Build())
     {
     }

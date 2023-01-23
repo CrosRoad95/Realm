@@ -73,7 +73,7 @@ internal class SignInService : ISignInService
             entity.AddComponent(new AFKComponent());
             entity.Destroyed += HandleDestroyed;
         }
-        catch (Exception ex)
+        catch (Exception)
         {
             // TODO: add Entity component add scope thing
             _usedAccountsIds.Remove(user.Id);
@@ -88,6 +88,7 @@ internal class SignInService : ISignInService
             entity.TryDestroyComponent<DailyVisitsCounterComponent>();
             entity.TryDestroyComponent<StatisticsCounterComponent>();
             entity.TryDestroyComponent<DiscoveriesComponent>();
+            throw;
         }
         finally
         {

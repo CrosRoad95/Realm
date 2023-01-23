@@ -1,4 +1,5 @@
-﻿using Realm.Persistance.MySql;
+﻿using Realm.Domain.Interfaces;
+using Realm.Persistance.MySql;
 using SlipeServer.Resources.Text3d;
 
 namespace Realm.Server.Extensions;
@@ -33,12 +34,20 @@ public static class ServerBuilderExtensions
                     services.AddPersistance<SQLiteDb>(db => db.UseSqlite("Filename=./server.db"));
                     services.AddRealmIdentity<SQLiteDb>(realmConfigurationProvider.GetRequired<IdentityConfiguration>("Identity"));
                     break;
+                case "InMemory":
+                    services.AddPersistance<SQLiteDb>(db => db.UseInMemoryDatabase("inMemoryDatabase"));
+                    services.AddRealmIdentity<SQLiteDb>(realmConfigurationProvider.GetRequired<IdentityConfiguration>("Identity"));
+                    break;
                 default:
-                    throw new NotImplementedException($"Database provider '{databaseProvider}' is not supported. use 'MySql' or 'SqlLite'.");
+                    throw new NotImplementedException($"Database provider '{databaseProvider}' is not supported. use 'MySql' or 'SqlLite' or 'InMemory'.");
             }
 
             services.AddSingleton<HelpCommand>();
             services.AddSingleton<ICommand, SaveCommand>();
+
+            services.AddSingleton<EntityByStringIdCollection>();
+            services.AddSingleton<ECS>();
+            services.AddSingleton<IEntityByElement>(x => x.GetRequiredService<ECS>());
         });
 
         // Resource

@@ -53,3 +53,6 @@ global using Realm.Domain.Persistance;
 global using Realm.Domain.Components.Vehicles;
 global using Realm.Persistance.Data;
 global using Realm.Persistance.Extensions;
+using System.Runtime.CompilerServices;
+
+[assembly: InternalsVisibleTo("Realm.Tests")]

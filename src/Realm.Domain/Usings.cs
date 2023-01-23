@@ -47,3 +47,4 @@ global using SlipeServer.Resources.Text3d;
 global using System.Runtime.CompilerServices;
 
 [assembly: InternalsVisibleTo("Realm.Server")]
+[assembly: InternalsVisibleTo("Realm.Tests")]

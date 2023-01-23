@@ -41,9 +41,6 @@ internal sealed class RPGServer : IRPGServer
         // Common
         services.AddSingleton((IRPGServer)this);
         services.AddSingleton(this);
-        services.AddSingleton<EntityByStringIdCollection>();
-        services.AddSingleton<ECS>();
-        services.AddSingleton<IEntityByElement>(x => x.GetRequiredService<ECS>());
         services.AddSingleton<SeederServerBuilder>();
         services.AddSingleton<ItemsRegistry>();
         services.AddSingleton<VehicleUpgradeRegistry>();
