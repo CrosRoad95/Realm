@@ -20,6 +20,7 @@ var server = builder.Build(null, extraBuilderSteps: serverBuilder =>
     serverBuilder.AddLogic<AchievementsLogic>();
     serverBuilder.AddLogic<WorldLogic>();
     serverBuilder.AddLogic<LevelsLogic>();
+    serverBuilder.AddLogic<PlayerGameplayLogic>();
 #if DEBUG
     serverBuilder.AddLogic<HotReloadLogic>("../../../Server/Gui");
 #endif

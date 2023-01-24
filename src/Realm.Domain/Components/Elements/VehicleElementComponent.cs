@@ -9,8 +9,9 @@ public class VehicleElementComponent : ElementComponent
     internal override Element Element => _vehicle;
 
     public ushort Model => _vehicle.Model;
-    public bool IsEngineOn => _vehicle.IsEngineOn;
-    public bool IsFrozen => _vehicle.IsFrozen;
+    public bool IsEngineOn { get => _vehicle.IsEngineOn; set => _vehicle.IsEngineOn = value; }
+    public bool IsFrozen { get => _vehicle.IsFrozen; set => _vehicle.IsFrozen = value; }
+    public bool IsLocked { get => _vehicle.IsLocked; set => _vehicle.IsLocked = value; }
 
     internal VehicleElementComponent(Vehicle vehicle)
     {

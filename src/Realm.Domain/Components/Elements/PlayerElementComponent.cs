@@ -22,13 +22,13 @@ public sealed class PlayerElementComponent : ElementComponent
     private readonly HashSet<string> _enableFightFlags = new();
     private readonly MapIdGenerator _mapIdGenerator = new(IdGeneratorConstants.MapIdStart, IdGeneratorConstants.MapIdStop);
 
-    public event Action<Entity?> FocusedEntityChanged;
+    public event Action<Entity, Entity?> FocusedEntityChanged;
     public Entity? FocusedEntity { get => _focusedEntity; internal set
         {
             if(value != _focusedEntity)
             {
                 _focusedEntity = value;
-                FocusedEntityChanged?.Invoke(value);
+                FocusedEntityChanged?.Invoke(Entity, value);
             }
         }
     }

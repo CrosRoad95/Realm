@@ -21,6 +21,11 @@ internal class WorldLogic
         AttachDiscovery(ent1, "loc-1", HandlePlayerDiscover);
         AttachDiscovery(ent2, "loc-2", HandlePlayerDiscover);
         AttachDiscovery(ent3, "loc-3", HandlePlayerDiscover);
+
+        _entityFactory.CreateVehicle(404, new Vector3(332.89f, -92.22f, 1.42f), Vector3.Zero, 0, 0, null, entity =>
+        {
+            entity.AddComponent(new VehicleForSaleComponent(200));
+        });
     }
 
     private void HandlePlayerDiscover(Entity entity, string discoverId)

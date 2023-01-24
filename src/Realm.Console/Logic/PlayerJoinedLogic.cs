@@ -29,13 +29,6 @@ internal sealed class PlayerJoinedLogic
         entity.AddComponent(new LoginGuiComponent());
 
         entity.ComponentAdded += HandleComponentAdded;
-
-        playerElementComponent.FocusedEntityChanged += HandleFocusedEntityChanged;
-    }
-
-    private void HandleFocusedEntityChanged(Entity? entity)
-    {
-        _logger.Information("Focus changed to: {entity}", entity);
     }
 
     private async void HandleComponentAdded(Component component)
