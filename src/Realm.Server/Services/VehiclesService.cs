@@ -19,7 +19,8 @@ public sealed class VehiclesService
         if (vehicleEntity.HasComponent<PrivateVehicleComponent>())
             return vehicleEntity;
 
-        vehicleEntity.AddComponent(new PrivateVehicleComponent(await _vehicleRepository.CreateNewVehicle()));
+        var vehicleElementComponent = vehicleEntity.GetComponent<VehicleElementComponent>();
+        vehicleEntity.AddComponent(new PrivateVehicleComponent(await _vehicleRepository.CreateNewVehicle(vehicleElementComponent.Model)));
         return vehicleEntity;
     }
 }
