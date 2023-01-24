@@ -15,6 +15,22 @@ internal class ClientInterfaceLogic
         _logger = logger.ForContext<ClientInterfaceLogic>();
 
         _ClientInterfaceService.ClientErrorMessage += HandleClientErrorMessage;
+        _ClientInterfaceService.FocusedElementChanged += HandleFocusedElementChanged;
+    }
+
+    private void HandleFocusedElementChanged(Player player, Element? focusedElement)
+    {
+        Entity? entity = _entityByElement.TryGetByElement(player);
+        if (entity == null)
+            return;
+
+        if(entity.TryGetComponent(out PlayerElementComponent playerElementComponent))
+        {
+            if (focusedElement == null)
+                playerElementComponent.FocusedEntity = null;
+            else
+                playerElementComponent.FocusedEntity = _entityByElement.TryGetByElement(focusedElement);
+        }
     }
 
     private void HandleClientErrorMessage(Player player, string message, int level, string file, int line)

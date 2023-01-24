@@ -10,6 +10,7 @@ internal class ClientInterfaceResource : Resource
     {
         ["debugging.lua"] = ResourceFiles.Debugging,
         ["utility.lua"] = ResourceFiles.Utility,
+        ["player.lua"] = ResourceFiles.Player,
     };
 
     internal ClientInterfaceResource(MtaServer server)

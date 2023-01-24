@@ -15,16 +15,26 @@ public sealed class PlayerElementComponent : ElementComponent
     [Inject]
     private Text3dService Text3dService { get; set; } = default!;
 
+    private Entity? _focusedEntity;
     private readonly Player _player;
     private readonly Dictionary<string, Func<Entity, Task>> _binds = new();
     private readonly Dictionary<string, DateTime> _bindsCooldown = new();
     private readonly HashSet<string> _enableFightFlags = new();
     private readonly MapIdGenerator _mapIdGenerator = new(IdGeneratorConstants.MapIdStart, IdGeneratorConstants.MapIdStop);
 
+    public event Action<Entity?> FocusedEntityChanged;
+    public Entity? FocusedEntity { get => _focusedEntity; internal set
+        {
+            if(value != _focusedEntity)
+            {
+                _focusedEntity = value;
+                FocusedEntityChanged?.Invoke(value);
+            }
+        }
+    }
+
     internal Player Player => _player;
-
     public string Name { get => Player.Name; set => Player.Name = value; }
-
     public string Language { get; private set; } = "pl";
 
     internal override Element Element => _player;

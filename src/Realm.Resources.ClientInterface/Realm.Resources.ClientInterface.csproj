@@ -9,6 +9,7 @@
 
 	<ItemGroup>
 		<EmbeddedResource Include="Lua\debugging.lua" />
+		<EmbeddedResource Include="Lua\player.lua" />
 		<EmbeddedResource Include="Lua\utility.lua" />
 	</ItemGroup>
 

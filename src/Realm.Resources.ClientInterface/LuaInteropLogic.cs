@@ -25,6 +25,7 @@ internal class ClientInterfaceLogic
         _resource = server.GetAdditionalResource<ClientInterfaceResource>();
         luaEventService.AddEventHandler("internalDebugMessage", HandleInternalDebugMessage);
         luaEventService.AddEventHandler("sendLocalizationCode", HandleLocalizationCode);
+        luaEventService.AddEventHandler("internalChangeFocusedElement", HandleFocusedElementChanged);
     }
 
     private void HandlePlayerJoin(Player player)
@@ -52,5 +53,11 @@ internal class ClientInterfaceLogic
         var file = _fromLuaValueMapper.Map(typeof(string), luaEvent.Parameters[3]) as string;
         var line = (int)_fromLuaValueMapper.Map(typeof(int), luaEvent.Parameters[4]);
         _ClientInterfaceService.BroadcastClientErrorMessage(luaEvent.Player, message, level, file, line);    
+    }
+
+    private void HandleFocusedElementChanged(LuaEvent luaEvent)
+    {
+        var focusedElement = _fromLuaValueMapper.Map(typeof(Element), luaEvent.Parameters[1]) as Element;
+        _ClientInterfaceService.BroadcastPlayerElementFocusChanged(luaEvent.Player, focusedElement);
     }
 }

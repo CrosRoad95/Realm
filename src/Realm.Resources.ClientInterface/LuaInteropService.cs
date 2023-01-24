@@ -7,6 +7,7 @@ public class ClientInterfaceService
 {
     public event Action<Player, string, int, string, int>? ClientErrorMessage;
     public event Action<Player, CultureInfo>? ClientCultureInfoUpdate;
+    public event Action<Player, Element?>? FocusedElementChanged;
     public ClientInterfaceService()
     {
 
@@ -20,6 +21,11 @@ public class ClientInterfaceService
     internal void BroadcastPlayerLocalizationCode(Player player, string code)
     {
         ClientCultureInfoUpdate?.Invoke(player, CultureInfo.GetCultureInfo(code));
+    }
+    
+    internal void BroadcastPlayerElementFocusChanged(Player player, Element? newFocusedElement)
+    {
+        FocusedElementChanged?.Invoke(player, newFocusedElement);
     }
 
     public void SetWorldDebuggingEnabled(Player player, bool active)
