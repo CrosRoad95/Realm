@@ -57,6 +57,9 @@ public class InventoryComponent : Component
         if (number == 0)
             return;
 
+        if (metadata == null)
+            metadata = new();
+
         var itemRegistryEntry = itemsRegistry.Get(itemId);
         if (Number + itemRegistryEntry.Size * number > Size && !force)
             throw new InventoryDoNotEnoughSpaceException();
@@ -66,21 +69,13 @@ public class InventoryComponent : Component
         {
             foreach (var item in _items.Where(x => x.ItemId == itemId))
             {
-                if(metadata != null)
-                {
-                    if (!item.Equals(metadata))
-                        break;
-                }
+                if (!item.Equals(metadata))
+                    continue;
 
                 var added = Math.Min(number, itemRegistryEntry.StackSize - item.Number);
                 item.Number += added;
                 number -= added;
             }
-        }
-        else
-        {
-            var item = new Item(itemRegistryEntry, number, metadata);
-            newItems.Add(item);
         }
 
         while (number > 0)
@@ -121,7 +116,7 @@ public class InventoryComponent : Component
         }
     }
 
-    public async Task<bool> TryUseItem(Item item, ItemRegistryEntry.ItemAction action)
+    public async Task<bool> TryUseItem(Item item, ItemAction action)
     {
         if (item.AvailiableActions.HasFlag(action))
         {

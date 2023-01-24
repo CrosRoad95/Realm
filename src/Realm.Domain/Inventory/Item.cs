@@ -84,16 +84,16 @@ public class Item : IEquatable<Item>, IEquatable<Dictionary<string, object>>
         if (other == null)
             return false;
 
-        if (MetaData == other || MetaData.Count == other.Count)
-            return true;
+        if (MetaData.Count != other.Count)
+            return false;
 
         foreach (var key in MetaData.Keys)
         {
-            if (MetaData[key].Equals(other[key]))
+            if (!MetaData[key].Equals(other[key]))
             {
-                return true;
+                return false;
             }
         }
-        return false;
+        return true;
     }
 }
