@@ -2,6 +2,6 @@
 
 public interface IVehicleRepository : IDisposable
 {
-    Task<Vehicle> CreateNewVehicle();
+    Task<Vehicle> CreateNewVehicle(ushort model);
     IQueryable<Vehicle> GetAll();
 }

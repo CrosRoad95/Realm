@@ -12,11 +12,12 @@ internal class VehicleRepository : IVehicleRepository
         _db = db;
     }
 
-    public async Task<Vehicle> CreateNewVehicle()
+    public async Task<Vehicle> CreateNewVehicle(ushort model)
     {
         var vehicle = new Vehicle
         {
             Id = Guid.NewGuid(),
+            Model = model,
             Platetext = Guid.NewGuid().ToString()[..8],
             CreatedAt = DateTime.Now,
             Spawned = true,

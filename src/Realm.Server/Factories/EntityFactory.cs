@@ -49,7 +49,7 @@ internal class EntityFactory : IEntityFactory
 
             entityBuilder?.Invoke(entity);
         });
-        vehicleEntity.AddComponent(new PrivateVehicleComponent(await _vehicleRepository.CreateNewVehicle()));
+        vehicleEntity.AddComponent(new PrivateVehicleComponent(await _vehicleRepository.CreateNewVehicle(model)));
         return vehicleEntity;
     }
 
