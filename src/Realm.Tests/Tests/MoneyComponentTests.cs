@@ -134,5 +134,48 @@ public class MoneyComponentTests
         take.Should().NotThrow<GameplayException>();
         _moneyComponent.Money.Should().Be(-5);
     }
+    
+    [Fact]
+    public void YouShouldBeAbleToTransferMoneyBetweenMoneyComponents()
+    {
+        var targetMoneyComponent = new MoneyComponent();
+        _entity.AddComponent(targetMoneyComponent);
+
+        _moneyComponent.Money = 15;
+        _moneyComponent.TransferMoney(targetMoneyComponent, 10);
+
+        _moneyComponent.Money.Should().Be(5);
+        targetMoneyComponent.Money.Should().Be(10);
+    }
+    
+    [Fact]
+    public void YouCannotTransferMoreMoneyThanYouHave()
+    {
+        var targetMoneyComponent = new MoneyComponent();
+        _entity.AddComponent(targetMoneyComponent);
+
+        _moneyComponent.Money = 15;
+        Action transfer = () => { _moneyComponent.TransferMoney(targetMoneyComponent, 20, false); };
+
+        transfer.Should().Throw<GameplayException>().WithMessage("Unable to take money, not enough money.");
+    }
+    
+    
+    [Fact]
+    public async Task TrasnferMoneyShouldBeThreadSafety()
+    {
+        var targetMoneyComponent = new MoneyComponent();
+        _entity.AddComponent(targetMoneyComponent);
+
+        _moneyComponent.Money = 800;
+
+        await ParallelHelpers.Run(() =>
+        {
+            _moneyComponent.TransferMoney(targetMoneyComponent, 1);
+        });
+
+        _moneyComponent.Money.Should().Be(0);
+        targetMoneyComponent.Money.Should().Be(800);
+    }
 
 }

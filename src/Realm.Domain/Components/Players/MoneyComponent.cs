@@ -137,4 +137,13 @@ public class MoneyComponent : Component
             _moneyLock.ExitWriteLock();
         }
     }
+
+    public void TransferMoney(MoneyComponent moneyComponent, decimal amount, bool force = false)
+    {
+        if (amount == 0)
+            return;
+
+        TakeMoney(amount, force);
+        moneyComponent.GiveMoney(amount);
+    }
 }
