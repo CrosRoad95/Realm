@@ -4,15 +4,18 @@
 	local window = guiProvider.window("Dashboard window", 0, 0, 600, 400);
 	guiProvider.centerWindow(window)
 	local tabPanel = guiProvider.tabPanel (0, 0, 600, 400, window ) 
-	local tab1 = guiProvider.tab("General informations", tabPanel)
 	do
-		sampleLabel = guiProvider.label(inspect(state), 10, 20, 280, 25, tab1);
-		local incCounter = guiProvider.button("increase", 300, 60, 100, 20, tab1);
+		local tab = guiProvider.tab("General informations", tabPanel)
+		sampleLabel = guiProvider.label(string.format("Money: %.2f", state.Money), 10, 30, 280, 25, tab);
+		local incCounter = guiProvider.button("increase", 300, 60, 100, 20, tab);
 		guiProvider.onClick(incCounter, function()
 			guiProvider.invokeAction("counter")
 		end)
 	end
-	guiProvider.tab("Vehicles", tabPanel)
+	do
+		local tab = guiProvider.tab("Vehicles", tabPanel)
+		local sampleLabel = guiProvider.label(inspect(state.VehicleLightInfos), 10, 20, 280, 25, tab);
+	end
 
 	function stateChanged(key, value)
 		state[key] = value;

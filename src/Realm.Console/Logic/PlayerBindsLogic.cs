@@ -8,11 +8,12 @@ internal sealed class PlayerBindsLogic
     }
 
     private readonly ECS _ecs;
+    private readonly IVehiclesService _vehiclesService;
 
-    public PlayerBindsLogic(ECS ecs)
+    public PlayerBindsLogic(ECS ecs, IVehiclesService vehiclesService)
     {
         _ecs = ecs;
-
+        _vehiclesService = vehiclesService;
         _ecs.EntityCreated += HandleEntityCreated;
     }
 
@@ -23,6 +24,11 @@ internal sealed class PlayerBindsLogic
     }
 
     private void OpenCloseGuiHelper<TGuiComponent>(Entity entity, string bind, GuiOpenOptions options = default) where TGuiComponent: GuiComponent, new()
+    {
+        OpenCloseGuiHelper(entity, bind, () => new TGuiComponent(), options);
+    }
+    
+    private void OpenCloseGuiHelper<TGuiComponent>(Entity entity, string bind, Func<TGuiComponent> factory, GuiOpenOptions options = default) where TGuiComponent: GuiComponent
     {
         var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();
         playerElementComponent.SetBind(bind, async entity =>
@@ -36,17 +42,44 @@ internal sealed class PlayerBindsLogic
             if (entity.HasComponent<GuiComponent>())
                 entity.DestroyComponent<GuiComponent>();
 
-            var guiComponent = await entity.AddComponentAsync(new TGuiComponent());
+            var guiComponent = await entity.AddComponentAsync(factory());
+            playerElementComponent.ResetCooldown(bind);
+        });
+    }
+
+    private void OpenCloseGuiHelper<TGuiComponent>(Entity entity, string bind, Func<Task<TGuiComponent>> factory, GuiOpenOptions options = default) where TGuiComponent: GuiComponent
+    {
+        var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();
+        playerElementComponent.SetBind(bind, async entity =>
+        {
+            if (entity.HasComponent<TGuiComponent>())
+            {
+                entity.DestroyComponent<TGuiComponent>();
+                return;
+            }
+
+            if (entity.HasComponent<GuiComponent>())
+                entity.DestroyComponent<GuiComponent>();
+
+            var guiComponent = await entity.AddComponentAsync(await factory());
             playerElementComponent.ResetCooldown(bind);
         });
     }
 
     private void HandleComponentAdded(Component component)
     {
-        if (component is AccountComponent)
+        if (component is AccountComponent accountComponent)
         {
             var entity = component.Entity;
-            OpenCloseGuiHelper<DashboardGuiComponent>(entity, "F1");
+            OpenCloseGuiHelper(entity, "F1", async () =>
+            {
+                DashboardGuiComponent.DashboardState state = new();
+                if (entity.TryGetComponent(out MoneyComponent moneyComponent))
+                    state.Money = (double)moneyComponent.Money;
+
+                state.VehicleLightInfos = await _vehiclesService.GetAllVehiclesLightInfoByOwnerId(accountComponent.Id);
+                return new DashboardGuiComponent(state);
+            });
             OpenCloseGuiHelper<InventoryGuiComponent>(entity, "i");
         }
     }

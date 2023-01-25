@@ -1,4 +1,5 @@
-﻿using Realm.Persistance.Interfaces;
+﻿using Realm.Domain.Data;
+using Realm.Persistance.Interfaces;
 
 namespace Realm.Server.Services;
 
@@ -22,5 +23,19 @@ internal sealed class VehiclesService : IVehiclesService
         var vehicleElementComponent = vehicleEntity.GetRequiredComponent<VehicleElementComponent>();
         vehicleEntity.AddComponent(new PrivateVehicleComponent(await _vehicleRepository.CreateNewVehicle(vehicleElementComponent.Model)));
         return vehicleEntity;
+    }
+
+    public async Task<List<VehicleLightInfo>> GetAllVehiclesLightInfoByOwnerId(Guid userId)
+    {
+        return await _vehicleRepository.GetAll()
+            .Include(x => x.VehicleAccesses)
+            .Where(x => x.VehicleAccesses.Any(x => x.UserId == userId))
+            .Select(x => new VehicleLightInfo
+            {
+                Id = x.Id,
+                Model = x.Model,
+                Position = x.TransformAndMotion.Position
+            })
+            .ToListAsync();
     }
 }
