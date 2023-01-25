@@ -1,13 +1,17 @@
-﻿namespace Realm.Console.Logic;
+﻿using Microsoft.Extensions.DependencyInjection;
+
+namespace Realm.Console.Logic;
 
 internal sealed class PlayerGameplayLogic
 {
     private readonly ECS _ecs;
+    private readonly IServiceProvider _serviceProvider;
     private readonly ILogger _logger;
 
-    public PlayerGameplayLogic(ECS ecs, ILogger logger)
+    public PlayerGameplayLogic(ECS ecs, ILogger logger, IServiceProvider serviceProvider)
     {
         _ecs = ecs;
+        _serviceProvider = serviceProvider;
         _logger = logger.ForContext<PlayerJoinedLogic>();
         _ecs.EntityCreated += HandleEntityCreated;
     }
@@ -27,12 +31,27 @@ internal sealed class PlayerGameplayLogic
         {
             if (entity.TryGetComponent(out VehicleForSaleComponent vehicleForSaleComponent))
             {
-                playerEntity.AddComponent(new BuyVehicleGuiComponent());
+                if(!playerEntity.HasComponent<GuiComponent>())
+                {
+                    var vehicleName = entity.GetRequiredComponent<VehicleElementComponent>().Name;
+                    playerEntity.AddComponent(new BuyVehicleGuiComponent(vehicleName, vehicleForSaleComponent.Price)).Bought = async () =>
+                    {
+                        playerEntity.TryDestroyComponent<BuyVehicleGuiComponent>();
+                        if(entity.TryDestroyComponent<VehicleForSaleComponent>())
+                        {
+                            await _serviceProvider.GetRequiredService<IVehiclesService>().ConvertToPrivateVehicle(entity);
+                            entity.GetRequiredComponent<PrivateVehicleComponent>().AddOwner(playerEntity);
+                        }
+                    };
+                }
             }
         }
         else
         {
-            playerEntity.TryDestroyComponent<BuyVehicleGuiComponent>();
+            if (playerEntity.TryDestroyComponent<BuyVehicleGuiComponent>())
+            {
+
+            }
         }
     }
 }

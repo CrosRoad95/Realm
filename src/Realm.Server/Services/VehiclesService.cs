@@ -2,11 +2,11 @@
 
 namespace Realm.Server.Services;
 
-public sealed class VehiclesService
+internal sealed class VehiclesService : IVehiclesService
 {
     private readonly IVehicleRepository _vehicleRepository;
 
-    internal VehiclesService(IVehicleRepository vehicleRepository)
+    public VehiclesService(IVehicleRepository vehicleRepository)
     {
         _vehicleRepository = vehicleRepository;
     }
@@ -19,7 +19,7 @@ public sealed class VehiclesService
         if (vehicleEntity.HasComponent<PrivateVehicleComponent>())
             return vehicleEntity;
 
-        var vehicleElementComponent = vehicleEntity.GetComponent<VehicleElementComponent>();
+        var vehicleElementComponent = vehicleEntity.GetRequiredComponent<VehicleElementComponent>();
         vehicleEntity.AddComponent(new PrivateVehicleComponent(await _vehicleRepository.CreateNewVehicle(vehicleElementComponent.Model)));
         return vehicleEntity;
     }
