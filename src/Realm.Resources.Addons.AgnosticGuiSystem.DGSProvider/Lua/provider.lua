@@ -19,6 +19,12 @@ local dgsUIProvider = {
 	scrollPane = function(x, y, width, height, parent)
 		return dgsCreateScrollPane(x, y, width, height, false, parent)
 	end,
+	tabPanel = function(x, y, width, height, parent)
+		return dgsCreateTabPanel(x, y, width, height, false, parent)
+	end,
+	tab = function(text, parent)
+		return dgsCreateTab(text, parent)
+	end,
 
 	-- Getters, setters
 	getValue = function(elementHandle)

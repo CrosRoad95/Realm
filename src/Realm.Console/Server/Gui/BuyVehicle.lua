@@ -1,4 +1,4 @@
-local function createLoginWindow(guiProvider, state)
+local function createBuyVehicleWindow(guiProvider, state)
 	local window = guiProvider.window("Sample buy vehicle", 0, 0, 300, 185);
 	guiProvider.centerWindow(window)
 	guiProvider.label(string.format("Vehicle: %s\nPrice: $%.2f", state.Name, state.Price), 10, 20, 280, 60, window);
@@ -18,5 +18,5 @@ local function createLoginWindow(guiProvider, state)
 end
 
 addEventHandler("onClientResourceStart", resourceRoot, function()
-	registerGui(createLoginWindow, "buyVehicle")
+	registerGui(createBuyVehicleWindow, "buyVehicle")
 end)

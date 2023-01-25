@@ -18,6 +18,12 @@
 	scrollPane = function(x, y, width, height, parent)
 		return guiCreateScrollPane(x, y, width, height, false, parent)
 	end,
+	tabPanel = function(x, y, width, height, parent)
+		return guiCreateTabPanel(x, y, width, height, false, parent)
+	end,
+	tab = function(text, parent)
+		return guiCreateTab(text, parent)
+	end,
 
 	-- Getters, setters
 	getValue = function(elementHandle)
