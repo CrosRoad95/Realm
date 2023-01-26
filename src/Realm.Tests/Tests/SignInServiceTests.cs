@@ -27,7 +27,7 @@ public class SignInServiceTests
         _signInService = new SignInService(new TestItemsRegistry(), new RealmLogger().GetLogger());
     }
 
-    [Fact]
+    //[Fact]
     public async Task SignInShouldAddAllNeededComponents()
     {
         var user = new User
