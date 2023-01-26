@@ -5,6 +5,7 @@ using RenderWareIo.Structs.Dff;
 using SlipeServer.Server.Elements;
 using SlipeServer.Server.Elements.ColShapes;
 using SlipeServer.Server.Elements.IdGeneration;
+using SlipeServer.Server.Enums;
 using static Grpc.Core.Metadata;
 
 namespace Realm.Server.Factories;
@@ -115,5 +116,21 @@ internal class EntityFactory : IEntityFactory
         marker.Color = color ?? System.Drawing.Color.White;
         var markerElementComponent = entity.AddComponent(new MarkerElementComponent(marker));
         return markerElementComponent;
+    }
+
+    public Entity CreateObject(ObjectModel model, Vector3 position, Vector3 rotation, byte interior = 0, ushort dimension = 0, string? id = null, Action<Entity>? entityBuilder = null)
+    {
+        return _ecs.CreateEntity(id ?? $"object {Guid.NewGuid()}", Entity.WorldObject, entity =>
+        {
+            var worldObject = new WorldObject(model, position);
+            var markerElementComponent = entity.AddComponent(new WorldObjectComponent(worldObject));
+
+            entity.Transform.Position = position;
+            entity.Transform.Rotation = rotation;
+            entity.Transform.Interior = interior;
+            entity.Transform.Dimension = dimension;
+
+            entityBuilder?.Invoke(entity);
+        });
     }
 }

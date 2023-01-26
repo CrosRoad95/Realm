@@ -21,6 +21,8 @@ internal class WorldLogic
         AttachDiscovery(ent1, "loc-1", HandlePlayerDiscover);
         AttachDiscovery(ent2, "loc-2", HandlePlayerDiscover);
         AttachDiscovery(ent3, "loc-3", HandlePlayerDiscover);
+
+        _entityFactory.CreateObject(SlipeServer.Server.Enums.ObjectModel.Gunbox, new Vector3(339.46f, -77.21f, 1.2f), Vector3.Zero);
     }
 
     private void HandlePlayerDiscover(Entity entity, string discoverId)

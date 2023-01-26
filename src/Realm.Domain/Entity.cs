@@ -13,6 +13,7 @@ public class Entity : IDisposable
     public const string PickupTag = "pickup";
     public const string MarkerTag = "marker";
     public const string CollisionShape = "collisionShape";
+    public const string WorldObject = "worldObject";
 
     private bool _disposed = false;
 
