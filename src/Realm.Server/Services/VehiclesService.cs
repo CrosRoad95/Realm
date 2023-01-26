@@ -18,10 +18,10 @@ internal sealed class VehiclesService : IVehiclesService
             throw new InvalidOperationException();
 
         if (vehicleEntity.HasComponent<PrivateVehicleComponent>())
-            return vehicleEntity;
+            throw new InvalidOperationException();
 
         var vehicleElementComponent = vehicleEntity.GetRequiredComponent<VehicleElementComponent>();
-        vehicleEntity.AddComponent(new PrivateVehicleComponent(await _vehicleRepository.CreateNewVehicle(vehicleElementComponent.Model)));
+        await vehicleEntity.AddComponentAsync(new PrivateVehicleComponent(await _vehicleRepository.CreateNewVehicle(vehicleElementComponent.Model)));
         return vehicleEntity;
     }
 

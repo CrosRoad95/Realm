@@ -156,7 +156,7 @@ internal sealed class CommandsLogic
         {
             var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();
             var veh = playerElementComponent.OccupiedVehicle;
-            veh.GetRequiredComponent<PrivateVehicleComponent>().AddOwner(entity);
+            veh.GetRequiredComponent<PrivateVehicleComponent>().AddAsOwner(entity);
         });
 
         _commandService.AddCommandHandler("accessinfo", async (entity, args) =>
@@ -279,6 +279,15 @@ internal sealed class CommandsLogic
                 levelComponent.GiveExperience(amount);
                 entity.GetRequiredComponent<PlayerElementComponent>().SendChatMessage($"gave experience: {amount}, level: {levelComponent.Level}, experience: {levelComponent.Experience}");
             }
+            return Task.CompletedTask;
+        });
+
+        _commandService.AddCommandHandler("cvforsale", (entity, args) =>
+        {
+            _entityFactory.CreateVehicle(404, entity.Transform.Position + new Vector3(4, 0, 0), Vector3.Zero, 0, 0, null, entity =>
+            {
+                entity.AddComponent(new VehicleForSaleComponent(200));
+            });
             return Task.CompletedTask;
         });
     }

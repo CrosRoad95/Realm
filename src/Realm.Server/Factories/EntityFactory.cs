@@ -5,6 +5,7 @@ using RenderWareIo.Structs.Dff;
 using SlipeServer.Server.Elements;
 using SlipeServer.Server.Elements.ColShapes;
 using SlipeServer.Server.Elements.IdGeneration;
+using static Grpc.Core.Metadata;
 
 namespace Realm.Server.Factories;
 
@@ -42,14 +43,15 @@ internal class EntityFactory : IEntityFactory
             var vehicle = new SlipeServer.Server.Elements.Vehicle(model, position);
             var vehicleElementComponent = entity.AddComponent(new VehicleElementComponent(vehicle));
 
-            entity.Transform.Position = position;
-            entity.Transform.Rotation = rotation;
-            entity.Transform.Interior = interior;
-            entity.Transform.Dimension = dimension;
-
             entityBuilder?.Invoke(entity);
         });
         vehicleEntity.AddComponent(new PrivateVehicleComponent(await _vehicleRepository.CreateNewVehicle(model)));
+
+        vehicleEntity.Transform.Position = position;
+        vehicleEntity.Transform.Rotation = rotation;
+        vehicleEntity.Transform.Interior = interior;
+        vehicleEntity.Transform.Dimension = dimension;
+
         return vehicleEntity;
     }
 
