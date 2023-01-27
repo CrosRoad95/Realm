@@ -16,7 +16,7 @@ public abstract class GuiComponent : Component
         _cursorless = cursorless;
     }
 
-    public override async Task Load()
+    public override async Task LoadAsync()
     {
         AgnosticGuiSystemService.FormSubmitted += HandleFormSubmitted;
         AgnosticGuiSystemService.ActionExecuted += HandleActionExecuted;

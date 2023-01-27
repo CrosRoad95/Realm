@@ -19,7 +19,7 @@ public class VehicleUpgradesComponent : Component
         _upgrades = vehicleUpgrades.Select(x => x.UpgradeId).ToList();
     }
 
-    public override Task Load()
+    public override Task LoadAsync()
     {
         RebuildUpgrades();
         return Task.CompletedTask;

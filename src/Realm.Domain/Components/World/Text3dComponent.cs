@@ -15,7 +15,7 @@ public sealed class Text3dComponent : Component
         _offset = offset;
     }
 
-    public override Task Load()
+    public override Task LoadAsync()
     {
         _text3dId = Text3dService.CreateText3d(Entity.Transform.Position + _offset ?? Vector3.Zero, _text);
         return Task.CompletedTask;

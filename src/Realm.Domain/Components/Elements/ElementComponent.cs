@@ -34,9 +34,8 @@ public abstract class ElementComponent : Component
         HandleDestroyed(Entity);
     }
 
-    public override Task Load()
+    public override void Load()
     {
-        base.Load();
         if(Entity.TryGetComponent(out PlayerElementComponent playerElementComponent))
         {
             Player = playerElementComponent.Player;
@@ -49,7 +48,6 @@ public abstract class ElementComponent : Component
             _rpgServer.AssociateElement(new ElementHandle(Element));
             Entity.Destroyed += HandleDestroyed;
         }
-        return Task.CompletedTask;
     }
 
     public void AddFocusable()

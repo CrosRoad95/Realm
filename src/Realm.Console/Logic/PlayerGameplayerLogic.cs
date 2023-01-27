@@ -1,4 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using Realm.Console.Components.Players;
+using Realm.Domain.Components.Object;
 
 namespace Realm.Console.Logic;
 
@@ -16,13 +18,23 @@ internal sealed class PlayerGameplayLogic
         _ecs.EntityCreated += HandleEntityCreated;
     }
 
-    private async void HandleEntityCreated(Entity entity)
+    private void HandleEntityCreated(Entity entity)
     {
         if (entity.Tag != Entity.PlayerTag)
             return;
 
-        entity.GetRequiredComponent<PlayerElementComponent>().FocusedEntityChanged += HandleFocusedEntityChanged;
+        var playerElementComponent =  entity.GetRequiredComponent<PlayerElementComponent>();
+        playerElementComponent.FocusedEntityChanged += HandleFocusedEntityChanged;
+        playerElementComponent.SetBind("x", HandleInteract);
+    }
 
+    private Task HandleInteract(Entity entity)
+    {
+        if(entity.TryGetComponent(out CurrentInteractEntityComponent currentInteractEntityComponent))
+        {
+            ;
+        }
+        return Task.CompletedTask;
     }
 
     private void HandleFocusedEntityChanged(Entity playerEntity, Entity? entity)
@@ -48,13 +60,16 @@ internal sealed class PlayerGameplayLogic
                     };
                 }
             }
+            else if (entity.TryGetComponent(out LiftableWorldObjectComponent liftableWorldObjectComponent))
+            {
+                playerEntity.TryDestroyComponent<CurrentInteractEntityComponent>();
+                playerEntity.AddComponent(new CurrentInteractEntityComponent(entity));
+            }
         }
         else
         {
-            if (playerEntity.TryDestroyComponent<BuyVehicleGuiComponent>())
-            {
-
-            }
+            playerEntity.TryDestroyComponent<CurrentInteractEntityComponent>();
+            playerEntity.TryDestroyComponent<BuyVehicleGuiComponent>();
         }
     }
 }

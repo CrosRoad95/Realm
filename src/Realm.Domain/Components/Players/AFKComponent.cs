@@ -13,7 +13,7 @@ public class AFKComponent : Component
     {
     }
 
-    public override Task Load()
+    public override Task LoadAsync()
     {
         AFKService.PlayerAFKStarted += HandlePlayerAFKStarted;
         AFKService.PlayerAFKSStopped += HandlePlayerAFKSStopped;

@@ -46,6 +46,8 @@ public class Entity : IDisposable
     {
         ThrowIfDisposed();
 
+        component.Entity = this;
+
         Action<Type, object> inject = default!;
         inject = (Type type, object obj) =>
         {
@@ -88,9 +90,9 @@ public class Entity : IDisposable
             throw new Exception("Component already attached to other entity");
         }
         InjectProperties(component);
-        component.Entity = this;
         InternalAddComponent(component);
-        Task.Run(component.Load);
+        component.Load();
+        Task.Run(component.LoadAsync);
         ComponentAdded?.Invoke(component);
         return component;
     }
@@ -105,7 +107,8 @@ public class Entity : IDisposable
         InjectProperties(component);
         component.Entity = this;
         InternalAddComponent(component);
-        await component.Load();
+        component.Load();
+        await component.LoadAsync();
         ComponentAdded?.Invoke(component);
         return component;
     }

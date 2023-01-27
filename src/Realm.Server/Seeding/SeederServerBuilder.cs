@@ -62,8 +62,9 @@ internal sealed class SeederServerBuilder
         {
             var blipEntity = CreateEntity(pair.Key, Entity.PickupTag, entity =>
             {
-                entity.AddComponent(new PickupElementComponent(new Pickup(Vector3.Zero, pair.Value.Model)));
                 entity.Transform.Position = pair.Value.Position;
+
+                entity.AddComponent(new PickupElementComponent(new Pickup(Vector3.Zero, pair.Value.Model)));
                 if(pair.Value.Text3d != null)
                 {
                     entity.AddComponent(new Text3dComponent(pair.Value.Text3d, new Vector3(0, 0, 0.75f)));

@@ -54,16 +54,14 @@ public class PickupElementComponent : ElementComponent
         _pickup.CollisionShape.Destroy();
     }
 
-    public override Task Load()
+    public override void Load()
     {
-        Entity.Transform.Bind(_pickup);
-        _pickup.CollisionShape.Position = _pickup.Position;
-        _rpgServer.AssociateElement(new ElementHandle(_pickup));
-        _rpgServer.AssociateElement(new ElementHandle(_pickup.CollisionShape));
         Entity.Destroyed += HandleDestroyed;
+        _pickup.CollisionShape.Position = _pickup.Position;
+        _rpgServer.AssociateElement(new ElementHandle(_pickup.CollisionShape));
         _pickup.CollisionShape.ElementEntered += HandleElementEntered;
         _pickup.CollisionShape.ElementLeft += HandleElementLeft;
-        return Task.CompletedTask;
+        base.Load();
     }
 
 }

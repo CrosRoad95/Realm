@@ -26,12 +26,13 @@ internal class EntityFactory : IEntityFactory
         return _ecs.CreateEntity(id ?? $"vehicle {Guid.NewGuid()}", Entity.VehicleTag, entity =>
         {
             var vehicle = new SlipeServer.Server.Elements.Vehicle(model, position);
-            var vehicleElementComponent = entity.AddComponent(new VehicleElementComponent(vehicle));
 
             entity.Transform.Position = position;
             entity.Transform.Rotation = rotation;
             entity.Transform.Interior = interior;
             entity.Transform.Dimension = dimension;
+
+            var vehicleElementComponent = entity.AddComponent(new VehicleElementComponent(vehicle));
 
             entityBuilder?.Invoke(entity);
         });
@@ -46,12 +47,13 @@ internal class EntityFactory : IEntityFactory
 
             entityBuilder?.Invoke(entity);
         });
-        vehicleEntity.AddComponent(new PrivateVehicleComponent(await _vehicleRepository.CreateNewVehicle(model)));
 
         vehicleEntity.Transform.Position = position;
         vehicleEntity.Transform.Rotation = rotation;
         vehicleEntity.Transform.Interior = interior;
         vehicleEntity.Transform.Dimension = dimension;
+
+        vehicleEntity.AddComponent(new PrivateVehicleComponent(await _vehicleRepository.CreateNewVehicle(model)));
 
         return vehicleEntity;
     }
@@ -62,11 +64,12 @@ internal class EntityFactory : IEntityFactory
         {
             var marker = new Marker(new Vector3(0,0,1000), markerType);
             marker.Color = System.Drawing.Color.White;
-            var markerElementComponent = entity.AddComponent(new MarkerElementComponent(marker));
 
             entity.Transform.Position = position;
             entity.Transform.Interior = interior;
             entity.Transform.Dimension = dimension;
+
+            var markerElementComponent = entity.AddComponent(new MarkerElementComponent(marker));
 
             entityBuilder?.Invoke(entity);
         });
@@ -77,11 +80,12 @@ internal class EntityFactory : IEntityFactory
         return _ecs.CreateEntity(id ?? $"collision sphere {Guid.NewGuid()}", Entity.CollisionShape, entity =>
         {
             var collisionSphere = new CollisionSphere(new Vector3(0,0,1000), radius);
-            var markerElementComponent = entity.AddComponent(new CollisionSphereElementComponent(collisionSphere));
 
             entity.Transform.Position = position;
             entity.Transform.Interior = interior;
             entity.Transform.Dimension = dimension;
+
+            var markerElementComponent = entity.AddComponent(new CollisionSphereElementComponent(collisionSphere));
 
             entityBuilder?.Invoke(entity);
         });
@@ -93,6 +97,9 @@ internal class EntityFactory : IEntityFactory
             throw new ArgumentException("Entity must be a player entity");
 
         var blip = new Blip(position, blipIcon, 250);
+
+        entity.Transform.Position = position;
+
         var blipElementComponent = entity.AddComponent(new BlipElementComponent(blip));
         return blipElementComponent;
     }
@@ -103,6 +110,9 @@ internal class EntityFactory : IEntityFactory
             throw new ArgumentException("Entity must be a player entity");
 
         var collisionSphere = new CollisionSphere(position, radius);
+
+        entity.Transform.Position = position;
+
         var collisionSphereElementComponent = entity.AddComponent(new CollisionSphereElementComponent(collisionSphere));
         return collisionSphereElementComponent;
     }
@@ -114,6 +124,9 @@ internal class EntityFactory : IEntityFactory
 
         var marker = new Marker(position, markerType);
         marker.Color = color ?? System.Drawing.Color.White;
+
+        entity.Transform.Position = position;
+
         var markerElementComponent = entity.AddComponent(new MarkerElementComponent(marker));
         return markerElementComponent;
     }
@@ -123,12 +136,13 @@ internal class EntityFactory : IEntityFactory
         return _ecs.CreateEntity(id ?? $"object {Guid.NewGuid()}", Entity.WorldObject, entity =>
         {
             var worldObject = new WorldObject(model, position);
-            var markerElementComponent = entity.AddComponent(new WorldObjectComponent(worldObject));
 
             entity.Transform.Position = position;
             entity.Transform.Rotation = rotation;
             entity.Transform.Interior = interior;
             entity.Transform.Dimension = dimension;
+
+            var markerElementComponent = entity.AddComponent(new WorldObjectComponent(worldObject));
 
             entityBuilder?.Invoke(entity);
         });

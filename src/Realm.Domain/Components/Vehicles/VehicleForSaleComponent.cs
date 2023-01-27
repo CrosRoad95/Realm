@@ -12,13 +12,13 @@ public class VehicleForSaleComponent : Component
         Price = price;
     }
 
-    public override Task Load()
+    public override Task LoadAsync()
     {
         var vehicleElementComponent = Entity.GetRequiredComponent<VehicleElementComponent>();
         vehicleElementComponent.IsFrozen = true;
         vehicleElementComponent.IsLocked = true;
         Entity.GetRequiredComponent<ElementComponent>().AddFocusable();
-        return base.Load();
+        return base.LoadAsync();
     }
 
     public override void Dispose()

@@ -92,7 +92,7 @@ public class VehicleFuelComponent : Component
         _fuelType = fuelType;
     }
 
-    public override Task Load()
+    public override Task LoadAsync()
     {
         var vehicle = Entity.GetRequiredComponent<VehicleElementComponent>().Vehicle;
         vehicle.PositionChanged += HandlePositionChanged;

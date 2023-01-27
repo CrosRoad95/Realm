@@ -1,4 +1,5 @@
-﻿using Realm.Domain.Interfaces;
+﻿using Realm.Domain.Components.Object;
+using Realm.Domain.Interfaces;
 using Realm.Domain.Registries;
 
 namespace Realm.Console.Logic;
@@ -288,6 +289,13 @@ internal sealed class CommandsLogic
             {
                 entity.AddComponent(new VehicleForSaleComponent(200));
             });
+            return Task.CompletedTask;
+        });
+
+        _commandService.AddCommandHandler("spawnbox", (entity, args) =>
+        {
+            var objectEntity = _entityFactory.CreateObject(SlipeServer.Server.Enums.ObjectModel.Gunbox, entity.Transform.Position + new Vector3(4, 0, 0), Vector3.Zero);
+            objectEntity.AddComponent(new LiftableWorldObjectComponent());
             return Task.CompletedTask;
         });
     }

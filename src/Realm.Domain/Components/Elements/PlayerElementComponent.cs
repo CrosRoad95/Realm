@@ -55,12 +55,11 @@ public sealed class PlayerElementComponent : ElementComponent
         _player = player;
     }
 
-    public override Task Load()
+    public override void Load()
     {
         Entity.Transform.Bind(_player);
         _player.BindExecuted += HandleBindExecuted;
         _player.Controls.FireEnabled = false;
-        return Task.CompletedTask;
     }
 
     public bool AddEnableFightFlag(string flag)
@@ -214,5 +213,10 @@ public sealed class PlayerElementComponent : ElementComponent
     public void SetRenderingEnabled(bool enabled)
     {
         Text3dService.SetRenderingEnabled(_player, enabled);
+    }
+
+    public async Task DoAnimation()
+    {
+
     }
 }

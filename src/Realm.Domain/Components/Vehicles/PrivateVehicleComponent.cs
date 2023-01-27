@@ -17,7 +17,7 @@ public class PrivateVehicleComponent : Component
         _vehicleData = vehicleData;
     }
 
-    public override Task Load()
+    public override Task LoadAsync()
     {
         var vehicleElementComponent = Entity.GetRequiredComponent<VehicleElementComponent>();
         var vehicle = vehicleElementComponent.Vehicle;

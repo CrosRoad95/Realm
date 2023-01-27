@@ -27,13 +27,13 @@ public sealed class InventoryGuiComponent : StatefulGuiComponent<InventoryGuiCom
 
     }
 
-    public override Task Load()
+    public override Task LoadAsync()
     {
         var inventory = Entity.GetRequiredComponent<InventoryComponent>();
         inventory.ItemAdded += HandleItemAdded;
         inventory.ItemRemoved += HandleItemRemoved;
         inventory.ItemChanged += HandleItemChanged;
-        return base.Load();
+        return base.LoadAsync();
     }
 
     public override void Dispose()
