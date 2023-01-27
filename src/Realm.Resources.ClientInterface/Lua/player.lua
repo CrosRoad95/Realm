@@ -12,7 +12,7 @@ local function setFocusedElement(newElement)
 		return;
 	end
 	focusedElement = newElement;
-	
+
 	triggerServerEventWithId("internalChangeFocusedElement", focusedElement)
 end
 
@@ -21,10 +21,12 @@ local function findNearestElementToPoint(elements, x,y,z)
 	local nearest = 9999999
 	local dis = 0;
 	for i,v in ipairs(elements)do
-		dis = getDistanceBetweenPoints3D(x,y,z, getElementPosition(v))
-		if(nearest > dis)then
-			nearestElement = v;
-			dis = nearest;
+		if(getElementData(v, "_focusable"))then
+			dis = getDistanceBetweenPoints3D(x,y,z, getElementPosition(v))
+			if(nearest > dis)then
+				nearestElement = v;
+				dis = nearest;
+			end
 		end
 	end
 	return nearestElement;

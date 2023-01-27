@@ -17,6 +17,13 @@ public class VehicleForSaleComponent : Component
         var vehicleElementComponent = Entity.GetRequiredComponent<VehicleElementComponent>();
         vehicleElementComponent.IsFrozen = true;
         vehicleElementComponent.IsLocked = true;
+        Entity.GetRequiredComponent<ElementComponent>().AddFocusable();
         return base.Load();
+    }
+
+    public override void Dispose()
+    {
+        Entity.GetRequiredComponent<ElementComponent>().RemoveFocusable();
+        base.Dispose();
     }
 }

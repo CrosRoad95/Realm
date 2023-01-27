@@ -9,6 +9,7 @@ public abstract class ElementComponent : Component
 
     abstract internal Element Element { get; }
     private Player? Player { get; set; }
+    private byte _focusableCounter;
 
     protected ElementComponent()
     {
@@ -49,5 +50,19 @@ public abstract class ElementComponent : Component
             Entity.Destroyed += HandleDestroyed;
         }
         return Task.CompletedTask;
+    }
+
+    public void AddFocusable()
+    {
+        _focusableCounter++;
+        if (_focusableCounter > 0)
+            Element.SetData("_focusable", true, DataSyncType.Broadcast);
+    }
+
+    public void RemoveFocusable()
+    {
+        _focusableCounter--;
+        if(_focusableCounter == 0)
+            Element.SetData("_focusable", false, DataSyncType.Broadcast);
     }
 }
