@@ -22,7 +22,7 @@ public abstract class CollisionShapeElementComponent : ElementComponent
 
     public void CheckCollisionWith(Entity entity)
     {
-        if(entity.TryGetComponent(out ElementComponent elementComponent))
+        if (entity.TryGetComponent(out ElementComponent elementComponent))
         {
             _collisionShape.CheckElementWithin(elementComponent.Element);
         }
@@ -38,8 +38,9 @@ public abstract class CollisionShapeElementComponent : ElementComponent
         if (EntityEntered != null)
         {
             var entity = EntityByElement.TryGetByElement(element);
-            if (entity != null && _entityRules.All(x => x.Check(entity)))
-                EntityEntered(entity);
+            if (entity != null && (entity.Tag == Entity.PlayerTag || entity.Tag == Entity.VehicleTag))
+                if (_entityRules.All(x => x.Check(entity)))
+                    EntityEntered(entity);
         }
     }
 
@@ -48,8 +49,9 @@ public abstract class CollisionShapeElementComponent : ElementComponent
         if (EntityLeft != null)
         {
             var entity = EntityByElement.TryGetByElement(element);
-            if (entity != null && _entityRules.All(x => x.Check(entity)))
-                EntityLeft(entity);
+            if (entity != null && (entity.Tag == Entity.PlayerTag || entity.Tag == Entity.VehicleTag))
+                if (_entityRules.All(x => x.Check(entity)))
+                    EntityLeft(entity);
         }
     }
 }

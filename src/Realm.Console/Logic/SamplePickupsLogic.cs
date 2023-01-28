@@ -23,6 +23,9 @@ internal class SamplePickupsLogic
             var pickupElementComponent = entity.GetRequiredComponent<PickupElementComponent>();
             pickupElementComponent.EntityEntered = async entity =>
             {
+                if (entity.Tag != Entity.PlayerTag)
+                    return;
+
                 var sessionComponent = entity.GetComponent<SessionComponent>();
                 if (sessionComponent != null && sessionComponent is not FractionSessionComponent)
                     return;
@@ -49,6 +52,9 @@ internal class SamplePickupsLogic
             var pickupElementComponent = entity.GetRequiredComponent<PickupElementComponent>();
             pickupElementComponent.EntityEntered = async entity =>
             {
+                if (entity.Tag != Entity.PlayerTag)
+                    return;
+
                 var sessionComponent = entity.GetComponent<SessionComponent>();
                 if(sessionComponent != null && sessionComponent is not JobSessionComponent)
                     return;

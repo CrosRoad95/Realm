@@ -28,7 +28,7 @@ public class PickupElementComponent : ElementComponent
         if(EntityEntered != null)
         {
             var entity = EntityByElement.TryGetByElement(element);
-            if(entity != null)
+            if(entity != null && (entity.Tag == Entity.PlayerTag || entity.Tag == Entity.VehicleTag))
             {
                 if(_entityRules.All(x => x.Check(entity)))
                     EntityEntered(entity);
@@ -41,7 +41,7 @@ public class PickupElementComponent : ElementComponent
         if(EntityLeft != null)
         {
             var entity = EntityByElement.TryGetByElement(element);
-            if (entity != null)
+            if (entity != null && (entity.Tag == Entity.PlayerTag || entity.Tag == Entity.VehicleTag))
                 if (_entityRules.All(x => x.Check(entity)))
                     EntityLeft(entity);
         }

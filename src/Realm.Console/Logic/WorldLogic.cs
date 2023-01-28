@@ -35,7 +35,7 @@ internal class WorldLogic
         collisionSphereElementComponent.AddRule(new MustBePlayerOnFootOnlyRule());
         collisionSphereElementComponent.EntityEntered = enteredEntity =>
         {
-            if (enteredEntity.GetRequiredComponent<DiscoveriesComponent>().TryDiscover(discoveryName))
+            if (enteredEntity.Tag == Entity.PlayerTag && enteredEntity.GetRequiredComponent<DiscoveriesComponent>().TryDiscover(discoveryName))
             {
                 callback(enteredEntity, discoveryName);
             }
