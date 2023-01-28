@@ -10,8 +10,9 @@ public abstract class ElementComponent : Component
     abstract internal Element Element { get; }
     private Player? Player { get; set; }
     private byte _focusableCounter;
+    private bool _isPerPlayer = false;
 
-    public bool AreCollisionsEnabled { get => Element.AreCollisionsEnabled; set => Element.AreCollisionsEnabled = value; }
+    public bool AreCollisionsEnabled { get => Element.IsCallPropagationEnabled; set => Element.IsCallPropagationEnabled = value; }
 
     protected ElementComponent()
     {
@@ -37,6 +38,7 @@ public abstract class ElementComponent : Component
             Player = playerElementComponent.Player;
             Element.Id = playerElementComponent.MapIdGenerator.GetId();
             Element.CreateFor(Player);
+            _isPerPlayer = true;
         }
         else
         {
@@ -50,7 +52,8 @@ public abstract class ElementComponent : Component
 
     private void HandleTransformPositionChanged(Transform newTransform)
     {
-        Element.Position = newTransform.Position;
+        if(!_isPerPlayer)
+            Element.Position = newTransform.Position;
     }
 
     public void AddFocusable()

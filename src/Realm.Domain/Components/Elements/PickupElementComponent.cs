@@ -57,11 +57,11 @@ public class PickupElementComponent : ElementComponent
     public override void Load()
     {
         Entity.Destroyed += HandleDestroyed;
-        _pickup.CollisionShape.Position = _pickup.Position;
         _rpgServer.AssociateElement(new ElementHandle(_pickup.CollisionShape));
         _pickup.CollisionShape.ElementEntered += HandleElementEntered;
         _pickup.CollisionShape.ElementLeft += HandleElementLeft;
         base.Load();
+        _pickup.CollisionShape.Position = _pickup.Position;
     }
 
 }

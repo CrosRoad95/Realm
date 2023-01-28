@@ -10,6 +10,7 @@ public abstract class Objective : IDisposable
 
     public event Action<Objective>? Completed;
     public event Action<Objective>? Incompleted;
+    public event Action<Objective>? Disposed;
 
     public Entity Entity { get => _entity ?? throw new InvalidOperationException(); internal set => _entity = value; }
 
@@ -56,5 +57,7 @@ public abstract class Objective : IDisposable
             Incomplete();
 
         _disposed = true;
+
+        Disposed?.Invoke(this);
     }
 }

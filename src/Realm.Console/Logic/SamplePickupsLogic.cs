@@ -1,4 +1,5 @@
-﻿using Realm.Domain.Interfaces;
+﻿using Realm.Domain.Components.Object;
+using Realm.Domain.Interfaces;
 using Realm.Domain.Rules;
 using Realm.Server.Extensions;
 
@@ -80,6 +81,17 @@ internal class SamplePickupsLogic
                         e.Entity.GetRequiredComponent<JobStatisticsComponent>().AddPoints(1, 1);
                         e.Entity.GetRequiredComponent<PlayerElementComponent>().SendChatMessage("kk");
                     };
+
+                    var objectEntity = _entityFactory.CreateObject(SlipeServer.Server.Enums.ObjectModel.Gunbox, new Vector3(379.00f, -102.77f, 1.24f), Vector3.Zero);
+                    objectEntity.AddComponent(new LiftableWorldObjectComponent());
+                    var objective2 = jobSessionComponent.AddObjective(new TransportEntityObjective(objectEntity, new Vector3(379.00f, -112.77f, 2.0f)));
+                    objective2.Completed += e =>
+                    {
+                        _ecs.Destroy(objectEntity);
+                        e.Entity.GetRequiredComponent<JobStatisticsComponent>().AddPoints(1, 2);
+                        e.Entity.GetRequiredComponent<PlayerElementComponent>().SendChatMessage("kk 2");
+                    };
+
                 }
             };
         }

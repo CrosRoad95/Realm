@@ -8,6 +8,7 @@ public abstract class JobSessionComponent : SessionComponent
     private IEntityFactory EntityFactory { get; set; } = default!;
 
     private readonly List<Objective> _objectives = new();
+    private readonly object _objectivesLock = new object();
     public IEnumerable<Objective> Objectives => _objectives;
     public JobSessionComponent()
     {
@@ -16,32 +17,42 @@ public abstract class JobSessionComponent : SessionComponent
 
     public void RemoveObjective(Objective objective)
     {
-        if (!objective.IsFulfilled)
-            objective.Incomplete();
-        objective.Dispose();
-        _objectives.Remove(objective);
+        lock(_objectivesLock)
+            _objectives.Remove(objective);
     }
 
     public TObjective AddObjective<TObjective>(TObjective objective) where TObjective : Objective
     {
         objective.Entity = Entity;
-        _objectives.Add(objective);
+        lock(_objectivesLock)
+            _objectives.Add(objective);
         objective.Load(EntityFactory, Entity);
         objective.Completed += HandleCompleted;
+        objective.Disposed += HandleDisposed;
         return objective;
+    }
+
+    private void HandleDisposed(Objective objective)
+    {
+        RemoveObjective(objective);
     }
 
     private void HandleCompleted(Objective objective)
     {
-        RemoveObjective(objective);
+        if (!objective.IsFulfilled)
+            objective.Incomplete();
+        objective.Dispose();
     }
 
     public override void Dispose()
     {
         base.Dispose();
-        while (_objectives.Count > 0)
+        lock(_objectivesLock)
         {
-            RemoveObjective(_objectives.Last());
+            while (_objectives.Count > 0)
+            {
+                RemoveObjective(_objectives.Last());
+            }
         }
     }
 }

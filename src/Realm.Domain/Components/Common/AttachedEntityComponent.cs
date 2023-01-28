@@ -15,24 +15,24 @@ public class AttachedEntityComponent : Component
 
     public override void Load()
     {
-        Entity.GetRequiredComponent<ElementComponent>().AreCollisionsEnabled = false;
+        AttachedEntity.GetRequiredComponent<ElementComponent>().AreCollisionsEnabled = false;
         Entity.Transform.PositionChanged += Transform_PositionChanged;
         Update();
     }
 
     private void Transform_PositionChanged(Transform transform)
     {
-        AttachedEntity.Transform.Position = transform.Position + Entity.Transform.Forward * Offset;
+        Update();
     }
 
     private void Update()
     {
-        AttachedEntity.Transform.Position = Entity.Transform.Position + Offset;
+        AttachedEntity.Transform.Position = Entity.Transform.Position + Entity.Transform.Forward * Offset;
     }
 
     public override void Dispose()
     {
         Entity.Transform.PositionChanged -= Transform_PositionChanged;
-        Entity.GetRequiredComponent<ElementComponent>().AreCollisionsEnabled = true;
+        AttachedEntity.GetRequiredComponent<ElementComponent>().AreCollisionsEnabled = true;
     }
 }

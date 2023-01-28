@@ -111,9 +111,9 @@ internal class EntityFactory : IEntityFactory
 
         var collisionSphere = new CollisionSphere(position, radius);
 
-        entity.Transform.Position = position;
-
         var collisionSphereElementComponent = entity.AddComponent(new CollisionSphereElementComponent(collisionSphere));
+
+        entity.Transform.Position = position;
         return collisionSphereElementComponent;
     }
 

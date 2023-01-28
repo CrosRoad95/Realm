@@ -58,7 +58,7 @@ public sealed class Transform
         }
     }
 
-    public Vector3 Forward => new(MathF.Cos((_rotation.Z - 90.0f) * (float)(Math.PI / 180)), MathF.Sin((_rotation.Z - 90.0f) * (float)(Math.PI / 180)), 0);
+    public Vector3 Forward => new(MathF.Sin(-(_rotation.Z) * (float)(Math.PI / 180)), MathF.Cos(-(_rotation.Z) * (float)(Math.PI / 180)), 0);
 
     public event Action<Transform>? PositionChanged;
     public event Action<Transform>? RotationChanged;

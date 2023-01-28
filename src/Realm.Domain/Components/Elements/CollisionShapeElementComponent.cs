@@ -38,7 +38,7 @@ public abstract class CollisionShapeElementComponent : ElementComponent
         if (EntityEntered != null)
         {
             var entity = EntityByElement.TryGetByElement(element);
-            if (entity != null && (entity.Tag == Entity.PlayerTag || entity.Tag == Entity.VehicleTag))
+            if (entity != null)
                 if (_entityRules.All(x => x.Check(entity)))
                     EntityEntered(entity);
         }
@@ -49,7 +49,7 @@ public abstract class CollisionShapeElementComponent : ElementComponent
         if (EntityLeft != null)
         {
             var entity = EntityByElement.TryGetByElement(element);
-            if (entity != null && (entity.Tag == Entity.PlayerTag || entity.Tag == Entity.VehicleTag))
+            if (entity != null)
                 if (_entityRules.All(x => x.Check(entity)))
                     EntityLeft(entity);
         }
