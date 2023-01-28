@@ -60,13 +60,13 @@ internal class SamplePickupsLogic
                 if(sessionComponent != null && sessionComponent is not JobSessionComponent)
                     return;
 
-                int completedObjectives = 0;
                 var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();
                 if (entity.HasComponent<JobSessionComponent>())
                 {
                     var jobSessionComponent = entity.GetRequiredComponent<JobSessionComponent>();
                     jobSessionComponent.End();
-                    playerElementComponent.SendChatMessage($"Job ended in: {jobSessionComponent.Elapsed}, completed objectives: {completedObjectives}");
+                    var elapsed = jobSessionComponent.Elapsed;
+                    playerElementComponent.SendChatMessage($"Job ended in: {elapsed.Hours:X2}:{elapsed.Minutes:X2}:{elapsed.Seconds:X2}, completed objectives: {jobSessionComponent.CompletedObjectives}");
                     entity.GetRequiredComponent<JobStatisticsComponent>().AddTimePlayed(1, (ulong)jobSessionComponent.Elapsed.Seconds);
                     entity.DestroyComponent(jobSessionComponent);
                 }
@@ -81,7 +81,6 @@ internal class SamplePickupsLogic
                         var objective = jobSessionComponent.AddObjective(new MarkerEnterObjective(new Vector3(383.6543f, -82.01953f, 3.914598f)));
                         objective.Completed += e =>
                         {
-                            completedObjectives++;
                             e.Entity.GetRequiredComponent<JobStatisticsComponent>().AddPoints(1, 1);
                             e.Entity.GetRequiredComponent<PlayerElementComponent>().SendChatMessage($"Entered marker, objectives left: {jobSessionComponent.Objectives.Count()}");
                         };
@@ -91,7 +90,6 @@ internal class SamplePickupsLogic
                         var objective2 = jobSessionComponent.AddObjective(new TransportEntityObjective(objectEntity, new Vector3(379.00f, -112.77f, 2.0f)));
                         objective2.Completed += e =>
                         {
-                            completedObjectives++;
                             e.Entity.GetRequiredComponent<JobStatisticsComponent>().AddPoints(1, 2);
                             e.Entity.GetRequiredComponent<PlayerElementComponent>().SendChatMessage($"Box delivered, objectives left: {jobSessionComponent.Objectives.Count()}");
                         };

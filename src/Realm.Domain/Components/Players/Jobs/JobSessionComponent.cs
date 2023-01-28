@@ -9,10 +9,13 @@ public abstract class JobSessionComponent : SessionComponent
     private IEntityFactory EntityFactory { get; set; } = default!;
 
     private readonly List<Objective> _objectives = new();
-    private readonly object _objectivesLock = new object();
+    private readonly object _objectivesLock = new();
     private bool _disposing = false;
+    private int _completedObjectives = 0;
+
     public IEnumerable<Objective> Objectives => _objectives;
     public event Action<JobSessionComponent>? CompletedAllObjectives;
+    public int CompletedObjectives => _completedObjectives;
 
     public JobSessionComponent()
     {
@@ -54,6 +57,7 @@ public abstract class JobSessionComponent : SessionComponent
         if (!objective.IsFulfilled)
             objective.Incomplete();
         objective.Dispose();
+        _completedObjectives++;
     }
 
     public override void Dispose()
