@@ -80,6 +80,8 @@ public sealed class InventoryGuiComponent : StatefulGuiComponent<InventoryGuiCom
 
     protected override void PreGuiOpen(InventoryState state)
     {
+        ThrowIfDisposed();
+
         var inventory = Entity.GetRequiredComponent<InventoryComponent>();
         state.Size = inventory.Size;
         state.Number = inventory.Number;
@@ -89,11 +91,13 @@ public sealed class InventoryGuiComponent : StatefulGuiComponent<InventoryGuiCom
 
     protected override async Task HandleForm(IFormContext formContext)
     {
+        ThrowIfDisposed();
     }
 
     protected override async Task HandleAction(IActionContext actionContext)
     {
-        switch(actionContext.ActionName)
+        ThrowIfDisposed();
+        switch (actionContext.ActionName)
         {
             case "doItemAction":
                 var useItemData = actionContext.GetData<UseItemData>();

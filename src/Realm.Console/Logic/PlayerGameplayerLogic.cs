@@ -1,5 +1,4 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using Realm.Console.Components.Players;
 using Realm.Domain.Components.Object;
 
 namespace Realm.Console.Logic;
@@ -28,11 +27,23 @@ internal sealed class PlayerGameplayLogic
         playerElementComponent.SetBind("x", HandleInteract);
     }
 
-    private Task HandleInteract(Entity entity)
+    private Task HandleInteract(Entity playerEntity)
     {
-        if(entity.TryGetComponent(out CurrentInteractEntityComponent currentInteractEntityComponent))
+        if(playerEntity.TryGetComponent(out AttachedEntityComponent attachedEntityComponent))
         {
-            ;
+            if(attachedEntityComponent.AttachedEntity.GetRequiredComponent<LiftableWorldObjectComponent>().TryDrop())
+                playerEntity.DestroyComponent(attachedEntityComponent);
+        }
+        else if(playerEntity.TryGetComponent(out CurrentInteractEntityComponent currentInteractEntityComponent))
+        {
+            var currentInteractEntity = currentInteractEntityComponent.CurrentInteractEntity;
+            if (currentInteractEntity.TryGetComponent(out LiftableWorldObjectComponent liftableWorldObjectComponent))
+            {
+                if (liftableWorldObjectComponent.TryLift(playerEntity))
+                {
+                    playerEntity.AddComponent(new AttachedEntityComponent(currentInteractEntity, new Vector3(1f,0,0)));
+                }
+            }
         }
         return Task.CompletedTask;
     }

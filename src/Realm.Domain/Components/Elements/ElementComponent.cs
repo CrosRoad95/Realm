@@ -11,6 +11,8 @@ public abstract class ElementComponent : Component
     private Player? Player { get; set; }
     private byte _focusableCounter;
 
+    public bool AreCollisionsEnabled { get => Element.AreCollisionsEnabled; set => Element.AreCollisionsEnabled = value; }
+
     protected ElementComponent()
     {
     }
@@ -28,12 +30,6 @@ public abstract class ElementComponent : Component
         }
     }
 
-    public override void Dispose()
-    {
-        base.Dispose();
-        HandleDestroyed(Entity);
-    }
-
     public override void Load()
     {
         if(Entity.TryGetComponent(out PlayerElementComponent playerElementComponent))
@@ -48,6 +44,13 @@ public abstract class ElementComponent : Component
             _rpgServer.AssociateElement(new ElementHandle(Element));
             Entity.Destroyed += HandleDestroyed;
         }
+
+        Entity.Transform.PositionChanged += HandleTransformPositionChanged;
+    }
+
+    private void HandleTransformPositionChanged(Transform newTransform)
+    {
+        Element.Position = newTransform.Position;
     }
 
     public void AddFocusable()
@@ -63,4 +66,12 @@ public abstract class ElementComponent : Component
         if(_focusableCounter == 0)
             Element.SetData("_focusable", false, DataSyncType.Broadcast);
     }
+
+    public override void Dispose()
+    {
+        base.Dispose();
+        HandleDestroyed(Entity);
+        Entity.Transform.PositionChanged -= HandleTransformPositionChanged;
+    }
+
 }

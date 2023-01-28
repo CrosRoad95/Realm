@@ -1,6 +1,6 @@
-﻿namespace Realm.Console.Components.Players;
+﻿namespace Realm.Domain.Components.Players;
 
-internal class CurrentInteractEntityComponent : Component
+public class CurrentInteractEntityComponent : Component
 {
     public Entity CurrentInteractEntity { get; }
     public CurrentInteractEntityComponent(Entity entity)
