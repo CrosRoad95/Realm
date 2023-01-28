@@ -9,6 +9,8 @@ public class MarkerEnterObjective : Objective
     private Entity _playerEntity = default!;
     private System.Timers.Timer _checkEnteredTimer = default!;
 
+    public override Vector3 Position => _position;
+
     public MarkerEnterObjective(Vector3 position)
     {
         _position = position;

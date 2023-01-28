@@ -14,6 +14,8 @@ public abstract class Objective : IDisposable
 
     public Entity Entity { get => _entity ?? throw new InvalidOperationException(); internal set => _entity = value; }
 
+    private BlipElementComponent? _blipElementComponent;
+    public abstract Vector3 Position { get; }
     public abstract void Load(IEntityFactory entityFactory, Entity playerEntity);
 
     protected void Complete()
@@ -44,6 +46,14 @@ public abstract class Objective : IDisposable
         _isFulfilled = true;
     }
 
+    public void AddBlip(BlipIcon blipIcon,IEntityFactory entityFactory)
+    {
+        if (_blipElementComponent != null)
+            throw new InvalidOperationException();
+
+        _blipElementComponent = entityFactory.CreateBlipFor(Entity, blipIcon, Position);
+    }
+
     protected void ThrowIfDisposed()
     {
         if (_disposed)
@@ -53,6 +63,9 @@ public abstract class Objective : IDisposable
     public virtual void Dispose()
     {
         ThrowIfDisposed();
+        if (_blipElementComponent != null)
+            _blipElementComponent.Dispose();
+
         if (!_isFulfilled)
             Incomplete();
 

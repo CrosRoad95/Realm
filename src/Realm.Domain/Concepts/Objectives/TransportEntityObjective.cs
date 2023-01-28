@@ -12,6 +12,8 @@ public class TransportEntityObjective : Objective
     private Entity _playerEntity = default!;
     private System.Timers.Timer _checkEnteredTimer = default!;
 
+    public override Vector3 Position => _position;
+
     public TransportEntityObjective(Entity entity, Vector3 position)
     {
         _entity = entity;

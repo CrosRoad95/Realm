@@ -79,6 +79,7 @@ internal class SamplePickupsLogic
                     var createObjectives = () =>
                     {
                         var objective = jobSessionComponent.AddObjective(new MarkerEnterObjective(new Vector3(383.6543f, -82.01953f, 3.914598f)));
+                        objective.AddBlip(BlipIcon.North, _entityFactory);
                         objective.Completed += e =>
                         {
                             e.Entity.GetRequiredComponent<JobStatisticsComponent>().AddPoints(1, 1);
