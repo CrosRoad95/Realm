@@ -1,4 +1,5 @@
 ﻿using Realm.Domain.Concepts.Objectives;
+using System.Security.AccessControl;
 
 namespace Realm.Domain.Components.Players.Jobs;
 
@@ -9,7 +10,10 @@ public abstract class JobSessionComponent : SessionComponent
 
     private readonly List<Objective> _objectives = new();
     private readonly object _objectivesLock = new object();
+    private bool _disposing = false;
     public IEnumerable<Objective> Objectives => _objectives;
+    public event Action<JobSessionComponent>? CompletedAllObjectives;
+
     public JobSessionComponent()
     {
 
@@ -17,8 +21,16 @@ public abstract class JobSessionComponent : SessionComponent
 
     public void RemoveObjective(Objective objective)
     {
-        lock(_objectivesLock)
+        var empty = false;
+        lock (_objectivesLock)
+        {
             _objectives.Remove(objective);
+            if(!_disposing)
+                empty = !_objectives.Any();
+        }
+
+        if(empty && !_disposing)
+            CompletedAllObjectives?.Invoke(this);
     }
 
     public TObjective AddObjective<TObjective>(TObjective objective) where TObjective : Objective
@@ -46,12 +58,15 @@ public abstract class JobSessionComponent : SessionComponent
 
     public override void Dispose()
     {
+        _disposing = true;
         base.Dispose();
         lock(_objectivesLock)
         {
             while (_objectives.Count > 0)
             {
-                RemoveObjective(_objectives.Last());
+                var objective = _objectives.Last();
+                objective.Dispose();
+                RemoveObjective(objective);
             }
         }
     }
