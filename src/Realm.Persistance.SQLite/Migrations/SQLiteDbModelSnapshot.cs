@@ -15,7 +15,7 @@ namespace Realm.Persistance.SQLite.Migrations
         protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
-            modelBuilder.HasAnnotation("ProductVersion", "7.0.1");
+            modelBuilder.HasAnnotation("ProductVersion", "7.0.2");
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<System.Guid>", b =>
                 {
@@ -172,6 +172,58 @@ namespace Realm.Persistance.SQLite.Migrations
                     b.HasKey("UserId", "DiscoveryId");
 
                     b.ToTable("Discoveries", (string)null);
+                });
+
+            modelBuilder.Entity("Realm.Persistance.Data.Group", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<byte?>("Kind")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(128)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Shortcut")
+                        .HasMaxLength(8)
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Name")
+                        .IsUnique();
+
+                    b.HasIndex("Shortcut")
+                        .IsUnique();
+
+                    b.ToTable("Groups", (string)null);
+                });
+
+            modelBuilder.Entity("Realm.Persistance.Data.GroupMember", b =>
+                {
+                    b.Property<int>("GroupId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("Rank")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("RankName")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("GroupId", "UserId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("GroupMembers", (string)null);
                 });
 
             modelBuilder.Entity("Realm.Persistance.Data.Inventory", b =>
@@ -707,6 +759,25 @@ namespace Realm.Persistance.SQLite.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("Realm.Persistance.Data.GroupMember", b =>
+                {
+                    b.HasOne("Realm.Persistance.Data.Group", "Group")
+                        .WithMany("Members")
+                        .HasForeignKey("GroupId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Realm.Persistance.Data.User", "User")
+                        .WithMany("GroupMembers")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Group");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("Realm.Persistance.Data.Inventory", b =>
                 {
                     b.HasOne("Realm.Persistance.Data.User", "User")
@@ -812,6 +883,11 @@ namespace Realm.Persistance.SQLite.Migrations
                     b.Navigation("Vehicle");
                 });
 
+            modelBuilder.Entity("Realm.Persistance.Data.Group", b =>
+                {
+                    b.Navigation("Members");
+                });
+
             modelBuilder.Entity("Realm.Persistance.Data.Inventory", b =>
                 {
                     b.Navigation("InventoryItems");
@@ -824,6 +900,8 @@ namespace Realm.Persistance.SQLite.Migrations
                     b.Navigation("DailyVisits");
 
                     b.Navigation("Discoveries");
+
+                    b.Navigation("GroupMembers");
 
                     b.Navigation("Inventories");
 

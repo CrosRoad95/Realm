@@ -19,6 +19,8 @@ public abstract class Db<T> : IdentityDbContext<User, Role, Guid,
     public DbSet<JobUpgrade> JobUpgrades => Set<JobUpgrade>();
     public DbSet<Achievement> Achievements => Set<Achievement>();
     public DbSet<Discovery> Discoveries => Set<Discovery>();
+    public DbSet<Group> Groups => Set<Group>();
+    public DbSet<GroupMember> GroupMembers => Set<GroupMember>();
 
     public Db(DbContextOptions<T> options) : base(options)
     {
@@ -94,6 +96,13 @@ public abstract class Db<T> : IdentityDbContext<User, Role, Guid,
                 .HasMany(x => x.Discoveries)
                 .WithOne(x => x.User)
                 .HasForeignKey(x => x.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            entityBuilder
+                .HasMany(x => x.GroupMembers)
+                .WithOne(x => x.User)
+                .HasForeignKey(x => x.UserId)
+                .HasPrincipalKey(x => x.Id)
                 .OnDelete(DeleteBehavior.Cascade);
         });
 
@@ -328,6 +337,45 @@ public abstract class Db<T> : IdentityDbContext<User, Role, Guid,
 
             entityBuilder.Property(x => x.DiscoveryId)
                 .HasMaxLength(32);
+        });
+        
+        modelBuilder.Entity<Group>(entityBuilder =>
+        {
+            entityBuilder
+                .ToTable(nameof(Groups))
+                .HasKey(x => x.Id);
+
+            entityBuilder.HasIndex(x => x.Name).IsUnique();
+            entityBuilder.HasIndex(x => x.Shortcut).IsUnique();
+
+            entityBuilder.Property(x => x.Name)
+                .HasMaxLength(128);
+
+            entityBuilder.Property(x => x.Shortcut)
+                .HasMaxLength(8);
+
+            entityBuilder.HasMany(x => x.Members)
+                .WithOne(x => x.Group)
+                .HasForeignKey(x => x.GroupId)
+                .HasPrincipalKey(x => x.Id);
+        });
+        
+        modelBuilder.Entity<GroupMember>(entityBuilder =>
+        {
+            entityBuilder
+                .ToTable(nameof(GroupMembers))
+                .HasKey(x => new { x.GroupId, x.UserId });
+
+            entityBuilder.Property(x => x.RankName)
+                .HasMaxLength(128);
+
+            entityBuilder.Property(x => x.RankName)
+                .HasMaxLength(64);
+
+            entityBuilder.HasOne(x => x.Group)
+                .WithMany(x => x.Members)
+                .HasForeignKey(x => x.GroupId)
+                .HasPrincipalKey(x => x.Id);
         });
 
     }

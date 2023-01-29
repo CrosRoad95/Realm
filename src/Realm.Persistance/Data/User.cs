@@ -28,4 +28,5 @@ public sealed class User : IdentityUser<Guid>
     public ICollection<JobUpgrade> JobUpgrades { get; set; } = new List<JobUpgrade>();
     public ICollection<JobStatistics> JobStatistics { get; set; } = new List<JobStatistics>();
     public ICollection<Discovery> Discoveries { get; set; } = new List<Discovery>();
+    public ICollection<GroupMember> GroupMembers { get; set; } = new List<GroupMember>();
 }

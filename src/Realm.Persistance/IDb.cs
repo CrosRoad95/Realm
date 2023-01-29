@@ -22,6 +22,8 @@ public interface IDb : IDisposable
     DbSet<Statistics> Statistics { get; }
     DbSet<JobUpgrade> JobUpgrades { get; }
     DbSet<Achievement> Achievements { get; }
+    DbSet<Group> Groups { get; }
+    DbSet<GroupMember> GroupMembers { get; }
 
     Task MigrateAsync();
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
