@@ -13,15 +13,17 @@ internal sealed class CommandsLogic
     private readonly IEntityFactory _entityFactory;
     private readonly RepositoryFactory _repositoryFactory;
     private readonly ItemsRegistry _itemsRegistry;
+    private readonly IGroupService _groupService;
 
     public CommandsLogic(RPGCommandService commandService, ILogger logger, IEntityFactory entityFactory, RepositoryFactory repositoryFactory,
-        ItemsRegistry itemsRegistry)
+        ItemsRegistry itemsRegistry, IGroupService groupService)
     {
         _commandService = commandService;
         _logger = logger;
         _entityFactory = entityFactory;
         _repositoryFactory = repositoryFactory;
         _itemsRegistry = itemsRegistry;
+        _groupService = groupService;
         _commandService.AddCommandHandler("gp", (entity, args) =>
         {
             logger.Information("{position}, {rotation}", entity.Transform.Position, entity.Transform.Rotation);
@@ -355,6 +357,22 @@ internal sealed class CommandsLogic
             }
             else
                 entity.GetRequiredComponent<PlayerElementComponent>().SendChatMessage($"Animation '{args.FirstOrDefault()}' not found.");
+        });
+
+        _commandService.AddCommandHandler("creategroup", async (entity, args) =>
+        {
+            var name = args.FirstOrDefault("default");
+            try
+            {
+                var group = await _groupService.CreateGroup(name, "");
+                await _groupService.AddMember(group.id, entity, 100, "Leader");
+
+                entity.GetRequiredComponent<PlayerElementComponent>().SendChatMessage($"Group: '{name}' has been created");
+            }
+            catch(Exception)
+            {
+                entity.GetRequiredComponent<PlayerElementComponent>().SendChatMessage($"Failed to create group: '{name}'");
+            }
         });
     }
 }
