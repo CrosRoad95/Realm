@@ -1,4 +1,6 @@
-﻿namespace Realm.Persistance;
+﻿using Realm.Persistance.Data;
+
+namespace Realm.Persistance;
 
 public abstract class Db<T> : IdentityDbContext<User, Role, Guid,
         IdentityUserClaim<Guid>,
@@ -9,6 +11,7 @@ public abstract class Db<T> : IdentityDbContext<User, Role, Guid,
 {
     public DbSet<UserLicense> UserLicenses => Set<UserLicense>();
     public DbSet<Vehicle> Vehicles => Set<Vehicle>();
+    public DbSet<VehicleAccess> VehicleAccesses => Set<VehicleAccess>();
     public DbSet<Inventory> Inventories => Set<Inventory>();
     public DbSet<InventoryItem> InventoryItems => Set<InventoryItem>();
     public DbSet<VehicleUpgrade> VehicleUpgrades => Set<VehicleUpgrade>();
@@ -109,7 +112,7 @@ public abstract class Db<T> : IdentityDbContext<User, Role, Guid,
         modelBuilder.Entity<Inventory>(entityBuilder =>
         {
             entityBuilder
-                .ToTable("Inventories")
+                .ToTable(nameof(Inventories))
                 .HasKey(x => x.Id);
 
             entityBuilder
@@ -122,7 +125,7 @@ public abstract class Db<T> : IdentityDbContext<User, Role, Guid,
         modelBuilder.Entity<DailyVisits>(entityBuilder =>
         {
             entityBuilder
-                .ToTable("DailyVisits")
+                .ToTable(nameof(DailyVisits))
                 .HasKey(x => x.UserId);
 
             entityBuilder.Property(x => x.LastVisit)
@@ -132,14 +135,14 @@ public abstract class Db<T> : IdentityDbContext<User, Role, Guid,
         modelBuilder.Entity<Statistics>(entityBuilder =>
         {
             entityBuilder
-                .ToTable("Statistics")
+                .ToTable(nameof(Statistics))
                 .HasKey(x => x.UserId);
         });
         
         modelBuilder.Entity<Achievement>(entityBuilder =>
         {
             entityBuilder
-                .ToTable("Achievements")
+                .ToTable(nameof(Achievements))
                 .HasKey(x => new { x.UserId, x.Name });
 
             entityBuilder.Property(x => x.Value)
@@ -149,7 +152,7 @@ public abstract class Db<T> : IdentityDbContext<User, Role, Guid,
         modelBuilder.Entity<JobUpgrade>(entityBuilder =>
         {
             entityBuilder
-                .ToTable("JobUpgrades")
+                .ToTable(nameof(JobUpgrades))
                 .HasKey(x => new { x.UserId, x.JobId, x.Name });
 
             entityBuilder.Property(x => x.Name)
@@ -159,14 +162,14 @@ public abstract class Db<T> : IdentityDbContext<User, Role, Guid,
         modelBuilder.Entity<JobStatistics>(entityBuilder =>
         {
             entityBuilder
-                .ToTable("JobPoints")
+                .ToTable(nameof(JobPoints))
                 .HasKey(x => new { x.UserId, x.JobId });
         });
         
         modelBuilder.Entity<InventoryItem>(entityBuilder =>
         {
             entityBuilder
-                .ToTable("InventoryItems")
+                .ToTable(nameof(InventoryItems))
                 .HasKey(x => new { x.Id, x.InventoryId });
 
             entityBuilder.Property(x => x.Id)
@@ -176,7 +179,7 @@ public abstract class Db<T> : IdentityDbContext<User, Role, Guid,
         modelBuilder.Entity<UserLicense>(entityBuilder =>
         {
             entityBuilder
-                .ToTable("UserLicense")
+                .ToTable(nameof(UserLicenses))
                 .HasKey(x => new { x.UserId, x.LicenseId });
         });
         
@@ -184,13 +187,13 @@ public abstract class Db<T> : IdentityDbContext<User, Role, Guid,
         modelBuilder.Entity<VehicleUpgrade>(entityBuilder =>
         {
             entityBuilder
-                .ToTable("VehicleUpgrades")
+                .ToTable(nameof(VehicleUpgrades))
                 .HasKey(x => new { x.VehicleId, x.UpgradeId });
         });
 
         modelBuilder.Entity<Vehicle>(entityBuilder =>
         {
-            entityBuilder.ToTable("Vehicles")
+            entityBuilder.ToTable(nameof(Vehicles))
                 .HasKey(x =>  x.Id);
 
             entityBuilder.Property(x => x.Platetext)
@@ -296,7 +299,7 @@ public abstract class Db<T> : IdentityDbContext<User, Role, Guid,
         modelBuilder.Entity<VehicleAccess>(entityBuilder =>
         {
             entityBuilder
-                .ToTable("VehicleAccesses")
+                .ToTable(nameof(VehicleAccesses))
                 .HasKey(x => x.Id);
 
             entityBuilder

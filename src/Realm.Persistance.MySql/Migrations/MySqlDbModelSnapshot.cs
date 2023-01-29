@@ -482,7 +482,7 @@ namespace Realm.Persistance.MySql.Migrations
 
                     b.HasKey("UserId", "LicenseId");
 
-                    b.ToTable("UserLicense", (string)null);
+                    b.ToTable("UserLicenses", (string)null);
                 });
 
             modelBuilder.Entity("Realm.Persistance.Data.Vehicle", b =>
