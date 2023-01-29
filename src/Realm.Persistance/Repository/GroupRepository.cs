@@ -11,6 +11,11 @@ internal class GroupRepository : IGroupRepository
         _db = db;
     }
 
+    public Task<Group?> GetGroupByName(string groupName) => _db.Groups
+        .Include(x => x.Members)
+        .Where(x => x.Name == groupName)
+        .FirstOrDefaultAsync();
+    
     public Task<int> GetGroupIdByName(string groupName) => _db.Groups
         .Where(x => x.Name == groupName)
         .Select(x => x.Id)

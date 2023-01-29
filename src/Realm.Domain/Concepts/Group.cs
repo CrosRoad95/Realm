@@ -8,4 +8,5 @@ public struct Group
     public string name;
     public string? shortcut;
     public GroupKind kind;
+    public GroupMember[] members;
 }

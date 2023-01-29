@@ -374,5 +374,16 @@ internal sealed class CommandsLogic
                 entity.GetRequiredComponent<PlayerElementComponent>().SendChatMessage($"Failed to create group: '{name}'");
             }
         });
+
+        _commandService.AddCommandHandler("mygroups", (entity, args) =>
+        {
+            var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();
+            playerElementComponent.SendChatMessage("Groups:");
+            foreach (var item in entity.Components.OfType<GroupMemeberComponent>())
+            {
+                playerElementComponent.SendChatMessage($"Group id: {item.GroupId}, rank: {item.Rank}, rank name: '{item.RankName}'");
+            }
+            return Task.CompletedTask;
+        });
     }
 }

@@ -90,5 +90,17 @@
 			"MaxVelocity": [ 100, 2 ],
 			"EngineAcceleration": [ 100, 2 ]
 		}
+	},
+	"Groups": {
+		"testSeededGroup": {
+			"Shortcut": "FOO",
+			"Kind": "Regular",
+			"Members": {
+				"admin": {
+					"Rank": 100,
+					"RankName": "Leader"
+				}
+			}
+		}
 	}
 }

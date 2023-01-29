@@ -1,4 +1,5 @@
 ﻿using FluentValidation;
+using Realm.Domain.Enums;
 using System.Drawing;
 
 namespace Realm.Server.Seeding;
@@ -54,6 +55,19 @@ internal class SeedData
         public float[] MaxVelocity { get; set; }
         public float[] EngineAcceleration { get; set; }
     }
+    
+    public class GroupMemberSeedData
+    {
+        public int Rank { get; set; }
+        public string RankName { get; set; }
+    }
+
+    public class GroupSeedData
+    {
+        public string Shortcut { get; set; }
+        public GroupKind GroupKind { get; set; }
+        public Dictionary<string, GroupMemberSeedData> Members { get; set; }
+    }
 
     public Dictionary<string, BlipSeedData> Blips = new();
     public Dictionary<string, PickupSeedData> Pickups = new();
@@ -62,6 +76,7 @@ internal class SeedData
     public List<string> Roles = new();
     public Dictionary<string, AccountSeedData> Accounts = new();
     public Dictionary<string, VehicleUpgradeDescriptionSeedData> Upgrades = new();
+    public Dictionary<string, GroupSeedData> Groups = new();
 }
 
 internal class SeedValidator : AbstractValidator<SeedData>

@@ -4,6 +4,7 @@ using Realm.Persistance.Data;
 using Realm.Persistance.Interfaces;
 using Group = Realm.Domain.Concepts.Group;
 using GroupData = Realm.Persistance.Data.Group;
+using GroupMember = Realm.Domain.Concepts.GroupMember;
 
 namespace Realm.Server.Services;
 
@@ -16,16 +17,36 @@ internal class GroupService : IGroupService
         _groupRepository = groupRepository;
     }
 
-    public async Task<Group> CreateGroup(string groupName, string shortcut, GroupKind groupKind = GroupKind.Regular)
+    private Group Map(GroupData groupData)
     {
-        var group = await _groupRepository.CreateNewGroup(groupName, shortcut, (byte)groupKind);
         return new Group
         {
-            id = group.Id,
-            name = group.Name,
-            shortcut = group.Shortcut,
-            kind = (GroupKind)group.Kind,
+            id = groupData.Id,
+            name = groupData.Name,
+            shortcut = groupData.Shortcut,
+            kind = (GroupKind)groupData.Kind,
+            members = groupData.Members.Select(x => new GroupMember
+            {
+                userId = x.UserId,
+                rank = x.Rank,
+                rankName = x.RankName
+            }).ToArray()
         };
+    }
+
+    public async Task<Group?> GetGroupByName(string groupName)
+    {
+        var groupData = await _groupRepository.GetGroupByName(groupName);
+        if (groupData == null)
+            return null;
+
+        return Map(groupData);
+    }
+    
+    public async Task<Group> CreateGroup(string groupName, string shortcut, GroupKind groupKind = GroupKind.Regular)
+    {
+        var groupData = await _groupRepository.CreateNewGroup(groupName, shortcut, (byte)groupKind);
+        return Map(groupData);
     }
 
     public async Task AddMember(int groupId, Entity entity, int rank = 1, string rankName = "")
@@ -46,5 +67,10 @@ internal class GroupService : IGroupService
         var userId = entity.GetRequiredComponent<AccountComponent>().Id;
         var groupMemberData = await _groupRepository.CreateNewGroupMember(groupName, userId, rank, rankName);
         entity.AddComponent(new GroupMemeberComponent(groupMemberData));
+    }
+
+    public async Task AddMember(string groupName, Guid userId, int rank = 1, string rankName = "")
+    {
+        await _groupRepository.CreateNewGroupMember(groupName, userId, rank, rankName);
     }
 }

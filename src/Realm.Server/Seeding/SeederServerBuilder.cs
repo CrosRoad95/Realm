@@ -14,18 +14,21 @@ internal sealed class SeederServerBuilder
     private readonly ECS _ecs;
     private readonly UserManager<User> _userManager;
     private readonly RoleManager<Role> _roleManager;
+    private readonly IGroupService _groupService;
     private readonly ILogger _logger;
 
     private readonly Dictionary<string, User> _createdUsers = new();
     public SeederServerBuilder(ILogger logger,
         EntityByStringIdCollection elementByStringIdCollection,
-        IServerFilesProvider serverFilesProvider, ECS ecs, UserManager<User> userManager, RoleManager<Role> roleManager)
+        IServerFilesProvider serverFilesProvider, ECS ecs, UserManager<User> userManager, RoleManager<Role> roleManager,
+        IGroupService groupService)
     {
         _elementByStringIdCollection = elementByStringIdCollection;
         _serverFilesProvider = serverFilesProvider;
         _ecs = ecs;
         _userManager = userManager;
         _roleManager = roleManager;
+        _groupService = groupService;
         _logger = logger.ForContext<SeederServerBuilder>();
     }
 
@@ -87,6 +90,40 @@ internal sealed class SeederServerBuilder
                 entity.Transform.Position = pair.Value.Position;
             });
             _logger.Information("Seeder: Created marker of id {elementId} at {position}", pair.Key, pair.Value.Position);
+        }
+    }
+    
+    private async Task BuildGroups(Dictionary<string, GroupSeedData> groups)
+    {
+        foreach (var pair in groups)
+        {
+            bool created = false;
+            Domain.Concepts.Group group;
+            try
+            {
+                group = await _groupService.CreateGroup(pair.Key, pair.Value.Shortcut, pair.Value.GroupKind);
+                created = true;
+            }
+            catch(Exception) // Group already exists
+            {
+                group = await _groupService.GetGroupByName(pair.Key) ?? throw new InvalidOperationException();
+            }
+
+            foreach (var item in pair.Value.Members)
+            {
+                try
+                {
+                    await _groupService.AddMember(group.name, _createdUsers[item.Key].Id, item.Value.Rank, item.Value.RankName);
+                }
+                catch(Exception) // Maybe member is already in group
+                {
+
+                }
+            }
+            if(created)
+                _logger.Information("Seeder: Created group {elementId} with members {members}", pair.Key, pair.Value.Members.Select(x => x.Key));
+            else
+                _logger.Information("Seeder: Updated group {elementId} with members {members}", pair.Key, pair.Value.Members.Select(x => x.Key));
         }
     }
 
@@ -167,6 +204,7 @@ internal sealed class SeederServerBuilder
         BuildBlips(seedData.Blips);
         BuildPickups(seedData.Pickups);
         BuildMarkers(seedData.Markers);
+        await BuildGroups(seedData.Groups);
         _createdUsers.Clear();
     }
 }
