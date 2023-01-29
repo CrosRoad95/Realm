@@ -215,8 +215,116 @@ public sealed class PlayerElementComponent : ElementComponent
         Text3dService.SetRenderingEnabled(_player, enabled);
     }
 
-    public async Task DoAnimation()
+    public enum Animation
     {
+        StartCarry,
+        CrouchAndTakeALook,
+        Swing,
+        Click,
+        Eat,
+        Sit,
+        CarryLiftUp,
+        CarryPutDown,
+        CarryLiftUpFromTable,
+        CarryPutDownOnTable,
 
+        // Complex animations
+        ComplexLiftUp,
+    }
+
+    public async Task DoComplexAnimationAsync(Animation animation, bool blockMovement = true)
+    {
+        if (blockMovement)
+            _player.ToggleAllControls(false, true, false);
+
+        switch (animation)
+        {
+            case Animation.ComplexLiftUp:
+                _player.SetAnimation("freeweights", "gym_free_pickup", TimeSpan.FromSeconds(3f), false, false, false, false, null, true);
+                await Task.Delay(TimeSpan.FromSeconds(3f));
+                _player.SetAnimation("CARRY", "crry_prtial", TimeSpan.FromSeconds(0.2f), true);
+                break;
+            default:
+                throw new NotSupportedException();
+        }
+
+        if (blockMovement)
+            _player.ToggleAllControls(true, true, false);
+    }
+
+    public void DoAnimation(Animation animation, TimeSpan? timeSpan = null)
+    {
+        DoAnimationInternal(animation, ref timeSpan);
+    }
+
+    public void DoAnimationInternal(Animation animation, ref TimeSpan? timeSpan)
+    {
+        switch(animation)
+        {
+            case Animation.StartCarry:
+                timeSpan = timeSpan ?? TimeSpan.FromSeconds(1);
+                _player.SetAnimation("CARRY", "crry_prtial", timeSpan, true, false);
+                break;
+            case Animation.CrouchAndTakeALook:
+                timeSpan = timeSpan ?? TimeSpan.FromSeconds(1);
+                _player.SetAnimation("COP_AMBIENT", "Copbrowse_nod", timeSpan, true, false);
+                break;
+            case Animation.Swing:
+                timeSpan = timeSpan ?? TimeSpan.FromSeconds(0.5f);
+                _player.SetAnimation("SWORD", "sword_block", timeSpan, false, false);
+                break;
+            case Animation.Click:
+                timeSpan = timeSpan ?? TimeSpan.FromSeconds(1);
+                _player.SetAnimation("CRIB", "CRIB_Use_Switch", timeSpan, true, false);
+                break;
+            case Animation.Eat:
+                timeSpan = timeSpan ?? TimeSpan.FromSeconds(1);
+                _player.SetAnimation("FOOD", "EAT_Burger", timeSpan, true, false);
+                break;
+            case Animation.Sit:
+                timeSpan = timeSpan ?? TimeSpan.FromSeconds(1);
+                _player.SetAnimation("BEACH", "ParkSit_M_loop", timeSpan, true, false);
+                break;
+            case Animation.CarryLiftUp:
+                timeSpan = timeSpan ?? TimeSpan.FromSeconds(1.25f);
+                _player.SetAnimation("CARRY", "liftup", timeSpan, false, false, false, false);
+                break;
+            case Animation.CarryPutDown:
+                timeSpan = timeSpan ?? TimeSpan.FromSeconds(1.25f);
+                _player.SetAnimation("CARRY", "putdwn", timeSpan, false, false, false, false);
+                break;
+            case Animation.CarryLiftUpFromTable:
+                timeSpan = timeSpan ?? TimeSpan.FromSeconds(1.25f);
+                _player.SetAnimation("CARRY", "liftup105", timeSpan, false, false, false, false);
+                break;
+            case Animation.CarryPutDownOnTable:
+                timeSpan = timeSpan ?? TimeSpan.FromSeconds(1.25f);
+                _player.SetAnimation("CARRY", "putdwn105", timeSpan, false, false, false, false);
+                break;
+            default:
+                throw new NotSupportedException();
+        }
+    }
+
+    public async Task DoAnimationAsync(Animation animation, TimeSpan? timeSpan = null, bool blockMovement = true)
+    {
+        if (blockMovement)
+            _player.ToggleAllControls(false, true, false);
+
+        try
+        {
+            DoAnimationInternal(animation, ref timeSpan);
+            if(timeSpan != null)
+                await Task.Delay(timeSpan.Value);
+        }
+        catch(Exception)
+        {
+            throw;
+        }
+        finally
+        {
+            if (blockMovement)
+                _player.ToggleAllControls(true, true, false);
+        }
     }
 }

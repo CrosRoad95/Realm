@@ -1,6 +1,8 @@
 ﻿using Realm.Domain.Components.Object;
+using Realm.Domain.Components.Players;
 using Realm.Domain.Interfaces;
 using Realm.Domain.Registries;
+using static Realm.Domain.Components.Elements.PlayerElementComponent;
 
 namespace Realm.Console.Logic;
 
@@ -297,6 +299,62 @@ internal sealed class CommandsLogic
             var objectEntity = _entityFactory.CreateObject(SlipeServer.Server.Enums.ObjectModel.Gunbox, entity.Transform.Position + new Vector3(4, 0, 0), Vector3.Zero);
             objectEntity.AddComponent(new LiftableWorldObjectComponent());
             return Task.CompletedTask;
+        });
+
+        _commandService.AddCommandHandler("animation", (entity, args) =>
+        {
+            if (Enum.TryParse<Animation>(args.FirstOrDefault(), out var animation))
+            {
+                try
+                {
+                    entity.GetRequiredComponent<PlayerElementComponent>().DoAnimation(animation);
+                }
+                catch (NotSupportedException)
+                {
+                    entity.GetRequiredComponent<PlayerElementComponent>().SendChatMessage($"Animation '{args.FirstOrDefault()}' is not supported");
+                }
+            }
+            else
+                entity.GetRequiredComponent<PlayerElementComponent>().SendChatMessage($"Animation '{args.FirstOrDefault()}' not found.");
+
+            return Task.CompletedTask;
+        });
+        _commandService.AddCommandHandler("animationasync", async (entity, args) =>
+        {
+            var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();
+            if (Enum.TryParse<Animation>(args.FirstOrDefault(), out var animation))
+            {
+                try
+                {
+                    playerElementComponent.SendChatMessage($"Started animation '{animation}'");
+                    await playerElementComponent.DoAnimationAsync(animation);
+                    playerElementComponent.SendChatMessage($"Finished animation '{animation}'");
+                }
+                catch (NotSupportedException)
+                {
+                    playerElementComponent.SendChatMessage($"Animation '{args.FirstOrDefault()}' is not supported");
+                }
+            }
+            else
+                playerElementComponent.SendChatMessage($"Animation '{args.FirstOrDefault()}' not found.");
+
+        });
+
+        _commandService.AddCommandHandler("complexanimation", async (entity, args) =>
+        {
+            if (Enum.TryParse<Animation>(args.FirstOrDefault(), out var animation))
+            {
+                try
+                {
+                    await entity.GetRequiredComponent<PlayerElementComponent>().DoComplexAnimationAsync(animation, true);
+                }
+                catch (NotSupportedException ex)
+                {
+                    entity.GetRequiredComponent<PlayerElementComponent>().SendChatMessage($"Animation '{args.FirstOrDefault()}' is not supported");
+                }
+            }
+            else
+                entity.GetRequiredComponent<PlayerElementComponent>().SendChatMessage($"Animation '{args.FirstOrDefault()}' not found.");
         });
     }
 }

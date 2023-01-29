@@ -41,6 +41,7 @@ internal sealed class PlayerGameplayLogic
             {
                 if (liftableWorldObjectComponent.TryLift(playerEntity))
                 {
+                    playerEntity.GetRequiredComponent<PlayerElementComponent>().DoAnimation(PlayerElementComponent.Animation.StartCarry);
                     playerEntity.AddComponent(new AttachedEntityComponent(currentInteractEntity, new Vector3(1f,1f,0)));
                 }
             }
