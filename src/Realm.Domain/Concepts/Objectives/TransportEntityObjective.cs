@@ -1,4 +1,5 @@
-﻿using Realm.Domain.Components.Object;
+﻿using Realm.Domain.Components.CollisionShapes;
+using Realm.Domain.Components.Object;
 
 namespace Realm.Domain.Concepts.Objectives;
 

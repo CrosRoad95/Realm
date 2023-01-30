@@ -1,4 +1,5 @@
 ﻿using Realm.Domain;
+using Realm.Domain.Components.CollisionShapes;
 using Realm.Domain.Interfaces;
 using Realm.Persistance.Interfaces;
 using RenderWareIo.Structs.Dff;
@@ -75,22 +76,6 @@ internal class EntityFactory : IEntityFactory
         });
     }
 
-    public Entity CreateCollisionSphere(Vector3 position, float radius, byte interior = 0, ushort dimension = 0, string? id = null, Action<Entity>? entityBuilder = null)
-    {
-        return _ecs.CreateEntity(id ?? $"collision sphere {Guid.NewGuid()}", Entity.CollisionShape, entity =>
-        {
-            var collisionSphere = new CollisionSphere(new Vector3(0,0,1000), radius);
-
-            entity.Transform.Position = position;
-            entity.Transform.Interior = interior;
-            entity.Transform.Dimension = dimension;
-
-            var markerElementComponent = entity.AddComponent(new CollisionSphereElementComponent(collisionSphere));
-
-            entityBuilder?.Invoke(entity);
-        });
-    }
-
     public BlipElementComponent CreateBlipFor(Entity entity, BlipIcon blipIcon, Vector3 position)
     {
         if(entity.Tag != Entity.PlayerTag)
@@ -147,4 +132,103 @@ internal class EntityFactory : IEntityFactory
             entityBuilder?.Invoke(entity);
         });
     }
+
+    #region Collision shapes
+
+    public Entity CreateCollisionCircle(Vector2 position, float radius, byte interior = 0, ushort dimension = 0, string? id = null, Action<Entity>? entityBuilder = null)
+    {
+        return _ecs.CreateEntity(id ?? $"collision circle {Guid.NewGuid()}", Entity.CollisionShape, entity =>
+        {
+            var collisionSphere = new CollisionCircle(new Vector2(0, 0), radius);
+
+            entity.Transform.Position = new Vector3(position, 0);
+            entity.Transform.Interior = interior;
+            entity.Transform.Dimension = dimension;
+
+            var markerElementComponent = entity.AddComponent(new CollisionCircleElementComponent(collisionSphere));
+
+            entityBuilder?.Invoke(entity);
+        });
+    }
+    
+    public Entity CreateCollisionCuboid(Vector3 position, Vector3 dimensions, byte interior = 0, ushort dimension = 0, string? id = null, Action<Entity>? entityBuilder = null)
+    {
+        return _ecs.CreateEntity(id ?? $"collision cuboid {Guid.NewGuid()}", Entity.CollisionShape, entity =>
+        {
+            var collisioncuboid = new CollisionCuboid(position, dimensions);
+
+            entity.Transform.Position = position;
+            entity.Transform.Interior = interior;
+            entity.Transform.Dimension = dimension;
+
+            var markerElementComponent = entity.AddComponent(new CollisionCuboidElementComponent(collisioncuboid));
+
+            entityBuilder?.Invoke(entity);
+        });
+    }
+    
+    public Entity CreateCollisionPolygon(Vector3 position, IEnumerable<Vector2> vertices, byte interior = 0, ushort dimension = 0, string? id = null, Action<Entity>? entityBuilder = null)
+    {
+        return _ecs.CreateEntity(id ?? $"collision polygon {Guid.NewGuid()}", Entity.CollisionShape, entity =>
+        {
+            var collisionPolygon = new CollisionPolygon(position, vertices);
+            entity.Transform.Position = position;
+            entity.Transform.Interior = interior;
+            entity.Transform.Dimension = dimension;
+
+            var markerElementComponent = entity.AddComponent(new CollisionPolygonElementComponent(collisionPolygon));
+
+            entityBuilder?.Invoke(entity);
+        });
+    }
+
+    public Entity CreateCollisionRectangle(Vector2 position, Vector2 dimensions, byte interior = 0, ushort dimension = 0, string? id = null, Action<Entity>? entityBuilder = null)
+    {
+        return _ecs.CreateEntity(id ?? $"collision sphere {Guid.NewGuid()}", Entity.CollisionShape, entity =>
+        {
+            var collisionRectangle = new CollisionRectangle(position, dimensions);
+
+            entity.Transform.Position = new Vector3(position, 0);
+            entity.Transform.Interior = interior;
+            entity.Transform.Dimension = dimension;
+
+            var markerElementComponent = entity.AddComponent(new CollisionRectangleElementComponent(collisionRectangle));
+
+            entityBuilder?.Invoke(entity);
+        });
+    }
+    
+    public Entity CreateCollisionSphere(Vector3 position, float radius, byte interior = 0, ushort dimension = 0, string? id = null, Action<Entity>? entityBuilder = null)
+    {
+        return _ecs.CreateEntity(id ?? $"collision sphere {Guid.NewGuid()}", Entity.CollisionShape, entity =>
+        {
+            var collisionSphere = new CollisionSphere(new Vector3(0, 0, 1000), radius);
+
+            entity.Transform.Position = position;
+            entity.Transform.Interior = interior;
+            entity.Transform.Dimension = dimension;
+
+            var markerElementComponent = entity.AddComponent(new CollisionSphereElementComponent(collisionSphere));
+
+            entityBuilder?.Invoke(entity);
+        });
+    }
+    
+    public Entity CreateCollisionTube(Vector3 position, float radius, float height, byte interior = 0, ushort dimension = 0, string? id = null, Action<Entity>? entityBuilder = null)
+    {
+        return _ecs.CreateEntity(id ?? $"collision sphere {Guid.NewGuid()}", Entity.CollisionShape, entity =>
+        {
+            var collisionTube = new CollisionTube(position, radius, height);
+
+            entity.Transform.Position = position;
+            entity.Transform.Interior = interior;
+            entity.Transform.Dimension = dimension;
+
+            var markerElementComponent = entity.AddComponent(new CollisionTubeElementComponent(collisionTube));
+
+            entityBuilder?.Invoke(entity);
+        });
+    }
+
+    #endregion
 }

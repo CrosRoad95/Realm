@@ -1,4 +1,6 @@
-﻿namespace Realm.Domain.Concepts.Objectives;
+﻿using Realm.Domain.Components.CollisionShapes;
+
+namespace Realm.Domain.Concepts.Objectives;
 
 public class MarkerEnterObjective : Objective
 {
