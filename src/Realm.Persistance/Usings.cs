@@ -12,3 +12,6 @@ global using Realm.Persistance.Data;
 global using Realm.Persistance.Data.Helpers;
 global using Realm.Persistance.Extensions;
 global using Realm.Persistance.Interfaces;
+global using System.Runtime.CompilerServices;
+
+[assembly: InternalsVisibleTo("Realm.Tests")]

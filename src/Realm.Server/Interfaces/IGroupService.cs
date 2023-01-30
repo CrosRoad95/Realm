@@ -9,4 +9,5 @@ public interface IGroupService
     Task AddMember(int groupId, Entity entity, int rank = 1, string rankName = "");
     Task AddMember(string groupName, Guid userId, int rank = 1, string rankName = "");
     Task<Domain.Concepts.Group?> GetGroupByName(string groupName);
+    Task AddMember(int groupId, Guid userId, int rank = 1, string rankName = "");
 }

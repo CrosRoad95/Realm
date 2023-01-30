@@ -16,6 +16,21 @@ internal class GroupRepository : IGroupRepository
         .Where(x => x.Name == groupName)
         .FirstOrDefaultAsync();
     
+    public Task<Group?> GetGroupByNameOrShortcut(string groupName, string shortcut) => _db.Groups
+        .Include(x => x.Members)
+        .Where(x => x.Name == groupName || x.Shortcut == shortcut)
+        .FirstOrDefaultAsync();
+    
+    public Task<bool> ExistsByName(string groupName) => _db.Groups
+        .AsNoTrackingWithIdentityResolution()
+        .Where(x => x.Name == groupName)
+        .AnyAsync();
+    
+    public Task<bool> ExistsByShortcut(string shortcut) => _db.Groups
+        .AsNoTrackingWithIdentityResolution()
+        .Where(x => x.Shortcut == shortcut)
+        .AnyAsync();
+    
     public Task<int> GetGroupIdByName(string groupName) => _db.Groups
         .Where(x => x.Name == groupName)
         .Select(x => x.Id)
@@ -54,6 +69,11 @@ internal class GroupRepository : IGroupRepository
         if (groupId == 0)
             throw new GroupNotFoundException(groupName);
 
+        return await CreateNewGroupMember(groupId, userId, rank, rankName);
+    }
+    
+    public async Task<GroupMember> CreateNewGroupMember(Guid groupId, Guid userId, int rank = 1, string rankName = "")
+    {
         return await CreateNewGroupMember(groupId, userId, rank, rankName);
     }
 

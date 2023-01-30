@@ -1,5 +1,6 @@
 ﻿using Realm.Domain.Concepts;
 using Realm.Domain.Enums;
+using Realm.Domain.Exceptions;
 using Realm.Persistance.Data;
 using Realm.Persistance.Interfaces;
 using Group = Realm.Domain.Concepts.Group;
@@ -42,9 +43,24 @@ internal class GroupService : IGroupService
 
         return Map(groupData);
     }
+
+    public async Task<Group?> GetGroupByNameOrShortut(string groupName, string shortcut)
+    {
+        var groupData = await _groupRepository.GetGroupByNameOrShortcut(groupName, shortcut);
+        if (groupData == null)
+            return null;
+
+        return Map(groupData);
+    }
     
     public async Task<Group> CreateGroup(string groupName, string shortcut, GroupKind groupKind = GroupKind.Regular)
     {
+        if(await _groupRepository.ExistsByName(groupName))
+            throw new GroupNameInUseException(groupName);
+        
+        if(await _groupRepository.ExistsByShortcut(shortcut))
+            throw new GroupShortcutInUseException(shortcut);
+
         var groupData = await _groupRepository.CreateNewGroup(groupName, shortcut, (byte)groupKind);
         return Map(groupData);
     }
@@ -72,5 +88,10 @@ internal class GroupService : IGroupService
     public async Task AddMember(string groupName, Guid userId, int rank = 1, string rankName = "")
     {
         await _groupRepository.CreateNewGroupMember(groupName, userId, rank, rankName);
+    }
+
+    public async Task AddMember(int groupId, Guid userId, int rank = 1, string rankName = "")
+    {
+        await _groupRepository.CreateNewGroupMember(groupId, userId, rank, rankName);
     }
 }
