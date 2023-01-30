@@ -62,4 +62,18 @@ public class GroupServiceTests
         group.Value.members.Should().HaveCount(1);
         group.Value.members[0].userId.Should().Be(userGuid);
     }
+
+    [Fact]
+    public async Task YouCanAddMemberToGroupAndThenRemoveIt()
+    {
+        var userGuid = Guid.NewGuid();
+        var groupService = _serviceProvider.GetRequiredService<IGroupService>();
+        var newlyCreatedGroup = await groupService.CreateGroup("Test group", "TG", Domain.Enums.GroupKind.Regular);
+
+        await groupService.AddMember(newlyCreatedGroup.id, userGuid, 100, "Leader");
+        await groupService.RemoveMember(newlyCreatedGroup.id, userGuid);
+
+        var group = await groupService.GetGroupByName("Test group");
+        group.Value.members.Should().BeEmpty();
+    }
 }

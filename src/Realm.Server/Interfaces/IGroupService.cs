@@ -10,4 +10,5 @@ public interface IGroupService
     Task AddMember(string groupName, Guid userId, int rank = 1, string rankName = "");
     Task<Domain.Concepts.Group?> GetGroupByName(string groupName);
     Task AddMember(int groupId, Guid userId, int rank = 1, string rankName = "");
+    Task RemoveMember(int groupId, Guid userId);
 }

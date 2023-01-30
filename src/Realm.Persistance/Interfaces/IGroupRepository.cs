@@ -10,4 +10,5 @@ public interface IGroupRepository : IDisposable
     Task<bool> ExistsByShortcut(string shortcut);
     Task<Group?> GetGroupByName(string groupName);
     Task<Group?> GetGroupByNameOrShortcut(string groupName, string shortcut);
+    Task<bool> RemoveGroupMember(int groupId, Guid userId);
 }

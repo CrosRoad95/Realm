@@ -94,4 +94,10 @@ internal class GroupService : IGroupService
     {
         await _groupRepository.CreateNewGroupMember(groupId, userId, rank, rankName);
     }
+
+    public async Task RemoveMember(int groupId, Guid userId)
+    {
+        if (!await _groupRepository.RemoveGroupMember(groupId, userId))
+            throw new GroupMemberNotFoundException(groupId, userId);
+    }
 }

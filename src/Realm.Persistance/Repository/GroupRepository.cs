@@ -72,6 +72,16 @@ internal class GroupRepository : IGroupRepository
         return await CreateNewGroupMember(groupId, userId, rank, rankName);
     }
     
+    public async Task<bool> RemoveGroupMember(int groupId, Guid userId)
+    {
+        var member = await _db.GroupMembers.Where(x => x.GroupId == groupId && x.UserId == userId)
+            .FirstOrDefaultAsync();
+        if (member == null)
+            return false;
+        _db.GroupMembers.Remove(member);
+        return await _db.SaveChangesAsync() == 1;
+    }
+    
     public async Task<GroupMember> CreateNewGroupMember(Guid groupId, Guid userId, int rank = 1, string rankName = "")
     {
         return await CreateNewGroupMember(groupId, userId, rank, rankName);
