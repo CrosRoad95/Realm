@@ -11,7 +11,7 @@ using Realm.Server.Services;
 
 namespace Realm.Tests.Tests;
 
-public class GroupServiceTests
+public class GroupServiceTests : IDisposable
 {
     private readonly IServiceProvider _serviceProvider;
     public GroupServiceTests()
@@ -75,5 +75,13 @@ public class GroupServiceTests
 
         var group = await groupService.GetGroupByName("Test group");
         group.Value.members.Should().BeEmpty();
+    }
+
+    public void Dispose()
+    {
+        var db = _serviceProvider.GetRequiredService<IDb>();
+        db.GroupMembers.RemoveRange(db.GroupMembers);
+        db.Groups.RemoveRange(db.Groups);
+        db.SaveChangesAsync().Wait();
     }
 }
