@@ -37,7 +37,7 @@ public abstract class ElementComponent : Component
         {
             Player = playerElementComponent.Player;
             Element.Id = playerElementComponent.MapIdGenerator.GetId();
-            Element.CreateFor(Player);
+            Element.AssociateWith(Player);
             _isPerPlayer = true;
         }
         else
