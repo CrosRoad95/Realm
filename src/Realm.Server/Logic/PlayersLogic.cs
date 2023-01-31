@@ -46,7 +46,7 @@ internal class PlayersLogic
             _playerResources.TryRemove(player, out var _);
         }
 
-        _ecs.CreateEntity("Player " + player.Name, Entity.PlayerTag, entity =>
+        _ecs.CreateEntity("Player " + player.Name, Entity.EntityTag.Player, entity =>
         {
             entity.AddComponent(new PlayerElementComponent(player));
         });

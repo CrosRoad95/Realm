@@ -20,7 +20,7 @@ internal class SignInService : ISignInService
 
     public async Task<bool> SignIn(Entity entity, User user)
     {
-        if (entity.Tag != Entity.PlayerTag || !entity.HasComponent<PlayerElementComponent>())
+        if (entity.Tag != Entity.EntityTag.Player || !entity.HasComponent<PlayerElementComponent>())
             throw new NotSupportedException("Entity is not a player entity.");
 
         await _lock.WaitAsync();

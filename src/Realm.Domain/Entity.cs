@@ -7,19 +7,23 @@ namespace Realm.Domain;
 
 public class Entity : IDisposable
 {
-    public const string PlayerTag = "player";
-    public const string PedTag = "ped";
-    public const string VehicleTag = "vehicle";
-    public const string BlipTag = "blip";
-    public const string PickupTag = "pickup";
-    public const string MarkerTag = "marker";
-    public const string CollisionShape = "collisionShape";
-    public const string WorldObject = "worldObject";
+    public enum EntityTag
+    {
+        Unknown,
+        Player,
+        Ped,
+        Vehicle,
+        Blip,
+        Pickup,
+        Marker,
+        CollisionShape,
+        WorldObject,
+    }
 
     private bool _disposed = false;
 
     public string Id { get; } = Guid.NewGuid().ToString();
-    public string Tag { get; set; } = "";
+    public EntityTag Tag { get; }
     public string Name { get; set; } = "";
 
     private readonly ReaderWriterLockSlim _componentsLock = new();
@@ -35,7 +39,7 @@ public class Entity : IDisposable
 
     public event Action<Entity>? Destroyed;
 
-    public Entity(IServiceProvider serviceProvider, string name = "", string tag = "")
+    public Entity(IServiceProvider serviceProvider, string name = "", EntityTag tag = EntityTag.Unknown)
     {
         _serviceProvider = serviceProvider;
         Name = name;

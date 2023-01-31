@@ -19,12 +19,12 @@ internal class SamplePickupsLogic
 
     private void EntityCreated(Entity entity)
     {
-        if (entity.Tag == Entity.PickupTag && entity.Name.StartsWith("fractionTestPickup"))
+        if (entity.Tag == Entity.EntityTag.Pickup && entity.Name.StartsWith("fractionTestPickup"))
         {
             var pickupElementComponent = entity.GetRequiredComponent<PickupElementComponent>();
             pickupElementComponent.EntityEntered = async entity =>
             {
-                if (entity.Tag != Entity.PlayerTag)
+                if (entity.Tag != Entity.EntityTag.Player)
                     return;
 
                 var sessionComponent = entity.GetComponent<SessionComponent>();
@@ -48,12 +48,12 @@ internal class SamplePickupsLogic
             };
         }
         
-        if (entity.Tag == Entity.PickupTag && entity.Name.StartsWith("jobTestPickup"))
+        if (entity.Tag == Entity.EntityTag.Pickup && entity.Name.StartsWith("jobTestPickup"))
         {
             var pickupElementComponent = entity.GetRequiredComponent<PickupElementComponent>();
             pickupElementComponent.EntityEntered = async entity =>
             {
-                if (entity.Tag != Entity.PlayerTag)
+                if (entity.Tag != Entity.EntityTag.Player)
                     return;
 
                 var sessionComponent = entity.GetComponent<SessionComponent>();
@@ -107,14 +107,14 @@ internal class SamplePickupsLogic
             };
         }
 
-        if (entity.Tag == Entity.PickupTag && entity.Name.StartsWith("withText3d"))
+        if (entity.Tag == Entity.EntityTag.Pickup && entity.Name.StartsWith("withText3d"))
         {
             var pickupElementComponent = entity.GetRequiredComponent<PickupElementComponent>();
             pickupElementComponent.AddRule(new MustBePlayerOnFootOnlyRule());
             pickupElementComponent.AddOpenGuiLogic<TestWindowComponent>();
         }
 
-        if (entity.Tag == Entity.PickupTag && entity.Name.StartsWith("exampleShopPickup"))
+        if (entity.Tag == Entity.EntityTag.Pickup && entity.Name.StartsWith("exampleShopPickup"))
         {
             var pickupElementComponent = entity.GetRequiredComponent<PickupElementComponent>();
             pickupElementComponent.AddRule(new MustBePlayerOnFootOnlyRule());

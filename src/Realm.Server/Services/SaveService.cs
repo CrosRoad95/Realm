@@ -262,10 +262,10 @@ internal class SaveService : ISaveService
     {
         switch (entity.Tag)
         {
-            case Entity.PlayerTag:
+            case Entity.EntityTag.Player:
                 await SavePlayer(entity);
                 break;
-            case Entity.VehicleTag:
+            case Entity.EntityTag.Vehicle:
                 await SaveVehicle(entity);
                 break;
             default:

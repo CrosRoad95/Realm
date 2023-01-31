@@ -18,7 +18,7 @@ public class EntityHelper
 
     public Entity CreatePlayerEntity()
     {
-        var entity = new Entity(_serviceProvider, Guid.NewGuid().ToString()[..8], Entity.PlayerTag);
+        var entity = new Entity(_serviceProvider, Guid.NewGuid().ToString()[..8], Entity.EntityTag.Player);
         entity.AddComponent(new PlayerElementComponent(_testingServer.AddFakePlayer()));
         return entity;
     }

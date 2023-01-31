@@ -14,7 +14,7 @@ internal sealed class PlayerJoinedLogic
 
     private async void HandleEntityCreated(Entity entity)
     {
-        if (entity.Tag != Entity.PlayerTag)
+        if (entity.Tag != Entity.EntityTag.Player)
             return;
 
         var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();

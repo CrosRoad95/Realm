@@ -1,4 +1,5 @@
 ﻿using FluentAssertions;
+using Realm.Domain;
 using Realm.Tests.Helpers;
 
 namespace Realm.Tests.Tests;
@@ -21,7 +22,7 @@ public class ECSTests
         {
             created = true;
         };
-        var entity = _ecs.CreateEntity("foo", "test");
+        var entity = _ecs.CreateEntity("foo", Entity.EntityTag.Unknown);
         entity.Dispose();
         #endregion
 
@@ -43,7 +44,7 @@ public class ECSTests
 
         await ParallelHelpers.Run((x,i) =>
         {
-            var entity = _ecs.CreateEntity($"foo{x}{i}", "test");
+            var entity = _ecs.CreateEntity($"foo{x}{i}", Entity.EntityTag.Unknown);
             entity.Dispose();
         });
         #endregion

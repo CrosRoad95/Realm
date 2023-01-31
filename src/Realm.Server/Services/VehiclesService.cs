@@ -14,7 +14,7 @@ internal sealed class VehiclesService : IVehiclesService
 
     public async Task<Entity> ConvertToPrivateVehicle(Entity vehicleEntity)
     {
-        if (vehicleEntity.Tag != Entity.VehicleTag)
+        if (vehicleEntity.Tag != Entity.EntityTag.Vehicle)
             throw new InvalidOperationException();
 
         if (vehicleEntity.HasComponent<PrivateVehicleComponent>())

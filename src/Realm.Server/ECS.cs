@@ -47,7 +47,7 @@ public sealed class ECS : IEntityByElement
         return result;
     }
     
-    public Entity CreateEntity(string name, string tag, Action<Entity>? entityBuilder = null)
+    public Entity CreateEntity(string name, Entity.EntityTag tag, Action<Entity>? entityBuilder = null)
     {
         if (_entityByName.ContainsKey(name))
             throw new EntityAlreadyExistsException(name);

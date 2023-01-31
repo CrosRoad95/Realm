@@ -73,7 +73,7 @@ public class PrivateVehicleComponent : Component
 
     public bool TryGetAccess(Entity entity, out VehicleAccess vehicleAccess)
     {
-        if (entity.Tag != Entity.PlayerTag)
+        if (entity.Tag != Entity.EntityTag.Player)
             throw new InvalidOperationException();
 
         var userId = entity.GetRequiredComponent<AccountComponent>().Id;
@@ -89,7 +89,7 @@ public class PrivateVehicleComponent : Component
 
     public VehicleAccess AddAsOwner(Entity entity)
     {
-        if (entity.Tag != Entity.PlayerTag)
+        if (entity.Tag != Entity.EntityTag.Player)
             throw new InvalidOperationException();
 
         if (TryGetAccess(entity, out var _))

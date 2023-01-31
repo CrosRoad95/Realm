@@ -38,7 +38,7 @@ public class ItemsLogic
 
     private void HandleEntityCreated(Entity entity)
     {
-        if(entity.Tag == Entity.PlayerTag)
+        if(entity.Tag == Entity.EntityTag.Player)
             entity.ComponentAdded += HandleComponentAdded;
     }
 

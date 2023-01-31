@@ -21,7 +21,7 @@ public class EntityTests
         #region Arrange & Act
         bool componentAdded = false;
         bool componentDetached = false;
-        var entity = new Entity(_serviceProvider, "foo", "test");
+        var entity = new Entity(_serviceProvider, "foo", Entity.EntityTag.Unknown);
         entity.ComponentAdded += e =>
         {
             componentAdded = true;
@@ -47,7 +47,7 @@ public class EntityTests
     {
         #region Arrange & Act
         int addedComponents = 0;
-        var entity = new Entity(_serviceProvider, "foo", "test");
+        var entity = new Entity(_serviceProvider, "foo", Entity.EntityTag.Unknown);
         entity.ComponentAdded += e =>
         {
             Interlocked.Increment(ref addedComponents);
@@ -72,7 +72,7 @@ public class EntityTests
     public void TestComponentsDependencyInjection()
     {
         #region Arrange & Act
-        var entity = new Entity(_serviceProvider, "foo", "test");
+        var entity = new Entity(_serviceProvider, "foo", Entity.EntityTag.Unknown);
         var component = new TestComponent();
         entity.AddComponent(component);
         #endregion
@@ -86,7 +86,7 @@ public class EntityTests
     public void ComponentShouldNotBeAddedIfFailedToLoad()
     {
         #region Arrange & Act
-        var entity = new Entity(_serviceProvider, "foo", "test");
+        var entity = new Entity(_serviceProvider, "foo", Entity.EntityTag.Unknown);
         var component = new ThrowExceptionComponent();
 
         var action = () => entity.AddComponent(component);
@@ -102,7 +102,7 @@ public class EntityTests
     public async Task ComponentShouldNotBeAddedIfFailedToAsyncLoad()
     {
         #region Arrange & Act
-        var entity = new Entity(_serviceProvider, "foo", "test");
+        var entity = new Entity(_serviceProvider, "foo", Entity.EntityTag.Unknown);
         var component = new ThrowExceptionAsyncComponent();
 
         var action = async () => await entity.AddComponentAsync(component);
@@ -118,7 +118,7 @@ public class EntityTests
     public async Task ComponentShouldBeRemovedIfAsyncLoadThrowException()
     {
         #region Arrange & Act
-        var entity = new Entity(_serviceProvider, "foo", "test");
+        var entity = new Entity(_serviceProvider, "foo", Entity.EntityTag.Unknown);
         var component = new ThrowExceptionAsyncComponent();
 
         var action = () => entity.AddComponent(component);
