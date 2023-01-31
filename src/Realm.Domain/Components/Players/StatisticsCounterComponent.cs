@@ -27,12 +27,11 @@ public class StatisticsCounterComponent : Component
         TraveledDistanceInAir = statistics.TraveledDistanceInAir;
     }
 
-    public override Task LoadAsync()
+    protected override void Load()
     {
         var player = Entity.GetRequiredComponent<PlayerElementComponent>().Player;
         StatisticsCounterService.StatisticsCollected += HandleStatisticsCollected;
         StatisticsCounterService.SetCounterEnabledFor(player, true);
-        return Task.CompletedTask;
     }
 
     public override void Dispose()

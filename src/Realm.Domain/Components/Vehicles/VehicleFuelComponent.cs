@@ -92,7 +92,7 @@ public class VehicleFuelComponent : Component
         _fuelType = fuelType;
     }
 
-    public override void Load()
+    protected override void Load()
     {
         var vehicle = Entity.GetRequiredComponent<VehicleElementComponent>().Vehicle;
         vehicle.PositionChanged += HandlePositionChanged;

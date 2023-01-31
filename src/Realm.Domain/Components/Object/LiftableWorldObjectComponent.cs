@@ -42,10 +42,9 @@ public class LiftableWorldObjectComponent : Component
         return true;
     }
 
-    public override Task LoadAsync()
+    protected override void Load()
     {
         Entity.GetRequiredComponent<ElementComponent>().AddFocusable();
-        return base.LoadAsync();
     }
 
     public override void Dispose()

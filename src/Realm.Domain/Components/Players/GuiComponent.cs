@@ -16,10 +16,14 @@ public abstract class GuiComponent : Component
         _cursorless = cursorless;
     }
 
-    public override async Task LoadAsync()
+    protected override void Load()
     {
         AgnosticGuiSystemService.FormSubmitted += HandleFormSubmitted;
         AgnosticGuiSystemService.ActionExecuted += HandleActionExecuted;
+    }
+
+    protected override async Task LoadAsync()
+    {
         await OpenGui();
     }
 

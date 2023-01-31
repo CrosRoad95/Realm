@@ -54,7 +54,7 @@ public class PickupElementComponent : ElementComponent
         _pickup.CollisionShape.Destroy();
     }
 
-    public override void Load()
+    protected override void Load()
     {
         Entity.Destroyed += HandleDestroyed;
         _pickup.CollisionShape.ElementEntered += HandleElementEntered;

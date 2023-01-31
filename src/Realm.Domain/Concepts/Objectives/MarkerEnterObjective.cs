@@ -18,7 +18,7 @@ public class MarkerEnterObjective : Objective
         _position = position;
     }
 
-    public override void Load(IEntityFactory entityFactory, Entity playerEntity)
+    protected override void Load(IEntityFactory entityFactory, Entity playerEntity)
     {
         _playerEntity = playerEntity;
         _markerElementComponent = entityFactory.CreateMarkerFor(playerEntity, _position, MarkerType.Arrow, Color.White);

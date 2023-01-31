@@ -13,7 +13,7 @@ public class AttachedEntityComponent : Component
         Offset = offset;
     }
 
-    public override void Load()
+    protected override void Load()
     {
         AttachedEntity.GetRequiredComponent<ElementComponent>().AreCollisionsEnabled = false;
         Entity.Transform.PositionChanged += Transform_PositionChanged;

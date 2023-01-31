@@ -41,7 +41,18 @@ public abstract class JobSessionComponent : SessionComponent
         objective.Entity = Entity;
         lock(_objectivesLock)
             _objectives.Add(objective);
-        objective.Load(EntityFactory, Entity);
+        try
+        {
+            objective.LoadInternal(EntityFactory, Entity);
+        }
+        catch(Exception)
+        {
+            objective.Entity = null!;
+            objective.Dispose();
+            lock (_objectivesLock)
+                _objectives.Remove(objective);
+            throw;
+        }
         objective.Completed += HandleCompleted;
         objective.Disposed += HandleDisposed;
         return objective;
@@ -49,6 +60,8 @@ public abstract class JobSessionComponent : SessionComponent
 
     private void HandleDisposed(Objective objective)
     {
+        objective.Completed -= HandleCompleted;
+        objective.Disposed -= HandleDisposed;
         RemoveObjective(objective);
     }
 

@@ -19,10 +19,9 @@ public class VehicleUpgradesComponent : Component
         _upgrades = vehicleUpgrades.Select(x => x.UpgradeId).ToList();
     }
 
-    public override Task LoadAsync()
+    protected override void Load()
     {
         RebuildUpgrades();
-        return Task.CompletedTask;
     }
 
     public bool HasUpgrade(uint upgradeId) => _upgrades.Any(x => x == upgradeId);

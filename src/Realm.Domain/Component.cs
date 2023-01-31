@@ -1,19 +1,29 @@
-﻿using Realm.Domain.Concepts.Objectives;
-
-namespace Realm.Domain;
+﻿namespace Realm.Domain;
 
 public abstract class Component
 {
     private bool _disposed = false;
     public Entity Entity { get; internal set; } = default!;
 
-    public virtual Task LoadAsync() => Task.CompletedTask;
-    public virtual void Load() { }
+    protected virtual Task LoadAsync() => Task.CompletedTask;
+    protected virtual void Load() { }
+
+    internal void InternalLoad()
+    {
+        ThrowIfDisposed();
+        Load();
+    }
+
+    internal async Task InternalLoadAsync()
+    {
+        ThrowIfDisposed();
+        await LoadAsync();
+    }
 
     protected void ThrowIfDisposed()
     {
         if (_disposed)
-            throw new ObjectDisposedException(nameof(Objective));
+            throw new ObjectDisposedException(nameof(Component));
     }
 
     public virtual void Dispose()

@@ -16,7 +16,13 @@ public abstract class Objective : IDisposable
 
     private BlipElementComponent? _blipElementComponent;
     public abstract Vector3 Position { get; }
-    public abstract void Load(IEntityFactory entityFactory, Entity playerEntity);
+    protected abstract void Load(IEntityFactory entityFactory, Entity playerEntity);
+
+    internal void LoadInternal(IEntityFactory entityFactory, Entity playerEntity)
+    {
+        ThrowIfDisposed();
+        Load(entityFactory, playerEntity);
+    }
 
     protected void Complete()
     {

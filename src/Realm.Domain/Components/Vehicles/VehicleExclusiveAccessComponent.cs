@@ -16,7 +16,7 @@ public class VehicleExclusiveAccessComponent : VehicleAccessControllerComponent
         _entity.Destroyed -= HandleTargetEntityDestroyed;
     }
 
-    public override void Load()
+    protected override void Load()
     {
         if(Entity.Tag != Entity.VehicleTag)
             throw new NotSupportedException("This component only works on vehicles.");

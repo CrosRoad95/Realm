@@ -55,7 +55,7 @@ public sealed class PlayerElementComponent : ElementComponent
         _player = player;
     }
 
-    public override void Load()
+    protected override void Load()
     {
         Entity.Transform.Bind(_player);
         _player.BindExecuted += HandleBindExecuted;

@@ -38,10 +38,9 @@ public class MileageCounterComponent : Component
         _minimumDistanceThreshold = minimumDistanceThreshold;
     }
 
-    public override Task LoadAsync()
+    protected override void Load()
     {
         Entity.Transform.PositionChanged += HandlePositionChanged;
-        return Task.CompletedTask;
     }
 
     public override void Dispose()

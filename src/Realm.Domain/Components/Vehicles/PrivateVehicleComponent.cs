@@ -17,7 +17,7 @@ public class PrivateVehicleComponent : Component
         _vehicleData = vehicleData;
     }
 
-    public override Task LoadAsync()
+    protected override void Load()
     {
         var vehicleElementComponent = Entity.GetRequiredComponent<VehicleElementComponent>();
         var vehicle = vehicleElementComponent.Vehicle;
@@ -69,8 +69,6 @@ public class PrivateVehicleComponent : Component
             UserId = x.User.Id,
             Ownership = x.Description.Ownership
         }).ToList();
-
-        return Task.CompletedTask;
     }
 
     public bool TryGetAccess(Entity entity, out VehicleAccess vehicleAccess)

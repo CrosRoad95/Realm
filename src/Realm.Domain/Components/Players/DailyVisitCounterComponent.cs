@@ -20,10 +20,9 @@ public class DailyVisitsCounterComponent : Component
         VisitsInRowRecord = dailyVisits.VisitsInRowRecord;
     }
 
-    public override Task LoadAsync()
+    protected override void Load()
     {
         Update();
-        return Task.CompletedTask;
     }
 
     private void Update()

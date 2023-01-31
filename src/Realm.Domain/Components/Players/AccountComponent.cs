@@ -22,7 +22,7 @@ public class AccountComponent : Component
         _user = user;
     }
 
-    public override async Task LoadAsync()
+    protected override async Task LoadAsync()
     {
         await UpdateClaimsPrincipal();
     }

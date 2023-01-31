@@ -29,7 +29,7 @@ public abstract class ElementComponent : Component
         }
     }
 
-    public override void Load()
+    protected override void Load()
     {
         if(Entity.TryGetComponent(out PlayerElementComponent playerElementComponent))
         {

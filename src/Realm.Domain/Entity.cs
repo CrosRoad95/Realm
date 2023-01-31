@@ -91,8 +91,20 @@ public class Entity : IDisposable
         }
         InjectProperties(component);
         InternalAddComponent(component);
-        component.Load();
-        Task.Run(component.LoadAsync);
+        try
+        {
+            component.InternalLoad();
+        }
+        catch(Exception)
+        {
+            DestroyComponent(component);
+            throw;
+        }
+        Task.Run(async () =>
+        {
+            ThrowIfDisposed();
+            await component.InternalLoadAsync();
+        });
         ComponentAdded?.Invoke(component);
         return component;
     }
@@ -105,10 +117,18 @@ public class Entity : IDisposable
             throw new Exception("Component already attached to other entity");
         }
         InjectProperties(component);
-        component.Entity = this;
         InternalAddComponent(component);
-        component.Load();
-        await component.LoadAsync();
+
+        try
+        {
+            component.InternalLoad();
+            await component.InternalLoadAsync();
+        }
+        catch(Exception)
+        {
+            DestroyComponent(component);
+            throw;
+        }
         ComponentAdded?.Invoke(component);
         return component;
     }
