@@ -58,6 +58,12 @@ internal class ClientInterfaceLogic
     private void HandleFocusedElementChanged(LuaEvent luaEvent)
     {
         var focusedElement = _fromLuaValueMapper.Map(typeof(Element), luaEvent.Parameters[1]) as Element;
+        var childElement = _fromLuaValueMapper.Map(typeof(string), luaEvent.Parameters[2]) as string;
+        if(childElement != null)
+        {
+            Console.WriteLine("FOCUS CHILD ELEMENT {0}", childElement);
+            ;
+        }
         _ClientInterfaceService.BroadcastPlayerElementFocusChanged(luaEvent.Player, focusedElement);
     }
 }

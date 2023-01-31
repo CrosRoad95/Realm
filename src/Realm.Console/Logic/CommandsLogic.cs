@@ -147,6 +147,7 @@ internal sealed class CommandsLogic
             vehicleEntity.AddComponent(new VehicleUpgradesComponent());
             vehicleEntity.AddComponent(new MileageCounterComponent());
             vehicleEntity.AddComponent(new VehicleFuelComponent("default", 20, 20, 0.01, 2)).Active = true;
+            vehicleEntity.AddComponent(new VehicleFocusableComponent());
             return Task.CompletedTask;
         });
         
