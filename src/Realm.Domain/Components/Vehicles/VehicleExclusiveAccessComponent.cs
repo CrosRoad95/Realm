@@ -18,16 +18,11 @@ public class VehicleExclusiveAccessComponent : VehicleAccessControllerComponent
 
     protected override void Load()
     {
-        if(Entity.Tag != Entity.VehicleTag)
-            throw new NotSupportedException("This component only works on vehicles.");
-
-        if (Entity.Components.OfType<VehicleAccessControllerComponent>().Where(x => x != this).Any())
-            throw new InvalidOperationException("Vehicle already have vehicle access controller component");
-
+        base.Load();
         Entity.GetRequiredComponent<VehicleElementComponent>().Vehicle.CanEnter = CanEnter;
     }
 
-    public bool CanEnter(Ped ped, Vehicle vehicle)
+    protected override bool CanEnter(Ped ped, Vehicle vehicle)
     {
         if(_entity.TryGetComponent(out PlayerElementComponent playerElementComponent))
         {

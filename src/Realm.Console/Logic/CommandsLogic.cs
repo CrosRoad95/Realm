@@ -158,7 +158,17 @@ internal sealed class CommandsLogic
             vehicleEntity.AddComponent(new MileageCounterComponent());
             vehicleEntity.AddComponent(new VehicleFuelComponent("default", 20, 20, 0.01, 2)).Active = true;
             vehicleEntity.AddComponent(new VehicleExclusiveAccessComponent(vehicleEntity));
-            entity.Transform.Position = vehicleEntity.Transform.Position;
+            return Task.CompletedTask;
+        });
+
+        _commandService.AddCommandHandler("noaccesscv", (entity, args) =>
+        {
+            using var vehicleRepository = _repositoryFactory.GetVehicleRepository();
+            var vehicleEntity = _entityFactory.CreateVehicle(404, entity.Transform.Position + new Vector3(4, 0, 0), entity.Transform.Rotation);
+            vehicleEntity.AddComponent(new VehicleUpgradesComponent());
+            vehicleEntity.AddComponent(new MileageCounterComponent());
+            vehicleEntity.AddComponent(new VehicleFuelComponent("default", 20, 20, 0.01, 2)).Active = true;
+            vehicleEntity.AddComponent(new VehicleNoAccessComponent());
             return Task.CompletedTask;
         });
 

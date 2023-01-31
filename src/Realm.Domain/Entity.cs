@@ -8,6 +8,7 @@ namespace Realm.Domain;
 public class Entity : IDisposable
 {
     public const string PlayerTag = "player";
+    public const string PedTag = "ped";
     public const string VehicleTag = "vehicle";
     public const string BlipTag = "blip";
     public const string PickupTag = "pickup";
