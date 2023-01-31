@@ -16,8 +16,8 @@ public sealed class Transform
         {
             if (_position != value)
             {
-                PositionChanged?.Invoke(this);
                 _position = value;
+                PositionChanged?.Invoke(this);
             }
         }
     }
@@ -28,8 +28,8 @@ public sealed class Transform
         {
             if (_rotation != value)
             {
-                RotationChanged?.Invoke(this);
                 _rotation = value;
+                RotationChanged?.Invoke(this);
             }
         }
     }
@@ -40,8 +40,8 @@ public sealed class Transform
         {
             if (_interior != value)
             {
-                InteriorChanged?.Invoke(this);
                 _interior = value;
+                InteriorChanged?.Invoke(this);
             }
         }
     }
@@ -52,8 +52,8 @@ public sealed class Transform
         {
             if (_dimension != value)
             {
-                DimensionChanged?.Invoke(this);
                 _dimension = value;
+                DimensionChanged?.Invoke(this);
             }
         }
     }

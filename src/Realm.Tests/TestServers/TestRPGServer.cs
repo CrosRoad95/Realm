@@ -66,11 +66,6 @@ internal class TestRPGServer : IRPGServer
         throw new NotImplementedException();
     }
 
-    public void AssociateElement(IElementHandle elementHandle)
-    {
-        throw new NotImplementedException();
-    }
-
     public object GetRequiredService(Type type)
     {
         throw new NotImplementedException();

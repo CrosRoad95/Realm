@@ -4,8 +4,6 @@ public abstract class ElementComponent : Component
 {
     [Inject]
     protected IEntityByElement EntityByElement { get; set; } = default!;
-    [Inject]
-    protected IRPGServer _rpgServer { get; set; } = default!;
 
     abstract internal Element Element { get; }
     private Player? Player { get; set; }
@@ -37,17 +35,21 @@ public abstract class ElementComponent : Component
         {
             Player = playerElementComponent.Player;
             Element.Id = playerElementComponent.MapIdGenerator.GetId();
-            Element.AssociateWith(Player);
             _isPerPlayer = true;
         }
         else
         {
             Entity.Transform.Bind(Element);
-            _rpgServer.AssociateElement(new ElementHandle(Element));
+            Element.PositionChanged += Element_PositionChanged;
             Entity.Destroyed += HandleDestroyed;
         }
 
         Entity.Transform.PositionChanged += HandleTransformPositionChanged;
+    }
+
+    private void Element_PositionChanged(Element sender, ElementChangedEventArgs<Vector3> args)
+    {
+        ;
     }
 
     private void HandleTransformPositionChanged(Transform newTransform)

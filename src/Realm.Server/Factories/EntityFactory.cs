@@ -1,6 +1,7 @@
 ﻿using Realm.Domain;
 using Realm.Domain.Components.CollisionShapes;
 using Realm.Domain.Interfaces;
+using Realm.Interfaces.Server;
 using Realm.Persistance.Interfaces;
 using RenderWareIo.Structs.Dff;
 using SlipeServer.Server.Elements;
@@ -8,6 +9,7 @@ using SlipeServer.Server.Elements.ColShapes;
 using SlipeServer.Server.Elements.IdGeneration;
 using SlipeServer.Server.Enums;
 using static Grpc.Core.Metadata;
+using Vehicle = SlipeServer.Server.Elements.Vehicle;
 
 namespace Realm.Server.Factories;
 
@@ -15,44 +17,63 @@ internal class EntityFactory : IEntityFactory
 {
     private readonly ECS _ecs;
     private readonly IVehicleRepository _vehicleRepository;
+    private readonly RPGServer _rpgServer;
 
-    public EntityFactory(ECS ecs, IVehicleRepository vehicleRepository)
+    public EntityFactory(ECS ecs, IVehicleRepository vehicleRepository, RPGServer rpgServer)
     {
         _ecs = ecs;
         _vehicleRepository = vehicleRepository;
+        _rpgServer = rpgServer;
+    }
+
+    private void AssociateWithServer(Entity entity)
+    {
+        var element = entity.GetRequiredComponent<ElementComponent>().Element;
+        element.AssociateWith(_rpgServer.MtaServer);
+        if(element is Pickup pickup)
+        {
+            pickup.CollisionShape.AssociateWith(_rpgServer.MtaServer);
+        }
     }
 
     public Entity CreateVehicle(ushort model, Vector3 position, Vector3 rotation, byte interior = 0, ushort dimension = 0, string? id = null, Action<Entity>? entityBuilder = null)
     {
-        return _ecs.CreateEntity(id ?? $"vehicle {Guid.NewGuid()}", Entity.VehicleTag, entity =>
+        var vehicleEntity = _ecs.CreateEntity(id ?? $"vehicle {Guid.NewGuid()}", Entity.VehicleTag, entity =>
         {
-            var vehicle = new SlipeServer.Server.Elements.Vehicle(model, position);
-
+            var vehicle = new Vehicle(model, new Vector3(0,0,4));
+            
+            var vehicleElementComponent = entity.AddComponent(new VehicleElementComponent(vehicle));
+            
             entity.Transform.Position = position;
             entity.Transform.Rotation = rotation;
             entity.Transform.Interior = interior;
             entity.Transform.Dimension = dimension;
 
-            var vehicleElementComponent = entity.AddComponent(new VehicleElementComponent(vehicle));
+            AssociateWithServer(entity);
 
             entityBuilder?.Invoke(entity);
         });
+
+        return vehicleEntity;
     }
     
     public async Task<Entity> CreateNewPrivateVehicle(ushort model, Vector3 position, Vector3 rotation, byte interior = 0, ushort dimension = 0, string? id = null, Action<Entity>? entityBuilder = null)
     {
         var vehicleEntity = _ecs.CreateEntity(id ?? $"vehicle {Guid.NewGuid()}", Entity.VehicleTag, entity =>
         {
-            var vehicle = new SlipeServer.Server.Elements.Vehicle(model, position);
+            var vehicle = new Vehicle(model, position);
+
             var vehicleElementComponent = entity.AddComponent(new VehicleElementComponent(vehicle));
+
+            entity.Transform.Position = position;
+            entity.Transform.Rotation = rotation;
+            entity.Transform.Interior = interior;
+            entity.Transform.Dimension = dimension;
+
+            AssociateWithServer(entity);
 
             entityBuilder?.Invoke(entity);
         });
-
-        vehicleEntity.Transform.Position = position;
-        vehicleEntity.Transform.Rotation = rotation;
-        vehicleEntity.Transform.Interior = interior;
-        vehicleEntity.Transform.Dimension = dimension;
 
         vehicleEntity.AddComponent(new PrivateVehicleComponent(await _vehicleRepository.CreateNewVehicle(model)));
 
@@ -66,16 +87,46 @@ internal class EntityFactory : IEntityFactory
             var marker = new Marker(new Vector3(0,0,1000), markerType);
             marker.Color = System.Drawing.Color.White;
 
+            var markerElementComponent = entity.AddComponent(new MarkerElementComponent(marker));
+
             entity.Transform.Position = position;
             entity.Transform.Interior = interior;
             entity.Transform.Dimension = dimension;
 
-            var markerElementComponent = entity.AddComponent(new MarkerElementComponent(marker));
+            AssociateWithServer(entity);
 
             entityBuilder?.Invoke(entity);
         });
     }
 
+    public Entity CreatePickup(ushort model, Vector3 position, string? id = null)
+    {
+        var pickupEntity = _ecs.CreateEntity(id ?? $"marker {Guid.NewGuid()}", Entity.PickupTag, entity =>
+        {
+            entity.AddComponent(new PickupElementComponent(new Pickup(Vector3.Zero, model)));
+
+            AssociateWithServer(entity);
+
+            entity.Transform.Position = position;
+        });
+
+        return pickupEntity;
+    }
+    
+    public Entity CreateBlip(BlipIcon blipIcon, Vector3 position, string? id = null)
+    {
+        var blipEntity = _ecs.CreateEntity(id ?? $"marker {Guid.NewGuid()}", Entity.BlipTag, entity =>
+        {
+            entity.AddComponent(new BlipElementComponent(new Blip(Vector3.Zero, blipIcon, 250)));
+
+            AssociateWithServer(entity);
+
+            entity.Transform.Position = position;
+        });
+
+        return blipEntity;
+    }
+    
     public BlipElementComponent CreateBlipFor(Entity entity, BlipIcon blipIcon, Vector3 position)
     {
         if(entity.Tag != Entity.PlayerTag)
@@ -83,9 +134,8 @@ internal class EntityFactory : IEntityFactory
 
         var blip = new Blip(position, blipIcon, 250);
 
-        entity.Transform.Position = position;
-
         var blipElementComponent = entity.AddComponent(new BlipElementComponent(blip));
+        entity.Transform.Position = position;
         return blipElementComponent;
     }
 
@@ -129,6 +179,8 @@ internal class EntityFactory : IEntityFactory
 
             var markerElementComponent = entity.AddComponent(new WorldObjectComponent(worldObject));
 
+            AssociateWithServer(entity);
+
             entityBuilder?.Invoke(entity);
         });
     }
@@ -147,6 +199,8 @@ internal class EntityFactory : IEntityFactory
 
             var markerElementComponent = entity.AddComponent(new CollisionCircleElementComponent(collisionSphere));
 
+            AssociateWithServer(entity);
+
             entityBuilder?.Invoke(entity);
         });
     }
@@ -163,6 +217,8 @@ internal class EntityFactory : IEntityFactory
 
             var markerElementComponent = entity.AddComponent(new CollisionCuboidElementComponent(collisioncuboid));
 
+            AssociateWithServer(entity);
+
             entityBuilder?.Invoke(entity);
         });
     }
@@ -177,6 +233,8 @@ internal class EntityFactory : IEntityFactory
             entity.Transform.Dimension = dimension;
 
             var markerElementComponent = entity.AddComponent(new CollisionPolygonElementComponent(collisionPolygon));
+
+            AssociateWithServer(entity);
 
             entityBuilder?.Invoke(entity);
         });
@@ -194,6 +252,8 @@ internal class EntityFactory : IEntityFactory
 
             var markerElementComponent = entity.AddComponent(new CollisionRectangleElementComponent(collisionRectangle));
 
+            AssociateWithServer(entity);
+
             entityBuilder?.Invoke(entity);
         });
     }
@@ -210,6 +270,8 @@ internal class EntityFactory : IEntityFactory
 
             var markerElementComponent = entity.AddComponent(new CollisionSphereElementComponent(collisionSphere));
 
+            AssociateWithServer(entity);
+
             entityBuilder?.Invoke(entity);
         });
     }
@@ -225,6 +287,8 @@ internal class EntityFactory : IEntityFactory
             entity.Transform.Dimension = dimension;
 
             var markerElementComponent = entity.AddComponent(new CollisionTubeElementComponent(collisionTube));
+
+            AssociateWithServer(entity);
 
             entityBuilder?.Invoke(entity);
         });

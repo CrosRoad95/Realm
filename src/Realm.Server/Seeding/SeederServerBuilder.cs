@@ -1,7 +1,11 @@
 ﻿using FluentValidation;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using Realm.Domain;
 using Realm.Domain.Components.World;
+using Realm.Domain.Interfaces;
 using System.Security.Claims;
+using static Grpc.Core.Metadata;
 using static Realm.Server.Seeding.SeedData;
 
 namespace Realm.Server.Seeding;
@@ -15,13 +19,14 @@ internal sealed class SeederServerBuilder
     private readonly UserManager<User> _userManager;
     private readonly RoleManager<Role> _roleManager;
     private readonly IGroupService _groupService;
+    private readonly IEntityFactory _entityFactory;
     private readonly ILogger _logger;
 
     private readonly Dictionary<string, User> _createdUsers = new();
     public SeederServerBuilder(ILogger logger,
         EntityByStringIdCollection elementByStringIdCollection,
         IServerFilesProvider serverFilesProvider, ECS ecs, UserManager<User> userManager, RoleManager<Role> roleManager,
-        IGroupService groupService)
+        IGroupService groupService, IEntityFactory entityFactory)
     {
         _elementByStringIdCollection = elementByStringIdCollection;
         _serverFilesProvider = serverFilesProvider;
@@ -29,6 +34,7 @@ internal sealed class SeederServerBuilder
         _userManager = userManager;
         _roleManager = roleManager;
         _groupService = groupService;
+        _entityFactory = entityFactory;
         _logger = logger.ForContext<SeederServerBuilder>();
     }
 
@@ -39,22 +45,12 @@ internal sealed class SeederServerBuilder
             throw new Exception($"Failed to assign seeded element to id {id} because it is already in used.");
     }
 
-    private Entity CreateEntity(string key, string tag, Action<Entity> entityBuilder)
-    {
-        var entity = _ecs.CreateEntity(key, tag, entityBuilder);
-        AssignElementToId(entity, key);
-        return entity;
-    }
-
     private void BuildBlips(Dictionary<string, BlipSeedData> blips)
     {
         foreach (var pair in blips)
         {
-            var blipEntity = CreateEntity(pair.Key, Entity.BlipTag, entity =>
-            {
-                entity.AddComponent(new BlipElementComponent(new Blip(Vector3.Zero, (BlipIcon)pair.Value.Icon, 250)));
-                entity.Transform.Position = pair.Value.Position;
-            });
+            var entity = _entityFactory.CreateBlip((BlipIcon)pair.Value.Icon, pair.Value.Position, pair.Key);
+            AssignElementToId(entity, pair.Key);
             _logger.Information("Seeder: Created blip of id {elementId} with icon {blipIcon} at {position}", pair.Key, pair.Value.Icon, pair.Value.Position);
         }
     }
@@ -63,16 +59,12 @@ internal sealed class SeederServerBuilder
     {
         foreach (var pair in pickups)
         {
-            var blipEntity = CreateEntity(pair.Key, Entity.PickupTag, entity =>
+            var entity = _entityFactory.CreatePickup(pair.Value.Model, pair.Value.Position, pair.Key);
+            if (pair.Value.Text3d != null)
             {
-                entity.Transform.Position = pair.Value.Position;
-
-                entity.AddComponent(new PickupElementComponent(new Pickup(Vector3.Zero, pair.Value.Model)));
-                if(pair.Value.Text3d != null)
-                {
-                    entity.AddComponent(new Text3dComponent(pair.Value.Text3d, new Vector3(0, 0, 0.75f)));
-                }
-            });
+                entity.AddComponent(new Text3dComponent(pair.Value.Text3d, new Vector3(0, 0, 0.75f)));
+            }
+            AssignElementToId(entity, pair.Key);
             _logger.Information("Seeder: Created pickup of id {elementId} with icon {pickupModel} at {position}", pair.Key, pair.Value.Model, pair.Value.Position);
         }
     }
@@ -81,14 +73,8 @@ internal sealed class SeederServerBuilder
     {
         foreach (var pair in markers)
         {
-            var blipEntity = CreateEntity(pair.Key, Entity.MarkerTag, entity =>
-            {
-                var marker = new Marker(Vector3.Zero, pair.Value.MarkerType);
-                marker.Color = pair.Value.Color;
-                marker.Size = pair.Value.Size;
-                entity.AddComponent(new MarkerElementComponent(marker));
-                entity.Transform.Position = pair.Value.Position;
-            });
+            var entity = _entityFactory.CreateMarker(pair.Value.MarkerType, pair.Value.Position, 0, 0, pair.Key);
+            AssignElementToId(entity, pair.Key);
             _logger.Information("Seeder: Created marker of id {elementId} at {position}", pair.Key, pair.Value.Position);
         }
     }

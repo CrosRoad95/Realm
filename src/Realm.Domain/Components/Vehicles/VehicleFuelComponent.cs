@@ -92,7 +92,7 @@ public class VehicleFuelComponent : Component
         _fuelType = fuelType;
     }
 
-    public override Task LoadAsync()
+    public override void Load()
     {
         var vehicle = Entity.GetRequiredComponent<VehicleElementComponent>().Vehicle;
         vehicle.PositionChanged += HandlePositionChanged;
@@ -102,7 +102,6 @@ public class VehicleFuelComponent : Component
             foreach (var item in Entity.Components.OfType<VehicleFuelComponent>().Where(x => x != this))
                 item.Active = false;
         }
-        return Task.CompletedTask;
     }
 
     public override void Dispose()

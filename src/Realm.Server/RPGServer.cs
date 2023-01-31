@@ -14,6 +14,7 @@ internal sealed class RPGServer : IRPGServer
 
     public event Action? ServerStarted;
 
+    internal MtaServer MtaServer => _server;
     public RPGServer(RealmConfigurationProvider realmConfigurationProvider, List<IModule> modules, Action<ServerBuilder>? configureServerBuilder = null)
     {
         _modules = modules;
@@ -69,12 +70,6 @@ internal sealed class RPGServer : IRPGServer
                 services.AddSingleton(module);
                 module.Configure(services);
             }
-    }
-
-    public void AssociateElement(IElementHandle elementHandle)
-    {
-        var element = (Element)elementHandle.GetElement();
-        _server.AssociateElement(element);
     }
 
     public TService GetRequiredService<TService>() where TService: notnull

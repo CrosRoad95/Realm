@@ -140,13 +140,26 @@ internal sealed class CommandsLogic
             return Task.CompletedTask;
         });
 
-        _commandService.AddCommandHandler("cv", async (entity, args) =>
+        _commandService.AddCommandHandler("cv", (entity, args) =>
         {
             using var vehicleRepository = _repositoryFactory.GetVehicleRepository();
-            var vehicleEntity = await _entityFactory.CreateNewPrivateVehicle(404, entity.Transform.Position + new Vector3(4, 0, 0), entity.Transform.Rotation);
+            var vehicleEntity = _entityFactory.CreateVehicle(404, entity.Transform.Position + new Vector3(4, 0, 0), entity.Transform.Rotation);
             vehicleEntity.AddComponent(new VehicleUpgradesComponent());
             vehicleEntity.AddComponent(new MileageCounterComponent());
             vehicleEntity.AddComponent(new VehicleFuelComponent("default", 20, 20, 0.01, 2)).Active = true;
+            return Task.CompletedTask;
+        });
+        
+        _commandService.AddCommandHandler("exclusivecv", (entity, args) =>
+        {
+            using var vehicleRepository = _repositoryFactory.GetVehicleRepository();
+            var vehicleEntity = _entityFactory.CreateVehicle(404, entity.Transform.Position + new Vector3(4, 0, 0), entity.Transform.Rotation);
+            vehicleEntity.AddComponent(new VehicleUpgradesComponent());
+            vehicleEntity.AddComponent(new MileageCounterComponent());
+            vehicleEntity.AddComponent(new VehicleFuelComponent("default", 20, 20, 0.01, 2)).Active = true;
+            vehicleEntity.AddComponent(new VehicleExclusiveAccessComponent(vehicleEntity));
+            entity.Transform.Position = vehicleEntity.Transform.Position;
+            return Task.CompletedTask;
         });
 
         _commandService.AddCommandHandler("privateblip", async (entity, args) =>
