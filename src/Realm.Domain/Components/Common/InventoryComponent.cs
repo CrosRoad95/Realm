@@ -5,15 +5,23 @@ namespace Realm.Domain.Components.Common;
 public class InventoryComponent : Component
 {
     private readonly List<Item> _items = new();
+    private readonly object _itemsLock = new object();
     public event Action<InventoryComponent, Item>? ItemAdded;
     public event Action<InventoryComponent, Item>? ItemRemoved;
     public event Action<InventoryComponent, Item>? ItemChanged;
 
     public Guid? Id { get; private set; } = null;
     public uint Size { get; set; }
-    public uint Number => (uint)_items.Sum(x => x.Size * x.Number);
+    public uint Number
+    {
+        get
+        {
+            lock (_itemsLock)
+                return (uint)_items.Sum(x => x.Size * x.Number);
+        }
+    }
 
-    public IEnumerable<Item> Items => _items;
+    public IReadOnlyList<Item> Items => _items;
 
     public Func<InventoryComponent, Item, ItemAction, Task> UseCallback { get; set; } = default!;
 
@@ -29,26 +37,36 @@ public class InventoryComponent : Component
         _items = items.ToList();
     }
 
-    public bool HasItem(uint itemId)
+    public bool HasItemById(uint itemId)
     {
-        return _items.Any(x => x.ItemId == itemId);
+        lock(_itemsLock)
+            return _items.Any(x => x.ItemId == itemId);
+    }
+    
+    public int SumItemsById(uint itemId)
+    {
+        lock (_itemsLock)
+            return _items.Count(x => x.ItemId == itemId);
     }
 
     public bool TryGetByLocalId(string localId, out Item item)
     {
-        item = _items.FirstOrDefault(x => x.LocalId == localId)!;
+        lock (_itemsLock)
+            item = _items.FirstOrDefault(x => x.LocalId == localId)!;
         return item != null;
     }
     
     public bool TryGetByItemId(uint itemId, out Item item)
     {
-        item = _items.FirstOrDefault(x => x.ItemId == itemId)!;
+        lock (_itemsLock)
+            item = _items.FirstOrDefault(x => x.ItemId == itemId)!;
         return item != null;
     }
 
     public bool TryGetByIdAndMetadata(uint itemId, Dictionary<string, object> metadata, out Item item)
     {
-        item = _items.FirstOrDefault(x => x.ItemId == itemId && x.Equals(metadata))!;
+        lock (_itemsLock)
+            item = _items.FirstOrDefault(x => x.ItemId == itemId && x.Equals(metadata))!;
         return item != null;
     }
 
@@ -67,14 +85,17 @@ public class InventoryComponent : Component
         List<Item> newItems = new();
         if (tryStack)
         {
-            foreach (var item in _items.Where(x => x.ItemId == itemId))
+            lock (_itemsLock)
             {
-                if (!item.Equals(metadata))
-                    continue;
+                foreach (var item in _items.Where(x => x.ItemId == itemId))
+                {
+                    if (!item.Equals(metadata))
+                        continue;
 
-                var added = Math.Min(number, itemRegistryEntry.StackSize - item.Number);
-                item.Number += added;
-                number -= added;
+                    var added = Math.Min(number, itemRegistryEntry.StackSize - item.Number);
+                    item.Number += added;
+                    number -= added;
+                }
             }
         }
 
@@ -90,7 +111,8 @@ public class InventoryComponent : Component
         foreach (var newItem in newItems)
         {
             newItem.Changed += HandleItemChanged;
-            _items.Add(newItem);
+            lock (_itemsLock)
+                _items.Add(newItem);
             ItemAdded?.Invoke(this, newItem);
         }
     }
@@ -109,11 +131,18 @@ public class InventoryComponent : Component
         }
         else
         {
-            if(!_items.Remove(item))
-                throw new InvalidOperationException();
+            lock (_itemsLock)
+                if (!_items.Remove(item))
+                    throw new InvalidOperationException();
 
             ItemRemoved?.Invoke(this, item);
         }
+    }
+    
+    public void RemoveItem(uint id, bool removeEntireStack = false)
+    {
+        if (TryGetByItemId(id, out var item))
+            RemoveItem(item, removeEntireStack);
     }
 
     public async Task<bool> TryUseItem(Item item, ItemAction action)

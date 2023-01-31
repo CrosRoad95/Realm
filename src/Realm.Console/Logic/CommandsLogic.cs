@@ -56,6 +56,18 @@ internal sealed class CommandsLogic
             }
             return Task.CompletedTask;
         });
+        
+        _commandService.AddCommandHandler("takeitem", (entity, args) =>
+        {
+            if(entity.TryGetComponent(out InventoryComponent inventoryComponent))
+            {
+                uint itemId = uint.Parse(args.ElementAtOrDefault(0) ?? "1");
+                uint count = uint.Parse(args.ElementAtOrDefault(1) ?? "1");
+                inventoryComponent.RemoveItem(itemId);
+                entity.GetRequiredComponent<PlayerElementComponent>().SendChatMessage($"Item removed, {inventoryComponent.Number}/{inventoryComponent.Size}");
+            }
+            return Task.CompletedTask;
+        });
 
         _commandService.AddCommandHandler("licenses", (entity, args) =>
         {

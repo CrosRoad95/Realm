@@ -1,4 +1,5 @@
 ﻿using Realm.Domain.IdGenerators;
+using SlipeServer.Server.Collections;
 
 namespace Realm.Domain.Components.Elements;
 
@@ -36,6 +37,7 @@ public sealed class PlayerElementComponent : ElementComponent
     internal Player Player => _player;
     public string Name { get => Player.Name; set => Player.Name = value; }
     public string Language { get; private set; } = "pl";
+    public WeaponCollection Weapons => _player.Weapons;
 
     internal override Element Element => _player;
     internal MapIdGenerator MapIdGenerator => _mapIdGenerator;
@@ -59,14 +61,19 @@ public sealed class PlayerElementComponent : ElementComponent
     {
         Entity.Transform.Bind(_player);
         _player.BindExecuted += HandleBindExecuted;
-        _player.Controls.FireEnabled = false;
+        UpdateFight();
+    }
+
+    private void UpdateFight()
+    {
+        _player.Controls.FireEnabled = _enableFightFlags.Any();
     }
 
     public bool AddEnableFightFlag(string flag)
     {
         if(_enableFightFlags.Add(flag))
         {
-            _player.Controls.FireEnabled = _enableFightFlags.Any();
+            UpdateFight();
             return true;
         }
         return false;
@@ -76,7 +83,7 @@ public sealed class PlayerElementComponent : ElementComponent
     {
         if(_enableFightFlags.Remove(flag))
         {
-            _player.Controls.FireEnabled = _enableFightFlags.Any();
+            UpdateFight();
             return true;
         }
         return false;
