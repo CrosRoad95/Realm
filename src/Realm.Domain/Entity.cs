@@ -100,12 +100,21 @@ public class Entity : IDisposable
             DestroyComponent(component);
             throw;
         }
+
+        ComponentAdded?.Invoke(component);
+
         Task.Run(async () =>
         {
             ThrowIfDisposed();
-            await component.InternalLoadAsync();
+            try
+            {
+                await component.InternalLoadAsync();
+            }
+            catch (Exception)
+            {
+                DestroyComponent(component);
+            }
         });
-        ComponentAdded?.Invoke(component);
         return component;
     }
     

@@ -81,5 +81,59 @@ public class EntityTests
         component.isObjectDefined().Should().BeTrue();
         #endregion
     }
+    
+    [Fact]
+    public void ComponentShouldNotBeAddedIfFailedToLoad()
+    {
+        #region Arrange & Act
+        var entity = new Entity(_serviceProvider, "foo", "test");
+        var component = new ThrowExceptionComponent();
 
+        var action = () => entity.AddComponent(component);
+        #endregion
+
+        #region Act
+        action.Should().Throw<Exception>().WithMessage("Something went wrong");
+        entity.Components.Should().BeEmpty();
+        #endregion
+    }
+
+    [Fact]
+    public async Task ComponentShouldNotBeAddedIfFailedToAsyncLoad()
+    {
+        #region Arrange & Act
+        var entity = new Entity(_serviceProvider, "foo", "test");
+        var component = new ThrowExceptionAsyncComponent();
+
+        var action = async () => await entity.AddComponentAsync(component);
+        #endregion
+
+        #region Act
+        await action.Should().ThrowAsync<Exception>().WithMessage("Something went wrong");
+        entity.Components.Should().BeEmpty();
+        #endregion
+    }
+
+    [Fact]
+    public async Task ComponentShouldBeRemovedIfAsyncLoadThrowException()
+    {
+        #region Arrange & Act
+        var entity = new Entity(_serviceProvider, "foo", "test");
+        var component = new ThrowExceptionAsyncComponent();
+
+        var action = () => entity.AddComponent(component);
+        #endregion
+
+        #region Act
+        var t = new TaskCompletionSource();
+        entity.ComponentDetached += e =>
+        {
+            t.SetResult();
+        };
+
+        action();
+
+        (await Task.WhenAny(t.Task, Task.Delay(500))).Should().Be(t.Task);
+        #endregion
+    }
 }
