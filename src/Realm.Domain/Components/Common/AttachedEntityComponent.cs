@@ -1,6 +1,4 @@
-﻿using System.Security.Cryptography.Xml;
-
-namespace Realm.Domain.Components.Common;
+﻿namespace Realm.Domain.Components.Common;
 
 public class AttachedEntityComponent : Component
 {

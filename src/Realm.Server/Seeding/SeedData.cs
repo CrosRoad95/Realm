@@ -1,5 +1,4 @@
-﻿using FluentValidation;
-using Realm.Domain.Enums;
+﻿using Realm.Domain.Enums;
 using System.Drawing;
 
 namespace Realm.Server.Seeding;

@@ -1,5 +1,4 @@
 ﻿using Realm.Domain.Inventory;
-using Realm.Persistance.Data;
 
 namespace Realm.Console.Components.Gui;
 

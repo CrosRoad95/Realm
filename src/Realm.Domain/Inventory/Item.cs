@@ -1,6 +1,4 @@
-﻿using static Realm.Domain.Registries.ItemRegistryEntry;
-
-namespace Realm.Domain.Inventory;
+﻿namespace Realm.Domain.Inventory;
 
 public class Item : IEquatable<Item>, IEquatable<Dictionary<string, object>>
 {

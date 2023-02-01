@@ -1,7 +1,4 @@
-﻿using Realm.Persistance.Extensions;
-using Realm.Persistance.Interfaces;
-
-namespace Realm.Persistance.Repository;
+﻿namespace Realm.Persistance.Repository;
 
 internal class VehicleRepository : IVehicleRepository
 {

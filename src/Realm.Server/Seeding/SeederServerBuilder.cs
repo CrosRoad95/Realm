@@ -1,12 +1,4 @@
-﻿using FluentValidation;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
-using Realm.Domain;
-using Realm.Domain.Components.World;
-using Realm.Domain.Interfaces;
-using System.Security.Claims;
-using static Grpc.Core.Metadata;
-using static Realm.Server.Seeding.SeedData;
+﻿using static Realm.Server.Seeding.SeedData;
 
 namespace Realm.Server.Seeding;
 

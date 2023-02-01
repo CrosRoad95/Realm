@@ -1,7 +1,5 @@
 ﻿using Realm.Domain.Components.Object;
-using Realm.Domain.Components.Players;
 using Realm.Domain.Interfaces;
-using Realm.Domain.Registries;
 using static Realm.Domain.Components.Elements.PlayerElementComponent;
 
 namespace Realm.Console.Logic;

@@ -1,5 +1,4 @@
-﻿using GroupData = Realm.Persistance.Data.Group;
-using GroupMemberData = Realm.Persistance.Data.GroupMember;
+﻿using GroupMemberData = Realm.Persistance.Data.GroupMember;
 
 namespace Realm.Domain.Components.Players;
 

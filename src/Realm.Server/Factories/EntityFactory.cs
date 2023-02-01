@@ -1,14 +1,7 @@
-﻿using Realm.Domain;
-using Realm.Domain.Components.CollisionShapes;
-using Realm.Domain.Interfaces;
-using Realm.Interfaces.Server;
+﻿using Realm.Domain.Components.CollisionShapes;
 using Realm.Persistance.Interfaces;
-using RenderWareIo.Structs.Dff;
-using SlipeServer.Server.Elements;
 using SlipeServer.Server.Elements.ColShapes;
-using SlipeServer.Server.Elements.IdGeneration;
 using SlipeServer.Server.Enums;
-using static Grpc.Core.Metadata;
 using Vehicle = SlipeServer.Server.Elements.Vehicle;
 
 namespace Realm.Server.Factories;

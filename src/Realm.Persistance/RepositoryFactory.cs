@@ -1,6 +1,4 @@
-﻿using Realm.Persistance.Interfaces;
-
-namespace Realm.Persistance;
+﻿namespace Realm.Persistance;
 
 public class RepositoryFactory
 {

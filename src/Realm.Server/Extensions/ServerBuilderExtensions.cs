@@ -1,5 +1,4 @@
-﻿using Realm.Domain.Interfaces;
-using Realm.Persistance.MySql;
+﻿using Realm.Persistance.MySql;
 using SlipeServer.Resources.Text3d;
 
 namespace Realm.Server.Extensions;

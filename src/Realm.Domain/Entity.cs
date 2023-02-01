@@ -1,6 +1,4 @@
-﻿using Microsoft.AspNetCore.Components;
-using Realm.Domain.Concepts.Objectives;
-using System.ComponentModel;
+﻿using Realm.Domain.Concepts.Objectives;
 using System.Diagnostics.CodeAnalysis;
 
 namespace Realm.Domain;

@@ -1,5 +1,4 @@
-﻿using Realm.Domain.Components.Elements;
-using Realm.Domain.Inventory;
+﻿using Realm.Domain.Inventory;
 using SlipeServer.Server.Elements.Structs;
 using SlipeServer.Server.Enums;
 using static Realm.Domain.Registries.ItemRegistryEntry;

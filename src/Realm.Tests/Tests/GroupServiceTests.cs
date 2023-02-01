@@ -1,5 +1,4 @@
 ﻿using FluentAssertions;
-using FluentAssertions.Common;
 using Microsoft.EntityFrameworkCore;
 using Realm.Domain.Exceptions;
 using Realm.Persistance;

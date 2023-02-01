@@ -53,6 +53,11 @@ global using Realm.Domain.Persistance;
 global using Realm.Domain.Components.Vehicles;
 global using Realm.Persistance.Data;
 global using Realm.Persistance.Extensions;
+global using FluentValidation;
+global using Microsoft.AspNetCore.Identity;
+global using Realm.Domain.Components.World;
+global using Realm.Domain.Interfaces;
+global using System.Security.Claims;
 using System.Runtime.CompilerServices;
 
 [assembly: InternalsVisibleTo("Realm.Tests")]
