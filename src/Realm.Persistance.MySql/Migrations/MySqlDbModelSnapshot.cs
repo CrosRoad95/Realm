@@ -176,6 +176,55 @@ namespace Realm.Persistance.MySql.Migrations
                     b.ToTable("Discoveries", (string)null);
                 });
 
+            modelBuilder.Entity("Realm.Persistance.Data.Fraction", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(128)
+                        .HasColumnType("varchar(128)");
+
+                    b.Property<string>("Shortcut")
+                        .HasMaxLength(8)
+                        .HasColumnType("varchar(8)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Name")
+                        .IsUnique();
+
+                    b.HasIndex("Shortcut")
+                        .IsUnique();
+
+                    b.ToTable("Fractions", (string)null);
+                });
+
+            modelBuilder.Entity("Realm.Persistance.Data.FractionMember", b =>
+                {
+                    b.Property<int>("FractionId")
+                        .HasColumnType("int");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("char(36)");
+
+                    b.Property<int>("Rank")
+                        .HasColumnType("int");
+
+                    b.Property<string>("RankName")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("varchar(64)");
+
+                    b.HasKey("FractionId", "UserId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("FractionMembers", (string)null);
+                });
+
             modelBuilder.Entity("Realm.Persistance.Data.Group", b =>
                 {
                     b.Property<int>("Id")
@@ -761,6 +810,25 @@ namespace Realm.Persistance.MySql.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("Realm.Persistance.Data.FractionMember", b =>
+                {
+                    b.HasOne("Realm.Persistance.Data.Fraction", "Fraction")
+                        .WithMany("Members")
+                        .HasForeignKey("FractionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Realm.Persistance.Data.User", "User")
+                        .WithMany("FractionMembers")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Fraction");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("Realm.Persistance.Data.GroupMember", b =>
                 {
                     b.HasOne("Realm.Persistance.Data.Group", "Group")
@@ -885,6 +953,11 @@ namespace Realm.Persistance.MySql.Migrations
                     b.Navigation("Vehicle");
                 });
 
+            modelBuilder.Entity("Realm.Persistance.Data.Fraction", b =>
+                {
+                    b.Navigation("Members");
+                });
+
             modelBuilder.Entity("Realm.Persistance.Data.Group", b =>
                 {
                     b.Navigation("Members");
@@ -902,6 +975,8 @@ namespace Realm.Persistance.MySql.Migrations
                     b.Navigation("DailyVisits");
 
                     b.Navigation("Discoveries");
+
+                    b.Navigation("FractionMembers");
 
                     b.Navigation("GroupMembers");
 

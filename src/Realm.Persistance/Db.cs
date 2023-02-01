@@ -1,4 +1,6 @@
-﻿namespace Realm.Persistance;
+﻿using Realm.Persistance.Data;
+
+namespace Realm.Persistance;
 
 public abstract class Db<T> : IdentityDbContext<User, Role, Guid,
         IdentityUserClaim<Guid>,
@@ -22,6 +24,8 @@ public abstract class Db<T> : IdentityDbContext<User, Role, Guid,
     public DbSet<Discovery> Discoveries => Set<Discovery>();
     public DbSet<Group> Groups => Set<Group>();
     public DbSet<GroupMember> GroupMembers => Set<GroupMember>();
+    public DbSet<Fraction> Fractions => Set<Fraction>();
+    public DbSet<FractionMember> FractionMembers => Set<FractionMember>();
 
     public Db(DbContextOptions<T> options) : base(options)
     {
@@ -101,6 +105,13 @@ public abstract class Db<T> : IdentityDbContext<User, Role, Guid,
 
             entityBuilder
                 .HasMany(x => x.GroupMembers)
+                .WithOne(x => x.User)
+                .HasForeignKey(x => x.UserId)
+                .HasPrincipalKey(x => x.Id)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            entityBuilder
+                .HasMany(x => x.FractionMembers)
                 .WithOne(x => x.User)
                 .HasForeignKey(x => x.UserId)
                 .HasPrincipalKey(x => x.Id)
@@ -376,6 +387,46 @@ public abstract class Db<T> : IdentityDbContext<User, Role, Guid,
             entityBuilder.HasOne(x => x.Group)
                 .WithMany(x => x.Members)
                 .HasForeignKey(x => x.GroupId)
+                .HasPrincipalKey(x => x.Id);
+        });
+        
+        
+        modelBuilder.Entity<Fraction>(entityBuilder =>
+        {
+            entityBuilder
+                .ToTable(nameof(Fractions))
+                .HasKey(x => x.Id);
+
+            entityBuilder.HasIndex(x => x.Name).IsUnique();
+            entityBuilder.HasIndex(x => x.Shortcut).IsUnique();
+
+            entityBuilder.Property(x => x.Name)
+                .HasMaxLength(128);
+
+            entityBuilder.Property(x => x.Shortcut)
+                .HasMaxLength(8);
+
+            entityBuilder.HasMany(x => x.Members)
+                .WithOne(x => x.Fraction)
+                .HasForeignKey(x => x.FractionId)
+                .HasPrincipalKey(x => x.Id);
+        });
+        
+        modelBuilder.Entity<FractionMember>(entityBuilder =>
+        {
+            entityBuilder
+                .ToTable(nameof(FractionMembers))
+                .HasKey(x => new { x.FractionId, x.UserId });
+
+            entityBuilder.Property(x => x.RankName)
+                .HasMaxLength(128);
+
+            entityBuilder.Property(x => x.RankName)
+                .HasMaxLength(64);
+
+            entityBuilder.HasOne(x => x.Fraction)
+                .WithMany(x => x.Members)
+                .HasForeignKey(x => x.FractionId)
                 .HasPrincipalKey(x => x.Id);
         });
 

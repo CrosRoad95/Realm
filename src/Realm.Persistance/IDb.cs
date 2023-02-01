@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore.ChangeTracking;
+using Realm.Persistance.Data;
 
 namespace Realm.Persistance;
 
@@ -25,6 +26,8 @@ public interface IDb : IDisposable
     DbSet<Achievement> Achievements { get; }
     DbSet<Group> Groups { get; }
     DbSet<GroupMember> GroupMembers { get; }
+    DbSet<Fraction> Fractions { get; }
+    DbSet<FractionMember> FractionMembers { get; }
 
     Task MigrateAsync();
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
