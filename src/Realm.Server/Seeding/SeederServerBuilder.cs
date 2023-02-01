@@ -7,7 +7,6 @@ internal sealed class SeederServerBuilder
     private const string _basePath = "Seed";
     private readonly EntityByStringIdCollection _elementByStringIdCollection;
     private readonly IServerFilesProvider _serverFilesProvider;
-    private readonly ECS _ecs;
     private readonly UserManager<User> _userManager;
     private readonly RoleManager<Role> _roleManager;
     private readonly IGroupService _groupService;
@@ -22,7 +21,6 @@ internal sealed class SeederServerBuilder
     {
         _elementByStringIdCollection = elementByStringIdCollection;
         _serverFilesProvider = serverFilesProvider;
-        _ecs = ecs;
         _userManager = userManager;
         _roleManager = roleManager;
         _groupService = groupService;
@@ -41,9 +39,16 @@ internal sealed class SeederServerBuilder
     {
         foreach (var pair in blips)
         {
-            var entity = _entityFactory.CreateBlip((BlipIcon)pair.Value.Icon, pair.Value.Position, pair.Key);
-            AssignElementToId(entity, pair.Key);
-            _logger.Information("Seeder: Created blip of id {elementId} with icon {blipIcon} at {position}", pair.Key, pair.Value.Icon, pair.Value.Position);
+            if(Enum.IsDefined(typeof(BlipIcon), pair.Value.Icon))
+            {
+                var entity = _entityFactory.CreateBlip((BlipIcon)pair.Value.Icon, pair.Value.Position, pair.Key);
+                AssignElementToId(entity, pair.Key);
+                _logger.Information("Seeder: Created blip of id {elementId} with icon {blipIcon} at position {position}", pair.Key, pair.Value.Icon, pair.Value.Position);
+            }
+            else
+            {
+                _logger.Error("Seeder: Failed to create blip with icon {blipIcon} at position {position}", pair.Key, pair.Value.Icon, pair.Value.Position);
+            }
         }
     }
 
@@ -65,9 +70,14 @@ internal sealed class SeederServerBuilder
     {
         foreach (var pair in markers)
         {
-            var entity = _entityFactory.CreateMarker(pair.Value.MarkerType, pair.Value.Position, 0, 0, pair.Key);
-            AssignElementToId(entity, pair.Key);
-            _logger.Information("Seeder: Created marker of id {elementId} at {position}", pair.Key, pair.Value.Position);
+            if (Enum.IsDefined(typeof(MarkerType), pair.Value.MarkerType))
+            {
+                var entity = _entityFactory.CreateMarker(pair.Value.MarkerType, pair.Value.Position, 0, 0, pair.Key);
+                AssignElementToId(entity, pair.Key);
+                _logger.Information("Seeder: Created marker of id {elementId} at {position}", pair.Key, pair.Value.Position);
+            }
+            else
+                _logger.Information("Seeder: Failed to create type {markerType} at {position}", pair.Value.MarkerType, pair.Value.Position);
         }
     }
     
@@ -111,10 +121,15 @@ internal sealed class SeederServerBuilder
         foreach (var roleName in roles)
         {
             if (!existingRoles.Any(x => x.Name == roleName))
+            {
                 await _roleManager.CreateAsync(new Role
                 {
                     Name = roleName
                 });
+                _logger.Information("Seeder: Created role {roleName}", roleName);
+            }
+            else
+                _logger.Information("Seeder: Role {roleName} already exists", roleName);
         }
     }
 
@@ -132,10 +147,13 @@ internal sealed class SeederServerBuilder
                 if(identityResult.Succeeded)
                 {
                     user = await _userManager.FindByNameAsync(pair.Key);
+                    _logger.Information("Seeder: Created user {userName}", pair.Key);
                 }
             }
+            else
+                _logger.Information("Seeder: User {userName} already exists", pair.Key);
 
-            if(user == null)
+            if (user == null)
                 throw new Exception($"Failed to create user account '{pair.Key}'");
 
             var claims = pair.Value.Claims.Select(x => new Claim(x.Key, x.Value))
