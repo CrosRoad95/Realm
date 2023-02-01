@@ -1,4 +1,5 @@
-﻿using static Realm.Server.Seeding.SeedData;
+﻿using Realm.Domain.Inventory;
+using static Realm.Server.Seeding.SeedData;
 
 namespace Realm.Server.Seeding;
 
@@ -11,13 +12,15 @@ internal sealed class SeederServerBuilder
     private readonly RoleManager<Role> _roleManager;
     private readonly IGroupService _groupService;
     private readonly IEntityFactory _entityFactory;
+    private readonly IFractionService _fractionService;
+    private readonly IDb _db;
     private readonly ILogger _logger;
 
-    private readonly Dictionary<string, User> _createdUsers = new();
+    private readonly Dictionary<string, User> _createdAccounts = new();
     public SeederServerBuilder(ILogger logger,
         EntityByStringIdCollection elementByStringIdCollection,
-        IServerFilesProvider serverFilesProvider, ECS ecs, UserManager<User> userManager, RoleManager<Role> roleManager,
-        IGroupService groupService, IEntityFactory entityFactory)
+        IServerFilesProvider serverFilesProvider, UserManager<User> userManager, RoleManager<Role> roleManager,
+        IGroupService groupService, IEntityFactory entityFactory, IFractionService fractionService, IDb db)
     {
         _elementByStringIdCollection = elementByStringIdCollection;
         _serverFilesProvider = serverFilesProvider;
@@ -25,6 +28,8 @@ internal sealed class SeederServerBuilder
         _roleManager = roleManager;
         _groupService = groupService;
         _entityFactory = entityFactory;
+        _fractionService = fractionService;
+        _db = db;
         _logger = logger.ForContext<SeederServerBuilder>();
     }
 
@@ -101,7 +106,7 @@ internal sealed class SeederServerBuilder
             {
                 try
                 {
-                    await _groupService.AddMember(group.name, _createdUsers[item.Key].Id, item.Value.Rank, item.Value.RankName);
+                    await _groupService.AddMember(group.name, _createdAccounts[item.Key].Id, item.Value.Rank, item.Value.RankName);
                 }
                 catch(Exception) // Maybe member is already in group
                 {
@@ -167,10 +172,53 @@ internal sealed class SeederServerBuilder
             await _userManager.AddClaimsAsync(user, claims);
             await _userManager.AddToRolesAsync(user, pair.Value.Roles);
 
-            _createdUsers.Add(pair.Key, user);
+            _createdAccounts.Add(pair.Key, user);
         }
     }
 
+    private async Task BuildFractions(Dictionary<string, FractionSeedData> fractions)
+    {
+        foreach (var fraction in fractions)
+        {
+            var id = fraction.Value.Id;
+            var fractionData = await _db.Fractions
+                .Include(x => x.Members)
+                .Where(x => x.Id == id && x.Code == fraction.Value.Code && x.Name == fraction.Key).FirstOrDefaultAsync();
+
+            if(fractionData == null)
+            {
+                var oldFractionData = await _db.Fractions
+                    .Include(x => x.Members)
+                    .Where(x => x.Id == id).FirstOrDefaultAsync();
+                if(oldFractionData != null)
+                {
+                    _db.Fractions.Remove(oldFractionData);
+                    _logger.Information("Seeder: Removed old fraction '{fractionName}' from database.", oldFractionData.Name);
+                }
+
+                fractionData = new Fraction
+                {
+                    Id = id,
+                    Name = fraction.Key,
+                    Code = fraction.Value.Code,
+                    Members = fraction.Value.Members.Select(x => new FractionMember
+                    {
+                        UserId = _createdAccounts[x.Key].Id,
+                        Rank = x.Value.Rank,
+                        RankName = x.Value.RankName,
+                    }).ToList()
+                };
+                _db.Fractions.Add(fractionData);
+
+                _logger.Information("Seeder: Added fraction '{fractionName}' to database.", fractionData.Name);
+            }
+
+            _fractionService.CreateFraction(id, fraction.Key, fraction.Value.Code, fraction.Value.Position);
+            _logger.Information("Seeder: Created fraction '{fractionName}'.", fractionData.Name);
+        }
+        await _db.SaveChangesAsync();
+    }
+    
     public async Task Build()
     {
         var result = new JObject();
@@ -197,10 +245,11 @@ internal sealed class SeederServerBuilder
     {
         await BuildIdentityRoles(seedData.Roles);
         await BuildIdentityAccounts(seedData.Accounts);
+        await BuildFractions(seedData.Fractions);
         BuildBlips(seedData.Blips);
         BuildPickups(seedData.Pickups);
         BuildMarkers(seedData.Markers);
         await BuildGroups(seedData.Groups);
-        _createdUsers.Clear();
+        _createdAccounts.Clear();
     }
 }

@@ -58,9 +58,9 @@
 		}
 	},
 	"Fractions": {
-		"fractionSapd": {
+		"San andreas police department": {
+			"Id": 1,
 			"Code": "SAPD",
-			"Name": "San andreas police department",
 			"Position": {
 				"X": 10,
 				"Y": 10,
@@ -68,7 +68,8 @@
 			},
 			"Members": {
 				"admin": {
-					"Permissions": [ "all" ]
+					"Rank": 100,
+					"RankName": "Leader"
 				}
 			}
 		}

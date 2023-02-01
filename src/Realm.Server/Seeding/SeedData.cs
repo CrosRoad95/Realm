@@ -31,13 +31,14 @@ internal class SeedData
 
     public class FractionMemberSeedData
     {
-        public string[]? Permissions { get; set; }
+        public int Rank { get; set; }
+        public string RankName { get; set; }
     }
 
     public class FractionSeedData
     {
+        public int Id { get; set; }
         public string Code { get; set; }
-        public string Name { get; set; }
         public Vector3 Position { get; set; }
         public Dictionary<string, FractionMemberSeedData> Members { get; set; }
     }

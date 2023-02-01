@@ -180,21 +180,21 @@ namespace Realm.Persistance.SQLite.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
+                    b.Property<string>("Code")
+                        .HasMaxLength(8)
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(128)
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("Shortcut")
-                        .HasMaxLength(8)
-                        .HasColumnType("TEXT");
-
                     b.HasKey("Id");
 
-                    b.HasIndex("Name")
+                    b.HasIndex("Code")
                         .IsUnique();
 
-                    b.HasIndex("Shortcut")
+                    b.HasIndex("Name")
                         .IsUnique();
 
                     b.ToTable("Fractions", (string)null);

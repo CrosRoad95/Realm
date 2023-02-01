@@ -398,12 +398,12 @@ public abstract class Db<T> : IdentityDbContext<User, Role, Guid,
                 .HasKey(x => x.Id);
 
             entityBuilder.HasIndex(x => x.Name).IsUnique();
-            entityBuilder.HasIndex(x => x.Shortcut).IsUnique();
+            entityBuilder.HasIndex(x => x.Code).IsUnique();
 
             entityBuilder.Property(x => x.Name)
                 .HasMaxLength(128);
 
-            entityBuilder.Property(x => x.Shortcut)
+            entityBuilder.Property(x => x.Code)
                 .HasMaxLength(8);
 
             entityBuilder.HasMany(x => x.Members)
