@@ -2,13 +2,13 @@
 
 namespace Realm.Domain.Components.Players;
 
-public class GroupMemeberComponent : Component
+public class GroupMemberComponent : Component
 {
     public int GroupId { get; private set; }
     public int Rank { get; private set; }
     public string RankName { get; private set; }
 
-    internal GroupMemeberComponent(GroupMemberData groupMemberData)
+    internal GroupMemberComponent(GroupMemberData groupMemberData)
     {
         GroupId = groupMemberData.GroupId;
         Rank = groupMemberData.Rank;

@@ -210,11 +210,15 @@ internal sealed class SeederServerBuilder
                 };
                 _db.Fractions.Add(fractionData);
 
-                _logger.Information("Seeder: Added fraction '{fractionName}' to database.", fractionData.Name);
+                _logger.Information("Seeder: Added fraction '{fractionName}' to database with id {fractionId}.", fractionData.Name);
             }
 
             _fractionService.CreateFraction(id, fraction.Key, fraction.Value.Code, fraction.Value.Position);
-            _logger.Information("Seeder: Created fraction '{fractionName}'.", fractionData.Name);
+            foreach (var member in fraction.Value.Members)
+            {
+                _fractionService.InternalAddMember(id, _createdAccounts[member.Key].Id, member.Value.Rank, member.Value.RankName);
+            }
+            _logger.Information("Seeder: Created fraction '{fractionName}' with id {fractionId}.", fractionData.Name);
         }
         await _db.SaveChangesAsync();
     }

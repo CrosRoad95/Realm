@@ -1,6 +1,4 @@
-﻿using Realm.Domain.Enums;
-
-namespace Realm.Domain.Concepts;
+﻿namespace Realm.Domain.Concepts;
 
 public struct Fraction
 {
@@ -8,5 +6,5 @@ public struct Fraction
     public string name;
     public string? code;
     public Vector3 position;
-    public FractionMember[] members;
+    public List<FractionMember> members;
 }

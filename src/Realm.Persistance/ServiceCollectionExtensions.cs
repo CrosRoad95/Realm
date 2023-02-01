@@ -27,6 +27,7 @@ public static class ServiceCollectionExtensions
 
         services.AddTransient<IVehicleRepository, VehicleRepository>();
         services.AddTransient<IGroupRepository, GroupRepository>();
+        services.AddTransient<IFractionRepository, FractionRepository>();
 
         services.AddDbContext<IDb, T>(dboptions, ServiceLifetime.Transient);
 

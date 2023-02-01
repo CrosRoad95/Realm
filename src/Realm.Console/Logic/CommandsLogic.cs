@@ -413,9 +413,20 @@ internal sealed class CommandsLogic
         {
             var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();
             playerElementComponent.SendChatMessage("Groups:");
-            foreach (var item in entity.Components.OfType<GroupMemeberComponent>())
+            foreach (var item in entity.Components.OfType<GroupMemberComponent>())
             {
                 playerElementComponent.SendChatMessage($"Group id: {item.GroupId}, rank: {item.Rank}, rank name: '{item.RankName}'");
+            }
+            return Task.CompletedTask;
+        });
+
+        _commandService.AddCommandHandler("myfractions", (entity, args) =>
+        {
+            var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();
+            playerElementComponent.SendChatMessage("Fractions:");
+            foreach (var item in entity.Components.OfType<FractionMemberComponent>())
+            {
+                playerElementComponent.SendChatMessage($"Fraction id: {item.FractionId}, rank: {item.Rank}, rank name: '{item.RankName}'");
             }
             return Task.CompletedTask;
         });

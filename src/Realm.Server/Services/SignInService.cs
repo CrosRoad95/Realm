@@ -75,7 +75,10 @@ internal class SignInService : ISignInService
                 await entity.AddComponentAsync(new DiscoveriesComponent());
 
             foreach (var groupMemberData in user.GroupMembers)
-                await entity.AddComponentAsync(new GroupMemeberComponent(groupMemberData));
+                await entity.AddComponentAsync(new GroupMemberComponent(groupMemberData));
+            
+            foreach (var fractionMemberData in user.FractionMembers)
+                await entity.AddComponentAsync(new FractionMemberComponent(fractionMemberData));
 
             entity.AddComponent(new LicensesComponent(user.Licenses));
             entity.AddComponent(new PlayTimeComponent());

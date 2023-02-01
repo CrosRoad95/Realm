@@ -70,7 +70,7 @@ internal class GroupService : IGroupService
 
         var userId = entity.GetRequiredComponent<AccountComponent>().Id;
         var groupMemberData = await _groupRepository.CreateNewGroupMember(groupId, userId, rank, rankName);
-        entity.AddComponent(new GroupMemeberComponent(groupMemberData));
+        entity.AddComponent(new GroupMemberComponent(groupMemberData));
     }
 
     public async Task AddMember(string groupName, Entity entity, int rank = 1, string rankName = "")
@@ -80,7 +80,7 @@ internal class GroupService : IGroupService
 
         var userId = entity.GetRequiredComponent<AccountComponent>().Id;
         var groupMemberData = await _groupRepository.CreateNewGroupMember(groupName, userId, rank, rankName);
-        entity.AddComponent(new GroupMemeberComponent(groupMemberData));
+        entity.AddComponent(new GroupMemberComponent(groupMemberData));
     }
 
     public async Task AddMember(string groupName, Guid userId, int rank = 1, string rankName = "")
