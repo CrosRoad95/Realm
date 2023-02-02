@@ -22,6 +22,7 @@ internal class SamplePickupsLogic
         if (entity.Tag == Entity.EntityTag.Pickup && entity.Name.StartsWith("fractionTestPickup"))
         {
             var pickupElementComponent = entity.GetRequiredComponent<PickupElementComponent>();
+            pickupElementComponent.AddRule(new MustBePlayerInFractionRule(1));
             pickupElementComponent.EntityEntered = async entity =>
             {
                 if (entity.Tag != Entity.EntityTag.Player)
