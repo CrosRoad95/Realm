@@ -56,11 +56,16 @@ public class PickupElementComponent : ElementComponent
 
     protected override void Load()
     {
+        base.Load();
         Entity.Destroyed += HandleDestroyed;
         _pickup.CollisionShape.ElementEntered += HandleElementEntered;
         _pickup.CollisionShape.ElementLeft += HandleElementLeft;
-        base.Load();
         _pickup.CollisionShape.Position = _pickup.Position;
+        Entity.Transform.PositionChanged += HandlePositionChanged;
     }
 
+    private void HandlePositionChanged(Transform transform)
+    {
+        _pickup.CollisionShape.Position = transform.Position;
+    }
 }
