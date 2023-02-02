@@ -10,7 +10,7 @@ public abstract class ElementComponent : Component
     private byte _focusableCounter;
     private bool _isPerPlayer = false;
 
-    public bool AreCollisionsEnabled { get => Element.IsCallPropagationEnabled; set => Element.IsCallPropagationEnabled = value; }
+    public bool AreCollisionsEnabled { get => Element.AreCollisionsEnabled; set => Element.AreCollisionsEnabled = value; }
 
     protected ElementComponent()
     {
