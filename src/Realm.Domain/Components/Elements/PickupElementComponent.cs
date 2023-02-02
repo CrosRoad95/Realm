@@ -7,6 +7,7 @@ public class PickupElementComponent : ElementComponent
     protected readonly Pickup _pickup;
     public Action<Entity>? EntityEntered { get; set; }
     public Action<Entity>? EntityLeft { get; set; }
+    public Action<Entity, IEntityRule>? EntityRuleFailed { get; set; }
 
     internal override Element Element => _pickup;
 
@@ -30,8 +31,15 @@ public class PickupElementComponent : ElementComponent
             var entity = EntityByElement.TryGetByElement(element);
             if(entity != null && (entity.Tag == Entity.EntityTag.Player || entity.Tag == Entity.EntityTag.Vehicle))
             {
-                if(_entityRules.All(x => x.Check(entity)))
-                    EntityEntered(entity);
+                foreach (var rule in _entityRules)
+                {
+                    if(!rule.Check(entity))
+                    {
+                        EntityRuleFailed?.Invoke(entity, rule);
+                        return;
+                    }
+                }
+                EntityEntered(entity);
             }
         }
     }

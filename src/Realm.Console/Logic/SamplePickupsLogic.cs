@@ -1,4 +1,5 @@
 ﻿using Realm.Domain.Components.Object;
+using Realm.Domain.Components.Players;
 using Realm.Domain.Interfaces;
 using Realm.Domain.Rules;
 using Realm.Server.Extensions;
@@ -23,6 +24,12 @@ internal class SamplePickupsLogic
         {
             var pickupElementComponent = entity.GetRequiredComponent<PickupElementComponent>();
             pickupElementComponent.AddRule(new MustBePlayerInFractionRule(1));
+            pickupElementComponent.EntityRuleFailed = (entity, rule) =>
+            {
+                var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();
+                playerElementComponent.SendChatMessage($"No permissions, rule: {rule.GetType().Name}");
+
+            };
             pickupElementComponent.EntityEntered = async entity =>
             {
                 if (entity.Tag != Entity.EntityTag.Player)
