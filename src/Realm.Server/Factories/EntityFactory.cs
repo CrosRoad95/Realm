@@ -1,4 +1,5 @@
 ﻿using Realm.Domain.Components.CollisionShapes;
+using Realm.Domain.Components.Elements;
 using Realm.Persistance.Interfaces;
 using SlipeServer.Server.Elements.ColShapes;
 using SlipeServer.Server.Enums;
@@ -26,6 +27,17 @@ internal class EntityFactory : IEntityFactory
         if(element is Pickup pickup)
         {
             pickup.CollisionShape.AssociateWith(_rpgServer.MtaServer);
+        }
+    }
+
+    private void AssociateWithPlayerEntity(ElementComponent elementComponent, Entity playerEntity)
+    {
+        var element = elementComponent.Element;
+        var player = playerEntity.GetRequiredComponent<PlayerElementComponent>().Player;
+        element.AssociateWith(player);
+        if(element is Pickup pickup)
+        {
+            pickup.CollisionShape.AssociateWith(player);
         }
     }
 
@@ -120,42 +132,44 @@ internal class EntityFactory : IEntityFactory
         return blipEntity;
     }
     
-    public BlipElementComponent CreateBlipFor(Entity entity, BlipIcon blipIcon, Vector3 position)
+    public BlipElementComponent CreateBlipFor(Entity playerEntity, BlipIcon blipIcon, Vector3 position)
     {
-        if(entity.Tag != Entity.EntityTag.Player)
+        if(playerEntity.Tag != Entity.EntityTag.Player)
             throw new ArgumentException("Entity must be a player entity");
 
         var blip = new Blip(position, blipIcon, 250);
 
-        var blipElementComponent = entity.AddComponent(new BlipElementComponent(blip));
-        entity.Transform.Position = position;
+        var blipElementComponent = playerEntity.AddComponent(new BlipElementComponent(blip));
+        playerEntity.Transform.Position = position;
+        AssociateWithPlayerEntity(blipElementComponent, playerEntity);
         return blipElementComponent;
     }
 
-    public CollisionSphereElementComponent CreateCollisionSphereFor(Entity entity, Vector3 position, float radius)
+    public CollisionSphereElementComponent CreateCollisionSphereFor(Entity playerEntity, Vector3 position, float radius)
     {
-        if (entity.Tag != Entity.EntityTag.Player)
+        if (playerEntity.Tag != Entity.EntityTag.Player)
             throw new ArgumentException("Entity must be a player entity");
 
         var collisionSphere = new CollisionSphere(position, radius);
 
-        var collisionSphereElementComponent = entity.AddComponent(new CollisionSphereElementComponent(collisionSphere));
-
-        entity.Transform.Position = position;
+        var collisionSphereElementComponent = playerEntity.AddComponent(new CollisionSphereElementComponent(collisionSphere));
+        playerEntity.Transform.Position = position;
+        AssociateWithPlayerEntity(collisionSphereElementComponent, playerEntity);
         return collisionSphereElementComponent;
     }
 
-    public MarkerElementComponent CreateMarkerFor(Entity entity, Vector3 position, MarkerType markerType, System.Drawing.Color? color = null)
+    public MarkerElementComponent CreateMarkerFor(Entity playerEntity, Vector3 position, MarkerType markerType, System.Drawing.Color? color = null)
     {
-        if (entity.Tag != Entity.EntityTag.Player)
+        if (playerEntity.Tag != Entity.EntityTag.Player)
             throw new ArgumentException("Entity must be a player entity");
 
         var marker = new Marker(position, markerType);
         marker.Color = color ?? System.Drawing.Color.White;
 
-        entity.Transform.Position = position;
+        playerEntity.Transform.Position = position;
 
-        var markerElementComponent = entity.AddComponent(new MarkerElementComponent(marker));
+        var markerElementComponent = playerEntity.AddComponent(new MarkerElementComponent(marker));
+        AssociateWithPlayerEntity(markerElementComponent, playerEntity);
         return markerElementComponent;
     }
 
