@@ -68,4 +68,9 @@ public class PickupElementComponent : ElementComponent
     {
         _pickup.CollisionShape.Position = transform.Position;
     }
+
+    public override void Dispose()
+    {
+        Entity.Transform.PositionChanged -= HandlePositionChanged;
+    }
 }
