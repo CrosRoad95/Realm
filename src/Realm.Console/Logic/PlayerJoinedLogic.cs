@@ -1,4 +1,6 @@
-﻿namespace Realm.Console.Logic;
+﻿using Realm.Domain;
+
+namespace Realm.Console.Logic;
 
 internal sealed class PlayerJoinedLogic
 {
@@ -29,34 +31,47 @@ internal sealed class PlayerJoinedLogic
         entity.AddComponent(new LoginGuiComponent());
 
         entity.ComponentAdded += HandleComponentAdded;
+        entity.Destroyed += HandleDestroyed;
+    }
+
+    private void HandleDestroyed(Entity entity)
+    {
+        entity.ComponentAdded -= HandleComponentAdded;
     }
 
     private async void HandleComponentAdded(Component component)
     {
-        if (component is AccountComponent)
+        try
         {
-            var playerElementComponent = component.Entity.GetRequiredComponent<PlayerElementComponent>();
-            await playerElementComponent.FadeCameraAsync(CameraFade.Out);
-            playerElementComponent.SetChatVisible(true);
-            playerElementComponent.SetGuiDebugToolsEnabled(true);
-            playerElementComponent.ClearChatBox();
-            playerElementComponent.SetCameraTarget(component.Entity);
-            if (!playerElementComponent.TrySpawnAtLastPosition())
+            if (component is AccountComponent)
             {
-                playerElementComponent.Spawn(new Vector3(362.58f + (float)Random.Shared.NextDouble() * 3, -91.07f + (float)Random.Shared.NextDouble() * 3, 1.38f),
-                    new Vector3(0, 0, 90));
+                var playerElementComponent = component.Entity.GetRequiredComponent<PlayerElementComponent>();
+                await playerElementComponent.FadeCameraAsync(CameraFade.Out);
+                playerElementComponent.SetChatVisible(true);
+                playerElementComponent.SetGuiDebugToolsEnabled(true);
+                playerElementComponent.ClearChatBox();
+                playerElementComponent.SetCameraTarget(component.Entity);
+                if (!playerElementComponent.TrySpawnAtLastPosition())
+                {
+                    playerElementComponent.Spawn(new Vector3(362.58f + (float)Random.Shared.NextDouble() * 3, -91.07f + (float)Random.Shared.NextDouble() * 3, 1.38f),
+                        new Vector3(0, 0, 90));
+                }
+                await Task.Delay(300);
+                await playerElementComponent.FadeCameraAsync(CameraFade.In);
+                playerElementComponent.SetRenderingEnabled(true);
             }
-            await Task.Delay(300);
-            await playerElementComponent.FadeCameraAsync(CameraFade.In);
-            playerElementComponent.SetRenderingEnabled(true);
-        }
 
-        if (component is LevelComponent levelComponent)
-        {
-            levelComponent.LevelChanged += (self, level) =>
+            if (component is LevelComponent levelComponent)
             {
-                _logger.Information("Player leveled up: {level}", level);
-            };
+                levelComponent.LevelChanged += (self, level) =>
+                {
+                    _logger.Information("Player leveled up: {level}", level);
+                };
+            }
+        }
+        catch(Exception ex)
+        {
+            _logger.Error(ex, "Failed to add component.");
         }
     }
 }

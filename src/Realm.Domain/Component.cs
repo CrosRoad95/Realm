@@ -23,7 +23,7 @@ public abstract class Component
     protected void ThrowIfDisposed()
     {
         if (_disposed)
-            throw new ObjectDisposedException(nameof(Component));
+            throw new ObjectDisposedException(GetType().Name);
     }
 
     public virtual void Dispose()

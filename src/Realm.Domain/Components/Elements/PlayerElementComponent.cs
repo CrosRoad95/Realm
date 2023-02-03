@@ -26,7 +26,8 @@ public sealed class PlayerElementComponent : ElementComponent
     public event Action<Entity, Entity?>? FocusedEntityChanged;
     public Entity? FocusedEntity { get => _focusedEntity; internal set
         {
-            if(value != _focusedEntity)
+            ThrowIfDisposed();
+            if (value != _focusedEntity)
             {
                 _focusedEntity = value;
                 FocusedEntityChanged?.Invoke(Entity, value);
@@ -35,6 +36,7 @@ public sealed class PlayerElementComponent : ElementComponent
     }
 
     internal Player Player => _player;
+    internal bool Spawned { get; set; }
     public string Name { get => Player.Name; set => Player.Name = value; }
     public string Language { get; private set; } = "pl";
     public WeaponCollection Weapons => _player.Weapons;
@@ -46,6 +48,7 @@ public sealed class PlayerElementComponent : ElementComponent
     {
         get
         {
+            ThrowIfDisposed();
             if (_player.Vehicle == null)
                 return null;
             return EntityByElement.TryGetByElement(_player.Vehicle);
@@ -54,11 +57,13 @@ public sealed class PlayerElementComponent : ElementComponent
 
     internal PlayerElementComponent(Player player)
     {
+        ThrowIfDisposed();
         _player = player;
     }
 
     protected override void Load()
     {
+        ThrowIfDisposed();
         Entity.Transform.Bind(_player);
         _player.BindExecuted += HandleBindExecuted;
         UpdateFight();
@@ -66,12 +71,14 @@ public sealed class PlayerElementComponent : ElementComponent
 
     private void UpdateFight()
     {
+        ThrowIfDisposed();
         _player.Controls.FireEnabled = _enableFightFlags.Any();
     }
 
     public bool AddEnableFightFlag(string flag)
     {
-        if(_enableFightFlags.Add(flag))
+        ThrowIfDisposed();
+        if (_enableFightFlags.Add(flag))
         {
             UpdateFight();
             return true;
@@ -81,7 +88,8 @@ public sealed class PlayerElementComponent : ElementComponent
     
     public bool RemoveEnableFightFlag(string flag)
     {
-        if(_enableFightFlags.Remove(flag))
+        ThrowIfDisposed();
+        if (_enableFightFlags.Remove(flag))
         {
             UpdateFight();
             return true;
@@ -89,16 +97,11 @@ public sealed class PlayerElementComponent : ElementComponent
         return false;
     }
 
-    public override void Dispose()
-    {
-        base.Dispose();
-        _player.Kick(PlayerDisconnectType.SHUTDOWN);
-    }
-
     public bool Compare(Player player) => _player == player;
 
     public bool TrySpawnAtLastPosition()
     {
+        ThrowIfDisposed();
         var accountComponent = Entity.GetComponent<AccountComponent>();
         if (accountComponent != null)
         {
@@ -115,55 +118,54 @@ public sealed class PlayerElementComponent : ElementComponent
 
     public void Spawn(Vector3 position, Vector3? rotation = null)
     {
+        ThrowIfDisposed();
         _player.Camera.Target = _player;
         _player.Spawn(position, rotation?.Z ?? 0, 0, 0, 0);
         _player.Rotation = rotation ?? Vector3.Zero;
-        if(position != Vector3.Zero)
-        {
-            Task.Run(async () =>
-            {
-                await Task.Delay(250);
-                if(Entity.Transform.Position.LengthSquared() < 7)
-                {
-                    Entity.Transform.Position = position;
-                }
-            });
-        }
+        Entity.Transform.Position = position;
+        Spawned = true;
     }
 
     public void SendChatMessage(string message, Color? color = null, bool isColorCoded = false)
     {
+        ThrowIfDisposed();
         ChatBox.OutputTo(_player, message, color ?? Color.White, isColorCoded);
     }
 
     public void ClearChatBox()
     {
+        ThrowIfDisposed();
         ChatBox.ClearFor(_player);
     }
     
     public void SetCameraMatrix(Vector3 from, Vector3 to)
     {
+        ThrowIfDisposed();
         _player.Camera.SetMatrix(from, to);
     }
 
     public void FadeCamera(CameraFade cameraFade, float fadeTime = 0.5f)
     {
+        ThrowIfDisposed();
         _player.Camera.Fade(cameraFade, fadeTime);
     }
 
     public Task FadeCameraAsync(CameraFade cameraFade, float fadeTime = 0.5f)
     {
+        ThrowIfDisposed();
         _player.Camera.Fade(cameraFade, fadeTime);
         return Task.Delay(TimeSpan.FromSeconds(fadeTime));
     }
 
     public void SetChatVisible(bool visible)
     {
+        ThrowIfDisposed();
         ChatBox.SetVisibleFor(_player, visible);
     }
     
     public void SetCameraTarget(Entity entity)
     {
+        ThrowIfDisposed();
         var elementComponent = entity.GetRequiredComponent<ElementComponent>();
         _player.Camera.Target = elementComponent.Element;
     }
@@ -171,6 +173,7 @@ public sealed class PlayerElementComponent : ElementComponent
     #region ClientInterface resource
     public void SetClipboard(string content)
     {
+        ThrowIfDisposed();
         ClientInterfaceService.SetClipboard(_player, content);
     }
     #endregion
@@ -178,12 +181,14 @@ public sealed class PlayerElementComponent : ElementComponent
     #region Overlay resource
     public void AddNotification(string message)
     {
+        ThrowIfDisposed();
         OverlayNotificationsService.AddNotification(_player, message);
     }
     #endregion
 
     public void SetBind(string key, Func<Entity, Task> callback)
     {
+        ThrowIfDisposed();
         if (_binds.ContainsKey(key))
             throw new BindAlreadyExistsException(key);
 
@@ -193,11 +198,13 @@ public sealed class PlayerElementComponent : ElementComponent
 
     public void ResetCooldown(string key)
     {
+        ThrowIfDisposed();
         _bindsCooldown.Remove(key);
     }
 
     private async void HandleBindExecuted(Player sender, PlayerBindExecutedEventArgs e)
     {
+        ThrowIfDisposed();
         if (!_binds.ContainsKey(e.Key))
             return;
 
@@ -214,11 +221,13 @@ public sealed class PlayerElementComponent : ElementComponent
 
     public void SetGuiDebugToolsEnabled(bool enabled)
     {
+        ThrowIfDisposed();
         AgnosticGuiSystemService.SetDebugToolsEnabled(_player, enabled);
     }
 
     public void SetRenderingEnabled(bool enabled)
     {
+        ThrowIfDisposed();
         Text3dService.SetRenderingEnabled(_player, enabled);
     }
 
@@ -241,6 +250,8 @@ public sealed class PlayerElementComponent : ElementComponent
 
     public async Task DoComplexAnimationAsync(Animation animation, bool blockMovement = true)
     {
+        ThrowIfDisposed();
+
         if (blockMovement)
             _player.ToggleAllControls(false, true, false);
 
@@ -261,6 +272,8 @@ public sealed class PlayerElementComponent : ElementComponent
 
     public void DoAnimation(Animation animation, TimeSpan? timeSpan = null)
     {
+        ThrowIfDisposed();
+
         DoAnimationInternal(animation, ref timeSpan);
     }
 
@@ -315,6 +328,8 @@ public sealed class PlayerElementComponent : ElementComponent
 
     public async Task DoAnimationAsync(Animation animation, TimeSpan? timeSpan = null, bool blockMovement = true)
     {
+        ThrowIfDisposed();
+
         if (blockMovement)
             _player.ToggleAllControls(false, true, false);
 
@@ -333,5 +348,12 @@ public sealed class PlayerElementComponent : ElementComponent
             if (blockMovement)
                 _player.ToggleAllControls(true, true, false);
         }
+    }
+
+
+    public override void Dispose()
+    {
+        base.Dispose();
+        _player.Kick(PlayerDisconnectType.SHUTDOWN);
     }
 }

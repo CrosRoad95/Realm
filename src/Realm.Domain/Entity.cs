@@ -19,6 +19,8 @@ public class Entity : IDisposable
     }
 
     private bool _disposed = false;
+    private readonly CancellationTokenSource _cancellationTokenSource;
+    public CancellationToken CancellationToken => _cancellationTokenSource.Token;
 
     public string Id { get; } = Guid.NewGuid().ToString();
     public EntityTag Tag { get; }
@@ -39,6 +41,7 @@ public class Entity : IDisposable
 
     public Entity(IServiceProvider serviceProvider, string name = "", EntityTag tag = EntityTag.Unknown)
     {
+        _cancellationTokenSource = new CancellationTokenSource();
         _serviceProvider = serviceProvider;
         Name = name;
         Tag = tag;
@@ -309,6 +312,7 @@ public class Entity : IDisposable
     public virtual void Dispose()
     {
         ThrowIfDisposed();
+        _cancellationTokenSource.Cancel();
         Destroy();
         _disposed = true;
     }

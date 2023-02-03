@@ -125,7 +125,9 @@ internal class SaveService : ISaveService
         var user = await _dbContext.Users
             .IncludeAll()
             .Where(x => x.Id == accountComponent.Id).FirstAsync();
-        user.LastTransformAndMotion = entity.Transform.GetTransformAndMotion();
+
+        if(entity.TryGetComponent(out PlayerElementComponent playerElementComponent) && playerElementComponent.Spawned)
+            user.LastTransformAndMotion = entity.Transform.GetTransformAndMotion();
 
         if (entity.TryGetComponent(out MoneyComponent moneyComponent))
             user.Money = moneyComponent.Money;

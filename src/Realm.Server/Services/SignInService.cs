@@ -19,6 +19,9 @@ internal class SignInService : ISignInService
 
     public async Task<bool> SignIn(Entity entity, User user)
     {
+        if (entity == null)
+            throw new NullReferenceException(nameof(entity));
+
         if (entity.Tag != Entity.EntityTag.Player || !entity.HasComponent<PlayerElementComponent>())
             throw new NotSupportedException("Entity is not a player entity.");
 

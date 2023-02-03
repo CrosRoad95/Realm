@@ -113,7 +113,7 @@ public sealed class ECS : IEntityByElement
 
     private void HandlePlayerEntityDestroyed(Entity playerEntity)
     {
-        playerEntity.Destroyed += HandlePlayerEntityDestroyed;
+        playerEntity.Destroyed -= HandlePlayerEntityDestroyed;
         var playerComponent = playerEntity.GetRequiredComponent<PlayerElementComponent>();
         _entityByPlayer.Remove(playerComponent.Player, out var _);
     }
