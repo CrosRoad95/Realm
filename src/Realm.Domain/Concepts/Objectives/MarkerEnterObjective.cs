@@ -31,11 +31,20 @@ public class MarkerEnterObjective : Objective
 
     private void HandleElapsed(object? sender, System.Timers.ElapsedEventArgs e)
     {
-        _collisionSphereElementComponent.CheckCollisionWith(_playerEntity);
+        try
+        {
+            _collisionSphereElementComponent.CheckCollisionWith(_playerEntity);
+        }
+        catch(Exception ex)
+        {
+            Logger.Error(ex, "Failed to check collision with player entity.");
+        }
     }
 
     private void EntityEntered(Entity entity)
     {
+        ThrowIfDisposed();
+
         if(entity == Entity)
             Complete();
     }

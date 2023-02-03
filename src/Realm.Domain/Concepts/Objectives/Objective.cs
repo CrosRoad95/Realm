@@ -16,11 +16,13 @@ public abstract class Objective : IDisposable
 
     private BlipElementComponent? _blipElementComponent;
     public abstract Vector3 Position { get; }
+    protected ILogger Logger { get; private set; } = default!;
     protected abstract void Load(IEntityFactory entityFactory, Entity playerEntity);
 
-    internal void LoadInternal(IEntityFactory entityFactory, Entity playerEntity)
+    internal void LoadInternal(IEntityFactory entityFactory, Entity playerEntity, ILogger logger)
     {
         ThrowIfDisposed();
+        Logger = logger.ForContext(GetType());
         Load(entityFactory, playerEntity);
     }
 
@@ -54,6 +56,8 @@ public abstract class Objective : IDisposable
 
     public void AddBlip(BlipIcon blipIcon,IEntityFactory entityFactory)
     {
+        ThrowIfDisposed();
+
         if (_blipElementComponent != null)
             throw new InvalidOperationException();
 

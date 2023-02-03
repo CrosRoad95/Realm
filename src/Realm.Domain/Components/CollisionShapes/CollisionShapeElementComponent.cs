@@ -4,6 +4,9 @@ namespace Realm.Domain.Components.CollisionShapes;
 
 public abstract class CollisionShapeElementComponent : ElementComponent
 {
+    [Inject]
+    private ILogger Logger { get; set; } = default!;
+
     protected readonly CollisionShape _collisionShape;
 
     public Action<Entity>? EntityEntered { get; set; }
@@ -12,6 +15,7 @@ public abstract class CollisionShapeElementComponent : ElementComponent
     internal override Element Element => _collisionShape;
 
     private readonly List<IEntityRule> _entityRules = new();
+    private readonly object _entityRulesLock = new();
 
     protected CollisionShapeElementComponent(CollisionShape collisionShape)
     {
@@ -22,6 +26,8 @@ public abstract class CollisionShapeElementComponent : ElementComponent
 
     public void CheckCollisionWith(Entity entity)
     {
+        ThrowIfDisposed();
+
         if (entity.TryGetComponent(out ElementComponent elementComponent))
         {
             _collisionShape.CheckElementWithin(elementComponent.Element);
@@ -30,28 +36,55 @@ public abstract class CollisionShapeElementComponent : ElementComponent
 
     public void AddRule(IEntityRule entityRule)
     {
-        _entityRules.Add(entityRule);
+        ThrowIfDisposed();
+
+        lock(_entityRulesLock)
+            _entityRules.Add(entityRule);
     }
 
     private void HandleElementEntered(Element element)
     {
-        if (EntityEntered != null)
+        ThrowIfDisposed();
+
+        if (EntityEntered == null)
+            return;
+
+        try
         {
             var entity = EntityByElement.TryGetByElement(element);
-            if (entity != null)
+            if(entity == null)
+                throw new NullReferenceException(nameof(entity));
+
+            lock(_entityRulesLock)
                 if (_entityRules.All(x => x.Check(entity)))
                     EntityEntered(entity);
+        }
+        catch(Exception ex)
+        {
+            Logger.Error(ex, "Failed to handle element entered.");
         }
     }
 
     private void HandleElementLeft(Element element)
     {
-        if (EntityLeft != null)
+        ThrowIfDisposed();
+
+        if (EntityLeft == null)
+            return;
+
+        try
         {
             var entity = EntityByElement.TryGetByElement(element);
-            if (entity != null)
+            if (entity == null)
+                throw new NullReferenceException(nameof(entity));
+
+            lock (_entityRulesLock)
                 if (_entityRules.All(x => x.Check(entity)))
                     EntityLeft(entity);
+        }
+        catch (Exception ex)
+        {
+            Logger.Error(ex, "Failed to handle element left.");
         }
     }
 }

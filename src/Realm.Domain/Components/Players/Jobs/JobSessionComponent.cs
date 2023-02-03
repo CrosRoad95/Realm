@@ -6,6 +6,8 @@ public abstract class JobSessionComponent : SessionComponent
 {
     [Inject]
     private IEntityFactory EntityFactory { get; set; } = default!;
+    [Inject]
+    private ILogger Logger { get; set; } = default!;
 
     private readonly List<Objective> _objectives = new();
     private readonly object _objectivesLock = new();
@@ -42,7 +44,7 @@ public abstract class JobSessionComponent : SessionComponent
             _objectives.Add(objective);
         try
         {
-            objective.LoadInternal(EntityFactory, Entity);
+            objective.LoadInternal(EntityFactory, Entity, Logger);
         }
         catch(Exception)
         {

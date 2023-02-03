@@ -6,7 +6,8 @@ public class LicensesComponent : Component
 {
     private readonly List<License> _licenses = new();
 
-    public IEnumerable<License> Licenses => _licenses;
+    public IReadOnlyList<License> Licenses => _licenses;
+    private readonly object _licensesLock = new object();
 
     public LicensesComponent()
     {
@@ -24,40 +25,46 @@ public class LicensesComponent : Component
 
     public License? GetLicense(string licenseId)
     {
-        return _licenses.Where(x => x.licenseId.ToLower() == licenseId.ToLower()).FirstOrDefault();
+        ThrowIfDisposed();
+
+        lock(_licensesLock)
+            return _licenses.Where(x => x.licenseId.ToLower() == licenseId.ToLower()).FirstOrDefault();
     }
 
     public bool IsLicenseSuspended(string licenseId)
     {
-        var isSuspended = _licenses.Where(x => x.licenseId == licenseId && x.IsSuspended)
+        lock(_licensesLock)
+            return _licenses.Where(x => x.licenseId == licenseId && x.IsSuspended)
             .Any();
-
-        return isSuspended;
     }
 
     public string? GetLastLicenseSuspensionReason(string licenseId)
     {
-        var suspensionReason = _licenses
+        lock(_licensesLock)
+        return _licenses
             .Where(x => x.licenseId == licenseId)
             .Select(x => x.suspendedReason)
             .FirstOrDefault();
-
-        return suspensionReason;
     }
 
     public bool AddLicense(string licenseId)
     {
-        if (HasLicense(licenseId, true))
-            return false;
         var userLicense = new License
         {
             licenseId = licenseId,
         };
-        _licenses.Add(userLicense);
-        return true;
+
+        lock (_licensesLock)
+        {
+            if (InternalHasLicense(licenseId, true))
+                return false;
+
+            _licenses.Add(userLicense);
+            return true;
+        }
     }
 
-    public bool HasLicense(string licenseId, bool includeSuspended = false)
+    private bool InternalHasLicense(string licenseId, bool includeSuspended = false)
     {
         var query = _licenses.Where(x => x.licenseId == licenseId);
 
@@ -65,32 +72,42 @@ public class LicensesComponent : Component
             query = query.Where(x => !x.IsSuspended);
         return query.Any();
     }
+    
+    public bool HasLicense(string licenseId, bool includeSuspended = false)
+    {
+        lock (_licensesLock)
+            return InternalHasLicense(licenseId, includeSuspended);
+    }
 
-    public bool SuspendLicense(string licenseId, TimeSpan timeSpan, string? reason = null)
+    public void SuspendLicense(string licenseId, TimeSpan timeSpan, string? reason = null)
     {
         if (timeSpan.Ticks <= 0)
             throw new Exception();
 
-        var index = _licenses.FindIndex(x => x.licenseId == licenseId);
-        if (index == -1)
-            throw new Exception();
+        lock (_licensesLock)
+        {
+            var index = _licenses.FindIndex(x => x.licenseId == licenseId);
+            if (index == -1)
+                throw new Exception();
 
-        var previous = _licenses[index];
-        previous.suspendedUntil = DateTime.Now + timeSpan;
-        previous.suspendedReason = reason;
-        _licenses[index] = previous;
-        return true;
+            var previous = _licenses[index];
+            previous.suspendedUntil = DateTime.Now + timeSpan;
+            previous.suspendedReason = reason;
+            _licenses[index] = previous;
+        }
     }
 
-    public bool UnSuspendLicense(string licenseId)
+    public void UnSuspendLicense(string licenseId)
     {
-        var index = _licenses.FindIndex(x => x.licenseId == licenseId);
-        if (index == -1)
-            throw new Exception();
+        lock (_licensesLock)
+        {
+            var index = _licenses.FindIndex(x => x.licenseId == licenseId);
+            if (index == -1)
+                throw new Exception();
 
-        var previous = _licenses[index];
-        previous.suspendedUntil = null;
-        _licenses[index] = previous;
-        return true;
+            var previous = _licenses[index];
+            previous.suspendedUntil = null;
+            _licenses[index] = previous;
+        }
     }
 }

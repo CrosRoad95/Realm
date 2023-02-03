@@ -34,20 +34,31 @@ public class TransportEntityObjective : Objective
 
     private void HandleElapsed(object? sender, System.Timers.ElapsedEventArgs e)
     {
-        if(_entity.TryGetComponent(out LiftableWorldObjectComponent liftableWorldObjectComponent))
+        try
         {
-            if(liftableWorldObjectComponent.Owner == null) // Accept only dropped entities.
+            ThrowIfDisposed();
+
+            if (_entity.TryGetComponent(out LiftableWorldObjectComponent liftableWorldObjectComponent))
+            {
+                if(liftableWorldObjectComponent.Owner == null) // Accept only dropped entities.
+                    _collisionSphereElementComponent.CheckCollisionWith(_entity);
+            }
+            else
+            {
                 _collisionSphereElementComponent.CheckCollisionWith(_entity);
+            }
         }
-        else
+        catch(Exception)
         {
-            _collisionSphereElementComponent.CheckCollisionWith(_entity);
+            // TODO: Capture
         }
     }
 
     private void EntityEntered(Entity entity)
     {
-        if(entity == _entity)
+        ThrowIfDisposed();
+
+        if (entity == _entity)
             Complete();
     }
 

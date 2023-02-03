@@ -6,6 +6,8 @@ namespace Realm.Domain.Components.Players;
 public class AchievementsComponent : Component
 {
     private readonly Dictionary<string, Achievement> _achievements = new();
+    private readonly object _achievementsLock = new object();
+
     public IReadOnlyDictionary<string, Achievement> Achievements => _achievements;
 
     public event Action<Entity, string>? AchievementUnlocked;
@@ -33,62 +35,79 @@ public class AchievementsComponent : Component
 
     public void SetAchievementValue(string achievementName, object value)
     {
-        TryInitializeAchievement(achievementName);
+        lock (_achievementsLock)
+        {
+            TryInitializeAchievement(achievementName);
 
-        var achievement = _achievements[achievementName];
-        achievement.value = value;
-        _achievements[achievementName] = achievement;
+            var achievement = _achievements[achievementName];
+            achievement.value = value;
+            _achievements[achievementName] = achievement;
+        }
     }
     
     public T? GetAchievementValue<T>(string achievementName)
     {
-        TryInitializeAchievement(achievementName);
+        lock (_achievementsLock)
+        {
+            TryInitializeAchievement(achievementName);
 
-        var value = _achievements[achievementName].value;
-        return (T?)value;
+            var value = _achievements[achievementName].value;
+            return (T?)value;
+        }
     }
     
     public float GetProgress(string achievementName)
     {
-        TryInitializeAchievement(achievementName);
-
-        return _achievements[achievementName].progress;
+        lock (_achievementsLock)
+        {
+            TryInitializeAchievement(achievementName);
+            return _achievements[achievementName].progress;
+        }
     }
     
     public bool HasProgress(string achievementName, float progress)
     {
-        TryInitializeAchievement(achievementName);
+        lock (_achievementsLock)
+        {
+            TryInitializeAchievement(achievementName);
 
-        return progress <= _achievements[achievementName].progress;
+            return progress <= _achievements[achievementName].progress;
+        }
     }
 
     public async Task<bool> TryReceiveReward(string achievementName, Func<Task> action)
     {
-        TryInitializeAchievement(achievementName);
+        lock (_achievementsLock)
+        {
+            TryInitializeAchievement(achievementName);
 
-        var achievement = _achievements[achievementName];
-        if (achievement.prizeReceived)
-            return false;
+            var achievement = _achievements[achievementName];
+            if (achievement.prizeReceived)
+                return false;
 
-        achievement.prizeReceived = true;
+            achievement.prizeReceived = true;
+        }
         await action();
         return true;
     }
 
     public bool UpdateProgress(string achievementName, float progress, float maximumProgress)
     {
-        TryInitializeAchievement(achievementName);
+        lock (_achievementsLock)
+        {
+            TryInitializeAchievement(achievementName);
 
-        if (!_achievements.ContainsKey(achievementName))
-            _achievements[achievementName] = new();
-        var achievement = _achievements[achievementName];
-        if (achievement.prizeReceived || HasProgress(achievementName, maximumProgress))
-            return false;
+            if (!_achievements.ContainsKey(achievementName))
+                _achievements[achievementName] = new();
+            var achievement = _achievements[achievementName];
+            if (achievement.prizeReceived || HasProgress(achievementName, maximumProgress))
+                return false;
 
-        achievement.progress = Math.Min(progress + achievement.progress, maximumProgress);
-        if (HasProgress(achievementName, maximumProgress))
-            AchievementUnlocked?.Invoke(Entity, achievementName);
+            achievement.progress = Math.Min(progress + achievement.progress, maximumProgress);
+            if (HasProgress(achievementName, maximumProgress))
+                AchievementUnlocked?.Invoke(Entity, achievementName);
 
-        return true;
+            return true;
+        }
     }
 }
