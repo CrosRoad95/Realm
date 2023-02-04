@@ -19,7 +19,7 @@ public class CollisionShapeElementComponentTests
         services.AddSingleton<RealmConfigurationProvider>(new TestConfigurationProvider());
         services.AddSingleton<ECS>();
         services.AddSingleton<IEntityByElement>(x => x.GetRequiredService<ECS>());
-        services.AddSingleton<ILogger>(new LoggerConfiguration().CreateLogger());
+        services.AddLogging(x => x.AddSerilog(new LoggerConfiguration().CreateLogger(), dispose: true));
 
         var serviceProvider = services.BuildServiceProvider();
         _entity = serviceProvider.GetRequiredService<ECS>().CreateEntity("test", Entity.EntityTag.Unknown);
