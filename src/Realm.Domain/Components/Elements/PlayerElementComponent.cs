@@ -239,12 +239,18 @@ public sealed class PlayerElementComponent : ElementComponent
         ThrowIfDisposed();
 
         if (!_binds.ContainsKey(key))
+        {
+            _bindsLock.Release();
             return;
+        }
 
         if(_bindsCooldown.TryGetValue(key, out var cooldownUntil))
         {
             if (cooldownUntil > DateTime.Now)
+            {
+                _bindsLock.Release();
                 return;
+            }
         }
         _bindsCooldown[key] = DateTime.MaxValue; // Lock bind indefinitly in case of bind takes a long time to execute
         try
