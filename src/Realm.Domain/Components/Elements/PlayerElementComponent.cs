@@ -15,10 +15,14 @@ public sealed class PlayerElementComponent : ElementComponent
     private AgnosticGuiSystemService AgnosticGuiSystemService { get; set; } = default!;
     [Inject]
     private Text3dService Text3dService { get; set; } = default!;
+    [Inject]
+    private ILogger<PlayerElementComponent> Logger { get; set; } = default!;
 
     private Entity? _focusedEntity;
     private readonly Player _player;
-    private readonly Dictionary<string, Func<Entity, Task>> _binds = new();
+    private readonly Dictionary<string, Func<Entity, KeyState, Task>> _binds = new();
+    private readonly SemaphoreSlim _bindsLock = new(1);
+
     private readonly Dictionary<string, DateTime> _bindsCooldown = new();
     private readonly HashSet<string> _enableFightFlags = new();
     private readonly MapIdGenerator _mapIdGenerator = new(IdGeneratorConstants.MapIdStart, IdGeneratorConstants.MapIdStop);
@@ -57,7 +61,6 @@ public sealed class PlayerElementComponent : ElementComponent
 
     internal PlayerElementComponent(Player player)
     {
-        ThrowIfDisposed();
         _player = player;
     }
 
@@ -186,37 +189,80 @@ public sealed class PlayerElementComponent : ElementComponent
     }
     #endregion
 
-    public void SetBind(string key, Func<Entity, Task> callback)
+    public void SetBind(string key, Func<Entity, KeyState, Task> callback)
     {
         ThrowIfDisposed();
+
+        _bindsLock.Wait();
         if (_binds.ContainsKey(key))
             throw new BindAlreadyExistsException(key);
 
-        _player.SetBind(key, KeyState.Up);
+        _player.SetBind(key, KeyState.Both);
         _binds[key] = callback;
+        _bindsLock.Release();
+
+    }
+    
+    public void SetBind(string key, Func<Entity, Task> callback)
+    {
+        ThrowIfDisposed();
+        _bindsLock.Wait();
+        if (_binds.ContainsKey(key))
+            throw new BindAlreadyExistsException(key);
+
+        _player.SetBind(key, KeyState.Down);
+        _binds[key] = (entity, keyState) =>
+        {
+            return callback(entity);
+        };
+        _bindsLock.Release();
     }
 
     public void ResetCooldown(string key)
     {
         ThrowIfDisposed();
+
+        _bindsLock.Wait();
         _bindsCooldown.Remove(key);
+        _bindsLock.Release();
     }
 
-    private async void HandleBindExecuted(Player sender, PlayerBindExecutedEventArgs e)
+    private async void HandleBindExecuted(Player _, PlayerBindExecutedEventArgs e)
+    {
+        await InternalHandleBindExecuted(e.Key, e.KeyState);
+    }
+
+    internal async Task InternalHandleBindExecuted(string key, KeyState keyState)
     {
         ThrowIfDisposed();
-        if (!_binds.ContainsKey(e.Key))
+        await _bindsLock.WaitAsync();
+        ThrowIfDisposed();
+
+        if (!_binds.ContainsKey(key))
             return;
 
-        if(_bindsCooldown.TryGetValue(e.Key, out var cooldownUntil))
+        if(_bindsCooldown.TryGetValue(key, out var cooldownUntil))
         {
             if (cooldownUntil > DateTime.Now)
                 return;
         }
-        _bindsCooldown[e.Key] = DateTime.MaxValue; // Lock bind indefinitly in case of bind takes a long time to execute
-        await _binds[e.Key](Entity);
-        if(_bindsCooldown.ContainsKey(e.Key)) // Wasn't bind cooldown reset?
-            _bindsCooldown[e.Key] = DateTime.Now.AddMilliseconds(400);
+        _bindsCooldown[key] = DateTime.MaxValue; // Lock bind indefinitly in case of bind takes a long time to execute
+        try
+        {
+            await _binds[key](Entity, keyState);
+        }
+        catch(Exception ex)
+        {
+            Logger.LogError(ex, "Failed to execute bind {key} and state {keyState}.", key, keyState);
+            throw;
+        }
+        finally
+        {
+            if(_bindsCooldown.ContainsKey(key)) // Wasn't bind cooldown reset?
+                _bindsCooldown[key] = DateTime.Now.AddMilliseconds(400);
+
+            _bindsLock.Release();
+        }
     }
 
     public void SetGuiDebugToolsEnabled(bool enabled)
