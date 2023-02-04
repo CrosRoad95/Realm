@@ -5,18 +5,18 @@ public class HelpCommand : ICommand
     public string CommandName => "help";
 
     private readonly ICommand[] _commands;
-    private readonly ILogger _logger;
+    private readonly ILogger<HelpCommand> _logger;
 
-    public HelpCommand(IEnumerable<ICommand> commands, ILogger logger)
+    public HelpCommand(IEnumerable<ICommand> commands, ILogger<HelpCommand> logger)
     {
+        _logger = logger;
         _commands = commands.ToArray();
-        _logger = logger.ForContext<HelpCommand>();
     }
 
     public Task HandleCommand(string command)
     {
-        _logger.Information("Commands:");
-        _logger.Information($"\t{string.Join('\t', _commands.Select(x => x.CommandName))}");
+        _logger.LogInformation("Commands:");
+        _logger.LogInformation($"\t{string.Join('\t', _commands.Select(x => x.CommandName))}");
         return Task.CompletedTask;
     }
 }

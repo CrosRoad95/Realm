@@ -1,5 +1,4 @@
-﻿using Realm.Domain.Inventory;
-using static Realm.Server.Seeding.SeedData;
+﻿using static Realm.Server.Seeding.SeedData;
 
 namespace Realm.Server.Seeding;
 
@@ -14,14 +13,15 @@ internal sealed class SeederServerBuilder
     private readonly IEntityFactory _entityFactory;
     private readonly IFractionService _fractionService;
     private readonly IDb _db;
-    private readonly ILogger _logger;
+    private readonly ILogger<SeederServerBuilder> _logger;
 
     private readonly Dictionary<string, User> _createdAccounts = new();
-    public SeederServerBuilder(ILogger logger,
+    public SeederServerBuilder(ILogger<SeederServerBuilder> logger,
         EntityByStringIdCollection elementByStringIdCollection,
         IServerFilesProvider serverFilesProvider, UserManager<User> userManager, RoleManager<Role> roleManager,
         IGroupService groupService, IEntityFactory entityFactory, IFractionService fractionService, IDb db)
     {
+        _logger = logger;
         _elementByStringIdCollection = elementByStringIdCollection;
         _serverFilesProvider = serverFilesProvider;
         _userManager = userManager;
@@ -30,7 +30,6 @@ internal sealed class SeederServerBuilder
         _entityFactory = entityFactory;
         _fractionService = fractionService;
         _db = db;
-        _logger = logger.ForContext<SeederServerBuilder>();
     }
 
     private void AssignElementToId(Entity entity, string id)
@@ -48,11 +47,11 @@ internal sealed class SeederServerBuilder
             {
                 var entity = _entityFactory.CreateBlip((BlipIcon)pair.Value.Icon, pair.Value.Position, pair.Key);
                 AssignElementToId(entity, pair.Key);
-                _logger.Information("Seeder: Created blip of id {elementId} with icon {blipIcon} at position {position}", pair.Key, pair.Value.Icon, pair.Value.Position);
+                _logger.LogInformation("Seeder: Created blip of id {elementId} with icon {blipIcon} at position {position}", pair.Key, pair.Value.Icon, pair.Value.Position);
             }
             else
             {
-                _logger.Error("Seeder: Failed to create blip with icon {blipIcon} at position {position}", pair.Key, pair.Value.Icon, pair.Value.Position);
+                _logger.LogError("Seeder: Failed to create blip of id {id} with icon {blipIcon} at position {position}", pair.Key, pair.Value.Icon, pair.Value.Position);
             }
         }
     }
@@ -67,7 +66,7 @@ internal sealed class SeederServerBuilder
                 entity.AddComponent(new Text3dComponent(pair.Value.Text3d, new Vector3(0, 0, 0.75f)));
             }
             AssignElementToId(entity, pair.Key);
-            _logger.Information("Seeder: Created pickup of id {elementId} with icon {pickupModel} at {position}", pair.Key, pair.Value.Model, pair.Value.Position);
+            _logger.LogInformation("Seeder: Created pickup of id {elementId} with icon {pickupModel} at {position}", pair.Key, pair.Value.Model, pair.Value.Position);
         }
     }
     
@@ -79,10 +78,10 @@ internal sealed class SeederServerBuilder
             {
                 var entity = _entityFactory.CreateMarker(pair.Value.MarkerType, pair.Value.Position, 0, 0, pair.Key);
                 AssignElementToId(entity, pair.Key);
-                _logger.Information("Seeder: Created marker of id {elementId} at {position}", pair.Key, pair.Value.Position);
+                _logger.LogInformation("Seeder: Created marker of id {elementId} at {position}", pair.Key, pair.Value.Position);
             }
             else
-                _logger.Information("Seeder: Failed to create type {markerType} at {position}", pair.Value.MarkerType, pair.Value.Position);
+                _logger.LogInformation("Seeder: Failed to create type {markerType} at {position}", pair.Value.MarkerType, pair.Value.Position);
         }
     }
     
@@ -114,9 +113,9 @@ internal sealed class SeederServerBuilder
                 }
             }
             if(created)
-                _logger.Information("Seeder: Created group {elementId} with members {members}", pair.Key, pair.Value.Members.Select(x => x.Key));
+                _logger.LogInformation("Seeder: Created group {elementId} with members {members}", pair.Key, pair.Value.Members.Select(x => x.Key));
             else
-                _logger.Information("Seeder: Updated group {elementId} with members {members}", pair.Key, pair.Value.Members.Select(x => x.Key));
+                _logger.LogInformation("Seeder: Updated group {elementId} with members {members}", pair.Key, pair.Value.Members.Select(x => x.Key));
         }
     }
 
@@ -131,10 +130,10 @@ internal sealed class SeederServerBuilder
                 {
                     Name = roleName
                 });
-                _logger.Information("Seeder: Created role {roleName}", roleName);
+                _logger.LogInformation("Seeder: Created role {roleName}", roleName);
             }
             else
-                _logger.Information("Seeder: Role {roleName} already exists", roleName);
+                _logger.LogInformation("Seeder: Role {roleName} already exists", roleName);
         }
     }
 
@@ -152,11 +151,11 @@ internal sealed class SeederServerBuilder
                 if(identityResult.Succeeded)
                 {
                     user = await _userManager.FindByNameAsync(pair.Key);
-                    _logger.Information("Seeder: Created user {userName}", pair.Key);
+                    _logger.LogInformation("Seeder: Created user {userName}", pair.Key);
                 }
             }
             else
-                _logger.Information("Seeder: User {userName} already exists", pair.Key);
+                _logger.LogInformation("Seeder: User {userName} already exists", pair.Key);
 
             if (user == null)
                 throw new Exception($"Failed to create user account '{pair.Key}'");
@@ -193,7 +192,7 @@ internal sealed class SeederServerBuilder
                 if(oldFractionData != null)
                 {
                     _db.Fractions.Remove(oldFractionData);
-                    _logger.Information("Seeder: Removed old fraction '{fractionName}' from database.", oldFractionData.Name);
+                    _logger.LogInformation("Seeder: Removed old fraction '{fractionName}' from database.", oldFractionData.Name);
                 }
 
                 fractionData = new Fraction
@@ -210,7 +209,7 @@ internal sealed class SeederServerBuilder
                 };
                 _db.Fractions.Add(fractionData);
 
-                _logger.Information("Seeder: Added fraction '{fractionName}' to database with id {fractionId}.", fractionData.Name);
+                _logger.LogInformation("Seeder: Added fraction '{fractionName}' to database with id {fractionId}.", fractionData.Name);
             }
 
             _fractionService.CreateFraction(id, fraction.Key, fraction.Value.Code, fraction.Value.Position);
@@ -218,7 +217,7 @@ internal sealed class SeederServerBuilder
             {
                 _fractionService.InternalAddMember(id, _createdAccounts[member.Key].Id, member.Value.Rank, member.Value.RankName);
             }
-            _logger.Information("Seeder: Created fraction '{fractionName}' with id {fractionId}.", fractionData.Name);
+            _logger.LogInformation("Seeder: Created fraction '{fractionName}' with id {fractionId}.", fractionData.Name);
         }
         await _db.SaveChangesAsync();
     }

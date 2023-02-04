@@ -22,7 +22,7 @@ public abstract class Objective : IDisposable
     internal void LoadInternal(IEntityFactory entityFactory, Entity playerEntity, ILogger logger)
     {
         ThrowIfDisposed();
-        Logger = logger.ForContext(GetType());
+        Logger = logger;
         Load(entityFactory, playerEntity);
     }
 

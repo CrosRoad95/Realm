@@ -6,6 +6,6 @@ internal class ModulesLogic
     {
         foreach (var module in modules)
             module.Init(serviceProvider);
-        logger.Information("Loaded modules: {modules}", string.Join(", ", modules.Select(x => x.Name)));
+        logger.LogInformation("Loaded modules: {modules}", string.Join(", ", modules.Select(x => x.Name)));
     }
 }

@@ -5,7 +5,7 @@ namespace Realm.Domain.Components.CollisionShapes;
 public abstract class CollisionShapeElementComponent : ElementComponent
 {
     [Inject]
-    private ILogger Logger { get; set; } = default!;
+    private ILogger<CollisionShapeElementComponent> Logger { get; set; } = default!;
 
     protected readonly CollisionShape _collisionShape;
 
@@ -61,7 +61,7 @@ public abstract class CollisionShapeElementComponent : ElementComponent
         }
         catch(Exception ex)
         {
-            Logger.Error(ex, "Failed to handle element entered.");
+            Logger.LogError(ex, "Failed to handle element entered.");
         }
     }
 
@@ -84,7 +84,7 @@ public abstract class CollisionShapeElementComponent : ElementComponent
         }
         catch (Exception ex)
         {
-            Logger.Error(ex, "Failed to handle element left.");
+            Logger.LogError(ex, "Failed to handle element left.");
         }
     }
 }

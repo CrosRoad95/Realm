@@ -28,7 +28,7 @@ internal class RealmTestingServer : TestingServer
 
             services.AddSingleton<IConsole>(new EmptyServerConsole());
             services.AddSingleton<IServerFilesProvider>(new NullServerFilesProvider());
-            services.AddSingleton<ILogger>(new LoggerConfiguration().CreateLogger());
+            services.AddLogging(x => x.AddSerilog(new LoggerConfiguration().CreateLogger(), dispose: true));
         });
     })
     {

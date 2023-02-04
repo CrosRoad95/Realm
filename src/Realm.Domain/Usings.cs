@@ -1,7 +1,6 @@
 ﻿global using SlipeServer.Server.Elements;
 global using System.Drawing;
 global using System.Numerics;
-global using Serilog;
 global using Vehicle = SlipeServer.Server.Elements.Vehicle;
 global using Newtonsoft.Json;
 global using Microsoft.AspNetCore.Identity;
@@ -43,6 +42,7 @@ global using SlipeServer.Server.Events;
 global using SlipeServer.Server.Constants;
 global using SlipeServer.Resources.Text3d;
 global using System.Runtime.CompilerServices;
+global using Microsoft.Extensions.Logging;
 
 [assembly: InternalsVisibleTo("Realm.Server")]
 [assembly: InternalsVisibleTo("Realm.Tests")]

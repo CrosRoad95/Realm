@@ -2,15 +2,15 @@
 
 internal class ClientInterfaceLogic
 {
-    private readonly ILogger _logger;
+    private readonly ILogger<ClientInterfaceLogic> _logger;
     private readonly ClientInterfaceService _ClientInterfaceService;
     private readonly IEntityByElement _entityByElement;
 
-    public ClientInterfaceLogic(ClientInterfaceService ClientInterfaceService, ILogger logger, IEntityByElement entityByElement)
+    public ClientInterfaceLogic(ClientInterfaceService ClientInterfaceService, ILogger<ClientInterfaceLogic> logger, IEntityByElement entityByElement)
     {
         _ClientInterfaceService = ClientInterfaceService;
         _entityByElement = entityByElement;
-        _logger = logger.ForContext<ClientInterfaceLogic>();
+        _logger = logger;
 
         _ClientInterfaceService.ClientErrorMessage += HandleClientErrorMessage;
         _ClientInterfaceService.FocusedElementChanged += HandleFocusedElementChanged;
@@ -39,13 +39,13 @@ internal class ClientInterfaceLogic
         {
             case 0: // Custom
             case 3: // Information
-                _logger.Information("Clientside: {player} ({level}): {message} in {file}:{line}", playerName, level, message, file, line);
+                _logger.LogInformation("Clientside: {player} ({level}): {message} in {file}:{line}", playerName, level, message, file, line);
                 break;
             case 2: // Warning
-                _logger.Warning("Clientside: {player} ({level}): {message} in {file}:{line}", playerName, level, message, file, line);
+                _logger.LogWarning("Clientside: {player} ({level}): {message} in {file}:{line}", playerName, level, message, file, line);
                 break;
             default: // Error or something else
-                _logger.Error("Clientside: {player} ({level}): {message} in {file}:{line}", playerName, level, message, file, line);
+                _logger.LogError("Clientside: {player} ({level}): {message} in {file}:{line}", playerName, level, message, file, line);
                 break;
         }
     }

@@ -1,5 +1,5 @@
-﻿using Realm.Resources.AgnosticGuiSystem;
-using Serilog;
+﻿using Microsoft.Extensions.Logging;
+using Realm.Resources.AgnosticGuiSystem;
 using System.Diagnostics;
 
 namespace Realm.ConsoleUtilities;
@@ -11,7 +11,7 @@ public sealed class HotReloadLogic
     private readonly AgnosticGuiSystemService _agnosticGuiSystemService;
     private readonly ILogger _logger;
 
-    public HotReloadLogic(AgnosticGuiSystemService agnosticGuiSystemService, ILogger logger, string path)
+    public HotReloadLogic(AgnosticGuiSystemService agnosticGuiSystemService, ILogger<HotReloadLogic> logger, string path)
     {
         _hotReloadLogic = this;
         _hotReload = new HotReload(path);
@@ -24,6 +24,6 @@ public sealed class HotReloadLogic
     {
         var stopwatch = Stopwatch.StartNew();
         await _agnosticGuiSystemService.UpdateGuiFiles();
-        _logger.Information("Updated guis in: {time}ms", stopwatch.ElapsedMilliseconds);
+        _logger.LogInformation("Updated guis in: {time}ms", stopwatch.ElapsedMilliseconds);
     }
 }

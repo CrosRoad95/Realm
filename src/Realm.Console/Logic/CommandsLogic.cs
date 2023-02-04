@@ -1,4 +1,5 @@
-﻿using Realm.Domain.Components.Object;
+﻿using Microsoft.Extensions.Logging;
+using Realm.Domain.Components.Object;
 using Realm.Domain.Interfaces;
 using static Realm.Domain.Components.Elements.PlayerElementComponent;
 
@@ -7,13 +8,13 @@ namespace Realm.Console.Logic;
 internal sealed class CommandsLogic
 {
     private readonly RPGCommandService _commandService;
-    private readonly ILogger _logger;
+    private readonly ILogger<CommandsLogic> _logger;
     private readonly IEntityFactory _entityFactory;
     private readonly RepositoryFactory _repositoryFactory;
     private readonly ItemsRegistry _itemsRegistry;
     private readonly IGroupService _groupService;
 
-    public CommandsLogic(RPGCommandService commandService, ILogger logger, IEntityFactory entityFactory, RepositoryFactory repositoryFactory,
+    public CommandsLogic(RPGCommandService commandService, ILogger<CommandsLogic> logger, IEntityFactory entityFactory, RepositoryFactory repositoryFactory,
         ItemsRegistry itemsRegistry, IGroupService groupService)
     {
         _commandService = commandService;
@@ -24,7 +25,7 @@ internal sealed class CommandsLogic
         _groupService = groupService;
         _commandService.AddCommandHandler("gp", (entity, args) =>
         {
-            logger.Information("{position}, {rotation}", entity.Transform.Position, entity.Transform.Rotation);
+            logger.LogInformation("{position}, {rotation}", entity.Transform.Position, entity.Transform.Rotation);
             return Task.CompletedTask;
         });
 

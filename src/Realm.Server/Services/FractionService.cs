@@ -1,7 +1,5 @@
-﻿using Realm.Domain.Concepts;
-using Realm.Domain.Exceptions;
+﻿using Realm.Domain.Exceptions;
 using Realm.Persistance.Interfaces;
-using System.Collections.Concurrent;
 using Fraction = Realm.Domain.Concepts.Fraction;
 using FractionMember = Realm.Domain.Concepts.FractionMember;
 

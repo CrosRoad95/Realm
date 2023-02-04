@@ -3,11 +3,11 @@
 public class RPGServerBuilder
 {
     private readonly List<IModule> _modules = new();
-    private ILogger? _logger;
+    private Serilog.ILogger? _logger;
     private IConsole? _console;
     private RealmConfigurationProvider? _realmConfigurationProvider;
 
-    public RPGServerBuilder AddLogger(ILogger logger)
+    public RPGServerBuilder AddLogger(Serilog.ILogger logger)
     {
         _logger = logger;
         return this;
@@ -46,7 +46,7 @@ public class RPGServerBuilder
 
             serverBuilder.ConfigureServices(services =>
             {
-                services.AddSingleton(_logger);
+                services.AddLogging(x => x.AddSerilog(_logger, dispose: true));
                 services.AddSingleton(_console);
 #if DEBUG
                 serverFilesProvider ??= new ServerFilesProvider(basePath ?? "../../../Server");

@@ -1,19 +1,16 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using Realm.Domain.Components.Object;
-
-namespace Realm.Console.Logic;
+﻿namespace Realm.Console.Logic;
 
 internal sealed class PlayerGameplayLogic
 {
     private readonly ECS _ecs;
     private readonly IServiceProvider _serviceProvider;
-    private readonly ILogger _logger;
+    private readonly ILogger<PlayerGameplayLogic> _logger;
 
-    public PlayerGameplayLogic(ECS ecs, ILogger logger, IServiceProvider serviceProvider)
+    public PlayerGameplayLogic(ECS ecs, ILogger<PlayerGameplayLogic> logger, IServiceProvider serviceProvider)
     {
         _ecs = ecs;
         _serviceProvider = serviceProvider;
-        _logger = logger.ForContext<PlayerJoinedLogic>();
+        _logger = logger;
         _ecs.EntityCreated += HandleEntityCreated;
     }
 

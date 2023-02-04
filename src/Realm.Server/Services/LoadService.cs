@@ -46,10 +46,10 @@ internal class LoadService : ILoadService
             }
             catch (Exception ex)
             {
-                _logger.Error(ex, "Failed to spawn vehicle: {id}", vehicleData.Id);
+                _logger.LogError(ex, "Failed to spawn vehicle: {id}", vehicleData.Id);
             }
         }
         if (i > 0)
-            _logger.Information("Loaded: {amount} vehicles", i);
+            _logger.LogInformation("Loaded: {amount} vehicles", i);
     }
 }

@@ -13,7 +13,6 @@
 
 	<ItemGroup>
 		<PackageReference Include="SlipeServer.Resources.Base" Version="0.1.0-CI-20230130-055643" />
-		<PackageReference Include="Serilog" Version="2.12.0" />
 	</ItemGroup>
 
 </Project>

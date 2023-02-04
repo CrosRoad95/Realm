@@ -1,16 +1,14 @@
-﻿using Realm.Domain;
-
-namespace Realm.Console.Logic;
+﻿namespace Realm.Console.Logic;
 
 internal sealed class PlayerJoinedLogic
 {
     private readonly ECS _ecs;
-    private readonly ILogger _logger;
+    private readonly ILogger<PlayerJoinedLogic> _logger;
 
-    public PlayerJoinedLogic(ECS ecs, ILogger logger)
+    public PlayerJoinedLogic(ECS ecs, ILogger<PlayerJoinedLogic> logger)
     {
         _ecs = ecs;
-        _logger = logger.ForContext<PlayerJoinedLogic>();
+        _logger = logger;
         _ecs.EntityCreated += HandleEntityCreated;
     }
 
@@ -65,13 +63,13 @@ internal sealed class PlayerJoinedLogic
             {
                 levelComponent.LevelChanged += (self, level) =>
                 {
-                    _logger.Information("Player leveled up: {level}", level);
+                    _logger.LogInformation("Player leveled up: {level}", level);
                 };
             }
         }
         catch(Exception ex)
         {
-            _logger.Error(ex, "Failed to add component.");
+            _logger.LogError(ex, "Failed to add component.");
         }
     }
 }

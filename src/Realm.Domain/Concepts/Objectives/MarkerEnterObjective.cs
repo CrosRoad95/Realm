@@ -37,7 +37,7 @@ public class MarkerEnterObjective : Objective
         }
         catch(Exception ex)
         {
-            Logger.Error(ex, "Failed to check collision with player entity.");
+            Logger.LogError(ex, "Failed to check collision with player entity.");
         }
     }
 

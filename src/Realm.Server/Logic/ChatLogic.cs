@@ -39,7 +39,7 @@ internal class ChatLogic
                         foreach (var targetPlayerEntity in _ecs.GetPlayerEntities().Where(x => x.HasComponent<AccountComponent>()))
                             targetPlayerEntity.GetRequiredComponent<PlayerElementComponent>().SendChatMessage(message, Color.White, true);
 
-                        _logger.Information("{message}", message);
+                        _logger.LogInformation("{message}", message);
                     }
                     else
                     {

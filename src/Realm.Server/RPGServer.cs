@@ -32,8 +32,8 @@ internal sealed class RPGServer : IRPGServer
             }
         );
 
-        _logger = GetRequiredService<ILogger>().ForContext<RPGServer>();
-        _logger.Information("Starting server:");
+        _logger = GetRequiredService<ILogger<RPGServer>>();
+        _logger.LogInformation("Starting server:");
     }
 
     private void ConfigureServices(IServiceCollection services)
@@ -86,7 +86,7 @@ internal sealed class RPGServer : IRPGServer
         await GetRequiredService<ILoadService>().LoadAll();
 
         ServerStarted?.Invoke();
-        _logger.Information("Server started.");
+        _logger.LogInformation("Server started.");
     }
 
     private async Task BuildFromSeedFiles()
@@ -97,7 +97,7 @@ internal sealed class RPGServer : IRPGServer
 
     public async Task Stop()
     {
-        _logger.Information("Server stopping.");
+        _logger.LogInformation("Server stopping.");
         int i = 0;
         var saveService = GetRequiredService<ISaveService>();
 
@@ -112,7 +112,7 @@ internal sealed class RPGServer : IRPGServer
             }
             catch (Exception ex)
             {
-                _logger.Error(ex, "Failed to save entity.");
+                _logger.LogError(ex, "Failed to save entity.");
             }
             finally
             {
@@ -125,11 +125,11 @@ internal sealed class RPGServer : IRPGServer
         }
         catch (Exception ex)
         {
-            _logger.Error(ex, "Failed to save entities.");
+            _logger.LogError(ex, "Failed to save entities.");
         }
 
         await Task.Delay(500);
         _server.Stop();
-        _logger.Information("Server stopped, saved: {amount} entities.", i);
+        _logger.LogInformation("Server stopped, saved: {amount} entities.", i);
     }
 }

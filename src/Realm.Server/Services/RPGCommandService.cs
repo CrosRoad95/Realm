@@ -6,14 +6,14 @@ public class RPGCommandService
 {
     private readonly CommandService _commandService;
     private readonly ECS _ecs;
-    private readonly ILogger _logger;
+    private readonly ILogger<RPGCommandService> _logger;
 
     private readonly List<Command> _commands = new();
-    public RPGCommandService(CommandService commandService, ILogger logger, ECS ecs)
+    public RPGCommandService(CommandService commandService, ILogger<RPGCommandService> logger, ECS ecs)
     {
+        _logger = logger;
         _commandService = commandService;
         _ecs = ecs;
-        _logger = logger.ForContext<RPGCommandService>();
     }
 
     public bool AddCommandHandler(string commandName, Func<Entity, string[], Task> callback, string[]? requiredPolicies = null)
@@ -23,9 +23,9 @@ public class RPGCommandService
         }
 
         if (requiredPolicies != null)
-            _logger.Verbose("Created command {commandName} with required policies: {requiredPolicies}", commandName, requiredPolicies);
+            _logger.LogInformation("Created command {commandName} with required policies: {requiredPolicies}", commandName, requiredPolicies);
         else
-            _logger.Verbose("Created command {commandName}", commandName);
+            _logger.LogInformation("Created command {commandName}", commandName);
 
         var command = _commandService.AddCommand(commandName);
         _commands.Add(command);
@@ -44,22 +44,22 @@ public class RPGCommandService
                 foreach (var policy in requiredPolicies)
                     if (!await accountComponent.AuthorizePolicy(policy))
                     {
-                        _logger.Verbose("{player} failed to execute command {commandName} because failed to authorize for policy {policy}", player, commandName, policy);
+                        _logger.LogInformation("{player} failed to execute command {commandName} because failed to authorize for policy {policy}", player, commandName, policy);
                         return;
                     }
             }
 
             if (args.Arguments.Any())
-                _logger.Verbose("{player} executed command {commandName} with arguments {commandArguments}.", entity);
+                _logger.LogInformation("{player} executed command {commandName} with arguments {commandArguments}.", entity);
             else
-                _logger.Verbose("{player} executed command {commandName} with no arguments.", entity);
+                _logger.LogInformation("{player} executed command {commandName} with no arguments.", entity);
             try
             {
                 await callback(entity, args.Arguments);
             }
             catch (Exception ex)
             {
-                _logger.Error(ex, "Exception thrown while executing command {commandName} with arguments {commandArguments}");
+                _logger.LogError(ex, "Exception thrown while executing command {commandName} with arguments {commandArguments}");
             }
         };
         return true;

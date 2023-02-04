@@ -1,4 +1,4 @@
-﻿using Serilog;
+﻿using Microsoft.Extensions.Logging;
 using SlipeServer.Server;
 using SlipeServer.Server.Elements;
 using SlipeServer.Server.Events;
@@ -11,15 +11,15 @@ internal class ClientInterfaceLogic
 {
     private readonly FromLuaValueMapper _fromLuaValueMapper;
     private readonly ClientInterfaceService _ClientInterfaceService;
-    private readonly ILogger _logger;
+    private readonly ILogger<ClientInterfaceLogic> _logger;
     private readonly ClientInterfaceResource _resource;
 
     public ClientInterfaceLogic(MtaServer server, LuaEventService luaEventService, FromLuaValueMapper fromLuaValueMapper,
-        ClientInterfaceService ClientInterfaceService, ILogger logger)
+        ClientInterfaceService ClientInterfaceService, ILogger<ClientInterfaceLogic> logger)
     {
         _fromLuaValueMapper = fromLuaValueMapper;
         _ClientInterfaceService = ClientInterfaceService;
-        _logger = logger.ForContext<ClientInterfaceLogic>();
+        _logger = logger;
         server.PlayerJoined += HandlePlayerJoin;
 
         _resource = server.GetAdditionalResource<ClientInterfaceResource>();
@@ -42,7 +42,7 @@ internal class ClientInterfaceLogic
         }
         else
         {
-            _logger.Warning("Failed to get localization code for player {player}", luaEvent.Player);
+            _logger.LogWarning("Failed to get localization code for player {player}", luaEvent.Player);
         }
     }
 
