@@ -333,7 +333,7 @@ internal sealed class CommandsLogic
 
         _commandService.AddCommandHandler("spawnbox", (entity, args) =>
         {
-            var objectEntity = _entityFactory.CreateObject(SlipeServer.Server.Enums.ObjectModel.Gunbox, entity.Transform.Position + new Vector3(4, 0, 0), Vector3.Zero);
+            var objectEntity = _entityFactory.CreateObject(SlipeServer.Server.Enums.ObjectModel.Gunbox, entity.Transform.Position + new Vector3(4, 0, -0.65f), Vector3.Zero);
             objectEntity.AddComponent(new LiftableWorldObjectComponent());
             return Task.CompletedTask;
         });

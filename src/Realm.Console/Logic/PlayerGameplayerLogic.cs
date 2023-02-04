@@ -26,26 +26,37 @@ internal sealed class PlayerGameplayLogic
         playerElementComponent.SetBind("x", HandleInteract);
     }
 
-    private Task HandleInteract(Entity playerEntity)
+    private async Task HandleInteract(Entity playerEntity)
     {
         if(playerEntity.TryGetComponent(out AttachedEntityComponent attachedEntityComponent))
         {
-            if(attachedEntityComponent.AttachedEntity.GetRequiredComponent<LiftableWorldObjectComponent>().TryDrop())
+            await playerEntity.GetRequiredComponent<PlayerElementComponent>().DoAnimationAsync(PlayerElementComponent.Animation.CarryPutDown);
+
+            if (attachedEntityComponent.AttachedEntity.GetRequiredComponent<LiftableWorldObjectComponent>().TryDrop())
+            {
                 playerEntity.DestroyComponent(attachedEntityComponent);
+                attachedEntityComponent.AttachedEntity.Transform.Position += new Vector3(0.0f, 0.0f, -0.6f);
+                attachedEntityComponent.AttachedEntity.Transform.Rotation = new Vector3
+                {
+                    X = 0,
+                    Y = 0,
+                    Z = 0
+                };
+            }
         }
         else if(playerEntity.TryGetComponent(out CurrentInteractEntityComponent currentInteractEntityComponent))
         {
             var currentInteractEntity = currentInteractEntityComponent.CurrentInteractEntity;
-            if (currentInteractEntity.TryGetComponent(out LiftableWorldObjectComponent liftableWorldObjectComponent))
+            if (playerEntity.DistanceTo(currentInteractEntity) < 1.3f && currentInteractEntity.TryGetComponent(out LiftableWorldObjectComponent liftableWorldObjectComponent))
             {
                 if (playerEntity.IsLookingAt(currentInteractEntity) && liftableWorldObjectComponent.TryLift(playerEntity))
                 {
+                    await playerEntity.GetRequiredComponent<PlayerElementComponent>().DoAnimationAsync(PlayerElementComponent.Animation.CarryLiftUp);
                     playerEntity.GetRequiredComponent<PlayerElementComponent>().DoAnimation(PlayerElementComponent.Animation.StartCarry);
-                    playerEntity.AddComponent(new AttachedEntityComponent(currentInteractEntity, new Vector3(1f,1f,0)));
+                    playerEntity.AddComponent(new AttachedEntityComponent(currentInteractEntity, new Vector3(0.6f, 0.6f, -0.4f)));
                 }
             }
         }
-        return Task.CompletedTask;
     }
 
     private void HandleFocusedEntityChanged(Entity playerEntity, Entity? entity)

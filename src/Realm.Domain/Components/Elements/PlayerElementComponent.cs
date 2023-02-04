@@ -362,7 +362,7 @@ public sealed class PlayerElementComponent : ElementComponent
                 _player.SetAnimation("CARRY", "liftup", timeSpan, false, false, false, false);
                 break;
             case Animation.CarryPutDown:
-                timeSpan = timeSpan ?? TimeSpan.FromSeconds(1.25f);
+                timeSpan = timeSpan ?? TimeSpan.FromSeconds(1.0f);
                 _player.SetAnimation("CARRY", "putdwn", timeSpan, false, false, false, false);
                 break;
             case Animation.CarryLiftUpFromTable:
@@ -370,7 +370,7 @@ public sealed class PlayerElementComponent : ElementComponent
                 _player.SetAnimation("CARRY", "liftup105", timeSpan, false, false, false, false);
                 break;
             case Animation.CarryPutDownOnTable:
-                timeSpan = timeSpan ?? TimeSpan.FromSeconds(1.25f);
+                timeSpan = timeSpan ?? TimeSpan.FromSeconds(1.0f);
                 _player.SetAnimation("CARRY", "putdwn105", timeSpan, false, false, false, false);
                 break;
             default:

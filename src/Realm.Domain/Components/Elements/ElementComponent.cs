@@ -40,16 +40,17 @@ public abstract class ElementComponent : Component
         else
         {
             Entity.Transform.Bind(Element);
-            Element.PositionChanged += Element_PositionChanged;
             Entity.Destroyed += HandleDestroyed;
         }
 
         Entity.Transform.PositionChanged += HandleTransformPositionChanged;
+        Entity.Transform.RotationChanged += HandleTransformRotationChanged;
     }
 
-    private void Element_PositionChanged(Element sender, ElementChangedEventArgs<Vector3> args)
+    private void HandleTransformRotationChanged(Transform newTransform)
     {
-        ;
+        if (!_isPerPlayer)
+            Element.Rotation = newTransform.Rotation;
     }
 
     private void HandleTransformPositionChanged(Transform newTransform)
