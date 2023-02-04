@@ -1,4 +1,6 @@
-﻿namespace Realm.Console.Logic;
+﻿using Realm.Server.Extensions;
+
+namespace Realm.Console.Logic;
 
 internal sealed class PlayerGameplayLogic
 {
@@ -36,7 +38,7 @@ internal sealed class PlayerGameplayLogic
             var currentInteractEntity = currentInteractEntityComponent.CurrentInteractEntity;
             if (currentInteractEntity.TryGetComponent(out LiftableWorldObjectComponent liftableWorldObjectComponent))
             {
-                if (liftableWorldObjectComponent.TryLift(playerEntity))
+                if (playerEntity.IsLookingAt(currentInteractEntity) && liftableWorldObjectComponent.TryLift(playerEntity))
                 {
                     playerEntity.GetRequiredComponent<PlayerElementComponent>().DoAnimation(PlayerElementComponent.Animation.StartCarry);
                     playerEntity.AddComponent(new AttachedEntityComponent(currentInteractEntity, new Vector3(1f,1f,0)));
