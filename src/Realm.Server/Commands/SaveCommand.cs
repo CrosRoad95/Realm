@@ -1,11 +1,10 @@
 ﻿namespace Realm.Server.Commands;
 
+[CommandName("save")]
 internal class SaveCommand : ICommand
 {
     private readonly ECS _ecs;
     private readonly ISaveService _saveService;
-
-    public string CommandName => "save";
 
     public SaveCommand(ECS ecs, ISaveService saveService)
     {

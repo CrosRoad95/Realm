@@ -42,7 +42,7 @@ public static class ServerBuilderExtensions
             }
 
             services.AddSingleton<HelpCommand>();
-            services.AddSingleton<ICommand, SaveCommand>();
+            services.AddCommand<SaveCommand>();
 
             services.AddSingleton<EntityByStringIdCollection>();
             services.AddSingleton<ECS>();

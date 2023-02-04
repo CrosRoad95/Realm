@@ -1,16 +1,34 @@
-﻿namespace Realm.Server.Commands;
+﻿using Microsoft.Extensions.DependencyInjection;
+using System.Reflection;
+
+namespace Realm.Server.Commands;
 
 internal class EssentialCommandsLogic
 {
     private readonly IConsole _consoleCommands;
-    private readonly List<ICommand> _commands;
+    private readonly IServiceProvider _serviceProvider;
+    private readonly ILogger<EssentialCommandsLogic> _logger;
+    private readonly Dictionary<string, Type> _commands = new();
 
-    public EssentialCommandsLogic(IConsole consoleCommands, IEnumerable<ICommand> commands, HelpCommand helpCommand)
+    public EssentialCommandsLogic(IConsole consoleCommands, IEnumerable<CommandTypeWrapper> commands,
+        IServiceProvider serviceProvider, ILogger<EssentialCommandsLogic> logger)
     {
         _consoleCommands = consoleCommands;
-        _commands = commands.ToList();
-        _commands.Add(helpCommand);
+        _serviceProvider = serviceProvider;
+        _logger = logger;
         _consoleCommands.CommandExecuted += HandleCommandExecuted;
+
+        _commands["help"] = typeof(HelpCommand);
+        foreach (var item in commands)
+        {
+            var commandName = item.Type.GetCustomAttribute<CommandNameAttribute>().Name.ToLower();
+            if (_commands.ContainsKey(commandName))
+            {
+                _commands.Clear();
+                throw new Exception($"Command '{commandName}' already exists");
+            }
+            _commands[commandName] = item.Type;
+        }
     }
 
     private void HandleCommandExecuted(string? line)
@@ -18,16 +36,24 @@ internal class EssentialCommandsLogic
         if (line == null)
             return;
 
-        var firstWord = line.Split(' ').FirstOrDefault();
+        var firstWord = line.Split(' ').FirstOrDefault().ToLower();
         if (firstWord == null)
             return;
 
-        foreach (var command in _commands)
+        if(_commands.TryGetValue(firstWord, out Type value))
         {
-            if (line.StartsWith(command.CommandName))
+            try
             {
-                command.HandleCommand(line);
+                (_serviceProvider.GetRequiredService(value) as ICommand).HandleCommand(line);
             }
+            catch(Exception ex)
+            {
+                _logger.LogError(ex, "Failed to execute command: '{commandName}' not found", firstWord);
+            }
+        }
+        else
+        {
+            _logger.LogWarning("Command '{commandName}' not found", firstWord);
         }
     }
 }
