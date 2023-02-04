@@ -2,7 +2,7 @@
 
 internal class ModulesLogic
 {
-    public ModulesLogic(ILogger logger, IServiceProvider serviceProvider, IEnumerable<IModule> modules)
+    public ModulesLogic(ILogger<ModulesLogic> logger, IServiceProvider serviceProvider, IEnumerable<IModule> modules)
     {
         foreach (var module in modules)
             module.Init(serviceProvider);

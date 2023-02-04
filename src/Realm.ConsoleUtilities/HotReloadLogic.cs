@@ -9,7 +9,7 @@ public sealed class HotReloadLogic
     private static HotReloadLogic? _hotReloadLogic;
     private readonly HotReload _hotReload;
     private readonly AgnosticGuiSystemService _agnosticGuiSystemService;
-    private readonly ILogger _logger;
+    private readonly ILogger<HotReloadLogic> _logger;
 
     public HotReloadLogic(AgnosticGuiSystemService agnosticGuiSystemService, ILogger<HotReloadLogic> logger, string path)
     {

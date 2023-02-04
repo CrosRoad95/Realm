@@ -7,7 +7,7 @@ public abstract class JobSessionComponent : SessionComponent
     [Inject]
     private IEntityFactory EntityFactory { get; set; } = default!;
     [Inject]
-    private ILogger Logger { get; set; } = default!;
+    private ILogger<JobSessionComponent> Logger { get; set; } = default!;
 
     private readonly List<Objective> _objectives = new();
     private readonly object _objectivesLock = new();

@@ -5,15 +5,13 @@ namespace Realm.Server.Logic;
 
 internal class ChatLogic
 {
-    private readonly MtaServer _server;
     private readonly ChatBox _chatBox;
-    private readonly ILogger _logger;
+    private readonly ILogger<ChatLogic> _logger;
     private readonly IEntityByElement _entityByElement;
     private readonly ECS _ecs;
 
-    public ChatLogic(MtaServer server, ChatBox chatBox, ILogger logger, IEntityByElement entityByElement, ECS ecs)
+    public ChatLogic(MtaServer server, ChatBox chatBox, ILogger<ChatLogic> logger, IEntityByElement entityByElement, ECS ecs)
     {
-        _server = server;
         _chatBox = chatBox;
         _logger = logger;
         _entityByElement = entityByElement;

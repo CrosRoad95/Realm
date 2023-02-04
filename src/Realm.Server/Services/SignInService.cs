@@ -9,9 +9,9 @@ internal class SignInService : ISignInService
 
     private readonly HashSet<int> _usedAccountsIds = new();
     private readonly ItemsRegistry _itemsRegistry;
-    private readonly ILogger _logger;
+    private readonly ILogger<SignInService> _logger;
 
-    public SignInService(ItemsRegistry itemsRegistry, ILogger logger)
+    public SignInService(ItemsRegistry itemsRegistry, ILogger<SignInService> logger)
     {
         _itemsRegistry = itemsRegistry;
         _logger = logger;
@@ -88,9 +88,8 @@ internal class SignInService : ISignInService
             entity.AddComponent(new LevelComponent(user.Level, user.Experience));
             entity.AddComponent(new MoneyComponent(user.Money));
             entity.AddComponent(new AFKComponent());
-            entity.Destroyed += HandleDestroyed;
         }
-        catch (Exception)
+        catch (Exception ex)
         {
             // TODO: add Entity component add scope thing
             _usedAccountsIds.Remove(user.Id);
@@ -105,12 +104,14 @@ internal class SignInService : ISignInService
             entity.TryDestroyComponent<DailyVisitsCounterComponent>();
             entity.TryDestroyComponent<StatisticsCounterComponent>();
             entity.TryDestroyComponent<DiscoveriesComponent>();
+            _logger.LogError(ex, "Failed to sign in user of id {userId}", user.Id);
             throw;
         }
         finally
         {
             _lock.Release();
         }
+        entity.Destroyed += HandleDestroyed;
         return true;
     }
 

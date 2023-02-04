@@ -8,7 +8,7 @@ namespace Realm.Server;
 internal sealed class RPGServer : IRPGServer
 {
     private readonly MtaServer _server;
-    private readonly ILogger _logger;
+    private readonly ILogger<RPGServer> _logger;
     private readonly List<IModule> _modules;
 
     public event Action? ServerStarted;

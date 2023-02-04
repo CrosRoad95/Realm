@@ -87,6 +87,11 @@ public class Entity : IDisposable
         }
     }
 
+    public TComponent AddComponent<TComponent>() where TComponent : Component, new()
+    {
+        return AddComponent(new TComponent());
+    }
+
     public TComponent AddComponent<TComponent>(TComponent component) where TComponent : Component
     {
         ThrowIfDisposed();

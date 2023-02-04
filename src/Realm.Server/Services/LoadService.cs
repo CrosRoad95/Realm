@@ -4,9 +4,9 @@ internal class LoadService : ILoadService
 {
     private readonly RepositoryFactory _repositoryFactory;
     private readonly IEntityFactory _entityFactory;
-    private readonly ILogger _logger;
+    private readonly ILogger<LoadService> _logger;
 
-    public LoadService(RepositoryFactory repositoryFactory, IEntityFactory entityFactory, ILogger logger) {
+    public LoadService(RepositoryFactory repositoryFactory, IEntityFactory entityFactory, ILogger<LoadService> logger) {
         _repositoryFactory = repositoryFactory;
         _entityFactory = entityFactory;
         _logger = logger;

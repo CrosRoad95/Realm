@@ -16,7 +16,7 @@ public abstract class Objective : IDisposable
 
     private BlipElementComponent? _blipElementComponent;
     public abstract Vector3 Position { get; }
-    protected ILogger Logger { get; private set; } = default!;
+    protected ILogger Logger { get; set; } = default!;
     protected abstract void Load(IEntityFactory entityFactory, Entity playerEntity);
 
     internal void LoadInternal(IEntityFactory entityFactory, Entity playerEntity, ILogger logger)

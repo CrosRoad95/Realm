@@ -1,6 +1,7 @@
 ﻿using Castle.Core.Logging;
 using FluentAssertions;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Logging;
 using Moq;
 using Realm.Logging;
 using Realm.Persistance.Data;
@@ -16,13 +17,13 @@ public class SignInServiceTests
     private readonly EntityHelper _entityHelper;
     private readonly RealmTestingServer _realmTestingServer;
     private readonly ISignInService _signInService;
-    private readonly Mock<ILogger> _logger;
+    private readonly Mock<ILogger<SignInService>> _logger;
 
     public SignInServiceTests()
     {
         _realmTestingServer = new();
         _entityHelper = new(_realmTestingServer);
-        _logger = new Mock<ILogger>();
+        _logger = new Mock<ILogger<SignInService>>();
 
         _signInService = new SignInService(new TestItemsRegistry(), _logger.Object);
     }
