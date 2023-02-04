@@ -2,8 +2,8 @@
 
 public class Inventory
 {
-    public Guid Id { get; set; }
-    public Guid UserId { get; set; }
+    public int Id { get; set; }
+    public int UserId { get; set; }
     public uint Size { get; set; }
 
     public ICollection<InventoryItem> InventoryItems = new List<InventoryItem>();

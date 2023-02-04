@@ -13,7 +13,6 @@ internal class VehicleRepository : IVehicleRepository
     {
         var vehicle = new Vehicle
         {
-            Id = Guid.NewGuid(),
             Model = model,
             Platetext = Guid.NewGuid().ToString()[..8],
             CreatedAt = DateTime.Now,

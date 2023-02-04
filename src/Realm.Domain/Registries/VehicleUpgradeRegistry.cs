@@ -2,18 +2,18 @@
 
 public class VehicleUpgradeRegistry
 {
-    private readonly Dictionary<uint, VehicleUpgradeRegistryEntry> _vehicleUpgradesRegistryEntries = new();
+    private readonly Dictionary<int, VehicleUpgradeRegistryEntry> _vehicleUpgradesRegistryEntries = new();
     public VehicleUpgradeRegistry()
     {
 
     }
 
-    public VehicleUpgradeRegistryEntry Get(uint id)
+    public VehicleUpgradeRegistryEntry Get(int id)
     {
         return _vehicleUpgradesRegistryEntries[id];
     }
 
-    public void AddUpgrade(uint id, VehicleUpgradeRegistryEntry vehicleUpgradeRegistryEntry)
+    public void AddUpgrade(int id, VehicleUpgradeRegistryEntry vehicleUpgradeRegistryEntry)
     {
         if (_vehicleUpgradesRegistryEntries.ContainsKey(id))
         {

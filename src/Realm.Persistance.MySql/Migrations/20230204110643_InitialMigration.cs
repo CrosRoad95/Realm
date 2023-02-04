@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore.Metadata;
+﻿using System;
+using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
@@ -15,10 +16,46 @@ namespace Realm.Persistance.MySql.Migrations
                 .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
+                name: "Fractions",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
+                    Name = table.Column<string>(type: "varchar(128)", maxLength: 128, nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    Code = table.Column<string>(type: "varchar(8)", maxLength: 8, nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4")
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Fractions", x => x.Id);
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
+
+            migrationBuilder.CreateTable(
+                name: "Groups",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
+                    Name = table.Column<string>(type: "varchar(128)", maxLength: 128, nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    Shortcut = table.Column<string>(type: "varchar(8)", maxLength: 8, nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    Kind = table.Column<byte>(type: "tinyint unsigned", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Groups", x => x.Id);
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
+
+            migrationBuilder.CreateTable(
                 name: "Roles",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
                     Name = table.Column<string>(type: "varchar(256)", maxLength: 256, nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     NormalizedName = table.Column<string>(type: "varchar(256)", maxLength: 256, nullable: true)
@@ -36,7 +73,8 @@ namespace Realm.Persistance.MySql.Migrations
                 name: "Users",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
                     Nick = table.Column<string>(type: "longtext", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     RegisteredDateTime = table.Column<DateTime>(type: "datetime(6)", nullable: true),
@@ -52,6 +90,8 @@ namespace Realm.Persistance.MySql.Migrations
                     PlayTime = table.Column<ulong>(type: "bigint unsigned", nullable: false),
                     Skin = table.Column<short>(type: "smallint", nullable: false),
                     Money = table.Column<decimal>(type: "decimal(65,30)", nullable: false),
+                    Level = table.Column<uint>(type: "int unsigned", nullable: false),
+                    Experience = table.Column<uint>(type: "int unsigned", nullable: false),
                     LastTransformAndMotion = table.Column<string>(type: "varchar(400)", maxLength: 400, nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     UserName = table.Column<string>(type: "varchar(256)", maxLength: 256, nullable: true)
@@ -87,8 +127,8 @@ namespace Realm.Persistance.MySql.Migrations
                 name: "Vehicles",
                 columns: table => new
                 {
-                    UserId = table.Column<string>(type: "varchar(255)", nullable: false)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
                     Model = table.Column<ushort>(type: "smallint unsigned", nullable: false),
                     TransformAndMotion = table.Column<string>(type: "varchar(400)", maxLength: 400, nullable: false, defaultValue: "{\"Position\":{\"X\":0.0,\"Y\":0.0,\"Z\":0.0},\"Rotation\":{\"X\":0.0,\"Y\":0.0,\"Z\":0.0},\"Interior\":0,\"Dimension\":0,\"Velocity\":{\"X\":0.0,\"Y\":0.0,\"Z\":0.0},\"AngularVelocity\":{\"X\":0.0,\"Y\":0.0,\"Z\":0.0}}")
                         .Annotation("MySql:CharSet", "utf8mb4"),
@@ -115,11 +155,12 @@ namespace Realm.Persistance.MySql.Migrations
                     IsFrozen = table.Column<bool>(type: "tinyint(1)", nullable: false, defaultValue: false),
                     Removed = table.Column<bool>(type: "tinyint(1)", nullable: false, defaultValue: false),
                     CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false),
-                    Spawned = table.Column<bool>(type: "tinyint(1)", nullable: false, defaultValue: false)
+                    Spawned = table.Column<bool>(type: "tinyint(1)", nullable: false, defaultValue: false),
+                    Mileage = table.Column<float>(type: "float", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Vehicles", x => x.UserId);
+                    table.PrimaryKey("PK_Vehicles", x => x.Id);
                 })
                 .Annotation("MySql:CharSet", "utf8mb4");
 
@@ -129,7 +170,7 @@ namespace Realm.Persistance.MySql.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
-                    RoleId = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
+                    RoleId = table.Column<int>(type: "int", nullable: false),
                     ClaimType = table.Column<string>(type: "longtext", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     ClaimValue = table.Column<string>(type: "longtext", nullable: true)
@@ -151,7 +192,7 @@ namespace Realm.Persistance.MySql.Migrations
                 name: "Achievements",
                 columns: table => new
                 {
-                    UserId = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
+                    UserId = table.Column<int>(type: "int", nullable: false),
                     Name = table.Column<string>(type: "varchar(255)", nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     Progress = table.Column<float>(type: "float", nullable: false),
@@ -175,7 +216,7 @@ namespace Realm.Persistance.MySql.Migrations
                 name: "DailyVisits",
                 columns: table => new
                 {
-                    UserId = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
+                    UserId = table.Column<int>(type: "int", nullable: false),
                     LastVisit = table.Column<DateTime>(type: "datetime(6)", nullable: false, defaultValue: new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)),
                     VisitsInRow = table.Column<int>(type: "int", nullable: false),
                     VisitsInRowRecord = table.Column<int>(type: "int", nullable: false)
@@ -193,11 +234,88 @@ namespace Realm.Persistance.MySql.Migrations
                 .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
+                name: "Discoveries",
+                columns: table => new
+                {
+                    UserId = table.Column<int>(type: "int", nullable: false),
+                    DiscoveryId = table.Column<string>(type: "varchar(32)", maxLength: 32, nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4")
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Discoveries", x => new { x.UserId, x.DiscoveryId });
+                    table.ForeignKey(
+                        name: "FK_Discoveries_Users_UserId",
+                        column: x => x.UserId,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
+
+            migrationBuilder.CreateTable(
+                name: "FractionMembers",
+                columns: table => new
+                {
+                    FractionId = table.Column<int>(type: "int", nullable: false),
+                    UserId = table.Column<int>(type: "int", nullable: false),
+                    Rank = table.Column<int>(type: "int", nullable: false),
+                    RankName = table.Column<string>(type: "varchar(64)", maxLength: 64, nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4")
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_FractionMembers", x => new { x.FractionId, x.UserId });
+                    table.ForeignKey(
+                        name: "FK_FractionMembers_Fractions_FractionId",
+                        column: x => x.FractionId,
+                        principalTable: "Fractions",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_FractionMembers_Users_UserId",
+                        column: x => x.UserId,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
+
+            migrationBuilder.CreateTable(
+                name: "GroupMembers",
+                columns: table => new
+                {
+                    GroupId = table.Column<int>(type: "int", nullable: false),
+                    UserId = table.Column<int>(type: "int", nullable: false),
+                    Rank = table.Column<int>(type: "int", nullable: false),
+                    RankName = table.Column<string>(type: "varchar(64)", maxLength: 64, nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4")
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_GroupMembers", x => new { x.GroupId, x.UserId });
+                    table.ForeignKey(
+                        name: "FK_GroupMembers_Groups_GroupId",
+                        column: x => x.GroupId,
+                        principalTable: "Groups",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_GroupMembers_Users_UserId",
+                        column: x => x.UserId,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
+
+            migrationBuilder.CreateTable(
                 name: "Inventories",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
-                    UserId = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
+                    UserId = table.Column<int>(type: "int", nullable: false),
                     Size = table.Column<uint>(type: "int unsigned", nullable: false)
                 },
                 constraints: table =>
@@ -213,17 +331,39 @@ namespace Realm.Persistance.MySql.Migrations
                 .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
-                name: "JobUpgrades",
+                name: "JobPoints",
                 columns: table => new
                 {
-                    UserId = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
+                    UserId = table.Column<int>(type: "int", nullable: false),
                     JobId = table.Column<short>(type: "smallint", nullable: false),
-                    Name = table.Column<string>(type: "varchar(255)", maxLength: 255, nullable: false)
-                        .Annotation("MySql:CharSet", "utf8mb4")
+                    Points = table.Column<ulong>(type: "bigint unsigned", nullable: false),
+                    TimePlayed = table.Column<ulong>(type: "bigint unsigned", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_JobUpgrades", x => new { x.UserId, x.JobId, x.Name });
+                    table.PrimaryKey("PK_JobPoints", x => new { x.UserId, x.JobId });
+                    table.ForeignKey(
+                        name: "FK_JobPoints_Users_UserId",
+                        column: x => x.UserId,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
+
+            migrationBuilder.CreateTable(
+                name: "JobUpgrades",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
+                    UserId = table.Column<int>(type: "int", nullable: false),
+                    JobId = table.Column<short>(type: "smallint", nullable: false),
+                    UpgradeId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_JobUpgrades", x => x.Id);
                     table.ForeignKey(
                         name: "FK_JobUpgrades_Users_UserId",
                         column: x => x.UserId,
@@ -237,7 +377,7 @@ namespace Realm.Persistance.MySql.Migrations
                 name: "Statistics",
                 columns: table => new
                 {
-                    UserId = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
+                    UserId = table.Column<int>(type: "int", nullable: false),
                     TraveledDistanceInVehicleAsDriver = table.Column<float>(type: "float", nullable: false),
                     TraveledDistanceInVehicleAsPassager = table.Column<float>(type: "float", nullable: false),
                     TraveledDistanceSwimming = table.Column<float>(type: "float", nullable: false),
@@ -262,7 +402,7 @@ namespace Realm.Persistance.MySql.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
-                    UserId = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
+                    UserId = table.Column<int>(type: "int", nullable: false),
                     ClaimType = table.Column<string>(type: "longtext", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     ClaimValue = table.Column<string>(type: "longtext", nullable: true)
@@ -281,21 +421,20 @@ namespace Realm.Persistance.MySql.Migrations
                 .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
-                name: "UserLicense",
+                name: "UserLicenses",
                 columns: table => new
                 {
-                    UserId = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
-                    LicenseId = table.Column<string>(type: "varchar(255)", nullable: false)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    UserId = table.Column<int>(type: "int", nullable: false),
+                    LicenseId = table.Column<int>(type: "int", nullable: false),
                     SuspendedUntil = table.Column<DateTime>(type: "datetime(6)", nullable: true),
                     SuspendedReason = table.Column<string>(type: "longtext", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4")
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_UserLicense", x => new { x.UserId, x.LicenseId });
+                    table.PrimaryKey("PK_UserLicenses", x => new { x.UserId, x.LicenseId });
                     table.ForeignKey(
-                        name: "FK_UserLicense_Users_UserId",
+                        name: "FK_UserLicenses_Users_UserId",
                         column: x => x.UserId,
                         principalTable: "Users",
                         principalColumn: "Id",
@@ -313,7 +452,7 @@ namespace Realm.Persistance.MySql.Migrations
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     ProviderDisplayName = table.Column<string>(type: "longtext", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    UserId = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci")
+                    UserId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -331,8 +470,8 @@ namespace Realm.Persistance.MySql.Migrations
                 name: "UserRoles",
                 columns: table => new
                 {
-                    UserId = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
-                    RoleId = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci")
+                    UserId = table.Column<int>(type: "int", nullable: false),
+                    RoleId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -356,7 +495,7 @@ namespace Realm.Persistance.MySql.Migrations
                 name: "UserTokens",
                 columns: table => new
                 {
-                    UserId = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
+                    UserId = table.Column<int>(type: "int", nullable: false),
                     LoginProvider = table.Column<string>(type: "varchar(255)", nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     Name = table.Column<string>(type: "varchar(255)", nullable: false)
@@ -382,9 +521,8 @@ namespace Realm.Persistance.MySql.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
-                    VehicleId = table.Column<string>(type: "varchar(255)", nullable: false)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    UserId = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
+                    VehicleId = table.Column<int>(type: "int", nullable: false),
+                    UserId = table.Column<int>(type: "int", nullable: false),
                     Description = table.Column<string>(type: "longtext", nullable: false, defaultValue: "{\"Ownership\":false}")
                         .Annotation("MySql:CharSet", "utf8mb4")
                 },
@@ -401,7 +539,7 @@ namespace Realm.Persistance.MySql.Migrations
                         name: "FK_VehicleAccesses_Vehicles_VehicleId",
                         column: x => x.VehicleId,
                         principalTable: "Vehicles",
-                        principalColumn: "UserId",
+                        principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 })
                 .Annotation("MySql:CharSet", "utf8mb4");
@@ -410,8 +548,7 @@ namespace Realm.Persistance.MySql.Migrations
                 name: "VehicleFuels",
                 columns: table => new
                 {
-                    VehicleId = table.Column<string>(type: "varchar(255)", nullable: false)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    VehicleId = table.Column<int>(type: "int", nullable: false),
                     FuelType = table.Column<string>(type: "varchar(16)", maxLength: 16, nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     MinimumDistanceThreshold = table.Column<float>(type: "float", nullable: false),
@@ -427,7 +564,7 @@ namespace Realm.Persistance.MySql.Migrations
                         name: "FK_VehicleFuels_Vehicles_VehicleId",
                         column: x => x.VehicleId,
                         principalTable: "Vehicles",
-                        principalColumn: "UserId",
+                        principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 })
                 .Annotation("MySql:CharSet", "utf8mb4");
@@ -436,9 +573,8 @@ namespace Realm.Persistance.MySql.Migrations
                 name: "VehicleUpgrades",
                 columns: table => new
                 {
-                    VehicleId = table.Column<string>(type: "varchar(255)", nullable: false)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    UpgradeId = table.Column<uint>(type: "int unsigned", nullable: false)
+                    VehicleId = table.Column<int>(type: "int", nullable: false),
+                    UpgradeId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -447,7 +583,7 @@ namespace Realm.Persistance.MySql.Migrations
                         name: "FK_VehicleUpgrades_Vehicles_VehicleId",
                         column: x => x.VehicleId,
                         principalTable: "Vehicles",
-                        principalColumn: "UserId",
+                        principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 })
                 .Annotation("MySql:CharSet", "utf8mb4");
@@ -458,7 +594,7 @@ namespace Realm.Persistance.MySql.Migrations
                 {
                     Id = table.Column<string>(type: "varchar(36)", maxLength: 36, nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    InventoryId = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
+                    InventoryId = table.Column<int>(type: "int", nullable: false),
                     ItemId = table.Column<uint>(type: "int unsigned", nullable: false),
                     Number = table.Column<uint>(type: "int unsigned", nullable: false),
                     MetaData = table.Column<string>(type: "longtext", nullable: false)
@@ -477,6 +613,40 @@ namespace Realm.Persistance.MySql.Migrations
                 .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateIndex(
+                name: "IX_FractionMembers_UserId",
+                table: "FractionMembers",
+                column: "UserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Fractions_Code",
+                table: "Fractions",
+                column: "Code",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Fractions_Name",
+                table: "Fractions",
+                column: "Name",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_GroupMembers_UserId",
+                table: "GroupMembers",
+                column: "UserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Groups_Name",
+                table: "Groups",
+                column: "Name",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Groups_Shortcut",
+                table: "Groups",
+                column: "Shortcut",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Inventories_UserId",
                 table: "Inventories",
                 column: "UserId");
@@ -485,6 +655,11 @@ namespace Realm.Persistance.MySql.Migrations
                 name: "IX_InventoryItems_InventoryId",
                 table: "InventoryItems",
                 column: "InventoryId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_JobUpgrades_UserId_JobId_UpgradeId",
+                table: "JobUpgrades",
+                columns: new[] { "UserId", "JobId", "UpgradeId" });
 
             migrationBuilder.CreateIndex(
                 name: "IX_RoleClaims_RoleId",
@@ -544,7 +719,19 @@ namespace Realm.Persistance.MySql.Migrations
                 name: "DailyVisits");
 
             migrationBuilder.DropTable(
+                name: "Discoveries");
+
+            migrationBuilder.DropTable(
+                name: "FractionMembers");
+
+            migrationBuilder.DropTable(
+                name: "GroupMembers");
+
+            migrationBuilder.DropTable(
                 name: "InventoryItems");
+
+            migrationBuilder.DropTable(
+                name: "JobPoints");
 
             migrationBuilder.DropTable(
                 name: "JobUpgrades");
@@ -559,7 +746,7 @@ namespace Realm.Persistance.MySql.Migrations
                 name: "UserClaims");
 
             migrationBuilder.DropTable(
-                name: "UserLicense");
+                name: "UserLicenses");
 
             migrationBuilder.DropTable(
                 name: "UserLogins");
@@ -578,6 +765,12 @@ namespace Realm.Persistance.MySql.Migrations
 
             migrationBuilder.DropTable(
                 name: "VehicleUpgrades");
+
+            migrationBuilder.DropTable(
+                name: "Fractions");
+
+            migrationBuilder.DropTable(
+                name: "Groups");
 
             migrationBuilder.DropTable(
                 name: "Inventories");

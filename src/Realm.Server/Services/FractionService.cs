@@ -29,7 +29,7 @@ internal class FractionService : IFractionService
             });
     }
 
-    public void InternalAddMember(int fractionId, Guid userId, int rank, string rankName)
+    public void InternalAddMember(int fractionId, int userId, int rank, string rankName)
     {
         lock (_fractionLock)
         {
@@ -46,7 +46,7 @@ internal class FractionService : IFractionService
         }
     }
 
-    public async Task AddMember(int fractionId, Guid userId, int rank, string rankName)
+    public async Task AddMember(int fractionId, int userId, int rank, string rankName)
     {
         InternalAddMember(fractionId, userId, rank, rankName);
 

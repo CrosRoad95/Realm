@@ -8,10 +8,10 @@ public interface IDb : IDisposable
     EntityEntry Attach(object entity);
     DbSet<User> Users { get; }
     DbSet<Role> Roles { get; }
-    DbSet<IdentityUserClaim<Guid>> UserClaims { get; }
-    DbSet<IdentityUserLogin<Guid>> UserLogins { get; }
-    DbSet<IdentityRoleClaim<Guid>> RoleClaims { get; }
-    DbSet<IdentityUserToken<Guid>> UserTokens { get; }
+    DbSet<IdentityUserClaim<int>> UserClaims { get; }
+    DbSet<IdentityUserLogin<int>> UserLogins { get; }
+    DbSet<IdentityRoleClaim<int>> RoleClaims { get; }
+    DbSet<IdentityUserToken<int>> UserTokens { get; }
     DbSet<UserLicense> UserLicenses { get; }
     DbSet<Vehicle> Vehicles { get; }
     DbSet<VehicleAccess> VehicleAccesses { get; }

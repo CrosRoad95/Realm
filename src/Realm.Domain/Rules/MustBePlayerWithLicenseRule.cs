@@ -2,9 +2,9 @@
 
 public sealed class MustBePlayerWithLicenseRule : IEntityRule
 {
-    private readonly string _licenseId;
+    private readonly int _licenseId;
 
-    public MustBePlayerWithLicenseRule(string licenseId)
+    public MustBePlayerWithLicenseRule(int licenseId)
     {
         _licenseId = licenseId;
     }

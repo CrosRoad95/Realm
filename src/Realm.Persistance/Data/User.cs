@@ -1,6 +1,6 @@
 ﻿namespace Realm.Persistance.Data;
 
-public sealed class User : IdentityUser<Guid>
+public sealed class User : IdentityUser<int>
 {
 #pragma warning disable CS8618
     public string? Nick { get; set; }

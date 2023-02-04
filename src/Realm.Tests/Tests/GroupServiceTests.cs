@@ -51,26 +51,26 @@ public class GroupServiceTests : IDisposable
     [Fact]
     public async Task YouCanAddMemberToGroup()
     {
-        var userGuid = Guid.NewGuid();
+        var userId = 1;
         var groupService = _serviceProvider.GetRequiredService<IGroupService>();
         var newlyCreatedGroup = await groupService.CreateGroup("Test group", "TG", Domain.Enums.GroupKind.Regular);
 
-        await groupService.AddMember(newlyCreatedGroup.id, userGuid, 100, "Leader");
+        await groupService.AddMember(newlyCreatedGroup.id, userId, 100, "Leader");
 
         var group = await groupService.GetGroupByName("Test group");
         group.Value.members.Should().HaveCount(1);
-        group.Value.members[0].userId.Should().Be(userGuid);
+        group.Value.members[0].userId.Should().Be(userId);
     }
 
     [Fact]
     public async Task YouCanAddMemberToGroupAndThenRemoveIt()
     {
-        var userGuid = Guid.NewGuid();
+        var userId = 1;
         var groupService = _serviceProvider.GetRequiredService<IGroupService>();
         var newlyCreatedGroup = await groupService.CreateGroup("Test group", "TG", Domain.Enums.GroupKind.Regular);
 
-        await groupService.AddMember(newlyCreatedGroup.id, userGuid, 100, "Leader");
-        await groupService.RemoveMember(newlyCreatedGroup.id, userGuid);
+        await groupService.AddMember(newlyCreatedGroup.id, userId, 100, "Leader");
+        await groupService.RemoveMember(newlyCreatedGroup.id, userId);
 
         var group = await groupService.GetGroupByName("Test group");
         group.Value.members.Should().BeEmpty();

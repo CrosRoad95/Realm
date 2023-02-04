@@ -7,8 +7,8 @@ public class VehicleUpgradesComponent : Component
     [Inject]
     private VehicleUpgradeRegistry VehicleUpgradeRegistry { get; set; } = default!;
 
-    private List<uint> _upgrades = new();
-    public IEnumerable<uint> Upgrades => _upgrades;
+    private List<int> _upgrades = new();
+    public IEnumerable<int> Upgrades => _upgrades;
 
     public VehicleUpgradesComponent()
     {
@@ -24,9 +24,9 @@ public class VehicleUpgradesComponent : Component
         RebuildUpgrades();
     }
 
-    public bool HasUpgrade(uint upgradeId) => _upgrades.Any(x => x == upgradeId);
+    public bool HasUpgrade(int upgradeId) => _upgrades.Any(x => x == upgradeId);
 
-    public bool AddUpgrade(uint upgradeId, bool rebuild = true)
+    public bool AddUpgrade(int upgradeId, bool rebuild = true)
     {
         _upgrades.Add(upgradeId);
         if (rebuild)
@@ -34,7 +34,7 @@ public class VehicleUpgradesComponent : Component
         return true;
     }
     
-    public bool RemoveUpgrade(uint upgradeId, bool rebuild = true)
+    public bool RemoveUpgrade(int upgradeId, bool rebuild = true)
     {
         bool result = _upgrades.Remove(upgradeId);
         if (result && rebuild)

@@ -77,8 +77,7 @@ internal class SaveService : ISaveService
         vehicleData.TransformAndMotion = entity.Transform.GetTransformAndMotion();
         vehicleData.VehicleAccesses = privateVehicleComponent.VehicleAccesses.Select(x => new VehicleAccess
         {
-            Id = x.Id ?? Guid.Empty,
-            UserId = x.UserId,
+            UserId = x.UserId ?? 0,
             VehicleId = vehicleData.Id,
             Vehicle = vehicleData,
             Description = new Persistance.Data.Helpers.VehicleAccessDescription
@@ -163,7 +162,7 @@ internal class SaveService : ISaveService
             var inventory = new Inventory
             {
                 Size = x.Size,
-                Id = x.Id ?? Guid.Empty,
+                Id = x.Id ?? 0,
             };
             inventory.InventoryItems = x.Items.Select(item => new InventoryItem
             {
@@ -180,7 +179,6 @@ internal class SaveService : ISaveService
         {
             user.DailyVisits = new DailyVisits
             {
-                UserId = user.DailyVisits?.UserId ?? Guid.Empty,
                 LastVisit = dailyVisitsCounterComponent.LastVisit,
                 VisitsInRow = dailyVisitsCounterComponent.VisitsInRow,
                 VisitsInRowRecord = dailyVisitsCounterComponent.VisitsInRowRecord,
@@ -193,7 +191,6 @@ internal class SaveService : ISaveService
         {
             user.Statistics = new Statistics
             {
-                UserId = user.Statistics?.UserId ?? Guid.Empty,
                 TraveledDistanceByFoot = statisticsCounterComponent.TraveledDistanceByFoot,
                 TraveledDistanceInAir = statisticsCounterComponent.TraveledDistanceInAir,
                 TraveledDistanceInVehicleAsDriver = statisticsCounterComponent.TraveledDistanceInVehicleAsDriver,
@@ -222,7 +219,7 @@ internal class SaveService : ISaveService
             user.JobUpgrades = jobUpgradesComponent.Upgrades.Select(x => new JobUpgrade
             {
                 JobId = x.jobId,
-                Name = x.name,
+                UpgradeId = x.UpgradeId,
             }).ToList();
         }
         else

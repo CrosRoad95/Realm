@@ -88,7 +88,7 @@ internal sealed class CommandsLogic
             if (entity.TryGetComponent(out LicensesComponent licenseComponent))
             {
                 var license = args.First();
-                if (licenseComponent.AddLicense(license))
+                if (licenseComponent.AddLicense(int.Parse(license)))
                 {
                     entity.GetRequiredComponent<PlayerElementComponent>().SendChatMessage($"license added: '{license}'");
                 }
@@ -230,7 +230,7 @@ internal sealed class CommandsLogic
             var jobUpgradesComponent = entity.GetRequiredComponent<JobUpgradesComponent>();
             try
             {
-                jobUpgradesComponent.AddJobUpgrade(1, "foo");
+                jobUpgradesComponent.AddJobUpgrade(1, 1);
                 entity.GetRequiredComponent<PlayerElementComponent>().SendChatMessage("Upgrade added");
             }
             catch (Exception ex)
@@ -273,7 +273,7 @@ internal sealed class CommandsLogic
         {
             if (entity.TryGetComponent(out JobUpgradesComponent jobUpgradesComponent))
             {
-                jobUpgradesComponent.AddJobUpgrade(1, "foo");
+                jobUpgradesComponent.AddJobUpgrade(1, 1);
                 entity.GetRequiredComponent<PlayerElementComponent>().SendChatMessage($"Job upgrade added");
             }
             
@@ -285,8 +285,8 @@ internal sealed class CommandsLogic
 
             if (entity.TryGetComponent(out LicensesComponent licenseComponent))
             {
-                if (licenseComponent.AddLicense("test123"))
-                    entity.GetRequiredComponent<PlayerElementComponent>().SendChatMessage($"Test license added: 'test123'");
+                if (licenseComponent.AddLicense(1))
+                    entity.GetRequiredComponent<PlayerElementComponent>().SendChatMessage($"Test license added: 'test123' of id 1");
             }
 
             if (entity.TryGetComponent(out MoneyComponent moneyComponent))

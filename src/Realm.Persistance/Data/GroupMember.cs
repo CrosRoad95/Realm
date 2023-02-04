@@ -3,7 +3,7 @@
 public class GroupMember
 {
     public int GroupId { get; set; }
-    public Guid UserId { get; set; }
+    public int UserId { get; set; }
     public int Rank { get; set; }
     public string RankName { get; set; }
 

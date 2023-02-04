@@ -8,7 +8,7 @@ public class JobUpgradesComponent : Component
     private readonly List<JobUpgrade> _upgrades = new();
     public IEnumerable<JobUpgrade> Upgrades => _upgrades;
 
-    public event Action<Entity, short, string>? JobUpgradeAdded;
+    public event Action<Entity, short, int>? JobUpgradeAdded;
 
     public JobUpgradesComponent()
     {
@@ -20,22 +20,22 @@ public class JobUpgradesComponent : Component
         _upgrades = jobUpgrades.Select(x => new JobUpgrade
         {
             jobId = x.JobId,
-            name = x.Name,
+            UpgradeId = x.UpgradeId,
         }).ToList();
     }
 
-    public bool HasJobUpgrade(short jobId, string upgradeName) => _upgrades.Any(x => x.jobId == jobId && x.name == upgradeName);
+    public bool HasJobUpgrade(short jobId, int upgradeId) => _upgrades.Any(x => x.jobId == jobId && x.UpgradeId == upgradeId);
 
-    public void AddJobUpgrade(short jobId, string upgradeName)
+    public void AddJobUpgrade(short jobId, int upgradeId)
     {
-        if (HasJobUpgrade(jobId, upgradeName))
-            throw new UpgradeAlreadyExistsException(jobId, upgradeName);
+        if (HasJobUpgrade(jobId, upgradeId))
+            throw new UpgradeAlreadyExistsException(jobId, upgradeId);
         _upgrades.Add(new JobUpgrade
         {
             jobId = jobId,
-            name = upgradeName,
+            UpgradeId = upgradeId,
         });
 
-        JobUpgradeAdded?.Invoke(Entity, jobId, upgradeName);
+        JobUpgradeAdded?.Invoke(Entity, jobId, upgradeId);
     }
 }

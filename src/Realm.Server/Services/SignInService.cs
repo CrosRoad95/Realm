@@ -7,7 +7,7 @@ internal class SignInService : ISignInService
 {
     private readonly SemaphoreSlim _lock = new(1);
 
-    private readonly HashSet<Guid> _usedAccountsIds = new();
+    private readonly HashSet<int> _usedAccountsIds = new();
     private readonly ItemsRegistry _itemsRegistry;
     private readonly ILogger _logger;
 

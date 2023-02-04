@@ -2,5 +2,5 @@
 
 public class GroupMemberNotFoundException : Exception
 {
-    public GroupMemberNotFoundException(int groupId, Guid userId) : base($"User of id {userId} is not found in group {groupId}.") { }
+    public GroupMemberNotFoundException(int groupId, int userId) : base($"User of id {userId} is not found in group {groupId}.") { }
 }

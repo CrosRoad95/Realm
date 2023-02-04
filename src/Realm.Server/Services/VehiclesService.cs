@@ -25,7 +25,7 @@ internal sealed class VehiclesService : IVehiclesService
         return vehicleEntity;
     }
 
-    public async Task<List<VehicleLightInfo>> GetAllVehiclesLightInfoByOwnerId(Guid userId)
+    public async Task<List<VehicleLightInfo>> GetAllVehiclesLightInfoByOwnerId(int userId)
     {
         return await _vehicleRepository.GetAll()
             .Include(x => x.VehicleAccesses)

@@ -2,7 +2,7 @@
 
 public class VehicleFuel
 {
-    public Guid VehicleId { get; set; }
+    public int VehicleId { get; set; }
     public string FuelType { get; set; }
     public float MinimumDistanceThreshold { get; set; }
     public float FuelConsumptionPerOneKm { get; set; }
@@ -10,5 +10,5 @@ public class VehicleFuel
     public float MaxCapacity { get; set; }
     public bool Active { get; set; }
 
-    public virtual Vehicle Vehicle { get; set; }
+    public virtual Vehicle? Vehicle { get; set; }
 }

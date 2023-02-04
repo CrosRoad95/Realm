@@ -15,7 +15,7 @@ public class AccountComponent : Component
     private ClaimsPrincipal? _claimsPrincipal;
 
     internal User User => _user;
-    public Guid Id => _user.Id;
+    public int Id => _user.Id;
     public string? UserName => _user.UserName;
     internal AccountComponent(User user)
     {

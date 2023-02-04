@@ -10,7 +10,7 @@ public class InventoryComponent : Component
     public event Action<InventoryComponent, Item>? ItemRemoved;
     public event Action<InventoryComponent, Item>? ItemChanged;
 
-    public Guid? Id { get; private set; } = null;
+    public int? Id { get; private set; } = null;
     public uint Size { get; set; }
     public uint Number
     {
@@ -30,7 +30,7 @@ public class InventoryComponent : Component
         Size = size;
     }
 
-    internal InventoryComponent(uint size, Guid id, IEnumerable<Item> items)
+    internal InventoryComponent(uint size, int id, IEnumerable<Item> items)
     {
         Size = size;
         Id = id;

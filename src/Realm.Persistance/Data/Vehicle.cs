@@ -3,7 +3,7 @@
 public sealed class Vehicle
 {
 #pragma warning disable CS8618
-    public Guid Id { get; set; }
+    public int Id { get; set; }
     public ushort Model { get; set; }
     public TransformAndMotion TransformAndMotion { get; set; }
     public VehicleColor Color { get; set; }

@@ -2,7 +2,7 @@
 
 public class VehicleUpgradeRegistryEntry
 {
-    internal uint Id { get; set; }
+    internal int Id { get; set; }
     public class UpgradeDescription
     {
         public float IncreaseByUnits { get; set; } = 0;

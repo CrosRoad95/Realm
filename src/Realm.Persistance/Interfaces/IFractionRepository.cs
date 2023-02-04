@@ -2,5 +2,5 @@
 
 public interface IFractionRepository
 {
-    Task<FractionMember> CreateNewFractionMember(int fractionId, Guid userId, int rank = 1, string rankName = "");
+    Task<FractionMember> CreateNewFractionMember(int fractionId, int UserId, int rank = 1, string rankName = "");
 }

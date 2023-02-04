@@ -23,22 +23,22 @@ public class LicensesComponent : Component
         }).ToList();
     }
 
-    public License? GetLicense(string licenseId)
+    public License? GetLicense(int licenseId)
     {
         ThrowIfDisposed();
 
         lock(_licensesLock)
-            return _licenses.Where(x => x.licenseId.ToLower() == licenseId.ToLower()).FirstOrDefault();
+            return _licenses.Where(x => x.licenseId == licenseId).FirstOrDefault();
     }
 
-    public bool IsLicenseSuspended(string licenseId)
+    public bool IsLicenseSuspended(int licenseId)
     {
         lock(_licensesLock)
             return _licenses.Where(x => x.licenseId == licenseId && x.IsSuspended)
             .Any();
     }
 
-    public string? GetLastLicenseSuspensionReason(string licenseId)
+    public string? GetLastLicenseSuspensionReason(int licenseId)
     {
         lock(_licensesLock)
         return _licenses
@@ -47,7 +47,7 @@ public class LicensesComponent : Component
             .FirstOrDefault();
     }
 
-    public bool AddLicense(string licenseId)
+    public bool AddLicense(int licenseId)
     {
         var userLicense = new License
         {
@@ -64,7 +64,7 @@ public class LicensesComponent : Component
         }
     }
 
-    private bool InternalHasLicense(string licenseId, bool includeSuspended = false)
+    private bool InternalHasLicense(int licenseId, bool includeSuspended = false)
     {
         var query = _licenses.Where(x => x.licenseId == licenseId);
 
@@ -73,13 +73,13 @@ public class LicensesComponent : Component
         return query.Any();
     }
     
-    public bool HasLicense(string licenseId, bool includeSuspended = false)
+    public bool HasLicense(int licenseId, bool includeSuspended = false)
     {
         lock (_licensesLock)
             return InternalHasLicense(licenseId, includeSuspended);
     }
 
-    public void SuspendLicense(string licenseId, TimeSpan timeSpan, string? reason = null)
+    public void SuspendLicense(int licenseId, TimeSpan timeSpan, string? reason = null)
     {
         if (timeSpan.Ticks <= 0)
             throw new Exception();
@@ -97,7 +97,7 @@ public class LicensesComponent : Component
         }
     }
 
-    public void UnSuspendLicense(string licenseId)
+    public void UnSuspendLicense(int licenseId)
     {
         lock (_licensesLock)
         {

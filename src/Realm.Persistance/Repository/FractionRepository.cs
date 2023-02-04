@@ -9,7 +9,7 @@ internal class FractionRepository : IFractionRepository
         _db = db;
     }
 
-    public async Task<FractionMember> CreateNewFractionMember(int fractionId, Guid userId, int rank = 1, string rankName = "")
+    public async Task<FractionMember> CreateNewFractionMember(int fractionId, int userId, int rank = 1, string rankName = "")
     {
         var fractionMember = new FractionMember
         {

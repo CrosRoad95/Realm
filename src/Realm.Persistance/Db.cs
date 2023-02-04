@@ -1,11 +1,11 @@
 ﻿namespace Realm.Persistance;
 
-public abstract class Db<T> : IdentityDbContext<User, Role, Guid,
-        IdentityUserClaim<Guid>,
-        IdentityUserRole<Guid>,
-        IdentityUserLogin<Guid>,
-        IdentityRoleClaim<Guid>,
-        IdentityUserToken<Guid>>, IDb where T : Db<T>
+public abstract class Db<T> : IdentityDbContext<User, Role, int,
+        IdentityUserClaim<int>,
+        IdentityUserRole<int>,
+        IdentityUserLogin<int>,
+        IdentityRoleClaim<int>,
+        IdentityUserToken<int>>, IDb where T : Db<T>
 {
     public DbSet<UserLicense> UserLicenses => Set<UserLicense>();
     public DbSet<Vehicle> Vehicles => Set<Vehicle>();
@@ -40,11 +40,11 @@ public abstract class Db<T> : IdentityDbContext<User, Role, Guid,
 
         modelBuilder.Entity<User>().ToTable("Users");
         modelBuilder.Entity<Role>().ToTable("Roles");
-        modelBuilder.Entity<IdentityUserClaim<Guid>>().ToTable("UserClaims");
-        modelBuilder.Entity<IdentityUserRole<Guid>>().ToTable("UserRoles");
-        modelBuilder.Entity<IdentityUserLogin<Guid>>().ToTable("UserLogins");
-        modelBuilder.Entity<IdentityRoleClaim<Guid>>().ToTable("RoleClaims");
-        modelBuilder.Entity<IdentityUserToken<Guid>>().ToTable("UserTokens");
+        modelBuilder.Entity<IdentityUserClaim<int>>().ToTable("UserClaims");
+        modelBuilder.Entity<IdentityUserRole<int>>().ToTable("UserRoles");
+        modelBuilder.Entity<IdentityUserLogin<int>>().ToTable("UserLogins");
+        modelBuilder.Entity<IdentityRoleClaim<int>>().ToTable("RoleClaims");
+        modelBuilder.Entity<IdentityUserToken<int>>().ToTable("UserTokens");
 
         modelBuilder.Entity<User>(entityBuilder =>
         {
@@ -71,7 +71,8 @@ public abstract class Db<T> : IdentityDbContext<User, Role, Guid,
             entityBuilder
                 .HasMany(x => x.JobUpgrades)
                 .WithOne(x => x.User)
-                .HasForeignKey(x => x.UserId);
+                .HasForeignKey(x => x.UserId)
+                .HasPrincipalKey(x => x.Id);
             
             entityBuilder
                 .HasMany(x => x.JobStatistics)
@@ -160,10 +161,11 @@ public abstract class Db<T> : IdentityDbContext<User, Role, Guid,
         {
             entityBuilder
                 .ToTable(nameof(JobUpgrades))
-                .HasKey(x => new { x.UserId, x.JobId, x.Name });
+                .HasKey(x => x.Id);
 
-            entityBuilder.Property(x => x.Name)
-                .HasMaxLength(255);
+            entityBuilder
+                .ToTable(nameof(JobUpgrades))
+                .HasIndex(x => new { x.UserId, x.JobId, x.UpgradeId });
         });
         
         modelBuilder.Entity<JobStatistics>(entityBuilder =>

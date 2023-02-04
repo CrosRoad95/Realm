@@ -83,17 +83,17 @@ internal class GroupService : IGroupService
         entity.AddComponent(new GroupMemberComponent(groupMemberData));
     }
 
-    public async Task AddMember(string groupName, Guid userId, int rank = 1, string rankName = "")
+    public async Task AddMember(string groupName, int userId, int rank = 1, string rankName = "")
     {
         await _groupRepository.CreateNewGroupMember(groupName, userId, rank, rankName);
     }
 
-    public async Task AddMember(int groupId, Guid userId, int rank = 1, string rankName = "")
+    public async Task AddMember(int groupId, int userId, int rank = 1, string rankName = "")
     {
         await _groupRepository.CreateNewGroupMember(groupId, userId, rank, rankName);
     }
 
-    public async Task RemoveMember(int groupId, Guid userId)
+    public async Task RemoveMember(int groupId, int userId)
     {
         if (!await _groupRepository.RemoveGroupMember(groupId, userId))
             throw new GroupMemberNotFoundException(groupId, userId);

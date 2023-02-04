@@ -19,7 +19,7 @@ namespace Realm.Persistance.MySql.Migrations
                 .HasAnnotation("ProductVersion", "7.0.2")
                 .HasAnnotation("Relational:MaxIdentifierLength", 64);
 
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<System.Guid>", b =>
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<int>", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -31,8 +31,8 @@ namespace Realm.Persistance.MySql.Migrations
                     b.Property<string>("ClaimValue")
                         .HasColumnType("longtext");
 
-                    b.Property<Guid>("RoleId")
-                        .HasColumnType("char(36)");
+                    b.Property<int>("RoleId")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
@@ -41,7 +41,7 @@ namespace Realm.Persistance.MySql.Migrations
                     b.ToTable("RoleClaims", (string)null);
                 });
 
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<System.Guid>", b =>
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<int>", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -53,8 +53,8 @@ namespace Realm.Persistance.MySql.Migrations
                     b.Property<string>("ClaimValue")
                         .HasColumnType("longtext");
 
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("char(36)");
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
@@ -63,7 +63,7 @@ namespace Realm.Persistance.MySql.Migrations
                     b.ToTable("UserClaims", (string)null);
                 });
 
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<System.Guid>", b =>
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<int>", b =>
                 {
                     b.Property<string>("LoginProvider")
                         .HasColumnType("varchar(255)");
@@ -74,8 +74,8 @@ namespace Realm.Persistance.MySql.Migrations
                     b.Property<string>("ProviderDisplayName")
                         .HasColumnType("longtext");
 
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("char(36)");
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
 
                     b.HasKey("LoginProvider", "ProviderKey");
 
@@ -84,13 +84,13 @@ namespace Realm.Persistance.MySql.Migrations
                     b.ToTable("UserLogins", (string)null);
                 });
 
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<System.Guid>", b =>
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<int>", b =>
                 {
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("char(36)");
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
 
-                    b.Property<Guid>("RoleId")
-                        .HasColumnType("char(36)");
+                    b.Property<int>("RoleId")
+                        .HasColumnType("int");
 
                     b.HasKey("UserId", "RoleId");
 
@@ -99,10 +99,10 @@ namespace Realm.Persistance.MySql.Migrations
                     b.ToTable("UserRoles", (string)null);
                 });
 
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<System.Guid>", b =>
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<int>", b =>
                 {
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("char(36)");
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
 
                     b.Property<string>("LoginProvider")
                         .HasColumnType("varchar(255)");
@@ -120,8 +120,8 @@ namespace Realm.Persistance.MySql.Migrations
 
             modelBuilder.Entity("Realm.Persistance.Data.Achievement", b =>
                 {
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("char(36)");
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
 
                     b.Property<string>("Name")
                         .HasColumnType("varchar(255)");
@@ -143,8 +143,8 @@ namespace Realm.Persistance.MySql.Migrations
 
             modelBuilder.Entity("Realm.Persistance.Data.DailyVisits", b =>
                 {
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("char(36)");
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
 
                     b.Property<DateTime>("LastVisit")
                         .ValueGeneratedOnAdd()
@@ -164,8 +164,8 @@ namespace Realm.Persistance.MySql.Migrations
 
             modelBuilder.Entity("Realm.Persistance.Data.Discovery", b =>
                 {
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("char(36)");
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
 
                     b.Property<string>("DiscoveryId")
                         .HasMaxLength(32)
@@ -207,8 +207,8 @@ namespace Realm.Persistance.MySql.Migrations
                     b.Property<int>("FractionId")
                         .HasColumnType("int");
 
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("char(36)");
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
 
                     b.Property<int>("Rank")
                         .HasColumnType("int");
@@ -259,8 +259,8 @@ namespace Realm.Persistance.MySql.Migrations
                     b.Property<int>("GroupId")
                         .HasColumnType("int");
 
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("char(36)");
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
 
                     b.Property<int>("Rank")
                         .HasColumnType("int");
@@ -279,15 +279,15 @@ namespace Realm.Persistance.MySql.Migrations
 
             modelBuilder.Entity("Realm.Persistance.Data.Inventory", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("char(36)");
+                        .HasColumnType("int");
 
                     b.Property<uint>("Size")
                         .HasColumnType("int unsigned");
 
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("char(36)");
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
@@ -302,8 +302,8 @@ namespace Realm.Persistance.MySql.Migrations
                         .HasMaxLength(36)
                         .HasColumnType("varchar(36)");
 
-                    b.Property<Guid>("InventoryId")
-                        .HasColumnType("char(36)");
+                    b.Property<int>("InventoryId")
+                        .HasColumnType("int");
 
                     b.Property<uint>("ItemId")
                         .HasColumnType("int unsigned");
@@ -324,8 +324,8 @@ namespace Realm.Persistance.MySql.Migrations
 
             modelBuilder.Entity("Realm.Persistance.Data.JobStatistics", b =>
                 {
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("char(36)");
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
 
                     b.Property<short>("JobId")
                         .HasColumnType("smallint");
@@ -343,26 +343,31 @@ namespace Realm.Persistance.MySql.Migrations
 
             modelBuilder.Entity("Realm.Persistance.Data.JobUpgrade", b =>
                 {
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("char(36)");
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
 
                     b.Property<short>("JobId")
                         .HasColumnType("smallint");
 
-                    b.Property<string>("Name")
-                        .HasMaxLength(255)
-                        .HasColumnType("varchar(255)");
+                    b.Property<int>("UpgradeId")
+                        .HasColumnType("int");
 
-                    b.HasKey("UserId", "JobId", "Name");
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId", "JobId", "UpgradeId");
 
                     b.ToTable("JobUpgrades", (string)null);
                 });
 
             modelBuilder.Entity("Realm.Persistance.Data.Role", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("char(36)");
+                        .HasColumnType("int");
 
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken()
@@ -387,8 +392,8 @@ namespace Realm.Persistance.MySql.Migrations
 
             modelBuilder.Entity("Realm.Persistance.Data.Statistics", b =>
                 {
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("char(36)");
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
 
                     b.Property<float>("TraveledDistanceByFoot")
                         .HasColumnType("float");
@@ -412,9 +417,9 @@ namespace Realm.Persistance.MySql.Migrations
 
             modelBuilder.Entity("Realm.Persistance.Data.User", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("char(36)");
+                        .HasColumnType("int");
 
                     b.Property<int>("AccessFailedCount")
                         .HasColumnType("int");
@@ -517,11 +522,11 @@ namespace Realm.Persistance.MySql.Migrations
 
             modelBuilder.Entity("Realm.Persistance.Data.UserLicense", b =>
                 {
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("char(36)");
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
 
-                    b.Property<string>("LicenseId")
-                        .HasColumnType("varchar(255)");
+                    b.Property<int>("LicenseId")
+                        .HasColumnType("int");
 
                     b.Property<string>("SuspendedReason")
                         .HasColumnType("longtext");
@@ -536,9 +541,9 @@ namespace Realm.Persistance.MySql.Migrations
 
             modelBuilder.Entity("Realm.Persistance.Data.Vehicle", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("char(36)");
+                        .HasColumnType("int");
 
                     b.Property<string>("Color")
                         .IsRequired()
@@ -658,9 +663,9 @@ namespace Realm.Persistance.MySql.Migrations
 
             modelBuilder.Entity("Realm.Persistance.Data.VehicleAccess", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("char(36)");
+                        .HasColumnType("int");
 
                     b.Property<string>("Description")
                         .IsRequired()
@@ -668,12 +673,12 @@ namespace Realm.Persistance.MySql.Migrations
                         .HasColumnType("longtext")
                         .HasDefaultValue("{\"Ownership\":false}");
 
-                    b.Property<Guid?>("UserId")
-                        .HasColumnType("char(36)");
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
 
-                    b.Property<Guid>("VehicleId")
+                    b.Property<int>("VehicleId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("char(36)");
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
@@ -686,8 +691,8 @@ namespace Realm.Persistance.MySql.Migrations
 
             modelBuilder.Entity("Realm.Persistance.Data.VehicleFuel", b =>
                 {
-                    b.Property<Guid>("VehicleId")
-                        .HasColumnType("char(36)");
+                    b.Property<int>("VehicleId")
+                        .HasColumnType("int");
 
                     b.Property<string>("FuelType")
                         .HasMaxLength(16)
@@ -715,18 +720,18 @@ namespace Realm.Persistance.MySql.Migrations
 
             modelBuilder.Entity("Realm.Persistance.Data.VehicleUpgrade", b =>
                 {
-                    b.Property<Guid>("VehicleId")
-                        .HasColumnType("char(36)");
+                    b.Property<int>("VehicleId")
+                        .HasColumnType("int");
 
-                    b.Property<uint>("UpgradeId")
-                        .HasColumnType("int unsigned");
+                    b.Property<int>("UpgradeId")
+                        .HasColumnType("int");
 
                     b.HasKey("VehicleId", "UpgradeId");
 
                     b.ToTable("VehicleUpgrades", (string)null);
                 });
 
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<System.Guid>", b =>
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<int>", b =>
                 {
                     b.HasOne("Realm.Persistance.Data.Role", null)
                         .WithMany()
@@ -735,7 +740,7 @@ namespace Realm.Persistance.MySql.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<System.Guid>", b =>
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<int>", b =>
                 {
                     b.HasOne("Realm.Persistance.Data.User", null)
                         .WithMany()
@@ -744,7 +749,7 @@ namespace Realm.Persistance.MySql.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<System.Guid>", b =>
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<int>", b =>
                 {
                     b.HasOne("Realm.Persistance.Data.User", null)
                         .WithMany()
@@ -753,7 +758,7 @@ namespace Realm.Persistance.MySql.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<System.Guid>", b =>
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<int>", b =>
                 {
                     b.HasOne("Realm.Persistance.Data.Role", null)
                         .WithMany()
@@ -768,7 +773,7 @@ namespace Realm.Persistance.MySql.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<System.Guid>", b =>
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<int>", b =>
                 {
                     b.HasOne("Realm.Persistance.Data.User", null)
                         .WithMany()
@@ -918,7 +923,9 @@ namespace Realm.Persistance.MySql.Migrations
                 {
                     b.HasOne("Realm.Persistance.Data.User", "User")
                         .WithMany("VehicleAccesses")
-                        .HasForeignKey("UserId");
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("Realm.Persistance.Data.Vehicle", "Vehicle")
                         .WithMany("VehicleAccesses")

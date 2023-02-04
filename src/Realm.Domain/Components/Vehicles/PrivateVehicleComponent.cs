@@ -7,7 +7,7 @@ public class PrivateVehicleComponent : Component
 {
     private readonly VehicleData _vehicleData;
 
-    internal Guid Id => _vehicleData.Id;
+    internal int Id => _vehicleData.Id;
 
     private List<VehicleAccess> _vehicleAccesses = new();
     public IReadOnlyList<VehicleAccess> VehicleAccesses => _vehicleAccesses;

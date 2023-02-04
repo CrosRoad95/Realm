@@ -2,9 +2,10 @@
 
 public class JobUpgrade
 {
-    public Guid UserId { get; set; }
+    public int Id { get; set; }
+    public int UserId { get; set; }
     public short JobId { get; set; }
-    public string Name { get; set; }
+    public int UpgradeId { get; set; }
 
-    public virtual User User { get; set; }
+    public virtual User? User { get; set; }
 }
