@@ -40,7 +40,7 @@ internal sealed class PlayerGameplayLogic
                 {
                     X = 0,
                     Y = 0,
-                    Z = 0
+                    Z = playerEntity.Transform.Rotation.Z
                 };
             }
         }

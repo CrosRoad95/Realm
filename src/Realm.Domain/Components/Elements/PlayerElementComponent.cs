@@ -229,7 +229,30 @@ public sealed class PlayerElementComponent : ElementComponent
 
     private async void HandleBindExecuted(Player _, PlayerBindExecutedEventArgs e)
     {
-        await InternalHandleBindExecuted(e.Key, e.KeyState);
+        try
+        {
+            await InternalHandleBindExecuted(e.Key, e.KeyState);
+        }
+        catch(Exception ex)
+        {
+            // Ignore
+        }
+    }
+
+    public bool IsCooldownActive(string key)
+    {
+        _bindsLock.Wait();
+        if (_bindsCooldown.TryGetValue(key, out var cooldownUntil))
+        {
+            _bindsLock.Release();
+            if (cooldownUntil > DateTime.Now)
+            {
+                return true;
+            }
+        }
+        else
+            _bindsLock.Release();
+        return false;
     }
 
     internal async Task InternalHandleBindExecuted(string key, KeyState keyState)
