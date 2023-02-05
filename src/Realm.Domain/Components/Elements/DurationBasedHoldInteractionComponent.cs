@@ -17,7 +17,7 @@ public class DurationBasedHoldInteractionComponent : InteractionComponent
 
     }
 
-    public async Task<bool> BeginInteraction(Entity playerEntity, TimeSpan timeSpan)
+    public async Task<bool> BeginInteraction(Entity playerEntity, TimeSpan timeSpan, CancellationToken cancellationToken = default)
     {
         if (playerEntity == null)
             throw new NullReferenceException(nameof(playerEntity));
@@ -34,7 +34,7 @@ public class DurationBasedHoldInteractionComponent : InteractionComponent
             Owner.Destroyed += HandleDestroyed;
 
             _interactionTaskComplectionSource = new TaskCompletionSource();
-            _interactionTask = Task.Delay(timeSpan);
+            _interactionTask = Task.Delay(timeSpan, cancellationToken);
         }
         catch (Exception)
         {
@@ -45,20 +45,15 @@ public class DurationBasedHoldInteractionComponent : InteractionComponent
             _semaphore.Release();
         }
 
-        try
+        var finishedTask = await Task.WhenAny(_interactionTaskComplectionSource.Task, _interactionTask);
+        if (finishedTask == _interactionTask)
         {
-            if (await Task.WhenAny(_interactionTaskComplectionSource.Task, _interactionTask) == _interactionTask)
-            {
-                Owner.Destroyed -= HandleDestroyed;
-                Owner = null;
-                return true;
-            }
-            return false;
+            Owner.Destroyed -= HandleDestroyed;
+            Owner = null;
+            cancellationToken.ThrowIfCancellationRequested();
+            return true;
         }
-        finally
-        {
-
-        }
+        return false;
     }
 
     private void HandleDestroyed(Entity _)

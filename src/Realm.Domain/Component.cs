@@ -5,6 +5,7 @@ public abstract class Component
     private bool _disposed = false;
     public Entity Entity { get; internal set; } = default!;
 
+    public event Action<Component>? Disposed;
     protected virtual Task LoadAsync() => Task.CompletedTask;
     protected virtual void Load() { }
 
@@ -30,5 +31,6 @@ public abstract class Component
     {
         ThrowIfDisposed();
         _disposed = true;
+        Disposed?.Invoke(this);
     }
 }

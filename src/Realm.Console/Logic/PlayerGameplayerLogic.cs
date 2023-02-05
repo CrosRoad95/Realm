@@ -62,16 +62,28 @@ internal sealed class PlayerGameplayLogic
                         }
                         break;
                     case DurationBasedHoldInteractionComponent durationBasedHoldInteractionComponent:
-                        _logger.LogInformation("Interaction");
+                        _logger.LogInformation("Interaction begin");
                         if (keyState == KeyState.Down)
                         {
-                            if(await durationBasedHoldInteractionComponent.BeginInteraction(currentInteractEntity, TimeSpan.FromSeconds(5)))
+                            var token = new CancellationTokenSource();
+                            currentInteractEntityComponent.Disposed += e =>
                             {
-                                _logger.LogInformation("Interaction completed");
+                                token.Cancel();
+                            };
+                            try
+                            {
+                                if (await durationBasedHoldInteractionComponent.BeginInteraction(currentInteractEntity, TimeSpan.FromSeconds(5), token.Token))
+                                {
+                                    _logger.LogInformation("Interaction completed");
+                                }
+                                else
+                                {
+                                    _logger.LogInformation("Interaction failed");
+                                }
                             }
-                            else
+                            catch (OperationCanceledException ex)
                             {
-                                _logger.LogInformation("Interaction failed");
+                                _logger.LogInformation("Interaction failed ( not focused )");
                             }
                         }
                         else

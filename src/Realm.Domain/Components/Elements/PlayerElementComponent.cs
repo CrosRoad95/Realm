@@ -243,10 +243,9 @@ public sealed class PlayerElementComponent : ElementComponent
         {
             await InternalHandleBindExecuted(e.Key, e.KeyState);
         }
-        catch(Exception ex)
+        finally
         {
-            ;
-            // Ignore
+
         }
     }
 
