@@ -1,4 +1,5 @@
 ﻿using Realm.Server.Extensions;
+using SlipeServer.Server.Elements.Enums;
 
 namespace Realm.Console.Logic;
 
@@ -26,7 +27,7 @@ internal sealed class PlayerGameplayLogic
         playerElementComponent.SetBind("x", HandleInteract);
     }
 
-    private async Task HandleInteract(Entity playerEntity)
+    private async Task HandleInteract(Entity playerEntity, KeyState keyState)
     {
         if(playerEntity.TryGetComponent(out AttachedEntityComponent attachedEntityComponent))
         {
@@ -47,13 +48,46 @@ internal sealed class PlayerGameplayLogic
         else if(playerEntity.TryGetComponent(out CurrentInteractEntityComponent currentInteractEntityComponent))
         {
             var currentInteractEntity = currentInteractEntityComponent.CurrentInteractEntity;
-            if (playerEntity.DistanceTo(currentInteractEntity) < 1.3f && currentInteractEntity.TryGetComponent(out LiftableWorldObjectComponent liftableWorldObjectComponent))
+            if (playerEntity.DistanceTo(currentInteractEntity) < 1.3f && currentInteractEntity.TryGetComponent(out InteractionComponent interactionComponent))
             {
-                if (playerEntity.IsLookingAt(currentInteractEntity) && liftableWorldObjectComponent.TryLift(playerEntity))
+                var playerElementComponent = playerEntity.GetRequiredComponent<PlayerElementComponent>();
+                switch (interactionComponent)
                 {
-                    await playerEntity.GetRequiredComponent<PlayerElementComponent>().DoAnimationAsync(PlayerElementComponent.Animation.CarryLiftUp);
-                    playerEntity.GetRequiredComponent<PlayerElementComponent>().DoAnimation(PlayerElementComponent.Animation.StartCarry);
-                    playerEntity.AddComponent(new AttachedEntityComponent(currentInteractEntity, new Vector3(0.6f, 0.6f, -0.4f)));
+                    case LiftableWorldObjectComponent liftableWorldObjectComponent:
+                        if (playerEntity.IsLookingAt(currentInteractEntity) && liftableWorldObjectComponent.TryLift(playerEntity))
+                        {
+                            await playerElementComponent.DoAnimationAsync(PlayerElementComponent.Animation.CarryLiftUp);
+                            playerElementComponent.DoAnimation(PlayerElementComponent.Animation.StartCarry);
+                            playerEntity.AddComponent(new AttachedEntityComponent(currentInteractEntity, new Vector3(0.6f, 0.6f, -0.4f)));
+                        }
+                        break;
+                    case DurationBasedHoldInteractionComponent durationBasedHoldInteractionComponent:
+                        _logger.LogInformation("Interaction");
+                        if (keyState == KeyState.Down)
+                        {
+                            if(await durationBasedHoldInteractionComponent.BeginInteraction(currentInteractEntity, TimeSpan.FromSeconds(5)))
+                            {
+                                _logger.LogInformation("Interaction completed");
+                            }
+                            else
+                            {
+                                _logger.LogInformation("Interaction failed");
+                            }
+                        }
+                        else
+                        {
+                            if (durationBasedHoldInteractionComponent.EndInteraction(currentInteractEntity))
+                            {
+                                _logger.LogInformation("Interaction ended");
+                            }
+                            else
+                            {
+                                _logger.LogInformation("Interaction end failed");
+                            }
+                        }
+                        ;
+                        break;
+
                 }
             }
         }
@@ -82,7 +116,7 @@ internal sealed class PlayerGameplayLogic
                     };
                 }
             }
-            else if (entity.TryGetComponent(out LiftableWorldObjectComponent liftableWorldObjectComponent))
+            else if (entity.TryGetComponent(out InteractionComponent interactionComponent))
             {
                 playerEntity.TryDestroyComponent<CurrentInteractEntityComponent>();
                 playerEntity.AddComponent(new CurrentInteractEntityComponent(entity));

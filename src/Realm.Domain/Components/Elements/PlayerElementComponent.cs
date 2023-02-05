@@ -1,5 +1,7 @@
-﻿using Realm.Domain.IdGenerators;
+﻿using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using Realm.Domain.IdGenerators;
 using SlipeServer.Server.Collections;
+using SlipeServer.Server.Elements.Enums;
 
 namespace Realm.Domain.Components.Elements;
 
@@ -22,8 +24,12 @@ public sealed class PlayerElementComponent : ElementComponent
     private readonly Player _player;
     private readonly Dictionary<string, Func<Entity, KeyState, Task>> _binds = new();
     private readonly SemaphoreSlim _bindsLock = new(1);
+    private readonly SemaphoreSlim _bindsUpLock = new(1);
+    private readonly SemaphoreSlim _bindsDownLock = new(1);
+    private readonly object _bindsCooldownLock = new();
 
-    private readonly Dictionary<string, DateTime> _bindsCooldown = new();
+    private readonly Dictionary<string, DateTime> _bindsDownCooldown = new();
+    private readonly Dictionary<string, DateTime> _bindsUpCooldown = new();
     private readonly HashSet<string> _enableFightFlags = new();
     private readonly MapIdGenerator _mapIdGenerator = new(IdGeneratorConstants.MapIdStart, IdGeneratorConstants.MapIdStop);
 
@@ -218,13 +224,17 @@ public sealed class PlayerElementComponent : ElementComponent
         _bindsLock.Release();
     }
 
-    public void ResetCooldown(string key)
+    public void ResetCooldown(string key, KeyState keyState = KeyState.Down)
     {
         ThrowIfDisposed();
 
-        _bindsLock.Wait();
-        _bindsCooldown.Remove(key);
-        _bindsLock.Release();
+        lock (_bindsCooldownLock)
+        {
+            if (keyState == KeyState.Down)
+                _bindsDownCooldown.Remove(key);
+            else
+                _bindsUpCooldown.Remove(key);
+        }
     }
 
     private async void HandleBindExecuted(Player _, PlayerBindExecutedEventArgs e)
@@ -235,47 +245,87 @@ public sealed class PlayerElementComponent : ElementComponent
         }
         catch(Exception ex)
         {
+            ;
             // Ignore
         }
     }
 
-    public bool IsCooldownActive(string key)
+    internal bool InternalIsCooldownActive(string key, KeyState keyState = KeyState.Down)
     {
-        _bindsLock.Wait();
-        if (_bindsCooldown.TryGetValue(key, out var cooldownUntil))
+        DateTime cooldownUntil = DateTime.MinValue;
+
+        lock (_bindsCooldownLock)
         {
-            _bindsLock.Release();
-            if (cooldownUntil > DateTime.Now)
+            if (keyState == KeyState.Down)
+                _bindsDownCooldown.TryGetValue(key, out cooldownUntil);
+            else
+                _bindsUpCooldown.TryGetValue(key, out cooldownUntil);
+        }
+
+        if (cooldownUntil > DateTime.Now)
+        {
+            return true;
+        }
+        return false;
+    }
+
+    public bool IsCooldownActive(string key, KeyState keyState = KeyState.Down)
+    {
+        if(keyState == KeyState.Down)
+            _bindsDownLock.Wait();
+        else
+            _bindsUpLock.Wait();
+        try
+        {
+            return InternalIsCooldownActive(key, keyState);
+        }
+        finally
+        {
+            if (keyState == KeyState.Down)
+                _bindsDownLock.Release();
+            else
+                _bindsUpLock.Release();
+        }
+    }
+
+    internal void SetCooldown(string key, KeyState keyState, DateTime until)
+    {
+        lock (_bindsCooldownLock)
+        {
+            if (keyState == KeyState.Down)
+                _bindsDownCooldown[key] = until;
+            else
+                _bindsUpCooldown[key] = until;
+        }
+    }
+
+    internal void TrySetCooldown(string key, KeyState keyState, DateTime until)
+    {
+        lock (_bindsCooldownLock)
+        {
+            if (keyState == KeyState.Down)
             {
-                return true;
+                if (_bindsDownCooldown.ContainsKey(key))
+                    _bindsDownCooldown[key] = until;
+            }
+            else
+            {
+                if (_bindsUpCooldown.ContainsKey(key))
+                    _bindsUpCooldown[key] = until;
             }
         }
-        else
-            _bindsLock.Release();
-        return false;
     }
 
     internal async Task InternalHandleBindExecuted(string key, KeyState keyState)
     {
         ThrowIfDisposed();
-        await _bindsLock.WaitAsync();
-        ThrowIfDisposed();
 
-        if (!_binds.ContainsKey(key))
-        {
-            _bindsLock.Release();
+        if(IsCooldownActive(key, keyState))
             return;
-        }
 
-        if(_bindsCooldown.TryGetValue(key, out var cooldownUntil))
-        {
-            if (cooldownUntil > DateTime.Now)
-            {
-                _bindsLock.Release();
-                return;
-            }
-        }
-        _bindsCooldown[key] = DateTime.MaxValue; // Lock bind indefinitly in case of bind takes a long time to execute
+        // Lock bind indefinitly in case of bind takes a long time to execute, reset cooldown to unlock
+        SetCooldown(key, keyState, DateTime.MaxValue);
+
         try
         {
             await _binds[key](Entity, keyState);
@@ -287,10 +337,7 @@ public sealed class PlayerElementComponent : ElementComponent
         }
         finally
         {
-            if(_bindsCooldown.ContainsKey(key)) // Wasn't bind cooldown reset?
-                _bindsCooldown[key] = DateTime.Now.AddMilliseconds(400);
-
-            _bindsLock.Release();
+            TrySetCooldown(key, keyState, DateTime.Now.AddMilliseconds(400));
         }
     }
 

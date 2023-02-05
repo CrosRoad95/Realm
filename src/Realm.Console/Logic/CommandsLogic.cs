@@ -338,6 +338,13 @@ internal sealed class CommandsLogic
             return Task.CompletedTask;
         });
 
+        _commandService.AddCommandHandler("spawnbox2", (entity, args) =>
+        {
+            var objectEntity = _entityFactory.CreateObject(SlipeServer.Server.Enums.ObjectModel.Gunbox, entity.Transform.Position + new Vector3(4, 0, -0.65f), Vector3.Zero);
+            objectEntity.AddComponent(new DurationBasedHoldInteractionComponent());
+            return Task.CompletedTask;
+        });
+
         _commandService.AddCommandHandler("animation", (entity, args) =>
         {
             if (Enum.TryParse<Animation>(args.FirstOrDefault(), out var animation))

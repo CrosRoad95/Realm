@@ -1,6 +1,6 @@
 ﻿namespace Realm.Domain.Components.Object;
 
-public class LiftableWorldObjectComponent : Component
+public class LiftableWorldObjectComponent : InteractionComponent
 {
     private readonly object _ownerLock = new();
     public Entity? Owner { get; private set; }
@@ -40,16 +40,5 @@ public class LiftableWorldObjectComponent : Component
             Owner = null;
         }
         return true;
-    }
-
-    protected override void Load()
-    {
-        Entity.GetRequiredComponent<ElementComponent>().AddFocusable();
-    }
-
-    public override void Dispose()
-    {
-        Entity.GetRequiredComponent<ElementComponent>().RemoveFocusable();
-        base.Dispose();
     }
 }
