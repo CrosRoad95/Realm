@@ -346,9 +346,6 @@ public abstract class Db<T> : IdentityDbContext<User, Role, int,
             entityBuilder
                 .ToTable(nameof(Discoveries))
                 .HasKey(x => new { x.UserId, x.DiscoveryId });
-
-            entityBuilder.Property(x => x.DiscoveryId)
-                .HasMaxLength(32);
         });
         
         modelBuilder.Entity<Group>(entityBuilder =>

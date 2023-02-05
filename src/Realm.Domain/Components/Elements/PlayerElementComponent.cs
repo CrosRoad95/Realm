@@ -220,7 +220,7 @@ public sealed class PlayerElementComponent : ElementComponent
         _binds[key] = (entity, keyState) =>
         {
             if(keyState == KeyState.Down)
-                return callback(entity);
+                 return callback(entity);
             return Task.CompletedTask;
         };
         _bindsLock.Release();

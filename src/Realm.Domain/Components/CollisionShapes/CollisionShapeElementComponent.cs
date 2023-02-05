@@ -34,6 +34,14 @@ public abstract class CollisionShapeElementComponent : ElementComponent
         }
     }
 
+    public void AddRule<TRule>() where TRule: IEntityRule, new()
+    {
+        ThrowIfDisposed();
+
+        lock(_entityRulesLock)
+            _entityRules.Add(new TRule());
+    }
+
     public void AddRule(IEntityRule entityRule)
     {
         ThrowIfDisposed();
