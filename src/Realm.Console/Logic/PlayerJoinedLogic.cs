@@ -12,7 +12,7 @@ internal sealed class PlayerJoinedLogic
         _ecs.EntityCreated += HandleEntityCreated;
     }
 
-    private async void HandleEntityCreated(Entity entity)
+    private void HandleEntityCreated(Entity entity)
     {
         if (entity.Tag != Entity.EntityTag.Player)
             return;
@@ -23,9 +23,9 @@ internal sealed class PlayerJoinedLogic
         playerElementComponent.ClearChatBox();
         playerElementComponent.FadeCamera(CameraFade.In);
         playerElementComponent.SetCameraMatrix(new Vector3(379.89844f, -92.6416f, 10.950561f), new Vector3(336.75684f, -93.018555f, 1.3956465f));
-        var adminComp = await entity.AddComponentAsync(new AdminComponent());
-        adminComp.DebugView = true;
-        adminComp.DevelopmentMode = true;
+        var adminComponent = entity.AddComponent<AdminComponent>();
+        adminComponent.DebugView = true;
+        adminComponent.DevelopmentMode = true;
         entity.AddComponent(new LoginGuiComponent());
 
         entity.ComponentAdded += HandleComponentAdded;

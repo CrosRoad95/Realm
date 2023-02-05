@@ -219,7 +219,9 @@ public sealed class PlayerElementComponent : ElementComponent
         _player.SetBind(key, KeyState.Down);
         _binds[key] = (entity, keyState) =>
         {
-            return callback(entity);
+            if(keyState == KeyState.Down)
+                return callback(entity);
+            return Task.CompletedTask;
         };
         _bindsLock.Release();
     }

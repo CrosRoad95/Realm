@@ -77,4 +77,25 @@ public class AdminComponent : Component
             }
         }
     }
+
+    private Task ToggleNoClip(Entity entity)
+    {
+        NoClip = !NoClip;
+        return Task.CompletedTask;
+    }
+
+    protected override void Load()
+    {
+        var playerElementComponent = Entity.GetRequiredComponent<PlayerElementComponent>();
+        playerElementComponent.SendChatMessage("Admin mode enabled.");
+        playerElementComponent.SetBind("num_0", ToggleNoClip);
+    }
+
+    public override void Dispose()
+    {
+        DevelopmentMode = false;
+        DebugView = false;
+        AdminTools = false;
+        NoClip = false;
+    }
 }
