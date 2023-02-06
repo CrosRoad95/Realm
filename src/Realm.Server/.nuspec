@@ -23,8 +23,10 @@
             <dependency id="Microsoft.Extensions.Configuration.EnvironmentVariables" version="7.0.0" />
             <dependency id="Microsoft.Extensions.Configuration.Json" version="7.0.0" />
             <dependency id="Serilog" version="2.12.0" />       
+            <dependency id="Serilog.Extensions.Hosting" version="5.0.1" />       
+            <dependency id="Serilog.Extensions.Logging" version="3.1.0" />       
             <dependency id="Serilog.Sinks.Console" version="4.1.1-dev-00896" />
-            <dependency id="Serilog.Sinks.Seq" version="5.2.1" />  
+            <dependency id="Serilog.Sinks.Seq" version="5.2.1" />
             <dependency id="SlipeServer.Resources.Base" version="0.1.0-CI-20230130-055643" />    
             <dependency id="SlipeServer.Resources.DGS" version="0.1.0-CI-20230130-055643" />
 			<dependency id="SlipeServer.Resources.NoClip" version="0.1.0-CI-20230130-055643" />
