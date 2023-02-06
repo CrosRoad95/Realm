@@ -1,14 +1,11 @@
-﻿using Castle.Core.Logging;
-using FluentAssertions;
+﻿using FluentAssertions;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
 using Moq;
-using Realm.Logging;
 using Realm.Persistance.Data;
 using Realm.Server.Interfaces;
 using Realm.Server.Services;
 using Realm.Tests.Helpers;
-using ILogger = Microsoft.Extensions.Logging.ILogger;
 
 namespace Realm.Tests.Tests;
 

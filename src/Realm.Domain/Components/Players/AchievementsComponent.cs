@@ -3,6 +3,7 @@ using Achievement = Realm.Domain.Concepts.Achievement;
 
 namespace Realm.Domain.Components.Players;
 
+[ComponentUsage(false)]
 public class AchievementsComponent : Component
 {
     private readonly Dictionary<string, Achievement> _achievements = new();

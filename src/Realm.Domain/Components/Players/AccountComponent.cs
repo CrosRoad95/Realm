@@ -2,6 +2,7 @@
 
 namespace Realm.Domain.Components.Players;
 
+[ComponentUsage(false)]
 public class AccountComponent : Component
 {
     [Inject]

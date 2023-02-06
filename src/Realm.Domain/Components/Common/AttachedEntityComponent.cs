@@ -1,5 +1,6 @@
 ﻿namespace Realm.Domain.Components.Common;
 
+[ComponentUsage(true)]
 public class AttachedEntityComponent : Component
 {
     public Entity AttachedEntity { get; }

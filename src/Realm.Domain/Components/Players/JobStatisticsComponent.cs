@@ -3,6 +3,7 @@ using JobStatistics = Realm.Domain.Concepts.JobStatistics;
 
 namespace Realm.Domain.Components.Players;
 
+[ComponentUsage(false)]
 public class JobStatisticsComponent : Component
 {
     private readonly Dictionary<short, JobStatistics> _jobStatistics = new();

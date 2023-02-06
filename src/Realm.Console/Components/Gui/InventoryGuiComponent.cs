@@ -2,6 +2,7 @@
 
 namespace Realm.Console.Components.Gui;
 
+[ComponentUsage(false)]
 public sealed class InventoryGuiComponent : StatefulGuiComponent<InventoryGuiComponent.InventoryState>
 {
     public class InventoryState

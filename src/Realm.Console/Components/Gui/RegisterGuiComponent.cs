@@ -1,5 +1,6 @@
 ﻿namespace Realm.Console.Components.Gui;
 
+[ComponentUsage(false)]
 public sealed class RegisterGuiComponent : GuiComponent
 {
     [Inject]
@@ -39,7 +40,7 @@ public sealed class RegisterGuiComponent : GuiComponent
                 }, registerData.Password);
                 if (identityResult.Succeeded)
                 {
-                    Entity.AddComponent(new LoginGuiComponent());
+                    Entity.AddComponent<LoginGuiComponent>();
                     Entity.DestroyComponent(this);
                     return;
                 }
@@ -58,7 +59,7 @@ public sealed class RegisterGuiComponent : GuiComponent
         switch (actionContext.ActionName)
         {
             case "navigateToLogin":
-                Entity.AddComponent(new LoginGuiComponent());
+                Entity.AddComponent<LoginGuiComponent>();
                 Entity.DestroyComponent(this);
                 break;
             default:

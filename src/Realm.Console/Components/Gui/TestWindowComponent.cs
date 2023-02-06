@@ -1,5 +1,6 @@
 ﻿namespace Realm.Console.Components.Gui;
 
+[ComponentUsage(false)]
 public sealed class TestWindowComponent : GuiComponent
 {
     public TestWindowComponent() : base("test", true)

@@ -2,6 +2,7 @@
 
 namespace Realm.Domain.Components.Players;
 
+[ComponentUsage(true)]
 public class GroupMemberComponent : Component
 {
     public int GroupId { get; private set; }

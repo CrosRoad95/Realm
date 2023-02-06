@@ -1,4 +1,5 @@
 ﻿using Realm.Domain.Concepts.Objectives;
+using RenderWareIo.Structs.Ide;
 using System.Diagnostics.CodeAnalysis;
 
 namespace Realm.Domain;
@@ -48,30 +49,37 @@ public class Entity : IDisposable
         Transform = new Transform(this);
     }
 
+    private void InternalInjectProperties(Type type, object obj)
+    {
+        foreach (var property in type.GetProperties(BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.FlattenHierarchy))
+        {
+            if (property.GetCustomAttribute<InjectAttribute>() != null)
+            {
+                property.SetValue(obj, _serviceProvider.GetRequiredService(property.PropertyType));
+            }
+        }
+
+        if (type != typeof(object))
+            InternalInjectProperties(type.BaseType, obj);
+    }
+
     private void InjectProperties<TComponent>(TComponent component) where TComponent : Component
     {
         ThrowIfDisposed();
 
         component.Entity = this;
 
-        Action<Type, object> inject = default!;
-        inject = (Type type, object obj) =>
-        {
-            foreach (var property in type.GetProperties(BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.FlattenHierarchy))
-            {
-                if (property.GetCustomAttribute<InjectAttribute>() != null)
-                {
-                    property.SetValue(component, _serviceProvider.GetRequiredService(property.PropertyType));
-                }
-            }
+        InternalInjectProperties(typeof(TComponent), component);
+    }
 
-            if (type != typeof(object))
-            {
-                inject(type.BaseType, obj);
-            }
-        };
+    private void CheckCanBeAdded<TComponent>() where TComponent : Component
+    {
+        var componentUsageAttribute = typeof(TComponent).GetCustomAttribute<ComponentUsageAttribute>();
+        if (componentUsageAttribute == null || componentUsageAttribute.AllowMultiple)
+            return;
 
-        inject(typeof(TComponent), component);
+        if (_components.OfType<TComponent>().Any())
+            throw new ComponentCanNotBeAddedException<TComponent>();
     }
 
     private void InternalAddComponent<TComponent>(TComponent component) where TComponent : Component
@@ -79,7 +87,12 @@ public class Entity : IDisposable
         _componentsLock.EnterWriteLock();
         try
         {
+            CheckCanBeAdded<TComponent>();
             _components.Add(component);
+        }
+        catch(Exception)
+        {
+            throw;
         }
         finally
         {

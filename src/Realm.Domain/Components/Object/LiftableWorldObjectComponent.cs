@@ -1,5 +1,6 @@
 ﻿namespace Realm.Domain.Components.Object;
 
+[ComponentUsage(false)]
 public class LiftableWorldObjectComponent : InteractionComponent
 {
     private readonly object _ownerLock = new();

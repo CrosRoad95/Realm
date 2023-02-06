@@ -43,6 +43,7 @@ global using SlipeServer.Server.Constants;
 global using SlipeServer.Resources.Text3d;
 global using System.Runtime.CompilerServices;
 global using Microsoft.Extensions.Logging;
+global using Realm.Domain.Attributes;
 
 [assembly: InternalsVisibleTo("Realm.Server")]
 [assembly: InternalsVisibleTo("Realm.Tests")]

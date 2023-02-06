@@ -3,6 +3,7 @@ using SlipeServer.Resources.NoClip;
 
 namespace Realm.Domain.Components.Players;
 
+[ComponentUsage(false)]
 public class AdminComponent : Component
 {
     [Inject]

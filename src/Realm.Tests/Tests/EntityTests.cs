@@ -1,5 +1,6 @@
 ﻿using FluentAssertions;
 using Realm.Domain;
+using Realm.Domain.Exceptions;
 using Realm.Tests.Classes.Components;
 using Realm.Tests.Helpers;
 
@@ -134,6 +135,20 @@ public class EntityTests
         action();
 
         (await Task.WhenAny(t.Task, Task.Delay(500))).Should().Be(t.Task);
+        #endregion
+    }
+
+    [Fact]
+    public void ComponentUsageShouldPreventYouFromAddingOneComponentTwoTimes()
+    {
+        #region Arrange
+        var entity = new Entity(_serviceProvider, "foo", Entity.EntityTag.Unknown);
+        var action = () => entity.AddComponent<OneComponent>();
+        #endregion
+
+        #region Act & Assert
+        action.Should().NotThrow();
+        action.Should().Throw<ComponentCanNotBeAddedException<OneComponent>>().WithMessage("Only one instance of component 'OneComponent' can be added to one entity");
         #endregion
     }
 }

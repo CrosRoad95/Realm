@@ -1,6 +1,4 @@
-﻿using Microsoft.Extensions.Logging;
-using Realm.Domain.Components.Object;
-using Realm.Domain.Interfaces;
+﻿using Realm.Domain.Interfaces;
 using static Realm.Domain.Components.Elements.PlayerElementComponent;
 
 namespace Realm.Console.Logic;

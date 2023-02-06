@@ -58,7 +58,6 @@ global using Microsoft.AspNetCore.Identity;
 global using Realm.Domain.Components.World;
 global using Realm.Domain.Interfaces;
 global using System.Security.Claims;
-global using ILogger = Microsoft.Extensions.Logging.ILogger;
 global using Microsoft.Extensions.Logging;
 global using Realm.Server.Attributes;
 

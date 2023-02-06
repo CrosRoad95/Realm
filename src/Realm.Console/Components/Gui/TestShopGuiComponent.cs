@@ -1,5 +1,6 @@
 ﻿namespace Realm.Console.Components.Gui;
 
+[ComponentUsage(false)]
 public sealed class TestShopGuiComponent : GuiComponent
 {
     public TestShopGuiComponent() : base("shop", true)

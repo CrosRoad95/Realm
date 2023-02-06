@@ -1,5 +1,4 @@
-﻿using Realm.Domain.Components.Object;
-using Realm.Domain.Interfaces;
+﻿using Realm.Domain.Interfaces;
 using Realm.Domain.Rules;
 using Realm.Server.Extensions;
 

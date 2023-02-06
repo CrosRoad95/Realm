@@ -1,5 +1,6 @@
 ﻿namespace Realm.Domain.Components.Players;
 
+[ComponentUsage(false)]
 public class LevelComponent : Component
 {
     [Inject]

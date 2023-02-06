@@ -1,5 +1,6 @@
 ﻿namespace Realm.Console.Components.Gui;
 
+[ComponentUsage(false)]
 public sealed class BuyVehicleGuiComponent : StatefulGuiComponent<BuyVehicleGuiComponent.VehicleBuyState>
 {
     public class VehicleBuyState

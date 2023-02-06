@@ -10,13 +10,16 @@ namespace Realm.Tests.Tests;
 public class MoneyComponentTests
 {
     private readonly Entity _entity;
+    private readonly Entity _entityB;
     private readonly MoneyComponent _moneyComponent;
 
     public MoneyComponentTests()
     {
         var services = new ServiceCollection();
         services.AddSingleton<RealmConfigurationProvider>(new TestConfigurationProvider());
-        _entity = new(services.BuildServiceProvider(), "test", Entity.EntityTag.Unknown);
+        var serviceProvider = services.BuildServiceProvider();
+        _entity = new(serviceProvider, "test", Entity.EntityTag.Unknown);
+        _entityB = new(serviceProvider, "test2", Entity.EntityTag.Unknown);
         _moneyComponent = new();
         _entity.AddComponent(_moneyComponent);
     }
@@ -139,7 +142,7 @@ public class MoneyComponentTests
     public void YouShouldBeAbleToTransferMoneyBetweenMoneyComponents()
     {
         var targetMoneyComponent = new MoneyComponent();
-        _entity.AddComponent(targetMoneyComponent);
+        _entityB.AddComponent(targetMoneyComponent);
 
         _moneyComponent.Money = 15;
         _moneyComponent.TransferMoney(targetMoneyComponent, 10);
@@ -152,7 +155,7 @@ public class MoneyComponentTests
     public void YouCannotTransferMoreMoneyThanYouHave()
     {
         var targetMoneyComponent = new MoneyComponent();
-        _entity.AddComponent(targetMoneyComponent);
+        _entityB.AddComponent(targetMoneyComponent);
 
         _moneyComponent.Money = 15;
         Action transfer = () => { _moneyComponent.TransferMoney(targetMoneyComponent, 20, false); };
@@ -165,7 +168,7 @@ public class MoneyComponentTests
     public async Task TrasnferMoneyShouldBeThreadSafety()
     {
         var targetMoneyComponent = new MoneyComponent();
-        _entity.AddComponent(targetMoneyComponent);
+        _entityB.AddComponent(targetMoneyComponent);
 
         _moneyComponent.Money = 800;
 
@@ -177,5 +180,4 @@ public class MoneyComponentTests
         _moneyComponent.Money.Should().Be(0);
         targetMoneyComponent.Money.Should().Be(800);
     }
-
 }

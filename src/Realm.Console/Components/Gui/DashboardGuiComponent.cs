@@ -2,6 +2,7 @@
 
 namespace Realm.Console.Components.Gui;
 
+[ComponentUsage(false)]
 public sealed class DashboardGuiComponent : StatefulGuiComponent<DashboardGuiComponent.DashboardState>
 {
     public class DashboardState

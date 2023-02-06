@@ -2,6 +2,7 @@
 
 namespace Realm.Domain.Components.Players;
 
+[ComponentUsage(false)]
 public class LicensesComponent : Component
 {
     private readonly List<License> _licenses = new();

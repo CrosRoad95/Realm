@@ -1,5 +1,6 @@
 ﻿namespace Realm.Domain.Components.Players;
 
+[ComponentUsage(false)]
 public class DiscoveriesComponent : Component
 {
     private readonly HashSet<int> _discoveries = new();

@@ -1,5 +1,6 @@
 ﻿namespace Realm.Domain.Components.Players;
 
+[ComponentUsage(false)]
 public class CurrentInteractEntityComponent : Component
 {
     public Entity CurrentInteractEntity { get; }

@@ -31,3 +31,4 @@ global using Realm.Interfaces.Server;
 global using Microsoft.Extensions.DependencyInjection;
 global using Microsoft.Extensions.Logging;
 global using Realm.Domain.Components.Object;
+global using Realm.Domain.Attributes;

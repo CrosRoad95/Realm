@@ -3,6 +3,7 @@ using JobUpgradeData = Realm.Persistance.Data.JobUpgrade;
 
 namespace Realm.Domain.Components.Players;
 
+[ComponentUsage(false)]
 public class JobUpgradesComponent : Component
 {
     private readonly List<JobUpgrade> _upgrades = new();
