@@ -94,6 +94,9 @@ public class AdminComponent : Component
 
     public override void Dispose()
     {
+        var playerElementComponent = Entity.GetRequiredComponent<PlayerElementComponent>();
+        playerElementComponent.SendChatMessage("Admin mode enabled.");
+        playerElementComponent.Unbind("num_0");
         DevelopmentMode = false;
         DebugView = false;
         AdminTools = false;

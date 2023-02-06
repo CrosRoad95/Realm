@@ -199,7 +199,10 @@ public sealed class PlayerElementComponent : ElementComponent
 
         _bindsLock.Wait();
         if (_binds.ContainsKey(key))
+        {
+            _bindsLock.Release();
             throw new BindAlreadyExistsException(key);
+        }
 
         _player.SetBind(key, KeyState.Both);
         _binds[key] = callback;
@@ -212,7 +215,10 @@ public sealed class PlayerElementComponent : ElementComponent
         ThrowIfDisposed();
         _bindsLock.Wait();
         if (_binds.ContainsKey(key))
+        {
+            _bindsLock.Release();
             throw new BindAlreadyExistsException(key);
+        }
 
         _player.SetBind(key, KeyState.Down);
         _binds[key] = (entity, keyState) =>
@@ -221,6 +227,20 @@ public sealed class PlayerElementComponent : ElementComponent
                  return callback(entity);
             return Task.CompletedTask;
         };
+        _bindsLock.Release();
+    }
+
+    public void Unbind(string key)
+    {
+        ThrowIfDisposed();
+        _bindsLock.Wait();
+        if (!_binds.ContainsKey(key))
+        {
+            _bindsLock.Release();
+            throw new BindDoesntExistsException(key);
+        }
+        _player.RemoveBind(key, KeyState.Both);
+        _binds.Remove(key);
         _bindsLock.Release();
     }
 

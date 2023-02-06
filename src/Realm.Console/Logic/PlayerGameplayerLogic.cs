@@ -1,4 +1,5 @@
-﻿using Realm.Server.Extensions;
+﻿using Realm.Domain;
+using Realm.Server.Extensions;
 using SlipeServer.Server.Elements.Enums;
 
 namespace Realm.Console.Logic;
@@ -22,9 +23,18 @@ internal sealed class PlayerGameplayLogic
         if (entity.Tag != Entity.EntityTag.Player)
             return;
 
-        var playerElementComponent =  entity.GetRequiredComponent<PlayerElementComponent>();
-        playerElementComponent.FocusedEntityChanged += HandleFocusedEntityChanged;
-        playerElementComponent.SetBind("x", HandleInteract);
+
+        entity.ComponentAdded += HandleComponentAdded;
+    }
+
+    private void HandleComponentAdded(Component component)
+    {
+        if(component is AccountComponent)
+        {
+            var playerElementComponent = component.Entity.GetRequiredComponent<PlayerElementComponent>();
+            playerElementComponent.FocusedEntityChanged += HandleFocusedEntityChanged;
+            playerElementComponent.SetBind("x", HandleInteract);
+        }
     }
 
     private async Task HandleInteract(Entity playerEntity, KeyState keyState)
