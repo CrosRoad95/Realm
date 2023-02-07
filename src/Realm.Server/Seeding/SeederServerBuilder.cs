@@ -225,7 +225,24 @@ internal sealed class SeederServerBuilder
     public async Task Build()
     {
         var result = new JObject();
-        var seedDatas = _serverFilesProvider.GetFiles(_basePath).Select(seedFileName => JsonConvert.DeserializeObject<SeedData>(File.ReadAllText(seedFileName)));
+        List<SeedData> seedDatas = new();
+        var seedFiles = _serverFilesProvider.GetFiles(_basePath).ToList();
+        _logger.LogInformation("Found seed files: {seedFiles}", seedFiles);
+        foreach (var seedFileName in seedFiles)
+        {
+            try
+            {
+                var data = JsonConvert.DeserializeObject<SeedData>(File.ReadAllText(seedFileName));
+                if (data == null)
+                    throw new Exception("Something went wrong while deserializing.");
+                seedDatas.Add(data);
+            }
+            catch(Exception ex)
+            {
+                _logger.LogError(ex, "Failed to load seed file: {seedFileName}", seedFileName);
+            }
+        }
+
         foreach (var sourceObject in seedDatas)
         {
             var @object = JObject.Parse(JsonConvert.SerializeObject(sourceObject));
