@@ -75,9 +75,11 @@ public abstract class ElementComponent : Component
 
     public override void Dispose()
     {
-        base.Dispose();
-        HandleDestroyed(Entity);
+        if(_focusableCounter != 0)
+            Element.SetData("_focusable", false, DataSyncType.Broadcast);
         Entity.Transform.PositionChanged -= HandleTransformPositionChanged;
+        Entity.Transform.RotationChanged -= HandleTransformRotationChanged;
+        HandleDestroyed(Entity);
+        base.Dispose();
     }
-
 }

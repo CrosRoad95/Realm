@@ -36,6 +36,9 @@ public abstract class Objective : IDisposable
         if (_isFulfilled)
             throw new ObjectiveAlreadyFulfilledException();
 
+        if (_blipElementComponent != null)
+            RemoveBlip();
+
         Completed?.Invoke(this);
         _isFulfilled = true;
     }
@@ -50,11 +53,14 @@ public abstract class Objective : IDisposable
         if (_isFulfilled)
             throw new ObjectiveAlreadyFulfilledException();
 
+        if (_blipElementComponent != null)
+            RemoveBlip();
+
         Incompleted?.Invoke(this);
         _isFulfilled = true;
     }
 
-    public void AddBlip(BlipIcon blipIcon,IEntityFactory entityFactory)
+    public void AddBlip(BlipIcon blipIcon, IEntityFactory entityFactory)
     {
         ThrowIfDisposed();
 
@@ -62,6 +68,23 @@ public abstract class Objective : IDisposable
             throw new InvalidOperationException();
 
         _blipElementComponent = entityFactory.CreateBlipFor(Entity, blipIcon, Position);
+        _blipElementComponent.Disposed += HandleBlipElementComponentDisposed;
+    }
+
+    public void RemoveBlip()
+    {
+        ThrowIfDisposed();
+
+        if (_blipElementComponent == null)
+            throw new InvalidOperationException();
+
+        Entity.DestroyComponent(_blipElementComponent);
+        _blipElementComponent = null;
+    }
+
+    private void HandleBlipElementComponentDisposed(Component _)
+    {
+        _blipElementComponent = null;
     }
 
     protected void ThrowIfDisposed()
@@ -74,7 +97,7 @@ public abstract class Objective : IDisposable
     {
         ThrowIfDisposed();
         if (_blipElementComponent != null)
-            _blipElementComponent.Dispose();
+            RemoveBlip();
 
         if (!_isFulfilled)
             Incomplete();

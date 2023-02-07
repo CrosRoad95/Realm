@@ -5,9 +5,11 @@ namespace Realm.Domain.Components.Players.Jobs;
 public abstract class JobSessionComponent : SessionComponent
 {
     [Inject]
-    private IEntityFactory EntityFactory { get; set; } = default!;
+    protected IEntityFactory EntityFactory { get; set; } = default!;
     [Inject]
     private ILogger<JobSessionComponent> Logger { get; set; } = default!;
+
+    public abstract short JobId { get; }
 
     private readonly List<Objective> _objectives = new();
     private readonly object _objectivesLock = new();
@@ -23,7 +25,7 @@ public abstract class JobSessionComponent : SessionComponent
 
     }
 
-    public void RemoveObjective(Objective objective)
+    protected void RemoveObjective(Objective objective)
     {
         var empty = false;
         lock (_objectivesLock)
@@ -37,7 +39,7 @@ public abstract class JobSessionComponent : SessionComponent
             CompletedAllObjectives?.Invoke(this);
     }
 
-    public TObjective AddObjective<TObjective>(TObjective objective) where TObjective : Objective
+    protected TObjective AddObjective<TObjective>(TObjective objective) where TObjective : Objective
     {
         objective.Entity = Entity;
         lock(_objectivesLock)
@@ -77,7 +79,6 @@ public abstract class JobSessionComponent : SessionComponent
     public override void Dispose()
     {
         _disposing = true;
-        base.Dispose();
         lock(_objectivesLock)
         {
             while (_objectives.Count > 0)
@@ -87,5 +88,6 @@ public abstract class JobSessionComponent : SessionComponent
                 RemoveObjective(objective);
             }
         }
+        base.Dispose();
     }
 }

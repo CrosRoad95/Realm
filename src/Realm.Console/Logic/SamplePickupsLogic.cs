@@ -57,7 +57,7 @@ internal class SamplePickupsLogic
         if (entity.Tag == Entity.EntityTag.Pickup && entity.Name.StartsWith("jobTestPickup"))
         {
             var pickupElementComponent = entity.GetRequiredComponent<PickupElementComponent>();
-            pickupElementComponent.EntityEntered = async entity =>
+            pickupElementComponent.EntityEntered = entity =>
             {
                 if (entity.Tag != Entity.EntityTag.Player)
                     return;
@@ -73,42 +73,22 @@ internal class SamplePickupsLogic
                     jobSessionComponent.End();
                     var elapsed = jobSessionComponent.Elapsed;
                     playerElementComponent.SendChatMessage($"Job ended in: {elapsed.Hours:X2}:{elapsed.Minutes:X2}:{elapsed.Seconds:X2}, completed objectives: {jobSessionComponent.CompletedObjectives}");
-                    entity.GetRequiredComponent<JobStatisticsComponent>().AddTimePlayed(1, (ulong)jobSessionComponent.Elapsed.Seconds);
+                    entity.GetRequiredComponent<JobStatisticsComponent>().AddTimePlayed(jobSessionComponent.JobId, (ulong)jobSessionComponent.Elapsed.Seconds);
                     entity.DestroyComponent(jobSessionComponent);
                 }
                 else
                 {
-                    var jobSessionComponent = await entity.AddComponentAsync(new TestJobComponent());
+                    var jobSessionComponent = entity.AddComponent<TestJobComponent>();
                     playerElementComponent.SendChatMessage($"Job started");
                     jobSessionComponent.Start();
-
-                    var createObjectives = () =>
-                    {
-                        var objective = jobSessionComponent.AddObjective(new MarkerEnterObjective(new Vector3(383.6543f, -82.01953f, 3.914598f)));
-                        objective.AddBlip(BlipIcon.North, _entityFactory);
-                        objective.Completed += e =>
-                        {
-                            e.Entity.GetRequiredComponent<JobStatisticsComponent>().AddPoints(1, 1);
-                            e.Entity.GetRequiredComponent<PlayerElementComponent>().SendChatMessage($"Entered marker, objectives left: {jobSessionComponent.Objectives.Count()}");
-                        };
-
-                        var objectEntity = _entityFactory.CreateObject(SlipeServer.Server.Enums.ObjectModel.Gunbox, new Vector3(379.00f, -102.77f, 1.24f), Vector3.Zero);
-                        objectEntity.AddComponent(new LiftableWorldObjectComponent());
-                        var objective2 = jobSessionComponent.AddObjective(new TransportEntityObjective(objectEntity, new Vector3(379.00f, -112.77f, 2.0f)));
-                        objective2.Completed += e =>
-                        {
-                            e.Entity.GetRequiredComponent<JobStatisticsComponent>().AddPoints(1, 2);
-                            e.Entity.GetRequiredComponent<PlayerElementComponent>().SendChatMessage($"Box delivered, objectives left: {jobSessionComponent.Objectives.Count()}");
-                        };
-                    };
 
                     jobSessionComponent.CompletedAllObjectives += async e =>
                     {
                         playerElementComponent.SendChatMessage($"All objectives completed!");
                         await Task.Delay(2000);
-                        createObjectives();
+                        jobSessionComponent.CreateObjectives();
                     };
-                    createObjectives();
+                    jobSessionComponent.CreateObjectives();
                 }
             };
         }

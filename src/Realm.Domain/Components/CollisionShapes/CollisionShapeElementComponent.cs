@@ -89,10 +89,20 @@ public abstract class CollisionShapeElementComponent : ElementComponent
             lock (_entityRulesLock)
                 if (_entityRules.All(x => x.Check(entity)))
                     EntityLeft(entity);
+
+            _collisionShape.ElementEntered -= HandleElementEntered;
+            _collisionShape.ElementLeft -= HandleElementLeft;
         }
         catch (Exception ex)
         {
             Logger.LogError(ex, "Failed to handle element left.");
         }
+    }
+
+    public override void Dispose()
+    {
+        _collisionShape.ElementEntered -= HandleElementEntered;
+        _collisionShape.ElementLeft -= HandleElementLeft;
+        base.Dispose();
     }
 }

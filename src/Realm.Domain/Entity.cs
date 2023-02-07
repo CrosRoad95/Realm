@@ -1,5 +1,4 @@
 ﻿using Realm.Domain.Concepts.Objectives;
-using RenderWareIo.Structs.Ide;
 using System.Diagnostics.CodeAnalysis;
 
 namespace Realm.Domain;
