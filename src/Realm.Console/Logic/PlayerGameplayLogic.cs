@@ -57,12 +57,12 @@ internal sealed class PlayerGameplayLogic
         else if(playerEntity.TryGetComponent(out CurrentInteractEntityComponent currentInteractEntityComponent))
         {
             var currentInteractEntity = currentInteractEntityComponent.CurrentInteractEntity;
-            if (playerEntity.DistanceTo(currentInteractEntity) < 1.3f && currentInteractEntity.TryGetComponent(out InteractionComponent interactionComponent))
+            if (currentInteractEntity.TryGetComponent(out InteractionComponent interactionComponent) && playerEntity.DistanceTo(currentInteractEntity) < interactionComponent.MaxInteractionDistance)
             {
                 var playerElementComponent = playerEntity.GetRequiredComponent<PlayerElementComponent>();
                 switch (interactionComponent)
                 {
-                    case LiftableWorldObjectComponent liftableWorldObjectComponent:
+                    case LiftableWorldObjectComponent liftableWorldObjectComponent when keyState == KeyState.Down:
                         if (playerEntity.IsLookingAt(currentInteractEntity) && liftableWorldObjectComponent.TryLift(playerEntity))
                         {
                             await playerElementComponent.DoAnimationAsync(PlayerElementComponent.Animation.CarryLiftUp);
