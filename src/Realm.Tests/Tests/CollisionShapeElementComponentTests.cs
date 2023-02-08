@@ -5,6 +5,7 @@ using SlipeServer.Server.Elements.ColShapes;
 using FluentAssertions;
 using Realm.Domain.Interfaces;
 using Serilog;
+using Realm.Resources.ClientInterface;
 
 namespace Realm.Tests.Tests;
 
@@ -18,6 +19,7 @@ public class CollisionShapeElementComponentTests
         var services = new ServiceCollection();
         services.AddSingleton<RealmConfigurationProvider>(new TestConfigurationProvider());
         services.AddSingleton<ECS>();
+        services.AddSingleton<ClientInterfaceService>();
         services.AddSingleton<IEntityByElement>(x => x.GetRequiredService<ECS>());
         services.AddLogging(x => x.AddSerilog(new LoggerConfiguration().CreateLogger(), dispose: true));
 
