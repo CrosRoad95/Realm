@@ -1,4 +1,5 @@
 ﻿using Realm.Domain.Interfaces;
+using SlipeServer.Server.Enums;
 using static Realm.Domain.Components.Elements.PlayerElementComponent;
 
 namespace Realm.Console.Logic;

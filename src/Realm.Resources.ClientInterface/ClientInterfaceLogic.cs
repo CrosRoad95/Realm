@@ -4,21 +4,26 @@ using SlipeServer.Server.Elements;
 using SlipeServer.Server.Events;
 using SlipeServer.Server.Mappers;
 using SlipeServer.Server.Services;
+using System.Xml.Linq;
 
 namespace Realm.Resources.ClientInterface;
 
 internal class ClientInterfaceLogic
 {
+    private readonly LuaEventService _luaEventService;
     private readonly FromLuaValueMapper _fromLuaValueMapper;
-    private readonly ClientInterfaceService _ClientInterfaceService;
+    private readonly ClientInterfaceService _clientInterfaceService;
     private readonly ILogger<ClientInterfaceLogic> _logger;
     private readonly ClientInterfaceResource _resource;
+    private readonly List<Element> _focusableElements = new();
+    private readonly object _focusableElementsLock = new();
 
     public ClientInterfaceLogic(MtaServer server, LuaEventService luaEventService, FromLuaValueMapper fromLuaValueMapper,
         ClientInterfaceService ClientInterfaceService, ILogger<ClientInterfaceLogic> logger)
     {
+        _luaEventService = luaEventService;
         _fromLuaValueMapper = fromLuaValueMapper;
-        _ClientInterfaceService = ClientInterfaceService;
+        _clientInterfaceService = ClientInterfaceService;
         _logger = logger;
         server.PlayerJoined += HandlePlayerJoin;
 
@@ -26,11 +31,50 @@ internal class ClientInterfaceLogic
         luaEventService.AddEventHandler("internalDebugMessage", HandleInternalDebugMessage);
         luaEventService.AddEventHandler("sendLocalizationCode", HandleLocalizationCode);
         luaEventService.AddEventHandler("internalChangeFocusedElement", HandleFocusedElementChanged);
+        _clientInterfaceService.FocusableAdded += HandleFocusableAdded;
+        _clientInterfaceService.FocusableRemoved += HandleFocusableRemoved;
     }
 
-    private void HandlePlayerJoin(Player player)
+    private void HandleFocusableAdded(Element element)
     {
-        _resource.StartFor(player);
+        bool added = false;
+        lock (_focusableElementsLock)
+            if (!_focusableElements.Contains(element))
+            {
+                _focusableElements.Add(element);
+                element.Destroyed += HandleDestroyed;
+                added = true;
+            }
+
+        if (added)
+            _luaEventService.TriggerEvent("internalAddFocusable", element);
+    }
+
+    private void HandleDestroyed(Element element)
+    {
+        HandleFocusableRemoved(element);
+    }
+
+    private void HandleFocusableRemoved(Element element)
+    {
+        bool removed = false;
+        lock (_focusableElementsLock)
+            if (_focusableElements.Contains(element))
+            {
+                _focusableElements.Remove(element);
+                element.Destroyed -= HandleDestroyed;
+                removed = true;
+            }
+
+        if (removed)
+            _luaEventService.TriggerEvent("internalRemoveFocusable", element);
+    }
+
+    private async void HandlePlayerJoin(Player player)
+    {
+        await _resource.StartForAsync(player);
+        if(_focusableElements.Any())
+            _luaEventService.TriggerEvent("internalAddFocusables", player, _focusableElements);
     }
 
     private void HandleLocalizationCode(LuaEvent luaEvent)
@@ -38,7 +82,7 @@ internal class ClientInterfaceLogic
         var code = luaEvent.Parameters[1].StringValue;
         if(code != null)
         {
-            _ClientInterfaceService.BroadcastPlayerLocalizationCode(luaEvent.Player, code);
+            _clientInterfaceService.BroadcastPlayerLocalizationCode(luaEvent.Player, code);
         }
         else
         {
@@ -52,7 +96,7 @@ internal class ClientInterfaceLogic
         var level = (int)_fromLuaValueMapper.Map(typeof(int), luaEvent.Parameters[2]);
         var file = _fromLuaValueMapper.Map(typeof(string), luaEvent.Parameters[3]) as string;
         var line = (int)_fromLuaValueMapper.Map(typeof(int), luaEvent.Parameters[4]);
-        _ClientInterfaceService.BroadcastClientErrorMessage(luaEvent.Player, message, level, file, line);    
+        _clientInterfaceService.BroadcastClientErrorMessage(luaEvent.Player, message, level, file, line);    
     }
 
     private void HandleFocusedElementChanged(LuaEvent luaEvent)
@@ -64,6 +108,6 @@ internal class ClientInterfaceLogic
             Console.WriteLine("FOCUS CHILD ELEMENT {0}", childElement);
             ;
         }
-        _ClientInterfaceService.BroadcastPlayerElementFocusChanged(luaEvent.Player, focusedElement);
+        _clientInterfaceService.BroadcastPlayerElementFocusChanged(luaEvent.Player, focusedElement);
     }
 }

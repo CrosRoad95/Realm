@@ -11,6 +11,7 @@ internal class ClientInterfaceResource : Resource
         ["debugging.lua"] = ResourceFiles.Debugging,
         ["utility.lua"] = ResourceFiles.Utility,
         ["player.lua"] = ResourceFiles.Player,
+        ["focusable.lua"] = ResourceFiles.Focusable,
     };
 
     internal ClientInterfaceResource(MtaServer server)

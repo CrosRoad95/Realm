@@ -8,7 +8,12 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+	  <None Remove="Lua\focusable.lua" />
+	</ItemGroup>
+
+	<ItemGroup>
 		<EmbeddedResource Include="Lua\debugging.lua" />
+		<EmbeddedResource Include="Lua\focusable.lua" />
 		<EmbeddedResource Include="Lua\player.lua" />
 		<EmbeddedResource Include="Lua\utility.lua" />
 	</ItemGroup>

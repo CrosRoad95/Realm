@@ -8,6 +8,9 @@ public class ClientInterfaceService
     public event Action<Player, string, int, string, int>? ClientErrorMessage;
     public event Action<Player, CultureInfo>? ClientCultureInfoUpdate;
     public event Action<Player, Element?>? FocusedElementChanged;
+    internal event Action<Element>? FocusableAdded;
+    internal event Action<Element>? FocusableRemoved;
+
     public ClientInterfaceService()
     {
 
@@ -41,5 +44,15 @@ public class ClientInterfaceService
     public void SetDevelopmentModeEnabled(Player player, bool enabled)
     {
         player.TriggerLuaEvent("internalSetDevelopmentModeEnabled", player, enabled);
+    }
+
+    public void AddFocusable(Element element)
+    {
+        FocusableAdded?.Invoke(element);
+    }
+
+    public void RemoveFocusable(Element element)
+    {
+        FocusableRemoved?.Invoke(element);
     }
 }

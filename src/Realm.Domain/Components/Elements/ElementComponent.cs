@@ -4,10 +4,11 @@ public abstract class ElementComponent : Component
 {
     [Inject]
     protected IEntityByElement EntityByElement { get; set; } = default!;
+    [Inject]
+    private ClientInterfaceService ClientInterfaceService { get; set; } = default!;
 
     abstract internal Element Element { get; }
     private Player? Player { get; set; }
-    private byte _focusableCounter;
     private bool _isPerPlayer = false;
 
     public bool AreCollisionsEnabled { get => Element.AreCollisionsEnabled; set => Element.AreCollisionsEnabled = value; }
@@ -61,22 +62,17 @@ public abstract class ElementComponent : Component
 
     public void AddFocusable()
     {
-        _focusableCounter++;
-        if (_focusableCounter > 0)
-            Element.SetData("_focusable", true, DataSyncType.Broadcast);
+        ClientInterfaceService.AddFocusable(Element);
     }
 
     public void RemoveFocusable()
     {
-        _focusableCounter--;
-        if(_focusableCounter == 0)
-            Element.SetData("_focusable", false, DataSyncType.Broadcast);
+        ClientInterfaceService.RemoveFocusable(Element);
     }
 
     public override void Dispose()
     {
-        if(_focusableCounter != 0)
-            Element.SetData("_focusable", false, DataSyncType.Broadcast);
+        ClientInterfaceService.RemoveFocusable(Element);
         Entity.Transform.PositionChanged -= HandleTransformPositionChanged;
         Entity.Transform.RotationChanged -= HandleTransformRotationChanged;
         HandleDestroyed(Entity);
