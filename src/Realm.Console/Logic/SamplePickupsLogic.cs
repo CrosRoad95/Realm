@@ -96,15 +96,29 @@ internal class SamplePickupsLogic
         if (entity.Tag == Entity.EntityTag.Pickup && entity.Name.StartsWith("withText3d"))
         {
             var pickupElementComponent = entity.GetRequiredComponent<PickupElementComponent>();
-            pickupElementComponent.AddRule(new MustBePlayerOnFootOnlyRule());
+            pickupElementComponent.AddRule<MustBePlayerOnFootOnlyRule>();
             pickupElementComponent.AddOpenGuiLogic<TestWindowComponent>();
         }
 
         if (entity.Tag == Entity.EntityTag.Pickup && entity.Name.StartsWith("exampleShopPickup"))
         {
             var pickupElementComponent = entity.GetRequiredComponent<PickupElementComponent>();
-            pickupElementComponent.AddRule(new MustBePlayerOnFootOnlyRule());
+            pickupElementComponent.AddRule<MustBePlayerOnFootOnlyRule>();
             pickupElementComponent.AddOpenGuiLogic<TestShopGuiComponent, InventoryGuiComponent>();
+        }
+
+        if (entity.Tag == Entity.EntityTag.Marker && entity.Name.StartsWith("testMarker"))
+        {
+            var pickupElementComponent = entity.GetRequiredComponent<MarkerElementComponent>();
+            pickupElementComponent.AddRule<MustBePlayerOnFootOnlyRule>();
+            pickupElementComponent.EntityEntered = entity =>
+            {
+                entity.GetRequiredComponent<PlayerElementComponent>().SendChatMessage($"Entered marker");
+            };
+            pickupElementComponent.EntityLeft = entity =>
+            {
+                entity.GetRequiredComponent<PlayerElementComponent>().SendChatMessage($"Left marker");
+            };
         }
     }
 }

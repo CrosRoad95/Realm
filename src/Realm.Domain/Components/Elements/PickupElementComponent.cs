@@ -24,6 +24,11 @@ public class PickupElementComponent : ElementComponent
         _entityRules.Add(entityRule);
     }
 
+    public void AddRule<TEntityRole>() where TEntityRole: IEntityRule, new()
+    {
+        _entityRules.Add(new TEntityRole());
+    }
+
     private void HandleElementEntered(Element element)
     {
         if(EntityEntered != null)

@@ -4,7 +4,6 @@ using SlipeServer.Server.Elements;
 using SlipeServer.Server.Events;
 using SlipeServer.Server.Mappers;
 using SlipeServer.Server.Services;
-using System.Xml.Linq;
 
 namespace Realm.Resources.ClientInterface;
 

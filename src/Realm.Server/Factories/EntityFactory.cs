@@ -21,11 +21,16 @@ internal class EntityFactory : IEntityFactory
 
     private void AssociateWithServer(Entity entity)
     {
-        var element = entity.GetRequiredComponent<ElementComponent>().Element;
+        var elementComponent = entity.GetRequiredComponent<ElementComponent>();
+        var element = elementComponent.Element;
         element.AssociateWith(_rpgServer.MtaServer);
-        if(element is Pickup pickup)
+        if (element is Pickup pickup)
         {
             pickup.CollisionShape.AssociateWith(_rpgServer.MtaServer);
+        }
+        if(elementComponent is MarkerElementComponent markerElementComponent)
+        {
+            markerElementComponent.CollisionShape.AssociateWith(_rpgServer.MtaServer);
         }
     }
 
@@ -37,6 +42,10 @@ internal class EntityFactory : IEntityFactory
         if(element is Pickup pickup)
         {
             pickup.CollisionShape.AssociateWith(player);
+        }
+        if (elementComponent is MarkerElementComponent markerElementComponent)
+        {
+            markerElementComponent.CollisionShape.AssociateWith(_rpgServer.MtaServer);
         }
     }
 
