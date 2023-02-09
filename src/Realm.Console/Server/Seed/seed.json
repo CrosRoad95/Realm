@@ -74,7 +74,9 @@
 			}
 		}
 	},
-	"Roles": [ "admin" ],
+	"Roles": {
+		"admin": {}
+	},
 	"Accounts": {
 		"admin": {
 			"Password": "asdASD123!@#",

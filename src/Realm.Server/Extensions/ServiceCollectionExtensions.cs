@@ -8,4 +8,18 @@ public static class ServiceCollectionExtensions
         services.AddTransient<TCommand>();
         return services;
     }
+
+    public static ServiceCollection AddSeederProvider<TSeederProvider>(this ServiceCollection services) where TSeederProvider : class, ISeederProvider
+    {
+        services.AddSingleton<ISeederProvider, TSeederProvider>();
+        return services;
+    }
+    
+    public static ServiceCollection AddAsyncSeederProvider<TSeederProvider>(this ServiceCollection services) where TSeederProvider : class, IAsyncSeederProvider
+    {
+        services.AddSingleton<IAsyncSeederProvider, TSeederProvider>();
+        return services;
+    }
+
+
 }

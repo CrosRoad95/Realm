@@ -73,18 +73,10 @@ internal class SeedData
     public Dictionary<string, PickupSeedData> Pickups = new();
     public Dictionary<string, MarkerSeedData> Markers = new();
     public Dictionary<string, FractionSeedData> Fractions = new();
-    public List<string> Roles = new();
+    public Dictionary<string, object> Roles = new();
     public Dictionary<string, AccountSeedData> Accounts = new();
     public Dictionary<string, VehicleUpgradeDescriptionSeedData> Upgrades = new();
     public Dictionary<string, GroupSeedData> Groups = new();
-}
-
-internal class SeedValidator : AbstractValidator<SeedData>
-{
-    public SeedValidator()
-    {
-
-    }
 }
 
 #pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.

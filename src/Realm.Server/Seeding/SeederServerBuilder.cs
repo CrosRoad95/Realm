@@ -1,4 +1,5 @@
-﻿using static Realm.Server.Seeding.SeedData;
+﻿using Microsoft.Extensions.DependencyInjection;
+using static Realm.Server.Seeding.SeedData;
 
 namespace Realm.Server.Seeding;
 
@@ -12,6 +13,8 @@ internal sealed class SeederServerBuilder
     private readonly IGroupService _groupService;
     private readonly IEntityFactory _entityFactory;
     private readonly IFractionService _fractionService;
+    private readonly Dictionary<string, ISeederProvider> _seederProviders = new();
+    private readonly Dictionary<string, IAsyncSeederProvider> _asyncSeederProviders = new();
     private readonly IDb _db;
     private readonly ILogger<SeederServerBuilder> _logger;
 
@@ -19,7 +22,7 @@ internal sealed class SeederServerBuilder
     public SeederServerBuilder(ILogger<SeederServerBuilder> logger,
         EntityByStringIdCollection elementByStringIdCollection,
         IServerFilesProvider serverFilesProvider, UserManager<User> userManager, RoleManager<Role> roleManager,
-        IGroupService groupService, IEntityFactory entityFactory, IFractionService fractionService, IDb db)
+        IGroupService groupService, IEntityFactory entityFactory, IFractionService fractionService, IDb db, IEnumerable<ISeederProvider> seederProviders, IEnumerable<IAsyncSeederProvider> asyncSeederProviders)
     {
         _logger = logger;
         _elementByStringIdCollection = elementByStringIdCollection;
@@ -30,6 +33,17 @@ internal sealed class SeederServerBuilder
         _entityFactory = entityFactory;
         _fractionService = fractionService;
         _db = db;
+        foreach (var seederProvider in seederProviders)
+        {
+            _seederProviders[seederProvider.SeedKey] = seederProvider;
+            logger.LogInformation("Using {seederProvider} for seed key {seedKey}", seederProvider, seederProvider.SeedKey);
+        }
+
+        foreach (var seederProvider in asyncSeederProviders)
+        {
+            _asyncSeederProviders[seederProvider.SeedKey] = seederProvider;
+            logger.LogInformation("Using async {seederProvider} for seed key {seedKey}", seederProvider, seederProvider.SeedKey);
+        }
     }
 
     private void AssignElementToId(Entity entity, string id)
@@ -119,16 +133,16 @@ internal sealed class SeederServerBuilder
         }
     }
 
-    private async Task BuildIdentityRoles(List<string> roles)
+    private async Task BuildIdentityRoles(Dictionary<string, object> roles)
     {
         var existingRoles = await _roleManager.Roles.ToListAsync();
         foreach (var roleName in roles)
         {
-            if (!existingRoles.Any(x => x.Name == roleName))
+            if (!existingRoles.Any(x => x.Name == roleName.Key))
             {
                 await _roleManager.CreateAsync(new Role
                 {
-                    Name = roleName
+                    Name = roleName.Key
                 });
                 _logger.LogInformation("Seeder: Created role {roleName}", roleName);
             }
@@ -252,19 +266,39 @@ internal sealed class SeederServerBuilder
             });
         }
 
+        var seedKeyValuePairs = result.ToObject<Dictionary<string, Dictionary<string, JObject>>>();
+        foreach (var seedKeyValuePair in seedKeyValuePairs)
+        {
+            if (_seederProviders.TryGetValue(seedKeyValuePair.Key, out var value))
+            {
+                foreach (var keyValuePair in seedKeyValuePair.Value)
+                {
+                    value.Seed(seedKeyValuePair.Key, keyValuePair.Key, keyValuePair.Value);
+                }
+            }
+        }
+
+        foreach (var seedKeyValuePair in seedKeyValuePairs)
+        {
+            if (_asyncSeederProviders.TryGetValue(seedKeyValuePair.Key, out var value))
+            {
+                foreach (var keyValuePair in seedKeyValuePair.Value)
+                {
+                    await value.SeedAsync(seedKeyValuePair.Key, keyValuePair.Key, keyValuePair.Value);
+                }
+            }
+        }
+
         var seedData = result.ToObject<SeedData>();
         if (seedData == null)
             throw new Exception("Failed to load seed data.");
 
-        var seedValidator = new SeedValidator();
-        await seedValidator.ValidateAndThrowAsync(seedData);
         await BuildFrom(seedData);
     }
     
     private async Task BuildFrom(SeedData seedData)
     {
         await BuildIdentityRoles(seedData.Roles);
-        await BuildIdentityAccounts(seedData.Accounts);
         await BuildFractions(seedData.Fractions);
         BuildBlips(seedData.Blips);
         BuildPickups(seedData.Pickups);
