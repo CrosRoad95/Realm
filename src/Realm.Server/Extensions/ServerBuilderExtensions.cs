@@ -53,7 +53,7 @@ public static class ServerBuilderExtensions
         var commonOptions = new CommonResourceOptions();
 
         builder.AddNoClipResource();
-        builder.AddDGSResource(DGSVersion.Release_3_518);
+        builder.AddDGSResource(DGSVersion.Release_3_520);
         builder.AddAgnosticGuiSystemResource(builder =>
         {
             builder.AddGuiProvider(CeGuiGuiProvider.Name, CeGuiGuiProvider.LuaCode);

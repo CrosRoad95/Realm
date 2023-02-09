@@ -266,6 +266,11 @@ internal sealed class SeederServerBuilder
             });
         }
 
+        var seedData = result.ToObject<SeedData>();
+        if (seedData == null)
+            throw new Exception("Failed to load seed data.");
+        await BuildFrom(seedData);
+
         var seedKeyValuePairs = result.ToObject<Dictionary<string, Dictionary<string, JObject>>>();
         foreach (var seedKeyValuePair in seedKeyValuePairs)
         {
@@ -289,16 +294,13 @@ internal sealed class SeederServerBuilder
             }
         }
 
-        var seedData = result.ToObject<SeedData>();
-        if (seedData == null)
-            throw new Exception("Failed to load seed data.");
 
-        await BuildFrom(seedData);
     }
     
     private async Task BuildFrom(SeedData seedData)
     {
         await BuildIdentityRoles(seedData.Roles);
+        await BuildIdentityAccounts(seedData.Accounts);
         await BuildFractions(seedData.Fractions);
         BuildBlips(seedData.Blips);
         BuildPickups(seedData.Pickups);

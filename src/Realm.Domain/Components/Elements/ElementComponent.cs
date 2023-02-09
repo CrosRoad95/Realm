@@ -1,4 +1,6 @@
-﻿namespace Realm.Domain.Components.Elements;
+﻿using SlipeServer.Packets.Structs;
+
+namespace Realm.Domain.Components.Elements;
 
 public abstract class ElementComponent : Component
 {
@@ -35,7 +37,7 @@ public abstract class ElementComponent : Component
         if(Entity.TryGetComponent(out PlayerElementComponent playerElementComponent))
         {
             Player = playerElementComponent.Player;
-            Element.Id = playerElementComponent.MapIdGenerator.GetId();
+            Element.Id = (ElementId)playerElementComponent.MapIdGenerator.GetId();
             _isPerPlayer = true;
         }
         else
