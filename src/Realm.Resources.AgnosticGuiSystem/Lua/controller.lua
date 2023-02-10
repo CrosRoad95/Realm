@@ -49,6 +49,14 @@ local function internalGetWindowHandleByName(name, defaultState)
 	if(guis[name] == nil)then
 		error("Gui of name '"..tostring(name).."' doesn't' exists!")
 	end
+	local stateMd5 = md5(inspect(defaultState));
+
+	if(guis[name].handle and guis[name].stateMd5 ~= stateMd5)then
+		currentGuiProvider.destroy(guis[name].handle)
+		guis[name].handle = false;
+		guis[name].stateMd5 = "";
+	end
+
 	if(guis[name].handle == false)then
 		currentGui = name;
 		currentGuiProvider.currentGui = currentGui;
@@ -67,6 +75,7 @@ local function internalGetWindowHandleByName(name, defaultState)
 			guis[name].handle = windowHandle;
 			guis[name].stateChanged = function()end
 		end
+		guis[name].stateMd5 = stateMd5;
 		currentGui = nil;
 	end
 
@@ -98,6 +107,7 @@ function registerGui(callback, name)
 	guis[name] = {
 		callback = callback,
 		name = name,
+		stateMd5 = "",
 		handle = false,
 	};
 end
@@ -273,6 +283,7 @@ local function internalCommonGuiProvider()
 			fileClose(file)
 		end,
 		forgetForm = function(form)
+			local name = form.getName()
 			local fileName = "@remember_"..name..".json";
 			if(fileExists(fileName))then
 				fileDelete(fileName)

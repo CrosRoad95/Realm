@@ -1,11 +1,22 @@
 ﻿namespace Realm.Console.Components.Gui;
 
-[ComponentUsage(false)]
-public sealed class TestWindowComponent : GuiComponent
+public class SampleState
 {
-    public TestWindowComponent() : base("test", true)
+    public int Foo { get; set; }
+}
+
+[ComponentUsage(false)]
+public sealed class TestWindowComponent : StatefulGuiComponent<SampleState>
+{
+    private static int i = 0;
+    public TestWindowComponent() : base("test", true, new())
     {
 
+    }
+
+    protected override void PreGuiOpen(SampleState state)
+    {
+        state.Foo = ++i;
     }
 
     protected override async Task HandleForm(IFormContext formContext)

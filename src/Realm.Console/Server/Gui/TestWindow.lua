@@ -1,7 +1,7 @@
-﻿local function createLoginWindow(guiProvider)
+﻿local function createLoginWindow(guiProvider, state)
 	local window = guiProvider.window("Sample window", 0, 0, 300, 185);
 	guiProvider.centerWindow(window)
-	local information = guiProvider.label("hello", 10, 20, 280, 25, window);
+	local information = guiProvider.label(inspect(state), 10, 20, 280, 25, window);
 
 	function stateChanged(key, value)
 		iprint("payload", key, value)
