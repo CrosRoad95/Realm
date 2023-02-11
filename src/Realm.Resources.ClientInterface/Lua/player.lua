@@ -1,6 +1,7 @@
 ﻿addEvent("onLoggedIn", true)
 setElementData(localPlayer, "translations", {}, false)
 triggerServerEventWithId("sendLocalizationCode", getLocalization().code)
+triggerServerEventWithId("sendScreenSize", guiGetScreenSize())
 
 addEvent("updateTranslation", true)
 addEventHandler("updateTranslation", localPlayer, function(translations)

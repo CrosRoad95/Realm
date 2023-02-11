@@ -1,4 +1,7 @@
-﻿namespace Realm.Console.Logic;
+﻿using Realm.Resources.Overlay;
+using System.Drawing;
+
+namespace Realm.Console.Logic;
 
 internal sealed class PlayerJoinedLogic
 {
@@ -57,6 +60,11 @@ internal sealed class PlayerJoinedLogic
                 await Task.Delay(300);
                 await playerElementComponent.FadeCameraAsync(CameraFade.In);
                 playerElementComponent.SetRenderingEnabled(true);
+
+                var hud = playerElementComponent.CreateHud("testhud", x => x
+                    .AddRectangle(new Vector2(x.Right - 200, 200), new Size(200, 20), Color.Pink)
+                    .AddText("foo bar", new Vector2(x.Right - 200, 200), new Size(200, 20), alignX: "center", alignY: "center"));
+                hud.SetVisible(true);
             }
 
             if (component is LevelComponent levelComponent)

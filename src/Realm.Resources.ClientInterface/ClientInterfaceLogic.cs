@@ -29,6 +29,7 @@ internal class ClientInterfaceLogic
         _resource = server.GetAdditionalResource<ClientInterfaceResource>();
         luaEventService.AddEventHandler("internalDebugMessage", HandleInternalDebugMessage);
         luaEventService.AddEventHandler("sendLocalizationCode", HandleLocalizationCode);
+        luaEventService.AddEventHandler("sendScreenSize", HandleScreenSize);
         luaEventService.AddEventHandler("internalChangeFocusedElement", HandleFocusedElementChanged);
         _clientInterfaceService.FocusableAdded += HandleFocusableAdded;
         _clientInterfaceService.FocusableRemoved += HandleFocusableRemoved;
@@ -86,6 +87,20 @@ internal class ClientInterfaceLogic
         else
         {
             _logger.LogWarning("Failed to get localization code for player {player}", luaEvent.Player);
+        }
+    }
+    
+    private void HandleScreenSize(LuaEvent luaEvent)
+    {
+        var x = luaEvent.Parameters[1].IntegerValue;
+        var y = luaEvent.Parameters[2].IntegerValue;
+        if(x != null && y != null)
+        {
+            _clientInterfaceService.BroadcastPlayerScreenSize(luaEvent.Player, x.Value, y.Value);
+        }
+        else
+        {
+            _logger.LogWarning("Failed to get screen size for player {player}", luaEvent.Player);
         }
     }
 

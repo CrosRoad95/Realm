@@ -16,7 +16,7 @@ public static class ServerBuilderExtensions
 
         builder.ConfigureServices(services =>
         {
-            services.AddSingleton<OverlayNotificationsService>();
+            services.AddSingleton<OverlayService>();
         });
 
         builder.AddLogic<OverlayLogic>();

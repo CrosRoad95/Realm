@@ -1,4 +1,6 @@
-﻿using Realm.Domain.IdGenerators;
+﻿using Realm.Domain.Concepts;
+using Realm.Domain.IdGenerators;
+using Realm.Resources.Overlay.Interfaces;
 using SlipeServer.Server.Collections;
 
 namespace Realm.Domain.Components.Elements;
@@ -8,7 +10,7 @@ public sealed class PlayerElementComponent : ElementComponent
     [Inject]
     private ChatBox ChatBox { get; set; } = default!;
     [Inject]
-    private OverlayNotificationsService OverlayNotificationsService { get; set; } = default!;
+    private OverlayService OverlayService { get; set; } = default!;
     [Inject]
     private ClientInterfaceService ClientInterfaceService { get; set; } = default!;
     [Inject]
@@ -20,6 +22,7 @@ public sealed class PlayerElementComponent : ElementComponent
 
     private Entity? _focusedEntity;
     private readonly Player _player;
+    private readonly Vector2 _screenSize;
     private readonly Dictionary<string, Func<Entity, KeyState, Task>> _binds = new();
     private readonly SemaphoreSlim _bindsLock = new(1);
     private readonly SemaphoreSlim _bindsUpLock = new(1);
@@ -30,7 +33,8 @@ public sealed class PlayerElementComponent : ElementComponent
     private readonly Dictionary<string, DateTime> _bindsUpCooldown = new();
     private readonly HashSet<string> _enableFightFlags = new();
     private readonly MapIdGenerator _mapIdGenerator = new(IdGeneratorConstants.MapIdStart, IdGeneratorConstants.MapIdStop);
-
+    private readonly Dictionary<string, IDisposable> _huds = new();
+    private readonly object _hudsLock = new();
     public event Action<Entity, Entity?>? FocusedEntityChanged;
     public Entity? FocusedEntity { get => _focusedEntity; internal set
         {
@@ -42,6 +46,7 @@ public sealed class PlayerElementComponent : ElementComponent
             }
         }
     }
+    public Vector2 ScreenSize => _screenSize;
 
     internal Player Player => _player;
     internal bool Spawned { get; set; }
@@ -63,9 +68,10 @@ public sealed class PlayerElementComponent : ElementComponent
         }
     }
 
-    internal PlayerElementComponent(Player player)
+    internal PlayerElementComponent(Player player, Vector2 screenSize)
     {
         _player = player;
+        _screenSize = screenSize;
     }
 
     protected override void Load()
@@ -189,7 +195,7 @@ public sealed class PlayerElementComponent : ElementComponent
     public void AddNotification(string message)
     {
         ThrowIfDisposed();
-        OverlayNotificationsService.AddNotification(_player, message);
+        OverlayService.AddNotification(_player, message);
     }
     #endregion
 
@@ -491,9 +497,42 @@ public sealed class PlayerElementComponent : ElementComponent
         }
     }
 
+    public IHud<object> CreateHud(string hudId, Action<IHudBuilder<object>> hudBuilderCallback, Vector2? offset = null)
+    {
+        lock (_hudsLock)
+        {
+            if(_huds.ContainsKey(hudId))
+                throw new Exception("Hud name already in use");
+
+            OverlayService.CreateHud(_player, hudId, hudBuilderCallback, _screenSize, offset);
+            var hudController = new Hud<object>(hudId, _player, OverlayService, offset, null);
+            _huds[hudId] = hudController;
+            return hudController;
+        }
+    }
+
+    public void RemoveHud(string hudId)
+    {
+        lock(_hudsLock)
+        {
+            if(!_huds.ContainsKey(hudId))
+                throw new Exception("Hud with this does not exists.");
+
+            _huds.Remove(hudId);
+        }
+        OverlayService.RemoveHud(_player, hudId);
+    }
 
     public override void Dispose()
     {
+        lock(_hudsLock)
+        {
+            foreach (var item in _huds)
+            {
+                item.Value.Dispose();
+            }
+            _huds.Clear();
+        }
         base.Dispose();
         _player.Kick(PlayerDisconnectType.SHUTDOWN);
     }

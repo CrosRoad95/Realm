@@ -49,12 +49,15 @@ local function internalGetWindowHandleByName(name, defaultState)
 	if(guis[name] == nil)then
 		error("Gui of name '"..tostring(name).."' doesn't' exists!")
 	end
-	local stateMd5 = md5(inspect(defaultState));
+	local stateMd5 = nil;
+	if(defaultState ~= nil)then
+		stateMd5 = md5(inspect(defaultState));
 
-	if(guis[name].handle and guis[name].stateMd5 ~= stateMd5)then
-		currentGuiProvider.destroy(guis[name].handle)
-		guis[name].handle = false;
-		guis[name].stateMd5 = "";
+		if(guis[name].handle and guis[name].stateMd5 ~= stateMd5)then
+			currentGuiProvider.destroy(guis[name].handle)
+			guis[name].handle = false;
+			guis[name].stateMd5 = "";
+		end
 	end
 
 	if(guis[name].handle == false)then
@@ -91,7 +94,7 @@ local function internalOpenGui(name, defaultState)
 end
 
 local function internalCloseGui(name)
-	local result = currentGuiProvider.close(internalGetWindowHandleByName(name, {}).handle)
+	local result = currentGuiProvider.close(internalGetWindowHandleByName(name, nil).handle)
 	if(result ~= true)then
 		error("Failed to close gui '"..tostring(name).."'");
 	end

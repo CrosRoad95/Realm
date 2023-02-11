@@ -9,7 +9,8 @@ internal class OverlayResource : Resource
 {
     internal Dictionary<string, byte[]> AdditionalFiles { get; } = new Dictionary<string, byte[]>()
     {
-        ["overlay.lua"] = ResourceFiles.Overlay,
+        ["utility.lua"] = ResourceFiles.Utility,
+        ["hud.lua"] = ResourceFiles.Hud,
         ["notifications.lua"] = ResourceFiles.Notifications,
     };
 

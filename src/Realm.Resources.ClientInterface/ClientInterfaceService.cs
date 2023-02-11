@@ -6,7 +6,8 @@ namespace Realm.Resources.ClientInterface;
 public class ClientInterfaceService
 {
     public event Action<Player, string, int, string, int>? ClientErrorMessage;
-    public event Action<Player, CultureInfo>? ClientCultureInfoUpdate;
+    public event Action<Player, CultureInfo>? ClientCultureInfoChanged;
+    public event Action<Player, int, int>? ClientScreenSizeChanged;
     public event Action<Player, Element?>? FocusedElementChanged;
     internal event Action<Element>? FocusableAdded;
     internal event Action<Element>? FocusableRemoved;
@@ -23,7 +24,12 @@ public class ClientInterfaceService
     
     internal void BroadcastPlayerLocalizationCode(Player player, string code)
     {
-        ClientCultureInfoUpdate?.Invoke(player, CultureInfo.GetCultureInfo(code));
+        ClientCultureInfoChanged?.Invoke(player, CultureInfo.GetCultureInfo(code));
+    }
+    
+    internal void BroadcastPlayerScreenSize(Player player, int x, int y)
+    {
+        ClientScreenSizeChanged?.Invoke(player, x, y);
     }
     
     internal void BroadcastPlayerElementFocusChanged(Player player, Element? newFocusedElement)

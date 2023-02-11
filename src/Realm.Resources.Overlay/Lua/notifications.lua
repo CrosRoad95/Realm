@@ -1,5 +1,4 @@
 ﻿local notifications = {}
-local sx, sy = guiGetScreenSize();
 
 addEventHandler("onClientRender", root, function()
     local x, width, height = sx * 0.7777, sx * 0.1719, sy * 0.027;

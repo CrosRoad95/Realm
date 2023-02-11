@@ -1,4 +1,5 @@
 ﻿using Realm.Common.Utilities;
+using Realm.Resources.ClientInterface;
 using System.Collections.Concurrent;
 
 namespace Realm.Server.Logic;
@@ -11,16 +12,18 @@ internal class PlayersLogic
     private readonly IEntityByElement _entityByElement;
     private readonly RealmDbContextFactory _realmDbContextFactory;
     private readonly MtaServer _mtaServer;
+    private readonly ClientInterfaceService _clientInterfaceService;
     private readonly ConcurrentDictionary<Player, Latch> _playerResources = new();
 
     public PlayersLogic(ECS ecs, IServiceProvider serviceProvider, IEntityByElement entityByElement,
-        RealmDbContextFactory realmDbContextFactory, MtaServer mtaServer)
+        RealmDbContextFactory realmDbContextFactory, MtaServer mtaServer, ClientInterfaceService clientInterfaceService)
     {
         _ecs = ecs;
         _serviceProvider = serviceProvider;
         _entityByElement = entityByElement;
         _realmDbContextFactory = realmDbContextFactory;
         _mtaServer = mtaServer;
+        _clientInterfaceService = clientInterfaceService;
         _ecs.EntityCreated += HandleEntityCreated;
         _mtaServer.PlayerJoined += HandlePlayerJoined;
     }
@@ -30,6 +33,18 @@ internal class PlayersLogic
         _playerResources[player] = new Latch(RESOURCES_COUNT, TimeSpan.FromSeconds(60));
         player.ResourceStarted += HandlePlayerResourceStarted;
         player.Disconnected += HandlePlayerDisconnected;
+
+        var source = new TaskCompletionSource<(int, int)>();
+        void HandleClientScreenSizeChanged(Player player2, int x, int y)
+        {
+            if(player2 == player)
+            {
+                _clientInterfaceService.ClientScreenSizeChanged -= HandleClientScreenSizeChanged;
+                source.SetResult((x, y));
+            }
+        }
+        _clientInterfaceService.ClientScreenSizeChanged += HandleClientScreenSizeChanged;
+
         try
         {
             await _playerResources[player].WaitAsync();
@@ -45,9 +60,11 @@ internal class PlayersLogic
             _playerResources.TryRemove(player, out var _);
         }
 
+        var screenSize = await source.Task;
+
         _ecs.CreateEntity("Player " + player.Name, Entity.EntityTag.Player, entity =>
         {
-            entity.AddComponent(new PlayerElementComponent(player));
+            entity.AddComponent(new PlayerElementComponent(player, new Vector2(screenSize.Item1, screenSize.Item2)));
         });
     }
 

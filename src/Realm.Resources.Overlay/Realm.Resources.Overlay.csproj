@@ -7,10 +7,15 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Lua\utility.lua" />
+  </ItemGroup>
+
+  <ItemGroup>
     <EmbeddedResource Include="Lua\notifications.lua" />
-    <EmbeddedResource Include="Lua\overlay.lua">
+    <EmbeddedResource Include="Lua\hud.lua">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </EmbeddedResource>
+    <EmbeddedResource Include="Lua\utility.lua" />
   </ItemGroup>
 
 
