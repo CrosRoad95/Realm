@@ -33,6 +33,7 @@ internal class ClientInterfaceLogic
         luaEventService.AddEventHandler("internalChangeFocusedElement", HandleFocusedElementChanged);
         _clientInterfaceService.FocusableAdded += HandleFocusableAdded;
         _clientInterfaceService.FocusableRemoved += HandleFocusableRemoved;
+        _clientInterfaceService.FocusableRenderingChanged += HandlePlayerFocusableRenderingEnabled;
     }
 
     private void HandleFocusableAdded(Element element)
@@ -77,6 +78,11 @@ internal class ClientInterfaceLogic
             _luaEventService.TriggerEvent("internalAddFocusables", player, _focusableElements);
     }
 
+    private void HandlePlayerFocusableRenderingEnabled(Player player, bool enabled)
+    {
+        _luaEventService.TriggerEvent("internalSetFocusableRenderingEnabled", player, enabled);
+    }
+
     private void HandleLocalizationCode(LuaEvent luaEvent)
     {
         var code = luaEvent.Parameters[1].StringValue;
@@ -117,11 +123,6 @@ internal class ClientInterfaceLogic
     {
         var focusedElement = _fromLuaValueMapper.Map(typeof(Element), luaEvent.Parameters[1]) as Element;
         var childElement = _fromLuaValueMapper.Map(typeof(string), luaEvent.Parameters[2]) as string;
-        if(childElement != null)
-        {
-            Console.WriteLine("FOCUS CHILD ELEMENT {0}", childElement);
-            ;
-        }
         _clientInterfaceService.BroadcastPlayerElementFocusChanged(luaEvent.Player, focusedElement);
     }
 }

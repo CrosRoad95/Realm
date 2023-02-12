@@ -436,5 +436,13 @@ internal sealed class CommandsLogic
             }
             return Task.CompletedTask;
         });
+
+        _commandService.AddCommandHandler("toggleadmindebug", (entity, args) =>
+        {
+            var adminComponent = entity.GetRequiredComponent<AdminComponent>();
+            adminComponent.AdminTools = !adminComponent.AdminTools;
+            adminComponent.InterfactionDebugRenderingEnabled = !adminComponent.InterfactionDebugRenderingEnabled;
+            return Task.CompletedTask;
+        });
     }
 }

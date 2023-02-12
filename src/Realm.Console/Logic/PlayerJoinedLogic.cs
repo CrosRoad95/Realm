@@ -24,7 +24,7 @@ internal sealed class PlayerJoinedLogic
             return;
 
         var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();
-        playerElementComponent.SetRenderingEnabled(false);
+        playerElementComponent.SetText3dRenderingEnabled(false);
         playerElementComponent.SetChatVisible(false);
         playerElementComponent.ClearChatBox();
         playerElementComponent.FadeCamera(CameraFade.In);
@@ -62,7 +62,7 @@ internal sealed class PlayerJoinedLogic
                 }
                 await Task.Delay(300);
                 await playerElementComponent.FadeCameraAsync(CameraFade.In);
-                playerElementComponent.SetRenderingEnabled(true);
+                playerElementComponent.SetText3dRenderingEnabled(true);
                 var hud = playerElementComponent.CreateHud("testhud", x => x
                     .AddRectangle(new Vector2(x.Right - 400, 600), new Size(400, 20), Color.DarkBlue)
                     .AddText("foo bar", new Vector2(x.Right - 200, 600), new Size(200, 20), font: "default", alignX: "center", alignY: "center")

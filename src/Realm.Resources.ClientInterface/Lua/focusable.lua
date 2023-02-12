@@ -1,7 +1,8 @@
 ﻿local focusableElements = {}
 local focusableElementsCount = 0;
-local focusedElement = nil
-local focusedChildElement = nil
+local focusedElement = nil;
+local focusedChildElement = nil;
+local debugRenderEnabled = false;
 
 local function setFocusedElement(newElement, newChildElement)
 	if(focusedElement == newElement and focusedChildElement == newChildElement)then
@@ -73,17 +74,17 @@ local function updateFocusedElement()
 	local px,py,pz = getPointFromDistanceRotation(x, y, 1.25, -r)
 	local nearestElement,nearestChildElement = findNearestElementOfIntrestAt(px, py, z, getElementInterior(localPlayer), getElementDimension(localPlayer))
 	
-	-- DEBUG
-	dxDrawLine3D(x,y,z, px, py,z, tocolor(255,0,0), 2)
-	if(nearestElement)then
-		px,py,pz = getElementPosition(nearestElement);
-		dxDrawLine3D(x,y,z, px,py,pz, tocolor(0,255,0), 3)
-		if(getElementType(nearestElement) == "vehicle" and nearestChildElement)then
-			px,py,pz = getVehicleComponentPosition(nearestElement, nearestChildElement, "world")
-			dxDrawLine3D(x,y,z, px,py,pz, tocolor(0,0,255), 3)
+	if(debugRenderEnabled)then
+		dxDrawLine3D(x,y,z, px, py,z, tocolor(255,0,0), 2)
+		if(nearestElement)then
+			px,py,pz = getElementPosition(nearestElement);
+			dxDrawLine3D(x,y,z, px,py,pz, tocolor(0,255,0), 3)
+			if(getElementType(nearestElement) == "vehicle" and nearestChildElement)then
+				px,py,pz = getVehicleComponentPosition(nearestElement, nearestChildElement, "world")
+				dxDrawLine3D(x,y,z, px,py,pz, tocolor(0,0,255), 3)
+			end
 		end
 	end
-	-- END DEBUG
 
 	setFocusedElement(nearestElement,nearestChildElement);
 end
@@ -115,4 +116,9 @@ addEventHandler("internalAddFocusables", localPlayer, function(elements)
 	for i,v in ipairs(elements)do
 		internalAddFocusable(v)
 	end
+end)
+
+addEvent("internalSetFocusableRenderingEnabled", true)
+addEventHandler("internalSetFocusableRenderingEnabled", localPlayer, function(enabled)
+	debugRenderEnabled = enabled;
 end)

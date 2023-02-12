@@ -11,6 +11,7 @@ public class ClientInterfaceService
     public event Action<Player, Element?>? FocusedElementChanged;
     internal event Action<Element>? FocusableAdded;
     internal event Action<Element>? FocusableRemoved;
+    internal event Action<Player, bool>? FocusableRenderingChanged;
 
     public ClientInterfaceService()
     {
@@ -60,5 +61,10 @@ public class ClientInterfaceService
     public void RemoveFocusable(Element element)
     {
         FocusableRemoved?.Invoke(element);
+    }
+
+    public void SetFocusableRenderingEnabled(Player player, bool enabled)
+    {
+        FocusableRenderingChanged?.Invoke(player, enabled);
     }
 }

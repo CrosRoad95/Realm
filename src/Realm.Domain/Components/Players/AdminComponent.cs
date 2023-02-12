@@ -19,6 +19,7 @@ public class AdminComponent : Component
     private bool _adminTools = false;
     private bool _noClip = false;
     private bool _developmentMode = false;
+    private bool _interfactionDebugRenderingEnabled = false;
 
     public bool DevelopmentMode
     {
@@ -78,6 +79,19 @@ public class AdminComponent : Component
             }
         }
     }
+    
+    public bool InterfactionDebugRenderingEnabled
+    {
+        get => _interfactionDebugRenderingEnabled; set
+        {
+            if (_interfactionDebugRenderingEnabled != value)
+            {
+                _interfactionDebugRenderingEnabled = value;
+                var player = Entity.GetRequiredComponent<PlayerElementComponent>().Player;
+                ClientInterfaceService.SetFocusableRenderingEnabled(player, _interfactionDebugRenderingEnabled);
+            }
+        }
+    }
 
     private Task ToggleNoClip(Entity entity)
     {
@@ -101,5 +115,6 @@ public class AdminComponent : Component
         DebugView = false;
         AdminTools = false;
         NoClip = false;
+        InterfactionDebugRenderingEnabled = false;
     }
 }

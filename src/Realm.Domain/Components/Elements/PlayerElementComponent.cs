@@ -372,7 +372,13 @@ public sealed class PlayerElementComponent : ElementComponent
         AgnosticGuiSystemService.SetDebugToolsEnabled(_player, enabled);
     }
 
-    public void SetRenderingEnabled(bool enabled)
+    public void SetText3dRenderingEnabled(bool enabled)
+    {
+        ThrowIfDisposed();
+        Text3dService.SetRenderingEnabled(_player, enabled);
+    }
+
+    public void SasdetText3dRenderingEnabled(bool enabled)
     {
         ThrowIfDisposed();
         Text3dService.SetRenderingEnabled(_player, enabled);
