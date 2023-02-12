@@ -1,4 +1,8 @@
-﻿using Realm.Domain.Interfaces;
+﻿using Realm.Domain.Components.Elements;
+using Realm.Domain.Interfaces;
+using Realm.Resources.Assets;
+using Realm.Resources.Assets.Interfaces;
+using System.Drawing;
 using static Realm.Domain.Components.Elements.PlayerElementComponent;
 
 namespace Realm.Console.Logic;
@@ -11,9 +15,10 @@ internal sealed class CommandsLogic
     private readonly RepositoryFactory _repositoryFactory;
     private readonly ItemsRegistry _itemsRegistry;
     private readonly IGroupService _groupService;
+    private readonly AssetsRegistry _assetsRegistry;
 
     public CommandsLogic(RPGCommandService commandService, ILogger<CommandsLogic> logger, IEntityFactory entityFactory, RepositoryFactory repositoryFactory,
-        ItemsRegistry itemsRegistry, IGroupService groupService)
+        ItemsRegistry itemsRegistry, IGroupService groupService, AssetsRegistry assetsRegistry)
     {
         _commandService = commandService;
         _logger = logger;
@@ -21,6 +26,7 @@ internal sealed class CommandsLogic
         _repositoryFactory = repositoryFactory;
         _itemsRegistry = itemsRegistry;
         _groupService = groupService;
+        _assetsRegistry = assetsRegistry;
         _commandService.AddCommandHandler("gp", (entity, args) =>
         {
             logger.LogInformation("{position}, {rotation}", entity.Transform.Position, entity.Transform.Rotation);
@@ -444,5 +450,25 @@ internal sealed class CommandsLogic
             adminComponent.InterfactionDebugRenderingEnabled = !adminComponent.InterfactionDebugRenderingEnabled;
             return Task.CompletedTask;
         });
+
+        _commandService.AddCommandHandler("createhud", (entity, args) =>
+        {
+            var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();
+            var hud = playerElementComponent.CreateHud("testhud", x => x
+                .AddRectangle(new Vector2(x.Right - 400, 600), new Size(400, 20), Color.DarkBlue)
+                .AddText("foo bar", new Vector2(x.Right - 200, 600), new Size(200, 20), font: "default", alignX: "center", alignY: "center")
+                .AddText("custom font", new Vector2(x.Right - 400, 600), new Size(200, 20), font: _assetsRegistry.GetAsset<IFont>("Better Together.otf"), alignX: "center", alignY: "center"));
+            hud.SetVisible(true);
+            return Task.CompletedTask;
+        });
+
+        _commandService.AddCommandHandler("movehud", (entity, args) =>
+        {
+            var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();
+            var testhud = playerElementComponent.GetHud<object>("testhud");
+            testhud.Position = new Vector2(0, hudPosition++ * 10);
+            return Task.CompletedTask;
+        });
     }
+    static int hudPosition = 0;
 }

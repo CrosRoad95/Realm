@@ -8,7 +8,7 @@ local function renderHud(hudData)
 		if(v[1] == "text")then
 			dxDrawText(v[3], v[4] + x, v[5] + y, v[4] + v[6] + x, v[5] + v[7] + y, v[8], v[9], v[10], v[11], v[12], v[13])
 		elseif(v[1] == "rectangle")then
-			dxDrawRectangle(v[3] + x, v[4] + y, v[5] + x, v[6] + y, v[7])
+			dxDrawRectangle(v[3] + x, v[4] + y, v[5], v[6], v[7])
 		end
 	end
 end
@@ -52,6 +52,12 @@ end
 addEvent("setHudVisible", true)
 addEventHandler("setHudVisible", localPlayer, function(hudId, enabled)
 	enabledHuds[hudId] = enabled;
+end)
+
+addEvent("setHudPosition", true)
+addEventHandler("setHudPosition", localPlayer, function(hudId, x, y)
+	huds[hudId].position = {x, y};
+	iprint("huds[hudId].position",huds[hudId].position)
 end)
 
 addEvent("createHud", true)

@@ -25,6 +25,7 @@ internal class OverlayLogic
         _overlayService.HudCreated = HandleHudCreated;
         _overlayService.HudRemoved = HandleHudRemoved;
         _overlayService.HudVisibilityChanged = HandleHudVisibilityChanged;
+        _overlayService.HudPositionChanged = HandleHudPositionChanged;
     }
 
     private void HandleNotificationAdded(Player player, string message)
@@ -35,6 +36,10 @@ internal class OverlayLogic
     public void HandleHudVisibilityChanged(Player player, string hudId, bool visible)
     {
         _luaEventService.TriggerEventFor(player, "setHudVisible", player, hudId, visible);
+    }
+    public void HandleHudPositionChanged(Player player, string hudId, float x, float y)
+    {
+        _luaEventService.TriggerEventFor(player, "setHudPosition", player, hudId, x, y);
     }
 
     private void HandleHudCreated(Player player, string hudId, Vector2 position, IEnumerable<LuaValue> hudElementsDefinitions)

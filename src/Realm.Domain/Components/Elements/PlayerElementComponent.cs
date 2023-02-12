@@ -517,6 +517,11 @@ public sealed class PlayerElementComponent : ElementComponent
         }
     }
 
+    public IHud<THud> GetHud<THud>(string hudId)
+    {
+        return (IHud<THud>)_huds[hudId];
+    }
+
     public void RemoveHud(string hudId)
     {
         lock(_hudsLock)
