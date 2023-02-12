@@ -1,41 +1,31 @@
-﻿local assets = {}
-addEvent("onAssetDataReady", false)
-local function requestAsset(name)
-	if(assets[name])then
-		triggerServerEvent("internalRequestAsset", resourceRoot, name)
+﻿local assetInfos = {}
+local loadedAssets = {}
+
+function requestAsset(name)
+	local assetInfo = assetInfos[name];
+	if(not assetInfos[name])then
+		error("Could not find asset: '"..name.."'")
 	end
-	return false
+	if(not loadedAssets[name])then
+		loadAsset(name, assetInfo)
+	end
+
+	return loadedAssets[name]
 end
 
-local function handleRequestChecksums(jsonData)
+function loadAsset(name, assetInfo)
+	local assetType = assetInfo[1]
+	if(assetType == "Font")then
+		loadedAssets[name] = dxCreateFont(assetInfo[2], 12)
+		outputDebugString("Loaded font: "..tostring(name))
+	end
 
+	return loadedAssets[name]
 end
 
-addEventHandler("onClientResourceStart", resourceRoot, function()
-	addEvent("internalResponseRequestChecksums", true)
-	addEvent("internalResponseRequestAsset", true)
-	addEventHandler("internalResponseRequestChecksums", localPlayer, function(json)
-		assets = fromJSON(json)
-	end)
-	addEventHandler("internalResponseRequestAsset", localPlayer, function(name, json)
-		assetInfoAndData = fromJSON(json)
-		triggerEvent("onAssetDataReady", localPlayer, name, assetInfoAndData["Item1"], assetInfoAndData["Item2"])
-	end)
-
-	triggerServerEvent("internalRequestChecksums", resourceRoot)
+addEvent("internalResponseRequestAsset", true)
+addEventHandler("internalResponseRequestAsset", localPlayer, function(receivedAssets)
+	assetInfos = receivedAssets
 end)
 
--- Test code:
-addCommandHandler("assetTest", function()
-	requestAsset("test")
-end)
-
-createObject(1337, -5, 5, 3.2);
-addEventHandler("onAssetDataReady", localPlayer, function(name, type, data)
-	if(type == "model")then
-		local col = engineLoadCOL(base64Decode(data[2]))
-		engineReplaceCOL ( col, 1337 )
-		local dff = engineLoadDFF (base64Decode(data[1]))
-		engineReplaceModel ( dff, 1337 )
-	end
-end)
+triggerServerEvent("internalRequestAssets", resourceRoot)

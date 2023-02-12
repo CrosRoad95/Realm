@@ -1,5 +1,6 @@
 ﻿local enabledHuds = {}
 local huds = {}
+local assets = {}
 
 local function renderHud(hudData)
 	local x,y = unpack(hudData.position)
@@ -8,6 +9,27 @@ local function renderHud(hudData)
 			dxDrawText(v[3], v[4] + x, v[5] + y, v[4] + v[6] + x, v[5] + v[7] + y, v[8], v[9], v[10], v[11], v[12], v[13])
 		elseif(v[1] == "rectangle")then
 			dxDrawRectangle(v[3] + x, v[4] + y, v[5] + x, v[6] + y, v[7])
+		end
+	end
+end
+
+local function prepareAsset(asset)
+	local assetType = asset[1];
+	if(assetType == "Font")then
+		if(not assets[asset[2]])then
+			return requestAsset(asset[2])
+		end
+	end
+	return asset;
+end
+
+local function prepareElements(hudData)
+	for i,v in ipairs(hudData.elements)do
+		if(v[1] == "text")then
+			local asset = v[11];
+			if(type(asset) == "table")then
+				v[11] = prepareAsset(asset);
+			end
 		end
 	end
 end
@@ -38,6 +60,7 @@ addEventHandler("createHud", localPlayer, function(hudId, x, y, elements)
 		position = {x,y},
 		elements = elements,
 	}
+	prepareElements(huds[hudId]);
 end)
 
 addEvent("removeHud", true)

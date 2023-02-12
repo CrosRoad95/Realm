@@ -31,6 +31,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Server\Assets\Fonts\" />
+  </ItemGroup>
 	
   <PropertyGroup>
     <DockerfileRunArguments>-p 22003:22003/udp -p 22005:22005/tcp -p 22126:22126/udp</DockerfileRunArguments>

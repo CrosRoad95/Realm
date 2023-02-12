@@ -1,5 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using static Realm.Server.Seeding.SeedData;
+﻿using static Realm.Server.Seeding.SeedData;
 
 namespace Realm.Server.Seeding;
 

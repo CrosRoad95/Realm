@@ -1,4 +1,7 @@
 ﻿
+using Realm.Console.Services;
+using Realm.Resources.Assets.Interfaces;
+
 Directory.SetCurrentDirectory(Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly()!.Location)!);
 
 var builder = new RPGServerBuilder();
@@ -24,6 +27,10 @@ var server = builder.Build(null, extraBuilderSteps: serverBuilder =>
 #if DEBUG
     serverBuilder.AddLogic<HotReloadLogic>("../../../Server/Gui");
 #endif
+    serverBuilder.ConfigureServices(x =>
+    {
+        x.AddTransient<IServerAssetsProvider, ServerAssetsService>();
+    });
 });
 
 Console.CancelKeyPress += (sender, args) =>

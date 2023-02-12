@@ -7,7 +7,6 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\Realm.Assets\Realm.Assets.csproj" />
 		<ProjectReference Include="..\Realm.Configuration\Realm.Configuration.csproj" />
 		<ProjectReference Include="..\Realm.Persistance\Realm.Persistance.csproj" />
 		<ProjectReference Include="..\Realm.Resources.AdminTools\Realm.Resources.AdminTools.csproj" />

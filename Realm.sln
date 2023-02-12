@@ -58,8 +58,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Realm.Resources.Overlay", "
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Realm.Resources.Assets", "src\Realm.Resources.Assets\Realm.Resources.Assets.csproj", "{0F9B6AB9-65CA-486F-82C5-89B7F792BA9E}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Realm.Assets", "src\Realm.Assets\Realm.Assets.csproj", "{367F717A-6E40-47C8-B997-53515335A724}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Realm.Module.Grpc", "src\Realm.GRpc\Realm.Module.Grpc.csproj", "{F4A7AEA2-542D-4C5E-9FF1-A6862D9C2154}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Realm.Module.GRPC.Proto", "src\Realm.Grpc.Proto\Realm.Module.GRPC.Proto.csproj", "{C4F530B4-1378-4E0A-BB47-044455AA8B99}"
@@ -168,10 +166,6 @@ Global
 		{0F9B6AB9-65CA-486F-82C5-89B7F792BA9E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0F9B6AB9-65CA-486F-82C5-89B7F792BA9E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0F9B6AB9-65CA-486F-82C5-89B7F792BA9E}.Release|Any CPU.Build.0 = Release|Any CPU
-		{367F717A-6E40-47C8-B997-53515335A724}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{367F717A-6E40-47C8-B997-53515335A724}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{367F717A-6E40-47C8-B997-53515335A724}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{367F717A-6E40-47C8-B997-53515335A724}.Release|Any CPU.Build.0 = Release|Any CPU
 		{F4A7AEA2-542D-4C5E-9FF1-A6862D9C2154}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{F4A7AEA2-542D-4C5E-9FF1-A6862D9C2154}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F4A7AEA2-542D-4C5E-9FF1-A6862D9C2154}.Release|Any CPU.ActiveCfg = Release|Any CPU

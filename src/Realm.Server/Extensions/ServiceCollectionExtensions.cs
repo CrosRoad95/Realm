@@ -20,6 +20,4 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<IAsyncSeederProvider, TSeederProvider>();
         return services;
     }
-
-
 }

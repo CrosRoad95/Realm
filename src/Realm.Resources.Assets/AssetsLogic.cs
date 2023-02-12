@@ -2,40 +2,25 @@
 using SlipeServer.Server;
 using SlipeServer.Server.Services;
 using SlipeServer.Server.Events;
-using Newtonsoft.Json;
+using SlipeServer.Packets.Definitions.Lua;
 
 namespace Realm.Resources.Assets;
 
 internal class AssetsLogic
 {
     private readonly AssetsResource _resource;
+    private readonly AssetsRegistry _assetsRegistry;
     private readonly AssetsService _assetsService;
     private readonly LuaEventService _luaEventService;
-    private readonly Dictionary<string, (string, string[])> _assetsRegistry = new();
-    private readonly Dictionary<string, (string, string[])> _assetsChecksums = new();
-    public AssetsLogic(MtaServer server, AssetsService assetsService, LuaEventService luaEventService)
+    public AssetsLogic(MtaServer server, AssetsRegistry assetsRegistry, AssetsService assetsService, LuaEventService luaEventService)
     {
         server.PlayerJoined += HandlePlayerJoin;
 
         _resource = server.GetAdditionalResource<AssetsResource>();
+        _assetsRegistry = assetsRegistry;
         _assetsService = assetsService;
         _luaEventService = luaEventService;
-        _assetsService.ModelAdded += HandleModelAdded;
-        luaEventService.AddEventHandler("internalRequestChecksums", HandleRequestChecksums);
-        luaEventService.AddEventHandler("internalRequestAsset", HandleRequestAsset);
-    }
-
-    private void HandleModelAdded(string name, IModel model)
-    {
-        _assetsRegistry[name] = ("model", new string[] { Convert.ToBase64String(model.Dff), Convert.ToBase64String(model.Col) });
-        _assetsChecksums[name] = ("model", new string[] { GetMD5checksum(model.Dff), GetMD5checksum(model.Col) });
-    }
-
-    public string GetMD5checksum(byte[] inputData)
-    {
-        using var md5 = System.Security.Cryptography.MD5.Create();
-        md5.TransformFinalBlock(inputData, 0, inputData.Length);
-        return BitConverter.ToString(md5.Hash).Replace("-", "").ToLowerInvariant();
+        luaEventService.AddEventHandler("internalRequestAssets", HandleInternalRequestAssets);
     }
 
     private void HandlePlayerJoin(Player player)
@@ -43,16 +28,10 @@ internal class AssetsLogic
         _resource.StartFor(player);
     }
 
-    private void HandleRequestChecksums(LuaEvent luaEvent)
+    private void HandleInternalRequestAssets(LuaEvent luaEvent)
     {
-        _luaEventService.TriggerEventFor(luaEvent.Player, "internalResponseRequestChecksums", luaEvent.Player, JsonConvert.SerializeObject(_assetsChecksums));
-    }
-
-    private void HandleRequestAsset(LuaEvent luaEvent)
-    {
-        string name = ((string)luaEvent.Parameters[0]);
-        var asset = _assetsRegistry[name];
-        _luaEventService.TriggerEventFor(luaEvent.Player, "internalResponseRequestAsset", luaEvent.Player, name, JsonConvert.SerializeObject(asset));
+        var luaValue = _assetsRegistry.Assets.ToDictionary(x => new LuaValue(x.Key), x => _assetsService.Map(x.Value));
+        _luaEventService.TriggerEventFor(luaEvent.Player, "internalResponseRequestAsset", luaEvent.Player, new LuaValue(luaValue));
     }
 
 }

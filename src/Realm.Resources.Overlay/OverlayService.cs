@@ -1,4 +1,5 @@
-﻿using Realm.Resources.Overlay.Interfaces;
+﻿using Realm.Resources.Assets;
+using Realm.Resources.Overlay.Interfaces;
 using SlipeServer.Packets.Definitions.Lua;
 using SlipeServer.Server.Elements;
 using System.Drawing;
@@ -22,6 +23,12 @@ public class OverlayService
     internal Action<Player, string, Vector2, IEnumerable<LuaValue>>? HudCreated;
     internal Action<Player, string>? HudRemoved;
     internal Action<Player, string, bool>? HudVisibilityChanged;
+    private readonly AssetsService _assetsService;
+
+    public OverlayService(AssetsService assetsService)
+    {
+        _assetsService = assetsService;
+    }
 
     public void AddNotification(Player player, string message)
     {
@@ -35,14 +42,14 @@ public class OverlayService
     
     public void CreateHud(Player player, string hudId, Action<IHudBuilder<object>> hudBuilderCallback, Vector2 screenSize, Vector2 ? position = null)
     {
-        var hudBuilder = new HudBuilder<object>(null, screenSize);
+        var hudBuilder = new HudBuilder<object>(null, _assetsService, screenSize);
         hudBuilderCallback(hudBuilder);
         HudCreated?.Invoke(player, hudId, position ?? Vector2.Zero, hudBuilder.HudElementsDefinitions);
     }
 
     public void CreateHud<TState>(Player player, string hudId, Action<IHudBuilder<TState>> hudBuilderCallback, Vector2 screenSize, Vector2? position = null, TState? defaultState = null) where TState : class
     {
-        var hudBuilder = new HudBuilder<TState>(defaultState, screenSize);
+        var hudBuilder = new HudBuilder<TState>(defaultState, _assetsService, screenSize);
         hudBuilderCallback(hudBuilder);
         HudCreated?.Invoke(player, hudId, position ?? Vector2.Zero, hudBuilder.HudElementsDefinitions);
     }

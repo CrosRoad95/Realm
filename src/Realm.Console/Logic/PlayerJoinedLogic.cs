@@ -1,4 +1,5 @@
-﻿using Realm.Resources.Overlay;
+﻿using Realm.Resources.Assets;
+using Realm.Resources.Assets.Interfaces;
 using System.Drawing;
 
 namespace Realm.Console.Logic;
@@ -7,11 +8,13 @@ internal sealed class PlayerJoinedLogic
 {
     private readonly ECS _ecs;
     private readonly ILogger<PlayerJoinedLogic> _logger;
+    private readonly AssetsRegistry _assetsRegistry;
 
-    public PlayerJoinedLogic(ECS ecs, ILogger<PlayerJoinedLogic> logger)
+    public PlayerJoinedLogic(ECS ecs, ILogger<PlayerJoinedLogic> logger, AssetsRegistry assetsRegistry)
     {
         _ecs = ecs;
         _logger = logger;
+        _assetsRegistry = assetsRegistry;
         _ecs.EntityCreated += HandleEntityCreated;
     }
 
@@ -60,10 +63,10 @@ internal sealed class PlayerJoinedLogic
                 await Task.Delay(300);
                 await playerElementComponent.FadeCameraAsync(CameraFade.In);
                 playerElementComponent.SetRenderingEnabled(true);
-
                 var hud = playerElementComponent.CreateHud("testhud", x => x
-                    .AddRectangle(new Vector2(x.Right - 200, 200), new Size(200, 20), Color.Pink)
-                    .AddText("foo bar", new Vector2(x.Right - 200, 200), new Size(200, 20), alignX: "center", alignY: "center"));
+                    .AddRectangle(new Vector2(x.Right - 400, 600), new Size(400, 20), Color.DarkBlue)
+                    .AddText("foo bar", new Vector2(x.Right - 200, 600), new Size(200, 20), font: "default", alignX: "center", alignY: "center")
+                    .AddText("custom font", new Vector2(x.Right - 400, 600), new Size(200, 20), font: _assetsRegistry.GetAsset<IFont>("Better Together.otf"), alignX: "center", alignY: "center"));
                 hud.SetVisible(true);
             }
 

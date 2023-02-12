@@ -30,8 +30,6 @@ global using Realm.Configuration;
 global using Realm.Domain.Registries;
 global using Realm.Domain.Inventory;
 global using Microsoft.AspNetCore.Components;
-global using Realm.Assets.Factories;
-global using Realm.Resources.Assets;
 global using Realm.Domain.Exceptions;
 global using Realm.Domain.Interfaces;
 global using SlipeServer.Server.Elements.ColShapes;

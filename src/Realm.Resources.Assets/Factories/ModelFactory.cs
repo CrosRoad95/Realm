@@ -1,5 +1,4 @@
-﻿using Realm.Resources.Assets;
-using RenderWareBuilders;
+﻿using RenderWareBuilders;
 using System.Drawing;
 using System.Numerics;
 
@@ -33,7 +32,7 @@ public class ModelFactory
         });
     }
 
-    public IModel Build()
+    public (byte[], byte[]) Build()
     {
         var dff = _renderWareBuilder.BuildDff();
         var col = _renderWareBuilder.BuildCol();
@@ -41,6 +40,6 @@ public class ModelFactory
         using MemoryStream colStream = new();
         dff.Write(dffStream);
         col.Write(colStream);
-        return new Model(dffStream.ToArray(), colStream.ToArray());
+        return (dffStream.ToArray(), colStream.ToArray());
     }
 }

@@ -17,7 +17,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Realm.Assets\Realm.Assets.csproj" />
     <ProjectReference Include="..\Realm.Configuration\Realm.Configuration.csproj" />
     <ProjectReference Include="..\Realm.Discord\Realm.Module.Discord.csproj" />
     <ProjectReference Include="..\Realm.Domain\Realm.Domain.csproj" />

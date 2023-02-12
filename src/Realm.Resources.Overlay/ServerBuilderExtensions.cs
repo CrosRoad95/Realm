@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using Realm.Resources.Assets;
 using SlipeServer.Server.ServerBuilders;
 
 namespace Realm.Resources.Overlay;
@@ -10,6 +11,7 @@ public static class ServerBuilderExtensions
         builder.AddBuildStep(server =>
         {
             var resource = new OverlayResource(server);
+            resource.InjectAssetsExportedFunctions();
 
             server.AddAdditionalResource(resource, resource.AdditionalFiles);
         });

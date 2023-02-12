@@ -21,5 +21,6 @@
 
 	<ItemGroup>
 		<ProjectReference Include="..\Realm.Resources.Addons.Common\Realm.Resources.Addons.Common.csproj" />
+		<ProjectReference Include="..\Realm.Resources.Assets\Realm.Resources.Assets.csproj" />
 	</ItemGroup>
 </Project>
