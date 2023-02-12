@@ -1,10 +1,10 @@
 ﻿namespace Realm.DiscordBot.Commands;
 
-public class ConnectAccountToServerCommand : InteractionModuleBase<SocketInteractionContext>
+internal class ConnectAccountToServerCommand : InteractionModuleBase<SocketInteractionContext>
 {
-    private readonly DiscordConfiguration _discordConfiguration;
+    private readonly DiscordBotConfiguration _discordConfiguration;
 
-    public ConnectAccountToServerCommand(DiscordConfiguration discordConfiguration)
+    public ConnectAccountToServerCommand(DiscordBotConfiguration discordConfiguration)
     {
         _discordConfiguration = discordConfiguration;
     }

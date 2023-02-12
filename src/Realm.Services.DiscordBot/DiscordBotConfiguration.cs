@@ -6,7 +6,7 @@ internal interface IChannelConfiguration
 
 }
 
-public class DiscordConfiguration
+internal class DiscordBotConfiguration
 {
     public class StatusChannelConfiguration : IChannelConfiguration
     {
@@ -22,6 +22,7 @@ public class DiscordConfiguration
 
     public string Token { get; set; } = "";
     public ulong Guild { get; set; }
+    public string GrpcAddress { get; set; }
 
     public StatusChannelConfiguration? StatusChannel { get; set; }
     public ConnectServerAccountConfiguration? ConnectServerAccountChannel { get; set; }

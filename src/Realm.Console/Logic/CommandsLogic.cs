@@ -1,5 +1,4 @@
-﻿using Realm.Domain.Components.Elements;
-using Realm.Domain.Interfaces;
+﻿using Realm.Domain.Interfaces;
 using Realm.Resources.Assets;
 using Realm.Resources.Assets.Interfaces;
 using System.Drawing;

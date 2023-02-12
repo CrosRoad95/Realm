@@ -1,5 +1,4 @@
 ﻿using Realm.Module.Discord;
-using Realm.Interfaces.Extend;
 using Realm.Interfaces.Server;
 using Realm.Logging;
 using Realm.Server.Extensions;

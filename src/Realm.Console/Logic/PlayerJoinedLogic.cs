@@ -1,6 +1,4 @@
 ﻿using Realm.Resources.Assets;
-using Realm.Resources.Assets.Interfaces;
-using System.Drawing;
 
 namespace Realm.Console.Logic;
 

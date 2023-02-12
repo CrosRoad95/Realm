@@ -1,10 +1,10 @@
-﻿using Realm.Interfaces.Grpc;
+﻿using Realm.Interfaces.Extend;
 
 namespace Realm.Module.WebApp;
 
-internal class WebAppIntegration
+internal class WebAppIntegration : IModule
 {
-    public WebAppIntegration(IGrpcDiscord grpcDiscord)
+    public WebAppIntegration()
     {
     }
 }

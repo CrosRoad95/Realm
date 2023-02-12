@@ -23,7 +23,6 @@ global using Realm.Persistance.SQLite;
 global using Realm.Server.Commands;
 global using Realm.Interfaces.Server;
 global using Realm.Server.Extensions;
-global using Realm.Interfaces.Extend;
 global using Realm.Server.Interfaces;
 global using Realm.Server.Services;
 global using Realm.Resources.ClientInterface;

@@ -2,7 +2,7 @@
 
 namespace Realm.Module.Grpc.Stubs.Discord;
 
-public sealed class DiscordHandshakeServiceStub : Handshake.HandshakeBase
+internal sealed class DiscordHandshakeServiceStub : Handshake.HandshakeBase
 {
     public override Task<HandshakeReply> DoHandshake(HandshakeRequest request, ServerCallContext context)
     {

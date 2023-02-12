@@ -1,6 +1,5 @@
 ﻿using Realm.DiscordBot;
 using Realm.Configuration;
-using Microsoft.Extensions.Configuration;
 using Realm.Logging;
 using Serilog.Events;
 using Grpc.Net.Client;
@@ -10,8 +9,8 @@ var realmLogger = new RealmLogger(LogEventLevel.Verbose)
     .AddSeq();
 
 servicesCollection.AddSingleton(realmLogger.GetLogger());
-servicesCollection.AddSingleton(new RealmConfigurationProvider().Get<DiscordConfiguration>("discord"));
-servicesCollection.AddSingleton<DiscordClient>();
+servicesCollection.AddRealmConfiguration();
+servicesCollection.AddSingleton(x => x.GetRequiredService<IRealmConfigurationProvider>().GetRequired<DiscordBotConfiguration>("Discord"));
 servicesCollection.AddSingleton<DiscordClient>();
 servicesCollection.AddSingleton(new DiscordSocketClient(new DiscordSocketConfig { GatewayIntents = GatewayIntents.AllUnprivileged | GatewayIntents.GuildMembers }));
 servicesCollection.AddSingleton<CommandHandler>();

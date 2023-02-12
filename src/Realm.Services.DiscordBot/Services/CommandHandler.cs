@@ -1,13 +1,13 @@
 ﻿namespace Realm.DiscordBot.Services;
 
-public class CommandHandler
+internal class CommandHandler
 {
     private readonly DiscordSocketClient _client;
     private readonly InteractionService _interactionService;
-    private readonly DiscordConfiguration _discordConfiguration;
+    private readonly DiscordBotConfiguration _discordConfiguration;
     private readonly IServiceProvider _services;
 
-    public CommandHandler(DiscordSocketClient client, DiscordConfiguration discordConfiguration, IServiceProvider services)
+    public CommandHandler(DiscordSocketClient client, DiscordBotConfiguration discordConfiguration, IServiceProvider services)
     {
         _client = client;
         _interactionService = new InteractionService(_client);

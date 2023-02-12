@@ -1,6 +1,6 @@
 ﻿namespace Realm.Module.Grpc.Stubs;
 
-public sealed class GreeterServiceStub : Greeter.GreeterBase
+internal sealed class GreeterServiceStub : Greeter.GreeterBase
 {
     public override Task<HelloReply> SayHello(HelloRequest request, ServerCallContext context)
     {

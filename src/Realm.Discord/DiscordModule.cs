@@ -1,13 +1,14 @@
-﻿using Realm.Interfaces.Grpc;
+﻿using Realm.Interfaces.Extend;
+using Realm.Interfaces.Grpc;
 using Realm.Module.Discord.Interfaces;
 
 namespace Realm.Module.Discord;
 
-internal class DiscordIntegration
+internal class DiscordModule : IModule
 {
     private readonly IDiscordStatusChannelUpdateHandler? _discordStatusChannelUpdateHandler;
 
-    public DiscordIntegration(IGrpcDiscord grpcDiscord, IDiscordStatusChannelUpdateHandler? discordStatusChannelUpdateHandler = null)
+    public DiscordModule(IGrpcDiscord grpcDiscord, IDiscordStatusChannelUpdateHandler? discordStatusChannelUpdateHandler = null)
     {
         grpcDiscord.UpdateStatusChannel = HandleUpdateStatusChannel;
         _discordStatusChannelUpdateHandler = discordStatusChannelUpdateHandler;

@@ -1,6 +1,7 @@
 ﻿using Realm.Domain.IdGenerators;
 using Realm.Domain.Registries;
 using Realm.Module.Discord;
+using Realm.Module.Grpc;
 using Realm.Module.WebApp;
 using Realm.Server.Logic;
 using SlipeServer.Server.Elements.IdGeneration;
@@ -24,6 +25,7 @@ internal sealed class RPGServer : IRPGServer
                 builder.AddLogic<GuisLogic>();
                 builder.AddLogic<StartupLogic>();
                 builder.AddLogic<ChatLogic>();
+                builder.AddLogic<ModulesLogic>();
                 builder.ConfigureServer(realmConfigurationProvider);
                 configureServerBuilder?.Invoke(builder);
 
@@ -63,6 +65,7 @@ internal sealed class RPGServer : IRPGServer
             new RangedCollectionBasedElementIdGenerator(x.GetRequiredService<IElementCollection>(), IdGeneratorConstants.PlayerIdStart, IdGeneratorConstants.PlayerIdStop)
         );
 
+        services.AddGrpcModule();
         services.AddDiscordModule();
         services.AddWebAppModule();
     }

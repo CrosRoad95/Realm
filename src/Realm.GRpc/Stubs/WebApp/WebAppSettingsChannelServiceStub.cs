@@ -1,5 +1,5 @@
 ﻿namespace Realm.Module.Grpc.Stubs.WebApp;
 
-internal class WebAppSettingsChannelServiceStub
+internal sealed class WebAppSettingsChannelServiceStub
 {
 }

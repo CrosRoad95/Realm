@@ -1,7 +1,5 @@
 ﻿using Realm.Configuration;
 using Realm.Logging;
-using Realm.Module.Discord;
-using Realm.Module.Grpc;
 using Realm.Server;
 using Serilog.Events;
 

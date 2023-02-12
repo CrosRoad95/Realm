@@ -5,7 +5,7 @@ namespace Realm.DiscordBot.Channels;
 
 internal class DiscordStatusChannel
 {
-    private readonly DiscordConfiguration.StatusChannelConfiguration? _configuration;
+    private readonly DiscordBotConfiguration.StatusChannelConfiguration? _configuration;
     private readonly BotIdProvider _botdIdProvider;
     private ILogger _logger;
     private DiscordMessage? _statusDiscordMessage;
@@ -14,7 +14,7 @@ internal class DiscordStatusChannel
 
     public delegate Task<string> GetStatusChannelContent();
 
-    public DiscordStatusChannel(DiscordConfiguration discordConfiguration, BotIdProvider botdIdProvider, ILogger logger, GrpcChannel grpcChannel)
+    public DiscordStatusChannel(DiscordBotConfiguration discordConfiguration, BotIdProvider botdIdProvider, ILogger logger, GrpcChannel grpcChannel)
     {
         _configuration = discordConfiguration.StatusChannel;
         _botdIdProvider = botdIdProvider;

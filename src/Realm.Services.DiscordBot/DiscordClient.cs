@@ -5,7 +5,7 @@ namespace Realm.DiscordBot;
 internal class DiscordClient
 {
     private readonly DiscordSocketClient _client;
-    private readonly DiscordConfiguration _discordConfiguration;
+    private readonly DiscordBotConfiguration _discordConfiguration;
     private readonly DiscordStatusChannel _discordStatusChannel;
     private readonly DiscordServerConnectionChannel _serverConnectionChannel;
     private readonly CommandHandler _commandHandler;
@@ -15,7 +15,7 @@ internal class DiscordClient
 
     private readonly Handshake.HandshakeClient _handshakeClient;
 
-    public DiscordClient(DiscordSocketClient discordSocketClient, DiscordConfiguration discordConfiguration, DiscordStatusChannel discordStatusChannel, DiscordServerConnectionChannel serverConnectionChannel,
+    public DiscordClient(DiscordSocketClient discordSocketClient, DiscordBotConfiguration discordConfiguration, DiscordStatusChannel discordStatusChannel, DiscordServerConnectionChannel serverConnectionChannel,
         ILogger logger, CommandHandler commandHandler, BotIdProvider botIdProvider, GrpcChannel grpcChannel)
     {
         _client = discordSocketClient;

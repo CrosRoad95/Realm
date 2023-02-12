@@ -1,6 +1,5 @@
 ﻿using Realm.Resources.Assets.Classes;
 using Realm.Resources.Assets.Interfaces;
-using SlipeServer.Server.Elements.Enums;
 
 namespace Realm.Resources.Assets;
 
