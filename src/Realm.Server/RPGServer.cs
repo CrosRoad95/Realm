@@ -1,5 +1,7 @@
 ﻿using Realm.Domain.IdGenerators;
 using Realm.Domain.Registries;
+using Realm.Module.Discord;
+using Realm.Module.WebApp;
 using Realm.Server.Logic;
 using SlipeServer.Server.Elements.IdGeneration;
 
@@ -9,20 +11,17 @@ internal sealed class RPGServer : IRPGServer
 {
     private readonly MtaServer _server;
     private readonly ILogger<RPGServer> _logger;
-    private readonly List<IModule> _modules;
 
     public event Action? ServerStarted;
 
     internal MtaServer MtaServer => _server;
-    public RPGServer(RealmConfigurationProvider realmConfigurationProvider, List<IModule> modules, Action<ServerBuilder>? configureServerBuilder = null)
+    public RPGServer(IRealmConfigurationProvider realmConfigurationProvider, Action<ServerBuilder>? configureServerBuilder = null)
     {
-        _modules = modules;
         _server = new MtaServer(
             builder =>
             {
                 builder.AddLogic<PlayersLogic>();
                 builder.AddLogic<GuisLogic>();
-                builder.AddLogic<ModulesLogic>();
                 builder.AddLogic<StartupLogic>();
                 builder.AddLogic<ChatLogic>();
                 builder.ConfigureServer(realmConfigurationProvider);
@@ -64,12 +63,8 @@ internal sealed class RPGServer : IRPGServer
             new RangedCollectionBasedElementIdGenerator(x.GetRequiredService<IElementCollection>(), IdGeneratorConstants.PlayerIdStart, IdGeneratorConstants.PlayerIdStop)
         );
 
-        if (_modules != null)
-            foreach (var module in _modules)
-            {
-                services.AddSingleton(module);
-                module.Configure(services);
-            }
+        services.AddDiscordModule();
+        services.AddWebAppModule();
     }
 
     public TService GetRequiredService<TService>() where TService: notnull

@@ -49,6 +49,16 @@ local function addNotification(message)
 	}
 end
 
+local function setHudState(hudData, newState)
+	for i,v in ipairs(hudData.elements)do
+		if(newState[v[2]])then
+			if(v[1] == "text")then
+				v[3] = newState[v[2]]
+			end
+		end
+	end
+end
+
 addEvent("setHudVisible", true)
 addEventHandler("setHudVisible", localPlayer, function(hudId, enabled)
 	enabledHuds[hudId] = enabled;
@@ -57,7 +67,11 @@ end)
 addEvent("setHudPosition", true)
 addEventHandler("setHudPosition", localPlayer, function(hudId, x, y)
 	huds[hudId].position = {x, y};
-	iprint("huds[hudId].position",huds[hudId].position)
+end)
+
+addEvent("setHudState", true)
+addEventHandler("setHudState", localPlayer, function(hudId, newHudState)
+	setHudState(huds[hudId], newHudState)
 end)
 
 addEvent("createHud", true)

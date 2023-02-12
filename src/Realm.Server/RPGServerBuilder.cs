@@ -2,10 +2,9 @@
 
 public class RPGServerBuilder
 {
-    private readonly List<IModule> _modules = new();
     private Serilog.ILogger? _logger;
     private IConsole? _console;
-    private RealmConfigurationProvider? _realmConfigurationProvider;
+    private IRealmConfigurationProvider? _realmConfigurationProvider;
 
     public RPGServerBuilder AddLogger(Serilog.ILogger logger)
     {
@@ -19,15 +18,9 @@ public class RPGServerBuilder
         return this;
     }
 
-    public RPGServerBuilder AddConfiguration(RealmConfigurationProvider realmConfigurationProvider)
+    public RPGServerBuilder AddConfiguration(IRealmConfigurationProvider realmConfigurationProvider)
     {
         _realmConfigurationProvider = realmConfigurationProvider;
-        return this;
-    }
-
-    public RPGServerBuilder AddModule<TModule>() where TModule : IModule, new()
-    {
-        _modules.Add(new TModule());
         return this;
     }
 
@@ -40,7 +33,7 @@ public class RPGServerBuilder
         if (_realmConfigurationProvider == null)
             throw new Exception("RealmConfigurationProvider not configured.");
 
-        return new RPGServer(_realmConfigurationProvider, _modules, serverBuilder =>
+        return new RPGServer(_realmConfigurationProvider, serverBuilder =>
         {
             extraBuilderSteps?.Invoke(serverBuilder);
 

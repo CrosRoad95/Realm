@@ -2,7 +2,13 @@
 
 internal class StartupLogic
 {
-    public StartupLogic(MtaServer mtaServer, RealmConfigurationProvider realmConfigurationProvider)
+    public class ServerListConfiguration
+    {
+        public string GameType { get; set; } = "New-Realm";
+        public string MapName { get; set; } = "N/A";
+    }
+
+    public StartupLogic(MtaServer mtaServer, IRealmConfigurationProvider realmConfigurationProvider)
     {
         var serverListConfiguration = realmConfigurationProvider.GetRequired<ServerListConfiguration>("ServerList");
         mtaServer.GameType = serverListConfiguration.GameType;

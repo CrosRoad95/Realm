@@ -2,9 +2,12 @@
 
 namespace Realm.Tests;
 
-internal class TestConfigurationProvider : RealmConfigurationProvider
+internal class TestConfigurationProvider : IRealmConfigurationProvider
 {
-    public TestConfigurationProvider() : base(new ConfigurationBuilder()
+    private readonly IConfiguration _configuration;
+    public TestConfigurationProvider()
+    {
+        _configuration = new ConfigurationBuilder()
             .AddInMemoryCollection(new Dictionary<string, string>
             {
                 ["server:isVoiceEnabled"] = "true",
@@ -22,7 +25,10 @@ internal class TestConfigurationProvider : RealmConfigurationProvider
                 ["Gameplay:MoneyLimit"] = "10000",
                 ["Gameplay:MoneyPrecision"] = "4",
                 ["Database:Provider"] = "InMemory",
-            }).Build())
-    {
+            }).Build();
     }
+
+    public T? Get<T>(string name) => _configuration.GetSection(name).Get<T>();
+    public T GetRequired<T>(string name) => _configuration.GetSection(name).Get<T>() ??
+        throw new Exception($"Missing configuration '{name}'");
 }

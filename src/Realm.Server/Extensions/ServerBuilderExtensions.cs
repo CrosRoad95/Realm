@@ -6,7 +6,7 @@ namespace Realm.Server.Extensions;
 
 public static class ServerBuilderExtensions
 {
-    public static ServerBuilder ConfigureServer(this ServerBuilder builder, RealmConfigurationProvider realmConfigurationProvider)
+    public static ServerBuilder ConfigureServer(this ServerBuilder builder, IRealmConfigurationProvider realmConfigurationProvider)
     {
         var _serverConfiguration = realmConfigurationProvider.GetRequired<SlipeServer.Server.Configuration>("Server");
         builder.UseConfiguration(_serverConfiguration);

@@ -517,6 +517,33 @@ public sealed class PlayerElementComponent : ElementComponent
         }
     }
 
+    public IHud<TState> CreateHud<TState>(string hudId, Action<IHudBuilder<TState>> hudBuilderCallback, TState defaultState, Vector2? offset = null)
+         where TState : class
+    {
+        lock (_hudsLock)
+        {
+            if(_huds.ContainsKey(hudId))
+                throw new Exception("Hud name already in use");
+
+            List<(int, PropertyInfo)> dynamicHudComponents = new();
+
+            var HandleDynamicHudComponentAdded = (int id, PropertyInfo propertyInfo) =>
+            {
+                dynamicHudComponents.Add((id, propertyInfo));
+            };
+
+            OverlayService.CreateHud(_player, hudId, e =>
+            {
+                e.DynamicHudComponentAdded += HandleDynamicHudComponentAdded;
+                hudBuilderCallback(e);
+                e.DynamicHudComponentAdded -= HandleDynamicHudComponentAdded;
+            }, _screenSize, offset, defaultState);
+            var hudController = new Hud<TState>(hudId, _player, OverlayService, offset, defaultState, dynamicHudComponents);
+            _huds[hudId] = hudController;
+            return hudController;
+        }
+    }
+
     public IHud<THud> GetHud<THud>(string hudId)
     {
         return (IHud<THud>)_huds[hudId];

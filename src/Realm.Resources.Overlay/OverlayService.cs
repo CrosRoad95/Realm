@@ -24,6 +24,7 @@ public class OverlayService
     internal Action<Player, string>? HudRemoved;
     internal Action<Player, string, bool>? HudVisibilityChanged;
     internal Action<Player, string, float, float>? HudPositionChanged;
+    internal Action<Player, string, Dictionary<int, object>>? HudStateChanged;
     private readonly AssetsService _assetsService;
 
     public OverlayService(AssetsService assetsService)
@@ -44,6 +45,11 @@ public class OverlayService
     public void SetHudPosition(Player player, string hudId, Vector2 position)
     {
         HudPositionChanged?.Invoke(player, hudId, position.X, position.Y);
+    }
+    
+    public void SetHudState(Player player, string hudId, Dictionary<int, object> state)
+    {
+        HudStateChanged?.Invoke(player, hudId, state);
     }
     
     public void CreateHud(Player player, string hudId, Action<IHudBuilder<object>> hudBuilderCallback, Vector2 screenSize, Vector2 ? position = null)

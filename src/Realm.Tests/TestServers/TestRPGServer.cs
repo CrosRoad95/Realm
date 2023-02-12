@@ -7,6 +7,7 @@ using SlipeServer.Server.Elements;
 using Realm.Interfaces.Providers;
 using Realm.Server.Providers;
 using Realm.Domain;
+using Realm.Module.WebApp;
 
 namespace Realm.Tests.TestServers;
 
@@ -20,11 +21,6 @@ internal class TestRPGServer : IRPGServer
 
     public TestRPGServer()
     {
-        var modules = new IModule[]
-        {
-            new DiscordModule(),
-        };
-
         var configuration = new TestConfigurationProvider();
         TestServer = MtaServer.CreateWithDiSupport<RealmTestingPlayer>(builder =>
         {
@@ -35,12 +31,8 @@ internal class TestRPGServer : IRPGServer
                 services.AddSingleton((IServerFilesProvider)NullServerFilesProvider.Instance);
                 services.AddSingleton(new RealmLogger().GetLogger());
 
-                if (modules != null)
-                    foreach (var module in modules)
-                    {
-                        services.AddSingleton(module);
-                        module.Configure(services);
-                    }
+                services.AddDiscordModule();
+                services.AddWebAppModule();
             });
             builder.ConfigureServer(configuration);
         });
@@ -49,11 +41,6 @@ internal class TestRPGServer : IRPGServer
     public TService GetRequiredService<TService>() where TService : notnull
     {
         return TestServer.GetRequiredService<TService>();
-    }
-
-    public void AssociateElement(Element element)
-    {
-        //throw new NotImplementedException();
     }
 
     public Entity CreateEntity(string name)

@@ -469,6 +469,40 @@ internal sealed class CommandsLogic
             testhud.Position = new Vector2(0, hudPosition++ * 10);
             return Task.CompletedTask;
         });
+
+        _commandService.AddCommandHandler("createstatefulhud", (entity, args) =>
+        {
+            var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();
+            var hud = playerElementComponent.CreateHud("teststatefulhud", x => x
+                .AddRectangle(new Vector2(x.Right - 400, 600), new Size(400, 20), Color.DarkBlue)
+                .AddText(x => x.Text1, new Vector2(x.Right - 200, 600), new Size(200, 20), font: "default", alignX: "center", alignY: "center")
+                .AddText("custom font", new Vector2(x.Right - 400, 600), new Size(200, 20), font: _assetsRegistry.GetAsset<IFont>("Better Together.otf"), alignX: "center", alignY: "center"),
+                new SampleHudState
+                {
+                    Text1 = "text1",
+                    Text2 = "text2",
+                });
+            hud.SetVisible(true);
+            return Task.CompletedTask;
+        });
+
+        _commandService.AddCommandHandler("updatestate", (entity, args) =>
+        {
+            var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();
+            var testhud = playerElementComponent.GetHud<SampleHudState>("teststatefulhud");
+            testhud.UpdateState(x =>
+            {
+                x.Text1 = Guid.NewGuid().ToString()[..8];
+            });
+            return Task.CompletedTask;
+        });
+
     }
+    class SampleHudState
+    {
+        public string Text1 { get; set; }
+        public string Text2 { get; set; }
+    }
+
     static int hudPosition = 0;
 }

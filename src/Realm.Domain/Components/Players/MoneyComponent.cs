@@ -4,7 +4,7 @@
 public class MoneyComponent : Component
 {
     [Inject]
-    private RealmConfigurationProvider RealmConfigurationProvider { get; set; } = default!;
+    private IRealmConfigurationProvider RealmConfigurationProvider { get; set; } = default!;
 
     private decimal _money = 0;
     private readonly ReaderWriterLockSlim _moneyLock = new();

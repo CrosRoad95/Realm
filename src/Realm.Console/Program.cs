@@ -7,8 +7,7 @@ using Realm.Resources.Assets.Interfaces;
 Directory.SetCurrentDirectory(Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly()!.Location)!);
 
 var builder = new RPGServerBuilder();
-builder.AddDefaultModules()
-    .AddDefaultLogger()
+builder.AddDefaultLogger()
     .AddDefaultConsole()
     .AddDefaultConfiguration();
 

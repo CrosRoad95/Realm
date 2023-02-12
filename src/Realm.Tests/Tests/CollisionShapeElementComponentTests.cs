@@ -17,7 +17,7 @@ public class CollisionShapeElementComponentTests
     public CollisionShapeElementComponentTests()
     {
         var services = new ServiceCollection();
-        services.AddSingleton<RealmConfigurationProvider>(new TestConfigurationProvider());
+        services.AddSingleton<IRealmConfigurationProvider>(new TestConfigurationProvider());
         services.AddSingleton<ECS>();
         services.AddSingleton<ClientInterfaceService>();
         services.AddSingleton<IEntityByElement>(x => x.GetRequiredService<ECS>());

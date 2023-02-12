@@ -8,5 +8,5 @@ public interface IHud : IDisposable
 
 public interface IHud<TState> : IHud
 {
-
+    void UpdateState(Action<TState> callback);
 }

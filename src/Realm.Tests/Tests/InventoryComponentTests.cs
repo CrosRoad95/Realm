@@ -45,7 +45,7 @@ public class InventoryComponentTests
         });
 
         var services = new ServiceCollection();
-        services.AddSingleton<RealmConfigurationProvider>(new TestConfigurationProvider());
+        services.AddSingleton<IRealmConfigurationProvider>(new TestConfigurationProvider());
         _entity = new(services.BuildServiceProvider(), "test", Entity.EntityTag.Unknown);
         _inventoryComponent = new(100);
         _entity.AddComponent(_inventoryComponent);

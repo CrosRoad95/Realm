@@ -16,7 +16,7 @@ public class MoneyComponentTests
     public MoneyComponentTests()
     {
         var services = new ServiceCollection();
-        services.AddSingleton<RealmConfigurationProvider>(new TestConfigurationProvider());
+        services.AddSingleton<IRealmConfigurationProvider>(new TestConfigurationProvider());
         var serviceProvider = services.BuildServiceProvider();
         _entity = new(serviceProvider, "test", Entity.EntityTag.Unknown);
         _entityB = new(serviceProvider, "test2", Entity.EntityTag.Unknown);

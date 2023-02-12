@@ -24,13 +24,6 @@ public static class RPGServerBuilderExtensions
         return serverBuilder;
     }
 
-    public static RPGServerBuilder AddDefaultModules(this RPGServerBuilder serverBuilder)
-    {
-        serverBuilder.AddModule<DiscordModule>();
-        serverBuilder.AddModule<GrpcModule>();
-        return serverBuilder;
-    }
-
     public static RPGServerBuilder AddDefaultConfiguration(this RPGServerBuilder serverBuilder)
     {
         var configurationProvider = new RealmConfigurationProvider();
