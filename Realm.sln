@@ -60,7 +60,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Realm.Resources.Assets", "s
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Realm.Module.Grpc", "src\Realm.GRpc\Realm.Module.Grpc.csproj", "{F4A7AEA2-542D-4C5E-9FF1-A6862D9C2154}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Realm.Module.GRPC.Proto", "src\Realm.Grpc.Proto\Realm.Module.GRPC.Proto.csproj", "{C4F530B4-1378-4E0A-BB47-044455AA8B99}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Realm.Module.Grpc.Proto", "src\Realm.Grpc.Proto\Realm.Module.Grpc.Proto.csproj", "{C4F530B4-1378-4E0A-BB47-044455AA8B99}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Services", "Services", "{1B4D0935-5736-4E56-B65E-0CACF26B17DD}"
 EndProject

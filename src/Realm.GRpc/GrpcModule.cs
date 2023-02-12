@@ -1,4 +1,6 @@
-﻿using Realm.Module.Grpc.Services;
+﻿using Grpc.Core.Logging;
+using Microsoft.Extensions.Logging;
+using Realm.Module.Grpc.Services;
 using Realm.Module.Grpc.Stubs;
 using Realm.Module.Grpc.Stubs.Discord;
 
@@ -7,7 +9,7 @@ namespace Realm.Module.Grpc;
 public class GrpcModule : IModule
 {
     private Server? _grpcServer;
-
+    private ILogger<GrpcModule> _logger;
     public GrpcModule()
     {
     }
@@ -24,6 +26,7 @@ public class GrpcModule : IModule
 
     public void Init(IServiceProvider serviceProvider)
     {
+        _logger = serviceProvider.GetRequiredService<ILogger<GrpcModule>>();
         _grpcServer = new Server
         {
             Services =
@@ -37,10 +40,6 @@ public class GrpcModule : IModule
                 new ServerPort("localhost", 22010, ServerCredentials.Insecure)
             },
         };
-    }
-
-    public void PostInit(IServiceProvider serviceProvider)
-    {
         Start();
     }
 
@@ -53,7 +52,10 @@ public class GrpcModule : IModule
     private void Start()
     {
         if (_grpcServer != null)
+        {
             _grpcServer.Start();
+            _logger.LogInformation("Started grpc server.");
+        }
     }
 
     private void Shutdown()

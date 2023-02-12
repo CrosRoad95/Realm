@@ -7,9 +7,6 @@ public class DiscordModule : IModule
     public void Configure(IServiceCollection services)
     {
         services.AddSingleton<DiscordIntegration>();
-
-        services.AddSingleton<DiscordVerificationHandler>();
-        services.AddSingleton<DiscordUserChangedHandler>();
     }
 
     public void Init(IServiceProvider serviceProvider)

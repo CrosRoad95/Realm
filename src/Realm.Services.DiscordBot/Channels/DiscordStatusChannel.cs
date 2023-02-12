@@ -66,14 +66,14 @@ internal class DiscordStatusChannel
         {
             newContent = $"Stan serwera na dzień {timestamp}: Serwer nie odpowiada, prawdopodobnie jest wyłączony lub wystąpił inny nieznany błąd";
             if (_lastReceivedUpdate != null)
-                newContent = newContent + $"\nOstatnio serwer był online dnia: {_lastReceivedUpdate}";
+                newContent += $"\nOstatnio serwer był online dnia: {_lastReceivedUpdate}";
         }
         catch(Exception ex)
         {
             newContent = $"Stan serwera na dzień {timestamp}: Wystąpił nieznany błąd podczas pobierania statusu serwera.";
             _logger.Error(ex, "Failed to update status channel.");
             if (_lastReceivedUpdate != null)
-                newContent = newContent + $"\nOstatnio serwer był online dnia: {_lastReceivedUpdate}";
+                newContent += $"\nOstatnio serwer był online dnia: {_lastReceivedUpdate}";
         }
         finally
         {

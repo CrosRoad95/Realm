@@ -2,7 +2,7 @@
 
 namespace Realm.Module.Grpc.Stubs.Discord;
 
-public sealed class DiscordStatusChannelServiceStub : StatusChannel.StatusChannelBase
+internal sealed class DiscordStatusChannelServiceStub : StatusChannel.StatusChannelBase
 {
     private readonly IGrpcDiscord _grpcDiscord;
 
