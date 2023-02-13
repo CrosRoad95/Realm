@@ -1,8 +1,7 @@
-﻿
-using Realm.Console.Discord.Handler;
-using Realm.Console.Services;
+﻿using Realm.Console.Services;
 using Realm.Module.Discord.Interfaces;
 using Realm.Resources.Assets.Interfaces;
+using Realm.Server.Integrations.Discord.Handlers;
 
 Directory.SetCurrentDirectory(Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly()!.Location)!);
 
@@ -34,7 +33,8 @@ var server = builder.Build(null, extraBuilderSteps: serverBuilder =>
         x.AddTransient<IServerAssetsProvider, ServerAssetsService>();
 
         #region Discord integration specific
-        x.AddSingleton<IDiscordStatusChannelUpdateHandler, DiscordStatusChannelUpdateHandler>();
+        x.AddSingleton<IDiscordStatusChannelUpdateHandler, DefaultDiscordStatusChannelUpdateHandler>();
+        x.AddSingleton<IDiscordConnectAccountHandler, DefaultDiscordConnectAccountHandler>();
         #endregion
     });
 });

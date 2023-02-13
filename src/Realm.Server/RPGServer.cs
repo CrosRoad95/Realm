@@ -56,9 +56,6 @@ internal sealed class RPGServer : IRPGServer
         services.AddTransient<IGroupService, GroupService>();
         services.AddTransient<IFractionService, FractionService>();
 
-        // Player specific
-        services.AddTransient<DiscordUser>();
-
         services.AddTransient<IEntityFactory, EntityFactory>();
 
         services.AddSingleton<IElementIdGenerator, RangedCollectionBasedElementIdGenerator>(x =>

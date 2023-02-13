@@ -1,6 +1,4 @@
-﻿using Realm.Module.Grpc.Services;
-
-namespace Realm.Module.Grpc;
+﻿namespace Realm.Module.Grpc;
 
 public static class ServiceCollectionExtensions
 {
@@ -9,7 +7,7 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<GreeterServiceStub>();
         services.AddSingleton<DiscordHandshakeServiceStub>();
         services.AddSingleton<DiscordStatusChannelServiceStub>();
-        services.AddSingleton<IGrpcDiscord, DiscordService>();
+        services.AddSingleton<DiscordConnectAccountChannelStub>();
         services.AddSingleton<IModule, GrpcModule>();
         return services;
     }

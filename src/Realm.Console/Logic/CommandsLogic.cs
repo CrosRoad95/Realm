@@ -496,6 +496,17 @@ internal sealed class CommandsLogic
             return Task.CompletedTask;
         });
 
+        _commandService.AddCommandHandler("discord", (entity, args) =>
+        {
+            entity.TryDestroyComponent<PendingDiscordIntegrationComponent>();
+            var pendingDiscordIntegrationComponent = new PendingDiscordIntegrationComponent();
+            var code = pendingDiscordIntegrationComponent.GenerateAndGetDiscordConnectionCode();
+            entity.AddComponent(pendingDiscordIntegrationComponent);
+            var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();
+            playerElementComponent.SendChatMessage($"Aby połączyć konto wpisz na kanale discord #polacz-konto komendę: /polaczkonto {code}");
+            return Task.CompletedTask;
+        });
+
     }
     class SampleHudState
     {

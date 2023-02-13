@@ -2,5 +2,5 @@
 
 public interface IDiscordStatusChannelUpdateHandler
 {
-    Task<string> HandleStatusUpdate();
+    Task<string> HandleStatusUpdate(CancellationToken cancellationToken);
 }

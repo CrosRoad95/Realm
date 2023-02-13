@@ -1,28 +1,42 @@
 ﻿using Discord;
+using Realm.Module.Discord.Interfaces;
 
 namespace Realm.Module.Grpc.Stubs.Discord;
 
 internal sealed class DiscordStatusChannelServiceStub : StatusChannel.StatusChannelBase
 {
-    private readonly IGrpcDiscord _grpcDiscord;
+    private readonly IDiscordService _discordService;
+    private readonly ILogger<DiscordStatusChannelServiceStub> _logger;
 
-    public DiscordStatusChannelServiceStub(IGrpcDiscord grpcDiscord)
+    public DiscordStatusChannelServiceStub(IDiscordService grpcDiscord, ILogger<DiscordStatusChannelServiceStub> logger)
     {
-        _grpcDiscord = grpcDiscord;
+        _discordService = grpcDiscord;
+        _logger = logger;
     }
 
     public override async Task<ContentResponse> Update(ContentRequest request, ServerCallContext context)
     {
-        if (_grpcDiscord.UpdateStatusChannel == null)
+        if (_discordService.UpdateStatusChannel == null)
             return new ContentResponse
             {
-                Message = "Status serwera nie mógł zostać określony ponieważ moduł 'discord' nie jest dołączony do serwera."
+                Message = "Discord module not configured properly."
             };
 
-        var newStatus = await _grpcDiscord.UpdateStatusChannel();
-        return new ContentResponse
+        try
         {
-            Message = newStatus
-        };
+            var newStatus = await _discordService.UpdateStatusChannel(context.CancellationToken);
+            return new ContentResponse
+            {
+                Message = newStatus
+            };
+        }
+        catch(Exception ex)
+        {
+            _logger.LogError(ex, "Error while updating server status.");
+            return new ContentResponse
+            {
+                Message = "Error while updating server status."
+            };
+        }
     }
 }

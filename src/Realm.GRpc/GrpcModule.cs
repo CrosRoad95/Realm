@@ -1,11 +1,15 @@
-﻿namespace Realm.Module.Grpc;
+﻿using Discord;
+
+namespace Realm.Module.Grpc;
 
 internal sealed class GrpcModule : IModule
 {
-    private Server? _grpcServer;
-    private ILogger<GrpcModule> _logger;
+    private readonly Server? _grpcServer;
+    private readonly ILogger<GrpcModule> _logger;
+
     public GrpcModule(ILogger<GrpcModule> logger, GreeterServiceStub greeterServiceStub,
         DiscordHandshakeServiceStub discordHandshakeServiceStub, DiscordStatusChannelServiceStub discordStatusChannelServiceStub,
+        DiscordConnectAccountChannelStub discordConnectAccountChannelStub,
         IRealmConfigurationProvider realmConfigurationProvider)
     {
         _logger = logger;
@@ -14,9 +18,10 @@ internal sealed class GrpcModule : IModule
         {
             Services =
             {
-                Greet.Greeter.BindService(greeterServiceStub),
-                Discord.Handshake.BindService(discordHandshakeServiceStub),
-                Discord.StatusChannel.BindService(discordStatusChannelServiceStub),
+                Greeter.BindService(greeterServiceStub),
+                Handshake.BindService(discordHandshakeServiceStub),
+                StatusChannel.BindService(discordStatusChannelServiceStub),
+                ConnectAccountChannel.BindService(discordConnectAccountChannelStub),
             },
             Ports =
             {

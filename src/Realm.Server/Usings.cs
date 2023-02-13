@@ -46,7 +46,6 @@ global using Realm.Domain;
 global using Realm.Domain.Components.Common;
 global using Realm.Domain.Components.Elements;
 global using Realm.Domain.Components.Players;
-global using Realm.Domain.Persistance;
 global using Realm.Domain.Components.Vehicles;
 global using Realm.Persistance.Data;
 global using Realm.Persistance.Extensions;

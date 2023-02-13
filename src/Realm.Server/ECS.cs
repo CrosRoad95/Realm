@@ -20,7 +20,7 @@ public sealed class ECS : IEntityByElement
         _serviceProvider = serviceProvider;
     }
 
-    public IEnumerable<Entity> GetPlayerEntities() => _entityByPlayer.Values;
+    public IReadOnlyList<Entity> GetPlayerEntities() => new List<Entity>(_entityByPlayer.Values);
 
     public Entity GetEntityByPlayer(Player player)
     {

@@ -10,6 +10,10 @@ service StatusChannel {
   rpc Update (ContentRequest) returns (ContentResponse);
 }
 
+service ConnectAccountChannel {
+  rpc TryConnect (SendConnectionCodeRequest) returns (SendConnectionCodeResponse);
+}
+
 message HandshakeRequest {
   string message = 1;
 }
@@ -24,4 +28,14 @@ message ContentRequest {
 
 message ContentResponse {
   string message = 1;
+}
+
+message SendConnectionCodeRequest {
+  string code = 1;
+  uint64 userId = 2;
+}
+
+message SendConnectionCodeResponse {
+  bool success = 1;
+  string message = 2;
 }

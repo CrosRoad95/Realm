@@ -4,24 +4,23 @@ using Realm.Logging;
 using Serilog.Events;
 using Grpc.Net.Client;
 
-var servicesCollection = new ServiceCollection();
+var services = new ServiceCollection();
 var realmLogger = new RealmLogger(LogEventLevel.Verbose)
     .AddSeq();
 
-servicesCollection.AddSingleton(realmLogger.GetLogger());
-servicesCollection.AddRealmConfiguration();
-servicesCollection.AddSingleton(x => x.GetRequiredService<IRealmConfigurationProvider>().GetRequired<DiscordBotConfiguration>("Discord"));
-servicesCollection.AddSingleton<DiscordClient>();
-servicesCollection.AddSingleton(new DiscordSocketClient(new DiscordSocketConfig { GatewayIntents = GatewayIntents.AllUnprivileged | GatewayIntents.GuildMembers }));
-servicesCollection.AddSingleton<CommandHandler>();
-servicesCollection.AddSingleton<BotIdProvider>();
-servicesCollection.AddSingleton(GrpcChannel.ForAddress("http://localhost:22010"));
+services.AddLogging(x => x.AddSerilog(realmLogger.GetLogger(), dispose: true));
+services.AddRealmConfiguration();
+services.AddSingleton(x => x.GetRequiredService<IRealmConfigurationProvider>().GetRequired<DiscordBotConfiguration>("Discord"));
+services.AddSingleton<DiscordClient>();
+services.AddSingleton(new DiscordSocketClient(new DiscordSocketConfig { GatewayIntents = GatewayIntents.AllUnprivileged | GatewayIntents.GuildMembers }));
+services.AddSingleton<CommandHandler>();
+services.AddSingleton<BotIdProvider>();
+services.AddSingleton(GrpcChannel.ForAddress("http://localhost:22010"));
 
 // Channels:
-servicesCollection.AddSingleton<DiscordStatusChannel>();
-servicesCollection.AddSingleton<DiscordServerConnectionChannel>();
+services.AddSingleton<DiscordStatusChannel>();
 
-var serviceProvider = servicesCollection.BuildServiceProvider();
+var serviceProvider = services.BuildServiceProvider();
 
 var discordIntegration = serviceProvider.GetRequiredService<DiscordClient>();
 await discordIntegration.StartAsync();

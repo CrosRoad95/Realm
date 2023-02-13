@@ -92,6 +92,13 @@ internal class PlayersLogic
                 var player = playerElementComponent.Player;
             }
         }
+        if (component is DiscordIntegrationComponent discordIntegration)
+        {
+            if (entity.TryGetComponent(out PlayerElementComponent playerElementComponent))
+            {
+                playerElementComponent.SendChatMessage("Dziękujemy za połączenie konta :)");
+            }
+        }
         if (component is AccountComponent accountComponent)
         {
             if (entity.TryGetComponent(out PlayerElementComponent playerElementComponent))

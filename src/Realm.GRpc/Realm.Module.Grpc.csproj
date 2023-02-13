@@ -19,6 +19,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Realm.Configuration\Realm.Configuration.csproj" />
+    <ProjectReference Include="..\Realm.Discord\Realm.Module.Discord.csproj" />
     <ProjectReference Include="..\Realm.Interfaces\Realm.Interfaces.csproj" />
   </ItemGroup>
 

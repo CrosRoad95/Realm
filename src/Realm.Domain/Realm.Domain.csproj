@@ -19,5 +19,9 @@
 		<PackageReference Include="SlipeServer.Resources.NoClip" Version="0.1.0-CI-20230130-155823" />
 		<PackageReference Include="SlipeServer.Resources.Text3d" Version="0.1.0-CI-20230130-155823" />
 	</ItemGroup>
+
+	<ItemGroup>
+	  <Folder Include="Persistance\" />
+	</ItemGroup>
 	
 </Project>

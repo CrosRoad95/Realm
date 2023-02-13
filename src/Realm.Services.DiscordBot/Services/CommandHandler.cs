@@ -1,4 +1,6 @@
-﻿namespace Realm.DiscordBot.Services;
+﻿using Realm.DiscordBot.Commands;
+
+namespace Realm.DiscordBot.Services;
 
 internal class CommandHandler
 {
@@ -18,7 +20,8 @@ internal class CommandHandler
     public async Task InitializeAsync()
     {
         // add the public modules that inherit InteractionModuleBase<T> to the InteractionService
-        await _interactionService.AddModulesAsync(Assembly.GetExecutingAssembly(), _services);
+        //await _interactionService.AddModulesAsync(Assembly.GetExecutingAssembly(), _services);
+        await _interactionService.AddModuleAsync<ConnectAccountToServerCommand>(_services);
         await _interactionService.RegisterCommandsToGuildAsync(_discordConfiguration.Guild);
 
         // process the InteractionCreated payloads to execute Interactions commands

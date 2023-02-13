@@ -11,5 +11,6 @@ global using Discord.WebSocket;
 global using Discord.Interactions;
 
 global using Realm.DiscordBot.Channels;
-global using Realm.DiscordBot.Classes;
 global using Realm.DiscordBot.Services;
+global using Microsoft.Extensions.Logging;
+global using ILogger = Microsoft.Extensions.Logging.ILogger;
