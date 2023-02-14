@@ -36,7 +36,7 @@
     <ProjectReference Include="..\Realm.Resources.Overlay\Realm.Resources.Overlay.csproj" />
     <ProjectReference Include="..\Realm.Resources.StatisticsCounter\Realm.Resources.StatisticsCounter.csproj" />
     <ProjectReference Include="..\RealmResources.ElementOutline\Realm.Resources.ElementOutline.csproj" />
-	<ProjectReference Include="..\Realm.GRpc\Realm.Module.Grpc.csproj" />
+	<ProjectReference Include="..\Realm.Module.Grpc\Realm.Module.Grpc.csproj" />
 	<ProjectReference Include="..\Realm.Logging\Realm.Logging.csproj" />
   </ItemGroup>
 </Project>
