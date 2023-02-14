@@ -82,10 +82,14 @@
 			"Password": "asdASD123!@#",
 			"Claims": {
 				"webPanel": "*",
-				"admin": true,
-				"discord.user.id": 254302438234783746
+				"admin": true
 			},
-			"Roles": [ "admin" ]
+			"Roles": [ "admin" ],
+			"Integrations": {
+				"Discord": {
+					"UserId": 254302438234783746
+				}
+			}
 		}
 	},
 	"Upgrades": {

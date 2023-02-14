@@ -43,11 +43,22 @@ internal class SeedData
         public Dictionary<string, FractionMemberSeedData> Members { get; set; }
     }
 
+    public class DiscordIntegrationSeedData
+    {
+        public ulong UserId { get; set; }
+    }
+
+    public class IntegrationsSeedData
+    {
+        public DiscordIntegrationSeedData? Discord { get; set; }
+    }
+
     public class AccountSeedData
     {
         public string Password { get; set; }
         public Dictionary<string, string> Claims { get; set; }
         public List<string> Roles { get; set; }
+        public IntegrationsSeedData? Integrations { get; set; }
     }
 
     public class VehicleUpgradeDescriptionSeedData

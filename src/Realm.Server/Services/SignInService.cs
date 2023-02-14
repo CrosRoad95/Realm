@@ -109,6 +109,7 @@ internal class SignInService : ISignInService
             entity.TryDestroyComponent<DailyVisitsCounterComponent>();
             entity.TryDestroyComponent<StatisticsCounterComponent>();
             entity.TryDestroyComponent<DiscoveriesComponent>();
+            entity.TryDestroyComponent<DiscordIntegrationComponent>();
             _logger.LogError(ex, "Failed to sign in user of id {userId}", user.Id);
             throw;
         }

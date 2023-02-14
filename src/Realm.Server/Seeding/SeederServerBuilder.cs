@@ -184,6 +184,17 @@ internal sealed class SeederServerBuilder
             await _userManager.AddClaimsAsync(user, claims);
             await _userManager.AddToRolesAsync(user, pair.Value.Roles);
 
+            var integrations = pair.Value.Integrations;
+            if(integrations != null)
+            {
+                if(integrations.Discord != null)
+                {
+                    var discordUserId = integrations.Discord.UserId;
+                    user.DiscordIntegration = new DiscordIntegration { DiscordUserId = discordUserId };
+                    _logger.LogInformation("Seeder: Added discord integration with discord user id {discordUserId} for user {userName}", discordUserId, pair.Key);
+                }
+                await _userManager.UpdateAsync(user);
+            }
             _createdAccounts.Add(pair.Key, user);
         }
     }
