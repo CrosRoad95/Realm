@@ -255,6 +255,15 @@ internal class SaveService : ISaveService
             user.Level = 0;
             user.Experience = 0;
         }
+
+        if(entity.TryGetComponent(out DiscordIntegrationComponent discordIntegrationComponent))
+        {
+
+        }
+        else
+        {
+
+        }
     }
 
     public async Task<bool> Save(Entity entity)

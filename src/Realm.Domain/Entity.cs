@@ -141,6 +141,11 @@ public class Entity : IDisposable
         return component;
     }
     
+    public Task<TComponent> AddComponentAsync<TComponent>() where TComponent : Component, new()
+    {
+        return AddComponentAsync(new TComponent());
+    }
+
     public async Task<TComponent> AddComponentAsync<TComponent>(TComponent component) where TComponent : Component
     {
         ThrowIfDisposed();

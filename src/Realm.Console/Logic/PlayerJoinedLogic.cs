@@ -30,7 +30,7 @@ internal sealed class PlayerJoinedLogic
         var adminComponent = entity.AddComponent<AdminComponent>();
         adminComponent.DebugView = true;
         adminComponent.DevelopmentMode = true;
-        entity.AddComponent(new LoginGuiComponent());
+        entity.AddComponent<LoginGuiComponent>();
 
         entity.ComponentAdded += HandleComponentAdded;
         entity.Destroyed += HandleDestroyed;

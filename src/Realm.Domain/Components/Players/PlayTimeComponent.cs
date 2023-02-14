@@ -4,6 +4,7 @@
 public class PlayTimeComponent : Component
 {
     private DateTime? _startDateTime;
+    private readonly ulong _currentPlayTime = 0;
 
     public ulong PlayTime
     {
@@ -15,21 +16,16 @@ public class PlayTimeComponent : Component
         }
     }
 
-    public ulong TotalPlayTime
-    {
-        get
-        {
-            ulong totalPlayTime = PlayTime;
-            if(Entity.TryGetComponent(out AccountComponent accountComponent))
-            {
-                totalPlayTime += accountComponent.User.PlayTime;
-            }
-            return totalPlayTime;
-        }
-    }
+    public ulong TotalPlayTime => PlayTime + _currentPlayTime;
 
     public PlayTimeComponent()
     {
+        _startDateTime = DateTime.Now;
+    }
+
+    public PlayTimeComponent(ulong currentPlayTime)
+    {
+        _currentPlayTime = currentPlayTime;
         _startDateTime = DateTime.Now;
     }
 

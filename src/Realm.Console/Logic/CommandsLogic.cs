@@ -158,10 +158,10 @@ internal sealed class CommandsLogic
         {
             using var vehicleRepository = _repositoryFactory.GetVehicleRepository();
             var vehicleEntity = _entityFactory.CreateVehicle(404, entity.Transform.Position + new Vector3(4, 0, 0), entity.Transform.Rotation);
-            vehicleEntity.AddComponent(new VehicleUpgradesComponent());
-            vehicleEntity.AddComponent(new MileageCounterComponent());
+            vehicleEntity.AddComponent<VehicleUpgradesComponent>();
+            vehicleEntity.AddComponent<MileageCounterComponent>();
             vehicleEntity.AddComponent(new VehicleFuelComponent("default", 20, 20, 0.01, 2)).Active = true;
-            vehicleEntity.AddComponent(new VehicleFocusableComponent());
+            vehicleEntity.AddComponent<VehicleFocusableComponent>();
             return Task.CompletedTask;
         });
         
@@ -169,8 +169,8 @@ internal sealed class CommandsLogic
         {
             using var vehicleRepository = _repositoryFactory.GetVehicleRepository();
             var vehicleEntity = _entityFactory.CreateVehicle(404, entity.Transform.Position + new Vector3(4, 0, 0), entity.Transform.Rotation);
-            vehicleEntity.AddComponent(new VehicleUpgradesComponent());
-            vehicleEntity.AddComponent(new MileageCounterComponent());
+            vehicleEntity.AddComponent<VehicleUpgradesComponent>();
+            vehicleEntity.AddComponent<MileageCounterComponent>();
             vehicleEntity.AddComponent(new VehicleFuelComponent("default", 20, 20, 0.01, 2)).Active = true;
             vehicleEntity.AddComponent(new VehicleExclusiveAccessComponent(vehicleEntity));
             return Task.CompletedTask;
@@ -180,10 +180,10 @@ internal sealed class CommandsLogic
         {
             using var vehicleRepository = _repositoryFactory.GetVehicleRepository();
             var vehicleEntity = _entityFactory.CreateVehicle(404, entity.Transform.Position + new Vector3(4, 0, 0), entity.Transform.Rotation);
-            vehicleEntity.AddComponent(new VehicleUpgradesComponent());
-            vehicleEntity.AddComponent(new MileageCounterComponent());
+            vehicleEntity.AddComponent<VehicleUpgradesComponent>();
+            vehicleEntity.AddComponent<MileageCounterComponent>();
             vehicleEntity.AddComponent(new VehicleFuelComponent("default", 20, 20, 0.01, 2)).Active = true;
-            vehicleEntity.AddComponent(new VehicleNoAccessComponent());
+            vehicleEntity.AddComponent<VehicleNoAccessComponent>();
             return Task.CompletedTask;
         });
 
@@ -344,7 +344,7 @@ internal sealed class CommandsLogic
         _commandService.AddCommandHandler("spawnbox2", (entity, args) =>
         {
             var objectEntity = _entityFactory.CreateObject(SlipeServer.Server.Enums.ObjectModel.Gunbox, entity.Transform.Position + new Vector3(4, 0, -0.65f), Vector3.Zero);
-            objectEntity.AddComponent(new DurationBasedHoldInteractionComponent());
+            objectEntity.AddComponent<DurationBasedHoldInteractionComponent>();
             return Task.CompletedTask;
         });
 

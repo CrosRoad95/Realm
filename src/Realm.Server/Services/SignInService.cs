@@ -10,11 +10,13 @@ internal class SignInService : ISignInService
     private readonly HashSet<int> _usedAccountsIds = new();
     private readonly ItemsRegistry _itemsRegistry;
     private readonly ILogger<SignInService> _logger;
+    private readonly IRealmConfigurationProvider _realmConfigurationProvider;
 
-    public SignInService(ItemsRegistry itemsRegistry, ILogger<SignInService> logger)
+    public SignInService(ItemsRegistry itemsRegistry, ILogger<SignInService> logger, IRealmConfigurationProvider realmConfigurationProvider)
     {
         _itemsRegistry = itemsRegistry;
         _logger = logger;
+        _realmConfigurationProvider = realmConfigurationProvider;
     }
 
     public async Task<bool> SignIn(Entity entity, User user)
@@ -41,53 +43,53 @@ internal class SignInService : ISignInService
                             new Item(_itemsRegistry.Get(x.ItemId), x.Number, JsonConvert.DeserializeObject<Dictionary<string, object>>(x.MetaData))
                         )
                         .ToList();
-                    await entity.AddComponentAsync(new InventoryComponent(inventory.Size, inventory.Id, items));
+                    entity.AddComponent(new InventoryComponent(inventory.Size, inventory.Id, items));
                 }
             }
             else
-                await entity.AddComponentAsync(new InventoryComponent(20));
+                entity.AddComponent(new InventoryComponent(_realmConfigurationProvider.GetRequired<uint>("Gameplay:DefaultInventorySize")));
 
             if (user.DailyVisits != null)
-                await entity.AddComponentAsync(new DailyVisitsCounterComponent(user.DailyVisits));
+                entity.AddComponent(new DailyVisitsCounterComponent(user.DailyVisits));
             else
-                await entity.AddComponentAsync(new DailyVisitsCounterComponent());
+                entity.AddComponent<DailyVisitsCounterComponent>();
             
             if (user.Statistics != null)
-                await entity.AddComponentAsync(new StatisticsCounterComponent(user.Statistics));
+                entity.AddComponent(new StatisticsCounterComponent(user.Statistics));
             else
-                await entity.AddComponentAsync(new StatisticsCounterComponent());
+                entity.AddComponent<StatisticsCounterComponent>();
             
             if (user.Achievements != null)
-                await entity.AddComponentAsync(new AchievementsComponent(user.Achievements));
+                entity.AddComponent(new AchievementsComponent(user.Achievements));
             else
-                await entity.AddComponentAsync(new AchievementsComponent());
+                entity.AddComponent<AchievementsComponent>();
             
             if (user.JobUpgrades != null)
-                await entity.AddComponentAsync(new JobUpgradesComponent(user.JobUpgrades));
+                entity.AddComponent(new JobUpgradesComponent(user.JobUpgrades));
             else
-                await entity.AddComponentAsync(new JobUpgradesComponent());
+                entity.AddComponent<JobUpgradesComponent>();
             
             if (user.JobStatistics != null)
-                await entity.AddComponentAsync(new JobStatisticsComponent(user.JobStatistics));
+                entity.AddComponent(new JobStatisticsComponent(user.JobStatistics));
             else
-                await entity.AddComponentAsync(new JobStatisticsComponent());
+                entity.AddComponent<JobStatisticsComponent>();
             
             if (user.Discoveries != null)
-                await entity.AddComponentAsync(new DiscoveriesComponent(user.Discoveries));
+                entity.AddComponent(new DiscoveriesComponent(user.Discoveries));
             else
-                await entity.AddComponentAsync(new DiscoveriesComponent());
+                entity.AddComponent<DiscoveriesComponent>();
 
             foreach (var groupMemberData in user.GroupMembers)
-                await entity.AddComponentAsync(new GroupMemberComponent(groupMemberData));
+                entity.AddComponent(new GroupMemberComponent(groupMemberData));
             
             foreach (var fractionMemberData in user.FractionMembers)
-                await entity.AddComponentAsync(new FractionMemberComponent(fractionMemberData));
+                entity.AddComponent(new FractionMemberComponent(fractionMemberData));
 
             entity.AddComponent(new LicensesComponent(user.Licenses));
-            entity.AddComponent(new PlayTimeComponent());
+            entity.AddComponent(new PlayTimeComponent(user.PlayTime));
             entity.AddComponent(new LevelComponent(user.Level, user.Experience));
             entity.AddComponent(new MoneyComponent(user.Money));
-            entity.AddComponent(new AFKComponent());
+            entity.AddComponent<AFKComponent>();
         }
         catch (Exception ex)
         {

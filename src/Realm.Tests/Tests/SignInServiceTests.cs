@@ -22,7 +22,7 @@ public class SignInServiceTests
         _entityHelper = new(_realmTestingServer);
         _logger = new Mock<ILogger<SignInService>>();
 
-        _signInService = new SignInService(new TestItemsRegistry(), _logger.Object);
+        _signInService = new SignInService(new TestItemsRegistry(), _logger.Object, new TestConfigurationProvider());
     }
 
     //[Fact]

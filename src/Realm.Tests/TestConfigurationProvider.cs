@@ -24,6 +24,7 @@ internal class TestConfigurationProvider : IRealmConfigurationProvider
                 ["Identity:Policies:Admin:RequireClaims:Test"] = "true",
                 ["Gameplay:MoneyLimit"] = "10000",
                 ["Gameplay:MoneyPrecision"] = "4",
+                ["Gameplay:DefaultInventorySize"] = "20",
                 ["Database:Provider"] = "InMemory",
             }).Build();
     }
