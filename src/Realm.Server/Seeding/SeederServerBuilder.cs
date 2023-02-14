@@ -154,7 +154,11 @@ internal sealed class SeederServerBuilder
     {
         foreach (var pair in accounts)
         {
-            var user = await _userManager.FindByNameAsync(pair.Key);
+            var user = await _userManager.Users
+                .Include(x => x.DiscordIntegration)
+                .Where(x => x.UserName == pair.Key)
+                .FirstOrDefaultAsync();
+
             if (user == null)
             {
                 var identityResult = await _userManager.CreateAsync(new User
@@ -190,7 +194,10 @@ internal sealed class SeederServerBuilder
                 if(integrations.Discord != null)
                 {
                     var discordUserId = integrations.Discord.UserId;
-                    user.DiscordIntegration = new DiscordIntegration { DiscordUserId = discordUserId };
+                    if(user.DiscordIntegration != null)
+                        user.DiscordIntegration.DiscordUserId = discordUserId;
+                    else
+                        user.DiscordIntegration = new DiscordIntegration { DiscordUserId = discordUserId };
                     _logger.LogInformation("Seeder: Added discord integration with discord user id {discordUserId} for user {userName}", discordUserId, pair.Key);
                 }
                 await _userManager.UpdateAsync(user);
