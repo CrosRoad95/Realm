@@ -258,11 +258,14 @@ internal class SaveService : ISaveService
 
         if(entity.TryGetComponent(out DiscordIntegrationComponent discordIntegrationComponent))
         {
-
+            user.DiscordIntegration = new DiscordIntegration
+            {
+                DiscordUserId = discordIntegrationComponent.DiscordUserId
+            };
         }
         else
         {
-
+            user.DiscordIntegration = null;
         }
     }
 

@@ -78,6 +78,9 @@ internal class SignInService : ISignInService
                 entity.AddComponent(new DiscoveriesComponent(user.Discoveries));
             else
                 entity.AddComponent<DiscoveriesComponent>();
+            
+            if (user.DiscordIntegration != null)
+                entity.AddComponent(new DiscordIntegrationComponent(user.DiscordIntegration.DiscordUserId));
 
             foreach (var groupMemberData in user.GroupMembers)
                 entity.AddComponent(new GroupMemberComponent(groupMemberData));

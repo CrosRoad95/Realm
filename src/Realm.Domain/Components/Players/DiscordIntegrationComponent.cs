@@ -3,10 +3,11 @@
 [ComponentUsage(false)]
 public class DiscordIntegrationComponent : IntegrationComponent
 {
-    private readonly ulong _discordId;
+    private readonly ulong _discordUserId;
+    public ulong DiscordUserId => _discordUserId;
 
     public DiscordIntegrationComponent(ulong discordId)
     {
-        _discordId = discordId;
+        _discordUserId = discordId;
     }
 }

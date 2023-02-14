@@ -24,6 +24,7 @@ public abstract class Db<T> : IdentityDbContext<User, Role, int,
     public DbSet<GroupMember> GroupMembers => Set<GroupMember>();
     public DbSet<Fraction> Fractions => Set<Fraction>();
     public DbSet<FractionMember> FractionMembers => Set<FractionMember>();
+    public DbSet<DiscordIntegration> DiscordIntegrations => Set<DiscordIntegration>();
 
     public Db(DbContextOptions<T> options) : base(options)
     {
@@ -115,6 +116,11 @@ public abstract class Db<T> : IdentityDbContext<User, Role, int,
                 .HasForeignKey(x => x.UserId)
                 .HasPrincipalKey(x => x.Id)
                 .OnDelete(DeleteBehavior.Cascade);
+
+            entityBuilder
+                .HasOne(x => x.DiscordIntegration)
+                .WithOne(x => x.User)
+                .HasForeignKey<DiscordIntegration>(x => x.UserId);
         });
 
         modelBuilder.Entity<Inventory>(entityBuilder =>
@@ -387,7 +393,6 @@ public abstract class Db<T> : IdentityDbContext<User, Role, int,
                 .HasPrincipalKey(x => x.Id);
         });
         
-        
         modelBuilder.Entity<Fraction>(entityBuilder =>
         {
             entityBuilder
@@ -427,5 +432,11 @@ public abstract class Db<T> : IdentityDbContext<User, Role, int,
                 .HasPrincipalKey(x => x.Id);
         });
 
+        modelBuilder.Entity<DiscordIntegration>(entityBuilder =>
+        {
+            entityBuilder
+                .ToTable(nameof(DiscordIntegration))
+                .HasKey(x => x.UserId);
+        });
     }
 }

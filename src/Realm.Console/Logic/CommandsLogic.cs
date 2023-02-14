@@ -498,11 +498,16 @@ internal sealed class CommandsLogic
 
         _commandService.AddCommandHandler("discord", (entity, args) =>
         {
+            var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();
+            if (entity.HasComponent<DiscordIntegrationComponent>())
+            {
+                playerElementComponent.SendChatMessage("Twoje konto jest już połączone z discordem.");
+                return Task.CompletedTask;
+            }
             entity.TryDestroyComponent<PendingDiscordIntegrationComponent>();
             var pendingDiscordIntegrationComponent = new PendingDiscordIntegrationComponent();
             var code = pendingDiscordIntegrationComponent.GenerateAndGetDiscordConnectionCode();
             entity.AddComponent(pendingDiscordIntegrationComponent);
-            var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();
             playerElementComponent.SendChatMessage($"Aby połączyć konto wpisz na kanale discord #polacz-konto komendę: /polaczkonto {code}");
             return Task.CompletedTask;
         });

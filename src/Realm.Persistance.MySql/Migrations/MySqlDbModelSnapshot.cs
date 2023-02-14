@@ -162,6 +162,19 @@ namespace Realm.Persistance.MySql.Migrations
                     b.ToTable("DailyVisits", (string)null);
                 });
 
+            modelBuilder.Entity("Realm.Persistance.Data.DiscordIntegration", b =>
+                {
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.Property<ulong>("DiscordUserId")
+                        .HasColumnType("bigint unsigned");
+
+                    b.HasKey("UserId");
+
+                    b.ToTable("DiscordIntegration", (string)null);
+                });
+
             modelBuilder.Entity("Realm.Persistance.Data.Discovery", b =>
                 {
                     b.Property<int>("UserId")
@@ -803,6 +816,17 @@ namespace Realm.Persistance.MySql.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("Realm.Persistance.Data.DiscordIntegration", b =>
+                {
+                    b.HasOne("Realm.Persistance.Data.User", "User")
+                        .WithOne("DiscordIntegration")
+                        .HasForeignKey("Realm.Persistance.Data.DiscordIntegration", "UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("Realm.Persistance.Data.Discovery", b =>
                 {
                     b.HasOne("Realm.Persistance.Data.User", "User")
@@ -979,6 +1003,8 @@ namespace Realm.Persistance.MySql.Migrations
                     b.Navigation("Achievements");
 
                     b.Navigation("DailyVisits");
+
+                    b.Navigation("DiscordIntegration");
 
                     b.Navigation("Discoveries");
 
