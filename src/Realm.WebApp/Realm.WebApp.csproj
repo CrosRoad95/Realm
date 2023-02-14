@@ -20,7 +20,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Protobuf Include="..\Realm.Modules.Grpc.Proto\webapp.proto" GrpcServices="Client">
+    <Protobuf Include="..\Realm.Module.Grpc.Proto\webapp.proto" GrpcServices="Client">
       <Link>Protos\webapp.proto</Link>
     </Protobuf>
   </ItemGroup>
