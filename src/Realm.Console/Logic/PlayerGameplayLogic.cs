@@ -90,7 +90,7 @@ internal sealed class PlayerGameplayLogic
                                     _logger.LogInformation("Interaction failed");
                                 }
                             }
-                            catch (OperationCanceledException ex)
+                            catch (OperationCanceledException)
                             {
                                 _logger.LogInformation("Interaction failed ( not focused )");
                             }

@@ -13,7 +13,7 @@ public class DefaultDiscordConnectAccountHandler : IDiscordConnectAccountHandler
         _logger = logger;
     }
 
-    public async Task<TryConnectResponse> HandleConnectAccount(string code, ulong userId, CancellationToken cancellationToken)
+    public Task<TryConnectResponse> HandleConnectAccount(string code, ulong userId, CancellationToken cancellationToken)
     {
         try
         {
@@ -24,29 +24,29 @@ public class DefaultDiscordConnectAccountHandler : IDiscordConnectAccountHandler
                     if (component.Verify(code))
                     {
                         item.AddComponent(new DiscordIntegrationComponent(userId));
-                        return new TryConnectResponse
+                        return Task.FromResult(new TryConnectResponse
                         {
                             message = "Account connected successfully!",
                             success = true,
-                        };
+                        });
                     }
                 }
             }
 
-            return new TryConnectResponse
+            return Task.FromResult(new TryConnectResponse
             {
                 message = "Unexpected error while trying to connect account",
                 success = false,
-            };
+            });
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Unexpected error while trying to connect account");
-            return new TryConnectResponse
+            return Task.FromResult(new TryConnectResponse
             {
                 message = "Unexpected error while trying to connect account",
                 success = false,
-            };
+            });
             throw;
         }
     }

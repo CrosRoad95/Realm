@@ -33,7 +33,7 @@ public class ClientInterfaceService
         ClientScreenSizeChanged?.Invoke(player, x, y);
     }
     
-    internal void BroadcastPlayerElementFocusChanged(Player player, Element? newFocusedElement)
+    internal void BroadcastPlayerElementFocusChanged(Player player, Element? newFocusedElement, string? childElement)
     {
         FocusedElementChanged?.Invoke(player, newFocusedElement);
     }

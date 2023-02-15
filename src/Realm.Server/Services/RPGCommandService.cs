@@ -59,7 +59,7 @@ public class RPGCommandService
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Exception thrown while executing command {commandName} with arguments {commandArguments}");
+                _logger.LogError(ex, "Exception thrown while executing command {commandName} with arguments {commandArguments}", commandName, args.Arguments);
             }
         };
         return true;

@@ -5,11 +5,13 @@ internal class SaveCommand : ICommand
 {
     private readonly ECS _ecs;
     private readonly ISaveService _saveService;
+    private readonly ILogger<SaveCommand> _logger;
 
-    public SaveCommand(ECS ecs, ISaveService saveService)
+    public SaveCommand(ECS ecs, ISaveService saveService, ILogger<SaveCommand> logger)
     {
         _ecs = ecs;
         _saveService = saveService;
+        _logger = logger;
     }
 
     public async Task HandleCommand(string command)
@@ -24,7 +26,7 @@ internal class SaveCommand : ICommand
             }
             catch (Exception ex)
             {
-                ;
+                _logger.LogError(ex, "Failed to save entity: {entityName}", entity.ToString());
             }
         }
         await _saveService.Commit();

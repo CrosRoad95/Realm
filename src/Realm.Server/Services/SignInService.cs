@@ -131,6 +131,7 @@ internal class SignInService : ISignInService
         }
         catch(Exception ex)
         {
+            _logger.LogError(ex, "Failed to destroy player entity {entityName}", entity.Name);
             throw;
         }
         finally

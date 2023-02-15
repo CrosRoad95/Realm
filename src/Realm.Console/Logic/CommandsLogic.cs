@@ -395,7 +395,7 @@ internal sealed class CommandsLogic
                 {
                     await entity.GetRequiredComponent<PlayerElementComponent>().DoComplexAnimationAsync(animation, true);
                 }
-                catch (NotSupportedException ex)
+                catch (NotSupportedException)
                 {
                     entity.GetRequiredComponent<PlayerElementComponent>().SendChatMessage($"Animation '{args.FirstOrDefault()}' is not supported");
                 }

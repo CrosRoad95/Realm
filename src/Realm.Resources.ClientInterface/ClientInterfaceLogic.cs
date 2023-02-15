@@ -123,6 +123,6 @@ internal class ClientInterfaceLogic
     {
         var focusedElement = _fromLuaValueMapper.Map(typeof(Element), luaEvent.Parameters[1]) as Element;
         var childElement = _fromLuaValueMapper.Map(typeof(string), luaEvent.Parameters[2]) as string;
-        _clientInterfaceService.BroadcastPlayerElementFocusChanged(luaEvent.Player, focusedElement);
+        _clientInterfaceService.BroadcastPlayerElementFocusChanged(luaEvent.Player, focusedElement, childElement);
     }
 }
