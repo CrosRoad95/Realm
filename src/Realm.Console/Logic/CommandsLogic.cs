@@ -233,8 +233,10 @@ internal sealed class CommandsLogic
             var jobUpgradesComponent = entity.GetRequiredComponent<JobUpgradesComponent>();
             try
             {
-                jobUpgradesComponent.AddJobUpgrade(1, 1);
-                entity.GetRequiredComponent<PlayerElementComponent>().SendChatMessage("Upgrade added");
+                if(jobUpgradesComponent.TryAddJobUpgrade(1, 1))
+                    entity.GetRequiredComponent<PlayerElementComponent>().SendChatMessage("Upgrade added");
+                else
+                    entity.GetRequiredComponent<PlayerElementComponent>().SendChatMessage("Failed to add upgrade");
             }
             catch (Exception ex)
             {
@@ -276,8 +278,10 @@ internal sealed class CommandsLogic
         {
             if (entity.TryGetComponent(out JobUpgradesComponent jobUpgradesComponent))
             {
-                jobUpgradesComponent.AddJobUpgrade(1, 1);
-                entity.GetRequiredComponent<PlayerElementComponent>().SendChatMessage($"Job upgrade added");
+                if (jobUpgradesComponent.TryAddJobUpgrade(1, 1))
+                    entity.GetRequiredComponent<PlayerElementComponent>().SendChatMessage("Upgrade added");
+                else
+                    entity.GetRequiredComponent<PlayerElementComponent>().SendChatMessage("Failed to add upgrade");
             }
             
             if (entity.TryGetComponent(out InventoryComponent inventoryComponent))

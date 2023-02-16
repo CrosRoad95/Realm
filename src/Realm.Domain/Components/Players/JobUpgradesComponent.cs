@@ -7,9 +7,8 @@ namespace Realm.Domain.Components.Players;
 public class JobUpgradesComponent : Component
 {
     private readonly List<JobUpgrade> _upgrades = new();
-    public IEnumerable<JobUpgrade> Upgrades => _upgrades;
-
-    public event Action<Entity, short, int>? JobUpgradeAdded;
+    private readonly object _upgradesLock = new();
+    public IReadOnlyList<JobUpgrade> Upgrades => _upgrades;
 
     public JobUpgradesComponent()
     {
@@ -25,18 +24,27 @@ public class JobUpgradesComponent : Component
         }).ToList();
     }
 
-    public bool HasJobUpgrade(short jobId, int upgradeId) => _upgrades.Any(x => x.jobId == jobId && x.UpgradeId == upgradeId);
+    private bool InternalHasJobUpgrade(short jobId, int upgradeId) => _upgrades.Any(x => x.jobId == jobId && x.UpgradeId == upgradeId);
 
-    public void AddJobUpgrade(short jobId, int upgradeId)
+    public bool HasJobUpgrade(short jobId, int upgradeId)
     {
-        if (HasJobUpgrade(jobId, upgradeId))
-            throw new UpgradeAlreadyExistsException(jobId, upgradeId);
-        _upgrades.Add(new JobUpgrade
-        {
-            jobId = jobId,
-            UpgradeId = upgradeId,
-        });
+        lock (_upgradesLock)
+            return InternalHasJobUpgrade(jobId, upgradeId);
+    }
 
-        JobUpgradeAdded?.Invoke(Entity, jobId, upgradeId);
+    public bool TryAddJobUpgrade(short jobId, int upgradeId)
+    {
+        lock (_upgradesLock)
+        {
+            if (InternalHasJobUpgrade(jobId, upgradeId))
+                return false;
+
+            _upgrades.Add(new JobUpgrade
+            {
+                jobId = jobId,
+                UpgradeId = upgradeId,
+            });
+            return true;
+        }
     }
 }
