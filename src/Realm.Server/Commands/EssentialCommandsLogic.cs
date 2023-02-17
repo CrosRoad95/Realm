@@ -32,7 +32,7 @@ internal class EssentialCommandsLogic
 
     private void HandleCommandExecuted(string? line)
     {
-        if (line == null)
+        if (string.IsNullOrWhiteSpace(line))
             return;
 
         var firstWord = line.Split(' ').FirstOrDefault().ToLower();
