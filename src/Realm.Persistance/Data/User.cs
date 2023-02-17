@@ -31,4 +31,5 @@ public sealed class User : IdentityUser<int>
     public ICollection<GroupMember> GroupMembers { get; set; } = new List<GroupMember>();
     public ICollection<FractionMember> FractionMembers { get; set; } = new List<FractionMember>();
     public DiscordIntegration? DiscordIntegration { get; set; }
+    public ICollection<UserUpgrade> UserUpgrades { get; set; } = new List<UserUpgrade>();
 }

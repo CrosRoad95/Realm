@@ -25,6 +25,7 @@ public abstract class Db<T> : IdentityDbContext<User, Role, int,
     public DbSet<Fraction> Fractions => Set<Fraction>();
     public DbSet<FractionMember> FractionMembers => Set<FractionMember>();
     public DbSet<DiscordIntegration> DiscordIntegrations => Set<DiscordIntegration>();
+    public DbSet<UserUpgrade> UserUpgrades => Set<UserUpgrade>();
 
     public Db(DbContextOptions<T> options) : base(options)
     {
@@ -112,6 +113,13 @@ public abstract class Db<T> : IdentityDbContext<User, Role, int,
 
             entityBuilder
                 .HasMany(x => x.FractionMembers)
+                .WithOne(x => x.User)
+                .HasForeignKey(x => x.UserId)
+                .HasPrincipalKey(x => x.Id)
+                .OnDelete(DeleteBehavior.Cascade);
+            
+            entityBuilder
+                .HasMany(x => x.UserUpgrades)
                 .WithOne(x => x.User)
                 .HasForeignKey(x => x.UserId)
                 .HasPrincipalKey(x => x.Id)
@@ -437,6 +445,13 @@ public abstract class Db<T> : IdentityDbContext<User, Role, int,
             entityBuilder
                 .ToTable(nameof(DiscordIntegration))
                 .HasKey(x => x.UserId);
+        });
+
+        modelBuilder.Entity<UserUpgrade>(entityBuilder =>
+        {
+            entityBuilder
+                .ToTable(nameof(UserUpgrade))
+                .HasKey(x => new { x.UserId, x.UpgradeId });
         });
     }
 }

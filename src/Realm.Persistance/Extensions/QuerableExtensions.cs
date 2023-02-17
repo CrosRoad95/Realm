@@ -29,6 +29,7 @@ public static class QuerableExtensions
             .Include(x => x.GroupMembers)
             .Include(x => x.FractionMembers)
             .Include(x => x.DiscordIntegration)
+            .Include(x => x.UserUpgrades)
             .Include(x => x.Inventories)
             .ThenInclude(x => x!.InventoryItems);
     }

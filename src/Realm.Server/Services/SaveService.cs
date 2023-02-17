@@ -125,6 +125,10 @@ internal class SaveService : ISaveService
             .IncludeAll()
             .Where(x => x.Id == accountComponent.Id).FirstAsync();
 
+        user.UserUpgrades = accountComponent.Upgrades.Select(x => new UserUpgrade
+        {
+            UpgradeId = x
+        }).ToList();
         if(entity.TryGetComponent(out PlayerElementComponent playerElementComponent) && playerElementComponent.Spawned)
             user.LastTransformAndMotion = entity.Transform.GetTransformAndMotion();
 

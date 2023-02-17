@@ -515,6 +515,18 @@ internal sealed class CommandsLogic
             playerElementComponent.SendChatMessage($"Aby połączyć konto wpisz na kanale discord #polacz-konto komendę: /polaczkonto {code}");
             return Task.CompletedTask;
         });
+        
+        _commandService.AddCommandHandler("adduserupgrade", (entity, args) =>
+        {
+            var accountComponent = entity.GetRequiredComponent<AccountComponent>();
+            var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();
+            var i = Random.Shared.Next(0, 10);
+            if (accountComponent.TryAddUpgrade(i))
+                playerElementComponent.SendChatMessage($"Pomyślnie dodano ulepszenie id {i}");
+            else
+                playerElementComponent.SendChatMessage($"Pomyślnie dodano ulepszenie id {i}");
+            return Task.CompletedTask;
+        });
 
     }
     class SampleHudState

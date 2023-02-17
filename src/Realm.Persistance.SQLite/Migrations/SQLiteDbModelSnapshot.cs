@@ -549,6 +549,19 @@ namespace Realm.Persistance.SQLite.Migrations
                     b.ToTable("UserLicenses", (string)null);
                 });
 
+            modelBuilder.Entity("Realm.Persistance.Data.UserUpgrade", b =>
+                {
+                    b.Property<int>("UserId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("UpgradeId")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("UserId", "UpgradeId");
+
+                    b.ToTable("UserUpgrade", (string)null);
+                });
+
             modelBuilder.Entity("Realm.Persistance.Data.Vehicle", b =>
                 {
                     b.Property<int>("Id")
@@ -940,6 +953,17 @@ namespace Realm.Persistance.SQLite.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("Realm.Persistance.Data.UserUpgrade", b =>
+                {
+                    b.HasOne("Realm.Persistance.Data.User", "User")
+                        .WithMany("UserUpgrades")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("Realm.Persistance.Data.VehicleAccess", b =>
                 {
                     b.HasOne("Realm.Persistance.Data.User", "User")
@@ -1019,6 +1043,8 @@ namespace Realm.Persistance.SQLite.Migrations
                     b.Navigation("Licenses");
 
                     b.Navigation("Statistics");
+
+                    b.Navigation("UserUpgrades");
 
                     b.Navigation("VehicleAccesses");
                 });

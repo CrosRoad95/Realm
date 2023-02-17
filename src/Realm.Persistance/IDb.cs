@@ -27,6 +27,7 @@ public interface IDb : IDisposable
     DbSet<GroupMember> GroupMembers { get; }
     DbSet<Fraction> Fractions { get; }
     DbSet<FractionMember> FractionMembers { get; }
+    DbSet<UserUpgrade> UserUpgrades { get; }
 
     Task MigrateAsync();
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);

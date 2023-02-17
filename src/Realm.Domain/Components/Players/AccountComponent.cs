@@ -14,13 +14,17 @@ public class AccountComponent : Component
 
     private readonly User _user;
     private ClaimsPrincipal? _claimsPrincipal;
+    private List<int> _upgrades = new();
+    private object _upgradesLock = new();
 
     internal User User => _user;
     public int Id => _user.Id;
     public string? UserName => _user.UserName;
+    public IReadOnlyList<int> Upgrades => _upgrades;
     internal AccountComponent(User user)
     {
         _user = user;
+        _upgrades = _user.UserUpgrades.Select(x => x.UpgradeId).ToList();
     }
 
     protected override async Task LoadAsync()
@@ -130,5 +134,24 @@ public class AccountComponent : Component
     {
         var result = await AuthorizationService.AuthorizeAsync(_claimsPrincipal, policy);
         return result.Succeeded;
+    }
+
+    internal bool InternalHasUpgrade(int upgradeId) => _upgrades.Contains(upgradeId);
+
+    public bool HasUpgrade(int upgradeId)
+    {
+        lock (_upgradesLock)
+            return InternalHasUpgrade(upgradeId);
+    }
+
+    public bool TryAddUpgrade(int upgradeId)
+    {
+        lock(_upgradesLock)
+        {
+            if (InternalHasUpgrade(upgradeId))
+                return false;
+            _upgrades.Add(upgradeId);
+            return true;
+        }
     }
 }
