@@ -1,6 +1,7 @@
 ﻿using Realm.Domain.Components.CollisionShapes;
 using Realm.Persistance.Interfaces;
 using SlipeServer.Server.Elements.ColShapes;
+using SlipeServer.Server.Elements.Enums;
 using SlipeServer.Server.Enums;
 using Vehicle = SlipeServer.Server.Elements.Vehicle;
 
@@ -192,7 +193,7 @@ internal class EntityFactory : IEntityFactory
             entity.Transform.Interior = interior;
             entity.Transform.Dimension = dimension;
 
-            var markerElementComponent = entity.AddComponent(new WorldObjectComponent(worldObject));
+            var worldObjectComponent = entity.AddComponent(new WorldObjectComponent(worldObject));
 
             AssociateWithServer(entity);
 
@@ -212,7 +213,7 @@ internal class EntityFactory : IEntityFactory
             entity.Transform.Interior = interior;
             entity.Transform.Dimension = dimension;
 
-            var markerElementComponent = entity.AddComponent(new CollisionCircleElementComponent(collisionSphere));
+            var collisionCircleElementComponent = entity.AddComponent(new CollisionCircleElementComponent(collisionSphere));
 
             AssociateWithServer(entity);
 
@@ -230,7 +231,7 @@ internal class EntityFactory : IEntityFactory
             entity.Transform.Interior = interior;
             entity.Transform.Dimension = dimension;
 
-            var markerElementComponent = entity.AddComponent(new CollisionCuboidElementComponent(collisioncuboid));
+            var collisionCuboidElementComponent = entity.AddComponent(new CollisionCuboidElementComponent(collisioncuboid));
 
             AssociateWithServer(entity);
 
@@ -247,7 +248,7 @@ internal class EntityFactory : IEntityFactory
             entity.Transform.Interior = interior;
             entity.Transform.Dimension = dimension;
 
-            var markerElementComponent = entity.AddComponent(new CollisionPolygonElementComponent(collisionPolygon));
+            var collisionPolygonElementComponent = entity.AddComponent(new CollisionPolygonElementComponent(collisionPolygon));
 
             AssociateWithServer(entity);
 
@@ -265,7 +266,7 @@ internal class EntityFactory : IEntityFactory
             entity.Transform.Interior = interior;
             entity.Transform.Dimension = dimension;
 
-            var markerElementComponent = entity.AddComponent(new CollisionRectangleElementComponent(collisionRectangle));
+            var collisionRectangleElementComponent = entity.AddComponent(new CollisionRectangleElementComponent(collisionRectangle));
 
             AssociateWithServer(entity);
 
@@ -283,7 +284,7 @@ internal class EntityFactory : IEntityFactory
             entity.Transform.Interior = interior;
             entity.Transform.Dimension = dimension;
 
-            var markerElementComponent = entity.AddComponent(new CollisionSphereElementComponent(collisionSphere));
+            var collisionSphereElementComponent = entity.AddComponent(new CollisionSphereElementComponent(collisionSphere));
 
             AssociateWithServer(entity);
 
@@ -301,7 +302,25 @@ internal class EntityFactory : IEntityFactory
             entity.Transform.Interior = interior;
             entity.Transform.Dimension = dimension;
 
-            var markerElementComponent = entity.AddComponent(new CollisionTubeElementComponent(collisionTube));
+            var collisionTubeElementComponent = entity.AddComponent(new CollisionTubeElementComponent(collisionTube));
+
+            AssociateWithServer(entity);
+
+            entityBuilder?.Invoke(entity);
+        });
+    }
+    
+    public Entity CreatePed(PedModel pedModel, Vector3 position, byte interior = 0, ushort dimension = 0, string? id = null, Action<Entity>? entityBuilder = null)
+    {
+        return _ecs.CreateEntity(id ?? $"ped {Guid.NewGuid()}", Entity.EntityTag.Ped, entity =>
+        {
+            var ped = new Ped(pedModel, position);
+
+            entity.Transform.Position = position;
+            entity.Transform.Interior = interior;
+            entity.Transform.Dimension = dimension;
+
+            var pedElementComponent = entity.AddComponent(new PedElementComponent(ped));
 
             AssociateWithServer(entity);
 
