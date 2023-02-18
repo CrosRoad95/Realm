@@ -10,19 +10,22 @@ internal class OverlayLogic
 {
     private readonly LuaEventService _luaEventService;
     private readonly OverlayService _overlayService;
+    private readonly RootElement _rootElement;
     private readonly OverlayResource _resource;
 
     public OverlayLogic(MtaServer server, LuaEventService luaEventService,
-        OverlayService overlayService)
+        OverlayService overlayService, RootElement rootElement)
     {
         _luaEventService = luaEventService;
         _overlayService = overlayService;
+        _rootElement = rootElement;
         server.PlayerJoined += HandlePlayerJoin;
 
         _resource = server.GetAdditionalResource<OverlayResource>();
 
         _overlayService.NotificationAdded += HandleNotificationAdded;
         _overlayService.HudCreated = HandleHudCreated;
+        _overlayService.Hud3dCreated = HandleHud3dCreated;
         _overlayService.HudRemoved = HandleHudRemoved;
         _overlayService.HudVisibilityChanged = HandleHudVisibilityChanged;
         _overlayService.HudPositionChanged = HandleHudPositionChanged;
@@ -64,6 +67,11 @@ internal class OverlayLogic
     private void HandleHudCreated(Player player, string hudId, Vector2 position, IEnumerable<LuaValue> hudElementsDefinitions)
     {
         _luaEventService.TriggerEventFor(player, "createHud", player, hudId, position.X, position.Y, hudElementsDefinitions);
+    }
+
+    private void HandleHud3dCreated(string hudId, Vector3 position, IEnumerable<LuaValue> hudElementsDefinitions)
+    {
+        _luaEventService.TriggerEvent("createHud3d", _rootElement, hudId, hudElementsDefinitions, position.X, position.Y, position.Z);
     }
     
     private void HandleHudRemoved(Player player, string hudId)

@@ -21,6 +21,7 @@ public class OverlayService
 
     internal Action<Player, string>? NotificationAdded;
     internal Action<Player, string, Vector2, IEnumerable<LuaValue>>? HudCreated;
+    internal Action<string, Vector3, IEnumerable<LuaValue>>? Hud3dCreated;
     internal Action<Player, string>? HudRemoved;
     internal Action<Player, string, bool>? HudVisibilityChanged;
     internal Action<Player, string, float, float>? HudPositionChanged;
@@ -51,7 +52,14 @@ public class OverlayService
     {
         HudStateChanged?.Invoke(player, hudId, state);
     }
-    
+
+    public void CreateHud3d<TState>(string hudId, Action<IHudBuilder<TState>> hudBuilderCallback, Vector3? position = null) where TState : class
+    {
+        var hudBuilder = new HudBuilder<TState>(null, _assetsService, new Vector2(0,0));
+        hudBuilderCallback(hudBuilder);
+        Hud3dCreated?.Invoke(hudId, position ?? Vector3.Zero, hudBuilder.HudElementsDefinitions);
+    }
+
     public void CreateHud(Player player, string hudId, Action<IHudBuilder<object>> hudBuilderCallback, Vector2 screenSize, Vector2 ? position = null)
     {
         var hudBuilder = new HudBuilder<object>(null, _assetsService, screenSize);

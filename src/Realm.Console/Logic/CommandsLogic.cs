@@ -15,9 +15,10 @@ internal sealed class CommandsLogic
     private readonly ItemsRegistry _itemsRegistry;
     private readonly IGroupService _groupService;
     private readonly AssetsRegistry _assetsRegistry;
+    private readonly ECS _ecs;
 
     public CommandsLogic(RPGCommandService commandService, ILogger<CommandsLogic> logger, IEntityFactory entityFactory, RepositoryFactory repositoryFactory,
-        ItemsRegistry itemsRegistry, IGroupService groupService, AssetsRegistry assetsRegistry)
+        ItemsRegistry itemsRegistry, IGroupService groupService, AssetsRegistry assetsRegistry, ECS ecs)
     {
         _commandService = commandService;
         _logger = logger;
@@ -26,6 +27,7 @@ internal sealed class CommandsLogic
         _itemsRegistry = itemsRegistry;
         _groupService = groupService;
         _assetsRegistry = assetsRegistry;
+        _ecs = ecs;
         _commandService.AddCommandHandler("gp", (entity, args) =>
         {
             logger.LogInformation("{position}, {rotation}", entity.Transform.Position, entity.Transform.Rotation);
@@ -342,6 +344,21 @@ internal sealed class CommandsLogic
         {
             var objectEntity = _entityFactory.CreateObject(SlipeServer.Server.Enums.ObjectModel.Gunbox, entity.Transform.Position + new Vector3(4, 0, -0.65f), Vector3.Zero);
             objectEntity.AddComponent(new LiftableWorldObjectComponent());
+            return Task.CompletedTask;
+        });
+        
+        _commandService.AddCommandHandler("hud3d", (entity, args) =>
+        {
+            var e = _ecs.CreateEntity(Guid.NewGuid().ToString(), Entity.EntityTag.Unknown);
+            e.Transform.Position = entity.Transform.Position + new Vector3(4, 0, 0);
+            e.AddComponent(new Hud3dComponent<object>(e => e.AddRectangle(Vector2.Zero, new Size(50, 50), Color.Red), new object()));
+
+            var e2 = _ecs.CreateEntity(Guid.NewGuid().ToString(), Entity.EntityTag.Unknown);
+            e2.Transform.Position = entity.Transform.Position + new Vector3(-4, 0, 0);
+            e2.AddComponent(new Hud3dComponent<object>(e => e
+                .AddRectangle(Vector2.Zero, new Size(100, 100), Color.Red)
+                .AddRectangle(new Vector2(25, 25), new Size(50, 50), Color.Green)
+                , new object()));
             return Task.CompletedTask;
         });
 

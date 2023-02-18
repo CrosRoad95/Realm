@@ -1,16 +1,28 @@
 ﻿local enabledHuds = {}
 local huds = {}
+local huds3d = {}
 local assets = {}
+local hud3dResolution = 32; -- 32 pixels per 1m
 
-local function renderHud(hudData)
-	local x,y = unpack(hudData.position)
-	for i,v in ipairs(hudData.elements)do
+local function renderHud(position, elements)
+	local x,y = unpack(position)
+	for i,v in ipairs(elements)do
 		if(v[1] == "text")then
 			dxDrawText(v[3], v[4] + x, v[5] + y, v[4] + v[6] + x, v[5] + v[7] + y, v[8], v[9], v[10], v[11], v[12], v[13])
 		elseif(v[1] == "rectangle")then
 			dxDrawRectangle(v[3] + x, v[4] + y, v[5], v[6], v[7])
 		end
 	end
+end
+
+local function calculateBoundingBox(position, elements)
+	local x,y = unpack(position)
+	local maxX, maxY = 0,0
+	for i,v in ipairs(elements)do
+		maxX = math.max(maxX, v[4] + x, v[4] + v[6] + x)
+		maxY = math.max(maxY, v[5] + y, v[5] + v[7] + y)
+	end
+	return maxX + x, maxY + y
 end
 
 local function prepareAsset(asset)
@@ -23,8 +35,8 @@ local function prepareAsset(asset)
 	return asset;
 end
 
-local function prepareElements(hudData)
-	for i,v in ipairs(hudData.elements)do
+local function prepareElements(elements)
+	for i,v in ipairs(elements)do
 		if(v[1] == "text")then
 			local asset = v[11];
 			if(type(asset) == "table")then
@@ -37,8 +49,12 @@ end
 local function renderHuds()
 	for i,v in pairs(huds)do
 		if(enabledHuds[i])then
-			renderHud(v)
+			renderHud(v.position, v.elements)
 		end
+	end
+	for i,v in pairs(huds3d)do
+		local h = v.size[2] / hud3dResolution;
+		dxDrawMaterialLine3D(v.position[1], v.position[2], v.position[3] - h/2, v.position[1], v.position[2], v.position[3] + h/2, false, v.element, v.size[1] / hud3dResolution)
 	end
 end
 
@@ -80,7 +96,22 @@ addEventHandler("createHud", localPlayer, function(hudId, x, y, elements)
 		position = {x,y},
 		elements = elements,
 	}
-	prepareElements(huds[hudId]);
+	prepareElements(element);
+end)
+
+addEvent("createHud3d", true)
+addEventHandler("createHud3d", localPlayer, function(hudId, elements, x, y, z)
+	prepareElements(elements);
+	local sx,sy = calculateBoundingBox({0, 0}, elements)
+	local rt = dxCreateRenderTarget(sx, sy, false)
+    dxSetRenderTarget(rt)
+	renderHud({0,0}, elements)
+    dxSetRenderTarget()
+	huds3d[hudId] = {
+		position = {x,y,z},
+		size = {sx,sy},
+		element = rt,
+	}
 end)
 
 addEvent("removeHud", true)
