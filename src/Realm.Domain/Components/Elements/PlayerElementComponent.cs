@@ -84,7 +84,6 @@ public sealed class PlayerElementComponent : ElementComponent
 
     private void UpdateFight()
     {
-        ThrowIfDisposed();
         _player.Controls.FireEnabled = _enableFightFlags.Any();
     }
 

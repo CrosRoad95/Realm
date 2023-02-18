@@ -14,6 +14,10 @@ public abstract class ElementComponent : Component
     private bool _isPerPlayer = false;
 
     public bool AreCollisionsEnabled { get => Element.AreCollisionsEnabled; set => Element.AreCollisionsEnabled = value; }
+    public Vector3 Velocity { get => Element.Velocity; set => Element.Velocity = value; }
+    public Vector3 TurnVelocity { get => Element.TurnVelocity; set => Element.TurnVelocity = value; }
+    public byte Alpha { get => Element.Alpha; set => Element.Alpha = value; }
+    public bool IsFrozen { get => Element.IsFrozen; set => Element.IsFrozen = value; }
 
     protected ElementComponent()
     {
