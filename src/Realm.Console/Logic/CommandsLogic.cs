@@ -333,7 +333,7 @@ internal sealed class CommandsLogic
 
         _commandService.AddCommandHandler("cvforsale", (entity, args) =>
         {
-            _entityFactory.CreateVehicle(404, entity.Transform.Position + new Vector3(4, 0, 0), Vector3.Zero, 0, 0, null, entity =>
+            _entityFactory.CreateVehicle(404, entity.Transform.Position + new Vector3(4, 0, 0), Vector3.Zero, entityBuilder: entity =>
             {
                 entity.AddComponent(new VehicleForSaleComponent(200));
             });

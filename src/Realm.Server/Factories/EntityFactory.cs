@@ -1,4 +1,5 @@
 ﻿using Realm.Domain.Components.CollisionShapes;
+using Realm.Domain.Concepts;
 using Realm.Persistance.Interfaces;
 using SlipeServer.Server.Elements.ColShapes;
 using SlipeServer.Server.Elements.Enums;
@@ -50,9 +51,9 @@ internal class EntityFactory : IEntityFactory
         }
     }
 
-    public Entity CreateVehicle(ushort model, Vector3 position, Vector3 rotation, byte interior = 0, ushort dimension = 0, string? id = null, Action<Entity>? entityBuilder = null)
+    public Entity CreateVehicle(ushort model, Vector3 position, Vector3 rotation, ConstructionInfo? constructionInfo = null, Action<Entity>? entityBuilder = null)
     {
-        var vehicleEntity = _ecs.CreateEntity(id ?? $"vehicle {Guid.NewGuid()}", Entity.EntityTag.Vehicle, entity =>
+        var vehicleEntity = _ecs.CreateEntity(constructionInfo?.Id ?? $"vehicle {Guid.NewGuid()}", Entity.EntityTag.Vehicle, entity =>
         {
             var vehicle = new Vehicle(model, new Vector3(0,0,4));
             
@@ -60,20 +61,22 @@ internal class EntityFactory : IEntityFactory
             
             entity.Transform.Position = position;
             entity.Transform.Rotation = rotation;
-            entity.Transform.Interior = interior;
-            entity.Transform.Dimension = dimension;
+            if(constructionInfo!= null)
+            {
+                entity.Transform.Interior = constructionInfo.Interior;
+                entity.Transform.Dimension = constructionInfo.Dimension;
+            }
 
             AssociateWithServer(entity);
-
             entityBuilder?.Invoke(entity);
         });
 
         return vehicleEntity;
     }
     
-    public async Task<Entity> CreateNewPrivateVehicle(ushort model, Vector3 position, Vector3 rotation, byte interior = 0, ushort dimension = 0, string? id = null, Action<Entity>? entityBuilder = null)
+    public async Task<Entity> CreateNewPrivateVehicle(ushort model, Vector3 position, Vector3 rotation, ConstructionInfo? constructionInfo = null, Action<Entity>? entityBuilder = null)
     {
-        var vehicleEntity = _ecs.CreateEntity(id ?? $"vehicle {Guid.NewGuid()}", Entity.EntityTag.Vehicle, entity =>
+        var vehicleEntity = _ecs.CreateEntity(constructionInfo?.Id ?? $"vehicle {Guid.NewGuid()}", Entity.EntityTag.Vehicle, entity =>
         {
             var vehicle = new Vehicle(model, position);
 
@@ -81,11 +84,13 @@ internal class EntityFactory : IEntityFactory
 
             entity.Transform.Position = position;
             entity.Transform.Rotation = rotation;
-            entity.Transform.Interior = interior;
-            entity.Transform.Dimension = dimension;
+            if (constructionInfo != null)
+            {
+                entity.Transform.Interior = constructionInfo.Interior;
+                entity.Transform.Dimension = constructionInfo.Dimension;
+            }
 
             AssociateWithServer(entity);
-
             entityBuilder?.Invoke(entity);
         });
 
@@ -94,9 +99,9 @@ internal class EntityFactory : IEntityFactory
         return vehicleEntity;
     }
 
-    public Entity CreateMarker(MarkerType markerType, Vector3 position, byte interior = 0, ushort dimension = 0, string? id = null, Action<Entity>? entityBuilder = null)
+    public Entity CreateMarker(MarkerType markerType, Vector3 position, ConstructionInfo? constructionInfo = null, Action<Entity>? entityBuilder = null)
     {
-        return _ecs.CreateEntity(id ?? $"marker {Guid.NewGuid()}", Entity.EntityTag.Marker, entity =>
+        return _ecs.CreateEntity(constructionInfo?.Id ?? $"marker {Guid.NewGuid()}", Entity.EntityTag.Marker, entity =>
         {
             var marker = new Marker(new Vector3(0,0,1000), markerType);
             marker.Color = System.Drawing.Color.White;
@@ -104,38 +109,52 @@ internal class EntityFactory : IEntityFactory
             var markerElementComponent = entity.AddComponent(new MarkerElementComponent(marker));
 
             entity.Transform.Position = position;
-            entity.Transform.Interior = interior;
-            entity.Transform.Dimension = dimension;
+            if (constructionInfo != null)
+            {
+                entity.Transform.Interior = constructionInfo.Interior;
+                entity.Transform.Dimension = constructionInfo.Dimension;
+            }
 
             AssociateWithServer(entity);
-
             entityBuilder?.Invoke(entity);
         });
     }
 
-    public Entity CreatePickup(ushort model, Vector3 position, string? id = null)
+    public Entity CreatePickup(ushort model, Vector3 position, ConstructionInfo? constructionInfo = null, Action<Entity>? entityBuilder = null)
     {
-        var pickupEntity = _ecs.CreateEntity(id ?? $"marker {Guid.NewGuid()}", Entity.EntityTag.Pickup, entity =>
+        var pickupEntity = _ecs.CreateEntity(constructionInfo?.Id ?? $"marker {Guid.NewGuid()}", Entity.EntityTag.Pickup, entity =>
         {
             entity.AddComponent(new PickupElementComponent(new Pickup(Vector3.Zero, model)));
 
-            AssociateWithServer(entity);
-
             entity.Transform.Position = position;
+            if (constructionInfo != null)
+            {
+                entity.Transform.Interior = constructionInfo.Interior;
+                entity.Transform.Dimension = constructionInfo.Dimension;
+            }
+
+            AssociateWithServer(entity);
+            entityBuilder?.Invoke(entity);
         });
 
         return pickupEntity;
     }
     
-    public Entity CreateBlip(BlipIcon blipIcon, Vector3 position, string? id = null)
+    public Entity CreateBlip(BlipIcon blipIcon, Vector3 position, ConstructionInfo? constructionInfo = null, Action<Entity>? entityBuilder = null)
     {
-        var blipEntity = _ecs.CreateEntity(id ?? $"marker {Guid.NewGuid()}", Entity.EntityTag.Blip, entity =>
+        var blipEntity = _ecs.CreateEntity(constructionInfo?.Id ?? $"marker {Guid.NewGuid()}", Entity.EntityTag.Blip, entity =>
         {
             entity.AddComponent(new BlipElementComponent(new Blip(Vector3.Zero, blipIcon, 250)));
 
-            AssociateWithServer(entity);
-
             entity.Transform.Position = position;
+            if (constructionInfo != null)
+            {
+                entity.Transform.Interior = constructionInfo.Interior;
+                entity.Transform.Dimension = constructionInfo.Dimension;
+            }
+
+            AssociateWithServer(entity);
+            entityBuilder?.Invoke(entity);
         });
 
         return blipEntity;
@@ -182,54 +201,57 @@ internal class EntityFactory : IEntityFactory
         return markerElementComponent;
     }
 
-    public Entity CreateObject(ObjectModel model, Vector3 position, Vector3 rotation, byte interior = 0, ushort dimension = 0, string? id = null, Action<Entity>? entityBuilder = null)
+    public Entity CreateObject(ObjectModel model, Vector3 position, Vector3 rotation, ConstructionInfo? constructionInfo = null, Action<Entity>? entityBuilder = null)
     {
-        return _ecs.CreateEntity(id ?? $"object {Guid.NewGuid()}", Entity.EntityTag.WorldObject, entity =>
+        return _ecs.CreateEntity(constructionInfo?.Id ?? $"object {Guid.NewGuid()}", Entity.EntityTag.WorldObject, entity =>
         {
-            var worldObject = new WorldObject(model, position);
+            entity.AddComponent(new WorldObjectComponent(new WorldObject(model, position)));
 
             entity.Transform.Position = position;
             entity.Transform.Rotation = rotation;
-            entity.Transform.Interior = interior;
-            entity.Transform.Dimension = dimension;
-
-            var worldObjectComponent = entity.AddComponent(new WorldObjectComponent(worldObject));
+            if (constructionInfo != null)
+            {
+                entity.Transform.Interior = constructionInfo.Interior;
+                entity.Transform.Dimension = constructionInfo.Dimension;
+            }
 
             AssociateWithServer(entity);
-
             entityBuilder?.Invoke(entity);
         });
     }
 
     #region Collision shapes
 
-    public Entity CreateCollisionCircle(Vector2 position, float radius, byte interior = 0, ushort dimension = 0, string? id = null, Action<Entity>? entityBuilder = null)
+    public Entity CreateCollisionCircle(Vector2 position, float radius, ConstructionInfo? constructionInfo = null, Action<Entity>? entityBuilder = null)
     {
-        return _ecs.CreateEntity(id ?? $"collision circle {Guid.NewGuid()}", Entity.EntityTag.CollisionShape, entity =>
+        return _ecs.CreateEntity(constructionInfo?.Id ?? $"collision circle {Guid.NewGuid()}", Entity.EntityTag.CollisionShape, entity =>
         {
-            var collisionSphere = new CollisionCircle(new Vector2(0, 0), radius);
+            entity.AddComponent(new CollisionCircleElementComponent(new CollisionCircle(new Vector2(0, 0), radius)));
 
             entity.Transform.Position = new Vector3(position, 0);
-            entity.Transform.Interior = interior;
-            entity.Transform.Dimension = dimension;
-
-            var collisionCircleElementComponent = entity.AddComponent(new CollisionCircleElementComponent(collisionSphere));
+            if (constructionInfo != null)
+            {
+                entity.Transform.Interior = constructionInfo.Interior;
+                entity.Transform.Dimension = constructionInfo.Dimension;
+            }
 
             AssociateWithServer(entity);
-
             entityBuilder?.Invoke(entity);
         });
     }
     
-    public Entity CreateCollisionCuboid(Vector3 position, Vector3 dimensions, byte interior = 0, ushort dimension = 0, string? id = null, Action<Entity>? entityBuilder = null)
+    public Entity CreateCollisionCuboid(Vector3 position, Vector3 dimensions, ConstructionInfo? constructionInfo = null, Action<Entity>? entityBuilder = null)
     {
-        return _ecs.CreateEntity(id ?? $"collision cuboid {Guid.NewGuid()}", Entity.EntityTag.CollisionShape, entity =>
+        return _ecs.CreateEntity(constructionInfo?.Id ?? $"collision cuboid {Guid.NewGuid()}", Entity.EntityTag.CollisionShape, entity =>
         {
             var collisioncuboid = new CollisionCuboid(position, dimensions);
 
             entity.Transform.Position = position;
-            entity.Transform.Interior = interior;
-            entity.Transform.Dimension = dimension;
+            if (constructionInfo != null)
+            {
+                entity.Transform.Interior = constructionInfo.Interior;
+                entity.Transform.Dimension = constructionInfo.Dimension;
+            }
 
             var collisionCuboidElementComponent = entity.AddComponent(new CollisionCuboidElementComponent(collisioncuboid));
 
@@ -239,91 +261,87 @@ internal class EntityFactory : IEntityFactory
         });
     }
     
-    public Entity CreateCollisionPolygon(Vector3 position, IEnumerable<Vector2> vertices, byte interior = 0, ushort dimension = 0, string? id = null, Action<Entity>? entityBuilder = null)
+    public Entity CreateCollisionPolygon(Vector3 position, IEnumerable<Vector2> vertices, ConstructionInfo? constructionInfo = null, Action<Entity>? entityBuilder = null)
     {
-        return _ecs.CreateEntity(id ?? $"collision polygon {Guid.NewGuid()}", Entity.EntityTag.CollisionShape, entity =>
+        return _ecs.CreateEntity(constructionInfo?.Id ?? $"collision polygon {Guid.NewGuid()}", Entity.EntityTag.CollisionShape, entity =>
         {
-            var collisionPolygon = new CollisionPolygon(position, vertices);
+            entity.AddComponent(new CollisionPolygonElementComponent(new CollisionPolygon(position, vertices)));
             entity.Transform.Position = position;
-            entity.Transform.Interior = interior;
-            entity.Transform.Dimension = dimension;
-
-            var collisionPolygonElementComponent = entity.AddComponent(new CollisionPolygonElementComponent(collisionPolygon));
+            if (constructionInfo != null)
+            {
+                entity.Transform.Interior = constructionInfo.Interior;
+                entity.Transform.Dimension = constructionInfo.Dimension;
+            }
 
             AssociateWithServer(entity);
-
             entityBuilder?.Invoke(entity);
         });
     }
 
-    public Entity CreateCollisionRectangle(Vector2 position, Vector2 dimensions, byte interior = 0, ushort dimension = 0, string? id = null, Action<Entity>? entityBuilder = null)
+    public Entity CreateCollisionRectangle(Vector2 position, Vector2 dimensions, ConstructionInfo? constructionInfo = null, Action<Entity>? entityBuilder = null)
     {
-        return _ecs.CreateEntity(id ?? $"collision sphere {Guid.NewGuid()}", Entity.EntityTag.CollisionShape, entity =>
+        return _ecs.CreateEntity(constructionInfo?.Id ?? $"collision sphere {Guid.NewGuid()}", Entity.EntityTag.CollisionShape, entity =>
         {
-            var collisionRectangle = new CollisionRectangle(position, dimensions);
-
+            entity.AddComponent(new CollisionRectangleElementComponent(new CollisionRectangle(position, dimensions)));
             entity.Transform.Position = new Vector3(position, 0);
-            entity.Transform.Interior = interior;
-            entity.Transform.Dimension = dimension;
-
-            var collisionRectangleElementComponent = entity.AddComponent(new CollisionRectangleElementComponent(collisionRectangle));
+            if (constructionInfo != null)
+            {
+                entity.Transform.Interior = constructionInfo.Interior;
+                entity.Transform.Dimension = constructionInfo.Dimension;
+            }
 
             AssociateWithServer(entity);
-
             entityBuilder?.Invoke(entity);
         });
     }
     
-    public Entity CreateCollisionSphere(Vector3 position, float radius, byte interior = 0, ushort dimension = 0, string? id = null, Action<Entity>? entityBuilder = null)
+    public Entity CreateCollisionSphere(Vector3 position, float radius, ConstructionInfo? constructionInfo = null, Action<Entity>? entityBuilder = null)
     {
-        return _ecs.CreateEntity(id ?? $"collision sphere {Guid.NewGuid()}", Entity.EntityTag.CollisionShape, entity =>
+        return _ecs.CreateEntity(constructionInfo?.Id ?? $"collision sphere {Guid.NewGuid()}", Entity.EntityTag.CollisionShape, entity =>
         {
-            var collisionSphere = new CollisionSphere(new Vector3(0, 0, 1000), radius);
-
+            entity.AddComponent(new CollisionSphereElementComponent(new CollisionSphere(new Vector3(0, 0, 1000), radius)));
             entity.Transform.Position = position;
-            entity.Transform.Interior = interior;
-            entity.Transform.Dimension = dimension;
-
-            var collisionSphereElementComponent = entity.AddComponent(new CollisionSphereElementComponent(collisionSphere));
+            if (constructionInfo != null)
+            {
+                entity.Transform.Interior = constructionInfo.Interior;
+                entity.Transform.Dimension = constructionInfo.Dimension;
+            }
 
             AssociateWithServer(entity);
-
             entityBuilder?.Invoke(entity);
         });
     }
     
-    public Entity CreateCollisionTube(Vector3 position, float radius, float height, byte interior = 0, ushort dimension = 0, string? id = null, Action<Entity>? entityBuilder = null)
+    public Entity CreateCollisionTube(Vector3 position, float radius, float height, ConstructionInfo? constructionInfo = null, Action<Entity>? entityBuilder = null)
     {
-        return _ecs.CreateEntity(id ?? $"collision sphere {Guid.NewGuid()}", Entity.EntityTag.CollisionShape, entity =>
+        return _ecs.CreateEntity(constructionInfo?.Id ?? $"collision sphere {Guid.NewGuid()}", Entity.EntityTag.CollisionShape, entity =>
         {
-            var collisionTube = new CollisionTube(position, radius, height);
-
+            entity.AddComponent(new CollisionTubeElementComponent(new CollisionTube(position, radius, height)));
             entity.Transform.Position = position;
-            entity.Transform.Interior = interior;
-            entity.Transform.Dimension = dimension;
-
-            var collisionTubeElementComponent = entity.AddComponent(new CollisionTubeElementComponent(collisionTube));
+            if (constructionInfo != null)
+            {
+                entity.Transform.Interior = constructionInfo.Interior;
+                entity.Transform.Dimension = constructionInfo.Dimension;
+            }
 
             AssociateWithServer(entity);
-
             entityBuilder?.Invoke(entity);
         });
     }
     
-    public Entity CreatePed(PedModel pedModel, Vector3 position, byte interior = 0, ushort dimension = 0, string? id = null, Action<Entity>? entityBuilder = null)
+    public Entity CreatePed(PedModel pedModel, Vector3 position, ConstructionInfo? constructionInfo = null, Action<Entity>? entityBuilder = null)
     {
-        return _ecs.CreateEntity(id ?? $"ped {Guid.NewGuid()}", Entity.EntityTag.Ped, entity =>
+        return _ecs.CreateEntity(constructionInfo?.Id ?? $"ped {Guid.NewGuid()}", Entity.EntityTag.Ped, entity =>
         {
-            var ped = new Ped(pedModel, position);
-
+            entity.AddComponent(new PedElementComponent(new Ped(pedModel, position)));
             entity.Transform.Position = position;
-            entity.Transform.Interior = interior;
-            entity.Transform.Dimension = dimension;
-
-            var pedElementComponent = entity.AddComponent(new PedElementComponent(ped));
+            if (constructionInfo != null)
+            {
+                entity.Transform.Interior = constructionInfo.Interior;
+                entity.Transform.Dimension = constructionInfo.Dimension;
+            }
 
             AssociateWithServer(entity);
-
             entityBuilder?.Invoke(entity);
         });
     }

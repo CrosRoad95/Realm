@@ -141,7 +141,6 @@ internal class SaveService : ISaveService
         {
             user.Licenses = licensesComponent.Licenses.Select(x => new UserLicense
             {
-                User = user,
                 LicenseId = x.licenseId,
                 SuspendedReason = x.suspendedReason,
                 SuspendedUntil = x.suspendedUntil,

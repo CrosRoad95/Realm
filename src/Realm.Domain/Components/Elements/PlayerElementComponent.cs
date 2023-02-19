@@ -132,9 +132,9 @@ public sealed class PlayerElementComponent : ElementComponent
     {
         ThrowIfDisposed();
         _player.Camera.Target = _player;
-        _player.Spawn(position, rotation?.Z ?? 0, 0, 0, 0);
-        _player.Rotation = rotation ?? Vector3.Zero;
+        _player.Spawn(position, 0, 0, 0, 0);
         Entity.Transform.Position = position;
+        Entity.Transform.Rotation = rotation ?? Vector3.Zero;
         Spawned = true;
     }
 

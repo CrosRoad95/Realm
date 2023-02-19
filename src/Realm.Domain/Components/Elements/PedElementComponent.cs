@@ -1,6 +1,4 @@
-﻿using Realm.Domain.Rules;
-
-namespace Realm.Domain.Components.Elements;
+﻿namespace Realm.Domain.Components.Elements;
 
 public class PedElementComponent : ElementComponent
 {

@@ -33,7 +33,12 @@ internal class LoadService : ILoadService
             try
             {
                 await Task.Delay(200);
-                var entity = _entityFactory.CreateVehicle(vehicleData.Model, vehicleData.TransformAndMotion.Position, vehicleData.TransformAndMotion.Rotation, vehicleData.TransformAndMotion.Interior, vehicleData.TransformAndMotion.Dimension, $"vehicle {vehicleData.Id}",
+                var entity = _entityFactory.CreateVehicle(vehicleData.Model, vehicleData.TransformAndMotion.Position, vehicleData.TransformAndMotion.Rotation, new Domain.Concepts.ConstructionInfo
+                {
+                    Id = $"vehicle {vehicleData.Id}",
+                    Interior = vehicleData.TransformAndMotion.Interior,
+                    Dimension = vehicleData.TransformAndMotion.Dimension,
+                },
                     entity =>
                     {
                         entity.AddComponent(new PrivateVehicleComponent(vehicleData));
