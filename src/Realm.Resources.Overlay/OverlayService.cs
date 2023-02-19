@@ -23,9 +23,11 @@ public class OverlayService
     internal Action<Player, string, Vector2, IEnumerable<LuaValue>>? HudCreated;
     internal Action<string, Vector3, IEnumerable<LuaValue>>? Hud3dCreated;
     internal Action<Player, string>? HudRemoved;
+    internal Action<string>? Hud3dRemoved;
     internal Action<Player, string, bool>? HudVisibilityChanged;
     internal Action<Player, string, float, float>? HudPositionChanged;
     internal Action<Player, string, Dictionary<int, object>>? HudStateChanged;
+    internal Action<string, Dictionary<int, object>>? Hud3dStateChanged;
     private readonly AssetsService _assetsService;
 
     public OverlayService(AssetsService assetsService)
@@ -52,10 +54,15 @@ public class OverlayService
     {
         HudStateChanged?.Invoke(player, hudId, state);
     }
-
-    public void CreateHud3d<TState>(string hudId, Action<IHudBuilder<TState>> hudBuilderCallback, Vector3? position = null) where TState : class
+        
+    public void SetHud3dState(string hudId, Dictionary<int, object> state)
     {
-        var hudBuilder = new HudBuilder<TState>(null, _assetsService, new Vector2(0,0));
+        Hud3dStateChanged?.Invoke(hudId, state);
+    }
+
+    public void CreateHud3d<TState>(string hudId, Action<IHudBuilder<TState>> hudBuilderCallback, TState state, Vector3? position = null) where TState : class
+    {
+        var hudBuilder = new HudBuilder<TState>(state, _assetsService, new Vector2(0,0));
         hudBuilderCallback(hudBuilder);
         Hud3dCreated?.Invoke(hudId, position ?? Vector3.Zero, hudBuilder.HudElementsDefinitions);
     }
@@ -77,5 +84,9 @@ public class OverlayService
     public void RemoveHud(Player player, string hudId)
     {
         HudRemoved?.Invoke(player, hudId);
+    }
+    public void RemoveHud3d(string hudId)
+    {
+        Hud3dRemoved?.Invoke(hudId);
     }
 }

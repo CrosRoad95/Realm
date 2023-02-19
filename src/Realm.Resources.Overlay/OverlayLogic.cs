@@ -27,9 +27,11 @@ internal class OverlayLogic
         _overlayService.HudCreated = HandleHudCreated;
         _overlayService.Hud3dCreated = HandleHud3dCreated;
         _overlayService.HudRemoved = HandleHudRemoved;
+        _overlayService.Hud3dRemoved = HandleHud3dRemoved;
         _overlayService.HudVisibilityChanged = HandleHudVisibilityChanged;
         _overlayService.HudPositionChanged = HandleHudPositionChanged;
         _overlayService.HudStateChanged = HandleHudStateChanged;
+        _overlayService.Hud3dStateChanged = HandleHud3dStateChanged;
     }
 
     private void HandleNotificationAdded(Player player, string message)
@@ -45,6 +47,23 @@ internal class OverlayLogic
     public void HandleHudPositionChanged(Player player, string hudId, float x, float y)
     {
         _luaEventService.TriggerEventFor(player, "setHudPosition", player, hudId, x, y);
+    }
+
+    public void HandleHud3dStateChanged(string hudId, Dictionary<int, object> keyValuePairs)
+    {
+        Dictionary<LuaValue, LuaValue> luaValue = new();
+        foreach (var item in keyValuePairs)
+        {
+            var stringValue = item.Value.ToString();
+            if (stringValue != null)
+            {
+                if (double.TryParse(stringValue, out var result))
+                    luaValue.Add(item.Key, result);
+                else
+                    luaValue.Add(item.Key, stringValue);
+            }
+        }
+        _luaEventService.TriggerEvent("setHud3dState", _rootElement, hudId, new LuaValue(luaValue));
     }
 
     public void HandleHudStateChanged(Player player, string hudId, Dictionary<int, object> keyValuePairs)
@@ -77,6 +96,11 @@ internal class OverlayLogic
     private void HandleHudRemoved(Player player, string hudId)
     {
         _luaEventService.TriggerEventFor(player, "removeHud", player, hudId);
+    }
+    
+    private void HandleHud3dRemoved(string hudId)
+    {
+        _luaEventService.TriggerEvent("removeHud3d", _rootElement, hudId);
     }
 
     private void HandlePlayerJoin(Player player)

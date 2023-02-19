@@ -2,7 +2,8 @@
 local huds = {}
 local huds3d = {}
 local assets = {}
-local hud3dResolution = 32; -- 32 pixels per 1m
+local hud3dResolution = 128; -- 128 pixels per 1m
+
 
 local function renderHud(position, elements)
 	local x,y = unpack(position)
@@ -46,15 +47,32 @@ local function prepareElements(elements)
 	end
 end
 
+local function rerenderHud3d(elements, oldrt)
+	prepareElements(elements);
+	local sx,sy = calculateBoundingBox({0, 0}, elements)
+	local rt = dxCreateRenderTarget(sx, sy, false)
+    dxSetRenderTarget(rt)
+	renderHud({0,0}, elements)
+    dxSetRenderTarget()
+	return rt, sx, sy;
+end
+
 local function renderHuds()
 	for i,v in pairs(huds)do
 		if(enabledHuds[i])then
 			renderHud(v.position, v.elements)
 		end
 	end
+	local h;
 	for i,v in pairs(huds3d)do
-		local h = v.size[2] / hud3dResolution;
-		dxDrawMaterialLine3D(v.position[1], v.position[2], v.position[3] - h/2, v.position[1], v.position[2], v.position[3] + h/2, false, v.element, v.size[1] / hud3dResolution)
+		h = v.size[2] / hud3dResolution;
+		if(v.rerender)then
+			local newrt, sx, sy = rerenderHud3d(v.elements, v.element)
+			v.element = newrt;
+			v.size = {sx, sy}
+			v.rerender = false;
+		end
+		dxDrawMaterialLine3D(v.position[1], v.position[2], v.position[3] + h/2, v.position[1], v.position[2], v.position[3] - h/2, false, v.element, v.size[1] / hud3dResolution)
 	end
 end
 
@@ -65,8 +83,8 @@ local function addNotification(message)
 	}
 end
 
-local function setHudState(hudData, newState)
-	for i,v in ipairs(hudData.elements)do
+local function setHudState(elements, newState)
+	for i,v in ipairs(elements)do
 		if(newState[v[2]])then
 			if(v[1] == "text")then
 				v[3] = newState[v[2]]
@@ -87,7 +105,13 @@ end)
 
 addEvent("setHudState", true)
 addEventHandler("setHudState", localPlayer, function(hudId, newHudState)
-	setHudState(huds[hudId], newHudState)
+	setHudState(huds[hudId].elements, newHudState)
+end)
+
+addEvent("setHud3dState", true)
+addEventHandler("setHud3dState", localPlayer, function(hudId, newHudState)
+	setHudState(huds3d[hudId].elements, newHudState)
+	huds3d[hudId].rerender = true;
 end)
 
 addEvent("createHud", true)
@@ -101,22 +125,25 @@ end)
 
 addEvent("createHud3d", true)
 addEventHandler("createHud3d", localPlayer, function(hudId, elements, x, y, z)
-	prepareElements(elements);
-	local sx,sy = calculateBoundingBox({0, 0}, elements)
-	local rt = dxCreateRenderTarget(sx, sy, false)
-    dxSetRenderTarget(rt)
-	renderHud({0,0}, elements)
-    dxSetRenderTarget()
 	huds3d[hudId] = {
+		elements = elements,
 		position = {x,y,z},
-		size = {sx,sy},
-		element = rt,
+		size = {-1, -1},
+		element = nil,
+		rerender = true,
 	}
 end)
 
 addEvent("removeHud", true)
 addEventHandler("removeHud", localPlayer, function(hudId)
 	huds[hudId] = nil;
+	enabledHuds[hudId] = nil;
+end)
+
+addEvent("removeHud3d", true)
+addEventHandler("removeHud3d", localPlayer, function(hudId)
+	destroyElement(huds3d[hudId].element)
+	huds3d[hudId] = nil;
 	enabledHuds[hudId] = nil;
 end)
 

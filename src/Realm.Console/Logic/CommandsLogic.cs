@@ -17,6 +17,11 @@ internal sealed class CommandsLogic
     private readonly AssetsRegistry _assetsRegistry;
     private readonly ECS _ecs;
 
+    private class TestState
+    {
+        public string Text { get; set; }
+    }
+
     public CommandsLogic(RPGCommandService commandService, ILogger<CommandsLogic> logger, IEntityFactory entityFactory, RepositoryFactory repositoryFactory,
         ItemsRegistry itemsRegistry, IGroupService groupService, AssetsRegistry assetsRegistry, ECS ecs)
     {
@@ -347,19 +352,41 @@ internal sealed class CommandsLogic
             return Task.CompletedTask;
         });
         
-        _commandService.AddCommandHandler("hud3d", (entity, args) =>
+        _commandService.AddCommandHandler("hud3d", async (entity, args) =>
         {
             var e = _ecs.CreateEntity(Guid.NewGuid().ToString(), Entity.EntityTag.Unknown);
-            e.Transform.Position = entity.Transform.Position + new Vector3(4, 0, 0);
-            e.AddComponent(new Hud3dComponent<object>(e => e.AddRectangle(Vector2.Zero, new Size(50, 50), Color.Red), new object()));
-
-            var e2 = _ecs.CreateEntity(Guid.NewGuid().ToString(), Entity.EntityTag.Unknown);
-            e2.Transform.Position = entity.Transform.Position + new Vector3(-4, 0, 0);
-            e2.AddComponent(new Hud3dComponent<object>(e => e
+            e.Transform.Position = entity.Transform.Position + new Vector3(-4, 0, 0);
+            e.AddComponent(new Hud3dComponent<TestState>(e => e
                 .AddRectangle(Vector2.Zero, new Size(100, 100), Color.Red)
                 .AddRectangle(new Vector2(25, 25), new Size(50, 50), Color.Green)
-                , new object()));
-            return Task.CompletedTask;
+                .AddText(x => x.Text, new Vector2(0,0), new Size(100, 100), Color.Blue)
+                , new TestState
+                {
+                    Text = "test 1",
+                }));
+
+            await Task.Delay(2000);
+            _ecs.Destroy(e);
+        });
+        
+        _commandService.AddCommandHandler("hud3d2", async (entity, args) =>
+        {
+            var e = _ecs.CreateEntity(Guid.NewGuid().ToString(), Entity.EntityTag.Unknown);
+            e.Transform.Position = entity.Transform.Position + new Vector3(-4, 0, 0);
+            var hud3d = e.AddComponent(new Hud3dComponent<TestState>(e => e
+                .AddRectangle(Vector2.Zero, new Size(200, 200), Color.Red)
+                .AddRectangle(new Vector2(25, 25), new Size(50, 50), Color.Green)
+                .AddText(x => x.Text, new Vector2(0,0), new Size(200, 200), Color.White)
+                , new TestState
+                {
+                    Text = "test 1",
+                }));
+
+            while(true)
+            {
+                await Task.Delay(1000);
+                hud3d.UpdateState(x => x.Text = $"time {DateTime.Now}");
+            }
         });
 
         _commandService.AddCommandHandler("spawnbox2", (entity, args) =>
