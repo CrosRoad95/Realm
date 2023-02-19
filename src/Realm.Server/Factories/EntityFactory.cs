@@ -23,6 +23,8 @@ internal class EntityFactory : IEntityFactory
 
     private void AssociateWithServer(Entity entity)
     {
+        if (_rpgServer.MtaServer == null)
+            throw new InvalidOperationException("Could not create entities in logics constructors.");
         var elementComponent = entity.GetRequiredComponent<ElementComponent>();
         var element = elementComponent.Element;
         element.AssociateWith(_rpgServer.MtaServer);
