@@ -54,7 +54,10 @@ public class VehicleElementComponent : ElementComponent
         _vehicle.SetDoorOpenRatio(door, ratio, time);
     }
 
-
+    public void AddPassenger(byte seat, Entity pedEntity, bool warpsIn = true)
+    {
+        _vehicle.AddPassenger(seat, pedEntity.GetRequiredComponent<PedElementComponent>().Ped, warpsIn);
+    }
 
     internal VehicleElementComponent(Vehicle vehicle)
     {

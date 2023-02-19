@@ -2,12 +2,14 @@
 
 public class PedElementComponent : ElementComponent
 {
-    protected readonly Ped _pickup;
+    protected readonly Ped _ped;
 
-    internal override Element Element => _pickup;
+    internal Ped Ped => _ped;
+
+    internal override Element Element => _ped;
 
     internal PedElementComponent(Ped ped)
     {
-        _pickup = ped;
+        _ped = ped;
     }
 }

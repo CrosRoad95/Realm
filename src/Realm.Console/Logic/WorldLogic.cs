@@ -60,6 +60,10 @@ internal class WorldLogic
 
     private void HandleServerStarted()
     {
+        var veh = _entityFactory.CreateVehicle(404, new Vector3(0,0,4), Vector3.Zero);
+        var ped = _entityFactory.CreatePed(SlipeServer.Server.Elements.Enums.PedModel.Cj, new Vector3(5, 0, 4));
+        veh.GetRequiredComponent<VehicleElementComponent>().AddPassenger(0, ped);
+
         foreach (var item in _discoveryInfos)
         {
             var entity = _entityFactory.CreateCollisionSphere(item.Value.position, 8);

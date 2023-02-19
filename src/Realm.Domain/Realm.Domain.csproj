@@ -7,6 +7,12 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+	  <Compile Remove="Persistance\**" />
+	  <EmbeddedResource Remove="Persistance\**" />
+	  <None Remove="Persistance\**" />
+	</ItemGroup>
+
+	<ItemGroup>
 		<ProjectReference Include="..\Realm.Configuration\Realm.Configuration.csproj" />
 		<ProjectReference Include="..\Realm.Persistance\Realm.Persistance.csproj" />
 		<ProjectReference Include="..\Realm.Resources.AdminTools\Realm.Resources.AdminTools.csproj" />
@@ -18,10 +24,6 @@
 		<ProjectReference Include="..\Realm.Resources.StatisticsCounter\Realm.Resources.StatisticsCounter.csproj" />
 		<PackageReference Include="SlipeServer.Resources.NoClip" Version="0.1.0-CI-20230130-155823" />
 		<PackageReference Include="SlipeServer.Resources.Text3d" Version="0.1.0-CI-20230130-155823" />
-	</ItemGroup>
-
-	<ItemGroup>
-	  <Folder Include="Persistance\" />
 	</ItemGroup>
 	
 </Project>
