@@ -2,6 +2,7 @@
 using Realm.Domain.IdGenerators;
 using Realm.Resources.Overlay.Interfaces;
 using SlipeServer.Server.Collections;
+using SlipeServer.Server.Concepts;
 
 namespace Realm.Domain.Components.Elements;
 
@@ -52,6 +53,7 @@ public sealed class PlayerElementComponent : PedElementComponent
     internal bool Spawned { get; set; }
     public string Name { get => Player.Name; set => Player.Name = value; }
     public string Language { get; private set; } = "pl";
+    public Controls Controls => _player.Controls;
     public WeaponCollection Weapons => _player.Weapons;
 
     internal override Element Element => _player;
