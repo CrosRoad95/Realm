@@ -26,7 +26,7 @@ public abstract class Objective : IDisposable
         Load(entityFactory, playerEntity);
     }
 
-    protected void Complete()
+    protected void Complete(Objective objective)
     {
         ThrowIfDisposed();
 
@@ -39,11 +39,11 @@ public abstract class Objective : IDisposable
         if (_blipElementComponent != null)
             RemoveBlip();
 
-        Completed?.Invoke(this);
+        Completed?.Invoke(objective);
         _isFulfilled = true;
     }
 
-    public void Incomplete()
+    public void Incomplete(Objective objective)
     {
         ThrowIfDisposed();
 
@@ -56,7 +56,7 @@ public abstract class Objective : IDisposable
         if (_blipElementComponent != null)
             RemoveBlip();
 
-        Incompleted?.Invoke(this);
+        Incompleted?.Invoke(objective);
         _isFulfilled = true;
     }
 
@@ -100,7 +100,7 @@ public abstract class Objective : IDisposable
             RemoveBlip();
 
         if (!_isFulfilled)
-            Incomplete();
+            Incomplete(this);
 
         _disposed = true;
 

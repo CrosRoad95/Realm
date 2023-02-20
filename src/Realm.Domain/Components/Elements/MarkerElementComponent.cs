@@ -88,5 +88,6 @@ public class MarkerElementComponent : ElementComponent
     public override void Dispose()
     {
         Entity.Transform.PositionChanged -= HandlePositionChanged;
+        base.Dispose();
     }
 }

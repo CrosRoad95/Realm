@@ -46,7 +46,7 @@ public class MarkerEnterObjective : Objective
         ThrowIfDisposed();
 
         if(entity == Entity)
-            Complete();
+            Complete(this);
     }
 
     public override void Dispose()

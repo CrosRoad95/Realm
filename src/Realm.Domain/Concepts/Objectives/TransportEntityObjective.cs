@@ -59,7 +59,7 @@ public class TransportEntityObjective : Objective
         ThrowIfDisposed();
 
         if (entity == _entity)
-            Complete();
+            Complete(this);
     }
 
     public override void Dispose()

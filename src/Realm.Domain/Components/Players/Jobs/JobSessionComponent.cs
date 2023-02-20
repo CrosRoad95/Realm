@@ -71,7 +71,7 @@ public abstract class JobSessionComponent : SessionComponent
     private void HandleCompleted(Objective objective)
     {
         if (!objective.IsFulfilled)
-            objective.Incomplete();
+            objective.Incomplete(objective);
         objective.Dispose();
         _completedObjectives++;
     }
