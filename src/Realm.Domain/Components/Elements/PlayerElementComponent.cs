@@ -5,7 +5,7 @@ using SlipeServer.Server.Collections;
 
 namespace Realm.Domain.Components.Elements;
 
-public sealed class PlayerElementComponent : ElementComponent
+public sealed class PlayerElementComponent : PedElementComponent
 {
     [Inject]
     private ChatBox ChatBox { get; set; } = default!;
@@ -68,7 +68,7 @@ public sealed class PlayerElementComponent : ElementComponent
         }
     }
 
-    internal PlayerElementComponent(Player player, Vector2 screenSize)
+    internal PlayerElementComponent(Player player, Vector2 screenSize) : base(player)
     {
         _player = player;
         _screenSize = screenSize;

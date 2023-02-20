@@ -1,6 +1,4 @@
-﻿using Realm.Domain.Concepts.Objectives;
-
-namespace Realm.Domain.Components.Players.Jobs;
+﻿namespace Realm.Domain.Components.Players.Jobs;
 
 public abstract class JobSessionComponent : SessionComponent
 {
