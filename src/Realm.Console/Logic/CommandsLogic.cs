@@ -351,6 +351,19 @@ internal sealed class CommandsLogic
             objectEntity.AddComponent(new LiftableWorldObjectComponent());
             return Task.CompletedTask;
         });
+
+        _commandService.AddCommandHandler("spawnboxmany", (entity, args) =>
+        {
+            var objectEntity = _entityFactory.CreateObject(SlipeServer.Server.Enums.ObjectModel.Gunbox, entity.Transform.Position + new Vector3(4, 0, -0.6f), Vector3.Zero);
+            objectEntity.AddComponent(new LiftableWorldObjectComponent());
+            var objectEntity1 = _entityFactory.CreateObject(SlipeServer.Server.Enums.ObjectModel.Gunbox, entity.Transform.Position + new Vector3(4 + 0.8f, 0, -0.6f), Vector3.Zero);
+            objectEntity1.AddComponent(new LiftableWorldObjectComponent());
+            var objectEntity2 = _entityFactory.CreateObject(SlipeServer.Server.Enums.ObjectModel.Gunbox, entity.Transform.Position + new Vector3(4, 0 + 0.8f, -0.6f), Vector3.Zero);
+            objectEntity2.AddComponent(new LiftableWorldObjectComponent());
+            var objectEntity3 = _entityFactory.CreateObject(SlipeServer.Server.Enums.ObjectModel.Gunbox, entity.Transform.Position + new Vector3(4 + 0.8f, 0 + 0.8f, -0.6f), Vector3.Zero);
+            objectEntity3.AddComponent(new LiftableWorldObjectComponent());
+            return Task.CompletedTask;
+        });
         
         _commandService.AddCommandHandler("hud3d", async (entity, args) =>
         {

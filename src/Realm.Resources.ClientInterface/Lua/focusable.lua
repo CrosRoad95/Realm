@@ -49,7 +49,7 @@ local function findNearestElementOfIntrestAt(x,y,z, i, d)
 	if(#vehicles > 0)then
 		return findNearestElementToPoint(vehicles, x,y,z)
 	end
-	local objects = getElementsWithinRange(x,y,z, 1.5, "object", i, d )
+	local objects = getElementsWithinRange(x,y,z, 0.75, "object", i, d )
 	if(#objects > 0)then
 		return findNearestElementToPoint(objects, x,y,z)
 	end
@@ -71,7 +71,7 @@ local function updateFocusedElement()
 		z = z - 0.5;
 	end
 	local _,_,r = getElementRotation(localPlayer)
-	local px,py,pz = getPointFromDistanceRotation(x, y, 1.25, -r)
+	local px,py,pz = getPointFromDistanceRotation(x, y, 0.5, -r)
 	local nearestElement,nearestChildElement = findNearestElementOfIntrestAt(px, py, z, getElementInterior(localPlayer), getElementDimension(localPlayer))
 	
 	if(debugRenderEnabled)then
