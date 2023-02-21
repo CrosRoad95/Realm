@@ -120,7 +120,7 @@ addEventHandler("createHud", localPlayer, function(hudId, x, y, elements)
 		position = {x,y},
 		elements = elements,
 	}
-	prepareElements(element);
+	prepareElements(elements);
 end)
 
 addEvent("createHud3d", true)
