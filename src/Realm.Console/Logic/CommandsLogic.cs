@@ -395,10 +395,11 @@ internal sealed class CommandsLogic
                     Text = "test 1",
                 }));
 
+            int i = 0;
             while(true)
             {
-                await Task.Delay(1000);
-                hud3d.UpdateState(x => x.Text = $"time {DateTime.Now}");
+                await Task.Delay(1000 / 60);
+                hud3d.UpdateState(x => x.Text = $"time {DateTime.Now} {i++}");
             }
         });
 

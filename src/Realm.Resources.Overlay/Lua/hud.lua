@@ -48,9 +48,20 @@ local function prepareElements(elements)
 end
 
 local function rerenderHud3d(elements, oldrt)
+	local rt;
 	prepareElements(elements);
 	local sx,sy = calculateBoundingBox({0, 0}, elements)
-	local rt = dxCreateRenderTarget(sx, sy, false)
+	if(oldrt)then
+		local osx, osy = dxGetMaterialSize(oldrt);
+		if(osx == sx and osy == sy)then
+			rt = oldrt
+		else
+			destroyElement(oldrt)
+			rt = dxCreateRenderTarget(sx, sy, false)
+		end
+	else
+		rt = dxCreateRenderTarget(sx, sy, false)
+	end
     dxSetRenderTarget(rt)
 	renderHud({0,0}, elements)
     dxSetRenderTarget()
@@ -66,7 +77,7 @@ local function renderHuds()
 	local h;
 	for i,v in pairs(huds3d)do
 		h = v.size[2] / hud3dResolution;
-		if(v.rerender)then
+		if(v.rerender or not isElement(v.element))then
 			local newrt, sx, sy = rerenderHud3d(v.elements, v.element)
 			v.element = newrt;
 			v.size = {sx, sy}
