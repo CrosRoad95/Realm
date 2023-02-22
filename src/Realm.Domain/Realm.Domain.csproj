@@ -22,6 +22,7 @@
 		<ProjectReference Include="..\Realm.Resources.ClientInterface\Realm.Resources.ClientInterface.csproj" />
 		<ProjectReference Include="..\Realm.Resources.Overlay\Realm.Resources.Overlay.csproj" />
 		<ProjectReference Include="..\Realm.Resources.StatisticsCounter\Realm.Resources.StatisticsCounter.csproj" />
+		<PackageReference Include="SlipeServer.Resources.BoneAttach" Version="0.1.0-CI-20230208-155823" />
 		<PackageReference Include="SlipeServer.Resources.NoClip" Version="0.1.0-CI-20230130-155823" />
 		<PackageReference Include="SlipeServer.Resources.Text3d" Version="0.1.0-CI-20230130-155823" />
 	</ItemGroup>

@@ -45,7 +45,7 @@ internal sealed class PlayerGameplayLogic
             if (attachedEntityComponent.AttachedEntity.GetRequiredComponent<LiftableWorldObjectComponent>().TryDrop())
             {
                 playerEntity.DestroyComponent(attachedEntityComponent);
-                attachedEntityComponent.AttachedEntity.Transform.Position += new Vector3(0.0f, 0.0f, -0.6f);
+                attachedEntityComponent.AttachedEntity.Transform.Position = playerEntity.Transform.Position + playerEntity.Transform.Forward * 1.0f - new Vector3(0, 0, 0.55f);
                 attachedEntityComponent.AttachedEntity.Transform.Rotation = new Vector3
                 {
                     X = 0,
@@ -67,7 +67,7 @@ internal sealed class PlayerGameplayLogic
                         {
                             await playerElementComponent.DoAnimationAsync(PlayerElementComponent.Animation.CarryLiftUp);
                             playerElementComponent.DoAnimation(PlayerElementComponent.Animation.StartCarry);
-                            playerEntity.AddComponent(new AttachedEntityComponent(currentInteractEntity, new Vector3(0.6f, 0.6f, -0.4f)));
+                            playerEntity.AddComponent(new AttachedEntityComponent(currentInteractEntity, SlipeServer.Packets.Enums.BoneId.LeftHand, new Vector3(0.2f, 0.2f, -0), new Vector3(0, -20, 0)));
                         }
                         break;
                     case DurationBasedHoldInteractionComponent durationBasedHoldInteractionComponent:

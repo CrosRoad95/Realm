@@ -1,5 +1,6 @@
 ﻿using Realm.Persistance.MySql;
 using Realm.Resources.Assets;
+using SlipeServer.Resources.BoneAttach;
 using SlipeServer.Resources.Text3d;
 
 namespace Realm.Server.Extensions;
@@ -68,6 +69,7 @@ public static class ServerBuilderExtensions
         builder.AddOverlayResource();
         builder.AddAssetsResource();
         builder.AddText3dResource();
+        builder.AddBoneAttachResource(BoneAttachVersion.Release_1_2_0);
 
         // Resources logics
         builder.AddLogic<ClientInterfaceLogic>();

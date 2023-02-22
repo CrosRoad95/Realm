@@ -1,37 +1,40 @@
-﻿namespace Realm.Domain.Components.Common;
+﻿using SlipeServer.Resources.BoneAttach;
+
+namespace Realm.Domain.Components.Common;
 
 [ComponentUsage(true)]
 public class AttachedEntityComponent : Component
 {
+    private readonly BoneId _boneId;
+    private readonly Vector3? _positionOffset;
+    private readonly Vector3? _rotationOffset;
+
+    [Inject]
+    private BoneAttachService BoneAttachService { get; set; } = default!;
+
     public Entity AttachedEntity { get; }
     public Vector3 Offset { get; }
 
-    public AttachedEntityComponent(Entity entity, Vector3 offset)
+    public AttachedEntityComponent(Entity entity, BoneId boneId, Vector3? positionOffset = null, Vector3? rotationOffset = null)
     {
         AttachedEntity = entity;
-        Offset = offset;
+        _boneId = boneId;
+        _positionOffset = positionOffset;
+        _rotationOffset = rotationOffset;
     }
 
     protected override void Load()
     {
+        var element = AttachedEntity.GetRequiredComponent<ElementComponent>().Element;
+        var ped = Entity.GetRequiredComponent<PedElementComponent>().Ped;
+        BoneAttachService.Attach(element, ped, _boneId, _positionOffset, _rotationOffset);
         AttachedEntity.GetRequiredComponent<ElementComponent>().AreCollisionsEnabled = false;
-        Entity.Transform.PositionChanged += Transform_PositionChanged;
-        Update();
-    }
-
-    private void Transform_PositionChanged(Transform transform)
-    {
-        Update();
-    }
-
-    private void Update()
-    {
-        AttachedEntity.Transform.Position = Entity.Transform.Position + Entity.Transform.Forward * Offset;
     }
 
     public override void Dispose()
     {
-        Entity.Transform.PositionChanged -= Transform_PositionChanged;
-        AttachedEntity.GetRequiredComponent<ElementComponent>().AreCollisionsEnabled = true;
+        var element = AttachedEntity.GetRequiredComponent<ElementComponent>().Element;
+        if(BoneAttachService.IsAttached(element))
+            BoneAttachService.Detach(element);
     }
 }
