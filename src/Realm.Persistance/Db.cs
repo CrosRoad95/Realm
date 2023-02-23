@@ -26,6 +26,7 @@ public abstract class Db<T> : IdentityDbContext<User, Role, int,
     public DbSet<FractionMember> FractionMembers => Set<FractionMember>();
     public DbSet<DiscordIntegration> DiscordIntegrations => Set<DiscordIntegration>();
     public DbSet<UserUpgrade> UserUpgrades => Set<UserUpgrade>();
+    public DbSet<VehiclePartDamage> VehiclePartDamages => Set<VehiclePartDamage>();
 
     public Db(DbContextOptions<T> options) : base(options)
     {
@@ -317,6 +318,11 @@ public abstract class Db<T> : IdentityDbContext<User, Role, int,
                 .HasMany(x => x.Fuels)
                 .WithOne(x => x.Vehicle)
                 .HasForeignKey(x => x.VehicleId);
+
+            entityBuilder
+                .HasMany(x => x.PartDamages)
+                .WithOne(x => x.Vehicle)
+                .HasForeignKey(x => x.VehicleId);
         });
 
         modelBuilder.Entity<VehicleAccess>(entityBuilder =>
@@ -353,6 +359,14 @@ public abstract class Db<T> : IdentityDbContext<User, Role, int,
 
             entityBuilder.Property(x => x.FuelType)
                 .HasMaxLength(16);
+        });
+        
+
+        modelBuilder.Entity<VehiclePartDamage>(entityBuilder =>
+        {
+            entityBuilder
+                .ToTable(nameof(VehiclePartDamages))
+                .HasKey(x => new { x.VehicleId, x.PartId });
         });
         
         modelBuilder.Entity<Discovery>(entityBuilder =>

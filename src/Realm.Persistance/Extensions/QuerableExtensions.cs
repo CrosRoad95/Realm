@@ -38,6 +38,7 @@ public static class QuerableExtensions
     {
         return query.Include(x => x.Fuels)
             .Include(x => x.Upgrades)
+            .Include(x => x.PartDamages)
             .Include(x => x.VehicleAccesses)
             .ThenInclude(x => x.User);
     }

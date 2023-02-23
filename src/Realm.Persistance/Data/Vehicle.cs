@@ -29,5 +29,6 @@ public sealed class Vehicle
     public ICollection<VehicleAccess> VehicleAccesses { get; set; } = new List<VehicleAccess>();
     public ICollection<VehicleUpgrade> Upgrades { get; set; } = new List<VehicleUpgrade>();
     public ICollection<VehicleFuel> Fuels { get; set; } = new List<VehicleFuel>();
+    public ICollection<VehiclePartDamage> PartDamages { get; set; } = new List<VehiclePartDamage>();
 #pragma warning restore CS8618
 }

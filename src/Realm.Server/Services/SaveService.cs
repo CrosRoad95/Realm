@@ -114,6 +114,21 @@ internal class SaveService : ISaveService
         {
             vehicleData.Mileage = mileageCounterComponent.Mileage;
         }
+        if (entity.TryGetComponent(out VehiclePartDamageComponent vehiclePartDamageComponent))
+        {
+            List<VehiclePartDamage> vehiclePartDamages = new();
+            foreach (var item in vehiclePartDamageComponent.Parts)
+            {
+                var state = vehiclePartDamageComponent.Get(item);
+                if(state != null)
+                    vehiclePartDamages.Add(new VehiclePartDamage
+                    {
+                        PartId = item,
+                        State = state.Value
+                    });
+            }
+            vehicleData.PartDamages = vehiclePartDamages;
+        }
     }
 
     private async Task SavePlayer(Entity entity)

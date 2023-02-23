@@ -169,7 +169,18 @@ internal sealed class CommandsLogic
             vehicleEntity.AddComponent<MileageCounterComponent>();
             vehicleEntity.AddComponent(new VehicleFuelComponent("default", 20, 20, 0.01, 2)).Active = true;
             vehicleEntity.AddComponent<VehicleFocusableComponent>();
+            vehicleEntity.AddComponent<VehiclePartDamageComponent>().AddPart(1, 1337);
             return Task.CompletedTask;
+        });
+        
+        _commandService.AddCommandHandler("cvprivate", async (entity, args) =>
+        {
+            using var vehicleRepository = _repositoryFactory.GetVehicleRepository();
+            var vehicleEntity = await _entityFactory.CreateNewPrivateVehicle(404, entity.Transform.Position + new Vector3(4, 0, 0), entity.Transform.Rotation);
+            vehicleEntity.AddComponent(new VehicleUpgradesComponent()).AddUpgrade(1);
+            vehicleEntity.AddComponent(new MileageCounterComponent());
+            vehicleEntity.AddComponent(new VehicleFuelComponent("default", 20, 20, 0.01, 2)).Active = true;
+            vehicleEntity.AddComponent<VehiclePartDamageComponent>().AddPart(1, 1337);
         });
         
         _commandService.AddCommandHandler("exclusivecv", (entity, args) =>
@@ -322,6 +333,7 @@ internal sealed class CommandsLogic
                 vehicleEntity.AddComponent(new VehicleUpgradesComponent()).AddUpgrade(1);
                 vehicleEntity.AddComponent(new MileageCounterComponent());
                 vehicleEntity.AddComponent(new VehicleFuelComponent("default", 20, 20, 0.01, 2)).Active = true;
+                vehicleEntity.AddComponent<VehiclePartDamageComponent>().AddPart(1, 1337);
             }
         });
 

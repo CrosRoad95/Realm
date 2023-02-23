@@ -743,6 +743,22 @@ namespace Realm.Persistance.MySql.Migrations
                     b.ToTable("VehicleFuels", (string)null);
                 });
 
+            modelBuilder.Entity("Realm.Persistance.Data.VehiclePartDamage", b =>
+                {
+                    b.Property<int>("VehicleId")
+                        .HasColumnType("int");
+
+                    b.Property<short>("PartId")
+                        .HasColumnType("smallint");
+
+                    b.Property<float>("State")
+                        .HasColumnType("float");
+
+                    b.HasKey("VehicleId", "PartId");
+
+                    b.ToTable("VehiclePartDamages", (string)null);
+                });
+
             modelBuilder.Entity("Realm.Persistance.Data.VehicleUpgrade", b =>
                 {
                     b.Property<int>("VehicleId")
@@ -996,6 +1012,17 @@ namespace Realm.Persistance.MySql.Migrations
                     b.Navigation("Vehicle");
                 });
 
+            modelBuilder.Entity("Realm.Persistance.Data.VehiclePartDamage", b =>
+                {
+                    b.HasOne("Realm.Persistance.Data.Vehicle", "Vehicle")
+                        .WithMany("PartDamages")
+                        .HasForeignKey("VehicleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Vehicle");
+                });
+
             modelBuilder.Entity("Realm.Persistance.Data.VehicleUpgrade", b =>
                 {
                     b.HasOne("Realm.Persistance.Data.Vehicle", "Vehicle")
@@ -1054,6 +1081,8 @@ namespace Realm.Persistance.MySql.Migrations
             modelBuilder.Entity("Realm.Persistance.Data.Vehicle", b =>
                 {
                     b.Navigation("Fuels");
+
+                    b.Navigation("PartDamages");
 
                     b.Navigation("Upgrades");
 
