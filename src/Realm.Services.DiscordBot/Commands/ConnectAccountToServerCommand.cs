@@ -1,6 +1,5 @@
 ﻿using Grpc.Core;
 using Grpc.Net.Client;
-using Microsoft.Extensions.Logging;
 
 namespace Realm.DiscordBot.Commands;
 

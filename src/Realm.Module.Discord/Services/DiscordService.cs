@@ -1,5 +1,4 @@
-﻿using Realm.Interfaces.Grpc;
-using Realm.Module.Discord.Interfaces;
+﻿using Realm.Module.Discord.Interfaces;
 
 namespace Realm.Module.Grpc.Services;
 

@@ -1,5 +1,4 @@
 ﻿using Realm.Interfaces.Extend;
-using Realm.Interfaces.Grpc;
 using Realm.Module.Discord.Interfaces;
 using Realm.Module.Grpc.Services;
 
