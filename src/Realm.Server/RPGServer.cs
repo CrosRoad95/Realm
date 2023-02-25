@@ -1,5 +1,7 @@
-﻿using Realm.Domain.Components.Elements;
+﻿using Realm.Configuration;
+using Realm.Domain.Components.Elements;
 using Realm.Domain.IdGenerators;
+using Realm.Domain.Options;
 using Realm.Domain.Registries;
 using Realm.Module.Discord;
 using Realm.Module.Grpc;
@@ -30,7 +32,7 @@ internal sealed class RPGServer : IRPGServer
                 builder.ConfigureServer(realmConfigurationProvider);
                 configureServerBuilder?.Invoke(builder);
 
-                builder.ConfigureServices(ConfigureServices);
+                builder.ConfigureServices(x => ConfigureServices(x, realmConfigurationProvider));
             }
         );
 
@@ -38,7 +40,7 @@ internal sealed class RPGServer : IRPGServer
         _logger.LogInformation("Starting server:");
     }
 
-    private void ConfigureServices(IServiceCollection services)
+    private void ConfigureServices(IServiceCollection services, IRealmConfigurationProvider realmConfigurationProvider)
     {
         // Common
         services.AddSingleton((IRPGServer)this);
@@ -63,6 +65,9 @@ internal sealed class RPGServer : IRPGServer
         services.AddSingleton<IElementIdGenerator, RangedCollectionBasedElementIdGenerator>(x =>
             new RangedCollectionBasedElementIdGenerator(x.GetRequiredService<IElementCollection>(), IdGeneratorConstants.PlayerIdStart, IdGeneratorConstants.PlayerIdStop)
         );
+
+        // Options
+        services.Configure<GameplayOptions>(realmConfigurationProvider.GetSection("Gameplay"));
 
         services.AddGrpcModule();
         services.AddDiscordModule();

@@ -3,6 +3,7 @@ using Realm.Common.Exceptions;
 using Realm.Configuration;
 using Realm.Domain;
 using Realm.Domain.Components.Players;
+using Realm.Domain.Options;
 using Realm.Tests.Helpers;
 
 namespace Realm.Tests.Tests;
@@ -16,7 +17,9 @@ public class MoneyComponentTests
     public MoneyComponentTests()
     {
         var services = new ServiceCollection();
-        services.AddSingleton<IRealmConfigurationProvider>(new TestConfigurationProvider());
+        var configurationProvider = new TestConfigurationProvider();
+        services.Configure<GameplayOptions>(configurationProvider.GetSection("Gameplay"));
+
         var serviceProvider = services.BuildServiceProvider();
         _entity = new(serviceProvider, "test", Entity.EntityTag.Unknown);
         _entityB = new(serviceProvider, "test2", Entity.EntityTag.Unknown);

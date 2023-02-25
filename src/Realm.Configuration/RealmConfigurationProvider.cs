@@ -16,6 +16,9 @@ public class RealmConfigurationProvider : IRealmConfigurationProvider
     }
 
     public T? Get<T>(string name) => _configuration.GetSection(name).Get<T>();
+
     public T GetRequired<T>(string name) => _configuration.GetSection(name).Get<T>() ??
         throw new Exception($"Missing configuration '{name}'");
+
+    public IConfigurationSection GetSection(string name) => _configuration.GetSection(name);
 }

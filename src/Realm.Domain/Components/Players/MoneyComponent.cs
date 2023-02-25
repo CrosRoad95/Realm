@@ -1,10 +1,13 @@
-﻿namespace Realm.Domain.Components.Players;
+﻿using Microsoft.Extensions.Options;
+using Realm.Domain.Options;
+
+namespace Realm.Domain.Components.Players;
 
 [ComponentUsage(false)]
 public class MoneyComponent : Component
 {
     [Inject]
-    private IRealmConfigurationProvider RealmConfigurationProvider { get; set; } = default!;
+    private IOptions<GameplayOptions> GameplayOptions { get; set; } = default!;
 
     private decimal _money = 0;
     private readonly ReaderWriterLockSlim _moneyLock = new();
@@ -20,7 +23,7 @@ public class MoneyComponent : Component
 
             value = Normalize(value);
 
-            if (Math.Abs(value) > RealmConfigurationProvider.GetRequired<decimal>("Gameplay:MoneyLimit"))
+            if (Math.Abs(value) > GameplayOptions.Value.MoneyLimit)
                 throw new GameplayException("Unable to set money beyond limit.");
 
             _moneyLock.EnterWriteLock();
@@ -70,7 +73,7 @@ public class MoneyComponent : Component
 
     private decimal Normalize(decimal amount)
     {
-        var moneyPrecision = RealmConfigurationProvider.GetRequired<byte>("Gameplay:MoneyPrecision");
+        var moneyPrecision = GameplayOptions.Value.MoneyPrecision;
         return Truncate(amount, moneyPrecision);
     }
 
@@ -89,7 +92,7 @@ public class MoneyComponent : Component
         _moneyLock.EnterWriteLock();
         try
         {
-            if (Math.Abs(_money) + amount > RealmConfigurationProvider.GetRequired<decimal>("Gameplay:MoneyLimit"))
+            if (Math.Abs(_money) + amount > GameplayOptions.Value.MoneyLimit)
                 throw new GameplayException("Unable to give money beyond limit.");
 
             _money += amount;
@@ -120,7 +123,7 @@ public class MoneyComponent : Component
         _moneyLock.EnterWriteLock();
         try
         {
-            if (Math.Abs(_money) + amount > RealmConfigurationProvider.GetRequired<decimal>("Gameplay:MoneyLimit"))
+            if (Math.Abs(_money) + amount > GameplayOptions.Value.MoneyLimit)
                 throw new GameplayException("Unable to take money beyond limit.");
 
             if(_money - amount < 0 && !force)
