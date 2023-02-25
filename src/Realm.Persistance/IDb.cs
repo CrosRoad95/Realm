@@ -28,6 +28,7 @@ public interface IDb : IDisposable
     DbSet<Fraction> Fractions { get; }
     DbSet<FractionMember> FractionMembers { get; }
     DbSet<UserUpgrade> UserUpgrades { get; }
+    DbSet<Ban> Bans { get; }
 
     Task MigrateAsync();
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);

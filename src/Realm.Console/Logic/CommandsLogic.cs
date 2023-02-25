@@ -16,6 +16,7 @@ internal sealed class CommandsLogic
     private readonly IGroupService _groupService;
     private readonly AssetsRegistry _assetsRegistry;
     private readonly ECS _ecs;
+    private readonly IBanService _banService;
 
     private class TestState
     {
@@ -23,7 +24,7 @@ internal sealed class CommandsLogic
     }
 
     public CommandsLogic(RPGCommandService commandService, ILogger<CommandsLogic> logger, IEntityFactory entityFactory, RepositoryFactory repositoryFactory,
-        ItemsRegistry itemsRegistry, IGroupService groupService, AssetsRegistry assetsRegistry, ECS ecs)
+        ItemsRegistry itemsRegistry, IGroupService groupService, AssetsRegistry assetsRegistry, ECS ecs, IBanService banService)
     {
         _commandService = commandService;
         _logger = logger;
@@ -33,6 +34,7 @@ internal sealed class CommandsLogic
         _groupService = groupService;
         _assetsRegistry = assetsRegistry;
         _ecs = ecs;
+        _banService = banService;
         _commandService.AddCommandHandler("gp", (entity, args) =>
         {
             logger.LogInformation("{position}, {rotation}", entity.Transform.Position, entity.Transform.Rotation);
@@ -596,6 +598,14 @@ internal sealed class CommandsLogic
             else
                 playerElementComponent.SendChatMessage($"Pomyślnie dodano ulepszenie id {i}");
             return Task.CompletedTask;
+        });
+        
+        _commandService.AddCommandHandler("ban", async (entity, args) =>
+        {
+            var accountComponent = entity.GetRequiredComponent<AccountComponent>();
+            var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();
+            await _banService.BanUserId(accountComponent.Id);
+            playerElementComponent.Kick("test 123");
         });
 
     }

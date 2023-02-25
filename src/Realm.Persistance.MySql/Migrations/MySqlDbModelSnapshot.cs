@@ -141,6 +141,39 @@ namespace Realm.Persistance.MySql.Migrations
                     b.ToTable("Achievements", (string)null);
                 });
 
+            modelBuilder.Entity("Realm.Persistance.Data.Ban", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("End")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("Reason")
+                        .HasMaxLength(256)
+                        .HasColumnType("varchar(256)");
+
+                    b.Property<string>("Responsible")
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("Serial")
+                        .HasMaxLength(32)
+                        .HasColumnType("varchar(32)");
+
+                    b.Property<int>("Type")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Bans", (string)null);
+                });
+
             modelBuilder.Entity("Realm.Persistance.Data.DailyVisits", b =>
                 {
                     b.Property<int>("UserId")
@@ -830,6 +863,15 @@ namespace Realm.Persistance.MySql.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Realm.Persistance.Data.Ban", b =>
+                {
+                    b.HasOne("Realm.Persistance.Data.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId");
 
                     b.Navigation("User");
                 });

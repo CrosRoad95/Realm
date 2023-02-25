@@ -1,4 +1,5 @@
-﻿using Realm.Persistance.Repository;
+﻿using Realm.Persistance.Interfaces;
+using Realm.Persistance.Repository;
 
 namespace Realm.Persistance;
 
@@ -28,6 +29,7 @@ public static class ServiceCollectionExtensions
         services.AddTransient<IVehicleRepository, VehicleRepository>();
         services.AddTransient<IGroupRepository, GroupRepository>();
         services.AddTransient<IFractionRepository, FractionRepository>();
+        services.AddTransient<IBanRepository, BanRepository>();
 
         services.AddDbContext<IDb, T>(dboptions, ServiceLifetime.Transient);
 

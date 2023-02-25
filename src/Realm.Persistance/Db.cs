@@ -27,6 +27,7 @@ public abstract class Db<T> : IdentityDbContext<User, Role, int,
     public DbSet<DiscordIntegration> DiscordIntegrations => Set<DiscordIntegration>();
     public DbSet<UserUpgrade> UserUpgrades => Set<UserUpgrade>();
     public DbSet<VehiclePartDamage> VehiclePartDamages => Set<VehiclePartDamage>();
+    public DbSet<Ban> Bans => Set<Ban>();
 
     public Db(DbContextOptions<T> options) : base(options)
     {
@@ -466,6 +467,19 @@ public abstract class Db<T> : IdentityDbContext<User, Role, int,
             entityBuilder
                 .ToTable(nameof(UserUpgrade))
                 .HasKey(x => new { x.UserId, x.UpgradeId });
+        });
+
+        modelBuilder.Entity<Ban>(entityBuilder =>
+        {
+            entityBuilder
+                .ToTable(nameof(Bans))
+                .HasKey(x => x.Id);
+
+            entityBuilder.Property(x => x.Serial)
+                .HasMaxLength(32);
+
+            entityBuilder.Property(x => x.Reason)
+                .HasMaxLength(256);
         });
     }
 }

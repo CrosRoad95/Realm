@@ -1,4 +1,5 @@
-﻿using Realm.Domain.IdGenerators;
+﻿using Realm.Domain.Components.Elements;
+using Realm.Domain.IdGenerators;
 using Realm.Domain.Registries;
 using Realm.Module.Discord;
 using Realm.Module.Grpc;
@@ -55,6 +56,7 @@ internal sealed class RPGServer : IRPGServer
         services.AddTransient<IVehiclesService, VehiclesService>();
         services.AddTransient<IGroupService, GroupService>();
         services.AddTransient<IFractionService, FractionService>();
+        services.AddTransient<IBanService, BanService>();
 
         services.AddTransient<IEntityFactory, EntityFactory>();
 

@@ -562,6 +562,16 @@ public sealed class PlayerElementComponent : PedElementComponent
         OverlayService.RemoveHud(_player, hudId);
     }
 
+    public void Kick(PlayerDisconnectType playerDisconnectType)
+    {
+        _player.Kick(playerDisconnectType);
+    }
+    
+    public void Kick(string reason)
+    {
+        _player.Kick(reason);
+    }
+
     public override void Dispose()
     {
         lock(_hudsLock)
@@ -575,4 +585,5 @@ public sealed class PlayerElementComponent : PedElementComponent
         base.Dispose();
         _player.Kick(PlayerDisconnectType.SHUTDOWN);
     }
+
 }
