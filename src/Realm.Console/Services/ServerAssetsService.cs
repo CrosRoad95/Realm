@@ -20,7 +20,6 @@ public class ServerAssetsService : IServerAssetsProvider
             var fileName = Path.GetRelativePath(_basePath, item);
             var content = File.ReadAllBytes(item);
             yield return (fileName, content);
-            var folder = Path.GetDirectoryName(fileName);
             switch(Path.GetDirectoryName(fileName))
             {
                 case "Fonts":

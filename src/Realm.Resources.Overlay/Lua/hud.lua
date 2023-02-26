@@ -9,7 +9,7 @@ local function renderHud(position, elements)
 	local x,y = unpack(position)
 	for i,v in ipairs(elements)do
 		if(v[1] == "text")then
-			dxDrawText(v[3], v[4] + x, v[5] + y, v[4] + v[6] + x, v[5] + v[7] + y, v[8], v[9], v[10], v[11], v[12], v[13])
+			dxDrawText(v[3], v[4] + x, v[5] + y, v[4] + v[6] + x, v[5] + v[7] + y, v[8], v[9], v[10], v[11] or "sans", v[12], v[13])
 		elseif(v[1] == "rectangle")then
 			dxDrawRectangle(v[3] + x, v[4] + y, v[5], v[6], v[7])
 		end

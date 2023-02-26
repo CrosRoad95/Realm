@@ -16,6 +16,9 @@ internal class AssetsResource : Resource
     internal AssetsResource(MtaServer server)
         : base(server, server.GetRequiredService<RootElement>(), "Assets")
     {
+        foreach (var (path, content) in AdditionalFiles)
+            Files.Add(ResourceFileFactory.FromBytes(content, path));
+
         var logger = server.GetRequiredService<ILogger<AssetsResource>>();
         var assets = server.GetRequiredService<IEnumerable<IServerAssetsProvider>>().SelectMany(x => x.Provide()).ToList();
         long contentSize = 0;
@@ -26,9 +29,6 @@ internal class AssetsResource : Resource
             contentSize += content.Length;
         }
         logger.LogInformation("Loaded {count} assets of total size: {sizeInMB:N2}MB", assets.Count, contentSize / 1024.0f / 1024.0f);
-
-        foreach (var (path, content) in AdditionalFiles)
-            Files.Add(ResourceFileFactory.FromBytes(content, path));
 
         Exports.Add("requestAsset");
     }

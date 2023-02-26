@@ -39,13 +39,22 @@ internal class ClientInterfaceLogic
         {
             case 0: // Custom
             case 3: // Information
-                _logger.LogInformation("Clientside: {player} ({level}): {message} in {file}:{line}", playerName, level, message, file, line);
+                if (line > 0)
+                    _logger.LogInformation("Clientside: {player} ({level}): {message} in {file}:{line}", playerName, level, message, file, line);
+                else
+                    _logger.LogInformation("Clientside: {player} ({level}): {message}", playerName, level, message);
                 break;
             case 2: // Warning
-                _logger.LogWarning("Clientside: {player} ({level}): {message} in {file}:{line}", playerName, level, message, file, line);
+                if (line > 0)
+                    _logger.LogWarning("Clientside: {player} ({level}): {message} in {file}:{line}", playerName, level, message, file, line);
+                else
+                    _logger.LogWarning("Clientside: {player} ({level}): {message}", playerName, level, message);
                 break;
             default: // Error or something else
-                _logger.LogError("Clientside: {player} ({level}): {message} in {file}:{line}", playerName, level, message, file, line);
+                if (line > 0)
+                    _logger.LogError("Clientside: {player} ({level}): {message} in {file}:{line}", playerName, level, message, file, line);
+                else
+                    _logger.LogError("Clientside: {player} ({level}): {message}", playerName, level, message);
                 break;
         }
     }
