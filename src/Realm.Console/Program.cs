@@ -40,6 +40,7 @@ var server = builder.Build(null, extraBuilderSteps: serverBuilder =>
         #region Discord integration specific
         x.AddSingleton<IDiscordStatusChannelUpdateHandler, DefaultDiscordStatusChannelUpdateHandler>();
         x.AddSingleton<IDiscordConnectAccountHandler, DefaultDiscordConnectAccountHandler>();
+        x.AddSingleton<IDiscordPrivateMessageReceived, DefaultDiscordPrivateMessageReceivedHandler>();
         #endregion
 
         #region In game command

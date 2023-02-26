@@ -11,6 +11,7 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<DiscordHandshakeServiceStub>();
         services.AddSingleton<DiscordStatusChannelServiceStub>();
         services.AddSingleton<DiscordConnectAccountChannelStub>();
+        services.AddSingleton<DiscordPrivateMessagesChannelsStub>();
 
         services.AddSingleton<IDiscordService, DiscordService>();
         services.AddSingleton<IModule, DiscordModule>();

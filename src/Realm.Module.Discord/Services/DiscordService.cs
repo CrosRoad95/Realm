@@ -13,6 +13,7 @@ internal class DiscordService : IDiscordService
 
     public UpdateStatusChannel? UpdateStatusChannel { get; set; }
     public TryConnectAccountChannel? TryConnectAccountChannel { get; set; }
+    public PrivateMessageReceived? PrivateMessageReceived { get; set; }
 
     public async Task<ulong> SendMessage(ulong channelId, string message)
     {

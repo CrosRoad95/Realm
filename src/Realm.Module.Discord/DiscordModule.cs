@@ -11,20 +11,25 @@ internal class DiscordModule : IModule
     private readonly Server? _grpcServer;
     private readonly IDiscordStatusChannelUpdateHandler? _discordStatusChannelUpdateHandler;
     private readonly IDiscordConnectAccountHandler? _discordConnectAccountHandler;
+    private readonly IDiscordPrivateMessageReceived? _discordPrivateMessageReceived;
 
     public DiscordModule(ILogger<DiscordModule> logger, IDiscordService grpcDiscord,
         DiscordHandshakeServiceStub discordHandshakeServiceStub, DiscordStatusChannelServiceStub discordStatusChannelServiceStub,
         DiscordConnectAccountChannelStub discordConnectAccountChannelStub,
+        DiscordPrivateMessagesChannelsStub discordPrivateMessagesChannelsStub,
         IRealmConfigurationProvider realmConfigurationProvider,
         IDiscordStatusChannelUpdateHandler? discordStatusChannelUpdateHandler = null,
-        IDiscordConnectAccountHandler? discordConnectAccountHandler = null
+        IDiscordConnectAccountHandler? discordConnectAccountHandler = null,
+        IDiscordPrivateMessageReceived? discordPrivateMessageReceived = null
         )
     {
         grpcDiscord.UpdateStatusChannel = HandleUpdateStatusChannel;
         grpcDiscord.TryConnectAccountChannel = HandleTryConnectAccountChannel;
+        grpcDiscord.PrivateMessageReceived = HandlePrivateMessageReceived;
         _logger = logger;
         _discordStatusChannelUpdateHandler = discordStatusChannelUpdateHandler;
         _discordConnectAccountHandler = discordConnectAccountHandler;
+        _discordPrivateMessageReceived = discordPrivateMessageReceived;
 
         var configuration = realmConfigurationProvider.GetRequired<GrpcConfiguration>("Grpc");
         _grpcServer = new Server
@@ -34,6 +39,7 @@ internal class DiscordModule : IModule
                 Handshake.BindService(discordHandshakeServiceStub),
                 StatusChannel.BindService(discordStatusChannelServiceStub),
                 ConnectAccountChannel.BindService(discordConnectAccountChannelStub),
+                PrivateMessagesChannels.BindService(discordPrivateMessagesChannelsStub),
             },
             Ports =
             {
@@ -63,5 +69,11 @@ internal class DiscordModule : IModule
             };
 
         return await _discordConnectAccountHandler.HandleConnectAccount(code, userId, cancellationToken);
+    }
+
+    public void HandlePrivateMessageReceived(ulong userId, ulong messageId, string content, CancellationToken cancellationToken)
+    {
+        if(_discordPrivateMessageReceived != null)
+            _discordPrivateMessageReceived.HandlePrivateMessage(userId, messageId, content);
     }
 }

@@ -24,6 +24,7 @@ services.AddSingleton(GrpcChannel.ForAddress("http://localhost:22010"));
 
 // Channels:
 services.AddSingleton<DiscordStatusChannel>();
+services.AddSingleton<Realm.DiscordBot.Channels.PrivateMessagesChannels>();
 
 var serviceProvider = services.BuildServiceProvider();
 
