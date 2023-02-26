@@ -1,5 +1,4 @@
-﻿using Greet;
-using Realm.Configuration;
+﻿using Realm.Configuration;
 using Realm.Interfaces.Extend;
 using Realm.Module.Discord.Stubs;
 using Realm.Module.Grpc;

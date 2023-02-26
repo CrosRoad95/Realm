@@ -10,6 +10,7 @@ internal class DiscordClient
     private readonly CommandHandler _commandHandler;
     private readonly BotIdProvider _botIdProvider;
     private readonly ILogger<DiscordClient> _logger;
+    private SocketGuild? _socketGuild;
 
     public DiscordClient(DiscordSocketClient discordSocketClient, DiscordBotConfiguration discordConfiguration, DiscordStatusChannel discordStatusChannel,
         ILogger<DiscordClient> logger, CommandHandler commandHandler, BotIdProvider botIdProvider, GrpcChannel grpcChannel)
@@ -39,14 +40,22 @@ internal class DiscordClient
 
     private async Task HandleReady()
     {
-        var guild = _client.GetGuild(_discordConfiguration.Guild);
-        if (guild == null)
-            throw new NullReferenceException(nameof(guild));
+        _socketGuild = _client.GetGuild(_discordConfiguration.Guild);
+        if (_socketGuild == null)
+            throw new NullReferenceException(nameof(_socketGuild));
 
         _botIdProvider.Id = _client.CurrentUser.Id;
-        _ = Task.Run(async () => await _discordStatusChannel.StartAsync(guild));
+        _ = Task.Run(async () => await _discordStatusChannel.StartAsync(_socketGuild));
 
         await _commandHandler.InitializeAsync();
+    }
+
+    public SocketGuildChannel GetChannel(ulong channelId)
+    {
+        if(_socketGuild == null)
+            throw new NullReferenceException(nameof(_socketGuild));
+
+        return _socketGuild.GetChannel(channelId);
     }
 
     private Task HandleLog(LogMessage log)

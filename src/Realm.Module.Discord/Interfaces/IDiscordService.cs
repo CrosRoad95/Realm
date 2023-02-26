@@ -13,4 +13,6 @@ public interface IDiscordService
 {
     UpdateStatusChannel? UpdateStatusChannel { get; set; }
     TryConnectAccountChannel? TryConnectAccountChannel { get; set; }
+
+    Task<ulong> SendMessage(ulong channelId, string message);
 }

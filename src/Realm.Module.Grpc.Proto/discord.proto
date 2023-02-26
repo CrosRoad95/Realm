@@ -14,6 +14,10 @@ service ConnectAccountChannel {
   rpc TryConnect (SendConnectionCodeRequest) returns (SendConnectionCodeResponse);
 }
 
+service Messaging {
+  rpc SendMessage (SendMessageRequest) returns (SendMessageResponse);
+}
+
 message HandshakeRequest {
   string message = 1;
 }
@@ -38,4 +42,14 @@ message SendConnectionCodeRequest {
 message SendConnectionCodeResponse {
   bool success = 1;
   string message = 2;
+}
+
+message SendMessageRequest {
+  uint64 channelId = 1;
+  string message = 2;
+}
+
+message SendMessageResponse {
+  bool success = 1;
+  uint64 messageId = 2;
 }

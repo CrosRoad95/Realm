@@ -1,4 +1,5 @@
 ﻿using Realm.Domain.Interfaces;
+using Realm.Module.Discord.Interfaces;
 using Realm.Resources.Assets;
 using Realm.Resources.Assets.Interfaces;
 using System.Drawing;
@@ -17,6 +18,7 @@ internal sealed class CommandsLogic
     private readonly AssetsRegistry _assetsRegistry;
     private readonly ECS _ecs;
     private readonly IBanService _banService;
+    private readonly IDiscordService _discordService;
 
     private class TestState
     {
@@ -24,7 +26,7 @@ internal sealed class CommandsLogic
     }
 
     public CommandsLogic(RPGCommandService commandService, ILogger<CommandsLogic> logger, IEntityFactory entityFactory, RepositoryFactory repositoryFactory,
-        ItemsRegistry itemsRegistry, IGroupService groupService, AssetsRegistry assetsRegistry, ECS ecs, IBanService banService)
+        ItemsRegistry itemsRegistry, IGroupService groupService, AssetsRegistry assetsRegistry, ECS ecs, IBanService banService, IDiscordService discordService)
     {
         _commandService = commandService;
         _logger = logger;
@@ -35,6 +37,7 @@ internal sealed class CommandsLogic
         _assetsRegistry = assetsRegistry;
         _ecs = ecs;
         _banService = banService;
+        _discordService = discordService;
         _commandService.AddCommandHandler("gp", (entity, args) =>
         {
             logger.LogInformation("{position}, {rotation}", entity.Transform.Position, entity.Transform.Rotation);
@@ -625,7 +628,14 @@ internal sealed class CommandsLogic
             return Task.CompletedTask;
         });
 
+        _commandService.AddCommandHandler("discordsendmessage", async (entity, args) =>
+        {
+            var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();
+            var messageId = await _discordService.SendMessage(1079342213097607399, args.First());
+            playerElementComponent.SendChatMessage($"Wysłano wiadomość, id: {messageId}");
+        });
     }
+
     class SampleHudState
     {
         public string Text1 { get; set; }
