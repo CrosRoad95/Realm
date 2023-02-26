@@ -1,7 +1,4 @@
-﻿using Discord;
-using Realm.Module.Discord.Interfaces;
-
-namespace Realm.Module.Grpc.Stubs.Discord;
+﻿namespace Realm.Module.Discord.Stubs;
 
 internal sealed class DiscordStatusChannelServiceStub : StatusChannel.StatusChannelBase
 {
@@ -30,7 +27,7 @@ internal sealed class DiscordStatusChannelServiceStub : StatusChannel.StatusChan
                 Message = newStatus
             };
         }
-        catch(Exception ex)
+        catch (Exception ex)
         {
             _logger.LogError(ex, "Error while updating server status.");
             return new ContentResponse

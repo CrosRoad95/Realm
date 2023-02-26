@@ -1,6 +1,4 @@
-﻿using Discord;
-
-namespace Realm.Module.Grpc.Stubs.Discord;
+﻿namespace Realm.Module.Discord.Stubs;
 
 internal sealed class DiscordHandshakeServiceStub : Handshake.HandshakeBase
 {

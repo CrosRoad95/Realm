@@ -1,5 +1,4 @@
-﻿using Realm.Persistance.Interfaces;
-using Realm.Persistance.Repository;
+﻿using Realm.Persistance.Repository;
 
 namespace Realm.Persistance;
 

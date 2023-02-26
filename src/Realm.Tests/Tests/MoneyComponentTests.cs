@@ -1,6 +1,5 @@
 ﻿using FluentAssertions;
 using Realm.Common.Exceptions;
-using Realm.Configuration;
 using Realm.Domain;
 using Realm.Domain.Components.Players;
 using Realm.Domain.Options;

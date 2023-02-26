@@ -1,7 +1,4 @@
-﻿using Discord;
-using Realm.Module.Discord.Interfaces;
-
-namespace Realm.Module.Grpc.Stubs.Discord;
+﻿namespace Realm.Module.Discord.Stubs;
 
 internal sealed class DiscordConnectAccountChannelStub : ConnectAccountChannel.ConnectAccountChannelBase
 {
@@ -21,7 +18,7 @@ internal sealed class DiscordConnectAccountChannelStub : ConnectAccountChannel.C
             {
                 Success = false,
             };
-        
+
         try
         {
             var response = await _discordService.TryConnectAccountChannel(request.Code, request.UserId, context.CancellationToken);
@@ -31,7 +28,7 @@ internal sealed class DiscordConnectAccountChannelStub : ConnectAccountChannel.C
                 Message = response.message,
             };
         }
-        catch(Exception ex)
+        catch (Exception ex)
         {
             _logger.LogError(ex, "Error connecting account.");
             return new SendConnectionCodeResponse

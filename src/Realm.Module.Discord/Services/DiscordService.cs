@@ -1,6 +1,4 @@
-﻿using Realm.Module.Discord.Interfaces;
-
-namespace Realm.Module.Grpc.Services;
+﻿namespace Realm.Module.Discord.Services;
 
 internal class DiscordService : IDiscordService
 {

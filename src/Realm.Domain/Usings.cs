@@ -26,7 +26,6 @@ global using SlipeServer.Packets.Enums;
 global using Realm.Persistance.Data.Helpers;
 global using SlipeServer.Server.Elements.Events;
 global using Realm.Common.Exceptions;
-global using Realm.Configuration;
 global using Realm.Domain.Registries;
 global using Realm.Domain.Inventory;
 global using Microsoft.AspNetCore.Components;
