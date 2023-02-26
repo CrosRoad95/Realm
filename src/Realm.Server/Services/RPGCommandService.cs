@@ -16,7 +16,7 @@ public class RPGCommandService
         _ecs = ecs;
     }
 
-    public bool AddCommandHandler(string commandName, Func<Entity, string[], Task> callback, string[]? requiredPolicies = null)
+    public bool AddCommandHandler(string commandName, Func<Guid, Entity, string[], Task> callback, string[]? requiredPolicies = null)
     {
         if(_commands.Any(x => string.Equals(x.CommandText, commandName, StringComparison.OrdinalIgnoreCase))) {
             throw new Exception($"Command with name '{commandName}' already exists");
@@ -39,6 +39,8 @@ public class RPGCommandService
             using var playerProperty = LogContext.PushProperty("player", player);
             using var commandNameProperty = LogContext.PushProperty("commandName", commandName);
             using var commandArgumentProperty = LogContext.PushProperty("commandArguments", args.Arguments);
+            var traceId = Guid.NewGuid();
+            _logger.LogInformation("Begin command {commandName} execution with traceId={traceId}", commandName, traceId);
             if (requiredPolicies != null)
             {
                 foreach (var policy in requiredPolicies)
@@ -55,11 +57,15 @@ public class RPGCommandService
                 _logger.LogInformation("{player} executed command {commandName} with no arguments.", entity);
             try
             {
-                await callback(entity, args.Arguments);
+                await callback(traceId, entity, args.Arguments);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Exception thrown while executing command {commandName} with arguments {commandArguments}", commandName, args.Arguments);
+            }
+            finally
+            {
+                _logger.LogInformation("Ended command {commandName} execution with traceId={traceId}", commandName, traceId);
             }
         };
         return true;

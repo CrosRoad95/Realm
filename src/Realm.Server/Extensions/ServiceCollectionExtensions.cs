@@ -1,4 +1,6 @@
-﻿namespace Realm.Server.Extensions;
+﻿using Microsoft.Extensions.DependencyInjection;
+
+namespace Realm.Server.Extensions;
 
 public static class ServiceCollectionExtensions
 {
@@ -18,6 +20,13 @@ public static class ServiceCollectionExtensions
     public static ServiceCollection AddAsyncSeederProvider<TSeederProvider>(this ServiceCollection services) where TSeederProvider : class, IAsyncSeederProvider
     {
         services.AddSingleton<IAsyncSeederProvider, TSeederProvider>();
+        return services;
+    }
+
+    public static ServiceCollection AddInGameCommand<TInGameCommand>(this ServiceCollection services) where TInGameCommand: class, IIngameCommand
+    {
+        services.AddTransient<IIngameCommand>(x => x.GetRequiredService<TInGameCommand>());
+        services.AddTransient<TInGameCommand>();
         return services;
     }
 }

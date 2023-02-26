@@ -1,7 +1,10 @@
-﻿using Realm.Console.Services;
+﻿using Realm.Console.Commands;
+using Realm.Console.Services;
 using Realm.Module.Discord.Interfaces;
 using Realm.Resources.Assets.Interfaces;
+using Realm.Server.Extensions;
 using Realm.Server.Integrations.Discord.Handlers;
+using Realm.Server.Logic.Defaults;
 
 Directory.SetCurrentDirectory(Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly()!.Location)!);
 
@@ -14,8 +17,9 @@ SemaphoreSlim semaphore = new(0);
 
 var server = builder.Build(null, extraBuilderSteps: serverBuilder =>
 {
+    serverBuilder.AddLogic<DefaultCommandsLogic>();
+
     serverBuilder.AddLogic<PlayerJoinedLogic>();
-    serverBuilder.AddLogic<CommandsLogic>();
     serverBuilder.AddLogic<SamplePickupsLogic>();
     serverBuilder.AddLogic<PlayerBindsLogic>();
     serverBuilder.AddLogic<ItemsLogic>();
@@ -35,6 +39,16 @@ var server = builder.Build(null, extraBuilderSteps: serverBuilder =>
         #region Discord integration specific
         x.AddSingleton<IDiscordStatusChannelUpdateHandler, DefaultDiscordStatusChannelUpdateHandler>();
         x.AddSingleton<IDiscordConnectAccountHandler, DefaultDiscordConnectAccountHandler>();
+        #endregion
+
+        #region In game command
+        x.AddInGameCommand<CreateGroupCommand>();
+        x.AddInGameCommand<GiveItemCommand>();
+        x.AddInGameCommand<GiveLicenseCommand>();
+        x.AddInGameCommand<GPCommand>();
+        x.AddInGameCommand<InventoryCommand>();
+        x.AddInGameCommand<LicensesCommand>();
+        x.AddInGameCommand<TakeItemCommand>();
         #endregion
     });
 });
