@@ -34,4 +34,26 @@ internal class MessagingServiceStub : Messaging.MessagingBase
             };
         }
     }
+
+    public override async Task<SendMessageToUserResponse> SendMessageToUser(SendMessageToUserRequest request, ServerCallContext context)
+    {
+        var user = _discordClient.GetUser(request.UserId);
+        try
+        {
+            var message = await user.SendMessageAsync(request.Message);
+            return new SendMessageToUserResponse
+            {
+                Success = true,
+                MessageId = message.Id
+            };
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to send message to user");
+            return new SendMessageToUserResponse
+            {
+                Success = false
+            };
+        }
+    }
 }

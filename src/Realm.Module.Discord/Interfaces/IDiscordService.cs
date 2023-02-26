@@ -15,4 +15,5 @@ public interface IDiscordService
     TryConnectAccountChannel? TryConnectAccountChannel { get; set; }
 
     Task<ulong> SendMessage(ulong channelId, string message);
+    Task<ulong> SendMessageToUser(ulong userId, string message);
 }

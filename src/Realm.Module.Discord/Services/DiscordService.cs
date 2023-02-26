@@ -27,4 +27,18 @@ internal class DiscordService : IDiscordService
 
         throw new Exception("Failed to send message");
     }
+
+    public async Task<ulong> SendMessageToUser(ulong userId, string message)
+    {
+        var response = await _messagingClient.SendMessageToUserAsync(new SendMessageToUserRequest
+        {
+            UserId = userId,
+            Message = message,
+        });
+
+        if (response.Success)
+            return response.MessageId;
+
+        throw new Exception("Failed to send message");
+    }
 }

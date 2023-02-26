@@ -16,6 +16,7 @@ service ConnectAccountChannel {
 
 service Messaging {
   rpc SendMessage (SendMessageRequest) returns (SendMessageResponse);
+  rpc SendMessageToUser (SendMessageToUserRequest) returns (SendMessageToUserResponse);
 }
 
 message HandshakeRequest {
@@ -50,6 +51,16 @@ message SendMessageRequest {
 }
 
 message SendMessageResponse {
+  bool success = 1;
+  uint64 messageId = 2;
+}
+
+message SendMessageToUserRequest {
+  uint64 userId = 1;
+  string message = 2;
+}
+
+message SendMessageToUserResponse {
   bool success = 1;
   uint64 messageId = 2;
 }

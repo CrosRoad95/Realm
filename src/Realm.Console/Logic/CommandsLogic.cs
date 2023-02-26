@@ -541,6 +541,13 @@ internal sealed class CommandsLogic
             var messageId = await _discordService.SendMessage(1079342213097607399, args.First());
             playerElementComponent.SendChatMessage($"Wysłano wiadomość, id: {messageId}");
         });
+
+        _commandService.AddCommandHandler("discordsendmessagetouser", async (a, entity, args) =>
+        {
+            var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();
+            var messageId = await _discordService.SendMessageToUser(659910279353729086, args.First());
+            playerElementComponent.SendChatMessage($"Wysłano wiadomość, id: {messageId}");
+        });
     }
 
     class SampleHudState

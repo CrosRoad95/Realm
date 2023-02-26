@@ -46,6 +46,7 @@ internal class DiscordClient
 
         _botIdProvider.Id = _client.CurrentUser.Id;
         _ = Task.Run(async () => await _discordStatusChannel.StartAsync(_socketGuild));
+        await _socketGuild.DownloadUsersAsync();
 
         await _commandHandler.InitializeAsync();
     }
@@ -56,6 +57,14 @@ internal class DiscordClient
             throw new NullReferenceException(nameof(_socketGuild));
 
         return _socketGuild.GetChannel(channelId);
+    }
+    
+    public SocketGuildUser GetUser(ulong userId)
+    {
+        if(_socketGuild == null)
+            throw new NullReferenceException(nameof(_socketGuild));
+
+        return _socketGuild.GetUser(userId);
     }
 
     private Task HandleLog(LogMessage log)
