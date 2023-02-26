@@ -607,6 +607,23 @@ internal sealed class CommandsLogic
             await _banService.BanUserId(accountComponent.Id);
             playerElementComponent.Kick("test 123");
         });
+        
+        _commandService.AddCommandHandler("destroyattachedentity", (entity, args) =>
+        {
+            var accountComponent = entity.GetRequiredComponent<AccountComponent>();
+            var attachedEntity = entity.GetRequiredComponent<AttachedEntityComponent>();
+            var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();
+            _ecs.Destroy(attachedEntity.AttachedEntity);
+            if (entity.HasComponent<AttachedEntityComponent>())
+            {
+                playerElementComponent.SendChatMessage("Nie udalo sie zniszczyc");
+            }
+            else
+            {
+                playerElementComponent.SendChatMessage("Zniszczone");
+            }
+            return Task.CompletedTask;
+        });
 
     }
     class SampleHudState
