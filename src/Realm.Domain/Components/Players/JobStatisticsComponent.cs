@@ -9,7 +9,9 @@ public class JobStatisticsComponent : Component
     private readonly Dictionary<short, JobStatistics> _jobStatistics = new();
     public IReadOnlyDictionary<short, JobStatistics> JobStatistics => _jobStatistics;
 
-    public event Action<Entity, short, JobStatistics>? StatisticsChanged;
+    private readonly DateOnly _date = DateOnly.FromDateTime(DateTime.Now);
+    internal DateOnly Date => _date;
+    private readonly object _lock = new object();
 
     public JobStatisticsComponent()
     {
@@ -18,11 +20,13 @@ public class JobStatisticsComponent : Component
 
     internal JobStatisticsComponent(ICollection<JobStatisticsData> jobStatistics)
     {
-        _jobStatistics = jobStatistics.ToDictionary(x => x.JobId, x => new JobStatistics
+        _jobStatistics = jobStatistics.GroupBy(x => x.JobId).ToDictionary(x => x.Key, x => new JobStatistics
         {
-            jobId = x.JobId,
-            points= x.Points,
-            timePlayed = x.TimePlayed,
+            jobId = x.Key,
+            points= (ulong)x.Sum(x => (decimal)x.Points),
+            timePlayed = (ulong)x.Sum(x => (decimal)x.TimePlayed),
+            sessionPoints = 0,
+            sessionTimePlayed = 0,
         });
     }
 
@@ -38,21 +42,39 @@ public class JobStatisticsComponent : Component
 
     public void AddPoints(short jobId, ulong points)
     {
-        EnsureJobIsInitialized(jobId);
-        var jobStatistics = _jobStatistics[jobId];
-        jobStatistics.points += points;
-        _jobStatistics[jobId] = jobStatistics;
-
-        StatisticsChanged?.Invoke(Entity, jobId, jobStatistics);
+        lock(_lock)
+        {
+            EnsureJobIsInitialized(jobId);
+            var jobStatistics = _jobStatistics[jobId];
+            jobStatistics.points += points;
+            jobStatistics.sessionPoints += points;
+            _jobStatistics[jobId] = jobStatistics;
+        }
     }
 
     public void AddTimePlayed(short jobId, ulong timePlayed)
     {
-        EnsureJobIsInitialized(jobId);
-        var jobStatistics = _jobStatistics[jobId];
-        jobStatistics.timePlayed += timePlayed;
-        _jobStatistics[jobId] = jobStatistics;
+        lock (_lock)
+        {
+            EnsureJobIsInitialized(jobId);
+            var jobStatistics = _jobStatistics[jobId];
+            jobStatistics.timePlayed += timePlayed;
+            jobStatistics.sessionTimePlayed += timePlayed;
+            _jobStatistics[jobId] = jobStatistics;
+        }
+    }
 
-        StatisticsChanged?.Invoke(Entity, jobId, jobStatistics);
+    internal void Reset()
+    {
+        lock (_lock)
+        {
+            foreach (var item in _jobStatistics.Keys)
+            {
+                var jobStatistics = _jobStatistics[item];
+                jobStatistics.sessionPoints = 0;
+                jobStatistics.sessionTimePlayed = 0;
+                _jobStatistics[item] = jobStatistics;
+            }
+        }
     }
 }

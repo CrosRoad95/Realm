@@ -57,6 +57,7 @@ internal sealed class RPGServer : IRPGServer
         services.AddTransient<IGroupService, GroupService>();
         services.AddTransient<IFractionService, FractionService>();
         services.AddTransient<IBanService, BanService>();
+        services.AddTransient<IJobService, JobService>();
 
         services.AddTransient<IEntityFactory, EntityFactory>();
 

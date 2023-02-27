@@ -188,7 +188,10 @@ public abstract class Db<T> : IdentityDbContext<User, Role, int,
         {
             entityBuilder
                 .ToTable(nameof(JobPoints))
-                .HasKey(x => new { x.UserId, x.JobId });
+                .HasKey(x => new { x.UserId, x.JobId, x.Date });
+
+            entityBuilder.Property(x => x.Date)
+                .HasColumnType("date");
         });
         
         modelBuilder.Entity<InventoryItem>(entityBuilder =>

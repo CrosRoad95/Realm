@@ -375,13 +375,16 @@ namespace Realm.Persistance.MySql.Migrations
                     b.Property<short>("JobId")
                         .HasColumnType("smallint");
 
+                    b.Property<DateOnly>("Date")
+                        .HasColumnType("date");
+
                     b.Property<ulong>("Points")
                         .HasColumnType("bigint unsigned");
 
                     b.Property<ulong>("TimePlayed")
                         .HasColumnType("bigint unsigned");
 
-                    b.HasKey("UserId", "JobId");
+                    b.HasKey("UserId", "JobId", "Date");
 
                     b.ToTable("JobPoints", (string)null);
                 });

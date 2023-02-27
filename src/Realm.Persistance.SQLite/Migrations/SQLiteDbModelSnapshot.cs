@@ -373,13 +373,16 @@ namespace Realm.Persistance.SQLite.Migrations
                     b.Property<short>("JobId")
                         .HasColumnType("INTEGER");
 
+                    b.Property<DateOnly>("Date")
+                        .HasColumnType("date");
+
                     b.Property<ulong>("Points")
                         .HasColumnType("INTEGER");
 
                     b.Property<ulong>("TimePlayed")
                         .HasColumnType("INTEGER");
 
-                    b.HasKey("UserId", "JobId");
+                    b.HasKey("UserId", "JobId", "Date");
 
                     b.ToTable("JobPoints", (string)null);
                 });

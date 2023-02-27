@@ -1,11 +1,12 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
+﻿using System;
+using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
 namespace Realm.Persistance.SQLite.Migrations
 {
     /// <inheritdoc />
-    public partial class ChangeDiscoveryIdTypeToInt : Migration
+    public partial class InitialMigration : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -169,6 +170,29 @@ namespace Realm.Persistance.SQLite.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Bans",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    End = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    Serial = table.Column<string>(type: "TEXT", maxLength: 32, nullable: true),
+                    UserId = table.Column<int>(type: "INTEGER", nullable: true),
+                    Reason = table.Column<string>(type: "TEXT", maxLength: 256, nullable: true),
+                    Responsible = table.Column<string>(type: "TEXT", nullable: true),
+                    Type = table.Column<int>(type: "INTEGER", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Bans", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Bans_Users_UserId",
+                        column: x => x.UserId,
+                        principalTable: "Users",
+                        principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
                 name: "DailyVisits",
                 columns: table => new
                 {
@@ -182,6 +206,24 @@ namespace Realm.Persistance.SQLite.Migrations
                     table.PrimaryKey("PK_DailyVisits", x => x.UserId);
                     table.ForeignKey(
                         name: "FK_DailyVisits_Users_UserId",
+                        column: x => x.UserId,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "DiscordIntegration",
+                columns: table => new
+                {
+                    UserId = table.Column<int>(type: "INTEGER", nullable: false),
+                    DiscordUserId = table.Column<ulong>(type: "INTEGER", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_DiscordIntegration", x => x.UserId);
+                    table.ForeignKey(
+                        name: "FK_DiscordIntegration_Users_UserId",
                         column: x => x.UserId,
                         principalTable: "Users",
                         principalColumn: "Id",
@@ -284,12 +326,13 @@ namespace Realm.Persistance.SQLite.Migrations
                 {
                     UserId = table.Column<int>(type: "INTEGER", nullable: false),
                     JobId = table.Column<short>(type: "INTEGER", nullable: false),
+                    Date = table.Column<DateOnly>(type: "date", nullable: false),
                     Points = table.Column<ulong>(type: "INTEGER", nullable: false),
                     TimePlayed = table.Column<ulong>(type: "INTEGER", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_JobPoints", x => new { x.UserId, x.JobId });
+                    table.PrimaryKey("PK_JobPoints", x => new { x.UserId, x.JobId, x.Date });
                     table.ForeignKey(
                         name: "FK_JobPoints_Users_UserId",
                         column: x => x.UserId,
@@ -447,6 +490,24 @@ namespace Realm.Persistance.SQLite.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "UserUpgrade",
+                columns: table => new
+                {
+                    UserId = table.Column<int>(type: "INTEGER", nullable: false),
+                    UpgradeId = table.Column<int>(type: "INTEGER", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_UserUpgrade", x => new { x.UserId, x.UpgradeId });
+                    table.ForeignKey(
+                        name: "FK_UserUpgrade_Users_UserId",
+                        column: x => x.UserId,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "VehicleAccesses",
                 columns: table => new
                 {
@@ -497,6 +558,25 @@ namespace Realm.Persistance.SQLite.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "VehiclePartDamages",
+                columns: table => new
+                {
+                    VehicleId = table.Column<int>(type: "INTEGER", nullable: false),
+                    PartId = table.Column<short>(type: "INTEGER", nullable: false),
+                    State = table.Column<float>(type: "REAL", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_VehiclePartDamages", x => new { x.VehicleId, x.PartId });
+                    table.ForeignKey(
+                        name: "FK_VehiclePartDamages_Vehicles_VehicleId",
+                        column: x => x.VehicleId,
+                        principalTable: "Vehicles",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "VehicleUpgrades",
                 columns: table => new
                 {
@@ -534,6 +614,11 @@ namespace Realm.Persistance.SQLite.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Bans_UserId",
+                table: "Bans",
+                column: "UserId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_FractionMembers_UserId",
@@ -639,7 +724,13 @@ namespace Realm.Persistance.SQLite.Migrations
                 name: "Achievements");
 
             migrationBuilder.DropTable(
+                name: "Bans");
+
+            migrationBuilder.DropTable(
                 name: "DailyVisits");
+
+            migrationBuilder.DropTable(
+                name: "DiscordIntegration");
 
             migrationBuilder.DropTable(
                 name: "Discoveries");
@@ -681,10 +772,16 @@ namespace Realm.Persistance.SQLite.Migrations
                 name: "UserTokens");
 
             migrationBuilder.DropTable(
+                name: "UserUpgrade");
+
+            migrationBuilder.DropTable(
                 name: "VehicleAccesses");
 
             migrationBuilder.DropTable(
                 name: "VehicleFuels");
+
+            migrationBuilder.DropTable(
+                name: "VehiclePartDamages");
 
             migrationBuilder.DropTable(
                 name: "VehicleUpgrades");

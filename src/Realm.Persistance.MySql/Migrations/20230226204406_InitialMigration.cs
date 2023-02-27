@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore.Metadata;
+﻿using System;
+using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
@@ -212,6 +213,33 @@ namespace Realm.Persistance.MySql.Migrations
                 .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
+                name: "Bans",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
+                    End = table.Column<DateTime>(type: "datetime(6)", nullable: false),
+                    Serial = table.Column<string>(type: "varchar(32)", maxLength: 32, nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    UserId = table.Column<int>(type: "int", nullable: true),
+                    Reason = table.Column<string>(type: "varchar(256)", maxLength: 256, nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    Responsible = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    Type = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Bans", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Bans_Users_UserId",
+                        column: x => x.UserId,
+                        principalTable: "Users",
+                        principalColumn: "Id");
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
+
+            migrationBuilder.CreateTable(
                 name: "DailyVisits",
                 columns: table => new
                 {
@@ -233,12 +261,30 @@ namespace Realm.Persistance.MySql.Migrations
                 .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
+                name: "DiscordIntegration",
+                columns: table => new
+                {
+                    UserId = table.Column<int>(type: "int", nullable: false),
+                    DiscordUserId = table.Column<ulong>(type: "bigint unsigned", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_DiscordIntegration", x => x.UserId);
+                    table.ForeignKey(
+                        name: "FK_DiscordIntegration_Users_UserId",
+                        column: x => x.UserId,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
+
+            migrationBuilder.CreateTable(
                 name: "Discoveries",
                 columns: table => new
                 {
                     UserId = table.Column<int>(type: "int", nullable: false),
-                    DiscoveryId = table.Column<string>(type: "varchar(32)", maxLength: 32, nullable: false)
-                        .Annotation("MySql:CharSet", "utf8mb4")
+                    DiscoveryId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -335,12 +381,13 @@ namespace Realm.Persistance.MySql.Migrations
                 {
                     UserId = table.Column<int>(type: "int", nullable: false),
                     JobId = table.Column<short>(type: "smallint", nullable: false),
+                    Date = table.Column<DateOnly>(type: "date", nullable: false),
                     Points = table.Column<ulong>(type: "bigint unsigned", nullable: false),
                     TimePlayed = table.Column<ulong>(type: "bigint unsigned", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_JobPoints", x => new { x.UserId, x.JobId });
+                    table.PrimaryKey("PK_JobPoints", x => new { x.UserId, x.JobId, x.Date });
                     table.ForeignKey(
                         name: "FK_JobPoints_Users_UserId",
                         column: x => x.UserId,
@@ -515,6 +562,25 @@ namespace Realm.Persistance.MySql.Migrations
                 .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
+                name: "UserUpgrade",
+                columns: table => new
+                {
+                    UserId = table.Column<int>(type: "int", nullable: false),
+                    UpgradeId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_UserUpgrade", x => new { x.UserId, x.UpgradeId });
+                    table.ForeignKey(
+                        name: "FK_UserUpgrade_Users_UserId",
+                        column: x => x.UserId,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
+
+            migrationBuilder.CreateTable(
                 name: "VehicleAccesses",
                 columns: table => new
                 {
@@ -569,6 +635,26 @@ namespace Realm.Persistance.MySql.Migrations
                 .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
+                name: "VehiclePartDamages",
+                columns: table => new
+                {
+                    VehicleId = table.Column<int>(type: "int", nullable: false),
+                    PartId = table.Column<short>(type: "smallint", nullable: false),
+                    State = table.Column<float>(type: "float", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_VehiclePartDamages", x => new { x.VehicleId, x.PartId });
+                    table.ForeignKey(
+                        name: "FK_VehiclePartDamages_Vehicles_VehicleId",
+                        column: x => x.VehicleId,
+                        principalTable: "Vehicles",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
+
+            migrationBuilder.CreateTable(
                 name: "VehicleUpgrades",
                 columns: table => new
                 {
@@ -610,6 +696,11 @@ namespace Realm.Persistance.MySql.Migrations
                         onDelete: ReferentialAction.Cascade);
                 })
                 .Annotation("MySql:CharSet", "utf8mb4");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Bans_UserId",
+                table: "Bans",
+                column: "UserId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_FractionMembers_UserId",
@@ -715,7 +806,13 @@ namespace Realm.Persistance.MySql.Migrations
                 name: "Achievements");
 
             migrationBuilder.DropTable(
+                name: "Bans");
+
+            migrationBuilder.DropTable(
                 name: "DailyVisits");
+
+            migrationBuilder.DropTable(
+                name: "DiscordIntegration");
 
             migrationBuilder.DropTable(
                 name: "Discoveries");
@@ -757,10 +854,16 @@ namespace Realm.Persistance.MySql.Migrations
                 name: "UserTokens");
 
             migrationBuilder.DropTable(
+                name: "UserUpgrade");
+
+            migrationBuilder.DropTable(
                 name: "VehicleAccesses");
 
             migrationBuilder.DropTable(
                 name: "VehicleFuels");
+
+            migrationBuilder.DropTable(
+                name: "VehiclePartDamages");
 
             migrationBuilder.DropTable(
                 name: "VehicleUpgrades");

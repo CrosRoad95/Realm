@@ -245,12 +245,47 @@ internal class SaveService : ISaveService
 
         if (entity.TryGetComponent(out JobStatisticsComponent jobStatisticsComponent))
         {
-            user.JobStatistics = jobStatisticsComponent.JobStatistics.Select(x => new JobStatistics
+            var newStatistics = jobStatisticsComponent.JobStatistics.Where(x => x.Value.sessionPoints > 0 || x.Value.sessionTimePlayed > 0);
+            foreach (var item in newStatistics)
             {
-                JobId = x.Key,
-                Points = x.Value.points,
-                TimePlayed = x.Value.timePlayed,
-            }).ToList();
+                var first = user.JobStatistics.FirstOrDefault(x => x.JobId == item.Value.jobId && x.Date == jobStatisticsComponent.Date);
+                if (first == null)
+                {
+                    user.JobStatistics.Add(new JobStatistics
+                    {
+                        Date = jobStatisticsComponent.Date,
+                        JobId = item.Key,
+                        Points = item.Value.sessionPoints,
+                        TimePlayed = item.Value.sessionTimePlayed
+                    });
+                }
+                else
+                {
+                    first.Points += item.Value.sessionPoints;
+                    first.TimePlayed += item.Value.sessionTimePlayed;
+                }
+            }
+            jobStatisticsComponent.Reset();
+            //jobStatisticsComponent.JobStatistics
+            //var first = user.JobStatistics.FirstOrDefault(x => x.Date == jobStatisticsComponent.Date);
+            //if (first == null)
+            //{
+            //    user.JobStatistics.Add(new JobStatistics
+            //    {
+            //        Date= jobStatisticsComponent.Date,
+            //        JobId = jobStatisticsComponent
+            //    });
+            //}
+            //else
+            //{
+
+            //}
+            //user.JobStatistics = jobStatisticsComponent.JobStatistics.Select(x => new JobStatistics
+            //{
+            //    JobId = x.Key,
+            //    Points = x.Value.points,
+            //    TimePlayed = x.Value.timePlayed,
+            //}).ToList();
         }
         else
             user.JobStatistics = new List<JobStatistics>();
