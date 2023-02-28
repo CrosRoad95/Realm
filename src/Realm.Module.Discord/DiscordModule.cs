@@ -1,7 +1,8 @@
-﻿using Realm.Configuration;
+﻿using Microsoft.Extensions.Options;
+using Realm.Configuration;
 using Realm.Interfaces.Extend;
 using Realm.Module.Discord.Stubs;
-using Realm.Module.Grpc;
+using Realm.Module.Grpc.Options;
 
 namespace Realm.Module.Discord;
 
@@ -17,7 +18,7 @@ internal class DiscordModule : IModule
         DiscordHandshakeServiceStub discordHandshakeServiceStub, DiscordStatusChannelServiceStub discordStatusChannelServiceStub,
         DiscordConnectAccountChannelStub discordConnectAccountChannelStub,
         DiscordPrivateMessagesChannelsStub discordPrivateMessagesChannelsStub,
-        IRealmConfigurationProvider realmConfigurationProvider,
+        IOptions<GrpcOptions> options,
         IDiscordStatusChannelUpdateHandler? discordStatusChannelUpdateHandler = null,
         IDiscordConnectAccountHandler? discordConnectAccountHandler = null,
         IDiscordPrivateMessageReceived? discordPrivateMessageReceived = null
@@ -31,7 +32,6 @@ internal class DiscordModule : IModule
         _discordConnectAccountHandler = discordConnectAccountHandler;
         _discordPrivateMessageReceived = discordPrivateMessageReceived;
 
-        var configuration = realmConfigurationProvider.GetRequired<GrpcConfiguration>("Grpc");
         _grpcServer = new Server
         {
             Services =
@@ -43,7 +43,7 @@ internal class DiscordModule : IModule
             },
             Ports =
             {
-                new ServerPort(configuration.Host, configuration.Port, ServerCredentials.Insecure)
+                new ServerPort(options.Value.Host, options.Value.Port, ServerCredentials.Insecure)
             },
         };
 

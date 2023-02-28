@@ -6,14 +6,14 @@ internal interface IChannelConfiguration
 
 }
 
-internal class DiscordBotConfiguration
+internal class DiscordBotOptions
 {
     public class StatusChannelConfiguration : IChannelConfiguration
     {
         public ulong ChannelId { get; set; }
     }
 
-    public class ConnectServerAccountConfiguration : IChannelConfiguration
+    public class ConnectServerAccountOptions : IChannelConfiguration
     {
         public ulong ChannelId { get; set; }
         public string InformationMessage { get; set; }
@@ -25,5 +25,5 @@ internal class DiscordBotConfiguration
     public string GrpcAddress { get; set; }
 
     public StatusChannelConfiguration? StatusChannel { get; set; }
-    public ConnectServerAccountConfiguration? ConnectServerAccountChannel { get; set; }
+    public ConnectServerAccountOptions? ConnectServerAccountChannel { get; set; }
 }

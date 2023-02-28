@@ -1,4 +1,5 @@
-﻿using Realm.DiscordBot.Commands;
+﻿using Microsoft.Extensions.Options;
+using Realm.DiscordBot.Commands;
 
 namespace Realm.DiscordBot.Services;
 
@@ -6,14 +7,14 @@ internal class CommandHandler
 {
     private readonly DiscordSocketClient _client;
     private readonly InteractionService _interactionService;
-    private readonly DiscordBotConfiguration _discordConfiguration;
+    private readonly IOptions<DiscordBotOptions> _discordBotOptions;
     private readonly IServiceProvider _services;
 
-    public CommandHandler(DiscordSocketClient client, DiscordBotConfiguration discordConfiguration, IServiceProvider services)
+    public CommandHandler(DiscordSocketClient client, IOptions<DiscordBotOptions> discordBotOptions, IServiceProvider services)
     {
         _client = client;
         _interactionService = new InteractionService(_client);
-        _discordConfiguration = discordConfiguration;
+        _discordBotOptions = discordBotOptions;
         _services = services;
     }
 
@@ -22,7 +23,7 @@ internal class CommandHandler
         // add the public modules that inherit InteractionModuleBase<T> to the InteractionService
         //await _interactionService.AddModulesAsync(Assembly.GetExecutingAssembly(), _services);
         await _interactionService.AddModuleAsync<ConnectAccountToServerCommand>(_services);
-        await _interactionService.RegisterCommandsToGuildAsync(_discordConfiguration.Guild);
+        await _interactionService.RegisterCommandsToGuildAsync(_discordBotOptions.Value.Guild);
 
         // process the InteractionCreated payloads to execute Interactions commands
         _client.InteractionCreated += HandleInteraction;

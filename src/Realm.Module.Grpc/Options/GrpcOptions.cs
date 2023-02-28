@@ -1,6 +1,6 @@
-﻿namespace Realm.Module.Grpc;
+﻿namespace Realm.Module.Grpc.Options;
 
-public class GrpcConfiguration
+public class GrpcOptions
 {
     public string Host { get; set; }
     public ushort Port { get; set; }

@@ -1,17 +1,18 @@
 ﻿using Grpc.Core;
 using Grpc.Net.Client;
+using Microsoft.Extensions.Options;
 
 namespace Realm.DiscordBot.Commands;
 
 internal class ConnectAccountToServerCommand : InteractionModuleBase<SocketInteractionContext>
 {
-    private readonly DiscordBotConfiguration _discordConfiguration;
+    private readonly DiscordBotOptions.ConnectServerAccountOptions? _connectServerAccountOptions;
     private readonly ILogger<ConnectAccountToServerCommand> _logger;
     private readonly ConnectAccountChannel.ConnectAccountChannelClient _connectAccountChannelClient;
 
-    public ConnectAccountToServerCommand(DiscordBotConfiguration discordConfiguration, GrpcChannel grpcChannel, ILogger<ConnectAccountToServerCommand> logger)
+    public ConnectAccountToServerCommand(IOptions<DiscordBotOptions> discordConfiguration, GrpcChannel grpcChannel, ILogger<ConnectAccountToServerCommand> logger)
     {
-        _discordConfiguration = discordConfiguration;
+        _connectServerAccountOptions = discordConfiguration.Value.ConnectServerAccountChannel;
         _logger = logger;
         _connectAccountChannelClient = new(grpcChannel);
     }
@@ -19,13 +20,13 @@ internal class ConnectAccountToServerCommand : InteractionModuleBase<SocketInter
     [SlashCommand("polaczkonto", "Łączenie konta discord z serwerem mta", false, RunMode.Async)]
     public async Task ConnectAccount(string kod)
     {
-        if(_discordConfiguration.ConnectServerAccountChannel == null)
+        if(_connectServerAccountOptions == null)
         {
             await RespondAsync("Ten serwer nie wspiera łączenia kont discord z serwerem mta lub konfiguracja serwera jest niepoprawna.", ephemeral: true);
             return;
         }
 
-        if(Context.Channel.Id != _discordConfiguration.ConnectServerAccountChannel.ChannelId)
+        if(Context.Channel.Id != _connectServerAccountOptions.ChannelId)
         {
             await RespondAsync("Nie możesz użyć tej komendy na tym kanale.", ephemeral: true);
             return;

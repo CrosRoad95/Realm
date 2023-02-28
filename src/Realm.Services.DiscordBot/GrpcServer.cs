@@ -1,16 +1,16 @@
 ﻿using Grpc.Core;
+using Microsoft.Extensions.Options;
 using Realm.Configuration;
 using Realm.DiscordBot.Stubs;
-using Realm.Module.Grpc;
+using Realm.Module.Grpc.Options;
 
 namespace Realm.DiscordBot;
 
 internal class GrpcServer
 {
     private readonly Server? _grpcServer;
-    public GrpcServer(IRealmConfigurationProvider realmConfigurationProvider, MessagingServiceStub messagingServiceStub)
+    public GrpcServer(IOptions<GrpcOptions> grpcOptions, MessagingServiceStub messagingServiceStub)
     {
-        var configuration = realmConfigurationProvider.GetRequired<GrpcConfiguration>("Grpc");
         _grpcServer = new Server
         {
             Services =
@@ -19,7 +19,7 @@ internal class GrpcServer
             },
             Ports =
             {
-                new ServerPort(configuration.Host, configuration.Port, ServerCredentials.Insecure)
+                new ServerPort(grpcOptions.Value.Host, grpcOptions.Value.Port, ServerCredentials.Insecure)
             },
         };
 

@@ -1,17 +1,13 @@
-﻿namespace Realm.Server.Logic;
+﻿using Microsoft.Extensions.Options;
+using Realm.Domain.Options;
+
+namespace Realm.Server.Logic;
 
 internal class StartupLogic
 {
-    public class ServerListConfiguration
+    public StartupLogic(MtaServer mtaServer, IOptions<ServerListOptions> serverListOptions)
     {
-        public string GameType { get; set; } = "New-Realm";
-        public string MapName { get; set; } = "N/A";
-    }
-
-    public StartupLogic(MtaServer mtaServer, IRealmConfigurationProvider realmConfigurationProvider)
-    {
-        var serverListConfiguration = realmConfigurationProvider.GetRequired<ServerListConfiguration>("ServerList");
-        mtaServer.GameType = serverListConfiguration.GameType;
-        mtaServer.MapName = serverListConfiguration.MapName;
+        mtaServer.GameType = serverListOptions.Value.GameType;
+        mtaServer.MapName = serverListOptions.Value.MapName;
     }
 }

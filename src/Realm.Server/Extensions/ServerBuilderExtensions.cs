@@ -1,7 +1,10 @@
-﻿using Realm.Persistance.MySql;
+﻿using Realm.Domain.Options;
+using Realm.Module.Grpc.Options;
+using Realm.Persistance.MySql;
 using Realm.Resources.Assets;
 using SlipeServer.Resources.BoneAttach;
 using SlipeServer.Resources.Text3d;
+using static Realm.Server.Logic.StartupLogic;
 
 namespace Realm.Server.Extensions;
 
@@ -20,7 +23,11 @@ public static class ServerBuilderExtensions
 
         builder.ConfigureServices(services =>
         {
-            services.AddSingleton(realmConfigurationProvider);
+            // Options
+            services.Configure<GameplayOptions>(realmConfigurationProvider.GetSection("Gameplay"));
+            services.Configure<GrpcOptions>(realmConfigurationProvider.GetSection("Grpc"));
+            services.Configure<ServerListOptions>(realmConfigurationProvider.GetSection("ServerList"));
+
             var databaseProvider = realmConfigurationProvider.Get<string>("Database:Provider");
             switch (databaseProvider)
             {

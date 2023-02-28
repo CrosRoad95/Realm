@@ -1,12 +1,13 @@
 ﻿using Grpc.Core;
 using Grpc.Net.Client;
+using Microsoft.Extensions.Options;
 using Realm.DiscordBot.Extensions;
 
 namespace Realm.DiscordBot.Channels;
 
 internal class DiscordStatusChannel
 {
-    private readonly DiscordBotConfiguration.StatusChannelConfiguration? _configuration;
+    private readonly DiscordBotOptions.StatusChannelConfiguration? _configuration;
     private readonly BotIdProvider _botdIdProvider;
     private readonly ILogger _logger;
     private IMessage? _statusDiscordMessage;
@@ -15,9 +16,9 @@ internal class DiscordStatusChannel
 
     public delegate Task<string> GetStatusChannelContent();
 
-    public DiscordStatusChannel(DiscordBotConfiguration discordConfiguration, BotIdProvider botdIdProvider, ILogger<DiscordStatusChannel> logger, GrpcChannel grpcChannel)
+    public DiscordStatusChannel(IOptions<DiscordBotOptions> discordConfiguration, BotIdProvider botdIdProvider, ILogger<DiscordStatusChannel> logger, GrpcChannel grpcChannel)
     {
-        _configuration = discordConfiguration.StatusChannel;
+        _configuration = discordConfiguration.Value.StatusChannel;
         _botdIdProvider = botdIdProvider;
         _statusChannelClient = new(grpcChannel);
         _logger = logger;

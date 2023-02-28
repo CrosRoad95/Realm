@@ -1,7 +1,9 @@
 ﻿using FluentAssertions;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Moq;
+using Realm.Domain.Options;
 using Realm.Persistance.Data;
 using Realm.Server.Interfaces;
 using Realm.Server.Services;
@@ -22,7 +24,7 @@ public class SignInServiceTests
         _entityHelper = new(_realmTestingServer);
         _logger = new Mock<ILogger<SignInService>>();
 
-        _signInService = new SignInService(new TestItemsRegistry(), _logger.Object, new TestConfigurationProvider());
+        _signInService = new SignInService(new TestItemsRegistry(), _logger.Object, _realmTestingServer.GetRequiredService<IOptions<GameplayOptions>>());
     }
 
     //[Fact]

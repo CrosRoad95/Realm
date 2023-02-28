@@ -1,11 +1,12 @@
 ﻿using Grpc.Net.Client;
+using Microsoft.Extensions.Options;
 
 namespace Realm.DiscordBot;
 
 internal class DiscordClient
 {
     private readonly DiscordSocketClient _client;
-    private readonly DiscordBotConfiguration _discordConfiguration;
+    private readonly IOptions<DiscordBotOptions> _discordBotOptions;
     private readonly DiscordStatusChannel _discordStatusChannel;
     private readonly Channels.PrivateMessagesChannels _privateMessagesChannels;
     private readonly CommandHandler _commandHandler;
@@ -13,12 +14,12 @@ internal class DiscordClient
     private readonly ILogger<DiscordClient> _logger;
     private SocketGuild? _socketGuild;
 
-    public DiscordClient(DiscordSocketClient discordSocketClient, DiscordBotConfiguration discordConfiguration, DiscordStatusChannel discordStatusChannel,
+    public DiscordClient(DiscordSocketClient discordSocketClient, IOptions<DiscordBotOptions> discordBotOptions, DiscordStatusChannel discordStatusChannel,
         Channels.PrivateMessagesChannels privateMessagesChannels,
         ILogger<DiscordClient> logger, CommandHandler commandHandler, BotIdProvider botIdProvider, GrpcChannel grpcChannel)
     {
         _client = discordSocketClient;
-        _discordConfiguration = discordConfiguration;
+        _discordBotOptions = discordBotOptions;
         _discordStatusChannel = discordStatusChannel;
         _privateMessagesChannels = privateMessagesChannels;
         _commandHandler = commandHandler;
@@ -43,13 +44,13 @@ internal class DiscordClient
 
     public async Task StartAsync()
     {
-        await _client.LoginAsync(TokenType.Bot, _discordConfiguration.Token);
+        await _client.LoginAsync(TokenType.Bot, _discordBotOptions.Value.Token);
         await _client.StartAsync();
     }
 
     private async Task HandleReady()
     {
-        _socketGuild = _client.GetGuild(_discordConfiguration.Guild);
+        _socketGuild = _client.GetGuild(_discordBotOptions.Value.Guild);
         if (_socketGuild == null)
             throw new NullReferenceException(nameof(_socketGuild));
 

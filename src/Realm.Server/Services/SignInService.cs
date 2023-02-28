@@ -1,4 +1,6 @@
-﻿using Realm.Domain.Inventory;
+﻿using Microsoft.Extensions.Options;
+using Realm.Domain.Inventory;
+using Realm.Domain.Options;
 using Realm.Domain.Registries;
 
 namespace Realm.Server.Services;
@@ -10,13 +12,13 @@ internal class SignInService : ISignInService
     private readonly HashSet<int> _usedAccountsIds = new();
     private readonly ItemsRegistry _itemsRegistry;
     private readonly ILogger<SignInService> _logger;
-    private readonly IRealmConfigurationProvider _realmConfigurationProvider;
+    private readonly IOptions<GameplayOptions> _gameplayOptions;
 
-    public SignInService(ItemsRegistry itemsRegistry, ILogger<SignInService> logger, IRealmConfigurationProvider realmConfigurationProvider)
+    public SignInService(ItemsRegistry itemsRegistry, ILogger<SignInService> logger, IOptions<GameplayOptions> gameplayOptions)
     {
         _itemsRegistry = itemsRegistry;
         _logger = logger;
-        _realmConfigurationProvider = realmConfigurationProvider;
+        _gameplayOptions = gameplayOptions;
     }
 
     public async Task<bool> SignIn(Entity entity, User user)
@@ -47,7 +49,7 @@ internal class SignInService : ISignInService
                 }
             }
             else
-                entity.AddComponent(new InventoryComponent(_realmConfigurationProvider.GetRequired<uint>("Gameplay:DefaultInventorySize")));
+                entity.AddComponent(new InventoryComponent(_gameplayOptions.Value.DefaultInventorySize));
 
             if (user.DailyVisits != null)
                 entity.AddComponent(new DailyVisitsCounterComponent(user.DailyVisits));
