@@ -2,5 +2,9 @@
 
 public interface IFractionRepository
 {
-    Task<FractionMember> CreateNewFractionMember(int fractionId, int UserId, int rank = 1, string rankName = "");
+    void CreateFraction(int id, string fractionName, string fractionCode);
+    void AddFractionMember(int fractionId, int userId, int rank = 1, string rankName = "");
+    Task<bool> Exists(int id, string code, string name);
+    Task Commit();
+    Task<List<FractionMember>> GetAllMembers(int fractionId);
 }

@@ -4,7 +4,7 @@
 public sealed class RegisterGuiComponent : GuiComponent
 {
     [Inject]
-    private ISignInService SignInService { get; set; } = default!;
+    private IRPGUserManager SignInService { get; set; } = default!;
     [Inject]
     private UserManager<User> UserManager { get; set; } = default!;
 

@@ -14,14 +14,14 @@ internal sealed class SeederServerBuilder
     private readonly IFractionService _fractionService;
     private readonly Dictionary<string, ISeederProvider> _seederProviders = new();
     private readonly Dictionary<string, IAsyncSeederProvider> _asyncSeederProviders = new();
-    private readonly IDb _db;
     private readonly ILogger<SeederServerBuilder> _logger;
 
     private readonly Dictionary<string, User> _createdAccounts = new();
     public SeederServerBuilder(ILogger<SeederServerBuilder> logger,
         EntityByStringIdCollection elementByStringIdCollection,
         IServerFilesProvider serverFilesProvider, UserManager<User> userManager, RoleManager<Role> roleManager,
-        IGroupService groupService, IEntityFactory entityFactory, IFractionService fractionService, IDb db, IEnumerable<ISeederProvider> seederProviders, IEnumerable<IAsyncSeederProvider> asyncSeederProviders)
+        IGroupService groupService, IEntityFactory entityFactory, IFractionService fractionService, IEnumerable<ISeederProvider> seederProviders,
+        IEnumerable<IAsyncSeederProvider> asyncSeederProviders)
     {
         _logger = logger;
         _elementByStringIdCollection = elementByStringIdCollection;
@@ -31,7 +31,6 @@ internal sealed class SeederServerBuilder
         _groupService = groupService;
         _entityFactory = entityFactory;
         _fractionService = fractionService;
-        _db = db;
         foreach (var seederProvider in seederProviders)
         {
             _seederProviders[seederProvider.SeedKey] = seederProvider;
@@ -220,46 +219,19 @@ internal sealed class SeederServerBuilder
         foreach (var fraction in fractions)
         {
             var id = fraction.Value.Id;
-            var fractionData = await _db.Fractions
-                .Include(x => x.Members)
-                .Where(x => x.Id == id && x.Code == fraction.Value.Code && x.Name == fraction.Key).FirstOrDefaultAsync();
+            await _fractionService.InternalCreateFraction(id, fraction.Key, fraction.Value.Code, fraction.Value.Position);
 
-            if(fractionData == null)
-            {
-                var oldFractionData = await _db.Fractions
-                    .Include(x => x.Members)
-                    .Where(x => x.Id == id).FirstOrDefaultAsync();
-                if(oldFractionData != null)
-                {
-                    _db.Fractions.Remove(oldFractionData);
-                    _logger.LogInformation("Seeder: Removed old fraction '{fractionName}' from database.", oldFractionData.Name);
-                }
-
-                fractionData = new Fraction
-                {
-                    Id = id,
-                    Name = fraction.Key,
-                    Code = fraction.Value.Code,
-                    Members = fraction.Value.Members.Select(x => new FractionMember
-                    {
-                        UserId = _createdAccounts[x.Key].Id,
-                        Rank = x.Value.Rank,
-                        RankName = x.Value.RankName,
-                    }).ToList()
-                };
-                _db.Fractions.Add(fractionData);
-
-                _logger.LogInformation("Seeder: Added fraction '{fractionName}' to database with id {fractionId}.", fractionData.Name);
-            }
-
-            _fractionService.CreateFraction(id, fraction.Key, fraction.Value.Code, fraction.Value.Position);
             foreach (var member in fraction.Value.Members)
             {
-                _fractionService.InternalAddMember(id, _createdAccounts[member.Key].Id, member.Value.Rank, member.Value.RankName);
+                var userId = _createdAccounts[member.Key].Id;
+                if (!_fractionService.HasMember(id, userId))
+                {
+                    if(await _fractionService.TryAddMember(id, userId, member.Value.Rank, member.Value.RankName))
+                        _logger.LogInformation("Seeder: Added member {userId} with rank: {fractionRank} ({fractionRankName}) to the fraction with id {fractionId}.", userId, member.Value.Rank, member.Value.RankName, id);
+                }
             }
-            _logger.LogInformation("Seeder: Created fraction '{fractionName}' with id {fractionId}.", fractionData.Name);
+            _logger.LogInformation("Seeder: Created fraction '{fractionCode}' with id {fractionId}.", fraction.Value.Code, id);
         }
-        await _db.SaveChangesAsync();
     }
     
     public async Task Build()

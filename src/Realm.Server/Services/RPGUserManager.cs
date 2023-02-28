@@ -1,24 +1,47 @@
-﻿using Microsoft.Extensions.Options;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Options;
 using Realm.Domain.Inventory;
 using Realm.Domain.Options;
 using Realm.Domain.Registries;
+using Realm.Persistance.Data;
 
 namespace Realm.Server.Services;
 
-internal class SignInService : ISignInService
+internal class RPGUserManager : IRPGUserManager
 {
     private readonly SemaphoreSlim _lock = new(1);
 
     private readonly HashSet<int> _usedAccountsIds = new();
     private readonly ItemsRegistry _itemsRegistry;
-    private readonly ILogger<SignInService> _logger;
+    private readonly UserManager<User> _userManager;
+    private readonly ILogger<RPGUserManager> _logger;
     private readonly IOptions<GameplayOptions> _gameplayOptions;
 
-    public SignInService(ItemsRegistry itemsRegistry, ILogger<SignInService> logger, IOptions<GameplayOptions> gameplayOptions)
+    public RPGUserManager(ItemsRegistry itemsRegistry, UserManager<User> userManager, ILogger<RPGUserManager> logger, IOptions<GameplayOptions> gameplayOptions)
     {
         _itemsRegistry = itemsRegistry;
+        _userManager = userManager;
         _logger = logger;
         _gameplayOptions = gameplayOptions;
+    }
+
+    public async Task<User?> SignUp(string username, string password)
+    {
+        var identityResult = await _userManager.CreateAsync(new User
+        {
+            UserName = username,
+        }, password);
+        if (identityResult.Succeeded)
+        {
+            _logger.LogInformation("Created an account {userName}", username);
+            return await _userManager.FindByNameAsync(username) ?? throw new Exception("Unable to find just created account");
+        }
+        else
+        {
+            _logger.LogWarning("Failed to create an account {userName} because: {identityResultErrors}", username, identityResult.Errors.Select(x => x.Description));
+        }
+        
+        return null;
     }
 
     public async Task<bool> SignIn(Entity entity, User user)
@@ -42,7 +65,7 @@ internal class SignInService : ISignInService
                 {
                     var items = inventory.InventoryItems
                         .Select(x =>
-                            new Item(_itemsRegistry.Get(x.ItemId), x.Number, JsonConvert.DeserializeObject<Dictionary<string, object>>(x.MetaData))
+                            new Item(_itemsRegistry, x.ItemId, x.Number, JsonConvert.DeserializeObject<Dictionary<string, object>>(x.MetaData))
                         )
                         .ToList();
                     entity.AddComponent(new InventoryComponent(inventory.Size, inventory.Id, items));

@@ -15,16 +15,16 @@ public class SignInServiceTests
 {
     private readonly EntityHelper _entityHelper;
     private readonly RealmTestingServer _realmTestingServer;
-    private readonly ISignInService _signInService;
-    private readonly Mock<ILogger<SignInService>> _logger;
+    private readonly IRPGUserManager _signInService;
+    private readonly Mock<ILogger<RPGUserManager>> _logger;
 
     public SignInServiceTests()
     {
         _realmTestingServer = new();
         _entityHelper = new(_realmTestingServer);
-        _logger = new Mock<ILogger<SignInService>>();
+        _logger = new Mock<ILogger<RPGUserManager>>();
 
-        _signInService = new SignInService(new TestItemsRegistry(), _logger.Object, _realmTestingServer.GetRequiredService<IOptions<GameplayOptions>>());
+        _signInService = new RPGUserManager(new TestItemsRegistry(), _realmTestingServer.GetRequiredService<UserManager<User>>(), _logger.Object, _realmTestingServer.GetRequiredService<IOptions<GameplayOptions>>());
     }
 
     //[Fact]

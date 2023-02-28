@@ -104,7 +104,7 @@ public class InventoryComponent : Component
         {
             var thisItemNumber = Math.Min(number, itemRegistryEntry.StackSize);
             number -= thisItemNumber;
-            var item = new Item(itemRegistryEntry, number, metadata);
+            var item = new Item(itemsRegistry, itemId, number, metadata);
             item.Number = thisItemNumber;
             newItems.Add(item);
         }

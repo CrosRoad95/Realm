@@ -9,7 +9,28 @@ internal class FractionRepository : IFractionRepository
         _db = db;
     }
 
-    public async Task<FractionMember> CreateNewFractionMember(int fractionId, int userId, int rank = 1, string rankName = "")
+    public async Task<List<FractionMember>> GetAllMembers(int fractionId) => await _db.FractionMembers.Where(x => x.FractionId == fractionId).ToListAsync();
+
+    public Task<bool> Exists(int id, string code, string name)
+    {
+        var query = _db.Fractions
+            .AsNoTracking()
+            .Where(x => x.Id == id && x.Code == code && x.Name == name);
+
+        return query.AnyAsync();
+    }
+
+    public void CreateFraction(int id, string fractionName, string fractionCode)
+    {
+        _db.Fractions.Add(new Fraction
+        {
+            Id = id,
+            Name = fractionName,
+            Code = fractionCode
+        });
+    }
+
+    public void AddFractionMember(int fractionId, int userId, int rank = 1, string rankName = "")
     {
         var fractionMember = new FractionMember
         {
@@ -19,7 +40,10 @@ internal class FractionRepository : IFractionRepository
             RankName = rankName,
         };
         _db.FractionMembers.Add(fractionMember);
-        await _db.SaveChangesAsync();
-        return fractionMember;
+    }
+
+    public Task Commit()
+    {
+        return _db.SaveChangesAsync();
     }
 }

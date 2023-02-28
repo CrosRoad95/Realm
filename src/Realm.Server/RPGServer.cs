@@ -51,7 +51,7 @@ internal sealed class RPGServer : IRPGServer
 
         // Services
         services.AddSingleton<RPGCommandService>();
-        services.AddSingleton<ISignInService, SignInService>();
+        services.AddSingleton<IRPGUserManager, RPGUserManager>();
         services.AddTransient<ISaveService, SaveService>();
         services.AddTransient<ILoadService, LoadService>();
         services.AddTransient<IVehiclesService, VehiclesService>();

@@ -1,4 +1,6 @@
-﻿namespace Realm.Domain.Inventory;
+﻿using Realm.Domain.Registries;
+
+namespace Realm.Domain.Inventory;
 
 public class Item : IEquatable<Item>, IEquatable<Dictionary<string, object>>
 {
@@ -24,8 +26,9 @@ public class Item : IEquatable<Item>, IEquatable<Dictionary<string, object>>
     public event Action<Item, uint, uint>? NumberChanged;
     public event Action<Item>? Changed;
 
-    internal Item(ItemRegistryEntry itemRegistryEntry, uint number, Dictionary<string, object>? metaData = null)
+    internal Item(ItemsRegistry itemsRegistry, uint itemId, uint number, Dictionary<string, object>? metaData = null)
     {
+        var itemRegistryEntry = itemsRegistry.Get(itemId);
         AvailiableActions = itemRegistryEntry.AvailiableActions;
         Size = itemRegistryEntry.Size;
         Name = itemRegistryEntry.Name;

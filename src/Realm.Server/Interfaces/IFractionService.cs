@@ -2,7 +2,9 @@
 
 public interface IFractionService
 {
-    Task AddMember(int fractionId, int UserId, int rank, string rankName);
-    void CreateFraction(int id, string fractionName, string fractionCode, Vector3 position);
-    internal void InternalAddMember(int fractionId, int UserId, int rank, string rankName);
+    Task<bool> TryAddMember(int fractionId, int userId, int rank, string rankName);
+    bool Exists(int id);
+    bool HasMember(int fractionId, int userId);
+    internal Task InternalCreateFraction(int id, string fractionName, string fractionCode, Vector3 position);
+    internal Task<bool> InternalExists(int id, string code, string name);
 }
