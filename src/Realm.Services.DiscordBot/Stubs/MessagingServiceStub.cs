@@ -35,6 +35,29 @@ internal class MessagingServiceStub : Messaging.MessagingBase
         }
     }
 
+    public override async Task<SendFileResponse> SendFile(SendFileRequest request, ServerCallContext context)
+    {
+        var channel = _discordClient.GetChannel(request.ChannelId) as SocketTextChannel;
+        try
+        {
+            using var stream = new MemoryStream(request.File.Memory.ToArray());
+            var message = await channel.SendFileAsync(stream, request.FileName, request.Message);
+            return new SendFileResponse
+            {
+                Success = true,
+                MessageId = message.Id
+            };
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to send file");
+            return new SendFileResponse
+            {
+                Success = false
+            };
+        }
+    }
+
     public override async Task<SendMessageToUserResponse> SendMessageToUser(SendMessageToUserRequest request, ServerCallContext context)
     {
         var user = _discordClient.GetUser(request.UserId);

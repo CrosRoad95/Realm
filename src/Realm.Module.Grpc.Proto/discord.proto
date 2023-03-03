@@ -20,6 +20,7 @@ service PrivateMessagesChannels {
 
 service Messaging {
   rpc SendMessage (SendMessageRequest) returns (SendMessageResponse);
+  rpc SendFile (SendFileRequest) returns (SendFileResponse);
   rpc SendMessageToUser (SendMessageToUserRequest) returns (SendMessageToUserResponse);
 }
 
@@ -55,6 +56,18 @@ message SendMessageRequest {
 }
 
 message SendMessageResponse {
+  bool success = 1;
+  uint64 messageId = 2;
+}
+
+message SendFileRequest {
+  uint64 channelId = 1;
+  bytes file = 2;
+  string fileName = 3;
+  string message = 4;
+}
+
+message SendFileResponse {
   bool success = 1;
   uint64 messageId = 2;
 }

@@ -16,6 +16,7 @@ public interface IDiscordService
     TryConnectAccountChannel? TryConnectAccountChannel { get; set; }
     PrivateMessageReceived? PrivateMessageReceived { get; set; }
 
+    Task<ulong> SendFile(ulong channelId, Stream file, string fileName, string message);
     Task<ulong> SendMessage(ulong channelId, string message);
     Task<ulong> SendMessageToUser(ulong userId, string message);
 }

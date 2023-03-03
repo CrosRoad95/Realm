@@ -2,6 +2,7 @@
 using Realm.Domain.Interfaces;
 using Realm.Domain.Inventory;
 using Realm.Module.Discord.Interfaces;
+using Realm.Persistance.Data;
 using Realm.Resources.Assets;
 using Realm.Resources.Assets.Interfaces;
 using System.Drawing;
@@ -542,6 +543,23 @@ internal sealed class CommandsLogic
             var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();
             var messageId = await _discordService.SendMessageToUser(659910279353729086, args.First());
             playerElementComponent.SendChatMessage($"Wysłano wiadomość, id: {messageId}");
+        });
+
+        Stream generateStreamFromString(string s)
+        {
+            var stream = new MemoryStream();
+            var writer = new StreamWriter(stream);
+            writer.Write(s);
+            writer.Flush();
+            stream.Position = 0;
+            return stream;
+        }
+
+        _commandService.AddCommandHandler("discordsendfile", async (a, entity, args) =>
+        {
+            var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();
+            var messageId = await _discordService.SendFile(997787973775011853, generateStreamFromString("dowody"), "dowody_na_borsuka.txt", "potwierdzam");
+            playerElementComponent.SendChatMessage($"Wysłano plik, id: {messageId}");
         });
     }
 

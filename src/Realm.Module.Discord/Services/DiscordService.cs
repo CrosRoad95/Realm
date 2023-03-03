@@ -1,4 +1,5 @@
-﻿using Grpc.Net.Client;
+﻿using Google.Protobuf;
+using Grpc.Net.Client;
 
 namespace Realm.Module.Discord.Services;
 
@@ -27,6 +28,23 @@ internal class DiscordService : IDiscordService
             return response.MessageId;
 
         throw new Exception("Failed to send message");
+    }
+    
+    public async Task<ulong> SendFile(ulong channelId, Stream file, string fileName, string message)
+    {
+        var byteString = ByteString.FromStream(file);
+        var response = await _messagingClient.SendFileAsync(new SendFileRequest
+        {
+            File = byteString,
+            FileName = fileName,
+            ChannelId = channelId,
+            Message = message,
+        });
+
+        if (response.Success)
+            return response.MessageId;
+
+        throw new Exception("Failed to send file");
     }
 
     public async Task<ulong> SendMessageToUser(ulong userId, string message)
