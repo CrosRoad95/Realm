@@ -26,6 +26,11 @@ public class AssetsRegistry
     {
         return (TAsset)InternalGetAsset(assetName);
     }
+    
+    public IFont GetFont(string assetName)
+    {
+        return (IFont)InternalGetAsset(assetName);
+    }
 
     public void AddModel(string name, byte[] col, byte[] dff)
     {
