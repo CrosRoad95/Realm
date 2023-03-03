@@ -571,6 +571,11 @@ public sealed class PlayerElementComponent : PedElementComponent
     {
         _player.Kick(reason);
     }
+    
+    public void ShowHudComponent(HudComponent hudComponent, bool isVisible)
+    {
+        _player.ShowHudComponent(hudComponent, isVisible);
+    }
 
     public override void Dispose()
     {
