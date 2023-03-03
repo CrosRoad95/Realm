@@ -576,6 +576,23 @@ public sealed class PlayerElementComponent : PedElementComponent
     {
         _player.ShowHudComponent(hudComponent, isVisible);
     }
+    
+    public void SetFpsLimit(ushort limit)
+    {
+        _player.SetFpsLimit(limit);
+    }
+
+    public void PlaySound(byte sound)
+    {
+        _player.PlaySound(sound);
+    }
+    
+    public void SetTransferBoxVisible(bool visible)
+    {
+        _player.SetTransferBoxVisible(visible);
+    }
+    
+    public bool HasJetpack { get => _player.HasJetpack; set => _player.HasJetpack = value; }
 
     public override void Dispose()
     {
