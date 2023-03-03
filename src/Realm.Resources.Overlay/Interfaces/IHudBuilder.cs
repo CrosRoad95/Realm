@@ -18,3 +18,5 @@ public interface IHudBuilder<TState>
     IHudBuilder<TState> AddText(string text, Vector2 position, Size size, Color? color = null, Size? scale = null, IFont? font = null, string alignX = "left", string alignY = "top");
     IHudBuilder<TState> AddText(Expression<Func<TState, string>> text, Vector2 position, Size size, Color? color = null, Size? scale = null, string font = "default", string alignX = "left", string alignY = "top");
 }
+
+public interface IHudBuilder : IHudBuilder<object> { }

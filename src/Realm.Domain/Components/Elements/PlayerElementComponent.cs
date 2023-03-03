@@ -34,8 +34,6 @@ public sealed class PlayerElementComponent : PedElementComponent
     private readonly Dictionary<string, DateTime> _bindsUpCooldown = new();
     private readonly HashSet<string> _enableFightFlags = new();
     private readonly MapIdGenerator _mapIdGenerator = new(IdGeneratorConstants.MapIdStart, IdGeneratorConstants.MapIdStop);
-    private readonly Dictionary<string, IDisposable> _huds = new();
-    private readonly object _hudsLock = new();
     public event Action<Entity, Entity?>? FocusedEntityChanged;
     public Entity? FocusedEntity { get => _focusedEntity; internal set
         {
@@ -504,64 +502,6 @@ public sealed class PlayerElementComponent : PedElementComponent
         }
     }
 
-    public IHud<object> CreateHud(string hudId, Action<IHudBuilder<object>> hudBuilderCallback, Vector2? offset = null)
-    {
-        lock (_hudsLock)
-        {
-            if(_huds.ContainsKey(hudId))
-                throw new Exception("Hud name already in use");
-
-            OverlayService.CreateHud(_player, hudId, hudBuilderCallback, _screenSize, offset);
-            var hudController = new Hud<object>(hudId, _player, OverlayService, offset, null);
-            _huds[hudId] = hudController;
-            return hudController;
-        }
-    }
-
-    public IHud<TState> CreateHud<TState>(string hudId, Action<IHudBuilder<TState>> hudBuilderCallback, TState defaultState, Vector2? offset = null)
-         where TState : class
-    {
-        lock (_hudsLock)
-        {
-            if(_huds.ContainsKey(hudId))
-                throw new Exception("Hud name already in use");
-
-            List<(int, PropertyInfo)> dynamicHudComponents = new();
-
-            var HandleDynamicHudComponentAdded = (int id, PropertyInfo propertyInfo) =>
-            {
-                dynamicHudComponents.Add((id, propertyInfo));
-            };
-
-            OverlayService.CreateHud(_player, hudId, e =>
-            {
-                e.DynamicHudComponentAdded += HandleDynamicHudComponentAdded;
-                hudBuilderCallback(e);
-                e.DynamicHudComponentAdded -= HandleDynamicHudComponentAdded;
-            }, _screenSize, offset, defaultState);
-            var hudController = new Hud<TState>(hudId, _player, OverlayService, offset, defaultState, dynamicHudComponents);
-            _huds[hudId] = hudController;
-            return hudController;
-        }
-    }
-
-    public IHud<THud> GetHud<THud>(string hudId)
-    {
-        return (IHud<THud>)_huds[hudId];
-    }
-
-    public void RemoveHud(string hudId)
-    {
-        lock(_hudsLock)
-        {
-            if(!_huds.ContainsKey(hudId))
-                throw new Exception("Hud with this does not exists.");
-
-            _huds.Remove(hudId);
-        }
-        OverlayService.RemoveHud(_player, hudId);
-    }
-
     public void Kick(PlayerDisconnectType playerDisconnectType)
     {
         _player.Kick(playerDisconnectType);
@@ -572,7 +512,7 @@ public sealed class PlayerElementComponent : PedElementComponent
         _player.Kick(reason);
     }
     
-    public void ShowHudComponent(HudComponent hudComponent, bool isVisible)
+    public void ShowHudComponent(SlipeServer.Server.Elements.Enums.HudComponent hudComponent, bool isVisible)
     {
         _player.ShowHudComponent(hudComponent, isVisible);
     }
@@ -596,16 +536,7 @@ public sealed class PlayerElementComponent : PedElementComponent
 
     public override void Dispose()
     {
-        lock(_hudsLock)
-        {
-            foreach (var item in _huds)
-            {
-                item.Value.Dispose();
-            }
-            _huds.Clear();
-        }
         base.Dispose();
         _player.Kick(PlayerDisconnectType.SHUTDOWN);
     }
-
 }

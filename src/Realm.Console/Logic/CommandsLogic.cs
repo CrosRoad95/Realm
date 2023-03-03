@@ -1,4 +1,5 @@
-﻿using Realm.Domain.Interfaces;
+﻿using Realm.Console.Components.Huds;
+using Realm.Domain.Interfaces;
 using Realm.Domain.Inventory;
 using Realm.Module.Discord.Interfaces;
 using Realm.Resources.Assets;
@@ -15,7 +16,6 @@ internal sealed class CommandsLogic
     private readonly IEntityFactory _entityFactory;
     private readonly RepositoryFactory _repositoryFactory;
     private readonly ItemsRegistry _itemsRegistry;
-    private readonly AssetsRegistry _assetsRegistry;
     private readonly ECS _ecs;
     private readonly IBanService _banService;
     private readonly IDiscordService _discordService;
@@ -26,13 +26,12 @@ internal sealed class CommandsLogic
     }
 
     public CommandsLogic(RPGCommandService commandService, IEntityFactory entityFactory, RepositoryFactory repositoryFactory,
-        ItemsRegistry itemsRegistry, AssetsRegistry assetsRegistry, ECS ecs, IBanService banService, IDiscordService discordService)
+        ItemsRegistry itemsRegistry, ECS ecs, IBanService banService, IDiscordService discordService)
     {
         _commandService = commandService;
         _entityFactory = entityFactory;
         _repositoryFactory = repositoryFactory;
         _itemsRegistry = itemsRegistry;
-        _assetsRegistry = assetsRegistry;
         _ecs = ecs;
         _banService = banService;
         _discordService = discordService;
@@ -439,46 +438,42 @@ internal sealed class CommandsLogic
         _commandService.AddCommandHandler("createhud", (a, entity, args) =>
         {
             var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();
-            var hud = playerElementComponent.CreateHud("testhud", x => x
-                .AddRectangle(new Vector2(x.Right - 400, 600), new Size(400, 20), Color.DarkBlue)
-                .AddText("foo bar", new Vector2(x.Right - 200, 600), new Size(200, 20), font: "default", alignX: "center", alignY: "center")
-                .AddText("custom font", new Vector2(x.Right - 400, 600), new Size(200, 20), font: _assetsRegistry.GetAsset<IFont>("Better Together.otf"), alignX: "center", alignY: "center"));
-            hud.SetVisible(true);
+            entity.AddComponent(new SampleHud());
             return Task.CompletedTask;
         });
 
         _commandService.AddCommandHandler("movehud", (a, entity, args) =>
         {
-            var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();
-            var testhud = playerElementComponent.GetHud<object>("testhud");
-            testhud.Position = new Vector2(0, hudPosition++ * 10);
+            var sampleHud = entity.GetRequiredComponent<SampleHud>();
+            sampleHud.Position = new Vector2(0, hudPosition++ * 10);
             return Task.CompletedTask;
         });
 
         _commandService.AddCommandHandler("createstatefulhud", (a, entity, args) =>
         {
             var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();
-            var hud = playerElementComponent.CreateHud("teststatefulhud", x => x
-                .AddRectangle(new Vector2(x.Right - 400, 600), new Size(400, 20), Color.DarkBlue)
-                .AddText(x => x.Text1, new Vector2(x.Right - 200, 600), new Size(200, 20), font: "default", alignX: "center", alignY: "center")
-                .AddText("custom font", new Vector2(x.Right - 400, 600), new Size(200, 20), font: _assetsRegistry.GetAsset<IFont>("Better Together.otf"), alignX: "center", alignY: "center"),
-                new SampleHudState
-                {
-                    Text1 = "text1",
-                    Text2 = "text2",
-                });
-            hud.SetVisible(true);
+            var sampleHud = entity.AddComponent(new SampleStatefulHud(new SampleHudState
+            {
+                Text1 = "text1",
+                Text2 = "text2",
+            }));
             return Task.CompletedTask;
         });
 
         _commandService.AddCommandHandler("updatestate", (a, entity, args) =>
         {
-            var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();
-            var testhud = playerElementComponent.GetHud<SampleHudState>("teststatefulhud");
-            testhud.UpdateState(x =>
+            var sampleHud = entity.GetRequiredComponent<SampleStatefulHud>();
+            sampleHud.UpdateState(x =>
             {
                 x.Text1 = Guid.NewGuid().ToString()[..8];
             });
+            return Task.CompletedTask;
+        });
+
+        _commandService.AddCommandHandler("destroyhuds", (a, entity, args) =>
+        {
+            entity.TryDestroyComponent<SampleHud>();
+            entity.TryDestroyComponent<SampleStatefulHud>();
             return Task.CompletedTask;
         });
 
@@ -548,12 +543,6 @@ internal sealed class CommandsLogic
             var messageId = await _discordService.SendMessageToUser(659910279353729086, args.First());
             playerElementComponent.SendChatMessage($"Wysłano wiadomość, id: {messageId}");
         });
-    }
-
-    class SampleHudState
-    {
-        public string Text1 { get; set; }
-        public string Text2 { get; set; }
     }
 
     static int hudPosition = 0;
