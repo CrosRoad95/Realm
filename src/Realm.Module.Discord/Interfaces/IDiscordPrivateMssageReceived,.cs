@@ -2,5 +2,5 @@
 
 public interface IDiscordPrivateMessageReceived
 {
-    void HandlePrivateMessage(ulong userId, ulong messageId, string content);
+    Task HandlePrivateMessage(ulong userId, ulong messageId, string content);
 }

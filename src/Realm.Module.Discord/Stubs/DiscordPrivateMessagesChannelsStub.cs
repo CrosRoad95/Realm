@@ -9,20 +9,20 @@ internal class DiscordPrivateMessagesChannelsStub : PrivateMessagesChannels.Priv
         _discordService = discordService;
     }
 
-    public override Task<SendPrivateMessageResponse> ReceivedPrivateMessage(SendPrivateMessageRequest request, ServerCallContext context)
+    public override async Task<SendPrivateMessageResponse> ReceivedPrivateMessage(SendPrivateMessageRequest request, ServerCallContext context)
     {
         if (_discordService.PrivateMessageReceived != null)
         {
-            _discordService.PrivateMessageReceived(request.UserId, request.MessageId, request.Message, context.CancellationToken);
-            return Task.FromResult(new SendPrivateMessageResponse
+            await _discordService.PrivateMessageReceived(request.UserId, request.MessageId, request.Message, context.CancellationToken);
+            return new SendPrivateMessageResponse
             {
                 Success = true
-            });
+            };
         }
 
-        return Task.FromResult(new SendPrivateMessageResponse
+        return new SendPrivateMessageResponse
         {
             Success = false
-        });
+        };
     }
 }

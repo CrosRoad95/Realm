@@ -12,8 +12,9 @@ public class DefaultDiscordPrivateMessageReceivedHandler : IDiscordPrivateMessag
         _chatBox = chatBox;
     }
 
-    public void HandlePrivateMessage(ulong userId, ulong messageId, string content)
+    public Task HandlePrivateMessage(ulong userId, ulong messageId, string content)
     {
         _chatBox.Output($"{userId}: {content}");
+        return Task.CompletedTask;
     }
 }

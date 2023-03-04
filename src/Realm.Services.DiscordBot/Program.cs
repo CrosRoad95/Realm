@@ -15,12 +15,15 @@ services.AddLogging(x => x.AddSerilog(realmLogger.GetLogger(), dispose: true));
 services.Configure<GrpcOptions>(realmConfigurationProvider.GetSection("Grpc"));
 services.Configure<DiscordBotOptions>(realmConfigurationProvider.GetSection("Discord"));
 services.AddSingleton<DiscordClient>();
-services.AddSingleton(new DiscordSocketClient(new DiscordSocketConfig { GatewayIntents = GatewayIntents.AllUnprivileged | GatewayIntents.GuildMembers }));
+services.AddSingleton(new DiscordSocketClient(new DiscordSocketConfig {
+    GatewayIntents = GatewayIntents.All
+}));
 services.AddSingleton<CommandHandler>();
 services.AddSingleton<BotIdProvider>();
 
 services.AddSingleton<GrpcServer>();
 services.AddSingleton<MessagingServiceStub>();
+services.AddSingleton<TextBasedCommands>();
 
 services.AddSingleton(GrpcChannel.ForAddress("http://localhost:22010"));
 

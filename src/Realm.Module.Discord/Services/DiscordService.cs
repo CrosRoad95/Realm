@@ -15,6 +15,7 @@ internal class DiscordService : IDiscordService
     public UpdateStatusChannel? UpdateStatusChannel { get; set; }
     public TryConnectAccountChannel? TryConnectAccountChannel { get; set; }
     public PrivateMessageReceived? PrivateMessageReceived { get; set; }
+    public TextBasedMessageReceived? TextBasedCommandReceived { get; set; }
 
     public async Task<ulong> SendMessage(ulong channelId, string message)
     {
@@ -59,5 +60,29 @@ internal class DiscordService : IDiscordService
             return response.MessageId;
 
         throw new Exception("Failed to send message");
+    }
+
+    Dictionary<ulong, Dictionary<string, Func<ulong, string, Task>>> _textBasedCommandHandlers = new Dictionary<ulong, Dictionary<string, Func<ulong, string, Task>>>();
+
+    public async Task HandleTextBasedCommand(ulong userId, ulong channelId, string command)
+    {
+        if(_textBasedCommandHandlers.TryGetValue(channelId, out var channelCommands))
+        {
+            var splitted = command.Split(' ', 2);
+            if (channelCommands.TryGetValue(splitted[0], out var commandHandler))
+            {
+                await commandHandler(userId, command[splitted[0].Length..]);
+            }
+        }
+    }
+
+    public void AddTextBasedCommandHandler(ulong channelId, string command, Func<ulong, string, Task> callback)
+    {
+        if (!_textBasedCommandHandlers.ContainsKey(channelId))
+        {
+            _textBasedCommandHandlers[channelId] = new();
+        }
+
+        _textBasedCommandHandlers[channelId][command] = callback;
     }
 }

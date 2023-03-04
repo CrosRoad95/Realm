@@ -5,6 +5,7 @@ using Realm.Module.Discord.Interfaces;
 using Realm.Persistance.Data;
 using Realm.Resources.Assets;
 using Realm.Resources.Assets.Interfaces;
+using SlipeServer.Server.Services;
 using System.Drawing;
 using System.Reflection;
 using static Realm.Domain.Components.Elements.PlayerElementComponent;
@@ -20,6 +21,7 @@ internal sealed class CommandsLogic
     private readonly ECS _ecs;
     private readonly IBanService _banService;
     private readonly IDiscordService _discordService;
+    private readonly ChatBox _chatBox;
 
     private class TestState
     {
@@ -27,7 +29,7 @@ internal sealed class CommandsLogic
     }
 
     public CommandsLogic(RPGCommandService commandService, IEntityFactory entityFactory, RepositoryFactory repositoryFactory,
-        ItemsRegistry itemsRegistry, ECS ecs, IBanService banService, IDiscordService discordService)
+        ItemsRegistry itemsRegistry, ECS ecs, IBanService banService, IDiscordService discordService, ChatBox chatBox)
     {
         _commandService = commandService;
         _entityFactory = entityFactory;
@@ -36,8 +38,7 @@ internal sealed class CommandsLogic
         _ecs = ecs;
         _banService = banService;
         _discordService = discordService;
-
-        
+        _chatBox = chatBox;
         _commandService.AddCommandHandler("playtime", (a, entity, args) =>
         {
             if (entity.TryGetComponent(out PlayTimeComponent playTimeComponent))
@@ -560,6 +561,18 @@ internal sealed class CommandsLogic
             var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();
             var messageId = await _discordService.SendFile(997787973775011853, generateStreamFromString("dowody"), "dowody_na_borsuka.txt", "potwierdzam");
             playerElementComponent.SendChatMessage($"Wysłano plik, id: {messageId}");
+        });
+
+        _discordService.AddTextBasedCommandHandler(1069962155539042314, "test", (userId, parameters) =>
+        {
+            _chatBox.Output($"Użytkownik o id {userId} wpisał komendę 'test' z parametrami: {parameters}");
+            return Task.CompletedTask;
+        });
+
+        _discordService.AddTextBasedCommandHandler(997787973775011853, "gracze", async (userId, parameters) =>
+        {
+            var playerEntities = _ecs.GetPlayerEntities();
+            await _discordService.SendMessage(997787973775011853, $"Gracze na serwerze: {string.Join(", ",playerEntities.Select(x => x.GetRequiredComponent<PlayerElementComponent>().Name))}");
         });
     }
 

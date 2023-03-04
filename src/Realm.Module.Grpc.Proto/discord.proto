@@ -24,6 +24,10 @@ service Messaging {
   rpc SendMessageToUser (SendMessageToUserRequest) returns (SendMessageToUserResponse);
 }
 
+service Commands {
+  rpc SendTextBasedCommand (SendTextBasedCommandRequest) returns (SendTextBasedCommandResponse);
+}
+
 message HandshakeRequest {
   string message = 1;
 }
@@ -89,5 +93,15 @@ message SendPrivateMessageRequest {
 }
 
 message SendPrivateMessageResponse {
+  bool success = 1;
+}
+
+message SendTextBasedCommandRequest {
+  uint64 channelId = 1;
+  uint64 userId = 2;
+  string command = 3;
+}
+
+message SendTextBasedCommandResponse {
   bool success = 1;
 }
