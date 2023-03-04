@@ -1,14 +1,21 @@
-﻿using Realm.Console.Components.Huds;
+﻿using Google.Protobuf.WellKnownTypes;
+using Realm.Console.Components.Huds;
 using Realm.Domain.Interfaces;
 using Realm.Domain.Inventory;
 using Realm.Module.Discord.Interfaces;
 using Realm.Persistance.Data;
 using Realm.Resources.Assets;
 using Realm.Resources.Assets.Interfaces;
+using SixLabors.Fonts;
+using SixLabors.ImageSharp.Drawing;
+using SixLabors.ImageSharp.Drawing.Processing;
+using SixLabors.ImageSharp.Formats.Jpeg;
 using SlipeServer.Server.Services;
 using System.Drawing;
 using System.Reflection;
 using static Realm.Domain.Components.Elements.PlayerElementComponent;
+using Color = System.Drawing.Color;
+using Size = System.Drawing.Size;
 
 namespace Realm.Console.Logic;
 
@@ -353,7 +360,7 @@ internal sealed class CommandsLogic
 
         _commandService.AddCommandHandler("animation", (a, entity, args) =>
         {
-            if (Enum.TryParse<Animation>(args.FirstOrDefault(), out var animation))
+            if (System.Enum.TryParse<Animation>(args.FirstOrDefault(), out var animation))
             {
                 try
                 {
@@ -372,7 +379,7 @@ internal sealed class CommandsLogic
         _commandService.AddCommandHandler("animationasync", async (a, entity, args) =>
         {
             var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();
-            if (Enum.TryParse<Animation>(args.FirstOrDefault(), out var animation))
+            if (System.Enum.TryParse<Animation>(args.FirstOrDefault(), out var animation))
             {
                 try
                 {
@@ -392,7 +399,7 @@ internal sealed class CommandsLogic
 
         _commandService.AddCommandHandler("complexanimation", async (a, entity, args) =>
         {
-            if (Enum.TryParse<Animation>(args.FirstOrDefault(), out var animation))
+            if (System.Enum.TryParse<Animation>(args.FirstOrDefault(), out var animation))
             {
                 try
                 {
@@ -573,6 +580,68 @@ internal sealed class CommandsLogic
         {
             var playerEntities = _ecs.GetPlayerEntities();
             await _discordService.SendMessage(997787973775011853, $"Gracze na serwerze: {string.Join(", ",playerEntities.Select(x => x.GetRequiredComponent<PlayerElementComponent>().Name))}");
+        });
+
+
+        FontCollection collection = new();
+        FontFamily family = collection.Add("Server/Fonts/Ratual.otf");
+        Font font = family.CreateFont(24, FontStyle.Regular);
+
+        _discordService.AddTextBasedCommandHandler(997787973775011853, "graczegrafika", async (userId, parameters) =>
+        {
+            var playerEntities = _ecs.GetPlayerEntities();
+            int width = 480;
+            int height = 60;
+
+            DrawingOptions options = new()
+            {
+                GraphicsOptions = new()
+                {
+                    ColorBlendingMode = PixelColorBlendingMode.Multiply
+                }
+            };
+
+            var encoder = new JpegEncoder()
+            {
+                Quality = 40
+            };
+
+            using (var memoryStream = new MemoryStream())
+            using (Image<Rgba32> image = new(width, height))
+            {
+                image.Mutate(x => x.DrawText($"Gracze na serwerze: {string.Join(", ", playerEntities.Select(x => x.GetRequiredComponent<PlayerElementComponent>().Name))}", font, IronSoftware.Drawing.Color.White, new SixLabors.ImageSharp.PointF(10, 10)));
+                image.Save(memoryStream, encoder);
+                memoryStream.Position = 0;
+                await _discordService.SendFile(997787973775011853, memoryStream, "obrazek.jpg", "");
+            }
+        });
+
+        _discordService.AddTextBasedCommandHandler(997787973775011853, "testgrafika", async (userId, parameters) =>
+        {
+            int width = 480;
+            int height = 60;
+
+            DrawingOptions options = new()
+            {
+                GraphicsOptions = new()
+                {
+                    ColorBlendingMode = PixelColorBlendingMode.Multiply
+                }
+            };
+
+            var encoder = new JpegEncoder()
+            {
+                Quality = 40
+            };
+
+            using (var memoryStream = new MemoryStream())
+            using (Image<Rgba32> image = new(width, height))
+            {
+                image.Mutate(x => x.DrawText(parameters, font, IronSoftware.Drawing.Color.White, new SixLabors.ImageSharp.PointF(10, 10)));
+                image.Save(memoryStream, encoder);
+                memoryStream.Position = 0;
+                await _discordService.SendFile(997787973775011853, memoryStream, "obrazek.jpg", "");
+            }
         });
     }
 

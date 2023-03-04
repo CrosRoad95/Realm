@@ -2,6 +2,8 @@
 using Realm.Resources.Assets;
 using System.Drawing;
 using Realm.Resources.Overlay.Interfaces;
+using Size = System.Drawing.Size;
+using Color = System.Drawing.Color;
 
 namespace Realm.Console.Components.Huds;
 
