@@ -42,11 +42,7 @@ internal class DiscordStatusChannel
     
     public async Task Update()
     {
-        var timestamp = new TimestampTag
-        {
-            Time = DateTime.UtcNow,
-            Style = TimestampTagStyles.ShortDateTime
-        };
+        var timestamp = new TimestampTag(DateTime.UtcNow, TimestampTagStyles.ShortDateTime);
         if (_statusDiscordMessage == null)
             throw new Exception("Failed to update status channel, channel not found.");
 

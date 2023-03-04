@@ -1,4 +1,5 @@
-﻿using Discord.WebSocket;
+﻿using Discord.Logger;
+using Discord.WebSocket;
 using Grpc.Net.Client;
 using Microsoft.Extensions.Options;
 using Realm.DiscordBot.Services;
@@ -14,12 +15,11 @@ internal class DiscordClient
     private readonly CommandHandler _commandHandler;
     private readonly BotIdProvider _botIdProvider;
     private readonly TextBasedCommands _textBasecCommands;
-    private readonly ILogger<DiscordClient> _logger;
     private SocketGuild? _socketGuild;
 
     public DiscordClient(DiscordSocketClient discordSocketClient, IOptions<DiscordBotOptions> discordBotOptions, DiscordStatusChannel discordStatusChannel,
-        Channels.PrivateMessagesChannels privateMessagesChannels,
-        ILogger<DiscordClient> logger, CommandHandler commandHandler, BotIdProvider botIdProvider, GrpcChannel grpcChannel, TextBasedCommands textBasecCommands)
+        Channels.PrivateMessagesChannels privateMessagesChannels, CommandHandler commandHandler, BotIdProvider botIdProvider, GrpcChannel grpcChannel, TextBasedCommands textBasecCommands,
+        IDiscordLogger discordLogger)
     {
         _client = discordSocketClient;
         _discordBotOptions = discordBotOptions;
@@ -28,9 +28,8 @@ internal class DiscordClient
         _commandHandler = commandHandler;
         _botIdProvider = botIdProvider;
         _textBasecCommands = textBasecCommands;
-        _logger = logger;
+        discordLogger.Attach(_client);
         _client.Ready += HandleReady;
-        _client.Log += HandleLog;
         _client.GuildMemberUpdated += HandleGuildMemberUpdated;
         _client.MessageReceived += HandlePrivateMessageReceived;
     }
@@ -86,11 +85,5 @@ internal class DiscordClient
             throw new NullReferenceException(nameof(_socketGuild));
 
         return _socketGuild.GetUser(userId);
-    }
-
-    private Task HandleLog(LogMessage log)
-    {
-        _logger.LogInformation(log.ToString());
-        return Task.CompletedTask;
     }
 }

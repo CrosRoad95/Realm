@@ -5,12 +5,14 @@ using Serilog.Events;
 using Grpc.Net.Client;
 using Realm.DiscordBot.Stubs;
 using Realm.Module.Grpc.Options;
+using Discord.Logger;
 
 var realmConfigurationProvider = new RealmConfigurationProvider();
 var services = new ServiceCollection();
 var realmLogger = new RealmLogger(LogEventLevel.Verbose)
     .AddSeq();
 
+services.AddDiscordLogger();
 services.AddLogging(x => x.AddSerilog(realmLogger.GetLogger(), dispose: true));
 services.Configure<GrpcOptions>(realmConfigurationProvider.GetSection("Grpc"));
 services.Configure<DiscordBotOptions>(realmConfigurationProvider.GetSection("Discord"));
