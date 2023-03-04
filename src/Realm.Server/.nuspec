@@ -27,10 +27,10 @@
             <dependency id="Serilog.Extensions.Logging" version="3.1.0" />       
             <dependency id="Serilog.Sinks.Console" version="4.1.1-dev-00896" />
             <dependency id="Serilog.Sinks.Seq" version="5.2.1" />
-            <dependency id="SlipeServer.Resources.Base" version="0.1.0-CI-20230130-155823" />    
-            <dependency id="SlipeServer.Resources.DGS" version="0.1.0-CI-20230130-155823" />
-			<dependency id="SlipeServer.Resources.NoClip" version="0.1.0-CI-20230130-155823" />
-			<dependency id="SlipeServer.Resources.Text3d" version="0.1.0-CI-20230130-155823" />
+            <dependency id="SlipeServer.Resources.Base" version="0.1.0-CI-20230303-053612" />    
+            <dependency id="SlipeServer.Resources.DGS" version="0.1.0-CI-20230303-053612" />
+			<dependency id="SlipeServer.Resources.NoClip" version="0.1.0-CI-20230303-053612" />
+			<dependency id="SlipeServer.Resources.Text3d" version="0.1.0-CI-20230303-053612" />
             <dependency id="RenderWareBuilders" version="0.1.0-CI-20221009-163717" />
             <dependency id="RenderWareIo" version="0.1.0-CI-20221009-163717" />
             <dependency id="Silk.NET.Assimp" version="2.16.0" />
