@@ -6,7 +6,6 @@
         <description>RPG Server Base for mta sa based on slipe-server</description>
         <authors>Sebastian Jura</authors>
         <dependencies>
-            <dependency id="BCrypt.Net-Next" version="4.0.3" />  
             <dependency id="FluentValidation" version="11.2.2" />
             <dependency id="Microsoft.Extensions.Hosting.Abstractions" version="7.0.0" /> 
             <dependency id="Microsoft.AspNetCore.Identity.EntityFrameworkCore" version="7.0.2" />
