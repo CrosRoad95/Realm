@@ -10,7 +10,7 @@ public sealed class LicensesCommand : IIngameCommand
         _logger = logger;
     }
 
-    public Task Handle(Guid traceId, Entity entity, string[] args)
+    public Task Handle(Entity entity, string[] args)
     {
         if (entity.TryGetComponent(out LicensesComponent licenseComponent))
         {

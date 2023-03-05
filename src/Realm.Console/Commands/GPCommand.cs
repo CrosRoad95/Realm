@@ -10,7 +10,7 @@ public sealed class GPCommand : IIngameCommand
         _logger = logger;
     }
 
-    public Task Handle(Guid traceId, Entity entity, string[] args)
+    public Task Handle(Entity entity, string[] args)
     {
         var pos = entity.Transform.Position;
         var rot = entity.Transform.Rotation;

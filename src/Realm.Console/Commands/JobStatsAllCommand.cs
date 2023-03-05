@@ -12,7 +12,7 @@ public sealed class JobsStatsAllCommand : IIngameCommand
         _jobService = jobService;
     }
 
-    public async Task Handle(Guid traceId, Entity entity, string[] args)
+    public async Task Handle(Entity entity, string[] args)
     {
         var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();
         var accountComponent = entity.GetRequiredComponent<AccountComponent>();

@@ -14,7 +14,7 @@ public sealed class GiveItemCommand : IIngameCommand
         _itemsRegistry = itemsRegistry;
     }
 
-    public Task Handle(Guid traceId, Entity entity, string[] args)
+    public Task Handle(Entity entity, string[] args)
     {
         if (entity.TryGetComponent(out InventoryComponent inventoryComponent))
         {

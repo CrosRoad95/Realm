@@ -2,5 +2,5 @@
 
 public interface IIngameCommand
 {
-    Task Handle(Guid traceId, Entity entity, string[] args);
+    Task Handle(Entity entity, string[] args);
 }

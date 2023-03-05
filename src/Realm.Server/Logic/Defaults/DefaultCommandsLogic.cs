@@ -10,9 +10,9 @@ public class DefaultCommandsLogic
         {
             var type = ingameCommand.GetType();
             var commandName = type.GetCustomAttribute<CommandNameAttribute>().Name.ToLower();
-            commandService.AddCommandHandler(commandName, async (traceId, entity, args) =>
+            commandService.AddCommandHandler(commandName, async (entity, args) =>
             {
-                await (serviceProvider.GetRequiredService(type) as IIngameCommand).Handle(traceId, entity, args);
+                await (serviceProvider.GetRequiredService(type) as IIngameCommand).Handle(entity, args);
             });
         }
     }

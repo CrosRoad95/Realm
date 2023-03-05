@@ -28,7 +28,7 @@ internal class TestRPGServer : IRPGServer
                 services.AddSingleton(configuration);
                 services.AddSingleton<IConsole, TestConsoleCommands>();
                 services.AddSingleton((IServerFilesProvider)NullServerFilesProvider.Instance);
-                services.AddSingleton(new RealmLogger().GetLogger());
+                services.AddSingleton(new RealmLogger("TestServer").GetLogger());
 
                 services.AddDiscordModule();
                 services.AddWebAppModule();

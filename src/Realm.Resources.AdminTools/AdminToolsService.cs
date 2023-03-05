@@ -9,7 +9,7 @@ public class AdminToolsService
     internal event Action<Player>? AdminToolsDisabled;
 
     private readonly HashSet<Player> _enabledForPlayers = new();
-    private readonly SemaphoreSlim _semaphoreSlim = new SemaphoreSlim(1);
+    private readonly object _enabledForPlayersLock = new();
     public AdminToolsService()
     {
 
@@ -22,10 +22,9 @@ public class AdminToolsService
 
     public void EnableAdminToolsForPlayer(Player player)
     {
-        _semaphoreSlim.Wait();
-        bool succeed = _enabledForPlayers.Add(player);
-
-        _semaphoreSlim.Release();
+        bool succeed;
+        lock (_enabledForPlayersLock)
+            succeed = _enabledForPlayers.Add(player);
 
         if(succeed)
         {
@@ -36,16 +35,15 @@ public class AdminToolsService
 
     private void HandlePlayerDisconnected(Player player, PlayerQuitEventArgs e)
     {
-        _semaphoreSlim.Wait();
-        _enabledForPlayers.Remove(player);
-        _semaphoreSlim.Release();
+        lock (_enabledForPlayersLock)
+            _enabledForPlayers.Remove(player);
     }
 
     public void DisableAdminToolsForPlayer(Player player)
     {
-        _semaphoreSlim.Wait();
-        bool succeed = _enabledForPlayers.Remove(player);
-        _semaphoreSlim.Release();
+        bool succeed;
+        lock (_enabledForPlayersLock)
+            succeed = _enabledForPlayers.Remove(player);
 
         if(succeed)
         {

@@ -50,6 +50,7 @@ public sealed class PlayerElementComponent : PedElementComponent
     internal Player Player => _player;
     internal bool Spawned { get; set; }
     public string Name { get => Player.Name; set => Player.Name = value; }
+    public string Serial => Player.Client.Serial;
     public string Language { get; private set; } = "pl";
     public Controls Controls => _player.Controls;
     public WeaponCollection Weapons => _player.Weapons;

@@ -30,4 +30,12 @@ public class SampleStatefulHud : HudComponent<SampleHudState>
         x.AddText(x => x.Text1, new Vector2(x.Right - 200, 600), new Size(200, 20), font: "default", alignX: "center", alignY: "center");
         x.AddText("custom font", new Vector2(x.Right - 400, 600), new Size(200, 20), font: AssetsRegistry.GetFont("Better Together.otf"), alignX: "center", alignY: "center");
     }
+
+    public void Update()
+    {
+        UpdateState(x =>
+        {
+            x.Text1 = Guid.NewGuid().ToString()[..8];
+        });
+    }
 }

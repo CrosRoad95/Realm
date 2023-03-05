@@ -13,10 +13,10 @@ public static class RPGServerBuilderExtensions
         return serverBuilder;
     }
 
-    public static RPGServerBuilder AddDefaultLogger(this RPGServerBuilder serverBuilder)
+    public static RPGServerBuilder AddDefaultLogger(this RPGServerBuilder serverBuilder, string? appName = null, string? seqServerUrl = null)
     {
-        var logger = new RealmLogger(LogEventLevel.Verbose)
-            .AddSeq()
+        var logger = new RealmLogger(appName ?? "RPGServer", LogEventLevel.Verbose)
+            .AddSeq(seqServerUrl ?? "http://localhost:5341")
             .GetLogger();
         serverBuilder.AddLogger(logger);
         return serverBuilder;

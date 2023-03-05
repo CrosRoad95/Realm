@@ -12,7 +12,7 @@ public class RealmLogger
     private LoggingLevelSwitch levelSwitch = new LoggingLevelSwitch();
 
     public LoggingLevelSwitch LevelSwitch => levelSwitch;
-    public RealmLogger(LogEventLevel logEventLevel = LogEventLevel.Debug)
+    public RealmLogger(string appName, LogEventLevel logEventLevel = LogEventLevel.Debug)
     {
         levelSwitch.MinimumLevel = logEventLevel;
         _loggerConfiguration = new LoggerConfiguration()
@@ -20,6 +20,8 @@ public class RealmLogger
             .WriteTo.Console(
                 outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3}] {Message:lj}{NewLine}{Exception}",
                 levelSwitch: levelSwitch)
+            .Enrich.WithProperty("AppName", appName)
+            .Enrich.WithThreadId()
             .Enrich.FromLogContext();
     }
 
@@ -29,9 +31,9 @@ public class RealmLogger
         return this;
     }
 
-    public RealmLogger AddSeq()
+    public RealmLogger AddSeq(string serverUrl)
     {
-        _loggerConfiguration.WriteTo.Seq("http://localhost:5341", controlLevelSwitch: LevelSwitch);
+        _loggerConfiguration.WriteTo.Seq(serverUrl, controlLevelSwitch: LevelSwitch);
         return this;
     }
 

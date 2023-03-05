@@ -16,7 +16,7 @@ public class RPGCommandService
         _ecs = ecs;
     }
 
-    public bool AddCommandHandler(string commandName, Func<Guid, Entity, string[], Task> callback, string[]? requiredPolicies = null)
+    public bool AddCommandHandler(string commandName, Func<Entity, string[], Task> callback, string[]? requiredPolicies = null)
     {
         if(_commands.Any(x => string.Equals(x.CommandText, commandName, StringComparison.OrdinalIgnoreCase))) {
             throw new Exception($"Command with name '{commandName}' already exists");
@@ -33,13 +33,15 @@ public class RPGCommandService
         {
             var player = args.Player;
             var entity = _ecs.GetEntityByPlayer(player);
-            if (!entity.TryGetComponent<AccountComponent>(out var accountComponent))
+            if (!entity.TryGetComponent<AccountComponent>(out var accountComponent) || !entity.TryGetComponent<PlayerElementComponent>(out var playerElementComponent))
                 return;
 
-            using var playerProperty = LogContext.PushProperty("player", player);
-            using var commandNameProperty = LogContext.PushProperty("commandName", commandName);
-            using var commandArgumentProperty = LogContext.PushProperty("commandArguments", args.Arguments);
             var traceId = Guid.NewGuid();
+            using var _1 = LogContext.PushProperty("serial", playerElementComponent.Serial);
+            using var _2 = LogContext.PushProperty("accountId", accountComponent.Id);
+            using var _3 = LogContext.PushProperty("commandName", commandName);
+            using var _4 = LogContext.PushProperty("commandArguments", args.Arguments);
+            using var _5 = LogContext.PushProperty("traceId", traceId);
             _logger.LogInformation("Begin command {commandName} execution with traceId={traceId}", commandName, traceId);
             if (requiredPolicies != null)
             {
@@ -57,7 +59,7 @@ public class RPGCommandService
                 _logger.LogInformation("{player} executed command {commandName} with no arguments.", entity);
             try
             {
-                await callback(traceId, entity, args.Arguments);
+                await callback(entity, args.Arguments);
             }
             catch (Exception ex)
             {

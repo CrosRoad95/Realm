@@ -9,8 +9,8 @@ using Discord.Logger;
 
 var realmConfigurationProvider = new RealmConfigurationProvider();
 var services = new ServiceCollection();
-var realmLogger = new RealmLogger(LogEventLevel.Verbose)
-    .AddSeq();
+var realmLogger = new RealmLogger("DiscordBot", LogEventLevel.Verbose)
+    .AddSeq("http://localhost:5341");
 
 services.AddDiscordLogger();
 services.AddLogging(x => x.AddSerilog(realmLogger.GetLogger(), dispose: true));

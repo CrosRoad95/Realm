@@ -14,15 +14,28 @@ local function setFocusedElement(newElement, newChildElement)
 	triggerServerEventWithId("internalChangeFocusedElement", focusedElement, newChildElement)
 end
 
+local function getFocusPosition(element)
+	local ex, ey, ez = getElementPosition(element);
+	if(getElementType(element) == "object")then
+		local x0, y0, z0, x1, y1, z1 = getElementBoundingBox(element)
+		ex, ey, ez = ex + (x0 + x1) / 2, ey + (y0 + y1) / 2, ez + (z0 + z1) / 2
+	else
+		ex, ey, ez = getElementPosition(element);
+	end
+	return ex, ey, ez;
+end
+
 local function findNearestElementToPoint(elements, x,y,z)
 	local nearestElement = nil;
 	local nearestComponent = nil;
 	local nearest = 9999999
 	local dis = 0;
+	local ex,ey,ez;
 	for i,v in ipairs(elements)do
 		if(focusableElements[v])then
 			if(v ~= localPlayer)then
-				dis = getDistanceBetweenPoints3D(x,y,z, getElementPosition(v))
+				ex, ey, ez = getFocusPosition(v)
+				dis = getDistanceBetweenPoints3D(x,y,z, ex, ey, ez)
 				if(nearest > dis)then
 					nearestElement = v;
 					dis = nearest;
@@ -49,7 +62,7 @@ local function findNearestElementOfIntrestAt(x,y,z, i, d)
 	if(#vehicles > 0)then
 		return findNearestElementToPoint(vehicles, x,y,z)
 	end
-	local objects = getElementsWithinRange(x,y,z, 0.75, "object", i, d )
+	local objects = getElementsWithinRange(x,y,z, 1.5, "object", i, d )
 	if(#objects > 0)then
 		return findNearestElementToPoint(objects, x,y,z)
 	end
@@ -58,6 +71,10 @@ local function findNearestElementOfIntrestAt(x,y,z, i, d)
 		return findNearestElementToPoint(peds, x,y,z)
 	end
 	return nil;
+end
+
+local function drawBox(x0, y0, z0, x1, y1, z1)
+	dxDrawLine3D(x0, y0, z0, x1, y1, z1, tocolor(0,0,255), 1)
 end
 
 local function updateFocusedElement()
@@ -76,12 +93,15 @@ local function updateFocusedElement()
 	
 	if(debugRenderEnabled)then
 		dxDrawLine3D(x,y,z, px, py,z, tocolor(255,0,0), 2)
-		if(nearestElement)then
-			px,py,pz = getElementPosition(nearestElement);
+		if(nearestElement and isElement(nearestElement))then
+			px,py,pz = getFocusPosition(nearestElement);
 			dxDrawLine3D(x,y,z, px,py,pz, tocolor(0,255,0), 3)
 			if(getElementType(nearestElement) == "vehicle" and nearestChildElement)then
-				px,py,pz = getVehicleComponentPosition(nearestElement, nearestChildElement, "world")
-				dxDrawLine3D(x,y,z, px,py,pz, tocolor(0,0,255), 3)
+				cx,cy,cz = getVehicleComponentPosition(nearestElement, nearestChildElement, "world")
+				dxDrawLine3D(x,y,z, cx,cy,cz, tocolor(0,0,255), 3)
+			elseif(getElementType(nearestElement) == "object")then
+				local x0, y0, z0, x1, y1, z1 = getElementBoundingBox(nearestElement)
+				drawBox(px + x0, py + y0, pz + z0, px + x1, py + y1, pz + z1)
 			end
 		end
 	end

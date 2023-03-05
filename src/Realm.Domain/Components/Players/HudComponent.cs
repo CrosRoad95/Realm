@@ -22,7 +22,7 @@ public abstract class HudComponent<TState> : Component where TState : class
             if (_visible != value)
             {
                 _visible = value;
-                _hud.SetVisible(true);
+                _hud.SetVisible(_visible);
             }
         }
     }
@@ -55,7 +55,7 @@ public abstract class HudComponent<TState> : Component where TState : class
         Visible = true;
     }
 
-    public void UpdateState(Action<TState> callback)
+    protected void UpdateState(Action<TState> callback)
     {
         _hud.UpdateState(callback);
     }

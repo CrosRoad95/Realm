@@ -10,7 +10,7 @@ public sealed class InventoryCommand : IIngameCommand
         _logger = logger;
     }
 
-    public Task Handle(Guid traceId, Entity entity, string[] args)
+    public Task Handle(Entity entity, string[] args)
     {
         if (entity.TryGetComponent(out InventoryComponent inventoryComponent))
         {

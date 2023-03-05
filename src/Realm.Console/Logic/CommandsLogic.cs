@@ -46,7 +46,7 @@ internal sealed class CommandsLogic
         _banService = banService;
         _discordService = discordService;
         _chatBox = chatBox;
-        _commandService.AddCommandHandler("playtime", (a, entity, args) =>
+        _commandService.AddCommandHandler("playtime", (entity, args) =>
         {
             if (entity.TryGetComponent(out PlayTimeComponent playTimeComponent))
             {
@@ -55,7 +55,7 @@ internal sealed class CommandsLogic
             return Task.CompletedTask;
         });
         
-        _commandService.AddCommandHandler("givemoney", (a, entity, args) =>
+        _commandService.AddCommandHandler("givemoney", (entity, args) =>
         {
             if (entity.TryGetComponent(out MoneyComponent moneyComponent))
             {
@@ -66,7 +66,7 @@ internal sealed class CommandsLogic
             return Task.CompletedTask;
         });
         
-        _commandService.AddCommandHandler("takemoney", (a, entity, args) =>
+        _commandService.AddCommandHandler("takemoney", (entity, args) =>
         {
             if (entity.TryGetComponent(out MoneyComponent moneyComponent))
             {
@@ -77,7 +77,7 @@ internal sealed class CommandsLogic
             return Task.CompletedTask;
         });
         
-        _commandService.AddCommandHandler("setmoney", (a, entity, args) =>
+        _commandService.AddCommandHandler("setmoney", (entity, args) =>
         {
             if (entity.TryGetComponent(out MoneyComponent moneyComponent))
             {
@@ -88,7 +88,7 @@ internal sealed class CommandsLogic
             return Task.CompletedTask;
         });
         
-        _commandService.AddCommandHandler("money", (a, entity, args) =>
+        _commandService.AddCommandHandler("money", (entity, args) =>
         {
             if (entity.TryGetComponent(out MoneyComponent moneyComponent))
             {
@@ -97,7 +97,7 @@ internal sealed class CommandsLogic
             return Task.CompletedTask;
         });
 
-        _commandService.AddCommandHandler("cv", (a, entity, args) =>
+        _commandService.AddCommandHandler("cv", (entity, args) =>
         {
             using var vehicleRepository = _repositoryFactory.GetVehicleRepository();
             var vehicleEntity = _entityFactory.CreateVehicle(404, entity.Transform.Position + new Vector3(4, 0, 0), entity.Transform.Rotation);
@@ -109,7 +109,7 @@ internal sealed class CommandsLogic
             return Task.CompletedTask;
         });
         
-        _commandService.AddCommandHandler("cvprivate", async (a, entity, args) =>
+        _commandService.AddCommandHandler("cvprivate", async (entity, args) =>
         {
             using var vehicleRepository = _repositoryFactory.GetVehicleRepository();
             var vehicleEntity = await _entityFactory.CreateNewPrivateVehicle(404, entity.Transform.Position + new Vector3(4, 0, 0), entity.Transform.Rotation);
@@ -119,7 +119,7 @@ internal sealed class CommandsLogic
             vehicleEntity.AddComponent<VehiclePartDamageComponent>().AddPart(1, 1337);
         });
         
-        _commandService.AddCommandHandler("exclusivecv", (a, entity, args) =>
+        _commandService.AddCommandHandler("exclusivecv", (entity, args) =>
         {
             using var vehicleRepository = _repositoryFactory.GetVehicleRepository();
             var vehicleEntity = _entityFactory.CreateVehicle(404, entity.Transform.Position + new Vector3(4, 0, 0), entity.Transform.Rotation);
@@ -130,7 +130,7 @@ internal sealed class CommandsLogic
             return Task.CompletedTask;
         });
 
-        _commandService.AddCommandHandler("noaccesscv", (a, entity, args) =>
+        _commandService.AddCommandHandler("noaccesscv", (entity, args) =>
         {
             using var vehicleRepository = _repositoryFactory.GetVehicleRepository();
             var vehicleEntity = _entityFactory.CreateVehicle(404, entity.Transform.Position + new Vector3(4, 0, 0), entity.Transform.Rotation);
@@ -141,7 +141,7 @@ internal sealed class CommandsLogic
             return Task.CompletedTask;
         });
 
-        _commandService.AddCommandHandler("privateblip", async (a, entity, args) =>
+        _commandService.AddCommandHandler("privateblip", async (entity, args) =>
         {
             using var vehicleRepository = _repositoryFactory.GetVehicleRepository();
             var blipElementComponent = _entityFactory.CreateBlipFor(entity, BlipIcon.Pizza, entity.Transform.Position);
@@ -149,14 +149,14 @@ internal sealed class CommandsLogic
             entity.DestroyComponent(blipElementComponent);
         });
 
-        _commandService.AddCommandHandler("addmeasowner", async (a, entity, args) =>
+        _commandService.AddCommandHandler("addmeasowner", async (entity, args) =>
         {
             var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();
             var veh = playerElementComponent.OccupiedVehicle;
             veh.GetRequiredComponent<PrivateVehicleComponent>().AddAsOwner(entity);
         });
 
-        _commandService.AddCommandHandler("accessinfo", async (a, entity, args) =>
+        _commandService.AddCommandHandler("accessinfo", async (entity, args) =>
         {
             var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();
             var veh = playerElementComponent.OccupiedVehicle;
@@ -175,14 +175,14 @@ internal sealed class CommandsLogic
             }
         });
 
-        _commandService.AddCommandHandler("testachievement", async (a, entity, args) =>
+        _commandService.AddCommandHandler("testachievement", async (entity, args) =>
         {
             var achievementsComponent = entity.GetRequiredComponent<AchievementsComponent>();
             achievementsComponent.UpdateProgress("test", 2, 10);
             entity.GetRequiredComponent<PlayerElementComponent>().SendChatMessage($"progressed achieviement 'test'");
         });
 
-        _commandService.AddCommandHandler("addupgrade", async (a, entity, args) =>
+        _commandService.AddCommandHandler("addupgrade", async (entity, args) =>
         {
             var jobUpgradesComponent = entity.GetRequiredComponent<JobUpgradesComponent>();
             try
@@ -198,7 +198,7 @@ internal sealed class CommandsLogic
             }
         });
 
-        _commandService.AddCommandHandler("addvehicleupgrade", async (a, entity, args) =>
+        _commandService.AddCommandHandler("addvehicleupgrade", async (entity, args) =>
         {
             var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();
             var veh = playerElementComponent.OccupiedVehicle;
@@ -218,7 +218,7 @@ internal sealed class CommandsLogic
             playerElementComponent.SendChatMessage("Upgrade added");
         });
 
-        _commandService.AddCommandHandler("comps", async (a, entity, args) =>
+        _commandService.AddCommandHandler("comps", async (entity, args) =>
         {
             var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();
             playerElementComponent.SendChatMessage("Components:");
@@ -228,7 +228,7 @@ internal sealed class CommandsLogic
             }
         });
 
-        _commandService.AddCommandHandler("addtestdata", async (a, entity, args) =>
+        _commandService.AddCommandHandler("addtestdata", async (entity, args) =>
         {
             if (entity.TryGetComponent(out JobUpgradesComponent jobUpgradesComponent))
             {
@@ -273,7 +273,7 @@ internal sealed class CommandsLogic
             }
         });
 
-        _commandService.AddCommandHandler("giveexperience", (a, entity, args) =>
+        _commandService.AddCommandHandler("giveexperience", (entity, args) =>
         {
             if (entity.TryGetComponent(out LevelComponent levelComponent))
             {
@@ -284,7 +284,7 @@ internal sealed class CommandsLogic
             return Task.CompletedTask;
         });
 
-        _commandService.AddCommandHandler("cvforsale", (a, entity, args) =>
+        _commandService.AddCommandHandler("cvforsale", (entity, args) =>
         {
             _entityFactory.CreateVehicle(404, entity.Transform.Position + new Vector3(4, 0, 0), Vector3.Zero, entityBuilder: entity =>
             {
@@ -293,14 +293,21 @@ internal sealed class CommandsLogic
             return Task.CompletedTask;
         });
 
-        _commandService.AddCommandHandler("spawnbox", (a, entity, args) =>
+        _commandService.AddCommandHandler("spawnbox", (entity, args) =>
         {
             var objectEntity = _entityFactory.CreateObject(SlipeServer.Server.Enums.ObjectModel.Gunbox, entity.Transform.Position + new Vector3(4, 0, -0.65f), Vector3.Zero);
             objectEntity.AddComponent(new LiftableWorldObjectComponent());
             return Task.CompletedTask;
         });
 
-        _commandService.AddCommandHandler("spawnboxmany", (a, entity, args) =>
+        _commandService.AddCommandHandler("spawnboard", (entity, args) =>
+        {
+            var objectEntity = _entityFactory.CreateObject((SlipeServer.Server.Enums.ObjectModel)3077, entity.Transform.Position + new Vector3(4, 0, -1), Vector3.Zero);
+            objectEntity.AddComponent(new LiftableWorldObjectComponent());
+            return Task.CompletedTask;
+        });
+
+        _commandService.AddCommandHandler("spawnboxmany", (entity, args) =>
         {
             var objectEntity = _entityFactory.CreateObject(SlipeServer.Server.Enums.ObjectModel.Gunbox, entity.Transform.Position + new Vector3(4, 0, -0.6f), Vector3.Zero);
             objectEntity.AddComponent(new LiftableWorldObjectComponent());
@@ -313,7 +320,7 @@ internal sealed class CommandsLogic
             return Task.CompletedTask;
         });
         
-        _commandService.AddCommandHandler("hud3d", async (a, entity, args) =>
+        _commandService.AddCommandHandler("hud3d", async (entity, args) =>
         {
             var e = _ecs.CreateEntity(Guid.NewGuid().ToString(), Entity.EntityTag.Unknown);
             e.Transform.Position = entity.Transform.Position + new Vector3(-4, 0, 0);
@@ -330,7 +337,7 @@ internal sealed class CommandsLogic
             _ecs.Destroy(e);
         });
         
-        _commandService.AddCommandHandler("hud3d2", async (a, entity, args) =>
+        _commandService.AddCommandHandler("hud3d2", async (entity, args) =>
         {
             var e = _ecs.CreateEntity(Guid.NewGuid().ToString(), Entity.EntityTag.Unknown);
             e.Transform.Position = entity.Transform.Position + new Vector3(-4, 0, 0);
@@ -351,14 +358,14 @@ internal sealed class CommandsLogic
             }
         });
 
-        _commandService.AddCommandHandler("spawnbox2", (a, entity, args) =>
+        _commandService.AddCommandHandler("spawnbox2", (entity, args) =>
         {
             var objectEntity = _entityFactory.CreateObject(SlipeServer.Server.Enums.ObjectModel.Gunbox, entity.Transform.Position + new Vector3(4, 0, -0.65f), Vector3.Zero);
             objectEntity.AddComponent<DurationBasedHoldInteractionComponent>();
             return Task.CompletedTask;
         });
 
-        _commandService.AddCommandHandler("animation", (a, entity, args) =>
+        _commandService.AddCommandHandler("animation", (entity, args) =>
         {
             if (System.Enum.TryParse<Animation>(args.FirstOrDefault(), out var animation))
             {
@@ -376,7 +383,7 @@ internal sealed class CommandsLogic
 
             return Task.CompletedTask;
         });
-        _commandService.AddCommandHandler("animationasync", async (a, entity, args) =>
+        _commandService.AddCommandHandler("animationasync", async (entity, args) =>
         {
             var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();
             if (System.Enum.TryParse<Animation>(args.FirstOrDefault(), out var animation))
@@ -397,7 +404,7 @@ internal sealed class CommandsLogic
 
         });
 
-        _commandService.AddCommandHandler("complexanimation", async (a, entity, args) =>
+        _commandService.AddCommandHandler("complexanimation", async (entity, args) =>
         {
             if (System.Enum.TryParse<Animation>(args.FirstOrDefault(), out var animation))
             {
@@ -414,7 +421,7 @@ internal sealed class CommandsLogic
                 entity.GetRequiredComponent<PlayerElementComponent>().SendChatMessage($"Animation '{args.FirstOrDefault()}' not found.");
         });
 
-        _commandService.AddCommandHandler("mygroups", (a, entity, args) =>
+        _commandService.AddCommandHandler("mygroups", (entity, args) =>
         {
             var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();
             playerElementComponent.SendChatMessage("Groups:");
@@ -425,7 +432,7 @@ internal sealed class CommandsLogic
             return Task.CompletedTask;
         });
 
-        _commandService.AddCommandHandler("myfractions", (a, entity, args) =>
+        _commandService.AddCommandHandler("myfractions", (entity, args) =>
         {
             var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();
             playerElementComponent.SendChatMessage("Fractions:");
@@ -436,7 +443,7 @@ internal sealed class CommandsLogic
             return Task.CompletedTask;
         });
 
-        _commandService.AddCommandHandler("toggleadmindebug", (a, entity, args) =>
+        _commandService.AddCommandHandler("toggleadmindebug", (entity, args) =>
         {
             var adminComponent = entity.GetRequiredComponent<AdminComponent>();
             adminComponent.AdminTools = !adminComponent.AdminTools;
@@ -444,21 +451,21 @@ internal sealed class CommandsLogic
             return Task.CompletedTask;
         });
 
-        _commandService.AddCommandHandler("createhud", (a, entity, args) =>
+        _commandService.AddCommandHandler("createhud", (entity, args) =>
         {
             var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();
             entity.AddComponent(new SampleHud());
             return Task.CompletedTask;
         });
 
-        _commandService.AddCommandHandler("movehud", (a, entity, args) =>
+        _commandService.AddCommandHandler("movehud", (entity, args) =>
         {
             var sampleHud = entity.GetRequiredComponent<SampleHud>();
             sampleHud.Position = new Vector2(0, hudPosition++ * 10);
             return Task.CompletedTask;
         });
 
-        _commandService.AddCommandHandler("createstatefulhud", (a, entity, args) =>
+        _commandService.AddCommandHandler("createstatefulhud", (entity, args) =>
         {
             var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();
             var sampleHud = entity.AddComponent(new SampleStatefulHud(new SampleHudState
@@ -469,24 +476,21 @@ internal sealed class CommandsLogic
             return Task.CompletedTask;
         });
 
-        _commandService.AddCommandHandler("updatestate", (a, entity, args) =>
+        _commandService.AddCommandHandler("updatestate", (entity, args) =>
         {
             var sampleHud = entity.GetRequiredComponent<SampleStatefulHud>();
-            sampleHud.UpdateState(x =>
-            {
-                x.Text1 = Guid.NewGuid().ToString()[..8];
-            });
+            sampleHud.Update();
             return Task.CompletedTask;
         });
 
-        _commandService.AddCommandHandler("destroyhuds", (a, entity, args) =>
+        _commandService.AddCommandHandler("destroyhuds", (entity, args) =>
         {
             entity.TryDestroyComponent<SampleHud>();
             entity.TryDestroyComponent<SampleStatefulHud>();
             return Task.CompletedTask;
         });
 
-        _commandService.AddCommandHandler("discord", (a, entity, args) =>
+        _commandService.AddCommandHandler("discord", (entity, args) =>
         {
             var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();
             if (entity.HasComponent<DiscordIntegrationComponent>())
@@ -502,7 +506,7 @@ internal sealed class CommandsLogic
             return Task.CompletedTask;
         });
         
-        _commandService.AddCommandHandler("adduserupgrade", (a, entity, args) =>
+        _commandService.AddCommandHandler("adduserupgrade", (entity, args) =>
         {
             var accountComponent = entity.GetRequiredComponent<AccountComponent>();
             var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();
@@ -514,7 +518,7 @@ internal sealed class CommandsLogic
             return Task.CompletedTask;
         });
         
-        _commandService.AddCommandHandler("ban", async (a, entity, args) =>
+        _commandService.AddCommandHandler("ban", async (entity, args) =>
         {
             var accountComponent = entity.GetRequiredComponent<AccountComponent>();
             var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();
@@ -522,7 +526,7 @@ internal sealed class CommandsLogic
             playerElementComponent.Kick("test 123");
         });
         
-        _commandService.AddCommandHandler("destroyattachedentity", (a, entity, args) =>
+        _commandService.AddCommandHandler("destroyattachedentity", (entity, args) =>
         {
             var accountComponent = entity.GetRequiredComponent<AccountComponent>();
             var attachedEntity = entity.GetRequiredComponent<AttachedEntityComponent>();
@@ -539,14 +543,14 @@ internal sealed class CommandsLogic
             return Task.CompletedTask;
         });
 
-        _commandService.AddCommandHandler("discordsendmessage", async (a, entity, args) =>
+        _commandService.AddCommandHandler("discordsendmessage", async (entity, args) =>
         {
             var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();
             var messageId = await _discordService.SendMessage(1079342213097607399, args.First());
             playerElementComponent.SendChatMessage($"Wysłano wiadomość, id: {messageId}");
         });
 
-        _commandService.AddCommandHandler("discordsendmessagetouser", async (a, entity, args) =>
+        _commandService.AddCommandHandler("discordsendmessagetouser", async (entity, args) =>
         {
             var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();
             var messageId = await _discordService.SendMessageToUser(659910279353729086, args.First());
@@ -563,7 +567,7 @@ internal sealed class CommandsLogic
             return stream;
         }
 
-        _commandService.AddCommandHandler("discordsendfile", async (a, entity, args) =>
+        _commandService.AddCommandHandler("discordsendfile", async (entity, args) =>
         {
             var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();
             var messageId = await _discordService.SendFile(997787973775011853, generateStreamFromString("dowody"), "dowody_na_borsuka.txt", "potwierdzam");

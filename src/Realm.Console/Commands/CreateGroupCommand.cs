@@ -12,7 +12,7 @@ public sealed class CreateGroupCommand : IIngameCommand
         _groupService = groupService;
     }
 
-    public async Task Handle(Guid traceId, Entity entity, string[] args)
+    public async Task Handle(Entity entity, string[] args)
     {
         var name = args.FirstOrDefault("default");
         try
