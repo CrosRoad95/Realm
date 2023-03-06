@@ -1,4 +1,6 @@
-﻿using SlipeServer.Server.Concepts;
+﻿using Realm.Logging;
+using SlipeServer.Server.Concepts;
+using System.Diagnostics;
 
 namespace Realm.Server.Services;
 
@@ -36,13 +38,15 @@ public class RPGCommandService
             if (!entity.TryGetComponent<AccountComponent>(out var accountComponent) || !entity.TryGetComponent<PlayerElementComponent>(out var playerElementComponent))
                 return;
 
-            var traceId = Guid.NewGuid();
+            var start = Stopwatch.GetTimestamp();
+            var activity = new Activity("CommandHandler");
+            activity.Start();
+
             using var _1 = LogContext.PushProperty("serial", playerElementComponent.Serial);
             using var _2 = LogContext.PushProperty("accountId", accountComponent.Id);
             using var _3 = LogContext.PushProperty("commandName", commandName);
             using var _4 = LogContext.PushProperty("commandArguments", args.Arguments);
-            using var _5 = LogContext.PushProperty("traceId", traceId);
-            _logger.LogInformation("Begin command {commandName} execution with traceId={traceId}", commandName, traceId);
+            _logger.LogInformation("Begin command {commandName} execution with traceId={TraceId}", commandName);
             if (requiredPolicies != null)
             {
                 foreach (var policy in requiredPolicies)
@@ -67,7 +71,8 @@ public class RPGCommandService
             }
             finally
             {
-                _logger.LogInformation("Ended command {commandName} execution with traceId={traceId}", commandName, traceId);
+                _logger.LogInformation("Ended command {commandName} execution with traceId={TraceId} in {totalMiliseconds}miliseconds", commandName, activity.GetTraceId(), (Stopwatch.GetTimestamp() - start) / (float)TimeSpan.TicksPerMillisecond);
+                activity.Stop();
             }
         };
         return true;

@@ -11,6 +11,7 @@ using SixLabors.ImageSharp.Drawing;
 using SixLabors.ImageSharp.Drawing.Processing;
 using SixLabors.ImageSharp.Formats.Jpeg;
 using SlipeServer.Server.Services;
+using System.Diagnostics;
 using System.Drawing;
 using System.Reflection;
 using static Realm.Domain.Components.Elements.PlayerElementComponent;
@@ -29,6 +30,7 @@ internal sealed class CommandsLogic
     private readonly IBanService _banService;
     private readonly IDiscordService _discordService;
     private readonly ChatBox _chatBox;
+    private readonly ILogger<CommandsLogic> _logger;
 
     private class TestState
     {
@@ -36,7 +38,7 @@ internal sealed class CommandsLogic
     }
 
     public CommandsLogic(RPGCommandService commandService, IEntityFactory entityFactory, RepositoryFactory repositoryFactory,
-        ItemsRegistry itemsRegistry, ECS ecs, IBanService banService, IDiscordService discordService, ChatBox chatBox)
+        ItemsRegistry itemsRegistry, ECS ecs, IBanService banService, IDiscordService discordService, ChatBox chatBox, ILogger<CommandsLogic> logger)
     {
         _commandService = commandService;
         _entityFactory = entityFactory;
@@ -46,6 +48,7 @@ internal sealed class CommandsLogic
         _banService = banService;
         _discordService = discordService;
         _chatBox = chatBox;
+        _logger = logger;
         _commandService.AddCommandHandler("playtime", (entity, args) =>
         {
             if (entity.TryGetComponent(out PlayTimeComponent playTimeComponent))
@@ -572,6 +575,17 @@ internal sealed class CommandsLogic
             var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();
             var messageId = await _discordService.SendFile(997787973775011853, generateStreamFromString("dowody"), "dowody_na_borsuka.txt", "potwierdzam");
             playerElementComponent.SendChatMessage($"Wysłano plik, id: {messageId}");
+        });
+        
+
+        _commandService.AddCommandHandler("testlogs", (entity, args) =>
+        {
+            _logger.LogInformation("test test 1");
+            var activity = new Activity("TestLogsActivity");
+            activity.Start();
+            _logger.LogInformation("test test 2");
+            activity.Stop();
+            return Task.CompletedTask;
         });
 
         _discordService.AddTextBasedCommandHandler(1069962155539042314, "test", (userId, parameters) =>

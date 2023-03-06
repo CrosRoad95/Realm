@@ -22,6 +22,7 @@ public class RealmLogger
                 levelSwitch: levelSwitch)
             .Enrich.WithProperty("AppName", appName)
             .Enrich.WithThreadId()
+            .Enrich.With<ActivityEnricher>()
             .Enrich.FromLogContext();
     }
 
