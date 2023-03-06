@@ -51,10 +51,14 @@ public class MarkerEnterObjective : Objective
 
     public override void Dispose()
     {
-        _checkEnteredTimer.Dispose();
-        _collisionSphereElementComponent.EntityEntered = null;
+        if(_checkEnteredTimer != null)
+            _checkEnteredTimer.Dispose();
+        if(_collisionSphereElementComponent != null)
+        {
+            _collisionSphereElementComponent.EntityEntered = null;
+            _playerEntity.TryDestroyComponent(_collisionSphereElementComponent);
+        }
         _playerEntity.TryDestroyComponent(_markerElementComponent);
-        _playerEntity.TryDestroyComponent(_collisionSphereElementComponent);
         base.Dispose();
     }
 }

@@ -46,12 +46,12 @@ public abstract class JobSessionComponent : SessionComponent
         {
             objective.LoadInternal(EntityFactory, Entity, Logger);
         }
-        catch(Exception)
+        catch(Exception ex)
         {
-            objective.Entity = null!;
             objective.Dispose();
             lock (_objectivesLock)
                 _objectives.Remove(objective);
+            objective.Entity = null!;
             throw;
         }
         objective.Completed += HandleCompleted;

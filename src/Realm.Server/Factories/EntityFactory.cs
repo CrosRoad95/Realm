@@ -49,7 +49,7 @@ internal class EntityFactory : IEntityFactory
         }
         if (elementComponent is MarkerElementComponent markerElementComponent)
         {
-            markerElementComponent.CollisionShape.AssociateWith(_rpgServer.MtaServer);
+            markerElementComponent.CollisionShape.AssociateWith(player);
         }
     }
 

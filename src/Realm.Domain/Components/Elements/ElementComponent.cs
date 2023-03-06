@@ -18,6 +18,7 @@ public abstract class ElementComponent : Component
     public Vector3 TurnVelocity { get => Element.TurnVelocity; set => Element.TurnVelocity = value; }
     public byte Alpha { get => Element.Alpha; set => Element.Alpha = value; }
     public bool IsFrozen { get => Element.IsFrozen; set => Element.IsFrozen = value; }
+    protected bool IsPerPlayer { get => _isPerPlayer; set => _isPerPlayer = value; }
 
     protected ElementComponent()
     {
@@ -48,10 +49,9 @@ public abstract class ElementComponent : Component
         {
             Entity.Transform.Bind(Element);
             Entity.Destroyed += HandleDestroyed;
+            Entity.Transform.PositionChanged += HandleTransformPositionChanged;
+            Entity.Transform.RotationChanged += HandleTransformRotationChanged;
         }
-
-        Entity.Transform.PositionChanged += HandleTransformPositionChanged;
-        Entity.Transform.RotationChanged += HandleTransformRotationChanged;
     }
 
     private void HandleTransformRotationChanged(Transform newTransform)
@@ -79,8 +79,11 @@ public abstract class ElementComponent : Component
     public override void Dispose()
     {
         ClientInterfaceService.RemoveFocusable(Element);
-        Entity.Transform.PositionChanged -= HandleTransformPositionChanged;
-        Entity.Transform.RotationChanged -= HandleTransformRotationChanged;
+        if(!_isPerPlayer)
+        {
+            Entity.Transform.PositionChanged -= HandleTransformPositionChanged;
+            Entity.Transform.RotationChanged -= HandleTransformRotationChanged;
+        }
         HandleDestroyed(Entity);
         base.Dispose();
     }

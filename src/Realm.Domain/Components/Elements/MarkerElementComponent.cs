@@ -1,4 +1,5 @@
 ﻿using Realm.Domain.Rules;
+using SlipeServer.Packets.Structs;
 
 namespace Realm.Domain.Components.Elements;
 
@@ -73,11 +74,15 @@ public class MarkerElementComponent : ElementComponent
     protected override void Load()
     {
         base.Load();
+        if (Entity.TryGetComponent(out PlayerElementComponent playerElementComponent))
+            _collisionShape.Id = (ElementId)playerElementComponent.MapIdGenerator.GetId();
+
         Entity.Destroyed += HandleDestroyed;
         _collisionShape.ElementEntered += HandleElementEntered;
         _collisionShape.ElementLeft += HandleElementLeft;
         _collisionShape.Position = _marker.Position;
-        Entity.Transform.PositionChanged += HandlePositionChanged;
+        if(!IsPerPlayer)
+            Entity.Transform.PositionChanged += HandlePositionChanged;
     }
 
     private void HandlePositionChanged(Transform transform)
@@ -87,7 +92,8 @@ public class MarkerElementComponent : ElementComponent
 
     public override void Dispose()
     {
-        Entity.Transform.PositionChanged -= HandlePositionChanged;
+        if(!IsPerPlayer)
+            Entity.Transform.PositionChanged -= HandlePositionChanged;
         base.Dispose();
     }
 }
