@@ -31,13 +31,7 @@ public class BanService : IBanService
         await _banRepository.Commit();
     }
 
-    public Task<List<Ban>> GetBansBySerial(string serial)
-    {
-        return _banRepository.GetBansBySerial(serial);
-    }
+    public Task<List<Ban>> GetBansBySerial(string serial) => _banRepository.GetBansBySerial(serial);
 
-    public Task<List<Ban>> GetBansByUserId(int userId)
-    {
-        return _banRepository.GetBansByUserId(userId);
-    }
+    public Task<List<Ban>> GetBansByUserId(int userId) => _banRepository.GetBansByUserId(userId);
 }

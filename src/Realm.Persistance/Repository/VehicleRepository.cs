@@ -23,13 +23,41 @@ internal class VehicleRepository : IVehicleRepository
         return vehicle;
     }
 
-    public IQueryable<Vehicle> GetAll()
+    public Task<List<VehicleModelPositionDTO>> GetAllVehiclesModelPositionDTOsByUserId(int userId)
     {
-        return _db.Vehicles.IsNotRemoved();
+        var query = _db.Vehicles
+            .TagWithSource(nameof(VehicleRepository))
+            .AsNoTrackingWithIdentityResolution()
+            .Include(x => x.VehicleAccesses)
+            .Where(x => x.VehicleAccesses.Any(x => x.UserId == userId))
+            .Select(x => new VehicleModelPositionDTO
+            {
+                Id = x.Id,
+                Model = x.Model,
+                Position = x.TransformAndMotion.Position
+            });
+
+        return query.ToListAsync();
+    }
+
+    public Task<List<Vehicle>> GetAllReadOnlySpawnedVehicles()
+    {
+        var query = _db.Vehicles
+            .TagWithSource(nameof(VehicleRepository))
+            .AsNoTrackingWithIdentityResolution()
+            .IncludeAll()
+            .IsSpawned();
+
+        return query.ToListAsync();
     }
 
     public void Dispose()
     {
         _db.Dispose();
+    }
+
+    public Task Commit()
+    {
+        return _db.SaveChangesAsync();
     }
 }

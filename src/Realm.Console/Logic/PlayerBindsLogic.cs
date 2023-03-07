@@ -77,7 +77,13 @@ internal sealed class PlayerBindsLogic
                 if (entity.TryGetComponent(out MoneyComponent moneyComponent))
                     state.Money = (double)moneyComponent.Money;
 
-                state.VehicleLightInfos = await _vehiclesService.GetAllVehiclesLightInfoByOwnerId(accountComponent.Id);
+                var vehiclesWithModelAndPositionDTos = await _vehiclesService.GetAllVehiclesModelPositionDTOsByUserId(accountComponent.Id);
+                state.VehicleLightInfos = vehiclesWithModelAndPositionDTos.Select(x => new Domain.Data.VehicleLightInfo
+                {
+                    Id = x.Id,
+                    Model = x.Model,
+                    Position = x.Position,
+                }).ToList();
                 return new DashboardGuiComponent(state);
             });
             OpenCloseGuiHelper<InventoryGuiComponent>(entity, "i");

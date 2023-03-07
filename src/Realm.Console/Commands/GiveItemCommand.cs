@@ -1,6 +1,4 @@
-﻿using Realm.Domain.Registries;
-
-namespace Realm.Console.Commands;
+﻿namespace Realm.Console.Commands;
 
 [CommandName("giveitem")]
 public sealed class GiveItemCommand : IIngameCommand

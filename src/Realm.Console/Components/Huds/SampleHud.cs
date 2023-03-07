@@ -1,6 +1,4 @@
-﻿using Realm.Resources.Assets.Interfaces;
-using Realm.Resources.Assets;
-using System.Drawing;
+﻿using Realm.Resources.Assets;
 using Realm.Resources.Overlay.Interfaces;
 using Size = System.Drawing.Size;
 using Color = System.Drawing.Color;

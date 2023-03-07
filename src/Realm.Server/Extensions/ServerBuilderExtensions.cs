@@ -4,7 +4,6 @@ using Realm.Persistance.MySql;
 using Realm.Resources.Assets;
 using SlipeServer.Resources.BoneAttach;
 using SlipeServer.Resources.Text3d;
-using static Realm.Server.Logic.StartupLogic;
 
 namespace Realm.Server.Extensions;
 

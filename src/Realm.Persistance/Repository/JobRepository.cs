@@ -8,15 +8,45 @@ internal class JobRepository : IJobRepository
     {
         _db = db;
     }
-
-    public IQueryable<JobStatistics> GetAll()
+    
+    public Task<Dictionary<int, PlayerJobStatisticsDTO>> GetJobStatistics(short jobId, int limit = 10)
     {
-        return _db.JobPoints;
+        var query = _db.JobPoints
+            .TagWithSource(nameof(JobRepository))
+            .AsNoTrackingWithIdentityResolution()
+            .Where(x => x.JobId == jobId)
+            .GroupBy(x => x.UserId)
+            .Select(x => new PlayerJobStatisticsDTO
+            {
+                UserId = x.Key,
+                Points = x.Sum(y => (int)y.Points),
+                TimePlayed = x.Sum(y => (int)y.TimePlayed)
+            })
+            .OrderBy(x => x.Points)
+            .Take(limit);
+
+        return query.ToDictionaryAsync(x => x.UserId);
+    }
+    
+    public Task<JobStatisticsDTO?> GetPlayerJobStatistics(int userId, short jobId)
+    {
+        var query = _db.JobPoints
+            .TagWithSource(nameof(JobRepository))
+            .AsNoTrackingWithIdentityResolution()
+            .Where(x => x.JobId == jobId)
+            .GroupBy(x => true)
+            .Select(x => new JobStatisticsDTO
+            {
+                Points = x.Sum(y => (int)y.Points),
+                TimePlayed = x.Sum(y => (int)y.TimePlayed)
+            });
+
+        return query.FirstOrDefaultAsync();
     }
 
-    public async Task Commit()
+    public Task Commit()
     {
-        await _db.SaveChangesAsync();
+        return _db.SaveChangesAsync();
     }
 
     public void Dispose()

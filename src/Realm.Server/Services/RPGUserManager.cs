@@ -1,9 +1,7 @@
-﻿using Microsoft.AspNetCore.Identity;
-using Microsoft.Extensions.Options;
+﻿using Microsoft.Extensions.Options;
 using Realm.Domain.Inventory;
 using Realm.Domain.Options;
 using Realm.Domain.Registries;
-using Realm.Persistance.Data;
 
 namespace Realm.Server.Services;
 

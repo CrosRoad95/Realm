@@ -12,26 +12,31 @@ internal class GroupRepository : IGroupRepository
     }
 
     public Task<Group?> GetGroupByName(string groupName) => _db.Groups
+        .TagWithSource(nameof(GroupRepository))
         .Include(x => x.Members)
         .Where(x => x.Name == groupName)
         .FirstOrDefaultAsync();
     
     public Task<Group?> GetGroupByNameOrShortcut(string groupName, string shortcut) => _db.Groups
+        .TagWithSource(nameof(GroupRepository))
         .Include(x => x.Members)
         .Where(x => x.Name == groupName || x.Shortcut == shortcut)
         .FirstOrDefaultAsync();
     
     public Task<bool> ExistsByName(string groupName) => _db.Groups
+        .TagWithSource(nameof(GroupRepository))
         .AsNoTrackingWithIdentityResolution()
         .Where(x => x.Name == groupName)
         .AnyAsync();
     
     public Task<bool> ExistsByShortcut(string shortcut) => _db.Groups
+        .TagWithSource(nameof(GroupRepository))
         .AsNoTrackingWithIdentityResolution()
         .Where(x => x.Shortcut == shortcut)
         .AnyAsync();
     
     public Task<int> GetGroupIdByName(string groupName) => _db.Groups
+        .TagWithSource(nameof(GroupRepository))
         .Where(x => x.Name == groupName)
         .Select(x => x.Id)
         .FirstOrDefaultAsync();
@@ -74,7 +79,9 @@ internal class GroupRepository : IGroupRepository
     
     public async Task<bool> RemoveGroupMember(int groupId, int userId)
     {
-        var member = await _db.GroupMembers.Where(x => x.GroupId == groupId && x.UserId == userId)
+        var member = await _db.GroupMembers
+            .TagWithSource(nameof(GroupRepository))
+            .Where(x => x.GroupId == groupId && x.UserId == userId)
             .FirstOrDefaultAsync();
         if (member == null)
             return false;
@@ -85,5 +92,10 @@ internal class GroupRepository : IGroupRepository
     public void Dispose()
     {
         _db.Dispose();
+    }
+
+    public Task Commit()
+    {
+        return _db.SaveChangesAsync();
     }
 }

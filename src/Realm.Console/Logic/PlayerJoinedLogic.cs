@@ -7,21 +7,25 @@ internal sealed class PlayerJoinedLogic
     private readonly ECS _ecs;
     private readonly ILogger<PlayerJoinedLogic> _logger;
     private readonly AssetsRegistry _assetsRegistry;
+    private readonly IBanService _banService;
 
-    public PlayerJoinedLogic(ECS ecs, ILogger<PlayerJoinedLogic> logger, AssetsRegistry assetsRegistry)
+    public PlayerJoinedLogic(ECS ecs, ILogger<PlayerJoinedLogic> logger, AssetsRegistry assetsRegistry, IBanService banService)
     {
         _ecs = ecs;
         _logger = logger;
         _assetsRegistry = assetsRegistry;
+        _banService = banService;
         _ecs.EntityCreated += HandleEntityCreated;
     }
 
-    private void HandleEntityCreated(Entity entity)
+    private async void HandleEntityCreated(Entity entity)
     {
         if (entity.Tag != Entity.EntityTag.Player)
             return;
 
         var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();
+        var bans = await _banService.GetBansBySerial(playerElementComponent.Serial);
+        ;
         playerElementComponent.SetText3dRenderingEnabled(false);
         playerElementComponent.SetChatVisible(false);
         playerElementComponent.ClearChatBox();

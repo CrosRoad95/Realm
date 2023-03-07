@@ -2,19 +2,13 @@
 
 public interface IJobService
 {
-    public struct UserJobStatistics
-    {
-        public int points;
-        public int timePlayed;
-    }
+    Task<Dictionary<int, JobStatistics>> GetTotalJobStatistics(short jobId, int limit = 10);
+    Task<JobStatistics?> TryGetTotalUserJobStatistics(int userId, short jobId);
 
     public struct JobStatistics
     {
-        public int userId;
         public int points;
         public int timePlayed;
     }
 
-    Task<UserJobStatistics> GetTotalUserJobStatistics(int userId, int jobId);
-    Task<List<JobStatistics>> GetTotalJobStatistics(int jobId);
 }

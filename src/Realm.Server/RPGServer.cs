@@ -1,9 +1,7 @@
 ﻿using Realm.Domain.IdGenerators;
-using Realm.Domain.Options;
 using Realm.Domain.Registries;
 using Realm.Module.Discord;
 using Realm.Module.Grpc;
-using Realm.Module.Grpc.Options;
 using Realm.Module.WebApp;
 using Realm.Server.Logic;
 using SlipeServer.Server.Elements.IdGeneration;

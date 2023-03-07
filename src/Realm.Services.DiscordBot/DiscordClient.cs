@@ -1,8 +1,6 @@
 ﻿using Discord.Logger;
-using Discord.WebSocket;
 using Grpc.Net.Client;
 using Microsoft.Extensions.Options;
-using Realm.DiscordBot.Services;
 
 namespace Realm.DiscordBot;
 

@@ -1,7 +1,8 @@
 ﻿namespace Realm.Persistance.Interfaces;
 
-public interface IVehicleRepository : IDisposable
+public interface IVehicleRepository : IRepositoryBase
 {
     Task<Vehicle> CreateNewVehicle(ushort model);
-    IQueryable<Vehicle> GetAll();
+    Task<List<Vehicle>> GetAllReadOnlySpawnedVehicles();
+    Task<List<VehicleModelPositionDTO>> GetAllVehiclesModelPositionDTOsByUserId(int userId);
 }

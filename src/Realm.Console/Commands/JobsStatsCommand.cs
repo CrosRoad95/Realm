@@ -16,7 +16,7 @@ public sealed class JobsStatsCommand : IIngameCommand
     {
         var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();
         var accountComponent = entity.GetRequiredComponent<AccountComponent>();
-        var stats = await _jobService.GetTotalUserJobStatistics(accountComponent.Id, 1);
-        playerElementComponent.SendChatMessage($"stats: {stats.points}, time: {stats.timePlayed}");
+        var stats = await _jobService.TryGetTotalUserJobStatistics(accountComponent.Id, 1);
+        playerElementComponent.SendChatMessage($"stats: {stats.Value.points}, time: {stats.Value.timePlayed}");
     }
 }

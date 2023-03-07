@@ -1,6 +1,4 @@
-﻿using Grpc.Core;
-using Grpc.Net.Client;
-using Realm.DiscordBot.Extensions;
+﻿using Grpc.Net.Client;
 
 namespace Realm.DiscordBot.Channels;
 

@@ -1,6 +1,6 @@
 ﻿namespace Realm.Persistance.Interfaces;
 
-public interface IGroupRepository : IDisposable
+public interface IGroupRepository : IRepositoryBase
 {
     Task<Group> CreateNewGroup(string groupName, string shortcut, byte kind = 1);
     Task<GroupMember> CreateNewGroupMember(string groupName, int userId, int rank = 1, string rankName = "");

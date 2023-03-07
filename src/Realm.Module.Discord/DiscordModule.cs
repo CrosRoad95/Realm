@@ -1,6 +1,4 @@
-﻿using Discord;
-using Microsoft.Extensions.Options;
-using Realm.Configuration;
+﻿using Microsoft.Extensions.Options;
 using Realm.Interfaces.Extend;
 using Realm.Module.Discord.Stubs;
 using Realm.Module.Grpc.Options;

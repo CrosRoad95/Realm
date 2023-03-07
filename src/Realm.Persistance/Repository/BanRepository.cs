@@ -37,16 +37,18 @@ internal class BanRepository : IBanRepository
         return ban;
     }
     
-    public async Task<List<Ban>> GetBansBySerial(string serial)
+    public Task<List<Ban>> GetBansBySerial(string serial)
     {
-        return await _db.Bans
-            .Where(x => x.Serial == serial && x.End > DateTime.Now)
-            .ToListAsync();
+        var query = _db.Bans
+            .TagWithSource(nameof(BanRepository))
+            .Where(x => x.Serial == serial && x.End > DateTime.Now);
+        return query.ToListAsync();
     }
     
     public async Task<List<Ban>> GetBansByUserId(int userId)
     {
         return await _db.Bans
+            .TagWithSource(nameof(BanRepository))
             .Where(x => x.UserId == userId && x.End > DateTime.Now)
             .ToListAsync();
     }
@@ -56,9 +58,9 @@ internal class BanRepository : IBanRepository
         _db.Bans.Remove(ban);
     }
 
-    public async Task Commit()
+    public Task Commit()
     {
-        await _db.SaveChangesAsync();
+        return _db.SaveChangesAsync();
     }
 
     public void Dispose()

@@ -14,6 +14,7 @@ internal class FractionRepository : IFractionRepository
     public Task<bool> Exists(int id, string code, string name)
     {
         var query = _db.Fractions
+            .TagWithSource(nameof(FractionRepository))
             .AsNoTracking()
             .Where(x => x.Id == id && x.Code == code && x.Name == name);
 
@@ -45,5 +46,10 @@ internal class FractionRepository : IFractionRepository
     public Task Commit()
     {
         return _db.SaveChangesAsync();
+    }
+
+    public void Dispose()
+    {
+        _db.Dispose();
     }
 }

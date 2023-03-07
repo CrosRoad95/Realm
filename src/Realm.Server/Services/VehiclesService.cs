@@ -1,4 +1,4 @@
-﻿using Realm.Domain.Data;
+﻿using Realm.Persistance.DTOs;
 using Realm.Persistance.Interfaces;
 
 namespace Realm.Server.Services;
@@ -25,17 +25,8 @@ internal sealed class VehiclesService : IVehiclesService
         return vehicleEntity;
     }
 
-    public async Task<List<VehicleLightInfo>> GetAllVehiclesLightInfoByOwnerId(int userId)
+    public async Task<List<VehicleModelPositionDTO>> GetAllVehiclesModelPositionDTOsByUserId(int userId)
     {
-        return await _vehicleRepository.GetAll()
-            .Include(x => x.VehicleAccesses)
-            .Where(x => x.VehicleAccesses.Any(x => x.UserId == userId))
-            .Select(x => new VehicleLightInfo
-            {
-                Id = x.Id,
-                Model = x.Model,
-                Position = x.TransformAndMotion.Position
-            })
-            .ToListAsync();
+        return await _vehicleRepository.GetAllVehiclesModelPositionDTOsByUserId(userId);
     }
 }

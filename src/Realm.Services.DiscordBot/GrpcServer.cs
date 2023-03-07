@@ -1,7 +1,5 @@
-﻿using Discord;
-using Grpc.Core;
+﻿using Grpc.Core;
 using Microsoft.Extensions.Options;
-using Realm.Configuration;
 using Realm.DiscordBot.Stubs;
 using Realm.Module.Grpc.Options;
 

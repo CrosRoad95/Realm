@@ -1,5 +1,4 @@
-﻿using Realm.Domain.Interfaces;
-using Realm.Domain.Rules;
+﻿using Realm.Domain.Rules;
 using Realm.Server.Extensions;
 
 namespace Realm.Console.Logic;

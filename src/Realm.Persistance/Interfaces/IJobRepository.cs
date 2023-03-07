@@ -1,7 +1,7 @@
 ﻿namespace Realm.Persistance.Interfaces;
 
-public interface IJobRepository : IDisposable
+public interface IJobRepository : IRepositoryBase
 {
-    Task Commit();
-    IQueryable<JobStatistics> GetAll();
+    Task<Dictionary<int, PlayerJobStatisticsDTO>> GetJobStatistics(short jobId, int limit = 10);
+    Task<JobStatisticsDTO?> GetPlayerJobStatistics(int userId, short jobId);
 }

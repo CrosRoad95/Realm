@@ -47,4 +47,9 @@ public static class QuerableExtensions
     {
         return query.Where(x => x.Spawned);
     }
+
+    public static IQueryable<T> TagWithSource<T>(this IQueryable<T> queryable, string tag = "", [CallerMemberName] string methodName = "")
+    {
+        return queryable.TagWith(string.IsNullOrEmpty(tag) ? $"{methodName}" : $"{tag}{methodName}");
+    }
 }

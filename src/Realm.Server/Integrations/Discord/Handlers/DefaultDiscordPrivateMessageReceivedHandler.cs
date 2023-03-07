@@ -1,5 +1,4 @@
 ﻿using Realm.Module.Discord.Interfaces;
-using SlipeServer.Server.Services;
 
 namespace Realm.Server.Integrations.Discord.Handlers;
 
