@@ -79,6 +79,7 @@ public static class ServerBuilderExtensions
 
         // Resources logics
         builder.AddLogic<ClientInterfaceLogic>();
+        builder.AddLogic<StatisticsCounterLogic>();
 
         // Miscellaneous logic
         builder.AddLogic<EssentialCommandsLogic>();

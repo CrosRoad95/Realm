@@ -58,9 +58,15 @@ internal class StatisticCounterLogic
     private void HandleCollectStatistics(LuaEvent luaEvent)
     {
         // TODO: Put into try catch, catch exceptions, log them
-        var collectedStatistics = luaEvent.Parameters.First().TableValue
-            .ToDictionary(x => x.Key.ToString(), x => float.Parse(x.Value.ToString()));
+        try
+        {
+            var collectedStatistics = luaEvent.Parameters.First().TableValue
+                .ToDictionary(x => x.Key.IntegerValue ?? throw new Exception(), x => float.Parse(x.Value.ToString()));
+            _statisticsCounterService.RelayCollectedStatistics(luaEvent.Player, collectedStatistics);
+        }
+        catch(Exception ex)
+        {
 
-        _statisticsCounterService.RelayCollectedStatistics(luaEvent.Player, collectedStatistics);
+        }
     }
 }

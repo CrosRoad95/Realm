@@ -24,7 +24,7 @@ public class AccountComponent : Component
     internal AccountComponent(User user)
     {
         _user = user;
-        _upgrades = _user.UserUpgrades.Select(x => x.UpgradeId).ToList();
+        _upgrades = _user.Upgrades.Select(x => x.UpgradeId).ToList();
     }
 
     protected override async Task LoadAsync()

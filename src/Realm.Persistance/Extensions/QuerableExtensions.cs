@@ -24,12 +24,12 @@ public static class QuerableExtensions
             .Include(x => x.JobStatistics)
             .Include(x => x.Achievements)
             .Include(x => x.DailyVisits)
-            .Include(x => x.Statistics)
+            .Include(x => x.Stats)
             .Include(x => x.Discoveries)
             .Include(x => x.GroupMembers)
             .Include(x => x.FractionMembers)
             .Include(x => x.DiscordIntegration)
-            .Include(x => x.UserUpgrades)
+            .Include(x => x.Upgrades)
             .Include(x => x.Inventories)
             .ThenInclude(x => x!.InventoryItems);
     }

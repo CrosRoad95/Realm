@@ -20,7 +20,7 @@ public interface IDb : IDisposable
     DbSet<VehicleUpgrade> VehicleUpgrades { get; }
     DbSet<VehicleFuel> VehicleFuels { get; }
     DbSet<DailyVisits> DailyVisits { get; }
-    DbSet<Statistics> Statistics { get; }
+    DbSet<UserStat> UserStats { get; }
     DbSet<JobUpgrade> JobUpgrades { get; }
     DbSet<Achievement> Achievements { get; }
     DbSet<Group> Groups { get; }

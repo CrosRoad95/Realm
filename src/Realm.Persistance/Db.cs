@@ -15,7 +15,7 @@ public abstract class Db<T> : IdentityDbContext<User, Role, int,
     public DbSet<VehicleUpgrade> VehicleUpgrades => Set<VehicleUpgrade>();
     public DbSet<VehicleFuel> VehicleFuels => Set<VehicleFuel>();
     public DbSet<DailyVisits> DailyVisits => Set<DailyVisits>();
-    public DbSet<Statistics> Statistics => Set<Statistics>();
+    public DbSet<UserStat> UserStats => Set<UserStat>();
     public DbSet<JobStatistics> JobPoints => Set<JobStatistics>();
     public DbSet<JobUpgrade> JobUpgrades => Set<JobUpgrade>();
     public DbSet<Achievement> Achievements => Set<Achievement>();
@@ -89,9 +89,9 @@ public abstract class Db<T> : IdentityDbContext<User, Role, int,
                 .HasForeignKey<DailyVisits>(x => x.UserId);
 
             entityBuilder
-                .HasOne(x => x.Statistics)
+                .HasMany(x => x.Stats)
                 .WithOne(x => x.User)
-                .HasForeignKey<Statistics>(x => x.UserId);
+                .HasForeignKey(x => x.UserId);
                 //.OnDelete(DeleteBehavior.Cascade);
 
             entityBuilder
@@ -121,7 +121,7 @@ public abstract class Db<T> : IdentityDbContext<User, Role, int,
                 .OnDelete(DeleteBehavior.Cascade);
             
             entityBuilder
-                .HasMany(x => x.UserUpgrades)
+                .HasMany(x => x.Upgrades)
                 .WithOne(x => x.User)
                 .HasForeignKey(x => x.UserId)
                 .HasPrincipalKey(x => x.Id)
@@ -156,11 +156,11 @@ public abstract class Db<T> : IdentityDbContext<User, Role, int,
                 .HasDefaultValue(DateTime.MinValue);
         });
         
-        modelBuilder.Entity<Statistics>(entityBuilder =>
+        modelBuilder.Entity<UserStat>(entityBuilder =>
         {
             entityBuilder
-                .ToTable(nameof(Statistics))
-                .HasKey(x => x.UserId);
+                .ToTable(nameof(UserStats))
+                .HasKey(x => new { x.UserId, x.StatId });
         });
         
         modelBuilder.Entity<Achievement>(entityBuilder =>

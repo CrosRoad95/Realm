@@ -77,8 +77,8 @@ internal class RPGUserManager : IRPGUserManager
             else
                 entity.AddComponent<DailyVisitsCounterComponent>();
             
-            if (user.Statistics != null)
-                entity.AddComponent(new StatisticsCounterComponent(user.Statistics));
+            if (user.Stats != null)
+                entity.AddComponent(new StatisticsCounterComponent(user.Stats));
             else
                 entity.AddComponent<StatisticsCounterComponent>();
             

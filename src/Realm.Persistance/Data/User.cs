@@ -23,7 +23,6 @@ public sealed class User : IdentityUser<int>
     public ICollection<VehicleAccess> VehicleAccesses { get; set; } = new List<VehicleAccess>();
     public ICollection<Inventory>? Inventories { get; set; } = new List<Inventory>();
     public DailyVisits? DailyVisits { get; set; }
-    public Statistics? Statistics { get; set; }
     public ICollection<Achievement> Achievements { get; set; } = new List<Achievement>();
     public ICollection<JobUpgrade> JobUpgrades { get; set; } = new List<JobUpgrade>();
     public ICollection<JobStatistics> JobStatistics { get; set; } = new List<JobStatistics>();
@@ -31,5 +30,6 @@ public sealed class User : IdentityUser<int>
     public ICollection<GroupMember> GroupMembers { get; set; } = new List<GroupMember>();
     public ICollection<FractionMember> FractionMembers { get; set; } = new List<FractionMember>();
     public DiscordIntegration? DiscordIntegration { get; set; }
-    public ICollection<UserUpgrade> UserUpgrades { get; set; } = new List<UserUpgrade>();
+    public ICollection<UserUpgrade> Upgrades { get; set; } = new List<UserUpgrade>();
+    public ICollection<UserStat> Stats { get; set; } = new List<UserStat>();
 }

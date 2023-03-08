@@ -140,7 +140,7 @@ internal class SaveService : ISaveService
             .IncludeAll()
             .Where(x => x.Id == accountComponent.Id).FirstAsync();
 
-        user.UserUpgrades = accountComponent.Upgrades.Select(x => new UserUpgrade
+        user.Upgrades = accountComponent.Upgrades.Select(x => new UserUpgrade
         {
             UpgradeId = x
         }).ToList();
@@ -207,17 +207,16 @@ internal class SaveService : ISaveService
 
         if (entity.TryGetComponent(out StatisticsCounterComponent statisticsCounterComponent))
         {
-            user.Statistics = new Statistics
+            user.Stats = statisticsCounterComponent.GetStatsIds.Select(x => new UserStat
             {
-                TraveledDistanceByFoot = statisticsCounterComponent.TraveledDistanceByFoot,
-                TraveledDistanceInAir = statisticsCounterComponent.TraveledDistanceInAir,
-                TraveledDistanceInVehicleAsDriver = statisticsCounterComponent.TraveledDistanceInVehicleAsDriver,
-                TraveledDistanceInVehicleAsPassager = statisticsCounterComponent.TraveledDistanceInVehicleAsPassager,
-                TraveledDistanceSwimming = statisticsCounterComponent.TraveledDistanceSwimming,
-            };
+                StatId = x,
+                Value = statisticsCounterComponent.GetStat(x)
+            }).ToList();
+            _dbContext.UserStats.AddRange(user.Stats);
+            ;
         }
         else
-            user.Statistics = null;
+            user.Stats = new List<UserStat>();
 
         if (entity.TryGetComponent(out AchievementsComponent achievementsComponent))
         {

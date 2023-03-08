@@ -438,31 +438,6 @@ namespace Realm.Persistance.MySql.Migrations
                     b.ToTable("Roles", (string)null);
                 });
 
-            modelBuilder.Entity("Realm.Persistance.Data.Statistics", b =>
-                {
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
-
-                    b.Property<float>("TraveledDistanceByFoot")
-                        .HasColumnType("float");
-
-                    b.Property<float>("TraveledDistanceInAir")
-                        .HasColumnType("float");
-
-                    b.Property<float>("TraveledDistanceInVehicleAsDriver")
-                        .HasColumnType("float");
-
-                    b.Property<float>("TraveledDistanceInVehicleAsPassager")
-                        .HasColumnType("float");
-
-                    b.Property<float>("TraveledDistanceSwimming")
-                        .HasColumnType("float");
-
-                    b.HasKey("UserId");
-
-                    b.ToTable("Statistics", (string)null);
-                });
-
             modelBuilder.Entity("Realm.Persistance.Data.User", b =>
                 {
                     b.Property<int>("Id")
@@ -585,6 +560,22 @@ namespace Realm.Persistance.MySql.Migrations
                     b.HasKey("UserId", "LicenseId");
 
                     b.ToTable("UserLicenses", (string)null);
+                });
+
+            modelBuilder.Entity("Realm.Persistance.Data.UserStat", b =>
+                {
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("StatId")
+                        .HasColumnType("int");
+
+                    b.Property<float>("Value")
+                        .HasColumnType("float");
+
+                    b.HasKey("UserId", "StatId");
+
+                    b.ToTable("UserStats", (string)null);
                 });
 
             modelBuilder.Entity("Realm.Persistance.Data.UserUpgrade", b =>
@@ -994,17 +985,6 @@ namespace Realm.Persistance.MySql.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("Realm.Persistance.Data.Statistics", b =>
-                {
-                    b.HasOne("Realm.Persistance.Data.User", "User")
-                        .WithOne("Statistics")
-                        .HasForeignKey("Realm.Persistance.Data.Statistics", "UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("User");
-                });
-
             modelBuilder.Entity("Realm.Persistance.Data.UserLicense", b =>
                 {
                     b.HasOne("Realm.Persistance.Data.User", "User")
@@ -1016,10 +996,21 @@ namespace Realm.Persistance.MySql.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("Realm.Persistance.Data.UserStat", b =>
+                {
+                    b.HasOne("Realm.Persistance.Data.User", "User")
+                        .WithMany("Stats")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("Realm.Persistance.Data.UserUpgrade", b =>
                 {
                     b.HasOne("Realm.Persistance.Data.User", "User")
-                        .WithMany("UserUpgrades")
+                        .WithMany("Upgrades")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -1116,9 +1107,9 @@ namespace Realm.Persistance.MySql.Migrations
 
                     b.Navigation("Licenses");
 
-                    b.Navigation("Statistics");
+                    b.Navigation("Stats");
 
-                    b.Navigation("UserUpgrades");
+                    b.Navigation("Upgrades");
 
                     b.Navigation("VehicleAccesses");
                 });

@@ -17,16 +17,16 @@ local function updateCounter()
 	local occupiedSeat = getPedOccupiedVehicleSeat(localPlayer)
 	if(occupiedSeat)then
 		if(occupiedSeat == 0)then
-			incCounter("traveledDistanceInVehicleAsDriver", traveledDistance)
+			incCounter(1, traveledDistance)
 		else
-			incCounter("traveledDistanceInVehicleAsPassager", traveledDistance)
+			incCounter(2, traveledDistance)
 		end
 	elseif(isElementInWater(localPlayer))then
-		incCounter("traveledDistanceSwimming", traveledDistance)
+		incCounter(3, traveledDistance)
 	elseif(isPedOnGround(localPlayer))then
-		incCounter("traveledDistanceByFoot", traveledDistance)
+		incCounter(4, traveledDistance)
 	else
-		incCounter("traveledDistanceInAir", traveledDistance)
+		incCounter(5, traveledDistance)
 	end
 	
 	totalLastCollectionTraveledDistance = totalLastCollectionTraveledDistance + traveledDistance
