@@ -10,29 +10,37 @@ public class PendingDiscordIntegrationComponent : Component
 
     private string? _discordConnectionCode = null;
     private DateTime? _discordConnectionCodeValidUntil = null;
+    private object _lock = new();
 
     public PendingDiscordIntegrationComponent()
     {
     }
 
+    private bool HasPendingDiscordConnectionCode() => _discordConnectionCodeValidUntil != null && _discordConnectionCodeValidUntil > DateTimeProvider.Now;
+
     public bool Verify(string code)
     {
         ThrowIfDisposed();
 
-        if (!HasPendingDiscordConnectionCode())
+
+        lock (_lock)
+        {
+            if (!HasPendingDiscordConnectionCode())
             return false;
 
-        return _discordConnectionCode == code;
+            return _discordConnectionCode == code;
+        }
     }
 
-    private bool HasPendingDiscordConnectionCode() => _discordConnectionCodeValidUntil != null || _discordConnectionCodeValidUntil > DateTimeProvider.Now;
-
-    public string? GenerateAndGetDiscordConnectionCode(TimeSpan? validFor = null)
+    public string GenerateAndGetDiscordConnectionCode(TimeSpan? validFor = null)
     {
         ThrowIfDisposed();
 
-        _discordConnectionCode = Guid.NewGuid().ToString();
-        _discordConnectionCodeValidUntil = DateTimeProvider.Now.Add(validFor ?? TimeSpan.FromMinutes(2));
-        return _discordConnectionCode;
+        lock (_lock)
+        {
+            _discordConnectionCode = Guid.NewGuid().ToString();
+            _discordConnectionCodeValidUntil = DateTimeProvider.Now.Add(validFor ?? TimeSpan.FromMinutes(2));
+            return _discordConnectionCode;
+        }
     }
 }
