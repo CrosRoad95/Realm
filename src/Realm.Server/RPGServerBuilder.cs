@@ -1,4 +1,6 @@
-﻿namespace Realm.Server;
+﻿using SlipeServer.Server;
+
+namespace Realm.Server;
 
 public class RPGServerBuilder
 {
@@ -40,6 +42,7 @@ public class RPGServerBuilder
             serverBuilder.ConfigureServices(services =>
             {
                 services.AddLogging(x => x.AddSerilog(_logger, dispose: true));
+                services.AddTransient<Microsoft.Extensions.Logging.ILogger>(x => x.GetRequiredService<ILogger<MtaServer>>());
                 services.AddSingleton(_console);
 #if DEBUG
                 serverFilesProvider ??= new ServerFilesProvider(basePath ?? "../../../Server");

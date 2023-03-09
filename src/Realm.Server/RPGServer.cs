@@ -1,10 +1,14 @@
-﻿using Realm.Domain.IdGenerators;
+﻿using Microsoft.Extensions.DependencyInjection.Extensions;
+using Realm.Domain.IdGenerators;
 using Realm.Domain.Registries;
 using Realm.Module.Discord;
 using Realm.Module.Grpc;
 using Realm.Module.WebApp;
 using Realm.Server.Logic;
 using SlipeServer.Server.Elements.IdGeneration;
+using SlipeServer.Server.Enums;
+using SlipeServer.Server.Loggers;
+using System.Collections.Concurrent;
 
 namespace Realm.Server;
 
@@ -39,6 +43,8 @@ internal sealed class RPGServer : IRPGServer
 
     private void ConfigureServices(IServiceCollection services, IRealmConfigurationProvider realmConfigurationProvider)
     {
+        services.Remove(services.Where(x => x.ImplementationType == typeof(ConsoleLogger)).First());
+
         // Common
         services.AddSingleton((IRPGServer)this);
         services.AddSingleton(this);
@@ -59,7 +65,6 @@ internal sealed class RPGServer : IRPGServer
         services.AddTransient<IJobService, JobService>();
 
         services.AddTransient<IEntityFactory, EntityFactory>();
-
         services.AddSingleton<IElementIdGenerator, RangedCollectionBasedElementIdGenerator>(x =>
             new RangedCollectionBasedElementIdGenerator(x.GetRequiredService<IElementCollection>(), IdGeneratorConstants.PlayerIdStart, IdGeneratorConstants.PlayerIdStop)
         );
