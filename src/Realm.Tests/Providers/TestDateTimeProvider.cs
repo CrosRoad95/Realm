@@ -5,9 +5,9 @@ namespace Realm.Tests.Providers;
 internal class TestDateTimeProvider : IDateTimeProvider
 {
     private DateTime _now;
-    public TestDateTimeProvider()
+    public TestDateTimeProvider(DateTime? now = null)
     {
-        _now = DateTime.Now;
+        _now = now ?? DateTime.Now;
     }
 
     public void AddOffset(TimeSpan timeSpan)

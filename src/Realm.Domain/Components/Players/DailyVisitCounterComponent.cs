@@ -30,7 +30,7 @@ public class DailyVisitsCounterComponent : Component
         Update();
     }
 
-    private void Update()
+    internal void Update()
     {
         if (LastVisit.Date == DateTimeProvider.Now.Date)
             return;
