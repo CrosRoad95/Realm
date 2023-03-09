@@ -32,4 +32,5 @@ public sealed class User : IdentityUser<int>
     public DiscordIntegration? DiscordIntegration { get; set; }
     public ICollection<UserUpgrade> Upgrades { get; set; } = new List<UserUpgrade>();
     public ICollection<UserStat> Stats { get; set; } = new List<UserStat>();
+    public ICollection<UserReward> Rewards { get; set; } = new List<UserReward>();
 }

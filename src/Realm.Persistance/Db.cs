@@ -1,4 +1,6 @@
-﻿namespace Realm.Persistance;
+﻿using Realm.Persistance.Data;
+
+namespace Realm.Persistance;
 
 public abstract class Db<T> : IdentityDbContext<User, Role, int,
         IdentityUserClaim<int>,
@@ -28,6 +30,7 @@ public abstract class Db<T> : IdentityDbContext<User, Role, int,
     public DbSet<UserUpgrade> UserUpgrades => Set<UserUpgrade>();
     public DbSet<VehiclePartDamage> VehiclePartDamages => Set<VehiclePartDamage>();
     public DbSet<Ban> Bans => Set<Ban>();
+    public DbSet<UserReward> UserRewards => Set<UserReward>();
 
     public Db(DbContextOptions<T> options) : base(options)
     {
@@ -93,6 +96,11 @@ public abstract class Db<T> : IdentityDbContext<User, Role, int,
                 .WithOne(x => x.User)
                 .HasForeignKey(x => x.UserId);
                 //.OnDelete(DeleteBehavior.Cascade);
+
+            entityBuilder
+                .HasMany(x => x.Rewards)
+                .WithOne(x => x.User)
+                .HasForeignKey(x => x.UserId);
 
             entityBuilder
                 .HasMany(x => x.Inventories)
@@ -161,6 +169,13 @@ public abstract class Db<T> : IdentityDbContext<User, Role, int,
             entityBuilder
                 .ToTable(nameof(UserStats))
                 .HasKey(x => new { x.UserId, x.StatId });
+        });
+        
+        modelBuilder.Entity<UserReward>(entityBuilder =>
+        {
+            entityBuilder
+                .ToTable(nameof(UserRewards))
+                .HasKey(x => new { x.UserId, x.RewardId });
         });
         
         modelBuilder.Entity<Achievement>(entityBuilder =>

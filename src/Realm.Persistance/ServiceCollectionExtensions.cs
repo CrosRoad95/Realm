@@ -30,6 +30,7 @@ public static class ServiceCollectionExtensions
         services.AddTransient<IFractionRepository, FractionRepository>();
         services.AddTransient<IBanRepository, BanRepository>();
         services.AddTransient<IJobRepository, JobRepository>();
+        services.AddTransient<IUserRewardRepository, UserRewardRepository>();
 
         services.AddDbContext<IDb, T>(dboptions, ServiceLifetime.Transient);
 

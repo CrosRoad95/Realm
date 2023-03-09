@@ -562,6 +562,19 @@ namespace Realm.Persistance.MySql.Migrations
                     b.ToTable("UserLicenses", (string)null);
                 });
 
+            modelBuilder.Entity("Realm.Persistance.Data.UserReward", b =>
+                {
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("RewardId")
+                        .HasColumnType("int");
+
+                    b.HasKey("UserId", "RewardId");
+
+                    b.ToTable("UserRewards", (string)null);
+                });
+
             modelBuilder.Entity("Realm.Persistance.Data.UserStat", b =>
                 {
                     b.Property<int>("UserId")
@@ -996,6 +1009,17 @@ namespace Realm.Persistance.MySql.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("Realm.Persistance.Data.UserReward", b =>
+                {
+                    b.HasOne("Realm.Persistance.Data.User", "User")
+                        .WithMany("Rewards")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("Realm.Persistance.Data.UserStat", b =>
                 {
                     b.HasOne("Realm.Persistance.Data.User", "User")
@@ -1106,6 +1130,8 @@ namespace Realm.Persistance.MySql.Migrations
                     b.Navigation("JobUpgrades");
 
                     b.Navigation("Licenses");
+
+                    b.Navigation("Rewards");
 
                     b.Navigation("Stats");
 
