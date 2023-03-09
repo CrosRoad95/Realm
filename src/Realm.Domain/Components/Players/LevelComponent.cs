@@ -10,8 +10,10 @@ public class LevelComponent : Component
     public uint Level { get; private set; }
     public uint Experience { get; private set; }
 
+    private object _lock = new();
+
     public event Action<LevelComponent, uint>? LevelChanged;
-    public event Action<LevelComponent, uint>? ExperienceChanged;
+
     public LevelComponent()
     {
 
@@ -25,9 +27,11 @@ public class LevelComponent : Component
 
     public void GiveExperience(uint amount)
     {
-        Experience += amount;
-        CheckForNextLevel();
-        ExperienceChanged?.Invoke(this, Experience);
+        lock(_lock)
+        {
+            Experience += amount;
+            CheckForNextLevel();
+        }
     }
 
     private void CheckForNextLevel()

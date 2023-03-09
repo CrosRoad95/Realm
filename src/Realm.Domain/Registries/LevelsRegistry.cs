@@ -21,6 +21,8 @@ public class LevelsRegistry
 
     public uint GetExperienceRequiredForLevel(uint level)
     {
-        return _levels[level];
+        if(_levels.ContainsKey(level))
+            return _levels[level];
+        return uint.MaxValue;
     }
 }
