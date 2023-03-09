@@ -6,7 +6,7 @@ using Realm.Domain.Concepts;
 using Realm.Tests.Providers;
 using Realm.Common.Providers;
 
-namespace Realm.Tests.Tests;
+namespace Realm.Tests.Tests.Components;
 
 public class JobStatisticsComponentTests
 {

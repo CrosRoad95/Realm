@@ -3,7 +3,7 @@ using Realm.Domain.Components.Elements;
 using Realm.Tests.Helpers;
 using SlipeServer.Server.Elements.Enums;
 
-namespace Realm.Tests.Tests;
+namespace Realm.Tests.Tests.Components;
 
 public class PlayerElementComponentTests
 {

@@ -4,7 +4,7 @@ using Realm.Domain.Components.Common;
 using Realm.Domain.Registries;
 using FluentAssertions;
 
-namespace Realm.Tests.Tests;
+namespace Realm.Tests.Tests.Components;
 
 public class InventoryComponentTests
 {
@@ -81,7 +81,7 @@ public class InventoryComponentTests
         _inventoryComponent.AddItem(_itemsRegistry, 3, 2, null, tryStack);
         _inventoryComponent.AddItem(_itemsRegistry, 3, 22, null, tryStack);
 
-        if(tryStack)
+        if (tryStack)
         {
             _inventoryComponent.Items.Should().HaveCount(3); // 8 + 8 + 8
         }

@@ -7,7 +7,7 @@ using Realm.Domain.Interfaces;
 using Serilog;
 using Realm.Resources.ClientInterface;
 
-namespace Realm.Tests.Tests;
+namespace Realm.Tests.Tests.Components;
 
 public class CollisionShapeElementComponentTests
 {
@@ -25,7 +25,7 @@ public class CollisionShapeElementComponentTests
 
         var serviceProvider = services.BuildServiceProvider();
         _entity = serviceProvider.GetRequiredService<ECS>().CreateEntity("test", Entity.EntityTag.Unknown);
-        _collisionSphereElementComponent = new(new CollisionSphere(new System.Numerics.Vector3(0,0,0), 10));
+        _collisionSphereElementComponent = new(new CollisionSphere(new System.Numerics.Vector3(0, 0, 0), 10));
         _entity.AddComponent(_collisionSphereElementComponent);
     }
 

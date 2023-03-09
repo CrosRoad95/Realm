@@ -5,7 +5,7 @@ using Realm.Domain.Components.Players;
 using Realm.Domain.Options;
 using Realm.Tests.Helpers;
 
-namespace Realm.Tests.Tests;
+namespace Realm.Tests.Tests.Components;
 
 public class MoneyComponentTests
 {
@@ -88,7 +88,7 @@ public class MoneyComponentTests
         Action actTakeMoney = () => { _moneyComponent.TakeMoney(amount); };
         Action actSetMoney = () => { _moneyComponent.Money = amount; };
 
-        if(amount > 0)
+        if (amount > 0)
         {
             actGiveMoney.Should().Throw<GameplayException>()
                 .WithMessage("Unable to give money beyond limit.");
@@ -128,7 +128,7 @@ public class MoneyComponentTests
             .WithMessage("Unable to take money, not enough money.");
         _moneyComponent.Money.Should().Be(5);
     }
-    
+
     [Fact]
     public void YouShouldBeAbleToForceTakeMoneyIfThereIsNotEnoughOfThem()
     {
@@ -139,7 +139,7 @@ public class MoneyComponentTests
         take.Should().NotThrow<GameplayException>();
         _moneyComponent.Money.Should().Be(-5);
     }
-    
+
     [Fact]
     public void YouShouldBeAbleToTransferMoneyBetweenMoneyComponents()
     {
@@ -152,7 +152,7 @@ public class MoneyComponentTests
         _moneyComponent.Money.Should().Be(5);
         targetMoneyComponent.Money.Should().Be(10);
     }
-    
+
     [Fact]
     public void YouCannotTransferMoreMoneyThanYouHave()
     {
@@ -164,8 +164,8 @@ public class MoneyComponentTests
 
         transfer.Should().Throw<GameplayException>().WithMessage("Unable to take money, not enough money.");
     }
-    
-    
+
+
     [Fact]
     public async Task TrasnferMoneyShouldBeThreadSafety()
     {
