@@ -6,9 +6,6 @@ namespace Realm.Domain.Components.Players;
 [ComponentUsage(false)]
 public class StatisticsCounterComponent : Component
 {
-    [Inject]
-    private StatisticsCounterService StatisticsCounterService { get; set; } = default!;
-
     private readonly ConcurrentDictionary<int, float> _stats = new ConcurrentDictionary<int, float>();
 
     public IEnumerable<int> GetStatsIds => _stats.Keys;
@@ -22,11 +19,6 @@ public class StatisticsCounterComponent : Component
         {
             _stats.TryAdd(item.StatId, item.Value);
         }
-    }
-
-    protected override void Load()
-    {
-        var player = Entity.GetRequiredComponent<PlayerElementComponent>().Player;
     }
 
     public void IncreaseStat(int statId, float value)

@@ -244,6 +244,7 @@ public class Entity : IDisposable
     {
         ThrowIfDisposed();
 
+        ComponentDetached?.Invoke(component);
         if (component.Entity == this)
         {
             _componentsLock.EnterWriteLock();
@@ -257,7 +258,6 @@ public class Entity : IDisposable
             }
             component.Entity = null!;
         }
-        ComponentDetached?.Invoke(component);
     }
 
     public void DestroyComponent<TComponent>(TComponent component) where TComponent: Component
