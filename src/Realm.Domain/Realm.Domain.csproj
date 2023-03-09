@@ -7,12 +7,6 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-	  <Compile Remove="Persistance\**" />
-	  <EmbeddedResource Remove="Persistance\**" />
-	  <None Remove="Persistance\**" />
-	</ItemGroup>
-
-	<ItemGroup>
 		<ProjectReference Include="..\Realm.Configuration\Realm.Configuration.csproj" />
 		<ProjectReference Include="..\Realm.Persistance\Realm.Persistance.csproj" />
 		<ProjectReference Include="..\Realm.Resources.AdminTools\Realm.Resources.AdminTools.csproj" />

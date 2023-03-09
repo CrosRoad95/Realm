@@ -3,6 +3,8 @@ using Realm.Domain.Options;
 using Realm.Domain;
 using FluentAssertions;
 using Realm.Domain.Concepts;
+using Realm.Tests.Providers;
+using Realm.Common.Providers;
 
 namespace Realm.Tests.Tests;
 
@@ -16,10 +18,11 @@ public class JobStatisticsComponentTests
         var services = new ServiceCollection();
         var configurationProvider = new TestConfigurationProvider();
         services.Configure<GameplayOptions>(configurationProvider.GetSection("Gameplay"));
+        services.AddSingleton<IDateTimeProvider, TestDateTimeProvider>();
 
         var serviceProvider = services.BuildServiceProvider();
         _entity = new(serviceProvider, "test", Entity.EntityTag.Unknown);
-        _jobStatisticsComponent = new();
+        _jobStatisticsComponent = new(serviceProvider.GetRequiredService<IDateTimeProvider>().Now);
         _entity.AddComponent(_jobStatisticsComponent);
     }
 

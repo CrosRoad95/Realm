@@ -1,16 +1,19 @@
-﻿using Realm.Persistance.Interfaces;
+﻿using Realm.Common.Providers;
+using Realm.Persistance.Interfaces;
 
 namespace Realm.Server.Services;
 
 public class BanService : IBanService
 {
     private readonly IBanRepository _banRepository;
+    private readonly IDateTimeProvider _dateTimeProvider;
 
     public event Action<Ban>? BanAdded;
     public event Action<Ban>? BanRemoved;
-    public BanService(IBanRepository banRepository)
+    public BanService(IBanRepository banRepository, IDateTimeProvider dateTimeProvider)
     {
         _banRepository = banRepository;
+        _dateTimeProvider = dateTimeProvider;
     }
 
     public async Task BanSerial(string serial, DateTime? until = null, string? reason = null, string? responsible = null, int type = 0)
@@ -31,7 +34,7 @@ public class BanService : IBanService
         await _banRepository.Commit();
     }
 
-    public Task<List<Ban>> GetBansBySerial(string serial) => _banRepository.GetBansBySerial(serial);
+    public Task<List<Ban>> GetBansBySerial(string serial) => _banRepository.GetBansBySerial(serial, _dateTimeProvider);
 
-    public Task<List<Ban>> GetBansByUserId(int userId) => _banRepository.GetBansByUserId(userId);
+    public Task<List<Ban>> GetBansByUserId(int userId) => _banRepository.GetBansByUserId(userId, _dateTimeProvider);
 }

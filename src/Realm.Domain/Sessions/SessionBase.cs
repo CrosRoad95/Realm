@@ -4,7 +4,6 @@ namespace Realm.Domain.Sessions;
 
 public abstract class SessionBase
 {
-    private readonly DateTime _startTime = DateTime.Now;
     private readonly Stopwatch _stopwatch = new Stopwatch();
     private readonly string _sessionId = Guid.NewGuid().ToString();
     private readonly string _code;

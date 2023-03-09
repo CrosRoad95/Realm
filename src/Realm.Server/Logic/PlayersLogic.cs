@@ -1,4 +1,5 @@
-﻿using Realm.Common.Utilities;
+﻿using Realm.Common.Providers;
+using Realm.Common.Utilities;
 using System.Collections.Concurrent;
 
 namespace Realm.Server.Logic;
@@ -12,10 +13,11 @@ internal class PlayersLogic
     private readonly RealmDbContextFactory _realmDbContextFactory;
     private readonly MtaServer _mtaServer;
     private readonly ClientInterfaceService _clientInterfaceService;
+    private readonly IDateTimeProvider _dateTimeProvider;
     private readonly ConcurrentDictionary<Player, Latch> _playerResources = new();
 
     public PlayersLogic(ECS ecs, IServiceProvider serviceProvider, IEntityByElement entityByElement,
-        RealmDbContextFactory realmDbContextFactory, MtaServer mtaServer, ClientInterfaceService clientInterfaceService)
+        RealmDbContextFactory realmDbContextFactory, MtaServer mtaServer, ClientInterfaceService clientInterfaceService, IDateTimeProvider dateTimeProvider)
     {
         _ecs = ecs;
         _serviceProvider = serviceProvider;
@@ -23,6 +25,7 @@ internal class PlayersLogic
         _realmDbContextFactory = realmDbContextFactory;
         _mtaServer = mtaServer;
         _clientInterfaceService = clientInterfaceService;
+        _dateTimeProvider = dateTimeProvider;
         _ecs.EntityCreated += HandleEntityCreated;
         _mtaServer.PlayerJoined += HandlePlayerJoined;
     }
@@ -92,13 +95,7 @@ internal class PlayersLogic
                 var player = playerElementComponent.Player;
             }
         }
-        if (component is DiscordIntegrationComponent discordIntegration)
-        {
-            if (entity.TryGetComponent(out PlayerElementComponent playerElementComponent))
-            {
-                playerElementComponent.SendChatMessage("Dziękujemy za połączenie konta :)");
-            }
-        }
+
         if (component is AccountComponent accountComponent)
         {
             if (entity.TryGetComponent(out PlayerElementComponent playerElementComponent))
@@ -106,7 +103,7 @@ internal class PlayersLogic
                 var client = playerElementComponent.Player.Client;
                 using var context = _realmDbContextFactory.CreateDbContext();
                 var user = await context.Users.Where(x => x.Id == accountComponent.Id).FirstAsync();
-                user.LastLogindDateTime = DateTime.Now;
+                user.LastLogindDateTime = _dateTimeProvider.Now;
                 user.LastIp = client.IPAddress?.ToString();
                 user.LastSerial = client.Serial;
                 if (user.RegisterSerial == null)
@@ -116,7 +113,7 @@ internal class PlayersLogic
                     user.RegisterIp = user.LastIp;
 
                 if (user.RegisteredDateTime == null)
-                    user.RegisteredDateTime = DateTime.Now;
+                    user.RegisteredDateTime = _dateTimeProvider.Now;
                 context.Users.Update(user);
                 await context.SaveChangesAsync();
             }

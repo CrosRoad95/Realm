@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Options;
+using Realm.Common.Providers;
 using Realm.Domain.Inventory;
 using Realm.Domain.Options;
 using Realm.Domain.Registries;
@@ -14,13 +15,16 @@ internal class RPGUserManager : IRPGUserManager
     private readonly UserManager<User> _userManager;
     private readonly ILogger<RPGUserManager> _logger;
     private readonly IOptions<GameplayOptions> _gameplayOptions;
+    private readonly IDateTimeProvider _dateTimeProvider;
 
-    public RPGUserManager(ItemsRegistry itemsRegistry, UserManager<User> userManager, ILogger<RPGUserManager> logger, IOptions<GameplayOptions> gameplayOptions)
+    public RPGUserManager(ItemsRegistry itemsRegistry, UserManager<User> userManager, ILogger<RPGUserManager> logger, IOptions<GameplayOptions> gameplayOptions,
+        IDateTimeProvider dateTimeProvider)
     {
         _itemsRegistry = itemsRegistry;
         _userManager = userManager;
         _logger = logger;
         _gameplayOptions = gameplayOptions;
+        _dateTimeProvider = dateTimeProvider;
     }
 
     public async Task<User?> SignUp(string username, string password)
@@ -93,9 +97,9 @@ internal class RPGUserManager : IRPGUserManager
                 entity.AddComponent<JobUpgradesComponent>();
             
             if (user.JobStatistics != null)
-                entity.AddComponent(new JobStatisticsComponent(user.JobStatistics));
+                entity.AddComponent(new JobStatisticsComponent(_dateTimeProvider.Now, user.JobStatistics));
             else
-                entity.AddComponent<JobStatisticsComponent>();
+                entity.AddComponent(new JobStatisticsComponent(_dateTimeProvider.Now));
             
             if (user.Discoveries != null)
                 entity.AddComponent(new DiscoveriesComponent(user.Discoveries));

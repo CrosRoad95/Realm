@@ -1,8 +1,12 @@
-﻿namespace Realm.Domain.Components.Players;
+﻿using Realm.Common.Providers;
+
+namespace Realm.Domain.Components.Players;
 
 [ComponentUsage(false)]
 public class AFKComponent : Component
 {
+    [Inject]
+    private IDateTimeProvider DateTimeProvider { get; set; } = default!;
     [Inject]
     private AFKService AFKService { get; set; } = default!;
 
@@ -29,7 +33,7 @@ public class AFKComponent : Component
 
     protected virtual void StateHasChanged()
     {
-        TimeSpan elapsed = (TimeSpan)((LastAFK == null) ? TimeSpan.Zero : DateTime.Now - LastAFK);
+        TimeSpan elapsed = (TimeSpan)((LastAFK == null) ? TimeSpan.Zero : DateTimeProvider.Now - LastAFK);
         StateChanged?.Invoke(Entity, IsAFK, elapsed);
     }
 
@@ -40,7 +44,7 @@ public class AFKComponent : Component
 
         IsAFK = false;
         StateHasChanged();
-        LastAFK = DateTime.Now;
+        LastAFK = DateTimeProvider.Now;
     }
 
     private void HandlePlayerAFKStarted(Player player)
@@ -50,6 +54,6 @@ public class AFKComponent : Component
 
         IsAFK = true;
         StateHasChanged();
-        LastAFK = DateTime.Now;
+        LastAFK = DateTimeProvider.Now;
     }
 }

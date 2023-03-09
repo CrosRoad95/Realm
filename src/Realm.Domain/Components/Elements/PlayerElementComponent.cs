@@ -1,4 +1,5 @@
-﻿using Realm.Domain.IdGenerators;
+﻿using Realm.Common.Providers;
+using Realm.Domain.IdGenerators;
 using SlipeServer.Server.Collections;
 using SlipeServer.Server.Concepts;
 
@@ -6,6 +7,8 @@ namespace Realm.Domain.Components.Elements;
 
 public sealed class PlayerElementComponent : PedElementComponent
 {
+    [Inject]
+    private IDateTimeProvider DateTimeProvider { get; set; } = default!;
     [Inject]
     private ChatBox ChatBox { get; set; } = default!;
     [Inject]
@@ -285,7 +288,7 @@ public sealed class PlayerElementComponent : PedElementComponent
                 _bindsUpCooldown.TryGetValue(key, out cooldownUntil);
         }
 
-        if (cooldownUntil > DateTime.Now)
+        if (cooldownUntil > DateTimeProvider.Now)
         {
             return true;
         }
@@ -360,7 +363,7 @@ public sealed class PlayerElementComponent : PedElementComponent
         }
         finally
         {
-            TrySetCooldown(key, keyState, DateTime.Now.AddMilliseconds(400));
+            TrySetCooldown(key, keyState, DateTimeProvider.Now.AddMilliseconds(400));
         }
     }
 

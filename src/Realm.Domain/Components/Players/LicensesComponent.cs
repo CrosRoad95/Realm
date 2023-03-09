@@ -1,10 +1,14 @@
-﻿using License = Realm.Domain.Concepts.License;
+﻿using Realm.Common.Providers;
+using License = Realm.Domain.Concepts.License;
 
 namespace Realm.Domain.Components.Players;
 
 [ComponentUsage(false)]
 public class LicensesComponent : Component
 {
+    [Inject]
+    private IDateTimeProvider DateTimeProvider { get; set; } = default!;
+
     private readonly List<License> _licenses = new();
 
     public IReadOnlyList<License> Licenses => _licenses;
@@ -35,7 +39,7 @@ public class LicensesComponent : Component
     public bool IsLicenseSuspended(int licenseId)
     {
         lock(_licensesLock)
-            return _licenses.Where(x => x.licenseId == licenseId && x.IsSuspended)
+            return _licenses.Where(x => x.licenseId == licenseId && x.IsSuspended(DateTimeProvider))
             .Any();
     }
 
@@ -70,7 +74,7 @@ public class LicensesComponent : Component
         var query = _licenses.Where(x => x.licenseId == licenseId);
 
         if (includeSuspended)
-            query = query.Where(x => !x.IsSuspended);
+            query = query.Where(x => !(x.suspendedUntil != null && x.suspendedUntil > DateTimeProvider.Now));
         return query.Any();
     }
     
@@ -92,7 +96,7 @@ public class LicensesComponent : Component
                 throw new Exception();
 
             var previous = _licenses[index];
-            previous.suspendedUntil = DateTime.Now + timeSpan;
+            previous.suspendedUntil = DateTimeProvider.Now + timeSpan;
             previous.suspendedReason = reason;
             _licenses[index] = previous;
         }

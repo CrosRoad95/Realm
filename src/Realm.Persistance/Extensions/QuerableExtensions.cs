@@ -1,15 +1,17 @@
-﻿namespace Realm.Persistance.Extensions;
+﻿using Realm.Common.Providers;
+
+namespace Realm.Persistance.Extensions;
 
 public static class QuerableExtensions
 {
-    public static IQueryable<UserLicense> NotSuspended(this IQueryable<UserLicense> query)
+    public static IQueryable<UserLicense> NotSuspended(this IQueryable<UserLicense> query, IDateTimeProvider dateTimeProvider)
     {
-        return query.Where(x => x.SuspendedUntil == null || x.SuspendedUntil < DateTime.Now);
+        return query.Where(x => x.SuspendedUntil == null || x.SuspendedUntil < dateTimeProvider.Now);
     }
 
-    public static IQueryable<UserLicense> IsSuspended(this IQueryable<UserLicense> query)
+    public static IQueryable<UserLicense> IsSuspended(this IQueryable<UserLicense> query, IDateTimeProvider dateTimeProvider)
     {
-        return query.Where(x => x.SuspendedUntil != null && x.SuspendedUntil > DateTime.Now);
+        return query.Where(x => x.SuspendedUntil != null && x.SuspendedUntil > dateTimeProvider.Now);
     }
 
     public static IQueryable<Vehicle> IsNotRemoved(this IQueryable<Vehicle> query)

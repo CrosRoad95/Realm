@@ -1,8 +1,12 @@
-﻿namespace Realm.Domain.Components.Players;
+﻿using Realm.Common.Providers;
+
+namespace Realm.Domain.Components.Players;
 
 [ComponentUsage(false)]
 public class DailyVisitsCounterComponent : Component
 {
+    [Inject]
+    private IDateTimeProvider DateTimeProvider { get; set; } = default!;
     public DateTime LastVisit { get; set; } = DateTime.MinValue;
     public int VisitsInRow { get; set; }
     public int VisitsInRowRecord { get; set; }
@@ -28,12 +32,12 @@ public class DailyVisitsCounterComponent : Component
 
     private void Update()
     {
-        if (LastVisit.Date == DateTime.Now.Date)
+        if (LastVisit.Date == DateTimeProvider.Now.Date)
             return;
 
         bool reseted = false;
 
-        if (LastVisit.Date.AddDays(1) == DateTime.Now.Date)
+        if (LastVisit.Date.AddDays(1) == DateTimeProvider.Now.Date)
         {
             VisitsInRow++;
         }
@@ -50,7 +54,7 @@ public class DailyVisitsCounterComponent : Component
         }
 
         PlayerVisited?.Invoke(Entity, VisitsInRow, reseted);
-        LastVisit = DateTime.Now;
+        LastVisit = DateTimeProvider.Now;
     }
 }
 

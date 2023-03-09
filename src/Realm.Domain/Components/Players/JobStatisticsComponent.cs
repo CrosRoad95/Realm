@@ -9,17 +9,18 @@ public class JobStatisticsComponent : Component
     private readonly Dictionary<short, JobStatistics> _jobStatistics = new();
     public IReadOnlyDictionary<short, JobStatistics> JobStatistics => _jobStatistics;
 
-    private readonly DateOnly _date = DateOnly.FromDateTime(DateTime.Now);
+    private readonly DateOnly _date;
     internal DateOnly Date => _date;
     private readonly object _lock = new object();
 
-    public JobStatisticsComponent()
+    public JobStatisticsComponent(DateTime forDateTime)
     {
-
+        _date = DateOnly.FromDateTime(forDateTime);
     }
 
-    internal JobStatisticsComponent(ICollection<JobStatisticsData> jobStatistics)
+    internal JobStatisticsComponent(DateTime forDateTime, ICollection<JobStatisticsData> jobStatistics)
     {
+        _date = DateOnly.FromDateTime(forDateTime);
         _jobStatistics = jobStatistics.GroupBy(x => x.JobId).ToDictionary(x => x.Key, x => new JobStatistics
         {
             jobId = x.Key,

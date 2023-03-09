@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection.Extensions;
+using Realm.Common.Providers;
 using Realm.Domain.IdGenerators;
 using Realm.Domain.Registries;
 using Realm.Module.Discord;
@@ -46,6 +47,7 @@ internal sealed class RPGServer : IRPGServer
         services.Remove(services.Where(x => x.ImplementationType == typeof(ConsoleLogger)).First());
 
         // Common
+        services.AddSingleton<IDateTimeProvider, DateTimeProvider>();
         services.AddSingleton((IRPGServer)this);
         services.AddSingleton(this);
         services.AddSingleton<SeederServerBuilder>();

@@ -1,4 +1,6 @@
-﻿namespace Realm.Persistance.Repository;
+﻿using Realm.Common.Providers;
+
+namespace Realm.Persistance.Repository;
 
 internal class BanRepository : IBanRepository
 {
@@ -37,19 +39,19 @@ internal class BanRepository : IBanRepository
         return ban;
     }
     
-    public Task<List<Ban>> GetBansBySerial(string serial)
+    public Task<List<Ban>> GetBansBySerial(string serial, IDateTimeProvider dateTimeProvider)
     {
         var query = _db.Bans
             .TagWithSource(nameof(BanRepository))
-            .Where(x => x.Serial == serial && x.End > DateTime.Now);
+            .Where(x => x.Serial == serial && x.End > dateTimeProvider.Now);
         return query.ToListAsync();
     }
     
-    public async Task<List<Ban>> GetBansByUserId(int userId)
+    public async Task<List<Ban>> GetBansByUserId(int userId, IDateTimeProvider dateTimeProvider)
     {
         return await _db.Bans
             .TagWithSource(nameof(BanRepository))
-            .Where(x => x.UserId == userId && x.End > DateTime.Now)
+            .Where(x => x.UserId == userId && x.End > dateTimeProvider.Now)
             .ToListAsync();
     }
 

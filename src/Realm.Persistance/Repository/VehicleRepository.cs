@@ -1,12 +1,16 @@
-﻿namespace Realm.Persistance.Repository;
+﻿using Realm.Common.Providers;
+
+namespace Realm.Persistance.Repository;
 
 internal class VehicleRepository : IVehicleRepository
 {
     private readonly IDb _db;
+    private readonly IDateTimeProvider _dateTimeProvider;
 
-    public VehicleRepository(IDb db)
+    public VehicleRepository(IDb db, IDateTimeProvider dateTimeProvider)
     {
         _db = db;
+        _dateTimeProvider = dateTimeProvider;
     }
 
     public async Task<Vehicle> CreateNewVehicle(ushort model)
@@ -15,7 +19,7 @@ internal class VehicleRepository : IVehicleRepository
         {
             Model = model,
             Platetext = Guid.NewGuid().ToString()[..8],
-            CreatedAt = DateTime.Now,
+            CreatedAt = _dateTimeProvider.Now,
             Spawned = true,
         };
         _db.Vehicles.Add(vehicle);

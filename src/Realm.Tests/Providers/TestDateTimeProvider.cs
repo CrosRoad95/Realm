@@ -1,0 +1,19 @@
+﻿using Realm.Common.Providers;
+
+namespace Realm.Tests.Providers;
+
+internal class TestDateTimeProvider : IDateTimeProvider
+{
+    private DateTime _now;
+    public TestDateTimeProvider()
+    {
+        _now = DateTime.Now;
+    }
+
+    public void AddOffset(TimeSpan timeSpan)
+    {
+        _now += timeSpan;
+    }
+
+    public DateTime Now => _now;
+}

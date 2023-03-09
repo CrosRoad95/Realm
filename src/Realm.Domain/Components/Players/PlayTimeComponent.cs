@@ -1,8 +1,13 @@
-﻿namespace Realm.Domain.Components.Players;
+﻿using Realm.Common.Providers;
+
+namespace Realm.Domain.Components.Players;
 
 [ComponentUsage(false)]
 public class PlayTimeComponent : Component
 {
+    [Inject]
+    private IDateTimeProvider DateTimeProvider { get; set; } = default!;
+
     private DateTime? _startDateTime;
     private readonly ulong _currentPlayTime = 0;
 
@@ -12,7 +17,7 @@ public class PlayTimeComponent : Component
         {
             if (_startDateTime == null)
                 return 0;
-            return (ulong)(DateTime.Now - _startDateTime.Value).Seconds;
+            return (ulong)(DateTimeProvider.Now - _startDateTime.Value).Seconds;
         }
     }
 
@@ -20,17 +25,20 @@ public class PlayTimeComponent : Component
 
     public PlayTimeComponent()
     {
-        _startDateTime = DateTime.Now;
     }
 
     public PlayTimeComponent(ulong currentPlayTime)
     {
         _currentPlayTime = currentPlayTime;
-        _startDateTime = DateTime.Now;
+    }
+
+    protected override void Load()
+    {
+        _startDateTime = DateTimeProvider.Now;
     }
 
     public void Reset()
     {
-        _startDateTime = DateTime.Now;
+        _startDateTime = DateTimeProvider.Now;
     }
 }

@@ -1,4 +1,5 @@
-﻿using Realm.Console.Components.Huds;
+﻿using Realm.Common.Providers;
+using Realm.Console.Components.Huds;
 using Realm.Module.Discord.Interfaces;
 using SixLabors.Fonts;
 using SixLabors.ImageSharp.Drawing.Processing;
@@ -22,6 +23,7 @@ internal sealed class CommandsLogic
     private readonly IDiscordService _discordService;
     private readonly ChatBox _chatBox;
     private readonly ILogger<CommandsLogic> _logger;
+    private readonly IDateTimeProvider _dateTimeProvider;
 
     private class TestState
     {
@@ -29,7 +31,8 @@ internal sealed class CommandsLogic
     }
 
     public CommandsLogic(RPGCommandService commandService, IEntityFactory entityFactory, RepositoryFactory repositoryFactory,
-        ItemsRegistry itemsRegistry, ECS ecs, IBanService banService, IDiscordService discordService, ChatBox chatBox, ILogger<CommandsLogic> logger)
+        ItemsRegistry itemsRegistry, ECS ecs, IBanService banService, IDiscordService discordService, ChatBox chatBox, ILogger<CommandsLogic> logger,
+        IDateTimeProvider dateTimeProvider)
     {
         _commandService = commandService;
         _entityFactory = entityFactory;
@@ -40,6 +43,7 @@ internal sealed class CommandsLogic
         _discordService = discordService;
         _chatBox = chatBox;
         _logger = logger;
+        _dateTimeProvider = dateTimeProvider;
         _commandService.AddCommandHandler("playtime", (entity, args) =>
         {
             if (entity.TryGetComponent(out PlayTimeComponent playTimeComponent))
@@ -348,7 +352,7 @@ internal sealed class CommandsLogic
             while(true)
             {
                 await Task.Delay(1000 / 60);
-                hud3d.UpdateState(x => x.Text = $"time {DateTime.Now} {i++}");
+                hud3d.UpdateState(x => x.Text = $"time {_dateTimeProvider.Now} {i++}");
             }
         });
 
