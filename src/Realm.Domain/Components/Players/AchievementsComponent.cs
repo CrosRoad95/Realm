@@ -1,5 +1,6 @@
 ﻿using AchievementData = Realm.Persistance.Data.Achievement;
 using Achievement = Realm.Domain.Concepts.Achievement;
+using System;
 
 namespace Realm.Domain.Components.Players;
 
@@ -37,6 +38,8 @@ public class AchievementsComponent : Component
 
     public void SetAchievementValue(int achievementId, object value)
     {
+        ThrowIfDisposed();
+
         lock (_achievementsLock)
         {
             TryInitializeAchievementInternal(achievementId);
@@ -49,6 +52,8 @@ public class AchievementsComponent : Component
     
     public T? GetAchievementValue<T>(int achievementId)
     {
+        ThrowIfDisposed();
+
         lock (_achievementsLock)
         {
             TryInitializeAchievementInternal(achievementId);
@@ -60,6 +65,8 @@ public class AchievementsComponent : Component
     
     public float GetProgress(int achievementId)
     {
+        ThrowIfDisposed();
+
         lock (_achievementsLock)
         {
             TryInitializeAchievementInternal(achievementId);
@@ -69,6 +76,11 @@ public class AchievementsComponent : Component
     
     public bool HasReachedProgressThreshold(int achievementId, float progress)
     {
+        ThrowIfDisposed();
+
+        if (progress < 0)
+            throw new ArgumentOutOfRangeException(nameof(progress));
+
         lock (_achievementsLock)
         {
             TryInitializeAchievementInternal(achievementId);
@@ -77,17 +89,22 @@ public class AchievementsComponent : Component
         }
     }
 
-    public bool TryReceiveReward(int achievementId)
+    public bool TryReceiveReward(int achievementId, float requiredProgress)
     {
+        ThrowIfDisposed();
+
+        if (requiredProgress < 0)
+            throw new ArgumentOutOfRangeException(nameof(requiredProgress));
+
         lock (_achievementsLock)
         {
             TryInitializeAchievementInternal(achievementId);
 
             var achievement = _achievements[achievementId];
-            if (achievement.prizeReceived)
+            if (achievement.prizeReceived || achievement.progress < requiredProgress)
                 return false;
 
-            achievement.prizeReceived = true;
+            _achievements[achievementId] = _achievements[achievementId] with { prizeReceived = true };
         }
 
         return true;
@@ -95,19 +112,28 @@ public class AchievementsComponent : Component
 
     public bool UpdateProgress(int achievementId, float progress, float maximumProgress)
     {
+        ThrowIfDisposed();
+
+        if (progress < 0)
+            throw new ArgumentOutOfRangeException(nameof(progress));
+        
+        if(maximumProgress < 0)
+            throw new ArgumentOutOfRangeException(nameof(maximumProgress));
+
         lock (_achievementsLock)
         {
             TryInitializeAchievementInternal(achievementId);
 
             var achievement = _achievements[achievementId];
+
             if (achievement.prizeReceived || HasReachedProgressThreshold(achievementId, maximumProgress))
                 return false;
 
-            achievement.progress = Math.Min(progress + achievement.progress, maximumProgress);
+            _achievements[achievementId] = achievement with { progress = Math.Min(progress + achievement.progress, maximumProgress) };
             if (HasReachedProgressThreshold(achievementId, maximumProgress))
                 AchievementUnlocked?.Invoke(this, achievementId);
             else
-                AchievementProgressed?.Invoke(this, achievementId, achievement.progress);
+                AchievementProgressed?.Invoke(this, achievementId, _achievements[achievementId].progress);
 
             return true;
         }
