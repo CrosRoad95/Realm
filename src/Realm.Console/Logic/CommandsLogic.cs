@@ -176,7 +176,7 @@ internal sealed class CommandsLogic
         _commandService.AddCommandHandler("testachievement", async (entity, args) =>
         {
             var achievementsComponent = entity.GetRequiredComponent<AchievementsComponent>();
-            achievementsComponent.UpdateProgress("test", 2, 10);
+            achievementsComponent.UpdateProgress(1, 2, 10);
             entity.GetRequiredComponent<PlayerElementComponent>().SendChatMessage($"progressed achieviement 'test'");
         });
 
@@ -257,7 +257,7 @@ internal sealed class CommandsLogic
 
             if (entity.TryGetComponent(out AchievementsComponent achievementsComponent))
             {
-                achievementsComponent.UpdateProgress("test", 2, 10);
+                achievementsComponent.UpdateProgress(1, 2, 10);
                 entity.GetRequiredComponent<PlayerElementComponent>().SendChatMessage($"Updated achievement 'test' progress to 2");
             }
 

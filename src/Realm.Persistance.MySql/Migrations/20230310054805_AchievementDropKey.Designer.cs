@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Realm.Persistance.MySql;
 
@@ -10,9 +11,11 @@ using Realm.Persistance.MySql;
 namespace Realm.Persistance.MySql.Migrations
 {
     [DbContext(typeof(MySqlDb))]
-    partial class MySqlDbModelSnapshot : ModelSnapshot
+    [Migration("20230310054805_AchievementDropKey")]
+    partial class AchievementDropKey
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -120,9 +123,6 @@ namespace Realm.Persistance.MySql.Migrations
 
             modelBuilder.Entity("Realm.Persistance.Data.Achievement", b =>
                 {
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
-
                     b.Property<int>("AchievementId")
                         .HasColumnType("int");
 
@@ -132,11 +132,12 @@ namespace Realm.Persistance.MySql.Migrations
                     b.Property<float>("Progress")
                         .HasColumnType("float");
 
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
                     b.Property<string>("Value")
                         .HasMaxLength(255)
                         .HasColumnType("varchar(255)");
-
-                    b.HasKey("UserId", "AchievementId");
 
                     b.ToTable("Achievements", (string)null);
                 });
@@ -863,17 +864,6 @@ namespace Realm.Persistance.MySql.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Realm.Persistance.Data.Achievement", b =>
-                {
-                    b.HasOne("Realm.Persistance.Data.User", "User")
-                        .WithMany("Achievements")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("User");
-                });
-
             modelBuilder.Entity("Realm.Persistance.Data.Ban", b =>
                 {
                     b.HasOne("Realm.Persistance.Data.User", "User")
@@ -1111,8 +1101,6 @@ namespace Realm.Persistance.MySql.Migrations
 
             modelBuilder.Entity("Realm.Persistance.Data.User", b =>
                 {
-                    b.Navigation("Achievements");
-
                     b.Navigation("DailyVisits");
 
                     b.Navigation("DiscordIntegration");

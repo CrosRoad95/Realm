@@ -182,7 +182,7 @@ public abstract class Db<T> : IdentityDbContext<User, Role, int,
         {
             entityBuilder
                 .ToTable(nameof(Achievements))
-                .HasKey(x => new { x.UserId, x.Name });
+                .HasKey(x => new { x.UserId, x.AchievementId });
 
             entityBuilder.Property(x => x.Value)
                 .HasMaxLength(255);

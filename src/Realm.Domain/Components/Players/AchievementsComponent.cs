@@ -6,13 +6,13 @@ namespace Realm.Domain.Components.Players;
 [ComponentUsage(false)]
 public class AchievementsComponent : Component
 {
-    private readonly Dictionary<string, Achievement> _achievements = new();
+    private readonly Dictionary<int, Achievement> _achievements = new();
     private readonly object _achievementsLock = new object();
 
-    public IReadOnlyDictionary<string, Achievement> Achievements => _achievements;
+    public IReadOnlyDictionary<int, Achievement> Achievements => _achievements;
 
-    public event Action<AchievementsComponent, string>? AchievementUnlocked;
-    public event Action<AchievementsComponent, string, float>? AchievementProgressed;
+    public event Action<AchievementsComponent, int>? AchievementUnlocked;
+    public event Action<AchievementsComponent, int, float>? AchievementProgressed;
 
     public AchievementsComponent()
     {
@@ -21,7 +21,7 @@ public class AchievementsComponent : Component
 
     internal AchievementsComponent(ICollection<AchievementData> achievements)
     {
-        _achievements = achievements.ToDictionary(x => x.Name, x => new Achievement
+        _achievements = achievements.ToDictionary(x => x.AchievementId, x => new Achievement
         {
             progress = x.Progress,
             value = JsonConvert.DeserializeObject(x.Value),
@@ -29,61 +29,61 @@ public class AchievementsComponent : Component
         });
     }
 
-    private void TryInitializeAchievementInternal(string achievementName)
+    private void TryInitializeAchievementInternal(int achievementId)
     {
-        if (!_achievements.ContainsKey(achievementName))
-            _achievements[achievementName] = new();
+        if (!_achievements.ContainsKey(achievementId))
+            _achievements[achievementId] = new();
     }
 
-    public void SetAchievementValue(string achievementName, object value)
+    public void SetAchievementValue(int achievementId, object value)
     {
         lock (_achievementsLock)
         {
-            TryInitializeAchievementInternal(achievementName);
+            TryInitializeAchievementInternal(achievementId);
 
-            var achievement = _achievements[achievementName];
+            var achievement = _achievements[achievementId];
             achievement.value = value;
-            _achievements[achievementName] = achievement;
+            _achievements[achievementId] = achievement;
         }
     }
     
-    public T? GetAchievementValue<T>(string achievementName)
+    public T? GetAchievementValue<T>(int achievementId)
     {
         lock (_achievementsLock)
         {
-            TryInitializeAchievementInternal(achievementName);
+            TryInitializeAchievementInternal(achievementId);
 
-            var value = _achievements[achievementName].value;
+            var value = _achievements[achievementId].value;
             return (T?)value;
         }
     }
     
-    public float GetProgress(string achievementName)
+    public float GetProgress(int achievementId)
     {
         lock (_achievementsLock)
         {
-            TryInitializeAchievementInternal(achievementName);
-            return _achievements[achievementName].progress;
+            TryInitializeAchievementInternal(achievementId);
+            return _achievements[achievementId].progress;
         }
     }
     
-    public bool HasReachedProgressThreshold(string achievementName, float progress)
+    public bool HasReachedProgressThreshold(int achievementId, float progress)
     {
         lock (_achievementsLock)
         {
-            TryInitializeAchievementInternal(achievementName);
+            TryInitializeAchievementInternal(achievementId);
 
-            return progress <= _achievements[achievementName].progress;
+            return progress <= _achievements[achievementId].progress;
         }
     }
 
-    public bool TryReceiveReward(string achievementName)
+    public bool TryReceiveReward(int achievementId)
     {
         lock (_achievementsLock)
         {
-            TryInitializeAchievementInternal(achievementName);
+            TryInitializeAchievementInternal(achievementId);
 
-            var achievement = _achievements[achievementName];
+            var achievement = _achievements[achievementId];
             if (achievement.prizeReceived)
                 return false;
 
@@ -93,21 +93,21 @@ public class AchievementsComponent : Component
         return true;
     }
 
-    public bool UpdateProgress(string achievementName, float progress, float maximumProgress)
+    public bool UpdateProgress(int achievementId, float progress, float maximumProgress)
     {
         lock (_achievementsLock)
         {
-            TryInitializeAchievementInternal(achievementName);
+            TryInitializeAchievementInternal(achievementId);
 
-            var achievement = _achievements[achievementName];
-            if (achievement.prizeReceived || HasReachedProgressThreshold(achievementName, maximumProgress))
+            var achievement = _achievements[achievementId];
+            if (achievement.prizeReceived || HasReachedProgressThreshold(achievementId, maximumProgress))
                 return false;
 
             achievement.progress = Math.Min(progress + achievement.progress, maximumProgress);
-            if (HasReachedProgressThreshold(achievementName, maximumProgress))
-                AchievementUnlocked?.Invoke(this, achievementName);
+            if (HasReachedProgressThreshold(achievementId, maximumProgress))
+                AchievementUnlocked?.Invoke(this, achievementId);
             else
-                AchievementProgressed?.Invoke(this, achievementName, achievement.progress);
+                AchievementProgressed?.Invoke(this, achievementId, achievement.progress);
 
             return true;
         }

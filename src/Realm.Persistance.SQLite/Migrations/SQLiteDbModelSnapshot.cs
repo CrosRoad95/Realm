@@ -121,8 +121,8 @@ namespace Realm.Persistance.SQLite.Migrations
                     b.Property<int>("UserId")
                         .HasColumnType("INTEGER");
 
-                    b.Property<string>("Name")
-                        .HasColumnType("TEXT");
+                    b.Property<int>("AchievementId")
+                        .HasColumnType("INTEGER");
 
                     b.Property<bool>("PrizeReceived")
                         .HasColumnType("INTEGER");
@@ -134,7 +134,7 @@ namespace Realm.Persistance.SQLite.Migrations
                         .HasMaxLength(255)
                         .HasColumnType("TEXT");
 
-                    b.HasKey("UserId", "Name");
+                    b.HasKey("UserId", "AchievementId");
 
                     b.ToTable("Achievements", (string)null);
                 });

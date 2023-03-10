@@ -222,7 +222,7 @@ internal class SaveService : ISaveService
         {
             user.Achievements = achievementsComponent.Achievements.Select(x => new Achievement
             {
-                Name = x.Key,
+                AchievementId = x.Key,
                 Value = JsonConvert.SerializeObject(x.Value.value, Formatting.None),
                 PrizeReceived = x.Value.prizeReceived,
                 Progress = x.Value.progress,
