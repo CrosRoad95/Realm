@@ -42,7 +42,7 @@ public class RPGCommandService
             var activity = new Activity("CommandHandler");
             activity.Start();
 
-            using var _1 = LogContext.PushProperty("serial", playerElementComponent.Serial);
+            using var _1 = LogContext.PushProperty("serial", playerElementComponent.Client.Serial);
             using var _2 = LogContext.PushProperty("accountId", accountComponent.Id);
             using var _3 = LogContext.PushProperty("commandName", commandName);
             using var _4 = LogContext.PushProperty("commandArguments", args.Arguments);

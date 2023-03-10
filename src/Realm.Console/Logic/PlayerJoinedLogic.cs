@@ -24,7 +24,7 @@ internal sealed class PlayerJoinedLogic
             return;
 
         var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();
-        var bans = await _banService.GetBansBySerial(playerElementComponent.Serial);
+        var bans = await _banService.GetBansBySerial(playerElementComponent.Client.Serial);
         ;
         playerElementComponent.SetText3dRenderingEnabled(false);
         playerElementComponent.SetChatVisible(false);
