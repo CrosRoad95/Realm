@@ -1,21 +1,34 @@
-﻿namespace Realm.Server.Logic.Resources;
+﻿using Realm.Domain.Interfaces;
+
+namespace Realm.Server.Logic.Resources;
 
 internal class StatisticsCounterLogic
 {
     private readonly StatisticsCounterService _statisticsCounterService;
     private readonly MtaServer _mtaServer;
     private readonly ECS _ecs;
+    private readonly IEntityByElement _entityByElement;
     private readonly ILogger<StatisticsCounterLogic> _logger;
 
-    public StatisticsCounterLogic(StatisticsCounterService statisticsCounterService, MtaServer mtaServer, ECS ecs, ILogger<StatisticsCounterLogic> logger)
+    public StatisticsCounterLogic(StatisticsCounterService statisticsCounterService, MtaServer mtaServer, ECS ecs,
+        IEntityByElement entityByElement, ILogger<StatisticsCounterLogic> logger)
     {
         _statisticsCounterService = statisticsCounterService;
         _mtaServer = mtaServer;
         _ecs = ecs;
+        _entityByElement = entityByElement;
         _logger = logger;
         _ecs.EntityCreated += HandleEntityCreated;
         statisticsCounterService.StatisticsCollected += HandleStatisticsCollected;
-        //StatisticsCounterService.SetCounterEnabledFor(player, true);
+        statisticsCounterService.FpsStatisticsCollected += HandleFpsStatisticsCollected;
+    }
+
+    private void HandleFpsStatisticsCollected(Player player, float minFps, float maxFps, float avgFps)
+    {
+        if (_entityByElement.TryGetEntityByPlayer(player, out var playerEntity))
+        {
+            playerEntity.GetRequiredComponent<PlayerElementComponent>().SendChatMessage($"Fps: {minFps}, {maxFps}, {avgFps}");
+        }
     }
 
     private void HandleStatisticsCollected(Player player, Dictionary<int, float> statistics)

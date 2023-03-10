@@ -3,6 +3,7 @@ using Realm.Domain.IdGenerators;
 using SlipeServer.Server.Clients;
 using SlipeServer.Server.Collections;
 using SlipeServer.Server.Concepts;
+using SlipeServer.Server.Elements;
 
 namespace Realm.Domain.Components.Elements;
 
@@ -67,7 +68,9 @@ public sealed class PlayerElementComponent : PedElementComponent
             ThrowIfDisposed();
             if (_player.Vehicle == null)
                 return null;
-            return EntityByElement.TryGetByElement(_player.Vehicle);
+
+            EntityByElement.TryGetByElement(_player.Vehicle, out var entity);
+            return entity;
         }
     }
 

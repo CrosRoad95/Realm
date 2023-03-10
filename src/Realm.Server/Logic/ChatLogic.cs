@@ -1,4 +1,6 @@
-﻿using SlipeServer.Server.Extensions;
+﻿using Realm.Domain.Interfaces;
+using SlipeServer.Server.Elements;
+using SlipeServer.Server.Extensions;
 using System.Drawing;
 
 namespace Realm.Server.Logic;
@@ -28,22 +30,22 @@ internal class ChatLogic
         switch (arguments.Command)
         {
             case "say":
-                var playerEntity = _entityByElement.TryGetEntityByPlayer(player);
-                if (playerEntity != null && playerEntity.TryGetComponent(out PlayerElementComponent playerElementComponent))
-                {
-                    if (playerEntity.HasComponent<AccountComponent>())
+                if (_entityByElement.TryGetEntityByPlayer(player, out var playerEntity))
+                    if (playerEntity.TryGetComponent(out PlayerElementComponent playerElementComponent))
                     {
-                        string message = $"{player.NametagColor.ToColorCode()}{player.Name}: #ffffff{string.Join(' ', arguments.Arguments)}";
-                        foreach (var targetPlayerEntity in _ecs.GetPlayerEntities().Where(x => x.HasComponent<AccountComponent>()))
-                            targetPlayerEntity.GetRequiredComponent<PlayerElementComponent>().SendChatMessage(message, Color.White, true);
+                        if (playerEntity.HasComponent<AccountComponent>())
+                        {
+                            string message = $"{player.NametagColor.ToColorCode()}{player.Name}: #ffffff{string.Join(' ', arguments.Arguments)}";
+                            foreach (var targetPlayerEntity in _ecs.GetPlayerEntities().Where(x => x.HasComponent<AccountComponent>()))
+                                targetPlayerEntity.GetRequiredComponent<PlayerElementComponent>().SendChatMessage(message, Color.White, true);
 
-                        _logger.LogInformation("{message}", message);
+                            _logger.LogInformation("{message}", message);
+                        }
+                        else
+                        {
+                            playerElementComponent.SendChatMessage("Nie możesz pisać ponieważ nie jesteś zalogowany.");
+                        }
                     }
-                    else
-                    {
-                        playerElementComponent.SendChatMessage("Nie możesz pisać ponieważ nie jesteś zalogowany.");
-                    }
-                }
                 break;
         }
     }

@@ -7,7 +7,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Lua\fpsCounter.lua" />
+  </ItemGroup>
+
+  <ItemGroup>
     <EmbeddedResource Include="Lua\counter.lua" />
+    <EmbeddedResource Include="Lua\fpsCounter.lua" />
   </ItemGroup>
 
 	<ItemGroup>

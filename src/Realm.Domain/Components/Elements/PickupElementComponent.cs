@@ -33,19 +33,19 @@ public class PickupElementComponent : ElementComponent
     {
         if(EntityEntered != null)
         {
-            var entity = EntityByElement.TryGetByElement(element);
-            if(entity != null && (entity.Tag == Entity.EntityTag.Player || entity.Tag == Entity.EntityTag.Vehicle))
-            {
-                foreach (var rule in _entityRules)
+            if(EntityByElement.TryGetByElement(element, out var entity))
+                if(entity.Tag == Entity.EntityTag.Player || entity.Tag == Entity.EntityTag.Vehicle)
                 {
-                    if(!rule.Check(entity))
+                    foreach (var rule in _entityRules)
                     {
-                        EntityRuleFailed?.Invoke(entity, rule);
-                        return;
+                        if(!rule.Check(entity))
+                        {
+                            EntityRuleFailed?.Invoke(entity, rule);
+                            return;
+                        }
                     }
+                    EntityEntered(entity);
                 }
-                EntityEntered(entity);
-            }
         }
     }
 
@@ -53,10 +53,10 @@ public class PickupElementComponent : ElementComponent
     {
         if(EntityLeft != null)
         {
-            var entity = EntityByElement.TryGetByElement(element);
-            if (entity != null && (entity.Tag == Entity.EntityTag.Player || entity.Tag == Entity.EntityTag.Vehicle))
-                if (_entityRules.All(x => x.Check(entity)))
-                    EntityLeft(entity);
+            if (EntityByElement.TryGetByElement(element, out var entity))
+                if (entity.Tag == Entity.EntityTag.Player || entity.Tag == Entity.EntityTag.Vehicle)
+                    if (_entityRules.All(x => x.Check(entity)))
+                        EntityLeft(entity);
         }
     }
 

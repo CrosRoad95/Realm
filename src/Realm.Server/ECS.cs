@@ -32,16 +32,14 @@ public sealed class ECS : IEntityByElement
         return _entityByElement[element];
     }
 
-    public Entity? TryGetEntityByPlayer(Player player)
+    public bool TryGetEntityByPlayer(Player player, out Entity result)
     {
-        _entityByPlayer.TryGetValue(player, out Entity? result);
-        return result;
+        return _entityByPlayer.TryGetValue(player, out result);
     }
 
-    public Entity? TryGetByElement(Element element)
+    public bool TryGetByElement(Element element, out Entity result)
     {
-        _entityByElement.TryGetValue(element, out Entity? result);
-        return result;
+        return _entityByElement.TryGetValue(element, out result);
     }
     
     public Entity CreateEntity(string name, Entity.EntityTag tag, Action<Entity>? entityBuilder = null)

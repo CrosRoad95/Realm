@@ -1,4 +1,7 @@
-﻿namespace Realm.Server.Logic.Resources;
+﻿using Realm.Domain.Interfaces;
+using SlipeServer.Server.Elements;
+
+namespace Realm.Server.Logic.Resources;
 
 internal class ClientInterfaceLogic
 {
@@ -18,23 +21,27 @@ internal class ClientInterfaceLogic
 
     private void HandleFocusedElementChanged(Player player, Element? focusedElement)
     {
-        Entity? entity = _entityByElement.TryGetByElement(player);
-        if (entity == null)
+        if (!_entityByElement.TryGetEntityByPlayer(player, out var playerEntity))
             return;
 
-        if(entity.TryGetComponent(out PlayerElementComponent playerElementComponent))
+        if(playerEntity.TryGetComponent(out PlayerElementComponent playerElementComponent))
         {
             if (focusedElement == null)
                 playerElementComponent.FocusedEntity = null;
             else
-                playerElementComponent.FocusedEntity = _entityByElement.TryGetByElement(focusedElement);
+            {
+                _entityByElement.TryGetByElement(focusedElement, out var entity);
+                playerElementComponent.FocusedEntity = entity;
+            }
         }
     }
 
     private void HandleClientErrorMessage(Player player, string message, int level, string file, int line)
     {
-        Entity? entity = _entityByElement.TryGetByElement(player);
-        var playerName = entity?.Name ?? player.Name;
+        if (!_entityByElement.TryGetEntityByPlayer(player, out var playerEntity))
+            return;
+
+        var playerName = playerEntity?.Name ?? player.Name;
         switch (level)
         {
             case 0: // Custom
