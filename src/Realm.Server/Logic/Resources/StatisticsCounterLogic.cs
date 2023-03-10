@@ -20,16 +20,16 @@ internal class StatisticsCounterLogic
         _logger = logger;
         _ecs.EntityCreated += HandleEntityCreated;
         statisticsCounterService.StatisticsCollected += HandleStatisticsCollected;
-        statisticsCounterService.FpsStatisticsCollected += HandleFpsStatisticsCollected;
+        //statisticsCounterService.FpsStatisticsCollected += HandleFpsStatisticsCollected;
     }
 
-    private void HandleFpsStatisticsCollected(Player player, float minFps, float maxFps, float avgFps)
-    {
-        if (_entityByElement.TryGetEntityByPlayer(player, out var playerEntity))
-        {
-            playerEntity.GetRequiredComponent<PlayerElementComponent>().SendChatMessage($"Fps: {minFps}, {maxFps}, {avgFps}");
-        }
-    }
+    //private void HandleFpsStatisticsCollected(Player player, float minFps, float maxFps, float avgFps)
+    //{
+    //    if (_entityByElement.TryGetEntityByPlayer(player, out var playerEntity))
+    //    {
+    //        playerEntity.GetRequiredComponent<PlayerElementComponent>().SendChatMessage($"Fps: {minFps}, {maxFps}, {avgFps}");
+    //    }
+    //}
 
     private void HandleStatisticsCollected(Player player, Dictionary<int, float> statistics)
     {
