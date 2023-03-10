@@ -14,6 +14,9 @@ public class LicensesComponent : Component
     public IReadOnlyList<License> Licenses => _licenses;
     private readonly object _licensesLock = new object();
 
+    public event Action<LicensesComponent, int>? LicenseAdded;
+    public event Action<LicensesComponent, int, DateTime, string>? LicenseSuspended;
+    public event Action<LicensesComponent, int>? LicenseUnSuspended;
     public LicensesComponent()
     {
     }
@@ -38,22 +41,29 @@ public class LicensesComponent : Component
 
     public bool IsLicenseSuspended(int licenseId)
     {
-        lock(_licensesLock)
-            return _licenses.Where(x => x.licenseId == licenseId && x.IsSuspended(DateTimeProvider))
-            .Any();
+        ThrowIfDisposed();
+
+        lock (_licensesLock)
+            return _licenses
+                .Where(x => x.licenseId == licenseId && x.IsSuspended(DateTimeProvider))
+                .Any();
     }
 
     public string? GetLastLicenseSuspensionReason(int licenseId)
     {
-        lock(_licensesLock)
-        return _licenses
-            .Where(x => x.licenseId == licenseId)
-            .Select(x => x.suspendedReason)
-            .FirstOrDefault();
+        ThrowIfDisposed();
+
+        lock (_licensesLock)
+            return _licenses
+                .Where(x => x.licenseId == licenseId)
+                .Select(x => x.suspendedReason)
+                .FirstOrDefault();
     }
 
     public bool AddLicense(int licenseId)
     {
+        ThrowIfDisposed();
+
         var userLicense = new License
         {
             licenseId = licenseId,
@@ -65,6 +75,7 @@ public class LicensesComponent : Component
                 return false;
 
             _licenses.Add(userLicense);
+            LicenseAdded?.Invoke(this, licenseId);
             return true;
         }
     }
@@ -75,17 +86,23 @@ public class LicensesComponent : Component
 
         if (includeSuspended)
             query = query.Where(x => !(x.suspendedUntil != null && x.suspendedUntil > DateTimeProvider.Now));
-        return query.Any();
+
+        lock (_licensesLock)
+            return query.Any();
     }
     
     public bool HasLicense(int licenseId, bool includeSuspended = false)
     {
+        ThrowIfDisposed();
+
         lock (_licensesLock)
             return InternalHasLicense(licenseId, includeSuspended);
     }
 
     public void SuspendLicense(int licenseId, TimeSpan timeSpan, string? reason = null)
     {
+        ThrowIfDisposed();
+
         if (timeSpan.Ticks <= 0)
             throw new Exception();
 
@@ -104,15 +121,18 @@ public class LicensesComponent : Component
 
     public void UnSuspendLicense(int licenseId)
     {
+        ThrowIfDisposed();
+
         lock (_licensesLock)
         {
             var index = _licenses.FindIndex(x => x.licenseId == licenseId);
             if (index == -1)
                 throw new Exception();
 
-            var previous = _licenses[index];
-            previous.suspendedUntil = null;
-            _licenses[index] = previous;
+            var license = _licenses[index];
+            license.suspendedUntil = null;
+            _licenses[index] = license;
+            LicenseUnSuspended?.Invoke(this, licenseId);
         }
     }
 }

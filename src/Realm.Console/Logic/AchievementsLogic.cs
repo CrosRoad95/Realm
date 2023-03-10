@@ -25,9 +25,9 @@ internal sealed class AchievementsLogic
         }
     }
 
-    private void HandleAchievementUnlocked(Entity entity, string achievementName)
+    private void HandleAchievementUnlocked(AchievementsComponent achievementsComponent, string achievementName)
     {
-        var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();
+        var playerElementComponent = achievementsComponent.Entity.GetRequiredComponent<PlayerElementComponent>();
         playerElementComponent.AddNotification($"Odblokowałeś osiągnięcie '{achievementName}'");
     }
 }

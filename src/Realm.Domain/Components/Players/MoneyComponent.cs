@@ -12,9 +12,9 @@ public class MoneyComponent : Component
     private decimal _money = 0;
     private readonly ReaderWriterLockSlim _moneyLock = new();
 
-    public event Action<decimal>? MoneySet;
-    public event Action<decimal>? MoneyAdded;
-    public event Action<decimal>? MoneyTaken;
+    public event Action<MoneyComponent, decimal>? MoneySet;
+    public event Action<MoneyComponent, decimal>? MoneyAdded;
+    public event Action<MoneyComponent, decimal>? MoneyTaken;
     public decimal Money
     {
         get => _money; set
@@ -32,7 +32,7 @@ public class MoneyComponent : Component
                 if (_money == value)
                     return;
                 _money = value;
-                MoneySet?.Invoke(_money);
+                MoneySet?.Invoke(this, _money);
             }
             catch (Exception)
             {
@@ -96,7 +96,7 @@ public class MoneyComponent : Component
                 throw new GameplayException("Unable to give money beyond limit.");
 
             _money += amount;
-            MoneyAdded?.Invoke(amount);
+            MoneyAdded?.Invoke(this, amount);
         }
         catch(Exception)
         {
@@ -130,7 +130,7 @@ public class MoneyComponent : Component
                 throw new GameplayException("Unable to take money, not enough money.");
 
             _money -= amount;
-            MoneyTaken?.Invoke(amount);
+            MoneyTaken?.Invoke(this, amount);
         }
         catch(Exception)
         {

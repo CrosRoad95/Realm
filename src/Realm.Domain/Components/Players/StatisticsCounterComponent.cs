@@ -9,6 +9,8 @@ public class StatisticsCounterComponent : Component
     private readonly ConcurrentDictionary<int, float> _stats = new ConcurrentDictionary<int, float>();
 
     public IEnumerable<int> GetStatsIds => _stats.Keys;
+
+    public event Action<StatisticsCounterComponent, int, float> StatIncreased;
     public StatisticsCounterComponent()
     {
     }
@@ -23,20 +25,26 @@ public class StatisticsCounterComponent : Component
 
     public void IncreaseStat(int statId, float value)
     {
+        ThrowIfDisposed();
+
         if (value < 0) throw new ArgumentOutOfRangeException(nameof(value));
 
         if(_stats.TryGetValue(statId, out var stat))
         {
-            _stats.TryUpdate(statId, stat + value, stat);
+            if(_stats.TryUpdate(statId, stat + value, stat))
+                StatIncreased?.Invoke(this, statId, value);
         }
         else
         {
-            _stats.TryAdd(statId, value);
+            if(_stats.TryAdd(statId, value))
+                StatIncreased?.Invoke(this, statId, value);
         }
     }
 
     public float GetStat(int statId)
     {
+        ThrowIfDisposed();
+
         _stats.TryGetValue(statId, out var statValue);
         return statValue;
     }

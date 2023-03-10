@@ -445,7 +445,7 @@ internal sealed class CommandsLogic
         {
             var adminComponent = entity.GetRequiredComponent<AdminComponent>();
             adminComponent.AdminTools = !adminComponent.AdminTools;
-            adminComponent.InterfactionDebugRenderingEnabled = !adminComponent.InterfactionDebugRenderingEnabled;
+            adminComponent.InteractionDebugRenderingEnabled = !adminComponent.InteractionDebugRenderingEnabled;
             return Task.CompletedTask;
         });
 

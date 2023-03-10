@@ -21,6 +21,10 @@ public class AccountComponent : Component
     public int Id => _user.Id;
     public string? UserName => _user.UserName;
     public IReadOnlyList<int> Upgrades => _upgrades;
+
+    public event Action<AccountComponent, int>? UpgradeAdded;
+    public event Action<AccountComponent, int>? UpgradeRemoved;
+
     internal AccountComponent(User user)
     {
         _user = user;
@@ -39,21 +43,29 @@ public class AccountComponent : Component
 
     public bool IsInRole(string role)
     {
+        ThrowIfDisposed();
+
         return _claimsPrincipal!.IsInRole(role);
     }
 
     public bool HasClaim(string type)
     {
+        ThrowIfDisposed();
+
         return _claimsPrincipal!.HasClaim(x => x.Type == type);
     }
 
     public string? GetClaimValue(string type)
     {
+        ThrowIfDisposed();
+
         return _claimsPrincipal!.Claims.First(x => x.Type == type).Value;
     }
 
     public async Task<bool> AddClaim(string type, string value)
     {
+        ThrowIfDisposed();
+
         var result = await UserManager.AddClaimAsync(_user, new Claim(type, value));
         if (result.Succeeded)
             await UpdateClaimsPrincipal();
@@ -62,6 +74,8 @@ public class AccountComponent : Component
 
     public async Task<bool> AddClaims(Dictionary<string, string> claims)
     {
+        ThrowIfDisposed();
+
         var result = await UserManager.AddClaimsAsync(_user, claims.Select(x => new Claim(x.Key, x.Value)));
         if (result.Succeeded)
             await UpdateClaimsPrincipal();
@@ -70,6 +84,8 @@ public class AccountComponent : Component
 
     public async Task<bool> AddRole(string role)
     {
+        ThrowIfDisposed();
+
         var result = await UserManager.AddToRoleAsync(_user, role);
         if (result.Succeeded)
             await UpdateClaimsPrincipal();
@@ -78,6 +94,8 @@ public class AccountComponent : Component
 
     public async Task<bool> AddRoles(IEnumerable<string> role)
     {
+        ThrowIfDisposed();
+
         var result = await UserManager.AddToRolesAsync(_user, role);
         if (result.Succeeded)
             await UpdateClaimsPrincipal();
@@ -86,6 +104,8 @@ public class AccountComponent : Component
 
     public async Task<IEnumerable<string>> GetClaims()
     {
+        ThrowIfDisposed();
+
         return (await UserManager.GetClaimsAsync(_user)).Select(x => x.Type).ToList();
     }
 
@@ -96,6 +116,8 @@ public class AccountComponent : Component
 
     public async Task<bool> RemoveClaim(string type, string? value = null)
     {
+        ThrowIfDisposed();
+
         var claims = await UserManager.GetClaimsAsync(_user);
         Claim? claim;
         if (value != null)
@@ -115,6 +137,8 @@ public class AccountComponent : Component
 
     public async Task<bool> RemoveRole(string role)
     {
+        ThrowIfDisposed();
+
         var result = await UserManager.RemoveFromRoleAsync(_user, role);
         if (result.Succeeded)
             await UpdateClaimsPrincipal();
@@ -123,6 +147,8 @@ public class AccountComponent : Component
 
     public async Task<bool> RemoveAllClaims()
     {
+        ThrowIfDisposed();
+
         var claims = await UserManager.GetClaimsAsync(_user);
         var result = await UserManager.RemoveClaimsAsync(_user, claims);
         if (result.Succeeded)
@@ -132,6 +158,8 @@ public class AccountComponent : Component
 
     public async Task<bool> AuthorizePolicy(string policy)
     {
+        ThrowIfDisposed();
+
         var result = await AuthorizationService.AuthorizeAsync(_claimsPrincipal, policy);
         return result.Succeeded;
     }
@@ -140,17 +168,36 @@ public class AccountComponent : Component
 
     public bool HasUpgrade(int upgradeId)
     {
+        ThrowIfDisposed();
+
         lock (_upgradesLock)
             return InternalHasUpgrade(upgradeId);
     }
 
     public bool TryAddUpgrade(int upgradeId)
     {
-        lock(_upgradesLock)
+        ThrowIfDisposed();
+
+        lock (_upgradesLock)
         {
             if (InternalHasUpgrade(upgradeId))
                 return false;
             _upgrades.Add(upgradeId);
+            UpgradeAdded?.Invoke(this, upgradeId);
+            return true;
+        }
+    }
+
+    public bool TryRemoveUpgrade(int upgradeId)
+    {
+        ThrowIfDisposed();
+
+        lock (_upgradesLock)
+        {
+            if (!InternalHasUpgrade(upgradeId))
+                return false;
+            _upgrades.Remove(upgradeId);
+            UpgradeRemoved?.Invoke(this, upgradeId);
             return true;
         }
     }

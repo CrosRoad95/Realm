@@ -12,7 +12,7 @@ public class AFKComponent : Component
 
     public DateTime? LastAFK { get; private set; }
     public bool IsAFK { get; private set; }
-    public event Action<Entity, bool, TimeSpan>? StateChanged;
+    public event Action<AFKComponent, bool, TimeSpan>? StateChanged;
 
     public AFKComponent()
     {
@@ -34,7 +34,7 @@ public class AFKComponent : Component
     protected virtual void StateHasChanged()
     {
         TimeSpan elapsed = (TimeSpan)((LastAFK == null) ? TimeSpan.Zero : DateTimeProvider.Now - LastAFK);
-        StateChanged?.Invoke(Entity, IsAFK, elapsed);
+        StateChanged?.Invoke(this, IsAFK, elapsed);
     }
 
     private void HandlePlayerAFKSStopped(Player player)

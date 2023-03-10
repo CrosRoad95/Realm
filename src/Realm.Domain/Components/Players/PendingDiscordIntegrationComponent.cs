@@ -16,12 +16,16 @@ public class PendingDiscordIntegrationComponent : Component
     {
     }
 
-    private bool HasPendingDiscordConnectionCode() => _discordConnectionCodeValidUntil != null && _discordConnectionCodeValidUntil > DateTimeProvider.Now;
+    private bool HasPendingDiscordConnectionCode() {
+        ThrowIfDisposed();
+
+        lock (_lock)
+            return _discordConnectionCodeValidUntil != null && _discordConnectionCodeValidUntil > DateTimeProvider.Now;
+    }
 
     public bool Verify(string code)
     {
         ThrowIfDisposed();
-
 
         lock (_lock)
         {

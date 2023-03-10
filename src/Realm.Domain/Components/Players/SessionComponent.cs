@@ -17,6 +17,8 @@ public abstract class SessionComponent : Component
 
     public void Start()
     {
+        ThrowIfDisposed();
+
         if (IsRunning)
             throw new SessionAlreadyRunningException();
         _stopwatch.Reset();
@@ -32,6 +34,8 @@ public abstract class SessionComponent : Component
 
     public void End()
     {
+        ThrowIfDisposed();
+
         Entity.Destroyed -= HandleDestroyed;
         SessionEnded?.Invoke(Entity);
         _stopwatch.Stop();

@@ -7,7 +7,7 @@ public class DiscoveriesComponent : Component
     private readonly object _discoveriesLock = new();
     public IReadOnlyCollection<int> Discoveries => _discoveries;
 
-    public event Action<int>? Discovered;
+    public event Action<DiscoveriesComponent, int>? Discovered;
 
     public DiscoveriesComponent() { }
 
@@ -22,7 +22,7 @@ public class DiscoveriesComponent : Component
         {
             var success = _discoveries.Add(discoveryId);
             if (success)
-                Discovered?.Invoke(discoveryId);
+                Discovered?.Invoke(this, discoveryId);
             return success;
         }
     }

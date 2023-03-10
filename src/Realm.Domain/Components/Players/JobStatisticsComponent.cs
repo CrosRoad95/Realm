@@ -13,6 +13,9 @@ public class JobStatisticsComponent : Component
     internal DateOnly Date => _date;
     private readonly object _lock = new object();
 
+    public event Action<JobStatisticsComponent, short, ulong, ulong>? PointsAdded;
+    public event Action<JobStatisticsComponent, short, ulong, ulong>? TimePlayedAdded;
+
     public JobStatisticsComponent(DateTime forDateTime)
     {
         _date = DateOnly.FromDateTime(forDateTime);
@@ -50,6 +53,7 @@ public class JobStatisticsComponent : Component
             jobStatistics.points += points;
             jobStatistics.sessionPoints += points;
             _jobStatistics[jobId] = jobStatistics;
+            PointsAdded?.Invoke(this, jobId, jobStatistics.points, jobStatistics.sessionPoints);
         }
     }
 
@@ -62,6 +66,7 @@ public class JobStatisticsComponent : Component
             jobStatistics.timePlayed += timePlayed;
             jobStatistics.sessionTimePlayed += timePlayed;
             _jobStatistics[jobId] = jobStatistics;
+            PointsAdded?.Invoke(this, jobId, jobStatistics.timePlayed, jobStatistics.sessionTimePlayed);
         }
     }
 

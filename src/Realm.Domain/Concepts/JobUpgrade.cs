@@ -3,5 +3,5 @@
 public struct JobUpgrade
 {
     public short jobId;
-    public int UpgradeId;
+    public int upgradeId;
 }

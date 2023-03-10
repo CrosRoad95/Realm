@@ -236,7 +236,7 @@ internal class SaveService : ISaveService
             user.JobUpgrades = jobUpgradesComponent.Upgrades.Select(x => new JobUpgrade
             {
                 JobId = x.jobId,
-                UpgradeId = x.UpgradeId,
+                UpgradeId = x.upgradeId,
             }).ToList();
         }
         else

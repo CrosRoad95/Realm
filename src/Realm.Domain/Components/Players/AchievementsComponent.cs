@@ -11,7 +11,8 @@ public class AchievementsComponent : Component
 
     public IReadOnlyDictionary<string, Achievement> Achievements => _achievements;
 
-    public event Action<Entity, string>? AchievementUnlocked;
+    public event Action<AchievementsComponent, string>? AchievementUnlocked;
+    public event Action<AchievementsComponent, string, float>? AchievementProgressed;
 
     public AchievementsComponent()
     {
@@ -28,7 +29,7 @@ public class AchievementsComponent : Component
         });
     }
 
-    private void TryInitializeAchievement(string achievementName)
+    private void TryInitializeAchievementInternal(string achievementName)
     {
         if (!_achievements.ContainsKey(achievementName))
             _achievements[achievementName] = new();
@@ -38,7 +39,7 @@ public class AchievementsComponent : Component
     {
         lock (_achievementsLock)
         {
-            TryInitializeAchievement(achievementName);
+            TryInitializeAchievementInternal(achievementName);
 
             var achievement = _achievements[achievementName];
             achievement.value = value;
@@ -50,7 +51,7 @@ public class AchievementsComponent : Component
     {
         lock (_achievementsLock)
         {
-            TryInitializeAchievement(achievementName);
+            TryInitializeAchievementInternal(achievementName);
 
             var value = _achievements[achievementName].value;
             return (T?)value;
@@ -61,26 +62,26 @@ public class AchievementsComponent : Component
     {
         lock (_achievementsLock)
         {
-            TryInitializeAchievement(achievementName);
+            TryInitializeAchievementInternal(achievementName);
             return _achievements[achievementName].progress;
         }
     }
     
-    public bool HasProgress(string achievementName, float progress)
+    public bool HasReachedProgressThreshold(string achievementName, float progress)
     {
         lock (_achievementsLock)
         {
-            TryInitializeAchievement(achievementName);
+            TryInitializeAchievementInternal(achievementName);
 
             return progress <= _achievements[achievementName].progress;
         }
     }
 
-    public async Task<bool> TryReceiveReward(string achievementName, Func<Task> action)
+    public bool TryReceiveReward(string achievementName)
     {
         lock (_achievementsLock)
         {
-            TryInitializeAchievement(achievementName);
+            TryInitializeAchievementInternal(achievementName);
 
             var achievement = _achievements[achievementName];
             if (achievement.prizeReceived)
@@ -88,7 +89,7 @@ public class AchievementsComponent : Component
 
             achievement.prizeReceived = true;
         }
-        await action();
+
         return true;
     }
 
@@ -96,17 +97,17 @@ public class AchievementsComponent : Component
     {
         lock (_achievementsLock)
         {
-            TryInitializeAchievement(achievementName);
+            TryInitializeAchievementInternal(achievementName);
 
-            if (!_achievements.ContainsKey(achievementName))
-                _achievements[achievementName] = new();
             var achievement = _achievements[achievementName];
-            if (achievement.prizeReceived || HasProgress(achievementName, maximumProgress))
+            if (achievement.prizeReceived || HasReachedProgressThreshold(achievementName, maximumProgress))
                 return false;
 
             achievement.progress = Math.Min(progress + achievement.progress, maximumProgress);
-            if (HasProgress(achievementName, maximumProgress))
-                AchievementUnlocked?.Invoke(Entity, achievementName);
+            if (HasReachedProgressThreshold(achievementName, maximumProgress))
+                AchievementUnlocked?.Invoke(this, achievementName);
+            else
+                AchievementProgressed?.Invoke(this, achievementName, achievement.progress);
 
             return true;
         }

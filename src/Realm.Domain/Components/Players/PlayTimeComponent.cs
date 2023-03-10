@@ -39,6 +39,8 @@ public class PlayTimeComponent : Component
 
     public void Reset()
     {
+        ThrowIfDisposed();
+
         _startDateTime = DateTimeProvider.Now;
     }
 }

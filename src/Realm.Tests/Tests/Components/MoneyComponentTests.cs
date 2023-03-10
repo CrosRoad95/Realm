@@ -35,11 +35,11 @@ public class MoneyComponentTests
     {
         decimal moneyAdded = 0;
         decimal moneyTaken = 0;
-        _moneyComponent.MoneyAdded += amount =>
+        _moneyComponent.MoneyAdded += (moneyComponent, amount) =>
         {
             moneyAdded += amount;
         };
-        _moneyComponent.MoneyTaken += amount =>
+        _moneyComponent.MoneyTaken += (moneyComponent, amount) =>
         {
             moneyTaken += amount;
         };
