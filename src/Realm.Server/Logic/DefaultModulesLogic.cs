@@ -2,9 +2,9 @@
 
 namespace Realm.Server.Logic;
 
-internal sealed class ModulesLogic
+public sealed class DefaultModulesLogic
 {
-    public ModulesLogic(IEnumerable<IModule> modules)
+    public DefaultModulesLogic(IEnumerable<IModule> modules)
     {
         modules.ToList();
     }

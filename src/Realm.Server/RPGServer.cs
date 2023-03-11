@@ -30,7 +30,7 @@ internal sealed class RPGServer : IRPGServer
                 builder.AddLogic<GuisLogic>();
                 builder.AddLogic<StartupLogic>();
                 builder.AddLogic<ChatLogic>();
-                builder.AddLogic<ModulesLogic>();
+                //builder.AddLogic<DefaultModulesLogic>();
                 builder.ConfigureServer(realmConfigurationProvider);
                 configureServerBuilder?.Invoke(builder);
 
