@@ -12,6 +12,7 @@ internal class OverlayResource : Resource
         ["utility.lua"] = ResourceFiles.Utility,
         ["hud.lua"] = ResourceFiles.Hud,
         ["notifications.lua"] = ResourceFiles.Notifications,
+        ["displays.lua"] = ResourceFiles.Displays,
     };
 
     internal OverlayResource(MtaServer server)

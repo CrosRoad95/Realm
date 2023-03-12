@@ -71,7 +71,7 @@ internal sealed class PlayerGameplayLogic
                         }
                         break;
                     case DurationBasedHoldInteractionComponent durationBasedHoldInteractionComponent:
-                        _logger.LogInformation("Interaction begin");
+                        _logger.LogInformation("Interaction begin {keyState}", keyState);
                         if (keyState == KeyState.Down)
                         {
                             var token = new CancellationTokenSource();
@@ -81,8 +81,9 @@ internal sealed class PlayerGameplayLogic
                             };
                             try
                             {
-                                if (await durationBasedHoldInteractionComponent.BeginInteraction(currentInteractEntity, TimeSpan.FromSeconds(5), token.Token))
+                                if (await durationBasedHoldInteractionComponent.BeginInteraction(playerEntity, TimeSpan.FromSeconds(3), token.Token))
                                 {
+                                    playerEntity.GetRequiredComponent<PlayerElementComponent>().SendChatMessage("okk");
                                     _logger.LogInformation("Interaction completed");
                                 }
                                 else
@@ -97,7 +98,7 @@ internal sealed class PlayerGameplayLogic
                         }
                         else
                         {
-                            if (durationBasedHoldInteractionComponent.EndInteraction(currentInteractEntity))
+                            if (durationBasedHoldInteractionComponent.EndInteraction(playerEntity))
                             {
                                 _logger.LogInformation("Interaction ended");
                             }

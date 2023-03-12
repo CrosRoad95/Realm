@@ -28,6 +28,8 @@ public class OverlayService
     internal Action<Player, string, float, float>? HudPositionChanged;
     internal Action<Player, string, Dictionary<int, object>>? HudStateChanged;
     internal Action<string, Dictionary<int, object>>? Hud3dStateChanged;
+    internal Action<Player, string, Vector3, TimeSpan>? Display3dRingAdded;
+    internal Action<Player, string>? Display3dRingRemoved;
     private readonly AssetsService _assetsService;
 
     public OverlayService(AssetsService assetsService)
@@ -85,8 +87,21 @@ public class OverlayService
     {
         HudRemoved?.Invoke(player, hudId);
     }
+
     public void RemoveHud3d(string hudId)
     {
         Hud3dRemoved?.Invoke(hudId);
+    }
+
+    public string AddRing3dDisplay(Player player, Vector3 position, TimeSpan time)
+    {
+        var id = Guid.NewGuid().ToString();
+        Display3dRingAdded?.Invoke(player, id, position, time);
+        return id;
+    }
+
+    public void RemoveRing3dDisplay(Player player, string id)
+    {
+        Display3dRingRemoved?.Invoke(player, id);
     }
 }

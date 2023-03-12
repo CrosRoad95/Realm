@@ -4,25 +4,25 @@ namespace Realm.Domain.Components.Elements;
 
 public class DurationBasedHoldInteractionComponent : InteractionComponent
 {
-    [Inject]
-    private ILogger<DurationBasedHoldInteractionComponent> Logger { get; set; }
-
     private readonly SemaphoreSlim _semaphore = new(1);
     public Entity? Owner { get; private set; }
     private TaskCompletionSource? _interactionTaskComplectionSource;
     private Task? _interactionTask;
+
+    public event Action<DurationBasedHoldInteractionComponent, Entity, TimeSpan>? InteractionStarted;
+    public event Action<DurationBasedHoldInteractionComponent, Entity, bool>? InteractionCompleted;
 
     public DurationBasedHoldInteractionComponent()
     {
 
     }
 
-    public async Task<bool> BeginInteraction(Entity playerEntity, TimeSpan timeSpan, CancellationToken cancellationToken = default)
+    public async Task<bool> BeginInteraction(Entity owningEntity, TimeSpan timeSpan, CancellationToken cancellationToken = default)
     {
-        if (playerEntity == null)
-            throw new NullReferenceException(nameof(playerEntity));
+        if (owningEntity == null)
+            throw new NullReferenceException(nameof(owningEntity));
 
-        if (!await _semaphore.WaitAsync(4))
+        if (!await _semaphore.WaitAsync(4, cancellationToken))
             return false;
 
         try
@@ -30,7 +30,7 @@ public class DurationBasedHoldInteractionComponent : InteractionComponent
             if (Owner != null)
                 return false;
 
-            Owner = playerEntity;
+            Owner = owningEntity;
             Owner.Destroyed += HandleDestroyed;
 
             _interactionTaskComplectionSource = new TaskCompletionSource();
@@ -45,15 +45,27 @@ public class DurationBasedHoldInteractionComponent : InteractionComponent
             _semaphore.Release();
         }
 
-        var finishedTask = await Task.WhenAny(_interactionTaskComplectionSource.Task, _interactionTask);
-        if (finishedTask == _interactionTask)
+        InteractionStarted?.Invoke(this, owningEntity, timeSpan);
+        try
         {
-            Owner.Destroyed -= HandleDestroyed;
-            Owner = null;
-            cancellationToken.ThrowIfCancellationRequested();
-            return true;
+            var finishedTask = await Task.WhenAny(_interactionTaskComplectionSource.Task, _interactionTask);
+            if (finishedTask == _interactionTask)
+            {
+                Owner.Destroyed -= HandleDestroyed;
+                Owner = null;
+                cancellationToken.ThrowIfCancellationRequested();
+                return true;
+            }
+            return false;
         }
-        return false;
+        catch (Exception)
+        {
+            throw;
+        }
+        finally
+        {
+            InteractionCompleted?.Invoke(this, owningEntity, false);
+        }
     }
 
     private void HandleDestroyed(Entity _)
@@ -75,16 +87,16 @@ public class DurationBasedHoldInteractionComponent : InteractionComponent
         }
     }
 
-    public bool EndInteraction(Entity playerEntity)
+    public bool EndInteraction(Entity owningEntity)
     {
-        if (playerEntity == null)
-            throw new NullReferenceException(nameof(playerEntity));
+        if (owningEntity == null)
+            throw new NullReferenceException(nameof(owningEntity));
 
         _semaphore.Wait();
 
         try
         {
-            if (Owner != playerEntity)
+            if (Owner != owningEntity)
                 return false;
 
             Owner.Destroyed -= HandleDestroyed;
@@ -104,6 +116,7 @@ public class DurationBasedHoldInteractionComponent : InteractionComponent
         }
         finally
         {
+            InteractionCompleted?.Invoke(this, owningEntity, true);
             _semaphore.Release();
         }
     }

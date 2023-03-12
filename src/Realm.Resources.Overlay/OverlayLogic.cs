@@ -32,6 +32,8 @@ internal class OverlayLogic
         _overlayService.HudPositionChanged = HandleHudPositionChanged;
         _overlayService.HudStateChanged = HandleHudStateChanged;
         _overlayService.Hud3dStateChanged = HandleHud3dStateChanged;
+        _overlayService.Display3dRingAdded = HandleDisplay3dRingAdded;
+        _overlayService.Display3dRingRemoved = HandleDisplay3dRingRemoved;
     }
 
     private void HandleNotificationAdded(Player player, string message)
@@ -106,5 +108,15 @@ internal class OverlayLogic
     private void HandlePlayerJoin(Player player)
     {
         _resource.StartFor(player);
+    }
+
+    private void HandleDisplay3dRingAdded(Player player, string id, Vector3 position, TimeSpan time)
+    {
+        _luaEventService.TriggerEvent("addDisplay3dRing", player, id, position.X, position.Y, position.Z, time.TotalMilliseconds);
+    }
+
+    private void HandleDisplay3dRingRemoved(Player player, string id)
+    {
+        _luaEventService.TriggerEvent("removeDisplay3dRing", player, id);
     }
 }

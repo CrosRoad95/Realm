@@ -1,4 +1,5 @@
 ﻿using Realm.Common.Providers;
+using Realm.Console.Components;
 using Realm.Console.Components.Huds;
 using Realm.Module.Discord.Interfaces;
 using SixLabors.Fonts;
@@ -360,6 +361,13 @@ internal sealed class CommandsLogic
         {
             var objectEntity = _entityFactory.CreateObject(SlipeServer.Server.Enums.ObjectModel.Gunbox, entity.Transform.Position + new Vector3(4, 0, -0.65f), Vector3.Zero);
             objectEntity.AddComponent<DurationBasedHoldInteractionComponent>();
+            return Task.CompletedTask;
+        });
+
+        _commandService.AddCommandHandler("spawnbox3", (entity, args) =>
+        {
+            var objectEntity = _entityFactory.CreateObject(SlipeServer.Server.Enums.ObjectModel.Gunbox, entity.Transform.Position + new Vector3(4, 0, -0.65f), Vector3.Zero);
+            objectEntity.AddComponent<DurationBasedHoldInteractionWithRingEffectComponent>();
             return Task.CompletedTask;
         });
 

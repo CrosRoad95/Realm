@@ -9,4 +9,5 @@ internal class ResourceFiles
     public static byte[] Utility { get; } = EmbeddedResourceHelper.GetLuaFile("Realm.Resources.Overlay.Lua.utility.lua", Assembly);
     public static byte[] Hud { get; } = EmbeddedResourceHelper.GetLuaFile("Realm.Resources.Overlay.Lua.hud.lua", Assembly);
     public static byte[] Notifications { get; } = EmbeddedResourceHelper.GetLuaFile("Realm.Resources.Overlay.Lua.notifications.lua", Assembly);
+    public static byte[] Displays { get; } = EmbeddedResourceHelper.GetLuaFile("Realm.Resources.Overlay.Lua.displays.lua", Assembly);
 }

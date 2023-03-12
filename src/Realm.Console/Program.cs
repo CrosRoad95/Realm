@@ -56,6 +56,7 @@ var server = builder.Build(null, extraBuilderSteps: serverBuilder =>
         x.AddInGameCommand<JobsStatsCommand>();
         x.AddInGameCommand<JobsStatsAllCommand>();
         x.AddInGameCommand<GiveRewardCommand>();
+        x.AddInGameCommand<Display3dRing>();
         #endregion
     });
 });
