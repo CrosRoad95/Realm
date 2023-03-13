@@ -1,4 +1,4 @@
-﻿using Realm.Domain.Components.CollisionShapes;
+﻿using Realm.Domain.Components.Elements.CollisionShapes;
 using Realm.Domain.Rules;
 
 namespace Realm.Console.Logic;

@@ -1,11 +1,11 @@
 ﻿using Realm.Configuration;
 using Realm.Domain;
-using Realm.Domain.Components.CollisionShapes;
 using SlipeServer.Server.Elements.ColShapes;
 using FluentAssertions;
 using Realm.Domain.Interfaces;
 using Serilog;
 using Realm.Resources.ClientInterface;
+using Realm.Domain.Components.Elements.CollisionShapes;
 
 namespace Realm.Tests.Tests.Components;
 

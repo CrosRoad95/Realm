@@ -1,4 +1,6 @@
-﻿namespace Realm.Console.Components.Gui;
+﻿using Realm.Domain.Contexts;
+
+namespace Realm.Console.Components.Gui;
 
 [ComponentUsage(false)]
 public sealed class TestShopGuiComponent : GuiComponent

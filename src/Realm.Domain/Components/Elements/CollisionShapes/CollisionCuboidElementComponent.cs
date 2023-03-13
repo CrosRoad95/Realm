@@ -1,4 +1,4 @@
-﻿namespace Realm.Domain.Components.CollisionShapes;
+﻿namespace Realm.Domain.Components.Elements.CollisionShapes;
 
 public class CollisionCuboidElementComponent : CollisionShapeElementComponent
 {

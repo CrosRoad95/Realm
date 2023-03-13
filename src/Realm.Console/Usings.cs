@@ -15,7 +15,6 @@ global using Realm.Domain.Components.Elements;
 global using Realm.Console.Components.Gui;
 global using Realm.Domain.Components.Players;
 global using Realm.Server.Interfaces;
-global using Realm.Domain.Contextes;
 global using Realm.Console.Data;
 global using Realm.Persistance.Data;
 global using Realm.Domain.Registries;

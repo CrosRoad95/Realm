@@ -1,6 +1,6 @@
 ﻿using Realm.Domain.Rules;
 
-namespace Realm.Domain.Components.CollisionShapes;
+namespace Realm.Domain.Components.Elements.CollisionShapes;
 
 public abstract class CollisionShapeElementComponent : ElementComponent
 {
@@ -34,11 +34,11 @@ public abstract class CollisionShapeElementComponent : ElementComponent
         }
     }
 
-    public void AddRule<TRule>() where TRule: IEntityRule, new()
+    public void AddRule<TRule>() where TRule : IEntityRule, new()
     {
         ThrowIfDisposed();
 
-        lock(_entityRulesLock)
+        lock (_entityRulesLock)
             _entityRules.Add(new TRule());
     }
 
@@ -46,7 +46,7 @@ public abstract class CollisionShapeElementComponent : ElementComponent
     {
         ThrowIfDisposed();
 
-        lock(_entityRulesLock)
+        lock (_entityRulesLock)
             _entityRules.Add(entityRule);
     }
 
@@ -59,14 +59,14 @@ public abstract class CollisionShapeElementComponent : ElementComponent
 
         try
         {
-            if(!EntityByElement.TryGetByElement(element, out var entity))
+            if (!EntityByElement.TryGetByElement(element, out var entity))
                 throw new NullReferenceException(nameof(entity));
 
-            lock(_entityRulesLock)
+            lock (_entityRulesLock)
                 if (_entityRules.All(x => x.Check(entity)))
                     EntityEntered(entity);
         }
-        catch(Exception ex)
+        catch (Exception ex)
         {
             Logger.LogError(ex, "Failed to handle element entered.");
         }
@@ -81,7 +81,7 @@ public abstract class CollisionShapeElementComponent : ElementComponent
 
         try
         {
-            if(!EntityByElement.TryGetByElement(element, out var entity))
+            if (!EntityByElement.TryGetByElement(element, out var entity))
                 throw new NullReferenceException(nameof(entity));
 
             lock (_entityRulesLock)

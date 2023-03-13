@@ -1,4 +1,4 @@
-﻿namespace Realm.Domain.Contextes;
+﻿namespace Realm.Domain.Contexts;
 
 internal class ActionContext : IActionContext
 {

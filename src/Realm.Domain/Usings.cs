@@ -33,7 +33,6 @@ global using Realm.Domain.Exceptions;
 global using Realm.Domain.Interfaces;
 global using SlipeServer.Server.Elements.ColShapes;
 global using Realm.Resources.AFK;
-global using Realm.Domain.Contextes;
 global using SlipeServer.Server.Events;
 global using SlipeServer.Server.Constants;
 global using SlipeServer.Resources.Text3d;
@@ -41,6 +40,8 @@ global using System.Runtime.CompilerServices;
 global using Microsoft.Extensions.Logging;
 global using Realm.Domain.Attributes;
 global using Realm.Domain.Concepts.Objectives;
+global using Realm.Domain.Components.Elements.CollisionShapes;
+global using Realm.Domain.Components.Object;
 
 [assembly: InternalsVisibleTo("Realm.Server")]
 [assembly: InternalsVisibleTo("Realm.Tests")]

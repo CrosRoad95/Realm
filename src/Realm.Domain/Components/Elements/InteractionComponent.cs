@@ -1,4 +1,4 @@
-﻿namespace Realm.Domain.Components.Object;
+﻿namespace Realm.Domain.Components.Elements;
 
 public class InteractionComponent : Component
 {

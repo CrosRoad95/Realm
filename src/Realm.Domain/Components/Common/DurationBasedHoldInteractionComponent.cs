@@ -1,6 +1,4 @@
-﻿using Realm.Domain.Components.Object;
-
-namespace Realm.Domain.Components.Elements;
+﻿namespace Realm.Domain.Components.Common;
 
 public class DurationBasedHoldInteractionComponent : InteractionComponent
 {
@@ -110,7 +108,7 @@ public class DurationBasedHoldInteractionComponent : InteractionComponent
 
             return true;
         }
-        catch(Exception)
+        catch (Exception)
         {
             throw;
         }

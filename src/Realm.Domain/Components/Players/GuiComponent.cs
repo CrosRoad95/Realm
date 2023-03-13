@@ -1,4 +1,6 @@
-﻿namespace Realm.Domain.Components.Players;
+﻿using Realm.Domain.Contexts;
+
+namespace Realm.Domain.Components.Players;
 
 public abstract class GuiComponent : Component
 {
