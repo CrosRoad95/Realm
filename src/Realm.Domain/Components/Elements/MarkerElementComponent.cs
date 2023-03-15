@@ -77,7 +77,7 @@ public class MarkerElementComponent : ElementComponent
         if (Entity.TryGetComponent(out PlayerElementComponent playerElementComponent))
             _collisionShape.Id = (ElementId)playerElementComponent.MapIdGenerator.GetId();
 
-        Entity.Destroyed += HandleDestroyed;
+        Entity.Disposed += HandleDestroyed;
         _collisionShape.ElementEntered += HandleElementEntered;
         _collisionShape.ElementLeft += HandleElementLeft;
         _collisionShape.Position = _marker.Position;

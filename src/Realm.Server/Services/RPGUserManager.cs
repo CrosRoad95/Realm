@@ -144,7 +144,7 @@ internal class RPGUserManager : IRPGUserManager
         {
             _lock.Release();
         }
-        entity.Destroyed += HandleDestroyed;
+        entity.Disposed += HandleDestroyed;
         return true;
     }
 

@@ -11,7 +11,7 @@ public sealed class EntityByStringIdCollection
             return false;
         _entitiesById[id] = entity;
         _idByEntity[entity] = id;
-        entity.Destroyed += HandleDestroyed;
+        entity.Disposed += HandleDestroyed;
         return true;
     }
 
@@ -23,7 +23,7 @@ public sealed class EntityByStringIdCollection
 
         _entitiesById.Remove(id);
         _idByEntity.Remove(entity);
-        entity.Destroyed -= HandleDestroyed;
+        entity.Disposed -= HandleDestroyed;
     }
 
     public string? GetEntityId(Entity entity)

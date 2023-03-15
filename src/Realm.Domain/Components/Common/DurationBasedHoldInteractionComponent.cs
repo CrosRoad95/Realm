@@ -29,7 +29,7 @@ public class DurationBasedHoldInteractionComponent : InteractionComponent
                 return false;
 
             Owner = owningEntity;
-            Owner.Destroyed += HandleDestroyed;
+            Owner.Disposed += HandleDestroyed;
 
             _interactionTaskComplectionSource = new TaskCompletionSource();
             _interactionTask = Task.Delay(timeSpan, cancellationToken);
@@ -49,7 +49,7 @@ public class DurationBasedHoldInteractionComponent : InteractionComponent
             var finishedTask = await Task.WhenAny(_interactionTaskComplectionSource.Task, _interactionTask);
             if (finishedTask == _interactionTask)
             {
-                Owner.Destroyed -= HandleDestroyed;
+                Owner.Disposed -= HandleDestroyed;
                 Owner = null;
                 cancellationToken.ThrowIfCancellationRequested();
                 return true;
@@ -97,7 +97,7 @@ public class DurationBasedHoldInteractionComponent : InteractionComponent
             if (Owner != owningEntity)
                 return false;
 
-            Owner.Destroyed -= HandleDestroyed;
+            Owner.Disposed -= HandleDestroyed;
             Owner = null;
 
             if (_interactionTaskComplectionSource != null)

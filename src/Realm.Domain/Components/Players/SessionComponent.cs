@@ -24,7 +24,7 @@ public abstract class SessionComponent : Component
         _stopwatch.Reset();
         _stopwatch.Start();
         SessionStarted?.Invoke(Entity);
-        Entity.Destroyed += HandleDestroyed;
+        Entity.Disposed += HandleDestroyed;
     }
 
     private void HandleDestroyed(Entity entity)
@@ -36,7 +36,7 @@ public abstract class SessionComponent : Component
     {
         ThrowIfDisposed();
 
-        Entity.Destroyed -= HandleDestroyed;
+        Entity.Disposed -= HandleDestroyed;
         SessionEnded?.Invoke(Entity);
         _stopwatch.Stop();
     }

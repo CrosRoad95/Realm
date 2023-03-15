@@ -36,7 +36,7 @@ public class Entity : IDisposable
     public event Action<Component>? ComponentAdded;
     public event Action<Component>? ComponentDetached;
 
-    public event Action<Entity>? Destroyed;
+    public event Action<Entity>? Disposed;
 
     internal Player Player => GetRequiredComponent<PlayerElementComponent>().Player;
 
@@ -304,10 +304,21 @@ public class Entity : IDisposable
         DetachComponent(component);
     }
 
-    private void Destroy()
+    public override string ToString() => Name;
+
+    protected void ThrowIfDisposed()
     {
-        if (Destroyed != null)
-            Destroyed.Invoke(this);
+        if (_disposed)
+            throw new ObjectDisposedException(nameof(Objective));
+    }
+
+    public virtual void Dispose()
+    {
+        ThrowIfDisposed();
+        _cancellationTokenSource.Cancel();
+
+        if (Disposed != null)
+            Disposed.Invoke(this);
 
         List<Component> componentsToDestroy;
         _componentsLock.EnterReadLock();
@@ -322,21 +333,7 @@ public class Entity : IDisposable
 
         foreach (var component in componentsToDestroy)
             DestroyComponent(component);
-    }
 
-    public override string ToString() => Name;
-
-    protected void ThrowIfDisposed()
-    {
-        if (_disposed)
-            throw new ObjectDisposedException(nameof(Objective));
-    }
-
-    public virtual void Dispose()
-    {
-        ThrowIfDisposed();
-        _cancellationTokenSource.Cancel();
-        Destroy();
         _disposed = true;
     }
 }

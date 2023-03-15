@@ -37,7 +37,7 @@ internal sealed class PlayerJoinedLogic
         entity.AddComponent<LoginGuiComponent>();
 
         entity.ComponentAdded += HandleComponentAdded;
-        entity.Destroyed += HandleDestroyed;
+        entity.Disposed += HandleDestroyed;
     }
 
     private void HandleDestroyed(Entity entity)

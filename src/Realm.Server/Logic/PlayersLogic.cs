@@ -98,7 +98,7 @@ internal class PlayersLogic
 
     private void HandleEntityCreated(Entity entity)
     {
-        entity.Destroyed += HandleEntityDestroyed;
+        entity.Disposed += HandleEntityDestroyed;
         entity.ComponentAdded += HandleComponentAdded;
     }
 

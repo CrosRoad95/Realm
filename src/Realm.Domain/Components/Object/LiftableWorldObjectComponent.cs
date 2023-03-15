@@ -17,7 +17,7 @@ public class LiftableWorldObjectComponent : InteractionComponent
             if(Owner == null)
             {
                 Owner = entity;
-                Owner.Destroyed += HandleDestroyed;
+                Owner.Disposed += HandleDestroyed;
                 return true;
             }
         }
@@ -37,7 +37,7 @@ public class LiftableWorldObjectComponent : InteractionComponent
             {
                 return false;
             }
-            Owner.Destroyed -= HandleDestroyed;
+            Owner.Disposed -= HandleDestroyed;
             Owner = null;
         }
         return true;

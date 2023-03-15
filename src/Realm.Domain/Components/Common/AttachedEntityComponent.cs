@@ -26,12 +26,12 @@ public class AttachedEntityComponent : Component
     private void HandleAttachedEntityDestroyed(Entity entity)
     {
         Entity.DestroyComponent(this);
-        AttachedEntity.Destroyed -= HandleAttachedEntityDestroyed;
+        AttachedEntity.Disposed -= HandleAttachedEntityDestroyed;
     }
 
     protected override void Load()
     {
-        AttachedEntity.Destroyed += HandleAttachedEntityDestroyed;
+        AttachedEntity.Disposed += HandleAttachedEntityDestroyed;
         var element = AttachedEntity.GetRequiredComponent<ElementComponent>().Element;
         var ped = Entity.GetRequiredComponent<PedElementComponent>().Ped;
         BoneAttachService.Attach(element, ped, _boneId, _positionOffset, _rotationOffset);
@@ -41,7 +41,7 @@ public class AttachedEntityComponent : Component
     public override void Dispose()
     {
         var element = AttachedEntity.GetRequiredComponent<ElementComponent>().Element;
-        AttachedEntity.Destroyed -= HandleAttachedEntityDestroyed;
+        AttachedEntity.Disposed -= HandleAttachedEntityDestroyed;
         if (BoneAttachService.IsAttached(element))
             BoneAttachService.Detach(element);
         base.Dispose();

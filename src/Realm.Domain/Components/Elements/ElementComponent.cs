@@ -32,7 +32,7 @@ public abstract class ElementComponent : Component
         }
         else
         {
-            Entity.Destroyed -= HandleDestroyed;
+            Entity.Disposed -= HandleDestroyed;
             Element.Destroy();
         }
     }
@@ -48,7 +48,7 @@ public abstract class ElementComponent : Component
         else
         {
             Entity.Transform.Bind(Element);
-            Entity.Destroyed += HandleDestroyed;
+            Entity.Disposed += HandleDestroyed;
             Entity.Transform.PositionChanged += HandleTransformPositionChanged;
             Entity.Transform.RotationChanged += HandleTransformRotationChanged;
         }

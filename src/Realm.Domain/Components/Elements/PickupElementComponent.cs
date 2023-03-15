@@ -70,7 +70,7 @@ public class PickupElementComponent : ElementComponent
     protected override void Load()
     {
         base.Load();
-        Entity.Destroyed += HandleDestroyed;
+        Entity.Disposed += HandleDestroyed;
         _pickup.CollisionShape.ElementEntered += HandleElementEntered;
         _pickup.CollisionShape.ElementLeft += HandleElementLeft;
         _pickup.CollisionShape.Position = _pickup.Position;

@@ -7,13 +7,13 @@ public class VehicleExclusiveAccessComponent : VehicleAccessControllerComponent
     public VehicleExclusiveAccessComponent(Entity targetPlayerEntity)
     {
         _entity = targetPlayerEntity;
-        _entity.Destroyed += HandleTargetEntityDestroyed;
+        _entity.Disposed += HandleTargetEntityDestroyed;
     }
 
     private void HandleTargetEntityDestroyed(Entity obj)
     {
         Entity.DestroyComponent(this);
-        _entity.Destroyed -= HandleTargetEntityDestroyed;
+        _entity.Disposed -= HandleTargetEntityDestroyed;
     }
 
     protected override void Load()

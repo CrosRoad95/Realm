@@ -59,7 +59,7 @@ public sealed class ECS : IEntityByElement
         }
         _entityByName[name] = newlyCreatedEntity;
         newlyCreatedEntity.ComponentAdded += HandleComponentAdded;
-        newlyCreatedEntity.Destroyed += HandleEntityDestroyed;
+        newlyCreatedEntity.Disposed += HandleEntityDestroyed;
         if (entityBuilder != null)
             entityBuilder(newlyCreatedEntity);
         EntityCreated?.Invoke(newlyCreatedEntity);
@@ -99,7 +99,7 @@ public sealed class ECS : IEntityByElement
         {
             var player = playerElementComponent.Player;
             _entityByPlayer[playerElementComponent.Player] = component.Entity;
-            component.Entity.Destroyed += HandlePlayerEntityDestroyed;
+            component.Entity.Disposed += HandlePlayerEntityDestroyed;
         }
     }
 
@@ -111,7 +111,7 @@ public sealed class ECS : IEntityByElement
 
     private void HandlePlayerEntityDestroyed(Entity playerEntity)
     {
-        playerEntity.Destroyed -= HandlePlayerEntityDestroyed;
+        playerEntity.Disposed -= HandlePlayerEntityDestroyed;
         var playerComponent = playerEntity.GetRequiredComponent<PlayerElementComponent>();
         _entityByPlayer.Remove(playerComponent.Player, out var _);
     }
