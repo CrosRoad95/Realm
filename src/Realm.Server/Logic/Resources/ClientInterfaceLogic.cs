@@ -1,7 +1,4 @@
-﻿using Realm.Domain.Interfaces;
-using SlipeServer.Server.Elements;
-
-namespace Realm.Server.Logic.Resources;
+﻿namespace Realm.Server.Logic.Resources;
 
 internal class ClientInterfaceLogic
 {

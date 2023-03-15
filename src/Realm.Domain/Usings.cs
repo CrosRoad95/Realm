@@ -5,7 +5,6 @@ global using Vehicle = SlipeServer.Server.Elements.Vehicle;
 global using Newtonsoft.Json;
 global using Microsoft.AspNetCore.Identity;
 global using Microsoft.Extensions.DependencyInjection;
-global using Realm.Resources.StatisticsCounter;
 global using Realm.Persistance.Data;
 global using System.Security.Claims;
 global using Realm.Domain.Components.Common;
@@ -42,6 +41,7 @@ global using Realm.Domain.Attributes;
 global using Realm.Domain.Concepts.Objectives;
 global using Realm.Domain.Components.Elements.CollisionShapes;
 global using Realm.Domain.Components.Object;
+global using System.Globalization;
 
 [assembly: InternalsVisibleTo("Realm.Server")]
 [assembly: InternalsVisibleTo("Realm.Tests")]

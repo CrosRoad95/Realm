@@ -1,5 +1,4 @@
-﻿using Realm.Domain.Inventory;
-using System.Collections.Concurrent;
+﻿using System.Collections.Concurrent;
 
 namespace Realm.Domain.Components.Players;
 

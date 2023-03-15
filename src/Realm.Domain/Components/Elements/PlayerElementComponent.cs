@@ -3,7 +3,6 @@ using Realm.Domain.IdGenerators;
 using SlipeServer.Server.Clients;
 using SlipeServer.Server.Collections;
 using SlipeServer.Server.Concepts;
-using SlipeServer.Server.Elements;
 
 namespace Realm.Domain.Components.Elements;
 
@@ -27,6 +26,7 @@ public sealed class PlayerElementComponent : PedElementComponent
     private Entity? _focusedEntity;
     private readonly Player _player;
     private readonly Vector2 _screenSize;
+    private readonly CultureInfo _culture;
     private readonly Dictionary<string, Func<Entity, KeyState, Task>> _binds = new();
     private readonly SemaphoreSlim _bindsLock = new(1);
     private readonly SemaphoreSlim _bindsUpLock = new(1);
@@ -49,12 +49,12 @@ public sealed class PlayerElementComponent : PedElementComponent
         }
     }
     public Vector2 ScreenSize => _screenSize;
+    public CultureInfo Culture => _culture;
 
     internal Player Player => _player;
     internal bool Spawned { get; set; }
     public string Name { get => Player.Name; set => Player.Name = value; }
     public IClient Client => Player.Client;
-    public string Language { get; private set; } = "pl";
     public Controls Controls => _player.Controls;
     public WeaponCollection Weapons => _player.Weapons;
 
@@ -74,10 +74,11 @@ public sealed class PlayerElementComponent : PedElementComponent
         }
     }
 
-    internal PlayerElementComponent(Player player, Vector2 screenSize) : base(player)
+    internal PlayerElementComponent(Player player, Vector2 screenSize, CultureInfo cultureInfo) : base(player)
     {
         _player = player;
         _screenSize = screenSize;
+        _culture = cultureInfo;
     }
 
     protected override void Load()

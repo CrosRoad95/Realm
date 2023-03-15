@@ -1,5 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection.Extensions;
-using Realm.Common.Providers;
+﻿using Realm.Common.Providers;
 using Realm.Domain.IdGenerators;
 using Realm.Domain.Registries;
 using Realm.Module.Discord;
@@ -7,9 +6,7 @@ using Realm.Module.Grpc;
 using Realm.Module.WebApp;
 using Realm.Server.Logic;
 using SlipeServer.Server.Elements.IdGeneration;
-using SlipeServer.Server.Enums;
 using SlipeServer.Server.Loggers;
-using System.Collections.Concurrent;
 
 namespace Realm.Server;
 
@@ -39,7 +36,6 @@ internal sealed class RPGServer : IRPGServer
         );
 
         _logger = GetRequiredService<ILogger<RPGServer>>();
-        _logger.LogInformation("Starting server:");
     }
 
     private void ConfigureServices(IServiceCollection services, IRealmConfigurationProvider realmConfigurationProvider)

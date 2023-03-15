@@ -1,6 +1,4 @@
-﻿using System.Globalization;
-
-namespace Realm.Domain.Options;
+﻿namespace Realm.Domain.Options;
 
 public class GameplayOptions
 {

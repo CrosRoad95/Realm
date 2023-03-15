@@ -1,6 +1,5 @@
 ﻿using AchievementData = Realm.Persistance.Data.Achievement;
 using Achievement = Realm.Domain.Concepts.Achievement;
-using System;
 
 namespace Realm.Domain.Components.Players;
 

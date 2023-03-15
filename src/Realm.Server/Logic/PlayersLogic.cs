@@ -1,6 +1,7 @@
 ﻿using Realm.Common.Providers;
 using Realm.Common.Utilities;
 using System.Collections.Concurrent;
+using System.Globalization;
 
 namespace Realm.Server.Logic;
 
@@ -36,16 +37,28 @@ internal class PlayersLogic
         player.ResourceStarted += HandlePlayerResourceStarted;
         player.Disconnected += HandlePlayerDisconnected;
 
-        var source = new TaskCompletionSource<(int, int)>();
+        var taskWaitForScreenSize = new TaskCompletionSource<(int, int)>();
+        var taskWaitForCultureInfo = new TaskCompletionSource<CultureInfo>();
         void HandleClientScreenSizeChanged(Player player2, int x, int y)
         {
             if(player2 == player)
             {
                 _clientInterfaceService.ClientScreenSizeChanged -= HandleClientScreenSizeChanged;
-                source.SetResult((x, y));
+                taskWaitForScreenSize.SetResult((x, y));
             }
         }
+
+        void HandleClientCultureInfoChanged(Player player2, CultureInfo cultureInfo)
+        {
+            if (player2 == player)
+            {
+                _clientInterfaceService.ClientCultureInfoChanged -= HandleClientCultureInfoChanged;
+                taskWaitForCultureInfo.SetResult(cultureInfo);
+            }
+        }
+
         _clientInterfaceService.ClientScreenSizeChanged += HandleClientScreenSizeChanged;
+        _clientInterfaceService.ClientCultureInfoChanged += HandleClientCultureInfoChanged;
 
         try
         {
@@ -62,12 +75,20 @@ internal class PlayersLogic
             _playerResources.TryRemove(player, out var _);
         }
 
-        var screenSize = await source.Task;
-
-        _ecs.CreateEntity("Player " + player.Name, Entity.EntityTag.Player, entity =>
+        try
         {
-            entity.AddComponent(new PlayerElementComponent(player, new Vector2(screenSize.Item1, screenSize.Item2)));
-        });
+            var screenSize = await taskWaitForScreenSize.Task;
+            var cultureInfo = await taskWaitForCultureInfo.Task;
+
+            _ecs.CreateEntity("Player " + player.Name, Entity.EntityTag.Player, entity =>
+            {
+                entity.AddComponent(new PlayerElementComponent(player, new Vector2(screenSize.Item1, screenSize.Item2), cultureInfo));
+            });
+        }
+        catch(Exception ex)
+        {
+            ;
+        }
     }
 
     private void HandlePlayerResourceStarted(Player player, SlipeServer.Server.Elements.Events.PlayerResourceStartedEventArgs e)

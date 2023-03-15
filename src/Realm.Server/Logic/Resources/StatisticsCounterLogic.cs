@@ -1,6 +1,4 @@
-﻿using Realm.Domain.Interfaces;
-
-namespace Realm.Server.Logic.Resources;
+﻿namespace Realm.Server.Logic.Resources;
 
 internal class StatisticsCounterLogic
 {
