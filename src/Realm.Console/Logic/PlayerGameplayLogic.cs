@@ -1,4 +1,5 @@
-﻿using Realm.Server.Extensions;
+﻿using Realm.Domain.Enums;
+using Realm.Server.Extensions;
 using SlipeServer.Server.Elements.Enums;
 
 namespace Realm.Console.Logic;
@@ -40,7 +41,7 @@ internal sealed class PlayerGameplayLogic
     {
         if(playerEntity.TryGetComponent(out AttachedEntityComponent attachedEntityComponent))
         {
-            await playerEntity.GetRequiredComponent<PlayerElementComponent>().DoAnimationAsync(PlayerElementComponent.Animation.CarryPutDown);
+            await playerEntity.GetRequiredComponent<PlayerElementComponent>().DoAnimationAsync(Animation.CarryPutDown);
 
             if (attachedEntityComponent.AttachedEntity.GetRequiredComponent<LiftableWorldObjectComponent>().TryDrop())
             {
@@ -65,8 +66,8 @@ internal sealed class PlayerGameplayLogic
                     case LiftableWorldObjectComponent liftableWorldObjectComponent when keyState == KeyState.Down:
                         if (playerEntity.IsLookingAt(currentInteractEntity) && liftableWorldObjectComponent.TryLift(playerEntity))
                         {
-                            await playerElementComponent.DoAnimationAsync(PlayerElementComponent.Animation.CarryLiftUp);
-                            playerElementComponent.DoAnimation(PlayerElementComponent.Animation.StartCarry);
+                            await playerElementComponent.DoAnimationAsync(Animation.CarryLiftUp);
+                            playerElementComponent.DoAnimation(Animation.StartCarry);
                             playerEntity.AddComponent(new AttachedEntityComponent(currentInteractEntity, SlipeServer.Packets.Enums.BoneId.LeftHand, new Vector3(0.2f, 0.2f, -0), new Vector3(0, -20, 0)));
                         }
                         break;

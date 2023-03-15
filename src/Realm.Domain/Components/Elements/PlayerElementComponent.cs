@@ -1,10 +1,4 @@
-﻿using Realm.Common.Providers;
-using Realm.Domain.IdGenerators;
-using SlipeServer.Server.Clients;
-using SlipeServer.Server.Collections;
-using SlipeServer.Server.Concepts;
-
-namespace Realm.Domain.Components.Elements;
+﻿namespace Realm.Domain.Components.Elements;
 
 public sealed class PlayerElementComponent : PedElementComponent
 {
@@ -388,23 +382,6 @@ public sealed class PlayerElementComponent : PedElementComponent
     {
         ThrowIfDisposed();
         Text3dService.SetRenderingEnabled(_player, enabled);
-    }
-
-    public enum Animation
-    {
-        StartCarry,
-        CrouchAndTakeALook,
-        Swing,
-        Click,
-        Eat,
-        Sit,
-        CarryLiftUp,
-        CarryPutDown,
-        CarryLiftUpFromTable,
-        CarryPutDownOnTable,
-
-        // Complex animations
-        ComplexLiftUp,
     }
 
     public async Task DoComplexAnimationAsync(Animation animation, bool blockMovement = true)

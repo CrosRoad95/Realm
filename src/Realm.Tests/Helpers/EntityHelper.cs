@@ -17,7 +17,7 @@ public class EntityHelper
     public Entity CreatePlayerEntity()
     {
         var entity = new Entity(_serviceProvider, Guid.NewGuid().ToString()[..8], Entity.EntityTag.Player);
-        entity.AddComponent(new PlayerElementComponent(_testingServer.AddFakePlayer(), new System.Numerics.Vector2(1920, 1080)));
+        entity.AddComponent(new PlayerElementComponent(_testingServer.AddFakePlayer(), new System.Numerics.Vector2(1920, 1080), new System.Globalization.CultureInfo("pl-PL")));
         return entity;
     }
 }

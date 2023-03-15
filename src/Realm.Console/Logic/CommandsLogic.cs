@@ -1,6 +1,7 @@
 ﻿using Realm.Common.Providers;
 using Realm.Console.Components;
 using Realm.Console.Components.Huds;
+using Realm.Domain.Enums;
 using Realm.Module.Discord.Interfaces;
 using SixLabors.Fonts;
 using SixLabors.ImageSharp.Drawing.Processing;

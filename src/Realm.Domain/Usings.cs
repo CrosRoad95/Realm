@@ -42,6 +42,12 @@ global using Realm.Domain.Concepts.Objectives;
 global using Realm.Domain.Components.Elements.CollisionShapes;
 global using Realm.Domain.Components.Object;
 global using System.Globalization;
+global using Realm.Common.Providers;
+global using Realm.Domain.Enums;
+global using Realm.Domain.IdGenerators;
+global using SlipeServer.Server.Clients;
+global using SlipeServer.Server.Collections;
+global using SlipeServer.Server.Concepts;
 
 [assembly: InternalsVisibleTo("Realm.Server")]
 [assembly: InternalsVisibleTo("Realm.Tests")]
