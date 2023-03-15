@@ -80,6 +80,7 @@ public static class ServerBuilderExtensions
         // Resources logics
         builder.AddLogic<ClientInterfaceLogic>();
         builder.AddLogic<StatisticsCounterLogic>();
+        builder.AddLogic<DefaultAfkLogic>();
 
         // Miscellaneous logic
         builder.AddLogic<EssentialCommandsLogic>();

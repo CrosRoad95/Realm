@@ -1,35 +1,15 @@
-﻿using Realm.Common.Providers;
-
-namespace Realm.Domain.Components.Players;
+﻿namespace Realm.Domain.Components.Players;
 
 [ComponentUsage(false)]
 public class AFKComponent : Component
 {
     [Inject]
     private IDateTimeProvider DateTimeProvider { get; set; } = default!;
-    [Inject]
-    private AFKService AFKService { get; set; } = default!;
 
     public DateTime? LastAFK { get; private set; }
     public bool IsAFK { get; private set; }
     public event Action<AFKComponent, bool, TimeSpan>? StateChanged;
-
-    public AFKComponent()
-    {
-    }
-
-    protected override void Load()
-    {
-        AFKService.PlayerAFKStarted += HandlePlayerAFKStarted;
-        AFKService.PlayerAFKSStopped += HandlePlayerAFKSStopped;
-    }
-
-    public override void Dispose()
-    {
-        base.Dispose();
-        AFKService.PlayerAFKStarted -= HandlePlayerAFKStarted;
-        AFKService.PlayerAFKSStopped -= HandlePlayerAFKSStopped;
-    }
+    private object _lock = new();
 
     protected virtual void StateHasChanged()
     {
@@ -37,23 +17,23 @@ public class AFKComponent : Component
         StateChanged?.Invoke(this, IsAFK, elapsed);
     }
 
-    private void HandlePlayerAFKSStopped(Player player)
+    internal void HandlePlayerAFKStopped()
     {
-        if(!Entity.GetRequiredComponent<PlayerElementComponent>().Compare(player))
-            return;
-
-        IsAFK = false;
-        StateHasChanged();
-        LastAFK = DateTimeProvider.Now;
+        lock (_lock)
+        {
+            IsAFK = false;
+            StateHasChanged();
+            LastAFK = DateTimeProvider.Now;
+        }
     }
 
-    private void HandlePlayerAFKStarted(Player player)
+    internal void HandlePlayerAFKStarted()
     {
-        if (!Entity.GetRequiredComponent<PlayerElementComponent>().Compare(player))
-            return;
-
-        IsAFK = true;
-        StateHasChanged();
-        LastAFK = DateTimeProvider.Now;
+        lock(_lock)
+        {
+            IsAFK = true;
+            StateHasChanged();
+            LastAFK = DateTimeProvider.Now;
+        }
     }
 }

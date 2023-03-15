@@ -6,7 +6,7 @@ namespace Realm.Resources.AFK;
 public class AFKService
 {
     public event Action<Player>? PlayerAFKStarted;
-    public event Action<Player>? PlayerAFKSStopped;
+    public event Action<Player>? PlayerAFKStopped;
     private readonly HashSet<Player> _afkPlayers = new();
 
     public AFKService(LuaEventService luaEventService)
@@ -24,6 +24,6 @@ public class AFKService
     internal void HandleAFKStop(Player player)
     {
         if(_afkPlayers.Remove(player))
-            PlayerAFKSStopped?.Invoke(player);
+            PlayerAFKStopped?.Invoke(player);
     }
 }
