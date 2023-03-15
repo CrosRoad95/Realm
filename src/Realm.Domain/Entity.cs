@@ -38,6 +38,8 @@ public class Entity : IDisposable
 
     public event Action<Entity>? Destroyed;
 
+    internal Player Player => GetRequiredComponent<PlayerElementComponent>().Player;
+
     public Entity(IServiceProvider serviceProvider, string name = "", EntityTag tag = EntityTag.Unknown)
     {
         _cancellationTokenSource = new CancellationTokenSource();

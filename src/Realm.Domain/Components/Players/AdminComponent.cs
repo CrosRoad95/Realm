@@ -33,8 +33,7 @@ public class AdminComponent : Component
         {
             if (_developmentMode != value)
             {
-                var player = Entity.GetRequiredComponent<PlayerElementComponent>().Player;
-                ClientInterfaceService.SetDevelopmentModeEnabled(player, value);
+                ClientInterfaceService.SetDevelopmentModeEnabled(Entity.Player, value);
                 _developmentMode = value;
                 DevelopmentModeStateChanged?.Invoke(this, _developmentMode);
             }
@@ -47,8 +46,7 @@ public class AdminComponent : Component
         {
             if (_debugView != value)
             {
-                var player = Entity.GetRequiredComponent<PlayerElementComponent>().Player;
-                DebugLog.SetVisibleTo(player, value);
+                DebugLog.SetVisibleTo(Entity.Player, value);
                 _debugView = value;
                 DebugViewStateChanged?.Invoke(this, _debugView);
             }
@@ -61,14 +59,13 @@ public class AdminComponent : Component
         {
             if (_adminTools != value)
             {
-                var player = Entity.GetRequiredComponent<PlayerElementComponent>().Player;
                 if (value)
                 {
-                    AdminToolsService.EnableAdminToolsForPlayer(player);
+                    AdminToolsService.EnableAdminToolsForPlayer(Entity.Player);
                 }
                 else
                 {
-                    AdminToolsService.DisableAdminToolsForPlayer(player);
+                    AdminToolsService.DisableAdminToolsForPlayer(Entity.Player);
                 }
                 _adminTools = value;
                 AdminToolsStateChanged?.Invoke(this, _adminTools);
@@ -82,8 +79,7 @@ public class AdminComponent : Component
         {
             if (_noClip != value)
             {
-                var player = Entity.GetRequiredComponent<PlayerElementComponent>().Player;
-                NoClipService.SetEnabledTo(player, value);
+                NoClipService.SetEnabledTo(Entity.Player, value);
                 _noClip = value;
                 NoClipStateChanged?.Invoke(this, _noClip);
             }
@@ -96,8 +92,7 @@ public class AdminComponent : Component
         {
             if (_interactionDebugRenderingEnabled != value)
             {
-                var player = Entity.GetRequiredComponent<PlayerElementComponent>().Player;
-                ClientInterfaceService.SetFocusableRenderingEnabled(player, _interactionDebugRenderingEnabled);
+                ClientInterfaceService.SetFocusableRenderingEnabled(Entity.Player, _interactionDebugRenderingEnabled);
                 _interactionDebugRenderingEnabled = value;
                 NoClipStateChanged?.Invoke(this, _interactionDebugRenderingEnabled);
 
@@ -105,24 +100,13 @@ public class AdminComponent : Component
         }
     }
 
-    private Task ToggleNoClip(Entity entity)
+    public void ToggleNoClip()
     {
         NoClip = !NoClip;
-        return Task.CompletedTask;
-    }
-
-    protected override void Load()
-    {
-        var playerElementComponent = Entity.GetRequiredComponent<PlayerElementComponent>();
-        playerElementComponent.SendChatMessage("Admin mode enabled.");
-        playerElementComponent.SetBind("num_0", ToggleNoClip);
     }
 
     public override void Dispose()
     {
-        var playerElementComponent = Entity.GetRequiredComponent<PlayerElementComponent>();
-        playerElementComponent.SendChatMessage("Admin mode enabled.");
-        playerElementComponent.Unbind("num_0");
         DevelopmentMode = false;
         DebugView = false;
         AdminTools = false;
