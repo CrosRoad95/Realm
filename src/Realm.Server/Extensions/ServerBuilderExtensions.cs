@@ -4,21 +4,32 @@ using Realm.Persistance.MySql;
 using Realm.Resources.Assets;
 using SlipeServer.Resources.BoneAttach;
 using SlipeServer.Resources.Text3d;
+using SlipeServer.Server.ServerBuilders;
 
 namespace Realm.Server.Extensions;
 
 public static class ServerBuilderExtensions
 {
-    public static ServerBuilder ConfigureServer(this ServerBuilder builder, IRealmConfigurationProvider realmConfigurationProvider)
+    public static ServerBuilder ConfigureServer(this ServerBuilder builder, IRealmConfigurationProvider realmConfigurationProvider, ServerBuilderDefaultBehaviours? serverBuilderDefaultBehaviours = null)
     {
         var _serverConfiguration = realmConfigurationProvider.GetRequired<SlipeServer.Server.Configuration>("Server");
         builder.UseConfiguration(_serverConfiguration);
-        var exceptBehaviours = ServerBuilderDefaultBehaviours.DefaultChatBehaviour;
+        if(serverBuilderDefaultBehaviours != null)
+        {
+            if(serverBuilderDefaultBehaviours != ServerBuilderDefaultBehaviours.None)
+            {
+                builder.AddDefaults(exceptBehaviours: serverBuilderDefaultBehaviours.Value);
+            }
+        }
+        else
+        {
+            var exceptBehaviours = ServerBuilderDefaultBehaviours.DefaultChatBehaviour;
 #if DEBUG
-        builder.AddDefaults(exceptBehaviours: ServerBuilderDefaultBehaviours.MasterServerAnnouncementBehaviour | exceptBehaviours);
+            builder.AddDefaults(exceptBehaviours: ServerBuilderDefaultBehaviours.MasterServerAnnouncementBehaviour | exceptBehaviours);
 #else
-        builder.AddDefaults(exceptBehaviours: exceptBehaviours);
+            builder.AddDefaults(exceptBehaviours: exceptBehaviours);
 #endif
+        }
 
         builder.ConfigureServices(services =>
         {

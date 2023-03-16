@@ -3,6 +3,7 @@ using SlipeServer.Server.Elements.Enums;
 
 namespace Realm.Tests.Tests.Components;
 
+[Collection("Sequential")]
 public class PlayerElementComponentTests
 {
     private readonly RealmTestingServer _server;
@@ -10,11 +11,11 @@ public class PlayerElementComponentTests
 
     public PlayerElementComponentTests()
     {
-        _server = new();
+        _server = new(new(), new(5010));
         _entityHelper = new(_server);
     }
 
-    //[Fact]
+    [Fact]
     public async Task TestBindsCooldown()
     {
         #region Arrange
@@ -39,7 +40,7 @@ public class PlayerElementComponentTests
         #endregion
     }
 
-    //[Fact]
+    [Fact]
     public async Task TestBindsThrowingException()
     {
         #region Arrange

@@ -12,19 +12,14 @@ public class SignInServiceTests
 {
     private readonly EntityHelper _entityHelper;
     private readonly RealmTestingServer _realmTestingServer;
-    private readonly TestDateTimeProvider _testDateTimeProvider;
     private readonly IRPGUserManager _signInService;
-    private readonly Mock<ILogger<RPGUserManager>> _logger;
 
     public SignInServiceTests()
     {
-        _realmTestingServer = new();
-        _testDateTimeProvider = new();
+        _realmTestingServer = new(new(), new(5000));
         _entityHelper = new(_realmTestingServer);
-        _logger = new Mock<ILogger<RPGUserManager>>();
 
-        _signInService = new RPGUserManager(new TestItemsRegistry(), _realmTestingServer.GetRequiredService<UserManager<User>>(), _logger.Object,
-            _realmTestingServer.GetRequiredService<IOptions<GameplayOptions>>(), _testDateTimeProvider);
+        _signInService = _realmTestingServer.GetRequiredService<IRPGUserManager>();
     }
 
     [Fact]

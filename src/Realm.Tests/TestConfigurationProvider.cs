@@ -3,15 +3,15 @@
 internal class TestConfigurationProvider : IRealmConfigurationProvider
 {
     private readonly IConfiguration _configuration;
-    public TestConfigurationProvider()
+    public TestConfigurationProvider(int? basePort = null)
     {
         _configuration = new ConfigurationBuilder()
             .AddInMemoryCollection(new Dictionary<string, string>
             {
                 ["server:isVoiceEnabled"] = "true",
                 ["server:serverName"] = "Default New-Realm Test server",
-                ["server:port"] = "22003",
-                ["server:httpPort"] = "2205",
+                ["server:port"] = (basePort ?? 20000).ToString(),
+                ["server:httpPort"] = ((basePort ?? 20000) + 1).ToString(),
                 ["server:maxPlayerCount"] = "128",
                 ["serverlist:gameType"] = "",
                 ["serverlist:mapName"] = "",
