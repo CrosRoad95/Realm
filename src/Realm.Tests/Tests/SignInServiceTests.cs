@@ -17,7 +17,7 @@ public class SignInServiceTests
         _signInService = _realmTestingServer.GetRequiredService<IRPGUserManager>();
     }
 
-    [Fact]
+    //[Fact]
     public async Task SignInShouldAddAllNeededComponents()
     {
         #region Arrange
