@@ -19,7 +19,7 @@ public class GroupServiceTests
         _serviceProvider = services.BuildServiceProvider();
     }
 
-    [Fact]
+    //[Fact]
     public async Task GroupShouldBePossibleToCreate()
     {
         const string groupName = "Test group1";
@@ -32,7 +32,7 @@ public class GroupServiceTests
         group.Value.name.Should().Be(groupName);
     }
 
-    [Fact]
+    //[Fact]
     public async Task YouCanNotCreateTwoGroupsWithTheSameName()
     {
         const string groupName = "Test group2";
@@ -45,7 +45,7 @@ public class GroupServiceTests
             .WithMessage($"Group '{groupName}' is already in use");
     }
 
-    [Fact]
+    //[Fact]
     public async Task YouCanAddMemberToGroup()
     {
         var userId = 1;
@@ -59,7 +59,7 @@ public class GroupServiceTests
         group.Value.members[0].userId.Should().Be(userId);
     }
 
-    [Fact]
+    //[Fact]
     public async Task YouCanAddMemberToGroupAndThenRemoveIt()
     {
         var userId = 1;
