@@ -1,10 +1,4 @@
-﻿using Realm.Domain.Components.Players;
-using Realm.Domain;
-using FluentAssertions;
-using Realm.Common.Providers;
-using Realm.Tests.Providers;
-
-namespace Realm.Tests.Tests.Components;
+﻿namespace Realm.Tests.Tests.Components;
 
 public class AFKComponentTests
 {

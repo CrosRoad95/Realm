@@ -31,7 +31,6 @@ global using Microsoft.AspNetCore.Components;
 global using Realm.Domain.Exceptions;
 global using Realm.Domain.Interfaces;
 global using SlipeServer.Server.Elements.ColShapes;
-global using Realm.Resources.AFK;
 global using SlipeServer.Server.Events;
 global using SlipeServer.Server.Constants;
 global using SlipeServer.Resources.Text3d;

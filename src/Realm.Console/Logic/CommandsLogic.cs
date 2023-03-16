@@ -8,7 +8,6 @@ using SixLabors.ImageSharp.Drawing.Processing;
 using SixLabors.ImageSharp.Formats.Jpeg;
 using SlipeServer.Server.Services;
 using System.Diagnostics;
-using static Realm.Domain.Components.Elements.PlayerElementComponent;
 using Color = System.Drawing.Color;
 using Size = System.Drawing.Size;
 

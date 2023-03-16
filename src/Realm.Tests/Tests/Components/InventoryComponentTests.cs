@@ -1,10 +1,4 @@
-﻿using Realm.Configuration;
-using Realm.Domain;
-using Realm.Domain.Components.Common;
-using Realm.Domain.Registries;
-using FluentAssertions;
-
-namespace Realm.Tests.Tests.Components;
+﻿namespace Realm.Tests.Tests.Components;
 
 public class InventoryComponentTests
 {

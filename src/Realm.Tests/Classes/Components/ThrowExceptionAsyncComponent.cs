@@ -1,6 +1,4 @@
-﻿using Realm.Domain;
-
-namespace Realm.Tests.Classes.Components;
+﻿namespace Realm.Tests.Classes.Components;
 
 internal class ThrowExceptionAsyncComponent : Component
 {

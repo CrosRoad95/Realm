@@ -1,7 +1,4 @@
-﻿using Realm.Configuration;
-using Realm.Domain;
-using SlipeServer.Server.Elements.ColShapes;
-using FluentAssertions;
+﻿using SlipeServer.Server.Elements.ColShapes;
 using Realm.Domain.Interfaces;
 using Serilog;
 using Realm.Resources.ClientInterface;

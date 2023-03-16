@@ -1,8 +1,4 @@
-﻿using FluentAssertions;
-using Realm.Domain;
-using Realm.Tests.Helpers;
-
-namespace Realm.Tests.Tests;
+﻿namespace Realm.Tests.Tests;
 
 public class ECSTests
 {

@@ -1,10 +1,4 @@
-﻿using Realm.Domain.Components.Players;
-using Realm.Domain;
-using Realm.Common.Providers;
-using Realm.Tests.Providers;
-using FluentAssertions;
-
-namespace Realm.Tests.Tests.Components;
+﻿namespace Realm.Tests.Tests.Components;
 
 public class DailyVisitsCounterComponentTests
 {

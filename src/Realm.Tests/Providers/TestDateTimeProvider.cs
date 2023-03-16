@@ -1,6 +1,4 @@
-﻿using Realm.Common.Providers;
-
-namespace Realm.Tests.Providers;
+﻿namespace Realm.Tests.Providers;
 
 internal class TestDateTimeProvider : IDateTimeProvider
 {

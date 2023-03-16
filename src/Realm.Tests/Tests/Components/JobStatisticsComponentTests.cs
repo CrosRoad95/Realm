@@ -1,12 +1,4 @@
-﻿using Realm.Domain.Components.Players;
-using Realm.Domain.Options;
-using Realm.Domain;
-using FluentAssertions;
-using Realm.Domain.Concepts;
-using Realm.Tests.Providers;
-using Realm.Common.Providers;
-
-namespace Realm.Tests.Tests.Components;
+﻿namespace Realm.Tests.Tests.Components;
 
 public class JobStatisticsComponentTests
 {

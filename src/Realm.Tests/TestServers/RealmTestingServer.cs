@@ -1,5 +1,4 @@
 ﻿using Moq;
-using Realm.Domain.Registries;
 using Realm.Interfaces.Providers;
 using Realm.Interfaces.Server;
 using Realm.Server.Console;

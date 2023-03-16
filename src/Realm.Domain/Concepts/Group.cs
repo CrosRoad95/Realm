@@ -1,6 +1,4 @@
-﻿using Realm.Domain.Enums;
-
-namespace Realm.Domain.Concepts;
+﻿namespace Realm.Domain.Concepts;
 
 public struct Group
 {

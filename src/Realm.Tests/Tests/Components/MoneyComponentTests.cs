@@ -1,11 +1,4 @@
-﻿using FluentAssertions;
-using Realm.Common.Exceptions;
-using Realm.Domain;
-using Realm.Domain.Components.Players;
-using Realm.Domain.Options;
-using Realm.Tests.Helpers;
-
-namespace Realm.Tests.Tests.Components;
+﻿namespace Realm.Tests.Tests.Components;
 
 public class MoneyComponentTests
 {

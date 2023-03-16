@@ -1,6 +1,4 @@
-﻿using Realm.Common.Providers;
-
-namespace Realm.Domain.Components.Players;
+﻿namespace Realm.Domain.Components.Players;
 
 [ComponentUsage(false)]
 public class PendingDiscordIntegrationComponent : Component

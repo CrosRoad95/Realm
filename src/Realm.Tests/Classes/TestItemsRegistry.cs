@@ -1,6 +1,4 @@
-﻿using Realm.Domain.Registries;
-
-namespace Realm.Tests.Classes;
+﻿namespace Realm.Tests.Classes;
 
 internal class TestItemsRegistry : ItemsRegistry
 {

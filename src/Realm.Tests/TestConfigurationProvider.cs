@@ -1,6 +1,4 @@
-﻿using Realm.Configuration;
-
-namespace Realm.Tests;
+﻿namespace Realm.Tests;
 
 internal class TestConfigurationProvider : IRealmConfigurationProvider
 {

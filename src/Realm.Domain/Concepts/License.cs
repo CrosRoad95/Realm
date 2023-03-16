@@ -1,6 +1,4 @@
-﻿using Realm.Common.Providers;
-
-namespace Realm.Domain.Concepts;
+﻿namespace Realm.Domain.Concepts;
 
 public struct License
 {
