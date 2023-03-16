@@ -20,7 +20,7 @@ public class AuthorizationPoliciesProvider
 public static class ServiceCollectionExtensions
 {
     public static IServiceCollection AddPersistance<T>(this IServiceCollection services,
-        Action<DbContextOptionsBuilder> dboptions) where T : DbContext, IDb
+        Action<DbContextOptionsBuilder> dboptions, ServiceLifetime serviceLifetime = ServiceLifetime.Transient) where T : DbContext, IDb
     {
         services.AddSingleton<RealmDbContextFactory>();
         services.AddSingleton<RepositoryFactory>();
@@ -32,7 +32,7 @@ public static class ServiceCollectionExtensions
         services.AddTransient<IJobRepository, JobRepository>();
         services.AddTransient<IUserRewardRepository, UserRewardRepository>();
 
-        services.AddDbContext<IDb, T>(dboptions, ServiceLifetime.Transient);
+        services.AddDbContext<IDb, T>(dboptions, serviceLifetime);
 
         return services;
     }
