@@ -55,10 +55,12 @@ internal class RPGUserManager : IRPGUserManager
             throw new NotSupportedException("Entity is not a player entity.");
 
         await _lock.WaitAsync(TimeSpan.FromSeconds(1));
+        using var transaction = entity.BeginComponentTransaction();
         try
         {
             if (!_usedAccountsIds.Add(user.Id))
                 return false;
+
 
             await entity.AddComponentAsync(new AccountComponent(user));
             if (user.Inventories != null && user.Inventories.Any())
@@ -120,23 +122,13 @@ internal class RPGUserManager : IRPGUserManager
             entity.AddComponent(new LevelComponent(user.Level, user.Experience));
             entity.AddComponent(new MoneyComponent(user.Money));
             entity.AddComponent<AFKComponent>();
+            entity.Commit(transaction);
         }
         catch (Exception ex)
         {
             // TODO: add Entity component add scope thing
             _usedAccountsIds.Remove(user.Id);
-            entity.TryDestroyComponent<AccountComponent>();
-            entity.TryDestroyComponent<InventoryComponent>();
-            entity.TryDestroyComponent<LicensesComponent>();
-            entity.TryDestroyComponent<PlayTimeComponent>();
-            entity.TryDestroyComponent<MoneyComponent>();
-            entity.TryDestroyComponent<LevelComponent>();
-            entity.TryDestroyComponent<JobUpgradesComponent>();
-            entity.TryDestroyComponent<JobStatisticsComponent>();
-            entity.TryDestroyComponent<DailyVisitsCounterComponent>();
-            entity.TryDestroyComponent<StatisticsCounterComponent>();
-            entity.TryDestroyComponent<DiscoveriesComponent>();
-            entity.TryDestroyComponent<DiscordIntegrationComponent>();
+            entity.Rollback(transaction);
             _logger.LogError(ex, "Failed to sign in user of id {userId}", user.Id);
             throw;
         }

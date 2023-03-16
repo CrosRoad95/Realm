@@ -4,6 +4,10 @@ namespace Realm.Domain;
 
 public class Entity : IDisposable
 {
+    private object _transactionLock = new();
+    private byte _version;
+    private bool _hasPendingTransaction;
+
     public enum EntityTag
     {
         Unknown,
@@ -55,6 +59,9 @@ public class Entity : IDisposable
         {
             if (property.GetCustomAttribute<InjectAttribute>() != null)
             {
+                var service = _serviceProvider.GetService(property.PropertyType);
+                if (service == null)
+                    throw new Exception($"Could not inject service of type {property.PropertyType}");
                 property.SetValue(obj, _serviceProvider.GetRequiredService(property.PropertyType));
             }
         }
@@ -89,6 +96,8 @@ public class Entity : IDisposable
         {
             CheckCanBeAdded<TComponent>();
             _components.Add(component);
+            lock (_transactionLock)
+                component._version = _version;
         }
         catch(Exception)
         {
@@ -335,5 +344,93 @@ public class Entity : IDisposable
             DestroyComponent(component);
 
         _disposed = true;
+    }
+
+
+    public IEntityComponentsTransaction BeginComponentTransaction()
+    {
+        ThrowIfDisposed();
+
+        lock (_transactionLock)
+        {
+            if (_hasPendingTransaction)
+                throw new InvalidOperationException("Transaction for this entity is already in progress");
+            _hasPendingTransaction = true;
+            return new EntityComponentsTransaction(_version, this);
+        }
+    }
+
+    public int Commit(IEntityComponentsTransaction transaction)
+    {
+        ThrowIfDisposed();
+
+        if (transaction.Entity != this)
+            throw new InvalidOperationException("Transaction does not belong to this entity");
+        
+        if(!transaction.TryClose())
+            throw new InvalidOperationException("Transaction already commited");
+
+        int commitedComponents = 0;
+        _componentsLock.EnterWriteLock();
+        try
+        {
+            commitedComponents = _components.Count(x => x._version == transaction.Version);
+        }
+        finally
+        {
+            _componentsLock.ExitWriteLock();
+            lock (_transactionLock)
+            {
+                _hasPendingTransaction = false;
+                _version++;
+            }
+        }
+
+        return commitedComponents;
+    }
+
+    public int Rollback(IEntityComponentsTransaction transaction)
+    {
+        ThrowIfDisposed();
+
+        if(transaction.Entity != this)
+            throw new InvalidOperationException("Transaction does not belong to this entity");
+
+        if (!transaction.TryClose())
+            throw new InvalidOperationException("Transaction already commited");
+
+        int rollbackedComponents = 0;
+        List<Component> components;
+        _componentsLock.EnterReadLock();
+        try
+        {
+            components = Components.ToList();
+        }
+        finally
+        {
+            _componentsLock.ExitReadLock();
+        }
+
+        try
+        {
+            foreach (var item in components)
+            {
+                if (item._version == transaction.Version)
+                {
+                    DestroyComponent(item);
+                    rollbackedComponents++;
+                }
+            }
+        }
+        finally
+        {
+            lock (_transactionLock)
+            {
+                _hasPendingTransaction = false;
+                _version++;
+            }
+        }
+
+        return rollbackedComponents;
     }
 }

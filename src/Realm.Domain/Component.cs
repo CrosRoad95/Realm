@@ -2,6 +2,9 @@
 
 public abstract class Component
 {
+    internal object _versionLock;
+    internal byte _version;
+
     private bool _disposed = false;
     public Entity Entity { get; internal set; } = default!;
 
