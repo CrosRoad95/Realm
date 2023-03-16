@@ -27,9 +27,10 @@ public class SignInServiceTests
             _realmTestingServer.GetRequiredService<IOptions<GameplayOptions>>(), _testDateTimeProvider);
     }
 
-    //[Fact]
+    [Fact]
     public async Task SignInShouldAddAllNeededComponents()
     {
+        #region Arrange
         var user = new User
         {
             UserName = Guid.NewGuid().ToString()[..8],
@@ -38,8 +39,14 @@ public class SignInServiceTests
         await _realmTestingServer.GetRequiredService<UserManager<User>>().CreateAsync(user, "asdASD123!@#");
 
         var playerEntity = _entityHelper.CreatePlayerEntity();
-        var signedIn = await _signInService.SignIn(playerEntity, user);
+        #endregion
 
+        #region Act
+        var signedIn = await _signInService.SignIn(playerEntity, user);
+        #endregion
+
+        #region Assert
         signedIn.Should().BeTrue();
+        #endregion
     }
 }
