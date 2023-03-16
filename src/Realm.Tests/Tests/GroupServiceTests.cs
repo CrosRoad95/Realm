@@ -7,8 +7,7 @@ using Realm.Persistance.SQLite;
 
 namespace Realm.Tests.Tests;
 
-[Collection(nameof(GroupServiceTests))]
-public class GroupServiceTests : IAsyncDisposable
+public class GroupServiceTests
 {
     private readonly IServiceProvider _serviceProvider;
     public GroupServiceTests()
@@ -72,13 +71,5 @@ public class GroupServiceTests : IAsyncDisposable
 
         var group = await groupService.GetGroupByName("Test group4");
         group.Value.members.Should().BeEmpty();
-    }
-
-    public async ValueTask DisposeAsync()
-    {
-        var db = _serviceProvider.GetRequiredService<IDb>();
-        db.GroupMembers.RemoveRange(await db.GroupMembers.ToListAsync());
-        db.Groups.RemoveRange(await db.Groups.ToListAsync());
-        await db.SaveChangesAsync();
     }
 }
