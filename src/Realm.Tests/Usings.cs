@@ -4,10 +4,7 @@ global using Xunit;
 
 global using Microsoft.Extensions.Configuration;
 global using Microsoft.Extensions.DependencyInjection;
-
-global using SlipeServer.Server;
 global using SlipeServer.Server.TestTools;
-global using Realm.Tests.Classes;
 global using Realm.Tests.TestServers;
 global using Realm.Server;
 global using Realm.Domain.Components.Players;
@@ -22,3 +19,12 @@ global using Realm.Configuration;
 global using Realm.Domain.Components.Common;
 global using Realm.Domain.Registries;
 global using Realm.Domain.Concepts;
+global using Moq;
+global using Realm.Interfaces.Providers;
+global using Realm.Interfaces.Server;
+global using Realm.Server.Console;
+global using Realm.Server.Extensions;
+global using Realm.Server.Interfaces;
+global using Realm.Server.Providers;
+global using Realm.Server.Services;
+global using Serilog;

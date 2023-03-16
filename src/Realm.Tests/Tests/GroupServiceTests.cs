@@ -4,8 +4,6 @@ using Realm.Persistance;
 using Realm.Persistance.Interfaces;
 using Realm.Persistance.Repository;
 using Realm.Persistance.SQLite;
-using Realm.Server.Interfaces;
-using Realm.Server.Services;
 
 namespace Realm.Tests.Tests;
 

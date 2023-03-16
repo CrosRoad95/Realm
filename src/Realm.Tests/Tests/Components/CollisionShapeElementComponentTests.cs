@@ -1,6 +1,5 @@
 ﻿using SlipeServer.Server.Elements.ColShapes;
 using Realm.Domain.Interfaces;
-using Serilog;
 using Realm.Resources.ClientInterface;
 using Realm.Domain.Components.Elements.CollisionShapes;
 
