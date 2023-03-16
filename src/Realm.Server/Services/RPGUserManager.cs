@@ -54,7 +54,7 @@ internal class RPGUserManager : IRPGUserManager
         if (entity.Tag != Entity.EntityTag.Player || !entity.HasComponent<PlayerElementComponent>())
             throw new NotSupportedException("Entity is not a player entity.");
 
-        await _lock.WaitAsync();
+        await _lock.WaitAsync(TimeSpan.FromSeconds(1));
         try
         {
             if (!_usedAccountsIds.Add(user.Id))
