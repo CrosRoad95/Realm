@@ -19,7 +19,7 @@
 		return guiCreateScrollPane(x, y, width, height, false, parent)
 	end,
 	tabPanel = function(x, y, width, height, parent)
-		return guiCreateTabPanel(x, y, width, height, false, parent)
+		return guiCreateTabPanel(x, y + 20, width, height - 20, false, parent)
 	end,
 	tab = function(text, parent)
 		return guiCreateTab(text, parent)

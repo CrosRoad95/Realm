@@ -2,7 +2,6 @@ local function createGrid(sx, sy, columns, rows, cellsPadding)
   local grid = {}
   local cellx = (sx - (columns - 1) * cellsPadding) / columns
   local celly = (sy - (rows - 1) * cellsPadding) / rows
-  local px,py = sx, sy
   local px,py = 0,0
   for x=0, columns - 1 do
     for y=0, rows - 1 do
