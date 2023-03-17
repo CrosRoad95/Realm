@@ -108,4 +108,22 @@ public class EntityTransactionTest
         act.Should().Throw<InvalidOperationException>().WithMessage("Transaction already commited");
         #endregion
     }
+
+    [Fact]
+    public void ComponentsAddedBeforeTransactionBeginShouldNotBeIncludedIntoTransaction()
+    {
+        #region Act
+        _entity.AddComponent<TestComponent>();
+        using var transaction = _entity.BeginComponentTransaction();
+        _entity.AddComponent<TestComponent>();
+        _entity.AddComponent<TestComponent>();
+        var rollbackedComponents = _entity.Rollback(transaction);
+        #endregion
+
+        #region Assert
+        rollbackedComponents.Should().Be(2);
+        _entity.Components.Should().HaveCount(1);
+        #endregion
+    }
+
 }

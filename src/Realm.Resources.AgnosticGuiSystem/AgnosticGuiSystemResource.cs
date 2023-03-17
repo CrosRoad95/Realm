@@ -11,6 +11,7 @@ internal class AgnosticGuiSystemResource : Resource
     internal Dictionary<string, byte[]> AdditionalFiles { get; } = new Dictionary<string, byte[]>()
     {
         ["controller.lua"] = ResourceFiles.Controller,
+        ["utilities.lua"] = ResourceFiles.Utilities,
     };
 
     internal AgnosticGuiSystemResource(MtaServer server, AgnosticGuiSystemOptions agnosticGuiSystemOptions)

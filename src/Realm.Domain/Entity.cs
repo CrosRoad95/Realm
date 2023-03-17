@@ -356,6 +356,7 @@ public class Entity : IDisposable
             if (_hasPendingTransaction)
                 throw new InvalidOperationException("Transaction for this entity is already in progress");
             _hasPendingTransaction = true;
+            _version++;
             return new EntityComponentsTransaction(_version, this);
         }
     }

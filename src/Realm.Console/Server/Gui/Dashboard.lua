@@ -15,6 +15,10 @@
 	do
 		local tab = guiProvider.tab("Vehicles", tabPanel)
 		local sampleLabel = guiProvider.label(inspect(state.VehicleLightInfos), 10, 20, 280, 25, tab);
+		local grid,cellx, celly = utilities.createGrid(100, 100, 3, 3, 5);
+		for i,v in ipairs(grid)do
+			guiProvider.button(v[1].."x"..v[2], 20 + v[3], 50 + v[4], cellx, celly, tab);
+		end
 	end
 
 	function stateChanged(key, value)

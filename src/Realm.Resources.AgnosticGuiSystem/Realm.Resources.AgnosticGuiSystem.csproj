@@ -8,7 +8,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Lua\utilities.lua" />
+  </ItemGroup>
+
+  <ItemGroup>
     <EmbeddedResource Include="Lua\controller.lua" />
+    <EmbeddedResource Include="Lua\utilities.lua" />
   </ItemGroup>
 
   <ItemGroup>
