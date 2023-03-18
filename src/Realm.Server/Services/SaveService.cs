@@ -129,6 +129,15 @@ internal class SaveService : ISaveService
             }
             vehicleData.PartDamages = vehiclePartDamages;
         }
+
+        if(entity.TryGetComponent(out VehicleEngineComponent vehicleEngineComponent))
+        {
+            vehicleData.VehicleEngines = vehicleEngineComponent.VehicleEngineIds.Select(x => new VehicleEngine
+            {
+                EngineId = (short)x,
+                Selected = x == vehicleEngineComponent.ActiveVehicleEngineId
+            }).ToList();
+        }
     }
 
     private async Task SavePlayer(Entity entity)

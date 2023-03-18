@@ -434,4 +434,7 @@ public class Entity : IDisposable
 
         return rollbackedComponents;
     }
+
+    public TService GetRequiredService<TService>() where TService : class
+        => _serviceProvider.GetRequiredService<TService>();
 }

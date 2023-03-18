@@ -128,7 +128,7 @@ public class VehicleUpgradesComponent : Component
         return result;
     }
 
-    private void ApplyUpgrades(object vehicleHandling, IEnumerable<FloatValueUpgradeDescription?> upgradeDescriptions, Expression<Func<VehicleHandling, float>> handlingProperty)
+    private void ApplyUpgrade(object vehicleHandling, IEnumerable<FloatValueUpgradeDescription?> upgradeDescriptions, Expression<Func<VehicleHandling, float>> handlingProperty)
     {
         float increseByUnits = 0;
         float multipleBy = 0;
@@ -146,6 +146,12 @@ public class VehicleUpgradesComponent : Component
         propertyInfo.SetValue(vehicleHandling, value);
     }
 
+    private void ApplyUpgrades(object boxedVehicleHandling, IEnumerable<VehicleUpgradeRegistryEntry> upgradesEntries)
+    {
+        ApplyUpgrade(boxedVehicleHandling, upgradesEntries.Select(x => x.MaxVelocity), x => x.MaxVelocity);
+        ApplyUpgrade(boxedVehicleHandling, upgradesEntries.Select(x => x.EngineAcceleration), x => x.EngineAcceleration);
+    }
+
     public void RebuildUpgrades()
     {
         var vehicle = Entity.GetRequiredComponent<VehicleElementComponent>().Vehicle;
@@ -157,12 +163,16 @@ public class VehicleUpgradesComponent : Component
             if (!_dirtyState)
                 return;
 
-            if(_upgrades.Any())
+            if (_upgrades.Any())
             {
                 IEnumerable<VehicleUpgradeRegistryEntry> upgradesEntries = _upgrades.Select(VehicleUpgradeRegistry.Get);
 
-                ApplyUpgrades(boxedVehicleHandling, upgradesEntries.Select(x => x.MaxVelocity), x => x.MaxVelocity);
-                ApplyUpgrades(boxedVehicleHandling, upgradesEntries.Select(x => x.EngineAcceleration), x => x.EngineAcceleration);
+                ApplyUpgrades(boxedVehicleHandling, upgradesEntries);
+
+                if (Entity.TryGetComponent(out VehicleEngineComponent vehicleEngineComponent))
+                {
+                    ApplyUpgrades(boxedVehicleHandling, new VehicleUpgradeRegistryEntry[] { VehicleUpgradeRegistry.Get(vehicleEngineComponent.UpgradeId) });
+                }
             }
             _dirtyState = false;
         }

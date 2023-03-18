@@ -29,6 +29,7 @@ public abstract class Db<T> : IdentityDbContext<User, Role, int,
     public DbSet<VehiclePartDamage> VehiclePartDamages => Set<VehiclePartDamage>();
     public DbSet<Ban> Bans => Set<Ban>();
     public DbSet<UserReward> UserRewards => Set<UserReward>();
+    public DbSet<VehicleEngine> VehicleEngines => Set<VehicleEngine>();
 
     public Db(DbContextOptions<T> options) : base(options)
     {
@@ -174,6 +175,13 @@ public abstract class Db<T> : IdentityDbContext<User, Role, int,
             entityBuilder
                 .ToTable(nameof(UserRewards))
                 .HasKey(x => new { x.UserId, x.RewardId });
+        });
+        
+        modelBuilder.Entity<VehicleEngine>(entityBuilder =>
+        {
+            entityBuilder
+                .ToTable(nameof(VehicleEngines))
+                .HasKey(x => new { x.VehicleId, x.EngineId });
         });
         
         modelBuilder.Entity<Achievement>(entityBuilder =>
@@ -339,6 +347,11 @@ public abstract class Db<T> : IdentityDbContext<User, Role, int,
             entityBuilder
                 .HasMany(x => x.PartDamages)
                 .WithOne(x => x.Vehicle)
+                .HasForeignKey(x => x.VehicleId);
+
+            entityBuilder
+                .HasMany(x => x.VehicleEngines)
+                .WithOne()
                 .HasForeignKey(x => x.VehicleId);
         });
 

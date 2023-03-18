@@ -752,6 +752,22 @@ namespace Realm.Persistance.SQLite.Migrations
                     b.ToTable("VehicleAccesses", (string)null);
                 });
 
+            modelBuilder.Entity("Realm.Persistance.Data.VehicleEngine", b =>
+                {
+                    b.Property<int>("VehicleId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<short>("EngineId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("Selected")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("VehicleId", "EngineId");
+
+                    b.ToTable("VehicleEngines", (string)null);
+                });
+
             modelBuilder.Entity("Realm.Persistance.Data.VehicleFuel", b =>
                 {
                     b.Property<int>("VehicleId")
@@ -1059,6 +1075,15 @@ namespace Realm.Persistance.SQLite.Migrations
                     b.Navigation("Vehicle");
                 });
 
+            modelBuilder.Entity("Realm.Persistance.Data.VehicleEngine", b =>
+                {
+                    b.HasOne("Realm.Persistance.Data.Vehicle", null)
+                        .WithMany("VehicleEngines")
+                        .HasForeignKey("VehicleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("Realm.Persistance.Data.VehicleFuel", b =>
                 {
                     b.HasOne("Realm.Persistance.Data.Vehicle", "Vehicle")
@@ -1147,6 +1172,8 @@ namespace Realm.Persistance.SQLite.Migrations
                     b.Navigation("Upgrades");
 
                     b.Navigation("VehicleAccesses");
+
+                    b.Navigation("VehicleEngines");
                 });
 #pragma warning restore 612, 618
         }

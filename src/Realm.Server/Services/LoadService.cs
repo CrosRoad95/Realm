@@ -39,6 +39,10 @@ internal class LoadService : ILoadService
                         entity.AddComponent(new PrivateVehicleComponent(vehicleData));
                         entity.AddComponent(new VehicleUpgradesComponent(vehicleData.Upgrades));
                         entity.AddComponent(new MileageCounterComponent(vehicleData.Mileage));
+                        if(vehicleData.VehicleEngines.Any())
+                            entity.AddComponent(new VehicleEngineComponent(vehicleData.VehicleEngines));
+                        else
+                            entity.AddComponent< VehicleEngineComponent>();
                         entity.AddComponent(new VehiclePartDamageComponent(vehicleData.PartDamages));
                         foreach (var vehicleFuel in vehicleData.Fuels)
                             entity.AddComponent(new VehicleFuelComponent(vehicleFuel.FuelType, vehicleFuel.Amount, vehicleFuel.MaxCapacity, vehicleFuel.FuelConsumptionPerOneKm, vehicleFuel.MinimumDistanceThreshold)).Active = vehicleFuel.Active;

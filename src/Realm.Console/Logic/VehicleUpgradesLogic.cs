@@ -4,7 +4,7 @@ public class VehicleUpgradesLogic
 {
     public VehicleUpgradesLogic(VehicleUpgradeRegistry vehicleUpgradeRegistry)
     {
-        vehicleUpgradeRegistry.AddUpgrade(1, new VehicleUpgradeRegistryEntry
+        vehicleUpgradeRegistry.AddUpgrade(2, new VehicleUpgradeRegistryEntry
         {
             EngineAcceleration = new Domain.Data.FloatValueUpgradeDescription
             {

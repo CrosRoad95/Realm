@@ -5,6 +5,7 @@ using Realm.Module.Discord;
 using Realm.Module.Grpc;
 using Realm.Module.WebApp;
 using Realm.Server.Logic;
+using Realm.Server.Logic.Registries;
 using SlipeServer.Server.Elements.IdGeneration;
 using SlipeServer.Server.Loggers;
 
@@ -27,6 +28,10 @@ internal sealed class RPGServer : IRPGServer
                 builder.AddLogic<GuisLogic>();
                 builder.AddLogic<StartupLogic>();
                 builder.AddLogic<ChatLogic>();
+
+                builder.AddLogic<VehicleUpgradeRegistryLogic>();
+                builder.AddLogic<VehicleEnginesRegistryLogic>();
+
                 //builder.AddLogic<DefaultModulesLogic>();
                 builder.ConfigureServer(realmConfigurationProvider);
                 configureServerBuilder?.Invoke(builder);
@@ -42,16 +47,21 @@ internal sealed class RPGServer : IRPGServer
     {
         services.Remove(services.Where(x => x.ImplementationType == typeof(ConsoleLogger)).First());
 
-        // Common
+        #region Common
         services.AddSingleton<IDateTimeProvider, DateTimeProvider>();
         services.AddSingleton((IRPGServer)this);
         services.AddSingleton(this);
         services.AddSingleton<SeederServerBuilder>();
+        #endregion
+
+        #region Registries
         services.AddSingleton<ItemsRegistry>();
         services.AddSingleton<VehicleUpgradeRegistry>();
         services.AddSingleton<LevelsRegistry>();
+        services.AddSingleton<VehicleEnginesRegistry>();
+        #endregion
 
-        // Services
+        #region Common
         services.AddSingleton<RPGCommandService>();
         services.AddSingleton<IRPGUserManager, RPGUserManager>();
         services.AddTransient<ISaveService, SaveService>();
@@ -62,6 +72,7 @@ internal sealed class RPGServer : IRPGServer
         services.AddTransient<IBanService, BanService>();
         services.AddTransient<IJobService, JobService>();
         services.AddTransient<IRewardService, RewardService>();
+        #endregion
 
         services.AddTransient<IEntityFactory, EntityFactory>();
         services.AddSingleton<IElementIdGenerator, RangedCollectionBasedElementIdGenerator>(x =>
