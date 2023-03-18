@@ -4,10 +4,8 @@ namespace Realm.Domain.Components.Elements;
 
 public abstract class ElementComponent : Component
 {
-    [Inject]
-    protected IEntityByElement EntityByElement { get; set; } = default!;
-    [Inject]
-    private ClientInterfaceService ClientInterfaceService { get; set; } = default!;
+    internal Action<Element>? AddFocusableHandler { get; set; }
+    internal Action<Element>? RemoveFocusableHandler { get; set; }
 
     abstract internal Element Element { get; }
     private Player? Player { get; set; }
@@ -68,18 +66,18 @@ public abstract class ElementComponent : Component
 
     public void AddFocusable()
     {
-        ClientInterfaceService.AddFocusable(Element);
+        AddFocusableHandler?.Invoke(Element);
     }
 
     public void RemoveFocusable()
     {
-        ClientInterfaceService.RemoveFocusable(Element);
+        RemoveFocusableHandler?.Invoke(Element);
     }
 
     public override void Dispose()
     {
-        ClientInterfaceService.RemoveFocusable(Element);
-        if(!_isPerPlayer)
+        RemoveFocusableHandler?.Invoke(Element);
+        if (!_isPerPlayer)
         {
             Entity.Transform.PositionChanged -= HandleTransformPositionChanged;
             Entity.Transform.RotationChanged -= HandleTransformRotationChanged;

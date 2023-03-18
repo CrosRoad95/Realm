@@ -5,6 +5,9 @@ namespace Realm.Domain.Components.Elements.CollisionShapes;
 public abstract class CollisionShapeElementComponent : ElementComponent
 {
     [Inject]
+    private IEntityByElement EntityByElement { get; set; } = default!;
+
+    [Inject]
     private ILogger<CollisionShapeElementComponent> Logger { get; set; } = default!;
 
     protected readonly CollisionShape _collisionShape;

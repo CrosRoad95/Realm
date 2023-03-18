@@ -3,17 +3,40 @@
 internal class ClientInterfaceLogic
 {
     private readonly ILogger<ClientInterfaceLogic> _logger;
-    private readonly ClientInterfaceService _ClientInterfaceService;
+    private readonly ClientInterfaceService _clientInterfaceService;
     private readonly IEntityByElement _entityByElement;
 
-    public ClientInterfaceLogic(ClientInterfaceService ClientInterfaceService, ILogger<ClientInterfaceLogic> logger, IEntityByElement entityByElement)
+    public ClientInterfaceLogic(ClientInterfaceService clientInterfaceService, ILogger<ClientInterfaceLogic> logger, IEntityByElement entityByElement,
+        ECS ecs)
     {
-        _ClientInterfaceService = ClientInterfaceService;
+        _clientInterfaceService = clientInterfaceService;
         _entityByElement = entityByElement;
         _logger = logger;
 
-        _ClientInterfaceService.ClientErrorMessage += HandleClientErrorMessage;
-        _ClientInterfaceService.FocusedElementChanged += HandleFocusedElementChanged;
+        _clientInterfaceService.ClientErrorMessage += HandleClientErrorMessage;
+        _clientInterfaceService.FocusedElementChanged += HandleFocusedElementChanged;
+        ecs.EntityCreated += HandleEntityCreated;
+    }
+
+
+    private void HandleEntityCreated(Entity entity)
+    {
+        entity.Disposed += HandleEntityDestroyed;
+        entity.ComponentAdded += HandleComponentAdded;
+    }
+
+    private void HandleEntityDestroyed(Entity entity)
+    {
+        entity.ComponentAdded -= HandleComponentAdded;
+    }
+
+    private void HandleComponentAdded(Component component)
+    {
+        if(component is ElementComponent elementComponent)
+        {
+            elementComponent.AddFocusableHandler = _clientInterfaceService.AddFocusable;
+            elementComponent.RemoveFocusableHandler = _clientInterfaceService.RemoveFocusable;
+        }
     }
 
     private void HandleFocusedElementChanged(Player player, Element? focusedElement)

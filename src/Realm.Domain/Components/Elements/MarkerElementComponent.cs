@@ -5,6 +5,9 @@ namespace Realm.Domain.Components.Elements;
 
 public class MarkerElementComponent : ElementComponent
 {
+    [Inject]
+    private IEntityByElement EntityByElement { get; set; } = default!;
+
     protected readonly Marker _marker;
     protected readonly CollisionSphere _collisionShape;
     internal override Element Element => _marker;

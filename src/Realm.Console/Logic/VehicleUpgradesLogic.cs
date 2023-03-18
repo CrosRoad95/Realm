@@ -6,12 +6,12 @@ public class VehicleUpgradesLogic
     {
         vehicleUpgradeRegistry.AddUpgrade(1, new VehicleUpgradeRegistryEntry
         {
-            EngineAcceleration = new VehicleUpgradeRegistryEntry.UpgradeDescription
+            EngineAcceleration = new Domain.Data.FloatValueUpgradeDescription
             {
                 IncreaseByUnits = 100,
                 MultipleBy = 2,
             },
-            MaxVelocity = new VehicleUpgradeRegistryEntry.UpgradeDescription
+            MaxVelocity = new Domain.Data.FloatValueUpgradeDescription
             {
                 IncreaseByUnits = 100,
                 MultipleBy = 2,

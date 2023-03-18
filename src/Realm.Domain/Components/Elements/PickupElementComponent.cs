@@ -4,6 +4,9 @@ namespace Realm.Domain.Components.Elements;
 
 public class PickupElementComponent : ElementComponent
 {
+    [Inject]
+    private IEntityByElement EntityByElement { get; set; } = default!;
+
     protected readonly Pickup _pickup;
     public Action<Entity>? EntityEntered { get; set; }
     public Action<Entity>? EntityLeft { get; set; }

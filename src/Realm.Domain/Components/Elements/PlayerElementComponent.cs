@@ -3,6 +3,8 @@
 public sealed class PlayerElementComponent : PedElementComponent
 {
     [Inject]
+    private IEntityByElement EntityByElement { get; set; } = default!;
+    [Inject]
     private IDateTimeProvider DateTimeProvider { get; set; } = default!;
     [Inject]
     private ChatBox ChatBox { get; set; } = default!;
