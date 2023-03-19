@@ -56,7 +56,8 @@ global using Realm.Domain.Interfaces;
 global using System.Security.Claims;
 global using Microsoft.Extensions.Logging;
 global using Realm.Server.Attributes;
-
-using System.Runtime.CompilerServices;
+global using Realm.Domain.Concepts;
+global using Realm.Domain.IdGenerators;
+global using System.Runtime.CompilerServices;
 
 [assembly: InternalsVisibleTo("Realm.Tests")]

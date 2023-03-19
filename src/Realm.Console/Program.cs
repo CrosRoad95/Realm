@@ -30,6 +30,7 @@ var server = builder.Build(null, extraBuilderSteps: serverBuilder =>
     serverBuilder.AddLogic<PlayerGameplayLogic>();
     serverBuilder.AddLogic<DiscordIntegrationLogic>();
     serverBuilder.AddLogic<CommandsLogic>();
+    serverBuilder.AddLogic<MapsLogic>();
 #if DEBUG
     serverBuilder.AddLogic<HotReloadLogic>("../../../Server/Gui");
 #endif

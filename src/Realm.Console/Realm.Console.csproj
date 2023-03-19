@@ -36,6 +36,12 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Server\Assets\Fonts\" />
+    <Folder Include="Server\Maps\" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Update="Server\Maps\test.map">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 	
   <PropertyGroup>

@@ -21,7 +21,6 @@ end)
 addEvent("internalRemovePedNametag", true)
 addEventHandler("internalRemovePedNametag", localPlayer, function(ped)
 	nametags[ped] = nil
-	iprint("removed ped", ped)
 end)
 
 addEvent("internalSetNametagRenderingEnabled", true)

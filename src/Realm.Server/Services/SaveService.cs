@@ -1,5 +1,7 @@
 ﻿using static Realm.Persistance.Data.Helpers.VehicleDamageState;
 using static Realm.Persistance.Data.Helpers.VehicleWheelStatus;
+using JobUpgrade = Realm.Persistance.Data.JobUpgrade;
+using VehicleAccess = Realm.Persistance.Data.VehicleAccess;
 
 namespace Realm.Server.Services;
 
@@ -229,7 +231,7 @@ internal class SaveService : ISaveService
 
         if (entity.TryGetComponent(out AchievementsComponent achievementsComponent))
         {
-            user.Achievements = achievementsComponent.Achievements.Select(x => new Achievement
+            user.Achievements = achievementsComponent.Achievements.Select(x => new Persistance.Data.Achievement
             {
                 AchievementId = x.Key,
                 Value = JsonConvert.SerializeObject(x.Value.value, Formatting.None),
@@ -238,7 +240,7 @@ internal class SaveService : ISaveService
             }).ToList();
         }
         else
-            user.Achievements = new List<Achievement>();
+            user.Achievements = new List<Persistance.Data.Achievement>();
 
         if (entity.TryGetComponent(out JobUpgradesComponent jobUpgradesComponent))
         {
@@ -249,7 +251,7 @@ internal class SaveService : ISaveService
             }).ToList();
         }
         else
-            user.JobUpgrades = new List<JobUpgrade>();
+            user.JobUpgrades = new List<Persistance.Data.JobUpgrade>();
 
         if (entity.TryGetComponent(out JobStatisticsComponent jobStatisticsComponent))
         {
@@ -259,7 +261,7 @@ internal class SaveService : ISaveService
                 var first = user.JobStatistics.FirstOrDefault(x => x.JobId == item.Value.jobId && x.Date == jobStatisticsComponent.Date);
                 if (first == null)
                 {
-                    user.JobStatistics.Add(new JobStatistics
+                    user.JobStatistics.Add(new Persistance.Data.JobStatistics
                     {
                         Date = jobStatisticsComponent.Date,
                         JobId = item.Key,
@@ -296,7 +298,7 @@ internal class SaveService : ISaveService
             //}).ToList();
         }
         else
-            user.JobStatistics = new List<JobStatistics>();
+            user.JobStatistics = new List<Persistance.Data.JobStatistics>();
 
         if (entity.TryGetComponent(out DiscoveriesComponent discoveriesComponent))
         {
