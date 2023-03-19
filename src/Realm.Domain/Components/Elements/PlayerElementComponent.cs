@@ -353,18 +353,21 @@ public sealed class PlayerElementComponent : PedElementComponent
         // Lock bind indefinitly in case of bind takes a long time to execute, reset cooldown to unlock
         SetCooldown(key, keyState, DateTime.MaxValue);
 
-        try
+        if (_binds.TryGetValue(key, out var bindCallback))
         {
-            await _binds[key](Entity, keyState);
-        }
-        catch(Exception ex)
-        {
-            Logger.LogError(ex, "Failed to execute bind {key} and state {keyState}.", key, keyState);
-            throw;
-        }
-        finally
-        {
-            TrySetCooldown(key, keyState, DateTimeProvider.Now.AddMilliseconds(400));
+            try
+            {
+                await bindCallback(Entity, keyState);
+            }
+            catch(Exception ex)
+            {
+                Logger.LogError(ex, "Failed to execute bind {key} and state {keyState}.", key, keyState);
+                throw;
+            }
+            finally
+            {
+                TrySetCooldown(key, keyState, DateTimeProvider.Now.AddMilliseconds(400));
+            }
         }
     }
 
