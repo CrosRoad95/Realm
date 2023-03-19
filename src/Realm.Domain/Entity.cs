@@ -43,6 +43,7 @@ public class Entity : IDisposable
     public event Action<Entity>? Disposed;
 
     internal Player Player => GetRequiredComponent<PlayerElementComponent>().Player;
+    internal Element Element => GetRequiredComponent<ElementComponent>().Element;
 
     public Entity(IServiceProvider serviceProvider, string name = "", EntityTag tag = EntityTag.Unknown)
     {

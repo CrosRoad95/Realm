@@ -1,4 +1,7 @@
-﻿using Realm.Resources.Assets;
+﻿using Realm.Domain;
+using Realm.Resources.Assets;
+using Realm.Resources.Nametags;
+using Realm.Server.Extensions;
 
 namespace Realm.Console.Logic;
 
@@ -8,13 +11,16 @@ internal sealed class PlayerJoinedLogic
     private readonly ILogger<PlayerJoinedLogic> _logger;
     private readonly AssetsRegistry _assetsRegistry;
     private readonly IBanService _banService;
+    private readonly NametagsService _nametagsService;
 
-    public PlayerJoinedLogic(ECS ecs, ILogger<PlayerJoinedLogic> logger, AssetsRegistry assetsRegistry, IBanService banService)
+    public PlayerJoinedLogic(ECS ecs, ILogger<PlayerJoinedLogic> logger, AssetsRegistry assetsRegistry, IBanService banService,
+        NametagsService nametagsService)
     {
         _ecs = ecs;
         _logger = logger;
         _assetsRegistry = assetsRegistry;
         _banService = banService;
+        _nametagsService = nametagsService;
         _ecs.EntityCreated += HandleEntityCreated;
     }
 
@@ -65,6 +71,7 @@ internal sealed class PlayerJoinedLogic
                 await Task.Delay(300);
                 await playerElementComponent.FadeCameraAsync(CameraFade.In);
                 playerElementComponent.SetText3dRenderingEnabled(true);
+                _nametagsService.SetNametagRenderingEnabled(component.Entity, true);
             }
 
             if (component is LevelComponent levelComponent)

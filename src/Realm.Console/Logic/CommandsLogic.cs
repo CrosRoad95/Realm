@@ -1,8 +1,10 @@
 ﻿using Realm.Common.Providers;
 using Realm.Console.Components;
 using Realm.Console.Components.Huds;
+using Realm.Domain.Components.World;
 using Realm.Domain.Enums;
 using Realm.Module.Discord.Interfaces;
+using Realm.Resources.Nametags;
 using SixLabors.Fonts;
 using SixLabors.ImageSharp.Drawing.Processing;
 using SixLabors.ImageSharp.Formats.Jpeg;
@@ -10,6 +12,7 @@ using SlipeServer.Server.Services;
 using System.Diagnostics;
 using Color = System.Drawing.Color;
 using Size = System.Drawing.Size;
+using Realm.Server.Extensions;
 
 namespace Realm.Console.Logic;
 
@@ -25,6 +28,7 @@ internal sealed class CommandsLogic
     private readonly ChatBox _chatBox;
     private readonly ILogger<CommandsLogic> _logger;
     private readonly IDateTimeProvider _dateTimeProvider;
+    private readonly NametagsService _nametagsService;
 
     private class TestState
     {
@@ -33,7 +37,7 @@ internal sealed class CommandsLogic
 
     public CommandsLogic(RPGCommandService commandService, IEntityFactory entityFactory, RepositoryFactory repositoryFactory,
         ItemsRegistry itemsRegistry, ECS ecs, IBanService banService, IDiscordService discordService, ChatBox chatBox, ILogger<CommandsLogic> logger,
-        IDateTimeProvider dateTimeProvider)
+        IDateTimeProvider dateTimeProvider, NametagsService nametagsService)
     {
         _commandService = commandService;
         _entityFactory = entityFactory;
@@ -45,6 +49,7 @@ internal sealed class CommandsLogic
         _chatBox = chatBox;
         _logger = logger;
         _dateTimeProvider = dateTimeProvider;
+        _nametagsService = nametagsService;
         _commandService.AddCommandHandler("playtime", (entity, args) =>
         {
             if (entity.TryGetComponent(out PlayTimeComponent playTimeComponent))
@@ -591,6 +596,47 @@ internal sealed class CommandsLogic
             activity.Stop();
             return Task.CompletedTask;
         });
+
+        _commandService.AddCommandHandler("nametags", (entity, args) =>
+        {
+            var ped = _entityFactory.CreatePed(SlipeServer.Server.Elements.Enums.PedModel.Truth, entity.Transform.Position + new Vector3(4, 0, 0));
+            ped.AddComponent(new NametagComponent("[22] Borsuk"));
+            return Task.CompletedTask;
+        });
+        
+        _commandService.AddCommandHandler("nametags2", async (entity, args) =>
+        {
+            var nametag = new NametagComponent("[22] Borsuk");
+            var ped = _entityFactory.CreatePed(SlipeServer.Server.Elements.Enums.PedModel.Truth, entity.Transform.Position + new Vector3(4, 0, 0));
+            ped.AddComponent(nametag);
+            await Task.Delay(1000);
+            ped.DestroyComponent(nametag);
+        });
+        
+        _commandService.AddCommandHandler("nametags3", async (entity, args) =>
+        {
+            var nametag = new NametagComponent("[22] Borsuk");
+            var ped = _entityFactory.CreatePed(SlipeServer.Server.Elements.Enums.PedModel.Truth, entity.Transform.Position + new Vector3(4, 0, 0));
+            ped.AddComponent(nametag);
+            await Task.Delay(1000);
+            nametag.Text = "[100] Borsuk";
+        });
+        
+        _commandService.AddCommandHandler("nametags4", (entity, args) =>
+        {
+            nametagsService.SetNametagRenderingEnabled(entity, (args.FirstOrDefault() == "true") ? true : false);
+            return Task.CompletedTask;
+        });
+
+        _commandService.AddCommandHandler("nametags5", async (entity, args) =>
+        {
+            var nametag = new NametagComponent("[22] Borsuk");
+            var ped = _entityFactory.CreatePed(SlipeServer.Server.Elements.Enums.PedModel.Truth, entity.Transform.Position + new Vector3(4, 0, 0));
+            ped.AddComponent(nametag);
+            await Task.Delay(1000);
+            _ecs.Destroy(ped);
+        });
+
 
         _discordService.AddTextBasedCommandHandler(1069962155539042314, "test", (userId, parameters) =>
         {
