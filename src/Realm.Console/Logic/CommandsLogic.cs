@@ -646,6 +646,24 @@ internal sealed class CommandsLogic
             veh.Color3 = Color.FromArgb(rnd.Next(256), rnd.Next(256), rnd.Next(256));
             veh.Color4 = Color.FromArgb(rnd.Next(256), rnd.Next(256), rnd.Next(256));
         });
+        
+        _commandService.AddCommandHandler("setsetting", async (entity, args) =>
+        {
+            entity.GetRequiredComponent<AccountComponent>().SetSetting(1, args[0]);
+        });
+
+        _commandService.AddCommandHandler("removesetting", async (entity, args) =>
+        {
+            entity.GetRequiredComponent<AccountComponent>().RemoveSetting(1);
+        });
+        _commandService.AddCommandHandler("getsetting", async (entity, args) =>
+        {
+            var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();
+
+            var settingValue = entity.GetRequiredComponent<AccountComponent>().GetSetting(1);
+
+            playerElementComponent.SendChatMessage($"Setting1: {settingValue}");
+        });
 
 
         _discordService.AddTextBasedCommandHandler(1069962155539042314, "test", (userId, parameters) =>

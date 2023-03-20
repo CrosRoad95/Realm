@@ -1,4 +1,6 @@
-﻿namespace Realm.Persistance;
+﻿using Realm.Persistance.Data;
+
+namespace Realm.Persistance;
 
 public abstract class Db<T> : IdentityDbContext<User, Role, int,
         IdentityUserClaim<int>,
@@ -29,6 +31,7 @@ public abstract class Db<T> : IdentityDbContext<User, Role, int,
     public DbSet<VehiclePartDamage> VehiclePartDamages => Set<VehiclePartDamage>();
     public DbSet<Ban> Bans => Set<Ban>();
     public DbSet<UserReward> UserRewards => Set<UserReward>();
+    public DbSet<UserSetting> UserSettings => Set<UserSetting>();
     public DbSet<VehicleEngine> VehicleEngines => Set<VehicleEngine>();
 
     public Db(DbContextOptions<T> options) : base(options)
@@ -99,6 +102,11 @@ public abstract class Db<T> : IdentityDbContext<User, Role, int,
             entityBuilder
                 .HasMany(x => x.Rewards)
                 .WithOne(x => x.User)
+                .HasForeignKey(x => x.UserId);
+            
+            entityBuilder
+                .HasMany(x => x.Settings)
+                .WithOne()
                 .HasForeignKey(x => x.UserId);
 
             entityBuilder
@@ -175,6 +183,16 @@ public abstract class Db<T> : IdentityDbContext<User, Role, int,
             entityBuilder
                 .ToTable(nameof(UserRewards))
                 .HasKey(x => new { x.UserId, x.RewardId });
+        });
+
+        modelBuilder.Entity<UserSetting>(entityBuilder =>
+        {
+            entityBuilder
+                .ToTable(nameof(UserSettings))
+                .HasKey(x => new { x.UserId, x.SettingId });
+
+            entityBuilder.Property(x => x.SettingId)
+                .HasMaxLength(255);
         });
         
         modelBuilder.Entity<VehicleEngine>(entityBuilder =>

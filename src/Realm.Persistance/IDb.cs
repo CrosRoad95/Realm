@@ -31,6 +31,7 @@ public interface IDb : IDisposable
     DbSet<Ban> Bans { get; }
     DbSet<JobStatistics> JobPoints { get; }
     DbSet<UserReward> UserRewards { get; }
+    DbSet<UserSetting> UserSettings { get; }
 
     Task MigrateAsync();
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);

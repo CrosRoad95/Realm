@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Authorization;
+using System.Collections.Concurrent;
 
 namespace Realm.Domain.Components.Players;
 
@@ -14,12 +15,14 @@ public class AccountComponent : Component
     private ClaimsPrincipal _claimsPrincipal = default!;
     private List<int> _upgrades = new();
     private object _upgradesLock = new();
+    private readonly ConcurrentDictionary<int, string> _settings = new();
 
     internal User User => _user;
     internal ClaimsPrincipal ClaimsPrincipal => _claimsPrincipal ?? throw new ArgumentNullException(nameof(_claimsPrincipal));
     public int Id => _user.Id;
     public string? UserName => _user.UserName;
     public IReadOnlyList<int> Upgrades => _upgrades;
+    public ICollection<int> Settings => _settings.Keys;
 
     public event Action<AccountComponent, int>? UpgradeAdded;
     public event Action<AccountComponent, int>? UpgradeRemoved;
@@ -29,8 +32,11 @@ public class AccountComponent : Component
     {
         _user = user;
         _upgrades = _user.Upgrades.Select(x => x.UpgradeId).ToList();
+        foreach (var item in _user.Settings)
+        {
+            _settings[item.SettingId] = item.Value;
+        }
     }
-
     protected override async Task LoadAsync()
     {
         await UpdateClaimsPrincipal();
@@ -194,4 +200,24 @@ public class AccountComponent : Component
             return true;
         }
     }
+
+    public void SetSetting(int settingId, string value)
+    {
+        if (value.Length > 255)
+            throw new ArgumentException("Value is too long", nameof(value));
+        _settings[settingId] = value;
+    }
+    
+    public string? GetSetting(int settingId)
+    {
+        if (_settings.TryGetValue(settingId, out var value))
+            return value;
+        return null;
+    }
+
+    public void RemoveSetting(int settingId)
+    {
+        _settings.TryRemove(settingId, out var _);
+    }
+
 }

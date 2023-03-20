@@ -155,6 +155,13 @@ internal class SaveService : ISaveService
         {
             UpgradeId = x
         }).ToList();
+        
+        user.Settings = accountComponent.Settings.Select(x => new UserSetting
+        {
+            SettingId = x,
+            Value = accountComponent.GetSetting(x) ?? ""
+        }).ToList();
+
         if(entity.TryGetComponent(out PlayerElementComponent playerElementComponent) && playerElementComponent.Spawned)
             user.LastTransformAndMotion = entity.Transform.GetTransformAndMotion();
 

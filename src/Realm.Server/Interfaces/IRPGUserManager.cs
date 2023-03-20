@@ -2,6 +2,10 @@
 
 public interface IRPGUserManager
 {
+    Task<bool> AuthorizePolicy(AccountComponent accountComponent, string policy);
+    Task<bool> CheckPasswordAsync(User user, string password);
+    Task<User?> GetUserByLogin(string login);
+    Task<bool> IsUserNameInUse(string userName);
     Task<bool> SignIn(Entity entity, User user);
-    Task<User?> SignUp(string username, string password);
+    Task<int> SignUp(string username, string password);
 }

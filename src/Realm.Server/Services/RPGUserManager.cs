@@ -1,8 +1,11 @@
-﻿using Microsoft.Extensions.Options;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Options;
 using Realm.Common.Providers;
 using Realm.Domain.Inventory;
 using Realm.Domain.Options;
 using Realm.Domain.Registries;
+using Realm.Persistance.Data;
 
 namespace Realm.Server.Services;
 
@@ -16,34 +19,35 @@ internal class RPGUserManager : IRPGUserManager
     private readonly ILogger<RPGUserManager> _logger;
     private readonly IOptions<GameplayOptions> _gameplayOptions;
     private readonly IDateTimeProvider _dateTimeProvider;
+    private readonly IAuthorizationService _authorizationService;
 
     public RPGUserManager(ItemsRegistry itemsRegistry, UserManager<User> userManager, ILogger<RPGUserManager> logger, IOptions<GameplayOptions> gameplayOptions,
-        IDateTimeProvider dateTimeProvider)
+        IDateTimeProvider dateTimeProvider, IAuthorizationService authorizationService)
     {
         _itemsRegistry = itemsRegistry;
         _userManager = userManager;
         _logger = logger;
         _gameplayOptions = gameplayOptions;
         _dateTimeProvider = dateTimeProvider;
+        _authorizationService = authorizationService;
     }
 
-    public async Task<User?> SignUp(string username, string password)
+    public async Task<int> SignUp(string username, string password)
     {
-        var identityResult = await _userManager.CreateAsync(new User
+        var user = new User
         {
             UserName = username,
-        }, password);
+        };
+
+        var identityResult = await _userManager.CreateAsync(user, password);
         if (identityResult.Succeeded)
         {
-            _logger.LogInformation("Created an account {userName}", username);
-            return await _userManager.FindByNameAsync(username) ?? throw new Exception("Unable to find just created account");
+            _logger.LogInformation("Created a user account of id {userId} {userName}", user.Id, username);
+            return user.Id;
         }
-        else
-        {
-            _logger.LogWarning("Failed to create an account {userName} because: {identityResultErrors}", username, identityResult.Errors.Select(x => x.Description));
-        }
-        
-        return null;
+
+        _logger.LogError("Failed to create a user account {userName} because: {identityResultErrors}", username, identityResult.Errors.Select(x => x.Description));
+        throw new Exception("Failed to create a user account");
     }
 
     public async Task<bool> SignIn(Entity entity, User user)
@@ -60,7 +64,6 @@ internal class RPGUserManager : IRPGUserManager
         {
             if (!_usedAccountsIds.Add(user.Id))
                 return false;
-
 
             await entity.AddComponentAsync(new AccountComponent(user));
             if (user.Inventories != null && user.Inventories.Any())
@@ -157,5 +160,30 @@ internal class RPGUserManager : IRPGUserManager
         {
             _lock.Release();
         }
+    }
+
+    public async Task<bool> AuthorizePolicy(AccountComponent accountComponent, string policy)
+    {
+        var result = await _authorizationService.AuthorizeAsync(accountComponent.ClaimsPrincipal, policy);
+        return result.Succeeded;
+    }
+
+    public Task<User?> GetUserByLogin(string login)
+    {
+        return _userManager.Users
+            .IncludeAll()
+            .Where(u => u.UserName == login)
+            .AsNoTrackingWithIdentityResolution()
+            .FirstOrDefaultAsync();
+    }
+
+    public Task<bool> CheckPasswordAsync(User user, string password)
+    {
+        return _userManager.CheckPasswordAsync(user, password);
+    }
+
+    public Task<bool> IsUserNameInUse(string userName)
+    {
+        return _userManager.Users.AnyAsync(u => u.UserName.ToLower() == userName.ToLower());
     }
 }

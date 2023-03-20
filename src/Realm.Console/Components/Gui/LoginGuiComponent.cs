@@ -1,5 +1,4 @@
 ﻿using Realm.Domain.Contexts;
-using Realm.Persistance.Extensions;
 
 namespace Realm.Console.Components.Gui;
 
@@ -7,9 +6,7 @@ namespace Realm.Console.Components.Gui;
 public sealed class LoginGuiComponent : GuiComponent
 {
     [Inject]
-    private IRPGUserManager SignInService { get; set; } = default!;
-    [Inject]
-    private UserManager<User> UserManager { get; set; } = default!;
+    private IRPGUserManager RPGUserManager { get; set; } = default!;
 
     public LoginGuiComponent() : base("login", false)
     {
@@ -23,11 +20,7 @@ public sealed class LoginGuiComponent : GuiComponent
             case "login":
                 var loginData = formContext.GetData<LoginData>();
 
-                var user = await UserManager.Users
-                    .IncludeAll()
-                    .Where(u => u.UserName == loginData.Login)
-                    .AsNoTrackingWithIdentityResolution()
-                    .FirstOrDefaultAsync();
+                var user = await RPGUserManager.GetUserByLogin(loginData.Login);
 
                 if (user == null)
                 {
@@ -35,12 +28,12 @@ public sealed class LoginGuiComponent : GuiComponent
                     return;
                 }
 
-                if(!await UserManager.CheckPasswordAsync(user, loginData.Password))
+                if(!await RPGUserManager.CheckPasswordAsync(user, loginData.Password))
                 {
                     formContext.ErrorResponse("Login lub hasło jest niepoprawne.");
                     return;
                 }
-                if(await SignInService.SignIn(Entity, user))
+                if(await RPGUserManager.SignIn(Entity, user))
                 {
                     Entity.DestroyComponent(this);
                     formContext.SuccessResponse();

@@ -21,7 +21,9 @@ public static class QuerableExtensions
 
     public static IQueryable<User> IncludeAll(this IQueryable<User> query)
     {
-        return query.Include(x => x.Licenses)
+        return query
+            .AsSplitQuery()
+            .Include(x => x.Licenses)
             .Include(x => x.JobUpgrades)
             .Include(x => x.JobStatistics)
             .Include(x => x.Achievements)
@@ -32,6 +34,7 @@ public static class QuerableExtensions
             .Include(x => x.FractionMembers)
             .Include(x => x.DiscordIntegration)
             .Include(x => x.Upgrades)
+            .Include(x => x.Settings)
             .Include(x => x.Inventories)
             .ThenInclude(x => x!.InventoryItems);
     }
@@ -41,6 +44,7 @@ public static class QuerableExtensions
         return query.Include(x => x.Fuels)
             .Include(x => x.Upgrades)
             .Include(x => x.PartDamages)
+            .Include(x => x.VehicleEngines)
             .Include(x => x.VehicleAccesses)
             .ThenInclude(x => x.User);
     }

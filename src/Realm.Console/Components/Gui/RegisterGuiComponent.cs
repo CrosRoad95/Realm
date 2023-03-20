@@ -1,4 +1,5 @@
-﻿using Realm.Domain.Contexts;
+﻿using Microsoft.AspNetCore.Identity;
+using Realm.Domain.Contexts;
 
 namespace Realm.Console.Components.Gui;
 
@@ -6,9 +7,7 @@ namespace Realm.Console.Components.Gui;
 public sealed class RegisterGuiComponent : GuiComponent
 {
     [Inject]
-    private IRPGUserManager SignInService { get; set; } = default!;
-    [Inject]
-    private UserManager<User> UserManager { get; set; } = default!;
+    private IRPGUserManager RPGUserManager { get; set; } = default!;
 
     public RegisterGuiComponent() : base("register", false)
     {
@@ -27,28 +26,21 @@ public sealed class RegisterGuiComponent : GuiComponent
                     return;
                 }
 
-                var user = await UserManager.Users
-                    .FirstOrDefaultAsync(u => u.UserName.ToLower() == registerData.Login.ToLower());
-
-                if (user != null)
+                if (await RPGUserManager.IsUserNameInUse(registerData.Login))
                 {
                     formContext.ErrorResponse("Login zajęty.");
                     return;
                 }
 
-                var identityResult = await UserManager.CreateAsync(new User
+                try
                 {
-                    UserName = registerData.Login,
-                }, registerData.Password);
-                if (identityResult.Succeeded)
-                {
+                    var userId = await RPGUserManager.SignUp(registerData.Login, registerData.Password);
                     Entity.AddComponent<LoginGuiComponent>();
                     Entity.DestroyComponent(this);
-                    return;
                 }
-                else
+                catch(Exception ex)
                 {
-                    formContext.ErrorResponse(identityResult.Errors.First().Description);
+                    formContext.ErrorResponse("Wystąpił błąd podczas rejestracji.");
                 }
                 break;
             default:

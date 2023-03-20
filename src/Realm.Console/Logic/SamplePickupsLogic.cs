@@ -23,8 +23,11 @@ internal class SamplePickupsLogic
             pickupElementComponent.AddRule(new MustBePlayerInFractionRule(1));
             pickupElementComponent.EntityRuleFailed = (entity, rule) =>
             {
-                var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();
-                playerElementComponent.SendChatMessage($"No permissions, rule: {rule.GetType().Name}");
+                if(entity.Tag == Entity.EntityTag.Player)
+                {
+                    var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();
+                    playerElementComponent.SendChatMessage($"No permissions, rule: {rule.GetType().Name}");
+                }
 
             };
             pickupElementComponent.EntityEntered = async entity =>

@@ -72,7 +72,6 @@ internal sealed class RPGServer : IRPGServer
         services.AddTransient<IBanService, BanService>();
         services.AddTransient<IJobService, JobService>();
         services.AddTransient<IRewardService, RewardService>();
-        services.AddTransient<IAccountService, AccountService>();
         services.AddSingleton<IMapsService, MapsService>();
         #endregion
 

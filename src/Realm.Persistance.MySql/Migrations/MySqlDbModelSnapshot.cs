@@ -575,6 +575,24 @@ namespace Realm.Persistance.MySql.Migrations
                     b.ToTable("UserRewards", (string)null);
                 });
 
+            modelBuilder.Entity("Realm.Persistance.Data.UserSetting", b =>
+                {
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("SettingId")
+                        .HasMaxLength(255)
+                        .HasColumnType("int");
+
+                    b.Property<string>("Value")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.HasKey("UserId", "SettingId");
+
+                    b.ToTable("UserSettings", (string)null);
+                });
+
             modelBuilder.Entity("Realm.Persistance.Data.UserStat", b =>
                 {
                     b.Property<int>("UserId")
@@ -1036,6 +1054,15 @@ namespace Realm.Persistance.MySql.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("Realm.Persistance.Data.UserSetting", b =>
+                {
+                    b.HasOne("Realm.Persistance.Data.User", null)
+                        .WithMany("Settings")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("Realm.Persistance.Data.UserStat", b =>
                 {
                     b.HasOne("Realm.Persistance.Data.User", "User")
@@ -1157,6 +1184,8 @@ namespace Realm.Persistance.MySql.Migrations
                     b.Navigation("Licenses");
 
                     b.Navigation("Rewards");
+
+                    b.Navigation("Settings");
 
                     b.Navigation("Stats");
 
