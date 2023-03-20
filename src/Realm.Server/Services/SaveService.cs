@@ -96,6 +96,8 @@ internal class SaveService : ISaveService
                 Vehicle = vehicleData,
                 VehicleId = vehicleData.Id
             }).ToList();
+
+            vehicleData.Paintjob = vehicleUpgradesComponent.Paintjob;
         }
 
         {

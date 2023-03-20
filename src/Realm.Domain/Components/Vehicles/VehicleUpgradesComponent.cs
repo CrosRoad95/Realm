@@ -28,8 +28,19 @@ public class VehicleUpgradesComponent : Component
         }
     }
 
+    public byte Paintjob
+    {
+        get => Entity.GetRequiredComponent<VehicleElementComponent>().Vehicle.PaintJob;
+        set
+        {
+            Entity.GetRequiredComponent<VehicleElementComponent>().Vehicle.PaintJob = value;
+            PaintjobChanged?.Invoke(this, value);
+        }
+    }
+
     public event Action<VehicleUpgradesComponent, int>? UpgradeAdded;
     public event Action<VehicleUpgradesComponent, int>? UpgradeRemoved;
+    public event Action<VehicleUpgradesComponent, byte>? PaintjobChanged;
 
     public VehicleUpgradesComponent() { }
 
