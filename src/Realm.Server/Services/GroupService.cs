@@ -51,6 +51,11 @@ internal class GroupService : IGroupService
         return Map(groupData);
     }
     
+    public Task<bool> GroupExistsByNameOrShortut(string groupName, string shortcut)
+    {
+        return _groupRepository.ExistsByNameOrShortcut(groupName, shortcut);
+    }
+    
     public async Task<Group> CreateGroup(string groupName, string shortcut, GroupKind groupKind = GroupKind.Regular)
     {
         if(await _groupRepository.ExistsByName(groupName))

@@ -11,4 +11,6 @@ public interface IGroupService
     Task<Domain.Concepts.Group?> GetGroupByName(string groupName);
     Task AddMember(int groupId, int userId, int rank = 1, string rankName = "");
     Task RemoveMember(int groupId, int userId);
+    Task<bool> GroupExistsByNameOrShortut(string groupName, string shortcut);
+    Task<Domain.Concepts.Group?> GetGroupByNameOrShortut(string groupName, string shortcut);
 }

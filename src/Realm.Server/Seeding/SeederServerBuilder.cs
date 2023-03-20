@@ -110,16 +110,16 @@ internal sealed class SeederServerBuilder
     {
         foreach (var pair in groups)
         {
-            bool created = false;
             Domain.Concepts.Group group;
-            try
+            if(!await _groupService.GroupExistsByNameOrShortut(pair.Key, pair.Value.Shortcut))
             {
                 group = await _groupService.CreateGroup(pair.Key, pair.Value.Shortcut, pair.Value.GroupKind);
-                created = true;
+                _logger.LogInformation("Seeder: Created group {elementId} with members {members}", pair.Key, pair.Value.Members.Select(x => x.Key));
             }
-            catch(Exception) // Group already exists
+            else
             {
-                group = await _groupService.GetGroupByName(pair.Key) ?? throw new InvalidOperationException();
+                group = await _groupService.GetGroupByNameOrShortut(pair.Key, pair.Value.Shortcut) ?? throw new Exception("Failed to get group by name or shortcut");
+                _logger.LogInformation("Seeder: Updated group {elementId} with members {members}", pair.Key, pair.Value.Members.Select(x => x.Key));
             }
 
             foreach (var item in pair.Value.Members)
@@ -133,10 +133,6 @@ internal sealed class SeederServerBuilder
 
                 }
             }
-            if(created)
-                _logger.LogInformation("Seeder: Created group {elementId} with members {members}", pair.Key, pair.Value.Members.Select(x => x.Key));
-            else
-                _logger.LogInformation("Seeder: Updated group {elementId} with members {members}", pair.Key, pair.Value.Members.Select(x => x.Key));
         }
     }
 

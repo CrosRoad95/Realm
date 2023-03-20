@@ -130,6 +130,9 @@ public class VehicleUpgradesComponent : Component
 
     private void ApplyUpgrade(object vehicleHandling, IEnumerable<FloatValueUpgradeDescription?> upgradeDescriptions, Expression<Func<VehicleHandling, float>> handlingProperty)
     {
+        if (!upgradeDescriptions.Any())
+            throw new InvalidOperationException("Sequence contains no elements");
+
         float increseByUnits = 0;
         float multipleBy = 0;
         var memberExpression = (MemberExpression)handlingProperty.Body;
@@ -139,6 +142,8 @@ public class VehicleUpgradesComponent : Component
         {
             increseByUnits += floatValueUpgradeDescription.IncreaseByUnits;
             multipleBy += floatValueUpgradeDescription.MultipleBy;
+            if (floatValueUpgradeDescription.MultipleBy == 0)
+                throw new ArgumentOutOfRangeException("Multiple by can not be 0");
         }
         value *= multipleBy;
         value += increseByUnits;
@@ -176,6 +181,7 @@ public class VehicleUpgradesComponent : Component
             }
             _dirtyState = false;
         }
+
         vehicle.Handling = (VehicleHandling)boxedVehicleHandling;
     }
 }

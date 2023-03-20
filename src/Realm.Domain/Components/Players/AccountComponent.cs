@@ -9,21 +9,21 @@ public class AccountComponent : Component
     private UserManager<User> UserManager { get; set; } = default!;
     [Inject]
     private SignInManager<User> SignInManager { get; set; } = default!;
-    [Inject]
-    private IAuthorizationService AuthorizationService { get; set; } = default!;
 
     private readonly User _user;
-    private ClaimsPrincipal? _claimsPrincipal;
+    private ClaimsPrincipal _claimsPrincipal = default!;
     private List<int> _upgrades = new();
     private object _upgradesLock = new();
 
     internal User User => _user;
+    internal ClaimsPrincipal ClaimsPrincipal => _claimsPrincipal ?? throw new ArgumentNullException(nameof(_claimsPrincipal));
     public int Id => _user.Id;
     public string? UserName => _user.UserName;
     public IReadOnlyList<int> Upgrades => _upgrades;
 
     public event Action<AccountComponent, int>? UpgradeAdded;
     public event Action<AccountComponent, int>? UpgradeRemoved;
+    public event Action<AccountComponent, ClaimsPrincipal>? ClaimsPrincipalUpdated;
 
     internal AccountComponent(User user)
     {
@@ -39,6 +39,7 @@ public class AccountComponent : Component
     private async Task UpdateClaimsPrincipal()
     {
         _claimsPrincipal = await SignInManager.CreateUserPrincipalAsync(_user);
+        ClaimsPrincipalUpdated?.Invoke(this, _claimsPrincipal);
     }
 
     public bool IsInRole(string role)
@@ -153,14 +154,6 @@ public class AccountComponent : Component
         var result = await UserManager.RemoveClaimsAsync(_user, claims);
         if (result.Succeeded)
             await UpdateClaimsPrincipal();
-        return result.Succeeded;
-    }
-
-    public async Task<bool> AuthorizePolicy(string policy)
-    {
-        ThrowIfDisposed();
-
-        var result = await AuthorizationService.AuthorizeAsync(_claimsPrincipal, policy);
         return result.Succeeded;
     }
 

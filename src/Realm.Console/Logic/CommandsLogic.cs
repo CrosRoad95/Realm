@@ -636,6 +636,16 @@ internal sealed class CommandsLogic
             await Task.Delay(1000);
             _ecs.Destroy(ped);
         });
+        
+        _commandService.AddCommandHandler("randomvehcolor", async (entity, args) =>
+        {
+            var rnd = Random.Shared;
+            var veh = entity.GetRequiredComponent<PlayerElementComponent>().OccupiedVehicle.GetRequiredComponent<VehicleElementComponent>();
+            veh.PrimaryColor = Color.FromArgb(rnd.Next(256), rnd.Next(256), rnd.Next(256));
+            veh.SecondaryColor = Color.FromArgb(rnd.Next(256), rnd.Next(256), rnd.Next(256));
+            veh.Color3 = Color.FromArgb(rnd.Next(256), rnd.Next(256), rnd.Next(256));
+            veh.Color4 = Color.FromArgb(rnd.Next(256), rnd.Next(256), rnd.Next(256));
+        });
 
 
         _discordService.AddTextBasedCommandHandler(1069962155539042314, "test", (userId, parameters) =>

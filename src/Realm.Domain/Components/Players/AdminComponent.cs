@@ -100,11 +100,6 @@ public class AdminComponent : Component
         }
     }
 
-    public void ToggleNoClip()
-    {
-        NoClip = !NoClip;
-    }
-
     public override void Dispose()
     {
         DevelopmentMode = false;

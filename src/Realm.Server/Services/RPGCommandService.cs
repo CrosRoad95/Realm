@@ -8,14 +8,16 @@ public class RPGCommandService
 {
     private readonly CommandService _commandService;
     private readonly ECS _ecs;
+    private readonly IAccountService _accountService;
     private readonly ILogger<RPGCommandService> _logger;
 
     private readonly List<Command> _commands = new();
-    public RPGCommandService(CommandService commandService, ILogger<RPGCommandService> logger, ECS ecs)
+    public RPGCommandService(CommandService commandService, ILogger<RPGCommandService> logger, ECS ecs, IAccountService accountService)
     {
         _logger = logger;
         _commandService = commandService;
         _ecs = ecs;
+        _accountService = accountService;
     }
 
     public bool AddCommandHandler(string commandName, Func<Entity, string[], Task> callback, string[]? requiredPolicies = null)
@@ -50,7 +52,7 @@ public class RPGCommandService
             if (requiredPolicies != null)
             {
                 foreach (var policy in requiredPolicies)
-                    if (!await accountComponent.AuthorizePolicy(policy))
+                    if (!await _accountService.AuthorizePolicy(accountComponent, policy))
                     {
                         _logger.LogInformation("{player} failed to execute command {commandName} because failed to authorize for policy {policy}", player, commandName, policy);
                         return;

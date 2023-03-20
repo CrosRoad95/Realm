@@ -27,7 +27,7 @@ internal class LoadService : ILoadService
         {
             try
             {
-                await Task.Delay(200);
+                //await Task.Delay(200);
                 var entity = _entityFactory.CreateVehicle(vehicleData.Model, vehicleData.TransformAndMotion.Position, vehicleData.TransformAndMotion.Rotation, new Domain.Concepts.ConstructionInfo
                 {
                     Id = $"vehicle {vehicleData.Id}",

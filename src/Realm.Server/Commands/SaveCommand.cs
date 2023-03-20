@@ -22,6 +22,9 @@ internal class SaveCommand : ICommand
             try
             {
                 await _saveService.Save(entity);
+#if DEBUG
+                await _saveService.Commit();
+#endif
                 savedEntities++;
             }
             catch (Exception ex)
@@ -29,6 +32,8 @@ internal class SaveCommand : ICommand
                 _logger.LogError(ex, "Failed to save entity: {entityName}", entity.ToString());
             }
         }
+#if !DEBUG
         await _saveService.Commit();
+#endif
     }
 }

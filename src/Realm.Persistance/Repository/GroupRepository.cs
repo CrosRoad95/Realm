@@ -29,6 +29,12 @@ internal class GroupRepository : IGroupRepository
         .Where(x => x.Name == groupName)
         .AnyAsync();
     
+    public Task<bool> ExistsByNameOrShortcut(string groupName, string shortcut) => _db.Groups
+        .TagWithSource(nameof(GroupRepository))
+        .AsNoTrackingWithIdentityResolution()
+        .Where(x => x.Name == groupName || x.Shortcut == shortcut)
+        .AnyAsync();
+    
     public Task<bool> ExistsByShortcut(string shortcut) => _db.Groups
         .TagWithSource(nameof(GroupRepository))
         .AsNoTrackingWithIdentityResolution()
