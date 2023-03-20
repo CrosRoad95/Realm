@@ -65,7 +65,6 @@ public class PickupElementComponent : ElementComponent
                         Logger.LogError(ex, "Failed to invoke entity entered callback");
                     }
                 }
-        }
     }
 
     private void HandleElementLeft(Element element)
@@ -82,7 +81,6 @@ public class PickupElementComponent : ElementComponent
                         {
                             Logger.LogError(ex, "Failed to invoke entity left callback");
                         }
-        }
     }
 
     private void HandleDestroyed(Entity entity)

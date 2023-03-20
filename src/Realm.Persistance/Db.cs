@@ -32,6 +32,7 @@ public abstract class Db<T> : IdentityDbContext<User, Role, int,
     public DbSet<Ban> Bans => Set<Ban>();
     public DbSet<UserReward> UserRewards => Set<UserReward>();
     public DbSet<UserSetting> UserSettings => Set<UserSetting>();
+    public DbSet<UserWhitelistedSerial> UserWhitelistedSerials => Set<UserWhitelistedSerial>();
     public DbSet<VehicleEngine> VehicleEngines => Set<VehicleEngine>();
 
     public Db(DbContextOptions<T> options) : base(options)
@@ -106,6 +107,11 @@ public abstract class Db<T> : IdentityDbContext<User, Role, int,
             
             entityBuilder
                 .HasMany(x => x.Settings)
+                .WithOne()
+                .HasForeignKey(x => x.UserId);
+
+            entityBuilder
+                .HasMany(x => x.WhitelistedSerials)
                 .WithOne()
                 .HasForeignKey(x => x.UserId);
 
@@ -193,6 +199,16 @@ public abstract class Db<T> : IdentityDbContext<User, Role, int,
 
             entityBuilder.Property(x => x.SettingId)
                 .HasMaxLength(255);
+        });
+
+        modelBuilder.Entity<UserWhitelistedSerial>(entityBuilder =>
+        {
+            entityBuilder
+                .ToTable(nameof(UserWhitelistedSerials))
+                .HasKey(x => new { x.UserId, x.Serial });
+
+            entityBuilder.Property(x => x.Serial)
+                .HasMaxLength(32);
         });
         
         modelBuilder.Entity<VehicleEngine>(entityBuilder =>

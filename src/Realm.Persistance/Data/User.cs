@@ -34,4 +34,5 @@ public sealed class User : IdentityUser<int>
     public ICollection<UserStat> Stats { get; set; } = new List<UserStat>();
     public ICollection<UserReward> Rewards { get; set; } = new List<UserReward>();
     public ICollection<UserSetting> Settings { get; set; } = new List<UserSetting>();
+    public ICollection<UserWhitelistedSerial> WhitelistedSerials { get; set; } = new List<UserWhitelistedSerial>();
 }

@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore.Diagnostics.Internal;
 using Microsoft.Extensions.Options;
 using Realm.Common.Providers;
 using Realm.Domain.Inventory;
@@ -20,9 +21,10 @@ internal class RPGUserManager : IRPGUserManager
     private readonly IOptions<GameplayOptions> _gameplayOptions;
     private readonly IDateTimeProvider _dateTimeProvider;
     private readonly IAuthorizationService _authorizationService;
+    private readonly IDb _db;
 
     public RPGUserManager(ItemsRegistry itemsRegistry, UserManager<User> userManager, ILogger<RPGUserManager> logger, IOptions<GameplayOptions> gameplayOptions,
-        IDateTimeProvider dateTimeProvider, IAuthorizationService authorizationService)
+        IDateTimeProvider dateTimeProvider, IAuthorizationService authorizationService, IDb db)
     {
         _itemsRegistry = itemsRegistry;
         _userManager = userManager;
@@ -30,6 +32,7 @@ internal class RPGUserManager : IRPGUserManager
         _gameplayOptions = gameplayOptions;
         _dateTimeProvider = dateTimeProvider;
         _authorizationService = authorizationService;
+        _db = db;
     }
 
     public async Task<int> SignUp(string username, string password)
@@ -185,5 +188,55 @@ internal class RPGUserManager : IRPGUserManager
     public Task<bool> IsUserNameInUse(string userName)
     {
         return _userManager.Users.AnyAsync(u => u.UserName.ToLower() == userName.ToLower());
+    }
+
+    public Task<bool> IsSerialWhitelisted(int userId, string serial)
+    {
+        return _db.UserWhitelistedSerials.AnyAsync(x => x.UserId == userId && x.Serial == serial);
+    }
+
+    public async Task<bool> TryAddWhitelistedSerial(int userId, string serial)
+    {
+        if (serial.Length != 32)
+            throw new ArgumentException(null, nameof(serial));
+
+        try
+        {
+            _db.UserWhitelistedSerials.Add(new UserWhitelistedSerial
+            {
+                Serial = serial,
+                UserId = userId
+            });
+
+            var added = await _db.SaveChangesAsync();
+            return added > 0;
+        }
+        catch(Exception)
+        {
+            return false;
+        }
+        finally
+        {
+            _db.ChangeTracker.Clear();
+        }
+    }
+
+    public async Task<bool> TryRemoveWhitelistedSerial(int userId, string serial)
+    {
+        if (serial.Length != 32)
+            throw new ArgumentException(null, nameof(serial));
+
+        try
+        {
+            var deleted = await _db.UserWhitelistedSerials
+                .Where(x => x.UserId == userId && x.Serial == serial)
+                .ExecuteDeleteAsync();
+
+            return deleted > 0;
+        }
+        catch(Exception)
+        {
+            return false;
+        }
     }
 }

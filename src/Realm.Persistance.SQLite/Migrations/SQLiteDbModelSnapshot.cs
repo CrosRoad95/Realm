@@ -620,6 +620,20 @@ namespace Realm.Persistance.SQLite.Migrations
                     b.ToTable("UserUpgrade", (string)null);
                 });
 
+            modelBuilder.Entity("Realm.Persistance.Data.UserWhitelistedSerial", b =>
+                {
+                    b.Property<int>("UserId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Serial")
+                        .HasMaxLength(32)
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("UserId", "Serial");
+
+                    b.ToTable("UserWhitelistedSerials", (string)null);
+                });
+
             modelBuilder.Entity("Realm.Persistance.Data.Vehicle", b =>
                 {
                     b.Property<int>("Id")
@@ -1083,6 +1097,15 @@ namespace Realm.Persistance.SQLite.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("Realm.Persistance.Data.UserWhitelistedSerial", b =>
+                {
+                    b.HasOne("Realm.Persistance.Data.User", null)
+                        .WithMany("WhitelistedSerials")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("Realm.Persistance.Data.VehicleAccess", b =>
                 {
                     b.HasOne("Realm.Persistance.Data.User", "User")
@@ -1190,6 +1213,8 @@ namespace Realm.Persistance.SQLite.Migrations
                     b.Navigation("Upgrades");
 
                     b.Navigation("VehicleAccesses");
+
+                    b.Navigation("WhitelistedSerials");
                 });
 
             modelBuilder.Entity("Realm.Persistance.Data.Vehicle", b =>

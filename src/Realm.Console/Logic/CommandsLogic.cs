@@ -37,7 +37,7 @@ internal sealed class CommandsLogic
 
     public CommandsLogic(RPGCommandService commandService, IEntityFactory entityFactory, RepositoryFactory repositoryFactory,
         ItemsRegistry itemsRegistry, ECS ecs, IBanService banService, IDiscordService discordService, ChatBox chatBox, ILogger<CommandsLogic> logger,
-        IDateTimeProvider dateTimeProvider, NametagsService nametagsService)
+        IDateTimeProvider dateTimeProvider, NametagsService nametagsService, IRPGUserManager rpgUserManager)
     {
         _commandService = commandService;
         _entityFactory = entityFactory;
@@ -656,6 +656,7 @@ internal sealed class CommandsLogic
         {
             entity.GetRequiredComponent<AccountComponent>().RemoveSetting(1);
         });
+
         _commandService.AddCommandHandler("getsetting", async (entity, args) =>
         {
             var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();
@@ -665,6 +666,36 @@ internal sealed class CommandsLogic
             playerElementComponent.SendChatMessage($"Setting1: {settingValue}");
         });
 
+        
+        _commandService.AddCommandHandler("whitelistmyserial", async (entity, args) =>
+        {
+            var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();
+            var accountComponent = entity.GetRequiredComponent<AccountComponent>();
+
+            if (await rpgUserManager.TryAddWhitelistedSerial(accountComponent.Id, playerElementComponent.Client.Serial))
+            {
+                playerElementComponent.SendChatMessage($"Dodano serial");
+            }
+            else
+            {
+                playerElementComponent.SendChatMessage($"Nie udało się dodać");
+            }
+        });
+        
+        _commandService.AddCommandHandler("removewhitelistmyserial", async (entity, args) =>
+        {
+            var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();
+            var accountComponent = entity.GetRequiredComponent<AccountComponent>();
+
+            if (await rpgUserManager.TryRemoveWhitelistedSerial(accountComponent.Id, playerElementComponent.Client.Serial))
+            {
+                playerElementComponent.SendChatMessage($"Usunięto serial");
+            }
+            else
+            {
+                playerElementComponent.SendChatMessage($"Nie udało się usunąć");
+            }
+        });
 
         _discordService.AddTextBasedCommandHandler(1069962155539042314, "test", (userId, parameters) =>
         {

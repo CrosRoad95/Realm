@@ -7,6 +7,8 @@ public sealed class LoginGuiComponent : GuiComponent
 {
     [Inject]
     private IRPGUserManager RPGUserManager { get; set; } = default!;
+    [Inject]
+    private ILogger<GuiComponent> Logger { get; set; } = default!;
 
     public LoginGuiComponent() : base("login", false)
     {
@@ -26,6 +28,11 @@ public sealed class LoginGuiComponent : GuiComponent
                 {
                     formContext.ErrorResponse("Login lub hasło jest niepoprawne.");
                     return;
+                }
+
+                if (!await RPGUserManager.IsSerialWhitelisted(user.Id, formContext.Entity.GetRequiredComponent<PlayerElementComponent>().Client.Serial))
+                {
+                    Logger.LogWarning("Player logged in to not whitelisted user account.");
                 }
 
                 if(!await RPGUserManager.CheckPasswordAsync(user, loginData.Password))

@@ -7,14 +7,26 @@ internal class FormContext : IFormContext
     private readonly string _formName;
     private readonly LuaValue _data;
     private readonly AgnosticGuiSystemService _agnosticGuiSystemService;
+    private readonly IEntityByElement _entityByElement;
 
     public string FormName => _formName;
-    public FormContext(Player player, string formName, LuaValue data, AgnosticGuiSystemService agnosticGuiSystemService)
+
+    public Entity Entity
+    {
+        get
+        {
+            _entityByElement.TryGetEntityByPlayer(_player, out var entity);
+            return entity;
+        }
+    }
+
+    public FormContext(Player player, string formName, LuaValue data, AgnosticGuiSystemService agnosticGuiSystemService, IEntityByElement entityByElement)
     {
         _player = player;
         _formName = formName;
         _data = data;
         _agnosticGuiSystemService = agnosticGuiSystemService;
+        _entityByElement = entityByElement;
     }
 
     public TData GetData<TData>() where TData : ILuaValue, new()

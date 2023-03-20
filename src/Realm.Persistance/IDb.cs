@@ -32,6 +32,7 @@ public interface IDb : IDisposable
     DbSet<JobStatistics> JobPoints { get; }
     DbSet<UserReward> UserRewards { get; }
     DbSet<UserSetting> UserSettings { get; }
+    DbSet<UserWhitelistedSerial> UserWhitelistedSerials { get; }
 
     Task MigrateAsync();
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
