@@ -93,7 +93,6 @@ internal class SaveService : ISaveService
             vehicleData.Upgrades = vehicleUpgradesComponent.Upgrades.Select(x => new Persistance.Data.VehicleUpgrade
             {
                 UpgradeId = x,
-                Vehicle = vehicleData,
                 VehicleId = vehicleData.Id
             }).ToList();
 
@@ -104,7 +103,6 @@ internal class SaveService : ISaveService
             var fuelComponents = entity.Components.OfType<VehicleFuelComponent>();
             vehicleData.Fuels = fuelComponents.Select(x => new VehicleFuel
             {
-                Vehicle = vehicleData,
                 VehicleId = vehicleData.Id,
                 FuelType = x.FuelType,
                 Active = x.Active,

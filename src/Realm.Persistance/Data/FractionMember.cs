@@ -1,6 +1,6 @@
 ﻿namespace Realm.Persistance.Data;
 
-public class FractionMember
+public sealed class FractionMember
 {
     public int FractionId { get; set; }
     public int UserId { get; set; }

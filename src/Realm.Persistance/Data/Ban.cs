@@ -1,6 +1,6 @@
 ﻿namespace Realm.Persistance.Data;
 
-public class Ban
+public sealed class Ban
 {
     public int Id { get; set; }
     public DateTime End { get; set; }

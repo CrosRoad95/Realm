@@ -1,6 +1,6 @@
 ﻿namespace Realm.Persistance.Data;
 
-public class Fraction
+public sealed class Fraction
 {
     public int Id { get; set; }
     public string Name { get; set; }

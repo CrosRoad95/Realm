@@ -1,6 +1,6 @@
 ﻿namespace Realm.Persistance.Data;
 
-public class VehicleEngine
+public sealed class VehicleEngine
 {
     public int VehicleId { get; set; }
     public short EngineId { get; set; }

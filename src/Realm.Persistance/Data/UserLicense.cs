@@ -1,6 +1,6 @@
 ﻿namespace Realm.Persistance.Data;
 
-public class UserLicense
+public sealed class UserLicense
 {
 #pragma warning disable CS8618
     public int UserId { get; set; }
@@ -8,6 +8,4 @@ public class UserLicense
     public DateTime? SuspendedUntil { get; set; }
     public string? SuspendedReason { get; set; }
 #pragma warning restore CS8618
-
-    public virtual User? User { get; set; }
 }

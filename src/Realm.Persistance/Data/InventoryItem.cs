@@ -1,6 +1,6 @@
 ﻿namespace Realm.Persistance.Data;
 
-public class InventoryItem
+public sealed class InventoryItem
 {
     public string Id { get; set; }
     public uint ItemId { get; set; }
@@ -8,5 +8,5 @@ public class InventoryItem
     public int InventoryId { get; set; }
     public string MetaData { get; set; }
 
-    public virtual Inventory? Inventory { get; set; }
+    public Inventory? Inventory { get; set; }
 }

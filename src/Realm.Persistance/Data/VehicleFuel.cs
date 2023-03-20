@@ -1,6 +1,6 @@
 ﻿namespace Realm.Persistance.Data;
 
-public class VehicleFuel
+public sealed class VehicleFuel
 {
     public int VehicleId { get; set; }
     public string FuelType { get; set; }
@@ -9,6 +9,4 @@ public class VehicleFuel
     public float Amount { get; set; }
     public float MaxCapacity { get; set; }
     public bool Active { get; set; }
-
-    public virtual Vehicle? Vehicle { get; set; }
 }

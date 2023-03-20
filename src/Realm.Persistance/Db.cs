@@ -65,7 +65,7 @@ public abstract class Db<T> : IdentityDbContext<User, Role, int,
 
             entityBuilder
                 .HasMany(x => x.Licenses)
-                .WithOne(x => x.User)
+                .WithOne()
                 .HasForeignKey(x => x.UserId);
 
             entityBuilder
@@ -75,34 +75,34 @@ public abstract class Db<T> : IdentityDbContext<User, Role, int,
 
             entityBuilder
                 .HasMany(x => x.Achievements)
-                .WithOne(x => x.User)
+                .WithOne()
                 .HasForeignKey(x => x.UserId);
 
             entityBuilder
                 .HasMany(x => x.JobUpgrades)
-                .WithOne(x => x.User)
+                .WithOne()
                 .HasForeignKey(x => x.UserId)
                 .HasPrincipalKey(x => x.Id);
             
             entityBuilder
                 .HasMany(x => x.JobStatistics)
-                .WithOne(x => x.User)
+                .WithOne()
                 .HasForeignKey(x => x.UserId);
 
             entityBuilder
                 .HasOne(x => x.DailyVisits)
-                .WithOne(x => x.User)
+                .WithOne()
                 .HasForeignKey<DailyVisits>(x => x.UserId);
 
             entityBuilder
                 .HasMany(x => x.Stats)
-                .WithOne(x => x.User)
+                .WithOne()
                 .HasForeignKey(x => x.UserId);
                 //.OnDelete(DeleteBehavior.Cascade);
 
             entityBuilder
                 .HasMany(x => x.Rewards)
-                .WithOne(x => x.User)
+                .WithOne()
                 .HasForeignKey(x => x.UserId);
             
             entityBuilder
@@ -117,13 +117,13 @@ public abstract class Db<T> : IdentityDbContext<User, Role, int,
 
             entityBuilder
                 .HasMany(x => x.Inventories)
-                .WithOne(x => x.User)
+                .WithOne()
                 .HasForeignKey(x => x.UserId)
                 .OnDelete(DeleteBehavior.Cascade);
 
             entityBuilder
                 .HasMany(x => x.Discoveries)
-                .WithOne(x => x.User)
+                .WithOne()
                 .HasForeignKey(x => x.UserId)
                 .OnDelete(DeleteBehavior.Cascade);
 
@@ -140,13 +140,12 @@ public abstract class Db<T> : IdentityDbContext<User, Role, int,
                 .HasForeignKey(x => x.UserId)
                 .HasPrincipalKey(x => x.Id)
                 .OnDelete(DeleteBehavior.Cascade);
-            
+
             entityBuilder
                 .HasMany(x => x.Upgrades)
-                .WithOne(x => x.User)
+                .WithOne()
                 .HasForeignKey(x => x.UserId)
-                .HasPrincipalKey(x => x.Id)
-                .OnDelete(DeleteBehavior.Cascade);
+                .HasPrincipalKey(x => x.Id);
 
             entityBuilder
                 .HasOne(x => x.DiscordIntegration)
@@ -370,17 +369,17 @@ public abstract class Db<T> : IdentityDbContext<User, Role, int,
 
             entityBuilder
                 .HasMany(x => x.Upgrades)
-                .WithOne(x => x.Vehicle)
+                .WithOne()
                 .HasForeignKey(x => x.VehicleId);
 
             entityBuilder
                 .HasMany(x => x.Fuels)
-                .WithOne(x => x.Vehicle)
+                .WithOne()
                 .HasForeignKey(x => x.VehicleId);
 
             entityBuilder
                 .HasMany(x => x.PartDamages)
-                .WithOne(x => x.Vehicle)
+                .WithOne()
                 .HasForeignKey(x => x.VehicleId);
 
             entityBuilder

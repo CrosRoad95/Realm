@@ -1,6 +1,6 @@
 ﻿namespace Realm.Persistance.Data;
 
-public class Group
+public sealed class Group
 {
     public int Id { get; set; }
     public string Name { get; set; }
