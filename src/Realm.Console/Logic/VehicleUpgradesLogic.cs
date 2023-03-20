@@ -1,4 +1,6 @@
-﻿namespace Realm.Console.Logic;
+﻿using Realm.Domain.Data.Upgrades;
+
+namespace Realm.Console.Logic;
 
 public class VehicleUpgradesLogic
 {
@@ -6,15 +8,23 @@ public class VehicleUpgradesLogic
     {
         vehicleUpgradeRegistry.AddUpgrade(2, new VehicleUpgradeRegistryEntry
         {
-            EngineAcceleration = new Domain.Data.FloatValueUpgradeDescription
+            EngineAcceleration = new FloatValueUpgradeDescription
             {
                 IncreaseByUnits = 100,
                 MultipleBy = 2,
             },
-            MaxVelocity = new Domain.Data.FloatValueUpgradeDescription
+            MaxVelocity = new FloatValueUpgradeDescription
             {
                 IncreaseByUnits = 100,
                 MultipleBy = 2,
+            }
+        });
+
+        vehicleUpgradeRegistry.AddUpgrade(3, new VehicleUpgradeRegistryEntry
+        {
+            Visuals = new VisualUpgradeDescription
+            {
+                Wheels = SlipeServer.Packets.Enums.VehicleUpgrades.VehicleUpgradeWheel.Offroad
             }
         });
     }

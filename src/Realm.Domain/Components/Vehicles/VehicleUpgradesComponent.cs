@@ -1,6 +1,8 @@
 ﻿using Newtonsoft.Json.Linq;
-using Realm.Domain.Data;
+using Realm.Domain.Data.Upgrades;
 using SlipeServer.Packets.Definitions.Entities.Structs;
+using SlipeServer.Packets.Enums.VehicleUpgrades;
+using SlipeServer.Server.ElementConcepts;
 using VehicleUpgradeData = Realm.Persistance.Data.VehicleUpgrade;
 
 namespace Realm.Domain.Components.Vehicles;
@@ -128,6 +130,33 @@ public class VehicleUpgradesComponent : Component
         return result;
     }
 
+    private void ApplyVisualUpgrades(VehicleUpgrades vehicleUpgrades, IEnumerable<VehicleUpgradeRegistryEntry?> upgradeDescriptions)
+    {
+        if (!upgradeDescriptions.Any())
+            throw new InvalidOperationException("Sequence contains no elements");
+
+        var visualUpgrades = upgradeDescriptions.Where(x => x?.Visuals != null).Select(x => x!.Visuals!).ToList();
+        if(visualUpgrades.Any())
+        {
+            vehicleUpgrades.Hood = visualUpgrades.Where(x => x.Hood != null).Select(x => x.Hood).FirstOrDefault() ?? 0;
+            vehicleUpgrades.Vent = visualUpgrades.Where(x => x.Vent != null).Select(x => x.Vent).FirstOrDefault() ?? 0;
+            vehicleUpgrades.Spoiler = visualUpgrades.Where(x => x.Spoiler != null).Select(x => x.Spoiler).FirstOrDefault() ?? 0;
+            vehicleUpgrades.Sideskirt = visualUpgrades.Where(x => x.Sideskirt != null).Select(x => x.Sideskirt).FirstOrDefault() ?? 0;
+            vehicleUpgrades.FrontBullbar = visualUpgrades.Where(x => x.FrontBullbar != null).Select(x => x.FrontBullbar).FirstOrDefault() ?? 0;
+            vehicleUpgrades.RearBullbar = visualUpgrades.Where(x => x.RearBullbar != null).Select(x => x.RearBullbar).FirstOrDefault() ?? 0;
+            vehicleUpgrades.Lamps = visualUpgrades.Where(x => x.Lamps != null).Select(x => x.Lamps).FirstOrDefault() ?? 0;
+            vehicleUpgrades.Roof = visualUpgrades.Where(x => x.Roof != null).Select(x => x.Roof).FirstOrDefault() ?? 0;
+            vehicleUpgrades.Nitro = visualUpgrades.Where(x => x.Nitro != null).Select(x => x.Nitro).FirstOrDefault() ?? 0;
+            vehicleUpgrades.HasHydraulics = visualUpgrades.Where(x => x.HasHydraulics != null).Select(x => x.HasHydraulics).FirstOrDefault() ?? false;
+            vehicleUpgrades.HasStereo = visualUpgrades.Where(x => x.HasStereo != null).Select(x => x.HasStereo).FirstOrDefault() ?? false;
+            vehicleUpgrades.Wheels = visualUpgrades.Where(x => x.Wheels != null).Select(x => x.Wheels).FirstOrDefault() ?? 0;
+            vehicleUpgrades.Exhaust = visualUpgrades.Where(x => x.Exhaust != null).Select(x => x.Exhaust).FirstOrDefault() ?? 0;
+            vehicleUpgrades.FrontBumper = visualUpgrades.Where(x => x.FrontBumper != null).Select(x => x.FrontBumper).FirstOrDefault() ?? 0;
+            vehicleUpgrades.RearBumper = visualUpgrades.Where(x => x.RearBumper != null).Select(x => x.RearBumper).FirstOrDefault() ?? 0;
+            vehicleUpgrades.Misc = visualUpgrades.Where(x => x.Misc != null).Select(x => x.Misc).FirstOrDefault() ?? 0;
+        }
+    }
+
     private void ApplyUpgrade(object vehicleHandling, IEnumerable<FloatValueUpgradeDescription?> upgradeDescriptions, Expression<Func<VehicleHandling, float>> handlingProperty)
     {
         if (!upgradeDescriptions.Any())
@@ -143,9 +172,10 @@ public class VehicleUpgradesComponent : Component
             increseByUnits += floatValueUpgradeDescription.IncreaseByUnits;
             multipleBy += floatValueUpgradeDescription.MultipleBy;
             if (floatValueUpgradeDescription.MultipleBy == 0)
-                throw new ArgumentOutOfRangeException("Multiple by can not be 0");
+                throw new ArgumentOutOfRangeException(nameof(floatValueUpgradeDescription.MultipleBy), "Multiple by can not be 0");
         }
-        value *= multipleBy;
+        if(multipleBy != 0)
+            value *= multipleBy;
         value += increseByUnits;
 
         propertyInfo.SetValue(vehicleHandling, value);
@@ -173,6 +203,7 @@ public class VehicleUpgradesComponent : Component
                 IEnumerable<VehicleUpgradeRegistryEntry> upgradesEntries = _upgrades.Select(VehicleUpgradeRegistry.Get);
 
                 ApplyUpgrades(boxedVehicleHandling, upgradesEntries);
+                ApplyVisualUpgrades(vehicle.Upgrades, upgradesEntries);
 
                 if (Entity.TryGetComponent(out VehicleEngineComponent vehicleEngineComponent))
                 {

@@ -1,4 +1,4 @@
-﻿using Realm.Domain.Data;
+﻿using Realm.Domain.Data.Upgrades;
 
 namespace Realm.Domain.Registries;
 
@@ -8,4 +8,5 @@ public class VehicleUpgradeRegistryEntry
 
     public FloatValueUpgradeDescription? MaxVelocity { get; set; } = null;
     public FloatValueUpgradeDescription? EngineAcceleration { get; set; } = null;
+    public VisualUpgradeDescription? Visuals { get; set; } = null;
 }

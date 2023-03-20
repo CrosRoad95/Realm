@@ -1,5 +1,6 @@
 ﻿using Realm.Domain.Components.Elements;
 using Realm.Domain.Components.Vehicles;
+using Realm.Domain.Data.Upgrades;
 using Realm.Domain.Interfaces;
 using Realm.Domain.Registries;
 using SlipeServer.Server.Constants;
@@ -31,7 +32,7 @@ public class VehicleUpgradesComponentTests
 
         _vehicleUpgradeRegistry.AddUpgrade(1, new VehicleUpgradeRegistryEntry
         {
-            MaxVelocity = new Domain.Data.FloatValueUpgradeDescription
+            MaxVelocity = new FloatValueUpgradeDescription
             {
                 IncreaseByUnits = 10,
                 MultipleBy = 10,
@@ -40,7 +41,7 @@ public class VehicleUpgradesComponentTests
 
         _vehicleUpgradeRegistry.AddUpgrade(2, new VehicleUpgradeRegistryEntry
         {
-            MaxVelocity = new Domain.Data.FloatValueUpgradeDescription
+            MaxVelocity = new FloatValueUpgradeDescription
             {
                 IncreaseByUnits = 10,
                 MultipleBy = 10,

@@ -696,6 +696,20 @@ internal sealed class CommandsLogic
                 playerElementComponent.SendChatMessage($"Nie udało się usunąć");
             }
         });
+        
+        _commandService.AddCommandHandler("addvisualupgrade", (entity, args) =>
+        {
+            var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();
+            if (playerElementComponent.OccupiedVehicle.GetRequiredComponent<VehicleUpgradesComponent>().AddUniqueUpgrade(3))
+            {
+                playerElementComponent.SendChatMessage($"dodano wizualne ulepszenie");
+            }
+            else
+            {
+                playerElementComponent.SendChatMessage($"Nie udało się dodać wizualnego ulepszenia");
+            }
+            return Task.CompletedTask;
+        });
 
         _discordService.AddTextBasedCommandHandler(1069962155539042314, "test", (userId, parameters) =>
         {
