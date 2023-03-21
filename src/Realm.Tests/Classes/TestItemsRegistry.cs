@@ -1,4 +1,6 @@
-﻿namespace Realm.Tests.Classes;
+﻿using Realm.Domain.Enums;
+
+namespace Realm.Tests.Classes;
 
 internal class TestItemsRegistry : ItemsRegistry
 {
@@ -6,7 +8,7 @@ internal class TestItemsRegistry : ItemsRegistry
     {
         AddItem(1, new ItemRegistryEntry
         {
-            AvailiableActions = ItemRegistryEntry.ItemAction.Use,
+            AvailiableActions = ItemAction.Use,
             Name = "Test item id 1",
             Size = 1,
             StackSize = 1,

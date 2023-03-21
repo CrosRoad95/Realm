@@ -2,12 +2,6 @@
 
 public class ItemRegistryEntry
 {
-    public enum ItemAction
-    {
-        None = 0,
-        Use = 1,
-    }
-
     public uint Id { get; set; }
     public decimal Size { get; set; }
     public string Name { get; set; }

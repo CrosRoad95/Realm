@@ -1,4 +1,6 @@
-﻿namespace Realm.Tests.Tests.Components;
+﻿using Realm.Domain.Enums;
+
+namespace Realm.Tests.Tests.Components;
 
 public class InventoryComponentTests
 {
@@ -14,28 +16,28 @@ public class InventoryComponentTests
             Name = "test item id 1",
             Size = 1,
             StackSize = 1,
-            AvailiableActions = ItemRegistryEntry.ItemAction.Use,
+            AvailiableActions = ItemAction.Use,
         });
         _itemsRegistry.AddItem(2, new ItemRegistryEntry
         {
             Name = "test item id 2",
             Size = 2,
             StackSize = 1,
-            AvailiableActions = ItemRegistryEntry.ItemAction.Use,
+            AvailiableActions = ItemAction.Use,
         });
         _itemsRegistry.AddItem(3, new ItemRegistryEntry
         {
             Name = "test item id 3",
             Size = 1,
             StackSize = 8,
-            AvailiableActions = ItemRegistryEntry.ItemAction.Use,
+            AvailiableActions = ItemAction.Use,
         });
         _itemsRegistry.AddItem(4, new ItemRegistryEntry
         {
             Name = "test item id 4",
             Size = 2,
             StackSize = 8,
-            AvailiableActions = ItemRegistryEntry.ItemAction.Use,
+            AvailiableActions = ItemAction.Use,
         });
 
         var services = new ServiceCollection();
