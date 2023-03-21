@@ -520,14 +520,14 @@ public abstract class Db<T> : IdentityDbContext<User, Role, int,
         modelBuilder.Entity<DiscordIntegration>(entityBuilder =>
         {
             entityBuilder
-                .ToTable(nameof(DiscordIntegration))
+                .ToTable(nameof(DiscordIntegrations))
                 .HasKey(x => x.UserId);
         });
 
         modelBuilder.Entity<UserUpgrade>(entityBuilder =>
         {
             entityBuilder
-                .ToTable(nameof(UserUpgrade))
+                .ToTable(nameof(UserUpgrades))
                 .HasKey(x => new { x.UserId, x.UpgradeId });
         });
 
