@@ -6,14 +6,14 @@ namespace Realm.Domain.Components.Common;
 public class InventoryComponent : Component
 {
     private readonly List<Item> _items = new();
-    private readonly object _itemsLock = new object();
+    private readonly object _itemsLock = new();
     public event Action<InventoryComponent, Item>? ItemAdded;
     public event Action<InventoryComponent, Item>? ItemRemoved;
     public event Action<InventoryComponent, Item>? ItemChanged;
 
     public int? Id { get; private set; } = null;
     public uint Size { get; set; }
-    public uint Number
+    public decimal Number
     {
         get
         {
@@ -22,7 +22,12 @@ public class InventoryComponent : Component
         }
     }
 
-    public IReadOnlyList<Item> Items => _items;
+    public IReadOnlyList<Item> Items {
+        get {
+            lock(_itemsLock)
+                return new List<Item>(_items);
+        }
+    }
 
     public Func<InventoryComponent, Item, ItemAction, Task> UseCallback { get; set; } = default!;
 
@@ -48,6 +53,18 @@ public class InventoryComponent : Component
     {
         lock (_itemsLock)
             return _items.Count(x => x.ItemId == itemId);
+    }
+    
+    public List<Item> GetItemsById(uint itemId)
+    {
+        lock (_itemsLock)
+            return new List<Item>(_items.Where(x => x.ItemId == itemId));
+    }
+
+    public bool HasItemWithMetadata(uint itemId, string key, object? metadata)
+    {
+        lock (_itemsLock)
+            return _items.Any(x => x.ItemId == itemId && x.GetMetadata(key) == metadata);
     }
 
     public bool TryGetByLocalId(string localId, out Item item)
@@ -136,6 +153,7 @@ public class InventoryComponent : Component
                 if (!_items.Remove(item))
                     throw new InvalidOperationException();
 
+            item.Changed -= HandleItemChanged;
             ItemRemoved?.Invoke(this, item);
         }
     }
