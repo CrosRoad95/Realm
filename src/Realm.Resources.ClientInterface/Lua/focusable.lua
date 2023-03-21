@@ -144,7 +144,3 @@ addEvent("internalSetFocusableRenderingEnabled", true)
 addEventHandler("internalSetFocusableRenderingEnabled", localPlayer, function(enabled)
 	debugRenderEnabled = enabled;
 end)
-
-setTimer(function()
-	iprint(getTickCount(), "focusableElements",focusableElements)
-end, 1000, 1000)
