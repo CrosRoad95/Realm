@@ -46,7 +46,6 @@ public abstract class ElementComponent : Component
         else
         {
             Entity.Transform.Bind(Element);
-            Entity.Disposed += HandleDestroyed;
             Entity.Transform.PositionChanged += HandleTransformPositionChanged;
             Entity.Transform.RotationChanged += HandleTransformRotationChanged;
         }

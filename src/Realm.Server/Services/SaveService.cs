@@ -258,7 +258,7 @@ internal class SaveService : ISaveService
             }).ToList();
         }
         else
-            user.JobUpgrades = new List<Persistance.Data.JobUpgrade>();
+            user.JobUpgrades = new List<JobUpgrade>();
 
         if (entity.TryGetComponent(out JobStatisticsComponent jobStatisticsComponent))
         {

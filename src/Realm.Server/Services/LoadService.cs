@@ -28,7 +28,7 @@ internal class LoadService : ILoadService
             try
             {
                 //await Task.Delay(200);
-                var entity = _entityFactory.CreateVehicle(vehicleData.Model, vehicleData.TransformAndMotion.Position, vehicleData.TransformAndMotion.Rotation, new Domain.Concepts.ConstructionInfo
+                var entity = _entityFactory.CreateVehicle(vehicleData.Model, vehicleData.TransformAndMotion.Position, vehicleData.TransformAndMotion.Rotation, new ConstructionInfo
                 {
                     Id = $"vehicle {vehicleData.Id}",
                     Interior = vehicleData.TransformAndMotion.Interior,
@@ -44,8 +44,16 @@ internal class LoadService : ILoadService
                         else
                             entity.AddComponent< VehicleEngineComponent>();
                         entity.AddComponent(new VehiclePartDamageComponent(vehicleData.PartDamages));
-                        foreach (var vehicleFuel in vehicleData.Fuels)
-                            entity.AddComponent(new VehicleFuelComponent(vehicleFuel.FuelType, vehicleFuel.Amount, vehicleFuel.MaxCapacity, vehicleFuel.FuelConsumptionPerOneKm, vehicleFuel.MinimumDistanceThreshold)).Active = vehicleFuel.Active;
+
+                        if(vehicleData.Fuels.Any())
+                        {
+                            foreach (var vehicleFuel in vehicleData.Fuels)
+                                entity.AddComponent(new VehicleFuelComponent(vehicleFuel.FuelType, vehicleFuel.Amount, vehicleFuel.MaxCapacity, vehicleFuel.FuelConsumptionPerOneKm, vehicleFuel.MinimumDistanceThreshold)).Active = vehicleFuel.Active;
+                        }
+                        else
+                        {
+                            
+                        }
                     });
                 i++;
             }

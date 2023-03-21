@@ -57,7 +57,7 @@ internal sealed class SeederServerBuilder
         {
             if(Enum.IsDefined(typeof(BlipIcon), pair.Value.Icon))
             {
-                var entity = _entityFactory.CreateBlip((BlipIcon)pair.Value.Icon, pair.Value.Position, new Domain.Concepts.ConstructionInfo
+                var entity = _entityFactory.CreateBlip((BlipIcon)pair.Value.Icon, pair.Value.Position, new ConstructionInfo
                 {
                     Id = pair.Key
                 });
@@ -75,7 +75,7 @@ internal sealed class SeederServerBuilder
     {
         foreach (var pair in pickups)
         {
-            var entity = _entityFactory.CreatePickup(pair.Value.Model, pair.Value.Position, new Domain.Concepts.ConstructionInfo
+            var entity = _entityFactory.CreatePickup(pair.Value.Model, pair.Value.Position, new ConstructionInfo
             {
                 Id = pair.Key,
             });
@@ -94,7 +94,7 @@ internal sealed class SeederServerBuilder
         {
             if (Enum.IsDefined(typeof(MarkerType), pair.Value.MarkerType))
             {
-                var entity = _entityFactory.CreateMarker(pair.Value.MarkerType, pair.Value.Position,new Domain.Concepts.ConstructionInfo
+                var entity = _entityFactory.CreateMarker(pair.Value.MarkerType, pair.Value.Position,new ConstructionInfo
                 {
                     Id = pair.Key,
                 });

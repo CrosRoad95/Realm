@@ -750,7 +750,7 @@ internal sealed class CommandsLogic
             using (var memoryStream = new MemoryStream())
             using (Image<Rgba32> image = new(width, height))
             {
-                image.Mutate(x => x.DrawText($"Gracze na serwerze: {string.Join(", ", playerEntities.Select(x => x.GetRequiredComponent<PlayerElementComponent>().Name))}", font, IronSoftware.Drawing.Color.White, new SixLabors.ImageSharp.PointF(10, 10)));
+                image.Mutate(x => x.DrawText($"Gracze na serwerze: {string.Join(", ", playerEntities.Select(x => x.GetRequiredComponent<PlayerElementComponent>().Name))}", font, IronSoftware.Drawing.Color.White, new PointF(10, 10)));
                 image.Save(memoryStream, encoder);
                 memoryStream.Position = 0;
                 await _discordService.SendFile(997787973775011853, memoryStream, "obrazek.jpg", "");
@@ -778,7 +778,7 @@ internal sealed class CommandsLogic
             using (var memoryStream = new MemoryStream())
             using (Image<Rgba32> image = new(width, height))
             {
-                image.Mutate(x => x.DrawText(parameters, font, IronSoftware.Drawing.Color.White, new SixLabors.ImageSharp.PointF(10, 10)));
+                image.Mutate(x => x.DrawText(parameters, font, IronSoftware.Drawing.Color.White, new PointF(10, 10)));
                 image.Save(memoryStream, encoder);
                 memoryStream.Position = 0;
                 await _discordService.SendFile(997787973775011853, memoryStream, "obrazek.jpg", "");

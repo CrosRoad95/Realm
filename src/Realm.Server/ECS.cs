@@ -12,9 +12,19 @@ public sealed class ECS : IEntityByElement
     private readonly ConcurrentDictionary<string, Entity> _entityByName = new();
     private readonly IServiceProvider _serviceProvider;
 
-    public IReadOnlyCollection<Entity> Entities => _entities;
+    public IReadOnlyCollection<Entity> Entities
+    {
+        get
+        {
+            _entitiesLock.EnterWriteLock();
+            var entities = new List<Entity>(_entities);
+            _entitiesLock.ExitWriteLock();
+            return entities;
+        }
+    }
 
     public event Action<Entity>? EntityCreated;
+
     public ECS(IServiceProvider serviceProvider)
     {
         _serviceProvider = serviceProvider;
@@ -60,8 +70,7 @@ public sealed class ECS : IEntityByElement
         _entityByName[name] = newlyCreatedEntity;
         newlyCreatedEntity.ComponentAdded += HandleComponentAdded;
         newlyCreatedEntity.Disposed += HandleEntityDestroyed;
-        if (entityBuilder != null)
-            entityBuilder(newlyCreatedEntity);
+        entityBuilder?.Invoke(newlyCreatedEntity);
         EntityCreated?.Invoke(newlyCreatedEntity);
         return newlyCreatedEntity;
     }
