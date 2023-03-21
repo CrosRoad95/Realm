@@ -1,4 +1,6 @@
-﻿namespace Realm.Server.Logic.Resources;
+﻿using Realm.Domain.Components.Elements;
+
+namespace Realm.Server.Logic.Resources;
 
 internal class ClientInterfaceLogic
 {
@@ -32,11 +34,23 @@ internal class ClientInterfaceLogic
 
     private void HandleComponentAdded(Component component)
     {
+        if(component is InteractionComponent interactionComponent)
+        {
+            _clientInterfaceService.AddFocusable(component.Entity.Element);
+            interactionComponent.Disposed += HandleInteractionComponentDisposed;
+        }
         if(component is ElementComponent elementComponent)
         {
             elementComponent.AddFocusableHandler = _clientInterfaceService.AddFocusable;
             elementComponent.RemoveFocusableHandler = _clientInterfaceService.RemoveFocusable;
         }
+    }
+
+    private void HandleInteractionComponentDisposed(Component component)
+    {
+        var interactionComponent = (InteractionComponent)component;
+        interactionComponent.Disposed -= HandleInteractionComponentDisposed;
+        _clientInterfaceService.RemoveFocusable(interactionComponent.Entity.Element);
     }
 
     private void HandleFocusedElementChanged(Player player, Element? focusedElement)

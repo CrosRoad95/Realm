@@ -10,7 +10,7 @@ local function setFocusedElement(newElement, newChildElement)
 	end
 	focusedElement = newElement;
 	focusedChildElement = newChildElement;
-
+	iprint("focusedElement, newChildElement",focusedElement, newChildElement)
 	triggerServerEventWithId("internalChangeFocusedElement", focusedElement, newChildElement)
 end
 
@@ -119,6 +119,7 @@ end
 
 addEvent("internalAddFocusable", true)
 addEventHandler("internalAddFocusable", root, function()
+	iprint("internalAddFocusable",source)
 	internalAddFocusable(source)
 end)
 
@@ -133,6 +134,7 @@ end)
 
 addEvent("internalAddFocusables", true)
 addEventHandler("internalAddFocusables", localPlayer, function(elements)
+	iprint("internalAddFocusables",internalAddFocusables)
 	for i,v in ipairs(elements)do
 		internalAddFocusable(v)
 	end
@@ -142,3 +144,7 @@ addEvent("internalSetFocusableRenderingEnabled", true)
 addEventHandler("internalSetFocusableRenderingEnabled", localPlayer, function(enabled)
 	debugRenderEnabled = enabled;
 end)
+
+setTimer(function()
+	iprint(getTickCount(), "focusableElements",focusableElements)
+end, 1000, 1000)

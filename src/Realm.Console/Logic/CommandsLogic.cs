@@ -305,6 +305,14 @@ internal sealed class CommandsLogic
             return Task.CompletedTask;
         });
 
+        _commandService.AddCommandHandler("spawntempbox", async (entity, args) =>
+        {
+            var objectEntity = _entityFactory.CreateObject(SlipeServer.Server.Enums.ObjectModel.Gunbox, entity.Transform.Position + new Vector3(4, 0, -0.65f), Vector3.Zero);
+            objectEntity.AddComponent(new LiftableWorldObjectComponent());
+            await Task.Delay(5000);
+            objectEntity.Dispose();
+        });
+
         _commandService.AddCommandHandler("spawnboard", (entity, args) =>
         {
             var objectEntity = _entityFactory.CreateObject((SlipeServer.Server.Enums.ObjectModel)3077, entity.Transform.Position + new Vector3(4, 0, -1), Vector3.Zero);
