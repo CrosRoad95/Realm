@@ -17,7 +17,7 @@ public class Item : IEquatable<Item>, IEquatable<Dictionary<string, object>>
         }
     }
     public string Name { get; init; }
-    public uint Size { get; init; }
+    public decimal Size { get; init; }
     public ItemRegistryEntry.ItemAction AvailiableActions { get; init; }
     public Dictionary<string, object> MetaData { get; init; }
     
