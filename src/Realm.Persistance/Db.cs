@@ -159,6 +159,9 @@ public abstract class Db<T> : IdentityDbContext<User, Role, int,
                 .ToTable(nameof(Inventories))
                 .HasKey(x => x.Id);
 
+            entityBuilder.Property(x => x.Size)
+                .HasPrecision(38, 18);
+
             entityBuilder
                 .HasMany(x => x.InventoryItems)
                 .WithOne(x => x.Inventory)

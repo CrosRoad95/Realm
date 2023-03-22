@@ -12,7 +12,7 @@ public class InventoryComponent : Component
     public event Action<InventoryComponent, Item>? ItemChanged;
 
     public int? Id { get; private set; } = null;
-    public uint Size { get; set; }
+    public decimal Size { get; set; }
     public decimal Number
     {
         get
@@ -31,12 +31,12 @@ public class InventoryComponent : Component
 
     public Func<InventoryComponent, Item, ItemAction, Task> UseCallback { get; set; } = default!;
 
-    public InventoryComponent(uint size)
+    public InventoryComponent(decimal size)
     {
         Size = size;
     }
 
-    internal InventoryComponent(uint size, int id, IEnumerable<Item> items)
+    internal InventoryComponent(decimal size, int id, IEnumerable<Item> items)
     {
         Size = size;
         Id = id;
@@ -100,7 +100,7 @@ public class InventoryComponent : Component
         if (Number + itemRegistryEntry.Size * number > Size && !force)
             throw new InventoryDoNotEnoughSpaceException();
 
-        List<Item> newItems = new();
+        List<Item> newItems = new();    
         if (tryStack)
         {
             lock (_itemsLock)

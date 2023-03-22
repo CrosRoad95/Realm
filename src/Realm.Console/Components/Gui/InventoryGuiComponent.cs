@@ -50,19 +50,19 @@ public sealed class InventoryGuiComponent : StatefulGuiComponent<InventoryGuiCom
     private void HandleItemAdded(InventoryComponent inventoryComponent, Item item)
     {
         ChangeState(x => x.Items, MapItems().ToList());
-        ChangeState(x => x.Number, inventoryComponent.Number);
+        ChangeState(x => x.Number, (double)inventoryComponent.Number);
     }
     
     private void HandleItemRemoved(InventoryComponent inventoryComponent, Item item)
     {
         ChangeState(x => x.Items, MapItems().ToList());
-        ChangeState(x => x.Number, inventoryComponent.Number);
+        ChangeState(x => x.Number, (double)inventoryComponent.Number);
     }
     
     private void HandleItemChanged(InventoryComponent inventoryComponent, Item item)
     {
         ChangeState(x => x.Items, MapItems().ToList());
-        ChangeState(x => x.Number, inventoryComponent.Number);
+        ChangeState(x => x.Number, (double)inventoryComponent.Number);
     }
 
     private IEnumerable<InventoryState.InventoryItem> MapItems()
@@ -84,8 +84,8 @@ public sealed class InventoryGuiComponent : StatefulGuiComponent<InventoryGuiCom
         ThrowIfDisposed();
 
         var inventory = Entity.GetRequiredComponent<InventoryComponent>();
-        state.Size = inventory.Size;
-        state.Number = inventory.Number;
+        state.Size = (double)inventory.Size;
+        state.Number = (double)inventory.Number;
         state.Items.Clear();
         state.Items.AddRange(MapItems());
     }

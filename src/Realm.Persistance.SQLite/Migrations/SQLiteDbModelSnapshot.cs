@@ -326,8 +326,9 @@ namespace Realm.Persistance.SQLite.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
-                    b.Property<uint>("Size")
-                        .HasColumnType("INTEGER");
+                    b.Property<decimal>("Size")
+                        .HasPrecision(38, 18)
+                        .HasColumnType("TEXT");
 
                     b.Property<int>("UserId")
                         .HasColumnType("INTEGER");
