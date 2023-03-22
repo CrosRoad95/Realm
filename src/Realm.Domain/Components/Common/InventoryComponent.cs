@@ -91,7 +91,7 @@ public class InventoryComponent : Component
     public void AddItem(ItemsRegistry itemsRegistry, uint itemId, uint number = 1, Dictionary<string, object>? metadata = null, bool tryStack = true, bool force = false)
     {
         if (number == 0)
-            return;
+            throw new ArgumentOutOfRangeException(nameof(number));
 
         if (metadata == null)
             metadata = new();

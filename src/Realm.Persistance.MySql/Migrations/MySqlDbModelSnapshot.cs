@@ -808,9 +808,9 @@ namespace Realm.Persistance.MySql.Migrations
                     b.Property<int>("VehicleId")
                         .HasColumnType("int");
 
-                    b.Property<string>("FuelType")
+                    b.Property<short>("FuelType")
                         .HasMaxLength(16)
-                        .HasColumnType("varchar(16)");
+                        .HasColumnType("smallint");
 
                     b.Property<bool>("Active")
                         .HasColumnType("tinyint(1)");

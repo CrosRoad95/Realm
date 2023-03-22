@@ -9,7 +9,7 @@ public class VehicleFuelComponent : Component
     private float _maxCapacity = 0;
     private float _fuelConsumptionPerOneKm;
     private float _minimumDistanceThreshold;
-    private string _fuelType;
+    private short _fuelType;
     private bool _active;
 
     public bool Active
@@ -24,7 +24,7 @@ public class VehicleFuelComponent : Component
         }
     }
 
-    public string FuelType
+    public short FuelType
     {
         get => _fuelType;
         set => _fuelType = value;
@@ -77,9 +77,8 @@ public class VehicleFuelComponent : Component
         }
     }
 
-    public VehicleFuelComponent(string fuelType, double initialAmount, double maxCapacity, double fuelConsumptionPerOneKm, double minimumDistanceThreshold)
+    public VehicleFuelComponent(short fuelType, double initialAmount, double maxCapacity, double fuelConsumptionPerOneKm, double minimumDistanceThreshold)
     {
-        if(fuelType.Length < 1 || fuelType.Length > 15) throw new ArgumentOutOfRangeException(nameof(fuelType));
         if (initialAmount < 0) throw new ArgumentOutOfRangeException(nameof(initialAmount));
         if (minimumDistanceThreshold < 0) throw new ArgumentOutOfRangeException(nameof(minimumDistanceThreshold));
         if (fuelConsumptionPerOneKm < 0) throw new ArgumentOutOfRangeException(nameof(fuelConsumptionPerOneKm));
