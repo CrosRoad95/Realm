@@ -71,6 +71,17 @@ internal sealed class PlayerBindsLogic
         if (component is AccountComponent accountComponent)
         {
             var entity = component.Entity;
+            var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();
+
+            playerElementComponent.SetBind("num_0", entity =>
+            {
+                if(entity.TryGetComponent(out AdminComponent adminComponent))
+                {
+                    adminComponent.NoClip = !adminComponent.NoClip;
+                }
+                return Task.CompletedTask;
+            });
+
             OpenCloseGuiHelper(entity, "F1", async () =>
             {
                 DashboardGuiComponent.DashboardState state = new();

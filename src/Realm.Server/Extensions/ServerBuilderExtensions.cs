@@ -72,7 +72,10 @@ public static class ServerBuilderExtensions
         // Resource
         var commonOptions = new CommonResourceOptions();
 
-        builder.AddNoClipResource();
+        builder.AddNoClipResource(new NoClipOptions
+        {
+            Bind = null
+        });
         builder.AddDGSResource(DGSVersion.Release_3_520);
         builder.AddAgnosticGuiSystemResource(builder =>
         {
