@@ -37,7 +37,7 @@ addEventHandler("onClientRender", root, function()
 	local i,d = getElementInterior(localPlayer), getElementDimension(localPlayer)
 	local cx,cy,cz = getCameraMatrix()
 	for ped, nametag in pairs(nametags)do
-		if(ped and isElement(ped) and getElementInterior(ped) == i and getElementDimension(ped) == d)then
+		if(ped and isElement(ped) and getElementInterior(ped) == i and getElementDimension(ped) == d and ped ~= localPlayer)then
 			x,y,z = getElementPosition(ped)
 			dis = getDistanceBetweenPoints3D(cx, cy, cz, x,y,z)
 			if(dis < maxDistance)then
