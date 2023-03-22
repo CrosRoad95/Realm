@@ -78,6 +78,7 @@ public static class ServerBuilderExtensions
         {
             builder.AddGuiProvider(CeGuiGuiProvider.Name, CeGuiGuiProvider.LuaCode);
             builder.AddGuiProvider(DGSGuiProvider.Name, DGSGuiProvider.LuaCode);
+            builder.SetGuiProvider(DGSGuiProvider.Name);
         }, commonOptions);
         builder.AddClientInterfaceResource(commonOptions);
         builder.AddElementOutlineResource();

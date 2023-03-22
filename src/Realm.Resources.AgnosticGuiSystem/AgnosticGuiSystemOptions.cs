@@ -1,9 +1,12 @@
-﻿namespace Realm.Resources.AgnosticGuiSystem;
+﻿using System.Text;
+
+namespace Realm.Resources.AgnosticGuiSystem;
 
 public class AgnosticGuiSystemOptions
 {
     internal readonly Dictionary<string, byte[]> _providers = new();
     internal readonly Dictionary<string, byte[]> _guis = new();
+    internal byte[]? _selectedGuiProvider = null;
 
     public AgnosticGuiSystemOptions AddGuiProvider(string name, byte[] luaCode)
     {
@@ -12,6 +15,15 @@ public class AgnosticGuiSystemOptions
             throw new ArgumentException(null, nameof(name));
 
         _providers.Add(name, luaCode);
+        return this;
+    }
+
+    public AgnosticGuiSystemOptions SetGuiProvider(string name)
+    {
+        if (!_providers.ContainsKey($"{name}.lua"))
+            throw new ArgumentException(null, nameof(name));
+
+        _selectedGuiProvider = UTF8Encoding.UTF8.GetBytes($"selectedGuiProvider = \"{name}\"");
         return this;
     }
 

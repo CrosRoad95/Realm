@@ -315,7 +315,10 @@ local function internalCommonGuiProvider()
 end
 
 local function entrypoint()
-	currentGuiProvider = guiProviders["dgs"]
+	if(selectedGuiProvider == nil)then
+		error("No gui provider selected.")
+	end
+	currentGuiProvider = guiProviders[selectedGuiProvider]
 	if(currentGuiProvider == nil)then
 		error("No gui provider found")
 	end

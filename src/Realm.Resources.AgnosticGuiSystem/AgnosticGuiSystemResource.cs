@@ -26,6 +26,8 @@ internal class AgnosticGuiSystemResource : Resource
         
         foreach (var (path, content) in agnosticGuiSystemOptions._guis)
             NoClientScripts[$"{Name}/{path}"] = content;
+        
+        NoClientScripts[$"{Name}/selectedGuiProvider.lua"] = agnosticGuiSystemOptions._selectedGuiProvider ?? throw new Exception("No gui provider selected");
 
         UpdateGuiFiles();
     }
