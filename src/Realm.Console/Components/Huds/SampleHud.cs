@@ -18,7 +18,7 @@ public class SampleHud : HudComponent
     protected override void Build(IHudBuilder<object> x)
     {
         x.AddRectangle(new Vector2(x.Right - 400, 600), new Size(400, 20), Color.DarkBlue);
-        x.AddText("foo bar", new Vector2(x.Right - 200, 600), new Size(200, 20), font: "default", alignX: "center", alignY: "center");
-        x.AddText("custom font", new Vector2(x.Right - 400, 600), new Size(200, 20), font: AssetsRegistry.GetFont("Better Together.otf"), alignX: "center", alignY: "center");
+        x.AddText("foo bar", new Vector2(x.Right - 200, 600), new Size(200, 20), font: "default", alignX: Resources.Overlay.Enums.HorizontalAlign.Center, alignY: Resources.Overlay.Enums.VerticalAlign.Center);
+        x.AddText("custom font", new Vector2(x.Right - 400, 600), new Size(200, 20), font: AssetsRegistry.GetFont("Better Together.otf"), alignX: Resources.Overlay.Enums.HorizontalAlign.Center, alignY: Resources.Overlay.Enums.VerticalAlign.Center);
     }
 }

@@ -25,8 +25,8 @@ public class SampleStatefulHud : HudComponent<SampleHudState>
     protected override void Build(IHudBuilder<SampleHudState> x)
     {
         x.AddRectangle(new Vector2(x.Right - 400, 600), new Size(400, 20), Color.DarkBlue);
-        x.AddText(x => x.Text1, new Vector2(x.Right - 200, 600), new Size(200, 20), font: "default", alignX: "center", alignY: "center");
-        x.AddText("custom font", new Vector2(x.Right - 400, 600), new Size(200, 20), font: AssetsRegistry.GetFont("Better Together.otf"), alignX: "center", alignY: "center");
+        x.AddText(x => x.Text1, new Vector2(x.Right - 200, 600), new Size(200, 20), font: "default", alignX: Resources.Overlay.Enums.HorizontalAlign.Center, alignY: Resources.Overlay.Enums.VerticalAlign.Center);
+        x.AddText("custom font", new Vector2(x.Right - 400, 600), new Size(200, 20), font: AssetsRegistry.GetFont("Better Together.otf"), alignX: Resources.Overlay.Enums.HorizontalAlign.Center, alignY: Resources.Overlay.Enums.VerticalAlign.Center);
     }
 
     public void Update()

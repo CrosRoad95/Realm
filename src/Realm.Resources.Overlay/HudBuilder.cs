@@ -1,5 +1,6 @@
 ﻿using Realm.Resources.Assets;
 using Realm.Resources.Assets.Interfaces;
+using Realm.Resources.Overlay.Enums;
 using Realm.Resources.Overlay.Interfaces;
 using SlipeServer.Packets.Definitions.Lua;
 using System.Drawing;
@@ -30,21 +31,37 @@ internal class HudBuilder<TState> : IHudBuilder<TState>
         _screenSize = screenSize;
     }
 
-    internal IHudBuilder<TState> InternalAddText(string text, Vector2 position, Size size, Color? color = null, Size? scale = null, LuaValue? font = null, string alignX = "left", string alignY = "top")
+    private string ToString(HorizontalAlign horizontalAlign) => horizontalAlign switch
+    {
+        HorizontalAlign.Left => "left",
+        HorizontalAlign.Right => "right",
+        HorizontalAlign.Center => "center",
+        _ => throw new NotImplementedException()
+    };
+
+    private string ToString(VerticalAlign verticalAlign) => verticalAlign switch
+    {
+        VerticalAlign.Top => "top",
+        VerticalAlign.Bottom => "bottom",
+        VerticalAlign.Center => "center",
+        _ => throw new NotImplementedException()
+    };
+
+    internal IHudBuilder<TState> InternalAddText(string text, Vector2 position, Size size, Color? color = null, Size? scale = null, LuaValue? font = null, HorizontalAlign alignX = HorizontalAlign.Left, VerticalAlign alignY = VerticalAlign.Top)
     {
         color ??= Color.White;
         double luaColor = color.Value.B + color.Value.G * 256 + color.Value.R * 256 * 256 + color.Value.A * 256 * 256 * 256;
-        _luaValues.Add(new(new LuaValue[] { "text", ++_id, text, position.X, position.Y, size.Width, size.Height, luaColor, scale?.Width ?? 1, scale?.Height ?? 1, font, alignX, alignY }));
+        _luaValues.Add(new(new LuaValue[] { "text", ++_id, text, position.X, position.Y, size.Width, size.Height, luaColor, scale?.Width ?? 1, scale?.Height ?? 1, font, ToString(alignX), ToString(alignY) }));
         return this;
     }
     
-    public IHudBuilder<TState> AddText(string text, Vector2 position, Size size, Color? color = null, Size? scale = null, string font = "default", string alignX = "left", string alignY = "top")
+    public IHudBuilder<TState> AddText(string text, Vector2 position, Size size, Color? color = null, Size? scale = null, string font = "default", HorizontalAlign alignX = HorizontalAlign.Left, VerticalAlign alignY = VerticalAlign.Top)
     {
         InternalAddText(text, position, size, color, scale, font, alignX, alignY);
         return this;
     }
 
-    public IHudBuilder<TState> AddText(Expression<Func<TState, string>> exp, Vector2 position, Size size, Color? color = null, Size? scale = null, string font = "default", string alignX = "left", string alignY = "top")
+    public IHudBuilder<TState> AddText(Expression<Func<TState, string>> exp, Vector2 position, Size size, Color? color = null, Size? scale = null, string font = "default", HorizontalAlign alignX = HorizontalAlign.Left, VerticalAlign alignY = VerticalAlign.Top)
     {
         var me = exp.Body as MemberExpression;
         var propertyInfo = me.Member as PropertyInfo;
@@ -53,7 +70,7 @@ internal class HudBuilder<TState> : IHudBuilder<TState>
         return this;
     }
     
-    public IHudBuilder<TState> AddText(string text, Vector2 position, Size size, Color? color = null, Size? scale = null, IFont? font = null, string alignX = "left", string alignY = "top")
+    public IHudBuilder<TState> AddText(string text, Vector2 position, Size size, Color? color = null, Size? scale = null, IFont? font = null, HorizontalAlign alignX = HorizontalAlign.Left, VerticalAlign alignY = VerticalAlign.Top)
     {
         if (font == null)
             throw new ArgumentNullException(nameof(font));
