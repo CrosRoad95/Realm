@@ -29,6 +29,7 @@ internal sealed class CommandsLogic
     private readonly ILogger<CommandsLogic> _logger;
     private readonly IDateTimeProvider _dateTimeProvider;
     private readonly NametagsService _nametagsService;
+    private readonly IVehiclesService _vehiclesService;
 
     private class TestState
     {
@@ -37,7 +38,7 @@ internal sealed class CommandsLogic
 
     public CommandsLogic(RPGCommandService commandService, IEntityFactory entityFactory, RepositoryFactory repositoryFactory,
         ItemsRegistry itemsRegistry, ECS ecs, IBanService banService, IDiscordService discordService, ChatBox chatBox, ILogger<CommandsLogic> logger,
-        IDateTimeProvider dateTimeProvider, NametagsService nametagsService, IRPGUserManager rpgUserManager)
+        IDateTimeProvider dateTimeProvider, NametagsService nametagsService, IRPGUserManager rpgUserManager, IVehiclesService vehiclesService)
     {
         _commandService = commandService;
         _entityFactory = entityFactory;
@@ -50,6 +51,7 @@ internal sealed class CommandsLogic
         _logger = logger;
         _dateTimeProvider = dateTimeProvider;
         _nametagsService = nametagsService;
+        _vehiclesService = vehiclesService;
         _commandService.AddCommandHandler("playtime", (entity, args) =>
         {
             if (entity.TryGetComponent(out PlayTimeComponent playTimeComponent))
@@ -717,6 +719,24 @@ internal sealed class CommandsLogic
                 playerElementComponent.SendChatMessage($"Nie udało się dodać wizualnego ulepszenia");
             }
             return Task.CompletedTask;
+        });
+        
+        _commandService.AddCommandHandler("despawn", async (entity, args) =>
+        {
+            var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();
+            await _vehiclesService.Despawn(playerElementComponent.OccupiedVehicle);
+        });
+
+        _commandService.AddCommandHandler("spawnback", async (entity, args) =>
+        {
+            var en = await _vehiclesService.SpawnById(int.Parse(args[0]));
+            var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();
+            if (en != null)
+            {
+                playerElementComponent.SendChatMessage("Spawned");
+            }
+            else
+                playerElementComponent.SendChatMessage("Error while spawning");
         });
 
         _discordService.AddTextBasedCommandHandler(1069962155539042314, "test", (userId, parameters) =>

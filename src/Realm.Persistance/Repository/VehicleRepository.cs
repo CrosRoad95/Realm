@@ -42,7 +42,7 @@ internal class VehicleRepository : IVehicleRepository
 
         return query.ToListAsync();
     }
-    
+
     public Task<List<Vehicle>> GetVehiclesByUserId(int userId)
     {
         var query = _db.Vehicles
@@ -51,6 +51,16 @@ internal class VehicleRepository : IVehicleRepository
             .Where(x => x.VehicleAccesses.Any(x => x.UserId == userId));
 
         return query.ToListAsync();
+    }
+
+    public Task<Vehicle?> GetReadOnlyVehicleById(int id)
+    {
+        var query = _db.Vehicles
+            .TagWithSource(nameof(VehicleRepository))
+            .AsNoTrackingWithIdentityResolution()
+            .Where(x => x.Id == id);
+
+        return query.FirstOrDefaultAsync();
     }
 
     public Task<List<Vehicle>> GetAllSpawnedVehicles()
@@ -62,6 +72,26 @@ internal class VehicleRepository : IVehicleRepository
             .IsSpawned();
 
         return query.ToListAsync();
+    }
+    
+    public async Task<bool> SetSpawned(int id, bool spawned)
+    {
+        var query = _db.Vehicles
+            .TagWithSource(nameof(VehicleRepository))
+            .Where(x => x.Id == id);
+
+        var result = await query.ExecuteUpdateAsync(x => x.SetProperty(y => y.Spawned, spawned));
+        return result > 0;
+    }
+    
+    public async Task<bool> IsSpawned(int id)
+    {
+        var query = _db.Vehicles
+            .TagWithSource(nameof(VehicleRepository))
+            .Where(x => x.Id == id)
+            .Select(x => x.Spawned);
+
+        return await query.FirstAsync();
     }
 
     public void Dispose()

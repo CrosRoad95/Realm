@@ -1,15 +1,19 @@
-﻿namespace Realm.Server.Services;
+﻿using Realm.Server.Interfaces;
+
+namespace Realm.Server.Services;
 
 internal class LoadService : ILoadService
 {
     private readonly RepositoryFactory _repositoryFactory;
     private readonly IEntityFactory _entityFactory;
     private readonly ILogger<LoadService> _logger;
+    private readonly IVehiclesService _vehiclesService;
 
-    public LoadService(RepositoryFactory repositoryFactory, IEntityFactory entityFactory, ILogger<LoadService> logger) {
+    public LoadService(RepositoryFactory repositoryFactory, IEntityFactory entityFactory, ILogger<LoadService> logger, IVehiclesService vehiclesService) {
         _repositoryFactory = repositoryFactory;
         _entityFactory = entityFactory;
         _logger = logger;
+        _vehiclesService = vehiclesService;
     }
 
     public async Task LoadAll()
@@ -28,33 +32,7 @@ internal class LoadService : ILoadService
             try
             {
                 //await Task.Delay(200);
-                var entity = _entityFactory.CreateVehicle(vehicleData.Model, vehicleData.TransformAndMotion.Position, vehicleData.TransformAndMotion.Rotation, new ConstructionInfo
-                {
-                    Id = $"vehicle {vehicleData.Id}",
-                    Interior = vehicleData.TransformAndMotion.Interior,
-                    Dimension = vehicleData.TransformAndMotion.Dimension,
-                },
-                    entity =>
-                    {
-                        entity.AddComponent(new PrivateVehicleComponent(vehicleData));
-                        entity.AddComponent(new VehicleUpgradesComponent(vehicleData.Upgrades));
-                        entity.AddComponent(new MileageCounterComponent(vehicleData.Mileage));
-                        if(vehicleData.VehicleEngines.Any())
-                            entity.AddComponent(new VehicleEngineComponent(vehicleData.VehicleEngines));
-                        else
-                            entity.AddComponent< VehicleEngineComponent>();
-                        entity.AddComponent(new VehiclePartDamageComponent(vehicleData.PartDamages));
-
-                        if(vehicleData.Fuels.Any())
-                        {
-                            foreach (var vehicleFuel in vehicleData.Fuels)
-                                entity.AddComponent(new VehicleFuelComponent(vehicleFuel.FuelType, vehicleFuel.Amount, vehicleFuel.MaxCapacity, vehicleFuel.FuelConsumptionPerOneKm, vehicleFuel.MinimumDistanceThreshold)).Active = vehicleFuel.Active;
-                        }
-                        else
-                        {
-                            
-                        }
-                    });
+                _vehiclesService.Spawn(vehicleData);
                 i++;
             }
             catch (Exception ex)
