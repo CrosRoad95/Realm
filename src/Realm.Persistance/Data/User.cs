@@ -20,7 +20,7 @@ public sealed class User : IdentityUser<int>
 #pragma warning restore CS8618
 
     public ICollection<UserLicense> Licenses { get; set; } = new List<UserLicense>();
-    public ICollection<VehicleAccess> VehicleAccesses { get; set; } = new List<VehicleAccess>();
+    public ICollection<VehiclePlayerAccess> VehiclePlayerAccesses { get; set; } = new List<VehiclePlayerAccess>();
     public ICollection<Inventory>? Inventories { get; set; } = new List<Inventory>();
     public DailyVisits? DailyVisits { get; set; }
     public ICollection<Achievement> Achievements { get; set; } = new List<Achievement>();

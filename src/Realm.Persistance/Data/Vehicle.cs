@@ -26,7 +26,7 @@ public sealed class Vehicle
     public bool Spawned { get; set; }
     public float Mileage { get; set; }
 
-    public ICollection<VehicleAccess> VehicleAccesses { get; set; } = new List<VehicleAccess>();
+    public ICollection<VehiclePlayerAccess> PlayerAccesses { get; set; } = new List<VehiclePlayerAccess>();
     public ICollection<VehicleUpgrade> Upgrades { get; set; } = new List<VehicleUpgrade>();
     public ICollection<VehicleFuel> Fuels { get; set; } = new List<VehicleFuel>();
     public ICollection<VehiclePartDamage> PartDamages { get; set; } = new List<VehiclePartDamage>();

@@ -759,34 +759,6 @@ namespace Realm.Persistance.MySql.Migrations
                     b.ToTable("Vehicles", (string)null);
                 });
 
-            modelBuilder.Entity("Realm.Persistance.Data.VehicleAccess", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("longtext")
-                        .HasDefaultValue("{\"Ownership\":false}");
-
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("VehicleId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UserId");
-
-                    b.HasIndex("VehicleId");
-
-                    b.ToTable("VehicleAccesses", (string)null);
-                });
-
             modelBuilder.Entity("Realm.Persistance.Data.VehicleEngine", b =>
                 {
                     b.Property<int>("VehicleId")
@@ -846,6 +818,35 @@ namespace Realm.Persistance.MySql.Migrations
                     b.HasKey("VehicleId", "PartId");
 
                     b.ToTable("VehiclePartDamages", (string)null);
+                });
+
+            modelBuilder.Entity("Realm.Persistance.Data.VehiclePlayerAccess", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    b.Property<byte>("AccessType")
+                        .HasColumnType("tinyint unsigned");
+
+                    b.Property<string>("CustomValue")
+                        .HasMaxLength(255)
+                        .HasColumnType("varchar(255)");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("VehicleId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.HasIndex("VehicleId");
+
+                    b.ToTable("VehiclePlayerAccesses", (string)null);
                 });
 
             modelBuilder.Entity("Realm.Persistance.Data.VehicleUpgrade", b =>
@@ -1089,25 +1090,6 @@ namespace Realm.Persistance.MySql.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Realm.Persistance.Data.VehicleAccess", b =>
-                {
-                    b.HasOne("Realm.Persistance.Data.User", "User")
-                        .WithMany("VehicleAccesses")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Realm.Persistance.Data.Vehicle", "Vehicle")
-                        .WithMany("VehicleAccesses")
-                        .HasForeignKey("VehicleId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("User");
-
-                    b.Navigation("Vehicle");
-                });
-
             modelBuilder.Entity("Realm.Persistance.Data.VehicleEngine", b =>
                 {
                     b.HasOne("Realm.Persistance.Data.Vehicle", null)
@@ -1133,6 +1115,25 @@ namespace Realm.Persistance.MySql.Migrations
                         .HasForeignKey("VehicleId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("Realm.Persistance.Data.VehiclePlayerAccess", b =>
+                {
+                    b.HasOne("Realm.Persistance.Data.User", "User")
+                        .WithMany("VehiclePlayerAccesses")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Realm.Persistance.Data.Vehicle", "Vehicle")
+                        .WithMany("PlayerAccesses")
+                        .HasForeignKey("VehicleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+
+                    b.Navigation("Vehicle");
                 });
 
             modelBuilder.Entity("Realm.Persistance.Data.VehicleUpgrade", b =>
@@ -1189,7 +1190,7 @@ namespace Realm.Persistance.MySql.Migrations
 
                     b.Navigation("Upgrades");
 
-                    b.Navigation("VehicleAccesses");
+                    b.Navigation("VehiclePlayerAccesses");
 
                     b.Navigation("WhitelistedSerials");
                 });
@@ -1200,9 +1201,9 @@ namespace Realm.Persistance.MySql.Migrations
 
                     b.Navigation("PartDamages");
 
-                    b.Navigation("Upgrades");
+                    b.Navigation("PlayerAccesses");
 
-                    b.Navigation("VehicleAccesses");
+                    b.Navigation("Upgrades");
 
                     b.Navigation("VehicleEngines");
                 });

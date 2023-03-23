@@ -1,5 +1,5 @@
 ﻿using VehicleData = Realm.Persistance.Data.Vehicle;
-using VehicleAccess = Realm.Domain.Concepts.VehicleAccess;
+using VehiclePlayerAccess = Realm.Domain.Concepts.VehiclePlayerAccess;
 
 namespace Realm.Domain.Components.Vehicles;
 
@@ -9,8 +9,8 @@ public class PrivateVehicleComponent : Component
 
     internal int Id => _vehicleData.Id;
 
-    private List<VehicleAccess> _vehicleAccesses = new();
-    public IReadOnlyList<VehicleAccess> VehicleAccesses => _vehicleAccesses;
+    private List<VehiclePlayerAccess> _vehiclePlayerAccesses = new();
+    public IReadOnlyList<VehiclePlayerAccess> PlayerAccesses => _vehiclePlayerAccesses;
 
     internal PrivateVehicleComponent(VehicleData vehicleData)
     {
@@ -63,31 +63,32 @@ public class PrivateVehicleComponent : Component
         vehicle.IsTaxiLightOn = _vehicleData.TaxiLightState;
         vehicle.Health = _vehicleData.Health;
         vehicle.IsFrozen = _vehicleData.IsFrozen;
-        _vehicleAccesses = _vehicleData.VehicleAccesses.Select(x => new VehicleAccess
+        _vehiclePlayerAccesses = _vehicleData.PlayerAccesses.Select(x => new VehiclePlayerAccess
         {
             Id = x.Id,
             UserId = x.User.Id,
-            Ownership = x.Description.Ownership
+            AccessType = x.AccessType,
+            CustomValue = x.CustomValue
         }).ToList();
     }
 
-    public bool TryGetAccess(Entity entity, out VehicleAccess vehicleAccess)
+    public bool TryGetAccess(Entity entity, out VehiclePlayerAccess vehicleAccess)
     {
         if (entity.Tag != Entity.EntityTag.Player)
             throw new InvalidOperationException();
 
         var userId = entity.GetRequiredComponent<AccountComponent>().Id;
-        var index = _vehicleAccesses.FindIndex(x => x.UserId == userId);
+        var index = _vehiclePlayerAccesses.FindIndex(x => x.UserId == userId);
         if(index >= 0)
         {
-            vehicleAccess = _vehicleAccesses[index];
+            vehicleAccess = _vehiclePlayerAccesses[index];
             return true;
         }
         vehicleAccess = default;
         return false;
     }
 
-    public VehicleAccess AddAsOwner(Entity entity)
+    public VehiclePlayerAccess AddAccess(Entity entity, byte accessType, string? customValue = null)
     {
         if (entity.Tag != Entity.EntityTag.Player)
             throw new InvalidOperationException();
@@ -95,11 +96,17 @@ public class PrivateVehicleComponent : Component
         if (TryGetAccess(entity, out var _))
             throw new EntityAccessDefinedException();
 
-        _vehicleAccesses.Add(new VehicleAccess
+        _vehiclePlayerAccesses.Add(new VehiclePlayerAccess
         {
             UserId = entity.GetRequiredComponent<AccountComponent>().Id,
-            Ownership = true,
+            AccessType = accessType,
+            CustomValue = customValue
         });
-        return _vehicleAccesses.Last();
+        return _vehiclePlayerAccesses.Last();
+    }
+
+    public VehiclePlayerAccess AddAsOwner(Entity entity, string? customValue = null)
+    {
+        return AddAccess(entity, 0, customValue);
     }
 }

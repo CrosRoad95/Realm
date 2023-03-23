@@ -124,6 +124,7 @@ internal sealed class CommandsLogic
             vehicleEntity.AddComponent<VehicleEngineComponent>();
             vehicleEntity.AddComponent(new VehicleFuelComponent(1, 20, 20, 0.01, 2)).Active = true;
             vehicleEntity.AddComponent<VehiclePartDamageComponent>().AddPart(1, 1337);
+            vehicleEntity.GetRequiredComponent<PrivateVehicleComponent>().AddAsOwner(entity);
         });
         
         _commandService.AddCommandHandler("exclusivecv", (entity, args) =>
@@ -176,9 +177,9 @@ internal sealed class CommandsLogic
             var privateVehicleComponent = veh.GetRequiredComponent<PrivateVehicleComponent>();
             playerElementComponent.SendChatMessage("Access info:");
 
-            foreach (var vehicleAccess in privateVehicleComponent.VehicleAccesses)
+            foreach (var vehicleAccess in privateVehicleComponent.PlayerAccesses)
             {
-                playerElementComponent.SendChatMessage($"Access: ({vehicleAccess.UserId}) = Ownership={vehicleAccess.Ownership}");
+                playerElementComponent.SendChatMessage($"Access: ({vehicleAccess.UserId}) = Ownership={vehicleAccess.AccessType == 0}");
             }
         });
 

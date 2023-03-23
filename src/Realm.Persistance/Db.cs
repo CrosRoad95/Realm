@@ -11,7 +11,7 @@ public abstract class Db<T> : IdentityDbContext<User, Role, int,
 {
     public DbSet<UserLicense> UserLicenses => Set<UserLicense>();
     public DbSet<Vehicle> Vehicles => Set<Vehicle>();
-    public DbSet<VehicleAccess> VehicleAccesses => Set<VehicleAccess>();
+    public DbSet<VehiclePlayerAccess> VehiclePlayerAccesses => Set<VehiclePlayerAccess>();
     public DbSet<Inventory> Inventories => Set<Inventory>();
     public DbSet<InventoryItem> InventoryItems => Set<InventoryItem>();
     public DbSet<VehicleUpgrade> VehicleUpgrades => Set<VehicleUpgrade>();
@@ -69,7 +69,7 @@ public abstract class Db<T> : IdentityDbContext<User, Role, int,
                 .HasForeignKey(x => x.UserId);
 
             entityBuilder
-                .HasMany(x => x.VehicleAccesses)
+                .HasMany(x => x.VehiclePlayerAccesses)
                 .WithOne(x => x.User)
                 .HasForeignKey(x => x.UserId);
 
@@ -366,7 +366,7 @@ public abstract class Db<T> : IdentityDbContext<User, Role, int,
                 .IsRequired();
 
             entityBuilder
-                .HasMany(x => x.VehicleAccesses)
+                .HasMany(x => x.PlayerAccesses)
                 .WithOne(x => x.Vehicle)
                 .HasForeignKey(x => x.VehicleId);
 
@@ -391,29 +391,28 @@ public abstract class Db<T> : IdentityDbContext<User, Role, int,
                 .HasForeignKey(x => x.VehicleId);
         });
 
-        modelBuilder.Entity<VehicleAccess>(entityBuilder =>
+        modelBuilder.Entity<VehiclePlayerAccess>(entityBuilder =>
         {
             entityBuilder
-                .ToTable(nameof(VehicleAccesses))
+                .ToTable(nameof(VehiclePlayerAccesses))
                 .HasKey(x => x.Id);
 
             entityBuilder
                 .Property(x => x.VehicleId)
                 .ValueGeneratedOnAdd();
 
-            entityBuilder.Property(x => x.Description)
-                .HasConversion(x => x.Serialize(), x => VehicleAccessDescription.CreateFromString(x))
-                .HasDefaultValue(new VehicleAccessDescription())
-                .IsRequired();
+            entityBuilder
+                .Property(x => x.CustomValue)
+                .HasMaxLength(255);
 
             entityBuilder
                 .HasOne(x => x.User)
-                .WithMany(x => x.VehicleAccesses)
+                .WithMany(x => x.VehiclePlayerAccesses)
                 .HasForeignKey(x => x.UserId);
 
             entityBuilder
                 .HasOne(x => x.Vehicle)
-                .WithMany(x => x.VehicleAccesses)
+                .WithMany(x => x.PlayerAccesses)
                 .HasForeignKey(x => x.VehicleId);
         });
 
