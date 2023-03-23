@@ -25,8 +25,18 @@ internal sealed class VehiclesService : IVehiclesService
         return vehicleEntity;
     }
 
-    public async Task<List<VehicleModelPositionDTO>> GetAllVehiclesModelPositionDTOsByUserId(int userId)
+    public Task<List<LightInfoVehicleDTO>> GetLightVehiclesByUserId(int userId)
     {
-        return await _vehicleRepository.GetAllVehiclesModelPositionDTOsByUserId(userId);
+        return _vehicleRepository.GetLightVehiclesByUserId(userId);
+    }
+
+    public Task<List<Persistance.Data.Vehicle>> GetVehiclesByUserId(int userId)
+    {
+        return _vehicleRepository.GetVehiclesByUserId(userId);
+    }
+
+    public Task<List<Persistance.Data.Vehicle>> GetAllSpawnedVehicles()
+    {
+        return _vehicleRepository.GetAllSpawnedVehicles();
     }
 }

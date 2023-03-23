@@ -88,7 +88,7 @@ internal sealed class PlayerBindsLogic
                 if (entity.TryGetComponent(out MoneyComponent moneyComponent))
                     state.Money = (double)moneyComponent.Money;
 
-                var vehiclesWithModelAndPositionDTos = await _vehiclesService.GetAllVehiclesModelPositionDTOsByUserId(accountComponent.Id);
+                var vehiclesWithModelAndPositionDTos = await _vehiclesService.GetLightVehiclesByUserId(accountComponent.Id);
                 state.VehicleLightInfos = vehiclesWithModelAndPositionDTos.Select(x => new Domain.Data.VehicleLightInfo
                 {
                     Id = x.Id,

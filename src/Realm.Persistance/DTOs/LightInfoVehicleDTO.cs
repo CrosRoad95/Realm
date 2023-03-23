@@ -1,6 +1,6 @@
 ﻿namespace Realm.Persistance.DTOs;
 
-public class VehicleModelPositionDTO
+public class LightInfoVehicleDTO
 {
     public int Id { get; set; }
     public ushort Model { get; set; }

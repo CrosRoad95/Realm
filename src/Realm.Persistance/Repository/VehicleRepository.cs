@@ -27,14 +27,13 @@ internal class VehicleRepository : IVehicleRepository
         return vehicle;
     }
 
-    public Task<List<VehicleModelPositionDTO>> GetAllVehiclesModelPositionDTOsByUserId(int userId)
+    public Task<List<LightInfoVehicleDTO>> GetLightVehiclesByUserId(int userId)
     {
         var query = _db.Vehicles
             .TagWithSource(nameof(VehicleRepository))
             .AsNoTrackingWithIdentityResolution()
-            .Include(x => x.VehicleAccesses)
             .Where(x => x.VehicleAccesses.Any(x => x.UserId == userId))
-            .Select(x => new VehicleModelPositionDTO
+            .Select(x => new LightInfoVehicleDTO
             {
                 Id = x.Id,
                 Model = x.Model,
@@ -43,8 +42,18 @@ internal class VehicleRepository : IVehicleRepository
 
         return query.ToListAsync();
     }
+    
+    public Task<List<Vehicle>> GetVehiclesByUserId(int userId)
+    {
+        var query = _db.Vehicles
+            .TagWithSource(nameof(VehicleRepository))
+            .AsNoTrackingWithIdentityResolution()
+            .Where(x => x.VehicleAccesses.Any(x => x.UserId == userId));
 
-    public Task<List<Vehicle>> GetAllReadOnlySpawnedVehicles()
+        return query.ToListAsync();
+    }
+
+    public Task<List<Vehicle>> GetAllSpawnedVehicles()
     {
         var query = _db.Vehicles
             .TagWithSource(nameof(VehicleRepository))

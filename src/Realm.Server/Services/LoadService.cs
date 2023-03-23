@@ -20,7 +20,7 @@ internal class LoadService : ILoadService
     private async Task LoadAllVehicles()
     {
         using var vehicleRepository = _repositoryFactory.GetVehicleRepository();
-        var results = await vehicleRepository.GetAllReadOnlySpawnedVehicles();
+        var results = await vehicleRepository.GetAllSpawnedVehicles();
 
         int i = 0;
         foreach (var vehicleData in results)

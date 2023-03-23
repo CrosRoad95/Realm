@@ -5,5 +5,6 @@ namespace Realm.Server.Interfaces;
 public interface IVehiclesService
 {
     Task<Entity> ConvertToPrivateVehicle(Entity vehicleEntity);
-    Task<List<VehicleModelPositionDTO>> GetAllVehiclesModelPositionDTOsByUserId(int userId);
+    Task<List<LightInfoVehicleDTO>> GetLightVehiclesByUserId(int userId);
+    Task<List<Persistance.Data.Vehicle>> GetVehiclesByUserId(int userId);
 }

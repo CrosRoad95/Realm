@@ -3,6 +3,7 @@
 public interface IVehicleRepository : IRepositoryBase
 {
     Task<Vehicle> CreateNewVehicle(ushort model);
-    Task<List<Vehicle>> GetAllReadOnlySpawnedVehicles();
-    Task<List<VehicleModelPositionDTO>> GetAllVehiclesModelPositionDTOsByUserId(int userId);
+    Task<List<Vehicle>> GetAllSpawnedVehicles();
+    Task<List<LightInfoVehicleDTO>> GetLightVehiclesByUserId(int userId);
+    Task<List<Vehicle>> GetVehiclesByUserId(int userId);
 }
