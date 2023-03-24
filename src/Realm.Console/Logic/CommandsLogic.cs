@@ -13,6 +13,7 @@ using System.Diagnostics;
 using Color = System.Drawing.Color;
 using Size = System.Drawing.Size;
 using Realm.Server.Extensions;
+using Realm.Console.Components.Vehicles;
 
 namespace Realm.Console.Logic;
 
