@@ -9,12 +9,12 @@ namespace Realm.Resources.Overlay;
 internal class OverlayLogic
 {
     private readonly LuaEventService _luaEventService;
-    private readonly OverlayService _overlayService;
+    private readonly IOverlayService _overlayService;
     private readonly RootElement _rootElement;
     private readonly OverlayResource _resource;
 
     public OverlayLogic(MtaServer server, LuaEventService luaEventService,
-        OverlayService overlayService, RootElement rootElement)
+        IOverlayService overlayService, RootElement rootElement)
     {
         _luaEventService = luaEventService;
         _overlayService = overlayService;

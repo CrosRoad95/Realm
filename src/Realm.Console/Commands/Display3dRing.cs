@@ -8,9 +8,9 @@ namespace Realm.Console.Commands;
 public sealed class Display3dRing : IIngameCommand
 {
     private readonly ILogger<Display3dRing> _logger;
-    private readonly OverlayService _overlayService;
+    private readonly IOverlayService _overlayService;
 
-    public Display3dRing(ILogger<Display3dRing> logger, OverlayService overlayService)
+    public Display3dRing(ILogger<Display3dRing> logger, IOverlayService overlayService)
     {
         _logger = logger;
         _overlayService = overlayService;

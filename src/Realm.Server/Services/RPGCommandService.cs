@@ -40,9 +40,10 @@ public class RPGCommandService
             if (!entity.TryGetComponent<AccountComponent>(out var accountComponent) || !entity.TryGetComponent<PlayerElementComponent>(out var playerElementComponent))
                 return;
 
-            var start = Stopwatch.GetTimestamp();
             var activity = new Activity("CommandHandler");
             activity.Start();
+            _logger.LogInformation("Begin command {commandName} execution with traceId={TraceId}", commandName, activity.GetTraceId());
+            var start = Stopwatch.GetTimestamp();
 
             using var _1 = LogContext.PushProperty("serial", playerElementComponent.Client.Serial);
             using var _2 = LogContext.PushProperty("accountId", accountComponent.Id);

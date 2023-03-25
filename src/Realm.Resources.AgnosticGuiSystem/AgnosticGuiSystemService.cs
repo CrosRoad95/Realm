@@ -7,11 +7,9 @@ using System.Diagnostics;
 
 namespace Realm.Resources.AgnosticGuiSystem;
 
-public class AgnosticGuiSystemService
+internal sealed class AgnosticGuiSystemService : IAgnosticGuiSystemService
 {
-    public delegate Task GuiChangedDelegate();
-
-    public GuiChangedDelegate? GuiFilesChanged;
+    public GuiChangedDelegate? GuiFilesChanged { get; set; }
 
     private readonly AgnosticGuiSystemResource _resource;
     public event Action<LuaEvent>? FormSubmitted;
@@ -25,12 +23,12 @@ public class AgnosticGuiSystemService
         _luaValueMapper = luaValueMapper;
     }
 
-    internal void HandleInternalSubmitForm(LuaEvent luaEvent)
+    public void HandleInternalSubmitForm(LuaEvent luaEvent)
     {
         FormSubmitted?.Invoke(luaEvent);
     }
-    
-    internal void HandleInternalActionExecuted(LuaEvent luaEvent)
+
+    public void HandleInternalActionExecuted(LuaEvent luaEvent)
     {
         ActionExecuted?.Invoke(luaEvent);
     }

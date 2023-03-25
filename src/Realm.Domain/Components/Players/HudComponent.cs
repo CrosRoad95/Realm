@@ -7,7 +7,7 @@ namespace Realm.Domain.Components.Players;
 public abstract class HudComponent<TState> : Component where TState : class
 {
     [Inject]
-    private OverlayService OverlayService { get; set; } = default!;
+    private IOverlayService OverlayService { get; set; } = default!;
 
     private readonly string _id = Guid.NewGuid().ToString();
     private Hud<TState> _hud = default!;

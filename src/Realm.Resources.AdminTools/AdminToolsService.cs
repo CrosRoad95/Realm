@@ -3,10 +3,10 @@ using SlipeServer.Server.Elements.Events;
 
 namespace Realm.Resources.AdminTools;
 
-public class AdminToolsService
+internal sealed class AdminToolsService : IAdminToolsService
 {
-    internal event Action<Player>? AdminToolsEnabled;
-    internal event Action<Player>? AdminToolsDisabled;
+    public event Action<Player>? AdminToolsEnabled;
+    public event Action<Player>? AdminToolsDisabled;
 
     private readonly HashSet<Player> _enabledForPlayers = new();
     private readonly object _enabledForPlayersLock = new();

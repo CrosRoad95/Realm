@@ -29,7 +29,7 @@ internal sealed class CommandsLogic
     private readonly ChatBox _chatBox;
     private readonly ILogger<CommandsLogic> _logger;
     private readonly IDateTimeProvider _dateTimeProvider;
-    private readonly NametagsService _nametagsService;
+    private readonly INametagsService _nametagsService;
     private readonly IVehiclesService _vehiclesService;
 
     private class TestState
@@ -39,7 +39,7 @@ internal sealed class CommandsLogic
 
     public CommandsLogic(RPGCommandService commandService, IEntityFactory entityFactory, RepositoryFactory repositoryFactory,
         ItemsRegistry itemsRegistry, ECS ecs, IBanService banService, IDiscordService discordService, ChatBox chatBox, ILogger<CommandsLogic> logger,
-        IDateTimeProvider dateTimeProvider, NametagsService nametagsService, IRPGUserManager rpgUserManager, IVehiclesService vehiclesService)
+        IDateTimeProvider dateTimeProvider, INametagsService nametagsService, IRPGUserManager rpgUserManager, IVehiclesService vehiclesService)
     {
         _commandService = commandService;
         _entityFactory = entityFactory;

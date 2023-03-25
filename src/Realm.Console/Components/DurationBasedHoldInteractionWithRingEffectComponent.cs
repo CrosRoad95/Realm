@@ -6,7 +6,7 @@ namespace Realm.Console.Components;
 internal class DurationBasedHoldInteractionWithRingEffectComponent : DurationBasedHoldInteractionComponent
 {
     [Inject]
-    private OverlayService OverlayService { get; set; } = default!;
+    private IOverlayService OverlayService { get; set; } = default!;
     [Inject]
     private ILogger<DurationBasedHoldInteractionWithRingEffectComponent> Logger { get; set; } = default!;
 

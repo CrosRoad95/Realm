@@ -11,12 +11,12 @@ internal class StatisticCounterLogic
 {
     private readonly LuaEventService _luaEventService;
     private readonly StatisticsCounterResource _resource;
-    private readonly StatisticsCounterService _statisticsCounterService;
+    private readonly IStatisticsCounterService _statisticsCounterService;
     private readonly ILogger<StatisticCounterLogic> _logger;
     private readonly HashSet<Player> _players = new();
 
     public StatisticCounterLogic(MtaServer server, LuaEventService luaEventService,
-        StatisticsCounterService statisticsCounterResource, ILogger<StatisticCounterLogic> logger)
+        IStatisticsCounterService statisticsCounterResource, ILogger<StatisticCounterLogic> logger)
     {
         _luaEventService = luaEventService;
         _statisticsCounterService = statisticsCounterResource;

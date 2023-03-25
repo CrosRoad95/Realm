@@ -4,7 +4,7 @@ using SlipeServer.Packets.Definitions.Lua;
 
 namespace Realm.Resources.Assets;
 
-public class AssetsService
+internal sealed class AssetsService : IAssetsService
 {
     public LuaValue Map(IAsset asset)
     {

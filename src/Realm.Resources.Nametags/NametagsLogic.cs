@@ -11,7 +11,7 @@ namespace Realm.Resources.Nametags;
 internal class NametagsLogic
 {
     private readonly LuaEventService _luaEventService;
-    private readonly NametagsService _nametagsService;
+    private readonly INametagsService _nametagsService;
     private readonly ILogger<NametagsLogic> _logger;
     private readonly RootElement _rootElement;
     private readonly NametagsResource _resource;
@@ -20,7 +20,7 @@ internal class NametagsLogic
     
     //private readonly Dictionary<Ped, Nametag> _nametags = new();
 
-    public NametagsLogic(MtaServer mtaServer, LuaEventService luaEventService, NametagsService nametagsService, ILogger<NametagsLogic> logger,
+    public NametagsLogic(MtaServer mtaServer, LuaEventService luaEventService, INametagsService nametagsService, ILogger<NametagsLogic> logger,
         RootElement rootElement)
     {
         _luaEventService = luaEventService;
@@ -44,7 +44,7 @@ internal class NametagsLogic
     private void HandleRemoveNametag(Ped ped)
     {
         lock (_lock)
-            _nametagsCache.TableValue.Remove(ped);
+            _nametagsCache.TableValue!.Remove(ped);
         _luaEventService.TriggerEvent("internalRemovePedNametag", _rootElement, ped);
     }
 
@@ -52,7 +52,7 @@ internal class NametagsLogic
     {
         lock(_lock)
         {
-            if(_nametagsCache.TableValue.Count > 0)
+            if(_nametagsCache.TableValue!.Count > 0)
                 player.TriggerLuaEvent("internalResendAllNametags", player, _nametagsCache);
         }
     }
@@ -60,7 +60,7 @@ internal class NametagsLogic
     public void ResendPedNametagToAllPlayers(Ped ped)
     {
         lock(_lock)
-            _luaEventService.TriggerEvent("internalSendPedNametags", _rootElement, ped, _nametagsCache.TableValue[ped]);
+            _luaEventService.TriggerEvent("internalSendPedNametags", _rootElement, ped, _nametagsCache.TableValue![ped]);
     }
 
     private void HandleSetNametag(Ped ped, string text)
@@ -71,7 +71,7 @@ internal class NametagsLogic
         };
 
         lock(_lock)
-            _nametagsCache.TableValue[ped] = nametag.LuaValue;
+            _nametagsCache.TableValue![ped] = nametag.LuaValue;
         ResendPedNametagToAllPlayers(ped);
     }
 
@@ -92,6 +92,6 @@ internal class NametagsLogic
     private void HandleDisconnected(Player player, SlipeServer.Server.Elements.Events.PlayerQuitEventArgs e)
     {
         lock(_lock)
-            _nametagsCache.TableValue.Remove(player);
+            _nametagsCache.TableValue!.Remove(player);
     }
 }

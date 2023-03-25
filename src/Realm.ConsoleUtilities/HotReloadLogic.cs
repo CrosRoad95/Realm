@@ -8,10 +8,10 @@ public sealed class HotReloadLogic
 {
     private static HotReloadLogic? _hotReloadLogic;
     private readonly HotReload _hotReload;
-    private readonly AgnosticGuiSystemService _agnosticGuiSystemService;
+    private readonly IAgnosticGuiSystemService _agnosticGuiSystemService;
     private readonly ILogger<HotReloadLogic> _logger;
 
-    public HotReloadLogic(AgnosticGuiSystemService agnosticGuiSystemService, ILogger<HotReloadLogic> logger, string path)
+    public HotReloadLogic(IAgnosticGuiSystemService agnosticGuiSystemService, ILogger<HotReloadLogic> logger, string path)
     {
         _hotReloadLogic = this;
         _hotReload = new HotReload(path);

@@ -6,10 +6,10 @@ namespace Realm.Resources.AgnosticGuiSystem;
 
 internal class AgnosticGuiSystemLogic
 {
-    private readonly AgnosticGuiSystemService _agnosticGuiSystemService;
+    private readonly IAgnosticGuiSystemService _agnosticGuiSystemService;
     private readonly AgnosticGuiSystemResource _resource;
 
-    public AgnosticGuiSystemLogic(MtaServer server, LuaEventService luaEventService, AgnosticGuiSystemService agnosticGuiSystemService)
+    public AgnosticGuiSystemLogic(MtaServer server, LuaEventService luaEventService, IAgnosticGuiSystemService agnosticGuiSystemService)
     {
         luaEventService.AddEventHandler("internalSubmitForm", HandleInternalSubmitForm);
         luaEventService.AddEventHandler("internalActionExecuted", HandleInternalActionExecuted);

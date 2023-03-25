@@ -5,7 +5,7 @@ namespace Realm.Domain.Components.Players;
 public abstract class GuiComponent : Component
 {
     [Inject]
-    private AgnosticGuiSystemService AgnosticGuiSystemService { get; set; } = default!;
+    private IAgnosticGuiSystemService AgnosticGuiSystemService { get; set; } = default!;
     [Inject]
     private ILogger<GuiComponent> Logger { get; set; } = default!;
     [Inject]

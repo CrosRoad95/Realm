@@ -6,7 +6,7 @@ internal class FormContext : IFormContext
     private readonly Player _player;
     private readonly string _formName;
     private readonly LuaValue _data;
-    private readonly AgnosticGuiSystemService _agnosticGuiSystemService;
+    private readonly IAgnosticGuiSystemService _agnosticGuiSystemService;
     private readonly IEntityByElement _entityByElement;
 
     public string FormName => _formName;
@@ -20,7 +20,7 @@ internal class FormContext : IFormContext
         }
     }
 
-    public FormContext(Player player, string formName, LuaValue data, AgnosticGuiSystemService agnosticGuiSystemService, IEntityByElement entityByElement)
+    public FormContext(Player player, string formName, LuaValue data, IAgnosticGuiSystemService agnosticGuiSystemService, IEntityByElement entityByElement)
     {
         _player = player;
         _formName = formName;

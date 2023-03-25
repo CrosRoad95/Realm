@@ -5,7 +5,7 @@ namespace Realm.Domain.Components.World;
 public sealed class NametagComponent : Component
 {
     [Inject]
-    private NametagsService NametagsService { get; set; } = default!;
+    private INametagsService NametagsService { get; set; } = default!;
 
     private readonly object _lock = new();
     private string _text;

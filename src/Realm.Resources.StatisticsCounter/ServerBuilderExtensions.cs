@@ -16,7 +16,7 @@ public static class ServerBuilderExtensions
 
         builder.ConfigureServices(services =>
         {
-            services.AddSingleton<StatisticsCounterService>();
+            services.AddSingleton<IStatisticsCounterService, StatisticsCounterService>();
         });
 
         builder.AddLogic<StatisticCounterLogic>();

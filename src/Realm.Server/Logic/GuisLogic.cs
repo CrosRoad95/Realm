@@ -14,7 +14,7 @@ internal class GuisLogic
 
     private void HandleServerStarted()
     {
-        _serviceProvider.GetRequiredService<AgnosticGuiSystemService>().GuiFilesChanged = HandleGuiFilesChanged;
+        _serviceProvider.GetRequiredService<IAgnosticGuiSystemService>().GuiFilesChanged = HandleGuiFilesChanged;
     }
 
     private Task HandleGuiFilesChanged()

@@ -11,18 +11,18 @@ internal class ClientInterfaceLogic
 {
     private readonly LuaEventService _luaEventService;
     private readonly FromLuaValueMapper _fromLuaValueMapper;
-    private readonly ClientInterfaceService _clientInterfaceService;
+    private readonly IClientInterfaceService _clientInterfaceService;
     private readonly ILogger<ClientInterfaceLogic> _logger;
     private readonly ClientInterfaceResource _resource;
     private readonly List<Element> _focusableElements = new();
     private readonly object _focusableElementsLock = new();
 
     public ClientInterfaceLogic(MtaServer server, LuaEventService luaEventService, FromLuaValueMapper fromLuaValueMapper,
-        ClientInterfaceService ClientInterfaceService, ILogger<ClientInterfaceLogic> logger)
+        IClientInterfaceService clientInterfaceService, ILogger<ClientInterfaceLogic> logger)
     {
         _luaEventService = luaEventService;
         _fromLuaValueMapper = fromLuaValueMapper;
-        _clientInterfaceService = ClientInterfaceService;
+        _clientInterfaceService = clientInterfaceService;
         _logger = logger;
         server.PlayerJoined += HandlePlayerJoin;
 

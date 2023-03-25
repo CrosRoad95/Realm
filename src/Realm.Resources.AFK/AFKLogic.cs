@@ -7,10 +7,10 @@ namespace Realm.Resources.AFK;
 
 internal class AFKLogic
 {
-    private readonly AFKService _AFKService;
+    private readonly IAFKService _AFKService;
     private readonly AFKResource _resource;
 
-    public AFKLogic(MtaServer mtaServer, LuaEventService luaEventService, AFKService AFKService)
+    public AFKLogic(MtaServer mtaServer, LuaEventService luaEventService, IAFKService AFKService)
     {
         luaEventService.AddEventHandler("internalAFKStart", HandleAFKStart);
         luaEventService.AddEventHandler("internalAFKStop", HandleAFKStop);

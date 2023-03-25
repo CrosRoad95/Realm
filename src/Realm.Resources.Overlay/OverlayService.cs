@@ -7,7 +7,7 @@ using System.Numerics;
 
 namespace Realm.Resources.Overlay;
 
-public class OverlayService
+internal sealed class OverlayService : IOverlayService
 {
     private struct HudElement
     {
@@ -19,20 +19,20 @@ public class OverlayService
         public LuaValue LuaValue => new(new LuaValue[] { type, id, position.X, position.Y, size.Width, size.Height });
     }
 
-    internal Action<Player, string>? NotificationAdded;
-    internal Action<Player, string, Vector2, IEnumerable<LuaValue>>? HudCreated;
-    internal Action<string, Vector3, IEnumerable<LuaValue>>? Hud3dCreated;
-    internal Action<Player, string>? HudRemoved;
-    internal Action<string>? Hud3dRemoved;
-    internal Action<Player, string, bool>? HudVisibilityChanged;
-    internal Action<Player, string, float, float>? HudPositionChanged;
-    internal Action<Player, string, Dictionary<int, object>>? HudStateChanged;
-    internal Action<string, Dictionary<int, object>>? Hud3dStateChanged;
-    internal Action<Player, string, Vector3, TimeSpan>? Display3dRingAdded;
-    internal Action<Player, string>? Display3dRingRemoved;
-    private readonly AssetsService _assetsService;
+    public Action<Player, string>? NotificationAdded { get; set; }
+    public Action<Player, string, Vector2, IEnumerable<LuaValue>>? HudCreated { get; set; }
+    public Action<string, Vector3, IEnumerable<LuaValue>>? Hud3dCreated { get; set; }
+    public Action<Player, string>? HudRemoved { get; set; }
+    public Action<string>? Hud3dRemoved { get; set; }
+    public Action<Player, string, bool>? HudVisibilityChanged { get; set; }
+    public Action<Player, string, float, float>? HudPositionChanged { get; set; }
+    public Action<Player, string, Dictionary<int, object>>? HudStateChanged { get; set; }
+    public Action<string, Dictionary<int, object>>? Hud3dStateChanged { get; set; }
+    public Action<Player, string, Vector3, TimeSpan>? Display3dRingAdded { get; set; }
+    public Action<Player, string>? Display3dRingRemoved { get; set; }
+    private readonly IAssetsService _assetsService;
 
-    public OverlayService(AssetsService assetsService)
+    public OverlayService(IAssetsService assetsService)
     {
         _assetsService = assetsService;
     }

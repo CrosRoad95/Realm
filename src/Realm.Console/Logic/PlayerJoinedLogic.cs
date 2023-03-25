@@ -11,10 +11,10 @@ internal sealed class PlayerJoinedLogic
     private readonly ILogger<PlayerJoinedLogic> _logger;
     private readonly AssetsRegistry _assetsRegistry;
     private readonly IBanService _banService;
-    private readonly NametagsService _nametagsService;
+    private readonly INametagsService _nametagsService;
 
     public PlayerJoinedLogic(ECS ecs, ILogger<PlayerJoinedLogic> logger, AssetsRegistry assetsRegistry, IBanService banService,
-        NametagsService nametagsService)
+        INametagsService nametagsService)
     {
         _ecs = ecs;
         _logger = logger;

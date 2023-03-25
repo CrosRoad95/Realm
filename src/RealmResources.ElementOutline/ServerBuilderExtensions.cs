@@ -16,7 +16,7 @@ public static class ServerBuilderExtensions
 
         builder.ConfigureServices(services =>
         {
-            services.AddSingleton<ElementOutlineService>();
+            services.AddSingleton<IElementOutlineService, ElementOutlineService>();
         });
 
         builder.AddLogic<ElementOutlineLogic>();

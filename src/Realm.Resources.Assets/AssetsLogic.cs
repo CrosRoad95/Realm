@@ -10,9 +10,9 @@ internal class AssetsLogic
 {
     private readonly AssetsResource _resource;
     private readonly AssetsRegistry _assetsRegistry;
-    private readonly AssetsService _assetsService;
+    private readonly IAssetsService _assetsService;
     private readonly LuaEventService _luaEventService;
-    public AssetsLogic(MtaServer server, AssetsRegistry assetsRegistry, AssetsService assetsService, LuaEventService luaEventService)
+    public AssetsLogic(MtaServer server, AssetsRegistry assetsRegistry, IAssetsService assetsService, LuaEventService luaEventService)
     {
         server.PlayerJoined += HandlePlayerJoin;
 

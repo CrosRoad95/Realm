@@ -5,7 +5,7 @@ internal class DefaultAfkLogic
     private readonly IEntityByElement _entityByElement;
     private readonly ILogger<StatisticsCounterLogic> _logger;
 
-    public DefaultAfkLogic(AFKService afkService,
+    public DefaultAfkLogic(IAFKService afkService,
         IEntityByElement entityByElement, ILogger<StatisticsCounterLogic> logger)
     {
         _entityByElement = entityByElement;

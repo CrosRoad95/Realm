@@ -14,7 +14,7 @@ internal class HudBuilder<TState> : IHudBuilder<TState>
 {
     private readonly List<LuaValue> _luaValues = new();
     private readonly TState? _state;
-    private readonly AssetsService _assetsService;
+    private readonly IAssetsService _assetsService;
     private readonly Vector2 _screenSize;
 
     public float Right => _screenSize.X;
@@ -24,7 +24,7 @@ internal class HudBuilder<TState> : IHudBuilder<TState>
     internal IEnumerable<LuaValue> HudElementsDefinitions => _luaValues;
     public event Action<int, PropertyInfo>? DynamicHudComponentAdded;
 
-    public HudBuilder(TState? defaultState, AssetsService assetsService, Vector2 screenSize)
+    public HudBuilder(TState? defaultState, IAssetsService assetsService, Vector2 screenSize)
     {
         _state = defaultState;
         _assetsService = assetsService;

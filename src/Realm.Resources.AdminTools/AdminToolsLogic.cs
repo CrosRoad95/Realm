@@ -15,7 +15,7 @@ internal class AdminToolsLogic
     private readonly IElementCollection _elementCollection;
     private readonly List<Player> _debugWorldSubscribers = new();
 
-    public AdminToolsLogic(MtaServer mtaServer, LuaEventService luaEventService, AdminToolsService adminToolsService, IElementCollection elementCollection)
+    public AdminToolsLogic(MtaServer mtaServer, LuaEventService luaEventService, IAdminToolsService adminToolsService, IElementCollection elementCollection)
     {
         mtaServer.PlayerJoined += HandlePlayerJoin;
         _resource = mtaServer.GetAdditionalResource<AdminToolsResource>();

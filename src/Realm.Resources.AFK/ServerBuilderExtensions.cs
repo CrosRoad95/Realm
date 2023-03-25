@@ -16,7 +16,7 @@ public static class ServerBuilderExtensions
 
         builder.ConfigureServices(services =>
         {
-            services.AddSingleton<AFKService>();
+            services.AddSingleton<IAFKService, AFKService>();
         });
 
         builder.AddLogic<AFKLogic>();

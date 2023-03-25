@@ -2,9 +2,9 @@
 
 namespace Realm.Resources.StatisticsCounter;
 
-public class StatisticsCounterService
+internal sealed class StatisticsCounterService : IStatisticsCounterService
 {
-    internal event Action<Player, bool>? CounterStateChanged;
+    public event Action<Player, bool>? CounterStateChanged;
     public event Action<Player, Dictionary<int, float>>? StatisticsCollected;
     public event Action<Player, float, float, float>? FpsStatisticsCollected;
 

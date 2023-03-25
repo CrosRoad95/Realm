@@ -5,7 +5,7 @@ namespace Realm.Domain.Components.Common;
 public class Hud3dComponent<TState> : Component where TState : class
 {
     [Inject]
-    private OverlayService OverlayService { get; set; } = default!;
+    private IOverlayService OverlayService { get; set; } = default!;
 
     private static int _idCounter = 0;
     private readonly int _id = _idCounter++;

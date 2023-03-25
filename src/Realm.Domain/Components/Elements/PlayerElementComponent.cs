@@ -9,11 +9,11 @@ public sealed class PlayerElementComponent : PedElementComponent
     [Inject]
     private ChatBox ChatBox { get; set; } = default!;
     [Inject]
-    private OverlayService OverlayService { get; set; } = default!;
+    private IOverlayService OverlayService { get; set; } = default!;
     [Inject]
-    private ClientInterfaceService ClientInterfaceService { get; set; } = default!;
+    private IClientInterfaceService ClientInterfaceService { get; set; } = default!;
     [Inject]
-    private AgnosticGuiSystemService AgnosticGuiSystemService { get; set; } = default!;
+    private IAgnosticGuiSystemService AgnosticGuiSystemService { get; set; } = default!;
     [Inject]
     private Text3dService Text3dService { get; set; } = default!;
     [Inject]

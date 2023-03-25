@@ -8,11 +8,11 @@ namespace Realm.Resources.ElementOutline;
 
 internal class ElementOutlineLogic
 {
-    private readonly ElementOutlineService _elementOutlineService;
+    private readonly IElementOutlineService _elementOutlineService;
     private readonly LuaEventService _luaEventService;
     private readonly FromLuaValueMapper _fromLuaValueMapper;
     private readonly ElementOutlineResource _resource;
-    public ElementOutlineLogic(MtaServer server, LuaEventService luaEventService, FromLuaValueMapper fromLuaValueMapper, ElementOutlineService elementOutlineService)
+    public ElementOutlineLogic(MtaServer server, LuaEventService luaEventService, FromLuaValueMapper fromLuaValueMapper, IElementOutlineService elementOutlineService)
     {
         _luaEventService = luaEventService;
         _fromLuaValueMapper = fromLuaValueMapper;

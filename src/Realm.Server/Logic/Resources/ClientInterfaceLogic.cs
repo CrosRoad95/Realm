@@ -5,10 +5,10 @@ namespace Realm.Server.Logic.Resources;
 internal class ClientInterfaceLogic
 {
     private readonly ILogger<ClientInterfaceLogic> _logger;
-    private readonly ClientInterfaceService _clientInterfaceService;
+    private readonly IClientInterfaceService _clientInterfaceService;
     private readonly IEntityByElement _entityByElement;
 
-    public ClientInterfaceLogic(ClientInterfaceService clientInterfaceService, ILogger<ClientInterfaceLogic> logger, IEntityByElement entityByElement,
+    public ClientInterfaceLogic(IClientInterfaceService clientInterfaceService, ILogger<ClientInterfaceLogic> logger, IEntityByElement entityByElement,
         ECS ecs)
     {
         _clientInterfaceService = clientInterfaceService;

@@ -9,13 +9,15 @@ public class CollisionShapeElementComponentTests
 {
     private readonly Entity _entity;
     private readonly CollisionSphereElementComponent _collisionSphereElementComponent;
+    private readonly IClientInterfaceService _clientInterfaceServiceMock = new ClientInterfaceService();
 
     public CollisionShapeElementComponentTests()
     {
+        // FocusableAdded
         var services = new ServiceCollection();
         services.AddSingleton<IRealmConfigurationProvider>(new TestConfigurationProvider());
         services.AddSingleton<ECS>();
-        services.AddSingleton<ClientInterfaceService>();
+        services.AddSingleton(_clientInterfaceServiceMock);
         services.AddSingleton<IEntityByElement>(x => x.GetRequiredService<ECS>());
         services.AddLogging(x => x.AddSerilog(new LoggerConfiguration().CreateLogger(), dispose: true));
 

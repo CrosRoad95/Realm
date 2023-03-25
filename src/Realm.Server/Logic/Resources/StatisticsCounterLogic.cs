@@ -2,13 +2,13 @@
 
 internal class StatisticsCounterLogic
 {
-    private readonly StatisticsCounterService _statisticsCounterService;
+    private readonly IStatisticsCounterService _statisticsCounterService;
     private readonly MtaServer _mtaServer;
     private readonly ECS _ecs;
     private readonly IEntityByElement _entityByElement;
     private readonly ILogger<StatisticsCounterLogic> _logger;
 
-    public StatisticsCounterLogic(StatisticsCounterService statisticsCounterService, MtaServer mtaServer, ECS ecs,
+    public StatisticsCounterLogic(IStatisticsCounterService statisticsCounterService, MtaServer mtaServer, ECS ecs,
         IEntityByElement entityByElement, ILogger<StatisticsCounterLogic> logger)
     {
         _statisticsCounterService = statisticsCounterService;

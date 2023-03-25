@@ -5,7 +5,7 @@ namespace Realm.Domain.Components.Players;
 public abstract class StatefulGuiComponent<TState> : GuiComponent
 {
     [Inject]
-    private AgnosticGuiSystemService AgnosticGuiSystemService { get; set; } = default!;
+    private IAgnosticGuiSystemService AgnosticGuiSystemService { get; set; } = default!;
     [Inject]
     private LuaValueMapper LuaValueMapper { get; set; } = default!;
 

@@ -3,37 +3,37 @@ using System.Globalization;
 
 namespace Realm.Resources.ClientInterface;
 
-public class ClientInterfaceService
+internal sealed class ClientInterfaceService : IClientInterfaceService
 {
     public event Action<Player, string, int, string, int>? ClientErrorMessage;
     public event Action<Player, CultureInfo>? ClientCultureInfoChanged;
     public event Action<Player, int, int>? ClientScreenSizeChanged;
     public event Action<Player, Element?>? FocusedElementChanged;
-    internal event Action<Element>? FocusableAdded;
-    internal event Action<Element>? FocusableRemoved;
-    internal event Action<Player, bool>? FocusableRenderingChanged;
+    public event Action<Element>? FocusableAdded;
+    public event Action<Element>? FocusableRemoved;
+    public event Action<Player, bool>? FocusableRenderingChanged;
 
     public ClientInterfaceService()
     {
 
     }
 
-    internal void BroadcastClientErrorMessage(Player player, string message, int level, string file, int line)
+    public void BroadcastClientErrorMessage(Player player, string message, int level, string file, int line)
     {
         ClientErrorMessage?.Invoke(player, message, level, file, line);
     }
-    
-    internal void BroadcastPlayerLocalizationCode(Player player, string code)
+
+    public void BroadcastPlayerLocalizationCode(Player player, string code)
     {
         ClientCultureInfoChanged?.Invoke(player, CultureInfo.GetCultureInfo(code));
     }
-    
-    internal void BroadcastPlayerScreenSize(Player player, int x, int y)
+
+    public void BroadcastPlayerScreenSize(Player player, int x, int y)
     {
         ClientScreenSizeChanged?.Invoke(player, x, y);
     }
-    
-    internal void BroadcastPlayerElementFocusChanged(Player player, Element? newFocusedElement, string? childElement)
+
+    public void BroadcastPlayerElementFocusChanged(Player player, Element? newFocusedElement, string? childElement)
     {
         FocusedElementChanged?.Invoke(player, newFocusedElement);
     }

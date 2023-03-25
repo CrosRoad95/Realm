@@ -19,7 +19,7 @@ public static class ServerBuilderExtensions
 
         builder.ConfigureServices(services =>
         {
-            services.AddSingleton<ClientInterfaceService>();
+            services.AddSingleton<IClientInterfaceService, ClientInterfaceService>();
         });
 
         builder.AddLogic<ClientInterfaceLogic>();

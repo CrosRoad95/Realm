@@ -16,7 +16,7 @@ public static class ServerBuilderExtensions
 
         builder.ConfigureServices(services =>
         {
-            services.AddSingleton<NametagsService>();
+            services.AddSingleton<INametagsService, NametagsService>();
         });
 
         builder.AddLogic<NametagsLogic>();

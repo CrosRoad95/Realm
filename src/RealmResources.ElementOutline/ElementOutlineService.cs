@@ -3,10 +3,10 @@ using System.Drawing;
 
 namespace Realm.Resources.ElementOutline;
 
-public class ElementOutlineService
+internal sealed class ElementOutlineService : IElementOutlineService
 {
-    internal event Action<Player, Element, Color>? OutlineChanged;
-    internal event Action<Player, Element>? OutlineRemoved;
+    public event Action<Player, Element, Color>? OutlineChanged;
+    public event Action<Player, Element>? OutlineRemoved;
 
     public void SetElementOutlineForPlayer(Player player, Element target, Color color)
     {

@@ -13,12 +13,12 @@ internal class PlayersLogic
     private readonly IEntityByElement _entityByElement;
     private readonly RealmDbContextFactory _realmDbContextFactory;
     private readonly MtaServer _mtaServer;
-    private readonly ClientInterfaceService _clientInterfaceService;
+    private readonly IClientInterfaceService _clientInterfaceService;
     private readonly IDateTimeProvider _dateTimeProvider;
     private readonly ConcurrentDictionary<Player, Latch> _playerResources = new();
 
     public PlayersLogic(ECS ecs, IServiceProvider serviceProvider, IEntityByElement entityByElement,
-        RealmDbContextFactory realmDbContextFactory, MtaServer mtaServer, ClientInterfaceService clientInterfaceService, IDateTimeProvider dateTimeProvider)
+        RealmDbContextFactory realmDbContextFactory, MtaServer mtaServer, IClientInterfaceService clientInterfaceService, IDateTimeProvider dateTimeProvider)
     {
         _ecs = ecs;
         _serviceProvider = serviceProvider;

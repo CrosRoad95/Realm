@@ -30,7 +30,7 @@ public static class ServerBuilderExtensions
 
         builder.ConfigureServices(services =>
         {
-            services.AddSingleton<AgnosticGuiSystemService>();
+            services.AddSingleton<IAgnosticGuiSystemService, AgnosticGuiSystemService>();
         });
 
         builder.AddLogic<AgnosticGuiSystemLogic>();

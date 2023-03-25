@@ -16,7 +16,7 @@ public static class ServerBuilderExtensions
 
         builder.ConfigureServices(services =>
         {
-            services.AddSingleton<AdminToolsService>();
+            services.AddSingleton<IAdminToolsService, AdminToolsService>();
         });
 
         builder.AddLogic<AdminToolsLogic>();

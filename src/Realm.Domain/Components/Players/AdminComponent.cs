@@ -11,9 +11,9 @@ public class AdminComponent : Component
     [Inject]
     private DebugLog DebugLog { get; set; } = default!;
     [Inject]
-    private AdminToolsService AdminToolsService { get; set; } = default!;
+    private IAdminToolsService AdminToolsService { get; set; } = default!;
     [Inject]
-    private ClientInterfaceService ClientInterfaceService { get; set; } = default!;
+    private IClientInterfaceService ClientInterfaceService { get; set; } = default!;
 
     private bool _debugView = false;
     private bool _adminTools = false;
