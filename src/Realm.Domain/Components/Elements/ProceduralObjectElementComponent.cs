@@ -14,11 +14,10 @@ public class ProceduralObjectElementComponent : ElementComponent
     {
     }
 
-    protected override Task LoadAsync()
+    protected override void Load()
     {
         var modelFactory = new ModelFactory();
         modelFactory.AddTriangle(new Vector3(0, 0, 0), new Vector3(0, 10, 0), new Vector3(10, 10, 0));
         AssetsRegistry.AddModel("test", modelFactory.Build());
-        return Task.CompletedTask;
     }
 }

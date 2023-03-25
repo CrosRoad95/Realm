@@ -1,4 +1,6 @@
-﻿namespace Realm.Tests.Tests;
+﻿using Realm.Domain.Enums;
+
+namespace Realm.Tests.Tests;
 
 public class ECSTests
 {
@@ -18,7 +20,7 @@ public class ECSTests
         {
             created = true;
         };
-        var entity = _ecs.CreateEntity("foo", Entity.EntityTag.Unknown);
+        var entity = _ecs.CreateEntity("foo", EntityTag.Unknown);
         entity.Dispose();
         #endregion
 
@@ -40,7 +42,7 @@ public class ECSTests
 
         await ParallelHelpers.Run((x,i) =>
         {
-            var entity = _ecs.CreateEntity($"foo{x}{i}", Entity.EntityTag.Unknown);
+            var entity = _ecs.CreateEntity($"foo{x}{i}", EntityTag.Unknown);
             entity.Dispose();
         });
         #endregion

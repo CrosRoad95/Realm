@@ -1,4 +1,6 @@
-﻿using Realm.Domain.Components.Elements.CollisionShapes;
+﻿using Realm.Domain.Components;
+using Realm.Domain.Components.Elements.CollisionShapes;
+using Realm.Domain.Enums;
 using Realm.Domain.Rules;
 
 namespace Realm.Console.Logic;
@@ -25,6 +27,7 @@ internal class WorldLogic
     };
 
     private readonly IEntityFactory _entityFactory;
+
     public WorldLogic(IRPGServer rpgServer, IEntityFactory entityFactory, ECS ecs)
     {
         _entityFactory = entityFactory;
@@ -34,7 +37,7 @@ internal class WorldLogic
 
     private void HandleEntityCreated(Entity entity)
     {
-        if (entity.Tag != Entity.EntityTag.Player)
+        if (entity.Tag != EntityTag.Player)
             return;
 
         entity.ComponentAdded += HandleComponentAdded;

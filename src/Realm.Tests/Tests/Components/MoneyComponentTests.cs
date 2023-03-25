@@ -1,4 +1,6 @@
-﻿namespace Realm.Tests.Tests.Components;
+﻿using Realm.Domain.Enums;
+
+namespace Realm.Tests.Tests.Components;
 
 public class MoneyComponentTests
 {
@@ -13,8 +15,8 @@ public class MoneyComponentTests
         services.Configure<GameplayOptions>(configurationProvider.GetSection("Gameplay"));
 
         var serviceProvider = services.BuildServiceProvider();
-        _entity = new(serviceProvider, "test", Entity.EntityTag.Unknown);
-        _entityB = new(serviceProvider, "test2", Entity.EntityTag.Unknown);
+        _entity = new(serviceProvider, "test", EntityTag.Unknown);
+        _entityB = new(serviceProvider, "test2", EntityTag.Unknown);
         _moneyComponent = new();
         _entity.AddComponent(_moneyComponent);
     }

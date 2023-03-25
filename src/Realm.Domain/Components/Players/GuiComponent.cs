@@ -2,7 +2,7 @@
 
 namespace Realm.Domain.Components.Players;
 
-public abstract class GuiComponent : Component
+public abstract class GuiComponent : AsyncComponent
 {
     [Inject]
     private IAgnosticGuiSystemService AgnosticGuiSystemService { get; set; } = default!;
@@ -20,14 +20,10 @@ public abstract class GuiComponent : Component
         _cursorless = cursorless;
     }
 
-    protected override void Load()
+    protected override async Task LoadAsync()
     {
         AgnosticGuiSystemService.FormSubmitted += HandleFormSubmitted;
         AgnosticGuiSystemService.ActionExecuted += HandleActionExecuted;
-    }
-
-    protected override async Task LoadAsync()
-    {
         await OpenGui();
     }
 

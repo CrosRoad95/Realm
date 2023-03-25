@@ -1,6 +1,8 @@
-﻿namespace Realm.Tests.Classes.Components;
+﻿using Realm.Domain.Components;
 
-internal class ThrowExceptionAsyncComponent : Component
+namespace Realm.Tests.Classes.Components;
+
+internal class ThrowExceptionAsyncComponent : AsyncComponent
 {
     protected override Task LoadAsync()
     {

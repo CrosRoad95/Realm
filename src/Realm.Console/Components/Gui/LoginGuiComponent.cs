@@ -40,9 +40,11 @@ public sealed class LoginGuiComponent : GuiComponent
                     formContext.ErrorResponse("Login lub hasło jest niepoprawne.");
                     return;
                 }
-                if(await RPGUserManager.SignIn(Entity, user))
+
+                var asyncEntity = Entity as AsyncEntity;
+                if (await RPGUserManager.SignIn(asyncEntity, user))
                 {
-                    Entity.DestroyComponent(this);
+                    asyncEntity.DestroyComponent(this);
                     formContext.SuccessResponse();
                     return;
                 }

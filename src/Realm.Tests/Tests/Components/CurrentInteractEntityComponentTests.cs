@@ -1,4 +1,6 @@
-﻿namespace Realm.Tests.Tests.Components;
+﻿using Realm.Domain.Enums;
+
+namespace Realm.Tests.Tests.Components;
 
 public class CurrentInteractEntityComponentTests
 {
@@ -13,10 +15,10 @@ public class CurrentInteractEntityComponentTests
 
         var serviceProvider = services.BuildServiceProvider();
 
-        _entity = new(serviceProvider, "test1", Entity.EntityTag.Unknown);
-        _testEntity = new(serviceProvider, "test2", Entity.EntityTag.Unknown);
-        _entity2 = new(serviceProvider, "test3", Entity.EntityTag.Unknown);
-        _testEntity2 = new(serviceProvider, "test4", Entity.EntityTag.Unknown);
+        _entity = new(serviceProvider, "test1", EntityTag.Unknown);
+        _testEntity = new(serviceProvider, "test2", EntityTag.Unknown);
+        _entity2 = new(serviceProvider, "test3", EntityTag.Unknown);
+        _testEntity2 = new(serviceProvider, "test4", EntityTag.Unknown);
     }
 
     [Fact]

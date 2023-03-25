@@ -1,4 +1,6 @@
-﻿namespace Realm.Domain.Concepts.Objectives;
+﻿using Realm.Domain.Components;
+
+namespace Realm.Domain.Concepts.Objectives;
 
 public abstract class Objective : IDisposable
 {

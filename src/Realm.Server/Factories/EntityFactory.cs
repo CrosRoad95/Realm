@@ -1,5 +1,6 @@
 ﻿using Realm.Domain.Components.Elements.CollisionShapes;
 using Realm.Domain.Concepts;
+using Realm.Domain.Enums;
 using Realm.Persistance.Interfaces;
 using SlipeServer.Server.Elements.ColShapes;
 using SlipeServer.Server.Elements.Enums;
@@ -55,7 +56,7 @@ internal class EntityFactory : IEntityFactory
 
     public Entity CreateVehicle(ushort model, Vector3 position, Vector3 rotation, ConstructionInfo? constructionInfo = null, Action<Entity>? entityBuilder = null)
     {
-        var vehicleEntity = _ecs.CreateEntity(constructionInfo?.Id ?? $"vehicle {Guid.NewGuid()}", Entity.EntityTag.Vehicle, entity =>
+        var vehicleEntity = _ecs.CreateEntity(constructionInfo?.Id ?? $"vehicle {Guid.NewGuid()}", EntityTag.Vehicle, entity =>
         {
             var vehicle = new Vehicle(model, new Vector3(0,0,4));
             
@@ -78,7 +79,7 @@ internal class EntityFactory : IEntityFactory
     
     public async Task<Entity> CreateNewPrivateVehicle(ushort model, Vector3 position, Vector3 rotation, ConstructionInfo? constructionInfo = null, Action<Entity>? entityBuilder = null)
     {
-        var vehicleEntity = _ecs.CreateEntity(constructionInfo?.Id ?? $"vehicle {Guid.NewGuid()}", Entity.EntityTag.Vehicle, entity =>
+        var vehicleEntity = _ecs.CreateEntity(constructionInfo?.Id ?? $"vehicle {Guid.NewGuid()}", EntityTag.Vehicle, entity =>
         {
             var vehicle = new Vehicle(model, position);
 
@@ -103,7 +104,7 @@ internal class EntityFactory : IEntityFactory
 
     public Entity CreateMarker(MarkerType markerType, Vector3 position, ConstructionInfo? constructionInfo = null, Action<Entity>? entityBuilder = null)
     {
-        return _ecs.CreateEntity(constructionInfo?.Id ?? $"marker {Guid.NewGuid()}", Entity.EntityTag.Marker, entity =>
+        return _ecs.CreateEntity(constructionInfo?.Id ?? $"marker {Guid.NewGuid()}", EntityTag.Marker, entity =>
         {
             var marker = new Marker(new Vector3(0,0,1000), markerType);
             marker.Color = System.Drawing.Color.White;
@@ -124,7 +125,7 @@ internal class EntityFactory : IEntityFactory
 
     public Entity CreatePickup(ushort model, Vector3 position, ConstructionInfo? constructionInfo = null, Action<Entity>? entityBuilder = null)
     {
-        var pickupEntity = _ecs.CreateEntity(constructionInfo?.Id ?? $"marker {Guid.NewGuid()}", Entity.EntityTag.Pickup, entity =>
+        var pickupEntity = _ecs.CreateEntity(constructionInfo?.Id ?? $"marker {Guid.NewGuid()}", EntityTag.Pickup, entity =>
         {
             entity.AddComponent(new PickupElementComponent(new Pickup(Vector3.Zero, model)));
 
@@ -144,7 +145,7 @@ internal class EntityFactory : IEntityFactory
     
     public Entity CreateBlip(BlipIcon blipIcon, Vector3 position, ConstructionInfo? constructionInfo = null, Action<Entity>? entityBuilder = null)
     {
-        var blipEntity = _ecs.CreateEntity(constructionInfo?.Id ?? $"marker {Guid.NewGuid()}", Entity.EntityTag.Blip, entity =>
+        var blipEntity = _ecs.CreateEntity(constructionInfo?.Id ?? $"marker {Guid.NewGuid()}", EntityTag.Blip, entity =>
         {
             entity.AddComponent(new BlipElementComponent(new Blip(Vector3.Zero, blipIcon, 250)));
 
@@ -164,7 +165,7 @@ internal class EntityFactory : IEntityFactory
     
     public BlipElementComponent CreateBlipFor(Entity playerEntity, BlipIcon blipIcon, Vector3 position)
     {
-        if(playerEntity.Tag != Entity.EntityTag.Player)
+        if(playerEntity.Tag != EntityTag.Player)
             throw new ArgumentException("Entity must be a player entity");
 
         var blip = new Blip(position, blipIcon, 250);
@@ -177,7 +178,7 @@ internal class EntityFactory : IEntityFactory
 
     public CollisionSphereElementComponent CreateCollisionSphereFor(Entity playerEntity, Vector3 position, float radius)
     {
-        if (playerEntity.Tag != Entity.EntityTag.Player)
+        if (playerEntity.Tag != EntityTag.Player)
             throw new ArgumentException("Entity must be a player entity");
 
         var collisionSphere = new CollisionSphere(position, radius);
@@ -190,7 +191,7 @@ internal class EntityFactory : IEntityFactory
 
     public MarkerElementComponent CreateMarkerFor(Entity playerEntity, Vector3 position, MarkerType markerType, System.Drawing.Color? color = null)
     {
-        if (playerEntity.Tag != Entity.EntityTag.Player)
+        if (playerEntity.Tag != EntityTag.Player)
             throw new ArgumentException("Entity must be a player entity");
 
         var marker = new Marker(position, markerType);
@@ -205,7 +206,7 @@ internal class EntityFactory : IEntityFactory
 
     public Entity CreateObject(ObjectModel model, Vector3 position, Vector3 rotation, ConstructionInfo? constructionInfo = null, Action<Entity>? entityBuilder = null)
     {
-        return _ecs.CreateEntity(constructionInfo?.Id ?? $"object {Guid.NewGuid()}", Entity.EntityTag.WorldObject, entity =>
+        return _ecs.CreateEntity(constructionInfo?.Id ?? $"object {Guid.NewGuid()}", EntityTag.WorldObject, entity =>
         {
             entity.AddComponent(new WorldObjectComponent(new WorldObject(model, position)));
 
@@ -226,7 +227,7 @@ internal class EntityFactory : IEntityFactory
 
     public Entity CreateCollisionCircle(Vector2 position, float radius, ConstructionInfo? constructionInfo = null, Action<Entity>? entityBuilder = null)
     {
-        return _ecs.CreateEntity(constructionInfo?.Id ?? $"collision circle {Guid.NewGuid()}", Entity.EntityTag.CollisionShape, entity =>
+        return _ecs.CreateEntity(constructionInfo?.Id ?? $"collision circle {Guid.NewGuid()}", EntityTag.CollisionShape, entity =>
         {
             entity.AddComponent(new CollisionCircleElementComponent(new CollisionCircle(new Vector2(0, 0), radius)));
 
@@ -244,7 +245,7 @@ internal class EntityFactory : IEntityFactory
     
     public Entity CreateCollisionCuboid(Vector3 position, Vector3 dimensions, ConstructionInfo? constructionInfo = null, Action<Entity>? entityBuilder = null)
     {
-        return _ecs.CreateEntity(constructionInfo?.Id ?? $"collision cuboid {Guid.NewGuid()}", Entity.EntityTag.CollisionShape, entity =>
+        return _ecs.CreateEntity(constructionInfo?.Id ?? $"collision cuboid {Guid.NewGuid()}", EntityTag.CollisionShape, entity =>
         {
             var collisioncuboid = new CollisionCuboid(position, dimensions);
 
@@ -265,7 +266,7 @@ internal class EntityFactory : IEntityFactory
     
     public Entity CreateCollisionPolygon(Vector3 position, IEnumerable<Vector2> vertices, ConstructionInfo? constructionInfo = null, Action<Entity>? entityBuilder = null)
     {
-        return _ecs.CreateEntity(constructionInfo?.Id ?? $"collision polygon {Guid.NewGuid()}", Entity.EntityTag.CollisionShape, entity =>
+        return _ecs.CreateEntity(constructionInfo?.Id ?? $"collision polygon {Guid.NewGuid()}", EntityTag.CollisionShape, entity =>
         {
             entity.AddComponent(new CollisionPolygonElementComponent(new CollisionPolygon(position, vertices)));
             entity.Transform.Position = position;
@@ -282,7 +283,7 @@ internal class EntityFactory : IEntityFactory
 
     public Entity CreateCollisionRectangle(Vector2 position, Vector2 dimensions, ConstructionInfo? constructionInfo = null, Action<Entity>? entityBuilder = null)
     {
-        return _ecs.CreateEntity(constructionInfo?.Id ?? $"collision sphere {Guid.NewGuid()}", Entity.EntityTag.CollisionShape, entity =>
+        return _ecs.CreateEntity(constructionInfo?.Id ?? $"collision sphere {Guid.NewGuid()}", EntityTag.CollisionShape, entity =>
         {
             entity.AddComponent(new CollisionRectangleElementComponent(new CollisionRectangle(position, dimensions)));
             entity.Transform.Position = new Vector3(position, 0);
@@ -299,7 +300,7 @@ internal class EntityFactory : IEntityFactory
     
     public Entity CreateCollisionSphere(Vector3 position, float radius, ConstructionInfo? constructionInfo = null, Action<Entity>? entityBuilder = null)
     {
-        return _ecs.CreateEntity(constructionInfo?.Id ?? $"collision sphere {Guid.NewGuid()}", Entity.EntityTag.CollisionShape, entity =>
+        return _ecs.CreateEntity(constructionInfo?.Id ?? $"collision sphere {Guid.NewGuid()}", EntityTag.CollisionShape, entity =>
         {
             entity.AddComponent(new CollisionSphereElementComponent(new CollisionSphere(new Vector3(0, 0, 1000), radius)));
             entity.Transform.Position = position;
@@ -316,7 +317,7 @@ internal class EntityFactory : IEntityFactory
     
     public Entity CreateCollisionTube(Vector3 position, float radius, float height, ConstructionInfo? constructionInfo = null, Action<Entity>? entityBuilder = null)
     {
-        return _ecs.CreateEntity(constructionInfo?.Id ?? $"collision sphere {Guid.NewGuid()}", Entity.EntityTag.CollisionShape, entity =>
+        return _ecs.CreateEntity(constructionInfo?.Id ?? $"collision sphere {Guid.NewGuid()}", EntityTag.CollisionShape, entity =>
         {
             entity.AddComponent(new CollisionTubeElementComponent(new CollisionTube(position, radius, height)));
             entity.Transform.Position = position;
@@ -333,7 +334,7 @@ internal class EntityFactory : IEntityFactory
     
     public Entity CreatePed(PedModel pedModel, Vector3 position, ConstructionInfo? constructionInfo = null, Action<Entity>? entityBuilder = null)
     {
-        return _ecs.CreateEntity(constructionInfo?.Id ?? $"ped {Guid.NewGuid()}", Entity.EntityTag.Ped, entity =>
+        return _ecs.CreateEntity(constructionInfo?.Id ?? $"ped {Guid.NewGuid()}", EntityTag.Ped, entity =>
         {
             entity.AddComponent(new PedElementComponent(new Ped(pedModel, position)));
             entity.Transform.Position = position;

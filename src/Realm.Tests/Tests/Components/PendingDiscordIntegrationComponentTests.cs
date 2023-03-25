@@ -1,4 +1,6 @@
-﻿namespace Realm.Tests.Tests.Components;
+﻿using Realm.Domain.Enums;
+
+namespace Realm.Tests.Tests.Components;
 
 public class PendingDiscordIntegrationComponentTests
 {
@@ -13,7 +15,7 @@ public class PendingDiscordIntegrationComponentTests
         services.AddSingleton<IDateTimeProvider>(_testDateTimeProvider);
 
         var serviceProvider = services.BuildServiceProvider();
-        _entity1 = new(serviceProvider, "test", Entity.EntityTag.Unknown);
+        _entity1 = new(serviceProvider, "test", EntityTag.Unknown);
         _pendingDiscordIntegration = new();
         _entity1.AddComponent(_pendingDiscordIntegration);
     }

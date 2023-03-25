@@ -11,7 +11,7 @@ public sealed class MustBePlayerInFractionRule : IEntityRule
 
     public bool Check(Entity entity)
     {
-        if (entity.Tag != Entity.EntityTag.Player)
+        if (entity.Tag != EntityTag.Player)
             return false;
 
         return entity.Components.OfType<FractionMemberComponent>().Where(x => x.FractionId== _fractionId).Any();

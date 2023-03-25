@@ -1,4 +1,5 @@
-﻿using Realm.Domain.Enums;
+﻿using Realm.Domain.Components;
+using Realm.Domain.Enums;
 using Realm.Domain.Inventory;
 using SlipeServer.Server.Elements.Structs;
 using SlipeServer.Server.Enums;
@@ -38,7 +39,7 @@ public class ItemsLogic
 
     private void HandleEntityCreated(Entity entity)
     {
-        if(entity.Tag == Entity.EntityTag.Player)
+        if(entity.Tag == EntityTag.Player)
             entity.ComponentAdded += HandleComponentAdded;
     }
 

@@ -1,4 +1,5 @@
-﻿using static Realm.Persistance.Data.Helpers.VehicleDamageState;
+﻿using Realm.Domain.Enums;
+using static Realm.Persistance.Data.Helpers.VehicleDamageState;
 using static Realm.Persistance.Data.Helpers.VehicleWheelStatus;
 using JobUpgrade = Realm.Persistance.Data.JobUpgrade;
 using VehiclePlayerAccess = Realm.Persistance.Data.VehiclePlayerAccess;
@@ -341,10 +342,10 @@ internal class SaveService : ISaveService
     {
         switch (entity.Tag)
         {
-            case Entity.EntityTag.Player:
+            case EntityTag.Player:
                 await SavePlayer(entity);
                 break;
-            case Entity.EntityTag.Vehicle:
+            case EntityTag.Vehicle:
                 await SaveVehicle(entity);
                 break;
             default:

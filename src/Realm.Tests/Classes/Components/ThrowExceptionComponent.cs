@@ -1,4 +1,6 @@
-﻿namespace Realm.Tests.Classes.Components;
+﻿using Realm.Domain.Components;
+
+namespace Realm.Tests.Classes.Components;
 
 public class ThrowExceptionComponent : Component
 {

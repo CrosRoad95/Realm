@@ -1,4 +1,6 @@
-﻿using Realm.Domain.Exceptions;
+﻿using Realm.Domain.Components;
+using Realm.Domain.Enums;
+using Realm.Domain.Exceptions;
 using System.Collections.Concurrent;
 
 namespace Realm.Server;
@@ -18,6 +20,17 @@ public sealed class ECS : IEntityByElement
         {
             _entitiesLock.EnterWriteLock();
             var entities = new List<Entity>(_entities);
+            _entitiesLock.ExitWriteLock();
+            return entities;
+        }
+    }
+    
+    public IReadOnlyCollection<Entity> VehicleEntities
+    {
+        get
+        {
+            _entitiesLock.EnterWriteLock();
+            var entities = new List<Entity>(_entities.Where(x => x.Tag == EntityTag.Vehicle));
             _entitiesLock.ExitWriteLock();
             return entities;
         }
@@ -52,7 +65,7 @@ public sealed class ECS : IEntityByElement
         return _entityByElement.TryGetValue(element, out result);
     }
     
-    public Entity CreateEntity(string name, Entity.EntityTag tag, Action<Entity>? entityBuilder = null)
+    public Entity CreateEntity(string name, EntityTag tag, Action<Entity>? entityBuilder = null)
     {
         if (_entityByName.ContainsKey(name))
             throw new EntityAlreadyExistsException(name);
@@ -71,6 +84,30 @@ public sealed class ECS : IEntityByElement
         newlyCreatedEntity.ComponentAdded += HandleComponentAdded;
         newlyCreatedEntity.Disposed += HandleEntityDestroyed;
         entityBuilder?.Invoke(newlyCreatedEntity);
+        EntityCreated?.Invoke(newlyCreatedEntity);
+        return newlyCreatedEntity;
+    }
+    
+    public async Task<AsyncEntity> CreateAsyncEntity(string name, EntityTag tag, Func<AsyncEntity, Task>? entityBuilder = null)
+    {
+        if (_entityByName.ContainsKey(name))
+            throw new EntityAlreadyExistsException(name);
+
+        var newlyCreatedEntity = new AsyncEntity(_serviceProvider, name, tag);
+        _entitiesLock.EnterWriteLock();
+        try
+        {
+            _entities.Add(newlyCreatedEntity);
+        }
+        finally
+        {
+            _entitiesLock.ExitWriteLock();
+        }
+        _entityByName[name] = newlyCreatedEntity;
+        newlyCreatedEntity.ComponentAdded += HandleComponentAdded;
+        newlyCreatedEntity.Disposed += HandleEntityDestroyed;
+        if(entityBuilder != null)
+            await entityBuilder.Invoke(newlyCreatedEntity);
         EntityCreated?.Invoke(newlyCreatedEntity);
         return newlyCreatedEntity;
     }

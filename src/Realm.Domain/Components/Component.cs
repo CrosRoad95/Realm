@@ -1,6 +1,6 @@
-﻿namespace Realm.Domain;
+﻿namespace Realm.Domain.Components;
 
-public abstract class Component
+public abstract class Component : IDisposable
 {
     internal object _versionLock;
     internal byte _version;
@@ -9,19 +9,12 @@ public abstract class Component
     public Entity Entity { get; internal set; } = default!;
 
     public event Action<Component>? Disposed;
-    protected virtual Task LoadAsync() => Task.CompletedTask;
     protected virtual void Load() { }
 
     internal void InternalLoad()
     {
         ThrowIfDisposed();
         Load();
-    }
-
-    internal async Task InternalLoadAsync()
-    {
-        ThrowIfDisposed();
-        await LoadAsync();
     }
 
     protected void ThrowIfDisposed()

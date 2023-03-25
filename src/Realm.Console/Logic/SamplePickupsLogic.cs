@@ -1,4 +1,5 @@
-﻿using Realm.Domain.Rules;
+﻿using Realm.Domain.Enums;
+using Realm.Domain.Rules;
 using Realm.Server.Extensions;
 
 namespace Realm.Console.Logic;
@@ -17,13 +18,13 @@ internal class SamplePickupsLogic
 
     private void EntityCreated(Entity entity)
     {
-        if (entity.Tag == Entity.EntityTag.Pickup && entity.Name.StartsWith("fractionTestPickup"))
+        if (entity.Tag == EntityTag.Pickup && entity.Name.StartsWith("fractionTestPickup"))
         {
             var pickupElementComponent = entity.GetRequiredComponent<PickupElementComponent>();
             pickupElementComponent.AddRule(new MustBePlayerInFractionRule(1));
             pickupElementComponent.EntityRuleFailed = (entity, rule) =>
             {
-                if(entity.Tag == Entity.EntityTag.Player)
+                if(entity.Tag == EntityTag.Player)
                 {
                     var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();
                     playerElementComponent.SendChatMessage($"No permissions, rule: {rule.GetType().Name}");
@@ -32,7 +33,7 @@ internal class SamplePickupsLogic
             };
             pickupElementComponent.EntityEntered = async entity =>
             {
-                if (entity.Tag != Entity.EntityTag.Player)
+                if (entity.Tag != EntityTag.Player)
                     return;
 
                 var sessionComponent = entity.GetComponent<SessionComponent>();
@@ -49,19 +50,19 @@ internal class SamplePickupsLogic
                 }
                 else
                 {
-                    var fractionSessionComponent = await entity.AddComponentAsync(new FractionSessionComponent());
+                    var fractionSessionComponent = entity.AddComponent<FractionSessionComponent>();
                     playerElementComponent.SendChatMessage($"Session started");
                     fractionSessionComponent.Start();
                 }
             };
         }
         
-        if (entity.Tag == Entity.EntityTag.Pickup && entity.Name.StartsWith("jobTestPickup"))
+        if (entity.Tag == EntityTag.Pickup && entity.Name.StartsWith("jobTestPickup"))
         {
             var pickupElementComponent = entity.GetRequiredComponent<PickupElementComponent>();
             pickupElementComponent.EntityEntered = entity =>
             {
-                if (entity.Tag != Entity.EntityTag.Player)
+                if (entity.Tag != EntityTag.Player)
                     return;
 
                 var sessionComponent = entity.GetComponent<SessionComponent>();
@@ -95,21 +96,21 @@ internal class SamplePickupsLogic
             };
         }
 
-        if (entity.Tag == Entity.EntityTag.Pickup && entity.Name.StartsWith("withText3d"))
+        if (entity.Tag == EntityTag.Pickup && entity.Name.StartsWith("withText3d"))
         {
             var pickupElementComponent = entity.GetRequiredComponent<PickupElementComponent>();
             pickupElementComponent.AddRule<MustBePlayerOnFootOnlyRule>();
             pickupElementComponent.AddOpenGuiLogic<TestWindowComponent>();
         }
 
-        if (entity.Tag == Entity.EntityTag.Pickup && entity.Name.StartsWith("exampleShopPickup"))
+        if (entity.Tag == EntityTag.Pickup && entity.Name.StartsWith("exampleShopPickup"))
         {
             var pickupElementComponent = entity.GetRequiredComponent<PickupElementComponent>();
             pickupElementComponent.AddRule<MustBePlayerOnFootOnlyRule>();
             pickupElementComponent.AddOpenGuiLogic<TestShopGuiComponent, InventoryGuiComponent>();
         }
 
-        if (entity.Tag == Entity.EntityTag.Marker && entity.Name.StartsWith("testMarker"))
+        if (entity.Tag == EntityTag.Marker && entity.Name.StartsWith("testMarker"))
         {
             var pickupElementComponent = entity.GetRequiredComponent<MarkerElementComponent>();
             pickupElementComponent.AddRule<MustBePlayerOnFootOnlyRule>();

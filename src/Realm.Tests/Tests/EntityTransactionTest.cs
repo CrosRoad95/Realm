@@ -1,4 +1,5 @@
-﻿using Realm.Tests.Classes.Components;
+﻿using Realm.Domain.Enums;
+using Realm.Tests.Classes.Components;
 
 namespace Realm.Tests.Tests;
 
@@ -12,7 +13,7 @@ public class EntityTransactionTest
         services.AddSingleton(new object());
         var serviceProvider = services.BuildServiceProvider();
 
-        _entity = new(serviceProvider, "test", Entity.EntityTag.Unknown);
+        _entity = new(serviceProvider, "test", EntityTag.Unknown);
     }
 
     [Fact]

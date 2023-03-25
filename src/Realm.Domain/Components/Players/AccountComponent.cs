@@ -4,7 +4,7 @@ using System.Collections.Concurrent;
 namespace Realm.Domain.Components.Players;
 
 [ComponentUsage(false)]
-public class AccountComponent : Component
+public class AccountComponent : AsyncComponent
 {
     [Inject]
     private UserManager<User> UserManager { get; set; } = default!;

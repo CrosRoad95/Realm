@@ -2,6 +2,7 @@
 using Realm.Domain.Interfaces;
 using Realm.Resources.ClientInterface;
 using Realm.Domain.Components.Elements.CollisionShapes;
+using Realm.Domain.Enums;
 
 namespace Realm.Tests.Tests.Components;
 
@@ -22,7 +23,7 @@ public class CollisionShapeElementComponentTests
         services.AddLogging(x => x.AddSerilog(new LoggerConfiguration().CreateLogger(), dispose: true));
 
         var serviceProvider = services.BuildServiceProvider();
-        _entity = serviceProvider.GetRequiredService<ECS>().CreateEntity("test", Entity.EntityTag.Unknown);
+        _entity = serviceProvider.GetRequiredService<ECS>().CreateEntity("test", EntityTag.Unknown);
         _collisionSphereElementComponent = new(new CollisionSphere(new System.Numerics.Vector3(0, 0, 0), 10));
         _entity.AddComponent(_collisionSphereElementComponent);
     }

@@ -1,10 +1,12 @@
-﻿namespace Realm.Server.Extensions;
+﻿using Realm.Domain.Enums;
+
+namespace Realm.Server.Extensions;
 
 public static class EntityExtensions
 {
     public static bool IsLookingAt(this Entity a, Entity b, float tolerance = 25.0f)
     {
-        if (a.Tag != Entity.EntityTag.Player)
+        if (a.Tag != EntityTag.Player)
             throw new InvalidOperationException();
 
         var t =  (a.Transform.Position.FindRotation(b.Transform.Position) + a.Transform.Rotation.Z) % 360;

@@ -1,4 +1,5 @@
-﻿using Realm.Server;
+﻿using Realm.Domain.Enums;
+using Realm.Server;
 using SlipeServer.Server.Enums;
 
 namespace Realm.Console.Logic;
@@ -27,7 +28,7 @@ internal class MapsLogic
 
     private void HandleEntityCreated(Entity entity)
     {
-        if (entity.Tag != Entity.EntityTag.Player)
+        if (entity.Tag != EntityTag.Player)
             return;
 
         _mapsService.LoadMapFor("testmap", entity);

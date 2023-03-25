@@ -1,4 +1,5 @@
-﻿using Realm.Persistance.DTOs;
+﻿using Realm.Domain.Enums;
+using Realm.Persistance.DTOs;
 using Realm.Persistance.Interfaces;
 
 namespace Realm.Server.Services;
@@ -18,14 +19,17 @@ internal sealed class VehiclesService : IVehiclesService
 
     public async Task<Entity> ConvertToPrivateVehicle(Entity vehicleEntity)
     {
-        if (vehicleEntity.Tag != Entity.EntityTag.Vehicle)
+        if (vehicleEntity.IsAsyncEntity)
+            throw new InvalidOperationException();
+
+        if (vehicleEntity.Tag != EntityTag.Vehicle)
             throw new InvalidOperationException();
 
         if (vehicleEntity.HasComponent<PrivateVehicleComponent>())
             throw new InvalidOperationException();
 
         var vehicleElementComponent = vehicleEntity.GetRequiredComponent<VehicleElementComponent>();
-        await vehicleEntity.AddComponentAsync(new PrivateVehicleComponent(await _vehicleRepository.CreateNewVehicle(vehicleElementComponent.Model)));
+        vehicleEntity.AddComponent(new PrivateVehicleComponent(await _vehicleRepository.CreateNewVehicle(vehicleElementComponent.Model)));
         return vehicleEntity;
     }
 

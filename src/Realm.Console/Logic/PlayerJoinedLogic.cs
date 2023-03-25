@@ -1,4 +1,5 @@
-﻿using Realm.Domain;
+﻿using Realm.Domain.Components;
+using Realm.Domain.Enums;
 using Realm.Resources.Assets;
 using Realm.Resources.Nametags;
 using Realm.Server.Extensions;
@@ -26,12 +27,12 @@ internal sealed class PlayerJoinedLogic
 
     private async void HandleEntityCreated(Entity entity)
     {
-        if (entity.Tag != Entity.EntityTag.Player)
+        if (entity.Tag != EntityTag.Player)
             return;
 
         var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();
         var bans = await _banService.GetBansBySerial(playerElementComponent.Client.Serial);
-        ;
+
         playerElementComponent.SetText3dRenderingEnabled(false);
         playerElementComponent.SetChatVisible(false);
         playerElementComponent.ClearChatBox();

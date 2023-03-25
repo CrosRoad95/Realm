@@ -1,4 +1,6 @@
-﻿namespace Realm.Tests.Tests.Components;
+﻿using Realm.Domain.Enums;
+
+namespace Realm.Tests.Tests.Components;
 
 public class AchievementsComponentTests
 {
@@ -11,7 +13,7 @@ public class AchievementsComponentTests
 
         var serviceProvider = services.BuildServiceProvider();
 
-        _entity = new(serviceProvider, "test", Entity.EntityTag.Unknown);
+        _entity = new(serviceProvider, "test", EntityTag.Unknown);
         _achievementsComponent = new();
         _entity.AddComponent(_achievementsComponent);
     }

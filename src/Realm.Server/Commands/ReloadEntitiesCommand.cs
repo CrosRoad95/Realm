@@ -1,4 +1,6 @@
-﻿namespace Realm.Server.Commands;
+﻿using Realm.Domain.Enums;
+
+namespace Realm.Server.Commands;
 
 [CommandName("reloadentities")]
 internal class ReloadEntitiesCommand : ICommand
@@ -19,16 +21,18 @@ internal class ReloadEntitiesCommand : ICommand
     public async Task HandleCommand(string command)
     {
         int savedEntities = 0;
-        foreach (var entity in _ecs.Entities.Where(x => x.Tag == Entity.EntityTag.Vehicle))
+        foreach (var entity in _ecs.Entities)
         {
             try
             {
-                await _saveService.Save(entity);
+                if(await _saveService.Save(entity))
+                {
 #if DEBUG
-                await _saveService.Commit();
+                    await _saveService.Commit();
 #endif
-                savedEntities++;
-                _ecs.Destroy(entity);
+                    savedEntities++;
+                    _ecs.Destroy(entity);
+                }
             }
             catch (Exception ex)
             {

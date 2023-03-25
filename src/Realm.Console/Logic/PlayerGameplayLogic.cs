@@ -1,4 +1,5 @@
 ﻿using Realm.Console.Components.Vehicles;
+using Realm.Domain.Components;
 using Realm.Domain.Enums;
 using Realm.Server.Extensions;
 using SlipeServer.Server.Elements.Enums;
@@ -21,7 +22,7 @@ internal sealed class PlayerGameplayLogic
 
     private void HandleEntityCreated(Entity entity)
     {
-        if (entity.Tag != Entity.EntityTag.Player)
+        if (entity.Tag != EntityTag.Player)
             return;
 
 

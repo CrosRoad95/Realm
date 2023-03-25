@@ -1,4 +1,7 @@
-﻿namespace Realm.Server.Logic.Resources;
+﻿using Realm.Domain.Components;
+using Realm.Domain.Enums;
+
+namespace Realm.Server.Logic.Resources;
 
 internal class StatisticsCounterLogic
 {
@@ -55,7 +58,7 @@ internal class StatisticsCounterLogic
 
     private void HandleEntityCreated(Entity entity)
     {
-        if (entity.Tag != Entity.EntityTag.Player)
+        if (entity.Tag != EntityTag.Player)
             return;
 
         entity.ComponentAdded += HandleComponentAdded;

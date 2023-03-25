@@ -39,7 +39,7 @@ public class PickupElementComponent : ElementComponent
     {
         if(EntityEntered != null)
             if(EntityByElement.TryGetByElement(element, out var entity))
-                if(entity.Tag == Entity.EntityTag.Player || entity.Tag == Entity.EntityTag.Vehicle)
+                if(entity.Tag == EntityTag.Player || entity.Tag == EntityTag.Vehicle)
                 {
                     foreach (var rule in _entityRules)
                     {
@@ -71,7 +71,7 @@ public class PickupElementComponent : ElementComponent
     {
         if(EntityLeft != null)
             if (EntityByElement.TryGetByElement(element, out var entity))
-                if (entity.Tag == Entity.EntityTag.Player || entity.Tag == Entity.EntityTag.Vehicle)
+                if (entity.Tag == EntityTag.Player || entity.Tag == EntityTag.Vehicle)
                     if (_entityRules.All(x => x.Check(entity)))
                         try
                         {

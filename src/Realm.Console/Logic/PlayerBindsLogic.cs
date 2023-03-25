@@ -1,4 +1,7 @@
-﻿namespace Realm.Console.Logic;
+﻿using Realm.Domain.Components;
+using Realm.Domain.Enums;
+
+namespace Realm.Console.Logic;
 
 internal sealed class PlayerBindsLogic
 {
@@ -19,16 +22,16 @@ internal sealed class PlayerBindsLogic
 
     private void HandleEntityCreated(Entity entity)
     {
-        if(entity.Tag == Entity.EntityTag.Player)
+        if(entity.Tag == EntityTag.Player)
             entity.ComponentAdded += HandleComponentAdded;
     }
 
-    private void OpenCloseGuiHelper<TGuiComponent>(Entity entity, string bind, GuiOpenOptions options = default) where TGuiComponent: GuiComponent, new()
+    private void OpenCloseGuiHelper<TGuiComponent>(AsyncEntity entity, string bind, GuiOpenOptions options = default) where TGuiComponent: GuiComponent, new()
     {
         OpenCloseGuiHelper(entity, bind, () => new TGuiComponent(), options);
     }
     
-    private void OpenCloseGuiHelper<TGuiComponent>(Entity entity, string bind, Func<TGuiComponent> factory, GuiOpenOptions options = default) where TGuiComponent: GuiComponent
+    private void OpenCloseGuiHelper<TGuiComponent>(AsyncEntity entity, string bind, Func<TGuiComponent> factory, GuiOpenOptions options = default) where TGuiComponent: GuiComponent
     {
         var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();
         playerElementComponent.SetBind(bind, async entity =>
@@ -47,7 +50,7 @@ internal sealed class PlayerBindsLogic
         });
     }
 
-    private void OpenCloseGuiHelper<TGuiComponent>(Entity entity, string bind, Func<Task<TGuiComponent>> factory, GuiOpenOptions options = default) where TGuiComponent: GuiComponent
+    private void OpenCloseGuiHelper<TGuiComponent>(AsyncEntity entity, string bind, Func<Task<TGuiComponent>> factory, GuiOpenOptions options = default) where TGuiComponent: GuiComponent
     {
         var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();
         playerElementComponent.SetBind(bind, async entity =>
@@ -58,8 +61,7 @@ internal sealed class PlayerBindsLogic
                 return;
             }
 
-            if (entity.HasComponent<GuiComponent>())
-                entity.DestroyComponent<GuiComponent>();
+            entity.TryDestroyComponent<GuiComponent>();
 
             var guiComponent = await entity.AddComponentAsync(await factory());
             playerElementComponent.ResetCooldown(bind);
@@ -70,7 +72,7 @@ internal sealed class PlayerBindsLogic
     {
         if (component is AccountComponent accountComponent)
         {
-            var entity = component.Entity;
+            var entity = component.Entity as AsyncEntity;
             var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();
 
             playerElementComponent.SetBind("num_0", entity =>

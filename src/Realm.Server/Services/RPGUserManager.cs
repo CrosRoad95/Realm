@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore.Diagnostics.Internal;
 using Microsoft.Extensions.Options;
 using Realm.Common.Providers;
+using Realm.Domain.Enums;
 using Realm.Domain.Inventory;
 using Realm.Domain.Options;
 using Realm.Domain.Registries;
@@ -53,12 +54,12 @@ internal class RPGUserManager : IRPGUserManager
         throw new Exception("Failed to create a user account");
     }
 
-    public async Task<bool> SignIn(Entity entity, User user)
+    public async Task<bool> SignIn(AsyncEntity entity, User user)
     {
         if (entity == null)
             throw new NullReferenceException(nameof(entity));
 
-        if (entity.Tag != Entity.EntityTag.Player || !entity.HasComponent<PlayerElementComponent>())
+        if (entity.Tag != EntityTag.Player || !entity.HasComponent<PlayerElementComponent>())
             throw new NotSupportedException("Entity is not a player entity.");
 
         await _lock.WaitAsync(TimeSpan.FromSeconds(1));

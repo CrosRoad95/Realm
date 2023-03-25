@@ -1,4 +1,7 @@
-﻿namespace Realm.Console.Logic;
+﻿using Realm.Domain.Components;
+using Realm.Domain.Enums;
+
+namespace Realm.Console.Logic;
 
 internal sealed class AchievementsLogic
 {
@@ -13,7 +16,7 @@ internal sealed class AchievementsLogic
 
     private void HandleEntityCreated(Entity entity)
     {
-        if(entity.Tag == Entity.EntityTag.Player)
+        if(entity.Tag == EntityTag.Player)
             entity.ComponentAdded += HandleComponentAdded;
     }
 

@@ -1,4 +1,6 @@
-﻿namespace Realm.Tests.Tests.Components;
+﻿using Realm.Domain.Enums;
+
+namespace Realm.Tests.Tests.Components;
 
 public class DailyVisitsCounterComponentTests
 {
@@ -13,7 +15,7 @@ public class DailyVisitsCounterComponentTests
         services.AddSingleton<IDateTimeProvider>(_testDateTimeProvider);
 
         var serviceProvider = services.BuildServiceProvider();
-        _entity = new(serviceProvider, "test", Entity.EntityTag.Unknown);
+        _entity = new(serviceProvider, "test", EntityTag.Unknown);
         _dailyVisitsCounterComponent = new();
         _entity.AddComponent(_dailyVisitsCounterComponent);
     }

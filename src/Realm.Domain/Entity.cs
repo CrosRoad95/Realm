@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics.CodeAnalysis;
+using Realm.Domain.Components;
 
 namespace Realm.Domain;
 
@@ -8,22 +9,7 @@ public class Entity : IDisposable
     private byte _version;
     private bool _hasPendingTransaction;
 
-    public enum EntityTag
-    {
-        Unknown,
-        Player,
-        Ped,
-        Vehicle,
-        Blip,
-        Pickup,
-        Marker,
-        CollisionShape,
-        WorldObject,
-    }
-
     private bool _disposed = false;
-    private readonly CancellationTokenSource _cancellationTokenSource;
-    public CancellationToken CancellationToken => _cancellationTokenSource.Token;
 
     public string Id { get; } = Guid.NewGuid().ToString();
     public EntityTag Tag { get; }
@@ -44,10 +30,10 @@ public class Entity : IDisposable
 
     internal Player Player => GetRequiredComponent<PlayerElementComponent>().Player;
     internal Element Element => GetRequiredComponent<ElementComponent>().Element;
+    public virtual bool IsAsyncEntity => false;
 
     public Entity(IServiceProvider serviceProvider, string name = "", EntityTag tag = EntityTag.Unknown)
     {
-        _cancellationTokenSource = new CancellationTokenSource();
         _serviceProvider = serviceProvider;
         Name = name;
         Tag = tag;
@@ -71,7 +57,7 @@ public class Entity : IDisposable
             InternalInjectProperties(type.BaseType, obj);
     }
 
-    private void InjectProperties<TComponent>(TComponent component) where TComponent : Component
+    protected void InjectProperties<TComponent>(TComponent component) where TComponent : Component
     {
         ThrowIfDisposed();
 
@@ -80,7 +66,7 @@ public class Entity : IDisposable
         InternalInjectProperties(typeof(TComponent), component);
     }
 
-    private void CheckCanBeAdded<TComponent>() where TComponent : Component
+    protected void CheckCanBeAdded<TComponent>() where TComponent : Component
     {
         var componentUsageAttribute = typeof(TComponent).GetCustomAttribute<ComponentUsageAttribute>();
         if (componentUsageAttribute == null || componentUsageAttribute.AllowMultiple)
@@ -90,7 +76,7 @@ public class Entity : IDisposable
             throw new ComponentCanNotBeAddedException<TComponent>();
     }
 
-    private void InternalAddComponent<TComponent>(TComponent component) where TComponent : Component
+    protected void InternalAddComponent<TComponent>(TComponent component) where TComponent : Component
     {
         _componentsLock.EnterWriteLock();
         try
@@ -110,6 +96,11 @@ public class Entity : IDisposable
         }
     }
 
+    protected void OnComponentAdded(Component component)
+    {
+        ComponentAdded?.Invoke(component);
+    }
+
     public TComponent AddComponent<TComponent>() where TComponent : Component, new()
     {
         return AddComponent(new TComponent());
@@ -117,6 +108,8 @@ public class Entity : IDisposable
 
     public TComponent AddComponent<TComponent>(TComponent component) where TComponent : Component
     {
+        if (component is AsyncComponent)
+            throw new ArgumentException("Component is async exception");
         ThrowIfDisposed();
 
         if (component.Entity != null)
@@ -135,52 +128,10 @@ public class Entity : IDisposable
             throw;
         }
 
-        ComponentAdded?.Invoke(component);
-
-        Task.Run(async () =>
-        {
-            ThrowIfDisposed();
-            try
-            {
-                await component.InternalLoadAsync();
-            }
-            catch (Exception)
-            {
-                DestroyComponent(component);
-            }
-        });
+        OnComponentAdded(component);
         return component;
     }
     
-    public Task<TComponent> AddComponentAsync<TComponent>() where TComponent : Component, new()
-    {
-        return AddComponentAsync(new TComponent());
-    }
-
-    public async Task<TComponent> AddComponentAsync<TComponent>(TComponent component) where TComponent : Component
-    {
-        ThrowIfDisposed();
-        if (component.Entity != null)
-        {
-            throw new Exception("Component already attached to other entity");
-        }
-        InjectProperties(component);
-        InternalAddComponent(component);
-
-        try
-        {
-            component.InternalLoad();
-            await component.InternalLoadAsync();
-        }
-        catch(Exception)
-        {
-            DestroyComponent(component);
-            throw;
-        }
-        ComponentAdded?.Invoke(component);
-        return component;
-    }
-
     public TComponent? GetComponent<TComponent>() where TComponent : Component
     {
         ThrowIfDisposed();
@@ -325,7 +276,6 @@ public class Entity : IDisposable
     public virtual void Dispose()
     {
         ThrowIfDisposed();
-        _cancellationTokenSource.Cancel();
 
         if (Disposed != null)
             Disposed.Invoke(this);

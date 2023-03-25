@@ -6,7 +6,7 @@ public abstract class VehicleAccessControllerComponent : Component
 
     protected override void Load()
     {
-        if (Entity.Tag != Entity.EntityTag.Vehicle)
+        if (Entity.Tag != EntityTag.Vehicle)
             throw new NotSupportedException("This component only works on vehicles.");
 
         if (Entity.Components.OfType<VehicleAccessControllerComponent>().Where(x => x != this).Any())
@@ -17,7 +17,7 @@ public abstract class VehicleAccessControllerComponent : Component
     {
         switch (entity.Tag)
         {
-            case Entity.EntityTag.Player:
+            case EntityTag.Player:
                 {
                     var player = entity.GetRequiredComponent<PlayerElementComponent>().Player;
                     var vehicle = Entity.GetRequiredComponent<VehicleElementComponent>().Vehicle;

@@ -41,7 +41,7 @@ public class MarkerElementComponent : ElementComponent
         if (EntityEntered != null)
         {
             if (EntityByElement.TryGetByElement(element, out Entity entity))
-                if (entity.Tag == Entity.EntityTag.Player || entity.Tag == Entity.EntityTag.Vehicle)
+                if (entity.Tag == EntityTag.Player || entity.Tag == EntityTag.Vehicle)
                 {
                     foreach (var rule in _entityRules)
                     {
@@ -61,7 +61,7 @@ public class MarkerElementComponent : ElementComponent
         if (EntityLeft != null)
         {
             if(EntityByElement.TryGetByElement(element, out Entity entity))
-                if (entity != null && (entity.Tag == Entity.EntityTag.Player || entity.Tag == Entity.EntityTag.Vehicle))
+                if (entity != null && (entity.Tag == EntityTag.Player || entity.Tag == EntityTag.Vehicle))
                     if (_entityRules.All(x => x.Check(entity)))
                         EntityLeft(entity);
         }

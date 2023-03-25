@@ -1,5 +1,7 @@
 ﻿using Realm.Common.Providers;
 using Realm.Common.Utilities;
+using Realm.Domain.Components;
+using Realm.Domain.Enums;
 using System.Collections.Concurrent;
 using System.Globalization;
 
@@ -80,7 +82,7 @@ internal class PlayersLogic
             var screenSize = await taskWaitForScreenSize.Task;
             var cultureInfo = await taskWaitForCultureInfo.Task;
 
-            _ecs.CreateEntity("Player " + player.Name, Entity.EntityTag.Player, entity =>
+            _ecs.CreateEntity("Player " + player.Name, EntityTag.Player, entity =>
             {
                 entity.AddComponent(new PlayerElementComponent(player, new Vector2(screenSize.Item1, screenSize.Item2), cultureInfo));
             });

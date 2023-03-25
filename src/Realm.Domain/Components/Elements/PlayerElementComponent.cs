@@ -23,7 +23,7 @@ public sealed class PlayerElementComponent : PedElementComponent
     private readonly Player _player;
     private readonly Vector2 _screenSize;
     private readonly CultureInfo _culture;
-    private readonly Dictionary<string, Func<Entity, KeyState, Task>> _binds = new();
+    private readonly Dictionary<string, Func<AsyncEntity, KeyState, Task>> _binds = new();
     private readonly SemaphoreSlim _bindsLock = new(1);
     private readonly SemaphoreSlim _bindsUpLock = new(1);
     private readonly SemaphoreSlim _bindsDownLock = new(1);
@@ -201,7 +201,7 @@ public sealed class PlayerElementComponent : PedElementComponent
     }
     #endregion
 
-    public void SetBind(string key, Func<Entity, KeyState, Task> callback)
+    public void SetBind(string key, Func<AsyncEntity, KeyState, Task> callback)
     {
         ThrowIfDisposed();
 
@@ -218,7 +218,7 @@ public sealed class PlayerElementComponent : PedElementComponent
 
     }
     
-    public void SetBind(string key, Func<Entity, Task> callback)
+    public void SetBind(string key, Func<AsyncEntity, Task> callback)
     {
         ThrowIfDisposed();
         _bindsLock.Wait();
@@ -357,7 +357,7 @@ public sealed class PlayerElementComponent : PedElementComponent
         {
             try
             {
-                await bindCallback(Entity, keyState);
+                await bindCallback(Entity as AsyncEntity, keyState);
             }
             catch(Exception ex)
             {

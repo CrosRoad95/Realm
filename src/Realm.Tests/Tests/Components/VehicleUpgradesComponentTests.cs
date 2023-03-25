@@ -1,6 +1,7 @@
 ﻿using Realm.Domain.Components.Elements;
 using Realm.Domain.Components.Vehicles;
 using Realm.Domain.Data.Upgrades;
+using Realm.Domain.Enums;
 using Realm.Domain.Interfaces;
 using Realm.Domain.Registries;
 using SlipeServer.Server.Constants;
@@ -24,7 +25,7 @@ public class VehicleUpgradesComponentTests
 
         var serviceProvider = services.BuildServiceProvider();
         _vehicleUpgradeRegistry = serviceProvider.GetRequiredService<VehicleUpgradeRegistry>();
-        _entity = new(serviceProvider, "test", Entity.EntityTag.Unknown);
+        _entity = new(serviceProvider, "test", EntityTag.Unknown);
         _vehicleUpgradesComponent = new();
         _vehicleElementComponent = new VehicleElementComponent(new SlipeServer.Server.Elements.Vehicle(SlipeServer.Server.Elements.VehicleModel.Perennial, Vector3.Zero));
         _entity.AddComponent(_vehicleElementComponent);
