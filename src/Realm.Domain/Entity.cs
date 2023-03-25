@@ -109,13 +109,12 @@ public class Entity : IDisposable
     public TComponent AddComponent<TComponent>(TComponent component) where TComponent : Component
     {
         if (component is AsyncComponent)
-            throw new ArgumentException("Component is async exception");
+            throw new ArgumentException("Can not add async component to non async entity");
         ThrowIfDisposed();
 
         if (component.Entity != null)
-        {
             throw new Exception("Component already attached to other entity");
-        }
+
         InjectProperties(component);
         InternalAddComponent(component);
         try

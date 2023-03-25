@@ -7,14 +7,12 @@ internal class ChatLogic
 {
     private readonly ChatBox _chatBox;
     private readonly ILogger<ChatLogic> _logger;
-    private readonly IEntityByElement _entityByElement;
-    private readonly ECS _ecs;
+    private readonly IECS _ecs;
 
-    public ChatLogic(MtaServer server, ChatBox chatBox, ILogger<ChatLogic> logger, IEntityByElement entityByElement, ECS ecs)
+    public ChatLogic(MtaServer server, ChatBox chatBox, ILogger<ChatLogic> logger , IECS ecs)
     {
         _chatBox = chatBox;
         _logger = logger;
-        _entityByElement = entityByElement;
         _ecs = ecs;
 
         server.PlayerJoined += (player) =>
@@ -28,13 +26,13 @@ internal class ChatLogic
         switch (arguments.Command)
         {
             case "say":
-                if (_entityByElement.TryGetEntityByPlayer(player, out var playerEntity))
+                if (_ecs.TryGetEntityByPlayer(player, out var playerEntity))
                     if (playerEntity.TryGetComponent(out PlayerElementComponent playerElementComponent))
                     {
                         if (playerEntity.HasComponent<AccountComponent>())
                         {
                             string message = $"{player.NametagColor.ToColorCode()}{player.Name}: #ffffff{string.Join(' ', arguments.Arguments)}";
-                            foreach (var targetPlayerEntity in _ecs.GetPlayerEntities().Where(x => x.HasComponent<AccountComponent>()))
+                            foreach (var targetPlayerEntity in _ecs.PlayerEntities.Where(x => x.HasComponent<AccountComponent>()))
                                 targetPlayerEntity.GetRequiredComponent<PlayerElementComponent>().SendChatMessage(message, Color.White, true);
 
                             _logger.LogInformation("{message}", message);

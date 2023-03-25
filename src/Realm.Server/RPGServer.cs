@@ -129,7 +129,7 @@ internal sealed class RPGServer : IRPGServer
             }
             finally
             {
-                ecs.Destroy(entity);
+                entity.Dispose();
             }
         }
         try

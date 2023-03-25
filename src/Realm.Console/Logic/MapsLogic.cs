@@ -7,9 +7,9 @@ namespace Realm.Console.Logic;
 internal class MapsLogic
 {
     private readonly IMapsService _mapsService;
-    private readonly ECS _ecs;
+    private readonly IECS _ecs;
 
-    public MapsLogic(IMapsService mapsService, ECS ecs)
+    public MapsLogic(IMapsService mapsService, IECS ecs)
     {
         _mapsService = mapsService;
         _ecs = ecs;

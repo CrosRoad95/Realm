@@ -28,7 +28,7 @@ internal class WorldLogic
 
     private readonly IEntityFactory _entityFactory;
 
-    public WorldLogic(IRPGServer rpgServer, IEntityFactory entityFactory, ECS ecs)
+    public WorldLogic(IRPGServer rpgServer, IEntityFactory entityFactory, IECS ecs)
     {
         _entityFactory = entityFactory;
         rpgServer.ServerStarted += HandleServerStarted;

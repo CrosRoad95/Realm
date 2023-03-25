@@ -7,17 +7,14 @@ internal class StatisticsCounterLogic
 {
     private readonly IStatisticsCounterService _statisticsCounterService;
     private readonly MtaServer _mtaServer;
-    private readonly ECS _ecs;
-    private readonly IEntityByElement _entityByElement;
+    private readonly IECS _ecs;
     private readonly ILogger<StatisticsCounterLogic> _logger;
 
-    public StatisticsCounterLogic(IStatisticsCounterService statisticsCounterService, MtaServer mtaServer, ECS ecs,
-        IEntityByElement entityByElement, ILogger<StatisticsCounterLogic> logger)
+    public StatisticsCounterLogic(IStatisticsCounterService statisticsCounterService, MtaServer mtaServer, IECS ecs, ILogger<StatisticsCounterLogic> logger)
     {
         _statisticsCounterService = statisticsCounterService;
         _mtaServer = mtaServer;
         _ecs = ecs;
-        _entityByElement = entityByElement;
         _logger = logger;
         _ecs.EntityCreated += HandleEntityCreated;
         statisticsCounterService.StatisticsCollected += HandleStatisticsCollected;
@@ -36,17 +33,19 @@ internal class StatisticsCounterLogic
     {
         try
         {
-            var entity = _ecs.GetEntityByPlayer(player);
-            var statisticsCounterComponent = entity.GetRequiredComponent<StatisticsCounterComponent>();
-            foreach (var item in statistics)
+            if(_ecs.TryGetEntityByPlayer(player, out Entity entity))
             {
-                try
+                var statisticsCounterComponent = entity.GetRequiredComponent<StatisticsCounterComponent>();
+                foreach (var item in statistics)
                 {
-                    statisticsCounterComponent.IncreaseStat(item.Key, item.Value);
-                }
-                catch(Exception ex)
-                {
-                    _logger.LogError(ex, "Failed to increase stat for player {playerName} serial: {serial}", player.Name, player.Client.Serial);
+                    try
+                    {
+                        statisticsCounterComponent.IncreaseStat(item.Key, item.Value);
+                    }
+                    catch(Exception ex)
+                    {
+                        _logger.LogError(ex, "Failed to increase stat for player {playerName} serial: {serial}", player.Name, player.Client.Serial);
+                    }
                 }
             }
         }

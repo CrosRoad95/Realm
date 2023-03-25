@@ -9,7 +9,7 @@ public abstract class GuiComponent : AsyncComponent
     [Inject]
     private ILogger<GuiComponent> Logger { get; set; } = default!;
     [Inject]
-    private IEntityByElement EntityByElement { get; set; } = default!;
+    private IECS ECS { get; set; } = default!;
 
     protected readonly string _name;
     protected readonly bool _cursorless;
@@ -60,7 +60,7 @@ public abstract class GuiComponent : AsyncComponent
             string formName = luaEvent.Parameters[2].StringValue ?? throw new InvalidOperationException();
             try
             {
-                await HandleForm(new FormContext(luaEvent.Player, formName, luaEvent.Parameters[3], AgnosticGuiSystemService, EntityByElement));
+                await HandleForm(new FormContext(luaEvent.Player, formName, luaEvent.Parameters[3], AgnosticGuiSystemService, ECS));
             }
             catch(Exception ex)
             {

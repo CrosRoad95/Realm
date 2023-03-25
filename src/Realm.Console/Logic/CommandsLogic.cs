@@ -23,7 +23,7 @@ internal sealed class CommandsLogic
     private readonly IEntityFactory _entityFactory;
     private readonly RepositoryFactory _repositoryFactory;
     private readonly ItemsRegistry _itemsRegistry;
-    private readonly ECS _ecs;
+    private readonly IECS _ecs;
     private readonly IBanService _banService;
     private readonly IDiscordService _discordService;
     private readonly ChatBox _chatBox;
@@ -38,7 +38,7 @@ internal sealed class CommandsLogic
     }
 
     public CommandsLogic(RPGCommandService commandService, IEntityFactory entityFactory, RepositoryFactory repositoryFactory,
-        ItemsRegistry itemsRegistry, ECS ecs, IBanService banService, IDiscordService discordService, ChatBox chatBox, ILogger<CommandsLogic> logger,
+        ItemsRegistry itemsRegistry, IECS ecs, IBanService banService, IDiscordService discordService, ChatBox chatBox, ILogger<CommandsLogic> logger,
         IDateTimeProvider dateTimeProvider, INametagsService nametagsService, IRPGUserManager rpgUserManager, IVehiclesService vehiclesService)
     {
         _commandService = commandService;
@@ -339,7 +339,7 @@ internal sealed class CommandsLogic
         
         _commandService.AddCommandHandler("hud3d", async (entity, args) =>
         {
-            var e = _ecs.CreateEntity(Guid.NewGuid().ToString(), EntityTag.Unknown);
+            using var e = _ecs.CreateEntity(Guid.NewGuid().ToString(), EntityTag.Unknown);
             e.Transform.Position = entity.Transform.Position + new Vector3(-4, 0, 0);
             e.AddComponent(new Hud3dComponent<TestState>(e => e
                 .AddRectangle(Vector2.Zero, new Size(100, 100), Color.Red)
@@ -351,7 +351,6 @@ internal sealed class CommandsLogic
                 }));
 
             await Task.Delay(2000);
-            _ecs.Destroy(e);
         });
         
         _commandService.AddCommandHandler("hud3d2", async (entity, args) =>
@@ -555,7 +554,7 @@ internal sealed class CommandsLogic
             var accountComponent = entity.GetRequiredComponent<AccountComponent>();
             var attachedEntity = entity.GetRequiredComponent<AttachedEntityComponent>();
             var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();
-            _ecs.Destroy(attachedEntity.AttachedEntity);
+            attachedEntity.AttachedEntity.Dispose();
             if (entity.HasComponent<AttachedEntityComponent>())
             {
                 playerElementComponent.SendChatMessage("Nie udalo sie zniszczyc");
@@ -643,10 +642,9 @@ internal sealed class CommandsLogic
         _commandService.AddCommandHandler("nametags5", async (entity, args) =>
         {
             var nametag = new NametagComponent("[22] Borsuk");
-            var ped = _entityFactory.CreatePed(SlipeServer.Server.Elements.Enums.PedModel.Truth, entity.Transform.Position + new Vector3(4, 0, 0));
+            using var ped = _entityFactory.CreatePed(SlipeServer.Server.Elements.Enums.PedModel.Truth, entity.Transform.Position + new Vector3(4, 0, 0));
             ped.AddComponent(nametag);
             await Task.Delay(1000);
-            _ecs.Destroy(ped);
         });
         
         _commandService.AddCommandHandler("randomvehcolor", async (entity, args) =>
@@ -749,7 +747,7 @@ internal sealed class CommandsLogic
 
         _discordService.AddTextBasedCommandHandler(997787973775011853, "gracze", async (userId, parameters) =>
         {
-            var playerEntities = _ecs.GetPlayerEntities();
+            var playerEntities = _ecs.PlayerEntities;
             await _discordService.SendMessage(997787973775011853, $"Gracze na serwerze: {string.Join(", ",playerEntities.Select(x => x.GetRequiredComponent<PlayerElementComponent>().Name))}");
         });
 
@@ -760,7 +758,7 @@ internal sealed class CommandsLogic
 
         _discordService.AddTextBasedCommandHandler(997787973775011853, "graczegrafika", async (userId, parameters) =>
         {
-            var playerEntities = _ecs.GetPlayerEntities();
+            var playerEntities = _ecs.PlayerEntities;
             int width = 480;
             int height = 60;
 

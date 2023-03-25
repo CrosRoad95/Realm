@@ -2,13 +2,13 @@
 
 internal class DefaultAfkLogic
 {
-    private readonly IEntityByElement _entityByElement;
+    private readonly IECS _ecs;
     private readonly ILogger<StatisticsCounterLogic> _logger;
 
     public DefaultAfkLogic(IAFKService afkService,
-        IEntityByElement entityByElement, ILogger<StatisticsCounterLogic> logger)
+        IECS ecs, ILogger<StatisticsCounterLogic> logger)
     {
-        _entityByElement = entityByElement;
+        _ecs = ecs;
         _logger = logger;
         afkService.PlayerAFKStarted += HandlePlayerAFKStarted;
         afkService.PlayerAFKStopped += HandlePlayerAFKStopped;
@@ -16,7 +16,7 @@ internal class DefaultAfkLogic
 
     private void HandlePlayerAFKStarted(Player player)
     {
-        if (_entityByElement.TryGetEntityByPlayer(player, out var entity))
+        if (_ecs.TryGetEntityByPlayer(player, out var entity))
         {
             if (entity.TryGetComponent(out AFKComponent afkComponent))
             {
@@ -28,7 +28,7 @@ internal class DefaultAfkLogic
 
     private void HandlePlayerAFKStopped(Player player)
     {
-        if(_entityByElement.TryGetEntityByPlayer(player, out var entity))
+        if(_ecs.TryGetEntityByPlayer(player, out var entity))
         {
             if(entity.TryGetComponent(out AFKComponent afkComponent))
             {

@@ -64,9 +64,7 @@ public static class ServerBuilderExtensions
             services.AddCommand<SaveCommand>();
             services.AddCommand<ReloadEntitiesCommand>();
 
-            services.AddSingleton<EntityByStringIdCollection>();
-            services.AddSingleton<ECS>();
-            services.AddSingleton<IEntityByElement>(x => x.GetRequiredService<ECS>());
+            services.AddSingleton<IECS, ECS>();
         });
 
         // Resource

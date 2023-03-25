@@ -3,9 +3,9 @@
 internal class GuisLogic
 {
     private readonly IServiceProvider _serviceProvider;
-    private readonly ECS _ecs;
+    private readonly IECS _ecs;
 
-    public GuisLogic(IServiceProvider serviceProvider, IRPGServer rpgServer, ECS ecs)
+    public GuisLogic(IServiceProvider serviceProvider, IRPGServer rpgServer, IECS ecs)
     {
         _serviceProvider = serviceProvider;
         _ecs = ecs;
@@ -19,7 +19,7 @@ internal class GuisLogic
 
     private Task HandleGuiFilesChanged()
     {
-        foreach (var entity in _ecs.Entities)
+        foreach (var entity in _ecs.PlayerEntities)
         {
             var guiComponents = entity.Components.OfType<GuiComponent>().ToList();
             foreach (var guiComponent in guiComponents)

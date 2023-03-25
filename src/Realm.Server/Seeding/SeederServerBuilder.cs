@@ -1,11 +1,11 @@
-﻿using static Realm.Server.Seeding.SeedData;
+﻿using Realm.Domain.Interfaces;
+using static Realm.Server.Seeding.SeedData;
 
 namespace Realm.Server.Seeding;
 
 internal sealed class SeederServerBuilder
 {
     private const string _basePath = "Seed";
-    private readonly EntityByStringIdCollection _elementByStringIdCollection;
     private readonly IServerFilesProvider _serverFilesProvider;
     private readonly UserManager<User> _userManager;
     private readonly RoleManager<Role> _roleManager;
@@ -15,16 +15,15 @@ internal sealed class SeederServerBuilder
     private readonly Dictionary<string, ISeederProvider> _seederProviders = new();
     private readonly Dictionary<string, IAsyncSeederProvider> _asyncSeederProviders = new();
     private readonly ILogger<SeederServerBuilder> _logger;
-
+    private readonly IECS _ecs;
     private readonly Dictionary<string, User> _createdAccounts = new();
-    public SeederServerBuilder(ILogger<SeederServerBuilder> logger,
-        EntityByStringIdCollection elementByStringIdCollection,
+    public SeederServerBuilder(ILogger<SeederServerBuilder> logger, IECS ecs,
         IServerFilesProvider serverFilesProvider, UserManager<User> userManager, RoleManager<Role> roleManager,
         IGroupService groupService, IEntityFactory entityFactory, IFractionService fractionService, IEnumerable<ISeederProvider> seederProviders,
         IEnumerable<IAsyncSeederProvider> asyncSeederProviders)
     {
         _logger = logger;
-        _elementByStringIdCollection = elementByStringIdCollection;
+        _ecs = ecs;
         _serverFilesProvider = serverFilesProvider;
         _userManager = userManager;
         _roleManager = roleManager;
@@ -44,13 +43,6 @@ internal sealed class SeederServerBuilder
         }
     }
 
-    private void AssignElementToId(Entity entity, string id)
-    {
-        var succeed = _elementByStringIdCollection.AssignEntityToId(entity, id);
-        if (!succeed)
-            throw new Exception($"Failed to assign seeded element to id {id} because it is already in used.");
-    }
-
     private void BuildBlips(Dictionary<string, BlipSeedData> blips)
     {
         foreach (var pair in blips)
@@ -61,7 +53,6 @@ internal sealed class SeederServerBuilder
                 {
                     Id = pair.Key
                 });
-                AssignElementToId(entity, pair.Key);
                 _logger.LogInformation("Seeder: Created blip of id {elementId} with icon {blipIcon} at position {position}", pair.Key, pair.Value.Icon, pair.Value.Position);
             }
             else
@@ -83,7 +74,6 @@ internal sealed class SeederServerBuilder
             {
                 entity.AddComponent(new Text3dComponent(pair.Value.Text3d, new Vector3(0, 0, 0.75f)));
             }
-            AssignElementToId(entity, pair.Key);
             _logger.LogInformation("Seeder: Created pickup of id {elementId} with icon {pickupModel} at {position}", pair.Key, pair.Value.Model, pair.Value.Position);
         }
     }
@@ -98,7 +88,6 @@ internal sealed class SeederServerBuilder
                 {
                     Id = pair.Key,
                 });
-                AssignElementToId(entity, pair.Key);
                 _logger.LogInformation("Seeder: Created marker of id {elementId} at {position}", pair.Key, pair.Value.Position);
             }
             else

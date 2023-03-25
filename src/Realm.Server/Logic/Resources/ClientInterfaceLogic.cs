@@ -7,18 +7,17 @@ internal class ClientInterfaceLogic
 {
     private readonly ILogger<ClientInterfaceLogic> _logger;
     private readonly IClientInterfaceService _clientInterfaceService;
-    private readonly IEntityByElement _entityByElement;
+    private readonly IECS _ecs;
 
-    public ClientInterfaceLogic(IClientInterfaceService clientInterfaceService, ILogger<ClientInterfaceLogic> logger, IEntityByElement entityByElement,
-        ECS ecs)
+    public ClientInterfaceLogic(IClientInterfaceService clientInterfaceService, ILogger<ClientInterfaceLogic> logger, IECS ecs)
     {
         _clientInterfaceService = clientInterfaceService;
-        _entityByElement = entityByElement;
+        _ecs = ecs;
         _logger = logger;
 
         _clientInterfaceService.ClientErrorMessage += HandleClientErrorMessage;
         _clientInterfaceService.FocusedElementChanged += HandleFocusedElementChanged;
-        ecs.EntityCreated += HandleEntityCreated;
+        _ecs.EntityCreated += HandleEntityCreated;
     }
 
 
@@ -56,7 +55,7 @@ internal class ClientInterfaceLogic
 
     private void HandleFocusedElementChanged(Player player, Element? focusedElement)
     {
-        if (!_entityByElement.TryGetEntityByPlayer(player, out var playerEntity))
+        if (!_ecs.TryGetEntityByPlayer(player, out var playerEntity))
             return;
 
         if(playerEntity.TryGetComponent(out PlayerElementComponent playerElementComponent))
@@ -65,7 +64,7 @@ internal class ClientInterfaceLogic
                 playerElementComponent.FocusedEntity = null;
             else
             {
-                _entityByElement.TryGetByElement(focusedElement, out var entity);
+                _ecs.TryGetByElement(focusedElement, out var entity);
                 playerElementComponent.FocusedEntity = entity;
             }
         }
@@ -73,7 +72,7 @@ internal class ClientInterfaceLogic
 
     private void HandleClientErrorMessage(Player player, string message, int level, string file, int line)
     {
-        if (!_entityByElement.TryGetEntityByPlayer(player, out var playerEntity))
+        if (!_ecs.TryGetEntityByPlayer(player, out var playerEntity))
             return;
 
         var playerName = playerEntity?.Name ?? player.Name;

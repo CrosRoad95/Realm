@@ -5,9 +5,9 @@ namespace Realm.Console.Logic;
 
 internal sealed class AchievementsLogic
 {
-    private readonly ECS _ecs;
+    private readonly IECS _ecs;
 
-    public AchievementsLogic(ECS ecs)
+    public AchievementsLogic(IECS ecs)
     {
         _ecs = ecs;
 

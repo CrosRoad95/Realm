@@ -17,13 +17,12 @@ public class CollisionShapeElementComponentTests
         // FocusableAdded
         var services = new ServiceCollection();
         services.AddSingleton<IRealmConfigurationProvider>(new TestConfigurationProvider());
-        services.AddSingleton<ECS>();
+        services.AddSingleton<IECS, ECS>();
         services.AddSingleton(_clientInterfaceServiceMock);
-        services.AddSingleton<IEntityByElement>(x => x.GetRequiredService<ECS>());
         services.AddLogging(x => x.AddSerilog(new LoggerConfiguration().CreateLogger(), dispose: true));
 
         var serviceProvider = services.BuildServiceProvider();
-        _entity = serviceProvider.GetRequiredService<ECS>().CreateEntity("test", EntityTag.Unknown);
+        _entity = serviceProvider.GetRequiredService<IECS>().CreateEntity("test", EntityTag.Unknown);
         _collisionSphereElementComponent = new(new CollisionSphere(new System.Numerics.Vector3(0, 0, 0), 10));
         _entity.AddComponent(_collisionSphereElementComponent);
     }

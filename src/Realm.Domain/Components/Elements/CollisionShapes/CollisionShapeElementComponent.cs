@@ -5,7 +5,7 @@ namespace Realm.Domain.Components.Elements.CollisionShapes;
 public abstract class CollisionShapeElementComponent : ElementComponent
 {
     [Inject]
-    private IEntityByElement EntityByElement { get; set; } = default!;
+    private IECS ECS { get; set; } = default!;
 
     [Inject]
     private ILogger<CollisionShapeElementComponent> Logger { get; set; } = default!;
@@ -62,7 +62,7 @@ public abstract class CollisionShapeElementComponent : ElementComponent
 
         try
         {
-            if (!EntityByElement.TryGetByElement(element, out var entity))
+            if (!ECS.TryGetByElement(element, out var entity))
                 throw new NullReferenceException(nameof(entity));
 
             lock (_entityRulesLock)
@@ -84,7 +84,7 @@ public abstract class CollisionShapeElementComponent : ElementComponent
 
         try
         {
-            if (!EntityByElement.TryGetByElement(element, out var entity))
+            if (!ECS.TryGetByElement(element, out var entity))
                 throw new NullReferenceException(nameof(entity));
 
             lock (_entityRulesLock)

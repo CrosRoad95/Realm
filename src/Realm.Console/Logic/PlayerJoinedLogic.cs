@@ -8,13 +8,13 @@ namespace Realm.Console.Logic;
 
 internal sealed class PlayerJoinedLogic
 {
-    private readonly ECS _ecs;
+    private readonly IECS _ecs;
     private readonly ILogger<PlayerJoinedLogic> _logger;
     private readonly AssetsRegistry _assetsRegistry;
     private readonly IBanService _banService;
     private readonly INametagsService _nametagsService;
 
-    public PlayerJoinedLogic(ECS ecs, ILogger<PlayerJoinedLogic> logger, AssetsRegistry assetsRegistry, IBanService banService,
+    public PlayerJoinedLogic(IECS ecs, ILogger<PlayerJoinedLogic> logger, AssetsRegistry assetsRegistry, IBanService banService,
         INametagsService nametagsService)
     {
         _ecs = ecs;

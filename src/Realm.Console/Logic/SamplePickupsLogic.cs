@@ -6,10 +6,10 @@ namespace Realm.Console.Logic;
 
 internal class SamplePickupsLogic
 {
-    private readonly ECS _ecs;
+    private readonly IECS _ecs;
     private readonly IEntityFactory _entityFactory;
 
-    public SamplePickupsLogic(ECS ecs, IEntityFactory entityFactory)
+    public SamplePickupsLogic(IECS ecs, IEntityFactory entityFactory)
     {
         _ecs = ecs;
         _entityFactory = entityFactory;

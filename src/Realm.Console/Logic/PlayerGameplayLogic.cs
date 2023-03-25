@@ -8,11 +8,11 @@ namespace Realm.Console.Logic;
 
 internal sealed class PlayerGameplayLogic
 {
-    private readonly ECS _ecs;
+    private readonly IECS _ecs;
     private readonly IServiceProvider _serviceProvider;
     private readonly ILogger<PlayerGameplayLogic> _logger;
 
-    public PlayerGameplayLogic(ECS ecs, ILogger<PlayerGameplayLogic> logger, IServiceProvider serviceProvider)
+    public PlayerGameplayLogic(IECS ecs, ILogger<PlayerGameplayLogic> logger, IServiceProvider serviceProvider)
     {
         _ecs = ecs;
         _serviceProvider = serviceProvider;

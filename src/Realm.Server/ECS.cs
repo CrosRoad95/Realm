@@ -2,15 +2,18 @@
 using Realm.Domain.Enums;
 using Realm.Domain.Exceptions;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.Xml.Linq;
 
 namespace Realm.Server;
 
-public sealed class ECS : IEntityByElement
+internal sealed class ECS : IECS
 {
     private readonly ReaderWriterLockSlim _entitiesLock = new();
     private readonly List<Entity> _entities = new();
     private readonly ConcurrentDictionary<Player, Entity> _entityByPlayer = new();
     private readonly ConcurrentDictionary<Element, Entity> _entityByElement = new();
+    private readonly ConcurrentDictionary<string, Entity> _entityById = new();
     private readonly ConcurrentDictionary<string, Entity> _entityByName = new();
     private readonly IServiceProvider _serviceProvider;
 
@@ -35,6 +38,17 @@ public sealed class ECS : IEntityByElement
             return entities;
         }
     }
+    
+    public IReadOnlyCollection<Entity> PlayerEntities
+    {
+        get
+        {
+            _entitiesLock.EnterWriteLock();
+            var entities = new List<Entity>(_entities.Where(x => x.Tag == EntityTag.Vehicle));
+            _entitiesLock.ExitWriteLock();
+            return entities;
+        }
+    }
 
     public event Action<Entity>? EntityCreated;
 
@@ -42,8 +56,6 @@ public sealed class ECS : IEntityByElement
     {
         _serviceProvider = serviceProvider;
     }
-
-    public IReadOnlyList<Entity> GetPlayerEntities() => new List<Entity>(_entityByPlayer.Values);
 
     public Entity GetEntityByPlayer(Player player)
     {
@@ -65,24 +77,31 @@ public sealed class ECS : IEntityByElement
         return _entityByElement.TryGetValue(element, out result);
     }
     
+    private void InternalEntityCreated(Entity entity)
+    {
+        _entitiesLock.EnterWriteLock();
+        try
+        {
+            _entities.Add(entity);
+        }
+        finally
+        {
+            _entitiesLock.ExitWriteLock();
+        }
+        _entityById[entity.Id] = entity;
+        _entityByName[entity.Name] = entity;
+        entity.ComponentAdded += HandleComponentAdded;
+        entity.Disposed += HandleEntityDestroyed;
+    }
+
     public Entity CreateEntity(string name, EntityTag tag, Action<Entity>? entityBuilder = null)
     {
         if (_entityByName.ContainsKey(name))
             throw new EntityAlreadyExistsException(name);
 
         var newlyCreatedEntity = new Entity(_serviceProvider, name, tag);
-        _entitiesLock.EnterWriteLock();
-        try
-        {
-            _entities.Add(newlyCreatedEntity);
-        }
-        finally
-        {
-            _entitiesLock.ExitWriteLock();
-        }
-        _entityByName[name] = newlyCreatedEntity;
-        newlyCreatedEntity.ComponentAdded += HandleComponentAdded;
-        newlyCreatedEntity.Disposed += HandleEntityDestroyed;
+
+        InternalEntityCreated(newlyCreatedEntity);
         entityBuilder?.Invoke(newlyCreatedEntity);
         EntityCreated?.Invoke(newlyCreatedEntity);
         return newlyCreatedEntity;
@@ -90,23 +109,13 @@ public sealed class ECS : IEntityByElement
     
     public async Task<AsyncEntity> CreateAsyncEntity(string name, EntityTag tag, Func<AsyncEntity, Task>? entityBuilder = null)
     {
-        if (_entityByName.ContainsKey(name))
+        if (_entityById.ContainsKey(name))
             throw new EntityAlreadyExistsException(name);
 
         var newlyCreatedEntity = new AsyncEntity(_serviceProvider, name, tag);
-        _entitiesLock.EnterWriteLock();
-        try
-        {
-            _entities.Add(newlyCreatedEntity);
-        }
-        finally
-        {
-            _entitiesLock.ExitWriteLock();
-        }
-        _entityByName[name] = newlyCreatedEntity;
-        newlyCreatedEntity.ComponentAdded += HandleComponentAdded;
-        newlyCreatedEntity.Disposed += HandleEntityDestroyed;
-        if(entityBuilder != null)
+
+        InternalEntityCreated(newlyCreatedEntity);
+        if (entityBuilder != null)
             await entityBuilder.Invoke(newlyCreatedEntity);
         EntityCreated?.Invoke(newlyCreatedEntity);
         return newlyCreatedEntity;
@@ -114,7 +123,9 @@ public sealed class ECS : IEntityByElement
 
     private void HandleEntityDestroyed(Entity entity)
     {
+        _entityById.Remove(entity.Id, out var _);
         _entityByName.Remove(entity.Name, out var _);
+
         _entitiesLock.EnterWriteLock();
         try
         {
@@ -128,17 +139,12 @@ public sealed class ECS : IEntityByElement
         entity.ComponentAdded -= HandleComponentAdded;
     }
 
-    public void Destroy(Entity entity)
-    {
-        entity.Dispose();
-    }
-
     private void HandleComponentAdded(Component component)
     {
         if(component is ElementComponent elementComponent)
         {
             _entityByElement[elementComponent.Element] = component.Entity;
-            component.Entity.ComponentDetached += HandleElementComponentRemoved;
+            component.Entity.Disposed += HandleElementEntityDestroyed;
         }
 
         if (component is PlayerElementComponent playerElementComponent)
@@ -149,16 +155,26 @@ public sealed class ECS : IEntityByElement
         }
     }
 
-    private void HandleElementComponentRemoved(Component component)
+    private void HandleElementEntityDestroyed(Entity elementEntity)
     {
-        if (component is ElementComponent elementComponent)
-            _entityByElement.Remove(elementComponent.Element, out var _);
+        elementEntity.Disposed -= HandleElementEntityDestroyed;
+        _entityByElement.Remove(elementEntity.Element, out var _);
     }
 
     private void HandlePlayerEntityDestroyed(Entity playerEntity)
     {
         playerEntity.Disposed -= HandlePlayerEntityDestroyed;
-        var playerComponent = playerEntity.GetRequiredComponent<PlayerElementComponent>();
-        _entityByPlayer.Remove(playerComponent.Player, out var _);
+        _entityByPlayer.Remove(playerEntity.Player, out var _);
     }
+
+    private void HandleDestroyed(Entity entity)
+    {
+        _entityById.TryRemove(entity.Id, out var _);
+        _entityByName.TryRemove(entity.Name, out var _);
+        entity.Disposed -= HandleDestroyed;
+    }
+
+    public bool GetEntityById(string id, out Entity? entity) => _entityById.TryGetValue(id, out entity);
+    public bool GetEntityByName(string name, out Entity? entity) => _entityByName.TryGetValue(name, out entity);
+
 }

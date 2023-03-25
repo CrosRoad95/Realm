@@ -120,19 +120,40 @@ public class EntityTests
         var entity = new AsyncEntity(_serviceProvider, "foo", EntityTag.Unknown);
         var component = new ThrowExceptionAsyncComponent();
 
-        var action = () => entity.AddComponentAsync(component);
         #endregion
 
         #region Act
+        var action = async () => await entity.AddComponentAsync(component);
+        #endregion
+
+        #region Assert
         var t = new TaskCompletionSource();
         entity.ComponentDetached += e =>
         {
             t.SetResult();
         };
 
-        action();
+        _ = action();
 
         (await Task.WhenAny(t.Task, Task.Delay(5000))).Should().Be(t.Task);
+        #endregion
+    }
+
+    [Fact]
+    public void AsyncComponentCanNotBeAddedToNonAsyncEntity()
+    {
+        #region Arrange
+        var entity = new AsyncEntity(_serviceProvider, "foo", EntityTag.Unknown);
+        var component = new ThrowExceptionAsyncComponent();
+
+        #endregion
+
+        #region Act
+        var action = () => entity.AddComponent(component);
+        #endregion
+
+        #region Act
+        action.Should().Throw<ArgumentException>().WithMessage("Can not add async component to non async entity");
         #endregion
     }
 

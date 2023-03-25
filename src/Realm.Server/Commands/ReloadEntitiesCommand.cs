@@ -31,7 +31,7 @@ internal class ReloadEntitiesCommand : ICommand
                     await _saveService.Commit();
 #endif
                     savedEntities++;
-                    _ecs.Destroy(entity);
+                    entity.Dispose();
                 }
             }
             catch (Exception ex)

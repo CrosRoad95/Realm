@@ -15,7 +15,7 @@ public class VehicleUpgradesComponentTests
     private readonly VehicleUpgradesComponent _vehicleUpgradesComponent;
     private readonly VehicleElementComponent _vehicleElementComponent;
     private readonly VehicleUpgradeRegistry _vehicleUpgradeRegistry;
-    private readonly Mock<IEntityByElement> _mock = new(MockBehavior.Strict);
+    private readonly Mock<IECS> _mock = new(MockBehavior.Strict);
 
     public VehicleUpgradesComponentTests()
     {

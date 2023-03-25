@@ -3,7 +3,7 @@
 public sealed class PlayerElementComponent : PedElementComponent
 {
     [Inject]
-    private IEntityByElement EntityByElement { get; set; } = default!;
+    private IECS ECS { get; set; } = default!;
     [Inject]
     private IDateTimeProvider DateTimeProvider { get; set; } = default!;
     [Inject]
@@ -65,7 +65,7 @@ public sealed class PlayerElementComponent : PedElementComponent
             if (_player.Vehicle == null)
                 return null;
 
-            EntityByElement.TryGetByElement(_player.Vehicle, out var entity);
+            ECS.TryGetByElement(_player.Vehicle, out var entity);
             return entity;
         }
     }

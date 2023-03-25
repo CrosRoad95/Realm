@@ -6,7 +6,7 @@ namespace Realm.Domain.Components.Elements;
 public class MarkerElementComponent : ElementComponent
 {
     [Inject]
-    private IEntityByElement EntityByElement { get; set; } = default!;
+    private IECS ECS { get; set; } = default!;
 
     protected readonly Marker _marker;
     protected readonly CollisionSphere _collisionShape;
@@ -40,7 +40,7 @@ public class MarkerElementComponent : ElementComponent
     {
         if (EntityEntered != null)
         {
-            if (EntityByElement.TryGetByElement(element, out Entity entity))
+            if (ECS.TryGetByElement(element, out Entity entity))
                 if (entity.Tag == EntityTag.Player || entity.Tag == EntityTag.Vehicle)
                 {
                     foreach (var rule in _entityRules)
@@ -60,7 +60,7 @@ public class MarkerElementComponent : ElementComponent
     {
         if (EntityLeft != null)
         {
-            if(EntityByElement.TryGetByElement(element, out Entity entity))
+            if(ECS.TryGetByElement(element, out Entity entity))
                 if (entity != null && (entity.Tag == EntityTag.Player || entity.Tag == EntityTag.Vehicle))
                     if (_entityRules.All(x => x.Check(entity)))
                         EntityLeft(entity);

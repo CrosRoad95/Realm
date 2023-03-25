@@ -4,10 +4,10 @@ namespace Realm.Server.Integrations.Discord.Handlers;
 
 public class DefaultDiscordConnectAccountHandler : IDiscordConnectAccountHandler
 {
-    private readonly ECS _ecs;
+    private readonly IECS _ecs;
     private readonly ILogger<DefaultDiscordConnectAccountHandler> _logger;
 
-    public DefaultDiscordConnectAccountHandler(ECS ecs, ILogger<DefaultDiscordConnectAccountHandler> logger)
+    public DefaultDiscordConnectAccountHandler(IECS ecs, ILogger<DefaultDiscordConnectAccountHandler> logger)
     {
         _ecs = ecs;
         _logger = logger;
@@ -17,7 +17,7 @@ public class DefaultDiscordConnectAccountHandler : IDiscordConnectAccountHandler
     {
         try
         {
-            foreach (var item in _ecs.GetPlayerEntities())
+            foreach (var item in _ecs.PlayerEntities)
             {
                 if(item.TryGetComponent<PendingDiscordIntegrationComponent>(out var component))
                 {

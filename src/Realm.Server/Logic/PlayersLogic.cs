@@ -10,21 +10,20 @@ namespace Realm.Server.Logic;
 internal class PlayersLogic
 {
     const int RESOURCES_COUNT = 10;
-    private readonly ECS _ecs;
+    private readonly IECS _ecs;
     private readonly IServiceProvider _serviceProvider;
-    private readonly IEntityByElement _entityByElement;
+    private readonly IECS _entityByElement;
     private readonly RealmDbContextFactory _realmDbContextFactory;
     private readonly MtaServer _mtaServer;
     private readonly IClientInterfaceService _clientInterfaceService;
     private readonly IDateTimeProvider _dateTimeProvider;
     private readonly ConcurrentDictionary<Player, Latch> _playerResources = new();
 
-    public PlayersLogic(ECS ecs, IServiceProvider serviceProvider, IEntityByElement entityByElement,
+    public PlayersLogic(ECS ecs, IServiceProvider serviceProvider,
         RealmDbContextFactory realmDbContextFactory, MtaServer mtaServer, IClientInterfaceService clientInterfaceService, IDateTimeProvider dateTimeProvider)
     {
         _ecs = ecs;
         _serviceProvider = serviceProvider;
-        _entityByElement = entityByElement;
         _realmDbContextFactory = realmDbContextFactory;
         _mtaServer = mtaServer;
         _clientInterfaceService = clientInterfaceService;

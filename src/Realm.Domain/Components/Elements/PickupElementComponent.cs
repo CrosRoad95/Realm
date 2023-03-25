@@ -6,8 +6,8 @@ namespace Realm.Domain.Components.Elements;
 public class PickupElementComponent : ElementComponent
 {
     [Inject]
-    private IEntityByElement EntityByElement { get; set; } = default!;
-        [Inject]
+    private IECS ECS { get; set; } = default!;
+    [Inject]
     private ILogger<PickupElementComponent> Logger { get; set; } = default!;
 
     protected readonly Pickup _pickup;
@@ -38,7 +38,7 @@ public class PickupElementComponent : ElementComponent
     private void HandleElementEntered(Element element)
     {
         if(EntityEntered != null)
-            if(EntityByElement.TryGetByElement(element, out var entity))
+            if(ECS.TryGetByElement(element, out var entity))
                 if(entity.Tag == EntityTag.Player || entity.Tag == EntityTag.Vehicle)
                 {
                     foreach (var rule in _entityRules)
@@ -70,7 +70,7 @@ public class PickupElementComponent : ElementComponent
     private void HandleElementLeft(Element element)
     {
         if(EntityLeft != null)
-            if (EntityByElement.TryGetByElement(element, out var entity))
+            if (ECS.TryGetByElement(element, out var entity))
                 if (entity.Tag == EntityTag.Player || entity.Tag == EntityTag.Vehicle)
                     if (_entityRules.All(x => x.Check(entity)))
                         try

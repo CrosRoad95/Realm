@@ -10,10 +10,10 @@ internal sealed class PlayerBindsLogic
         public List<Type>? allowToOpenWithGui;
     }
 
-    private readonly ECS _ecs;
+    private readonly IECS _ecs;
     private readonly IVehiclesService _vehiclesService;
 
-    public PlayerBindsLogic(ECS ecs, IVehiclesService vehiclesService)
+    public PlayerBindsLogic(IECS ecs, IVehiclesService vehiclesService)
     {
         _ecs = ecs;
         _vehiclesService = vehiclesService;

@@ -9,7 +9,7 @@ namespace Realm.Console.Logic;
 
 public class ItemsLogic
 {
-    public ItemsLogic(ItemsRegistry itemsRegistry, ECS ecs)
+    public ItemsLogic(ItemsRegistry itemsRegistry, IECS ecs)
     {
         itemsRegistry.UseCallback = Use;
         itemsRegistry.AddItem(1, new ItemRegistryEntry
