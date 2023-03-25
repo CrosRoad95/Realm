@@ -12,14 +12,13 @@ internal class PlayersLogic
     const int RESOURCES_COUNT = 10;
     private readonly IECS _ecs;
     private readonly IServiceProvider _serviceProvider;
-    private readonly IECS _entityByElement;
     private readonly RealmDbContextFactory _realmDbContextFactory;
     private readonly MtaServer _mtaServer;
     private readonly IClientInterfaceService _clientInterfaceService;
     private readonly IDateTimeProvider _dateTimeProvider;
     private readonly ConcurrentDictionary<Player, Latch> _playerResources = new();
 
-    public PlayersLogic(ECS ecs, IServiceProvider serviceProvider,
+    public PlayersLogic(IECS ecs, IServiceProvider serviceProvider,
         RealmDbContextFactory realmDbContextFactory, MtaServer mtaServer, IClientInterfaceService clientInterfaceService, IDateTimeProvider dateTimeProvider)
     {
         _ecs = ecs;
@@ -81,9 +80,10 @@ internal class PlayersLogic
             var screenSize = await taskWaitForScreenSize.Task;
             var cultureInfo = await taskWaitForCultureInfo.Task;
 
-            _ecs.CreateEntity("Player " + player.Name, EntityTag.Player, entity =>
+            await _ecs.CreateAsyncEntity("Player " + player.Name, EntityTag.Player, entity =>
             {
                 entity.AddComponent(new PlayerElementComponent(player, new Vector2(screenSize.Item1, screenSize.Item2), cultureInfo));
+                return Task.CompletedTask;
             });
         }
         catch(Exception ex)
@@ -146,7 +146,7 @@ internal class PlayersLogic
     {
         player.Disconnected -= HandlePlayerDisconnected;
         _playerResources.TryRemove(player, out var _);
-        if(_entityByElement.TryGetEntityByPlayer(player, out var playerEntity))
+        if(_ecs.TryGetEntityByPlayer(player, out var playerEntity))
         {
             var saveService = _serviceProvider.GetRequiredService<ISaveService>();
             await saveService.Save(playerEntity);

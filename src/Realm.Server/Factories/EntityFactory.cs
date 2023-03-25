@@ -11,11 +11,11 @@ namespace Realm.Server.Factories;
 
 internal class EntityFactory : IEntityFactory
 {
-    private readonly ECS _ecs;
+    private readonly IECS _ecs;
     private readonly IVehicleRepository _vehicleRepository;
     private readonly RPGServer _rpgServer;
 
-    public EntityFactory(ECS ecs, IVehicleRepository vehicleRepository, RPGServer rpgServer)
+    public EntityFactory(IECS ecs, IVehicleRepository vehicleRepository, RPGServer rpgServer)
     {
         _ecs = ecs;
         _vehicleRepository = vehicleRepository;

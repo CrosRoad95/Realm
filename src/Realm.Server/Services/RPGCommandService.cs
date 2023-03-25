@@ -6,12 +6,25 @@ namespace Realm.Server.Services;
 
 public class RPGCommandService
 {
+    private class AsyncCommandInfo
+    {
+        public Func<Entity, string[], Task> Callback { get; set; }
+        public string[]? RequiredPolicies { get; set; }
+    }
+    
+    private class CommandInfo
+    {
+        public Action<Entity, string[]> Callback { get; set; }
+        public string[]? RequiredPolicies { get; set; }
+    }
+
     private readonly CommandService _commandService;
     private readonly IECS _ecs;
     private readonly IRPGUserManager _rpgUserManager;
     private readonly ILogger<RPGCommandService> _logger;
 
-    private readonly List<Command> _commands = new();
+    private readonly Dictionary<string, AsyncCommandInfo> _asyncCommands = new();
+    private readonly Dictionary<string, CommandInfo> _commands = new();
     public RPGCommandService(CommandService commandService, ILogger<RPGCommandService> logger, IECS ecs, IRPGUserManager rpgUserManager)
     {
         _logger = logger;
@@ -20,9 +33,30 @@ public class RPGCommandService
         _rpgUserManager = rpgUserManager;
     }
 
-    public bool AddCommandHandler(string commandName, Func<Entity, string[], Task> callback, string[]? requiredPolicies = null)
+    public bool AddAsyncCommandHandler(string commandName, Func<Entity, string[], Task> callback, string[]? requiredPolicies = null)
     {
-        if(_commands.Any(x => string.Equals(x.CommandText, commandName, StringComparison.OrdinalIgnoreCase))) {
+        if(_asyncCommands.Keys.Any(x => string.Equals(x, commandName, StringComparison.OrdinalIgnoreCase))) {
+            throw new Exception($"Command with name '{commandName}' already exists");
+        }
+
+        if (requiredPolicies != null)
+            _logger.LogInformation("Created async command {commandName} with required policies: {requiredPolicies}", commandName, requiredPolicies);
+        else
+            _logger.LogInformation("Created async command {commandName}", commandName);
+
+        var command = _commandService.AddCommand(commandName);
+        _asyncCommands.Add(commandName, new AsyncCommandInfo
+        {
+            Callback = callback,
+            RequiredPolicies = requiredPolicies
+        });
+        command.Triggered += HandleAsyncTriggered;
+        return true;
+    }
+
+    public bool AddCommandHandler(string commandName, Action<Entity, string[]> callback, string[]? requiredPolicies = null)
+    {
+        if(_commands.Keys.Any(x => string.Equals(x, commandName, StringComparison.OrdinalIgnoreCase))) {
             throw new Exception($"Command with name '{commandName}' already exists");
         }
 
@@ -32,9 +66,23 @@ public class RPGCommandService
             _logger.LogInformation("Created command {commandName}", commandName);
 
         var command = _commandService.AddCommand(commandName);
-        _commands.Add(command);
-        command.Triggered += async (source, args) =>
+        _commands.Add(commandName, new CommandInfo
         {
+            Callback = callback,
+            RequiredPolicies = requiredPolicies
+        });
+        command.Triggered += HandleTriggered;
+        return true;
+    }
+
+    private async void HandleTriggered(object? sender, SlipeServer.Server.Events.CommandTriggeredEventArgs args)
+    {
+        try
+        {
+            var commandText = ((Command)sender).CommandText;
+            if (!_commands.TryGetValue(commandText, out var commandInfo))
+                return;
+
             var player = args.Player;
             if (!_ecs.TryGetEntityByPlayer(player, out var entity))
                 return;
@@ -44,42 +92,105 @@ public class RPGCommandService
 
             var activity = new Activity("CommandHandler");
             activity.Start();
-            _logger.LogInformation("Begin command {commandName} execution with traceId={TraceId}", commandName, activity.GetTraceId());
+            _logger.LogInformation("Begin command {commandText} execution with traceId={TraceId}", commandText, activity.GetTraceId());
             var start = Stopwatch.GetTimestamp();
 
             using var _1 = LogContext.PushProperty("serial", playerElementComponent.Client.Serial);
             using var _2 = LogContext.PushProperty("accountId", accountComponent.Id);
-            using var _3 = LogContext.PushProperty("commandName", commandName);
+            using var _3 = LogContext.PushProperty("commandText", commandText);
             using var _4 = LogContext.PushProperty("commandArguments", args.Arguments);
-            _logger.LogInformation("Begin command {commandName} execution with traceId={TraceId}", commandName);
-            if (requiredPolicies != null)
+            _logger.LogInformation("Begin command {commandText} execution with traceId={TraceId}", commandText);
+            if (commandInfo.RequiredPolicies != null)
             {
-                foreach (var policy in requiredPolicies)
+                foreach (var policy in commandInfo.RequiredPolicies)
                     if (!await _rpgUserManager.AuthorizePolicy(accountComponent, policy))
                     {
-                        _logger.LogInformation("{player} failed to execute command {commandName} because failed to authorize for policy {policy}", player, commandName, policy);
+                        _logger.LogInformation("{player} failed to execute command {commandText} because failed to authorize for policy {policy}", player, commandText, policy);
                         return;
                     }
             }
 
             if (args.Arguments.Any())
-                _logger.LogInformation("{player} executed command {commandName} with arguments {commandArguments}.", entity);
+                _logger.LogInformation("{player} executed command {commandText} with arguments {commandArguments}.", entity);
             else
-                _logger.LogInformation("{player} executed command {commandName} with no arguments.", entity);
+                _logger.LogInformation("{player} executed command {commandText} with no arguments.", entity);
             try
             {
-                await callback(entity, args.Arguments);
+                commandInfo.Callback(entity, args.Arguments);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Exception thrown while executing command {commandName} with arguments {commandArguments}", commandName, args.Arguments);
+                _logger.LogError(ex, "Exception thrown while executing command {commandText} with arguments {commandArguments}", commandText, args.Arguments);
             }
             finally
             {
-                _logger.LogInformation("Ended command {commandName} execution with traceId={TraceId} in {totalMiliseconds}miliseconds", commandName, activity.GetTraceId(), (Stopwatch.GetTimestamp() - start) / (float)TimeSpan.TicksPerMillisecond);
+                _logger.LogInformation("Ended command {commandText} execution with traceId={TraceId} in {totalMiliseconds}miliseconds", commandText, activity.GetTraceId(), (Stopwatch.GetTimestamp() - start) / (float)TimeSpan.TicksPerMillisecond);
                 activity.Stop();
             }
-        };
-        return true;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Exception thrown while executing command {commandText} with arguments {commandArguments}", ((Command)sender).CommandText, args.Arguments);
+        }
+    }
+
+    private async void HandleAsyncTriggered(object? sender, SlipeServer.Server.Events.CommandTriggeredEventArgs args)
+    {
+        try
+        {
+            var commandText = ((Command)sender).CommandText;
+
+            if (!_asyncCommands.TryGetValue(commandText, out var commandInfo))
+                return;
+
+            var player = args.Player;
+            if (!_ecs.TryGetEntityByPlayer(player, out var entity))
+                return;
+
+            if (!entity.TryGetComponent<AccountComponent>(out var accountComponent) || !entity.TryGetComponent<PlayerElementComponent>(out var playerElementComponent))
+                return;
+
+            var activity = new Activity("CommandHandler");
+            activity.Start();
+            _logger.LogInformation("Begin command {commandText} execution with traceId={TraceId}", commandText, activity.GetTraceId());
+            var start = Stopwatch.GetTimestamp();
+
+            using var _1 = LogContext.PushProperty("serial", playerElementComponent.Client.Serial);
+            using var _2 = LogContext.PushProperty("accountId", accountComponent.Id);
+            using var _3 = LogContext.PushProperty("commandText", commandText);
+            using var _4 = LogContext.PushProperty("commandArguments", args.Arguments);
+            _logger.LogInformation("Begin command {commandText} execution with traceId={TraceId}", commandText);
+            if (commandInfo.RequiredPolicies != null)
+            {
+                foreach (var policy in commandInfo.RequiredPolicies)
+                    if (!await _rpgUserManager.AuthorizePolicy(accountComponent, policy))
+                    {
+                        _logger.LogInformation("{player} failed to execute command {commandText} because failed to authorize for policy {policy}", player, commandText, policy);
+                        return;
+                    }
+            }
+
+            if (args.Arguments.Any())
+                _logger.LogInformation("{player} executed command {commandText} with arguments {commandArguments}.", entity);
+            else
+                _logger.LogInformation("{player} executed command {commandText} with no arguments.", entity);
+            try
+            {
+                await commandInfo.Callback(entity, args.Arguments);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Exception thrown while executing command {commandText} with arguments {commandArguments}", commandText, args.Arguments);
+            }
+            finally
+            {
+                _logger.LogInformation("Ended command {commandText} execution with traceId={TraceId} in {totalMiliseconds}miliseconds", commandText, activity.GetTraceId(), (Stopwatch.GetTimestamp() - start) / (float)TimeSpan.TicksPerMillisecond);
+                activity.Stop();
+            }
+        }
+        catch(Exception ex)
+        {
+            _logger.LogError(ex, "Exception thrown while executing command {commandText} with arguments {commandArguments}", ((Command)sender).CommandText, args.Arguments);
+        }
     }
 }

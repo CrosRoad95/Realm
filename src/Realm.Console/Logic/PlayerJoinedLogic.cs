@@ -30,6 +30,7 @@ internal sealed class PlayerJoinedLogic
         if (entity.Tag != EntityTag.Player)
             return;
 
+        var asyncEntity = entity as AsyncEntity;
         var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();
         var bans = await _banService.GetBansBySerial(playerElementComponent.Client.Serial);
 
@@ -41,7 +42,7 @@ internal sealed class PlayerJoinedLogic
         var adminComponent = entity.AddComponent<AdminComponent>();
         adminComponent.DebugView = true;
         adminComponent.DevelopmentMode = true;
-        entity.AddComponent<LoginGuiComponent>();
+        await asyncEntity.AddComponentAsync<LoginGuiComponent>();
 
         entity.ComponentAdded += HandleComponentAdded;
         entity.Disposed += HandleDestroyed;
