@@ -91,6 +91,10 @@ local function updateFocusedElement()
 	local nearestElement,nearestChildElement = findNearestElementOfIntrestAt(px, py, z, getElementInterior(localPlayer), getElementDimension(localPlayer))
 	
 	if(debugRenderEnabled)then
+		for focusableElement in pairs(focusableElements)do
+			local ex,ey,ez = getElementPosition(focusableElement)
+			dxDrawLine3D(ex,ey,ez + 3, ex,ey,ez + 1, tocolor(0,0,255), 4)
+		end
 		dxDrawLine3D(x,y,z, px, py,z, tocolor(255,0,0), 2)
 		if(nearestElement and isElement(nearestElement))then
 			px,py,pz = getFocusPosition(nearestElement);
