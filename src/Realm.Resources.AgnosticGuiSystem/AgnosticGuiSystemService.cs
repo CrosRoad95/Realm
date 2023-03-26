@@ -3,6 +3,7 @@ using SlipeServer.Server;
 using SlipeServer.Server.Elements;
 using SlipeServer.Server.Events;
 using SlipeServer.Server.Mappers;
+using System.Collections.Concurrent;
 using System.Diagnostics;
 
 namespace Realm.Resources.AgnosticGuiSystem;
@@ -14,7 +15,8 @@ internal sealed class AgnosticGuiSystemService : IAgnosticGuiSystemService
     private readonly AgnosticGuiSystemResource _resource;
     public event Action<LuaEvent>? FormSubmitted;
     public event Action<LuaEvent>? ActionExecuted;
-    private readonly Dictionary<Player, HashSet<string>> _playersGuis = new();
+    private readonly ConcurrentDictionary<Player, object> _playersLocks = new();
+    private readonly ConcurrentDictionary<Player, List<string>> _playersGuis = new();
     private readonly LuaValueMapper _luaValueMapper;
 
     public AgnosticGuiSystemService(MtaServer server, LuaValueMapper luaValueMapper)
@@ -33,25 +35,24 @@ internal sealed class AgnosticGuiSystemService : IAgnosticGuiSystemService
         ActionExecuted?.Invoke(luaEvent);
     }
 
-    private bool EnsurePlayerGuisAreInitialized(Player player)
+    private void EnsurePlayerGuisAreInitialized(Player player)
     {
-        if (!_playersGuis.ContainsKey(player))
-        {
-            _playersGuis[player] = new();
-            return true;
-        }
-        return false;
+        _playersGuis.GetOrAdd(player, x => new());
+        _playersLocks.GetOrAdd(player, x => new());
     }
 
     public bool OpenGui(Player player, string gui, bool cursorless, LuaValue? arg1 = null)
     {
         EnsurePlayerGuisAreInitialized(player);
 
-        if (_playersGuis[player].Contains(gui))
-            return false;
+        lock(_playersLocks[player])
+        {
+            if (_playersGuis[player].Contains(gui))
+                return false;
 
-        _playersGuis[player].Add(gui);
-        player.TriggerLuaEvent("internalUiOpenGui", player, gui, cursorless, arg1 ?? new LuaValue());
+            _playersGuis[player].Add(gui);
+            player.TriggerLuaEvent("internalUiOpenGui", player, gui, cursorless, arg1 ?? new LuaValue());
+        }
         return true;
     }
 
@@ -59,11 +60,14 @@ internal sealed class AgnosticGuiSystemService : IAgnosticGuiSystemService
     {
         EnsurePlayerGuisAreInitialized(player);
 
-        if (!_playersGuis[player].Contains(gui))
-            return false;
+        lock (_playersLocks[player])
+        {
+            if (!_playersGuis[player].Contains(gui))
+                return false;
 
-        _playersGuis[player].Remove(gui);
-        player.TriggerLuaEvent("internalUiCloseGui", player, gui, cursorless);
+            _playersGuis[player].Remove(gui);
+            player.TriggerLuaEvent("internalUiCloseGui", player, gui, cursorless);
+        }
         return true;
     }
 
@@ -71,9 +75,12 @@ internal sealed class AgnosticGuiSystemService : IAgnosticGuiSystemService
     {
         EnsurePlayerGuisAreInitialized(player);
 
-        foreach (var gui in _playersGuis[player]) 
-            player.TriggerLuaEvent("internalUiCloseGui", player, gui, false);
-        _playersGuis[player].Clear();
+        lock (_playersLocks[player])
+        {
+            foreach (var gui in _playersGuis[player]) 
+                player.TriggerLuaEvent("internalUiCloseGui", player, gui, false);
+            _playersGuis[player].Clear();
+        }
     }
     
     public void SetDebugToolsEnabled(Player player, bool enabled)
@@ -104,11 +111,10 @@ internal sealed class AgnosticGuiSystemService : IAgnosticGuiSystemService
         {
             CloseAllGuis(player);
             _resource.StopFor(player);
+            await _resource.StartForAsync(player);
         }
 
         if (GuiFilesChanged != null)
             await GuiFilesChanged();
-
-        _playersGuis.Clear();
     }
 }

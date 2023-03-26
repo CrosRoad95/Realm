@@ -1,7 +1,7 @@
 ﻿local function createDashboardWindow(guiProvider, state)
 	local sampleLabel;
 
-	local window = guiProvider.window("Dashboard window", 0, 0, 600, 400);
+	local window = guiProvider.window("Dashboard windowasd", 0, 0, 600, 400);
 	guiProvider.centerWindow(window)
 	local tabPanel = guiProvider.tabPanel (0, 0, 600, 400, window ) 
 	do
@@ -29,6 +29,7 @@
 	end
 	return window, stateChanged
 end
+
 
 addEventHandler("onClientResourceStart", resourceRoot, function()
 	registerGui(createDashboardWindow, "dashboard")

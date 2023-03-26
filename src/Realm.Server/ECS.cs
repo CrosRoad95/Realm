@@ -44,7 +44,7 @@ internal sealed class ECS : IECS
         get
         {
             _entitiesLock.EnterWriteLock();
-            var entities = new List<Entity>(_entities.Where(x => x.Tag == EntityTag.Vehicle));
+            var entities = new List<Entity>(_entities.Where(x => x.Tag == EntityTag.Player));
             _entitiesLock.ExitWriteLock();
             return entities;
         }
