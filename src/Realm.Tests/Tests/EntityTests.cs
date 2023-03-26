@@ -101,7 +101,7 @@ public class EntityTests
     public async Task ComponentShouldNotBeAddedIfFailedToAsyncLoad()
     {
         #region Arrange & Act
-        var entity = new AsyncEntity(_serviceProvider, "foo", EntityTag.Unknown);
+        var entity = new Entity(_serviceProvider, "foo", EntityTag.Unknown);
         var component = new ThrowExceptionAsyncComponent();
 
         var action = async () => await entity.AddComponentAsync(component);
@@ -117,7 +117,7 @@ public class EntityTests
     public async Task ComponentShouldBeRemovedIfAsyncLoadThrowException()
     {
         #region Arrange & Act
-        var entity = new AsyncEntity(_serviceProvider, "foo", EntityTag.Unknown);
+        var entity = new Entity(_serviceProvider, "foo", EntityTag.Unknown);
         var component = new ThrowExceptionAsyncComponent();
 
         #endregion
@@ -143,7 +143,7 @@ public class EntityTests
     public void AsyncComponentCanNotBeAddedToNonAsyncEntity()
     {
         #region Arrange
-        var entity = new AsyncEntity(_serviceProvider, "foo", EntityTag.Unknown);
+        var entity = new Entity(_serviceProvider, "foo", EntityTag.Unknown);
         var component = new ThrowExceptionAsyncComponent();
 
         #endregion

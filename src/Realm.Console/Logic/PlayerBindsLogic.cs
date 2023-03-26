@@ -26,12 +26,12 @@ internal sealed class PlayerBindsLogic
             entity.ComponentAdded += HandleComponentAdded;
     }
 
-    private void OpenCloseGuiHelper<TGuiComponent>(AsyncEntity entity, string bind, GuiOpenOptions options = default) where TGuiComponent: GuiComponent, new()
+    private void OpenCloseGuiHelper<TGuiComponent>(Entity entity, string bind, GuiOpenOptions options = default) where TGuiComponent: GuiComponent, new()
     {
         OpenCloseGuiHelper(entity, bind, () => new TGuiComponent(), options);
     }
     
-    private void OpenCloseGuiHelper<TGuiComponent>(AsyncEntity entity, string bind, Func<TGuiComponent> factory, GuiOpenOptions options = default) where TGuiComponent: GuiComponent
+    private void OpenCloseGuiHelper<TGuiComponent>(Entity entity, string bind, Func<TGuiComponent> factory, GuiOpenOptions options = default) where TGuiComponent: GuiComponent
     {
         var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();
         playerElementComponent.SetBind(bind, async entity =>
@@ -45,12 +45,12 @@ internal sealed class PlayerBindsLogic
             if (entity.HasComponent<GuiComponent>())
                 entity.DestroyComponent<GuiComponent>();
 
-            var guiComponent = await entity.AddComponentAsync(factory());
+            var guiComponent = entity.AddComponent(factory());
             playerElementComponent.ResetCooldown(bind);
         });
     }
 
-    private void OpenCloseGuiHelper<TGuiComponent>(AsyncEntity entity, string bind, Func<Task<TGuiComponent>> factory, GuiOpenOptions options = default) where TGuiComponent: GuiComponent
+    private void OpenCloseGuiHelper<TGuiComponent>(Entity entity, string bind, Func<Task<TGuiComponent>> factory, GuiOpenOptions options = default) where TGuiComponent: GuiComponent
     {
         var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();
         playerElementComponent.SetBind(bind, async entity =>
@@ -63,7 +63,7 @@ internal sealed class PlayerBindsLogic
 
             entity.TryDestroyComponent<GuiComponent>();
 
-            var guiComponent = await entity.AddComponentAsync(await factory());
+            var guiComponent = entity.AddComponent(await factory());
             playerElementComponent.ResetCooldown(bind);
         });
     }
@@ -72,7 +72,7 @@ internal sealed class PlayerBindsLogic
     {
         if (component is AccountComponent accountComponent)
         {
-            var entity = component.Entity as AsyncEntity;
+            var entity = component.Entity;
             var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();
 
             playerElementComponent.SetBind("num_0", entity =>

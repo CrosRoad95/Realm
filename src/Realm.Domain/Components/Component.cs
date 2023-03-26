@@ -9,6 +9,9 @@ public abstract class Component : IDisposable
     public Entity Entity { get; internal set; } = default!;
 
     public event Action<Component>? Disposed;
+
+    public virtual bool IsAsync() => false;
+
     protected virtual void Load() { }
 
     internal void InternalLoad()

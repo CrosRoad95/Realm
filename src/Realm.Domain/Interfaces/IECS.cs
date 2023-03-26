@@ -7,7 +7,6 @@ public interface IECS
 
     event Action<Entity>? EntityCreated;
 
-    Task<AsyncEntity> CreateAsyncEntity(string name, EntityTag tag, Func<AsyncEntity, Task>? entityBuilder = null);
     Entity CreateEntity(string name, EntityTag tag, Action<Entity>? entityBuilder = null);
     Entity GetByElement(Element element);
     bool TryGetByElement(Element element, out Entity result);

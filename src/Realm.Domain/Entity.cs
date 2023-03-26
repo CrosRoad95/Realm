@@ -30,7 +30,6 @@ public class Entity : IDisposable
 
     internal Player Player => GetRequiredComponent<PlayerElementComponent>().Player;
     internal Element Element => GetRequiredComponent<ElementComponent>().Element;
-    public virtual bool IsAsyncEntity => false;
 
     public Entity(IServiceProvider serviceProvider, string name = "", EntityTag tag = EntityTag.Unknown)
     {
@@ -130,7 +129,38 @@ public class Entity : IDisposable
         OnComponentAdded(component);
         return component;
     }
-    
+
+
+    public Task<TComponent> AddComponentAsync<TComponent>() where TComponent : AsyncComponent, new()
+    {
+        return AddComponentAsync(new TComponent());
+    }
+
+    public async Task<TComponent> AddComponentAsync<TComponent>(TComponent component) where TComponent : AsyncComponent
+    {
+        ThrowIfDisposed();
+        if (component.Entity != null)
+        {
+            throw new Exception("Component already attached to other entity");
+        }
+        InjectProperties(component);
+        InternalAddComponent(component);
+
+        try
+        {
+            component.InternalLoad();
+            await component.InternalLoadAsync();
+        }
+        catch (Exception)
+        {
+            DestroyComponent(component);
+            throw;
+        }
+        OnComponentAdded(component);
+        return component;
+    }
+
+
     public TComponent? GetComponent<TComponent>() where TComponent : Component
     {
         ThrowIfDisposed();

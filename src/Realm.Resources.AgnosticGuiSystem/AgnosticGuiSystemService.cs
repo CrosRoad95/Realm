@@ -43,15 +43,9 @@ internal sealed class AgnosticGuiSystemService : IAgnosticGuiSystemService
         return false;
     }
 
-    private async ValueTask EnsureGuiResourceIsRunning(Player player)
+    public bool OpenGui(Player player, string gui, bool cursorless, LuaValue? arg1 = null)
     {
-        await _resource.StartForAsync(player);
-    }
-
-    public async ValueTask<bool> OpenGui(Player player, string gui, bool cursorless, LuaValue? arg1 = null)
-    {
-        if(EnsurePlayerGuisAreInitialized(player))
-            await EnsureGuiResourceIsRunning(player);
+        EnsurePlayerGuisAreInitialized(player);
 
         if (_playersGuis[player].Contains(gui))
             return false;
@@ -63,7 +57,7 @@ internal sealed class AgnosticGuiSystemService : IAgnosticGuiSystemService
 
     public bool CloseGui(Player player, string gui, bool cursorless)
     {
-        Debug.Assert(!EnsurePlayerGuisAreInitialized(player));
+        EnsurePlayerGuisAreInitialized(player);
 
         if (!_playersGuis[player].Contains(gui))
             return false;
@@ -75,7 +69,7 @@ internal sealed class AgnosticGuiSystemService : IAgnosticGuiSystemService
 
     public void CloseAllGuis(Player player)
     {
-        Debug.Assert(!EnsurePlayerGuisAreInitialized(player));
+        EnsurePlayerGuisAreInitialized(player);
 
         foreach (var gui in _playersGuis[player]) 
             player.TriggerLuaEvent("internalUiCloseGui", player, gui, false);
@@ -89,7 +83,7 @@ internal sealed class AgnosticGuiSystemService : IAgnosticGuiSystemService
     
     public void SendFormResponse(Player player, string id, string name, params object[] values)
     {
-        Debug.Assert(!EnsurePlayerGuisAreInitialized(player));
+        EnsurePlayerGuisAreInitialized(player);
 
         var luaValues = values.Select(_luaValueMapper.Map).ToArray();
         player.TriggerLuaEvent("internalSubmitFormResponse", player, id, name, luaValues);
@@ -97,7 +91,7 @@ internal sealed class AgnosticGuiSystemService : IAgnosticGuiSystemService
 
     public void SendStateChanged(Player player, string guiName, Dictionary<LuaValue, LuaValue> changes)
     {
-        Debug.Assert(!EnsurePlayerGuisAreInitialized(player));
+        EnsurePlayerGuisAreInitialized(player);
 
         player.TriggerLuaEvent("internalUiStateChanged", player, guiName, new LuaValue(changes));
     }

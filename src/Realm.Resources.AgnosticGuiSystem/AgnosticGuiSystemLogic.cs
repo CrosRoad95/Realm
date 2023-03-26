@@ -1,4 +1,5 @@
 ﻿using SlipeServer.Server;
+using SlipeServer.Server.Elements;
 using SlipeServer.Server.Events;
 using SlipeServer.Server.Services;
 
@@ -16,6 +17,7 @@ internal class AgnosticGuiSystemLogic
         _agnosticGuiSystemService = agnosticGuiSystemService;
 
         _resource = server.GetAdditionalResource<AgnosticGuiSystemResource>();
+        server.PlayerJoined += HandlePlayerJoin;
     }
 
     public void HandleInternalSubmitForm(LuaEvent luaEvent)
@@ -26,5 +28,10 @@ internal class AgnosticGuiSystemLogic
     public void HandleInternalActionExecuted(LuaEvent luaEvent)
     {
         _agnosticGuiSystemService.HandleInternalActionExecuted(luaEvent);
+    }
+
+    private void HandlePlayerJoin(Player player)
+    {
+        _resource.StartFor(player);
     }
 }

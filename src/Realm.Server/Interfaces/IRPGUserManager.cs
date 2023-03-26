@@ -7,7 +7,7 @@ public interface IRPGUserManager
     Task<User?> GetUserByLogin(string login);
     Task<bool> IsSerialWhitelisted(int userId, string serial);
     Task<bool> IsUserNameInUse(string userName);
-    Task<bool> SignIn(AsyncEntity entity, User user);
+    Task<bool> SignIn(Entity entity, User user);
     Task<int> SignUp(string username, string password);
     Task<bool> TryAddWhitelistedSerial(int userId, string serial);
     Task<bool> TryRemoveWhitelistedSerial(int userId, string serial);

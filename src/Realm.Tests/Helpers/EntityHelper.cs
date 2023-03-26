@@ -14,9 +14,9 @@ public class EntityHelper
         _serviceProvider = _testingServer.GetRequiredService<IServiceProvider>();
     }
 
-    public AsyncEntity CreatePlayerEntity()
+    public Entity CreatePlayerEntity()
     {
-        var entity = new AsyncEntity(_serviceProvider, Guid.NewGuid().ToString()[..8], EntityTag.Player);
+        var entity = new Entity(_serviceProvider, Guid.NewGuid().ToString()[..8], EntityTag.Player);
         entity.AddComponent(new PlayerElementComponent(_testingServer.AddFakePlayer(), new System.Numerics.Vector2(1920, 1080), new System.Globalization.CultureInfo("pl-PL")));
         return entity;
     }

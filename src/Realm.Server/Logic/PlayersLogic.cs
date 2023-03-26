@@ -80,10 +80,9 @@ internal class PlayersLogic
             var screenSize = await taskWaitForScreenSize.Task;
             var cultureInfo = await taskWaitForCultureInfo.Task;
 
-            await _ecs.CreateAsyncEntity("Player " + player.Name, EntityTag.Player, entity =>
+            _ecs.CreateEntity("Player " + player.Name, EntityTag.Player, entity =>
             {
                 entity.AddComponent(new PlayerElementComponent(player, new Vector2(screenSize.Item1, screenSize.Item2), cultureInfo));
-                return Task.CompletedTask;
             });
         }
         catch(Exception ex)

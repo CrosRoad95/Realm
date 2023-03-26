@@ -41,10 +41,9 @@ public sealed class LoginGuiComponent : GuiComponent
                     return;
                 }
 
-                var asyncEntity = Entity as AsyncEntity;
-                if (await RPGUserManager.SignIn(asyncEntity, user))
+                if (await RPGUserManager.SignIn(Entity, user))
                 {
-                    asyncEntity.DestroyComponent(this);
+                    Entity.DestroyComponent(this);
                     formContext.SuccessResponse();
                     return;
                 }

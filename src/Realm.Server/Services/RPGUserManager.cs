@@ -54,7 +54,7 @@ internal class RPGUserManager : IRPGUserManager
         throw new Exception("Failed to create a user account");
     }
 
-    public async Task<bool> SignIn(AsyncEntity entity, User user)
+    public async Task<bool> SignIn(Entity entity, User user)
     {
         if (entity == null)
             throw new NullReferenceException(nameof(entity));

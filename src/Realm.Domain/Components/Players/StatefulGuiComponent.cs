@@ -20,11 +20,11 @@ public abstract class StatefulGuiComponent<TState> : GuiComponent
 
     protected virtual void PreGuiOpen(TState state) { }
 
-    protected override async Task OpenGui()
+    protected override void OpenGui()
     {
         PreGuiOpen(_state);
         var playerElementComponent = Entity.GetRequiredComponent<PlayerElementComponent>();
-        await AgnosticGuiSystemService.OpenGui(playerElementComponent.Player, _name, _cursorless, LuaValueMapper.UniversalMap(_state));
+        AgnosticGuiSystemService.OpenGui(playerElementComponent.Player, _name, _cursorless, LuaValueMapper.UniversalMap(_state));
     }
 
     private void FlushChanged()

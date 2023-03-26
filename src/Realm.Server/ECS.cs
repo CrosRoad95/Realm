@@ -106,20 +106,6 @@ internal sealed class ECS : IECS
         EntityCreated?.Invoke(newlyCreatedEntity);
         return newlyCreatedEntity;
     }
-    
-    public async Task<AsyncEntity> CreateAsyncEntity(string name, EntityTag tag, Func<AsyncEntity, Task>? entityBuilder = null)
-    {
-        if (_entityById.ContainsKey(name))
-            throw new EntityAlreadyExistsException(name);
-
-        var newlyCreatedEntity = new AsyncEntity(_serviceProvider, name, tag);
-
-        InternalEntityCreated(newlyCreatedEntity);
-        if (entityBuilder != null)
-            await entityBuilder.Invoke(newlyCreatedEntity);
-        EntityCreated?.Invoke(newlyCreatedEntity);
-        return newlyCreatedEntity;
-    }
 
     private void HandleEntityDestroyed(Entity entity)
     {

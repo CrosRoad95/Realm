@@ -15,7 +15,7 @@ public interface IAgnosticGuiSystemService
 
     void CloseAllGuis(Player player);
     bool CloseGui(Player player, string gui, bool cursorless);
-    ValueTask<bool> OpenGui(Player player, string gui, bool cursorless, LuaValue? arg1 = null);
+    bool OpenGui(Player player, string gui, bool cursorless, LuaValue? arg1 = null);
     void SendFormResponse(Player player, string id, string name, params object[] values);
     void SendStateChanged(Player player, string guiName, Dictionary<LuaValue, LuaValue> changes);
     void SetDebugToolsEnabled(Player player, bool enabled);
