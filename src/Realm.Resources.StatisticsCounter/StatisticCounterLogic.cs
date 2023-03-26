@@ -1,8 +1,10 @@
 ﻿using Microsoft.Extensions.Logging;
+using Realm.Resources.Base;
 using SlipeServer.Server;
 using SlipeServer.Server.Elements;
 using SlipeServer.Server.Elements.Events;
 using SlipeServer.Server.Events;
+using SlipeServer.Server.Mappers;
 using SlipeServer.Server.Services;
 
 namespace Realm.Resources.StatisticsCounter;
@@ -13,14 +15,16 @@ internal class StatisticCounterLogic
     private readonly StatisticsCounterResource _resource;
     private readonly IStatisticsCounterService _statisticsCounterService;
     private readonly ILogger<StatisticCounterLogic> _logger;
+    private readonly FromLuaValueMapper _fromLuaValueMapper;
     private readonly HashSet<Player> _players = new();
 
     public StatisticCounterLogic(MtaServer server, LuaEventService luaEventService,
-        IStatisticsCounterService statisticsCounterResource, ILogger<StatisticCounterLogic> logger)
+        IStatisticsCounterService statisticsCounterResource, ILogger<StatisticCounterLogic> logger, FromLuaValueMapper fromLuaValueMapper)
     {
         _luaEventService = luaEventService;
         _statisticsCounterService = statisticsCounterResource;
         _logger = logger;
+        _fromLuaValueMapper = fromLuaValueMapper;
         server.PlayerJoined += HandlePlayerJoin;
 
         _resource = server.GetAdditionalResource<StatisticsCounterResource>();
@@ -77,9 +81,8 @@ internal class StatisticCounterLogic
     {
         try
         {
-            var minFps = luaEvent.Parameters[0].FloatValue ?? throw new Exception("Failed to read minimal fps");
-            var maxFps = luaEvent.Parameters[1].FloatValue ?? throw new Exception("Failed to read maximum fps");
-            var avgFps = luaEvent.Parameters[2].FloatValue ?? throw new Exception("Failed to read average fps");
+            var (minFps, maxFps, avgFps) = luaEvent.Read<float, float, float>(_fromLuaValueMapper);
+
             if(minFps < 0 || maxFps < 0 || avgFps < 0 || minFps > 1000 || maxFps > 1000 || avgFps > 1000)
             {
                 throw new ArgumentOutOfRangeException($"Failed to read fps, min: {minFps}, max: {maxFps}, avg: {avgFps}");

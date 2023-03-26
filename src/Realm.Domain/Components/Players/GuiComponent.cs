@@ -1,4 +1,5 @@
 ﻿using Realm.Domain.Contexts;
+using Realm.Resources.Base;
 
 namespace Realm.Domain.Components.Players;
 
@@ -10,6 +11,8 @@ public abstract class GuiComponent : Component
     private ILogger<GuiComponent> Logger { get; set; } = default!;
     [Inject]
     private IECS ECS { get; set; } = default!;
+    [Inject]
+    private FromLuaValueMapper FromLuaValueMapper { get; set; } = default!;
 
     protected readonly string _name;
     protected readonly bool _cursorless;
@@ -34,37 +37,47 @@ public abstract class GuiComponent : Component
 
     private async void HandleActionExecuted(LuaEvent luaEvent)
     {
-        //string id = luaEvent.Parameters[0].StringValue ?? throw new InvalidOperationException();
-        string guiName = luaEvent.Parameters[1].StringValue ?? throw new InvalidOperationException();
-        if (guiName == _name)
+        try
         {
-            string actionName = luaEvent.Parameters[2].StringValue ?? throw new InvalidOperationException();
-            try
+            var (id, guiName, actionName) = luaEvent.Read<string, string, string>(FromLuaValueMapper);
+            if (guiName == _name)
             {
-                await HandleAction(new ActionContext(actionName, luaEvent.Parameters[3]));
+                try
+                {
+                    await HandleAction(new ActionContext(actionName, luaEvent.Parameters[3]));
+                }
+                catch(Exception ex)
+                {
+                    Logger.LogError(ex, "Failed to execute action {actionName}.", actionName);
+                }
             }
-            catch(Exception ex)
-            {
-                Logger.LogError(ex, "Failed to execute action {actionName}.", actionName);
-            }
+        }
+        catch(Exception ex)
+        {
+            Logger.LogError(ex, "Failed to read luaEvent parameters");
         }
     }
 
     private async void HandleFormSubmitted(LuaEvent luaEvent)
     {
-        //string id = luaEvent.Parameters[0].StringValue ?? throw new InvalidOperationException();
-        string guiName = luaEvent.Parameters[1].StringValue ?? throw new InvalidOperationException();
-        if(guiName == _name)
+        try
         {
-            string formName = luaEvent.Parameters[2].StringValue ?? throw new InvalidOperationException();
-            try
+            var (id, guiName, formName, data) = luaEvent.Read<string, string, string, LuaValue> (FromLuaValueMapper);
+            if(guiName == _name)
             {
-                await HandleForm(new FormContext(luaEvent.Player, formName, luaEvent.Parameters[3], AgnosticGuiSystemService, ECS));
+                try
+                {
+                    await HandleForm(new FormContext(luaEvent.Player, formName, data, AgnosticGuiSystemService, ECS));
+                }
+                catch(Exception ex)
+                {
+                    Logger.LogError(ex, "Failed to handle form {formName}.", formName);
+                }
             }
-            catch(Exception ex)
-            {
-                Logger.LogError(ex, "Failed to handle form {formName}.", formName);
-            }
+        }
+        catch(Exception ex)
+        {
+            Logger.LogError(ex, "Failed to read luaEvent parameters");
         }
     }
 

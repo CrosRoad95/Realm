@@ -85,7 +85,7 @@ internal class NametagsLogic
         }
         catch(Exception ex)
         {
-            _logger.LogError(ex, "Failed to start nametags resource for player {playerName}", player.Name);
+            _logger.LogError(ex, "Failed to start nametags resource for player: {playerName}, serial: {playerSerial}", player.Name, player.Client.Serial);
         }
     }
 

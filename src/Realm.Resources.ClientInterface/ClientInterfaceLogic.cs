@@ -76,9 +76,16 @@ internal class ClientInterfaceLogic
 
     private async void HandlePlayerJoin(Player player)
     {
-        await _resource.StartForAsync(player);
-        if(_focusableElements.Any())
-            _luaEventHub.Invoke(player, x => x.AddFocusables(_focusableElements));
+        try
+        {
+            await _resource.StartForAsync(player);
+            if (_focusableElements.Any())
+                _luaEventHub.Invoke(player, x => x.AddFocusables(_focusableElements));
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to start ClientInterface resource for player: {playerName}, serial: {playerSerial}", player.Name, player.Client.Serial);
+        }
     }
 
     private void HandlePlayerFocusableRenderingEnabled(Player player, bool enabled)
@@ -88,7 +95,8 @@ internal class ClientInterfaceLogic
 
     private void HandleLocalizationCode(LuaEvent luaEvent)
     {
-        var code = luaEvent.Parameters[1].StringValue;
+        var (id, code) = luaEvent.Read<string, string>(_fromLuaValueMapper);
+
         if(code != null)
         {
             _clientInterfaceService.BroadcastPlayerLocalizationCode(luaEvent.Player, code);
@@ -101,11 +109,10 @@ internal class ClientInterfaceLogic
     
     private void HandleScreenSize(LuaEvent luaEvent)
     {
-        var x = luaEvent.Parameters[1].IntegerValue;
-        var y = luaEvent.Parameters[2].IntegerValue;
-        if(x != null && y != null)
+        var (id, x, y) = luaEvent.Read<string, int, int>(_fromLuaValueMapper);
+        if(x != 0 && y != 0)
         {
-            _clientInterfaceService.BroadcastPlayerScreenSize(luaEvent.Player, x.Value, y.Value);
+            _clientInterfaceService.BroadcastPlayerScreenSize(luaEvent.Player, x, y);
         }
         else
         {
@@ -115,17 +122,14 @@ internal class ClientInterfaceLogic
 
     private void HandleInternalDebugMessage(LuaEvent luaEvent)
     {
-        var message = _fromLuaValueMapper.Map(typeof(string), luaEvent.Parameters[1]) as string;
-        var level = (int)_fromLuaValueMapper.Map(typeof(int), luaEvent.Parameters[2]);
-        var file = _fromLuaValueMapper.Map(typeof(string), luaEvent.Parameters[3]) as string;
-        var line = (int)_fromLuaValueMapper.Map(typeof(int), luaEvent.Parameters[4]);
+        var (id, message, level, file, line) = luaEvent.Read<string, string, int, string, int>(_fromLuaValueMapper);
         _clientInterfaceService.BroadcastClientErrorMessage(luaEvent.Player, message, level, file, line);    
     }
 
     private void HandleFocusedElementChanged(LuaEvent luaEvent)
     {
-        var focusedElement = _fromLuaValueMapper.Map(typeof(Element), luaEvent.Parameters[1]) as Element;
-        var childElement = _fromLuaValueMapper.Map(typeof(string), luaEvent.Parameters[2]) as string;
+        var (id, focusedElement, childElement) = luaEvent.Read<string, Element, string>(_fromLuaValueMapper);
+
         _clientInterfaceService.BroadcastPlayerElementFocusChanged(luaEvent.Player, focusedElement, childElement);
     }
 }
