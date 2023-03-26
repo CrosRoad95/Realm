@@ -23,7 +23,8 @@ public sealed class PlayerElementComponent : PedElementComponent
     private readonly Player _player;
     private readonly Vector2 _screenSize;
     private readonly CultureInfo _culture;
-    private readonly Dictionary<string, Func<Entity, KeyState, Task>> _binds = new();
+    private readonly Dictionary<string, Func<Entity, KeyState, Task>> _asyncBinds = new();
+    private readonly Dictionary<string, Action<Entity, KeyState>> _binds = new();
     private readonly SemaphoreSlim _bindsLock = new(1);
     private readonly SemaphoreSlim _bindsUpLock = new(1);
     private readonly SemaphoreSlim _bindsDownLock = new(1);
@@ -210,12 +211,47 @@ public sealed class PlayerElementComponent : PedElementComponent
     }
     #endregion
 
-    public void SetBind(string key, Func<Entity, KeyState, Task> callback)
+    public void SetBindAsync(string key, Func<Entity, KeyState, Task> callback)
     {
         ThrowIfDisposed();
 
         _bindsLock.Wait();
-        if (_binds.ContainsKey(key))
+        if (_asyncBinds.ContainsKey(key))
+        {
+            _bindsLock.Release();
+            throw new BindAlreadyExistsException(key);
+        }
+
+        _player.SetBind(key, KeyState.Both);
+        _asyncBinds[key] = callback;
+        _bindsLock.Release();
+    }
+    
+    public void SetBindAsync(string key, Func<Entity, Task> callback)
+    {
+        ThrowIfDisposed();
+        _bindsLock.Wait();
+        if (_asyncBinds.ContainsKey(key))
+        {
+            _bindsLock.Release();
+            throw new BindAlreadyExistsException(key);
+        }
+
+        _player.SetBind(key, KeyState.Down);
+        _asyncBinds[key] = async (entity, keyState) =>
+        {
+            if(keyState == KeyState.Down)
+                    await callback(entity);
+        };
+        _bindsLock.Release();
+    }
+
+    public void SetBind(string key, Action<Entity, KeyState> callback)
+    {
+        ThrowIfDisposed();
+
+        _bindsLock.Wait();
+        if (_asyncBinds.ContainsKey(key))
         {
             _bindsLock.Release();
             throw new BindAlreadyExistsException(key);
@@ -224,10 +260,9 @@ public sealed class PlayerElementComponent : PedElementComponent
         _player.SetBind(key, KeyState.Both);
         _binds[key] = callback;
         _bindsLock.Release();
-
     }
-    
-    public void SetBind(string key, Func<Entity, Task> callback)
+
+    public void SetBind(string key, Action<Entity> callback)
     {
         ThrowIfDisposed();
         _bindsLock.Wait();
@@ -241,8 +276,7 @@ public sealed class PlayerElementComponent : PedElementComponent
         _binds[key] = (entity, keyState) =>
         {
             if(keyState == KeyState.Down)
-                 return callback(entity);
-            return Task.CompletedTask;
+                 callback(entity);
         };
         _bindsLock.Release();
     }
@@ -251,13 +285,16 @@ public sealed class PlayerElementComponent : PedElementComponent
     {
         ThrowIfDisposed();
         _bindsLock.Wait();
-        if (!_binds.ContainsKey(key))
+        if (!_asyncBinds.ContainsKey(key) || !_binds.ContainsKey(key))
         {
             _bindsLock.Release();
             throw new BindDoesntExistsException(key);
         }
         _player.RemoveBind(key, KeyState.Both);
-        _binds.Remove(key);
+        if (_asyncBinds.ContainsKey(key))
+            _asyncBinds.Remove(key);
+        if (_binds.ContainsKey(key))
+            _binds.Remove(key);
         _bindsLock.Release();
     }
 
@@ -362,15 +399,33 @@ public sealed class PlayerElementComponent : PedElementComponent
         // Lock bind indefinitly in case of bind takes a long time to execute, reset cooldown to unlock
         SetCooldown(key, keyState, DateTime.MaxValue);
 
+
         if (_binds.TryGetValue(key, out var bindCallback))
         {
             try
             {
-                await bindCallback(Entity, keyState);
+                bindCallback(Entity, keyState);
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError(ex, "Failed to execute bind {key} and state {keyState}.", key, keyState);
+                throw;
+            }
+            finally
+            {
+                TrySetCooldown(key, keyState, DateTimeProvider.Now.AddMilliseconds(400));
+            }
+        }
+
+        if (_asyncBinds.TryGetValue(key, out var asyncBindCallback))
+        {
+            try
+            {
+                await asyncBindCallback(Entity, keyState);
             }
             catch(Exception ex)
             {
-                Logger.LogError(ex, "Failed to execute bind {key} and state {keyState}.", key, keyState);
+                Logger.LogError(ex, "Failed to execute async bind {key} and state {keyState}.", key, keyState);
                 throw;
             }
             finally

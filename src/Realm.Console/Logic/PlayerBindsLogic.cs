@@ -34,7 +34,7 @@ internal sealed class PlayerBindsLogic
     private void OpenCloseGuiHelper<TGuiComponent>(Entity entity, string bind, Func<TGuiComponent> factory, GuiOpenOptions options = default) where TGuiComponent: GuiComponent
     {
         var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();
-        playerElementComponent.SetBind(bind, async entity =>
+        playerElementComponent.SetBindAsync(bind, async entity =>
         {
             if (entity.HasComponent<TGuiComponent>())
             {
@@ -53,7 +53,7 @@ internal sealed class PlayerBindsLogic
     private void OpenCloseGuiHelper<TGuiComponent>(Entity entity, string bind, Func<Task<TGuiComponent>> factory, GuiOpenOptions options = default) where TGuiComponent: GuiComponent
     {
         var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();
-        playerElementComponent.SetBind(bind, async entity =>
+        playerElementComponent.SetBindAsync(bind, async entity =>
         {
             if (entity.HasComponent<TGuiComponent>())
             {
@@ -75,7 +75,7 @@ internal sealed class PlayerBindsLogic
             var entity = component.Entity;
             var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();
 
-            playerElementComponent.SetBind("num_0", entity =>
+            playerElementComponent.SetBindAsync("num_0", entity =>
             {
                 if(entity.TryGetComponent(out AdminComponent adminComponent))
                 {

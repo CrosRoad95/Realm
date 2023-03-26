@@ -16,7 +16,7 @@ public class PlayerElementComponentTests
     }
 
     [Fact]
-    public async Task TestBindsCooldown()
+    public async Task TestAsyncBindsCooldown()
     {
         #region Arrange
         int executionCount = 0;
@@ -25,7 +25,6 @@ public class PlayerElementComponentTests
         playerElementComponent.SetBind("x", (entity, keyState) =>
         {
             executionCount++;
-            return Task.CompletedTask;
         });
         #endregion
 
@@ -41,12 +40,12 @@ public class PlayerElementComponentTests
     }
 
     [Fact]
-    public async Task TestBindsThrowingException()
+    public async Task TestAsyncBindsThrowingException()
     {
         #region Arrange
         var playerEntity = _entityHelper.CreatePlayerEntity();
         var playerElementComponent = playerEntity.GetRequiredComponent<PlayerElementComponent>();
-        playerElementComponent.SetBind("x", (entity, keyState) =>
+        playerElementComponent.SetBindAsync("x", (entity, keyState) =>
         {
             throw new Exception("test123");
         });

@@ -35,7 +35,7 @@ internal sealed class PlayerGameplayLogic
         {
             var playerElementComponent = component.Entity.GetRequiredComponent<PlayerElementComponent>();
             playerElementComponent.FocusedEntityChanged += HandleFocusedEntityChanged;
-            playerElementComponent.SetBind("x", HandleInteract);
+            playerElementComponent.SetBindAsync("x", HandleInteract);
         }
     }
 
