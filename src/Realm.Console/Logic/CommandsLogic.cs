@@ -34,7 +34,7 @@ internal sealed class CommandsLogic
     private readonly IDateTimeProvider _dateTimeProvider;
     private readonly INametagsService _nametagsService;
     private readonly IVehiclesService _vehiclesService;
-    private readonly ILuaEventHub<IClientInterfaceTestHub> _luaEventHub;
+    private readonly ILuaEventHub<IClientInterfaceEventHub> _luaEventHub;
 
     private class TestState
     {
@@ -44,7 +44,7 @@ internal sealed class CommandsLogic
     public CommandsLogic(RPGCommandService commandService, IEntityFactory entityFactory, RepositoryFactory repositoryFactory,
         ItemsRegistry itemsRegistry, IECS ecs, IBanService banService, IDiscordService discordService, ChatBox chatBox, ILogger<CommandsLogic> logger,
         IDateTimeProvider dateTimeProvider, INametagsService nametagsService, IRPGUserManager rpgUserManager, IVehiclesService vehiclesService,
-        ILuaEventHub<IClientInterfaceTestHub> luaEventHub)
+        ILuaEventHub<IClientInterfaceEventHub> luaEventHub)
     {
         _commandService = commandService;
         _entityFactory = entityFactory;
@@ -711,13 +711,6 @@ internal sealed class CommandsLogic
                 playerElementComponent.SendChatMessage("Error while spawning");
         });
         
-        _commandService.AddCommandHandler("eventhub", (entity, args) =>
-        {
-            var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();
-            playerElementComponent.SendChatMessage("eventhub");
-            luaEventHub.Invoke(entity, x => x.TestHub(1, 2, "asd"));
-        });
-
         _discordService.AddTextBasedCommandHandler(1069962155539042314, "test", (userId, parameters) =>
         {
             _chatBox.Output($"Użytkownik o id {userId} wpisał komendę 'test' z parametrami: {parameters}");

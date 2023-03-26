@@ -10,7 +10,6 @@ local function setFocusedElement(newElement, newChildElement)
 	end
 	focusedElement = newElement;
 	focusedChildElement = newChildElement;
-	iprint("focusedElement, newChildElement",focusedElement, newChildElement)
 	triggerServerEventWithId("internalChangeFocusedElement", focusedElement, newChildElement)
 end
 
@@ -110,37 +109,46 @@ local function updateFocusedElement()
 end
 
 local function internalAddFocusable(element)
-	focusableElements[element] = true;
-	focusableElementsCount = focusableElementsCount + 1
-	if(focusableElementsCount == 1)then
-		addEventHandler("onClientPreRender", root, updateFocusedElement)
+	if(not focusableElements[element])then
+		focusableElements[element] = true;
+		focusableElementsCount = focusableElementsCount + 1
+		if(focusableElementsCount == 1)then
+			addEventHandler("onClientPreRender", root, updateFocusedElement)
+		end
 	end
 end
 
-addEvent("internalAddFocusable", true)
-addEventHandler("internalAddFocusable", root, function()
-	iprint("internalAddFocusable",source)
-	internalAddFocusable(source)
-end)
-
-addEvent("internalRemoveFocusable", true)
-addEventHandler("internalRemoveFocusable", root, function()
-	focusableElements[source] = nil;
-	focusableElementsCount = focusableElementsCount + 1
-	if(focusableElementsCount == 0)then
-		removeEventHandler("onClientPreRender", root, updateFocusedElement)
+local function internalRemoveFocusable(element)
+	if(focusableElements[element])then
+		focusableElements[element] = nil;
+		focusableElementsCount = focusableElementsCount - 1
+		if(focusableElementsCount == 0)then
+			removeEventHandler("onClientPreRender", root, updateFocusedElement)
+		end
 	end
-end)
+end
 
-addEvent("internalAddFocusables", true)
-addEventHandler("internalAddFocusables", localPlayer, function(elements)
-	iprint("internalAddFocusables",internalAddFocusables)
-	for i,v in ipairs(elements)do
+local function handleAddFocusable()
+	internalAddFocusable(source)
+end
+
+local function handleRemoveFocusable()
+	internalRemoveFocusable(source)
+end
+
+local function handleAddFocusables(focusables)
+	for i,v in ipairs(focusables)do
 		internalAddFocusable(v)
 	end
-end)
+end
 
-addEvent("internalSetFocusableRenderingEnabled", true)
-addEventHandler("internalSetFocusableRenderingEnabled", localPlayer, function(enabled)
+local function handleAetFocusableRenderingEnabled(enabled)
 	debugRenderEnabled = enabled;
+end
+
+addEventHandler("onClientResourceStart", resourceRoot, function()
+	hubBind("AddFocusable", handleAddFocusable)
+	hubBind("RemoveFocusable", handleRemoveFocusable)
+	hubBind("AddFocusables", handleAddFocusables)
+	hubBind("SetFocusableRenderingEnabled", handleAetFocusableRenderingEnabled)
 end)

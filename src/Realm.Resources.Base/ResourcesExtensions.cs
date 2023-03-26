@@ -9,8 +9,10 @@ public static class ResourcesExtensions
     private static string _hubBaseScript = """
 local hub = {};
 function hubBind(name, func)
-    hub[name] = func
-    iprint("hubBind", name, func);
+    if(type(name) ~= "string" or type(func) ~= "function")then
+        error("Failed to bind");
+    end
+    hub[name] = func;
 end
 """;
     public static void AddLuaEventHub<T>(this Resource resource)
@@ -32,20 +34,37 @@ end
 
     private static void AddMethod(ref StringBuilder sb, string baseName, MethodInfo methodInfo)
     {
+        var hasParameters = methodInfo.GetParameters().Any();
         var parameters = string.Join(", ", methodInfo.GetParameters().Select(p => p.Name));
+        var call = hasParameters ? $"local success, result = pcall(callback, {parameters});" : "local success, result = pcall(callback);";
         var code = $"""
-addEvent("internalHub{baseName}{methodInfo.Name}", true)
+addEvent("internalHub{baseName}{methodInfo.Name}", true);
 addEventHandler("internalHub{baseName}{methodInfo.Name}", localPlayer, function({parameters})
+    --iprint({parameters})
     local callbackName = "{methodInfo.Name}";
     local callback = hub[callbackName];
     if(type(callback) ~= "function")then
-        error("Failed to invoke hub method: '{methodInfo.Name}' because no function is bound")
+        error("Failed to invoke hub method: '"..callbackName.."' because no function is bound");
     end
-    local success, result = pcall(callback, {parameters})
+    {call}
     if(not success)then
-        error("Failed to invoke hub method: '{methodInfo.Name}' because: "..tostring(result))
+        error("Failed to invoke hub method: '"..callbackName.."' because: "..tostring(result));
     end
 end)
+
+addEvent("internalHubBroadcast{baseName}{methodInfo.Name}", true);
+addEventHandler("internalHubBroadcast{baseName}{methodInfo.Name}", root, function({parameters})
+    local callbackName = "{methodInfo.Name}";
+    local callback = hub[callbackName];
+    if(type(callback) ~= "function")then
+        error("Failed to invoke hub method: '"..callbackName.."' because no function is bound");
+    end
+    {call}
+    if(not success)then
+        error("Failed to invoke hub method: '"..callbackName.."' because: "..tostring(result));
+    end
+end)
+
 """;
         sb.AppendLine(code);
     }

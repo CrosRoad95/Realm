@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
+using Realm.Resources.Base;
 using SlipeServer.Server;
 using SlipeServer.Server.Elements;
 using SlipeServer.Server.Events;
@@ -13,17 +14,19 @@ internal class ClientInterfaceLogic
     private readonly FromLuaValueMapper _fromLuaValueMapper;
     private readonly IClientInterfaceService _clientInterfaceService;
     private readonly ILogger<ClientInterfaceLogic> _logger;
+    private readonly ILuaEventHub<IClientInterfaceEventHub> _luaEventHub;
     private readonly ClientInterfaceResource _resource;
     private readonly List<Element> _focusableElements = new();
     private readonly object _focusableElementsLock = new();
 
     public ClientInterfaceLogic(MtaServer server, LuaEventService luaEventService, FromLuaValueMapper fromLuaValueMapper,
-        IClientInterfaceService clientInterfaceService, ILogger<ClientInterfaceLogic> logger)
+        IClientInterfaceService clientInterfaceService, ILogger<ClientInterfaceLogic> logger, ILuaEventHub<IClientInterfaceEventHub> luaEventHub)
     {
         _luaEventService = luaEventService;
         _fromLuaValueMapper = fromLuaValueMapper;
         _clientInterfaceService = clientInterfaceService;
         _logger = logger;
+        _luaEventHub = luaEventHub;
         server.PlayerJoined += HandlePlayerJoin;
 
         _resource = server.GetAdditionalResource<ClientInterfaceResource>();
@@ -48,7 +51,7 @@ internal class ClientInterfaceLogic
             }
 
         if (added)
-            _luaEventService.TriggerEvent("internalAddFocusable", element);
+            _luaEventHub.Broadcast(x => x.AddFocusable(), element);
     }
 
     private void HandleDestroyed(Element element)
@@ -68,19 +71,19 @@ internal class ClientInterfaceLogic
             }
 
         if (removed)
-            _luaEventService.TriggerEvent("internalRemoveFocusable", element);
+            _luaEventHub.Broadcast(x => x.AddFocusable(), element);
     }
 
     private async void HandlePlayerJoin(Player player)
     {
         await _resource.StartForAsync(player);
         if(_focusableElements.Any())
-            _luaEventService.TriggerEvent("internalAddFocusables", player, _focusableElements);
+            _luaEventHub.Invoke(player, x => x.AddFocusables(_focusableElements));
     }
 
     private void HandlePlayerFocusableRenderingEnabled(Player player, bool enabled)
     {
-        _luaEventService.TriggerEvent("internalSetFocusableRenderingEnabled", player, enabled);
+        _luaEventHub.Invoke(player, x => x.SetFocusableRenderingEnabled(enabled));
     }
 
     private void HandleLocalizationCode(LuaEvent luaEvent)

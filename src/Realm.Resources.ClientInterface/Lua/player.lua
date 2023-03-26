@@ -17,11 +17,3 @@ addEvent("internalSetDevelopmentModeEnabled", true)
 addEventHandler("internalSetDevelopmentModeEnabled", localPlayer, function(enabled)
 	setDevelopmentMode(enabled)
 end)
-
-local function testHub(...)
-	iprint("testhub callback", ...)
-end
-
-addEventHandler("onClientResourceStart", resourceRoot, function()
-	hubBind("TestHub", testHub)
-end)

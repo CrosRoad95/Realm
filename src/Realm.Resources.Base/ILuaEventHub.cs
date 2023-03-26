@@ -5,5 +5,6 @@ namespace Realm.Resources.Base;
 
 public interface ILuaEventHub<THub>
 {
+    void Broadcast(Expression<Action<THub>> expression, Element? source = null);
     void Invoke(Player player, Expression<Action<THub>> expression);
 }
