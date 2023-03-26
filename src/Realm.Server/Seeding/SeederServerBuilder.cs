@@ -174,7 +174,7 @@ internal sealed class SeederServerBuilder
                 .Concat(new List<Claim>
                 {
                     new("seeded", "true"),
-                    new("persistant", "true"),
+                    new("persistent", "true"),
                 });
 
             await _userManager.RemoveClaimsAsync(user, await _userManager.GetClaimsAsync(user));

@@ -6,8 +6,6 @@ public class RealmTestingPlayer : TestingPlayer
 
     public new string Id => Name;
 
-    public bool IsPersistant => true;
-
     private readonly CancellationTokenSource _cancellationTokenSource;
 
     public RealmTestingPlayer()
