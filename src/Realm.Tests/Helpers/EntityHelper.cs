@@ -1,9 +1,10 @@
 ﻿using Realm.Domain.Components.Elements;
 using Realm.Domain.Enums;
+using System.Numerics;
 
 namespace Realm.Tests.Helpers;
 
-public class EntityHelper
+internal class EntityHelper
 {
     private readonly IServiceProvider _serviceProvider;
     private readonly TestingServer _testingServer;
@@ -18,6 +19,13 @@ public class EntityHelper
     {
         var entity = new Entity(_serviceProvider, Guid.NewGuid().ToString()[..8], EntityTag.Player);
         entity.AddComponent(new PlayerElementComponent(_testingServer.AddFakePlayer(), new System.Numerics.Vector2(1920, 1080), new System.Globalization.CultureInfo("pl-PL")));
+        return entity;
+    }
+
+    public Entity CreateObjectEntity()
+    {
+        var entity = new Entity(_serviceProvider, Guid.NewGuid().ToString()[..8], EntityTag.Player);
+        entity.AddComponent(new WorldObjectComponent(new SlipeServer.Server.Elements.WorldObject(SlipeServer.Server.Enums.ObjectModel.Vegtree3, Vector3.Zero)));
         return entity;
     }
 }

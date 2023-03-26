@@ -12,7 +12,7 @@ public class AttachedEntityComponent : Component
     [Inject]
     private BoneAttachService BoneAttachService { get; set; } = default!;
 
-    public Entity AttachedEntity { get; }
+    public Entity? AttachedEntity { get; private set; }
     public Vector3 Offset { get; }
 
     public AttachedEntityComponent(Entity entity, BoneId boneId, Vector3? positionOffset = null, Vector3? rotationOffset = null)
@@ -25,8 +25,7 @@ public class AttachedEntityComponent : Component
 
     private void HandleAttachedEntityDestroyed(Entity entity)
     {
-        Entity.DestroyComponent(this);
-        AttachedEntity.Disposed -= HandleAttachedEntityDestroyed;
+        Entity.TryDestroyComponent(this);
     }
 
     protected override void Load()
@@ -42,6 +41,7 @@ public class AttachedEntityComponent : Component
     {
         var element = AttachedEntity.GetRequiredComponent<ElementComponent>().Element;
         AttachedEntity.Disposed -= HandleAttachedEntityDestroyed;
+        AttachedEntity = null;
         if (BoneAttachService.IsAttached(element))
             BoneAttachService.Detach(element);
         base.Dispose();
