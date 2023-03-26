@@ -12,8 +12,8 @@
     <EmbeddedResource Include="Lua\Tools\debugWorld.lua" />
   </ItemGroup>
 
-	<ItemGroup>
-		<ProjectReference Include="..\Realm.Resources.Addons.Common\Realm.Resources.Addons.Common.csproj" />
-	</ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Realm.Resources.Base\Realm.Resources.Base.csproj" />
+  </ItemGroup>
 
 </Project>

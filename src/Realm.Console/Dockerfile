@@ -11,7 +11,7 @@ COPY ["src/Realm.Configuration/Realm.Configuration.csproj", "src/Realm.Configura
 COPY ["src/Realm.Server/Realm.Server.csproj", "src/Realm.Server/"]
 COPY ["src/Realm.Assets/Realm.Assets.csproj", "src/Realm.Assets/"]
 COPY ["src/Realm.Resources.Assets/Realm.Resources.Assets.csproj", "src/Realm.Resources.Assets/"]
-COPY ["src/Realm.Resources.Addons.Common/Realm.Resources.Addons.Common.csproj", "src/Realm.Resources.Addons.Common/"]
+COPY ["src/Realm.Resources.Base/Realm.Resources.Base.csproj", "src/Realm.Resources.Base/"]
 COPY ["src/Realm.Discord/Realm.Module.Discord.csproj", "src/Realm.Discord/"]
 COPY ["src/Realm.Domain/Realm.Domain.csproj", "src/Realm.Domain/"]
 COPY ["src/Realm.Persistance/Realm.Persistance.csproj", "src/Realm.Persistance/"]

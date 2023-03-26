@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using Realm.Resources.Addons.Common;
 using SlipeServer.Server.ServerBuilders;
 using SlipeServer.Resources.DGS;
+using Realm.Resources.Base;
 
 namespace Realm.Resources.AgnosticGuiSystem;
 

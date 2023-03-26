@@ -10,8 +10,8 @@
     <EmbeddedResource Include="Lua\afk.lua" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Realm.Resources.Base\Realm.Resources.Base.csproj" />
+  </ItemGroup>
 
-	<ItemGroup>
-		<ProjectReference Include="..\Realm.Resources.Addons.Common\Realm.Resources.Addons.Common.csproj" />
-	</ItemGroup>
 </Project>

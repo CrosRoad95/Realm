@@ -17,7 +17,7 @@ COPY ["Realm.Persistance.SQLite/Realm.Persistance.SQLite.csproj", "Realm.Persist
 COPY ["Realm.Persistance/Realm.Persistance.csproj", "Realm.Persistance/"]
 COPY ["Realm.Resources.Addons.AgnosticGuiSystem.CeGuiProvider/Realm.Resources.Addons.AgnosticGuiSystem.CeGuiProvider.csproj", "Realm.Resources.Addons.AgnosticGuiSystem.CeGuiProvider/"]
 COPY ["Realm.Resources.AgnosticGuiSystem/Realm.Resources.AgnosticGuiSystem.csproj", "Realm.Resources.AgnosticGuiSystem/"]
-COPY ["Realm.Resources.Addons.Common/Realm.Resources.Addons.Common.csproj", "Realm.Resources.Addons.Common/"]
+COPY ["Realm.Resources.Base/Realm.Resources.Base.csproj", "Realm.Resources.Base/"]
 COPY ["Realm.Resources.ClientInterface/Realm.Resources.ClientInterface.csproj", "Realm.Resources.ClientInterface/"]
 RUN dotnet restore "Realm.WebApp/Realm.WebApp.csproj"
 COPY . .

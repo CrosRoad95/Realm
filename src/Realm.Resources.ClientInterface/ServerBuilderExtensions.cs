@@ -1,5 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using Realm.Resources.Addons.Common;
+using Realm.Resources.Base;
 using SlipeServer.Server.ServerBuilders;
 
 namespace Realm.Resources.ClientInterface;

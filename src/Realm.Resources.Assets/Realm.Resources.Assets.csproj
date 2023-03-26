@@ -11,9 +11,9 @@
   </ItemGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\Realm.Resources.Addons.Common\Realm.Resources.Addons.Common.csproj" />
 	    <PackageReference Include="RenderWareBuilders" Version="0.1.0-CI-20221009-163717" />
-        <PackageReference Include="RenderWareIo" Version="0.1.0-CI-20221009-163717" />
+		<ProjectReference Include="..\Realm.Resources.Base\Realm.Resources.Base.csproj" />
+		<PackageReference Include="RenderWareIo" Version="0.1.0-CI-20221009-163717" />
         <PackageReference Include="Silk.NET.Assimp" Version="2.16.0" />
 	</ItemGroup>
 </Project>
