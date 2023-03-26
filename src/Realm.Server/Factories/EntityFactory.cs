@@ -2,6 +2,7 @@
 using Realm.Domain.Concepts;
 using Realm.Domain.Enums;
 using Realm.Persistance.Interfaces;
+using RenderWareIo.Structs.Dff;
 using SlipeServer.Server.Elements.ColShapes;
 using SlipeServer.Server.Elements.Enums;
 using SlipeServer.Server.Enums;
@@ -176,6 +177,38 @@ internal class EntityFactory : IEntityFactory
         return blipElementComponent;
     }
 
+    public Entity CreateRadarArea(Vector2 position, Vector2 size, System.Drawing.Color color, ConstructionInfo? constructionInfo = null, Action<Entity>? entityBuilder = null)
+    {
+        var blipEntity = _ecs.CreateEntity(constructionInfo?.Id ?? $"radarArea {Guid.NewGuid()}", EntityTag.Blip, entity =>
+        {
+            entity.AddComponent(new RadarAreaElementComponent(new RadarArea(position, size, color)));
+
+            entity.Transform.Position = new Vector3(position, 0);
+            if (constructionInfo != null)
+            {
+                entity.Transform.Interior = constructionInfo.Interior;
+                entity.Transform.Dimension = constructionInfo.Dimension;
+            }
+
+            AssociateWithServer(entity);
+            entityBuilder?.Invoke(entity);
+        });
+
+        return blipEntity;
+    }
+
+    public RadarAreaElementComponent CreateRadarAreaFor(Entity playerEntity, Vector2 position, Vector2 size, System.Drawing.Color color)
+    {
+        if (playerEntity.Tag != EntityTag.Player)
+            throw new ArgumentException("Entity must be a player entity");
+
+        var radarArea = new RadarArea(position, size, color);
+
+        var radarAreaElementComponent = playerEntity.AddComponent(new RadarAreaElementComponent(radarArea));
+        AssociateWithPlayerEntity(radarAreaElementComponent, playerEntity);
+        return radarAreaElementComponent;
+    }
+    
     public CollisionSphereElementComponent CreateCollisionSphereFor(Entity playerEntity, Vector3 position, float radius)
     {
         if (playerEntity.Tag != EntityTag.Player)
@@ -184,7 +217,6 @@ internal class EntityFactory : IEntityFactory
         var collisionSphere = new CollisionSphere(position, radius);
 
         var collisionSphereElementComponent = playerEntity.AddComponent(new CollisionSphereElementComponent(collisionSphere));
-        playerEntity.Transform.Position = position;
         AssociateWithPlayerEntity(collisionSphereElementComponent, playerEntity);
         return collisionSphereElementComponent;
     }
