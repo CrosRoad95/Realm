@@ -14,6 +14,7 @@ public static class ServerBuilderExtensions
             if (commonResourceOptions != null)
                 commonResourceOptions.Configure(resource);
 
+            resource.AddLuaEventHub<IClientInterfaceTestHub>();
             server.AddAdditionalResource(resource, resource.AdditionalFiles);
         });
 
@@ -22,6 +23,7 @@ public static class ServerBuilderExtensions
             services.AddSingleton<IClientInterfaceService, ClientInterfaceService>();
         });
 
+        builder.AddLuaEventHub<IClientInterfaceTestHub, ClientInterfaceResource>();
         builder.AddLogic<ClientInterfaceLogic>();
     }
 }
