@@ -120,7 +120,7 @@ public class Entity : IDisposable
         {
             component.InternalLoad();
         }
-        catch(Exception)
+        catch(Exception ex)
         {
             DestroyComponent(component);
             throw;

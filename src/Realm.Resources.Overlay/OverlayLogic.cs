@@ -3,6 +3,7 @@ using SlipeServer.Server.Services;
 using SlipeServer.Server;
 using System.Numerics;
 using SlipeServer.Packets.Definitions.Lua;
+using SlipeServer.Server.Mappers;
 
 namespace Realm.Resources.Overlay;
 
@@ -11,14 +12,16 @@ internal class OverlayLogic
     private readonly LuaEventService _luaEventService;
     private readonly IOverlayService _overlayService;
     private readonly RootElement _rootElement;
+    private readonly LuaValueMapper _luaValueMapper;
     private readonly OverlayResource _resource;
 
     public OverlayLogic(MtaServer server, LuaEventService luaEventService,
-        IOverlayService overlayService, RootElement rootElement)
+        IOverlayService overlayService, RootElement rootElement, LuaValueMapper luaValueMapper)
     {
         _luaEventService = luaEventService;
         _overlayService = overlayService;
         _rootElement = rootElement;
+        _luaValueMapper = luaValueMapper;
         server.PlayerJoined += HandlePlayerJoin;
 
         _resource = server.GetAdditionalResource<OverlayResource>();
@@ -51,19 +54,12 @@ internal class OverlayLogic
         _luaEventService.TriggerEventFor(player, "setHudPosition", player, hudId, x, y);
     }
 
-    public void HandleHud3dStateChanged(string hudId, Dictionary<int, object> keyValuePairs)
+    public void HandleHud3dStateChanged(string hudId, Dictionary<int, object?> keyValuePairs)
     {
         Dictionary<LuaValue, LuaValue> luaValue = new();
         foreach (var item in keyValuePairs)
         {
-            var stringValue = item.Value.ToString();
-            if (stringValue != null)
-            {
-                if (double.TryParse(stringValue, out var result))
-                    luaValue.Add(item.Key, result);
-                else
-                    luaValue.Add(item.Key, stringValue);
-            }
+            luaValue.Add(item.Key, _luaValueMapper.Map(item.Value));
         }
         _luaEventService.TriggerEvent("setHud3dState", _rootElement, hudId, new LuaValue(luaValue));
     }
@@ -73,14 +69,7 @@ internal class OverlayLogic
         Dictionary<LuaValue, LuaValue> luaValue = new();
         foreach (var item in keyValuePairs)
         {
-            var stringValue = item.Value.ToString();
-            if(stringValue != null)
-            {
-                if (double.TryParse(stringValue, out var result))
-                    luaValue.Add(item.Key, result);
-                else
-                    luaValue.Add(item.Key, stringValue);
-            }
+            luaValue.Add(item.Key, _luaValueMapper.Map(item.Value));
         }
         _luaEventService.TriggerEventFor(player, "setHudState", player, hudId, new LuaValue(luaValue));
     }

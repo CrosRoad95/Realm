@@ -27,7 +27,7 @@ internal sealed class OverlayService : IOverlayService
     public Action<Player, string, bool>? HudVisibilityChanged { get; set; }
     public Action<Player, string, float, float>? HudPositionChanged { get; set; }
     public Action<Player, string, Dictionary<int, object>>? HudStateChanged { get; set; }
-    public Action<string, Dictionary<int, object>>? Hud3dStateChanged { get; set; }
+    public Action<string, Dictionary<int, object?>>? Hud3dStateChanged { get; set; }
     public Action<Player, string, Vector3, TimeSpan>? Display3dRingAdded { get; set; }
     public Action<Player, string>? Display3dRingRemoved { get; set; }
     private readonly IAssetsService _assetsService;
@@ -57,7 +57,7 @@ internal sealed class OverlayService : IOverlayService
         HudStateChanged?.Invoke(player, hudId, state);
     }
         
-    public void SetHud3dState(string hudId, Dictionary<int, object> state)
+    public void SetHud3dState(string hudId, Dictionary<int, object?> state)
     {
         Hud3dStateChanged?.Invoke(hudId, state);
     }

@@ -179,7 +179,7 @@ internal class EntityFactory : IEntityFactory
 
     public Entity CreateRadarArea(Vector2 position, Vector2 size, System.Drawing.Color color, ConstructionInfo? constructionInfo = null, Action<Entity>? entityBuilder = null)
     {
-        var blipEntity = _ecs.CreateEntity(constructionInfo?.Id ?? $"radarArea {Guid.NewGuid()}", EntityTag.Blip, entity =>
+        var blipEntity = _ecs.CreateEntity(constructionInfo?.Id ?? $"radarArea {Guid.NewGuid()}", EntityTag.RadarArea, entity =>
         {
             entity.AddComponent(new RadarAreaElementComponent(new RadarArea(position, size, color)));
 
