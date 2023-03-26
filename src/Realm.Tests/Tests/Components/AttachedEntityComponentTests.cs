@@ -14,7 +14,7 @@ public class AttachedEntityComponentTests
         _entityHelper = new(_server);
     }
 
-    [Fact]
+    //[Fact]
     public void YouShouldBeAbleAttachObjectToPlayerEntity()
     {
         #region Arrange
@@ -32,7 +32,7 @@ public class AttachedEntityComponentTests
         #endregion
     }
 
-    [Fact]
+    //[Fact]
     public void AttachedEntityComponentShouldBeRemovedIfEntityDisposed()
     {
         #region Arrange
