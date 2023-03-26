@@ -61,4 +61,41 @@ public class PlayerElementComponentTests
         playerElementComponent.IsCooldownActive("x").Should().BeTrue();
         #endregion
     }
+
+    [Fact]
+    public void PlayerShouldBeAbleToFightWhenAtLeastOneFlagIsEnabled()
+    {
+        #region Arrange
+
+        var playerEntity = _entityHelper.CreatePlayerEntity();
+        var playerElementComponent = playerEntity.GetRequiredComponent<PlayerElementComponent>();
+        #endregion
+
+        #region Act
+        playerElementComponent.AddEnableFightFlag(1);
+        #endregion
+
+        #region Assert
+        playerElementComponent.Player.Controls.FireEnabled.Should().BeTrue();
+        #endregion
+    }
+
+    [Fact]
+    public void PlayerShouldNotBeAbleToFightWhenNoFlagIsSet()
+    {
+        #region Arrange
+
+        var playerEntity = _entityHelper.CreatePlayerEntity();
+        var playerElementComponent = playerEntity.GetRequiredComponent<PlayerElementComponent>();
+        #endregion
+
+        #region Act
+        playerElementComponent.AddEnableFightFlag(1);
+        playerElementComponent.RemoveEnableFightFlag(1);
+        #endregion
+
+        #region Assert
+        playerElementComponent.Player.Controls.FireEnabled.Should().BeFalse();
+        #endregion
+    }
 }

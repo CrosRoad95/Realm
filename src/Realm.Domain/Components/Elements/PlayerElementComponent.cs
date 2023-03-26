@@ -31,7 +31,8 @@ public sealed class PlayerElementComponent : PedElementComponent
 
     private readonly Dictionary<string, DateTime> _bindsDownCooldown = new();
     private readonly Dictionary<string, DateTime> _bindsUpCooldown = new();
-    private readonly HashSet<string> _enableFightFlags = new();
+    private readonly List<short> _enableFightFlags = new();
+    private readonly object _enableFightFlagsLock = new();
     private readonly MapIdGenerator _mapIdGenerator = new(IdGeneratorConstants.MapIdStart, IdGeneratorConstants.MapIdStop);
     public event Action<Entity, Entity?>? FocusedEntityChanged;
     public Entity? FocusedEntity { get => _focusedEntity; internal set
@@ -90,24 +91,32 @@ public sealed class PlayerElementComponent : PedElementComponent
         _player.Controls.FireEnabled = _enableFightFlags.Any();
     }
 
-    public bool AddEnableFightFlag(string flag)
+    public bool AddEnableFightFlag(short flag)
     {
         ThrowIfDisposed();
-        if (_enableFightFlags.Add(flag))
+        lock(_enableFightFlagsLock)
         {
-            UpdateFight();
-            return true;
+            if (!_enableFightFlags.Contains(flag))
+            {
+                _enableFightFlags.Add(flag);
+                UpdateFight();
+                return true;
+            }
         }
         return false;
     }
     
-    public bool RemoveEnableFightFlag(string flag)
+    public bool RemoveEnableFightFlag(short flag)
     {
         ThrowIfDisposed();
-        if (_enableFightFlags.Remove(flag))
+        lock(_enableFightFlagsLock)
         {
-            UpdateFight();
-            return true;
+            if (_enableFightFlags.Contains(flag))
+            {
+                _enableFightFlags.Remove(flag);
+                UpdateFight();
+                return true;
+            }
         }
         return false;
     }
