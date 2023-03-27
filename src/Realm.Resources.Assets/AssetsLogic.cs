@@ -3,6 +3,8 @@ using SlipeServer.Server;
 using SlipeServer.Server.Services;
 using SlipeServer.Server.Events;
 using SlipeServer.Packets.Definitions.Lua;
+using Microsoft.Extensions.Logging;
+using Realm.Resources.Assets.Interfaces;
 
 namespace Realm.Resources.Assets;
 
@@ -12,17 +14,20 @@ internal class AssetsLogic
     private readonly AssetsRegistry _assetsRegistry;
     private readonly IAssetsService _assetsService;
     private readonly LuaEventService _luaEventService;
-    public AssetsLogic(MtaServer server, AssetsRegistry assetsRegistry, IAssetsService assetsService, LuaEventService luaEventService)
+    public AssetsLogic(MtaServer server, AssetsRegistry assetsRegistry, IAssetsService assetsService, LuaEventService luaEventService, ILogger<AssetsLogic> logger, IEnumerable<IServerAssetsProvider> serverAssetsProviders)
     {
         server.PlayerJoined += HandlePlayerJoin;
 
-        _resource = server.GetAdditionalResource<AssetsResource>();
         _assetsRegistry = assetsRegistry;
         _assetsService = assetsService;
         _luaEventService = luaEventService;
         luaEventService.AddEventHandler("internalRequestAssets", HandleInternalRequestAssets);
-    }
 
+        _resource = new AssetsResource(server, serverAssetsProviders);
+        server.AddAdditionalResource(_resource, _resource.AdditionalFiles);
+        logger.LogInformation("Loaded {count} assets of total size: {sizeInMB:N4}MB", _resource.AdditionalFiles.Count, _resource.ContentSize / 1024.0f / 1024.0f);
+    }
+    
     private void HandlePlayerJoin(Player player)
     {
         _resource.StartFor(player);

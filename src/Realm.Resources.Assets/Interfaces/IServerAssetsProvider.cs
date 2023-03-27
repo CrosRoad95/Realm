@@ -2,5 +2,5 @@
 
 public interface IServerAssetsProvider
 {
-    public IEnumerable<(string, byte[])> Provide();
+    public IEnumerable<string> Provide();
 }

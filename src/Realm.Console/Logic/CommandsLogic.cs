@@ -724,6 +724,13 @@ internal sealed class CommandsLogic
         });
 
 
+        _commandService.AddCommandHandler("proceduralobject", (entity, args) =>
+        {
+            var objectEntity = _entityFactory.CreateObject(SlipeServer.Server.Enums.ObjectModel.Gunbox, entity.Transform.Position + new Vector3(4, 0, -0.65f), Vector3.Zero);
+        });
+
+
+
         FontCollection collection = new();
         FontFamily family = collection.Add("Server/Fonts/Ratual.otf");
         Font font = family.CreateFont(24, FontStyle.Regular);

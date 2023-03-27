@@ -4,6 +4,7 @@ using Realm.Domain.Registries;
 using Realm.Module.Discord;
 using Realm.Module.Grpc;
 using Realm.Module.WebApp;
+using Realm.Resources.Assets.Interfaces;
 using Realm.Server.Logic;
 using Realm.Server.Logic.Registries;
 using SlipeServer.Server.Elements.IdGeneration;
@@ -32,7 +33,6 @@ internal sealed class RPGServer : IRPGServer
                 builder.AddLogic<VehicleUpgradeRegistryLogic>();
                 builder.AddLogic<VehicleEnginesRegistryLogic>();
 
-                //builder.AddLogic<DefaultModulesLogic>();
                 builder.ConfigureServer(realmConfigurationProvider);
                 configureServerBuilder?.Invoke(builder);
 
@@ -49,6 +49,7 @@ internal sealed class RPGServer : IRPGServer
 
         #region Common
         services.AddSingleton<IDateTimeProvider, DateTimeProvider>();
+        services.AddSingleton<IAssetEncryptionProvider, AssetEncryptionProvider>();
         services.AddSingleton((IRPGServer)this);
         services.AddSingleton(this);
         services.AddSingleton<SeederServerBuilder>();

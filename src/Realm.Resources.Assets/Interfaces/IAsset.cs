@@ -3,5 +3,4 @@
 public interface IAsset
 {
     string Name { get; }
-    string Path { get; }
 }

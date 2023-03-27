@@ -37,6 +37,7 @@ public static class ServerBuilderExtensions
             services.Configure<GameplayOptions>(realmConfigurationProvider.GetSection("Gameplay"));
             services.Configure<GrpcOptions>(realmConfigurationProvider.GetSection("Grpc"));
             services.Configure<ServerListOptions>(realmConfigurationProvider.GetSection("ServerList"));
+            services.Configure<AssetsOptions>(realmConfigurationProvider.GetSection("Assets"));
 
             var databaseProvider = realmConfigurationProvider.Get<string>("Database:Provider");
             switch (databaseProvider)

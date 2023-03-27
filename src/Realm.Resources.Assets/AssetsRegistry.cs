@@ -1,12 +1,21 @@
 ﻿using Realm.Resources.Assets.Classes;
 using Realm.Resources.Assets.Interfaces;
+using SlipeServer.Server.Enums;
 
 namespace Realm.Resources.Assets;
 
-public class AssetsRegistry
+public class AssetsRegistry : IServerAssetsProvider
 {
+    private readonly object _lock = new();
     private readonly Dictionary<string, IAsset> _assets = new();
+    private readonly Dictionary<ObjectModel, string> _replacedModels = new();
     public IReadOnlyDictionary<string, IAsset> Assets => _assets;
+    public IReadOnlyDictionary<ObjectModel, string> ReplacedModels => _replacedModels;
+
+    public AssetsRegistry()
+    {
+        Directory.CreateDirectory("Server/Assets/Models/Procedural");
+    }
 
     internal IAsset InternalGetAsset(string name)
     {
@@ -19,32 +28,73 @@ public class AssetsRegistry
 
     public IAsset GetAsset(string assetName)
     {
-        return InternalGetAsset(assetName);
+        lock(_lock)
+            return InternalGetAsset(assetName);
     }
 
     public TAsset GetAsset<TAsset>(string assetName) where TAsset : IAsset
     {
-        return (TAsset)InternalGetAsset(assetName);
+        lock (_lock)
+            return (TAsset)InternalGetAsset(assetName);
     }
     
     public IFont GetFont(string assetName)
     {
-        return (IFont)InternalGetAsset(assetName);
+        lock (_lock)
+            return (IFont)InternalGetAsset(assetName);
     }
 
-    public void AddModel(string name, byte[] col, byte[] dff)
+    public IModel AddModel(string name, Stream colStream, Stream dffStream)
     {
-        _assets.Add(name, new Model(name, ""));
-    }
+        lock (_lock)
+            if (_assets.ContainsKey(name))
+                throw new Exception($"Name '{name}' already in use");
 
-    public void AddModel(string name, (byte[], byte[]) colDff)
-    {
-        AddModel(name, colDff.Item1, colDff.Item2);
+        var colFileName = $"Server/Assets/Models/Procedural/{name}.col";
+        var dffFileName = $"Server/Assets/Models/Procedural/{name}.dff";
+
+        using (var fileStream = File.Create(colFileName))
+            colStream.CopyTo(fileStream);
+        using (var fileStream = File.Create(dffFileName))
+            dffStream.CopyTo(fileStream);
+
+        var model = new Model(name, colFileName, dffFileName);
+        lock (_lock)
+            _assets.Add(name, model);
+        return model;
     }
 
     public void AddFont(string name, string path)
     {
-        _assets.Add(name, new Font(name, path));
+        lock (_lock)
+            _assets.Add(name, new Font(name, path));
     }
 
+    public void ReplaceModel(ObjectModel objectModel, IModel model)
+    {
+        lock (_lock)
+            _replacedModels[objectModel] = model.Name;
+    }
+
+    public IEnumerable<string> Provide()
+    {
+        lock (_lock)
+        {
+            foreach (var item in _assets)
+            {
+                switch(item.Value)
+                {
+                    case IModel model:
+                        yield return model.ColPath;
+                        yield return model.DffPath;
+                        break;
+                    case IFont font:
+                        yield return font.FontPath;
+                        break;
+                    default:
+                        break;
+                }
+            }
+        }
+    }
 }

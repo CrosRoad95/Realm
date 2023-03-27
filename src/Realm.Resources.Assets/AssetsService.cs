@@ -10,8 +10,8 @@ internal sealed class AssetsService : IAssetsService
     {
         return asset switch
         {
-            Font font => new LuaValue(new LuaValue[] { "Font", font.Path }),
-            Model model => new LuaValue(new LuaValue[] { "Model", model.Path }),
+            Font font => new LuaValue(new LuaValue[] { "Font", font.FontPath }),
+            Model model => new LuaValue(new LuaValue[] { "Model", model.ColPath }),
             _ => throw new NotImplementedException()
         };
     }

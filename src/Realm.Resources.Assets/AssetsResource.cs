@@ -2,7 +2,8 @@
 using SlipeServer.Server.Resources;
 using SlipeServer.Server;
 using Realm.Resources.Assets.Interfaces;
-using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using System.Text;
 
 namespace Realm.Resources.Assets;
 
@@ -13,23 +14,63 @@ internal class AssetsResource : Resource
         ["assets.lua"] = ResourceFiles.Assets,
     };
 
-    internal AssetsResource(MtaServer server)
+    private readonly long _contentSize = 0;
+    public long ContentSize => _contentSize;
+
+    private readonly string _decryptScript = """
+do
+    local key = base64Decode("{0}");
+    function decryptAsset(fileName)
+        local file = fileOpen(fileName);
+        local content = fileRead(file, fileGetSize(file));
+        fileClose(file)
+	    local decryptedContent = decodeString("aes128", content, {1}
+		    key = key,
+		    iv = key,
+	    {2})
+        return decryptedContent
+    end
+end
+""";
+
+    internal AssetsResource(MtaServer server, IEnumerable<IServerAssetsProvider> serverAssetsProviders)
         : base(server, server.GetRequiredService<RootElement>(), "Assets")
     {
+        var encryptionProvider = server.GetRequiredService<IAssetEncryptionProvider>();
+        var assetsRegistry = server.GetRequiredService<AssetsRegistry>();
+
         foreach (var (path, content) in AdditionalFiles)
             Files.Add(ResourceFileFactory.FromBytes(content, path));
 
-        var logger = server.GetRequiredService<ILogger<AssetsResource>>();
-        var assets = server.GetRequiredService<IEnumerable<IServerAssetsProvider>>().SelectMany(x => x.Provide()).ToList();
-        long contentSize = 0;
-        foreach (var (path, content) in assets)
+        var assets = serverAssetsProviders.SelectMany(x => x.Provide()).ToList();
+        foreach (var path in assets)
         {
-            Files.Add(ResourceFileFactory.FromBytes(content, path));
-            AdditionalFiles.Add(path, content);
-            contentSize += content.Length;
-        }
-        logger.LogInformation("Loaded {count} assets of total size: {sizeInMB:N2}MB", assets.Count, contentSize / 1024.0f / 1024.0f);
+            using var content = File.OpenRead(path);
+            var md5 = Utilities.CreateMD5(content);
+            var pathMd5 = Utilities.CreateMD5(path);
+            var contentByte = Utilities.ReadFully(content);
+            var encrypted = encryptionProvider.Encrypt(contentByte);
 
+            Files.Add(ResourceFileFactory.FromBytes(encrypted, pathMd5));
+            AdditionalFiles.Add(pathMd5, encrypted);
+            _contentSize += content.Length;
+        }
+
+        var keyBase64 = Convert.ToBase64String(encryptionProvider.Key);
+        var decryptString = string.Format(_decryptScript, keyBase64, "{", "}");
+
+        var modelsToReplace = new StringBuilder();
+        foreach (var item in assetsRegistry.ReplacedModels)
+        {
+            var asset = assetsRegistry.GetAsset<IModel>(item.Value);
+            var col = Utilities.CreateMD5(asset.ColPath);
+            var dff = Utilities.CreateMD5(asset.DffPath);
+            modelsToReplace.AppendLine($"local col = engineLoadCOL(decryptAsset(\"{col}\"));engineReplaceCOL(col,{(int)item.Key});");
+            modelsToReplace.AppendLine($"local dff = engineLoadDFF(decryptAsset(\"{dff}\"));engineReplaceModel(dff,{(int)item.Key});");
+        }
+
+        NoClientScripts.Add("decrypt.lua", Encoding.UTF8.GetBytes(decryptString));
+        NoClientScripts.Add("modelsToReplace.lua", Encoding.UTF8.GetBytes(modelsToReplace.ToString()));
         Exports.Add("requestAsset");
     }
 }

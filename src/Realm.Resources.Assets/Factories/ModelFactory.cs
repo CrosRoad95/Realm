@@ -32,14 +32,22 @@ public class ModelFactory
         });
     }
 
-    public (byte[], byte[]) Build()
+    public Stream BuildDff()
     {
         var dff = _renderWareBuilder.BuildDff();
-        var col = _renderWareBuilder.BuildCol();
-        using MemoryStream dffStream = new();
-        using MemoryStream colStream = new();
-        dff.Write(dffStream);
-        col.Write(colStream);
-        return (dffStream.ToArray(), colStream.ToArray());
+        MemoryStream stream = new();
+        dff.Write(stream);
+        stream.Seek(0, SeekOrigin.Begin);
+        return stream;
     }
+
+    public Stream BuildCol()
+    {
+        var col = _renderWareBuilder.BuildCol();
+        MemoryStream stream = new();
+        col.Write(stream);
+        stream.Seek(0, SeekOrigin.Begin);
+        return stream;
+    }
+
 }

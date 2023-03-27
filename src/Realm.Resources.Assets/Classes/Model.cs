@@ -5,11 +5,13 @@ namespace Realm.Resources.Assets.Classes;
 internal class Model : IModel
 {
     public string Name { get; }
-    public string Path { get; }
+    public string ColPath { get; }
+    public string DffPath { get; }
 
-    public Model(string name, string path)
+    public Model(string name, string colPath, string dffPath)
     {
         Name = name;
-        Path = path;
+        ColPath = colPath;
+        DffPath = dffPath;
     }
 }

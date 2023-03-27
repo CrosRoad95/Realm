@@ -2,4 +2,5 @@
 
 public interface IFont : IAsset
 {
+    string FontPath { get; }
 }

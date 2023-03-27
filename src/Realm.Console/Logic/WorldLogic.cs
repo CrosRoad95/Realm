@@ -3,6 +3,7 @@ using Realm.Domain.Components.Elements.CollisionShapes;
 using Realm.Domain.Enums;
 using Realm.Domain.Interfaces;
 using Realm.Domain.Rules;
+using SlipeServer.Server.Enums;
 
 namespace Realm.Console.Logic;
 
@@ -65,6 +66,7 @@ internal class WorldLogic
     {
         _entityFactory.CreateRadarArea(new Vector2(0, 0), new Vector2(50, 50), System.Drawing.Color.Pink);
 
+        _entityFactory.CreateObject((ObjectModel)1338, new Vector3(0,0,10), Vector3.Zero);
         var veh = _entityFactory.CreateVehicle(404, new Vector3(0,0,4), Vector3.Zero);
         var ped = _entityFactory.CreatePed(SlipeServer.Server.Elements.Enums.PedModel.Cj, new Vector3(5, 0, 4));
         veh.GetRequiredComponent<VehicleElementComponent>().AddPassenger(0, ped);
