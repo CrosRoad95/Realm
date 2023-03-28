@@ -330,12 +330,7 @@ namespace Realm.Persistance.SQLite.Migrations
                         .HasPrecision(38, 18)
                         .HasColumnType("TEXT");
 
-                    b.Property<int>("UserId")
-                        .HasColumnType("INTEGER");
-
                     b.HasKey("Id");
-
-                    b.HasIndex("UserId");
 
                     b.ToTable("Inventories", (string)null);
                 });
@@ -540,6 +535,21 @@ namespace Realm.Persistance.SQLite.Migrations
                         .HasDatabaseName("UserNameIndex");
 
                     b.ToTable("Users", (string)null);
+                });
+
+            modelBuilder.Entity("Realm.Persistance.Data.UserInventory", b =>
+                {
+                    b.Property<int>("UserId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("InventoryId")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("UserId", "InventoryId");
+
+                    b.HasIndex("InventoryId");
+
+                    b.ToTable("UserInventory", (string)null);
                 });
 
             modelBuilder.Entity("Realm.Persistance.Data.UserLicense", b =>
@@ -996,15 +1006,6 @@ namespace Realm.Persistance.SQLite.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("Realm.Persistance.Data.Inventory", b =>
-                {
-                    b.HasOne("Realm.Persistance.Data.User", null)
-                        .WithMany("Inventories")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
             modelBuilder.Entity("Realm.Persistance.Data.InventoryItem", b =>
                 {
                     b.HasOne("Realm.Persistance.Data.Inventory", "Inventory")
@@ -1032,6 +1033,25 @@ namespace Realm.Persistance.SQLite.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("Realm.Persistance.Data.UserInventory", b =>
+                {
+                    b.HasOne("Realm.Persistance.Data.Inventory", "Inventory")
+                        .WithMany("UserInventories")
+                        .HasForeignKey("InventoryId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Realm.Persistance.Data.User", "User")
+                        .WithMany("UserInventories")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Inventory");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("Realm.Persistance.Data.UserLicense", b =>
@@ -1156,6 +1176,8 @@ namespace Realm.Persistance.SQLite.Migrations
             modelBuilder.Entity("Realm.Persistance.Data.Inventory", b =>
                 {
                     b.Navigation("InventoryItems");
+
+                    b.Navigation("UserInventories");
                 });
 
             modelBuilder.Entity("Realm.Persistance.Data.User", b =>
@@ -1172,8 +1194,6 @@ namespace Realm.Persistance.SQLite.Migrations
 
                     b.Navigation("GroupMembers");
 
-                    b.Navigation("Inventories");
-
                     b.Navigation("JobStatistics");
 
                     b.Navigation("JobUpgrades");
@@ -1187,6 +1207,8 @@ namespace Realm.Persistance.SQLite.Migrations
                     b.Navigation("Stats");
 
                     b.Navigation("Upgrades");
+
+                    b.Navigation("UserInventories");
 
                     b.Navigation("VehiclePlayerAccesses");
 

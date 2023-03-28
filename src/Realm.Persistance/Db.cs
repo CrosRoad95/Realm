@@ -34,6 +34,7 @@ public abstract class Db<T> : IdentityDbContext<User, Role, int,
     public DbSet<UserSetting> UserSettings => Set<UserSetting>();
     public DbSet<UserWhitelistedSerial> UserWhitelistedSerials => Set<UserWhitelistedSerial>();
     public DbSet<VehicleEngine> VehicleEngines => Set<VehicleEngine>();
+    public DbSet<UserInventory> UserInventories => Set<UserInventory>();
 
     public Db(DbContextOptions<T> options) : base(options)
     {
@@ -117,9 +118,15 @@ public abstract class Db<T> : IdentityDbContext<User, Role, int,
 
             entityBuilder
                 .HasMany(x => x.Inventories)
-                .WithOne()
-                .HasForeignKey(x => x.UserId)
-                .OnDelete(DeleteBehavior.Cascade);
+                .WithMany()
+                .UsingEntity<UserInventory>(y => y
+                    .HasOne(z => z.Inventory)
+                    .WithMany(z => z.UserInventories)
+                    .HasForeignKey(z => z.InventoryId),
+                    y => y
+                    .HasOne(z => z.User)
+                    .WithMany(z => z.UserInventories)
+                    .HasForeignKey(z => z.UserId));
 
             entityBuilder
                 .HasMany(x => x.Discoveries)
@@ -167,6 +174,13 @@ public abstract class Db<T> : IdentityDbContext<User, Role, int,
                 .WithOne(x => x.Inventory)
                 .HasForeignKey(x => x.InventoryId)
                 .OnDelete(DeleteBehavior.Cascade);
+        });
+        
+        modelBuilder.Entity<UserInventory>(entityBuilder =>
+        {
+            entityBuilder
+                .ToTable(nameof(UserInventory))
+                .HasKey(x => new { x.UserId, x.InventoryId });
         });
         
         modelBuilder.Entity<DailyVisits>(entityBuilder =>

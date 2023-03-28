@@ -44,7 +44,7 @@ internal sealed class CommandsLogic
     public CommandsLogic(RPGCommandService commandService, IEntityFactory entityFactory, RepositoryFactory repositoryFactory,
         ItemsRegistry itemsRegistry, IECS ecs, IBanService banService, IDiscordService discordService, ChatBox chatBox, ILogger<CommandsLogic> logger,
         IDateTimeProvider dateTimeProvider, INametagsService nametagsService, IRPGUserManager rpgUserManager, IVehiclesService vehiclesService,
-        ILuaEventHub<IClientInterfaceEventHub> luaEventHub)
+        ILuaEventHub<IClientInterfaceEventHub> luaEventHub, GameWorld gameWorld)
     {
         _commandService = commandService;
         _entityFactory = entityFactory;
@@ -728,8 +728,16 @@ internal sealed class CommandsLogic
         {
             var objectEntity = _entityFactory.CreateObject(SlipeServer.Server.Enums.ObjectModel.Gunbox, entity.Transform.Position + new Vector3(4, 0, -0.65f), Vector3.Zero);
         });
-
-
+        
+        _commandService.AddCommandHandler("day", (entity, args) =>
+        {
+            gameWorld.SetTime(12, 0);
+        });
+        
+        _commandService.AddCommandHandler("night", (entity, args) =>
+        {
+            gameWorld.SetTime(0, 0);
+        });
 
         FontCollection collection = new();
         FontFamily family = collection.Add("Server/Fonts/Ratual.otf");
