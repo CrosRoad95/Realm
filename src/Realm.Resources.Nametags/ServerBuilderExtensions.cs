@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using Realm.Resources.Base;
 using SlipeServer.Server.ServerBuilders;
 
 namespace Realm.Resources.Nametags;
@@ -11,6 +12,7 @@ public static class ServerBuilderExtensions
         {
             var resource = new NametagsResource(server);
 
+            resource.AddLuaEventHub<INametagsEventHub>();
             server.AddAdditionalResource(resource, resource.AdditionalFiles);
         });
 
@@ -18,6 +20,8 @@ public static class ServerBuilderExtensions
         {
             services.AddSingleton<INametagsService, NametagsService>();
         });
+
+        builder.AddLuaEventHub<INametagsEventHub, NametagsResource>();
 
         builder.AddLogic<NametagsLogic>();
     }

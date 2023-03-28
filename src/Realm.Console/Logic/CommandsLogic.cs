@@ -619,7 +619,12 @@ internal sealed class CommandsLogic
             ped.AddComponent(nametag);
             await Task.Delay(1000);
         });
-        
+
+        _commandService.AddCommandHandler("nametags6", (entity, args) =>
+        {
+            nametagsService.SetLocalPlayerRenderingEnabled(entity, (args.FirstOrDefault() == "true") ? true : false);
+        });
+
         _commandService.AddAsyncCommandHandler("randomvehcolor", async (entity, args) =>
         {
             var rnd = Random.Shared;

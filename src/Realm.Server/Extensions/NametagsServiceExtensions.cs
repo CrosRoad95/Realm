@@ -9,4 +9,10 @@ public static class NametagsServiceExtensions
         var player = entity.GetRequiredComponent<PlayerElementComponent>().Player;
         service.SetNametagRenderingEnabled(player, enabled);
     }
+
+    public static void SetLocalPlayerRenderingEnabled(this INametagsService service, Entity entity, bool enabled)
+    {
+        var player = entity.GetRequiredComponent<PlayerElementComponent>().Player;
+        service.SetLocalPlayerRenderingEnabled(player, enabled);
+    }
 }

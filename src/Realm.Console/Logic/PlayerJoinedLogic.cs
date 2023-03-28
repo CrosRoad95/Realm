@@ -1,4 +1,5 @@
 ﻿using Realm.Domain.Components;
+using Realm.Domain.Components.World;
 using Realm.Domain.Enums;
 using Realm.Resources.Assets;
 using Realm.Resources.Nametags;
@@ -58,6 +59,7 @@ internal sealed class PlayerJoinedLogic
         {
             if (component is AccountComponent)
             {
+                var entity = component.Entity;
                 var playerElementComponent = component.Entity.GetRequiredComponent<PlayerElementComponent>();
                 await playerElementComponent.FadeCameraAsync(CameraFade.Out);
                 playerElementComponent.SetChatVisible(true);
@@ -72,6 +74,7 @@ internal sealed class PlayerJoinedLogic
                 await Task.Delay(300);
                 await playerElementComponent.FadeCameraAsync(CameraFade.In);
                 playerElementComponent.SetText3dRenderingEnabled(true);
+                entity.AddComponent(new NametagComponent("KoxKociarz"));
                 _nametagsService.SetNametagRenderingEnabled(component.Entity, true);
             }
 

@@ -1,32 +1,24 @@
 ﻿using Microsoft.Extensions.Logging;
+using Newtonsoft.Json.Linq;
+using Realm.Resources.Base;
 using SlipeServer.Packets.Definitions.Lua;
 using SlipeServer.Server;
 using SlipeServer.Server.Elements;
-using SlipeServer.Server.Events;
-using SlipeServer.Server.Services;
-using System.Collections.Concurrent;
 
 namespace Realm.Resources.Nametags;
 
 internal class NametagsLogic
 {
-    private readonly LuaEventService _luaEventService;
-    private readonly INametagsService _nametagsService;
     private readonly ILogger<NametagsLogic> _logger;
-    private readonly RootElement _rootElement;
+    private readonly ILuaEventHub<INametagsEventHub> _luaEventHub;
     private readonly NametagsResource _resource;
     private readonly object _lock = new();
     private LuaValue _nametagsCache = new(new Dictionary<LuaValue, LuaValue>());
     
-    //private readonly Dictionary<Ped, Nametag> _nametags = new();
-
-    public NametagsLogic(MtaServer mtaServer, LuaEventService luaEventService, INametagsService nametagsService, ILogger<NametagsLogic> logger,
-        RootElement rootElement)
+    public NametagsLogic(MtaServer mtaServer, INametagsService nametagsService, ILogger<NametagsLogic> logger, ILuaEventHub<INametagsEventHub> luaEventHub)
     {
-        _luaEventService = luaEventService;
-        _nametagsService = nametagsService;
         _logger = logger;
-        _rootElement = rootElement;
+        _luaEventHub = luaEventHub;
         _resource = mtaServer.GetAdditionalResource<NametagsResource>();
 
         mtaServer.PlayerJoined += HandlePlayerJoin;
@@ -34,33 +26,42 @@ internal class NametagsLogic
         nametagsService.HandleSetNametag = HandleSetNametag;
         nametagsService.HandleRemoveNametag = HandleRemoveNametag;
         nametagsService.HandleSetNametagRenderingEnabled = HandleSetNametagRenderingEnabled;
+        nametagsService.HandleSetLocalPlayerRenderingEnabled = HandleSetLocalPlayerRenderingEnabled;
     }
 
     private void HandleSetNametagRenderingEnabled(Player player, bool enabled)
     {
-        player.TriggerLuaEvent("internalSetNametagRenderingEnabled", player, enabled);
+        _luaEventHub.Invoke(player, x => x.SetRenderingEnabled(enabled));
+    }
+
+    private void HandleSetLocalPlayerRenderingEnabled(Player player, bool enabled)
+    {
+        _luaEventHub.Invoke(player, x => x.SetLocalPlayerRenderingEnabled(enabled));
     }
     
     private void HandleRemoveNametag(Ped ped)
     {
         lock (_lock)
             _nametagsCache.TableValue!.Remove(ped);
-        _luaEventService.TriggerEvent("internalRemovePedNametag", _rootElement, ped);
+        _luaEventHub.Broadcast(x => x.RemoveNametag(), ped);
     }
 
     public void ResendAllNametagsToAllPlayer(Player player)
     {
         lock(_lock)
         {
-            if(_nametagsCache.TableValue!.Count > 0)
-                player.TriggerLuaEvent("internalResendAllNametags", player, _nametagsCache);
+            if (_nametagsCache.TableValue!.Count > 0)
+                _luaEventHub.Invoke(player, x => x.AddNametags(_nametagsCache));
         }
     }
     
     public void ResendPedNametagToAllPlayers(Ped ped)
     {
         lock(_lock)
-            _luaEventService.TriggerEvent("internalSendPedNametags", _rootElement, ped, _nametagsCache.TableValue![ped]);
+        {
+            var value = _nametagsCache.TableValue![ped];
+            _luaEventHub.Broadcast(x => x.SetPedNametag(value), ped);
+        }
     }
 
     private void HandleSetNametag(Ped ped, string text)
