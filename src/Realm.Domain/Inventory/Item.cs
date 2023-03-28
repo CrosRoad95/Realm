@@ -2,6 +2,7 @@
 
 public class Item : IEquatable<Item>, IEquatable<Dictionary<string, object>>
 {
+    public string Id { get; internal set; } = Guid.NewGuid().ToString();
     public string LocalId { get; } = Guid.NewGuid().ToString();
     public uint ItemId { get; private set; }
 

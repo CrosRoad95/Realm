@@ -1,4 +1,5 @@
-﻿using Realm.Common.Providers;
+﻿using Microsoft.Extensions.Logging;
+using Realm.Common.Providers;
 using Realm.Common.Utilities;
 using Realm.Domain.Components;
 using Realm.Domain.Enums;
@@ -16,10 +17,12 @@ internal class PlayersLogic
     private readonly MtaServer _mtaServer;
     private readonly IClientInterfaceService _clientInterfaceService;
     private readonly IDateTimeProvider _dateTimeProvider;
+    private readonly ISaveService _saveService;
+    private readonly ILogger<PlayersLogic> _logger;
     private readonly ConcurrentDictionary<Player, Latch> _playerResources = new();
 
     public PlayersLogic(IECS ecs, IServiceProvider serviceProvider,
-        RealmDbContextFactory realmDbContextFactory, MtaServer mtaServer, IClientInterfaceService clientInterfaceService, IDateTimeProvider dateTimeProvider)
+        RealmDbContextFactory realmDbContextFactory, MtaServer mtaServer, IClientInterfaceService clientInterfaceService, IDateTimeProvider dateTimeProvider, ISaveService saveService, ILogger<PlayersLogic> logger)
     {
         _ecs = ecs;
         _serviceProvider = serviceProvider;
@@ -27,6 +30,8 @@ internal class PlayersLogic
         _mtaServer = mtaServer;
         _clientInterfaceService = clientInterfaceService;
         _dateTimeProvider = dateTimeProvider;
+        _saveService = saveService;
+        _logger = logger;
         _ecs.EntityCreated += HandleEntityCreated;
         _mtaServer.PlayerJoined += HandlePlayerJoined;
     }
@@ -109,48 +114,74 @@ internal class PlayersLogic
 
     private async void HandleComponentAdded(Component component)
     {
-        var entity = component.Entity;
+        try
         {
-            if (component is PlayerElementComponent playerElementComponent)
+            var entity = component.Entity;
             {
-                var player = playerElementComponent.Player;
+                if (component is PlayerElementComponent playerElementComponent)
+                {
+                    var player = playerElementComponent.Player;
+                }
+            }
+
+            if (component is InventoryComponent inventoryComponent)
+            {
+                if (inventoryComponent.Id == 0)
+                {
+                    if (entity.TryGetComponent(out AccountComponent account))
+                    {
+                        var inventoryId = await _saveService.SaveNewPlayerInventory(inventoryComponent, account.Id);
+                        inventoryComponent.Id = inventoryId;
+                    }
+                }
+            }
+
+            if (component is AccountComponent accountComponent)
+            {
+                if (entity.TryGetComponent(out PlayerElementComponent playerElementComponent))
+                {
+                    var client = playerElementComponent.Player.Client;
+                    using var context = _realmDbContextFactory.CreateDbContext();
+                    var user = await context.Users.Where(x => x.Id == accountComponent.Id).FirstAsync();
+                    user.LastLogindDateTime = _dateTimeProvider.Now;
+                    user.LastIp = client.IPAddress?.ToString();
+                    user.LastSerial = client.Serial;
+                    if (user.RegisterSerial == null)
+                        user.RegisterSerial = client.Serial;
+
+                    if (user.RegisterIp == null)
+                        user.RegisterIp = user.LastIp;
+
+                    if (user.RegisteredDateTime == null)
+                        user.RegisteredDateTime = _dateTimeProvider.Now;
+                    context.Users.Update(user);
+                    await context.SaveChangesAsync();
+                }
             }
         }
-
-        if (component is AccountComponent accountComponent)
+        catch (Exception ex)
         {
-            if (entity.TryGetComponent(out PlayerElementComponent playerElementComponent))
-            {
-                var client = playerElementComponent.Player.Client;
-                using var context = _realmDbContextFactory.CreateDbContext();
-                var user = await context.Users.Where(x => x.Id == accountComponent.Id).FirstAsync();
-                user.LastLogindDateTime = _dateTimeProvider.Now;
-                user.LastIp = client.IPAddress?.ToString();
-                user.LastSerial = client.Serial;
-                if (user.RegisterSerial == null)
-                    user.RegisterSerial = client.Serial;
-
-                if (user.RegisterIp == null)
-                    user.RegisterIp = user.LastIp;
-
-                if (user.RegisteredDateTime == null)
-                    user.RegisteredDateTime = _dateTimeProvider.Now;
-                context.Users.Update(user);
-                await context.SaveChangesAsync();
-            }
+            _logger.LogError(ex, "Something went wrong");
         }
     }
 
     private async void HandlePlayerDisconnected(Player player, SlipeServer.Server.Elements.Events.PlayerQuitEventArgs e)
     {
-        player.Disconnected -= HandlePlayerDisconnected;
-        _playerResources.TryRemove(player, out var _);
-        if(_ecs.TryGetEntityByPlayer(player, out var playerEntity))
+        try
         {
-            var saveService = _serviceProvider.GetRequiredService<ISaveService>();
-            await saveService.Save(playerEntity);
-            await saveService.Commit();
-            playerEntity.Dispose();
+            player.Disconnected -= HandlePlayerDisconnected;
+            _playerResources.TryRemove(player, out var _);
+            if(_ecs.TryGetEntityByPlayer(player, out var playerEntity))
+            {
+                var saveService = _serviceProvider.GetRequiredService<ISaveService>();
+                await saveService.Save(playerEntity);
+                await saveService.Commit();
+                playerEntity.Dispose();
+            }
+        }
+        catch(Exception ex)
+        {
+            _logger.LogError(ex, "Something went wrong");
         }
     }
 }

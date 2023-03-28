@@ -11,7 +11,7 @@ public class InventoryComponent : Component
     public event Action<InventoryComponent, Item>? ItemRemoved;
     public event Action<InventoryComponent, Item>? ItemChanged;
 
-    public int? Id { get; private set; } = null;
+    internal int Id { get; set; }
     public decimal Size { get; set; }
     public decimal Number
     {

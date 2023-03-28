@@ -235,6 +235,22 @@ internal sealed class CommandsLogic
             }
         });
 
+        _commandService.AddCommandHandler("additem", (entity, args) =>
+        {
+            if (entity.TryGetComponent(out InventoryComponent inventoryComponent))
+            {
+                inventoryComponent.AddItem(_itemsRegistry, 1);
+                entity.GetRequiredComponent<PlayerElementComponent>().SendChatMessage($"Test item added");
+            }
+        });
+        _commandService.AddCommandHandler("additem2", (entity, args) =>
+        {
+            if (entity.TryGetComponent(out InventoryComponent inventoryComponent))
+            {
+                inventoryComponent.AddItem(_itemsRegistry, 2);
+                entity.GetRequiredComponent<PlayerElementComponent>().SendChatMessage($"Test item added");
+            }
+        });
         _commandService.AddAsyncCommandHandler("addtestdata", async (entity, args) =>
         {
             if (entity.TryGetComponent(out JobUpgradesComponent jobUpgradesComponent))

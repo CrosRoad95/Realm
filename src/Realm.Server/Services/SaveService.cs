@@ -1,4 +1,7 @@
-﻿using Realm.Domain.Enums;
+﻿using Realm.Domain;
+using Realm.Domain.Enums;
+using Realm.Persistance;
+using Realm.Persistance.Data;
 using static Realm.Persistance.Data.Helpers.VehicleDamageState;
 using static Realm.Persistance.Data.Helpers.VehicleWheelStatus;
 using JobUpgrade = Realm.Persistance.Data.JobUpgrade;
@@ -141,6 +144,42 @@ internal class SaveService : ISaveService
         }
     }
 
+    private Inventory MapInventory(InventoryComponent inventoryComponent)
+    {
+        var inventory = new Inventory
+        {
+            Size = inventoryComponent.Size,
+            Id = inventoryComponent.Id,
+            InventoryItems = MapItems(inventoryComponent),
+        };
+        return inventory;
+    }
+
+    private List<InventoryItem> MapItems(InventoryComponent inventoryComponent)
+    {
+        var items = inventoryComponent.Items.Select(item => new InventoryItem
+        {
+            Id = item.Id,
+            ItemId = item.ItemId,
+            Number = item.Number,
+            MetaData = JsonConvert.SerializeObject(item.MetaData, Formatting.None),
+        }).ToList();
+
+        return items;
+    }
+
+    public async Task<int> SaveNewPlayerInventory(InventoryComponent inventoryComponent, int userId)
+    {
+        var inventory = MapInventory(inventoryComponent);
+        _dbContext.UserInventories.Add(new UserInventory
+        {
+            Inventory = inventory,
+            UserId = userId
+        });
+        await _dbContext.SaveChangesAsync();
+        return inventory.Id;
+    }
+
     private async Task SavePlayer(Entity entity)
     {
         if (!entity.TryGetComponent(out AccountComponent accountComponent))
@@ -191,24 +230,22 @@ internal class SaveService : ISaveService
         else
             user.PlayTime = 0;
 
-        var inventoryComponents = entity.Components.OfType<InventoryComponent>().ToList();
-        user.Inventories = inventoryComponents.Select(x =>
+        var inventoryComponents = entity.Components.OfType<InventoryComponent>()
+            .Where(x => x.Id != 0)
+            .ToList();
+
+        if (inventoryComponents.Any())
         {
-            var inventory = new Inventory
+            foreach (var inventory in user.Inventories)
             {
-                Size = x.Size,
-                Id = x.Id ?? 0,
-            };
-            inventory.InventoryItems = x.Items.Select(item => new InventoryItem
-            {
-                Id = Guid.NewGuid().ToString(),
-                ItemId = item.ItemId,
-                Number = item.Number,
-                Inventory = inventory,
-                MetaData = JsonConvert.SerializeObject(item.MetaData, Formatting.None),
-            }).ToList();
-            return inventory;
-        }).ToList();
+                var inventoryComponent = inventoryComponents.Where(x => x.Id == inventory.Id).First();
+                inventory.Size = inventoryComponent.Size;
+                inventory.InventoryItems = MapItems(inventoryComponent);
+            }
+        }
+        else
+            user.Inventories = new List<Inventory>();
+
 
         if (entity.TryGetComponent(out DailyVisitsCounterComponent dailyVisitsCounterComponent))
         {
@@ -230,7 +267,6 @@ internal class SaveService : ISaveService
                 Value = statisticsCounterComponent.GetStat(x)
             }).ToList();
             _dbContext.UserStats.AddRange(user.Stats);
-            ;
         }
         else
             user.Stats = new List<UserStat>();
@@ -282,26 +318,6 @@ internal class SaveService : ISaveService
                 }
             }
             jobStatisticsComponent.Reset();
-            //jobStatisticsComponent.JobStatistics
-            //var first = user.JobStatistics.FirstOrDefault(x => x.Date == jobStatisticsComponent.Date);
-            //if (first == null)
-            //{
-            //    user.JobStatistics.Add(new JobStatistics
-            //    {
-            //        Date= jobStatisticsComponent.Date,
-            //        JobId = jobStatisticsComponent
-            //    });
-            //}
-            //else
-            //{
-
-            //}
-            //user.JobStatistics = jobStatisticsComponent.JobStatistics.Select(x => new JobStatistics
-            //{
-            //    JobId = x.Key,
-            //    Points = x.Value.points,
-            //    TimePlayed = x.Value.timePlayed,
-            //}).ToList();
         }
         else
             user.JobStatistics = new List<Persistance.Data.JobStatistics>();

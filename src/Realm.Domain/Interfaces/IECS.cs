@@ -2,6 +2,7 @@
 
 public interface IECS
 {
+    IReadOnlyCollection<Entity> Entities { get; }
     IReadOnlyCollection<Entity> VehicleEntities { get; }
     IReadOnlyCollection<Entity> PlayerEntities { get; }
 

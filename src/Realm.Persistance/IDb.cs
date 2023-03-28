@@ -33,7 +33,11 @@ public interface IDb : IDisposable
     DbSet<UserReward> UserRewards { get; }
     DbSet<UserSetting> UserSettings { get; }
     DbSet<UserWhitelistedSerial> UserWhitelistedSerials { get; }
+    DbSet<UserInventory> UserInventories { get; }
 
     Task MigrateAsync();
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
+    EntityEntry<TEntity> Entry<TEntity>(TEntity entity) where TEntity : class;
+
+    event EventHandler<SavedChangesEventArgs>? SavedChanges;
 }

@@ -3,11 +3,11 @@
 [CommandName("save")]
 internal class SaveCommand : ICommand
 {
-    private readonly ECS _ecs;
+    private readonly IECS _ecs;
     private readonly ISaveService _saveService;
     private readonly ILogger<SaveCommand> _logger;
 
-    public SaveCommand(ECS ecs, ISaveService saveService, ILogger<SaveCommand> logger)
+    public SaveCommand(IECS ecs, ISaveService saveService, ILogger<SaveCommand> logger)
     {
         _ecs = ecs;
         _saveService = saveService;
@@ -21,11 +21,16 @@ internal class SaveCommand : ICommand
         {
             try
             {
-                await _saveService.Save(entity);
 #if DEBUG
-                await _saveService.Commit();
+                if(await _saveService.Save(entity))
+                {
+                    await _saveService.Commit();
+                    savedEntities++;
+                }
+#else
+                if (await _saveService.Save(entity))
+                    savedEntities++;
 #endif
-                savedEntities++;
             }
             catch (Exception ex)
             {
