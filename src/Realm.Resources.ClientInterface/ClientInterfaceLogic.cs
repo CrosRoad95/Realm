@@ -71,7 +71,7 @@ internal class ClientInterfaceLogic
             }
 
         if (removed)
-            _luaEventHub.Broadcast(x => x.AddFocusable(), element);
+            _luaEventHub.Broadcast(x => x.RemoveFocusable(), element);
     }
 
     private async void HandlePlayerJoin(Player player)

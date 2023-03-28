@@ -40,7 +40,6 @@ end
         var code = $"""
 addEvent("internalHub{baseName}{methodInfo.Name}", true);
 addEventHandler("internalHub{baseName}{methodInfo.Name}", localPlayer, function({parameters})
-    --iprint({parameters})
     local callbackName = "{methodInfo.Name}";
     local callback = hub[callbackName];
     if(type(callback) ~= "function")then
