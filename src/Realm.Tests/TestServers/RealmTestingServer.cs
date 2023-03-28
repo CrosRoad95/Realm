@@ -1,4 +1,7 @@
-﻿namespace Realm.Tests.TestServers;
+﻿using Realm.Resources.Assets.Interfaces;
+using Realm.Tests.Classes;
+
+namespace Realm.Tests.TestServers;
 
 internal class RealmTestingServer : TestingServer
 {
@@ -20,6 +23,7 @@ internal class RealmTestingServer : TestingServer
             services.AddSingleton<ItemsRegistry>();
             services.AddSingleton<VehicleUpgradeRegistry>();
             services.AddSingleton<LevelsRegistry>();
+            services.AddSingleton<IAssetEncryptionProvider, TestAssetEncryptionProvider>();
 
             services.AddSingleton<IConsole>(new EmptyServerConsole());
             services.AddSingleton<IServerFilesProvider>(new NullServerFilesProvider());

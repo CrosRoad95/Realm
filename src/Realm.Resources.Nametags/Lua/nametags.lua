@@ -42,6 +42,7 @@ end
 function handleSetPedNametag(nametag)
 	nametags[source] = nametag
 end
+
 function handleRemoveNametag()
 	nametags[source] = nametag
 end
