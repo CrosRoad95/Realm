@@ -50,3 +50,4 @@ global using SlipeServer.Server.Concepts;
 
 [assembly: InternalsVisibleTo("Realm.Server")]
 [assembly: InternalsVisibleTo("Realm.Tests")]
+[assembly: InternalsVisibleTo("DynamicProxyGenAssembly2")]

@@ -11,6 +11,7 @@ internal class RealmTestingServer : TestingServer
     public RealmTestingServer(TestDateTimeProvider dateTimeProvider, TestConfigurationProvider testConfigurationProvider, Action<ServiceCollection>? configureServices = null) : base(testConfigurationProvider.GetRequired<SlipeServer.Server.Configuration>("server"), (serverBuilder) =>
     {
         var saveServiceMock = new Mock<ISaveService>(MockBehavior.Strict);
+        saveServiceMock.Setup(x => x.SaveNewPlayerInventory(It.IsAny<InventoryComponent>(), It.IsAny<int>())).ReturnsAsync(1);
         var rpgServerMock = new Mock<IRPGServer>(MockBehavior.Strict);
         serverBuilder.ConfigureServer(testConfigurationProvider, SlipeServer.Server.ServerBuilders.ServerBuilderDefaultBehaviours.None);
         serverBuilder.ConfigureServices(services =>

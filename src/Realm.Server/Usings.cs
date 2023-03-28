@@ -60,3 +60,4 @@ global using Realm.Domain.IdGenerators;
 global using System.Runtime.CompilerServices;
 
 [assembly: InternalsVisibleTo("Realm.Tests")]
+[assembly: InternalsVisibleTo("DynamicProxyGenAssembly2")]
