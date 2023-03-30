@@ -43,7 +43,7 @@ public class Item : IEquatable<Item>, IEquatable<Dictionary<string, object>>
     {
         get
         {
-            _lock.EnterWriteLock();
+            _lock.EnterReadLock();
             try
             {
                 return new Dictionary<string, object>(_metaData);
