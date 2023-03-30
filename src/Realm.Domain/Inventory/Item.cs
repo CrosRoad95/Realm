@@ -2,26 +2,59 @@
 
 public class Item : IEquatable<Item>, IEquatable<Dictionary<string, object>>
 {
+    private readonly ReaderWriterLockSlim _lock = new();
     public string Id { get; internal set; } = Guid.NewGuid().ToString();
     public string LocalId { get; } = Guid.NewGuid().ToString();
     public uint ItemId { get; private set; }
 
     private uint _number = 0;
-    public uint Number { get => _number; set
+    public uint Number
+    {
+        get
         {
+            _lock.EnterReadLock();
+            try
+            {
+                return _number;
+            }
+            finally
+            {
+                _lock.ExitReadLock();
+            }
+        }
+        set
+        {
+            if (value == 0)
+                throw new ArgumentException(nameof(value));
+
+            _lock.EnterWriteLock();
             var old = _number;
             _number = value;
-            if (old != 0)
-            {
-                NumberChanged?.Invoke(this, old, _number);
-            }
+            _lock.ExitWriteLock();
+
+            NumberChanged?.Invoke(this, old, value);
         }
     }
     public string Name { get; init; }
     public decimal Size { get; init; }
     public ItemAction AvailiableActions { get; init; }
-    public Dictionary<string, object> MetaData { get; init; }
-    
+    private readonly Dictionary<string, object> _metaData;
+    public IReadOnlyDictionary<string, object> MetaData
+    {
+        get
+        {
+            _lock.EnterWriteLock();
+            try
+            {
+                return new Dictionary<string, object>(_metaData);
+            }
+            finally
+            {
+                _lock.ExitReadLock();
+            }
+        }
+    }
+
     public event Action<Item, uint, uint>? NumberChanged;
     public event Action<Item>? Changed;
 
@@ -35,30 +68,60 @@ public class Item : IEquatable<Item>, IEquatable<Dictionary<string, object>>
         _number = number;
         if (metaData != null)
         {
-            MetaData = metaData;
+            _metaData = metaData;
         }
         else
         {
-            MetaData = new();
+            _metaData = new();
         }
     }
 
     public bool SetMetadata(string key, object value)
     {
-        if (value is string or double or int)
+        _lock.EnterWriteLock();
+        try
         {
-            MetaData[key] = value;
-            Changed?.Invoke(this);
-            return true;
+            if (value is string or double or int)
+            {
+                _metaData[key] = value;
+                Changed?.Invoke(this);
+                return true;
+            }
+            return false;
         }
-        return false;
+        finally
+        {
+            _lock.ExitWriteLock();
+        }
     }
 
     public object? GetMetadata(string key)
     {
-        if (MetaData.TryGetValue(key, out var value))
-            return value;
-        return null;
+        _lock.EnterReadLock();
+        try
+        {
+            if (_metaData.TryGetValue(key, out var value))
+                return value;
+            return null;
+        }
+        finally
+        {
+            _lock.ExitReadLock();
+        }
+    }
+    
+
+    public bool HasMetadata(string key)
+    {
+        _lock.EnterReadLock();
+        try
+        {
+            return _metaData.ContainsKey(key);
+        }
+        finally
+        {
+            _lock.ExitReadLock();
+        }
     }
 
     public override string ToString() => Name;
@@ -76,7 +139,7 @@ public class Item : IEquatable<Item>, IEquatable<Dictionary<string, object>>
         if (ItemId != other.ItemId)
             return false;
 
-        return Equals(other.MetaData);
+        return Equals(other._metaData);
     }
 
     public bool Equals(Dictionary<string, object>? other)
@@ -84,16 +147,24 @@ public class Item : IEquatable<Item>, IEquatable<Dictionary<string, object>>
         if (other == null)
             return false;
 
-        if (MetaData.Count != other.Count)
-            return false;
-
-        foreach (var key in MetaData.Keys)
+        _lock.EnterReadLock();
+        try
         {
-            if (!MetaData[key].Equals(other[key]))
-            {
+            if (_metaData.Count != other.Count)
                 return false;
+
+            foreach (var key in _metaData.Keys)
+            {
+                if (!_metaData[key].Equals(other[key]))
+                {
+                    return false;
+                }
             }
+            return true;
         }
-        return true;
+        finally
+        {
+            _lock.ExitReadLock();
+        }
     }
 }

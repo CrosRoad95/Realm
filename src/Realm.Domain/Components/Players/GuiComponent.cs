@@ -39,12 +39,12 @@ public abstract class GuiComponent : Component
     {
         try
         {
-            var (id, guiName, actionName) = luaEvent.Read<string, string, string>(FromLuaValueMapper);
+            var (id, guiName, actionName, data) = luaEvent.Read<string, string, string, LuaValue>(FromLuaValueMapper);
             if (guiName == _name)
             {
                 try
                 {
-                    await HandleAction(new ActionContext(actionName, luaEvent.Parameters[3]));
+                    await HandleAction(new ActionContext(actionName, data));
                 }
                 catch(Exception ex)
                 {
