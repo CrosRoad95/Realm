@@ -1,4 +1,4 @@
-﻿using Realm.Domain.Data.Upgrades;
+﻿using Realm.Domain.Data.VehicleUpgrades;
 
 namespace Realm.Domain.Registries;
 

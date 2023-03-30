@@ -1,6 +1,4 @@
-﻿using Realm.Common.Providers;
-
-namespace Realm.Server.Providers;
+﻿namespace Realm.Server.Providers;
 
 internal class DateTimeProvider : IDateTimeProvider
 {

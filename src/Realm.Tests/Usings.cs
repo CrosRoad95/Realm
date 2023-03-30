@@ -6,7 +6,6 @@ global using Microsoft.Extensions.Configuration;
 global using Microsoft.Extensions.DependencyInjection;
 global using SlipeServer.Server.TestTools;
 global using Realm.Tests.TestServers;
-global using Realm.Server;
 global using Realm.Domain.Components.Players;
 global using Realm.Domain;
 global using FluentAssertions;

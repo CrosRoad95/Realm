@@ -2,7 +2,7 @@
 using Org.BouncyCastle.Crypto;
 using Org.BouncyCastle.Security;
 
-namespace Realm.Server;
+namespace Realm.Server.Security.Cryptography;
 
 public class AESCrypto
 {

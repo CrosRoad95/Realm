@@ -3,7 +3,6 @@ using Realm.Domain.Enums;
 using Realm.Domain.Inventory;
 using SlipeServer.Server.Elements.Structs;
 using SlipeServer.Server.Enums;
-using static Realm.Domain.Registries.ItemRegistryEntry;
 
 namespace Realm.Console.Logic;
 

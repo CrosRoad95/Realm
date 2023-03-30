@@ -1,6 +1,4 @@
-﻿using static Realm.Domain.Registries.ItemRegistryEntry;
-
-namespace Realm.Domain.Registries.Abstractions;
+﻿namespace Realm.Domain.Registries.Abstractions;
 
 public abstract class RegistryBase<TEntry> where TEntry : RegistryEntryBase
 {

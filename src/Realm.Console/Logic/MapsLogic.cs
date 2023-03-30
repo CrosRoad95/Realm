@@ -1,5 +1,4 @@
 ﻿using Realm.Domain.Enums;
-using Realm.Server;
 using SlipeServer.Server.Enums;
 
 namespace Realm.Console.Logic;

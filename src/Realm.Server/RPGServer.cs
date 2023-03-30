@@ -1,14 +1,4 @@
-﻿using Realm.Common.Providers;
-using Realm.Domain.IdGenerators;
-using Realm.Domain.Registries;
-using Realm.Module.Discord;
-using Realm.Module.Grpc;
-using Realm.Module.WebApp;
-using Realm.Resources.Assets.Interfaces;
-using Realm.Server.Logic;
-using Realm.Server.Logic.Registries;
-using SlipeServer.Server.Elements.IdGeneration;
-using SlipeServer.Server.Loggers;
+﻿using Realm.Server.Entities;
 
 namespace Realm.Server;
 
@@ -53,6 +43,7 @@ internal sealed class RPGServer : IRPGServer
         services.AddSingleton((IRPGServer)this);
         services.AddSingleton(this);
         services.AddSingleton<SeederServerBuilder>();
+        services.AddSingleton<RPGCommandService>();
         #endregion
 
         #region Registries
@@ -62,9 +53,12 @@ internal sealed class RPGServer : IRPGServer
         services.AddSingleton<VehicleEnginesRegistry>();
         #endregion
 
+        #region Security
+        services.AddSingleton<IActiveUsers, ActiveUsers>();
+        #endregion
+
         #region Common
-        services.AddSingleton<RPGCommandService>();
-        services.AddSingleton<IRPGUserManager, RPGUserManager>();
+        services.AddTransient<IUsersService, UsersService>();
         services.AddTransient<ISaveService, SaveService>();
         services.AddTransient<ILoadService, LoadService>();
         services.AddTransient<IVehiclesService, VehiclesService>();

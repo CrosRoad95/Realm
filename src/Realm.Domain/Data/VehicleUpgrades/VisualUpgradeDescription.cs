@@ -1,6 +1,6 @@
 ﻿using SlipeServer.Packets.Enums.VehicleUpgrades;
 
-namespace Realm.Domain.Data.Upgrades;
+namespace Realm.Domain.Data.VehicleUpgrades;
 
 public class VisualUpgradeDescription
 {

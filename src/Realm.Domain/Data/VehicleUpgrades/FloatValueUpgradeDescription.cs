@@ -1,4 +1,4 @@
-﻿namespace Realm.Domain.Data.Upgrades;
+﻿namespace Realm.Domain.Data.VehicleUpgrades;
 
 public class FloatValueUpgradeDescription
 {

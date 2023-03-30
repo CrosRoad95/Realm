@@ -3,6 +3,7 @@ using Realm.Domain.Interfaces;
 using Realm.Resources.ClientInterface;
 using Realm.Domain.Components.Elements.CollisionShapes;
 using Realm.Domain.Enums;
+using Realm.Server.Entities;
 
 namespace Realm.Tests.Tests.Components;
 

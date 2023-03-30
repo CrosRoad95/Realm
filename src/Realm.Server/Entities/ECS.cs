@@ -2,10 +2,9 @@
 using Realm.Domain.Enums;
 using Realm.Domain.Exceptions;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
 using System.Xml.Linq;
 
-namespace Realm.Server;
+namespace Realm.Server.Entities;
 
 internal sealed class ECS : IECS
 {
@@ -27,7 +26,7 @@ internal sealed class ECS : IECS
             return entities;
         }
     }
-    
+
     public IReadOnlyCollection<Entity> VehicleEntities
     {
         get
@@ -38,7 +37,7 @@ internal sealed class ECS : IECS
             return entities;
         }
     }
-    
+
     public IReadOnlyCollection<Entity> PlayerEntities
     {
         get
@@ -76,7 +75,7 @@ internal sealed class ECS : IECS
     {
         return _entityByElement.TryGetValue(element, out result);
     }
-    
+
     private void InternalEntityCreated(Entity entity)
     {
         _entitiesLock.EnterWriteLock();
@@ -127,7 +126,7 @@ internal sealed class ECS : IECS
 
     private void HandleComponentAdded(Component component)
     {
-        if(component is ElementComponent elementComponent)
+        if (component is ElementComponent elementComponent)
         {
             _entityByElement[elementComponent.Element] = component.Entity;
             component.Entity.Disposed += HandleElementEntityDestroyed;

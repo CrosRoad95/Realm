@@ -9,4 +9,5 @@ public interface IBanRepository : IRepositoryBase
     Task<List<Ban>> GetBansByUserId(int userId, IDateTimeProvider dateTimeProvider);
     Task<List<Ban>> GetBansBySerial(string serial, IDateTimeProvider dateTimeProvider);
     void RemoveBan(Ban ban);
+    Task<Ban?> GetBanBySerialAndBanType(string serial, int banType, IDateTimeProvider dateTimeProvider);
 }

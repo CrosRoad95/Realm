@@ -6,7 +6,7 @@ namespace Realm.Console.Components.Gui;
 public sealed class LoginGuiComponent : GuiComponent
 {
     [Inject]
-    private IRPGUserManager RPGUserManager { get; set; } = default!;
+    private IUsersService RPGUserManager { get; set; } = default!;
     [Inject]
     private ILogger<GuiComponent> Logger { get; set; } = default!;
 

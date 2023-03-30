@@ -6,4 +6,5 @@ public class GameplayOptions
     public byte MoneyPrecision { get; set; }
     public CultureInfo CurrencyCulture { get; set; }
     public uint DefaultInventorySize { get; set; }
+    public int BanType { get; set; }
 }

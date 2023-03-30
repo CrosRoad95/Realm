@@ -1,9 +1,8 @@
 ﻿using Realm.Domain.Components.Elements;
 using Realm.Domain.Components.Vehicles;
-using Realm.Domain.Data.Upgrades;
+using Realm.Domain.Data.VehicleUpgrades;
 using Realm.Domain.Enums;
 using Realm.Domain.Interfaces;
-using Realm.Domain.Registries;
 using SlipeServer.Server.Constants;
 using System.Numerics;
 

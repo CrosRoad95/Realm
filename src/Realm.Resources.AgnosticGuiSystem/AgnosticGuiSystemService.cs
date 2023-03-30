@@ -4,7 +4,6 @@ using SlipeServer.Server.Elements;
 using SlipeServer.Server.Events;
 using SlipeServer.Server.Mappers;
 using System.Collections.Concurrent;
-using System.Diagnostics;
 
 namespace Realm.Resources.AgnosticGuiSystem;
 

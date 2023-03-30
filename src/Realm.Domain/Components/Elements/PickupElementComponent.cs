@@ -1,5 +1,4 @@
 ﻿using Realm.Domain.Rules;
-using System.Data;
 
 namespace Realm.Domain.Components.Elements;
 

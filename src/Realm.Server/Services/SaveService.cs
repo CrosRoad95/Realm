@@ -1,7 +1,4 @@
-﻿using Realm.Domain;
-using Realm.Domain.Enums;
-using Realm.Persistance;
-using Realm.Persistance.Data;
+﻿using Realm.Domain.Enums;
 using static Realm.Persistance.Data.Helpers.VehicleDamageState;
 using static Realm.Persistance.Data.Helpers.VehicleWheelStatus;
 using JobUpgrade = Realm.Persistance.Data.JobUpgrade;

@@ -1,6 +1,6 @@
 ﻿using Realm.Resources.Nametags;
 
-namespace Realm.Domain.Components.World;
+namespace Realm.Domain.Components.Peds;
 
 public sealed class NametagComponent : Component
 {
@@ -10,9 +10,11 @@ public sealed class NametagComponent : Component
     private readonly object _lock = new();
     private string _text;
 
-    public string Text { get => _text; set
+    public string Text
+    {
+        get => _text; set
         {
-            lock(_lock)
+            lock (_lock)
             {
                 _text = value;
                 NametagsService.SetNametag((Ped)Entity.Element, _text);

@@ -1,20 +1,9 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using Realm.Domain.Components.Common;
-using Realm.Domain.Enums;
+﻿using Realm.Domain.Enums;
 using Realm.Resources.Assets;
 using Realm.Resources.Overlay;
-using Realm.Resources.Overlay.Interfaces;
 using SixLabors.ImageSharp;
 using SlipeServer.Packets.Definitions.Lua;
-using SlipeServer.Server.Elements;
-using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Linq;
 using System.Numerics;
-using System.Security.Cryptography.X509Certificates;
-using System.Text;
-using System.Threading.Tasks;
 using Color = System.Drawing.Color;
 using Size = System.Drawing.Size;
 

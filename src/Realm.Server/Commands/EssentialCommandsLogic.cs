@@ -20,7 +20,14 @@ internal class EssentialCommandsLogic
         _commands["help"] = typeof(HelpCommand);
         foreach (var item in commands)
         {
-            var commandName = item.Type.GetCustomAttribute<CommandNameAttribute>().Name.ToLower();
+            var commandNameAttribute = item.Type.GetCustomAttribute<CommandNameAttribute>();
+            if (commandNameAttribute == null)
+            {
+                logger.LogWarning($"Command class {item.Type.Name} has no CommandName attribute");
+                continue;
+            }
+
+            var commandName = commandNameAttribute.Name.ToLower();
             if (_commands.ContainsKey(commandName))
             {
                 _commands.Clear();

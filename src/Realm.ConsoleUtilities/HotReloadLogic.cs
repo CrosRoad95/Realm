@@ -22,8 +22,15 @@ public sealed class HotReloadLogic
 
     private async void HandleHotReload()
     {
-        var stopwatch = Stopwatch.StartNew();
-        await _agnosticGuiSystemService.UpdateGuiFiles();
-        _logger.LogInformation("Updated guis in: {time}ms", stopwatch.ElapsedMilliseconds);
+        try
+        {
+            var stopwatch = Stopwatch.StartNew();
+            await _agnosticGuiSystemService.UpdateGuiFiles();
+            _logger.LogInformation("Updated guis in: {time}ms", stopwatch.ElapsedMilliseconds);
+        }
+        catch(Exception ex)
+        {
+            _logger.LogError(ex, "Failed to update gui files.");
+        }
     }
 }

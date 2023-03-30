@@ -1,6 +1,4 @@
-﻿using Realm.Domain.Registries;
-
-namespace Realm.Server.Logic.Registries;
+﻿namespace Realm.Server.Logic.Registries;
 
 internal class VehicleEnginesRegistryLogic
 {

@@ -47,6 +47,14 @@ internal class BanRepository : IBanRepository
         return query.ToListAsync();
     }
     
+    public Task<Ban?> GetBanBySerialAndBanType(string serial, int banType, IDateTimeProvider dateTimeProvider)
+    {
+        var query = _db.Bans
+            .TagWithSource(nameof(BanRepository))
+            .Where(x => x.Serial == serial && x.Type == banType && x.End > dateTimeProvider.Now);
+        return query.FirstOrDefaultAsync();
+    }
+    
     public async Task<List<Ban>> GetBansByUserId(int userId, IDateTimeProvider dateTimeProvider)
     {
         return await _db.Bans

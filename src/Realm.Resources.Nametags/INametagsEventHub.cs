@@ -1,5 +1,4 @@
 ﻿using SlipeServer.Packets.Definitions.Lua;
-using SlipeServer.Server.Elements;
 
 namespace Realm.Resources.Nametags;
 

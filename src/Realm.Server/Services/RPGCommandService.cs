@@ -20,12 +20,12 @@ public class RPGCommandService
 
     private readonly CommandService _commandService;
     private readonly IECS _ecs;
-    private readonly IRPGUserManager _rpgUserManager;
+    private readonly IUsersService _rpgUserManager;
     private readonly ILogger<RPGCommandService> _logger;
 
     private readonly Dictionary<string, AsyncCommandInfo> _asyncCommands = new();
     private readonly Dictionary<string, CommandInfo> _commands = new();
-    public RPGCommandService(CommandService commandService, ILogger<RPGCommandService> logger, IECS ecs, IRPGUserManager rpgUserManager)
+    public RPGCommandService(CommandService commandService, ILogger<RPGCommandService> logger, IECS ecs, IUsersService rpgUserManager)
     {
         _logger = logger;
         _commandService = commandService;

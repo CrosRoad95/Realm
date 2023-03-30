@@ -1,7 +1,6 @@
 ﻿using Realm.Common.Providers;
 using Realm.Console.Components;
 using Realm.Console.Components.Huds;
-using Realm.Domain.Components.World;
 using Realm.Domain.Enums;
 using Realm.Module.Discord.Interfaces;
 using Realm.Resources.Nametags;
@@ -15,8 +14,8 @@ using Size = System.Drawing.Size;
 using Realm.Server.Extensions;
 using Realm.Console.Components.Vehicles;
 using Realm.Resources.Base;
-using Realm.Domain.Extensions;
 using Realm.Resources.ClientInterface;
+using Realm.Domain.Components.Peds;
 
 namespace Realm.Console.Logic;
 
@@ -43,7 +42,7 @@ internal sealed class CommandsLogic
 
     public CommandsLogic(RPGCommandService commandService, IEntityFactory entityFactory, RepositoryFactory repositoryFactory,
         ItemsRegistry itemsRegistry, IECS ecs, IBanService banService, IDiscordService discordService, ChatBox chatBox, ILogger<CommandsLogic> logger,
-        IDateTimeProvider dateTimeProvider, INametagsService nametagsService, IRPGUserManager rpgUserManager, IVehiclesService vehiclesService,
+        IDateTimeProvider dateTimeProvider, INametagsService nametagsService, IUsersService rpgUserManager, IVehiclesService vehiclesService,
         ILuaEventHub<IClientInterfaceEventHub> luaEventHub, GameWorld gameWorld)
     {
         _commandService = commandService;

@@ -1,5 +1,4 @@
-﻿using Realm.Common.Providers;
-using Realm.Module.Discord.Interfaces;
+﻿using Realm.Module.Discord.Interfaces;
 
 namespace Realm.Server.Integrations.Discord.Handlers;
 

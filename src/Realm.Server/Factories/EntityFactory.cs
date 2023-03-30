@@ -1,8 +1,6 @@
 ﻿using Realm.Domain.Components.Elements.CollisionShapes;
-using Realm.Domain.Concepts;
 using Realm.Domain.Enums;
 using Realm.Persistance.Interfaces;
-using RenderWareIo.Structs.Dff;
 using SlipeServer.Server.Elements.ColShapes;
 using SlipeServer.Server.Elements.Enums;
 using SlipeServer.Server.Enums;

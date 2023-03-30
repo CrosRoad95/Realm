@@ -1,5 +1,4 @@
 ﻿using Realm.Domain.Enums;
-using static Realm.Domain.Registries.ItemRegistryEntry;
 
 namespace Realm.Console.Data;
 

@@ -2,7 +2,7 @@
 using System.Drawing;
 using System.Numerics;
 
-namespace Realm.Assets.Factories;
+namespace Realm.Resources.Assets.Factories;
 
 public class ModelFactory
 {
@@ -17,7 +17,7 @@ public class ModelFactory
         var vert1 = _renderWareBuilder.AddVertex(vertex1, Vector3.UnitZ, new Vector2(vertex1.X, vertex1.Y));
         var vert2 = _renderWareBuilder.AddVertex(vertex2, Vector3.UnitZ, new Vector2(vertex2.X, vertex2.Y));
         var vert3 = _renderWareBuilder.AddVertex(vertex3, Vector3.UnitZ, new Vector2(vertex3.X, vertex3.Y));
-       var mat =  _renderWareBuilder.AddMaterial(new Material
+        var mat = _renderWareBuilder.AddMaterial(new Material
         {
             Color = Color.White,
             MaskName = "",

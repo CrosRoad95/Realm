@@ -1,6 +1,4 @@
-﻿using Microsoft.Extensions.Logging;
-using Realm.Common.Providers;
-using Realm.Common.Utilities;
+﻿using Realm.Common.Utilities;
 using Realm.Domain.Components;
 using Realm.Domain.Enums;
 using System.Collections.Concurrent;
@@ -38,50 +36,50 @@ internal class PlayersLogic
 
     private async void HandlePlayerJoined(Player player)
     {
-        _playerResources[player] = new Latch(RESOURCES_COUNT, TimeSpan.FromSeconds(60));
-        player.ResourceStarted += HandlePlayerResourceStarted;
-        player.Disconnected += HandlePlayerDisconnected;
-
-        var taskWaitForScreenSize = new TaskCompletionSource<(int, int)>();
-        var taskWaitForCultureInfo = new TaskCompletionSource<CultureInfo>();
-        void HandleClientScreenSizeChanged(Player player2, int x, int y)
-        {
-            if(player2 == player)
-            {
-                _clientInterfaceService.ClientScreenSizeChanged -= HandleClientScreenSizeChanged;
-                taskWaitForScreenSize.SetResult((x, y));
-            }
-        }
-
-        void HandleClientCultureInfoChanged(Player player2, CultureInfo cultureInfo)
-        {
-            if (player2 == player)
-            {
-                _clientInterfaceService.ClientCultureInfoChanged -= HandleClientCultureInfoChanged;
-                taskWaitForCultureInfo.SetResult(cultureInfo);
-            }
-        }
-
-        _clientInterfaceService.ClientScreenSizeChanged += HandleClientScreenSizeChanged;
-        _clientInterfaceService.ClientCultureInfoChanged += HandleClientCultureInfoChanged;
-
         try
         {
-            await _playerResources[player].WaitAsync();
-        }
-        catch (Exception)
-        {
-            player.Kick("Resources took to long to load. Please reconnect.");
-            return;
-        }
-        finally
-        {
-            player.ResourceStarted -= HandlePlayerResourceStarted;
-            _playerResources.TryRemove(player, out var _);
-        }
+            _playerResources[player] = new Latch(RESOURCES_COUNT, TimeSpan.FromSeconds(60));
+            player.ResourceStarted += HandlePlayerResourceStarted;
+            player.Disconnected += HandlePlayerDisconnected;
 
-        try
-        {
+            var taskWaitForScreenSize = new TaskCompletionSource<(int, int)>();
+            var taskWaitForCultureInfo = new TaskCompletionSource<CultureInfo>();
+            void HandleClientScreenSizeChanged(Player player2, int x, int y)
+            {
+                if (player2 == player)
+                {
+                    _clientInterfaceService.ClientScreenSizeChanged -= HandleClientScreenSizeChanged;
+                    taskWaitForScreenSize.SetResult((x, y));
+                }
+            }
+
+            void HandleClientCultureInfoChanged(Player player2, CultureInfo cultureInfo)
+            {
+                if (player2 == player)
+                {
+                    _clientInterfaceService.ClientCultureInfoChanged -= HandleClientCultureInfoChanged;
+                    taskWaitForCultureInfo.SetResult(cultureInfo);
+                }
+            }
+
+            _clientInterfaceService.ClientScreenSizeChanged += HandleClientScreenSizeChanged;
+            _clientInterfaceService.ClientCultureInfoChanged += HandleClientCultureInfoChanged;
+
+            try
+            {
+                await _playerResources[player].WaitAsync();
+            }
+            catch (Exception)
+            {
+                player.Kick("Resources took to long to load. Please reconnect.");
+                return;
+            }
+            finally
+            {
+                player.ResourceStarted -= HandlePlayerResourceStarted;
+                _playerResources.TryRemove(player, out var _);
+            }
+
             var screenSize = await taskWaitForScreenSize.Task;
             var cultureInfo = await taskWaitForCultureInfo.Task;
 
@@ -89,10 +87,11 @@ internal class PlayersLogic
             {
                 entity.AddComponent(new PlayerElementComponent(player, new Vector2(screenSize.Item1, screenSize.Item2), cultureInfo));
             });
+
         }
-        catch(Exception ex)
+        catch (Exception ex)
         {
-            ;
+            _logger.LogError(ex, "Failed to handle player joined");
         }
     }
 
@@ -181,7 +180,7 @@ internal class PlayersLogic
         }
         catch(Exception ex)
         {
-            _logger.LogError(ex, "Something went wrong");
+            _logger.LogError(ex, "Failed to handle player disconnected");
         }
     }
 }

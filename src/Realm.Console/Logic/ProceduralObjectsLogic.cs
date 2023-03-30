@@ -1,5 +1,5 @@
-﻿using Realm.Assets.Factories;
-using Realm.Resources.Assets;
+﻿using Realm.Resources.Assets;
+using Realm.Resources.Assets.Factories;
 using SlipeServer.Server.Enums;
 
 namespace Realm.Console.Logic;

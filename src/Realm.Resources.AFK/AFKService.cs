@@ -1,5 +1,4 @@
 ﻿using SlipeServer.Server.Elements;
-using SlipeServer.Server.Services;
 
 namespace Realm.Resources.AFK;
 

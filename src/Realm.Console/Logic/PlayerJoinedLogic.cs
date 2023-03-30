@@ -1,7 +1,6 @@
 ﻿using Realm.Domain.Components;
-using Realm.Domain.Components.World;
+using Realm.Domain.Components.Peds;
 using Realm.Domain.Enums;
-using Realm.Resources.Assets;
 using Realm.Resources.Nametags;
 using Realm.Server.Extensions;
 
@@ -11,28 +10,22 @@ internal sealed class PlayerJoinedLogic
 {
     private readonly IECS _ecs;
     private readonly ILogger<PlayerJoinedLogic> _logger;
-    private readonly AssetsRegistry _assetsRegistry;
-    private readonly IBanService _banService;
     private readonly INametagsService _nametagsService;
 
-    public PlayerJoinedLogic(IECS ecs, ILogger<PlayerJoinedLogic> logger, AssetsRegistry assetsRegistry, IBanService banService,
-        INametagsService nametagsService)
+    public PlayerJoinedLogic(IECS ecs, ILogger<PlayerJoinedLogic> logger, INametagsService nametagsService)
     {
         _ecs = ecs;
         _logger = logger;
-        _assetsRegistry = assetsRegistry;
-        _banService = banService;
         _nametagsService = nametagsService;
         _ecs.EntityCreated += HandleEntityCreated;
     }
 
-    private async void HandleEntityCreated(Entity entity)
+    private void HandleEntityCreated(Entity entity)
     {
         if (entity.Tag != EntityTag.Player)
             return;
 
         var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();
-        var bans = await _banService.GetBansBySerial(playerElementComponent.Client.Serial);
 
         playerElementComponent.SetText3dRenderingEnabled(false);
         playerElementComponent.SetChatVisible(false);

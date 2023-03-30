@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Identity;
-using Realm.Domain.Contexts;
+﻿using Realm.Domain.Contexts;
 
 namespace Realm.Console.Components.Gui;
 
@@ -7,7 +6,7 @@ namespace Realm.Console.Components.Gui;
 public sealed class RegisterGuiComponent : GuiComponent
 {
     [Inject]
-    private IRPGUserManager RPGUserManager { get; set; } = default!;
+    private IUsersService RPGUserManager { get; set; } = default!;
 
     public RegisterGuiComponent() : base("register", false)
     {

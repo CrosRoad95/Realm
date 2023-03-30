@@ -2,7 +2,6 @@
 using SlipeServer.Server.Resources;
 using SlipeServer.Server;
 using Realm.Resources.Assets.Interfaces;
-using Microsoft.Extensions.Options;
 using System.Text;
 
 namespace Realm.Resources.Assets;

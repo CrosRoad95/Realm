@@ -1,6 +1,5 @@
 ﻿using Realm.Domain.Concepts.Interface;
 using Realm.Domain.Structs;
-using RenderWareIo.Structs.Col;
 using SlipeServer.Packets.Structs;
 
 namespace Realm.Domain.Concepts;

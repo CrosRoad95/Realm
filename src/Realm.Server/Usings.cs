@@ -58,6 +58,18 @@ global using Realm.Server.Attributes;
 global using Realm.Domain.Concepts;
 global using Realm.Domain.IdGenerators;
 global using System.Runtime.CompilerServices;
+global using Realm.Server.Security.Interfaces;
+global using Realm.Common.Providers;
+global using Realm.Domain.Registries;
+global using Realm.Module.Discord;
+global using Realm.Module.Grpc;
+global using Realm.Module.WebApp;
+global using Realm.Resources.Assets.Interfaces;
+global using Realm.Server.Logic;
+global using Realm.Server.Logic.Registries;
+global using Realm.Server.Security;
+global using SlipeServer.Server.Elements.IdGeneration;
+global using SlipeServer.Server.Loggers;
 
 [assembly: InternalsVisibleTo("Realm.Tests")]
 [assembly: InternalsVisibleTo("DynamicProxyGenAssembly2")]

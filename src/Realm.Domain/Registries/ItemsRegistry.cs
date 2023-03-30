@@ -1,6 +1,4 @@
-﻿using static Realm.Domain.Registries.ItemRegistryEntry;
-
-namespace Realm.Domain.Registries;
+﻿namespace Realm.Domain.Registries;
 
 public class ItemsRegistry
 {

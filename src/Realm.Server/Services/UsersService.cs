@@ -1,31 +1,24 @@
 ﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore.Diagnostics.Internal;
 using Microsoft.Extensions.Options;
-using Realm.Common.Providers;
 using Realm.Domain.Enums;
 using Realm.Domain.Inventory;
 using Realm.Domain.Options;
-using Realm.Domain.Registries;
-using Realm.Persistance.Data;
 
 namespace Realm.Server.Services;
 
-internal class RPGUserManager : IRPGUserManager
+internal class UsersService : IUsersService
 {
-    private readonly SemaphoreSlim _lock = new(1);
-
-    private readonly HashSet<int> _usedAccountsIds = new();
     private readonly ItemsRegistry _itemsRegistry;
     private readonly UserManager<User> _userManager;
-    private readonly ILogger<RPGUserManager> _logger;
+    private readonly ILogger<UsersService> _logger;
     private readonly IOptions<GameplayOptions> _gameplayOptions;
     private readonly IDateTimeProvider _dateTimeProvider;
     private readonly IAuthorizationService _authorizationService;
     private readonly IDb _db;
+    private readonly IActiveUsers _activeUsers;
 
-    public RPGUserManager(ItemsRegistry itemsRegistry, UserManager<User> userManager, ILogger<RPGUserManager> logger, IOptions<GameplayOptions> gameplayOptions,
-        IDateTimeProvider dateTimeProvider, IAuthorizationService authorizationService, IDb db)
+    public UsersService(ItemsRegistry itemsRegistry, UserManager<User> userManager, ILogger<UsersService> logger, IOptions<GameplayOptions> gameplayOptions,
+        IDateTimeProvider dateTimeProvider, IAuthorizationService authorizationService, IDb db, IActiveUsers activeUsers)
     {
         _itemsRegistry = itemsRegistry;
         _userManager = userManager;
@@ -34,6 +27,7 @@ internal class RPGUserManager : IRPGUserManager
         _dateTimeProvider = dateTimeProvider;
         _authorizationService = authorizationService;
         _db = db;
+        _activeUsers = activeUsers;
     }
 
     public async Task<int> SignUp(string username, string password)
@@ -62,11 +56,10 @@ internal class RPGUserManager : IRPGUserManager
         if (entity.Tag != EntityTag.Player || !entity.HasComponent<PlayerElementComponent>())
             throw new NotSupportedException("Entity is not a player entity.");
 
-        await _lock.WaitAsync(TimeSpan.FromSeconds(1));
         using var transaction = entity.BeginComponentTransaction();
         try
         {
-            if (!_usedAccountsIds.Add(user.Id))
+            if (!_activeUsers.TrySetActive(user.Id))
                 return false;
 
             await entity.AddComponentAsync(new AccountComponent(user));
@@ -133,36 +126,26 @@ internal class RPGUserManager : IRPGUserManager
         }
         catch (Exception ex)
         {
-            // TODO: add Entity component add scope thing
-            _usedAccountsIds.Remove(user.Id);
+            _activeUsers.TrySetInactive(user.Id);
             entity.Rollback(transaction);
             _logger.LogError(ex, "Failed to sign in user of id {userId}", user.Id);
             throw;
-        }
-        finally
-        {
-            _lock.Release();
         }
         entity.Disposed += HandleDestroyed;
         return true;
     }
 
-    private async void HandleDestroyed(Entity entity)
+    private void HandleDestroyed(Entity entity)
     {
-        await _lock.WaitAsync();
         try
         {
             var accountComponent = entity.GetRequiredComponent<AccountComponent>();
-            _usedAccountsIds.Remove(accountComponent.Id);
+            _activeUsers.TrySetInactive(accountComponent.Id);
         }
         catch(Exception ex)
         {
             _logger.LogError(ex, "Failed to destroy player entity {entityName}", entity.Name);
             throw;
-        }
-        finally
-        {
-            _lock.Release();
         }
     }
 
@@ -180,6 +163,24 @@ internal class RPGUserManager : IRPGUserManager
             .AsNoTrackingWithIdentityResolution()
             .FirstOrDefaultAsync();
     }
+    
+    public Task<User?> GetUserByLoginCaseInsensitive(string login)
+    {
+        return _userManager.Users
+            .IncludeAll()
+            .Where(u => u.NormalizedUserName == login.ToUpper())
+            .AsNoTrackingWithIdentityResolution()
+            .FirstOrDefaultAsync();
+    }
+    
+    public Task<User?> GetUserById(int id)
+    {
+        return _userManager.Users
+            .IncludeAll()
+            .Where(u => u.Id == id)
+            .AsNoTrackingWithIdentityResolution()
+            .FirstOrDefaultAsync();
+    }
 
     public Task<bool> CheckPasswordAsync(User user, string password)
     {
@@ -188,7 +189,12 @@ internal class RPGUserManager : IRPGUserManager
 
     public Task<bool> IsUserNameInUse(string userName)
     {
-        return _userManager.Users.AnyAsync(u => u.UserName.ToLower() == userName.ToLower());
+        return _userManager.Users.AnyAsync(u => u.UserName == userName);
+    }
+    
+    public Task<bool> IsUserNameInUseCaseInsensitive(string userName)
+    {
+        return _userManager.Users.AnyAsync(u => u.NormalizedUserName == userName.ToUpper());
     }
 
     public Task<bool> IsSerialWhitelisted(int userId, string serial)
@@ -238,6 +244,10 @@ internal class RPGUserManager : IRPGUserManager
         catch(Exception)
         {
             return false;
+        }
+        finally
+        {
+            _db.ChangeTracker.Clear();
         }
     }
 }

@@ -30,7 +30,7 @@ internal class RealmTestingServer : TestingServer
             services.AddSingleton<IServerFilesProvider>(new NullServerFilesProvider());
             services.AddLogging(x => x.AddSerilog(new LoggerConfiguration().CreateLogger(), dispose: true));
 
-            services.AddSingleton<IRPGUserManager, RPGUserManager>();
+            services.AddSingleton<IUsersService, UsersService>();
             configureServices?.Invoke(services);
         });
     })

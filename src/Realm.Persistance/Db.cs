@@ -1,6 +1,4 @@
-﻿using Realm.Persistance.Data;
-
-namespace Realm.Persistance;
+﻿namespace Realm.Persistance;
 
 public abstract class Db<T> : IdentityDbContext<User, Role, int,
         IdentityUserClaim<int>,

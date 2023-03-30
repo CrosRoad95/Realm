@@ -1,5 +1,4 @@
-﻿using Realm.Common.Providers;
-using Realm.Persistance.Interfaces;
+﻿using Realm.Persistance.Interfaces;
 
 namespace Realm.Server.Services;
 
@@ -37,4 +36,6 @@ public class BanService : IBanService
     public Task<List<Ban>> GetBansBySerial(string serial) => _banRepository.GetBansBySerial(serial, _dateTimeProvider);
 
     public Task<List<Ban>> GetBansByUserId(int userId) => _banRepository.GetBansByUserId(userId, _dateTimeProvider);
+    
+    public Task<Ban?> GetBanBySerialAndBanType(string serial, int banType) => _banRepository.GetBanBySerialAndBanType(serial, banType, _dateTimeProvider);
 }

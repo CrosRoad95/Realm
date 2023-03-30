@@ -7,14 +7,14 @@ public class SignInServiceTests
 {
     private readonly EntityHelper _entityHelper;
     private readonly RealmTestingServer _realmTestingServer;
-    private readonly IRPGUserManager _signInService;
+    private readonly IUsersService _signInService;
 
     public SignInServiceTests()
     {
         _realmTestingServer = new(new(), new(5000));
         _entityHelper = new(_realmTestingServer);
 
-        _signInService = _realmTestingServer.GetRequiredService<IRPGUserManager>();
+        _signInService = _realmTestingServer.GetRequiredService<IUsersService>();
     }
 
     //[Fact]

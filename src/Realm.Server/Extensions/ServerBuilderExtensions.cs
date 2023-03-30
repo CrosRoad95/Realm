@@ -5,6 +5,7 @@ using Realm.Resources.Assets;
 using SlipeServer.Resources.BoneAttach;
 using SlipeServer.Resources.Text3d;
 using Realm.Resources.Nametags;
+using Realm.Server.Entities;
 
 namespace Realm.Server.Extensions;
 

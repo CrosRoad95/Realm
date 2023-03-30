@@ -1,5 +1,4 @@
-﻿using SlipeServer.Server.Enums;
-using System.Xml.Serialization;
+﻿using System.Xml.Serialization;
 
 namespace Realm.Server.Xml.Map;
 

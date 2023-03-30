@@ -1,6 +1,5 @@
 ﻿using Realm.Console.Commands;
 using Realm.Module.Discord.Interfaces;
-using Realm.Resources.Assets.Interfaces;
 using Realm.Server.Extensions;
 using Realm.Server.Integrations.Discord.Handlers;
 using Realm.Server.Logic;
@@ -34,6 +33,7 @@ var server = builder.Build(null, extraBuilderSteps: serverBuilder =>
     serverBuilder.AddLogic<DefaultModulesLogic>();
     serverBuilder.AddLogic<ProceduralObjectsLogic>();
     serverBuilder.AddLogic<AssetsLogic>();
+    serverBuilder.AddLogic<DefaultBanLogic>();
 #if DEBUG
     serverBuilder.AddLogic<HotReloadLogic>("../../../Server/Gui");
 #endif

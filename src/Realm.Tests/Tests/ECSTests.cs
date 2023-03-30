@@ -1,4 +1,5 @@
 ﻿using Realm.Domain.Enums;
+using Realm.Server.Entities;
 
 namespace Realm.Tests.Tests;
 
