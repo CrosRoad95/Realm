@@ -1,15 +1,17 @@
 ﻿using Realm.Domain.Enums;
 using Realm.Server.Entities;
+using SlipeServer.Server.ElementCollections;
 
 namespace Realm.Tests.Tests;
 
 public class ECSTests
 {
     private readonly ECS _ecs; 
+    private readonly Mock<IElementCollection> _elementCollection = new();
     public ECSTests()
     {
         var services = new ServiceCollection();
-        _ecs = new ECS(services.BuildServiceProvider());
+        _ecs = new ECS(services.BuildServiceProvider(), _elementCollection.Object);
     }
 
     [Fact]
