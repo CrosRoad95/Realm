@@ -16,6 +16,8 @@ public abstract class ElementComponent : Component
     public Vector3 TurnVelocity { get => Element.TurnVelocity; set => Element.TurnVelocity = value; }
     public byte Alpha { get => Element.Alpha; set => Element.Alpha = value; }
     public bool IsFrozen { get => Element.IsFrozen; set => Element.IsFrozen = value; }
+    public byte Interior { get => Element.Interior; set => Element.Interior = value; }
+    public ushort Dimension { get => Element.Dimension; set => Element.Dimension = value; }
     protected bool IsPerPlayer { get => _isPerPlayer; set => _isPerPlayer = value; }
 
     protected ElementComponent()

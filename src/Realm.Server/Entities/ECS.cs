@@ -15,6 +15,7 @@ internal sealed class ECS : IECS
     private readonly ConcurrentDictionary<string, Entity> _entityById = new();
     private readonly ConcurrentDictionary<string, Entity> _entityByName = new();
     private readonly IServiceProvider _serviceProvider;
+    private readonly IElementCollection _elementCollection;
 
     public IReadOnlyCollection<Entity> Entities
     {
@@ -51,9 +52,10 @@ internal sealed class ECS : IECS
 
     public event Action<Entity>? EntityCreated;
 
-    public ECS(IServiceProvider serviceProvider)
+    public ECS(IServiceProvider serviceProvider, IElementCollection elementCollection)
     {
         _serviceProvider = serviceProvider;
+        _elementCollection = elementCollection;
     }
 
     public Entity GetEntityByPlayer(Player player)
@@ -162,4 +164,13 @@ internal sealed class ECS : IECS
     public bool GetEntityById(string id, out Entity? entity) => _entityById.TryGetValue(id, out entity);
     public bool GetEntityByName(string name, out Entity? entity) => _entityByName.TryGetValue(name, out entity);
 
+    public IEnumerable<Entity> GetWithinRange(Vector3 position, float range)
+    {
+        var elements = _elementCollection.GetWithinRange(position, range);
+        foreach (var element in elements)
+        {
+            if(TryGetByElement(element, out var entity))
+                yield return entity;
+        }
+    }
 }

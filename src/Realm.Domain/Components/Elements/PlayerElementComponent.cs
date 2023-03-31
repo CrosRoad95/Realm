@@ -52,12 +52,25 @@ public sealed class PlayerElementComponent : PedElementComponent
     internal Player Player => _player;
     internal bool Spawned { get; set; }
     public string Name { get => Player.Name; set => Player.Name = value; }
+    public byte WantedLevel { get => Player.WantedLevel; set => Player.WantedLevel = value; }
+    public Vector3 AimOrigin { get => Player.AimOrigin; set => Player.AimOrigin = value; }
+    public Vector3 AimDirection { get => Player.AimDirection; set => Player.AimDirection = value; }
+    public Vector3 CameraPosition { get => Player.CameraPosition; set => Player.CameraPosition = value; }
+    public Vector3 CameraDirection { get => Player.CameraDirection; set => Player.CameraDirection = value; }
+    public float CameraRotation { get => Player.CameraRotation; set => Player.CameraRotation = value; }
+    public bool IsOnGround { get => Player.IsOnGround; set => Player.IsOnGround = value; }
+    public bool WearsGoggles { get => Player.WearsGoggles; set => Player.WearsGoggles = value; }
+    public bool HasContact { get => Player.HasContact; set => Player.HasContact = value; }
+    public bool IsChoking { get => Player.IsChoking; set => Player.IsChoking = value; }
     public IClient Client => Player.Client;
     public Controls Controls => _player.Controls;
     public WeaponCollection Weapons => _player.Weapons;
 
     internal override Element Element => _player;
     internal MapIdGenerator MapIdGenerator => _mapIdGenerator;
+
+    public event Action<PlayerElementComponent, PedWastedEventArgs>? Wasted;
+    public event Action<PlayerElementComponent, PlayerDamagedEventArgs>? Damaged;
 
     public Entity? OccupiedVehicle
     {
@@ -84,7 +97,20 @@ public sealed class PlayerElementComponent : PedElementComponent
         ThrowIfDisposed();
         Entity.Transform.Bind(_player);
         _player.BindExecuted += HandleBindExecuted;
+        _player.Wasted += HandleWasted;
+        _player.Damaged += HandleDamaged;
         UpdateFight();
+        _player.IsNametagShowing = false;
+    }
+
+    private void HandleDamaged(Player sender, PlayerDamagedEventArgs e)
+    {
+        Damaged?.Invoke(this, e);
+    }
+
+    private void HandleWasted(Ped sender, PedWastedEventArgs e)
+    {
+        Wasted?.Invoke(this, e);
     }
 
     private void UpdateFight()
@@ -134,6 +160,7 @@ public sealed class PlayerElementComponent : PedElementComponent
             if (lastTransformAndMotion != null)
             {
                 Spawn(lastTransformAndMotion.Position, lastTransformAndMotion.Rotation);
+
                 return true;
             }
         }

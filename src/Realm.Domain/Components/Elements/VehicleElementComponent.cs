@@ -2,6 +2,9 @@
 
 public class VehicleElementComponent : ElementComponent
 {
+    [Inject]
+    private IECS _ecs { get; set; }
+
     protected readonly Vehicle _vehicle;
 
     internal Vehicle Vehicle => _vehicle;
@@ -21,10 +24,24 @@ public class VehicleElementComponent : ElementComponent
     public Color Color3 { get => _vehicle.Colors.Color3; set => _vehicle.Colors.Color3 = value; }
     public Color Color4 { get => _vehicle.Colors.Color4; set => _vehicle.Colors.Color4 = value; }
     public byte PaintJob { get => _vehicle.PaintJob; set => _vehicle.PaintJob = value; }
+    public Dictionary<byte, Entity> Occupants => _vehicle.Occupants.ToDictionary(x => x.Key, x => _ecs.GetByElement(x.Value));
+    
+    public event Action<VehicleElementComponent, VehiclePushedEventArgs> Pushed;
+    public event Action<VehicleElementComponent, VehicleLightStateChangedArgs> LightStateChanged;
+    public event Action<VehicleElementComponent, VehiclePanelStateChangedArgs> PanelStateChanged;
+    public event Action<VehicleElementComponent, VehicleWheelStateChangedArgs> WheelStateChanged;
+    public event Action<VehicleElementComponent, VehicleDoorStateChangedArgs> DoorStateChanged;
+    public event Action<VehicleElementComponent, float, float> HealthChanged;
+    public event Action<VehicleElementComponent> Blown;
 
     public void BlowUp()
     {
         _vehicle.BlowUp();
+    }
+    
+    public void Respawn()
+    {
+        _vehicle.Respawn();
     }
 
     public void SetDoorState(VehicleDoor door, VehicleDoorState state, bool spawnFlyingComponent = false)
@@ -54,11 +71,62 @@ public class VehicleElementComponent : ElementComponent
 
     public void AddPassenger(byte seat, Entity pedEntity, bool warpsIn = true)
     {
-        _vehicle.AddPassenger(seat, pedEntity.GetRequiredComponent<PedElementComponent>().Ped, warpsIn);
+        _vehicle.AddPassenger(seat, (Ped)pedEntity.Element, warpsIn);
+    }
+    
+    public void RemovePasssenger(Entity pedEntity, bool warpsOut = true)
+    {
+        _vehicle.RemovePassenger((Ped)pedEntity.Element, warpsOut);
     }
 
     internal VehicleElementComponent(Vehicle vehicle)
     {
         _vehicle = vehicle;
+    }
+
+    protected override void Load()
+    {
+        _vehicle.Pushed += HandlePushed;
+        _vehicle.LightStateChanged += HandleLightStateChanged;
+        _vehicle.PanelStateChanged += HandlePanelStateChanged;
+        _vehicle.WheelStateChanged += HandleWheelStateChanged;
+        _vehicle.DoorStateChanged += HandleDoorStateChanged;
+        _vehicle.HealthChanged += HandleHealthChanged;
+        _vehicle.Blown += HandleBlown;
+    }
+
+    private void HandleBlown(Element sender)
+    {
+        Blown?.Invoke(this);
+    }
+
+    private void HandleHealthChanged(Vehicle sender, ElementChangedEventArgs<Vehicle, float> args)
+    {
+        HealthChanged?.Invoke(this, args.OldValue, args.NewValue);
+    }
+
+    private void HandlePushed(Vehicle sender, VehiclePushedEventArgs e)
+    {
+        Pushed?.Invoke(this, e);
+    }
+
+    private void HandleLightStateChanged(Element sender, VehicleLightStateChangedArgs e)
+    {
+        LightStateChanged?.Invoke(this, e);
+    }
+
+    private void HandlePanelStateChanged(Element sender, VehiclePanelStateChangedArgs e)
+    {
+        PanelStateChanged?.Invoke(this, e);
+    }
+
+    private void HandleWheelStateChanged(Element sender, VehicleWheelStateChangedArgs e)
+    {
+        WheelStateChanged?.Invoke(this, e);
+    }
+
+    private void HandleDoorStateChanged(Element sender, VehicleDoorStateChangedArgs e)
+    {
+        DoorStateChanged?.Invoke(this, e);
     }
 }

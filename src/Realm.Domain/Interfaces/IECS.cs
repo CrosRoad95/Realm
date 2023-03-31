@@ -10,6 +10,7 @@ public interface IECS
 
     Entity CreateEntity(string name, EntityTag tag, Action<Entity>? entityBuilder = null);
     Entity GetByElement(Element element);
+    IEnumerable<Entity> GetWithinRange(Vector3 position, float range);
     bool TryGetByElement(Element element, out Entity result);
     bool TryGetEntityByPlayer(Player player, out Entity result);
 }
