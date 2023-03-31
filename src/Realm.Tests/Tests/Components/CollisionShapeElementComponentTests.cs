@@ -4,6 +4,7 @@ using Realm.Resources.ClientInterface;
 using Realm.Domain.Components.Elements.CollisionShapes;
 using Realm.Domain.Enums;
 using Realm.Server.Entities;
+using SlipeServer.Server.ElementCollections;
 
 namespace Realm.Tests.Tests.Components;
 
@@ -12,6 +13,7 @@ public class CollisionShapeElementComponentTests
     private readonly Entity _entity;
     private readonly CollisionSphereElementComponent _collisionSphereElementComponent;
     private readonly IClientInterfaceService _clientInterfaceServiceMock = new ClientInterfaceService();
+    private readonly Mock<IElementCollection> _elementCollectionMock = new(MockBehavior.Strict);
 
     public CollisionShapeElementComponentTests()
     {
@@ -19,6 +21,7 @@ public class CollisionShapeElementComponentTests
         var services = new ServiceCollection();
         services.AddSingleton<IRealmConfigurationProvider>(new TestConfigurationProvider());
         services.AddSingleton<IECS, ECS>();
+        services.AddSingleton<IElementCollection>(_elementCollectionMock.Object);
         services.AddSingleton(_clientInterfaceServiceMock);
         services.AddLogging(x => x.AddSerilog(new LoggerConfiguration().CreateLogger(), dispose: true));
 
