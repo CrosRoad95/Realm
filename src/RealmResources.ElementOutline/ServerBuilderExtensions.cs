@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using Realm.Resources.Base;
 using SlipeServer.Server.ServerBuilders;
 
 namespace Realm.Resources.ElementOutline;
@@ -11,6 +12,7 @@ public static class ServerBuilderExtensions
         {
             var resource = new ElementOutlineResource(server);
 
+            resource.AddLuaEventHub<IElementOutlineEventHub>();
             server.AddAdditionalResource(resource, resource.AdditionalFiles);
         });
 
@@ -19,6 +21,7 @@ public static class ServerBuilderExtensions
             services.AddSingleton<IElementOutlineService, ElementOutlineService>();
         });
 
+        builder.AddLuaEventHub<IElementOutlineEventHub, ElementOutlineResource>();
         builder.AddLogic<ElementOutlineLogic>();
     }
 }

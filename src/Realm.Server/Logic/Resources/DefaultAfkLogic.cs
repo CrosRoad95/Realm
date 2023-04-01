@@ -20,7 +20,6 @@ internal class DefaultAfkLogic
         {
             if (entity.TryGetComponent(out AFKComponent afkComponent))
             {
-                _logger.LogInformation("Started afk {entity}", entity);
                 afkComponent.HandlePlayerAFKStarted();
             }
         }
@@ -32,7 +31,6 @@ internal class DefaultAfkLogic
         {
             if(entity.TryGetComponent(out AFKComponent afkComponent))
             {
-                _logger.LogInformation("Stopped afk {entity}", entity);
                 afkComponent.HandlePlayerAFKStopped();
             }
         }

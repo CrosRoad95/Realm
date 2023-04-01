@@ -16,6 +16,9 @@ using Realm.Console.Components.Vehicles;
 using Realm.Resources.Base;
 using Realm.Resources.ClientInterface;
 using Realm.Domain.Components.Peds;
+using SlipeServer.Server.Enums;
+using Realm.Resources.ElementOutline;
+using Realm.Server.Extensions.Resources;
 
 namespace Realm.Console.Logic;
 
@@ -43,7 +46,7 @@ internal sealed class CommandsLogic
     public CommandsLogic(RPGCommandService commandService, IEntityFactory entityFactory, RepositoryFactory repositoryFactory,
         ItemsRegistry itemsRegistry, IECS ecs, IBanService banService, IDiscordService discordService, ChatBox chatBox, ILogger<CommandsLogic> logger,
         IDateTimeProvider dateTimeProvider, INametagsService nametagsService, IUsersService rpgUserManager, IVehiclesService vehiclesService,
-        ILuaEventHub<IClientInterfaceEventHub> luaEventHub, GameWorld gameWorld)
+        ILuaEventHub<IClientInterfaceEventHub> luaEventHub, GameWorld gameWorld, IElementOutlineService elementOutlineService)
     {
         _commandService = commandService;
         _entityFactory = entityFactory;
@@ -638,6 +641,41 @@ internal sealed class CommandsLogic
         _commandService.AddCommandHandler("nametags6", (entity, args) =>
         {
             nametagsService.SetLocalPlayerRenderingEnabled(entity, (args.FirstOrDefault() == "true") ? true : false);
+        });
+
+        _commandService.AddCommandHandler("outlinerendering", (entity, args) =>
+        {
+            elementOutlineService.SetRenderingEnabled(entity, (args.FirstOrDefault() == "true") ? true : false);
+        });
+
+        _commandService.AddCommandHandler("outline1", (entity, args) =>
+        {
+            var ped = _entityFactory.CreatePed(SlipeServer.Server.Elements.Enums.PedModel.Truth, entity.Transform.Position + new Vector3(4, 0, 0));
+            var @object = _entityFactory.CreateObject((ObjectModel)1337, entity.Transform.Position + new Vector3(4, 4, 0), Vector3.Zero);
+            ped.AddComponent(new OutlineComponent(Color.Red));
+            @object.AddComponent(new OutlineComponent(Color.Red));
+        });
+        
+        _commandService.AddAsyncCommandHandler("outline2", async (entity, args) =>
+        {
+            using var ped = _entityFactory.CreatePed(SlipeServer.Server.Elements.Enums.PedModel.Truth, entity.Transform.Position + new Vector3(4, 0, 0));
+            ped.AddComponent(new OutlineComponent(Color.Red));
+            await Task.Delay(1000);
+        });
+        
+        _commandService.AddAsyncCommandHandler("outline3", async (entity, args) =>
+        {
+            var ped = _entityFactory.CreatePed(SlipeServer.Server.Elements.Enums.PedModel.Truth, entity.Transform.Position + new Vector3(4, 0, 0));
+            using var outlineComponent = ped.AddComponent(new OutlineComponent(Color.Red));
+            await Task.Delay(1000);
+        });
+
+        _commandService.AddCommandHandler("outline4", (entity, args) =>
+        {
+            var ped = _entityFactory.CreatePed(SlipeServer.Server.Elements.Enums.PedModel.Truth, entity.Transform.Position + new Vector3(4, 0, 0));
+            var @object = _entityFactory.CreateObject((ObjectModel)1337, entity.Transform.Position + new Vector3(4, 4, 0), Vector3.Zero);
+            elementOutlineService.SetEntityOutlineForPlayer(entity, ped, Color.Red);
+            elementOutlineService.SetEntityOutlineForPlayer(entity, @object, Color.Blue);
         });
 
         _commandService.AddAsyncCommandHandler("randomvehcolor", async (entity, args) =>

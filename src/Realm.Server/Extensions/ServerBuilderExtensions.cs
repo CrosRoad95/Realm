@@ -98,6 +98,7 @@ public static class ServerBuilderExtensions
         builder.AddLogic<ClientInterfaceLogic>();
         builder.AddLogic<StatisticsCounterLogic>();
         builder.AddLogic<DefaultAfkLogic>();
+        builder.AddLogic<OutlineLogic>();
 
         // Miscellaneous logic
         builder.AddLogic<EssentialCommandsLogic>();

@@ -1,4 +1,6 @@
-﻿local ped_wall_mrt = [[//
+﻿local isRenderingEnabled = true;
+
+local ped_wall_mrt = [[//
 // ped_wall_mrt.fx
 //
 
@@ -191,13 +193,24 @@ dxSetShaderValue(postEdgeShader, "sTex0", renderTarget);
 dxSetShaderValue(postEdgeShader, "sRes", screenX, screenY);
 
 local function removeOutline(target)
-    engineRemoveShaderFromWorldTexture(outlineElements[target], "*", target);
-    destroyElement(outlineElements[target])
-    outlineElements[target] = nil
-    outlineElementsCounter = outlineElementsCounter - 1
+    if(outlineElements[target])then
+        engineRemoveShaderFromWorldTexture(outlineElements[target], "*", target);
+        destroyElement(outlineElements[target])
+        outlineElements[target] = nil
+        outlineElementsCounter = outlineElementsCounter - 1
+    end
+end
+
+local function handleElementDestroyed()
+    removeOutline(source)
+    removeEventHandler("onClientElementDestroy", source, handleElementDestroyed)
 end
 
 local function createOutline(target, r, g, b, a)
+    if(outlineElements[target])then
+        iprint("exists", target, outlineElements)
+        return false;
+    end
     local shader = dxCreateShader(ped_wall_mrt, 1, 0, true, "all");
     dxSetShaderValue(shader, "outlineColor", {r, g, b, a / 255});
     dxSetShaderValue(shader, "secondRT", renderTarget);
@@ -205,33 +218,48 @@ local function createOutline(target, r, g, b, a)
     engineApplyShaderToWorldTexture(shader, "*", target);
     outlineElementsCounter = outlineElementsCounter + 1
     outlineElements[target] = shader
-    addEventHandler("onClientElementDestroy", target, function()
-        removeOutline(source)
-    end)
+    addEventHandler("onClientElementDestroy", target, handleElementDestroyed)
 end
 
-addEvent("internalSetOutline", true)
-addEvent("internalRemoveOutline", true)
-addEventHandler("internalSetOutline", localPlayer, function(target, color)
-    if(outlineElements[target])then
-        removeOutline(target)
-    end
-    createOutline(target, color.R, color.G, color.B, color.A)
-end)
-
-addEventHandler("internalRemoveOutline", localPlayer, function(target, color)
-    iprint("internalRemoveOutline", target, color)
-end)
-
-addEventHandler("onClientPreRender", root, function()
-    if(outlineElementsCounter > 0)then
-        dxSetRenderTarget(renderTarget, true);
-        dxSetRenderTarget();
-    end
-end)
-
 addEventHandler("onClientRender", root, function()
-    if(outlineElementsCounter > 0)then
-        dxDrawImage(0, 0, screenX, screenY, postEdgeShader, 0, 0, 0, tocolor(255, 255, 255, 255));
+    if(outlineElementsCounter <= 0 or not isRenderingEnabled)then
+        return;
     end
+
+    dxDrawImage(0, 0, screenX, screenY, postEdgeShader, 0, 0, 0, tocolor(255, 255, 255, 255));
+    dxSetRenderTarget(renderTarget, true);
+    dxSetRenderTarget();
+end)
+
+function handleSetOutlines(elements, colors)
+    local color;
+    for i,v in ipairs(elements)do
+        color = colors[i];        
+        createOutline(v, color.R, color.G, color.B, color.A)
+    end
+end
+
+function handleSetOutline(color)
+    createOutline(source, color.R, color.G, color.B, color.A)
+end
+
+
+function handleSetOutlineForElement(element, color)
+    createOutline(element, color.R, color.G, color.B, color.A)
+end
+
+function handleRemoveOutline()
+    handleElementDestroyed()
+end
+
+function handleSetRenderingEnabled(enabled)
+    isRenderingEnabled = enabled
+end
+
+addEventHandler("onClientResourceStart", resourceRoot, function()
+	hubBind("SetOutlines", handleSetOutlines)
+	hubBind("SetOutline", handleSetOutline)
+	hubBind("SetOutlineForElement", handleSetOutlineForElement)
+	hubBind("RemoveOutline", handleRemoveOutline)
+	hubBind("SetRenderingEnabled", handleSetRenderingEnabled)
 end)

@@ -24,10 +24,10 @@ public class LuaEventHub<THub, TResource> : ILuaEventHub<THub> where TResource: 
         _rootElement = rootElement;
     }
 
-    public void Invoke(Player player, Expression<Action<THub>> expression)
+    public void Invoke(Player player, Expression<Action<THub>> expression, Element? source = null)
     {
         var (eventName, values) = ConvertExpression(expression);
-        _luaEventService.TriggerEventFor(player, eventName, player, values.ToArray());
+        _luaEventService.TriggerEventFor(player, eventName, source ?? player, values.ToArray());
     }
 
     public void Broadcast(Expression<Action<THub>> expression, Element? source = null)
