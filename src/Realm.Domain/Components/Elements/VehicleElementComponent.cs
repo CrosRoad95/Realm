@@ -3,7 +3,7 @@
 public class VehicleElementComponent : ElementComponent
 {
     [Inject]
-    private IECS _ecs { get; set; }
+    private IECS _ecs { get; set; } = default!;
 
     protected readonly Vehicle _vehicle;
 
@@ -26,13 +26,13 @@ public class VehicleElementComponent : ElementComponent
     public byte PaintJob { get => _vehicle.PaintJob; set => _vehicle.PaintJob = value; }
     public Dictionary<byte, Entity> Occupants => _vehicle.Occupants.ToDictionary(x => x.Key, x => _ecs.GetByElement(x.Value));
     
-    public event Action<VehicleElementComponent, VehiclePushedEventArgs> Pushed;
-    public event Action<VehicleElementComponent, VehicleLightStateChangedArgs> LightStateChanged;
-    public event Action<VehicleElementComponent, VehiclePanelStateChangedArgs> PanelStateChanged;
-    public event Action<VehicleElementComponent, VehicleWheelStateChangedArgs> WheelStateChanged;
-    public event Action<VehicleElementComponent, VehicleDoorStateChangedArgs> DoorStateChanged;
-    public event Action<VehicleElementComponent, float, float> HealthChanged;
-    public event Action<VehicleElementComponent> Blown;
+    public event Action<VehicleElementComponent, VehiclePushedEventArgs>? Pushed;
+    public event Action<VehicleElementComponent, VehicleLightStateChangedArgs>? LightStateChanged;
+    public event Action<VehicleElementComponent, VehiclePanelStateChangedArgs>? PanelStateChanged;
+    public event Action<VehicleElementComponent, VehicleWheelStateChangedArgs>? WheelStateChanged;
+    public event Action<VehicleElementComponent, VehicleDoorStateChangedArgs>? DoorStateChanged;
+    public event Action<VehicleElementComponent, float, float>? HealthChanged;
+    public event Action<VehicleElementComponent>? Blown;
 
     public void BlowUp()
     {
@@ -93,6 +93,7 @@ public class VehicleElementComponent : ElementComponent
         _vehicle.DoorStateChanged += HandleDoorStateChanged;
         _vehicle.HealthChanged += HandleHealthChanged;
         _vehicle.Blown += HandleBlown;
+        base.Load();
     }
 
     private void HandleBlown(Element sender)

@@ -17,11 +17,10 @@ public class CollisionShapeElementComponentTests
 
     public CollisionShapeElementComponentTests()
     {
-        // FocusableAdded
         var services = new ServiceCollection();
         services.AddSingleton<IRealmConfigurationProvider>(new TestConfigurationProvider());
         services.AddSingleton<IECS, ECS>();
-        services.AddSingleton<IElementCollection>(_elementCollectionMock.Object);
+        services.AddSingleton(_elementCollectionMock.Object);
         services.AddSingleton(_clientInterfaceServiceMock);
         services.AddLogging(x => x.AddSerilog(new LoggerConfiguration().CreateLogger(), dispose: true));
 

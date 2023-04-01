@@ -26,6 +26,10 @@ internal class EntityFactory : IEntityFactory
         if (_rpgServer.MtaServer == null)
             throw new InvalidOperationException("Could not create entities in logics constructors.");
         var elementComponent = entity.GetRequiredComponent<ElementComponent>();
+
+        if (!elementComponent.BaseLoaded)
+            throw new Exception("Failed to load element entity, base.Load wans't called.");
+
         var element = elementComponent.Element;
         element.AssociateWith(_rpgServer.MtaServer);
         if (element is Pickup pickup)
@@ -57,7 +61,7 @@ internal class EntityFactory : IEntityFactory
     {
         var vehicleEntity = _ecs.CreateEntity(constructionInfo?.Id ?? $"vehicle {Guid.NewGuid()}", EntityTag.Vehicle, entity =>
         {
-            var vehicle = new Vehicle(model, new Vector3(0,0,4));
+            var vehicle = new Vehicle(model, new Vector3(0,0,9999));
             
             var vehicleElementComponent = entity.AddComponent(new VehicleElementComponent(vehicle));
             

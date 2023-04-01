@@ -11,6 +11,8 @@ public abstract class ElementComponent : Component
     private Player? Player { get; set; }
     private bool _isPerPlayer = false;
 
+    internal bool BaseLoaded { get; set; } = false;
+
     public bool AreCollisionsEnabled { get => Element.AreCollisionsEnabled; set => Element.AreCollisionsEnabled = value; }
     public Vector3 Velocity { get => Element.Velocity; set => Element.Velocity = value; }
     public Vector3 TurnVelocity { get => Element.TurnVelocity; set => Element.TurnVelocity = value; }
@@ -51,6 +53,7 @@ public abstract class ElementComponent : Component
             Entity.Transform.PositionChanged += HandleTransformPositionChanged;
             Entity.Transform.RotationChanged += HandleTransformRotationChanged;
         }
+        BaseLoaded = true;
     }
 
     private void HandleTransformRotationChanged(Transform newTransform)
