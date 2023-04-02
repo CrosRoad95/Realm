@@ -263,6 +263,7 @@ internal class EntityFactory : IEntityFactory
             throw new ArgumentException("Entity must be a player entity");
 
         var worldObject = new WorldObject(model, position);
+        worldObject.Rotation = rotation;
 
         var markerElementComponent = playerEntity.AddComponent(new WorldObjectComponent(worldObject));
         AssociateWithPlayerEntity(markerElementComponent, playerEntity);

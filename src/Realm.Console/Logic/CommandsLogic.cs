@@ -797,6 +797,11 @@ internal sealed class CommandsLogic
             gameWorld.SetTime(0, 0);
         });
 
+        _commandService.AddCommandHandler("createObjectFor", (entity, args) =>
+        {
+            _entityFactory.CreateObjectFor(entity, (ObjectModel)1337, entity.Transform.Position, entity.Transform.Rotation);
+        });
+
         FontCollection collection = new();
         FontFamily family = collection.Add("Server/Fonts/Ratual.otf");
         Font font = family.CreateFont(24, FontStyle.Regular);
