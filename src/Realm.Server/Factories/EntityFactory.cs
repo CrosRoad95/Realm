@@ -1,6 +1,8 @@
-﻿using Realm.Domain.Components.Elements.CollisionShapes;
+﻿using Realm.Domain;
+using Realm.Domain.Components.Elements.CollisionShapes;
 using Realm.Domain.Enums;
 using Realm.Persistance.Interfaces;
+using SlipeServer.Server.Elements;
 using SlipeServer.Server.Elements.ColShapes;
 using SlipeServer.Server.Elements.Enums;
 using SlipeServer.Server.Enums;
@@ -231,8 +233,6 @@ internal class EntityFactory : IEntityFactory
         var marker = new Marker(position, markerType);
         marker.Color = color ?? System.Drawing.Color.White;
 
-        playerEntity.Transform.Position = position;
-
         var markerElementComponent = playerEntity.AddComponent(new MarkerElementComponent(marker));
         AssociateWithPlayerEntity(markerElementComponent, playerEntity);
         return markerElementComponent;
@@ -255,6 +255,18 @@ internal class EntityFactory : IEntityFactory
             AssociateWithServer(entity);
             entityBuilder?.Invoke(entity);
         });
+    }
+
+    public WorldObjectComponent CreateObjectFor(Entity playerEntity, ObjectModel model, Vector3 position, Vector3 rotation)
+    {
+        if (playerEntity.Tag != EntityTag.Player)
+            throw new ArgumentException("Entity must be a player entity");
+
+        var worldObject = new WorldObject(model, position);
+
+        var markerElementComponent = playerEntity.AddComponent(new WorldObjectComponent(worldObject));
+        AssociateWithPlayerEntity(markerElementComponent, playerEntity);
+        return markerElementComponent;
     }
 
     #region Collision shapes
