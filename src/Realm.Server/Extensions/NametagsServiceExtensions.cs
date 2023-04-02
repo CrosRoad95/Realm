@@ -6,13 +6,11 @@ public static class NametagsServiceExtensions
 {
     public static void SetNametagRenderingEnabled(this INametagsService service, Entity entity, bool enabled)
     {
-        var player = entity.GetRequiredComponent<PlayerElementComponent>().Player;
-        service.SetNametagRenderingEnabled(player, enabled);
+        service.SetNametagRenderingEnabled(entity.Player, enabled);
     }
 
     public static void SetLocalPlayerRenderingEnabled(this INametagsService service, Entity entity, bool enabled)
     {
-        var player = entity.GetRequiredComponent<PlayerElementComponent>().Player;
-        service.SetLocalPlayerRenderingEnabled(player, enabled);
+        service.SetLocalPlayerRenderingEnabled(entity.Player, enabled);
     }
 }

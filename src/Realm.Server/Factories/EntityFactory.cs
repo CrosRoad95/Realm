@@ -47,7 +47,7 @@ internal class EntityFactory : IEntityFactory
     private void AssociateWithPlayerEntity(ElementComponent elementComponent, Entity playerEntity)
     {
         var element = elementComponent.Element;
-        var player = playerEntity.GetRequiredComponent<PlayerElementComponent>().Player;
+        var player = playerEntity.Player;
         element.AssociateWith(player);
         if(element is Pickup pickup)
         {

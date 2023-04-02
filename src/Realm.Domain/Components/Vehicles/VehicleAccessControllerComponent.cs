@@ -19,8 +19,8 @@ public abstract class VehicleAccessControllerComponent : Component
         {
             case EntityTag.Player:
                 {
-                    var player = entity.GetRequiredComponent<PlayerElementComponent>().Player;
-                    var vehicle = Entity.GetRequiredComponent<VehicleElementComponent>().Vehicle;
+                    var player = entity.Player;
+                    var vehicle = (Vehicle)Entity.Element;
                     return CanEnter(player, vehicle);
                 }
             default:
