@@ -17,7 +17,15 @@ public class Entity : IDisposable
 
     private readonly ReaderWriterLockSlim _componentsLock = new();
     private readonly List<Component> _components = new();
-    public IReadOnlyCollection<Component> Components => _components;
+    public IReadOnlyCollection<Component> Components {
+        get
+        {
+            _componentsLock.EnterReadLock();
+            var components = new List<Component>(_components);
+            _componentsLock.ExitReadLock();
+            return components;
+        }
+    }
 
     private readonly IServiceProvider _serviceProvider;
 
@@ -56,7 +64,7 @@ public class Entity : IDisposable
             InternalInjectProperties(type.BaseType, obj);
     }
 
-    protected void InjectProperties<TComponent>(TComponent component) where TComponent : Component
+    internal void InjectProperties<TComponent>(TComponent component) where TComponent : Component
     {
         ThrowIfDisposed();
 

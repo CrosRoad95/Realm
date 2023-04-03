@@ -1,4 +1,5 @@
 ﻿using Realm.Domain;
+using Realm.Domain.Components.Elements;
 using Realm.Domain.Components.Elements.CollisionShapes;
 using Realm.Domain.Enums;
 using Realm.Persistance.Interfaces;
@@ -41,6 +42,21 @@ internal class EntityFactory : IEntityFactory
         if(elementComponent is MarkerElementComponent markerElementComponent)
         {
             markerElementComponent.CollisionShape.AssociateWith(_rpgServer.MtaServer);
+        }
+    }
+
+    private void AssociateWithPlayerEntity<TElementComponent>(PlayerPrivateElementComponent<TElementComponent> elementComponent, Entity playerEntity) where TElementComponent : ElementComponent
+    {
+        var element = elementComponent.Element;
+        var player = playerEntity.Player;
+        element.AssociateWith(player);
+        if(element is Pickup pickup)
+        {
+            pickup.CollisionShape.AssociateWith(player);
+        }
+        if (elementComponent is MarkerElementComponent markerElementComponent)
+        {
+            markerElementComponent.CollisionShape.AssociateWith(player);
         }
     }
 
@@ -168,14 +184,14 @@ internal class EntityFactory : IEntityFactory
         return blipEntity;
     }
     
-    public BlipElementComponent CreateBlipFor(Entity playerEntity, BlipIcon blipIcon, Vector3 position)
+    public PlayerPrivateElementComponent<BlipElementComponent> CreateBlipFor(Entity playerEntity, BlipIcon blipIcon, Vector3 position)
     {
         if(playerEntity.Tag != EntityTag.Player)
             throw new ArgumentException("Entity must be a player entity");
 
         var blip = new Blip(position, blipIcon, 250);
 
-        var blipElementComponent = playerEntity.AddComponent(new BlipElementComponent(blip));
+        var blipElementComponent = playerEntity.AddComponent(PlayerPrivateElementComponent.Create(new BlipElementComponent(blip)));
         playerEntity.Transform.Position = position;
         AssociateWithPlayerEntity(blipElementComponent, playerEntity);
         return blipElementComponent;
@@ -201,31 +217,31 @@ internal class EntityFactory : IEntityFactory
         return blipEntity;
     }
 
-    public RadarAreaElementComponent CreateRadarAreaFor(Entity playerEntity, Vector2 position, Vector2 size, System.Drawing.Color color)
+    public PlayerPrivateElementComponent<RadarAreaElementComponent> CreateRadarAreaFor(Entity playerEntity, Vector2 position, Vector2 size, System.Drawing.Color color)
     {
         if (playerEntity.Tag != EntityTag.Player)
             throw new ArgumentException("Entity must be a player entity");
 
         var radarArea = new RadarArea(position, size, color);
 
-        var radarAreaElementComponent = playerEntity.AddComponent(new RadarAreaElementComponent(radarArea));
+        var radarAreaElementComponent = playerEntity.AddComponent(PlayerPrivateElementComponent.Create(new RadarAreaElementComponent(radarArea)));
         AssociateWithPlayerEntity(radarAreaElementComponent, playerEntity);
         return radarAreaElementComponent;
     }
     
-    public CollisionSphereElementComponent CreateCollisionSphereFor(Entity playerEntity, Vector3 position, float radius)
+    public PlayerPrivateElementComponent<CollisionSphereElementComponent> CreateCollisionSphereFor(Entity playerEntity, Vector3 position, float radius)
     {
         if (playerEntity.Tag != EntityTag.Player)
             throw new ArgumentException("Entity must be a player entity");
 
         var collisionSphere = new CollisionSphere(position, radius);
 
-        var collisionSphereElementComponent = playerEntity.AddComponent(new CollisionSphereElementComponent(collisionSphere));
+        var collisionSphereElementComponent = playerEntity.AddComponent(PlayerPrivateElementComponent.Create(new CollisionSphereElementComponent(collisionSphere)));
         AssociateWithPlayerEntity(collisionSphereElementComponent, playerEntity);
         return collisionSphereElementComponent;
     }
 
-    public MarkerElementComponent CreateMarkerFor(Entity playerEntity, Vector3 position, MarkerType markerType, System.Drawing.Color? color = null)
+    public PlayerPrivateElementComponent<MarkerElementComponent> CreateMarkerFor(Entity playerEntity, Vector3 position, MarkerType markerType, System.Drawing.Color? color = null)
     {
         if (playerEntity.Tag != EntityTag.Player)
             throw new ArgumentException("Entity must be a player entity");
@@ -233,7 +249,7 @@ internal class EntityFactory : IEntityFactory
         var marker = new Marker(position, markerType);
         marker.Color = color ?? System.Drawing.Color.White;
 
-        var markerElementComponent = playerEntity.AddComponent(new MarkerElementComponent(marker));
+        var markerElementComponent = playerEntity.AddComponent(PlayerPrivateElementComponent.Create(new MarkerElementComponent(marker)));
         AssociateWithPlayerEntity(markerElementComponent, playerEntity);
         return markerElementComponent;
     }
@@ -257,7 +273,7 @@ internal class EntityFactory : IEntityFactory
         });
     }
 
-    public WorldObjectComponent CreateObjectFor(Entity playerEntity, ObjectModel model, Vector3 position, Vector3 rotation)
+    public PlayerPrivateElementComponent<WorldObjectComponent> CreateObjectFor(Entity playerEntity, ObjectModel model, Vector3 position, Vector3 rotation)
     {
         if (playerEntity.Tag != EntityTag.Player)
             throw new ArgumentException("Entity must be a player entity");
@@ -265,9 +281,9 @@ internal class EntityFactory : IEntityFactory
         var worldObject = new WorldObject(model, position);
         worldObject.Rotation = rotation;
 
-        var markerElementComponent = playerEntity.AddComponent(new WorldObjectComponent(worldObject));
-        AssociateWithPlayerEntity(markerElementComponent, playerEntity);
-        return markerElementComponent;
+        var worldObjectElementComponent = playerEntity.AddComponent(PlayerPrivateElementComponent.Create(new WorldObjectComponent(worldObject)));
+        AssociateWithPlayerEntity(worldObjectElementComponent, playerEntity);
+        return worldObjectElementComponent;
     }
 
     #region Collision shapes

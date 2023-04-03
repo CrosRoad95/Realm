@@ -5,8 +5,8 @@ public class TransportEntityObjective : Objective
     private readonly Entity _entity;
     private readonly Vector3 _position;
     
-    private MarkerElementComponent _markerElementComponent = default!;
-    private CollisionSphereElementComponent _collisionSphereElementComponent = default!;
+    private PlayerPrivateElementComponent<MarkerElementComponent> _markerElementComponent = default!;
+    private PlayerPrivateElementComponent<CollisionSphereElementComponent> _collisionSphereElementComponent = default!;
     private Entity _playerEntity = default!;
     private System.Timers.Timer _checkEnteredTimer = default!;
 
@@ -23,7 +23,7 @@ public class TransportEntityObjective : Objective
         _playerEntity = playerEntity;
         _markerElementComponent = entityFactory.CreateMarkerFor(playerEntity, _position, MarkerType.Arrow, Color.White);
         _collisionSphereElementComponent = entityFactory.CreateCollisionSphereFor(playerEntity, _position, 1.5f);
-        _collisionSphereElementComponent.EntityEntered = EntityEntered;
+        _collisionSphereElementComponent.ElementComponent.EntityEntered = EntityEntered;
         _checkEnteredTimer = new System.Timers.Timer(TimeSpan.FromSeconds(0.25f));
         _checkEnteredTimer.Elapsed += HandleElapsed;
         _checkEnteredTimer.Start();
@@ -38,11 +38,11 @@ public class TransportEntityObjective : Objective
             if (_entity.TryGetComponent(out LiftableWorldObjectComponent liftableWorldObjectComponent))
             {
                 if(liftableWorldObjectComponent.Owner == null) // Accept only dropped entities.
-                    _collisionSphereElementComponent.CheckCollisionWith(_entity);
+                    _collisionSphereElementComponent.ElementComponent.CheckCollisionWith(_entity);
             }
             else
             {
-                _collisionSphereElementComponent.CheckCollisionWith(_entity);
+                _collisionSphereElementComponent.ElementComponent.CheckCollisionWith(_entity);
             }
         }
         catch(Exception)
@@ -63,7 +63,7 @@ public class TransportEntityObjective : Objective
     {
         _entity.Dispose();
         _checkEnteredTimer.Dispose();
-        _collisionSphereElementComponent.EntityEntered = null;
+        _collisionSphereElementComponent.ElementComponent.EntityEntered = null;
         _playerEntity.TryDestroyComponent(_markerElementComponent);
         _playerEntity.TryDestroyComponent(_collisionSphereElementComponent);
         base.Dispose();

@@ -799,7 +799,19 @@ internal sealed class CommandsLogic
 
         _commandService.AddCommandHandler("createObjectFor", (entity, args) =>
         {
-            _entityFactory.CreateObjectFor(entity, (ObjectModel)1337, entity.Transform.Position, entity.Transform.Rotation);
+            _entityFactory.CreateObjectFor(entity, (ObjectModel)1337, entity.Transform.Position + new Vector3(3,0,0), entity.Transform.Rotation);
+        });
+
+        _commandService.AddAsyncCommandHandler("createObjectFor2", async (entity, args) =>
+        {
+            var pos = entity.Transform.Position + new Vector3(3, 0, 0);
+            var obj = _entityFactory.CreateObjectFor(entity, (ObjectModel)1337, pos, entity.Transform.Rotation);
+            for(int i = 0; i < 10;i++)
+            {
+                await Task.Delay(2000);
+                obj.Position = pos + new Vector3(i, 0, 0);
+                obj.Rotation = entity.Transform.Rotation;
+            }
         });
 
         FontCollection collection = new();

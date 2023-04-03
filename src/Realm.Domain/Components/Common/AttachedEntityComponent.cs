@@ -12,12 +12,26 @@ public class AttachedEntityComponent : Component
     [Inject]
     private BoneAttachService BoneAttachService { get; set; } = default!;
 
-    public Entity? AttachedEntity { get; private set; }
+    private Entity? _attachedEntity;
+    public Entity? AttachedEntity
+    {
+        get
+        {
+            ThrowIfDisposed();
+            return _attachedEntity;
+        }
+        private set
+        {
+            ThrowIfDisposed();
+            _attachedEntity = value;
+        }
+    }
+
     public Vector3 Offset { get; }
 
     public AttachedEntityComponent(Entity entity, BoneId boneId, Vector3? positionOffset = null, Vector3? rotationOffset = null)
     {
-        AttachedEntity = entity;
+        _attachedEntity = entity;
         _boneId = boneId;
         _positionOffset = positionOffset;
         _rotationOffset = rotationOffset;

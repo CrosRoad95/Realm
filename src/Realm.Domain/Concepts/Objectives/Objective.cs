@@ -16,7 +16,7 @@ public abstract class Objective : IDisposable
 
     public Entity Entity { get => _entity ?? throw new InvalidOperationException(); internal set => _entity = value; }
 
-    private BlipElementComponent? _blipElementComponent;
+    private PlayerPrivateElementComponent<BlipElementComponent>? _blipElementComponent;
     public abstract Vector3 Position { get; }
     protected ILogger Logger { get; set; } = default!;
     protected abstract void Load(IEntityFactory entityFactory, Entity playerEntity);

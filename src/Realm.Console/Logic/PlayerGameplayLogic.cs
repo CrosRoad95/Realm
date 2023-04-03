@@ -43,13 +43,14 @@ internal sealed class PlayerGameplayLogic
     {
         if(playerEntity.TryGetComponent(out AttachedEntityComponent attachedEntityComponent))
         {
+            var attachedEntity = attachedEntityComponent.AttachedEntity;
             await playerEntity.GetRequiredComponent<PlayerElementComponent>().DoAnimationAsync(Animation.CarryPutDown);
 
-            if (attachedEntityComponent.AttachedEntity.GetRequiredComponent<LiftableWorldObjectComponent>().TryDrop())
+            if (attachedEntity.GetRequiredComponent<LiftableWorldObjectComponent>().TryDrop())
             {
                 playerEntity.DestroyComponent(attachedEntityComponent);
-                attachedEntityComponent.AttachedEntity.Transform.Position = playerEntity.Transform.Position + playerEntity.Transform.Forward * 1.0f - new Vector3(0, 0, 0.55f);
-                attachedEntityComponent.AttachedEntity.Transform.Rotation = new Vector3
+                attachedEntity.Transform.Position = playerEntity.Transform.Position + playerEntity.Transform.Forward * 1.0f - new Vector3(0, 0, 0.55f);
+                attachedEntity.Transform.Rotation = new Vector3
                 {
                     X = 0,
                     Y = 0,

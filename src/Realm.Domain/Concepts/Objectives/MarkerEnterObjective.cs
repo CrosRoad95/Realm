@@ -4,8 +4,8 @@ public class MarkerEnterObjective : Objective
 {
     private readonly Vector3 _position;
     
-    private MarkerElementComponent _markerElementComponent = default!;
-    private CollisionSphereElementComponent _collisionSphereElementComponent = default!;
+    private PlayerPrivateElementComponent<MarkerElementComponent> _markerElementComponent = default!;
+    private PlayerPrivateElementComponent<CollisionSphereElementComponent> _collisionSphereElementComponent = default!;
     private Entity _playerEntity = default!;
     private System.Timers.Timer _checkEnteredTimer = default!;
 
@@ -21,7 +21,7 @@ public class MarkerEnterObjective : Objective
         _playerEntity = playerEntity;
         _markerElementComponent = entityFactory.CreateMarkerFor(playerEntity, _position, MarkerType.Arrow, Color.White);
         _collisionSphereElementComponent = entityFactory.CreateCollisionSphereFor(playerEntity, _position, 2);
-        _collisionSphereElementComponent.EntityEntered = EntityEntered;
+        _collisionSphereElementComponent.ElementComponent.EntityEntered = EntityEntered;
         _checkEnteredTimer = new System.Timers.Timer(TimeSpan.FromSeconds(0.25f));
         _checkEnteredTimer.Elapsed += HandleElapsed;
         _checkEnteredTimer.Start();
@@ -31,7 +31,7 @@ public class MarkerEnterObjective : Objective
     {
         try
         {
-            _collisionSphereElementComponent.CheckCollisionWith(_playerEntity);
+            _collisionSphereElementComponent.ElementComponent.CheckCollisionWith(_playerEntity);
         }
         catch(Exception ex)
         {
@@ -53,7 +53,7 @@ public class MarkerEnterObjective : Objective
             _checkEnteredTimer.Dispose();
         if(_collisionSphereElementComponent != null)
         {
-            _collisionSphereElementComponent.EntityEntered = null;
+            _collisionSphereElementComponent.ElementComponent.EntityEntered = null;
             _playerEntity.TryDestroyComponent(_collisionSphereElementComponent);
         }
         _playerEntity.TryDestroyComponent(_markerElementComponent);
