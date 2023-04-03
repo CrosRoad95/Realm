@@ -32,6 +32,7 @@
 			<dependency id="SlipeServer.Resources.NoClip" version="0.1.0-CI-20230303-053612" />
 			<dependency id="SlipeServer.Resources.Text3d" version="0.1.0-CI-20230303-053612" />
 			<dependency id="SlipeServer.Resources.BoneAttach" version="0.1.0-CI-20230303-053612" />
+			<dependency id="SlipeServer.Resources.Watermark" version="0.1.0-CI-20230303-053612" />
             <dependency id="RenderWareBuilders" version="0.1.0-CI-20221009-163717" />
             <dependency id="RenderWareIo" version="0.1.0-CI-20221009-163717" />
             <dependency id="Silk.NET.Assimp" version="2.16.0" />
