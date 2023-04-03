@@ -32,7 +32,7 @@ internal class VehicleRepository : IVehicleRepository
         var query = _db.Vehicles
             .TagWithSource(nameof(VehicleRepository))
             .AsNoTrackingWithIdentityResolution()
-            .Where(x => x.PlayerAccesses.Any(x => x.UserId == userId))
+            .Where(x => x.UserAccesses.Any(x => x.UserId == userId))
             .Select(x => new LightInfoVehicleDTO
             {
                 Id = x.Id,
@@ -48,7 +48,7 @@ internal class VehicleRepository : IVehicleRepository
         var query = _db.Vehicles
             .TagWithSource(nameof(VehicleRepository))
             .AsNoTrackingWithIdentityResolution()
-            .Where(x => x.PlayerAccesses.Any(x => x.UserId == userId));
+            .Where(x => x.UserAccesses.Any(x => x.UserId == userId));
 
         return query.ToListAsync();
     }

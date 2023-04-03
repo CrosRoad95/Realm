@@ -2,6 +2,6 @@
 
 public interface IJobRepository : IRepositoryBase
 {
-    Task<Dictionary<int, PlayerJobStatisticsDTO>> GetJobStatistics(short jobId, int limit = 10);
-    Task<JobStatisticsDTO?> GetPlayerJobStatistics(int userId, short jobId);
+    Task<Dictionary<int, UserJobStatisticsDTO>> GetJobStatistics(short jobId, int limit = 10);
+    Task<JobStatisticsDTO?> GetUserJobStatistics(int userId, short jobId);
 }

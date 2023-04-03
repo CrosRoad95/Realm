@@ -14,7 +14,7 @@ internal class JobService : IJobService
 
     public async Task<JobStatistics?> TryGetTotalUserJobStatistics(int userId, short jobId)
     {
-        var queryResult = await _jobRepository.GetPlayerJobStatistics(userId, jobId);
+        var queryResult = await _jobRepository.GetUserJobStatistics(userId, jobId);
         if(queryResult != null)
         {
             return new JobStatistics

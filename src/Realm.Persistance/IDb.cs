@@ -14,7 +14,7 @@ public interface IDb : IDisposable
     DbSet<IdentityUserToken<int>> UserTokens { get; }
     DbSet<UserLicense> UserLicenses { get; }
     DbSet<Vehicle> Vehicles { get; }
-    DbSet<VehiclePlayerAccess> VehiclePlayerAccesses { get; }
+    DbSet<VehicleUserAccess> VehicleUserAccess { get; }
     DbSet<Inventory> Inventories { get; }
     DbSet<InventoryItem> InventoryItems { get; }
     DbSet<VehicleUpgrade> VehicleUpgrades { get; }

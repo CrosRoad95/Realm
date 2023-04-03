@@ -1,6 +1,6 @@
 ﻿namespace Realm.Persistance.DTOs;
 
-public class PlayerJobStatisticsDTO
+public class UserJobStatisticsDTO
 {
     public int UserId { get; set; }
     public int Points { get; set; }

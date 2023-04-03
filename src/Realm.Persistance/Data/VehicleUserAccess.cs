@@ -1,6 +1,6 @@
 ﻿namespace Realm.Persistance.Data;
 
-public sealed class VehiclePlayerAccess
+public sealed class VehicleUserAccess
 {
     public int Id { get; set; }
     public int VehicleId { get; set; }

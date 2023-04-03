@@ -2,7 +2,7 @@
 using static Realm.Persistance.Data.Helpers.VehicleDamageState;
 using static Realm.Persistance.Data.Helpers.VehicleWheelStatus;
 using JobUpgrade = Realm.Persistance.Data.JobUpgrade;
-using VehiclePlayerAccess = Realm.Persistance.Data.VehiclePlayerAccess;
+using VehiclePlayerAccess = Realm.Persistance.Data.VehicleUserAccess;
 
 namespace Realm.Server.Services;
 
@@ -78,7 +78,7 @@ internal class SaveService : ISaveService
         vehicleData.Health = vehicle.Health;
         vehicleData.IsFrozen = vehicle.IsFrozen;
         vehicleData.TransformAndMotion = entity.Transform.GetTransformAndMotion();
-        vehicleData.PlayerAccesses = privateVehicleComponent.PlayerAccesses.Select(x => new VehiclePlayerAccess
+        vehicleData.UserAccesses = privateVehicleComponent.PlayerAccesses.Select(x => new VehiclePlayerAccess
         {
             UserId = x.UserId,
             VehicleId = vehicleData.Id,

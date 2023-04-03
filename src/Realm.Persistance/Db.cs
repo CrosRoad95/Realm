@@ -9,7 +9,7 @@ public abstract class Db<T> : IdentityDbContext<User, Role, int,
 {
     public DbSet<UserLicense> UserLicenses => Set<UserLicense>();
     public DbSet<Vehicle> Vehicles => Set<Vehicle>();
-    public DbSet<VehiclePlayerAccess> VehiclePlayerAccesses => Set<VehiclePlayerAccess>();
+    public DbSet<VehicleUserAccess> VehicleUserAccess => Set<VehicleUserAccess>();
     public DbSet<Inventory> Inventories => Set<Inventory>();
     public DbSet<InventoryItem> InventoryItems => Set<InventoryItem>();
     public DbSet<VehicleUpgrade> VehicleUpgrades => Set<VehicleUpgrade>();
@@ -74,7 +74,7 @@ public abstract class Db<T> : IdentityDbContext<User, Role, int,
                 .HasForeignKey(x => x.UserId);
 
             entityBuilder
-                .HasMany(x => x.VehiclePlayerAccesses)
+                .HasMany(x => x.VehicleUserAccesses)
                 .WithOne(x => x.User)
                 .HasForeignKey(x => x.UserId);
 
@@ -190,7 +190,7 @@ public abstract class Db<T> : IdentityDbContext<User, Role, int,
         modelBuilder.Entity<VehicleInventory>(entityBuilder =>
         {
             entityBuilder
-                .ToTable(nameof(VehicleInventory))
+                .ToTable(nameof(VehicleInventories))
                 .HasKey(x => new { x.VehicleId, x.InventoryId });
         });
         
@@ -391,7 +391,7 @@ public abstract class Db<T> : IdentityDbContext<User, Role, int,
                 .IsRequired();
 
             entityBuilder
-                .HasMany(x => x.PlayerAccesses)
+                .HasMany(x => x.UserAccesses)
                 .WithOne(x => x.Vehicle)
                 .HasForeignKey(x => x.VehicleId);
 
@@ -428,10 +428,10 @@ public abstract class Db<T> : IdentityDbContext<User, Role, int,
                     .HasForeignKey(z => z.VehicleId));
         });
 
-        modelBuilder.Entity<VehiclePlayerAccess>(entityBuilder =>
+        modelBuilder.Entity<VehicleUserAccess>(entityBuilder =>
         {
             entityBuilder
-                .ToTable(nameof(VehiclePlayerAccesses))
+                .ToTable(nameof(VehicleUserAccess))
                 .HasKey(x => x.Id);
 
             entityBuilder
@@ -444,12 +444,12 @@ public abstract class Db<T> : IdentityDbContext<User, Role, int,
 
             entityBuilder
                 .HasOne(x => x.User)
-                .WithMany(x => x.VehiclePlayerAccesses)
+                .WithMany(x => x.VehicleUserAccesses)
                 .HasForeignKey(x => x.UserId);
 
             entityBuilder
                 .HasOne(x => x.Vehicle)
-                .WithMany(x => x.PlayerAccesses)
+                .WithMany(x => x.UserAccesses)
                 .HasForeignKey(x => x.VehicleId);
         });
 

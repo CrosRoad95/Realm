@@ -27,7 +27,7 @@ public sealed class Vehicle
     public float Mileage { get; set; }
 
     public ICollection<Inventory>? Inventories { get; set; } = new List<Inventory>();
-    public ICollection<VehiclePlayerAccess> PlayerAccesses { get; set; } = new List<VehiclePlayerAccess>();
+    public ICollection<VehicleUserAccess> UserAccesses { get; set; } = new List<VehicleUserAccess>();
     public ICollection<VehicleUpgrade> Upgrades { get; set; } = new List<VehicleUpgrade>();
     public ICollection<VehicleFuel> Fuels { get; set; } = new List<VehicleFuel>();
     public ICollection<VehiclePartDamage> PartDamages { get; set; } = new List<VehiclePartDamage>();

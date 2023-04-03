@@ -63,7 +63,7 @@ public class PrivateVehicleComponent : Component
         vehicle.IsTaxiLightOn = _vehicleData.TaxiLightState;
         vehicle.Health = _vehicleData.Health;
         vehicle.IsFrozen = _vehicleData.IsFrozen;
-        _vehiclePlayerAccesses = _vehicleData.PlayerAccesses.Select(x => new VehiclePlayerAccess
+        _vehiclePlayerAccesses = _vehicleData.UserAccesses.Select(x => new VehiclePlayerAccess
         {
             Id = x.Id,
             UserId = x.User.Id,

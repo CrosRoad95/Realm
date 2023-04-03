@@ -47,7 +47,7 @@ public static class QuerableExtensions
             .Include(x => x.VehicleEngines)
             .Include(x => x.Inventories)
             .ThenInclude(x => x!.InventoryItems)
-            .Include(x => x.PlayerAccesses)
+            .Include(x => x.UserAccesses)
             .ThenInclude(x => x.User);
     }
 
