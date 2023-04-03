@@ -389,17 +389,7 @@ public class Entity : IDisposable
             throw new InvalidOperationException("Transaction already commited");
 
         int rollbackedComponents = 0;
-        List<Component> components;
-        _componentsLock.EnterReadLock();
-        try
-        {
-            components = Components.ToList();
-        }
-        finally
-        {
-            _componentsLock.ExitReadLock();
-        }
-
+        var components = Components;
         try
         {
             foreach (var item in components)
