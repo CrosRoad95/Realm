@@ -514,44 +514,48 @@ public sealed class PlayerElementComponent : PedElementComponent
         switch(animation)
         {
             case Animation.StartCarry:
-                timeSpan = timeSpan ?? TimeSpan.FromSeconds(1);
+                timeSpan ??= TimeSpan.FromSeconds(1);
                 _player.SetAnimation("CARRY", "crry_prtial", timeSpan, true, false);
                 break;
             case Animation.CrouchAndTakeALook:
-                timeSpan = timeSpan ?? TimeSpan.FromSeconds(1);
+                timeSpan ??= TimeSpan.FromSeconds(1);
                 _player.SetAnimation("COP_AMBIENT", "Copbrowse_nod", timeSpan, true, false);
                 break;
             case Animation.Swing:
-                timeSpan = timeSpan ?? TimeSpan.FromSeconds(0.5f);
+                timeSpan ??= TimeSpan.FromSeconds(0.5f);
                 _player.SetAnimation("SWORD", "sword_block", timeSpan, false, false);
                 break;
             case Animation.Click:
-                timeSpan = timeSpan ?? TimeSpan.FromSeconds(1);
+                timeSpan ??= TimeSpan.FromSeconds(1);
                 _player.SetAnimation("CRIB", "CRIB_Use_Switch", timeSpan, true, false);
                 break;
             case Animation.Eat:
-                timeSpan = timeSpan ?? TimeSpan.FromSeconds(1);
+                timeSpan ??= TimeSpan.FromSeconds(1);
                 _player.SetAnimation("FOOD", "EAT_Burger", timeSpan, true, false);
                 break;
             case Animation.Sit:
-                timeSpan = timeSpan ?? TimeSpan.FromSeconds(1);
+                timeSpan ??= TimeSpan.FromSeconds(1);
                 _player.SetAnimation("BEACH", "ParkSit_M_loop", timeSpan, true, false);
                 break;
             case Animation.CarryLiftUp:
-                timeSpan = timeSpan ?? TimeSpan.FromSeconds(1.25f);
+                timeSpan ??= TimeSpan.FromSeconds(1.25f);
                 _player.SetAnimation("CARRY", "liftup", timeSpan, false, false, false, false);
                 break;
             case Animation.CarryPutDown:
-                timeSpan = timeSpan ?? TimeSpan.FromSeconds(1.0f);
+                timeSpan ??= TimeSpan.FromSeconds(1.0f);
                 _player.SetAnimation("CARRY", "putdwn", timeSpan, false, false, false, false);
                 break;
             case Animation.CarryLiftUpFromTable:
-                timeSpan = timeSpan ?? TimeSpan.FromSeconds(1.25f);
+                timeSpan ??= TimeSpan.FromSeconds(1.25f);
                 _player.SetAnimation("CARRY", "liftup105", timeSpan, false, false, false, false);
                 break;
             case Animation.CarryPutDownOnTable:
-                timeSpan = timeSpan ?? TimeSpan.FromSeconds(1.0f);
+                timeSpan ??= TimeSpan.FromSeconds(1.0f);
                 _player.SetAnimation("CARRY", "putdwn105", timeSpan, false, false, false, false);
+                break;
+            case Animation.PlantBomb:
+                timeSpan ??= TimeSpan.FromSeconds(1.5f);
+                _player.SetAnimation("BOMBER", "BOM_Plant", timeSpan, false, false, false, false);
                 break;
             default:
                 throw new NotSupportedException();
