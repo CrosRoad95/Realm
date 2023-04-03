@@ -812,6 +812,21 @@ namespace Realm.Persistance.SQLite.Migrations
                     b.ToTable("VehicleFuels", (string)null);
                 });
 
+            modelBuilder.Entity("Realm.Persistance.Data.VehicleInventory", b =>
+                {
+                    b.Property<int>("VehicleId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("InventoryId")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("VehicleId", "InventoryId");
+
+                    b.HasIndex("InventoryId");
+
+                    b.ToTable("VehicleInventory", (string)null);
+                });
+
             modelBuilder.Entity("Realm.Persistance.Data.VehiclePartDamage", b =>
                 {
                     b.Property<int>("VehicleId")
@@ -1126,6 +1141,25 @@ namespace Realm.Persistance.SQLite.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("Realm.Persistance.Data.VehicleInventory", b =>
+                {
+                    b.HasOne("Realm.Persistance.Data.Inventory", "Inventory")
+                        .WithMany("VehicleInventories")
+                        .HasForeignKey("InventoryId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Realm.Persistance.Data.Vehicle", "Vehicle")
+                        .WithMany("VehicleInventories")
+                        .HasForeignKey("VehicleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Inventory");
+
+                    b.Navigation("Vehicle");
+                });
+
             modelBuilder.Entity("Realm.Persistance.Data.VehiclePartDamage", b =>
                 {
                     b.HasOne("Realm.Persistance.Data.Vehicle", null)
@@ -1178,6 +1212,8 @@ namespace Realm.Persistance.SQLite.Migrations
                     b.Navigation("InventoryItems");
 
                     b.Navigation("UserInventories");
+
+                    b.Navigation("VehicleInventories");
                 });
 
             modelBuilder.Entity("Realm.Persistance.Data.User", b =>
@@ -1226,6 +1262,8 @@ namespace Realm.Persistance.SQLite.Migrations
                     b.Navigation("Upgrades");
 
                     b.Navigation("VehicleEngines");
+
+                    b.Navigation("VehicleInventories");
                 });
 #pragma warning restore 612, 618
         }

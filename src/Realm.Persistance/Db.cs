@@ -33,6 +33,7 @@ public abstract class Db<T> : IdentityDbContext<User, Role, int,
     public DbSet<UserWhitelistedSerial> UserWhitelistedSerials => Set<UserWhitelistedSerial>();
     public DbSet<VehicleEngine> VehicleEngines => Set<VehicleEngine>();
     public DbSet<UserInventory> UserInventories => Set<UserInventory>();
+    public DbSet<VehicleInventory> VehicleInventories => Set<VehicleInventory>();
 
     public Db(DbContextOptions<T> options) : base(options)
     {
@@ -184,6 +185,13 @@ public abstract class Db<T> : IdentityDbContext<User, Role, int,
             entityBuilder
                 .ToTable(nameof(UserInventory))
                 .HasKey(x => new { x.UserId, x.InventoryId });
+        });
+        
+        modelBuilder.Entity<VehicleInventory>(entityBuilder =>
+        {
+            entityBuilder
+                .ToTable(nameof(VehicleInventory))
+                .HasKey(x => new { x.VehicleId, x.InventoryId });
         });
         
         modelBuilder.Entity<DailyVisits>(entityBuilder =>
@@ -406,6 +414,18 @@ public abstract class Db<T> : IdentityDbContext<User, Role, int,
                 .HasMany(x => x.VehicleEngines)
                 .WithOne()
                 .HasForeignKey(x => x.VehicleId);
+
+            entityBuilder
+                .HasMany(x => x.Inventories)
+                .WithMany()
+                .UsingEntity<VehicleInventory>(y => y
+                    .HasOne(z => z.Inventory)
+                    .WithMany(z => z.VehicleInventories)
+                    .HasForeignKey(z => z.InventoryId),
+                    y => y
+                    .HasOne(z => z.Vehicle)
+                    .WithMany(z => z.VehicleInventories)
+                    .HasForeignKey(z => z.VehicleId));
         });
 
         modelBuilder.Entity<VehiclePlayerAccess>(entityBuilder =>

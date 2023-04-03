@@ -7,4 +7,5 @@ public sealed class Inventory
 
     public ICollection<InventoryItem> InventoryItems = new List<InventoryItem>();
     public ICollection<UserInventory> UserInventories = new List<UserInventory>();
+    public ICollection<VehicleInventory> VehicleInventories = new List<VehicleInventory>();
 }

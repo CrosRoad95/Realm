@@ -34,6 +34,7 @@ public interface IDb : IDisposable
     DbSet<UserSetting> UserSettings { get; }
     DbSet<UserWhitelistedSerial> UserWhitelistedSerials { get; }
     DbSet<UserInventory> UserInventories { get; }
+    DbSet<VehicleInventory> VehicleInventories { get; }
 
     Task MigrateAsync();
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
