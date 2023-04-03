@@ -7,4 +7,5 @@ public class GameplayOptions
     public CultureInfo CurrencyCulture { get; set; }
     public uint DefaultInventorySize { get; set; }
     public int BanType { get; set; }
+    public string Watermark { get; set; }
 }

@@ -6,6 +6,7 @@ using SlipeServer.Resources.BoneAttach;
 using SlipeServer.Resources.Text3d;
 using Realm.Resources.Nametags;
 using Realm.Server.Entities;
+using SlipeServer.Resources.Watermark;
 
 namespace Realm.Server.Extensions;
 
@@ -69,7 +70,8 @@ public static class ServerBuilderExtensions
             services.AddSingleton<IECS, ECS>();
         });
 
-        // Resource
+        #region Resources
+
         var commonOptions = new CommonResourceOptions();
 
         builder.AddNoClipResource(new NoClipOptions
@@ -93,12 +95,16 @@ public static class ServerBuilderExtensions
         builder.AddText3dResource();
         builder.AddNametagsResource();
         builder.AddBoneAttachResource(BoneAttachVersion.Release_1_2_0);
+        builder.AddWatermarkResource();
+        #endregion
 
-        // Resources logics
+        #region Resources Logics
         builder.AddLogic<ClientInterfaceLogic>();
         builder.AddLogic<StatisticsCounterLogic>();
         builder.AddLogic<DefaultAfkLogic>();
         builder.AddLogic<OutlineLogic>();
+        builder.AddLogic<WatermarkLogic>();
+        #endregion
 
         // Miscellaneous logic
         builder.AddLogic<EssentialCommandsLogic>();
