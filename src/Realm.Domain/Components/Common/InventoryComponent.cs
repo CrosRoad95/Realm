@@ -1,4 +1,6 @@
-﻿namespace Realm.Domain.Components.Common;
+﻿using Realm.Domain.Inventory;
+
+namespace Realm.Domain.Components.Common;
 
 [ComponentUsage(true)]
 public class InventoryComponent : Component
@@ -53,16 +55,22 @@ public class InventoryComponent : Component
             return _items.Count(x => x.ItemId == itemId);
     }
     
-    public List<Item> GetItemsById(uint itemId)
+    public IReadOnlyList<Item> GetItemsById(uint itemId)
     {
         lock (_itemsLock)
             return new List<Item>(_items.Where(x => x.ItemId == itemId));
+    }
+    
+    public IReadOnlyList<Item> GetItemsByIdWithMetadata(uint itemId, string key, object? metadata)
+    {
+        lock (_itemsLock)
+            return new List<Item>(_items.Where(x => x.ItemId == itemId && x.GetMetadata(key).Equals(metadata)));
     }
 
     public bool HasItemWithMetadata(uint itemId, string key, object? metadata)
     {
         lock (_itemsLock)
-            return _items.Any(x => x.ItemId == itemId && x.GetMetadata(key) == metadata);
+            return _items.Any(x => x.ItemId == itemId && x.GetMetadata(key).Equals(metadata));
     }
 
     public bool TryGetByLocalId(string localId, out Item item)
@@ -86,7 +94,12 @@ public class InventoryComponent : Component
         return item != null;
     }
 
-    public void AddItem(ItemsRegistry itemsRegistry, uint itemId, uint number = 1, Dictionary<string, object>? metadata = null, bool tryStack = true, bool force = false)
+    public Item AddSingleItem(ItemsRegistry itemsRegistry, uint itemId, Dictionary<string, object>? metadata = null, bool tryStack = true, bool force = false)
+    {
+        return AddItem(itemsRegistry, itemId, 1, metadata, tryStack, force).First();
+    }
+
+    public IEnumerable<Item> AddItem(ItemsRegistry itemsRegistry, uint itemId, uint number = 1, Dictionary<string, object>? metadata = null, bool tryStack = true, bool force = false)
     {
         if (number == 0)
             throw new ArgumentOutOfRangeException(nameof(number));
@@ -131,6 +144,8 @@ public class InventoryComponent : Component
                 _items.Add(newItem);
             ItemAdded?.Invoke(this, newItem);
         }
+
+        return newItems.AsReadOnly();
     }
 
     private void HandleItemChanged(Item item)
