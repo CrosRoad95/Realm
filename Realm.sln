@@ -80,6 +80,12 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Realm.Resources.Nametags", 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Realm.Resources.Base", "src\Realm.Resources.Base\Realm.Resources.Base.csproj", "{0DE9EB8D-852E-489C-B283-4A066F9C1867}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Extensions", "Extensions", "{3AFC0A70-7226-480F-99AD-AA4542DE820C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Realm.Extensions.RazorGui", "Realm.Extensions.RazorGui\Realm.Extensions.RazorGui.csproj", "{5F1A8D47-04A4-4494-8E40-3838A8A47B36}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Realm.Console.RazorGuis", "Realm.Console.RazorGuis\Realm.Console.RazorGuis.csproj", "{D7A48BE5-535B-47DB-8EF8-712AD3E3F5FA}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -210,6 +216,14 @@ Global
 		{0DE9EB8D-852E-489C-B283-4A066F9C1867}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0DE9EB8D-852E-489C-B283-4A066F9C1867}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0DE9EB8D-852E-489C-B283-4A066F9C1867}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5F1A8D47-04A4-4494-8E40-3838A8A47B36}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5F1A8D47-04A4-4494-8E40-3838A8A47B36}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5F1A8D47-04A4-4494-8E40-3838A8A47B36}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5F1A8D47-04A4-4494-8E40-3838A8A47B36}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D7A48BE5-535B-47DB-8EF8-712AD3E3F5FA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D7A48BE5-535B-47DB-8EF8-712AD3E3F5FA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D7A48BE5-535B-47DB-8EF8-712AD3E3F5FA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D7A48BE5-535B-47DB-8EF8-712AD3E3F5FA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -238,6 +252,7 @@ Global
 		{7A03C405-8770-493A-9C09-66A105DA0A7C} = {1B4D0935-5736-4E56-B65E-0CACF26B17DD}
 		{9F84053A-97C9-42AC-A328-F14817C8FDAB} = {28944775-A0AF-46D4-9480-D6F4189002B7}
 		{0DE9EB8D-852E-489C-B283-4A066F9C1867} = {28944775-A0AF-46D4-9480-D6F4189002B7}
+		{5F1A8D47-04A4-4494-8E40-3838A8A47B36} = {3AFC0A70-7226-480F-99AD-AA4542DE820C}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {3922BF34-8D0B-4DC1-9EFC-D4CFB948B3B8}

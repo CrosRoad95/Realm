@@ -8,6 +8,7 @@ local currentGui = nil
 local lastCreatedWindow = nil
 local cooldown = {}
 local currentOpenedGui = {}
+local forms = {}
 local debugToolsEnabledState = false;
 local screenX, screenY = guiGetScreenSize();
 local sx,sy = screenX, screenY
@@ -194,12 +195,16 @@ addEventHandler("internalSubmitFormResponse", localPlayer, function(id, name, da
 	end
 end)
 
+function getFormByName(name)
+	return forms[name];
+end
+
 function createForm(name, fields)
 	if(currentGui == nil)then
 		error("Can't use createFrom outside gui constructor.'")
 	end
 	local _currentGuiName = currentGui;
-	return {
+	local form = {
 		submit = function()
 			if(pendingFormsSubmissions[name])then
 				return false
@@ -224,6 +229,8 @@ function createForm(name, fields)
 			return name;
 		end,
 	};
+	forms[name] = form;
+	return form;
 end
 
 function cooldownCheck(key, time)

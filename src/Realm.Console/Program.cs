@@ -4,6 +4,7 @@ using Realm.Server.Extensions;
 using Realm.Server.Integrations.Discord.Handlers;
 using Realm.Server.Logic;
 using Realm.Server.Logic.Defaults;
+using Realm.Extensions.RazorGui;
 
 Directory.SetCurrentDirectory(Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly()!.Location)!);
 
@@ -34,11 +35,13 @@ var server = builder.Build(null, extraBuilderSteps: serverBuilder =>
     serverBuilder.AddLogic<ProceduralObjectsLogic>();
     serverBuilder.AddLogic<AssetsLogic>();
     serverBuilder.AddLogic<DefaultBanLogic>();
+    serverBuilder.AddLogic<TestLogic>();
 #if DEBUG
     serverBuilder.AddLogic<HotReloadLogic>("../../../Server/Gui");
 #endif
     serverBuilder.ConfigureServices(x =>
     {
+        x.AddRazorGui();
         #region Discord integration specific
         x.AddSingleton<IDiscordStatusChannelUpdateHandler, DefaultDiscordStatusChannelUpdateHandler>();
         x.AddSingleton<IDiscordConnectAccountHandler, DefaultDiscordConnectAccountHandler>();
