@@ -83,6 +83,8 @@ public abstract class GuiComponent : Component
 
     public void Close()
     {
+        ThrowIfDisposed();
+
         AgnosticGuiSystemService.FormSubmitted -= HandleFormSubmitted;
         AgnosticGuiSystemService.ActionExecuted -= HandleActionExecuted;
 

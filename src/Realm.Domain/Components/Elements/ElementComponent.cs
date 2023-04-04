@@ -13,13 +13,76 @@ public abstract class ElementComponent : Component
 
     internal bool BaseLoaded { get; set; } = false;
 
-    public bool AreCollisionsEnabled { get => Element.AreCollisionsEnabled; set => Element.AreCollisionsEnabled = value; }
-    public Vector3 Velocity { get => Element.Velocity; set => Element.Velocity = value; }
-    public Vector3 TurnVelocity { get => Element.TurnVelocity; set => Element.TurnVelocity = value; }
-    public byte Alpha { get => Element.Alpha; set => Element.Alpha = value; }
-    public bool IsFrozen { get => Element.IsFrozen; set => Element.IsFrozen = value; }
-    public byte Interior { get => Element.Interior; set => Element.Interior = value; }
-    public ushort Dimension { get => Element.Dimension; set => Element.Dimension = value; }
+    public Vector3 Velocity
+    {
+        get
+        {
+            ThrowIfDisposed();
+            return Element.Velocity;
+        }
+        set
+        {
+            ThrowIfDisposed();
+            Element.Velocity = value;
+        }
+    }
+    
+    public Vector3 TurnVelocity
+    {
+        get
+        {
+            ThrowIfDisposed();
+            return Element.TurnVelocity;
+        }
+        set
+        {
+            ThrowIfDisposed();
+            Element.TurnVelocity = value;
+        }
+    }
+
+    public bool AreCollisionsEnabled
+    {
+        get
+        {
+            ThrowIfDisposed();
+            return Element.AreCollisionsEnabled;
+        }
+        set
+        {
+            ThrowIfDisposed();
+            Element.AreCollisionsEnabled = value;
+        }
+    }
+    
+    public byte Alpha
+    {
+        get
+        {
+            ThrowIfDisposed();
+            return Element.Alpha;
+        }
+        set
+        {
+            ThrowIfDisposed();
+            Element.Alpha = value;
+        }
+    }
+
+    public bool IsFrozen
+    {
+        get
+        {
+            ThrowIfDisposed();
+            return Element.IsFrozen;
+        }
+        set
+        {
+            ThrowIfDisposed();
+            Element.IsFrozen = value;
+        }
+    }
+
     protected bool IsPerPlayer { get => _isPerPlayer; set => _isPerPlayer = value; }
 
     protected ElementComponent()
@@ -70,11 +133,13 @@ public abstract class ElementComponent : Component
 
     public void AddFocusable()
     {
+        ThrowIfDisposed();
         AddFocusableHandler?.Invoke(Element);
     }
 
     public void RemoveFocusable()
     {
+        ThrowIfDisposed();
         RemoveFocusableHandler?.Invoke(Element);
     }
 

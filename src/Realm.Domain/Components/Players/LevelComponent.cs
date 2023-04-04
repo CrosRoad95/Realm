@@ -6,7 +6,16 @@ public class LevelComponent : Component
     [Inject]
     private LevelsRegistry LevelsRegistry { get; set; } = default!;
 
-    public uint NextLevelRequiredExperience => LevelsRegistry.GetExperienceRequiredForLevel(Level + 1);
+    public uint NextLevelRequiredExperience
+    {
+
+        get
+        {
+            ThrowIfDisposed();
+            return LevelsRegistry.GetExperienceRequiredForLevel(Level + 1);
+        }
+    }
+
     public uint Level { get; private set; }
     public uint Experience { get; private set; }
 
@@ -28,6 +37,8 @@ public class LevelComponent : Component
 
     public void GiveExperience(uint amount)
     {
+        ThrowIfDisposed();
+
         lock(_lock)
         {
             Experience += amount;

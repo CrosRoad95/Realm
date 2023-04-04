@@ -60,7 +60,7 @@ public class ItemsLogic
                 if(!inventoryComponent.HasItemById(itemId))
                 {
                     var playerElementComponent = inventoryComponent.Entity.GetRequiredComponent<PlayerElementComponent>();
-                    playerElementComponent.Weapons.Remove(WeaponId.Bat);
+                    playerElementComponent.GiveWeapon(WeaponId.Bat);
                     playerElementComponent.SendChatMessage("Bat taken");
                 }
                 break;
@@ -74,9 +74,9 @@ public class ItemsLogic
         {
             case 3:
                 var playerElementComponent = inventoryComponent.Entity.GetRequiredComponent<PlayerElementComponent>();
-                if(!playerElementComponent.Weapons.Any(x => x.Type == WeaponId.Bat))
+                if(!playerElementComponent.HasWeapon(WeaponId.Bat))
                 {
-                    playerElementComponent.Weapons.Add(new Weapon(WeaponId.Bat, 1));
+                    playerElementComponent.GiveWeapon(WeaponId.Bat, 1);
                     playerElementComponent.SendChatMessage("Bat given");
                 }
                 break;

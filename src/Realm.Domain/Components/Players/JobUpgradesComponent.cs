@@ -30,12 +30,16 @@ public class JobUpgradesComponent : Component
 
     public bool HasJobUpgrade(short jobId, int upgradeId)
     {
+        ThrowIfDisposed();
+
         lock (_upgradesLock)
             return InternalHasJobUpgrade(jobId, upgradeId);
     }
 
     public bool TryAddJobUpgrade(short jobId, int upgradeId)
     {
+        ThrowIfDisposed();
+
         lock (_upgradesLock)
         {
             if (InternalHasJobUpgrade(jobId, upgradeId))
@@ -55,6 +59,8 @@ public class JobUpgradesComponent : Component
 
     public bool TryRemoveJobUpgrade(short jobId, int upgradeId, bool all = false)
     {
+        ThrowIfDisposed();
+
         lock (_upgradesLock)
         {
             if (!InternalHasJobUpgrade(jobId, upgradeId))

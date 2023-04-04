@@ -15,8 +15,16 @@ public abstract class HudComponent<TState> : Component where TState : class
     private readonly Vector2? _offset;
     private bool _visible;
 
-    public bool Visible { get => _visible; set
+    public bool Visible
+    {
+        get
         {
+            ThrowIfDisposed();
+            return _visible;
+        }
+        set
+        {
+            ThrowIfDisposed();
             if (_visible != value)
             {
                 _visible = value;
@@ -25,7 +33,19 @@ public abstract class HudComponent<TState> : Component where TState : class
         }
     }
 
-    public Vector2 Position { get => _hud.Position; set => _hud.Position = value; }
+    public Vector2 Position
+    {
+        get
+        {
+            ThrowIfDisposed();
+            return _hud.Position;
+        }
+        set
+        {
+            ThrowIfDisposed();
+            _hud.Position = value;
+        }
+    }
 
     public HudComponent(TState defaultState, Vector2? offset = null)
     {

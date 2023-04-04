@@ -10,11 +10,52 @@ public class PickupElementComponent : ElementComponent
     private ILogger<PickupElementComponent> Logger { get; set; } = default!;
 
     protected readonly Pickup _pickup;
-    public Action<Entity>? EntityEntered { get; set; }
-    public Action<Entity>? EntityLeft { get; set; }
-    public Action<Entity, IEntityRule>? EntityRuleFailed { get; set; }
-
     internal override Element Element => _pickup;
+    private Action<Entity>? _entityEntered;
+    private Action<Entity>? _entityLeft;
+    private Action<Entity, IEntityRule>? _entityRuleFailed;
+
+    public Action<Entity>? EntityEntered
+    {
+        get
+        {
+            ThrowIfDisposed();
+            return _entityEntered;
+        }
+        set
+        {
+            ThrowIfDisposed();
+            _entityEntered = value;
+        }
+    }
+
+    public Action<Entity>? EntityLeft
+    {
+        get
+        {
+            ThrowIfDisposed();
+            return _entityLeft;
+        }
+        set
+        {
+            ThrowIfDisposed();
+            _entityLeft = value;
+        }
+    }
+
+    public Action<Entity, IEntityRule>? EntityRuleFailed
+    {
+        get
+        {
+            ThrowIfDisposed();
+            return _entityRuleFailed;
+        }
+        set
+        {
+            ThrowIfDisposed();
+            _entityRuleFailed = value;
+        }
+    }
 
     private readonly List<IEntityRule> _entityRules = new();
 
@@ -26,60 +67,94 @@ public class PickupElementComponent : ElementComponent
 
     public void AddRule(IEntityRule entityRule)
     {
+        ThrowIfDisposed();
+
         _entityRules.Add(entityRule);
     }
 
-    public void AddRule<TEntityRole>() where TEntityRole: IEntityRule, new()
+    public void AddRule<TEntityRole>() where TEntityRole : IEntityRule, new()
     {
+        ThrowIfDisposed();
+
         _entityRules.Add(new TEntityRole());
     }
 
     private void HandleElementEntered(Element element)
     {
-        if(EntityEntered != null)
-            if(ECS.TryGetByElement(element, out var entity))
-                if(entity.Tag == EntityTag.Player || entity.Tag == EntityTag.Vehicle)
+        if (EntityEntered == null)
+            return;
+
+        if (!ECS.TryGetByElement(element, out var entity))
+            return;
+
+        if (entity.Tag != EntityTag.Player && entity.Tag != EntityTag.Vehicle)
+            return;
+
+        foreach (var rule in _entityRules)
+        {
+            bool success;
+            try
+            {
+                success = rule.Check(entity);
+            }
+            catch(Exception ex)
+            {
+                Logger.LogError(ex, "Failed to invoke check role");
+                break;
+            }
+
+            if (!rule.Check(entity))
+            {
+                try
                 {
-                    foreach (var rule in _entityRules)
-                    {
-                        if(!rule.Check(entity))
-                        {
-                            try
-                            {
-                                EntityRuleFailed?.Invoke(entity, rule);
-                            }
-                            catch(Exception ex)
-                            {
-                                Logger.LogError(ex, "Failed to invoke entity failed callback");
-                            }
-                            return;
-                        }
-                    }
-                    try
-                    {
-                        EntityEntered(entity);
-                    }
-                    catch (Exception ex)
-                    {
-                        Logger.LogError(ex, "Failed to invoke entity entered callback");
-                    }
+                    EntityRuleFailed?.Invoke(entity, rule);
                 }
+                catch (Exception ex)
+                {
+                    Logger.LogError(ex, "Failed to invoke entity failed callback");
+                }
+                return;
+            }
+        }
+        try
+        {
+            EntityEntered(entity);
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Failed to invoke entity entered callback");
+        }
     }
 
     private void HandleElementLeft(Element element)
     {
-        if(EntityLeft != null)
-            if (ECS.TryGetByElement(element, out var entity))
-                if (entity.Tag == EntityTag.Player || entity.Tag == EntityTag.Vehicle)
-                    if (_entityRules.All(x => x.Check(entity)))
-                        try
-                        {
-                            EntityLeft(entity);
-                        }
-                        catch (Exception ex)
-                        {
-                            Logger.LogError(ex, "Failed to invoke entity left callback");
-                        }
+        if (EntityLeft == null)
+            return;
+
+        if (!ECS.TryGetByElement(element, out var entity))
+            return;
+
+        if (entity.Tag != EntityTag.Player && entity.Tag != EntityTag.Vehicle)
+            return;
+
+        try
+        {
+            if (!_entityRules.All(x => x.Check(entity)))
+                return;
+        }
+        catch(Exception ex)
+        {
+            Logger.LogError(ex, "Failed to invoke check role");
+        }
+
+        try
+        {
+            EntityLeft(entity);
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Failed to invoke entity left callback");
+        }
     }
 
     private void HandleDestroyed(Entity entity)
@@ -106,6 +181,9 @@ public class PickupElementComponent : ElementComponent
 
     public override void Dispose()
     {
+        _entityEntered = null;
+        _entityLeft = null;
+        _entityRuleFailed = null;
         Entity.Transform.PositionChanged -= HandlePositionChanged;
     }
 }

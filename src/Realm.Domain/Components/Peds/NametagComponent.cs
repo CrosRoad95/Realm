@@ -12,8 +12,14 @@ public sealed class NametagComponent : Component
 
     public string Text
     {
-        get => _text; set
+        get
         {
+            ThrowIfDisposed();
+            return _text;
+        }
+        set
+        {
+            ThrowIfDisposed();
             lock (_lock)
             {
                 _text = value;
@@ -21,6 +27,7 @@ public sealed class NametagComponent : Component
             }
         }
     }
+
     public NametagComponent(string text)
     {
         _text = text;

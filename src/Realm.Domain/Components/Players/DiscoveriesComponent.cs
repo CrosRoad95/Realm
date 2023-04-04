@@ -18,7 +18,9 @@ public class DiscoveriesComponent : Component
 
     public bool TryDiscover(int discoveryId)
     {
-        lock(_discoveriesLock)
+        ThrowIfDisposed();
+
+        lock (_discoveriesLock)
         {
             var success = _discoveries.Add(discoveryId);
             if (success)
@@ -27,5 +29,9 @@ public class DiscoveriesComponent : Component
         }
     }
 
-    public bool IsDiscovered(int discoveryId) => _discoveries.Contains(discoveryId);
+    public bool IsDiscovered(int discoveryId)
+    {
+        ThrowIfDisposed();
+        return _discoveries.Contains(discoveryId);
+    }
 }

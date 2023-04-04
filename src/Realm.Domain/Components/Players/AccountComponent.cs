@@ -117,6 +117,8 @@ public class AccountComponent : AsyncComponent
 
     public async Task<IEnumerable<string>> GetRoles()
     {
+        ThrowIfDisposed();
+
         return (await UserManager.GetRolesAsync(_user)).ToList();
     }
 
@@ -202,6 +204,8 @@ public class AccountComponent : AsyncComponent
 
     public void SetSetting(int settingId, string value)
     {
+        ThrowIfDisposed();
+
         if (value.Length > 255)
             throw new ArgumentException("Value is too long", nameof(value));
         _settings[settingId] = value;
@@ -209,6 +213,7 @@ public class AccountComponent : AsyncComponent
     
     public string? GetSetting(int settingId)
     {
+        ThrowIfDisposed();
         if (_settings.TryGetValue(settingId, out var value))
             return value;
         return null;
@@ -216,7 +221,8 @@ public class AccountComponent : AsyncComponent
 
     public void RemoveSetting(int settingId)
     {
+        ThrowIfDisposed();
+
         _settings.TryRemove(settingId, out var _);
     }
-
 }

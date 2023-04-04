@@ -17,7 +17,12 @@ public class MoneyComponent : Component
     public event Action<MoneyComponent, decimal>? MoneyTaken;
     public decimal Money
     {
-        get => _money; set
+        get
+        {
+            ThrowIfDisposed();
+            return _money;
+        }
+        set
         {
             ThrowIfDisposed();
 
@@ -144,6 +149,8 @@ public class MoneyComponent : Component
 
     public void TransferMoney(MoneyComponent moneyComponent, decimal amount, bool force = false)
     {
+        ThrowIfDisposed();
+
         if (amount == 0)
             return;
 

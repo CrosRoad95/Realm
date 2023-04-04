@@ -62,8 +62,17 @@ public class RadarAreaElementComponent : ElementComponent
         }
     }
 
-    public bool IsInside(Entity entity) => _radarArea.IsInside(new Vector2(entity.Transform.Position.X, entity.Transform.Position.Y));
-    public bool IsInside(Vector2 vector2) => _radarArea.IsInside(vector2);
+    public bool IsInside(Entity entity)
+    {
+        ThrowIfDisposed();
+        return _radarArea.IsInside(new Vector2(entity.Transform.Position.X, entity.Transform.Position.Y));
+    }
+
+    public bool IsInside(Vector2 vector2)
+    {
+        ThrowIfDisposed();
+        return _radarArea.IsInside(vector2);
+    }
 
     internal RadarAreaElementComponent(RadarArea radarArea)
     {

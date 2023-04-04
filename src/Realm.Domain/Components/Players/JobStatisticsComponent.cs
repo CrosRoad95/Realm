@@ -46,7 +46,9 @@ public class JobStatisticsComponent : Component
 
     public void AddPoints(short jobId, ulong points)
     {
-        lock(_lock)
+        ThrowIfDisposed();
+
+        lock (_lock)
         {
             EnsureJobIsInitialized(jobId);
             var jobStatistics = _jobStatistics[jobId];
@@ -59,6 +61,8 @@ public class JobStatisticsComponent : Component
 
     public void AddTimePlayed(short jobId, ulong timePlayed)
     {
+        ThrowIfDisposed();
+
         lock (_lock)
         {
             EnsureJobIsInitialized(jobId);

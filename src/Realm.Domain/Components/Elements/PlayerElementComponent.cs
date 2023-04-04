@@ -36,7 +36,17 @@ public sealed class PlayerElementComponent : PedElementComponent
     private readonly object _enableFightFlagsLock = new();
     private readonly MapIdGenerator _mapIdGenerator = new(IdGeneratorConstants.MapIdStart, IdGeneratorConstants.MapIdStop);
     public event Action<Entity, Entity?>? FocusedEntityChanged;
-    public Entity? FocusedEntity { get => _focusedEntity; internal set
+    internal Player Player => _player;
+    internal bool Spawned { get; set; }
+
+    public Entity? FocusedEntity
+    {
+        get
+        {
+            ThrowIfDisposed();
+            return _focusedEntity;
+        }
+        internal set
         {
             ThrowIfDisposed();
             if (value != _focusedEntity)
@@ -46,25 +56,195 @@ public sealed class PlayerElementComponent : PedElementComponent
             }
         }
     }
-    public Vector2 ScreenSize => _screenSize;
-    public CultureInfo Culture => _culture;
 
-    internal Player Player => _player;
-    internal bool Spawned { get; set; }
-    public string Name { get => Player.Name; set => Player.Name = value; }
-    public byte WantedLevel { get => Player.WantedLevel; set => Player.WantedLevel = value; }
-    public Vector3 AimOrigin { get => Player.AimOrigin; set => Player.AimOrigin = value; }
-    public Vector3 AimDirection { get => Player.AimDirection; set => Player.AimDirection = value; }
-    public Vector3 CameraPosition { get => Player.CameraPosition; set => Player.CameraPosition = value; }
-    public Vector3 CameraDirection { get => Player.CameraDirection; set => Player.CameraDirection = value; }
-    public float CameraRotation { get => Player.CameraRotation; set => Player.CameraRotation = value; }
-    public bool IsOnGround { get => Player.IsOnGround; set => Player.IsOnGround = value; }
-    public bool WearsGoggles { get => Player.WearsGoggles; set => Player.WearsGoggles = value; }
-    public bool HasContact { get => Player.HasContact; set => Player.HasContact = value; }
-    public bool IsChoking { get => Player.IsChoking; set => Player.IsChoking = value; }
-    public IClient Client => Player.Client;
-    public Controls Controls => _player.Controls;
-    public WeaponCollection Weapons => _player.Weapons;
+    public Vector2 ScreenSize
+    {
+        get
+        {
+            ThrowIfDisposed();
+            return _screenSize;
+        }
+    }
+
+    public CultureInfo Culture {
+        get
+        {
+            ThrowIfDisposed();
+            return _culture;
+        }
+    }
+
+    public string Name
+    {
+        get
+        {
+            ThrowIfDisposed();
+            return _player.Name;
+        }
+        set
+        {
+            ThrowIfDisposed();
+            _player.Name = value;
+        }
+    }
+
+    public byte WantedLevel
+    {
+        get
+        {
+            ThrowIfDisposed();
+            return _player.WantedLevel;
+        }
+        set
+        {
+            ThrowIfDisposed();
+            _player.WantedLevel = value;
+        }
+    }
+
+    public Vector3 AimOrigin
+    {
+        get
+        {
+            ThrowIfDisposed();
+            return _player.AimOrigin;
+        }
+        set
+        {
+            ThrowIfDisposed();
+            _player.AimOrigin = value;
+        }
+    }
+
+    public Vector3 AimDirection
+    {
+        get
+        {
+            ThrowIfDisposed();
+            return _player.AimDirection;
+        }
+        set
+        {
+            ThrowIfDisposed();
+            _player.AimDirection = value;
+        }
+    }
+
+    public Vector3 CameraPosition
+    {
+        get
+        {
+            ThrowIfDisposed();
+            return _player.CameraPosition;
+        }
+        set
+        {
+            ThrowIfDisposed();
+            _player.CameraPosition = value;
+        }
+    }
+
+    public Vector3 CameraDirection
+    {
+        get
+        {
+            ThrowIfDisposed();
+            return _player.CameraDirection;
+        }
+        set
+        {
+            ThrowIfDisposed();
+            _player.CameraDirection = value;
+        }
+    }
+
+    public float CameraRotation
+    {
+        get
+        {
+            ThrowIfDisposed();
+            return _player.CameraRotation;
+        }
+        set
+        {
+            ThrowIfDisposed();
+            _player.CameraRotation = value;
+        }
+    }
+
+    public bool IsOnGround
+    {
+        get
+        {
+            ThrowIfDisposed();
+            return _player.IsOnGround;
+        }
+        set
+        {
+            ThrowIfDisposed();
+            _player.IsOnGround = value;
+        }
+    }
+
+    public bool WearsGoggles
+    {
+        get
+        {
+            ThrowIfDisposed();
+            return _player.WearsGoggles;
+        }
+        set
+        {
+            ThrowIfDisposed();
+            _player.WearsGoggles = value;
+        }
+    }
+
+    public bool HasContact
+    {
+        get
+        {
+            ThrowIfDisposed();
+            return _player.HasContact;
+        }
+        set
+        {
+            ThrowIfDisposed();
+            _player.HasContact = value;
+        }
+    }
+
+    public bool IsChoking
+    {
+        get
+        {
+            ThrowIfDisposed();
+            return _player.IsChoking;
+        }
+        set
+        {
+            ThrowIfDisposed();
+            _player.IsChoking = value;
+        }
+    }
+
+    public IClient Client
+    {
+        get
+        {
+            ThrowIfDisposed();
+            return _player.Client;
+        }
+    }
+
+    public Controls Controls
+    {
+        get
+        {
+            ThrowIfDisposed();
+            return _player.Controls;
+        }
+    }
 
     internal override Element Element => _player;
     internal MapIdGenerator MapIdGenerator => _mapIdGenerator;
@@ -371,6 +551,8 @@ public sealed class PlayerElementComponent : PedElementComponent
 
     public bool IsCooldownActive(string key, KeyState keyState = KeyState.Down)
     {
+        ThrowIfDisposed();
+
         if(keyState == KeyState.Down)
             _bindsDownLock.Wait();
         else
@@ -474,12 +656,6 @@ public sealed class PlayerElementComponent : PedElementComponent
         Text3dService.SetRenderingEnabled(_player, enabled);
     }
 
-    public void SasdetText3dRenderingEnabled(bool enabled)
-    {
-        ThrowIfDisposed();
-        Text3dService.SetRenderingEnabled(_player, enabled);
-    }
-
     public async Task DoComplexAnimationAsync(Animation animation, bool blockMovement = true)
     {
         ThrowIfDisposed();
@@ -509,7 +685,7 @@ public sealed class PlayerElementComponent : PedElementComponent
         DoAnimationInternal(animation, ref timeSpan);
     }
 
-    public void DoAnimationInternal(Animation animation, ref TimeSpan? timeSpan)
+    internal void DoAnimationInternal(Animation animation, ref TimeSpan? timeSpan)
     {
         switch(animation)
         {
@@ -588,35 +764,39 @@ public sealed class PlayerElementComponent : PedElementComponent
 
     public void Kick(PlayerDisconnectType playerDisconnectType)
     {
+        ThrowIfDisposed();
         _player.Kick(playerDisconnectType);
     }
     
     public void Kick(string reason)
     {
+        ThrowIfDisposed();
         _player.Kick(reason);
     }
     
     public void ShowHudComponent(SlipeServer.Server.Elements.Enums.HudComponent hudComponent, bool isVisible)
     {
+        ThrowIfDisposed();
         _player.ShowHudComponent(hudComponent, isVisible);
     }
     
     public void SetFpsLimit(ushort limit)
     {
+        ThrowIfDisposed();
         _player.SetFpsLimit(limit);
     }
 
     public void PlaySound(byte sound)
     {
+        ThrowIfDisposed();
         _player.PlaySound(sound);
     }
     
     public void SetTransferBoxVisible(bool visible)
     {
+        ThrowIfDisposed();
         _player.SetTransferBoxVisible(visible);
     }
-    
-    public bool HasJetpack { get => _player.HasJetpack; set => _player.HasJetpack = value; }
 
     public override void Dispose()
     {

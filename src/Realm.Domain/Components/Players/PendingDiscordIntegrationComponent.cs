@@ -14,7 +14,8 @@ public class PendingDiscordIntegrationComponent : Component
     {
     }
 
-    private bool HasPendingDiscordConnectionCode() {
+    private bool HasPendingDiscordConnectionCode()
+    {
         ThrowIfDisposed();
 
         lock (_lock)

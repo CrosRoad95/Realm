@@ -29,8 +29,14 @@ public class AdminComponent : Component
 
     public bool DevelopmentMode
     {
-        get => _developmentMode; set
+        get
         {
+            ThrowIfDisposed();
+            return _developmentMode;
+        }
+        set
+        {
+            ThrowIfDisposed();
             if (_developmentMode != value)
             {
                 ClientInterfaceService.SetDevelopmentModeEnabled(Entity.Player, value);
@@ -39,11 +45,17 @@ public class AdminComponent : Component
             }
         }
     }
-    
+
     public bool DebugView
     {
-        get => _debugView; set
+        get
         {
+            ThrowIfDisposed();
+            return _debugView;
+        }
+        set
+        {
+            ThrowIfDisposed();
             if (_debugView != value)
             {
                 DebugLog.SetVisibleTo(Entity.Player, value);
@@ -55,8 +67,14 @@ public class AdminComponent : Component
 
     public bool AdminTools
     {
-        get => _adminTools; set
+        get
         {
+            ThrowIfDisposed();
+            return _adminTools;
+        }
+        set
+        {
+            ThrowIfDisposed();
             if (_adminTools != value)
             {
                 if (value)
@@ -75,8 +93,14 @@ public class AdminComponent : Component
 
     public bool NoClip
     {
-        get => _noClip; set
+        get
         {
+            ThrowIfDisposed();
+            return _noClip;
+        }
+        set
+        {
+            ThrowIfDisposed();
             if (_noClip != value)
             {
                 NoClipService.SetEnabledTo(Entity.Player, value);
@@ -85,11 +109,17 @@ public class AdminComponent : Component
             }
         }
     }
-    
+
     public bool InteractionDebugRenderingEnabled
     {
-        get => _interactionDebugRenderingEnabled; set
+        get
         {
+            ThrowIfDisposed();
+            return _interactionDebugRenderingEnabled;
+        }
+        set
+        {
+            ThrowIfDisposed();
             if (_interactionDebugRenderingEnabled != value)
             {
                 ClientInterfaceService.SetFocusableRenderingEnabled(Entity.Player, _interactionDebugRenderingEnabled);

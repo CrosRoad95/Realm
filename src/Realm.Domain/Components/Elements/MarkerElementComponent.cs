@@ -12,11 +12,107 @@ public class MarkerElementComponent : ElementComponent
     protected readonly CollisionSphere _collisionShape;
     internal override Element Element => _marker;
     internal CollisionSphere CollisionShape => _collisionShape;
-    public Action<Entity>? EntityEntered { get; set; }
-    public Action<Entity>? EntityLeft { get; set; }
-    public Action<Entity, IEntityRule>? EntityRuleFailed { get; set; }
+    private Action<Entity>? _entityEntered;
+    private Action<Entity>? _entityLeft;
+    private Action<Entity, IEntityRule>? _entityRuleFailed;
 
-    public Color Color { get => _marker.Color; set => _marker.Color = value; }
+    public Action<Entity>? EntityEntered
+    {
+        get
+        {
+            ThrowIfDisposed();
+            return _entityEntered;
+        }
+        set
+        {
+            ThrowIfDisposed();
+            _entityEntered = value;
+        }
+    }
+
+    public Action<Entity>? EntityLeft
+    {
+        get
+        {
+            ThrowIfDisposed();
+            return _entityLeft;
+        }
+        set
+        {
+            ThrowIfDisposed();
+            _entityLeft = value;
+        }
+    }
+
+    public Action<Entity, IEntityRule>? EntityRuleFailed
+    {
+        get
+        {
+            ThrowIfDisposed();
+            return _entityRuleFailed;
+        }
+        set
+        {
+            ThrowIfDisposed();
+            _entityRuleFailed = value;
+        }
+    }
+
+    public Color Color
+    {
+        get
+        {
+            ThrowIfDisposed();
+            return _marker.Color;
+        }
+        set
+        {
+            ThrowIfDisposed();
+            _marker.Color = value;
+        }
+    }
+    
+    public float Size
+    {
+        get
+        {
+            ThrowIfDisposed();
+            return _marker.Size;
+        }
+        set
+        {
+            ThrowIfDisposed();
+            _marker.Size = value;
+        }
+    }
+    
+    public Vector3? TargetPosition
+    {
+        get
+        {
+            ThrowIfDisposed();
+            return _marker.TargetPosition;
+        }
+        set
+        {
+            ThrowIfDisposed();
+            _marker.TargetPosition = value;
+        }
+    }
+    
+    public MarkerIcon MarkerIcon
+    {
+        get
+        {
+            ThrowIfDisposed();
+            return _marker.MarkerIcon;
+        }
+        set
+        {
+            ThrowIfDisposed();
+            _marker.MarkerIcon = value;
+        }
+    }
 
     private readonly List<IEntityRule> _entityRules = new();
 
@@ -28,43 +124,50 @@ public class MarkerElementComponent : ElementComponent
 
     public void AddRule(IEntityRule entityRule)
     {
+        ThrowIfDisposed();
         _entityRules.Add(entityRule);
     }
 
     public void AddRule<TEntityRole>() where TEntityRole : IEntityRule, new()
     {
+        ThrowIfDisposed();
         _entityRules.Add(new TEntityRole());
     }
 
     private void HandleElementEntered(Element element)
     {
-        if (EntityEntered != null)
+        if (EntityEntered == null)
+            return;
+
+        if (!ECS.TryGetByElement(element, out Entity entity))
+            return;
+
+        if (entity.Tag != EntityTag.Player && entity.Tag != EntityTag.Vehicle)
+            return;
+
+        foreach (var rule in _entityRules)
         {
-            if (ECS.TryGetByElement(element, out Entity entity))
-                if (entity.Tag == EntityTag.Player || entity.Tag == EntityTag.Vehicle)
-                {
-                    foreach (var rule in _entityRules)
-                    {
-                        if (!rule.Check(entity))
-                        {
-                            EntityRuleFailed?.Invoke(entity, rule);
-                            return;
-                        }
-                    }
-                    EntityEntered(entity);
-                }
+            if (!rule.Check(entity))
+            {
+                EntityRuleFailed?.Invoke(entity, rule);
+                return;
+            }
         }
+        EntityEntered(entity);
     }
 
     private void HandleElementLeft(Element element)
     {
-        if (EntityLeft != null)
-        {
-            if(ECS.TryGetByElement(element, out Entity entity))
-                if (entity != null && (entity.Tag == EntityTag.Player || entity.Tag == EntityTag.Vehicle))
-                    if (_entityRules.All(x => x.Check(entity)))
-                        EntityLeft(entity);
-        }
+        if (EntityLeft == null)
+            return;
+        if (!ECS.TryGetByElement(element, out Entity entity))
+            return;
+
+        if (entity.Tag != EntityTag.Player && entity.Tag != EntityTag.Vehicle)
+            return;
+
+        if (_entityRules.All(x => x.Check(entity)))
+            EntityLeft(entity);
     }
 
     private void HandleDestroyed(Entity entity)
@@ -95,7 +198,10 @@ public class MarkerElementComponent : ElementComponent
 
     public override void Dispose()
     {
-        if(!IsPerPlayer)
+        _entityEntered = null;
+        _entityLeft = null;
+        _entityRuleFailed = null;
+        if (!IsPerPlayer)
             Entity.Transform.PositionChanged -= HandlePositionChanged;
         base.Dispose();
     }

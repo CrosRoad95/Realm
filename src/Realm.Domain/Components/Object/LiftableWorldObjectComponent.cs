@@ -12,6 +12,8 @@ public class LiftableWorldObjectComponent : InteractionComponent
 
     public bool TryLift(Entity entity)
     {
+        ThrowIfDisposed();
+
         lock(_ownerLock)
         {
             if(Owner == null)
@@ -31,7 +33,9 @@ public class LiftableWorldObjectComponent : InteractionComponent
 
     public bool TryDrop()
     {
-        lock(_ownerLock)
+        ThrowIfDisposed();
+
+        lock (_ownerLock)
         {
             if(Owner == null)
             {
