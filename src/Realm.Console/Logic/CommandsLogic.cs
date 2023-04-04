@@ -802,6 +802,21 @@ internal sealed class CommandsLogic
             _entityFactory.CreateObjectFor(entity, (ObjectModel)1337, entity.Transform.Position + new Vector3(3,0,0), entity.Transform.Rotation);
         });
 
+        _commandService.AddCommandHandler("tp", (entity, args) =>
+        {
+            entity.Transform.Position = new Vector3(0, 0, 3);
+        });
+
+        _commandService.AddCommandHandler("i", (entity, args) =>
+        {
+            entity.Transform.Interior = byte.Parse(args.First());
+        });
+
+        _commandService.AddCommandHandler("d", (entity, args) =>
+        {
+            entity.Transform.Dimension = ushort.Parse(args.First());
+        });
+
         _commandService.AddAsyncCommandHandler("createObjectFor2", async (entity, args) =>
         {
             var pos = entity.Transform.Position + new Vector3(3, 0, 0);

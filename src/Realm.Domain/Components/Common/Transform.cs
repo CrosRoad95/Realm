@@ -6,6 +6,7 @@ public sealed class Transform
     private Vector3 _rotation;
     private byte _interior;
     private ushort _dimension;
+    private Element? _element = null;
     private bool _isBound = false;
 
     public Entity Entity { get; private set; }
@@ -17,6 +18,8 @@ public sealed class Transform
             if (_position != value)
             {
                 _position = value;
+                if (_element != null)
+                    _element.Position = value;
                 PositionChanged?.Invoke(this);
             }
         }
@@ -29,6 +32,8 @@ public sealed class Transform
             if (_rotation != value)
             {
                 _rotation = value;
+                if (_element != null)
+                    _element.Rotation = value;
                 RotationChanged?.Invoke(this);
             }
         }
@@ -41,6 +46,8 @@ public sealed class Transform
             if (_interior != value)
             {
                 _interior = value;
+                if (_element != null)
+                    _element.Interior = value;
                 InteriorChanged?.Invoke(this);
             }
         }
@@ -53,6 +60,8 @@ public sealed class Transform
             if (_dimension != value)
             {
                 _dimension = value;
+                if (_element != null)
+                    _element.Dimension = value;
                 DimensionChanged?.Invoke(this);
             }
         }
@@ -74,6 +83,7 @@ public sealed class Transform
         if (_isBound)
             throw new TransformAlreadyBoundException();
         _isBound = true;
+        _element = element;
         element.Position = _position;
         if(element.ElementType != ElementType.Pickup)
             element.Rotation = _rotation;
@@ -88,22 +98,26 @@ public sealed class Transform
 
     private void HandlePositionChanged(Element _, ElementChangedEventArgs<Vector3> args)
     {
-        Position = args.NewValue;
+        if(args.IsSync)
+           Position = args.NewValue;
     }
 
     private void HandleRotationChanged(Element _, ElementChangedEventArgs<Vector3> args)
     {
-        Rotation = args.NewValue;
+        if (args.IsSync)
+            Rotation = args.NewValue;
     }
 
     private void InteriorInteriorChanged(Element _, ElementChangedEventArgs<byte> args)
     {
-        Interior = args.NewValue;
+        if (args.IsSync)
+            Interior = args.NewValue;
     }
 
     private void HandleDimensionChanged(Element _, ElementChangedEventArgs<ushort> args)
     {
-        Dimension = args.NewValue;
+        if (args.IsSync)
+            Dimension = args.NewValue;
     }
 
     private void HandleDestroyed(Element element)
