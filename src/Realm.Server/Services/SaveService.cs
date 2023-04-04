@@ -1,4 +1,5 @@
 ﻿using Realm.Domain.Enums;
+using Realm.Persistance.Data;
 using static Realm.Persistance.Data.Helpers.VehicleDamageState;
 using static Realm.Persistance.Data.Helpers.VehicleWheelStatus;
 using JobUpgrade = Realm.Persistance.Data.JobUpgrade;
@@ -139,6 +140,22 @@ internal class SaveService : ISaveService
                 Selected = x == vehicleEngineComponent.ActiveVehicleEngineId
             }).ToList();
         }
+
+        var inventoryComponents = entity.Components.OfType<InventoryComponent>()
+        .Where(x => x.Id != 0)
+        .ToList();
+
+            if (inventoryComponents.Any())
+            {
+                foreach (var inventory in vehicleData.Inventories)
+                {
+                    var inventoryComponent = inventoryComponents.Where(x => x.Id == inventory.Id).First();
+                    inventory.Size = inventoryComponent.Size;
+                    inventory.InventoryItems = MapItems(inventoryComponent);
+                }
+            }
+            else
+            vehicleData.Inventories = new List<Inventory>();
     }
 
     private Inventory MapInventory(InventoryComponent inventoryComponent)
@@ -172,6 +189,18 @@ internal class SaveService : ISaveService
         {
             Inventory = inventory,
             UserId = userId
+        });
+        await _dbContext.SaveChangesAsync();
+        return inventory.Id;
+    }
+    
+    public async Task<int> SaveNewVehicleInventory(InventoryComponent inventoryComponent, int vehicleId)
+    {
+        var inventory = MapInventory(inventoryComponent);
+        _dbContext.VehicleInventories.Add(new VehicleInventory
+        {
+            Inventory = inventory,
+            VehicleId = vehicleId
         });
         await _dbContext.SaveChangesAsync();
         return inventory.Id;

@@ -6,4 +6,5 @@ public interface ISaveService
     Task Commit();
     
     internal Task<int> SaveNewPlayerInventory(InventoryComponent inventoryComponent, int userId);
+    internal Task<int> SaveNewVehicleInventory(InventoryComponent inventoryComponent, int vehicleId);
 }

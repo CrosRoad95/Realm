@@ -102,6 +102,9 @@ internal class PlayersLogic
 
     private void HandleEntityCreated(Entity entity)
     {
+        if (entity.Tag != EntityTag.Player)
+            return;
+
         entity.Disposed += HandleEntityDestroyed;
         entity.ComponentAdded += HandleComponentAdded;
     }
@@ -116,12 +119,6 @@ internal class PlayersLogic
         try
         {
             var entity = component.Entity;
-            {
-                if (component is PlayerElementComponent playerElementComponent)
-                {
-                    var player = playerElementComponent.Player;
-                }
-            }
 
             if (component is InventoryComponent inventoryComponent)
             {

@@ -1,4 +1,5 @@
 ﻿using Realm.Domain.Enums;
+using Realm.Domain.Inventory;
 using Realm.Persistance.DTOs;
 using Realm.Persistance.Interfaces;
 
@@ -9,12 +10,14 @@ internal sealed class VehiclesService : IVehiclesService
     private readonly IVehicleRepository _vehicleRepository;
     private readonly IEntityFactory _entityFactory;
     private readonly ISaveService _saveService;
+    private readonly ItemsRegistry _itemsRegistry;
 
-    public VehiclesService(IVehicleRepository vehicleRepository, IEntityFactory entityFactory, ISaveService saveService)
+    public VehiclesService(IVehicleRepository vehicleRepository, IEntityFactory entityFactory, ISaveService saveService, ItemsRegistry itemsRegistry)
     {
         _vehicleRepository = vehicleRepository;
         _entityFactory = entityFactory;
         _saveService = saveService;
+        _itemsRegistry = itemsRegistry;
     }
 
     public async Task<Entity> ConvertToPrivateVehicle(Entity vehicleEntity)
@@ -94,10 +97,20 @@ internal sealed class VehiclesService : IVehiclesService
                     foreach (var vehicleFuel in vehicleData.Fuels)
                         entity.AddComponent(new VehicleFuelComponent(vehicleFuel.FuelType, vehicleFuel.Amount, vehicleFuel.MaxCapacity, vehicleFuel.FuelConsumptionPerOneKm, vehicleFuel.MinimumDistanceThreshold)).Active = vehicleFuel.Active;
                 }
-                else
-                {
 
+                if (vehicleData.Inventories != null && vehicleData.Inventories.Any())
+                {
+                    foreach (var inventory in vehicleData.Inventories)
+                    {
+                        var items = inventory.InventoryItems
+                            .Select(x =>
+                                new Item(_itemsRegistry, x.ItemId, x.Number, JsonConvert.DeserializeObject<Dictionary<string, object>>(x.MetaData))
+                            )
+                            .ToList();
+                        entity.AddComponent(new InventoryComponent(inventory.Size, inventory.Id, items));
+                    }
                 }
+
             });
 
         return entity;
