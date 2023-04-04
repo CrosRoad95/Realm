@@ -94,8 +94,8 @@ public abstract class GuiComponent : Component
 
     public override void Dispose()
     {
-        base.Dispose();
         Close();
+        base.Dispose();
     }
 
     protected virtual Task HandleForm(IFormContext formContext)
