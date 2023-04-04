@@ -340,7 +340,8 @@ public sealed class PlayerElementComponent : PedElementComponent
             if (lastTransformAndMotion != null)
             {
                 Spawn(lastTransformAndMotion.Position, lastTransformAndMotion.Rotation);
-
+                Entity.Transform.Interior = lastTransformAndMotion.Interior;
+                Entity.Transform.Dimension = lastTransformAndMotion.Dimension;
                 return true;
             }
         }
