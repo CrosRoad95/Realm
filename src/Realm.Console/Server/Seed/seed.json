@@ -75,7 +75,8 @@
 		}
 	},
 	"Roles": {
-		"admin": {}
+		"admin": {},
+		"testRole": {}
 	},
 	"Accounts": {
 		"admin": {
@@ -84,7 +85,7 @@
 				"webPanel": "*",
 				"admin": true
 			},
-			"Roles": [ "admin" ],
+			"Roles": [ "admin", "testRole" ],
 			"Integrations": {
 				"Discord": {
 					"UserId": 254302438234783746

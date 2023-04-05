@@ -17,7 +17,7 @@ public class AccountComponent : AsyncComponent
     private readonly ConcurrentDictionary<int, string> _settings = new();
 
     internal User User => _user;
-    internal ClaimsPrincipal ClaimsPrincipal => _claimsPrincipal ?? throw new ArgumentNullException(nameof(_claimsPrincipal));
+    public ClaimsPrincipal ClaimsPrincipal => _claimsPrincipal ?? throw new ArgumentNullException(nameof(_claimsPrincipal));
     public int Id => _user.Id;
     public string? UserName => _user.UserName;
     public IReadOnlyList<int> Upgrades => _upgrades;
@@ -26,6 +26,7 @@ public class AccountComponent : AsyncComponent
     public event Action<AccountComponent, int>? UpgradeAdded;
     public event Action<AccountComponent, int>? UpgradeRemoved;
     public event Action<AccountComponent, ClaimsPrincipal>? ClaimsPrincipalUpdated;
+    private readonly List<string> _roles = new();
 
     internal AccountComponent(User user)
     {
@@ -36,8 +37,10 @@ public class AccountComponent : AsyncComponent
             _settings[item.SettingId] = item.Value;
         }
     }
+
     protected override async Task LoadAsync()
     {
+        _roles.AddRange(await GetRolesAsync());
         await UpdateClaimsPrincipal();
     }
 
@@ -51,7 +54,7 @@ public class AccountComponent : AsyncComponent
     {
         ThrowIfDisposed();
 
-        return _claimsPrincipal!.IsInRole(role);
+        return _roles.Contains(role);
     }
 
     public bool HasClaim(string type)
@@ -92,17 +95,25 @@ public class AccountComponent : AsyncComponent
     {
         ThrowIfDisposed();
 
+        if (_roles.Contains(role))
+            return false;
+
         var result = await UserManager.AddToRoleAsync(_user, role);
         if (result.Succeeded)
             await UpdateClaimsPrincipal();
         return result.Succeeded;
     }
 
-    public async Task<bool> AddRoles(IEnumerable<string> role)
+    public async Task<bool> AddRoles(IEnumerable<string> roles)
     {
         ThrowIfDisposed();
 
-        var result = await UserManager.AddToRolesAsync(_user, role);
+        var rolesToAdd = roles.Except(_roles);
+
+        if (!rolesToAdd.Any())
+            return false;
+
+        var result = await UserManager.AddToRolesAsync(_user, rolesToAdd);
         if (result.Succeeded)
             await UpdateClaimsPrincipal();
         return result.Succeeded;
@@ -115,11 +126,18 @@ public class AccountComponent : AsyncComponent
         return (await UserManager.GetClaimsAsync(_user)).Select(x => x.Type).ToList();
     }
 
-    public async Task<IEnumerable<string>> GetRoles()
+    public async Task<IReadOnlyList<string>> GetRolesAsync()
     {
         ThrowIfDisposed();
 
-        return (await UserManager.GetRolesAsync(_user)).ToList();
+        return (await UserManager.GetRolesAsync(_user)).ToList().AsReadOnly();
+    }
+
+    public IReadOnlyList<string> GetRoles()
+    {
+        ThrowIfDisposed();
+
+        return new List<string>(_roles).AsReadOnly();
     }
 
     public async Task<bool> RemoveClaim(string type, string? value = null)
@@ -146,6 +164,9 @@ public class AccountComponent : AsyncComponent
     public async Task<bool> RemoveRole(string role)
     {
         ThrowIfDisposed();
+
+        if (!_roles.Contains(role))
+            return false;
 
         var result = await UserManager.RemoveFromRoleAsync(_user, role);
         if (result.Succeeded)

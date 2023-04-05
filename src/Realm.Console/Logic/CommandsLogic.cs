@@ -559,6 +559,20 @@ internal sealed class CommandsLogic
                 playerElementComponent.SendChatMessage("Zniszczone");
             }
         });
+        
+        _commandService.AddCommandHandler("testrole", (entity, args) =>
+        {
+            var accountComponent = entity.GetRequiredComponent<AccountComponent>();
+            var isAdmin = accountComponent.IsInRole("admin");
+            var roles = accountComponent.GetRoles();
+            foreach (var item in roles)
+            {
+                if(!accountComponent.IsInRole(item))
+                {
+                    throw new Exception();
+                }
+            }
+        });
 
         _commandService.AddAsyncCommandHandler("discordsendmessage", async (entity, args) =>
         {
