@@ -2,5 +2,5 @@
 
 public interface IDiscordUserChangedHandler
 {
-    Task HandleUserChanged(ulong discordAccountId);
+    Task HandleUserChanged(ulong discordUserId);
 }

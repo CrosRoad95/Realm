@@ -3,7 +3,7 @@
 namespace Realm.Domain.Components.Players;
 
 [ComponentUsage(false)]
-public class AccountComponent : AsyncComponent
+public class UserComponent : AsyncComponent
 {
     [Inject]
     private UserManager<User> UserManager { get; set; } = default!;
@@ -23,12 +23,12 @@ public class AccountComponent : AsyncComponent
     public IReadOnlyList<int> Upgrades => _upgrades;
     public ICollection<int> Settings => _settings.Keys;
 
-    public event Action<AccountComponent, int>? UpgradeAdded;
-    public event Action<AccountComponent, int>? UpgradeRemoved;
-    public event Action<AccountComponent, ClaimsPrincipal>? ClaimsPrincipalUpdated;
+    public event Action<UserComponent, int>? UpgradeAdded;
+    public event Action<UserComponent, int>? UpgradeRemoved;
+    public event Action<UserComponent, ClaimsPrincipal>? ClaimsPrincipalUpdated;
     private readonly List<string> _roles = new();
 
-    internal AccountComponent(User user)
+    internal UserComponent(User user)
     {
         _user = user;
         _upgrades = _user.Upgrades.Select(x => x.UpgradeId).ToList();

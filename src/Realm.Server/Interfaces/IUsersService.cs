@@ -2,7 +2,7 @@
 
 public interface IUsersService
 {
-    Task<bool> AuthorizePolicy(AccountComponent accountComponent, string policy);
+    Task<bool> AuthorizePolicy(UserComponent userComponent, string policy);
     Task<bool> CheckPasswordAsync(User user, string password);
     Task<User?> GetUserById(int id);
     Task<User?> GetUserByLogin(string login);

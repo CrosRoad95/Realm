@@ -73,7 +73,7 @@ internal class GroupService : IGroupService
         if (entity.Tag != EntityTag.Player)
             throw new InvalidOperationException();
 
-        var userId = entity.GetRequiredComponent<AccountComponent>().Id;
+        var userId = entity.GetRequiredComponent<UserComponent>().Id;
         var groupMemberData = await _groupRepository.CreateNewGroupMember(groupId, userId, rank, rankName);
         entity.AddComponent(new GroupMemberComponent(groupMemberData));
     }
@@ -83,7 +83,7 @@ internal class GroupService : IGroupService
         if (entity.Tag != EntityTag.Player)
             throw new InvalidOperationException();
 
-        var userId = entity.GetRequiredComponent<AccountComponent>().Id;
+        var userId = entity.GetRequiredComponent<UserComponent>().Id;
         var groupMemberData = await _groupRepository.CreateNewGroupMember(groupName, userId, rank, rankName);
         entity.AddComponent(new GroupMemberComponent(groupMemberData));
     }

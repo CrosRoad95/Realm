@@ -77,7 +77,7 @@ public class PrivateVehicleComponent : Component
         if (entity.Tag != EntityTag.Player)
             throw new InvalidOperationException();
 
-        var userId = entity.GetRequiredComponent<AccountComponent>().Id;
+        var userId = entity.GetRequiredComponent<UserComponent>().Id;
         var index = _vehiclePlayerAccesses.FindIndex(x => x.UserId == userId);
         if(index >= 0)
         {
@@ -98,7 +98,7 @@ public class PrivateVehicleComponent : Component
 
         _vehiclePlayerAccesses.Add(new VehiclePlayerAccess
         {
-            UserId = entity.GetRequiredComponent<AccountComponent>().Id,
+            UserId = entity.GetRequiredComponent<UserComponent>().Id,
             AccessType = accessType,
             CustomValue = customValue
         });

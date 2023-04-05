@@ -40,12 +40,12 @@ internal class UsersService : IUsersService
         var identityResult = await _userManager.CreateAsync(user, password);
         if (identityResult.Succeeded)
         {
-            _logger.LogInformation("Created a user account of id {userId} {userName}", user.Id, username);
+            _logger.LogInformation("Created a user of id {userId} {userName}", user.Id, username);
             return user.Id;
         }
 
-        _logger.LogError("Failed to create a user account {userName} because: {identityResultErrors}", username, identityResult.Errors.Select(x => x.Description));
-        throw new Exception("Failed to create a user account");
+        _logger.LogError("Failed to create a user {userName} because: {identityResultErrors}", username, identityResult.Errors.Select(x => x.Description));
+        throw new Exception("Failed to create a user");
     }
 
     public async Task<bool> SignIn(Entity entity, User user)
@@ -62,7 +62,7 @@ internal class UsersService : IUsersService
             if (!_activeUsers.TrySetActive(user.Id))
                 return false;
 
-            await entity.AddComponentAsync(new AccountComponent(user));
+            await entity.AddComponentAsync(new UserComponent(user));
             if (user.Inventories != null && user.Inventories.Any())
             {
                 foreach (var inventory in user.Inventories)
@@ -139,8 +139,8 @@ internal class UsersService : IUsersService
     {
         try
         {
-            var accountComponent = entity.GetRequiredComponent<AccountComponent>();
-            _activeUsers.TrySetInactive(accountComponent.Id);
+            var userComponent = entity.GetRequiredComponent<UserComponent>();
+            _activeUsers.TrySetInactive(userComponent.Id);
         }
         catch(Exception ex)
         {
@@ -149,9 +149,9 @@ internal class UsersService : IUsersService
         }
     }
 
-    public async Task<bool> AuthorizePolicy(AccountComponent accountComponent, string policy)
+    public async Task<bool> AuthorizePolicy(UserComponent userComponent, string policy)
     {
-        var result = await _authorizationService.AuthorizeAsync(accountComponent.ClaimsPrincipal, policy);
+        var result = await _authorizationService.AuthorizeAsync(userComponent.ClaimsPrincipal, policy);
         return result.Succeeded;
     }
 

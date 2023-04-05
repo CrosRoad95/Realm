@@ -56,7 +56,7 @@ internal class DiscordStatusChannel
         catch (RpcException ex) when (ex.StatusCode == StatusCode.DeadlineExceeded)
         {
             newContent = $"Stan serwera na dzień {timestamp}: Serwer nie odpowiada, prawdopodobnie jest wyłączony lub wystąpił inny nieznany błąd";
-            _logger.LogError(ex, "Error while connecting account");
+            _logger.LogError(ex, "Error while connecting user");
             if (_lastReceivedUpdate != null)
                 newContent += $"\nOstatnio serwer był online dnia: {_lastReceivedUpdate}";
         }

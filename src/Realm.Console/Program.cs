@@ -41,7 +41,7 @@ var server = builder.Build(null, extraBuilderSteps: serverBuilder =>
     {
         #region Discord integration specific
         x.AddSingleton<IDiscordStatusChannelUpdateHandler, DefaultDiscordStatusChannelUpdateHandler>();
-        x.AddSingleton<IDiscordConnectAccountHandler, DefaultDiscordConnectAccountHandler>();
+        x.AddSingleton<IDiscordConnectUserHandler, DefaultDiscordConnectUserHandler>();
         x.AddSingleton<IDiscordPrivateMessageReceived, DefaultDiscordPrivateMessageReceivedHandler>();
         x.AddSingleton<IDiscordTextBasedCommandHandler, DefaultTextBasedCommandHandler>();
         #endregion

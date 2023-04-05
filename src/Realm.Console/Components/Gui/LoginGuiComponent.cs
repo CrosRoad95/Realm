@@ -32,7 +32,7 @@ public sealed class LoginGuiComponent : GuiComponent
 
                 if (!await RPGUserManager.IsSerialWhitelisted(user.Id, formContext.Entity.GetRequiredComponent<PlayerElementComponent>().Client.Serial))
                 {
-                    Logger.LogWarning("Player logged in to not whitelisted user account.");
+                    Logger.LogWarning("Player logged in to not whitelisted user.");
                 }
 
                 if(!await RPGUserManager.CheckPasswordAsync(user, loginData.Password))

@@ -124,34 +124,36 @@ internal class PlayersLogic
             {
                 if (inventoryComponent.Id == 0)
                 {
-                    if (entity.TryGetComponent(out AccountComponent account))
+                    if (entity.TryGetComponent(out UserComponent userComponent))
                     {
-                        var inventoryId = await _saveService.SaveNewPlayerInventory(inventoryComponent, account.Id);
+                        var inventoryId = await _saveService.SaveNewPlayerInventory(inventoryComponent, userComponent.Id);
                         inventoryComponent.Id = inventoryId;
                     }
                 }
             }
 
-            if (component is AccountComponent accountComponent)
             {
-                if (entity.TryGetComponent(out PlayerElementComponent playerElementComponent))
+                if (component is UserComponent userComponent)
                 {
-                    var client = playerElementComponent.Player.Client;
-                    using var context = _realmDbContextFactory.CreateDbContext();
-                    var user = await context.Users.Where(x => x.Id == accountComponent.Id).FirstAsync();
-                    user.LastLogindDateTime = _dateTimeProvider.Now;
-                    user.LastIp = client.IPAddress?.ToString();
-                    user.LastSerial = client.Serial;
-                    if (user.RegisterSerial == null)
-                        user.RegisterSerial = client.Serial;
+                    if (entity.TryGetComponent(out PlayerElementComponent playerElementComponent))
+                    {
+                        var client = playerElementComponent.Player.Client;
+                        using var context = _realmDbContextFactory.CreateDbContext();
+                        var user = await context.Users.Where(x => x.Id == userComponent.Id).FirstAsync();
+                        user.LastLogindDateTime = _dateTimeProvider.Now;
+                        user.LastIp = client.IPAddress?.ToString();
+                        user.LastSerial = client.Serial;
+                        if (user.RegisterSerial == null)
+                            user.RegisterSerial = client.Serial;
 
-                    if (user.RegisterIp == null)
-                        user.RegisterIp = user.LastIp;
+                        if (user.RegisterIp == null)
+                            user.RegisterIp = user.LastIp;
 
-                    if (user.RegisteredDateTime == null)
-                        user.RegisteredDateTime = _dateTimeProvider.Now;
-                    context.Users.Update(user);
-                    await context.SaveChangesAsync();
+                        if (user.RegisteredDateTime == null)
+                            user.RegisteredDateTime = _dateTimeProvider.Now;
+                        context.Users.Update(user);
+                        await context.SaveChangesAsync();
+                    }
                 }
             }
         }

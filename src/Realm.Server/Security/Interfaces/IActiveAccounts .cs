@@ -2,7 +2,7 @@
 
 public interface IActiveUsers
 {
-    bool IsActive(int accountId);
-    bool TrySetActive(int accountId);
-    bool TrySetInactive(int accountId);
+    bool IsActive(int userId);
+    bool TrySetActive(int userId);
+    bool TrySetInactive(int userId);
 }

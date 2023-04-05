@@ -13,7 +13,7 @@ internal class DiscordBotOptions
         public ulong ChannelId { get; set; }
     }
 
-    public class ConnectServerAccountOptions : IChannelConfiguration
+    public class ConnectServerUserOptions : IChannelConfiguration
     {
         public ulong ChannelId { get; set; }
         public string InformationMessage { get; set; }
@@ -25,5 +25,5 @@ internal class DiscordBotOptions
     public string GrpcAddress { get; set; }
 
     public StatusChannelConfiguration? StatusChannel { get; set; }
-    public ConnectServerAccountOptions? ConnectServerAccountChannel { get; set; }
+    public ConnectServerUserOptions? ConnectServerUserChannel { get; set; }
 }

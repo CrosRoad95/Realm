@@ -208,22 +208,22 @@ internal class SaveService : ISaveService
 
     private async Task SavePlayer(Entity entity)
     {
-        if (!entity.TryGetComponent(out AccountComponent accountComponent))
+        if (!entity.TryGetComponent(out UserComponent userComponent))
             return;
 
         var user = await _dbContext.Users
             .IncludeAll()
-            .Where(x => x.Id == accountComponent.Id).FirstAsync();
+            .Where(x => x.Id == userComponent.Id).FirstAsync();
 
-        user.Upgrades = accountComponent.Upgrades.Select(x => new UserUpgrade
+        user.Upgrades = userComponent.Upgrades.Select(x => new UserUpgrade
         {
             UpgradeId = x
         }).ToList();
         
-        user.Settings = accountComponent.Settings.Select(x => new UserSetting
+        user.Settings = userComponent.Settings.Select(x => new UserSetting
         {
             SettingId = x,
-            Value = accountComponent.GetSetting(x) ?? ""
+            Value = userComponent.GetSetting(x) ?? ""
         }).ToList();
 
         if(entity.TryGetComponent(out PlayerElementComponent playerElementComponent) && playerElementComponent.Spawned)

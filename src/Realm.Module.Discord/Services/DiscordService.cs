@@ -13,7 +13,7 @@ internal class DiscordService : IDiscordService
     }
 
     public UpdateStatusChannel? UpdateStatusChannel { get; set; }
-    public TryConnectAccountChannel? TryConnectAccountChannel { get; set; }
+    public TryConnectUserChannel? TryConnectUserChannel { get; set; }
     public PrivateMessageReceived? PrivateMessageReceived { get; set; }
     public TextBasedMessageReceived? TextBasedCommandReceived { get; set; }
 

@@ -10,7 +10,7 @@ public static class ServiceCollectionExtensions
     {
         services.AddSingleton<DiscordHandshakeServiceStub>();
         services.AddSingleton<DiscordStatusChannelServiceStub>();
-        services.AddSingleton<DiscordConnectAccountChannelStub>();
+        services.AddSingleton<DiscordConnectUserChannelStub>();
         services.AddSingleton<DiscordPrivateMessagesChannelsStub>();
         services.AddSingleton<DiscordTextBasedCommandsStub>();
 

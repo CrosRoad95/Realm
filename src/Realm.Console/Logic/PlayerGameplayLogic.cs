@@ -31,7 +31,7 @@ internal sealed class PlayerGameplayLogic
 
     private void HandleComponentAdded(Component component)
     {
-        if(component is AccountComponent)
+        if(component is UserComponent)
         {
             var playerElementComponent = component.Entity.GetRequiredComponent<PlayerElementComponent>();
             playerElementComponent.FocusedEntityChanged += HandleFocusedEntityChanged;

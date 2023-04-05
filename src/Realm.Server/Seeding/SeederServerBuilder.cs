@@ -15,7 +15,7 @@ internal sealed class SeederServerBuilder
     private readonly Dictionary<string, IAsyncSeederProvider> _asyncSeederProviders = new();
     private readonly ILogger<SeederServerBuilder> _logger;
     private readonly IECS _ecs;
-    private readonly Dictionary<string, User> _createdAccounts = new();
+    private readonly Dictionary<string, User> _createdUsers = new();
     public SeederServerBuilder(ILogger<SeederServerBuilder> logger, IECS ecs,
         IServerFilesProvider serverFilesProvider, UserManager<User> userManager, RoleManager<Role> roleManager,
         IGroupService groupService, IEntityFactory entityFactory, IFractionService fractionService, IEnumerable<ISeederProvider> seederProviders,
@@ -114,7 +114,7 @@ internal sealed class SeederServerBuilder
             {
                 try
                 {
-                    await _groupService.AddMember(group.name, _createdAccounts[item.Key].Id, item.Value.Rank, item.Value.RankName);
+                    await _groupService.AddMember(group.name, _createdUsers[item.Key].Id, item.Value.Rank, item.Value.RankName);
                 }
                 catch(Exception) // Maybe member is already in group
                 {
@@ -142,9 +142,9 @@ internal sealed class SeederServerBuilder
         }
     }
 
-    private async Task BuildIdentityAccounts(Dictionary<string, AccountSeedData> accounts)
+    private async Task BuildIdentityUsers(Dictionary<string, UserSeedData> users)
     {
-        foreach (var pair in accounts)
+        foreach (var pair in users)
         {
             var user = await _userManager.Users
                 .Include(x => x.DiscordIntegration)
@@ -167,7 +167,7 @@ internal sealed class SeederServerBuilder
                 _logger.LogInformation("Seeder: User {userName} already exists", pair.Key);
 
             if (user == null)
-                throw new Exception($"Failed to create user account '{pair.Key}'");
+                throw new Exception($"Failed to create user '{pair.Key}'");
 
             var claims = pair.Value.Claims.Select(x => new Claim(x.Key, x.Value))
                 .Concat(new List<Claim>
@@ -194,7 +194,7 @@ internal sealed class SeederServerBuilder
                 }
                 await _userManager.UpdateAsync(user);
             }
-            _createdAccounts.Add(pair.Key, user);
+            _createdUsers.Add(pair.Key, user);
         }
     }
 
@@ -207,7 +207,7 @@ internal sealed class SeederServerBuilder
 
             foreach (var member in fraction.Value.Members)
             {
-                var userId = _createdAccounts[member.Key].Id;
+                var userId = _createdUsers[member.Key].Id;
                 if (!_fractionService.HasMember(id, userId))
                 {
                     if(await _fractionService.TryAddMember(id, userId, member.Value.Rank, member.Value.RankName))
@@ -280,12 +280,12 @@ internal sealed class SeederServerBuilder
     private async Task BuildFrom(SeedData seedData)
     {
         await BuildIdentityRoles(seedData.Roles);
-        await BuildIdentityAccounts(seedData.Accounts);
+        await BuildIdentityUsers(seedData.Users);
         await BuildFractions(seedData.Fractions);
         BuildBlips(seedData.Blips);
         BuildPickups(seedData.Pickups);
         BuildMarkers(seedData.Markers);
         await BuildGroups(seedData.Groups);
-        _createdAccounts.Clear();
+        _createdUsers.Clear();
     }
 }

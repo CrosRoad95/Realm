@@ -10,7 +10,7 @@ service StatusChannel {
   rpc Update (ContentRequest) returns (ContentResponse);
 }
 
-service ConnectAccountChannel {
+service ConnectUserChannel {
   rpc TryConnect (SendConnectionCodeRequest) returns (SendConnectionCodeResponse);
 }
 

@@ -70,7 +70,7 @@ internal sealed class PlayerBindsLogic
 
     private void HandleComponentAdded(Component component)
     {
-        if (component is AccountComponent accountComponent)
+        if (component is UserComponent userComponent)
         {
             var entity = component.Entity;
             var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();
@@ -90,7 +90,7 @@ internal sealed class PlayerBindsLogic
                 if (entity.TryGetComponent(out MoneyComponent moneyComponent))
                     state.Money = (double)moneyComponent.Money;
 
-                var vehiclesWithModelAndPositionDTos = await _vehiclesService.GetLightVehiclesByUserId(accountComponent.Id);
+                var vehiclesWithModelAndPositionDTos = await _vehiclesService.GetLightVehiclesByUserId(userComponent.Id);
                 state.VehicleLightInfos = vehiclesWithModelAndPositionDTos.Select(x => new Domain.Data.VehicleLightInfo
                 {
                     Id = x.Id,

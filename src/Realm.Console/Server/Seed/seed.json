@@ -78,7 +78,7 @@
 		"admin": {},
 		"testRole": {}
 	},
-	"Accounts": {
+	"Users": {
 		"admin": {
 			"Password": "asdASD123!@#",
 			"Claims": {

@@ -29,10 +29,10 @@ internal class ChatLogic
                 if (_ecs.TryGetEntityByPlayer(player, out var playerEntity))
                     if (playerEntity.TryGetComponent(out PlayerElementComponent playerElementComponent))
                     {
-                        if (playerEntity.HasComponent<AccountComponent>())
+                        if (playerEntity.HasComponent<UserComponent>())
                         {
                             string message = $"{player.NametagColor.ToColorCode()}{player.Name}: #ffffff{string.Join(' ', arguments.Arguments)}";
-                            foreach (var targetPlayerEntity in _ecs.PlayerEntities.Where(x => x.HasComponent<AccountComponent>()))
+                            foreach (var targetPlayerEntity in _ecs.PlayerEntities.Where(x => x.HasComponent<UserComponent>()))
                                 targetPlayerEntity.GetRequiredComponent<PlayerElementComponent>().SendChatMessage(message, Color.White, true);
 
                             _logger.LogInformation("{message}", message);

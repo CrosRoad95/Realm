@@ -53,7 +53,7 @@ internal class SeedData
         public DiscordIntegrationSeedData? Discord { get; set; }
     }
 
-    public class AccountSeedData
+    public class UserSeedData
     {
         public string Password { get; set; }
         public Dictionary<string, string> Claims { get; set; }
@@ -85,7 +85,7 @@ internal class SeedData
     public Dictionary<string, MarkerSeedData> Markers = new();
     public Dictionary<string, FractionSeedData> Fractions = new();
     public Dictionary<string, object> Roles = new();
-    public Dictionary<string, AccountSeedData> Accounts = new();
+    public Dictionary<string, UserSeedData> Users = new();
     public Dictionary<string, VehicleUpgradeDescriptionSeedData> Upgrades = new();
     public Dictionary<string, GroupSeedData> Groups = new();
 }

@@ -1,11 +1,11 @@
 ﻿namespace Realm.Module.Discord.Stubs;
 
-internal sealed class DiscordConnectAccountChannelStub : ConnectAccountChannel.ConnectAccountChannelBase
+internal sealed class DiscordConnectUserChannelStub : ConnectUserChannel.ConnectUserChannelBase
 {
     private readonly IDiscordService _discordService;
-    private readonly ILogger<DiscordConnectAccountChannelStub> _logger;
+    private readonly ILogger<DiscordConnectUserChannelStub> _logger;
 
-    public DiscordConnectAccountChannelStub(IDiscordService discordService, ILogger<DiscordConnectAccountChannelStub> logger)
+    public DiscordConnectUserChannelStub(IDiscordService discordService, ILogger<DiscordConnectUserChannelStub> logger)
     {
         _discordService = discordService;
         _logger = logger;
@@ -13,7 +13,7 @@ internal sealed class DiscordConnectAccountChannelStub : ConnectAccountChannel.C
 
     public override async Task<SendConnectionCodeResponse> TryConnect(SendConnectionCodeRequest request, ServerCallContext context)
     {
-        if (_discordService.TryConnectAccountChannel == null)
+        if (_discordService.TryConnectUserChannel == null)
             return new SendConnectionCodeResponse
             {
                 Success = false,
@@ -21,7 +21,7 @@ internal sealed class DiscordConnectAccountChannelStub : ConnectAccountChannel.C
 
         try
         {
-            var response = await _discordService.TryConnectAccountChannel(request.Code, request.UserId, context.CancellationToken);
+            var response = await _discordService.TryConnectUserChannel(request.Code, request.UserId, context.CancellationToken);
             return new SendConnectionCodeResponse
             {
                 Success = response.success,
@@ -30,11 +30,11 @@ internal sealed class DiscordConnectAccountChannelStub : ConnectAccountChannel.C
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error connecting account.");
+            _logger.LogError(ex, "Error connecting user.");
             return new SendConnectionCodeResponse
             {
                 Success = false,
-                Message = "Error connecting account.",
+                Message = "Error connecting user.",
             };
         }
     }

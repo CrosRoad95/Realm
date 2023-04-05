@@ -13,6 +13,6 @@ internal class RewardService : IRewardService
 
     public async Task<bool> TryGiveReward(Entity entity, int rewardId)
     {
-        return await _userRewardRepository.TryAddReward(entity.GetRequiredComponent<AccountComponent>().Id, rewardId);
+        return await _userRewardRepository.TryAddReward(entity.GetRequiredComponent<UserComponent>().Id, rewardId);
     }
 }

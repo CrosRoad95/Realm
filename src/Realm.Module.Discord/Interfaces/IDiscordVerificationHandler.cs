@@ -2,5 +2,5 @@
 
 public interface IDiscordVerificationHandler
 {
-    Task<bool> HandleVerifyCode(string code, ulong discordAccountId);
+    Task<bool> HandleVerifyCode(string code, ulong discordUserId);
 }

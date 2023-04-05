@@ -50,7 +50,7 @@ internal sealed class PlayerJoinedLogic
     {
         try
         {
-            if (component is AccountComponent)
+            if (component is UserComponent)
             {
                 var entity = component.Entity;
                 var playerElementComponent = component.Entity.GetRequiredComponent<PlayerElementComponent>();

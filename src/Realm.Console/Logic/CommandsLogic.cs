@@ -527,10 +527,10 @@ internal sealed class CommandsLogic
         
         _commandService.AddCommandHandler("adduserupgrade", (entity, args) =>
         {
-            var accountComponent = entity.GetRequiredComponent<AccountComponent>();
+            var userComponent = entity.GetRequiredComponent<UserComponent>();
             var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();
             var i = Random.Shared.Next(0, 10);
-            if (accountComponent.TryAddUpgrade(i))
+            if (userComponent.TryAddUpgrade(i))
                 playerElementComponent.SendChatMessage($"Pomyślnie dodano ulepszenie id {i}");
             else
                 playerElementComponent.SendChatMessage($"Pomyślnie dodano ulepszenie id {i}");
@@ -538,15 +538,15 @@ internal sealed class CommandsLogic
         
         _commandService.AddAsyncCommandHandler("ban", async (entity, args) =>
         {
-            var accountComponent = entity.GetRequiredComponent<AccountComponent>();
+            var userComponent = entity.GetRequiredComponent<UserComponent>();
             var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();
-            await _banService.BanUserId(accountComponent.Id);
+            await _banService.BanUserId(userComponent.Id);
             playerElementComponent.Kick("test 123");
         });
         
         _commandService.AddCommandHandler("destroyattachedentity", (entity, args) =>
         {
-            var accountComponent = entity.GetRequiredComponent<AccountComponent>();
+            var userComponent = entity.GetRequiredComponent<UserComponent>();
             var attachedEntity = entity.GetRequiredComponent<AttachedEntityComponent>();
             var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();
             attachedEntity.AttachedEntity.Dispose();
@@ -562,12 +562,12 @@ internal sealed class CommandsLogic
         
         _commandService.AddCommandHandler("testrole", (entity, args) =>
         {
-            var accountComponent = entity.GetRequiredComponent<AccountComponent>();
-            var isAdmin = accountComponent.IsInRole("admin");
-            var roles = accountComponent.GetRoles();
+            var userComponent = entity.GetRequiredComponent<UserComponent>();
+            var isAdmin = userComponent.IsInRole("admin");
+            var roles = userComponent.GetRoles();
             foreach (var item in roles)
             {
-                if(!accountComponent.IsInRole(item))
+                if(!userComponent.IsInRole(item))
                 {
                     throw new Exception();
                 }
@@ -704,19 +704,19 @@ internal sealed class CommandsLogic
         
         _commandService.AddAsyncCommandHandler("setsetting", async (entity, args) =>
         {
-            entity.GetRequiredComponent<AccountComponent>().SetSetting(1, args[0]);
+            entity.GetRequiredComponent<UserComponent>().SetSetting(1, args[0]);
         });
 
         _commandService.AddAsyncCommandHandler("removesetting", async (entity, args) =>
         {
-            entity.GetRequiredComponent<AccountComponent>().RemoveSetting(1);
+            entity.GetRequiredComponent<UserComponent>().RemoveSetting(1);
         });
 
         _commandService.AddAsyncCommandHandler("getsetting", async (entity, args) =>
         {
             var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();
 
-            var settingValue = entity.GetRequiredComponent<AccountComponent>().GetSetting(1);
+            var settingValue = entity.GetRequiredComponent<UserComponent>().GetSetting(1);
 
             playerElementComponent.SendChatMessage($"Setting1: {settingValue}");
         });
@@ -725,9 +725,9 @@ internal sealed class CommandsLogic
         _commandService.AddAsyncCommandHandler("whitelistmyserial", async (entity, args) =>
         {
             var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();
-            var accountComponent = entity.GetRequiredComponent<AccountComponent>();
+            var userComponent = entity.GetRequiredComponent<UserComponent>();
 
-            if (await rpgUserManager.TryAddWhitelistedSerial(accountComponent.Id, playerElementComponent.Client.Serial))
+            if (await rpgUserManager.TryAddWhitelistedSerial(userComponent.Id, playerElementComponent.Client.Serial))
             {
                 playerElementComponent.SendChatMessage($"Dodano serial");
             }
@@ -740,9 +740,9 @@ internal sealed class CommandsLogic
         _commandService.AddAsyncCommandHandler("removewhitelistmyserial", async (entity, args) =>
         {
             var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();
-            var accountComponent = entity.GetRequiredComponent<AccountComponent>();
+            var userComponent = entity.GetRequiredComponent<UserComponent>();
 
-            if (await rpgUserManager.TryRemoveWhitelistedSerial(accountComponent.Id, playerElementComponent.Client.Serial))
+            if (await rpgUserManager.TryRemoveWhitelistedSerial(userComponent.Id, playerElementComponent.Client.Serial))
             {
                 playerElementComponent.SendChatMessage($"Usunięto serial");
             }

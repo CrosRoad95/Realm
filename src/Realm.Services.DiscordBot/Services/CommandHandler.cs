@@ -22,7 +22,7 @@ internal class CommandHandler
     {
         // add the public modules that inherit InteractionModuleBase<T> to the InteractionService
         //await _interactionService.AddModulesAsync(Assembly.GetExecutingAssembly(), _services);
-        await _interactionService.AddModuleAsync<ConnectAccountToServerCommand>(_services);
+        await _interactionService.AddModuleAsync<ConnectUserToServerCommand>(_services);
         await _interactionService.RegisterCommandsToGuildAsync(_discordBotOptions.Value.Guild);
 
         // process the InteractionCreated payloads to execute Interactions commands

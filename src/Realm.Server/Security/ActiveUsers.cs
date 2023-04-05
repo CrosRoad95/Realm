@@ -3,14 +3,14 @@
 internal class ActiveUsers : IActiveUsers
 {
     private readonly ReaderWriterLockSlim _lock = new();
-    private readonly List<int> _usedAccountsIds = new();
+    private readonly List<int> _activeUsersIds = new();
 
-    public bool IsActive(int accountId)
+    public bool IsActive(int userId)
     {
         _lock.EnterReadLock();
         try
         {
-            return _usedAccountsIds.Contains(accountId);
+            return _activeUsersIds.Contains(userId);
         }
         finally
         {
@@ -18,16 +18,16 @@ internal class ActiveUsers : IActiveUsers
         }
     }
 
-    public bool TrySetActive(int accountId)
+    public bool TrySetActive(int userId)
     {
 
         _lock.EnterReadLock();
         try
         {
-            if( _usedAccountsIds.Contains(accountId))
+            if( _activeUsersIds.Contains(userId))
                 return false;
 
-            _usedAccountsIds.Add(accountId);
+            _activeUsersIds.Add(userId);
             return true;
 
         }
@@ -37,16 +37,16 @@ internal class ActiveUsers : IActiveUsers
         }
     }
 
-    public bool TrySetInactive(int accountId)
+    public bool TrySetInactive(int userId)
     {
 
         _lock.EnterReadLock();
         try
         {
-            if( !_usedAccountsIds.Contains(accountId))
+            if( !_activeUsersIds.Contains(userId))
                 return false;
 
-            _usedAccountsIds.Remove(accountId);
+            _activeUsersIds.Remove(userId);
             return true;
 
         }

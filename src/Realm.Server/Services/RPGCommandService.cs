@@ -87,7 +87,7 @@ public class RPGCommandService
             if (!_ecs.TryGetEntityByPlayer(player, out var entity))
                 return;
 
-            if (!entity.TryGetComponent<AccountComponent>(out var accountComponent) || !entity.TryGetComponent<PlayerElementComponent>(out var playerElementComponent))
+            if (!entity.TryGetComponent<UserComponent>(out var userComponent) || !entity.TryGetComponent<PlayerElementComponent>(out var playerElementComponent))
                 return;
 
             var activity = new Activity("CommandHandler");
@@ -96,14 +96,14 @@ public class RPGCommandService
             var start = Stopwatch.GetTimestamp();
 
             using var _1 = LogContext.PushProperty("serial", playerElementComponent.Client.Serial);
-            using var _2 = LogContext.PushProperty("accountId", accountComponent.Id);
+            using var _2 = LogContext.PushProperty("userId", userComponent.Id);
             using var _3 = LogContext.PushProperty("commandText", commandText);
             using var _4 = LogContext.PushProperty("commandArguments", args.Arguments);
             _logger.LogInformation("Begin command {commandText} execution with traceId={TraceId}", commandText);
             if (commandInfo.RequiredPolicies != null)
             {
                 foreach (var policy in commandInfo.RequiredPolicies)
-                    if (!await _rpgUserManager.AuthorizePolicy(accountComponent, policy))
+                    if (!await _rpgUserManager.AuthorizePolicy(userComponent, policy))
                     {
                         _logger.LogInformation("{player} failed to execute command {commandText} because failed to authorize for policy {policy}", player, commandText, policy);
                         return;
@@ -147,7 +147,7 @@ public class RPGCommandService
             if (!_ecs.TryGetEntityByPlayer(player, out var entity))
                 return;
 
-            if (!entity.TryGetComponent<AccountComponent>(out var accountComponent) || !entity.TryGetComponent<PlayerElementComponent>(out var playerElementComponent))
+            if (!entity.TryGetComponent<UserComponent>(out var userComponent) || !entity.TryGetComponent<PlayerElementComponent>(out var playerElementComponent))
                 return;
 
             var activity = new Activity("CommandHandler");
@@ -156,14 +156,14 @@ public class RPGCommandService
             var start = Stopwatch.GetTimestamp();
 
             using var _1 = LogContext.PushProperty("serial", playerElementComponent.Client.Serial);
-            using var _2 = LogContext.PushProperty("accountId", accountComponent.Id);
+            using var _2 = LogContext.PushProperty("userId", userComponent.Id);
             using var _3 = LogContext.PushProperty("commandText", commandText);
             using var _4 = LogContext.PushProperty("commandArguments", args.Arguments);
             _logger.LogInformation("Begin command {commandText} execution with traceId={TraceId}", commandText);
             if (commandInfo.RequiredPolicies != null)
             {
                 foreach (var policy in commandInfo.RequiredPolicies)
-                    if (!await _rpgUserManager.AuthorizePolicy(accountComponent, policy))
+                    if (!await _rpgUserManager.AuthorizePolicy(userComponent, policy))
                     {
                         _logger.LogInformation("{player} failed to execute command {commandText} because failed to authorize for policy {policy}", player, commandText, policy);
                         return;

@@ -10,29 +10,29 @@ internal class DiscordModule : IModule
     private readonly ILogger<DiscordModule> _logger;
     private readonly Server? _grpcServer;
     private readonly IDiscordStatusChannelUpdateHandler? _discordStatusChannelUpdateHandler;
-    private readonly IDiscordConnectAccountHandler? _discordConnectAccountHandler;
+    private readonly IDiscordConnectUserHandler? _discordConnectUserHandler;
     private readonly IDiscordPrivateMessageReceived? _discordPrivateMessageReceived;
     private readonly IDiscordTextBasedCommandHandler? _discordTextBasedCommandHandler;
 
     public DiscordModule(ILogger<DiscordModule> logger, IDiscordService grpcDiscord,
         DiscordHandshakeServiceStub discordHandshakeServiceStub, DiscordStatusChannelServiceStub discordStatusChannelServiceStub,
-        DiscordConnectAccountChannelStub discordConnectAccountChannelStub,
+        DiscordConnectUserChannelStub discordConnectUserChannelStub,
         DiscordPrivateMessagesChannelsStub discordPrivateMessagesChannelsStub,
         DiscordTextBasedCommandsStub discordTextBasedCommandsStub,
         IOptions<GrpcOptions> options,
         IDiscordStatusChannelUpdateHandler? discordStatusChannelUpdateHandler = null,
-        IDiscordConnectAccountHandler? discordConnectAccountHandler = null,
+        IDiscordConnectUserHandler? discordConnectUserHandler = null,
         IDiscordPrivateMessageReceived? discordPrivateMessageReceived = null,
         IDiscordTextBasedCommandHandler? discordTextBasedCommandHandler = null
         )
     {
         grpcDiscord.UpdateStatusChannel = HandleUpdateStatusChannel;
-        grpcDiscord.TryConnectAccountChannel = HandleTryConnectAccountChannel;
+        grpcDiscord.TryConnectUserChannel = HandleTryConnectUserChannel;
         grpcDiscord.PrivateMessageReceived = HandlePrivateMessageReceived;
         grpcDiscord.TextBasedCommandReceived = HandleTextBasedMessageReceived;
         _logger = logger;
         _discordStatusChannelUpdateHandler = discordStatusChannelUpdateHandler;
-        _discordConnectAccountHandler = discordConnectAccountHandler;
+        _discordConnectUserHandler = discordConnectUserHandler;
         _discordPrivateMessageReceived = discordPrivateMessageReceived;
         _discordTextBasedCommandHandler = discordTextBasedCommandHandler;
         _grpcServer = new Server
@@ -41,7 +41,7 @@ internal class DiscordModule : IModule
             {
                 Handshake.BindService(discordHandshakeServiceStub),
                 StatusChannel.BindService(discordStatusChannelServiceStub),
-                ConnectAccountChannel.BindService(discordConnectAccountChannelStub),
+                ConnectUserChannel.BindService(discordConnectUserChannelStub),
                 PrivateMessagesChannels.BindService(discordPrivateMessagesChannelsStub),
                 Commands.BindService(discordTextBasedCommandsStub),
             },
@@ -63,16 +63,16 @@ internal class DiscordModule : IModule
         return await _discordStatusChannelUpdateHandler.HandleStatusUpdate(cancellationToken);
     }
 
-    public async Task<TryConnectResponse> HandleTryConnectAccountChannel(string code, ulong userId, CancellationToken cancellationToken)
+    public async Task<TryConnectResponse> HandleTryConnectUserChannel(string code, ulong userId, CancellationToken cancellationToken)
     {
-        if (_discordConnectAccountHandler == null)
+        if (_discordConnectUserHandler == null)
             return new TryConnectResponse
             {
                 success = false,
                 message = "Discord connection handles is not configured properly."
             };
 
-        return await _discordConnectAccountHandler.HandleConnectAccount(code, userId, cancellationToken);
+        return await _discordConnectUserHandler.HandleConnectUser(code, userId, cancellationToken);
     }
 
     public async Task HandlePrivateMessageReceived(ulong userId, ulong messageId, string content, CancellationToken cancellationToken)

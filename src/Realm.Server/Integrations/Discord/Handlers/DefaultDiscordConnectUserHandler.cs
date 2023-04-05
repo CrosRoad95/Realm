@@ -2,18 +2,18 @@
 
 namespace Realm.Server.Integrations.Discord.Handlers;
 
-public class DefaultDiscordConnectAccountHandler : IDiscordConnectAccountHandler
+public class DefaultDiscordConnectUserHandler : IDiscordConnectUserHandler
 {
     private readonly IECS _ecs;
-    private readonly ILogger<DefaultDiscordConnectAccountHandler> _logger;
+    private readonly ILogger<DefaultDiscordConnectUserHandler> _logger;
 
-    public DefaultDiscordConnectAccountHandler(IECS ecs, ILogger<DefaultDiscordConnectAccountHandler> logger)
+    public DefaultDiscordConnectUserHandler(IECS ecs, ILogger<DefaultDiscordConnectUserHandler> logger)
     {
         _ecs = ecs;
         _logger = logger;
     }
 
-    public Task<TryConnectResponse> HandleConnectAccount(string code, ulong userId, CancellationToken cancellationToken)
+    public Task<TryConnectResponse> HandleConnectUser(string code, ulong userId, CancellationToken cancellationToken)
     {
         try
         {
@@ -26,7 +26,7 @@ public class DefaultDiscordConnectAccountHandler : IDiscordConnectAccountHandler
                         item.AddComponent(new DiscordIntegrationComponent(userId));
                         return Task.FromResult(new TryConnectResponse
                         {
-                            message = "Account connected successfully!",
+                            message = "User connected successfully!",
                             success = true,
                         });
                     }
@@ -35,16 +35,16 @@ public class DefaultDiscordConnectAccountHandler : IDiscordConnectAccountHandler
 
             return Task.FromResult(new TryConnectResponse
             {
-                message = "Unexpected error while trying to connect account",
+                message = "Unexpected error while trying to connect user",
                 success = false,
             });
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Unexpected error while trying to connect account");
+            _logger.LogError(ex, "Unexpected error while trying to connect user");
             return Task.FromResult(new TryConnectResponse
             {
-                message = "Unexpected error while trying to connect account",
+                message = "Unexpected error while trying to connect user",
                 success = false,
             });
             throw;

@@ -333,10 +333,10 @@ public sealed class PlayerElementComponent : PedElementComponent
     public bool TrySpawnAtLastPosition()
     {
         ThrowIfDisposed();
-        var accountComponent = Entity.GetComponent<AccountComponent>();
-        if (accountComponent != null)
+        var userComponent = Entity.GetComponent<UserComponent>();
+        if (userComponent != null)
         {
-            var lastTransformAndMotion = accountComponent.User.LastTransformAndMotion;
+            var lastTransformAndMotion = userComponent.User.LastTransformAndMotion;
             if (lastTransformAndMotion != null)
             {
                 Spawn(lastTransformAndMotion.Position, lastTransformAndMotion.Rotation);
