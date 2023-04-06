@@ -47,7 +47,11 @@ end
 
 local function internalGetWindowHandleByName(name, defaultState)
 	if(guis[name] == nil)then
-		error("Gui of name '"..tostring(name).."' doesn't' exists!")
+		local availiableGuis = {}
+		for name in pairs(guis)do
+			availiableGuis[#availiableGuis + 1] = "'"..name.."'"
+		end
+		error("Gui of name '"..tostring(name).."' doesn't' exists. Availiable guis: "..table.concat(availiableGuis, ", "))
 	end
 	local stateMd5 = nil;
 	if(defaultState ~= nil)then

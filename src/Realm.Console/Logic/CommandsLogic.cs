@@ -765,6 +765,11 @@ internal sealed class CommandsLogic
             }
         });
         
+        _commandService.AddCommandHandler("addinvalidguicomponent", (entity, args) =>
+        {
+            entity.AddComponent<InvalidGuiComponent>();
+        });
+        
         _commandService.AddAsyncCommandHandler("despawn", async (entity, args) =>
         {
             var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();
