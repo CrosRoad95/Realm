@@ -12,6 +12,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <EmbeddedResource Include="Lua\cegui.lua" />
     <EmbeddedResource Include="Lua\controller.lua" />
     <EmbeddedResource Include="Lua\utilities.lua" />
   </ItemGroup>

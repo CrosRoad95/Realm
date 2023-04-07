@@ -27,7 +27,6 @@ global using Realm.Server.Interfaces;
 global using Realm.Server.Services;
 global using Realm.Resources.ClientInterface;
 global using Realm.Resources.AgnosticGuiSystem;
-global using Realm.Resources.Addons.AgnosticGuiSystem.CeGuiProvider;
 global using Realm.Resources.Base;
 global using Realm.Server.Factories;
 global using Realm.Configuration;

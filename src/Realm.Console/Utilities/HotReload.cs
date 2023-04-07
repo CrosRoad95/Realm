@@ -1,4 +1,4 @@
-﻿namespace Realm.ConsoleUtilities;
+﻿namespace Realm.Console.Utilities;
 
 internal sealed class HotReload
 {

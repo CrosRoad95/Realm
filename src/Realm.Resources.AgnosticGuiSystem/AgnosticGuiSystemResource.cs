@@ -12,6 +12,7 @@ internal class AgnosticGuiSystemResource : Resource
     {
         ["controller.lua"] = ResourceFiles.Controller,
         ["utilities.lua"] = ResourceFiles.Utilities,
+        ["ceguiProvider.lua"] = ResourceFiles.CeGuiProvider,
     };
 
     internal AgnosticGuiSystemResource(MtaServer server, AgnosticGuiSystemOptions agnosticGuiSystemOptions)
@@ -22,7 +23,8 @@ internal class AgnosticGuiSystemResource : Resource
             Files.Add(ResourceFileFactory.FromBytes(content, path));
         
         foreach (var (path, content) in agnosticGuiSystemOptions._providers)
-            Files.Add(ResourceFileFactory.FromBytes(content, path));
+            if(content != null)
+                Files.Add(ResourceFileFactory.FromBytes(content, path));
         
         foreach (var (path, content) in agnosticGuiSystemOptions._guis)
             NoClientScripts[$"{Name}/{path}"] = content;

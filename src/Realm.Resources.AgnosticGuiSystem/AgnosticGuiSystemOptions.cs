@@ -4,10 +4,15 @@ namespace Realm.Resources.AgnosticGuiSystem;
 
 public class AgnosticGuiSystemOptions
 {
-    internal readonly Dictionary<string, byte[]> _providers = new();
+    internal readonly Dictionary<string, byte[]?> _providers = new();
     internal readonly Dictionary<string, byte[]> _guis = new();
     internal byte[]? _selectedGuiProvider = null;
 
+    public AgnosticGuiSystemOptions()
+    {
+        _providers.Add("cegui", null);
+
+    }
     public AgnosticGuiSystemOptions AddGuiProvider(string name, byte[] luaCode)
     {
         name = $"{name}.lua";

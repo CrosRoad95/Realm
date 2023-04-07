@@ -22,7 +22,6 @@ global using Realm.Server.Services;
 global using Realm.Console.Components.Jobs;
 global using Realm.Domain.Components.Players.Jobs;
 global using Realm.Domain.Concepts.Objectives;
-global using Realm.ConsoleUtilities;
 global using Realm.Interfaces.Server;
 global using Microsoft.Extensions.DependencyInjection;
 global using Microsoft.Extensions.Logging;

@@ -1,6 +1,4 @@
-﻿using Realm.Interfaces.Server;
-
-namespace Realm.ConsoleUtilities;
+﻿namespace Realm.Console.Utilities;
 
 internal class DefaultServerConsole : IConsole
 {
@@ -12,7 +10,7 @@ internal class DefaultServerConsole : IConsole
         {
             while (true)
             {
-                var line = Console.ReadLine();
+                var line = System.Console.ReadLine();
                 if (line == null)
                     break;
                 CommandExecuted?.Invoke(line);

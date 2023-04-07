@@ -29,12 +29,12 @@
     <ProjectReference Include="..\Realm.Persistance.MySql\Realm.Persistance.MySql.csproj" />
     <ProjectReference Include="..\Realm.Persistance.SQLite\Realm.Persistance.SQLite.csproj" />
     <ProjectReference Include="..\Realm.Persistance\Realm.Persistance.csproj" />
-    <ProjectReference Include="..\Realm.Resources.Addons.AgnosticGuiSystem.CeGuiProvider\Realm.Resources.Addons.AgnosticGuiSystem.CeGuiProvider.csproj" />
     <ProjectReference Include="..\Realm.Resources.Addons.AgnosticGuiSystem.DGSProvider\Realm.Resources.Addons.AgnosticGuiSystem.DGSProvider.csproj" />
     <ProjectReference Include="..\Realm.Resources.AdminTools\Realm.Resources.AdminTools.csproj" />
     <ProjectReference Include="..\Realm.Resources.AFK\Realm.Resources.AFK.csproj" />
     <ProjectReference Include="..\Realm.Resources.AgnosticGuiSystem\Realm.Resources.AgnosticGuiSystem.csproj" />
     <ProjectReference Include="..\Realm.Resources.ClientInterface\Realm.Resources.ClientInterface.csproj" />
+    <ProjectReference Include="..\Realm.Resources.ElementOutline\Realm.Resources.ElementOutline.csproj" />
     <ProjectReference Include="..\Realm.Resources.Overlay\Realm.Resources.Overlay.csproj" />
     <ProjectReference Include="..\Realm.Resources.StatisticsCounter\Realm.Resources.StatisticsCounter.csproj" />
     <ProjectReference Include="..\RealmResources.ElementOutline\Realm.Resources.ElementOutline.csproj" />

@@ -81,7 +81,6 @@ public static class ServerBuilderExtensions
         builder.AddDGSResource(DGSVersion.Release_3_520);
         builder.AddAgnosticGuiSystemResource(builder =>
         {
-            builder.AddGuiProvider(CeGuiGuiProvider.Name, CeGuiGuiProvider.LuaCode);
             builder.AddGuiProvider(DGSGuiProvider.Name, DGSGuiProvider.LuaCode);
             builder.SetGuiProvider(DGSGuiProvider.Name);
         }, commonOptions);

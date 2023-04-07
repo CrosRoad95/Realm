@@ -1,9 +1,8 @@
 ﻿using Realm.Configuration;
 using Realm.Logging;
-using Realm.Server;
 using Serilog.Events;
 
-namespace Realm.ConsoleUtilities;
+namespace Realm.Console.Utilities;
 
 public static class RPGServerBuilderExtensions
 {

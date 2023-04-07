@@ -1,8 +1,7 @@
-﻿using Microsoft.Extensions.Logging;
-using Realm.Resources.AgnosticGuiSystem;
+﻿using Realm.Resources.AgnosticGuiSystem;
 using System.Diagnostics;
 
-namespace Realm.ConsoleUtilities;
+namespace Realm.Console.Utilities;
 
 public sealed class HotReloadLogic
 {
@@ -28,7 +27,7 @@ public sealed class HotReloadLogic
             await _agnosticGuiSystemService.UpdateGuiFiles();
             _logger.LogInformation("Updated guis in: {time}ms", stopwatch.ElapsedMilliseconds);
         }
-        catch(Exception ex)
+        catch (Exception ex)
         {
             _logger.LogError(ex, "Failed to update gui files.");
         }
