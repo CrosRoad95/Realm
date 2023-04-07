@@ -21,12 +21,12 @@ public class SignInServiceTests
     public async Task SignInShouldAddAllNeededComponents()
     {
         #region Arrange
-        var user = new User
+        var user = new UserData
         {
             UserName = Guid.NewGuid().ToString()[..8],
         };
         
-        await _realmTestingServer.GetRequiredService<UserManager<User>>().CreateAsync(user, "asdASD123!@#");
+        await _realmTestingServer.GetRequiredService<UserManager<UserData>>().CreateAsync(user, "asdASD123!@#");
 
         var playerEntity = _entityHelper.CreatePlayerEntity();
         #endregion

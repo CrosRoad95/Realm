@@ -1,7 +1,4 @@
-﻿using Realm.Domain.Components;
-using Realm.Domain.Enums;
-
-namespace Realm.Server.Logic;
+﻿namespace Realm.Server.Logic;
 
 internal class VehiclesLogic
 {

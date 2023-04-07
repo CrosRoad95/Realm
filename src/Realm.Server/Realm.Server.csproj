@@ -15,13 +15,15 @@
     <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="7.0.0" />
     <PackageReference Include="Serilog" Version="2.12.0" />
 	<PackageReference Include="Portable.BouncyCastle" Version="1.9.0" />
+	<PackageReference Include="SlipeServer.Resources.BoneAttach" Version="0.1.0-CI-20230407-045347" />
+	<PackageReference Include="SlipeServer.Resources.NoClip" Version="0.1.0-CI-20230407-045347" />
+	<PackageReference Include="SlipeServer.Resources.Text3d" Version="0.1.0-CI-20230407-045347" />
 	<PackageReference Include="SlipeServer.Resources.Watermark" Version="0.1.0-CI-20230407-045347" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Realm.Configuration\Realm.Configuration.csproj" />
     <ProjectReference Include="..\Realm.Module.Discord\Realm.Module.Discord.csproj" />
-    <ProjectReference Include="..\Realm.Domain\Realm.Domain.csproj" />
     <ProjectReference Include="..\Realm.Module.Grpc\Realm.Module.Grpc.csproj" />
     <ProjectReference Include="..\Realm.Module.WebApp\Realm.Module.WebApp.csproj" />
     <ProjectReference Include="..\Realm.Module.Discord\Realm.Module.Discord.csproj" />
@@ -35,6 +37,7 @@
     <ProjectReference Include="..\Realm.Resources.AgnosticGuiSystem\Realm.Resources.AgnosticGuiSystem.csproj" />
     <ProjectReference Include="..\Realm.Resources.ClientInterface\Realm.Resources.ClientInterface.csproj" />
     <ProjectReference Include="..\Realm.Resources.ElementOutline\Realm.Resources.ElementOutline.csproj" />
+    <ProjectReference Include="..\Realm.Resources.Nametags\Realm.Resources.Nametags.csproj" />
     <ProjectReference Include="..\Realm.Resources.Overlay\Realm.Resources.Overlay.csproj" />
     <ProjectReference Include="..\Realm.Resources.StatisticsCounter\Realm.Resources.StatisticsCounter.csproj" />
     <ProjectReference Include="..\RealmResources.ElementOutline\Realm.Resources.ElementOutline.csproj" />

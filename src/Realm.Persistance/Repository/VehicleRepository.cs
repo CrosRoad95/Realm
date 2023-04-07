@@ -1,25 +1,21 @@
-﻿using Realm.Common.Providers;
-
-namespace Realm.Persistance.Repository;
+﻿namespace Realm.Persistance.Repository;
 
 internal class VehicleRepository : IVehicleRepository
 {
     private readonly IDb _db;
-    private readonly IDateTimeProvider _dateTimeProvider;
 
-    public VehicleRepository(IDb db, IDateTimeProvider dateTimeProvider)
+    public VehicleRepository(IDb db)
     {
         _db = db;
-        _dateTimeProvider = dateTimeProvider;
     }
 
-    public async Task<Vehicle> CreateNewVehicle(ushort model)
+    public async Task<VehicleData> CreateNewVehicle(ushort model, DateTime now)
     {
-        var vehicle = new Vehicle
+        var vehicle = new VehicleData
         {
             Model = model,
             Platetext = Guid.NewGuid().ToString()[..8],
-            CreatedAt = _dateTimeProvider.Now,
+            CreatedAt = now,
             Spawned = true,
         };
         _db.Vehicles.Add(vehicle);
@@ -43,7 +39,7 @@ internal class VehicleRepository : IVehicleRepository
         return query.ToListAsync();
     }
 
-    public Task<List<Vehicle>> GetVehiclesByUserId(int userId)
+    public Task<List<VehicleData>> GetVehiclesByUserId(int userId)
     {
         var query = _db.Vehicles
             .TagWithSource(nameof(VehicleRepository))
@@ -53,7 +49,7 @@ internal class VehicleRepository : IVehicleRepository
         return query.ToListAsync();
     }
 
-    public Task<Vehicle?> GetReadOnlyVehicleById(int id)
+    public Task<VehicleData?> GetReadOnlyVehicleById(int id)
     {
         var query = _db.Vehicles
             .TagWithSource(nameof(VehicleRepository))
@@ -63,7 +59,7 @@ internal class VehicleRepository : IVehicleRepository
         return query.FirstOrDefaultAsync();
     }
 
-    public Task<List<Vehicle>> GetAllSpawnedVehicles()
+    public Task<List<VehicleData>> GetAllSpawnedVehicles()
     {
         var query = _db.Vehicles
             .TagWithSource(nameof(VehicleRepository))

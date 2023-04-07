@@ -1,9 +1,10 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Realm.Domain.Exceptions;
 using Realm.Persistance;
 using Realm.Persistance.Interfaces;
 using Realm.Persistance.Repository;
 using Realm.Persistance.SQLite;
+using Realm.Server.Enums;
+using Realm.Server.Exceptions;
 
 namespace Realm.Tests.Tests;
 
@@ -25,7 +26,7 @@ public class GroupServiceTests
         const string groupName = "Test group1";
         var groupService = _serviceProvider.GetRequiredService<IGroupService>();
 
-        await groupService.CreateGroup(groupName, "TG1", Domain.Enums.GroupKind.Regular);
+        await groupService.CreateGroup(groupName, "TG1", GroupKind.Regular);
 
         var group = await groupService.GetGroupByName(groupName);
 
@@ -38,7 +39,7 @@ public class GroupServiceTests
         const string groupName = "Test group2";
         var groupService = _serviceProvider.GetRequiredService<IGroupService>();
 
-        Func<Task> createGroup = async () => await groupService.CreateGroup(groupName, "TG2", Domain.Enums.GroupKind.Regular);
+        Func<Task> createGroup = async () => await groupService.CreateGroup(groupName, "TG2", GroupKind.Regular);
 
         await createGroup.Should().NotThrowAsync();
         (await createGroup.Should().ThrowAsync<GroupNameInUseException>())
@@ -50,7 +51,7 @@ public class GroupServiceTests
     {
         var userId = 1;
         var groupService = _serviceProvider.GetRequiredService<IGroupService>();
-        var newlyCreatedGroup = await groupService.CreateGroup("Test group3", "TG3", Domain.Enums.GroupKind.Regular);
+        var newlyCreatedGroup = await groupService.CreateGroup("Test group3", "TG3", GroupKind.Regular);
 
         await groupService.AddMember(newlyCreatedGroup.id, userId, 100, "Leader");
 
@@ -64,7 +65,7 @@ public class GroupServiceTests
     {
         var userId = 1;
         var groupService = _serviceProvider.GetRequiredService<IGroupService>();
-        var newlyCreatedGroup = await groupService.CreateGroup("Test group4", "TG4", Domain.Enums.GroupKind.Regular);
+        var newlyCreatedGroup = await groupService.CreateGroup("Test group4", "TG4", GroupKind.Regular);
 
         await groupService.AddMember(newlyCreatedGroup.id, userId, 100, "Leader");
         await groupService.RemoveMember(newlyCreatedGroup.id, userId);

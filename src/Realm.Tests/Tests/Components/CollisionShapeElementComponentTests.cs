@@ -1,10 +1,9 @@
 ﻿using SlipeServer.Server.Elements.ColShapes;
-using Realm.Domain.Interfaces;
 using Realm.Resources.ClientInterface;
-using Realm.Domain.Components.Elements.CollisionShapes;
-using Realm.Domain.Enums;
 using Realm.Server.Entities;
 using SlipeServer.Server.ElementCollections;
+using Realm.Server.Enums;
+using Realm.Server.Components.Elements.CollisionShapes;
 
 namespace Realm.Tests.Tests.Components;
 

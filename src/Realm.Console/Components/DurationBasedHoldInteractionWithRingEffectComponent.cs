@@ -1,5 +1,5 @@
-﻿using Realm.Domain.Enums;
-using Realm.Resources.Overlay;
+﻿using Realm.Resources.Overlay;
+using Realm.Server.Enums;
 using Realm.Server.Extensions;
 
 namespace Realm.Console.Components;

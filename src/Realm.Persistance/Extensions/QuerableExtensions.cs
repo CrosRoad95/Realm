@@ -1,25 +1,23 @@
-﻿using Realm.Common.Providers;
-
-namespace Realm.Persistance.Extensions;
+﻿namespace Realm.Persistance.Extensions;
 
 public static class QuerableExtensions
 {
-    public static IQueryable<UserLicense> NotSuspended(this IQueryable<UserLicense> query, IDateTimeProvider dateTimeProvider)
+    public static IQueryable<UserLicenseData> NotSuspended(this IQueryable<UserLicenseData> query, DateTime now)
     {
-        return query.Where(x => x.SuspendedUntil == null || x.SuspendedUntil < dateTimeProvider.Now);
+        return query.Where(x => x.SuspendedUntil == null || x.SuspendedUntil < now);
     }
 
-    public static IQueryable<UserLicense> IsSuspended(this IQueryable<UserLicense> query, IDateTimeProvider dateTimeProvider)
+    public static IQueryable<UserLicenseData> IsSuspended(this IQueryable<UserLicenseData> query, DateTime now)
     {
-        return query.Where(x => x.SuspendedUntil != null && x.SuspendedUntil > dateTimeProvider.Now);
+        return query.Where(x => x.SuspendedUntil != null && x.SuspendedUntil > now);
     }
 
-    public static IQueryable<Vehicle> IsNotRemoved(this IQueryable<Vehicle> query)
+    public static IQueryable<VehicleData> IsNotRemoved(this IQueryable<VehicleData> query)
     {
         return query.Where(x => !x.Removed);
     }
 
-    public static IQueryable<User> IncludeAll(this IQueryable<User> query)
+    public static IQueryable<UserData> IncludeAll(this IQueryable<UserData> query)
     {
         return query
             .AsSplitQuery()
@@ -39,7 +37,7 @@ public static class QuerableExtensions
             .ThenInclude(x => x!.InventoryItems);
     }
 
-    public static IQueryable<Vehicle> IncludeAll(this IQueryable<Vehicle> query)
+    public static IQueryable<VehicleData> IncludeAll(this IQueryable<VehicleData> query)
     {
         return query.Include(x => x.Fuels)
             .Include(x => x.Upgrades)
@@ -51,7 +49,7 @@ public static class QuerableExtensions
             .ThenInclude(x => x.User);
     }
 
-    public static IQueryable<Vehicle> IsSpawned(this IQueryable<Vehicle> query)
+    public static IQueryable<VehicleData> IsSpawned(this IQueryable<VehicleData> query)
     {
         return query.Where(x => x.Spawned);
     }

@@ -1,5 +1,5 @@
-﻿using Realm.Domain.Attributes;
-using Realm.Domain.Components;
+﻿using Realm.Server.Attributes;
+using Realm.Server.Components;
 
 namespace Realm.Tests.Classes.Components;
 

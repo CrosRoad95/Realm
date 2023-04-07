@@ -1,7 +1,7 @@
-﻿using Realm.Domain.Components;
-using Realm.Domain.Components.Elements.CollisionShapes;
-using Realm.Domain.Enums;
-using Realm.Domain.Rules;
+﻿using Realm.Server.Components;
+using Realm.Server.Components.Elements.CollisionShapes;
+using Realm.Server.Enums;
+using Realm.Server.Rules;
 using SlipeServer.Server.Enums;
 
 namespace Realm.Console.Logic;

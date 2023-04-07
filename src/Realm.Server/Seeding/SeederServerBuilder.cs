@@ -6,8 +6,8 @@ internal sealed class SeederServerBuilder
 {
     private const string _basePath = "Seed";
     private readonly IServerFilesProvider _serverFilesProvider;
-    private readonly UserManager<User> _userManager;
-    private readonly RoleManager<Role> _roleManager;
+    private readonly UserManager<UserData> _userManager;
+    private readonly RoleManager<RoleData> _roleManager;
     private readonly IGroupService _groupService;
     private readonly IEntityFactory _entityFactory;
     private readonly IFractionService _fractionService;
@@ -15,9 +15,9 @@ internal sealed class SeederServerBuilder
     private readonly Dictionary<string, IAsyncSeederProvider> _asyncSeederProviders = new();
     private readonly ILogger<SeederServerBuilder> _logger;
     private readonly IECS _ecs;
-    private readonly Dictionary<string, User> _createdUsers = new();
+    private readonly Dictionary<string, UserData> _createdUsers = new();
     public SeederServerBuilder(ILogger<SeederServerBuilder> logger, IECS ecs,
-        IServerFilesProvider serverFilesProvider, UserManager<User> userManager, RoleManager<Role> roleManager,
+        IServerFilesProvider serverFilesProvider, UserManager<UserData> userManager, RoleManager<RoleData> roleManager,
         IGroupService groupService, IEntityFactory entityFactory, IFractionService fractionService, IEnumerable<ISeederProvider> seederProviders,
         IEnumerable<IAsyncSeederProvider> asyncSeederProviders)
     {
@@ -98,7 +98,7 @@ internal sealed class SeederServerBuilder
     {
         foreach (var pair in groups)
         {
-            Domain.Concepts.Group group;
+            Group group;
             if(!await _groupService.GroupExistsByNameOrShortut(pair.Key, pair.Value.Shortcut))
             {
                 group = await _groupService.CreateGroup(pair.Key, pair.Value.Shortcut, pair.Value.GroupKind);
@@ -131,7 +131,7 @@ internal sealed class SeederServerBuilder
         {
             if (!existingRoles.Any(x => x.Name == roleName.Key))
             {
-                await _roleManager.CreateAsync(new Role
+                await _roleManager.CreateAsync(new RoleData
                 {
                     Name = roleName.Key
                 });
@@ -153,7 +153,7 @@ internal sealed class SeederServerBuilder
 
             if (user == null)
             {
-                var identityResult = await _userManager.CreateAsync(new User
+                var identityResult = await _userManager.CreateAsync(new UserData
                 {
                     UserName = pair.Key,
                 }, pair.Value.Password);
@@ -189,7 +189,7 @@ internal sealed class SeederServerBuilder
                     if(user.DiscordIntegration != null)
                         user.DiscordIntegration.DiscordUserId = discordUserId;
                     else
-                        user.DiscordIntegration = new DiscordIntegration { DiscordUserId = discordUserId };
+                        user.DiscordIntegration = new DiscordIntegrationData { DiscordUserId = discordUserId };
                     _logger.LogInformation("Seeder: Added discord integration with discord user id {discordUserId} for user {userName}", discordUserId, pair.Key);
                 }
                 await _userManager.UpdateAsync(user);

@@ -1,6 +1,6 @@
-﻿using Realm.Domain.Enums;
-using Realm.Domain.Rules;
+﻿using Realm.Server.Enums;
 using Realm.Server.Extensions;
+using Realm.Server.Rules;
 
 namespace Realm.Console.Logic;
 

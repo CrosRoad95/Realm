@@ -1,6 +1,4 @@
-﻿using System.Reflection;
-
-namespace Realm.Server.Logic.Defaults;
+﻿namespace Realm.Server.Logic.Defaults;
 
 public class DefaultCommandsLogic
 {

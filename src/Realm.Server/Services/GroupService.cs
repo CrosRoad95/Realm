@@ -1,9 +1,7 @@
-﻿using Realm.Domain.Enums;
-using Realm.Domain.Exceptions;
-using Realm.Persistance.Interfaces;
-using Group = Realm.Domain.Concepts.Group;
-using GroupData = Realm.Persistance.Data.Group;
-using GroupMember = Realm.Domain.Concepts.GroupMember;
+﻿using Realm.Persistance.Interfaces;
+using Group = Realm.Server.Concepts.Group;
+using GroupData = Realm.Persistance.Data.GroupData;
+using GroupMember = Realm.Server.Concepts.GroupMember;
 
 namespace Realm.Server.Services;
 

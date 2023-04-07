@@ -1,5 +1,5 @@
-﻿using Realm.Domain.Enums;
-using Realm.Domain.Exceptions;
+﻿using Realm.Server.Enums;
+using Realm.Server.Exceptions;
 using Realm.Tests.Classes.Components;
 
 namespace Realm.Tests.Tests;

@@ -46,13 +46,13 @@ public static class ServiceCollectionExtensions
 
     public static IServiceCollection AddRealmIdentity<T>(this IServiceCollection services, IdentityConfiguration configuration) where T : Db<T>
     {
-        services.AddIdentity<User, Role>(setup =>
+        services.AddIdentity<UserData, RoleData>(setup =>
         {
             setup.SignIn.RequireConfirmedAccount = true;
         })
            .AddEntityFrameworkStores<T>()
            .AddDefaultTokenProviders()
-           .AddClaimsPrincipalFactory<UserClaimsPrincipalFactory<User>>();
+           .AddClaimsPrincipalFactory<UserClaimsPrincipalFactory<UserData>>();
 
         services.AddSingleton(new AuthorizationPoliciesProvider(configuration.Policies.Keys));
 

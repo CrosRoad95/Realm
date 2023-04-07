@@ -1,6 +1,4 @@
-﻿using Realm.Common.Providers;
-
-namespace Realm.Persistance.Repository;
+﻿namespace Realm.Persistance.Repository;
 
 internal class BanRepository : IBanRepository
 {
@@ -11,9 +9,9 @@ internal class BanRepository : IBanRepository
         _db = db;
     }
 
-    public Ban CreateBanForSerial(string serial, DateTime? until = null, string? reason = null, string? responsible = null, int type = 0)
+    public BanData CreateBanForSerial(string serial, DateTime? until = null, string? reason = null, string? responsible = null, int type = 0)
     {
-        var ban = new Ban
+        var ban = new BanData
         {
             Serial = serial,
             End = until ?? DateTime.MaxValue,
@@ -25,9 +23,9 @@ internal class BanRepository : IBanRepository
         return ban;
     }
     
-    public Ban CreateBanForUser(int userId, DateTime? until = null, string? reason = null, string? responsible = null, int type = 0)
+    public BanData CreateBanForUser(int userId, DateTime? until = null, string? reason = null, string? responsible = null, int type = 0)
     {
-        var ban = new Ban
+        var ban = new BanData
         {
             UserId = userId,
             End = until ?? DateTime.MaxValue,
@@ -39,31 +37,31 @@ internal class BanRepository : IBanRepository
         return ban;
     }
     
-    public Task<List<Ban>> GetBansBySerial(string serial, IDateTimeProvider dateTimeProvider)
+    public Task<List<BanData>> GetBansBySerial(string serial, DateTime now)
     {
         var query = _db.Bans
             .TagWithSource(nameof(BanRepository))
-            .Where(x => x.Serial == serial && x.End > dateTimeProvider.Now);
+            .Where(x => x.Serial == serial && x.End > now);
         return query.ToListAsync();
     }
     
-    public Task<Ban?> GetBanBySerialAndBanType(string serial, int banType, IDateTimeProvider dateTimeProvider)
+    public Task<BanData?> GetBanBySerialAndBanType(string serial, int banType, DateTime now)
     {
         var query = _db.Bans
             .TagWithSource(nameof(BanRepository))
-            .Where(x => x.Serial == serial && x.Type == banType && x.End > dateTimeProvider.Now);
+            .Where(x => x.Serial == serial && x.Type == banType && x.End > now);
         return query.FirstOrDefaultAsync();
     }
     
-    public async Task<List<Ban>> GetBansByUserId(int userId, IDateTimeProvider dateTimeProvider)
+    public async Task<List<BanData>> GetBansByUserId(int userId, DateTime now)
     {
         return await _db.Bans
             .TagWithSource(nameof(BanRepository))
-            .Where(x => x.UserId == userId && x.End > dateTimeProvider.Now)
+            .Where(x => x.UserId == userId && x.End > now)
             .ToListAsync();
     }
 
-    public void RemoveBan(Ban ban)
+    public void RemoveBan(BanData ban)
     {
         _db.Bans.Remove(ban);
     }

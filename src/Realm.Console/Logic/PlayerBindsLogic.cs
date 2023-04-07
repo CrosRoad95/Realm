@@ -1,5 +1,6 @@
-﻿using Realm.Domain.Components;
-using Realm.Domain.Enums;
+﻿using Realm.Server.Components;
+using Realm.Server.DTOs;
+using Realm.Server.Enums;
 
 namespace Realm.Console.Logic;
 
@@ -91,7 +92,7 @@ internal sealed class PlayerBindsLogic
                     state.Money = (double)moneyComponent.Money;
 
                 var vehiclesWithModelAndPositionDTos = await _vehiclesService.GetLightVehiclesByUserId(userComponent.Id);
-                state.VehicleLightInfos = vehiclesWithModelAndPositionDTos.Select(x => new Domain.Data.VehicleLightInfo
+                state.VehicleLightInfos = vehiclesWithModelAndPositionDTos.Select(x => new VehicleLightInfoDTO
                 {
                     Id = x.Id,
                     Model = x.Model,

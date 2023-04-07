@@ -1,5 +1,5 @@
-﻿using Realm.Domain.Contexts;
-using Realm.Domain.Data;
+﻿using Realm.Server.Contexts.Interfaces;
+using Realm.Server.DTOs;
 
 namespace Realm.Console.Components.Gui;
 
@@ -9,7 +9,7 @@ public sealed class DashboardGuiComponent : StatefulGuiComponent<DashboardGuiCom
     public class DashboardState
     {
         public double Money { get; set; }
-        public List<VehicleLightInfo> VehicleLightInfos { get; set; }
+        public List<VehicleLightInfoDTO> VehicleLightInfos { get; set; }
     }
 
     public DashboardGuiComponent(DashboardState state) : base("dashboard", false, state)

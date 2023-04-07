@@ -17,8 +17,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Realm.Interfaces", "src\Rea
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Realm.Tests", "src\Realm.Tests\Realm.Tests.csproj", "{34808A81-F2EA-4B91-A69C-8B0D47AA02F4}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Realm.Common", "src\Realm.Common\Realm.Common.csproj", "{DB48C5CE-FDDA-4790-8D40-97320F39F65C}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Realm.Configuration", "src\Realm.Configuration\Realm.Configuration.csproj", "{22B462AD-74A2-44F2-9D20-6B4C78CF4681}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Realm.WebApp", "src\Realm.WebApp\Realm.WebApp.csproj", "{F0BAB8CC-D627-46C1-BEEB-86ED7E3B090F}"
@@ -53,8 +51,6 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Services", "Services", "{1B4D0935-5736-4E56-B65E-0CACF26B17DD}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Realm.DiscordBot", "src\Realm.Services.DiscordBot\Realm.DiscordBot.csproj", "{439C6299-2B3A-49F9-9DED-F297F44C355B}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Realm.Domain", "src\Realm.Domain\Realm.Domain.csproj", "{9A2A0372-C197-4759-8718-78AEA2F1907B}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Realm.Module.WebApp", "src\Realm.Module.WebApp\Realm.Module.WebApp.csproj", "{8060B5A2-41BA-46ED-B46E-35B13D59D429}"
 EndProject
@@ -106,10 +102,6 @@ Global
 		{34808A81-F2EA-4B91-A69C-8B0D47AA02F4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{34808A81-F2EA-4B91-A69C-8B0D47AA02F4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{34808A81-F2EA-4B91-A69C-8B0D47AA02F4}.Release|Any CPU.Build.0 = Release|Any CPU
-		{DB48C5CE-FDDA-4790-8D40-97320F39F65C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{DB48C5CE-FDDA-4790-8D40-97320F39F65C}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{DB48C5CE-FDDA-4790-8D40-97320F39F65C}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{DB48C5CE-FDDA-4790-8D40-97320F39F65C}.Release|Any CPU.Build.0 = Release|Any CPU
 		{22B462AD-74A2-44F2-9D20-6B4C78CF4681}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{22B462AD-74A2-44F2-9D20-6B4C78CF4681}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{22B462AD-74A2-44F2-9D20-6B4C78CF4681}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -154,10 +146,6 @@ Global
 		{439C6299-2B3A-49F9-9DED-F297F44C355B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{439C6299-2B3A-49F9-9DED-F297F44C355B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{439C6299-2B3A-49F9-9DED-F297F44C355B}.Release|Any CPU.Build.0 = Release|Any CPU
-		{9A2A0372-C197-4759-8718-78AEA2F1907B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{9A2A0372-C197-4759-8718-78AEA2F1907B}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{9A2A0372-C197-4759-8718-78AEA2F1907B}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{9A2A0372-C197-4759-8718-78AEA2F1907B}.Release|Any CPU.Build.0 = Release|Any CPU
 		{8060B5A2-41BA-46ED-B46E-35B13D59D429}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{8060B5A2-41BA-46ED-B46E-35B13D59D429}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8060B5A2-41BA-46ED-B46E-35B13D59D429}.Release|Any CPU.ActiveCfg = Release|Any CPU

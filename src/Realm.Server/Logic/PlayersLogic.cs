@@ -1,8 +1,5 @@
-﻿using Realm.Common.Utilities;
-using Realm.Domain.Components;
-using Realm.Domain.Enums;
+﻿using Realm.Server.Utilities;
 using System.Collections.Concurrent;
-using System.Globalization;
 
 namespace Realm.Server.Logic;
 
@@ -95,7 +92,7 @@ internal class PlayersLogic
         }
     }
 
-    private void HandlePlayerResourceStarted(Player player, SlipeServer.Server.Elements.Events.PlayerResourceStartedEventArgs e)
+    private void HandlePlayerResourceStarted(Player player, PlayerResourceStartedEventArgs e)
     {
         _playerResources[player].Decrement();
     }
@@ -163,7 +160,7 @@ internal class PlayersLogic
         }
     }
 
-    private async void HandlePlayerDisconnected(Player player, SlipeServer.Server.Elements.Events.PlayerQuitEventArgs e)
+    private async void HandlePlayerDisconnected(Player player, PlayerQuitEventArgs e)
     {
         try
         {

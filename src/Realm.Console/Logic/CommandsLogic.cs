@@ -1,7 +1,5 @@
-﻿using Realm.Common.Providers;
-using Realm.Console.Components;
+﻿using Realm.Console.Components;
 using Realm.Console.Components.Huds;
-using Realm.Domain.Enums;
 using Realm.Module.Discord.Interfaces;
 using Realm.Resources.Nametags;
 using SixLabors.Fonts;
@@ -15,11 +13,12 @@ using Realm.Server.Extensions;
 using Realm.Console.Components.Vehicles;
 using Realm.Resources.Base;
 using Realm.Resources.ClientInterface;
-using Realm.Domain.Components.Peds;
+using Realm.Server.Components.Peds;
 using SlipeServer.Server.Enums;
 using Realm.Resources.ElementOutline;
 using Realm.Server.Extensions.Resources;
-using Realm.Domain.Components.World;
+using Realm.Server.Components.World;
+using Realm.Server.Enums;
 
 namespace Realm.Console.Logic;
 
@@ -333,7 +332,7 @@ internal sealed class CommandsLogic
 
         _commandService.AddCommandHandler("spawnboard", (entity, args) =>
         {
-            var objectEntity = _entityFactory.CreateObject((SlipeServer.Server.Enums.ObjectModel)3077, entity.Transform.Position + new Vector3(4, 0, -1), Vector3.Zero);
+            var objectEntity = _entityFactory.CreateObject((ObjectModel)3077, entity.Transform.Position + new Vector3(4, 0, -1), Vector3.Zero);
             objectEntity.AddComponent(new LiftableWorldObjectComponent());
         });
 

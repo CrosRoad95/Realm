@@ -1,6 +1,4 @@
-﻿using System.Globalization;
-
-namespace Realm.Server.Extensions;
+﻿namespace Realm.Server.Extensions;
 
 public static class NumericExtensions
 {

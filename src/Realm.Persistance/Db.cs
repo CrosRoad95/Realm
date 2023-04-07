@@ -1,39 +1,39 @@
 ﻿namespace Realm.Persistance;
 
-public abstract class Db<T> : IdentityDbContext<User, Role, int,
+public abstract class Db<T> : IdentityDbContext<UserData, RoleData, int,
         IdentityUserClaim<int>,
         IdentityUserRole<int>,
         IdentityUserLogin<int>,
         IdentityRoleClaim<int>,
         IdentityUserToken<int>>, IDb where T : Db<T>
 {
-    public DbSet<UserLicense> UserLicenses => Set<UserLicense>();
-    public DbSet<Vehicle> Vehicles => Set<Vehicle>();
-    public DbSet<VehicleUserAccess> VehicleUserAccess => Set<VehicleUserAccess>();
-    public DbSet<Inventory> Inventories => Set<Inventory>();
-    public DbSet<InventoryItem> InventoryItems => Set<InventoryItem>();
-    public DbSet<VehicleUpgrade> VehicleUpgrades => Set<VehicleUpgrade>();
-    public DbSet<VehicleFuel> VehicleFuels => Set<VehicleFuel>();
-    public DbSet<DailyVisits> DailyVisits => Set<DailyVisits>();
-    public DbSet<UserStat> UserStats => Set<UserStat>();
-    public DbSet<JobStatistics> JobPoints => Set<JobStatistics>();
-    public DbSet<JobUpgrade> JobUpgrades => Set<JobUpgrade>();
-    public DbSet<Achievement> Achievements => Set<Achievement>();
-    public DbSet<Discovery> Discoveries => Set<Discovery>();
-    public DbSet<Group> Groups => Set<Group>();
-    public DbSet<GroupMember> GroupMembers => Set<GroupMember>();
-    public DbSet<Fraction> Fractions => Set<Fraction>();
-    public DbSet<FractionMember> FractionMembers => Set<FractionMember>();
-    public DbSet<DiscordIntegration> DiscordIntegrations => Set<DiscordIntegration>();
-    public DbSet<UserUpgrade> UserUpgrades => Set<UserUpgrade>();
-    public DbSet<VehiclePartDamage> VehiclePartDamages => Set<VehiclePartDamage>();
-    public DbSet<Ban> Bans => Set<Ban>();
-    public DbSet<UserReward> UserRewards => Set<UserReward>();
-    public DbSet<UserSetting> UserSettings => Set<UserSetting>();
-    public DbSet<UserWhitelistedSerial> UserWhitelistedSerials => Set<UserWhitelistedSerial>();
-    public DbSet<VehicleEngine> VehicleEngines => Set<VehicleEngine>();
-    public DbSet<UserInventory> UserInventories => Set<UserInventory>();
-    public DbSet<VehicleInventory> VehicleInventories => Set<VehicleInventory>();
+    public DbSet<UserLicenseData> UserLicenses => Set<UserLicenseData>();
+    public DbSet<VehicleData> Vehicles => Set<VehicleData>();
+    public DbSet<VehicleUserAccessData> VehicleUserAccess => Set<VehicleUserAccessData>();
+    public DbSet<InventoryData> Inventories => Set<InventoryData>();
+    public DbSet<InventoryItemData> InventoryItems => Set<InventoryItemData>();
+    public DbSet<VehicleUpgradeData> VehicleUpgrades => Set<VehicleUpgradeData>();
+    public DbSet<VehicleFuelData> VehicleFuels => Set<VehicleFuelData>();
+    public DbSet<DailyVisitsData> DailyVisits => Set<DailyVisitsData>();
+    public DbSet<UserStatData> UserStats => Set<UserStatData>();
+    public DbSet<JobStatisticsData> JobPoints => Set<JobStatisticsData>();
+    public DbSet<JobUpgradeData> JobUpgrades => Set<JobUpgradeData>();
+    public DbSet<AchievementData> Achievements => Set<AchievementData>();
+    public DbSet<DiscoveryData> Discoveries => Set<DiscoveryData>();
+    public DbSet<GroupData> Groups => Set<GroupData>();
+    public DbSet<GroupMemberData> GroupMembers => Set<GroupMemberData>();
+    public DbSet<FractionData> Fractions => Set<FractionData>();
+    public DbSet<FractionMemberData> FractionMembers => Set<FractionMemberData>();
+    public DbSet<DiscordIntegrationData> DiscordIntegrations => Set<DiscordIntegrationData>();
+    public DbSet<UserUpgradeData> UserUpgrades => Set<UserUpgradeData>();
+    public DbSet<VehiclePartDamageData> VehiclePartDamages => Set<VehiclePartDamageData>();
+    public DbSet<BanData> Bans => Set<BanData>();
+    public DbSet<UserRewardData> UserRewards => Set<UserRewardData>();
+    public DbSet<UserSettingData> UserSettings => Set<UserSettingData>();
+    public DbSet<UserWhitelistedSerialData> UserWhitelistedSerials => Set<UserWhitelistedSerialData>();
+    public DbSet<VehicleEngineData> VehicleEngines => Set<VehicleEngineData>();
+    public DbSet<UserInventoryData> UserInventories => Set<UserInventoryData>();
+    public DbSet<VehicleInventoryData> VehicleInventories => Set<VehicleInventoryData>();
 
     public Db(DbContextOptions<T> options) : base(options)
     {
@@ -53,15 +53,15 @@ public abstract class Db<T> : IdentityDbContext<User, Role, int,
     {
         base.OnModelCreating(modelBuilder);
 
-        modelBuilder.Entity<User>().ToTable("Users");
-        modelBuilder.Entity<Role>().ToTable("Roles");
+        modelBuilder.Entity<UserData>().ToTable("Users");
+        modelBuilder.Entity<RoleData>().ToTable("Roles");
         modelBuilder.Entity<IdentityUserClaim<int>>().ToTable("UserClaims");
         modelBuilder.Entity<IdentityUserRole<int>>().ToTable("UserRoles");
         modelBuilder.Entity<IdentityUserLogin<int>>().ToTable("UserLogins");
         modelBuilder.Entity<IdentityRoleClaim<int>>().ToTable("RoleClaims");
         modelBuilder.Entity<IdentityUserToken<int>>().ToTable("UserTokens");
 
-        modelBuilder.Entity<User>(entityBuilder =>
+        modelBuilder.Entity<UserData>(entityBuilder =>
         {
             entityBuilder.Property(x => x.LastTransformAndMotion)
                 .HasMaxLength(400)
@@ -97,7 +97,7 @@ public abstract class Db<T> : IdentityDbContext<User, Role, int,
             entityBuilder
                 .HasOne(x => x.DailyVisits)
                 .WithOne()
-                .HasForeignKey<DailyVisits>(x => x.UserId);
+                .HasForeignKey<DailyVisitsData>(x => x.UserId);
 
             entityBuilder
                 .HasMany(x => x.Stats)
@@ -123,7 +123,7 @@ public abstract class Db<T> : IdentityDbContext<User, Role, int,
             entityBuilder
                 .HasMany(x => x.Inventories)
                 .WithMany()
-                .UsingEntity<UserInventory>(y => y
+                .UsingEntity<UserInventoryData>(y => y
                     .HasOne(z => z.Inventory)
                     .WithMany(z => z.UserInventories)
                     .HasForeignKey(z => z.InventoryId),
@@ -161,10 +161,10 @@ public abstract class Db<T> : IdentityDbContext<User, Role, int,
             entityBuilder
                 .HasOne(x => x.DiscordIntegration)
                 .WithOne(x => x.User)
-                .HasForeignKey<DiscordIntegration>(x => x.UserId);
+                .HasForeignKey<DiscordIntegrationData>(x => x.UserId);
         });
 
-        modelBuilder.Entity<Inventory>(entityBuilder =>
+        modelBuilder.Entity<InventoryData>(entityBuilder =>
         {
             entityBuilder
                 .ToTable(nameof(Inventories))
@@ -180,21 +180,21 @@ public abstract class Db<T> : IdentityDbContext<User, Role, int,
                 .OnDelete(DeleteBehavior.Cascade);
         });
         
-        modelBuilder.Entity<UserInventory>(entityBuilder =>
+        modelBuilder.Entity<UserInventoryData>(entityBuilder =>
         {
             entityBuilder
-                .ToTable(nameof(UserInventory))
+                .ToTable(nameof(UserInventoryData))
                 .HasKey(x => new { x.UserId, x.InventoryId });
         });
         
-        modelBuilder.Entity<VehicleInventory>(entityBuilder =>
+        modelBuilder.Entity<VehicleInventoryData>(entityBuilder =>
         {
             entityBuilder
                 .ToTable(nameof(VehicleInventories))
                 .HasKey(x => new { x.VehicleId, x.InventoryId });
         });
         
-        modelBuilder.Entity<DailyVisits>(entityBuilder =>
+        modelBuilder.Entity<DailyVisitsData>(entityBuilder =>
         {
             entityBuilder
                 .ToTable(nameof(DailyVisits))
@@ -204,21 +204,21 @@ public abstract class Db<T> : IdentityDbContext<User, Role, int,
                 .HasDefaultValue(DateTime.MinValue);
         });
         
-        modelBuilder.Entity<UserStat>(entityBuilder =>
+        modelBuilder.Entity<UserStatData>(entityBuilder =>
         {
             entityBuilder
                 .ToTable(nameof(UserStats))
                 .HasKey(x => new { x.UserId, x.StatId });
         });
         
-        modelBuilder.Entity<UserReward>(entityBuilder =>
+        modelBuilder.Entity<UserRewardData>(entityBuilder =>
         {
             entityBuilder
                 .ToTable(nameof(UserRewards))
                 .HasKey(x => new { x.UserId, x.RewardId });
         });
 
-        modelBuilder.Entity<UserSetting>(entityBuilder =>
+        modelBuilder.Entity<UserSettingData>(entityBuilder =>
         {
             entityBuilder
                 .ToTable(nameof(UserSettings))
@@ -228,7 +228,7 @@ public abstract class Db<T> : IdentityDbContext<User, Role, int,
                 .HasMaxLength(255);
         });
 
-        modelBuilder.Entity<UserWhitelistedSerial>(entityBuilder =>
+        modelBuilder.Entity<UserWhitelistedSerialData>(entityBuilder =>
         {
             entityBuilder
                 .ToTable(nameof(UserWhitelistedSerials))
@@ -238,14 +238,14 @@ public abstract class Db<T> : IdentityDbContext<User, Role, int,
                 .HasMaxLength(32);
         });
         
-        modelBuilder.Entity<VehicleEngine>(entityBuilder =>
+        modelBuilder.Entity<VehicleEngineData>(entityBuilder =>
         {
             entityBuilder
                 .ToTable(nameof(VehicleEngines))
                 .HasKey(x => new { x.VehicleId, x.EngineId });
         });
         
-        modelBuilder.Entity<Achievement>(entityBuilder =>
+        modelBuilder.Entity<AchievementData>(entityBuilder =>
         {
             entityBuilder
                 .ToTable(nameof(Achievements))
@@ -255,7 +255,7 @@ public abstract class Db<T> : IdentityDbContext<User, Role, int,
                 .HasMaxLength(255);
         });
         
-        modelBuilder.Entity<JobUpgrade>(entityBuilder =>
+        modelBuilder.Entity<JobUpgradeData>(entityBuilder =>
         {
             entityBuilder
                 .ToTable(nameof(JobUpgrades))
@@ -266,7 +266,7 @@ public abstract class Db<T> : IdentityDbContext<User, Role, int,
                 .HasIndex(x => new { x.UserId, x.JobId, x.UpgradeId });
         });
         
-        modelBuilder.Entity<JobStatistics>(entityBuilder =>
+        modelBuilder.Entity<JobStatisticsData>(entityBuilder =>
         {
             entityBuilder
                 .ToTable(nameof(JobPoints))
@@ -276,7 +276,7 @@ public abstract class Db<T> : IdentityDbContext<User, Role, int,
                 .HasColumnType("date");
         });
         
-        modelBuilder.Entity<InventoryItem>(entityBuilder =>
+        modelBuilder.Entity<InventoryItemData>(entityBuilder =>
         {
             entityBuilder
                 .ToTable(nameof(InventoryItems))
@@ -286,7 +286,7 @@ public abstract class Db<T> : IdentityDbContext<User, Role, int,
                 .HasMaxLength(36);
         });
 
-        modelBuilder.Entity<UserLicense>(entityBuilder =>
+        modelBuilder.Entity<UserLicenseData>(entityBuilder =>
         {
             entityBuilder
                 .ToTable(nameof(UserLicenses))
@@ -294,14 +294,14 @@ public abstract class Db<T> : IdentityDbContext<User, Role, int,
         });
         
 
-        modelBuilder.Entity<VehicleUpgrade>(entityBuilder =>
+        modelBuilder.Entity<VehicleUpgradeData>(entityBuilder =>
         {
             entityBuilder
                 .ToTable(nameof(VehicleUpgrades))
                 .HasKey(x => new { x.VehicleId, x.UpgradeId });
         });
 
-        modelBuilder.Entity<Vehicle>(entityBuilder =>
+        modelBuilder.Entity<VehicleData>(entityBuilder =>
         {
             entityBuilder.ToTable(nameof(Vehicles))
                 .HasKey(x =>  x.Id);
@@ -418,7 +418,7 @@ public abstract class Db<T> : IdentityDbContext<User, Role, int,
             entityBuilder
                 .HasMany(x => x.Inventories)
                 .WithMany()
-                .UsingEntity<VehicleInventory>(y => y
+                .UsingEntity<VehicleInventoryData>(y => y
                     .HasOne(z => z.Inventory)
                     .WithMany(z => z.VehicleInventories)
                     .HasForeignKey(z => z.InventoryId),
@@ -428,7 +428,7 @@ public abstract class Db<T> : IdentityDbContext<User, Role, int,
                     .HasForeignKey(z => z.VehicleId));
         });
 
-        modelBuilder.Entity<VehicleUserAccess>(entityBuilder =>
+        modelBuilder.Entity<VehicleUserAccessData>(entityBuilder =>
         {
             entityBuilder
                 .ToTable(nameof(VehicleUserAccess))
@@ -453,7 +453,7 @@ public abstract class Db<T> : IdentityDbContext<User, Role, int,
                 .HasForeignKey(x => x.VehicleId);
         });
 
-        modelBuilder.Entity<VehicleFuel>(entityBuilder =>
+        modelBuilder.Entity<VehicleFuelData>(entityBuilder =>
         {
             entityBuilder
                 .ToTable(nameof(VehicleFuels))
@@ -464,21 +464,21 @@ public abstract class Db<T> : IdentityDbContext<User, Role, int,
         });
         
 
-        modelBuilder.Entity<VehiclePartDamage>(entityBuilder =>
+        modelBuilder.Entity<VehiclePartDamageData>(entityBuilder =>
         {
             entityBuilder
                 .ToTable(nameof(VehiclePartDamages))
                 .HasKey(x => new { x.VehicleId, x.PartId });
         });
         
-        modelBuilder.Entity<Discovery>(entityBuilder =>
+        modelBuilder.Entity<DiscoveryData>(entityBuilder =>
         {
             entityBuilder
                 .ToTable(nameof(Discoveries))
                 .HasKey(x => new { x.UserId, x.DiscoveryId });
         });
         
-        modelBuilder.Entity<Group>(entityBuilder =>
+        modelBuilder.Entity<GroupData>(entityBuilder =>
         {
             entityBuilder
                 .ToTable(nameof(Groups))
@@ -499,7 +499,7 @@ public abstract class Db<T> : IdentityDbContext<User, Role, int,
                 .HasPrincipalKey(x => x.Id);
         });
         
-        modelBuilder.Entity<GroupMember>(entityBuilder =>
+        modelBuilder.Entity<GroupMemberData>(entityBuilder =>
         {
             entityBuilder
                 .ToTable(nameof(GroupMembers))
@@ -517,7 +517,7 @@ public abstract class Db<T> : IdentityDbContext<User, Role, int,
                 .HasPrincipalKey(x => x.Id);
         });
         
-        modelBuilder.Entity<Fraction>(entityBuilder =>
+        modelBuilder.Entity<FractionData>(entityBuilder =>
         {
             entityBuilder
                 .ToTable(nameof(Fractions))
@@ -538,7 +538,7 @@ public abstract class Db<T> : IdentityDbContext<User, Role, int,
                 .HasPrincipalKey(x => x.Id);
         });
         
-        modelBuilder.Entity<FractionMember>(entityBuilder =>
+        modelBuilder.Entity<FractionMemberData>(entityBuilder =>
         {
             entityBuilder
                 .ToTable(nameof(FractionMembers))
@@ -556,21 +556,21 @@ public abstract class Db<T> : IdentityDbContext<User, Role, int,
                 .HasPrincipalKey(x => x.Id);
         });
 
-        modelBuilder.Entity<DiscordIntegration>(entityBuilder =>
+        modelBuilder.Entity<DiscordIntegrationData>(entityBuilder =>
         {
             entityBuilder
                 .ToTable(nameof(DiscordIntegrations))
                 .HasKey(x => x.UserId);
         });
 
-        modelBuilder.Entity<UserUpgrade>(entityBuilder =>
+        modelBuilder.Entity<UserUpgradeData>(entityBuilder =>
         {
             entityBuilder
                 .ToTable(nameof(UserUpgrades))
                 .HasKey(x => new { x.UserId, x.UpgradeId });
         });
 
-        modelBuilder.Entity<Ban>(entityBuilder =>
+        modelBuilder.Entity<BanData>(entityBuilder =>
         {
             entityBuilder
                 .ToTable(nameof(Bans))

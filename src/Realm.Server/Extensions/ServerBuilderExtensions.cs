@@ -1,12 +1,11 @@
-﻿using Realm.Domain.Options;
-using Realm.Module.Grpc.Options;
+﻿using Realm.Module.Grpc.Options;
 using Realm.Persistance.MySql;
 using Realm.Resources.Assets;
 using SlipeServer.Resources.BoneAttach;
-using SlipeServer.Resources.Text3d;
 using Realm.Resources.Nametags;
 using Realm.Server.Entities;
 using SlipeServer.Resources.Watermark;
+using Realm.Server.Options;
 
 namespace Realm.Server.Extensions;
 

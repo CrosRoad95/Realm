@@ -1,5 +1,5 @@
 ﻿using Microsoft.AspNetCore.Components;
-using Realm.Domain.Components;
+using Realm.Server.Components;
 
 namespace Realm.Tests.Classes.Components;
 

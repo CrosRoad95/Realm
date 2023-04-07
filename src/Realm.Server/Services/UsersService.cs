@@ -1,15 +1,13 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Options;
-using Realm.Domain.Enums;
-using Realm.Domain.Inventory;
-using Realm.Domain.Options;
+using Realm.Server.Options;
 
 namespace Realm.Server.Services;
 
 internal class UsersService : IUsersService
 {
     private readonly ItemsRegistry _itemsRegistry;
-    private readonly UserManager<User> _userManager;
+    private readonly UserManager<UserData> _userManager;
     private readonly ILogger<UsersService> _logger;
     private readonly IOptions<GameplayOptions> _gameplayOptions;
     private readonly IDateTimeProvider _dateTimeProvider;
@@ -17,7 +15,7 @@ internal class UsersService : IUsersService
     private readonly IDb _db;
     private readonly IActiveUsers _activeUsers;
 
-    public UsersService(ItemsRegistry itemsRegistry, UserManager<User> userManager, ILogger<UsersService> logger, IOptions<GameplayOptions> gameplayOptions,
+    public UsersService(ItemsRegistry itemsRegistry, UserManager<UserData> userManager, ILogger<UsersService> logger, IOptions<GameplayOptions> gameplayOptions,
         IDateTimeProvider dateTimeProvider, IAuthorizationService authorizationService, IDb db, IActiveUsers activeUsers)
     {
         _itemsRegistry = itemsRegistry;
@@ -32,7 +30,7 @@ internal class UsersService : IUsersService
 
     public async Task<int> SignUp(string username, string password)
     {
-        var user = new User
+        var user = new UserData
         {
             UserName = username,
         };
@@ -48,7 +46,7 @@ internal class UsersService : IUsersService
         throw new Exception("Failed to create a user");
     }
 
-    public async Task<bool> SignIn(Entity entity, User user)
+    public async Task<bool> SignIn(Entity entity, UserData user)
     {
         if (entity == null)
             throw new NullReferenceException(nameof(entity));
@@ -155,7 +153,7 @@ internal class UsersService : IUsersService
         return result.Succeeded;
     }
 
-    public Task<User?> GetUserByLogin(string login)
+    public Task<UserData?> GetUserByLogin(string login)
     {
         return _userManager.Users
             .IncludeAll()
@@ -164,7 +162,7 @@ internal class UsersService : IUsersService
             .FirstOrDefaultAsync();
     }
     
-    public Task<User?> GetUserByLoginCaseInsensitive(string login)
+    public Task<UserData?> GetUserByLoginCaseInsensitive(string login)
     {
         return _userManager.Users
             .IncludeAll()
@@ -173,7 +171,7 @@ internal class UsersService : IUsersService
             .FirstOrDefaultAsync();
     }
     
-    public Task<User?> GetUserById(int id)
+    public Task<UserData?> GetUserById(int id)
     {
         return _userManager.Users
             .IncludeAll()
@@ -182,7 +180,7 @@ internal class UsersService : IUsersService
             .FirstOrDefaultAsync();
     }
 
-    public Task<bool> CheckPasswordAsync(User user, string password)
+    public Task<bool> CheckPasswordAsync(UserData user, string password)
     {
         return _userManager.CheckPasswordAsync(user, password);
     }
@@ -209,7 +207,7 @@ internal class UsersService : IUsersService
 
         try
         {
-            _db.UserWhitelistedSerials.Add(new UserWhitelistedSerial
+            _db.UserWhitelistedSerials.Add(new UserWhitelistedSerialData
             {
                 Serial = serial,
                 UserId = userId

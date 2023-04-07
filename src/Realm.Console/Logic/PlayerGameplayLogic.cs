@@ -1,6 +1,6 @@
 ﻿using Realm.Console.Components.Vehicles;
-using Realm.Domain.Components;
-using Realm.Domain.Enums;
+using Realm.Server.Components;
+using Realm.Server.Enums;
 using Realm.Server.Extensions;
 using SlipeServer.Server.Elements.Enums;
 

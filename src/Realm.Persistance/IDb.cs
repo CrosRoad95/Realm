@@ -6,35 +6,35 @@ public interface IDb : IDisposable
 {
     ChangeTracker ChangeTracker { get; }
     EntityEntry Attach(object entity);
-    DbSet<User> Users { get; }
-    DbSet<Role> Roles { get; }
+    DbSet<UserData> Users { get; }
+    DbSet<RoleData> Roles { get; }
     DbSet<IdentityUserClaim<int>> UserClaims { get; }
     DbSet<IdentityUserLogin<int>> UserLogins { get; }
     DbSet<IdentityRoleClaim<int>> RoleClaims { get; }
     DbSet<IdentityUserToken<int>> UserTokens { get; }
-    DbSet<UserLicense> UserLicenses { get; }
-    DbSet<Vehicle> Vehicles { get; }
-    DbSet<VehicleUserAccess> VehicleUserAccess { get; }
-    DbSet<Inventory> Inventories { get; }
-    DbSet<InventoryItem> InventoryItems { get; }
-    DbSet<VehicleUpgrade> VehicleUpgrades { get; }
-    DbSet<VehicleFuel> VehicleFuels { get; }
-    DbSet<DailyVisits> DailyVisits { get; }
-    DbSet<UserStat> UserStats { get; }
-    DbSet<JobUpgrade> JobUpgrades { get; }
-    DbSet<Achievement> Achievements { get; }
-    DbSet<Group> Groups { get; }
-    DbSet<GroupMember> GroupMembers { get; }
-    DbSet<Fraction> Fractions { get; }
-    DbSet<FractionMember> FractionMembers { get; }
-    DbSet<UserUpgrade> UserUpgrades { get; }
-    DbSet<Ban> Bans { get; }
-    DbSet<JobStatistics> JobPoints { get; }
-    DbSet<UserReward> UserRewards { get; }
-    DbSet<UserSetting> UserSettings { get; }
-    DbSet<UserWhitelistedSerial> UserWhitelistedSerials { get; }
-    DbSet<UserInventory> UserInventories { get; }
-    DbSet<VehicleInventory> VehicleInventories { get; }
+    DbSet<UserLicenseData> UserLicenses { get; }
+    DbSet<VehicleData> Vehicles { get; }
+    DbSet<VehicleUserAccessData> VehicleUserAccess { get; }
+    DbSet<InventoryData> Inventories { get; }
+    DbSet<InventoryItemData> InventoryItems { get; }
+    DbSet<VehicleUpgradeData> VehicleUpgrades { get; }
+    DbSet<VehicleFuelData> VehicleFuels { get; }
+    DbSet<DailyVisitsData> DailyVisits { get; }
+    DbSet<UserStatData> UserStats { get; }
+    DbSet<JobUpgradeData> JobUpgrades { get; }
+    DbSet<AchievementData> Achievements { get; }
+    DbSet<GroupData> Groups { get; }
+    DbSet<GroupMemberData> GroupMembers { get; }
+    DbSet<FractionData> Fractions { get; }
+    DbSet<FractionMemberData> FractionMembers { get; }
+    DbSet<UserUpgradeData> UserUpgrades { get; }
+    DbSet<BanData> Bans { get; }
+    DbSet<JobStatisticsData> JobPoints { get; }
+    DbSet<UserRewardData> UserRewards { get; }
+    DbSet<UserSettingData> UserSettings { get; }
+    DbSet<UserWhitelistedSerialData> UserWhitelistedSerials { get; }
+    DbSet<UserInventoryData> UserInventories { get; }
+    DbSet<VehicleInventoryData> VehicleInventories { get; }
 
     Task MigrateAsync();
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);

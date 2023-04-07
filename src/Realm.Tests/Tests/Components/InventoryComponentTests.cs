@@ -1,5 +1,5 @@
-﻿using Realm.Domain.Enums;
-using Realm.Domain.Inventory;
+﻿using Realm.Server.Enums;
+using Realm.Server.Inventory;
 
 namespace Realm.Tests.Tests.Components;
 

@@ -1,5 +1,4 @@
 ﻿using SlipeServer.Server.Extensions;
-using System.Drawing;
 
 namespace Realm.Server.Logic;
 
@@ -21,7 +20,7 @@ internal class ChatLogic
         };
     }
 
-    private void HandlePlayerCommandEntered(Player player, SlipeServer.Server.Elements.Events.PlayerCommandEventArgs arguments)
+    private void HandlePlayerCommandEntered(Player player, PlayerCommandEventArgs arguments)
     {
         switch (arguments.Command)
         {

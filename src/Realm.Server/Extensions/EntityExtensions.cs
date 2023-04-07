@@ -1,6 +1,4 @@
-﻿using Realm.Domain.Enums;
-
-namespace Realm.Server.Extensions;
+﻿namespace Realm.Server.Extensions;
 
 public static class EntityExtensions
 {

@@ -1,4 +1,4 @@
-﻿using Realm.Domain.Components.Elements;
+﻿using Realm.Server.Components.Elements;
 using SlipeServer.Server.Elements.Enums;
 
 namespace Realm.Tests.Tests.Components;

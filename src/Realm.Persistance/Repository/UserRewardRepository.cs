@@ -13,7 +13,7 @@ internal class UserRewardRepository : IUserRewardRepository
     {
         try
         {
-            _db.UserRewards.Add(new UserReward
+            _db.UserRewards.Add(new UserRewardData
             {
                 RewardId = rewardId,
                 UserId = userId

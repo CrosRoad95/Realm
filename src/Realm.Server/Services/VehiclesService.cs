@@ -1,6 +1,4 @@
-﻿using Realm.Domain.Enums;
-using Realm.Domain.Inventory;
-using Realm.Persistance.DTOs;
+﻿using Realm.Persistance.DTOs;
 using Realm.Persistance.Interfaces;
 
 namespace Realm.Server.Services;
@@ -11,13 +9,15 @@ internal sealed class VehiclesService : IVehiclesService
     private readonly IEntityFactory _entityFactory;
     private readonly ISaveService _saveService;
     private readonly ItemsRegistry _itemsRegistry;
+    private readonly IDateTimeProvider _dateTimeProvider;
 
-    public VehiclesService(IVehicleRepository vehicleRepository, IEntityFactory entityFactory, ISaveService saveService, ItemsRegistry itemsRegistry)
+    public VehiclesService(IVehicleRepository vehicleRepository, IEntityFactory entityFactory, ISaveService saveService, ItemsRegistry itemsRegistry, IDateTimeProvider dateTimeProvider)
     {
         _vehicleRepository = vehicleRepository;
         _entityFactory = entityFactory;
         _saveService = saveService;
         _itemsRegistry = itemsRegistry;
+        _dateTimeProvider = dateTimeProvider;
     }
 
     public async Task<Entity> ConvertToPrivateVehicle(Entity vehicleEntity)
@@ -29,7 +29,7 @@ internal sealed class VehiclesService : IVehiclesService
             throw new InvalidOperationException();
 
         var vehicleElementComponent = vehicleEntity.GetRequiredComponent<VehicleElementComponent>();
-        vehicleEntity.AddComponent(new PrivateVehicleComponent(await _vehicleRepository.CreateNewVehicle(vehicleElementComponent.Model)));
+        vehicleEntity.AddComponent(new PrivateVehicleComponent(await _vehicleRepository.CreateNewVehicle(vehicleElementComponent.Model, _dateTimeProvider.Now)));
         return vehicleEntity;
     }
 
@@ -38,17 +38,17 @@ internal sealed class VehiclesService : IVehiclesService
         return _vehicleRepository.GetLightVehiclesByUserId(userId);
     }
 
-    public Task<List<Persistance.Data.Vehicle>> GetVehiclesByUserId(int userId)
+    public Task<List<VehicleData>> GetVehiclesByUserId(int userId)
     {
         return _vehicleRepository.GetVehiclesByUserId(userId);
     }
 
-    public Task<List<Persistance.Data.Vehicle>> GetAllSpawnedVehicles()
+    public Task<List<VehicleData>> GetAllSpawnedVehicles()
     {
         return _vehicleRepository.GetAllSpawnedVehicles();
     }
 
-    public Task<Persistance.Data.Vehicle?> GetVehicleById(int id)
+    public Task<VehicleData?> GetVehicleById(int id)
     {
         return _vehicleRepository.GetReadOnlyVehicleById(id);
     }
@@ -73,7 +73,7 @@ internal sealed class VehiclesService : IVehiclesService
         return null;
     }
 
-    public Entity Spawn(Persistance.Data.Vehicle vehicleData)
+    public Entity Spawn(VehicleData vehicleData)
     {
         var entity = _entityFactory.CreateVehicle(vehicleData.Model, vehicleData.TransformAndMotion.Position, vehicleData.TransformAndMotion.Rotation, new ConstructionInfo
         {

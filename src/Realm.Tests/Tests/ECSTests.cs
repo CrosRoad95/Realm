@@ -1,5 +1,5 @@
-﻿using Realm.Domain.Enums;
-using Realm.Server.Entities;
+﻿using Realm.Server.Entities;
+using Realm.Server.Enums;
 using SlipeServer.Server.ElementCollections;
 
 namespace Realm.Tests.Tests;

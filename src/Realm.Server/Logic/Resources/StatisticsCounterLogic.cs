@@ -1,7 +1,4 @@
-﻿using Realm.Domain.Components;
-using Realm.Domain.Enums;
-
-namespace Realm.Server.Logic.Resources;
+﻿namespace Realm.Server.Logic.Resources;
 
 internal class StatisticsCounterLogic
 {

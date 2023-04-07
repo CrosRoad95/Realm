@@ -1,0 +1,189 @@
+﻿using Realm.Server.Rules;
+
+namespace Realm.Server.Components.Elements;
+
+public class PickupElementComponent : ElementComponent
+{
+    [Inject]
+    private IECS ECS { get; set; } = default!;
+    [Inject]
+    private ILogger<PickupElementComponent> Logger { get; set; } = default!;
+
+    protected readonly Pickup _pickup;
+    internal override Element Element => _pickup;
+    private Action<Entity>? _entityEntered;
+    private Action<Entity>? _entityLeft;
+    private Action<Entity, IEntityRule>? _entityRuleFailed;
+
+    public Action<Entity>? EntityEntered
+    {
+        get
+        {
+            ThrowIfDisposed();
+            return _entityEntered;
+        }
+        set
+        {
+            ThrowIfDisposed();
+            _entityEntered = value;
+        }
+    }
+
+    public Action<Entity>? EntityLeft
+    {
+        get
+        {
+            ThrowIfDisposed();
+            return _entityLeft;
+        }
+        set
+        {
+            ThrowIfDisposed();
+            _entityLeft = value;
+        }
+    }
+
+    public Action<Entity, IEntityRule>? EntityRuleFailed
+    {
+        get
+        {
+            ThrowIfDisposed();
+            return _entityRuleFailed;
+        }
+        set
+        {
+            ThrowIfDisposed();
+            _entityRuleFailed = value;
+        }
+    }
+
+    private readonly List<IEntityRule> _entityRules = new();
+
+    internal PickupElementComponent(Pickup pickup)
+    {
+        _pickup = pickup;
+        _pickup.RespawnTime = 500;
+    }
+
+    public void AddRule(IEntityRule entityRule)
+    {
+        ThrowIfDisposed();
+
+        _entityRules.Add(entityRule);
+    }
+
+    public void AddRule<TEntityRole>() where TEntityRole : IEntityRule, new()
+    {
+        ThrowIfDisposed();
+
+        _entityRules.Add(new TEntityRole());
+    }
+
+    private void HandleElementEntered(Element element)
+    {
+        if (EntityEntered == null)
+            return;
+
+        if (!ECS.TryGetByElement(element, out var entity))
+            return;
+
+        if (entity.Tag != EntityTag.Player && entity.Tag != EntityTag.Vehicle)
+            return;
+
+        foreach (var rule in _entityRules)
+        {
+            bool success;
+            try
+            {
+                success = rule.Check(entity);
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError(ex, "Failed to invoke check role");
+                break;
+            }
+
+            if (!rule.Check(entity))
+            {
+                try
+                {
+                    EntityRuleFailed?.Invoke(entity, rule);
+                }
+                catch (Exception ex)
+                {
+                    Logger.LogError(ex, "Failed to invoke entity failed callback");
+                }
+                return;
+            }
+        }
+        try
+        {
+            EntityEntered(entity);
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Failed to invoke entity entered callback");
+        }
+    }
+
+    private void HandleElementLeft(Element element)
+    {
+        if (EntityLeft == null)
+            return;
+
+        if (!ECS.TryGetByElement(element, out var entity))
+            return;
+
+        if (entity.Tag != EntityTag.Player && entity.Tag != EntityTag.Vehicle)
+            return;
+
+        try
+        {
+            if (!_entityRules.All(x => x.Check(entity)))
+                return;
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Failed to invoke check role");
+        }
+
+        try
+        {
+            EntityLeft(entity);
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Failed to invoke entity left callback");
+        }
+    }
+
+    private void HandleDestroyed(Entity entity)
+    {
+        _pickup.CollisionShape.ElementEntered -= HandleElementEntered;
+        _pickup.CollisionShape.ElementLeft -= HandleElementLeft;
+        _pickup.CollisionShape.Destroy();
+    }
+
+    protected override void Load()
+    {
+        base.Load();
+        Entity.Disposed += HandleDestroyed;
+        _pickup.CollisionShape.ElementEntered += HandleElementEntered;
+        _pickup.CollisionShape.ElementLeft += HandleElementLeft;
+        _pickup.CollisionShape.Position = _pickup.Position;
+        Entity.Transform.PositionChanged += HandlePositionChanged;
+    }
+
+    private void HandlePositionChanged(Transform transform)
+    {
+        _pickup.CollisionShape.Position = transform.Position;
+    }
+
+    public override void Dispose()
+    {
+        _entityEntered = null;
+        _entityLeft = null;
+        _entityRuleFailed = null;
+        Entity.Transform.PositionChanged -= HandlePositionChanged;
+    }
+}

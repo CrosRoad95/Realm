@@ -7,8 +7,8 @@ public class BanService : IBanService
     private readonly IBanRepository _banRepository;
     private readonly IDateTimeProvider _dateTimeProvider;
 
-    public event Action<Ban>? BanAdded;
-    public event Action<Ban>? BanRemoved;
+    public event Action<BanData>? BanAdded;
+    public event Action<BanData>? BanRemoved;
     public BanService(IBanRepository banRepository, IDateTimeProvider dateTimeProvider)
     {
         _banRepository = banRepository;
@@ -27,15 +27,15 @@ public class BanService : IBanService
         await _banRepository.Commit();
     }
 
-    public async Task RemoveBan(Ban ban)
+    public async Task RemoveBan(BanData ban)
     {
         _banRepository.RemoveBan(ban);
         await _banRepository.Commit();
     }
 
-    public Task<List<Ban>> GetBansBySerial(string serial) => _banRepository.GetBansBySerial(serial, _dateTimeProvider);
+    public Task<List<BanData>> GetBansBySerial(string serial) => _banRepository.GetBansBySerial(serial, _dateTimeProvider.Now);
 
-    public Task<List<Ban>> GetBansByUserId(int userId) => _banRepository.GetBansByUserId(userId, _dateTimeProvider);
+    public Task<List<BanData>> GetBansByUserId(int userId) => _banRepository.GetBansByUserId(userId, _dateTimeProvider.Now);
     
-    public Task<Ban?> GetBanBySerialAndBanType(string serial, int banType) => _banRepository.GetBanBySerialAndBanType(serial, banType, _dateTimeProvider);
+    public Task<BanData?> GetBanBySerialAndBanType(string serial, int banType) => _banRepository.GetBanBySerialAndBanType(serial, banType, _dateTimeProvider.Now);
 }

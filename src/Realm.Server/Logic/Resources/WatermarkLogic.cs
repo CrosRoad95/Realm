@@ -1,5 +1,5 @@
 ﻿using Microsoft.Extensions.Options;
-using Realm.Domain.Options;
+using Realm.Server.Options;
 using SlipeServer.Resources.Watermark;
 
 namespace Realm.Server.Logic.Resources;

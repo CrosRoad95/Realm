@@ -1,5 +1,4 @@
 ﻿using Realm.Logging;
-using SlipeServer.Server.Concepts;
 using System.Diagnostics;
 
 namespace Realm.Server.Services;
@@ -75,7 +74,7 @@ public class RPGCommandService
         return true;
     }
 
-    private async void HandleTriggered(object? sender, SlipeServer.Server.Events.CommandTriggeredEventArgs args)
+    private async void HandleTriggered(object? sender, CommandTriggeredEventArgs args)
     {
         try
         {
@@ -134,7 +133,7 @@ public class RPGCommandService
         }
     }
 
-    private async void HandleAsyncTriggered(object? sender, SlipeServer.Server.Events.CommandTriggeredEventArgs args)
+    private async void HandleAsyncTriggered(object? sender, CommandTriggeredEventArgs args)
     {
         try
         {

@@ -1,4 +1,4 @@
-﻿using Realm.Domain.Data.VehicleUpgrades;
+﻿using Realm.Server.Concepts.Upgrades;
 
 namespace Realm.Console.Logic;
 

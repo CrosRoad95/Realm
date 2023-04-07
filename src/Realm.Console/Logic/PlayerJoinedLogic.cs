@@ -1,7 +1,7 @@
-﻿using Realm.Domain.Components;
-using Realm.Domain.Components.Peds;
-using Realm.Domain.Enums;
+﻿using Realm.Server.Components.Peds;
 using Realm.Resources.Nametags;
+using Realm.Server.Components;
+using Realm.Server.Enums;
 using Realm.Server.Extensions;
 
 namespace Realm.Console.Logic;

@@ -1,5 +1,5 @@
-﻿using Realm.Domain.Contexts;
-using Realm.Domain.Inventory;
+﻿using Realm.Server.Contexts.Interfaces;
+using Realm.Server.Inventory;
 
 namespace Realm.Console.Components.Gui;
 

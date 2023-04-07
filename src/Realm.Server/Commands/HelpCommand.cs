@@ -1,6 +1,4 @@
-﻿using System.Reflection;
-
-namespace Realm.Server.Commands;
+﻿namespace Realm.Server.Commands;
 
 [CommandName("help")]
 internal class HelpCommand : ICommand

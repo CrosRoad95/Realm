@@ -1,4 +1,4 @@
-﻿using Realm.Domain.Contexts;
+﻿using Realm.Server.Contexts.Interfaces;
 
 namespace Realm.Console.Components.Gui;
 

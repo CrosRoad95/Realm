@@ -1,8 +1,7 @@
-﻿using Realm.Domain.Enums;
-using static Realm.Persistance.Data.Helpers.VehicleDamageState;
+﻿using static Realm.Persistance.Data.Helpers.VehicleDamageState;
 using static Realm.Persistance.Data.Helpers.VehicleWheelStatus;
-using JobUpgrade = Realm.Persistance.Data.JobUpgrade;
-using VehiclePlayerAccess = Realm.Persistance.Data.VehicleUserAccess;
+using JobUpgradeData = Realm.Persistance.Data.JobUpgradeData;
+using VehiclePlayerAccess = Realm.Persistance.Data.VehicleUserAccessData;
 
 namespace Realm.Server.Services;
 
@@ -89,7 +88,7 @@ internal class SaveService : ISaveService
 
         if (entity.TryGetComponent(out VehicleUpgradesComponent vehicleUpgradesComponent))
         {
-            vehicleData.Upgrades = vehicleUpgradesComponent.Upgrades.Select(x => new Persistance.Data.VehicleUpgrade
+            vehicleData.Upgrades = vehicleUpgradesComponent.Upgrades.Select(x => new VehicleUpgradeData
             {
                 UpgradeId = x,
                 VehicleId = vehicleData.Id
@@ -100,7 +99,7 @@ internal class SaveService : ISaveService
 
         {
             var fuelComponents = entity.Components.OfType<VehicleFuelComponent>();
-            vehicleData.Fuels = fuelComponents.Select(x => new VehicleFuel
+            vehicleData.Fuels = fuelComponents.Select(x => new VehicleFuelData
             {
                 VehicleId = vehicleData.Id,
                 FuelType = x.FuelType,
@@ -117,12 +116,12 @@ internal class SaveService : ISaveService
         }
         if (entity.TryGetComponent(out VehiclePartDamageComponent vehiclePartDamageComponent))
         {
-            List<VehiclePartDamage> vehiclePartDamages = new();
+            List<VehiclePartDamageData> vehiclePartDamages = new();
             foreach (var item in vehiclePartDamageComponent.Parts)
             {
                 var state = vehiclePartDamageComponent.Get(item);
                 if(state != null)
-                    vehiclePartDamages.Add(new VehiclePartDamage
+                    vehiclePartDamages.Add(new VehiclePartDamageData
                     {
                         PartId = item,
                         State = state.Value
@@ -133,7 +132,7 @@ internal class SaveService : ISaveService
 
         if(entity.TryGetComponent(out VehicleEngineComponent vehicleEngineComponent))
         {
-            vehicleData.VehicleEngines = vehicleEngineComponent.VehicleEngineIds.Select(x => new VehicleEngine
+            vehicleData.VehicleEngines = vehicleEngineComponent.VehicleEngineIds.Select(x => new VehicleEngineData
             {
                 EngineId = (short)x,
                 Selected = x == vehicleEngineComponent.ActiveVehicleEngineId
@@ -154,12 +153,12 @@ internal class SaveService : ISaveService
                 }
             }
             else
-            vehicleData.Inventories = new List<Inventory>();
+            vehicleData.Inventories = new List<InventoryData>();
     }
 
-    private Inventory MapInventory(InventoryComponent inventoryComponent)
+    private InventoryData MapInventory(InventoryComponent inventoryComponent)
     {
-        var inventory = new Inventory
+        var inventory = new InventoryData
         {
             Size = inventoryComponent.Size,
             Id = inventoryComponent.Id,
@@ -168,9 +167,9 @@ internal class SaveService : ISaveService
         return inventory;
     }
 
-    private List<InventoryItem> MapItems(InventoryComponent inventoryComponent)
+    private List<InventoryItemData> MapItems(InventoryComponent inventoryComponent)
     {
-        var items = inventoryComponent.Items.Select(item => new InventoryItem
+        var items = inventoryComponent.Items.Select(item => new InventoryItemData
         {
             Id = item.Id,
             ItemId = item.ItemId,
@@ -184,7 +183,7 @@ internal class SaveService : ISaveService
     public async Task<int> SaveNewPlayerInventory(InventoryComponent inventoryComponent, int userId)
     {
         var inventory = MapInventory(inventoryComponent);
-        _dbContext.UserInventories.Add(new UserInventory
+        _dbContext.UserInventories.Add(new UserInventoryData
         {
             Inventory = inventory,
             UserId = userId
@@ -196,7 +195,7 @@ internal class SaveService : ISaveService
     public async Task<int> SaveNewVehicleInventory(InventoryComponent inventoryComponent, int vehicleId)
     {
         var inventory = MapInventory(inventoryComponent);
-        _dbContext.VehicleInventories.Add(new VehicleInventory
+        _dbContext.VehicleInventories.Add(new VehicleInventoryData
         {
             Inventory = inventory,
             VehicleId = vehicleId
@@ -214,12 +213,12 @@ internal class SaveService : ISaveService
             .IncludeAll()
             .Where(x => x.Id == userComponent.Id).FirstAsync();
 
-        user.Upgrades = userComponent.Upgrades.Select(x => new UserUpgrade
+        user.Upgrades = userComponent.Upgrades.Select(x => new UserUpgradeData
         {
             UpgradeId = x
         }).ToList();
         
-        user.Settings = userComponent.Settings.Select(x => new UserSetting
+        user.Settings = userComponent.Settings.Select(x => new UserSettingData
         {
             SettingId = x,
             Value = userComponent.GetSetting(x) ?? ""
@@ -235,7 +234,7 @@ internal class SaveService : ISaveService
             
         if (entity.TryGetComponent(out LicensesComponent licensesComponent))
         {
-            user.Licenses = licensesComponent.Licenses.Select(x => new UserLicense
+            user.Licenses = licensesComponent.Licenses.Select(x => new UserLicenseData
             {
                 LicenseId = x.licenseId,
                 SuspendedReason = x.suspendedReason,
@@ -244,7 +243,7 @@ internal class SaveService : ISaveService
         }
         else
         {
-            user.Licenses = new List<UserLicense>();
+            user.Licenses = new List<UserLicenseData>();
         }
 
         if (entity.TryGetComponent(out PlayTimeComponent playTimeComponent))
@@ -269,12 +268,12 @@ internal class SaveService : ISaveService
             }
         }
         else
-            user.Inventories = new List<Inventory>();
+            user.Inventories = new List<InventoryData>();
 
 
         if (entity.TryGetComponent(out DailyVisitsCounterComponent dailyVisitsCounterComponent))
         {
-            user.DailyVisits = new DailyVisits
+            user.DailyVisits = new DailyVisitsData
             {
                 LastVisit = dailyVisitsCounterComponent.LastVisit,
                 VisitsInRow = dailyVisitsCounterComponent.VisitsInRow,
@@ -286,7 +285,7 @@ internal class SaveService : ISaveService
 
         if (entity.TryGetComponent(out StatisticsCounterComponent statisticsCounterComponent))
         {
-            user.Stats = statisticsCounterComponent.GetStatsIds.Select(x => new UserStat
+            user.Stats = statisticsCounterComponent.GetStatsIds.Select(x => new UserStatData
             {
                 StatId = x,
                 Value = statisticsCounterComponent.GetStat(x)
@@ -294,11 +293,11 @@ internal class SaveService : ISaveService
             _dbContext.UserStats.AddRange(user.Stats);
         }
         else
-            user.Stats = new List<UserStat>();
+            user.Stats = new List<UserStatData>();
 
         if (entity.TryGetComponent(out AchievementsComponent achievementsComponent))
         {
-            user.Achievements = achievementsComponent.Achievements.Select(x => new Persistance.Data.Achievement
+            user.Achievements = achievementsComponent.Achievements.Select(x => new AchievementData
             {
                 AchievementId = x.Key,
                 Value = JsonConvert.SerializeObject(x.Value.value, Formatting.None),
@@ -307,18 +306,18 @@ internal class SaveService : ISaveService
             }).ToList();
         }
         else
-            user.Achievements = new List<Persistance.Data.Achievement>();
+            user.Achievements = new List<AchievementData>();
 
         if (entity.TryGetComponent(out JobUpgradesComponent jobUpgradesComponent))
         {
-            user.JobUpgrades = jobUpgradesComponent.Upgrades.Select(x => new JobUpgrade
+            user.JobUpgrades = jobUpgradesComponent.Upgrades.Select(x => new JobUpgradeData
             {
                 JobId = x.jobId,
                 UpgradeId = x.upgradeId,
             }).ToList();
         }
         else
-            user.JobUpgrades = new List<JobUpgrade>();
+            user.JobUpgrades = new List<JobUpgradeData>();
 
         if (entity.TryGetComponent(out JobStatisticsComponent jobStatisticsComponent))
         {
@@ -328,7 +327,7 @@ internal class SaveService : ISaveService
                 var first = user.JobStatistics.FirstOrDefault(x => x.JobId == item.Value.jobId && x.Date == jobStatisticsComponent.Date);
                 if (first == null)
                 {
-                    user.JobStatistics.Add(new Persistance.Data.JobStatistics
+                    user.JobStatistics.Add(new JobStatisticsData
                     {
                         Date = jobStatisticsComponent.Date,
                         JobId = item.Key,
@@ -345,11 +344,11 @@ internal class SaveService : ISaveService
             jobStatisticsComponent.Reset();
         }
         else
-            user.JobStatistics = new List<Persistance.Data.JobStatistics>();
+            user.JobStatistics = new List<JobStatisticsData>();
 
         if (entity.TryGetComponent(out DiscoveriesComponent discoveriesComponent))
         {
-            user.Discoveries = discoveriesComponent.Discoveries.Select(x => new Discovery
+            user.Discoveries = discoveriesComponent.Discoveries.Select(x => new DiscoveryData
             {
                 DiscoveryId = x,
             }).ToList();
@@ -368,7 +367,7 @@ internal class SaveService : ISaveService
 
         if(entity.TryGetComponent(out DiscordIntegrationComponent discordIntegrationComponent))
         {
-            user.DiscordIntegration = new DiscordIntegration
+            user.DiscordIntegration = new DiscordIntegrationData
             {
                 DiscordUserId = discordIntegrationComponent.DiscordUserId
             };

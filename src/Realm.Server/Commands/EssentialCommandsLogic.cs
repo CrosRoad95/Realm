@@ -1,6 +1,4 @@
-﻿using System.Reflection;
-
-namespace Realm.Server.Commands;
+﻿namespace Realm.Server.Commands;
 
 internal class EssentialCommandsLogic
 {

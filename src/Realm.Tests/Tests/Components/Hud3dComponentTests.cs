@@ -1,6 +1,6 @@
-﻿using Realm.Domain.Enums;
-using Realm.Resources.Assets;
+﻿using Realm.Resources.Assets;
 using Realm.Resources.Overlay;
+using Realm.Server.Enums;
 using SixLabors.ImageSharp;
 using SlipeServer.Packets.Definitions.Lua;
 using System.Numerics;

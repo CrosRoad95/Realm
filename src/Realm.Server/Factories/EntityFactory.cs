@@ -1,8 +1,4 @@
-﻿using Realm.Domain.Components.Elements.CollisionShapes;
-using Realm.Domain.Enums;
-using Realm.Persistance.Interfaces;
-using SlipeServer.Server.Elements.ColShapes;
-using SlipeServer.Server.Elements.Enums;
+﻿using Realm.Persistance.Interfaces;
 using SlipeServer.Server.Enums;
 using Vehicle = SlipeServer.Server.Elements.Vehicle;
 
@@ -13,12 +9,14 @@ internal class EntityFactory : IEntityFactory
     private readonly IECS _ecs;
     private readonly IVehicleRepository _vehicleRepository;
     private readonly RPGServer _rpgServer;
+    private readonly IDateTimeProvider _dateTimeProvider;
 
-    public EntityFactory(IECS ecs, IVehicleRepository vehicleRepository, RPGServer rpgServer)
+    public EntityFactory(IECS ecs, IVehicleRepository vehicleRepository, RPGServer rpgServer, IDateTimeProvider dateTimeProvider)
     {
         _ecs = ecs;
         _vehicleRepository = vehicleRepository;
         _rpgServer = rpgServer;
+        _dateTimeProvider = dateTimeProvider;
     }
 
     private void AssociateWithServer(Entity entity)
@@ -115,7 +113,7 @@ internal class EntityFactory : IEntityFactory
             entityBuilder?.Invoke(entity);
         });
 
-        vehicleEntity.AddComponent(new PrivateVehicleComponent(await _vehicleRepository.CreateNewVehicle(model)));
+        vehicleEntity.AddComponent(new PrivateVehicleComponent(await _vehicleRepository.CreateNewVehicle(model, _dateTimeProvider.Now)));
 
         return vehicleEntity;
     }
@@ -194,7 +192,7 @@ internal class EntityFactory : IEntityFactory
         return blipElementComponent;
     }
 
-    public Entity CreateRadarArea(Vector2 position, Vector2 size, System.Drawing.Color color, ConstructionInfo? constructionInfo = null, Action<Entity>? entityBuilder = null)
+    public Entity CreateRadarArea(Vector2 position, Vector2 size, Color color, ConstructionInfo? constructionInfo = null, Action<Entity>? entityBuilder = null)
     {
         var blipEntity = _ecs.CreateEntity(constructionInfo?.Id ?? $"radarArea {Guid.NewGuid()}", EntityTag.RadarArea, entity =>
         {
@@ -214,7 +212,7 @@ internal class EntityFactory : IEntityFactory
         return blipEntity;
     }
 
-    public PlayerPrivateElementComponent<RadarAreaElementComponent> CreateRadarAreaFor(Entity playerEntity, Vector2 position, Vector2 size, System.Drawing.Color color)
+    public PlayerPrivateElementComponent<RadarAreaElementComponent> CreateRadarAreaFor(Entity playerEntity, Vector2 position, Vector2 size, Color color)
     {
         if (playerEntity.Tag != EntityTag.Player)
             throw new ArgumentException("Entity must be a player entity");
@@ -238,7 +236,7 @@ internal class EntityFactory : IEntityFactory
         return collisionSphereElementComponent;
     }
 
-    public PlayerPrivateElementComponent<MarkerElementComponent> CreateMarkerFor(Entity playerEntity, Vector3 position, MarkerType markerType, System.Drawing.Color? color = null)
+    public PlayerPrivateElementComponent<MarkerElementComponent> CreateMarkerFor(Entity playerEntity, Vector3 position, MarkerType markerType, Color? color = null)
     {
         if (playerEntity.Tag != EntityTag.Player)
             throw new ArgumentException("Entity must be a player entity");

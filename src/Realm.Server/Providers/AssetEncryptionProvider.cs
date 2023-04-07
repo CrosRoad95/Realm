@@ -1,5 +1,5 @@
 ﻿using Microsoft.Extensions.Options;
-using Realm.Domain.Options;
+using Realm.Server.Options;
 using Realm.Server.Security.Cryptography;
 
 namespace Realm.Server.Providers;

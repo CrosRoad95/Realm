@@ -1,5 +1,5 @@
-﻿using Realm.Domain.Components;
-using Realm.Domain.Enums;
+﻿using Realm.Server.Components;
+using Realm.Server.Enums;
 
 namespace Realm.Console.Logic;
 

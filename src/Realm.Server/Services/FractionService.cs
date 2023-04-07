@@ -1,7 +1,6 @@
-﻿using Realm.Domain.Exceptions;
-using Realm.Persistance.Interfaces;
-using Fraction = Realm.Domain.Concepts.Fraction;
-using FractionMember = Realm.Domain.Concepts.FractionMember;
+﻿using Realm.Persistance.Interfaces;
+using Fraction = Realm.Server.Concepts.Fraction;
+using FractionMember = Realm.Server.Concepts.FractionMember;
 
 namespace Realm.Server.Services;
 

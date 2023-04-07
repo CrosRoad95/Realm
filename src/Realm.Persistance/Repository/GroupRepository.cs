@@ -11,13 +11,13 @@ internal class GroupRepository : IGroupRepository
         _db = db;
     }
 
-    public Task<Group?> GetGroupByName(string groupName) => _db.Groups
+    public Task<GroupData?> GetGroupByName(string groupName) => _db.Groups
         .TagWithSource(nameof(GroupRepository))
         .Include(x => x.Members)
         .Where(x => x.Name == groupName)
         .FirstOrDefaultAsync();
     
-    public Task<Group?> GetGroupByNameOrShortcut(string groupName, string shortcut) => _db.Groups
+    public Task<GroupData?> GetGroupByNameOrShortcut(string groupName, string shortcut) => _db.Groups
         .TagWithSource(nameof(GroupRepository))
         .Include(x => x.Members)
         .Where(x => x.Name == groupName || x.Shortcut == shortcut)
@@ -47,9 +47,9 @@ internal class GroupRepository : IGroupRepository
         .Select(x => x.Id)
         .FirstOrDefaultAsync();
 
-    public async Task<Group> CreateNewGroup(string groupName, string shortcut, byte kind = 1)
+    public async Task<GroupData> CreateNewGroup(string groupName, string shortcut, byte kind = 1)
     {
-        var group = new Group
+        var group = new GroupData
         {
             Name = groupName,
             Shortcut = shortcut,
@@ -60,9 +60,9 @@ internal class GroupRepository : IGroupRepository
         return group;
     }
 
-    public async Task<GroupMember> CreateNewGroupMember(int groupId, int userId, int rank = 1, string rankName = "")
+    public async Task<GroupMemberData> CreateNewGroupMember(int groupId, int userId, int rank = 1, string rankName = "")
     {
-        var groupMember = new GroupMember
+        var groupMember = new GroupMemberData
         {
             GroupId = groupId,
             UserId = userId,
@@ -74,7 +74,7 @@ internal class GroupRepository : IGroupRepository
         return groupMember;
     }
 
-    public async Task<GroupMember> CreateNewGroupMember(string groupName, int userId, int rank = 1, string rankName = "")
+    public async Task<GroupMemberData> CreateNewGroupMember(string groupName, int userId, int rank = 1, string rankName = "")
     {
         var groupId = await GetGroupIdByName(groupName);
         if (groupId == 0)

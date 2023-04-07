@@ -1,5 +1,5 @@
-﻿using Realm.Domain.Components.Elements;
-using Realm.Domain.Enums;
+﻿using Realm.Server.Components.Elements;
+using Realm.Server.Enums;
 using System.Numerics;
 
 namespace Realm.Tests.Helpers;
@@ -21,7 +21,7 @@ internal class EntityHelper
         var entity = new Entity(_serviceProvider, Guid.NewGuid().ToString()[..8], EntityTag.Player);
         var player = _testingServer.AddFakePlayer();
         player.TriggerResourceStarted(420);
-        entity.AddComponent(new PlayerElementComponent(player, new System.Numerics.Vector2(1920, 1080), new System.Globalization.CultureInfo("pl-PL")));
+        entity.AddComponent(new PlayerElementComponent(player, new Vector2(1920, 1080), new System.Globalization.CultureInfo("pl-PL")));
 
         return entity;
     }

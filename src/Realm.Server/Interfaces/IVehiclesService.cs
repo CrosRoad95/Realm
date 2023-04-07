@@ -7,7 +7,7 @@ public interface IVehiclesService
     Task<Entity> ConvertToPrivateVehicle(Entity vehicleEntity);
     Task Despawn(Entity entity);
     Task<List<LightInfoVehicleDTO>> GetLightVehiclesByUserId(int userId);
-    Task<List<Persistance.Data.Vehicle>> GetVehiclesByUserId(int userId);
+    Task<List<VehicleData>> GetVehiclesByUserId(int userId);
     Task<Entity?> SpawnById(int id);
-    internal Entity Spawn(Persistance.Data.Vehicle vehicleData);
+    internal Entity Spawn(VehicleData vehicleData);
 }

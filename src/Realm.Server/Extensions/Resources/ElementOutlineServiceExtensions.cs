@@ -1,6 +1,4 @@
-﻿using System.Drawing;
-
-namespace Realm.Server.Extensions.Resources;
+﻿namespace Realm.Server.Extensions.Resources;
 
 public static class ElementOutlineServiceExtensions
 {
