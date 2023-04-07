@@ -1,5 +1,4 @@
-﻿using Realm.Resources.Nametags;
-using System.Drawing;
+﻿using System.Drawing;
 
 namespace Realm.Server.Extensions.Resources;
 

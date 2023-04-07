@@ -9,6 +9,7 @@ internal class EntityHelper
     private readonly IServiceProvider _serviceProvider;
     private readonly TestingServer _testingServer;
 
+
     public EntityHelper(TestingServer testingServer)
     {
         _testingServer = testingServer;
@@ -19,16 +20,8 @@ internal class EntityHelper
     {
         var entity = new Entity(_serviceProvider, Guid.NewGuid().ToString()[..8], EntityTag.Player);
         var player = _testingServer.AddFakePlayer();
-
+        player.TriggerResourceStarted(420);
         entity.AddComponent(new PlayerElementComponent(player, new System.Numerics.Vector2(1920, 1080), new System.Globalization.CultureInfo("pl-PL")));
-
-        Task.Run(async () =>
-        {
-            await Task.Delay(30000);
-            for (ushort i = 0; i < ushort.MaxValue; i++)
-                player.TriggerResourceStarted(i);
-
-        });
 
         return entity;
     }

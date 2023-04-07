@@ -1,6 +1,4 @@
-﻿using Realm.Domain.Inventory;
-
-namespace Realm.Domain.Components.Common;
+﻿namespace Realm.Domain.Components.Common;
 
 [ComponentUsage(true)]
 public class InventoryComponent : Component

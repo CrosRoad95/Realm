@@ -7,10 +7,7 @@ public class AttachedEntityComponentTests
 
     public AttachedEntityComponentTests()
     {
-        _server = new(new(), new(5020), services =>
-        {
-
-        });
+        _server = new();
         _entityHelper = new(_server);
     }
 

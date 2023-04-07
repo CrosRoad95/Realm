@@ -70,7 +70,6 @@ global using Realm.Server.Logic.Registries;
 global using Realm.Server.Security;
 global using SlipeServer.Server.Elements.IdGeneration;
 global using SlipeServer.Server.Loggers;
-global using Realm.Server.Extensions.Resources;
 
 [assembly: InternalsVisibleTo("Realm.Tests")]
 [assembly: InternalsVisibleTo("DynamicProxyGenAssembly2")]

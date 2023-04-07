@@ -11,7 +11,7 @@ public class PlayerElementComponentTests
 
     public PlayerElementComponentTests()
     {
-        _server = new(new(), new(5010));
+        _server = new();
         _entityHelper = new(_server);
     }
 

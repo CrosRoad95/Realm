@@ -1,10 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
 using Realm.Resources.Base;
-using SlipeServer.Packets.Definitions.Lua;
 using SlipeServer.Server;
 using SlipeServer.Server.Elements;
-using SlipeServer.Server.Mappers;
-using SlipeServer.Server.Services;
 using System.Drawing;
 
 namespace Realm.Resources.ElementOutline;

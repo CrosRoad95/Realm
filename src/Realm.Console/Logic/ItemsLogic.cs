@@ -1,7 +1,6 @@
 ﻿using Realm.Domain.Components;
 using Realm.Domain.Enums;
 using Realm.Domain.Inventory;
-using SlipeServer.Server.Elements.Structs;
 using SlipeServer.Server.Enums;
 
 namespace Realm.Console.Logic;

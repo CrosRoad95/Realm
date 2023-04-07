@@ -11,7 +11,7 @@ public class SignInServiceTests
 
     public SignInServiceTests()
     {
-        _realmTestingServer = new(new(), new(5000));
+        _realmTestingServer = new();
         _entityHelper = new(_realmTestingServer);
 
         _signInService = _realmTestingServer.GetRequiredService<IUsersService>();

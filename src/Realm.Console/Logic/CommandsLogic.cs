@@ -20,7 +20,6 @@ using SlipeServer.Server.Enums;
 using Realm.Resources.ElementOutline;
 using Realm.Server.Extensions.Resources;
 using Realm.Domain.Components.World;
-using Realm.Domain;
 
 namespace Realm.Console.Logic;
 

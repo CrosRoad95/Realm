@@ -1,5 +1,4 @@
 ﻿using Realm.Domain.Components;
-using Realm.Domain.Components.Common;
 
 namespace Realm.Server.Logic.Resources;
 
