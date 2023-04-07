@@ -1,0 +1,28 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net7.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="Lua\displays.lua" />
+    <None Remove="Lua\utility.lua" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Lua\displays.lua" />
+    <EmbeddedResource Include="Lua\notifications.lua" />
+    <EmbeddedResource Include="Lua\hud.lua">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Lua\utility.lua" />
+  </ItemGroup>
+
+
+	<ItemGroup>
+		<ProjectReference Include="..\RealmCore.Resources.Assets\RealmCore.Resources.Assets.csproj" />
+        <ProjectReference Include="..\RealmCore.Resources.Base\RealmCore.Resources.Base.csproj" />
+	</ItemGroup>
+</Project>

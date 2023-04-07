@@ -1,0 +1,26 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net7.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+	<LangVersion>preview</LangVersion>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="Lua\utilities.lua" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Lua\cegui.lua" />
+    <EmbeddedResource Include="Lua\controller.lua" />
+    <EmbeddedResource Include="Lua\utilities.lua" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\RealmCore.Interfaces\RealmCore.Interfaces.csproj" />
+    <ProjectReference Include="..\RealmCore.Resources.Addons.AgnosticGuiSystem.DGSProvider\RealmCore.Resources.Addons.AgnosticGuiSystem.DGSProvider.csproj" />
+	<ProjectReference Include="..\RealmCore.Resources.Base\RealmCore.Resources.Base.csproj" />
+  </ItemGroup>
+
+</Project>

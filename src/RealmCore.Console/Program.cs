@@ -1,0 +1,83 @@
+﻿using RealmCore.Server.Extensions;
+using RealmCore.Console.Commands;
+using RealmCore.Console.Utilities;
+using RealmCore.Module.Discord.Interfaces;
+using RealmCore.Server.Integrations.Discord.Handlers;
+using RealmCore.Server.Logic;
+using RealmCore.Server.Logic.Defaults;
+
+Directory.SetCurrentDirectory(Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly()!.Location)!);
+
+var builder = new RPGServerBuilder();
+builder.AddDefaultLogger()
+    .AddDefaultConsole()
+    .AddDefaultConfiguration();
+
+SemaphoreSlim semaphore = new(0);
+
+var server = builder.Build(null, extraBuilderSteps: serverBuilder =>
+{
+    serverBuilder.AddLogic<DefaultCommandsLogic>();
+
+    serverBuilder.AddLogic<PlayerJoinedLogic>();
+    serverBuilder.AddLogic<SamplePickupsLogic>();
+    serverBuilder.AddLogic<PlayerBindsLogic>();
+    serverBuilder.AddLogic<ItemsLogic>();
+    serverBuilder.AddLogic<VehicleUpgradesLogic>();
+    serverBuilder.AddLogic<AchievementsLogic>();
+    serverBuilder.AddLogic<WorldLogic>();
+    serverBuilder.AddLogic<LevelsLogic>();
+    serverBuilder.AddLogic<PlayerGameplayLogic>();
+    serverBuilder.AddLogic<DiscordIntegrationLogic>();
+    serverBuilder.AddLogic<CommandsLogic>();
+    serverBuilder.AddLogic<MapsLogic>();
+    serverBuilder.AddLogic<DefaultModulesLogic>();
+    serverBuilder.AddLogic<ProceduralObjectsLogic>();
+    serverBuilder.AddLogic<AssetsLogic>();
+    serverBuilder.AddLogic<DefaultBanLogic>();
+#if DEBUG
+    serverBuilder.AddLogic<HotReloadLogic>("../../../Server/Gui");
+#endif
+    serverBuilder.ConfigureServices(x =>
+    {
+        #region Discord integration specific
+        x.AddSingleton<IDiscordStatusChannelUpdateHandler, DefaultDiscordStatusChannelUpdateHandler>();
+        x.AddSingleton<IDiscordConnectUserHandler, DefaultDiscordConnectUserHandler>();
+        x.AddSingleton<IDiscordPrivateMessageReceived, DefaultDiscordPrivateMessageReceivedHandler>();
+        x.AddSingleton<IDiscordTextBasedCommandHandler, DefaultTextBasedCommandHandler>();
+        #endregion
+
+        #region In game command
+        x.AddInGameCommand<CreateGroupCommand>();
+        x.AddInGameCommand<GiveItemCommand>();
+        x.AddInGameCommand<GiveLicenseCommand>();
+        x.AddInGameCommand<GPCommand>();
+        x.AddInGameCommand<InventoryCommand>();
+        x.AddInGameCommand<LicensesCommand>();
+        x.AddInGameCommand<TakeItemCommand>();
+        x.AddInGameCommand<AddPointsCommand>();
+        x.AddInGameCommand<JobsStatsCommand>();
+        x.AddInGameCommand<JobsStatsAllCommand>();
+        x.AddInGameCommand<GiveRewardCommand>();
+        x.AddInGameCommand<Display3dRing>();
+        x.AddInGameCommand<CurrencyCommand>();
+        #endregion
+    });
+});
+
+Console.CancelKeyPress += (sender, args) =>
+{
+    try
+    {
+        server.Stop().Wait();
+    }
+    finally
+    {
+        semaphore.Release();
+    }
+};
+
+await server.Start();
+server.GetRequiredService<IConsole>().Start();
+await semaphore.WaitAsync();
+Console.WriteLine("Server stopped.");
