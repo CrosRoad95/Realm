@@ -17,7 +17,7 @@ public sealed class Text3dComponent : Component
 
     protected override void Load()
     {
-        _text3dId = Text3dService.CreateText3d(Entity.Transform.Position + _offset ?? Vector3.Zero, _text);
+        _text3dId = Text3dService.CreateText3d(Entity.Transform.Position + (_offset ?? Vector3.Zero), _text);
     }
 
     public override void Dispose()

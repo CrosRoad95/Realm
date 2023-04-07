@@ -19,6 +19,8 @@ using Realm.Domain.Components.Peds;
 using SlipeServer.Server.Enums;
 using Realm.Resources.ElementOutline;
 using Realm.Server.Extensions.Resources;
+using Realm.Domain.Components.World;
+using Realm.Domain;
 
 namespace Realm.Console.Logic;
 
@@ -768,6 +770,13 @@ internal sealed class CommandsLogic
         _commandService.AddCommandHandler("addinvalidguicomponent", (entity, args) =>
         {
             entity.AddComponent<InvalidGuiComponent>();
+        });
+
+        _commandService.AddCommandHandler("text3dcomp", (entity, args) =>
+        {
+            var markerEntity = entityFactory.CreateMarker(MarkerType.Arrow, entity.Transform.Position);
+            markerEntity.AddComponent(new Text3dComponent("test1"));
+            markerEntity.AddComponent(new Text3dComponent("offset z+1", new Vector3(0, 0, 1)));
         });
         
         _commandService.AddAsyncCommandHandler("despawn", async (entity, args) =>
