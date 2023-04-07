@@ -20,10 +20,11 @@ internal class EntityHelper
         var entity = new Entity(_serviceProvider, Guid.NewGuid().ToString()[..8], EntityTag.Player);
         var player = _testingServer.AddFakePlayer();
 
-        for (ushort i = 0; i < 100; i++)
+        entity.AddComponent(new PlayerElementComponent(player, new System.Numerics.Vector2(1920, 1080), new System.Globalization.CultureInfo("pl-PL")));
+
+        for (ushort i = 0; i < ushort.MaxValue; i++)
             player.TriggerResourceStarted(i);
 
-        entity.AddComponent(new PlayerElementComponent(player, new System.Numerics.Vector2(1920, 1080), new System.Globalization.CultureInfo("pl-PL")));
         return entity;
     }
 
