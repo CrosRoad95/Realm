@@ -3,9 +3,9 @@ using SlipeServer.Server.Resources;
 using SlipeServer.Server;
 using RealmCore.Interfaces.Providers;
 
-namespace RealmCore.Resources.AgnosticGuiSystem;
+namespace RealmCore.Resources.GuiSystem;
 
-internal class AgnosticGuiSystemResource : Resource
+internal class GuiSystemResource : Resource
 {
     private readonly IServerFilesProvider _serverFilesProvider;
     internal Dictionary<string, byte[]> AdditionalFiles { get; } = new Dictionary<string, byte[]>()
@@ -15,21 +15,21 @@ internal class AgnosticGuiSystemResource : Resource
         ["ceguiProvider.lua"] = ResourceFiles.CeGuiProvider,
     };
 
-    internal AgnosticGuiSystemResource(MtaServer server, AgnosticGuiSystemOptions agnosticGuiSystemOptions)
-        : base(server, server.GetRequiredService<RootElement>(), "AgnosticGuiSystem")
+    internal GuiSystemResource(MtaServer server, GuiSystemOptions GuiSystemOptions)
+        : base(server, server.GetRequiredService<RootElement>(), "GuiSystem")
     {
         _serverFilesProvider = server.GetRequiredService<IServerFilesProvider>();
         foreach (var (path, content) in AdditionalFiles)
             Files.Add(ResourceFileFactory.FromBytes(content, path));
 
-        foreach (var (path, content) in agnosticGuiSystemOptions._providers)
+        foreach (var (path, content) in GuiSystemOptions._providers)
             if (content != null)
                 Files.Add(ResourceFileFactory.FromBytes(content, path));
 
-        foreach (var (path, content) in agnosticGuiSystemOptions._guis)
+        foreach (var (path, content) in GuiSystemOptions._guis)
             NoClientScripts[$"{Name}/{path}"] = content;
 
-        NoClientScripts[$"{Name}/selectedGuiProvider.lua"] = agnosticGuiSystemOptions._selectedGuiProvider ?? throw new Exception("No gui provider selected");
+        NoClientScripts[$"{Name}/selectedGuiProvider.lua"] = GuiSystemOptions._selectedGuiProvider ?? throw new Exception("No gui provider selected");
 
         UpdateGuiFiles();
     }

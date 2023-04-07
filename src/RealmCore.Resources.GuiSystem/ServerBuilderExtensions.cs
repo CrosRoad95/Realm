@@ -3,13 +3,13 @@ using SlipeServer.Server.ServerBuilders;
 using SlipeServer.Resources.DGS;
 using RealmCore.Resources.Base;
 
-namespace RealmCore.Resources.AgnosticGuiSystem;
+namespace RealmCore.Resources.GuiSystem;
 
 public static class ServerBuilderExtensions
 {
-    public static void AddAgnosticGuiSystemResource(this ServerBuilder builder, Action<AgnosticGuiSystemOptions> optionsBuilder, CommonResourceOptions? commonResourceOptions = null)
+    public static void AddGuiSystemResource(this ServerBuilder builder, Action<GuiSystemOptions> optionsBuilder, CommonResourceOptions? commonResourceOptions = null)
     {
-        var options = new AgnosticGuiSystemOptions();
+        var options = new GuiSystemOptions();
         optionsBuilder(options);
 
         if (!options._providers.Any())
@@ -17,7 +17,7 @@ public static class ServerBuilderExtensions
 
         builder.AddBuildStep(server =>
         {
-            var resource = new AgnosticGuiSystemResource(server, options);
+            var resource = new GuiSystemResource(server, options);
             resource.InjectDGSExportedFunctions();
             if (commonResourceOptions != null)
                 commonResourceOptions.Configure(resource);
@@ -30,9 +30,9 @@ public static class ServerBuilderExtensions
 
         builder.ConfigureServices(services =>
         {
-            services.AddSingleton<IAgnosticGuiSystemService, AgnosticGuiSystemService>();
+            services.AddSingleton<IGuiSystemService, GuiSystemService>();
         });
 
-        builder.AddLogic<AgnosticGuiSystemLogic>();
+        builder.AddLogic<GuiSystemLogic>();
     }
 }

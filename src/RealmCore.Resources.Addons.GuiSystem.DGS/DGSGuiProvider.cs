@@ -1,4 +1,4 @@
-﻿namespace RealmCore.Resources.Addons.AgnosticGuiSystem.DGSProvider;
+﻿namespace RealmCore.Resources.Addons.GuiSystem.DGSProvider;
 
 public static class DGSGuiProvider
 {

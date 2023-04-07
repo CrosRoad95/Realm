@@ -1,19 +1,19 @@
 ﻿using System.Text;
 
-namespace RealmCore.Resources.AgnosticGuiSystem;
+namespace RealmCore.Resources.GuiSystem;
 
-public class AgnosticGuiSystemOptions
+public class GuiSystemOptions
 {
     internal readonly Dictionary<string, byte[]?> _providers = new();
     internal readonly Dictionary<string, byte[]> _guis = new();
     internal byte[]? _selectedGuiProvider = null;
 
-    public AgnosticGuiSystemOptions()
+    public GuiSystemOptions()
     {
         _providers.Add("cegui", null);
 
     }
-    public AgnosticGuiSystemOptions AddGuiProvider(string name, byte[] luaCode)
+    public GuiSystemOptions AddGuiProvider(string name, byte[] luaCode)
     {
         name = $"{name}.lua";
         if (_providers.ContainsKey(name))
@@ -23,7 +23,7 @@ public class AgnosticGuiSystemOptions
         return this;
     }
 
-    public AgnosticGuiSystemOptions SetGuiProvider(string name)
+    public GuiSystemOptions SetGuiProvider(string name)
     {
         if (!_providers.ContainsKey($"{name}.lua"))
             throw new ArgumentException(null, nameof(name));
@@ -32,7 +32,7 @@ public class AgnosticGuiSystemOptions
         return this;
     }
 
-    public AgnosticGuiSystemOptions AddGui(string name, byte[] luaCode)
+    public GuiSystemOptions AddGui(string name, byte[] luaCode)
     {
         if (_guis.ContainsKey(name))
             throw new ArgumentException(null, nameof(name));

@@ -19,7 +19,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\RealmCore.Interfaces\RealmCore.Interfaces.csproj" />
-    <ProjectReference Include="..\RealmCore.Resources.Addons.AgnosticGuiSystem.DGSProvider\RealmCore.Resources.Addons.AgnosticGuiSystem.DGSProvider.csproj" />
+    <ProjectReference Include="..\RealmCore.Resources.Addons.GuiSystem.DGS\RealmCore.Resources.Addons.GuiSystem.DGS.csproj" />
 	<ProjectReference Include="..\RealmCore.Resources.Base\RealmCore.Resources.Base.csproj" />
   </ItemGroup>
 

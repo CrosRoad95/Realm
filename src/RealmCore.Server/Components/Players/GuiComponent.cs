@@ -1,9 +1,11 @@
-﻿namespace RealmCore.Server.Components.Players;
+﻿using RealmCore.Resources.GuiSystem;
+
+namespace RealmCore.Server.Components.Players;
 
 public abstract class GuiComponent : Component
 {
     [Inject]
-    private IAgnosticGuiSystemService AgnosticGuiSystemService { get; set; } = default!;
+    private IGuiSystemService GuiSystemService { get; set; } = default!;
     [Inject]
     private ILogger<GuiComponent> Logger { get; set; } = default!;
     [Inject]
@@ -22,14 +24,14 @@ public abstract class GuiComponent : Component
 
     protected override void Load()
     {
-        AgnosticGuiSystemService.FormSubmitted += HandleFormSubmitted;
-        AgnosticGuiSystemService.ActionExecuted += HandleActionExecuted;
+        GuiSystemService.FormSubmitted += HandleFormSubmitted;
+        GuiSystemService.ActionExecuted += HandleActionExecuted;
         OpenGui();
     }
 
     protected virtual void OpenGui()
     {
-        AgnosticGuiSystemService.OpenGui(Entity.Player, _name, _cursorless);
+        GuiSystemService.OpenGui(Entity.Player, _name, _cursorless);
     }
 
     private async void HandleActionExecuted(LuaEvent luaEvent)
@@ -64,7 +66,7 @@ public abstract class GuiComponent : Component
             {
                 try
                 {
-                    await HandleForm(new FormContext(luaEvent.Player, formName, data, AgnosticGuiSystemService, ECS));
+                    await HandleForm(new FormContext(luaEvent.Player, formName, data, GuiSystemService, ECS));
                 }
                 catch (Exception ex)
                 {
@@ -82,11 +84,11 @@ public abstract class GuiComponent : Component
     {
         ThrowIfDisposed();
 
-        AgnosticGuiSystemService.FormSubmitted -= HandleFormSubmitted;
-        AgnosticGuiSystemService.ActionExecuted -= HandleActionExecuted;
+        GuiSystemService.FormSubmitted -= HandleFormSubmitted;
+        GuiSystemService.ActionExecuted -= HandleActionExecuted;
 
         var playerElementComponent = Entity.GetRequiredComponent<PlayerElementComponent>();
-        AgnosticGuiSystemService.CloseGui(playerElementComponent.Player, _name, _cursorless);
+        GuiSystemService.CloseGui(playerElementComponent.Player, _name, _cursorless);
     }
 
     public override void Dispose()

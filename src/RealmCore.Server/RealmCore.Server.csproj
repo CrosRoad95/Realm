@@ -30,10 +30,10 @@
     <ProjectReference Include="..\RealmCore.Module.Grpc.Proto\RealmCore.Module.Grpc.Proto.csproj" />
     <ProjectReference Include="..\RealmCore.MySql\RealmCore.MySql.csproj" />
     <ProjectReference Include="..\RealmCore.Persistance\RealmCore.Persistance.csproj" />
-    <ProjectReference Include="..\RealmCore.Resources.Addons.AgnosticGuiSystem.DGSProvider\RealmCore.Resources.Addons.AgnosticGuiSystem.DGSProvider.csproj" />
+    <ProjectReference Include="..\RealmCore.Resources.Addons.GuiSystem.DGS\RealmCore.Resources.Addons.GuiSystem.DGS.csproj" />
     <ProjectReference Include="..\RealmCore.Resources.AdminTools\RealmCore.Resources.AdminTools.csproj" />
     <ProjectReference Include="..\RealmCore.Resources.AFK\RealmCore.Resources.AFK.csproj" />
-    <ProjectReference Include="..\RealmCore.Resources.AgnosticGuiSystem\RealmCore.Resources.AgnosticGuiSystem.csproj" />
+    <ProjectReference Include="..\RealmCore.Resources.GuiSystem\RealmCore.Resources.GuiSystem.csproj" />
     <ProjectReference Include="..\RealmCore.Resources.ClientInterface\RealmCore.Resources.ClientInterface.csproj" />
     <ProjectReference Include="..\RealmCore.Resources.ElementOutline\RealmCore.Resources.ElementOutline.csproj" />
     <ProjectReference Include="..\RealmCore.Resources.Nametags\RealmCore.Resources.Nametags.csproj" />

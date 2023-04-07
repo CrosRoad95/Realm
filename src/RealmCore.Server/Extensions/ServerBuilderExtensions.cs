@@ -1,4 +1,6 @@
-﻿namespace RealmCore.Server.Extensions;
+﻿using RealmCore.Resources.GuiSystem;
+
+namespace RealmCore.Server.Extensions;
 
 public static class ServerBuilderExtensions
 {
@@ -69,7 +71,7 @@ public static class ServerBuilderExtensions
             Bind = null
         });
         builder.AddDGSResource(DGSVersion.Release_3_520);
-        builder.AddAgnosticGuiSystemResource(builder =>
+        builder.AddGuiSystemResource(builder =>
         {
             builder.AddGuiProvider(DGSGuiProvider.Name, DGSGuiProvider.LuaCode);
             builder.SetGuiProvider(DGSGuiProvider.Name);

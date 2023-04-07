@@ -1,4 +1,6 @@
-﻿namespace RealmCore.Server.Logic;
+﻿using RealmCore.Resources.GuiSystem;
+
+namespace RealmCore.Server.Logic;
 
 internal class GuisLogic
 {
@@ -14,7 +16,7 @@ internal class GuisLogic
 
     private void HandleServerStarted()
     {
-        _serviceProvider.GetRequiredService<IAgnosticGuiSystemService>().GuiFilesChanged = HandleGuiFilesChanged;
+        _serviceProvider.GetRequiredService<IGuiSystemService>().GuiFilesChanged = HandleGuiFilesChanged;
     }
 
     private Task HandleGuiFilesChanged()

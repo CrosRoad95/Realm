@@ -1,4 +1,5 @@
-﻿using HudComponent = SlipeServer.Server.Elements.Enums.HudComponent;
+﻿using RealmCore.Resources.GuiSystem;
+using HudComponent = SlipeServer.Server.Elements.Enums.HudComponent;
 
 namespace RealmCore.Server.Components.Elements;
 
@@ -15,7 +16,7 @@ public sealed class PlayerElementComponent : PedElementComponent
     [Inject]
     private IClientInterfaceService ClientInterfaceService { get; set; } = default!;
     [Inject]
-    private IAgnosticGuiSystemService AgnosticGuiSystemService { get; set; } = default!;
+    private IGuiSystemService GuiSystemService { get; set; } = default!;
     [Inject]
     private Text3dService Text3dService { get; set; } = default!;
     [Inject]
@@ -651,7 +652,7 @@ public sealed class PlayerElementComponent : PedElementComponent
     public void SetGuiDebugToolsEnabled(bool enabled)
     {
         ThrowIfDisposed();
-        AgnosticGuiSystemService.SetDebugToolsEnabled(_player, enabled);
+        GuiSystemService.SetDebugToolsEnabled(_player, enabled);
     }
 
     public void SetText3dRenderingEnabled(bool enabled)

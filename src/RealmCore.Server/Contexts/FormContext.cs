@@ -1,4 +1,6 @@
-﻿namespace RealmCore.Server.Contexts;
+﻿using RealmCore.Resources.GuiSystem;
+
+namespace RealmCore.Server.Contexts;
 
 internal class FormContext : IFormContext
 {
@@ -6,7 +8,7 @@ internal class FormContext : IFormContext
     private readonly Player _player;
     private readonly string _formName;
     private readonly LuaValue _data;
-    private readonly IAgnosticGuiSystemService _agnosticGuiSystemService;
+    private readonly IGuiSystemService _GuiSystemService;
     private readonly IECS _ecs;
 
     public string FormName => _formName;
@@ -20,12 +22,12 @@ internal class FormContext : IFormContext
         }
     }
 
-    public FormContext(Player player, string formName, LuaValue data, IAgnosticGuiSystemService agnosticGuiSystemService, IECS ecs)
+    public FormContext(Player player, string formName, LuaValue data, IGuiSystemService GuiSystemService, IECS ecs)
     {
         _player = player;
         _formName = formName;
         _data = data;
-        _agnosticGuiSystemService = agnosticGuiSystemService;
+        _GuiSystemService = GuiSystemService;
         _ecs = ecs;
     }
 
@@ -41,7 +43,7 @@ internal class FormContext : IFormContext
         if (_responsed)
             throw new Exception("Form already got response.");
 
-        _agnosticGuiSystemService.SendFormResponse(_player, "", FormName, true, data);
+        _GuiSystemService.SendFormResponse(_player, "", FormName, true, data);
         _responsed = true;
     }
 
@@ -50,7 +52,7 @@ internal class FormContext : IFormContext
         if (_responsed)
             throw new Exception("Form already got response.");
 
-        _agnosticGuiSystemService.SendFormResponse(_player, "", FormName, false, data);
+        _GuiSystemService.SendFormResponse(_player, "", FormName, false, data);
         _responsed = true;
     }
 }

@@ -2,12 +2,12 @@
 using SlipeServer.Server.Elements;
 using SlipeServer.Server.Events;
 
-namespace RealmCore.Resources.AgnosticGuiSystem;
+namespace RealmCore.Resources.GuiSystem;
 
 
 public delegate Task GuiChangedDelegate();
 
-public interface IAgnosticGuiSystemService
+public interface IGuiSystemService
 {
     GuiChangedDelegate? GuiFilesChanged { get; set; }
     event Action<LuaEvent>? FormSubmitted;

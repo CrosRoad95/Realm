@@ -15,8 +15,8 @@ COPY ["RealmCore.Interfaces/RealmCore.Interfaces.csproj", "RealmCore.Interfaces/
 COPY ["RealmCore.Common/RealmCore.Common.csproj", "RealmCore.Common/"]
 COPY ["RealmCore.Persistance.SQLite/RealmCore.Persistance.SQLite.csproj", "RealmCore.Persistance.SQLite/"]
 COPY ["RealmCore.Persistance/RealmCore.Persistance.csproj", "RealmCore.Persistance/"]
-COPY ["RealmCore.Resources.Addons.AgnosticGuiSystem.CeGuiProvider/RealmCore.Resources.Addons.AgnosticGuiSystem.CeGuiProvider.csproj", "RealmCore.Resources.Addons.AgnosticGuiSystem.CeGuiProvider/"]
-COPY ["RealmCore.Resources.AgnosticGuiSystem/RealmCore.Resources.AgnosticGuiSystem.csproj", "RealmCore.Resources.AgnosticGuiSystem/"]
+COPY ["RealmCore.Resources.Addons.GuiSystem.CeGuiProvider/RealmCore.Resources.Addons.GuiSystem.CeGuiProvider.csproj", "RealmCore.Resources.Addons.GuiSystem.CeGuiProvider/"]
+COPY ["RealmCore.Resources.GuiSystem/RealmCore.Resources.GuiSystem.csproj", "RealmCore.Resources.GuiSystem/"]
 COPY ["RealmCore.Resources.Base/RealmCore.Resources.Base.csproj", "RealmCore.Resources.Base/"]
 COPY ["RealmCore.Resources.ClientInterface/RealmCore.Resources.ClientInterface.csproj", "RealmCore.Resources.ClientInterface/"]
 RUN dotnet restore "RealmCore.WebApp/RealmCore.WebApp.csproj"

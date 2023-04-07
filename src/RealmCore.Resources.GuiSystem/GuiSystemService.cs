@@ -5,22 +5,22 @@ using SlipeServer.Server.Events;
 using SlipeServer.Server.Mappers;
 using System.Collections.Concurrent;
 
-namespace RealmCore.Resources.AgnosticGuiSystem;
+namespace RealmCore.Resources.GuiSystem;
 
-internal sealed class AgnosticGuiSystemService : IAgnosticGuiSystemService
+internal sealed class GuiSystemService : IGuiSystemService
 {
     public GuiChangedDelegate? GuiFilesChanged { get; set; }
 
-    private readonly AgnosticGuiSystemResource _resource;
+    private readonly GuiSystemResource _resource;
     public event Action<LuaEvent>? FormSubmitted;
     public event Action<LuaEvent>? ActionExecuted;
     private readonly ConcurrentDictionary<Player, object> _playersLocks = new();
     private readonly ConcurrentDictionary<Player, List<string>> _playersGuis = new();
     private readonly LuaValueMapper _luaValueMapper;
 
-    public AgnosticGuiSystemService(MtaServer server, LuaValueMapper luaValueMapper)
+    public GuiSystemService(MtaServer server, LuaValueMapper luaValueMapper)
     {
-        _resource = server.GetAdditionalResource<AgnosticGuiSystemResource>();
+        _resource = server.GetAdditionalResource<GuiSystemResource>();
         _luaValueMapper = luaValueMapper;
     }
 

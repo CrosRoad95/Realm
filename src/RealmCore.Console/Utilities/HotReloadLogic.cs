@@ -1,4 +1,4 @@
-﻿using RealmCore.Resources.AgnosticGuiSystem;
+﻿using RealmCore.Resources.GuiSystem;
 using System.Diagnostics;
 
 namespace RealmCore.Console.Utilities;
@@ -7,15 +7,15 @@ public sealed class HotReloadLogic
 {
     private static HotReloadLogic? _hotReloadLogic;
     private readonly HotReload _hotReload;
-    private readonly IAgnosticGuiSystemService _agnosticGuiSystemService;
+    private readonly IGuiSystemService _GuiSystemService;
     private readonly ILogger<HotReloadLogic> _logger;
 
-    public HotReloadLogic(IAgnosticGuiSystemService agnosticGuiSystemService, ILogger<HotReloadLogic> logger, string path)
+    public HotReloadLogic(IGuiSystemService GuiSystemService, ILogger<HotReloadLogic> logger, string path)
     {
         _hotReloadLogic = this;
         _hotReload = new HotReload(path);
         _hotReload.OnReload += HandleHotReload;
-        _agnosticGuiSystemService = agnosticGuiSystemService;
+        _GuiSystemService = GuiSystemService;
         _logger = logger;
     }
 
@@ -24,7 +24,7 @@ public sealed class HotReloadLogic
         try
         {
             var stopwatch = Stopwatch.StartNew();
-            await _agnosticGuiSystemService.UpdateGuiFiles();
+            await _GuiSystemService.UpdateGuiFiles();
             _logger.LogInformation("Updated guis in: {time}ms", stopwatch.ElapsedMilliseconds);
         }
         catch (Exception ex)

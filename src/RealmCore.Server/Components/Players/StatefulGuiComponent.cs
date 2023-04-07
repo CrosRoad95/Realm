@@ -1,9 +1,11 @@
-﻿namespace RealmCore.Server.Components.Players;
+﻿using RealmCore.Resources.GuiSystem;
+
+namespace RealmCore.Server.Components.Players;
 
 public abstract class StatefulGuiComponent<TState> : GuiComponent
 {
     [Inject]
-    private IAgnosticGuiSystemService AgnosticGuiSystemService { get; set; } = default!;
+    private IGuiSystemService GuiSystemService { get; set; } = default!;
     [Inject]
     private LuaValueMapper LuaValueMapper { get; set; } = default!;
 
@@ -22,13 +24,13 @@ public abstract class StatefulGuiComponent<TState> : GuiComponent
     {
         PreGuiOpen(_state);
         var playerElementComponent = Entity.GetRequiredComponent<PlayerElementComponent>();
-        AgnosticGuiSystemService.OpenGui(playerElementComponent.Player, _name, _cursorless, LuaValueMapper.UniversalMap(_state));
+        GuiSystemService.OpenGui(playerElementComponent.Player, _name, _cursorless, LuaValueMapper.UniversalMap(_state));
     }
 
     private void FlushChanged()
     {
         var playerElementComponent = Entity.GetRequiredComponent<PlayerElementComponent>();
-        AgnosticGuiSystemService.SendStateChanged(playerElementComponent.Player, _name, _stateChange);
+        GuiSystemService.SendStateChanged(playerElementComponent.Player, _name, _stateChange);
         _stateChange.Clear();
     }
 
