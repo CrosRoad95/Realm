@@ -118,7 +118,7 @@ namespace RealmCore.Persistance.MySql.Migrations
                     b.ToTable("UserTokens", (string)null);
                 });
 
-            modelBuilder.Entity("RealmCore.Persistance.Data.Achievement", b =>
+            modelBuilder.Entity("RealmCore.Persistance.Data.AchievementData", b =>
                 {
                     b.Property<int>("UserId")
                         .HasColumnType("int");
@@ -141,7 +141,7 @@ namespace RealmCore.Persistance.MySql.Migrations
                     b.ToTable("Achievements", (string)null);
                 });
 
-            modelBuilder.Entity("RealmCore.Persistance.Data.Ban", b =>
+            modelBuilder.Entity("RealmCore.Persistance.Data.BanData", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -174,7 +174,7 @@ namespace RealmCore.Persistance.MySql.Migrations
                     b.ToTable("Bans", (string)null);
                 });
 
-            modelBuilder.Entity("RealmCore.Persistance.Data.DailyVisits", b =>
+            modelBuilder.Entity("RealmCore.Persistance.Data.DailyVisitsData", b =>
                 {
                     b.Property<int>("UserId")
                         .HasColumnType("int");
@@ -195,7 +195,7 @@ namespace RealmCore.Persistance.MySql.Migrations
                     b.ToTable("DailyVisits", (string)null);
                 });
 
-            modelBuilder.Entity("RealmCore.Persistance.Data.DiscordIntegration", b =>
+            modelBuilder.Entity("RealmCore.Persistance.Data.DiscordIntegrationData", b =>
                 {
                     b.Property<int>("UserId")
                         .HasColumnType("int");
@@ -208,7 +208,7 @@ namespace RealmCore.Persistance.MySql.Migrations
                     b.ToTable("DiscordIntegrations", (string)null);
                 });
 
-            modelBuilder.Entity("RealmCore.Persistance.Data.Discovery", b =>
+            modelBuilder.Entity("RealmCore.Persistance.Data.DiscoveryData", b =>
                 {
                     b.Property<int>("UserId")
                         .HasColumnType("int");
@@ -221,7 +221,7 @@ namespace RealmCore.Persistance.MySql.Migrations
                     b.ToTable("Discoveries", (string)null);
                 });
 
-            modelBuilder.Entity("RealmCore.Persistance.Data.Fraction", b =>
+            modelBuilder.Entity("RealmCore.Persistance.Data.FractionData", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -247,7 +247,7 @@ namespace RealmCore.Persistance.MySql.Migrations
                     b.ToTable("Fractions", (string)null);
                 });
 
-            modelBuilder.Entity("RealmCore.Persistance.Data.FractionMember", b =>
+            modelBuilder.Entity("RealmCore.Persistance.Data.FractionMemberData", b =>
                 {
                     b.Property<int>("FractionId")
                         .HasColumnType("int");
@@ -270,7 +270,7 @@ namespace RealmCore.Persistance.MySql.Migrations
                     b.ToTable("FractionMembers", (string)null);
                 });
 
-            modelBuilder.Entity("RealmCore.Persistance.Data.Group", b =>
+            modelBuilder.Entity("RealmCore.Persistance.Data.GroupData", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -299,7 +299,7 @@ namespace RealmCore.Persistance.MySql.Migrations
                     b.ToTable("Groups", (string)null);
                 });
 
-            modelBuilder.Entity("RealmCore.Persistance.Data.GroupMember", b =>
+            modelBuilder.Entity("RealmCore.Persistance.Data.GroupMemberData", b =>
                 {
                     b.Property<int>("GroupId")
                         .HasColumnType("int");
@@ -322,7 +322,7 @@ namespace RealmCore.Persistance.MySql.Migrations
                     b.ToTable("GroupMembers", (string)null);
                 });
 
-            modelBuilder.Entity("RealmCore.Persistance.Data.Inventory", b =>
+            modelBuilder.Entity("RealmCore.Persistance.Data.InventoryData", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -337,7 +337,7 @@ namespace RealmCore.Persistance.MySql.Migrations
                     b.ToTable("Inventories", (string)null);
                 });
 
-            modelBuilder.Entity("RealmCore.Persistance.Data.InventoryItem", b =>
+            modelBuilder.Entity("RealmCore.Persistance.Data.InventoryItemData", b =>
                 {
                     b.Property<string>("Id")
                         .HasMaxLength(36)
@@ -363,7 +363,7 @@ namespace RealmCore.Persistance.MySql.Migrations
                     b.ToTable("InventoryItems", (string)null);
                 });
 
-            modelBuilder.Entity("RealmCore.Persistance.Data.JobStatistics", b =>
+            modelBuilder.Entity("RealmCore.Persistance.Data.JobStatisticsData", b =>
                 {
                     b.Property<int>("UserId")
                         .HasColumnType("int");
@@ -385,7 +385,7 @@ namespace RealmCore.Persistance.MySql.Migrations
                     b.ToTable("JobPoints", (string)null);
                 });
 
-            modelBuilder.Entity("RealmCore.Persistance.Data.JobUpgrade", b =>
+            modelBuilder.Entity("RealmCore.Persistance.Data.JobUpgradeData", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -407,7 +407,7 @@ namespace RealmCore.Persistance.MySql.Migrations
                     b.ToTable("JobUpgrades", (string)null);
                 });
 
-            modelBuilder.Entity("RealmCore.Persistance.Data.Role", b =>
+            modelBuilder.Entity("RealmCore.Persistance.Data.RoleData", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -434,7 +434,7 @@ namespace RealmCore.Persistance.MySql.Migrations
                     b.ToTable("Roles", (string)null);
                 });
 
-            modelBuilder.Entity("RealmCore.Persistance.Data.User", b =>
+            modelBuilder.Entity("RealmCore.Persistance.Data.UserData", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -539,7 +539,7 @@ namespace RealmCore.Persistance.MySql.Migrations
                     b.ToTable("Users", (string)null);
                 });
 
-            modelBuilder.Entity("RealmCore.Persistance.Data.UserInventory", b =>
+            modelBuilder.Entity("RealmCore.Persistance.Data.UserInventoryData", b =>
                 {
                     b.Property<int>("UserId")
                         .HasColumnType("int");
@@ -551,10 +551,10 @@ namespace RealmCore.Persistance.MySql.Migrations
 
                     b.HasIndex("InventoryId");
 
-                    b.ToTable("UserInventory", (string)null);
+                    b.ToTable("UserInventories", (string)null);
                 });
 
-            modelBuilder.Entity("RealmCore.Persistance.Data.UserLicense", b =>
+            modelBuilder.Entity("RealmCore.Persistance.Data.UserLicenseData", b =>
                 {
                     b.Property<int>("UserId")
                         .HasColumnType("int");
@@ -573,7 +573,7 @@ namespace RealmCore.Persistance.MySql.Migrations
                     b.ToTable("UserLicenses", (string)null);
                 });
 
-            modelBuilder.Entity("RealmCore.Persistance.Data.UserReward", b =>
+            modelBuilder.Entity("RealmCore.Persistance.Data.UserRewardData", b =>
                 {
                     b.Property<int>("UserId")
                         .HasColumnType("int");
@@ -586,7 +586,7 @@ namespace RealmCore.Persistance.MySql.Migrations
                     b.ToTable("UserRewards", (string)null);
                 });
 
-            modelBuilder.Entity("RealmCore.Persistance.Data.UserSetting", b =>
+            modelBuilder.Entity("RealmCore.Persistance.Data.UserSettingData", b =>
                 {
                     b.Property<int>("UserId")
                         .HasColumnType("int");
@@ -604,7 +604,7 @@ namespace RealmCore.Persistance.MySql.Migrations
                     b.ToTable("UserSettings", (string)null);
                 });
 
-            modelBuilder.Entity("RealmCore.Persistance.Data.UserStat", b =>
+            modelBuilder.Entity("RealmCore.Persistance.Data.UserStatData", b =>
                 {
                     b.Property<int>("UserId")
                         .HasColumnType("int");
@@ -620,7 +620,7 @@ namespace RealmCore.Persistance.MySql.Migrations
                     b.ToTable("UserStats", (string)null);
                 });
 
-            modelBuilder.Entity("RealmCore.Persistance.Data.UserUpgrade", b =>
+            modelBuilder.Entity("RealmCore.Persistance.Data.UserUpgradeData", b =>
                 {
                     b.Property<int>("UserId")
                         .HasColumnType("int");
@@ -633,7 +633,7 @@ namespace RealmCore.Persistance.MySql.Migrations
                     b.ToTable("UserUpgrades", (string)null);
                 });
 
-            modelBuilder.Entity("RealmCore.Persistance.Data.UserWhitelistedSerial", b =>
+            modelBuilder.Entity("RealmCore.Persistance.Data.UserWhitelistedSerialData", b =>
                 {
                     b.Property<int>("UserId")
                         .HasColumnType("int");
@@ -647,7 +647,7 @@ namespace RealmCore.Persistance.MySql.Migrations
                     b.ToTable("UserWhitelistedSerials", (string)null);
                 });
 
-            modelBuilder.Entity("RealmCore.Persistance.Data.Vehicle", b =>
+            modelBuilder.Entity("RealmCore.Persistance.Data.VehicleData", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -769,7 +769,7 @@ namespace RealmCore.Persistance.MySql.Migrations
                     b.ToTable("Vehicles", (string)null);
                 });
 
-            modelBuilder.Entity("RealmCore.Persistance.Data.VehicleEngine", b =>
+            modelBuilder.Entity("RealmCore.Persistance.Data.VehicleEngineData", b =>
                 {
                     b.Property<int>("VehicleId")
                         .HasColumnType("int");
@@ -785,7 +785,7 @@ namespace RealmCore.Persistance.MySql.Migrations
                     b.ToTable("VehicleEngines", (string)null);
                 });
 
-            modelBuilder.Entity("RealmCore.Persistance.Data.VehicleFuel", b =>
+            modelBuilder.Entity("RealmCore.Persistance.Data.VehicleFuelData", b =>
                 {
                     b.Property<int>("VehicleId")
                         .HasColumnType("int");
@@ -814,7 +814,7 @@ namespace RealmCore.Persistance.MySql.Migrations
                     b.ToTable("VehicleFuels", (string)null);
                 });
 
-            modelBuilder.Entity("RealmCore.Persistance.Data.VehicleInventory", b =>
+            modelBuilder.Entity("RealmCore.Persistance.Data.VehicleInventoryData", b =>
                 {
                     b.Property<int>("VehicleId")
                         .HasColumnType("int");
@@ -829,7 +829,7 @@ namespace RealmCore.Persistance.MySql.Migrations
                     b.ToTable("VehicleInventories", (string)null);
                 });
 
-            modelBuilder.Entity("RealmCore.Persistance.Data.VehiclePartDamage", b =>
+            modelBuilder.Entity("RealmCore.Persistance.Data.VehiclePartDamageData", b =>
                 {
                     b.Property<int>("VehicleId")
                         .HasColumnType("int");
@@ -845,7 +845,7 @@ namespace RealmCore.Persistance.MySql.Migrations
                     b.ToTable("VehiclePartDamages", (string)null);
                 });
 
-            modelBuilder.Entity("RealmCore.Persistance.Data.VehicleUpgrade", b =>
+            modelBuilder.Entity("RealmCore.Persistance.Data.VehicleUpgradeData", b =>
                 {
                     b.Property<int>("VehicleId")
                         .HasColumnType("int");
@@ -858,7 +858,7 @@ namespace RealmCore.Persistance.MySql.Migrations
                     b.ToTable("VehicleUpgrades", (string)null);
                 });
 
-            modelBuilder.Entity("RealmCore.Persistance.Data.VehicleUserAccess", b =>
+            modelBuilder.Entity("RealmCore.Persistance.Data.VehicleUserAccessData", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -889,7 +889,7 @@ namespace RealmCore.Persistance.MySql.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<int>", b =>
                 {
-                    b.HasOne("RealmCore.Persistance.Data.Role", null)
+                    b.HasOne("RealmCore.Persistance.Data.RoleData", null)
                         .WithMany()
                         .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -898,7 +898,7 @@ namespace RealmCore.Persistance.MySql.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<int>", b =>
                 {
-                    b.HasOne("RealmCore.Persistance.Data.User", null)
+                    b.HasOne("RealmCore.Persistance.Data.UserData", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -907,7 +907,7 @@ namespace RealmCore.Persistance.MySql.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<int>", b =>
                 {
-                    b.HasOne("RealmCore.Persistance.Data.User", null)
+                    b.HasOne("RealmCore.Persistance.Data.UserData", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -916,13 +916,13 @@ namespace RealmCore.Persistance.MySql.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<int>", b =>
                 {
-                    b.HasOne("RealmCore.Persistance.Data.Role", null)
+                    b.HasOne("RealmCore.Persistance.Data.RoleData", null)
                         .WithMany()
                         .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("RealmCore.Persistance.Data.User", null)
+                    b.HasOne("RealmCore.Persistance.Data.UserData", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -931,69 +931,69 @@ namespace RealmCore.Persistance.MySql.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<int>", b =>
                 {
-                    b.HasOne("RealmCore.Persistance.Data.User", null)
+                    b.HasOne("RealmCore.Persistance.Data.UserData", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("RealmCore.Persistance.Data.Achievement", b =>
+            modelBuilder.Entity("RealmCore.Persistance.Data.AchievementData", b =>
                 {
-                    b.HasOne("RealmCore.Persistance.Data.User", null)
+                    b.HasOne("RealmCore.Persistance.Data.UserData", null)
                         .WithMany("Achievements")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("RealmCore.Persistance.Data.Ban", b =>
+            modelBuilder.Entity("RealmCore.Persistance.Data.BanData", b =>
                 {
-                    b.HasOne("RealmCore.Persistance.Data.User", "User")
+                    b.HasOne("RealmCore.Persistance.Data.UserData", "User")
                         .WithMany()
                         .HasForeignKey("UserId");
 
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("RealmCore.Persistance.Data.DailyVisits", b =>
+            modelBuilder.Entity("RealmCore.Persistance.Data.DailyVisitsData", b =>
                 {
-                    b.HasOne("RealmCore.Persistance.Data.User", null)
+                    b.HasOne("RealmCore.Persistance.Data.UserData", null)
                         .WithOne("DailyVisits")
-                        .HasForeignKey("RealmCore.Persistance.Data.DailyVisits", "UserId")
+                        .HasForeignKey("RealmCore.Persistance.Data.DailyVisitsData", "UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("RealmCore.Persistance.Data.DiscordIntegration", b =>
+            modelBuilder.Entity("RealmCore.Persistance.Data.DiscordIntegrationData", b =>
                 {
-                    b.HasOne("RealmCore.Persistance.Data.User", "User")
+                    b.HasOne("RealmCore.Persistance.Data.UserData", "User")
                         .WithOne("DiscordIntegration")
-                        .HasForeignKey("RealmCore.Persistance.Data.DiscordIntegration", "UserId")
+                        .HasForeignKey("RealmCore.Persistance.Data.DiscordIntegrationData", "UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("RealmCore.Persistance.Data.Discovery", b =>
+            modelBuilder.Entity("RealmCore.Persistance.Data.DiscoveryData", b =>
                 {
-                    b.HasOne("RealmCore.Persistance.Data.User", null)
+                    b.HasOne("RealmCore.Persistance.Data.UserData", null)
                         .WithMany("Discoveries")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("RealmCore.Persistance.Data.FractionMember", b =>
+            modelBuilder.Entity("RealmCore.Persistance.Data.FractionMemberData", b =>
                 {
-                    b.HasOne("RealmCore.Persistance.Data.Fraction", "Fraction")
+                    b.HasOne("RealmCore.Persistance.Data.FractionData", "Fraction")
                         .WithMany("Members")
                         .HasForeignKey("FractionId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("RealmCore.Persistance.Data.User", "User")
+                    b.HasOne("RealmCore.Persistance.Data.UserData", "User")
                         .WithMany("FractionMembers")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -1004,15 +1004,15 @@ namespace RealmCore.Persistance.MySql.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("RealmCore.Persistance.Data.GroupMember", b =>
+            modelBuilder.Entity("RealmCore.Persistance.Data.GroupMemberData", b =>
                 {
-                    b.HasOne("RealmCore.Persistance.Data.Group", "Group")
+                    b.HasOne("RealmCore.Persistance.Data.GroupData", "Group")
                         .WithMany("Members")
                         .HasForeignKey("GroupId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("RealmCore.Persistance.Data.User", "User")
+                    b.HasOne("RealmCore.Persistance.Data.UserData", "User")
                         .WithMany("GroupMembers")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -1023,9 +1023,9 @@ namespace RealmCore.Persistance.MySql.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("RealmCore.Persistance.Data.InventoryItem", b =>
+            modelBuilder.Entity("RealmCore.Persistance.Data.InventoryItemData", b =>
                 {
-                    b.HasOne("RealmCore.Persistance.Data.Inventory", "Inventory")
+                    b.HasOne("RealmCore.Persistance.Data.InventoryData", "Inventory")
                         .WithMany("InventoryItems")
                         .HasForeignKey("InventoryId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -1034,33 +1034,33 @@ namespace RealmCore.Persistance.MySql.Migrations
                     b.Navigation("Inventory");
                 });
 
-            modelBuilder.Entity("RealmCore.Persistance.Data.JobStatistics", b =>
+            modelBuilder.Entity("RealmCore.Persistance.Data.JobStatisticsData", b =>
                 {
-                    b.HasOne("RealmCore.Persistance.Data.User", null)
+                    b.HasOne("RealmCore.Persistance.Data.UserData", null)
                         .WithMany("JobStatistics")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("RealmCore.Persistance.Data.JobUpgrade", b =>
+            modelBuilder.Entity("RealmCore.Persistance.Data.JobUpgradeData", b =>
                 {
-                    b.HasOne("RealmCore.Persistance.Data.User", null)
+                    b.HasOne("RealmCore.Persistance.Data.UserData", null)
                         .WithMany("JobUpgrades")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("RealmCore.Persistance.Data.UserInventory", b =>
+            modelBuilder.Entity("RealmCore.Persistance.Data.UserInventoryData", b =>
                 {
-                    b.HasOne("RealmCore.Persistance.Data.Inventory", "Inventory")
+                    b.HasOne("RealmCore.Persistance.Data.InventoryData", "Inventory")
                         .WithMany("UserInventories")
                         .HasForeignKey("InventoryId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("RealmCore.Persistance.Data.User", "User")
+                    b.HasOne("RealmCore.Persistance.Data.UserData", "User")
                         .WithMany("UserInventories")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -1071,87 +1071,87 @@ namespace RealmCore.Persistance.MySql.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("RealmCore.Persistance.Data.UserLicense", b =>
+            modelBuilder.Entity("RealmCore.Persistance.Data.UserLicenseData", b =>
                 {
-                    b.HasOne("RealmCore.Persistance.Data.User", null)
+                    b.HasOne("RealmCore.Persistance.Data.UserData", null)
                         .WithMany("Licenses")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("RealmCore.Persistance.Data.UserReward", b =>
+            modelBuilder.Entity("RealmCore.Persistance.Data.UserRewardData", b =>
                 {
-                    b.HasOne("RealmCore.Persistance.Data.User", null)
+                    b.HasOne("RealmCore.Persistance.Data.UserData", null)
                         .WithMany("Rewards")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("RealmCore.Persistance.Data.UserSetting", b =>
+            modelBuilder.Entity("RealmCore.Persistance.Data.UserSettingData", b =>
                 {
-                    b.HasOne("RealmCore.Persistance.Data.User", null)
+                    b.HasOne("RealmCore.Persistance.Data.UserData", null)
                         .WithMany("Settings")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("RealmCore.Persistance.Data.UserStat", b =>
+            modelBuilder.Entity("RealmCore.Persistance.Data.UserStatData", b =>
                 {
-                    b.HasOne("RealmCore.Persistance.Data.User", null)
+                    b.HasOne("RealmCore.Persistance.Data.UserData", null)
                         .WithMany("Stats")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("RealmCore.Persistance.Data.UserUpgrade", b =>
+            modelBuilder.Entity("RealmCore.Persistance.Data.UserUpgradeData", b =>
                 {
-                    b.HasOne("RealmCore.Persistance.Data.User", null)
+                    b.HasOne("RealmCore.Persistance.Data.UserData", null)
                         .WithMany("Upgrades")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("RealmCore.Persistance.Data.UserWhitelistedSerial", b =>
+            modelBuilder.Entity("RealmCore.Persistance.Data.UserWhitelistedSerialData", b =>
                 {
-                    b.HasOne("RealmCore.Persistance.Data.User", null)
+                    b.HasOne("RealmCore.Persistance.Data.UserData", null)
                         .WithMany("WhitelistedSerials")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("RealmCore.Persistance.Data.VehicleEngine", b =>
+            modelBuilder.Entity("RealmCore.Persistance.Data.VehicleEngineData", b =>
                 {
-                    b.HasOne("RealmCore.Persistance.Data.Vehicle", null)
+                    b.HasOne("RealmCore.Persistance.Data.VehicleData", null)
                         .WithMany("VehicleEngines")
                         .HasForeignKey("VehicleId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("RealmCore.Persistance.Data.VehicleFuel", b =>
+            modelBuilder.Entity("RealmCore.Persistance.Data.VehicleFuelData", b =>
                 {
-                    b.HasOne("RealmCore.Persistance.Data.Vehicle", null)
+                    b.HasOne("RealmCore.Persistance.Data.VehicleData", null)
                         .WithMany("Fuels")
                         .HasForeignKey("VehicleId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("RealmCore.Persistance.Data.VehicleInventory", b =>
+            modelBuilder.Entity("RealmCore.Persistance.Data.VehicleInventoryData", b =>
                 {
-                    b.HasOne("RealmCore.Persistance.Data.Inventory", "Inventory")
+                    b.HasOne("RealmCore.Persistance.Data.InventoryData", "Inventory")
                         .WithMany("VehicleInventories")
                         .HasForeignKey("InventoryId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("RealmCore.Persistance.Data.Vehicle", "Vehicle")
+                    b.HasOne("RealmCore.Persistance.Data.VehicleData", "Vehicle")
                         .WithMany("VehicleInventories")
                         .HasForeignKey("VehicleId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -1162,33 +1162,33 @@ namespace RealmCore.Persistance.MySql.Migrations
                     b.Navigation("Vehicle");
                 });
 
-            modelBuilder.Entity("RealmCore.Persistance.Data.VehiclePartDamage", b =>
+            modelBuilder.Entity("RealmCore.Persistance.Data.VehiclePartDamageData", b =>
                 {
-                    b.HasOne("RealmCore.Persistance.Data.Vehicle", null)
+                    b.HasOne("RealmCore.Persistance.Data.VehicleData", null)
                         .WithMany("PartDamages")
                         .HasForeignKey("VehicleId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("RealmCore.Persistance.Data.VehicleUpgrade", b =>
+            modelBuilder.Entity("RealmCore.Persistance.Data.VehicleUpgradeData", b =>
                 {
-                    b.HasOne("RealmCore.Persistance.Data.Vehicle", null)
+                    b.HasOne("RealmCore.Persistance.Data.VehicleData", null)
                         .WithMany("Upgrades")
                         .HasForeignKey("VehicleId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("RealmCore.Persistance.Data.VehicleUserAccess", b =>
+            modelBuilder.Entity("RealmCore.Persistance.Data.VehicleUserAccessData", b =>
                 {
-                    b.HasOne("RealmCore.Persistance.Data.User", "User")
+                    b.HasOne("RealmCore.Persistance.Data.UserData", "User")
                         .WithMany("VehicleUserAccesses")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("RealmCore.Persistance.Data.Vehicle", "Vehicle")
+                    b.HasOne("RealmCore.Persistance.Data.VehicleData", "Vehicle")
                         .WithMany("UserAccesses")
                         .HasForeignKey("VehicleId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -1199,17 +1199,17 @@ namespace RealmCore.Persistance.MySql.Migrations
                     b.Navigation("Vehicle");
                 });
 
-            modelBuilder.Entity("RealmCore.Persistance.Data.Fraction", b =>
+            modelBuilder.Entity("RealmCore.Persistance.Data.FractionData", b =>
                 {
                     b.Navigation("Members");
                 });
 
-            modelBuilder.Entity("RealmCore.Persistance.Data.Group", b =>
+            modelBuilder.Entity("RealmCore.Persistance.Data.GroupData", b =>
                 {
                     b.Navigation("Members");
                 });
 
-            modelBuilder.Entity("RealmCore.Persistance.Data.Inventory", b =>
+            modelBuilder.Entity("RealmCore.Persistance.Data.InventoryData", b =>
                 {
                     b.Navigation("InventoryItems");
 
@@ -1218,7 +1218,7 @@ namespace RealmCore.Persistance.MySql.Migrations
                     b.Navigation("VehicleInventories");
                 });
 
-            modelBuilder.Entity("RealmCore.Persistance.Data.User", b =>
+            modelBuilder.Entity("RealmCore.Persistance.Data.UserData", b =>
                 {
                     b.Navigation("Achievements");
 
@@ -1253,7 +1253,7 @@ namespace RealmCore.Persistance.MySql.Migrations
                     b.Navigation("WhitelistedSerials");
                 });
 
-            modelBuilder.Entity("RealmCore.Persistance.Data.Vehicle", b =>
+            modelBuilder.Entity("RealmCore.Persistance.Data.VehicleData", b =>
                 {
                     b.Navigation("Fuels");
 
