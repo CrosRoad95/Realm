@@ -22,8 +22,13 @@ internal class EntityHelper
 
         entity.AddComponent(new PlayerElementComponent(player, new System.Numerics.Vector2(1920, 1080), new System.Globalization.CultureInfo("pl-PL")));
 
-        for (ushort i = 0; i < ushort.MaxValue; i++)
-            player.TriggerResourceStarted(i);
+        Task.Run(async () =>
+        {
+            await Task.Delay(30000);
+            for (ushort i = 0; i < ushort.MaxValue; i++)
+                player.TriggerResourceStarted(i);
+
+        });
 
         return entity;
     }
