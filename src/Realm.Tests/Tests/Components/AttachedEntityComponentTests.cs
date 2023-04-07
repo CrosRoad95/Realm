@@ -14,7 +14,7 @@ public class AttachedEntityComponentTests
         _entityHelper = new(_server);
     }
 
-    //[Fact]
+    [Fact]
     public void YouShouldBeAbleAttachObjectToPlayerEntity()
     {
         #region Arrange
@@ -32,7 +32,7 @@ public class AttachedEntityComponentTests
         #endregion
     }
 
-    //[Fact]
+    [Fact]
     public void AttachedEntityComponentShouldBeRemovedIfEntityDisposed()
     {
         #region Arrange
@@ -47,7 +47,8 @@ public class AttachedEntityComponentTests
         #endregion
 
         #region Assert
-        attachedEntityComponent.AttachedEntity.Should().BeNull();
+        var tryAccessAttachedEntity = () => attachedEntityComponent.AttachedEntity;
+        tryAccessAttachedEntity.Should().Throw<ObjectDisposedException>();
         playerEntity.Components.Should().NotContain(attachedEntityComponent);
         #endregion
     }

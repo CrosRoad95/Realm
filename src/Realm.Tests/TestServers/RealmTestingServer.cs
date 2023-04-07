@@ -1,4 +1,6 @@
 ﻿using Realm.Resources.Assets.Interfaces;
+using Realm.Server.Security.Interfaces;
+using Realm.Server.Security;
 using Realm.Tests.Classes;
 
 namespace Realm.Tests.TestServers;
@@ -20,6 +22,8 @@ internal class RealmTestingServer : TestingServer
             services.AddSingleton(rpgServerMock.Object);
 
             services.AddSingleton<IDateTimeProvider>(dateTimeProvider);
+
+            services.AddSingleton<IActiveUsers, ActiveUsers>();
 
             services.AddSingleton<ItemsRegistry>();
             services.AddSingleton<VehicleUpgradeRegistry>();
