@@ -23,8 +23,7 @@ public sealed class Text3dComponent : Component
     public override void Dispose()
     {
         base.Dispose();
-        if (_text3dId == null)
-            throw new Exception("Bug?");
-        Text3dService.RemoveText3d(_text3dId.Value);
+        if (_text3dId != null)
+            Text3dService.RemoveText3d(_text3dId.Value);
     }
 }
