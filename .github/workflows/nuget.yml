@@ -6,7 +6,7 @@ on:
       version:
         description: 'Version'     
         required: true
-        default: 'warning'
+        default: '0.1.0'
 
 jobs:
   build:
@@ -27,5 +27,4 @@ jobs:
       with:
         nuget-api-key: ${{ secrets.NUGET_API_KEY }}
         nuget-version: '5.x'
-    - run: nuget pack src/Realm.Server/Realm.Server.csproj -IncludeReferencedProjects -OutputFileNamesWithoutVersion -Version ${{ github.event.inputs.version }}
     - run: nuget push *.nupkg -Source https://api.nuget.org/v3/index.json
