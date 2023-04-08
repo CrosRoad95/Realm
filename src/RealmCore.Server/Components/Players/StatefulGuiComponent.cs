@@ -54,4 +54,20 @@ public abstract class StatefulGuiComponent<TState> : GuiComponent
             FlushChanged();
         }
     }
+
+    protected void ChangeState<TValue>(Expression<Func<TState, TValue>> exp, Func<TState, TValue> value)
+    {
+        if (exp.Body is not MemberExpression memberExpression)
+            throw new InvalidExpressionException();
+
+        var property = (PropertyInfo)memberExpression.Member;
+        var stateValue = property.GetValue(_state);
+        var newValue = value(_state);
+        if (stateValue != newValue as object)
+        {
+            property.SetValue(_state, newValue);
+            _stateChange[memberExpression.Member.Name] = LuaValueMapper.Map(newValue);
+            FlushChanged();
+        }
+    }
 }

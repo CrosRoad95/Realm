@@ -75,8 +75,11 @@ local dgsUIProvider = {
 		dgsSetEnabled(elementHandle, false)
 	end,
 	destroy = function(elementHandle)
-		destroyElement(elementHandle)
-		return true;
+		if(isElement(elementHandle))then
+			destroyElement(elementHandle)
+			return true;
+		end
+		return false;
 	end,
 	getSize = function(elementHandle)
 		return dgsGetSize(elementHandle)

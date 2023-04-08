@@ -9,7 +9,18 @@
 		sampleLabel = guiProvider.label(string.format("Money: %.2f", state.Money), 10, 30, 280, 25, tab);
 		local incCounter = guiProvider.button("increase", 300, 60, 100, 20, tab);
 		guiProvider.onClick(incCounter, function()
-			guiProvider.invokeAction("counter")
+			guiProvider.invokeAction("increase")
+		end)
+		
+		local decCounter = guiProvider.button("decrease", 420, 60, 100, 20, tab);
+		guiProvider.onClick(decCounter, function()
+			guiProvider.invokeAction("decrease")
+		end)
+		
+		guiProvider.usingState("Counter", function(value)
+			for i=1,value do
+				guiProvider.label(string.format("(%i)", i), 10 + i * 50, 150, 280, 25, tab);
+			end
 		end)
 	end
 	do

@@ -98,6 +98,7 @@ internal sealed class PlayerBindsLogic
                     Model = x.Model,
                     Position = x.Position,
                 }).ToList();
+                state.Counter = 3;
                 return new DashboardGuiComponent(state);
             });
             OpenCloseGuiHelper<InventoryGuiComponent>(entity, "i");

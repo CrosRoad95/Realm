@@ -25,6 +25,8 @@ local dockingAreas = {
 	["rightBottom"] = {sx - 500, sy - 400, 500, 400},
 }
 
+addEvent("guiElementCreated")
+
 function guiGetScreenSize()
 	return screenX, screenY;
 end
@@ -61,31 +63,34 @@ local function internalGetWindowHandleByName(name, defaultState)
 			currentGuiProvider.destroy(guis[name].handle)
 			guis[name].handle = false;
 			guis[name].stateMd5 = "";
+			guis[name].state = defaultState
 		end
 	end
 
 	if(guis[name].handle == false)then
 		currentGui = name;
 		currentGuiProvider.currentGui = currentGui;
-		local status, retval = pcall(function()
+		local success, errorMessage = pcall(function()
+			guis[name].state = defaultState
+			guis[name].stateCallbacks = {}
 			local windowHandle, setStateCallback = guis[name].callback(currentGuiProvider, defaultState);
 			guis[name].handle = windowHandle;
-			guis[name].stateChanged = setStateCallback;
+			guis[name].stateChanged = setStateCallback or function()end;
 			return true
 		end)
-		if(not status)then
+		if(not success)then
 			if(lastCreatedWindow ~= nil)then
 				currentGuiProvider.close(lastCreatedWindow)
 				lastCreatedWindow = nil
 			end
-			local windowHandle = createErrorGui(currentGuiProvider, retval, name)
+			local windowHandle = createErrorGui(currentGuiProvider, errorMessage, name)
 			guis[name].handle = windowHandle;
+			guis[name].stateCallbacks = {}
 			guis[name].stateChanged = function()end
 		end
 		guis[name].stateMd5 = stateMd5;
 		currentGui = nil;
 	end
-
 	return guis[name];
 end
 
@@ -318,6 +323,10 @@ local function internalCommonGuiProvider()
 	}
 end
 
+addEventHandler("guiElementCreated", resourceRoot, function(...)
+	--iprint("guiElementCreated",...)
+end)
+
 local function entrypoint()
 	if(selectedGuiProvider == nil)then
 		error("No gui provider selected.")
@@ -333,10 +342,85 @@ local function entrypoint()
 
 	local _onClick = currentGuiProvider.onClick;
 	local _window = currentGuiProvider.window;
+	local _createInput = currentGuiProvider.input;
+	local _createButton = currentGuiProvider.button;
+	local _createLabel = currentGuiProvider.label;
+	local _createCheckbox = currentGuiProvider.checkbox;
+	local _createScrollPane = currentGuiProvider.scrollPane;
+	local _createTabPanel = currentGuiProvider.tabPanel;
+	local _createTab = currentGuiProvider.tab;
+
+	currentGuiProvider.input = function(...)
+		local input = _createInput(...)
+		triggerEvent("guiElementCreated", resourceRoot, "input", input)
+		return input
+	end
+
+	currentGuiProvider.button = function(...)
+		local button = _createButton(...)
+		triggerEvent("guiElementCreated", resourceRoot, "button", button)
+		return button
+	end
+	
+	currentGuiProvider.label = function(...)
+		local label = _createLabel(...)
+		triggerEvent("guiElementCreated", resourceRoot, "label", label)
+		return label
+	end
+	
+	currentGuiProvider.checkbox = function(...)
+		local checkbox = _createCheckbox(...)
+		triggerEvent("guiElementCreated", resourceRoot, "checkbox", checkbox)
+		return checkbox
+	end
+	
+	currentGuiProvider.scrollPane = function(...)
+		local scrollPane = _createScrollPane(...)
+		triggerEvent("guiElementCreated", resourceRoot, "scrollPane", scrollPane)
+		return scrollPane
+	end
+	
+	currentGuiProvider.tabPanel = function(...)
+		local tabPanel = _createTabPanel(...)
+		triggerEvent("guiElementCreated", resourceRoot, "tabPanel", tabPanel)
+		return tabPanel
+	end
+	
+	currentGuiProvider.tab = function(...)
+		local tab = _createTab(...)
+		triggerEvent("guiElementCreated", resourceRoot, "tab", tab)
+		return tab
+	end
+	
 	currentGuiProvider.window = function(...)
 		lastCreatedWindow = _window(...)
 		return lastCreatedWindow
 	end
+
+	currentGuiProvider.usingState = function(stateKey, callback)
+		if(currentGui == nil)then
+			error("Can't use usingState outside gui constructor.'")
+		end
+		
+		local _currentGui = getCurrentGuiName();
+		local gui = guis[_currentGui];
+		local createdElements = {}
+		local function handleElementCreated(elementType, element)
+			createdElements[#createdElements + 1] = element;
+		end
+		local updateCallback = function(newState)
+			for i,v in ipairs(createdElements)do
+				currentGuiProvider.destroy(v)
+			end
+			createdElements = {}
+			addEventHandler("guiElementCreated", resourceRoot, handleElementCreated)
+			callback(gui.state[stateKey])
+			removeEventHandler("guiElementCreated", resourceRoot, handleElementCreated)
+		end
+		gui.stateCallbacks[stateKey] = updateCallback;
+		updateCallback(gui.state[stateKey])
+	end
+
 	currentGuiProvider.onClick = function(elementHandle, callback)
 		if(currentGui == nil)then
 			error("Can't use onClick outside gui constructor.'")
@@ -354,7 +438,11 @@ local function entrypoint()
 		local currentGuiHandle = internalGetWindowHandleByName(guiName)
 		if(currentGuiHandle)then
 			currentGui = guiName;
+			currentGuiHandle.state = changes
 			for k,v in pairs(changes)do
+				if(currentGuiHandle.stateCallbacks[k])then
+					currentGuiHandle.stateCallbacks[k](v)
+				end
 				currentGuiHandle.stateChanged(k, v);
 			end
 			currentGui = nil;

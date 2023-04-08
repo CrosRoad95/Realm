@@ -8,6 +8,7 @@ public sealed class DashboardGuiComponent : StatefulGuiComponent<DashboardGuiCom
 {
     public class DashboardState
     {
+        public int Counter { get; set; }
         public double Money { get; set; }
         public List<VehicleLightInfoDTO> VehicleLightInfos { get; set; }
     }
@@ -21,8 +22,11 @@ public sealed class DashboardGuiComponent : StatefulGuiComponent<DashboardGuiCom
     {
         switch (actionContext.ActionName)
         {
-            case "counter":
-
+            case "increase":
+                ChangeState(x => x.Counter, GetStateValue(x => x.Counter) + 1);
+                break;
+            case "decrease":
+                ChangeState(x => x.Counter, state => state.Counter - 1);
                 break;
             default:
                 throw new NotImplementedException();
