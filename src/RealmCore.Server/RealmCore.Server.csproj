@@ -27,7 +27,6 @@
     <ProjectReference Include="..\RealmCore.Configuration\RealmCore.Configuration.csproj" />
     <ProjectReference Include="..\RealmCore.Module.Discord\RealmCore.Module.Discord.csproj" />
     <ProjectReference Include="..\RealmCore.Module.Grpc\RealmCore.Module.Grpc.csproj" />
-    <ProjectReference Include="..\RealmCore.Module.WebApp\RealmCore.Module.WebApp.csproj" />
     <ProjectReference Include="..\RealmCore.Module.Discord\RealmCore.Module.Discord.csproj" />
     <ProjectReference Include="..\RealmCore.Module.Grpc.Proto\RealmCore.Module.Grpc.Proto.csproj" />
     <ProjectReference Include="..\RealmCore.MySql\RealmCore.MySql.csproj" />

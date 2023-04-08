@@ -59,7 +59,6 @@ global using RealmCore.Server.Security.Interfaces;
 global using RealmCore.Server.Registries;
 global using RealmCore.Module.Discord;
 global using RealmCore.Module.Grpc;
-global using RealmCore.Module.WebApp;
 global using RealmCore.Resources.Assets.Interfaces;
 global using RealmCore.Server.Logic;
 global using RealmCore.Server.Logic.Registries;

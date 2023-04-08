@@ -1,6 +1,4 @@
-﻿using RealmCore.Resources.GuiSystem;
-
-namespace RealmCore.Server.Components.Players;
+﻿namespace RealmCore.Server.Components.Players;
 
 public abstract class StatefulGuiComponent<TState> : GuiComponent
 {

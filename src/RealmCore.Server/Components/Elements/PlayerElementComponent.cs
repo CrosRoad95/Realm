@@ -1,5 +1,4 @@
-﻿using RealmCore.Resources.GuiSystem;
-using HudComponent = SlipeServer.Server.Elements.Enums.HudComponent;
+﻿using HudComponent = SlipeServer.Server.Elements.Enums.HudComponent;
 
 namespace RealmCore.Server.Components.Elements;
 

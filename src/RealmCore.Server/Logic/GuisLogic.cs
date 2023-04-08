@@ -1,6 +1,4 @@
-﻿using RealmCore.Resources.GuiSystem;
-
-namespace RealmCore.Server.Logic;
+﻿namespace RealmCore.Server.Logic;
 
 internal class GuisLogic
 {

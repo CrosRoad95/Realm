@@ -76,7 +76,6 @@ internal sealed class RPGServer : IRPGServer
 
         services.AddGrpcModule();
         services.AddDiscordModule();
-        services.AddWebAppModule();
     }
 
     public TService GetRequiredService<TService>() where TService : notnull

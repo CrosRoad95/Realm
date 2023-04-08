@@ -1,6 +1,4 @@
-﻿using RealmCore.Resources.GuiSystem;
-
-namespace RealmCore.Server.Extensions;
+﻿namespace RealmCore.Server.Extensions;
 
 public static class ServerBuilderExtensions
 {
