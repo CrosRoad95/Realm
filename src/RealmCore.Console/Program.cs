@@ -5,6 +5,9 @@ using RealmCore.Module.Discord.Interfaces;
 using RealmCore.Server.Integrations.Discord.Handlers;
 using RealmCore.Server.Logic;
 using RealmCore.Server.Logic.Defaults;
+using System.Reflection;
+using Microsoft.AspNetCore.Identity;
+using RealmCore.Console.Data.Validators;
 
 Directory.SetCurrentDirectory(Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly()!.Location)!);
 
@@ -38,29 +41,31 @@ var server = builder.Build(null, extraBuilderSteps: serverBuilder =>
 #if DEBUG
     serverBuilder.AddLogic<HotReloadLogic>("../../../Server/Gui");
 #endif
-    serverBuilder.ConfigureServices(x =>
+    serverBuilder.ConfigureServices(services =>
     {
+        services.AddTransient<IValidator<LoginData>, LoginDataValidator>();
+
         #region Discord integration specific
-        x.AddSingleton<IDiscordStatusChannelUpdateHandler, DefaultDiscordStatusChannelUpdateHandler>();
-        x.AddSingleton<IDiscordConnectUserHandler, DefaultDiscordConnectUserHandler>();
-        x.AddSingleton<IDiscordPrivateMessageReceived, DefaultDiscordPrivateMessageReceivedHandler>();
-        x.AddSingleton<IDiscordTextBasedCommandHandler, DefaultTextBasedCommandHandler>();
+        services.AddSingleton<IDiscordStatusChannelUpdateHandler, DefaultDiscordStatusChannelUpdateHandler>();
+        services.AddSingleton<IDiscordConnectUserHandler, DefaultDiscordConnectUserHandler>();
+        services.AddSingleton<IDiscordPrivateMessageReceived, DefaultDiscordPrivateMessageReceivedHandler>();
+        services.AddSingleton<IDiscordTextBasedCommandHandler, DefaultTextBasedCommandHandler>();
         #endregion
 
         #region In game command
-        x.AddInGameCommand<CreateGroupCommand>();
-        x.AddInGameCommand<GiveItemCommand>();
-        x.AddInGameCommand<GiveLicenseCommand>();
-        x.AddInGameCommand<GPCommand>();
-        x.AddInGameCommand<InventoryCommand>();
-        x.AddInGameCommand<LicensesCommand>();
-        x.AddInGameCommand<TakeItemCommand>();
-        x.AddInGameCommand<AddPointsCommand>();
-        x.AddInGameCommand<JobsStatsCommand>();
-        x.AddInGameCommand<JobsStatsAllCommand>();
-        x.AddInGameCommand<GiveRewardCommand>();
-        x.AddInGameCommand<Display3dRing>();
-        x.AddInGameCommand<CurrencyCommand>();
+        services.AddInGameCommand<CreateGroupCommand>();
+        services.AddInGameCommand<GiveItemCommand>();
+        services.AddInGameCommand<GiveLicenseCommand>();
+        services.AddInGameCommand<GPCommand>();
+        services.AddInGameCommand<InventoryCommand>();
+        services.AddInGameCommand<LicensesCommand>();
+        services.AddInGameCommand<TakeItemCommand>();
+        services.AddInGameCommand<AddPointsCommand>();
+        services.AddInGameCommand<JobsStatsCommand>();
+        services.AddInGameCommand<JobsStatsAllCommand>();
+        services.AddInGameCommand<GiveRewardCommand>();
+        services.AddInGameCommand<Display3dRing>();
+        services.AddInGameCommand<CurrencyCommand>();
         #endregion
     });
 });

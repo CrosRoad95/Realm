@@ -8,6 +8,7 @@ internal class FormContext : IFormContext
     private readonly LuaValue _data;
     private readonly IGuiSystemService _GuiSystemService;
     private readonly IECS _ecs;
+    private readonly IServiceProvider _serviceProvider;
 
     public string FormName => _formName;
 
@@ -20,19 +21,25 @@ internal class FormContext : IFormContext
         }
     }
 
-    public FormContext(Player player, string formName, LuaValue data, IGuiSystemService GuiSystemService, IECS ecs)
+    public FormContext(Player player, string formName, LuaValue data, IGuiSystemService GuiSystemService, IECS ecs, IServiceProvider serviceProvider)
     {
         _player = player;
         _formName = formName;
         _data = data;
         _GuiSystemService = GuiSystemService;
         _ecs = ecs;
+        _serviceProvider = serviceProvider;
     }
 
-    public TData GetData<TData>() where TData : ILuaValue, new()
+    public TData GetData<TData>(bool supressValidation = false) where TData : ILuaValue, new()
     {
         var data = new TData();
         data.Parse(_data);
+        if(!supressValidation)
+        {
+            var validator = _serviceProvider.GetRequiredService<IValidator<TData>>();
+            validator.ValidateAndThrow(data);
+        }
         return data;
     }
 

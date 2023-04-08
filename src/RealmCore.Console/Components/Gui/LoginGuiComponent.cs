@@ -20,7 +20,16 @@ public sealed class LoginGuiComponent : GuiComponent
         switch (formContext.FormName)
         {
             case "login":
-                var loginData = formContext.GetData<LoginData>();
+                LoginData loginData;
+                try
+                {
+                    loginData = formContext.GetData<LoginData>();
+                }
+                catch(ValidationException ex)
+                {
+                    formContext.ErrorResponse(ex.Errors.First().ErrorMessage);
+                    return;
+                }
 
                 var user = await RPGUserManager.GetUserByLogin(loginData.Login);
 

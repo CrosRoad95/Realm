@@ -26,3 +26,4 @@ global using Microsoft.Extensions.DependencyInjection;
 global using Microsoft.Extensions.Logging;
 global using RealmCore.Server.Components.Object;
 global using RealmCore.Server.Attributes;
+global using FluentValidation;

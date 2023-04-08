@@ -10,6 +10,8 @@ public abstract class GuiComponent : Component
     private IECS ECS { get; set; } = default!;
     [Inject]
     private FromLuaValueMapper FromLuaValueMapper { get; set; } = default!;
+    [Inject]
+    private IServiceProvider ServiceProvider { get; set; } = default!;
 
     protected readonly string _name;
     protected readonly bool _cursorless;
@@ -62,13 +64,15 @@ public abstract class GuiComponent : Component
             var (id, guiName, formName, data) = luaEvent.Read<string, string, string, LuaValue>(FromLuaValueMapper);
             if (guiName == _name)
             {
+                var formContext = new FormContext(luaEvent.Player, formName, data, GuiSystemService, ECS, ServiceProvider);
                 try
                 {
-                    await HandleForm(new FormContext(luaEvent.Player, formName, data, GuiSystemService, ECS));
+                    await HandleForm(formContext);
                 }
                 catch (Exception ex)
                 {
                     Logger.LogError(ex, "Failed to handle form {formName}.", formName);
+                    formContext.ErrorResponse("Wystąpił nieznany błąd.");
                 }
             }
         }
