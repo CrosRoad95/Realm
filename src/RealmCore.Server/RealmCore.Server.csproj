@@ -6,6 +6,8 @@
     <Nullable>enable</Nullable>
 	<LangVersion>preview</LangVersion>
 	<SignAssembly>False</SignAssembly>
+	<Version>0.0.0</Version>
+	<Authors>Sebastian Jura</Authors>
   </PropertyGroup>
 
   <ItemGroup>
