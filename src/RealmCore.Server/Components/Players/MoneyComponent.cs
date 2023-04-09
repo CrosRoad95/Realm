@@ -7,7 +7,7 @@ public class MoneyComponent : Component
     private IOptions<GameplayOptions> GameplayOptions { get; set; } = default!;
 
     private decimal _money = 0;
-    private readonly ReaderWriterLockSlim _moneyLock = new();
+    private readonly ReaderWriterLockSlim _moneyLock = new(LockRecursionPolicy.SupportsRecursion);
 
     public event Action<MoneyComponent, decimal>? MoneySet;
     public event Action<MoneyComponent, decimal>? MoneyAdded;
@@ -125,7 +125,7 @@ public class MoneyComponent : Component
         _moneyLock.EnterWriteLock();
         try
         {
-            if (Math.Abs(_money) + amount > GameplayOptions.Value.MoneyLimit)
+            if (Math.Abs(_money) - amount < -GameplayOptions.Value.MoneyLimit)
                 throw new GameplayException("Unable to take money beyond limit.");
 
             if (_money - amount < 0 && !force)
@@ -135,6 +135,59 @@ public class MoneyComponent : Component
             MoneyTaken?.Invoke(this, amount);
         }
         catch (Exception)
+        {
+            throw;
+        }
+        finally
+        {
+            _moneyLock.ExitWriteLock();
+        }
+    }
+
+    internal bool InternalHasMoney(decimal amount, bool force = false) => (_money > amount) || force;
+
+    public bool HasMoney(decimal amount, bool force = false)
+    {
+        _moneyLock.EnterReadLock();
+        try
+        {
+            return InternalHasMoney(amount, force);
+        }
+        finally
+        {
+            _moneyLock.ExitReadLock();
+        }
+    }
+
+    public bool TryTakeMoney(decimal amount, bool force = false)
+    {
+        try
+        {
+            TakeMoney(amount, force);
+            return true;
+        }
+        catch
+        {
+            return false;
+        }
+    }
+
+    public bool TryTakeMoneyWithCallback(decimal amount, Func<bool> action, bool force = false)
+    {
+        _moneyLock.EnterWriteLock();
+        try
+        {
+            if(!InternalHasMoney(amount, force))
+                return false;
+
+            if(action())
+            {
+                TakeMoney(amount, force);
+                return true;
+            }
+            return false;
+        }
+        catch
         {
             throw;
         }

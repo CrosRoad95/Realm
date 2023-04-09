@@ -9,7 +9,7 @@ internal class LevelsLogic
         _levelsRegistry = levelsRegistry;
         for (uint i = 1; i < 100; i++)
         {
-            _levelsRegistry.AddLevel(new LevelRegistryEntry(i, i * 25));
+            _levelsRegistry.Add(1, new LevelRegistryEntry(i * 25));
         }
     }
 }

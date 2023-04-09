@@ -4,7 +4,7 @@ internal class TestItemsRegistry : ItemsRegistry
 {
     public TestItemsRegistry()
     {
-        AddItem(1, new ItemRegistryEntry
+        Add(1, new ItemRegistryEntry
         {
             AvailiableActions = ItemAction.Use,
             Name = "Test item id 1",

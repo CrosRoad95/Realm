@@ -1,21 +1,33 @@
 ﻿namespace RealmCore.Server.Registries.Abstractions;
 
-public abstract class RegistryBase<TEntry> where TEntry : RegistryEntryBase
+public abstract class RegistryBase<TKey, TEntry> where TEntry : RegistryEntryBase<TKey>
+    where TKey : unmanaged
 {
-    protected readonly Dictionary<int, TEntry> _entries = new();
+    protected readonly Dictionary<TKey, TEntry> _entries = new();
 
-    public TEntry Get(int id)
+    public TEntry Get(TKey id)
     {
         return _entries[id];
     }
+    
+    public bool HasKey(TKey id)
+    {
+        return _entries.ContainsKey(id);
+    }
 
-    public void Add(int id, TEntry entry)
+    public void Add(TKey id, TEntry entry)
     {
         if (_entries.ContainsKey(id))
         {
-            throw new Exception("Entry of id '" + id + "' already exists;.");
+            throw new Exception($"Entry of id '{id}' already exists;.");
         }
         entry.Id = id;
         _entries[id] = entry;
     }
+}
+
+
+public abstract class RegistryBase<TEntry> : RegistryBase<int, TEntry>
+     where TEntry : RegistryEntryBase<int>
+{
 }

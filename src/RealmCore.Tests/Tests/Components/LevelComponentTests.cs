@@ -16,7 +16,7 @@ public class LevelComponentTests
         for(int i = 0; i < 10;i++)
         {
             var requiredExperience = (uint)(10 * i + 10);
-            levelsRegistry.AddLevel(new LevelRegistryEntry((uint)i+1, requiredExperience));
+            levelsRegistry.Add((uint)i + 1, new LevelRegistryEntry(requiredExperience));
             _totalRequiredExperience += requiredExperience;
         }
         _entity = new(serviceProvider, "test", EntityTag.Unknown);

@@ -1,4 +1,6 @@
-﻿namespace RealmCore.Tests.Tests.Components;
+﻿using RealmCore.Server.Components.Players;
+
+namespace RealmCore.Tests.Tests.Components;
 
 public class MoneyComponentTests
 {
@@ -158,7 +160,6 @@ public class MoneyComponentTests
         transfer.Should().Throw<GameplayException>().WithMessage("Unable to take money, not enough money.");
     }
 
-
     [Fact]
     public async Task TrasnferMoneyShouldBeThreadSafety()
     {
@@ -174,5 +175,79 @@ public class MoneyComponentTests
 
         _moneyComponent.Money.Should().Be(0);
         targetMoneyComponent.Money.Should().Be(800);
+    }
+
+    [InlineData(10, 5, false, true)]
+    [InlineData(10, 5, true, true)]
+    [InlineData(10, 15, false, false)]
+    [InlineData(10, 15, true, true)]
+    [Theory]
+    public void HasMoneyShouldReturnExpectedValue(decimal amount, decimal requiredAmount, bool force, bool expectedResult)
+    {
+        var moneyComponent = new MoneyComponent();
+        _entityB.AddComponent(moneyComponent);
+
+        _moneyComponent.Money = amount;
+        _moneyComponent.HasMoney(requiredAmount, force).Should().Be(expectedResult);
+    }
+
+    [InlineData(6, 4)]
+    [InlineData(20, 10)]
+    [Theory]
+    public void TryTakeMoneyShouldWork(decimal takenMoney, decimal expectedMoney)
+    {
+        var moneyComponent = new MoneyComponent();
+        _entityB.AddComponent(moneyComponent);
+
+        _moneyComponent.Money = 10;
+        _moneyComponent.TryTakeMoney(takenMoney);
+        _moneyComponent.Money.Should().Be(expectedMoney);
+    }
+
+    [Fact]
+    public void TryTakeMoneyWithCallbackShouldSucceed()
+    {
+        var moneyComponent = new MoneyComponent();
+        _entityB.AddComponent(moneyComponent);
+
+        _moneyComponent.Money = 10;
+        _moneyComponent.TryTakeMoneyWithCallback(5, () =>
+        {
+            return true;
+        });
+        _moneyComponent.Money.Should().Be(5);
+    }
+
+    [Fact]
+    public void TryTakeMoneyWithCallbackShouldFail()
+    {
+        var moneyComponent = new MoneyComponent();
+        _entityB.AddComponent(moneyComponent);
+
+        _moneyComponent.Money = 10;
+        _moneyComponent.TryTakeMoneyWithCallback(5, () =>
+        {
+            return false;
+        });
+        _moneyComponent.Money.Should().Be(10);
+    }
+
+    [Fact]
+    public void TryTakeMoneyWithCallbackShouldFailOnException()
+    {
+        var moneyComponent = new MoneyComponent();
+        _entityB.AddComponent(moneyComponent);
+
+        _moneyComponent.Money = 10;
+        var act = () =>
+        {
+            _moneyComponent.TryTakeMoneyWithCallback(5, () =>
+            {
+                throw new Exception();
+            });
+        };
+
+        act.Should().Throw<Exception>();
+        _moneyComponent.Money.Should().Be(10);
     }
 }

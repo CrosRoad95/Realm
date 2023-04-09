@@ -1,13 +1,11 @@
 ﻿namespace RealmCore.Server.Registries;
 
-public class LevelRegistryEntry
+public class LevelRegistryEntry : RegistryEntryBase<uint>
 {
-    public uint Level { get; }
     public uint RequiredExperience { get; }
 
-    public LevelRegistryEntry(uint level, uint requiredExperience)
+    public LevelRegistryEntry(uint requiredExperience)
     {
-        Level = level;
         RequiredExperience = requiredExperience;
     }
 }

@@ -1,4 +1,5 @@
-﻿using RealmCore.Server.Inventory;
+﻿using RealmCore.Server.Components.Common;
+using RealmCore.Server.Inventory;
 
 namespace RealmCore.Tests.Tests.Components;
 
@@ -11,32 +12,46 @@ public class InventoryComponentTests
     public InventoryComponentTests()
     {
         _itemsRegistry = new();
-        _itemsRegistry.AddItem(1, new ItemRegistryEntry
+        _itemsRegistry.Add(1, new ItemRegistryEntry
         {
             Name = "test item id 1",
             Size = 1,
-            StackSize = 1,
+            StackSize = 8,
             AvailiableActions = ItemAction.Use,
         });
-        _itemsRegistry.AddItem(2, new ItemRegistryEntry
+        _itemsRegistry.Add(2, new ItemRegistryEntry
         {
             Name = "test item id 2",
             Size = 2,
             StackSize = 1,
             AvailiableActions = ItemAction.Use,
         });
-        _itemsRegistry.AddItem(3, new ItemRegistryEntry
+        _itemsRegistry.Add(3, new ItemRegistryEntry
         {
             Name = "test item id 3",
             Size = 1,
             StackSize = 8,
-            AvailiableActions = ItemAction.Use,
+            AvailiableActions = ItemAction.Use | ItemAction.Drop | ItemAction.Eat,
         });
-        _itemsRegistry.AddItem(4, new ItemRegistryEntry
+        _itemsRegistry.Add(4, new ItemRegistryEntry
         {
             Name = "test item id 4",
-            Size = 2,
+            Size = 100,
             StackSize = 8,
+            AvailiableActions = ItemAction.Use,
+        });
+        _itemsRegistry.Add(5, new ItemRegistryEntry
+        {
+            Name = "test item id 5",
+            Size = 101,
+            StackSize = 8,
+            AvailiableActions = ItemAction.Use,
+        });
+        _itemsRegistry.Add(6, new ItemRegistryEntry
+        {
+            Name = "test item id 6",
+            Size = 1,
+            StackSize = 1,
             AvailiableActions = ItemAction.Use,
         });
 
@@ -116,21 +131,21 @@ public class InventoryComponentTests
     [Fact]
     public void SumItemsByIdShouldWork()
     {
-        _inventoryComponent.AddItem(_itemsRegistry, 1, 1);
-        _inventoryComponent.AddItem(_itemsRegistry, 1, 1);
         _inventoryComponent.AddItem(_itemsRegistry, 2, 1);
+        _inventoryComponent.AddItem(_itemsRegistry, 2, 1);
+        _inventoryComponent.AddItem(_itemsRegistry, 6, 1);
 
-        _inventoryComponent.SumItemsById(1).Should().Be(2);
+        _inventoryComponent.SumItemsById(2).Should().Be(2);
     }
     
     [Fact]
     public void GetItemsByIdShouldWork()
     {
-        var item1 = _inventoryComponent.AddItem(_itemsRegistry, 1, 1).First();
-        var item2 = _inventoryComponent.AddItem(_itemsRegistry, 1, 1).First();
-        _inventoryComponent.AddItem(_itemsRegistry, 2, 1);
+        var item1 = _inventoryComponent.AddItem(_itemsRegistry, 2, 1).First();
+        var item2 = _inventoryComponent.AddItem(_itemsRegistry, 2, 1).First();
+        _inventoryComponent.AddItem(_itemsRegistry, 6, 1);
 
-        _inventoryComponent.GetItemsById(1).Should().BeEquivalentTo(new List<Item>
+        _inventoryComponent.GetItemsById(2).Should().BeEquivalentTo(new List<Item>
         {
             item1, item2
         });
@@ -161,7 +176,7 @@ public class InventoryComponentTests
     }
     
     [Fact]
-    public void asd()
+    public void YouShouldBeAbleToAddAndGetItemByMetadata()
     {
         var item = _inventoryComponent.AddSingleItem(_itemsRegistry, 1, new Dictionary<string, object> { ["foo"] = 1 });
         var found = _inventoryComponent.TryGetByIdAndMetadata(1, new Dictionary<string, object> { ["foo"] = 1 }, out Item foundItem);
@@ -176,5 +191,86 @@ public class InventoryComponentTests
         var act = () => _inventoryComponent.AddItem(_itemsRegistry, 1, 0);
 
         act.Should().Throw<ArgumentOutOfRangeException>();
+    }
+
+    [Fact]
+    public void InventoryShouldBeResizable()
+    {
+        _inventoryComponent.HasSpace(200).Should().BeFalse();
+        _inventoryComponent.Size = 500;
+        _inventoryComponent.HasSpace(200).Should().BeTrue();
+    }
+
+    [Fact]
+    public void YouShouldBeAbleToCheckIfItemWillFitIntoInventory()
+    {
+        _inventoryComponent.Size = 100;
+        _inventoryComponent.HasSpaceForItem(1, _itemsRegistry).Should().BeTrue();
+        _inventoryComponent.HasSpaceForItem(4, _itemsRegistry).Should().BeTrue();
+        _inventoryComponent.HasSpaceForItem(5, _itemsRegistry).Should().BeFalse();
+        _inventoryComponent.HasSpaceForItem(1, 100, _itemsRegistry).Should().BeTrue();
+        _inventoryComponent.HasSpaceForItem(1, 101, _itemsRegistry).Should().BeFalse();
+    }
+
+    [Fact]
+    public void YouShouldBeAbleToUseItem()
+    {
+        void HandleItemUsed(InventoryComponent inventoryComponent, Item usedItem, ItemAction flags)
+        {
+            usedItem.SetMetadata("counter", (int)usedItem.GetMetadata("counter") - 1);
+        }
+
+        _inventoryComponent.ItemUsed += HandleItemUsed;
+        _inventoryComponent.Size = 100;
+        var item = _inventoryComponent.AddSingleItem(_itemsRegistry, 1, new Dictionary<string, object> { ["counter"] = 10 });
+
+        _inventoryComponent.TryUseItem(item, ItemAction.Use).Should().BeTrue();
+        item.GetMetadata("counter").Should().Be(9);
+    }
+
+    [Fact]
+    public void YouCanNotUseItemIfItDoesNotSupportIt()
+    {
+        _inventoryComponent.Size = 100;
+        var item = _inventoryComponent.AddSingleItem(_itemsRegistry, 1);
+        _inventoryComponent.TryUseItem(item, ItemAction.Close).Should().BeFalse();
+    }
+
+    [Fact]
+    public void RemoveItemShouldWork()
+    {
+        var item = _inventoryComponent.AddSingleItem(_itemsRegistry, 1);
+        _inventoryComponent.RemoveItem(item);
+        _inventoryComponent.Items.Should().BeEmpty();
+    }
+
+    [Fact]
+    public void RemoveItemByIdShouldWork()
+    {
+        var item = _inventoryComponent.AddSingleItem(_itemsRegistry, 1);
+        _inventoryComponent.RemoveItem(1);
+        _inventoryComponent.Items.Should().BeEmpty();
+    }
+
+    [Fact]
+    public void RemoveItemShouldRemoveSingleItemWork()
+    {
+        _inventoryComponent.Size = 100;
+        _inventoryComponent.AddItem(_itemsRegistry, 1, 4);
+        _inventoryComponent.RemoveItem(1);
+
+        var items = _inventoryComponent.Items;
+        items.Should().HaveCount(1);
+        items.First().Number.Should().Be(3);
+    }
+
+    [Fact]
+    public void RemoveItemStackShouldRemoveEntireStack()
+    {
+        _inventoryComponent.Size = 100;
+        _inventoryComponent.AddItem(_itemsRegistry, 1, 4);
+        _inventoryComponent.RemoveItemStack(1);
+
+        _inventoryComponent.Items.Should().BeEmpty();
     }
 }

@@ -1,6 +1,11 @@
 ﻿namespace RealmCore.Server.Registries.Abstractions;
 
-public abstract class RegistryEntryBase
+public abstract class RegistryEntryBase<TKey>
 {
-    public int Id { get; internal set; }
+    public TKey Id { get; internal set; }
+}
+
+public abstract class RegistryEntryBase : RegistryEntryBase<int>
+{
+
 }

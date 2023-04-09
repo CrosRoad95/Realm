@@ -1,4 +1,6 @@
-﻿namespace RealmCore.Server.Components.Common;
+﻿using RealmCore.Server.Enums;
+
+namespace RealmCore.Server.Components.Common;
 
 [ComponentUsage(true)]
 public class InventoryComponent : Component
@@ -8,6 +10,7 @@ public class InventoryComponent : Component
     public event Action<InventoryComponent, Item>? ItemAdded;
     public event Action<InventoryComponent, Item>? ItemRemoved;
     public event Action<InventoryComponent, Item>? ItemChanged;
+    public event Action<InventoryComponent, Item, ItemAction>? ItemUsed;
 
     private decimal _size;
     internal int Id { get; set; }
@@ -45,8 +48,6 @@ public class InventoryComponent : Component
         }
     }
 
-    public Func<InventoryComponent, Item, ItemAction, Task>? UseCallback { get; set; }
-
     public InventoryComponent(decimal size)
     {
         _size = size;
@@ -64,6 +65,15 @@ public class InventoryComponent : Component
         ThrowIfDisposed();
         lock (_itemsLock)
             return _items.Any(x => x.ItemId == itemId);
+    }
+
+    internal bool InternalHasItem(Item item) => _items.Contains(item);
+
+    public bool HasItem(Item item)
+    {
+        ThrowIfDisposed();
+        lock (_itemsLock)
+            return InternalHasItem(item);
     }
 
     public int SumItemsById(uint itemId)
@@ -179,12 +189,24 @@ public class InventoryComponent : Component
         ItemChanged?.Invoke(this, item);
     }
 
-    public void RemoveItem(Item item, bool removeEntireStack = false)
+    public bool RemoveItemStack(Item item) => RemoveItem(item, item.Number);
+    public bool RemoveItemStack(uint id)
     {
         ThrowIfDisposed();
-        if (item.Number > 1 && !removeEntireStack)
+        if (TryGetByItemId(id, out var item))
+            return RemoveItemStack(item);
+        return false;
+    }
+
+    public bool RemoveItem(Item item, uint number = 1)
+    {
+        ThrowIfDisposed();
+        if (number == 0 || !HasItem(item))
+            return false;
+
+        if (item.Number > number)
         {
-            item.Number--;
+            item.Number -= number;
             ItemChanged?.Invoke(this, item);
         }
         else
@@ -196,33 +218,47 @@ public class InventoryComponent : Component
             item.Changed -= HandleItemChanged;
             ItemRemoved?.Invoke(this, item);
         }
+        return true;
     }
 
-    public void RemoveItem(uint id, bool removeEntireStack = false)
+    public bool RemoveItem(uint id, uint number = 1)
     {
         ThrowIfDisposed();
         if (TryGetByItemId(id, out var item))
-            RemoveItem(item, removeEntireStack);
+            return RemoveItem(item, number);
+        return false;
     }
 
-    public async Task<bool> TryUseItem(Item item, ItemAction action)
+    public bool TryUseItem(Item item, ItemAction flags)
     {
         ThrowIfDisposed();
-        if (item.AvailiableActions.HasFlag(action))
-        {
-            if (UseCallback == null)
-                throw new NotImplementedException();
 
-            await UseCallback(this, item, action);
+        if (HasItem(item) && (item.AvailiableActions & flags) == flags)
+        {
+            ItemUsed?.Invoke(this, item, flags);
             return true;
         }
 
         return false;
     }
 
+    public bool HasSpace(decimal space)
+    {
+        return Number + space <= Size;
+    }
+    
+    public bool HasSpaceForItem(uint itemId, ItemsRegistry itemsRegistry)
+    {
+        return Number + itemsRegistry.Get(itemId).Size <= Size;
+    }
+    
+    public bool HasSpaceForItem(uint itemId, uint number, ItemsRegistry itemsRegistry)
+    {
+        return Number + itemsRegistry.Get(itemId).Size * number <= Size;
+    }
+
     public override void Dispose()
     {
-        UseCallback = null;
         base.Dispose();
     }
 }

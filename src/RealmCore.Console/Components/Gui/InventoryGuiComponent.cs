@@ -103,7 +103,7 @@ public sealed class InventoryGuiComponent : StatefulGuiComponent<InventoryGuiCom
                 var useItemData = actionContext.GetData<UseItemData>();
                 var inventory = Entity.GetRequiredComponent<InventoryComponent>();
                 if (inventory.TryGetByLocalId(useItemData.LocalId, out Item item))
-                    await inventory.TryUseItem(item, useItemData.ItemAction);
+                    inventory.TryUseItem(item, useItemData.ItemAction);
                 break;
             default:
                 throw new NotImplementedException();
