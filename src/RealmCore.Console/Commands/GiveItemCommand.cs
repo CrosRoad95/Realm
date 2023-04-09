@@ -18,7 +18,10 @@ public sealed class GiveItemCommand : IIngameCommand
         {
             uint itemId = uint.Parse(args.ElementAtOrDefault(0) ?? "1");
             uint count = uint.Parse(args.ElementAtOrDefault(1) ?? "1");
-            inventoryComponent.AddItem(_itemsRegistry, itemId, count);
+            inventoryComponent.AddItem(_itemsRegistry, itemId, count, new Dictionary<string, object>
+            {
+                ["foo"] = 10
+            });
             entity.GetRequiredComponent<PlayerElementComponent>().SendChatMessage($"Item added, {inventoryComponent.Number}/{inventoryComponent.Size}");
         }
 

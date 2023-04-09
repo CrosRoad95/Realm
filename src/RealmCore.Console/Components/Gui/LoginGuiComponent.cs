@@ -50,13 +50,19 @@ public sealed class LoginGuiComponent : GuiComponent
                     return;
                 }
 
-                if (await RPGUserManager.SignIn(Entity, user))
+                try
                 {
-                    Entity.DestroyComponent(this);
-                    formContext.SuccessResponse();
-                    return;
+                    if (await RPGUserManager.SignIn(Entity, user))
+                    {
+                        Entity.TryDestroyComponent(this);
+                        formContext.SuccessResponse();
+                        return;
+                    }
                 }
-                formContext.ErrorResponse("Błąd podczas logowania.");
+                catch(Exception ex)
+                {
+                    formContext.ErrorResponse("Błąd podczas logowania.");
+                }
                 break;
             default:
                 throw new NotImplementedException();

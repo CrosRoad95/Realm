@@ -39,12 +39,11 @@ internal sealed class PlayerBindsLogic
         {
             if (entity.HasComponent<TGuiComponent>())
             {
-                entity.DestroyComponent<TGuiComponent>();
+                entity.TryDestroyComponent<TGuiComponent>();
                 return;
             }
 
-            if (entity.HasComponent<GuiComponent>())
-                entity.DestroyComponent<GuiComponent>();
+            entity.TryDestroyComponent<GuiComponent>();
 
             var guiComponent = entity.AddComponent(factory());
             playerElementComponent.ResetCooldown(bind);

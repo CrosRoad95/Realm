@@ -105,9 +105,9 @@ public class VehicleFuelComponent : Component
 
     public override void Dispose()
     {
-        base.Dispose();
         var vehicle = Entity.GetRequiredComponent<VehicleElementComponent>().Vehicle;
         vehicle.PositionChanged -= HandlePositionChanged;
+        base.Dispose();
     }
 
     private void HandlePositionChanged(Element sender, ElementChangedEventArgs<Vector3> args)

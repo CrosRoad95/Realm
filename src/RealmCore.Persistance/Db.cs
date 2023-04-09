@@ -41,7 +41,9 @@ public abstract class Db<T> : IdentityDbContext<UserData, RoleData, int,
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
+#if DEBUG
         optionsBuilder.EnableSensitiveDataLogging();
+#endif
     }
 
     public async Task MigrateAsync()

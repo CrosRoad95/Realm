@@ -273,8 +273,16 @@ public class Entity : IDisposable
 
         if (HasComponent(component))
         {
-            component.Dispose();
-            DetachComponent(component);
+            try
+            {
+                component.Dispose();
+                DetachComponent(component);
+            }
+            catch (Exception ex)
+            {
+                if (ex is not ObjectDisposedException)
+                    throw;
+            }
             return true;
         }
 
@@ -287,8 +295,16 @@ public class Entity : IDisposable
         var component = GetComponent<TComponent>();
         if (component != null)
         {
-            component.Dispose();
-            DetachComponent(component);
+            try
+            {
+                component.Dispose();
+                DetachComponent(component);
+            }
+            catch(Exception ex)
+            {
+                if (ex is not ObjectDisposedException)
+                    throw;
+            }
             return true;
         }
         return false;

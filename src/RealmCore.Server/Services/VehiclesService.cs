@@ -1,5 +1,7 @@
-﻿using RealmCore.Persistance.DTOs;
+﻿using Newtonsoft.Json;
+using RealmCore.Persistance.DTOs;
 using RealmCore.Persistance.Interfaces;
+using RealmCore.Server.Json.Converters;
 
 namespace RealmCore.Server.Services;
 
@@ -10,6 +12,7 @@ internal sealed class VehiclesService : IVehiclesService
     private readonly ISaveService _saveService;
     private readonly ItemsRegistry _itemsRegistry;
     private readonly IDateTimeProvider _dateTimeProvider;
+    private readonly JsonSerializerSettings _jsonSerializerSettings;
 
     public VehiclesService(IVehicleRepository vehicleRepository, IEntityFactory entityFactory, ISaveService saveService, ItemsRegistry itemsRegistry, IDateTimeProvider dateTimeProvider)
     {
@@ -18,6 +21,11 @@ internal sealed class VehiclesService : IVehiclesService
         _saveService = saveService;
         _itemsRegistry = itemsRegistry;
         _dateTimeProvider = dateTimeProvider;
+
+        _jsonSerializerSettings = new JsonSerializerSettings
+        {
+            Converters = new List<JsonConverter> { new DoubleConverter() }
+        };
     }
 
     public async Task<Entity> ConvertToPrivateVehicle(Entity vehicleEntity)
@@ -104,7 +112,7 @@ internal sealed class VehiclesService : IVehiclesService
                     {
                         var items = inventory.InventoryItems
                             .Select(x =>
-                                new Item(_itemsRegistry, x.ItemId, x.Number, JsonConvert.DeserializeObject<Dictionary<string, object>>(x.MetaData))
+                                new Item(_itemsRegistry, x.ItemId, x.Number, JsonConvert.DeserializeObject<Dictionary<string, object>>(x.MetaData, _jsonSerializerSettings))
                             )
                             .ToList();
                         entity.AddComponent(new InventoryComponent(inventory.Size, inventory.Id, items));

@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Authorization;
+using RealmCore.Server.Json.Converters;
 
 namespace RealmCore.Server.Services;
+
 
 internal class UsersService : IUsersService
 {
@@ -13,6 +15,8 @@ internal class UsersService : IUsersService
     private readonly IDb _db;
     private readonly IActiveUsers _activeUsers;
 
+    private readonly JsonSerializerSettings _jsonSerializerSettings;
+
     public UsersService(ItemsRegistry itemsRegistry, UserManager<UserData> userManager, ILogger<UsersService> logger, IOptions<GameplayOptions> gameplayOptions,
         IDateTimeProvider dateTimeProvider, IAuthorizationService authorizationService, IDb db, IActiveUsers activeUsers)
     {
@@ -24,6 +28,11 @@ internal class UsersService : IUsersService
         _authorizationService = authorizationService;
         _db = db;
         _activeUsers = activeUsers;
+
+        _jsonSerializerSettings = new JsonSerializerSettings
+        {
+            Converters = new List<JsonConverter> { new DoubleConverter() }
+        };
     }
 
     public async Task<int> SignUp(string username, string password)
@@ -65,7 +74,7 @@ internal class UsersService : IUsersService
                 {
                     var items = inventory.InventoryItems
                         .Select(x =>
-                            new Item(_itemsRegistry, x.ItemId, x.Number, JsonConvert.DeserializeObject<Dictionary<string, object>>(x.MetaData))
+                            new Item(_itemsRegistry, x.ItemId, x.Number, JsonConvert.DeserializeObject<Dictionary<string, object>>(x.MetaData, _jsonSerializerSettings))
                         )
                         .ToList();
                     entity.AddComponent(new InventoryComponent(inventory.Size, inventory.Id, items));

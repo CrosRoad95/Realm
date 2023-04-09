@@ -256,9 +256,4 @@ public class InventoryComponent : Component
     {
         return Number + itemsRegistry.Get(itemId).Size * number <= Size;
     }
-
-    public override void Dispose()
-    {
-        base.Dispose();
-    }
 }

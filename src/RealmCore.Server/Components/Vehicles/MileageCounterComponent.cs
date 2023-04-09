@@ -45,8 +45,8 @@ public class MileageCounterComponent : Component
 
     public override void Dispose()
     {
-        base.Dispose();
         Entity.Transform.PositionChanged -= HandlePositionChanged;
+        base.Dispose();
     }
 
     private void HandlePositionChanged(Transform transform)

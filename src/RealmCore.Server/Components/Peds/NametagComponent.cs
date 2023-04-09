@@ -38,7 +38,7 @@ public sealed class NametagComponent : Component
 
     public override void Dispose()
     {
-        base.Dispose();
         NametagsService.RemoveNametag((Ped)Entity.Element);
+        base.Dispose();
     }
 }

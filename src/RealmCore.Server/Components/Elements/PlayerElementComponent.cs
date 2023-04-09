@@ -804,7 +804,7 @@ public sealed class PlayerElementComponent : PedElementComponent
 
     public override void Dispose()
     {
-        base.Dispose();
         _player.Kick(PlayerDisconnectType.SHUTDOWN);
+        base.Dispose();
     }
 }
