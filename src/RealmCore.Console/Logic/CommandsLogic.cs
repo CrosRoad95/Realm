@@ -796,6 +796,34 @@ internal sealed class CommandsLogic
                 playerElementComponent.SendChatMessage("Error while spawning");
         });
 
+        _commandService.AddCommandHandler("inventoryoccupied", (entity, args) =>
+        {
+            var inv = entity.GetRequiredComponent<InventoryComponent>();
+            var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();
+            playerElementComponent.SendChatMessage($"Inventory: {inv.Number}/{inv.Size}");
+        });
+        
+        _commandService.AddCommandHandler("giveitem4", (entity, args) =>
+        {
+            var inv = entity.GetRequiredComponent<InventoryComponent>();
+            inv.AddSingleItem(_itemsRegistry, 4);
+            var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();
+            playerElementComponent.SendChatMessage("Item given");
+        });
+        
+        _commandService.AddCommandHandler("itemwithmetadata", (entity, args) =>
+        {
+            var inv = entity.GetRequiredComponent<InventoryComponent>();
+            var item = inv.AddSingleItem(_itemsRegistry, 4, new Dictionary<string, object>
+            {
+                ["number"] = 1m
+            });
+
+            var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();
+            playerElementComponent.SendChatMessage($"Item regular: {item.GetMetadata("number").GetType()}");
+            playerElementComponent.SendChatMessage($"Item cast<int>: {item.GetMetadata<int>("number").GetType()}");
+        });
+
         _discordService.AddTextBasedCommandHandler(1069962155539042314, "test", (userId, parameters) =>
         {
             _chatBox.Output($"Użytkownik o id {userId} wpisał komendę 'test' z parametrami: {parameters}");

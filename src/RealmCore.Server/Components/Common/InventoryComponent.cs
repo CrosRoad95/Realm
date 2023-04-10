@@ -34,7 +34,7 @@ public class InventoryComponent : Component
         {
             ThrowIfDisposed();
             lock (_itemsLock)
-                return (uint)_items.Sum(x => x.Size * x.Number);
+                return _items.Sum(x => x.Size * x.Number);
         }
     }
 
@@ -96,6 +96,13 @@ public class InventoryComponent : Component
         lock (_itemsLock)
             return new List<Item>(_items.Where(x => x.ItemId == itemId && x.GetMetadata(key).Equals(metadata)));
     }
+    
+    public Item? GetSingleItemByIdWithMetadata(uint itemId, Dictionary<string, object> metadata)
+    {
+        ThrowIfDisposed();
+        lock (_itemsLock)
+            return _items.Where(x => x.ItemId == itemId && x.Equals(metadata)).FirstOrDefault();
+    }
 
     public bool HasItemWithMetadata(uint itemId, string key, object? metadata)
     {
@@ -131,7 +138,10 @@ public class InventoryComponent : Component
     public Item AddSingleItem(ItemsRegistry itemsRegistry, uint itemId, Dictionary<string, object>? metadata = null, bool tryStack = true, bool force = false)
     {
         ThrowIfDisposed();
-        return AddItem(itemsRegistry, itemId, 1, metadata, tryStack, force).First();
+        var item = AddItem(itemsRegistry, itemId, 1, metadata, tryStack, force);
+        if (item.Any())
+            return item.First();
+        return GetSingleItemByIdWithMetadata(itemId, metadata ?? new()) ?? throw new InvalidOperationException();
     }
 
     public IEnumerable<Item> AddItem(ItemsRegistry itemsRegistry, uint itemId, uint number = 1, Dictionary<string, object>? metadata = null, bool tryStack = true, bool force = false)

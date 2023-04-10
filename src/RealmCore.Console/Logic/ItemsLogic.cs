@@ -31,6 +31,13 @@ public class ItemsLogic
             Name = "Sample weapon",
             AvailiableActions = ItemAction.None,
         });
+        itemsRegistry.Add(4, new ItemRegistryEntry
+        {
+            Size = 0.05m,
+            StackSize = 10,
+            Name = "item size 0.05",
+            AvailiableActions = ItemAction.None,
+        });
 
         ecs.EntityCreated += HandleEntityCreated;
     }

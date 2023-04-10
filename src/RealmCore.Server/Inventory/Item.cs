@@ -109,7 +109,16 @@ public class Item : IEquatable<Item>, IEquatable<Dictionary<string, object>>
             _lock.ExitReadLock();
         }
     }
-
+    
+    public T GetMetadata<T>(string key)
+    {
+        return (T)Convert.ChangeType(GetMetadata(key), typeof(T));
+    }
+    
+    public object GetMetadata(string key, Type type)
+    {
+        return Convert.ChangeType(GetMetadata(key), type);
+    }
 
     public bool HasMetadata(string key)
     {
