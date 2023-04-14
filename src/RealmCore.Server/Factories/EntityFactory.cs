@@ -281,7 +281,6 @@ internal class EntityFactory : IEntityFactory
     }
 
     #region Collision shapes
-
     public Entity CreateCollisionCircle(Vector2 position, float radius, ConstructionInfo? constructionInfo = null, Action<Entity>? entityBuilder = null)
     {
         return _ecs.CreateEntity(constructionInfo?.Id ?? $"collision circle {Guid.NewGuid()}", EntityTag.CollisionShape, entity =>
@@ -340,7 +339,7 @@ internal class EntityFactory : IEntityFactory
 
     public Entity CreateCollisionRectangle(Vector2 position, Vector2 dimensions, ConstructionInfo? constructionInfo = null, Action<Entity>? entityBuilder = null)
     {
-        return _ecs.CreateEntity(constructionInfo?.Id ?? $"collision sphere {Guid.NewGuid()}", EntityTag.CollisionShape, entity =>
+        return _ecs.CreateEntity(constructionInfo?.Id ?? $"collision rectangle {Guid.NewGuid()}", EntityTag.CollisionShape, entity =>
         {
             entity.AddComponent(new CollisionRectangleElementComponent(new CollisionRectangle(position, dimensions)));
             entity.Transform.Position = new Vector3(position, 0);
@@ -374,7 +373,7 @@ internal class EntityFactory : IEntityFactory
 
     public Entity CreateCollisionTube(Vector3 position, float radius, float height, ConstructionInfo? constructionInfo = null, Action<Entity>? entityBuilder = null)
     {
-        return _ecs.CreateEntity(constructionInfo?.Id ?? $"collision sphere {Guid.NewGuid()}", EntityTag.CollisionShape, entity =>
+        return _ecs.CreateEntity(constructionInfo?.Id ?? $"collision tube {Guid.NewGuid()}", EntityTag.CollisionShape, entity =>
         {
             entity.AddComponent(new CollisionTubeElementComponent(new CollisionTube(position, radius, height)));
             entity.Transform.Position = position;
@@ -388,7 +387,7 @@ internal class EntityFactory : IEntityFactory
             entityBuilder?.Invoke(entity);
         });
     }
-
+    
     public Entity CreatePed(PedModel pedModel, Vector3 position, ConstructionInfo? constructionInfo = null, Action<Entity>? entityBuilder = null)
     {
         return _ecs.CreateEntity(constructionInfo?.Id ?? $"ped {Guid.NewGuid()}", EntityTag.Ped, entity =>
