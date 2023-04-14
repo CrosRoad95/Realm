@@ -1,5 +1,8 @@
-﻿namespace RealmCore.SQLite;
+﻿using System.Diagnostics.CodeAnalysis;
 
+namespace RealmCore.SQLite;
+
+[ExcludeFromCodeCoverage]
 public class DbFactory : IDesignTimeDbContextFactory<SQLiteDb>
 {
     public SQLiteDb CreateDbContext(string[] args)

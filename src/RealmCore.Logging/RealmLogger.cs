@@ -1,9 +1,11 @@
 ﻿using Serilog;
 using Serilog.Core;
 using Serilog.Events;
+using System.Diagnostics.CodeAnalysis;
 
 namespace RealmCore.Logging;
 
+[ExcludeFromCodeCoverage]
 public class RealmLogger
 {
     private LoggerConfiguration _loggerConfiguration;

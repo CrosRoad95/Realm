@@ -1,9 +1,11 @@
 ﻿using Serilog.Core;
 using Serilog.Events;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 
 namespace RealmCore.Logging;
 
+[ExcludeFromCodeCoverage]
 internal class ActivityEnricher : ILogEventEnricher
 {
     public void Enrich(LogEvent logEvent, ILogEventPropertyFactory propertyFactory)
@@ -20,6 +22,7 @@ internal class ActivityEnricher : ILogEventEnricher
     }
 }
 
+[ExcludeFromCodeCoverage]
 public static class ActivityExtensions
 {
     public static string GetSpanId(this Activity activity)

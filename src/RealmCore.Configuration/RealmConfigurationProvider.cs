@@ -1,5 +1,8 @@
-﻿namespace RealmCore.Configuration;
+﻿using System.Diagnostics.CodeAnalysis;
 
+namespace RealmCore.Configuration;
+
+[ExcludeFromCodeCoverage]
 public class RealmConfigurationProvider : IRealmConfigurationProvider
 {
     public readonly IConfiguration _configuration;
