@@ -1,4 +1,4 @@
-﻿using RealmCore.Resources.Assets;
+﻿using RealmCore.Resources.Assets.Interfaces;
 using RealmCore.Resources.Overlay;
 using SixLabors.ImageSharp;
 using SlipeServer.Packets.Definitions.Lua;

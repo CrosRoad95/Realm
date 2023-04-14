@@ -1,4 +1,4 @@
-﻿using RealmCore.Resources.Assets;
+﻿using RealmCore.Resources.Assets.Interfaces;
 using RealmCore.Resources.Overlay.Interfaces;
 using SlipeServer.Packets.Definitions.Lua;
 using SlipeServer.Server.Elements;

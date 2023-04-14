@@ -23,6 +23,8 @@ internal class AssetsLogic
         _luaEventService = luaEventService;
         luaEventService.AddEventHandler("internalRequestAssets", HandleInternalRequestAssets);
 
+        _assetsService.ReplaceModelForPlayer = HandleReplaceModelForPlayer;
+        _assetsService.RestoreModelForPlayer = HandleRestoreModelForPlayer;
         _resource = new AssetsResource(server, serverAssetsProviders);
         server.AddAdditionalResource(_resource, _resource.AdditionalFiles);
         logger.LogInformation("Loaded {count} assets of total size: {sizeInMB:N4}MB", _resource.AdditionalFiles.Count, _resource.ContentSize / 1024.0f / 1024.0f);
@@ -39,4 +41,15 @@ internal class AssetsLogic
         _luaEventService.TriggerEventFor(luaEvent.Player, "internalResponseRequestAsset", luaEvent.Player, new LuaValue(luaValue));
     }
 
+    private void HandleReplaceModelForPlayer(Player player, Stream dff, Stream col, ushort model)
+    {
+        var dffString = Convert.ToBase64String(Utilities.ReadFully(dff));
+        var colString = Convert.ToBase64String(Utilities.ReadFully(col));
+        _luaEventService.TriggerEventFor(player, "internalReplaceModel", player, dffString, colString, (int)model);
+    }
+
+    private void HandleRestoreModelForPlayer(Player player,ushort model)
+    {
+        _luaEventService.TriggerEventFor(player, "internalRestoreModel", player, (int)model);
+    }
 }

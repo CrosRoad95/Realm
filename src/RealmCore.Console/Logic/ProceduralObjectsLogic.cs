@@ -27,12 +27,14 @@ internal class ProceduralObjectsLogic
         modelFactory.AddTriangle(new Vector3(2, 2, 0), new Vector3(0, 10, 0), new Vector3(10, 0, 0), "Metal1_128");
         modelFactory.AddTriangle(new Vector3(0, 10, 0), new Vector3(10, 0, 0), new Vector3(10, 10, 0), "Metal1_128");
         var dff = modelFactory.BuildDff();
+        var col = modelFactory.BuildCol();
 #if DEBUG
         if (!Directory.Exists("testoutput"))
             Directory.CreateDirectory("testoutput");
         File.WriteAllBytes("testoutput/debugmodel.dff", ReadFully(dff));
+        File.WriteAllBytes("testoutput/debugmodel.col", ReadFully(col));
 #endif
-        var model = assetsRegistry.AddModel("test", modelFactory.BuildCol(), dff);
+        var model = assetsRegistry.AddModel("test", col, dff);
         assetsRegistry.ReplaceModel((ObjectModel)1338, model);
         ;
     }

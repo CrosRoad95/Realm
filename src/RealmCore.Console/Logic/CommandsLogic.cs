@@ -19,6 +19,8 @@ using RealmCore.Resources.ClientInterface;
 using RealmCore.Module.Discord.Interfaces;
 using RealmCore.Console.Components;
 using RealmCore.Resources.ElementOutline;
+using RealmCore.Resources.Assets.Factories;
+using RealmCore.Resources.Assets.Interfaces;
 
 namespace RealmCore.Console.Logic;
 
@@ -44,7 +46,7 @@ internal sealed class CommandsLogic
     public CommandsLogic(RPGCommandService commandService, IEntityFactory entityFactory, RepositoryFactory repositoryFactory,
         ItemsRegistry itemsRegistry, IECS ecs, IBanService banService, IDiscordService discordService, ChatBox chatBox, ILogger<CommandsLogic> logger,
         IDateTimeProvider dateTimeProvider, INametagsService nametagsService, IUsersService rpgUserManager, IVehiclesService vehiclesService,
-        GameWorld gameWorld, IElementOutlineService elementOutlineService)
+        GameWorld gameWorld, IElementOutlineService elementOutlineService, IAssetsService assetsService)
     {
         _commandService = commandService;
         _entityFactory = entityFactory;
@@ -866,6 +868,23 @@ internal sealed class CommandsLogic
         _commandService.AddCommandHandler("d", (entity, args) =>
         {
             entity.Transform.Dimension = ushort.Parse(args.First());
+        });
+        
+        _commandService.AddCommandHandler("runtimeobject", (entity, args) =>
+        {
+            var modelFactory = new ModelFactory();
+            modelFactory.AddTriangle(new Vector3(2, 2, 0), new Vector3(0, 10, 0), new Vector3(10, 0, 0), "Metal1_128");
+            modelFactory.AddTriangle(new Vector3(10, 0, 0), new Vector3(0, 10, 0), new Vector3(10, 10, 0), "Metal1_128");
+            var dff = modelFactory.BuildDff();
+            var col = modelFactory.BuildCol();
+            assetsService.ReplaceModelFor(entity, dff, col, 1339);
+            _entityFactory.CreateObject((ObjectModel)1339, entity.Transform.Position + new Vector3(15, 15, -5), Vector3.Zero);
+        });
+        
+        
+        _commandService.AddCommandHandler("restoreobject", (entity, args) =>
+        {
+            assetsService.RestoreModelFor(entity, 1339);
         });
 
         _commandService.AddAsyncCommandHandler("createObjectFor2", async (entity, args) =>

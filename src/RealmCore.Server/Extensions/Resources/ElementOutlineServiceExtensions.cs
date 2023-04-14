@@ -2,9 +2,9 @@
 
 public static class ElementOutlineServiceExtensions
 {
-    public static void SetRenderingEnabled(this IElementOutlineService service, Entity entity, bool enabled)
+    public static void SetRenderingEnabled(this IElementOutlineService service, Entity playerEntity, bool enabled)
     {
-        service.SetRenderingEnabled(entity.Player, enabled);
+        service.SetRenderingEnabled(playerEntity.Player, enabled);
     }
 
     public static void SetEntityOutlineForPlayer(this IElementOutlineService service, Entity playerEntity, Entity elementEntity, Color color)
@@ -12,8 +12,8 @@ public static class ElementOutlineServiceExtensions
         service.SetElementOutlineForPlayer(playerEntity.Player, elementEntity.Element, color);
     }
 
-    public static void RemoveEntityOutlineForPlayer(this IElementOutlineService service, Entity entity)
+    public static void RemoveEntityOutlineForPlayer(this IElementOutlineService service, Entity playerEntity)
     {
-        service.RemoveElementOutlineForPlayer(entity.Player, entity.Element);
+        service.RemoveElementOutlineForPlayer(playerEntity.Player, playerEntity.Element);
     }
 }

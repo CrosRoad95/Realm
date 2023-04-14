@@ -28,4 +28,19 @@ addEventHandler("internalResponseRequestAsset", localPlayer, function(receivedAs
 	assetInfos = receivedAssets
 end)
 
+addEvent("internalReplaceModel", true)
+addEventHandler("internalReplaceModel", localPlayer, function(dffData, colData, model)
+	local col = engineLoadCOL ( base64Decode(colData))
+	engineReplaceCOL ( col, model )
+	local dff = engineLoadDFF (base64Decode(dffData) )
+	engineReplaceModel ( dff, model )
+end)
+
+
+addEvent("internalRestoreModel", true)
+addEventHandler("internalRestoreModel", localPlayer, function(model)
+	engineRestoreCOL(model)
+	engineRestoreModel(model)
+end)
+
 triggerServerEvent("internalRequestAssets", resourceRoot)
