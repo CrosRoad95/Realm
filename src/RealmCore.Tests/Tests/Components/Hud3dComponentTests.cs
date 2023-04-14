@@ -17,6 +17,8 @@ public class Hud3dComponentTests
 
     public Hud3dComponentTests()
     {
+        _assetsService.SetupGet(x => x.ReplaceModelForPlayer).Throws<NotImplementedException>();
+        _assetsService.SetupGet(x => x.RestoreModelForPlayer).Throws<NotImplementedException>();
         _overlayService = new(_assetsService.Object);
         _testDateTimeProvider = new();
         var services = new ServiceCollection();

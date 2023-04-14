@@ -4,7 +4,7 @@ internal sealed class Map : IMap
 {
     private readonly List<WorldObject> _worldObjects;
     private readonly BoundingBox _boundingBox;
-    public List<WorldObject> WorldObjects => _worldObjects;
+    internal IReadOnlyCollection<WorldObject> WorldObjects => _worldObjects.AsReadOnly();
 
     public BoundingBox BoundingBox => _boundingBox;
 
