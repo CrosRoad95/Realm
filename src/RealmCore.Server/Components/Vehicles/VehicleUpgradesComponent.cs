@@ -170,7 +170,7 @@ public class VehicleUpgradesComponent : Component
         float multipleBy = 0;
         var memberExpression = (MemberExpression)handlingProperty.Body;
         var propertyInfo = (PropertyInfo)memberExpression.Member;
-        var value = (float)propertyInfo.GetValue(vehicleHandling);
+        var value = (float)propertyInfo.GetValue(vehicleHandling)!;
         foreach (var floatValueUpgradeDescription in upgradeDescriptions.Where(x => x != null).Select(x => x!))
         {
             increseByUnits += floatValueUpgradeDescription.IncreaseByUnits;

@@ -1,5 +1,4 @@
-﻿using RealmCore.Server.Components.Common;
-using RealmCore.Server.Inventory;
+﻿using RealmCore.Server.Inventory;
 
 namespace RealmCore.Tests.Tests.Components;
 

@@ -9,17 +9,17 @@ namespace RealmCore.Logging;
 public class RealmLogger
 {
     private LoggerConfiguration _loggerConfiguration;
-    private LoggingLevelSwitch levelSwitch = new LoggingLevelSwitch();
+    private readonly LoggingLevelSwitch _levelSwitch = new();
 
-    public LoggingLevelSwitch LevelSwitch => levelSwitch;
+    public LoggingLevelSwitch LevelSwitch => _levelSwitch;
     public RealmLogger(string appName, LogEventLevel logEventLevel = LogEventLevel.Debug)
     {
-        levelSwitch.MinimumLevel = logEventLevel;
+        _levelSwitch.MinimumLevel = logEventLevel;
         _loggerConfiguration = new LoggerConfiguration()
-            .MinimumLevel.ControlledBy(levelSwitch)
+            .MinimumLevel.ControlledBy(_levelSwitch)
             .WriteTo.Console(
                 outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3}] {Message:lj}{NewLine}{Exception}",
-                levelSwitch: levelSwitch)
+                levelSwitch: _levelSwitch)
             .Enrich.WithProperty("AppName", appName)
             .Enrich.WithThreadId()
             .Enrich.With<ActivityEnricher>()

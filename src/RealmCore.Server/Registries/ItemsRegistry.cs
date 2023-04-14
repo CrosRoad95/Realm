@@ -1,6 +1,4 @@
-﻿using RealmCore.Server.Registries.Abstractions;
-
-namespace RealmCore.Server.Registries;
+﻿namespace RealmCore.Server.Registries;
 
 public class ItemsRegistry : RegistryBase<uint, ItemRegistryEntry>
 {

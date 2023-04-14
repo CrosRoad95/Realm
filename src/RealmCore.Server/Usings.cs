@@ -116,6 +116,9 @@ global using RealmCore.Module.Discord.Interfaces;
 global using Microsoft.Extensions.Options;
 global using RealmCore.Server.Security.Cryptography;
 global using RealmCore.Server.Registries.Abstractions;
+global using RealmCore.Server.Xml;
+global using RealmCore.Server.Xml.Map;
+global using System.Xml.Serialization;
 
 global using ILogger = Microsoft.Extensions.Logging.ILogger;
 

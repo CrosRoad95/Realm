@@ -1,6 +1,4 @@
-﻿using RealmCore.Server.Components.Players;
-
-namespace RealmCore.Tests.Tests.Components;
+﻿namespace RealmCore.Tests.Tests.Components;
 
 public class MoneyComponentTests
 {

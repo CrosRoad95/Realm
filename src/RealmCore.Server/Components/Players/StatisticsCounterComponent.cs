@@ -7,7 +7,8 @@ public class StatisticsCounterComponent : Component
 
     public IEnumerable<int> GetStatsIds => _stats.Keys;
 
-    public event Action<StatisticsCounterComponent, int, float> StatIncreased;
+    public event Action<StatisticsCounterComponent, int, float>? StatIncreased;
+
     public StatisticsCounterComponent()
     {
     }

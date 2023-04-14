@@ -20,12 +20,4 @@ public sealed class TestWindowComponent : StatefulGuiComponent<SampleState>
     {
         state.Foo = ++i;
     }
-
-    protected override async Task HandleForm(IFormContext formContext)
-    {
-    }
-
-    protected override async Task HandleAction(IActionContext actionContext)
-    {
-    }
 }

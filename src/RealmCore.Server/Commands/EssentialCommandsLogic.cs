@@ -21,7 +21,7 @@ internal class EssentialCommandsLogic
             var commandNameAttribute = item.Type.GetCustomAttribute<CommandNameAttribute>();
             if (commandNameAttribute == null)
             {
-                logger.LogWarning($"Command class {item.Type.Name} has no CommandName attribute");
+                logger.LogWarning("Command class {className} has no CommandName attribute", item.Type.Name);
                 continue;
             }
 

@@ -6,23 +6,23 @@ namespace RealmCore.Server.Security.Cryptography;
 
 public class AESCrypto
 {
-    private byte[] Key = new byte[16];
-    private byte[] IV = new byte[16];
-    private const int CHUNK_SIZE = 16;
-    private IBufferedCipher cipher = CipherUtilities.GetCipher("AES/CTR/NoPadding");
+    private readonly byte[] _key = new byte[16];
+    private readonly byte[] _iv = new byte[16];
+    private readonly IBufferedCipher _cipher = CipherUtilities.GetCipher("AES/CTR/NoPadding");
+    private const int _chunkSize = 16;
 
     // Key and IV I get from client.
     public AESCrypto(byte[] key, byte[] iv, bool forEncryption)
     {
-        Key = key;
-        IV = iv;
-        cipher.Init(forEncryption, new ParametersWithIV(new KeyParameter(Key), IV));
+        _key = key;
+        _iv = iv;
+        _cipher.Init(forEncryption, new ParametersWithIV(new KeyParameter(_key), _iv));
     }
 
     public byte[] PerformAES(byte[] incomingBytes)
     {
-        int blockCount = incomingBytes.Length / CHUNK_SIZE; // Number of blocks
-        int blockRemaining = incomingBytes.Length % CHUNK_SIZE; // Remaining bytes of the last block
+        int blockCount = incomingBytes.Length / _chunkSize; // Number of blocks
+        int blockRemaining = incomingBytes.Length % _chunkSize; // Remaining bytes of the last block
 
         byte[] outcomingBytes = new byte[incomingBytes.Length];
 
@@ -31,11 +31,11 @@ public class AESCrypto
             // Why do I need to re-init it again?
             //cipher.Init(false, new ParametersWithIV(new KeyParameter(Key), IV));
 
-            byte[] temp = new byte[CHUNK_SIZE];
-            Array.Copy(incomingBytes, i * CHUNK_SIZE, temp, 0, CHUNK_SIZE);
+            byte[] temp = new byte[_chunkSize];
+            Array.Copy(incomingBytes, i * _chunkSize, temp, 0, _chunkSize);
 
-            byte[] decryptedChunk = cipher.ProcessBytes(temp);
-            Array.Copy(decryptedChunk, 0, outcomingBytes, i * CHUNK_SIZE, CHUNK_SIZE);
+            byte[] decryptedChunk = _cipher.ProcessBytes(temp);
+            Array.Copy(decryptedChunk, 0, outcomingBytes, i * _chunkSize, _chunkSize);
             //Increase(IV); Why do I need to increse iv by hand?
         }
 
@@ -47,23 +47,11 @@ public class AESCrypto
             byte[] temp = new byte[blockRemaining];
             Array.Copy(incomingBytes, incomingBytes.Length - blockRemaining, temp, 0, blockRemaining);
 
-            byte[] decryptedChunk = cipher.DoFinal(temp);
+            byte[] decryptedChunk = _cipher.DoFinal(temp);
             Array.Copy(decryptedChunk, 0, outcomingBytes, incomingBytes.Length - blockRemaining, blockRemaining);
             //Increase(IV); Why do I need to increse iv by hand?
         }
 
         return outcomingBytes;
-    }
-
-    private void Increase(byte[] iv)
-    {
-        for (var i = 0; i < iv.Length; i++)
-        {
-            iv[i]++;
-            if (iv[i] != 0)
-            {
-                break;
-            }
-        }
     }
 }

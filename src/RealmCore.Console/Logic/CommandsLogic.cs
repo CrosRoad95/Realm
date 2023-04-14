@@ -34,9 +34,7 @@ internal sealed class CommandsLogic
     private readonly ChatBox _chatBox;
     private readonly ILogger<CommandsLogic> _logger;
     private readonly IDateTimeProvider _dateTimeProvider;
-    private readonly INametagsService _nametagsService;
     private readonly IVehiclesService _vehiclesService;
-    private readonly ILuaEventHub<IClientInterfaceEventHub> _luaEventHub;
 
     private class TestState
     {
@@ -46,7 +44,7 @@ internal sealed class CommandsLogic
     public CommandsLogic(RPGCommandService commandService, IEntityFactory entityFactory, RepositoryFactory repositoryFactory,
         ItemsRegistry itemsRegistry, IECS ecs, IBanService banService, IDiscordService discordService, ChatBox chatBox, ILogger<CommandsLogic> logger,
         IDateTimeProvider dateTimeProvider, INametagsService nametagsService, IUsersService rpgUserManager, IVehiclesService vehiclesService,
-        ILuaEventHub<IClientInterfaceEventHub> luaEventHub, GameWorld gameWorld, IElementOutlineService elementOutlineService)
+        GameWorld gameWorld, IElementOutlineService elementOutlineService)
     {
         _commandService = commandService;
         _entityFactory = entityFactory;
@@ -58,9 +56,7 @@ internal sealed class CommandsLogic
         _chatBox = chatBox;
         _logger = logger;
         _dateTimeProvider = dateTimeProvider;
-        _nametagsService = nametagsService;
         _vehiclesService = vehiclesService;
-        _luaEventHub = luaEventHub;
         _commandService.AddCommandHandler("playtime", (entity, args) =>
         {
             if (entity.TryGetComponent(out PlayTimeComponent playTimeComponent))
@@ -487,7 +483,7 @@ internal sealed class CommandsLogic
         _commandService.AddCommandHandler("movehud", (entity, args) =>
         {
             var sampleHud = entity.GetRequiredComponent<SampleHud>();
-            sampleHud.Position = new Vector2(0, hudPosition++ * 10);
+            sampleHud.Position = new Vector2(0, _hudPosition++ * 10);
         });
 
         _commandService.AddCommandHandler("createstatefulhud", (entity, args) =>
@@ -642,7 +638,7 @@ internal sealed class CommandsLogic
 
         _commandService.AddCommandHandler("nametags4", (entity, args) =>
         {
-            nametagsService.SetNametagRenderingEnabled(entity, args.FirstOrDefault() == "true" ? true : false);
+            nametagsService.SetNametagRenderingEnabled(entity, args.FirstOrDefault() == "true");
         });
 
         _commandService.AddAsyncCommandHandler("nametags5", async (entity, args) =>
@@ -655,12 +651,12 @@ internal sealed class CommandsLogic
 
         _commandService.AddCommandHandler("nametags6", (entity, args) =>
         {
-            nametagsService.SetLocalPlayerRenderingEnabled(entity, args.FirstOrDefault() == "true" ? true : false);
+            nametagsService.SetLocalPlayerRenderingEnabled(entity, args.FirstOrDefault() == "true");
         });
 
         _commandService.AddCommandHandler("outlinerendering", (entity, args) =>
         {
-            elementOutlineService.SetRenderingEnabled(entity, args.FirstOrDefault() == "true" ? true : false);
+            elementOutlineService.SetRenderingEnabled(entity, args.FirstOrDefault() == "true");
         });
 
         _commandService.AddCommandHandler("outline1", (entity, args) =>
@@ -693,7 +689,7 @@ internal sealed class CommandsLogic
             elementOutlineService.SetEntityOutlineForPlayer(entity, @object, Color.Blue);
         });
 
-        _commandService.AddAsyncCommandHandler("randomvehcolor", async (entity, args) =>
+        _commandService.AddCommandHandler("randomvehcolor", (entity, args) =>
         {
             var rnd = Random.Shared;
             var veh = entity.GetRequiredComponent<PlayerElementComponent>().OccupiedVehicle.GetRequiredComponent<VehicleElementComponent>();
@@ -703,17 +699,17 @@ internal sealed class CommandsLogic
             veh.Color4 = Color.FromArgb(rnd.Next(256), rnd.Next(256), rnd.Next(256));
         });
 
-        _commandService.AddAsyncCommandHandler("setsetting", async (entity, args) =>
+        _commandService.AddCommandHandler("setsetting", (entity, args) =>
         {
             entity.GetRequiredComponent<UserComponent>().SetSetting(1, args[0]);
         });
 
-        _commandService.AddAsyncCommandHandler("removesetting", async (entity, args) =>
+        _commandService.AddCommandHandler("removesetting", (entity, args) =>
         {
             entity.GetRequiredComponent<UserComponent>().RemoveSetting(1);
         });
 
-        _commandService.AddAsyncCommandHandler("getsetting", async (entity, args) =>
+        _commandService.AddCommandHandler("getsetting", (entity, args) =>
         {
             var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();
 
@@ -907,14 +903,13 @@ internal sealed class CommandsLogic
                 Quality = 40
             };
 
-            using (var memoryStream = new MemoryStream())
-            using (Image<Rgba32> image = new(width, height))
-            {
-                image.Mutate(x => x.DrawText($"Gracze na serwerze: {string.Join(", ", playerEntities.Select(x => x.GetRequiredComponent<PlayerElementComponent>().Name))}", font, IronSoftware.Drawing.Color.White, new PointF(10, 10)));
-                image.Save(memoryStream, encoder);
-                memoryStream.Position = 0;
-                await _discordService.SendFile(997787973775011853, memoryStream, "obrazek.jpg", "");
-            }
+            using var memoryStream = new MemoryStream();
+            using var image = new Image<Rgba32>(width, height);
+
+            image.Mutate(x => x.DrawText($"Gracze na serwerze: {string.Join(", ", playerEntities.Select(x => x.GetRequiredComponent<PlayerElementComponent>().Name))}", font, IronSoftware.Drawing.Color.White, new PointF(10, 10)));
+            image.Save(memoryStream, encoder);
+            memoryStream.Position = 0;
+            await _discordService.SendFile(997787973775011853, memoryStream, "obrazek.jpg", "");
         });
 
         _discordService.AddTextBasedCommandHandler(997787973775011853, "testgrafika", async (userId, parameters) =>
@@ -935,16 +930,15 @@ internal sealed class CommandsLogic
                 Quality = 40
             };
 
-            using (var memoryStream = new MemoryStream())
-            using (Image<Rgba32> image = new(width, height))
-            {
-                image.Mutate(x => x.DrawText(parameters, font, IronSoftware.Drawing.Color.White, new PointF(10, 10)));
-                image.Save(memoryStream, encoder);
-                memoryStream.Position = 0;
-                await _discordService.SendFile(997787973775011853, memoryStream, "obrazek.jpg", "");
-            }
+            using var memoryStream = new MemoryStream();
+            using Image<Rgba32> image = new(width, height);
+
+            image.Mutate(x => x.DrawText(parameters, font, IronSoftware.Drawing.Color.White, new PointF(10, 10)));
+            image.Save(memoryStream, encoder);
+            memoryStream.Position = 0;
+            await _discordService.SendFile(997787973775011853, memoryStream, "obrazek.jpg", "");
         });
     }
 
-    static int hudPosition = 0;
+    static int _hudPosition = 0;
 }

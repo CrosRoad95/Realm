@@ -6,6 +6,8 @@ internal sealed class Map : IMap
     private readonly BoundingBox _boundingBox;
     public List<WorldObject> WorldObjects => _worldObjects;
 
+    public BoundingBox BoundingBox => _boundingBox;
+
     public Map(MapIdGenerator mapIdGenerator, IEnumerable<WorldObject> worldObjects)
     {
         if (worldObjects.TryGetNonEnumeratedCount(out int count))

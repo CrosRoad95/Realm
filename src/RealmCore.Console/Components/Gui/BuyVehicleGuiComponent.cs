@@ -33,8 +33,4 @@ public sealed class BuyVehicleGuiComponent : StatefulGuiComponent<BuyVehicleGuiC
                 throw new NotImplementedException();
         }
     }
-
-    protected override async Task HandleAction(IActionContext actionContext)
-    {
-    }
 }

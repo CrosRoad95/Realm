@@ -1,6 +1,4 @@
-﻿using System.Xml.Serialization;
-
-namespace RealmCore.Server.Xml.Map;
+﻿namespace RealmCore.Server.Xml.Map;
 
 public sealed class XmlObject
 {

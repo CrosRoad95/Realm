@@ -1,6 +1,4 @@
-﻿using RealmCore.Server.Enums;
-
-namespace RealmCore.Server.Components.Common;
+﻿namespace RealmCore.Server.Components.Common;
 
 [ComponentUsage(true)]
 public class InventoryComponent : Component

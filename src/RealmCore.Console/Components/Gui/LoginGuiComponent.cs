@@ -59,7 +59,7 @@ public sealed class LoginGuiComponent : GuiComponent
                         return;
                     }
                 }
-                catch(Exception ex)
+                catch(Exception)
                 {
                     formContext.ErrorResponse("Błąd podczas logowania.");
                 }

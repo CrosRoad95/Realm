@@ -15,7 +15,7 @@ internal class HelpCommand : ICommand
     public Task HandleCommand(string command)
     {
         _logger.LogInformation("Commands:");
-        _logger.LogInformation($"\t{string.Join('\t', _commands.Select(x => x.Type.GetCustomAttribute<CommandNameAttribute>().Name))}");
+        _logger.LogInformation("\t{commands}", string.Join('\t', _commands.Select(x => x.Type.GetCustomAttribute<CommandNameAttribute>().Name)));
         return Task.CompletedTask;
     }
 }

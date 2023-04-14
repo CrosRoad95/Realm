@@ -121,8 +121,10 @@ internal class EntityFactory : IEntityFactory
     {
         return _ecs.CreateEntity(constructionInfo?.Id ?? $"marker {Guid.NewGuid()}", EntityTag.Marker, entity =>
         {
-            var marker = new Marker(new Vector3(0, 0, 1000), markerType);
-            marker.Color = Color.White;
+            var marker = new Marker(new Vector3(0, 0, 1000), markerType)
+            {
+                Color = Color.White
+            };
 
             var markerElementComponent = entity.AddComponent(new MarkerElementComponent(marker));
 
@@ -240,8 +242,10 @@ internal class EntityFactory : IEntityFactory
         if (playerEntity.Tag != EntityTag.Player)
             throw new ArgumentException("Entity must be a player entity");
 
-        var marker = new Marker(position, markerType);
-        marker.Color = color ?? Color.White;
+        var marker = new Marker(position, markerType)
+        {
+            Color = color ?? Color.White
+        };
 
         var markerElementComponent = playerEntity.AddComponent(PlayerPrivateElementComponent.Create(new MarkerElementComponent(marker)));
         AssociateWithPlayerEntity(markerElementComponent, playerEntity);
@@ -272,8 +276,10 @@ internal class EntityFactory : IEntityFactory
         if (playerEntity.Tag != EntityTag.Player)
             throw new ArgumentException("Entity must be a player entity");
 
-        var worldObject = new WorldObject(model, position);
-        worldObject.Rotation = rotation;
+        var worldObject = new WorldObject(model, position)
+        {
+            Rotation = rotation
+        };
 
         var worldObjectElementComponent = playerEntity.AddComponent(PlayerPrivateElementComponent.Create(new WorldObjectComponent(worldObject)));
         AssociateWithPlayerEntity(worldObjectElementComponent, playerEntity);

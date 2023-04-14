@@ -1,6 +1,4 @@
-﻿using System.Xml.Serialization;
-
-namespace RealmCore.Server.Xml.Map;
+﻿namespace RealmCore.Server.Xml.Map;
 
 [Serializable, XmlRoot(Namespace = "", ElementName = "map")]
 public sealed class XmlMap

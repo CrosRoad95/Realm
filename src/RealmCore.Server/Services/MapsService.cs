@@ -1,12 +1,8 @@
-﻿using RealmCore.Server.Xml;
-using RealmCore.Server.Xml.Map;
-using System.Xml.Serialization;
-
-namespace RealmCore.Server.Services;
+﻿namespace RealmCore.Server.Services;
 
 internal class MapsService : IMapsService
 {
-    private readonly MapIdGenerator mapIdGenerator;
+    private readonly MapIdGenerator _mapIdGenerator;
     private readonly Dictionary<string, Map> _maps = new();
     private readonly object _lock = new();
 
@@ -21,7 +17,7 @@ internal class MapsService : IMapsService
 
     public MapsService()
     {
-        mapIdGenerator = new(IdGeneratorConstants.WorldMapIdStart, IdGeneratorConstants.WorldMapIdStop);
+        _mapIdGenerator = new(IdGeneratorConstants.WorldMapIdStart, IdGeneratorConstants.WorldMapIdStop);
     }
 
     private void AddMap(string name, Map map)
@@ -51,7 +47,7 @@ internal class MapsService : IMapsService
 
     public void RegisterMapFromXml(string name, string fileName)
     {
-        XmlSerializer serializer = new XmlSerializer(typeof(XmlMap), "");
+        XmlSerializer serializer = new(typeof(XmlMap), "");
 
         XmlMap xmlMap;
         {
@@ -63,7 +59,7 @@ internal class MapsService : IMapsService
         if (!xmlMap.Objects.Any())
             throw new InvalidOperationException("Map contains no objects");
 
-        AddMap(name, new Map(mapIdGenerator, xmlMap.Objects.Select(x => new WorldObject((ObjectModel)x.Model, new Vector3(x.PosX, x.PosY, x.PosZ))
+        AddMap(name, new Map(_mapIdGenerator, xmlMap.Objects.Select(x => new WorldObject((ObjectModel)x.Model, new Vector3(x.PosX, x.PosY, x.PosZ))
         {
             Rotation = new Vector3(x.RotX, x.RotY, x.RotZ),
             Interior = x.Interior,
@@ -77,6 +73,6 @@ internal class MapsService : IMapsService
         if (!worldObjects.Any())
             throw new InvalidOperationException("Map contains no objects");
 
-        AddMap(name, new Map(mapIdGenerator, worldObjects));
+        AddMap(name, new Map(_mapIdGenerator, worldObjects));
     }
 }

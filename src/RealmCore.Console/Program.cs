@@ -5,8 +5,6 @@ using RealmCore.Module.Discord.Interfaces;
 using RealmCore.Server.Integrations.Discord.Handlers;
 using RealmCore.Server.Logic;
 using RealmCore.Server.Logic.Defaults;
-using System.Reflection;
-using Microsoft.AspNetCore.Identity;
 using RealmCore.Console.Data.Validators;
 
 Directory.SetCurrentDirectory(Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly()!.Location)!);
