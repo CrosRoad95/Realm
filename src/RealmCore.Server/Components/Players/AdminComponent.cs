@@ -134,5 +134,6 @@ public class AdminComponent : Component
         AdminTools = false;
         NoClip = false;
         InteractionDebugRenderingEnabled = false;
+        base.Dispose();
     }
 }

@@ -17,6 +17,8 @@ public class DurationBasedHoldInteractionComponent : InteractionComponent
 
     public async Task<bool> BeginInteraction(Entity owningEntity, TimeSpan timeSpan, CancellationToken cancellationToken = default)
     {
+        ThrowIfDisposed();
+
         if (owningEntity == null)
             throw new NullReferenceException(nameof(owningEntity));
 
@@ -87,6 +89,8 @@ public class DurationBasedHoldInteractionComponent : InteractionComponent
 
     public bool EndInteraction(Entity owningEntity)
     {
+        ThrowIfDisposed();
+
         if (owningEntity == null)
             throw new NullReferenceException(nameof(owningEntity));
 

@@ -10,7 +10,13 @@ public class LicensesComponent : Component
 
     private readonly List<License> _licenses = new();
 
-    public IReadOnlyList<License> Licenses => _licenses;
+    public IReadOnlyList<License> Licenses {
+        get
+        {
+            lock (_licensesLock)
+                return new List<License>(_licenses).AsReadOnly();
+        }
+    }
     private readonly object _licensesLock = new object();
 
     public event Action<LicensesComponent, int>? LicenseAdded;

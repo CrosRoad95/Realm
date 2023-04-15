@@ -14,6 +14,7 @@ public class VehicleUpgradesComponent : Component
     {
         get
         {
+            ThrowIfDisposed();
             lock (_upgradesLock)
             {
                 return new List<int>(_upgrades);
@@ -23,9 +24,14 @@ public class VehicleUpgradesComponent : Component
 
     public byte Paintjob
     {
-        get => Entity.GetRequiredComponent<VehicleElementComponent>().Vehicle.PaintJob;
+        get
+        {
+            ThrowIfDisposed();
+            return Entity.GetRequiredComponent<VehicleElementComponent>().Vehicle.PaintJob;
+        }
         set
         {
+            ThrowIfDisposed();
             Entity.GetRequiredComponent<VehicleElementComponent>().Vehicle.PaintJob = value;
             PaintjobChanged?.Invoke(this, value);
         }
@@ -52,12 +58,14 @@ public class VehicleUpgradesComponent : Component
 
     public bool HasUpgrade(int upgradeId)
     {
+        ThrowIfDisposed();
         lock (_upgradesLock)
             return InternalHasUpgrade(upgradeId);
     }
 
     public bool AddUpgrades(IEnumerable<int> upgradeIds, bool rebuild = true)
     {
+        ThrowIfDisposed();
         lock (_upgradesLock)
         {
             _upgrades.AddRange(upgradeIds);
@@ -73,6 +81,7 @@ public class VehicleUpgradesComponent : Component
 
     public bool AddUpgrade(int upgradeId, bool rebuild = true)
     {
+        ThrowIfDisposed();
         lock (_upgradesLock)
         {
             _upgrades.Add(upgradeId);
@@ -86,6 +95,7 @@ public class VehicleUpgradesComponent : Component
 
     public bool AddUniqueUpgrade(int upgradeId, bool rebuild = true)
     {
+        ThrowIfDisposed();
         lock (_upgradesLock)
         {
             if (InternalHasUpgrade(upgradeId))
@@ -102,6 +112,7 @@ public class VehicleUpgradesComponent : Component
 
     public void RemoveAllUpgrades(bool rebuild = true)
     {
+        ThrowIfDisposed();
         List<int> copy;
         lock (_upgradesLock)
         {
@@ -119,6 +130,7 @@ public class VehicleUpgradesComponent : Component
 
     public bool RemoveUpgrade(int upgradeId, bool rebuild = true)
     {
+        ThrowIfDisposed();
         bool result;
         lock (_upgrades)
         {
@@ -193,6 +205,8 @@ public class VehicleUpgradesComponent : Component
 
     public void RebuildUpgrades()
     {
+        ThrowIfDisposed();
+
         var vehicle = Entity.GetRequiredComponent<VehicleElementComponent>().Vehicle;
         var vehicleHandling = VehicleHandlingConstants.DefaultVehicleHandling[vehicle.Model];
         object boxedVehicleHandling = vehicleHandling;

@@ -9,7 +9,22 @@ public abstract class SessionComponent : Component
     public event Action<Entity>? SessionStarted;
     public event Action<Entity>? SessionEnded;
 
-    public TimeSpan Elapsed => _stopwatch.Elapsed;
+    public TimeSpan Elapsed {
+        get
+        {
+            ThrowIfDisposed();
+            return _stopwatch.Elapsed;
+        }
+    }
+
+    public bool IsRunning
+    {
+        get
+        {
+            ThrowIfDisposed();
+            return _stopwatch.IsRunning;
+        }
+    }
 
     public SessionComponent()
     {
@@ -40,6 +55,4 @@ public abstract class SessionComponent : Component
         SessionEnded?.Invoke(Entity);
         _stopwatch.Stop();
     }
-
-    public bool IsRunning => _stopwatch.IsRunning;
 }

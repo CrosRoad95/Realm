@@ -897,7 +897,6 @@ internal sealed class CommandsLogic
         {
             var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();
             playerElementComponent.SendChatMessage($"amiinwater: {playerElementComponent.IsInWater} {entity.Transform.Position}");
-
         });
         
         _commandService.AddCommandHandler("formatmoney", (entity, args) =>

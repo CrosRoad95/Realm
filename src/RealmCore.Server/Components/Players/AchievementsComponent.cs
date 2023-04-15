@@ -4,9 +4,18 @@
 public class AchievementsComponent : Component
 {
     private readonly Dictionary<int, Achievement> _achievements = new();
-    private readonly object _achievementsLock = new object();
+    private readonly object _achievementsLock = new();
 
-    public IReadOnlyDictionary<int, Achievement> Achievements => _achievements;
+    public IReadOnlyDictionary<int, Achievement> Achievements
+    {
+        get
+        {
+            lock(_achievementsLock)
+            {
+                return new Dictionary<int, Achievement>(_achievements);
+            }
+        }
+    }
 
     public event Action<AchievementsComponent, int>? AchievementUnlocked;
     public event Action<AchievementsComponent, int, float>? AchievementProgressed;

@@ -5,7 +5,14 @@ public class JobUpgradesComponent : Component
 {
     private readonly List<JobUpgrade> _upgrades = new();
     private readonly object _upgradesLock = new();
-    public IReadOnlyList<JobUpgrade> Upgrades => _upgrades;
+    public IReadOnlyList<JobUpgrade> Upgrades
+    {
+        get
+        {
+            lock (_upgradesLock)
+                return new List<JobUpgrade>(_upgrades);
+        }
+    }
 
     public event Action<JobUpgradesComponent, JobUpgrade>? UpgradeAdded;
     public event Action<JobUpgradesComponent, JobUpgrade>? UpgradeRemoved;

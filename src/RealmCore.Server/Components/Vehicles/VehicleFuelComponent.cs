@@ -14,9 +14,14 @@ public class VehicleFuelComponent : Component
 
     public bool Active
     {
-        get => _active;
+        get
+        {
+            ThrowIfDisposed();
+            return _active;
+        }
         set
         {
+            ThrowIfDisposed();
             if (value)
                 Update(true);
 
@@ -26,15 +31,27 @@ public class VehicleFuelComponent : Component
 
     public short FuelType
     {
-        get => _fuelType;
-        set => _fuelType = value;
+        get
+        {
+            ThrowIfDisposed();
+            return _fuelType;
+        }
+        set {
+            ThrowIfDisposed();
+            _fuelType = value;
+        }
     }
 
     public float MinimumDistanceThreshold
     {
-        get => _minimumDistanceThreshold;
+        get
+        {
+            ThrowIfDisposed();
+            return _minimumDistanceThreshold;
+        }
         set
         {
+            ThrowIfDisposed();
             if (value < 0.0f) value = 0.0f;
             _minimumDistanceThreshold = value;
         }
@@ -42,9 +59,14 @@ public class VehicleFuelComponent : Component
 
     public float FuelConsumptionPerOneKm
     {
-        get => _fuelConsumptionPerOneKm;
+        get
+        {
+            ThrowIfDisposed();
+            return _fuelConsumptionPerOneKm;
+        }
         set
         {
+            ThrowIfDisposed();
             if (value < 0.0f) value = 0.0f;
             _fuelConsumptionPerOneKm = value;
         }
@@ -52,11 +74,18 @@ public class VehicleFuelComponent : Component
 
     public float Amount
     {
-        get => _amount;
+        get
+        {
+            ThrowIfDisposed();
+            return _amount;
+        }
         set
         {
-            if (value < 0.0f) value = 0.0f;
-            if (value >= MaxCapacity) value = MaxCapacity;
+            ThrowIfDisposed();
+            if (value < 0.0f)
+                value = 0.0f;
+            if (value >= MaxCapacity)
+                value = MaxCapacity;
             _amount = value;
             Update(true);
         }
@@ -64,9 +93,15 @@ public class VehicleFuelComponent : Component
 
     public float MaxCapacity
     {
-        get => _maxCapacity;
+        get
+        {
+            ThrowIfDisposed();
+            return _maxCapacity;
+        }
+
         set
         {
+            ThrowIfDisposed();
             if (value < 0.0f)
                 _maxCapacity = 0;
             else

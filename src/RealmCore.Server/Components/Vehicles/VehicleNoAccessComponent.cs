@@ -13,5 +13,6 @@ public class VehicleNoAccessComponent : VehicleAccessControllerComponent
     public override void Dispose()
     {
         Entity.GetRequiredComponent<VehicleElementComponent>().Vehicle.CanEnter = null;
+        base.Dispose();
     }
 }

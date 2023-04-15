@@ -13,8 +13,14 @@ public sealed class VehicleEngineComponent : Component
 
     public int ActiveVehicleEngineId
     {
-        get => _activeVehicleEngineId; set
+        get
         {
+            ThrowIfDisposed();
+            return _activeVehicleEngineId;
+        }
+        set
+        {
+            ThrowIfDisposed();
             lock (_lock)
             {
                 if (!_vehicleEngineIds.Contains(value))
@@ -30,6 +36,7 @@ public sealed class VehicleEngineComponent : Component
     {
         get
         {
+            ThrowIfDisposed();
             lock (_lock)
             {
                 return new List<int>(_vehicleEngineIds);
@@ -63,6 +70,7 @@ public sealed class VehicleEngineComponent : Component
 
     public void AddEngine(int engineId)
     {
+        ThrowIfDisposed();
         lock (_lock)
         {
             if (_vehicleEngineIds.Contains(engineId))
@@ -76,6 +84,7 @@ public sealed class VehicleEngineComponent : Component
 
     public void RemoveEngine(int engineId)
     {
+        ThrowIfDisposed();
         lock (_lock)
         {
             if (_activeVehicleEngineId == engineId)

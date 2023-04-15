@@ -148,6 +148,8 @@ public class MoneyComponent : Component
 
     public bool HasMoney(decimal amount, bool force = false)
     {
+        ThrowIfDisposed();
+
         _moneyLock.EnterReadLock();
         try
         {
@@ -161,6 +163,8 @@ public class MoneyComponent : Component
 
     public bool TryTakeMoney(decimal amount, bool force = false)
     {
+        ThrowIfDisposed();
+
         try
         {
             TakeMoney(amount, force);
@@ -174,6 +178,8 @@ public class MoneyComponent : Component
 
     public bool TryTakeMoneyWithCallback(decimal amount, Func<bool> action, bool force = false)
     {
+        ThrowIfDisposed();
+
         _moneyLock.EnterWriteLock();
         try
         {

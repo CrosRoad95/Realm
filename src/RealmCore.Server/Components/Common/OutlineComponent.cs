@@ -2,10 +2,19 @@
 
 public class OutlineComponent : Component
 {
-    public Color Color { get; }
+    private readonly Color _color;
+
+    public Color Color
+    {
+        get
+        {
+            ThrowIfDisposed();
+            return _color;
+        }
+    }
 
     public OutlineComponent(Color color)
     {
-        Color = color;
+        _color = color;
     }
 }

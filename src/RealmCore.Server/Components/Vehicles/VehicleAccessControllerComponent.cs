@@ -15,6 +15,8 @@ public abstract class VehicleAccessControllerComponent : Component
 
     public bool HasAccess(Entity entity)
     {
+        ThrowIfDisposed();
+
         switch (entity.Tag)
         {
             case EntityTag.Player:

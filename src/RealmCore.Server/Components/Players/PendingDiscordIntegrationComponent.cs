@@ -8,7 +8,7 @@ public class PendingDiscordIntegrationComponent : Component
 
     private string? _discordConnectionCode = null;
     private DateTime? _discordConnectionCodeValidUntil = null;
-    private object _lock = new();
+    private readonly object _lock = new();
 
     public PendingDiscordIntegrationComponent()
     {

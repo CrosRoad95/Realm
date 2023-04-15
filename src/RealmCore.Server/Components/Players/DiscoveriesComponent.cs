@@ -5,7 +5,17 @@ public class DiscoveriesComponent : Component
 {
     private readonly HashSet<int> _discoveries = new();
     private readonly object _discoveriesLock = new();
-    public IReadOnlyCollection<int> Discoveries => _discoveries;
+    public IReadOnlyCollection<int> Discoveries
+    {
+        get
+        {
+            ThrowIfDisposed();
+            lock (_discoveriesLock)
+            {
+                return new List<int>(_discoveries);
+            }
+        }
+    }
 
     public event Action<DiscoveriesComponent, int>? Discovered;
 

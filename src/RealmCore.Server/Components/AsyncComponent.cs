@@ -14,8 +14,7 @@ public abstract class AsyncComponent : Component, IAsyncDisposable
 
     public ValueTask DisposeAsync()
     {
-        ThrowIfDisposed();
-
+        base.Dispose();
         return ValueTask.CompletedTask;
     }
 }

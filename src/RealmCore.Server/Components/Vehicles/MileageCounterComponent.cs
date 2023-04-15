@@ -8,9 +8,14 @@ public class MileageCounterComponent : Component
 
     public float Mileage
     {
-        get => _mileage;
+        get
+        {
+            ThrowIfDisposed();
+            return _mileage;
+        }
         set
         {
+            ThrowIfDisposed();
             if (value < 0.0f) value = 0.0f;
             _mileage = value;
         }
@@ -18,9 +23,14 @@ public class MileageCounterComponent : Component
 
     public float MinimumDistanceThreshold
     {
-        get => _minimumDistanceThreshold;
+        get
+        {
+            ThrowIfDisposed();
+            return _minimumDistanceThreshold;
+        }
         set
         {
+            ThrowIfDisposed();
             if (value < 0.0f) value = 0.0f;
             _minimumDistanceThreshold = value;
         }

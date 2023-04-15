@@ -252,16 +252,22 @@ public class InventoryComponent : Component
 
     public bool HasSpace(decimal space)
     {
+        ThrowIfDisposed();
+
         return Number + space <= Size;
     }
     
     public bool HasSpaceForItem(uint itemId, ItemsRegistry itemsRegistry)
     {
+        ThrowIfDisposed();
+
         return Number + itemsRegistry.Get(itemId).Size <= Size;
     }
     
     public bool HasSpaceForItem(uint itemId, uint number, ItemsRegistry itemsRegistry)
     {
+        ThrowIfDisposed();
+
         return Number + itemsRegistry.Get(itemId).Size * number <= Size;
     }
 }

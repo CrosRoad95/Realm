@@ -7,11 +7,19 @@ namespace RealmCore.Server.Components.Players;
 public class JobStatisticsComponent : Component
 {
     private readonly Dictionary<short, JobStatistics> _jobStatistics = new();
-    public IReadOnlyDictionary<short, JobStatistics> JobStatistics => _jobStatistics;
+    public IReadOnlyDictionary<short, JobStatistics> JobStatistics
+    {
+        get
+        {
+            ThrowIfDisposed();
+            lock (_lock)
+                return new Dictionary<short, JobStatistics>(_jobStatistics);
+        }
+    }
 
     private readonly DateOnly _date;
     internal DateOnly Date => _date;
-    private readonly object _lock = new object();
+    private readonly object _lock = new();
 
     public event Action<JobStatisticsComponent, short, ulong, ulong>? PointsAdded;
     public event Action<JobStatisticsComponent, short, ulong, ulong>? TimePlayedAdded;

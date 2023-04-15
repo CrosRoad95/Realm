@@ -9,7 +9,14 @@ public class PrivateVehicleComponent : Component
     internal int Id => _vehicleData.Id;
 
     private List<VehiclePlayerAccess> _vehiclePlayerAccesses = new();
-    public IReadOnlyList<VehiclePlayerAccess> PlayerAccesses => _vehiclePlayerAccesses;
+    public IReadOnlyList<VehiclePlayerAccess> PlayerAccesses
+    {
+        get
+        {
+            ThrowIfDisposed();
+            return new List<VehiclePlayerAccess>(_vehiclePlayerAccesses);
+        }
+    }
 
     internal PrivateVehicleComponent(VehicleData vehicleData)
     {
@@ -73,6 +80,8 @@ public class PrivateVehicleComponent : Component
 
     public bool TryGetAccess(Entity entity, out VehiclePlayerAccess vehicleAccess)
     {
+        ThrowIfDisposed();
+
         if (entity.Tag != EntityTag.Player)
             throw new InvalidOperationException();
 
@@ -89,6 +98,8 @@ public class PrivateVehicleComponent : Component
 
     public VehiclePlayerAccess AddAccess(Entity entity, byte accessType, string? customValue = null)
     {
+        ThrowIfDisposed();
+
         if (entity.Tag != EntityTag.Player)
             throw new InvalidOperationException();
 
@@ -106,6 +117,8 @@ public class PrivateVehicleComponent : Component
 
     public VehiclePlayerAccess AddAsOwner(Entity entity, string? customValue = null)
     {
+        ThrowIfDisposed();
+
         return AddAccess(entity, 0, customValue);
     }
 }

@@ -25,8 +25,6 @@ public class AttachedEntityComponent : Component
         }
     }
 
-    public Vector3 Offset { get; }
-
     public AttachedEntityComponent(Entity entity, BoneId boneId, Vector3? positionOffset = null, Vector3? rotationOffset = null)
     {
         _attachedEntity = entity;

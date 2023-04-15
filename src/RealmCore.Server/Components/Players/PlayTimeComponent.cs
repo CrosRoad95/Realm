@@ -13,13 +13,22 @@ public class PlayTimeComponent : Component
     {
         get
         {
+            ThrowIfDisposed();
+
             if (_startDateTime == null)
                 return 0;
             return (ulong)(DateTimeProvider.Now - _startDateTime.Value).Seconds;
         }
     }
 
-    public ulong TotalPlayTime => PlayTime + _currentPlayTime;
+    public ulong TotalPlayTime
+    {
+        get
+        {
+            ThrowIfDisposed();
+            return PlayTime + _currentPlayTime;
+        }
+    }
 
     public PlayTimeComponent()
     {
