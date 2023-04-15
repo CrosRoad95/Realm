@@ -9,7 +9,7 @@ internal sealed class AdminToolsService : IAdminToolsService
     public event Action<Player>? AdminToolsDisabled;
 
     private readonly HashSet<Player> _enabledForPlayers = new();
-    private readonly object _enabledForPlayersLock = new();
+    private readonly object _lock = new();
     public AdminToolsService()
     {
 
@@ -23,7 +23,7 @@ internal sealed class AdminToolsService : IAdminToolsService
     public void EnableAdminToolsForPlayer(Player player)
     {
         bool succeed;
-        lock (_enabledForPlayersLock)
+        lock (_lock)
             succeed = _enabledForPlayers.Add(player);
 
         if (succeed)
@@ -35,14 +35,14 @@ internal sealed class AdminToolsService : IAdminToolsService
 
     private void HandlePlayerDisconnected(Player player, PlayerQuitEventArgs e)
     {
-        lock (_enabledForPlayersLock)
+        lock (_lock)
             _enabledForPlayers.Remove(player);
     }
 
     public void DisableAdminToolsForPlayer(Player player)
     {
         bool succeed;
-        lock (_enabledForPlayersLock)
+        lock (_lock)
             succeed = _enabledForPlayers.Remove(player);
 
         if (succeed)

@@ -7,7 +7,7 @@ namespace RealmCore.Server.Services;
 internal class FractionService : IFractionService
 {
     private readonly Dictionary<int, Fraction> _fractions = new();
-    private readonly object _fractionLock = new object();
+    private readonly object _lock = new();
     private readonly IFractionRepository _fractionRepository;
 
     public FractionService(IFractionRepository fractionRepository)
@@ -19,7 +19,7 @@ internal class FractionService : IFractionService
 
     public bool Exists(int id)
     {
-        lock (_fractionLock)
+        lock (_lock)
             return _fractions.ContainsKey(id);
     }
 
@@ -33,7 +33,7 @@ internal class FractionService : IFractionService
 
     public bool HasMember(int fractionId, int userId)
     {
-        lock (_fractionLock)
+        lock (_lock)
             return InternalHasMember(fractionId, userId);
     }
 
@@ -54,7 +54,7 @@ internal class FractionService : IFractionService
     public async Task InternalCreateFraction(int fractionId, string fractionName, string fractionCode, Vector3 position)
     {
         var members = await _fractionRepository.GetAllMembers(fractionId);
-        lock (_fractionLock)
+        lock (_lock)
             _fractions.Add(fractionId, new Fraction
             {
                 id = fractionId,
@@ -76,7 +76,7 @@ internal class FractionService : IFractionService
 
     public async Task<bool> TryAddMember(int fractionId, int userId, int rank, string rankName)
     {
-        lock (_fractionLock)
+        lock (_lock)
         {
             if (InternalHasMember(fractionId, userId))
                 return false;

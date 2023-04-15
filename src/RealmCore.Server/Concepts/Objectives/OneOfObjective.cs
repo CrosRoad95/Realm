@@ -4,7 +4,7 @@ public class OneOfObjective : Objective
 {
     private readonly Objective[] _objectives;
     private bool _completed = false;
-    private object _completedLock = new();
+    private object _lock = new();
     public override Vector3 Position => throw new NotImplementedException();
 
     public OneOfObjective(params Objective[] objectives)
@@ -25,7 +25,7 @@ public class OneOfObjective : Objective
 
     private void HandleIncompleted(Objective objective)
     {
-        lock (_completedLock)
+        lock (_lock)
         {
             if (_completed)
                 return;
@@ -38,7 +38,7 @@ public class OneOfObjective : Objective
 
     private void HandleCompleted(Objective objective)
     {
-        lock (_completedLock)
+        lock (_lock)
         {
             if (_completed)
                 return;
@@ -64,7 +64,7 @@ public class OneOfObjective : Objective
 
     public override void Dispose()
     {
-        lock (_completedLock)
+        lock (_lock)
         {
             if (!_completed)
                 DisposeChildObjectives();

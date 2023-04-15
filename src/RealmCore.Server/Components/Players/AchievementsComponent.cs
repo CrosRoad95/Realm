@@ -4,13 +4,13 @@
 public class AchievementsComponent : Component
 {
     private readonly Dictionary<int, Achievement> _achievements = new();
-    private readonly object _achievementsLock = new();
+    private readonly object _lock = new();
 
     public IReadOnlyDictionary<int, Achievement> Achievements
     {
         get
         {
-            lock(_achievementsLock)
+            lock(_lock)
             {
                 return new Dictionary<int, Achievement>(_achievements);
             }
@@ -45,7 +45,7 @@ public class AchievementsComponent : Component
     {
         ThrowIfDisposed();
 
-        lock (_achievementsLock)
+        lock (_lock)
         {
             TryInitializeAchievementInternal(achievementId);
 
@@ -59,7 +59,7 @@ public class AchievementsComponent : Component
     {
         ThrowIfDisposed();
 
-        lock (_achievementsLock)
+        lock (_lock)
         {
             TryInitializeAchievementInternal(achievementId);
 
@@ -72,7 +72,7 @@ public class AchievementsComponent : Component
     {
         ThrowIfDisposed();
 
-        lock (_achievementsLock)
+        lock (_lock)
         {
             TryInitializeAchievementInternal(achievementId);
             return _achievements[achievementId].progress;
@@ -86,7 +86,7 @@ public class AchievementsComponent : Component
         if (progress < 0)
             throw new ArgumentOutOfRangeException(nameof(progress));
 
-        lock (_achievementsLock)
+        lock (_lock)
         {
             TryInitializeAchievementInternal(achievementId);
 
@@ -101,7 +101,7 @@ public class AchievementsComponent : Component
         if (requiredProgress < 0)
             throw new ArgumentOutOfRangeException(nameof(requiredProgress));
 
-        lock (_achievementsLock)
+        lock (_lock)
         {
             TryInitializeAchievementInternal(achievementId);
 
@@ -125,7 +125,7 @@ public class AchievementsComponent : Component
         if (maximumProgress < 0)
             throw new ArgumentOutOfRangeException(nameof(maximumProgress));
 
-        lock (_achievementsLock)
+        lock (_lock)
         {
             TryInitializeAchievementInternal(achievementId);
 

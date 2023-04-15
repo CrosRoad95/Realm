@@ -7,7 +7,7 @@ public class VehicleUpgradesComponent : Component
     private VehicleUpgradeRegistry VehicleUpgradeRegistry { get; set; } = default!;
 
     private readonly List<int> _upgrades = new();
-    private readonly object _upgradesLock = new();
+    private readonly object _lock = new();
     private bool _dirtyState = false;
 
     public IReadOnlyCollection<int> Upgrades
@@ -15,7 +15,7 @@ public class VehicleUpgradesComponent : Component
         get
         {
             ThrowIfDisposed();
-            lock (_upgradesLock)
+            lock (_lock)
             {
                 return new List<int>(_upgrades);
             }
@@ -59,14 +59,14 @@ public class VehicleUpgradesComponent : Component
     public bool HasUpgrade(int upgradeId)
     {
         ThrowIfDisposed();
-        lock (_upgradesLock)
+        lock (_lock)
             return InternalHasUpgrade(upgradeId);
     }
 
     public bool AddUpgrades(IEnumerable<int> upgradeIds, bool rebuild = true)
     {
         ThrowIfDisposed();
-        lock (_upgradesLock)
+        lock (_lock)
         {
             _upgrades.AddRange(upgradeIds);
             _dirtyState = true;
@@ -82,7 +82,7 @@ public class VehicleUpgradesComponent : Component
     public bool AddUpgrade(int upgradeId, bool rebuild = true)
     {
         ThrowIfDisposed();
-        lock (_upgradesLock)
+        lock (_lock)
         {
             _upgrades.Add(upgradeId);
             _dirtyState = true;
@@ -96,7 +96,7 @@ public class VehicleUpgradesComponent : Component
     public bool AddUniqueUpgrade(int upgradeId, bool rebuild = true)
     {
         ThrowIfDisposed();
-        lock (_upgradesLock)
+        lock (_lock)
         {
             if (InternalHasUpgrade(upgradeId))
                 return false;
@@ -114,7 +114,7 @@ public class VehicleUpgradesComponent : Component
     {
         ThrowIfDisposed();
         List<int> copy;
-        lock (_upgradesLock)
+        lock (_lock)
         {
             copy = new List<int>(_upgrades);
             _upgrades.Clear();
@@ -211,7 +211,7 @@ public class VehicleUpgradesComponent : Component
         var vehicleHandling = VehicleHandlingConstants.DefaultVehicleHandling[vehicle.Model];
         object boxedVehicleHandling = vehicleHandling;
 
-        lock (_upgradesLock)
+        lock (_lock)
         {
             if (!_dirtyState)
                 return;

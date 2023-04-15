@@ -3,7 +3,7 @@
 [ComponentUsage(false)]
 public class LiftableWorldObjectComponent : InteractionComponent
 {
-    private readonly object _ownerLock = new();
+    private readonly object _lock = new();
     public Entity? Owner { get; private set; }
 
     public event Action<LiftableWorldObjectComponent, Entity>? Lifted;
@@ -18,7 +18,7 @@ public class LiftableWorldObjectComponent : InteractionComponent
     {
         ThrowIfDisposed();
 
-        lock (_ownerLock)
+        lock (_lock)
         {
             if (Entity == entity)
                 return false;
@@ -43,7 +43,7 @@ public class LiftableWorldObjectComponent : InteractionComponent
     {
         ThrowIfDisposed();
 
-        lock (_ownerLock)
+        lock (_lock)
         {
             if (Owner == null)
                 return false;

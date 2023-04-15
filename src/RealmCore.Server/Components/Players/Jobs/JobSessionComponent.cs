@@ -10,7 +10,7 @@ public abstract class JobSessionComponent : SessionComponent
     public abstract short JobId { get; }
 
     private readonly List<Objective> _objectives = new();
-    private readonly object _objectivesLock = new();
+    private readonly object _lock = new();
     private bool _disposing = false;
     private int _completedObjectives = 0;
 
@@ -26,7 +26,7 @@ public abstract class JobSessionComponent : SessionComponent
     protected void RemoveObjective(Objective objective)
     {
         var empty = false;
-        lock (_objectivesLock)
+        lock (_lock)
         {
             _objectives.Remove(objective);
             if (!_disposing)
@@ -40,7 +40,7 @@ public abstract class JobSessionComponent : SessionComponent
     protected TObjective AddObjective<TObjective>(TObjective objective) where TObjective : Objective
     {
         objective.Entity = Entity;
-        lock (_objectivesLock)
+        lock (_lock)
             _objectives.Add(objective);
         try
         {
@@ -49,7 +49,7 @@ public abstract class JobSessionComponent : SessionComponent
         catch (Exception ex)
         {
             objective.Dispose();
-            lock (_objectivesLock)
+            lock (_lock)
                 _objectives.Remove(objective);
             objective.Entity = null!;
             throw;
@@ -77,7 +77,7 @@ public abstract class JobSessionComponent : SessionComponent
     public override void Dispose()
     {
         _disposing = true;
-        lock (_objectivesLock)
+        lock (_lock)
         {
             while (_objectives.Count > 0)
             {

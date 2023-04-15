@@ -4,13 +4,13 @@
 public class DiscoveriesComponent : Component
 {
     private readonly HashSet<int> _discoveries = new();
-    private readonly object _discoveriesLock = new();
+    private readonly object _lock = new();
     public IReadOnlyCollection<int> Discoveries
     {
         get
         {
             ThrowIfDisposed();
-            lock (_discoveriesLock)
+            lock (_lock)
             {
                 return new List<int>(_discoveries);
             }
@@ -30,7 +30,7 @@ public class DiscoveriesComponent : Component
     {
         ThrowIfDisposed();
 
-        lock (_discoveriesLock)
+        lock (_lock)
         {
             var success = _discoveries.Add(discoveryId);
             if (success)

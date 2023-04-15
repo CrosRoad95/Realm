@@ -4,12 +4,12 @@
 public class JobUpgradesComponent : Component
 {
     private readonly List<JobUpgrade> _upgrades = new();
-    private readonly object _upgradesLock = new();
+    private readonly object _lock = new();
     public IReadOnlyList<JobUpgrade> Upgrades
     {
         get
         {
-            lock (_upgradesLock)
+            lock (_lock)
                 return new List<JobUpgrade>(_upgrades);
         }
     }
@@ -36,7 +36,7 @@ public class JobUpgradesComponent : Component
     {
         ThrowIfDisposed();
 
-        lock (_upgradesLock)
+        lock (_lock)
             return InternalHasJobUpgrade(jobId, upgradeId);
     }
 
@@ -44,7 +44,7 @@ public class JobUpgradesComponent : Component
     {
         ThrowIfDisposed();
 
-        lock (_upgradesLock)
+        lock (_lock)
         {
             if (InternalHasJobUpgrade(jobId, upgradeId))
                 return false;
@@ -65,7 +65,7 @@ public class JobUpgradesComponent : Component
     {
         ThrowIfDisposed();
 
-        lock (_upgradesLock)
+        lock (_lock)
         {
             if (!InternalHasJobUpgrade(jobId, upgradeId))
                 return false;

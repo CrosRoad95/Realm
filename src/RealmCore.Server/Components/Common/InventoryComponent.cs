@@ -4,7 +4,7 @@
 public class InventoryComponent : Component
 {
     private readonly List<Item> _items = new();
-    private readonly object _itemsLock = new();
+    private readonly object _lock = new();
     public event Action<InventoryComponent, Item>? ItemAdded;
     public event Action<InventoryComponent, Item>? ItemRemoved;
     public event Action<InventoryComponent, Item>? ItemChanged;
@@ -31,7 +31,7 @@ public class InventoryComponent : Component
         get
         {
             ThrowIfDisposed();
-            lock (_itemsLock)
+            lock (_lock)
                 return _items.Sum(x => x.Size * x.Number);
         }
     }
@@ -41,7 +41,7 @@ public class InventoryComponent : Component
         get
         {
             ThrowIfDisposed();
-            lock (_itemsLock)
+            lock (_lock)
                 return new List<Item>(_items);
         }
     }
@@ -61,7 +61,7 @@ public class InventoryComponent : Component
     public bool HasItemById(uint itemId)
     {
         ThrowIfDisposed();
-        lock (_itemsLock)
+        lock (_lock)
             return _items.Any(x => x.ItemId == itemId);
     }
 
@@ -70,49 +70,49 @@ public class InventoryComponent : Component
     public bool HasItem(Item item)
     {
         ThrowIfDisposed();
-        lock (_itemsLock)
+        lock (_lock)
             return InternalHasItem(item);
     }
 
     public int SumItemsById(uint itemId)
     {
         ThrowIfDisposed();
-        lock (_itemsLock)
+        lock (_lock)
             return _items.Count(x => x.ItemId == itemId);
     }
 
     public IReadOnlyList<Item> GetItemsById(uint itemId)
     {
         ThrowIfDisposed();
-        lock (_itemsLock)
+        lock (_lock)
             return new List<Item>(_items.Where(x => x.ItemId == itemId));
     }
 
     public IReadOnlyList<Item> GetItemsByIdWithMetadata(uint itemId, string key, object? metadata)
     {
         ThrowIfDisposed();
-        lock (_itemsLock)
+        lock (_lock)
             return new List<Item>(_items.Where(x => x.ItemId == itemId && x.GetMetadata(key).Equals(metadata)));
     }
     
     public Item? GetSingleItemByIdWithMetadata(uint itemId, Dictionary<string, object> metadata)
     {
         ThrowIfDisposed();
-        lock (_itemsLock)
+        lock (_lock)
             return _items.Where(x => x.ItemId == itemId && x.Equals(metadata)).FirstOrDefault();
     }
 
     public bool HasItemWithMetadata(uint itemId, string key, object? metadata)
     {
         ThrowIfDisposed();
-        lock (_itemsLock)
+        lock (_lock)
             return _items.Any(x => x.ItemId == itemId && x.GetMetadata(key).Equals(metadata));
     }
 
     public bool TryGetByLocalId(string localId, out Item item)
     {
         ThrowIfDisposed();
-        lock (_itemsLock)
+        lock (_lock)
             item = _items.FirstOrDefault(x => x.LocalId == localId)!;
         return item != null;
     }
@@ -120,7 +120,7 @@ public class InventoryComponent : Component
     public bool TryGetByItemId(uint itemId, out Item item)
     {
         ThrowIfDisposed();
-        lock (_itemsLock)
+        lock (_lock)
             item = _items.FirstOrDefault(x => x.ItemId == itemId)!;
         return item != null;
     }
@@ -128,7 +128,7 @@ public class InventoryComponent : Component
     public bool TryGetByIdAndMetadata(uint itemId, Dictionary<string, object> metadata, out Item item)
     {
         ThrowIfDisposed();
-        lock (_itemsLock)
+        lock (_lock)
             item = _items.FirstOrDefault(x => x.ItemId == itemId && x.Equals(metadata))!;
         return item != null;
     }
@@ -158,7 +158,7 @@ public class InventoryComponent : Component
         List<Item> newItems = new();
         if (tryStack)
         {
-            lock (_itemsLock)
+            lock (_lock)
             {
                 foreach (var item in _items.Where(x => x.ItemId == itemId))
                 {
@@ -184,7 +184,7 @@ public class InventoryComponent : Component
         foreach (var newItem in newItems)
         {
             newItem.Changed += HandleItemChanged;
-            lock (_itemsLock)
+            lock (_lock)
                 _items.Add(newItem);
             ItemAdded?.Invoke(this, newItem);
         }
@@ -219,7 +219,7 @@ public class InventoryComponent : Component
         }
         else
         {
-            lock (_itemsLock)
+            lock (_lock)
                 if (!_items.Remove(item))
                     throw new InvalidOperationException();
 

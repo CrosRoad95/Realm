@@ -13,11 +13,11 @@ public class LicensesComponent : Component
     public IReadOnlyList<License> Licenses {
         get
         {
-            lock (_licensesLock)
+            lock (_lock)
                 return new List<License>(_licenses).AsReadOnly();
         }
     }
-    private readonly object _licensesLock = new object();
+    private readonly object _lock = new();
 
     public event Action<LicensesComponent, int>? LicenseAdded;
     public event Action<LicensesComponent, int, DateTime, string>? LicenseSuspended;
@@ -40,7 +40,7 @@ public class LicensesComponent : Component
     {
         ThrowIfDisposed();
 
-        lock (_licensesLock)
+        lock (_lock)
             return _licenses.Where(x => x.licenseId == licenseId).FirstOrDefault();
     }
 
@@ -48,7 +48,7 @@ public class LicensesComponent : Component
     {
         ThrowIfDisposed();
 
-        lock (_licensesLock)
+        lock (_lock)
             return _licenses
                 .Where(x => x.licenseId == licenseId && x.IsSuspended(DateTimeProvider))
                 .Any();
@@ -58,7 +58,7 @@ public class LicensesComponent : Component
     {
         ThrowIfDisposed();
 
-        lock (_licensesLock)
+        lock (_lock)
             return _licenses
                 .Where(x => x.licenseId == licenseId)
                 .Select(x => x.suspendedReason)
@@ -74,7 +74,7 @@ public class LicensesComponent : Component
             licenseId = licenseId,
         };
 
-        lock (_licensesLock)
+        lock (_lock)
         {
             if (InternalHasLicense(licenseId, true))
                 return false;
@@ -92,7 +92,7 @@ public class LicensesComponent : Component
         if (includeSuspended)
             query = query.Where(x => !(x.suspendedUntil != null && x.suspendedUntil > DateTimeProvider.Now));
 
-        lock (_licensesLock)
+        lock (_lock)
             return query.Any();
     }
 
@@ -100,7 +100,7 @@ public class LicensesComponent : Component
     {
         ThrowIfDisposed();
 
-        lock (_licensesLock)
+        lock (_lock)
             return InternalHasLicense(licenseId, includeSuspended);
     }
 
@@ -111,7 +111,7 @@ public class LicensesComponent : Component
         if (timeSpan.Ticks <= 0)
             throw new Exception();
 
-        lock (_licensesLock)
+        lock (_lock)
         {
             var index = _licenses.FindIndex(x => x.licenseId == licenseId);
             if (index == -1)
@@ -128,7 +128,7 @@ public class LicensesComponent : Component
     {
         ThrowIfDisposed();
 
-        lock (_licensesLock)
+        lock (_lock)
         {
             var index = _licenses.FindIndex(x => x.licenseId == licenseId);
             if (index == -1)
