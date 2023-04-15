@@ -669,6 +669,12 @@ public sealed class PlayerElementComponent : PedElementComponent
         Text3dService.SetRenderingEnabled(_player, enabled);
     }
 
+    public void ToggleAllControls(bool isEnabled, bool gtaControls = true, bool mtaControls = true)
+    {
+        ThrowIfDisposed();
+        _player.ToggleAllControls(isEnabled, gtaControls, mtaControls);
+    }
+
     public async Task DoComplexAnimationAsync(Animation animation, bool blockMovement = true)
     {
         ThrowIfDisposed();
