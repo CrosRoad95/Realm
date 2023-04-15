@@ -248,6 +248,15 @@ public sealed class PlayerElementComponent : PedElementComponent
             return _player.Controls;
         }
     }
+    
+    public bool IsInWater
+    {
+        get
+        {
+            ThrowIfDisposed();
+            return _player.IsInWater;
+        }
+    }
 
     internal override Element Element => _player;
     internal MapIdGenerator MapIdGenerator => _mapIdGenerator;

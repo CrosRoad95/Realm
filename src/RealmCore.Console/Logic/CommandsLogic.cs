@@ -886,6 +886,13 @@ internal sealed class CommandsLogic
         {
             assetsService.RestoreModelFor(entity, 1339);
         });
+        
+        _commandService.AddCommandHandler("amiinwater", (entity, args) =>
+        {
+            var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();
+            playerElementComponent.SendChatMessage($"amiinwater: {playerElementComponent.IsInWater} {entity.Transform.Position}");
+
+        });
 
         _commandService.AddAsyncCommandHandler("createObjectFor2", async (entity, args) =>
         {
