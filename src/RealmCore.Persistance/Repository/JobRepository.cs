@@ -44,7 +44,7 @@ internal class JobRepository : IJobRepository
         return query.FirstOrDefaultAsync();
     }
 
-    public Task Commit()
+    public Task<int> Commit()
     {
         return _db.SaveChangesAsync();
     }

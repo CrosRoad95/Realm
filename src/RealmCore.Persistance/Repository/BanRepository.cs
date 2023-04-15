@@ -66,7 +66,7 @@ internal class BanRepository : IBanRepository
         _db.Bans.Remove(ban);
     }
 
-    public Task Commit()
+    public Task<int> Commit()
     {
         return _db.SaveChangesAsync();
     }

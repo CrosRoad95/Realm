@@ -155,8 +155,9 @@ public class PickupElementComponent : ElementComponent
         }
     }
 
-    private void HandleDestroyed(Entity entity)
+    private void HandleDisposed(Entity entity)
     {
+        Entity.Disposed -= HandleDisposed;
         _pickup.CollisionShape.ElementEntered -= HandleElementEntered;
         _pickup.CollisionShape.ElementLeft -= HandleElementLeft;
         _pickup.CollisionShape.Destroy();
@@ -165,7 +166,7 @@ public class PickupElementComponent : ElementComponent
     protected override void Load()
     {
         base.Load();
-        Entity.Disposed += HandleDestroyed;
+        Entity.Disposed += HandleDisposed;
         _pickup.CollisionShape.ElementEntered += HandleElementEntered;
         _pickup.CollisionShape.ElementLeft += HandleElementLeft;
         _pickup.CollisionShape.Position = _pickup.Position;

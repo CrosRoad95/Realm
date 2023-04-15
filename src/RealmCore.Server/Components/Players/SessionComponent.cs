@@ -37,10 +37,10 @@ public abstract class SessionComponent : Component
         _stopwatch.Reset();
         _stopwatch.Start();
         SessionStarted?.Invoke(Entity);
-        Entity.Disposed += HandleDestroyed;
+        Entity.Disposed += HandleDisposed;
     }
 
-    private void HandleDestroyed(Entity entity)
+    private void HandleDisposed(Entity entity)
     {
         End();
     }
@@ -49,7 +49,7 @@ public abstract class SessionComponent : Component
     {
         ThrowIfDisposed();
 
-        Entity.Disposed -= HandleDestroyed;
+        Entity.Disposed -= HandleDisposed;
         SessionEnded?.Invoke(Entity);
         _stopwatch.Stop();
     }

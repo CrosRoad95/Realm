@@ -87,7 +87,7 @@ public abstract class ElementComponent : Component
     {
     }
 
-    private void HandleDestroyed(Entity entity)
+    private void HandleDisposed(Entity entity)
     {
         if (Player != null)
         {
@@ -95,7 +95,7 @@ public abstract class ElementComponent : Component
         }
         else
         {
-            Entity.Disposed -= HandleDestroyed;
+            Entity.Disposed -= HandleDisposed;
             Element.Destroy();
         }
     }
@@ -149,7 +149,7 @@ public abstract class ElementComponent : Component
             Entity.Transform.PositionChanged -= HandleTransformPositionChanged;
             Entity.Transform.RotationChanged -= HandleTransformRotationChanged;
         }
-        HandleDestroyed(Entity);
+        HandleDisposed(Entity);
         base.Dispose();
     }
 }

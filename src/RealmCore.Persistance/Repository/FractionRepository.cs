@@ -43,7 +43,7 @@ internal class FractionRepository : IFractionRepository
         _db.FractionMembers.Add(fractionMember);
     }
 
-    public Task Commit()
+    public Task<int> Commit()
     {
         return _db.SaveChangesAsync();
     }

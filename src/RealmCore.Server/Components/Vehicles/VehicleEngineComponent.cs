@@ -93,6 +93,6 @@ public sealed class VehicleEngineComponent : Component
             }
             _vehicleEngineIds.Remove(engineId);
         }
-        VehicleEngineAdded?.Invoke(this, engineId);
+        VehicleEngineRemoved?.Invoke(this, engineId);
     }
 }

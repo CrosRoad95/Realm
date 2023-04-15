@@ -17,8 +17,10 @@ public class BanService : IBanService
 
     public async Task BanSerial(string serial, DateTime? until = null, string? reason = null, string? responsible = null, int type = 0)
     {
-        _banRepository.CreateBanForSerial(serial, until, reason, responsible, type);
-        await _banRepository.Commit();
+        var banData = _banRepository.CreateBanForSerial(serial, until, reason, responsible, type);
+        if (await _banRepository.Commit() > 0)
+            BanAdded?.Invoke(banData);
+
     }
 
     public async Task BanUserId(int userId, DateTime? until = null, string? reason = null, string? responsible = null, int type = 0)

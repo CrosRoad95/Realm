@@ -18,7 +18,7 @@ public class LicensesComponent : Component
     private readonly object _lock = new();
 
     public event Action<LicensesComponent, int>? LicenseAdded;
-    public event Action<LicensesComponent, int, DateTime, string>? LicenseSuspended;
+    public event Action<LicensesComponent, int, DateTime, string?>? LicenseSuspended;
     public event Action<LicensesComponent, int>? LicenseUnSuspended;
     public LicensesComponent()
     {
@@ -119,6 +119,7 @@ public class LicensesComponent : Component
             previous.suspendedUntil = DateTimeProvider.Now + timeSpan;
             previous.suspendedReason = reason;
             _licenses[index] = previous;
+            LicenseSuspended?.Invoke(this, licenseId, previous.suspendedUntil.Value, previous.suspendedReason);
         }
     }
 

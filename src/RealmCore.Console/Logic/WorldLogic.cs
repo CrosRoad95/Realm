@@ -42,10 +42,10 @@ internal class WorldLogic
             return;
 
         entity.ComponentAdded += HandleComponentAdded;
-        entity.Disposed += HandleDestroyed;
+        entity.Disposed += HandleDisposed;
     }
 
-    private void HandleDestroyed(Entity entity)
+    private void HandleDisposed(Entity entity)
     {
         entity.ComponentAdded -= HandleComponentAdded;
     }

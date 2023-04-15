@@ -150,11 +150,11 @@ internal sealed class ECS : IECS
         _entityByPlayer.Remove(playerEntity.Player, out var _);
     }
 
-    private void HandleDestroyed(Entity entity)
+    private void HandleDisposed(Entity entity)
     {
         _entityById.TryRemove(entity.Id, out var _);
         _entityByName.TryRemove(entity.Name, out var _);
-        entity.Disposed -= HandleDestroyed;
+        entity.Disposed -= HandleDisposed;
     }
 
     public bool GetEntityById(string id, out Entity? entity) => _entityById.TryGetValue(id, out entity);

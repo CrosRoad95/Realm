@@ -2,5 +2,5 @@
 
 public interface IRepositoryBase : IDisposable
 {
-    Task Commit();
+    Task<int> Commit();
 }

@@ -167,7 +167,7 @@ public class MarkerElementComponent : ElementComponent
             EntityLeft(entity);
     }
 
-    private void HandleDestroyed(Entity entity)
+    private void HandleDisposed(Entity entity)
     {
         _collisionShape.ElementEntered -= HandleElementEntered;
         _collisionShape.ElementLeft -= HandleElementLeft;
@@ -180,7 +180,7 @@ public class MarkerElementComponent : ElementComponent
         if (Entity.TryGetComponent(out PlayerElementComponent playerElementComponent))
             _collisionShape.Id = (ElementId)playerElementComponent.MapIdGenerator.GetId();
 
-        Entity.Disposed += HandleDestroyed;
+        Entity.Disposed += HandleDisposed;
         _collisionShape.ElementEntered += HandleElementEntered;
         _collisionShape.ElementLeft += HandleElementLeft;
         _collisionShape.Position = _marker.Position;

@@ -27,7 +27,7 @@ internal class UserRewardRepository : IUserRewardRepository
         }
     }
 
-    public Task Commit()
+    public Task<int> Commit()
     {
         return _db.SaveChangesAsync();
     }

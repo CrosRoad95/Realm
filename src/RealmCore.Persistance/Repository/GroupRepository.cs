@@ -100,7 +100,7 @@ internal class GroupRepository : IGroupRepository
         _db.Dispose();
     }
 
-    public Task Commit()
+    public Task<int> Commit()
     {
         return _db.SaveChangesAsync();
     }

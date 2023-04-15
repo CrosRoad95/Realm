@@ -75,7 +75,7 @@ public class JobStatisticsComponent : Component
             jobStatistics.timePlayed += timePlayed;
             jobStatistics.sessionTimePlayed += timePlayed;
             _jobStatistics[jobId] = jobStatistics;
-            PointsAdded?.Invoke(this, jobId, jobStatistics.timePlayed, jobStatistics.sessionTimePlayed);
+            TimePlayedAdded?.Invoke(this, jobId, jobStatistics.timePlayed, jobStatistics.sessionTimePlayed);
         }
     }
 

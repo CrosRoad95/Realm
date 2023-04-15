@@ -216,7 +216,7 @@ public class InventoryComponentTests
     {
         void HandleItemUsed(InventoryComponent inventoryComponent, Item usedItem, ItemAction flags)
         {
-            usedItem.SetMetadata("counter", (int)usedItem.GetMetadata("counter") - 1);
+            usedItem.SetMetadata("counter", usedItem.GetMetadata<int>("counter") - 1);
         }
 
         _inventoryComponent.ItemUsed += HandleItemUsed;

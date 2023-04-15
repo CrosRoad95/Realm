@@ -95,7 +95,7 @@ internal class VehicleRepository : IVehicleRepository
         _db.Dispose();
     }
 
-    public Task Commit()
+    public Task<int> Commit()
     {
         return _db.SaveChangesAsync();
     }

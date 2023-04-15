@@ -148,8 +148,7 @@ public class InventoryComponent : Component
         if (number == 0)
             throw new ArgumentOutOfRangeException(nameof(number));
 
-        if (metadata == null)
-            metadata = new();
+        metadata ??= new();
 
         var itemRegistryEntry = itemsRegistry.Get(itemId);
         if (Number + itemRegistryEntry.Size * number > Size && !force)
@@ -176,8 +175,10 @@ public class InventoryComponent : Component
         {
             var thisItemNumber = Math.Min(number, itemRegistryEntry.StackSize);
             number -= thisItemNumber;
-            var item = new Item(itemsRegistry, itemId, number, metadata);
-            item.Number = thisItemNumber;
+            var item = new Item(itemsRegistry, itemId, number, metadata)
+            {
+                Number = thisItemNumber
+            };
             newItems.Add(item);
         }
 

@@ -136,11 +136,11 @@ internal class UsersService : IUsersService
             _logger.LogError(ex, "Failed to sign in user of id {userId}", user.Id);
             throw;
         }
-        entity.Disposed += HandleDestroyed;
+        entity.Disposed += HandleDisposed;
         return true;
     }
 
-    private void HandleDestroyed(Entity entity)
+    private void HandleDisposed(Entity entity)
     {
         try
         {
