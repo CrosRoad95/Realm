@@ -691,6 +691,11 @@ public sealed class PlayerElementComponent : PedElementComponent
             _player.ToggleAllControls(true, true, false);
     }
 
+    public void StopAnimation()
+    {
+        _player.StopAnimation();
+    }
+
     public void DoAnimation(Animation animation, TimeSpan? timeSpan = null)
     {
         ThrowIfDisposed();
@@ -745,6 +750,10 @@ public sealed class PlayerElementComponent : PedElementComponent
             case Animation.PlantBomb:
                 timeSpan ??= TimeSpan.FromSeconds(1.5f);
                 _player.SetAnimation("BOMBER", "BOM_Plant", timeSpan, false, false, false, false);
+                break;
+            case Animation.StartFishing:
+                timeSpan ??= TimeSpan.FromSeconds(1.5f);
+                _player.SetAnimation("SWORD", "sword_block", timeSpan, false, false, false, true);
                 break;
             default:
                 throw new NotSupportedException();

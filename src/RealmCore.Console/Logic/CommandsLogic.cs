@@ -395,6 +395,11 @@ internal sealed class CommandsLogic
             objectEntity.AddComponent<DurationBasedHoldInteractionWithRingEffectComponent>();
         });
 
+        _commandService.AddCommandHandler("stopanimation", (entity, args) =>
+        {
+            entity.GetRequiredComponent<PlayerElementComponent>().StopAnimation();
+        });
+
         _commandService.AddCommandHandler("animation", (entity, args) =>
         {
             if (Enum.TryParse<Animation>(args.FirstOrDefault(), out var animation))
@@ -411,6 +416,7 @@ internal sealed class CommandsLogic
             else
                 entity.GetRequiredComponent<PlayerElementComponent>().SendChatMessage($"Animation '{args.FirstOrDefault()}' not found.");
         });
+
         _commandService.AddAsyncCommandHandler("animationasync", async (entity, args) =>
         {
             var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();

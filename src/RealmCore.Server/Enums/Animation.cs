@@ -13,6 +13,7 @@ public enum Animation
     CarryLiftUpFromTable,
     CarryPutDownOnTable,
     PlantBomb,
+    StartFishing,
 
     // Complex animations
     ComplexLiftUp,
