@@ -1,7 +1,4 @@
-﻿using JobStatisticsData = RealmCore.Persistance.Data.JobStatisticsData;
-using JobStatistics = RealmCore.Server.Concepts.JobStatistics;
-
-namespace RealmCore.Server.Components.Players;
+﻿namespace RealmCore.Server.Components.Players;
 
 [ComponentUsage(false)]
 public class JobStatisticsComponent : Component

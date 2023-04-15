@@ -119,6 +119,9 @@ global using RealmCore.Server.Registries.Abstractions;
 global using RealmCore.Server.Xml;
 global using RealmCore.Server.Xml.Map;
 global using System.Xml.Serialization;
+global using RealmCore.Persistance.Interfaces;
+global using System.Diagnostics;
+global using RealmCore.Persistance.Data.Helpers;
 
 global using ILogger = Microsoft.Extensions.Logging.ILogger;
 

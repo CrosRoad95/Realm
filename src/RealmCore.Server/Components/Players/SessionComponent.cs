@@ -1,6 +1,4 @@
-﻿using System.Diagnostics;
-
-namespace RealmCore.Server.Components.Players;
+﻿namespace RealmCore.Server.Components.Players;
 
 public abstract class SessionComponent : Component
 {

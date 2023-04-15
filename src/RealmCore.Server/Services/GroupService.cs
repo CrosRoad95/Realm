@@ -1,9 +1,4 @@
-﻿using RealmCore.Persistance.Interfaces;
-using Group = RealmCore.Server.Concepts.Group;
-using GroupData = RealmCore.Persistance.Data.GroupData;
-using GroupMember = RealmCore.Server.Concepts.GroupMember;
-
-namespace RealmCore.Server.Services;
+﻿namespace RealmCore.Server.Services;
 
 internal class GroupService : IGroupService
 {

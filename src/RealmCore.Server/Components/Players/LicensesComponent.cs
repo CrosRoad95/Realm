@@ -1,6 +1,4 @@
-﻿using License = RealmCore.Server.Concepts.License;
-
-namespace RealmCore.Server.Components.Players;
+﻿namespace RealmCore.Server.Components.Players;
 
 [ComponentUsage(false)]
 public class LicensesComponent : Component
