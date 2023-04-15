@@ -61,6 +61,7 @@ internal class UsersService : IUsersService
         if (entity.Tag != EntityTag.Player || !entity.HasComponent<PlayerElementComponent>())
             throw new NotSupportedException("Entity is not a player entity.");
 
+        using var _ = _logger.BeginEntity(entity);
         using var transaction = entity.BeginComponentTransaction();
         try
         {
@@ -133,7 +134,7 @@ internal class UsersService : IUsersService
         {
             _activeUsers.TrySetInactive(user.Id);
             entity.Rollback(transaction);
-            _logger.LogError(ex, "Failed to sign in user of id {userId}", user.Id);
+            _logger.LogError(ex, "Failed to sign in a user");
             throw;
         }
         entity.Disposed += HandleDisposed;

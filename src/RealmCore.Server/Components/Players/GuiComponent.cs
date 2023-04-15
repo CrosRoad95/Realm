@@ -71,7 +71,7 @@ public abstract class GuiComponent : Component
                 }
                 catch (Exception ex)
                 {
-                    Logger.LogError(ex, "Failed to handle form {formName}.", formName);
+                    Logger.LogHandleError(ex);
                     formContext.ErrorResponse("Wystąpił nieznany błąd.");
                 }
             }

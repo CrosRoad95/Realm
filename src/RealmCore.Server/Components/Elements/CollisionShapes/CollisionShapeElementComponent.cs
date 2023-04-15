@@ -69,7 +69,7 @@ public abstract class CollisionShapeElementComponent : ElementComponent
         }
         catch (Exception ex)
         {
-            Logger.LogError(ex, "Failed to handle element entered.");
+            Logger.LogHandleError(ex);
         }
     }
 
@@ -91,7 +91,7 @@ public abstract class CollisionShapeElementComponent : ElementComponent
         }
         catch (Exception ex)
         {
-            Logger.LogError(ex, "Failed to handle element left.");
+            Logger.LogHandleError(ex);
         }
     }
 

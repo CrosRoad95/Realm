@@ -19,6 +19,7 @@ internal class SaveCommand : ICommand
         int savedEntities = 0;
         foreach (var entity in _ecs.Entities)
         {
+            using var _ = _logger.BeginEntity(entity);
             try
             {
 #if DEBUG
