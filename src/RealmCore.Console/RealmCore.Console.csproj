@@ -39,6 +39,9 @@
     <Folder Include="Server\Maps\" />
   </ItemGroup>
   <ItemGroup>
+    <None Update="Server\Assets\Fonts\Better Together.otf">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="Server\Maps\test.map">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>

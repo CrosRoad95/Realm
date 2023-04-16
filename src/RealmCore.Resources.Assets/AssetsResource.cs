@@ -44,15 +44,25 @@ end
         var assets = serverAssetsProviders.SelectMany(x => x.Provide()).ToList();
         foreach (var path in assets)
         {
-            using var content = File.OpenRead(path);
-            var md5 = Utilities.CreateMD5(content);
-            var pathMd5 = Utilities.CreateMD5(path);
-            var contentByte = Utilities.ReadFully(content);
-            var encrypted = encryptionProvider.Encrypt(contentByte);
+            if(path.EndsWith(".otf") || path.EndsWith(".ttf"))
+            {
+                var content = File.ReadAllBytes(path);
+                Files.Add(ResourceFileFactory.FromBytes(content, path));
+                AdditionalFiles.Add(path, content);
+                _contentSize += content.Length;
+            }
+            else
+            {
+                using var content = File.OpenRead(path);
+                var md5 = Utilities.CreateMD5(content);
+                var pathMd5 = Utilities.CreateMD5(path);
+                var contentByte = Utilities.ReadFully(content);
+                var encrypted = encryptionProvider.Encrypt(contentByte);
 
-            Files.Add(ResourceFileFactory.FromBytes(encrypted, pathMd5));
-            AdditionalFiles.Add(pathMd5, encrypted);
-            _contentSize += content.Length;
+                Files.Add(ResourceFileFactory.FromBytes(encrypted, pathMd5));
+                AdditionalFiles.Add(pathMd5, encrypted);
+                _contentSize += content.Length;
+            }
         }
 
         var keyBase64 = Convert.ToBase64String(encryptionProvider.Key);

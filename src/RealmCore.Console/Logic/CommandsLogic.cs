@@ -488,6 +488,12 @@ internal sealed class CommandsLogic
             entity.AddComponent(new SampleHud());
         });
 
+        _commandService.AddCommandHandler("createhud2", (entity, args) =>
+        {
+            var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();
+            entity.AddComponent(new SampleHud2());
+        });
+
         _commandService.AddCommandHandler("movehud", (entity, args) =>
         {
             var sampleHud = entity.GetRequiredComponent<SampleHud>();

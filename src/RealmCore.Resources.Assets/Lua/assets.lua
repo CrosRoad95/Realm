@@ -13,8 +13,15 @@ function requestAsset(name)
 	return loadedAssets[name]
 end
 
+local function checkIfAssetExists(path)
+	if(not fileExists(path))then
+		error("Asset file: ''"..path.."'' doesn't exists'");
+	end
+end
+
 function loadAsset(name, assetInfo)
 	local assetType = assetInfo[1]
+	checkIfAssetExists(assetInfo[2])
 	if(assetType == "Font")then
 		loadedAssets[name] = dxCreateFont(assetInfo[2], 12)
 		outputDebugString("Loaded font: "..tostring(name))

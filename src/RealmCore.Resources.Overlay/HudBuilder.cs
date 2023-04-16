@@ -1,5 +1,9 @@
 ﻿using RealmCore.Resources.Assets.Interfaces;
+using RealmCore.Resources.Base.Extensions;
+using RealmCore.Resources.Overlay.Builders;
+using RealmCore.Resources.Overlay.Builders.Interfaces;
 using RealmCore.Resources.Overlay.Enums;
+using RealmCore.Resources.Overlay.Extensions;
 using RealmCore.Resources.Overlay.Interfaces;
 using SlipeServer.Packets.Definitions.Lua;
 using System.Drawing;
@@ -30,33 +34,25 @@ internal class HudBuilder<TState> : IHudBuilder<TState>
         _screenSize = screenSize;
     }
 
-    private string ToString(HorizontalAlign horizontalAlign) => horizontalAlign switch
-    {
-        HorizontalAlign.Left => "left",
-        HorizontalAlign.Right => "right",
-        HorizontalAlign.Center => "center",
-        _ => throw new NotImplementedException()
-    };
-
-    private string ToString(VerticalAlign verticalAlign) => verticalAlign switch
-    {
-        VerticalAlign.Top => "top",
-        VerticalAlign.Bottom => "bottom",
-        VerticalAlign.Center => "center",
-        _ => throw new NotImplementedException()
-    };
-
     internal IHudBuilder<TState> InternalAddText(string text, Vector2 position, Size size, Color? color = null, Size? scale = null, LuaValue? font = null, HorizontalAlign alignX = HorizontalAlign.Left, VerticalAlign alignY = VerticalAlign.Top)
     {
         color ??= Color.White;
-        double luaColor = color.Value.B + color.Value.G * 256 + color.Value.R * 256 * 256 + color.Value.A * 256 * 256 * 256;
-        _luaValues.Add(new(new LuaValue[] { "text", ++_id, text, position.X, position.Y, size.Width, size.Height, luaColor, scale?.Width ?? 1, scale?.Height ?? 1, font, ToString(alignX), ToString(alignY) }));
+        double luaColor = color.Value.ToLuaColor();
+        _luaValues.Add(new(new LuaValue[] { "text", ++_id, text, position.X, position.Y, size.Width, size.Height, luaColor, scale?.Width ?? 1, scale?.Height ?? 1, font, alignX.AsString(), alignY.AsString() }));
         return this;
     }
 
     public IHudBuilder<TState> AddText(string text, Vector2 position, Size size, Color? color = null, Size? scale = null, string font = "default", HorizontalAlign alignX = HorizontalAlign.Left, VerticalAlign alignY = VerticalAlign.Top)
     {
         InternalAddText(text, position, size, color, scale, font, alignX, alignY);
+        return this;
+    }
+
+    public IHudBuilder<TState> AddText(Action<ITextHudBuilder<TState>> textBuilderCallback)
+    {
+        var builder = new TextHudBuilder<TState>(++_id, _state, _assetsService);
+        textBuilderCallback(builder);
+        _luaValues.Add(builder.Build());
         return this;
     }
 
@@ -79,7 +75,7 @@ internal class HudBuilder<TState> : IHudBuilder<TState>
 
     public IHudBuilder<TState> AddRectangle(Vector2 position, Size size, Color color)
     {
-        double luaColor = color.B + color.G * 256 + color.R * 256 * 256 + color.A * 256 * 256 * 256;
+        double luaColor = color.ToLuaColor();
         _luaValues.Add(new(new LuaValue[] { "rectangle", ++_id, position.X, position.Y, size.Width, size.Height, luaColor }));
         return this;
     }

@@ -53,8 +53,18 @@ public class Hud3dComponent<TState> : Component where TState : class
         OverlayService.CreateHud3d(_id.ToString(), e =>
         {
             e.DynamicHudComponentAdded += HandleDynamicHudComponentAdded;
-            _hudBuilderCallback(e);
-            e.DynamicHudComponentAdded -= HandleDynamicHudComponentAdded;
+            try
+            {
+                _hudBuilderCallback(e);
+            }
+            catch(Exception ex)
+            {
+                throw;
+            }
+            finally
+            {
+                e.DynamicHudComponentAdded -= HandleDynamicHudComponentAdded;
+            }
         }, _state, Entity.Transform.Position + _offset);
 
         _dynamicHudComponents.AddRange(dynamicHudComponents);
