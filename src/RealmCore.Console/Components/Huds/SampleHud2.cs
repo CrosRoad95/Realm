@@ -6,21 +6,39 @@ using RealmCore.Resources.Overlay.Interfaces;
 
 namespace RealmCore.Console.Components.Huds;
 
-public class SampleHud2 : HudComponent
+
+public class SampleHud2State
+{
+    public string Text1 { get; set; }
+    public string Text2 { get; set; }
+}
+
+[ComponentUsage(false)]
+public class SampleHud2 : HudComponent<SampleHud2State>
 {
     [Inject]
     private AssetsRegistry AssetsRegistry { get; set; } = default!;
 
-    public SampleHud2() : base(new())
+    public SampleHud2() : base(new SampleHud2State
+    {
+        Text1 = "text1",
+        Text2 = "text2"
+    })
     {
 
     }
 
-    protected override void Build(IHudBuilder<object> x)
+    protected override void Build(IHudBuilder<SampleHud2State> x)
     {
         x.AddRectangle(new Vector2(x.Right - 400, 600), new Size(400, 20), Color.DarkBlue);
-        //x.AddText("foo bar", new Vector2(x.Right - 200, 600), new Size(200, 20), font: "default", alignX: HorizontalAlign.Center, alignY: VerticalAlign.Center);
-        x.AddText(x => x.WithText("foo bar").WithPosition(new Vector2(100,10)));
+
+        x.AddText(x => x.WithText("foo bar").WithPosition(new Vector2(100, 10)));
+        x.AddText(x => x.WithText(x => $"Text1: {x.Text1.ToUpper()}").WithPosition(new Vector2(100, 30)));
         x.AddText("custom font", new Vector2(x.Right - 400, 600), new Size(200, 20), font: AssetsRegistry.GetFont("Better Together.otf"), alignX: HorizontalAlign.Center, alignY: VerticalAlign.Center);
+    }
+
+    public void Update()
+    {
+        UpdateState(x => x.Text1 = Guid.NewGuid().ToString());
     }
 }

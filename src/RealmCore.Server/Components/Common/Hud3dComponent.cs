@@ -1,4 +1,6 @@
-﻿namespace RealmCore.Server.Components.Common;
+﻿using RealmCore.Resources.Overlay;
+
+namespace RealmCore.Server.Components.Common;
 
 public class Hud3dComponent<TState> : Component where TState : class
 {
@@ -8,13 +10,13 @@ public class Hud3dComponent<TState> : Component where TState : class
     private static int _idCounter = 0;
     private readonly int _id = _idCounter++;
     private readonly Action<IHudBuilder<TState>> _hudBuilderCallback;
-    private readonly List<(int, PropertyInfo)> _dynamicHudComponents = new();
+    private readonly List<DynamicHudComponent> _dynamicHudComponents = new();
     private readonly TState? _state;
     private readonly Vector3 _offset;
 
     public int Id => _id;
     public Vector3 Offset => _offset;
-    internal IEnumerable<(int, PropertyInfo)> DynamicHudComponents => _dynamicHudComponents;
+    internal IEnumerable<DynamicHudComponent> DynamicHudComponents => _dynamicHudComponents;
 
     public Hud3dComponent(Action<IHudBuilder<TState>> hudBuilderCallback, TState? defaultState = null, Vector3? offset = null)
     {
@@ -33,26 +35,24 @@ public class Hud3dComponent<TState> : Component where TState : class
         Dictionary<int, object?> stateChange = new();
         foreach (var item in _dynamicHudComponents)
         {
-            var objectValue = item.Item2.GetValue(_state);
-            stateChange.Add(item.Item1, objectValue);
+            var objectValue = item.PropertyInfo.GetValue(_state);
+            stateChange.Add(item.ComponentId, objectValue);
         }
 
         if (stateChange.Any())
             OverlayService.SetHud3dState(_id.ToString(), stateChange);
     }
 
+    private void HandleDynamicHudComponentAdded(DynamicHudComponent dynamicHudComponent)
+    {
+        _dynamicHudComponents.Add(dynamicHudComponent);
+    }
+
     protected override void Load()
     {
-        List<(int, PropertyInfo)> dynamicHudComponents = new();
-
-        var HandleDynamicHudComponentAdded = (int id, PropertyInfo propertyInfo) =>
-        {
-            dynamicHudComponents.Add((id, propertyInfo));
-        };
-
         OverlayService.CreateHud3d(_id.ToString(), e =>
         {
-            e.DynamicHudComponentAdded += HandleDynamicHudComponentAdded;
+            e.DynamicHudComponentAdded = HandleDynamicHudComponentAdded;
             try
             {
                 _hudBuilderCallback(e);
@@ -63,11 +63,10 @@ public class Hud3dComponent<TState> : Component where TState : class
             }
             finally
             {
-                e.DynamicHudComponentAdded -= HandleDynamicHudComponentAdded;
+                e.DynamicHudComponentAdded = null;
             }
         }, _state, Entity.Transform.Position + _offset);
 
-        _dynamicHudComponents.AddRange(dynamicHudComponents);
         base.Load();
     }
 

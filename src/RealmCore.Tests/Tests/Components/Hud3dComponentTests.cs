@@ -86,7 +86,7 @@ public class Hud3dComponentTests
         #endregion
 
         #region Assert
-        hud3d.DynamicHudComponents.Select(x => x.Item1).ToList().Should().BeEquivalentTo(new int[]
+        hud3d.DynamicHudComponents.Select(x => x.ComponentId).ToList().Should().BeEquivalentTo(new int[]
         {
             1, 3, 5
         });

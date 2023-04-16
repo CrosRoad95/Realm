@@ -11,6 +11,20 @@ using System.Linq.Expressions;
 
 namespace RealmCore.Resources.Overlay.Builders;
 
+internal class PropertyExpressionVisitor : ExpressionVisitor
+{
+    public List<PropertyInfo> Properties { get; private set; } = new();
+
+    protected override Expression VisitMember(MemberExpression node)
+    {
+        if (node.Member is PropertyInfo propertyInfo)
+        {
+            Properties.Add(propertyInfo);
+        }
+        return base.VisitMember(node);
+    }
+}
+
 internal class TextHudBuilder<TState> : ITextHudBuilder<TState>
 {
     private string _text = "";
@@ -25,7 +39,7 @@ internal class TextHudBuilder<TState> : ITextHudBuilder<TState>
     private readonly int _id;
     private readonly TState _state;
     private readonly IAssetsService _assetsService;
-    public event Action<int, PropertyInfo>? DynamicHudComponentAdded;
+    public Action<DynamicHudComponent>? DynamicHudComponentAdded { get; set; }
 
     public TextHudBuilder(int id, TState state, IAssetsService assetsService)
     {
@@ -42,10 +56,18 @@ internal class TextHudBuilder<TState> : ITextHudBuilder<TState>
 
     private TProperty WithProperty<TProperty>(Expression<Func<TState, TProperty>> expression)
     {
-        var me = expression.Body as MemberExpression ?? throw new ArgumentException("Expression must be a member expression.");
-        var propertyInfo = me.Member as PropertyInfo ?? throw new ArgumentException("Expression must be a property.");
-        var value = expression.Compile()(_state);
-        DynamicHudComponentAdded?.Invoke(_id, propertyInfo);
+        var visitor = new PropertyExpressionVisitor();
+        visitor.Visit(expression);
+        var factory = expression.Compile();
+        var value = factory(_state);
+        foreach (var propertyInfo in visitor.Properties)
+            DynamicHudComponentAdded?.Invoke(new DynamicHudComponent
+            {
+                ComponentId = _id,
+                PropertyInfo = propertyInfo,
+                Factory = factory
+            });
+
         return value;
     }
 

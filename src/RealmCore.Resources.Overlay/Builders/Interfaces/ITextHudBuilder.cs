@@ -2,6 +2,7 @@
 using RealmCore.Resources.Overlay.Enums;
 using SlipeServer.Packets.Definitions.Lua;
 using System.Drawing;
+using System.Linq.Expressions;
 using System.Numerics;
 using System.Reflection;
 
@@ -9,8 +10,6 @@ namespace RealmCore.Resources.Overlay.Builders.Interfaces;
 
 public interface ITextHudBuilder<TState>
 {
-    event Action<int, PropertyInfo>? DynamicHudComponentAdded;
-
     ITextHudBuilder<TState> WithColor(Color color);
     ITextHudBuilder<TState> WithFont(IFont font);
     ITextHudBuilder<TState> WithFont(string stringFont);
@@ -19,6 +18,8 @@ public interface ITextHudBuilder<TState>
     ITextHudBuilder<TState> WithScale(Size? scale);
     ITextHudBuilder<TState> WithSize(Size size);
     ITextHudBuilder<TState> WithText(string text);
+    ITextHudBuilder<TState> WithText(Expression<Func<TState, string>> expression);
     ITextHudBuilder<TState> WithVerticalAlign(VerticalAlign alignY);
+    internal Action<DynamicHudComponent>? DynamicHudComponentAdded { get; set; }
     internal LuaValue[] Build();
 }

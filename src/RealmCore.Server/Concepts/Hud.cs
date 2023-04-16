@@ -1,11 +1,13 @@
-﻿namespace RealmCore.Server.Concepts;
+﻿using System.Linq.Expressions;
+
+namespace RealmCore.Server.Concepts;
 
 internal class Hud<TState> : IHud<TState> where TState : class
 {
     private readonly Player _player;
     private readonly IOverlayService _overlayService;
     private readonly TState? _state;
-    private readonly List<(int, PropertyInfo)>? _dynamicHudComponents;
+    private readonly List<DynamicHudComponent>? _dynamicHudComponents;
     private bool _disposed = false;
     private Vector2 _position;
 
@@ -23,7 +25,7 @@ internal class Hud<TState> : IHud<TState> where TState : class
         }
     }
 
-    public Hud(string name, Player player, IOverlayService overlayService, Vector2? position = null, TState? state = default, List<(int, PropertyInfo)>? dynamicHudComponents = null)
+    public Hud(string name, Player player, IOverlayService overlayService, Vector2? position = null, TState? state = default, List<DynamicHudComponent>? dynamicHudComponents = null)
     {
         Name = name;
         _player = player;
@@ -50,8 +52,8 @@ internal class Hud<TState> : IHud<TState> where TState : class
         Dictionary<int, object> stateChange = new();
         foreach (var item in _dynamicHudComponents)
         {
-            var value = item.Item2.GetValue(_state).ToString();
-            stateChange.Add(item.Item1, value);
+            var value = item.Factory(_state) as object;
+            stateChange.Add(item.ComponentId, value);
         }
 
         if (stateChange.Any())

@@ -1,4 +1,8 @@
-﻿namespace RealmCore.Server.Components.Players;
+﻿using RealmCore.Resources.Overlay;
+using System.Reflection;
+using System;
+
+namespace RealmCore.Server.Components.Players;
 
 [ComponentUsage(true)]
 public abstract class HudComponent<TState> : Component where TState : class
@@ -53,19 +57,30 @@ public abstract class HudComponent<TState> : Component where TState : class
     protected override void Load()
     {
         var playerElementComponent = Entity.GetRequiredComponent<PlayerElementComponent>();
-        List<(int, PropertyInfo)> dynamicHudComponents = new();
+        List<DynamicHudComponent> dynamicHudComponents = new();
 
-        var HandleDynamicHudComponentAdded = (int id, PropertyInfo propertyInfo) =>
+        var HandleDynamicHudComponentAdded = (DynamicHudComponent dynamicHudComponent) =>
         {
-            dynamicHudComponents.Add((id, propertyInfo));
+            dynamicHudComponents.Add(dynamicHudComponent);
         };
 
         OverlayService.CreateHud(playerElementComponent.Player, _id, e =>
         {
-            e.DynamicHudComponentAdded += HandleDynamicHudComponentAdded;
-            Build(e);
-            e.DynamicHudComponentAdded -= HandleDynamicHudComponentAdded;
+            e.DynamicHudComponentAdded = HandleDynamicHudComponentAdded;
+            try
+            {
+                Build(e);
+            }
+            catch(Exception ex)
+            {
+                throw;
+            }
+            finally
+            {
+                e.DynamicHudComponentAdded = null;
+            }
         }, playerElementComponent.ScreenSize, _offset, _defaultState);
+
         _hud = new Hud<TState>(_id, playerElementComponent.Player, OverlayService, _offset, _defaultState, dynamicHudComponents);
         Visible = true;
     }

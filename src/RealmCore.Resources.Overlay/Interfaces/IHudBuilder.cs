@@ -13,7 +13,7 @@ public interface IHudBuilder<TState>
     float Right { get; }
     float Bottom { get; }
 
-    event Action<int, PropertyInfo>? DynamicHudComponentAdded;
+    Action<DynamicHudComponent>? DynamicHudComponentAdded { get; set; }
 
     IHudBuilder<TState> AddRectangle(Vector2 position, Size size, Color color);
     IHudBuilder<TState> AddText(string text, Vector2 position, Size size, Color? color = null, Size? scale = null, string font = "default", HorizontalAlign alignX = HorizontalAlign.Left, VerticalAlign alignY = VerticalAlign.Top);
