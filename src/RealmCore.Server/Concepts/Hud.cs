@@ -1,6 +1,4 @@
-﻿using System.Linq.Expressions;
-
-namespace RealmCore.Server.Concepts;
+﻿namespace RealmCore.Server.Concepts;
 
 internal class Hud<TState> : IHud<TState> where TState : class
 {

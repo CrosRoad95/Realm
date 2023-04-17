@@ -1,7 +1,5 @@
 ﻿using RealmCore.Resources.Assets.Classes;
 using RealmCore.Resources.Assets.Interfaces;
-using RenderWareIo.Structs.Col;
-using RenderWareIo.Structs.Dff;
 using SlipeServer.Packets.Definitions.Lua;
 using SlipeServer.Server.Elements;
 

@@ -1,6 +1,4 @@
-﻿using System.Diagnostics;
-
-namespace RealmCore.Server.Sessions;
+﻿namespace RealmCore.Server.Sessions;
 
 public abstract class SessionBase
 {

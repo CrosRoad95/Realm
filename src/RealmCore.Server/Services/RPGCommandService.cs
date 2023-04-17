@@ -1,5 +1,4 @@
 ﻿using RealmCore.Logging;
-using System.Diagnostics;
 
 namespace RealmCore.Server.Services;
 

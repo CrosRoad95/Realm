@@ -1,5 +1,4 @@
-﻿using RealmCore.Persistance.Interfaces;
-using Vehicle = SlipeServer.Server.Elements.Vehicle;
+﻿using Vehicle = SlipeServer.Server.Elements.Vehicle;
 
 namespace RealmCore.Server.Factories;
 

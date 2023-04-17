@@ -100,6 +100,7 @@ internal class SamplePickupsLogic
         {
             var pickupElementComponent = entity.GetRequiredComponent<PickupElementComponent>();
             pickupElementComponent.AddRule<MustBePlayerOnFootOnlyRule>();
+            pickupElementComponent.AddRule<MustNotHaveComponent<AttachedEntityComponent>>();
             pickupElementComponent.AddOpenGuiLogic<TestWindowComponent>();
         }
 

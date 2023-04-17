@@ -3,13 +3,11 @@ using RealmCore.Resources.Base.Extensions;
 using RealmCore.Resources.Overlay.Builders;
 using RealmCore.Resources.Overlay.Builders.Interfaces;
 using RealmCore.Resources.Overlay.Enums;
-using RealmCore.Resources.Overlay.Extensions;
 using RealmCore.Resources.Overlay.Interfaces;
 using SlipeServer.Packets.Definitions.Lua;
 using System.Drawing;
 using System.Linq.Expressions;
 using System.Numerics;
-using System.Reflection;
 
 namespace RealmCore.Resources.Overlay;
 
@@ -65,7 +63,7 @@ internal class HudBuilder<TState> : IHudBuilder<TState>
 
     public IHudBuilder<TState> AddText(Expression<Func<TState, string>> exp, Vector2 position, Size size, Color? color = null, Size? scale = null, string font = "default", HorizontalAlign alignX = HorizontalAlign.Left, VerticalAlign alignY = VerticalAlign.Top)
     {
-        AddText(b => b.WithText(exp).WithPosition(position).WithSize(size).WithColor(color ?? Color.White).WithFont(font).WithHorizontalAlign(alignX).WithVerticalAlign(alignY));
+        AddText(b => b.WithText(exp).WithPosition(position).WithSize(size).WithScale(scale).WithColor(color ?? Color.White).WithFont(font).WithHorizontalAlign(alignX).WithVerticalAlign(alignY));
         return this;
     }
 
@@ -74,7 +72,7 @@ internal class HudBuilder<TState> : IHudBuilder<TState>
         if (font == null)
             throw new ArgumentNullException(nameof(font));
 
-        AddText(b => b.WithText(text).WithPosition(position).WithSize(size).WithColor(color ?? Color.White).WithFont(font).WithHorizontalAlign(alignX).WithVerticalAlign(alignY));
+        AddText(b => b.WithText(text).WithPosition(position).WithSize(size).WithScale(scale).WithColor(color ?? Color.White).WithFont(font).WithHorizontalAlign(alignX).WithVerticalAlign(alignY));
         return this;
     }
 

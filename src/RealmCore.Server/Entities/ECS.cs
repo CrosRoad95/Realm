@@ -66,11 +66,21 @@ internal sealed class ECS : IECS
 
     public bool TryGetEntityByPlayer(Player player, out Entity result)
     {
+        if (player.IsDestroyed)
+        {
+            result = null;
+            return false;
+        }
         return _entityByPlayer.TryGetValue(player, out result);
     }
 
     public bool TryGetByElement(Element element, out Entity result)
     {
+        if (element.IsDestroyed)
+        {
+            result = null;
+            return false;
+        }
         return _entityByElement.TryGetValue(element, out result);
     }
 

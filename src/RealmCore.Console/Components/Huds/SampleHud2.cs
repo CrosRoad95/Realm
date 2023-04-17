@@ -32,13 +32,17 @@ public class SampleHud2 : HudComponent<SampleHud2State>
     {
         x.AddRectangle(new Vector2(x.Right - 400, 600), new Size(400, 20), Color.DarkBlue);
 
-        x.AddText(x => x.WithText("foo bar").WithPosition(new Vector2(100, 10)));
-        x.AddText(x => x.WithText(x => $"Text1: {x.Text1.ToUpper()}").WithPosition(new Vector2(100, 30)));
+        x.AddText("foobar", new Vector2(100, 10), new Size(1,1), font: "default");
+        x.AddText(x => x.Text2, new Vector2(100, 30), new Size(1,1));
+        x.AddText(x => x.WithText(x => x.Text2).WithPosition(new Vector2(100, 50)));
+        x.AddText(x => x.WithText("foo bar").WithPosition(new Vector2(100, 60)));
+        x.AddText(x => x.WithText(x => $"Text1: {x.Text1.ToUpper()}").WithPosition(new Vector2(100, 80)));
         x.AddText("custom font", new Vector2(x.Right - 400, 600), new Size(200, 20), font: AssetsRegistry.GetFont("Better Together.otf"), alignX: HorizontalAlign.Center, alignY: VerticalAlign.Center);
     }
 
     public void Update()
     {
         UpdateState(x => x.Text1 = Guid.NewGuid().ToString());
+        UpdateState(x => x.Text2 = Guid.NewGuid().ToString());
     }
 }

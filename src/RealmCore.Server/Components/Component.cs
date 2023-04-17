@@ -2,10 +2,11 @@
 
 public abstract class Component : IDisposable
 {
-    internal object _versionLock;
+    internal object _versionLock = new();
     internal byte _version;
 
-    private bool _disposed = false;
+    protected bool _disposed = false;
+
     public Entity Entity { get; internal set; } = default!;
 
     public event Action<Component>? Disposed;

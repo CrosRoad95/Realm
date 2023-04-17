@@ -7,6 +7,12 @@ public sealed class MustBePlayerOnFootOnlyRule : IEntityRule
         if (entity.Tag != EntityTag.Player)
             return false;
 
-        return entity.GetRequiredComponent<PlayerElementComponent>().OccupiedVehicle == null;
+        if(entity.Player.HasJetpack)
+            return false;
+
+        if (entity.Player.VehicleAction != VehicleAction.None)
+            return false;
+
+        return entity.Player.Vehicle == null;
     }
 }

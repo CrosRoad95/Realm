@@ -1,6 +1,4 @@
-﻿using RealmCore.Persistance.Interfaces;
-
-namespace RealmCore.Server.Services;
+﻿namespace RealmCore.Server.Services;
 
 internal class RewardService : IRewardService
 {

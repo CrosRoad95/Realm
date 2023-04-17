@@ -10,12 +10,10 @@ using RealmCore.Server.Components.Peds;
 using SlipeServer.Server.Enums;
 using RealmCore.Server.Components.World;
 using RealmCore.Server.Enums;
-using RealmCore.Resources.Base;
 using RealmCore.Server.Extensions.Resources;
 using RealmCore.Server.Extensions;
 using RealmCore.Console.Components.Huds;
 using RealmCore.Resources.Nametags;
-using RealmCore.Resources.ClientInterface;
 using RealmCore.Module.Discord.Interfaces;
 using RealmCore.Console.Components;
 using RealmCore.Resources.ElementOutline;
@@ -108,7 +106,7 @@ internal sealed class CommandsLogic
         _commandService.AddCommandHandler("cv", (entity, args) =>
         {
             using var vehicleRepository = _repositoryFactory.GetVehicleRepository();
-            var vehicleEntity = _entityFactory.CreateVehicle(404, entity.Transform.Position + new Vector3(4, 0, 0), entity.Transform.Rotation);
+            var vehicleEntity = _entityFactory.CreateVehicle(ushort.Parse(args.First()), entity.Transform.Position + new Vector3(4, 0, 0), entity.Transform.Rotation);
             vehicleEntity.AddComponent<VehicleUpgradesComponent>();
             vehicleEntity.AddComponent<MileageCounterComponent>();
             vehicleEntity.AddComponent(new VehicleFuelComponent(1, 20, 20, 0.01, 2)).Active = true;

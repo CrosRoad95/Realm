@@ -1,6 +1,4 @@
-﻿using RealmCore.Server.Contexts.Interfaces;
-
-namespace RealmCore.Console.Components.Gui;
+﻿namespace RealmCore.Console.Components.Gui;
 
 public class SampleState
 {
@@ -10,7 +8,7 @@ public class SampleState
 [ComponentUsage(false)]
 public sealed class TestWindowComponent : StatefulGuiComponent<SampleState>
 {
-    private static int i = 0;
+    private static int _i = 0;
     public TestWindowComponent() : base("test", true, new())
     {
 
@@ -18,6 +16,6 @@ public sealed class TestWindowComponent : StatefulGuiComponent<SampleState>
 
     protected override void PreGuiOpen(SampleState state)
     {
-        state.Foo = ++i;
+        state.Foo = ++_i;
     }
 }

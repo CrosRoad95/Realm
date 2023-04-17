@@ -16,4 +16,5 @@ public enum ItemAction
     Repair = 1 << 9,    // 512
     Open = 1 << 10,     // 1024
     Close = 1 << 11,    // 2048
+    Select = 1 << 12,   // 4096
 }

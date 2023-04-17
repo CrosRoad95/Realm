@@ -1,5 +1,4 @@
-﻿using RealmCore.Server;
-using RealmCore.Server.Components.Object;
+﻿using RealmCore.Server.Components.Object;
 using RealmCore.Tests.Classes.Components;
 
 namespace RealmCore.Tests.Tests.Components;

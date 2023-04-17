@@ -61,7 +61,7 @@ public abstract class CollisionShapeElementComponent : ElementComponent
         try
         {
             if (!ECS.TryGetByElement(element, out var entity))
-                throw new NullReferenceException(nameof(entity));
+                return;
 
             lock (_entityRulesLock)
                 if (_entityRules.All(x => x.Check(entity)))
@@ -83,7 +83,7 @@ public abstract class CollisionShapeElementComponent : ElementComponent
         try
         {
             if (!ECS.TryGetByElement(element, out var entity))
-                throw new NullReferenceException(nameof(entity));
+                return;
 
             lock (_entityRulesLock)
                 if (_entityRules.All(x => x.Check(entity)))

@@ -1,8 +1,4 @@
-﻿using RealmCore.Resources.Overlay;
-using System.Reflection;
-using System;
-
-namespace RealmCore.Server.Components.Players;
+﻿namespace RealmCore.Server.Components.Players;
 
 [ComponentUsage(true)]
 public abstract class HudComponent<TState> : Component where TState : class

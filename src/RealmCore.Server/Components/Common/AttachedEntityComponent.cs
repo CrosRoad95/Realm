@@ -6,12 +6,13 @@ public class AttachedEntityComponent : Component
     private readonly BoneId _boneId;
     private readonly Vector3? _positionOffset;
     private readonly Vector3? _rotationOffset;
+    private readonly object _lock = new();
 
     [Inject]
     private BoneAttachService BoneAttachService { get; set; } = default!;
 
-    private Entity? _attachedEntity;
-    public Entity? AttachedEntity
+    private Entity _attachedEntity;
+    public Entity AttachedEntity
     {
         get
         {
@@ -38,20 +39,33 @@ public class AttachedEntityComponent : Component
         Entity.TryDestroyComponent(this);
     }
 
+    public bool TryDetach(out Entity entity)
+    {
+        lock (_lock)
+        {
+            if(_disposed)
+            {
+                entity = null;
+                return false;
+            }
+            entity = _attachedEntity;
+            return Entity.TryDestroyComponent(this);
+        }
+    }
+
     protected override void Load()
     {
-        AttachedEntity.Disposed += HandleAttachedEntityDestroyed;
-        var element = AttachedEntity.GetRequiredComponent<ElementComponent>().Element;
+        _attachedEntity.Disposed += HandleAttachedEntityDestroyed;
+        var element = _attachedEntity.GetRequiredComponent<ElementComponent>().Element;
         var ped = Entity.GetRequiredComponent<PedElementComponent>().Ped;
         BoneAttachService.Attach(element, ped, _boneId, _positionOffset, _rotationOffset);
-        AttachedEntity.GetRequiredComponent<ElementComponent>().AreCollisionsEnabled = false;
+        _attachedEntity.GetRequiredComponent<ElementComponent>().AreCollisionsEnabled = false;
     }
 
     public override void Dispose()
     {
-        var element = AttachedEntity.GetRequiredComponent<ElementComponent>().Element;
-        AttachedEntity.Disposed -= HandleAttachedEntityDestroyed;
-        AttachedEntity = null;
+        var element = _attachedEntity.GetRequiredComponent<ElementComponent>().Element;
+        _attachedEntity.Disposed -= HandleAttachedEntityDestroyed;
         if (BoneAttachService.IsAttached(element))
             BoneAttachService.Detach(element);
         base.Dispose();

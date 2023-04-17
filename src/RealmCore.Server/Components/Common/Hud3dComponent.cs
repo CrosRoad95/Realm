@@ -1,6 +1,4 @@
-﻿using RealmCore.Resources.Overlay;
-
-namespace RealmCore.Server.Components.Common;
+﻿namespace RealmCore.Server.Components.Common;
 
 public class Hud3dComponent<TState> : Component where TState : class
 {
