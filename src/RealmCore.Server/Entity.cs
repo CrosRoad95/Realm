@@ -330,8 +330,7 @@ public class Entity : IDisposable
     {
         ThrowIfDisposed();
 
-        if (Disposed != null)
-            Disposed.Invoke(this);
+        Disposed?.Invoke(this);
 
         List<Component> componentsToDestroy;
         _componentsLock.EnterReadLock();

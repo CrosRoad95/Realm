@@ -12,5 +12,5 @@ public interface IECS
     Entity GetByElement(Element element);
     IEnumerable<Entity> GetWithinRange(Vector3 position, float range);
     bool TryGetByElement(Element element, out Entity result);
-    bool TryGetEntityByPlayer(Player player, out Entity result);
+    bool TryGetEntityByPlayer(Player player, out Entity result, bool ignoreDestroyed = false);
 }

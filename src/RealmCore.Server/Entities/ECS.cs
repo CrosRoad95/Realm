@@ -64,9 +64,9 @@ internal sealed class ECS : IECS
         return _entityByElement[element];
     }
 
-    public bool TryGetEntityByPlayer(Player player, out Entity result)
+    public bool TryGetEntityByPlayer(Player player, out Entity result, bool ignoreDestroyed = false)
     {
-        if (player.IsDestroyed)
+        if (player.IsDestroyed && !ignoreDestroyed)
         {
             result = null;
             return false;

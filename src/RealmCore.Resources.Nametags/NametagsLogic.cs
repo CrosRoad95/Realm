@@ -91,6 +91,7 @@ internal class NametagsLogic
 
     private void HandleDisconnected(Player player, SlipeServer.Server.Elements.Events.PlayerQuitEventArgs e)
     {
+        player.Disconnected -= HandleDisconnected;
         lock (_lock)
             _nametagsCache.TableValue!.Remove(player);
     }

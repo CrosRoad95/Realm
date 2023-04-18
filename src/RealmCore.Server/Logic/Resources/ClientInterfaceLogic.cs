@@ -78,9 +78,9 @@ internal class ClientInterfaceLogic
             case 0: // Custom
             case 3: // Information
                 if (line > 0)
-                    _logger.LogInformation("Clientside: {player} ({level}): {message} in {file}:{line}", playerName, level, message, file, line);
+                    _logger.LogTrace("Clientside: {player} ({level}): {message} in {file}:{line}", playerName, level, message, file, line);
                 else
-                    _logger.LogInformation("Clientside: {player} ({level}): {message}", playerName, level, message);
+                    _logger.LogTrace("Clientside: {player} ({level}): {message}", playerName, level, message);
                 break;
             case 2: // Warning
                 if (line > 0)

@@ -39,6 +39,7 @@ internal class TextHudBuilder<TState> : ITextHudBuilder<TState>
     private readonly int _id;
     private readonly TState _state;
     private readonly IAssetsService _assetsService;
+
     public Action<DynamicHudComponent>? DynamicHudComponentAdded { get; set; }
 
     public TextHudBuilder(int id, TState state, IAssetsService assetsService)
@@ -65,7 +66,6 @@ internal class TextHudBuilder<TState> : ITextHudBuilder<TState>
             {
                 ComponentId = _id,
                 PropertyInfo = propertyInfo,
-                Factory = factory
             });
 
         return value;

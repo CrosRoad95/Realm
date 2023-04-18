@@ -1,7 +1,7 @@
 ﻿namespace RealmCore.Server.Components.Players;
 
 [ComponentUsage(true)]
-public abstract class HudComponent<TState> : Component where TState : class
+public abstract class HudComponent<TState> : Component where TState : class, new()
 {
     [Inject]
     private IOverlayService OverlayService { get; set; } = default!;
@@ -50,19 +50,16 @@ public abstract class HudComponent<TState> : Component where TState : class
         _offset = offset;
     }
 
+    public HudComponent(Vector2? offset = null) : this(new(), offset) { }
+
     protected override void Load()
     {
         var playerElementComponent = Entity.GetRequiredComponent<PlayerElementComponent>();
         List<DynamicHudComponent> dynamicHudComponents = new();
 
-        var HandleDynamicHudComponentAdded = (DynamicHudComponent dynamicHudComponent) =>
-        {
-            dynamicHudComponents.Add(dynamicHudComponent);
-        };
-
         OverlayService.CreateHud(playerElementComponent.Player, _id, e =>
         {
-            e.DynamicHudComponentAdded = HandleDynamicHudComponentAdded;
+            e.DynamicHudComponentAdded = dynamicHudComponents.Add;
             try
             {
                 Build(e);

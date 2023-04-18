@@ -165,12 +165,18 @@ internal class PlayersLogic
         {
             player.Disconnected -= HandlePlayerDisconnected;
             _playerResources.TryRemove(player, out var _);
-            if (_ecs.TryGetEntityByPlayer(player, out var playerEntity))
+            if (_ecs.TryGetEntityByPlayer(player, out var playerEntity, true))
             {
-                var saveService = _serviceProvider.GetRequiredService<ISaveService>();
-                await saveService.Save(playerEntity);
-                await saveService.Commit();
-                playerEntity.Dispose();
+                try
+                {
+                    var saveService = _serviceProvider.GetRequiredService<ISaveService>();
+                    await saveService.Save(playerEntity);
+                    await saveService.Commit();
+                }
+                finally
+                {
+                    playerEntity.Dispose();
+                }
             }
         }
         catch (Exception ex)

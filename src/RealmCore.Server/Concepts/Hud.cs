@@ -50,7 +50,7 @@ internal class Hud<TState> : IHud<TState> where TState : class
         Dictionary<int, object> stateChange = new();
         foreach (var item in _dynamicHudComponents)
         {
-            var value = item.Factory(_state) as object;
+            var value = item.PropertyInfo.GetValue(_state);
             stateChange.Add(item.ComponentId, value);
         }
 
