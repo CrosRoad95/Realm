@@ -1,7 +1,7 @@
-﻿using RealmCore.Resources.AdminTools.Data;
+﻿using RealmCore.Resources.Admin.Data;
 using System.Numerics;
 
-namespace RealmCore.Resources.AdminTools.Interfaces;
+namespace RealmCore.Resources.Admin.Interfaces;
 
 public interface IWorldDebugData
 {

@@ -92,12 +92,12 @@ addEventHandler("onClientResourceStart", resourceRoot, function()
 	addEventHandler("onLoggedIn", localPlayer, function()
 		loggedIn = true;
 	end)
-	addEventHandler("internalOnAdminToolsEnabled", localPlayer, function()
+	addEventHandler("internalOnAdminModeEnabled", localPlayer, function()
 		addEventHandler("onClientRender", root, render)
 		bindKey("z", "both", openCloseDialog)
 	end)
 
-	addEventHandler("internalOnAdminToolsDisabled", localPlayer, function()
+	addEventHandler("internalOnAdminModeDisabled", localPlayer, function()
 		removeEventHandler("onClientRender", root, render)
 		unbindKey("z", "both", openCloseDialog)
 		if(opened)then

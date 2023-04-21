@@ -1,4 +1,4 @@
-﻿namespace RealmCore.Resources.AdminTools.Enums;
+﻿namespace RealmCore.Resources.Admin.Enums;
 
 public enum PreviewType
 {

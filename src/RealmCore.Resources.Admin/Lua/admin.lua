@@ -1,18 +1,18 @@
 ﻿local tools = {}
-local adminToolsEnabled = false;
+local adminModeEnabled = false;
 
-addEvent("internalSetAdminToolsEnabled", true)
-addEvent("internalOnAdminToolsEnabled", false)
-addEvent("internalOnAdminToolsDisabled", false)
+addEvent("internalSetAdminEnabled", true)
+addEvent("internalOnAdminModeEnabled", false)
+addEvent("internalOnAdminModeDisabled", false)
 
-addEventHandler("internalSetAdminToolsEnabled", localPlayer, function(enabled)
-    if(adminToolsEnabled == enabled)then
+addEventHandler("internalSetAdminEnabled", localPlayer, function(enabled)
+    if(adminModeEnabled == enabled)then
         return
     end
     if(enabled)then
-        triggerEvent("internalOnAdminToolsEnabled", localPlayer)
+        triggerEvent("internalOnAdminModeEnabled", localPlayer)
     else
-        triggerEvent("internalOnAdminToolsDisabled", localPlayer)
+        triggerEvent("internalOnAdminModeDisabled", localPlayer)
     end
 end)
 function getTools()

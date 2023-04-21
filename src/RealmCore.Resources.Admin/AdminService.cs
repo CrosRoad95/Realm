@@ -1,26 +1,27 @@
 ﻿using SlipeServer.Server.Elements;
 using SlipeServer.Server.Elements.Events;
 
-namespace RealmCore.Resources.AdminTools;
+namespace RealmCore.Resources.Admin;
 
-internal sealed class AdminToolsService : IAdminToolsService
+internal sealed class AdminService : IAdminService
 {
-    public event Action<Player>? AdminToolsEnabled;
-    public event Action<Player>? AdminToolsDisabled;
+    public event Action<Player>? AdminEnabled;
+    public event Action<Player>? AdminDisabled;
 
     private readonly HashSet<Player> _enabledForPlayers = new();
     private readonly object _lock = new();
-    public AdminToolsService()
+    public AdminService()
     {
 
     }
 
-    public bool HasAdminToolsEnabled(Player player)
+    public bool HasAdminModeEnabled(Player player)
     {
-        return _enabledForPlayers.Contains(player);
+        lock (_lock)
+            return _enabledForPlayers.Contains(player);
     }
 
-    public void EnableAdminToolsForPlayer(Player player)
+    public void EnableAdminModeForPlayer(Player player)
     {
         bool succeed;
         lock (_lock)
@@ -28,7 +29,7 @@ internal sealed class AdminToolsService : IAdminToolsService
 
         if (succeed)
         {
-            AdminToolsEnabled?.Invoke(player);
+            AdminEnabled?.Invoke(player);
             player.Disconnected += HandlePlayerDisconnected;
         }
     }
@@ -39,7 +40,7 @@ internal sealed class AdminToolsService : IAdminToolsService
             _enabledForPlayers.Remove(player);
     }
 
-    public void DisableAdminToolsForPlayer(Player player)
+    public void DisableAdminModeForPlayer(Player player)
     {
         bool succeed;
         lock (_lock)
@@ -47,7 +48,7 @@ internal sealed class AdminToolsService : IAdminToolsService
 
         if (succeed)
         {
-            AdminToolsDisabled?.Invoke(player);
+            AdminDisabled?.Invoke(player);
             player.Disconnected -= HandlePlayerDisconnected;
         }
     }

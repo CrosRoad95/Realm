@@ -9,7 +9,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <EmbeddedResource Include="Lua\adminTools.lua" />
+    <EmbeddedResource Include="Lua\admin.lua" />
     <EmbeddedResource Include="Lua\debugDraw.lua" />
     <EmbeddedResource Include="Lua\Tools\debugWorld.lua" />
   </ItemGroup>

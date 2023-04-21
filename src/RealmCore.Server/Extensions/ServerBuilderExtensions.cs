@@ -76,7 +76,7 @@ public static class ServerBuilderExtensions
         }, commonOptions);
         builder.AddClientInterfaceResource(commonOptions);
         builder.AddElementOutlineResource();
-        builder.AddAdminToolsResource();
+        builder.AddAdminResource();
         builder.AddAFKResource();
         builder.AddStatisticsCounterResource();
         builder.AddOverlayResource();

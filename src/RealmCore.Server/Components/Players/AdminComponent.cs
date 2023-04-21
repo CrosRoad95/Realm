@@ -8,18 +8,18 @@ public class AdminComponent : Component
     [Inject]
     private DebugLog DebugLog { get; set; } = default!;
     [Inject]
-    private IAdminToolsService AdminToolsService { get; set; } = default!;
+    private IAdminService AdminService { get; set; } = default!;
     [Inject]
     private IClientInterfaceService ClientInterfaceService { get; set; } = default!;
 
     private bool _debugView = false;
-    private bool _adminTools = false;
+    private bool _adminMode = false;
     private bool _noClip = false;
     private bool _developmentMode = false;
     private bool _interactionDebugRenderingEnabled = false;
 
     public event Action<AdminComponent, bool>? DebugViewStateChanged;
-    public event Action<AdminComponent, bool>? AdminToolsStateChanged;
+    public event Action<AdminComponent, bool>? AdminModeChanged;
     public event Action<AdminComponent, bool>? NoClipStateChanged;
     public event Action<AdminComponent, bool>? DevelopmentModeStateChanged;
     public event Action<AdminComponent, bool>? InteractionDebugRenderingStateChanged;
@@ -62,28 +62,28 @@ public class AdminComponent : Component
         }
     }
 
-    public bool AdminTools
+    public bool HasAdminModeEnabled
     {
         get
         {
             ThrowIfDisposed();
-            return _adminTools;
+            return _adminMode;
         }
         set
         {
             ThrowIfDisposed();
-            if (_adminTools != value)
+            if (_adminMode != value)
             {
                 if (value)
                 {
-                    AdminToolsService.EnableAdminToolsForPlayer(Entity.Player);
+                    AdminService.EnableAdminModeForPlayer(Entity.Player);
                 }
                 else
                 {
-                    AdminToolsService.DisableAdminToolsForPlayer(Entity.Player);
+                    AdminService.DisableAdminModeForPlayer(Entity.Player);
                 }
-                _adminTools = value;
-                AdminToolsStateChanged?.Invoke(this, _adminTools);
+                _adminMode = value;
+                AdminModeChanged?.Invoke(this, _adminMode);
             }
         }
     }
@@ -131,7 +131,7 @@ public class AdminComponent : Component
     {
         DevelopmentMode = false;
         DebugView = false;
-        AdminTools = false;
+        HasAdminModeEnabled = false;
         NoClip = false;
         InteractionDebugRenderingEnabled = false;
         base.Dispose();

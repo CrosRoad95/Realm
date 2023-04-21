@@ -1,7 +1,7 @@
-﻿using RealmCore.Resources.AdminTools.Enums;
+﻿using RealmCore.Resources.Admin.Enums;
 using System.Drawing;
 
-namespace RealmCore.Resources.AdminTools.Data;
+namespace RealmCore.Resources.Admin.Data;
 
 public struct DebugData
 {

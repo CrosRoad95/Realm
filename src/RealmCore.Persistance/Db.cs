@@ -1,4 +1,6 @@
-﻿namespace RealmCore.Persistance;
+﻿using Microsoft.Extensions.Logging;
+
+namespace RealmCore.Persistance;
 
 public abstract class Db<T> : IdentityDbContext<UserData, RoleData, int,
         IdentityUserClaim<int>,

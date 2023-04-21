@@ -31,7 +31,7 @@ global using RealmCore.Resources.Base;
 global using RealmCore.Server.Factories;
 global using RealmCore.Configuration;
 global using RealmCore.Resources.AFK;
-global using RealmCore.Resources.AdminTools;
+global using RealmCore.Resources.Admin;
 global using RealmCore.Resources.Addons.GuiSystem.DGSProvider;
 global using RealmCore.Resources.ElementOutline;
 global using RealmCore.Resources.StatisticsCounter;

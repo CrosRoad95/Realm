@@ -1,4 +1,4 @@
-﻿using RealmCore.Resources.AdminTools.Interfaces;
+﻿using RealmCore.Resources.Admin.Interfaces;
 using SlipeServer.Packets.Definitions.Lua;
 using SlipeServer.Server;
 using SlipeServer.Server.ElementCollections;
@@ -6,23 +6,23 @@ using SlipeServer.Server.Elements;
 using SlipeServer.Server.Events;
 using SlipeServer.Server.Services;
 
-namespace RealmCore.Resources.AdminTools;
+namespace RealmCore.Resources.Admin;
 
-internal class AdminToolsLogic
+internal class AdminLogic
 {
-    private readonly AdminToolsResource _resource;
+    private readonly AdminResource _resource;
     private readonly LuaEventService _luaEventService;
     private readonly IElementCollection _elementCollection;
     private readonly List<Player> _debugWorldSubscribers = new();
 
-    public AdminToolsLogic(MtaServer mtaServer, LuaEventService luaEventService, IAdminToolsService adminToolsService, IElementCollection elementCollection)
+    public AdminLogic(MtaServer mtaServer, LuaEventService luaEventService, IAdminService adminService, IElementCollection elementCollection)
     {
         mtaServer.PlayerJoined += HandlePlayerJoin;
-        _resource = mtaServer.GetAdditionalResource<AdminToolsResource>();
+        _resource = mtaServer.GetAdditionalResource<AdminResource>();
         _luaEventService = luaEventService;
         _elementCollection = elementCollection;
-        adminToolsService.AdminToolsDisabled += HandleAdminToolsDisabled;
-        adminToolsService.AdminToolsEnabled += HandleAdminToolsEnabled;
+        adminService.AdminDisabled += HandleAdminDisabled;
+        adminService.AdminEnabled += HandleAdminEnabled;
         mtaServer.LuaEventTriggered += HandleLuaEventTriggered;
         mtaServer.ElementCreated += HandleElementCreated;
     }
@@ -98,14 +98,14 @@ internal class AdminToolsLogic
         }
     }
 
-    private void HandleAdminToolsEnabled(Player player)
+    private void HandleAdminEnabled(Player player)
     {
-        _luaEventService.TriggerEventFor(player, "internalSetAdminToolsEnabled", player, true);
+        _luaEventService.TriggerEventFor(player, "internalSetAdminEnabled", player, true);
     }
 
-    private void HandleAdminToolsDisabled(Player player)
+    private void HandleAdminDisabled(Player player)
     {
-        _luaEventService.TriggerEventFor(player, "internalSetAdminToolsEnabled", player, false);
+        _luaEventService.TriggerEventFor(player, "internalSetAdminEnabled", player, false);
     }
 
     private void HandlePlayerJoin(Player player)
