@@ -476,7 +476,7 @@ internal sealed class CommandsLogic
         _commandService.AddCommandHandler("toggleadmindebug", (entity, args) =>
         {
             var adminComponent = entity.GetRequiredComponent<AdminComponent>();
-            adminComponent.HasAdminModeEnabled = !adminComponent.HasAdminModeEnabled;
+            adminComponent.AdminMode = !adminComponent.AdminMode;
             adminComponent.InteractionDebugRenderingEnabled = !adminComponent.InteractionDebugRenderingEnabled;
         });
 

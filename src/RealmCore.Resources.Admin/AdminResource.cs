@@ -11,6 +11,7 @@ internal class AdminResource : Resource
         ["debugDraw.lua"] = ResourceFiles.DebugDraw,
         ["admin.lua"] = ResourceFiles.Admin,
         ["tools/debugWorld.lua"] = ResourceFiles.ToolsDebugWorld,
+        ["tools/components.lua"] = ResourceFiles.ToolComponents,
     };
 
     internal AdminResource(MtaServer server)

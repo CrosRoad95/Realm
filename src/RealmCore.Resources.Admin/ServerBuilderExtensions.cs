@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using RealmCore.Resources.Base;
 using SlipeServer.Server.ServerBuilders;
 
 namespace RealmCore.Resources.Admin;
@@ -11,6 +12,7 @@ public static class ServerBuilderExtensions
         {
             var resource = new AdminResource(server);
 
+            resource.AddLuaEventHub<IAdminEventHub>();
             server.AddAdditionalResource(resource, resource.AdditionalFiles);
         });
 
@@ -19,6 +21,7 @@ public static class ServerBuilderExtensions
             services.AddSingleton<IAdminService, AdminService>();
         });
 
+        builder.AddLuaEventHub<IAdminEventHub, AdminResource>();
         builder.AddLogic<AdminLogic>();
     }
 }

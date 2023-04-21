@@ -10,7 +10,6 @@ namespace RealmCore.Resources.ClientInterface;
 
 internal class ClientInterfaceLogic
 {
-    private readonly LuaEventService _luaEventService;
     private readonly FromLuaValueMapper _fromLuaValueMapper;
     private readonly IClientInterfaceService _clientInterfaceService;
     private readonly ILogger<ClientInterfaceLogic> _logger;
@@ -22,7 +21,6 @@ internal class ClientInterfaceLogic
     public ClientInterfaceLogic(MtaServer server, LuaEventService luaEventService, FromLuaValueMapper fromLuaValueMapper,
         IClientInterfaceService clientInterfaceService, ILogger<ClientInterfaceLogic> logger, ILuaEventHub<IClientInterfaceEventHub> luaEventHub)
     {
-        _luaEventService = luaEventService;
         _fromLuaValueMapper = fromLuaValueMapper;
         _clientInterfaceService = clientInterfaceService;
         _logger = logger;

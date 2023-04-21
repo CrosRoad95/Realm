@@ -1,5 +1,4 @@
-﻿addEvent("onLoggedIn", true)
-setElementData(localPlayer, "translations", {}, false)
+﻿setElementData(localPlayer, "translations", {}, false)
 triggerServerEventWithId("sendLocalizationCode", getLocalization().code)
 triggerServerEventWithId("sendScreenSize", guiGetScreenSize())
 

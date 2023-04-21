@@ -9,8 +9,13 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Lua\Tools\components.lua" />
+  </ItemGroup>
+
+  <ItemGroup>
     <EmbeddedResource Include="Lua\admin.lua" />
     <EmbeddedResource Include="Lua\debugDraw.lua" />
+    <EmbeddedResource Include="Lua\Tools\components.lua" />
     <EmbeddedResource Include="Lua\Tools\debugWorld.lua" />
   </ItemGroup>
 

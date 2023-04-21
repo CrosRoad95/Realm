@@ -62,7 +62,7 @@ public class AdminComponent : Component
         }
     }
 
-    public bool HasAdminModeEnabled
+    public bool AdminMode
     {
         get
         {
@@ -131,7 +131,7 @@ public class AdminComponent : Component
     {
         DevelopmentMode = false;
         DebugView = false;
-        HasAdminModeEnabled = false;
+        AdminMode = false;
         NoClip = false;
         InteractionDebugRenderingEnabled = false;
         base.Dispose();

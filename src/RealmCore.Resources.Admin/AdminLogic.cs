@@ -1,4 +1,6 @@
-﻿using RealmCore.Resources.Admin.Interfaces;
+﻿using RealmCore.Resources.Admin.Data;
+using RealmCore.Resources.Admin.Interfaces;
+using RealmCore.Resources.Base;
 using SlipeServer.Packets.Definitions.Lua;
 using SlipeServer.Server;
 using SlipeServer.Server.ElementCollections;
@@ -13,14 +15,16 @@ internal class AdminLogic
     private readonly AdminResource _resource;
     private readonly LuaEventService _luaEventService;
     private readonly IElementCollection _elementCollection;
+    private readonly ILuaEventHub<IAdminEventHub> _luaEventHub;
     private readonly List<Player> _debugWorldSubscribers = new();
 
-    public AdminLogic(MtaServer mtaServer, LuaEventService luaEventService, IAdminService adminService, IElementCollection elementCollection)
+    public AdminLogic(MtaServer mtaServer, LuaEventService luaEventService, IAdminService adminService, IElementCollection elementCollection, ILuaEventHub<IAdminEventHub> luaEventHub)
     {
         mtaServer.PlayerJoined += HandlePlayerJoin;
         _resource = mtaServer.GetAdditionalResource<AdminResource>();
         _luaEventService = luaEventService;
         _elementCollection = elementCollection;
+        _luaEventHub = luaEventHub;
         adminService.AdminDisabled += HandleAdminDisabled;
         adminService.AdminEnabled += HandleAdminEnabled;
         mtaServer.LuaEventTriggered += HandleLuaEventTriggered;
@@ -53,14 +57,14 @@ internal class AdminLogic
         var debugData = _elementCollection.GetAll()
             .Where(x => x is IWorldDebugData)
             .Select(ElementToLuaValue);
-        _luaEventService.TriggerEventFor(player, "internalAddOrUpdateDebugElements", player, debugData);
+        _luaEventHub.Invoke(player, x => x.InternalAddOrUpdateDebugElements(debugData));
     }
 
     private void SendElementsDebugInfoToPlayers(params Element[] elements)
     {
         var debugData = elements.Select(ElementToLuaValue);
         foreach (var player in _debugWorldSubscribers)
-            _luaEventService.TriggerEventFor(player, "internalAddOrUpdateDebugElements", player, debugData);
+            _luaEventHub.Invoke(player, x => x.InternalAddOrUpdateDebugElements(debugData));
     }
 
     private void SubscribeToDrawWorld(Player player)
@@ -100,12 +104,12 @@ internal class AdminLogic
 
     private void HandleAdminEnabled(Player player)
     {
-        _luaEventService.TriggerEventFor(player, "internalSetAdminEnabled", player, true);
+        _luaEventHub.Invoke(player, x => x.InternalSetAdminEnabled(true));
     }
 
     private void HandleAdminDisabled(Player player)
     {
-        _luaEventService.TriggerEventFor(player, "internalSetAdminEnabled", player, false);
+        _luaEventHub.Invoke(player, x => x.InternalSetAdminEnabled(false));
     }
 
     private void HandlePlayerJoin(Player player)

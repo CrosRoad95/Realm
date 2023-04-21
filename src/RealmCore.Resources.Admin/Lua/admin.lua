@@ -5,7 +5,7 @@ addEvent("internalSetAdminEnabled", true)
 addEvent("internalOnAdminModeEnabled", false)
 addEvent("internalOnAdminModeDisabled", false)
 
-addEventHandler("internalSetAdminEnabled", localPlayer, function(enabled)
+function handleInternalSetAdminEnabled(enabled)
     if(adminModeEnabled == enabled)then
         return
     end
@@ -14,7 +14,8 @@ addEventHandler("internalSetAdminEnabled", localPlayer, function(enabled)
     else
         triggerEvent("internalOnAdminModeDisabled", localPlayer)
     end
-end)
+end
+
 function getTools()
     local toolsNames = {}
     for name in pairs(tools)do
@@ -57,3 +58,8 @@ end
 function addTool(name, enable, disable)
     tools[name] = {enable, disable, false} -- enable callback, disable callback, state
 end
+
+addEventHandler("onClientResourceStart", resourceRoot, function()
+	hubBind("InternalSetAdminEnabled", handleInternalSetAdminEnabled)
+	hubBind("InternalAddOrUpdateDebugElements", handleInternalAddOrUpdateDebugElements)
+end)

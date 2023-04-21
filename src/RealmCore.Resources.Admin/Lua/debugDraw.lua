@@ -70,9 +70,6 @@ local function navigation(key, state)
 end
 
 local function openCloseDialog(key, state)
-	if(not loggedIn)then
-		return;
-	end
 	if(state == "down")then
 		opened = true
 		bindKey("space", "down", toggling)
@@ -89,10 +86,8 @@ local function openCloseDialog(key, state)
 end
 
 addEventHandler("onClientResourceStart", resourceRoot, function()
-	addEventHandler("onLoggedIn", localPlayer, function()
-		loggedIn = true;
-	end)
 	addEventHandler("internalOnAdminModeEnabled", localPlayer, function()
+		iprint("internalOnAdminModeEnabled")
 		addEventHandler("onClientRender", root, render)
 		bindKey("z", "both", openCloseDialog)
 	end)

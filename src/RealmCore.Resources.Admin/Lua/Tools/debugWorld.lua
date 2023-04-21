@@ -93,11 +93,10 @@ addEventHandler("onClientResourceStart", resourceRoot, function()
 	addTool("Debug world", enableDrawWorld, disableDrawWorld)
 end)
 
-addEvent("internalAddOrUpdateDebugElements", true)
-addEventHandler("internalAddOrUpdateDebugElements", localPlayer, function(debugData)
+function handleInternalAddOrUpdateDebugElements(debugData)
 	for i,v in ipairs(debugData)do
 		v.color = tocolor(v.color[1], v.color[2], v.color[3], v.color[4])
 		worldElements[v.debugId] = v
 	end
 	--print("updated or added:", #debugData, "elements");
-end)
+end
