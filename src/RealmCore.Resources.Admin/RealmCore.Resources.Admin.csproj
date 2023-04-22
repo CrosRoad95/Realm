@@ -16,11 +16,15 @@
     <EmbeddedResource Include="Lua\admin.lua" />
     <EmbeddedResource Include="Lua\debugDraw.lua" />
     <EmbeddedResource Include="Lua\Tools\components.lua" />
-    <EmbeddedResource Include="Lua\Tools\debugWorld.lua" />
+    <EmbeddedResource Include="Lua\Tools\entities.lua" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\RealmCore.Resources.Base\RealmCore.Resources.Base.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Interfaces\" />
   </ItemGroup>
 
 </Project>

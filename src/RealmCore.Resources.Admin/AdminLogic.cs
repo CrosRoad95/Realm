@@ -1,12 +1,15 @@
 ﻿using RealmCore.Resources.Admin.Data;
-using RealmCore.Resources.Admin.Interfaces;
+using RealmCore.Resources.Admin.Enums;
 using RealmCore.Resources.Admin.Messages;
+using RealmCore.Resources.Base;
+using RealmCore.Resources.Base.Extensions;
 using RealmCore.Resources.Base.Interfaces;
 using SlipeServer.Packets.Definitions.Lua;
 using SlipeServer.Server;
 using SlipeServer.Server.ElementCollections;
 using SlipeServer.Server.Elements;
 using SlipeServer.Server.Events;
+using SlipeServer.Server.Mappers;
 using SlipeServer.Server.Services;
 using System.Linq;
 
@@ -16,31 +19,40 @@ internal class AdminLogic
 {
     private readonly AdminResource _resource;
     private readonly LuaEventService _luaEventService;
+    private readonly IAdminService _adminService;
     private readonly IElementCollection _elementCollection;
     private readonly ILuaEventHub<IAdminEventHub> _luaEventHub;
+    private readonly FromLuaValueMapper _fromLuaValueMapper;
+    private readonly LuaValueMapper _luaValueMapper;
+    private readonly object _debugWorldSubscribersLock = new();
     private readonly List<Player> _debugWorldSubscribers = new();
+    private readonly object _enabledForPlayersLock = new();
+    private readonly List<Player> _enabledForPlayers = new();
 
-    private readonly HashSet<Player> _enabledForPlayers = new();
-    private readonly object _lock = new();
-
-    public AdminLogic(MtaServer mtaServer, LuaEventService luaEventService, IAdminService adminService, IElementCollection elementCollection, ILuaEventHub<IAdminEventHub> luaEventHub)
+    public AdminLogic(MtaServer mtaServer, LuaEventService luaEventService, IAdminService adminService, IElementCollection elementCollection, ILuaEventHub<IAdminEventHub> luaEventHub, FromLuaValueMapper fromLuaValueMapper, LuaValueMapper luaValueMapper)
     {
         mtaServer.PlayerJoined += HandlePlayerJoin;
         _resource = mtaServer.GetAdditionalResource<AdminResource>();
         _luaEventService = luaEventService;
+        _adminService = adminService;
         _elementCollection = elementCollection;
         _luaEventHub = luaEventHub;
-        adminService.MessageHandler = HandleMessage;
-        mtaServer.LuaEventTriggered += HandleLuaEventTriggered;
-        mtaServer.ElementCreated += HandleElementCreated;
+        _fromLuaValueMapper = fromLuaValueMapper;
+        _luaValueMapper = luaValueMapper;
+        _adminService.MessageHandler = HandleMessage;
+
+        luaEventService.AddEventHandler("internalSetToolState", HandleSetToolState);
+
+        _luaValueMapper.DefineStructMapper<EntityDebugInfo>(EntityDebugInfoToLuaValue);
     }
 
     private void HandleMessage(IMessage message)
     {
+        // TODO: add loggers
         switch(message)
         {
             case AdminModeChangedMessage adminModeChangedMessage:
-                lock (_lock)
+                lock (_enabledForPlayersLock)
                 {
                     if (IsAdminEnabledForPlayer(adminModeChangedMessage.Player) == adminModeChangedMessage.State)
                         return;
@@ -50,13 +62,58 @@ internal class AdminLogic
                 }
                 break;
             case SetAdminToolsMessage setAdminToolsMessage:
-                lock (_lock)
+                lock (_enabledForPlayersLock)
                 {
                     if (!IsAdminEnabledForPlayer(setAdminToolsMessage.Player))
                         return;
                     var tools = setAdminToolsMessage.AdminTools.Select(x => (int)x);
                     _luaEventHub.Invoke(setAdminToolsMessage.Player, x => x.SetTools(tools));
                 }
+                break;
+            case BroadcastEntityDebugInfoMessage broadcastEntityDebugInfoMessage:
+                lock (_enabledForPlayersLock)
+                {
+                    if (!_enabledForPlayers.Any())
+                        return;
+
+                    var luaValue = new LuaValue[] { _luaValueMapper.Map(broadcastEntityDebugInfoMessage.EntityDebugInfo) };
+                    _luaEventHub.Invoke(_enabledForPlayers, x => x.AddOrUpdateEntity(luaValue));
+                }
+                break;
+            case BroadcastEntitiesDebugInfoMessage broadcastEntitiesDebugInfoMessage:
+                lock (_enabledForPlayersLock)
+                {
+                    if (!_enabledForPlayers.Any())
+                        return;
+
+                    var luaValuees = broadcastEntitiesDebugInfoMessage.EntitiesDebugInfo.Select(x => _luaValueMapper.Map(x));
+                    _luaEventHub.Invoke(_enabledForPlayers, x => x.AddOrUpdateEntity(luaValuees));
+                }
+                break;
+            case BroadcastEntityDebugInfoMessageForPlayer broadcastEntityDebugInfoMessageForPlayer:
+                lock (_enabledForPlayersLock)
+                {
+                    var player = broadcastEntityDebugInfoMessageForPlayer.player;
+                    if (!_enabledForPlayers.Contains(player))
+                        return;
+
+                    var luaValue = new LuaValue[] { _luaValueMapper.Map(broadcastEntityDebugInfoMessageForPlayer.EntityDebugInfo) };
+                    _luaEventHub.Invoke(_enabledForPlayers, x => x.AddOrUpdateEntity(luaValue));
+                }
+                break;
+            case BroadcastEntitiesDebugInfoMessageForPlayer broadcastEntitiesDebugInfoMessageForPlayer:
+                lock (_enabledForPlayersLock)
+                {
+                    var player = broadcastEntitiesDebugInfoMessageForPlayer.player;
+                    if (!_enabledForPlayers.Contains(player))
+                        return;
+
+                    var luaValuees = broadcastEntitiesDebugInfoMessageForPlayer.EntitiesDebugInfo.Select(x => _luaValueMapper.Map(x));
+                    _luaEventHub.Invoke(player, x => x.AddOrUpdateEntity(luaValuees));
+                }
+                break;
+            case ClearEntitiesForPlayerMessage clearEntitiesForPlayerMessage:
+                _luaEventHub.Invoke(clearEntitiesForPlayerMessage.player, x => x.ClearEntities());
                 break;
             default:
                 throw new NotImplementedException();
@@ -65,85 +122,26 @@ internal class AdminLogic
 
     private bool IsAdminEnabledForPlayer(Player player) => _enabledForPlayers.Contains(player);
 
-    private void HandleElementCreated(Element element)
+    private LuaValue EntityDebugInfoToLuaValue(EntityDebugInfo entityDebugInfo)
     {
-        SendElementsDebugInfoToPlayers(element);
-    }
-
-    private LuaValue ElementToLuaValue(Element element)
-    {
-        var worldDebugData = element as IWorldDebugData;
-        var debugData = worldDebugData.DebugData;
-        return new LuaValue(new Dictionary<LuaValue, LuaValue>
+        var data = new Dictionary<LuaValue, LuaValue>
         {
-            ["element"] = element,
-            ["debugId"] = debugData.DebugId.ToString(),
-            ["name"] = element.ToString(),
-            ["previewType"] = (int)debugData.PreviewType,
-            ["color"] = new LuaValue(new LuaValue[] { (int)debugData.PreviewColor.R, (int)debugData.PreviewColor.G, (int)debugData.PreviewColor.B, (int)debugData.PreviewColor.A }),
-            ["type"] = element.GetType().Name,
-            ["position"] = new LuaValue(new LuaValue[] { worldDebugData.Position.X, worldDebugData.Position.Y, worldDebugData.Position.Z }),
-        });
+            ["debugId"] = entityDebugInfo.debugId,
+            ["name"] = entityDebugInfo.name,
+            ["previewType"] = (int)entityDebugInfo.previewType,
+            ["color"] = entityDebugInfo.previewColor.ToLuaColor(),
+            ["position"] = new LuaValue(new LuaValue[] { entityDebugInfo.position.X, entityDebugInfo.position.Y, entityDebugInfo.position.Z }),
+        };
+        if (entityDebugInfo.element != null)
+            data["element"] = entityDebugInfo.element;
+
+        return new LuaValue(data);
     }
 
-    private void SendAllElementsDebugInfoToPlayer(Player player)
+    private void HandleSetToolState(LuaEvent luaEvent)
     {
-        var debugData = _elementCollection.GetAll()
-            .Where(x => x is IWorldDebugData)
-            .Select(ElementToLuaValue);
-        _luaEventHub.Invoke(player, x => x.AddOrUpdateDebugElements(debugData));
-    }
-
-    private void SendElementsDebugInfoToPlayers(params Element[] elements)
-    {
-        var debugData = elements.Select(ElementToLuaValue);
-        foreach (var player in _debugWorldSubscribers)
-            _luaEventHub.Invoke(player, x => x.AddOrUpdateDebugElements(debugData));
-    }
-
-    private void SubscribeToDrawWorld(Player player)
-    {
-        if (_debugWorldSubscribers.Contains(player))
-            return;
-        _debugWorldSubscribers.Add(player);
-        player.Disconnected += HandlePlayerDisconnected;
-        SendAllElementsDebugInfoToPlayer(player);
-    }
-
-    private void UnsubscribeToDrawWorld(Player player)
-    {
-        if (!_debugWorldSubscribers.Contains(player))
-            return;
-        _debugWorldSubscribers.Remove(player);
-        player.Disconnected -= HandlePlayerDisconnected;
-    }
-
-    private void HandlePlayerDisconnected(Player sender, SlipeServer.Server.Elements.Events.PlayerQuitEventArgs e)
-    {
-        UnsubscribeToDrawWorld(sender);
-    }
-
-    private void HandleLuaEventTriggered(LuaEvent luaEvent)
-    {
-        switch (luaEvent.Name)
-        {
-            case "internalDrawWorldSubscribe":
-                SubscribeToDrawWorld(luaEvent.Player);
-                break;
-            case "internalDrawWorldUnsubscribe":
-                UnsubscribeToDrawWorld(luaEvent.Player);
-                break;
-        }
-    }
-
-    private void HandleAdminEnabled(Player player)
-    {
-        _luaEventHub.Invoke(player, x => x.SetAdminEnabled(true));
-    }
-
-    private void HandleAdminDisabled(Player player)
-    {
-        _luaEventHub.Invoke(player, x => x.SetAdminEnabled(false));
+        var (tool, state) = luaEvent.Read<AdminTool, bool>(_fromLuaValueMapper);
+        _adminService.RelayToolStateChanged(luaEvent.Player, tool, state);
     }
 
     private void HandlePlayerJoin(Player player)

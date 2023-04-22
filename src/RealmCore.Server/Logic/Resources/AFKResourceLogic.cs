@@ -1,12 +1,12 @@
 ﻿namespace RealmCore.Server.Logic.Resources;
 
-internal class DefaultAfkLogic
+internal sealed class AFKResourceLogic
 {
     private readonly IECS _ecs;
-    private readonly ILogger<StatisticsCounterLogic> _logger;
+    private readonly ILogger<StatisticsCounterResourceLogic> _logger;
 
-    public DefaultAfkLogic(IAFKService afkService,
-        IECS ecs, ILogger<StatisticsCounterLogic> logger)
+    public AFKResourceLogic(IAFKService afkService,
+        IECS ecs, ILogger<StatisticsCounterResourceLogic> logger)
     {
         _ecs = ecs;
         _logger = logger;

@@ -2,6 +2,6 @@
 
 public enum AdminTool
 {
-    World,
+    Entities,
     Components
 }

@@ -31,6 +31,15 @@ public class LuaEventHub<THub, TResource> : ILuaEventHub<THub> where TResource :
         _luaEventService.TriggerEventFor(player, eventName, source ?? player, values.ToArray());
     }
 
+    public void Invoke(IEnumerable<Player> players, Expression<Action<THub>> expression, Element? source = null)
+    {
+        var (eventName, values) = ConvertExpression(expression);
+        foreach (var player in players)
+        {
+            _luaEventService.TriggerEventFor(player, eventName, source ?? player, values.ToArray());
+        }
+    }
+
     public void Broadcast(Expression<Action<THub>> expression, Element? source = null)
     {
         var (eventName, values) = ConvertExpression(expression, "internalHubBroadcast");

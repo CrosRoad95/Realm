@@ -48,7 +48,7 @@ local function render()
 	end
 end
 
-local function toggling()
+local function handleToggleTool()
 	if(currentlySelectedTool ~= nil)then
 		toggleTool(currentlySelectedTool)
 	end
@@ -72,12 +72,12 @@ end
 local function openCloseDialog(key, state)
 	if(state == "down")then
 		opened = true
-		bindKey("space", "down", toggling)
+		bindKey("space", "down", handleToggleTool)
 		bindKey("arrow_u", "down", navigation)
 		bindKey("arrow_d", "down", navigation)
 	else
 		opened = false
-		unbindKey("space", "down", toggling)
+		unbindKey("space", "down", handleToggleTool)
 		unbindKey("arrow_u", "down", navigation)
 		unbindKey("arrow_d", "down", navigation)
 	end

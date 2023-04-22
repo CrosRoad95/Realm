@@ -1,13 +1,13 @@
 ﻿namespace RealmCore.Server.Logic.Resources;
 
-internal class StatisticsCounterLogic
+internal sealed class StatisticsCounterResourceLogic
 {
     private readonly IStatisticsCounterService _statisticsCounterService;
     private readonly MtaServer _mtaServer;
     private readonly IECS _ecs;
-    private readonly ILogger<StatisticsCounterLogic> _logger;
+    private readonly ILogger<StatisticsCounterResourceLogic> _logger;
 
-    public StatisticsCounterLogic(IStatisticsCounterService statisticsCounterService, MtaServer mtaServer, IECS ecs, ILogger<StatisticsCounterLogic> logger)
+    public StatisticsCounterResourceLogic(IStatisticsCounterService statisticsCounterService, MtaServer mtaServer, IECS ecs, ILogger<StatisticsCounterResourceLogic> logger)
     {
         _statisticsCounterService = statisticsCounterService;
         _mtaServer = mtaServer;

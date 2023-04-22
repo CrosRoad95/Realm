@@ -88,11 +88,12 @@ public static class ServerBuilderExtensions
         #endregion
 
         #region Resources Logics
-        builder.AddLogic<ClientInterfaceLogic>();
-        builder.AddLogic<StatisticsCounterLogic>();
-        builder.AddLogic<DefaultAfkLogic>();
-        builder.AddLogic<OutlineLogic>();
-        builder.AddLogic<WatermarkLogic>();
+        builder.AddLogic<ClientInterfaceResourceLogic>();
+        builder.AddLogic<StatisticsCounterResourceLogic>();
+        builder.AddLogic<AFKResourceLogic>();
+        builder.AddLogic<AdminResourceLogic>();
+        builder.AddLogic<OutlineResourceLogic>();
+        builder.AddLogic<WatermarkResourceLogic>();
         #endregion
 
         // Miscellaneous logic

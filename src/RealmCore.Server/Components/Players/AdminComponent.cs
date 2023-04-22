@@ -32,6 +32,8 @@ public class AdminComponent : Component
         _adminTools = adminTools;
     }
 
+    public bool HasAdminTool(AdminTool adminTool) => _adminTools.Contains(adminTool);
+
     public bool DevelopmentMode
     {
         get

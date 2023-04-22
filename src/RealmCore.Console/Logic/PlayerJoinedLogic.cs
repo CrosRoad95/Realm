@@ -33,7 +33,7 @@ internal sealed class PlayerJoinedLogic
         playerElementComponent.ClearChatBox();
         playerElementComponent.FadeCamera(CameraFade.In);
         playerElementComponent.SetCameraMatrix(new Vector3(379.89844f, -92.6416f, 10.950561f), new Vector3(336.75684f, -93.018555f, 1.3956465f));
-        var adminComponent = entity.AddComponent(new AdminComponent(new List<AdminTool> { AdminTool.World, AdminTool.Components }));
+        var adminComponent = entity.AddComponent(new AdminComponent(new List<AdminTool> { AdminTool.Entities, AdminTool.Components }));
         adminComponent.DebugView = true;
         adminComponent.DevelopmentMode = true;
         entity.AddComponent<LoginGuiComponent>();

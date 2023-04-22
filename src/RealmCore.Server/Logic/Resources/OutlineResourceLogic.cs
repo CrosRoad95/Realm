@@ -1,12 +1,12 @@
 ﻿namespace RealmCore.Server.Logic.Resources;
 
-internal class OutlineLogic
+internal sealed class OutlineResourceLogic
 {
-    private readonly ILogger<ClientInterfaceLogic> _logger;
+    private readonly ILogger<ClientInterfaceResourceLogic> _logger;
     private readonly IElementOutlineService _elementOutlineService;
     private readonly IECS _ecs;
 
-    public OutlineLogic(IElementOutlineService elementOutlineService, ILogger<ClientInterfaceLogic> logger, IECS ecs)
+    public OutlineResourceLogic(IElementOutlineService elementOutlineService, ILogger<ClientInterfaceResourceLogic> logger, IECS ecs)
     {
         _elementOutlineService = elementOutlineService;
         _ecs = ecs;

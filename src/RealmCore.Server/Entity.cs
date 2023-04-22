@@ -38,13 +38,21 @@ public class Entity : IDisposable
 
     internal Player Player => GetRequiredComponent<PlayerElementComponent>().Player;
     internal Element Element => GetRequiredComponent<ElementComponent>().Element;
-
+    
     public Entity(IServiceProvider serviceProvider, string name = "", EntityTag tag = EntityTag.Unknown)
     {
         _serviceProvider = serviceProvider;
         Name = name;
         Tag = tag;
         Transform = new Transform(this);
+    }
+
+    internal Element? TryGetElement()
+    {
+        if(TryGetComponent(out ElementComponent elementComponent))
+            return elementComponent.Element;
+
+        return null;
     }
 
     private void InternalInjectProperties(Type type, object obj)

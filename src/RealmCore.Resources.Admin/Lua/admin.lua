@@ -1,6 +1,11 @@
 ﻿local tools = {}
 local adminModeEnabled = false;
 local enabledTools = {}
+local entities = {}
+
+function getEntities()
+    return entities;
+end
 
 addEvent("internalOnAdminModeEnabled", false)
 addEvent("internalOnAdminModeDisabled", false)
@@ -23,6 +28,10 @@ function handleSetTools(newEnabledTools)
     end
 end
 
+function handleAddEntity(entity)
+    iprint("entity", entity)
+end
+
 function getTools()
     local toolsNames = {}
     for name,v in pairs(tools)do
@@ -35,10 +44,13 @@ function getTools()
 end
 
 function toggleTool(name)
-    if(not tools[name])then
+    local tool = tools[name];
+    if(not tool)then
         return false
     end
-    return setToolEnabled(name, not tools[name][3])
+    local newState = not tool[3];
+    triggerServerEvent("internalSetToolState", resourceRoot, tool[4], newState)
+    return setToolEnabled(name, newState);
 end
 
 function isToolEnabled(name)
@@ -72,8 +84,27 @@ function addTool(name, enable, disable, id)
     tools[name] = {enable, disable, false, id} -- enable callback, disable callback, state, id
 end
 
+local function handleAddOrUpdateEntity(entity)
+    entities[entity.debugId] = entity
+end
+
+function handleAddOrUpdateEntities(entityOrEntities)
+	if(#entityOrEntities > 0)then
+		for i,v in ipairs(entityOrEntities)do
+			handleAddOrUpdateEntity(v)
+		end
+	else
+		handleAddOrUpdateEntity(entityOrEntities)
+	end
+end
+
+function handleClearEntities()
+    entities = {}
+end
+
 addEventHandler("onClientResourceStart", resourceRoot, function()
 	hubBind("SetAdminEnabled", handleSetAdminEnabled)
-	hubBind("AddOrUpdateDebugElements", handleAddOrUpdateDebugElements)
 	hubBind("SetTools", handleSetTools)
+	hubBind("AddOrUpdateEntity", handleAddOrUpdateEntities)
+	hubBind("ClearEntities", handleClearEntities)
 end)

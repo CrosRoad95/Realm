@@ -1,12 +1,12 @@
 ﻿namespace RealmCore.Server.Logic.Resources;
 
-internal class ClientInterfaceLogic
+internal sealed class ClientInterfaceResourceLogic
 {
-    private readonly ILogger<ClientInterfaceLogic> _logger;
+    private readonly ILogger<ClientInterfaceResourceLogic> _logger;
     private readonly IClientInterfaceService _clientInterfaceService;
     private readonly IECS _ecs;
 
-    public ClientInterfaceLogic(IClientInterfaceService clientInterfaceService, ILogger<ClientInterfaceLogic> logger, IECS ecs)
+    public ClientInterfaceResourceLogic(IClientInterfaceService clientInterfaceService, ILogger<ClientInterfaceResourceLogic> logger, IECS ecs)
     {
         _clientInterfaceService = clientInterfaceService;
         _ecs = ecs;

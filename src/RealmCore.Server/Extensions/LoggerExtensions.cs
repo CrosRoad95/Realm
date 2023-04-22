@@ -1,4 +1,6 @@
-﻿namespace RealmCore.Server.Extensions;
+﻿using RealmCore.Server.Components.Elements;
+
+namespace RealmCore.Server.Extensions;
 
 public static class LoggerExtensions
 {
@@ -18,6 +20,26 @@ public static class LoggerExtensions
                     if (entity.TryGetComponent(out PlayerElementComponent playerElementComponent))
                         data["serial"] = playerElementComponent.Client.Serial;
                 }
+                break;
+        }
+        return logger.BeginScope(data);
+    }
+    
+    public static IDisposable? BeginPlayer<T>(this ILogger<T> logger, Element element)
+    {
+        if (element == null)
+            throw new ArgumentNullException(nameof(element));
+
+        Dictionary<string, object> data = new()
+        {
+            ["elementType"] = element.ElementType
+        };
+
+        switch (element)
+        {
+            case Player player:
+                data["name"] = player.Name;
+                data["serial"] = player.Client.Serial;
                 break;
         }
         return logger.BeginScope(data);
