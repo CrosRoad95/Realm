@@ -44,8 +44,23 @@ public class RealmLogger
             .Filter.ByExcluding(le => SourceContextEquals(le, typeof(T)));
         return this;
     }
+    public RealmLogger ByExcluding(string sourceContext)
+    {
+        _loggerConfiguration = _loggerConfiguration
+            .Filter.ByExcluding(le => SourceContextEquals(le, sourceContext));
+        return this;
+    }
+    
+    public RealmLogger ByExcluding(Func<LogEvent, bool> exclusionPredicate)
+    {
+        _loggerConfiguration = _loggerConfiguration.Filter.ByExcluding(exclusionPredicate);
+        return this;
+    }
 
-    private static bool SourceContextEquals(LogEvent logEvent, Type sourceContext) => logEvent.Properties.GetValueOrDefault("SourceContext") is ScalarValue sv && sv.Value?.ToString() == sourceContext.FullName;
+    private static bool SourceContextEquals(LogEvent logEvent, Type sourceContext)
+        => logEvent.Properties.GetValueOrDefault("SourceContext") is ScalarValue sv && sv.Value?.ToString() == sourceContext.FullName;
+    
+    private static bool SourceContextEquals(LogEvent logEvent, string sourceContext) => logEvent.Properties.GetValueOrDefault("SourceContext") is ScalarValue sv && sv.Value?.ToString() == sourceContext;
 
     public ILogger GetLogger() => _loggerConfiguration.CreateLogger();
 }
