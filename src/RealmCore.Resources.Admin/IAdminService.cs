@@ -1,13 +1,13 @@
-﻿using SlipeServer.Server.Elements;
+﻿using RealmCore.Resources.Admin.Enums;
+using RealmCore.Resources.Base.Interfaces;
+using SlipeServer.Server.Elements;
 
 namespace RealmCore.Resources.Admin;
 
 public interface IAdminService
 {
-    internal event Action<Player>? AdminEnabled;
-    internal event Action<Player>? AdminDisabled;
+    internal Action<IMessage>? MessageHandler { get; set; }
 
-    void DisableAdminModeForPlayer(Player player);
-    void EnableAdminModeForPlayer(Player player);
-    bool HasAdminModeEnabled(Player player);
+    void SetAdminModeEnabledForPlayer(Player player, bool enabled);
+    void SetAdminTools(Player player, IReadOnlyList<AdminTool> adminTools);
 }

@@ -1,55 +1,26 @@
-﻿using SlipeServer.Server.Elements;
-using SlipeServer.Server.Elements.Events;
+﻿using RealmCore.Resources.Admin.Enums;
+using RealmCore.Resources.Admin.Messages;
+using RealmCore.Resources.Base.Interfaces;
+using SlipeServer.Server.Elements;
 
 namespace RealmCore.Resources.Admin;
 
 internal sealed class AdminService : IAdminService
 {
-    public event Action<Player>? AdminEnabled;
-    public event Action<Player>? AdminDisabled;
+    public Action<IMessage>? MessageHandler { get; set; }
 
-    private readonly HashSet<Player> _enabledForPlayers = new();
-    private readonly object _lock = new();
     public AdminService()
     {
 
     }
 
-    public bool HasAdminModeEnabled(Player player)
+    public void SetAdminModeEnabledForPlayer(Player player, bool enabled)
     {
-        lock (_lock)
-            return _enabledForPlayers.Contains(player);
+        MessageHandler?.Invoke(new AdminModeChangedMessage(player, enabled));
     }
 
-    public void EnableAdminModeForPlayer(Player player)
+    public void SetAdminTools(Player player, IReadOnlyList<AdminTool> adminTools)
     {
-        bool succeed;
-        lock (_lock)
-            succeed = _enabledForPlayers.Add(player);
-
-        if (succeed)
-        {
-            AdminEnabled?.Invoke(player);
-            player.Disconnected += HandlePlayerDisconnected;
-        }
-    }
-
-    private void HandlePlayerDisconnected(Player player, PlayerQuitEventArgs e)
-    {
-        lock (_lock)
-            _enabledForPlayers.Remove(player);
-    }
-
-    public void DisableAdminModeForPlayer(Player player)
-    {
-        bool succeed;
-        lock (_lock)
-            succeed = _enabledForPlayers.Remove(player);
-
-        if (succeed)
-        {
-            AdminDisabled?.Invoke(player);
-            player.Disconnected -= HandlePlayerDisconnected;
-        }
+        MessageHandler?.Invoke(new SetAdminToolsMessage(player, adminTools));
     }
 }

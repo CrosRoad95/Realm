@@ -87,7 +87,6 @@ end
 
 addEventHandler("onClientResourceStart", resourceRoot, function()
 	addEventHandler("internalOnAdminModeEnabled", localPlayer, function()
-		iprint("internalOnAdminModeEnabled")
 		addEventHandler("onClientRender", root, render)
 		bindKey("z", "both", openCloseDialog)
 	end)

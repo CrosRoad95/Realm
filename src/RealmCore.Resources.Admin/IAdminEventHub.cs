@@ -4,6 +4,7 @@ namespace RealmCore.Resources.Admin;
 
 public interface IAdminEventHub
 {
-    void InternalAddOrUpdateDebugElements(IEnumerable<LuaValue> debugElements);
-    void InternalSetAdminEnabled(bool enabled);
+    void AddOrUpdateDebugElements(IEnumerable<LuaValue> debugElements);
+    void SetAdminEnabled(bool enabled);
+    void SetTools(IEnumerable<int> enabledTools);
 }

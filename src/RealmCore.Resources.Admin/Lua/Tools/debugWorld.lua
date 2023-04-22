@@ -90,10 +90,10 @@ local function disableDrawWorld()
 end
 
 addEventHandler("onClientResourceStart", resourceRoot, function()
-	addTool("Debug world", enableDrawWorld, disableDrawWorld)
+	addTool("Debug world", enableDrawWorld, disableDrawWorld, 0)
 end)
 
-function handleInternalAddOrUpdateDebugElements(debugData)
+function handleAddOrUpdateDebugElements(debugData)
 	for i,v in ipairs(debugData)do
 		v.color = tocolor(v.color[1], v.color[2], v.color[3], v.color[4])
 		worldElements[v.debugId] = v

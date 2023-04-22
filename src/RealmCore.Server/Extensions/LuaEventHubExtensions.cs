@@ -1,4 +1,6 @@
-﻿namespace RealmCore.Server.Extensions;
+﻿using RealmCore.Resources.Base.Interfaces;
+
+namespace RealmCore.Server.Extensions;
 
 public static class LuaEventHubExtensions
 {

@@ -1,11 +1,11 @@
 ﻿local tools = {}
 local adminModeEnabled = false;
+local enabledTools = {}
 
-addEvent("internalSetAdminEnabled", true)
 addEvent("internalOnAdminModeEnabled", false)
 addEvent("internalOnAdminModeDisabled", false)
 
-function handleInternalSetAdminEnabled(enabled)
+function handleSetAdminEnabled(enabled)
     if(adminModeEnabled == enabled)then
         return
     end
@@ -16,10 +16,19 @@ function handleInternalSetAdminEnabled(enabled)
     end
 end
 
+function handleSetTools(newEnabledTools)
+    enabledTools = {}
+    for i,v in ipairs(newEnabledTools)do
+        enabledTools[v] = v
+    end
+end
+
 function getTools()
     local toolsNames = {}
-    for name in pairs(tools)do
-        toolsNames[#toolsNames + 1] = name
+    for name,v in pairs(tools)do
+        if(enabledTools[v[4]])then
+            toolsNames[#toolsNames + 1] = name
+        end
     end
     table.sort(toolsNames)
     return toolsNames
@@ -40,26 +49,31 @@ function isToolEnabled(name)
 end
 
 function setToolEnabled(name, enabled)
-    if(not tools[name])then
+    local tool = tools[name];
+    if(not tool)then
         return false
     end
-    if(enabled ~= tools[name][3])then
+    if(not enabledTools[tool[4]])then
+        return
+    end
+    if(enabled ~= tool[3])then
         if(enabled)then
-            tools[name][1]()
+            tool[1]()
         else
-            tools[name][2]()
+            tool[2]()
         end
-        tools[name][3] = enabled
+        tool[3] = enabled
         return true
     end
     return false
 end
 
-function addTool(name, enable, disable)
-    tools[name] = {enable, disable, false} -- enable callback, disable callback, state
+function addTool(name, enable, disable, id)
+    tools[name] = {enable, disable, false, id} -- enable callback, disable callback, state, id
 end
 
 addEventHandler("onClientResourceStart", resourceRoot, function()
-	hubBind("InternalSetAdminEnabled", handleInternalSetAdminEnabled)
-	hubBind("InternalAddOrUpdateDebugElements", handleInternalAddOrUpdateDebugElements)
+	hubBind("SetAdminEnabled", handleSetAdminEnabled)
+	hubBind("AddOrUpdateDebugElements", handleAddOrUpdateDebugElements)
+	hubBind("SetTools", handleSetTools)
 end)

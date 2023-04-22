@@ -1,7 +1,7 @@
 ﻿using SlipeServer.Server.Elements;
 using System.Linq.Expressions;
 
-namespace RealmCore.Resources.Base;
+namespace RealmCore.Resources.Base.Interfaces;
 
 public interface ILuaEventHub<THub>
 {
