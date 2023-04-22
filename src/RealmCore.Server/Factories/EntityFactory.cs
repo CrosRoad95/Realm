@@ -187,7 +187,6 @@ internal class EntityFactory : IEntityFactory
         var blip = new Blip(position, blipIcon, 250);
 
         var blipElementComponent = playerEntity.AddComponent(PlayerPrivateElementComponent.Create(new BlipElementComponent(blip)));
-        playerEntity.Transform.Position = position;
         AssociateWithPlayerEntity(blipElementComponent, playerEntity);
         return blipElementComponent;
     }
