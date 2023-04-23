@@ -31,7 +31,7 @@ internal class SamplePickupsLogic
                 }
 
             };
-            pickupElementComponent.EntityEntered = async entity =>
+            pickupElementComponent.EntityEntered = async (enteredPickup, entity) =>
             {
                 if (entity.Tag != EntityTag.Player)
                     return;
@@ -60,7 +60,7 @@ internal class SamplePickupsLogic
         if (entity.Tag == EntityTag.Pickup && entity.Name.StartsWith("jobTestPickup"))
         {
             var pickupElementComponent = entity.GetRequiredComponent<PickupElementComponent>();
-            pickupElementComponent.EntityEntered = entity =>
+            pickupElementComponent.EntityEntered = (enteredPickup, entity) =>
             {
                 if (entity.Tag != EntityTag.Player)
                     return;
@@ -115,11 +115,11 @@ internal class SamplePickupsLogic
         {
             var pickupElementComponent = entity.GetRequiredComponent<MarkerElementComponent>();
             pickupElementComponent.AddRule<MustBePlayerOnFootOnlyRule>();
-            pickupElementComponent.EntityEntered = entity =>
+            pickupElementComponent.EntityEntered = (enteredPickup, entity) =>
             {
                 entity.GetRequiredComponent<PlayerElementComponent>().SendChatMessage($"Entered marker");
             };
-            pickupElementComponent.EntityLeft = entity =>
+            pickupElementComponent.EntityLeft = (leftPickup, entity) =>
             {
                 entity.GetRequiredComponent<PlayerElementComponent>().SendChatMessage($"Left marker");
             };

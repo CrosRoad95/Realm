@@ -34,7 +34,7 @@ public class CollisionShapeElementComponentTests
         #region Arrange
 
         bool entityEntered = false;
-        _collisionSphereElementComponent.EntityEntered += e =>
+        _collisionSphereElementComponent.EntityEntered += (enteredColshape, e) =>
         {
             entityEntered = true;
         };

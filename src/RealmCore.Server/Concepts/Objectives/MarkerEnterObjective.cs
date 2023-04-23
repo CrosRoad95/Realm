@@ -39,7 +39,7 @@ public class MarkerEnterObjective : Objective
         }
     }
 
-    private void EntityEntered(Entity entity)
+    private void EntityEntered(Entity colshapeEntity, Entity entity)
     {
         ThrowIfDisposed();
 

@@ -9,11 +9,11 @@ public class PickupElementComponent : ElementComponent
 
     protected readonly Pickup _pickup;
     internal override Element Element => _pickup;
-    private Action<Entity>? _entityEntered;
-    private Action<Entity>? _entityLeft;
+    private Action<Entity, Entity>? _entityEntered;
+    private Action<Entity, Entity>? _entityLeft;
     private Action<Entity, IEntityRule>? _entityRuleFailed;
 
-    public Action<Entity>? EntityEntered
+    public Action<Entity, Entity>? EntityEntered
     {
         get
         {
@@ -27,7 +27,7 @@ public class PickupElementComponent : ElementComponent
         }
     }
 
-    public Action<Entity>? EntityLeft
+    public Action<Entity, Entity>? EntityLeft
     {
         get
         {
@@ -116,7 +116,7 @@ public class PickupElementComponent : ElementComponent
         }
         try
         {
-            EntityEntered(entity);
+            EntityEntered(Entity, entity);
         }
         catch (Exception ex)
         {
@@ -147,7 +147,7 @@ public class PickupElementComponent : ElementComponent
 
         try
         {
-            EntityLeft(entity);
+            EntityLeft(Entity, entity);
         }
         catch (Exception ex)
         {

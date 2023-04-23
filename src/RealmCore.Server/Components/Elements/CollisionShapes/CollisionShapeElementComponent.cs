@@ -10,8 +10,8 @@ public abstract class CollisionShapeElementComponent : ElementComponent
 
     protected readonly CollisionShape _collisionShape;
 
-    public Action<Entity>? EntityEntered { get; set; }
-    public Action<Entity>? EntityLeft { get; set; }
+    public Action<Entity, Entity>? EntityEntered { get; set; }
+    public Action<Entity, Entity>? EntityLeft { get; set; }
 
     internal override Element Element => _collisionShape;
 
@@ -65,7 +65,7 @@ public abstract class CollisionShapeElementComponent : ElementComponent
 
             lock (_entityRulesLock)
                 if (_entityRules.All(x => x.Check(entity)))
-                    EntityEntered(entity);
+                    EntityEntered(Entity, entity);
         }
         catch (Exception ex)
         {
@@ -87,7 +87,7 @@ public abstract class CollisionShapeElementComponent : ElementComponent
 
             lock (_entityRulesLock)
                 if (_entityRules.All(x => x.Check(entity)))
-                    EntityLeft(entity);
+                    EntityLeft(Entity, entity);
         }
         catch (Exception ex)
         {

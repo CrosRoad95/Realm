@@ -9,11 +9,11 @@ public class MarkerElementComponent : ElementComponent
     protected readonly CollisionSphere _collisionShape;
     internal override Element Element => _marker;
     internal CollisionSphere CollisionShape => _collisionShape;
-    private Action<Entity>? _entityEntered;
-    private Action<Entity>? _entityLeft;
+    private Action<Entity, Entity>? _entityEntered;
+    private Action<Entity, Entity>? _entityLeft;
     private Action<Entity, IEntityRule>? _entityRuleFailed;
 
-    public Action<Entity>? EntityEntered
+    public Action<Entity, Entity>? EntityEntered
     {
         get
         {
@@ -27,7 +27,7 @@ public class MarkerElementComponent : ElementComponent
         }
     }
 
-    public Action<Entity>? EntityLeft
+    public Action<Entity, Entity>? EntityLeft
     {
         get
         {
@@ -150,7 +150,7 @@ public class MarkerElementComponent : ElementComponent
                 return;
             }
         }
-        EntityEntered(entity);
+        EntityEntered(Entity, entity);
     }
 
     private void HandleElementLeft(Element element)
@@ -164,7 +164,7 @@ public class MarkerElementComponent : ElementComponent
             return;
 
         if (_entityRules.All(x => x.Check(entity)))
-            EntityLeft(entity);
+            EntityLeft(Entity, entity);
     }
 
     private void HandleDisposed(Entity entity)

@@ -94,7 +94,7 @@ internal class WorldLogic
     {
         var collisionSphereElementComponent = entity.GetRequiredComponent<CollisionSphereElementComponent>();
         collisionSphereElementComponent.AddRule<MustBePlayerRule>();
-        collisionSphereElementComponent.EntityEntered = enteredEntity =>
+        collisionSphereElementComponent.EntityEntered = (enteredColshapeEntity, enteredEntity) =>
         {
             if (enteredEntity.GetRequiredComponent<DiscoveriesComponent>().TryDiscover(discoveryName))
             {

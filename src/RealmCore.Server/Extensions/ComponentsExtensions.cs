@@ -4,12 +4,12 @@ public static class ComponentsExtensions
 {
     public static void AddOpenGuiLogic<TGui>(this PickupElementComponent pickupElementComponent) where TGui : GuiComponent, new()
     {
-        pickupElementComponent.EntityEntered = entity =>
+        pickupElementComponent.EntityEntered = (enteredPickup, entity) =>
         {
             if (!entity.HasComponent<GuiComponent>())
                 entity.AddComponent(new TGui());
         };
-        pickupElementComponent.EntityLeft = entity =>
+        pickupElementComponent.EntityLeft = (leftPickup, entity) =>
         {
             if (entity.HasComponent<TGui>())
                 entity.DestroyComponent<TGui>();
@@ -20,7 +20,7 @@ public static class ComponentsExtensions
         where TGui1 : GuiComponent, new()
         where TGui2 : GuiComponent, new()
     {
-        pickupElementComponent.EntityEntered = entity =>
+        pickupElementComponent.EntityEntered = (enteredPickup, entity) =>
         {
             if (!entity.HasComponent<GuiComponent>())
             {
@@ -28,7 +28,7 @@ public static class ComponentsExtensions
                 entity.AddComponent(new TGui2());
             }
         };
-        pickupElementComponent.EntityLeft = entity =>
+        pickupElementComponent.EntityLeft = (leftPickup, entity) =>
         {
             if (entity.HasComponent<TGui1>())
                 entity.DestroyComponent<TGui1>();
