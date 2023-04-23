@@ -228,6 +228,23 @@ public class Entity : IDisposable
         return has;
     }
 
+    public bool HasComponent(Type type)
+    {
+        ThrowIfDisposed();
+        bool has;
+
+        _componentsLock.EnterReadLock();
+        try
+        {
+            has = _components.Where(x => x.GetType() == type).Any();
+        }
+        finally
+        {
+            _componentsLock.ExitReadLock();
+        }
+        return has;
+    }
+
     public bool TryGetComponent<TComponent>([NotNullWhen(true)] out TComponent component) where TComponent : Component
     {
         component = GetComponent<TComponent>();
