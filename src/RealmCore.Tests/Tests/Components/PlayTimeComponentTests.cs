@@ -26,18 +26,18 @@ public class PlayTimeComponentTests
     [Fact]
     public void TestIfCounterWorksCorrectly()
     {
-        _playTimeComponent.PlayTime.Should().Be(0);
-        _playTimeComponent.TotalPlayTime.Should().Be(0);
+        _playTimeComponent.PlayTime.Should().Be(TimeSpan.Zero);
+        _playTimeComponent.TotalPlayTime.Should().Be(TimeSpan.Zero);
 
-        _playTimeComponentWithInitialState.PlayTime.Should().Be(0);
-        _playTimeComponentWithInitialState.TotalPlayTime.Should().Be(1000);
+        _playTimeComponentWithInitialState.PlayTime.Should().Be(TimeSpan.Zero);
+        _playTimeComponentWithInitialState.TotalPlayTime.Should().Be(TimeSpan.FromSeconds(1000));
 
         _testDateTimeProvider.AddOffset(TimeSpan.FromSeconds(50));
 
-        _playTimeComponent.PlayTime.Should().Be(50);
-        _playTimeComponent.TotalPlayTime.Should().Be(50);
+        _playTimeComponent.PlayTime.Should().Be(TimeSpan.FromSeconds(50));
+        _playTimeComponent.TotalPlayTime.Should().Be(TimeSpan.FromSeconds(50));
 
-        _playTimeComponentWithInitialState.PlayTime.Should().Be(50);
-        _playTimeComponentWithInitialState.TotalPlayTime.Should().Be(1050);
+        _playTimeComponentWithInitialState.PlayTime.Should().Be(TimeSpan.FromSeconds(50));
+        _playTimeComponentWithInitialState.TotalPlayTime.Should().Be(TimeSpan.FromSeconds(1050));
     }
 }

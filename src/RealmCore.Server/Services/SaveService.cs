@@ -246,7 +246,7 @@ internal class SaveService : ISaveService
 
         if (entity.TryGetComponent(out PlayTimeComponent playTimeComponent))
         {
-            user.PlayTime = playTimeComponent.TotalPlayTime;
+            user.PlayTime = (ulong)playTimeComponent.TotalPlayTime.TotalSeconds;
             playTimeComponent.Reset();
         }
         else
