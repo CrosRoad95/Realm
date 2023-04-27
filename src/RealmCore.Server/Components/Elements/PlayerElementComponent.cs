@@ -537,6 +537,10 @@ public sealed class PlayerElementComponent : PedElementComponent
         {
             await InternalHandleBindExecuted(e.Key, e.KeyState);
         }
+        catch(Exception ex)
+        {
+            Logger.LogHandleError(ex);
+        }
         finally
         {
 

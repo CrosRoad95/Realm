@@ -37,6 +37,8 @@ internal sealed class StatisticsCounterResourceLogic
                 {
                     try
                     {
+                        if (item.Key < 0 || item.Key > 1000)
+                            throw new Exception($"Received out of range statId from client: {item.Key}");
                         statisticsCounterComponent.IncreaseStat(item.Key, item.Value);
                     }
                     catch (Exception ex)

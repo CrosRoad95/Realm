@@ -9,30 +9,28 @@ public class PlayTimeComponent : Component
     private DateTime? _startDateTime;
     private readonly ulong _currentPlayTime = 0;
 
-    public ulong PlayTime
+    public TimeSpan PlayTime
     {
         get
         {
             ThrowIfDisposed();
 
             if (_startDateTime == null)
-                return 0;
-            return (ulong)(DateTimeProvider.Now - _startDateTime.Value).Seconds;
+                return TimeSpan.Zero;
+            return DateTimeProvider.Now - _startDateTime.Value;
         }
     }
 
-    public ulong TotalPlayTime
+    public TimeSpan TotalPlayTime
     {
         get
         {
             ThrowIfDisposed();
-            return PlayTime + _currentPlayTime;
+            return PlayTime + TimeSpan.FromSeconds(_currentPlayTime);
         }
     }
 
-    public PlayTimeComponent()
-    {
-    }
+    public PlayTimeComponent() { }
 
     public PlayTimeComponent(ulong currentPlayTime)
     {
