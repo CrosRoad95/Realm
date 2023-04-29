@@ -19,6 +19,7 @@ using RealmCore.Console.Components;
 using RealmCore.Resources.ElementOutline;
 using RealmCore.Resources.Assets.Factories;
 using RealmCore.Resources.Assets.Interfaces;
+using RealmCore.Server.Concepts.Spawning;
 
 namespace RealmCore.Console.Logic;
 
@@ -44,7 +45,7 @@ internal sealed class CommandsLogic
     public CommandsLogic(RPGCommandService commandService, IEntityFactory entityFactory, RepositoryFactory repositoryFactory,
         ItemsRegistry itemsRegistry, IECS ecs, IBanService banService, IDiscordService discordService, ChatBox chatBox, ILogger<CommandsLogic> logger,
         IDateTimeProvider dateTimeProvider, INametagsService nametagsService, IUsersService rpgUserManager, IVehiclesService vehiclesService,
-        GameWorld gameWorld, IElementOutlineService elementOutlineService, IAssetsService assetsService)
+        GameWorld gameWorld, IElementOutlineService elementOutlineService, IAssetsService assetsService, ISpawnMarkersService spawnMarkersService)
     {
         _commandService = commandService;
         _entityFactory = entityFactory;
@@ -871,7 +872,7 @@ internal sealed class CommandsLogic
         {
             gameWorld.SetTime(0, 0);
         });
-
+        
         _commandService.AddCommandHandler("createObjectFor", (entity, args) =>
         {
             _entityFactory.CreateObjectFor(entity, (ObjectModel)1337, entity.Transform.Position + new Vector3(3, 0, 0), entity.Transform.Rotation);
@@ -931,6 +932,12 @@ internal sealed class CommandsLogic
                 obj.Position = pos + new Vector3(i, 0, 0);
                 obj.Rotation = entity.Transform.Rotation;
             }
+        });
+
+        _commandService.AddCommandHandler("addtestmarker", (entity, args) =>
+        {
+            spawnMarkersService.AddSpawnMarker(new PointSpawnMarker(entity.Transform.Position));
+            entity.GetRequiredComponent<PlayerElementComponent>().SendChatMessage("marker added");
         });
 
         FontCollection collection = new();

@@ -122,6 +122,7 @@ global using System.Xml.Serialization;
 global using RealmCore.Persistance.Interfaces;
 global using System.Diagnostics;
 global using RealmCore.Persistance.Data.Helpers;
+global using RealmCore.Server.Concepts.Spawning;
 
 global using ILogger = Microsoft.Extensions.Logging.ILogger;
 

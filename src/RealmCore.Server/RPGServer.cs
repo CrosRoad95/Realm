@@ -68,6 +68,7 @@ internal sealed class RPGServer : IRPGServer
         services.AddTransient<IJobService, JobService>();
         services.AddTransient<IRewardService, RewardService>();
         services.AddSingleton<IMapsService, MapsService>();
+        services.AddSingleton<ISpawnMarkersService, SpawnMarkersService>();
         #endregion
 
         services.AddTransient<IEntityFactory, EntityFactory>();
