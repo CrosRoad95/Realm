@@ -40,24 +40,28 @@ internal class EssentialCommandsLogic
         if (string.IsNullOrWhiteSpace(line))
             return;
 
-        var firstWord = line.Split(' ').FirstOrDefault().ToLower();
+        var firstWord = line.Split(' ').FirstOrDefault();
         if (firstWord == null)
             return;
+        var loweredFirstWord = firstWord.ToLower();
 
-        if (_commands.TryGetValue(firstWord, out Type value))
+        if (_commands.TryGetValue(loweredFirstWord, out Type? value))
         {
             try
             {
-                (_serviceProvider.GetRequiredService(value) as ICommand).HandleCommand(line);
+                var command = _serviceProvider.GetRequiredService(value) as ICommand;
+                if (command == null)
+                    throw new InvalidOperationException("Expected command to implement ICommand interface");
+                command.HandleCommand(line);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Failed to execute command: '{commandName}' not found", firstWord);
+                _logger.LogError(ex, "Failed to execute command: '{commandName}' not found", loweredFirstWord);
             }
         }
         else
         {
-            _logger.LogWarning("Command '{commandName}' not found", firstWord);
+            _logger.LogWarning("Command '{commandName}' not found", loweredFirstWord);
         }
     }
 }

@@ -33,7 +33,7 @@ public class PrivateVehicleComponent : Component
         vehicle.Colors.Color4 = _vehicleData.Color.Color4;
         vehicle.PaintJob = (byte)_vehicleData.Paintjob;
         vehicle.PlateText = _vehicleData.Platetext;
-        vehicle.Variants = new SlipeServer.Server.ElementConcepts.VehicleVariants
+        vehicle.Variants = new VehicleVariants
         {
             Variant1 = _vehicleData.Variant.Variant1,
             Variant2 = _vehicleData.Variant.Variant2,

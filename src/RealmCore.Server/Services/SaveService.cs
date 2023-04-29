@@ -26,11 +26,11 @@ internal class SaveService : ISaveService
         var vehicle = vehicleElementComponent.Vehicle;
 
         vehicleData.Model = vehicle.Model;
-        vehicleData.Color = new Persistance.Data.Helpers.VehicleColor(vehicle.Colors.Primary, vehicle.Colors.Secondary, vehicle.Colors.Color3, vehicle.Colors.Color4, vehicle.HeadlightColor);
+        vehicleData.Color = new VehicleColor(vehicle.Colors.Primary, vehicle.Colors.Secondary, vehicle.Colors.Color3, vehicle.Colors.Color4, vehicle.HeadlightColor);
         vehicleData.Paintjob = vehicle.PaintJob;
         vehicleData.Platetext = vehicle.PlateText;
-        vehicleData.Variant = new Persistance.Data.Helpers.VehicleVariant(vehicle.Variants.Variant1, vehicle.Variants.Variant2);
-        vehicleData.DamageState = new Persistance.Data.Helpers.VehicleDamageState
+        vehicleData.Variant = new VehicleVariant(vehicle.Variants.Variant1, vehicle.Variants.Variant2);
+        vehicleData.DamageState = new VehicleDamageState
         {
             FrontLeftLight = (LightState)vehicle.Damage.Lights[0],
             FrontRightLight = (LightState)vehicle.Damage.Lights[1],
@@ -50,7 +50,7 @@ internal class SaveService : ISaveService
             RearLeftDoor = (DoorState)vehicle.Damage.Doors[4],
             RearRightDoor = (DoorState)vehicle.Damage.Doors[5],
         };
-        vehicleData.DoorOpenRatio = new Persistance.Data.Helpers.VehicleDoorOpenRatio
+        vehicleData.DoorOpenRatio = new VehicleDoorOpenRatio
         {
             Hood = vehicle.DoorRatios[0],
             Trunk = vehicle.DoorRatios[1],
@@ -59,12 +59,12 @@ internal class SaveService : ISaveService
             RearLeft = vehicle.DoorRatios[4],
             RearRight = vehicle.DoorRatios[5],
         };
-        vehicleData.WheelStatus = new Persistance.Data.Helpers.VehicleWheelStatus
+        vehicleData.WheelStatus = new VehicleWheelStatus
         {
-            FrontLeft = (WheelStatus)vehicle.GetWheelState(SlipeServer.Packets.Enums.VehicleWheel.FrontLeft),
-            FrontRight = (WheelStatus)vehicle.GetWheelState(SlipeServer.Packets.Enums.VehicleWheel.FrontRight),
-            RearLeft = (WheelStatus)vehicle.GetWheelState(SlipeServer.Packets.Enums.VehicleWheel.RearLeft),
-            RearRight = (WheelStatus)vehicle.GetWheelState(SlipeServer.Packets.Enums.VehicleWheel.RearLeft),
+            FrontLeft = (WheelStatus)vehicle.GetWheelState(VehicleWheel.FrontLeft),
+            FrontRight = (WheelStatus)vehicle.GetWheelState(VehicleWheel.FrontRight),
+            RearLeft = (WheelStatus)vehicle.GetWheelState(VehicleWheel.RearLeft),
+            RearRight = (WheelStatus)vehicle.GetWheelState(VehicleWheel.RearLeft),
         };
         vehicleData.EngineState = vehicle.IsEngineOn;
         vehicleData.LandingGearDown = vehicle.IsLandingGearDown;

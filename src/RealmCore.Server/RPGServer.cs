@@ -19,7 +19,6 @@ internal sealed class RPGServer : IRPGServer
                 builder.AddLogic<VehiclesLogic>();
                 builder.AddLogic<GuisLogic>();
                 builder.AddLogic<StartupLogic>();
-                builder.AddLogic<DefaultChatLogic>();
 
                 builder.AddLogic<VehicleUpgradeRegistryLogic>();
                 builder.AddLogic<VehicleEnginesRegistryLogic>();
