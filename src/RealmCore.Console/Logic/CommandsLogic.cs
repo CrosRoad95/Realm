@@ -798,6 +798,12 @@ internal sealed class CommandsLogic
             await _vehiclesService.Despawn(playerElementComponent.OccupiedVehicle);
         });
 
+        _commandService.AddCommandHandler("disposeveh", (entity, args) =>
+        {
+            var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();
+            playerElementComponent.OccupiedVehicle.Dispose();
+        });
+
         _commandService.AddAsyncCommandHandler("spawnback", async (entity, args) =>
         {
             var en = await _vehiclesService.SpawnById(int.Parse(args[0]));

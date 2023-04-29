@@ -1,4 +1,7 @@
-﻿namespace RealmCore.Server.Components.Elements;
+﻿using SlipeServer.Server.Elements;
+using System.Security.Principal;
+
+namespace RealmCore.Server.Components.Elements;
 
 public abstract class ElementComponent : Component
 {
@@ -96,6 +99,11 @@ public abstract class ElementComponent : Component
         else
         {
             Entity.Disposed -= HandleDisposed;
+            if(Element is Vehicle vehicle)
+            {
+                foreach (var occupant in vehicle.Occupants)
+                    vehicle.RemovePassenger(occupant.Value);
+            }
             Element.Destroy();
         }
     }

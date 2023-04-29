@@ -61,8 +61,11 @@ internal sealed class VehiclesService : IVehiclesService
 
     public async Task Despawn(Entity entity)
     {
+        if (entity.Tag != EntityTag.Vehicle)
+            throw new InvalidOperationException("Entity is not vehicle");
         await _vehicleRepository.SetSpawned(entity.GetRequiredComponent<PrivateVehicleComponent>().Id, false);
         await _saveService.Save(entity);
+        await _saveService.Commit();
         entity.Dispose();
     }
 
