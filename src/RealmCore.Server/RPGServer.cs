@@ -1,4 +1,6 @@
-﻿namespace RealmCore.Server;
+﻿using RealmCore.Server.Logic.Defaults;
+
+namespace RealmCore.Server;
 
 internal sealed class RPGServer : IRPGServer
 {
@@ -17,7 +19,7 @@ internal sealed class RPGServer : IRPGServer
                 builder.AddLogic<VehiclesLogic>();
                 builder.AddLogic<GuisLogic>();
                 builder.AddLogic<StartupLogic>();
-                builder.AddLogic<ChatLogic>();
+                builder.AddLogic<DefaultChatLogic>();
 
                 builder.AddLogic<VehicleUpgradeRegistryLogic>();
                 builder.AddLogic<VehicleEnginesRegistryLogic>();

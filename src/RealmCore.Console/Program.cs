@@ -36,6 +36,7 @@ var server = builder.Build(null, extraBuilderSteps: serverBuilder =>
     serverBuilder.AddLogic<ProceduralObjectsLogic>();
     serverBuilder.AddLogic<AssetsLogic>();
     serverBuilder.AddLogic<DefaultBanLogic>();
+    serverBuilder.AddLogic<DefaultChatLogic>();
 #if DEBUG
     serverBuilder.AddLogic<HotReloadLogic>("../../../Server/Gui");
 #endif

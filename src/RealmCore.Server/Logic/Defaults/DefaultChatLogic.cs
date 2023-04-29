@@ -1,14 +1,14 @@
 ﻿using SlipeServer.Server.Extensions;
 
-namespace RealmCore.Server.Logic;
+namespace RealmCore.Server.Logic.Defaults;
 
-internal class ChatLogic
+public class DefaultChatLogic
 {
     private readonly ChatBox _chatBox;
-    private readonly ILogger<ChatLogic> _logger;
+    private readonly ILogger<DefaultChatLogic> _logger;
     private readonly IECS _ecs;
 
-    public ChatLogic(MtaServer server, ChatBox chatBox, ILogger<ChatLogic> logger, IECS ecs)
+    public DefaultChatLogic(MtaServer server, ChatBox chatBox, ILogger<DefaultChatLogic> logger, IECS ecs)
     {
         _chatBox = chatBox;
         _logger = logger;
