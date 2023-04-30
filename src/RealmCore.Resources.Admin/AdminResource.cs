@@ -12,6 +12,7 @@ internal class AdminResource : Resource
         ["admin.lua"] = ResourceFiles.Admin,
         ["tools/entities.lua"] = ResourceFiles.ToolEntities,
         ["tools/components.lua"] = ResourceFiles.ToolComponents,
+        ["tools/spawnMarkers.lua"] = ResourceFiles.ToolSpawnMarkers,
     };
 
     internal AdminResource(MtaServer server)

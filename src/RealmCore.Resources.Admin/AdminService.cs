@@ -2,6 +2,7 @@
 using RealmCore.Resources.Admin.Enums;
 using RealmCore.Resources.Admin.Messages;
 using RealmCore.Resources.Base.Interfaces;
+using SlipeServer.Packets.Definitions.Lua;
 using SlipeServer.Server.Elements;
 
 namespace RealmCore.Resources.Admin;
@@ -52,6 +53,16 @@ internal sealed class AdminService : IAdminService
     }
 
     public void BroadcastClearEntityForPlayer(Player player)
+    {
+        MessageHandler?.Invoke(new ClearEntitiesForPlayerMessage(player));
+    }
+
+    public void BroadcastSpawnMarkersForPlayer(Player player, IEnumerable<LuaValue> spawnMarkers)
+    {
+        MessageHandler?.Invoke(new BroadcastSpawnMarkersForPlayerMessage(player, spawnMarkers));
+    }
+
+    public void BroadcastClearSpawnMarkersForPlayer(Player player)
     {
         MessageHandler?.Invoke(new ClearEntitiesForPlayerMessage(player));
     }

@@ -10,6 +10,7 @@
 
   <ItemGroup>
     <None Remove="Lua\Tools\components.lua" />
+    <None Remove="Lua\Tools\spawnMarkers.lua" />
   </ItemGroup>
 
   <ItemGroup>
@@ -17,6 +18,7 @@
     <EmbeddedResource Include="Lua\debugDraw.lua" />
     <EmbeddedResource Include="Lua\Tools\components.lua" />
     <EmbeddedResource Include="Lua\Tools\entities.lua" />
+    <EmbeddedResource Include="Lua\Tools\spawnMarkers.lua" />
   </ItemGroup>
 
   <ItemGroup>

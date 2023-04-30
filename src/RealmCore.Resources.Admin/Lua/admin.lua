@@ -2,9 +2,15 @@
 local adminModeEnabled = false;
 local enabledTools = {}
 local entities = {}
+local spawnMarkers = {}
+local toolIdsInUse = {}
 
 function getEntities()
     return entities;
+end
+
+function getSpawnMarkers()
+    return spawnMarkers;
 end
 
 addEvent("internalOnAdminModeEnabled", false)
@@ -81,6 +87,10 @@ function setToolEnabled(name, enabled)
 end
 
 function addTool(name, enable, disable, id)
+    if(toolIdsInUse[id])then
+        error("Admin tool id "..id.." is already in use");
+    end
+    toolIdsInUse[id] = true
     tools[name] = {enable, disable, false, id} -- enable callback, disable callback, state, id
 end
 
@@ -99,7 +109,15 @@ function handleAddOrUpdateEntities(entityOrEntities)
 end
 
 function handleClearEntities()
-    entities = {}
+    entities = {};
+end
+
+function handleSetSpawnMarkers(data)
+    spawnMarkers = data;
+end
+
+function handleClearSpawnMarkers()
+    spawnMarkers = {};
 end
 
 addEventHandler("onClientResourceStart", resourceRoot, function()
@@ -107,4 +125,6 @@ addEventHandler("onClientResourceStart", resourceRoot, function()
 	hubBind("SetTools", handleSetTools)
 	hubBind("AddOrUpdateEntity", handleAddOrUpdateEntities)
 	hubBind("ClearEntities", handleClearEntities)
+	hubBind("SetSpawnMarkers", handleSetSpawnMarkers)
+	hubBind("ClearSpawnMarkers", handleClearSpawnMarkers)
 end)

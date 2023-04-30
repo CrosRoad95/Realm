@@ -1,6 +1,7 @@
 ﻿using RealmCore.Resources.Admin.Data;
 using RealmCore.Resources.Admin.Enums;
 using RealmCore.Resources.Base.Interfaces;
+using SlipeServer.Packets.Definitions.Lua;
 using SlipeServer.Server.Elements;
 
 namespace RealmCore.Resources.Admin;
@@ -19,4 +20,6 @@ public interface IAdminService
     void BroadcastEntityDebugInfoUpdateForPlayer(Player player, EntityDebugInfo entityDebugInfo);
     void BroadcastEntityDebugInfoUpdateForPlayer(Player player, IEnumerable<EntityDebugInfo> entitiesDebugInfo);
     void BroadcastClearEntityForPlayer(Player player);
+    void BroadcastSpawnMarkersForPlayer(Player player, IEnumerable<LuaValue> entitiesDebugInfo);
+    void BroadcastClearSpawnMarkersForPlayer(Player player);
 }

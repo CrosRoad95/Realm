@@ -8,4 +8,6 @@ public interface IAdminEventHub
     void SetTools(IEnumerable<int> enabledTools);
     void AddOrUpdateEntity(IEnumerable<LuaValue> entityLuaValues);
     void ClearEntities();
+    void SetSpawnMarkers(IEnumerable<LuaValue> spawnMarkers);
+    void ClearSpawnMarkers();
 }

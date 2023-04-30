@@ -934,10 +934,16 @@ internal sealed class CommandsLogic
             }
         });
 
-        _commandService.AddCommandHandler("addtestmarker", (entity, args) =>
+        _commandService.AddCommandHandler("addtestmarker1", (entity, args) =>
         {
-            spawnMarkersService.AddSpawnMarker(new PointSpawnMarker(entity.Transform.Position));
-            entity.GetRequiredComponent<PlayerElementComponent>().SendChatMessage("marker added");
+            spawnMarkersService.AddSpawnMarker(new PointSpawnMarker("test123", entity.Transform.Position));
+            entity.GetRequiredComponent<PlayerElementComponent>().SendChatMessage("marker added1");
+        });
+
+        _commandService.AddCommandHandler("addtestmarker2", (entity, args) =>
+        {
+            spawnMarkersService.AddSpawnMarker(new DirectionalSpawnMarker("test direct", entity.Transform.Position, entity.Transform.Rotation.Z));
+            entity.GetRequiredComponent<PlayerElementComponent>().SendChatMessage("marker added2");
         });
 
         FontCollection collection = new();

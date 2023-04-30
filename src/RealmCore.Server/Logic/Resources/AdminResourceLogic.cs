@@ -8,12 +8,14 @@ internal sealed class AdminResourceLogic
     private readonly IECS _ecs;
     private readonly IAdminService _adminService;
     private readonly ILogger<AdminResourceLogic> _logger;
+    private readonly ISpawnMarkersService _spawnMarkersService;
 
-    public AdminResourceLogic(IECS ecs, IAdminService adminService, ILogger<AdminResourceLogic> logger)
+    public AdminResourceLogic(IECS ecs, IAdminService adminService, ILogger<AdminResourceLogic> logger, ISpawnMarkersService spawnMarkersService)
     {
         _ecs = ecs;
         _adminService = adminService;
         _logger = logger;
+        _spawnMarkersService = spawnMarkersService;
         _ecs.EntityCreated += HandleEntityCreated;
 
         _adminService.ToolStateChanged += HandleToolStateChanged;
@@ -68,6 +70,36 @@ internal sealed class AdminResourceLogic
                     }));
                 else
                     _adminService.BroadcastClearEntityForPlayer(player);
+                break;
+            case AdminTool.ShowSpawnMarkers:
+                if(state)
+                {
+                    _adminService.BroadcastSpawnMarkersForPlayer(player, _spawnMarkersService.SpawnMarkers.Select(x =>
+                    {
+                        switch (x)
+                        {
+                            case PointSpawnMarker pointSpawnMarker:
+                                return new LuaValue(new Dictionary<LuaValue, LuaValue>
+                                {
+                                    ["type"] = "point",
+                                    ["name"] = x.Name,
+                                    ["position"] = LuaValue.ArrayFromVector(pointSpawnMarker.Position)
+                                });
+                            case DirectionalSpawnMarker directionalSpawnMarker:
+                                return new LuaValue(new Dictionary<LuaValue, LuaValue>
+                                {
+                                    ["type"] = "directional",
+                                    ["name"] = x.Name,
+                                    ["position"] = LuaValue.ArrayFromVector(directionalSpawnMarker.Position),
+                                    ["direction"] = new LuaValue(directionalSpawnMarker.Direction)
+                                });
+                            default:
+                                throw new NotImplementedException();
+                        }
+                    }));
+                }
+                else
+                    _adminService.BroadcastClearSpawnMarkersForPlayer(player);
                 break;
         }
     }
