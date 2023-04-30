@@ -55,7 +55,7 @@ public class Hud3dComponent<TState> : Component where TState : class
             {
                 _hudBuilderCallback(e);
             }
-            catch(Exception ex)
+            catch(Exception)
             {
                 throw;
             }

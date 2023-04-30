@@ -64,7 +64,7 @@ public abstract class HudComponent<TState> : Component where TState : class, new
             {
                 Build(e);
             }
-            catch(Exception ex)
+            catch(Exception)
             {
                 throw;
             }

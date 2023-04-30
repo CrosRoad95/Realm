@@ -46,7 +46,7 @@ public abstract class JobSessionComponent : SessionComponent
         {
             objective.LoadInternal(EntityFactory, Entity, Logger);
         }
-        catch (Exception ex)
+        catch (Exception)
         {
             objective.Dispose();
             lock (_lock)

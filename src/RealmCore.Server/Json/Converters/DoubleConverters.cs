@@ -7,7 +7,7 @@ public class DoubleConverter : JsonConverter
         return objectType == typeof(object);
     }
 
-    public override object? ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
+    public override object? ReadJson(JsonReader reader, Type objectType, object? existingValue, JsonSerializer serializer)
     {
         switch (reader.TokenType)
         {
@@ -20,7 +20,7 @@ public class DoubleConverter : JsonConverter
 
     public override bool CanWrite => false;
 
-    public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
+    public override void WriteJson(JsonWriter writer, object? value, JsonSerializer serializer)
     {
         throw new NotImplementedException();
     }

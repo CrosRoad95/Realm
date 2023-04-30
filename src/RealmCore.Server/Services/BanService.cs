@@ -31,6 +31,7 @@ public class BanService : IBanService
     {
         _banRepository.RemoveBan(ban);
         await _banRepository.Commit();
+        BanRemoved?.Invoke(ban);
     }
 
     public Task<List<BanData>> GetBansBySerial(string serial) => _banRepository.GetBansBySerial(serial, _dateTimeProvider.Now);

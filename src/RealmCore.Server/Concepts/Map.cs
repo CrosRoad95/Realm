@@ -27,10 +27,10 @@ internal sealed class Map : IMap
             var pos = worldObject.Position;
             if (pos.X < min.X) min.X = pos.X;
             if (pos.X > max.X) max.X = pos.X;
-            if (pos.Y < min.Y) min.Y = pos.X;
-            if (pos.Y > max.Y) max.Y = pos.X;
-            if (pos.Z < min.Z) min.Z = pos.X;
-            if (pos.X > max.Z) max.Z = pos.X;
+            if (pos.Y < min.Y) min.Y = pos.Y;
+            if (pos.Y > max.Y) max.Y = pos.Y;
+            if (pos.Z < min.Z) min.Z = pos.Z;
+            if (pos.X > max.Z) max.Z = pos.Z;
             _worldObjects.Add(worldObject);
         }
 

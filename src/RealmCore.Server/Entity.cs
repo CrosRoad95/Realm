@@ -136,7 +136,7 @@ public class Entity : IDisposable
         {
             component.InternalLoad();
         }
-        catch (Exception ex)
+        catch (Exception)
         {
             DestroyComponent(component);
             throw;

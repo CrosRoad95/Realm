@@ -79,7 +79,7 @@ public class RPGCommandService
     {
         try
         {
-            var commandText = ((Command)sender).CommandText;
+            var commandText = ((Command)sender!).CommandText;
             if (!_commands.TryGetValue(commandText, out var commandInfo))
                 return;
 
@@ -130,7 +130,7 @@ public class RPGCommandService
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Exception thrown while executing command {commandText} with arguments {commandArguments}", ((Command)sender).CommandText, args.Arguments);
+            _logger.LogError(ex, "Exception thrown while executing command {commandText} with arguments {commandArguments}", ((Command)sender!).CommandText, args.Arguments);
         }
     }
 
@@ -138,7 +138,7 @@ public class RPGCommandService
     {
         try
         {
-            var commandText = ((Command)sender).CommandText;
+            var commandText = ((Command)sender!).CommandText;
 
             if (!_asyncCommands.TryGetValue(commandText, out var commandInfo))
                 return;
@@ -190,7 +190,7 @@ public class RPGCommandService
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Exception thrown while executing command {commandText} with arguments {commandArguments}", ((Command)sender).CommandText, args.Arguments);
+            _logger.LogError(ex, "Exception thrown while executing command {commandText} with arguments {commandArguments}", ((Command)sender!).CommandText, args.Arguments);
         }
     }
 }

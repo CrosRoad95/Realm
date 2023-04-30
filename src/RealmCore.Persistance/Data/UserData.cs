@@ -21,7 +21,7 @@ public sealed class UserData : IdentityUser<int>
 
     public ICollection<UserLicenseData> Licenses { get; set; } = new List<UserLicenseData>();
     public ICollection<VehicleUserAccessData> VehicleUserAccesses { get; set; } = new List<VehicleUserAccessData>();
-    public ICollection<InventoryData>? Inventories { get; set; } = new List<InventoryData>();
+    public ICollection<InventoryData> Inventories { get; set; } = new List<InventoryData>();
     public DailyVisitsData? DailyVisits { get; set; }
     public ICollection<AchievementData> Achievements { get; set; } = new List<AchievementData>();
     public ICollection<JobUpgradeData> JobUpgrades { get; set; } = new List<JobUpgradeData>();

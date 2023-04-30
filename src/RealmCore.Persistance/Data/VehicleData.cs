@@ -26,7 +26,7 @@ public sealed class VehicleData
     public bool Spawned { get; set; }
     public float Mileage { get; set; }
 
-    public ICollection<InventoryData>? Inventories { get; set; } = new List<InventoryData>();
+    public ICollection<InventoryData> Inventories { get; set; } = new List<InventoryData>();
     public ICollection<VehicleUserAccessData> UserAccesses { get; set; } = new List<VehicleUserAccessData>();
     public ICollection<VehicleUpgradeData> Upgrades { get; set; } = new List<VehicleUpgradeData>();
     public ICollection<VehicleFuelData> Fuels { get; set; } = new List<VehicleFuelData>();
