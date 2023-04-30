@@ -683,22 +683,43 @@ public sealed class PlayerElementComponent : PedElementComponent
     {
         ThrowIfDisposed();
 
-        if (blockMovement)
-            _player.ToggleAllControls(false, true, false);
 
-        switch (animation)
+        var walkEnabled = _player.Controls.WalkEnabled;
+        var fireEnabled = _player.Controls.FireEnabled;
+        var jumpEnabled = _player.Controls.JumpEnabled;
+        if (blockMovement)
         {
-            case Animation.ComplexLiftUp:
-                _player.SetAnimation("freeweights", "gym_free_pickup", TimeSpan.FromSeconds(3f), false, false, false, false, null, true);
-                await Task.Delay(TimeSpan.FromSeconds(3f));
-                _player.SetAnimation("CARRY", "crry_prtial", TimeSpan.FromSeconds(0.2f), true);
-                break;
-            default:
-                throw new NotSupportedException();
+            _player.Controls.WalkEnabled = false;
+            _player.Controls.FireEnabled = false;
+            _player.Controls.JumpEnabled = false;
         }
 
-        if (blockMovement)
-            _player.ToggleAllControls(true, true, false);
+        try
+        {
+            switch (animation)
+            {
+                case Animation.ComplexLiftUp:
+                    _player.SetAnimation("freeweights", "gym_free_pickup", TimeSpan.FromSeconds(3f), false, false, false, false, null, true);
+                    await Task.Delay(TimeSpan.FromSeconds(3f));
+                    _player.SetAnimation("CARRY", "crry_prtial", TimeSpan.FromSeconds(0.2f), true);
+                    break;
+                default:
+                    throw new NotSupportedException();
+            }
+        }
+        catch(Exception)
+        {
+            throw;
+        }
+        finally
+        {
+            if (blockMovement)
+            {
+                _player.Controls.WalkEnabled = walkEnabled;
+                _player.Controls.FireEnabled = fireEnabled;
+                _player.Controls.JumpEnabled = jumpEnabled;
+            }
+        }
     }
 
     public void StopAnimation()
@@ -774,8 +795,15 @@ public sealed class PlayerElementComponent : PedElementComponent
     {
         ThrowIfDisposed();
 
+        var walkEnabled = _player.Controls.WalkEnabled;
+        var fireEnabled = _player.Controls.FireEnabled;
+        var jumpEnabled = _player.Controls.JumpEnabled;
         if (blockMovement)
-            _player.ToggleAllControls(false, true, false);
+        {
+            _player.Controls.WalkEnabled = false;
+            _player.Controls.FireEnabled = false;
+            _player.Controls.JumpEnabled = false;
+        }
 
         try
         {
@@ -790,7 +818,11 @@ public sealed class PlayerElementComponent : PedElementComponent
         finally
         {
             if (blockMovement)
-                _player.ToggleAllControls(true, true, false);
+            {
+                _player.Controls.WalkEnabled = walkEnabled;
+                _player.Controls.FireEnabled = fireEnabled;
+                _player.Controls.JumpEnabled = jumpEnabled;
+            }
         }
     }
 
