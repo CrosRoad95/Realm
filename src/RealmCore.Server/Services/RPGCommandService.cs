@@ -1,4 +1,6 @@
-﻿using RealmCore.Logging;
+﻿using Polly;
+using Polly.RateLimit;
+using RealmCore.Logging;
 using System.Diagnostics;
 
 namespace RealmCore.Server.Services;
@@ -9,6 +11,7 @@ public class RPGCommandService
     {
         public Func<Entity, string[], Task> Callback { get; set; }
         public string[]? RequiredPolicies { get; set; }
+        public bool NoTracing { get; set; }
     }
 
     private class CommandInfo
@@ -21,16 +24,18 @@ public class RPGCommandService
     private readonly CommandService _commandService;
     private readonly IECS _ecs;
     private readonly IUsersService _rpgUserManager;
+    private readonly IPolicyDrivenCommandExecutor _policyDrivenCommandExecutor;
     private readonly ILogger<RPGCommandService> _logger;
 
     private readonly Dictionary<string, AsyncCommandInfo> _asyncCommands = new();
     private readonly Dictionary<string, CommandInfo> _commands = new();
-    public RPGCommandService(CommandService commandService, ILogger<RPGCommandService> logger, IECS ecs, IUsersService rpgUserManager)
+    public RPGCommandService(CommandService commandService, ILogger<RPGCommandService> logger, IECS ecs, IUsersService rpgUserManager, IPolicyDrivenCommandExecutor policyDrivenCommandExecutor)
     {
         _logger = logger;
         _commandService = commandService;
         _ecs = ecs;
         _rpgUserManager = rpgUserManager;
+        _policyDrivenCommandExecutor = policyDrivenCommandExecutor;
     }
 
     public bool AddAsyncCommandHandler(string commandName, Func<Entity, string[], Task> callback, string[]? requiredPolicies = null)
@@ -52,6 +57,7 @@ public class RPGCommandService
             RequiredPolicies = requiredPolicies
         });
         command.Triggered += HandleAsyncTriggered;
+
         return true;
     }
 
@@ -95,14 +101,11 @@ public class RPGCommandService
 
             var activity = new Activity("CommandHandler");
             activity.Start();
-            if (!commandInfo.NoTracing)
-            {
-                _logger.LogInformation("Begin command {commandText} execution with traceId={TraceId}", commandText, activity.GetTraceId());
-            }
             var start = Stopwatch.GetTimestamp();
 
-            using var _3 = LogContext.PushProperty("commandText", commandText);
-            using var _4 = LogContext.PushProperty("commandArguments", args.Arguments);
+            using var _1 = _logger.BeginEntity(entity);
+            using var _2 = LogContext.PushProperty("commandText", commandText);
+            using var _3 = LogContext.PushProperty("commandArguments", args.Arguments);
             if(!commandInfo.NoTracing)
                 _logger.LogInformation("Begin command {commandText} execution with traceId={TraceId}", commandText);
 
@@ -125,7 +128,18 @@ public class RPGCommandService
             }
             try
             {
-                commandInfo.Callback(entity, args.Arguments);
+                if(userComponent.HasClaim("commandsNoLimit"))
+                    commandInfo.Callback(entity, args.Arguments);
+                else
+                    _policyDrivenCommandExecutor.Execute(() =>
+                    {
+                        commandInfo.Callback(entity, args.Arguments);
+                    }, userComponent.Id.ToString());
+            }
+            catch (RateLimitRejectedException rateLimitRejectedException)
+            {
+                playerElementComponent.SendChatMessage("Zbyt szybko wysyłasz komendy. Poczekaj chwilę.");
+                _logger.LogError(rateLimitRejectedException, "Exception thrown while executing command {commandText} with arguments {commandArguments}", commandText, args.Arguments);
             }
             catch (Exception ex)
             {
@@ -164,14 +178,14 @@ public class RPGCommandService
 
             var activity = new Activity("CommandHandler");
             activity.Start();
-            _logger.LogInformation("Begin command {commandText} execution with traceId={TraceId}", commandText, activity.GetTraceId());
             var start = Stopwatch.GetTimestamp();
 
-            using var _1 = LogContext.PushProperty("serial", playerElementComponent.Client.Serial);
-            using var _2 = LogContext.PushProperty("userId", userComponent.Id);
-            using var _3 = LogContext.PushProperty("commandText", commandText);
-            using var _4 = LogContext.PushProperty("commandArguments", args.Arguments);
-            _logger.LogInformation("Begin command {commandText} execution with traceId={TraceId}", commandText);
+            using var _1 = _logger.BeginEntity(entity);
+            using var _2 = LogContext.PushProperty("commandText", commandText);
+            using var _3 = LogContext.PushProperty("commandArguments", args.Arguments);
+            if (!commandInfo.NoTracing)
+                _logger.LogInformation("Begin async command {commandText} execution with traceId={TraceId}", commandText);
+
             if (commandInfo.RequiredPolicies != null)
             {
                 foreach (var policy in commandInfo.RequiredPolicies)
@@ -188,7 +202,19 @@ public class RPGCommandService
                 _logger.LogInformation("{player} executed command {commandText} with no arguments.", entity);
             try
             {
-                await commandInfo.Callback(entity, args.Arguments);
+
+                if (userComponent.HasClaim("commandsNoLimit"))
+                    await commandInfo.Callback(entity, args.Arguments);
+                else
+                    await _policyDrivenCommandExecutor.ExecuteAsync(async () =>
+                    {
+                        await commandInfo.Callback(entity, args.Arguments);
+                    }, userComponent.Id.ToString());
+            }
+            catch (RateLimitRejectedException rateLimitRejectedException)
+            {
+                playerElementComponent.SendChatMessage("Zbyt szybko wysyłasz komendy. Poczekaj chwilę.");
+                _logger.LogError(rateLimitRejectedException, "Exception thrown while executing command {commandText} with arguments {commandArguments}", commandText, args.Arguments);
             }
             catch (Exception ex)
             {
@@ -196,7 +222,8 @@ public class RPGCommandService
             }
             finally
             {
-                _logger.LogInformation("Ended command {commandText} execution with traceId={TraceId} in {totalMiliseconds}miliseconds", commandText, activity.GetTraceId(), (Stopwatch.GetTimestamp() - start) / (float)TimeSpan.TicksPerMillisecond);
+                if (!commandInfo.NoTracing)
+                    _logger.LogInformation("Ended async command {commandText} execution with traceId={TraceId} in {totalMiliseconds}miliseconds", commandText, activity.GetTraceId(), (Stopwatch.GetTimestamp() - start) / (float)TimeSpan.TicksPerMillisecond);
                 activity.Stop();
             }
         }

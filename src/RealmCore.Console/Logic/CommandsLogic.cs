@@ -951,6 +951,19 @@ internal sealed class CommandsLogic
             _logger.LogInformation("no trace");
         }, null, true);
 
+        int counter = 0;
+        _commandService.AddCommandHandler("counter", (entity, args) =>
+        {
+            counter++;
+            _logger.LogInformation("Counter: {counter}", counter);
+        });
+
+        _commandService.AddAsyncCommandHandler("counterasync", async (entity, args) =>
+        {
+            counter++;
+            _logger.LogInformation("Counter: {counter}", counter);
+        });
+
         FontCollection collection = new();
         FontFamily family = collection.Add("Server/Fonts/Ratual.otf");
         Font font = family.CreateFont(24, FontStyle.Regular);

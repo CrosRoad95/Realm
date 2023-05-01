@@ -1,6 +1,4 @@
-﻿using RealmCore.Server.Logic.Defaults;
-
-namespace RealmCore.Server;
+﻿namespace RealmCore.Server;
 
 internal sealed class RPGServer : IRPGServer
 {
@@ -69,6 +67,10 @@ internal sealed class RPGServer : IRPGServer
         services.AddTransient<IRewardService, RewardService>();
         services.AddSingleton<IMapsService, MapsService>();
         services.AddSingleton<ISpawnMarkersService, SpawnMarkersService>();
+        #endregion
+
+        #region Policies
+        services.AddSingleton<IPolicyDrivenCommandExecutor, PolicyDrivenCommandExecutor>();
         #endregion
 
         services.AddTransient<IEntityFactory, EntityFactory>();
