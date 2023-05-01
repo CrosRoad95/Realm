@@ -946,6 +946,11 @@ internal sealed class CommandsLogic
             entity.GetRequiredComponent<PlayerElementComponent>().SendChatMessage("marker added2");
         });
 
+        _commandService.AddCommandHandler("testnotrace", (entity, args) =>
+        {
+            _logger.LogInformation("no trace");
+        }, null, true);
+
         FontCollection collection = new();
         FontFamily family = collection.Add("Server/Fonts/Ratual.otf");
         Font font = family.CreateFont(24, FontStyle.Regular);

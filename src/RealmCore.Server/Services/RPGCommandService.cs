@@ -1,4 +1,5 @@
 ﻿using RealmCore.Logging;
+using System.Diagnostics;
 
 namespace RealmCore.Server.Services;
 
@@ -14,6 +15,7 @@ public class RPGCommandService
     {
         public Action<Entity, string[]> Callback { get; set; }
         public string[]? RequiredPolicies { get; set; }
+        public bool NoTracing { get; set; }
     }
 
     private readonly CommandService _commandService;
@@ -53,7 +55,7 @@ public class RPGCommandService
         return true;
     }
 
-    public bool AddCommandHandler(string commandName, Action<Entity, string[]> callback, string[]? requiredPolicies = null)
+    public bool AddCommandHandler(string commandName, Action<Entity, string[]> callback, string[]? requiredPolicies = null, bool noTracing = false)
     {
         if (_commands.Keys.Any(x => string.Equals(x, commandName, StringComparison.OrdinalIgnoreCase)))
         {
@@ -69,7 +71,8 @@ public class RPGCommandService
         _commands.Add(commandName, new CommandInfo
         {
             Callback = callback,
-            RequiredPolicies = requiredPolicies
+            RequiredPolicies = requiredPolicies,
+            NoTracing = noTracing
         });
         command.Triggered += HandleTriggered;
         return true;
@@ -92,14 +95,17 @@ public class RPGCommandService
 
             var activity = new Activity("CommandHandler");
             activity.Start();
-            _logger.LogInformation("Begin command {commandText} execution with traceId={TraceId}", commandText, activity.GetTraceId());
+            if (!commandInfo.NoTracing)
+            {
+                _logger.LogInformation("Begin command {commandText} execution with traceId={TraceId}", commandText, activity.GetTraceId());
+            }
             var start = Stopwatch.GetTimestamp();
 
-            using var _1 = LogContext.PushProperty("serial", playerElementComponent.Client.Serial);
-            using var _2 = LogContext.PushProperty("userId", userComponent.Id);
             using var _3 = LogContext.PushProperty("commandText", commandText);
             using var _4 = LogContext.PushProperty("commandArguments", args.Arguments);
-            _logger.LogInformation("Begin command {commandText} execution with traceId={TraceId}", commandText);
+            if(!commandInfo.NoTracing)
+                _logger.LogInformation("Begin command {commandText} execution with traceId={TraceId}", commandText);
+
             if (commandInfo.RequiredPolicies != null)
             {
                 foreach (var policy in commandInfo.RequiredPolicies)
@@ -110,10 +116,13 @@ public class RPGCommandService
                     }
             }
 
-            if (args.Arguments.Any())
-                _logger.LogInformation("{player} executed command {commandText} with arguments {commandArguments}.", entity);
-            else
-                _logger.LogInformation("{player} executed command {commandText} with no arguments.", entity);
+            if (!commandInfo.NoTracing)
+            {
+                if (args.Arguments.Any())
+                    _logger.LogInformation("{player} executed command {commandText} with arguments {commandArguments}.", entity);
+                else
+                    _logger.LogInformation("{player} executed command {commandText} with no arguments.", entity);
+            }
             try
             {
                 commandInfo.Callback(entity, args.Arguments);
@@ -124,7 +133,10 @@ public class RPGCommandService
             }
             finally
             {
-                _logger.LogInformation("Ended command {commandText} execution with traceId={TraceId} in {totalMiliseconds}miliseconds", commandText, activity.GetTraceId(), (Stopwatch.GetTimestamp() - start) / (float)TimeSpan.TicksPerMillisecond);
+                if (!commandInfo.NoTracing)
+                {
+                    _logger.LogInformation("Ended command {commandText} execution with traceId={TraceId} in {totalMiliseconds}miliseconds", commandText, activity.GetTraceId(), (Stopwatch.GetTimestamp() - start) / (float)TimeSpan.TicksPerMillisecond);
+                }
                 activity.Stop();
             }
         }
