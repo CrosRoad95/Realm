@@ -1,6 +1,6 @@
 ﻿namespace RealmCore.Server.Components.Common;
 
-public class DurationBasedHoldInteractionComponent : InteractionComponent
+public abstract class DurationBasedHoldInteractionComponent : InteractionComponent
 {
     private readonly SemaphoreSlim _semaphore = new(1);
     public Entity? Owner { get; private set; }
@@ -10,12 +10,14 @@ public class DurationBasedHoldInteractionComponent : InteractionComponent
     public event Action<DurationBasedHoldInteractionComponent, Entity, TimeSpan>? InteractionStarted;
     public event Action<DurationBasedHoldInteractionComponent, Entity, bool>? InteractionCompleted;
 
+    public abstract TimeSpan Time { get; }
+
     public DurationBasedHoldInteractionComponent()
     {
 
     }
 
-    public async Task<bool> BeginInteraction(Entity owningEntity, TimeSpan timeSpan, CancellationToken cancellationToken = default)
+    public async Task<bool> BeginInteraction(Entity owningEntity, CancellationToken cancellationToken = default)
     {
         ThrowIfDisposed();
 
@@ -34,7 +36,7 @@ public class DurationBasedHoldInteractionComponent : InteractionComponent
             Owner.Disposed += HandleDisposed;
 
             _interactionTaskComplectionSource = new TaskCompletionSource();
-            _interactionTask = Task.Delay(timeSpan, cancellationToken);
+            _interactionTask = Task.Delay(Time, cancellationToken);
         }
         catch (Exception)
         {
@@ -45,7 +47,7 @@ public class DurationBasedHoldInteractionComponent : InteractionComponent
             _semaphore.Release();
         }
 
-        InteractionStarted?.Invoke(this, owningEntity, timeSpan);
+        InteractionStarted?.Invoke(this, owningEntity, Time);
         try
         {
             var finishedTask = await Task.WhenAny(_interactionTaskComplectionSource.Task, _interactionTask);

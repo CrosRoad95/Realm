@@ -385,12 +385,6 @@ internal sealed class CommandsLogic
         _commandService.AddCommandHandler("spawnbox2", (entity, args) =>
         {
             var objectEntity = _entityFactory.CreateObject(ObjectModel.Gunbox, entity.Transform.Position + new Vector3(4, 0, -0.65f), Vector3.Zero);
-            objectEntity.AddComponent<DurationBasedHoldInteractionComponent>();
-        });
-
-        _commandService.AddCommandHandler("spawnbox3", (entity, args) =>
-        {
-            var objectEntity = _entityFactory.CreateObject(ObjectModel.Gunbox, entity.Transform.Position + new Vector3(4, 0, -0.65f), Vector3.Zero);
             objectEntity.AddComponent<DurationBasedHoldInteractionWithRingEffectComponent>();
         });
 

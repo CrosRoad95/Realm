@@ -11,6 +11,8 @@ internal class DurationBasedHoldInteractionWithRingEffectComponent : DurationBas
     [Inject]
     private ILogger<DurationBasedHoldInteractionWithRingEffectComponent> Logger { get; set; } = default!;
 
+    public override TimeSpan Time => TimeSpan.FromSeconds(5);
+
     private readonly object _lock = new();
 
     private string? _ringId = null;

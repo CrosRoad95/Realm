@@ -85,7 +85,7 @@ internal sealed class PlayerGameplayLogic
                             };
                             try
                             {
-                                if (await durationBasedHoldInteractionComponent.BeginInteraction(playerEntity, TimeSpan.FromSeconds(3), token.Token))
+                                if (await durationBasedHoldInteractionComponent.BeginInteraction(playerEntity, token.Token))
                                 {
                                     playerEntity.GetRequiredComponent<PlayerElementComponent>().SendChatMessage("okk");
                                     _logger.LogInformation("Interaction completed");
