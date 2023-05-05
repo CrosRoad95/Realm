@@ -31,18 +31,23 @@ public class VehiclePartDamageComponent : Component
 
         if (state < 0)
             throw new ArgumentOutOfRangeException(nameof(state));
-        _partDamages.TryAdd(partId, state);
+        if (!_partDamages.TryAdd(partId, state))
+            throw new ArgumentException("Part id already added");
 
         if (state == 0)
             Update(partId);
     }
 
-    public void RemovePart(short partId)
+    public bool RemovePart(short partId)
     {
         ThrowIfDisposed();
 
         if (_partDamages.TryRemove(partId, out _))
+        {
             PartDestroyed?.Invoke(this, partId);
+            return true;
+        }
+        return false;
     }
 
     public void Modify(short partId, float difference)
