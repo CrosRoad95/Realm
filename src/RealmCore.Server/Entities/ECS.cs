@@ -20,7 +20,7 @@ internal sealed class ECS : IECS
             _entitiesLock.EnterWriteLock();
             var entities = new List<Entity>(_entities);
             _entitiesLock.ExitWriteLock();
-            return entities;
+            return entities.AsReadOnly();
         }
     }
 
@@ -42,7 +42,7 @@ internal sealed class ECS : IECS
             _entitiesLock.EnterWriteLock();
             var entities = new List<Entity>(_entities.Where(x => x.Tag == EntityTag.Player));
             _entitiesLock.ExitWriteLock();
-            return entities;
+            return entities.AsReadOnly();
         }
     }
 

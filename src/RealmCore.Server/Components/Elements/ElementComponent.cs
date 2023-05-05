@@ -1,7 +1,4 @@
-﻿using SlipeServer.Server.Elements;
-using System.Security.Principal;
-
-namespace RealmCore.Server.Components.Elements;
+﻿namespace RealmCore.Server.Components.Elements;
 
 public abstract class ElementComponent : Component
 {

@@ -271,13 +271,13 @@ public class VehicleElementComponent : ElementComponent
         _vehicle.HealthChanged += HandleHealthChanged;
         _vehicle.Blown += HandleBlown;
         _vehicle.PedEntered += HandlePedEntered;
-        _vehicle.PedLeft += handlePedLeft;
+        _vehicle.PedLeft += HandlePedLeft;
         base.Load();
     }
 
-    private void handlePedLeft(Element ped, VehicleLeftEventArgs e)
+    private void HandlePedLeft(Element ped, VehicleLeftEventArgs e)
     {
-        PedEntered?.Invoke(this, _ecs.GetByElement(ped));
+        PedLeft?.Invoke(this, _ecs.GetByElement(ped));
     }
 
     private void HandlePedEntered(Element ped, VehicleEnteredEventsArgs e)

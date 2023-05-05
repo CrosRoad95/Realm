@@ -57,26 +57,10 @@ public class MoneyComponent : Component
         _money = initialMoney;
     }
 
-    private decimal Truncate(decimal d, byte decimals)
-    {
-        decimal r = Math.Round(d, decimals);
-
-        if (d > 0 && r > d)
-        {
-            return r - new decimal(1, 0, 0, false, decimals);
-        }
-        else if (d < 0 && r < d)
-        {
-            return r + new decimal(1, 0, 0, false, decimals);
-        }
-
-        return r;
-    }
-
     private decimal Normalize(decimal amount)
     {
         var moneyPrecision = GameplayOptions.Value.MoneyPrecision;
-        return Truncate(amount, moneyPrecision);
+        return amount.Truncate(moneyPrecision);
     }
 
     public void GiveMoney(decimal amount)

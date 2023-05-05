@@ -11,7 +11,6 @@ using SlipeServer.Server.Elements;
 using SlipeServer.Server.Events;
 using SlipeServer.Server.Mappers;
 using SlipeServer.Server.Services;
-using System.Linq;
 
 namespace RealmCore.Resources.Admin;
 

@@ -11,9 +11,7 @@ public class DiscoveriesComponent : Component
         {
             ThrowIfDisposed();
             lock (_lock)
-            {
-                return new List<int>(_discoveries);
-            }
+                return new List<int>(_discoveries).AsReadOnly();
         }
     }
 

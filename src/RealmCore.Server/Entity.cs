@@ -23,7 +23,7 @@ public class Entity : IDisposable
             _componentsLock.EnterReadLock();
             var components = new List<Component>(_components);
             _componentsLock.ExitReadLock();
-            return components;
+            return components.AsReadOnly();
         }
     }
 
@@ -121,10 +121,17 @@ public class Entity : IDisposable
         return AddComponent(new TComponent());
     }
 
+    public TComponent AddComponentFromDI<TComponent>() where TComponent : Component
+    {
+        TComponent component = _serviceProvider.GetRequiredService<TComponent>();
+        return AddComponent(component);
+    }
+
     public TComponent AddComponent<TComponent>(TComponent component) where TComponent : Component
     {
         if (component is AsyncComponent)
             throw new ArgumentException("Can not add async component to non async entity");
+
         ThrowIfDisposed();
 
         if (component.Entity != null)

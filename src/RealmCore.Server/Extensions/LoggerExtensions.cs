@@ -1,6 +1,4 @@
-﻿using RealmCore.Server.Components.Elements;
-
-namespace RealmCore.Server.Extensions;
+﻿namespace RealmCore.Server.Extensions;
 
 public static class LoggerExtensions
 {

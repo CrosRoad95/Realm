@@ -16,9 +16,7 @@ public class VehicleUpgradesComponent : Component
         {
             ThrowIfDisposed();
             lock (_lock)
-            {
-                return new List<int>(_upgrades);
-            }
+                return new List<int>(_upgrades).AsReadOnly();
         }
     }
 
