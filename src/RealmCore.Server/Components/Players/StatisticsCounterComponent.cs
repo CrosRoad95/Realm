@@ -1,7 +1,7 @@
 ﻿namespace RealmCore.Server.Components.Players;
 
 [ComponentUsage(false)]
-public class StatisticsCounterComponent : Component
+public sealed class StatisticsCounterComponent : Component
 {
     private readonly ConcurrentDictionary<int, float> _stats = new ConcurrentDictionary<int, float>();
 
