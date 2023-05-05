@@ -199,6 +199,8 @@ public class VehicleElementComponent : ElementComponent
     public event Action<VehicleElementComponent, VehicleDoorStateChangedArgs>? DoorStateChanged;
     public event Action<VehicleElementComponent, float, float>? HealthChanged;
     public event Action<VehicleElementComponent>? Blown;
+    public event Action<VehicleElementComponent, Entity>? PedEntered;
+    public event Action<VehicleElementComponent, Entity>? PedLeft;
 
     public void BlowUp()
     {
@@ -268,7 +270,19 @@ public class VehicleElementComponent : ElementComponent
         _vehicle.DoorStateChanged += HandleDoorStateChanged;
         _vehicle.HealthChanged += HandleHealthChanged;
         _vehicle.Blown += HandleBlown;
+        _vehicle.PedEntered += HandlePedEntered;
+        _vehicle.PedLeft += handlePedLeft;
         base.Load();
+    }
+
+    private void handlePedLeft(Element ped, VehicleLeftEventArgs e)
+    {
+        PedEntered?.Invoke(this, _ecs.GetByElement(ped));
+    }
+
+    private void HandlePedEntered(Element ped, VehicleEnteredEventsArgs e)
+    {
+        PedEntered?.Invoke(this, _ecs.GetByElement(ped));
     }
 
     private void HandleBlown(Element sender)
