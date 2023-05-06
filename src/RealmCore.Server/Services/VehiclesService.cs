@@ -9,15 +9,17 @@ internal sealed class VehiclesService : IVehiclesService
     private readonly IEntityFactory _entityFactory;
     private readonly ISaveService _saveService;
     private readonly ItemsRegistry _itemsRegistry;
+    private readonly IVehicleEventRepository _vehicleEventRepository;
     private readonly IDateTimeProvider _dateTimeProvider;
     private readonly JsonSerializerSettings _jsonSerializerSettings;
 
-    public VehiclesService(IVehicleRepository vehicleRepository, IEntityFactory entityFactory, ISaveService saveService, ItemsRegistry itemsRegistry, IDateTimeProvider dateTimeProvider)
+    public VehiclesService(IVehicleRepository vehicleRepository, IEntityFactory entityFactory, ISaveService saveService, ItemsRegistry itemsRegistry, IVehicleEventRepository vehicleEventRepository, IDateTimeProvider dateTimeProvider)
     {
         _vehicleRepository = vehicleRepository;
         _entityFactory = entityFactory;
         _saveService = saveService;
         _itemsRegistry = itemsRegistry;
+        _vehicleEventRepository = vehicleEventRepository;
         _dateTimeProvider = dateTimeProvider;
 
         _jsonSerializerSettings = new JsonSerializerSettings
@@ -124,4 +126,19 @@ internal sealed class VehiclesService : IVehiclesService
 
         return entity;
     }
+
+    public async Task AddVehicleEvent(int id, int eventId)
+    {
+        _vehicleEventRepository.AddEvent(id, eventId, _dateTimeProvider.Now);
+        await _vehicleEventRepository.Commit();
+    }
+
+    public async Task AddVehicleEvent(Entity entity, int eventId)
+    {
+        await AddVehicleEvent(entity.GetRequiredComponent<PrivateVehicleComponent>().Id, eventId);
+    }
+
+    public Task<List<VehicleEventDTO>> GetAllVehicleEvents(int id) => _vehicleEventRepository.GetAllEventsByVehicleId(id);
+
+    public Task<List<VehicleEventDTO>> GetAllVehicleEvents(Entity entity) => _vehicleEventRepository.GetAllEventsByVehicleId(entity.GetRequiredComponent<PrivateVehicleComponent>().Id);
 }

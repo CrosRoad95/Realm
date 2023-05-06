@@ -958,6 +958,22 @@ internal sealed class CommandsLogic
             _logger.LogInformation("Counter: {counter}", counter);
         });
 
+        _commandService.AddAsyncCommandHandler("addvehevent", async (entity, args) =>
+        {
+            await _vehiclesService.AddVehicleEvent(entity.GetRequiredComponent<PlayerElementComponent>().OccupiedVehicle, 1);
+        });
+
+        _commandService.AddAsyncCommandHandler("vehevents", async (entity, args) =>
+        {
+            var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();
+            var events = await _vehiclesService.GetAllVehicleEvents(playerElementComponent.OccupiedVehicle);
+            playerElementComponent.SendChatMessage("Events:");
+            foreach (var item in events)
+            {
+                playerElementComponent.SendChatMessage($"Event: {item.DateTime} - {item.EventType}");
+            }
+        });
+
         FontCollection collection = new();
         FontFamily family = collection.Add("Server/Fonts/Ratual.otf");
         Font font = family.CreateFont(24, FontStyle.Regular);

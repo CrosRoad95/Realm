@@ -783,6 +783,28 @@ namespace RealmCore.Persistance.SQLite.Migrations
                     b.ToTable("VehicleEngines", (string)null);
                 });
 
+            modelBuilder.Entity("RealmCore.Persistance.Data.VehicleEventData", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTime>("DateTime")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("EventType")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("VehicleId")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("VehicleId");
+
+                    b.ToTable("VehicleEvents", (string)null);
+                });
+
             modelBuilder.Entity("RealmCore.Persistance.Data.VehicleFuelData", b =>
                 {
                     b.Property<int>("VehicleId")
@@ -1132,6 +1154,15 @@ namespace RealmCore.Persistance.SQLite.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("RealmCore.Persistance.Data.VehicleEventData", b =>
+                {
+                    b.HasOne("RealmCore.Persistance.Data.VehicleData", null)
+                        .WithMany("VehicleEvents")
+                        .HasForeignKey("VehicleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("RealmCore.Persistance.Data.VehicleFuelData", b =>
                 {
                     b.HasOne("RealmCore.Persistance.Data.VehicleData", null)
@@ -1262,6 +1293,8 @@ namespace RealmCore.Persistance.SQLite.Migrations
                     b.Navigation("UserAccesses");
 
                     b.Navigation("VehicleEngines");
+
+                    b.Navigation("VehicleEvents");
 
                     b.Navigation("VehicleInventories");
                 });

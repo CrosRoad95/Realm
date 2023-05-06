@@ -34,6 +34,7 @@ public abstract class Db<T> : IdentityDbContext<UserData, RoleData, int,
     public DbSet<VehicleEngineData> VehicleEngines => Set<VehicleEngineData>();
     public DbSet<UserInventoryData> UserInventories => Set<UserInventoryData>();
     public DbSet<VehicleInventoryData> VehicleInventories => Set<VehicleInventoryData>();
+    public DbSet<VehicleEventData> VehicleEvents => Set<VehicleEventData>();
 
     public Db(DbContextOptions<T> options) : base(options)
     {
@@ -194,6 +195,14 @@ public abstract class Db<T> : IdentityDbContext<UserData, RoleData, int,
             entityBuilder
                 .ToTable(nameof(VehicleInventories))
                 .HasKey(x => new { x.VehicleId, x.InventoryId });
+        });
+        
+
+        modelBuilder.Entity<VehicleEventData>(entityBuilder =>
+        {
+            entityBuilder
+                .ToTable(nameof(VehicleEvents))
+                .HasKey(x => x.Id);
         });
 
         modelBuilder.Entity<DailyVisitsData>(entityBuilder =>
@@ -428,6 +437,12 @@ public abstract class Db<T> : IdentityDbContext<UserData, RoleData, int,
                     .HasOne(z => z.Vehicle)
                     .WithMany(z => z.VehicleInventories)
                     .HasForeignKey(z => z.VehicleId));
+
+            entityBuilder
+                .HasMany(x => x.VehicleEvents)
+                .WithOne()
+                .HasForeignKey(x => x.VehicleId);
+
         });
 
         modelBuilder.Entity<VehicleUserAccessData>(entityBuilder =>

@@ -33,5 +33,6 @@ public sealed class VehicleData
     public ICollection<VehiclePartDamageData> PartDamages { get; set; } = new List<VehiclePartDamageData>();
     public ICollection<VehicleEngineData> VehicleEngines { get; set; } = new List<VehicleEngineData>();
     public ICollection<VehicleInventoryData> VehicleInventories = new List<VehicleInventoryData>();
+    public ICollection<VehicleEventData> VehicleEvents = new List<VehicleEventData>();
 #pragma warning restore CS8618
 }
