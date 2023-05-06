@@ -6,15 +6,27 @@ public class PrivateVehicleComponent : Component
 {
     private readonly VehicleData _vehicleData;
 
-    internal int Id => _vehicleData.Id;
+    public int Id => _vehicleData.Id;
 
+    private readonly object _lock = new();
     private List<VehiclePlayerAccess> _vehiclePlayerAccesses = new();
     public IReadOnlyList<VehiclePlayerAccess> PlayerAccesses
     {
         get
         {
             ThrowIfDisposed();
-            return new List<VehiclePlayerAccess>(_vehiclePlayerAccesses);
+            lock (_lock)
+                return new List<VehiclePlayerAccess>(_vehiclePlayerAccesses);
+        }
+    }
+
+    public IReadOnlyList<VehiclePlayerAccess> Owners
+    {
+        get
+        {
+            ThrowIfDisposed();
+            lock (_lock)
+                return new List<VehiclePlayerAccess>(_vehiclePlayerAccesses.Where(x => x.AccessType == 0));
         }
     }
 
@@ -86,13 +98,25 @@ public class PrivateVehicleComponent : Component
             throw new InvalidOperationException();
 
         var userId = entity.GetRequiredComponent<UserComponent>().Id;
-        var index = _vehiclePlayerAccesses.FindIndex(x => x.UserId == userId);
-        if (index >= 0)
+        lock (_lock)
         {
-            vehicleAccess = _vehiclePlayerAccesses[index];
-            return true;
+            var index = _vehiclePlayerAccesses.FindIndex(x => x.UserId == userId);
+            if (index >= 0)
+            {
+                vehicleAccess = _vehiclePlayerAccesses[index];
+                return true;
+            }
         }
         vehicleAccess = default;
+        return false;
+    }
+
+    public bool HasAccess(Entity entity)
+    {
+        if(TryGetAccess(entity, out VehiclePlayerAccess vehiclePlayerAccess))
+        {
+            return true;
+        }
         return false;
     }
 
@@ -106,13 +130,16 @@ public class PrivateVehicleComponent : Component
         if (TryGetAccess(entity, out var _))
             throw new EntityAccessDefinedException();
 
-        _vehiclePlayerAccesses.Add(new VehiclePlayerAccess
+        lock (_lock)
         {
-            UserId = entity.GetRequiredComponent<UserComponent>().Id,
-            AccessType = accessType,
-            CustomValue = customValue
-        });
-        return _vehiclePlayerAccesses.Last();
+            _vehiclePlayerAccesses.Add(new VehiclePlayerAccess
+            {
+                UserId = entity.GetRequiredComponent<UserComponent>().Id,
+                AccessType = accessType,
+                CustomValue = customValue
+            });
+            return _vehiclePlayerAccesses.Last();
+        }
     }
 
     public VehiclePlayerAccess AddAsOwner(Entity entity, string? customValue = null)

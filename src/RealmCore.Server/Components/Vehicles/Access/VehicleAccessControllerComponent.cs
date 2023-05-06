@@ -1,4 +1,4 @@
-﻿namespace RealmCore.Server.Components.Vehicles;
+﻿namespace RealmCore.Server.Components.Vehicles.Access;
 
 public abstract class VehicleAccessControllerComponent : Component
 {
