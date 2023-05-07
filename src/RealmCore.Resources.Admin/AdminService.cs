@@ -64,6 +64,16 @@ internal sealed class AdminService : IAdminService
 
     public void BroadcastClearSpawnMarkersForPlayer(Player player)
     {
-        MessageHandler?.Invoke(new ClearEntitiesForPlayerMessage(player));
+        MessageHandler?.Invoke(new ClearSpawnMarkersForPlayerMessage(player));
+    }
+
+    public void BroadcastEntitiesComponents(Player player, LuaValue entitiesComponents)
+    {
+        MessageHandler?.Invoke(new UpdateEntitiesComponentsMessage(player, entitiesComponents));
+    }
+
+    public void BroadcastClearEntitiesComponents(Player player)
+    {
+        MessageHandler?.Invoke(new ClearEntitiesComponentsMessage(player));
     }
 }

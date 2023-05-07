@@ -10,4 +10,6 @@ public interface IAdminEventHub
     void ClearEntities();
     void SetSpawnMarkers(IEnumerable<LuaValue> spawnMarkers);
     void ClearSpawnMarkers();
+    void UpdateEntitiesComponents(LuaValue entitiesComponents);
+    void ClearEntitiesComponents();
 }

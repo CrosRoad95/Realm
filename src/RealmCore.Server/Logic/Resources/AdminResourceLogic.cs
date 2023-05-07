@@ -52,6 +52,27 @@ internal sealed class AdminResourceLogic
         }
     }
 
+    private LuaValue GetDebugComponent(Component component)
+    {
+        var data = new Dictionary<LuaValue, LuaValue>
+        {
+            ["name"] = component.GetType().Name
+        };
+        if(component is ILuaDebugDataProvider luaDebugDataProvider)
+        {
+            data["data"] = luaDebugDataProvider.GetLuaDebugData();
+        }
+
+        return new LuaValue(data);
+    }
+
+    private List<LuaValue> GetDebugComponents(Entity entity)
+    {
+        return entity.Components
+            .Select(GetDebugComponent)
+            .ToList();
+    }
+
     private void InternalHandleToolStateChanged(Player player, AdminTool adminTool, bool state)
     {
         switch (adminTool)
@@ -70,6 +91,19 @@ internal sealed class AdminResourceLogic
                     }));
                 else
                     _adminService.BroadcastClearEntityForPlayer(player);
+                break;
+            case AdminTool.Components:
+                if (state)
+                {
+                    var components = new Dictionary<LuaValue, LuaValue>();
+                    foreach (var item in _ecs.Entities)
+                    {
+                        components[item.Id] = new LuaValue(GetDebugComponents(item));
+                    }
+                    _adminService.BroadcastEntitiesComponents(player, new LuaValue(components));
+                } 
+                else
+                    _adminService.BroadcastClearEntitiesComponents(player);
                 break;
             case AdminTool.ShowSpawnMarkers:
                 if(state)

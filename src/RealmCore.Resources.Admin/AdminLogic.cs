@@ -120,7 +120,13 @@ internal class AdminLogic
                 break;
             case ClearSpawnMarkersForPlayerMessage clearSpawnMarkersForPlayerMessage:
                 _luaEventHub.Invoke(clearSpawnMarkersForPlayerMessage.Player, x => x.ClearSpawnMarkers());
-
+                break;
+            case UpdateEntitiesComponentsMessage updateEntitiesComponentsMessage:
+                var components = updateEntitiesComponentsMessage.entitiesComponents;
+                _luaEventHub.Invoke(updateEntitiesComponentsMessage.Player, x => x.UpdateEntitiesComponents(components));
+                break;
+            case ClearEntitiesComponentsMessage clearEntitiesComponentsMessage:
+                _luaEventHub.Invoke(clearEntitiesComponentsMessage.Player, x => x.ClearEntitiesComponents());
                 break;
             default:
                 throw new NotImplementedException();

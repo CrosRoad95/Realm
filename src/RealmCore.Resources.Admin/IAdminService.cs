@@ -22,4 +22,6 @@ public interface IAdminService
     void BroadcastClearEntityForPlayer(Player player);
     void BroadcastSpawnMarkersForPlayer(Player player, IEnumerable<LuaValue> entitiesDebugInfo);
     void BroadcastClearSpawnMarkersForPlayer(Player player);
+    void BroadcastEntitiesComponents(Player player, LuaValue entitiesComponents);
+    void BroadcastClearEntitiesComponents(Player player);
 }

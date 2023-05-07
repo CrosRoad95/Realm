@@ -4,6 +4,7 @@ local enabledTools = {}
 local entities = {}
 local spawnMarkers = {}
 local toolIdsInUse = {}
+local entitiesComponents = {}
 
 function getEntities()
     return entities;
@@ -11,6 +12,10 @@ end
 
 function getSpawnMarkers()
     return spawnMarkers;
+end
+
+function getEntitiesComponents()
+    return entitiesComponents;
 end
 
 addEvent("internalOnAdminModeEnabled", false)
@@ -120,6 +125,14 @@ function handleClearSpawnMarkers()
     spawnMarkers = {};
 end
 
+function handleUpdateEntitiesComponents(data)
+    entitiesComponents = data;
+end
+
+function handleClearEntitiesComponents()
+    entitiesComponents = {}
+end
+
 addEventHandler("onClientResourceStart", resourceRoot, function()
 	hubBind("SetAdminEnabled", handleSetAdminEnabled)
 	hubBind("SetTools", handleSetTools)
@@ -127,4 +140,6 @@ addEventHandler("onClientResourceStart", resourceRoot, function()
 	hubBind("ClearEntities", handleClearEntities)
 	hubBind("SetSpawnMarkers", handleSetSpawnMarkers)
 	hubBind("ClearSpawnMarkers", handleClearSpawnMarkers)
+	hubBind("UpdateEntitiesComponents", handleUpdateEntitiesComponents)
+	hubBind("ClearEntitiesComponents", handleClearEntitiesComponents)
 end)

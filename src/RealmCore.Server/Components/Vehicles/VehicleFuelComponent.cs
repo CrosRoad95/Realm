@@ -1,6 +1,6 @@
 ﻿namespace RealmCore.Server.Components.Vehicles;
 
-public class VehicleFuelComponent : Component
+public class VehicleFuelComponent : Component, ILuaDebugDataProvider
 {
     public event Action<VehicleFuelComponent>? FuelRanOut;
 
@@ -174,5 +174,13 @@ public class VehicleFuelComponent : Component
             vehicle.IsEngineOn = false;
             FuelRanOut?.Invoke(this);
         }
+    }
+
+    public LuaValue GetLuaDebugData()
+    {
+        return new LuaValue(new Dictionary<LuaValue, LuaValue>
+        {
+            ["Paliwo"] = $"{_amount:0.00}/{_maxCapacity}"
+        });
     }
 }

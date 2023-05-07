@@ -67,7 +67,11 @@ local function drawEntities()
 						delta = debugTextScreenMaxDistance / math.max(debugTextScreenMaxDistance, calculateDistanceToScreenCenter(sx2,sy2), 0)
 						alpha = getEasingValue(delta, "OutQuad") * 255
 						if(cameraDistance < 10)then
-							debugText = string.format("Id: %s\nNazwa: %s", v.debugId, v.name)
+							if(isComponentDrawingEnabled())then
+								debugText = string.format("Id: %s\nNazwa: %s\n%s", v.debugId, v.name, getComponents(v.debugId))
+							else
+								debugText = string.format("Id: %s\nNazwa: %s", v.debugId, v.name)
+							end
 							fontSize = 1.5
 						elseif(cameraDistance < 100)then
 							debugText = string.format("Id: %s\nNazwa: %s", string.sub(v.debugId, 1, 8), v.name)
@@ -81,7 +85,7 @@ local function drawEntities()
 						if(debugText)then
 							local colorCoded = false
 							if(cameraDistance < 20)then
-								tx,ty = dxGetTextSize (debugText, 0, fontSize, 1, "sans", false, colorCoded)
+								tx,ty = dxGetTextSize(debugText, 0, fontSize, 1, "sans", false, colorCoded)
 								dxDrawRectangle(sx - 4, sy - 4, 8, 8, v.color)
 								if((sx - sx2 - tx/2) > 0)then
 									dxDrawLine(sx, sy, sx2 + tx, sy2, v.color, 2, false)
