@@ -10,7 +10,7 @@ public class ECSTests
     public ECSTests()
     {
         var services = new ServiceCollection();
-        _ecs = new ECS(services.BuildServiceProvider(), _elementCollection.Object);
+        _ecs = new ECS(services.BuildServiceProvider(), _elementCollection.Object, null);
     }
 
     [Fact]
