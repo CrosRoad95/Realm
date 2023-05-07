@@ -10,8 +10,10 @@ internal sealed class ECS : IECS
     private readonly ConcurrentDictionary<Element, Entity> _entityByElement = new();
     private readonly ConcurrentDictionary<string, Entity> _entityById = new();
     private readonly ConcurrentDictionary<string, Entity> _entityByName = new();
+    private readonly ConcurrentDictionary<int, Entity> _vehicleById = new();
     private readonly IServiceProvider _serviceProvider;
     private readonly IElementCollection _elementCollection;
+    private readonly ILogger<ECS> _logger;
 
     public IReadOnlyCollection<Entity> Entities
     {
@@ -48,10 +50,11 @@ internal sealed class ECS : IECS
 
     public event Action<Entity>? EntityCreated;
 
-    public ECS(IServiceProvider serviceProvider, IElementCollection elementCollection)
+    public ECS(IServiceProvider serviceProvider, IElementCollection elementCollection, ILogger<ECS> logger)
     {
         _serviceProvider = serviceProvider;
         _elementCollection = elementCollection;
+        _logger = logger;
     }
 
     public Entity GetEntityByPlayer(Player player)
@@ -146,6 +149,26 @@ internal sealed class ECS : IECS
             _entityByPlayer[playerElementComponent.Player] = component.Entity;
             component.Entity.Disposed += HandlePlayerEntityDestroyed;
         }
+
+        switch(component)
+        {
+            case PrivateVehicleComponent vehicleComponent:
+                if(_vehicleById.TryAdd(vehicleComponent.Id, component.Entity))
+                {
+                    component.Entity.Disposed += HandleVehicleEntityDisposed;
+                }
+                else
+                {
+                    _logger.LogWarning("Duplicated private vehicle component {vehicleId}", vehicleComponent.Id);
+                }
+                break;
+        }
+    }
+
+    private void HandleVehicleEntityDisposed(Entity entity)
+    {
+        _vehicleById.TryRemove(entity.GetRequiredComponent<PrivateVehicleComponent>().Id, out _);
+        entity.Disposed += HandleVehicleEntityDisposed;
     }
 
     private void HandleElementEntityDestroyed(Entity elementEntity)
@@ -169,6 +192,7 @@ internal sealed class ECS : IECS
 
     public bool GetEntityById(string id, out Entity? entity) => _entityById.TryGetValue(id, out entity);
     public bool GetEntityByName(string name, out Entity? entity) => _entityByName.TryGetValue(name, out entity);
+    public bool GetVehicleById(int id, out Entity? entity) => _vehicleById.TryGetValue(id, out entity);
 
     public IEnumerable<Entity> GetWithinRange(Vector3 position, float range)
     {

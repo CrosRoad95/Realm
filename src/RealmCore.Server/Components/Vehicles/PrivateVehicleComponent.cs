@@ -7,7 +7,14 @@ public class PrivateVehicleComponent : Component
     private readonly VehicleData _vehicleData;
 
     public int Id => _vehicleData.Id;
-
+    public byte Kind
+    {
+        get => _vehicleData.Kind;
+        internal set
+        {
+            _vehicleData.Kind = value;
+        }
+    }
     private readonly object _lock = new();
     private List<VehiclePlayerAccess> _vehiclePlayerAccesses = new();
     public IReadOnlyList<VehiclePlayerAccess> PlayerAccesses

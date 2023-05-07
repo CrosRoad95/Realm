@@ -12,6 +12,8 @@ public interface IVehiclesService
     Task<List<VehicleEventDTO>> GetAllVehicleEvents(Entity entity);
     Task<List<LightInfoVehicleDTO>> GetLightVehiclesByUserId(int userId);
     Task<List<VehicleData>> GetVehiclesByUserId(int userId);
+    Task<bool> SetVehicleKind(int id, byte kind);
+    Task<bool> SetVehicleKind(Entity vehicleEntity, byte kind);
     Task<Entity?> SpawnById(int id);
     internal Entity Spawn(VehicleData vehicleData);
 }

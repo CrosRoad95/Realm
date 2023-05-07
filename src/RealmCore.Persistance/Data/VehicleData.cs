@@ -25,6 +25,7 @@ public sealed class VehicleData
     public DateTime CreatedAt { get; set; }
     public bool Spawned { get; set; }
     public float Mileage { get; set; }
+    public byte Kind { get; set; }
 
     public ICollection<InventoryData> Inventories { get; set; } = new List<InventoryData>();
     public ICollection<VehicleUserAccessData> UserAccesses { get; set; } = new List<VehicleUserAccessData>();

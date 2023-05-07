@@ -8,5 +8,6 @@ public interface IVehicleRepository : IRepositoryBase
     Task<VehicleData?> GetReadOnlyVehicleById(int id);
     Task<List<VehicleData>> GetVehiclesByUserId(int userId);
     Task<bool> IsSpawned(int id);
+    Task<bool> SetKind(int id, byte kind);
     Task<bool> SetSpawned(int id, bool spawned);
 }

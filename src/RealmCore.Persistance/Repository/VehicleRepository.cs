@@ -79,6 +79,16 @@ internal class VehicleRepository : IVehicleRepository
         var result = await query.ExecuteUpdateAsync(x => x.SetProperty(y => y.Spawned, spawned));
         return result > 0;
     }
+    
+    public async Task<bool> SetKind(int id, byte kind)
+    {
+        var query = _db.Vehicles
+            .TagWithSource(nameof(VehicleRepository))
+            .Where(x => x.Id == id);
+
+        var result = await query.ExecuteUpdateAsync(x => x.SetProperty(y => y.Kind, kind));
+        return result > 0;
+    }
 
     public async Task<bool> IsSpawned(int id)
     {

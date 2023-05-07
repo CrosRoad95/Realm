@@ -953,6 +953,19 @@ internal sealed class CommandsLogic
             _logger.LogInformation("Counter: {counter}", counter);
         });
 
+        _commandService.AddAsyncCommandHandler("setkind", async (entity, args) =>
+        {
+            await _vehiclesService.SetVehicleKind(entity.GetRequiredComponent<PlayerElementComponent>().OccupiedVehicle, 42);
+        });
+        
+        _commandService.AddAsyncCommandHandler("kind", async (entity, args) =>
+        {
+            var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();
+            var veh = playerElementComponent.OccupiedVehicle;
+            var kind = veh.GetRequiredComponent<PrivateVehicleComponent>().Kind;
+            playerElementComponent.SendChatMessage($"Kind: {kind}");
+        });
+
         _commandService.AddAsyncCommandHandler("counterasync", async (entity, args) =>
         {
             counter++;

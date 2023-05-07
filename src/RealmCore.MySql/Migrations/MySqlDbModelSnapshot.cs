@@ -692,6 +692,9 @@ namespace RealmCore.Persistance.MySql.Migrations
                         .HasColumnType("tinyint(1)")
                         .HasDefaultValue(false);
 
+                    b.Property<byte>("Kind")
+                        .HasColumnType("tinyint unsigned");
+
                     b.Property<bool>("LandingGearDown")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("tinyint(1)")

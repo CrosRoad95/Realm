@@ -11,9 +11,10 @@ internal sealed class VehiclesService : IVehiclesService
     private readonly ItemsRegistry _itemsRegistry;
     private readonly IVehicleEventRepository _vehicleEventRepository;
     private readonly IDateTimeProvider _dateTimeProvider;
+    private readonly IECS _ecs;
     private readonly JsonSerializerSettings _jsonSerializerSettings;
 
-    public VehiclesService(IVehicleRepository vehicleRepository, IEntityFactory entityFactory, ISaveService saveService, ItemsRegistry itemsRegistry, IVehicleEventRepository vehicleEventRepository, IDateTimeProvider dateTimeProvider)
+    public VehiclesService(IVehicleRepository vehicleRepository, IEntityFactory entityFactory, ISaveService saveService, ItemsRegistry itemsRegistry, IVehicleEventRepository vehicleEventRepository, IDateTimeProvider dateTimeProvider, IECS ecs)
     {
         _vehicleRepository = vehicleRepository;
         _entityFactory = entityFactory;
@@ -21,7 +22,7 @@ internal sealed class VehiclesService : IVehiclesService
         _itemsRegistry = itemsRegistry;
         _vehicleEventRepository = vehicleEventRepository;
         _dateTimeProvider = dateTimeProvider;
-
+        _ecs = ecs;
         _jsonSerializerSettings = new JsonSerializerSettings
         {
             Converters = new List<JsonConverter> { new DoubleConverter() }
@@ -82,6 +83,17 @@ internal sealed class VehiclesService : IVehiclesService
             return Spawn(vehicle);
         }
         return null;
+    }
+
+    public Task<bool> SetVehicleKind(Entity vehicleEntity, byte kind)
+        => SetVehicleKind(vehicleEntity.GetRequiredComponent<PrivateVehicleComponent>().Id, kind);
+
+    public Task<bool> SetVehicleKind(int id, byte kind)
+    {
+        if(_ecs.GetVehicleById(id, out var entity))
+            entity.GetRequiredComponent<PrivateVehicleComponent>().Kind = kind;
+
+        return _vehicleRepository.SetKind(id, kind);
     }
 
     public Entity Spawn(VehicleData vehicleData)
