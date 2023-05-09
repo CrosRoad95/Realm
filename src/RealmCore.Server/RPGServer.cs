@@ -1,4 +1,6 @@
-﻿namespace RealmCore.Server;
+﻿using Microsoft.Extensions.Localization;
+
+namespace RealmCore.Server;
 
 internal sealed class RPGServer : IRPGServer
 {
@@ -44,6 +46,19 @@ internal sealed class RPGServer : IRPGServer
         services.AddSingleton<RPGCommandService>();
         #endregion
 
+        #region Localization
+        var supportedCultures = new[]
+        {
+            new CultureInfo("pl-PL"),
+            new CultureInfo("en-US")
+        };
+
+        services.AddLocalization(options => options.ResourcesPath = "Resources");
+        services.AddSingleton<IStringLocalizerFactory, ResourceManagerStringLocalizerFactory>();
+        services.AddSingleton(typeof(IStringLocalizer<>), typeof(StringLocalizer<>));
+
+        #endregion
+
         #region Registries
         services.AddSingleton<ItemsRegistry>();
         services.AddSingleton<VehicleUpgradeRegistry>();
@@ -87,6 +102,7 @@ internal sealed class RPGServer : IRPGServer
         return _server.GetRequiredService<TService>();
     }
 
+    IStringLocalizer<RPGServer>? _stringLocalizer;
     public async Task Start()
     {
         await GetRequiredService<IDb>().MigrateAsync();
@@ -95,8 +111,13 @@ internal sealed class RPGServer : IRPGServer
         _server.Start();
         await GetRequiredService<ILoadService>().LoadAll();
 
+        var gameplayOptions = GetRequiredService<IOptions<GameplayOptions>>();
+        CultureInfo.CurrentCulture = gameplayOptions.Value.Culture;
+        CultureInfo.CurrentUICulture = gameplayOptions.Value.Culture;
+        _stringLocalizer = GetRequiredService<IStringLocalizer<RPGServer>>();
+
         ServerStarted?.Invoke();
-        _logger.LogInformation("Server started.");
+        _logger.LogInformation(_stringLocalizer.GetOr("ServerStarted", "Server started."));
     }
 
     private async Task BuildFromSeedFiles()
@@ -107,7 +128,7 @@ internal sealed class RPGServer : IRPGServer
 
     public async Task Stop()
     {
-        _logger.LogInformation("Server stopping.");
+        _logger.LogInformation(_stringLocalizer.GetOr("ServerStopping", "Server stopping."));
         int i = 0;
         var saveService = GetRequiredService<ISaveService>();
 
@@ -122,7 +143,7 @@ internal sealed class RPGServer : IRPGServer
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Failed to save entity.");
+                _logger.LogError(ex, _stringLocalizer.GetOr("FailedToSaveEntity", "Failed to save entity."));
             }
             finally
             {
@@ -135,11 +156,11 @@ internal sealed class RPGServer : IRPGServer
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Failed to save entities.");
+            _logger.LogError(ex, _stringLocalizer.GetOr("FailedToSaveEntity", "Failed to save entities."));
         }
 
         await Task.Delay(500);
         _server.Stop();
-        _logger.LogInformation("Server stopped, saved: {amount} entities.", i);
+        _logger.LogInformation(_stringLocalizer.GetOr("ServerStopped", "Server stopped, saved: {amount} entities."), i);
     }
 }

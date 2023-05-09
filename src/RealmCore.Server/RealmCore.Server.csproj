@@ -46,4 +46,28 @@
 	<ProjectReference Include="..\RealmCore.Logging\RealmCore.Logging.csproj" />
 	<ProjectReference Include="..\RealmCore.SQLite\RealmCore.SQLite.csproj" />
   </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="Resources\RPGServer.en-US.Designer.cs">
+      <DependentUpon>RPGServer.en-US.resx</DependentUpon>
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+    </Compile>
+    <Compile Update="Resources\RPGServer.pl-PL.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>RPGServer.pl-PL.resx</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Update="Resources\RPGServer.en-US.resx">
+      <LastGenOutput>RPGServer.en-US.Designer.cs</LastGenOutput>
+      <Generator>ResXFileCodeGenerator</Generator>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Resources\RPGServer.pl-PL.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>RPGServer.pl-PL.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
 </Project>
