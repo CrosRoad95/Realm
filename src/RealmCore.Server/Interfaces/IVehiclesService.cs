@@ -10,6 +10,7 @@ public interface IVehiclesService
     Task Despawn(Entity entity);
     Task<List<VehicleEventDTO>> GetAllVehicleEvents(int id);
     Task<List<VehicleEventDTO>> GetAllVehicleEvents(Entity entity);
+    Task<LightInfoVehicleDTO?> GetLightVehicleById(int vehicleId);
     Task<List<LightInfoVehicleDTO>> GetLightVehiclesByUserId(int userId);
     Task<List<VehicleData>> GetVehiclesByUserId(int userId);
     Task<bool> SetVehicleKind(int id, byte kind);

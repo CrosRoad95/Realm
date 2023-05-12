@@ -38,6 +38,22 @@ internal class VehicleRepository : IVehicleRepository
 
         return query.ToListAsync();
     }
+    
+    public Task<LightInfoVehicleDTO?> GetLightVehicleById(int vehicleId)
+    {
+        var query = _db.Vehicles
+            .TagWithSource(nameof(VehicleRepository))
+            .AsNoTrackingWithIdentityResolution()
+            .Where(x => x.Id == vehicleId)
+            .Select(x => new LightInfoVehicleDTO
+            {
+                Id = x.Id,
+                Model = x.Model,
+                Position = x.TransformAndMotion.Position
+            });
+
+        return query.FirstOrDefaultAsync();
+    }
 
     public Task<List<VehicleData>> GetVehiclesByUserId(int userId)
     {

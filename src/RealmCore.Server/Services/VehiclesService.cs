@@ -47,6 +47,11 @@ internal sealed class VehiclesService : IVehiclesService
         return _vehicleRepository.GetLightVehiclesByUserId(userId);
     }
 
+    public Task<LightInfoVehicleDTO?> GetLightVehicleById(int vehicleId)
+    {
+        return _vehicleRepository.GetLightVehicleById(vehicleId);
+    }
+
     public Task<List<VehicleData>> GetVehiclesByUserId(int userId)
     {
         return _vehicleRepository.GetVehiclesByUserId(userId);
