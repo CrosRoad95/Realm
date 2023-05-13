@@ -463,11 +463,6 @@ public abstract class Db<T> : IdentityDbContext<UserData, RoleData, int,
                 .HasOne(x => x.User)
                 .WithMany(x => x.VehicleUserAccesses)
                 .HasForeignKey(x => x.UserId);
-
-            entityBuilder
-                .HasOne(x => x.Vehicle)
-                .WithMany(x => x.UserAccesses)
-                .HasForeignKey(x => x.VehicleId);
         });
 
         modelBuilder.Entity<VehicleFuelData>(entityBuilder =>

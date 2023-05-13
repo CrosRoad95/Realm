@@ -37,6 +37,7 @@ internal sealed class CommandsLogic
     private readonly ILogger<CommandsLogic> _logger;
     private readonly IDateTimeProvider _dateTimeProvider;
     private readonly IVehiclesService _vehiclesService;
+    private readonly ILoadService _loadService;
 
     private class TestState
     {
@@ -46,7 +47,7 @@ internal sealed class CommandsLogic
     public CommandsLogic(RPGCommandService commandService, IEntityFactory entityFactory, RepositoryFactory repositoryFactory,
         ItemsRegistry itemsRegistry, IECS ecs, IBanService banService, IDiscordService discordService, ChatBox chatBox, ILogger<CommandsLogic> logger,
         IDateTimeProvider dateTimeProvider, INametagsService nametagsService, IUsersService rpgUserManager, IVehiclesService vehiclesService,
-        GameWorld gameWorld, IElementOutlineService elementOutlineService, IAssetsService assetsService, ISpawnMarkersService spawnMarkersService)
+        GameWorld gameWorld, IElementOutlineService elementOutlineService, IAssetsService assetsService, ISpawnMarkersService spawnMarkersService, ILoadService loadService)
     {
         _commandService = commandService;
         _entityFactory = entityFactory;
@@ -59,6 +60,7 @@ internal sealed class CommandsLogic
         _logger = logger;
         _dateTimeProvider = dateTimeProvider;
         _vehiclesService = vehiclesService;
+        _loadService = loadService;
         _commandService.AddCommandHandler("playtime", (entity, args) =>
         {
             if (entity.TryGetComponent(out PlayTimeComponent playTimeComponent))
@@ -802,7 +804,8 @@ internal sealed class CommandsLogic
 
         _commandService.AddAsyncCommandHandler("spawnback", async (entity, args) =>
         {
-            var en = await _vehiclesService.SpawnById(int.Parse(args[0]));
+            var en = await _loadService.LoadVehicleById(int.Parse(args[0]));
+            await _vehiclesService.SetVehicleSpawned(en);
             var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();
             if (en != null)
             {

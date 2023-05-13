@@ -7,6 +7,7 @@ public interface IVehicleRepository : IRepositoryBase
     Task<LightInfoVehicleDTO?> GetLightVehicleById(int vehicleId);
     Task<List<LightInfoVehicleDTO>> GetLightVehiclesByUserId(int userId);
     Task<VehicleData?> GetReadOnlyVehicleById(int id);
+    Task<VehicleData?> GetVehicleById(int id);
     Task<List<VehicleData>> GetVehiclesByUserId(int userId);
     Task<bool> IsSpawned(int id);
     Task<bool> SetKind(int id, byte kind);

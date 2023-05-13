@@ -15,6 +15,7 @@ public interface IVehiclesService
     Task<List<VehicleData>> GetVehiclesByUserId(int userId);
     Task<bool> SetVehicleKind(int id, byte kind);
     Task<bool> SetVehicleKind(Entity vehicleEntity, byte kind);
-    Task<Entity?> SpawnById(int id);
+    Task<bool> SetVehicleSpawned(Entity vehicleEntity, bool spawned = true);
+    Task<bool> SetVehicleSpawned(int id, bool spawned = true);
     internal Entity Spawn(VehicleData vehicleData);
 }

@@ -85,6 +85,17 @@ internal class VehicleRepository : IVehicleRepository
 
         return query.ToListAsync();
     }
+    
+    public Task<VehicleData?> GetVehicleById(int id)
+    {
+        var query = _db.Vehicles
+            .TagWithSource(nameof(VehicleRepository))
+            .AsNoTrackingWithIdentityResolution()
+            .Where(x => x.Id == id)
+            .IncludeAll();
+
+        return query.FirstOrDefaultAsync();
+    }
 
     public async Task<bool> SetSpawned(int id, bool spawned)
     {

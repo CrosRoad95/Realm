@@ -77,6 +77,7 @@ internal class SaveService : ISaveService
         vehicleData.TransformAndMotion = entity.Transform.GetTransformAndMotion();
         vehicleData.UserAccesses = privateVehicleComponent.PlayerAccesses.Select(x => new VehicleUserAccessData
         {
+            Id = x.Id,
             UserId = x.UserId,
             VehicleId = vehicleData.Id,
             Vehicle = vehicleData,
@@ -123,7 +124,7 @@ internal class SaveService : ISaveService
                     {
                         PartId = item,
                         State = state.Value
-                    });
+                    }); 
             }
             vehicleData.PartDamages = vehiclePartDamages;
         }

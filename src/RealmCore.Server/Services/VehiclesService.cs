@@ -77,19 +77,6 @@ internal sealed class VehiclesService : IVehiclesService
         entity.Dispose();
     }
 
-    public async Task<Entity?> SpawnById(int id)
-    {
-        var vehicle = await _vehicleRepository.GetReadOnlyVehicleById(id);
-        if (vehicle == null)
-            return null;
-        if (vehicle.Spawned == false)
-        {
-            await _vehicleRepository.SetSpawned(id, true);
-            return Spawn(vehicle);
-        }
-        return null;
-    }
-
     public Task<bool> SetVehicleKind(Entity vehicleEntity, byte kind)
         => SetVehicleKind(vehicleEntity.GetRequiredComponent<PrivateVehicleComponent>().Id, kind);
 
@@ -99,6 +86,14 @@ internal sealed class VehiclesService : IVehiclesService
             entity.GetRequiredComponent<PrivateVehicleComponent>().Kind = kind;
 
         return _vehicleRepository.SetKind(id, kind);
+    }
+    
+    public Task<bool> SetVehicleSpawned(Entity vehicleEntity, bool spawned = true)
+        => SetVehicleSpawned(vehicleEntity.GetRequiredComponent<PrivateVehicleComponent>().Id, spawned);
+
+    public Task<bool> SetVehicleSpawned(int id, bool spawned = true)
+    {
+        return _vehicleRepository.SetSpawned(id, spawned);
     }
 
     public Entity Spawn(VehicleData vehicleData)

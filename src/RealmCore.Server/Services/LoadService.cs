@@ -3,14 +3,12 @@
 internal class LoadService : ILoadService
 {
     private readonly RepositoryFactory _repositoryFactory;
-    private readonly IEntityFactory _entityFactory;
     private readonly ILogger<LoadService> _logger;
     private readonly IVehiclesService _vehiclesService;
 
     public LoadService(RepositoryFactory repositoryFactory, IEntityFactory entityFactory, ILogger<LoadService> logger, IVehiclesService vehiclesService)
     {
         _repositoryFactory = repositoryFactory;
-        _entityFactory = entityFactory;
         _logger = logger;
         _vehiclesService = vehiclesService;
     }
@@ -18,6 +16,24 @@ internal class LoadService : ILoadService
     public async Task LoadAll()
     {
         await LoadAllVehicles();
+    }
+
+    public async Task<Entity?> LoadVehicleById(int id)
+    {
+        using var vehicleRepository = _repositoryFactory.GetVehicleRepository();
+        var vehicleData = await vehicleRepository.GetVehicleById(id);
+        if (vehicleData == null)
+            throw new Exception($"Failed to load vehicle data of id {id}");
+
+        try
+        {
+            return _vehiclesService.Spawn(vehicleData);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to spawn vehicle: {id}", vehicleData.Id);
+        }
+        return null;
     }
 
     private async Task LoadAllVehicles()

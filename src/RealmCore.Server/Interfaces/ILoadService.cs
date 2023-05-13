@@ -3,4 +3,5 @@
 public interface ILoadService
 {
     Task LoadAll();
+    Task<Entity?> LoadVehicleById(int id);
 }
