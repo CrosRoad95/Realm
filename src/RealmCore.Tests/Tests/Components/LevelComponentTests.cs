@@ -28,7 +28,7 @@ public class LevelComponentTests
     public void TestIfLevelsAreCountingCorrectly()
     {
         int addedLevels = 0;
-        _levelComponent.LevelChanged += (e, level) =>
+        _levelComponent.LevelChanged += (e, level, up) =>
         {
             addedLevels++;
         };

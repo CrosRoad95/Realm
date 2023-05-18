@@ -74,7 +74,7 @@ internal sealed class PlayerJoinedLogic
 
             if (component is LevelComponent levelComponent)
             {
-                levelComponent.LevelChanged += (self, level) =>
+                levelComponent.LevelChanged += (self, level, up) =>
                 {
                     _logger.LogInformation("Player leveled up: {level}", level);
                 };

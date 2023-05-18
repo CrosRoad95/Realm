@@ -8,7 +8,6 @@ public class LevelComponent : Component
 
     public uint NextLevelRequiredExperience
     {
-
         get
         {
             ThrowIfDisposed();
@@ -16,12 +15,46 @@ public class LevelComponent : Component
         }
     }
 
-    public uint Level { get; private set; }
-    public uint Experience { get; private set; }
+    private uint _level;
+    private uint _experience;
+
+    public uint Level
+    {
+        get => _level; set
+        {
+            if (value > _level)
+            {
+                for (var i = _level; value > _level; i++)
+                {
+                    _level = i;
+                    LevelChanged?.Invoke(this, i, true);
+                }
+            }
+            else
+            {
+                for (var i = _level; value < _level; i--)
+                {
+                    _level = i;
+                    LevelChanged?.Invoke(this, i, false);
+                }
+            }
+            _level = value;
+        }
+    }
+
+    public uint Experience
+    {
+        get => _experience; set
+        {
+            _experience = value;
+            CheckForNextLevel();
+            ExperienceChanged?.Invoke(this, value);
+        }
+    }
 
     private object _lock = new();
 
-    public event Action<LevelComponent, uint>? LevelChanged;
+    public event Action<LevelComponent, uint, bool>? LevelChanged;
     public event Action<LevelComponent, uint>? ExperienceChanged;
 
     public LevelComponent()
@@ -31,8 +64,8 @@ public class LevelComponent : Component
 
     public LevelComponent(uint level, uint experience)
     {
-        Level = level;
-        Experience = experience;
+        _level = level;
+        _experience = experience;
     }
 
     public void GiveExperience(uint amount)
@@ -41,7 +74,7 @@ public class LevelComponent : Component
 
         lock (_lock)
         {
-            Experience += amount;
+            _experience += amount;
             CheckForNextLevel();
             ExperienceChanged?.Invoke(this, Experience);
         }
@@ -49,11 +82,11 @@ public class LevelComponent : Component
 
     private void CheckForNextLevel()
     {
-        if (Experience >= NextLevelRequiredExperience)
+        if (_experience >= NextLevelRequiredExperience)
         {
-            Experience -= NextLevelRequiredExperience;
-            Level++;
-            LevelChanged?.Invoke(this, Level);
+            _experience -= NextLevelRequiredExperience;
+            _level++;
+            LevelChanged?.Invoke(this, _level, true);
             CheckForNextLevel();
         }
     }

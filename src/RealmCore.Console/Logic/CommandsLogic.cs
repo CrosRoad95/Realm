@@ -955,6 +955,27 @@ internal sealed class CommandsLogic
             counter++;
             _logger.LogInformation("Counter: {counter}", counter);
         });
+        
+        _commandService.AddCommandHandler("level", (entity, args) =>
+        {
+            var levelComponent = entity.GetRequiredComponent<LevelComponent>();
+            var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();
+            playerElementComponent.SendChatMessage($"Level: {levelComponent.Level}, exp: {levelComponent.Experience}");
+        });
+        
+        _commandService.AddCommandHandler("setlevel", (entity, args) =>
+        {
+            uint level = uint.Parse(args[0]);
+            var levelComponent = entity.GetRequiredComponent<LevelComponent>();
+            var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();
+            void handleLevelChanged(LevelComponent that, uint level, bool up)
+            {
+                playerElementComponent.SendChatMessage($"Level change: {level}, {up}");
+            }
+            levelComponent.LevelChanged += handleLevelChanged;
+            levelComponent.Level = level;
+            levelComponent.LevelChanged -= handleLevelChanged;
+        });
 
         _commandService.AddAsyncCommandHandler("setkind", async (entity, args) =>
         {
