@@ -14,7 +14,6 @@ internal class UsersService : IUsersService
     private readonly IAuthorizationService _authorizationService;
     private readonly IDb _db;
     private readonly IActiveUsers _activeUsers;
-
     private readonly JsonSerializerSettings _jsonSerializerSettings;
 
     public UsersService(ItemsRegistry itemsRegistry, UserManager<UserData> userManager, ILogger<UsersService> logger, IOptions<GameplayOptions> gameplayOptions,

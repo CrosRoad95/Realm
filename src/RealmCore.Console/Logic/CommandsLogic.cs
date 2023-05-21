@@ -21,6 +21,7 @@ using RealmCore.Resources.Assets.Factories;
 using RealmCore.Resources.Assets.Interfaces;
 using RealmCore.Server.Concepts.Spawning;
 using RealmCore.Server.Components.Vehicles.Access;
+using RealmCore.Server.Components.Elements;
 
 namespace RealmCore.Console.Logic;
 
@@ -975,6 +976,17 @@ internal sealed class CommandsLogic
             levelComponent.LevelChanged += handleLevelChanged;
             levelComponent.Level = level;
             levelComponent.LevelChanged -= handleLevelChanged;
+        });
+
+        _commandService.AddAsyncCommandHandler("usernames", async (entity, args) =>
+        {
+            await using var userRepository = repositoryFactory.GetUserRepository();
+            var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();
+            var userNames = await userRepository.GetUserNamesByIds(new int[] { 1 });
+            foreach (var item in userNames)
+            {
+                playerElementComponent.SendChatMessage($"{item.Key} = {item.Value}");
+            }
         });
 
         _commandService.AddAsyncCommandHandler("setkind", async (entity, args) =>

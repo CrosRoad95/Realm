@@ -66,13 +66,19 @@ internal class BanRepository : IBanRepository
         _db.Bans.Remove(ban);
     }
 
+    public void Dispose()
+    {
+        _db.Dispose();
+    }
+
     public Task<int> Commit()
     {
         return _db.SaveChangesAsync();
     }
 
-    public void Dispose()
+    public async ValueTask DisposeAsync()
     {
-        _db.Dispose();
+        await Commit();
+        Dispose();
     }
 }

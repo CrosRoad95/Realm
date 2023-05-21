@@ -136,4 +136,10 @@ internal class VehicleRepository : IVehicleRepository
     {
         return _db.SaveChangesAsync();
     }
+
+    public async ValueTask DisposeAsync()
+    {
+        await Commit();
+        Dispose();
+    }
 }

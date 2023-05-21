@@ -1,6 +1,6 @@
 ﻿namespace RealmCore.Persistance.Interfaces;
 
-public interface IVehicleEventRepository : IDisposable
+public interface IVehicleEventRepository : IRepositoryBase
 {
     void AddEvent(int vehicleId, int eventType, DateTime dateTime);
     Task<int> Commit();

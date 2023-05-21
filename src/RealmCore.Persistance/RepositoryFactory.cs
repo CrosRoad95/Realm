@@ -10,4 +10,5 @@ public class RepositoryFactory
     }
 
     public IVehicleRepository GetVehicleRepository() => _serviceProvider.GetRequiredService<IVehicleRepository>();
+    public IUserRepository GetUserRepository() => _serviceProvider.GetRequiredService<IUserRepository>();
 }

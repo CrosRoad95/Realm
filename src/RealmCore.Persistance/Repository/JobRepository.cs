@@ -44,13 +44,19 @@ internal class JobRepository : IJobRepository
         return query.FirstOrDefaultAsync();
     }
 
+    public void Dispose()
+    {
+        _db.Dispose();
+    }
+
     public Task<int> Commit()
     {
         return _db.SaveChangesAsync();
     }
 
-    public void Dispose()
+    public async ValueTask DisposeAsync()
     {
-        _db.Dispose();
+        await Commit();
+        Dispose();
     }
 }

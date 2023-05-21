@@ -32,6 +32,7 @@ public static class ServiceCollectionExtensions
         services.AddTransient<IJobRepository, JobRepository>();
         services.AddTransient<IUserRewardRepository, UserRewardRepository>();
         services.AddTransient<IVehicleEventRepository, VehicleEventRepository>();
+        services.AddTransient<IUserRepository, UserRepository>();
 
         services.AddDbContext<IDb, T>(dboptions, serviceLifetime);
 
