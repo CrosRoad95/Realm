@@ -1,4 +1,6 @@
-﻿namespace RealmCore.Server.Extensions;
+﻿using RealmCore.Resources.CEFBlazorGui;
+
+namespace RealmCore.Server.Extensions;
 
 public static class ServerBuilderExtensions
 {
@@ -85,6 +87,7 @@ public static class ServerBuilderExtensions
         builder.AddNametagsResource();
         builder.AddBoneAttachResource(BoneAttachVersion.Release_1_2_0);
         builder.AddWatermarkResource();
+        builder.AddCEFBlazorGuiResource("E:\\Drive D\\Realm\\src\\RealmCore.BlazorCEFGui\\bin\\Release\\net7.0\\browser-wasm\\publish\\wwwroot");
         #endregion
 
         #region Resources Logics

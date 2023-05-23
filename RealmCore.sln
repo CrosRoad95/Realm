@@ -72,6 +72,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RealmCore.Resources.Addons.
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RealmCore.Resources.Admin", "src\RealmCore.Resources.Admin\RealmCore.Resources.Admin.csproj", "{A3A3DBD9-2CC5-441E-A1AD-E78DE078C9BC}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RealmCore.BlazorCEFGui", "src\RealmCore.BlazorCEFGui\RealmCore.BlazorCEFGui.csproj", "{E21402AB-8EEA-4451-8BEB-F669E68C0B4B}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RealmCore.Resources.CEFBlazorGui", "src\RealmCore.Resources.CEFBlazorGui\RealmCore.Resources.CEFBlazorGui.csproj", "{F31834D0-4F1D-4CF1-B6CF-EFDCD27D101E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -186,6 +190,14 @@ Global
 		{A3A3DBD9-2CC5-441E-A1AD-E78DE078C9BC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A3A3DBD9-2CC5-441E-A1AD-E78DE078C9BC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A3A3DBD9-2CC5-441E-A1AD-E78DE078C9BC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E21402AB-8EEA-4451-8BEB-F669E68C0B4B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E21402AB-8EEA-4451-8BEB-F669E68C0B4B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E21402AB-8EEA-4451-8BEB-F669E68C0B4B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E21402AB-8EEA-4451-8BEB-F669E68C0B4B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F31834D0-4F1D-4CF1-B6CF-EFDCD27D101E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F31834D0-4F1D-4CF1-B6CF-EFDCD27D101E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F31834D0-4F1D-4CF1-B6CF-EFDCD27D101E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F31834D0-4F1D-4CF1-B6CF-EFDCD27D101E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -213,6 +225,7 @@ Global
 		{8624871A-6837-4853-95E6-C5DB1DB24CF8} = {28944775-A0AF-46D4-9480-D6F4189002B7}
 		{86449E0B-707D-4EA0-B528-4B31E3AECB95} = {9D22264B-12E5-4387-AD6F-BF9D4AE42C3C}
 		{A3A3DBD9-2CC5-441E-A1AD-E78DE078C9BC} = {28944775-A0AF-46D4-9480-D6F4189002B7}
+		{F31834D0-4F1D-4CF1-B6CF-EFDCD27D101E} = {28944775-A0AF-46D4-9480-D6F4189002B7}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {3922BF34-8D0B-4DC1-9EFC-D4CFB948B3B8}

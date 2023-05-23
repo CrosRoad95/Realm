@@ -1,0 +1,25 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>net7.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+		<Version>0.0.0</Version>
+		<Authors>Sebastian Jura</Authors>
+	</PropertyGroup>
+
+	<ItemGroup>
+	  <None Remove="Lua\cefBlazorGui.lua" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <EmbeddedResource Include="Lua\cefBlazorGui.lua">
+	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+	  </EmbeddedResource>
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\RealmCore.Resources.Base\RealmCore.Resources.Base.csproj" />
+	</ItemGroup>
+
+</Project>
