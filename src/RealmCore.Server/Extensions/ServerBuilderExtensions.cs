@@ -1,6 +1,4 @@
-﻿using RealmCore.Resources.CEFBlazorGui;
-
-namespace RealmCore.Server.Extensions;
+﻿namespace RealmCore.Server.Extensions;
 
 public static class ServerBuilderExtensions
 {

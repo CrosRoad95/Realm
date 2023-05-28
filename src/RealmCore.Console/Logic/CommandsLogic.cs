@@ -21,7 +21,6 @@ using RealmCore.Resources.Assets.Factories;
 using RealmCore.Resources.Assets.Interfaces;
 using RealmCore.Server.Concepts.Spawning;
 using RealmCore.Server.Components.Vehicles.Access;
-using RealmCore.Server.Components.Elements;
 
 namespace RealmCore.Console.Logic;
 

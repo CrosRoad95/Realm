@@ -1,5 +1,4 @@
-﻿using RealmCore.Resources.Admin.Enums;
-using RealmCore.Resources.Base.Interfaces;
+﻿using RealmCore.Resources.Base.Interfaces;
 using SlipeServer.Packets.Definitions.Lua;
 using SlipeServer.Server.Elements;
 

@@ -16,7 +16,6 @@ global using SlipeServer.Server.ServerBuilders;
 global using SlipeServer.Server.ElementCollections;
 global using SlipeServer.Server.Services;
 global using SlipeServer.Resources.NoClip;
-global using SlipeServer.Resources.DGS;
 
 global using RealmCore.Persistance;
 global using RealmCore.SQLite;
@@ -32,7 +31,6 @@ global using RealmCore.Server.Factories;
 global using RealmCore.Configuration;
 global using RealmCore.Resources.AFK;
 global using RealmCore.Resources.Admin;
-global using RealmCore.Resources.Addons.GuiSystem.DGSProvider;
 global using RealmCore.Resources.ElementOutline;
 global using RealmCore.Resources.StatisticsCounter;
 global using RealmCore.Server.Logic.Resources;
