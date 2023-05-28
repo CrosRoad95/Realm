@@ -4,28 +4,28 @@ namespace RealmCore.Server.Extensions;
 
 public static class ServerBuilderExtensions
 {
-    public static ServerBuilder ConfigureServer(this ServerBuilder builder, IRealmConfigurationProvider realmConfigurationProvider, ServerBuilderDefaultBehaviours? serverBuilderDefaultBehaviours = null)
+    public static ServerBuilder ConfigureServer(this ServerBuilder serverBuilder, IRealmConfigurationProvider realmConfigurationProvider, ServerBuilderDefaultBehaviours? serverBuilderDefaultBehaviours = null)
     {
         var _serverConfiguration = realmConfigurationProvider.GetRequired<SlipeServer.Server.Configuration>("Server");
-        builder.UseConfiguration(_serverConfiguration);
+        serverBuilder.UseConfiguration(_serverConfiguration);
         if (serverBuilderDefaultBehaviours != null)
         {
             if (serverBuilderDefaultBehaviours != ServerBuilderDefaultBehaviours.None)
             {
-                builder.AddDefaults(exceptBehaviours: serverBuilderDefaultBehaviours.Value);
+                serverBuilder.AddDefaults(exceptBehaviours: serverBuilderDefaultBehaviours.Value);
             }
         }
         else
         {
             var exceptBehaviours = ServerBuilderDefaultBehaviours.DefaultChatBehaviour;
 #if DEBUG
-            builder.AddDefaults(exceptBehaviours: ServerBuilderDefaultBehaviours.MasterServerAnnouncementBehaviour | exceptBehaviours);
+            serverBuilder.AddDefaults(exceptBehaviours: ServerBuilderDefaultBehaviours.MasterServerAnnouncementBehaviour | exceptBehaviours);
 #else
-            builder.AddDefaults(exceptBehaviours: exceptBehaviours);
+            serverBuilder.AddDefaults(exceptBehaviours: exceptBehaviours);
 #endif
         }
 
-        builder.ConfigureServices(services =>
+        serverBuilder.ConfigureServices(services =>
         {
             // Options
             services.Configure<GameplayOptions>(realmConfigurationProvider.GetSection("Gameplay"));
@@ -66,42 +66,37 @@ public static class ServerBuilderExtensions
 
         var commonOptions = new CommonResourceOptions();
 
-        builder.AddNoClipResource(new NoClipOptions
+        serverBuilder.AddNoClipResource(new NoClipOptions
         {
             Bind = null
         });
-        builder.AddDGSResource(DGSVersion.Release_3_520);
-        builder.AddGuiSystemResource(builder =>
-        {
-            builder.AddGuiProvider(DGSGuiProvider.Name, DGSGuiProvider.LuaCode);
-            builder.SetGuiProvider(DGSGuiProvider.Name);
-        }, commonOptions);
-        builder.AddClientInterfaceResource(commonOptions);
-        builder.AddElementOutlineResource();
-        builder.AddAdminResource();
-        builder.AddAFKResource();
-        builder.AddStatisticsCounterResource();
-        builder.AddOverlayResource();
-        builder.AddAssetsResource();
-        builder.AddText3dResource();
-        builder.AddNametagsResource();
-        builder.AddBoneAttachResource(BoneAttachVersion.Release_1_2_0);
-        builder.AddWatermarkResource();
-        builder.AddCEFBlazorGuiResource("E:\\Drive D\\Realm\\src\\RealmCore.BlazorCEFGui\\bin\\Release\\net7.0\\browser-wasm\\publish\\wwwroot");
+
+        serverBuilder.AddClientInterfaceResource(commonOptions);
+        serverBuilder.AddElementOutlineResource();
+        serverBuilder.AddAdminResource();
+        serverBuilder.AddAFKResource();
+        serverBuilder.AddStatisticsCounterResource();
+        serverBuilder.AddOverlayResource();
+        serverBuilder.AddAssetsResource();
+        serverBuilder.AddText3dResource();
+        serverBuilder.AddNametagsResource();
+        serverBuilder.AddBoneAttachResource(BoneAttachVersion.Release_1_2_0);
+        serverBuilder.AddWatermarkResource();
         #endregion
 
         #region Resources Logics
-        builder.AddLogic<ClientInterfaceResourceLogic>();
-        builder.AddLogic<StatisticsCounterResourceLogic>();
-        builder.AddLogic<AFKResourceLogic>();
-        builder.AddLogic<AdminResourceLogic>();
-        builder.AddLogic<OutlineResourceLogic>();
-        builder.AddLogic<WatermarkResourceLogic>();
+        serverBuilder.AddLogic<ClientInterfaceResourceLogic>();
+        serverBuilder.AddLogic<StatisticsCounterResourceLogic>();
+        serverBuilder.AddLogic<AFKResourceLogic>();
+        serverBuilder.AddLogic<AdminResourceLogic>();
+        serverBuilder.AddLogic<OutlineResourceLogic>();
+        serverBuilder.AddLogic<WatermarkResourceLogic>();
+        serverBuilder.AddLogic<CEFBlazorGuiResourceLogic>();
         #endregion
 
         // Miscellaneous logic
-        builder.AddLogic<EssentialCommandsLogic>();
+        serverBuilder.AddLogic<EssentialCommandsLogic>();
 
-        return builder;
+        return serverBuilder;
     }
 }

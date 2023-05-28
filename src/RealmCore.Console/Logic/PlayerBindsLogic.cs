@@ -83,6 +83,31 @@ internal sealed class PlayerBindsLogic
                 }
                 return Task.CompletedTask;
             });
+            playerElementComponent.SetBind("F2", entity =>
+            {
+                if (entity.TryGetComponent(out BlazorGuiComponent blazorGuiComponent))
+                {
+                    blazorGuiComponent.Visible = true;
+                    blazorGuiComponent.Path = "counter";
+                }
+            });
+
+            playerElementComponent.SetBind("F3", entity =>
+            {
+                if (entity.TryGetComponent(out BlazorGuiComponent blazorGuiComponent))
+                {
+                    blazorGuiComponent.Visible = true;
+                    blazorGuiComponent.Path = "fetchdata";
+                }
+            });
+
+            playerElementComponent.SetBind("F4", entity =>
+            {
+                if (entity.TryGetComponent(out BlazorGuiComponent blazorGuiComponent))
+                {
+                    blazorGuiComponent.Visible = false;
+                }
+            });
 
             OpenCloseGuiHelper(entity, "F1", async () =>
             {

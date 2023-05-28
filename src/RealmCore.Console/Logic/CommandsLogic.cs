@@ -978,6 +978,19 @@ internal sealed class CommandsLogic
             levelComponent.LevelChanged -= handleLevelChanged;
         });
 
+        _commandService.AddCommandHandler("cefdevtools", (entity, args) =>
+        {
+            var blazorGuiComponent = entity.GetRequiredComponent<BlazorGuiComponent>();
+            blazorGuiComponent.DevTools = !blazorGuiComponent.DevTools;
+            entity.GetRequiredComponent<PlayerElementComponent>().SendChatMessage($"Devtools {blazorGuiComponent.DevTools}");
+        }, null, true);
+        
+        _commandService.AddCommandHandler("cefpath", (entity, args) =>
+        {
+            var blazorGuiComponent = entity.GetRequiredComponent<BlazorGuiComponent>();
+            entity.GetRequiredComponent<PlayerElementComponent>().SendChatMessage($"Path {blazorGuiComponent.Path}");
+        }, null, true);
+
         _commandService.AddAsyncCommandHandler("usernames", async (entity, args) =>
         {
             await using var userRepository = repositoryFactory.GetUserRepository();
@@ -1022,6 +1035,16 @@ internal sealed class CommandsLogic
             {
                 playerElementComponent.SendChatMessage($"Event: {item.DateTime} - {item.EventType}");
             }
+        });
+
+        _commandService.AddCommandHandler("blazorguiopen", (entity, args) =>
+        {
+            entity.GetRequiredComponent<BlazorGuiComponent>().Path = "Counter";
+        });
+        
+        _commandService.AddCommandHandler("blazorguiclose", (entity, args) =>
+        {
+            entity.GetRequiredComponent<BlazorGuiComponent>().Path = null;
         });
 
         FontCollection collection = new();

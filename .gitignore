@@ -10,3 +10,4 @@ RealmRPG/
 *.local.json
 *.nupkg
 *.exe
+/src/RealmCore.Console/Server/BlazorGui

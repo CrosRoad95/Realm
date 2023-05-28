@@ -67,12 +67,8 @@ public class LuaEventHub<THub, TResource> : ILuaEventHub<THub> where TResource :
             case ConstantExpression constantExpression:
                 return _luaValueMapper.Map(constantExpression.Value);
             case MemberExpression memberExpression:
-                if (memberExpression.Member is FieldInfo fieldInfo)
-                {
-                    var value = fieldInfo.GetValue(((ConstantExpression)memberExpression.Expression).Value);
-                    return _luaValueMapper.Map(value);
-                }
-                return ConvertExpressionToLuaValue(memberExpression.Expression);
+                var value = Expression.Lambda(memberExpression).Compile().DynamicInvoke();
+                return _luaValueMapper.Map(value);
             default:
                 throw new NotSupportedException();
         }

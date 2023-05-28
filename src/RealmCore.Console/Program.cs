@@ -6,6 +6,10 @@ using RealmCore.Server.Integrations.Discord.Handlers;
 using RealmCore.Server.Logic;
 using RealmCore.Server.Logic.Defaults;
 using RealmCore.Console.Data.Validators;
+using RealmCore.Resources.CEFBlazorGui;
+using SlipeServer.Resources.DGS;
+using RealmCore.Resources.GuiSystem;
+using RealmCore.Resources.Addons.GuiSystem.DGSProvider;
 
 Directory.SetCurrentDirectory(Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly()!.Location)!);
 
@@ -18,6 +22,15 @@ SemaphoreSlim semaphore = new(0);
 
 var server = builder.Build(null, extraBuilderSteps: serverBuilder =>
 {
+    serverBuilder.AddDGSResource(DGSVersion.Release_3_520);
+    serverBuilder.AddGuiSystemResource(builder =>
+    {
+        builder.AddGuiProvider(DGSGuiProvider.Name, DGSGuiProvider.LuaCode);
+        builder.SetGuiProvider(DGSGuiProvider.Name);
+    }, new());
+
+    serverBuilder.AddCEFBlazorGuiResource("../../../Server/BlazorGui/wwwroot", CEFGuiBlazorMode.Prod);
+
     serverBuilder.AddLogic<DefaultCommandsLogic>();
 
     serverBuilder.AddLogic<PlayerJoinedLogic>();
@@ -37,9 +50,11 @@ var server = builder.Build(null, extraBuilderSteps: serverBuilder =>
     serverBuilder.AddLogic<AssetsLogic>();
     serverBuilder.AddLogic<DefaultBanLogic>();
     serverBuilder.AddLogic<DefaultChatLogic>();
+    serverBuilder.AddLogic<BlazorGuiLogic>();
 #if DEBUG
     serverBuilder.AddLogic<HotReloadLogic>("../../../Server/Gui");
 #endif
+
     serverBuilder.ConfigureServices(services =>
     {
         services.AddTransient<IValidator<LoginData>, LoginDataValidator>();

@@ -1,4 +1,7 @@
-﻿﻿<Router AppAssembly="@typeof(App).Assembly">
+﻿@inject NavigationManager _navigationManager
+@inject EventHub _eventHub
+
+﻿<Router AppAssembly="@typeof(App).Assembly">
     <Found Context="routeData">
         <RouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)" />
         <FocusOnNavigate RouteData="@routeData" Selector="h1" />
@@ -10,3 +13,16 @@
         </LayoutView>
     </NotFound>
 </Router>
+
+@code {
+    protected override void OnAfterRender(bool firstRender)
+    {
+        _navigationManager.LocationChanged += HandleLocationChanged;
+    }
+
+    async void HandleLocationChanged(object? sender, LocationChangedEventArgs e)
+    {
+        var path = _navigationManager.ToBaseRelativePath(e.Location);
+        await _eventHub.LocationChanged(path);
+    }
+}
