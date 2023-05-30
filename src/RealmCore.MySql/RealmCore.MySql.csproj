@@ -9,6 +9,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\RealmCore.Configuration\RealmCore.Configuration.csproj" />
     <ProjectReference Include="..\RealmCore.Persistance\RealmCore.Persistance.csproj" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="7.0.0">
       <PrivateAssets>all</PrivateAssets>
