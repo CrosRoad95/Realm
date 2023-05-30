@@ -1,4 +1,5 @@
-﻿using System.Diagnostics.CodeAnalysis;
+﻿using SlipeServer.Server.Elements;
+using System.Diagnostics.CodeAnalysis;
 
 namespace RealmCore.Server;
 
@@ -16,7 +17,7 @@ public class Entity : IDisposable
 
     private readonly ReaderWriterLockSlim _componentsLock = new();
     private readonly List<Component> _components = new();
-    public IReadOnlyCollection<Component> Components
+    public IEnumerable<Component> Components
     {
         get
         {
@@ -102,10 +103,6 @@ public class Entity : IDisposable
             lock (_transactionLock)
                 component._version = _version;
         }
-        catch (Exception)
-        {
-            throw;
-        }
         finally
         {
             _componentsLock.ExitWriteLock();
@@ -173,7 +170,7 @@ public class Entity : IDisposable
         try
         {
             component.InternalLoad();
-            await component.InternalLoadAsync();
+            await component.InternalLoadAsync().ConfigureAwait(false);
         }
         catch (Exception)
         {
@@ -184,7 +181,11 @@ public class Entity : IDisposable
         return component;
     }
 
-
+    private TComponent? InternalGetComponent<TComponent>() where TComponent : Component
+    {
+        return _components.OfType<TComponent>().FirstOrDefault();
+    }
+    
     public TComponent? GetComponent<TComponent>() where TComponent : Component
     {
         ThrowIfDisposed();
@@ -193,13 +194,23 @@ public class Entity : IDisposable
         _componentsLock.EnterReadLock();
         try
         {
-            element = _components.OfType<TComponent>().FirstOrDefault();
+            element = InternalGetComponent<TComponent>();
         }
         finally
         {
             _componentsLock.ExitReadLock();
         }
         return element;
+    }
+
+    internal bool InternalHasComponent<TComponent>(TComponent component) where TComponent : Component
+    {
+        return _components.Contains(component);
+    }
+
+    internal bool InternalHasComponent<TComponent>() where TComponent : Component
+    {
+        return _components.OfType<TComponent>().Any();
     }
 
     public bool HasComponent<TComponent>() where TComponent : Component
@@ -210,7 +221,7 @@ public class Entity : IDisposable
         _componentsLock.EnterReadLock();
         try
         {
-            has = _components.OfType<TComponent>().Any();
+            has = InternalHasComponent<TComponent>();
         }
         finally
         {
@@ -273,23 +284,31 @@ public class Entity : IDisposable
         DetachComponent(GetRequiredComponent<TComponent>());
     }
 
-    public void DetachComponent<TComponent>(TComponent component) where TComponent : Component
+    public void InternalDetachComponent<TComponent>(TComponent component) where TComponent : Component
     {
         ThrowIfDisposed();
 
         ComponentDetached?.Invoke(component);
+        _components.Remove(component);
+        component.Entity = null!;
+    }
+    
+
+    public void DetachComponent<TComponent>(TComponent component) where TComponent : Component
+    {
+        ThrowIfDisposed();
+
         if (component.Entity == this)
         {
             _componentsLock.EnterWriteLock();
             try
             {
-                _components.Remove(component);
+                InternalDetachComponent(component);
             }
             finally
             {
                 _componentsLock.ExitWriteLock();
             }
-            component.Entity = null!;
         }
     }
 
@@ -304,21 +323,21 @@ public class Entity : IDisposable
     {
         ThrowIfDisposed();
 
-        if (HasComponent(component))
+        _componentsLock.EnterWriteLock();
+        try
         {
-            try
+            if(InternalHasComponent(component))
             {
                 component.Dispose();
                 DetachComponent(component);
             }
-            catch (Exception ex)
-            {
-                if (ex is not ObjectDisposedException)
-                    throw;
-            }
-            return true;
         }
-
+        catch (ObjectDisposedException)
+        { }
+        catch (Exception)
+        {
+            throw;
+        }
         return false;
     }
 
@@ -326,21 +345,18 @@ public class Entity : IDisposable
     {
         ThrowIfDisposed();
         var component = GetComponent<TComponent>();
-        if (component != null)
+        try
         {
-            try
-            {
-                component.Dispose();
-                DetachComponent(component);
-            }
-            catch(Exception ex)
-            {
-                if (ex is not ObjectDisposedException)
-                    throw;
-            }
-            return true;
+            component.Dispose();
+            DetachComponent(component);
         }
-        return false;
+        catch(ObjectDisposedException)
+        { }
+        catch(Exception)
+        {
+            throw;
+        }
+        return true;
     }
 
     public void DestroyComponent<TComponent>() where TComponent : Component
