@@ -5,16 +5,33 @@
 
 <h1>Counter</h1>
 
+<p>testValue = @testValue</p>
+
 <p role="status">Current count: @currentCount</p>
 
 <button class="btn btn-primary" @onclick="IncrementCount">Click me</button>
+<button class="btn btn-primary" @onclick="IncrementCount2">Click me2</button>
 
 @code {
+    struct SampleStruct
+    {
+        public int a { get; set; }
+        public int b { get; set; }
+    }
+
     private int currentCount = 0;
+    private string testValue = "";
 
     private async Task IncrementCount()
     {
         currentCount++;
         await _eventHub.InvokeVoidAsync("test", 1, 2, 3);
+    }
+
+    private async Task IncrementCount2()
+    {
+        currentCount++;
+        var foo = await _eventHub.InvokeAsync<SampleStruct>("test", 1, 2, 3);
+        testValue = $"foo: {foo.a} {foo.b}";
     }
 }

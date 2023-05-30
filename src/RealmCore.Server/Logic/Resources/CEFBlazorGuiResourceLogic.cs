@@ -15,7 +15,8 @@ internal class CEFBlazorGuiResourceLogic
         _blazorGuiService = blazorGuiService;
         ecs.EntityCreated += HandleEntityCreated;
 
-        _cefBlazorGuiService.InvokeVoidAsyncInvoked += HandleInvokeVoidAsyncInvoked;
+        _cefBlazorGuiService.InvokeVoidAsyncInvoked = HandleInvokeVoidAsyncInvoked;
+        _cefBlazorGuiService.InvokeAsyncInvoked = HandleInvokeAsyncInvoked;
     }
 
     private void HandleInvokeVoidAsyncInvoked(Player player, string identifier, string args)
@@ -26,6 +27,16 @@ internal class CEFBlazorGuiResourceLogic
                 _blazorGuiService.RelayInvokeVoidAsync(component, identifier, args);
 
         }
+    }
+    private Task<object> HandleInvokeAsyncInvoked(Player player, string identifier, string args)
+    {
+        if(_ecs.TryGetEntityByPlayer(player, out var entity))
+        {
+            if (entity.TryGetComponent(out BlazorGuiComponent component))
+                return _blazorGuiService.RelayInvokeAsync(component, identifier, args);
+
+        }
+        return null;
     }
 
     private void HandleEntityCreated(Entity entity)

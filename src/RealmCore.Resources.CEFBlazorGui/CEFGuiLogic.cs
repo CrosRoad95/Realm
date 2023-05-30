@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 using RealmCore.Resources.Base;
 using RealmCore.Resources.Base.Interfaces;
 using RealmCore.Resources.CEFBlazorGui.Messages;
@@ -7,6 +8,7 @@ using SlipeServer.Server.Elements;
 using SlipeServer.Server.Events;
 using SlipeServer.Server.Mappers;
 using SlipeServer.Server.Services;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace RealmCore.Resources.CEFBlazorGui;
 
@@ -16,19 +18,19 @@ internal class CEFBlazorGuiLogic
     private readonly ILogger<CEFBlazorGuiLogic> _logger;
     private readonly ILuaEventHub<ICEFBlazorGuiEventHub> _luaEventHub;
     private readonly FromLuaValueMapper _fromLuaValueMapper;
-    private readonly ChatBox _chatBox;
     private readonly CEFBlazorGuiResource _resource;
 
-    public CEFBlazorGuiLogic(MtaServer mtaServer, LuaEventService luaEventService, ICEFBlazorGuiService CEFBlazorGuiService, ILogger<CEFBlazorGuiLogic> logger, ILuaEventHub<ICEFBlazorGuiEventHub> luaEventHub, FromLuaValueMapper fromLuaValueMapper, ChatBox chatBox)
+    public CEFBlazorGuiLogic(MtaServer mtaServer, LuaEventService luaEventService, ICEFBlazorGuiService CEFBlazorGuiService,
+        ILogger<CEFBlazorGuiLogic> logger, ILuaEventHub<ICEFBlazorGuiEventHub> luaEventHub, FromLuaValueMapper fromLuaValueMapper)
     {
         luaEventService.AddEventHandler("internalCEFBlazorGuiStart", HandleCEFBlazorGuiStart);
         luaEventService.AddEventHandler("internalCEFBlazorGuiStop", HandleCEFBlazorGuiStop);
         luaEventService.AddEventHandler("cefInvokeVoidAsync", HandleCEFInvokeVoidAsync);
+        luaEventService.AddEventHandler("cefInvokeAsync", HandleCEFInvokeAsync);
         _CEFBlazorGuiService = CEFBlazorGuiService;
         _logger = logger;
         _luaEventHub = luaEventHub;
         _fromLuaValueMapper = fromLuaValueMapper;
-        _chatBox = chatBox;
         _resource = mtaServer.GetAdditionalResource<CEFBlazorGuiResource>();
         mtaServer.PlayerJoined += HandlePlayerJoin;
         CEFBlazorGuiService.MessageHandler = HandleMessage;
@@ -79,9 +81,33 @@ internal class CEFBlazorGuiLogic
         }
     }
 
+
     private void HandleCEFInvokeVoidAsync(LuaEvent luaEvent)
     {
-        var (identifier, stringValue) =luaEvent.Read<string, string>(_fromLuaValueMapper);
-        _CEFBlazorGuiService.HandleCEFInvokeVoidAsync(luaEvent.Player, identifier, stringValue);
+        var (identifier, args) = luaEvent.Read<string, string>(_fromLuaValueMapper);
+        _CEFBlazorGuiService.HandleInvokeVoidAsyncHandler(luaEvent.Player, identifier, args);
+    }
+
+    private async void HandleCEFInvokeAsync(LuaEvent luaEvent)
+    {
+        try
+        {
+            var (identifier, promiseId, args) = luaEvent.Read<string, string, string>(_fromLuaValueMapper);
+            try
+            {
+                var value = await _CEFBlazorGuiService.HandleInvokeAsyncHandler(luaEvent.Player, identifier, args);
+                var data = JsonConvert.SerializeObject(value);
+                _luaEventHub.Invoke(luaEvent.Player, x => x.InvokeAsyncSuccess(promiseId, data));
+            }
+            catch(Exception ex)
+            {
+                _luaEventHub.Invoke(luaEvent.Player, x => x.InvokeAsyncError(promiseId));
+                throw;
+            }
+        }
+        catch(Exception ex)
+        {
+            _logger.LogError(ex, "Failed to handle cef invoke async");
+        }
     }
 }

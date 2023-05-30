@@ -6,12 +6,24 @@ internal class BlazorGuiLogic
 
     public BlazorGuiLogic(IBlazorGuiService blazorGuiService, ILogger<BlazorGuiLogic> logger)
     {
-        blazorGuiService.InvokeVoidAsync += HandleInvokeVoidAsync;
+        blazorGuiService.InvokeVoidAsync = HandleInvokeVoidAsync;
+        blazorGuiService.InvokeAsync = HandleInvokeAsync;
         _logger = logger;
     }
 
     private void HandleInvokeVoidAsync(BlazorGuiComponent blazorGuiComponent, string identifier, string args)
     {
-        _logger.LogInformation("InvokeVoidAsync: {identifier}={args}", identifier, args);
+        _logger.LogInformation("HandleInvokeVoidAsync: {identifier}={args}", identifier, args);
+    }
+
+    int a = 0;
+    private async Task<object> HandleInvokeAsync(BlazorGuiComponent blazorGuiComponent, string identifier, string args)
+    {
+        _logger.LogInformation("HandleInvokeAsync: {identifier}={args}", identifier, args);
+        return new
+        {
+            a = ++a,
+            b = 2
+        };
     }
 }

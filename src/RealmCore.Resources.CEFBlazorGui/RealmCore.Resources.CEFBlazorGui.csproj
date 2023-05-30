@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
 		<TargetFramework>net7.0</TargetFramework>
@@ -21,6 +21,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<ProjectReference Include="..\..\RealmCore.Resources.CEFBlazorGui.DebugServer\RealmCore.Resources.CEFBlazorGui.DebugServer.csproj" />
 		<ProjectReference Include="..\RealmCore.Resources.Base\RealmCore.Resources.Base.csproj" />
 	</ItemGroup>
 

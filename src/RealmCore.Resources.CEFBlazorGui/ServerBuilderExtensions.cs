@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using RealmCore.Resources.Base;
+using SlipeServer.Server.ElementCollections;
 using SlipeServer.Server.ServerBuilders;
 
 namespace RealmCore.Resources.CEFBlazorGui;
@@ -18,8 +19,7 @@ public static class ServerBuilderExtensions
 
         builder.ConfigureServices(services =>
         {
-            services.AddSingleton<HttpDebugServer>();
-            services.AddSingleton<ICEFBlazorGuiService>(x => new CEFBlazorGuiService(defaultCEFGuiBlazorMode, x.GetRequiredService<HttpDebugServer>()));
+            services.AddSingleton<ICEFBlazorGuiService>(x => new CEFBlazorGuiService(defaultCEFGuiBlazorMode, x.GetRequiredService<IElementCollection>()));
         });
 
         builder.AddLuaEventHub<ICEFBlazorGuiEventHub, CEFBlazorGuiResource>();

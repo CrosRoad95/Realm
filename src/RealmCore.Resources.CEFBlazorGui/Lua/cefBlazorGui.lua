@@ -7,6 +7,10 @@ local function handleInvokeVoidAsync(identifier, args)
 	triggerServerEvent("cefInvokeVoidAsync", resourceRoot, identifier, args);
 end
 
+local function handleInvokeAsync(identifier, promiseId, args)
+	triggerServerEvent("cefInvokeAsync", resourceRoot, identifier, promiseId, args);
+end
+
 function handleSetDevelopmentMode(enabled)
 	setDevelopmentMode(true, enabled);
 end
@@ -71,13 +75,25 @@ local function handleLoad(mode, x, y)
 	end
 end
 
+function handleInvokeAsyncSuccess(promiseId, response)
+	executeBrowserJavascript(webBrowser, string.format("invokeAsyncSuccess(%q, %q)", promiseId, response));
+end
+
+function handleInvokeAsyncError(promiseId)
+	executeBrowserJavascript(webBrowser, string.format("invokeAsyncError(%q)", promiseId, response));
+end
+
 addEventHandler("onClientResourceStart", resourceRoot, function()
 	hubBind("Load", handleLoad)
 	hubBind("SetDevelopmentMode", handleSetDevelopmentMode)
 	hubBind("ToggleDevTools", handleToggleDevTools)
 	hubBind("SetVisible", handleSetVisible)
 	hubBind("SetPath", handleSetPath)
+	hubBind("InvokeAsyncSuccess", handleInvokeAsyncSuccess)
+	hubBind("InvokeAsyncError", handleInvokeAsyncError)
 	
 	addEvent("invokeVoidAsync")
 	addEventHandler("invokeVoidAsync", resourceRoot, handleInvokeVoidAsync);
+	addEvent("invokeAsync")
+	addEventHandler("invokeAsync", resourceRoot, handleInvokeAsync);
 end)

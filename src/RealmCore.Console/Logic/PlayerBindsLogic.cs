@@ -87,8 +87,15 @@ internal sealed class PlayerBindsLogic
             {
                 if (entity.TryGetComponent(out BlazorGuiComponent blazorGuiComponent))
                 {
-                    blazorGuiComponent.Visible = true;
-                    blazorGuiComponent.Path = "counter";
+                    if (blazorGuiComponent.Visible)
+                    {
+                        blazorGuiComponent.Visible = false;
+                    }
+                    else
+                    {
+                        blazorGuiComponent.Visible = true;
+                        blazorGuiComponent.Path = "counter";
+                    }
                 }
             });
 
@@ -96,8 +103,15 @@ internal sealed class PlayerBindsLogic
             {
                 if (entity.TryGetComponent(out BlazorGuiComponent blazorGuiComponent))
                 {
-                    blazorGuiComponent.Visible = true;
-                    blazorGuiComponent.Path = "fetchdata";
+                    if(blazorGuiComponent.Visible)
+                    {
+                        blazorGuiComponent.Visible = false;
+                    }
+                    else
+                    {
+                        blazorGuiComponent.Visible = true;
+                        blazorGuiComponent.Path = "fetchdata";
+                    }
                 }
             });
 

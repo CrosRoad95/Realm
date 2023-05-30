@@ -1,4 +1,8 @@
-﻿namespace RealmCore.BlazorCEFGui.Services;
+﻿using Microsoft.JSInterop;
+using System.Text.Json;
+using System.Text.Json.Serialization;
+
+namespace RealmCore.BlazorCEFGui.Services;
 
 public class EventHub
 {
@@ -15,19 +19,30 @@ public class EventHub
     {
         if(_navigationManager.Uri.Contains("localhost"))
         {
-            Console.WriteLine("call 1");
             await _jsRuntime.InvokeVoidAsync("mtaTriggerEventDebug", "invokeVoidAsync", identifier, args);
         }
         else
         {
-            Console.WriteLine("call 2");
             await _jsRuntime.InvokeVoidAsync("mtaTriggerEvent", "invokeVoidAsync", identifier, args);
         }
+    }
+    
+    public async ValueTask<T> InvokeAsync<T>(string identifier, params object?[]? args)
+    {
+        string data;
+        if(_navigationManager.Uri.Contains("localhost"))
+        {
+            data = await _jsRuntime.InvokeAsync<string>("mtaTriggerEventWithResultDebug", "invokeAsync", identifier, args);
+        }
+        else
+        {
+            data = await _jsRuntime.InvokeAsync<string>("mtaTriggerEventWithResult", "invokeAsync", identifier, args);
+        }
+        return JsonSerializer.Deserialize<T>(data);
     }
 
     public ValueTask LocationChanged(string location)
     {
-        Console.WriteLine("location {0}", location);
         return InvokeVoidAsync("_locationChanged", location);
     }
 }
