@@ -1,6 +1,8 @@
 ﻿using RealmCore.Server.Enums;
 using RealmCore.Server.Extensions;
 using RealmCore.Server.Rules;
+using SlipeServer.Server.Services;
+using System.Data;
 
 namespace RealmCore.Console.Logic;
 
@@ -8,11 +10,13 @@ internal class SamplePickupsLogic
 {
     private readonly IECS _ecs;
     private readonly IEntityFactory _entityFactory;
+    private readonly ChatBox _chatBox;
 
-    public SamplePickupsLogic(IECS ecs, IEntityFactory entityFactory)
+    public SamplePickupsLogic(IECS ecs, IEntityFactory entityFactory, ChatBox chatBox)
     {
         _ecs = ecs;
         _entityFactory = entityFactory;
+        _chatBox = chatBox;
         _ecs.EntityCreated += EntityCreated;
     }
 
@@ -27,7 +31,7 @@ internal class SamplePickupsLogic
                 if (entity.Tag == EntityTag.Player)
                 {
                     var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();
-                    playerElementComponent.SendChatMessage($"No permissions, rule: {rule.GetType().Name}");
+                    _chatBox.OutputTo(entity, $"No permissions, rule: {rule.GetType().Name}");
                 }
 
             };
@@ -45,13 +49,13 @@ internal class SamplePickupsLogic
                 {
                     var fractionSessionComponent = entity.GetRequiredComponent<FractionSessionComponent>();
                     fractionSessionComponent.End();
-                    playerElementComponent.SendChatMessage($"Session ended in: {fractionSessionComponent.Elapsed}");
+                    _chatBox.OutputTo(entity, $"Session ended in: {fractionSessionComponent.Elapsed}");
                     entity.DestroyComponent(fractionSessionComponent);
                 }
                 else
                 {
                     var fractionSessionComponent = entity.AddComponent<FractionSessionComponent>();
-                    playerElementComponent.SendChatMessage($"Session started");
+                    _chatBox.OutputTo(entity, $"Session started");
                     fractionSessionComponent.Start();
                 }
             };
@@ -75,19 +79,19 @@ internal class SamplePickupsLogic
                     var jobSessionComponent = entity.GetRequiredComponent<JobSessionComponent>();
                     jobSessionComponent.End();
                     var elapsed = jobSessionComponent.Elapsed;
-                    playerElementComponent.SendChatMessage($"Job ended in: {elapsed.Hours:X2}:{elapsed.Minutes:X2}:{elapsed.Seconds:X2}, completed objectives: {jobSessionComponent.CompletedObjectives}");
+                    _chatBox.OutputTo(entity, $"Job ended in: {elapsed.Hours:X2}:{elapsed.Minutes:X2}:{elapsed.Seconds:X2}, completed objectives: {jobSessionComponent.CompletedObjectives}");
                     entity.GetRequiredComponent<JobStatisticsComponent>().AddTimePlayed(jobSessionComponent.JobId, (ulong)jobSessionComponent.Elapsed.Seconds);
                     entity.DestroyComponent(jobSessionComponent);
                 }
                 else
                 {
                     var jobSessionComponent = entity.AddComponent<TestJobComponent>();
-                    playerElementComponent.SendChatMessage($"Job started");
+                    _chatBox.OutputTo(entity, $"Job started");
                     jobSessionComponent.Start();
 
                     jobSessionComponent.CompletedAllObjectives += async e =>
                     {
-                        playerElementComponent.SendChatMessage($"All objectives completed!");
+                        _chatBox.OutputTo(entity, $"All objectives completed!");
                         await Task.Delay(2000);
                         jobSessionComponent.CreateObjectives();
                     };
@@ -117,11 +121,11 @@ internal class SamplePickupsLogic
             pickupElementComponent.AddRule<MustBePlayerOnFootOnlyRule>();
             pickupElementComponent.EntityEntered = (enteredPickup, entity) =>
             {
-                entity.GetRequiredComponent<PlayerElementComponent>().SendChatMessage($"Entered marker");
+                _chatBox.OutputTo(entity, $"Entered marker");
             };
             pickupElementComponent.EntityLeft = (leftPickup, entity) =>
             {
-                entity.GetRequiredComponent<PlayerElementComponent>().SendChatMessage($"Left marker");
+                _chatBox.OutputTo(entity, $"Left marker");
             };
         }
     }

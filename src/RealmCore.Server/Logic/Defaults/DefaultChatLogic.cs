@@ -26,20 +26,17 @@ public class DefaultChatLogic
         {
             case "say":
                 if (_ecs.TryGetEntityByPlayer(player, out var playerEntity))
-                    if (playerEntity.TryGetComponent(out PlayerElementComponent playerElementComponent))
+                    if (playerEntity.HasComponent<UserComponent>())
                     {
-                        if (playerEntity.HasComponent<UserComponent>())
-                        {
-                            string message = $"{player.NametagColor.ToColorCode()}{player.Name}: #ffffff{string.Join(' ', arguments.Arguments)}";
-                            foreach (var targetPlayerEntity in _ecs.PlayerEntities.Where(x => x.HasComponent<UserComponent>()))
-                                targetPlayerEntity.GetRequiredComponent<PlayerElementComponent>().SendChatMessage(message, Color.White, true);
+                        string message = $"{player.NametagColor.ToColorCode()}{player.Name}: #ffffff{string.Join(' ', arguments.Arguments)}";
+                        foreach (var targetPlayerEntity in _ecs.PlayerEntities.Where(x => x.HasComponent<UserComponent>()))
+                            _chatBox.OutputTo(targetPlayerEntity, message, Color.White, true);
 
-                            _logger.LogInformation("{message}", message);
-                        }
-                        else
-                        {
-                            playerElementComponent.SendChatMessage("Nie możesz pisać ponieważ nie jesteś zalogowany.");
-                        }
+                        _logger.LogInformation("{message}", message);
+                    }
+                    else
+                    {
+                        _chatBox.OutputTo(playerEntity, "Nie możesz pisać ponieważ nie jesteś zalogowany.");
                     }
                 break;
         }

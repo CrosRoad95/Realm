@@ -23,17 +23,19 @@ public class RPGCommandService
     private readonly IECS _ecs;
     private readonly IUsersService _rpgUserManager;
     private readonly IPolicyDrivenCommandExecutor _policyDrivenCommandExecutor;
+    private readonly ChatBox _chatBox;
     private readonly ILogger<RPGCommandService> _logger;
 
     private readonly Dictionary<string, AsyncCommandInfo> _asyncCommands = new();
     private readonly Dictionary<string, CommandInfo> _commands = new();
-    public RPGCommandService(CommandService commandService, ILogger<RPGCommandService> logger, IECS ecs, IUsersService rpgUserManager, IPolicyDrivenCommandExecutor policyDrivenCommandExecutor)
+    public RPGCommandService(CommandService commandService, ILogger<RPGCommandService> logger, IECS ecs, IUsersService rpgUserManager, IPolicyDrivenCommandExecutor policyDrivenCommandExecutor, ChatBox chatBox)
     {
         _logger = logger;
         _commandService = commandService;
         _ecs = ecs;
         _rpgUserManager = rpgUserManager;
         _policyDrivenCommandExecutor = policyDrivenCommandExecutor;
+        _chatBox = chatBox;
     }
 
     public bool AddAsyncCommandHandler(string commandName, Func<Entity, string[], Task> callback, string[]? requiredPolicies = null)
@@ -136,7 +138,7 @@ public class RPGCommandService
             }
             catch (RateLimitRejectedException rateLimitRejectedException)
             {
-                playerElementComponent.SendChatMessage("Zbyt szybko wysyłasz komendy. Poczekaj chwilę.");
+                _chatBox.OutputTo(entity, "Zbyt szybko wysyłasz komendy. Poczekaj chwilę.");
                 _logger.LogError(rateLimitRejectedException, "Exception thrown while executing command {commandText} with arguments {commandArguments}", commandText, args.Arguments);
             }
             catch (Exception ex)
@@ -211,7 +213,7 @@ public class RPGCommandService
             }
             catch (RateLimitRejectedException rateLimitRejectedException)
             {
-                playerElementComponent.SendChatMessage("Zbyt szybko wysyłasz komendy. Poczekaj chwilę.");
+                _chatBox.OutputTo(entity, "Zbyt szybko wysyłasz komendy. Poczekaj chwilę.");
                 _logger.LogError(rateLimitRejectedException, "Exception thrown while executing command {commandText} with arguments {commandArguments}", commandText, args.Arguments);
             }
             catch (Exception ex)

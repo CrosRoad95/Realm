@@ -4,6 +4,7 @@ using RealmCore.Server.Enums;
 using RealmCore.Server.Extensions;
 using RealmCore.Resources.Nametags;
 using RealmCore.Resources.Admin.Enums;
+using SlipeServer.Server.Services;
 
 namespace RealmCore.Console.Logic;
 
@@ -12,12 +13,14 @@ internal sealed class PlayerJoinedLogic
     private readonly IECS _ecs;
     private readonly ILogger<PlayerJoinedLogic> _logger;
     private readonly INametagsService _nametagsService;
+    private readonly ChatBox _chatBox;
 
-    public PlayerJoinedLogic(IECS ecs, ILogger<PlayerJoinedLogic> logger, INametagsService nametagsService)
+    public PlayerJoinedLogic(IECS ecs, ILogger<PlayerJoinedLogic> logger, INametagsService nametagsService, ChatBox chatBox)
     {
         _ecs = ecs;
         _logger = logger;
         _nametagsService = nametagsService;
+        _chatBox = chatBox;
         _ecs.EntityCreated += HandleEntityCreated;
     }
 
@@ -29,8 +32,8 @@ internal sealed class PlayerJoinedLogic
         var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();
 
         playerElementComponent.SetText3dRenderingEnabled(false);
-        playerElementComponent.SetChatVisible(false);
-        playerElementComponent.ClearChatBox();
+        _chatBox.SetVisibleFor(entity, false);
+        _chatBox.ClearFor(entity);
         playerElementComponent.FadeCamera(CameraFade.In);
         playerElementComponent.SetCameraMatrix(new Vector3(379.89844f, -92.6416f, 10.950561f), new Vector3(336.75684f, -93.018555f, 1.3956465f));
         var adminComponent = entity.AddComponent(new AdminComponent(new List<AdminTool> { AdminTool.Entities, AdminTool.Components, AdminTool.ShowSpawnMarkers }));
@@ -56,9 +59,9 @@ internal sealed class PlayerJoinedLogic
                 var entity = component.Entity;
                 var playerElementComponent = component.Entity.GetRequiredComponent<PlayerElementComponent>();
                 await playerElementComponent.FadeCameraAsync(CameraFade.Out);
-                playerElementComponent.SetChatVisible(true);
                 playerElementComponent.SetGuiDebugToolsEnabled(true);
-                playerElementComponent.ClearChatBox();
+                _chatBox.SetVisibleFor(entity, true);
+                _chatBox.ClearFor(entity);
                 playerElementComponent.SetCameraTarget(component.Entity);
                 if (!playerElementComponent.TrySpawnAtLastPosition())
                 {

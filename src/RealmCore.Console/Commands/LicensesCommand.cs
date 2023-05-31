@@ -1,13 +1,18 @@
-﻿namespace RealmCore.Console.Commands;
+﻿using RealmCore.Server.Extensions;
+using SlipeServer.Server.Services;
+
+namespace RealmCore.Console.Commands;
 
 [CommandName("licenses")]
 public sealed class LicensesCommand : IIngameCommand
 {
     private readonly ILogger<LicensesCommand> _logger;
+    private readonly ChatBox _chatBox;
 
-    public LicensesCommand(ILogger<LicensesCommand> logger)
+    public LicensesCommand(ILogger<LicensesCommand> logger, ChatBox chatBox)
     {
         _logger = logger;
+        _chatBox = chatBox;
     }
 
     public Task Handle(Entity entity, string[] args)
@@ -15,10 +20,10 @@ public sealed class LicensesCommand : IIngameCommand
         if (entity.TryGetComponent(out LicensesComponent licenseComponent))
         {
             var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();
-            playerElementComponent.SendChatMessage($"Licenses");
+            _chatBox.OutputTo(entity, $"Licenses");
             foreach (var license in licenseComponent.Licenses)
             {
-                playerElementComponent.SendChatMessage($"License: {license.licenseId} = {license.IsSuspended}");
+                _chatBox.OutputTo(entity, $"License: {license.licenseId} = {license.IsSuspended}");
             }
 
         }

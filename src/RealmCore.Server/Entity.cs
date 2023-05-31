@@ -78,8 +78,6 @@ public class Entity : IDisposable
     {
         ThrowIfDisposed();
 
-        component.Entity = this;
-
         InternalInjectProperties(typeof(TComponent), component);
     }
 
@@ -132,7 +130,7 @@ public class Entity : IDisposable
 
         ThrowIfDisposed();
 
-        if (component.Entity != null)
+        if (!component.TrySetEntity(this))
             throw new Exception("Component already attached to other entity");
 
         InjectProperties(component);
@@ -143,7 +141,10 @@ public class Entity : IDisposable
         }
         catch (Exception)
         {
-            DestroyComponent(component);
+            component.TryRemoveEntity(() =>
+            {
+                DestroyComponent(component);
+            });
             throw;
         }
 
@@ -160,10 +161,10 @@ public class Entity : IDisposable
     public async Task<TComponent> AddComponentAsync<TComponent>(TComponent component) where TComponent : AsyncComponent
     {
         ThrowIfDisposed();
-        if (component.Entity != null)
-        {
+
+        if (!component.TrySetEntity(this))
             throw new Exception("Component already attached to other entity");
-        }
+
         InjectProperties(component);
         InternalAddComponent(component);
 
@@ -272,10 +273,8 @@ public class Entity : IDisposable
 
     public TComponent GetRequiredComponent<TComponent>() where TComponent : Component
     {
-        var component = GetComponent<TComponent>();
-        if (component == null)
-            throw new ComponentNotFoundException<TComponent>();
-        return component;
+        var component = InternalGetComponent<TComponent>();
+        return component == null ? throw new ComponentNotFoundException<TComponent>() : component;
     }
 
     public void DetachComponent<TComponent>() where TComponent : Component
@@ -284,16 +283,15 @@ public class Entity : IDisposable
         DetachComponent(GetRequiredComponent<TComponent>());
     }
 
-    public void InternalDetachComponent<TComponent>(TComponent component) where TComponent : Component
+    private void InternalDetachComponent<TComponent>(TComponent component) where TComponent : Component
     {
-        ThrowIfDisposed();
-
-        ComponentDetached?.Invoke(component);
-        _components.Remove(component);
-        component.Entity = null!;
+        component.TryRemoveEntity(() =>
+        {
+            ComponentDetached?.Invoke(component);
+            _components.Remove(component);
+        });
     }
     
-
     public void DetachComponent<TComponent>(TComponent component) where TComponent : Component
     {
         ThrowIfDisposed();
@@ -329,7 +327,7 @@ public class Entity : IDisposable
             if(InternalHasComponent(component))
             {
                 component.Dispose();
-                DetachComponent(component);
+                InternalDetachComponent(component);
             }
         }
         catch (ObjectDisposedException)
@@ -337,6 +335,10 @@ public class Entity : IDisposable
         catch (Exception)
         {
             throw;
+        }
+        finally
+        {
+            _componentsLock.ExitWriteLock();
         }
         return false;
     }

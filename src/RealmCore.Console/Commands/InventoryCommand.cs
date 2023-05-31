@@ -1,13 +1,18 @@
-﻿namespace RealmCore.Console.Commands;
+﻿using RealmCore.Server.Extensions;
+using SlipeServer.Server.Services;
+
+namespace RealmCore.Console.Commands;
 
 [CommandName("inventory")]
 public sealed class InventoryCommand : IIngameCommand
 {
     private readonly ILogger<InventoryCommand> _logger;
+    private readonly ChatBox _chatBox;
 
-    public InventoryCommand(ILogger<InventoryCommand> logger)
+    public InventoryCommand(ILogger<InventoryCommand> logger, ChatBox chatBox)
     {
         _logger = logger;
+        _chatBox = chatBox;
     }
 
     public Task Handle(Entity entity, string[] args)
@@ -15,10 +20,10 @@ public sealed class InventoryCommand : IIngameCommand
         if (entity.TryGetComponent(out InventoryComponent inventoryComponent))
         {
             var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();
-            playerElementComponent.SendChatMessage($"Inventory, {inventoryComponent.Number}/{inventoryComponent.Size}");
+            _chatBox.OutputTo(entity, $"Inventory, {inventoryComponent.Number}/{inventoryComponent.Size}");
             foreach (var item in inventoryComponent.Items)
             {
-                playerElementComponent.SendChatMessage($"Item, {item.ItemId} = {item.Name}");
+                _chatBox.OutputTo(entity, $"Item, {item.ItemId} = {item.Name}");
             }
 
         }

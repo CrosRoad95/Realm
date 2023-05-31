@@ -1,13 +1,18 @@
-﻿namespace RealmCore.Console.Commands;
+﻿using RealmCore.Server.Extensions;
+using SlipeServer.Server.Services;
+
+namespace RealmCore.Console.Commands;
 
 [CommandName("givelicense")]
 public sealed class GiveLicenseCommand : IIngameCommand
 {
     private readonly ILogger<GiveLicenseCommand> _logger;
+    private readonly ChatBox _chatBox;
 
-    public GiveLicenseCommand(ILogger<GiveLicenseCommand> logger)
+    public GiveLicenseCommand(ILogger<GiveLicenseCommand> logger, ChatBox chatBox)
     {
         _logger = logger;
+        _chatBox = chatBox;
     }
 
     public Task Handle(Entity entity, string[] args)
@@ -17,11 +22,11 @@ public sealed class GiveLicenseCommand : IIngameCommand
             var license = args.First();
             if (licenseComponent.AddLicense(int.Parse(license)))
             {
-                entity.GetRequiredComponent<PlayerElementComponent>().SendChatMessage($"license added: '{license}'");
+                _chatBox.OutputTo(entity, $"license added: '{license}'");
             }
             else
             {
-                entity.GetRequiredComponent<PlayerElementComponent>().SendChatMessage($"failed to add license: '{license}'");
+                _chatBox.OutputTo(entity, $"failed to add license: '{license}'");
             }
         }
         return Task.CompletedTask;

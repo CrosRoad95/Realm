@@ -1,15 +1,20 @@
-﻿namespace RealmCore.Console.Commands;
+﻿using RealmCore.Server.Extensions;
+using SlipeServer.Server.Services;
+
+namespace RealmCore.Console.Commands;
 
 [CommandName("creategroup")]
 public sealed class CreateGroupCommand : IIngameCommand
 {
     private readonly ILogger<CreateGroupCommand> _logger;
     private readonly IGroupService _groupService;
+    private readonly ChatBox _chatBox;
 
-    public CreateGroupCommand(ILogger<CreateGroupCommand> logger, IGroupService groupService)
+    public CreateGroupCommand(ILogger<CreateGroupCommand> logger, IGroupService groupService, ChatBox chatBox)
     {
         _logger = logger;
         _groupService = groupService;
+        _chatBox = chatBox;
     }
 
     public async Task Handle(Entity entity, string[] args)
@@ -20,11 +25,11 @@ public sealed class CreateGroupCommand : IIngameCommand
             var group = await _groupService.CreateGroup(name, "");
             await _groupService.AddMember(group.id, entity, 100, "Leader");
 
-            entity.GetRequiredComponent<PlayerElementComponent>().SendChatMessage($"Group: '{name}' has been created");
+            _chatBox.OutputTo(entity, $"Group: '{name}' has been created");
         }
         catch (Exception)
         {
-            entity.GetRequiredComponent<PlayerElementComponent>().SendChatMessage($"Failed to create group: '{name}'");
+            _chatBox.OutputTo(entity, $"Failed to create group: '{name}'");
             throw;
         }
     }

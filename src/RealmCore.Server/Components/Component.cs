@@ -3,11 +3,25 @@
 public abstract class Component : IDisposable
 {
     internal object _versionLock = new();
+    internal object _entityLock = new();
     internal byte _version;
 
     protected bool _disposed = false;
 
-    public Entity Entity { get; internal set; } = default!;
+    private Entity? _entity = null;
+    public Entity Entity
+    {
+        get
+        {
+            lock(_entityLock)
+                return _entity ?? throw new InvalidOperationException();
+        }
+        internal set
+        {
+            lock(_entityLock)
+                _entity = value;
+        }
+    }
 
     public event Action<Component>? Disposed;
 
@@ -25,6 +39,32 @@ public abstract class Component : IDisposable
     {
         if (_disposed)
             throw new ObjectDisposedException(GetType().Name);
+    }
+
+    internal bool TryRemoveEntity(Action callback)
+    {
+        lock(_entityLock)
+        {
+            if (_entity == null)
+                return false;
+
+            callback();
+
+            _entity = null;
+            return true;
+        }
+    }
+    
+    internal bool TrySetEntity(Entity entity)
+    {
+        lock(_entityLock)
+        {
+            if (_entity != null)
+                return false;
+
+            _entity = entity;
+            return true;
+        }
     }
 
     public virtual void Dispose()

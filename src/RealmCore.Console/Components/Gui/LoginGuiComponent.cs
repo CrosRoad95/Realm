@@ -1,4 +1,5 @@
 ﻿using RealmCore.Server.Contexts.Interfaces;
+using RealmCore.Server.Extensions;
 
 namespace RealmCore.Console.Components.Gui;
 
@@ -59,8 +60,9 @@ public sealed class LoginGuiComponent : GuiComponent
                         return;
                     }
                 }
-                catch(Exception)
+                catch(Exception ex)
                 {
+                    Logger.LogHandleError(ex);
                     formContext.ErrorResponse("Błąd podczas logowania.");
                 }
                 break;

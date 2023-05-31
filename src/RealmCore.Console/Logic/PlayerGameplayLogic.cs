@@ -3,6 +3,7 @@ using RealmCore.Server.Components;
 using RealmCore.Server.Enums;
 using RealmCore.Server.Extensions;
 using SlipeServer.Server.Elements.Enums;
+using SlipeServer.Server.Services;
 
 namespace RealmCore.Console.Logic;
 
@@ -10,12 +11,14 @@ internal sealed class PlayerGameplayLogic
 {
     private readonly IECS _ecs;
     private readonly IServiceProvider _serviceProvider;
+    private readonly ChatBox _chatBox;
     private readonly ILogger<PlayerGameplayLogic> _logger;
 
-    public PlayerGameplayLogic(IECS ecs, ILogger<PlayerGameplayLogic> logger, IServiceProvider serviceProvider)
+    public PlayerGameplayLogic(IECS ecs, ILogger<PlayerGameplayLogic> logger, IServiceProvider serviceProvider, ChatBox chatBox)
     {
         _ecs = ecs;
         _serviceProvider = serviceProvider;
+        _chatBox = chatBox;
         _logger = logger;
         _ecs.EntityCreated += HandleEntityCreated;
     }
@@ -87,7 +90,7 @@ internal sealed class PlayerGameplayLogic
                             {
                                 if (await durationBasedHoldInteractionComponent.BeginInteraction(playerEntity, token.Token))
                                 {
-                                    playerEntity.GetRequiredComponent<PlayerElementComponent>().SendChatMessage("okk");
+                                    _chatBox.OutputTo(playerEntity, "okk");
                                     _logger.LogInformation("Interaction completed");
                                 }
                                 else

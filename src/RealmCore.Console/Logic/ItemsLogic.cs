@@ -1,13 +1,17 @@
 ﻿using RealmCore.Server.Components;
 using RealmCore.Server.Enums;
+using RealmCore.Server.Extensions;
 using RealmCore.Server.Inventory;
 using SlipeServer.Server.Enums;
+using SlipeServer.Server.Services;
 
 namespace RealmCore.Console.Logic;
 
 public class ItemsLogic
 {
-    public ItemsLogic(ItemsRegistry itemsRegistry, IECS ecs)
+    private readonly ChatBox _chatBox;
+
+    public ItemsLogic(ItemsRegistry itemsRegistry, IECS ecs, ChatBox chatBox)
     {
         itemsRegistry.UseCallback = Use;
         itemsRegistry.Add(1, new ItemRegistryEntry
@@ -40,6 +44,7 @@ public class ItemsLogic
         });
 
         ecs.EntityCreated += HandleEntityCreated;
+        _chatBox = chatBox;
     }
 
     private void HandleEntityCreated(Entity entity)
@@ -67,7 +72,7 @@ public class ItemsLogic
                 {
                     var playerElementComponent = inventoryComponent.Entity.GetRequiredComponent<PlayerElementComponent>();
                     playerElementComponent.GiveWeapon(WeaponId.Bat);
-                    playerElementComponent.SendChatMessage("Bat taken");
+                    _chatBox.OutputTo(inventoryComponent.Entity, "Bat taken");
                 }
                 break;
         }
@@ -83,7 +88,7 @@ public class ItemsLogic
                 if (!playerElementComponent.HasWeapon(WeaponId.Bat))
                 {
                     playerElementComponent.GiveWeapon(WeaponId.Bat, 1);
-                    playerElementComponent.SendChatMessage("Bat given");
+                    _chatBox.OutputTo(inventoryComponent.Entity, "Bat taken");
                 }
                 break;
         }
@@ -94,7 +99,7 @@ public class ItemsLogic
         switch (action)
         {
             case ItemAction.Use:
-                inventoryComponent.Entity.GetRequiredComponent<PlayerElementComponent>().SendChatMessage($"Item used: {item.Name}");
+                _chatBox.OutputTo(inventoryComponent.Entity, $"Item used: {item.Name}");
                 inventoryComponent.RemoveItem(item);
                 break;
         }

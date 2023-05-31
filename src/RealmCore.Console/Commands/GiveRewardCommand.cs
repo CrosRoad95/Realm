@@ -1,4 +1,7 @@
-﻿namespace RealmCore.Console.Commands;
+﻿using RealmCore.Server.Extensions;
+using SlipeServer.Server.Services;
+
+namespace RealmCore.Console.Commands;
 
 
 [CommandName("givereward")]
@@ -6,22 +9,24 @@ public sealed class GiveRewardCommand : IIngameCommand
 {
     private readonly ILogger<GiveRewardCommand> _logger;
     private readonly IRewardService _rewardService;
+    private readonly ChatBox _chatBox;
 
-    public GiveRewardCommand(ILogger<GiveRewardCommand> logger, IRewardService rewardService)
+    public GiveRewardCommand(ILogger<GiveRewardCommand> logger, IRewardService rewardService, ChatBox chatBox)
     {
         _logger = logger;
         _rewardService = rewardService;
+        _chatBox = chatBox;
     }
 
     public async Task Handle(Entity entity, string[] args)
     {
         if (await _rewardService.TryGiveReward(entity, 1))
         {
-            entity.GetRequiredComponent<PlayerElementComponent>().SendChatMessage("Nagroda id 1 została odebrana pomyślnie");
+            _chatBox.OutputTo(entity, "Nagroda id 1 została odebrana pomyślnie");
         }
         else
         {
-            entity.GetRequiredComponent<PlayerElementComponent>().SendChatMessage("Już otrzymałeś nagrode id 1");
+            _chatBox.OutputTo(entity, "Już otrzymałeś nagrode id 1");
         }
     }
 }

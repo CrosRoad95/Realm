@@ -9,8 +9,6 @@ public sealed class PlayerElementComponent : PedElementComponent
     [Inject]
     private IDateTimeProvider DateTimeProvider { get; set; } = default!;
     [Inject]
-    private ChatBox ChatBox { get; set; } = default!;
-    [Inject]
     private IOverlayService OverlayService { get; set; } = default!;
     [Inject]
     private IClientInterfaceService ClientInterfaceService { get; set; } = default!;
@@ -371,18 +369,6 @@ public sealed class PlayerElementComponent : PedElementComponent
         Spawned = true;
     }
 
-    public void SendChatMessage(string message, Color? color = null, bool isColorCoded = false)
-    {
-        ThrowIfDisposed();
-        ChatBox.OutputTo(_player, message, color ?? Color.White, isColorCoded);
-    }
-
-    public void ClearChatBox()
-    {
-        ThrowIfDisposed();
-        ChatBox.ClearFor(_player);
-    }
-
     public void SetCameraMatrix(Vector3 from, Vector3 to)
     {
         ThrowIfDisposed();
@@ -400,12 +386,6 @@ public sealed class PlayerElementComponent : PedElementComponent
         ThrowIfDisposed();
         _player.Camera.Fade(cameraFade, fadeTime);
         return Task.Delay(TimeSpan.FromSeconds(fadeTime));
-    }
-
-    public void SetChatVisible(bool visible)
-    {
-        ThrowIfDisposed();
-        ChatBox.SetVisibleFor(_player, visible);
     }
 
     public void SetCameraTarget(Entity entity)

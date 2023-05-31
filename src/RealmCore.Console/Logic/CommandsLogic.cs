@@ -65,7 +65,7 @@ internal sealed class CommandsLogic
         {
             if (entity.TryGetComponent(out PlayTimeComponent playTimeComponent))
             {
-                entity.GetRequiredComponent<PlayerElementComponent>().SendChatMessage($"playtime: {playTimeComponent.PlayTime}, total play time: {playTimeComponent.TotalPlayTime}");
+                _chatBox.OutputTo(entity, $"playtime: {playTimeComponent.PlayTime}, total play time: {playTimeComponent.TotalPlayTime}");
             }
         });
 
@@ -75,7 +75,7 @@ internal sealed class CommandsLogic
             {
                 var amount = decimal.Parse(args.First());
                 moneyComponent.GiveMoney(amount);
-                entity.GetRequiredComponent<PlayerElementComponent>().SendChatMessage($"gave money: {amount}, total money: {moneyComponent.Money}");
+                _chatBox.OutputTo(entity, $"gave money: {amount}, total money: {moneyComponent.Money}");
             }
         });
 
@@ -85,7 +85,7 @@ internal sealed class CommandsLogic
             {
                 var amount = decimal.Parse(args.First());
                 moneyComponent.TakeMoney(amount);
-                entity.GetRequiredComponent<PlayerElementComponent>().SendChatMessage($"taken money: {amount}, total money: {moneyComponent.Money}");
+                _chatBox.OutputTo(entity, $"taken money: {amount}, total money: {moneyComponent.Money}");
             }
         });
 
@@ -95,7 +95,7 @@ internal sealed class CommandsLogic
             {
                 var amount = decimal.Parse(args.First());
                 moneyComponent.Money = amount;
-                entity.GetRequiredComponent<PlayerElementComponent>().SendChatMessage($"taken money: {amount}, total money: {moneyComponent.Money}");
+                _chatBox.OutputTo(entity, $"taken money: {amount}, total money: {moneyComponent.Money}");
             }
         });
 
@@ -103,7 +103,7 @@ internal sealed class CommandsLogic
         {
             if (entity.TryGetComponent(out MoneyComponent moneyComponent))
             {
-                entity.GetRequiredComponent<PlayerElementComponent>().SendChatMessage($"total money: {moneyComponent.Money}");
+                _chatBox.OutputTo(entity, $"total money: {moneyComponent.Money}");
             }
         });
 
@@ -171,16 +171,16 @@ internal sealed class CommandsLogic
             var veh = playerElementComponent.OccupiedVehicle;
             if (veh == null)
             {
-                playerElementComponent.SendChatMessage("Enter vehicle!");
+                _chatBox.OutputTo(entity, "Enter vehicle!");
                 return;
             }
 
             var privateVehicleComponent = veh.GetRequiredComponent<PrivateVehicleComponent>();
-            playerElementComponent.SendChatMessage("Access info:");
+            _chatBox.OutputTo(entity, "Access info:");
 
             foreach (var vehicleAccess in privateVehicleComponent.PlayerAccesses)
             {
-                playerElementComponent.SendChatMessage($"Access: ({vehicleAccess.UserId}) = Ownership={vehicleAccess.AccessType == 0}");
+                _chatBox.OutputTo(entity, $"Access: ({vehicleAccess.UserId}) = Ownership={vehicleAccess.AccessType == 0}");
             }
         });
 
@@ -188,7 +188,7 @@ internal sealed class CommandsLogic
         {
             var achievementsComponent = entity.GetRequiredComponent<AchievementsComponent>();
             achievementsComponent.UpdateProgress(1, 2, 10);
-            entity.GetRequiredComponent<PlayerElementComponent>().SendChatMessage($"progressed achieviement 'test'");
+            _chatBox.OutputTo(entity, $"progressed achieviement 'test'");
         });
 
         _commandService.AddCommandHandler("addupgrade", (entity, args) =>
@@ -197,13 +197,13 @@ internal sealed class CommandsLogic
             try
             {
                 if (jobUpgradesComponent.TryAddJobUpgrade(1, 1))
-                    entity.GetRequiredComponent<PlayerElementComponent>().SendChatMessage("Upgrade added");
+                    _chatBox.OutputTo(entity, "Upgrade added");
                 else
-                    entity.GetRequiredComponent<PlayerElementComponent>().SendChatMessage("Failed to add upgrade");
+                    _chatBox.OutputTo(entity, "Failed to add upgrade");
             }
             catch (Exception ex)
             {
-                entity.GetRequiredComponent<PlayerElementComponent>().SendChatMessage($"Failed to add upgrade: {ex.Message}");
+                _chatBox.OutputTo(entity, $"Failed to add upgrade: {ex.Message}");
             }
         });
 
@@ -213,27 +213,27 @@ internal sealed class CommandsLogic
             var veh = playerElementComponent.OccupiedVehicle;
             if (veh == null)
             {
-                playerElementComponent.SendChatMessage("Enter vehicle!");
+                _chatBox.OutputTo(entity, "Enter vehicle!");
                 return;
             }
 
             var vehicleUpgradeComponent = veh.GetRequiredComponent<VehicleUpgradesComponent>();
             if (vehicleUpgradeComponent.HasUpgrade(1))
             {
-                playerElementComponent.SendChatMessage("You already have a upgrade!");
+                _chatBox.OutputTo(entity, "You already have a upgrade!");
                 return;
             }
             vehicleUpgradeComponent.AddUpgrade(1);
-            playerElementComponent.SendChatMessage("Upgrade added");
+            _chatBox.OutputTo(entity, "Upgrade added");
         });
 
         _commandService.AddCommandHandler("comps", (entity, args) =>
         {
             var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();
-            playerElementComponent.SendChatMessage("Components:");
+            _chatBox.OutputTo(entity, "Components:");
             foreach (var component in entity.Components)
             {
-                playerElementComponent.SendChatMessage($"> {component}");
+                _chatBox.OutputTo(entity, $"> {component}");
             }
         });
 
@@ -242,7 +242,7 @@ internal sealed class CommandsLogic
             if (entity.TryGetComponent(out InventoryComponent inventoryComponent))
             {
                 inventoryComponent.AddItem(_itemsRegistry, 1);
-                entity.GetRequiredComponent<PlayerElementComponent>().SendChatMessage($"Test item added");
+                _chatBox.OutputTo(entity, $"Test item added");
             }
         });
         _commandService.AddCommandHandler("additem2", (entity, args) =>
@@ -250,7 +250,7 @@ internal sealed class CommandsLogic
             if (entity.TryGetComponent(out InventoryComponent inventoryComponent))
             {
                 inventoryComponent.AddItem(_itemsRegistry, 2);
-                entity.GetRequiredComponent<PlayerElementComponent>().SendChatMessage($"Test item added");
+                _chatBox.OutputTo(entity, $"Test item added");
             }
         });
         _commandService.AddAsyncCommandHandler("addtestdata", async (entity, args) =>
@@ -258,34 +258,34 @@ internal sealed class CommandsLogic
             if (entity.TryGetComponent(out JobUpgradesComponent jobUpgradesComponent))
             {
                 if (jobUpgradesComponent.TryAddJobUpgrade(1, 1))
-                    entity.GetRequiredComponent<PlayerElementComponent>().SendChatMessage("Upgrade added");
+                    _chatBox.OutputTo(entity, "Upgrade added");
                 else
-                    entity.GetRequiredComponent<PlayerElementComponent>().SendChatMessage("Failed to add upgrade");
+                    _chatBox.OutputTo(entity, "Failed to add upgrade");
             }
 
             if (entity.TryGetComponent(out InventoryComponent inventoryComponent))
             {
                 inventoryComponent.AddItem(_itemsRegistry, 1);
-                entity.GetRequiredComponent<PlayerElementComponent>().SendChatMessage($"Test item added");
+                _chatBox.OutputTo(entity, $"Test item added");
             }
 
             if (entity.TryGetComponent(out LicensesComponent licenseComponent))
             {
                 if (licenseComponent.AddLicense(1))
-                    entity.GetRequiredComponent<PlayerElementComponent>().SendChatMessage($"Test license added: 'test123' of id 1");
+                    _chatBox.OutputTo(entity, $"Test license added: 'test123' of id 1");
             }
 
             if (entity.TryGetComponent(out MoneyComponent moneyComponent))
             {
                 moneyComponent.Money = (decimal)Random.Shared.NextDouble() * 1000;
-                entity.GetRequiredComponent<PlayerElementComponent>().SendChatMessage($"Set money to: {moneyComponent.Money}");
+                _chatBox.OutputTo(entity, $"Set money to: {moneyComponent.Money}");
             }
 
 
             if (entity.TryGetComponent(out AchievementsComponent achievementsComponent))
             {
                 achievementsComponent.UpdateProgress(1, 2, 10);
-                entity.GetRequiredComponent<PlayerElementComponent>().SendChatMessage($"Updated achievement 'test' progress to 2");
+                _chatBox.OutputTo(entity, $"Updated achievement 'test' progress to 2");
             }
 
             {
@@ -304,7 +304,7 @@ internal sealed class CommandsLogic
             {
                 var amount = uint.Parse(args.First());
                 levelComponent.GiveExperience(amount);
-                entity.GetRequiredComponent<PlayerElementComponent>().SendChatMessage($"gave experience: {amount}, level: {levelComponent.Level}, experience: {levelComponent.Experience}");
+                _chatBox.OutputTo(entity, $"gave experience: {amount}, level: {levelComponent.Level}, experience: {levelComponent.Experience}");
             }
         });
 
@@ -406,11 +406,11 @@ internal sealed class CommandsLogic
                 }
                 catch (NotSupportedException)
                 {
-                    entity.GetRequiredComponent<PlayerElementComponent>().SendChatMessage($"Animation '{args.FirstOrDefault()}' is not supported");
+                    _chatBox.OutputTo(entity, $"Animation '{args.FirstOrDefault()}' is not supported");
                 }
             }
             else
-                entity.GetRequiredComponent<PlayerElementComponent>().SendChatMessage($"Animation '{args.FirstOrDefault()}' not found.");
+                _chatBox.OutputTo(entity, $"Animation '{args.FirstOrDefault()}' not found.");
         });
 
         _commandService.AddAsyncCommandHandler("animationasync", async (entity, args) =>
@@ -420,17 +420,17 @@ internal sealed class CommandsLogic
             {
                 try
                 {
-                    playerElementComponent.SendChatMessage($"Started animation '{animation}'");
+                    _chatBox.OutputTo(entity, $"Started animation '{animation}'");
                     await playerElementComponent.DoAnimationAsync(animation);
-                    playerElementComponent.SendChatMessage($"Finished animation '{animation}'");
+                    _chatBox.OutputTo(entity, $"Finished animation '{animation}'");
                 }
                 catch (NotSupportedException)
                 {
-                    playerElementComponent.SendChatMessage($"Animation '{args.FirstOrDefault()}' is not supported");
+                    _chatBox.OutputTo(entity, $"Animation '{args.FirstOrDefault()}' is not supported");
                 }
             }
             else
-                playerElementComponent.SendChatMessage($"Animation '{args.FirstOrDefault()}' not found.");
+                _chatBox.OutputTo(entity, $"Animation '{args.FirstOrDefault()}' not found.");
 
         });
 
@@ -444,30 +444,30 @@ internal sealed class CommandsLogic
                 }
                 catch (NotSupportedException)
                 {
-                    entity.GetRequiredComponent<PlayerElementComponent>().SendChatMessage($"Animation '{args.FirstOrDefault()}' is not supported");
+                    _chatBox.OutputTo(entity, $"Animation '{args.FirstOrDefault()}' is not supported");
                 }
             }
             else
-                entity.GetRequiredComponent<PlayerElementComponent>().SendChatMessage($"Animation '{args.FirstOrDefault()}' not found.");
+                _chatBox.OutputTo(entity, $"Animation '{args.FirstOrDefault()}' not found.");
         });
 
         _commandService.AddCommandHandler("mygroups", (entity, args) =>
         {
             var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();
-            playerElementComponent.SendChatMessage("Groups:");
+            _chatBox.OutputTo(entity, "Groups:");
             foreach (var item in entity.Components.OfType<GroupMemberComponent>())
             {
-                playerElementComponent.SendChatMessage($"Group id: {item.GroupId}, rank: {item.Rank}, rank name: '{item.RankName}'");
+                _chatBox.OutputTo(entity, $"Group id: {item.GroupId}, rank: {item.Rank}, rank name: '{item.RankName}'");
             }
         });
 
         _commandService.AddCommandHandler("myfractions", (entity, args) =>
         {
             var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();
-            playerElementComponent.SendChatMessage("Fractions:");
+            _chatBox.OutputTo(entity, "Fractions:");
             foreach (var item in entity.Components.OfType<FractionMemberComponent>())
             {
-                playerElementComponent.SendChatMessage($"Fraction id: {item.FractionId}, rank: {item.Rank}, rank name: '{item.RankName}'");
+                _chatBox.OutputTo(entity, $"Fraction id: {item.FractionId}, rank: {item.Rank}, rank name: '{item.RankName}'");
             }
         });
 
@@ -529,13 +529,13 @@ internal sealed class CommandsLogic
             var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();
             if (entity.HasComponent<DiscordIntegrationComponent>())
             {
-                playerElementComponent.SendChatMessage("Twoje konto jest już połączone z discordem.");
+                _chatBox.OutputTo(entity, "Twoje konto jest już połączone z discordem.");
             }
             entity.TryDestroyComponent<PendingDiscordIntegrationComponent>();
             var pendingDiscordIntegrationComponent = new PendingDiscordIntegrationComponent();
             var code = pendingDiscordIntegrationComponent.GenerateAndGetDiscordConnectionCode();
             entity.AddComponent(pendingDiscordIntegrationComponent);
-            playerElementComponent.SendChatMessage($"Aby połączyć konto wpisz na kanale discord #polacz-konto komendę: /polaczkonto {code}");
+            _chatBox.OutputTo(entity, $"Aby połączyć konto wpisz na kanale discord #polacz-konto komendę: /polaczkonto {code}");
         });
 
         _commandService.AddCommandHandler("adduserupgrade", (entity, args) =>
@@ -544,9 +544,9 @@ internal sealed class CommandsLogic
             var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();
             var i = Random.Shared.Next(0, 10);
             if (userComponent.TryAddUpgrade(i))
-                playerElementComponent.SendChatMessage($"Pomyślnie dodano ulepszenie id {i}");
+                _chatBox.OutputTo(entity, $"Pomyślnie dodano ulepszenie id {i}");
             else
-                playerElementComponent.SendChatMessage($"Pomyślnie dodano ulepszenie id {i}");
+                _chatBox.OutputTo(entity, $"Pomyślnie dodano ulepszenie id {i}");
         });
 
         _commandService.AddAsyncCommandHandler("ban", async (entity, args) =>
@@ -565,11 +565,11 @@ internal sealed class CommandsLogic
             attachedEntity.AttachedEntity.Dispose();
             if (entity.HasComponent<AttachedEntityComponent>())
             {
-                playerElementComponent.SendChatMessage("Nie udalo sie zniszczyc");
+                _chatBox.OutputTo(entity, "Nie udalo sie zniszczyc");
             }
             else
             {
-                playerElementComponent.SendChatMessage("Zniszczone");
+                _chatBox.OutputTo(entity, "Zniszczone");
             }
         });
 
@@ -591,14 +591,14 @@ internal sealed class CommandsLogic
         {
             var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();
             var messageId = await _discordService.SendMessage(1079342213097607399, args.First());
-            playerElementComponent.SendChatMessage($"Wysłano wiadomość, id: {messageId}");
+            _chatBox.OutputTo(entity, $"Wysłano wiadomość, id: {messageId}");
         });
 
         _commandService.AddAsyncCommandHandler("discordsendmessagetouser", async (entity, args) =>
         {
             var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();
             var messageId = await _discordService.SendMessageToUser(659910279353729086, args.First());
-            playerElementComponent.SendChatMessage($"Wysłano wiadomość, id: {messageId}");
+            _chatBox.OutputTo(entity, $"Wysłano wiadomość, id: {messageId}");
         });
 
         Stream generateStreamFromString(string s)
@@ -615,7 +615,7 @@ internal sealed class CommandsLogic
         {
             var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();
             var messageId = await _discordService.SendFile(997787973775011853, generateStreamFromString("dowody"), "dowody_na_borsuka.txt", "potwierdzam");
-            playerElementComponent.SendChatMessage($"Wysłano plik, id: {messageId}");
+            _chatBox.OutputTo(entity, $"Wysłano plik, id: {messageId}");
         });
 
 
@@ -731,7 +731,7 @@ internal sealed class CommandsLogic
 
             var settingValue = entity.GetRequiredComponent<UserComponent>().GetSetting(1);
 
-            playerElementComponent.SendChatMessage($"Setting1: {settingValue}");
+            _chatBox.OutputTo(entity, $"Setting1: {settingValue}");
         });
 
 
@@ -742,11 +742,11 @@ internal sealed class CommandsLogic
 
             if (await rpgUserManager.TryAddWhitelistedSerial(userComponent.Id, playerElementComponent.Client.Serial))
             {
-                playerElementComponent.SendChatMessage($"Dodano serial");
+                _chatBox.OutputTo(entity, $"Dodano serial");
             }
             else
             {
-                playerElementComponent.SendChatMessage($"Nie udało się dodać");
+                _chatBox.OutputTo(entity, $"Nie udało się dodać");
             }
         });
 
@@ -757,11 +757,11 @@ internal sealed class CommandsLogic
 
             if (await rpgUserManager.TryRemoveWhitelistedSerial(userComponent.Id, playerElementComponent.Client.Serial))
             {
-                playerElementComponent.SendChatMessage($"Usunięto serial");
+                _chatBox.OutputTo(entity, $"Usunięto serial");
             }
             else
             {
-                playerElementComponent.SendChatMessage($"Nie udało się usunąć");
+                _chatBox.OutputTo(entity, $"Nie udało się usunąć");
             }
         });
 
@@ -770,11 +770,11 @@ internal sealed class CommandsLogic
             var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();
             if (playerElementComponent.OccupiedVehicle.GetRequiredComponent<VehicleUpgradesComponent>().AddUniqueUpgrade(3))
             {
-                playerElementComponent.SendChatMessage($"dodano wizualne ulepszenie");
+                _chatBox.OutputTo(entity, $"dodano wizualne ulepszenie");
             }
             else
             {
-                playerElementComponent.SendChatMessage($"Nie udało się dodać wizualnego ulepszenia");
+                _chatBox.OutputTo(entity, $"Nie udało się dodać wizualnego ulepszenia");
             }
         });
 
@@ -809,17 +809,17 @@ internal sealed class CommandsLogic
             var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();
             if (en != null)
             {
-                playerElementComponent.SendChatMessage("Spawned");
+                _chatBox.OutputTo(entity, "Spawned");
             }
             else
-                playerElementComponent.SendChatMessage("Error while spawning");
+                _chatBox.OutputTo(entity, "Error while spawning");
         });
 
         _commandService.AddCommandHandler("inventoryoccupied", (entity, args) =>
         {
             var inv = entity.GetRequiredComponent<InventoryComponent>();
             var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();
-            playerElementComponent.SendChatMessage($"Inventory: {inv.Number}/{inv.Size}");
+            _chatBox.OutputTo(entity, $"Inventory: {inv.Number}/{inv.Size}");
         });
         
         _commandService.AddCommandHandler("giveitem4", (entity, args) =>
@@ -827,7 +827,7 @@ internal sealed class CommandsLogic
             var inv = entity.GetRequiredComponent<InventoryComponent>();
             inv.AddSingleItem(_itemsRegistry, 4);
             var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();
-            playerElementComponent.SendChatMessage("Item given");
+            _chatBox.OutputTo(entity, "Item given");
         });
         
         _commandService.AddCommandHandler("itemwithmetadata", (entity, args) =>
@@ -839,8 +839,8 @@ internal sealed class CommandsLogic
             });
 
             var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();
-            playerElementComponent.SendChatMessage($"Item regular: {item.GetMetadata("number").GetType()}");
-            playerElementComponent.SendChatMessage($"Item cast<int>: {item.GetMetadata<int>("number").GetType()}");
+            _chatBox.OutputTo(entity, $"Item regular: {item.GetMetadata("number").GetType()}");
+            _chatBox.OutputTo(entity, $"Item cast<int>: {item.GetMetadata<int>("number").GetType()}");
         });
 
         _discordService.AddTextBasedCommandHandler(1069962155539042314, "test", (userId, parameters) =>
@@ -911,13 +911,13 @@ internal sealed class CommandsLogic
         _commandService.AddCommandHandler("amiinwater", (entity, args) =>
         {
             var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();
-            playerElementComponent.SendChatMessage($"amiinwater: {playerElementComponent.IsInWater} {entity.Transform.Position}");
+            _chatBox.OutputTo(entity, $"amiinwater: {playerElementComponent.IsInWater} {entity.Transform.Position}");
         });
         
         _commandService.AddCommandHandler("formatmoney", (entity, args) =>
         {
             var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();
-            playerElementComponent.SendChatMessage($"{123.123m.FormatMoney(new System.Globalization.CultureInfo("pl-PL"))}");
+            _chatBox.OutputTo(entity, $"{123.123m.FormatMoney(new System.Globalization.CultureInfo("pl-PL"))}");
         });
 
         _commandService.AddAsyncCommandHandler("createObjectFor2", async (entity, args) =>
@@ -935,13 +935,13 @@ internal sealed class CommandsLogic
         _commandService.AddCommandHandler("addtestmarker1", (entity, args) =>
         {
             spawnMarkersService.AddSpawnMarker(new PointSpawnMarker("test123", entity.Transform.Position));
-            entity.GetRequiredComponent<PlayerElementComponent>().SendChatMessage("marker added1");
+            _chatBox.OutputTo(entity, "marker added1");
         });
 
         _commandService.AddCommandHandler("addtestmarker2", (entity, args) =>
         {
             spawnMarkersService.AddSpawnMarker(new DirectionalSpawnMarker("test direct", entity.Transform.Position, entity.Transform.Rotation.Z));
-            entity.GetRequiredComponent<PlayerElementComponent>().SendChatMessage("marker added2");
+            _chatBox.OutputTo(entity, "marker added2");
         });
 
         _commandService.AddCommandHandler("testnotrace", (entity, args) =>
@@ -960,7 +960,7 @@ internal sealed class CommandsLogic
         {
             var levelComponent = entity.GetRequiredComponent<LevelComponent>();
             var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();
-            playerElementComponent.SendChatMessage($"Level: {levelComponent.Level}, exp: {levelComponent.Experience}");
+            _chatBox.OutputTo(entity, $"Level: {levelComponent.Level}, exp: {levelComponent.Experience}");
         });
         
         _commandService.AddCommandHandler("setlevel", (entity, args) =>
@@ -970,7 +970,7 @@ internal sealed class CommandsLogic
             var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();
             void handleLevelChanged(LevelComponent that, uint level, bool up)
             {
-                playerElementComponent.SendChatMessage($"Level change: {level}, {up}");
+                _chatBox.OutputTo(entity, $"Level change: {level}, {up}");
             }
             levelComponent.LevelChanged += handleLevelChanged;
             levelComponent.Level = level;
@@ -981,13 +981,13 @@ internal sealed class CommandsLogic
         {
             var blazorGuiComponent = entity.GetRequiredComponent<BlazorGuiComponent>();
             blazorGuiComponent.DevTools = !blazorGuiComponent.DevTools;
-            entity.GetRequiredComponent<PlayerElementComponent>().SendChatMessage($"Devtools {blazorGuiComponent.DevTools}");
+            _chatBox.OutputTo(entity, $"Devtools {blazorGuiComponent.DevTools}");
         }, null, true);
         
         _commandService.AddCommandHandler("cefpath", (entity, args) =>
         {
             var blazorGuiComponent = entity.GetRequiredComponent<BlazorGuiComponent>();
-            entity.GetRequiredComponent<PlayerElementComponent>().SendChatMessage($"Path {blazorGuiComponent.Path}");
+            _chatBox.OutputTo(entity, $"Path {blazorGuiComponent.Path}");
         }, null, true);
 
         _commandService.AddAsyncCommandHandler("usernames", async (entity, args) =>
@@ -997,7 +997,7 @@ internal sealed class CommandsLogic
             var userNames = await userRepository.GetUserNamesByIds(new int[] { 1 });
             foreach (var item in userNames)
             {
-                playerElementComponent.SendChatMessage($"{item.Key} = {item.Value}");
+                _chatBox.OutputTo(entity, $"{item.Key} = {item.Value}");
             }
         });
 
@@ -1011,7 +1011,7 @@ internal sealed class CommandsLogic
             var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();
             var veh = playerElementComponent.OccupiedVehicle;
             var kind = veh.GetRequiredComponent<PrivateVehicleComponent>().Kind;
-            playerElementComponent.SendChatMessage($"Kind: {kind}");
+            _chatBox.OutputTo(entity, $"Kind: {kind}");
         });
 
         _commandService.AddAsyncCommandHandler("counterasync", async (entity, args) =>
@@ -1029,10 +1029,10 @@ internal sealed class CommandsLogic
         {
             var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();
             var events = await _vehiclesService.GetAllVehicleEvents(playerElementComponent.OccupiedVehicle);
-            playerElementComponent.SendChatMessage("Events:");
+            _chatBox.OutputTo(entity, "Events:");
             foreach (var item in events)
             {
-                playerElementComponent.SendChatMessage($"Event: {item.DateTime} - {item.EventType}");
+                _chatBox.OutputTo(entity, $"Event: {item.DateTime} - {item.EventType}");
             }
         });
 

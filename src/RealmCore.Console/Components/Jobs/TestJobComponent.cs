@@ -1,7 +1,13 @@
-﻿namespace RealmCore.Console.Components.Jobs;
+﻿using RealmCore.Server.Extensions;
+using SlipeServer.Server.Services;
+
+namespace RealmCore.Console.Components.Jobs;
 
 internal class TestJobComponent : JobSessionComponent
 {
+    [Inject]
+    private ChatBox ChatBox { get; set; } = default!;
+
     public override short JobId => 1;
 
     public TestJobComponent()
@@ -30,19 +36,19 @@ internal class TestJobComponent : JobSessionComponent
     private void ObjectiveACompleted(Objective objective)
     {
         Entity.GetRequiredComponent<JobStatisticsComponent>().AddPoints(1, 1);
-        Entity.GetRequiredComponent<PlayerElementComponent>().SendChatMessage($"Entered marker, objectives left: {Objectives.Count()}");
+        ChatBox.OutputTo(Entity, $"Entered marker, objectives left: {Objectives.Count()}");
     }
 
     private void ObjectiveBCompleted(Objective objective)
     {
         Entity.GetRequiredComponent<JobStatisticsComponent>().AddPoints(1, 2);
-        Entity.GetRequiredComponent<PlayerElementComponent>().SendChatMessage($"Box delivered, objectives left: {Objectives.Count()}");
+        ChatBox.OutputTo(Entity, $"Box delivered, objectives left: {Objectives.Count()}");
     }
 
     private void ObjectiveCCompleted(Objective objective)
     {
         Entity.GetRequiredComponent<JobStatisticsComponent>().AddPoints(1, 1);
-        Entity.GetRequiredComponent<PlayerElementComponent>().SendChatMessage($"Entered one of mater, objectives left: {Objectives.Count()}");
+        ChatBox.OutputTo(Entity, $"Entered one of mater, objectives left: {Objectives.Count()}");
     }
 
 }
