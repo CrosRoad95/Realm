@@ -61,3 +61,11 @@ const invokeAsyncSuccess = (promiseId, data) => {
 const invokeAsyncError = (promiseId) => {
     pendingInvokes[promiseId].reject();
 };
+
+function registerCSharpFunction(cSharpApp) {
+    window.app = cSharpApp;
+}
+
+const navigate = (path) => {
+    window.app.invokeMethod("NavigateTo", path)
+};

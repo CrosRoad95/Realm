@@ -1,5 +1,6 @@
 ﻿@inject NavigationManager _navigationManager
 @inject EventHub _eventHub
+@inject IJSRuntime _jsRuntime
 
 ﻿<Router AppAssembly="@typeof(App).Assembly">
     <Found Context="routeData">
@@ -15,14 +16,24 @@
 </Router>
 
 @code {
-    protected override void OnAfterRender(bool firstRender)
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        _navigationManager.LocationChanged += HandleLocationChanged;
+        if (firstRender)
+        {
+            _navigationManager.LocationChanged += HandleLocationChanged;
+            await _jsRuntime.InvokeVoidAsync("registerCSharpFunction", DotNetObjectReference.Create(this));
+        }
     }
 
     async void HandleLocationChanged(object? sender, LocationChangedEventArgs e)
     {
         var path = _navigationManager.ToBaseRelativePath(e.Location);
         await _eventHub.LocationChanged(path);
+    }
+
+    [JSInvokable]
+    public void NavigateTo(string path)
+    {
+        _navigationManager.NavigateTo(path);
     }
 }

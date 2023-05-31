@@ -45,7 +45,7 @@ internal class CEFBlazorGuiResourceLogic
             return;
 
         var blazorGuiComponent = entity.AddComponent<BlazorGuiComponent>();
-        blazorGuiComponent.InternalPathChanged += HandleInternalPathChanged;
+        blazorGuiComponent.InternalPathChanged = HandleInternalPathChanged;
     }
 
     private void HandleInternalPathChanged(BlazorGuiComponent blazorGuiComponent, string? path)

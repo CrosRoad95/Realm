@@ -29,7 +29,7 @@ function handleSetPath(path)
 	if(selectedMode == "dev")then
 		loadBrowserURL(webBrowser, "http://localhost:5220/"..path)
 	elseif(selectedMode == "prod")then
-		outputChatBox("navigate "..tostring(path))
+		executeBrowserJavascript(webBrowser, string.format("navigate(%q)", path));
 	end
 end
 

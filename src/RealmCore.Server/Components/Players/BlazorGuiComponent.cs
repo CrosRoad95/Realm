@@ -8,8 +8,8 @@ public class BlazorGuiComponent : Component
     private ICEFBlazorGuiService CEFBlazorGuiService { get; set; } = default!;
 
     public event Action<BlazorGuiComponent, string?>? PathChanged;
-    internal event Action<BlazorGuiComponent, string?>? InternalPathChanged;
-    internal event Action<BlazorGuiComponent, bool?>? InternalDevToolsChanged;
+    internal Action<BlazorGuiComponent, string?> InternalPathChanged;
+    internal Action<BlazorGuiComponent, bool?> InternalDevToolsChanged;
 
     private string? _path;
     public string? Path
@@ -18,7 +18,6 @@ public class BlazorGuiComponent : Component
         {
             if (_path == value) return;
             InternalPathChanged?.Invoke(this, value);
-            Visible = true;
             _path = value;
         }
     }
