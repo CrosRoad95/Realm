@@ -1,4 +1,6 @@
-﻿namespace RealmCore.Persistance.Repository;
+﻿using static RealmCore.Persistance.Data.Helpers.VehicleWheelStatus;
+
+namespace RealmCore.Persistance.Repository;
 
 internal class VehicleRepository : IVehicleRepository
 {
@@ -16,6 +18,12 @@ internal class VehicleRepository : IVehicleRepository
             Model = model,
             Platetext = Guid.NewGuid().ToString()[..8],
             CreatedAt = now,
+            Color = new (),
+            DamageState = new(),
+            DoorOpenRatio = new() ,
+            TransformAndMotion = new(),
+            Variant = new(),
+            WheelStatus = new(),
             Spawned = true,
         };
         _db.Vehicles.Add(vehicle);

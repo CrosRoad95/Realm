@@ -6,7 +6,7 @@ internal class LoadService : ILoadService
     private readonly ILogger<LoadService> _logger;
     private readonly IVehiclesService _vehiclesService;
 
-    public LoadService(RepositoryFactory repositoryFactory, IEntityFactory entityFactory, ILogger<LoadService> logger, IVehiclesService vehiclesService)
+    public LoadService(RepositoryFactory repositoryFactory, ILogger<LoadService> logger, IVehiclesService vehiclesService)
     {
         _repositoryFactory = repositoryFactory;
         _logger = logger;

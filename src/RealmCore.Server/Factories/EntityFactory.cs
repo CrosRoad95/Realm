@@ -6,10 +6,10 @@ internal class EntityFactory : IEntityFactory
 {
     private readonly IECS _ecs;
     private readonly IVehicleRepository _vehicleRepository;
-    private readonly RPGServer _rpgServer;
+    private readonly IRPGServer _rpgServer;
     private readonly IDateTimeProvider _dateTimeProvider;
 
-    public EntityFactory(IECS ecs, IVehicleRepository vehicleRepository, RPGServer rpgServer, IDateTimeProvider dateTimeProvider)
+    public EntityFactory(IECS ecs, IVehicleRepository vehicleRepository, IRPGServer rpgServer, IDateTimeProvider dateTimeProvider)
     {
         _ecs = ecs;
         _vehicleRepository = vehicleRepository;
@@ -19,7 +19,7 @@ internal class EntityFactory : IEntityFactory
 
     private void AssociateWithServer(Entity entity)
     {
-        if (_rpgServer.MtaServer == null)
+        if (!_rpgServer.IsReady)
             throw new InvalidOperationException("Could not create entities in logics constructors.");
         var elementComponent = entity.GetRequiredComponent<ElementComponent>();
 
@@ -27,14 +27,14 @@ internal class EntityFactory : IEntityFactory
             throw new Exception("Failed to load element entity, base.Load wans't called.");
 
         var element = elementComponent.Element;
-        element.AssociateWith(_rpgServer.MtaServer);
+        _rpgServer.AssociateElement(element);
         if (element is Pickup pickup)
         {
-            pickup.CollisionShape.AssociateWith(_rpgServer.MtaServer);
+            _rpgServer.AssociateElement(pickup.CollisionShape);
         }
         if (elementComponent is MarkerElementComponent markerElementComponent)
         {
-            markerElementComponent.CollisionShape.AssociateWith(_rpgServer.MtaServer);
+            _rpgServer.AssociateElement(markerElementComponent.CollisionShape);
         }
     }
 
@@ -77,7 +77,9 @@ internal class EntityFactory : IEntityFactory
             var vehicleElementComponent = entity.AddComponent(new VehicleElementComponent(vehicle));
 
             entity.Transform.Position = position;
+            vehicle.RespawnPosition = position;
             entity.Transform.Rotation = rotation;
+            vehicle.RespawnRotation = rotation;
             if (constructionInfo != null)
             {
                 entity.Transform.Interior = constructionInfo.Interior;
@@ -96,11 +98,13 @@ internal class EntityFactory : IEntityFactory
         var vehicleEntity = _ecs.CreateEntity(constructionInfo?.Id ?? $"vehicle {Guid.NewGuid()}", EntityTag.Vehicle, entity =>
         {
             var vehicle = new Vehicle(model, position);
-
+            vehicle.Handling = VehicleHandlingConstants.DefaultVehicleHandling[vehicle.Model];
             var vehicleElementComponent = entity.AddComponent(new VehicleElementComponent(vehicle));
 
             entity.Transform.Position = position;
+            vehicle.RespawnPosition = position;
             entity.Transform.Rotation = rotation;
+            vehicle.RespawnRotation = rotation;
             if (constructionInfo != null)
             {
                 entity.Transform.Interior = constructionInfo.Interior;

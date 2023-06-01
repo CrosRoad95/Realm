@@ -7,9 +7,9 @@ internal class SaveService : ISaveService
 {
     private readonly IDb _dbContext;
 
-    public SaveService(RealmDbContextFactory realmDbContextFactory)
+    public SaveService(IDb dbContext)
     {
-        _dbContext = realmDbContextFactory.CreateDbContext();
+        _dbContext = dbContext;
     }
 
     private async Task SaveVehicle(Entity entity)
@@ -397,5 +397,4 @@ internal class SaveService : ISaveService
     {
         await _dbContext.SaveChangesAsync();
     }
-
 }

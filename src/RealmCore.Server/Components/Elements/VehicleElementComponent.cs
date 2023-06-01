@@ -183,6 +183,21 @@ public class VehicleElementComponent : ElementComponent
         }
     }
 
+    public string PlateText
+    {
+        get
+        {
+            ThrowIfDisposed();
+            return _vehicle.PlateText;
+        }
+        set
+        {
+            ThrowIfDisposed();
+            _vehicle.PlateText = value;
+        }
+    }
+
+
     public Dictionary<byte, Entity> Occupants
     {
         get

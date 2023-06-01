@@ -6,10 +6,12 @@ internal sealed class RPGServer : IRPGServer
 {
     private readonly MtaServer _server;
     private readonly ILogger<RPGServer> _logger;
+    private IStringLocalizer<RPGServer>? _stringLocalizer;
 
     public event Action? ServerStarted;
 
     internal MtaServer MtaServer => _server;
+    public bool IsReady => _server != null;
     public RPGServer(IRealmConfigurationProvider realmConfigurationProvider, Action<ServerBuilder>? configureServerBuilder = null)
     {
         _server = new MtaServer(
@@ -103,7 +105,6 @@ internal sealed class RPGServer : IRPGServer
         return _server.GetRequiredService<TService>();
     }
 
-    IStringLocalizer<RPGServer>? _stringLocalizer;
     public async Task Start()
     {
         await GetRequiredService<IDb>().MigrateAsync();
@@ -164,4 +165,6 @@ internal sealed class RPGServer : IRPGServer
         _server.Stop();
         _logger.LogInformation(_stringLocalizer.GetOr("ServerStopped", "Server stopped, saved: {amount} entities."), i);
     }
+
+    public void AssociateElement(object element) => ((Element)element).AssociateWith(MtaServer);
 }
