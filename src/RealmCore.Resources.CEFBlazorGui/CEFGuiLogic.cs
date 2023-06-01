@@ -8,7 +8,6 @@ using SlipeServer.Server.Elements;
 using SlipeServer.Server.Events;
 using SlipeServer.Server.Mappers;
 using SlipeServer.Server.Services;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace RealmCore.Resources.CEFBlazorGui;
 

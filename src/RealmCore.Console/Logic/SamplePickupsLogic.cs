@@ -2,7 +2,6 @@
 using RealmCore.Server.Extensions;
 using RealmCore.Server.Rules;
 using SlipeServer.Server.Services;
-using System.Data;
 
 namespace RealmCore.Console.Logic;
 
