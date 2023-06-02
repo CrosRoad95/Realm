@@ -36,7 +36,7 @@ end
 local function handleLoad(mode, x, y)
 	selectedMode = mode;
 	if(mode == "dev")then
-		browser = guiCreateBrowser( sx / 2 - x / 2, sy / 2 - y / 2, x, y, false, false, false)
+		browser = guiCreateBrowser( sx / 2 - x / 2, sy / 2 - y / 2, x, y, false, true, false)
 		webBrowser = guiGetBrowser( browser )
 		handleSetVisible(false)
 
