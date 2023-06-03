@@ -10,11 +10,13 @@ public interface ICEFBlazorGuiService
 
     CEFGuiBlazorMode CEFGuiMode { get; internal set; }
     Action<IMessage>? MessageHandler { get; set; }
-    Action<Player, string, string>? InvokeVoidAsyncInvoked { get; set; }
-    Func<Player, string, string, Task<object>>? InvokeAsyncInvoked { get; set; }
+    Action<Player, string, string>? RelayVoidAsyncInvoked { get; set; }
+    Func<Player, string, string, Task<object>>? RelayAsyncInvoked { get; set; }
+    Action<Player>? RelayPlayerBrowserReady { get; set; }
 
     internal void HandleCEFBlazorGuiStart(Player player);
     internal void HandleCEFBlazorGuiStop(Player player);
+    internal void HandlePlayerBrowserReady(Player player);
 
     bool IsCEFBlazorGui(Player player);
     void SetDevelopmentMode(Player player, bool isDevelopmentMode);

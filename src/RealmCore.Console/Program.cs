@@ -29,7 +29,7 @@ var server = builder.Build(null, extraBuilderSteps: serverBuilder =>
         builder.SetGuiProvider(DGSGuiProvider.Name);
     }, new());
 
-    serverBuilder.AddCEFBlazorGuiResource("../../../Server/BlazorGui/wwwroot", CEFGuiBlazorMode.Prod);
+    serverBuilder.AddCEFBlazorGuiResource("../../../Server/BlazorGui/wwwroot", CEFGuiBlazorMode.Dev);
 
     serverBuilder.AddLogic<DefaultCommandsLogic>();
 

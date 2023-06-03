@@ -26,6 +26,7 @@ internal class CEFBlazorGuiLogic
         luaEventService.AddEventHandler("internalCEFBlazorGuiStop", HandleCEFBlazorGuiStop);
         luaEventService.AddEventHandler("cefInvokeVoidAsync", HandleCEFInvokeVoidAsync);
         luaEventService.AddEventHandler("cefInvokeAsync", HandleCEFInvokeAsync);
+        luaEventService.AddEventHandler("internalBrowserCreated", HandleBrowserCreated);
         _CEFBlazorGuiService = CEFBlazorGuiService;
         _logger = logger;
         _luaEventHub = luaEventHub;
@@ -108,5 +109,10 @@ internal class CEFBlazorGuiLogic
         {
             _logger.LogError(ex, "Failed to handle cef invoke async");
         }
+    }
+
+    private void HandleBrowserCreated(LuaEvent luaEvent)
+    {
+        _CEFBlazorGuiService.HandlePlayerBrowserReady(luaEvent.Player);
     }
 }

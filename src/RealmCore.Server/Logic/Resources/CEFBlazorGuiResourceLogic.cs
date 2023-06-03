@@ -13,10 +13,10 @@ internal class CEFBlazorGuiResourceLogic
         _ecs = ecs;
         _cefBlazorGuiService = cefBlazorGuiService;
         _blazorGuiService = blazorGuiService;
-        ecs.EntityCreated += HandleEntityCreated;
 
-        _cefBlazorGuiService.InvokeVoidAsyncInvoked = HandleInvokeVoidAsyncInvoked;
-        _cefBlazorGuiService.InvokeAsyncInvoked = HandleInvokeAsyncInvoked;
+        _cefBlazorGuiService.RelayVoidAsyncInvoked = HandleInvokeVoidAsyncInvoked;
+        _cefBlazorGuiService.RelayAsyncInvoked = HandleInvokeAsyncInvoked;
+        _cefBlazorGuiService.RelayPlayerBrowserReady = HandlePlayerBrowserReady;
     }
 
     private void HandleInvokeVoidAsyncInvoked(Player player, string identifier, string args)
@@ -25,27 +25,26 @@ internal class CEFBlazorGuiResourceLogic
         {
             if (entity.TryGetComponent(out BlazorGuiComponent component))
                 _blazorGuiService.RelayInvokeVoidAsync(component, identifier, args);
-
         }
     }
+
     private Task<object> HandleInvokeAsyncInvoked(Player player, string identifier, string args)
     {
         if(_ecs.TryGetEntityByPlayer(player, out var entity))
         {
             if (entity.TryGetComponent(out BlazorGuiComponent component))
                 return _blazorGuiService.RelayInvokeAsync(component, identifier, args);
-
         }
         return null;
     }
 
-    private void HandleEntityCreated(Entity entity)
+    private void HandlePlayerBrowserReady(Player player)
     {
-        if(entity.Tag != EntityTag.Player)
-            return;
-
-        var blazorGuiComponent = entity.AddComponent<BlazorGuiComponent>();
-        blazorGuiComponent.InternalPathChanged = HandleInternalPathChanged;
+        if (_ecs.TryGetEntityByPlayer(player, out var entity))
+        {
+            var blazorGuiComponent = entity.AddComponent<BlazorGuiComponent>();
+            blazorGuiComponent.InternalPathChanged = HandleInternalPathChanged;
+        }
     }
 
     private void HandleInternalPathChanged(BlazorGuiComponent blazorGuiComponent, string? path)

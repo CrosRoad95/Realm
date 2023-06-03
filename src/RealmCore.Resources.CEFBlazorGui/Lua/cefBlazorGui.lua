@@ -47,13 +47,15 @@ local function handleLoad(mode, x, y)
 					requestBrowserDomains({ "localhost" })
 					local function handleClientBrowserWhitelistChange(newDomains)
 						if newDomains[1] == "localhost" then
-							loadBrowserURL( sourceBrowser, "http://localhost:5220/" )
+							triggerServerEvent("internalBrowserCreated", resourceRoot)
+							--loadBrowserURL( sourceBrowser, "http://localhost:5220/" )
 							removeEventHandler("onClientBrowserWhitelistChange", root, handleClientBrowserWhitelistChange);
 						end
 					end
 					addEventHandler("onClientBrowserWhitelistChange", root, handleClientBrowserWhitelistChange);
 				else
-					loadBrowserURL( sourceBrowser, "http://localhost:5220/" )
+					triggerServerEvent("internalBrowserCreated", resourceRoot)
+					--loadBrowserURL( sourceBrowser, "http://localhost:5220/" )
 				end
 			end
 		)

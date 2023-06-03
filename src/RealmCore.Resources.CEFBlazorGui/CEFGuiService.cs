@@ -16,8 +16,9 @@ internal sealed class CEFBlazorGuiService : ICEFBlazorGuiService
 
     public Action<IMessage>? MessageHandler { get; set; }
 
-    public Action<Player, string, string>? InvokeVoidAsyncInvoked { get; set; }
-    public Func<Player, string, string, Task<object>>? InvokeAsyncInvoked { get; set; }
+    public Action<Player, string, string>? RelayVoidAsyncInvoked { get; set; }
+    public Func<Player, string, string, Task<object>>? RelayAsyncInvoked { get; set; }
+    public Action<Player>? RelayPlayerBrowserReady { get; set; }
 
     public CEFGuiBlazorMode CEFGuiMode { get; set; }
 
@@ -48,27 +49,32 @@ internal sealed class CEFBlazorGuiService : ICEFBlazorGuiService
             PlayerCEFBlazorGuiStopped?.Invoke(player);
     }
 
+    public void HandlePlayerBrowserReady(Player player)
+    {
+        RelayPlayerBrowserReady?.Invoke(player);
+    }
+
     public void HandleInvokeVoidAsyncHandler(string identifier, string args)
     {
-        InvokeVoidAsyncInvoked?.Invoke(_elementCollection.GetByType<Player>().First(), identifier, args);
+        RelayVoidAsyncInvoked?.Invoke(_elementCollection.GetByType<Player>().First(), identifier, args);
     }
 
     public async Task<object> HandleInvokeAsyncHandler(string identifier, string args)
     {
-        if (InvokeAsyncInvoked != null)
-            return await InvokeAsyncInvoked(_elementCollection.GetByType<Player>().First(), identifier, args);
+        if (RelayAsyncInvoked != null)
+            return await RelayAsyncInvoked(_elementCollection.GetByType<Player>().First(), identifier, args);
         return null;
     }
 
     public void HandleInvokeVoidAsyncHandler(Player player, string identifier, string args)
     {
-        InvokeVoidAsyncInvoked?.Invoke(player, identifier, args);
+        RelayVoidAsyncInvoked?.Invoke(player, identifier, args);
     }
 
     public async Task<object> HandleInvokeAsyncHandler(Player player, string identifier, string args)
     {
-        if (InvokeAsyncInvoked != null)
-            return await InvokeAsyncInvoked(player, identifier, args);
+        if (RelayAsyncInvoked != null)
+            return await RelayAsyncInvoked(player, identifier, args);
         return null;
     }
 
