@@ -7,6 +7,7 @@ public class Latch
     private readonly TimeSpan? _timeout;
 
     private Task Task => _taskCompletionSource.Task;
+    public int Count => _count;
 
     public Latch(int initialCounter = 0, TimeSpan? timeout = null)
     {

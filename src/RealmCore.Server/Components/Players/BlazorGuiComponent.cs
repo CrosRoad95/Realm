@@ -64,6 +64,11 @@ public class BlazorGuiComponent : Component
             Path = path;
         }
     }
+    
+    public void Close()
+    {
+        Visible = false;
+    }
 
     internal void SetPath(string? path)
     {

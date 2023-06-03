@@ -1,4 +1,5 @@
-﻿using SlipeServer.Server;
+﻿using Microsoft.Extensions.Logging;
+using SlipeServer.Server;
 using SlipeServer.Server.Elements;
 using SlipeServer.Server.Events;
 using SlipeServer.Server.Services;
@@ -8,14 +9,15 @@ namespace RealmCore.Resources.GuiSystem;
 internal class GuiSystemLogic
 {
     private readonly IGuiSystemService _GuiSystemService;
+    private readonly ILogger<GuiSystemLogic> _logger;
     private readonly GuiSystemResource _resource;
 
-    public GuiSystemLogic(MtaServer server, LuaEventService luaEventService, IGuiSystemService GuiSystemService)
+    public GuiSystemLogic(MtaServer server, LuaEventService luaEventService, IGuiSystemService GuiSystemService, ILogger<GuiSystemLogic> logger)
     {
         luaEventService.AddEventHandler("internalSubmitForm", HandleInternalSubmitForm);
         luaEventService.AddEventHandler("internalActionExecuted", HandleInternalActionExecuted);
         _GuiSystemService = GuiSystemService;
-
+        _logger = logger;
         _resource = server.GetAdditionalResource<GuiSystemResource>();
         server.PlayerJoined += HandlePlayerJoin;
     }
@@ -30,8 +32,16 @@ internal class GuiSystemLogic
         _GuiSystemService.HandleInternalActionExecuted(luaEvent);
     }
 
-    private void HandlePlayerJoin(Player player)
+    private async void HandlePlayerJoin(Player player)
     {
-        _resource.StartFor(player);
+
+        try
+        {
+            await _resource.StartForAsync(player);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to start {resourceName} resource for player: {playerName}, serial: {playerSerial}", _resource.Name, player.Name, player.Client.Serial);
+        }
     }
 }

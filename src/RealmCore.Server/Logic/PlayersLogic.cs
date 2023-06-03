@@ -4,7 +4,7 @@ namespace RealmCore.Server.Logic;
 
 internal class PlayersLogic
 {
-    const int RESOURCES_COUNT = 10;
+    const int RESOURCES_COUNT = 14;
     private readonly IECS _ecs;
     private readonly IServiceProvider _serviceProvider;
     private readonly RealmDbContextFactory _realmDbContextFactory;
@@ -93,6 +93,7 @@ internal class PlayersLogic
 
     private void HandlePlayerResourceStarted(Player player, PlayerResourceStartedEventArgs e)
     {
+        Console.WriteLine("started {0}", _playerResources[player].Count);
         _playerResources[player].Decrement();
     }
 
