@@ -93,7 +93,6 @@ internal class PlayersLogic
 
     private void HandlePlayerResourceStarted(Player player, PlayerResourceStartedEventArgs e)
     {
-        Console.WriteLine("started {0}", _playerResources[player].Count);
         _playerResources[player].Decrement();
     }
 

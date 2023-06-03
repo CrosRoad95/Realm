@@ -58,11 +58,8 @@ public class BlazorGuiComponent : Component
 
     public void Open(string path)
     {
-        if(_path != path)
-        {
-            Visible = true;
-            Path = path;
-        }
+        Visible = true;
+        Path = path;
     }
     
     public void Close()
