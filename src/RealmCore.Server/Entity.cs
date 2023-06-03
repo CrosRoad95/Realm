@@ -345,17 +345,28 @@ public class Entity : IDisposable
     public bool TryDestroyComponent<TComponent>() where TComponent : Component
     {
         ThrowIfDisposed();
-        var component = GetComponent<TComponent>();
+
+        _componentsLock.EnterReadLock();
         try
         {
-            component.Dispose();
-            DetachComponent(component);
+            var component = InternalGetComponent<TComponent>();
+            if (component == null)
+                return false;
+            try
+            {
+                component.Dispose();
+                InternalDetachComponent(component);
+            }
+            catch (ObjectDisposedException)
+            { }
+            catch (Exception)
+            {
+                throw;
+            }
         }
-        catch(ObjectDisposedException)
-        { }
-        catch(Exception)
+        finally
         {
-            throw;
+            _componentsLock.ExitReadLock();
         }
         return true;
     }
