@@ -51,7 +51,7 @@ end
 function handleSetVisible(visible)
 	guiSetVisible(browser, visible);
 	setBrowserRenderingPaused (webBrowser, not visible);
-	showCursor(visible, visible);
+	showCursor(visible, false);
 end
 
 function handleSetPath(path)
