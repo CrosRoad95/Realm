@@ -19,21 +19,21 @@ internal class CEFBlazorGuiResourceLogic
         _cefBlazorGuiService.RelayPlayerBrowserReady = HandlePlayerBrowserReady;
     }
 
-    private void HandleInvokeVoidAsyncInvoked(Player player, string identifier, string args)
+    private void HandleInvokeVoidAsyncInvoked(Player player, string kind, string identifier, string args)
     {
         if(_ecs.TryGetEntityByPlayer(player, out var entity))
         {
             if (entity.TryGetComponent(out BlazorGuiComponent component))
-                _blazorGuiService.RelayInvokeVoidAsync(component, identifier, args);
+                _blazorGuiService.RelayInvokeVoidAsync(component, kind, identifier, args);
         }
     }
 
-    private Task<object> HandleInvokeAsyncInvoked(Player player, string identifier, string args)
+    private Task<object> HandleInvokeAsyncInvoked(Player player, string kind, string identifier, string args)
     {
         if(_ecs.TryGetEntityByPlayer(player, out var entity))
         {
             if (entity.TryGetComponent(out BlazorGuiComponent component))
-                return _blazorGuiService.RelayInvokeAsync(component, identifier, args);
+                return _blazorGuiService.RelayInvokeAsync(component, kind, identifier, args);
         }
         return null;
     }

@@ -1,4 +1,5 @@
 ﻿@inject EventHub _eventHub
+@inject RememberForm _rememberForm
 @page "/counter"
 
 <PageTitle>Counter</PageTitle>
@@ -11,6 +12,8 @@
 
 <button class="btn btn-primary" @onclick="IncrementCount">Click me</button>
 <button class="btn btn-primary" @onclick="IncrementCount2">Click me2</button>
+<button class="btn btn-primary" @onclick="Remember">Remember test form</button>
+<button class="btn btn-primary" @onclick="GetRemember">GetRemember test form</button>
 
 @code {
     struct SampleStruct
@@ -21,11 +24,27 @@
 
     private int currentCount = 0;
     private string testValue = "";
+    private SampleStruct sampleForm = new SampleStruct
+        {
+            a = 123,
+            b = 321
+        };
 
     private async Task IncrementCount()
     {
         currentCount++;
         await _eventHub.InvokeVoidAsync("test", 1, 2, 3);
+    }
+
+    private async Task Remember()
+    {
+        await _rememberForm.Remember("testForm", sampleForm);
+    }
+
+    private async Task GetRemember()
+    {
+        var testForm = await _rememberForm.Get<SampleStruct>("testForm");
+        Console.WriteLine("testForm: {0} {1}", testForm.a, testForm.b);
     }
 
     private async Task IncrementCount2()

@@ -70,7 +70,8 @@ internal class CEFBlazorGuiLogic
                 _luaEventHub.Invoke(setDevelopmentModeMessage.Player, x => x.SetDevelopmentMode(setDevelopmentModeMessage.Enabled));
                 break;
             case SetVisibleMessage setVisibleMessage:
-                _luaEventHub.Invoke(setVisibleMessage.Player, x => x.SetVisible(setVisibleMessage.Enabled));
+                var enabled = setVisibleMessage.Enabled;
+                _luaEventHub.Invoke(setVisibleMessage.Player, x => x.SetVisible(enabled));
                 break;
             case ToggleDevToolsMessage toggleDevToolsMessages:
                 _luaEventHub.Invoke(toggleDevToolsMessages.Player, x => x.ToggleDevTools(toggleDevToolsMessages.Enabled));
@@ -84,18 +85,18 @@ internal class CEFBlazorGuiLogic
 
     private void HandleCEFInvokeVoidAsync(LuaEvent luaEvent)
     {
-        var (identifier, args) = luaEvent.Read<string, string>(_fromLuaValueMapper);
-        _CEFBlazorGuiService.HandleInvokeVoidAsyncHandler(luaEvent.Player, identifier, args);
+        var (kind, identifier, args) = luaEvent.Read<string, string, string>(_fromLuaValueMapper);
+        _CEFBlazorGuiService.HandleInvokeVoidAsyncHandler(luaEvent.Player, kind, identifier, args);
     }
 
     private async void HandleCEFInvokeAsync(LuaEvent luaEvent)
     {
         try
         {
-            var (identifier, promiseId, args) = luaEvent.Read<string, string, string>(_fromLuaValueMapper);
+            var (kind, identifier, promiseId, args) = luaEvent.Read<string, string, string, string>(_fromLuaValueMapper);
             try
             {
-                var value = await _CEFBlazorGuiService.HandleInvokeAsyncHandler(luaEvent.Player, identifier, args);
+                var value = await _CEFBlazorGuiService.HandleInvokeAsyncHandler(luaEvent.Player, kind, identifier, args);
                 var data = JsonConvert.SerializeObject(value);
                 _luaEventHub.Invoke(luaEvent.Player, x => x.InvokeAsyncSuccess(promiseId, data));
             }

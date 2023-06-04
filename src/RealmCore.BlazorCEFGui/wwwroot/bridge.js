@@ -2,6 +2,7 @@ let invokesCounter = 0;
 const pendingInvokes = new Map();
 
 window.mtaTriggerEvent = (kind, csharpIdentifier, args) => {
+    console.log("mta trigger event", kind, csharpIdentifier, JSON.stringify(args))
     mta.triggerEvent(kind, csharpIdentifier, JSON.stringify(args));
 };
 
@@ -39,7 +40,6 @@ window.mtaTriggerEventWithResult = async (kind, csharpIdentifier, args) => {
     invokesCounter++;
     return await promiseWrapper.promise;
 };
-
 
 window.mtaTriggerEventWithResultDebug = async (kind, csharpIdentifier, args) => {
     var response = await fetch("http://localhost:22100/invokeAsync", {

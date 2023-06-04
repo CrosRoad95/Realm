@@ -11,15 +11,15 @@ internal class BlazorGuiLogic
         _logger = logger;
     }
 
-    private void HandleInvokeVoidAsync(BlazorGuiComponent blazorGuiComponent, string identifier, string args)
+    private void HandleInvokeVoidAsync(BlazorGuiComponent blazorGuiComponent, string kind, string identifier, string args)
     {
-        _logger.LogInformation("HandleInvokeVoidAsync: {identifier}={args}", identifier, args);
+        _logger.LogInformation("HandleInvokeVoidAsync: kind={kind} {identifier}={args}", kind, identifier, args);
     }
 
     int a = 0;
-    private async Task<object> HandleInvokeAsync(BlazorGuiComponent blazorGuiComponent, string identifier, string args)
+    private async Task<object> HandleInvokeAsync(BlazorGuiComponent blazorGuiComponent, string kind, string identifier, string args)
     {
-        _logger.LogInformation("HandleInvokeAsync: {identifier}={args}", identifier, args);
+        _logger.LogInformation("HandleInvokeAsync: kind={kind} {identifier}={args}", kind, identifier, args);
         return new
         {
             a = ++a,

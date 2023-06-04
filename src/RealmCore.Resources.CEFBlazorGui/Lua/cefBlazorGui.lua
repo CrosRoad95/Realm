@@ -4,11 +4,40 @@ local browser = nil;
 local selectedMode = "";
 
 local function handleInvokeVoidAsync(identifier, args)
-	triggerServerEvent("cefInvokeVoidAsync", resourceRoot, identifier, args);
+	triggerServerEvent("cefInvokeVoidAsync", resourceRoot, "InvokeVoidAsync", identifier, args);
 end
 
 local function handleInvokeAsync(identifier, promiseId, args)
-	triggerServerEvent("cefInvokeAsync", resourceRoot, identifier, promiseId, args);
+	triggerServerEvent("cefInvokeAsync", resourceRoot, "InvokeAsync", identifier, promiseId, args);
+end
+
+local function handleRememberFrom(formName, promiseId, formData)
+	local fileName = "@remember_"..formName..".json";
+	if(fileExists(fileName))then
+		fileDelete(fileName)
+	end
+	local file = fileCreate(fileName)
+	fileWrite(file, formData)
+	fileClose(file)
+end
+
+local function handleGetRememberFrom(formName, promiseId)
+	local fileName = "@remember_"..formName..".json";
+	if(not fileExists(fileName))then
+		rejectPromise(promiseId)
+	end
+	local file = fileOpen(fileName, true)
+	local content = fileRead(file, math.min(fileGetSize(file), 10000))
+	fileClose(file)
+	resolvePromise(promiseId, content);
+end
+
+
+local function handleForgetFrom(formName)
+	local fileName = "@remember_"..formName..".json";
+	if(fileExists(fileName))then
+		fileDelete(fileName)
+	end
 end
 
 function handleSetDevelopmentMode(enabled)
@@ -22,7 +51,7 @@ end
 function handleSetVisible(visible)
 	guiSetVisible(browser, visible);
 	setBrowserRenderingPaused (webBrowser, not visible);
-	showCursor(visible, false);
+	showCursor(visible, visible);
 end
 
 function handleSetPath(path)
@@ -68,6 +97,7 @@ local function handleLoad(mode, x, y)
 		addEventHandler( "onClientBrowserCreated", webBrowser, 
 			function()
 				if(fileExists("index.html"))then
+					triggerServerEvent("internalBrowserCreated", resourceRoot)
 					loadBrowserURL(source, "http://mta/local/index.html" )
 				else
 					loadBrowserURL(source, "http://mta/local/error.html" )
@@ -77,12 +107,20 @@ local function handleLoad(mode, x, y)
 	end
 end
 
+function resolvePromise(promiseId, data)
+	executeBrowserJavascript(webBrowser, string.format("invokeAsyncSuccess(%q, %q)", promiseId, data));
+end
+
+function rejectPromise(promiseId)
+	executeBrowserJavascript(webBrowser, string.format("invokeAsyncError(%q)", promiseId));
+end
+
 function handleInvokeAsyncSuccess(promiseId, response)
-	executeBrowserJavascript(webBrowser, string.format("invokeAsyncSuccess(%q, %q)", promiseId, response));
+	resolvePromise(promiseId, response)
 end
 
 function handleInvokeAsyncError(promiseId)
-	executeBrowserJavascript(webBrowser, string.format("invokeAsyncError(%q)", promiseId, response));
+	rejectPromise(promiseId)
 end
 
 addEventHandler("onClientResourceStart", resourceRoot, function()
@@ -98,4 +136,10 @@ addEventHandler("onClientResourceStart", resourceRoot, function()
 	addEventHandler("invokeVoidAsync", resourceRoot, handleInvokeVoidAsync);
 	addEvent("invokeAsync")
 	addEventHandler("invokeAsync", resourceRoot, handleInvokeAsync);
+	addEvent("rememberFrom")
+	addEventHandler("rememberFrom", resourceRoot, handleRememberFrom);
+	addEvent("getRememberFrom")
+	addEventHandler("getRememberFrom", resourceRoot, handleGetRememberFrom);
+	addEvent("forgetFrom")
+	addEventHandler("forgetFrom", resourceRoot, handleForgetFrom);
 end)

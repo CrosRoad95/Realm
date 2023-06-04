@@ -16,8 +16,8 @@ internal sealed class CEFBlazorGuiService : ICEFBlazorGuiService
 
     public Action<IMessage>? MessageHandler { get; set; }
 
-    public Action<Player, string, string>? RelayVoidAsyncInvoked { get; set; }
-    public Func<Player, string, string, Task<object>>? RelayAsyncInvoked { get; set; }
+    public Action<Player, string, string, string>? RelayVoidAsyncInvoked { get; set; }
+    public Func<Player, string, string, string, Task<object>>? RelayAsyncInvoked { get; set; }
     public Action<Player>? RelayPlayerBrowserReady { get; set; }
 
     public CEFGuiBlazorMode CEFGuiMode { get; set; }
@@ -54,27 +54,27 @@ internal sealed class CEFBlazorGuiService : ICEFBlazorGuiService
         RelayPlayerBrowserReady?.Invoke(player);
     }
 
-    public void HandleInvokeVoidAsyncHandler(string identifier, string args)
+    public void HandleInvokeVoidAsyncHandler(string kind, string identifier, string args)
     {
-        RelayVoidAsyncInvoked?.Invoke(_elementCollection.GetByType<Player>().First(), identifier, args);
+        RelayVoidAsyncInvoked?.Invoke(_elementCollection.GetByType<Player>().First(), kind, identifier, args);
     }
 
-    public async Task<object> HandleInvokeAsyncHandler(string identifier, string args)
+    public async Task<object> HandleInvokeAsyncHandler(string kind, string identifier, string args)
     {
         if (RelayAsyncInvoked != null)
-            return await RelayAsyncInvoked(_elementCollection.GetByType<Player>().First(), identifier, args);
+            return await RelayAsyncInvoked(_elementCollection.GetByType<Player>().First(), kind, identifier, args);
         return null;
     }
 
-    public void HandleInvokeVoidAsyncHandler(Player player, string identifier, string args)
+    public void HandleInvokeVoidAsyncHandler(Player player, string kind, string identifier, string args)
     {
-        RelayVoidAsyncInvoked?.Invoke(player, identifier, args);
+        RelayVoidAsyncInvoked?.Invoke(player, kind, identifier, args);
     }
 
-    public async Task<object> HandleInvokeAsyncHandler(Player player, string identifier, string args)
+    public async Task<object> HandleInvokeAsyncHandler(Player player, string kind, string identifier, string args)
     {
         if (RelayAsyncInvoked != null)
-            return await RelayAsyncInvoked(player, identifier, args);
+            return await RelayAsyncInvoked(player, kind, identifier, args);
         return null;
     }
 

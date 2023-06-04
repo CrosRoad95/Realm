@@ -89,12 +89,11 @@ internal sealed class PlayerBindsLogic
                 {
                     if (blazorGuiComponent.Visible)
                     {
-                        blazorGuiComponent.Visible = false;
+                        blazorGuiComponent.Close();
                     }
                     else
                     {
-                        blazorGuiComponent.Visible = true;
-                        blazorGuiComponent.Path = "counter";
+                        blazorGuiComponent.Open("counter");
                     }
                 }
             });

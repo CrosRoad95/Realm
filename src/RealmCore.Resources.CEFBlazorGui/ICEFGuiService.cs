@@ -10,8 +10,8 @@ public interface ICEFBlazorGuiService
 
     CEFGuiBlazorMode CEFGuiMode { get; internal set; }
     Action<IMessage>? MessageHandler { get; set; }
-    Action<Player, string, string>? RelayVoidAsyncInvoked { get; set; }
-    Func<Player, string, string, Task<object>>? RelayAsyncInvoked { get; set; }
+    Action<Player, string, string, string>? RelayVoidAsyncInvoked { get; set; }
+    Func<Player, string, string, string, Task<object>>? RelayAsyncInvoked { get; set; }
     Action<Player>? RelayPlayerBrowserReady { get; set; }
 
     internal void HandleCEFBlazorGuiStart(Player player);
@@ -23,6 +23,6 @@ public interface ICEFBlazorGuiService
     void ToggleDevTools(Player player, bool isDevelopmentMode);
     void SetVisible(Player player, bool visible);
     void SetPath(Player player, string path);
-    internal void HandleInvokeVoidAsyncHandler(Player player, string identifier, string args);
-    internal Task<object> HandleInvokeAsyncHandler(Player player, string identifier, string args);
+    internal void HandleInvokeVoidAsyncHandler(Player player, string kind, string identifier, string args);
+    internal Task<object> HandleInvokeAsyncHandler(Player player, string kind, string identifier, string args);
 }
