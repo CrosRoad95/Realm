@@ -1,7 +1,9 @@
-﻿using RealmCore.BlazorCEFGui.Extensions;
+﻿using Microsoft.AspNetCore.Components;
+using Microsoft.JSInterop;
+using RealmCore.BlazorLibrary.Extensions;
 using System.Text.Json;
 
-namespace RealmCore.BlazorCEFGui.Services;
+namespace RealmCore.BlazorLibrary.Services;
 
 public class RememberForm
 {

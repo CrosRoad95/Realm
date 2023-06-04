@@ -16,6 +16,10 @@
 	  <Embed Remove="@(BlazorWebAssemblyBuildOutputNative)" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\..\RealmCore.BlazorLibrary\RealmCore.BlazorLibrary.csproj" />
+  </ItemGroup>
+
 	<PropertyGroup>
 		<LinkerRootAssembly>$(OutputPath)\$(AssemblyName).dll</LinkerRootAssembly>
 	</PropertyGroup>

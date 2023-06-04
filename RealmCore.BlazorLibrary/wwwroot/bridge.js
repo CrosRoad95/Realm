@@ -2,7 +2,6 @@ let invokesCounter = 0;
 const pendingInvokes = new Map();
 
 window.mtaTriggerEvent = (kind, csharpIdentifier, args) => {
-    console.log("mta trigger event", kind, csharpIdentifier, JSON.stringify(args))
     mta.triggerEvent(kind, csharpIdentifier, JSON.stringify(args));
 };
 

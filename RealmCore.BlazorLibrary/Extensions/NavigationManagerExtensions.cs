@@ -1,6 +1,8 @@
-﻿namespace RealmCore.BlazorCEFGui.Extensions;
+﻿using Microsoft.AspNetCore.Components;
 
-internal static class NavigationManagerExtensions
+namespace RealmCore.BlazorLibrary.Extensions;
+
+public static class NavigationManagerExtensions
 {
     public static bool IsDev(this NavigationManager navigationManager)
     {

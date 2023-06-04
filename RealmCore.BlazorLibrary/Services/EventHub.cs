@@ -1,6 +1,8 @@
-﻿using System.Text.Json;
+﻿using Microsoft.AspNetCore.Components;
+using Microsoft.JSInterop;
+using System.Text.Json;
 
-namespace RealmCore.BlazorCEFGui.Services;
+namespace RealmCore.BlazorLibrary.Services;
 
 public class EventHub
 {
@@ -15,7 +17,7 @@ public class EventHub
 
     public async ValueTask InvokeVoidAsync(string identifier, params object?[]? args)
     {
-        if(_navigationManager.Uri.Contains("localhost"))
+        if (_navigationManager.Uri.Contains("localhost"))
         {
             await _jsRuntime.InvokeVoidAsync("mtaTriggerEventDebug", "invokeVoidAsync", identifier, args);
         }
@@ -24,11 +26,11 @@ public class EventHub
             await _jsRuntime.InvokeVoidAsync("mtaTriggerEvent", "invokeVoidAsync", identifier, args);
         }
     }
-    
+
     public async ValueTask<T> InvokeAsync<T>(string identifier, params object?[]? args)
     {
         string data;
-        if(_navigationManager.Uri.Contains("localhost"))
+        if (_navigationManager.Uri.Contains("localhost"))
         {
             data = await _jsRuntime.InvokeAsync<string>("mtaTriggerEventWithResultDebug", "invokeAsync", identifier, args);
         }
