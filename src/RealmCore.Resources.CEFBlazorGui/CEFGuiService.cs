@@ -19,6 +19,7 @@ internal sealed class CEFBlazorGuiService : ICEFBlazorGuiService
     public Action<Player, string, string, string>? RelayVoidAsyncInvoked { get; set; }
     public Func<Player, string, string, string, Task<object>>? RelayAsyncInvoked { get; set; }
     public Action<Player>? RelayPlayerBrowserReady { get; set; }
+    public Action<Player>? RelayPlayerBlazorReady { get; set; }
 
     public CEFGuiBlazorMode CEFGuiMode { get; set; }
 
@@ -28,9 +29,11 @@ internal sealed class CEFBlazorGuiService : ICEFBlazorGuiService
         _elementCollection = elementCollection;
         if (defaultCEFGuiBlazorMode == CEFGuiBlazorMode.Dev)
         {
-            _blazorDebugServer = new();
-            _blazorDebugServer.InvokeAsyncHandler = HandleInvokeAsyncHandler;
-            _blazorDebugServer.InvokeVoidAsyncHandler = HandleInvokeVoidAsyncHandler;
+            _blazorDebugServer = new()
+            {
+                InvokeAsyncHandler = HandleInvokeAsyncHandler,
+                InvokeVoidAsyncHandler = HandleInvokeVoidAsyncHandler
+            };
             Task.Run(_blazorDebugServer.Start);
         }
     }
@@ -54,6 +57,11 @@ internal sealed class CEFBlazorGuiService : ICEFBlazorGuiService
         RelayPlayerBrowserReady?.Invoke(player);
     }
 
+    public void HandlePlayerBlazorReady(Player player)
+    {
+        RelayPlayerBlazorReady?.Invoke(player);
+    }
+
     public void HandleInvokeVoidAsyncHandler(string kind, string identifier, string args)
     {
         RelayVoidAsyncInvoked?.Invoke(_elementCollection.GetByType<Player>().First(), kind, identifier, args);
@@ -68,7 +76,15 @@ internal sealed class CEFBlazorGuiService : ICEFBlazorGuiService
 
     public void HandleInvokeVoidAsyncHandler(Player player, string kind, string identifier, string args)
     {
-        RelayVoidAsyncInvoked?.Invoke(player, kind, identifier, args);
+        switch(identifier)
+        {
+            case "_ready":
+                RelayPlayerBlazorReady?.Invoke(player);
+                break;
+            default:
+                RelayVoidAsyncInvoked?.Invoke(player, kind, identifier, args);
+                break;
+        }
     }
 
     public async Task<object> HandleInvokeAsyncHandler(Player player, string kind, string identifier, string args)

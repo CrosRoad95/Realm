@@ -25,6 +25,7 @@ local function handleGetRememberFrom(formName, promiseId)
 	local fileName = "@remember_"..formName..".json";
 	if(not fileExists(fileName))then
 		rejectPromise(promiseId)
+		return;
 	end
 	local file = fileOpen(fileName, true)
 	local content = fileRead(file, math.min(fileGetSize(file), 10000))

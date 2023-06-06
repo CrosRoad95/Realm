@@ -13,6 +13,7 @@ public interface ICEFBlazorGuiService
     Action<Player, string, string, string>? RelayVoidAsyncInvoked { get; set; }
     Func<Player, string, string, string, Task<object>>? RelayAsyncInvoked { get; set; }
     Action<Player>? RelayPlayerBrowserReady { get; set; }
+    Action<Player>? RelayPlayerBlazorReady { get; set; }
 
     internal void HandleCEFBlazorGuiStart(Player player);
     internal void HandleCEFBlazorGuiStop(Player player);

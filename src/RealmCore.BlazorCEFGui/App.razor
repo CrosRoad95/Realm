@@ -22,6 +22,7 @@
         {
             _navigationManager.LocationChanged += HandleLocationChanged;
             await _jsRuntime.InvokeVoidAsync("registerCSharpFunction", DotNetObjectReference.Create(this));
+            await _eventHub.InvokeVoidAsync("_ready");
         }
     }
 

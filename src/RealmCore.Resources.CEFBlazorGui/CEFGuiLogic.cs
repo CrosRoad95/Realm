@@ -82,7 +82,6 @@ internal class CEFBlazorGuiLogic
         }
     }
 
-
     private void HandleCEFInvokeVoidAsync(LuaEvent luaEvent)
     {
         var (kind, identifier, args) = luaEvent.Read<string, string, string>(_fromLuaValueMapper);

@@ -16,7 +16,7 @@ internal class CEFBlazorGuiResourceLogic
 
         _cefBlazorGuiService.RelayVoidAsyncInvoked = HandleInvokeVoidAsyncInvoked;
         _cefBlazorGuiService.RelayAsyncInvoked = HandleInvokeAsyncInvoked;
-        _cefBlazorGuiService.RelayPlayerBrowserReady = HandlePlayerBrowserReady;
+        _cefBlazorGuiService.RelayPlayerBlazorReady = HandlePlayerBrowserReady;
     }
 
     private void HandleInvokeVoidAsyncInvoked(Player player, string kind, string identifier, string args)
