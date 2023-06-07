@@ -47,9 +47,9 @@ internal class CEFBlazorGuiResourceLogic
         }
     }
 
-    private void HandleInternalPathChanged(BlazorGuiComponent blazorGuiComponent, string? path)
+    private void HandleInternalPathChanged(BlazorGuiComponent blazorGuiComponent, string? path, bool force)
     {
         var player = blazorGuiComponent.Entity.Player;
-        _cefBlazorGuiService.SetPath(player, path ?? "");
+        _cefBlazorGuiService.SetPath(player, path ?? "", force);
     }
 }

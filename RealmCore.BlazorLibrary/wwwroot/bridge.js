@@ -65,6 +65,6 @@ function registerCSharpFunction(cSharpApp) {
     window.app = cSharpApp;
 }
 
-const navigate = (path) => {
-    window.app.invokeMethod("NavigateTo", path)
+const navigate = (path, force) => {
+    window.app.invokeMethod("NavigateTo", path, force)
 };

@@ -83,6 +83,7 @@ internal sealed class PlayerBindsLogic
                 }
                 return Task.CompletedTask;
             });
+
             playerElementComponent.SetBind("F2", entity =>
             {
                 if (entity.TryGetComponent(out BlazorGuiComponent blazorGuiComponent))
@@ -119,6 +120,14 @@ internal sealed class PlayerBindsLogic
                 if (entity.TryGetComponent(out BlazorGuiComponent blazorGuiComponent))
                 {
                     blazorGuiComponent.Visible = false;
+                }
+            });
+
+            playerElementComponent.SetBind("F7", entity =>
+            {
+                if (entity.TryGetComponent(out BlazorGuiComponent blazorGuiComponent))
+                {
+                    blazorGuiComponent.Open("http://mta/local/counter", true);
                 }
             });
 

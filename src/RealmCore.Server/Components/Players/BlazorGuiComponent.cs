@@ -1,4 +1,5 @@
-﻿using RealmCore.Resources.CEFBlazorGui;
+﻿using Google.Protobuf.WellKnownTypes;
+using RealmCore.Resources.CEFBlazorGui;
 
 namespace RealmCore.Server.Components.Players;
 
@@ -8,7 +9,7 @@ public class BlazorGuiComponent : Component
     private ICEFBlazorGuiService CEFBlazorGuiService { get; set; } = default!;
 
     public event Action<BlazorGuiComponent, string?>? PathChanged;
-    internal Action<BlazorGuiComponent, string?>? InternalPathChanged { get; set; }
+    internal Action<BlazorGuiComponent, string?, bool>? InternalPathChanged { get; set; }
     internal Action<BlazorGuiComponent, bool?>? InternalDevToolsChanged { get; set; }
 
     private string? _path;
@@ -17,7 +18,7 @@ public class BlazorGuiComponent : Component
         get => _path; set
         {
             if (_path == value) return;
-            InternalPathChanged?.Invoke(this, value);
+            InternalPathChanged?.Invoke(this, value, false);
             _path = value;
         }
     }
@@ -56,10 +57,13 @@ public class BlazorGuiComponent : Component
 
     }
 
-    public void Open(string path)
+    public void Open(string path, bool force = false)
     {
         Visible = true;
-        Path = path;
+        if (path == _path && !force)
+            return;
+        _path = path;
+        InternalPathChanged?.Invoke(this, path, force);
     }
     
     public void Close()

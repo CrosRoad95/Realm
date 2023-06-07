@@ -3,4 +3,4 @@ using SlipeServer.Server.Elements;
 
 namespace RealmCore.Resources.CEFBlazorGui.Messages;
 
-internal record struct SetPathMessage(Player Player, string Path) : IMessage;
+internal record struct SetPathMessage(Player Player, string Path, bool Force) : IMessage;

@@ -55,11 +55,12 @@ function handleSetVisible(visible)
 	showCursor(visible, false);
 end
 
-function handleSetPath(path)
+function handleSetPath(path, force)
 	if(selectedMode == "dev")then
 		loadBrowserURL(webBrowser, "http://localhost:5220/"..path)
 	elseif(selectedMode == "prod")then
-		executeBrowserJavascript(webBrowser, string.format("navigate(%q)", path));
+		local js = string.format("navigate(%q, %s)", path, force and "true" or "false");
+		executeBrowserJavascript(webBrowser, js);
 	end
 end
 

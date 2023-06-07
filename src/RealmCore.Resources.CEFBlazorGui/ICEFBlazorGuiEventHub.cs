@@ -6,7 +6,7 @@ public interface ICEFBlazorGuiEventHub
     void SetDevelopmentMode(bool enabled);
     void ToggleDevTools(bool enabled);
     void SetVisible(bool enabled);
-    void SetPath(string path);
+    void SetPath(string path, bool force);
     void InvokeAsyncSuccess(string promiseId, string data);
     void InvokeAsyncError(string promiseId);
 }

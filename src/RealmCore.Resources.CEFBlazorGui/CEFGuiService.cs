@@ -109,8 +109,8 @@ internal sealed class CEFBlazorGuiService : ICEFBlazorGuiService
         MessageHandler?.Invoke(new SetVisibleMessage(player, visible));
     }
 
-    public void SetPath(Player player, string path)
+    public void SetPath(Player player, string path, bool force)
     {
-        MessageHandler?.Invoke(new SetPathMessage(player, path));
+        MessageHandler?.Invoke(new SetPathMessage(player, path, force));
     }
 }
