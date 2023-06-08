@@ -35,15 +35,16 @@ internal class CEFBlazorGuiResourceLogic
             if (entity.TryGetComponent(out BlazorGuiComponent component))
                 return _blazorGuiService.RelayInvokeAsync(component, identifier, args);
         }
-        return null;
+        return Task.FromResult<object>(null);
     }
 
     private void HandlePlayerBrowserReady(Player player)
     {
         if (_ecs.TryGetEntityByPlayer(player, out var entity))
         {
-            var blazorGuiComponent = entity.AddComponent<BlazorGuiComponent>();
+            var blazorGuiComponent = new BlazorGuiComponent();
             blazorGuiComponent.InternalPathChanged = HandleInternalPathChanged;
+            entity.AddComponent(blazorGuiComponent);
         }
     }
 

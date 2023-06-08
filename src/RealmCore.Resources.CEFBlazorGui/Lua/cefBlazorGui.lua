@@ -110,19 +110,19 @@ local function handleLoad(mode, x, y)
 end
 
 function resolvePromise(promiseId, data)
-	executeBrowserJavascript(webBrowser, string.format("invokeAsyncSuccess(%q, %q)", promiseId, data));
+	executeBrowserJavascript(webBrowser, string.format("invokeAsyncSuccess(%i, %q)", promiseId, data));
 end
 
-function rejectPromise(promiseId)
-	executeBrowserJavascript(webBrowser, string.format("invokeAsyncError(%q)", promiseId));
+function rejectPromise(promiseId, reason)
+	executeBrowserJavascript(webBrowser, string.format("invokeAsyncError(%i, %q)", promiseId, reason));
 end
 
 function handleInvokeAsyncSuccess(promiseId, response)
 	resolvePromise(promiseId, response)
 end
 
-function handleInvokeAsyncError(promiseId)
-	rejectPromise(promiseId)
+function handleInvokeAsyncError(promiseId, reason)
+	rejectPromise(promiseId, reason)
 end
 
 addEventHandler("onClientResourceStart", resourceRoot, function()

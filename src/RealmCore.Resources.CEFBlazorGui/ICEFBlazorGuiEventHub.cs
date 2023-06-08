@@ -8,5 +8,5 @@ public interface ICEFBlazorGuiEventHub
     void SetVisible(bool enabled);
     void SetPath(string path, bool force);
     void InvokeAsyncSuccess(string promiseId, string data);
-    void InvokeAsyncError(string promiseId);
+    void InvokeAsyncError(string promiseId, string reason);
 }

@@ -54,6 +54,11 @@ internal sealed class PlayerJoinedLogic
     {
         try
         {
+            if (component is BlazorGuiComponent blazorGuiComponent)
+            {
+                //blazorGuiComponent.DevTools = true;
+                //blazorGuiComponent.Open("counter");
+            }
             if (component is UserComponent)
             {
                 var entity = component.Entity;

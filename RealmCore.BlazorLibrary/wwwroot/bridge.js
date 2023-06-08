@@ -57,8 +57,8 @@ const invokeAsyncSuccess = (promiseId, data) => {
     pendingInvokes[promiseId].resolve(data);
 };
 
-const invokeAsyncError = (promiseId) => {
-    pendingInvokes[promiseId].reject();
+const invokeAsyncError = (promiseId, reason) => {
+    pendingInvokes[promiseId].reject(reason);
 };
 
 function registerCSharpFunction(cSharpApp) {

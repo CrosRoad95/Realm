@@ -84,30 +84,30 @@ internal class CEFBlazorGuiLogic
 
     private void HandleCEFInvokeVoidAsync(LuaEvent luaEvent)
     {
-        var (identifier, args) = luaEvent.Read<string, string>(_fromLuaValueMapper);
-        _CEFBlazorGuiService.HandleInvokeVoidAsyncHandler(luaEvent.Player, identifier, args);
+        try
+        {
+            var (identifier, args) = luaEvent.Read<string, string>(_fromLuaValueMapper);
+            _CEFBlazorGuiService.HandleInvokeVoidAsyncHandler(luaEvent.Player, identifier, args);
+        }
+        catch(Exception ex)
+        {
+            _logger.LogError(ex, "Failed to handle invokeVoidAsync");
+        }
     }
 
     private async void HandleCEFInvokeAsync(LuaEvent luaEvent)
     {
+        var (identifier, promiseId, args) = luaEvent.Read<string, string, string>(_fromLuaValueMapper);
         try
         {
-            var (identifier, promiseId, args) = luaEvent.Read<string, string, string>(_fromLuaValueMapper);
-            try
-            {
-                var value = await _CEFBlazorGuiService.HandleInvokeAsyncHandler(luaEvent.Player, identifier, args);
-                var data = JsonConvert.SerializeObject(value);
-                _luaEventHub.Invoke(luaEvent.Player, x => x.InvokeAsyncSuccess(promiseId, data));
-            }
-            catch(Exception ex)
-            {
-                _luaEventHub.Invoke(luaEvent.Player, x => x.InvokeAsyncError(promiseId));
-                throw;
-            }
+            var value = await _CEFBlazorGuiService.HandleInvokeAsyncHandler(luaEvent.Player, identifier, args);
+            var data = JsonConvert.SerializeObject(value);
+            _luaEventHub.Invoke(luaEvent.Player, x => x.InvokeAsyncSuccess(promiseId, data));
         }
         catch(Exception ex)
         {
-            _logger.LogError(ex, "Failed to handle cef invoke async");
+            _luaEventHub.Invoke(luaEvent.Player, x => x.InvokeAsyncError(promiseId, ex.ToString()));
+            _logger.LogError(ex, "Failed to handle invokeAsync");
         }
     }
 
