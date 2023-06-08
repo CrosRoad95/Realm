@@ -168,4 +168,22 @@ public class EntityTests
         action.Should().Throw<ComponentCanNotBeAddedException<OneComponent>>().WithMessage("Only one instance of component 'OneComponent' can be added to one entity");
         #endregion
     }
+
+    [Fact]
+    public void ComponentShouldBeAbleToDisposeOtherComponentsInDisposeMethod()
+    {
+        #region Arrange
+        var entity = new Entity(_serviceProvider, "foo", EntityTag.Unknown);
+        entity.AddComponent<ParentComponent>();
+        entity.AddComponent<ChildComponent>();
+        #endregion
+
+        #region Act
+        entity.TryDestroyComponent<ParentComponent>();
+        #endregion
+
+        #region Assert
+        entity.Components.Should().BeEmpty();
+        #endregion
+    }
 }

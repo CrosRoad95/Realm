@@ -14,7 +14,7 @@ public class Entity : IDisposable
     public EntityTag Tag { get; }
     public string Name { get; set; } = "";
 
-    private readonly ReaderWriterLockSlim _componentsLock = new();
+    private readonly ReaderWriterLockSlim _componentsLock = new(LockRecursionPolicy.SupportsRecursion);
     private readonly List<Component> _components = new();
     public IEnumerable<Component> Components
     {
