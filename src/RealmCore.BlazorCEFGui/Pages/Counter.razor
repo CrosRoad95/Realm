@@ -10,6 +10,7 @@
 
 <p role="status">Current count: @currentCount</p>
 
+<p>remembered: @(_rememberedForm.a), @(_rememberedForm.b)</p>
 <button class="btn btn-primary" @onclick="IncrementCount">Click me</button>
 <button class="btn btn-primary" @onclick="IncrementCount2">Click me2</button>
 <button class="btn btn-primary" @onclick="Remember">Remember test form</button>
@@ -24,9 +25,11 @@
 
     private int currentCount = 0;
     private string testValue = "";
+    private SampleStruct _rememberedForm;
+
     private SampleStruct sampleForm = new SampleStruct
         {
-            a = 123,
+            a = 100,
             b = 321
         };
 
@@ -38,13 +41,13 @@
 
     private async Task Remember()
     {
+        sampleForm.a++;
         await _rememberForm.Remember("testForm", sampleForm);
     }
 
     private async Task GetRemember()
     {
-        var testForm = await _rememberForm.Get<SampleStruct>("testForm");
-        Console.WriteLine("testForm: {0} {1}", testForm.a, testForm.b);
+        _rememberedForm = await _rememberForm.Get<SampleStruct>("testForm");
     }
 
     private async Task IncrementCount2()

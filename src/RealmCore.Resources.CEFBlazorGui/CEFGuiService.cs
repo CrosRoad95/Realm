@@ -16,8 +16,8 @@ internal sealed class CEFBlazorGuiService : ICEFBlazorGuiService
 
     public Action<IMessage>? MessageHandler { get; set; }
 
-    public Action<Player, string, string, string>? RelayVoidAsyncInvoked { get; set; }
-    public Func<Player, string, string, string, Task<object>>? RelayAsyncInvoked { get; set; }
+    public Func<Player, string, string, Task>? RelayVoidAsyncInvoked { get; set; }
+    public Func<Player, string, string, Task<object>>? RelayAsyncInvoked { get; set; }
     public Action<Player>? RelayPlayerBrowserReady { get; set; }
     public Action<Player>? RelayPlayerBlazorReady { get; set; }
 
@@ -62,19 +62,19 @@ internal sealed class CEFBlazorGuiService : ICEFBlazorGuiService
         RelayPlayerBlazorReady?.Invoke(player);
     }
 
-    public void HandleInvokeVoidAsyncHandler(string kind, string identifier, string args)
+    public Task HandleInvokeVoidAsyncHandler(string identifier, string args)
     {
-        RelayVoidAsyncInvoked?.Invoke(_elementCollection.GetByType<Player>().First(), kind, identifier, args);
+        return RelayVoidAsyncInvoked?.Invoke(_elementCollection.GetByType<Player>().First(), identifier, args);
     }
 
-    public async Task<object> HandleInvokeAsyncHandler(string kind, string identifier, string args)
+    public async Task<object> HandleInvokeAsyncHandler(string identifier, string args)
     {
         if (RelayAsyncInvoked != null)
-            return await RelayAsyncInvoked(_elementCollection.GetByType<Player>().First(), kind, identifier, args);
+            return await RelayAsyncInvoked(_elementCollection.GetByType<Player>().First(), identifier, args);
         return null;
     }
 
-    public void HandleInvokeVoidAsyncHandler(Player player, string kind, string identifier, string args)
+    public void HandleInvokeVoidAsyncHandler(Player player, string identifier, string args)
     {
         switch(identifier)
         {
@@ -82,15 +82,15 @@ internal sealed class CEFBlazorGuiService : ICEFBlazorGuiService
                 RelayPlayerBlazorReady?.Invoke(player);
                 break;
             default:
-                RelayVoidAsyncInvoked?.Invoke(player, kind, identifier, args);
+                RelayVoidAsyncInvoked?.Invoke(player, identifier, args);
                 break;
         }
     }
 
-    public async Task<object> HandleInvokeAsyncHandler(Player player, string kind, string identifier, string args)
+    public async Task<object> HandleInvokeAsyncHandler(Player player, string identifier, string args)
     {
         if (RelayAsyncInvoked != null)
-            return await RelayAsyncInvoked(player, kind, identifier, args);
+            return await RelayAsyncInvoked(player, identifier, args);
         return null;
     }
 

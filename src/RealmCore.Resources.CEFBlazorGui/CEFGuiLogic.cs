@@ -24,8 +24,8 @@ internal class CEFBlazorGuiLogic
     {
         luaEventService.AddEventHandler("internalCEFBlazorGuiStart", HandleCEFBlazorGuiStart);
         luaEventService.AddEventHandler("internalCEFBlazorGuiStop", HandleCEFBlazorGuiStop);
-        luaEventService.AddEventHandler("cefInvokeVoidAsync", HandleCEFInvokeVoidAsync);
-        luaEventService.AddEventHandler("cefInvokeAsync", HandleCEFInvokeAsync);
+        luaEventService.AddEventHandler("internalCEFInvokeVoidAsync", HandleCEFInvokeVoidAsync);
+        luaEventService.AddEventHandler("internalCEFInvokeAsync", HandleCEFInvokeAsync);
         luaEventService.AddEventHandler("internalBrowserCreated", HandleBrowserCreated);
         _CEFBlazorGuiService = CEFBlazorGuiService;
         _logger = logger;
@@ -84,18 +84,18 @@ internal class CEFBlazorGuiLogic
 
     private void HandleCEFInvokeVoidAsync(LuaEvent luaEvent)
     {
-        var (kind, identifier, args) = luaEvent.Read<string, string, string>(_fromLuaValueMapper);
-        _CEFBlazorGuiService.HandleInvokeVoidAsyncHandler(luaEvent.Player, kind, identifier, args);
+        var (identifier, args) = luaEvent.Read<string, string>(_fromLuaValueMapper);
+        _CEFBlazorGuiService.HandleInvokeVoidAsyncHandler(luaEvent.Player, identifier, args);
     }
 
     private async void HandleCEFInvokeAsync(LuaEvent luaEvent)
     {
         try
         {
-            var (kind, identifier, promiseId, args) = luaEvent.Read<string, string, string, string>(_fromLuaValueMapper);
+            var (identifier, promiseId, args) = luaEvent.Read<string, string, string>(_fromLuaValueMapper);
             try
             {
-                var value = await _CEFBlazorGuiService.HandleInvokeAsyncHandler(luaEvent.Player, kind, identifier, args);
+                var value = await _CEFBlazorGuiService.HandleInvokeAsyncHandler(luaEvent.Player, identifier, args);
                 var data = JsonConvert.SerializeObject(value);
                 _luaEventHub.Invoke(luaEvent.Player, x => x.InvokeAsyncSuccess(promiseId, data));
             }

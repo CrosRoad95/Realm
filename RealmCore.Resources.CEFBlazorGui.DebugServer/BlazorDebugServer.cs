@@ -5,8 +5,8 @@ namespace RealmCore.Resources.CEFBlazorGui.DebugServer;
 
 public class BlazorDebugServer
 {
-    public Action<string, string, string>? InvokeVoidAsyncHandler { get; set; }
-    public Func<string, string, string, Task<object>>? InvokeAsyncHandler { get; set; }
+    public Func<string, string, Task>? InvokeVoidAsyncHandler { get; set; }
+    public Func<string, string, Task<object>>? InvokeAsyncHandler { get; set; }
 
     static void Main(string[] args) { }
     public BlazorDebugServer()
@@ -36,7 +36,7 @@ public class BlazorDebugServer
                             var invokeRequest = JsonConvert.DeserializeObject<HttpInvokeRequest>(requestBody);
                             if (invokeRequest == null)
                                 return;
-                            InvokeVoidAsyncHandler?.Invoke(invokeRequest.Kind, invokeRequest.CSharpIdentifier, invokeRequest.Args);
+                            await InvokeVoidAsyncHandler?.Invoke(invokeRequest.CSharpIdentifier, invokeRequest.Args);
                         });
                         endpoints.MapPost("/invokeAsync", async context =>
                         {
@@ -46,7 +46,7 @@ public class BlazorDebugServer
                             if (invokeRequest == null)
                                 return;
 
-                            var response = await InvokeAsyncHandler?.Invoke(invokeRequest.Kind, invokeRequest.CSharpIdentifier, invokeRequest.Args);
+                            var response = await InvokeAsyncHandler?.Invoke(invokeRequest.CSharpIdentifier, invokeRequest.Args);
                             if (response == null)
                                 return;
 

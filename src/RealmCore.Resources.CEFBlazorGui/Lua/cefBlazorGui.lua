@@ -4,11 +4,11 @@ local browser = nil;
 local selectedMode = "";
 
 local function handleInvokeVoidAsync(identifier, args)
-	triggerServerEvent("cefInvokeVoidAsync", resourceRoot, "InvokeVoidAsync", identifier, args);
+	triggerServerEvent("internalCEFInvokeVoidAsync", resourceRoot, identifier, args);
 end
 
 local function handleInvokeAsync(identifier, promiseId, args)
-	triggerServerEvent("cefInvokeAsync", resourceRoot, "InvokeAsync", identifier, promiseId, args);
+	triggerServerEvent("internalCEFInvokeAsync", resourceRoot, identifier, promiseId, args);
 end
 
 local function handleRememberFrom(formName, promiseId, formData)
