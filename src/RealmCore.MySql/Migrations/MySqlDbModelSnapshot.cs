@@ -7,7 +7,7 @@ using RealmCore.MySql;
 
 #nullable disable
 
-namespace RealmCore.Persistance.MySql.Migrations
+namespace RealmCore.Persistence.MySql.Migrations
 {
     [DbContext(typeof(MySqlDb))]
     partial class MySqlDbModelSnapshot : ModelSnapshot

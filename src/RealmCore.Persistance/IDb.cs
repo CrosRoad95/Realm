@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore.ChangeTracking;
 
-namespace RealmCore.Persistance;
+namespace RealmCore.Persistence;
 
 public interface IDb : IDisposable
 {

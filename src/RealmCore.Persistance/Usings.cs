@@ -9,10 +9,10 @@ global using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 global using Newtonsoft.Json;
 global using System.Runtime.CompilerServices;
 
-global using RealmCore.Persistance.Data;
-global using RealmCore.Persistance.Data.Helpers;
-global using RealmCore.Persistance.Extensions;
-global using RealmCore.Persistance.Interfaces;
-global using RealmCore.Persistance.DTOs;
+global using RealmCore.Persistence.Data;
+global using RealmCore.Persistence.Data.Helpers;
+global using RealmCore.Persistence.Extensions;
+global using RealmCore.Persistence.Interfaces;
+global using RealmCore.Persistence.DTOs;
 
 [assembly: InternalsVisibleTo("RealmCore.Tests")]

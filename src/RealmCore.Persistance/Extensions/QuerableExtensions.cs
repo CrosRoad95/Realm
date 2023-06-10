@@ -1,4 +1,4 @@
-﻿namespace RealmCore.Persistance.Extensions;
+﻿namespace RealmCore.Persistence.Extensions;
 
 public static class QuerableExtensions
 {

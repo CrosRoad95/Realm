@@ -1,4 +1,4 @@
-﻿using RealmCore.Persistance.DTOs;
+﻿using RealmCore.Persistence.DTOs;
 using RealmCore.Server.Json.Converters;
 
 namespace RealmCore.Server.Services;

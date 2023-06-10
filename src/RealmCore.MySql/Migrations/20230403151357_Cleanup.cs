@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace RealmCore.Persistance.MySql.Migrations
+namespace RealmCore.Persistence.MySql.Migrations
 {
     /// <inheritdoc />
     public partial class Cleanup : Migration

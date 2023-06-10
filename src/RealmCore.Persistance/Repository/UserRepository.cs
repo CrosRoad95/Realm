@@ -1,4 +1,4 @@
-﻿namespace RealmCore.Persistance.Repository;
+﻿namespace RealmCore.Persistence.Repository;
 
 internal class UserRepository : IUserRepository
 {

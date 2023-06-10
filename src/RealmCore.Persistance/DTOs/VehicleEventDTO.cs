@@ -1,4 +1,4 @@
-﻿namespace RealmCore.Persistance.DTOs;
+﻿namespace RealmCore.Persistence.DTOs;
 
 public class VehicleEventDTO
 {

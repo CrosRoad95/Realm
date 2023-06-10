@@ -1,4 +1,4 @@
-﻿namespace RealmCore.Persistance;
+﻿namespace RealmCore.Persistence;
 
 public class RepositoryFactory
 {

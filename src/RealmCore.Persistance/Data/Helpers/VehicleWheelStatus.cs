@@ -1,4 +1,4 @@
-﻿namespace RealmCore.Persistance.Data.Helpers;
+﻿namespace RealmCore.Persistence.Data.Helpers;
 
 public class VehicleWheelStatus
 {

@@ -1,4 +1,4 @@
-﻿using RealmCore.Persistance.DTOs;
+﻿using RealmCore.Persistence.DTOs;
 
 namespace RealmCore.Server.Interfaces;
 

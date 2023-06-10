@@ -2,7 +2,7 @@
 
 #nullable disable
 
-namespace RealmCore.Persistance.SQLite.Migrations
+namespace RealmCore.Persistence.SQLite.Migrations
 {
     /// <inheritdoc />
     public partial class AchievementDropKey : Migration

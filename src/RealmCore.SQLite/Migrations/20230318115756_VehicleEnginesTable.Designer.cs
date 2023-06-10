@@ -8,7 +8,7 @@ using RealmCore.SQLite;
 
 #nullable disable
 
-namespace RealmCore.Persistance.SQLite.Migrations
+namespace RealmCore.Persistence.SQLite.Migrations
 {
     [DbContext(typeof(SQLiteDb))]
     [Migration("20230318115756_VehicleEnginesTable")]

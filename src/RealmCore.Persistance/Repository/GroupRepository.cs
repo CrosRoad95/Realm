@@ -1,6 +1,6 @@
-﻿using RealmCore.Persistance.Exceptions;
+﻿using RealmCore.Persistence.Exceptions;
 
-namespace RealmCore.Persistance.Repository;
+namespace RealmCore.Persistence.Repository;
 
 internal class GroupRepository : IGroupRepository
 {

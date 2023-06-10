@@ -1,4 +1,4 @@
-﻿namespace RealmCore.Persistance.Interfaces;
+﻿namespace RealmCore.Persistence.Interfaces;
 
 public interface IVehicleEventRepository : IRepositoryBase
 {

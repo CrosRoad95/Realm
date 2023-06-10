@@ -1,5 +1,5 @@
-﻿using static RealmCore.Persistance.Data.Helpers.VehicleDamageState;
-using static RealmCore.Persistance.Data.Helpers.VehicleWheelStatus;
+﻿using static RealmCore.Persistence.Data.Helpers.VehicleDamageState;
+using static RealmCore.Persistence.Data.Helpers.VehicleWheelStatus;
 
 namespace RealmCore.Server.Services;
 

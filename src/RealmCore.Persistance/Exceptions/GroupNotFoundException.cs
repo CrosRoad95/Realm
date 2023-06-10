@@ -1,4 +1,4 @@
-﻿namespace RealmCore.Persistance.Exceptions;
+﻿namespace RealmCore.Persistence.Exceptions;
 
 public class GroupNotFoundException : Exception
 {

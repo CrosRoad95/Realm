@@ -1,6 +1,6 @@
-﻿using static RealmCore.Persistance.Data.Helpers.VehicleWheelStatus;
+﻿using static RealmCore.Persistence.Data.Helpers.VehicleWheelStatus;
 
-namespace RealmCore.Persistance.Repository;
+namespace RealmCore.Persistence.Repository;
 
 internal class VehicleRepository : IVehicleRepository
 {

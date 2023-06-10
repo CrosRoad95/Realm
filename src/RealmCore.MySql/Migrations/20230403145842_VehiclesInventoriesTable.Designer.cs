@@ -8,7 +8,7 @@ using RealmCore.MySql;
 
 #nullable disable
 
-namespace RealmCore.Persistance.MySql.Migrations
+namespace RealmCore.Persistence.MySql.Migrations
 {
     [DbContext(typeof(MySqlDb))]
     [Migration("20230403145842_VehiclesInventoriesTable")]
