@@ -82,7 +82,7 @@ internal sealed class AdminResourceLogic
                     _adminService.BroadcastEntityDebugInfoUpdateForPlayer(player, _ecs.Entities.Select(x => new EntityDebugInfo
                     {
                         debugId = x.Id,
-                        element = x.TryGetElement(),
+                        element = x.Element,
                         position = x.Transform.Position,
                         previewType = PreviewType.BoxWireframe,
                         previewColor = Color.Red,

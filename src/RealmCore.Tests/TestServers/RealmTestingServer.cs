@@ -5,13 +5,15 @@ using RealmCore.Tests.Classes;
 using SlipeServer.Server.Resources.Providers;
 using SlipeServer.Server.Resources.Interpreters;
 using SlipeServer.Server.Resources;
+using RealmCore.Resources.CEFBlazorGui;
+using SlipeServer.Server.ElementCollections;
 
 namespace RealmCore.Tests.TestServers;
 
-internal class TestResourcePRovider : IResourceProvider
+internal class TestResourceProvider : IResourceProvider
 {
     public int Resources = 0;
-    public TestResourcePRovider()
+    public TestResourceProvider()
     {
     }
 
@@ -69,8 +71,8 @@ internal class RealmTestingServer : TestingServer
 
             services.AddSingleton(saveServiceMock.Object);
             services.AddSingleton(rpgServerMock.Object);
-            services.AddSingleton<TestResourcePRovider>();
-            services.AddSingleton<IResourceProvider>(x => x.GetRequiredService<TestResourcePRovider>());
+            services.AddSingleton<TestResourceProvider>();
+            services.AddSingleton<IResourceProvider>(x => x.GetRequiredService<TestResourceProvider>());
 
             services.AddSingleton<IDateTimeProvider, TestDateTimeProvider>();
 
@@ -79,6 +81,9 @@ internal class RealmTestingServer : TestingServer
             services.AddSingleton<ItemsRegistry>();
             services.AddSingleton<VehicleUpgradeRegistry>();
             services.AddSingleton<LevelsRegistry>();
+            services.AddSingleton<ISpawnMarkersService, SpawnMarkersService>();
+            services.AddSingleton<ICEFBlazorGuiService>(x => new CEFBlazorGuiService(CEFGuiBlazorMode.Dev, x.GetRequiredService<IElementCollection>()));
+            services.AddSingleton<IBlazorGuiService, BlazorGuiService>();
             services.AddSingleton<IAssetEncryptionProvider, TestAssetEncryptionProvider>();
 
             services.AddSingleton<IConsole>(new EmptyServerConsole());

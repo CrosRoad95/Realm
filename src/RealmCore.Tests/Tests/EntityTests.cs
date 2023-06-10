@@ -1,15 +1,21 @@
 ﻿using RealmCore.Tests.Classes.Components;
+using RealmCore.Tests.Helpers;
 
 namespace RealmCore.Tests.Tests;
 
 public class EntityTests
 {
     private readonly IServiceProvider _serviceProvider;
+    private readonly RealmTestingServer _server;
+    private readonly EntityHelper _entityHelper;
+
     public EntityTests()
     {
         var services = new ServiceCollection();
         services.AddSingleton(new object());
         _serviceProvider = services.BuildServiceProvider();
+        _server = new();
+        _entityHelper = new(_server);
     }
 
     [Fact]
@@ -184,6 +190,68 @@ public class EntityTests
 
         #region Assert
         entity.Components.Should().BeEmpty();
+        #endregion
+    }
+
+    [Fact]
+    public void ComponentShouldBeAbleToDisposeOtherComponentsInDispose2Method()
+    {
+        #region Arrange
+        var entity = new Entity(_serviceProvider, "foo", EntityTag.Unknown);
+        var test1 = entity.AddComponent<TestComponent>();
+        var test2 = entity.AddComponent<TestComponent>();
+
+        test1.Disposed += e =>
+        {
+            entity.TryDestroyComponent(test2);
+        };
+        #endregion
+
+        #region Act
+        entity.TryDestroyComponent(test1);
+        #endregion
+
+        #region Assert
+        entity.Components.Should().BeEmpty();
+        #endregion
+    }
+
+    [Fact]
+    public void ComponentShouldBeAbleToDisposeOtherComponentsInDispose3Method()
+    {
+        #region Arrange
+        var entity = new Entity(_serviceProvider, "foo", EntityTag.Unknown);
+        var test1 = entity.AddComponent<TestComponent>();
+        var test2 = entity.AddComponent<ParentComponent>();
+
+        test1.Disposed += e =>
+        {
+            entity.TryDestroyComponent<ParentComponent>();
+        };
+        #endregion
+
+        #region Act
+        entity.TryDestroyComponent(test1);
+        #endregion
+
+        #region Assert
+        entity.Components.Should().BeEmpty();
+        #endregion
+    }
+
+    [Fact]
+    public void TryGetElementTest()
+    {
+        #region Arrange
+        var elementEntity = _entityHelper.CreateObjectEntity();
+        #endregion
+
+        #region Act
+        var success = elementEntity.TryGetElement(out var element);
+        #endregion
+
+        #region Assert
+        success.Should().BeTrue();
         #endregion
     }
 }

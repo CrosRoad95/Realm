@@ -48,12 +48,16 @@ public class Entity : IDisposable
         Transform = new Transform(this);
     }
 
-    internal Element? TryGetElement()
+    internal bool TryGetElement(out Element element)
     {
         if(TryGetComponent(out ElementComponent elementComponent))
-            return elementComponent.Element;
+        {
+            element = elementComponent.Element;
+            return true;
+        }
 
-        return null;
+        element = null!;
+        return false;
     }
 
     private void InternalInjectProperties(Type type, object obj)
@@ -276,12 +280,6 @@ public class Entity : IDisposable
         return component == null ? throw new ComponentNotFoundException<TComponent>() : component;
     }
 
-    public void DetachComponent<TComponent>() where TComponent : Component
-    {
-        ThrowIfDisposed();
-        DetachComponent(GetRequiredComponent<TComponent>());
-    }
-
     private void InternalDetachComponent<TComponent>(TComponent component) where TComponent : Component
     {
         component.TryRemoveEntity(() =>
@@ -346,7 +344,7 @@ public class Entity : IDisposable
     {
         ThrowIfDisposed();
 
-        _componentsLock.EnterReadLock();
+        _componentsLock.EnterWriteLock();
         try
         {
             var component = InternalGetComponent<TComponent>();
@@ -366,7 +364,7 @@ public class Entity : IDisposable
         }
         finally
         {
-            _componentsLock.ExitReadLock();
+            _componentsLock.ExitWriteLock();
         }
         return true;
     }
