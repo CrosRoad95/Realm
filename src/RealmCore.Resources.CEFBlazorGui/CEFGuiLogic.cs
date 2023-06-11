@@ -106,8 +106,8 @@ internal class CEFBlazorGuiLogic
         }
         catch(Exception ex)
         {
-            _luaEventHub.Invoke(luaEvent.Player, x => x.InvokeAsyncError(promiseId, ex.ToString()));
             _logger.LogError(ex, "Failed to handle invokeAsync");
+            _luaEventHub.Invoke(luaEvent.Player, x => x.InvokeAsyncError(promiseId, "Internal error"));
         }
     }
 
