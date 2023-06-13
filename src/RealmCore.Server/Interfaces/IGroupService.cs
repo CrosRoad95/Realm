@@ -9,6 +9,6 @@ public interface IGroupService
     Task<Group?> GetGroupByName(string groupName);
     Task AddMember(int groupId, int userId, int rank = 1, string rankName = "");
     Task RemoveMember(int groupId, int userId);
-    Task<bool> GroupExistsByNameOrShortut(string groupName, string shortcut);
-    Task<Group?> GetGroupByNameOrShortut(string groupName, string shortcut);
+    Task<bool> GroupExistsByNameOrShorcut(string groupName, string shortcut);
+    Task<Group?> GetGroupByNameOrShorcut(string groupName, string shortcut);
 }

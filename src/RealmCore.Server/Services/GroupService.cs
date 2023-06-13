@@ -35,7 +35,7 @@ internal class GroupService : IGroupService
         return Map(groupData);
     }
 
-    public async Task<Group?> GetGroupByNameOrShortut(string groupName, string shortcut)
+    public async Task<Group?> GetGroupByNameOrShorcut(string groupName, string shortcut)
     {
         var groupData = await _groupRepository.GetGroupByNameOrShortcut(groupName, shortcut);
         if (groupData == null)
@@ -44,7 +44,7 @@ internal class GroupService : IGroupService
         return Map(groupData);
     }
 
-    public Task<bool> GroupExistsByNameOrShortut(string groupName, string shortcut)
+    public Task<bool> GroupExistsByNameOrShorcut(string groupName, string shortcut)
     {
         return _groupRepository.ExistsByNameOrShortcut(groupName, shortcut);
     }

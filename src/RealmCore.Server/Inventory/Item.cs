@@ -61,7 +61,7 @@ public class Item : IEquatable<Item>, IEquatable<Dictionary<string, object>>
     internal Item(ItemsRegistry itemsRegistry, uint itemId, uint number, Dictionary<string, object>? metaData = null)
     {
         var itemRegistryEntry = itemsRegistry.Get(itemId);
-        AvailiableActions = itemRegistryEntry.AvailiableActions;
+        AvailiableActions = itemRegistryEntry.AvailableActions;
         Size = itemRegistryEntry.Size;
         Name = itemRegistryEntry.Name;
         ItemId = itemRegistryEntry.Id;

@@ -80,7 +80,7 @@ public class SaveLoadServiceTests
 
         #region Act
         var vehicle = vehicleElementComponent.Vehicle;
-        await vehiclesService.Despawn(vehicleEntity);
+        await vehiclesService.Destroy(vehicleEntity);
         vehicle.IsDestroyed.Should().BeTrue();
 
         var loadedVehicleEntity = await loadService.LoadVehicleById(1);

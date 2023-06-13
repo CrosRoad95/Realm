@@ -382,7 +382,7 @@ public class Entity : IDisposable
     protected void ThrowIfDisposed()
     {
         if (_disposed)
-            throw new ObjectDisposedException(nameof(Objective));
+            throw new ObjectDisposedException(nameof(Entity));
     }
 
     public virtual void Dispose()
@@ -408,7 +408,6 @@ public class Entity : IDisposable
         _disposed = true;
     }
 
-
     public IEntityComponentsTransaction BeginComponentTransaction()
     {
         ThrowIfDisposed();
@@ -431,13 +430,13 @@ public class Entity : IDisposable
             throw new InvalidOperationException("Transaction does not belong to this entity");
 
         if (!transaction.TryClose())
-            throw new InvalidOperationException("Transaction already commited");
+            throw new InvalidOperationException("Transaction already committed");
 
-        int commitedComponents = 0;
+        int committedComponents = 0;
         _componentsLock.EnterWriteLock();
         try
         {
-            commitedComponents = _components.Count(x => x._version == transaction.Version);
+            committedComponents = _components.Count(x => x._version == transaction.Version);
         }
         finally
         {
@@ -449,7 +448,7 @@ public class Entity : IDisposable
             }
         }
 
-        return commitedComponents;
+        return committedComponents;
     }
 
     public int Rollback(IEntityComponentsTransaction transaction)
@@ -460,7 +459,7 @@ public class Entity : IDisposable
             throw new InvalidOperationException("Transaction does not belong to this entity");
 
         if (!transaction.TryClose())
-            throw new InvalidOperationException("Transaction already commited");
+            throw new InvalidOperationException("Transaction already committed");
 
         int rollbackedComponents = 0;
         var components = Components;

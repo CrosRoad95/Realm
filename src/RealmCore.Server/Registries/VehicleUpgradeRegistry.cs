@@ -17,7 +17,7 @@ public class VehicleUpgradeRegistry
     {
         if (_vehicleUpgradesRegistryEntries.ContainsKey(id))
         {
-            throw new Exception("Item of id '" + id + "' already exists;.");
+            throw new Exception($"Item of id '{id}' already exists;.");
         }
         vehicleUpgradeRegistryEntry.Id = id;
         _vehicleUpgradesRegistryEntries[id] = vehicleUpgradeRegistryEntry;

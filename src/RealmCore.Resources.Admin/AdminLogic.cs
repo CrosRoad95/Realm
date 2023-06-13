@@ -85,8 +85,8 @@ internal class AdminLogic
                     if (!_enabledForPlayers.Any())
                         return;
 
-                    var luaValuees = broadcastEntitiesDebugInfoMessage.EntitiesDebugInfo.Select(x => _luaValueMapper.Map(x));
-                    _luaEventHub.Invoke(_enabledForPlayers, x => x.AddOrUpdateEntity(luaValuees));
+                    var luaValues = broadcastEntitiesDebugInfoMessage.EntitiesDebugInfo.Select(x => _luaValueMapper.Map(x));
+                    _luaEventHub.Invoke(_enabledForPlayers, x => x.AddOrUpdateEntity(luaValues));
                 }
                 break;
             case BroadcastEntityDebugInfoMessageForPlayer broadcastEntityDebugInfoMessageForPlayer:
@@ -107,8 +107,8 @@ internal class AdminLogic
                     if (!_enabledForPlayers.Contains(player))
                         return;
 
-                    var luaValuees = broadcastEntitiesDebugInfoMessageForPlayer.EntitiesDebugInfo.Select(x => _luaValueMapper.Map(x));
-                    _luaEventHub.Invoke(player, x => x.AddOrUpdateEntity(luaValuees));
+                    var luaValues = broadcastEntitiesDebugInfoMessageForPlayer.EntitiesDebugInfo.Select(x => _luaValueMapper.Map(x));
+                    _luaEventHub.Invoke(player, x => x.AddOrUpdateEntity(luaValues));
                 }
                 break;
             case ClearEntitiesForPlayerMessage clearEntitiesForPlayerMessage:

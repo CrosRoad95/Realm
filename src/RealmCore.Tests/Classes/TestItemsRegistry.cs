@@ -6,7 +6,7 @@ internal class TestItemsRegistry : ItemsRegistry
     {
         Add(1, new ItemRegistryEntry
         {
-            AvailiableActions = ItemAction.Use,
+            AvailableActions = ItemAction.Use,
             Name = "Test item id 1",
             Size = 1,
             StackSize = 1,

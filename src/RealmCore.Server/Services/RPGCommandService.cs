@@ -149,7 +149,7 @@ public class RPGCommandService
             {
                 if (!commandInfo.NoTracing)
                 {
-                    _logger.LogInformation("Ended command {commandText} execution with traceId={TraceId} in {totalMiliseconds}miliseconds", commandText, activity.GetTraceId(), (Stopwatch.GetTimestamp() - start) / (float)TimeSpan.TicksPerMillisecond);
+                    _logger.LogInformation("Ended command {commandText} execution with traceId={TraceId} in {totalMilliseconds}milliseconds", commandText, activity.GetTraceId(), (Stopwatch.GetTimestamp() - start) / (float)TimeSpan.TicksPerMillisecond);
                 }
                 activity.Stop();
             }
@@ -223,7 +223,7 @@ public class RPGCommandService
             finally
             {
                 if (!commandInfo.NoTracing)
-                    _logger.LogInformation("Ended async command {commandText} execution with traceId={TraceId} in {totalMiliseconds}miliseconds", commandText, activity.GetTraceId(), (Stopwatch.GetTimestamp() - start) / (float)TimeSpan.TicksPerMillisecond);
+                    _logger.LogInformation("Ended async command {commandText} execution with traceId={TraceId} in {totalMilliseconds}milliseconds", commandText, activity.GetTraceId(), (Stopwatch.GetTimestamp() - start) / (float)TimeSpan.TicksPerMillisecond);
                 activity.Stop();
             }
         }

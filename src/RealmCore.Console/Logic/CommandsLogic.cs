@@ -793,7 +793,7 @@ internal sealed class CommandsLogic
         _commandService.AddAsyncCommandHandler("despawn", async (entity, args) =>
         {
             var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();
-            await _vehiclesService.Despawn(playerElementComponent.OccupiedVehicle);
+            await _vehiclesService.Destroy(playerElementComponent.OccupiedVehicle);
         });
 
         _commandService.AddCommandHandler("disposeveh", (entity, args) =>

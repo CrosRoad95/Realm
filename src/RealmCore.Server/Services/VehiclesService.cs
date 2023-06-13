@@ -67,7 +67,7 @@ internal sealed class VehiclesService : IVehiclesService
         return _vehicleRepository.GetReadOnlyVehicleById(id);
     }
 
-    public async Task Despawn(Entity entity)
+    public async Task Destroy(Entity entity)
     {
         if (entity.Tag != EntityTag.Vehicle)
             throw new InvalidOperationException("Entity is not vehicle");

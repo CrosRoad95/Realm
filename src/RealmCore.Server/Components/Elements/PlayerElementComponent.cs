@@ -488,7 +488,7 @@ public sealed class PlayerElementComponent : PedElementComponent
         if (!_asyncBinds.ContainsKey(key) || !_binds.ContainsKey(key))
         {
             _bindsLock.Release();
-            throw new BindDoesntExistsException(key);
+            throw new BindDoesNotExistsException(key);
         }
         _player.RemoveBind(key, KeyState.Both);
         if (_asyncBinds.ContainsKey(key))

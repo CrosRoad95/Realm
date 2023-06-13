@@ -99,14 +99,14 @@ internal sealed class SeederServerBuilder
         foreach (var pair in groups)
         {
             Group group;
-            if (!await _groupService.GroupExistsByNameOrShortut(pair.Key, pair.Value.Shortcut))
+            if (!await _groupService.GroupExistsByNameOrShorcut(pair.Key, pair.Value.Shortcut))
             {
                 group = await _groupService.CreateGroup(pair.Key, pair.Value.Shortcut, pair.Value.GroupKind);
                 _logger.LogInformation("Seeder: Created group {elementId} with members {members}", pair.Key, pair.Value.Members.Select(x => x.Key));
             }
             else
             {
-                group = await _groupService.GetGroupByNameOrShortut(pair.Key, pair.Value.Shortcut) ?? throw new Exception("Failed to get group by name or shortcut");
+                group = await _groupService.GetGroupByNameOrShorcut(pair.Key, pair.Value.Shortcut) ?? throw new Exception("Failed to get group by name or shortcut");
                 _logger.LogInformation("Seeder: Updated group {elementId} with members {members}", pair.Key, pair.Value.Members.Select(x => x.Key));
             }
 
@@ -221,7 +221,7 @@ internal sealed class SeederServerBuilder
     public async Task Build()
     {
         var result = new JObject();
-        List<SeedData> seedDatas = new();
+        List<SeedData> seedDataList = new();
         var seedFiles = _serverFilesProvider.GetFiles(_basePath).ToList();
         _logger.LogInformation("Found seed files: {seedFiles}", seedFiles);
         foreach (var seedFileName in seedFiles)
@@ -231,7 +231,7 @@ internal sealed class SeederServerBuilder
                 var data = JsonConvert.DeserializeObject<SeedData>(File.ReadAllText(seedFileName));
                 if (data == null)
                     throw new Exception("Something went wrong while deserializing.");
-                seedDatas.Add(data);
+                seedDataList.Add(data);
             }
             catch (Exception ex)
             {
@@ -239,7 +239,7 @@ internal sealed class SeederServerBuilder
             }
         }
 
-        foreach (var sourceObject in seedDatas)
+        foreach (var sourceObject in seedDataList)
         {
             var @object = JObject.Parse(JsonConvert.SerializeObject(sourceObject));
             result.Merge(@object, new JsonMergeSettings

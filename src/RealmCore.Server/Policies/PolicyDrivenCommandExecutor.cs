@@ -22,6 +22,7 @@ internal class PolicyDrivenCommandExecutor : IPolicyDrivenCommandExecutor
             return ctx;
         }, new Context(operationKey));
     }
+
     public async Task ExecuteAsync(Func<Task> callback, string operationKey)
     {
         await _policyAsync.ExecuteAsync(async (ctx) =>

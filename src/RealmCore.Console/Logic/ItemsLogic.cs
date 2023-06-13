@@ -19,28 +19,28 @@ public class ItemsLogic
             Size = 1,
             StackSize = 4,
             Name = "Test item id 1",
-            AvailiableActions = ItemAction.Use,
+            AvailableActions = ItemAction.Use,
         });
         itemsRegistry.Add(2, new ItemRegistryEntry
         {
             Size = 2,
             StackSize = 4,
             Name = "Foo item id 2",
-            AvailiableActions = ItemAction.Use,
+            AvailableActions = ItemAction.Use,
         });
         itemsRegistry.Add(3, new ItemRegistryEntry
         {
             Size = 1,
             StackSize = 1,
             Name = "Sample weapon",
-            AvailiableActions = ItemAction.None,
+            AvailableActions = ItemAction.None,
         });
         itemsRegistry.Add(4, new ItemRegistryEntry
         {
             Size = 0.05m,
             StackSize = 10,
             Name = "item size 0.05",
-            AvailiableActions = ItemAction.None,
+            AvailableActions = ItemAction.None,
         });
 
         ecs.EntityCreated += HandleEntityCreated;

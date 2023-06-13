@@ -16,42 +16,42 @@ public class InventoryComponentTests
             Name = "test item id 1",
             Size = 1,
             StackSize = 8,
-            AvailiableActions = ItemAction.Use,
+            AvailableActions = ItemAction.Use,
         });
         _itemsRegistry.Add(2, new ItemRegistryEntry
         {
             Name = "test item id 2",
             Size = 2,
             StackSize = 1,
-            AvailiableActions = ItemAction.Use,
+            AvailableActions = ItemAction.Use,
         });
         _itemsRegistry.Add(3, new ItemRegistryEntry
         {
             Name = "test item id 3",
             Size = 1,
             StackSize = 8,
-            AvailiableActions = ItemAction.Use | ItemAction.Drop | ItemAction.Eat,
+            AvailableActions = ItemAction.Use | ItemAction.Drop | ItemAction.Eat,
         });
         _itemsRegistry.Add(4, new ItemRegistryEntry
         {
             Name = "test item id 4",
             Size = 100,
             StackSize = 8,
-            AvailiableActions = ItemAction.Use,
+            AvailableActions = ItemAction.Use,
         });
         _itemsRegistry.Add(5, new ItemRegistryEntry
         {
             Name = "test item id 5",
             Size = 101,
             StackSize = 8,
-            AvailiableActions = ItemAction.Use,
+            AvailableActions = ItemAction.Use,
         });
         _itemsRegistry.Add(6, new ItemRegistryEntry
         {
             Name = "test item id 6",
             Size = 1,
             StackSize = 1,
-            AvailiableActions = ItemAction.Use,
+            AvailableActions = ItemAction.Use,
         });
 
         var services = new ServiceCollection();
