@@ -88,7 +88,7 @@ public class EntityTransactionTest
         #endregion
 
         #region Act & Assert
-        act.Should().Throw<InvalidOperationException>().WithMessage("Transaction already commited");
+        act.Should().Throw<InvalidOperationException>().WithMessage("Transaction already committed");
         #endregion
     }
 
@@ -105,7 +105,7 @@ public class EntityTransactionTest
         #endregion
 
         #region Act & Assert
-        act.Should().Throw<InvalidOperationException>().WithMessage("Transaction already commited");
+        act.Should().Throw<InvalidOperationException>().WithMessage("Transaction already committed");
         #endregion
     }
 
