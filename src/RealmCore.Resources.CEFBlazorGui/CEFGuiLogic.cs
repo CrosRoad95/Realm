@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using RealmCore.Resources.Base;
 using RealmCore.Resources.Base.Interfaces;
@@ -17,10 +18,11 @@ internal class CEFBlazorGuiLogic
     private readonly ILogger<CEFBlazorGuiLogic> _logger;
     private readonly ILuaEventHub<ICEFBlazorGuiEventHub> _luaEventHub;
     private readonly FromLuaValueMapper _fromLuaValueMapper;
+    private readonly IOptions<BlazorOptions> _blazorOptions;
     private readonly CEFBlazorGuiResource _resource;
 
     public CEFBlazorGuiLogic(MtaServer mtaServer, LuaEventService luaEventService, ICEFBlazorGuiService CEFBlazorGuiService,
-        ILogger<CEFBlazorGuiLogic> logger, ILuaEventHub<ICEFBlazorGuiEventHub> luaEventHub, FromLuaValueMapper fromLuaValueMapper)
+        ILogger<CEFBlazorGuiLogic> logger, ILuaEventHub<ICEFBlazorGuiEventHub> luaEventHub, FromLuaValueMapper fromLuaValueMapper, IOptions<BlazorOptions> blazorOptions)
     {
         luaEventService.AddEventHandler("internalCEFInvokeVoidAsync", HandleCEFInvokeVoidAsync);
         luaEventService.AddEventHandler("internalCEFInvokeAsync", HandleCEFInvokeAsync);
@@ -29,6 +31,7 @@ internal class CEFBlazorGuiLogic
         _logger = logger;
         _luaEventHub = luaEventHub;
         _fromLuaValueMapper = fromLuaValueMapper;
+        _blazorOptions = blazorOptions;
         _resource = mtaServer.GetAdditionalResource<CEFBlazorGuiResource>();
         mtaServer.PlayerJoined += HandlePlayerJoin;
         CEFBlazorGuiService.MessageHandler = HandleMessage;
@@ -41,7 +44,9 @@ internal class CEFBlazorGuiLogic
             await  _resource.StartForAsync(player);
             _luaEventHub.Invoke(player, x => x.SetDevelopmentMode(true));
             var mode = _CEFBlazorGuiService.CEFGuiMode.ToString().ToLower();
-            _luaEventHub.Invoke(player, x => x.Load(mode, 1024, 768));
+            var width = _blazorOptions.Value.BrowserSize.Width;
+            var height = _blazorOptions.Value.BrowserSize.Height;
+            _luaEventHub.Invoke(player, x => x.Load(mode, width, height));
         }
         catch(Exception ex)
         {

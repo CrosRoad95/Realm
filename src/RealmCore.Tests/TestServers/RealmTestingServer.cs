@@ -71,6 +71,7 @@ internal class RealmTestingServer : TestingServer
             services.Configure<BlazorOptions>(options =>
             {
                 options.Mode = CEFGuiBlazorMode.Prod;
+                options.BrowserSize = new System.Drawing.Size(1024, 768);
             });
             services.AddSingleton(saveServiceMock.Object);
             services.AddSingleton(rpgServerMock.Object);
