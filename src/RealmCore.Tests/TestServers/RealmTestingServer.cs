@@ -68,7 +68,10 @@ internal class RealmTestingServer : TestingServer
         serverBuilder.ConfigureServer(testConfigurationProvider ?? new(), SlipeServer.Server.ServerBuilders.ServerBuilderDefaultBehaviours.None);
         serverBuilder.ConfigureServices(services =>
         {
-
+            services.Configure<BlazorOptions>(options =>
+            {
+                options.Mode = CEFGuiBlazorMode.Prod;
+            });
             services.AddSingleton(saveServiceMock.Object);
             services.AddSingleton(rpgServerMock.Object);
             services.AddSingleton<TestResourceProvider>();
@@ -82,7 +85,7 @@ internal class RealmTestingServer : TestingServer
             services.AddSingleton<VehicleUpgradeRegistry>();
             services.AddSingleton<LevelsRegistry>();
             services.AddSingleton<ISpawnMarkersService, SpawnMarkersService>();
-            services.AddSingleton<ICEFBlazorGuiService>(x => new CEFBlazorGuiService(CEFGuiBlazorMode.Dev, x.GetRequiredService<IElementCollection>()));
+            services.AddSingleton<ICEFBlazorGuiService, CEFBlazorGuiService>();
             services.AddSingleton<IBlazorGuiService, BlazorGuiService>();
             services.AddSingleton<IAssetEncryptionProvider, TestAssetEncryptionProvider>();
 

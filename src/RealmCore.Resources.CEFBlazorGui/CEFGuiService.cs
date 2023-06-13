@@ -1,4 +1,5 @@
-﻿using RealmCore.Resources.Base.Interfaces;
+﻿using Microsoft.Extensions.Options;
+using RealmCore.Resources.Base.Interfaces;
 using RealmCore.Resources.CEFBlazorGui.DebugServer;
 using RealmCore.Resources.CEFBlazorGui.Messages;
 using SlipeServer.Server.ElementCollections;
@@ -11,7 +12,7 @@ internal sealed class CEFBlazorGuiService : ICEFBlazorGuiService
     public event Action<Player>? PlayerCEFBlazorGuiStarted;
     public event Action<Player>? PlayerCEFBlazorGuiStopped;
     private readonly HashSet<Player> _CEFBlazorGuiPlayers = new();
-    private readonly BlazorDebugServer? _blazorDebugServer;
+    private BlazorDebugServer? _blazorDebugServer;
     private readonly IElementCollection _elementCollection;
 
     public Action<IMessage>? MessageHandler { get; set; }
@@ -23,19 +24,20 @@ internal sealed class CEFBlazorGuiService : ICEFBlazorGuiService
 
     public CEFGuiBlazorMode CEFGuiMode { get; set; }
 
-    public CEFBlazorGuiService(CEFGuiBlazorMode defaultCEFGuiBlazorMode, IElementCollection elementCollection)
+    public CEFBlazorGuiService(IOptions<BlazorOptions> blazorOptions, IElementCollection elementCollection)
     {
-        CEFGuiMode = defaultCEFGuiBlazorMode;
+        CEFGuiMode = blazorOptions.Value.Mode;
         _elementCollection = elementCollection;
-        if (defaultCEFGuiBlazorMode == CEFGuiBlazorMode.Dev)
+    }
+
+    public void StartDebugServer()
+    {
+        _blazorDebugServer = new()
         {
-            _blazorDebugServer = new()
-            {
-                InvokeAsyncHandler = HandleInvokeAsyncHandler,
-                InvokeVoidAsyncHandler = HandleInvokeVoidAsyncHandler
-            };
-            Task.Run(_blazorDebugServer.Start);
-        }
+            InvokeAsyncHandler = HandleInvokeAsyncHandler,
+            InvokeVoidAsyncHandler = HandleInvokeVoidAsyncHandler
+        };
+        Task.Run(_blazorDebugServer.Start);
     }
 
     public bool IsCEFBlazorGui(Player player) => _CEFBlazorGuiPlayers.Contains(player);

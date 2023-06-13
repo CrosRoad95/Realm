@@ -19,7 +19,7 @@ public static class ServerBuilderExtensions
 
         builder.ConfigureServices(services =>
         {
-            services.AddSingleton<ICEFBlazorGuiService>(x => new CEFBlazorGuiService(defaultCEFGuiBlazorMode, x.GetRequiredService<IElementCollection>()));
+            services.AddSingleton<ICEFBlazorGuiService, CEFBlazorGuiService>();
         });
 
         builder.AddLuaEventHub<ICEFBlazorGuiEventHub, CEFBlazorGuiResource>();
