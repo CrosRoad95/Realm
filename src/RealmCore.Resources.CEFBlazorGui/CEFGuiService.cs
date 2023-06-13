@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Options;
+﻿using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using RealmCore.Resources.Base.Interfaces;
 using RealmCore.Resources.CEFBlazorGui.DebugServer;
 using RealmCore.Resources.CEFBlazorGui.Messages;
@@ -11,9 +12,9 @@ internal sealed class CEFBlazorGuiService : ICEFBlazorGuiService
 {
     public event Action<Player>? PlayerCEFBlazorGuiStarted;
     public event Action<Player>? PlayerCEFBlazorGuiStopped;
-    private readonly HashSet<Player> _CEFBlazorGuiPlayers = new();
     private BlazorDebugServer? _blazorDebugServer;
     private readonly IElementCollection _elementCollection;
+    private readonly ILogger<CEFBlazorGuiService> _logger;
 
     public Action<IMessage>? MessageHandler { get; set; }
 
@@ -24,10 +25,11 @@ internal sealed class CEFBlazorGuiService : ICEFBlazorGuiService
 
     public CEFGuiBlazorMode CEFGuiMode { get; set; }
 
-    public CEFBlazorGuiService(IOptions<BlazorOptions> blazorOptions, IElementCollection elementCollection)
+    public CEFBlazorGuiService(IOptions<BlazorOptions> blazorOptions, IElementCollection elementCollection, ILogger<CEFBlazorGuiService> logger)
     {
         CEFGuiMode = blazorOptions.Value.Mode;
         _elementCollection = elementCollection;
+        _logger = logger;
     }
 
     public void StartDebugServer()
@@ -38,20 +40,6 @@ internal sealed class CEFBlazorGuiService : ICEFBlazorGuiService
             InvokeVoidAsyncHandler = HandleInvokeVoidAsyncHandler
         };
         Task.Run(_blazorDebugServer.Start);
-    }
-
-    public bool IsCEFBlazorGui(Player player) => _CEFBlazorGuiPlayers.Contains(player);
-
-    public void HandleCEFBlazorGuiStart(Player player)
-    {
-        if (_CEFBlazorGuiPlayers.Add(player))
-            PlayerCEFBlazorGuiStarted?.Invoke(player);
-    }
-
-    public void HandleCEFBlazorGuiStop(Player player)
-    {   
-        if (_CEFBlazorGuiPlayers.Remove(player))
-            PlayerCEFBlazorGuiStopped?.Invoke(player);
     }
 
     public void HandlePlayerBrowserReady(Player player)
@@ -66,10 +54,19 @@ internal sealed class CEFBlazorGuiService : ICEFBlazorGuiService
 
     public Task HandleInvokeVoidAsyncHandler(string identifier, string args)
     {
-        return RelayVoidAsyncInvoked?.Invoke(_elementCollection.GetByType<Player>().First(), identifier, args);
+        try
+        {
+            return RelayVoidAsyncInvoked?.Invoke(_elementCollection.GetByType<Player>().First(), identifier, args);
+        }
+        catch(Exception ex)
+        {
+            _logger.LogError(ex, "Failed to relay invokeVoidAsync");
+        }
+
+        return Task.CompletedTask;
     }
 
-    public async Task<object> HandleInvokeAsyncHandler(string identifier, string args)
+    public async Task<object?> HandleInvokeAsyncHandler(string identifier, string args)
     {
         if (RelayAsyncInvoked != null)
             return await RelayAsyncInvoked(_elementCollection.GetByType<Player>().First(), identifier, args);
@@ -78,21 +75,35 @@ internal sealed class CEFBlazorGuiService : ICEFBlazorGuiService
 
     public void HandleInvokeVoidAsyncHandler(Player player, string identifier, string args)
     {
-        switch(identifier)
+        try
         {
-            case "_ready":
-                RelayPlayerBlazorReady?.Invoke(player);
-                break;
-            default:
-                RelayVoidAsyncInvoked?.Invoke(player, identifier, args);
-                break;
+            switch(identifier)
+            {
+                case "_ready":
+                    RelayPlayerBlazorReady?.Invoke(player);
+                    break;
+                default:
+                    RelayVoidAsyncInvoked?.Invoke(player, identifier, args);
+                    break;
+            }
+        }
+        catch(Exception ex)
+        {
+            _logger.LogError(ex, "Failed to relay invokeVoidAsync");
         }
     }
 
-    public async Task<object> HandleInvokeAsyncHandler(Player player, string identifier, string args)
+    public async Task<object?> HandleInvokeAsyncHandler(Player player, string identifier, string args)
     {
-        if (RelayAsyncInvoked != null)
-            return await RelayAsyncInvoked(player, identifier, args);
+        try
+        {
+            if (RelayAsyncInvoked != null)
+                return await RelayAsyncInvoked(player, identifier, args);
+        }
+        catch(Exception ex)
+        {
+            _logger.LogError(ex, "Failed to relay invokeAsync");
+        }
         return null;
     }
 

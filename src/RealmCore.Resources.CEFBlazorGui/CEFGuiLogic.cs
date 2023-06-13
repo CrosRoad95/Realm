@@ -22,8 +22,6 @@ internal class CEFBlazorGuiLogic
     public CEFBlazorGuiLogic(MtaServer mtaServer, LuaEventService luaEventService, ICEFBlazorGuiService CEFBlazorGuiService,
         ILogger<CEFBlazorGuiLogic> logger, ILuaEventHub<ICEFBlazorGuiEventHub> luaEventHub, FromLuaValueMapper fromLuaValueMapper)
     {
-        luaEventService.AddEventHandler("internalCEFBlazorGuiStart", HandleCEFBlazorGuiStart);
-        luaEventService.AddEventHandler("internalCEFBlazorGuiStop", HandleCEFBlazorGuiStop);
         luaEventService.AddEventHandler("internalCEFInvokeVoidAsync", HandleCEFInvokeVoidAsync);
         luaEventService.AddEventHandler("internalCEFInvokeAsync", HandleCEFInvokeAsync);
         luaEventService.AddEventHandler("internalBrowserCreated", HandleBrowserCreated);
@@ -49,16 +47,6 @@ internal class CEFBlazorGuiLogic
         {
             _logger.LogError(ex, "Failed to start {resourceName} resource for player: {playerName}, serial: {playerSerial}", _resource.Name, player.Name, player.Client.Serial);
         }
-    }
-
-    private void HandleCEFBlazorGuiStart(LuaEvent luaEvent)
-    {
-        _CEFBlazorGuiService.HandleCEFBlazorGuiStart(luaEvent.Player);
-    }
-
-    private void HandleCEFBlazorGuiStop(LuaEvent luaEvent)
-    {
-        _CEFBlazorGuiService.HandleCEFBlazorGuiStop(luaEvent.Player);
     }
 
     private void HandleMessage(IMessage message)

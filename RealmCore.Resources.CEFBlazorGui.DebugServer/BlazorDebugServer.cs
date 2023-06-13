@@ -6,7 +6,7 @@ namespace RealmCore.Resources.CEFBlazorGui.DebugServer;
 public class BlazorDebugServer
 {
     public Func<string, string, Task>? InvokeVoidAsyncHandler { get; set; }
-    public Func<string, string, Task<object>>? InvokeAsyncHandler { get; set; }
+    public Func<string, string, Task<object?>>? InvokeAsyncHandler { get; set; }
 
     static void Main(string[] args) { }
     public BlazorDebugServer()
