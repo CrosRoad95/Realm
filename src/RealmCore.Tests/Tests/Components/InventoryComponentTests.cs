@@ -272,4 +272,14 @@ public class InventoryComponentTests
 
         _inventoryComponent.Items.Should().BeEmpty();
     }
+
+    [Fact]
+    public void AddItemShouldThrowAppropriateException()
+    {
+        _inventoryComponent.Size = 5;
+        var act = () => _inventoryComponent.AddItem(_itemsRegistry, 1, 4);
+
+        act.Should().NotThrow();
+        act.Should().Throw<InventoryNotEnoughSpaceException>().Where(x => x.InventorySize == 5 && x.RequiredSpace == 8);
+    }
 }

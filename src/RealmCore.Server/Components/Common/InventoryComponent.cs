@@ -151,8 +151,9 @@ public class InventoryComponent : Component
         metadata ??= new();
 
         var itemRegistryEntry = itemsRegistry.Get(itemId);
-        if (Number + itemRegistryEntry.Size * number > Size && !force)
-            throw new InventoryDoNotEnoughSpaceException();
+        var requiredSpace = Number + itemRegistryEntry.Size * number;
+        if (requiredSpace > Size && !force)
+            throw new InventoryNotEnoughSpaceException(Size, requiredSpace);
 
         List<Item> newItems = new();
         if (tryStack)
