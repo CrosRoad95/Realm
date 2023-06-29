@@ -325,6 +325,7 @@ public class Entity : IDisposable
             {
                 component.Dispose();
                 InternalDetachComponent(component);
+                return true;
             }
         }
         catch (ObjectDisposedException)
