@@ -37,7 +37,7 @@ local function findNearestElementToPoint(elements, x,y,z)
 				dis = getDistanceBetweenPoints3D(x,y,z, ex, ey, ez)
 				if(nearest > dis)then
 					nearestElement = v;
-					dis = nearest;
+					nearest = dis;
 				end
 			end
 		end

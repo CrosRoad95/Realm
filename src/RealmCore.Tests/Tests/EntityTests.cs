@@ -185,7 +185,7 @@ public class EntityTests
         #endregion
 
         #region Act
-        entity.TryDestroyComponent<ParentComponent>();
+        entity.TryDestroyComponent<ParentComponent>().Should().BeTrue();
         #endregion
 
         #region Assert
@@ -203,12 +203,12 @@ public class EntityTests
 
         test1.Disposed += e =>
         {
-            entity.TryDestroyComponent(test2);
+            entity.TryDestroyComponent(test2).Should().BeTrue();
         };
         #endregion
 
         #region Act
-        entity.TryDestroyComponent(test1);
+        entity.TryDestroyComponent(test1).Should().BeTrue();
         #endregion
 
         #region Assert
@@ -226,12 +226,12 @@ public class EntityTests
 
         test1.Disposed += e =>
         {
-            entity.TryDestroyComponent<ParentComponent>();
+            entity.TryDestroyComponent<ParentComponent>().Should().BeTrue();
         };
         #endregion
 
         #region Act
-        entity.TryDestroyComponent(test1);
+        entity.TryDestroyComponent(test1).Should().BeTrue();
         #endregion
 
         #region Assert
