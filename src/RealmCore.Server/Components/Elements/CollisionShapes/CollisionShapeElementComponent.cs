@@ -97,6 +97,8 @@ public abstract class CollisionShapeElementComponent : ElementComponent
 
     public override void Dispose()
     {
+        EntityEntered = null;
+        EntityLeft = null;
         _collisionShape.ElementEntered -= HandleElementEntered;
         _collisionShape.ElementLeft -= HandleElementLeft;
         base.Dispose();

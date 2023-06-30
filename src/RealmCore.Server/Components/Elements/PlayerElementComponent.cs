@@ -743,7 +743,7 @@ public sealed class PlayerElementComponent : PedElementComponent
                 _player.SetAnimation("BEACH", "ParkSit_M_loop", timeSpan, true, false);
                 break;
             case Animation.CarryLiftUp:
-                timeSpan ??= TimeSpan.FromSeconds(1.25f);
+                timeSpan ??= TimeSpan.FromSeconds(1.0f);
                 _player.SetAnimation("CARRY", "liftup", timeSpan, false, false, false, false);
                 break;
             case Animation.CarryPutDown:

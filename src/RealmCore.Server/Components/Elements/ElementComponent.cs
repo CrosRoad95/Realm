@@ -101,7 +101,11 @@ public abstract class ElementComponent : Component
                 foreach (var occupant in vehicle.Occupants)
                     vehicle.RemovePassenger(occupant.Value);
             }
-            Element.Destroy();
+            var destroyed = Element.Destroy();
+            if(Element is WorldObject w)
+            {
+                Console.WriteLine("Element {0}, {1}", (Element as WorldObject).Model, destroyed);
+            }
         }
     }
 

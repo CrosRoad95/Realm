@@ -1,4 +1,6 @@
-﻿namespace RealmCore.Server.Components.Elements;
+﻿using System.ComponentModel;
+
+namespace RealmCore.Server.Components.Elements;
 
 public class PlayerPrivateElementComponent<TElementComponent> : ElementComponent where TElementComponent : ElementComponent
 {
@@ -52,6 +54,11 @@ public class PlayerPrivateElementComponent<TElementComponent> : ElementComponent
     {
         base.Load();
         Entity.InjectProperties(_elementComponent);
+
+        if (!_elementComponent.TrySetEntity(Entity))
+            throw new Exception("Component already attached to other entity");
+
+        _elementComponent.InternalLoad();
     }
 
     public override void Dispose()

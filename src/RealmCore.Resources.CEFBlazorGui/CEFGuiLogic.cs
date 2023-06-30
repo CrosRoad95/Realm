@@ -43,7 +43,7 @@ internal class CEFBlazorGuiLogic
         {
             await  _resource.StartForAsync(player);
             _luaEventHub.Invoke(player, x => x.SetDevelopmentMode(true));
-            var mode = _CEFBlazorGuiService.CEFGuiMode.ToString().ToLower();
+            var mode = _blazorOptions.Value.Mode.ToString().ToLower();
             var width = _blazorOptions.Value.BrowserSize.Width;
             var height = _blazorOptions.Value.BrowserSize.Height;
             _luaEventHub.Invoke(player, x => x.Load(mode, width, height));

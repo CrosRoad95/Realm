@@ -282,7 +282,7 @@ internal sealed class SeederServerBuilder
         await BuildIdentityRoles(seedData.Roles);
         await BuildIdentityUsers(seedData.Users);
         await BuildFractions(seedData.Fractions);
-        BuildBlips(seedData.Blips);
+        //BuildBlips(seedData.Blips);
         BuildPickups(seedData.Pickups);
         BuildMarkers(seedData.Markers);
         await BuildGroups(seedData.Groups);

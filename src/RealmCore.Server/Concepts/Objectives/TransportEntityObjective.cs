@@ -62,8 +62,8 @@ public class TransportEntityObjective : Objective
     public override void Dispose()
     {
         _entity.Dispose();
+        _checkEnteredTimer.Stop();
         _checkEnteredTimer.Dispose();
-        _collisionSphereElementComponent.ElementComponent.EntityEntered = null;
         _playerEntity.TryDestroyComponent(_markerElementComponent);
         _playerEntity.TryDestroyComponent(_collisionSphereElementComponent);
         base.Dispose();

@@ -33,6 +33,10 @@ public class MarkerEnterObjective : Objective
         {
             _collisionSphereElementComponent.ElementComponent.CheckCollisionWith(_playerEntity);
         }
+        catch (ObjectDisposedException)
+        {
+            // Ignore
+        }
         catch (Exception ex)
         {
             Logger.LogError(ex, "Failed to check collision with player entity.");
@@ -50,10 +54,12 @@ public class MarkerEnterObjective : Objective
     public override void Dispose()
     {
         if (_checkEnteredTimer != null)
+        {
+            _checkEnteredTimer.Stop();
             _checkEnteredTimer.Dispose();
+        }
         if (_collisionSphereElementComponent != null)
         {
-            _collisionSphereElementComponent.ElementComponent.EntityEntered = null;
             _playerEntity.TryDestroyComponent(_collisionSphereElementComponent);
         }
         _playerEntity.TryDestroyComponent(_markerElementComponent);

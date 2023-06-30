@@ -81,6 +81,12 @@ var server = builder.Build(null, extraBuilderSteps: serverBuilder =>
         services.AddInGameCommand<Display3dRing>();
         services.AddInGameCommand<CurrencyCommand>();
         #endregion
+
+        services.Configure<BlazorOptions>(options =>
+        {
+            options.Mode = CEFGuiBlazorMode.Prod;
+            options.BrowserSize = new System.Drawing.Size(1024, 768);
+        });
     });
 });
 

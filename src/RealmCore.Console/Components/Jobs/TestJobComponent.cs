@@ -30,7 +30,6 @@ internal class TestJobComponent : JobSessionComponent
         var subObjective2 = new MarkerEnterObjective(new Vector3(393.80566f, -99.60156f, 5.2993988f));
         var objective1 = AddObjective(new OneOfObjective(subObjective1, subObjective2));
         objective1.Completed += ObjectiveCCompleted;
-
     }
 
     private void ObjectiveACompleted(Objective objective)
@@ -48,7 +47,7 @@ internal class TestJobComponent : JobSessionComponent
     private void ObjectiveCCompleted(Objective objective)
     {
         Entity.GetRequiredComponent<JobStatisticsComponent>().AddPoints(1, 1);
-        ChatBox.OutputTo(Entity, $"Entered one of mater, objectives left: {Objectives.Count()}");
+        ChatBox.OutputTo(Entity, $"Entered one of marker, objectives left: {Objectives.Count()}");
     }
 
 }
