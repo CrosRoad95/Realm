@@ -1,6 +1,4 @@
-﻿using System.ComponentModel;
-
-namespace RealmCore.Server.Components.Elements;
+﻿namespace RealmCore.Server.Components.Elements;
 
 public class PlayerPrivateElementComponent<TElementComponent> : ElementComponent where TElementComponent : ElementComponent
 {
