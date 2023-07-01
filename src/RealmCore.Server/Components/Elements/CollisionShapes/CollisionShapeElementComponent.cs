@@ -4,7 +4,8 @@ public abstract class CollisionShapeElementComponent : ElementComponent
 {
     [Inject]
     private IECS ECS { get; set; } = default!;
-
+    [Inject]
+    private IElementCollection ElementCollection { get; set; } = default!;
     [Inject]
     private ILogger<CollisionShapeElementComponent> Logger { get; set; } = default!;
 
@@ -23,6 +24,21 @@ public abstract class CollisionShapeElementComponent : ElementComponent
         _collisionShape = collisionShape;
         _collisionShape.ElementEntered += HandleElementEntered;
         _collisionShape.ElementLeft += HandleElementLeft;
+    }
+
+    public void RefreshColliders()
+    {
+        ThrowIfDisposed();
+
+        if(_collisionShape is CollisionSphere collisionSphere)
+        {
+            var elements = ElementCollection.GetWithinRange(_collisionShape.Position, collisionSphere.Radius);
+            foreach (var element in elements)
+            {
+                if (ECS.TryGetByElement(element, out Entity entity))
+                    CheckCollisionWith(entity);
+            }
+        }
     }
 
     public void CheckCollisionWith(Entity entity)

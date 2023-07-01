@@ -5,18 +5,24 @@ public class LiftableWorldObjectComponent : InteractionComponent
 {
     private readonly object _lock = new();
     public Entity? Owner { get; private set; }
+    public Entity[]? AllowedForEntities { get; private set; }
 
     public event Action<LiftableWorldObjectComponent, Entity>? Lifted;
     public event Action<LiftableWorldObjectComponent, Entity>? Dropped;
 
-    public LiftableWorldObjectComponent()
-    {
+    public LiftableWorldObjectComponent() { }
 
+    public LiftableWorldObjectComponent(params Entity[] allowedForEntities)
+    {
+        AllowedForEntities = allowedForEntities;
     }
 
     public bool TryLift(Entity entity)
     {
         ThrowIfDisposed();
+
+        if (!IsAllowedToLift(entity))
+            return false;
 
         lock (_lock)
         {
@@ -33,6 +39,8 @@ public class LiftableWorldObjectComponent : InteractionComponent
         }
         return false;
     }
+
+    public bool IsAllowedToLift(Entity entity) => AllowedForEntities == null || AllowedForEntities.Contains(entity);
 
     private void HandleDisposed(Entity disposedEntity)
     {

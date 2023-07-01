@@ -21,6 +21,7 @@ using RealmCore.Resources.Assets.Factories;
 using RealmCore.Resources.Assets.Interfaces;
 using RealmCore.Server.Concepts.Spawning;
 using RealmCore.Server.Components.Vehicles.Access;
+using RealmCore.Server.Components;
 
 namespace RealmCore.Console.Logic;
 
@@ -319,13 +320,20 @@ internal sealed class CommandsLogic
         _commandService.AddCommandHandler("spawnbox", (entity, args) =>
         {
             var objectEntity = _entityFactory.CreateObject(ObjectModel.Gunbox, entity.Transform.Position + new Vector3(4, 0, -0.65f), Vector3.Zero);
-            objectEntity.AddComponent(new LiftableWorldObjectComponent());
+            objectEntity.AddComponent<LiftableWorldObjectComponent>();
+        });
+        
+        _commandService.AddCommandHandler("spawnmybox", (entity, args) =>
+        {
+            var objectEntity = _entityFactory.CreateObject(ObjectModel.Gunbox, entity.Transform.Position + new Vector3(4, 0, -0.65f), Vector3.Zero);
+            objectEntity.AddComponent<LiftableWorldObjectComponent>();
+            objectEntity.AddComponent(new OwnerComponent(entity));
         });
 
         _commandService.AddCommandHandler("spawnboxforme", (entity, args) =>
         {
             var objectEntity = _entityFactory.CreateObjectVisibleFor(entity, ObjectModel.Gunbox, entity.Transform.Position + new Vector3(4, 0, -0.65f), Vector3.Zero);
-            objectEntity.AddComponent(new LiftableWorldObjectComponent());
+            objectEntity.AddComponent<LiftableWorldObjectComponent>();
         });
 
         _commandService.AddAsyncCommandHandler("spawntempbox", async (entity, args) =>
