@@ -21,7 +21,7 @@ internal class TestJobComponent : JobSessionComponent
         objective.AddBlip(BlipIcon.North, EntityFactory);
         objective.Completed += ObjectiveACompleted;
 
-        var objectEntity = EntityFactory.CreateObject(SlipeServer.Server.Enums.ObjectModel.Gunbox, new Vector3(379.00f, -102.77f, 1.24f), Vector3.Zero);
+        var objectEntity = EntityFactory.CreateObjectVisibleFor(Entity, SlipeServer.Server.Enums.ObjectModel.Gunbox, new Vector3(379.00f, -102.77f, 1.24f), Vector3.Zero);
         objectEntity.AddComponent<LiftableWorldObjectComponent>();
         var objective2 = AddObjective(new TransportEntityObjective(objectEntity, new Vector3(379.00f, -112.77f, 2.0f)));
         objective2.Completed += ObjectiveBCompleted;

@@ -322,6 +322,12 @@ internal sealed class CommandsLogic
             objectEntity.AddComponent(new LiftableWorldObjectComponent());
         });
 
+        _commandService.AddCommandHandler("spawnboxforme", (entity, args) =>
+        {
+            var objectEntity = _entityFactory.CreateObjectVisibleFor(entity, ObjectModel.Gunbox, entity.Transform.Position + new Vector3(4, 0, -0.65f), Vector3.Zero);
+            objectEntity.AddComponent(new LiftableWorldObjectComponent());
+        });
+
         _commandService.AddAsyncCommandHandler("spawntempbox", async (entity, args) =>
         {
             var objectEntity = _entityFactory.CreateObject(ObjectModel.Gunbox, entity.Transform.Position + new Vector3(4, 0, -0.65f), Vector3.Zero);

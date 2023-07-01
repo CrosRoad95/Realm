@@ -1,4 +1,6 @@
-﻿using Vehicle = SlipeServer.Server.Elements.Vehicle;
+﻿using Microsoft.AspNetCore.Identity;
+using RealmCore.Server.Concepts;
+using Vehicle = SlipeServer.Server.Elements.Vehicle;
 
 namespace RealmCore.Server.Factories;
 
@@ -56,6 +58,8 @@ internal class EntityFactory : IEntityFactory
     private void AssociateWithPlayerEntity(ElementComponent elementComponent, Entity playerEntity)
     {
         var element = elementComponent.Element;
+
+        element.Id = (ElementId)playerEntity.GetRequiredComponent<PlayerElementComponent>().MapIdGenerator.GetId();
         var player = playerEntity.Player;
         element.AssociateWith(player);
         if (element is Pickup pickup)
@@ -286,6 +290,28 @@ internal class EntityFactory : IEntityFactory
         var worldObjectElementComponent = playerEntity.AddComponent(PlayerPrivateElementComponent.Create(new WorldObjectComponent(worldObject)));
         AssociateWithPlayerEntity(worldObjectElementComponent, playerEntity);
         return worldObjectElementComponent;
+    }
+
+    public Entity CreateObjectVisibleFor(Entity playerEntity, ObjectModel model, Vector3 position, Vector3 rotation, ConstructionInfo? constructionInfo = null, Action<Entity>? entityBuilder = null)
+    {
+        if (playerEntity.Tag != EntityTag.Player)
+            throw new ArgumentException("Entity must be a player entity");
+
+        return _ecs.CreateEntity(constructionInfo?.Id ?? $"object {Guid.NewGuid()}", EntityTag.WorldObject, entity =>
+        {
+            var elementComponent = entity.AddComponent(new WorldObjectComponent(new WorldObject(model, position)));
+
+            entity.Transform.Position = position;
+            entity.Transform.Rotation = rotation;
+            if (constructionInfo != null)
+            {
+                entity.Transform.Interior = constructionInfo.Interior;
+                entity.Transform.Dimension = constructionInfo.Dimension;
+            }
+
+            AssociateWithPlayerEntity(elementComponent, playerEntity);
+            entityBuilder?.Invoke(entity);
+        });
     }
 
     #region Collision shapes
