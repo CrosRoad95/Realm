@@ -12,8 +12,8 @@ public static class ElementOutlineServiceExtensions
         service.SetElementOutlineForPlayer(playerEntity.Player, elementEntity.Element, color);
     }
 
-    public static void RemoveEntityOutlineForPlayer(this IElementOutlineService service, Entity playerEntity)
+    public static void RemoveEntityOutlineForPlayer(this IElementOutlineService service, Entity playerEntity, Entity elementEntity)
     {
-        service.RemoveElementOutlineForPlayer(playerEntity.Player, playerEntity.Element);
+        service.RemoveElementOutlineForPlayer(playerEntity.Player, elementEntity.Element);
     }
 }
