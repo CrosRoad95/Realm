@@ -34,26 +34,26 @@ internal class TestJobComponent : JobSessionComponent
         objective1.Completed += ObjectiveCCompleted;
     }
 
-    private void ObjectiveACompleted(Objective objective)
+    private void ObjectiveACompleted(Objective objective, object? data = null)
     {
         Entity.GetRequiredComponent<JobStatisticsComponent>().AddPoints(1, 1);
         ChatBox.OutputTo(Entity, $"Entered marker, objectives left: {Objectives.Count()}");
     }
 
-    private void ObjectiveBCompleted(Objective objective)
+    private void ObjectiveBCompleted(Objective objective, object? data = null)
     {
         Entity.GetRequiredComponent<JobStatisticsComponent>().AddPoints(1, 2);
         ChatBox.OutputTo(Entity, $"Box delivered, objectives left: {Objectives.Count()}");
     }
 
-    private void ObjectiveCCompleted(Objective objective)
+    private void ObjectiveCCompleted(Objective objective, object? data = null)
     {
         Entity.GetRequiredComponent<JobStatisticsComponent>().AddPoints(1, 1);
         ChatBox.OutputTo(Entity, $"Entered one of marker, objectives left: {Objectives.Count()}");
     }
 
-    private void ObjectiveDCompleted(Objective objective)
+    private void ObjectiveDCompleted(Objective objective, object? data = null)
     {
-        ChatBox.OutputTo(Entity, $"Entered marker, objectives left: {Objectives.Count()}");
+        ChatBox.OutputTo(Entity, $"Entered marker, objectives left: {Objectives.Count()} {data}");
     }
 }

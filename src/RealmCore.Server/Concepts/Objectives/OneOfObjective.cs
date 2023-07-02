@@ -36,7 +36,7 @@ public class OneOfObjective : Objective
         DisposeChildObjectives(objective);
     }
 
-    private void HandleCompleted(Objective objective)
+    private void HandleCompleted(Objective objective, object? data)
     {
         lock (_lock)
         {

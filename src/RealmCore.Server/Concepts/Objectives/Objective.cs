@@ -8,7 +8,7 @@ public abstract class Objective : IDisposable
 
     public bool IsFulfilled => _isFulfilled;
 
-    public event Action<Objective>? Completed;
+    public event Action<Objective, object?>? Completed;
     public event Action<Objective>? Incompleted;
     public event Action<Objective>? Disposed;
 
@@ -26,7 +26,7 @@ public abstract class Objective : IDisposable
         Load(entityFactory, playerEntity);
     }
 
-    protected void Complete(Objective objective)
+    protected void Complete(Objective objective, object? data = null)
     {
         ThrowIfDisposed();
 
@@ -39,7 +39,7 @@ public abstract class Objective : IDisposable
         if (_blipElementComponent != null)
             RemoveBlip();
 
-        Completed?.Invoke(objective);
+        Completed?.Invoke(objective, data);
         _isFulfilled = true;
     }
 

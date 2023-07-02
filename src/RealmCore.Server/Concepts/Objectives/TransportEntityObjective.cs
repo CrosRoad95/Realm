@@ -69,7 +69,7 @@ public class TransportEntityObjective : Objective
             if(entity.TryGetComponent(out OwnerComponent ownerComponent))
             {
                 if(ownerComponent.OwningEntity == _playerEntity)
-                    Complete(this);
+                    Complete(this, entity);
             }
         }
         else

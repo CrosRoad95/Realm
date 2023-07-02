@@ -66,7 +66,7 @@ public abstract class JobSessionComponent : SessionComponent
         RemoveObjective(objective);
     }
 
-    private void HandleCompleted(Objective objective)
+    private void HandleCompleted(Objective objective, object? data = null)
     {
         if (!objective.IsFulfilled)
             objective.Incomplete(objective);

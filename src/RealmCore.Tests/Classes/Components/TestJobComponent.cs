@@ -32,17 +32,17 @@ internal class TestJobComponent : JobSessionComponent
         objective1.Completed += ObjectiveCCompleted;
     }
 
-    private void ObjectiveACompleted(Objective objective)
+    private void ObjectiveACompleted(Objective objective, object? data = null)
     {
         Entity.GetRequiredComponent<JobStatisticsComponent>().AddPoints(1, 1);
     }
 
-    private void ObjectiveBCompleted(Objective objective)
+    private void ObjectiveBCompleted(Objective objective, object? data = null)
     {
         Entity.GetRequiredComponent<JobStatisticsComponent>().AddPoints(1, 2);
     }
 
-    private void ObjectiveCCompleted(Objective objective)
+    private void ObjectiveCCompleted(Objective objective, object? data = null)
     {
         Entity.GetRequiredComponent<JobStatisticsComponent>().AddPoints(1, 1);
     }
