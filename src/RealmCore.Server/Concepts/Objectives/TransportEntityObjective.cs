@@ -9,6 +9,7 @@ public class TransportEntityObjective : Objective
     private PlayerPrivateElementComponent<CollisionSphereElementComponent> _collisionSphereElementComponent = default!;
     private Entity _playerEntity = default!;
     private System.Timers.Timer _checkEnteredTimer = default!;
+    public Func<Entity, bool>? CheckEntity { get; set; }
 
     public override Vector3 Position => _position;
 
@@ -69,7 +70,17 @@ public class TransportEntityObjective : Objective
             if(entity.TryGetComponent(out OwnerComponent ownerComponent))
             {
                 if(ownerComponent.OwningEntity == _playerEntity)
+                {
+                    if(CheckEntity != null)
+                    {
+                        if(CheckEntity(entity))
+                        {
+                            Complete(this, entity);
+                            return;
+                        }
+                    }
                     Complete(this, entity);
+                }
             }
         }
         else
