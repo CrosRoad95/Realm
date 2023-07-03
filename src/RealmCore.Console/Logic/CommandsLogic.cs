@@ -317,6 +317,16 @@ internal sealed class CommandsLogic
             });
         });
 
+        _commandService.AddAsyncCommandHandler("privateoutlinetest", async (entity, args) =>
+        {
+            var objectEntity = _entityFactory.CreateObject(ObjectModel.Gunbox, entity.Transform.Position + new Vector3(4, 0, -0.65f), Vector3.Zero);
+            await Task.Delay(2000);
+            elementOutlineService.SetEntityOutlineForPlayer(entity, objectEntity, Color.Red);
+            await Task.Delay(1000);
+            elementOutlineService.RemoveEntityOutlineForPlayer(entity, objectEntity);
+            _chatBox.OutputTo(entity, "removed");
+        });
+
         _commandService.AddCommandHandler("spawnbox", (entity, args) =>
         {
             var objectEntity = _entityFactory.CreateObject(ObjectModel.Gunbox, entity.Transform.Position + new Vector3(4, 0, -0.65f), Vector3.Zero);

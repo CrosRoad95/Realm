@@ -56,7 +56,7 @@ internal class ElementOutlineLogic
     private void HandleOutlineRemoved(Element element)
     {
         _outlineInfos.Remove(element);
-        _luaEventHub.Broadcast(x => x.RemoveOutline(), element);
+        _luaEventHub.Broadcast(x => x.RemoveOutline(element));
     }
 
     private void HandleOutlineChanged(Element element, Color color)
@@ -75,7 +75,7 @@ internal class ElementOutlineLogic
 
     private void HandleForPlayerOutlineRemoved(Player player, Element element)
     {
-        _luaEventHub.Invoke(player, x => x.RemoveOutline(), element);
+        _luaEventHub.Invoke(player, x => x.RemoveOutline(element));
     }
 
     private void HandleSetRenderingEnabled(Player player, bool enabled)

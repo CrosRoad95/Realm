@@ -208,7 +208,6 @@ end
 
 local function createOutline(target, r, g, b, a)
     if(outlineElements[target])then
-        iprint("exists", target, outlineElements)
         return false;
     end
     local shader = dxCreateShader(ped_wall_mrt, 1, 0, true, "all");
@@ -248,8 +247,9 @@ function handleSetOutlineForElement(element, color)
     createOutline(element, color.R, color.G, color.B, color.A)
 end
 
-function handleRemoveOutline()
-    handleElementDestroyed()
+function handleRemoveOutline(element)
+    removeOutline(element)
+    removeEventHandler("onClientElementDestroy", element, handleElementDestroyed)
 end
 
 function handleSetRenderingEnabled(enabled)

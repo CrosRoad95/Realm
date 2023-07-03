@@ -8,6 +8,6 @@ internal interface IElementOutlineEventHub
     void SetOutlines(Element[] elements, Color[] color);
     void SetOutlineForElement(Element element, Color color);
     void SetOutline(Color color);
-    void RemoveOutline();
+    void RemoveOutline(Element element);
     void SetRenderingEnabled(bool enabled);
 }
