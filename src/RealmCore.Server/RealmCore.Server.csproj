@@ -20,6 +20,7 @@
 	<PackageReference Include="Portable.BouncyCastle" Version="1.9.0" />
 	<PackageReference Include="SlipeServer.Resources.BoneAttach" Version="0.1.0-CI-20230629-193427" />
 	<PackageReference Include="SlipeServer.Resources.NoClip" Version="0.1.0-CI-20230629-193427" />
+	<PackageReference Include="SlipeServer.Resources.Scoreboard" Version="0.1.0-CI-20230629-193427" />
 	<PackageReference Include="SlipeServer.Resources.Text3d" Version="0.1.0-CI-20230629-193427" />
 	<PackageReference Include="SlipeServer.Resources.Watermark" Version="0.1.0-CI-20230629-193427" />
   </ItemGroup>

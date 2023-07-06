@@ -1,4 +1,6 @@
-﻿namespace RealmCore.Server.Extensions;
+﻿using SlipeServer.Resources.Scoreboard;
+
+namespace RealmCore.Server.Extensions;
 
 public static class ServerBuilderExtensions
 {
@@ -80,6 +82,7 @@ public static class ServerBuilderExtensions
         serverBuilder.AddNametagsResource();
         serverBuilder.AddBoneAttachResource(BoneAttachVersion.Release_1_2_0);
         serverBuilder.AddWatermarkResource();
+        serverBuilder.AddScoreboard();
         #endregion
 
         #region Resources Logics

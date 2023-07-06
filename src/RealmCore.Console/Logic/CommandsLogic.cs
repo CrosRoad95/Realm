@@ -339,6 +339,13 @@ internal sealed class CommandsLogic
             objectEntity.AddComponent<LiftableWorldObjectComponent>();
             objectEntity.AddComponent(new OwnerComponent(entity));
         });
+        
+        _commandService.AddCommandHandler("spawnmybox2", (entity, args) =>
+        {
+            var objectEntity = _entityFactory.CreateObject(ObjectModel.Gunbox, entity.Transform.Position + new Vector3(4, 0, -0.65f), Vector3.Zero);
+            objectEntity.AddComponent<LiftableWorldObjectComponent>();
+            objectEntity.AddComponent(new OwnerDisposableComponent(entity));
+        });
 
         _commandService.AddCommandHandler("spawnboxforme", (entity, args) =>
         {
