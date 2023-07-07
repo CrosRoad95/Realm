@@ -255,4 +255,9 @@ internal class UsersService : IUsersService
             _db.ChangeTracker.Clear();
         }
     }
+
+    public void Kick(Entity entity, string reason)
+    {
+        entity.Player.Kick(reason);
+    }
 }

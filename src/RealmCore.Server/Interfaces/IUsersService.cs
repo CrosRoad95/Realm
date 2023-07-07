@@ -9,6 +9,7 @@ public interface IUsersService
     Task<UserData?> GetUserByLoginCaseInsensitive(string login);
     Task<bool> IsSerialWhitelisted(int userId, string serial);
     Task<bool> IsUserNameInUse(string userName);
+    void Kick(Entity entity, string reason);
     Task<bool> SignIn(Entity entity, UserData user);
     Task<int> SignUp(string username, string password);
     Task<bool> TryAddWhitelistedSerial(int userId, string serial);
