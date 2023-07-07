@@ -22,6 +22,7 @@ using RealmCore.Resources.Assets.Interfaces;
 using RealmCore.Server.Concepts.Spawning;
 using RealmCore.Server.Components.Vehicles.Access;
 using RealmCore.Server.Components;
+using RealmCore.Server.Inventory;
 
 namespace RealmCore.Console.Logic;
 
@@ -47,7 +48,7 @@ internal sealed class CommandsLogic
 
     public CommandsLogic(RPGCommandService commandService, IEntityFactory entityFactory, RepositoryFactory repositoryFactory,
         ItemsRegistry itemsRegistry, IECS ecs, IBanService banService, IDiscordService discordService, ChatBox chatBox, ILogger<CommandsLogic> logger,
-        IDateTimeProvider dateTimeProvider, INametagsService nametagsService, IUsersService rpgUserManager, IVehiclesService vehiclesService,
+        IDateTimeProvider dateTimeProvider, INametagsService nametagsService, IUsersService userManager, IVehiclesService vehiclesService,
         GameWorld gameWorld, IElementOutlineService elementOutlineService, IAssetsService assetsService, ISpawnMarkersService spawnMarkersService, ILoadService loadService)
     {
         _commandService = commandService;
@@ -771,7 +772,7 @@ internal sealed class CommandsLogic
             var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();
             var userComponent = entity.GetRequiredComponent<UserComponent>();
 
-            if (await rpgUserManager.TryAddWhitelistedSerial(userComponent.Id, playerElementComponent.Client.Serial))
+            if (await userManager.TryAddWhitelistedSerial(userComponent.Id, playerElementComponent.Client.Serial))
             {
                 _chatBox.OutputTo(entity, $"Dodano serial");
             }
@@ -786,7 +787,7 @@ internal sealed class CommandsLogic
             var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();
             var userComponent = entity.GetRequiredComponent<UserComponent>();
 
-            if (await rpgUserManager.TryRemoveWhitelistedSerial(userComponent.Id, playerElementComponent.Client.Serial))
+            if (await userManager.TryRemoveWhitelistedSerial(userComponent.Id, playerElementComponent.Client.Serial))
             {
                 _chatBox.OutputTo(entity, $"Usunięto serial");
             }
@@ -1071,10 +1072,35 @@ internal sealed class CommandsLogic
         {
             entity.GetRequiredComponent<BlazorGuiComponent>().Path = "Counter";
         });
-        
+
         _commandService.AddCommandHandler("blazorguiclose", (entity, args) =>
         {
             entity.GetRequiredComponent<BlazorGuiComponent>().Path = null;
+        });
+
+        _commandService.AddCommandHandler("kickme", (entity, args) =>
+        {
+            userManager.Kick(entity, "test");
+        });
+        
+        _commandService.AddCommandHandler("getplayerbyname", (entity, args) =>
+        {
+            if(userManager.TryGetPlayerByName(args.First(), out var foundPlayer))
+            {
+                _chatBox.OutputTo(entity, "found");
+            }
+            else
+                _chatBox.OutputTo(entity, "not found");
+        });
+        
+        _commandService.AddCommandHandler("findbyname", (entity, args) =>
+        {
+            var players = userManager.SearchPlayersByName(args.First());
+            _chatBox.OutputTo(entity, "found:");
+            foreach (var item in players)
+            {
+                _chatBox.OutputTo(entity, $"Player: {item.GetRequiredComponent<UserComponent>().UserName}");
+            }
         });
 
         FontCollection collection = new();

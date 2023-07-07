@@ -14,10 +14,12 @@ internal class UsersService : IUsersService
     private readonly IAuthorizationService _authorizationService;
     private readonly IDb _db;
     private readonly IActiveUsers _activeUsers;
+    private readonly IElementCollection _elementCollection;
+    private readonly IECS _ecs;
     private readonly JsonSerializerSettings _jsonSerializerSettings;
 
     public UsersService(ItemsRegistry itemsRegistry, UserManager<UserData> userManager, ILogger<UsersService> logger, IOptions<GameplayOptions> gameplayOptions,
-        IDateTimeProvider dateTimeProvider, IAuthorizationService authorizationService, IDb db, IActiveUsers activeUsers)
+        IDateTimeProvider dateTimeProvider, IAuthorizationService authorizationService, IDb db, IActiveUsers activeUsers, IElementCollection elementCollection, IECS ecs)
     {
         _itemsRegistry = itemsRegistry;
         _userManager = userManager;
@@ -27,7 +29,8 @@ internal class UsersService : IUsersService
         _authorizationService = authorizationService;
         _db = db;
         _activeUsers = activeUsers;
-
+        _elementCollection = elementCollection;
+        _ecs = ecs;
         _jsonSerializerSettings = new JsonSerializerSettings
         {
             Converters = new List<JsonConverter> { new DoubleConverter() }
@@ -259,5 +262,26 @@ internal class UsersService : IUsersService
     public void Kick(Entity entity, string reason)
     {
         entity.Player.Kick(reason);
+    }
+
+    public bool TryGetPlayerByName(string name, out Entity playerEntity)
+    {
+        var player = _elementCollection.GetByType<Player>().Where(x => x.Name == name).FirstOrDefault();
+        if (player == null)
+        {
+            playerEntity = null!;
+            return false;
+        }
+        return _ecs.TryGetEntityByPlayer(player, out playerEntity);
+    }
+
+    public IEnumerable<Entity> SearchPlayersByName(string pattern)
+    {
+        var players = _elementCollection.GetByType<Player>().Where(x => x.Name.ToLower().Contains(pattern.ToLower()));
+        foreach (var player in players)
+        {
+            if (_ecs.TryGetEntityByPlayer(player, out var playerEntity))
+                yield return playerEntity;
+        }
     }
 }
