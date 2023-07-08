@@ -35,7 +35,7 @@ internal class EssentialCommandsLogic
         }
     }
 
-    private void HandleCommandExecuted(string? line)
+    private void HandleCommandExecuted(Entity entity, string? line)
     {
         if (string.IsNullOrWhiteSpace(line))
             return;
@@ -52,7 +52,7 @@ internal class EssentialCommandsLogic
                 var command = _serviceProvider.GetRequiredService(value) as ICommand;
                 if (command == null)
                     throw new InvalidOperationException("Expected command to implement ICommand interface");
-                command.HandleCommand(line);
+                command.Handle(entity, line.Split(' ').ToArray());
             }
             catch (Exception ex)
             {

@@ -49,12 +49,14 @@ internal sealed class ECS : IECS
     }
 
     public event Action<Entity>? EntityCreated;
+    public Entity Console { get; }
 
     public ECS(IServiceProvider serviceProvider, IElementCollection elementCollection, ILogger<ECS> logger)
     {
         _serviceProvider = serviceProvider;
         _elementCollection = elementCollection;
         _logger = logger;
+        Console = CreateEntity("console", EntityTag.Console);
     }
 
     public Entity GetEntityByPlayer(Player player)

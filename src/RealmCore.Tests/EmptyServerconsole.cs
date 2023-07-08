@@ -9,7 +9,7 @@ public class EmptyServerConsole : IConsole
 
     public static IConsole Instance = new EmptyServerConsole();
 
-    public event Action<string?>? CommandExecuted;
+    public event Action<Entity, string?>? CommandExecuted;
 
     public void Start()
     {

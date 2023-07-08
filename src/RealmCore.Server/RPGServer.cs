@@ -7,7 +7,7 @@ internal sealed class RPGServer : IRPGServer
     private readonly MtaServer _server;
     private readonly ILogger<RPGServer> _logger;
     private IStringLocalizer<RPGServer>? _stringLocalizer;
-
+    public Entity Console { get; private set; } = null!;
     public event Action? ServerStarted;
 
     internal MtaServer MtaServer => _server;
@@ -110,7 +110,6 @@ internal sealed class RPGServer : IRPGServer
         await GetRequiredService<IDb>().MigrateAsync();
         await BuildFromSeedFiles();
 
-        _server.Start();
         await GetRequiredService<ILoadService>().LoadAll();
 
         var gameplayOptions = GetRequiredService<IOptions<GameplayOptions>>();
@@ -120,6 +119,7 @@ internal sealed class RPGServer : IRPGServer
 
         ServerStarted?.Invoke();
         _logger.LogInformation(_stringLocalizer.GetOr("ServerStarted", "Server started."));
+        _server.Start();
     }
 
     private async Task BuildFromSeedFiles()

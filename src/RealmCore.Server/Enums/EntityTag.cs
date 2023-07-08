@@ -12,4 +12,5 @@ public enum EntityTag
     CollisionShape,
     WorldObject,
     RadarArea,
+    Console,
 }

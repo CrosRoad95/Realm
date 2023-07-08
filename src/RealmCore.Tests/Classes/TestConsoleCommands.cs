@@ -2,7 +2,7 @@
 
 internal class TestConsoleCommands : IConsole
 {
-    public event Action<string?>? CommandExecuted;
+    public event Action<Entity, string?>? CommandExecuted;
 
     public void Start()
     {

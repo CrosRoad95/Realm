@@ -16,7 +16,7 @@ internal class ReloadEntitiesCommand : ICommand
         _loadService = loadService;
     }
 
-    public async Task HandleCommand(string command)
+    public async Task Handle(Entity consoleEntity, string[] args)
     {
         int savedEntities = 0;
         foreach (var entity in _ecs.Entities)

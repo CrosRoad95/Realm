@@ -8,7 +8,7 @@ public static class RPGServerBuilderExtensions
 {
     public static RPGServerBuilder AddDefaultConsole(this RPGServerBuilder serverBuilder)
     {
-        serverBuilder.AddConsole(new DefaultServerConsole());
+        serverBuilder.AddConsole(typeof(DefaultServerConsole));
         return serverBuilder;
     }
 

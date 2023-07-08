@@ -3,7 +3,7 @@
 public class RPGServerBuilder
 {
     private Serilog.ILogger? _logger;
-    private IConsole? _console;
+    private Type? _console;
     private IRealmConfigurationProvider? _realmConfigurationProvider;
 
     public RPGServerBuilder AddLogger(Serilog.ILogger logger)
@@ -12,7 +12,7 @@ public class RPGServerBuilder
         return this;
     }
 
-    public RPGServerBuilder AddConsole(IConsole console)
+    public RPGServerBuilder AddConsole(Type console)
     {
         _console = console;
         return this;
@@ -41,7 +41,7 @@ public class RPGServerBuilder
             {
                 services.AddLogging(x => x.AddSerilog(_logger, dispose: true));
                 services.AddTransient<ILogger>(x => x.GetRequiredService<ILogger<MtaServer>>());
-                services.AddSingleton(_console);
+                services.AddSingleton(typeof(IConsole), _console);
 #if DEBUG
                 serverFilesProvider ??= new ServerFilesProvider(basePath ?? "../../../Server");
 #else

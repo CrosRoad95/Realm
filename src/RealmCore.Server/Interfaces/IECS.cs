@@ -5,6 +5,7 @@ public interface IECS
     IReadOnlyCollection<Entity> Entities { get; }
     IReadOnlyCollection<Entity> VehicleEntities { get; }
     IReadOnlyCollection<Entity> PlayerEntities { get; }
+    Entity Console { get; }
 
     event Action<Entity>? EntityCreated;
 

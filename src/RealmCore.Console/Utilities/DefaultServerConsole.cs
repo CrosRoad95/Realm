@@ -2,7 +2,14 @@
 
 internal class DefaultServerConsole : IConsole
 {
-    public event Action<string?>? CommandExecuted;
+    private readonly IECS _ecs;
+
+    public event Action<Entity, string?>? CommandExecuted;
+
+    public DefaultServerConsole(IECS ecs)
+    {
+        _ecs = ecs;
+    }
 
     public void Start()
     {
@@ -13,7 +20,7 @@ internal class DefaultServerConsole : IConsole
                 var line = System.Console.ReadLine();
                 if (line == null)
                     break;
-                CommandExecuted?.Invoke(line);
+                CommandExecuted?.Invoke(_ecs.Console, line);
             }
         }
         finally
