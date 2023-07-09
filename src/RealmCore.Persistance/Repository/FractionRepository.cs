@@ -1,4 +1,6 @@
-﻿namespace RealmCore.Persistence.Repository;
+﻿using RealmCore.Persistance.Extensions;
+
+namespace RealmCore.Persistance.Repository;
 
 internal class FractionRepository : IFractionRepository
 {

@@ -1,3 +1,3 @@
-﻿namespace RealmCore.Persistence.Data;
+﻿namespace RealmCore.Persistance.Data;
 
 public sealed class RoleData : IdentityRole<int> { }

@@ -1,4 +1,6 @@
-﻿namespace RealmCore.Server.Interfaces;
+﻿using RealmCore.Persistance.Data;
+
+namespace RealmCore.Server.Interfaces;
 
 public interface IUsersService
 {

@@ -7,5 +7,4 @@ internal class CommandTypeWrapper
     {
         Type = type;
     }
-
 }

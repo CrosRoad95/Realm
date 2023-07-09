@@ -9,7 +9,7 @@ using RealmCore.Console.Data.Validators;
 using RealmCore.Resources.CEFBlazorGui;
 using SlipeServer.Resources.DGS;
 using RealmCore.Resources.GuiSystem;
-using RealmCore.Resources.Addons.GuiSystem.DGSProvider;
+using RealmCore.Resources.Addons.GuiSystem.DGS;
 
 Directory.SetCurrentDirectory(Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly()!.Location)!);
 

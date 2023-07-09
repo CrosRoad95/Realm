@@ -1,6 +1,6 @@
-﻿using RealmCore.Persistence.Repository;
+﻿using RealmCore.Persistance.Repository;
 
-namespace RealmCore.Persistence;
+namespace RealmCore.Persistance;
 
 public class AuthorizationPoliciesProvider
 {

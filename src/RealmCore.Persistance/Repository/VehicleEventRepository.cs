@@ -1,4 +1,6 @@
-﻿namespace RealmCore.Persistence.Repository;
+﻿using RealmCore.Persistance.DTOs;
+
+namespace RealmCore.Persistance.Repository;
 
 internal class VehicleEventRepository : IVehicleEventRepository
 {

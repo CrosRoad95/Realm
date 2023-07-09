@@ -1,4 +1,4 @@
-﻿namespace RealmCore.Persistence.Data;
+﻿namespace RealmCore.Persistance.Data;
 
 public class VehicleEventData
 {

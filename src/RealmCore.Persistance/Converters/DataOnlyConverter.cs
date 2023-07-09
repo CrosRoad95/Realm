@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
-namespace RealmCore.Persistence.Converters;
+namespace RealmCore.Persistance.Converters;
 
 // https://stackoverflow.com/questions/69146423/date-only-cannot-be-mapped-sql-server-2019
 internal class DateOnlyConverter : ValueConverter<DateOnly, DateTime>

@@ -1,4 +1,6 @@
-﻿namespace RealmCore.Server.Components.Players;
+﻿using RealmCore.Persistance.Data;
+
+namespace RealmCore.Server.Components.Players;
 
 [ComponentUsage(false)]
 public class JobStatisticsComponent : Component

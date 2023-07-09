@@ -1,7 +1,7 @@
 ﻿using SlipeServer.Resources.Base;
 using System.Reflection;
 
-namespace RealmCore.Resources.Addons.GuiSystem.DGSProvider;
+namespace RealmCore.Resources.Addons.GuiSystem.DGS;
 
 internal class ResourceFiles
 {

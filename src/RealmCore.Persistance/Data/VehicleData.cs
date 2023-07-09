@@ -1,4 +1,6 @@
-﻿namespace RealmCore.Persistence.Data;
+﻿using RealmCore.Persistance.Data.Helpers;
+
+namespace RealmCore.Persistance.Data;
 
 public sealed class VehicleData
 {

@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using RealmCore.Persistence;
+using RealmCore.Persistance;
 using System.Diagnostics.CodeAnalysis;
 
 namespace RealmCore.MySql;

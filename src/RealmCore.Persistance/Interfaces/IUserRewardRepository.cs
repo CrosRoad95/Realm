@@ -1,4 +1,4 @@
-﻿namespace RealmCore.Persistence.Interfaces;
+﻿namespace RealmCore.Persistance.Interfaces;
 
 public interface IUserRewardRepository : IRepositoryBase
 {

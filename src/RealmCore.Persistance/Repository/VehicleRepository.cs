@@ -1,4 +1,7 @@
-﻿namespace RealmCore.Persistence.Repository;
+﻿using RealmCore.Persistance.DTOs;
+using RealmCore.Persistance.Extensions;
+
+namespace RealmCore.Persistance.Repository;
 
 internal class VehicleRepository : IVehicleRepository
 {
@@ -16,9 +19,9 @@ internal class VehicleRepository : IVehicleRepository
             Model = model,
             Platetext = Guid.NewGuid().ToString()[..8],
             CreatedAt = now,
-            Color = new (),
+            Color = new(),
             DamageState = new(),
-            DoorOpenRatio = new() ,
+            DoorOpenRatio = new(),
             TransformAndMotion = new(),
             Variant = new(),
             WheelStatus = new(),
@@ -44,7 +47,7 @@ internal class VehicleRepository : IVehicleRepository
 
         return query.ToListAsync();
     }
-    
+
     public Task<LightInfoVehicleDTO?> GetLightVehicleById(int vehicleId)
     {
         var query = _db.Vehicles
@@ -91,7 +94,7 @@ internal class VehicleRepository : IVehicleRepository
 
         return query.ToListAsync();
     }
-    
+
     public Task<VehicleData?> GetVehicleById(int id)
     {
         var query = _db.Vehicles
@@ -112,7 +115,7 @@ internal class VehicleRepository : IVehicleRepository
         var result = await query.ExecuteUpdateAsync(x => x.SetProperty(y => y.Spawned, spawned));
         return result > 0;
     }
-    
+
     public async Task<bool> SetKind(int id, byte kind)
     {
         var query = _db.Vehicles

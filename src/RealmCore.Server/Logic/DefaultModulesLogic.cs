@@ -1,6 +1,4 @@
-﻿using RealmCore.Interfaces.Extend;
-
-namespace RealmCore.Server.Logic;
+﻿namespace RealmCore.Server.Logic;
 
 public sealed class DefaultModulesLogic
 {

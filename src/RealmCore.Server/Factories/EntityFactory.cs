@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Identity;
-using RealmCore.Server.Concepts;
+﻿using RealmCore.Persistance.Interfaces;
 using Vehicle = SlipeServer.Server.Elements.Vehicle;
 
 namespace RealmCore.Server.Factories;
@@ -26,7 +25,7 @@ internal class EntityFactory : IEntityFactory
         var elementComponent = entity.GetRequiredComponent<ElementComponent>();
 
         if (!elementComponent.BaseLoaded)
-            throw new Exception("Failed to load element entity, base.Load wans't called.");
+            throw new Exception("Failed to load element entity, base.Load was not called.");
 
         var element = elementComponent.Element;
         _rpgServer.AssociateElement(element);
@@ -76,7 +75,7 @@ internal class EntityFactory : IEntityFactory
     {
         var vehicleEntity = _ecs.CreateEntity(constructionInfo?.Id ?? $"vehicle {Guid.NewGuid()}", EntityTag.Vehicle, entity =>
         {
-            var vehicle = new Vehicle(model, new Vector3(0, 0, 9999));
+            var vehicle = new Vehicle(model, position);
 
             var vehicleElementComponent = entity.AddComponent(new VehicleElementComponent(vehicle));
 

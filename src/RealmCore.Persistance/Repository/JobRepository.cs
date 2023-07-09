@@ -1,4 +1,7 @@
-﻿namespace RealmCore.Persistence.Repository;
+﻿using RealmCore.Persistance.DTOs;
+using RealmCore.Persistance.Extensions;
+
+namespace RealmCore.Persistance.Repository;
 
 internal class JobRepository : IJobRepository
 {

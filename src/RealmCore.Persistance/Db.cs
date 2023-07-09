@@ -1,6 +1,7 @@
-﻿using System.Diagnostics.CodeAnalysis;
+﻿using RealmCore.Persistance.Data.Helpers;
+using System.Diagnostics.CodeAnalysis;
 
-namespace RealmCore.Persistence;
+namespace RealmCore.Persistance;
 
 [ExcludeFromCodeCoverage]
 public abstract class Db<T> : IdentityDbContext<UserData, RoleData, int,
@@ -199,7 +200,7 @@ public abstract class Db<T> : IdentityDbContext<UserData, RoleData, int,
                 .ToTable(nameof(VehicleInventories))
                 .HasKey(x => new { x.VehicleId, x.InventoryId });
         });
-        
+
 
         modelBuilder.Entity<VehicleEventData>(entityBuilder =>
         {

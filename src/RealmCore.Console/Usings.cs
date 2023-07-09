@@ -16,7 +16,6 @@ global using RealmCore.Console.Data;
 global using RealmCore.Server.Registries;
 global using RealmCore.Server.Components.Common;
 global using RealmCore.Server.Components.Vehicles;
-global using RealmCore.Persistence;
 global using RealmCore.Server.Services;
 global using RealmCore.Console.Components.Jobs;
 global using RealmCore.Server.Components.Players.Jobs;

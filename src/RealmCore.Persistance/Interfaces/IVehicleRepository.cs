@@ -1,4 +1,6 @@
-﻿namespace RealmCore.Persistence.Interfaces;
+﻿using RealmCore.Persistance.DTOs;
+
+namespace RealmCore.Persistance.Interfaces;
 
 public interface IVehicleRepository : IRepositoryBase
 {

@@ -1,4 +1,4 @@
-﻿namespace RealmCore.Persistence;
+﻿namespace RealmCore.Persistance;
 
 public class IdentityConfiguration
 {

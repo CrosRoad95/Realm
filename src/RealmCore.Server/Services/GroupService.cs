@@ -1,4 +1,7 @@
-﻿namespace RealmCore.Server.Services;
+﻿using RealmCore.Persistance.Data;
+using RealmCore.Persistance.Interfaces;
+
+namespace RealmCore.Server.Services;
 
 internal class GroupService : IGroupService
 {

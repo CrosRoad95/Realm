@@ -1,4 +1,4 @@
-﻿namespace RealmCore.Persistence.DTOs;
+﻿namespace RealmCore.Persistance.DTOs;
 
 internal class VehicleDTO
 {

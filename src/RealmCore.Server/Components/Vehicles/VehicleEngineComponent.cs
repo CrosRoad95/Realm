@@ -1,4 +1,6 @@
-﻿namespace RealmCore.Server.Components.Vehicles;
+﻿using RealmCore.Persistance.Data;
+
+namespace RealmCore.Server.Components.Vehicles;
 
 [ComponentUsage(true)]
 public sealed class VehicleEngineComponent : Component
