@@ -30,7 +30,6 @@ internal class MapsLogic
         if (entity.Tag != EntityTag.Player)
             return;
 
-        _mapsService.LoadMapFor("testmap", entity);
-        _mapsService.LoadMapFor("testmapxml", entity);
+        _mapsService.LoadAllMapsFor(entity);
     }
 }

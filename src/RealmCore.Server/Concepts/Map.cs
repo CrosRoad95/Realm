@@ -2,8 +2,19 @@
 
 internal sealed class Map : IMap
 {
+    private readonly object _lock = new();
     private readonly List<WorldObject> _worldObjects;
     private readonly BoundingBox _boundingBox;
+    private readonly List<Player> _createdForPlayers = new();
+    public List<Player> CreatedForPlayers
+    {
+        get
+        {
+            lock(_lock)
+                return new List<Player>(_createdForPlayers);
+        }
+    }
+
     internal IReadOnlyCollection<WorldObject> WorldObjects => _worldObjects.AsReadOnly();
 
     public BoundingBox BoundingBox => _boundingBox;
@@ -37,9 +48,38 @@ internal sealed class Map : IMap
         _boundingBox = new BoundingBox((min + max) * 0.5f, max - min);
     }
 
-    public void LoadForPlayer(Player player)
+    public bool IsCreatedFor(Entity entity) => IsCreatedFor(entity.Player);
+    public bool IsCreatedFor(Player player)
     {
-        foreach (var worldObject in _worldObjects)
-            worldObject.CreateFor(player);
+        lock (_lock)
+        {
+            return _createdForPlayers.Contains(player);
+        }
+    }
+
+    public bool LoadForPlayer(Entity entity) => LoadForPlayer(entity.Player);
+    public bool LoadForPlayer(Player player)
+    {
+        lock(_lock)
+        {
+            if (_createdForPlayers.Contains(player))
+                return false;
+
+            _createdForPlayers.Add(player);
+            player.Disconnected += HandleDisconnected;
+
+            foreach (var worldObject in _worldObjects)
+                worldObject.CreateFor(player);
+            return true;
+        }
+    }
+
+    private void HandleDisconnected(Player sender, PlayerQuitEventArgs e)
+    {
+        lock(_lock)
+        {
+            sender.Disconnected -= HandleDisconnected;
+            _createdForPlayers.Remove(sender);
+        }
     }
 }

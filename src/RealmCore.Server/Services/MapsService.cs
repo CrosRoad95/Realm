@@ -44,9 +44,22 @@ internal class MapsService : IMapsService
             map.LoadForPlayer(player);
         }
     }
+    
+    public void LoadAllMapsFor(Entity entity)
+    {
+        var player = entity.Player;
+        lock (_lock)
+        {
+            foreach (var map in _maps)
+                map.Value.LoadForPlayer(player);
+        }
+    }
 
     public void RegisterMapFromXml(string name, string fileName)
     {
+        if(_maps.ContainsKey(name))
+            throw new InvalidOperationException($"Map of name {name} already exists");
+
         XmlSerializer serializer = new(typeof(XmlMap), "");
 
         XmlMap xmlMap;
