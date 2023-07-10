@@ -105,12 +105,11 @@ internal class DiscordLogger : IDiscordLogger
 
     private async Task HandleMessageDeleted(Cacheable<IMessage, ulong> messageCache, Cacheable<IMessageChannel, ulong> messageChannelCache)
     {
-        var message = await messageCache.GetOrDownloadAsync().ConfigureAwait(false);
         var messageChannel = await messageChannelCache.GetOrDownloadAsync().ConfigureAwait(false);
         var logProperties = new Dictionary<string, object>
         {
             ["discordGuild"] = ((SocketGuildChannel)messageChannel).Guild.Id.ToString(),
-            ["discordMessageId"] = message.Id.ToString(),
+            ["discordMessageId"] = messageCache.Id.ToString(),
             ["discordChannelId"] = messageChannel.Id.ToString()
         };
 
