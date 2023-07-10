@@ -1,13 +1,14 @@
-﻿using Discord.WebSocket;
+﻿using Discord;
+using Discord.WebSocket;
 using Microsoft.Extensions.Logging;
 
-namespace Discord.Logger;
+namespace RealmCore.Discord.Logger;
 
 internal class DiscordLogger : IDiscordLogger
 {
     private readonly ILogger<DiscordLogger> _logger;
 
-    public DiscordLogger(ILogger<DiscordLogger> logger)
+    public DiscordLogger(DiscordSocketClient discordSocketClient, ILogger<DiscordLogger> logger)
     {
         _logger = logger;
     }

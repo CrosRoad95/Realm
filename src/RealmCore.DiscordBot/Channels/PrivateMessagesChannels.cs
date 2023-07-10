@@ -1,27 +1,33 @@
-﻿using Grpc.Net.Client;
+﻿using Discord.WebSocket;
+using Discord;
+using static Discord.PrivateMessagesChannels;
 
-namespace RealmCore.DiscordBot.Channels;
+namespace RealmCore.Discord.Integration.Channels;
 
-internal class PrivateMessagesChannels
+public sealed class PrivateMessagesChannels : ChannelBase
 {
     private readonly ILogger<PrivateMessagesChannels> _logger;
-    private readonly Discord.PrivateMessagesChannels.PrivateMessagesChannelsClient _statusChannelClient;
+    private readonly PrivateMessagesChannelsClient _statusChannelClient;
 
     public delegate Task<string> GetStatusChannelContent();
 
-    public PrivateMessagesChannels(ILogger<PrivateMessagesChannels> logger, GrpcChannel grpcChannel)
+    public PrivateMessagesChannels(ILogger<PrivateMessagesChannels> logger, GrpcChannel grpcChannel, DiscordSocketClient discordSocketClient)
     {
         _statusChannelClient = new(grpcChannel);
         _logger = logger;
+        discordSocketClient.MessageReceived += HandleMessageReceived;
     }
 
-    public async Task RelayPrivateMessage(ulong userId, ulong messageId, string message)
+    private async Task HandleMessageReceived(SocketMessage socketMessage)
     {
-        await _statusChannelClient.ReceivedPrivateMessageAsync(new SendPrivateMessageRequest
+        if (socketMessage.Channel is SocketDMChannel)
         {
-            UserId = userId,
-            MessageId = messageId,
-            Message = message,
-        });
+            await _statusChannelClient.ReceivedPrivateMessageAsync(new SendPrivateMessageRequest
+            {
+                UserId = socketMessage.Author.Id,
+                MessageId = socketMessage.Id,
+                Message = socketMessage.Content,
+            });
+        }
     }
 }

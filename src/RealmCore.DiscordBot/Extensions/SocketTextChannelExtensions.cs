@@ -1,4 +1,4 @@
-﻿namespace RealmCore.DiscordBot.Extensions;
+﻿namespace RealmCore.Discord.Integration.Extensions;
 
 internal static class SocketTextChannelExtensions
 {

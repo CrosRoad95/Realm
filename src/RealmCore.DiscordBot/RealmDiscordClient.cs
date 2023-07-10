@@ -1,47 +1,38 @@
-﻿using Discord.Logger;
-using Grpc.Net.Client;
-using Microsoft.Extensions.Options;
+﻿namespace RealmCore.Discord.Integration;
 
-namespace RealmCore.DiscordBot;
-
-internal class DiscordClient
+internal class RealmDiscordClient : IRealmDiscordClient
 {
     private readonly DiscordSocketClient _client;
     private readonly IOptions<DiscordBotOptions> _discordBotOptions;
-    private readonly DiscordStatusChannel _discordStatusChannel;
-    private readonly Channels.PrivateMessagesChannels _privateMessagesChannels;
+    private readonly ChannelBase[] _channels;
     private readonly CommandHandler _commandHandler;
     private readonly BotIdProvider _botIdProvider;
-    private readonly TextBasedCommands _textBasecCommands;
+    private readonly TextBasedCommands _textBasedCommands;
     private SocketGuild? _socketGuild;
+    public event Action? Ready;
 
-    public DiscordClient(DiscordSocketClient discordSocketClient, IOptions<DiscordBotOptions> discordBotOptions, DiscordStatusChannel discordStatusChannel,
-        Channels.PrivateMessagesChannels privateMessagesChannels, CommandHandler commandHandler, BotIdProvider botIdProvider, GrpcChannel grpcChannel, TextBasedCommands textBasecCommands,
+    public RealmDiscordClient(DiscordSocketClient discordSocketClient, IOptions<DiscordBotOptions> discordBotOptions, IEnumerable<ChannelBase> channels, CommandHandler commandHandler, BotIdProvider botIdProvider, TextBasedCommands textBasedCommands,
         IDiscordLogger discordLogger)
     {
         _client = discordSocketClient;
         _discordBotOptions = discordBotOptions;
-        _discordStatusChannel = discordStatusChannel;
-        _privateMessagesChannels = privateMessagesChannels;
+        _channels = channels.ToArray();
         _commandHandler = commandHandler;
         _botIdProvider = botIdProvider;
-        _textBasecCommands = textBasecCommands;
+        _textBasedCommands = textBasedCommands;
         discordLogger.Attach(_client);
         _client.Ready += HandleReady;
         _client.GuildMemberUpdated += HandleGuildMemberUpdated;
-        _client.MessageReceived += HandlePrivateMessageReceived;
+        _client.MessageReceived += HandleMessageReceived;
     }
 
-    private async Task HandlePrivateMessageReceived(SocketMessage socketMessage)
+    private async Task HandleMessageReceived(SocketMessage socketMessage)
     {
         if (socketMessage.Author.IsBot || !socketMessage.Content.Any())
             return;
 
-        if (socketMessage.Content.StartsWith("&"))
-            await _textBasecCommands.Relay(socketMessage);
-
-        if (socketMessage.Channel is SocketDMChannel)
-            await _privateMessagesChannels.RelayPrivateMessage(socketMessage.Author.Id, socketMessage.Id, socketMessage.Content);
+        if (socketMessage.Content.StartsWith(_discordBotOptions.Value.TextBasedCommandPrefix))
+            await _textBasedCommands.Relay(socketMessage);
     }
 
     private async Task HandleGuildMemberUpdated(Cacheable<SocketGuildUser, ulong> arg1, SocketGuildUser sockerGuildUser)
@@ -63,10 +54,14 @@ internal class DiscordClient
             throw new NullReferenceException(nameof(_socketGuild));
 
         _botIdProvider.Id = _client.CurrentUser.Id;
-        _ = Task.Run(async () => await _discordStatusChannel.StartAsync(_socketGuild));
+        foreach (var item in _channels)
+        {
+            _ = Task.Run(async () => await item.StartAsync(_socketGuild));
+        }
         await _socketGuild.DownloadUsersAsync();
 
         await _commandHandler.InitializeAsync();
+        Ready?.Invoke();
     }
 
     public SocketGuildChannel GetChannel(ulong channelId)

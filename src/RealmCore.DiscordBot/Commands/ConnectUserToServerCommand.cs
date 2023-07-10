@@ -1,8 +1,6 @@
 ﻿using Grpc.Core;
-using Grpc.Net.Client;
-using Microsoft.Extensions.Options;
 
-namespace RealmCore.DiscordBot.Commands;
+namespace RealmCore.Discord.Integration.Commands;
 
 internal class ConnectUserToServerCommand : InteractionModuleBase<SocketInteractionContext>
 {

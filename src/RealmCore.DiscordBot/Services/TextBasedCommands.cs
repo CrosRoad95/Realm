@@ -1,10 +1,10 @@
-﻿using Grpc.Net.Client;
+﻿using static Discord.Commands;
 
-namespace RealmCore.DiscordBot.Services;
+namespace RealmCore.Discord.Integration.Services;
 
 internal class TextBasedCommands
 {
-    private readonly Discord.Commands.CommandsClient _commandsClient;
+    private readonly CommandsClient _commandsClient;
     public TextBasedCommands(GrpcChannel grpcChannel)
     {
         _commandsClient = new(grpcChannel);

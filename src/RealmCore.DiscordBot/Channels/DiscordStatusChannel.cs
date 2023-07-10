@@ -1,36 +1,34 @@
 ﻿using Grpc.Core;
-using Grpc.Net.Client;
-using Microsoft.Extensions.Options;
-using RealmCore.DiscordBot.Extensions;
+using RealmCore.Discord.Integration.Extensions;
 
-namespace RealmCore.DiscordBot.Channels;
+namespace RealmCore.Discord.Integration.Channels;
 
-internal class DiscordStatusChannel
+public sealed class DiscordStatusChannel : ChannelBase
 {
     private readonly DiscordBotOptions.StatusChannelConfiguration? _configuration;
-    private readonly BotIdProvider _botdIdProvider;
+    private readonly BotIdProvider _botIdProvider;
     private readonly ILogger _logger;
-    private IMessage? _statusDiscordMessage;
+    private IUserMessage? _statusDiscordMessage;
     private readonly StatusChannel.StatusChannelClient _statusChannelClient;
     private TimestampTag? _lastReceivedUpdate = null;
 
     public delegate Task<string> GetStatusChannelContent();
 
-    public DiscordStatusChannel(IOptions<DiscordBotOptions> discordConfiguration, BotIdProvider botdIdProvider, ILogger<DiscordStatusChannel> logger, GrpcChannel grpcChannel)
+    public DiscordStatusChannel(IOptions<DiscordBotOptions> discordConfiguration, BotIdProvider botIdProvider, ILogger<DiscordStatusChannel> logger, GrpcChannel grpcChannel)
     {
         _configuration = discordConfiguration.Value.StatusChannel;
-        _botdIdProvider = botdIdProvider;
+        _botIdProvider = botIdProvider;
         _statusChannelClient = new(grpcChannel);
         _logger = logger;
     }
 
-    public async Task StartAsync(SocketGuild socketGuild)
+    public override async Task StartAsync(SocketGuild socketGuild)
     {
         if (_configuration == null)
             return;
 
         var channel = socketGuild.GetChannel(_configuration.ChannelId) as SocketTextChannel;
-        _statusDiscordMessage = await channel.TryGetLastMessageSendByUser(_botdIdProvider.Id);
+        _statusDiscordMessage = await channel.TryGetLastMessageSendByUser(_botIdProvider.Id) as IUserMessage;
         if (_statusDiscordMessage == null)
             _statusDiscordMessage = await channel.SendMessageAsync(string.Empty);
 
@@ -70,7 +68,7 @@ internal class DiscordStatusChannel
         finally
         {
             if (!string.IsNullOrEmpty(newContent))
-                await (_statusDiscordMessage as IUserMessage).ModifyAsync(x => x.Content = newContent);
+                await _statusDiscordMessage.ModifyAsync(x => x.Content = newContent);
         }
     }
 }

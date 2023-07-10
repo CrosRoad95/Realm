@@ -52,7 +52,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RealmCore.Module.Discord", 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RealmCore.Module.Grpc.Proto", "src\RealmCore.Module.Grpc.Proto\RealmCore.Module.Grpc.Proto.csproj", "{BCA0C11F-F5CD-46EA-9CE6-1C22BCF77E53}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Discord.Logger", "src\Discord.Logger\Discord.Logger.csproj", "{7A03C405-8770-493A-9C09-66A105DA0A7C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RealmCore.Discord.Logger", "src\Discord.Logger\RealmCore.Discord.Logger.csproj", "{7A03C405-8770-493A-9C09-66A105DA0A7C}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RealmCore.Resources.Nametags", "src\RealmCore.Resources.Nametags\RealmCore.Resources.Nametags.csproj", "{9F84053A-97C9-42AC-A328-F14817C8FDAB}"
 EndProject
@@ -60,7 +60,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RealmCore.Resources.Base", 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RealmCore.Resources.ElementOutline", "src\RealmCore.Resources.ElementOutline\RealmCore.Resources.ElementOutline.csproj", "{09E1E794-687D-462C-9CBF-CAC77824185A}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RealmCore.DiscordBot", "src\RealmCore.DiscordBot\RealmCore.DiscordBot.csproj", "{0E692FC5-4575-44AF-B80A-3DACC8578F09}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RealmCore.Discord.Integration", "src\RealmCore.DiscordBot\RealmCore.Discord.Integration.csproj", "{0E692FC5-4575-44AF-B80A-3DACC8578F09}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RealmCore.MySql", "src\RealmCore.MySql\RealmCore.MySql.csproj", "{5A44DAE0-7FAD-461B-B795-EFBCAAF79D10}"
 EndProject
@@ -79,6 +79,8 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RealmCore.BlazorLibrary", "src\RealmCore.BlazorLibrary\RealmCore.BlazorLibrary.csproj", "{7D07DE9C-282B-429A-A944-6779A72604BB}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RealmCore.Resources.CEFBlazorGui.DebugServer", "src\RealmCore.Resources.CEFBlazorGui.DebugServer\RealmCore.Resources.CEFBlazorGui.DebugServer.csproj", "{D6F6834D-D0FE-4296-BE1C-9CDF72D59BB2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RealmCore.Discord.Bot", "RealmCore.DiscordIntegration\RealmCore.Discord.Bot.csproj", "{B1B1018F-44C4-40C7-AFDA-FEE542C3ECA8}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -210,6 +212,10 @@ Global
 		{D6F6834D-D0FE-4296-BE1C-9CDF72D59BB2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D6F6834D-D0FE-4296-BE1C-9CDF72D59BB2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D6F6834D-D0FE-4296-BE1C-9CDF72D59BB2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B1B1018F-44C4-40C7-AFDA-FEE542C3ECA8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B1B1018F-44C4-40C7-AFDA-FEE542C3ECA8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B1B1018F-44C4-40C7-AFDA-FEE542C3ECA8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B1B1018F-44C4-40C7-AFDA-FEE542C3ECA8}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -239,6 +245,7 @@ Global
 		{A3A3DBD9-2CC5-441E-A1AD-E78DE078C9BC} = {28944775-A0AF-46D4-9480-D6F4189002B7}
 		{F31834D0-4F1D-4CF1-B6CF-EFDCD27D101E} = {28944775-A0AF-46D4-9480-D6F4189002B7}
 		{D6F6834D-D0FE-4296-BE1C-9CDF72D59BB2} = {28944775-A0AF-46D4-9480-D6F4189002B7}
+		{B1B1018F-44C4-40C7-AFDA-FEE542C3ECA8} = {1B4D0935-5736-4E56-B65E-0CACF26B17DD}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {3922BF34-8D0B-4DC1-9EFC-D4CFB948B3B8}

@@ -1,4 +1,4 @@
-﻿namespace RealmCore.DiscordBot;
+﻿namespace RealmCore.Discord.Integration;
 
 internal interface IChannelConfiguration
 {
@@ -6,7 +6,7 @@ internal interface IChannelConfiguration
 
 }
 
-internal class DiscordBotOptions
+public class DiscordBotOptions
 {
     public class StatusChannelConfiguration : IChannelConfiguration
     {
@@ -23,6 +23,8 @@ internal class DiscordBotOptions
     public string Token { get; set; } = "";
     public ulong Guild { get; set; }
     public string GrpcAddress { get; set; }
+    public string TextBasedCommandPrefix { get; set; } = "&";
+
 
     public StatusChannelConfiguration? StatusChannel { get; set; }
     public ConnectServerUserOptions? ConnectServerUserChannel { get; set; }

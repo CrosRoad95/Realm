@@ -1,9 +1,8 @@
 ﻿using Grpc.Core;
-using Microsoft.Extensions.Options;
-using RealmCore.DiscordBot.Stubs;
+using RealmCore.Discord.Integration.Stubs;
 using RealmCore.Module.Grpc.Options;
 
-namespace RealmCore.DiscordBot;
+namespace RealmCore.Discord.Integration;
 
 internal class GrpcServer
 {

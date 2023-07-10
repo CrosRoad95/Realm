@@ -1,6 +1,6 @@
 ﻿using Discord.WebSocket;
 
-namespace Discord.Logger;
+namespace RealmCore.Discord.Logger;
 
 public interface IDiscordLogger
 {

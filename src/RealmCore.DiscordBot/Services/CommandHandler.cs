@@ -1,7 +1,6 @@
-﻿using Microsoft.Extensions.Options;
-using RealmCore.DiscordBot.Commands;
+﻿using RealmCore.Discord.Integration.Commands;
 
-namespace RealmCore.DiscordBot.Services;
+namespace RealmCore.Discord.Integration.Services;
 
 internal class CommandHandler
 {

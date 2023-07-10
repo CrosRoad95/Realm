@@ -1,6 +1,6 @@
-﻿namespace RealmCore.DiscordBot;
+﻿namespace RealmCore.Discord.Integration;
 
-internal class BotIdProvider
+public class BotIdProvider
 {
     public ulong Id { get; set; }
     public BotIdProvider()

@@ -1,12 +1,12 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 
-namespace Discord.Logger;
+namespace RealmCore.Discord.Logger;
 
 public static class ServiceCollectionExtensions
 {
-    public static ServiceCollection AddDiscordLogger(this ServiceCollection serviceCollection)
+    public static IServiceCollection AddDiscordLogger(this IServiceCollection services)
     {
-        serviceCollection.AddSingleton<IDiscordLogger, DiscordLogger>();
-        return serviceCollection;
+        services.AddSingleton<IDiscordLogger, DiscordLogger>();
+        return services;
     }
 }
