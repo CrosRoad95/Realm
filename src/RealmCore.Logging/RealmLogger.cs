@@ -12,6 +12,9 @@ public class RealmLogger
     private readonly LoggingLevelSwitch _levelSwitch = new();
 
     public LoggingLevelSwitch LevelSwitch => _levelSwitch;
+
+    public LoggerConfiguration LoggerConfiguration => _loggerConfiguration;
+
     public RealmLogger(string appName, LogEventLevel logEventLevel = LogEventLevel.Debug)
     {
         _levelSwitch.MinimumLevel = logEventLevel;
@@ -29,12 +32,6 @@ public class RealmLogger
     public RealmLogger WithSink(ILogEventSink sink)
     {
         _loggerConfiguration = _loggerConfiguration.WriteTo.Sink(sink);
-        return this;
-    }
-
-    public RealmLogger AddSeq(string serverUrl)
-    {
-        _loggerConfiguration.WriteTo.Seq(serverUrl, controlLevelSwitch: LevelSwitch);
         return this;
     }
 

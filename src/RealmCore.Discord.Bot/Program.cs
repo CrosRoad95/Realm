@@ -10,8 +10,8 @@ using RealmCore.Discord.Integration.Interfaces;
 
 var realmConfigurationProvider = new RealmConfigurationProvider();
 var services = new ServiceCollection();
-var realmLogger = new RealmLogger("DiscordBot", LogEventLevel.Verbose)
-    .AddSeq("http://localhost:5341");
+var realmLogger = new RealmLogger("DiscordBot", LogEventLevel.Verbose);
+realmLogger.LoggerConfiguration.WriteTo.Seq("http://localhost:5341");
 
 services.AddDiscordLogger();
 services.AddLogging(x => x.AddSerilog(realmLogger.GetLogger(), dispose: true));
