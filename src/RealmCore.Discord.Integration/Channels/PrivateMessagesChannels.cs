@@ -1,6 +1,4 @@
-﻿using Discord.WebSocket;
-using Discord;
-using static Discord.PrivateMessagesChannels;
+﻿using static Discord.PrivateMessagesChannels;
 
 namespace RealmCore.Discord.Integration.Channels;
 

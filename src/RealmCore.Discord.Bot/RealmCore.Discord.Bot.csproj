@@ -12,10 +12,10 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\src\Discord.Logger\RealmCore.Discord.Logger.csproj" />
-    <ProjectReference Include="..\src\RealmCore.Configuration\RealmCore.Configuration.csproj" />
-    <ProjectReference Include="..\src\RealmCore.DiscordBot\RealmCore.Discord.Integration.csproj" />
-    <ProjectReference Include="..\src\RealmCore.Logging\RealmCore.Logging.csproj" />
+    <ProjectReference Include="..\RealmCore.Discord.Logger\RealmCore.Discord.Logger.csproj" />
+    <ProjectReference Include="..\RealmCore.Configuration\RealmCore.Configuration.csproj" />
+    <ProjectReference Include="..\RealmCore.Discord.Integration\RealmCore.Discord.Integration.csproj" />
+    <ProjectReference Include="..\RealmCore.Logging\RealmCore.Logging.csproj" />
   </ItemGroup>
 
   <ItemGroup>

@@ -22,7 +22,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <ProjectReference Include="..\Discord.Logger\RealmCore.Discord.Logger.csproj" />
+	  <ProjectReference Include="..\RealmCore.Discord.Logger\RealmCore.Discord.Logger.csproj" />
 	  <ProjectReference Include="..\RealmCore.Configuration\RealmCore.Configuration.csproj" />
 	  <ProjectReference Include="..\RealmCore.Interfaces\RealmCore.Interfaces.csproj" />
 	  <ProjectReference Include="..\RealmCore.Logging\RealmCore.Logging.csproj" />

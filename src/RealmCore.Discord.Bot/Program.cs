@@ -1,12 +1,12 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using RealmCore.Configuration;
-using RealmCore.Discord.Integration.Extensions;
-using RealmCore.Discord.Integration.Interfaces;
 using RealmCore.Logging;
 using RealmCore.Discord.Logger;
 using Serilog;
 using Serilog.Events;
 using RealmCore.Discord.Integration.Channels;
+using RealmCore.Discord.Integration.Extensions;
+using RealmCore.Discord.Integration.Interfaces;
 
 var realmConfigurationProvider = new RealmConfigurationProvider();
 var services = new ServiceCollection();
