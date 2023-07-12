@@ -14,7 +14,9 @@ internal class GuisLogic
 
     private void HandleServerStarted()
     {
-        _serviceProvider.GetRequiredService<IGuiSystemService>().GuiFilesChanged = HandleGuiFilesChanged;
+        var guiSystemProvider = _serviceProvider.GetService<IGuiSystemService>();
+        if(guiSystemProvider != null)
+            guiSystemProvider.GuiFilesChanged = HandleGuiFilesChanged;
     }
 
     private Task HandleGuiFilesChanged()

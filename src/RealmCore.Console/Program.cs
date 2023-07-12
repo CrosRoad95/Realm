@@ -18,16 +18,20 @@ builder.AddDefaultLogger()
     .AddDefaultConsole()
     .AddDefaultConfiguration();
 
+bool withDgs = true;
 SemaphoreSlim semaphore = new(0);
 
 var server = builder.Build(null, extraBuilderSteps: serverBuilder =>
 {
-    serverBuilder.AddDGSResource(DGSVersion.Release_3_520);
-    serverBuilder.AddGuiSystemResource(builder =>
+    if(withDgs)
     {
-        builder.AddGuiProvider(DGSGuiProvider.Name, DGSGuiProvider.LuaCode);
-        builder.SetGuiProvider(DGSGuiProvider.Name);
-    }, new());
+        serverBuilder.AddDGSResource(DGSVersion.Release_3_520);
+        serverBuilder.AddGuiSystemResource(builder =>
+        {
+            builder.AddGuiProvider(DGSGuiProvider.Name, DGSGuiProvider.LuaCode);
+            builder.SetGuiProvider(DGSGuiProvider.Name);
+        }, new());
+    }
 
     serverBuilder.AddCEFBlazorGuiResource("../../../Server/BlazorGui/wwwroot", CEFGuiBlazorMode.Prod);
 
@@ -52,7 +56,10 @@ var server = builder.Build(null, extraBuilderSteps: serverBuilder =>
     serverBuilder.AddLogic<DefaultChatLogic>();
     serverBuilder.AddLogic<BlazorGuiLogic>();
 #if DEBUG
-    serverBuilder.AddLogic<HotReloadLogic>("../../../Server/Gui");
+    if(withDgs)
+    {
+        serverBuilder.AddLogic<HotReloadLogic>("../../../Server/Gui");
+    }
 #endif
 
     serverBuilder.ConfigureServices(services =>
