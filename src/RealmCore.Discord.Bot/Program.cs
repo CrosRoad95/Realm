@@ -7,6 +7,7 @@ using Serilog.Events;
 using RealmCore.Discord.Integration.Channels;
 using RealmCore.Discord.Integration.Extensions;
 using RealmCore.Discord.Integration.Interfaces;
+using Discord.WebSocket;
 
 var realmConfigurationProvider = new RealmConfigurationProvider();
 var services = new ServiceCollection();
@@ -24,6 +25,11 @@ services.AddRealmDiscordBotIntegration(realmConfigurationProvider);
 var serviceProvider = services.BuildServiceProvider();
 
 var discordIntegration = serviceProvider.GetRequiredService<IRealmDiscordClient>();
-
+discordIntegration.Ready += () =>
+{
+    var discordLogger = serviceProvider.GetRequiredService<IDiscordLogger>();
+    var client = serviceProvider.GetRequiredService<DiscordSocketClient>();
+    discordLogger.Attach(client);
+};
 await discordIntegration.StartAsync();
 await Task.Delay(-1);

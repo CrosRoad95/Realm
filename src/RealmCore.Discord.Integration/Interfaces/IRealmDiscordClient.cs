@@ -2,5 +2,7 @@
 
 public interface IRealmDiscordClient
 {
+    event Action? Ready;
+
     Task StartAsync();
 }

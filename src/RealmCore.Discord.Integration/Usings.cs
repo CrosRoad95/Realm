@@ -14,4 +14,3 @@ global using Microsoft.Extensions.Options;
 global using RealmCore.Discord.Integration.Channels;
 global using RealmCore.Discord.Integration.Interfaces;
 global using RealmCore.Discord.Integration.Services;
-global using RealmCore.Discord.Logger;
