@@ -1,4 +1,4 @@
-﻿using RealmCore.Server.Components;
+﻿using RealmCore.Server.Abstractions;
 using RealmCore.Server.Enums;
 using RealmCore.Server.Extensions;
 using RealmCore.Server.Inventory;
@@ -7,11 +7,11 @@ using SlipeServer.Server.Services;
 
 namespace RealmCore.Console.Logic;
 
-public class ItemsLogic
+public class ItemsLogic : ComponentLogic<InventoryComponent>
 {
     private readonly ChatBox _chatBox;
 
-    public ItemsLogic(ItemsRegistry itemsRegistry, IECS ecs, ChatBox chatBox)
+    public ItemsLogic(ItemsRegistry itemsRegistry, IECS ecs, ChatBox chatBox) : base(ecs)
     {
         itemsRegistry.UseCallback = Use;
         itemsRegistry.Add(1, new ItemRegistryEntry
@@ -43,23 +43,19 @@ public class ItemsLogic
             AvailableActions = ItemAction.None,
         });
 
-        ecs.EntityCreated += HandleEntityCreated;
         _chatBox = chatBox;
     }
 
-    private void HandleEntityCreated(Entity entity)
+    protected override void ComponentAdded(InventoryComponent inventoryComponent)
     {
-        if (entity.Tag == EntityTag.Player)
-            entity.ComponentAdded += HandleComponentAdded;
+        inventoryComponent.ItemAdded += HandleInventoryComponentItemAdded;
+        inventoryComponent.ItemRemoved += HandleInventoryComponentItemRemoved;
     }
 
-    private void HandleComponentAdded(Component component)
+    protected override void ComponentRemoved(InventoryComponent inventoryComponent)
     {
-        if (component is InventoryComponent inventoryComponent)
-        {
-            inventoryComponent.ItemAdded += HandleInventoryComponentItemAdded;
-            inventoryComponent.ItemRemoved += HandleInventoryComponentItemRemoved;
-        }
+        inventoryComponent.ItemAdded -= HandleInventoryComponentItemAdded;
+        inventoryComponent.ItemRemoved -= HandleInventoryComponentItemRemoved;
     }
 
     private void HandleInventoryComponentItemRemoved(InventoryComponent inventoryComponent, Item item)

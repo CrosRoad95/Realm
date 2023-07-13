@@ -1,31 +1,20 @@
-﻿using RealmCore.Server.Components;
-using RealmCore.Server.Enums;
-
+﻿using RealmCore.Server.Abstractions;
+using RealmCore.Server.Components;
+using RealmCore.Server.Components.Players;
 namespace RealmCore.Console.Logic;
 
-internal sealed class AchievementsLogic
+internal sealed class AchievementsLogic : ComponentLogic<AchievementsComponent>
 {
-    private readonly IECS _ecs;
+    public AchievementsLogic(IECS ecs) : base(ecs) { }
 
-    public AchievementsLogic(IECS ecs)
+    protected override void ComponentAdded(AchievementsComponent achievementsComponent)
     {
-        _ecs = ecs;
-
-        _ecs.EntityCreated += HandleEntityCreated;
+        achievementsComponent.AchievementUnlocked += HandleAchievementUnlocked;
     }
 
-    private void HandleEntityCreated(Entity entity)
+    protected override void ComponentRemoved(AchievementsComponent achievementsComponent)
     {
-        if (entity.Tag == EntityTag.Player)
-            entity.ComponentAdded += HandleComponentAdded;
-    }
-
-    private void HandleComponentAdded(Component component)
-    {
-        if (component is AchievementsComponent achievementsComponent)
-        {
-            achievementsComponent.AchievementUnlocked += HandleAchievementUnlocked;
-        }
+        achievementsComponent.AchievementUnlocked += HandleAchievementUnlocked;
     }
 
     private void HandleAchievementUnlocked(AchievementsComponent achievementsComponent, int achievementName)
