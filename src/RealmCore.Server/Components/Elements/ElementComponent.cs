@@ -102,10 +102,6 @@ public abstract class ElementComponent : Component
                     vehicle.RemovePassenger(occupant.Value);
             }
             var destroyed = Element.Destroy();
-            if(Element is WorldObject w)
-            {
-                Console.WriteLine("Element {0}, {1}", (Element as WorldObject).Model, destroyed);
-            }
         }
     }
 

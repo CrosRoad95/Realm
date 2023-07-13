@@ -2,57 +2,51 @@
 
 internal class ActiveUsers : IActiveUsers
 {
-    private readonly ReaderWriterLockSlim _lock = new();
+    private readonly object _lock = new();
     private readonly List<int> _activeUsersIds = new();
+
+    public List<int> ActiveUsersIds
+    {
+        get
+        {
+            lock (_lock)
+                return new List<int>(_activeUsersIds);
+        }
+    }
+
+    public event Action<int>? Activated;
+    public event Action<int>? Deactivated;
 
     public bool IsActive(int userId)
     {
-        _lock.EnterReadLock();
-        try
-        {
+        lock (_lock)
             return _activeUsersIds.Contains(userId);
-        }
-        finally
-        {
-            _lock.ExitReadLock();
-        }
     }
 
     public bool TrySetActive(int userId)
     {
-
-        _lock.EnterReadLock();
-        try
+        lock (_lock)
         {
             if (_activeUsersIds.Contains(userId))
                 return false;
 
             _activeUsersIds.Add(userId);
+            Activated?.Invoke(userId);
             return true;
-
-        }
-        finally
-        {
-            _lock.ExitReadLock();
         }
     }
 
     public bool TrySetInactive(int userId)
     {
-
-        _lock.EnterReadLock();
-        try
+        lock (_lock)
         {
+
             if (!_activeUsersIds.Contains(userId))
                 return false;
 
             _activeUsersIds.Remove(userId);
+            Deactivated?.Invoke(userId);
             return true;
-
-        }
-        finally
-        {
-            _lock.ExitReadLock();
         }
     }
 }
