@@ -1,5 +1,5 @@
-﻿using RealmCore.Server.Contexts.Interfaces;
-using RealmCore.Server.Inventory;
+﻿using RealmCore.Server.Concepts;
+using RealmCore.Server.Contexts.Interfaces;
 
 namespace RealmCore.Console.Components.Gui;
 
@@ -73,7 +73,7 @@ public sealed class InventoryGuiComponent : StatefulGuiComponent<InventoryGuiCom
             id = x.ItemId,
             name = x.Name,
             number = x.Number,
-            actions = (double)x.AvailiableActions,
+            actions = (double)x.AvailableActions,
             metaData = x.MetaData
         }).OrderBy(x => x.id).ThenByDescending(x => x.number);
     }

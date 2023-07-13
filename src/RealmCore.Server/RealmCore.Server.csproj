@@ -11,6 +11,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Structs\**" />
+    <EmbeddedResource Remove="Structs\**" />
+    <None Remove="Structs\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="BCrypt.Net-Next" Version="4.0.3" />
     <PackageReference Include="FluentValidation" Version="11.2.2" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="7.0.2" />
@@ -71,9 +77,5 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>RPGServer.pl-PL.Designer.cs</LastGenOutput>
     </EmbeddedResource>
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Structs\" />
   </ItemGroup>
 </Project>

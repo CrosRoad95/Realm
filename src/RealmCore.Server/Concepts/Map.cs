@@ -1,6 +1,6 @@
 ﻿namespace RealmCore.Server.Concepts;
 
-internal sealed class Map : IMap
+internal sealed class Map
 {
     private readonly object _lock = new();
     private readonly List<WorldObject> _worldObjects;

@@ -1,6 +1,4 @@
-﻿using RealmCore.Server.Inventory;
-
-namespace RealmCore.Tests.Tests.Components;
+﻿namespace RealmCore.Tests.Tests.Components;
 
 public class InventoryComponentTests
 {

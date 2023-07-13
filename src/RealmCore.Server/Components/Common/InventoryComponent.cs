@@ -243,7 +243,7 @@ public class InventoryComponent : Component
     {
         ThrowIfDisposed();
 
-        if (HasItem(item) && (item.AvailiableActions & flags) == flags)
+        if (HasItem(item) && (item.AvailableActions & flags) == flags)
         {
             ItemUsed?.Invoke(this, item, flags);
             return true;

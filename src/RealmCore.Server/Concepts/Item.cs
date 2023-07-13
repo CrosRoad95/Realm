@@ -1,8 +1,8 @@
-﻿namespace RealmCore.Server.Inventory;
+﻿namespace RealmCore.Server.Concepts;
 
 public class Item : IEquatable<Item>, IEquatable<Dictionary<string, object>>
 {
-    private readonly ReaderWriterLockSlim _lock = new();
+    private readonly object _lock = new();
     public string Id { get; internal set; } = Guid.NewGuid().ToString();
     public string LocalId { get; } = Guid.NewGuid().ToString();
     public uint ItemId { get; private set; }
@@ -12,46 +12,35 @@ public class Item : IEquatable<Item>, IEquatable<Dictionary<string, object>>
     {
         get
         {
-            _lock.EnterReadLock();
-            try
-            {
+            lock (_lock)
                 return _number;
-            }
-            finally
-            {
-                _lock.ExitReadLock();
-            }
         }
         set
         {
             if (value == 0)
                 throw new ArgumentException(nameof(value));
 
-            _lock.EnterWriteLock();
-            var old = _number;
-            _number = value;
-            _lock.ExitWriteLock();
+            uint old;
+
+            lock (_lock)
+            {
+                old = _number;
+                _number = value;
+            }
 
             NumberChanged?.Invoke(this, old, value);
         }
     }
     public string Name { get; init; }
     public decimal Size { get; init; }
-    public ItemAction AvailiableActions { get; init; }
+    public ItemAction AvailableActions { get; init; }
     private readonly Dictionary<string, object> _metaData;
     public IReadOnlyDictionary<string, object> MetaData
     {
         get
         {
-            _lock.EnterReadLock();
-            try
-            {
+            lock (_lock)
                 return new Dictionary<string, object>(_metaData);
-            }
-            finally
-            {
-                _lock.ExitReadLock();
-            }
         }
     }
 
@@ -61,7 +50,7 @@ public class Item : IEquatable<Item>, IEquatable<Dictionary<string, object>>
     internal Item(ItemsRegistry itemsRegistry, uint itemId, uint number, Dictionary<string, object>? metaData = null)
     {
         var itemRegistryEntry = itemsRegistry.Get(itemId);
-        AvailiableActions = itemRegistryEntry.AvailableActions;
+        AvailableActions = itemRegistryEntry.AvailableActions;
         Size = itemRegistryEntry.Size;
         Name = itemRegistryEntry.Name;
         ItemId = itemRegistryEntry.Id;
@@ -78,8 +67,7 @@ public class Item : IEquatable<Item>, IEquatable<Dictionary<string, object>>
 
     public bool SetMetadata(string key, object value)
     {
-        _lock.EnterWriteLock();
-        try
+        lock (_lock)
         {
             if (value is string or double or int)
             {
@@ -89,24 +77,15 @@ public class Item : IEquatable<Item>, IEquatable<Dictionary<string, object>>
             }
             return false;
         }
-        finally
-        {
-            _lock.ExitWriteLock();
-        }
     }
 
     public object? GetMetadata(string key)
     {
-        _lock.EnterReadLock();
-        try
+        lock (_lock)
         {
             if (_metaData.TryGetValue(key, out var value))
                 return value;
             return null;
-        }
-        finally
-        {
-            _lock.ExitReadLock();
         }
     }
 
@@ -115,7 +94,7 @@ public class Item : IEquatable<Item>, IEquatable<Dictionary<string, object>>
         var value = GetMetadata(key);
         if (value == null)
         {
-            return default(T);
+            return default;
         }
         return (T)Convert.ChangeType(value, typeof(T));
     }
@@ -132,15 +111,8 @@ public class Item : IEquatable<Item>, IEquatable<Dictionary<string, object>>
 
     public bool HasMetadata(string key)
     {
-        _lock.EnterReadLock();
-        try
-        {
+        lock (_lock)
             return _metaData.ContainsKey(key);
-        }
-        finally
-        {
-            _lock.ExitReadLock();
-        }
     }
 
     public override string ToString() => Name;
@@ -166,8 +138,7 @@ public class Item : IEquatable<Item>, IEquatable<Dictionary<string, object>>
         if (other == null)
             return false;
 
-        _lock.EnterReadLock();
-        try
+        lock (_lock)
         {
             if (_metaData.Count != other.Count)
                 return false;
@@ -180,10 +151,6 @@ public class Item : IEquatable<Item>, IEquatable<Dictionary<string, object>>
                 }
             }
             return true;
-        }
-        finally
-        {
-            _lock.ExitReadLock();
         }
     }
 }
