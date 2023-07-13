@@ -26,10 +26,6 @@ public class RPGServerBuilder
 
     public IRPGServer Build(IServerFilesProvider? serverFilesProvider = null, string? basePath = null, Action<ServerBuilder>? extraBuilderSteps = null)
     {
-        if (_logger == null)
-            throw new Exception("Logger not configured.");
-        if (_console == null)
-            throw new Exception("Console not configured.");
         if (_realmConfigurationProvider == null)
             throw new Exception("RealmConfigurationProvider not configured.");
 
@@ -39,9 +35,11 @@ public class RPGServerBuilder
 
             serverBuilder.ConfigureServices(services =>
             {
-                services.AddLogging(x => x.AddSerilog(_logger, dispose: true));
+                if(_logger != null)
+                    services.AddLogging(x => x.AddSerilog(_logger, dispose: true));
                 services.AddTransient<ILogger>(x => x.GetRequiredService<ILogger<MtaServer>>());
-                services.AddSingleton(typeof(IConsole), _console);
+                if(_console != null)
+                    services.AddSingleton(typeof(IConsole), _console);
 #if DEBUG
                 serverFilesProvider ??= new ServerFilesProvider(basePath ?? "../../../Server");
 #else
