@@ -42,6 +42,7 @@
     <ProjectReference Include="..\RealmCore.Resources.Addons.GuiSystem.DGS\RealmCore.Resources.Addons.GuiSystem.DGS.csproj" />
     <ProjectReference Include="..\RealmCore.Resources.Admin\RealmCore.Resources.Admin.csproj" />
     <ProjectReference Include="..\RealmCore.Resources.AFK\RealmCore.Resources.AFK.csproj" />
+    <ProjectReference Include="..\RealmCore.Resources.Assets\RealmCore.Resources.Assets.csproj" />
     <ProjectReference Include="..\RealmCore.Resources.CEFBlazorGui\RealmCore.Resources.CEFBlazorGui.csproj" />
     <ProjectReference Include="..\RealmCore.Resources.GuiSystem\RealmCore.Resources.GuiSystem.csproj" />
     <ProjectReference Include="..\RealmCore.Resources.ClientInterface\RealmCore.Resources.ClientInterface.csproj" />
