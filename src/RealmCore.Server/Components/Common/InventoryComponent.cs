@@ -64,6 +64,13 @@ public class InventoryComponent : Component
         lock (_lock)
             return _items.Any(x => x.ItemId == itemId);
     }
+    
+    public bool HasItem(Func<Item, bool> callback)
+    {
+        ThrowIfDisposed();
+        lock (_lock)
+            return _items.Any(callback);
+    }
 
     internal bool InternalHasItem(Item item) => _items.Contains(item);
 
@@ -79,6 +86,13 @@ public class InventoryComponent : Component
         ThrowIfDisposed();
         lock (_lock)
             return _items.Count(x => x.ItemId == itemId);
+    }
+
+    public int SumItemsNumberById(uint itemId)
+    {
+        ThrowIfDisposed();
+        lock (_lock)
+            return (int)_items.Where(x => x.ItemId == itemId).Sum(x => x.Number);
     }
 
     public IReadOnlyList<Item> GetItemsById(uint itemId)
@@ -210,13 +224,22 @@ public class InventoryComponent : Component
 
     public bool RemoveItem(Item item, uint number = 1)
     {
+        return RemoveItem(item, out var _, number);
+    }
+
+    public bool RemoveItem(Item item, out uint removedNumber, uint number = 1)
+    {
         ThrowIfDisposed();
         if (number == 0 || !HasItem(item))
+        {
+            removedNumber = 0;
             return false;
+        }
 
         if (item.Number > number)
         {
             item.Number -= number;
+            removedNumber = number;
             ItemChanged?.Invoke(this, item);
         }
         else
@@ -226,6 +249,7 @@ public class InventoryComponent : Component
                     throw new InvalidOperationException();
 
             item.Changed -= HandleItemChanged;
+            removedNumber = item.Number;
             ItemRemoved?.Invoke(this, item);
         }
         return true;
@@ -235,7 +259,13 @@ public class InventoryComponent : Component
     {
         ThrowIfDisposed();
         if (TryGetByItemId(id, out var item))
-            return RemoveItem(item, number);
+        {
+            var success = RemoveItem(item, out var removedNumber, number);
+            var left = number - removedNumber;
+            if (left > 0)
+                success = RemoveItem(id, left);
+            return success;
+        }
         return false;
     }
 
@@ -271,5 +301,34 @@ public class InventoryComponent : Component
         ThrowIfDisposed();
 
         return Number + itemsRegistry.Get(itemId).Size * number <= Size;
+    }
+
+    public bool TransferItem(InventoryComponent destination, ItemsRegistry itemsRegistry, uint itemId, uint number, bool force)
+    {
+        ThrowIfDisposed();
+
+        if (SumItemsNumberById(itemId) >= number && RemoveItem(itemId, number))
+        {
+            try
+            {
+                destination.AddItem(itemsRegistry, itemId, number, force: force);
+                return true;
+            }
+            catch(InventoryNotEnoughSpaceException)
+            {
+                AddItem(itemsRegistry, itemId, number);
+                return false;
+            }
+        }
+        return false;
+    }
+
+    public void Clear()
+    {
+        ThrowIfDisposed();
+
+        var items = Items.ToList();
+        foreach (var item in items)
+            RemoveItem(item, item.Number);
     }
 }

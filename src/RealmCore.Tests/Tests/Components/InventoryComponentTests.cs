@@ -1,4 +1,6 @@
-﻿namespace RealmCore.Tests.Tests.Components;
+﻿using RealmCore.Server.Components.Common;
+
+namespace RealmCore.Tests.Tests.Components;
 
 public class InventoryComponentTests
 {
@@ -136,6 +138,16 @@ public class InventoryComponentTests
     }
     
     [Fact]
+    public void SumItemsNumberByIdShouldWork()
+    {
+        _inventoryComponent.AddItem(_itemsRegistry, 2, 4);
+        _inventoryComponent.AddItem(_itemsRegistry, 2, 3);
+        _inventoryComponent.AddItem(_itemsRegistry, 6, 5);
+
+        _inventoryComponent.SumItemsById(2).Should().Be(7);
+    }
+    
+    [Fact]
     public void GetItemsByIdShouldWork()
     {
         var item1 = _inventoryComponent.AddItem(_itemsRegistry, 2, 1).First();
@@ -240,6 +252,15 @@ public class InventoryComponentTests
         _inventoryComponent.RemoveItem(item);
         _inventoryComponent.Items.Should().BeEmpty();
     }
+    
+    [Fact]
+    public void RemoveItemRemoveMultipleStacks()
+    {
+        _inventoryComponent.AddItem(_itemsRegistry, 1, 20);
+        _inventoryComponent.RemoveItem(1, 20);
+        _inventoryComponent.Number.Should().Be(0);
+        _inventoryComponent.Items.Should().BeEmpty();
+    }
 
     [Fact]
     public void RemoveItemByIdShouldWork()
@@ -279,5 +300,47 @@ public class InventoryComponentTests
 
         act.Should().NotThrow();
         act.Should().Throw<InventoryNotEnoughSpaceException>().Where(x => x.InventorySize == 5 && x.RequiredSpace == 8);
+    }
+    
+    [Fact]
+    public void Clear()
+    {
+        #region Arrange
+        _inventoryComponent.AddItem(_itemsRegistry, 1, 2);
+        _inventoryComponent.AddItem(_itemsRegistry, 2, 3);
+        _inventoryComponent.AddItem(_itemsRegistry, 3, 4);
+        #endregion
+
+        #region Act
+        _inventoryComponent.Clear();
+        #endregion
+
+        #region Assert
+        _inventoryComponent.Number.Should().Be(0);
+        _inventoryComponent.Items.Should().BeEmpty();
+        #endregion
+    }
+
+    [InlineData(1, true, 9, 1)]
+    [InlineData(10, true, 0, 10)]
+    [InlineData(11, false, 10, 0)]
+    [Theory]
+    public void TransferItemTest(uint numberOfItems, bool success, int expectedNumberOfItemsInSourceInventory, int expectedNumberOfItemsInDestinationInventory)
+    {
+        #region Arrange
+        _inventoryComponent.Clear();
+        var destinationInventory = new InventoryComponent(10);
+        _inventoryComponent.AddItem(_itemsRegistry, 1, 10);
+        #endregion
+
+        #region Act
+        var isSuccess = _inventoryComponent.TransferItem(destinationInventory, _itemsRegistry, 1, numberOfItems, false);
+        #endregion
+
+        #region Assert
+        isSuccess.Should().Be(success);
+        _inventoryComponent.Number.Should().Be(expectedNumberOfItemsInSourceInventory);
+        destinationInventory.Number.Should().Be(expectedNumberOfItemsInDestinationInventory);
+        #endregion
     }
 }
