@@ -14,20 +14,18 @@ internal class AssetsLogic
     private readonly AssetsRegistry _assetsRegistry;
     private readonly IAssetsService _assetsService;
     private readonly LuaEventService _luaEventService;
-    public AssetsLogic(MtaServer server, AssetsRegistry assetsRegistry, IAssetsService assetsService, LuaEventService luaEventService, ILogger<AssetsLogic> logger, IEnumerable<IServerAssetsProvider> serverAssetsProviders)
+    public AssetsLogic(MtaServer mtaServer, AssetsRegistry assetsRegistry, IAssetsService assetsService, LuaEventService luaEventService)
     {
-        server.PlayerJoined += HandlePlayerJoin;
-
         _assetsRegistry = assetsRegistry;
         _assetsService = assetsService;
         _luaEventService = luaEventService;
         luaEventService.AddEventHandler("internalRequestAssets", HandleInternalRequestAssets);
+        _resource = mtaServer.GetAdditionalResource<AssetsResource>();
 
         _assetsService.ReplaceModelForPlayer = HandleReplaceModelForPlayer;
         _assetsService.RestoreModelForPlayer = HandleRestoreModelForPlayer;
-        _resource = new AssetsResource(server, serverAssetsProviders);
-        server.AddAdditionalResource(_resource, _resource.AdditionalFiles);
-        logger.LogInformation("Loaded {count} assets of total size: {sizeInMB:N4}MB", _resource.AdditionalFiles.Count, _resource.ContentSize / 1024.0f / 1024.0f);
+
+        mtaServer.PlayerJoined += HandlePlayerJoin;
     }
 
     private void HandlePlayerJoin(Player player)

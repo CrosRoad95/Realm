@@ -32,9 +32,10 @@ do
 end
 """;
 
-    internal AssetsResource(MtaServer server, IEnumerable<IServerAssetsProvider> serverAssetsProviders)
+    internal AssetsResource(MtaServer server)
         : base(server, server.GetRequiredService<RootElement>(), "Assets")
     {
+        var serverAssetsProviders = server.GetRequiredService<IEnumerable<IServerAssetsProvider>>();
         var encryptionProvider = server.GetRequiredService<IAssetEncryptionProvider>();
         var assetsRegistry = server.GetRequiredService<AssetsRegistry>();
 
@@ -68,18 +69,22 @@ end
         var keyBase64 = Convert.ToBase64String(encryptionProvider.Key);
         var decryptString = string.Format(_decryptScript, keyBase64, "{", "}");
 
-        var modelsToReplace = new StringBuilder();
-        foreach (var item in assetsRegistry.ReplacedModels)
+        if(assetsRegistry.ReplacedModels.Any())
         {
-            var asset = assetsRegistry.GetAsset<IModel>(item.Value);
-            var col = Utilities.CreateMD5(asset.ColPath);
-            var dff = Utilities.CreateMD5(asset.DffPath);
-            modelsToReplace.AppendLine($"local col = engineLoadCOL(decryptAsset(\"{col}\"));engineReplaceCOL(col,{(int)item.Key});");
-            modelsToReplace.AppendLine($"local dff = engineLoadDFF(decryptAsset(\"{dff}\"));engineReplaceModel(dff,{(int)item.Key});");
+            var modelsToReplace = new StringBuilder();
+            foreach (var item in assetsRegistry.ReplacedModels)
+            {
+                var asset = assetsRegistry.GetAsset<IModel>(item.Value);
+                var col = Utilities.CreateMD5(asset.ColPath);
+                var dff = Utilities.CreateMD5(asset.DffPath);
+                modelsToReplace.AppendLine($"local col = engineLoadCOL(decryptAsset(\"{col}\"));engineReplaceCOL(col,{(int)item.Key});");
+                modelsToReplace.AppendLine($"local dff = engineLoadDFF(decryptAsset(\"{dff}\"));engineReplaceModel(dff,{(int)item.Key});");
+            }
+
+            NoClientScripts.Add("decrypt.lua", Encoding.UTF8.GetBytes(decryptString));
+            NoClientScripts.Add("modelsToReplace.lua", Encoding.UTF8.GetBytes(modelsToReplace.ToString()));
         }
 
-        NoClientScripts.Add("decrypt.lua", Encoding.UTF8.GetBytes(decryptString));
-        NoClientScripts.Add("modelsToReplace.lua", Encoding.UTF8.GetBytes(modelsToReplace.ToString()));
         Exports.Add("requestAsset");
     }
 }

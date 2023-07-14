@@ -5,6 +5,7 @@ using RealmCore.Server.Extensions;
 using RealmCore.Resources.Nametags;
 using RealmCore.Resources.Admin.Enums;
 using SlipeServer.Server.Services;
+using RealmCore.Resources.GuiSystem;
 
 namespace RealmCore.Console.Logic;
 
@@ -14,13 +15,15 @@ internal sealed class PlayerJoinedLogic
     private readonly ILogger<PlayerJoinedLogic> _logger;
     private readonly INametagsService _nametagsService;
     private readonly ChatBox _chatBox;
+    private readonly IGuiSystemService? _guiSystemService;
 
-    public PlayerJoinedLogic(IECS ecs, ILogger<PlayerJoinedLogic> logger, INametagsService nametagsService, ChatBox chatBox)
+    public PlayerJoinedLogic(IECS ecs, ILogger<PlayerJoinedLogic> logger, INametagsService nametagsService, ChatBox chatBox, IGuiSystemService? guiSystemService = null)
     {
         _ecs = ecs;
         _logger = logger;
         _nametagsService = nametagsService;
         _chatBox = chatBox;
+        _guiSystemService = guiSystemService;
         _ecs.EntityCreated += HandleEntityCreated;
     }
 
@@ -64,7 +67,8 @@ internal sealed class PlayerJoinedLogic
                 var entity = component.Entity;
                 var playerElementComponent = component.Entity.GetRequiredComponent<PlayerElementComponent>();
                 await playerElementComponent.FadeCameraAsync(CameraFade.Out);
-                playerElementComponent.SetGuiDebugToolsEnabled(true);
+                if (_guiSystemService != null)
+                    _guiSystemService.SetDebugToolsEnabled(RealmInternal.GetPlayer(playerElementComponent), true);
                 _chatBox.SetVisibleFor(entity, true);
                 _chatBox.ClearFor(entity);
                 playerElementComponent.SetCameraTarget(component.Entity);

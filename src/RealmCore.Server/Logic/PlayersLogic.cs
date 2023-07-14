@@ -19,7 +19,7 @@ internal class PlayersLogic
     private readonly ConcurrentDictionary<Player, Latch> _playerResources = new();
 
     public PlayersLogic(IECS ecs, IServiceProvider serviceProvider,
-        RealmDbContextFactory realmDbContextFactory, MtaServer mtaServer, IClientInterfaceService clientInterfaceService, IDateTimeProvider dateTimeProvider, ISaveService saveService, ILogger<PlayersLogic> logger, IResourceProvider resourceProvider, MtaServer asd)
+        RealmDbContextFactory realmDbContextFactory, MtaServer mtaServer, IClientInterfaceService clientInterfaceService, IDateTimeProvider dateTimeProvider, ISaveService saveService, ILogger<PlayersLogic> logger, IResourceProvider resourceProvider)
     {
         _ecs = ecs;
         _serviceProvider = serviceProvider;

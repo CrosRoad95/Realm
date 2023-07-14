@@ -13,8 +13,6 @@ public sealed class PlayerElementComponent : PedElementComponent
     [Inject]
     private IClientInterfaceService ClientInterfaceService { get; set; } = default!;
     [Inject]
-    private IGuiSystemService GuiSystemService { get; set; } = default!;
-    [Inject]
     private Text3dService Text3dService { get; set; } = default!;
     [Inject]
     private ILogger<PlayerElementComponent> Logger { get; set; } = default!;
@@ -639,12 +637,6 @@ public sealed class PlayerElementComponent : PedElementComponent
                 TrySetCooldown(key, keyState, DateTimeProvider.Now.AddMilliseconds(400));
             }
         }
-    }
-
-    public void SetGuiDebugToolsEnabled(bool enabled)
-    {
-        ThrowIfDisposed();
-        GuiSystemService.SetDebugToolsEnabled(_player, enabled);
     }
 
     public void SetText3dRenderingEnabled(bool enabled)
