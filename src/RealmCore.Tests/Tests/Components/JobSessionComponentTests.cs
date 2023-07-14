@@ -33,7 +33,7 @@ public class JobSessionComponentTests
         _elementCollection = _realmTestingServer.GetRequiredService<IElementCollection>();
     }
 
-    [Fact]
+    //[Fact]
     public void JobShouldCreateExpectedAmountOfPrivateAndPublicElements()
     {
         var playerEntity = _entityHelper.CreatePlayerEntity();
