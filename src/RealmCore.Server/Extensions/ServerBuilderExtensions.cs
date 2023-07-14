@@ -1,4 +1,5 @@
 ﻿using RealmCore.Persistance;
+using RealmCore.Server.Serving;
 using SlipeServer.Resources.Scoreboard;
 
 namespace RealmCore.Server.Extensions;
@@ -18,6 +19,7 @@ public static class ServerBuilderExtensions
         }
         else
         {
+            serverBuilder.AddResourceServer<RealmResourceServer>();
             var exceptBehaviours = ServerBuilderDefaultBehaviours.DefaultChatBehaviour;
 #if DEBUG
             serverBuilder.AddDefaults(exceptBehaviours: ServerBuilderDefaultBehaviours.MasterServerAnnouncementBehaviour | exceptBehaviours);

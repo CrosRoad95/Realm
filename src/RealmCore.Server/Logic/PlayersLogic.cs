@@ -1,11 +1,12 @@
 ﻿using RealmCore.Persistance;
+using RealmCore.Server.Serving;
 using RealmCore.Server.Utilities;
+using SlipeServer.Server.Resources.Providers;
 
 namespace RealmCore.Server.Logic;
 
 internal class PlayersLogic
 {
-    const int RESOURCES_COUNT = 14;
     private readonly IECS _ecs;
     private readonly IServiceProvider _serviceProvider;
     private readonly RealmDbContextFactory _realmDbContextFactory;
@@ -14,10 +15,11 @@ internal class PlayersLogic
     private readonly IDateTimeProvider _dateTimeProvider;
     private readonly ISaveService _saveService;
     private readonly ILogger<PlayersLogic> _logger;
+    private readonly IResourceProvider _resourceProvider;
     private readonly ConcurrentDictionary<Player, Latch> _playerResources = new();
 
     public PlayersLogic(IECS ecs, IServiceProvider serviceProvider,
-        RealmDbContextFactory realmDbContextFactory, MtaServer mtaServer, IClientInterfaceService clientInterfaceService, IDateTimeProvider dateTimeProvider, ISaveService saveService, ILogger<PlayersLogic> logger)
+        RealmDbContextFactory realmDbContextFactory, MtaServer mtaServer, IClientInterfaceService clientInterfaceService, IDateTimeProvider dateTimeProvider, ISaveService saveService, ILogger<PlayersLogic> logger, IResourceProvider resourceProvider, MtaServer asd)
     {
         _ecs = ecs;
         _serviceProvider = serviceProvider;
@@ -27,15 +29,17 @@ internal class PlayersLogic
         _dateTimeProvider = dateTimeProvider;
         _saveService = saveService;
         _logger = logger;
+        _resourceProvider = resourceProvider;
         _ecs.EntityCreated += HandleEntityCreated;
         _mtaServer.PlayerJoined += HandlePlayerJoined;
     }
 
     private async void HandlePlayerJoined(Player player)
     {
+        var resources = _resourceProvider.GetResources();
         try
         {
-            _playerResources[player] = new Latch(RESOURCES_COUNT, TimeSpan.FromSeconds(60));
+            _playerResources[player] = new Latch(RealmResourceServer._resourceCounter, TimeSpan.FromSeconds(60));
             player.ResourceStarted += HandlePlayerResourceStarted;
             player.Disconnected += HandlePlayerDisconnected;
 

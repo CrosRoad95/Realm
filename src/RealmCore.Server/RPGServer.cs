@@ -1,5 +1,7 @@
 ﻿using Microsoft.Extensions.Localization;
 using RealmCore.Persistance;
+using RealmCore.Server.Serving;
+using SlipeServer.Server.Resources.Serving;
 
 namespace RealmCore.Server;
 
@@ -32,7 +34,6 @@ internal sealed class RPGServer : IRPGServer
                 builder.ConfigureServices(x => ConfigureServices(x, realmConfigurationProvider));
             }
         );
-
         _logger = GetRequiredService<ILogger<RPGServer>>();
     }
 
@@ -120,6 +121,7 @@ internal sealed class RPGServer : IRPGServer
 
         ServerStarted?.Invoke();
         _logger.LogInformation(_stringLocalizer.GetOr("ServerStarted", "Server started."));
+        _logger.LogInformation("Found resources: {resourcesCount}", RealmResourceServer._resourceCounter);
         _server.Start();
     }
 
