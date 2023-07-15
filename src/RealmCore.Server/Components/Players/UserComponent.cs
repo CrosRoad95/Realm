@@ -16,7 +16,7 @@ public class UserComponent : AsyncComponent
     private object _upgradesLock = new();
     private readonly ConcurrentDictionary<int, string> _settings = new();
 
-    internal UserData User => _user;
+    public UserData User => _user;
     public ClaimsPrincipal ClaimsPrincipal => _claimsPrincipal ?? throw new ArgumentNullException(nameof(_claimsPrincipal));
     public int Id => _user.Id;
     public string? UserName => _user.UserName;
