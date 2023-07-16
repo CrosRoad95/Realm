@@ -405,6 +405,57 @@ namespace RealmCore.Persistence.SQLite.Migrations
                     b.ToTable("JobUpgrades", (string)null);
                 });
 
+            modelBuilder.Entity("RealmCore.Persistance.Data.OpinionData", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTime>("DateTime")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Opinion")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("OpinionId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Opinions", (string)null);
+                });
+
+            modelBuilder.Entity("RealmCore.Persistance.Data.RatingData", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTime>("DateTime")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("Rating")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("RatingId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Ratings", (string)null);
+                });
+
             modelBuilder.Entity("RealmCore.Persistance.Data.RoleData", b =>
                 {
                     b.Property<int>("Id")
@@ -1075,6 +1126,28 @@ namespace RealmCore.Persistence.SQLite.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("RealmCore.Persistance.Data.OpinionData", b =>
+                {
+                    b.HasOne("RealmCore.Persistance.Data.UserData", "User")
+                        .WithMany("Opinions")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("RealmCore.Persistance.Data.RatingData", b =>
+                {
+                    b.HasOne("RealmCore.Persistance.Data.UserData", "User")
+                        .WithMany("Ratings")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("RealmCore.Persistance.Data.UserInventoryData", b =>
                 {
                     b.HasOne("RealmCore.Persistance.Data.InventoryData", "Inventory")
@@ -1269,6 +1342,10 @@ namespace RealmCore.Persistence.SQLite.Migrations
                     b.Navigation("JobUpgrades");
 
                     b.Navigation("Licenses");
+
+                    b.Navigation("Opinions");
+
+                    b.Navigation("Ratings");
 
                     b.Navigation("Rewards");
 

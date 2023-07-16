@@ -49,7 +49,7 @@ internal sealed class CommandsLogic
     public CommandsLogic(RPGCommandService commandService, IEntityFactory entityFactory, RepositoryFactory repositoryFactory,
         ItemsRegistry itemsRegistry, IECS ecs, IBanService banService, IDiscordService discordService, ChatBox chatBox, ILogger<CommandsLogic> logger,
         IDateTimeProvider dateTimeProvider, INametagsService nametagsService, IUsersService userManager, IVehiclesService vehiclesService,
-        GameWorld gameWorld, IElementOutlineService elementOutlineService, IAssetsService assetsService, ISpawnMarkersService spawnMarkersService, ILoadService loadService)
+        GameWorld gameWorld, IElementOutlineService elementOutlineService, IAssetsService assetsService, ISpawnMarkersService spawnMarkersService, ILoadService loadService, IFeedbackService feedbackService)
     {
         _commandService = commandService;
         _entityFactory = entityFactory;
@@ -1101,6 +1101,26 @@ internal sealed class CommandsLogic
             {
                 _chatBox.OutputTo(entity, $"Player: {item.GetRequiredComponent<UserComponent>().UserName}");
             }
+        });
+        
+        _commandService.AddAsyncCommandHandler("addrating", async (entity, args) =>
+        {
+            var last = (await feedbackService.GetLastRating(entity, 1)) ?? (0, DateTime.MinValue);
+            if(last.Item2.AddSeconds(3) > dateTimeProvider.Now)
+            {
+                _chatBox.OutputTo(entity, "możesz ocenić maksymalnie raz na 30sekund");
+                return;
+            }
+            var rating = Random.Shared.Next(100);
+            await feedbackService.ChangeLastRating(entity, 1, rating);
+            _chatBox.OutputTo(entity, $"zmieniono ocenę z {rating} z {last.Item1}");
+        });
+        
+        
+        _commandService.AddAsyncCommandHandler("addopinion", async (entity, args) =>
+        {
+            await feedbackService.AddOpinion(entity, 1, string.Join(", ", args));
+            _chatBox.OutputTo(entity, "Opinia dodana");
         });
 
         FontCollection collection = new();

@@ -8,16 +8,14 @@ namespace RealmCore.MySql;
 [ExcludeFromCodeCoverage]
 public sealed class DbFactory : IDesignTimeDbContextFactory<MySqlDb>
 {
-    private readonly IRealmConfigurationProvider _realmConfigurationProvider;
-
-    public DbFactory(IRealmConfigurationProvider realmConfigurationProvider)
+    public DbFactory()
     {
-        _realmConfigurationProvider = realmConfigurationProvider;
     }
 
     public MySqlDb CreateDbContext(string[] args)
     {
-        var connectionString = _realmConfigurationProvider.Get<string>("Database:ConnectionString");
+        var realmConfigurationProvider = new RealmConfigurationProvider();
+        var connectionString = realmConfigurationProvider.Get<string>("Database:ConnectionString");
 
         var builder = new DbContextOptionsBuilder<MySqlDb>();
         builder.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString));

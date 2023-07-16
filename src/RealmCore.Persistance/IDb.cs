@@ -36,6 +36,8 @@ public interface IDb : IDisposable
     DbSet<UserInventoryData> UserInventories { get; }
     DbSet<VehicleInventoryData> VehicleInventories { get; }
     DbSet<VehicleEventData> VehicleEvents { get; }
+    DbSet<RatingData> Ratings { get; }
+    DbSet<OpinionData> Opinions { get; }
 
     Task MigrateAsync();
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);

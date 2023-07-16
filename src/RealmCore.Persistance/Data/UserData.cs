@@ -38,4 +38,6 @@ public sealed class UserData : IdentityUser<int>
     public ICollection<UserSettingData> Settings { get; set; } = new List<UserSettingData>();
     public ICollection<UserWhitelistedSerialData> WhitelistedSerials { get; set; } = new List<UserWhitelistedSerialData>();
     public ICollection<UserInventoryData> UserInventories = new List<UserInventoryData>();
+    public ICollection<RatingData> Ratings = new List<RatingData>();
+    public ICollection<OpinionData> Opinions = new List<OpinionData>();
 }

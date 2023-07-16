@@ -1,4 +1,5 @@
-﻿using RealmCore.Persistance.Data.Helpers;
+﻿using Microsoft.Extensions.Options;
+using RealmCore.Persistance.Data.Helpers;
 using System.Diagnostics.CodeAnalysis;
 
 namespace RealmCore.Persistance;
@@ -39,6 +40,8 @@ public abstract class Db<T> : IdentityDbContext<UserData, RoleData, int,
     public DbSet<UserInventoryData> UserInventories => Set<UserInventoryData>();
     public DbSet<VehicleInventoryData> VehicleInventories => Set<VehicleInventoryData>();
     public DbSet<VehicleEventData> VehicleEvents => Set<VehicleEventData>();
+    public DbSet<RatingData> Ratings => Set<RatingData>();
+    public DbSet<OpinionData> Opinions => Set<OpinionData>();
 
     public Db(DbContextOptions<T> options) : base(options)
     {
@@ -169,6 +172,17 @@ public abstract class Db<T> : IdentityDbContext<UserData, RoleData, int,
                 .HasOne(x => x.DiscordIntegration)
                 .WithOne(x => x.User)
                 .HasForeignKey<DiscordIntegrationData>(x => x.UserId);
+
+            entityBuilder
+                .HasMany(x => x.Ratings)
+                .WithOne(x => x.User)
+                .HasForeignKey(x => x.UserId);
+            
+            entityBuilder
+                .HasMany(x => x.Opinions)
+                .WithOne(x => x.User)
+                .HasForeignKey(x => x.UserId);
+
         });
 
         modelBuilder.Entity<InventoryData>(entityBuilder =>
@@ -611,6 +625,20 @@ public abstract class Db<T> : IdentityDbContext<UserData, RoleData, int,
             entityBuilder
                 .ToTable(nameof(VehicleInventories))
                 .HasKey(x => new { x.VehicleId, x.InventoryId });
+        });
+
+        modelBuilder.Entity<RatingData>(entityBuilder =>
+        {
+            entityBuilder
+                .ToTable(nameof(Ratings))
+                .HasKey(x => x.Id);
+        });
+        
+        modelBuilder.Entity<OpinionData>(entityBuilder =>
+        {
+            entityBuilder
+                .ToTable(nameof(Opinions))
+                .HasKey(x => x.Id);
         });
     }
 }
