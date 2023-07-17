@@ -24,6 +24,7 @@ internal class VehicleEventRepository : IVehicleEventRepository
     public async Task<List<VehicleEventDTO>> GetAllEventsByVehicleId(int vehicleId)
     {
         return await _db.VehicleEvents
+            .TagWithSource(nameof(VehicleEventRepository))
             .Where(x => x.VehicleId == vehicleId)
             .Select(x => new VehicleEventDTO
             {
@@ -31,6 +32,15 @@ internal class VehicleEventRepository : IVehicleEventRepository
                 DateTime = x.DateTime
             })
             .ToListAsync();
+    }
+
+    public async Task<List<VehicleUserAccessData>> GetAllVehicleAccesses(int vehicleId)
+    {
+        var query = _db.VehicleUserAccess
+            .TagWithSource(nameof(VehicleEventRepository))
+            .Include(x => x.User)
+            .Where(x => x.VehicleId == vehicleId);
+        return await query.ToListAsync();
     }
 
     public void Dispose()

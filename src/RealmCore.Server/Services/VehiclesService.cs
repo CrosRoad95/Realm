@@ -98,6 +98,12 @@ internal sealed class VehiclesService : IVehiclesService
         return _vehicleRepository.SetSpawned(id, spawned);
     }
 
+    public async Task<VehicleAccess> GetVehicleAccess(int vehicleId)
+    {
+        var vehiclesAccesses = await _vehicleEventRepository.GetAllVehicleAccesses(vehicleId);
+        return new VehicleAccess(vehiclesAccesses);
+    }
+
     public Entity Spawn(VehicleData vehicleData)
     {
         var entity = _entityFactory.CreateVehicle(vehicleData.Model, vehicleData.TransformAndMotion.Position, vehicleData.TransformAndMotion.Rotation, new ConstructionInfo

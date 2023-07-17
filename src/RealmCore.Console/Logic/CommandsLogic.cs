@@ -129,7 +129,7 @@ internal sealed class CommandsLogic
             vehicleEntity.AddComponent<VehicleEngineComponent>();
             vehicleEntity.AddComponent(new VehicleFuelComponent(1, 20, 20, 0.01, 2)).Active = true;
             vehicleEntity.AddComponent<VehiclePartDamageComponent>().AddPart(1, 1337);
-            vehicleEntity.GetRequiredComponent<PrivateVehicleComponent>().AddAsOwner(entity);
+            vehicleEntity.GetRequiredComponent<PrivateVehicleComponent>().Access.AddAsOwner(entity);
         });
 
         _commandService.AddCommandHandler("exclusivecv", (entity, args) =>
@@ -164,7 +164,7 @@ internal sealed class CommandsLogic
         {
             var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();
             var veh = playerElementComponent.OccupiedVehicle;
-            veh.GetRequiredComponent<PrivateVehicleComponent>().AddAsOwner(entity);
+            veh.GetRequiredComponent<PrivateVehicleComponent>().Access.AddAsOwner(entity);
         });
 
         _commandService.AddCommandHandler("accessinfo", (entity, args) =>
@@ -180,7 +180,25 @@ internal sealed class CommandsLogic
             var privateVehicleComponent = veh.GetRequiredComponent<PrivateVehicleComponent>();
             _chatBox.OutputTo(entity, "Access info:");
 
-            foreach (var vehicleAccess in privateVehicleComponent.PlayerAccesses)
+            foreach (var vehicleAccess in privateVehicleComponent.Access.PlayerAccesses)
+            {
+                _chatBox.OutputTo(entity, $"Access: ({vehicleAccess.UserId}) = Ownership={vehicleAccess.AccessType == 0}");
+            }
+        });
+
+        _commandService.AddAsyncCommandHandler("accessinfobyid", async (entity, args) =>
+        {
+            using var access = await vehiclesService.GetVehicleAccess(int.Parse(args[0]));
+            if(access == null)
+            {
+                _chatBox.OutputTo(entity, "Vehicle not found");
+                return;
+            }
+
+
+            _chatBox.OutputTo(entity, "Access info:");
+
+            foreach (var vehicleAccess in access.PlayerAccesses)
             {
                 _chatBox.OutputTo(entity, $"Access: ({vehicleAccess.UserId}) = Ownership={vehicleAccess.AccessType == 0}");
             }

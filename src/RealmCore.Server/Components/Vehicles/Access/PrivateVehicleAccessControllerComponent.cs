@@ -23,7 +23,7 @@ public class PrivateVehicleAccessControllerComponent : VehicleAccessControllerCo
         if (!ECS.TryGetEntityByPlayer(player, out Entity entity))
             return false;
 
-        return _privateVehicleComponent.HasAccess(entity);
+        return _privateVehicleComponent.Access.HasAccess(entity);
     }
 
     public override void Dispose()

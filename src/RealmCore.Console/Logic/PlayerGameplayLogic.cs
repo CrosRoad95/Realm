@@ -137,7 +137,7 @@ internal sealed class PlayerGameplayLogic
                         if (entity.TryDestroyComponent<VehicleForSaleComponent>())
                         {
                             await _serviceProvider.GetRequiredService<IVehiclesService>().ConvertToPrivateVehicle(entity);
-                            entity.GetRequiredComponent<PrivateVehicleComponent>().AddAsOwner(playerEntity);
+                            entity.GetRequiredComponent<PrivateVehicleComponent>().Access.AddAsOwner(playerEntity);
                             entity.AddComponent(new VehicleUpgradesComponent());
                             entity.AddComponent(new MileageCounterComponent());
                             entity.AddComponent(new VehicleFuelComponent(1, 20, 20, 0.01, 2)).Active = true;

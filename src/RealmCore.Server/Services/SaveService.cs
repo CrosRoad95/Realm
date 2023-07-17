@@ -79,7 +79,7 @@ internal class SaveService : ISaveService
         vehicleData.Health = vehicle.Health;
         vehicleData.IsFrozen = vehicle.IsFrozen;
         vehicleData.TransformAndMotion = entity.Transform.GetTransformAndMotion();
-        vehicleData.UserAccesses = privateVehicleComponent.PlayerAccesses.Select(x => new VehicleUserAccessData
+        vehicleData.UserAccesses = privateVehicleComponent.Access.PlayerAccesses.Select(x => new VehicleUserAccessData
         {
             Id = x.Id,
             UserId = x.UserId,

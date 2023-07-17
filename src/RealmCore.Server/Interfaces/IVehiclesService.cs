@@ -13,6 +13,7 @@ public interface IVehiclesService
     Task<List<VehicleEventDTO>> GetAllVehicleEvents(Entity entity);
     Task<LightInfoVehicleDTO?> GetLightVehicleById(int vehicleId);
     Task<List<LightInfoVehicleDTO>> GetLightVehiclesByUserId(int userId);
+    Task<VehicleAccess> GetVehicleAccess(int vehicleId);
     Task<List<VehicleData>> GetVehiclesByUserId(int userId);
     Task<bool> SetVehicleKind(int id, byte kind);
     Task<bool> SetVehicleKind(Entity vehicleEntity, byte kind);
