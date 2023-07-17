@@ -1,11 +1,8 @@
-﻿using RealmCore.Server.Extensions;
-using SlipeServer.Server.Services;
-
-namespace RealmCore.Console.Commands;
+﻿namespace RealmCore.Console.Commands;
 
 
 [CommandName("givereward")]
-public sealed class GiveRewardCommand : IIngameCommand
+public sealed class GiveRewardCommand : IInGameCommand
 {
     private readonly ILogger<GiveRewardCommand> _logger;
     private readonly IRewardService _rewardService;
@@ -18,7 +15,7 @@ public sealed class GiveRewardCommand : IIngameCommand
         _chatBox = chatBox;
     }
 
-    public async Task Handle(Entity entity, string[] args)
+    public async Task Handle(Entity entity, CommandArguments args)
     {
         if (await _rewardService.TryGiveReward(entity, 1))
         {

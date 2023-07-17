@@ -2,7 +2,7 @@
 
 public class DefaultCommandsLogic
 {
-    public DefaultCommandsLogic(RPGCommandService commandService, IServiceProvider serviceProvider, IEnumerable<IIngameCommand> ingameCommands, ILogger<DefaultCommandsLogic> logger)
+    public DefaultCommandsLogic(RealmCommandService commandService, IServiceProvider serviceProvider, IEnumerable<IInGameCommand> ingameCommands, ILogger<DefaultCommandsLogic> logger)
     {
         foreach (var ingameCommand in ingameCommands)
         {
@@ -17,7 +17,7 @@ public class DefaultCommandsLogic
             var commandName = commandNameAttribute.Name.ToLower();
             commandService.AddAsyncCommandHandler(commandName, async (entity, args) =>
             {
-                var inGameCommand = serviceProvider.GetRequiredService(type) as IIngameCommand;
+                var inGameCommand = serviceProvider.GetRequiredService(type) as IInGameCommand;
                 if (inGameCommand == null)
                     throw new InvalidOperationException();
 

@@ -52,7 +52,7 @@ internal class EssentialCommandsLogic
                 var command = _serviceProvider.GetRequiredService(value) as ICommand;
                 if (command == null)
                     throw new InvalidOperationException("Expected command to implement ICommand interface");
-                command.Handle(entity, line.Split(' ').ToArray());
+                command.Handle(entity, new CommandArguments(line.Split(' ').ToArray()));
             }
             catch (Exception ex)
             {

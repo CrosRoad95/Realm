@@ -1,7 +1,6 @@
 ﻿using SixLabors.Fonts;
 using SixLabors.ImageSharp.Drawing.Processing;
 using SixLabors.ImageSharp.Formats.Jpeg;
-using SlipeServer.Server.Services;
 using System.Diagnostics;
 using Color = System.Drawing.Color;
 using Size = System.Drawing.Size;
@@ -11,7 +10,6 @@ using SlipeServer.Server.Enums;
 using RealmCore.Server.Components.World;
 using RealmCore.Server.Enums;
 using RealmCore.Server.Extensions.Resources;
-using RealmCore.Server.Extensions;
 using RealmCore.Console.Components.Huds;
 using RealmCore.Resources.Nametags;
 using RealmCore.Module.Discord.Interfaces;
@@ -28,7 +26,7 @@ namespace RealmCore.Console.Logic;
 
 internal sealed class CommandsLogic
 {
-    private readonly RPGCommandService _commandService;
+    private readonly RealmCommandService _commandService;
     private readonly IEntityFactory _entityFactory;
     private readonly RepositoryFactory _repositoryFactory;
     private readonly ItemsRegistry _itemsRegistry;
@@ -46,7 +44,7 @@ internal sealed class CommandsLogic
         public string Text { get; set; }
     }
 
-    public CommandsLogic(RPGCommandService commandService, IEntityFactory entityFactory, RepositoryFactory repositoryFactory,
+    public CommandsLogic(RealmCommandService commandService, IEntityFactory entityFactory, RepositoryFactory repositoryFactory,
         ItemsRegistry itemsRegistry, IECS ecs, IBanService banService, IDiscordService discordService, ChatBox chatBox, ILogger<CommandsLogic> logger,
         IDateTimeProvider dateTimeProvider, INametagsService nametagsService, IUsersService userManager, IVehiclesService vehiclesService,
         GameWorld gameWorld, IElementOutlineService elementOutlineService, IAssetsService assetsService, ISpawnMarkersService spawnMarkersService, ILoadService loadService, IFeedbackService feedbackService)
@@ -75,7 +73,7 @@ internal sealed class CommandsLogic
         {
             if (entity.TryGetComponent(out MoneyComponent moneyComponent))
             {
-                var amount = decimal.Parse(args.First());
+                var amount = args.ReadDecimal();
                 moneyComponent.GiveMoney(amount);
                 _chatBox.OutputTo(entity, $"gave money: {amount}, total money: {moneyComponent.Money}");
             }
@@ -85,7 +83,7 @@ internal sealed class CommandsLogic
         {
             if (entity.TryGetComponent(out MoneyComponent moneyComponent))
             {
-                var amount = decimal.Parse(args.First());
+                var amount = args.ReadDecimal();
                 moneyComponent.TakeMoney(amount);
                 _chatBox.OutputTo(entity, $"taken money: {amount}, total money: {moneyComponent.Money}");
             }
@@ -95,7 +93,7 @@ internal sealed class CommandsLogic
         {
             if (entity.TryGetComponent(out MoneyComponent moneyComponent))
             {
-                var amount = decimal.Parse(args.First());
+                var amount = args.ReadDecimal();
                 moneyComponent.Money = amount;
                 _chatBox.OutputTo(entity, $"taken money: {amount}, total money: {moneyComponent.Money}");
             }
@@ -112,7 +110,7 @@ internal sealed class CommandsLogic
         _commandService.AddCommandHandler("cv", (entity, args) =>
         {
             using var vehicleRepository = _repositoryFactory.GetVehicleRepository();
-            var vehicleEntity = _entityFactory.CreateVehicle(ushort.Parse(args.First()), entity.Transform.Position + new Vector3(4, 0, 0), entity.Transform.Rotation);
+            var vehicleEntity = _entityFactory.CreateVehicle(args.ReadUShort(), entity.Transform.Position + new Vector3(4, 0, 0), entity.Transform.Rotation);
             vehicleEntity.AddComponent<VehicleUpgradesComponent>();
             vehicleEntity.AddComponent<MileageCounterComponent>();
             vehicleEntity.AddComponent(new VehicleFuelComponent(1, 20, 20, 0.01, 2)).Active = true;
@@ -188,7 +186,7 @@ internal sealed class CommandsLogic
 
         _commandService.AddAsyncCommandHandler("accessinfobyid", async (entity, args) =>
         {
-            using var access = await vehiclesService.GetVehicleAccess(int.Parse(args[0]));
+            using var access = await vehiclesService.GetVehicleAccess(args.ReadInt());
             if(access == null)
             {
                 _chatBox.OutputTo(entity, "Vehicle not found");
@@ -322,7 +320,7 @@ internal sealed class CommandsLogic
         {
             if (entity.TryGetComponent(out LevelComponent levelComponent))
             {
-                var amount = uint.Parse(args.First());
+                var amount = args.ReadUInt();
                 levelComponent.GiveExperience(amount);
                 _chatBox.OutputTo(entity, $"gave experience: {amount}, level: {levelComponent.Level}, experience: {levelComponent.Experience}");
             }
@@ -448,7 +446,8 @@ internal sealed class CommandsLogic
 
         _commandService.AddCommandHandler("animation", (entity, args) =>
         {
-            if (Enum.TryParse<Animation>(args.FirstOrDefault(), out var animation))
+            var animationName = args.ReadWord();
+            if (Enum.TryParse<Animation>(animationName, out var animation))
             {
                 try
                 {
@@ -456,17 +455,18 @@ internal sealed class CommandsLogic
                 }
                 catch (NotSupportedException)
                 {
-                    _chatBox.OutputTo(entity, $"Animation '{args.FirstOrDefault()}' is not supported");
+                    _chatBox.OutputTo(entity, $"Animation '{animationName}' is not supported");
                 }
             }
             else
-                _chatBox.OutputTo(entity, $"Animation '{args.FirstOrDefault()}' not found.");
+                _chatBox.OutputTo(entity, $"Animation '{animationName}' not found.");
         });
 
         _commandService.AddAsyncCommandHandler("animationasync", async (entity, args) =>
         {
+            var animationName = args.ReadWord();
             var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();
-            if (Enum.TryParse<Animation>(args.FirstOrDefault(), out var animation))
+            if (Enum.TryParse<Animation>(animationName, out var animation))
             {
                 try
                 {
@@ -476,17 +476,18 @@ internal sealed class CommandsLogic
                 }
                 catch (NotSupportedException)
                 {
-                    _chatBox.OutputTo(entity, $"Animation '{args.FirstOrDefault()}' is not supported");
+                    _chatBox.OutputTo(entity, $"Animation '{animationName}' is not supported");
                 }
             }
             else
-                _chatBox.OutputTo(entity, $"Animation '{args.FirstOrDefault()}' not found.");
+                _chatBox.OutputTo(entity, $"Animation '{animationName}' not found.");
 
         });
 
         _commandService.AddAsyncCommandHandler("complexanimation", async (entity, args) =>
         {
-            if (Enum.TryParse<Animation>(args.FirstOrDefault(), out var animation))
+            var animationName = args.ReadWord();
+            if (Enum.TryParse<Animation>(animationName, out var animation))
             {
                 try
                 {
@@ -494,11 +495,11 @@ internal sealed class CommandsLogic
                 }
                 catch (NotSupportedException)
                 {
-                    _chatBox.OutputTo(entity, $"Animation '{args.FirstOrDefault()}' is not supported");
+                    _chatBox.OutputTo(entity, $"Animation '{animationName}' is not supported");
                 }
             }
             else
-                _chatBox.OutputTo(entity, $"Animation '{args.FirstOrDefault()}' not found.");
+                _chatBox.OutputTo(entity, $"Animation '{animationName}' not found.");
         });
 
         _commandService.AddCommandHandler("mygroups", (entity, args) =>
@@ -640,14 +641,14 @@ internal sealed class CommandsLogic
         _commandService.AddAsyncCommandHandler("discordsendmessage", async (entity, args) =>
         {
             var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();
-            var messageId = await _discordService.SendMessage(1079342213097607399, args.First());
+            var messageId = await _discordService.SendMessage(1079342213097607399, args.ReadAllAsString());
             _chatBox.OutputTo(entity, $"Wysłano wiadomość, id: {messageId}");
         });
 
         _commandService.AddAsyncCommandHandler("discordsendmessagetouser", async (entity, args) =>
         {
             var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();
-            var messageId = await _discordService.SendMessageToUser(659910279353729086, args.First());
+            var messageId = await _discordService.SendMessageToUser(659910279353729086, args.ReadAllAsString());
             _chatBox.OutputTo(entity, $"Wysłano wiadomość, id: {messageId}");
         });
 
@@ -704,7 +705,7 @@ internal sealed class CommandsLogic
 
         _commandService.AddCommandHandler("nametags4", (entity, args) =>
         {
-            nametagsService.SetNametagRenderingEnabled(entity, args.FirstOrDefault() == "true");
+            nametagsService.SetNametagRenderingEnabled(entity, args.ReadWord() == "true");
         });
 
         _commandService.AddAsyncCommandHandler("nametags5", async (entity, args) =>
@@ -717,12 +718,12 @@ internal sealed class CommandsLogic
 
         _commandService.AddCommandHandler("nametags6", (entity, args) =>
         {
-            nametagsService.SetLocalPlayerRenderingEnabled(entity, args.FirstOrDefault() == "true");
+            nametagsService.SetLocalPlayerRenderingEnabled(entity, args.ReadWord() == "true");
         });
 
         _commandService.AddCommandHandler("outlinerendering", (entity, args) =>
         {
-            elementOutlineService.SetRenderingEnabled(entity, args.FirstOrDefault() == "true");
+            elementOutlineService.SetRenderingEnabled(entity, args.ReadWord() == "true");
         });
 
         _commandService.AddCommandHandler("outline1", (entity, args) =>
@@ -767,7 +768,7 @@ internal sealed class CommandsLogic
 
         _commandService.AddCommandHandler("setsetting", (entity, args) =>
         {
-            entity.GetRequiredComponent<UserComponent>().SetSetting(1, args[0]);
+            entity.GetRequiredComponent<UserComponent>().SetSetting(1, args.ReadWord());
         });
 
         _commandService.AddCommandHandler("removesetting", (entity, args) =>
@@ -854,7 +855,7 @@ internal sealed class CommandsLogic
 
         _commandService.AddAsyncCommandHandler("spawnback", async (entity, args) =>
         {
-            var en = await _loadService.LoadVehicleById(int.Parse(args[0]));
+            var en = await _loadService.LoadVehicleById(args.ReadInt());
             await _vehiclesService.SetVehicleSpawned(en);
             var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();
             if (en != null)
@@ -933,12 +934,12 @@ internal sealed class CommandsLogic
 
         _commandService.AddCommandHandler("i", (entity, args) =>
         {
-            entity.Transform.Interior = byte.Parse(args.First());
+            entity.Transform.Interior = args.ReadByte();
         });
 
         _commandService.AddCommandHandler("d", (entity, args) =>
         {
-            entity.Transform.Dimension = ushort.Parse(args.First());
+            entity.Transform.Dimension = args.ReadUShort();
         });
         
         _commandService.AddCommandHandler("runtimeobject", (entity, args) =>
@@ -1015,7 +1016,7 @@ internal sealed class CommandsLogic
         
         _commandService.AddCommandHandler("setlevel", (entity, args) =>
         {
-            uint level = uint.Parse(args[0]);
+            uint level = args.ReadUInt();
             var levelComponent = entity.GetRequiredComponent<LevelComponent>();
             var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();
             void handleLevelChanged(LevelComponent that, uint level, bool up)
@@ -1103,7 +1104,7 @@ internal sealed class CommandsLogic
         
         _commandService.AddCommandHandler("getplayerbyname", (entity, args) =>
         {
-            if(userManager.TryGetPlayerByName(args.First(), out var foundPlayer))
+            if(userManager.TryGetPlayerByName(args.ReadWord(), out var foundPlayer))
             {
                 _chatBox.OutputTo(entity, "found");
             }
@@ -1113,7 +1114,7 @@ internal sealed class CommandsLogic
         
         _commandService.AddCommandHandler("findbyname", (entity, args) =>
         {
-            var players = userManager.SearchPlayersByName(args.First());
+            var players = userManager.SearchPlayersByName(args.ReadWord());
             _chatBox.OutputTo(entity, "found:");
             foreach (var item in players)
             {

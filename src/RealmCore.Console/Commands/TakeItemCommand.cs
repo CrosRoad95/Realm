@@ -1,10 +1,7 @@
-﻿using RealmCore.Server.Extensions;
-using SlipeServer.Server.Services;
-
-namespace RealmCore.Console.Commands;
+﻿namespace RealmCore.Console.Commands;
 
 [CommandName("takeitem")]
-public sealed class TakeItemCommand : IIngameCommand
+public sealed class TakeItemCommand : IInGameCommand
 {
     private readonly ILogger<TakeItemCommand> _logger;
     private readonly ItemsRegistry _itemsRegistry;
@@ -17,12 +14,12 @@ public sealed class TakeItemCommand : IIngameCommand
         _chatBox = chatBox;
     }
 
-    public Task Handle(Entity entity, string[] args)
+    public Task Handle(Entity entity, CommandArguments args)
     {
         if (entity.TryGetComponent(out InventoryComponent inventoryComponent))
         {
-            uint itemId = uint.Parse(args.ElementAtOrDefault(0) ?? "1");
-            uint count = uint.Parse(args.ElementAtOrDefault(1) ?? "1");
+            uint itemId = args.ReadUInt();
+            uint count = args.ReadUInt();
             inventoryComponent.RemoveItem(itemId);
             _chatBox.OutputTo(entity, $"Item removed, {inventoryComponent.Number}/{inventoryComponent.Size}");
         }

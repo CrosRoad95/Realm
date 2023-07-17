@@ -1,6 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using RealmCore.Resources.Assets.Interfaces;
-using SlipeServer.Server.Resources;
 using SlipeServer.Server.ServerBuilders;
 
 namespace RealmCore.Resources.Assets;

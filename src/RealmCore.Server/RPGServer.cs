@@ -1,7 +1,6 @@
 ﻿using Microsoft.Extensions.Localization;
 using RealmCore.Persistance;
 using RealmCore.Server.Serving;
-using SlipeServer.Server.Resources.Serving;
 
 namespace RealmCore.Server;
 
@@ -47,7 +46,7 @@ internal sealed class RPGServer : IRPGServer
         services.AddSingleton((IRPGServer)this);
         services.AddSingleton(this);
         services.AddSingleton<SeederServerBuilder>();
-        services.AddSingleton<RPGCommandService>();
+        services.AddSingleton<RealmCommandService>();
         #endregion
 
         #region Localization

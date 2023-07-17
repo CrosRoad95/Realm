@@ -1,5 +1,4 @@
 ﻿using RealmCore.Server.Contexts.Interfaces;
-using RealmCore.Server.Extensions;
 
 namespace RealmCore.Console.Components.Gui;
 

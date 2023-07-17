@@ -14,7 +14,7 @@ internal class SaveCommand : ICommand
         _logger = logger;
     }
 
-    public async Task Handle(Entity consoleEntity, string[] args)
+    public async Task Handle(Entity consoleEntity, CommandArguments args)
     {
         int savedEntities = 0;
         foreach (var entity in _ecs.Entities)

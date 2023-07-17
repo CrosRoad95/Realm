@@ -1,10 +1,7 @@
-﻿using RealmCore.Server.Extensions;
-using SlipeServer.Server.Services;
-
-namespace RealmCore.Console.Commands;
+﻿namespace RealmCore.Console.Commands;
 
 [CommandName("jobstats")]
-public sealed class JobsStatsCommand : IIngameCommand
+public sealed class JobsStatsCommand : IInGameCommand
 {
     private readonly ILogger<JobsStatsCommand> _logger;
     private readonly IJobService _jobService;
@@ -17,7 +14,7 @@ public sealed class JobsStatsCommand : IIngameCommand
         _chatBox = chatBox;
     }
 
-    public async Task Handle(Entity entity, string[] args)
+    public async Task Handle(Entity entity, CommandArguments args)
     {
         var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();
         var userComponent = entity.GetRequiredComponent<UserComponent>();

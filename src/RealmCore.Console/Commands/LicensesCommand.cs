@@ -1,10 +1,7 @@
-﻿using RealmCore.Server.Extensions;
-using SlipeServer.Server.Services;
-
-namespace RealmCore.Console.Commands;
+﻿namespace RealmCore.Console.Commands;
 
 [CommandName("licenses")]
-public sealed class LicensesCommand : IIngameCommand
+public sealed class LicensesCommand : IInGameCommand
 {
     private readonly ILogger<LicensesCommand> _logger;
     private readonly ChatBox _chatBox;
@@ -15,7 +12,7 @@ public sealed class LicensesCommand : IIngameCommand
         _chatBox = chatBox;
     }
 
-    public Task Handle(Entity entity, string[] args)
+    public Task Handle(Entity entity, CommandArguments args)
     {
         if (entity.TryGetComponent(out LicensesComponent licenseComponent))
         {

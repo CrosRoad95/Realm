@@ -1,6 +1,6 @@
 ﻿namespace RealmCore.Server.Interfaces;
 
-public interface IIngameCommand
+public interface IInGameCommand
 {
-    Task Handle(Entity entity, string[] args);
+    Task Handle(Entity entity, CommandArguments args);
 }

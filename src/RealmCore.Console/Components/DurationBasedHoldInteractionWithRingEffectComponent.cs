@@ -1,6 +1,5 @@
 ﻿using RealmCore.Resources.Overlay;
 using RealmCore.Server.Enums;
-using RealmCore.Server.Extensions;
 
 namespace RealmCore.Console.Components;
 

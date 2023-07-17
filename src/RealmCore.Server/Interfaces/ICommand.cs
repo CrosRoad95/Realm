@@ -2,5 +2,5 @@
 
 public interface ICommand
 {
-    Task Handle(Entity entity, string[] args);
+    Task Handle(Entity entity, CommandArguments args);
 }

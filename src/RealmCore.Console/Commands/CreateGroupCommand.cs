@@ -1,10 +1,7 @@
-﻿using RealmCore.Server.Extensions;
-using SlipeServer.Server.Services;
-
-namespace RealmCore.Console.Commands;
+﻿namespace RealmCore.Console.Commands;
 
 [CommandName("creategroup")]
-public sealed class CreateGroupCommand : IIngameCommand
+public sealed class CreateGroupCommand : IInGameCommand
 {
     private readonly ILogger<CreateGroupCommand> _logger;
     private readonly IGroupService _groupService;
@@ -17,9 +14,9 @@ public sealed class CreateGroupCommand : IIngameCommand
         _chatBox = chatBox;
     }
 
-    public async Task Handle(Entity entity, string[] args)
+    public async Task Handle(Entity entity, CommandArguments args)
     {
-        var name = args.FirstOrDefault("default");
+        var name = args.ReadWordOrDefault("default");
         try
         {
             var group = await _groupService.CreateGroup(name, "");

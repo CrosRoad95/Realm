@@ -1,7 +1,4 @@
-﻿using RealmCore.Server.Extensions;
-using SlipeServer.Server.Services;
-
-namespace RealmCore.Console.Components.Jobs;
+﻿namespace RealmCore.Console.Components.Jobs;
 
 internal class TestJobComponent : JobSessionComponent
 {

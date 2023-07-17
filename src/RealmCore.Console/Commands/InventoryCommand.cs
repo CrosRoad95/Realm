@@ -1,10 +1,7 @@
-﻿using RealmCore.Server.Extensions;
-using SlipeServer.Server.Services;
-
-namespace RealmCore.Console.Commands;
+﻿namespace RealmCore.Console.Commands;
 
 [CommandName("inventory")]
-public sealed class InventoryCommand : IIngameCommand
+public sealed class InventoryCommand : IInGameCommand
 {
     private readonly ILogger<InventoryCommand> _logger;
     private readonly ChatBox _chatBox;
@@ -15,7 +12,7 @@ public sealed class InventoryCommand : IIngameCommand
         _chatBox = chatBox;
     }
 
-    public Task Handle(Entity entity, string[] args)
+    public Task Handle(Entity entity, CommandArguments args)
     {
         if (entity.TryGetComponent(out InventoryComponent inventoryComponent))
         {

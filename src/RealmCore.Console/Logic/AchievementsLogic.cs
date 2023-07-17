@@ -1,6 +1,4 @@
 ﻿using RealmCore.Server.Abstractions;
-using RealmCore.Server.Components;
-using RealmCore.Server.Components.Players;
 namespace RealmCore.Console.Logic;
 
 internal sealed class AchievementsLogic : ComponentLogic<AchievementsComponent>

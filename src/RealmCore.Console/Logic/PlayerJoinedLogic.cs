@@ -1,10 +1,8 @@
 ﻿using RealmCore.Server.Components.Peds;
 using RealmCore.Server.Components;
 using RealmCore.Server.Enums;
-using RealmCore.Server.Extensions;
 using RealmCore.Resources.Nametags;
 using RealmCore.Resources.Admin.Enums;
-using SlipeServer.Server.Services;
 using RealmCore.Resources.GuiSystem;
 
 namespace RealmCore.Console.Logic;

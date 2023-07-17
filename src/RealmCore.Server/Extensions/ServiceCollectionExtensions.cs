@@ -21,9 +21,9 @@ public static class ServiceCollectionExtensions
         return services;
     }
 
-    public static ServiceCollection AddInGameCommand<TInGameCommand>(this ServiceCollection services) where TInGameCommand : class, IIngameCommand
+    public static ServiceCollection AddInGameCommand<TInGameCommand>(this ServiceCollection services) where TInGameCommand : class, IInGameCommand
     {
-        services.AddTransient<IIngameCommand>(x => x.GetRequiredService<TInGameCommand>());
+        services.AddTransient<IInGameCommand>(x => x.GetRequiredService<TInGameCommand>());
         services.AddTransient<TInGameCommand>();
         return services;
     }

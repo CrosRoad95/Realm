@@ -1,10 +1,7 @@
-﻿using RealmCore.Server.Extensions;
-using SlipeServer.Server.Services;
-
-namespace RealmCore.Console.Commands;
+﻿namespace RealmCore.Console.Commands;
 
 [CommandName("jobstatsall")]
-public sealed class JobsStatsAllCommand : IIngameCommand
+public sealed class JobsStatsAllCommand : IInGameCommand
 {
     private readonly ILogger<JobsStatsAllCommand> _logger;
     private readonly IJobService _jobService;
@@ -17,7 +14,7 @@ public sealed class JobsStatsAllCommand : IIngameCommand
         _chatBox = chatBox;
     }
 
-    public async Task Handle(Entity entity, string[] args)
+    public async Task Handle(Entity entity, CommandArguments args)
     {
         var stats = await _jobService.GetTotalJobStatistics(1);
         foreach (var item in stats)

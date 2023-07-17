@@ -1,5 +1,4 @@
-﻿using RealmCore.Server.Extensions;
-using RealmCore.Console.Commands;
+﻿using RealmCore.Console.Commands;
 using RealmCore.Console.Utilities;
 using RealmCore.Module.Discord.Interfaces;
 using RealmCore.Server.Integrations.Discord.Handlers;

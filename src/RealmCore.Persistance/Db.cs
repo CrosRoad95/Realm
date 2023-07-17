@@ -1,5 +1,4 @@
-﻿using Microsoft.Extensions.Options;
-using RealmCore.Persistance.Data.Helpers;
+﻿using RealmCore.Persistance.Data.Helpers;
 using System.Diagnostics.CodeAnalysis;
 
 namespace RealmCore.Persistance;

@@ -3,18 +3,18 @@ using RealmCore.Logging;
 
 namespace RealmCore.Server.Services;
 
-public class RPGCommandService
+public class RealmCommandService
 {
     private class AsyncCommandInfo
     {
-        public Func<Entity, string[], Task> Callback { get; set; }
+        public Func<Entity, CommandArguments, Task> Callback { get; set; }
         public string[]? RequiredPolicies { get; set; }
         public bool NoTracing { get; set; }
     }
 
     private class CommandInfo
     {
-        public Action<Entity, string[]> Callback { get; set; }
+        public Action<Entity, CommandArguments> Callback { get; set; }
         public string[]? RequiredPolicies { get; set; }
         public bool NoTracing { get; set; }
     }
@@ -24,11 +24,11 @@ public class RPGCommandService
     private readonly IUsersService _rpgUserManager;
     private readonly IPolicyDrivenCommandExecutor _policyDrivenCommandExecutor;
     private readonly ChatBox _chatBox;
-    private readonly ILogger<RPGCommandService> _logger;
+    private readonly ILogger<RealmCommandService> _logger;
 
     private readonly Dictionary<string, AsyncCommandInfo> _asyncCommands = new();
     private readonly Dictionary<string, CommandInfo> _commands = new();
-    public RPGCommandService(CommandService commandService, ILogger<RPGCommandService> logger, IECS ecs, IUsersService rpgUserManager, IPolicyDrivenCommandExecutor policyDrivenCommandExecutor, ChatBox chatBox)
+    public RealmCommandService(CommandService commandService, ILogger<RealmCommandService> logger, IECS ecs, IUsersService rpgUserManager, IPolicyDrivenCommandExecutor policyDrivenCommandExecutor, ChatBox chatBox)
     {
         _logger = logger;
         _commandService = commandService;
@@ -38,7 +38,7 @@ public class RPGCommandService
         _chatBox = chatBox;
     }
 
-    public bool AddAsyncCommandHandler(string commandName, Func<Entity, string[], Task> callback, string[]? requiredPolicies = null)
+    public bool AddAsyncCommandHandler(string commandName, Func<Entity, CommandArguments, Task> callback, string[]? requiredPolicies = null)
     {
         if (_asyncCommands.Keys.Any(x => string.Equals(x, commandName, StringComparison.OrdinalIgnoreCase)))
         {
@@ -61,7 +61,7 @@ public class RPGCommandService
         return true;
     }
 
-    public bool AddCommandHandler(string commandName, Action<Entity, string[]> callback, string[]? requiredPolicies = null, bool noTracing = false)
+    public bool AddCommandHandler(string commandName, Action<Entity, CommandArguments> callback, string[]? requiredPolicies = null, bool noTracing = false)
     {
         if (_commands.Keys.Any(x => string.Equals(x, commandName, StringComparison.OrdinalIgnoreCase)))
         {
@@ -129,11 +129,11 @@ public class RPGCommandService
             try
             {
                 if(userComponent.HasClaim("commandsNoLimit"))
-                    commandInfo.Callback(entity, args.Arguments);
+                    commandInfo.Callback(entity, new CommandArguments(args.Arguments));
                 else
                     _policyDrivenCommandExecutor.Execute(() =>
                     {
-                        commandInfo.Callback(entity, args.Arguments);
+                        commandInfo.Callback(entity, new CommandArguments(args.Arguments));
                     }, userComponent.Id.ToString());
             }
             catch (RateLimitRejectedException rateLimitRejectedException)
@@ -204,11 +204,11 @@ public class RPGCommandService
             {
 
                 if (userComponent.HasClaim("commandsNoLimit"))
-                    await commandInfo.Callback(entity, args.Arguments);
+                    await commandInfo.Callback(entity, new CommandArguments(args.Arguments));
                 else
                     await _policyDrivenCommandExecutor.ExecuteAsync(async () =>
                     {
-                        await commandInfo.Callback(entity, args.Arguments);
+                        await commandInfo.Callback(entity, new CommandArguments(args.Arguments));
                     }, userComponent.Id.ToString());
             }
             catch (RateLimitRejectedException rateLimitRejectedException)

@@ -1,10 +1,7 @@
-﻿using RealmCore.Server.Extensions;
-using SlipeServer.Server.Services;
-
-namespace RealmCore.Console.Commands;
+﻿namespace RealmCore.Console.Commands;
 
 [CommandName("addpoints")]
-public sealed class AddPointsCommand : IIngameCommand
+public sealed class AddPointsCommand : IInGameCommand
 {
     private readonly ILogger<AddPointsCommand> _logger;
     private readonly ChatBox _chatBox;
@@ -15,7 +12,7 @@ public sealed class AddPointsCommand : IIngameCommand
         _chatBox = chatBox;
     }
 
-    public Task Handle(Entity entity, string[] args)
+    public Task Handle(Entity entity, CommandArguments args)
     {
         entity.GetRequiredComponent<JobStatisticsComponent>().AddPoints(1, 1);
         _chatBox.OutputTo(entity, "added 1 point to job id 1");
