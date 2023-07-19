@@ -1,6 +1,6 @@
 ﻿namespace RealmCore.Server.Abstractions;
 
-public class ComponentLogic<T>
+public class ComponentLogic<T> where T: Component
 {
     public ComponentLogic(IECS ecs)
     {
@@ -10,13 +10,15 @@ public class ComponentLogic<T>
     private void HandleEntityCreated(Entity entity)
     {
         entity.ComponentAdded += HandleComponentAdded;
+        entity.ComponentDetached += HandleComponentDetached;
         entity.Disposed += HandleDisposed;
     }
 
     private void HandleDisposed(Entity entity)
     {
-        entity.ComponentAdded += HandleComponentAdded;
-        entity.ComponentDetached += HandleComponentDetached;
+        entity.ComponentAdded -= HandleComponentAdded;
+        entity.ComponentDetached -= HandleComponentDetached;
+        entity.Disposed -= HandleDisposed;
     }
 
     private void HandleComponentDetached(Component component)
