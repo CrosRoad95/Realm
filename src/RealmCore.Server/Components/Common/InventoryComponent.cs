@@ -4,11 +4,12 @@
 public class InventoryComponent : Component
 {
     private readonly List<Item> _items = new();
-    private readonly object _lock = new();
+    private readonly ReaderWriterLockSlim _semaphore = new(LockRecursionPolicy.SupportsRecursion);
     public event Action<InventoryComponent, Item>? ItemAdded;
     public event Action<InventoryComponent, Item>? ItemRemoved;
     public event Action<InventoryComponent, Item>? ItemChanged;
     public event Action<InventoryComponent, Item, ItemAction>? ItemUsed;
+    public event Action<InventoryComponent, decimal>? SizeChanged;
 
     private decimal _size;
     internal int Id { get; set; }
@@ -22,6 +23,7 @@ public class InventoryComponent : Component
         set
         {
             ThrowIfDisposed();
+            SizeChanged?.Invoke(this, value);
             _size = value;
         }
     }
@@ -31,8 +33,15 @@ public class InventoryComponent : Component
         get
         {
             ThrowIfDisposed();
-            lock (_lock)
+            _semaphore.EnterReadLock();
+            try
+            {
                 return _items.Sum(x => x.Size * x.Number);
+            }
+            finally
+            {
+                _semaphore.ExitReadLock();
+            }
         }
     }
 
@@ -41,8 +50,15 @@ public class InventoryComponent : Component
         get
         {
             ThrowIfDisposed();
-            lock (_lock)
+            _semaphore.EnterReadLock();
+            try
+            {
                 return new List<Item>(_items);
+            }
+            finally
+            {
+                _semaphore.ExitReadLock();
+            }
         }
     }
 
@@ -61,99 +77,192 @@ public class InventoryComponent : Component
     public bool HasItemById(uint itemId)
     {
         ThrowIfDisposed();
-        lock (_lock)
+        _semaphore.EnterReadLock();
+        try
+        {
             return _items.Any(x => x.ItemId == itemId);
+        }
+        finally
+        {
+            _semaphore.ExitReadLock();
+        }
     }
     
     public bool HasItem(Func<Item, bool> callback)
     {
         ThrowIfDisposed();
-        lock (_lock)
+        _semaphore.EnterReadLock();
+        try
+        {
             return _items.Any(callback);
+        }
+        finally
+        {
+            _semaphore.ExitReadLock();
+        }
     }
-
-    internal bool InternalHasItem(Item item) => _items.Contains(item);
 
     public bool HasItem(Item item)
     {
         ThrowIfDisposed();
-        lock (_lock)
-            return InternalHasItem(item);
+        _semaphore.EnterReadLock();
+        try
+        {
+            return _items.Contains(item);
+        }
+        finally
+        {
+            _semaphore.ExitReadLock();
+        }
     }
 
     public int SumItemsById(uint itemId)
     {
         ThrowIfDisposed();
-        lock (_lock)
+
+        _semaphore.EnterReadLock();
+        try
+        {
             return _items.Count(x => x.ItemId == itemId);
+        }
+        finally
+        {
+            _semaphore.ExitReadLock();
+        }
     }
 
     public int SumItemsNumberById(uint itemId)
     {
         ThrowIfDisposed();
-        lock (_lock)
+
+        _semaphore.EnterReadLock();
+        try
+        {
             return (int)_items.Where(x => x.ItemId == itemId).Sum(x => x.Number);
+        }
+        finally
+        {
+            _semaphore.ExitReadLock();
+        }
     }
 
     public IReadOnlyList<Item> GetItemsById(uint itemId)
     {
         ThrowIfDisposed();
-        lock (_lock)
+        _semaphore.EnterReadLock();
+        try
+        {
             return new List<Item>(_items.Where(x => x.ItemId == itemId));
+        }
+        finally
+        {
+            _semaphore.ExitReadLock();
+        }
     }
 
     public IReadOnlyList<Item> GetItemsByIdWithMetadata(uint itemId, string key, object? metadata)
     {
         ThrowIfDisposed();
-        lock (_lock)
+        _semaphore.EnterReadLock();
+        try
+        {
             return new List<Item>(_items.Where(x => x.ItemId == itemId && x.GetMetadata(key).Equals(metadata)));
+        }
+        finally
+        {
+            _semaphore.ExitReadLock();
+        }
     }
     
     public Item? GetSingleItemByIdWithMetadata(uint itemId, Dictionary<string, object> metadata)
     {
         ThrowIfDisposed();
-        lock (_lock)
+        _semaphore.EnterReadLock();
+        try
+        {
             return _items.Where(x => x.ItemId == itemId && x.Equals(metadata)).FirstOrDefault();
+        }
+        finally
+        {
+            _semaphore.ExitReadLock();
+        }
     }
 
     public bool HasItemWithMetadata(uint itemId, string key, object? metadata)
     {
         ThrowIfDisposed();
-        lock (_lock)
+
+        _semaphore.EnterReadLock();
+        try
+        {
             return _items.Any(x => x.ItemId == itemId && x.GetMetadata(key).Equals(metadata));
+        }
+        finally
+        {
+            _semaphore.ExitReadLock();
+        }
     }
 
     public bool TryGetByLocalId(string localId, out Item item)
     {
         ThrowIfDisposed();
-        lock (_lock)
+        _semaphore.EnterReadLock();
+        try
+        {
             item = _items.FirstOrDefault(x => x.LocalId == localId)!;
-        return item != null;
+            return item != null;
+        }
+        finally
+        {
+            _semaphore.ExitReadLock();
+        }
     }
 
     public bool TryGetByItemId(uint itemId, out Item item)
     {
         ThrowIfDisposed();
-        lock (_lock)
+        _semaphore.EnterReadLock();
+        try
+        {
             item = _items.FirstOrDefault(x => x.ItemId == itemId)!;
-        return item != null;
+            return item != null;
+        }
+        finally
+        {
+            _semaphore.ExitReadLock();
+        }
     }
 
     public bool TryGetByIdAndMetadata(uint itemId, Dictionary<string, object> metadata, out Item item)
     {
         ThrowIfDisposed();
-        lock (_lock)
+        _semaphore.EnterReadLock();
+        try
+        {
             item = _items.FirstOrDefault(x => x.ItemId == itemId && x.Equals(metadata))!;
-        return item != null;
+            return item != null;
+        }
+        finally
+        {
+            _semaphore.ExitReadLock();
+        }
     }
 
     public Item AddSingleItem(ItemsRegistry itemsRegistry, uint itemId, Dictionary<string, object>? metadata = null, bool tryStack = true, bool force = false)
     {
         ThrowIfDisposed();
-        var item = AddItem(itemsRegistry, itemId, 1, metadata, tryStack, force);
-        if (item.Any())
-            return item.First();
-        return GetSingleItemByIdWithMetadata(itemId, metadata ?? new()) ?? throw new InvalidOperationException();
+        _semaphore.EnterWriteLock();
+        try
+        {
+            var item = AddItem(itemsRegistry, itemId, 1, metadata, tryStack, force);
+            if (item.Any())
+                return item.First();
+            return GetSingleItemByIdWithMetadata(itemId, metadata ?? new()) ?? throw new InvalidOperationException();
+        }
+        finally
+        {
+            _semaphore.ExitWriteLock();
+        }
     }
 
     public IEnumerable<Item> AddItem(ItemsRegistry itemsRegistry, uint itemId, uint number = 1, Dictionary<string, object>? metadata = null, bool tryStack = true, bool force = false)
@@ -169,10 +278,11 @@ public class InventoryComponent : Component
         if (requiredSpace > Size && !force)
             throw new InventoryNotEnoughSpaceException(Size, requiredSpace);
 
-        List<Item> newItems = new();
-        if (tryStack)
+        _semaphore.EnterWriteLock();
+        try
         {
-            lock (_lock)
+            List<Item> newItems = new();
+            if (tryStack)
             {
                 foreach (var item in _items.Where(x => x.ItemId == itemId))
                 {
@@ -184,28 +294,31 @@ public class InventoryComponent : Component
                     number -= added;
                 }
             }
-        }
 
-        while (number > 0)
-        {
-            var thisItemNumber = Math.Min(number, itemRegistryEntry.StackSize);
-            number -= thisItemNumber;
-            var item = new Item(itemsRegistry, itemId, number, metadata)
+            while (number > 0)
             {
-                Number = thisItemNumber
-            };
-            newItems.Add(item);
-        }
+                var thisItemNumber = Math.Min(number, itemRegistryEntry.StackSize);
+                number -= thisItemNumber;
+                var item = new Item(itemsRegistry, itemId, number, metadata)
+                {
+                    Number = thisItemNumber
+                };
+                newItems.Add(item);
+            }
 
-        foreach (var newItem in newItems)
-        {
-            newItem.Changed += HandleItemChanged;
-            lock (_lock)
+            foreach (var newItem in newItems)
+            {
+                newItem.Changed += HandleItemChanged;
                 _items.Add(newItem);
-            ItemAdded?.Invoke(this, newItem);
-        }
+                ItemAdded?.Invoke(this, newItem);
+            }
 
-        return newItems.AsReadOnly();
+            return newItems.AsReadOnly();
+        }
+        finally
+        {
+            _semaphore.ExitWriteLock();
+        }
     }
 
     private void HandleItemChanged(Item item)
@@ -217,75 +330,113 @@ public class InventoryComponent : Component
     public bool RemoveItemStack(uint id)
     {
         ThrowIfDisposed();
-        if (TryGetByItemId(id, out var item))
-            return RemoveItemStack(item);
-        return false;
+        _semaphore.EnterWriteLock();
+        try
+        {
+            if (TryGetByItemId(id, out var item))
+                return RemoveItemStack(item);
+            return false;
+        }
+        finally
+        {
+            _semaphore.ExitWriteLock();
+        }
     }
 
     public bool RemoveItem(Item item, uint number = 1)
     {
-        return RemoveItem(item, out var _, number);
+        _semaphore.EnterWriteLock();
+        try
+        {
+            return RemoveItem(item, out var _, number);
+        }
+        finally
+        {
+            _semaphore.ExitWriteLock();
+        }
     }
 
     public bool RemoveItem(Item item, out uint removedNumber, uint number = 1)
     {
         ThrowIfDisposed();
-        if (number == 0 || !HasItem(item))
+        _semaphore.EnterWriteLock();
+        try
         {
-            removedNumber = 0;
-            return false;
-        }
+            if (number == 0 || !HasItem(item))
+            {
+                removedNumber = 0;
+                return false;
+            }
 
-        if (item.Number > number)
-        {
-            item.Number -= number;
-            removedNumber = number;
-            ItemChanged?.Invoke(this, item);
-        }
-        else
-        {
-            lock (_lock)
+            if (item.Number > number)
+            {
+                item.Number -= number;
+                removedNumber = number;
+                ItemChanged?.Invoke(this, item);
+            }
+            else
+            {
                 if (!_items.Remove(item))
                     throw new InvalidOperationException();
 
-            item.Changed -= HandleItemChanged;
-            removedNumber = item.Number;
-            ItemRemoved?.Invoke(this, item);
+                item.Changed -= HandleItemChanged;
+                removedNumber = item.Number;
+                ItemRemoved?.Invoke(this, item);
+            }
+            return true;
         }
-        return true;
+        finally
+        {
+            _semaphore.ExitWriteLock();
+        }
     }
 
     public bool RemoveItem(uint id, uint number = 1)
     {
         ThrowIfDisposed();
-        if (TryGetByItemId(id, out var item))
+        _semaphore.EnterWriteLock();
+        try
         {
-            var success = RemoveItem(item, out var removedNumber, number);
-            var left = number - removedNumber;
-            if (left > 0)
-                success = RemoveItem(id, left);
-            return success;
+            if (SumItemsNumberById(id) >= number && TryGetByItemId(id, out var item))
+            {
+                var success = RemoveItem(item, out var removedNumber, number);
+                var left = number - removedNumber;
+                if (left > 0)
+                    success = RemoveItem(id, left);
+                return success;
+            }
+            return false;
         }
-        return false;
+        finally
+        {
+            _semaphore.ExitWriteLock();
+        }
     }
 
     public bool TryUseItem(Item item, ItemAction flags)
     {
         ThrowIfDisposed();
 
-        if (HasItem(item) && (item.AvailableActions & flags) == flags)
+        _semaphore.EnterReadLock();
+        try
         {
-            ItemUsed?.Invoke(this, item, flags);
-            return true;
-        }
+            if (HasItem(item) && (item.AvailableActions & flags) == flags)
+            {
+                ItemUsed?.Invoke(this, item, flags);
+                return true;
+            }
 
-        return false;
+            return false;
+        }
+        finally
+        {
+            _semaphore.ExitReadLock();
+        }
     }
 
     public bool HasSpace(decimal space)
     {
         ThrowIfDisposed();
-
         return Number + space <= Size;
     }
     

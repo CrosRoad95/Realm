@@ -269,6 +269,14 @@ public class InventoryComponentTests
     }
 
     [Fact]
+    public void RemoveItemByIdShouldNotRemoveAnyStackIfThereIsNotEnough()
+    {
+        var item = _inventoryComponent.AddItem(_itemsRegistry, 1, 20);
+        _inventoryComponent.RemoveItem(30);
+        _inventoryComponent.Number.Should().Be(20);
+    }
+
+    [Fact]
     public void RemoveItemShouldRemoveSingleItemWork()
     {
         _inventoryComponent.Size = 100;
