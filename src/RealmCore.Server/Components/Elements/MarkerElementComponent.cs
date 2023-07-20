@@ -4,6 +4,8 @@ public class MarkerElementComponent : ElementComponent
 {
     [Inject]
     private IECS ECS { get; set; } = default!;
+    [Inject]
+    private ILogger<MarkerElementComponent> Logger { get; set; } = default!;
 
     protected readonly Marker _marker;
     protected readonly CollisionSphere _collisionShape;
@@ -150,7 +152,15 @@ public class MarkerElementComponent : ElementComponent
                 return;
             }
         }
-        EntityEntered(Entity, entity);
+
+        try
+        {
+            EntityEntered(Entity, entity);
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Failed to invoke entity entered callback");
+        }
     }
 
     private void HandleElementLeft(Element element)
@@ -164,7 +174,16 @@ public class MarkerElementComponent : ElementComponent
             return;
 
         if (_entityRules.All(x => x.Check(entity)))
-            EntityLeft(Entity, entity);
+        {
+            try
+            {
+                EntityLeft(Entity, entity);
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError(ex, "Failed to invoke entity left callback");
+            }
+        }
     }
 
     private void HandleDisposed(Entity entity)
