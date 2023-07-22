@@ -30,6 +30,7 @@ public class MoneyComponent : Component
                 throw new GameplayException("Unable to set money beyond limit.");
 
             _moneyLock.EnterWriteLock();
+            writeLockRecursionCount++;
             try
             {
                 if (_money == value)
@@ -43,7 +44,9 @@ public class MoneyComponent : Component
             }
             finally
             {
-                _moneyLock.ExitWriteLock();
+                writeLockRecursionCount--;
+                if (writeLockRecursionCount == 0)
+                    _moneyLock.ExitWriteLock();
             }
         }
     }
@@ -76,8 +79,8 @@ public class MoneyComponent : Component
         if (amount < 0)
             throw new GameplayException("Unable to give money, amount can not get negative.");
 
-        if (++writeLockRecursionCount == 1)
-            _moneyLock.EnterWriteLock();
+       _moneyLock.EnterWriteLock();
+        writeLockRecursionCount++;
         try
         {
             if (Math.Abs(_money) + amount > GameplayOptions.Value.MoneyLimit)
@@ -92,7 +95,8 @@ public class MoneyComponent : Component
         }
         finally
         {
-            if (--writeLockRecursionCount == 0)
+            writeLockRecursionCount--;
+            if (writeLockRecursionCount == 0)
                 _moneyLock.ExitWriteLock();
         }
     }
@@ -109,8 +113,8 @@ public class MoneyComponent : Component
         if (amount < 0)
             throw new GameplayException("Unable to take money, amount can not get negative.");
 
-        if(++writeLockRecursionCount == 1)
-            _moneyLock.EnterWriteLock();
+        _moneyLock.EnterWriteLock();
+        writeLockRecursionCount++;
         try
         {
             if (Math.Abs(_money) - amount < -GameplayOptions.Value.MoneyLimit)
@@ -128,7 +132,8 @@ public class MoneyComponent : Component
         }
         finally
         {
-            if(--writeLockRecursionCount == 0)
+            writeLockRecursionCount--;
+            if (writeLockRecursionCount == 0)
                 _moneyLock.ExitWriteLock();
         }
     }
@@ -169,8 +174,8 @@ public class MoneyComponent : Component
     {
         ThrowIfDisposed();
 
-        if (++writeLockRecursionCount == 1)
-            _moneyLock.EnterWriteLock();
+        _moneyLock.EnterWriteLock();
+        writeLockRecursionCount++;
         try
         {
             if(!InternalHasMoney(amount, force))
@@ -189,7 +194,8 @@ public class MoneyComponent : Component
         }
         finally
         {
-            if (--writeLockRecursionCount == 0)
+            writeLockRecursionCount--;
+            if (writeLockRecursionCount == 0)
                 _moneyLock.ExitWriteLock();
         }
     }
@@ -198,8 +204,9 @@ public class MoneyComponent : Component
     {
         ThrowIfDisposed();
 
-        if (++writeLockRecursionCount == 1)
-            _moneyLock.EnterWriteLock();
+        _moneyLock.EnterWriteLock();
+        writeLockRecursionCount++;
+
         try
         {
             if(!InternalHasMoney(amount, force))
@@ -218,7 +225,8 @@ public class MoneyComponent : Component
         }
         finally
         {
-            if (--writeLockRecursionCount == 0)
+            writeLockRecursionCount--;
+            if (writeLockRecursionCount == 0)
                 _moneyLock.ExitWriteLock();
         }
     }

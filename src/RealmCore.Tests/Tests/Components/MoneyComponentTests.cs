@@ -159,7 +159,7 @@ public class MoneyComponentTests
     }
 
     [Fact]
-    public async Task TrasnferMoneyShouldBeThreadSafety()
+    public async Task TransferMoneyShouldBeThreadSafety()
     {
         var targetMoneyComponent = new MoneyComponent();
         _entityB.AddComponent(targetMoneyComponent);
@@ -241,11 +241,11 @@ public class MoneyComponentTests
         {
             _moneyComponent.TryTakeMoneyWithCallback(5, () =>
             {
-                throw new Exception();
+                throw new InvalidOperationException();
             });
         };
 
-        act.Should().Throw<Exception>();
+        act.Should().ThrowExactly<InvalidOperationException>();
         _moneyComponent.Money.Should().Be(10);
     }
 
@@ -260,11 +260,11 @@ public class MoneyComponentTests
         {
             await _moneyComponent.TryTakeMoneyWithCallbackAsync(5, () =>
             {
-                throw new Exception();
+                throw new InvalidOperationException();
             });
         };
 
-        await act.Should().ThrowAsync<Exception>();
+        await act.Should().ThrowExactlyAsync<InvalidOperationException>();
         _moneyComponent.Money.Should().Be(10);
     }
 
