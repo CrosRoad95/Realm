@@ -20,7 +20,7 @@ internal class LoadService : ILoadService
         await LoadAllVehicles();
     }
 
-    public async Task<Entity?> LoadVehicleById(int id)
+    public async Task<Entity> LoadVehicleById(int id)
     {
         using var vehicleRepository = _repositoryFactory.GetVehicleRepository();
         var vehicleData = await vehicleRepository.GetVehicleById(id);
@@ -33,9 +33,9 @@ internal class LoadService : ILoadService
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Failed to spawn vehicle: {id}", vehicleData.Id);
+            _logger.LogError(ex, "Failed to spawn vehicle: {vehicleId}", vehicleData.Id);
+            throw;
         }
-        return null;
     }
 
     private async Task LoadAllVehicles()
