@@ -23,7 +23,7 @@ internal sealed class AdminResourceLogic
 
     private void HandleToolStateChanged(Player player, AdminTool adminTool, bool state)
     {
-        using var _ = _logger.BeginPlayer(player);
+        using var _ = _logger.BeginElement(player);
         try
         {
             if(!_ecs.TryGetEntityByPlayer(player, out var entity))

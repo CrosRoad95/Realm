@@ -30,7 +30,7 @@ public static class LoggerExtensions
         return logger.BeginScope(data);
     }
     
-    public static IDisposable? BeginPlayer<T>(this ILogger<T> logger, Element element)
+    public static IDisposable? BeginElement<T>(this ILogger<T> logger, Element element)
     {
         if (element == null)
             throw new ArgumentNullException(nameof(element));
