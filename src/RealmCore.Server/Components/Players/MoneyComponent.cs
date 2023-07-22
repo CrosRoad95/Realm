@@ -187,6 +187,33 @@ public class MoneyComponent : Component
         }
     }
 
+    public async Task<bool> TryTakeMoneyWithCallbackAsync(decimal amount, Func<Task<bool>> action, bool force = false)
+    {
+        ThrowIfDisposed();
+
+        _moneyLock.EnterWriteLock();
+        try
+        {
+            if(!InternalHasMoney(amount, force))
+                return false;
+
+            if(await action())
+            {
+                TakeMoney(amount, force);
+                return true;
+            }
+            return false;
+        }
+        catch
+        {
+            throw;
+        }
+        finally
+        {
+            _moneyLock.ExitWriteLock();
+        }
+    }
+
     public void TransferMoney(MoneyComponent moneyComponent, decimal amount, bool force = false)
     {
         ThrowIfDisposed();

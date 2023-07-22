@@ -248,4 +248,23 @@ public class MoneyComponentTests
         act.Should().Throw<Exception>();
         _moneyComponent.Money.Should().Be(10);
     }
+
+    [Fact]
+    public async Task TryTakeMoneyWithCallbackAsyncShouldFailOnException()
+    {
+        var moneyComponent = new MoneyComponent();
+        _entityB.AddComponent(moneyComponent);
+
+        _moneyComponent.Money = 10;
+        var act = async () =>
+        {
+            await _moneyComponent.TryTakeMoneyWithCallbackAsync(5, () =>
+            {
+                throw new Exception();
+            });
+        };
+
+        await act.Should().ThrowAsync<Exception>();
+        _moneyComponent.Money.Should().Be(10);
+    }
 }
