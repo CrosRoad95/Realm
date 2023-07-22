@@ -19,6 +19,13 @@ public static class LoggerExtensions
                         data["serial"] = playerElementComponent.Client.Serial;
                 }
                 break;
+            case EntityTag.Vehicle:
+                {
+
+                    if (entity.TryGetComponent(out PrivateVehicleComponent privateVehicleComponent))
+                        data["vehicleId"] = privateVehicleComponent.Id;
+                }
+                break;
         }
         return logger.BeginScope(data);
     }
