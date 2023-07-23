@@ -9,6 +9,8 @@ using RealmCore.Resources.CEFBlazorGui;
 using SlipeServer.Resources.DGS;
 using RealmCore.Resources.GuiSystem;
 using RealmCore.Resources.Addons.GuiSystem.DGS;
+using RealmCore.Module.Web.AdminPanel;
+using RealmCore.Module.Grpc;
 
 Directory.SetCurrentDirectory(Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly()!.Location)!);
 
@@ -54,6 +56,8 @@ var server = builder.Build(null, extraBuilderSteps: serverBuilder =>
     serverBuilder.AddLogic<DefaultBanLogic>();
     serverBuilder.AddLogic<DefaultChatLogic>();
     serverBuilder.AddLogic<BlazorGuiLogic>();
+    serverBuilder.AddLogic<GRpcLogic>();
+    serverBuilder.AddLogic<WebAdminPanelLogic>();
 #if DEBUG
     if(withDgs)
     {
@@ -70,6 +74,10 @@ var server = builder.Build(null, extraBuilderSteps: serverBuilder =>
         services.AddSingleton<IDiscordConnectUserHandler, DefaultDiscordConnectUserHandler>();
         services.AddSingleton<IDiscordPrivateMessageReceived, DefaultDiscordPrivateMessageReceivedHandler>();
         services.AddSingleton<IDiscordTextBasedCommandHandler, DefaultTextBasedCommandHandler>();
+        #endregion
+
+        #region Web admin panel
+        services.AddWebAdminPanelModule();
         #endregion
 
         #region In game command

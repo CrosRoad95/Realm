@@ -13,10 +13,10 @@ public delegate Task TextBasedMessageReceived(ulong userId, ulong channelId, str
 
 public interface IDiscordService
 {
-    UpdateStatusChannel? UpdateStatusChannel { get; set; }
-    TryConnectUserChannel? TryConnectUserChannel { get; set; }
-    PrivateMessageReceived? PrivateMessageReceived { get; set; }
-    TextBasedMessageReceived? TextBasedCommandReceived { get; set; }
+    internal UpdateStatusChannel? UpdateStatusChannel { get; set; }
+    internal TryConnectUserChannel? TryConnectUserChannel { get; set; }
+    internal PrivateMessageReceived? PrivateMessageReceived { get; set; }
+    internal TextBasedMessageReceived? TextBasedCommandReceived { get; set; }
 
     void AddTextBasedCommandHandler(ulong channelId, string command, Func<ulong, string, Task> callback);
     Task HandleTextBasedCommand(ulong userId, ulong channelId, string command);

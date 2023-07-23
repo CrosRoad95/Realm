@@ -1,0 +1,14 @@
+﻿<MudPaper Elevation="25" Class="d-flex flex-row pt-6 pb-4" Style="height:100px;">
+    <MudIcon Icon="" Color="Color.Primary" Class="mx-4" Style="width:54px; height:54px;"></MudIcon>
+    <div>
+        <MudText Typo="Typo.subtitle1" Class="mud-text-secondary mb-n1">@Title</MudText>
+        <MudText Typo="Typo.h5">@Data</MudText>
+    </div>
+</MudPaper>
+
+@code {
+    [Parameter]
+    public string Title { get; set; }
+    [Parameter]
+    public string Data { get; set; }
+}

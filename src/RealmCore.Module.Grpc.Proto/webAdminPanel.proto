@@ -6,6 +6,26 @@ service Handshake {
   rpc DoHandshake (HandshakeRequest) returns (HandshakeReply);
 }
 
+service Dashboard {
+  rpc GetDashboardElements (GetDashboardElementsRequest) returns (GetDashboardElementsReply);
+}
+
+message GetDashboardElementsRequest {
+  int32 id = 1;
+}
+
+message DashboardElement {
+  int32 id = 1;
+  int32 type = 2;
+  string name = 3;
+  string description = 4;
+  string data = 5;
+}
+
+message GetDashboardElementsReply {
+  repeated DashboardElement elements = 1;
+}
+
 message HandshakeRequest {
   string message = 1;
 }
@@ -25,3 +45,4 @@ message GetServerNameRequest {
 message GetServerNameReply {
   string serverName = 1;
 }
+

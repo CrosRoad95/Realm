@@ -13,6 +13,11 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<DiscordConnectUserChannelStub>();
         services.AddSingleton<DiscordPrivateMessagesChannelsStub>();
         services.AddSingleton<DiscordTextBasedCommandsStub>();
+        services.AddSingleton(x => Handshake.BindService(x.GetRequiredService<DiscordHandshakeServiceStub>()));
+        services.AddSingleton(x => StatusChannel.BindService(x.GetRequiredService<DiscordStatusChannelServiceStub>()));
+        services.AddSingleton(x => ConnectUserChannel.BindService(x.GetRequiredService<DiscordConnectUserChannelStub>()));
+        services.AddSingleton(x => PrivateMessagesChannels.BindService(x.GetRequiredService<DiscordPrivateMessagesChannelsStub>()));
+        services.AddSingleton(x => Commands.BindService(x.GetRequiredService<DiscordTextBasedCommandsStub>()));
 
         services.AddSingleton<IDiscordService, DiscordService>();
         services.AddSingleton<IModule, DiscordModule>();

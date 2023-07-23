@@ -1,25 +1,16 @@
-﻿using Microsoft.Extensions.Options;
-using RealmCore.Interfaces.Extend;
-using RealmCore.Module.Discord.Stubs;
-using RealmCore.Module.Grpc.Options;
+﻿using RealmCore.Interfaces.Extend;
 
 namespace RealmCore.Module.Discord;
 
 internal class DiscordModule : IModule
 {
     private readonly ILogger<DiscordModule> _logger;
-    private readonly Server? _grpcServer;
     private readonly IDiscordStatusChannelUpdateHandler? _discordStatusChannelUpdateHandler;
     private readonly IDiscordConnectUserHandler? _discordConnectUserHandler;
     private readonly IDiscordPrivateMessageReceived? _discordPrivateMessageReceived;
     private readonly IDiscordTextBasedCommandHandler? _discordTextBasedCommandHandler;
 
     public DiscordModule(ILogger<DiscordModule> logger, IDiscordService grpcDiscord,
-        DiscordHandshakeServiceStub discordHandshakeServiceStub, DiscordStatusChannelServiceStub discordStatusChannelServiceStub,
-        DiscordConnectUserChannelStub discordConnectUserChannelStub,
-        DiscordPrivateMessagesChannelsStub discordPrivateMessagesChannelsStub,
-        DiscordTextBasedCommandsStub discordTextBasedCommandsStub,
-        IOptions<GrpcOptions> options,
         IDiscordStatusChannelUpdateHandler? discordStatusChannelUpdateHandler = null,
         IDiscordConnectUserHandler? discordConnectUserHandler = null,
         IDiscordPrivateMessageReceived? discordPrivateMessageReceived = null,
@@ -35,24 +26,8 @@ internal class DiscordModule : IModule
         _discordConnectUserHandler = discordConnectUserHandler;
         _discordPrivateMessageReceived = discordPrivateMessageReceived;
         _discordTextBasedCommandHandler = discordTextBasedCommandHandler;
-        _grpcServer = new Server
-        {
-            Services =
-            {
-                Handshake.BindService(discordHandshakeServiceStub),
-                StatusChannel.BindService(discordStatusChannelServiceStub),
-                ConnectUserChannel.BindService(discordConnectUserChannelStub),
-                PrivateMessagesChannels.BindService(discordPrivateMessagesChannelsStub),
-                Commands.BindService(discordTextBasedCommandsStub),
-            },
-            Ports =
-            {
-                new ServerPort(options.Value.Host, options.Value.Port, ServerCredentials.Insecure)
-            },
-        };
 
-        _grpcServer.Start();
-        _logger.LogInformation("Started grpc server.");
+        _logger.LogInformation("{module} module loaded", "Discord");
     }
 
     public async Task<string> HandleUpdateStatusChannel(CancellationToken cancellationToken)

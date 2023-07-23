@@ -26,11 +26,14 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Protobuf Include="..\RealmCore.Module.Grpc.Proto\discord.proto" GrpcServices="Both">
-      <Link>Protos\discord.proto</Link>
-    </Protobuf>
+	  <Protobuf Include="..\RealmCore.Module.Grpc.Proto\discord.proto" GrpcServices="Both">
+		  <Link>Protos\discord.proto</Link>
+	  </Protobuf>
     <Protobuf Include="..\RealmCore.Module.Grpc.Proto\greet.proto" GrpcServices="Server">
       <Link>Protos\greet.proto</Link>
+    </Protobuf>
+    <Protobuf Include="..\RealmCore.Module.Grpc.Proto\webAdminPanel.proto" GrpcServices="Server">
+      <Link>Protos\webAdminPanel.proto</Link>
     </Protobuf>
   </ItemGroup>
 

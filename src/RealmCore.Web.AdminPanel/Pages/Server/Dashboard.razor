@@ -1,32 +1,23 @@
 ﻿@page "/server/dashboard"
-@inject ServerService _serverService;
-<PageTitle>Index</PageTitle>
+@inject DashboardService _dashboardService;
+<PageTitle>Dashboard</PageTitle>
 
-<h1>Gracze:</h1>
+<MudText Typo="Typo.h5" Color="Color.Primary" Class="mb-4">Dashboard</MudText>
 
-<ul>
-    @foreach (var pair in _players)
+<MudGrid>
+    @foreach (var item in DashboardElements)
     {
-        <li>@pair.Item1: @pair.Item2.Name</li>
+        <MudItem xs="12" sm="6" md="3">
+            <TextTile Title="@item.Name" Data="@item.Data" />
+        </MudItem>
     }
-</ul>
+</MudGrid>
 
 @code {
-    private List<(DateTime, Player)> _players = new();
+    private List<DashboardElement> DashboardElements { get; set; } = new();
 
-    private void PlayerJoined(Player player)
+    protected override async Task OnInitializedAsync()
     {
-        InvokeAsync(() =>
-        {
-            _players.Add((DateTime.Now, player));
-            StateHasChanged();
-        });
+        DashboardElements.AddRange(await _dashboardService.GetAllDashboardElements());
     }
-
-    protected override void OnInitialized()
-    {
-        _serverService.PlayerJoined += PlayerJoined;
-        base.OnInitialized();
-    }
-
 }

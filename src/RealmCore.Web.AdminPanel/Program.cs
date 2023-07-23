@@ -1,4 +1,5 @@
 using Grpc.Net.Client;
+using RealmCore.Web.AdminPanel.Stubs;
 
 var builder = WebApplication.CreateBuilder(args);
 //builder.Logging.ClearProviders();
@@ -7,7 +8,9 @@ builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
 builder.Services.AddMudServices();
 
-builder.Services.AddTransient<SettingsService>();
+builder.Services.AddTransient<DashboardServiceStub>();
+builder.Services.AddTransient<HandshakeServiceStub>();
+builder.Services.AddTransient<DashboardService>();
 builder.Services.AddTransient<JSRuntimeService>();
 builder.Services.AddSingleton(GrpcChannel.ForAddress("http://localhost:22010"));
 
