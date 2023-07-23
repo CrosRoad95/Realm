@@ -26,6 +26,17 @@ public class Entity : IDisposable
             return components.AsReadOnly();
         }
     }
+    
+    public int ComponentsCount
+    {
+        get
+        {
+            _componentsLock.EnterReadLock();
+            var count = _components.Count;
+            _componentsLock.ExitReadLock();
+            return count;
+        }
+    }
 
     private readonly IServiceProvider _serviceProvider;
 

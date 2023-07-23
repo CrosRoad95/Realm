@@ -19,6 +19,8 @@ public class ComponentLogic<T> where T: Component
         entity.ComponentAdded -= HandleComponentAdded;
         entity.ComponentDetached -= HandleComponentDetached;
         entity.Disposed -= HandleDisposed;
+        foreach (var component in entity.Components.OfType<T>())
+            HandleComponentDetached(component);
     }
 
     private void HandleComponentDetached(Component component)
