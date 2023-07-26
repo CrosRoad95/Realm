@@ -10,10 +10,12 @@ namespace RealmCore.Server.Services;
 internal class SaveService : ISaveService
 {
     private readonly IDb _dbContext;
+    private readonly IEnumerable<IUserDataSaver> _userDataSavers;
 
-    public SaveService(IDb dbContext)
+    public SaveService(IDb dbContext, IEnumerable<IUserDataSaver> userDataSavers)
     {
         _dbContext = dbContext;
+        _userDataSavers = userDataSavers;
     }
 
     private async Task SaveVehicle(Entity entity)
@@ -215,6 +217,9 @@ internal class SaveService : ISaveService
         var user = await _dbContext.Users
             .IncludeAll()
             .Where(x => x.Id == userComponent.Id).FirstAsync();
+
+        foreach (var item in _userDataSavers)
+            await item.SaveAsync(entity);
 
         user.Upgrades = userComponent.Upgrades.Select(x => new UserUpgradeData
         {
