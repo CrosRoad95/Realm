@@ -308,7 +308,7 @@ public class InventoryComponent : Component
 
             foreach (var newItem in newItems)
             {
-                newItem.Changed += HandleItemChanged;
+                newItem.MetadataChanged += HandleItemChanged;
                 _items.Add(newItem);
                 ItemAdded?.Invoke(this, newItem);
             }
@@ -379,7 +379,7 @@ public class InventoryComponent : Component
                 if (!_items.Remove(item))
                     throw new InvalidOperationException();
 
-                item.Changed -= HandleItemChanged;
+                item.MetadataChanged -= HandleItemChanged;
                 removedNumber = item.Number;
                 ItemRemoved?.Invoke(this, item);
             }

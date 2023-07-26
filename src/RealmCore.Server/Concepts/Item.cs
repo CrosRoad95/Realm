@@ -17,6 +17,9 @@ public class Item : IEquatable<Item>, IEquatable<Dictionary<string, object>>
         }
         set
         {
+            if (value != _number)
+                return;
+
             if (value == 0)
                 throw new ArgumentException(nameof(value));
 
@@ -45,7 +48,7 @@ public class Item : IEquatable<Item>, IEquatable<Dictionary<string, object>>
     }
 
     public event Action<Item, uint, uint>? NumberChanged;
-    public event Action<Item>? Changed;
+    public event Action<Item, string>? MetadataChanged;
 
     internal Item(ItemsRegistry itemsRegistry, uint itemId, uint number, Dictionary<string, object>? metaData = null)
     {
@@ -72,7 +75,21 @@ public class Item : IEquatable<Item>, IEquatable<Dictionary<string, object>>
             if (value is string or double or int)
             {
                 _metaData[key] = value;
-                Changed?.Invoke(this);
+                MetadataChanged?.Invoke(this, key);
+                return true;
+            }
+            return false;
+        }
+    }
+    
+    public bool RemoveMetadata(string key)
+    {
+        lock (_lock)
+        {
+            if (_metaData.ContainsKey(key))
+            {
+                _metaData.Remove(key);
+                MetadataChanged?.Invoke(this, key);
                 return true;
             }
             return false;
