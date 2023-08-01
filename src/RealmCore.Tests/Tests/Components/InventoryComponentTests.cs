@@ -345,22 +345,27 @@ public class InventoryComponentTests
     [InlineData(10, true, 0, 10)]
     [InlineData(11, false, 10, 0)]
     [Theory]
-    public void TransferItemTest(uint numberOfItems, bool success, int expectedNumberOfItemsInSourceInventory, int expectedNumberOfItemsInDestinationInventory)
+    public void TransferItemTest(uint numberOfItemsToTransfer, bool success, int expectedNumberOfItemsInSourceInventory, int expectedNumberOfItemsInDestinationInventory)
     {
         #region Arrange
         _inventoryComponent.Clear();
         var destinationInventory = new InventoryComponent(10);
-        _inventoryComponent.AddItem(_itemsRegistry, 1, 10);
+        var metaData = new Dictionary<string, object>
+        {
+            ["foo"] = 1
+        };
+        _inventoryComponent.AddItem(_itemsRegistry, 1, 10, metaData);
         #endregion
 
         #region Act
-        var isSuccess = _inventoryComponent.TransferItem(destinationInventory, _itemsRegistry, 1, numberOfItems, false);
+        var isSuccess = _inventoryComponent.TransferItem(destinationInventory, _itemsRegistry, 1, numberOfItemsToTransfer, false);
         #endregion
 
         #region Assert
         isSuccess.Should().Be(success);
         _inventoryComponent.Number.Should().Be(expectedNumberOfItemsInSourceInventory);
         destinationInventory.Number.Should().Be(expectedNumberOfItemsInDestinationInventory);
+        destinationInventory.Items.Select(x => x.MetaData).Should().AllBeEquivalentTo(metaData);
         #endregion
     }
 
@@ -476,5 +481,70 @@ public class InventoryComponentTests
         var item = _inventoryComponent.AddSingleItem(_itemsRegistry, 1, metaData);
 
         item.HasMetadata("foo").Should().BeTrue();
+    }
+
+    [Fact]
+    public async Task TransferItemShouldBeThreadSafe()
+    {
+        #region Arrange
+        _inventoryComponent.Clear();
+        var destinationInventory = new InventoryComponent(800);
+        _inventoryComponent.AddItem(_itemsRegistry, 1, 800, null, true, true);
+        #endregion
+
+        #region Act
+        await ParallelHelpers.Run(() =>
+        {
+            var isSuccess = _inventoryComponent.TransferItem(destinationInventory, _itemsRegistry, 1, 1, false);
+        });
+        #endregion
+
+        #region Assert
+        _inventoryComponent.Number.Should().Be(0);
+        destinationInventory.IsFull.Should().BeTrue();
+        #endregion
+    }
+
+    [Fact]
+    public void RemoveAndGetItemByIdShouldWork()
+    {
+        var metaData = new Dictionary<string, object>
+        {
+            ["foo"] = 1
+        };
+
+        var addedItem = _inventoryComponent.AddSingleItem(_itemsRegistry, 1, metaData);
+        var removedItem = _inventoryComponent.RemoveAndGetItemById(1).First();
+
+        addedItem.Should().BeEquivalentTo(removedItem);
+    }
+    
+    [Fact]
+    public void RemoveAndGetItemByIdShouldWorkForManyItems()
+    {
+        var metaData = new Dictionary<string, object>
+        {
+            ["foo"] = 1
+        };
+
+        var addedItem = _inventoryComponent.AddItem(_itemsRegistry, 1, 20, metaData);
+        var removedItem = _inventoryComponent.RemoveAndGetItemById(1, 20);
+
+        addedItem.Should().BeEquivalentTo(removedItem);
+    }
+    
+    [Fact]
+    public void RemovingOneItemAndGetItemByIdShouldWorkForManyItems()
+    {
+        var metaData = new Dictionary<string, object>
+        {
+            ["foo"] = 1
+        };
+
+        _inventoryComponent.AddItem(_itemsRegistry, 1, 20, metaData);
+        var removedItem = _inventoryComponent.RemoveAndGetItemById(1, 1);
+        _inventoryComponent.Number.Should().Be(19);
+        removedItem.Should().HaveCount(1);
+        removedItem.First().MetaData.Should().BeEquivalentTo(metaData);
     }
 }

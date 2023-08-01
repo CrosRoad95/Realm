@@ -29,6 +29,8 @@ public class InventoryComponent : Component
         }
     }
 
+    public bool IsFull => Number >= Size;
+
     public decimal Number
     {
         get
@@ -322,6 +324,65 @@ public class InventoryComponent : Component
         }
     }
 
+    public void AddItem(ItemsRegistry itemsRegistry, Item newItem, bool force = false)
+    {
+        ThrowIfDisposed();
+        
+        if(!force)
+        {
+            var itemRegistryEntry = itemsRegistry.Get(newItem.ItemId);
+            var requiredSpace = Number + itemRegistryEntry.Size * newItem.Number;
+            if (requiredSpace > Size)
+                throw new InventoryNotEnoughSpaceException(Size, requiredSpace);
+        }
+
+        _semaphore.EnterWriteLock();
+        try
+        {
+            newItem.MetadataChanged += HandleItemChanged;
+            _items.Add(newItem);
+            ItemAdded?.Invoke(this, newItem);
+        }
+        finally
+        {
+            _semaphore.ExitWriteLock();
+        }
+    }
+    
+    public void AddItems(ItemsRegistry itemsRegistry, IEnumerable<Item> newItems, bool force = false)
+    {
+        ThrowIfDisposed();
+
+        _semaphore.EnterWriteLock();
+
+        if (!force)
+        {
+            decimal requiredSpace = 0;
+            foreach (var newItem in newItems)
+            {
+                var itemRegistryEntry = itemsRegistry.Get(newItem.ItemId);
+                requiredSpace += Number + itemRegistryEntry.Size * newItem.Number;
+            }
+
+            if (requiredSpace > Size)
+                throw new InventoryNotEnoughSpaceException(Size, requiredSpace);
+        }
+
+        try
+        {
+            foreach (var newItem in newItems)
+            {
+                newItem.MetadataChanged += HandleItemChanged;
+                _items.Add(newItem);
+                ItemAdded?.Invoke(this, newItem);
+            }
+        }
+        finally
+        {
+            _semaphore.ExitWriteLock();
+        }
+    }
+
     private void HandleItemChanged(Item item, string key)
     {
         ItemChanged?.Invoke(this, item);
@@ -349,7 +410,7 @@ public class InventoryComponent : Component
         _semaphore.EnterWriteLock();
         try
         {
-            return RemoveItem(item, out var _, number);
+            return RemoveItem(item, out var _, out var _, number);
         }
         finally
         {
@@ -357,7 +418,7 @@ public class InventoryComponent : Component
         }
     }
 
-    public bool RemoveItem(Item item, out uint removedNumber, uint number = 1)
+    public bool RemoveItem(Item item, out uint removedNumber, out bool stackRemoved, uint number = 1)
     {
         ThrowIfDisposed();
 
@@ -370,6 +431,7 @@ public class InventoryComponent : Component
             if (!HasItem(item))
             {
                 removedNumber = 0;
+                stackRemoved = false;
                 return false;
             }
 
@@ -377,6 +439,7 @@ public class InventoryComponent : Component
             {
                 item.Number -= number;
                 removedNumber = number;
+                stackRemoved = false;
                 ItemChanged?.Invoke(this, item);
             }
             else
@@ -386,6 +449,7 @@ public class InventoryComponent : Component
 
                 item.MetadataChanged -= HandleItemChanged;
                 removedNumber = item.Number;
+                stackRemoved = true;
                 ItemRemoved?.Invoke(this, item);
             }
             return true;
@@ -404,13 +468,52 @@ public class InventoryComponent : Component
         {
             if (SumItemsNumberById(id) >= number && TryGetByItemId(id, out var item))
             {
-                var success = RemoveItem(item, out var removedNumber, number);
+                var success = RemoveItem(item, out var removedNumber, out var _, number);
                 var left = number - removedNumber;
                 if (left > 0)
                     success = RemoveItem(id, left);
                 return success;
             }
             return false;
+        }
+        finally
+        {
+            _semaphore.ExitWriteLock();
+        }
+    }
+    
+    public List<Item> RemoveAndGetItemById(uint id, uint number = 1)
+    {
+        return RemoveAndGetItemByIdInternal(id, number).ToList();
+    }
+
+    private IEnumerable<Item> RemoveAndGetItemByIdInternal(uint id, uint number = 1)
+    {
+        ThrowIfDisposed();
+        _semaphore.EnterWriteLock();
+        try
+        {
+            if (SumItemsNumberById(id) >= number && TryGetByItemId(id, out var item))
+            {
+                var success = RemoveItem(item, out var removedNumber, out bool stackRemoved, number);
+                if(item.Number > 0 && !stackRemoved)
+                {
+                    item = new Item(item)
+                    {
+                        Number = removedNumber
+                    };
+                }
+                Debug.Assert(success == true);
+                var left = number - removedNumber;
+                if (left > 0)
+                {
+                    foreach (var removedItem in RemoveAndGetItemByIdInternal(id, left))
+                    {
+                        yield return removedItem;
+                    }
+                }
+                yield return item;
+            }
         }
         finally
         {
@@ -463,16 +566,17 @@ public class InventoryComponent : Component
     {
         ThrowIfDisposed();
 
-        if ((SumItemsNumberById(itemId) >= number || force) && RemoveItem(itemId, number))
+        if (SumItemsNumberById(itemId) >= number || force)
         {
+            var removedItems = RemoveAndGetItemById(itemId, number);
             try
             {
-                destination.AddItem(itemsRegistry, itemId, number, force: force);
+                destination.AddItems(itemsRegistry, removedItems, force: force);
                 return true;
             }
             catch(InventoryNotEnoughSpaceException)
             {
-                AddItem(itemsRegistry, itemId, number);
+                AddItems(itemsRegistry, removedItems);
                 return false;
             }
         }

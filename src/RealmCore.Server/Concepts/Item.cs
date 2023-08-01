@@ -58,6 +58,16 @@ public class Item : IEquatable<Item>, IEquatable<Dictionary<string, object>>
     public event Action<Item, string>? MetadataChanged;
     public event Action<Item, string>? MetadataRemoved;
 
+    public Item(Item item)
+    {
+        ItemId = item.ItemId;
+        Size = item.Size;
+        Name = item.Name;
+        _number = item.Number;
+        _metaData = new Dictionary<string, object>(item.MetaData);
+        AvailableActions = item.AvailableActions;
+    }
+
     internal Item(ItemsRegistry itemsRegistry, uint itemId, uint number, Dictionary<string, object>? metaData = null)
     {
         var itemRegistryEntry = itemsRegistry.Get(itemId);
