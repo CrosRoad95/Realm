@@ -17,7 +17,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\RealmCore.BlazorLibrary\RealmCore.BlazorLibrary.csproj" />
     <ProjectReference Include="..\RealmCore.BlazorLibrary\RealmCore.BlazorLibrary.csproj" />
   </ItemGroup>
 
