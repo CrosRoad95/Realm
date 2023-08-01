@@ -13,6 +13,7 @@ public class InventoryComponent : Component
 
     private decimal _size;
     internal int Id { get; set; }
+
     public decimal Size
     {
         get
@@ -268,7 +269,7 @@ public class InventoryComponent : Component
     public IEnumerable<Item> AddItem(ItemsRegistry itemsRegistry, uint itemId, uint number = 1, Dictionary<string, object>? metadata = null, bool tryStack = true, bool force = false)
     {
         ThrowIfDisposed();
-        if (number == 0)
+        if (number <= 0)
             throw new ArgumentOutOfRangeException(nameof(number));
 
         metadata ??= new();
@@ -321,7 +322,7 @@ public class InventoryComponent : Component
         }
     }
 
-    private void HandleItemChanged(Item item)
+    private void HandleItemChanged(Item item, string key)
     {
         ItemChanged?.Invoke(this, item);
     }
@@ -359,10 +360,14 @@ public class InventoryComponent : Component
     public bool RemoveItem(Item item, out uint removedNumber, uint number = 1)
     {
         ThrowIfDisposed();
+
+        if (number <= 0)
+            throw new ArgumentOutOfRangeException(nameof(number));
+
         _semaphore.EnterWriteLock();
         try
         {
-            if (number == 0 || !HasItem(item))
+            if (!HasItem(item))
             {
                 removedNumber = 0;
                 return false;
@@ -458,7 +463,7 @@ public class InventoryComponent : Component
     {
         ThrowIfDisposed();
 
-        if (SumItemsNumberById(itemId) >= number && RemoveItem(itemId, number))
+        if ((SumItemsNumberById(itemId) >= number || force) && RemoveItem(itemId, number))
         {
             try
             {

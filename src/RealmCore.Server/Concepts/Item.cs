@@ -17,9 +17,6 @@ public class Item : IEquatable<Item>, IEquatable<Dictionary<string, object>>
         }
         set
         {
-            if (value != _number)
-                return;
-
             if (value == 0)
                 throw new ArgumentException(nameof(value));
 
@@ -31,7 +28,8 @@ public class Item : IEquatable<Item>, IEquatable<Dictionary<string, object>>
                 _number = value;
             }
 
-            NumberChanged?.Invoke(this, old, value);
+            if(old != value)
+                NumberChanged?.Invoke(this, old, value);
         }
     }
     public string Name { get; init; }
@@ -47,8 +45,18 @@ public class Item : IEquatable<Item>, IEquatable<Dictionary<string, object>>
         }
     }
 
+    public List<string> MetaDataKeys
+    {
+        get
+        {
+            lock (_lock)
+                return _metaData.Keys.ToList();
+        }
+    }
+
     public event Action<Item, uint, uint>? NumberChanged;
     public event Action<Item, string>? MetadataChanged;
+    public event Action<Item, string>? MetadataRemoved;
 
     internal Item(ItemsRegistry itemsRegistry, uint itemId, uint number, Dictionary<string, object>? metaData = null)
     {
@@ -89,10 +97,25 @@ public class Item : IEquatable<Item>, IEquatable<Dictionary<string, object>>
             if (_metaData.ContainsKey(key))
             {
                 _metaData.Remove(key);
-                MetadataChanged?.Invoke(this, key);
+                MetadataRemoved?.Invoke(this, key);
                 return true;
             }
             return false;
+        }
+    }
+
+    public void ChangeMetadata<T>(string key, Func<T, T> callback)
+    {
+        lock (_lock)
+        {
+            if (_metaData.ContainsKey(key))
+            {
+                var value = callback((T)_metaData[key]);
+                if (value == null)
+                    throw new NullReferenceException("Callback result can not be null");
+                _metaData[key] = value;
+                MetadataChanged?.Invoke(this, key);
+            }
         }
     }
 
@@ -103,6 +126,20 @@ public class Item : IEquatable<Item>, IEquatable<Dictionary<string, object>>
             if (_metaData.TryGetValue(key, out var value))
                 return value;
             return null;
+        }
+    }
+    
+    public bool TryGetMetadata<T>(string key, out T? value)
+    {
+        lock (_lock)
+        {
+            if (_metaData.TryGetValue(key, out var outValue))
+            {
+                value = (T)outValue;
+                return true;
+            }
+            value = default;
+            return false;
         }
     }
 

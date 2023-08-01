@@ -1,4 +1,7 @@
-﻿namespace RealmCore.Tests.Tests.Components;
+﻿using RealmCore.Server.Concepts;
+using RealmCore.Server.Registries;
+
+namespace RealmCore.Tests.Tests.Components;
 
 public class InventoryComponentTests
 {
@@ -169,6 +172,17 @@ public class InventoryComponentTests
         {
             item
         });
+    }
+
+    [Fact]
+    public void GetItemsByIdWithMetadataAsDictionaryShouldWork()
+    {
+        var item = _inventoryComponent.AddSingleItem(_itemsRegistry, 1, new Dictionary<string, object> { ["foo"] = 1 });
+
+        _inventoryComponent.GetSingleItemByIdWithMetadata(1, new Dictionary<string, object>
+        {
+            ["foo"] = 1
+        }).Should().BeEquivalentTo(item);
     }
 
     [Fact]
@@ -348,5 +362,119 @@ public class InventoryComponentTests
         _inventoryComponent.Number.Should().Be(expectedNumberOfItemsInSourceInventory);
         destinationInventory.Number.Should().Be(expectedNumberOfItemsInDestinationInventory);
         #endregion
+    }
+
+    [Fact]
+    public void TryGetMetaDataShouldWork()
+    {
+        var item = _inventoryComponent.AddSingleItem(_itemsRegistry, 1, new Dictionary<string, object>
+        {
+            ["number"] = 123,
+            ["string"] = "123",
+            ["object"] = new int[] { 1, 2, 3 }
+        });
+
+        item.TryGetMetadata("number", out int numberValue).Should().BeTrue();
+        numberValue.Should().Be(123);
+        item.TryGetMetadata("string", out string stringValue).Should().BeTrue();
+        stringValue.Should().Be("123");
+        item.TryGetMetadata("object", out int[] objectValue).Should().BeTrue();
+        objectValue.Should().BeEquivalentTo(new int[] { 1, 2, 3 });
+    }
+
+    [Theory]
+    [InlineData(1, true)]
+    [InlineData(2, false)]
+    public void TestHasItemWithCallback(uint itemId, bool has)
+    {
+        _inventoryComponent.AddSingleItem(_itemsRegistry, 1);
+        _inventoryComponent.HasItem(x => x.ItemId == itemId).Should().Be(has);
+    }
+
+    [Fact]
+    public void ItShouldBePossibleToCreateNewInventoryComponentWithItems()
+    {
+        var inventoryComponent = new InventoryComponent(10, 0, new List<Item>
+        {
+            new Item(_itemsRegistry, 1, 1)
+        });
+        inventoryComponent.Number.Should().Be(1);
+    }
+
+    [Fact]
+    public void ItemMetaDataPropertyShouldReturnCopyOfMetaData()
+    {
+        var metaData = new Dictionary<string, object>
+        {
+            ["foo"] = 1
+        };
+
+        var item = _inventoryComponent.AddSingleItem(_itemsRegistry, 1, metaData);
+
+        item.MetaData.Should().BeEquivalentTo(metaData);
+    }
+
+    [Fact]
+    public void ItemMetaDataKeysPropertyShouldReturnCopyOfMetaDataKeys()
+    {
+        var metaData = new Dictionary<string, object>
+        {
+            ["foo"] = 1
+        };
+
+        var item = _inventoryComponent.AddSingleItem(_itemsRegistry, 1, metaData);
+
+        item.MetaDataKeys.Should().BeEquivalentTo(new List<string> { "foo" });
+    }
+
+    [Fact]
+    public void YouShouldBeAbleToRemoveMetaData()
+    {
+        var metaData = new Dictionary<string, object>
+        {
+            ["foo"] = 1
+        };
+
+        var item = _inventoryComponent.AddSingleItem(_itemsRegistry, 1, metaData);
+        using var monitoredItem = item.Monitor();
+
+        item.RemoveMetadata("foo");
+
+        monitoredItem.Should().Raise(nameof(Item.MetadataRemoved));
+        item.MetaData.Should().BeEmpty();
+    }
+
+    [Fact]
+    public void YouShouldBeAbleToChangeMetaData()
+    {
+        var metaData = new Dictionary<string, object>
+        {
+            ["foo"] = 1
+        };
+
+        var item = _inventoryComponent.AddSingleItem(_itemsRegistry, 1, metaData);
+        using var monitoredItem = item.Monitor();
+
+        item.ChangeMetadata<int>("foo", x => x + 1);
+        ((int?)item.GetMetadata("foo")).Should().Be(2);
+
+        monitoredItem.Should().Raise(nameof(Item.MetadataChanged));
+        item.MetaData.Should().BeEquivalentTo(new Dictionary<string, object>
+        {
+            ["foo"] = 2
+        });
+    }
+
+    [Fact]
+    public void HasMetadataShouldWork()
+    {
+        var metaData = new Dictionary<string, object>
+        {
+            ["foo"] = 1
+        };
+
+        var item = _inventoryComponent.AddSingleItem(_itemsRegistry, 1, metaData);
+
+        item.HasMetadata("foo").Should().BeTrue();
     }
 }
