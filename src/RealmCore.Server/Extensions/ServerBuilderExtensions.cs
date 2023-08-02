@@ -1,6 +1,4 @@
-﻿using RealmCore.Persistance;
-using RealmCore.Server.Serving;
-using SlipeServer.Resources.Scoreboard;
+﻿using SlipeServer.Resources.Scoreboard;
 
 namespace RealmCore.Server.Extensions;
 

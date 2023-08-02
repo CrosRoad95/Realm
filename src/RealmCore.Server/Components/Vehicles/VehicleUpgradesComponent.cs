@@ -7,6 +7,8 @@ public class VehicleUpgradesComponent : Component
 {
     [Inject]
     private VehicleUpgradeRegistry VehicleUpgradeRegistry { get; set; } = default!;
+    [Inject]
+    private VehicleEnginesRegistry VehicleEnginesRegistry { get; set; } = default!;
 
     private readonly List<int> _upgrades = new();
     private readonly object _lock = new();
@@ -225,7 +227,8 @@ public class VehicleUpgradesComponent : Component
 
                 if (Entity.TryGetComponent(out VehicleEngineComponent vehicleEngineComponent))
                 {
-                    ApplyUpgrades(boxedVehicleHandling, new VehicleUpgradeRegistryEntry[] { VehicleUpgradeRegistry.Get(vehicleEngineComponent.UpgradeId) });
+                    var upgradeId = VehicleEnginesRegistry.Get(vehicleEngineComponent.ActiveVehicleEngineId).UpgradeId;
+                    ApplyUpgrades(boxedVehicleHandling, new VehicleUpgradeRegistryEntry[] { VehicleUpgradeRegistry.Get(upgradeId) });
                 }
             }
             _dirtyState = false;

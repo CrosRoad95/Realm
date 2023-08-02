@@ -1,5 +1,4 @@
-﻿using RealmCore.Server.Abstractions;
-namespace RealmCore.Console.Logic;
+﻿namespace RealmCore.Console.Logic;
 
 internal sealed class AchievementsLogic : ComponentLogic<AchievementsComponent>
 {
@@ -12,7 +11,7 @@ internal sealed class AchievementsLogic : ComponentLogic<AchievementsComponent>
 
     protected override void ComponentRemoved(AchievementsComponent achievementsComponent)
     {
-        achievementsComponent.AchievementUnlocked += HandleAchievementUnlocked;
+        achievementsComponent.AchievementUnlocked -= HandleAchievementUnlocked;
     }
 
     private void HandleAchievementUnlocked(AchievementsComponent achievementsComponent, int achievementName)

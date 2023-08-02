@@ -46,8 +46,6 @@ public sealed class VehicleEngineComponent : Component
         }
     }
 
-    internal int UpgradeId => Entity.GetRequiredService<VehicleEnginesRegistry>().Get(ActiveVehicleEngineId).UpgradeId;
-
     internal VehicleEngineComponent(ICollection<VehicleEngineData> vehicleEngines)
     {
         _activeVehicleEngineId = vehicleEngines.First(x => x.Selected).EngineId;

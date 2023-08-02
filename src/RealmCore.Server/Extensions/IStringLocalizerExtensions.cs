@@ -1,6 +1,4 @@
-﻿using Microsoft.Extensions.Localization;
-
-namespace RealmCore.Server.Extensions;
+﻿namespace RealmCore.Server.Extensions;
 
 public static class IStringLocalizerExtensions
 {

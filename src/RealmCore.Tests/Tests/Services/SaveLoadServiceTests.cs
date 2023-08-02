@@ -57,6 +57,7 @@ public class SaveLoadServiceTests
         services.AddSingleton(_vehicleUpgradeRegistry.Object);
         services.AddSingleton<IDateTimeProvider>(new TestDateTimeProvider());
         services.AddSingleton(new ItemsRegistry());
+        services.AddSingleton<VehicleEnginesRegistry>();
         _services = services.BuildServiceProvider();
     }
 

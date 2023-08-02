@@ -30,5 +30,6 @@ global using System.Diagnostics.CodeAnalysis;
 global using RealmCore.Server.Concepts;
 global using RealmCore.Server.Extensions;
 global using SlipeServer.Server.Services;
+global using RealmCore.Server.Abstractions;
 
 [assembly: ExcludeFromCodeCoverage]

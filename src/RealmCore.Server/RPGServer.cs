@@ -1,8 +1,4 @@
-﻿using Microsoft.Extensions.Localization;
-using RealmCore.Persistance;
-using RealmCore.Server.Serving;
-
-namespace RealmCore.Server;
+﻿namespace RealmCore.Server;
 
 internal sealed class RPGServer : IRPGServer
 {
@@ -38,7 +34,9 @@ internal sealed class RPGServer : IRPGServer
 
     private void ConfigureServices(IServiceCollection services, IRealmConfigurationProvider realmConfigurationProvider)
     {
-        services.Remove(services.Where(x => x.ImplementationType == typeof(ConsoleLogger)).First());
+        var consoleLogger = services.Where(x => x.ImplementationType == typeof(ConsoleLoggerProvider)).FirstOrDefault();
+        if(consoleLogger != null)
+            services.Remove(consoleLogger);
 
         #region Common
         services.AddSingleton<IDateTimeProvider, DateTimeProvider>();
@@ -118,10 +116,12 @@ internal sealed class RPGServer : IRPGServer
         CultureInfo.CurrentCulture = gameplayOptions.Value.Culture;
         CultureInfo.CurrentUICulture = gameplayOptions.Value.Culture;
         _stringLocalizer = GetRequiredService<IStringLocalizer<RPGServer>>();
+        var realmCommandService = GetRequiredService<RealmCommandService>();
 
         ServerStarted?.Invoke();
         _logger.LogInformation(_stringLocalizer.GetOr("ServerStarted", "Server started."));
         _logger.LogInformation("Found resources: {resourcesCount}", RealmResourceServer._resourceCounter);
+        _logger.LogInformation("Created commands: {commandsCount}", realmCommandService.Commands.Count);
         _server.Start();
     }
 

@@ -1,6 +1,5 @@
 ﻿using RealmCore.Module.Web.AdminPanel.Data;
 using RealmCore.Module.Web.AdminPanel.Enums;
-using WebAdminPanel;
 
 namespace RealmCore.Module.Web.AdminPanel.Services.Tabs;
 

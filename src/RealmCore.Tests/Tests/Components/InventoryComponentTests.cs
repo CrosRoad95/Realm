@@ -1,7 +1,4 @@
-﻿using RealmCore.Server.Concepts;
-using RealmCore.Server.Registries;
-
-namespace RealmCore.Tests.Tests.Components;
+﻿namespace RealmCore.Tests.Tests.Components;
 
 public class InventoryComponentTests
 {

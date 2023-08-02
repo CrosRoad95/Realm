@@ -18,6 +18,7 @@ public class VehicleUpgradesComponentTests
     {
         var services = new ServiceCollection();
         services.AddSingleton<VehicleUpgradeRegistry>();
+        services.AddSingleton<VehicleEnginesRegistry>();
         services.AddSingleton(_mock.Object);
 
         var serviceProvider = services.BuildServiceProvider();
