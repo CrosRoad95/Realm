@@ -1,4 +1,5 @@
 ﻿@page "/home"
+@inject EventHub _eventHub;
 
 <PageTitle>Index</PageTitle>
 
@@ -7,3 +8,10 @@
 Welcome to your new app.
 
 <SurveyPrompt Title="How is Blazor working for you?" />
+
+@code {
+    protected override async Task OnInitializedAsync()
+    {
+        await _eventHub.NotifyPageReady();
+    }
+}

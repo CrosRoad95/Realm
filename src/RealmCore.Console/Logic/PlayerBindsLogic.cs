@@ -4,6 +4,21 @@ using RealmCore.Server.Enums;
 
 namespace RealmCore.Console.Logic;
 
+
+internal class CounterPageComponent : GuiPageComponent
+{
+    public CounterPageComponent() : base("counter", true)
+    {
+    }
+}
+
+internal class HomePageComponent : GuiPageComponent
+{
+    public HomePageComponent() : base("home", true)
+    {
+    }
+}
+
 internal sealed class PlayerBindsLogic
 {
     public struct GuiOpenOptions
@@ -31,6 +46,30 @@ internal sealed class PlayerBindsLogic
     {
         OpenCloseGuiHelper(entity, bind, () => new TGuiComponent(), options);
     }
+
+    private void OpenCloseGuiPageHelper<TGuiComponent>(Entity entity, string bind) where TGuiComponent : GuiPageComponent, new()
+    {
+        OpenCloseGuiPageHelper(entity, bind, () => new TGuiComponent());
+    }
+
+    private void OpenCloseGuiPageHelper<TGuiComponent>(Entity entity, string bind, Func<TGuiComponent> factory) where TGuiComponent : GuiPageComponent
+    {
+        var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();
+        playerElementComponent.SetBind(bind, entity =>
+        {
+            if (entity.HasComponent<TGuiComponent>())
+            {
+                entity.DestroyComponent<TGuiComponent>();
+                return;
+            }
+
+            entity.TryDestroyComponent<GuiPageComponent>();
+
+            var guiComponent = entity.AddComponent(factory());
+            playerElementComponent.ResetCooldown(bind);
+        });
+    }
+
 
     private void OpenCloseGuiHelper<TGuiComponent>(Entity entity, string bind, Func<TGuiComponent> factory, GuiOpenOptions options = default) where TGuiComponent : GuiComponent
     {
@@ -119,17 +158,29 @@ internal sealed class PlayerBindsLogic
             {
                 if (entity.TryGetComponent(out BlazorGuiComponent blazorGuiComponent))
                 {
+                    blazorGuiComponent.Path = "index";
                     blazorGuiComponent.Visible = false;
                 }
             });
 
-            playerElementComponent.SetBind("F7", entity =>
-            {
-                if (entity.TryGetComponent(out BlazorGuiComponent blazorGuiComponent))
-                {
-                    blazorGuiComponent.Open("http://mta/local/counter", true);
-                }
-            });
+            OpenCloseGuiPageHelper<HomePageComponent>(entity, "F6");
+            OpenCloseGuiPageHelper<CounterPageComponent>(entity, "F7");
+
+            //playerElementComponent.SetBind("F6", entity =>
+            //{
+            //    if (entity.TryGetComponent(out BlazorGuiComponent blazorGuiComponent))
+            //    {
+            //        blazorGuiComponent.Open("home");
+            //    }
+            //});
+
+            //playerElementComponent.SetBind("F7", entity =>
+            //{
+            //    if (entity.TryGetComponent(out BlazorGuiComponent blazorGuiComponent))
+            //    {
+            //        blazorGuiComponent.Open("counter");
+            //    }
+            //});
 
             OpenCloseGuiHelper(entity, "F1", async () =>
             {

@@ -56,4 +56,9 @@
         var foo = await _eventHub.InvokeAsync<SampleStruct>("test", 1, 2, 3);
         testValue = $"foo: {foo.a} {foo.b}";
     }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await _eventHub.NotifyPageReady();
+    }
 }

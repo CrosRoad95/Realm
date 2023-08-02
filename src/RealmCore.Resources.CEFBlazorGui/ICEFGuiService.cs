@@ -20,7 +20,7 @@ public interface ICEFBlazorGuiService
     void SetDevelopmentMode(Player player, bool isDevelopmentMode);
     void ToggleDevTools(Player player, bool isDevelopmentMode);
     void SetVisible(Player player, bool visible);
-    void SetPath(Player player, string path, bool force);
+    void SetPath(Player player, string path, bool force, bool isAsync);
     internal void HandleInvokeVoidAsyncHandler(Player player, string identifier, string args);
     internal Task<object> HandleInvokeAsyncHandler(Player player, string identifier, string args);
 }

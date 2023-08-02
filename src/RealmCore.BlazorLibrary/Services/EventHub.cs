@@ -45,4 +45,9 @@ public class EventHub
     {
         return InvokeVoidAsync("_locationChanged", location);
     }
+
+    public ValueTask NotifyPageReady()
+    {
+        return InvokeVoidAsync("_guiReady");
+    }
 }

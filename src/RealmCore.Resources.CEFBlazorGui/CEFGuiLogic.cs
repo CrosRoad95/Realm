@@ -70,7 +70,7 @@ internal class CEFBlazorGuiLogic
                 _luaEventHub.Invoke(toggleDevToolsMessages.Player, x => x.ToggleDevTools(toggleDevToolsMessages.Enabled));
                 break;
             case SetPathMessage setPathMessage:
-                _luaEventHub.Invoke(setPathMessage.Player, x => x.SetPath(setPathMessage.Path, setPathMessage.Force));
+                _luaEventHub.Invoke(setPathMessage.Player, x => x.SetPath(setPathMessage.Path, setPathMessage.Force, setPathMessage.IsAsync));
                 break;
         }
     }

@@ -2,9 +2,24 @@
 local webBrowser = nil;
 local browser = nil;
 local selectedMode = "";
+local currentPath = "index"
+
+local function isValidPath(path)
+	if(currentPath == "index" or currentPath == "")then
+		return false;
+	else
+		return true;
+	end
+end
 
 local function handleInvokeVoidAsync(identifier, args)
-	triggerServerEvent("internalCEFInvokeVoidAsync", resourceRoot, identifier, args);
+	if(identifier == "_guiReady")then
+		if(isValidPath(currentPath))then
+			internalSetVisible(true)
+		end
+	else
+		triggerServerEvent("internalCEFInvokeVoidAsync", resourceRoot, identifier, args);
+	end
 end
 
 local function handleInvokeAsync(identifier, promiseId, args)
@@ -49,18 +64,31 @@ function handleToggleDevTools(enabled)
 	toggleBrowserDevTools(webBrowser, enabled);
 end
 
-function handleSetVisible(visible)
+function internalSetVisible(visible)
 	guiSetVisible(browser, visible);
 	setBrowserRenderingPaused (webBrowser, not visible);
-	showCursor(visible, false);
 end
 
-function handleSetPath(path, force)
+function handleSetVisible(visible)
+	internalSetVisible(visible)
+	showCursor(visible, false);
+	if(not visible)then -- TODO: verify if it is okey.
+		currentPath = "" 
+	end
+end
+
+function handleSetPath(path, force, isAsync)
+	currentPath = path;
 	if(selectedMode == "dev")then
 		loadBrowserURL(webBrowser, "http://localhost:5220/"..path)
 	elseif(selectedMode == "prod")then
 		local js = string.format("navigate(%q, %s)", path, force and "true" or "false");
 		executeBrowserJavascript(webBrowser, js);
+	end
+	if(isAsync)then
+		if(isValidPath(path))then
+			showCursor(true, false);
+		end
 	end
 end
 
@@ -101,6 +129,8 @@ local function handleLoad(mode, x, y)
 				if(fileExists("index.html"))then
 					triggerServerEvent("internalBrowserCreated", resourceRoot)
 					loadBrowserURL(source, "http://mta/local/index.html" )
+					setDevelopmentMode(true, true);
+					toggleBrowserDevTools(source, true);
 				else
 					loadBrowserURL(source, "http://mta/local/error.html" )
 				end

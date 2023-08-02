@@ -9,7 +9,7 @@ public class BlazorGuiComponent : Component
     private ICEFBlazorGuiService CEFBlazorGuiService { get; set; } = default!;
 
     public event Action<BlazorGuiComponent, string?>? PathChanged;
-    internal Action<BlazorGuiComponent, string?, bool>? InternalPathChanged { get; set; }
+    internal Action<BlazorGuiComponent, string?, bool, bool>? InternalPathChanged { get; set; }
     internal Action<BlazorGuiComponent, bool?>? InternalDevToolsChanged { get; set; }
 
     private string? _path;
@@ -18,7 +18,7 @@ public class BlazorGuiComponent : Component
         get => _path; set
         {
             if (_path == value) return;
-            InternalPathChanged?.Invoke(this, value, false);
+            InternalPathChanged?.Invoke(this, value, false, false);
             _path = value;
         }
     }
@@ -65,13 +65,23 @@ public class BlazorGuiComponent : Component
 
     }
 
-    public void Open(string path, bool force = false)
+    public void Open(string path, bool force = false, bool isAsync = false)
     {
-        Visible = true;
+        if(isAsync)
+        {
+            //Visible = true;
+            _visible = true;
+        }
+        else
+        {
+            Visible = true;
+        }
+
         if (path == _path && !force)
             return;
         _path = path;
-        InternalPathChanged?.Invoke(this, path, force);
+
+        InternalPathChanged?.Invoke(this, path, force, isAsync);
     }
     
     public void Close()
