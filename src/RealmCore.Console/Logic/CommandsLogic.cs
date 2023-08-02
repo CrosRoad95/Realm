@@ -529,6 +529,12 @@ internal sealed class CommandsLogic
             adminComponent.InteractionDebugRenderingEnabled = !adminComponent.InteractionDebugRenderingEnabled;
         });
 
+        _commandService.AddCommandHandler("createvehiclehud", (entity, args) =>
+        {
+            var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();
+            entity.AddComponent(new SampleVehicleHud());
+        });
+
         _commandService.AddCommandHandler("createhud", (entity, args) =>
         {
             var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();

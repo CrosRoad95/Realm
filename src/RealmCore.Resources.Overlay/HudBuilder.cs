@@ -67,6 +67,12 @@ internal class HudBuilder<TState> : IHudBuilder<TState>
         return this;
     }
 
+    public IHudBuilder<TState> AddVehicleSpeed(Vector2 position, Size size, Color? color = null, Size? scale = null, string font = "default", HorizontalAlign alignX = HorizontalAlign.Left, VerticalAlign alignY = VerticalAlign.Top)
+    {
+        AddText(b => b.WithComputedValue(ComputedValueType.VehicleSpeed).WithPosition(position).WithSize(size).WithScale(scale).WithColor(color ?? Color.White).WithFont(font).WithHorizontalAlign(alignX).WithVerticalAlign(alignY));
+        return this;
+    }
+
     public IHudBuilder<TState> AddText(string text, Vector2 position, Size size, Color? color = null, Size? scale = null, IFont? font = null, HorizontalAlign alignX = HorizontalAlign.Left, VerticalAlign alignY = VerticalAlign.Top)
     {
         if (font == null)

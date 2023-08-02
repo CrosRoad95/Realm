@@ -21,4 +21,5 @@ public interface ITextHudBuilder<TState>
     ITextHudBuilder<TState> WithVerticalAlign(VerticalAlign alignY);
     internal Action<DynamicHudComponent>? DynamicHudComponentAdded { get; set; }
     internal LuaValue[] Build();
+    ITextHudBuilder<TState> WithComputedValue(ComputedValueType computedValueType);
 }

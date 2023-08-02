@@ -129,8 +129,6 @@ local function handleLoad(mode, x, y)
 				if(fileExists("index.html"))then
 					triggerServerEvent("internalBrowserCreated", resourceRoot)
 					loadBrowserURL(source, "http://mta/local/index.html" )
-					setDevelopmentMode(true, true);
-					toggleBrowserDevTools(source, true);
 				else
 					loadBrowserURL(source, "http://mta/local/error.html" )
 				end

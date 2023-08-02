@@ -27,6 +27,7 @@ internal class PropertyExpressionVisitor : ExpressionVisitor
 
 internal class TextHudBuilder<TState> : ITextHudBuilder<TState>
 {
+    private ComputedValueType? _computedValueType = null;
     private string _text = "";
     private Vector2 _position;
     private Size _size;
@@ -52,6 +53,12 @@ internal class TextHudBuilder<TState> : ITextHudBuilder<TState>
     public ITextHudBuilder<TState> WithText(string text)
     {
         _text = text;
+        return this;
+    }
+    
+    public ITextHudBuilder<TState> WithComputedValue(ComputedValueType computedValueType)
+    {
+        _computedValueType = computedValueType;
         return this;
     }
 
@@ -133,11 +140,29 @@ internal class TextHudBuilder<TState> : ITextHudBuilder<TState>
 
     public LuaValue[] Build()
     {
+        if (_computedValueType == null)
+            return new LuaValue[]
+            {
+                "text",
+                _id,
+                _text,
+                _position.X,
+                _position.Y,
+                _size.Width,
+                _size.Height,
+                _color.ToLuaColor(),
+                _scale?.Width ?? 1,
+                _scale?.Height ?? 1,
+                (_font != null) ? _assetsService.MapHandle(_font) : _stringFont,
+                _alignX.AsString(),
+                _alignY.AsString()
+            };
+
         return new LuaValue[]
         {
-            "text",
+            "computedValue",
             _id,
-            _text,
+            _computedValueType.Value.ToString(),
             _position.X,
             _position.Y,
             _size.Width,

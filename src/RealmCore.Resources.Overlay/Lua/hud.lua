@@ -4,12 +4,26 @@ local huds3d = {}
 local assets = {}
 local hud3dResolution = 128; -- 128 pixels per 1m
 
+function getElementSpeed(theElement, unit)
+    local elementType = getElementType(theElement)
+    unit = unit == nil and 0 or ((not tonumber(unit)) and unit or tonumber(unit))
+    local mult = (unit == 0 or unit == "m/s") and 50 or ((unit == 1 or unit == "km/h") and 180 or 111.84681456)
+    return (Vector3(getElementVelocity(theElement)) * mult).length
+end
 
 local function renderHud(position, elements)
 	local x,y = unpack(position)
 	for i,v in ipairs(elements)do
 		if(v[1] == "text")then
 			dxDrawText(v[3], v[4] + x, v[5] + y, v[4] + v[6] + x, v[5] + v[7] + y, v[8], v[9], v[10], v[11] or "sans", v[12], v[13])
+		elseif(v[1] == "computedValue")then
+			if(v[3] == "VehicleSpeed")then
+				local vehicle = getPedOccupiedVehicle(localPlayer)
+				if(vehicle and getVehicleController(vehicle) == localPlayer)then
+					local speed = getElementSpeed(vehicle, "km/s")
+					dxDrawText(string.format("%ikm/h", speed), v[4] + x, v[5] + y, v[4] + v[6] + x, v[5] + v[7] + y, v[8], v[9], v[10], v[11] or "sans", v[12], v[13])
+				end
+			end
 		elseif(v[1] == "rectangle")then
 			dxDrawRectangle(v[3] + x, v[4] + y, v[5], v[6], v[7])
 		end
@@ -38,7 +52,7 @@ end
 
 local function prepareElements(elements)
 	for i,v in ipairs(elements)do
-		if(v[1] == "text")then
+		if(v[1] == "text" or v[1] == "computedValue")then
 			local asset = v[11];
 			if(type(asset) == "table")then
 				v[11] = prepareAsset(asset);
