@@ -2,6 +2,7 @@
 
 namespace RealmCore.Server.Components.Players;
 
+[ComponentUsage(true)]
 public class BlazorGuiComponent : Component
 {
     [Inject]
@@ -29,8 +30,16 @@ public class BlazorGuiComponent : Component
         {
             if (_devTools != value)
             {
-                CEFBlazorGuiService.SetDevelopmentMode(Entity.Player, value);
-                CEFBlazorGuiService.ToggleDevTools(Entity.Player, value);
+                if(value)
+                {
+                    CEFBlazorGuiService.SetDevelopmentMode(Entity.Player, value);
+                    CEFBlazorGuiService.ToggleDevTools(Entity.Player, value);
+                }
+                else
+                {
+                    CEFBlazorGuiService.ToggleDevTools(Entity.Player, value);
+                    CEFBlazorGuiService.SetDevelopmentMode(Entity.Player, value);
+                }
                 _devTools = value;
                 InternalDevToolsChanged?.Invoke(this, value);
             }
