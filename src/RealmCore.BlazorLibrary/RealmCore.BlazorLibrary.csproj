@@ -1,25 +1,31 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFramework>net7.0</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
-  </PropertyGroup>
+	<PropertyGroup>
+		<TargetFramework>net7.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+		<PackageProjectUrl>wwwroot/js</PackageProjectUrl>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <None Remove="wwwroot\bridge.js" />
-  </ItemGroup>
+	<ItemGroup>
+		<None Remove="wwwroot\bridge.js" />
+		<None Remove="wwwroot\sw.js" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <Content Include="wwwroot\bridge.js">
-      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
-      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
-    </Content>
-  </ItemGroup>
+	<ItemGroup>
+		<Content Include="wwwroot\js\bridge.js">
+			<ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+			<CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+		</Content>
+		<Content Include="wwwroot\js\sw.js">
+			<ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+			<CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+		</Content>
+	</ItemGroup>
 
-  <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.Components" Version="7.0.5" />
-    <PackageReference Include="Microsoft.JSInterop" Version="7.0.5" />
-  </ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="Microsoft.AspNetCore.Components" Version="7.0.5" />
+		<PackageReference Include="Microsoft.JSInterop" Version="7.0.5" />
+	</ItemGroup>
 
 </Project>

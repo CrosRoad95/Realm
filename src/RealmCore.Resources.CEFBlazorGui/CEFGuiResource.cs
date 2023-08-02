@@ -16,7 +16,8 @@ internal class CEFBlazorGuiResource : Resource
     internal CEFBlazorGuiResource(MtaServer server, string directoryPath)
         : base(server, server.GetRequiredService<RootElement>(), "CEFBlazorGui")
     {
-
+        string currentDir = System.IO.Directory.GetCurrentDirectory();
+        var filesPath = System.IO.Path.Combine(currentDir, directoryPath);
         foreach (var (path, content) in AdditionalFiles)
             Files.Add(ResourceFileFactory.FromBytes(content, path));
         try
