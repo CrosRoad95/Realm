@@ -1148,6 +1148,45 @@ internal sealed class CommandsLogic
             _chatBox.OutputTo(entity, "Opinia dodana");
         });
 
+        _commandService.AddAsyncCommandHandler("createmarkerforme", async (entity, args) =>
+        {
+            var marker = _entityFactory.CreateMarkerFor(entity, entity.Transform.Position, MarkerType.Cylinder);
+            marker.ElementComponent.Size = 4;
+            marker.ElementComponent.Color = Color.Red;
+            while (true)
+            {
+                if (marker.ElementComponent.Size == 4)
+                {
+                    marker.ElementComponent.Size = 2;
+                    marker.ElementComponent.Color = Color.Red;
+                }
+                else
+                {
+                    marker.ElementComponent.Size = 4;
+                    marker.ElementComponent.Color = Color.Blue;
+                }
+                await Task.Delay(500);
+            }
+        });
+        
+        _commandService.AddAsyncCommandHandler("createmarkerforme2", async (entity, args) =>
+        {
+            var marker = _entityFactory.CreateMarkerFor(entity, new Vector3(-600.8877f, 240.88867f, 26.091864f), MarkerType.Cylinder);
+            marker.ElementComponent.Size = 4;
+            marker.ElementComponent.Color = Color.Red;
+        });
+        
+        _commandService.AddCommandHandler("createmarkerforme3", (entity, args) =>
+        {
+            var marker = _entityFactory.CreateMarkerFor(entity, entity.Transform.Position, MarkerType.Cylinder);
+            marker.ElementComponent.Size = 4;
+            marker.ElementComponent.Color = Color.Red;
+            marker.ElementComponent.EntityEntered = (markerElementComponent, enteredMarker, enteredEntity) =>
+            {
+                ;
+            };
+        });
+
         FontCollection collection = new();
         FontFamily family = collection.Add("Server/Fonts/Ratual.otf");
         Font font = family.CreateFont(24, FontStyle.Regular);

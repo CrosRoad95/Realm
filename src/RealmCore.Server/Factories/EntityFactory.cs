@@ -9,7 +9,6 @@ internal class EntityFactory : IEntityFactory
     private readonly IVehicleRepository _vehicleRepository;
     private readonly IRPGServer _rpgServer;
     private readonly IDateTimeProvider _dateTimeProvider;
-
     public EntityFactory(IECS ecs, IVehicleRepository vehicleRepository, IRPGServer rpgServer, IDateTimeProvider dateTimeProvider)
     {
         _ecs = ecs;
@@ -48,7 +47,8 @@ internal class EntityFactory : IEntityFactory
         {
             pickup.CollisionShape.AssociateWith(player);
         }
-        if (elementComponent is MarkerElementComponent markerElementComponent)
+
+        if (elementComponent.ElementComponent is MarkerElementComponent markerElementComponent)
         {
             markerElementComponent.CollisionShape.AssociateWith(player);
         }

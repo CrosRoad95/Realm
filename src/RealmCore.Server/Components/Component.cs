@@ -70,7 +70,7 @@ public abstract class Component : IDisposable
     public virtual void Dispose()
     {
         ThrowIfDisposed();
-        _disposed = true;
         Disposed?.Invoke(this);
+        _disposed = true;
     }
 }

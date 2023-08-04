@@ -1,4 +1,7 @@
-﻿namespace RealmCore.Server;
+﻿using RealmCore.Server.Behaviours;
+using SlipeServer.Server.ServerBuilders;
+
+namespace RealmCore.Server;
 
 internal sealed class RPGServer : IRPGServer
 {
@@ -13,20 +16,22 @@ internal sealed class RPGServer : IRPGServer
     public RPGServer(IRealmConfigurationProvider realmConfigurationProvider, Action<ServerBuilder>? configureServerBuilder = null)
     {
         _server = new MtaServer(
-            builder =>
+            serverBuilder =>
             {
-                builder.AddLogic<PlayersLogic>();
-                builder.AddLogic<VehiclesLogic>();
-                builder.AddLogic<GuisLogic>();
-                builder.AddLogic<StartupLogic>();
+                serverBuilder.AddLogic<PlayersLogic>();
+                serverBuilder.AddLogic<VehiclesLogic>();
+                serverBuilder.AddLogic<GuisLogic>();
+                serverBuilder.AddLogic<StartupLogic>();
 
-                builder.AddLogic<VehicleUpgradeRegistryLogic>();
-                builder.AddLogic<VehicleEnginesRegistryLogic>();
+                serverBuilder.AddLogic<VehicleUpgradeRegistryLogic>();
+                serverBuilder.AddLogic<VehicleEnginesRegistryLogic>();
 
-                builder.ConfigureServer(realmConfigurationProvider);
-                configureServerBuilder?.Invoke(builder);
+                serverBuilder.AddBehaviour<PrivateCollisionShapeBehaviour>();
 
-                builder.ConfigureServices(x => ConfigureServices(x, realmConfigurationProvider));
+                serverBuilder.ConfigureServer(realmConfigurationProvider);
+                configureServerBuilder?.Invoke(serverBuilder);
+
+                serverBuilder.ConfigureServices(x => ConfigureServices(x, realmConfigurationProvider));
             }
         );
         _logger = GetRequiredService<ILogger<RPGServer>>();

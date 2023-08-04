@@ -4,12 +4,12 @@ public static class MarkerElementComponentExtensions
 {
     public static void AddOpenGuiLogic<TGui>(this MarkerElementComponent markerElementComponent) where TGui : GuiComponent, new()
     {
-        markerElementComponent.EntityEntered = (enteredPickup, entity) =>
+        markerElementComponent.EntityEntered = (markerElementComponent, enteredPickup, entity) =>
         {
             if (!entity.HasComponent<GuiComponent>())
                 entity.AddComponent(new TGui());
         };
-        markerElementComponent.EntityLeft = (leftPickup, entity) =>
+        markerElementComponent.EntityLeft = (markerElementComponent, leftPickup, entity) =>
         {
             if (entity.HasComponent<TGui>())
                 entity.DestroyComponent<TGui>();
@@ -18,12 +18,12 @@ public static class MarkerElementComponentExtensions
 
     public static void AddOpenGuiLogic<TGui>(this MarkerElementComponent markerElementComponent, Func<Entity, Task<TGui>> factory) where TGui : GuiComponent
     {
-        markerElementComponent.EntityEntered = async (enteredPickup, entity) =>
+        markerElementComponent.EntityEntered = async (markerElementComponent, enteredPickup, entity) =>
         {
             if (!entity.HasComponent<GuiComponent>())
                 entity.AddComponent(await factory(entity));
         };
-        markerElementComponent.EntityLeft = (leftPickup, entity) =>
+        markerElementComponent.EntityLeft = (markerElementComponent, leftPickup, entity) =>
         {
             if (entity.HasComponent<TGui>())
                 entity.DestroyComponent<TGui>();
@@ -34,7 +34,7 @@ public static class MarkerElementComponentExtensions
         where TGui1 : GuiComponent, new()
         where TGui2 : GuiComponent, new()
     {
-        markerElementComponent.EntityEntered = (enteredPickup, entity) =>
+        markerElementComponent.EntityEntered = (markerElementComponent, enteredPickup, entity) =>
         {
             if (!entity.HasComponent<GuiComponent>())
             {
@@ -42,7 +42,7 @@ public static class MarkerElementComponentExtensions
                 entity.AddComponent(new TGui2());
             }
         };
-        markerElementComponent.EntityLeft = (leftPickup, entity) =>
+        markerElementComponent.EntityLeft = (markerElementComponent, leftPickup, entity) =>
         {
             if (entity.HasComponent<TGui1>())
                 entity.DestroyComponent<TGui1>();
@@ -53,12 +53,12 @@ public static class MarkerElementComponentExtensions
 
     public static void AddOpenGuiPageLogic<TGui>(this MarkerElementComponent markerElementComponent) where TGui : GuiPageComponent, new()
     {
-        markerElementComponent.EntityEntered = (enteredPickup, entity) =>
+        markerElementComponent.EntityEntered = (markerElementComponent, enteredPickup, entity) =>
         {
             if (!entity.HasComponent<GuiPageComponent>())
                 entity.AddComponent(new TGui());
         };
-        markerElementComponent.EntityLeft = (leftPickup, entity) =>
+        markerElementComponent.EntityLeft = (markerElementComponent, leftPickup, entity) =>
         {
             if (entity.HasComponent<TGui>())
                 entity.DestroyComponent<TGui>();
@@ -67,12 +67,12 @@ public static class MarkerElementComponentExtensions
 
     public static void AddOpenGuiPageLogic<TGui>(this MarkerElementComponent markerElementComponent, Func<Entity, Task<TGui>> factory) where TGui : GuiPageComponent
     {
-        markerElementComponent.EntityEntered = async (enteredPickup, entity) =>
+        markerElementComponent.EntityEntered = async (markerElementComponent, enteredPickup, entity) =>
         {
             if (!entity.HasComponent<GuiPageComponent>())
                 entity.AddComponent(await factory(entity));
         };
-        markerElementComponent.EntityLeft = (leftPickup, entity) =>
+        markerElementComponent.EntityLeft = (markerElementComponent, leftPickup, entity) =>
         {
             if (entity.HasComponent<TGui>())
                 entity.DestroyComponent<TGui>();

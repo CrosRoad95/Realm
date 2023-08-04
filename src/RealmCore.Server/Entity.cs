@@ -200,22 +200,40 @@ public class Entity : IDisposable
     {
         return _components.OfType<TComponent>().FirstOrDefault();
     }
+
+    private IEnumerable<TComponent> InternalGetComponents<TComponent>() where TComponent : Component
+    {
+        return _components.OfType<TComponent>();
+    }
     
     public TComponent? GetComponent<TComponent>() where TComponent : Component
     {
         ThrowIfDisposed();
 
-        TComponent? element;
         _componentsLock.EnterReadLock();
         try
         {
-            element = InternalGetComponent<TComponent>();
+            return InternalGetComponent<TComponent>();
         }
         finally
         {
             _componentsLock.ExitReadLock();
         }
-        return element;
+    }
+    
+    public IReadOnlyList<TComponent> GetComponents<TComponent>() where TComponent : Component
+    {
+        ThrowIfDisposed();
+
+        _componentsLock.EnterReadLock();
+        try
+        {
+            return InternalGetComponents<TComponent>().ToList();
+        }
+        finally
+        {
+            _componentsLock.ExitReadLock();
+        }
     }
 
     internal bool InternalHasComponent<TComponent>(TComponent component) where TComponent : Component
@@ -231,18 +249,16 @@ public class Entity : IDisposable
     public bool HasComponent<TComponent>() where TComponent : Component
     {
         ThrowIfDisposed();
-        bool has;
 
         _componentsLock.EnterReadLock();
         try
         {
-            has = InternalHasComponent<TComponent>();
+            return InternalHasComponent<TComponent>();
         }
         finally
         {
             _componentsLock.ExitReadLock();
         }
-        return has;
     }
 
     public bool HasComponent<TComponent>(TComponent component) where TComponent : Component

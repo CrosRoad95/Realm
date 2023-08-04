@@ -6,16 +6,18 @@ public class MarkerElementComponent : ElementComponent
     private IECS ECS { get; set; } = default!;
     [Inject]
     private ILogger<MarkerElementComponent> Logger { get; set; } = default!;
+    [Inject]
+    private IElementCollection ElementCollection { get; set; } = default!;
 
     protected readonly Marker _marker;
     protected readonly CollisionSphere _collisionShape;
     internal override Element Element => _marker;
     internal CollisionSphere CollisionShape => _collisionShape;
-    private Action<Entity, Entity>? _entityEntered;
-    private Action<Entity, Entity>? _entityLeft;
-    private Action<Entity, IEntityRule>? _entityRuleFailed;
+    private Action<MarkerElementComponent, Entity, Entity>? _entityEntered;
+    private Action<MarkerElementComponent, Entity, Entity>? _entityLeft;
+    private Action<MarkerElementComponent, Entity, IEntityRule>? _entityRuleFailed;
 
-    public Action<Entity, Entity>? EntityEntered
+    public Action<MarkerElementComponent, Entity, Entity>? EntityEntered
     {
         get
         {
@@ -29,7 +31,7 @@ public class MarkerElementComponent : ElementComponent
         }
     }
 
-    public Action<Entity, Entity>? EntityLeft
+    public Action<MarkerElementComponent, Entity, Entity>? EntityLeft
     {
         get
         {
@@ -43,7 +45,7 @@ public class MarkerElementComponent : ElementComponent
         }
     }
 
-    public Action<Entity, IEntityRule>? EntityRuleFailed
+    public Action<MarkerElementComponent, Entity, IEntityRule>? EntityRuleFailed
     {
         get
         {
@@ -81,6 +83,7 @@ public class MarkerElementComponent : ElementComponent
         set
         {
             ThrowIfDisposed();
+            _collisionShape.Radius = value / 2.0f;
             _marker.Size = value;
         }
     }
@@ -121,6 +124,31 @@ public class MarkerElementComponent : ElementComponent
         _collisionShape = new CollisionSphere(marker.Position, _marker.Size);
     }
 
+    public void RefreshColliders()
+    {
+        ThrowIfDisposed();
+
+        if (_collisionShape is CollisionSphere collisionSphere)
+        {
+            var elements = ElementCollection.GetWithinRange(_collisionShape.Position, collisionSphere.Radius);
+            foreach (var element in elements)
+            {
+                if (ECS.TryGetByElement(element, out Entity entity))
+                    CheckCollisionWith(entity);
+            }
+        }
+    }
+
+    public void CheckCollisionWith(Entity entity)
+    {
+        ThrowIfDisposed();
+
+        if (entity.TryGetComponent(out ElementComponent elementComponent))
+        {
+            _collisionShape.CheckElementWithin(elementComponent.Element);
+        }
+    }
+
     public void AddRule(IEntityRule entityRule)
     {
         ThrowIfDisposed();
@@ -148,14 +176,14 @@ public class MarkerElementComponent : ElementComponent
         {
             if (!rule.Check(entity))
             {
-                EntityRuleFailed?.Invoke(entity, rule);
+                EntityRuleFailed?.Invoke(this, entity, rule);
                 return;
             }
         }
 
         try
         {
-            EntityEntered(Entity, entity);
+            EntityEntered(this, Entity, entity);
         }
         catch (Exception ex)
         {
@@ -177,7 +205,7 @@ public class MarkerElementComponent : ElementComponent
         {
             try
             {
-                EntityLeft(Entity, entity);
+                EntityLeft(this, Entity, entity);
             }
             catch (Exception ex)
             {

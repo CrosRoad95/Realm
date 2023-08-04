@@ -11,6 +11,7 @@ using RealmCore.Resources.GuiSystem;
 using RealmCore.Resources.Addons.GuiSystem.DGS;
 using RealmCore.Module.Web.AdminPanel;
 using RealmCore.Module.Grpc;
+using SlipeServer.Server.Behaviour;
 
 Directory.SetCurrentDirectory(Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly()!.Location)!);
 
@@ -58,8 +59,9 @@ var server = builder.Build(null, extraBuilderSteps: serverBuilder =>
     serverBuilder.AddLogic<BlazorGuiLogic>();
     serverBuilder.AddLogic<GRpcLogic>();
     serverBuilder.AddLogic<WebAdminPanelLogic>();
+
 #if DEBUG
-    if(withDgs)
+    if (withDgs)
     {
         serverBuilder.AddLogic<HotReloadLogic>("../../../Server/Gui");
     }

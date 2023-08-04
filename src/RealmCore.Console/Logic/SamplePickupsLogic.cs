@@ -116,11 +116,11 @@ internal class SamplePickupsLogic
         {
             var pickupElementComponent = entity.GetRequiredComponent<MarkerElementComponent>();
             pickupElementComponent.AddRule<MustBePlayerOnFootOnlyRule>();
-            pickupElementComponent.EntityEntered = (enteredPickup, entity) =>
+            pickupElementComponent.EntityEntered = (markerElementComponent, enteredPickup, entity) =>
             {
                 _chatBox.OutputTo(entity, $"Entered marker");
             };
-            pickupElementComponent.EntityLeft = (leftPickup, entity) =>
+            pickupElementComponent.EntityLeft = (markerElementComponent, leftPickup, entity) =>
             {
                 _chatBox.OutputTo(entity, $"Left marker");
             };
