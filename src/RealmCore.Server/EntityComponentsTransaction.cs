@@ -23,7 +23,7 @@ internal class EntityComponentsTransaction : IEntityComponentsTransaction
         lock (_lock)
         {
             if (!_state)
-                throw new InvalidOperationException("Transaction wasn't commited properly");
+                throw new InvalidOperationException("Transaction wasn't committed properly");
         }
     }
 

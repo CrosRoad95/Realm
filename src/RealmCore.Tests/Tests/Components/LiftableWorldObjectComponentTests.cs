@@ -1,4 +1,6 @@
-﻿using RealmCore.Server.Components.Object;
+﻿using Microsoft.Extensions.Logging;
+using RealmCore.Server.Components.Object;
+using RealmCore.Server.Entities;
 using RealmCore.Tests.Classes.Components;
 
 namespace RealmCore.Tests.Tests.Components;
@@ -8,11 +10,21 @@ public class LiftableWorldObjectComponentTests
     private readonly Entity _entity1;
     private readonly Entity _entity2;
     private readonly LiftableWorldObjectComponent _liftableWorldObjectComponent;
+    private readonly Mock<ILogger<Entity>> _logger = new(MockBehavior.Strict);
 
     public LiftableWorldObjectComponentTests()
     {
         var services = new ServiceCollection();
 
+        _logger.Setup(x => x.Log(
+            It.IsAny<LogLevel>(),
+            It.IsAny<EventId>(),
+            It.IsAny<It.IsAnyType>(),
+            It.IsAny<Exception>(),
+            (Func<It.IsAnyType, Exception, string>)It.IsAny<object>()))
+            .Verifiable();
+        _logger.Setup(x => x.BeginScope(It.IsAny<Dictionary<string, object>>())).Returns((IDisposable)null);
+        services.AddSingleton(_logger.Object);
         var serviceProvider = services.BuildServiceProvider();
 
         _entity1 = new(serviceProvider, "test1", EntityTag.Unknown);
@@ -107,7 +119,7 @@ public class LiftableWorldObjectComponentTests
         #endregion
 
         #region Act
-        _entity1.Dispose();
+        _entity2.Dispose();
         #endregion
 
         #region Assert

@@ -2,6 +2,7 @@
 using RealmCore.Persistance.Data;
 using RealmCore.Persistance.Extensions;
 using RealmCore.Server.Json.Converters;
+using static Grpc.Core.Metadata;
 
 namespace RealmCore.Server.Services;
 
@@ -66,86 +67,96 @@ internal class UsersService : IUsersService
             throw new NotSupportedException("Entity is not a player entity.");
 
         using var _ = _logger.BeginEntity(entity);
-        using var transaction = entity.BeginComponentTransaction();
+
+        if (!_activeUsers.TrySetActive(user.Id))
+            throw new Exception("Failed to login to already active account.");
+
+        entity.PreDisposed += HandlePreDisposed;
+
         try
         {
-            if (!_activeUsers.TrySetActive(user.Id))
-                return false;
-
-            await entity.AddComponentAsync(new UserComponent(user));
-            if (user.Inventories != null && user.Inventories.Any())
+            using var transaction = entity.BeginComponentTransaction();
+            try
             {
-                foreach (var inventory in user.Inventories)
+
+                await entity.AddComponentAsync(new UserComponent(user));
+                if (user.Inventories != null && user.Inventories.Any())
                 {
-                    var items = inventory.InventoryItems
-                        .Select(x =>
-                            new Item(_itemsRegistry, x.ItemId, x.Number, JsonConvert.DeserializeObject<Dictionary<string, object>>(x.MetaData, _jsonSerializerSettings))
-                        )
-                        .ToList();
-                    entity.AddComponent(new InventoryComponent(inventory.Size, inventory.Id, items));
+                    foreach (var inventory in user.Inventories)
+                    {
+                        var items = inventory.InventoryItems
+                            .Select(x =>
+                                new Item(_itemsRegistry, x.ItemId, x.Number, JsonConvert.DeserializeObject<Dictionary<string, object>>(x.MetaData, _jsonSerializerSettings))
+                            )
+                            .ToList();
+                        entity.AddComponent(new InventoryComponent(inventory.Size, inventory.Id, items));
+                    }
                 }
+                else
+                    entity.AddComponent(new InventoryComponent(_gameplayOptions.Value.DefaultInventorySize));
+
+                if (user.DailyVisits != null)
+                    entity.AddComponent(new DailyVisitsCounterComponent(user.DailyVisits));
+                else
+                    entity.AddComponent<DailyVisitsCounterComponent>();
+
+                if (user.Stats != null)
+                    entity.AddComponent(new StatisticsCounterComponent(user.Stats));
+                else
+                    entity.AddComponent<StatisticsCounterComponent>();
+
+                if (user.Achievements != null)
+                    entity.AddComponent(new AchievementsComponent(user.Achievements));
+                else
+                    entity.AddComponent<AchievementsComponent>();
+
+                if (user.JobUpgrades != null)
+                    entity.AddComponent(new JobUpgradesComponent(user.JobUpgrades));
+                else
+                    entity.AddComponent<JobUpgradesComponent>();
+
+                if (user.JobStatistics != null)
+                    entity.AddComponent(new JobStatisticsComponent(_dateTimeProvider.Now, user.JobStatistics));
+                else
+                    entity.AddComponent(new JobStatisticsComponent(_dateTimeProvider.Now));
+
+                if (user.Discoveries != null)
+                    entity.AddComponent(new DiscoveriesComponent(user.Discoveries));
+                else
+                    entity.AddComponent<DiscoveriesComponent>();
+
+                if (user.DiscordIntegration != null)
+                    entity.AddComponent(new DiscordIntegrationComponent(user.DiscordIntegration.DiscordUserId));
+
+                foreach (var groupMemberData in user.GroupMembers)
+                    entity.AddComponent(new GroupMemberComponent(groupMemberData));
+
+                foreach (var fractionMemberData in user.FractionMembers)
+                    entity.AddComponent(new FractionMemberComponent(fractionMemberData));
+
+                entity.AddComponent(new LicensesComponent(user.Licenses));
+                entity.AddComponent(new PlayTimeComponent(user.PlayTime));
+                entity.AddComponent(new LevelComponent(user.Level, user.Experience));
+                entity.AddComponent(new MoneyComponent(user.Money));
+                entity.AddComponent<AFKComponent>();
+                entity.Commit(transaction);
             }
-            else
-                entity.AddComponent(new InventoryComponent(_gameplayOptions.Value.DefaultInventorySize));
+            catch (Exception)
+            {
+                entity.Rollback(transaction);
+                throw;
+            }
+            return true;
 
-            if (user.DailyVisits != null)
-                entity.AddComponent(new DailyVisitsCounterComponent(user.DailyVisits));
-            else
-                entity.AddComponent<DailyVisitsCounterComponent>();
-
-            if (user.Stats != null)
-                entity.AddComponent(new StatisticsCounterComponent(user.Stats));
-            else
-                entity.AddComponent<StatisticsCounterComponent>();
-
-            if (user.Achievements != null)
-                entity.AddComponent(new AchievementsComponent(user.Achievements));
-            else
-                entity.AddComponent<AchievementsComponent>();
-
-            if (user.JobUpgrades != null)
-                entity.AddComponent(new JobUpgradesComponent(user.JobUpgrades));
-            else
-                entity.AddComponent<JobUpgradesComponent>();
-
-            if (user.JobStatistics != null)
-                entity.AddComponent(new JobStatisticsComponent(_dateTimeProvider.Now, user.JobStatistics));
-            else
-                entity.AddComponent(new JobStatisticsComponent(_dateTimeProvider.Now));
-
-            if (user.Discoveries != null)
-                entity.AddComponent(new DiscoveriesComponent(user.Discoveries));
-            else
-                entity.AddComponent<DiscoveriesComponent>();
-
-            if (user.DiscordIntegration != null)
-                entity.AddComponent(new DiscordIntegrationComponent(user.DiscordIntegration.DiscordUserId));
-
-            foreach (var groupMemberData in user.GroupMembers)
-                entity.AddComponent(new GroupMemberComponent(groupMemberData));
-
-            foreach (var fractionMemberData in user.FractionMembers)
-                entity.AddComponent(new FractionMemberComponent(fractionMemberData));
-
-            entity.AddComponent(new LicensesComponent(user.Licenses));
-            entity.AddComponent(new PlayTimeComponent(user.PlayTime));
-            entity.AddComponent(new LevelComponent(user.Level, user.Experience));
-            entity.AddComponent(new MoneyComponent(user.Money));
-            entity.AddComponent<AFKComponent>();
-            entity.Commit(transaction);
         }
         catch (Exception ex)
         {
-            _activeUsers.TrySetInactive(user.Id);
-            entity.Rollback(transaction);
-            _logger.LogError(ex, "Failed to sign in a user");
-            throw;
+            _logger.LogError(ex, "Failed to sign in a user.");
+            return false;
         }
-        entity.Disposed += HandleDisposed;
-        return true;
     }
 
-    private void HandleDisposed(Entity entity)
+    private void HandlePreDisposed(Entity entity)
     {
         try
         {

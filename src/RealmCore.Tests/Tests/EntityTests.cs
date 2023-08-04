@@ -1,4 +1,7 @@
-﻿using RealmCore.Tests.Classes.Components;
+﻿using Google.Protobuf.WellKnownTypes;
+using Microsoft.Extensions.Logging;
+using RealmCore.Tests.Classes.Components;
+using RealmCore.Tests.Extensions;
 
 namespace RealmCore.Tests.Tests;
 
@@ -8,10 +11,20 @@ public class EntityTests
     private readonly RealmTestingServer _server;
     private readonly EntityHelper _entityHelper;
 
+    private readonly Mock<ILogger<Entity>> _logger = new(MockBehavior.Strict);
     public EntityTests()
     {
         var services = new ServiceCollection();
         services.AddSingleton(new object());
+        _logger.Setup(x => x.Log(
+        It.IsAny<LogLevel>(),
+        It.IsAny<EventId>(),
+        It.IsAny<It.IsAnyType>(),
+        It.IsAny<Exception>(),
+        (Func<It.IsAnyType, Exception, string>)It.IsAny<object>()))
+        .Verifiable();
+            services.AddSingleton(_logger.Object);
+        _logger.Setup(x => x.BeginScope(It.IsAny<Dictionary<string, object>>())).Returns((IDisposable)null);
         _serviceProvider = services.BuildServiceProvider();
         _server = new();
         _entityHelper = new(_server);
@@ -40,7 +53,7 @@ public class EntityTests
         #region Act
         componentAdded.Should().BeTrue();
         componentDetached.Should().BeTrue();
-        component.IsDispoed().Should().BeTrue();
+        component.IsDisposed().Should().BeTrue();
         #endregion
     }
 
@@ -251,6 +264,62 @@ public class EntityTests
 
         #region Assert
         success.Should().BeTrue();
+        #endregion
+    }
+
+    [Fact]
+    public void TestEntityAndItsComponentLifecycle1()
+    {
+        #region Arrange & Act
+        var entity = new Entity(_serviceProvider, "foo", EntityTag.Unknown);
+        var component = new TestComponent();
+        using var entityMonitor = entity.Monitor();
+        using var componentMonitor = component.Monitor();
+        entity.AddComponent(component);
+        entity.DestroyComponent(component);
+        #endregion
+
+        #region Act
+        var entityEvents = entityMonitor.GetEvents("Entity");
+        var componentEvents = componentMonitor.GetEvents("Component");
+
+        var occurredEvents = entityEvents
+            .Concat(componentEvents)
+            .OrderBy(x => x.TimestampUtc)
+            .Select(x => x.Name)
+            .ToList();
+
+        var expectedEvents = new List<string> { "Entity/ComponentAdded", "Entity/ComponentDetached", "Component/Disposed" };
+
+        occurredEvents.Should().Equal(expectedEvents);
+        #endregion
+    }
+
+    [Fact]
+    public void TestEntityAndItsComponentLifecycle2()
+    {
+        #region Arrange & Act
+        var entity = new Entity(_serviceProvider, "foo", EntityTag.Unknown);
+        var component = new TestComponent();
+        using var entityMonitor = entity.Monitor();
+        using var componentMonitor = component.Monitor();
+        entity.AddComponent(component);
+        entity.Dispose();
+        #endregion
+
+        #region Act
+        var entityEvents = entityMonitor.GetEvents("Entity");
+        var componentEvents = componentMonitor.GetEvents("Component");
+
+        var occurredEvents = entityEvents
+            .Concat(componentEvents)
+            .OrderBy(x => x.TimestampUtc)
+            .Select(x => x.Name)
+            .ToList();
+
+        var expectedEvents = new List<string> { "Entity/ComponentAdded", "Entity/PreDisposed", "Entity/ComponentDetached", "Component/Disposed", "Entity/Disposed" };
+
+        occurredEvents.Should().Equal(expectedEvents);
         #endregion
     }
 }

@@ -32,7 +32,7 @@ public class LiftableWorldObjectComponent : InteractionComponent
             if (Owner == null)
             {
                 Owner = entity;
-                Owner.Disposed += HandleDisposed;
+                Owner.PreDisposed += HandleOwnerPreDisposed;
                 Lifted?.Invoke(this, entity);
                 return true;
             }
@@ -42,8 +42,10 @@ public class LiftableWorldObjectComponent : InteractionComponent
 
     public bool IsAllowedToLift(Entity entity) => AllowedForEntities == null || AllowedForEntities.Contains(entity);
 
-    private void HandleDisposed(Entity disposedEntity)
+    private void HandleOwnerPreDisposed(Entity disposedEntity)
     {
+        Debug.Assert(Owner != null);
+        Owner.PreDisposed -= HandleOwnerPreDisposed;
         TryDrop();
     }
 
@@ -56,16 +58,10 @@ public class LiftableWorldObjectComponent : InteractionComponent
             if (Owner == null)
                 return false;
 
-            Owner.Disposed -= HandleDisposed;
+            Owner.Disposed -= HandleOwnerPreDisposed;
             Dropped?.Invoke(this, Owner);
             Owner = null;
         }
         return true;
-    }
-
-    public override void Dispose()
-    {
-        TryDrop();
-        base.Dispose();
     }
 }

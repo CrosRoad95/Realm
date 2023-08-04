@@ -87,24 +87,6 @@ public abstract class ElementComponent : Component
     {
     }
 
-    private void HandleDisposed(Entity entity)
-    {
-        if (Player != null)
-        {
-            Element.DestroyFor(Player);
-        }
-        else
-        {
-            Entity.Disposed -= HandleDisposed;
-            if(Element is Vehicle vehicle)
-            {
-                foreach (var occupant in vehicle.Occupants)
-                    vehicle.RemovePassenger(occupant.Value);
-            }
-            var destroyed = Element.Destroy();
-        }
-    }
-
     protected override void Load()
     {
         if (Entity.TryGetComponent(out PlayerElementComponent playerElementComponent))
@@ -146,7 +128,7 @@ public abstract class ElementComponent : Component
         RemoveFocusableHandler?.Invoke(Element);
     }
 
-    public override void Dispose()
+    protected override void Detached()
     {
         RemoveFocusableHandler?.Invoke(Element);
         if (!_isPerPlayer)
@@ -154,7 +136,23 @@ public abstract class ElementComponent : Component
             Entity.Transform.PositionChanged -= HandleTransformPositionChanged;
             Entity.Transform.RotationChanged -= HandleTransformRotationChanged;
         }
-        HandleDisposed(Entity);
+        if (Player != null)
+        {
+            Element.DestroyFor(Player);
+        }
+        else
+        {
+            if (Element is Vehicle vehicle)
+            {
+                foreach (var occupant in vehicle.Occupants)
+                    vehicle.RemovePassenger(occupant.Value);
+            }
+            var destroyed = Element.Destroy();
+        }
+    }
+
+    public override void Dispose()
+    {
         base.Dispose();
     }
 }

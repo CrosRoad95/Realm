@@ -2,7 +2,7 @@
 
 namespace RealmCore.Server;
 
-public class Entity : IDisposable
+public sealed class Entity : IDisposable
 {
     private object _transactionLock = new();
     private byte _version;
@@ -46,6 +46,7 @@ public class Entity : IDisposable
     public event Action<Component>? ComponentDetached;
 
     public event Action<Entity>? Disposed;
+    public event Action<Entity>? PreDisposed;
 
     internal Player Player => GetRequiredComponent<PlayerElementComponent>().Player;
     internal Vehicle Vehicle => GetRequiredComponent<VehicleElementComponent>().Vehicle;
@@ -297,22 +298,33 @@ public class Entity : IDisposable
 
     public bool TryGetComponent<TComponent>([NotNullWhen(true)] out TComponent component) where TComponent : Component
     {
-        component = GetComponent<TComponent>();
+        component = GetComponent<TComponent>()!;
         return component != null;
     }
 
     public TComponent GetRequiredComponent<TComponent>() where TComponent : Component
     {
         var component = InternalGetComponent<TComponent>();
-        return component == null ? throw new ComponentNotFoundException<TComponent>() : component;
+        return component ?? throw new ComponentNotFoundException<TComponent>();
     }
 
     private void InternalDetachComponent<TComponent>(TComponent component) where TComponent : Component
     {
         component.TryRemoveEntity(() =>
         {
-            ComponentDetached?.Invoke(component);
-            _components.Remove(component);
+            try
+            {
+                ComponentDetached?.Invoke(component);
+                component.InternalDetached();
+            }
+            catch(Exception)
+            {
+                throw;
+            }
+            finally
+            {
+                _components.Remove(component);
+            }
         });
     }
     
@@ -337,8 +349,8 @@ public class Entity : IDisposable
     public void DestroyComponent<TComponent>(TComponent component) where TComponent : Component
     {
         ThrowIfDisposed();
-        component.Dispose();
         DetachComponent(component);
+        component.Dispose();
     }
 
     public bool TryDestroyComponent<TComponent>(TComponent component) where TComponent : Component
@@ -407,17 +419,17 @@ public class Entity : IDisposable
 
     public override string ToString() => Name;
 
-    protected void ThrowIfDisposed()
+    public void ThrowIfDisposed()
     {
         if (_disposed)
             throw new ObjectDisposedException(nameof(Entity));
     }
 
-    public virtual void Dispose()
+    public void Dispose()
     {
         ThrowIfDisposed();
 
-        Disposed?.Invoke(this);
+        PreDisposed?.Invoke(this);
 
         List<Component> componentsToDestroy;
         _componentsLock.EnterReadLock();
@@ -430,9 +442,21 @@ public class Entity : IDisposable
             _componentsLock.ExitReadLock();
         }
 
+        var logger = _serviceProvider.GetRequiredService<ILogger<Entity>>();
+        using var _ = logger.BeginEntity(this);
         foreach (var component in componentsToDestroy)
-            DestroyComponent(component);
+        {
+            try
+            {
+                DestroyComponent(component);
+            }
+            catch(Exception ex)
+            {
+                logger.LogError(ex, "Failed to destroy component.");
+            }
+        }    
 
+        Disposed?.Invoke(this);
         _disposed = true;
     }
 

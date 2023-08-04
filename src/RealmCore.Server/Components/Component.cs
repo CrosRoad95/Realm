@@ -28,6 +28,8 @@ public abstract class Component : IDisposable
     public virtual bool IsAsync() => false;
 
     protected virtual void Load() { }
+    protected virtual void Detached() { }
+    internal void InternalDetached() => Detached();
 
     internal void InternalLoad()
     {

@@ -133,13 +133,12 @@ public class AdminComponent : Component
         }
     }
 
-    public override void Dispose()
+    protected override void Detached()
     {
         DevelopmentMode = false;
         DebugView = false;
         AdminMode = false;
         NoClip = false;
         InteractionDebugRenderingEnabled = false;
-        base.Dispose();
     }
 }

@@ -1,4 +1,6 @@
-﻿namespace RealmCore.Tests.Tests.Components;
+﻿using Microsoft.Extensions.Logging;
+
+namespace RealmCore.Tests.Tests.Components;
 
 public class CurrentInteractEntityComponentTests
 {
@@ -6,10 +8,20 @@ public class CurrentInteractEntityComponentTests
     private readonly Entity _entity2;
     private readonly Entity _testEntity;
     private readonly Entity _testEntity2;
+    private readonly Mock<ILogger<Entity>> _logger = new(MockBehavior.Strict);
 
     public CurrentInteractEntityComponentTests()
     {
         var services = new ServiceCollection();
+        _logger.Setup(x => x.Log(
+            It.IsAny<LogLevel>(),
+            It.IsAny<EventId>(),
+            It.IsAny<It.IsAnyType>(),
+            It.IsAny<Exception>(),
+            (Func<It.IsAnyType, Exception, string>)It.IsAny<object>()))
+            .Verifiable();
+        services.AddSingleton(_logger.Object);
+        _logger.Setup(x => x.BeginScope(It.IsAny<Dictionary<string, object>>())).Returns((IDisposable)null);
 
         var serviceProvider = services.BuildServiceProvider();
 

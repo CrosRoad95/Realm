@@ -40,7 +40,6 @@ internal class ActiveUsers : IActiveUsers
     {
         lock (_lock)
         {
-
             if (!_activeUsersIds.Contains(userId))
                 return false;
 

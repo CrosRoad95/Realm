@@ -164,27 +164,38 @@ internal class PlayersLogic
 
     private async void HandlePlayerDisconnected(Player player, PlayerQuitEventArgs e)
     {
+        if (!_ecs.TryGetEntityByPlayer(player, out var playerEntity, true))
+            return;
         try
         {
             player.Disconnected -= HandlePlayerDisconnected;
             _playerResources.TryRemove(player, out var _);
-            if (_ecs.TryGetEntityByPlayer(player, out var playerEntity, true))
+            try
             {
-                try
-                {
-                    var saveService = _serviceProvider.GetRequiredService<ISaveService>();
-                    await saveService.Save(playerEntity);
-                    await saveService.Commit();
-                }
-                finally
-                {
-                    playerEntity.Dispose();
-                }
+                var saveService = _serviceProvider.GetRequiredService<ISaveService>();
+                await saveService.Save(playerEntity);
+                await saveService.Commit();
+            }
+            finally
+            {
+                playerEntity.Dispose();
             }
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Failed to handle player disconnected");
+            if (_ecs.ContainsEntity(playerEntity))
+            {
+                _logger.LogCritical(ex, "Failed to save and dispose entity! Executing backup disposing strategy.");
+                try
+                {
+                    _ecs.RemoveEntity(playerEntity);
+                }
+                catch(Exception ex2)
+                {
+                    _logger.LogCritical(ex2, "Backup entity dispose strategy failed.");
+                }
+            }
         }
     }
 }

@@ -16,12 +16,15 @@ public class SaveLoadServiceTests
     private readonly IServiceProvider _services;
     private readonly Mock<ILogger<LoadService>> _loggerLoadServiceMock = new(MockBehavior.Strict);
     private readonly Mock<ILogger<ECS>> _loggerECSMock = new(MockBehavior.Strict);
+    private readonly Mock<ILogger<Entity>> _logger = new(MockBehavior.Strict);
     private readonly Mock<IRPGServer> _rpgServerMock = new(MockBehavior.Strict);
     private readonly Mock<IElementCollection> _elementCollection = new(MockBehavior.Strict);
     private readonly Mock<VehicleUpgradeRegistry> _vehicleUpgradeRegistry = new(MockBehavior.Strict);
 
     public SaveLoadServiceTests()
     {
+        var services = new ServiceCollection();
+
         _loggerLoadServiceMock.Setup(x => x.Log(
             It.IsAny<LogLevel>(),
             It.IsAny<EventId>(),
@@ -38,10 +41,19 @@ public class SaveLoadServiceTests
             (Func<It.IsAnyType, Exception, string>)It.IsAny<object>()))
             .Verifiable();
 
+        _logger.Setup(x => x.Log(
+            It.IsAny<LogLevel>(),
+            It.IsAny<EventId>(),
+            It.IsAny<It.IsAnyType>(),
+            It.IsAny<Exception>(),
+            (Func<It.IsAnyType, Exception, string>)It.IsAny<object>()))
+            .Verifiable();
+        services.AddSingleton(_logger.Object);
+        _logger.Setup(x => x.BeginScope(It.IsAny<Dictionary<string, object>>())).Returns((IDisposable)null);
+
         _rpgServerMock.Setup(x => x.IsReady).Returns(true);
         _rpgServerMock.Setup(x => x.AssociateElement(It.IsAny<object>()));
 
-        var services = new ServiceCollection();
         services.AddPersistance<SQLiteDb>(db => db.UseSqlite($"Filename=./{Path.GetRandomFileName().Replace(".", "")}.db"));
         services.AddSingleton<ISaveService, SaveService>();
         services.AddSingleton<ILoadService, LoadService>();

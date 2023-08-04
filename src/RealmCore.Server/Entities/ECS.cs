@@ -59,6 +59,11 @@ internal sealed class ECS : IECS
         Console = CreateEntity("console", EntityTag.Console);
     }
 
+    public bool ContainsEntity(Entity entity)
+    {
+        return _entities.Contains(entity);
+    }
+
     public Entity GetEntityByPlayer(Player player)
     {
         return _entityByPlayer[player];
@@ -103,7 +108,7 @@ internal sealed class ECS : IECS
         _entityById[entity.Id] = entity;
         _entityByName[entity.Name] = entity;
         entity.ComponentAdded += HandleComponentAdded;
-        entity.Disposed += HandleEntityDestroyed;
+        entity.Disposed += HandleEntityDisposed;
     }
 
     public Entity CreateEntity(string name, EntityTag tag, Action<Entity>? entityBuilder = null)
@@ -119,7 +124,12 @@ internal sealed class ECS : IECS
         return newlyCreatedEntity;
     }
 
-    private void HandleEntityDestroyed(Entity entity)
+    private void HandleEntityDisposed(Entity entity)
+    {
+        RemoveEntity(entity);
+    }
+
+    public void RemoveEntity(Entity entity)
     {
         _entityById.Remove(entity.Id, out var _);
         _entityByName.Remove(entity.Name, out var _);
@@ -142,14 +152,14 @@ internal sealed class ECS : IECS
         if (component is ElementComponent elementComponent)
         {
             _entityByElement[elementComponent.Element] = component.Entity;
-            component.Entity.Disposed += HandleElementEntityDestroyed;
+            component.Entity.PreDisposed += HandleElementEntityPreDisposed;
         }
 
         if (component is PlayerElementComponent playerElementComponent)
         {
             var player = playerElementComponent.Player;
             _entityByPlayer[playerElementComponent.Player] = component.Entity;
-            component.Entity.Disposed += HandlePlayerEntityDestroyed;
+            component.Entity.PreDisposed += HandleElementEntityPreDisposed;
         }
 
         switch(component)
@@ -157,7 +167,7 @@ internal sealed class ECS : IECS
             case PrivateVehicleComponent vehicleComponent:
                 if(_vehicleById.TryAdd(vehicleComponent.Id, component.Entity))
                 {
-                    component.Entity.Disposed += HandleVehicleEntityDisposed;
+                    component.Entity.PreDisposed += HandleElementEntityPreDisposed;
                 }
                 else
                 {
@@ -167,16 +177,16 @@ internal sealed class ECS : IECS
         }
     }
 
-    private void HandleVehicleEntityDisposed(Entity entity)
+    private void HandleVehicleEntityPreDisposed(Entity entity)
     {
         _vehicleById.TryRemove(entity.GetRequiredComponent<PrivateVehicleComponent>().Id, out _);
-        entity.Disposed += HandleVehicleEntityDisposed;
+        entity.PreDisposed += HandleVehicleEntityPreDisposed;
     }
 
-    private void HandleElementEntityDestroyed(Entity elementEntity)
+    private void HandleElementEntityPreDisposed(Entity elementEntity)
     {
-        elementEntity.Disposed -= HandleElementEntityDestroyed;
         _entityByElement.Remove(elementEntity.Element, out var _);
+        elementEntity.PreDisposed -= HandleElementEntityPreDisposed;
     }
 
     private void HandlePlayerEntityDestroyed(Entity playerEntity)

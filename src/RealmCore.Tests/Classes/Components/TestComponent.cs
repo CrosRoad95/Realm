@@ -7,7 +7,7 @@ public class TestComponent : Component
 {
     [Inject]
     private object? Object { get; set; }
-    public bool IsDispoed()
+    public bool IsDisposed()
     {
         try
         {
