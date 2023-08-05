@@ -59,10 +59,9 @@ public class PlayerPrivateElementComponent<TElementComponent> : ElementComponent
         _elementComponent.InternalLoad();
     }
 
-    public override void Dispose()
+    protected override void Detached()
     {
         Entity.TryDestroyComponent(ElementComponent);
-        base.Dispose();
     }
 }
 
