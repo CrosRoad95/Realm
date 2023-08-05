@@ -288,7 +288,7 @@ public class EntityTests
             .Select(x => x.Name)
             .ToList();
 
-        var expectedEvents = new List<string> { "Entity/ComponentAdded", "Entity/ComponentDetached", "Component/Disposed" };
+        var expectedEvents = new List<string> { "Entity/ComponentAdded", "Entity/ComponentDetached", "Component/DetachedFromEntity", "Component/Disposed" };
 
         occurredEvents.Should().Equal(expectedEvents);
         #endregion
@@ -316,7 +316,7 @@ public class EntityTests
             .Select(x => x.Name)
             .ToList();
 
-        var expectedEvents = new List<string> { "Entity/ComponentAdded", "Entity/PreDisposed", "Entity/ComponentDetached", "Component/Disposed", "Entity/Disposed" };
+        var expectedEvents = new List<string> { "Entity/ComponentAdded", "Entity/PreDisposed", "Entity/ComponentDetached", "Component/DetachedFromEntity", "Component/Disposed", "Entity/Disposed" };
 
         occurredEvents.Should().Equal(expectedEvents);
         #endregion
