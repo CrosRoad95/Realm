@@ -148,6 +148,7 @@ internal sealed class SeederServerBuilder
     {
         foreach (var pair in users)
         {
+            var userSeedData = pair.Value;
             var user = await _userManager.Users
                 .IncludeAll()
                 .Where(x => x.UserName == pair.Key)
@@ -158,7 +159,7 @@ internal sealed class SeederServerBuilder
                 var identityResult = await _userManager.CreateAsync(new UserData
                 {
                     UserName = pair.Key,
-                }, pair.Value.Password);
+                }, userSeedData.Password);
                 if (identityResult.Succeeded)
                 {
                     user = await _userManager.FindByNameAsync(pair.Key);
@@ -171,22 +172,33 @@ internal sealed class SeederServerBuilder
             if (user == null)
                 throw new Exception($"Failed to create user '{pair.Key}'");
 
-            var claims = pair.Value.Claims.Select(x => new Claim(x.Key, x.Value))
-                .Concat(new List<Claim>
+            var claims = new List<Claim>
                 {
                     new("seeded", "true"),
                     new("persistent", "true"),
-                });
+                };
+            if(userSeedData.Claims != null)
+                claims = userSeedData.Claims.Select(x => new Claim(x.Key, x.Value)).Concat(claims).ToList();
 
             await _userManager.RemoveClaimsAsync(user, await _userManager.GetClaimsAsync(user));
             await _userManager.AddClaimsAsync(user, claims);
-            await _userManager.AddToRolesAsync(user, pair.Value.Roles);
+            if(pair.Value.Roles != null)
+                await _userManager.AddToRolesAsync(user, pair.Value.Roles);
 
-            user.Settings = pair.Value.Settings.Select(x => new UserSettingData
+            if(pair.Value.Settings != null)
             {
-                SettingId = x.Key,
-                Value = x.Value,
-            }).ToList();
+                foreach (var item in pair.Value.Settings)
+                {
+                    if(!user.Settings.Any(x => x.SettingId == item.Key))
+                    {
+                        user.Settings.Add(new UserSettingData
+                        {
+                            SettingId = item.Key,
+                            Value = item.Value,
+                        });
+                    }
+                }
+            }
 
             var integrations = pair.Value.Integrations;
             if (integrations != null)

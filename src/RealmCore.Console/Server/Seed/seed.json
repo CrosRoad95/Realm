@@ -86,7 +86,8 @@
 				"admin": true
 			},
 			"Settings": {
-				"123": "test123"
+				"123": "test123",
+				"321": "test321"
 			},
 			"Roles": [ "admin", "testRole" ],
 			"Integrations": {

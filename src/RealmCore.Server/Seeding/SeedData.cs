@@ -53,9 +53,9 @@ internal class SeedData
     public class UserSeedData
     {
         public string Password { get; set; }
-        public Dictionary<string, string> Claims { get; set; }
-        public Dictionary<int, string> Settings { get; set; }
-        public List<string> Roles { get; set; }
+        public Dictionary<string, string>? Claims { get; set; }
+        public Dictionary<int, string>? Settings { get; set; }
+        public List<string>? Roles { get; set; }
         public IntegrationsSeedData? Integrations { get; set; }
     }
 
