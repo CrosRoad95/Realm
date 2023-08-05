@@ -85,6 +85,9 @@
 				"webPanel": "*",
 				"admin": true
 			},
+			"Settings": {
+				"123": "test123"
+			},
 			"Roles": [ "admin", "testRole" ],
 			"Integrations": {
 				"Discord": {

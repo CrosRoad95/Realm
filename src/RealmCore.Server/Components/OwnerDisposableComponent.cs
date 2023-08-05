@@ -7,16 +7,16 @@ public class OwnerDisposableComponent : Component
     public OwnerDisposableComponent(Entity owningEntity)
     {
         OwningEntity = owningEntity;
-        OwningEntity.Disposed += HandleDisposed;
+        OwningEntity.PreDisposed += HandlePreDisposed;
     }
 
-    private void HandleDisposed(Entity entity)
+    private void HandlePreDisposed(Entity entity)
     {
         Entity.Dispose();
     }
 
     public override void Dispose()
     {
-        OwningEntity.Disposed -= HandleDisposed;
+        OwningEntity.Disposed -= HandlePreDisposed;
     }
 }

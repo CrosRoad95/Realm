@@ -1,4 +1,5 @@
 ﻿using RealmCore.Persistence.Data;
+using RealmCore.Persistence.Extensions;
 using static RealmCore.Server.Seeding.SeedData;
 
 namespace RealmCore.Server.Seeding;
@@ -148,7 +149,7 @@ internal sealed class SeederServerBuilder
         foreach (var pair in users)
         {
             var user = await _userManager.Users
-                .Include(x => x.DiscordIntegration)
+                .IncludeAll()
                 .Where(x => x.UserName == pair.Key)
                 .FirstOrDefaultAsync();
 
@@ -181,6 +182,12 @@ internal sealed class SeederServerBuilder
             await _userManager.AddClaimsAsync(user, claims);
             await _userManager.AddToRolesAsync(user, pair.Value.Roles);
 
+            user.Settings = pair.Value.Settings.Select(x => new UserSettingData
+            {
+                SettingId = x.Key,
+                Value = x.Value,
+            }).ToList();
+
             var integrations = pair.Value.Integrations;
             if (integrations != null)
             {
@@ -193,8 +200,9 @@ internal sealed class SeederServerBuilder
                         user.DiscordIntegration = new DiscordIntegrationData { DiscordUserId = discordUserId };
                     _logger.LogInformation("Seeder: Added discord integration with discord user id {discordUserId} for user {userName}", discordUserId, pair.Key);
                 }
-                await _userManager.UpdateAsync(user);
             }
+            await _userManager.UpdateAsync(user);
+
             _createdUsers.Add(pair.Key, user);
         }
     }
