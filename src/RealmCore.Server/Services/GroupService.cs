@@ -1,5 +1,5 @@
-﻿using RealmCore.Persistance.Data;
-using RealmCore.Persistance.Interfaces;
+﻿using RealmCore.Persistence.Data;
+using RealmCore.Persistence.Interfaces;
 
 namespace RealmCore.Server.Services;
 

@@ -1,7 +1,4 @@
-﻿using RealmCore.Server.Components.Elements;
-using static Grpc.Core.Metadata;
-
-namespace RealmCore.Server.Behaviours;
+﻿namespace RealmCore.Server.Behaviours;
 
 internal sealed class PrivateCollisionShapeBehaviour
 {

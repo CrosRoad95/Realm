@@ -1,5 +1,5 @@
-﻿using RealmCore.Persistance.Data;
-using RealmCore.Persistance.Interfaces;
+﻿using RealmCore.Persistence.Data;
+using RealmCore.Persistence.Interfaces;
 
 namespace RealmCore.Server.Services;
 
@@ -21,7 +21,6 @@ public class BanService : IBanService
         var banData = _banRepository.CreateBanForSerial(serial, until, reason, responsible, type);
         if (await _banRepository.Commit() > 0)
             BanAdded?.Invoke(banData);
-
     }
 
     public async Task BanUserId(int userId, DateTime? until = null, string? reason = null, string? responsible = null, int type = 0)

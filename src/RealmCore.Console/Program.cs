@@ -11,7 +11,6 @@ using RealmCore.Resources.GuiSystem;
 using RealmCore.Resources.Addons.GuiSystem.DGS;
 using RealmCore.Module.Web.AdminPanel;
 using RealmCore.Module.Grpc;
-using SlipeServer.Server.Behaviour;
 
 Directory.SetCurrentDirectory(Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly()!.Location)!);
 

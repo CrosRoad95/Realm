@@ -18,7 +18,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\RealmCore.Persistance\RealmCore.Persistance.csproj" />
+    <ProjectReference Include="..\RealmCore.Persistence\RealmCore.Persistence.csproj" />
   </ItemGroup>
 
   <ItemGroup>

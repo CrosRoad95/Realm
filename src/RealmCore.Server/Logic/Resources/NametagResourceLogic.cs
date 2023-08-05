@@ -1,5 +1,4 @@
-﻿using RealmCore.Resources.Nametags;
-using RealmCore.Server.Abstractions;
+﻿using RealmCore.Server.Abstractions;
 using RealmCore.Server.Components.Peds;
 
 namespace RealmCore.Server.Logic.Resources;

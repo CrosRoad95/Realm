@@ -117,7 +117,7 @@ global using RealmCore.Server.Policies.Interfaces;
 global using Polly;
 global using RealmCore.Interfaces.Extend;
 global using Microsoft.Extensions.Localization;
-global using RealmCore.Persistance;
+global using RealmCore.Persistence;
 global using RealmCore.Server.Serving;
 
 global using ILogger = Microsoft.Extensions.Logging.ILogger;

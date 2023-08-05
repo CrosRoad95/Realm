@@ -1,5 +1,4 @@
-﻿using Google.Protobuf.WellKnownTypes;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using RealmCore.Tests.Classes.Components;
 using RealmCore.Tests.Extensions;
 

@@ -1,6 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
 using RealmCore.Server.Components.Object;
-using RealmCore.Server.Entities;
 using RealmCore.Tests.Classes.Components;
 
 namespace RealmCore.Tests.Tests.Components;

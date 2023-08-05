@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
-using RealmCore.Persistance;
-using RealmCore.Persistance.Interfaces;
-using RealmCore.Persistance.Repository;
+using RealmCore.Persistence;
+using RealmCore.Persistence.Interfaces;
+using RealmCore.Persistence.Repository;
 using RealmCore.Server.Components.Elements;
 using RealmCore.Server.Entities;
 using RealmCore.Server.Factories;
@@ -54,7 +54,7 @@ public class SaveLoadServiceTests
         _rpgServerMock.Setup(x => x.IsReady).Returns(true);
         _rpgServerMock.Setup(x => x.AssociateElement(It.IsAny<object>()));
 
-        services.AddPersistance<SQLiteDb>(db => db.UseSqlite($"Filename=./{Path.GetRandomFileName().Replace(".", "")}.db"));
+        services.AddPersistence<SQLiteDb>(db => db.UseSqlite($"Filename=./{Path.GetRandomFileName().Replace(".", "")}.db"));
         services.AddSingleton<ISaveService, SaveService>();
         services.AddSingleton<ILoadService, LoadService>();
         services.AddSingleton<RepositoryFactory>();

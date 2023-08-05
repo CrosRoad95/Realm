@@ -1,4 +1,4 @@
-﻿using RealmCore.Persistance.Data;
+﻿using RealmCore.Persistence.Data;
 using static RealmCore.Server.Seeding.SeedData;
 
 namespace RealmCore.Server.Seeding;

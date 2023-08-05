@@ -1,4 +1,4 @@
-﻿using RealmCore.Persistance;
+﻿using RealmCore.Persistence;
 using System.Diagnostics.CodeAnalysis;
 
 namespace RealmCore.SQLite;

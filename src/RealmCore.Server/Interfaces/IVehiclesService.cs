@@ -1,5 +1,5 @@
-﻿using RealmCore.Persistance.Data;
-using RealmCore.Persistance.DTOs;
+﻿using RealmCore.Persistence.Data;
+using RealmCore.Persistence.DTOs;
 
 namespace RealmCore.Server.Interfaces;
 

@@ -1,11 +1,9 @@
 ﻿using Microsoft.AspNetCore.Authorization;
-using RealmCore.Persistance.Data;
-using RealmCore.Persistance.Extensions;
+using RealmCore.Persistence.Data;
+using RealmCore.Persistence.Extensions;
 using RealmCore.Server.Json.Converters;
-using static Grpc.Core.Metadata;
 
 namespace RealmCore.Server.Services;
-
 
 internal class UsersService : IUsersService
 {
@@ -78,7 +76,6 @@ internal class UsersService : IUsersService
             using var transaction = entity.BeginComponentTransaction();
             try
             {
-
                 await entity.AddComponentAsync(new UserComponent(user));
                 if (user.Inventories != null && user.Inventories.Any())
                 {

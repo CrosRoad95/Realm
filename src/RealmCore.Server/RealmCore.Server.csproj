@@ -38,7 +38,7 @@
     <ProjectReference Include="..\RealmCore.Module.Discord\RealmCore.Module.Discord.csproj" />
     <ProjectReference Include="..\RealmCore.Module.Grpc.Proto\RealmCore.Module.Grpc.Proto.csproj" />
     <ProjectReference Include="..\RealmCore.MySql\RealmCore.MySql.csproj" />
-    <ProjectReference Include="..\RealmCore.Persistance\RealmCore.Persistance.csproj" />
+    <ProjectReference Include="..\RealmCore.Persistence\RealmCore.Persistence.csproj" />
     <ProjectReference Include="..\RealmCore.Resources.Addons.GuiSystem.DGS\RealmCore.Resources.Addons.GuiSystem.DGS.csproj" />
     <ProjectReference Include="..\RealmCore.Resources.Admin\RealmCore.Resources.Admin.csproj" />
     <ProjectReference Include="..\RealmCore.Resources.AFK\RealmCore.Resources.AFK.csproj" />

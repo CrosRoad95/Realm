@@ -1,6 +1,6 @@
-﻿using RealmCore.Persistance;
-using RealmCore.Persistance.Interfaces;
-using RealmCore.Persistance.Repository;
+﻿using RealmCore.Persistence;
+using RealmCore.Persistence.Interfaces;
+using RealmCore.Persistence.Repository;
 
 namespace RealmCore.Tests.Tests;
 
@@ -10,7 +10,7 @@ public class GroupServiceTests
     public GroupServiceTests()
     {
         var services = new ServiceCollection();
-        services.AddPersistance<SQLiteDb>(db => db.UseInMemoryDatabase("inMemoryDatabase"), ServiceLifetime.Singleton);
+        services.AddPersistence<SQLiteDb>(db => db.UseInMemoryDatabase("inMemoryDatabase"), ServiceLifetime.Singleton);
         services.AddTransient<IGroupRepository, GroupRepository>();
         services.AddTransient<IGroupService, GroupService>();
         _serviceProvider = services.BuildServiceProvider();

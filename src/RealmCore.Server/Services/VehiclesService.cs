@@ -1,6 +1,6 @@
-﻿using RealmCore.Persistance.Data;
-using RealmCore.Persistance.DTOs;
-using RealmCore.Persistance.Interfaces;
+﻿using RealmCore.Persistence.Data;
+using RealmCore.Persistence.DTOs;
+using RealmCore.Persistence.Interfaces;
 using RealmCore.Server.Json.Converters;
 
 namespace RealmCore.Server.Services;

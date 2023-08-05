@@ -41,15 +41,15 @@ public static class ServerBuilderExtensions
                     var connectionString = realmConfigurationProvider.Get<string>("Database:ConnectionString");
                     if (string.IsNullOrEmpty(connectionString))
                         throw new Exception("Connection string not found or empty.");
-                    services.AddPersistance<MySqlDb>(db => db.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString)));
+                    services.AddPersistence<MySqlDb>(db => db.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString)));
                     services.AddRealmIdentity<MySqlDb>(realmConfigurationProvider.GetRequired<IdentityConfiguration>("Identity"));
                     break;
                 case "SqlLite":
-                    services.AddPersistance<SQLiteDb>(db => db.UseSqlite("Filename=./server.db"));
+                    services.AddPersistence<SQLiteDb>(db => db.UseSqlite("Filename=./server.db"));
                     services.AddRealmIdentity<SQLiteDb>(realmConfigurationProvider.GetRequired<IdentityConfiguration>("Identity"));
                     break;
                 case "InMemory":
-                    services.AddPersistance<SQLiteDb>(db => db.UseInMemoryDatabase("inMemoryDatabase"));
+                    services.AddPersistence<SQLiteDb>(db => db.UseInMemoryDatabase("inMemoryDatabase"));
                     services.AddRealmIdentity<SQLiteDb>(realmConfigurationProvider.GetRequired<IdentityConfiguration>("Identity"));
                     break;
                 default:

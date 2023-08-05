@@ -1,4 +1,4 @@
-﻿using RealmCore.Persistance.Data;
+﻿using RealmCore.Persistence.Data;
 
 namespace RealmCore.Server.Components.Players;
 
