@@ -614,6 +614,17 @@ internal sealed class CommandsLogic
             playerElementComponent.Kick("test 123");
         });
 
+        _commandService.AddCommandHandler("attach", (entity, args) =>
+        {
+            var objectEntity = _entityFactory.CreateObject((ObjectModel)1337, Vector3.Zero, Vector3.Zero);
+            //entity.AddComponent(new AttachedEntityComponent(objectEntity, SlipeServer.Packets.Enums.BoneId.Pelvis1, new Vector3(-1, -1, 1)));
+            entity.AddComponent(new OwnerDisposableComponent(objectEntity));
+            objectEntity.Disposed += e =>
+            {
+                logger.LogInformation("Disposed attached entity");
+            };
+        });
+        
         _commandService.AddCommandHandler("destroyattachedentity", (entity, args) =>
         {
             var userComponent = entity.GetRequiredComponent<UserComponent>();

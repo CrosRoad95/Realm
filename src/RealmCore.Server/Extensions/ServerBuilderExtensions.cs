@@ -95,6 +95,7 @@ public static class ServerBuilderExtensions
         serverBuilder.AddLogic<WatermarkResourceLogic>();
         serverBuilder.AddLogic<CEFBlazorGuiResourceLogic>();
         serverBuilder.AddLogic<NametagResourceLogic>();
+        serverBuilder.AddLogic<BoneAttachResourceLogic>();
         #endregion
 
         // Miscellaneous logic

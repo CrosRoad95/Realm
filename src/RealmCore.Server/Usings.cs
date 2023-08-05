@@ -119,6 +119,7 @@ global using RealmCore.Interfaces.Extend;
 global using Microsoft.Extensions.Localization;
 global using RealmCore.Persistence;
 global using RealmCore.Server.Serving;
+global using RealmCore.Server.Abstractions;
 
 global using ILogger = Microsoft.Extensions.Logging.ILogger;
 

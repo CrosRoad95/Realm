@@ -24,12 +24,16 @@ public abstract class Component : IDisposable
     }
 
     public event Action<Component>? Disposed;
+    public event Action<Component>? DetachedFromEntity;
 
     public virtual bool IsAsync() => false;
 
     protected virtual void Load() { }
     protected virtual void Detached() { }
-    internal void InternalDetached() => Detached();
+    internal void InternalDetached() {
+        DetachedFromEntity?.Invoke(this);
+        Detached();
+    }
 
     internal void InternalLoad()
     {

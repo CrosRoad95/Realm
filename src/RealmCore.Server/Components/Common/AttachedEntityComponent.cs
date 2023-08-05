@@ -8,9 +8,6 @@ public class AttachedEntityComponent : Component
     private readonly Vector3? _rotationOffset;
     private readonly object _lock = new();
 
-    [Inject]
-    private BoneAttachService BoneAttachService { get; set; } = default!;
-
     private Entity _attachedEntity;
     public Entity AttachedEntity
     {
@@ -25,6 +22,12 @@ public class AttachedEntityComponent : Component
             _attachedEntity = value;
         }
     }
+
+    public BoneId BoneId => _boneId;
+
+    public Vector3? PositionOffset => _positionOffset;
+
+    public Vector3? RotationOffset => _rotationOffset;
 
     public AttachedEntityComponent(Entity entity, BoneId boneId, Vector3? positionOffset = null, Vector3? rotationOffset = null)
     {
@@ -56,18 +59,10 @@ public class AttachedEntityComponent : Component
     protected override void Load()
     {
         _attachedEntity.Disposed += HandleAttachedEntityDestroyed;
-        var element = _attachedEntity.GetRequiredComponent<ElementComponent>().Element;
-        var ped = Entity.GetRequiredComponent<PedElementComponent>().Ped;
-        BoneAttachService.Attach(element, ped, _boneId, _positionOffset, _rotationOffset);
-        _attachedEntity.GetRequiredComponent<ElementComponent>().AreCollisionsEnabled = false;
     }
 
     public override void Dispose()
     {
-        var element = _attachedEntity.GetRequiredComponent<ElementComponent>().Element;
         _attachedEntity.Disposed -= HandleAttachedEntityDestroyed;
-        if (BoneAttachService.IsAttached(element))
-            BoneAttachService.Detach(element);
-        base.Dispose();
     }
 }
