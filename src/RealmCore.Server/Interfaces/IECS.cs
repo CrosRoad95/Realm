@@ -6,6 +6,9 @@ public interface IECS
     IReadOnlyCollection<Entity> VehicleEntities { get; }
     IReadOnlyCollection<Entity> PlayerEntities { get; }
     Entity Console { get; }
+    int EntitiesCount { get; }
+    int EntitiesComponentsCount { get; }
+
     event Action<Entity>? EntityCreated;
 
     bool ContainsEntity(Entity entity);

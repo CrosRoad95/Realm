@@ -1,4 +1,4 @@
-﻿namespace RealmCore.Server.Commands;
+﻿namespace RealmCore.Server.Logic;
 
 internal class EssentialCommandsLogic
 {

@@ -26,6 +26,28 @@ internal sealed class ECS : IECS
         }
     }
 
+    public int EntitiesCount
+    {
+        get
+        {
+            _entitiesLock.EnterWriteLock();
+            var count = _entities.Count;
+            _entitiesLock.ExitWriteLock();
+            return count;
+        }
+    }
+    
+    public int EntitiesComponentsCount
+    {
+        get
+        {
+            _entitiesLock.EnterWriteLock();
+            var count = _entities.Sum(x => x.ComponentsCount);
+            _entitiesLock.ExitWriteLock();
+            return count;
+        }
+    }
+
     public IReadOnlyCollection<Entity> VehicleEntities
     {
         get

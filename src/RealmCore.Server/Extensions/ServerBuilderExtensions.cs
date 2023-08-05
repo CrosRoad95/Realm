@@ -58,6 +58,7 @@ public static class ServerBuilderExtensions
 
             services.AddSingleton<HelpCommand>();
             services.AddCommand<SaveCommand>(); 
+            services.AddCommand<ServerInfoCommand>(); 
             services.AddCommand<ReloadEntitiesCommand>();
 
             services.AddSingleton<IECS, ECS>();
