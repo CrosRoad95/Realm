@@ -1,21 +1,21 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFramework>net7.0</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
-	  <Version>0.0.0</Version>
-	  <Authors>Sebastian Jura</Authors>
-  </PropertyGroup>
-
-  <ItemGroup>
-    <EmbeddedResource Include="Lua\assets.lua" />
-  </ItemGroup>
+	<PropertyGroup>
+		<TargetFramework>net7.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+		<Version>0.0.0</Version>
+		<Authors>Sebastian Jura</Authors>
+	</PropertyGroup>
 
 	<ItemGroup>
-	    <PackageReference Include="RenderWareBuilders" Version="0.1.0-CI-20221009-163717" />
+		<EmbeddedResource Include="Lua\assets.lua" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="RenderWareBuilders" Version="0.1.0-CI-20221009-163717" />
 		<ProjectReference Include="..\RealmCore.Resources.Base\RealmCore.Resources.Base.csproj" />
 		<PackageReference Include="RenderWareIo" Version="0.1.0-CI-20221009-163717" />
-        <PackageReference Include="Silk.NET.Assimp" Version="2.16.0" />
+		<PackageReference Include="Silk.NET.Assimp" Version="2.16.0" />
 	</ItemGroup>
 </Project>

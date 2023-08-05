@@ -1,19 +1,19 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFramework>net7.0</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
-	  <Version>0.0.0</Version>
-	  <Authors>Sebastian Jura</Authors>
-  </PropertyGroup>
+	<PropertyGroup>
+		<TargetFramework>net7.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+		<Version>0.0.0</Version>
+		<Authors>Sebastian Jura</Authors>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <EmbeddedResource Include="Lua\afk.lua" />
-  </ItemGroup>
+	<ItemGroup>
+		<EmbeddedResource Include="Lua\afk.lua" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\RealmCore.Resources.Base\RealmCore.Resources.Base.csproj" />
-  </ItemGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\RealmCore.Resources.Base\RealmCore.Resources.Base.csproj" />
+	</ItemGroup>
 
 </Project>

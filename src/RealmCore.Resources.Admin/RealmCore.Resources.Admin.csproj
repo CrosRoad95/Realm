@@ -1,34 +1,34 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFramework>net7.0</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
-	  <Version>0.0.0</Version>
-	  <Authors>Sebastian Jura</Authors>
-  </PropertyGroup>
+	<PropertyGroup>
+		<TargetFramework>net7.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+		<Version>0.0.0</Version>
+		<Authors>Sebastian Jura</Authors>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <Compile Remove="Interfaces\**" />
-    <EmbeddedResource Remove="Interfaces\**" />
-    <None Remove="Interfaces\**" />
-  </ItemGroup>
+	<ItemGroup>
+		<Compile Remove="Interfaces\**" />
+		<EmbeddedResource Remove="Interfaces\**" />
+		<None Remove="Interfaces\**" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <None Remove="Lua\Tools\components.lua" />
-    <None Remove="Lua\Tools\spawnMarkers.lua" />
-  </ItemGroup>
+	<ItemGroup>
+		<None Remove="Lua\Tools\components.lua" />
+		<None Remove="Lua\Tools\spawnMarkers.lua" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <EmbeddedResource Include="Lua\admin.lua" />
-    <EmbeddedResource Include="Lua\debugDraw.lua" />
-    <EmbeddedResource Include="Lua\Tools\components.lua" />
-    <EmbeddedResource Include="Lua\Tools\entities.lua" />
-    <EmbeddedResource Include="Lua\Tools\spawnMarkers.lua" />
-  </ItemGroup>
+	<ItemGroup>
+		<EmbeddedResource Include="Lua\admin.lua" />
+		<EmbeddedResource Include="Lua\debugDraw.lua" />
+		<EmbeddedResource Include="Lua\Tools\components.lua" />
+		<EmbeddedResource Include="Lua\Tools\entities.lua" />
+		<EmbeddedResource Include="Lua\Tools\spawnMarkers.lua" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\RealmCore.Resources.Base\RealmCore.Resources.Base.csproj" />
-  </ItemGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\RealmCore.Resources.Base\RealmCore.Resources.Base.csproj" />
+	</ItemGroup>
 
 </Project>

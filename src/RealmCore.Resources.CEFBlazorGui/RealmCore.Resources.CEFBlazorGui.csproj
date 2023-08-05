@@ -9,15 +9,15 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-	  <None Remove="Lua\cefBlazorGui.lua" />
-	  <None Remove="Lua\error.html" />
+		<None Remove="Lua\cefBlazorGui.lua" />
+		<None Remove="Lua\error.html" />
 	</ItemGroup>
 
 	<ItemGroup>
-	  <EmbeddedResource Include="Lua\cefBlazorGui.lua">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
-	  <EmbeddedResource Include="Lua\error.html" />
+		<EmbeddedResource Include="Lua\cefBlazorGui.lua">
+			<CopyToOutputDirectory>Never</CopyToOutputDirectory>
+		</EmbeddedResource>
+		<EmbeddedResource Include="Lua\error.html" />
 	</ItemGroup>
 
 	<ItemGroup>

@@ -15,33 +15,33 @@
 		<PackageReference Include="Grpc.AspNetCore.Server" Version="2.49.0" />
 		<PackageReference Include="Grpc.Net.ClientFactory" Version="2.49.0" />
 		<PackageReference Include="Grpc.Tools" Version="2.49.0">
-		  <PrivateAssets>all</PrivateAssets>
-		  <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
 		<PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="7.0.0" />
 	</ItemGroup>
 
 	<ItemGroup>
-	  <ProjectReference Include="..\RealmCore.Configuration\RealmCore.Configuration.csproj" />
-	  <ProjectReference Include="..\RealmCore.Interfaces\RealmCore.Interfaces.csproj" />
-	  <ProjectReference Include="..\RealmCore.Logging\RealmCore.Logging.csproj" />
-	  <ProjectReference Include="..\RealmCore.Module.Grpc\RealmCore.Module.Grpc.csproj" />
+		<ProjectReference Include="..\RealmCore.Configuration\RealmCore.Configuration.csproj" />
+		<ProjectReference Include="..\RealmCore.Interfaces\RealmCore.Interfaces.csproj" />
+		<ProjectReference Include="..\RealmCore.Logging\RealmCore.Logging.csproj" />
+		<ProjectReference Include="..\RealmCore.Module.Grpc\RealmCore.Module.Grpc.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>
-	  <Protobuf Include="..\RealmCore.Module.Grpc.Proto\discord.proto" GrpcServices="Both">
-	    <Link>Protos\discord.proto</Link>
-	  </Protobuf>
+		<Protobuf Include="..\RealmCore.Module.Grpc.Proto\discord.proto" GrpcServices="Both">
+			<Link>Protos\discord.proto</Link>
+		</Protobuf>
 	</ItemGroup>
 
 	<ItemGroup>
-	  <None Update="appsettings.json">
-	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-	  </None>
+		<None Update="appsettings.json">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
 	</ItemGroup>
 
 	<ItemGroup>
-	  <Folder Include="Protos\" />
+		<Folder Include="Protos\" />
 	</ItemGroup>
 
 </Project>
