@@ -1,4 +1,4 @@
-﻿namespace RealmCore.Server.Factories;
+﻿namespace RealmCore.Server.Exceptions;
 
 public class UnableToCreateElementException : Exception
 {

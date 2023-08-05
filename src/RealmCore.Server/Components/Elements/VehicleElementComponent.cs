@@ -265,7 +265,7 @@ public class VehicleElementComponent : ElementComponent
         _vehicle.AddPassenger(seat, (Ped)pedEntity.Element, warpsIn);
     }
 
-    public void RemovePasssenger(Entity pedEntity, bool warpsOut = true)
+    public void RemovePassenger(Entity pedEntity, bool warpsOut = true)
     {
         ThrowIfDisposed();
         _vehicle.RemovePassenger((Ped)pedEntity.Element, warpsOut);

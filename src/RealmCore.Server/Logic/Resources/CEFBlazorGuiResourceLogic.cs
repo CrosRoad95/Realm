@@ -2,7 +2,7 @@
 
 namespace RealmCore.Server.Logic.Resources;
 
-internal class CEFBlazorGuiResourceLogic
+internal sealed class CEFBlazorGuiResourceLogic
 {
     private readonly IECS _ecs;
     private readonly ICEFBlazorGuiService _cefBlazorGuiService;

@@ -1,4 +1,5 @@
-﻿using HudComponent = SlipeServer.Server.Elements.Enums.HudComponent;
+﻿using SlipeServer.Server.Elements;
+using HudComponent = SlipeServer.Server.Elements.Enums.HudComponent;
 
 namespace RealmCore.Server.Components.Elements;
 
@@ -832,6 +833,12 @@ public sealed class PlayerElementComponent : PedElementComponent
     {
         ThrowIfDisposed();
         _player.SetTransferBoxVisible(visible);
+    }
+
+    public void WarpIntoVehicle(Entity vehicleEntity, byte seat)
+    {
+        ThrowIfDisposed();
+        _player.WarpIntoVehicle(vehicleEntity.Vehicle, seat);
     }
 
     public override void Dispose()

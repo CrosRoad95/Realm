@@ -336,7 +336,7 @@ internal class EntityFactory : IEntityFactory
     {
         return _ecs.CreateEntity(constructionInfo?.Id ?? $"collision cuboid {Guid.NewGuid()}", EntityTag.CollisionShape, entity =>
         {
-            var collisioncuboid = new CollisionCuboid(position, dimensions);
+            var collisionCuboid = new CollisionCuboid(position, dimensions);
 
             entity.Transform.Position = position;
             if (constructionInfo != null)
@@ -345,7 +345,7 @@ internal class EntityFactory : IEntityFactory
                 entity.Transform.Dimension = constructionInfo.Dimension;
             }
 
-            var collisionCuboidElementComponent = entity.AddComponent(new CollisionCuboidElementComponent(collisioncuboid));
+            var collisionCuboidElementComponent = entity.AddComponent(new CollisionCuboidElementComponent(collisionCuboid));
 
             AssociateWithServer(entity);
 

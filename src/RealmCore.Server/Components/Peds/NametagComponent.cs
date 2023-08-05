@@ -2,12 +2,11 @@
 
 public sealed class NametagComponent : Component
 {
-    [Inject]
-    private INametagsService NametagsService { get; set; } = default!;
-
     private readonly object _lock = new();
-    private string _text;
 
+    public event Action<NametagComponent, string>? TextChanged;
+
+    private string _text;
     public string Text
     {
         get
@@ -21,7 +20,7 @@ public sealed class NametagComponent : Component
             lock (_lock)
             {
                 _text = value;
-                NametagsService.SetNametag((Ped)Entity.Element, _text);
+                TextChanged?.Invoke(this, _text);
             }
         }
     }
@@ -29,15 +28,5 @@ public sealed class NametagComponent : Component
     public NametagComponent(string text)
     {
         _text = text;
-    }
-
-    protected override void Load()
-    {
-        NametagsService.SetNametag((Ped)Entity.Element, _text);
-    }
-
-    protected override void Detached()
-    {
-        NametagsService.RemoveNametag((Ped)Entity.Element);
     }
 }

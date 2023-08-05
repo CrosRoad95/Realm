@@ -91,7 +91,7 @@ public class PedElementComponent : ElementComponent
         var weapon = _ped.Weapons.FirstOrDefault(x => x.Type == weaponId);
         if (weapon == null)
         {
-            _ped.Weapons.Add(new Weapon(WeaponId.Bat, 1));
+            _ped.Weapons.Add(new Weapon(weaponId, ammo));
         }
         else
         {
