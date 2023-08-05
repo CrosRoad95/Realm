@@ -16,12 +16,20 @@ public class PrivateVehicleComponent : Component
         }
     }
 
-    public VehicleAccess Access { get; }
+    private readonly VehicleAccess _access;
+    public VehicleAccess Access
+    {
+        get
+        {
+            ThrowIfDisposed();
+            return _access;
+        }
+    }
 
     internal PrivateVehicleComponent(VehicleData vehicleData)
     {
         _vehicleData = vehicleData;
-        Access = new VehicleAccess(_vehicleData.UserAccesses, this);
+        _access = new VehicleAccess(_vehicleData.UserAccesses, this);
     }
 
     protected override void Load()

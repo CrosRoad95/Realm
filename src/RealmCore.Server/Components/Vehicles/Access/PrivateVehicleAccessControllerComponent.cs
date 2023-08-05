@@ -6,11 +6,6 @@ public class PrivateVehicleAccessControllerComponent : VehicleAccessControllerCo
     private IECS ECS { get; set; } = default!;
 
     private PrivateVehicleComponent? _privateVehicleComponent;
-    protected override void Load()
-    {
-        base.Load();
-        Entity.GetRequiredComponent<VehicleElementComponent>().Vehicle.CanEnter = CanEnter;
-    }
 
     protected override bool CanEnter(Ped ped, Vehicle vehicle)
     {
@@ -24,11 +19,5 @@ public class PrivateVehicleAccessControllerComponent : VehicleAccessControllerCo
             return false;
 
         return _privateVehicleComponent.Access.HasAccess(entity);
-    }
-
-    public override void Dispose()
-    {
-        Entity.GetRequiredComponent<VehicleElementComponent>().Vehicle.CanEnter = null;
-        base.Dispose();
     }
 }

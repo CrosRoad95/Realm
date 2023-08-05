@@ -1,5 +1,6 @@
 ﻿namespace RealmCore.Server.Components.Vehicles.Access;
 
+[ComponentUsage(true)]
 public abstract class VehicleAccessControllerComponent : Component
 {
     protected abstract bool CanEnter(Ped ped, Vehicle vehicle);
@@ -11,22 +12,12 @@ public abstract class VehicleAccessControllerComponent : Component
 
         if (Entity.Components.OfType<VehicleAccessControllerComponent>().Where(x => x != this).Any())
             throw new InvalidOperationException("Vehicle already have vehicle access controller component");
+
+        Entity.GetRequiredComponent<VehicleElementComponent>().Vehicle.CanEnter = CanEnter;
     }
 
-    public bool HasAccess(Entity entity)
+    protected override void Detached()
     {
-        ThrowIfDisposed();
-
-        switch (entity.Tag)
-        {
-            case EntityTag.Player:
-                {
-                    var player = entity.Player;
-                    var vehicle = (Vehicle)Entity.Element;
-                    return CanEnter(player, vehicle);
-                }
-            default:
-                throw new InvalidOperationException();
-        }
+        Entity.GetRequiredComponent<VehicleElementComponent>().Vehicle.CanEnter = null;
     }
 }

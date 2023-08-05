@@ -138,11 +138,10 @@ public class VehicleFuelComponent : Component, ILuaDebugDataProvider
         }
     }
 
-    public override void Dispose()
+    protected override void Detached()
     {
         var vehicle = Entity.GetRequiredComponent<VehicleElementComponent>().Vehicle;
         vehicle.PositionChanged -= HandlePositionChanged;
-        base.Dispose();
     }
 
     private void HandlePositionChanged(Element sender, ElementChangedEventArgs<Vector3> args)

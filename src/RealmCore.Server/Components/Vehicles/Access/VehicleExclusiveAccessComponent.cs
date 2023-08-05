@@ -16,12 +16,6 @@ public class VehicleExclusiveAccessComponent : VehicleAccessControllerComponent
         _entity.Disposed -= HandleTargetEntityDestroyed;
     }
 
-    protected override void Load()
-    {
-        base.Load();
-        Entity.GetRequiredComponent<VehicleElementComponent>().Vehicle.CanEnter = CanEnter;
-    }
-
     protected override bool CanEnter(Ped ped, Vehicle vehicle)
     {
         if (_entity.TryGetComponent(out PlayerElementComponent playerElementComponent))
@@ -29,11 +23,5 @@ public class VehicleExclusiveAccessComponent : VehicleAccessControllerComponent
             return playerElementComponent.Player == ped;
         }
         return false;
-    }
-
-    public override void Dispose()
-    {
-        Entity.GetRequiredComponent<VehicleElementComponent>().Vehicle.CanEnter = null;
-        base.Dispose();
     }
 }
