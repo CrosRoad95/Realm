@@ -21,6 +21,7 @@ using RealmCore.Server.Concepts.Spawning;
 using RealmCore.Server.Components.Vehicles.Access;
 using RealmCore.Server.Components;
 using RealmCore.Persistence;
+using RealmCore.Server.Interfaces;
 
 namespace RealmCore.Console.Logic;
 
@@ -1152,11 +1153,21 @@ internal sealed class CommandsLogic
             _chatBox.OutputTo(entity, $"zmieniono ocenę z {rating} z {last.Item1}");
         });
         
-        
         _commandService.AddAsyncCommandHandler("addopinion", async (entity, args) =>
         {
             await feedbackService.AddOpinion(entity, 1, string.Join(", ", args));
             _chatBox.OutputTo(entity, "Opinia dodana");
+        });
+
+        _commandService.AddCommandHandler("addprivatemarker", (entity, args) =>
+        {
+            void handleEntityEntered(MarkerElementComponent markerElementComponent, Entity enteredMarker, Entity enteredEntity)
+            {
+                entity.DestroyComponent(markerElementComponent);
+            }
+
+            PlayerPrivateElementComponent<MarkerElementComponent> marker = _entityFactory.CreateMarkerFor(entity, entity.Transform.Position with { X = entity.Transform.Position.X + 4 }, MarkerType.Checkpoint);
+            marker.ElementComponent.EntityEntered = handleEntityEntered;
         });
 
         _commandService.AddAsyncCommandHandler("createmarkerforme", async (entity, args) =>

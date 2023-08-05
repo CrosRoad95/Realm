@@ -46,6 +46,13 @@ public class PlayerPrivateElementComponent<TElementComponent> : ElementComponent
     public PlayerPrivateElementComponent(TElementComponent elementComponent)
     {
         _elementComponent = elementComponent;
+        _elementComponent.DetachedFromEntity += HandleDetachedFromEntity;
+    }
+
+    private void HandleDetachedFromEntity(Component elementComponent)
+    {
+        _elementComponent.DetachedFromEntity -= HandleDetachedFromEntity;
+        Entity.DestroyComponent(this);
     }
 
     protected override void Load()
@@ -61,7 +68,8 @@ public class PlayerPrivateElementComponent<TElementComponent> : ElementComponent
 
     protected override void Detached()
     {
-        Entity.TryDestroyComponent(ElementComponent);
+        _elementComponent.DetachedFromEntity -= HandleDetachedFromEntity;
+        Entity.TryDestroyComponent(_elementComponent);
     }
 }
 

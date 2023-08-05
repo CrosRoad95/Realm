@@ -3,25 +3,24 @@
 internal sealed class PrivateCollisionShapeBehaviour
 {
     private readonly List<MarkerElementComponent> _markerElementComponents = new();
-    private readonly object _markerElementComponentsLock = new();
+    private readonly List<MarkerElementComponent> _markerElementsToRemove = new();
+    private readonly ReaderWriterLockSlim _markerElementComponentsLock = new();
     private readonly Task _refreshPrivateCollisionShapeCollidersTask;
+    private readonly ILogger<PrivateCollisionShapeBehaviour> _logger;
 
-    public PrivateCollisionShapeBehaviour(MtaServer server, IElementCollection elementCollection, IECS ecs)
+    public PrivateCollisionShapeBehaviour(IECS ecs, ILogger<PrivateCollisionShapeBehaviour> logger)
     {
-        lock (_markerElementComponentsLock)
+        foreach (var playerEntity in ecs.Entities.Where(x => x.Tag == EntityTag.Player))
         {
-            foreach (var playerEntity in ecs.Entities.Where(x => x.Tag == EntityTag.Player))
+            var privateMarkerElementComponents = playerEntity.GetComponents<PlayerPrivateElementComponent<MarkerElementComponent>>();
+            foreach (var markerElementComponent in privateMarkerElementComponents)
             {
-                var privaterMarkerElementComponents = playerEntity.GetComponents<PlayerPrivateElementComponent<MarkerElementComponent>>();
-                foreach (var markerElementComponent in privaterMarkerElementComponents)
-                {
-                    Add(markerElementComponent);
-                }
+                Add(markerElementComponent);
             }
         }
-
         ecs.EntityCreated += HandleEntityCreated;
         _refreshPrivateCollisionShapeCollidersTask = Task.Run(RefreshPrivateCollisionShapeColliders);
+        _logger = logger;
     }
 
     private void HandleEntityCreated(Entity entity)
@@ -47,31 +46,57 @@ internal sealed class PrivateCollisionShapeBehaviour
 
     private void Add(PlayerPrivateElementComponent<MarkerElementComponent> markerElementComponent)
     {
-        _markerElementComponents.Add(markerElementComponent.ElementComponent);
-        markerElementComponent.Disposed += HandleMarkerElementComponentDisposed;
+        _markerElementComponentsLock.EnterWriteLock();
+        try
+        {
+            _markerElementComponents.Add(markerElementComponent.ElementComponent);
+            markerElementComponent.Disposed += HandleMarkerElementComponentDisposed;
+        }
+        finally
+        {
+            _markerElementComponentsLock.ExitWriteLock();
+        }
     }
 
     private void HandleMarkerElementComponentDisposed(Component component)
     {
         if (component is PlayerPrivateElementComponent<MarkerElementComponent> privateMarkerElementComponent)
-            lock (_markerElementComponentsLock)
-            {
-                _markerElementComponents.Remove(privateMarkerElementComponent.ElementComponent);
-            }
+        {
+            _markerElementsToRemove.Add(privateMarkerElementComponent.ElementComponent);
+        }
     }
 
     private async Task RefreshPrivateCollisionShapeColliders()
     {
         while (true)
         {
-            lock (_markerElementComponentsLock)
+            _markerElementComponentsLock.EnterWriteLock();
+            try
             {
                 foreach (var markerElementComponent in _markerElementComponents)
                 {
                     markerElementComponent.RefreshColliders();
                 }
+
+                if(_markerElementsToRemove.Count > 0)
+                {
+                    foreach (var item in _markerElementsToRemove)
+                    {
+                        _markerElementComponents.Remove(item);
+                    }
+                    _markerElementsToRemove.Clear();
+                }
             }
-            await Task.Delay(250);
+            catch(Exception ex)
+            {
+                _logger.LogHandleError(ex);
+            }
+            finally
+            {
+                _markerElementComponentsLock.ExitWriteLock();
+            }
+
+            await Task.Delay(150);
         }
     }
 }
