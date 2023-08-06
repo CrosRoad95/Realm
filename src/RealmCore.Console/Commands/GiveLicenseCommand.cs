@@ -17,7 +17,7 @@ public sealed class GiveLicenseCommand : IInGameCommand
         if (entity.TryGetComponent(out LicensesComponent licenseComponent))
         {
             var license = args.ReadInt();
-            if (licenseComponent.AddLicense(license))
+            if (licenseComponent.TryAddLicense(license))
             {
                 _chatBox.OutputTo(entity, $"license added: '{license}'");
             }

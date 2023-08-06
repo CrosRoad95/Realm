@@ -104,16 +104,16 @@ public abstract class ElementComponent : Component
         BaseLoaded = true;
     }
 
-    private void HandleTransformRotationChanged(Transform newTransform)
+    private void HandleTransformRotationChanged(Transform newTransform, Vector3 rotation)
     {
         if (!_isPerPlayer)
-            Element.Rotation = newTransform.Rotation;
+            Element.Rotation = rotation;
     }
 
-    private void HandleTransformPositionChanged(Transform newTransform)
+    private void HandleTransformPositionChanged(Transform newTransform, Vector3 position)
     {
         if (!_isPerPlayer)
-            Element.Position = newTransform.Position;
+            Element.Position = position;
     }
 
     public void AddFocusable()

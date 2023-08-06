@@ -214,8 +214,9 @@ public class MarkerElementComponent : ElementComponent
         }
     }
 
-    private void HandleDisposed(Entity entity)
+    private void HandlePreDisposed(Entity entity)
     {
+        entity.PreDisposed -= HandlePreDisposed;
         _collisionShape.ElementEntered -= HandleElementEntered;
         _collisionShape.ElementLeft -= HandleElementLeft;
         _collisionShape.Destroy();
@@ -227,7 +228,7 @@ public class MarkerElementComponent : ElementComponent
         if (Entity.TryGetComponent(out PlayerElementComponent playerElementComponent))
             _collisionShape.Id = (ElementId)playerElementComponent.MapIdGenerator.GetId();
 
-        Entity.Disposed += HandleDisposed;
+        Entity.PreDisposed += HandlePreDisposed;
         _collisionShape.ElementEntered += HandleElementEntered;
         _collisionShape.ElementLeft += HandleElementLeft;
         _collisionShape.Position = _marker.Position;
@@ -235,7 +236,7 @@ public class MarkerElementComponent : ElementComponent
             Entity.Transform.PositionChanged += HandlePositionChanged;
     }
 
-    private void HandlePositionChanged(Transform transform)
+    private void HandlePositionChanged(Transform transform, Vector3 position)
     {
         _collisionShape.Position = transform.Position;
     }

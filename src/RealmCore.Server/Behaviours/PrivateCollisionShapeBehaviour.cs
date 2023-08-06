@@ -97,7 +97,7 @@ internal sealed class PrivateCollisionShapeBehaviour
                 _markerElementComponentsLock.ExitWriteLock();
             }
 
-            await Task.Delay(150);
+            await Task.Delay((int)(1000.0f / 60.0f));
         }
     }
 }

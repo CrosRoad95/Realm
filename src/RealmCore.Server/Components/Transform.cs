@@ -22,7 +22,7 @@ public sealed class Transform
                 _position = value;
                 if (_element != null)
                     _element.Position = value;
-                PositionChanged?.Invoke(this);
+                PositionChanged?.Invoke(this, value);
             }
         }
     }
@@ -36,7 +36,7 @@ public sealed class Transform
                 _rotation = value;
                 if (_element != null)
                     _element.Rotation = value;
-                RotationChanged?.Invoke(this);
+                RotationChanged?.Invoke(this, value);
             }
         }
     }
@@ -50,7 +50,7 @@ public sealed class Transform
                 _interior = value;
                 if (_element != null)
                     _element.Interior = value;
-                InteriorChanged?.Invoke(this);
+                InteriorChanged?.Invoke(this, value);
             }
         }
     }
@@ -64,17 +64,17 @@ public sealed class Transform
                 _dimension = value;
                 if (_element != null)
                     _element.Dimension = value;
-                DimensionChanged?.Invoke(this);
+                DimensionChanged?.Invoke(this, value);
             }
         }
     }
 
     public Vector3 Forward => new(MathF.Sin(-_rotation.Z * (float)(Math.PI / 180)), MathF.Cos(-_rotation.Z * (float)(Math.PI / 180)), 0);
 
-    public event Action<Transform>? PositionChanged;
-    public event Action<Transform>? RotationChanged;
-    public event Action<Transform>? InteriorChanged;
-    public event Action<Transform>? DimensionChanged;
+    public event Action<Transform, Vector3>? PositionChanged;
+    public event Action<Transform, Vector3>? RotationChanged;
+    public event Action<Transform, byte>? InteriorChanged;
+    public event Action<Transform, ushort>? DimensionChanged;
     public Transform(Entity entity)
     {
         Entity = entity;

@@ -85,7 +85,7 @@ public abstract class HudComponent<TState> : Component where TState : class, new
 
     protected abstract void Build(IHudBuilder<TState> hudBuilderCallback);
 
-    public override void Dispose()
+    protected override void Detached()
     {
         var playerElementComponent = Entity.GetRequiredComponent<PlayerElementComponent>();
         OverlayService.RemoveHud(playerElementComponent.Player, _id);

@@ -65,7 +65,7 @@ public class LicensesComponent : Component
                 .FirstOrDefault();
     }
 
-    public bool AddLicense(int licenseId)
+    public bool TryAddLicense(int licenseId)
     {
         ThrowIfDisposed();
 

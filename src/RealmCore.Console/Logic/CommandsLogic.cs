@@ -290,7 +290,7 @@ internal sealed class CommandsLogic
 
             if (entity.TryGetComponent(out LicensesComponent licenseComponent))
             {
-                if (licenseComponent.AddLicense(1))
+                if (licenseComponent.TryAddLicense(1))
                     _chatBox.OutputTo(entity, $"Test license added: 'test123' of id 1");
             }
 
@@ -1207,6 +1207,45 @@ internal sealed class CommandsLogic
             {
                 ;
             };
+        });
+        
+        _commandService.AddCommandHandler("setinterior", (entity, args) =>
+        {
+            if (entity.Transform.Interior == 1)
+                entity.Transform.Interior = 0;
+            else
+                entity.Transform.Interior = 1;
+        });
+        
+        _commandService.AddCommandHandler("setinterior2", (entity, args) =>
+        {
+            entity.Transform.Interior = 1;
+            var veh = _entityFactory.CreateVehicle(404, new Vector3(338.26562f, -87.75098f, 1.5197021f), Vector3.Zero);
+            entity.GetRequiredComponent<PlayerElementComponent>().WarpIntoVehicle(veh);
+        });
+        
+        _commandService.AddAsyncCommandHandler("setinterior2b", async (entity, args) =>
+        {
+            entity.Transform.InteriorChanged += (t,i) =>
+            {
+                chatBox.OutputTo(entity, $"Changed interior to: {i}");
+            };
+            entity.Transform.Interior = 1;
+            var veh = _entityFactory.CreateVehicle(404, new Vector3(338.26562f, -87.75098f, 1.5197021f), Vector3.Zero);
+            await Task.Delay(1000);
+            entity.GetRequiredComponent<PlayerElementComponent>().WarpIntoVehicle(veh);
+        });
+
+        _commandService.AddCommandHandler("setinterior3", (entity, args) =>
+        {
+            entity.Transform.Interior = 1;
+            entity.Transform.Interior = 0;
+        });
+
+
+        _commandService.AddCommandHandler("position", (entity, args) =>
+        {
+            _chatBox.OutputTo(entity, $"Position: {entity.Transform.Position}, rot: {entity.Transform.Rotation}, i: {entity.Transform.Interior}, d: {entity.Transform.Dimension}");
         });
 
         FontCollection collection = new();

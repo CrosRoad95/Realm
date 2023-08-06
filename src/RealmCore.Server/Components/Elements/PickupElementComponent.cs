@@ -173,9 +173,9 @@ public class PickupElementComponent : ElementComponent
         Entity.Transform.PositionChanged += HandlePositionChanged;
     }
 
-    private void HandlePositionChanged(Transform transform)
+    private void HandlePositionChanged(Transform transform, Vector3 position)
     {
-        _pickup.CollisionShape.Position = transform.Position;
+        _pickup.CollisionShape.Position = position;
     }
 
     public override void Dispose()

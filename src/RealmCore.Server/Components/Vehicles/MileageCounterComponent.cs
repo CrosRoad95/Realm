@@ -58,7 +58,7 @@ public class MileageCounterComponent : Component
         Entity.Transform.PositionChanged -= HandlePositionChanged;
     }
 
-    private void HandlePositionChanged(Transform transform)
+    private void HandlePositionChanged(Transform transform, Vector3 position)
     {
         Update();
     }

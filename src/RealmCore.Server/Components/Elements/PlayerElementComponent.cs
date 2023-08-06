@@ -834,12 +834,13 @@ public sealed class PlayerElementComponent : PedElementComponent
         _player.SetTransferBoxVisible(visible);
     }
 
-    public void WarpIntoVehicle(Entity vehicleEntity, byte seat)
+    public void WarpIntoVehicle(Entity vehicleEntity, byte seat = 0)
     {
         ThrowIfDisposed();
-        _player.Interior = vehicleEntity.Vehicle.Interior;
-        _player.Dimension = vehicleEntity.Vehicle.Dimension;
-        _player.WarpIntoVehicle(vehicleEntity.Vehicle, seat);
+        var vehicle = vehicleEntity.Vehicle;
+        Entity.Transform.Interior = vehicle.Interior;
+        Entity.Transform.Dimension = vehicle.Dimension;
+        _player.WarpIntoVehicle(vehicle, seat);
     }
 
     public override void Dispose()
