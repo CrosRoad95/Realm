@@ -837,6 +837,8 @@ public sealed class PlayerElementComponent : PedElementComponent
     public void WarpIntoVehicle(Entity vehicleEntity, byte seat)
     {
         ThrowIfDisposed();
+        _player.Interior = vehicleEntity.Vehicle.Interior;
+        _player.Dimension = vehicleEntity.Vehicle.Dimension;
         _player.WarpIntoVehicle(vehicleEntity.Vehicle, seat);
     }
 

@@ -34,7 +34,7 @@ internal sealed class ClientInterfaceResourceLogic
         if (component is InteractionComponent interactionComponent)
         {
             _clientInterfaceService.AddFocusable(component.Entity.Element);
-            interactionComponent.Disposed += HandleInteractionComponentDisposed;
+            interactionComponent.DetachedFromEntity += HandleInteractionComponentDetachedFromEntity;
         }
         if (component is ElementComponent elementComponent)
         {
@@ -43,10 +43,10 @@ internal sealed class ClientInterfaceResourceLogic
         }
     }
 
-    private void HandleInteractionComponentDisposed(Component component)
+    private void HandleInteractionComponentDetachedFromEntity(Component component)
     {
         var interactionComponent = (InteractionComponent)component;
-        interactionComponent.Disposed -= HandleInteractionComponentDisposed;
+        interactionComponent.DetachedFromEntity -= HandleInteractionComponentDetachedFromEntity;
         _clientInterfaceService.RemoveFocusable(interactionComponent.Entity.Element);
     }
 

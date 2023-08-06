@@ -73,6 +73,7 @@ internal sealed class PrivateCollisionShapeBehaviour
             _markerElementComponentsLock.EnterWriteLock();
             try
             {
+                // TODO: run outside write lock
                 foreach (var markerElementComponent in _markerElementComponents)
                 {
                     markerElementComponent.RefreshColliders();
