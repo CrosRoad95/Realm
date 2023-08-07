@@ -44,7 +44,7 @@ public class CommandArguments
     public ushort ReadUShort()
     {
         var value = _args[_index++];
-        return byte.Parse(value);
+        return ushort.Parse(value);
     }
 
     public uint ReadUInt()
