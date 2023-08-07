@@ -2,26 +2,22 @@
 
 public class VehicleExclusiveAccessComponent : VehicleAccessControllerComponent
 {
-    private readonly Entity _entity;
+    private readonly Entity _targetEntity;
 
-    public VehicleExclusiveAccessComponent(Entity targetPlayerEntity)
+    public VehicleExclusiveAccessComponent(Entity targetEntity)
     {
-        _entity = targetPlayerEntity;
-        _entity.Disposed += HandleTargetEntityDestroyed;
+        _targetEntity = targetEntity;
+        _targetEntity.Disposed += HandleTargetEntityDestroyed;
     }
 
     private void HandleTargetEntityDestroyed(Entity obj)
     {
         Entity.DestroyComponent(this);
-        _entity.Disposed -= HandleTargetEntityDestroyed;
+        _targetEntity.Disposed -= HandleTargetEntityDestroyed;
     }
 
-    protected override bool CanEnter(Ped ped, Vehicle vehicle)
+    protected override bool CanEnter(Entity pedEntity, Entity vehicleEntity)
     {
-        if (_entity.TryGetComponent(out PlayerElementComponent playerElementComponent))
-        {
-            return playerElementComponent.Player == ped;
-        }
-        return false;
+        return _targetEntity == pedEntity;
     }
 }

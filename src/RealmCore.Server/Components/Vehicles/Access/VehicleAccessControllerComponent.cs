@@ -3,7 +3,10 @@
 [ComponentUsage(true)]
 public abstract class VehicleAccessControllerComponent : Component
 {
-    protected abstract bool CanEnter(Ped ped, Vehicle vehicle);
+    [Inject]
+    private IVehicleAccessService VehicleAccessService { get; set; } = default!;
+
+    protected abstract bool CanEnter(Entity pedEntity, Entity vehicleEntity);
 
     protected override void Load()
     {
@@ -13,7 +16,15 @@ public abstract class VehicleAccessControllerComponent : Component
         if (Entity.Components.OfType<VehicleAccessControllerComponent>().Where(x => x != this).Any())
             throw new InvalidOperationException("Vehicle already have vehicle access controller component");
 
-        Entity.GetRequiredComponent<VehicleElementComponent>().Vehicle.CanEnter = CanEnter;
+        Entity.GetRequiredComponent<VehicleElementComponent>().Vehicle.CanEnter = CanEnterInternal;
+    }
+
+    private bool CanEnterInternal(Ped ped, Vehicle vehicle)
+    {
+        if (VehicleAccessService.InternalCanEnter(ped, vehicle, out var pedEntity, out var vehicleEntity))
+            return true;
+
+        return CanEnter(pedEntity, vehicleEntity);
     }
 
     protected override void Detached()

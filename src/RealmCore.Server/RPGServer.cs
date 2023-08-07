@@ -89,6 +89,7 @@ internal sealed class RPGServer : IRPGServer
         services.AddSingleton<IMapsService, MapsService>();
         services.AddSingleton<ISpawnMarkersService, SpawnMarkersService>();
         services.AddSingleton<IBlazorGuiService, BlazorGuiService>();
+        services.AddSingleton<IVehicleAccessService, VehicleAccessService>();
         #endregion
 
         #region Policies

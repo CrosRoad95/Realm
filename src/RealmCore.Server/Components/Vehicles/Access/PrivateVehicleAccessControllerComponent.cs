@@ -2,22 +2,13 @@
 
 public class PrivateVehicleAccessControllerComponent : VehicleAccessControllerComponent
 {
-    [Inject]
-    private IECS ECS { get; set; } = default!;
-
     private PrivateVehicleComponent? _privateVehicleComponent;
 
-    protected override bool CanEnter(Ped ped, Vehicle vehicle)
+    protected override bool CanEnter(Entity pedEntity, Entity vehicleEntity)
     {
         if(_privateVehicleComponent == null)
             _privateVehicleComponent = Entity.GetRequiredComponent<PrivateVehicleComponent>();
 
-        if (ped is not Player player)
-            return true;
-
-        if (!ECS.TryGetEntityByPlayer(player, out Entity entity))
-            return false;
-
-        return _privateVehicleComponent.Access.HasAccess(entity);
+        return _privateVehicleComponent.Access.HasAccess(pedEntity);
     }
 }

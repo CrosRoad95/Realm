@@ -2,5 +2,5 @@
 
 public class VehicleNoAccessComponent : VehicleAccessControllerComponent
 {
-    protected override bool CanEnter(Ped ped, Vehicle vehicle) => false;
+    protected override bool CanEnter(Entity _1, Entity _2) => false;
 }
