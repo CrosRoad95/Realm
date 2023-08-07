@@ -7,9 +7,8 @@ public class VehicleFocusableComponent : Component
         Entity.GetRequiredComponent<ElementComponent>().AddFocusable();
     }
 
-    public override void Dispose()
+    protected override void Detached()
     {
         Entity.GetRequiredComponent<ElementComponent>().RemoveFocusable();
-        base.Dispose();
     }
 }

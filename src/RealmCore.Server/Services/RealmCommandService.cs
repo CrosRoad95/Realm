@@ -117,7 +117,7 @@ public class RealmCommandService
                 foreach (var policy in commandInfo.RequiredPolicies)
                     if (!await _rpgUserManager.AuthorizePolicy(userComponent, policy))
                     {
-                        _logger.LogInformation("{player} failed to execute command {commandText} because failed to authorize for policy {policy}", player, commandText, policy);
+                        _logger.LogInformation("failed to execute command {commandText} because failed to authorize for policy {policy}", player, commandText, policy);
                         return;
                     }
             }
@@ -125,9 +125,9 @@ public class RealmCommandService
             if (!commandInfo.NoTracing)
             {
                 if (args.Arguments.Any())
-                    _logger.LogInformation("{player} executed command {commandText} with arguments {commandArguments}.", entity);
+                    _logger.LogInformation("Executed command {commandText} with arguments {commandArguments}.", entity);
                 else
-                    _logger.LogInformation("{player} executed command {commandText} with no arguments.", entity);
+                    _logger.LogInformation("Executed command {commandText} with no arguments.", entity);
             }
             try
             {
@@ -146,6 +146,7 @@ public class RealmCommandService
             }
             catch (Exception ex)
             {
+                _chatBox.OutputTo(entity, "Wystąpił nieznany błąd. Jeśli się powtórzy zgłoś się do administracji.");
                 _logger.LogError(ex, "Exception thrown while executing command {commandText} with arguments {commandArguments}", commandText, args.Arguments);
             }
             finally
