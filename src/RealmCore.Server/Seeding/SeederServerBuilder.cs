@@ -165,6 +165,11 @@ internal sealed class SeederServerBuilder
                     user = await _userManager.FindByNameAsync(pair.Key);
                     _logger.LogInformation("Seeder: Created user {userName}", pair.Key);
                 }
+                else
+                {
+                    var identityResultError = string.Join(" ", identityResult.Errors.Select(x => x.Description));
+                    _logger.LogError("Seeder: Failed to create user {userName}, reason: {identityResultError}", pair.Key, identityResultError);
+                }
             }
             else
                 _logger.LogInformation("Seeder: User {userName} already exists", pair.Key);
@@ -303,7 +308,7 @@ internal sealed class SeederServerBuilder
         await BuildIdentityRoles(seedData.Roles);
         await BuildIdentityUsers(seedData.Users);
         await BuildFractions(seedData.Fractions);
-        //BuildBlips(seedData.Blips);
+        BuildBlips(seedData.Blips);
         BuildPickups(seedData.Pickups);
         BuildMarkers(seedData.Markers);
         await BuildGroups(seedData.Groups);
