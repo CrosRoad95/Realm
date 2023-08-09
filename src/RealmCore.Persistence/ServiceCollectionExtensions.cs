@@ -68,8 +68,9 @@ public static class ServiceCollectionExtensions
                 {
                     policy.RequireAuthenticatedUser();
                     policy.RequireRole(identityPolicy.Value.RequireRoles);
-                    foreach (var claim in identityPolicy.Value.RequireClaims)
-                        policy.RequireClaim(claim.Key, claim.Value);
+                    if(identityPolicy.Value.RequireClaims != null)
+                        foreach (var claim in identityPolicy.Value.RequireClaims)
+                            policy.RequireClaim(claim.Key, claim.Value);
                 });
             }
         });

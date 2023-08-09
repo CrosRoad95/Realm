@@ -117,7 +117,7 @@ public class RealmCommandService
                 foreach (var policy in commandInfo.RequiredPolicies)
                     if (!await _rpgUserManager.AuthorizePolicy(userComponent, policy))
                     {
-                        _logger.LogInformation("failed to execute command {commandText} because failed to authorize for policy {policy}", player, commandText, policy);
+                        _logger.LogInformation("Failed to execute command {commandText} because failed to authorize for policy {policy}", commandText, policy);
                         return;
                     }
             }
@@ -195,7 +195,7 @@ public class RealmCommandService
                 foreach (var policy in commandInfo.RequiredPolicies)
                     if (!await _rpgUserManager.AuthorizePolicy(userComponent, policy))
                     {
-                        _logger.LogInformation("{player} failed to execute command {commandText} because failed to authorize for policy {policy}", player, commandText, policy);
+                        _logger.LogInformation("failed to execute command {commandText} because failed to authorize for policy {policy}", commandText, policy);
                         return;
                     }
             }

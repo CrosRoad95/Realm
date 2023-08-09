@@ -75,8 +75,8 @@
 		}
 	},
 	"Roles": {
-		"admin": {},
-		"testRole": {}
+		"Admin": {},
+		"TestRole": {}
 	},
 	"Users": {
 		"admin": {
@@ -89,7 +89,7 @@
 				"123": "test123",
 				"321": "test321"
 			},
-			"Roles": [ "admin", "testRole" ],
+			"Roles": [ "Admin", "TestRole" ],
 			"Integrations": {
 				"Discord": {
 					"UserId": 254302438234783746

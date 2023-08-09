@@ -1242,11 +1242,15 @@ internal sealed class CommandsLogic
             entity.Transform.Interior = 0;
         });
 
-
         _commandService.AddCommandHandler("position", (entity, args) =>
         {
             _chatBox.OutputTo(entity, $"Position: {entity.Transform.Position}, rot: {entity.Transform.Rotation}, i: {entity.Transform.Interior}, d: {entity.Transform.Dimension}");
         });
+
+        _commandService.AddCommandHandler("admincmd", (entity, args) =>
+        {
+            _chatBox.OutputTo(entity, $"executed admin cmd");
+        }, new string[] { "Admin" });
 
         FontCollection collection = new();
         FontFamily family = collection.Add("Server/Fonts/Ratual.otf");

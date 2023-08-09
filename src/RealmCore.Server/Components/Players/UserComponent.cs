@@ -1,4 +1,6 @@
 ﻿using RealmCore.Persistence.Data;
+using System.Data;
+using System.Security.Claims;
 
 namespace RealmCore.Server.Components.Players;
 
@@ -40,13 +42,18 @@ public class UserComponent : AsyncComponent
 
     protected override async Task LoadAsync()
     {
-        _roles.AddRange(await GetRolesAsync());
         await UpdateClaimsPrincipal();
     }
 
     private async Task UpdateClaimsPrincipal()
     {
+        _roles.Clear();
+        _roles.AddRange(await GetRolesAsync());
         _claimsPrincipal = await SignInManager.CreateUserPrincipalAsync(_user);
+        foreach (var role in _roles)
+        {
+            ((ClaimsIdentity)_claimsPrincipal.Identity).AddClaim(new Claim(ClaimTypes.Role, role));
+        }
         ClaimsPrincipalUpdated?.Invoke(this, _claimsPrincipal);
     }
 
