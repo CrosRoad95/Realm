@@ -77,6 +77,7 @@ internal class UsersService : IUsersService
             try
             {
                 await entity.AddComponentAsync(new UserComponent(user));
+                await TryUpdateLastNickName(entity);
                 if (user.Inventories != null && user.Inventories.Any())
                 {
                     foreach (var inventory in user.Inventories)
@@ -283,6 +284,18 @@ internal class UsersService : IUsersService
             return false;
         }
         return _ecs.TryGetEntityByPlayer(player, out playerEntity);
+    }
+    
+    public async Task<bool> TryUpdateLastNickName(Entity playerEntity)
+    {
+        var nick = playerEntity.Player.Name;
+        if (playerEntity.TryGetComponent(out UserComponent userComponent) && userComponent.Nick != nick)
+        {
+            await _db.Users.Where(x => x.Id == userComponent.Id)
+                .ExecuteUpdateAsync(x => x.SetProperty(y => y.Nick, playerEntity.Player.Name));
+            return true;
+        }
+        return false;
     }
 
     public IEnumerable<Entity> SearchPlayersByName(string pattern)

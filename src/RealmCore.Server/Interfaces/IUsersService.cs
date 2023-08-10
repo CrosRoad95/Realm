@@ -18,4 +18,5 @@ public interface IUsersService
     Task<bool> TryAddWhitelistedSerial(int userId, string serial);
     bool TryGetPlayerByName(string name, out Entity playerEntity);
     Task<bool> TryRemoveWhitelistedSerial(int userId, string serial);
+    Task<bool> TryUpdateLastNickName(Entity playerEntity);
 }
