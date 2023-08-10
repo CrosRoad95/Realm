@@ -5,14 +5,16 @@ internal class EssentialCommandsLogic
     private readonly IConsole _consoleCommands;
     private readonly IServiceProvider _serviceProvider;
     private readonly ILogger<EssentialCommandsLogic> _logger;
+    private readonly IUsersService _usersService;
     private readonly Dictionary<string, Type> _commands = new();
 
     public EssentialCommandsLogic(IConsole consoleCommands, IEnumerable<CommandTypeWrapper> commands,
-        IServiceProvider serviceProvider, ILogger<EssentialCommandsLogic> logger)
+        IServiceProvider serviceProvider, ILogger<EssentialCommandsLogic> logger, IUsersService usersService)
     {
         _consoleCommands = consoleCommands;
         _serviceProvider = serviceProvider;
         _logger = logger;
+        _usersService = usersService;
         _consoleCommands.CommandExecuted += HandleCommandExecuted;
 
         _commands["help"] = typeof(HelpCommand);
@@ -52,7 +54,7 @@ internal class EssentialCommandsLogic
                 var command = _serviceProvider.GetRequiredService(value) as ICommand;
                 if (command == null)
                     throw new InvalidOperationException("Expected command to implement ICommand interface");
-                command.Handle(entity, new CommandArguments(line.Split(' ').ToArray()));
+                command.Handle(entity, new CommandArguments(line.Split(' ').ToArray(), _usersService));
             }
             catch (Exception ex)
             {

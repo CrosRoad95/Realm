@@ -1247,6 +1247,21 @@ internal sealed class CommandsLogic
             _chatBox.OutputTo(entity, $"Position: {entity.Transform.Position}, rot: {entity.Transform.Rotation}, i: {entity.Transform.Interior}, d: {entity.Transform.Dimension}");
         });
 
+        _commandService.AddCommandHandler("testargs", (entity, args) =>
+        {
+            var a = args.ReadInt();
+            var b = args.ReadByte();
+            var c = args.ReadInt();
+            _chatBox.OutputTo(entity, $"Komenda wykonana, argumenty {a}, {b}, {c}");
+        });
+        
+        _commandService.AddCommandHandler("testargs2", (entity, args) =>
+        {
+            var a = args.ReadPlayerEntity();
+            var b = args.ReadPlayerEntity();
+            _chatBox.OutputTo(entity, $"Komenda wykonana, argumenty {a} {b}");
+        });
+        
         _commandService.AddCommandHandler("admincmd", (entity, args) =>
         {
             _chatBox.OutputTo(entity, $"executed admin cmd");

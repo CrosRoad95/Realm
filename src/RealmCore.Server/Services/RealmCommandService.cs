@@ -21,7 +21,7 @@ public class RealmCommandService
 
     private readonly CommandService _commandService;
     private readonly IECS _ecs;
-    private readonly IUsersService _rpgUserManager;
+    private readonly IUsersService _usersService;
     private readonly IPolicyDrivenCommandExecutor _policyDrivenCommandExecutor;
     private readonly ChatBox _chatBox;
     private readonly ILogger<RealmCommandService> _logger;
@@ -31,12 +31,12 @@ public class RealmCommandService
 
     public List<string> Commands => _commands.Keys.ToList();
 
-    public RealmCommandService(CommandService commandService, ILogger<RealmCommandService> logger, IECS ecs, IUsersService rpgUserManager, IPolicyDrivenCommandExecutor policyDrivenCommandExecutor, ChatBox chatBox)
+    public RealmCommandService(CommandService commandService, ILogger<RealmCommandService> logger, IECS ecs, IUsersService usersService, IPolicyDrivenCommandExecutor policyDrivenCommandExecutor, ChatBox chatBox)
     {
         _logger = logger;
         _commandService = commandService;
         _ecs = ecs;
-        _rpgUserManager = rpgUserManager;
+        _usersService = usersService;
         _policyDrivenCommandExecutor = policyDrivenCommandExecutor;
         _chatBox = chatBox;
     }
@@ -115,7 +115,7 @@ public class RealmCommandService
             if (commandInfo.RequiredPolicies != null)
             {
                 foreach (var policy in commandInfo.RequiredPolicies)
-                    if (!await _rpgUserManager.AuthorizePolicy(userComponent, policy))
+                    if (!await _usersService.AuthorizePolicy(userComponent, policy))
                     {
                         _logger.LogInformation("Failed to execute command {commandText} because failed to authorize for policy {policy}", commandText, policy);
                         return;
@@ -132,17 +132,33 @@ public class RealmCommandService
             try
             {
                 if(userComponent.HasClaim("commandsNoLimit"))
-                    commandInfo.Callback(entity, new CommandArguments(args.Arguments));
+                    commandInfo.Callback(entity, new CommandArguments(args.Arguments, _usersService));
                 else
                     _policyDrivenCommandExecutor.Execute(() =>
                     {
-                        commandInfo.Callback(entity, new CommandArguments(args.Arguments));
+                        commandInfo.Callback(entity, new CommandArguments(args.Arguments, _usersService));
                     }, userComponent.Id.ToString());
             }
             catch (RateLimitRejectedException rateLimitRejectedException)
             {
                 _chatBox.OutputTo(entity, "Zbyt szybko wysyłasz komendy. Poczekaj chwilę.");
                 _logger.LogError(rateLimitRejectedException, "Exception thrown while executing command {commandText} with arguments {commandArguments}", commandText, args.Arguments);
+            }
+            catch (CommandArgumentException ex)
+            {
+                if (ex.Argument != null)
+                {
+                    _chatBox.OutputTo(entity, $"Wystąpił błąd podczas wykonywania komendy '{commandText}'");
+                    if(string.IsNullOrWhiteSpace(ex.Argument))
+                        _chatBox.OutputTo(entity, $"Argument {ex.Index} jest niepoprawny ponieważ: {ex.Message}");
+                    else
+                        _chatBox.OutputTo(entity, $"Argument {ex.Index} '{ex.Argument}' jest niepoprawny ponieważ: {ex.Message}");
+                }
+                else
+                {
+                    _chatBox.OutputTo(entity, $"Wystąpił błąd podczas wykonywania komendy '{commandText}'. {ex.Message}");
+                }
+                _logger.LogWarning("Command argument exception was thrown while executing command {commandText} with arguments {commandArguments}, argument index: {argumentIndex}", commandText, args.Arguments, ex.Index);
             }
             catch (Exception ex)
             {
@@ -193,7 +209,7 @@ public class RealmCommandService
             if (commandInfo.RequiredPolicies != null)
             {
                 foreach (var policy in commandInfo.RequiredPolicies)
-                    if (!await _rpgUserManager.AuthorizePolicy(userComponent, policy))
+                    if (!await _usersService.AuthorizePolicy(userComponent, policy))
                     {
                         _logger.LogInformation("failed to execute command {commandText} because failed to authorize for policy {policy}", commandText, policy);
                         return;
@@ -208,17 +224,34 @@ public class RealmCommandService
             {
 
                 if (userComponent.HasClaim("commandsNoLimit"))
-                    await commandInfo.Callback(entity, new CommandArguments(args.Arguments));
+                    await commandInfo.Callback(entity, new CommandArguments(args.Arguments, _usersService));
                 else
                     await _policyDrivenCommandExecutor.ExecuteAsync(async () =>
                     {
-                        await commandInfo.Callback(entity, new CommandArguments(args.Arguments));
+                        await commandInfo.Callback(entity, new CommandArguments(args.Arguments, _usersService));
                     }, userComponent.Id.ToString());
             }
-            catch (RateLimitRejectedException rateLimitRejectedException)
+            catch (RateLimitRejectedException ex)
             {
                 _chatBox.OutputTo(entity, "Zbyt szybko wysyłasz komendy. Poczekaj chwilę.");
-                _logger.LogError(rateLimitRejectedException, "Exception thrown while executing command {commandText} with arguments {commandArguments}", commandText, args.Arguments);
+                _logger.LogWarning("Exception thrown while executing command {commandText} with arguments {commandArguments}", commandText, args.Arguments);
+            }
+            catch (CommandArgumentException ex)
+            {
+                if(ex.Argument != null)
+                {
+                    _chatBox.OutputTo(entity, $"Wystąpił błąd podczas wykonywania komendy '{commandText}'");
+                    _chatBox.OutputTo(entity, $"Argument {ex.Index} '{ex.Argument}' jest niepoprawny ponieważ: {ex.Message}");
+                }
+                else
+                {
+                    _chatBox.OutputTo(entity, $"Wystąpił błąd podczas wykonywania komendy '{commandText}'");
+                    if (string.IsNullOrWhiteSpace(ex.Argument))
+                        _chatBox.OutputTo(entity, $"Argument {ex.Index} jest niepoprawny ponieważ: {ex.Message}");
+                    else
+                        _chatBox.OutputTo(entity, $"Argument {ex.Index} '{ex.Argument}' jest niepoprawny ponieważ: {ex.Message}");
+                }
+                _logger.LogWarning("Command argument exception was thrown while executing command {commandText} with arguments {commandArguments}, argument index: {argumentIndex}", commandText, args.Arguments, ex.Index);
             }
             catch (Exception ex)
             {
