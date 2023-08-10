@@ -3,21 +3,22 @@
 public abstract class GuiPageComponent : Component
 {
     private BlazorGuiComponent? _blazorGuiComponent;
-    private readonly string _path;
-    private readonly bool _isAsync;
 
     protected BlazorGuiComponent BlazorGuiComponent => _blazorGuiComponent ?? throw new InvalidOperationException();
 
+    public string Path { get; }
+    public bool IsAsync { get; }
+
     public GuiPageComponent(string path, bool isAsync = false)
     {
-        _path = path;
-        _isAsync = isAsync;
+        Path = path;
+        IsAsync = isAsync;
     }
 
     protected override void Load()
     {
         _blazorGuiComponent = Entity.GetRequiredComponent<BlazorGuiComponent>();
-        BlazorGuiComponent.Open(_path, false, _isAsync);
+        BlazorGuiComponent.Open(Path, false, IsAsync);
     }
 
     public override void Dispose()
