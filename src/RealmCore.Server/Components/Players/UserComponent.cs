@@ -12,16 +12,17 @@ public class UserComponent : AsyncComponent
     [Inject]
     private SignInManager<UserData> SignInManager { get; set; } = default!;
 
-    private readonly UserData _user;
+    private readonly UserData? _user;
     private ClaimsPrincipal _claimsPrincipal = default!;
     private List<int> _upgrades = new();
     private object _upgradesLock = new();
     private readonly ConcurrentDictionary<int, string> _settings = new();
 
-    public UserData User => _user;
+    public UserData User => _user ?? throw new InvalidOperationException();
     public ClaimsPrincipal ClaimsPrincipal => _claimsPrincipal ?? throw new ArgumentNullException(nameof(_claimsPrincipal));
-    public int Id => _user.Id;
-    public string? UserName => _user.UserName;
+    public int Id => _user?.Id ?? -1;
+    public string? Nick => _user?.Nick;
+    public string? UserName => _user?.UserName;
     public IReadOnlyList<int> Upgrades => _upgrades;
     public ICollection<int> Settings => _settings.Keys;
 
@@ -30,6 +31,7 @@ public class UserComponent : AsyncComponent
     public event Action<UserComponent, ClaimsPrincipal>? ClaimsPrincipalUpdated;
     private readonly List<string> _roles = new();
 
+    public UserComponent() { }
     internal UserComponent(UserData user)
     {
         _user = user;
@@ -47,6 +49,9 @@ public class UserComponent : AsyncComponent
 
     private async Task UpdateClaimsPrincipal()
     {
+        if (_user == null)
+            return;
+
         _roles.Clear();
         _roles.AddRange(await GetRolesAsync());
         _claimsPrincipal = await SignInManager.CreateUserPrincipalAsync(_user);
@@ -68,19 +73,26 @@ public class UserComponent : AsyncComponent
     {
         ThrowIfDisposed();
 
-        return _claimsPrincipal!.HasClaim(x => x.Type == type);
+        if (_claimsPrincipal == null)
+            return false;
+        return _claimsPrincipal.HasClaim(x => x.Type == type);
     }
 
     public string? GetClaimValue(string type)
     {
         ThrowIfDisposed();
 
-        return _claimsPrincipal!.Claims.First(x => x.Type == type).Value;
+        if (_claimsPrincipal == null)
+            return null;
+        return _claimsPrincipal.Claims.First(x => x.Type == type).Value;
     }
 
     public async Task<bool> AddClaim(string type, string value)
     {
         ThrowIfDisposed();
+
+        if (_user == null)
+            return false;
 
         var result = await UserManager.AddClaimAsync(_user, new Claim(type, value));
         if (result.Succeeded)
@@ -91,6 +103,9 @@ public class UserComponent : AsyncComponent
     public async Task<bool> AddClaims(Dictionary<string, string> claims)
     {
         ThrowIfDisposed();
+
+        if (_user == null)
+            return false;
 
         var result = await UserManager.AddClaimsAsync(_user, claims.Select(x => new Claim(x.Key, x.Value)));
         if (result.Succeeded)
@@ -103,6 +118,9 @@ public class UserComponent : AsyncComponent
         ThrowIfDisposed();
 
         if (_roles.Contains(role))
+            return false;
+
+        if (_user == null)
             return false;
 
         var result = await UserManager.AddToRoleAsync(_user, role);
@@ -120,6 +138,9 @@ public class UserComponent : AsyncComponent
         if (!rolesToAdd.Any())
             return false;
 
+        if (_user == null)
+            return false;
+
         var result = await UserManager.AddToRolesAsync(_user, rolesToAdd);
         if (result.Succeeded)
             await UpdateClaimsPrincipal();
@@ -130,12 +151,18 @@ public class UserComponent : AsyncComponent
     {
         ThrowIfDisposed();
 
+        if (_user == null)
+            return new List<string>().AsReadOnly();
+
         return (await UserManager.GetClaimsAsync(_user)).Select(x => x.Type).ToList();
     }
 
     public async Task<IReadOnlyList<string>> GetRolesAsync()
     {
         ThrowIfDisposed();
+
+        if (_user == null)
+            return new List<string>().AsReadOnly();
 
         return (await UserManager.GetRolesAsync(_user)).ToList().AsReadOnly();
     }
@@ -150,6 +177,9 @@ public class UserComponent : AsyncComponent
     public async Task<bool> RemoveClaim(string type, string? value = null)
     {
         ThrowIfDisposed();
+
+        if (_user == null)
+            return false;
 
         var claims = await UserManager.GetClaimsAsync(_user);
         Claim? claim;
@@ -175,6 +205,9 @@ public class UserComponent : AsyncComponent
         if (!_roles.Contains(role))
             return false;
 
+        if (_user == null)
+            return false;
+
         var result = await UserManager.RemoveFromRoleAsync(_user, role);
         if (result.Succeeded)
             await UpdateClaimsPrincipal();
@@ -184,6 +217,9 @@ public class UserComponent : AsyncComponent
     public async Task<bool> RemoveAllClaims()
     {
         ThrowIfDisposed();
+
+        if (_user == null)
+            return false;
 
         var claims = await UserManager.GetClaimsAsync(_user);
         var result = await UserManager.RemoveClaimsAsync(_user, claims);

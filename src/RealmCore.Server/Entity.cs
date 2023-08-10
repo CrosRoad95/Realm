@@ -141,7 +141,7 @@ public sealed class Entity : IDisposable
     public TComponent AddComponent<TComponent>(TComponent component) where TComponent : Component
     {
         if (component is AsyncComponent)
-            throw new ArgumentException("Can not add async component to non async entity");
+            throw new ArgumentException("Can not add async component using sync method");
 
         ThrowIfDisposed();
 

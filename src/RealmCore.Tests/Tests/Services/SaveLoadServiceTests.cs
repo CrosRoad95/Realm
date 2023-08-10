@@ -1,15 +1,4 @@
-﻿using Microsoft.Extensions.Logging;
-using RealmCore.Persistence;
-using RealmCore.Persistence.Interfaces;
-using RealmCore.Persistence.Repository;
-using RealmCore.Server.Components.Elements;
-using RealmCore.Server.Entities;
-using RealmCore.Server.Factories;
-using SlipeServer.Server.ElementCollections;
-using System.Drawing;
-using System.Numerics;
-
-namespace RealmCore.Tests.Tests.Services;
+﻿namespace RealmCore.Tests.Tests.Services;
 
 public class SaveLoadServiceTests
 {
@@ -25,29 +14,10 @@ public class SaveLoadServiceTests
     {
         var services = new ServiceCollection();
 
-        _loggerLoadServiceMock.Setup(x => x.Log(
-            It.IsAny<LogLevel>(),
-            It.IsAny<EventId>(),
-            It.IsAny<It.IsAnyType>(),
-            It.IsAny<Exception>(),
-            (Func<It.IsAnyType, Exception, string>)It.IsAny<object>()))
-            .Verifiable();
+        _loggerLoadServiceMock.SetupLogger();
+        _loggerECSMock.SetupLogger();
+        _logger.SetupLogger();
 
-        _loggerECSMock.Setup(x => x.Log(
-            It.IsAny<LogLevel>(),
-            It.IsAny<EventId>(),
-            It.IsAny<It.IsAnyType>(),
-            It.IsAny<Exception>(),
-            (Func<It.IsAnyType, Exception, string>)It.IsAny<object>()))
-            .Verifiable();
-
-        _logger.Setup(x => x.Log(
-            It.IsAny<LogLevel>(),
-            It.IsAny<EventId>(),
-            It.IsAny<It.IsAnyType>(),
-            It.IsAny<Exception>(),
-            (Func<It.IsAnyType, Exception, string>)It.IsAny<object>()))
-            .Verifiable();
         services.AddSingleton(_logger.Object);
         _logger.Setup(x => x.BeginScope(It.IsAny<Dictionary<string, object>>())).Returns((IDisposable)null);
 

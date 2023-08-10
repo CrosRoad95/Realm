@@ -168,7 +168,7 @@ public class EntityTests
         #endregion
 
         #region Act
-        action.Should().Throw<ArgumentException>().WithMessage("Can not add async component to non async entity");
+        action.Should().Throw<ArgumentException>().WithMessage("Can not add async component using sync method");
         #endregion
     }
 

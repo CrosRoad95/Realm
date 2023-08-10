@@ -41,17 +41,27 @@ public class RealmCommandService
         _chatBox = chatBox;
     }
 
-    public bool AddAsyncCommandHandler(string commandName, Func<Entity, CommandArguments, Task> callback, string[]? requiredPolicies = null)
+    internal void ClearCommands()
     {
-        if (_asyncCommands.Keys.Any(x => string.Equals(x, commandName, StringComparison.OrdinalIgnoreCase)))
+        _asyncCommands.Clear();
+        _commands.Clear();
+    }
+
+    private void CheckIfCommandExists(string commandName)
+    {
+        if (_commands.Keys.Any(x => string.Equals(x, commandName, StringComparison.OrdinalIgnoreCase)))
         {
             throw new Exception($"Command with name '{commandName}' already exists");
         }
+        if (_asyncCommands.Keys.Any(x => string.Equals(x, commandName, StringComparison.OrdinalIgnoreCase)))
+        {
+            throw new Exception($"Async command with name '{commandName}' already exists");
+        }
+    }
 
-        if (requiredPolicies != null)
-            _logger.LogInformation("Created async command {commandName} with required policies: {requiredPolicies}", commandName, requiredPolicies);
-        else
-            _logger.LogInformation("Created async command {commandName}", commandName);
+    public void AddAsyncCommandHandler(string commandName, Func<Entity, CommandArguments, Task> callback, string[]? requiredPolicies = null)
+    {
+        CheckIfCommandExists(commandName);
 
         var command = _commandService.AddCommand(commandName);
         _asyncCommands.Add(commandName, new AsyncCommandInfo
@@ -61,20 +71,15 @@ public class RealmCommandService
         });
         command.Triggered += HandleAsyncTriggered;
 
-        return true;
+        if (requiredPolicies != null)
+            _logger.LogInformation("Created async command {commandName} with required policies: {requiredPolicies}", commandName, requiredPolicies);
+        else
+            _logger.LogInformation("Created async command {commandName}", commandName);
     }
 
-    public bool AddCommandHandler(string commandName, Action<Entity, CommandArguments> callback, string[]? requiredPolicies = null, bool noTracing = false)
+    public void AddCommandHandler(string commandName, Action<Entity, CommandArguments> callback, string[]? requiredPolicies = null, bool noTracing = false)
     {
-        if (_commands.Keys.Any(x => string.Equals(x, commandName, StringComparison.OrdinalIgnoreCase)))
-        {
-            throw new Exception($"Command with name '{commandName}' already exists");
-        }
-
-        if (requiredPolicies != null)
-            _logger.LogInformation("Created command {commandName} with required policies: {requiredPolicies}", commandName, requiredPolicies);
-        else
-            _logger.LogInformation("Created command {commandName}", commandName);
+        CheckIfCommandExists(commandName);
 
         var command = _commandService.AddCommand(commandName);
         _commands.Add(commandName, new CommandInfo
@@ -84,99 +89,191 @@ public class RealmCommandService
             NoTracing = noTracing
         });
         command.Triggered += HandleTriggered;
-        return true;
+
+        if (requiredPolicies != null)
+            _logger.LogInformation("Created command {commandName} with required policies: {requiredPolicies}", commandName, requiredPolicies);
+        else
+            _logger.LogInformation("Created command {commandName}", commandName);
+    }
+
+    internal async Task InternalHandleTriggered(object? sender, CommandTriggeredEventArgs args)
+    {
+        var commandText = ((Command)sender!).CommandText;
+        if (!_commands.TryGetValue(commandText, out var commandInfo))
+            return;
+
+        var player = args.Player;
+        if (!_ecs.TryGetEntityByPlayer(player, out var entity))
+            return;
+
+        if (!entity.TryGetComponent<UserComponent>(out var userComponent) || !entity.TryGetComponent<PlayerElementComponent>(out var playerElementComponent))
+            return;
+
+        var activity = new Activity("CommandHandler");
+        activity.Start();
+        var start = Stopwatch.GetTimestamp();
+
+        using var _1 = _logger.BeginEntity(entity);
+        using var _2 = LogContext.PushProperty("commandText", commandText);
+        using var _3 = LogContext.PushProperty("commandArguments", args.Arguments);
+        if (!commandInfo.NoTracing)
+            _logger.LogInformation("Begin command {commandText} execution with traceId={TraceId}", commandText);
+
+        if (commandInfo.RequiredPolicies != null)
+        {
+            foreach (var policy in commandInfo.RequiredPolicies)
+                if (!await _usersService.AuthorizePolicy(userComponent, policy))
+                {
+                    _logger.LogInformation("Failed to execute command {commandText} because failed to authorize for policy {policy}", commandText, policy);
+                    return;
+                }
+        }
+
+        if (!commandInfo.NoTracing)
+        {
+            if (args.Arguments.Any())
+                _logger.LogInformation("Executed command {commandText} with arguments {commandArguments}.", entity);
+            else
+                _logger.LogInformation("Executed command {commandText} with no arguments.", entity);
+        }
+        try
+        {
+            if (userComponent.HasClaim("commandsNoLimit"))
+                commandInfo.Callback(entity, new CommandArguments(args.Arguments, _usersService));
+            else
+                _policyDrivenCommandExecutor.Execute(() =>
+                {
+                    commandInfo.Callback(entity, new CommandArguments(args.Arguments, _usersService));
+                }, userComponent.Id.ToString());
+        }
+        catch (RateLimitRejectedException rateLimitRejectedException)
+        {
+            _chatBox.OutputTo(entity, "Zbyt szybko wysyłasz komendy. Poczekaj chwilę.");
+            _logger.LogError(rateLimitRejectedException, "Exception thrown while executing command {commandText} with arguments {commandArguments}", commandText, args.Arguments);
+        }
+        catch (CommandArgumentException ex)
+        {
+            if (ex.Argument != null)
+            {
+                _chatBox.OutputTo(entity, $"Wystąpił błąd podczas wykonywania komendy '{commandText}'");
+                if (string.IsNullOrWhiteSpace(ex.Argument))
+                    _chatBox.OutputTo(entity, $"Argument {ex.Index} jest niepoprawny ponieważ: {ex.Message}");
+                else
+                    _chatBox.OutputTo(entity, $"Argument {ex.Index} '{ex.Argument}' jest niepoprawny ponieważ: {ex.Message}");
+            }
+            else
+            {
+                _chatBox.OutputTo(entity, $"Wystąpił błąd podczas wykonywania komendy '{commandText}'. {ex.Message}");
+            }
+            _logger.LogWarning("Command argument exception was thrown while executing command {commandText} with arguments {commandArguments}, argument index: {argumentIndex}", commandText, args.Arguments, ex.Index);
+        }
+        catch (Exception ex)
+        {
+            _chatBox.OutputTo(entity, "Wystąpił nieznany błąd. Jeśli się powtórzy zgłoś się do administracji.");
+            _logger.LogError(ex, "Exception thrown while executing command {commandText} with arguments {commandArguments}", commandText, args.Arguments);
+        }
+        finally
+        {
+            if (!commandInfo.NoTracing)
+            {
+                _logger.LogInformation("Ended command {commandText} execution with traceId={TraceId} in {totalMilliseconds}milliseconds", commandText, activity.GetTraceId(), (Stopwatch.GetTimestamp() - start) / (float)TimeSpan.TicksPerMillisecond);
+            }
+            activity.Stop();
+        }
     }
 
     private async void HandleTriggered(object? sender, CommandTriggeredEventArgs args)
     {
         try
         {
-            var commandText = ((Command)sender!).CommandText;
-            if (!_commands.TryGetValue(commandText, out var commandInfo))
-                return;
-
-            var player = args.Player;
-            if (!_ecs.TryGetEntityByPlayer(player, out var entity))
-                return;
-
-            if (!entity.TryGetComponent<UserComponent>(out var userComponent) || !entity.TryGetComponent<PlayerElementComponent>(out var playerElementComponent))
-                return;
-
-            var activity = new Activity("CommandHandler");
-            activity.Start();
-            var start = Stopwatch.GetTimestamp();
-
-            using var _1 = _logger.BeginEntity(entity);
-            using var _2 = LogContext.PushProperty("commandText", commandText);
-            using var _3 = LogContext.PushProperty("commandArguments", args.Arguments);
-            if(!commandInfo.NoTracing)
-                _logger.LogInformation("Begin command {commandText} execution with traceId={TraceId}", commandText);
-
-            if (commandInfo.RequiredPolicies != null)
-            {
-                foreach (var policy in commandInfo.RequiredPolicies)
-                    if (!await _usersService.AuthorizePolicy(userComponent, policy))
-                    {
-                        _logger.LogInformation("Failed to execute command {commandText} because failed to authorize for policy {policy}", commandText, policy);
-                        return;
-                    }
-            }
-
-            if (!commandInfo.NoTracing)
-            {
-                if (args.Arguments.Any())
-                    _logger.LogInformation("Executed command {commandText} with arguments {commandArguments}.", entity);
-                else
-                    _logger.LogInformation("Executed command {commandText} with no arguments.", entity);
-            }
-            try
-            {
-                if(userComponent.HasClaim("commandsNoLimit"))
-                    commandInfo.Callback(entity, new CommandArguments(args.Arguments, _usersService));
-                else
-                    _policyDrivenCommandExecutor.Execute(() =>
-                    {
-                        commandInfo.Callback(entity, new CommandArguments(args.Arguments, _usersService));
-                    }, userComponent.Id.ToString());
-            }
-            catch (RateLimitRejectedException rateLimitRejectedException)
-            {
-                _chatBox.OutputTo(entity, "Zbyt szybko wysyłasz komendy. Poczekaj chwilę.");
-                _logger.LogError(rateLimitRejectedException, "Exception thrown while executing command {commandText} with arguments {commandArguments}", commandText, args.Arguments);
-            }
-            catch (CommandArgumentException ex)
-            {
-                if (ex.Argument != null)
-                {
-                    _chatBox.OutputTo(entity, $"Wystąpił błąd podczas wykonywania komendy '{commandText}'");
-                    if(string.IsNullOrWhiteSpace(ex.Argument))
-                        _chatBox.OutputTo(entity, $"Argument {ex.Index} jest niepoprawny ponieważ: {ex.Message}");
-                    else
-                        _chatBox.OutputTo(entity, $"Argument {ex.Index} '{ex.Argument}' jest niepoprawny ponieważ: {ex.Message}");
-                }
-                else
-                {
-                    _chatBox.OutputTo(entity, $"Wystąpił błąd podczas wykonywania komendy '{commandText}'. {ex.Message}");
-                }
-                _logger.LogWarning("Command argument exception was thrown while executing command {commandText} with arguments {commandArguments}, argument index: {argumentIndex}", commandText, args.Arguments, ex.Index);
-            }
-            catch (Exception ex)
-            {
-                _chatBox.OutputTo(entity, "Wystąpił nieznany błąd. Jeśli się powtórzy zgłoś się do administracji.");
-                _logger.LogError(ex, "Exception thrown while executing command {commandText} with arguments {commandArguments}", commandText, args.Arguments);
-            }
-            finally
-            {
-                if (!commandInfo.NoTracing)
-                {
-                    _logger.LogInformation("Ended command {commandText} execution with traceId={TraceId} in {totalMilliseconds}milliseconds", commandText, activity.GetTraceId(), (Stopwatch.GetTimestamp() - start) / (float)TimeSpan.TicksPerMillisecond);
-                }
-                activity.Stop();
-            }
+            await InternalHandleTriggered(sender, args);
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Exception thrown while executing command {commandText} with arguments {commandArguments}", ((Command)sender!).CommandText, args.Arguments);
+            _logger.LogCritical(ex, "Unexpected exception was thrown while executing command {commandText} with arguments {commandArguments}", ((Command)sender!).CommandText, args.Arguments);
+        }
+    }
+
+    internal async Task InternalHandleAsyncTriggered(object? sender, CommandTriggeredEventArgs args)
+    {
+        var commandText = ((Command)sender!).CommandText;
+
+        if (!_asyncCommands.TryGetValue(commandText, out var commandInfo))
+            return;
+
+        var player = args.Player;
+        if (!_ecs.TryGetEntityByPlayer(player, out var entity))
+            return;
+
+        if (!entity.TryGetComponent<UserComponent>(out var userComponent) || !entity.TryGetComponent<PlayerElementComponent>(out var playerElementComponent))
+            return;
+
+        var activity = new Activity("CommandHandler");
+        activity.Start();
+        var start = Stopwatch.GetTimestamp();
+
+        using var _1 = _logger.BeginEntity(entity);
+        using var _2 = LogContext.PushProperty("commandText", commandText);
+        using var _3 = LogContext.PushProperty("commandArguments", args.Arguments);
+        if (!commandInfo.NoTracing)
+            _logger.LogInformation("Begin async command {commandText} execution with traceId={TraceId}", commandText);
+
+        if (commandInfo.RequiredPolicies != null)
+        {
+            foreach (var policy in commandInfo.RequiredPolicies)
+                if (!await _usersService.AuthorizePolicy(userComponent, policy))
+                {
+                    _logger.LogInformation("failed to execute command {commandText} because failed to authorize for policy {policy}", commandText, policy);
+                    return;
+                }
+        }
+
+        if (args.Arguments.Any())
+            _logger.LogInformation("{player} executed command {commandText} with arguments {commandArguments}.", entity);
+        else
+            _logger.LogInformation("{player} executed command {commandText} with no arguments.", entity);
+        try
+        {
+
+            if (userComponent.HasClaim("commandsNoLimit"))
+                await commandInfo.Callback(entity, new CommandArguments(args.Arguments, _usersService));
+            else
+                await _policyDrivenCommandExecutor.ExecuteAsync(async () =>
+                {
+                    await commandInfo.Callback(entity, new CommandArguments(args.Arguments, _usersService));
+                }, userComponent.Id.ToString());
+        }
+        catch (RateLimitRejectedException ex)
+        {
+            _chatBox.OutputTo(entity, "Zbyt szybko wysyłasz komendy. Poczekaj chwilę.");
+            _logger.LogWarning("Exception thrown while executing command {commandText} with arguments {commandArguments}", commandText, args.Arguments);
+        }
+        catch (CommandArgumentException ex)
+        {
+            if (ex.Argument != null)
+            {
+                _chatBox.OutputTo(entity, $"Wystąpił błąd podczas wykonywania komendy '{commandText}'");
+                _chatBox.OutputTo(entity, $"Argument {ex.Index} '{ex.Argument}' jest niepoprawny ponieważ: {ex.Message}");
+            }
+            else
+            {
+                _chatBox.OutputTo(entity, $"Wystąpił błąd podczas wykonywania komendy '{commandText}'");
+                if (string.IsNullOrWhiteSpace(ex.Argument))
+                    _chatBox.OutputTo(entity, $"Argument {ex.Index} jest niepoprawny ponieważ: {ex.Message}");
+                else
+                    _chatBox.OutputTo(entity, $"Argument {ex.Index} '{ex.Argument}' jest niepoprawny ponieważ: {ex.Message}");
+            }
+            _logger.LogWarning("Command argument exception was thrown while executing command {commandText} with arguments {commandArguments}, argument index: {argumentIndex}", commandText, args.Arguments, ex.Index);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Exception thrown while executing command {commandText} with arguments {commandArguments}", commandText, args.Arguments);
+        }
+        finally
+        {
+            if (!commandInfo.NoTracing)
+                _logger.LogInformation("Ended async command {commandText} execution with traceId={TraceId} in {totalMilliseconds}milliseconds", commandText, activity.GetTraceId(), (Stopwatch.GetTimestamp() - start) / (float)TimeSpan.TicksPerMillisecond);
+            activity.Stop();
         }
     }
 
@@ -184,89 +281,11 @@ public class RealmCommandService
     {
         try
         {
-            var commandText = ((Command)sender!).CommandText;
-
-            if (!_asyncCommands.TryGetValue(commandText, out var commandInfo))
-                return;
-
-            var player = args.Player;
-            if (!_ecs.TryGetEntityByPlayer(player, out var entity))
-                return;
-
-            if (!entity.TryGetComponent<UserComponent>(out var userComponent) || !entity.TryGetComponent<PlayerElementComponent>(out var playerElementComponent))
-                return;
-
-            var activity = new Activity("CommandHandler");
-            activity.Start();
-            var start = Stopwatch.GetTimestamp();
-
-            using var _1 = _logger.BeginEntity(entity);
-            using var _2 = LogContext.PushProperty("commandText", commandText);
-            using var _3 = LogContext.PushProperty("commandArguments", args.Arguments);
-            if (!commandInfo.NoTracing)
-                _logger.LogInformation("Begin async command {commandText} execution with traceId={TraceId}", commandText);
-
-            if (commandInfo.RequiredPolicies != null)
-            {
-                foreach (var policy in commandInfo.RequiredPolicies)
-                    if (!await _usersService.AuthorizePolicy(userComponent, policy))
-                    {
-                        _logger.LogInformation("failed to execute command {commandText} because failed to authorize for policy {policy}", commandText, policy);
-                        return;
-                    }
-            }
-
-            if (args.Arguments.Any())
-                _logger.LogInformation("{player} executed command {commandText} with arguments {commandArguments}.", entity);
-            else
-                _logger.LogInformation("{player} executed command {commandText} with no arguments.", entity);
-            try
-            {
-
-                if (userComponent.HasClaim("commandsNoLimit"))
-                    await commandInfo.Callback(entity, new CommandArguments(args.Arguments, _usersService));
-                else
-                    await _policyDrivenCommandExecutor.ExecuteAsync(async () =>
-                    {
-                        await commandInfo.Callback(entity, new CommandArguments(args.Arguments, _usersService));
-                    }, userComponent.Id.ToString());
-            }
-            catch (RateLimitRejectedException ex)
-            {
-                _chatBox.OutputTo(entity, "Zbyt szybko wysyłasz komendy. Poczekaj chwilę.");
-                _logger.LogWarning("Exception thrown while executing command {commandText} with arguments {commandArguments}", commandText, args.Arguments);
-            }
-            catch (CommandArgumentException ex)
-            {
-                if(ex.Argument != null)
-                {
-                    _chatBox.OutputTo(entity, $"Wystąpił błąd podczas wykonywania komendy '{commandText}'");
-                    _chatBox.OutputTo(entity, $"Argument {ex.Index} '{ex.Argument}' jest niepoprawny ponieważ: {ex.Message}");
-                }
-                else
-                {
-                    _chatBox.OutputTo(entity, $"Wystąpił błąd podczas wykonywania komendy '{commandText}'");
-                    if (string.IsNullOrWhiteSpace(ex.Argument))
-                        _chatBox.OutputTo(entity, $"Argument {ex.Index} jest niepoprawny ponieważ: {ex.Message}");
-                    else
-                        _chatBox.OutputTo(entity, $"Argument {ex.Index} '{ex.Argument}' jest niepoprawny ponieważ: {ex.Message}");
-                }
-                _logger.LogWarning("Command argument exception was thrown while executing command {commandText} with arguments {commandArguments}, argument index: {argumentIndex}", commandText, args.Arguments, ex.Index);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Exception thrown while executing command {commandText} with arguments {commandArguments}", commandText, args.Arguments);
-            }
-            finally
-            {
-                if (!commandInfo.NoTracing)
-                    _logger.LogInformation("Ended async command {commandText} execution with traceId={TraceId} in {totalMilliseconds}milliseconds", commandText, activity.GetTraceId(), (Stopwatch.GetTimestamp() - start) / (float)TimeSpan.TicksPerMillisecond);
-                activity.Stop();
-            }
+            await InternalHandleAsyncTriggered(sender, args);
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Exception thrown while executing command {commandText} with arguments {commandArguments}", ((Command)sender!).CommandText, args.Arguments);
+            _logger.LogCritical(ex, "Unexpected exception was thrown while executing async command {commandText} with arguments {commandArguments}", ((Command)sender!).CommandText, args.Arguments);
         }
     }
 }
