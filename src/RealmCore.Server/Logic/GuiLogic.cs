@@ -1,11 +1,11 @@
 ﻿namespace RealmCore.Server.Logic;
 
-internal class GuisLogic
+internal class GuiLogic
 {
     private readonly IServiceProvider _serviceProvider;
     private readonly IECS _ecs;
 
-    public GuisLogic(IServiceProvider serviceProvider, IRPGServer rpgServer, IECS ecs)
+    public GuiLogic(IServiceProvider serviceProvider, IRPGServer rpgServer, IECS ecs)
     {
         _serviceProvider = serviceProvider;
         _ecs = ecs;
@@ -33,5 +33,4 @@ internal class GuisLogic
         }
         return Task.CompletedTask;
     }
-
 }

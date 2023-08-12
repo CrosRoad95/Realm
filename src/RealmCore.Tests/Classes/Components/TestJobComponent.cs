@@ -2,7 +2,6 @@
 using RealmCore.Server.Components.Players.Jobs;
 using RealmCore.Server.Concepts.Objectives;
 using SlipeServer.Server.Elements;
-using System.Numerics;
 
 namespace RealmCore.Tests.Classes.Components;
 

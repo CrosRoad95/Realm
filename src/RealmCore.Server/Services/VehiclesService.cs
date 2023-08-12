@@ -106,6 +106,9 @@ internal sealed class VehiclesService : IVehiclesService
 
     public Entity Spawn(VehicleData vehicleData)
     {
+        if(vehicleData.IsRemoved)
+            throw new VehicleRemovedException(vehicleData.Id);
+
         var entity = _entityFactory.CreateVehicle(vehicleData.Model, vehicleData.TransformAndMotion.Position, vehicleData.TransformAndMotion.Rotation, new ConstructionInfo
         {
             Id = $"vehicle {vehicleData.Id}",

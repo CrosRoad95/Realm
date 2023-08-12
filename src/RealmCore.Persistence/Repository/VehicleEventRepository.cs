@@ -1,6 +1,4 @@
-﻿using RealmCore.Persistence.Data;
-using RealmCore.Persistence;
-using RealmCore.Persistence.DTOs;
+﻿using RealmCore.Persistence.DTOs;
 
 namespace RealmCore.Persistence.Repository;
 

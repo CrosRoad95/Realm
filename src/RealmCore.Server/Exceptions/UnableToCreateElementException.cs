@@ -2,11 +2,10 @@
 
 public class UnableToCreateElementException : Exception
 {
-    private readonly string _elementType;
-    public string ElementType => _elementType;
+    public string ElementType { get; }
 
     public UnableToCreateElementException(string message, string elementType) : base(message)
     {
-        _elementType = elementType;
+        ElementType = elementType;
     }
 }

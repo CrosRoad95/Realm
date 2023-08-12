@@ -1,7 +1,4 @@
-﻿using RealmCore.Server.Components.Elements;
-using System.Numerics;
-
-namespace RealmCore.Tests.Helpers;
+﻿namespace RealmCore.Tests.Helpers;
 
 internal class EntityHelper
 {

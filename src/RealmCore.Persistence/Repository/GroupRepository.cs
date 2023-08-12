@@ -1,6 +1,4 @@
-﻿using RealmCore.Persistence;
-
-namespace RealmCore.Persistence.Repository;
+﻿namespace RealmCore.Persistence.Repository;
 
 internal class GroupRepository : IGroupRepository
 {

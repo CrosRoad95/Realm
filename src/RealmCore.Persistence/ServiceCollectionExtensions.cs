@@ -13,14 +13,14 @@ public class AuthorizationPoliciesProvider
     public void ValidatePolicy(string policy)
     {
         if (!_policies.Contains(policy))
-            throw new Exception($"Not supported policy '{policy}'");
+            throw new NotSupportedException($"Not supported policy '{policy}'");
     }
 }
 
 public static class ServiceCollectionExtensions
 {
     public static IServiceCollection AddPersistence<T>(this IServiceCollection services,
-        Action<DbContextOptionsBuilder> dboptions, ServiceLifetime serviceLifetime = ServiceLifetime.Transient) where T : DbContext, IDb
+        Action<DbContextOptionsBuilder> dbOptions, ServiceLifetime serviceLifetime = ServiceLifetime.Transient) where T : DbContext, IDb
     {
         services.AddSingleton<RealmDbContextFactory>();
         services.AddSingleton<RepositoryFactory>();
@@ -36,7 +36,7 @@ public static class ServiceCollectionExtensions
         services.AddTransient<IRatingRepository, RatingRepository>();
         services.AddTransient<IOpinionRepository, OpinionRepository>();
 
-        services.AddDbContext<IDb, T>(dboptions, serviceLifetime);
+        services.AddDbContext<IDb, T>(dbOptions, serviceLifetime);
 
         return services;
     }

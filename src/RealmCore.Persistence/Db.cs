@@ -182,6 +182,9 @@ public abstract class Db<T> : IdentityDbContext<UserData, RoleData, int,
                 .WithOne(x => x.User)
                 .HasForeignKey(x => x.UserId);
 
+            entityBuilder.Property(x => x.IsDisabled)
+                .HasDefaultValue(false)
+                .IsRequired();
         });
 
         modelBuilder.Entity<InventoryData>(entityBuilder =>
@@ -415,6 +418,10 @@ public abstract class Db<T> : IdentityDbContext<UserData, RoleData, int,
                 .IsRequired();
 
             entityBuilder.Property(x => x.Spawned)
+                .HasDefaultValue(false)
+                .IsRequired();
+            
+            entityBuilder.Property(x => x.IsRemoved)
                 .HasDefaultValue(false)
                 .IsRequired();
 

@@ -1,8 +1,4 @@
-﻿using Microsoft.Extensions.Logging;
-using RealmCore.Server.Entities;
-using SlipeServer.Server.ElementCollections;
-
-namespace RealmCore.Tests.Tests;
+﻿namespace RealmCore.Tests.Tests;
 
 public class ECSTests
 {

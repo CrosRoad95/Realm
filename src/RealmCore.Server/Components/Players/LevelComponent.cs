@@ -46,9 +46,12 @@ public class LevelComponent : Component
     {
         get => _experience; set
         {
-            _experience = value;
-            CheckForNextLevel();
-            ExperienceChanged?.Invoke(this, value);
+            if (_experience != value)
+            {
+                _experience = value;
+                CheckForNextLevel();
+                ExperienceChanged?.Invoke(this, value);
+            }
         }
     }
 

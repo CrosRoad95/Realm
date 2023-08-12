@@ -7,7 +7,7 @@ public sealed class UserData : IdentityUser<int>
 #pragma warning disable CS8618
     public string? Nick { get; set; }
     public DateTime? RegisteredDateTime { get; set; }
-    public DateTime? LastLogindDateTime { get; set; }
+    public DateTime? LastLoginDateTime { get; set; }
     public string? RegisterSerial { get; set; }
     public string? RegisterIp { get; set; }
     public string? LastSerial { get; set; }
@@ -17,7 +17,7 @@ public sealed class UserData : IdentityUser<int>
     public decimal Money { get; set; }
     public uint Level { get; set; }
     public uint Experience { get; set; }
-
+    public bool IsDisabled { get; set; }
     public TransformAndMotion? LastTransformAndMotion { get; set; } = null;
 #pragma warning restore CS8618
 

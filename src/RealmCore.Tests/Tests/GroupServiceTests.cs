@@ -1,8 +1,4 @@
-﻿using RealmCore.Persistence;
-using RealmCore.Persistence.Interfaces;
-using RealmCore.Persistence.Repository;
-
-namespace RealmCore.Tests.Tests;
+﻿namespace RealmCore.Tests.Tests;
 
 public class GroupServiceTests
 {

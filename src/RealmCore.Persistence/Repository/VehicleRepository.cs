@@ -1,5 +1,4 @@
-﻿using RealmCore.Persistence;
-using RealmCore.Persistence.DTOs;
+﻿using RealmCore.Persistence.DTOs;
 
 namespace RealmCore.Persistence.Repository;
 
@@ -35,6 +34,7 @@ internal class VehicleRepository : IVehicleRepository
     public Task<List<LightInfoVehicleDTO>> GetLightVehiclesByUserId(int userId)
     {
         var query = _db.Vehicles
+            .Where(x => !x.IsRemoved)
             .TagWithSource(nameof(VehicleRepository))
             .AsNoTrackingWithIdentityResolution()
             .Where(x => x.UserAccesses.Any(x => x.UserId == userId))
@@ -51,6 +51,7 @@ internal class VehicleRepository : IVehicleRepository
     public Task<LightInfoVehicleDTO?> GetLightVehicleById(int vehicleId)
     {
         var query = _db.Vehicles
+            .Where(x => !x.IsRemoved)
             .TagWithSource(nameof(VehicleRepository))
             .AsNoTrackingWithIdentityResolution()
             .Where(x => x.Id == vehicleId)
@@ -67,6 +68,7 @@ internal class VehicleRepository : IVehicleRepository
     public Task<List<VehicleData>> GetVehiclesByUserId(int userId)
     {
         var query = _db.Vehicles
+            .Where(x => !x.IsRemoved)
             .TagWithSource(nameof(VehicleRepository))
             .AsNoTrackingWithIdentityResolution()
             .Where(x => x.UserAccesses.Any(x => x.UserId == userId));
@@ -77,6 +79,7 @@ internal class VehicleRepository : IVehicleRepository
     public Task<VehicleData?> GetReadOnlyVehicleById(int id)
     {
         var query = _db.Vehicles
+            .Where(x => !x.IsRemoved)
             .TagWithSource(nameof(VehicleRepository))
             .AsNoTrackingWithIdentityResolution()
             .Where(x => x.Id == id);
@@ -87,6 +90,7 @@ internal class VehicleRepository : IVehicleRepository
     public Task<List<VehicleData>> GetAllSpawnedVehicles()
     {
         var query = _db.Vehicles
+            .Where(x => !x.IsRemoved)
             .TagWithSource(nameof(VehicleRepository))
             .AsNoTrackingWithIdentityResolution()
             .IncludeAll()
@@ -98,6 +102,7 @@ internal class VehicleRepository : IVehicleRepository
     public Task<VehicleData?> GetVehicleById(int id)
     {
         var query = _db.Vehicles
+            .Where(x => !x.IsRemoved)
             .TagWithSource(nameof(VehicleRepository))
             .AsNoTrackingWithIdentityResolution()
             .Where(x => x.Id == id)
@@ -109,6 +114,7 @@ internal class VehicleRepository : IVehicleRepository
     public async Task<bool> SetSpawned(int id, bool spawned)
     {
         var query = _db.Vehicles
+            .Where(x => !x.IsRemoved)
             .TagWithSource(nameof(VehicleRepository))
             .Where(x => x.Id == id);
 
@@ -119,6 +125,7 @@ internal class VehicleRepository : IVehicleRepository
     public async Task<bool> SetKind(int id, byte kind)
     {
         var query = _db.Vehicles
+            .Where(x => !x.IsRemoved)
             .TagWithSource(nameof(VehicleRepository))
             .Where(x => x.Id == id);
 
@@ -129,11 +136,23 @@ internal class VehicleRepository : IVehicleRepository
     public async Task<bool> IsSpawned(int id)
     {
         var query = _db.Vehicles
+            .Where(x => !x.IsRemoved)
             .TagWithSource(nameof(VehicleRepository))
             .Where(x => x.Id == id)
             .Select(x => x.Spawned);
 
         return await query.FirstAsync();
+    }
+
+    public async Task<bool> SoftRemove(int id)
+    {
+        var query = _db.Vehicles
+            .Where(x => !x.IsRemoved)
+            .TagWithSource(nameof(VehicleRepository))
+            .Where(x => x.Id == id);
+
+        var result = await query.ExecuteUpdateAsync(x => x.SetProperty(y => y.IsRemoved, true));
+        return result > 0;
     }
 
     public void Dispose()

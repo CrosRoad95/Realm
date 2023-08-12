@@ -13,6 +13,7 @@ local function isValidPath(path)
 end
 
 local function handleInvokeVoidAsync(identifier, args)
+	iprint("identifier, args",identifier, args)
 	if(identifier == "_guiReady")then
 		if(isValidPath(currentPath))then
 			internalSetVisible(true)

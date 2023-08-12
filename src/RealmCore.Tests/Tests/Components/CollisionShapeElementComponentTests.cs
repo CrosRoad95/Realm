@@ -1,7 +1,5 @@
 ﻿using SlipeServer.Server.Elements.ColShapes;
 using RealmCore.Resources.ClientInterface;
-using RealmCore.Server.Entities;
-using SlipeServer.Server.ElementCollections;
 using RealmCore.Server.Components.Elements.CollisionShapes;
 
 namespace RealmCore.Tests.Tests.Components;

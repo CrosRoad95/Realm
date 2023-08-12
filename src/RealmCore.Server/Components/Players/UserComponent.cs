@@ -1,6 +1,4 @@
 ﻿using RealmCore.Persistence.Data;
-using System.Data;
-using System.Security.Claims;
 
 namespace RealmCore.Server.Components.Players;
 

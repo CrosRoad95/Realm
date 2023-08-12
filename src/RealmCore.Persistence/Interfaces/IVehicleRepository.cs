@@ -14,4 +14,5 @@ public interface IVehicleRepository : IRepositoryBase
     Task<bool> IsSpawned(int id);
     Task<bool> SetKind(int id, byte kind);
     Task<bool> SetSpawned(int id, bool spawned);
+    Task<bool> SoftRemove(int id);
 }

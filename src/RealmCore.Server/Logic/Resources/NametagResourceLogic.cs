@@ -1,5 +1,4 @@
-﻿using RealmCore.Server.Abstractions;
-using RealmCore.Server.Components.Peds;
+﻿using RealmCore.Server.Components.Peds;
 
 namespace RealmCore.Server.Logic.Resources;
 

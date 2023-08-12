@@ -2,7 +2,6 @@
 using RealmCore.Resources.Overlay;
 using SixLabors.ImageSharp;
 using SlipeServer.Packets.Definitions.Lua;
-using System.Numerics;
 using Color = System.Drawing.Color;
 using Size = System.Drawing.Size;
 

@@ -2,8 +2,10 @@
 
 public sealed class DefaultModulesLogic
 {
+    private readonly List<IModule> _modules;
+
     public DefaultModulesLogic(IEnumerable<IModule> modules)
     {
-        modules.ToList();
+        _modules = modules.ToList();
     }
 }

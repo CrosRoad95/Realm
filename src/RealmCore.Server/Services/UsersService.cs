@@ -17,7 +17,10 @@ internal class UsersService : IUsersService
     private readonly IActiveUsers _activeUsers;
     private readonly IElementCollection _elementCollection;
     private readonly IECS _ecs;
-    private readonly JsonSerializerSettings _jsonSerializerSettings;
+    private static readonly JsonSerializerSettings _jsonSerializerSettings = new JsonSerializerSettings
+    {
+        Converters = new List<JsonConverter> { new DoubleConverter() }
+    };
 
     public UsersService(ItemsRegistry itemsRegistry, UserManager<UserData> userManager, ILogger<UsersService> logger, IOptions<GameplayOptions> gameplayOptions,
         IDateTimeProvider dateTimeProvider, IAuthorizationService authorizationService, IDb db, IActiveUsers activeUsers, IElementCollection elementCollection, IECS ecs)
@@ -32,10 +35,6 @@ internal class UsersService : IUsersService
         _activeUsers = activeUsers;
         _elementCollection = elementCollection;
         _ecs = ecs;
-        _jsonSerializerSettings = new JsonSerializerSettings
-        {
-            Converters = new List<JsonConverter> { new DoubleConverter() }
-        };
     }
 
     public async Task<int> SignUp(string username, string password)
@@ -63,6 +62,9 @@ internal class UsersService : IUsersService
 
         if (entity.Tag != EntityTag.Player || !entity.HasComponent<PlayerElementComponent>())
             throw new NotSupportedException("Entity is not a player entity.");
+
+        if (user.IsDisabled)
+            throw new UserDisabledException(user.Id);
 
         using var _ = _logger.BeginEntity(entity);
 
@@ -177,6 +179,7 @@ internal class UsersService : IUsersService
     public Task<UserData?> GetUserByLogin(string login)
     {
         return _userManager.Users
+            .TagWith(nameof(UsersService))
             .IncludeAll()
             .Where(u => u.UserName == login)
             .AsNoTrackingWithIdentityResolution()
@@ -186,15 +189,36 @@ internal class UsersService : IUsersService
     public Task<UserData?> GetUserByLoginCaseInsensitive(string login)
     {
         return _userManager.Users
+            .TagWith(nameof(UsersService))
             .IncludeAll()
             .Where(u => u.NormalizedUserName == login.ToUpper())
             .AsNoTrackingWithIdentityResolution()
             .FirstOrDefaultAsync();
     }
+    
+    public Task<int> CountUsersBySerial(string serial)
+    {
+        return _userManager.Users
+            .TagWith(nameof(UsersService))
+            .Where(u => u.RegisterSerial == serial)
+            .AsNoTrackingWithIdentityResolution()
+            .CountAsync();
+    }
+    
+    public Task<List<UserData>> GetUsersBySerial(string serial)
+    {
+        return _userManager.Users
+            .TagWith(nameof(UsersService))
+            .IncludeAll()
+            .Where(u => u.RegisterSerial == serial)
+            .AsNoTrackingWithIdentityResolution()
+            .ToListAsync();
+    }
 
     public Task<UserData?> GetUserById(int id)
     {
         return _userManager.Users
+            .TagWith(nameof(UsersService))
             .IncludeAll()
             .Where(u => u.Id == id)
             .AsNoTrackingWithIdentityResolution()
@@ -218,7 +242,9 @@ internal class UsersService : IUsersService
 
     public Task<bool> IsSerialWhitelisted(int userId, string serial)
     {
-        return _db.UserWhitelistedSerials.AnyAsync(x => x.UserId == userId && x.Serial == serial);
+        return _db.UserWhitelistedSerials
+            .TagWith(nameof(UsersService))
+            .AnyAsync(x => x.UserId == userId && x.Serial == serial);
     }
 
     public async Task<bool> TryAddWhitelistedSerial(int userId, string serial)
@@ -255,6 +281,7 @@ internal class UsersService : IUsersService
         try
         {
             var deleted = await _db.UserWhitelistedSerials
+                .TagWith(nameof(UsersService))
                 .Where(x => x.UserId == userId && x.Serial == serial)
                 .ExecuteDeleteAsync();
 
@@ -297,7 +324,7 @@ internal class UsersService : IUsersService
         }
         return false;
     }
-
+    
     public IEnumerable<Entity> SearchPlayersByName(string pattern)
     {
         var players = _elementCollection.GetByType<Player>().Where(x => x.Name.ToLower().Contains(pattern.ToLower()));

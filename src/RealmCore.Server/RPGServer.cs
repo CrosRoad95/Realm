@@ -19,7 +19,7 @@ internal sealed class RPGServer : IRPGServer
             {
                 serverBuilder.AddLogic<PlayersLogic>();
                 serverBuilder.AddLogic<VehiclesLogic>();
-                serverBuilder.AddLogic<GuisLogic>();
+                serverBuilder.AddLogic<GuiLogic>();
                 serverBuilder.AddLogic<StartupLogic>();
 
                 serverBuilder.AddLogic<VehicleUpgradeRegistryLogic>();
@@ -126,7 +126,7 @@ internal sealed class RPGServer : IRPGServer
         ServerStarted?.Invoke();
         _logger.LogInformation(_stringLocalizer.GetOr("ServerStarted", "Server started."));
         _logger.LogInformation("Found resources: {resourcesCount}", RealmResourceServer._resourceCounter);
-        _logger.LogInformation("Created commands: {commandsCount}", realmCommandService.Commands.Count);
+        _logger.LogInformation("Created commands: {commandsCount}", realmCommandService.CommandNames.Count);
         _server.Start();
     }
 

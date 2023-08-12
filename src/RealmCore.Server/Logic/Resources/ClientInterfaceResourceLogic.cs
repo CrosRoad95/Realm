@@ -17,7 +17,6 @@ internal sealed class ClientInterfaceResourceLogic
         _ecs.EntityCreated += HandleEntityCreated;
     }
 
-
     private void HandleEntityCreated(Entity entity)
     {
         entity.Disposed += HandleEntityDestroyed;

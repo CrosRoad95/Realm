@@ -61,7 +61,7 @@ public class PlayerPrivateElementComponent<TElementComponent> : ElementComponent
         Entity.InjectProperties(_elementComponent);
 
         if (!_elementComponent.TrySetEntity(Entity))
-            throw new Exception("Component already attached to other entity");
+            throw new ComponentCanNotBeAddedException<PlayerPrivateElementComponent>();
 
         _elementComponent.InternalLoad();
     }

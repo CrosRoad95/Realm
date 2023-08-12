@@ -5,18 +5,20 @@ namespace RealmCore.Server.Services;
 
 public class RealmCommandService
 {
-    private class AsyncCommandInfo
+    public class AsyncCommandInfo
     {
-        public Func<Entity, CommandArguments, Task> Callback { get; set; }
+        internal Func<Entity, CommandArguments, Task> Callback { get; set; }
         public string[]? RequiredPolicies { get; set; }
-        public bool NoTracing { get; set; }
+        public string? Description { get; set; }
+        public string? Usage { get; set; }
     }
 
-    private class CommandInfo
+    public class CommandInfo
     {
-        public Action<Entity, CommandArguments> Callback { get; set; }
+        internal Action<Entity, CommandArguments> Callback { get; set; }
         public string[]? RequiredPolicies { get; set; }
-        public bool NoTracing { get; set; }
+        public string? Description { get; set; }
+        public string? Usage { get; set; }
     }
 
     private readonly CommandService _commandService;
@@ -29,7 +31,9 @@ public class RealmCommandService
     private readonly Dictionary<string, AsyncCommandInfo> _asyncCommands = new();
     private readonly Dictionary<string, CommandInfo> _commands = new();
 
-    public List<string> Commands => _commands.Keys.ToList();
+    public IReadOnlyDictionary<string, AsyncCommandInfo> AsyncCommands => _asyncCommands.AsReadOnly();
+    public IReadOnlyDictionary<string, CommandInfo> Commands => _commands.AsReadOnly();
+    public List<string> CommandNames => _commands.Keys.ToList();
 
     public RealmCommandService(CommandService commandService, ILogger<RealmCommandService> logger, IECS ecs, IUsersService usersService, IPolicyDrivenCommandExecutor policyDrivenCommandExecutor, ChatBox chatBox)
     {
@@ -51,11 +55,11 @@ public class RealmCommandService
     {
         if (_commands.Keys.Any(x => string.Equals(x, commandName, StringComparison.OrdinalIgnoreCase)))
         {
-            throw new Exception($"Command with name '{commandName}' already exists");
+            throw new CommandExistsException($"Command with name '{commandName}' already exists");
         }
         if (_asyncCommands.Keys.Any(x => string.Equals(x, commandName, StringComparison.OrdinalIgnoreCase)))
         {
-            throw new Exception($"Async command with name '{commandName}' already exists");
+            throw new CommandExistsException($"Async command with name '{commandName}' already exists");
         }
     }
 
@@ -77,7 +81,7 @@ public class RealmCommandService
             _logger.LogInformation("Created async command {commandName}", commandName);
     }
 
-    public void AddCommandHandler(string commandName, Action<Entity, CommandArguments> callback, string[]? requiredPolicies = null, bool noTracing = false)
+    public void AddCommandHandler(string commandName, Action<Entity, CommandArguments> callback, string[]? requiredPolicies = null, string? description = null, string? usage = null)
     {
         CheckIfCommandExists(commandName);
 
@@ -86,7 +90,8 @@ public class RealmCommandService
         {
             Callback = callback,
             RequiredPolicies = requiredPolicies,
-            NoTracing = noTracing
+            Description = description,
+            Usage = usage
         });
         command.Triggered += HandleTriggered;
 
@@ -116,8 +121,7 @@ public class RealmCommandService
         using var _1 = _logger.BeginEntity(entity);
         using var _2 = LogContext.PushProperty("commandText", commandText);
         using var _3 = LogContext.PushProperty("commandArguments", args.Arguments);
-        if (!commandInfo.NoTracing)
-            _logger.LogInformation("Begin command {commandText} execution with traceId={TraceId}", commandText);
+        _logger.LogInformation("Begin command {commandText} with arguments {commandArguments} traceId={TraceId}", commandText);
 
         if (commandInfo.RequiredPolicies != null)
         {
@@ -129,13 +133,6 @@ public class RealmCommandService
                 }
         }
 
-        if (!commandInfo.NoTracing)
-        {
-            if (args.Arguments.Any())
-                _logger.LogInformation("Executed command {commandText} with arguments {commandArguments}.", entity);
-            else
-                _logger.LogInformation("Executed command {commandText} with no arguments.", entity);
-        }
         try
         {
             if (userComponent.HasClaim("commandsNoLimit"))
@@ -174,10 +171,7 @@ public class RealmCommandService
         }
         finally
         {
-            if (!commandInfo.NoTracing)
-            {
-                _logger.LogInformation("Ended command {commandText} execution with traceId={TraceId} in {totalMilliseconds}milliseconds", commandText, activity.GetTraceId(), (Stopwatch.GetTimestamp() - start) / (float)TimeSpan.TicksPerMillisecond);
-            }
+            _logger.LogInformation("Ended command {commandText} execution with traceId={TraceId} in {totalMilliseconds}milliseconds", commandText, activity.GetTraceId(), (Stopwatch.GetTimestamp() - start) / (float)TimeSpan.TicksPerMillisecond);
             activity.Stop();
         }
     }
@@ -215,8 +209,7 @@ public class RealmCommandService
         using var _1 = _logger.BeginEntity(entity);
         using var _2 = LogContext.PushProperty("commandText", commandText);
         using var _3 = LogContext.PushProperty("commandArguments", args.Arguments);
-        if (!commandInfo.NoTracing)
-            _logger.LogInformation("Begin async command {commandText} execution with traceId={TraceId}", commandText);
+        _logger.LogInformation("Begin async command {commandText} execution with traceId={TraceId}", commandText);
 
         if (commandInfo.RequiredPolicies != null)
         {
@@ -271,8 +264,7 @@ public class RealmCommandService
         }
         finally
         {
-            if (!commandInfo.NoTracing)
-                _logger.LogInformation("Ended async command {commandText} execution with traceId={TraceId} in {totalMilliseconds}milliseconds", commandText, activity.GetTraceId(), (Stopwatch.GetTimestamp() - start) / (float)TimeSpan.TicksPerMillisecond);
+            _logger.LogInformation("Ended async command {commandText} execution with traceId={TraceId} in {totalMilliseconds}milliseconds", commandText, activity.GetTraceId(), (Stopwatch.GetTimestamp() - start) / (float)TimeSpan.TicksPerMillisecond);
             activity.Stop();
         }
     }

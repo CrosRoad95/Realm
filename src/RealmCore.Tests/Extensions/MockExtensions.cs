@@ -1,6 +1,4 @@
-﻿using Microsoft.Extensions.Logging;
-
-namespace RealmCore.Tests.Extensions;
+﻿namespace RealmCore.Tests.Extensions;
 
 internal static class MockExtensions
 {

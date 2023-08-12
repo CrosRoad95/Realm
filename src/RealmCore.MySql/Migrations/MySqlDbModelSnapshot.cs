@@ -508,10 +508,15 @@ namespace RealmCore.Persistence.MySql.Migrations
                     b.Property<uint>("Experience")
                         .HasColumnType("int unsigned");
 
+                    b.Property<bool>("IsDisabled")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("tinyint(1)")
+                        .HasDefaultValue(false);
+
                     b.Property<string>("LastIp")
                         .HasColumnType("longtext");
 
-                    b.Property<DateTime?>("LastLogindDateTime")
+                    b.Property<DateTime?>("LastLoginDateTime")
                         .HasColumnType("datetime(6)");
 
                     b.Property<string>("LastSerial")
@@ -739,6 +744,11 @@ namespace RealmCore.Persistence.MySql.Migrations
                         .HasDefaultValue(1000f);
 
                     b.Property<bool>("IsFrozen")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("tinyint(1)")
+                        .HasDefaultValue(false);
+
+                    b.Property<bool>("IsRemoved")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("tinyint(1)")
                         .HasDefaultValue(false);

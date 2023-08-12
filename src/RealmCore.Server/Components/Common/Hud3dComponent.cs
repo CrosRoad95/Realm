@@ -27,7 +27,7 @@ public class Hud3dComponent<TState> : Component where TState : class
     {
         ThrowIfDisposed();
         if (_state == null || _dynamicHudComponents == null || !_dynamicHudComponents.Any())
-            throw new Exception("Hud3d has no state");
+            throw new HudException("Hud3d has no state");
 
         callback(_state);
         Dictionary<int, object?> stateChange = new();

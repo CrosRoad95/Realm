@@ -139,7 +139,7 @@ internal class PlayersLogic
                         var client = playerElementComponent.Player.Client;
                         using var context = _realmDbContextFactory.CreateDbContext();
                         var user = await context.Users.Where(x => x.Id == userComponent.Id).FirstAsync();
-                        user.LastLogindDateTime = _dateTimeProvider.Now;
+                        user.LastLoginDateTime = _dateTimeProvider.Now;
                         user.LastIp = client.IPAddress?.ToString();
                         user.LastSerial = client.Serial;
                         if (user.RegisterSerial == null)
