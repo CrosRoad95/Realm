@@ -1,4 +1,5 @@
 ﻿using RealmCore.Persistence.Data;
+using RealmCore.Server.Concepts;
 
 namespace RealmCore.Server.Components.Players;
 
@@ -119,6 +120,11 @@ public class AchievementsComponent : Component
 
     public bool UpdateProgress(int achievementId, float progress, float maximumProgress)
     {
+        return SetProgress(achievementId, Math.Min(progress + GetProgress(achievementId), maximumProgress), maximumProgress);
+    }
+
+    public bool SetProgress(int achievementId, float progress, float maximumProgress)
+    {
         ThrowIfDisposed();
 
         if (progress < 0)
@@ -136,7 +142,7 @@ public class AchievementsComponent : Component
             if (achievement.prizeReceived || HasReachedProgressThreshold(achievementId, maximumProgress))
                 return false;
 
-            _achievements[achievementId] = achievement with { progress = Math.Min(progress + achievement.progress, maximumProgress) };
+            _achievements[achievementId] = achievement with { progress = Math.Min(progress, maximumProgress) };
             if (HasReachedProgressThreshold(achievementId, maximumProgress))
                 AchievementUnlocked?.Invoke(this, achievementId);
             else
