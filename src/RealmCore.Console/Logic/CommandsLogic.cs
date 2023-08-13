@@ -1047,7 +1047,9 @@ internal sealed class CommandsLogic
 
         _commandService.AddCommandHandler("cefdevtools", (entity, args) =>
         {
+            var adminComponent = entity.GetRequiredComponent<AdminComponent>();
             var blazorGuiComponent = entity.GetRequiredComponent<BlazorGuiComponent>();
+            adminComponent.DevelopmentMode = true;
             blazorGuiComponent.DevTools = !blazorGuiComponent.DevTools;
             _chatBox.OutputTo(entity, $"Devtools {blazorGuiComponent.DevTools}");
         }, null);

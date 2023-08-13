@@ -38,7 +38,7 @@ public sealed class Entity : IDisposable
         }
     }
 
-    private readonly IServiceProvider _serviceProvider;
+    internal readonly IServiceProvider _serviceProvider;
 
     public Transform Transform { get; private set; }
 

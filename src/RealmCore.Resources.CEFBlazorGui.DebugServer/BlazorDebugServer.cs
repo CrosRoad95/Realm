@@ -36,7 +36,10 @@ public class BlazorDebugServer
                             var invokeRequest = JsonConvert.DeserializeObject<HttpInvokeRequest>(requestBody);
                             if (invokeRequest == null)
                                 return;
-                            await InvokeVoidAsyncHandler?.Invoke(invokeRequest.CSharpIdentifier, invokeRequest.Args);
+
+                            if(InvokeVoidAsyncHandler == null)
+                                throw new NullReferenceException("InvokeVoidAsyncHandler handler is not set");
+                            await InvokeVoidAsyncHandler.Invoke(invokeRequest.CSharpIdentifier, invokeRequest.Args);
                         });
                         endpoints.MapPost("/invokeAsync", async context =>
                         {
@@ -44,11 +47,19 @@ public class BlazorDebugServer
                             string requestBody = await reader.ReadToEndAsync();
                             var invokeRequest = JsonConvert.DeserializeObject<HttpInvokeRequest>(requestBody);
                             if (invokeRequest == null)
+                            {
+                                context.Response.StatusCode = 400;
                                 return;
+                            }
 
-                            var response = await InvokeAsyncHandler?.Invoke(invokeRequest.CSharpIdentifier, invokeRequest.Args);
+                            if (InvokeAsyncHandler == null)
+                                throw new NullReferenceException("InvokeAsyncHandler handler is not set");
+                            var response = await InvokeAsyncHandler.Invoke(invokeRequest.CSharpIdentifier, invokeRequest.Args);
                             if (response == null)
+                            {
+                                context.Response.StatusCode = 404;
                                 return;
+                            }
 
                             var data = JsonConvert.SerializeObject(response);
                             context.Response.StatusCode = 200;

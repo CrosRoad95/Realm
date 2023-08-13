@@ -6,7 +6,6 @@ global using System.Threading.Tasks;
 global using Microsoft.EntityFrameworkCore;
 global using Microsoft.Extensions.DependencyInjection;
 global using Serilog;
-global using Serilog.Context;
 global using Newtonsoft.Json;
 global using Newtonsoft.Json.Linq;
 

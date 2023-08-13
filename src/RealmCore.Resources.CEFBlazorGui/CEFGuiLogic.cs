@@ -42,7 +42,6 @@ internal class CEFBlazorGuiLogic
         try
         {
             await  _resource.StartForAsync(player);
-            _luaEventHub.Invoke(player, x => x.SetDevelopmentMode(true));
             var mode = _blazorOptions.Value.Mode.ToString().ToLower();
             var width = _blazorOptions.Value.BrowserSize.Width;
             var height = _blazorOptions.Value.BrowserSize.Height;
@@ -59,9 +58,6 @@ internal class CEFBlazorGuiLogic
         // TODO: add loggers
         switch (message)
         {
-            case SetDevelopmentModeMessage setDevelopmentModeMessage:
-                _luaEventHub.Invoke(setDevelopmentModeMessage.Player, x => x.SetDevelopmentMode(setDevelopmentModeMessage.Enabled));
-                break;
             case SetVisibleMessage setVisibleMessage:
                 var enabled = setVisibleMessage.Enabled;
                 _luaEventHub.Invoke(setVisibleMessage.Player, x => x.SetVisible(enabled));

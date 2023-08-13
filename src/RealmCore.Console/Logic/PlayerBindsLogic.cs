@@ -1,6 +1,7 @@
 ﻿using RealmCore.Server.DTOs;
 using RealmCore.Server.Components;
 using RealmCore.Server.Enums;
+using RealmCore.Server.Helpers;
 
 namespace RealmCore.Console.Logic;
 
@@ -40,71 +41,6 @@ internal sealed class PlayerBindsLogic
     {
         if (entity.Tag == EntityTag.Player)
             entity.ComponentAdded += HandleComponentAdded;
-    }
-
-    private void OpenCloseGuiHelper<TGuiComponent>(Entity entity, string bind, GuiOpenOptions options = default) where TGuiComponent : GuiComponent, new()
-    {
-        OpenCloseGuiHelper(entity, bind, () => new TGuiComponent(), options);
-    }
-
-    private void OpenCloseGuiPageHelper<TGuiComponent>(Entity entity, string bind) where TGuiComponent : GuiPageComponent, new()
-    {
-        OpenCloseGuiPageHelper(entity, bind, () => new TGuiComponent());
-    }
-
-    private void OpenCloseGuiPageHelper<TGuiComponent>(Entity entity, string bind, Func<TGuiComponent> factory) where TGuiComponent : GuiPageComponent
-    {
-        var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();
-        playerElementComponent.SetBind(bind, entity =>
-        {
-            if (entity.HasComponent<TGuiComponent>())
-            {
-                entity.DestroyComponent<TGuiComponent>();
-                return;
-            }
-
-            entity.TryDestroyComponent<GuiPageComponent>();
-
-            var guiComponent = entity.AddComponent(factory());
-            playerElementComponent.ResetCooldown(bind);
-        });
-    }
-
-
-    private void OpenCloseGuiHelper<TGuiComponent>(Entity entity, string bind, Func<TGuiComponent> factory, GuiOpenOptions options = default) where TGuiComponent : GuiComponent
-    {
-        var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();
-        playerElementComponent.SetBindAsync(bind, async entity =>
-        {
-            if (entity.HasComponent<TGuiComponent>())
-            {
-                entity.TryDestroyComponent<TGuiComponent>();
-                return;
-            }
-
-            entity.TryDestroyComponent<GuiComponent>();
-
-            var guiComponent = entity.AddComponent(factory());
-            playerElementComponent.ResetCooldown(bind);
-        });
-    }
-
-    private void OpenCloseGuiHelper<TGuiComponent>(Entity entity, string bind, Func<Task<TGuiComponent>> factory, GuiOpenOptions options = default) where TGuiComponent : GuiComponent
-    {
-        var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();
-        playerElementComponent.SetBindAsync(bind, async entity =>
-        {
-            if (entity.HasComponent<TGuiComponent>())
-            {
-                entity.DestroyComponent<TGuiComponent>();
-                return;
-            }
-
-            entity.TryDestroyComponent<GuiComponent>();
-
-            var guiComponent = entity.AddComponent(await factory());
-            playerElementComponent.ResetCooldown(bind);
-        });
     }
 
     private void HandleComponentAdded(Component component)
@@ -163,8 +99,8 @@ internal sealed class PlayerBindsLogic
                 }
             });
 
-            OpenCloseGuiPageHelper<HomePageComponent>(entity, "F6");
-            OpenCloseGuiPageHelper<CounterPageComponent>(entity, "F7");
+            GuiHelpers.BindGuiPage<HomePageComponent>(entity, "F6");
+            GuiHelpers.BindGuiPage<CounterPageComponent>(entity, "F7");
 
             //playerElementComponent.SetBind("F6", entity =>
             //{
@@ -182,7 +118,7 @@ internal sealed class PlayerBindsLogic
             //    }
             //});
 
-            OpenCloseGuiHelper(entity, "F1", async () =>
+            GuiHelpers.BindGuiPage(entity, "F1", async () =>
             {
                 DashboardGuiComponent.DashboardState state = new();
                 if (entity.TryGetComponent(out MoneyComponent moneyComponent))
@@ -198,7 +134,7 @@ internal sealed class PlayerBindsLogic
                 state.Counter = 3;
                 return new DashboardGuiComponent(state);
             });
-            OpenCloseGuiHelper<InventoryGuiComponent>(entity, "i");
+            GuiHelpers.BindGui<InventoryGuiComponent>(entity, "i");
         }
     }
 }

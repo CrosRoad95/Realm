@@ -48,6 +48,6 @@ public class EventHub
 
     public ValueTask NotifyPageReady()
     {
-        return InvokeVoidAsync("_guiReady");
+        return InvokeVoidAsync("_pageReady");
     }
 }

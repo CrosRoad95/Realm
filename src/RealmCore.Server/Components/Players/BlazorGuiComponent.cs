@@ -1,16 +1,11 @@
-﻿using RealmCore.Resources.CEFBlazorGui;
+﻿namespace RealmCore.Server.Components.Players;
 
-namespace RealmCore.Server.Components.Players;
-
-[ComponentUsage(true)]
+[ComponentUsage(false)]
 public class BlazorGuiComponent : Component
 {
-    [Inject]
-    private ICEFBlazorGuiService CEFBlazorGuiService { get; set; } = default!;
-
-    public event Action<BlazorGuiComponent, string?>? PathChanged;
-    internal Action<BlazorGuiComponent, string?, bool, bool>? InternalPathChanged { get; set; }
-    internal Action<BlazorGuiComponent, bool?>? InternalDevToolsChanged { get; set; }
+    public event Action<BlazorGuiComponent, string?, bool, GuiPageType, GuiPageChangeSource>? PathChanged;
+    public event Action<BlazorGuiComponent, bool>? DevToolsStateChanged;
+    public event Action<BlazorGuiComponent, bool>? VisibleChanged;
 
     private string? _path;
     public string? Path
@@ -18,7 +13,7 @@ public class BlazorGuiComponent : Component
         get => _path; set
         {
             if (_path == value) return;
-            InternalPathChanged?.Invoke(this, value, false, false);
+            PathChanged?.Invoke(this, value, false, GuiPageType.Unknown, GuiPageChangeSource.Server);
             _path = value;
         }
     }
@@ -30,18 +25,8 @@ public class BlazorGuiComponent : Component
         {
             if (_devTools != value)
             {
-                if(value)
-                {
-                    CEFBlazorGuiService.SetDevelopmentMode(Entity.Player, value);
-                    CEFBlazorGuiService.ToggleDevTools(Entity.Player, value);
-                }
-                else
-                {
-                    CEFBlazorGuiService.ToggleDevTools(Entity.Player, value);
-                    CEFBlazorGuiService.SetDevelopmentMode(Entity.Player, value);
-                }
                 _devTools = value;
-                InternalDevToolsChanged?.Invoke(this, value);
+                DevToolsStateChanged?.Invoke(this, value);
             }
         }
     }
@@ -53,21 +38,15 @@ public class BlazorGuiComponent : Component
         {
             if (_visible != value)
             {
-                CEFBlazorGuiService.SetVisible(Entity.Player, value);
                 _visible = value;
-                InternalDevToolsChanged?.Invoke(this, value);
+                VisibleChanged?.Invoke(this, value);
             }
         }
     }
 
-    public BlazorGuiComponent()
-    {
-
-    }
-
     public void Open(string path, bool force = false, bool isAsync = false)
     {
-        if(isAsync)
+        if (isAsync)
         {
             //Visible = true;
             _visible = true;
@@ -81,17 +60,17 @@ public class BlazorGuiComponent : Component
             return;
         _path = path;
 
-        InternalPathChanged?.Invoke(this, path, force, isAsync);
+        PathChanged?.Invoke(this, path, force, isAsync ? GuiPageType.Async : GuiPageType.Sync, GuiPageChangeSource.Server);
     }
-    
+
     public void Close()
     {
         Visible = false;
     }
 
-    internal void SetPath(string? path)
+    internal void InternalSetPath(string path)
     {
         _path = path;
-        PathChanged?.Invoke(this, path);
+        PathChanged?.Invoke(this, path, false, GuiPageType.Unknown, GuiPageChangeSource.Client);
     }
 }

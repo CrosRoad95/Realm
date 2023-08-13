@@ -68,7 +68,3 @@ function registerCSharpFunction(cSharpApp) {
 const navigate = (path, force) => {
     window.app.invokeMethod("NavigateTo", path, force)
 };
-
-if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('js/sw.js');
-}

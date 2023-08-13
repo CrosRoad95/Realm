@@ -30,16 +30,15 @@ internal sealed class CEFBlazorGuiService : ICEFBlazorGuiService
         CEFGuiMode = blazorOptions.Value.Mode;
         _elementCollection = elementCollection;
         _logger = logger;
-    }
-
-    public void StartDebugServer()
-    {
-        _blazorDebugServer = new()
+        if (blazorOptions.Value.Mode == CEFGuiBlazorMode.Dev)
         {
-            InvokeAsyncHandler = HandleInvokeAsyncHandler,
-            InvokeVoidAsyncHandler = HandleInvokeVoidAsyncHandler
-        };
-        Task.Run(_blazorDebugServer.Start);
+            _blazorDebugServer = new()
+            {
+                InvokeAsyncHandler = HandleInvokeAsyncHandler,
+                InvokeVoidAsyncHandler = HandleInvokeVoidAsyncHandler
+            };
+            Task.Run(_blazorDebugServer.Start);
+        }
     }
 
     public void HandlePlayerBrowserReady(Player player)
@@ -56,11 +55,13 @@ internal sealed class CEFBlazorGuiService : ICEFBlazorGuiService
     {
         try
         {
-            return RelayVoidAsyncInvoked?.Invoke(_elementCollection.GetByType<Player>().First(), identifier, args);
+            if(RelayVoidAsyncInvoked == null)
+                throw new NullReferenceException("RelayVoidAsyncInvoked handler is not set");
+            return RelayVoidAsyncInvoked.Invoke(_elementCollection.GetByType<Player>().First(), identifier, args);
         }
         catch(Exception ex)
         {
-            _logger.LogError(ex, "Failed to relay invokeVoidAsync");
+            _logger.LogError(ex, "Failed to relay invokeVoidAsync, no player found");
         }
 
         return Task.CompletedTask;
@@ -73,19 +74,13 @@ internal sealed class CEFBlazorGuiService : ICEFBlazorGuiService
         return null;
     }
 
-    public void HandleInvokeVoidAsyncHandler(Player player, string identifier, string args)
+    public async Task HandleInvokeVoidAsyncHandler(Player player, string identifier, string args)
     {
         try
         {
-            switch(identifier)
-            {
-                case "_ready":
-                    RelayPlayerBlazorReady?.Invoke(player);
-                    break;
-                default:
-                    RelayVoidAsyncInvoked?.Invoke(player, identifier, args);
-                    break;
-            }
+            if (RelayVoidAsyncInvoked == null)
+                throw new NullReferenceException("RelayVoidAsyncInvoked handler is not set");
+            await RelayVoidAsyncInvoked.Invoke(player, identifier, args);
         }
         catch(Exception ex)
         {
@@ -105,11 +100,6 @@ internal sealed class CEFBlazorGuiService : ICEFBlazorGuiService
             _logger.LogError(ex, "Failed to relay invokeAsync");
         }
         return null;
-    }
-
-    public void SetDevelopmentMode(Player player, bool isDevelopmentMode)
-    {
-        MessageHandler?.Invoke(new SetDevelopmentModeMessage(player, isDevelopmentMode));
     }
 
     public void ToggleDevTools(Player player, bool enabled)

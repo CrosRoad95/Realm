@@ -8,6 +8,7 @@ public abstract class GuiPageComponent : Component
 
     public string Path { get; }
     public bool IsAsync { get; }
+    private bool _loaded;
 
     public GuiPageComponent(string path, bool isAsync = false)
     {
@@ -19,12 +20,16 @@ public abstract class GuiPageComponent : Component
     {
         _blazorGuiComponent = Entity.GetRequiredComponent<BlazorGuiComponent>();
         BlazorGuiComponent.Open(Path, false, IsAsync);
+        _loaded = true;
     }
 
     public override void Dispose()
     {
-        BlazorGuiComponent.Path = "index";
-        BlazorGuiComponent.Visible = false;
+        if(_loaded)
+        {
+            BlazorGuiComponent.Path = "index";
+            BlazorGuiComponent.Visible = false;
+        }
         base.Dispose();
     }
 }

@@ -17,10 +17,9 @@ public interface ICEFBlazorGuiService
 
     internal void HandlePlayerBrowserReady(Player player);
 
-    void SetDevelopmentMode(Player player, bool isDevelopmentMode);
-    void ToggleDevTools(Player player, bool isDevelopmentMode);
+    void ToggleDevTools(Player player, bool enabled);
     void SetVisible(Player player, bool visible);
     void SetPath(Player player, string path, bool force, bool isAsync);
-    internal void HandleInvokeVoidAsyncHandler(Player player, string identifier, string args);
-    internal Task<object> HandleInvokeAsyncHandler(Player player, string identifier, string args);
+    internal Task HandleInvokeVoidAsyncHandler(Player player, string identifier, string args);
+    internal Task<object?> HandleInvokeAsyncHandler(Player player, string identifier, string args);
 }

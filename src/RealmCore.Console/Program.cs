@@ -34,7 +34,7 @@ var server = builder.Build(null, extraBuilderSteps: serverBuilder =>
         }, new());
     }
 
-    serverBuilder.AddCEFBlazorGuiResource("../../../Server/BlazorGui/wwwroot", CEFGuiBlazorMode.Prod);
+    serverBuilder.AddCEFBlazorGuiResource("../../../Server/BlazorGui/wwwroot", CEFGuiBlazorMode.Dev);
 
     serverBuilder.AddLogic<DefaultCommandsLogic>();
 
@@ -99,7 +99,7 @@ var server = builder.Build(null, extraBuilderSteps: serverBuilder =>
 
         services.Configure<BlazorOptions>(options =>
         {
-            options.Mode = CEFGuiBlazorMode.Prod;
+            options.Mode = CEFGuiBlazorMode.Dev;
             options.BrowserSize = new System.Drawing.Size(1024, 768);
         });
     });

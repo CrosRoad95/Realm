@@ -13,8 +13,7 @@ local function isValidPath(path)
 end
 
 local function handleInvokeVoidAsync(identifier, args)
-	iprint("identifier, args",identifier, args)
-	if(identifier == "_guiReady")then
+	if(identifier == "_pageReady")then
 		if(isValidPath(currentPath))then
 			internalSetVisible(true)
 		end
@@ -55,10 +54,6 @@ local function handleForgetFrom(formName)
 	if(fileExists(fileName))then
 		fileDelete(fileName)
 	end
-end
-
-function handleSetDevelopmentMode(enabled)
-	setDevelopmentMode(true, enabled);
 end
 
 function handleToggleDevTools(enabled)
@@ -156,7 +151,6 @@ end
 
 addEventHandler("onClientResourceStart", resourceRoot, function()
 	hubBind("Load", handleLoad)
-	hubBind("SetDevelopmentMode", handleSetDevelopmentMode)
 	hubBind("ToggleDevTools", handleToggleDevTools)
 	hubBind("SetVisible", handleSetVisible)
 	hubBind("SetPath", handleSetPath)

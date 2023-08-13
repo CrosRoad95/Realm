@@ -14,5 +14,5 @@ end)
 
 addEvent("internalSetDevelopmentModeEnabled", true)
 addEventHandler("internalSetDevelopmentModeEnabled", localPlayer, function(enabled)
-	setDevelopmentMode(enabled)
+	setDevelopmentMode(enabled, enabled)
 end)

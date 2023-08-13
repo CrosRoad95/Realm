@@ -2,32 +2,40 @@
 
 internal class BlazorGuiService : IBlazorGuiService
 {
-    public Action<BlazorGuiComponent, string, string>? InvokeVoidAsync { get; set; }
-    public Func<BlazorGuiComponent, string, string, Task<object>>? InvokeAsync { get; set; }
-
-    public BlazorGuiService()
-    {
-
-    }
+    public Func<BlazorGuiComponent, string, string, Task>? InvokeVoidAsync { get; set; }
+    public Func<BlazorGuiComponent, string, string, Task<object?>>? InvokeAsync { get; set; }
 
     public async Task RelayInvokeVoidAsync(BlazorGuiComponent component, string identifier, string args)
     {
         switch (identifier)
         {
             case "_locationChanged":
-                var path = JsonConvert.DeserializeObject<string>(args);
-                component.SetPath(path);
+                {
+                    // TODO: make it better
+                    string path;
+                    try
+                    {
+                        path = JsonConvert.DeserializeObject<string>(args);
+                    }
+                    catch(Exception)
+                    {
+                        path = JsonConvert.DeserializeObject<string[]>(args).First();
+                    }
+                    component.InternalSetPath(path);
+                }
                 break;
             default:
-                InvokeVoidAsync?.Invoke(component, identifier, args);
+                if (InvokeVoidAsync == null)
+                    return;
+                await InvokeVoidAsync.Invoke(component, identifier, args);
                 break;
         }
-    }
+    } 
 
-    public Task<object> RelayInvokeAsync(BlazorGuiComponent component, string identifier, string args)
+    public Task<object?> RelayInvokeAsync(BlazorGuiComponent component, string identifier, string args)
     {
         if(InvokeAsync != null)
             return InvokeAsync(component, identifier, args);
-        return Task.FromResult(new object());
+        return Task.FromResult<object?>(null);
     }
 }
