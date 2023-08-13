@@ -1,24 +1,35 @@
-﻿using Polly.RateLimit;
+﻿using Polly;
+using Polly.RateLimit;
 using RealmCore.Logging;
+using RealmCore.Server.Components.Players;
+using static RealmCore.Server.Services.RealmCommandService;
 
 namespace RealmCore.Server.Services;
 
 public class RealmCommandService
 {
-    public class AsyncCommandInfo
+
+    public abstract class CommandInfo
     {
-        internal Func<Entity, CommandArguments, Task> Callback { get; set; }
-        public string[]? RequiredPolicies { get; set; }
-        public string? Description { get; set; }
-        public string? Usage { get; set; }
+        public string CommandName { get; init; }
+        public string[]? RequiredPolicies { get; init; }
+        public string? Description { get; init; }
+        public string? Usage { get; init; }
+        public string? Category { get; init; }
+        public abstract bool IsAsync { get; }
     }
 
-    public class CommandInfo
+    internal class SyncCommandInfo : CommandInfo
     {
+        public override bool IsAsync => false;
+
         internal Action<Entity, CommandArguments> Callback { get; set; }
-        public string[]? RequiredPolicies { get; set; }
-        public string? Description { get; set; }
-        public string? Usage { get; set; }
+    }
+
+    internal class AsyncCommandInfo : CommandInfo
+    {
+        public override bool IsAsync => true;
+        internal Func<Entity, CommandArguments, Task> Callback { get; set; }
     }
 
     private readonly CommandService _commandService;
@@ -29,11 +40,10 @@ public class RealmCommandService
     private readonly ILogger<RealmCommandService> _logger;
 
     private readonly Dictionary<string, AsyncCommandInfo> _asyncCommands = new();
-    private readonly Dictionary<string, CommandInfo> _commands = new();
+    private readonly Dictionary<string, SyncCommandInfo> _commands = new();
 
-    public IReadOnlyDictionary<string, AsyncCommandInfo> AsyncCommands => _asyncCommands.AsReadOnly();
-    public IReadOnlyDictionary<string, CommandInfo> Commands => _commands.AsReadOnly();
-    public List<string> CommandNames => _commands.Keys.ToList();
+    public List<CommandInfo> Commands => _commands.Select(x => (CommandInfo)x.Value).Concat(_commands.Select(x => (CommandInfo)x.Value)).ToList();
+    public List<string> CommandNames => _commands.Keys.Concat(_asyncCommands.Keys).ToList();
 
     public RealmCommandService(CommandService commandService, ILogger<RealmCommandService> logger, IECS ecs, IUsersService usersService, IPolicyDrivenCommandExecutor policyDrivenCommandExecutor, ChatBox chatBox)
     {
@@ -63,15 +73,19 @@ public class RealmCommandService
         }
     }
 
-    public void AddAsyncCommandHandler(string commandName, Func<Entity, CommandArguments, Task> callback, string[]? requiredPolicies = null)
+    public void AddAsyncCommandHandler(string commandName, Func<Entity, CommandArguments, Task> callback, string[]? requiredPolicies = null, string? description = null, string? usage = null, string? category = null)
     {
         CheckIfCommandExists(commandName);
 
         var command = _commandService.AddCommand(commandName);
         _asyncCommands.Add(commandName, new AsyncCommandInfo
         {
+            CommandName = commandName,
             Callback = callback,
-            RequiredPolicies = requiredPolicies
+            RequiredPolicies = requiredPolicies,
+            Description = description,
+            Usage = usage,
+            Category = category
         });
         command.Triggered += HandleAsyncTriggered;
 
@@ -81,24 +95,34 @@ public class RealmCommandService
             _logger.LogInformation("Created async command {commandName}", commandName);
     }
 
-    public void AddCommandHandler(string commandName, Action<Entity, CommandArguments> callback, string[]? requiredPolicies = null, string? description = null, string? usage = null)
+    public void AddCommandHandler(string commandName, Action<Entity, CommandArguments> callback, string[]? requiredPolicies = null, string? description = null, string? usage = null, string? category = null)
     {
         CheckIfCommandExists(commandName);
 
         var command = _commandService.AddCommand(commandName);
-        _commands.Add(commandName, new CommandInfo
+        _commands.Add(commandName, new SyncCommandInfo
         {
+            CommandName = commandName,
             Callback = callback,
             RequiredPolicies = requiredPolicies,
             Description = description,
-            Usage = usage
+            Usage = usage,
+            Category = category
         });
         command.Triggered += HandleTriggered;
 
         if (requiredPolicies != null)
-            _logger.LogInformation("Created command {commandName} with required policies: {requiredPolicies}", commandName, requiredPolicies);
+            _logger.LogInformation("Created sync command {commandName} with required policies: {requiredPolicies}", commandName, requiredPolicies);
         else
-            _logger.LogInformation("Created command {commandName}", commandName);
+            _logger.LogInformation("Created sync command {commandName}", commandName);
+    }
+
+    private async Task<string?> ValidatePolicies(UserComponent userComponent, string[] policies)
+    {
+        foreach (var policy in policies)
+            if (!await _usersService.AuthorizePolicy(userComponent, policy))
+                return policy;
+        return null;
     }
 
     internal async Task InternalHandleTriggered(object? sender, CommandTriggeredEventArgs args)
@@ -118,19 +142,22 @@ public class RealmCommandService
         activity.Start();
         var start = Stopwatch.GetTimestamp();
 
-        using var _1 = _logger.BeginEntity(entity);
-        using var _2 = LogContext.PushProperty("commandText", commandText);
-        using var _3 = LogContext.PushProperty("commandArguments", args.Arguments);
+        using var _ = _logger.BeginEntity(entity);
+        using var _commandContextScope = _logger.BeginScope(new Dictionary<string, object>
+        {
+            ["commandText"] = commandText,
+            ["commandArguments"] = args.Arguments
+        });
         _logger.LogInformation("Begin command {commandText} with arguments {commandArguments} traceId={TraceId}", commandText);
 
         if (commandInfo.RequiredPolicies != null)
         {
-            foreach (var policy in commandInfo.RequiredPolicies)
-                if (!await _usersService.AuthorizePolicy(userComponent, policy))
-                {
-                    _logger.LogInformation("Failed to execute command {commandText} because failed to authorize for policy {policy}", commandText, policy);
-                    return;
-                }
+            var failedPolicy = await ValidatePolicies(userComponent, commandInfo.RequiredPolicies);
+            if (failedPolicy != null)
+            {
+                _logger.LogInformation("Failed to execute command {commandText} because failed to authorize for policy {policy}", commandText, failedPolicy);
+                return;
+            }
         }
 
         try
@@ -143,10 +170,10 @@ public class RealmCommandService
                     commandInfo.Callback(entity, new CommandArguments(args.Arguments, _usersService));
                 }, userComponent.Id.ToString());
         }
-        catch (RateLimitRejectedException rateLimitRejectedException)
+        catch (RateLimitRejectedException ex)
         {
             _chatBox.OutputTo(entity, "Zbyt szybko wysyłasz komendy. Poczekaj chwilę.");
-            _logger.LogError(rateLimitRejectedException, "Exception thrown while executing command {commandText} with arguments {commandArguments}", commandText, args.Arguments);
+            _logger.LogError(ex, "Rate limit exception thrown while executing command {commandText} with arguments {commandArguments}", commandText, args.Arguments);
         }
         catch (CommandArgumentException ex)
         {
@@ -206,25 +233,24 @@ public class RealmCommandService
         activity.Start();
         var start = Stopwatch.GetTimestamp();
 
-        using var _1 = _logger.BeginEntity(entity);
-        using var _2 = LogContext.PushProperty("commandText", commandText);
-        using var _3 = LogContext.PushProperty("commandArguments", args.Arguments);
+        using var _ = _logger.BeginEntity(entity);
+        using var _commandContextScope = _logger.BeginScope(new Dictionary<string, object>
+        {
+            ["commandText"] = commandText,
+            ["commandArguments"] = args.Arguments
+        });
         _logger.LogInformation("Begin async command {commandText} execution with traceId={TraceId}", commandText);
 
         if (commandInfo.RequiredPolicies != null)
         {
-            foreach (var policy in commandInfo.RequiredPolicies)
-                if (!await _usersService.AuthorizePolicy(userComponent, policy))
-                {
-                    _logger.LogInformation("failed to execute command {commandText} because failed to authorize for policy {policy}", commandText, policy);
-                    return;
-                }
+            var failedPolicy = await ValidatePolicies(userComponent, commandInfo.RequiredPolicies);
+            if (failedPolicy != null)
+            {
+                _logger.LogInformation("Failed to execute command {commandText} because failed to authorize for policy {policy}", commandText, failedPolicy);
+                return;
+            }
         }
-
-        if (args.Arguments.Any())
-            _logger.LogInformation("{player} executed command {commandText} with arguments {commandArguments}.", entity);
-        else
-            _logger.LogInformation("{player} executed command {commandText} with no arguments.", entity);
+        _logger.LogInformation("{player} executed command {commandText} with arguments {commandArguments}.", entity);
         try
         {
 
@@ -239,7 +265,7 @@ public class RealmCommandService
         catch (RateLimitRejectedException ex)
         {
             _chatBox.OutputTo(entity, "Zbyt szybko wysyłasz komendy. Poczekaj chwilę.");
-            _logger.LogWarning("Exception thrown while executing command {commandText} with arguments {commandArguments}", commandText, args.Arguments);
+            _logger.LogError(ex, "Rate limit exception thrown while executing command {commandText} with arguments {commandArguments}", commandText, args.Arguments);
         }
         catch (CommandArgumentException ex)
         {
