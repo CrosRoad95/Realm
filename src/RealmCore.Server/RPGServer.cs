@@ -126,7 +126,7 @@ internal sealed class RPGServer : IRPGServer
         ServerStarted?.Invoke();
         _logger.LogInformation(_stringLocalizer.GetOr("ServerStarted", "Server started."));
         _logger.LogInformation("Found resources: {resourcesCount}", RealmResourceServer._resourceCounter);
-        _logger.LogInformation("Created commands: {commandsCount}", realmCommandService.CommandNames.Count);
+        _logger.LogInformation("Created commands: {commandsCount}", realmCommandService.Count);
         _server.Start();
     }
 

@@ -39,8 +39,9 @@ public class RealmCommandService
     private readonly Dictionary<string, AsyncCommandInfo> _asyncCommands = new();
     private readonly Dictionary<string, SyncCommandInfo> _commands = new();
 
-    public List<CommandInfo> Commands => _commands.Select(x => (CommandInfo)x.Value).Concat(_commands.Select(x => (CommandInfo)x.Value)).ToList();
+    public List<CommandInfo> Commands => _commands.Select(x => (CommandInfo)x.Value).Concat(_asyncCommands.Select(x => (CommandInfo)x.Value)).ToList();
     public List<string> CommandNames => _commands.Keys.Concat(_asyncCommands.Keys).ToList();
+    public int Count => _commands.Count + _asyncCommands.Count;
 
     public RealmCommandService(CommandService commandService, ILogger<RealmCommandService> logger, IECS ecs, IUsersService usersService, IPolicyDrivenCommandExecutor policyDrivenCommandExecutor, ChatBox chatBox)
     {
@@ -147,7 +148,7 @@ public class RealmCommandService
         });
         _logger.LogInformation("Begin command {commandText} with arguments {commandArguments} traceId={TraceId}", commandText);
 
-        if (commandInfo.RequiredPolicies != null)
+        if (commandInfo.RequiredPolicies != null && commandInfo.RequiredPolicies.Length > 0)
         {
             var failedPolicy = await ValidatePolicies(userComponent, commandInfo.RequiredPolicies);
             if (failedPolicy != null)
@@ -238,7 +239,7 @@ public class RealmCommandService
         });
         _logger.LogInformation("Begin async command {commandText} execution with traceId={TraceId}", commandText);
 
-        if (commandInfo.RequiredPolicies != null)
+        if (commandInfo.RequiredPolicies != null && commandInfo.RequiredPolicies.Length > 0)
         {
             var failedPolicy = await ValidatePolicies(userComponent, commandInfo.RequiredPolicies);
             if (failedPolicy != null)
