@@ -34,7 +34,7 @@ public class AchievementsComponent : Component
         {
             progress = x.Progress,
             value = JsonConvert.DeserializeObject(x.Value),
-            prizeReceived = x.PrizeReceived,
+            rewardReceived = x.PrizeReceived,
         });
     }
 
@@ -97,6 +97,16 @@ public class AchievementsComponent : Component
         }
     }
 
+    public bool ReceivedReward(int achievementId)
+    {
+        lock (_lock)
+        {
+            TryInitializeAchievementInternal(achievementId);
+
+            return _achievements[achievementId].rewardReceived;
+        }
+    }
+
     public bool TryReceiveReward(int achievementId, float requiredProgress)
     {
         ThrowIfDisposed();
@@ -109,10 +119,10 @@ public class AchievementsComponent : Component
             TryInitializeAchievementInternal(achievementId);
 
             var achievement = _achievements[achievementId];
-            if (achievement.prizeReceived || achievement.progress < requiredProgress)
+            if (achievement.rewardReceived || achievement.progress < requiredProgress)
                 return false;
 
-            _achievements[achievementId] = _achievements[achievementId] with { prizeReceived = true };
+            _achievements[achievementId] = _achievements[achievementId] with { rewardReceived = true };
         }
 
         return true;
@@ -139,7 +149,7 @@ public class AchievementsComponent : Component
 
             var achievement = _achievements[achievementId];
 
-            if (achievement.prizeReceived || HasReachedProgressThreshold(achievementId, maximumProgress))
+            if (achievement.rewardReceived || HasReachedProgressThreshold(achievementId, maximumProgress))
                 return false;
 
             _achievements[achievementId] = achievement with { progress = Math.Min(progress, maximumProgress) };

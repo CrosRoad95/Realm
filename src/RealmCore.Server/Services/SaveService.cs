@@ -308,7 +308,7 @@ internal class SaveService : ISaveService
             {
                 AchievementId = x.Key,
                 Value = JsonConvert.SerializeObject(x.Value.value, Formatting.None),
-                PrizeReceived = x.Value.prizeReceived,
+                PrizeReceived = x.Value.rewardReceived,
                 Progress = x.Value.progress,
             }).ToList();
         }
