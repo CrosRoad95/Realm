@@ -8,7 +8,6 @@ namespace RealmCore.Tests.Tests.Services;
 
 public class RealmCommandServiceTests
 {
-    // CommandService commandService, ILogger<RealmCommandService> logger, IECS ecs, IUsersService usersService, IPolicyDrivenCommandExecutor policyDrivenCommandExecutor, ChatBox chatBox
     private readonly Mock<ILogger<RealmCommandService>> _logger = new(MockBehavior.Strict);
     private readonly CommandService _commandService;
     private readonly Mock<IECS> _ecsMock = new(MockBehavior.Strict);
@@ -29,10 +28,10 @@ public class RealmCommandServiceTests
         _sut = new RealmCommandService(_commandService, _logger.Object, _ecsMock.Object, _usersServiceMock.Object, _policyDrivenCommandExecutor, _chatBox);
     }
 
-    //[InlineData("foo", "FOO", true)]
-    //[InlineData("foo", "foo", true)]
-    //[InlineData("foo", "bar", false)]
-    //[Theory]
+    [InlineData("foo", "FOO", true)]
+    [InlineData("foo", "foo", true)]
+    [InlineData("foo", "bar", false)]
+    [Theory]
     public void YouCanNotCreateTwoSameCommands(string command1, string command2, bool shouldThrow)
     {
         _sut.ClearCommands();
@@ -52,10 +51,10 @@ public class RealmCommandServiceTests
         }
     }
 
-    //[InlineData("foo", "FOO", true)]
-    //[InlineData("foo", "foo", true)]
-    //[InlineData("foo", "bar", false)]
-    //[Theory]
+    [InlineData("foo", "FOO", true)]
+    [InlineData("foo", "foo", true)]
+    [InlineData("foo", "bar", false)]
+    [Theory]
     public void YouCanNotCreateTwoSameCommandsMixedAsyncAndNotAsync(string command1, string command2, bool shouldThrow)
     {
         _sut.ClearCommands();
@@ -75,10 +74,10 @@ public class RealmCommandServiceTests
         }
     }
 
-    //[InlineData("foo", "FOO", true)]
-    //[InlineData("foo", "foo", true)]
-    //[InlineData("foo", "bar", false)]
-    //[Theory]
+    [InlineData("foo", "FOO", true)]
+    [InlineData("foo", "foo", true)]
+    [InlineData("foo", "bar", false)]
+    [Theory]
     public void YouCanNotCreateTwoSameAsyncCommands(string command1, string command2, bool shouldThrow)
     {
         _sut.ClearCommands();
