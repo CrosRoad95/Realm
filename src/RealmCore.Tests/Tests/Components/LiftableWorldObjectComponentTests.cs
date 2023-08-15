@@ -14,14 +14,7 @@ public class LiftableWorldObjectComponentTests
     {
         var services = new ServiceCollection();
 
-        _logger.Setup(x => x.Log(
-            It.IsAny<LogLevel>(),
-            It.IsAny<EventId>(),
-            It.IsAny<It.IsAnyType>(),
-            It.IsAny<Exception>(),
-            (Func<It.IsAnyType, Exception, string>)It.IsAny<object>()))
-            .Verifiable();
-        _logger.Setup(x => x.BeginScope(It.IsAny<Dictionary<string, object>>())).Returns((IDisposable)null);
+        _logger.SetupLogger();
         services.AddSingleton(_logger.Object);
         var serviceProvider = services.BuildServiceProvider();
 

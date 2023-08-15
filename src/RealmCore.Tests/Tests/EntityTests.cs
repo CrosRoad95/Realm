@@ -13,15 +13,8 @@ public class EntityTests
     {
         var services = new ServiceCollection();
         services.AddSingleton(new object());
-        _logger.Setup(x => x.Log(
-        It.IsAny<LogLevel>(),
-        It.IsAny<EventId>(),
-        It.IsAny<It.IsAnyType>(),
-        It.IsAny<Exception>(),
-        (Func<It.IsAnyType, Exception, string>)It.IsAny<object>()))
-        .Verifiable();
-            services.AddSingleton(_logger.Object);
-        _logger.Setup(x => x.BeginScope(It.IsAny<Dictionary<string, object>>())).Returns((IDisposable)null);
+        _logger.SetupLogger();
+        services.AddSingleton(_logger.Object);
         _serviceProvider = services.BuildServiceProvider();
         _server = new();
         _entityHelper = new(_server);
