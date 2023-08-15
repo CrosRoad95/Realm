@@ -25,6 +25,8 @@ internal sealed class RPGServer : IRPGServer
                 serverBuilder.AddLogic<VehicleUpgradeRegistryLogic>();
                 serverBuilder.AddLogic<VehicleEnginesRegistryLogic>();
 
+                serverBuilder.AddLogic<VehicleAccessControllerComponentLogic>();
+
                 serverBuilder.AddBehaviour<PrivateCollisionShapeBehaviour>();
 
                 serverBuilder.ConfigureServer(realmConfigurationProvider);

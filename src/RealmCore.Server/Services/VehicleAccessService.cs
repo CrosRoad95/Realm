@@ -6,6 +6,7 @@ internal sealed class VehicleAccessService : IVehicleAccessService
     private readonly ILogger<VehicleAccessService> _logger;
 
     public event Func<Entity, Entity, bool>? CanEnter;
+    public event Action<Entity, Entity, VehicleAccessControllerComponent>? FailedToEnter;
 
     public VehicleAccessService(IECS ecs, ILogger<VehicleAccessService> logger)
     {
@@ -36,5 +37,10 @@ internal sealed class VehicleAccessService : IVehicleAccessService
             }
         }
         return true;
+    }
+
+    public void RelayFailedToEnter(Entity pedEntity, Entity vehicleEntity, VehicleAccessControllerComponent vehicleAccessControllerComponent)
+    {
+        FailedToEnter?.Invoke(pedEntity, vehicleEntity, vehicleAccessControllerComponent);
     }
 }
