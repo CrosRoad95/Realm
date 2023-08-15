@@ -97,6 +97,7 @@ public static class ServerBuilderExtensions
         serverBuilder.AddLogic<CEFBlazorGuiResourceLogic>();
         serverBuilder.AddLogic<NametagResourceLogic>();
         serverBuilder.AddLogic<BoneAttachResourceLogic>();
+        serverBuilder.AddLogic<Text3dComponentLogic>();
         #endregion
 
         // Miscellaneous logic
