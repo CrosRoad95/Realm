@@ -120,6 +120,8 @@ global using RealmCore.Persistence;
 global using RealmCore.Server.Serving;
 global using RealmCore.Server.Abstractions;
 global using RealmCore.Server.Components.Vehicles.Access;
+global using RealmCore.Server.Components.TagComponents;
+global using System.Xml.Linq;
 
 global using ILogger = Microsoft.Extensions.Logging.ILogger;
 

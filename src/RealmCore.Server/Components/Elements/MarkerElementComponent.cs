@@ -169,7 +169,8 @@ public class MarkerElementComponent : ElementComponent
         if (!ECS.TryGetByElement(element, out Entity entity))
             return;
 
-        if (entity.Tag != EntityTag.Player && entity.Tag != EntityTag.Vehicle)
+        var tag = entity.GetRequiredComponent<TagComponent>();
+        if (tag is not PlayerTagComponent or VehicleTagComponent)
             return;
 
         foreach (var rule in _entityRules)
@@ -198,7 +199,8 @@ public class MarkerElementComponent : ElementComponent
         if (!ECS.TryGetByElement(element, out Entity entity))
             return;
 
-        if (entity.Tag != EntityTag.Player && entity.Tag != EntityTag.Vehicle)
+        var tag = entity.GetRequiredComponent<TagComponent>();
+        if (tag is not PlayerTagComponent or VehicleTagComponent)
             return;
 
         if (_entityRules.All(x => x.Check(entity)))

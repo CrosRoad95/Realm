@@ -1,6 +1,4 @@
-﻿using System.Xml.Linq;
-
-namespace RealmCore.Server.Entities;
+﻿namespace RealmCore.Server.Entities;
 
 internal sealed class ECS : IECS
 {
@@ -48,27 +46,22 @@ internal sealed class ECS : IECS
         }
     }
 
-    public IReadOnlyCollection<Entity> VehicleEntities
+    public IEnumerable<Entity> GetEntitiesContainingComponent<TComponent>() where TComponent : Component
     {
-        get
+        _entitiesLock.EnterReadLock();
+        foreach (var entity in _entities)
         {
-            _entitiesLock.EnterWriteLock();
-            var entities = new List<Entity>(_entities.Where(x => x.Tag == EntityTag.Vehicle));
-            _entitiesLock.ExitWriteLock();
-            return entities;
+            if (entity.HasComponent<TComponent>())
+            {
+                yield return entity;
+            }
         }
+        _entitiesLock.ExitReadLock();
     }
 
-    public IReadOnlyCollection<Entity> PlayerEntities
-    {
-        get
-        {
-            _entitiesLock.EnterWriteLock();
-            var entities = new List<Entity>(_entities.Where(x => x.Tag == EntityTag.Player));
-            _entitiesLock.ExitWriteLock();
-            return entities.AsReadOnly();
-        }
-    }
+    public IEnumerable<Entity> VehicleEntities => GetEntitiesContainingComponent<VehicleTagComponent>();
+    public IEnumerable<Entity> PlayerEntities => GetEntitiesContainingComponent<PlayerTagComponent>();
+
 
     public event Action<Entity>? EntityCreated;
     public Entity Console { get; }
@@ -78,7 +71,10 @@ internal sealed class ECS : IECS
         _serviceProvider = serviceProvider;
         _elementCollection = elementCollection;
         _logger = logger;
-        Console = CreateEntity("console", EntityTag.Console);
+        Console = CreateEntity("console", e =>
+        {
+            e.AddComponent<ConsoleTagComponent>();
+        });
     }
 
     public bool ContainsEntity(Entity entity)
@@ -145,12 +141,12 @@ internal sealed class ECS : IECS
         entity.Disposed += HandleEntityDisposed;
     }
 
-    public Entity CreateEntity(string name, EntityTag tag, Action<Entity>? entityBuilder = null)
+    public Entity CreateEntity(string name, Action<Entity>? entityBuilder = null)
     {
         if (_entityByName.ContainsKey(name))
             throw new EntityAlreadyExistsException(name);
 
-        var newlyCreatedEntity = new Entity(_serviceProvider, name, tag);
+        var newlyCreatedEntity = new Entity(_serviceProvider, name);
 
         InternalEntityCreated(newlyCreatedEntity);
         entityBuilder?.Invoke(newlyCreatedEntity);

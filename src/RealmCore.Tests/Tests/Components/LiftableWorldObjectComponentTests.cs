@@ -25,8 +25,8 @@ public class LiftableWorldObjectComponentTests
         services.AddSingleton(_logger.Object);
         var serviceProvider = services.BuildServiceProvider();
 
-        _entity1 = new(serviceProvider, "test1", EntityTag.Unknown);
-        _entity2 = new(serviceProvider, "test2", EntityTag.Unknown);
+        _entity1 = new(serviceProvider, "test1");
+        _entity2 = new(serviceProvider, "test2");
         _entity1.AddComponent<TestElementComponent>();
         _liftableWorldObjectComponent = _entity1.AddComponent<LiftableWorldObjectComponent>();
     }

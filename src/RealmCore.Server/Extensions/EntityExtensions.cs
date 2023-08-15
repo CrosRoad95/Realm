@@ -4,7 +4,8 @@ public static class EntityExtensions
 {
     public static bool IsLookingAt(this Entity a, Entity b, float tolerance = 25.0f)
     {
-        if (a.Tag != EntityTag.Player)
+        var tag = a.GetRequiredComponent<TagComponent>();
+        if (tag is not PlayerTagComponent)
             throw new InvalidOperationException();
 
         var t = (a.Transform.Position.FindRotation(b.Transform.Position) + a.Transform.Rotation.Z) % 360;

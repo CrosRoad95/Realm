@@ -13,7 +13,7 @@ public class PendingDiscordIntegrationComponentTests
         services.AddSingleton<IDateTimeProvider>(_testDateTimeProvider);
 
         var serviceProvider = services.BuildServiceProvider();
-        _entity1 = new(serviceProvider, "test", EntityTag.Unknown);
+        _entity1 = new(serviceProvider, "test");
         _pendingDiscordIntegration = new();
         _entity1.AddComponent(_pendingDiscordIntegration);
     }

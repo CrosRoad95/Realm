@@ -11,7 +11,7 @@ public sealed class MustBePlayerWithLicenseRule : IEntityRule
 
     public bool Check(Entity entity)
     {
-        if (entity.Tag != EntityTag.Player)
+        if (!entity.HasComponent<PlayerTagComponent>())
             return false;
 
         if (entity.TryGetComponent(out LicensesComponent licensesComponent))

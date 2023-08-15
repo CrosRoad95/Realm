@@ -4,7 +4,7 @@ public sealed class MustBePlayerRule : IEntityRule
 {
     public bool Check(Entity entity)
     {
-        if (entity.Tag != EntityTag.Player)
+        if (!entity.HasComponent<PlayerTagComponent>())
             return false;
 
         return true;

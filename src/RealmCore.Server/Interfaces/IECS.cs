@@ -3,8 +3,8 @@
 public interface IECS
 {
     IReadOnlyCollection<Entity> Entities { get; }
-    IReadOnlyCollection<Entity> VehicleEntities { get; }
-    IReadOnlyCollection<Entity> PlayerEntities { get; }
+    IEnumerable<Entity> VehicleEntities { get; }
+    IEnumerable<Entity> PlayerEntities { get; }
     Entity Console { get; }
     int EntitiesCount { get; }
     int EntitiesComponentsCount { get; }
@@ -12,8 +12,9 @@ public interface IECS
     event Action<Entity>? EntityCreated;
 
     bool ContainsEntity(Entity entity);
-    Entity CreateEntity(string name, EntityTag tag, Action<Entity>? entityBuilder = null);
+    Entity CreateEntity(string name, Action<Entity>? entityBuilder = null);
     Entity GetByElement(Element element);
+    IEnumerable<Entity> GetEntitiesContainingComponent<TComponent>() where TComponent : Component;
     bool GetVehicleById(int id, out Entity entity);
     IEnumerable<Entity> GetWithinRange(Vector3 position, float range);
     bool TryGetByElement(Element element, out Entity result);

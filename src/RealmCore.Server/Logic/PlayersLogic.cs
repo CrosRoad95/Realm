@@ -82,8 +82,9 @@ internal class PlayersLogic
             var screenSize = await taskWaitForScreenSize.Task;
             var cultureInfo = await taskWaitForCultureInfo.Task;
 
-            _ecs.CreateEntity("Player " + player.Name, EntityTag.Player, entity =>
+            _ecs.CreateEntity("Player " + player.Name, entity =>
             {
+                entity.AddComponent<PlayerTagComponent>();
                 entity.AddComponent(new PlayerElementComponent(player, new Vector2(screenSize.Item1, screenSize.Item2), cultureInfo));
             });
 
@@ -101,7 +102,7 @@ internal class PlayersLogic
 
     private void HandleEntityCreated(Entity entity)
     {
-        if (entity.Tag != EntityTag.Player)
+        if (!entity.HasComponent<PlayerTagComponent>())
             return;
 
         entity.Disposed += HandleEntityDestroyed;

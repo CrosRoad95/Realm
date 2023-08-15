@@ -21,7 +21,7 @@ public class VehicleUpgradesComponentTests
 
         var serviceProvider = services.BuildServiceProvider();
         _vehicleUpgradeRegistry = serviceProvider.GetRequiredService<VehicleUpgradeRegistry>();
-        _entity = new(serviceProvider, "test", EntityTag.Unknown);
+        _entity = new(serviceProvider, "test");
         _vehicleUpgradesComponent = new();
         _vehicleElementComponent = new VehicleElementComponent(new SlipeServer.Server.Elements.Vehicle(SlipeServer.Server.Elements.VehicleModel.Perennial, Vector3.Zero));
         _entity.AddComponent(_vehicleElementComponent);

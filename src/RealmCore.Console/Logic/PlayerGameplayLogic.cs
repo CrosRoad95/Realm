@@ -23,7 +23,7 @@ internal sealed class PlayerGameplayLogic
 
     private void HandleEntityCreated(Entity entity)
     {
-        if (entity.Tag != EntityTag.Player)
+        if (!entity.HasComponent<PlayerTagComponent>())
             return;
 
 

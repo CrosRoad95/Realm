@@ -1,6 +1,5 @@
 ﻿using RealmCore.Server.DTOs;
 using RealmCore.Server.Components;
-using RealmCore.Server.Enums;
 using RealmCore.Server.Helpers;
 
 namespace RealmCore.Console.Logic;
@@ -39,7 +38,7 @@ internal sealed class PlayerBindsLogic
 
     private void HandleEntityCreated(Entity entity)
     {
-        if (entity.Tag == EntityTag.Player)
+        if (entity.HasComponent<PlayerTagComponent>())
             entity.ComponentAdded += HandleComponentAdded;
     }
 

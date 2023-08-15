@@ -11,7 +11,6 @@ public sealed class Entity : IDisposable
     private bool _disposed = false;
 
     public string Id { get; } = Guid.NewGuid().ToString();
-    public EntityTag Tag { get; }
     public string Name { get; set; } = "";
 
     private readonly ReaderWriterLockSlim _componentsLock = new(LockRecursionPolicy.SupportsRecursion);
@@ -52,11 +51,10 @@ public sealed class Entity : IDisposable
     internal Vehicle Vehicle => GetRequiredComponent<VehicleElementComponent>().Vehicle;
     internal Element Element => GetRequiredComponent<ElementComponent>().Element;
     
-    public Entity(IServiceProvider serviceProvider, string name = "", EntityTag tag = EntityTag.Unknown)
+    public Entity(IServiceProvider serviceProvider, string name = "")
     {
         _serviceProvider = serviceProvider;
         Name = name;
-        Tag = tag;
         Transform = new Transform(this);
     }
 

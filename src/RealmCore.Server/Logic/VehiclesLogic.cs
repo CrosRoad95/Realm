@@ -26,7 +26,7 @@ internal class VehiclesLogic
 
     private void HandleEntityCreated(Entity entity)
     {
-        if (entity.Tag != EntityTag.Vehicle)
+        if (!entity.HasComponent<VehicleTagComponent>())
             return;
 
         entity.Disposed += HandleEntityDestroyed;

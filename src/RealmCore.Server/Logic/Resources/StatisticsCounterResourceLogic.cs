@@ -1,19 +1,16 @@
 ﻿namespace RealmCore.Server.Logic.Resources;
 
-internal sealed class StatisticsCounterResourceLogic
+internal sealed class StatisticsCounterResourceLogic : ComponentLogic<StatisticsCounterComponent>
 {
     private readonly IStatisticsCounterService _statisticsCounterService;
-    private readonly MtaServer _mtaServer;
     private readonly IECS _ecs;
     private readonly ILogger<StatisticsCounterResourceLogic> _logger;
 
-    public StatisticsCounterResourceLogic(IStatisticsCounterService statisticsCounterService, MtaServer mtaServer, IECS ecs, ILogger<StatisticsCounterResourceLogic> logger)
+    public StatisticsCounterResourceLogic(IStatisticsCounterService statisticsCounterService, IECS ecs, ILogger<StatisticsCounterResourceLogic> logger) : base(ecs)
     {
         _statisticsCounterService = statisticsCounterService;
-        _mtaServer = mtaServer;
         _ecs = ecs;
         _logger = logger;
-        _ecs.EntityCreated += HandleEntityCreated;
         statisticsCounterService.StatisticsCollected += HandleStatisticsCollected;
         //statisticsCounterService.FpsStatisticsCollected += HandleFpsStatisticsCollected;
     }
@@ -54,27 +51,14 @@ internal sealed class StatisticsCounterResourceLogic
         }
     }
 
-    private void HandleEntityCreated(Entity entity)
+    protected override void ComponentAdded(StatisticsCounterComponent component)
     {
-        if (entity.Tag != EntityTag.Player)
-            return;
-
-        entity.ComponentAdded += HandleComponentAdded;
-        entity.ComponentDetached += HandleComponentDetached;
-    }
-
-    private void HandleComponentAdded(Component component)
-    {
-        if (component is not StatisticsCounterComponent) return;
-
         var playerElementComponent = component.Entity.GetRequiredComponent<PlayerElementComponent>();
         _statisticsCounterService.SetCounterEnabledFor(playerElementComponent.Player, true);
     }
 
-    private void HandleComponentDetached(Component component)
+    protected override void ComponentRemoved(StatisticsCounterComponent component)
     {
-        if (component is not StatisticsCounterComponent) return;
-
         var playerElementComponent = component.Entity.GetRequiredComponent<PlayerElementComponent>();
         _statisticsCounterService.SetCounterEnabledFor(playerElementComponent.Player, false);
     }

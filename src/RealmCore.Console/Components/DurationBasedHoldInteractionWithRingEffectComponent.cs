@@ -1,5 +1,4 @@
 ﻿using RealmCore.Resources.Overlay;
-using RealmCore.Server.Enums;
 
 namespace RealmCore.Console.Components;
 
@@ -18,12 +17,12 @@ internal class DurationBasedHoldInteractionWithRingEffectComponent : DurationBas
     public DurationBasedHoldInteractionWithRingEffectComponent()
     {
         InteractionStarted += HandleInteractionStarted;
-        InteractionCompleted += HandlenteractionCompleted;
+        InteractionCompleted += HandleInteractionCompleted;
     }
 
     private void HandleInteractionStarted(DurationBasedHoldInteractionComponent durationBasedHoldInteractionComponent, Entity owningEntity, TimeSpan time)
     {
-        if (owningEntity.Tag == EntityTag.Player)
+        if (owningEntity.HasComponent<PlayerTagComponent>())
             lock (_lock)
             {
                 _ringId = OverlayService.AddRing3dDisplay(owningEntity, Entity.Transform.Position, time);
@@ -31,9 +30,9 @@ internal class DurationBasedHoldInteractionWithRingEffectComponent : DurationBas
             }
     }
 
-    private void HandlenteractionCompleted(DurationBasedHoldInteractionComponent durationBasedHoldInteractionComponent, Entity owningEntity, bool succeed)
+    private void HandleInteractionCompleted(DurationBasedHoldInteractionComponent durationBasedHoldInteractionComponent, Entity owningEntity, bool succeed)
     {
-        if (owningEntity.Tag == EntityTag.Player)
+        if (owningEntity.HasComponent<PlayerTagComponent>())
             lock (_lock)
                 if (_ringId != null)
                 {

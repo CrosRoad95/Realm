@@ -87,7 +87,6 @@ internal sealed class AdminResourceLogic
                         previewType = PreviewType.BoxWireframe,
                         previewColor = Color.Red,
                         name = x.Name,
-                        tag = x.Tag.ToString(),
                     }));
                 else
                     _adminService.BroadcastClearEntityForPlayer(player);

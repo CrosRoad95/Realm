@@ -13,7 +13,7 @@ public class DailyVisitsCounterComponentTests
         services.AddSingleton<IDateTimeProvider>(_testDateTimeProvider);
 
         var serviceProvider = services.BuildServiceProvider();
-        _entity = new(serviceProvider, "test", EntityTag.Unknown);
+        _entity = new(serviceProvider, "test");
         _dailyVisitsCounterComponent = new();
         _entity.AddComponent(_dailyVisitsCounterComponent);
     }

@@ -60,7 +60,7 @@ internal class UsersService : IUsersService
         if (entity == null)
             throw new NullReferenceException(nameof(entity));
 
-        if (entity.Tag != EntityTag.Player || !entity.HasComponent<PlayerElementComponent>())
+        if (!entity.HasComponent<PlayerTagComponent>())
             throw new NotSupportedException("Entity is not a player entity.");
 
         if (user.IsDisabled)

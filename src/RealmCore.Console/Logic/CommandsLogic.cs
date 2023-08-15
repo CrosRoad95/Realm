@@ -398,7 +398,7 @@ internal sealed class CommandsLogic
 
         _commandService.AddAsyncCommandHandler("hud3d", async (entity, args) =>
         {
-            using var e = _ecs.CreateEntity(Guid.NewGuid().ToString(), EntityTag.Unknown);
+            using var e = _ecs.CreateEntity(Guid.NewGuid().ToString());
             e.Transform.Position = entity.Transform.Position + new Vector3(-4, 0, 0);
             e.AddComponent(new Hud3dComponent<TestState>(e => e
                 .AddRectangle(Vector2.Zero, new Size(100, 100), Color.Red)
@@ -414,7 +414,7 @@ internal sealed class CommandsLogic
 
         _commandService.AddAsyncCommandHandler("hud3d2", async (entity, args) =>
         {
-            var e = _ecs.CreateEntity(Guid.NewGuid().ToString(), EntityTag.Unknown);
+            var e = _ecs.CreateEntity(Guid.NewGuid().ToString());
             e.Transform.Position = entity.Transform.Position + new Vector3(-4, 0, 0);
             var hud3d = e.AddComponent(new Hud3dComponent<TestState>(e => e
                 .AddRectangle(Vector2.Zero, new Size(200, 200), Color.Red)

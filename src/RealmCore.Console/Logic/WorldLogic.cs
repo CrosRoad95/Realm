@@ -1,6 +1,5 @@
 ﻿using RealmCore.Server.Components;
 using RealmCore.Server.Components.Elements.CollisionShapes;
-using RealmCore.Server.Enums;
 using RealmCore.Server.Rules;
 using SlipeServer.Server.Enums;
 
@@ -38,7 +37,7 @@ internal class WorldLogic
 
     private void HandleEntityCreated(Entity entity)
     {
-        if (entity.Tag != EntityTag.Player)
+        if (!entity.HasComponent<PlayerTagComponent>())
             return;
 
         entity.ComponentAdded += HandleComponentAdded;

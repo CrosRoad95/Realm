@@ -10,7 +10,7 @@ internal sealed class PrivateCollisionShapeBehaviour
 
     public PrivateCollisionShapeBehaviour(IECS ecs, ILogger<PrivateCollisionShapeBehaviour> logger)
     {
-        foreach (var playerEntity in ecs.Entities.Where(x => x.Tag == EntityTag.Player))
+        foreach (var playerEntity in ecs.PlayerEntities)
         {
             var privateMarkerElementComponents = playerEntity.GetComponents<PlayerPrivateElementComponent<MarkerElementComponent>>();
             foreach (var markerElementComponent in privateMarkerElementComponents)

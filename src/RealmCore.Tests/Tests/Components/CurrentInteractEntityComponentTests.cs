@@ -23,10 +23,10 @@ public class CurrentInteractEntityComponentTests
 
         var serviceProvider = services.BuildServiceProvider();
 
-        _entity = new(serviceProvider, "test1", EntityTag.Unknown);
-        _testEntity = new(serviceProvider, "test2", EntityTag.Unknown);
-        _entity2 = new(serviceProvider, "test3", EntityTag.Unknown);
-        _testEntity2 = new(serviceProvider, "test4", EntityTag.Unknown);
+        _entity = new(serviceProvider, "test1");
+        _testEntity = new(serviceProvider, "test2");
+        _entity2 = new(serviceProvider, "test3");
+        _testEntity2 = new(serviceProvider, "test4");
     }
 
     [Fact]

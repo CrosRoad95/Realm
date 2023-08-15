@@ -19,7 +19,7 @@ public class LevelComponentTests
             levelsRegistry.Add((uint)i + 1, new LevelRegistryEntry(requiredExperience));
             _totalRequiredExperience += requiredExperience;
         }
-        _entity = new(serviceProvider, "test", EntityTag.Unknown);
+        _entity = new(serviceProvider, "test");
         _levelComponent = new();
         _entity.AddComponent(_levelComponent);
     }

@@ -1,5 +1,4 @@
-﻿using RealmCore.Server.Enums;
-using SlipeServer.Server.Enums;
+﻿using SlipeServer.Server.Enums;
 
 namespace RealmCore.Console.Logic;
 
@@ -27,7 +26,7 @@ internal class MapsLogic
 
     private void HandleEntityCreated(Entity entity)
     {
-        if (entity.Tag != EntityTag.Player)
+        if (!entity.HasComponent<PlayerTagComponent>())
             return;
 
         _mapsService.LoadAllMapsFor(entity);

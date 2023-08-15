@@ -12,7 +12,7 @@ public class EntityTransactionTest
         services.AddSingleton(new object());
         var serviceProvider = services.BuildServiceProvider();
 
-        _entity = new(serviceProvider, "test", EntityTag.Unknown);
+        _entity = new(serviceProvider, "test");
     }
 
     [Fact]

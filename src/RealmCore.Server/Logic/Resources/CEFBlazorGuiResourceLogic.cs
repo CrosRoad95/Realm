@@ -26,7 +26,7 @@ internal sealed class CEFBlazorGuiResourceLogic : ComponentLogic<BlazorGuiCompon
 
     private void HandleEntityCreated(Entity entity)
     {
-        if(entity.Tag == EntityTag.Player)
+        if(entity.HasComponent<PlayerTagComponent>())
             HandlePlayerBrowserReadyCore(entity);
     }
 

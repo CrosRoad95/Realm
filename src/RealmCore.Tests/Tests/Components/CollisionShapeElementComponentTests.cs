@@ -21,7 +21,7 @@ public class CollisionShapeElementComponentTests
         services.AddLogging(x => x.AddSerilog(new LoggerConfiguration().CreateLogger(), dispose: true));
 
         var serviceProvider = services.BuildServiceProvider();
-        _entity = serviceProvider.GetRequiredService<IECS>().CreateEntity("test", EntityTag.Unknown);
+        _entity = serviceProvider.GetRequiredService<IECS>().CreateEntity("test");
         _collisionSphereElementComponent = new(new CollisionSphere(new System.Numerics.Vector3(0, 0, 0), 10));
         _entity.AddComponent(_collisionSphereElementComponent);
     }

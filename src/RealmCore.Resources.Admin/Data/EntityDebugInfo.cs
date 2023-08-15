@@ -13,5 +13,4 @@ public struct EntityDebugInfo
     public string debugId;
     public PreviewType previewType;
     public Color previewColor;
-    public string tag;
 }

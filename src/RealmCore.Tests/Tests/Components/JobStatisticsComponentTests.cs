@@ -13,7 +13,7 @@ public class JobStatisticsComponentTests
         services.AddSingleton<IDateTimeProvider, TestDateTimeProvider>();
 
         var serviceProvider = services.BuildServiceProvider();
-        _entity = new(serviceProvider, "test", EntityTag.Unknown);
+        _entity = new(serviceProvider, "test");
         _jobStatisticsComponent = new(serviceProvider.GetRequiredService<IDateTimeProvider>().Now);
         _entity.AddComponent(_jobStatisticsComponent);
     }

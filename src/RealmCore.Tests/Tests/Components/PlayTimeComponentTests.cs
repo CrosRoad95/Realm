@@ -15,8 +15,8 @@ public class PlayTimeComponentTests
         services.AddSingleton<IDateTimeProvider>(_testDateTimeProvider);
 
         var serviceProvider = services.BuildServiceProvider();
-        _entity1 = new(serviceProvider, "test", EntityTag.Unknown);
-        _entity2 = new(serviceProvider, "test with initial state", EntityTag.Unknown);
+        _entity1 = new(serviceProvider, "test");
+        _entity2 = new(serviceProvider, "test with initial state");
         _playTimeComponent = new();
         _playTimeComponentWithInitialState = new(1000);
         _entity1.AddComponent(_playTimeComponent);

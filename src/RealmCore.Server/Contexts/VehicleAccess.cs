@@ -56,7 +56,9 @@ public class VehicleAccess : IDisposable
     public bool TryGetAccess(Entity entity, out VehiclePlayerAccess vehicleAccess)
     {
         ThrowIfDisposed();
-        if (entity.Tag != EntityTag.Player)
+
+        var tag = entity.GetRequiredComponent<TagComponent>();
+        if (tag is not PlayerTagComponent)
             throw new InvalidOperationException();
 
         var userId = entity.GetRequiredComponent<UserComponent>().Id;
@@ -86,7 +88,9 @@ public class VehicleAccess : IDisposable
     public VehiclePlayerAccess AddAccess(Entity entity, byte accessType, string? customValue = null)
     {
         ThrowIfDisposed();
-        if (entity.Tag != EntityTag.Player)
+
+        var tag = entity.GetRequiredComponent<TagComponent>();
+        if (tag is not PlayerTagComponent)
             throw new InvalidOperationException();
 
         if (TryGetAccess(entity, out var _))

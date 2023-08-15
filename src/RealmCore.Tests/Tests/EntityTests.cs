@@ -33,7 +33,7 @@ public class EntityTests
         #region Arrange & Act
         bool componentAdded = false;
         bool componentDetached = false;
-        var entity = new Entity(_serviceProvider, "foo", EntityTag.Unknown);
+        var entity = new Entity(_serviceProvider, "foo");
         entity.ComponentAdded += e =>
         {
             componentAdded = true;
@@ -59,7 +59,7 @@ public class EntityTests
     {
         #region Arrange & Act
         int addedComponents = 0;
-        var entity = new Entity(_serviceProvider, "foo", EntityTag.Unknown);
+        var entity = new Entity(_serviceProvider, "foo");
         entity.ComponentAdded += e =>
         {
             Interlocked.Increment(ref addedComponents);
@@ -73,7 +73,6 @@ public class EntityTests
         });
         #endregion
 
-
         #region Assert
         addedComponents.Should().Be(8 * 100);
         entity.Components.Should().BeEmpty();
@@ -84,7 +83,7 @@ public class EntityTests
     public void TestComponentsDependencyInjection()
     {
         #region Arrange & Act
-        var entity = new Entity(_serviceProvider, "foo", EntityTag.Unknown);
+        var entity = new Entity(_serviceProvider, "foo");
         var component = new TestComponent();
         entity.AddComponent(component);
         #endregion
@@ -98,7 +97,7 @@ public class EntityTests
     public void ComponentShouldNotBeAddedIfFailedToLoad()
     {
         #region Arrange & Act
-        var entity = new Entity(_serviceProvider, "foo", EntityTag.Unknown);
+        var entity = new Entity(_serviceProvider, "foo");
         var component = new ThrowExceptionComponent();
 
         var action = () => entity.AddComponent(component);
@@ -114,7 +113,7 @@ public class EntityTests
     public async Task ComponentShouldNotBeAddedIfFailedToAsyncLoad()
     {
         #region Arrange & Act
-        var entity = new Entity(_serviceProvider, "foo", EntityTag.Unknown);
+        var entity = new Entity(_serviceProvider, "foo");
         var component = new ThrowExceptionAsyncComponent();
 
         var action = async () => await entity.AddComponentAsync(component);
@@ -130,7 +129,7 @@ public class EntityTests
     public async Task ComponentShouldBeRemovedIfAsyncLoadThrowException()
     {
         #region Arrange & Act
-        var entity = new Entity(_serviceProvider, "foo", EntityTag.Unknown);
+        var entity = new Entity(_serviceProvider, "foo");
         var component = new ThrowExceptionAsyncComponent();
 
         #endregion
@@ -156,7 +155,7 @@ public class EntityTests
     public void AsyncComponentCanNotBeAddedToNonAsyncEntity()
     {
         #region Arrange
-        var entity = new Entity(_serviceProvider, "foo", EntityTag.Unknown);
+        var entity = new Entity(_serviceProvider, "foo");
         var component = new ThrowExceptionAsyncComponent();
 
         #endregion
@@ -174,7 +173,7 @@ public class EntityTests
     public void ComponentUsageShouldPreventYouFromAddingOneComponentTwoTimes()
     {
         #region Arrange
-        var entity = new Entity(_serviceProvider, "foo", EntityTag.Unknown);
+        var entity = new Entity(_serviceProvider, "foo");
         var action = () => entity.AddComponent<OneComponent>();
         #endregion
 
@@ -188,7 +187,7 @@ public class EntityTests
     public void ComponentShouldBeAbleToDisposeOtherComponentsInDisposeMethod()
     {
         #region Arrange
-        var entity = new Entity(_serviceProvider, "foo", EntityTag.Unknown);
+        var entity = new Entity(_serviceProvider, "foo");
         entity.AddComponent<ParentComponent>();
         entity.AddComponent<ChildComponent>();
         #endregion
@@ -206,7 +205,7 @@ public class EntityTests
     public void ComponentShouldBeAbleToDisposeOtherComponentsInDispose2Method()
     {
         #region Arrange
-        var entity = new Entity(_serviceProvider, "foo", EntityTag.Unknown);
+        var entity = new Entity(_serviceProvider, "foo");
         var test1 = entity.AddComponent<TestComponent>();
         var test2 = entity.AddComponent<TestComponent>();
 
@@ -229,7 +228,7 @@ public class EntityTests
     public void ComponentShouldBeAbleToDisposeOtherComponentsInDispose3Method()
     {
         #region Arrange
-        var entity = new Entity(_serviceProvider, "foo", EntityTag.Unknown);
+        var entity = new Entity(_serviceProvider, "foo");
         var test1 = entity.AddComponent<TestComponent>();
         var test2 = entity.AddComponent<ParentComponent>();
 
@@ -268,7 +267,7 @@ public class EntityTests
     public void TestEntityAndItsComponentLifecycle1()
     {
         #region Arrange & Act
-        var entity = new Entity(_serviceProvider, "foo", EntityTag.Unknown);
+        var entity = new Entity(_serviceProvider, "foo");
         var component = new TestComponent();
         using var entityMonitor = entity.Monitor();
         using var componentMonitor = component.Monitor();
@@ -296,7 +295,7 @@ public class EntityTests
     public void TestEntityAndItsComponentLifecycle2()
     {
         #region Arrange & Act
-        var entity = new Entity(_serviceProvider, "foo", EntityTag.Unknown);
+        var entity = new Entity(_serviceProvider, "foo");
         var component = new TestComponent();
         using var entityMonitor = entity.Monitor();
         using var componentMonitor = component.Monitor();

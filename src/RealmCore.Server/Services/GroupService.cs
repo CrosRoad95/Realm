@@ -66,7 +66,7 @@ internal class GroupService : IGroupService
 
     public async Task AddMember(int groupId, Entity entity, int rank = 1, string rankName = "")
     {
-        if (entity.Tag != EntityTag.Player)
+        if (!entity.HasComponent<PlayerTagComponent>())
             throw new InvalidOperationException();
 
         var userId = entity.GetRequiredComponent<UserComponent>().Id;
@@ -76,7 +76,7 @@ internal class GroupService : IGroupService
 
     public async Task AddMember(string groupName, Entity entity, int rank = 1, string rankName = "")
     {
-        if (entity.Tag != EntityTag.Player)
+        if (!entity.HasComponent<PlayerTagComponent>())
             throw new InvalidOperationException();
 
         var userId = entity.GetRequiredComponent<UserComponent>().Id;

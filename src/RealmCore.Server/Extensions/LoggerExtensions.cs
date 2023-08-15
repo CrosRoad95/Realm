@@ -8,25 +8,14 @@ public static class LoggerExtensions
             throw new ArgumentNullException(nameof(entity));
 
         Dictionary<string, object> data = new();
-        switch (entity.Tag)
-        {
-            case EntityTag.Player:
-                {
 
-                    if (entity.TryGetComponent(out UserComponent userComponent))
-                        data["userId"] = userComponent.Id;
-                    if (entity.TryGetComponent(out PlayerElementComponent playerElementComponent))
-                        data["serial"] = playerElementComponent.Client.Serial;
-                }
-                break;
-            case EntityTag.Vehicle:
-                {
+        if (entity.TryGetComponent(out UserComponent userComponent))
+            data["userId"] = userComponent.Id;
+        if (entity.TryGetComponent(out PlayerElementComponent playerElementComponent))
+            data["serial"] = playerElementComponent.Client.Serial;
+        if (entity.TryGetComponent(out PrivateVehicleComponent privateVehicleComponent))
+            data["vehicleId"] = privateVehicleComponent.Id;
 
-                    if (entity.TryGetComponent(out PrivateVehicleComponent privateVehicleComponent))
-                        data["vehicleId"] = privateVehicleComponent.Id;
-                }
-                break;
-        }
         return logger.BeginScope(data);
     }
     

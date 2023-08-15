@@ -11,7 +11,7 @@ public class AchievementsComponentTests
 
         var serviceProvider = services.BuildServiceProvider();
 
-        _entity = new(serviceProvider, "test", EntityTag.Unknown);
+        _entity = new(serviceProvider, "test");
         _achievementsComponent = new();
         _entity.AddComponent(_achievementsComponent);
     }

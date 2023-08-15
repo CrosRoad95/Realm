@@ -13,7 +13,7 @@ public class VehiclePartDamageComponentTests
 
         var serviceProvider = services.BuildServiceProvider();
 
-        _entity = new(serviceProvider, "test", EntityTag.Unknown);
+        _entity = new(serviceProvider, "test");
         _vehiclePartDamageComponent = new();
         _entity.AddComponent(_vehiclePartDamageComponent);
     }

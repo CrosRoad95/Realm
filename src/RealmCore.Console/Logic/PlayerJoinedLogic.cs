@@ -1,6 +1,5 @@
 ﻿using RealmCore.Server.Components.Peds;
 using RealmCore.Server.Components;
-using RealmCore.Server.Enums;
 using RealmCore.Resources.Nametags;
 using RealmCore.Resources.Admin.Enums;
 using RealmCore.Resources.GuiSystem;
@@ -27,7 +26,7 @@ internal sealed class PlayerJoinedLogic
 
     private void HandleEntityCreated(Entity entity)
     {
-        if (entity.Tag != EntityTag.Player)
+        if (!entity.HasComponent<PlayerTagComponent>())
             return;
 
         var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();

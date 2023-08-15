@@ -33,7 +33,7 @@ internal sealed class VehiclesService : IVehiclesService
 
     public async Task<Entity> ConvertToPrivateVehicle(Entity vehicleEntity)
     {
-        if (vehicleEntity.Tag != EntityTag.Vehicle)
+        if (!vehicleEntity.HasComponent<VehicleTagComponent>())
             throw new InvalidOperationException();
 
         if (vehicleEntity.HasComponent<PrivateVehicleComponent>())
@@ -71,7 +71,7 @@ internal sealed class VehiclesService : IVehiclesService
 
     public async Task Destroy(Entity entity)
     {
-        if (entity.Tag != EntityTag.Vehicle)
+        if (!entity.HasComponent<VehicleTagComponent>())
             throw new InvalidOperationException("Entity is not vehicle");
         await _vehicleRepository.SetSpawned(entity.GetRequiredComponent<PrivateVehicleComponent>().Id, false);
         await _saveService.Save(entity);

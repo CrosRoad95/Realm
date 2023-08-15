@@ -85,7 +85,8 @@ public class PickupElementComponent : ElementComponent
         if (!ECS.TryGetByElement(element, out var entity))
             return;
 
-        if (entity.Tag != EntityTag.Player && entity.Tag != EntityTag.Vehicle)
+        var tag = entity.GetRequiredComponent<TagComponent>();
+        if (tag is not PlayerTagComponent or VehicleTagComponent)
             return;
 
         foreach (var rule in _entityRules)
@@ -132,7 +133,8 @@ public class PickupElementComponent : ElementComponent
         if (!ECS.TryGetByElement(element, out var entity))
             return;
 
-        if (entity.Tag != EntityTag.Player && entity.Tag != EntityTag.Vehicle)
+        var tag = entity.GetRequiredComponent<TagComponent>();
+        if (tag is not PlayerTagComponent or VehicleTagComponent)
             return;
 
         try

@@ -13,7 +13,7 @@ public class AFKComponentTests
 
         var serviceProvider = services.BuildServiceProvider();
 
-        _entity = new(serviceProvider, "test", EntityTag.Unknown);
+        _entity = new(serviceProvider, "test");
         _afkComponent = _entity.AddComponent<AFKComponent>();
     }
 

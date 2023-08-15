@@ -387,16 +387,19 @@ internal class SaveService : ISaveService
 
     public async Task<bool> Save(Entity entity)
     {
-        switch (entity.Tag)
+        if(entity.TryGetComponent(out TagComponent tagComponent))
         {
-            case EntityTag.Player:
-                await SavePlayer(entity);
-                break;
-            case EntityTag.Vehicle:
-                await SaveVehicle(entity);
-                break;
-            default:
-                return false;
+            switch(tagComponent)
+            {
+                case PlayerTagComponent:
+                    await SavePlayer(entity);
+                    break;
+                case VehicleTagComponent:
+                    await SaveVehicle(entity);
+                    break;
+                default:
+                    return false;
+            }
         }
         return true;
     }
