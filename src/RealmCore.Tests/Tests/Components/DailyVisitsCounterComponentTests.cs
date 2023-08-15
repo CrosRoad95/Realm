@@ -10,7 +10,6 @@ public class DailyVisitsCounterComponentTests
     {
         _testDateTimeProvider = new();
         var services = new ServiceCollection();
-        services.AddSingleton<IDateTimeProvider>(_testDateTimeProvider);
 
         var serviceProvider = services.BuildServiceProvider();
         _entity = new(serviceProvider, "test");
@@ -18,16 +17,19 @@ public class DailyVisitsCounterComponentTests
         _entity.AddComponent(_dailyVisitsCounterComponent);
     }
 
-    [Fact]
-    public void VisitCounterShouldUpdateAppropriatly()
+    [InlineData(true)]
+    [InlineData(false)]
+    [Theory]
+    public void VisitCounterShouldUpdateAppropriately(bool useNowDateTime)
     {
+        _dailyVisitsCounterComponent.LastVisit = useNowDateTime ? DateTime.Now : DateTime.MinValue;
         int _day = 0;
-        bool _reseted = false;
+        bool _reset = false;
         int? _record = 0;
-        _dailyVisitsCounterComponent.PlayerVisited += (e, day, reseted) =>
+        _dailyVisitsCounterComponent.PlayerVisited += (e, day, wasReset) =>
         {
             _day = day;
-            _reseted = reseted;
+            _reset = wasReset;
         };
 
         _dailyVisitsCounterComponent.PlayerVisitsRecord += (e, record) =>
@@ -39,30 +41,30 @@ public class DailyVisitsCounterComponentTests
         _dailyVisitsCounterComponent.VisitsInRowRecord.Should().Be(0);
 
         _testDateTimeProvider.AddOffset(TimeSpan.FromDays(1));
-        _dailyVisitsCounterComponent.Update();
+        _dailyVisitsCounterComponent.Update(_testDateTimeProvider.Now);
 
         _dailyVisitsCounterComponent.VisitsInRow.Should().Be(1);
         _dailyVisitsCounterComponent.VisitsInRowRecord.Should().Be(1);
         _day.Should().Be(1);
-        _reseted.Should().BeFalse();
+        _reset.Should().BeFalse();
         _record.Should().Be(1);
 
         _testDateTimeProvider.AddOffset(TimeSpan.FromDays(1));
-        _dailyVisitsCounterComponent.Update();
+        _dailyVisitsCounterComponent.Update(_testDateTimeProvider.Now);
 
         _dailyVisitsCounterComponent.VisitsInRow.Should().Be(2);
         _dailyVisitsCounterComponent.VisitsInRowRecord.Should().Be(2);
         _day.Should().Be(2);
-        _reseted.Should().BeFalse();
+        _reset.Should().BeFalse();
         _record.Should().Be(2);
 
         _testDateTimeProvider.AddOffset(TimeSpan.FromDays(2));
-        _dailyVisitsCounterComponent.Update();
+        _dailyVisitsCounterComponent.Update(_testDateTimeProvider.Now);
 
         _dailyVisitsCounterComponent.VisitsInRow.Should().Be(0);
         _dailyVisitsCounterComponent.VisitsInRowRecord.Should().Be(2);
         _day.Should().Be(0);
-        _reseted.Should().BeTrue();
+        _reset.Should().BeTrue();
         _record.Should().Be(2);
     }
 }

@@ -1,4 +1,5 @@
 ﻿using RealmCore.Server.Behaviours;
+using RealmCore.Server.Logic.Components;
 
 namespace RealmCore.Server;
 

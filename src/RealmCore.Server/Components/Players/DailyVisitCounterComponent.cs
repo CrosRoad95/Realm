@@ -5,8 +5,6 @@ namespace RealmCore.Server.Components.Players;
 [ComponentUsage(false)]
 public class DailyVisitsCounterComponent : Component
 {
-    [Inject]
-    private IDateTimeProvider DateTimeProvider { get; set; } = default!;
     public DateTime LastVisit { get; set; } = DateTime.MinValue;
     public int VisitsInRow { get; set; }
     public int VisitsInRowRecord { get; set; }
@@ -25,26 +23,22 @@ public class DailyVisitsCounterComponent : Component
         VisitsInRowRecord = dailyVisits.VisitsInRowRecord;
     }
 
-    protected override void Load()
+    internal void Update(DateTime now)
     {
-        Update();
-    }
-
-    internal void Update()
-    {
-        if (LastVisit.Date == DateTimeProvider.Now.Date)
+        var nowDate = now.Date;
+        if (LastVisit.Date == nowDate)
             return;
 
-        bool reseted = false;
+        bool reset = false;
 
-        if (LastVisit.Date.AddDays(1) == DateTimeProvider.Now.Date)
+        if (LastVisit.Date.AddDays(1) == nowDate || LastVisit == DateTime.MinValue)
         {
             VisitsInRow++;
         }
         else
         {
             VisitsInRow = 0;
-            reseted = true;
+            reset = true;
         }
 
         if (VisitsInRow > VisitsInRowRecord) // Doesn't check if day passed because value can be arbitrarily changed
@@ -53,8 +47,8 @@ public class DailyVisitsCounterComponent : Component
             PlayerVisitsRecord?.Invoke(this, VisitsInRowRecord);
         }
 
-        PlayerVisited?.Invoke(this, VisitsInRow, reseted);
-        LastVisit = DateTimeProvider.Now;
+        PlayerVisited?.Invoke(this, VisitsInRow, reset);
+        LastVisit = nowDate;
     }
 }
 

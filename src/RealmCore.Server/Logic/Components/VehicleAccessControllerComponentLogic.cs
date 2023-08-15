@@ -1,4 +1,4 @@
-﻿namespace RealmCore.Server.Logic;
+﻿namespace RealmCore.Server.Logic.Components;
 
 internal class VehicleAccessControllerComponentLogic : ComponentLogic<VehicleAccessControllerComponent>
 {
@@ -11,14 +11,14 @@ internal class VehicleAccessControllerComponentLogic : ComponentLogic<VehicleAcc
 
     protected override void ComponentAdded(VehicleAccessControllerComponent vehicleAccessControllerComponent)
     {
-        vehicleAccessControllerComponent.Entity.GetRequiredComponent<VehicleElementComponent>().Vehicle.CanEnter = (Ped ped, Vehicle vehicle) =>
+        vehicleAccessControllerComponent.Entity.GetRequiredComponent<VehicleElementComponent>().Vehicle.CanEnter = (ped, vehicle) =>
         {
             if (_vehicleAccessService.InternalCanEnter(ped, vehicle, out var pedEntity, out var vehicleEntity))
                 return true;
 
             if (!vehicleAccessControllerComponent.InternalCanEnter(pedEntity, vehicleEntity))
                 _vehicleAccessService.RelayFailedToEnter(pedEntity, vehicleEntity, vehicleAccessControllerComponent);
-            
+
             return false;
         };
         base.ComponentAdded(vehicleAccessControllerComponent);
