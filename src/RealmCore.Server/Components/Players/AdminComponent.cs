@@ -5,15 +5,6 @@ namespace RealmCore.Server.Components.Players;
 [ComponentUsage(false)]
 public class AdminComponent : Component
 {
-    [Inject]
-    private NoClipService NoClipService { get; set; } = default!;
-    [Inject]
-    private DebugLog DebugLog { get; set; } = default!;
-    [Inject]
-    private IAdminService AdminService { get; set; } = default!;
-    [Inject]
-    private IClientInterfaceService ClientInterfaceService { get; set; } = default!;
-
     private bool _debugView = false;
     private bool _adminMode = false;
     private bool _noClip = false;
@@ -26,6 +17,8 @@ public class AdminComponent : Component
     public event Action<AdminComponent, bool>? NoClipStateChanged;
     public event Action<AdminComponent, bool>? DevelopmentModeStateChanged;
     public event Action<AdminComponent, bool>? InteractionDebugRenderingStateChanged;
+
+    public IEnumerable<AdminTool> AdminTools => _adminTools;
 
     public AdminComponent(List<AdminTool> adminTools)
     {
@@ -46,7 +39,6 @@ public class AdminComponent : Component
             ThrowIfDisposed();
             if (_developmentMode != value)
             {
-                ClientInterfaceService.SetDevelopmentModeEnabled(Entity.Player, value);
                 _developmentMode = value;
                 DevelopmentModeStateChanged?.Invoke(this, _developmentMode);
             }
@@ -65,7 +57,6 @@ public class AdminComponent : Component
             ThrowIfDisposed();
             if (_debugView != value)
             {
-                DebugLog.SetVisibleTo(Entity.Player, value);
                 _debugView = value;
                 DebugViewStateChanged?.Invoke(this, _debugView);
             }
@@ -85,10 +76,6 @@ public class AdminComponent : Component
             if (_adminMode != value)
             {
                 _adminMode = value;
-                AdminService.SetAdminModeEnabledForPlayer(Entity.Player, _adminMode);
-                if(value)
-                    AdminService.SetAdminTools(Entity.Player, _adminTools.AsReadOnly());
-
                 AdminModeChanged?.Invoke(this, _adminMode);
             }
         }
@@ -106,7 +93,6 @@ public class AdminComponent : Component
             ThrowIfDisposed();
             if (_noClip != value)
             {
-                NoClipService.SetEnabledTo(Entity.Player, value);
                 _noClip = value;
                 NoClipStateChanged?.Invoke(this, _noClip);
             }
@@ -125,10 +111,8 @@ public class AdminComponent : Component
             ThrowIfDisposed();
             if (_interactionDebugRenderingEnabled != value)
             {
-                ClientInterfaceService.SetFocusableRenderingEnabled(Entity.Player, _interactionDebugRenderingEnabled);
                 _interactionDebugRenderingEnabled = value;
-                NoClipStateChanged?.Invoke(this, _interactionDebugRenderingEnabled);
-
+                InteractionDebugRenderingStateChanged?.Invoke(this, _interactionDebugRenderingEnabled);
             }
         }
     }

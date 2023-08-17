@@ -1,4 +1,5 @@
-﻿using RealmCore.Server.Logic.Components;
+﻿using RealmCore.Console.Logic;
+using RealmCore.Server.Logic.Components;
 using SlipeServer.Resources.Scoreboard;
 
 namespace RealmCore.Server.Extensions;
@@ -100,6 +101,7 @@ public static class ServerBuilderExtensions
         serverBuilder.AddLogic<BoneAttachResourceLogic>();
         serverBuilder.AddLogic<Text3dComponentLogic>();
         serverBuilder.AddLogic<DailyVisitsCounterComponentLogic>();
+        serverBuilder.AddLogic<AdminComponentLogic>();
         #endregion
 
         // Miscellaneous logic

@@ -27,9 +27,9 @@ internal sealed class AdminService : IAdminService
         MessageHandler?.Invoke(new AdminModeChangedMessage(player, enabled));
     }
 
-    public void SetAdminTools(Player player, IReadOnlyList<AdminTool> adminTools)
+    public void SetAdminTools(Player player, IEnumerable<AdminTool> adminTools)
     {
-        MessageHandler?.Invoke(new SetAdminToolsMessage(player, adminTools));
+        MessageHandler?.Invoke(new SetAdminToolsMessage(player, adminTools.ToList()));
     }
 
     public void BroadcastEntityDebugInfoUpdate(EntityDebugInfo entityDebugInfo)

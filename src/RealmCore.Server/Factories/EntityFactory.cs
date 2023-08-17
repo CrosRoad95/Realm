@@ -1,5 +1,4 @@
 ﻿using RealmCore.Persistence.Interfaces;
-using static Grpc.Core.Metadata;
 using Vehicle = SlipeServer.Server.Elements.Vehicle;
 
 namespace RealmCore.Server.Factories;

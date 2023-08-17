@@ -14,7 +14,7 @@ public interface IAdminService
 
     internal void RelayToolStateChanged(Player player, AdminTool adminTool, bool state);
     void SetAdminModeEnabledForPlayer(Player player, bool enabled);
-    void SetAdminTools(Player player, IReadOnlyList<AdminTool> adminTools);
+    void SetAdminTools(Player player, IEnumerable<AdminTool> adminTools);
     void BroadcastEntityDebugInfoUpdate(EntityDebugInfo entityDebugInfo);
     void BroadcastEntityDebugInfoUpdate(IEnumerable<EntityDebugInfo> entityDebugInfo);
     void BroadcastEntityDebugInfoUpdateForPlayer(Player player, EntityDebugInfo entityDebugInfo);
