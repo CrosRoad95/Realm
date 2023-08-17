@@ -12,6 +12,13 @@ public class VehicleFuelComponent : Component, ILuaDebugDataProvider
     private short _fuelType;
     private bool _active;
 
+    public event Action<VehicleFuelComponent, bool>? ActiveChanged;
+    public event Action<VehicleFuelComponent, short>? FuelTypeChanged;
+    public event Action<VehicleFuelComponent, float>? MinimumDistanceThresholdChanged;
+    public event Action<VehicleFuelComponent, float>? AmountChanged;
+    public event Action<VehicleFuelComponent, float>? MaxCapacityChanged;
+    public event Action<VehicleFuelComponent, float>? FuelConsumptionPerOneKmChanged;
+
     public bool Active
     {
         get
@@ -26,6 +33,7 @@ public class VehicleFuelComponent : Component, ILuaDebugDataProvider
                 Update(true);
 
             _active = value;
+            ActiveChanged?.Invoke(this, value);
         }
     }
 
@@ -39,6 +47,7 @@ public class VehicleFuelComponent : Component, ILuaDebugDataProvider
         set {
             ThrowIfDisposed();
             _fuelType = value;
+            FuelTypeChanged?.Invoke(this, value);
         }
     }
 
@@ -54,6 +63,7 @@ public class VehicleFuelComponent : Component, ILuaDebugDataProvider
             ThrowIfDisposed();
             if (value < 0.0f) value = 0.0f;
             _minimumDistanceThreshold = value;
+            MinimumDistanceThresholdChanged?.Invoke(this, value);
         }
     }
 
@@ -69,6 +79,7 @@ public class VehicleFuelComponent : Component, ILuaDebugDataProvider
             ThrowIfDisposed();
             if (value < 0.0f) value = 0.0f;
             _fuelConsumptionPerOneKm = value;
+            FuelConsumptionPerOneKmChanged?.Invoke(this, value);
         }
     }
 
@@ -88,6 +99,7 @@ public class VehicleFuelComponent : Component, ILuaDebugDataProvider
                 value = MaxCapacity;
             _amount = value;
             Update(true);
+            AmountChanged?.Invoke(this, value);
         }
     }
 
@@ -109,6 +121,7 @@ public class VehicleFuelComponent : Component, ILuaDebugDataProvider
             if (_maxCapacity < _amount)
                 _amount = _maxCapacity;
             Update(true);
+            MaxCapacityChanged?.Invoke(this, value);
         }
     }
 
@@ -173,6 +186,7 @@ public class VehicleFuelComponent : Component, ILuaDebugDataProvider
             vehicle.IsEngineOn = false;
             FuelRanOut?.Invoke(this);
         }
+        AmountChanged?.Invoke(this, _amount);
     }
 
     public LuaValue GetLuaDebugData()
