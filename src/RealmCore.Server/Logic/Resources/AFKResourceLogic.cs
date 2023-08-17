@@ -4,12 +4,13 @@ internal sealed class AFKResourceLogic
 {
     private readonly IECS _ecs;
     private readonly ILogger<StatisticsCounterResourceLogic> _logger;
+    private readonly IDateTimeProvider _dateTimeProvider;
 
-    public AFKResourceLogic(IAFKService afkService,
-        IECS ecs, ILogger<StatisticsCounterResourceLogic> logger)
+    public AFKResourceLogic(IAFKService afkService, IECS ecs, ILogger<StatisticsCounterResourceLogic> logger, IDateTimeProvider dateTimeProvider)
     {
         _ecs = ecs;
         _logger = logger;
+        _dateTimeProvider = dateTimeProvider;
         afkService.PlayerAFKStarted += HandlePlayerAFKStarted;
         afkService.PlayerAFKStopped += HandlePlayerAFKStopped;
     }
@@ -20,7 +21,7 @@ internal sealed class AFKResourceLogic
         {
             if (entity.TryGetComponent(out AFKComponent afkComponent))
             {
-                afkComponent.HandlePlayerAFKStarted();
+                afkComponent.HandlePlayerAFKStarted(_dateTimeProvider.Now);
             }
         }
     }
@@ -31,7 +32,7 @@ internal sealed class AFKResourceLogic
         {
             if (entity.TryGetComponent(out AFKComponent afkComponent))
             {
-                afkComponent.HandlePlayerAFKStopped();
+                afkComponent.HandlePlayerAFKStopped(_dateTimeProvider.Now);
             }
         }
     }

@@ -3,37 +3,34 @@
 [ComponentUsage(false)]
 public class AFKComponent : Component
 {
-    [Inject]
-    private IDateTimeProvider DateTimeProvider { get; set; } = default!;
-
     public DateTime? LastAFK { get; private set; }
     public bool IsAFK { get; private set; }
     public event Action<AFKComponent, bool, TimeSpan>? StateChanged;
     private object _lock = new();
 
-    protected virtual void StateHasChanged()
+    protected virtual void StateHasChanged(DateTime now)
     {
-        TimeSpan elapsed = (TimeSpan)(LastAFK == null ? TimeSpan.Zero : DateTimeProvider.Now - LastAFK);
+        TimeSpan elapsed = (TimeSpan)(LastAFK == null ? TimeSpan.Zero : now - LastAFK);
         StateChanged?.Invoke(this, IsAFK, elapsed);
     }
 
-    internal void HandlePlayerAFKStopped()
+    internal void HandlePlayerAFKStopped(DateTime now)
     {
         lock (_lock)
         {
             IsAFK = false;
-            StateHasChanged();
-            LastAFK = DateTimeProvider.Now;
+            StateHasChanged(now);
+            LastAFK = now;
         }
     }
 
-    internal void HandlePlayerAFKStarted()
+    internal void HandlePlayerAFKStarted(DateTime now)
     {
         lock (_lock)
         {
             IsAFK = true;
-            StateHasChanged();
-            LastAFK = DateTimeProvider.Now;
+            StateHasChanged(now);
+            LastAFK = now;
         }
     }
 }
