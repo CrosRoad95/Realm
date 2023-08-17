@@ -207,6 +207,18 @@ public class VehicleElementComponent : ElementComponent
         }
     }
 
+    public Entity? Driver
+    {
+        get
+        {
+            ThrowIfDisposed();
+
+            if (_vehicle.Driver != null && _ecs.TryGetByElement(_vehicle.Driver, out var playerEntity))
+                return playerEntity;
+            return null;
+        }
+    }
+
     public event Action<VehicleElementComponent, VehiclePushedEventArgs>? Pushed;
     public event Action<VehicleElementComponent, VehicleLightStateChangedArgs>? LightStateChanged;
     public event Action<VehicleElementComponent, VehiclePanelStateChangedArgs>? PanelStateChanged;
@@ -216,6 +228,7 @@ public class VehicleElementComponent : ElementComponent
     public event Action<VehicleElementComponent>? Blown;
     public event Action<VehicleElementComponent, Entity>? PedEntered;
     public event Action<VehicleElementComponent, Entity>? PedLeft;
+    public event Action<VehicleElementComponent>? Damaged;
 
     public void BlowUp()
     {
@@ -308,6 +321,8 @@ public class VehicleElementComponent : ElementComponent
     private void HandleHealthChanged(Vehicle sender, ElementChangedEventArgs<Vehicle, float> args)
     {
         HealthChanged?.Invoke(this, args.OldValue, args.NewValue);
+        if (args.IsSync)
+            Damaged?.Invoke(this);
     }
 
     private void HandlePushed(Vehicle sender, VehiclePushedEventArgs e)
@@ -315,23 +330,31 @@ public class VehicleElementComponent : ElementComponent
         Pushed?.Invoke(this, e);
     }
 
-    private void HandleLightStateChanged(Element sender, VehicleLightStateChangedArgs e)
+    private void HandleLightStateChanged(Element sender, VehicleLightStateChangedArgs args)
     {
-        LightStateChanged?.Invoke(this, e);
+        LightStateChanged?.Invoke(this, args);
+        if(args.State != VehicleLightState.Intact)
+            Damaged?.Invoke(this);
     }
 
-    private void HandlePanelStateChanged(Element sender, VehiclePanelStateChangedArgs e)
+    private void HandlePanelStateChanged(Element sender, VehiclePanelStateChangedArgs args)
     {
-        PanelStateChanged?.Invoke(this, e);
+        PanelStateChanged?.Invoke(this, args);
+        if (args.State != VehiclePanelState.Undamaged)
+            Damaged?.Invoke(this);
     }
 
-    private void HandleWheelStateChanged(Element sender, VehicleWheelStateChangedArgs e)
+    private void HandleWheelStateChanged(Element sender, VehicleWheelStateChangedArgs args)
     {
-        WheelStateChanged?.Invoke(this, e);
+        WheelStateChanged?.Invoke(this, args);
+        if (args.State != VehicleWheelState.Inflated)
+            Damaged?.Invoke(this);
     }
 
-    private void HandleDoorStateChanged(Element sender, VehicleDoorStateChangedArgs e)
+    private void HandleDoorStateChanged(Element sender, VehicleDoorStateChangedArgs args)
     {
-        DoorStateChanged?.Invoke(this, e);
+        DoorStateChanged?.Invoke(this, args);
+        if (args.State != VehicleDoorState.ShutIntact)
+            Damaged?.Invoke(this);
     }
 }

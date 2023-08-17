@@ -259,6 +259,7 @@ public sealed class PlayerElementComponent : PedElementComponent
 
     public event Action<PlayerElementComponent, PedWastedEventArgs>? Wasted;
     public event Action<PlayerElementComponent, PlayerDamagedEventArgs>? Damaged;
+    public event Action<Entity?> OccupiedVehicleChanged;
 
     public Entity? OccupiedVehicle
     {
@@ -287,8 +288,23 @@ public sealed class PlayerElementComponent : PedElementComponent
         _player.BindExecuted += HandleBindExecuted;
         _player.Wasted += HandleWasted;
         _player.Damaged += HandleDamaged;
+        _player.VehicleChanged += HandleVehicleChanged;
         UpdateFight();
         _player.IsNametagShowing = false;
+    }
+
+    private void HandleVehicleChanged(Ped sender, ElementChangedEventArgs<Ped, Vehicle?> args)
+    {
+        if(args.NewValue == null)
+        {
+            OccupiedVehicleChanged?.Invoke(null);
+            return;
+        }
+
+        if(ECS.TryGetByElement(args.NewValue, out var vehicleEntity))
+        {
+            OccupiedVehicleChanged?.Invoke(vehicleEntity);
+        }
     }
 
     private void HandleDamaged(Player sender, PlayerDamagedEventArgs e)
@@ -845,6 +861,10 @@ public sealed class PlayerElementComponent : PedElementComponent
 
     public override void Dispose()
     {
+        _player.BindExecuted -= HandleBindExecuted;
+        _player.Wasted -= HandleWasted;
+        _player.Damaged -= HandleDamaged;
+        _player.VehicleChanged -= HandleVehicleChanged;
         _player.Kick(PlayerDisconnectType.SHUTDOWN);
         base.Dispose();
     }
