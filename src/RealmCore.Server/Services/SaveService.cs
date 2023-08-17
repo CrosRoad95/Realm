@@ -11,16 +11,18 @@ internal class SaveService : ISaveService
     private readonly IDb _dbContext;
     private readonly IEnumerable<IUserDataSaver> _userDataSavers;
 
+    public event Action<Entity>? EntitySaved;
+
     public SaveService(IDb dbContext, IEnumerable<IUserDataSaver> userDataSavers)
     {
         _dbContext = dbContext;
         _userDataSavers = userDataSavers;
     }
 
-    private async Task SaveVehicle(Entity entity)
+    private async Task<bool> SaveVehicle(Entity entity)
     {
         if (!entity.TryGetComponent(out PrivateVehicleComponent privateVehicleComponent))
-            return;
+            return false;
 
         var vehicleData = await _dbContext.Vehicles
             .IncludeAll()
@@ -158,6 +160,8 @@ internal class SaveService : ISaveService
         }
         else
             vehicleData.Inventories = new List<InventoryData>();
+
+        return true;
     }
 
     private InventoryData MapInventory(InventoryComponent inventoryComponent)
@@ -208,10 +212,10 @@ internal class SaveService : ISaveService
         return inventory.Id;
     }
 
-    private async Task SavePlayer(Entity entity)
+    private async Task<bool> SavePlayer(Entity entity)
     {
         if (!entity.TryGetComponent(out UserComponent userComponent))
-            return;
+            return false;
 
         var user = await _dbContext.Users
             .IncludeAll()
@@ -383,25 +387,25 @@ internal class SaveService : ISaveService
         {
             user.DiscordIntegration = null;
         }
+
+        return true;
     }
 
     public async Task<bool> Save(Entity entity)
     {
-        if(entity.TryGetComponent(out TagComponent tagComponent))
+        if (!entity.TryGetComponent(out TagComponent tagComponent))
+            return false;
+
+        bool result = tagComponent switch
         {
-            switch(tagComponent)
-            {
-                case PlayerTagComponent:
-                    await SavePlayer(entity);
-                    break;
-                case VehicleTagComponent:
-                    await SaveVehicle(entity);
-                    break;
-                default:
-                    return false;
-            }
-        }
-        return true;
+            PlayerTagComponent => await SavePlayer(entity),
+            VehicleTagComponent => await SaveVehicle(entity),
+            _ => false
+        };
+
+        if (result)
+            EntitySaved?.Invoke(entity);
+        return result;
     }
 
     public async Task Commit()
