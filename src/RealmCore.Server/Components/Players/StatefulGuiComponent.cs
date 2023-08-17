@@ -10,8 +10,8 @@ public abstract class StatefulGuiComponent<TState> : GuiComponent
     private readonly TState _state;
     private readonly Dictionary<LuaValue, LuaValue> _stateChange = new();
 
-    public StatefulGuiComponent(string name, bool cursorless, TState initialState)
-        : base(name, cursorless)
+    public StatefulGuiComponent(string name, bool cursorLess, TState initialState)
+        : base(name, cursorLess)
     {
         _state = initialState;
     }

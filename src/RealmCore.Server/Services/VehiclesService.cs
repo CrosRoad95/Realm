@@ -129,7 +129,7 @@ internal sealed class VehiclesService : IVehiclesService
                 if (vehicleData.Fuels.Any())
                 {
                     foreach (var vehicleFuel in vehicleData.Fuels)
-                        entity.AddComponent(new VehicleFuelComponent(vehicleFuel.FuelType, vehicleFuel.Amount, vehicleFuel.MaxCapacity, vehicleFuel.FuelConsumptionPerOneKm, vehicleFuel.MinimumDistanceThreshold)).Active = vehicleFuel.Active;
+                        entity.AddComponent(new FuelComponent(vehicleFuel.FuelType, vehicleFuel.Amount, vehicleFuel.MaxCapacity, vehicleFuel.FuelConsumptionPerOneKm, vehicleFuel.MinimumDistanceThreshold)).Active = vehicleFuel.Active;
                 }
 
                 if (vehicleData.Inventories != null && vehicleData.Inventories.Any())

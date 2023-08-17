@@ -10,7 +10,8 @@ public class LicensesComponent : Component
 
     private readonly List<License> _licenses = new();
 
-    public IReadOnlyList<License> Licenses {
+    public IReadOnlyList<License> Licenses
+    {
         get
         {
             lock (_lock)

@@ -1,8 +1,8 @@
 ﻿namespace RealmCore.Server.Components.Vehicles;
 
-public class VehicleFuelComponent : Component, ILuaDebugDataProvider
+public class FuelComponent : Component, ILuaDebugDataProvider
 {
-    public event Action<VehicleFuelComponent>? FuelRanOut;
+    public event Action<FuelComponent>? FuelRanOut;
 
     private Vector3 _lastPosition;
     private float _amount = 0;
@@ -12,12 +12,12 @@ public class VehicleFuelComponent : Component, ILuaDebugDataProvider
     private short _fuelType;
     private bool _active;
 
-    public event Action<VehicleFuelComponent, bool>? ActiveChanged;
-    public event Action<VehicleFuelComponent, short>? FuelTypeChanged;
-    public event Action<VehicleFuelComponent, float>? MinimumDistanceThresholdChanged;
-    public event Action<VehicleFuelComponent, float>? AmountChanged;
-    public event Action<VehicleFuelComponent, float>? MaxCapacityChanged;
-    public event Action<VehicleFuelComponent, float>? FuelConsumptionPerOneKmChanged;
+    public event Action<FuelComponent, bool>? ActiveChanged;
+    public event Action<FuelComponent, short>? FuelTypeChanged;
+    public event Action<FuelComponent, float>? MinimumDistanceThresholdChanged;
+    public event Action<FuelComponent, float>? AmountChanged;
+    public event Action<FuelComponent, float>? MaxCapacityChanged;
+    public event Action<FuelComponent, float>? FuelConsumptionPerOneKmChanged;
 
     public bool Active
     {
@@ -125,7 +125,7 @@ public class VehicleFuelComponent : Component, ILuaDebugDataProvider
         }
     }
 
-    public VehicleFuelComponent(short fuelType, double initialAmount, double maxCapacity, double fuelConsumptionPerOneKm, double minimumDistanceThreshold)
+    public FuelComponent(short fuelType, double initialAmount, double maxCapacity, double fuelConsumptionPerOneKm, double minimumDistanceThreshold)
     {
         if (initialAmount < 0) throw new ArgumentOutOfRangeException(nameof(initialAmount));
         if (minimumDistanceThreshold < 0) throw new ArgumentOutOfRangeException(nameof(minimumDistanceThreshold));
@@ -146,7 +146,7 @@ public class VehicleFuelComponent : Component, ILuaDebugDataProvider
         if (_active)
         {
             // Turn off other fuel components if this is active.
-            foreach (var item in Entity.Components.OfType<VehicleFuelComponent>().Where(x => x != this))
+            foreach (var item in Entity.Components.OfType<FuelComponent>().Where(x => x != this))
                 item.Active = false;
         }
     }

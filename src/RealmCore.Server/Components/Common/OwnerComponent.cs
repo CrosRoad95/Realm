@@ -1,4 +1,4 @@
-﻿namespace RealmCore.Server.Components;
+﻿namespace RealmCore.Server.Components.Common;
 
 public class OwnerComponent : Component
 {

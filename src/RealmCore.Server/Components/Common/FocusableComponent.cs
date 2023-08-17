@@ -1,6 +1,6 @@
-﻿namespace RealmCore.Server.Components.Vehicles;
+﻿namespace RealmCore.Server.Components.Common;
 
-public class VehicleFocusableComponent : Component
+public class FocusableComponent : Component
 {
     protected override void Load()
     {

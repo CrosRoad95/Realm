@@ -13,7 +13,7 @@ public class CurrentInteractEntityComponent : Component
         CurrentInteractEntity.Disposed += HandleDisposed;
     }
 
-    private void HandleDisposed(Entity etntiy)
+    private void HandleDisposed(Entity entity)
     {
         lock (_lock)
         {

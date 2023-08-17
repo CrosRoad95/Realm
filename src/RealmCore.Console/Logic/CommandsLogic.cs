@@ -19,7 +19,6 @@ using RealmCore.Resources.Assets.Factories;
 using RealmCore.Resources.Assets.Interfaces;
 using RealmCore.Server.Concepts.Spawning;
 using RealmCore.Server.Components.Vehicles.Access;
-using RealmCore.Server.Components;
 using RealmCore.Persistence;
 
 namespace RealmCore.Console.Logic;
@@ -113,8 +112,8 @@ internal sealed class CommandsLogic
             var vehicleEntity = _entityFactory.CreateVehicle(args.ReadUShort(), entity.Transform.Position + new Vector3(4, 0, 0), entity.Transform.Rotation);
             vehicleEntity.AddComponent<VehicleUpgradesComponent>();
             vehicleEntity.AddComponent<MileageCounterComponent>();
-            vehicleEntity.AddComponent(new VehicleFuelComponent(1, 20, 20, 0.01, 2)).Active = true;
-            vehicleEntity.AddComponent<VehicleFocusableComponent>();
+            vehicleEntity.AddComponent(new FuelComponent(1, 20, 20, 0.01, 2)).Active = true;
+            vehicleEntity.AddComponent<FocusableComponent>();
             vehicleEntity.AddComponent<VehiclePartDamageComponent>().AddPart(1, 1337);
         });
 
@@ -125,7 +124,7 @@ internal sealed class CommandsLogic
             vehicleEntity.AddComponent(new VehicleUpgradesComponent()).AddUpgrade(1);
             vehicleEntity.AddComponent<MileageCounterComponent>();
             vehicleEntity.AddComponent<VehicleEngineComponent>();
-            vehicleEntity.AddComponent(new VehicleFuelComponent(1, 20, 20, 0.01, 2)).Active = true;
+            vehicleEntity.AddComponent(new FuelComponent(1, 20, 20, 0.01, 2)).Active = true;
             vehicleEntity.AddComponent<VehiclePartDamageComponent>().AddPart(1, 1337);
             vehicleEntity.GetRequiredComponent<PrivateVehicleComponent>().Access.AddAsOwner(entity);
         });
@@ -136,8 +135,8 @@ internal sealed class CommandsLogic
             var vehicleEntity = _entityFactory.CreateVehicle(404, entity.Transform.Position + new Vector3(4, 0, 0), entity.Transform.Rotation);
             vehicleEntity.AddComponent<VehicleUpgradesComponent>();
             vehicleEntity.AddComponent<MileageCounterComponent>();
-            vehicleEntity.AddComponent(new VehicleFuelComponent(1, 20, 20, 0.01, 2)).Active = true;
-            vehicleEntity.AddComponent(new VehicleExclusiveAccessComponent(vehicleEntity));
+            vehicleEntity.AddComponent(new FuelComponent(1, 20, 20, 0.01, 2)).Active = true;
+            vehicleEntity.AddComponent(new VehicleExclusiveAccessComponent(entity));
         });
 
         _commandService.AddCommandHandler("noaccesscv", (entity, args) =>
@@ -146,7 +145,7 @@ internal sealed class CommandsLogic
             var vehicleEntity = _entityFactory.CreateVehicle(404, entity.Transform.Position + new Vector3(4, 0, 0), entity.Transform.Rotation);
             vehicleEntity.AddComponent<VehicleUpgradesComponent>();
             vehicleEntity.AddComponent<MileageCounterComponent>();
-            vehicleEntity.AddComponent(new VehicleFuelComponent(1, 20, 20, 0.01, 2)).Active = true;
+            vehicleEntity.AddComponent(new FuelComponent(1, 20, 20, 0.01, 2)).Active = true;
             vehicleEntity.AddComponent<VehicleNoAccessComponent>();
         });
 
@@ -187,7 +186,7 @@ internal sealed class CommandsLogic
         _commandService.AddAsyncCommandHandler("accessinfobyid", async (entity, args) =>
         {
             using var access = await vehiclesService.GetVehicleAccess(args.ReadInt());
-            if(access == null)
+            if (access == null)
             {
                 _chatBox.OutputTo(entity, "Vehicle not found");
                 return;
@@ -311,7 +310,7 @@ internal sealed class CommandsLogic
                 var vehicleEntity = await _entityFactory.CreateNewPrivateVehicle(404, entity.Transform.Position + new Vector3(4, 0, 0), entity.Transform.Rotation);
                 vehicleEntity.AddComponent(new VehicleUpgradesComponent()).AddUpgrade(1);
                 vehicleEntity.AddComponent(new MileageCounterComponent());
-                vehicleEntity.AddComponent(new VehicleFuelComponent(1, 20, 20, 0.01, 2)).Active = true;
+                vehicleEntity.AddComponent(new FuelComponent(1, 20, 20, 0.01, 2)).Active = true;
                 vehicleEntity.AddComponent<VehiclePartDamageComponent>().AddPart(1, 1337);
             }
         });
@@ -349,14 +348,14 @@ internal sealed class CommandsLogic
             var objectEntity = _entityFactory.CreateObject(ObjectModel.Gunbox, entity.Transform.Position + new Vector3(4, 0, -0.65f), Vector3.Zero);
             objectEntity.AddComponent<LiftableWorldObjectComponent>();
         });
-        
+
         _commandService.AddCommandHandler("spawnmybox", (entity, args) =>
         {
             var objectEntity = _entityFactory.CreateObject(ObjectModel.Gunbox, entity.Transform.Position + new Vector3(4, 0, -0.65f), Vector3.Zero);
             objectEntity.AddComponent<LiftableWorldObjectComponent>();
             objectEntity.AddComponent(new OwnerComponent(entity));
         });
-        
+
         _commandService.AddCommandHandler("spawnmybox2", (entity, args) =>
         {
             var objectEntity = _entityFactory.CreateObject(ObjectModel.Gunbox, entity.Transform.Position + new Vector3(4, 0, -0.65f), Vector3.Zero);
@@ -546,7 +545,7 @@ internal sealed class CommandsLogic
             var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();
             entity.AddComponent(new SampleHud2());
         });
-        
+
         _commandService.AddCommandHandler("updatestate2", (entity, args) =>
         {
             var sampleHud2 = entity.GetRequiredComponent<SampleHud2>();
@@ -624,7 +623,7 @@ internal sealed class CommandsLogic
                 logger.LogInformation("Disposed attached entity");
             };
         });
-        
+
         _commandService.AddCommandHandler("destroyattachedentity", (entity, args) =>
         {
             var userComponent = entity.GetRequiredComponent<UserComponent>();
@@ -889,7 +888,7 @@ internal sealed class CommandsLogic
             var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();
             _chatBox.OutputTo(entity, $"Inventory: {inv.Number}/{inv.Size}");
         });
-        
+
         _commandService.AddCommandHandler("giveitem4", (entity, args) =>
         {
             var inv = entity.GetRequiredComponent<InventoryComponent>();
@@ -897,7 +896,7 @@ internal sealed class CommandsLogic
             var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();
             _chatBox.OutputTo(entity, "Item given");
         });
-        
+
         _commandService.AddCommandHandler("itemwithmetadata", (entity, args) =>
         {
             var inv = entity.GetRequiredComponent<InventoryComponent>();
@@ -938,7 +937,7 @@ internal sealed class CommandsLogic
         {
             gameWorld.SetTime(0, 0);
         });
-        
+
         _commandService.AddCommandHandler("createObjectFor", (entity, args) =>
         {
             _entityFactory.CreateObjectFor(entity, (ObjectModel)1337, entity.Transform.Position + new Vector3(3, 0, 0), entity.Transform.Rotation);
@@ -958,7 +957,7 @@ internal sealed class CommandsLogic
         {
             entity.Transform.Dimension = args.ReadUShort();
         });
-        
+
         _commandService.AddCommandHandler("runtimeobject", (entity, args) =>
         {
             var modelFactory = new ModelFactory();
@@ -969,19 +968,19 @@ internal sealed class CommandsLogic
             assetsService.ReplaceModelFor(entity, dff, col, 1339);
             _entityFactory.CreateObject((ObjectModel)1339, entity.Transform.Position + new Vector3(15, 15, -5), Vector3.Zero);
         });
-        
-        
+
+
         _commandService.AddCommandHandler("restoreobject", (entity, args) =>
         {
             assetsService.RestoreModelFor(entity, 1339);
         });
-        
+
         _commandService.AddCommandHandler("amiinwater", (entity, args) =>
         {
             var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();
             _chatBox.OutputTo(entity, $"amiinwater: {playerElementComponent.IsInWater} {entity.Transform.Position}");
         });
-        
+
         _commandService.AddCommandHandler("formatmoney", (entity, args) =>
         {
             var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();
@@ -1023,14 +1022,14 @@ internal sealed class CommandsLogic
             counter++;
             _logger.LogInformation("Counter: {counter}", counter);
         });
-        
+
         _commandService.AddCommandHandler("level", (entity, args) =>
         {
             var levelComponent = entity.GetRequiredComponent<LevelComponent>();
             var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();
             _chatBox.OutputTo(entity, $"Level: {levelComponent.Level}, exp: {levelComponent.Experience}");
         });
-        
+
         _commandService.AddCommandHandler("setlevel", (entity, args) =>
         {
             uint level = args.ReadUInt();
@@ -1053,7 +1052,7 @@ internal sealed class CommandsLogic
             blazorGuiComponent.DevTools = !blazorGuiComponent.DevTools;
             _chatBox.OutputTo(entity, $"Devtools {blazorGuiComponent.DevTools}");
         }, null);
-        
+
         _commandService.AddCommandHandler("cefpath", (entity, args) =>
         {
             var blazorGuiComponent = entity.GetRequiredComponent<BlazorGuiComponent>();
@@ -1075,7 +1074,7 @@ internal sealed class CommandsLogic
         {
             await _vehiclesService.SetVehicleKind(entity.GetRequiredComponent<PlayerElementComponent>().OccupiedVehicle, 42);
         });
-        
+
         _commandService.AddAsyncCommandHandler("kind", async (entity, args) =>
         {
             var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();
@@ -1120,17 +1119,17 @@ internal sealed class CommandsLogic
         {
             userManager.Kick(entity, "test");
         });
-        
+
         _commandService.AddCommandHandler("getplayerbyname", (entity, args) =>
         {
-            if(userManager.TryGetPlayerByName(args.ReadArgument(), out var foundPlayer))
+            if (userManager.TryGetPlayerByName(args.ReadArgument(), out var foundPlayer))
             {
                 _chatBox.OutputTo(entity, "found");
             }
             else
                 _chatBox.OutputTo(entity, "not found");
         });
-        
+
         _commandService.AddCommandHandler("findbyname", (entity, args) =>
         {
             var players = userManager.SearchPlayersByName(args.ReadArgument());
@@ -1140,11 +1139,11 @@ internal sealed class CommandsLogic
                 _chatBox.OutputTo(entity, $"Player: {item.GetRequiredComponent<UserComponent>().UserName}");
             }
         });
-        
+
         _commandService.AddAsyncCommandHandler("addrating", async (entity, args) =>
         {
             var last = (await feedbackService.GetLastRating(entity, 1)) ?? (0, DateTime.MinValue);
-            if(last.Item2.AddSeconds(3) > dateTimeProvider.Now)
+            if (last.Item2.AddSeconds(3) > dateTimeProvider.Now)
             {
                 _chatBox.OutputTo(entity, "możesz ocenić maksymalnie raz na 30sekund");
                 return;
@@ -1153,7 +1152,7 @@ internal sealed class CommandsLogic
             await feedbackService.ChangeLastRating(entity, 1, rating);
             _chatBox.OutputTo(entity, $"zmieniono ocenę z {rating} z {last.Item1}");
         });
-        
+
         _commandService.AddAsyncCommandHandler("addopinion", async (entity, args) =>
         {
             await feedbackService.AddOpinion(entity, 1, string.Join(", ", args));
@@ -1191,14 +1190,14 @@ internal sealed class CommandsLogic
                 await Task.Delay(500);
             }
         });
-        
+
         _commandService.AddAsyncCommandHandler("createmarkerforme2", async (entity, args) =>
         {
             var marker = _entityFactory.CreateMarkerFor(entity, new Vector3(-600.8877f, 240.88867f, 26.091864f), MarkerType.Cylinder);
             marker.ElementComponent.Size = 4;
             marker.ElementComponent.Color = Color.Red;
         });
-        
+
         _commandService.AddCommandHandler("createmarkerforme3", (entity, args) =>
         {
             var marker = _entityFactory.CreateMarkerFor(entity, entity.Transform.Position, MarkerType.Cylinder);
@@ -1209,7 +1208,7 @@ internal sealed class CommandsLogic
                 ;
             };
         });
-        
+
         _commandService.AddCommandHandler("setinterior", (entity, args) =>
         {
             if (entity.Transform.Interior == 1)
@@ -1217,17 +1216,17 @@ internal sealed class CommandsLogic
             else
                 entity.Transform.Interior = 1;
         });
-        
+
         _commandService.AddCommandHandler("setinterior2", (entity, args) =>
         {
             entity.Transform.Interior = 1;
             var veh = _entityFactory.CreateVehicle(404, new Vector3(338.26562f, -87.75098f, 1.5197021f), Vector3.Zero);
             entity.GetRequiredComponent<PlayerElementComponent>().WarpIntoVehicle(veh);
         });
-        
+
         _commandService.AddAsyncCommandHandler("setinterior2b", async (entity, args) =>
         {
-            entity.Transform.InteriorChanged += (t,i) =>
+            entity.Transform.InteriorChanged += (t, i) =>
             {
                 chatBox.OutputTo(entity, $"Changed interior to: {i}");
             };
@@ -1255,14 +1254,14 @@ internal sealed class CommandsLogic
             var c = args.ReadInt();
             _chatBox.OutputTo(entity, $"Komenda wykonana, argumenty {a}, {b}, {c}");
         });
-        
+
         _commandService.AddCommandHandler("testargs2", (entity, args) =>
         {
             var a = args.ReadPlayerEntity();
             var b = args.ReadPlayerEntity();
             _chatBox.OutputTo(entity, $"Komenda wykonana, argumenty {a} {b}");
         });
-        
+
         _commandService.AddCommandHandler("admincmd", (entity, args) =>
         {
             _chatBox.OutputTo(entity, $"executed admin cmd");

@@ -102,7 +102,7 @@ internal class SaveService : ISaveService
         }
 
         {
-            var fuelComponents = entity.Components.OfType<VehicleFuelComponent>();
+            var fuelComponents = entity.Components.OfType<FuelComponent>();
             vehicleData.Fuels = fuelComponents.Select(x => new VehicleFuelData
             {
                 VehicleId = vehicleData.Id,

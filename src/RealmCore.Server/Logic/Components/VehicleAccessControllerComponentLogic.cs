@@ -17,9 +17,12 @@ internal class VehicleAccessControllerComponentLogic : ComponentLogic<VehicleAcc
                 return true;
 
             if (!vehicleAccessControllerComponent.InternalCanEnter(pedEntity, vehicleEntity))
+            {
                 _vehicleAccessService.RelayFailedToEnter(pedEntity, vehicleEntity, vehicleAccessControllerComponent);
+                return false;
+            }
 
-            return false;
+            return true;
         };
         base.ComponentAdded(vehicleAccessControllerComponent);
     }

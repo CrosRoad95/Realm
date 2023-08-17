@@ -79,7 +79,7 @@ public class MoneyComponent : Component
         if (amount < 0)
             throw new GameplayException("Unable to give money, amount can not get negative.");
 
-       _moneyLock.EnterWriteLock();
+        _moneyLock.EnterWriteLock();
         writeLockRecursionCount++;
         try
         {
@@ -178,10 +178,10 @@ public class MoneyComponent : Component
         writeLockRecursionCount++;
         try
         {
-            if(!InternalHasMoney(amount, force))
+            if (!InternalHasMoney(amount, force))
                 return false;
 
-            if(action())
+            if (action())
             {
                 TakeMoney(amount, force);
                 return true;
@@ -209,10 +209,10 @@ public class MoneyComponent : Component
 
         try
         {
-            if(!InternalHasMoney(amount, force))
+            if (!InternalHasMoney(amount, force))
                 return false;
 
-            if(await action())
+            if (await action())
             {
                 TakeMoney(amount, force);
                 return true;

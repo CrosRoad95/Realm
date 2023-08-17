@@ -180,21 +180,21 @@ public class VehicleUpgradesComponent : Component
         if (!upgradeDescriptions.Any())
             throw new InvalidOperationException("Sequence contains no elements");
 
-        float increseByUnits = 0;
+        float increaseByUnits = 0;
         float multipleBy = 0;
         var memberExpression = (MemberExpression)handlingProperty.Body;
         var propertyInfo = (PropertyInfo)memberExpression.Member;
         var value = (float)propertyInfo.GetValue(vehicleHandling)!;
         foreach (var floatValueUpgradeDescription in upgradeDescriptions.Where(x => x != null).Select(x => x!))
         {
-            increseByUnits += floatValueUpgradeDescription.IncreaseByUnits;
+            increaseByUnits += floatValueUpgradeDescription.IncreaseByUnits;
             multipleBy += floatValueUpgradeDescription.MultipleBy;
             if (floatValueUpgradeDescription.MultipleBy == 0)
                 throw new ArgumentOutOfRangeException(nameof(floatValueUpgradeDescription.MultipleBy), "Multiple by can not be 0");
         }
         if (multipleBy != 0)
             value *= multipleBy;
-        value += increseByUnits;
+        value += increaseByUnits;
 
         propertyInfo.SetValue(vehicleHandling, value);
     }

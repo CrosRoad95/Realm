@@ -55,7 +55,7 @@ public class LevelComponent : Component
         }
     }
 
-    private object _lock = new();
+    private readonly object _lock = new();
 
     public event Action<LevelComponent, uint, bool>? LevelChanged;
     public event Action<LevelComponent, uint>? ExperienceChanged;

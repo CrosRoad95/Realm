@@ -13,12 +13,12 @@ public abstract class Component : IDisposable
     {
         get
         {
-            lock(_entityLock)
+            lock (_entityLock)
                 return _entity ?? throw new InvalidOperationException();
         }
         internal set
         {
-            lock(_entityLock)
+            lock (_entityLock)
                 _entity = value;
         }
     }
@@ -30,7 +30,8 @@ public abstract class Component : IDisposable
 
     protected virtual void Load() { }
     protected virtual void Detached() { }
-    internal void InternalDetached() {
+    internal void InternalDetached()
+    {
         DetachedFromEntity?.Invoke(this);
         Detached();
     }
@@ -49,7 +50,7 @@ public abstract class Component : IDisposable
 
     internal bool TryRemoveEntity(Action callback)
     {
-        lock(_entityLock)
+        lock (_entityLock)
         {
             if (_entity == null)
                 return false;
@@ -60,10 +61,10 @@ public abstract class Component : IDisposable
             return true;
         }
     }
-    
+
     internal bool TrySetEntity(Entity entity)
     {
-        lock(_entityLock)
+        lock (_entityLock)
         {
             if (_entity != null)
                 return false;

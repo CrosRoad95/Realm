@@ -6,7 +6,7 @@ public class PrivateVehicleAccessControllerComponent : VehicleAccessControllerCo
 
     protected override bool CanEnter(Entity pedEntity, Entity vehicleEntity)
     {
-        if(_privateVehicleComponent == null)
+        if (_privateVehicleComponent == null)
             _privateVehicleComponent = Entity.GetRequiredComponent<PrivateVehicleComponent>();
 
         return _privateVehicleComponent.Access.HasAccess(pedEntity);

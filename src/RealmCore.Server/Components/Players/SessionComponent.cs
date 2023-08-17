@@ -7,7 +7,8 @@ public abstract class SessionComponent : Component
     public event Action<Entity>? SessionStarted;
     public event Action<Entity>? SessionEnded;
 
-    public TimeSpan Elapsed {
+    public TimeSpan Elapsed
+    {
         get
         {
             ThrowIfDisposed();
