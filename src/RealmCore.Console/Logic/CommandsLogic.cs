@@ -43,6 +43,12 @@ internal sealed class CommandsLogic
         public string Text { get; set; }
     }
 
+    private enum TestEnum
+    {
+        Test1,
+        Test2,
+    }
+
     public CommandsLogic(RealmCommandService commandService, IEntityFactory entityFactory, RepositoryFactory repositoryFactory,
         ItemsRegistry itemsRegistry, IECS ecs, IBanService banService, IDiscordService discordService, ChatBox chatBox, ILogger<CommandsLogic> logger,
         IDateTimeProvider dateTimeProvider, INametagsService nametagsService, IUsersService userManager, IVehiclesService vehiclesService,
@@ -1265,6 +1271,11 @@ internal sealed class CommandsLogic
         _commandService.AddCommandHandler("admincmd", (entity, args) =>
         {
             _chatBox.OutputTo(entity, $"executed admin cmd");
+        }, new string[] { "Admin" });
+        
+        _commandService.AddCommandHandler("enum", (entity, args) =>
+        {
+            _chatBox.OutputTo(entity, $"Enum value: {args.ReadEnum<TestEnum>()}");
         }, new string[] { "Admin" });
 
         FontCollection collection = new();

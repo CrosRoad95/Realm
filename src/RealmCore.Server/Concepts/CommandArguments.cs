@@ -5,6 +5,8 @@ public class CommandArguments
     private readonly string[] _args;
     private readonly IUsersService _usersService;
     private int _index;
+
+    public int Index => _index;
     public Span<string> Arguments => _args;
 
     public CommandArguments(string[] args, IUsersService usersService)
@@ -108,5 +110,23 @@ public class CommandArguments
         if (users.Count == 0)
             throw new CommandArgumentException(_index, "Nie znaleziono żadnego gracza o takiej nazwie", name);
         return users;
+    }
+
+    public TEnum? ReadEnum<TEnum>() where TEnum : struct
+    {
+        var str = ReadArgument();
+        if (int.TryParse(str, out int intValue))
+        {
+            if (Enum.IsDefined(typeof(TEnum), intValue))
+                return (TEnum)Enum.ToObject(typeof(TEnum), intValue);
+        }
+        else
+        {
+            if (Enum.TryParse<TEnum>(str, out var value))
+            {
+                return value;
+            }
+        }
+        throw new CommandArgumentException(_index, null, str);
     }
 }

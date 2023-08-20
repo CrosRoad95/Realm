@@ -181,7 +181,12 @@ public class RealmCommandService
                 if (string.IsNullOrWhiteSpace(ex.Argument))
                     _chatBox.OutputTo(entity, $"Argument {ex.Index} jest niepoprawny ponieważ: {ex.Message}");
                 else
-                    _chatBox.OutputTo(entity, $"Argument {ex.Index} '{ex.Argument}' jest niepoprawny ponieważ: {ex.Message}");
+                    if(ex.Message != null)
+                    {
+                        _chatBox.OutputTo(entity, $"Argument {ex.Index} '{ex.Argument}' jest niepoprawny ponieważ: {ex.Message}");
+                    }
+                    else
+                        _chatBox.OutputTo(entity, $"Argument {ex.Index} '{ex.Argument}' jest niepoprawny.");
             }
             else
             {
@@ -278,7 +283,12 @@ public class RealmCommandService
                 if (string.IsNullOrWhiteSpace(ex.Argument))
                     _chatBox.OutputTo(entity, $"Argument {ex.Index} jest niepoprawny ponieważ: {ex.Message}");
                 else
-                    _chatBox.OutputTo(entity, $"Argument {ex.Index} '{ex.Argument}' jest niepoprawny ponieważ: {ex.Message}");
+                    if(ex.Message != null)
+                    {
+                        _chatBox.OutputTo(entity, $"Argument {ex.Index} '{ex.Argument}' jest niepoprawny ponieważ: {ex.Message}");
+                    }
+                    else
+                        _chatBox.OutputTo(entity, $"Argument {ex.Index} '{ex.Argument}' jest niepoprawny.");
             }
             _logger.LogWarning("Command argument exception was thrown while executing command {commandText} with arguments {commandArguments}, argument index: {argumentIndex}", commandText, args.Arguments, ex.Index);
         }
