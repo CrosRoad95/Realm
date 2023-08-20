@@ -166,6 +166,9 @@ public class MarkerElementComponent : ElementComponent
         if (EntityEntered == null)
             return;
 
+        if (element.Interior != _marker.Interior || element.Dimension != _marker.Dimension)
+            return;
+
         if (!ECS.TryGetByElement(element, out Entity entity))
             return;
 
@@ -196,6 +199,10 @@ public class MarkerElementComponent : ElementComponent
     {
         if (EntityLeft == null)
             return;
+
+        if (element.Interior != _marker.Interior || element.Dimension != _marker.Dimension)
+            return;
+
         if (!ECS.TryGetByElement(element, out Entity entity))
             return;
 
@@ -243,13 +250,18 @@ public class MarkerElementComponent : ElementComponent
         _collisionShape.Position = transform.Position;
     }
 
+    protected override void Detached()
+    {
+        if (!IsPerPlayer)
+            Entity.Transform.PositionChanged -= HandlePositionChanged;
+        base.Detached();
+    }
+
     public override void Dispose()
     {
         _entityEntered = null;
         _entityLeft = null;
         _entityRuleFailed = null;
-        if (!IsPerPlayer)
-            Entity.Transform.PositionChanged -= HandlePositionChanged;
         base.Dispose();
     }
 }

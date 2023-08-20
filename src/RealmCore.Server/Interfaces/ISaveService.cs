@@ -2,6 +2,8 @@
 
 public interface ISaveService
 {
+    event Action<Entity>? EntitySaved;
+
     Task<bool> Save(Entity entity);
     Task Commit();
 

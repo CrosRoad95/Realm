@@ -274,16 +274,104 @@ public class MoneyComponentTests
         var moneyComponent = new MoneyComponent();
         _entityB.AddComponent(moneyComponent);
 
-        _moneyComponent.Money = 10;
+        _moneyComponent.Money = 100;
+        bool success = false;
         var act = async () =>
         {
-            await _moneyComponent.TryTakeMoneyWithCallbackAsync(5, () =>
+            success = await _moneyComponent.TryTakeMoneyWithCallbackAsync(5, () =>
             {
                 return Task.FromResult(true);
             });
         };
 
-        await act.Should().NotThrowAsync();
-        _moneyComponent.Money.Should().Be(5);
+        for (int i = 0; i < 20; i++)
+        {
+            await act.Should().NotThrowAsync();
+            success.Should().BeTrue();
+        }
+        _moneyComponent.Money.Should().Be(0);
+    }
+
+    [Fact]
+    public void TryTakeMoneyWithCallbackShouldFailIfHasNotEnoughMoney()
+    {
+        var moneyComponent = new MoneyComponent();
+        _entityB.AddComponent(moneyComponent);
+
+        _moneyComponent.Money = 100;
+        bool success = _moneyComponent.TryTakeMoneyWithCallback(101, () =>
+        {
+            return true;
+        });
+
+        success.Should().BeFalse();
+        _moneyComponent.Money.Should().Be(100);
+    }
+
+    [Fact]
+    public async Task TryTakeMoneyWithCallbackAsyncShouldFailIfHasNotEnoughMoney()
+    {
+        var moneyComponent = new MoneyComponent();
+        _entityB.AddComponent(moneyComponent);
+
+        _moneyComponent.Money = 100;
+        bool success = await _moneyComponent.TryTakeMoneyWithCallbackAsync(101, () =>
+        {
+            return Task.FromResult(true);
+        });
+
+        success.Should().BeFalse();
+        _moneyComponent.Money.Should().Be(100);
+    }
+
+    [Fact]
+    public void TryTakeMoneyWithCallbackShouldShouldNotTakeMoneyIfCallbackReturnFalse()
+    {
+        var moneyComponent = new MoneyComponent();
+        _entityB.AddComponent(moneyComponent);
+
+        _moneyComponent.Money = 100;
+        bool success = _moneyComponent.TryTakeMoneyWithCallback(50, () =>
+        {
+            return false;
+        });
+
+        success.Should().BeFalse();
+        _moneyComponent.Money.Should().Be(100);
+    }
+
+    [Fact]
+    public async Task TryTakeMoneyWithCallbackAsyncShouldNotTakeMoneyIfCallbackReturnFalse()
+    {
+        var moneyComponent = new MoneyComponent();
+        _entityB.AddComponent(moneyComponent);
+
+        _moneyComponent.Money = 100;
+        bool success = await _moneyComponent.TryTakeMoneyWithCallbackAsync(50, () =>
+        {
+            return Task.FromResult(false);
+        });
+
+        success.Should().BeFalse();
+        _moneyComponent.Money.Should().Be(100);
+    }
+
+    [Fact]
+    public void YouShouldNotBeAbleToSetMoneyInMoneyComponentEvents()
+    {
+        var moneyComponent = new MoneyComponent();
+        _entityB.AddComponent(moneyComponent);
+
+        var act = () =>
+        {
+            _moneyComponent.MoneySet += (that, amount) =>
+            {
+                that.Money = 50;
+            };
+            _moneyComponent.Money = 100;
+        };
+
+        act.Should().Throw<LockRecursionException>();
+        _moneyComponent.Money.Should().Be(100);
     }
 }

@@ -46,10 +46,13 @@ local function findNearestElementToPoint(elements, x,y,z)
 		local vehicle = nearestElement;
 		nearest = 9999999
 		for component in pairs(getVehicleComponents(vehicle))do
-			dis = getDistanceBetweenPoints3D(x,y,z, getVehicleComponentPosition(vehicle, component, "world"))
-			if(nearest > dis)then
-				nearestComponent = component;
-				nearest = dis;
+			local cx,cy,cz = getVehicleComponentPosition(vehicle, component, "world")
+			if(cx and cy and cz)then
+				dis = getDistanceBetweenPoints3D(x,y,z, cx,cy,cz)
+				if(nearest > dis)then
+					nearestComponent = component;
+					nearest = dis;
+				end
 			end
 		end
 	end
