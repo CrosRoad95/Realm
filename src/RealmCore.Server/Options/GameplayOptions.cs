@@ -9,4 +9,5 @@ public class GameplayOptions
     public uint DefaultInventorySize { get; set; }
     public int BanType { get; set; }
     public string Watermark { get; set; }
+    public string? Password { get; set; }
 }

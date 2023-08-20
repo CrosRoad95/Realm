@@ -33,5 +33,8 @@ global using SlipeServer.Server.Services;
 global using RealmCore.Server.Abstractions;
 global using RealmCore.Server.Components.TagComponents;
 global using RealmCore.Server.Rules;
+global using Microsoft.Extensions.Options;
+global using RealmCore.Server.Options;
+global using SlipeServer.Server;
 
 [assembly: ExcludeFromCodeCoverage]

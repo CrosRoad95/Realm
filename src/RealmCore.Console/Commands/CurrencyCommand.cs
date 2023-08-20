@@ -1,7 +1,4 @@
-﻿using Microsoft.Extensions.Options;
-using RealmCore.Server.Options;
-
-namespace RealmCore.Console.Commands;
+﻿namespace RealmCore.Console.Commands;
 
 [CommandName("currency")]
 public sealed class CurrencyCommand : IInGameCommand
