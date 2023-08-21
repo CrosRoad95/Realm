@@ -27,7 +27,6 @@ global using Serilog;
 global using Microsoft.EntityFrameworkCore;
 global using RealmCore.Server.Enums;
 global using RealmCore.Server.Exceptions;
-global using RealmCore.SQLite;
 global using Microsoft.Extensions.Logging;
 global using RealmCore.Persistence;
 global using RealmCore.Persistence.Interfaces;

@@ -103,9 +103,6 @@ internal sealed class RPGServer : IRPGServer
         services.AddSingleton<IElementIdGenerator, RangedCollectionBasedElementIdGenerator>(x =>
             new RangedCollectionBasedElementIdGenerator(x.GetRequiredService<IElementCollection>(), IdGeneratorConstants.PlayerIdStart, IdGeneratorConstants.PlayerIdStop)
         );
-
-        services.AddGrpcModule();
-        services.AddDiscordModule();
     }
 
     public TService GetRequiredService<TService>() where TService : notnull

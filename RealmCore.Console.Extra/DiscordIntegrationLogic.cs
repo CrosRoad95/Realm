@@ -1,6 +1,4 @@
-﻿using RealmCore.Module.Discord.Interfaces;
-
-namespace RealmCore.Console.Logic;
+﻿namespace RealmCore.Console.Logic;
 
 internal sealed class DiscordIntegrationLogic
 {

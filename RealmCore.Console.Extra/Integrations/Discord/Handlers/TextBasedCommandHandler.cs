@@ -1,10 +1,10 @@
-﻿namespace RealmCore.Server.Integrations.Discord.Handlers;
+﻿namespace RealmCore.Console.Integrations.Discord.Handlers;
 
-public class DefaultTextBasedCommandHandler : IDiscordTextBasedCommandHandler
+public class TextBasedCommandHandler : IDiscordTextBasedCommandHandler
 {
     private readonly IDiscordService _discordService;
 
-    public DefaultTextBasedCommandHandler(IDiscordService discordService)
+    public TextBasedCommandHandler(IDiscordService discordService)
     {
         _discordService = discordService;
     }

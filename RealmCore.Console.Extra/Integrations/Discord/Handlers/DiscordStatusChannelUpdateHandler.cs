@@ -1,10 +1,10 @@
-﻿namespace RealmCore.Server.Integrations.Discord.Handlers;
+﻿namespace RealmCore.Console.Integrations.Discord.Handlers;
 
-public class DefaultDiscordStatusChannelUpdateHandler : IDiscordStatusChannelUpdateHandler
+public class DiscordStatusChannelUpdateHandler : IDiscordStatusChannelUpdateHandler
 {
     private readonly IDateTimeProvider _dateTimeProvider;
 
-    public DefaultDiscordStatusChannelUpdateHandler(IDateTimeProvider dateTimeProvider)
+    public DiscordStatusChannelUpdateHandler(IDateTimeProvider dateTimeProvider)
     {
         _dateTimeProvider = dateTimeProvider;
     }

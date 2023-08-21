@@ -1,6 +1,4 @@
-﻿global using System;
-global using System.Threading.Tasks;
-global using System.Numerics;
+﻿global using System.Numerics;
 global using SlipeServer.Packets.Definitions.Lua;
 global using SlipeServer.Server.Events;
 global using SlipeServer.Packets.Lua.Camera;

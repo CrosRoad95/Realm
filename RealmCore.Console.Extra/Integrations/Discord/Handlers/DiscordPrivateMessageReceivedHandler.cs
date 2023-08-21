@@ -1,10 +1,10 @@
-﻿namespace RealmCore.Server.Integrations.Discord.Handlers;
+﻿namespace RealmCore.Console.Integrations.Discord.Handlers;
 
-public class DefaultDiscordPrivateMessageReceivedHandler : IDiscordPrivateMessageReceived
+public class DiscordPrivateMessageReceivedHandler : IDiscordPrivateMessageReceived
 {
     private readonly ChatBox _chatBox;
 
-    public DefaultDiscordPrivateMessageReceivedHandler(ChatBox chatBox)
+    public DiscordPrivateMessageReceivedHandler(ChatBox chatBox)
     {
         _chatBox = chatBox;
     }

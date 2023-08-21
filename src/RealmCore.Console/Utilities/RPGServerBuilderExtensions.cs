@@ -1,6 +1,5 @@
 ﻿using RealmCore.Configuration;
 using RealmCore.Logging;
-using Serilog;
 using Serilog.Events;
 
 namespace RealmCore.Console.Utilities;
@@ -15,8 +14,7 @@ public static class RPGServerBuilderExtensions
 
     public static RPGServerBuilder AddDefaultLogger(this RPGServerBuilder serverBuilder, string? appName = null, string? seqServerUrl = null)
     {
-        var realmLogger = new RealmLogger(appName ?? "RPGServer", LogEventLevel.Information);
-        realmLogger.LoggerConfiguration.WriteTo.Seq("http://localhost:5341");
+        var realmLogger = new RealmLogger(appName ?? "RealmCore", LogEventLevel.Information);
 
         serverBuilder.AddLogger(realmLogger.GetLogger());
         return serverBuilder;

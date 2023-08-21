@@ -1,7 +1,5 @@
 ﻿using RealmCore.Console.Commands;
 using RealmCore.Console.Utilities;
-using RealmCore.Module.Discord.Interfaces;
-using RealmCore.Server.Integrations.Discord.Handlers;
 using RealmCore.Server.Logic;
 using RealmCore.Server.Logic.Defaults;
 using RealmCore.Console.Data.Validators;
@@ -9,22 +7,26 @@ using RealmCore.Resources.CEFBlazorGui;
 using SlipeServer.Resources.DGS;
 using RealmCore.Resources.GuiSystem;
 using RealmCore.Resources.Addons.GuiSystem.DGS;
-using RealmCore.Module.Web.AdminPanel;
-using RealmCore.Module.Grpc;
+using RealmCore.Configuration;
+//using RealmCore.Console.Extra;
 
 Directory.SetCurrentDirectory(Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly()!.Location)!);
 
+var realmConfigurationProvider = new RealmConfigurationProvider();
+System.Console.WriteLine("aaaa1");
 var builder = new RPGServerBuilder();
+builder.AddConfiguration(realmConfigurationProvider);
 builder.AddDefaultLogger()
-    .AddDefaultConsole()
-    .AddDefaultConfiguration();
+    .AddDefaultConsole();
 
+System.Console.WriteLine("aaaa12");
 bool withDgs = true;
 SemaphoreSlim semaphore = new(0);
 
 var server = builder.Build(null, extraBuilderSteps: serverBuilder =>
 {
-    if(withDgs)
+    System.Console.WriteLine("aaaa13");
+    if (withDgs)
     {
         serverBuilder.AddDGSResource(DGSVersion.Release_3_520);
         serverBuilder.AddGuiSystemResource(builder =>
@@ -34,10 +36,12 @@ var server = builder.Build(null, extraBuilderSteps: serverBuilder =>
         }, new());
     }
 
+    System.Console.WriteLine("aaaa4");
     serverBuilder.AddCEFBlazorGuiResource("../../../Server/BlazorGui/wwwroot", CEFGuiBlazorMode.Dev);
 
     serverBuilder.AddLogic<DefaultCommandsLogic>();
 
+    System.Console.WriteLine("aaaa5");
     serverBuilder.AddLogic<PlayerJoinedLogic>();
     serverBuilder.AddLogic<SamplePickupsLogic>();
     serverBuilder.AddLogic<PlayerBindsLogic>();
@@ -47,7 +51,6 @@ var server = builder.Build(null, extraBuilderSteps: serverBuilder =>
     serverBuilder.AddLogic<WorldLogic>();
     serverBuilder.AddLogic<LevelsLogic>();
     serverBuilder.AddLogic<PlayerGameplayLogic>();
-    serverBuilder.AddLogic<DiscordIntegrationLogic>();
     serverBuilder.AddLogic<CommandsLogic>();
     serverBuilder.AddLogic<MapsLogic>();
     serverBuilder.AddLogic<DefaultModulesLogic>();
@@ -56,8 +59,7 @@ var server = builder.Build(null, extraBuilderSteps: serverBuilder =>
     serverBuilder.AddLogic<DefaultBanLogic>();
     serverBuilder.AddLogic<DefaultChatLogic>();
     serverBuilder.AddLogic<BlazorGuiLogic>();
-    serverBuilder.AddLogic<GRpcLogic>();
-    serverBuilder.AddLogic<WebAdminPanelLogic>();
+    System.Console.WriteLine("aaaa6");
 
 #if DEBUG
     if (withDgs)
@@ -68,18 +70,8 @@ var server = builder.Build(null, extraBuilderSteps: serverBuilder =>
 
     serverBuilder.ConfigureServices(services =>
     {
+        System.Console.WriteLine("aaaa7");
         services.AddTransient<IValidator<LoginData>, LoginDataValidator>();
-
-        #region Discord integration specific
-        services.AddSingleton<IDiscordStatusChannelUpdateHandler, DefaultDiscordStatusChannelUpdateHandler>();
-        services.AddSingleton<IDiscordConnectUserHandler, DefaultDiscordConnectUserHandler>();
-        services.AddSingleton<IDiscordPrivateMessageReceived, DefaultDiscordPrivateMessageReceivedHandler>();
-        services.AddSingleton<IDiscordTextBasedCommandHandler, DefaultTextBasedCommandHandler>();
-        #endregion
-
-        #region Web admin panel
-        services.AddWebAdminPanelModule();
-        #endregion
 
         #region In game command
         services.AddInGameCommand<CreateGroupCommand>();
@@ -97,12 +89,15 @@ var server = builder.Build(null, extraBuilderSteps: serverBuilder =>
         services.AddInGameCommand<CurrencyCommand>();
         #endregion
 
+        System.Console.WriteLine("aaaa71");
         services.Configure<BlazorOptions>(options =>
         {
             options.Mode = CEFGuiBlazorMode.Dev;
             options.BrowserSize = new System.Drawing.Size(1024, 768);
         });
     });
+
+    //serverBuilder.AddExtras(realmConfigurationProvider);
 });
 
 Console.CancelKeyPress += (sender, args) =>
@@ -117,7 +112,10 @@ Console.CancelKeyPress += (sender, args) =>
     }
 };
 
+System.Console.WriteLine("aaaa8");
 await server.Start();
+System.Console.WriteLine("aaaa9");
 server.GetRequiredService<IConsole>().Start();
+System.Console.WriteLine("aaaa10");
 await semaphore.WaitAsync();
 Console.WriteLine("Server stopped.");

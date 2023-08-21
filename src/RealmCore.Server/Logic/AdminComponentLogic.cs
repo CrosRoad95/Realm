@@ -1,4 +1,4 @@
-﻿namespace RealmCore.Console.Logic;
+﻿namespace RealmCore.Server.Logic;
 
 internal class AdminComponentLogic : ComponentLogic<AdminComponent>
 {

@@ -1,4 +1,6 @@
-﻿namespace RealmCore.Tests.Tests.Services;
+﻿using RealmCore.SQLite;
+
+namespace RealmCore.Tests.Tests.Services;
 
 public class SaveLoadServiceTests
 {

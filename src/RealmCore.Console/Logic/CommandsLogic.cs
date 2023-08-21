@@ -1,7 +1,4 @@
-﻿using SixLabors.Fonts;
-using SixLabors.ImageSharp.Drawing.Processing;
-using SixLabors.ImageSharp.Formats.Jpeg;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using Color = System.Drawing.Color;
 using Size = System.Drawing.Size;
 using RealmCore.Console.Components.Vehicles;
@@ -12,7 +9,6 @@ using RealmCore.Server.Enums;
 using RealmCore.Server.Extensions.Resources;
 using RealmCore.Console.Components.Huds;
 using RealmCore.Resources.Nametags;
-using RealmCore.Module.Discord.Interfaces;
 using RealmCore.Console.Components;
 using RealmCore.Resources.ElementOutline;
 using RealmCore.Resources.Assets.Factories;
@@ -31,7 +27,6 @@ internal sealed class CommandsLogic
     private readonly ItemsRegistry _itemsRegistry;
     private readonly IECS _ecs;
     private readonly IBanService _banService;
-    private readonly IDiscordService _discordService;
     private readonly ChatBox _chatBox;
     private readonly ILogger<CommandsLogic> _logger;
     private readonly IDateTimeProvider _dateTimeProvider;
@@ -50,7 +45,7 @@ internal sealed class CommandsLogic
     }
 
     public CommandsLogic(RealmCommandService commandService, IEntityFactory entityFactory, RepositoryFactory repositoryFactory,
-        ItemsRegistry itemsRegistry, IECS ecs, IBanService banService, IDiscordService discordService, ChatBox chatBox, ILogger<CommandsLogic> logger,
+        ItemsRegistry itemsRegistry, IECS ecs, IBanService banService, ChatBox chatBox, ILogger<CommandsLogic> logger,
         IDateTimeProvider dateTimeProvider, INametagsService nametagsService, IUsersService userManager, IVehiclesService vehiclesService,
         GameWorld gameWorld, IElementOutlineService elementOutlineService, IAssetsService assetsService, ISpawnMarkersService spawnMarkersService, ILoadService loadService, IFeedbackService feedbackService)
     {
@@ -60,7 +55,6 @@ internal sealed class CommandsLogic
         _itemsRegistry = itemsRegistry;
         _ecs = ecs;
         _banService = banService;
-        _discordService = discordService;
         _chatBox = chatBox;
         _logger = logger;
         _dateTimeProvider = dateTimeProvider;
@@ -660,38 +654,6 @@ internal sealed class CommandsLogic
             }
         });
 
-        _commandService.AddAsyncCommandHandler("discordsendmessage", async (entity, args) =>
-        {
-            var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();
-            var messageId = await _discordService.SendMessage(1079342213097607399, args.ReadAllAsString());
-            _chatBox.OutputTo(entity, $"Wysłano wiadomość, id: {messageId}");
-        });
-
-        _commandService.AddAsyncCommandHandler("discordsendmessagetouser", async (entity, args) =>
-        {
-            var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();
-            var messageId = await _discordService.SendMessageToUser(659910279353729086, args.ReadAllAsString());
-            _chatBox.OutputTo(entity, $"Wysłano wiadomość, id: {messageId}");
-        });
-
-        Stream generateStreamFromString(string s)
-        {
-            var stream = new MemoryStream();
-            var writer = new StreamWriter(stream);
-            writer.Write(s);
-            writer.Flush();
-            stream.Position = 0;
-            return stream;
-        }
-
-        _commandService.AddAsyncCommandHandler("discordsendfile", async (entity, args) =>
-        {
-            var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();
-            var messageId = await _discordService.SendFile(997787973775011853, generateStreamFromString("dowody"), "dowody_na_borsuka.txt", "potwierdzam");
-            _chatBox.OutputTo(entity, $"Wysłano plik, id: {messageId}");
-        });
-
-
         _commandService.AddCommandHandler("testlogs", (entity, args) =>
         {
             _logger.LogInformation("test test 1");
@@ -915,19 +877,6 @@ internal sealed class CommandsLogic
             _chatBox.OutputTo(entity, $"Item regular: {item.GetMetadata("number").GetType()}");
             _chatBox.OutputTo(entity, $"Item cast<int>: {item.GetMetadata<int>("number").GetType()}");
         });
-
-        _discordService.AddTextBasedCommandHandler(1069962155539042314, "test", (userId, parameters) =>
-        {
-            _chatBox.Output($"Użytkownik o id {userId} wpisał komendę 'test' z parametrami: {parameters}");
-            return Task.CompletedTask;
-        });
-
-        _discordService.AddTextBasedCommandHandler(997787973775011853, "gracze", async (userId, parameters) =>
-        {
-            var playerEntities = _ecs.PlayerEntities;
-            await _discordService.SendMessage(997787973775011853, $"Gracze na serwerze: {string.Join(", ", playerEntities.Select(x => x.GetRequiredComponent<PlayerElementComponent>().Name))}");
-        });
-
 
         _commandService.AddCommandHandler("proceduralobject", (entity, args) =>
         {
@@ -1278,64 +1227,6 @@ internal sealed class CommandsLogic
             _chatBox.OutputTo(entity, $"Enum value: {args.ReadEnum<TestEnum>()}");
         }, new string[] { "Admin" });
 
-        FontCollection collection = new();
-        FontFamily family = collection.Add("Server/Fonts/Ratual.otf");
-        Font font = family.CreateFont(24, FontStyle.Regular);
-
-        _discordService.AddTextBasedCommandHandler(997787973775011853, "graczegrafika", async (userId, parameters) =>
-        {
-            var playerEntities = _ecs.PlayerEntities;
-            int width = 480;
-            int height = 60;
-
-            DrawingOptions options = new()
-            {
-                GraphicsOptions = new()
-                {
-                    ColorBlendingMode = PixelColorBlendingMode.Multiply
-                }
-            };
-
-            var encoder = new JpegEncoder()
-            {
-                Quality = 40
-            };
-
-            using var memoryStream = new MemoryStream();
-            using var image = new Image<Rgba32>(width, height);
-
-            image.Mutate(x => x.DrawText($"Gracze na serwerze: {string.Join(", ", playerEntities.Select(x => x.GetRequiredComponent<PlayerElementComponent>().Name))}", font, IronSoftware.Drawing.Color.White, new PointF(10, 10)));
-            image.Save(memoryStream, encoder);
-            memoryStream.Position = 0;
-            await _discordService.SendFile(997787973775011853, memoryStream, "obrazek.jpg", "");
-        });
-
-        _discordService.AddTextBasedCommandHandler(997787973775011853, "testgrafika", async (userId, parameters) =>
-        {
-            int width = 480;
-            int height = 60;
-
-            DrawingOptions options = new()
-            {
-                GraphicsOptions = new()
-                {
-                    ColorBlendingMode = PixelColorBlendingMode.Multiply
-                }
-            };
-
-            var encoder = new JpegEncoder()
-            {
-                Quality = 40
-            };
-
-            using var memoryStream = new MemoryStream();
-            using Image<Rgba32> image = new(width, height);
-
-            image.Mutate(x => x.DrawText(parameters, font, IronSoftware.Drawing.Color.White, new PointF(10, 10)));
-            image.Save(memoryStream, encoder);
-            memoryStream.Position = 0;
-            await _discordService.SendFile(997787973775011853, memoryStream, "obrazek.jpg", "");
-        });
     }
 
     static int _hudPosition = 0;

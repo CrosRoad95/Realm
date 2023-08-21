@@ -1,5 +1,5 @@
-﻿using RealmCore.Console.Logic;
-using RealmCore.Server.Logic.Components;
+﻿using RealmCore.Server.Logic.Components;
+using RealmCore.SQLite;
 using SlipeServer.Resources.Scoreboard;
 
 namespace RealmCore.Server.Extensions;
@@ -32,7 +32,6 @@ public static class ServerBuilderExtensions
         {
             // Options
             services.Configure<GameplayOptions>(realmConfigurationProvider.GetSection("Gameplay"));
-            services.Configure<GrpcOptions>(realmConfigurationProvider.GetSection("Grpc"));
             services.Configure<ServerListOptions>(realmConfigurationProvider.GetSection("ServerList"));
             services.Configure<AssetsOptions>(realmConfigurationProvider.GetSection("Assets"));
 

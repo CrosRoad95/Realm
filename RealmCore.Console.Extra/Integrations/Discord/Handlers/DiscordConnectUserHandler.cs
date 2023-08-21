@@ -1,11 +1,13 @@
-﻿namespace RealmCore.Server.Integrations.Discord.Handlers;
+﻿using RealmCore.Server.Components.Players;
 
-public class DefaultDiscordConnectUserHandler : IDiscordConnectUserHandler
+namespace RealmCore.Console.Integrations.Discord.Handlers;
+
+public class DiscordConnectUserHandler : IDiscordConnectUserHandler
 {
     private readonly IECS _ecs;
-    private readonly ILogger<DefaultDiscordConnectUserHandler> _logger;
+    private readonly ILogger<DiscordConnectUserHandler> _logger;
 
-    public DefaultDiscordConnectUserHandler(IECS ecs, ILogger<DefaultDiscordConnectUserHandler> logger)
+    public DiscordConnectUserHandler(IECS ecs, ILogger<DiscordConnectUserHandler> logger)
     {
         _ecs = ecs;
         _logger = logger;
