@@ -3,6 +3,7 @@ local webBrowser = nil;
 local browser = nil;
 local selectedMode = "";
 local currentPath = "index"
+local isRemote = false;
 
 local function isValidPath(path)
 	if(currentPath == "index" or currentPath == "")then
@@ -75,6 +76,7 @@ end
 
 function handleSetPath(path, force, isAsync)
 	currentPath = path;
+	isRemote = false;
 	if(selectedMode == "dev")then
 		loadBrowserURL(webBrowser, "http://localhost:5220/"..path)
 	elseif(selectedMode == "prod")then
@@ -88,9 +90,17 @@ function handleSetPath(path, force, isAsync)
 	end
 end
 
+function handleSetRemotePath(path)
+	currentPath = path;
+	isRemote = true;
+	loadBrowserURL(webBrowser, path)
+	internalSetVisible(true)
+	showCursor(true, false);
+end
+
 local function handleLoad(mode, x, y)
 	selectedMode = mode;
-	if(mode == "dev")then
+	if(mode == "remote")then
 		browser = guiCreateBrowser( sx / 2 - x / 2, sy / 2 - y / 2, x, y, false, true, false)
 		webBrowser = guiGetBrowser( browser )
 		handleSetVisible(false)
@@ -114,7 +124,7 @@ local function handleLoad(mode, x, y)
 				end
 			end
 		)
-	elseif(mode == "prod")then
+	elseif(mode == "local")then
 		browser = guiCreateBrowser( sx / 2 - x / 2, sy / 2 - y / 2, x, y, true, true, false)
 		webBrowser = guiGetBrowser( browser )
 		handleSetVisible(false)
@@ -154,6 +164,7 @@ addEventHandler("onClientResourceStart", resourceRoot, function()
 	hubBind("ToggleDevTools", handleToggleDevTools)
 	hubBind("SetVisible", handleSetVisible)
 	hubBind("SetPath", handleSetPath)
+	hubBind("SetRemotePath", handleSetRemotePath)
 	hubBind("InvokeAsyncSuccess", handleInvokeAsyncSuccess)
 	hubBind("InvokeAsyncError", handleInvokeAsyncError)
 	

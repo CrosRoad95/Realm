@@ -12,6 +12,7 @@ public class RealmConfigurationProvider : IRealmConfigurationProvider
         _configuration =
             new ConfigurationBuilder()
             .AddJsonFile("appsettings.json", false)
+            .AddJsonFile("appsettings.server.json", true, true)
             .AddJsonFile("appsettings.development.json", true, true)
             .AddJsonFile("appsettings.local.json", true, true)
             .AddEnvironmentVariables()

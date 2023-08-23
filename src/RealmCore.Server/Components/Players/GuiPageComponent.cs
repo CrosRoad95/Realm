@@ -2,9 +2,9 @@
 
 public abstract class GuiPageComponent : Component
 {
-    private BlazorGuiComponent? _blazorGuiComponent;
+    private BrowserGuiComponent? _blazorGuiComponent;
 
-    protected BlazorGuiComponent BlazorGuiComponent => _blazorGuiComponent ?? throw new InvalidOperationException();
+    protected BrowserGuiComponent BlazorGuiComponent => _blazorGuiComponent ?? throw new InvalidOperationException();
 
     public string Path { get; }
     public bool IsAsync { get; }
@@ -18,7 +18,7 @@ public abstract class GuiPageComponent : Component
 
     protected override void Load()
     {
-        _blazorGuiComponent = Entity.GetRequiredComponent<BlazorGuiComponent>();
+        _blazorGuiComponent = Entity.GetRequiredComponent<BrowserGuiComponent>();
         BlazorGuiComponent.Open(Path, false, IsAsync);
         _loaded = true;
     }

@@ -3,7 +3,6 @@ using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using RealmCore.Resources.Base;
 using RealmCore.Resources.Base.Interfaces;
-using RealmCore.Resources.CEFBlazorGui.Messages;
 using SlipeServer.Server;
 using SlipeServer.Server.Elements;
 using SlipeServer.Server.Events;
@@ -67,6 +66,9 @@ internal class CEFBlazorGuiLogic
                 break;
             case SetPathMessage setPathMessage:
                 _luaEventHub.Invoke(setPathMessage.Player, x => x.SetPath(setPathMessage.Path, setPathMessage.Force, setPathMessage.IsAsync));
+                break;
+            case SetRemotePathMessage setRemotePathMessage:
+                _luaEventHub.Invoke(setRemotePathMessage.Player, x => x.SetRemotePath(setRemotePathMessage.Path));
                 break;
         }
     }

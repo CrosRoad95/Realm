@@ -83,8 +83,7 @@ internal class CEFBlazorGuiResource : Resource
         }
         catch (Exception ex)
         {
-            server.GetRequiredService<ILogger<CEFBlazorGuiResource>>().LogError(ex, "Failed to find production files, fallback to dev.");
-            server.GetRequiredService<ICEFBlazorGuiService>().CEFGuiMode = CEFGuiBlazorMode.Dev;
+            server.GetRequiredService<ILogger<CEFBlazorGuiResource>>().LogError(ex, "Failed to find production files.");
         }
     }
 }

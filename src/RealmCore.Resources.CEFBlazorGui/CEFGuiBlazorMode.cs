@@ -2,6 +2,6 @@
 
 public enum CEFGuiBlazorMode
 {
-    Dev,
-    Prod,
+    Remote,
+    Local,
 }

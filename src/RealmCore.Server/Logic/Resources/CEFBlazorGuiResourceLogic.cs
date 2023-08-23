@@ -2,7 +2,7 @@
 
 namespace RealmCore.Server.Logic.Resources;
 
-internal sealed class CEFBlazorGuiResourceLogic : ComponentLogic<BlazorGuiComponent>
+internal sealed class CEFBlazorGuiResourceLogic : ComponentLogic<BrowserGuiComponent>
 {
     private readonly IECS _ecs;
     private readonly ICEFBlazorGuiService _cefBlazorGuiService;
@@ -20,7 +20,7 @@ internal sealed class CEFBlazorGuiResourceLogic : ComponentLogic<BlazorGuiCompon
         _cefBlazorGuiService.RelayVoidAsyncInvoked = HandleInvokeVoidAsyncInvoked;
         _cefBlazorGuiService.RelayAsyncInvoked = HandleInvokeAsyncInvoked;
         _cefBlazorGuiService.RelayPlayerBlazorReady = HandlePlayerBrowserReady;
-        if(blazorOptions.Value.Mode == CEFGuiBlazorMode.Dev)
+        if(blazorOptions.Value.Mode == CEFGuiBlazorMode.Remote)
             _ecs.EntityCreated += HandleEntityCreated;
     }
 
@@ -30,32 +30,39 @@ internal sealed class CEFBlazorGuiResourceLogic : ComponentLogic<BlazorGuiCompon
             HandlePlayerBrowserReadyCore(entity);
     }
 
-    protected override void ComponentAdded(BlazorGuiComponent blazorGuiComponent)
+    protected override void ComponentAdded(BrowserGuiComponent blazorGuiComponent)
     {
         blazorGuiComponent.DevToolsStateChanged += HandleDevToolsStateChanged;
         blazorGuiComponent.PathChanged += HandlePathChanged;
         blazorGuiComponent.VisibleChanged += HandleVisibleChanged;
+        blazorGuiComponent.RemotePathChanged += HandleRemotePathChanged;
     }
 
-    protected override void ComponentRemoved(BlazorGuiComponent blazorGuiComponent)
+    protected override void ComponentRemoved(BrowserGuiComponent blazorGuiComponent)
     {
         blazorGuiComponent.DevToolsStateChanged -= HandleDevToolsStateChanged;
         blazorGuiComponent.PathChanged -= HandlePathChanged;
         blazorGuiComponent.VisibleChanged -= HandleVisibleChanged;
+        blazorGuiComponent.RemotePathChanged -= HandleRemotePathChanged;
     }
 
-    private void HandleVisibleChanged(BlazorGuiComponent blazorGuiComponent, bool visible)
+    private void HandleRemotePathChanged(BrowserGuiComponent blazorGuiComponent, string path)
+    {
+        _cefBlazorGuiService.SetRemotePath(blazorGuiComponent.Entity.Player, path);
+    }
+
+    private void HandleVisibleChanged(BrowserGuiComponent blazorGuiComponent, bool visible)
     {
         _cefBlazorGuiService.SetVisible(blazorGuiComponent.Entity.Player, visible);
     }
 
-    private void HandlePathChanged(BlazorGuiComponent blazorGuiComponent, string? path, bool force, GuiPageType guiType, GuiPageChangeSource guiPageChangeSource)
+    private void HandlePathChanged(BrowserGuiComponent blazorGuiComponent, string? path, bool force, GuiPageType guiType, GuiPageChangeSource guiPageChangeSource)
     {
         if(guiPageChangeSource == GuiPageChangeSource.Server)
             _cefBlazorGuiService.SetPath(blazorGuiComponent.Entity.Player, path ?? "", force, guiType == GuiPageType.Async);
     }
 
-    private void HandleDevToolsStateChanged(BlazorGuiComponent blazorGuiComponent, bool enabled)
+    private void HandleDevToolsStateChanged(BrowserGuiComponent blazorGuiComponent, bool enabled)
     {
         _cefBlazorGuiService.ToggleDevTools(blazorGuiComponent.Entity.Player, enabled);
     }
@@ -67,15 +74,15 @@ internal sealed class CEFBlazorGuiResourceLogic : ComponentLogic<BlazorGuiCompon
             switch(identifier)
             {
                 case "_ready":
-                    if (!entity.HasComponent<BlazorGuiComponent>())
+                    if (!entity.HasComponent<BrowserGuiComponent>())
                         _cefBlazorGuiService.RelayPlayerBlazorReady?.Invoke(player);
                     break;
                 case "_pageReady":
-                    if(_blazorOptions.Value.Mode == CEFGuiBlazorMode.Dev)
+                    if(_blazorOptions.Value.Mode == CEFGuiBlazorMode.Remote)
                         _cefBlazorGuiService.SetVisible(player, true);
                     break;
                 default:
-                    if (entity.TryGetComponent(out BlazorGuiComponent component))
+                    if (entity.TryGetComponent(out BrowserGuiComponent component))
                         await _blazorGuiService.RelayInvokeVoidAsync(component, identifier, args);
                     break;
             }
@@ -86,7 +93,7 @@ internal sealed class CEFBlazorGuiResourceLogic : ComponentLogic<BlazorGuiCompon
     {
         if(_ecs.TryGetEntityByPlayer(player, out var entity))
         {
-            if (entity.TryGetComponent(out BlazorGuiComponent component))
+            if (entity.TryGetComponent(out BrowserGuiComponent component))
                 return _blazorGuiService.RelayInvokeAsync(component, identifier, args);
         }
         return Task.FromResult<object?>(null);
@@ -94,11 +101,11 @@ internal sealed class CEFBlazorGuiResourceLogic : ComponentLogic<BlazorGuiCompon
 
     private void HandlePlayerBrowserReadyCore(Entity playerEntity)
     {
-        if (_blazorOptions.Value.Mode == CEFGuiBlazorMode.Dev)
+        if (_blazorOptions.Value.Mode == CEFGuiBlazorMode.Remote)
             _chatBox.OutputTo(playerEntity, "Aktywowano tryb developerski dla blazor gui.");
 
-        if(!playerEntity.HasComponent<BlazorGuiComponent>())
-            playerEntity.AddComponent<BlazorGuiComponent>();
+        if(!playerEntity.HasComponent<BrowserGuiComponent>())
+            playerEntity.AddComponent<BrowserGuiComponent>();
     }
 
     private void HandlePlayerBrowserReady(Player player)

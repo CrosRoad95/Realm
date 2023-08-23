@@ -2,7 +2,6 @@
 using Microsoft.Extensions.Options;
 using RealmCore.Resources.Base.Interfaces;
 using RealmCore.Resources.CEFBlazorGui.DebugServer;
-using RealmCore.Resources.CEFBlazorGui.Messages;
 using SlipeServer.Server.ElementCollections;
 using SlipeServer.Server.Elements;
 
@@ -30,7 +29,7 @@ internal sealed class CEFBlazorGuiService : ICEFBlazorGuiService
         CEFGuiMode = blazorOptions.Value.Mode;
         _elementCollection = elementCollection;
         _logger = logger;
-        if (blazorOptions.Value.Mode == CEFGuiBlazorMode.Dev)
+        if (blazorOptions.Value.DebuggingServer)
         {
             _blazorDebugServer = new()
             {
@@ -115,5 +114,10 @@ internal sealed class CEFBlazorGuiService : ICEFBlazorGuiService
     public void SetPath(Player player, string path, bool force, bool isAsync)
     {
         MessageHandler?.Invoke(new SetPathMessage(player, path, force, isAsync));
+    }
+
+    public void SetRemotePath(Player player, string path)
+    {
+        MessageHandler?.Invoke(new SetRemotePathMessage(player, path));
     }
 }

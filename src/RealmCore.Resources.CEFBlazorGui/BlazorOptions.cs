@@ -6,4 +6,5 @@ public class BlazorOptions
 {
     public CEFGuiBlazorMode Mode { get; set; }
     public Size BrowserSize { get; set; }
+    public bool DebuggingServer { get; set; }
 }

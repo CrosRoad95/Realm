@@ -25,9 +25,6 @@
 		<PackageReference Include="Serilog.Extensions.Logging" Version="3.1.0" />
 	</ItemGroup>
 	<ItemGroup>
-		<ProjectReference Include="..\RealmCore.Server\RealmCore.Server.csproj" />
-	</ItemGroup>
-	<ItemGroup>
 		<None Update="appsettings.json">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</None>
@@ -40,9 +37,9 @@
 		<Folder Include="Server\Maps\" />
 	</ItemGroup>
 	<ItemGroup>
-		<None Update="net2.so">
-		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-		</None>
+	  <ProjectReference Include="..\RealmCore.Sample\RealmCore.Sample.csproj" />
+	</ItemGroup>
+	<ItemGroup>
 		<None Update="Server\Assets\Fonts\Better Together.otf">
 			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>

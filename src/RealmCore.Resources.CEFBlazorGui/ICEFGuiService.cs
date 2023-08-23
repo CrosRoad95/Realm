@@ -22,4 +22,5 @@ public interface ICEFBlazorGuiService
     void SetPath(Player player, string path, bool force, bool isAsync);
     internal Task HandleInvokeVoidAsyncHandler(Player player, string identifier, string args);
     internal Task<object?> HandleInvokeAsyncHandler(Player player, string identifier, string args);
+    void SetRemotePath(Player player, string path);
 }
