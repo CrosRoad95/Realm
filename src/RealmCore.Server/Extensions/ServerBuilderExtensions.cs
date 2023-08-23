@@ -1,6 +1,8 @@
 ﻿using RealmCore.Server.Logic.Components;
 using RealmCore.SQLite;
 using SlipeServer.Resources.Scoreboard;
+using SlipeServer.Server.AllSeeingEye;
+using System.Runtime.InteropServices;
 
 namespace RealmCore.Server.Extensions;
 
@@ -24,7 +26,7 @@ public static class ServerBuilderExtensions
 #if DEBUG
             serverBuilder.AddDefaults(exceptBehaviours: ServerBuilderDefaultBehaviours.MasterServerAnnouncementBehaviour | exceptBehaviours);
 #else
-            serverBuilder.AddDefaults(exceptBehaviours: exceptBehaviours);
+                        serverBuilder.AddDefaults(exceptBehaviours: exceptBehaviours);
 #endif
         }
 

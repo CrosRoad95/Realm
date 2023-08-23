@@ -11,3 +11,4 @@ RealmRPG/
 *.nupkg
 *.exe
 /src/RealmCore.Console/Server/BlazorGui
+*.keys

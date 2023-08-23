@@ -13,19 +13,16 @@ using RealmCore.Configuration;
 Directory.SetCurrentDirectory(Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly()!.Location)!);
 
 var realmConfigurationProvider = new RealmConfigurationProvider();
-System.Console.WriteLine("aaaa1");
 var builder = new RPGServerBuilder();
 builder.AddConfiguration(realmConfigurationProvider);
 builder.AddDefaultLogger()
     .AddDefaultConsole();
 
-System.Console.WriteLine("aaaa12");
 bool withDgs = true;
 SemaphoreSlim semaphore = new(0);
 
 var server = builder.Build(null, extraBuilderSteps: serverBuilder =>
 {
-    System.Console.WriteLine("aaaa13");
     if (withDgs)
     {
         serverBuilder.AddDGSResource(DGSVersion.Release_3_520);
@@ -36,12 +33,10 @@ var server = builder.Build(null, extraBuilderSteps: serverBuilder =>
         }, new());
     }
 
-    System.Console.WriteLine("aaaa4");
     serverBuilder.AddCEFBlazorGuiResource("../../../Server/BlazorGui/wwwroot", CEFGuiBlazorMode.Dev);
 
     serverBuilder.AddLogic<DefaultCommandsLogic>();
 
-    System.Console.WriteLine("aaaa5");
     serverBuilder.AddLogic<PlayerJoinedLogic>();
     serverBuilder.AddLogic<SamplePickupsLogic>();
     serverBuilder.AddLogic<PlayerBindsLogic>();
@@ -59,7 +54,6 @@ var server = builder.Build(null, extraBuilderSteps: serverBuilder =>
     serverBuilder.AddLogic<DefaultBanLogic>();
     serverBuilder.AddLogic<DefaultChatLogic>();
     serverBuilder.AddLogic<BlazorGuiLogic>();
-    System.Console.WriteLine("aaaa6");
 
 #if DEBUG
     if (withDgs)
@@ -70,7 +64,6 @@ var server = builder.Build(null, extraBuilderSteps: serverBuilder =>
 
     serverBuilder.ConfigureServices(services =>
     {
-        System.Console.WriteLine("aaaa7");
         services.AddTransient<IValidator<LoginData>, LoginDataValidator>();
 
         #region In game command
@@ -89,7 +82,6 @@ var server = builder.Build(null, extraBuilderSteps: serverBuilder =>
         services.AddInGameCommand<CurrencyCommand>();
         #endregion
 
-        System.Console.WriteLine("aaaa71");
         services.Configure<BlazorOptions>(options =>
         {
             options.Mode = CEFGuiBlazorMode.Dev;
@@ -112,10 +104,7 @@ Console.CancelKeyPress += (sender, args) =>
     }
 };
 
-System.Console.WriteLine("aaaa8");
 await server.Start();
-System.Console.WriteLine("aaaa9");
-server.GetRequiredService<IConsole>().Start();
-System.Console.WriteLine("aaaa10");
+//server.GetRequiredService<IConsole>().Start();
 await semaphore.WaitAsync();
 Console.WriteLine("Server stopped.");

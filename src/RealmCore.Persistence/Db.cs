@@ -55,7 +55,8 @@ public abstract class Db<T> : IdentityDbContext<UserData, RoleData, int,
 
     public async Task MigrateAsync()
     {
-        await Database.MigrateAsync();
+        if(Database.IsRelational())
+            await Database.MigrateAsync();
     }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
