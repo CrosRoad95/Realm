@@ -5,7 +5,7 @@ internal class GuiLogic
     private readonly IServiceProvider _serviceProvider;
     private readonly IECS _ecs;
 
-    public GuiLogic(IServiceProvider serviceProvider, RealmServer realmServer, IECS ecs)
+    public GuiLogic(IServiceProvider serviceProvider, IRealmServer realmServer, IECS ecs)
     {
         _serviceProvider = serviceProvider;
         _ecs = ecs;

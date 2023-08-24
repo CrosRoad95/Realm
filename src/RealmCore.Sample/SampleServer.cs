@@ -20,6 +20,8 @@ public class SampleServer
 {
     public async Task Start()
     {
+        Directory.SetCurrentDirectory(Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly()!.Location)!);
+
         bool withDgs = true;
 
         var realmConfigurationProvider = new RealmConfigurationProvider();

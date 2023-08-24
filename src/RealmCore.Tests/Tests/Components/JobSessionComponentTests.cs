@@ -9,7 +9,7 @@ public class JobSessionComponentTests
 {
     private readonly IElementCollection _elementCollection;
     private readonly EntityHelper _entityHelper;
-    private readonly Mock<RealmServer> _realmServerMock = new(MockBehavior.Strict);
+    private readonly Mock<IRealmServer> _realmServerMock = new(MockBehavior.Strict);
     private readonly RealmTestingServer _realmTestingServer;
     private readonly Mock<IGuiSystemService> _guiSystemService = new(MockBehavior.Strict);
 

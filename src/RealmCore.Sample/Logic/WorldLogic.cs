@@ -27,7 +27,7 @@ internal class WorldLogic
 
     private readonly IEntityFactory _entityFactory;
 
-    public WorldLogic(RealmServer realmServer, IEntityFactory entityFactory, IECS ecs)
+    public WorldLogic(IRealmServer realmServer, IEntityFactory entityFactory, IECS ecs)
     {
         _entityFactory = entityFactory;
         realmServer.ServerStarted += HandleServerStarted;
