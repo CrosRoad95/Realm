@@ -18,7 +18,6 @@ global using RealmCore.Server.Registries;
 global using RealmCore.Server.Concepts;
 global using Moq;
 global using RealmCore.Interfaces.Providers;
-global using RealmCore.Interfaces.Server;
 global using RealmCore.Server.Extensions;
 global using RealmCore.Server.Interfaces;
 global using RealmCore.Server.Providers;

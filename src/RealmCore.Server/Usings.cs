@@ -5,7 +5,6 @@ global using System.Numerics;
 global using System.Threading.Tasks;
 global using Microsoft.EntityFrameworkCore;
 global using Microsoft.Extensions.DependencyInjection;
-global using Serilog;
 global using Newtonsoft.Json;
 global using Newtonsoft.Json.Linq;
 
@@ -16,7 +15,6 @@ global using SlipeServer.Server.ElementCollections;
 global using SlipeServer.Server.Services;
 global using SlipeServer.Resources.NoClip;
 global using RealmCore.Server.Commands;
-global using RealmCore.Interfaces.Server;
 global using RealmCore.Server.Extensions;
 global using RealmCore.Server.Interfaces;
 global using RealmCore.Server.Services;

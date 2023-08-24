@@ -3,38 +3,38 @@ using Vehicle = SlipeServer.Server.Elements.Vehicle;
 
 namespace RealmCore.Server.Factories;
 
-internal class EntityFactory : IEntityFactory
+internal sealed class EntityFactory : IEntityFactory
 {
     private readonly IECS _ecs;
     private readonly IVehicleRepository _vehicleRepository;
-    private readonly IRPGServer _rpgServer;
+    private readonly IRealmServer _realmServer;
     private readonly IDateTimeProvider _dateTimeProvider;
-    public EntityFactory(IECS ecs, IVehicleRepository vehicleRepository, IRPGServer rpgServer, IDateTimeProvider dateTimeProvider)
+    public EntityFactory(IECS ecs, IVehicleRepository vehicleRepository, IRealmServer realmServer, IDateTimeProvider dateTimeProvider)
     {
         _ecs = ecs;
         _vehicleRepository = vehicleRepository;
-        _rpgServer = rpgServer;
+        _realmServer = realmServer;
         _dateTimeProvider = dateTimeProvider;
     }
 
     private void AssociateWithServer(Entity entity)
     {
-        if (!_rpgServer.IsReady)
-            throw new InvalidOperationException("Could not create entities in logics constructors.");
+        //if (!_realmServer.IsReady)
+        //    throw new InvalidOperationException("Could not create entities in logics constructors.");
         var elementComponent = entity.GetRequiredComponent<ElementComponent>();
 
         if (!elementComponent.BaseLoaded)
             throw new Exception("Failed to load element entity, base.Load was not called.");
 
         var element = elementComponent.Element;
-        _rpgServer.AssociateElement(element);
+        _realmServer.AssociateElement(element);
         if (element is Pickup pickup)
         {
-            _rpgServer.AssociateElement(pickup.CollisionShape);
+            _realmServer.AssociateElement(pickup.CollisionShape);
         }
         if (elementComponent is MarkerElementComponent markerElementComponent)
         {
-            _rpgServer.AssociateElement(markerElementComponent.CollisionShape);
+            _realmServer.AssociateElement(markerElementComponent.CollisionShape);
         }
     }
 

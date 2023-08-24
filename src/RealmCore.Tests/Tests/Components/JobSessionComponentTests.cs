@@ -9,22 +9,17 @@ public class JobSessionComponentTests
 {
     private readonly IElementCollection _elementCollection;
     private readonly EntityHelper _entityHelper;
-    private readonly Mock<IRPGServer> _rpgServerMock = new(MockBehavior.Strict);
+    private readonly Mock<RealmServer> _realmServerMock = new(MockBehavior.Strict);
     private readonly RealmTestingServer _realmTestingServer;
     private readonly Mock<IGuiSystemService> _guiSystemService = new(MockBehavior.Strict);
 
     public JobSessionComponentTests()
     {
-        _rpgServerMock.Setup(x => x.IsReady).Returns(true);
-        _rpgServerMock.Setup(x => x.AssociateElement(It.IsAny<object>())).Callback<object>(e =>
-        {
-            _elementCollection.Add((Element)e);
-        });
         _realmTestingServer = new(null, services =>
         {
             services.AddSingleton<IEntityFactory, EntityFactory>();
             services.AddSingleton(_guiSystemService.Object);
-            services.AddSingleton(_rpgServerMock.Object);
+            services.AddSingleton(_realmServerMock.Object);
         });
         _entityHelper = new(_realmTestingServer);
         _elementCollection = _realmTestingServer.GetRequiredService<IElementCollection>();

@@ -27,10 +27,10 @@ internal class WorldLogic
 
     private readonly IEntityFactory _entityFactory;
 
-    public WorldLogic(IRPGServer rpgServer, IEntityFactory entityFactory, IECS ecs)
+    public WorldLogic(RealmServer realmServer, IEntityFactory entityFactory, IECS ecs)
     {
         _entityFactory = entityFactory;
-        rpgServer.ServerStarted += HandleServerStarted;
+        realmServer.ServerStarted += HandleServerStarted;
         ecs.EntityCreated += HandleEntityCreated;
     }
 

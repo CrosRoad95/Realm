@@ -1,4 +1,5 @@
 using RealmCore.BlazorGui;
+using RealmCore.Sample;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -24,7 +25,14 @@ app.MapRazorComponents<App>();
 
 Task.Run(async () =>
 {
-    await new SampleServer().Start();
+    try
+    {
+        await new SampleServer().Start();
+    }
+    catch(Exception ex)
+    {
+        Console.Write(ex.ToString());
+    }
 });
 
 app.Run();

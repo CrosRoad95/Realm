@@ -63,14 +63,14 @@ internal class RealmTestingServer : TestingServer
 
         var saveServiceMock = new Mock<ISaveService>(MockBehavior.Strict);
         saveServiceMock.Setup(x => x.SaveNewPlayerInventory(It.IsAny<InventoryComponent>(), It.IsAny<int>())).ReturnsAsync(1);
-        var rpgServerMock = new Mock<IRPGServer>(MockBehavior.Strict);
+        var rpgServerMock = new Mock<IRealmServer>(MockBehavior.Strict);
         serverBuilder.ConfigureServer(testConfigurationProvider ?? new(), SlipeServer.Server.ServerBuilders.ServerBuilderDefaultBehaviours.None);
         serverBuilder.ConfigureServices(services =>
         {
             services.Configure<BlazorOptions>(options =>
             {
                 options.Mode = CEFGuiBlazorMode.Local;
-                options.BrowserSize = new System.Drawing.Size(1024, 768);
+                options.BrowserSize = new Size(1024, 768);
             });
             services.AddSingleton(saveServiceMock.Object);
             services.AddSingleton(rpgServerMock.Object);
@@ -89,7 +89,6 @@ internal class RealmTestingServer : TestingServer
             services.AddSingleton<IBlazorGuiService, BlazorGuiService>();
             services.AddSingleton<IAssetEncryptionProvider, TestAssetEncryptionProvider>();
 
-            services.AddSingleton<IConsole>(new EmptyServerConsole());
             services.AddSingleton<IServerFilesProvider>(new NullServerFilesProvider());
             services.AddLogging(x => x.AddSerilog(new LoggerConfiguration().CreateLogger(), dispose: true));
 

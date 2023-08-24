@@ -18,7 +18,6 @@ global using RealmCore.Server.Services;
 global using RealmCore.Console.Components.Jobs;
 global using RealmCore.Server.Components.Players.Jobs;
 global using RealmCore.Server.Concepts.Objectives;
-global using RealmCore.Interfaces.Server;
 global using Microsoft.Extensions.DependencyInjection;
 global using Microsoft.Extensions.Logging;
 global using RealmCore.Server.Components.Object;

@@ -1,8 +1,6 @@
 ﻿using RealmCore.Server.Logic.Components;
 using RealmCore.SQLite;
 using SlipeServer.Resources.Scoreboard;
-using SlipeServer.Server.AllSeeingEye;
-using System.Runtime.InteropServices;
 
 namespace RealmCore.Server.Extensions;
 
@@ -104,9 +102,6 @@ public static class ServerBuilderExtensions
         serverBuilder.AddLogic<DailyVisitsCounterComponentLogic>();
         serverBuilder.AddLogic<AdminComponentLogic>();
         #endregion
-
-        // Miscellaneous logic
-        serverBuilder.AddLogic<EssentialCommandsLogic>();
 
         return serverBuilder;
     }

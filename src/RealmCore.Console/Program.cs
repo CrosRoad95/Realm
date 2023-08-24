@@ -1,1 +1,3 @@
-﻿await new SampleServer().Start();
+﻿using RealmCore.Sample;
+
+await new SampleServer().Start();

@@ -27,4 +27,67 @@ public static class ServiceCollectionExtensions
         services.AddTransient<TInGameCommand>();
         return services;
     }
+
+    internal static ServiceCollection ConfigureRealmServices(this ServiceCollection services)
+    {
+        var consoleLogger = services.Where(x => x.ImplementationType == typeof(ConsoleLoggerProvider)).FirstOrDefault();
+        if (consoleLogger != null)
+            services.Remove(consoleLogger);
+
+        #region Common
+        services.AddSingleton<IDateTimeProvider, DateTimeProvider>();
+        services.AddSingleton<IAssetEncryptionProvider, AssetEncryptionProvider>();
+        services.AddSingleton<SeederServerBuilder>();
+        services.AddSingleton<RealmCommandService>();
+        #endregion
+
+        #region Registries
+        services.AddSingleton<ItemsRegistry>();
+        services.AddSingleton<VehicleUpgradeRegistry>();
+        services.AddSingleton<LevelsRegistry>();
+        services.AddSingleton<VehicleEnginesRegistry>();
+        #endregion
+
+        #region Security
+        services.AddSingleton<IActiveUsers, ActiveUsers>();
+        #endregion
+
+        #region Common
+        services.AddTransient<IUsersService, UsersService>();
+        services.AddTransient<ISaveService, SaveService>();
+        services.AddTransient<ILoadService, LoadService>();
+        services.AddTransient<IVehiclesService, VehiclesService>();
+        services.AddTransient<IGroupService, GroupService>();
+        services.AddTransient<IFractionService, FractionService>();
+        services.AddTransient<IBanService, BanService>();
+        services.AddTransient<IJobService, JobService>();
+        services.AddTransient<IRewardService, RewardService>();
+        services.AddTransient<IFeedbackService, FeedbackService>();
+        services.AddSingleton<IMapsService, MapsService>();
+        services.AddSingleton<ISpawnMarkersService, SpawnMarkersService>();
+        services.AddSingleton<IBlazorGuiService, BlazorGuiService>();
+        services.AddSingleton<IVehicleAccessService, VehicleAccessService>();
+        #endregion
+
+        #region Policies
+        services.AddSingleton<IPolicyDrivenCommandExecutor, PolicyDrivenCommandExecutor>();
+        #endregion
+
+        services.AddTransient<IEntityFactory, EntityFactory>();
+        services.AddSingleton<IElementIdGenerator, RangedCollectionBasedElementIdGenerator>(x =>
+            new RangedCollectionBasedElementIdGenerator(x.GetRequiredService<IElementCollection>(), IdGeneratorConstants.PlayerIdStart, IdGeneratorConstants.PlayerIdStop)
+        );
+
+        services.AddTransient<ILogger>(x => x.GetRequiredService<ILogger<MtaServer>>());
+#if DEBUG
+        var serverFilesProvider = new ServerFilesProvider("../../../Server");
+#else
+        var serverFilesProvider = new ServerFilesProvider("Server");
+#endif
+        services.AddSingleton<IServerFilesProvider>(serverFilesProvider);
+        services.AddSingleton<IRealmServer>(x => (RealmServer)x.GetRequiredService<MtaServer>());
+
+        return services;
+    }
+
 }

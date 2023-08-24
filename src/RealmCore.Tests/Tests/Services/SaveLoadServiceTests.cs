@@ -1,4 +1,5 @@
 ﻿using RealmCore.SQLite;
+using SlipeServer.Server.Elements;
 
 namespace RealmCore.Tests.Tests.Services;
 
@@ -8,7 +9,7 @@ public class SaveLoadServiceTests
     private readonly Mock<ILogger<LoadService>> _loggerLoadServiceMock = new(MockBehavior.Strict);
     private readonly Mock<ILogger<ECS>> _loggerECSMock = new(MockBehavior.Strict);
     private readonly Mock<ILogger<Entity>> _logger = new(MockBehavior.Strict);
-    private readonly Mock<IRPGServer> _rpgServerMock = new(MockBehavior.Strict);
+    private readonly Mock<IRealmServer> _realmServerMock = new(MockBehavior.Strict);
     private readonly Mock<IElementCollection> _elementCollection = new(MockBehavior.Strict);
     private readonly Mock<VehicleUpgradeRegistry> _vehicleUpgradeRegistry = new(MockBehavior.Strict);
 
@@ -22,10 +23,7 @@ public class SaveLoadServiceTests
 
         services.AddSingleton(_logger.Object);
         _logger.Setup(x => x.BeginScope(It.IsAny<Dictionary<string, object>>())).Returns((IDisposable)null);
-
-        _rpgServerMock.Setup(x => x.IsReady).Returns(true);
-        _rpgServerMock.Setup(x => x.AssociateElement(It.IsAny<object>()));
-
+        _realmServerMock.Setup(x => x.AssociateElement<Element>(It.IsAny<Vehicle>())).Returns(It.IsAny<Vehicle>());
         services.AddPersistence<SQLiteDb>(db => db.UseSqlite($"Filename=./{Path.GetRandomFileName().Replace(".", "")}.db"));
         services.AddSingleton<ISaveService, SaveService>();
         services.AddSingleton<ILoadService, LoadService>();
@@ -37,7 +35,7 @@ public class SaveLoadServiceTests
         services.AddSingleton(_elementCollection.Object);
         services.AddSingleton(_loggerLoadServiceMock.Object);
         services.AddSingleton(_loggerECSMock.Object);
-        services.AddSingleton(_rpgServerMock.Object);
+        services.AddSingleton(_realmServerMock.Object);
         services.AddSingleton(_vehicleUpgradeRegistry.Object);
         services.AddSingleton<IDateTimeProvider>(new TestDateTimeProvider());
         services.AddSingleton(new ItemsRegistry());

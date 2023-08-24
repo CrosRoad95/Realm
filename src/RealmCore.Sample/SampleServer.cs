@@ -8,24 +8,22 @@ using SlipeServer.Resources.DGS;
 using RealmCore.Resources.GuiSystem;
 using RealmCore.Resources.Addons.GuiSystem.DGS;
 using RealmCore.Configuration;
+using RealmCore.Logging;
+using Serilog.Events;
+using Serilog;
+
+namespace RealmCore.Sample;
+
 //using RealmCore.Console.Extra;
 
 public class SampleServer
 {
     public async Task Start()
     {
-        Directory.SetCurrentDirectory(Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly()!.Location)!);
+        bool withDgs = true;
 
         var realmConfigurationProvider = new RealmConfigurationProvider();
-        var builder = new RPGServerBuilder();
-        builder.AddConfiguration(realmConfigurationProvider);
-        builder.AddDefaultLogger()
-            .AddDefaultConsole();
-
-        bool withDgs = true;
-        SemaphoreSlim semaphore = new(0);
-
-        var server = builder.Build(null, extraBuilderSteps: serverBuilder =>
+        var server = new RealmServer(realmConfigurationProvider, serverBuilder =>
         {
             if (withDgs)
             {
@@ -37,7 +35,8 @@ public class SampleServer
                 }, new());
             }
 
-            serverBuilder.AddCEFBlazorGuiResource("../../../Server/BlazorGui/wwwroot", CEFGuiBlazorMode.Remote);
+            serverBuilder.AddCEFBlazorGuiResource();
+            //serverBuilder.AddCEFBlazorGuiResource("../../../Server/BlazorGui/wwwroot", CEFGuiBlazorMode.Remote);
 
             serverBuilder.AddLogic<DefaultCommandsLogic>();
 
@@ -91,26 +90,15 @@ public class SampleServer
                     options.Mode = CEFGuiBlazorMode.Remote;
                     options.BrowserSize = new System.Drawing.Size(1024, 768);
                 });
+
+                var realmLogger = new RealmLogger("RealmCore", LogEventLevel.Information);
+                services.AddLogging(x => x.AddSerilog(realmLogger.GetLogger(), dispose: true));
             });
 
             //serverBuilder.AddExtras(realmConfigurationProvider);
         });
 
-        Console.CancelKeyPress += (sender, args) =>
-        {
-            try
-            {
-                server.Stop().Wait();
-            }
-            finally
-            {
-                semaphore.Release();
-            }
-        };
-
         await server.Start();
-        //server.GetRequiredService<IConsole>().Start();
-        await semaphore.WaitAsync();
-        Console.WriteLine("Server stopped.");
+        System.Console.WriteLine("Server stopped.");
     }
 }

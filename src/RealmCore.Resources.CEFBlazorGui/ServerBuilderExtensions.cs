@@ -6,7 +6,7 @@ namespace RealmCore.Resources.CEFBlazorGui;
 
 public static class ServerBuilderExtensions
 {
-    public static void AddCEFBlazorGuiResource(this ServerBuilder builder, string filesLocation, CEFGuiBlazorMode defaultCEFGuiBlazorMode)
+    public static void AddCEFBlazorGuiResource(this ServerBuilder builder, string? filesLocation = null)
     {
         builder.AddBuildStep(server =>
         {
