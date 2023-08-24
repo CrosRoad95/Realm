@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <Platforms>AnyCPU;x64</Platforms>
+	<IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\RealmCore.Module.Discord\RealmCore.Module.Discord.csproj" />
+		<ProjectReference Include="..\RealmCore.Module.Grpc\RealmCore.Module.Grpc.csproj" />
+		<ProjectReference Include="..\RealmCore.Module.Web.AdminPanel\RealmCore.Module.Web.AdminPanel.csproj" />
+		<ProjectReference Include="..\RealmCore.Server\RealmCore.Server.csproj" />
+	</ItemGroup>
+
+</Project>
