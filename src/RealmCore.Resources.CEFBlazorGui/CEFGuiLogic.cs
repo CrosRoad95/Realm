@@ -25,7 +25,8 @@ internal class CEFBlazorGuiLogic
     {
         luaEventService.AddEventHandler("internalCEFInvokeVoidAsync", HandleCEFInvokeVoidAsync);
         luaEventService.AddEventHandler("internalCEFInvokeAsync", HandleCEFInvokeAsync);
-        luaEventService.AddEventHandler("internalBrowserCreated", HandleBrowserCreated);
+        //luaEventService.AddEventHandler("internalBrowserCreated", HandleBrowserCreated);
+        luaEventService.AddEventHandler("internalBrowserDocumentReady", HandleBrowserDocumentReady);
         _CEFBlazorGuiService = CEFBlazorGuiService;
         _logger = logger;
         _luaEventHub = luaEventHub;
@@ -40,11 +41,13 @@ internal class CEFBlazorGuiLogic
     {
         try
         {
-            await  _resource.StartForAsync(player);
+            await _resource.StartForAsync(player);
             var mode = _blazorOptions.Value.Mode.ToString().ToLower();
             var width = _blazorOptions.Value.BrowserSize.Width;
             var height = _blazorOptions.Value.BrowserSize.Height;
-            _luaEventHub.Invoke(player, x => x.Load(mode, width, height));
+            var remoteUrl = _blazorOptions.Value.BaseRemoteUrl;
+            var requestWhitelistUrl = _blazorOptions.Value.RequestWhitelistUrl;
+            _luaEventHub.Invoke(player, x => x.Load(mode, width, height, remoteUrl, requestWhitelistUrl));
         }
         catch(Exception ex)
         {
@@ -102,7 +105,7 @@ internal class CEFBlazorGuiLogic
         }
     }
 
-    private void HandleBrowserCreated(LuaEvent luaEvent)
+    private void HandleBrowserDocumentReady(LuaEvent luaEvent)
     {
         _CEFBlazorGuiService.HandlePlayerBrowserReady(luaEvent.Player);
     }

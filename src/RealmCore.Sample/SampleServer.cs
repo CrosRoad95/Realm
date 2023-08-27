@@ -11,6 +11,7 @@ using RealmCore.Configuration;
 using RealmCore.Logging;
 using Serilog.Events;
 using Serilog;
+using RealmCore.Sample.Logic;
 
 namespace RealmCore.Sample;
 
@@ -42,6 +43,7 @@ public class SampleServer
 
             serverBuilder.AddLogic<DefaultCommandsLogic>();
 
+            serverBuilder.AddLogic<BrowserGuiComponentLogic>();
             serverBuilder.AddLogic<PlayerJoinedLogic>();
             serverBuilder.AddLogic<SamplePickupsLogic>();
             serverBuilder.AddLogic<PlayerBindsLogic>();
@@ -91,6 +93,8 @@ public class SampleServer
                 {
                     options.Mode = CEFGuiBlazorMode.Remote;
                     options.BrowserSize = new System.Drawing.Size(1024, 768);
+                    options.BaseRemoteUrl = "https://localhost:7149";
+                    options.RequestWhitelistUrl = "localhost";
                 });
 
                 var realmLogger = new RealmLogger("RealmCore", LogEventLevel.Information);

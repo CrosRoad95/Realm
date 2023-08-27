@@ -1229,10 +1229,15 @@ internal sealed class CommandsLogic
         
         _commandService.AddCommandHandler("cefblazor", (entity, args) =>
         {
-            entity.GetRequiredComponent<BrowserGuiComponent>().LoadRemotePage("https://localhost:7149/");
-            //entity.GetRequiredComponent<BrowserGuiComponent>().LoadRemotePage("http://localhost:5000/");
+            entity.GetRequiredComponent<BrowserGuiComponent>().LoadRemotePage("counter");
             _chatBox.OutputTo(entity, "Loaded");
         });
+        _commandService.AddCommandHandler("closeblazor", (entity, args) =>
+        {
+            entity.GetRequiredComponent<BrowserGuiComponent>().Close();
+            _chatBox.OutputTo(entity, "Closed");
+        });
+
 
     }
 

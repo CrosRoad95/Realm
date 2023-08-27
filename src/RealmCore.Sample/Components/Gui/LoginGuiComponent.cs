@@ -6,7 +6,7 @@ namespace RealmCore.Console.Components.Gui;
 public sealed class LoginGuiComponent : GuiComponent
 {
     [Inject]
-    private IUsersService RPGUserManager { get; set; } = default!;
+    private IUsersService usersService { get; set; } = default!;
     [Inject]
     private ILogger<GuiComponent> Logger { get; set; } = default!;
 
@@ -31,7 +31,7 @@ public sealed class LoginGuiComponent : GuiComponent
                     return;
                 }
 
-                var user = await RPGUserManager.GetUserByLogin(loginData.Login);
+                var user = await usersService.GetUserByLogin(loginData.Login);
 
                 if (user == null)
                 {
@@ -39,12 +39,14 @@ public sealed class LoginGuiComponent : GuiComponent
                     return;
                 }
 
-                if (!await RPGUserManager.IsSerialWhitelisted(user.Id, formContext.Entity.GetRequiredComponent<PlayerElementComponent>().Client.Serial))
-                {
-                    Logger.LogWarning("Player logged in to not whitelisted user.");
-                }
+                //if (!await usersService.IsSerialWhitelisted(user.Id, formContext.Entity.GetRequiredComponent<PlayerElementComponent>().Client.Serial))
+                //{
+                //    Logger.LogWarning("Player logged in to not whitelisted user.");
+                //    formContext.ErrorResponse("Nie możesz zalogować się na to konto.");
+                //    return;
+                //}
 
-                if (!await RPGUserManager.CheckPasswordAsync(user, loginData.Password))
+                if (!await usersService.CheckPasswordAsync(user, loginData.Password))
                 {
                     formContext.ErrorResponse("Login lub hasło jest niepoprawne.");
                     return;
@@ -52,7 +54,7 @@ public sealed class LoginGuiComponent : GuiComponent
 
                 try
                 {
-                    if (await RPGUserManager.SignIn(Entity, user))
+                    if (await usersService.SignIn(Entity, user))
                     {
                         Entity.TryDestroyComponent(this);
                         formContext.SuccessResponse();

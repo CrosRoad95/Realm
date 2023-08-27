@@ -242,9 +242,10 @@ internal class UsersService : IUsersService
 
     public Task<bool> IsSerialWhitelisted(int userId, string serial)
     {
-        return _db.UserWhitelistedSerials
+        var query = _db.UserWhitelistedSerials
             .TagWith(nameof(UsersService))
-            .AnyAsync(x => x.UserId == userId && x.Serial == serial);
+            .Where(x => x.UserId == userId && x.Serial == serial);
+        return query.AnyAsync();
     }
 
     public async Task<bool> TryAddWhitelistedSerial(int userId, string serial)

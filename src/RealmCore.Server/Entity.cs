@@ -360,8 +360,8 @@ public sealed class Entity : IDisposable
         {
             if(InternalHasComponent(component))
             {
-                component.Dispose();
                 InternalDetachComponent(component);
+                component.Dispose();
                 return true;
             }
         }
@@ -390,8 +390,8 @@ public sealed class Entity : IDisposable
                 return false;
             try
             {
-                component.Dispose();
                 InternalDetachComponent(component);
+                component.Dispose();
             }
             catch (ObjectDisposedException)
             { }
@@ -411,8 +411,8 @@ public sealed class Entity : IDisposable
     {
         ThrowIfDisposed();
         var component = GetRequiredComponent<TComponent>();
-        component.Dispose();
         DetachComponent(component);
+        component.Dispose();
     }
 
     public override string ToString() => Name;

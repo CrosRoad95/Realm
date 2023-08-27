@@ -71,6 +71,8 @@ internal class RealmTestingServer : TestingServer
             {
                 options.Mode = CEFGuiBlazorMode.Local;
                 options.BrowserSize = new Size(1024, 768);
+                options.BaseRemoteUrl = "https://localhost:7149";
+                options.RequestWhitelistUrl = "localhost";
             });
             services.AddSingleton(saveServiceMock.Object);
             services.AddSingleton(rpgServerMock.Object);

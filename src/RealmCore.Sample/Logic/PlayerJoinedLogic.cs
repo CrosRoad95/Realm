@@ -3,6 +3,7 @@ using RealmCore.Server.Components;
 using RealmCore.Resources.Nametags;
 using RealmCore.Resources.Admin.Enums;
 using RealmCore.Resources.GuiSystem;
+using RealmCore.Server;
 
 namespace RealmCore.Console.Logic;
 
@@ -54,11 +55,6 @@ internal sealed class PlayerJoinedLogic
     {
         try
         {
-            if (component is BrowserGuiComponent blazorGuiComponent)
-            {
-                //blazorGuiComponent.DevTools = true;
-                //blazorGuiComponent.Open("counter");
-            }
             if (component is UserComponent)
             {
                 var entity = component.Entity;

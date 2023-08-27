@@ -47,6 +47,7 @@ public class BrowserGuiComponent : Component
 
     public void LoadRemotePage(string path)
     {
+        Visible = true;
         RemotePathChanged?.Invoke(this, path);
     }
 

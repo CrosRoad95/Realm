@@ -19,15 +19,7 @@ internal sealed class CEFBlazorGuiResourceLogic : ComponentLogic<BrowserGuiCompo
         _chatBox = chatBox;
         _cefBlazorGuiService.RelayVoidAsyncInvoked = HandleInvokeVoidAsyncInvoked;
         _cefBlazorGuiService.RelayAsyncInvoked = HandleInvokeAsyncInvoked;
-        _cefBlazorGuiService.RelayPlayerBlazorReady = HandlePlayerBrowserReady;
-        if(blazorOptions.Value.Mode == CEFGuiBlazorMode.Remote)
-            _ecs.EntityCreated += HandleEntityCreated;
-    }
-
-    private void HandleEntityCreated(Entity entity)
-    {
-        if(entity.HasComponent<PlayerTagComponent>())
-            HandlePlayerBrowserReadyCore(entity);
+        _cefBlazorGuiService.RelayPlayerBrowserReady = HandlePlayerBrowserReady;
     }
 
     protected override void ComponentAdded(BrowserGuiComponent blazorGuiComponent)
@@ -101,9 +93,6 @@ internal sealed class CEFBlazorGuiResourceLogic : ComponentLogic<BrowserGuiCompo
 
     private void HandlePlayerBrowserReadyCore(Entity playerEntity)
     {
-        if (_blazorOptions.Value.Mode == CEFGuiBlazorMode.Remote)
-            _chatBox.OutputTo(playerEntity, "Aktywowano tryb developerski dla blazor gui.");
-
         if(!playerEntity.HasComponent<BrowserGuiComponent>())
             playerEntity.AddComponent<BrowserGuiComponent>();
     }

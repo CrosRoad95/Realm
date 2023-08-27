@@ -4,6 +4,13 @@ local browser = nil;
 local selectedMode = "";
 local currentPath = "index"
 local isRemote = false;
+local trace = true;
+
+local function itrace(...)
+	if(trace)then
+		iprint(...)
+	end
+end
 
 local function isValidPath(path)
 	if(currentPath == "index" or currentPath == "")then
@@ -62,6 +69,7 @@ function handleToggleDevTools(enabled)
 end
 
 function internalSetVisible(visible)
+	itrace("internalSetVisible");
 	guiSetVisible(browser, visible);
 	setBrowserRenderingPaused (webBrowser, not visible);
 end
@@ -90,37 +98,67 @@ function handleSetPath(path, force, isAsync)
 	end
 end
 
+local scheduledVisibility = false;
 function handleSetRemotePath(path)
 	currentPath = path;
 	isRemote = true;
 	loadBrowserURL(webBrowser, path)
-	internalSetVisible(true)
+	scheduledVisibility = true;
 	showCursor(true, false);
 end
 
-local function handleLoad(mode, x, y)
+local function handleLoad(mode, x, y, remoteUrl, requestWhitelistUrl)
 	selectedMode = mode;
+	itrace("internalSetVisible mode, x, y, remoteUrl", mode, x, y, remoteUrl)
 	if(mode == "remote")then
+		if(type(remoteUrl) ~= "string")then
+			error("Remote url is invalid, got: "..tostring(remoteUrl))
+		end
 		browser = guiCreateBrowser( sx / 2 - x / 2, sy / 2 - y / 2, x, y, false, true, false)
 		webBrowser = guiGetBrowser( browser )
 		handleSetVisible(false)
 
 		addEventHandler( "onClientBrowserCreated", webBrowser, 
 			function( )
+				itrace("onClientBrowserCreated")
 				local sourceBrowser = source;
-				if(isBrowserDomainBlocked ( "localhost" ))then
-					requestBrowserDomains({ "localhost" })
+				addEventHandler ( "onClientBrowserNavigate", sourceBrowser, function(...)
+					--if(url == remoteUrl)then
+						itrace("onClientBrowserNavigate", ...);
+						triggerServerEvent("internalBrowserDocumentReady", resourceRoot)
+					--end
+				end)
+				local function handleClientBrowserDocumentReady(url)
+					if(string.find(url, remoteUrl))then
+						itrace("handleClientBrowserDocumentReady", url);
+						triggerServerEvent("internalBrowserDocumentReady", resourceRoot)
+						removeEventHandler ( "onClientBrowserDocumentReady", sourceBrowser, handleClientBrowserDocumentReady)
+					end
+				end
+
+				addEventHandler ( "onClientBrowserDocumentReady", sourceBrowser, handleClientBrowserDocumentReady)
+				addEventHandler ( "onClientBrowserDocumentReady", sourceBrowser, function(...)
+					if(scheduledVisibility)then
+						internalSetVisible(true)
+						scheduledVisibility = false
+					end
+				end)
+				itrace("Request: ",requestWhitelistUrl)
+				if(isBrowserDomainBlocked ( requestWhitelistUrl ))then
+					requestBrowserDomains({ requestWhitelistUrl })
 					local function handleClientBrowserWhitelistChange(newDomains)
-						if newDomains[1] == "localhost" then
+						if newDomains[1] == requestWhitelistUrl then
 							triggerServerEvent("internalBrowserCreated", resourceRoot)
-							--loadBrowserURL( sourceBrowser, "http://localhost:5220/" )
+							itrace("loadurl", requestWhitelistUrl)
+							loadBrowserURL( sourceBrowser, remoteUrl )
 							removeEventHandler("onClientBrowserWhitelistChange", root, handleClientBrowserWhitelistChange);
 						end
 					end
 					addEventHandler("onClientBrowserWhitelistChange", root, handleClientBrowserWhitelistChange);
 				else
 					triggerServerEvent("internalBrowserCreated", resourceRoot)
-					--loadBrowserURL( sourceBrowser, "http://localhost:5220/" )
+					itrace("loadurl", remoteUrl)
+					loadBrowserURL( sourceBrowser, remoteUrl )
 				end
 			end
 		)

@@ -4,7 +4,7 @@ namespace RealmCore.Tests.Classes.Components;
 
 internal class ParentComponent : Component
 {
-    public override void Dispose()
+    protected override void Detached()
     {
         Entity.TryDestroyComponent<ChildComponent>();
     }

@@ -8,7 +8,6 @@ public interface ICEFBlazorGuiService
     event Action<Player>? PlayerCEFBlazorGuiStarted;
     event Action<Player>? PlayerCEFBlazorGuiStopped;
 
-    CEFGuiBlazorMode CEFGuiMode { get; internal set; }
     Action<IMessage>? MessageHandler { get; set; }
     Func<Player, string, string, Task>? RelayVoidAsyncInvoked { get; set; }
     Func<Player, string, string, Task<object?>>? RelayAsyncInvoked { get; set; }

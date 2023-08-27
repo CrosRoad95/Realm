@@ -22,11 +22,12 @@ internal sealed class CEFBlazorGuiService : ICEFBlazorGuiService
     public Action<Player>? RelayPlayerBrowserReady { get; set; }
     public Action<Player>? RelayPlayerBlazorReady { get; set; }
 
-    public CEFGuiBlazorMode CEFGuiMode { get; set; }
+    private readonly Uri? _baseUrl;
 
     public CEFBlazorGuiService(IOptions<BlazorOptions> blazorOptions, IElementCollection elementCollection, ILogger<CEFBlazorGuiService> logger)
     {
-        CEFGuiMode = blazorOptions.Value.Mode;
+        if(blazorOptions.Value.BaseRemoteUrl != null)
+            _baseUrl = new Uri(blazorOptions.Value.BaseRemoteUrl);
         _elementCollection = elementCollection;
         _logger = logger;
         if (blazorOptions.Value.DebuggingServer)
@@ -118,6 +119,9 @@ internal sealed class CEFBlazorGuiService : ICEFBlazorGuiService
 
     public void SetRemotePath(Player player, string path)
     {
-        MessageHandler?.Invoke(new SetRemotePathMessage(player, path));
+        if (_baseUrl == null)
+            throw new Exception("Failed to navigate to remote path without base url");
+        var uri = new Uri(_baseUrl, path).ToString();
+        MessageHandler?.Invoke(new SetRemotePathMessage(player, uri));
     }
 }

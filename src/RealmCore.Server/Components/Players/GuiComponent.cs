@@ -93,10 +93,9 @@ public abstract class GuiComponent : Component
         GuiSystemService.CloseGui(playerElementComponent.Player, _name, _cursorless);
     }
 
-    public override void Dispose()
+    protected override void Detached()
     {
         Close();
-        base.Dispose();
     }
 
     protected virtual Task HandleForm(IFormContext formContext)
