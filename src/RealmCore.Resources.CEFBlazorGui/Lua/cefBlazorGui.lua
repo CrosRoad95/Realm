@@ -4,7 +4,7 @@ local browser = nil;
 local selectedMode = "";
 local currentPath = "index"
 local isRemote = false;
-local trace = true;
+local trace = false;
 
 local function itrace(...)
 	if(trace)then

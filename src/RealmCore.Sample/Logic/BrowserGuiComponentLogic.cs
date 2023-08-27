@@ -8,6 +8,6 @@ internal sealed class BrowserGuiComponentLogic : ComponentLogic<BrowserGuiCompon
 
     protected override void ComponentAdded(BrowserGuiComponent blazorGuiComponent)
     {
-        blazorGuiComponent.LoadRemotePage("counter");
+        //blazorGuiComponent.LoadRemotePage("counter");
     }
 }
