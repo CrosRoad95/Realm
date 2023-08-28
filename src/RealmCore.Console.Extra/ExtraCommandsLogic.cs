@@ -1,5 +1,6 @@
 ﻿using RealmCore.Server;
 using RealmCore.Server.Components.Elements;
+using RealmCore.Server.Components.Elements.Abstractions;
 using RealmCore.Server.Services;
 
 namespace RealmCore.Console.Extra;
@@ -8,9 +9,9 @@ internal class ExtraCommandsLogic
 {
     private readonly IDiscordService _discordService;
     private readonly ChatBox _chatBox;
-    private readonly IECS _ecs;
+    private readonly IEntityEngine _ecs;
 
-    public ExtraCommandsLogic(IDiscordService discordService, RealmCommandService _commandService, ChatBox chatBox, IECS ecs)
+    public ExtraCommandsLogic(IDiscordService discordService, RealmCommandService _commandService, ChatBox chatBox, IEntityEngine ecs)
     {
         _discordService = discordService;
         _chatBox = chatBox;

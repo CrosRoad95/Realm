@@ -1,16 +1,18 @@
-﻿namespace RealmCore.Server.Commands;
+﻿using RealmCore.ECS;
+
+namespace RealmCore.Server.Commands;
 
 [CommandName("serverinfo")]
 internal class ServerInfoCommand : ICommand
 {
     private readonly ILogger<HelpCommand> _logger;
-    private readonly IECS _ecs;
+    private readonly IEntityEngine _ecs;
     private readonly MtaServer _mtaServer;
     private readonly IDateTimeProvider _dateTimeProvider;
     private readonly IElementCollection _elementCollection;
     private readonly IMapsService _mapsService;
 
-    public ServerInfoCommand(ILogger<HelpCommand> logger, IECS ecs, MtaServer mtaServer, IDateTimeProvider dateTimeProvider, IElementCollection elementCollection, IMapsService mapsService)
+    public ServerInfoCommand(ILogger<HelpCommand> logger, IEntityEngine ecs, MtaServer mtaServer, IDateTimeProvider dateTimeProvider, IElementCollection elementCollection, IMapsService mapsService)
     {
         _logger = logger;
         _ecs = ecs;

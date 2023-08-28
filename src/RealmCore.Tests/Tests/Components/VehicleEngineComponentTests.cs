@@ -1,4 +1,5 @@
-﻿using RealmCore.Server.Components.Vehicles;
+﻿using RealmCore.ECS;
+using RealmCore.Server.Components.Vehicles;
 using RealmCore.Server.Concepts.Upgrades;
 using SlipeServer.Server.Constants;
 
@@ -11,7 +12,7 @@ public class VehicleEngineComponentTests
     private readonly VehicleEngineComponent _vehicleEngineComponent;
     private readonly VehicleElementComponent _vehicleElementComponent;
     private readonly VehicleUpgradeRegistry _vehicleUpgradeRegistry;
-    private readonly Mock<IECS> _mock = new(MockBehavior.Strict);
+    private readonly Mock<IEntityEngine> _mock = new(MockBehavior.Strict);
 
     public VehicleEngineComponentTests()
     {
@@ -23,10 +24,10 @@ public class VehicleEngineComponentTests
         var serviceProvider = services.BuildServiceProvider();
         _vehicleUpgradeRegistry = serviceProvider.GetRequiredService<VehicleUpgradeRegistry>();
         var vehicleEnginesRegistry = serviceProvider.GetRequiredService<VehicleEnginesRegistry>();
-        _entity = new(serviceProvider, "test");
-        _vehicleUpgradesComponent = new();
+        _entity = new("test");
+        _vehicleUpgradesComponent = new(_vehicleUpgradeRegistry, vehicleEnginesRegistry);
         _vehicleEngineComponent = new();
-        _vehicleElementComponent = new VehicleElementComponent(new SlipeServer.Server.Elements.Vehicle(SlipeServer.Server.Elements.VehicleModel.Perennial, Vector3.Zero));
+        _vehicleElementComponent = new VehicleElementComponent(new SlipeServer.Server.Elements.Vehicle(SlipeServer.Server.Elements.VehicleModel.Perennial, Vector3.Zero), _mock.Object);
         _entity.AddComponent(_vehicleElementComponent);
         _entity.AddComponent(_vehicleEngineComponent);
         _entity.AddComponent(_vehicleUpgradesComponent);

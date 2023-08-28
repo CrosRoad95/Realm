@@ -1,22 +1,29 @@
-﻿namespace RealmCore.Console.Logic;
+﻿using RealmCore.Resources.Overlay;
+using RealmCore.Server.Extensions.Resources;
+
+namespace RealmCore.Console.Logic;
 
 internal sealed class AchievementsLogic : ComponentLogic<AchievementsComponent>
 {
-    public AchievementsLogic(IECS ecs) : base(ecs) { }
+    private readonly IOverlayService _overlayService;
+
+    public AchievementsLogic(IEntityEngine ecs, IOverlayService overlayService) : base(ecs)
+    {
+        _overlayService = overlayService;
+    }
 
     protected override void ComponentAdded(AchievementsComponent achievementsComponent)
     {
         achievementsComponent.AchievementUnlocked += HandleAchievementUnlocked;
     }
 
-    protected override void ComponentRemoved(AchievementsComponent achievementsComponent)
+    protected override void ComponentDetached(AchievementsComponent achievementsComponent)
     {
         achievementsComponent.AchievementUnlocked -= HandleAchievementUnlocked;
     }
 
     private void HandleAchievementUnlocked(AchievementsComponent achievementsComponent, int achievementName)
     {
-        var playerElementComponent = achievementsComponent.Entity.GetRequiredComponent<PlayerElementComponent>();
-        playerElementComponent.AddNotification($"Odblokowałeś osiągnięcie '{achievementName}'");
+        _overlayService.AddNotification(achievementsComponent.Entity, $"Odblokowałeś osiągnięcie '{achievementName}'");
     }
 }

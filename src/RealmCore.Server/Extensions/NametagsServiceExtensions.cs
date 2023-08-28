@@ -1,14 +1,16 @@
-﻿namespace RealmCore.Server.Extensions;
+﻿using RealmCore.ECS;
+
+namespace RealmCore.Server.Extensions;
 
 public static class NametagsServiceExtensions
 {
     public static void SetNametagRenderingEnabled(this INametagsService service, Entity entity, bool enabled)
     {
-        service.SetNametagRenderingEnabled(entity.Player, enabled);
+        service.SetNametagRenderingEnabled(entity.GetPlayer(), enabled);
     }
 
     public static void SetLocalPlayerRenderingEnabled(this INametagsService service, Entity entity, bool enabled)
     {
-        service.SetLocalPlayerRenderingEnabled(entity.Player, enabled);
+        service.SetLocalPlayerRenderingEnabled(entity.GetPlayer(), enabled);
     }
 }

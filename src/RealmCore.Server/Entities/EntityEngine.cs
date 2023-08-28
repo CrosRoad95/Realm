@@ -1,6 +1,10 @@
-﻿namespace RealmCore.Server.Entities;
+﻿using RealmCore.ECS;
+using RealmCore.ECS.Components;
+using RealmCore.Server.Components.Elements.Abstractions;
 
-internal sealed class ECS : IECS
+namespace RealmCore.Server.Entities;
+
+internal sealed class EntityEngine : IEntityEngine
 {
     private readonly ReaderWriterLockSlim _entitiesLock = new();
     private readonly List<Entity> _entities = new();
@@ -11,7 +15,7 @@ internal sealed class ECS : IECS
     private readonly ConcurrentDictionary<int, Entity> _vehicleById = new();
     private readonly IServiceProvider _serviceProvider;
     private readonly IElementCollection _elementCollection;
-    private readonly ILogger<ECS> _logger;
+    private readonly ILogger<EntityEngine> _logger;
 
     public IReadOnlyCollection<Entity> Entities
     {
@@ -66,7 +70,7 @@ internal sealed class ECS : IECS
     public event Action<Entity>? EntityCreated;
     public Entity Console { get; }
 
-    public ECS(IServiceProvider serviceProvider, IElementCollection elementCollection, ILogger<ECS> logger)
+    public EntityEngine(IServiceProvider serviceProvider, IElementCollection elementCollection, ILogger<EntityEngine> logger)
     {
         _serviceProvider = serviceProvider;
         _elementCollection = elementCollection;
@@ -146,7 +150,7 @@ internal sealed class ECS : IECS
         if (_entityByName.ContainsKey(name))
             throw new EntityAlreadyExistsException(name);
 
-        var newlyCreatedEntity = new Entity(_serviceProvider, name);
+        var newlyCreatedEntity = new Entity(name);
 
         InternalEntityCreated(newlyCreatedEntity);
         entityBuilder?.Invoke(newlyCreatedEntity);
@@ -215,14 +219,14 @@ internal sealed class ECS : IECS
 
     private void HandleElementEntityPreDisposed(Entity elementEntity)
     {
-        _entityByElement.Remove(elementEntity.Element, out var _);
+        _entityByElement.Remove(elementEntity.GetElement(), out var _);
         elementEntity.PreDisposed -= HandleElementEntityPreDisposed;
     }
 
     private void HandlePlayerEntityDestroyed(Entity playerEntity)
     {
         playerEntity.Disposed -= HandlePlayerEntityDestroyed;
-        _entityByPlayer.Remove(playerEntity.Player, out var _);
+        _entityByPlayer.Remove(playerEntity.GetPlayer(), out var _);
     }
 
     private void HandleDisposed(Entity entity)

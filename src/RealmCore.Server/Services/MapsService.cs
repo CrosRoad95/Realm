@@ -1,4 +1,6 @@
-﻿namespace RealmCore.Server.Services;
+﻿using RealmCore.ECS;
+
+namespace RealmCore.Server.Services;
 
 internal class MapsService : IMapsService
 {
@@ -34,7 +36,7 @@ internal class MapsService : IMapsService
 
     public void LoadMapFor(string name, Entity entity)
     {
-        var player = entity.Player;
+        var player = entity.GetPlayer();
         lock (_lock)
         {
             if (!_maps.TryGetValue(name, out var map))
@@ -47,7 +49,7 @@ internal class MapsService : IMapsService
     
     public void LoadAllMapsFor(Entity entity)
     {
-        var player = entity.Player;
+        var player = entity.GetPlayer();
         lock (_lock)
         {
             foreach (var map in _maps)

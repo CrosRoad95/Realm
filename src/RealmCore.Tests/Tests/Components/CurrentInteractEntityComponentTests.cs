@@ -1,4 +1,6 @@
-﻿namespace RealmCore.Tests.Tests.Components;
+﻿using RealmCore.ECS;
+
+namespace RealmCore.Tests.Tests.Components;
 
 public class CurrentInteractEntityComponentTests
 {
@@ -16,10 +18,10 @@ public class CurrentInteractEntityComponentTests
 
         var serviceProvider = services.BuildServiceProvider();
 
-        _entity = new(serviceProvider, "test1");
-        _testEntity = new(serviceProvider, "test2");
-        _entity2 = new(serviceProvider, "test3");
-        _testEntity2 = new(serviceProvider, "test4");
+        _entity = new("test1");
+        _testEntity = new("test2");
+        _entity2 = new("test3");
+        _testEntity2 = new("test4");
     }
 
     [Fact]

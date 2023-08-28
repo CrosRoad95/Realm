@@ -1,15 +1,14 @@
-﻿namespace RealmCore.Server.Components.Elements;
+﻿using RealmCore.ECS;
+using RealmCore.ECS.Components;
+using RealmCore.Server.Components.Elements.Abstractions;
+
+namespace RealmCore.Server.Components.Elements;
 
 public class MarkerElementComponent : ElementComponent
 {
-    [Inject]
-    private IECS ECS { get; set; } = default!;
-    [Inject]
-    private ILogger<MarkerElementComponent> Logger { get; set; } = default!;
-    [Inject]
-    private IElementCollection ElementCollection { get; set; } = default!;
-
     protected readonly Marker _marker;
+    private readonly IElementCollection _elementCollection;
+    private readonly IEntityEngine _entityEngine;
     protected readonly CollisionSphere _collisionShape;
     internal override Element Element => _marker;
     internal CollisionSphere CollisionShape => _collisionShape;
@@ -118,9 +117,11 @@ public class MarkerElementComponent : ElementComponent
 
     private readonly List<IEntityRule> _entityRules = new();
 
-    internal MarkerElementComponent(Marker marker)
+    internal MarkerElementComponent(Marker marker, IElementCollection elementCollection, IEntityEngine entityEngine)
     {
         _marker = marker;
+        _elementCollection = elementCollection;
+        _entityEngine = entityEngine;
         _collisionShape = new CollisionSphere(marker.Position, _marker.Size);
     }
 
@@ -130,10 +131,10 @@ public class MarkerElementComponent : ElementComponent
 
         if (_collisionShape is CollisionSphere collisionSphere)
         {
-            var elements = ElementCollection.GetWithinRange(_collisionShape.Position, collisionSphere.Radius);
+            var elements = _elementCollection.GetWithinRange(_collisionShape.Position, collisionSphere.Radius);
             foreach (var element in elements)
             {
-                if (ECS.TryGetByElement(element, out Entity entity))
+                if (_entityEngine.TryGetByElement(element, out Entity entity))
                     CheckCollisionWith(entity);
             }
         }
@@ -169,7 +170,7 @@ public class MarkerElementComponent : ElementComponent
         if (element.Interior != _marker.Interior || element.Dimension != _marker.Dimension)
             return;
 
-        if (!ECS.TryGetByElement(element, out Entity entity))
+        if (!_entityEngine.TryGetByElement(element, out Entity entity))
             return;
 
         var tag = entity.GetRequiredComponent<TagComponent>();
@@ -191,7 +192,7 @@ public class MarkerElementComponent : ElementComponent
         }
         catch (Exception ex)
         {
-            Logger.LogError(ex, "Failed to invoke entity entered callback");
+            // TODO: log
         }
     }
 
@@ -203,7 +204,7 @@ public class MarkerElementComponent : ElementComponent
         if (element.Interior != _marker.Interior || element.Dimension != _marker.Dimension)
             return;
 
-        if (!ECS.TryGetByElement(element, out Entity entity))
+        if (!_entityEngine.TryGetByElement(element, out Entity entity))
             return;
 
         var tag = entity.GetRequiredComponent<TagComponent>();
@@ -218,7 +219,7 @@ public class MarkerElementComponent : ElementComponent
             }
             catch (Exception ex)
             {
-                Logger.LogError(ex, "Failed to invoke entity left callback");
+                // TODO: log
             }
         }
     }
@@ -231,9 +232,9 @@ public class MarkerElementComponent : ElementComponent
         _collisionShape.Destroy();
     }
 
-    protected override void Load()
+    protected override void Attach()
     {
-        base.Load();
+        base.Attach();
         if (Entity.TryGetComponent(out PlayerElementComponent playerElementComponent))
             _collisionShape.Id = (ElementId)playerElementComponent.MapIdGenerator.GetId();
 
@@ -245,16 +246,16 @@ public class MarkerElementComponent : ElementComponent
             Entity.Transform.PositionChanged += HandlePositionChanged;
     }
 
-    private void HandlePositionChanged(Transform transform, Vector3 position)
+    private void HandlePositionChanged(Transform transform, Vector3 position, bool sync)
     {
         _collisionShape.Position = transform.Position;
     }
 
-    protected override void Detached()
+    protected override void Detach()
     {
         if (!IsPerPlayer)
             Entity.Transform.PositionChanged -= HandlePositionChanged;
-        base.Detached();
+        base.Detach();
     }
 
     public override void Dispose()

@@ -1,4 +1,7 @@
-﻿namespace RealmCore.Server.Rules;
+﻿using RealmCore.ECS;
+using RealmCore.ECS.Components;
+
+namespace RealmCore.Server.Rules;
 
 public sealed class MustHaveComponent<TComponent> : IEntityRule
     where TComponent : Component

@@ -1,4 +1,6 @@
-﻿namespace RealmCore.Server.Components.Players;
+﻿using RealmCore.ECS.Components;
+
+namespace RealmCore.Server.Components.Players;
 
 public abstract class GuiPageComponent : Component
 {
@@ -16,7 +18,7 @@ public abstract class GuiPageComponent : Component
         IsAsync = isAsync;
     }
 
-    protected override void Load()
+    protected override void Attach()
     {
         _blazorGuiComponent = Entity.GetRequiredComponent<BrowserGuiComponent>();
         BlazorGuiComponent.Open(Path, false, IsAsync);

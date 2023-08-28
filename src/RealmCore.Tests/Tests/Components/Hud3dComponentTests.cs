@@ -1,4 +1,5 @@
-﻿using RealmCore.Resources.Assets.Interfaces;
+﻿using RealmCore.ECS;
+using RealmCore.Resources.Assets.Interfaces;
 using RealmCore.Resources.Overlay;
 using SlipeServer.Packets.Definitions.Lua;
 using Color = System.Drawing.Color;
@@ -30,7 +31,7 @@ public class Hud3dComponentTests
     public void TestHud3dComponentShouldProduceAppropriateCallback()
     {
         #region Arrange
-        var entity = new Entity(_serviceProvider, "test");
+        var entity = new Entity("test");
         entity.Transform.Position = new Vector3(100, 100, 100);
         int callCount = 0;
         string _id = string.Empty;
@@ -76,7 +77,7 @@ public class Hud3dComponentTests
     public void TestDetectedDynamicHudComponents()
     {
         #region Arrange
-        var entity = new Entity(_serviceProvider, "test");
+        var entity = new Entity("test");
         #endregion
 
         #region Act
@@ -95,7 +96,7 @@ public class Hud3dComponentTests
     public void UpdateStateShouldProduceAppropriateCallback()
     {
         #region Arrange
-        var entity = new Entity(_serviceProvider, "test");
+        var entity = new Entity("test");
 
         int callsCount = 0;
         string _id = string.Empty;
@@ -134,7 +135,7 @@ public class Hud3dComponentTests
     public void Hud3dShouldBeRemovedWhenComponentGetRemoved()
     {
         #region Arrange
-        var entity = new Entity(_serviceProvider, "test");
+        var entity = new Entity("test");
 
         string _id = string.Empty;
         _overlayService.Hud3dRemoved = id =>
@@ -158,7 +159,7 @@ public class Hud3dComponentTests
     public void ItIsNotAllowedToUpdateStatelessHud()
     {
         #region Arrange
-        var entity = new Entity(_serviceProvider, "test");
+        var entity = new Entity("test");
         var hud3d = entity.AddComponent<SampleStateLessHud3d>();
         #endregion
 

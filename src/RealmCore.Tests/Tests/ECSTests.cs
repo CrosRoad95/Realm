@@ -1,8 +1,10 @@
-﻿namespace RealmCore.Tests.Tests;
+﻿using RealmCore.ECS;
+
+namespace RealmCore.Tests.Tests;
 
 public class ECSTests
 {
-    private readonly ECS _ecs; 
+    private readonly IEntityEngine _ecs; 
     private readonly Mock<IElementCollection> _elementCollection = new();
     private readonly Mock<ILogger<Entity>> _logger = new(MockBehavior.Strict);
     public ECSTests()
@@ -10,7 +12,7 @@ public class ECSTests
         var services = new ServiceCollection();
         _logger.SetupLogger();
         services.AddSingleton(_logger.Object);
-        _ecs = new ECS(services.BuildServiceProvider(), _elementCollection.Object, null);
+        _ecs = new EntityEngine(services.BuildServiceProvider(), _elementCollection.Object, null);
     }
 
     [Fact]

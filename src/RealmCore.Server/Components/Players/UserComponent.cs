@@ -1,16 +1,15 @@
-﻿using RealmCore.Persistence.Data;
+﻿using Microsoft.AspNetCore.Identity;
+using RealmCore.ECS.Components;
+using RealmCore.Persistence.Data;
 
 namespace RealmCore.Server.Components.Players;
 
 [ComponentUsage(false)]
 public class UserComponent : AsyncComponent
 {
-    [Inject]
-    private UserManager<UserData> UserManager { get; set; } = default!;
-    [Inject]
-    private SignInManager<UserData> SignInManager { get; set; } = default!;
-
     private readonly UserData? _user;
+    private readonly SignInManager<UserData> _signInManager;
+    private readonly UserManager<UserData> _userManager;
     private ClaimsPrincipal _claimsPrincipal = default!;
     private List<int> _upgrades = new();
     private object _upgradesLock = new();
@@ -29,10 +28,11 @@ public class UserComponent : AsyncComponent
     public event Action<UserComponent, ClaimsPrincipal>? ClaimsPrincipalUpdated;
     private readonly List<string> _roles = new();
 
-    public UserComponent() { }
-    internal UserComponent(UserData user)
+    internal UserComponent(UserData user, SignInManager<UserData> signInManager, UserManager<UserData> userManager)
     {
         _user = user;
+        _signInManager = signInManager;
+        _userManager = userManager;
         _upgrades = _user.Upgrades.Select(x => x.UpgradeId).ToList();
         foreach (var item in _user.Settings)
         {
@@ -52,7 +52,7 @@ public class UserComponent : AsyncComponent
 
         _roles.Clear();
         _roles.AddRange(await GetRolesAsync());
-        _claimsPrincipal = await SignInManager.CreateUserPrincipalAsync(_user);
+        _claimsPrincipal = await _signInManager.CreateUserPrincipalAsync(_user);
         foreach (var role in _roles)
         {
             ((ClaimsIdentity)_claimsPrincipal.Identity).AddClaim(new Claim(ClaimTypes.Role, role));
@@ -92,7 +92,7 @@ public class UserComponent : AsyncComponent
         if (_user == null)
             return false;
 
-        var result = await UserManager.AddClaimAsync(_user, new Claim(type, value));
+        var result = await _userManager.AddClaimAsync(_user, new Claim(type, value));
         if (result.Succeeded)
             await UpdateClaimsPrincipal();
         return result.Succeeded;
@@ -105,7 +105,7 @@ public class UserComponent : AsyncComponent
         if (_user == null)
             return false;
 
-        var result = await UserManager.AddClaimsAsync(_user, claims.Select(x => new Claim(x.Key, x.Value)));
+        var result = await _userManager.AddClaimsAsync(_user, claims.Select(x => new Claim(x.Key, x.Value)));
         if (result.Succeeded)
             await UpdateClaimsPrincipal();
         return result.Succeeded;
@@ -121,7 +121,7 @@ public class UserComponent : AsyncComponent
         if (_user == null)
             return false;
 
-        var result = await UserManager.AddToRoleAsync(_user, role);
+        var result = await _userManager.AddToRoleAsync(_user, role);
         if (result.Succeeded)
             await UpdateClaimsPrincipal();
         return result.Succeeded;
@@ -139,7 +139,7 @@ public class UserComponent : AsyncComponent
         if (_user == null)
             return false;
 
-        var result = await UserManager.AddToRolesAsync(_user, rolesToAdd);
+        var result = await _userManager.AddToRolesAsync(_user, rolesToAdd);
         if (result.Succeeded)
             await UpdateClaimsPrincipal();
         return result.Succeeded;
@@ -152,7 +152,7 @@ public class UserComponent : AsyncComponent
         if (_user == null)
             return new List<string>().AsReadOnly();
 
-        return (await UserManager.GetClaimsAsync(_user)).Select(x => x.Type).ToList();
+        return (await _userManager.GetClaimsAsync(_user)).Select(x => x.Type).ToList();
     }
 
     public async Task<IReadOnlyList<string>> GetRolesAsync()
@@ -162,7 +162,7 @@ public class UserComponent : AsyncComponent
         if (_user == null)
             return new List<string>().AsReadOnly();
 
-        return (await UserManager.GetRolesAsync(_user)).ToList().AsReadOnly();
+        return (await _userManager.GetRolesAsync(_user)).ToList().AsReadOnly();
     }
 
     public IReadOnlyList<string> GetRoles()
@@ -179,7 +179,7 @@ public class UserComponent : AsyncComponent
         if (_user == null)
             return false;
 
-        var claims = await UserManager.GetClaimsAsync(_user);
+        var claims = await _userManager.GetClaimsAsync(_user);
         Claim? claim;
         if (value != null)
             claim = claims.FirstOrDefault(x => x.Type == type && x.Value == value);
@@ -188,7 +188,7 @@ public class UserComponent : AsyncComponent
 
         if (claim != null)
         {
-            var result = await UserManager.RemoveClaimAsync(_user, claim);
+            var result = await _userManager.RemoveClaimAsync(_user, claim);
             if (result.Succeeded)
                 await UpdateClaimsPrincipal();
             return result.Succeeded;
@@ -206,7 +206,7 @@ public class UserComponent : AsyncComponent
         if (_user == null)
             return false;
 
-        var result = await UserManager.RemoveFromRoleAsync(_user, role);
+        var result = await _userManager.RemoveFromRoleAsync(_user, role);
         if (result.Succeeded)
             await UpdateClaimsPrincipal();
         return result.Succeeded;
@@ -219,8 +219,8 @@ public class UserComponent : AsyncComponent
         if (_user == null)
             return false;
 
-        var claims = await UserManager.GetClaimsAsync(_user);
-        var result = await UserManager.RemoveClaimsAsync(_user, claims);
+        var claims = await _userManager.GetClaimsAsync(_user);
+        var result = await _userManager.RemoveClaimsAsync(_user, claims);
         if (result.Succeeded)
             await UpdateClaimsPrincipal();
         return result.Succeeded;

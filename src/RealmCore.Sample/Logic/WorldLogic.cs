@@ -1,6 +1,10 @@
-﻿using RealmCore.Server.Components;
+﻿using RealmCore.ECS;
+using RealmCore.ECS.Components;
+using RealmCore.Resources.ClientInterface;
+using RealmCore.Resources.Overlay;
 using RealmCore.Server.Components.Elements.CollisionShapes;
 using SlipeServer.Server.Enums;
+using RealmCore.Server.Extensions.Resources;
 
 namespace RealmCore.Console.Logic;
 
@@ -26,10 +30,12 @@ internal class WorldLogic
     };
 
     private readonly IEntityFactory _entityFactory;
+    private readonly IOverlayService _overlayService;
 
-    public WorldLogic(IRealmServer realmServer, IEntityFactory entityFactory, IECS ecs)
+    public WorldLogic(IRealmServer realmServer, IEntityFactory entityFactory, IEntityEngine ecs, IOverlayService overlayService)
     {
         _entityFactory = entityFactory;
+        _overlayService = overlayService;
         realmServer.ServerStarted += HandleServerStarted;
         ecs.EntityCreated += HandleEntityCreated;
     }
@@ -79,12 +85,13 @@ internal class WorldLogic
     {
         if (newlyDiscovered)
         {
-            entity.GetRequiredComponent<PlayerElementComponent>().AddNotification($"Pomyślnie odkryłes miejscowke: {discoverId}");
+            _overlayService.AddNotification(entity, $"Pomyślnie odkryłes miejscowke: {discoverId}");
         }
 
         if (_discoveryInfos.TryGetValue(discoverId, out var value))
         {
-            _entityFactory.CreateBlipFor(entity, value.blipIcon, value.position);
+            using var scopedEntityFactory = _entityFactory.CreateScopedEntityFactory(entity);
+            scopedEntityFactory.CreateBlip(value.blipIcon, value.position);
         }
     }
 

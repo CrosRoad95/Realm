@@ -4,7 +4,7 @@ internal class VehicleAccessControllerComponentLogic : ComponentLogic<VehicleAcc
 {
     private readonly IVehicleAccessService _vehicleAccessService;
 
-    public VehicleAccessControllerComponentLogic(IECS ecs, IVehicleAccessService vehicleAccessService) : base(ecs)
+    public VehicleAccessControllerComponentLogic(IEntityEngine ecs, IVehicleAccessService vehicleAccessService) : base(ecs)
     {
         _vehicleAccessService = vehicleAccessService;
     }
@@ -27,7 +27,7 @@ internal class VehicleAccessControllerComponentLogic : ComponentLogic<VehicleAcc
         base.ComponentAdded(vehicleAccessControllerComponent);
     }
 
-    protected override void ComponentRemoved(VehicleAccessControllerComponent vehicleAccessControllerComponent)
+    protected override void ComponentDetached(VehicleAccessControllerComponent vehicleAccessControllerComponent)
     {
         vehicleAccessControllerComponent.Entity.GetRequiredComponent<VehicleElementComponent>().Vehicle.CanEnter = null;
     }

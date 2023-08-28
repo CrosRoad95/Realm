@@ -1,4 +1,6 @@
-﻿namespace RealmCore.Server.Concepts;
+﻿using RealmCore.ECS;
+
+namespace RealmCore.Server.Concepts;
 
 internal sealed class Map
 {
@@ -48,7 +50,7 @@ internal sealed class Map
         _boundingBox = new BoundingBox((min + max) * 0.5f, max - min);
     }
 
-    public bool IsCreatedFor(Entity entity) => IsCreatedFor(entity.Player);
+    public bool IsCreatedFor(Entity entity) => IsCreatedFor(entity.GetPlayer());
     public bool IsCreatedFor(Player player)
     {
         lock (_lock)
@@ -57,7 +59,7 @@ internal sealed class Map
         }
     }
 
-    public bool LoadForPlayer(Entity entity) => LoadForPlayer(entity.Player);
+    public bool LoadForPlayer(Entity entity) => LoadForPlayer(entity.GetPlayer());
     public bool LoadForPlayer(Player player)
     {
         lock(_lock)

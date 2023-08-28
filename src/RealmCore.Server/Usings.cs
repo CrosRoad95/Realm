@@ -21,7 +21,6 @@ global using RealmCore.Server.Services;
 global using RealmCore.Resources.ClientInterface;
 global using RealmCore.Resources.GuiSystem;
 global using RealmCore.Resources.Base;
-global using RealmCore.Server.Factories;
 global using RealmCore.Configuration;
 global using RealmCore.Resources.AFK;
 global using RealmCore.Resources.Admin;
@@ -115,6 +114,12 @@ global using RealmCore.Server.Abstractions;
 global using RealmCore.Server.Components.Vehicles.Access;
 global using RealmCore.Server.Components.TagComponents;
 global using System.Xml.Linq;
+global using RealmCore.ECS.Attributes;
+global using RealmCore.ECS.Components;
+global using RealmCore.Resources.Admin.Enums;
+global using RealmCore.ECS;
+global using RealmCore.Server.Extensions.Resources;
+global using RealmCore.Server.Interfaces.Abstractions;
 
 global using ILogger = Microsoft.Extensions.Logging.ILogger;
 

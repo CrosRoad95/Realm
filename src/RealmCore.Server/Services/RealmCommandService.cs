@@ -1,4 +1,5 @@
 ﻿using Polly.RateLimit;
+using RealmCore.ECS;
 using RealmCore.Logging;
 
 namespace RealmCore.Server.Services;
@@ -30,7 +31,7 @@ public class RealmCommandService
     }
 
     private readonly CommandService _commandService;
-    private readonly IECS _ecs;
+    private readonly IEntityEngine _ecs;
     private readonly IUsersService _usersService;
     private readonly IPolicyDrivenCommandExecutor _policyDrivenCommandExecutor;
     private readonly ChatBox _chatBox;
@@ -43,7 +44,7 @@ public class RealmCommandService
     public List<string> CommandNames => _commands.Keys.Concat(_asyncCommands.Keys).ToList();
     public int Count => _commands.Count + _asyncCommands.Count;
 
-    public RealmCommandService(CommandService commandService, ILogger<RealmCommandService> logger, IECS ecs, IUsersService usersService, IPolicyDrivenCommandExecutor policyDrivenCommandExecutor, ChatBox chatBox)
+    public RealmCommandService(CommandService commandService, ILogger<RealmCommandService> logger, IEntityEngine ecs, IUsersService usersService, IPolicyDrivenCommandExecutor policyDrivenCommandExecutor, ChatBox chatBox)
     {
         _logger = logger;
         _commandService = commandService;

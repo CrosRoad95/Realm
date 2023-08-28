@@ -1,4 +1,4 @@
-﻿namespace RealmCore.Server.Components;
+﻿namespace RealmCore.ECS.Components;
 
 public abstract class AsyncComponent : Component, IAsyncDisposable
 {

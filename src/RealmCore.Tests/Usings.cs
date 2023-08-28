@@ -32,7 +32,6 @@ global using RealmCore.Persistence.Interfaces;
 global using RealmCore.Persistence.Repository;
 global using RealmCore.Server.Components.Elements;
 global using RealmCore.Server.Entities;
-global using RealmCore.Server.Factories;
 global using RealmCore.Tests.Extensions;
 global using SlipeServer.Server.ElementCollections;
 global using System.Drawing;

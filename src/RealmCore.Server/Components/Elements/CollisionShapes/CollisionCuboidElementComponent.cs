@@ -2,7 +2,7 @@
 
 public class CollisionCuboidElementComponent : CollisionShapeElementComponent
 {
-    internal CollisionCuboidElementComponent(CollisionCuboid collisionCuboid) : base(collisionCuboid)
+    internal CollisionCuboidElementComponent(CollisionCuboid collisionCuboid, IEntityEngine entityEngine) : base(collisionCuboid, entityEngine)
     {
 
     }

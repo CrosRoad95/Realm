@@ -1,14 +1,16 @@
-﻿namespace RealmCore.Server.Commands;
+﻿using RealmCore.ECS;
+
+namespace RealmCore.Server.Commands;
 
 [CommandName("reloadentities")]
 internal class ReloadEntitiesCommand : ICommand
 {
-    private readonly ECS _ecs;
+    private readonly IEntityEngine _ecs;
     private readonly ISaveService _saveService;
     private readonly ILogger<SaveCommand> _logger;
     private readonly ILoadService _loadService;
 
-    public ReloadEntitiesCommand(ECS ecs, ISaveService saveService, ILogger<SaveCommand> logger, ILoadService loadService)
+    public ReloadEntitiesCommand(IEntityEngine ecs, ISaveService saveService, ILogger<SaveCommand> logger, ILoadService loadService)
     {
         _ecs = ecs;
         _saveService = saveService;

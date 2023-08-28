@@ -1,4 +1,7 @@
-﻿namespace RealmCore.Server.Concepts.Objectives;
+﻿using RealmCore.ECS;
+using RealmCore.Server.Components.Elements;
+
+namespace RealmCore.Server.Concepts.Objectives;
 
 public class TransportEntityObjective : Objective
 {
@@ -23,9 +26,15 @@ public class TransportEntityObjective : Objective
     protected override void Load(IEntityFactory entityFactory, Entity playerEntity)
     {
         _playerEntity = playerEntity;
-        if(_createMarker)
-            _markerElementComponent = entityFactory.CreateMarkerFor(playerEntity, _position, MarkerType.Arrow, Color.White);
-        _collisionSphereElementComponent = entityFactory.CreateCollisionSphereFor(playerEntity, _position, 1.5f);
+        using var scopedEntityFactory = entityFactory.CreateScopedEntityFactory(playerEntity);
+        if (_createMarker)
+        {
+            scopedEntityFactory.CreateMarker(MarkerType.Arrow, _position);
+            _markerElementComponent = scopedEntityFactory.LastCreatedComponent as PlayerPrivateElementComponent<MarkerElementComponent>;
+        }
+
+        scopedEntityFactory.CreateCollisionSphere(_position, 1.5f);
+        _collisionSphereElementComponent = scopedEntityFactory.LastCreatedComponent as PlayerPrivateElementComponent<CollisionSphereElementComponent>;
         _collisionSphereElementComponent.ElementComponent.EntityEntered = EntityEntered;
         _checkEnteredTimer = new System.Timers.Timer(TimeSpan.FromSeconds(0.25f));
         _checkEnteredTimer.Elapsed += HandleElapsed;

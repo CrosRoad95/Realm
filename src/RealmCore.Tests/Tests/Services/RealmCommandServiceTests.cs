@@ -1,4 +1,5 @@
-﻿using RealmCore.Server.Policies;
+﻿using RealmCore.ECS;
+using RealmCore.Server.Policies;
 using SlipeServer.Server.Concepts;
 using SlipeServer.Server.Elements;
 using SlipeServer.Server.Events;
@@ -10,7 +11,7 @@ public class RealmCommandServiceTests
 {
     private readonly Mock<ILogger<RealmCommandService>> _logger = new(MockBehavior.Strict);
     private readonly CommandService _commandService;
-    private readonly Mock<IECS> _ecsMock = new(MockBehavior.Strict);
+    private readonly Mock<IEntityEngine> _ecsMock = new(MockBehavior.Strict);
     private readonly Mock<IUsersService> _usersServiceMock = new(MockBehavior.Strict);
     private readonly ChatBox _chatBox;
     private readonly PolicyDrivenCommandExecutor _policyDrivenCommandExecutor = new();
@@ -104,7 +105,7 @@ public class RealmCommandServiceTests
     {
         var player = new Player();
         var playerEntity = _entityHelper.CreatePlayerEntity();
-        await playerEntity.AddComponentAsync<UserComponent>();
+        await playerEntity.AddComponentAsync(new UserComponent(null, null, null));
 
         _ecsMock.Setup(x => x.TryGetEntityByPlayer(player, out playerEntity, false)).Returns(true);
         _sut.ClearCommands();

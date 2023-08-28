@@ -1,4 +1,6 @@
-﻿namespace RealmCore.Tests.Tests.Components;
+﻿using RealmCore.ECS;
+
+namespace RealmCore.Tests.Tests.Components;
 
 public class StatisticsCounterComponentTests
 {
@@ -11,7 +13,7 @@ public class StatisticsCounterComponentTests
 
         var serviceProvider = services.BuildServiceProvider();
 
-        _entity = new(serviceProvider, "test");
+        _entity = new("test");
         _statisticsCounterComponent = new();
         _entity.AddComponent(_statisticsCounterComponent);
     }

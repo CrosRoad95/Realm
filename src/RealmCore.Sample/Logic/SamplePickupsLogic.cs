@@ -1,12 +1,14 @@
-﻿namespace RealmCore.Console.Logic;
+﻿using RealmCore.ECS;
+
+namespace RealmCore.Console.Logic;
 
 internal class SamplePickupsLogic
 {
-    private readonly IECS _ecs;
+    private readonly IEntityEngine _ecs;
     private readonly IEntityFactory _entityFactory;
     private readonly ChatBox _chatBox;
 
-    public SamplePickupsLogic(IECS ecs, IEntityFactory entityFactory, ChatBox chatBox)
+    public SamplePickupsLogic(IEntityEngine ecs, IEntityFactory entityFactory, ChatBox chatBox)
     {
         _ecs = ecs;
         _entityFactory = entityFactory;
@@ -75,7 +77,7 @@ internal class SamplePickupsLogic
                 }
                 else
                 {
-                    var jobSessionComponent = entity.AddComponent<TestJobComponent>();
+                    var jobSessionComponent = entity.AddComponent(new TestJobComponent(_entityFactory));
                     _chatBox.OutputTo(entity, $"Job started");
                     jobSessionComponent.Start();
 

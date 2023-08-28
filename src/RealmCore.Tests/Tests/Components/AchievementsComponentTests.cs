@@ -1,4 +1,6 @@
-﻿namespace RealmCore.Tests.Tests.Components;
+﻿using RealmCore.ECS;
+
+namespace RealmCore.Tests.Tests.Components;
 
 public class AchievementsComponentTests
 {
@@ -7,11 +9,7 @@ public class AchievementsComponentTests
 
     public AchievementsComponentTests()
     {
-        var services = new ServiceCollection();
-
-        var serviceProvider = services.BuildServiceProvider();
-
-        _entity = new(serviceProvider, "test");
+        _entity = new("test");
         _achievementsComponent = new();
         _entity.AddComponent(_achievementsComponent);
     }

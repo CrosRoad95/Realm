@@ -1,5 +1,7 @@
 ﻿using RealmCore.Console.Components.Vehicles;
-using RealmCore.Server.Components;
+using RealmCore.ECS;
+using RealmCore.ECS.Components;
+using RealmCore.Server.Components.Elements.Abstractions;
 using RealmCore.Server.Enums;
 using SlipeServer.Server.Elements.Enums;
 
@@ -7,16 +9,20 @@ namespace RealmCore.Console.Logic;
 
 internal sealed class PlayerGameplayLogic
 {
-    private readonly IECS _ecs;
+    private readonly IEntityEngine _ecs;
     private readonly IServiceProvider _serviceProvider;
     private readonly ChatBox _chatBox;
+    private readonly VehicleUpgradeRegistry _vehicleUpgradeRegistry;
+    private readonly VehicleEnginesRegistry _vehicleEnginesRegistry;
     private readonly ILogger<PlayerGameplayLogic> _logger;
 
-    public PlayerGameplayLogic(IECS ecs, ILogger<PlayerGameplayLogic> logger, IServiceProvider serviceProvider, ChatBox chatBox)
+    public PlayerGameplayLogic(IEntityEngine ecs, ILogger<PlayerGameplayLogic> logger, IServiceProvider serviceProvider, ChatBox chatBox, VehicleUpgradeRegistry vehicleUpgradeRegistry, VehicleEnginesRegistry vehicleEnginesRegistry)
     {
         _ecs = ecs;
         _serviceProvider = serviceProvider;
         _chatBox = chatBox;
+        _vehicleUpgradeRegistry = vehicleUpgradeRegistry;
+        _vehicleEnginesRegistry = vehicleEnginesRegistry;
         _logger = logger;
         _ecs.EntityCreated += HandleEntityCreated;
     }
@@ -136,7 +142,7 @@ internal sealed class PlayerGameplayLogic
                         {
                             await _serviceProvider.GetRequiredService<IVehiclesService>().ConvertToPrivateVehicle(entity);
                             entity.GetRequiredComponent<PrivateVehicleComponent>().Access.AddAsOwner(playerEntity);
-                            entity.AddComponent(new VehicleUpgradesComponent());
+                            entity.AddComponent(new VehicleUpgradesComponent(_vehicleUpgradeRegistry, _vehicleEnginesRegistry));
                             entity.AddComponent(new MileageCounterComponent());
                             entity.AddComponent(new FuelComponent(1, 20, 20, 0.01, 2)).Active = true;
                         }

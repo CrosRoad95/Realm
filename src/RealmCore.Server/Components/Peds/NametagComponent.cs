@@ -1,4 +1,6 @@
-﻿namespace RealmCore.Server.Components.Peds;
+﻿using RealmCore.ECS.Components;
+
+namespace RealmCore.Server.Components.Peds;
 
 public sealed class NametagComponent : Component
 {

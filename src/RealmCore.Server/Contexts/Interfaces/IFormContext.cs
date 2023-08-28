@@ -1,4 +1,6 @@
-﻿namespace RealmCore.Server.Contexts.Interfaces;
+﻿using RealmCore.ECS;
+
+namespace RealmCore.Server.Contexts.Interfaces;
 
 public interface IFormContext
 {

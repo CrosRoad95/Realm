@@ -3,9 +3,9 @@
 internal class GuiLogic
 {
     private readonly IServiceProvider _serviceProvider;
-    private readonly IECS _ecs;
+    private readonly IEntityEngine _ecs;
 
-    public GuiLogic(IServiceProvider serviceProvider, IRealmServer realmServer, IECS ecs)
+    public GuiLogic(IServiceProvider serviceProvider, IRealmServer realmServer, IEntityEngine ecs)
     {
         _serviceProvider = serviceProvider;
         _ecs = ecs;
@@ -26,7 +26,6 @@ internal class GuiLogic
             var guiComponents = entity.Components.OfType<GuiComponent>().ToList();
             foreach (var guiComponent in guiComponents)
             {
-                guiComponent.Close();
                 entity.DetachComponent(guiComponent);
                 entity.AddComponent(guiComponent);
             }

@@ -1,4 +1,7 @@
-﻿namespace RealmCore.Server.Components.Players;
+﻿using RealmCore.ECS;
+using RealmCore.ECS.Components;
+
+namespace RealmCore.Server.Components.Players;
 
 public abstract class SessionComponent : Component
 {

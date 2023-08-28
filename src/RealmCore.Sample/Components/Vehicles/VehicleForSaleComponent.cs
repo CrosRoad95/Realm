@@ -1,4 +1,5 @@
-﻿using RealmCore.Server.Components;
+﻿using RealmCore.ECS.Components;
+using RealmCore.Server.Components.Elements.Abstractions;
 
 namespace RealmCore.Console.Components.Vehicles;
 
@@ -14,7 +15,7 @@ public class VehicleForSaleComponent : Component
         Price = price;
     }
 
-    protected override void Load()
+    protected override void Attach()
     {
         var vehicleElementComponent = Entity.GetRequiredComponent<VehicleElementComponent>();
         vehicleElementComponent.IsFrozen = true;

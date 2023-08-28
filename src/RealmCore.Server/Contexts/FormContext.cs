@@ -1,4 +1,6 @@
-﻿namespace RealmCore.Server.Contexts;
+﻿using RealmCore.ECS;
+
+namespace RealmCore.Server.Contexts;
 
 internal class FormContext : IFormContext
 {
@@ -7,7 +9,7 @@ internal class FormContext : IFormContext
     private readonly string _formName;
     private readonly LuaValue _data;
     private readonly IGuiSystemService _GuiSystemService;
-    private readonly IECS _ecs;
+    private readonly IEntityEngine _ecs;
     private readonly IServiceProvider _serviceProvider;
 
     public string FormName => _formName;
@@ -21,7 +23,7 @@ internal class FormContext : IFormContext
         }
     }
 
-    public FormContext(Player player, string formName, LuaValue data, IGuiSystemService GuiSystemService, IECS ecs, IServiceProvider serviceProvider)
+    public FormContext(Player player, string formName, LuaValue data, IGuiSystemService GuiSystemService, IEntityEngine ecs, IServiceProvider serviceProvider)
     {
         _player = player;
         _formName = formName;

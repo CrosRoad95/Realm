@@ -1,13 +1,14 @@
-﻿namespace RealmCore.Server.Components.Elements;
+﻿using RealmCore.ECS;
+using RealmCore.ECS.Components;
+using RealmCore.Server.Components.Elements.Abstractions;
+
+namespace RealmCore.Server.Components.Elements;
 
 public class PickupElementComponent : ElementComponent
 {
-    [Inject]
-    private IECS ECS { get; set; } = default!;
-    [Inject]
-    private ILogger<PickupElementComponent> Logger { get; set; } = default!;
-
     protected readonly Pickup _pickup;
+    private readonly IEntityEngine _entityEngine;
+
     internal override Element Element => _pickup;
     private Action<Entity, Entity>? _entityEntered;
     private Action<Entity, Entity>? _entityLeft;
@@ -57,9 +58,10 @@ public class PickupElementComponent : ElementComponent
 
     private readonly List<IEntityRule> _entityRules = new();
 
-    internal PickupElementComponent(Pickup pickup)
+    internal PickupElementComponent(Pickup pickup, IEntityEngine entityEngine)
     {
         _pickup = pickup;
+        _entityEngine = entityEngine;
         _pickup.RespawnTime = 500;
     }
 
@@ -82,7 +84,7 @@ public class PickupElementComponent : ElementComponent
         if (EntityEntered == null)
             return;
 
-        if (!ECS.TryGetByElement(element, out var entity))
+        if (!_entityEngine.TryGetByElement(element, out var entity))
             return;
 
         var tag = entity.GetRequiredComponent<TagComponent>();
@@ -98,7 +100,7 @@ public class PickupElementComponent : ElementComponent
             }
             catch (Exception ex)
             {
-                Logger.LogError(ex, "Failed to invoke check role");
+                // TODO: log
                 break;
             }
 
@@ -110,7 +112,7 @@ public class PickupElementComponent : ElementComponent
                 }
                 catch (Exception ex)
                 {
-                    Logger.LogError(ex, "Failed to invoke entity failed callback");
+                    // TODO: log
                 }
                 return;
             }
@@ -121,7 +123,7 @@ public class PickupElementComponent : ElementComponent
         }
         catch (Exception ex)
         {
-            Logger.LogError(ex, "Failed to invoke entity entered callback");
+            // TODO: log
         }
     }
 
@@ -130,7 +132,7 @@ public class PickupElementComponent : ElementComponent
         if (EntityLeft == null)
             return;
 
-        if (!ECS.TryGetByElement(element, out var entity))
+        if (!_entityEngine.TryGetByElement(element, out var entity))
             return;
 
         var tag = entity.GetRequiredComponent<TagComponent>();
@@ -144,7 +146,7 @@ public class PickupElementComponent : ElementComponent
         }
         catch (Exception ex)
         {
-            Logger.LogError(ex, "Failed to invoke check role");
+            // TODO: log
         }
 
         try
@@ -153,7 +155,7 @@ public class PickupElementComponent : ElementComponent
         }
         catch (Exception ex)
         {
-            Logger.LogError(ex, "Failed to invoke entity left callback");
+            // TODO: log
         }
     }
 
@@ -165,9 +167,9 @@ public class PickupElementComponent : ElementComponent
         _pickup.CollisionShape.Destroy();
     }
 
-    protected override void Load()
+    protected override void Attach()
     {
-        base.Load();
+        base.Attach();
         Entity.Disposed += HandleDisposed;
         _pickup.CollisionShape.ElementEntered += HandleElementEntered;
         _pickup.CollisionShape.ElementLeft += HandleElementLeft;
@@ -175,7 +177,7 @@ public class PickupElementComponent : ElementComponent
         Entity.Transform.PositionChanged += HandlePositionChanged;
     }
 
-    private void HandlePositionChanged(Transform transform, Vector3 position)
+    private void HandlePositionChanged(Transform transform, Vector3 position, bool sync)
     {
         _pickup.CollisionShape.Position = position;
     }

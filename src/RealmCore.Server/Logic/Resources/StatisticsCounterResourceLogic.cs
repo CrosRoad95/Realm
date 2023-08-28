@@ -1,12 +1,14 @@
-﻿namespace RealmCore.Server.Logic.Resources;
+﻿using RealmCore.ECS;
+
+namespace RealmCore.Server.Logic.Resources;
 
 internal sealed class StatisticsCounterResourceLogic : ComponentLogic<StatisticsCounterComponent>
 {
     private readonly IStatisticsCounterService _statisticsCounterService;
-    private readonly IECS _ecs;
+    private readonly IEntityEngine _ecs;
     private readonly ILogger<StatisticsCounterResourceLogic> _logger;
 
-    public StatisticsCounterResourceLogic(IStatisticsCounterService statisticsCounterService, IECS ecs, ILogger<StatisticsCounterResourceLogic> logger) : base(ecs)
+    public StatisticsCounterResourceLogic(IStatisticsCounterService statisticsCounterService, IEntityEngine ecs, ILogger<StatisticsCounterResourceLogic> logger) : base(ecs)
     {
         _statisticsCounterService = statisticsCounterService;
         _ecs = ecs;
@@ -57,7 +59,7 @@ internal sealed class StatisticsCounterResourceLogic : ComponentLogic<Statistics
         _statisticsCounterService.SetCounterEnabledFor(playerElementComponent.Player, true);
     }
 
-    protected override void ComponentRemoved(StatisticsCounterComponent component)
+    protected override void ComponentDetached(StatisticsCounterComponent component)
     {
         var playerElementComponent = component.Entity.GetRequiredComponent<PlayerElementComponent>();
         _statisticsCounterService.SetCounterEnabledFor(playerElementComponent.Player, false);

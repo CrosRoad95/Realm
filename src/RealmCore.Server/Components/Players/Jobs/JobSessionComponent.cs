@@ -2,11 +2,6 @@
 
 public abstract class JobSessionComponent : SessionComponent
 {
-    [Inject]
-    protected IEntityFactory EntityFactory { get; set; } = default!;
-    [Inject]
-    private ILogger<JobSessionComponent> Logger { get; set; } = default!;
-
     public abstract short JobId { get; }
 
     private readonly List<Objective> _objectives = new();
@@ -15,9 +10,9 @@ public abstract class JobSessionComponent : SessionComponent
     private int _completedObjectives = 0;
 
     public IEnumerable<Objective> Objectives => _objectives;
-    public event Action<JobSessionComponent>? CompletedAllObjectives;
     public int CompletedObjectives => _completedObjectives;
-
+    public event Action<JobSessionComponent>? CompletedAllObjectives;
+    public event Action<JobSessionComponent, Objective> ObjectiveAdded;
     public JobSessionComponent()
     {
 
@@ -42,18 +37,7 @@ public abstract class JobSessionComponent : SessionComponent
         objective.Entity = Entity;
         lock (_lock)
             _objectives.Add(objective);
-        try
-        {
-            objective.LoadInternal(EntityFactory, Entity, Logger);
-        }
-        catch (Exception)
-        {
-            objective.Dispose();
-            lock (_lock)
-                _objectives.Remove(objective);
-            objective.Entity = null!;
-            throw;
-        }
+        ObjectiveAdded?.Invoke(this, objective);
         objective.Completed += HandleCompleted;
         objective.Disposed += HandleDisposed;
         return objective;

@@ -11,16 +11,16 @@ internal sealed class GuiSystemService : IGuiSystemService
 {
     public GuiChangedDelegate? GuiFilesChanged { get; set; }
 
-    private readonly GuiSystemResource _resource;
     public event Action<LuaEvent>? FormSubmitted;
     public event Action<LuaEvent>? ActionExecuted;
     private readonly ConcurrentDictionary<Player, object> _playersLocks = new();
     private readonly ConcurrentDictionary<Player, List<string>> _playersGuis = new();
+    private readonly MtaServer _server;
     private readonly LuaValueMapper _luaValueMapper;
 
     public GuiSystemService(MtaServer server, LuaValueMapper luaValueMapper)
     {
-        _resource = server.GetAdditionalResource<GuiSystemResource>();
+        _server = server;
         _luaValueMapper = luaValueMapper;
     }
 
@@ -104,13 +104,14 @@ internal sealed class GuiSystemService : IGuiSystemService
 
     public async Task UpdateGuiFiles()
     {
-        _resource.UpdateGuiFiles();
+        var resource = _server.GetAdditionalResource<GuiSystemResource>();
+        resource.UpdateGuiFiles();
         var players = _playersGuis.Keys;
         foreach (var player in players)
         {
             CloseAllGuis(player);
-            _resource.StopFor(player);
-            await _resource.StartForAsync(player);
+            resource.StopFor(player);
+            await resource.StartForAsync(player);
         }
 
         if (GuiFilesChanged != null)

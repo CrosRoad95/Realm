@@ -2,23 +2,22 @@
 
 internal class TestJobComponent : JobSessionComponent
 {
-    [Inject]
-    private ChatBox ChatBox { get; set; } = default!;
+    private readonly IEntityFactory _entityFactory;
 
     public override short JobId => 1;
 
-    public TestJobComponent()
+    public TestJobComponent(IEntityFactory entityFactory)
     {
-
+        _entityFactory = entityFactory;
     }
 
     public void CreateObjectives()
     {
         var objective = AddObjective(new MarkerEnterObjective(new Vector3(383.6543f, -82.01953f, 3.914598f)));
-        objective.AddBlip(BlipIcon.North, EntityFactory);
+        objective.AddBlip(BlipIcon.North);
         objective.Completed += ObjectiveACompleted;
 
-        var objectEntity = EntityFactory.CreateObject(SlipeServer.Server.Enums.ObjectModel.Gunbox, new Vector3(379.00f, -102.77f, 1.24f), Vector3.Zero);
+        var objectEntity = _entityFactory.CreateObject(SlipeServer.Server.Enums.ObjectModel.Gunbox, new Vector3(379.00f, -102.77f, 1.24f), Vector3.Zero);
         objectEntity.AddComponent<LiftableWorldObjectComponent>();
         var objective2 = AddObjective(new TransportEntityObjective(objectEntity, new Vector3(379.00f, -112.77f, 2.0f)));
         objective2.Completed += ObjectiveBCompleted;
@@ -34,23 +33,23 @@ internal class TestJobComponent : JobSessionComponent
     private void ObjectiveACompleted(Objective objective, object? data = null)
     {
         Entity.GetRequiredComponent<JobStatisticsComponent>().AddPoints(1, 1);
-        ChatBox.OutputTo(Entity, $"Entered marker, objectives left: {Objectives.Count()}");
+        //ChatBox.OutputTo(Entity, $"Entered marker, objectives left: {Objectives.Count()}");
     }
 
     private void ObjectiveBCompleted(Objective objective, object? data = null)
     {
         Entity.GetRequiredComponent<JobStatisticsComponent>().AddPoints(1, 2);
-        ChatBox.OutputTo(Entity, $"Box delivered, objectives left: {Objectives.Count()}");
+        //ChatBox.OutputTo(Entity, $"Box delivered, objectives left: {Objectives.Count()}");
     }
 
     private void ObjectiveCCompleted(Objective objective, object? data = null)
     {
         Entity.GetRequiredComponent<JobStatisticsComponent>().AddPoints(1, 1);
-        ChatBox.OutputTo(Entity, $"Entered one of marker, objectives left: {Objectives.Count()}");
+        //ChatBox.OutputTo(Entity, $"Entered one of marker, objectives left: {Objectives.Count()}");
     }
 
     private void ObjectiveDCompleted(Objective objective, object? data = null)
     {
-        ChatBox.OutputTo(Entity, $"Entered marker, objectives left: {Objectives.Count()} {data}");
+        //ChatBox.OutputTo(Entity, $"Entered marker, objectives left: {Objectives.Count()} {data}");
     }
 }

@@ -2,7 +2,7 @@
 
 public class CollisionRectangleElementComponent : CollisionShapeElementComponent
 {
-    internal CollisionRectangleElementComponent(CollisionRectangle collisionRectangle) : base(collisionRectangle)
+    internal CollisionRectangleElementComponent(CollisionRectangle collisionRectangle, IEntityEngine entityEngine) : base(collisionRectangle, entityEngine)
     {
 
     }

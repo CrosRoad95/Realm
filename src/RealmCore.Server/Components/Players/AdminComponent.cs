@@ -1,6 +1,4 @@
-﻿using RealmCore.Resources.Admin.Enums;
-
-namespace RealmCore.Server.Components.Players;
+﻿namespace RealmCore.Server.Components.Players;
 
 [ComponentUsage(false)]
 public class AdminComponent : Component
@@ -117,7 +115,7 @@ public class AdminComponent : Component
         }
     }
 
-    protected override void Detached()
+    protected override void Detach()
     {
         DevelopmentMode = false;
         DebugView = false;

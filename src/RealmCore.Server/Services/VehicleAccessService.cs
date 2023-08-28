@@ -1,14 +1,16 @@
-﻿namespace RealmCore.Server.Services;
+﻿using RealmCore.ECS;
+
+namespace RealmCore.Server.Services;
 
 internal sealed class VehicleAccessService : IVehicleAccessService
 {
-    private readonly IECS _ecs;
+    private readonly IEntityEngine _ecs;
     private readonly ILogger<VehicleAccessService> _logger;
 
     public event Func<Entity, Entity, bool>? CanEnter;
     public event Action<Entity, Entity, VehicleAccessControllerComponent>? FailedToEnter;
 
-    public VehicleAccessService(IECS ecs, ILogger<VehicleAccessService> logger)
+    public VehicleAccessService(IEntityEngine ecs, ILogger<VehicleAccessService> logger)
     {
         _ecs = ecs;
         _logger = logger;

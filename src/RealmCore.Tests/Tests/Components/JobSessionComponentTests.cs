@@ -8,6 +8,7 @@ namespace RealmCore.Tests.Tests.Components;
 public class JobSessionComponentTests
 {
     private readonly IElementCollection _elementCollection;
+    private readonly IEntityFactory _entityFactory;
     private readonly EntityHelper _entityHelper;
     private readonly Mock<IRealmServer> _realmServerMock = new(MockBehavior.Strict);
     private readonly RealmTestingServer _realmTestingServer;
@@ -23,13 +24,14 @@ public class JobSessionComponentTests
         });
         _entityHelper = new(_realmTestingServer);
         _elementCollection = _realmTestingServer.GetRequiredService<IElementCollection>();
+        _entityFactory = _realmTestingServer.GetRequiredService<IEntityFactory>();
     }
 
     //[Fact]
     public void JobShouldCreateExpectedAmountOfPrivateAndPublicElements()
     {
         var playerEntity = _entityHelper.CreatePlayerEntity();
-        var testJobComponent = playerEntity.AddComponent<TestJobComponent>();
+        var testJobComponent = playerEntity.AddComponent(new TestJobComponent(_entityFactory));
         playerEntity.AddComponent(new JobStatisticsComponent(DateTime.Now));
         testJobComponent.CreateObjectives();
         var elements = _elementCollection.GetAll().ToList();

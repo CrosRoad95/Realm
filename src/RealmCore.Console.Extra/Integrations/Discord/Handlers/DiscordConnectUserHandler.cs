@@ -4,10 +4,10 @@ namespace RealmCore.Console.Integrations.Discord.Handlers;
 
 public class DiscordConnectUserHandler : IDiscordConnectUserHandler
 {
-    private readonly IECS _ecs;
+    private readonly IEntityEngine _ecs;
     private readonly ILogger<DiscordConnectUserHandler> _logger;
 
-    public DiscordConnectUserHandler(IECS ecs, ILogger<DiscordConnectUserHandler> logger)
+    public DiscordConnectUserHandler(IEntityEngine ecs, ILogger<DiscordConnectUserHandler> logger)
     {
         _ecs = ecs;
         _logger = logger;

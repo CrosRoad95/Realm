@@ -16,16 +16,15 @@ public class SampleHud2State
 [ComponentUsage(false)]
 public class SampleHud2 : HudComponent<SampleHud2State>
 {
-    [Inject]
-    private AssetsRegistry AssetsRegistry { get; set; } = default!;
+    private readonly AssetsRegistry _assetsRegistry;
 
-    public SampleHud2() : base(new SampleHud2State
+    public SampleHud2(AssetsRegistry assetsRegistry) : base(new SampleHud2State
     {
         Text1 = "text1",
         Text2 = "text2"
     })
     {
-
+        _assetsRegistry = assetsRegistry;
     }
 
     protected override void Build(IHudBuilder<SampleHud2State> x)
@@ -37,7 +36,7 @@ public class SampleHud2 : HudComponent<SampleHud2State>
         x.AddText(x => x.WithText(x => x.Text2).WithPosition(new Vector2(100, 50)));
         x.AddText(x => x.WithText("foo bar").WithPosition(new Vector2(100, 60)));
         x.AddText(x => x.WithText(x => $"Text1: {x.Text1.ToUpper()}").WithPosition(new Vector2(100, 80)));
-        x.AddText("custom font", new Vector2(x.Right - 400, 600), new Size(200, 20), font: AssetsRegistry.GetFont("Better Together.otf"), alignX: HorizontalAlign.Center, alignY: VerticalAlign.Center);
+        x.AddText("custom font", new Vector2(x.Right - 400, 600), new Size(200, 20), font: _assetsRegistry.GetFont("Better Together.otf"), alignX: HorizontalAlign.Center, alignY: VerticalAlign.Center);
     }
 
     public void Update()

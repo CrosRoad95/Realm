@@ -1,6 +1,7 @@
 ﻿using SlipeServer.Server.Elements.ColShapes;
 using RealmCore.Resources.ClientInterface;
 using RealmCore.Server.Components.Elements.CollisionShapes;
+using RealmCore.ECS;
 
 namespace RealmCore.Tests.Tests.Components;
 
@@ -15,14 +16,15 @@ public class CollisionShapeElementComponentTests
     {
         var services = new ServiceCollection();
         services.AddSingleton<IRealmConfigurationProvider>(new TestConfigurationProvider());
-        services.AddSingleton<IECS, ECS>();
+        services.AddSingleton<IEntityEngine, EntityEngine>();
         services.AddSingleton(_elementCollectionMock.Object);
         services.AddSingleton(_clientInterfaceServiceMock);
         services.AddLogging(x => x.AddSerilog(new LoggerConfiguration().CreateLogger(), dispose: true));
 
         var serviceProvider = services.BuildServiceProvider();
-        _entity = serviceProvider.GetRequiredService<IECS>().CreateEntity("test");
-        _collisionSphereElementComponent = new(new CollisionSphere(new System.Numerics.Vector3(0, 0, 0), 10));
+        var entityEngine = serviceProvider.GetRequiredService<IEntityEngine>();
+        _entity = entityEngine.CreateEntity("test");
+        _collisionSphereElementComponent = new(new CollisionSphere(new System.Numerics.Vector3(0, 0, 0), 10), entityEngine);
         _entity.AddComponent(_collisionSphereElementComponent);
     }
 

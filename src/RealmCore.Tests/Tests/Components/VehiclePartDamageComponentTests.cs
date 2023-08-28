@@ -1,4 +1,5 @@
-﻿using RealmCore.Server.Components.Vehicles;
+﻿using RealmCore.ECS;
+using RealmCore.Server.Components.Vehicles;
 
 namespace RealmCore.Tests.Tests.Components;
 
@@ -13,7 +14,7 @@ public class VehiclePartDamageComponentTests
 
         var serviceProvider = services.BuildServiceProvider();
 
-        _entity = new(serviceProvider, "test");
+        _entity = new("test");
         _vehiclePartDamageComponent = new();
         _entity.AddComponent(_vehiclePartDamageComponent);
     }

@@ -1,17 +1,16 @@
-﻿namespace RealmCore.Server.Components.Players;
+﻿using RealmCore.ECS.Components;
+
+namespace RealmCore.Server.Components.Players;
 
 [ComponentUsage(false)]
 public class LevelComponent : Component
 {
-    [Inject]
-    private LevelsRegistry LevelsRegistry { get; set; } = default!;
-
     public uint NextLevelRequiredExperience
     {
         get
         {
             ThrowIfDisposed();
-            return LevelsRegistry.GetExperienceRequiredForLevel(Level + 1);
+            return _levelsRegistry.GetExperienceRequiredForLevel(Level + 1);
         }
     }
 
@@ -56,13 +55,14 @@ public class LevelComponent : Component
     }
 
     private readonly object _lock = new();
+    private readonly LevelsRegistry _levelsRegistry;
 
     public event Action<LevelComponent, uint, bool>? LevelChanged;
     public event Action<LevelComponent, uint>? ExperienceChanged;
 
-    public LevelComponent()
+    public LevelComponent(LevelsRegistry levelsRegistry)
     {
-
+        _levelsRegistry = levelsRegistry;
     }
 
     public LevelComponent(uint level, uint experience)

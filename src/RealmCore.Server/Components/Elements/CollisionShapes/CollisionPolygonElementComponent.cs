@@ -2,7 +2,7 @@
 
 public class CollisionPolygonElementComponent : CollisionShapeElementComponent
 {
-    internal CollisionPolygonElementComponent(CollisionPolygon collisionPolygon) : base(collisionPolygon)
+    internal CollisionPolygonElementComponent(CollisionPolygon collisionPolygon, IEntityEngine entityEngine) : base(collisionPolygon, entityEngine)
     {
 
     }

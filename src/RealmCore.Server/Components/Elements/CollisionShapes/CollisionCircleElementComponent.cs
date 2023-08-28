@@ -2,7 +2,7 @@
 
 public class CollisionCircleElementComponent : CollisionShapeElementComponent
 {
-    internal CollisionCircleElementComponent(CollisionCircle collisionCircle) : base(collisionCircle)
+    internal CollisionCircleElementComponent(CollisionCircle collisionCircle, IEntityEngine entityEngine) : base(collisionCircle, entityEngine)
     {
 
     }

@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Authorization;
+using RealmCore.ECS;
 using RealmCore.Persistence.Data;
 using RealmCore.Persistence.Extensions;
 using RealmCore.Server.Json.Converters;
@@ -8,6 +9,7 @@ namespace RealmCore.Server.Services;
 internal class UsersService : IUsersService
 {
     private readonly ItemsRegistry _itemsRegistry;
+    private readonly SignInManager<UserData> _signInManager;
     private readonly UserManager<UserData> _userManager;
     private readonly ILogger<UsersService> _logger;
     private readonly IOptions<GameplayOptions> _gameplayOptions;
@@ -16,16 +18,17 @@ internal class UsersService : IUsersService
     private readonly IDb _db;
     private readonly IActiveUsers _activeUsers;
     private readonly IElementCollection _elementCollection;
-    private readonly IECS _ecs;
+    private readonly IEntityEngine _ecs;
     private static readonly JsonSerializerSettings _jsonSerializerSettings = new JsonSerializerSettings
     {
         Converters = new List<JsonConverter> { new DoubleConverter() }
     };
 
-    public UsersService(ItemsRegistry itemsRegistry, UserManager<UserData> userManager, ILogger<UsersService> logger, IOptions<GameplayOptions> gameplayOptions,
-        IDateTimeProvider dateTimeProvider, IAuthorizationService authorizationService, IDb db, IActiveUsers activeUsers, IElementCollection elementCollection, IECS ecs)
+    public UsersService(ItemsRegistry itemsRegistry, SignInManager<UserData> signInManager, UserManager<UserData> userManager, ILogger<UsersService> logger, IOptions<GameplayOptions> gameplayOptions,
+        IDateTimeProvider dateTimeProvider, IAuthorizationService authorizationService, IDb db, IActiveUsers activeUsers, IElementCollection elementCollection, IEntityEngine ecs)
     {
         _itemsRegistry = itemsRegistry;
+        _signInManager = signInManager;
         _userManager = userManager;
         _logger = logger;
         _gameplayOptions = gameplayOptions;
@@ -75,77 +78,67 @@ internal class UsersService : IUsersService
 
         try
         {
-            using var transaction = entity.BeginComponentTransaction();
-            try
+            await entity.AddComponentAsync(new UserComponent(user, _signInManager, _userManager));
+            await TryUpdateLastNickName(entity);
+            if (user.Inventories != null && user.Inventories.Any())
             {
-                await entity.AddComponentAsync(new UserComponent(user));
-                await TryUpdateLastNickName(entity);
-                if (user.Inventories != null && user.Inventories.Any())
+                foreach (var inventory in user.Inventories)
                 {
-                    foreach (var inventory in user.Inventories)
-                    {
-                        var items = inventory.InventoryItems
-                            .Select(x =>
-                                new Item(_itemsRegistry, x.ItemId, x.Number, JsonConvert.DeserializeObject<Dictionary<string, object>>(x.MetaData, _jsonSerializerSettings))
-                            )
-                            .ToList();
-                        entity.AddComponent(new InventoryComponent(inventory.Size, inventory.Id, items));
-                    }
+                    var items = inventory.InventoryItems
+                        .Select(x =>
+                            new Item(_itemsRegistry, x.ItemId, x.Number, JsonConvert.DeserializeObject<Dictionary<string, object>>(x.MetaData, _jsonSerializerSettings))
+                        )
+                        .ToList();
+                    entity.AddComponent(new InventoryComponent(inventory.Size, inventory.Id, items));
                 }
-                else
-                    entity.AddComponent(new InventoryComponent(_gameplayOptions.Value.DefaultInventorySize));
-
-                if (user.DailyVisits != null)
-                    entity.AddComponent(new DailyVisitsCounterComponent(user.DailyVisits));
-                else
-                    entity.AddComponent<DailyVisitsCounterComponent>();
-
-                if (user.Stats != null)
-                    entity.AddComponent(new StatisticsCounterComponent(user.Stats));
-                else
-                    entity.AddComponent<StatisticsCounterComponent>();
-
-                if (user.Achievements != null)
-                    entity.AddComponent(new AchievementsComponent(user.Achievements));
-                else
-                    entity.AddComponent<AchievementsComponent>();
-
-                if (user.JobUpgrades != null)
-                    entity.AddComponent(new JobUpgradesComponent(user.JobUpgrades));
-                else
-                    entity.AddComponent<JobUpgradesComponent>();
-
-                if (user.JobStatistics != null)
-                    entity.AddComponent(new JobStatisticsComponent(_dateTimeProvider.Now, user.JobStatistics));
-                else
-                    entity.AddComponent(new JobStatisticsComponent(_dateTimeProvider.Now));
-
-                if (user.Discoveries != null)
-                    entity.AddComponent(new DiscoveriesComponent(user.Discoveries));
-                else
-                    entity.AddComponent<DiscoveriesComponent>();
-
-                if (user.DiscordIntegration != null)
-                    entity.AddComponent(new DiscordIntegrationComponent(user.DiscordIntegration.DiscordUserId));
-
-                foreach (var groupMemberData in user.GroupMembers)
-                    entity.AddComponent(new GroupMemberComponent(groupMemberData));
-
-                foreach (var fractionMemberData in user.FractionMembers)
-                    entity.AddComponent(new FractionMemberComponent(fractionMemberData));
-
-                entity.AddComponent(new LicensesComponent(user.Licenses));
-                entity.AddComponent(new PlayTimeComponent(user.PlayTime));
-                entity.AddComponent(new LevelComponent(user.Level, user.Experience));
-                entity.AddComponent(new MoneyComponent(user.Money));
-                entity.AddComponent<AFKComponent>();
-                entity.Commit(transaction);
             }
-            catch (Exception)
-            {
-                entity.Rollback(transaction);
-                throw;
-            }
+            else
+                entity.AddComponent(new InventoryComponent(_gameplayOptions.Value.DefaultInventorySize));
+
+            if (user.DailyVisits != null)
+                entity.AddComponent(new DailyVisitsCounterComponent(user.DailyVisits));
+            else
+                entity.AddComponent<DailyVisitsCounterComponent>();
+
+            if (user.Stats != null)
+                entity.AddComponent(new StatisticsCounterComponent(user.Stats));
+            else
+                entity.AddComponent<StatisticsCounterComponent>();
+
+            if (user.Achievements != null)
+                entity.AddComponent(new AchievementsComponent(user.Achievements));
+            else
+                entity.AddComponent<AchievementsComponent>();
+
+            if (user.JobUpgrades != null)
+                entity.AddComponent(new JobUpgradesComponent(user.JobUpgrades));
+            else
+                entity.AddComponent<JobUpgradesComponent>();
+
+            if (user.JobStatistics != null)
+                entity.AddComponent(new JobStatisticsComponent(_dateTimeProvider.Now, user.JobStatistics));
+            else
+                entity.AddComponent(new JobStatisticsComponent(_dateTimeProvider.Now));
+
+            if (user.Discoveries != null)
+                entity.AddComponent(new DiscoveriesComponent(user.Discoveries));
+            else
+                entity.AddComponent<DiscoveriesComponent>();
+
+            if (user.DiscordIntegration != null)
+                entity.AddComponent(new DiscordIntegrationComponent(user.DiscordIntegration.DiscordUserId));
+
+            foreach (var groupMemberData in user.GroupMembers)
+                entity.AddComponent(new GroupMemberComponent(groupMemberData));
+
+            foreach (var fractionMemberData in user.FractionMembers)
+                entity.AddComponent(new FractionMemberComponent(fractionMemberData));
+
+            entity.AddComponent(new LicensesComponent(user.Licenses, _dateTimeProvider));
+            entity.AddComponent(new PlayTimeComponent(user.PlayTime, _dateTimeProvider));
+            entity.AddComponent(new LevelComponent(user.Level, user.Experience));
+            entity.AddComponent(new MoneyComponent(user.Money, _gameplayOptions.Value.MoneyLimit, _gameplayOptions.Value.MoneyPrecision));
+            entity.AddComponent<AFKComponent>();
             return true;
 
         }
@@ -300,7 +293,7 @@ internal class UsersService : IUsersService
 
     public void Kick(Entity entity, string reason)
     {
-        entity.Player.Kick(reason);
+        entity.GetPlayer().Kick(reason);
     }
 
     public bool TryGetPlayerByName(string name, out Entity playerEntity)
@@ -316,11 +309,11 @@ internal class UsersService : IUsersService
     
     public async Task<bool> TryUpdateLastNickName(Entity playerEntity)
     {
-        var nick = playerEntity.Player.Name;
+        var nick = playerEntity.GetPlayer().Name;
         if (playerEntity.TryGetComponent(out UserComponent userComponent) && userComponent.Nick != nick)
         {
             await _db.Users.Where(x => x.Id == userComponent.Id)
-                .ExecuteUpdateAsync(x => x.SetProperty(y => y.Nick, playerEntity.Player.Name));
+                .ExecuteUpdateAsync(x => x.SetProperty(y => y.Nick, playerEntity.GetPlayer().Name));
             return true;
         }
         return false;

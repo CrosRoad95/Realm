@@ -1,4 +1,7 @@
-﻿namespace RealmCore.Server.Components.Vehicles.Access;
+﻿using RealmCore.ECS;
+using RealmCore.ECS.Components;
+
+namespace RealmCore.Server.Components.Vehicles.Access;
 
 [ComponentUsage(true)]
 public abstract class VehicleAccessControllerComponent : Component

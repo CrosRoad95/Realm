@@ -1,4 +1,5 @@
-﻿using RealmCore.Persistence.Data;
+﻿using RealmCore.ECS;
+using RealmCore.Persistence.Data;
 using RealmCore.Persistence.DTOs;
 using RealmCore.Persistence.Interfaces;
 using RealmCore.Server.Json.Converters;
@@ -13,10 +14,12 @@ internal sealed class VehiclesService : IVehiclesService
     private readonly ItemsRegistry _itemsRegistry;
     private readonly IVehicleEventRepository _vehicleEventRepository;
     private readonly IDateTimeProvider _dateTimeProvider;
-    private readonly IECS _ecs;
+    private readonly IEntityEngine _ecs;
+    private readonly VehicleUpgradeRegistry _vehicleUpgradeRegistry;
+    private readonly VehicleEnginesRegistry _vehicleEnginesRegistry;
     private readonly JsonSerializerSettings _jsonSerializerSettings;
 
-    public VehiclesService(IVehicleRepository vehicleRepository, IEntityFactory entityFactory, ISaveService saveService, ItemsRegistry itemsRegistry, IVehicleEventRepository vehicleEventRepository, IDateTimeProvider dateTimeProvider, IECS ecs)
+    public VehiclesService(IVehicleRepository vehicleRepository, IEntityFactory entityFactory, ISaveService saveService, ItemsRegistry itemsRegistry, IVehicleEventRepository vehicleEventRepository, IDateTimeProvider dateTimeProvider, IEntityEngine ecs, VehicleUpgradeRegistry vehicleUpgradeRegistry, VehicleEnginesRegistry vehicleEnginesRegistry)
     {
         _vehicleRepository = vehicleRepository;
         _entityFactory = entityFactory;
@@ -25,6 +28,8 @@ internal sealed class VehiclesService : IVehiclesService
         _vehicleEventRepository = vehicleEventRepository;
         _dateTimeProvider = dateTimeProvider;
         _ecs = ecs;
+        _vehicleUpgradeRegistry = vehicleUpgradeRegistry;
+        _vehicleEnginesRegistry = vehicleEnginesRegistry;
         _jsonSerializerSettings = new JsonSerializerSettings
         {
             Converters = new List<JsonConverter> { new DoubleConverter() }
@@ -118,7 +123,7 @@ internal sealed class VehiclesService : IVehiclesService
             entity =>
             {
                 entity.AddComponent(new PrivateVehicleComponent(vehicleData));
-                entity.AddComponent(new VehicleUpgradesComponent(vehicleData.Upgrades));
+                entity.AddComponent(new VehicleUpgradesComponent(vehicleData.Upgrades, _vehicleUpgradeRegistry, _vehicleEnginesRegistry));
                 entity.AddComponent(new MileageCounterComponent(vehicleData.Mileage));
                 if (vehicleData.VehicleEngines.Any())
                     entity.AddComponent(new VehicleEngineComponent(vehicleData.VehicleEngines));

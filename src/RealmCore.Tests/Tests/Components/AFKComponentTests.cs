@@ -1,4 +1,6 @@
-﻿namespace RealmCore.Tests.Tests.Components;
+﻿using RealmCore.ECS;
+
+namespace RealmCore.Tests.Tests.Components;
 
 public class AFKComponentTests
 {
@@ -12,7 +14,7 @@ public class AFKComponentTests
 
         var serviceProvider = services.BuildServiceProvider();
 
-        _entity = new(serviceProvider, "test");
+        _entity = new("test");
         _afkComponent = _entity.AddComponent<AFKComponent>();
     }
 

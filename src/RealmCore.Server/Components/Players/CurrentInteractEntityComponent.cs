@@ -1,4 +1,7 @@
-﻿namespace RealmCore.Server.Components.Players;
+﻿using RealmCore.ECS;
+using RealmCore.ECS.Components;
+
+namespace RealmCore.Server.Components.Players;
 
 [ComponentUsage(false)]
 public class CurrentInteractEntityComponent : Component

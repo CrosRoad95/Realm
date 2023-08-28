@@ -1,13 +1,11 @@
-﻿using RealmCore.Persistence.Data;
+﻿using RealmCore.ECS.Components;
+using RealmCore.Persistence.Data;
 
 namespace RealmCore.Server.Components.Players;
 
 [ComponentUsage(false)]
 public class LicensesComponent : Component
 {
-    [Inject]
-    private IDateTimeProvider DateTimeProvider { get; set; } = default!;
-
     private readonly List<License> _licenses = new();
 
     public IReadOnlyList<License> Licenses
@@ -19,15 +17,17 @@ public class LicensesComponent : Component
         }
     }
     private readonly object _lock = new();
+    private readonly IDateTimeProvider _dateTimeProvider;
 
     public event Action<LicensesComponent, int>? LicenseAdded;
     public event Action<LicensesComponent, int, DateTime, string?>? LicenseSuspended;
     public event Action<LicensesComponent, int>? LicenseUnSuspended;
-    public LicensesComponent()
+    public LicensesComponent(IDateTimeProvider dateTimeProvider)
     {
+        _dateTimeProvider = dateTimeProvider;
     }
 
-    internal LicensesComponent(IEnumerable<UserLicenseData> userLicenses)
+    internal LicensesComponent(IEnumerable<UserLicenseData> userLicenses, IDateTimeProvider dateTimeProvider)
     {
         _licenses = userLicenses.Select(x => new License
         {
@@ -35,6 +35,7 @@ public class LicensesComponent : Component
             suspendedReason = x.SuspendedReason,
             suspendedUntil = x.SuspendedUntil,
         }).ToList();
+        _dateTimeProvider = dateTimeProvider;
     }
 
     public License? GetLicense(int licenseId)
@@ -51,7 +52,7 @@ public class LicensesComponent : Component
 
         lock (_lock)
             return _licenses
-                .Where(x => x.licenseId == licenseId && x.IsSuspended(DateTimeProvider))
+                .Where(x => x.licenseId == licenseId && x.IsSuspended(_dateTimeProvider))
                 .Any();
     }
 
@@ -91,7 +92,7 @@ public class LicensesComponent : Component
         var query = _licenses.Where(x => x.licenseId == licenseId);
 
         if (includeSuspended)
-            query = query.Where(x => !(x.suspendedUntil != null && x.suspendedUntil > DateTimeProvider.Now));
+            query = query.Where(x => !(x.suspendedUntil != null && x.suspendedUntil > _dateTimeProvider.Now));
 
         lock (_lock)
             return query.Any();
@@ -119,7 +120,7 @@ public class LicensesComponent : Component
                 throw new Exception();
 
             var previous = _licenses[index];
-            previous.suspendedUntil = DateTimeProvider.Now + timeSpan;
+            previous.suspendedUntil = _dateTimeProvider.Now + timeSpan;
             previous.suspendedReason = reason;
             _licenses[index] = previous;
             LicenseSuspended?.Invoke(this, licenseId, previous.suspendedUntil.Value, previous.suspendedReason);

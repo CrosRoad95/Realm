@@ -33,5 +33,7 @@ global using RealmCore.Server.Rules;
 global using Microsoft.Extensions.Options;
 global using RealmCore.Server.Options;
 global using SlipeServer.Server;
+global using RealmCore.ECS.Attributes;
+global using RealmCore.Server.Extensions.Resources;
 
 [assembly: ExcludeFromCodeCoverage]

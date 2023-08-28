@@ -1,4 +1,5 @@
-﻿using RealmCore.Persistence.Data;
+﻿using RealmCore.ECS;
+using RealmCore.Persistence.Data;
 
 namespace RealmCore.Server.Interfaces;
 

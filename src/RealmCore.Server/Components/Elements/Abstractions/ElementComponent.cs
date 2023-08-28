@@ -1,4 +1,7 @@
-﻿namespace RealmCore.Server.Components.Elements;
+﻿using RealmCore.ECS.Components;
+using SlipeServer.Server.Elements;
+
+namespace RealmCore.Server.Components.Elements.Abstractions;
 
 public abstract class ElementComponent : Component
 {
@@ -87,9 +90,9 @@ public abstract class ElementComponent : Component
     {
     }
 
-    protected override void Load()
+    protected override void Attach()
     {
-        if (Entity.TryGetComponent(out PlayerElementComponent playerElementComponent))
+        if (Entity.TryGetComponent(out PlayerElementComponent playerElementComponent) && GetType() != typeof(PlayerElementComponent))
         {
             Player = playerElementComponent.Player;
             Element.Id = (ElementId)playerElementComponent.MapIdGenerator.GetId();
@@ -97,20 +100,32 @@ public abstract class ElementComponent : Component
         }
         else
         {
-            Entity.Transform.Bind(Element);
-            Entity.Transform.PositionChanged += HandleTransformPositionChanged;
-            Entity.Transform.RotationChanged += HandleTransformRotationChanged;
+            Bind();
         }
         BaseLoaded = true;
     }
 
-    private void HandleTransformRotationChanged(Transform newTransform, Vector3 rotation)
+
+    public void Bind()
+    {
+        var transform = Entity.GetRequiredComponent<Transform>();
+        Element.Position = transform.Position;
+        if (Element.ElementType != ElementType.Pickup)
+            Element.Rotation = transform.Rotation;
+        Element.Interior = transform.Interior;
+        Element.Dimension = transform.Dimension;
+
+        Entity.Transform.PositionChanged += HandleTransformPositionChanged;
+        Entity.Transform.RotationChanged += HandleTransformRotationChanged;
+    }
+
+    private void HandleTransformRotationChanged(Transform newTransform, Vector3 rotation, bool sync)
     {
         if (!_isPerPlayer)
             Element.Rotation = rotation;
     }
 
-    private void HandleTransformPositionChanged(Transform newTransform, Vector3 position)
+    private void HandleTransformPositionChanged(Transform newTransform, Vector3 position, bool sync)
     {
         if (!_isPerPlayer)
             Element.Position = position;
@@ -128,7 +143,7 @@ public abstract class ElementComponent : Component
         RemoveFocusableHandler?.Invoke(Element);
     }
 
-    protected override void Detached()
+    protected override void Detach()
     {
         RemoveFocusableHandler?.Invoke(Element);
         if (!_isPerPlayer)

@@ -1,26 +1,17 @@
-﻿using HudComponent = SlipeServer.Server.Elements.Enums.HudComponent;
+﻿using RealmCore.ECS;
+using RealmCore.Server.Components.Elements.Abstractions;
+using HudComponent = SlipeServer.Server.Elements.Enums.HudComponent;
 
 namespace RealmCore.Server.Components.Elements;
 
 public sealed class PlayerElementComponent : PedElementComponent
 {
-    [Inject]
-    private IECS ECS { get; set; } = default!;
-    [Inject]
-    private IDateTimeProvider DateTimeProvider { get; set; } = default!;
-    [Inject]
-    private IOverlayService OverlayService { get; set; } = default!;
-    [Inject]
-    private IClientInterfaceService ClientInterfaceService { get; set; } = default!;
-    [Inject]
-    private Text3dService Text3dService { get; set; } = default!;
-    [Inject]
-    private ILogger<PlayerElementComponent> Logger { get; set; } = default!;
-
     private Entity? _focusedEntity;
     private readonly Player _player;
     private readonly Vector2 _screenSize;
     private readonly CultureInfo _culture;
+    private readonly IEntityEngine _entityEngine;
+    private readonly IDateTimeProvider _dateTimeProvider;
     private readonly Dictionary<string, Func<Entity, KeyState, Task>> _asyncBinds = new();
     private readonly Dictionary<string, Action<Entity, KeyState>> _binds = new();
     private readonly SemaphoreSlim _bindsLock = new(1);
@@ -259,7 +250,7 @@ public sealed class PlayerElementComponent : PedElementComponent
 
     public event Action<PlayerElementComponent, PedWastedEventArgs>? Wasted;
     public event Action<PlayerElementComponent, PlayerDamagedEventArgs>? Damaged;
-    public event Action<Entity?> OccupiedVehicleChanged;
+    public event Action<Entity?>? OccupiedVehicleChanged;
 
     public Entity? OccupiedVehicle
     {
@@ -269,28 +260,36 @@ public sealed class PlayerElementComponent : PedElementComponent
             if (_player.Vehicle == null)
                 return null;
 
-            ECS.TryGetByElement(_player.Vehicle, out var entity);
+            _entityEngine.TryGetByElement(_player.Vehicle, out var entity);
             return entity;
         }
     }
 
-    internal PlayerElementComponent(Player player, Vector2 screenSize, CultureInfo cultureInfo) : base(player)
+    internal PlayerElementComponent(Player player, Vector2 screenSize, CultureInfo cultureInfo, IEntityEngine entityEngine, IDateTimeProvider dateTimeProvider) : base(player)
     {
+        player.IdChanged += Player_IdChanged;
         _player = player;
         _screenSize = screenSize;
         _culture = cultureInfo;
+        _entityEngine = entityEngine;
+        _dateTimeProvider = dateTimeProvider;
     }
 
-    protected override void Load()
+    private void Player_IdChanged(Element sender, ElementChangedEventArgs<Element, ElementId> args)
+    {
+        throw new NotImplementedException();
+    }
+
+    protected override void Attach()
     {
         ThrowIfDisposed();
-        Entity.Transform.Bind(_player);
         _player.BindExecuted += HandleBindExecuted;
         _player.Wasted += HandleWasted;
         _player.Damaged += HandleDamaged;
         _player.VehicleChanged += HandleVehicleChanged;
         UpdateFight();
         _player.IsNametagShowing = false;
+        base.Attach();
     }
 
     private void HandleVehicleChanged(Ped sender, ElementChangedEventArgs<Ped, Vehicle?> args)
@@ -301,7 +300,7 @@ public sealed class PlayerElementComponent : PedElementComponent
             return;
         }
 
-        if(ECS.TryGetByElement(args.NewValue, out var vehicleEntity))
+        if(_entityEngine.TryGetByElement(args.NewValue, out var vehicleEntity))
         {
             OccupiedVehicleChanged?.Invoke(vehicleEntity);
         }
@@ -376,8 +375,8 @@ public sealed class PlayerElementComponent : PedElementComponent
     public void Spawn(Vector3 position, Vector3? rotation = null)
     {
         ThrowIfDisposed();
-        _player.Camera.Target = _player;
         _player.Spawn(position, 0, 0, 0, 0);
+        _player.Camera.Target = _player;
         Entity.Transform.Position = position;
         Entity.Transform.Rotation = rotation ?? Vector3.Zero;
         Spawned = true;
@@ -408,22 +407,6 @@ public sealed class PlayerElementComponent : PedElementComponent
         var elementComponent = entity.GetRequiredComponent<ElementComponent>();
         _player.Camera.Target = elementComponent.Element;
     }
-
-    #region ClientInterface resource
-    public void SetClipboard(string content)
-    {
-        ThrowIfDisposed();
-        ClientInterfaceService.SetClipboard(_player, content);
-    }
-    #endregion
-
-    #region Overlay resource
-    public void AddNotification(string message)
-    {
-        ThrowIfDisposed();
-        OverlayService.AddNotification(_player, message);
-    }
-    #endregion
 
     public void SetBindAsync(string key, Func<Entity, KeyState, Task> callback)
     {
@@ -531,13 +514,9 @@ public sealed class PlayerElementComponent : PedElementComponent
         {
             await InternalHandleBindExecuted(e.Key, e.KeyState);
         }
-        catch(Exception ex)
+        catch(Exception)
         {
-            Logger.LogHandleError(ex);
-        }
-        finally
-        {
-
+            // TODO: handle exception
         }
     }
 
@@ -553,7 +532,7 @@ public sealed class PlayerElementComponent : PedElementComponent
                 _bindsUpCooldown.TryGetValue(key, out cooldownUntil);
         }
 
-        if (cooldownUntil > DateTimeProvider.Now)
+        if (cooldownUntil > _dateTimeProvider.Now)
         {
             return true;
         }
@@ -626,14 +605,9 @@ public sealed class PlayerElementComponent : PedElementComponent
             {
                 bindCallback(Entity, keyState);
             }
-            catch (Exception ex)
-            {
-                Logger.LogError(ex, "Failed to execute bind {key} and state {keyState}.", key, keyState);
-                throw;
-            }
             finally
             {
-                TrySetCooldown(key, keyState, DateTimeProvider.Now.AddMilliseconds(400));
+                TrySetCooldown(key, keyState, _dateTimeProvider.Now.AddMilliseconds(400));
             }
         }
 
@@ -643,22 +617,11 @@ public sealed class PlayerElementComponent : PedElementComponent
             {
                 await asyncBindCallback(Entity, keyState);
             }
-            catch (Exception ex)
-            {
-                Logger.LogError(ex, "Failed to execute async bind {key} and state {keyState}.", key, keyState);
-                throw;
-            }
             finally
             {
-                TrySetCooldown(key, keyState, DateTimeProvider.Now.AddMilliseconds(400));
+                TrySetCooldown(key, keyState, _dateTimeProvider.Now.AddMilliseconds(400));
             }
         }
-    }
-
-    public void SetText3dRenderingEnabled(bool enabled)
-    {
-        ThrowIfDisposed();
-        Text3dService.SetRenderingEnabled(_player, enabled);
     }
 
     public void ToggleAllControls(bool isEnabled, bool gtaControls = true, bool mtaControls = true)
@@ -853,7 +816,7 @@ public sealed class PlayerElementComponent : PedElementComponent
     public void WarpIntoVehicle(Entity vehicleEntity, byte seat = 0)
     {
         ThrowIfDisposed();
-        var vehicle = vehicleEntity.Vehicle;
+        var vehicle = vehicleEntity.GetVehicle();
         Entity.Transform.Interior = vehicle.Interior;
         Entity.Transform.Dimension = vehicle.Dimension;
         _player.WarpIntoVehicle(vehicle, seat);

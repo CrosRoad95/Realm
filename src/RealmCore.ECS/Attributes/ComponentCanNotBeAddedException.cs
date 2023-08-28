@@ -1,4 +1,4 @@
-﻿namespace RealmCore.Server.Exceptions;
+﻿namespace RealmCore.ECS.Attributes;
 
 public class ComponentCanNotBeAddedException<T> : Exception
 {

@@ -1,17 +1,15 @@
-﻿using RealmCore.Persistence.Data;
+﻿using RealmCore.ECS.Components;
+using RealmCore.Persistence.Data;
 
 namespace RealmCore.Server.Components.Vehicles;
 
 [ComponentUsage(false)]
 public class VehicleUpgradesComponent : Component
 {
-    [Inject]
-    private VehicleUpgradeRegistry VehicleUpgradeRegistry { get; set; } = default!;
-    [Inject]
-    private VehicleEnginesRegistry VehicleEnginesRegistry { get; set; } = default!;
-
     private readonly List<int> _upgrades = new();
     private readonly object _lock = new();
+    private readonly VehicleUpgradeRegistry _vehicleUpgradeRegistry;
+    private readonly VehicleEnginesRegistry _vehicleEnginesRegistry;
     private bool _dirtyState = false;
 
     public IReadOnlyCollection<int> Upgrades
@@ -43,15 +41,22 @@ public class VehicleUpgradesComponent : Component
     public event Action<VehicleUpgradesComponent, int>? UpgradeRemoved;
     public event Action<VehicleUpgradesComponent, byte>? PaintjobChanged;
 
-    public VehicleUpgradesComponent() { }
+    public VehicleUpgradesComponent(VehicleUpgradeRegistry vehicleUpgradeRegistry, VehicleEnginesRegistry vehicleEnginesRegistry)
+    {
+        _dirtyState = true;
+        _vehicleUpgradeRegistry = vehicleUpgradeRegistry;
+        _vehicleEnginesRegistry = vehicleEnginesRegistry;
+    }
 
-    internal VehicleUpgradesComponent(ICollection<VehicleUpgradeData> vehicleUpgrades)
+    internal VehicleUpgradesComponent(ICollection<VehicleUpgradeData> vehicleUpgrades, VehicleUpgradeRegistry vehicleUpgradeRegistry, VehicleEnginesRegistry vehicleEnginesRegistry)
     {
         _upgrades = vehicleUpgrades.Select(x => x.UpgradeId).ToList();
         _dirtyState = true;
+        _vehicleUpgradeRegistry = vehicleUpgradeRegistry;
+        _vehicleEnginesRegistry = vehicleEnginesRegistry;
     }
 
-    protected override void Load()
+    protected override void Attach()
     {
         RebuildUpgrades();
     }
@@ -220,15 +225,15 @@ public class VehicleUpgradesComponent : Component
 
             if (_upgrades.Any())
             {
-                IEnumerable<VehicleUpgradeRegistryEntry> upgradesEntries = _upgrades.Select(VehicleUpgradeRegistry.Get);
+                IEnumerable<VehicleUpgradeRegistryEntry> upgradesEntries = _upgrades.Select(_vehicleUpgradeRegistry.Get);
 
                 ApplyUpgrades(boxedVehicleHandling, upgradesEntries);
                 ApplyVisualUpgrades(vehicle.Upgrades, upgradesEntries);
 
                 if (Entity.TryGetComponent(out VehicleEngineComponent vehicleEngineComponent))
                 {
-                    var upgradeId = VehicleEnginesRegistry.Get(vehicleEngineComponent.ActiveVehicleEngineId).UpgradeId;
-                    ApplyUpgrades(boxedVehicleHandling, new VehicleUpgradeRegistryEntry[] { VehicleUpgradeRegistry.Get(upgradeId) });
+                    var upgradeId = _vehicleEnginesRegistry.Get(vehicleEngineComponent.ActiveVehicleEngineId).UpgradeId;
+                    ApplyUpgrades(boxedVehicleHandling, new VehicleUpgradeRegistryEntry[] { _vehicleUpgradeRegistry.Get(upgradeId) });
                 }
             }
             _dirtyState = false;

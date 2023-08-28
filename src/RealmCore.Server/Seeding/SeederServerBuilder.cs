@@ -16,9 +16,9 @@ internal sealed class SeederServerBuilder
     private readonly Dictionary<string, ISeederProvider> _seederProviders = new();
     private readonly Dictionary<string, IAsyncSeederProvider> _asyncSeederProviders = new();
     private readonly ILogger<SeederServerBuilder> _logger;
-    private readonly IECS _ecs;
+    private readonly IEntityEngine _ecs;
     private readonly Dictionary<string, UserData> _createdUsers = new();
-    public SeederServerBuilder(ILogger<SeederServerBuilder> logger, IECS ecs,
+    public SeederServerBuilder(ILogger<SeederServerBuilder> logger, IEntityEngine ecs,
         IServerFilesProvider serverFilesProvider, UserManager<UserData> userManager, RoleManager<RoleData> roleManager,
         IGroupService groupService, IEntityFactory entityFactory, IFractionService fractionService, IEnumerable<ISeederProvider> seederProviders,
         IEnumerable<IAsyncSeederProvider> asyncSeederProviders)

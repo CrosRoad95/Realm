@@ -1,4 +1,6 @@
-﻿namespace RealmCore.Server.Components.Vehicles;
+﻿using RealmCore.ECS.Components;
+
+namespace RealmCore.Server.Components.Vehicles;
 
 public class FuelComponent : Component, ILuaDebugDataProvider
 {
@@ -139,7 +141,7 @@ public class FuelComponent : Component, ILuaDebugDataProvider
         _fuelType = fuelType;
     }
 
-    protected override void Load()
+    protected override void Attach()
     {
         var vehicle = Entity.GetRequiredComponent<VehicleElementComponent>().Vehicle;
         vehicle.PositionChanged += HandlePositionChanged;
@@ -151,7 +153,7 @@ public class FuelComponent : Component, ILuaDebugDataProvider
         }
     }
 
-    protected override void Detached()
+    protected override void Detach()
     {
         var vehicle = Entity.GetRequiredComponent<VehicleElementComponent>().Vehicle;
         vehicle.PositionChanged -= HandlePositionChanged;

@@ -5,14 +5,15 @@ namespace RealmCore.Console.Components.Gui;
 [ComponentUsage(false)]
 public sealed class LoginGuiComponent : GuiComponent
 {
-    [Inject]
-    private IUsersService usersService { get; set; } = default!;
-    [Inject]
-    private ILogger<GuiComponent> Logger { get; set; } = default!;
+    private readonly IUsersService _usersService;
+    private readonly ILogger<LoginGuiComponent> _loggerLoginGuiComponent;
+    private readonly ILogger<RegisterGuiComponent> _loggerRegisterGuiComponent;
 
-    public LoginGuiComponent() : base("login", false)
+    public LoginGuiComponent(IUsersService usersService, ILogger<LoginGuiComponent> loggerLoginGuiComponent, ILogger<RegisterGuiComponent> loggerRegisterGuiComponent) : base("login", false)
     {
-
+        _usersService = usersService;
+        _loggerLoginGuiComponent = loggerLoginGuiComponent;
+        _loggerRegisterGuiComponent = loggerRegisterGuiComponent;
     }
 
     protected override async Task HandleForm(IFormContext formContext)
@@ -25,13 +26,13 @@ public sealed class LoginGuiComponent : GuiComponent
                 {
                     loginData = formContext.GetData<LoginData>();
                 }
-                catch(ValidationException ex)
+                catch (ValidationException ex)
                 {
                     formContext.ErrorResponse(ex.Errors.First().ErrorMessage);
                     return;
                 }
 
-                var user = await usersService.GetUserByLogin(loginData.Login);
+                var user = await _usersService.GetUserByLogin(loginData.Login);
 
                 if (user == null)
                 {
@@ -46,7 +47,7 @@ public sealed class LoginGuiComponent : GuiComponent
                 //    return;
                 //}
 
-                if (!await usersService.CheckPasswordAsync(user, loginData.Password))
+                if (!await _usersService.CheckPasswordAsync(user, loginData.Password))
                 {
                     formContext.ErrorResponse("Login lub hasło jest niepoprawne.");
                     return;
@@ -54,16 +55,16 @@ public sealed class LoginGuiComponent : GuiComponent
 
                 try
                 {
-                    if (await usersService.SignIn(Entity, user))
+                    if (await _usersService.SignIn(Entity, user))
                     {
                         Entity.TryDestroyComponent(this);
                         formContext.SuccessResponse();
                         return;
                     }
                 }
-                catch(Exception ex)
+                catch (Exception ex)
                 {
-                    Logger.LogHandleError(ex);
+                    _loggerLoginGuiComponent.LogHandleError(ex);
                     formContext.ErrorResponse("Błąd podczas logowania.");
                 }
                 break;
@@ -77,7 +78,7 @@ public sealed class LoginGuiComponent : GuiComponent
         switch (actionContext.ActionName)
         {
             case "navigateToRegister":
-                Entity.AddComponent<RegisterGuiComponent>();
+                Entity.AddComponent(new RegisterGuiComponent(_usersService, _loggerRegisterGuiComponent, _loggerLoginGuiComponent));
                 Entity.DestroyComponent(this);
                 break;
             default:

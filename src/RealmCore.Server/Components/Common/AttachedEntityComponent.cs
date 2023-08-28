@@ -1,4 +1,7 @@
-﻿namespace RealmCore.Server.Components.Common;
+﻿using RealmCore.ECS;
+using RealmCore.ECS.Components;
+
+namespace RealmCore.Server.Components.Common;
 
 [ComponentUsage(true)]
 public class AttachedEntityComponent : Component
@@ -56,7 +59,7 @@ public class AttachedEntityComponent : Component
         }
     }
 
-    protected override void Load()
+    protected override void Attach()
     {
         _attachedEntity.Disposed += HandleAttachedEntityDestroyed;
     }

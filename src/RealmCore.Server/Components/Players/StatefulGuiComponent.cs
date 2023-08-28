@@ -1,14 +1,24 @@
 ﻿namespace RealmCore.Server.Components.Players;
 
-public abstract class StatefulGuiComponent<TState> : GuiComponent
+public abstract class StatefulGuiComponentBase : GuiComponent
 {
-    [Inject]
-    private IGuiSystemService GuiSystemService { get; set; } = default!;
-    [Inject]
-    private LuaValueMapper LuaValueMapper { get; set; } = default!;
+    public Action<StatefulGuiComponentBase, string, bool, object?> GuiOpened;
+    public Action<StatefulGuiComponentBase, string, Dictionary<LuaValue, object?>> StateChanged;
+    public StatefulGuiComponentBase(string name, bool cursorLess)
+        : base(name, cursorLess)
+    {
 
+    }
+
+    protected void RelayGuiOpened(StatefulGuiComponentBase statefulGuiComponentBase, string name, bool cursorLess, object? state)
+    {
+        GuiOpened?.Invoke(statefulGuiComponentBase, name, cursorLess, state);
+    }
+}
+public abstract class StatefulGuiComponent<TState> : StatefulGuiComponentBase
+{
     private readonly TState _state;
-    private readonly Dictionary<LuaValue, LuaValue> _stateChange = new();
+    private readonly Dictionary<LuaValue, object?> _stateChange = new();
 
     public StatefulGuiComponent(string name, bool cursorLess, TState initialState)
         : base(name, cursorLess)
@@ -18,17 +28,16 @@ public abstract class StatefulGuiComponent<TState> : GuiComponent
 
     protected virtual void PreGuiOpen(TState state) { }
 
-    protected override void OpenGui()
+    protected void OpenGui()
     {
         PreGuiOpen(_state);
-        var playerElementComponent = Entity.GetRequiredComponent<PlayerElementComponent>();
-        GuiSystemService.OpenGui(playerElementComponent.Player, _name, _cursorless, LuaValueMapper.UniversalMap(_state));
+        GuiOpened?.Invoke(this, _name, _cursorless, _state);
     }
 
     private void FlushChanged()
     {
         var playerElementComponent = Entity.GetRequiredComponent<PlayerElementComponent>();
-        GuiSystemService.SendStateChanged(playerElementComponent.Player, _name, _stateChange);
+        StateChanged?.Invoke(this, _name, _stateChange);
         _stateChange.Clear();
     }
 
@@ -50,7 +59,7 @@ public abstract class StatefulGuiComponent<TState> : GuiComponent
         if (property.GetValue(_state) != value as object)
         {
             property.SetValue(_state, value);
-            _stateChange[memberExpression.Member.Name] = LuaValueMapper.Map(value);
+            _stateChange[memberExpression.Member.Name] = value;
             FlushChanged();
         }
     }
@@ -66,7 +75,7 @@ public abstract class StatefulGuiComponent<TState> : GuiComponent
         if (stateValue != newValue as object)
         {
             property.SetValue(_state, newValue);
-            _stateChange[memberExpression.Member.Name] = LuaValueMapper.Map(newValue);
+            _stateChange[memberExpression.Member.Name] = newValue;
             FlushChanged();
         }
     }

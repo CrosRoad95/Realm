@@ -1,4 +1,4 @@
-﻿namespace RealmCore.Server.Attributes;
+﻿namespace RealmCore.ECS.Attributes;
 
 public class ComponentUsageAttribute : Attribute
 {

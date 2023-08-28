@@ -1,4 +1,6 @@
-﻿namespace RealmCore.Server.Components.Elements;
+﻿using RealmCore.ECS.Components;
+
+namespace RealmCore.Server.Components.Elements.Abstractions;
 
 public abstract class InteractionComponent : Component
 {
@@ -9,12 +11,12 @@ public abstract class InteractionComponent : Component
 
     }
 
-    protected override void Load()
+    protected override void Attach()
     {
         Entity.GetRequiredComponent<ElementComponent>().AddFocusable();
     }
 
-    protected override void Detached()
+    protected override void Detach()
     {
         Entity.GetRequiredComponent<ElementComponent>().RemoveFocusable();
     }

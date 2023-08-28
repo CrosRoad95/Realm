@@ -2,11 +2,11 @@
 
 internal sealed class AFKResourceLogic
 {
-    private readonly IECS _ecs;
+    private readonly IEntityEngine _ecs;
     private readonly ILogger<StatisticsCounterResourceLogic> _logger;
     private readonly IDateTimeProvider _dateTimeProvider;
 
-    public AFKResourceLogic(IAFKService afkService, IECS ecs, ILogger<StatisticsCounterResourceLogic> logger, IDateTimeProvider dateTimeProvider)
+    public AFKResourceLogic(IAFKService afkService, IEntityEngine ecs, ILogger<StatisticsCounterResourceLogic> logger, IDateTimeProvider dateTimeProvider)
     {
         _ecs = ecs;
         _logger = logger;

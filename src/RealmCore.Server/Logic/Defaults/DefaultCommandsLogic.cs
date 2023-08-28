@@ -1,4 +1,6 @@
-﻿namespace RealmCore.Server.Logic.Defaults;
+﻿using RealmCore.ECS.Attributes;
+
+namespace RealmCore.Server.Logic.Defaults;
 
 public class DefaultCommandsLogic
 {

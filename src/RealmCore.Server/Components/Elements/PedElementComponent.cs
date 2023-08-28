@@ -1,4 +1,6 @@
-﻿namespace RealmCore.Server.Components.Elements;
+﻿using RealmCore.Server.Components.Elements.Abstractions;
+
+namespace RealmCore.Server.Components.Elements;
 
 public class PedElementComponent : ElementComponent
 {

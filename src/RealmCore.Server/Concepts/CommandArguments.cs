@@ -1,4 +1,6 @@
-﻿namespace RealmCore.Server.Concepts;
+﻿using RealmCore.ECS;
+
+namespace RealmCore.Server.Concepts;
 
 public class CommandArguments
 {

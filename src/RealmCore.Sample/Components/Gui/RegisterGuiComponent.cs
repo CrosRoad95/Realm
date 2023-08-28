@@ -5,12 +5,15 @@ namespace RealmCore.Console.Components.Gui;
 [ComponentUsage(false)]
 public sealed class RegisterGuiComponent : GuiComponent
 {
-    [Inject]
-    private IUsersService RPGUserManager { get; set; } = default!;
+    private readonly IUsersService _usersService;
+    private readonly ILogger<RegisterGuiComponent> _loggerRegisterGuiWindow;
+    private readonly ILogger<LoginGuiComponent> _loggerLoginGuiWindow;
 
-    public RegisterGuiComponent() : base("register", false)
+    public RegisterGuiComponent(IUsersService usersService, ILogger<RegisterGuiComponent> loggerRegisterGuiWindow, ILogger<LoginGuiComponent> loggerLoginGuiWindow) : base("register", false)
     {
-
+        _usersService = usersService;
+        _loggerRegisterGuiWindow = loggerRegisterGuiWindow;
+        _loggerLoginGuiWindow = loggerLoginGuiWindow;
     }
 
     protected override async Task HandleForm(IFormContext formContext)
@@ -25,7 +28,7 @@ public sealed class RegisterGuiComponent : GuiComponent
                     return;
                 }
 
-                if (await RPGUserManager.IsUserNameInUse(registerData.Login))
+                if (await _usersService.IsUserNameInUse(registerData.Login))
                 {
                     formContext.ErrorResponse("Login zajęty.");
                     return;
@@ -33,8 +36,8 @@ public sealed class RegisterGuiComponent : GuiComponent
 
                 try
                 {
-                    var userId = await RPGUserManager.SignUp(registerData.Login, registerData.Password);
-                    Entity.AddComponent<LoginGuiComponent>();
+                    var userId = await _usersService.SignUp(registerData.Login, registerData.Password);
+                    Entity.AddComponent(new LoginGuiComponent(_usersService, _loggerLoginGuiWindow, _loggerRegisterGuiWindow));
                     Entity.DestroyComponent(this);
                 }
                 catch (Exception ex)
@@ -52,7 +55,7 @@ public sealed class RegisterGuiComponent : GuiComponent
         switch (actionContext.ActionName)
         {
             case "navigateToLogin":
-                Entity.AddComponent<LoginGuiComponent>();
+                Entity.AddComponent(new LoginGuiComponent(_usersService, _loggerLoginGuiWindow, _loggerRegisterGuiWindow));
                 Entity.DestroyComponent(this);
                 break;
             default:

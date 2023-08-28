@@ -8,18 +8,17 @@ namespace RealmCore.Console.Components.Huds;
 
 public class SampleVehicleHud : HudComponent
 {
-    [Inject]
-    private AssetsRegistry AssetsRegistry { get; set; } = default!;
+    private readonly AssetsRegistry _assetsRegistry;
 
-    public SampleVehicleHud() : base(new())
+    public SampleVehicleHud(AssetsRegistry assetsRegistry) : base(new())
     {
-
+        _assetsRegistry = assetsRegistry;
     }
 
     protected override void Build(IHudBuilder<object> x)
     {
         x.AddRectangle(new Vector2(x.Right - 400, 600), new Size(400, 20), Color.DarkBlue);
         x.AddVehicleSpeed(new Vector2(x.Right - 200, 600), new Size(200, 20), font: "default", alignX: HorizontalAlign.Center, alignY: VerticalAlign.Center);
-        x.AddText("custom font", new Vector2(x.Right - 400, 600), new Size(200, 20), font: AssetsRegistry.GetFont("Better Together.otf"), alignX: HorizontalAlign.Center, alignY: VerticalAlign.Center);
+        x.AddText("custom font", new Vector2(x.Right - 400, 600), new Size(200, 20), font: _assetsRegistry.GetFont("Better Together.otf"), alignX: HorizontalAlign.Center, alignY: VerticalAlign.Center);
     }
 }

@@ -24,7 +24,7 @@ local dockingAreas = {
 	["centerBottom"] = {sx / 4, sy - 300, sx / 2, 300},
 	["rightBottom"] = {sx - 500, sy - 400, 500, 400},
 }
-
+setDebugViewActive(true)
 addEvent("guiElementCreated")
 
 function guiGetScreenSize()
@@ -451,6 +451,7 @@ local function entrypoint()
 
 	addEvent("internalUiOpenGui", true)
 	addEventHandler("internalUiOpenGui", localPlayer, function(guiName, cursorless, defaultState)
+		outputConsole("internalUiOpenGui")
 		openGui(guiName, cursorless, defaultState);
 	end)
 	

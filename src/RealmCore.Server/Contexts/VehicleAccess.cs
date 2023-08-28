@@ -1,4 +1,6 @@
-﻿using RealmCore.Persistence.Data;
+﻿using RealmCore.ECS;
+using RealmCore.ECS.Components;
+using RealmCore.Persistence.Data;
 
 namespace RealmCore.Server.Contexts;
 

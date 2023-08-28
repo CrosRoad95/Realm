@@ -1,4 +1,6 @@
-﻿namespace RealmCore.Server.Rules;
+﻿using RealmCore.ECS;
+
+namespace RealmCore.Server.Rules;
 
 public interface IEntityRule
 {

@@ -1,4 +1,7 @@
-﻿namespace RealmCore.Server.Behaviours;
+﻿using RealmCore.ECS;
+using RealmCore.ECS.Components;
+
+namespace RealmCore.Server.Behaviours;
 
 internal sealed class PrivateCollisionShapeBehaviour
 {
@@ -8,7 +11,7 @@ internal sealed class PrivateCollisionShapeBehaviour
     private readonly Task _refreshPrivateCollisionShapeCollidersTask;
     private readonly ILogger<PrivateCollisionShapeBehaviour> _logger;
 
-    public PrivateCollisionShapeBehaviour(IECS ecs, ILogger<PrivateCollisionShapeBehaviour> logger)
+    public PrivateCollisionShapeBehaviour(IEntityEngine ecs, ILogger<PrivateCollisionShapeBehaviour> logger)
     {
         foreach (var playerEntity in ecs.PlayerEntities)
         {

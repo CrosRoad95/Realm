@@ -1,12 +1,15 @@
-﻿namespace RealmCore.Server.Logic.Resources;
+﻿using RealmCore.ECS;
+using RealmCore.ECS.Components;
+
+namespace RealmCore.Server.Logic.Resources;
 
 internal sealed class OutlineResourceLogic
 {
     private readonly ILogger<ClientInterfaceResourceLogic> _logger;
     private readonly IElementOutlineService _elementOutlineService;
-    private readonly IECS _ecs;
+    private readonly IEntityEngine _ecs;
 
-    public OutlineResourceLogic(IElementOutlineService elementOutlineService, ILogger<ClientInterfaceResourceLogic> logger, IECS ecs)
+    public OutlineResourceLogic(IElementOutlineService elementOutlineService, ILogger<ClientInterfaceResourceLogic> logger, IEntityEngine ecs)
     {
         _elementOutlineService = elementOutlineService;
         _ecs = ecs;
@@ -32,13 +35,13 @@ internal sealed class OutlineResourceLogic
         if (component is OutlineComponent outlineComponent)
         {
             outlineComponent.Disposed += HandleOutlineComponentDisposed;
-            _elementOutlineService.SetElementOutline(outlineComponent.Entity.Element, outlineComponent.Color);
+            _elementOutlineService.SetElementOutline(outlineComponent.Entity.GetElement(), outlineComponent.Color);
         }
     }
 
     private void HandleOutlineComponentDisposed(Component component)
     {
         component.Disposed -= HandleOutlineComponentDisposed;
-        _elementOutlineService.RemoveElementOutline(component.Entity.Element);
+        _elementOutlineService.RemoveElementOutline(component.Entity.GetElement());
     }
 }

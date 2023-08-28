@@ -1,4 +1,6 @@
-﻿namespace RealmCore.Tests.Tests.Components;
+﻿using RealmCore.ECS;
+
+namespace RealmCore.Tests.Tests.Components;
 
 public class LevelComponentTests
 {
@@ -19,8 +21,8 @@ public class LevelComponentTests
             levelsRegistry.Add((uint)i + 1, new LevelRegistryEntry(requiredExperience));
             _totalRequiredExperience += requiredExperience;
         }
-        _entity = new(serviceProvider, "test");
-        _levelComponent = new();
+        _entity = new("test");
+        _levelComponent = new(levelsRegistry);
         _entity.AddComponent(_levelComponent);
     }
 

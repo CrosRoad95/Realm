@@ -1,16 +1,18 @@
-﻿using RealmCore.Resources.Admin.Data;
+﻿using RealmCore.ECS;
+using RealmCore.ECS.Components;
+using RealmCore.Resources.Admin.Data;
 using RealmCore.Resources.Admin.Enums;
 
 namespace RealmCore.Server.Logic.Resources;
 
 internal sealed class AdminResourceLogic
 {
-    private readonly IECS _ecs;
+    private readonly IEntityEngine _ecs;
     private readonly IAdminService _adminService;
     private readonly ILogger<AdminResourceLogic> _logger;
     private readonly ISpawnMarkersService _spawnMarkersService;
 
-    public AdminResourceLogic(IECS ecs, IAdminService adminService, ILogger<AdminResourceLogic> logger, ISpawnMarkersService spawnMarkersService)
+    public AdminResourceLogic(IEntityEngine ecs, IAdminService adminService, ILogger<AdminResourceLogic> logger, ISpawnMarkersService spawnMarkersService)
     {
         _ecs = ecs;
         _adminService = adminService;
@@ -52,7 +54,7 @@ internal sealed class AdminResourceLogic
         }
     }
 
-    private LuaValue GetDebugComponent(Component component)
+    private LuaValue GetDebugComponent(RealmCore.ECS.Interfaces.IComponent component)
     {
         var data = new Dictionary<LuaValue, LuaValue>
         {
@@ -82,7 +84,7 @@ internal sealed class AdminResourceLogic
                     _adminService.BroadcastEntityDebugInfoUpdateForPlayer(player, _ecs.Entities.Select(x => new EntityDebugInfo
                     {
                         debugId = x.Id,
-                        element = x.Element,
+                        element = x.GetElement(),
                         position = x.Transform.Position,
                         previewType = PreviewType.BoxWireframe,
                         previewColor = Color.Red,

@@ -1,4 +1,6 @@
-﻿namespace RealmCore.Tests.Tests.Components;
+﻿using RealmCore.ECS;
+
+namespace RealmCore.Tests.Tests.Components;
 
 public class InventoryComponentTests
 {
@@ -54,7 +56,7 @@ public class InventoryComponentTests
 
         var services = new ServiceCollection();
         services.AddSingleton<IRealmConfigurationProvider>(new TestConfigurationProvider());
-        _entity = new(services.BuildServiceProvider(), "test");
+        _entity = new("test");
         _inventoryComponent = new(100);
         _entity.AddComponent(_inventoryComponent);
     }

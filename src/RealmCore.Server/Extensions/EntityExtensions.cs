@@ -1,4 +1,7 @@
-﻿namespace RealmCore.Server.Extensions;
+﻿using RealmCore.ECS;
+using RealmCore.Server.Components.Elements.Abstractions;
+
+namespace RealmCore.Server.Extensions;
 
 public static class EntityExtensions
 {
@@ -19,4 +22,20 @@ public static class EntityExtensions
         var length = (a.Transform.Position - b.Transform.Position).Length();
         return length;
     }
+
+    internal static bool TryGetElement(this Entity entity, out Element element)
+    {
+        if (entity.TryGetComponent(out ElementComponent elementComponent))
+        {
+            element = elementComponent.Element;
+            return true;
+        }
+
+        element = null!;
+        return false;
+    }
+
+    internal static Player GetPlayer(this Entity entity) => entity.GetRequiredComponent<PlayerElementComponent>().Player;
+    internal static Vehicle GetVehicle(this Entity entity) => entity.GetRequiredComponent<VehicleElementComponent>().Vehicle;
+    internal static Element GetElement(this Entity entity) => entity.GetRequiredComponent<ElementComponent>().Element;
 }

@@ -2,7 +2,7 @@
 
 public class CollisionTubeElementComponent : CollisionShapeElementComponent
 {
-    internal CollisionTubeElementComponent(CollisionTube collisionTube) : base(collisionTube)
+    internal CollisionTubeElementComponent(CollisionTube collisionTube, IEntityEngine entityEngine) : base(collisionTube, entityEngine)
     {
 
     }

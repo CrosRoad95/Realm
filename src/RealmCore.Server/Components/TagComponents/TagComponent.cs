@@ -1,4 +1,6 @@
-﻿namespace RealmCore.Server.Components.TagComponents;
+﻿using RealmCore.ECS.Components;
+
+namespace RealmCore.Server.Components.TagComponents;
 
 [ComponentUsage]
 public abstract class TagComponent : Component { }

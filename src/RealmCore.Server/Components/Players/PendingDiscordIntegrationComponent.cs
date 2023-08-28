@@ -1,17 +1,18 @@
-﻿namespace RealmCore.Server.Components.Players;
+﻿using RealmCore.ECS.Components;
+
+namespace RealmCore.Server.Components.Players;
 
 [ComponentUsage(false)]
 public class PendingDiscordIntegrationComponent : Component
 {
-    [Inject]
-    protected IDateTimeProvider DateTimeProvider { get; set; } = default!;
-
     private string? _discordConnectionCode = null;
     private DateTime? _discordConnectionCodeValidUntil = null;
     private readonly object _lock = new();
+    private readonly IDateTimeProvider _dateTimeProvider;
 
-    public PendingDiscordIntegrationComponent()
+    public PendingDiscordIntegrationComponent(IDateTimeProvider dateTimeProvider)
     {
+        _dateTimeProvider = dateTimeProvider;
     }
 
     private bool HasPendingDiscordConnectionCode()
@@ -19,7 +20,7 @@ public class PendingDiscordIntegrationComponent : Component
         ThrowIfDisposed();
 
         lock (_lock)
-            return _discordConnectionCodeValidUntil != null && _discordConnectionCodeValidUntil > DateTimeProvider.Now;
+            return _discordConnectionCodeValidUntil != null && _discordConnectionCodeValidUntil > _dateTimeProvider.Now;
     }
 
     public bool Verify(string code)
@@ -42,7 +43,7 @@ public class PendingDiscordIntegrationComponent : Component
         lock (_lock)
         {
             _discordConnectionCode = Guid.NewGuid().ToString();
-            _discordConnectionCodeValidUntil = DateTimeProvider.Now.Add(validFor ?? TimeSpan.FromMinutes(2));
+            _discordConnectionCodeValidUntil = _dateTimeProvider.Now.Add(validFor ?? TimeSpan.FromMinutes(2));
             return _discordConnectionCode;
         }
     }

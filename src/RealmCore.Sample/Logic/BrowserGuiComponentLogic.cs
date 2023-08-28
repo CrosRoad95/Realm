@@ -2,7 +2,7 @@
 
 internal sealed class BrowserGuiComponentLogic : ComponentLogic<BrowserGuiComponent>
 {
-    public BrowserGuiComponentLogic(IECS ecs) : base(ecs)
+    public BrowserGuiComponentLogic(IEntityEngine ecs) : base(ecs)
     {
     }
 

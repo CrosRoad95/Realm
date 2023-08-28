@@ -1,6 +1,10 @@
-﻿using System.Diagnostics.CodeAnalysis;
+﻿using RealmCore.ECS.Attributes;
+using RealmCore.ECS.Components;
+using RealmCore.ECS.Interfaces;
+using System.Diagnostics.CodeAnalysis;
+using System.Reflection;
 
-namespace RealmCore.Server;
+namespace RealmCore.ECS;
 
 public sealed class Entity : IDisposable
 {
@@ -15,17 +19,25 @@ public sealed class Entity : IDisposable
 
     private readonly ReaderWriterLockSlim _componentsLock = new(LockRecursionPolicy.SupportsRecursion);
     private readonly List<Component> _components = new();
-    public IEnumerable<Component> Components
+    public IEnumerable<IComponent> Components
     {
         get
         {
             _componentsLock.EnterReadLock();
-            var components = new List<Component>(_components);
-            _componentsLock.ExitReadLock();
-            return components.AsReadOnly();
+            try
+            {
+                foreach (var item in _components)
+                {
+                    yield return item;
+                }
+            }
+            finally
+            {
+                _componentsLock.ExitReadLock();
+            }
         }
     }
-    
+
     public int ComponentsCount
     {
         get
@@ -37,9 +49,7 @@ public sealed class Entity : IDisposable
         }
     }
 
-    internal readonly IServiceProvider _serviceProvider;
-
-    public Transform Transform { get; private set; }
+    public Transform Transform => GetRequiredComponent<Transform>();
 
     public event Action<Component>? ComponentAdded;
     public event Action<Component>? ComponentDetached;
@@ -47,54 +57,12 @@ public sealed class Entity : IDisposable
     public event Action<Entity>? Disposed;
     public event Action<Entity>? PreDisposed;
 
-    internal Player Player => GetRequiredComponent<PlayerElementComponent>().Player;
-    internal Vehicle Vehicle => GetRequiredComponent<VehicleElementComponent>().Vehicle;
-    internal Element Element => GetRequiredComponent<ElementComponent>().Element;
-    
-    public Entity(IServiceProvider serviceProvider, string name = "")
+    public Entity(string name = "")
     {
-        _serviceProvider = serviceProvider;
         Name = name;
-        Transform = new Transform(this);
     }
 
-    internal bool TryGetElement(out Element element)
-    {
-        if(TryGetComponent(out ElementComponent elementComponent))
-        {
-            element = elementComponent.Element;
-            return true;
-        }
-
-        element = null!;
-        return false;
-    }
-
-    private void InternalInjectProperties(Type type, object obj)
-    {
-        foreach (var property in type.GetProperties(BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.FlattenHierarchy))
-        {
-            if (property.GetCustomAttribute<InjectAttribute>() != null)
-            {
-                var service = _serviceProvider.GetService(property.PropertyType);
-                if (service == null)
-                    throw new Exception($"Could not inject service of type {property.PropertyType}");
-                property.SetValue(obj, _serviceProvider.GetRequiredService(property.PropertyType));
-            }
-        }
-
-        if (type != typeof(object))
-            InternalInjectProperties(type.BaseType, obj);
-    }
-
-    internal void InjectProperties<TComponent>(TComponent component) where TComponent : Component
-    {
-        ThrowIfDisposed();
-
-        InternalInjectProperties(typeof(TComponent), component);
-    }
-
-    protected void CheckCanBeAdded<TComponent>() where TComponent : Component
+    private void CheckCanBeAdded<TComponent>() where TComponent : Component
     {
         var componentUsageAttribute = typeof(TComponent).GetCustomAttribute<ComponentUsageAttribute>();
         if (componentUsageAttribute == null || componentUsageAttribute.AllowMultiple)
@@ -104,7 +72,7 @@ public sealed class Entity : IDisposable
             throw new ComponentCanNotBeAddedException<TComponent>();
     }
 
-    protected void InternalAddComponent<TComponent>(TComponent component) where TComponent : Component
+    private void InternalAddComponent<TComponent>(TComponent component) where TComponent : Component
     {
         _componentsLock.EnterWriteLock();
         try
@@ -120,20 +88,9 @@ public sealed class Entity : IDisposable
         }
     }
 
-    protected void OnComponentAdded(Component component)
-    {
-        ComponentAdded?.Invoke(component);
-    }
-
     public TComponent AddComponent<TComponent>() where TComponent : Component, new()
     {
         return AddComponent(new TComponent());
-    }
-
-    public TComponent AddComponentFromDI<TComponent>() where TComponent : Component
-    {
-        TComponent component = _serviceProvider.GetRequiredService<TComponent>();
-        return AddComponent(component);
     }
 
     public TComponent AddComponent<TComponent>(TComponent component) where TComponent : Component
@@ -146,11 +103,10 @@ public sealed class Entity : IDisposable
         if (!component.TrySetEntity(this))
             throw new Exception("Component already attached to other entity");
 
-        InjectProperties(component);
         InternalAddComponent(component);
         try
         {
-            component.InternalLoad();
+            component.InternalAttach();
         }
         catch (Exception)
         {
@@ -161,7 +117,7 @@ public sealed class Entity : IDisposable
             throw;
         }
 
-        OnComponentAdded(component);
+        ComponentAdded?.Invoke(component);
         return component;
     }
 
@@ -178,12 +134,11 @@ public sealed class Entity : IDisposable
         if (!component.TrySetEntity(this))
             throw new Exception("Component already attached to other entity");
 
-        InjectProperties(component);
         InternalAddComponent(component);
 
         try
         {
-            component.InternalLoad();
+            component.InternalAttach();
             await component.InternalLoadAsync().ConfigureAwait(false);
         }
         catch (Exception)
@@ -191,7 +146,7 @@ public sealed class Entity : IDisposable
             DestroyComponent(component);
             throw;
         }
-        OnComponentAdded(component);
+        ComponentAdded?.Invoke(component);
         return component;
     }
 
@@ -204,7 +159,7 @@ public sealed class Entity : IDisposable
     {
         return _components.OfType<TComponent>();
     }
-    
+
     public TComponent? GetComponent<TComponent>() where TComponent : Component
     {
         ThrowIfDisposed();
@@ -219,7 +174,7 @@ public sealed class Entity : IDisposable
             _componentsLock.ExitReadLock();
         }
     }
-    
+
     public IReadOnlyList<TComponent> GetComponents<TComponent>() where TComponent : Component
     {
         ThrowIfDisposed();
@@ -313,9 +268,9 @@ public sealed class Entity : IDisposable
             try
             {
                 ComponentDetached?.Invoke(component);
-                component.InternalDetached();
+                component.InternalDetach();
             }
-            catch(Exception)
+            catch (Exception)
             {
                 throw;
             }
@@ -325,7 +280,7 @@ public sealed class Entity : IDisposable
             }
         });
     }
-    
+
     public void DetachComponent<TComponent>(TComponent component) where TComponent : Component
     {
         ThrowIfDisposed();
@@ -358,7 +313,7 @@ public sealed class Entity : IDisposable
         _componentsLock.EnterWriteLock();
         try
         {
-            if(InternalHasComponent(component))
+            if (InternalHasComponent(component))
             {
                 InternalDetachComponent(component);
                 component.Dispose();
@@ -440,99 +395,12 @@ public sealed class Entity : IDisposable
             _componentsLock.ExitReadLock();
         }
 
-        var logger = _serviceProvider.GetRequiredService<ILogger<Entity>>();
-        using var _ = logger.BeginEntity(this);
         foreach (var component in componentsToDestroy)
         {
-            try
-            {
-                DestroyComponent(component);
-            }
-            catch(Exception ex)
-            {
-                logger.LogError(ex, "Failed to destroy component.");
-            }
-        }    
+            DestroyComponent(component);
+        }
 
         Disposed?.Invoke(this);
         _disposed = true;
-    }
-
-    public IEntityComponentsTransaction BeginComponentTransaction()
-    {
-        ThrowIfDisposed();
-
-        lock (_transactionLock)
-        {
-            if (_hasPendingTransaction)
-                throw new InvalidOperationException("Transaction for this entity is already in progress");
-            _hasPendingTransaction = true;
-            _version++;
-            return new EntityComponentsTransaction(_version, this);
-        }
-    }
-
-    public int Commit(IEntityComponentsTransaction transaction)
-    {
-        ThrowIfDisposed();
-
-        if (transaction.Entity != this)
-            throw new InvalidOperationException("Transaction does not belong to this entity");
-
-        if (!transaction.TryClose())
-            throw new InvalidOperationException("Transaction already committed");
-
-        int committedComponents = 0;
-        _componentsLock.EnterWriteLock();
-        try
-        {
-            committedComponents = _components.Count(x => x._version == transaction.Version);
-        }
-        finally
-        {
-            _componentsLock.ExitWriteLock();
-            lock (_transactionLock)
-            {
-                _hasPendingTransaction = false;
-                _version++;
-            }
-        }
-
-        return committedComponents;
-    }
-
-    public int Rollback(IEntityComponentsTransaction transaction)
-    {
-        ThrowIfDisposed();
-
-        if (transaction.Entity != this)
-            throw new InvalidOperationException("Transaction does not belong to this entity");
-
-        if (!transaction.TryClose())
-            throw new InvalidOperationException("Transaction already committed");
-
-        int rollbackedComponents = 0;
-        var components = Components;
-        try
-        {
-            foreach (var item in components)
-            {
-                if (item._version == transaction.Version)
-                {
-                    DestroyComponent(item);
-                    rollbackedComponents++;
-                }
-            }
-        }
-        finally
-        {
-            lock (_transactionLock)
-            {
-                _hasPendingTransaction = false;
-                _version++;
-            }
-        }
-
-        return rollbackedComponents;
     }
 }

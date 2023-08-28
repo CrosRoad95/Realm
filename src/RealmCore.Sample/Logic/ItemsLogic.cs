@@ -7,7 +7,7 @@ public class ItemsLogic : ComponentLogic<InventoryComponent>
 {
     private readonly ChatBox _chatBox;
 
-    public ItemsLogic(ItemsRegistry itemsRegistry, IECS ecs, ChatBox chatBox) : base(ecs)
+    public ItemsLogic(ItemsRegistry itemsRegistry, IEntityEngine ecs, ChatBox chatBox) : base(ecs)
     {
         itemsRegistry.UseCallback = Use;
         itemsRegistry.Add(1, new ItemRegistryEntry
@@ -48,7 +48,7 @@ public class ItemsLogic : ComponentLogic<InventoryComponent>
         inventoryComponent.ItemRemoved += HandleInventoryComponentItemRemoved;
     }
 
-    protected override void ComponentRemoved(InventoryComponent inventoryComponent)
+    protected override void ComponentDetached(InventoryComponent inventoryComponent)
     {
         inventoryComponent.ItemAdded -= HandleInventoryComponentItemAdded;
         inventoryComponent.ItemRemoved -= HandleInventoryComponentItemRemoved;

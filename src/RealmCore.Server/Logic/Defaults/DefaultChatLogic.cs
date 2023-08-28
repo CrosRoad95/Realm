@@ -6,9 +6,9 @@ public class DefaultChatLogic
 {
     private readonly ChatBox _chatBox;
     private readonly ILogger<DefaultChatLogic> _logger;
-    private readonly IECS _ecs;
+    private readonly IEntityEngine _ecs;
 
-    public DefaultChatLogic(MtaServer server, ChatBox chatBox, ILogger<DefaultChatLogic> logger, IECS ecs)
+    public DefaultChatLogic(MtaServer server, ChatBox chatBox, ILogger<DefaultChatLogic> logger, IEntityEngine ecs)
     {
         _chatBox = chatBox;
         _logger = logger;

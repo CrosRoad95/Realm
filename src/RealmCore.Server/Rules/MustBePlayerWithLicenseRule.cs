@@ -1,12 +1,16 @@
-﻿namespace RealmCore.Server.Rules;
+﻿using RealmCore.ECS;
+
+namespace RealmCore.Server.Rules;
 
 public sealed class MustBePlayerWithLicenseRule : IEntityRule
 {
     private readonly int _licenseId;
+    private readonly IDateTimeProvider _dateTimeProvider;
 
-    public MustBePlayerWithLicenseRule(int licenseId)
+    public MustBePlayerWithLicenseRule(int licenseId, IDateTimeProvider dateTimeProvider)
     {
         _licenseId = licenseId;
+        _dateTimeProvider = dateTimeProvider;
     }
 
     public bool Check(Entity entity)

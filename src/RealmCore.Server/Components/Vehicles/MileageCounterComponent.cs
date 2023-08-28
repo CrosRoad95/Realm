@@ -1,4 +1,6 @@
-﻿namespace RealmCore.Server.Components.Vehicles;
+﻿using RealmCore.ECS.Components;
+
+namespace RealmCore.Server.Components.Vehicles;
 
 public class MileageCounterComponent : Component
 {
@@ -48,17 +50,17 @@ public class MileageCounterComponent : Component
         _minimumDistanceThreshold = minimumDistanceThreshold;
     }
 
-    protected override void Load()
+    protected override void Attach()
     {
         Entity.Transform.PositionChanged += HandlePositionChanged;
     }
 
-    protected override void Detached()
+    protected override void Detach()
     {
         Entity.Transform.PositionChanged -= HandlePositionChanged;
     }
 
-    private void HandlePositionChanged(Transform transform, Vector3 position)
+    private void HandlePositionChanged(Transform transform, Vector3 position, bool sync)
     {
         Update();
     }

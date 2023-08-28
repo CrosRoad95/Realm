@@ -1,4 +1,6 @@
-﻿namespace RealmCore.Server.Components.World;
+﻿using RealmCore.ECS.Components;
+
+namespace RealmCore.Server.Components.World;
 
 public sealed class Text3dComponent : Component
 {

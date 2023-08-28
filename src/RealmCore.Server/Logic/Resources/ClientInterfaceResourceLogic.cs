@@ -1,12 +1,16 @@
-﻿namespace RealmCore.Server.Logic.Resources;
+﻿using RealmCore.ECS;
+using RealmCore.ECS.Components;
+using RealmCore.Server.Components.Elements.Abstractions;
+
+namespace RealmCore.Server.Logic.Resources;
 
 internal sealed class ClientInterfaceResourceLogic
 {
     private readonly ILogger<ClientInterfaceResourceLogic> _logger;
     private readonly IClientInterfaceService _clientInterfaceService;
-    private readonly IECS _ecs;
+    private readonly IEntityEngine _ecs;
 
-    public ClientInterfaceResourceLogic(IClientInterfaceService clientInterfaceService, ILogger<ClientInterfaceResourceLogic> logger, IECS ecs)
+    public ClientInterfaceResourceLogic(IClientInterfaceService clientInterfaceService, ILogger<ClientInterfaceResourceLogic> logger, IEntityEngine ecs)
     {
         _clientInterfaceService = clientInterfaceService;
         _ecs = ecs;
@@ -32,8 +36,8 @@ internal sealed class ClientInterfaceResourceLogic
     {
         if (component is InteractionComponent interactionComponent)
         {
-            _clientInterfaceService.AddFocusable(component.Entity.Element);
-            interactionComponent.DetachedFromEntity += HandleInteractionComponentDetachedFromEntity;
+            _clientInterfaceService.AddFocusable(component.Entity.GetElement());
+            interactionComponent.Detached += HandleInteractionComponentDetachedFromEntity;
         }
         if (component is ElementComponent elementComponent)
         {
@@ -45,8 +49,8 @@ internal sealed class ClientInterfaceResourceLogic
     private void HandleInteractionComponentDetachedFromEntity(Component component)
     {
         var interactionComponent = (InteractionComponent)component;
-        interactionComponent.DetachedFromEntity -= HandleInteractionComponentDetachedFromEntity;
-        _clientInterfaceService.RemoveFocusable(interactionComponent.Entity.Element);
+        interactionComponent.Detached -= HandleInteractionComponentDetachedFromEntity;
+        _clientInterfaceService.RemoveFocusable(interactionComponent.Entity.GetElement());
     }
 
     private void HandleFocusedElementChanged(Player player, Element? focusedElement)

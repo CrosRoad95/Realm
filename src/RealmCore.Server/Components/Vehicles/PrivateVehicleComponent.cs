@@ -1,4 +1,5 @@
-﻿using RealmCore.Persistence.Data;
+﻿using RealmCore.ECS.Components;
+using RealmCore.Persistence.Data;
 
 namespace RealmCore.Server.Components.Vehicles;
 
@@ -32,7 +33,7 @@ public class PrivateVehicleComponent : Component
         _access = new VehicleAccess(_vehicleData.UserAccesses, this);
     }
 
-    protected override void Load()
+    protected override void Attach()
     {
         var vehicleElementComponent = Entity.GetRequiredComponent<VehicleElementComponent>();
         var vehicle = vehicleElementComponent.Vehicle;

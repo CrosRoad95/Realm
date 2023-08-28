@@ -1,4 +1,6 @@
-﻿namespace RealmCore.Server.Extensions;
+﻿using RealmCore.ECS;
+
+namespace RealmCore.Server.Extensions;
 
 public static class MarkerElementComponentExtensions
 {

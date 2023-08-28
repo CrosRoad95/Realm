@@ -1,6 +1,11 @@
-﻿namespace RealmCore.Server.Components.Elements;
+﻿using RealmCore.ECS.Components;
+using RealmCore.Server.Components.Elements.Abstractions;
 
-public class PlayerPrivateElementComponent<TElementComponent> : ElementComponent where TElementComponent : ElementComponent
+namespace RealmCore.Server.Components.Elements;
+
+public abstract class PlayerPrivateElementComponentBase : ElementComponent { }
+
+public class PlayerPrivateElementComponent<TElementComponent> : PlayerPrivateElementComponentBase where TElementComponent : ElementComponent
 {
     internal override Element Element => _elementComponent.Element;
 
@@ -46,29 +51,28 @@ public class PlayerPrivateElementComponent<TElementComponent> : ElementComponent
     public PlayerPrivateElementComponent(TElementComponent elementComponent)
     {
         _elementComponent = elementComponent;
-        _elementComponent.DetachedFromEntity += HandleDetachedFromEntity;
+        _elementComponent.Detached += HandleDetachedFromEntity;
     }
 
     private void HandleDetachedFromEntity(Component elementComponent)
     {
-        _elementComponent.DetachedFromEntity -= HandleDetachedFromEntity;
+        _elementComponent.Detached -= HandleDetachedFromEntity;
         Entity.DestroyComponent(this);
     }
 
-    protected override void Load()
+    protected override void Attach()
     {
-        base.Load();
-        Entity.InjectProperties(_elementComponent);
+        base.Attach();
 
         if (!_elementComponent.TrySetEntity(Entity))
             throw new ComponentCanNotBeAddedException<PlayerPrivateElementComponent>();
 
-        _elementComponent.InternalLoad();
+        _elementComponent.InternalAttach();
     }
 
-    protected override void Detached()
+    protected override void Detach()
     {
-        _elementComponent.DetachedFromEntity -= HandleDetachedFromEntity;
+        _elementComponent.Detached -= HandleDetachedFromEntity;
         Entity.TryDestroyComponent(_elementComponent);
     }
 }

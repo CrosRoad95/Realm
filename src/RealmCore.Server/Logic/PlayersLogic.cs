@@ -1,11 +1,14 @@
-﻿using RealmCore.Server.Utilities;
+﻿using RealmCore.ECS;
+using RealmCore.ECS.Components;
+using RealmCore.Server.Concepts;
+using RealmCore.Server.Utilities;
 using SlipeServer.Server.Resources.Providers;
 
 namespace RealmCore.Server.Logic;
 
 internal class PlayersLogic
 {
-    private readonly IECS _ecs;
+    private readonly IEntityEngine _entityEngine;
     private readonly IServiceProvider _serviceProvider;
     private readonly RealmDbContextFactory _realmDbContextFactory;
     private readonly MtaServer _mtaServer;
@@ -16,10 +19,10 @@ internal class PlayersLogic
     private readonly IResourceProvider _resourceProvider;
     private readonly ConcurrentDictionary<Player, Latch> _playerResources = new();
 
-    public PlayersLogic(IECS ecs, IServiceProvider serviceProvider,
+    public PlayersLogic(IEntityEngine ecs, IServiceProvider serviceProvider,
         RealmDbContextFactory realmDbContextFactory, MtaServer mtaServer, IClientInterfaceService clientInterfaceService, IDateTimeProvider dateTimeProvider, ISaveService saveService, ILogger<PlayersLogic> logger, IResourceProvider resourceProvider)
     {
-        _ecs = ecs;
+        _entityEngine = ecs;
         _serviceProvider = serviceProvider;
         _realmDbContextFactory = realmDbContextFactory;
         _mtaServer = mtaServer;
@@ -28,7 +31,7 @@ internal class PlayersLogic
         _saveService = saveService;
         _logger = logger;
         _resourceProvider = resourceProvider;
-        _ecs.EntityCreated += HandleEntityCreated;
+        _entityEngine.EntityCreated += HandleEntityCreated;
         _mtaServer.PlayerJoined += HandlePlayerJoined;
     }
 
@@ -82,10 +85,11 @@ internal class PlayersLogic
             var screenSize = await taskWaitForScreenSize.Task;
             var cultureInfo = await taskWaitForCultureInfo.Task;
 
-            _ecs.CreateEntity("Player " + player.Name, entity =>
+            _entityEngine.CreateEntity("Player " + player.Name, entity =>
             {
+                entity.AddComponent<Transform>();
                 entity.AddComponent<PlayerTagComponent>();
-                entity.AddComponent(new PlayerElementComponent(player, new Vector2(screenSize.Item1, screenSize.Item2), cultureInfo));
+                entity.AddComponent(new PlayerElementComponent(player, new Vector2(screenSize.Item1, screenSize.Item2), cultureInfo, _entityEngine, _dateTimeProvider));
             });
 
         }
@@ -165,7 +169,7 @@ internal class PlayersLogic
 
     private async void HandlePlayerDisconnected(Player player, PlayerQuitEventArgs e)
     {
-        if (!_ecs.TryGetEntityByPlayer(player, out var playerEntity, true))
+        if (!_entityEngine.TryGetEntityByPlayer(player, out var playerEntity, true))
             return;
         try
         {
@@ -185,12 +189,12 @@ internal class PlayersLogic
         catch (Exception ex)
         {
             _logger.LogError(ex, "Failed to handle player disconnected");
-            if (_ecs.ContainsEntity(playerEntity))
+            if (_entityEngine.ContainsEntity(playerEntity))
             {
                 _logger.LogCritical(ex, "Failed to save and dispose entity! Executing backup disposing strategy.");
                 try
                 {
-                    _ecs.RemoveEntity(playerEntity);
+                    _entityEngine.RemoveEntity(playerEntity);
                 }
                 catch(Exception ex2)
                 {

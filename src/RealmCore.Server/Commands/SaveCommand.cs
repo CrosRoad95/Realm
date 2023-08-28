@@ -1,13 +1,15 @@
-﻿namespace RealmCore.Server.Commands;
+﻿using RealmCore.ECS;
+
+namespace RealmCore.Server.Commands;
 
 [CommandName("save")]
 internal class SaveCommand : ICommand
 {
-    private readonly IECS _ecs;
+    private readonly IEntityEngine _ecs;
     private readonly ISaveService _saveService;
     private readonly ILogger<SaveCommand> _logger;
 
-    public SaveCommand(IECS ecs, ISaveService saveService, ILogger<SaveCommand> logger)
+    public SaveCommand(IEntityEngine ecs, ISaveService saveService, ILogger<SaveCommand> logger)
     {
         _ecs = ecs;
         _saveService = saveService;

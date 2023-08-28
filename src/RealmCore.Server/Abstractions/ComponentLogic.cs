@@ -1,10 +1,10 @@
 ﻿namespace RealmCore.Server.Abstractions;
 
-public class ComponentLogic<T> where T: Component
+public class ComponentLogic<T> where T: ECS.Interfaces.IComponent
 {
-    public ComponentLogic(IECS ecs)
+    public ComponentLogic(IEntityEngine entityEngine)
     {
-        ecs.EntityCreated += HandleEntityCreated;
+        entityEngine.EntityCreated += HandleEntityCreated;
     }
 
     private void HandleEntityCreated(Entity entity)
@@ -13,7 +13,8 @@ public class ComponentLogic<T> where T: Component
         entity.ComponentDetached += HandleComponentDetached;
         entity.Disposed += HandleDisposed;
         foreach (var component in entity.Components)
-            HandleComponentAdded(component);
+            if (component is T tComponent)
+                ComponentAdded(tComponent);
     }
 
     private void HandleDisposed(Entity entity)
@@ -22,13 +23,14 @@ public class ComponentLogic<T> where T: Component
         entity.ComponentDetached -= HandleComponentDetached;
         entity.Disposed -= HandleDisposed;
         foreach (var component in entity.Components.OfType<T>())
-            HandleComponentDetached(component);
+            if (component is T tComponent)
+                ComponentDetached(component);
     }
 
     private void HandleComponentDetached(Component component)
     {
         if (component is T tComponent)
-            ComponentRemoved(tComponent);
+            ComponentDetached(tComponent);
     }
 
     private void HandleComponentAdded(Component component)
@@ -38,5 +40,5 @@ public class ComponentLogic<T> where T: Component
     }
 
     protected virtual void ComponentAdded(T component) { }
-    protected virtual void ComponentRemoved(T component) { }
+    protected virtual void ComponentDetached(T component) { }
 }

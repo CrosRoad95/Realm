@@ -1,6 +1,7 @@
 ﻿using RealmCore.Server.DTOs;
-using RealmCore.Server.Components;
 using RealmCore.Server.Helpers;
+using RealmCore.ECS.Components;
+using RealmCore.ECS;
 
 namespace RealmCore.Console.Logic;
 
@@ -26,13 +27,15 @@ internal sealed class PlayerBindsLogic
         public List<Type>? allowToOpenWithGui;
     }
 
-    private readonly IECS _ecs;
+    private readonly IEntityEngine _ecs;
     private readonly IVehiclesService _vehiclesService;
+    private readonly IServiceProvider _serviceProvider;
 
-    public PlayerBindsLogic(IECS ecs, IVehiclesService vehiclesService)
+    public PlayerBindsLogic(IEntityEngine ecs, IVehiclesService vehiclesService, IServiceProvider serviceProvider)
     {
         _ecs = ecs;
         _vehiclesService = vehiclesService;
+        _serviceProvider = serviceProvider;
         _ecs.EntityCreated += HandleEntityCreated;
     }
 
@@ -98,8 +101,8 @@ internal sealed class PlayerBindsLogic
                 }
             });
 
-            GuiHelpers.BindGuiPage<HomePageComponent>(entity, "F6");
-            GuiHelpers.BindGuiPage<CounterPageComponent>(entity, "F7");
+            GuiHelpers.BindGuiPage<HomePageComponent>(entity, "F6", _serviceProvider);
+            GuiHelpers.BindGuiPage<CounterPageComponent>(entity, "F7", _serviceProvider);
 
             //playerElementComponent.SetBind("F6", entity =>
             //{
@@ -132,8 +135,8 @@ internal sealed class PlayerBindsLogic
                 }).ToList();
                 state.Counter = 3;
                 return new DashboardGuiComponent(state);
-            });
-            GuiHelpers.BindGui<InventoryGuiComponent>(entity, "i");
+            }, _serviceProvider);
+            GuiHelpers.BindGui<InventoryGuiComponent>(entity, "i", _serviceProvider);
         }
     }
 }

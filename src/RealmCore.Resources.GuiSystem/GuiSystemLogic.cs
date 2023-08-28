@@ -34,7 +34,6 @@ internal class GuiSystemLogic
 
     private async void HandlePlayerJoin(Player player)
     {
-
         try
         {
             await _resource.StartForAsync(player);

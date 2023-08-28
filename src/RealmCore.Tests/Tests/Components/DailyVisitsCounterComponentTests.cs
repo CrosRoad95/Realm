@@ -1,4 +1,6 @@
-﻿namespace RealmCore.Tests.Tests.Components;
+﻿using RealmCore.ECS;
+
+namespace RealmCore.Tests.Tests.Components;
 
 public class DailyVisitsCounterComponentTests
 {
@@ -12,7 +14,7 @@ public class DailyVisitsCounterComponentTests
         var services = new ServiceCollection();
 
         var serviceProvider = services.BuildServiceProvider();
-        _entity = new(serviceProvider, "test");
+        _entity = new("test");
         _dailyVisitsCounterComponent = new();
         _entity.AddComponent(_dailyVisitsCounterComponent);
     }

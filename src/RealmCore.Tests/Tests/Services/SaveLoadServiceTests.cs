@@ -1,4 +1,5 @@
-﻿using RealmCore.SQLite;
+﻿using RealmCore.ECS;
+using RealmCore.SQLite;
 using SlipeServer.Server.Elements;
 
 namespace RealmCore.Tests.Tests.Services;
@@ -7,7 +8,7 @@ public class SaveLoadServiceTests
 {
     private readonly IServiceProvider _services;
     private readonly Mock<ILogger<LoadService>> _loggerLoadServiceMock = new(MockBehavior.Strict);
-    private readonly Mock<ILogger<ECS>> _loggerECSMock = new(MockBehavior.Strict);
+    private readonly Mock<ILogger<EntityEngine>> _loggerECSMock = new(MockBehavior.Strict);
     private readonly Mock<ILogger<Entity>> _logger = new(MockBehavior.Strict);
     private readonly Mock<IRealmServer> _realmServerMock = new(MockBehavior.Strict);
     private readonly Mock<IElementCollection> _elementCollection = new(MockBehavior.Strict);
@@ -30,7 +31,7 @@ public class SaveLoadServiceTests
         services.AddSingleton<RepositoryFactory>();
         services.AddSingleton<IEntityFactory, EntityFactory>();
         services.AddSingleton<IVehicleRepository, VehicleRepository>();
-        services.AddSingleton<IECS, ECS>();
+        services.AddSingleton<IEntityEngine, EntityEngine>();
         services.AddSingleton<IVehiclesService, VehiclesService>();
         services.AddSingleton(_elementCollection.Object);
         services.AddSingleton(_loggerLoadServiceMock.Object);

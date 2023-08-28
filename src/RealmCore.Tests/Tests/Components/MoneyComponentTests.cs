@@ -1,4 +1,6 @@
-﻿namespace RealmCore.Tests.Tests.Components;
+﻿using RealmCore.ECS;
+
+namespace RealmCore.Tests.Tests.Components;
 
 public class MoneyComponentTests
 {
@@ -13,9 +15,9 @@ public class MoneyComponentTests
         services.Configure<GameplayOptions>(configurationProvider.GetSection("Gameplay"));
 
         var serviceProvider = services.BuildServiceProvider();
-        _entity = new(serviceProvider, "test");
-        _entityB = new(serviceProvider, "test2");
-        _moneyComponent = new();
+        _entity = new("test");
+        _entityB = new("test2");
+        _moneyComponent = new(1000000, 2);
         _entity.AddComponent(_moneyComponent);
     }
 
@@ -136,7 +138,7 @@ public class MoneyComponentTests
     [Fact]
     public void YouShouldBeAbleToTransferMoneyBetweenMoneyComponents()
     {
-        var targetMoneyComponent = new MoneyComponent();
+        var targetMoneyComponent = new MoneyComponent(1000000, 2);
         _entityB.AddComponent(targetMoneyComponent);
 
         _moneyComponent.Money = 15;
@@ -149,7 +151,7 @@ public class MoneyComponentTests
     [Fact]
     public void YouCannotTransferMoreMoneyThanYouHave()
     {
-        var targetMoneyComponent = new MoneyComponent();
+        var targetMoneyComponent = new MoneyComponent(1000000, 2);
         _entityB.AddComponent(targetMoneyComponent);
 
         _moneyComponent.Money = 15;
@@ -161,7 +163,7 @@ public class MoneyComponentTests
     [Fact]
     public async Task TransferMoneyShouldBeThreadSafety()
     {
-        var targetMoneyComponent = new MoneyComponent();
+        var targetMoneyComponent = new MoneyComponent(1000000, 2);
         _entityB.AddComponent(targetMoneyComponent);
 
         _moneyComponent.Money = 800;
@@ -182,7 +184,7 @@ public class MoneyComponentTests
     [Theory]
     public void HasMoneyShouldReturnExpectedValue(decimal amount, decimal requiredAmount, bool force, bool expectedResult)
     {
-        var moneyComponent = new MoneyComponent();
+        var moneyComponent = new MoneyComponent(1000000, 2);
         _entityB.AddComponent(moneyComponent);
 
         _moneyComponent.Money = amount;
@@ -194,7 +196,7 @@ public class MoneyComponentTests
     [Theory]
     public void TryTakeMoneyShouldWork(decimal takenMoney, decimal expectedMoney)
     {
-        var moneyComponent = new MoneyComponent();
+        var moneyComponent = new MoneyComponent(1000000, 2);
         _entityB.AddComponent(moneyComponent);
 
         _moneyComponent.Money = 10;
@@ -205,7 +207,7 @@ public class MoneyComponentTests
     [Fact]
     public void TryTakeMoneyWithCallbackShouldSucceed()
     {
-        var moneyComponent = new MoneyComponent();
+        var moneyComponent = new MoneyComponent(1000000, 2);
         _entityB.AddComponent(moneyComponent);
 
         _moneyComponent.Money = 10;
@@ -219,7 +221,7 @@ public class MoneyComponentTests
     [Fact]
     public void TryTakeMoneyWithCallbackShouldFail()
     {
-        var moneyComponent = new MoneyComponent();
+        var moneyComponent = new MoneyComponent(1000000, 2);
         _entityB.AddComponent(moneyComponent);
 
         _moneyComponent.Money = 10;
@@ -233,7 +235,7 @@ public class MoneyComponentTests
     [Fact]
     public void TryTakeMoneyWithCallbackShouldFailOnException()
     {
-        var moneyComponent = new MoneyComponent();
+        var moneyComponent = new MoneyComponent(1000000, 2);
         _entityB.AddComponent(moneyComponent);
 
         _moneyComponent.Money = 10;
@@ -252,7 +254,7 @@ public class MoneyComponentTests
     [Fact]
     public async Task TryTakeMoneyWithCallbackAsyncShouldFailOnException()
     {
-        var moneyComponent = new MoneyComponent();
+        var moneyComponent = new MoneyComponent(1000000, 2);
         _entityB.AddComponent(moneyComponent);
 
         _moneyComponent.Money = 10;
@@ -271,7 +273,7 @@ public class MoneyComponentTests
     [Fact]
     public async Task TryTakeMoneyWithCallbackAsyncShouldNotFail()
     {
-        var moneyComponent = new MoneyComponent();
+        var moneyComponent = new MoneyComponent(1000000, 2);
         _entityB.AddComponent(moneyComponent);
 
         _moneyComponent.Money = 100;
@@ -295,7 +297,7 @@ public class MoneyComponentTests
     [Fact]
     public void TryTakeMoneyWithCallbackShouldFailIfHasNotEnoughMoney()
     {
-        var moneyComponent = new MoneyComponent();
+        var moneyComponent = new MoneyComponent(1000000, 2);
         _entityB.AddComponent(moneyComponent);
 
         _moneyComponent.Money = 100;
@@ -311,7 +313,7 @@ public class MoneyComponentTests
     [Fact]
     public async Task TryTakeMoneyWithCallbackAsyncShouldFailIfHasNotEnoughMoney()
     {
-        var moneyComponent = new MoneyComponent();
+        var moneyComponent = new MoneyComponent(1000000, 2);
         _entityB.AddComponent(moneyComponent);
 
         _moneyComponent.Money = 100;
@@ -327,7 +329,7 @@ public class MoneyComponentTests
     [Fact]
     public void TryTakeMoneyWithCallbackShouldShouldNotTakeMoneyIfCallbackReturnFalse()
     {
-        var moneyComponent = new MoneyComponent();
+        var moneyComponent = new MoneyComponent(1000000, 2);
         _entityB.AddComponent(moneyComponent);
 
         _moneyComponent.Money = 100;
@@ -343,7 +345,7 @@ public class MoneyComponentTests
     [Fact]
     public async Task TryTakeMoneyWithCallbackAsyncShouldNotTakeMoneyIfCallbackReturnFalse()
     {
-        var moneyComponent = new MoneyComponent();
+        var moneyComponent = new MoneyComponent(1000000, 2);
         _entityB.AddComponent(moneyComponent);
 
         _moneyComponent.Money = 100;
@@ -359,7 +361,7 @@ public class MoneyComponentTests
     [Fact]
     public void YouShouldNotBeAbleToSetMoneyInMoneyComponentEvents()
     {
-        var moneyComponent = new MoneyComponent();
+        var moneyComponent = new MoneyComponent(1000000, 2);
         _entityB.AddComponent(moneyComponent);
 
         var act = () =>

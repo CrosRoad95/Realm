@@ -27,13 +27,13 @@ public sealed class InventoryGuiComponent : StatefulGuiComponent<InventoryGuiCom
 
     }
 
-    protected override void Load()
+    protected override void Attach()
     {
         var inventory = Entity.GetRequiredComponent<InventoryComponent>();
         inventory.ItemAdded += HandleItemAdded;
         inventory.ItemRemoved += HandleItemRemoved;
         inventory.ItemChanged += HandleItemChanged;
-        base.Load();
+        base.Attach();
     }
 
     public override void Dispose()

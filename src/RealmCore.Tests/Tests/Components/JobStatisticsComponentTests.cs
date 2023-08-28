@@ -1,4 +1,6 @@
-﻿namespace RealmCore.Tests.Tests.Components;
+﻿using RealmCore.ECS;
+
+namespace RealmCore.Tests.Tests.Components;
 
 public class JobStatisticsComponentTests
 {
@@ -13,7 +15,7 @@ public class JobStatisticsComponentTests
         services.AddSingleton<IDateTimeProvider, TestDateTimeProvider>();
 
         var serviceProvider = services.BuildServiceProvider();
-        _entity = new(serviceProvider, "test");
+        _entity = new("test");
         _jobStatisticsComponent = new(serviceProvider.GetRequiredService<IDateTimeProvider>().Now);
         _entity.AddComponent(_jobStatisticsComponent);
     }

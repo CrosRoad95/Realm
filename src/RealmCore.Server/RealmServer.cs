@@ -1,4 +1,5 @@
-﻿using RealmCore.Server.Behaviours;
+﻿using RealmCore.ECS;
+using RealmCore.Server.Behaviours;
 using RealmCore.Server.Logic.Components;
 
 namespace RealmCore.Server;
@@ -60,7 +61,7 @@ public class RealmServer : MtaServer, IRealmServer
         int i = 0;
         var saveService = GetRequiredService<ISaveService>();
 
-        var ecs = GetRequiredService<IECS>();
+        var ecs = GetRequiredService<IEntityEngine>();
         var entities = ecs.Entities.ToList();
         foreach (var entity in entities)
         {

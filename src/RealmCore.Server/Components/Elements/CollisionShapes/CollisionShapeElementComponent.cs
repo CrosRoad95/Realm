@@ -1,27 +1,26 @@
-﻿namespace RealmCore.Server.Components.Elements.CollisionShapes;
+﻿using RealmCore.ECS;
+using RealmCore.Server.Components.Elements.Abstractions;
+
+namespace RealmCore.Server.Components.Elements.CollisionShapes;
 
 public abstract class CollisionShapeElementComponent : ElementComponent
 {
-    [Inject]
-    private IECS ECS { get; set; } = default!;
-    [Inject]
-    private IElementCollection ElementCollection { get; set; } = default!;
-    [Inject]
-    private ILogger<CollisionShapeElementComponent> Logger { get; set; } = default!;
-
     protected readonly CollisionShape _collisionShape;
+    private readonly IEntityEngine _entityEngine;
 
     public Action<Entity, Entity>? EntityEntered { get; set; }
     public Action<Entity, Entity>? EntityLeft { get; set; }
+    internal Action<CollisionShapeElementComponent>? CollidersRefreshed;
 
     internal override Element Element => _collisionShape;
 
     private readonly List<IEntityRule> _entityRules = new();
     private readonly object _entityRulesLock = new();
 
-    protected CollisionShapeElementComponent(CollisionShape collisionShape)
+    protected CollisionShapeElementComponent(CollisionShape collisionShape, IEntityEngine entityEngine)
     {
         _collisionShape = collisionShape;
+        _entityEngine = entityEngine;
         _collisionShape.ElementEntered += HandleElementEntered;
         _collisionShape.ElementLeft += HandleElementLeft;
     }
@@ -30,15 +29,7 @@ public abstract class CollisionShapeElementComponent : ElementComponent
     {
         ThrowIfDisposed();
 
-        if(_collisionShape is CollisionSphere collisionSphere)
-        {
-            var elements = ElementCollection.GetWithinRange(_collisionShape.Position, collisionSphere.Radius);
-            foreach (var element in elements)
-            {
-                if (ECS.TryGetByElement(element, out Entity entity))
-                    CheckCollisionWith(entity);
-            }
-        }
+        CollidersRefreshed?.Invoke(this);
     }
 
     public void CheckCollisionWith(Entity entity)
@@ -76,7 +67,7 @@ public abstract class CollisionShapeElementComponent : ElementComponent
 
         try
         {
-            if (!ECS.TryGetByElement(element, out var entity))
+            if (!_entityEngine.TryGetByElement(element, out var entity))
                 return;
 
             lock (_entityRulesLock)
@@ -85,7 +76,7 @@ public abstract class CollisionShapeElementComponent : ElementComponent
         }
         catch (Exception ex)
         {
-            Logger.LogHandleError(ex);
+            // TODO: log
         }
     }
 
@@ -98,7 +89,7 @@ public abstract class CollisionShapeElementComponent : ElementComponent
 
         try
         {
-            if (!ECS.TryGetByElement(element, out var entity))
+            if (!_entityEngine.TryGetByElement(element, out var entity))
                 return;
 
             lock (_entityRulesLock)
@@ -107,7 +98,7 @@ public abstract class CollisionShapeElementComponent : ElementComponent
         }
         catch (Exception ex)
         {
-            Logger.LogHandleError(ex);
+            // TODO: log
         }
     }
 

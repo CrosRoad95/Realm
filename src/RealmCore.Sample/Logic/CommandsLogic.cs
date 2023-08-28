@@ -16,6 +16,10 @@ using RealmCore.Resources.Assets.Interfaces;
 using RealmCore.Server.Concepts.Spawning;
 using RealmCore.Server.Components.Vehicles.Access;
 using RealmCore.Persistence;
+using RealmCore.ECS;
+using RealmCore.Resources.Overlay;
+using RealmCore.Resources.Assets;
+using RealmCore.Server.Registries;
 
 namespace RealmCore.Console.Logic;
 
@@ -25,7 +29,7 @@ internal sealed class CommandsLogic
     private readonly IEntityFactory _entityFactory;
     private readonly RepositoryFactory _repositoryFactory;
     private readonly ItemsRegistry _itemsRegistry;
-    private readonly IECS _ecs;
+    private readonly IEntityEngine _ecs;
     private readonly IBanService _banService;
     private readonly ChatBox _chatBox;
     private readonly ILogger<CommandsLogic> _logger;
@@ -45,9 +49,9 @@ internal sealed class CommandsLogic
     }
 
     public CommandsLogic(RealmCommandService commandService, IEntityFactory entityFactory, RepositoryFactory repositoryFactory,
-        ItemsRegistry itemsRegistry, IECS ecs, IBanService banService, ChatBox chatBox, ILogger<CommandsLogic> logger,
+        ItemsRegistry itemsRegistry, IEntityEngine ecs, IBanService banService, ChatBox chatBox, ILogger<CommandsLogic> logger,
         IDateTimeProvider dateTimeProvider, INametagsService nametagsService, IUsersService userManager, IVehiclesService vehiclesService,
-        GameWorld gameWorld, IElementOutlineService elementOutlineService, IAssetsService assetsService, ISpawnMarkersService spawnMarkersService, ILoadService loadService, IFeedbackService feedbackService)
+        GameWorld gameWorld, IElementOutlineService elementOutlineService, IAssetsService assetsService, ISpawnMarkersService spawnMarkersService, ILoadService loadService, IFeedbackService feedbackService, IOverlayService overlayService, AssetsRegistry assetsRegistry, VehicleUpgradeRegistry vehicleUpgradeRegistry, VehicleEnginesRegistry vehicleEnginesRegistry)
     {
         _commandService = commandService;
         _entityFactory = entityFactory;
@@ -110,7 +114,7 @@ internal sealed class CommandsLogic
         {
             using var vehicleRepository = _repositoryFactory.GetVehicleRepository();
             var vehicleEntity = _entityFactory.CreateVehicle(args.ReadUShort(), entity.Transform.Position + new Vector3(4, 0, 0), entity.Transform.Rotation);
-            vehicleEntity.AddComponent<VehicleUpgradesComponent>();
+            vehicleEntity.AddComponent(new VehicleUpgradesComponent(vehicleUpgradeRegistry, vehicleEnginesRegistry));
             vehicleEntity.AddComponent<MileageCounterComponent>();
             vehicleEntity.AddComponent(new FuelComponent(1, 20, 20, 0.01, 2)).Active = true;
             vehicleEntity.AddComponent<FocusableComponent>();
@@ -121,7 +125,7 @@ internal sealed class CommandsLogic
         {
             using var vehicleRepository = _repositoryFactory.GetVehicleRepository();
             var vehicleEntity = await _entityFactory.CreateNewPrivateVehicle(404, entity.Transform.Position + new Vector3(4, 0, 0), entity.Transform.Rotation);
-            vehicleEntity.AddComponent(new VehicleUpgradesComponent()).AddUpgrade(1);
+            vehicleEntity.AddComponent(new VehicleUpgradesComponent(vehicleUpgradeRegistry, vehicleEnginesRegistry)).AddUpgrade(1);
             vehicleEntity.AddComponent<MileageCounterComponent>();
             vehicleEntity.AddComponent<VehicleEngineComponent>();
             vehicleEntity.AddComponent(new FuelComponent(1, 20, 20, 0.01, 2)).Active = true;
@@ -133,7 +137,7 @@ internal sealed class CommandsLogic
         {
             using var vehicleRepository = _repositoryFactory.GetVehicleRepository();
             var vehicleEntity = _entityFactory.CreateVehicle(404, entity.Transform.Position + new Vector3(4, 0, 0), entity.Transform.Rotation);
-            vehicleEntity.AddComponent<VehicleUpgradesComponent>();
+            vehicleEntity.AddComponent(new VehicleUpgradesComponent(vehicleUpgradeRegistry, vehicleEnginesRegistry));
             vehicleEntity.AddComponent<MileageCounterComponent>();
             vehicleEntity.AddComponent(new FuelComponent(1, 20, 20, 0.01, 2)).Active = true;
             vehicleEntity.AddComponent(new VehicleExclusiveAccessComponent(entity));
@@ -143,7 +147,7 @@ internal sealed class CommandsLogic
         {
             using var vehicleRepository = _repositoryFactory.GetVehicleRepository();
             var vehicleEntity = _entityFactory.CreateVehicle(404, entity.Transform.Position + new Vector3(4, 0, 0), entity.Transform.Rotation);
-            vehicleEntity.AddComponent<VehicleUpgradesComponent>();
+            vehicleEntity.AddComponent(new VehicleUpgradesComponent(vehicleUpgradeRegistry, vehicleEnginesRegistry));
             vehicleEntity.AddComponent<MileageCounterComponent>();
             vehicleEntity.AddComponent(new FuelComponent(1, 20, 20, 0.01, 2)).Active = true;
             vehicleEntity.AddComponent<VehicleNoAccessComponent>();
@@ -151,10 +155,11 @@ internal sealed class CommandsLogic
 
         _commandService.AddAsyncCommandHandler("privateblip", async (entity, args) =>
         {
+            using var scopedEntityFactory = _entityFactory.CreateScopedEntityFactory(entity);
             using var vehicleRepository = _repositoryFactory.GetVehicleRepository();
-            var blipElementComponent = _entityFactory.CreateBlipFor(entity, BlipIcon.Pizza, entity.Transform.Position);
+            var blipElementComponent = scopedEntityFactory.CreateBlip(BlipIcon.Pizza, entity.Transform.Position);
             await Task.Delay(1000);
-            entity.DestroyComponent(blipElementComponent);
+            entity.DestroyComponent(scopedEntityFactory.LastCreatedComponent);
         });
 
         _commandService.AddCommandHandler("addmeasowner", (entity, args) =>
@@ -308,7 +313,7 @@ internal sealed class CommandsLogic
             {
                 using var vehicleRepository = _repositoryFactory.GetVehicleRepository();
                 var vehicleEntity = await _entityFactory.CreateNewPrivateVehicle(404, entity.Transform.Position + new Vector3(4, 0, 0), entity.Transform.Rotation);
-                vehicleEntity.AddComponent(new VehicleUpgradesComponent()).AddUpgrade(1);
+                vehicleEntity.AddComponent(new VehicleUpgradesComponent(vehicleUpgradeRegistry, vehicleEnginesRegistry)).AddUpgrade(1);
                 vehicleEntity.AddComponent(new MileageCounterComponent());
                 vehicleEntity.AddComponent(new FuelComponent(1, 20, 20, 0.01, 2)).Active = true;
                 vehicleEntity.AddComponent<VehiclePartDamageComponent>().AddPart(1, 1337);
@@ -365,7 +370,8 @@ internal sealed class CommandsLogic
 
         _commandService.AddCommandHandler("spawnboxforme", (entity, args) =>
         {
-            var objectEntity = _entityFactory.CreateObjectVisibleFor(entity, ObjectModel.Gunbox, entity.Transform.Position + new Vector3(4, 0, -0.65f), Vector3.Zero);
+            using var scopedEntityFactory = _entityFactory.CreateScopedEntityFactory(entity);
+            var objectEntity = scopedEntityFactory.CreateObject(ObjectModel.Gunbox, entity.Transform.Position + new Vector3(4, 0, -0.65f), Vector3.Zero);
             objectEntity.AddComponent<LiftableWorldObjectComponent>();
         });
 
@@ -435,7 +441,7 @@ internal sealed class CommandsLogic
         _commandService.AddCommandHandler("spawnbox2", (entity, args) =>
         {
             var objectEntity = _entityFactory.CreateObject(ObjectModel.Gunbox, entity.Transform.Position + new Vector3(4, 0, -0.65f), Vector3.Zero);
-            objectEntity.AddComponent<DurationBasedHoldInteractionWithRingEffectComponent>();
+            objectEntity.AddComponent(new DurationBasedHoldInteractionWithRingEffectComponent(overlayService));
         });
 
         _commandService.AddCommandHandler("stopanimation", (entity, args) =>
@@ -531,19 +537,19 @@ internal sealed class CommandsLogic
         _commandService.AddCommandHandler("createvehiclehud", (entity, args) =>
         {
             var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();
-            entity.AddComponent(new SampleVehicleHud());
+            entity.AddComponent(new SampleVehicleHud(assetsRegistry));
         });
 
         _commandService.AddCommandHandler("createhud", (entity, args) =>
         {
             var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();
-            entity.AddComponent(new SampleHud());
+            entity.AddComponent(new SampleHud(assetsRegistry));
         });
 
         _commandService.AddCommandHandler("createhud2", (entity, args) =>
         {
             var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();
-            entity.AddComponent(new SampleHud2());
+            entity.AddComponent(new SampleHud2(assetsRegistry));
         });
 
         _commandService.AddCommandHandler("updatestate2", (entity, args) =>
@@ -565,7 +571,7 @@ internal sealed class CommandsLogic
             {
                 Text1 = "text1",
                 Text2 = "text2",
-            }));
+            }, assetsRegistry));
         });
 
         _commandService.AddCommandHandler("updatestate", (entity, args) =>
@@ -588,7 +594,7 @@ internal sealed class CommandsLogic
                 _chatBox.OutputTo(entity, "Twoje konto jest już połączone z discordem.");
             }
             entity.TryDestroyComponent<PendingDiscordIntegrationComponent>();
-            var pendingDiscordIntegrationComponent = new PendingDiscordIntegrationComponent();
+            var pendingDiscordIntegrationComponent = new PendingDiscordIntegrationComponent(dateTimeProvider);
             var code = pendingDiscordIntegrationComponent.GenerateAndGetDiscordConnectionCode();
             entity.AddComponent(pendingDiscordIntegrationComponent);
             _chatBox.OutputTo(entity, $"Aby połączyć konto wpisz na kanale discord #polacz-konto komendę: /polaczkonto {code}");
@@ -895,7 +901,8 @@ internal sealed class CommandsLogic
 
         _commandService.AddCommandHandler("createObjectFor", (entity, args) =>
         {
-            _entityFactory.CreateObjectFor(entity, (ObjectModel)1337, entity.Transform.Position + new Vector3(3, 0, 0), entity.Transform.Rotation);
+            using var scopedEntityFactory = _entityFactory.CreateScopedEntityFactory(entity);
+            scopedEntityFactory.CreateObject((ObjectModel)1337, entity.Transform.Position + new Vector3(3, 0, 0), entity.Transform.Rotation);
         });
 
         _commandService.AddCommandHandler("tp", (entity, args) =>
@@ -944,13 +951,19 @@ internal sealed class CommandsLogic
 
         _commandService.AddAsyncCommandHandler("createObjectFor2", async (entity, args) =>
         {
+            using var scopedEntityFactory = _entityFactory.CreateScopedEntityFactory(entity);
             var pos = entity.Transform.Position + new Vector3(3, 0, 0);
-            var obj = _entityFactory.CreateObjectFor(entity, (ObjectModel)1337, pos, entity.Transform.Rotation);
+
+            void handleComponentCreated(IScopedEntityFactory scopedEntityFactory, PlayerPrivateElementComponentBase playerPrivateElementComponentBase) {
+                ;
+            }
+            scopedEntityFactory.ComponentCreated += handleComponentCreated;
+            scopedEntityFactory.CreateObject((ObjectModel)1337, pos, entity.Transform.Rotation);
             for (int i = 0; i < 10; i++)
             {
                 await Task.Delay(2000);
-                obj.Position = pos + new Vector3(i, 0, 0);
-                obj.Rotation = entity.Transform.Rotation;
+                //obj.Position = pos + new Vector3(i, 0, 0);
+                //obj.Rotation = entity.Transform.Rotation;
             }
         });
 
@@ -1121,26 +1134,30 @@ internal sealed class CommandsLogic
                 entity.DestroyComponent(markerElementComponent);
             }
 
-            PlayerPrivateElementComponent<MarkerElementComponent> marker = _entityFactory.CreateMarkerFor(entity, entity.Transform.Position with { X = entity.Transform.Position.X + 4 }, MarkerType.Checkpoint);
+            using var scopedEntityFactory = _entityFactory.CreateScopedEntityFactory(entity);
+            scopedEntityFactory.CreateMarker(MarkerType.Checkpoint, entity.Transform.Position with { X = entity.Transform.Position.X + 4 });
+            var marker = scopedEntityFactory.LastCreatedComponent as PlayerPrivateElementComponent<MarkerElementComponent>;
             marker.ElementComponent.EntityEntered = handleEntityEntered;
         });
 
         _commandService.AddAsyncCommandHandler("createmarkerforme", async (entity, args) =>
         {
-            var marker = _entityFactory.CreateMarkerFor(entity, entity.Transform.Position, MarkerType.Cylinder);
-            marker.ElementComponent.Size = 4;
-            marker.ElementComponent.Color = Color.Red;
+            using var scopedEntityFactory = _entityFactory.CreateScopedEntityFactory(entity);
+            scopedEntityFactory.CreateMarker(MarkerType.Cylinder, entity.Transform.Position);
+            var component = scopedEntityFactory.LastCreatedComponent as PlayerPrivateElementComponent<MarkerElementComponent>;
+            component.ElementComponent.Size = 4;
+            component.ElementComponent.Color = Color.Red;
             while (true)
             {
-                if (marker.ElementComponent.Size == 4)
+                if (component.ElementComponent.Size == 4)
                 {
-                    marker.ElementComponent.Size = 2;
-                    marker.ElementComponent.Color = Color.Red;
+                    component.ElementComponent.Size = 2;
+                    component.ElementComponent.Color = Color.Red;
                 }
                 else
                 {
-                    marker.ElementComponent.Size = 4;
-                    marker.ElementComponent.Color = Color.Blue;
+                    component.ElementComponent.Size = 4;
+                    component.ElementComponent.Color = Color.Blue;
                 }
                 await Task.Delay(500);
             }
@@ -1148,14 +1165,18 @@ internal sealed class CommandsLogic
 
         _commandService.AddAsyncCommandHandler("createmarkerforme2", async (entity, args) =>
         {
-            var marker = _entityFactory.CreateMarkerFor(entity, new Vector3(-600.8877f, 240.88867f, 26.091864f), MarkerType.Cylinder);
+            using var scopedEntityFactory = _entityFactory.CreateScopedEntityFactory(entity);
+            scopedEntityFactory.CreateMarker(MarkerType.Cylinder, new Vector3(-600.8877f, 240.88867f, 26.091864f));
+            var marker = scopedEntityFactory.LastCreatedComponent as PlayerPrivateElementComponent<MarkerElementComponent>;
             marker.ElementComponent.Size = 4;
             marker.ElementComponent.Color = Color.Red;
         });
 
         _commandService.AddCommandHandler("createmarkerforme3", (entity, args) =>
         {
-            var marker = _entityFactory.CreateMarkerFor(entity, entity.Transform.Position, MarkerType.Cylinder);
+            using var scopedEntityFactory = _entityFactory.CreateScopedEntityFactory(entity);
+            scopedEntityFactory.CreateMarker(MarkerType.Cylinder, entity.Transform.Position);
+            var marker = scopedEntityFactory.LastCreatedComponent as PlayerPrivateElementComponent<MarkerElementComponent>;
             marker.ElementComponent.Size = 4;
             marker.ElementComponent.Color = Color.Red;
             marker.ElementComponent.EntityEntered = (markerElementComponent, enteredMarker, enteredEntity) =>
@@ -1181,7 +1202,7 @@ internal sealed class CommandsLogic
 
         _commandService.AddAsyncCommandHandler("setinterior2b", async (entity, args) =>
         {
-            entity.Transform.InteriorChanged += (t, i) =>
+            entity.Transform.InteriorChanged += (t, i, sync) =>
             {
                 chatBox.OutputTo(entity, $"Changed interior to: {i}");
             };

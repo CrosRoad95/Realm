@@ -1,4 +1,5 @@
-﻿using RealmCore.Server.Components.Object;
+﻿using RealmCore.ECS;
+using RealmCore.Server.Components.Object;
 using RealmCore.Tests.Classes.Components;
 
 namespace RealmCore.Tests.Tests.Components;
@@ -18,8 +19,8 @@ public class LiftableWorldObjectComponentTests
         services.AddSingleton(_logger.Object);
         var serviceProvider = services.BuildServiceProvider();
 
-        _entity1 = new(serviceProvider, "test1");
-        _entity2 = new(serviceProvider, "test2");
+        _entity1 = new("test1");
+        _entity2 = new("test2");
         _entity1.AddComponent<TestElementComponent>();
         _liftableWorldObjectComponent = _entity1.AddComponent<LiftableWorldObjectComponent>();
     }

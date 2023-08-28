@@ -1,4 +1,6 @@
-﻿namespace RealmCore.Server.Rules;
+﻿using RealmCore.ECS;
+
+namespace RealmCore.Server.Rules;
 
 public sealed class MustBePlayerOnFootOnlyRule : IEntityRule
 {
@@ -7,12 +9,13 @@ public sealed class MustBePlayerOnFootOnlyRule : IEntityRule
         if (!entity.HasComponent<PlayerTagComponent>())
             return false;
 
-        if(entity.Player.HasJetpack)
+        var player = entity.GetPlayer();
+        if (player.HasJetpack)
             return false;
 
-        if (entity.Player.VehicleAction != VehicleAction.None)
+        if (player.VehicleAction != VehicleAction.None)
             return false;
 
-        return entity.Player.Vehicle == null;
+        return player.Vehicle == null;
     }
 }

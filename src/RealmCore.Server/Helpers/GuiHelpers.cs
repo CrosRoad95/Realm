@@ -1,14 +1,16 @@
-﻿namespace RealmCore.Server.Helpers;
+﻿using RealmCore.ECS;
+
+namespace RealmCore.Server.Helpers;
 
 public static class GuiHelpers
 {
     #region Non-Cef gui
-    public static void BindGui<TGuiComponent>(Entity entity, string bind) where TGuiComponent : GuiComponent, new()
+    public static void BindGui<TGuiComponent>(Entity entity, string bind, IServiceProvider serviceProvider) where TGuiComponent : GuiComponent, new()
     {
-        BindGui(entity, bind, () => new TGuiComponent());
+        BindGui(entity, bind, () => new TGuiComponent(), serviceProvider);
     }
 
-    public static void BindGui<TGuiComponent>(Entity entity, string bind, Func<TGuiComponent> factory) where TGuiComponent : GuiComponent
+    public static void BindGui<TGuiComponent>(Entity entity, string bind, Func<TGuiComponent> factory, IServiceProvider serviceProvider) where TGuiComponent : GuiComponent
     {
         var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();
         playerElementComponent.SetBind(bind, entity =>
@@ -28,13 +30,13 @@ public static class GuiHelpers
             }
             catch (Exception ex)
             {
-                entity._serviceProvider.GetRequiredService<ILogger<TGuiComponent>>().LogError(ex, "Error while opening gui page");
-                entity._serviceProvider.GetRequiredService<ChatBox>().OutputTo(entity, "Wystąpił bład podczas próby otwarcia gui");
+                serviceProvider.GetRequiredService<ILogger<TGuiComponent>>().LogError(ex, "Error while opening gui page");
+                serviceProvider.GetRequiredService<ChatBox>().OutputTo(entity, "Wystąpił bład podczas próby otwarcia gui");
             }
         });
     }
     
-    public static void BindGui<TGuiComponent>(Entity entity, string bind, Func<Task<TGuiComponent>> factory) where TGuiComponent : GuiComponent
+    public static void BindGui<TGuiComponent>(Entity entity, string bind, Func<Task<TGuiComponent>> factory, IServiceProvider serviceProvider) where TGuiComponent : GuiComponent
     {
         var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();
         playerElementComponent.SetBindAsync(bind, async entity =>
@@ -54,8 +56,8 @@ public static class GuiHelpers
             }
             catch (Exception ex)
             {
-                entity._serviceProvider.GetRequiredService<ILogger<TGuiComponent>>().LogError(ex, "Error while opening gui page");
-                entity._serviceProvider.GetRequiredService<ChatBox>().OutputTo(entity, "Wystąpił bład podczas próby otwarcia gui");
+                serviceProvider.GetRequiredService<ILogger<TGuiComponent>>().LogError(ex, "Error while opening gui page");
+                serviceProvider.GetRequiredService<ChatBox>().OutputTo(entity, "Wystąpił bład podczas próby otwarcia gui");
             }
         });
     }
@@ -63,12 +65,12 @@ public static class GuiHelpers
     #endregion
 
     #region CEF Gui
-    public static void BindGuiPage<TGuiComponent>(Entity entity, string bind) where TGuiComponent : GuiPageComponent, new()
+    public static void BindGuiPage<TGuiComponent>(Entity entity, string bind, IServiceProvider serviceProvider) where TGuiComponent : GuiPageComponent, new()
     {
-        BindGuiPage(entity, bind, () => new TGuiComponent());
+        BindGuiPage(entity, bind, () => new TGuiComponent(), serviceProvider);
     }
 
-    public static void BindGuiPage<TGuiComponent>(Entity entity, string bind, Func<TGuiComponent> factory) where TGuiComponent : GuiPageComponent
+    public static void BindGuiPage<TGuiComponent>(Entity entity, string bind, Func<TGuiComponent> factory, IServiceProvider serviceProvider) where TGuiComponent : GuiPageComponent
     {
         var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();
         playerElementComponent.SetBind(bind, entity =>
@@ -88,13 +90,13 @@ public static class GuiHelpers
             }
             catch (Exception ex)
             {
-                entity._serviceProvider.GetRequiredService<ILogger<TGuiComponent>>().LogError(ex, "Error while opening gui page");
-                entity._serviceProvider.GetRequiredService<ChatBox>().OutputTo(entity, "Wystąpił bład podczas próby otwarcia gui");
+                serviceProvider.GetRequiredService<ILogger<TGuiComponent>>().LogError(ex, "Error while opening gui page");
+                serviceProvider.GetRequiredService<ChatBox>().OutputTo(entity, "Wystąpił bład podczas próby otwarcia gui");
             }
         });
     }
 
-    public static void BindGuiPage<TGuiComponent>(Entity entity, string bind, Func<Task<TGuiComponent>> factory) where TGuiComponent : GuiComponent
+    public static void BindGuiPage<TGuiComponent>(Entity entity, string bind, Func<Task<TGuiComponent>> factory, IServiceProvider serviceProvider) where TGuiComponent : GuiComponent
     {
         var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();
         playerElementComponent.SetBindAsync(bind, async entity =>
@@ -114,8 +116,8 @@ public static class GuiHelpers
             }
             catch (Exception ex)
             {
-                entity._serviceProvider.GetRequiredService<ILogger<TGuiComponent>>().LogError(ex, "Error while opening gui page");
-                entity._serviceProvider.GetRequiredService<ChatBox>().OutputTo(entity, "Wystąpił bład podczas próby otwarcia gui");
+                serviceProvider.GetRequiredService<ILogger<TGuiComponent>>().LogError(ex, "Error while opening gui page");
+                serviceProvider.GetRequiredService<ChatBox>().OutputTo(entity, "Wystąpił bład podczas próby otwarcia gui");
             }
         });
     }

@@ -1,12 +1,10 @@
 ﻿using Microsoft.AspNetCore.Components;
-using RealmCore.Server.Components;
+using RealmCore.ECS.Components;
 
 namespace RealmCore.Tests.Classes.Components;
 
 public class TestComponent : Component
 {
-    [Inject]
-    private object? Object { get; set; }
     public bool IsDisposed()
     {
         try
@@ -19,6 +17,4 @@ public class TestComponent : Component
             return true;
         }
     }
-
-    public bool isObjectDefined() => Object != null;
 }

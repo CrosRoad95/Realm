@@ -1,4 +1,6 @@
-﻿namespace RealmCore.Server.Concepts.Objectives;
+﻿using RealmCore.ECS;
+
+namespace RealmCore.Server.Concepts.Objectives;
 
 public class MarkerEnterObjective : Objective
 {
@@ -19,8 +21,11 @@ public class MarkerEnterObjective : Objective
     protected override void Load(IEntityFactory entityFactory, Entity playerEntity)
     {
         _playerEntity = playerEntity;
-        _markerElementComponent = entityFactory.CreateMarkerFor(playerEntity, _position, MarkerType.Arrow, Color.White);
-        _collisionSphereElementComponent = entityFactory.CreateCollisionSphereFor(playerEntity, _position, 2);
+        using var scopedEntityFactory = entityFactory.CreateScopedEntityFactory(playerEntity);
+        scopedEntityFactory.CreateMarker(MarkerType.Arrow, _position);
+        _markerElementComponent = scopedEntityFactory.LastCreatedComponent as PlayerPrivateElementComponent<MarkerElementComponent>;
+        scopedEntityFactory.CreateCollisionSphere(_position, 2);
+        _collisionSphereElementComponent = scopedEntityFactory.LastCreatedComponent as PlayerPrivateElementComponent<CollisionSphereElementComponent>;
         _collisionSphereElementComponent.ElementComponent.EntityEntered = EntityEntered;
         _checkEnteredTimer = new System.Timers.Timer(TimeSpan.FromSeconds(0.25f));
         _checkEnteredTimer.Elapsed += HandleElapsed;

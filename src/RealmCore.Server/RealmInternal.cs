@@ -1,4 +1,6 @@
-﻿namespace RealmCore.Server;
+﻿using RealmCore.Server.Components.Elements.Abstractions;
+
+namespace RealmCore.Server;
 
 public static class RealmInternal
 {

@@ -1,4 +1,6 @@
-﻿namespace RealmCore.Server.Concepts.Objectives;
+﻿using RealmCore.ECS;
+
+namespace RealmCore.Server.Concepts.Objectives;
 
 public class OneOfObjective : Objective
 {

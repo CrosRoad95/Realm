@@ -1,11 +1,12 @@
-﻿namespace RealmCore.Server.Components.Elements;
+﻿using RealmCore.ECS;
+using RealmCore.Server.Components.Elements.Abstractions;
+
+namespace RealmCore.Server.Components.Elements;
 
 public class VehicleElementComponent : ElementComponent
 {
-    [Inject]
-    private IECS _ecs { get; set; } = default!;
-
     protected readonly Vehicle _vehicle;
+    private readonly IEntityEngine _entityEngine;
 
     internal Vehicle Vehicle => _vehicle;
 
@@ -203,7 +204,7 @@ public class VehicleElementComponent : ElementComponent
         get
         {
             ThrowIfDisposed();
-            return _vehicle.Occupants.ToDictionary(x => x.Key, x => _ecs.GetByElement(x.Value));
+            return _vehicle.Occupants.ToDictionary(x => x.Key, x => _entityEngine.GetByElement(x.Value));
         }
     }
 
@@ -213,7 +214,7 @@ public class VehicleElementComponent : ElementComponent
         {
             ThrowIfDisposed();
 
-            if (_vehicle.Driver != null && _ecs.TryGetByElement(_vehicle.Driver, out var playerEntity))
+            if (_vehicle.Driver != null && _entityEngine.TryGetByElement(_vehicle.Driver, out var playerEntity))
                 return playerEntity;
             return null;
         }
@@ -275,21 +276,22 @@ public class VehicleElementComponent : ElementComponent
     public void AddPassenger(byte seat, Entity pedEntity, bool warpsIn = true)
     {
         ThrowIfDisposed();
-        _vehicle.AddPassenger(seat, (Ped)pedEntity.Element, warpsIn);
+        _vehicle.AddPassenger(seat, (Ped)pedEntity.GetElement(), warpsIn);
     }
 
     public void RemovePassenger(Entity pedEntity, bool warpsOut = true)
     {
         ThrowIfDisposed();
-        _vehicle.RemovePassenger((Ped)pedEntity.Element, warpsOut);
+        _vehicle.RemovePassenger((Ped)pedEntity.GetElement(), warpsOut);
     }
 
-    internal VehicleElementComponent(Vehicle vehicle)
+    internal VehicleElementComponent(Vehicle vehicle, IEntityEngine entityEngine)
     {
         _vehicle = vehicle;
+        _entityEngine = entityEngine;
     }
 
-    protected override void Load()
+    protected override void Attach()
     {
         _vehicle.Pushed += HandlePushed;
         _vehicle.LightStateChanged += HandleLightStateChanged;
@@ -300,17 +302,17 @@ public class VehicleElementComponent : ElementComponent
         _vehicle.Blown += HandleBlown;
         _vehicle.PedEntered += HandlePedEntered;
         _vehicle.PedLeft += HandlePedLeft;
-        base.Load();
+        base.Attach();
     }
 
     private void HandlePedLeft(Element ped, VehicleLeftEventArgs e)
     {
-        PedLeft?.Invoke(this, _ecs.GetByElement(ped));
+        PedLeft?.Invoke(this, _entityEngine.GetByElement(ped));
     }
 
     private void HandlePedEntered(Element ped, VehicleEnteredEventsArgs e)
     {
-        PedEntered?.Invoke(this, _ecs.GetByElement(ped));
+        PedEntered?.Invoke(this, _entityEngine.GetByElement(ped));
     }
 
     private void HandleBlown(Element sender)

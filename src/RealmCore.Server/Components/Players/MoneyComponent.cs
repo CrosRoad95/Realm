@@ -1,12 +1,13 @@
-﻿namespace RealmCore.Server.Components.Players;
+﻿using RealmCore.ECS.Components;
+
+namespace RealmCore.Server.Components.Players;
 
 [ComponentUsage(false)]
 public class MoneyComponent : Component
 {
-    [Inject]
-    private IOptions<GameplayOptions> GameplayOptions { get; set; } = default!;
-
     private decimal _money = 0;
+    private readonly decimal _moneyLimit;
+    private readonly byte _moneyPrecision;
     private readonly ReaderWriterLockSlim _moneyLock = new();
 
     public event Action<MoneyComponent, decimal>? MoneySet;
@@ -25,7 +26,7 @@ public class MoneyComponent : Component
 
             value = Normalize(value);
 
-            if (Math.Abs(value) > GameplayOptions.Value.MoneyLimit)
+            if (Math.Abs(value) > _moneyLimit)
                 throw new GameplayException("Unable to set money beyond limit.");
 
             _moneyLock.EnterWriteLock();
@@ -51,21 +52,21 @@ public class MoneyComponent : Component
         }
     }
 
-    public MoneyComponent()
+    public MoneyComponent(decimal moneyLimit, byte moneyPrecision)
     {
         _money = 0;
+        _moneyLimit = moneyLimit;
+        _moneyPrecision = moneyPrecision;
     }
 
-    public MoneyComponent(decimal initialMoney)
+    public MoneyComponent(decimal initialMoney, decimal moneyLimit, byte moneyPrecision)
     {
         _money = initialMoney;
+        _moneyLimit = moneyLimit;
+        _moneyPrecision = moneyPrecision;
     }
 
-    private decimal Normalize(decimal amount)
-    {
-        var moneyPrecision = GameplayOptions.Value.MoneyPrecision;
-        return amount.Truncate(moneyPrecision);
-    }
+    private decimal Normalize(decimal amount) => amount.Truncate(_moneyPrecision);
 
     public void GiveMoney(decimal amount)
     {
@@ -82,7 +83,7 @@ public class MoneyComponent : Component
         _moneyLock.EnterWriteLock();
         try
         {
-            if (Math.Abs(_money) + amount > GameplayOptions.Value.MoneyLimit)
+            if (Math.Abs(_money) + amount > _moneyLimit)
                 throw new GameplayException("Unable to give money beyond limit.");
 
             _money += amount;
@@ -108,7 +109,7 @@ public class MoneyComponent : Component
         if (amount < 0)
             throw new GameplayException("Unable to take money, amount can not get negative.");
 
-        if (Math.Abs(_money) - amount < -GameplayOptions.Value.MoneyLimit)
+        if (Math.Abs(_money) - amount < -_moneyLimit)
             throw new GameplayException("Unable to take money beyond limit.");
 
         if (_money - amount < 0 && !force)

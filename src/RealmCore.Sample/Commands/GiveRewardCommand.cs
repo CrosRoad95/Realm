@@ -1,4 +1,6 @@
-﻿namespace RealmCore.Console.Commands;
+﻿using RealmCore.ECS;
+
+namespace RealmCore.Console.Commands;
 
 
 [CommandName("givereward")]

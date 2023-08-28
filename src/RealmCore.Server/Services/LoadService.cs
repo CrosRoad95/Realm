@@ -1,4 +1,6 @@
-﻿namespace RealmCore.Server.Services;
+﻿using RealmCore.ECS;
+
+namespace RealmCore.Server.Services;
 
 internal class LoadService : ILoadService
 {

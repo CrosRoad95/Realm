@@ -1,6 +1,9 @@
-﻿namespace RealmCore.Server.Interfaces;
+﻿using RealmCore.ECS;
+using RealmCore.ECS.Components;
 
-public interface IECS
+namespace RealmCore.Server.Interfaces;
+
+public interface IEntityEngine
 {
     IReadOnlyCollection<Entity> Entities { get; }
     IEnumerable<Entity> VehicleEntities { get; }

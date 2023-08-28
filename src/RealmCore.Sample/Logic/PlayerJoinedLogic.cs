@@ -1,28 +1,38 @@
 ﻿using RealmCore.Server.Components.Peds;
-using RealmCore.Server.Components;
 using RealmCore.Resources.Nametags;
 using RealmCore.Resources.Admin.Enums;
 using RealmCore.Resources.GuiSystem;
-using RealmCore.Server;
+using RealmCore.ECS.Components;
+using RealmCore.ECS;
+using SlipeServer.Resources.Text3d;
+using RealmCore.Server.Extensions.Resources;
 
 namespace RealmCore.Console.Logic;
 
 internal sealed class PlayerJoinedLogic
 {
-    private readonly IECS _ecs;
+    private readonly IEntityEngine _entityEngine;
     private readonly ILogger<PlayerJoinedLogic> _logger;
+    private readonly ILogger<LoginGuiComponent> _loggerLoginGuiComponent;
+    private readonly ILogger<RegisterGuiComponent> _loggerRegisterGuiComponent;
     private readonly INametagsService _nametagsService;
+    private readonly IUsersService _usersService;
     private readonly ChatBox _chatBox;
+    private readonly Text3dService _text3DService;
     private readonly IGuiSystemService? _guiSystemService;
 
-    public PlayerJoinedLogic(IECS ecs, ILogger<PlayerJoinedLogic> logger, INametagsService nametagsService, ChatBox chatBox, IGuiSystemService? guiSystemService = null)
+    public PlayerJoinedLogic(IEntityEngine ecs, ILogger<PlayerJoinedLogic> logger, ILogger<LoginGuiComponent> loggerLoginGuiComponent, ILogger<RegisterGuiComponent> loggerRegisterGuiComponent, INametagsService nametagsService, IUsersService usersService, ChatBox chatBox, Text3dService text3DService, IGuiSystemService? guiSystemService = null)
     {
-        _ecs = ecs;
+        _entityEngine = ecs;
         _logger = logger;
+        _loggerLoginGuiComponent = loggerLoginGuiComponent;
+        _loggerRegisterGuiComponent = loggerRegisterGuiComponent;
         _nametagsService = nametagsService;
+        _usersService = usersService;
         _chatBox = chatBox;
+        _text3DService = text3DService;
         _guiSystemService = guiSystemService;
-        _ecs.EntityCreated += HandleEntityCreated;
+        _entityEngine.EntityCreated += HandleEntityCreated;
     }
 
     private void HandleEntityCreated(Entity entity)
@@ -32,7 +42,7 @@ internal sealed class PlayerJoinedLogic
 
         var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();
 
-        playerElementComponent.SetText3dRenderingEnabled(false);
+        _text3DService.SetRenderingEnabled(entity, false);
         _chatBox.SetVisibleFor(entity, false);
         _chatBox.ClearFor(entity);
         playerElementComponent.FadeCamera(CameraFade.In);
@@ -40,7 +50,7 @@ internal sealed class PlayerJoinedLogic
         var adminComponent = entity.AddComponent(new AdminComponent(new List<AdminTool> { AdminTool.Entities, AdminTool.Components, AdminTool.ShowSpawnMarkers }));
         adminComponent.DebugView = true;
         adminComponent.DevelopmentMode = true;
-        entity.AddComponent<LoginGuiComponent>();
+        entity.AddComponent(new LoginGuiComponent(_usersService, _loggerLoginGuiComponent, _loggerRegisterGuiComponent));
 
         entity.ComponentAdded += HandleComponentAdded;
         entity.Disposed += HandleDisposed;
@@ -72,7 +82,7 @@ internal sealed class PlayerJoinedLogic
                 }
                 await Task.Delay(300);
                 await playerElementComponent.FadeCameraAsync(CameraFade.In);
-                playerElementComponent.SetText3dRenderingEnabled(true);
+                _text3DService.SetRenderingEnabled(entity, true);
                 entity.AddComponent(new NametagComponent("KoxKociarz"));
                 _nametagsService.SetNametagRenderingEnabled(component.Entity, true);
             }

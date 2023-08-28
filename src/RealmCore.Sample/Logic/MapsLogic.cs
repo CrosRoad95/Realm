@@ -1,13 +1,14 @@
-﻿using SlipeServer.Server.Enums;
+﻿using RealmCore.ECS;
+using SlipeServer.Server.Enums;
 
 namespace RealmCore.Console.Logic;
 
 internal class MapsLogic
 {
     private readonly IMapsService _mapsService;
-    private readonly IECS _ecs;
+    private readonly IEntityEngine _ecs;
 
-    public MapsLogic(IMapsService mapsService, IECS ecs)
+    public MapsLogic(IMapsService mapsService, IEntityEngine ecs)
     {
         _mapsService = mapsService;
         _ecs = ecs;

@@ -1,10 +1,14 @@
-﻿namespace RealmCore.Server.Concepts.Objectives;
+﻿using RealmCore.ECS;
+using RealmCore.ECS.Components;
+
+namespace RealmCore.Server.Concepts.Objectives;
 
 public abstract class Objective : IDisposable
 {
     private bool _disposed = false;
     private bool _isFulfilled = false;
     private Entity? _entity;
+    private IEntityFactory? _entityFactory;
 
     public bool IsFulfilled => _isFulfilled;
 
@@ -23,6 +27,7 @@ public abstract class Objective : IDisposable
     {
         ThrowIfDisposed();
         Logger = logger;
+        _entityFactory = entityFactory;
         Load(entityFactory, playerEntity);
     }
 
@@ -60,14 +65,16 @@ public abstract class Objective : IDisposable
         _isFulfilled = true;
     }
 
-    public void AddBlip(BlipIcon blipIcon, IEntityFactory entityFactory)
+    public void AddBlip(BlipIcon blipIcon)
     {
         ThrowIfDisposed();
 
         if (_blipElementComponent != null)
             throw new InvalidOperationException();
 
-        _blipElementComponent = entityFactory.CreateBlipFor(Entity, blipIcon, Position);
+        using var scopedEntityFactory = _entityFactory.CreateScopedEntityFactory(Entity);
+        scopedEntityFactory.CreateBlip(blipIcon, Position);
+        _blipElementComponent = scopedEntityFactory.LastCreatedComponent as PlayerPrivateElementComponent<BlipElementComponent>;
         _blipElementComponent.Disposed += HandleBlipElementComponentDisposed;
     }
 

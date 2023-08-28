@@ -1,6 +1,8 @@
-﻿namespace RealmCore.Server.Components;
+﻿using RealmCore.ECS.Interfaces;
 
-public abstract class Component : IDisposable
+namespace RealmCore.ECS.Components;
+
+public abstract class Component : IComponent, IDisposable
 {
     internal object _versionLock = new();
     internal object _entityLock = new();
@@ -23,23 +25,26 @@ public abstract class Component : IDisposable
         }
     }
 
+    public event Action<Component>? Attached;
+    public event Action<Component>? Detached;
     public event Action<Component>? Disposed;
-    public event Action<Component>? DetachedFromEntity;
 
     public virtual bool IsAsync() => false;
 
-    protected virtual void Load() { }
-    protected virtual void Detached() { }
-    internal void InternalDetached()
+    protected virtual void Attach() { }
+    protected virtual void Detach() { }
+
+    internal void InternalDetach()
     {
-        DetachedFromEntity?.Invoke(this);
-        Detached();
+        Detached?.Invoke(this);
+        Detach();
     }
 
-    internal void InternalLoad()
+    internal void InternalAttach()
     {
         ThrowIfDisposed();
-        Load();
+        Attached?.Invoke(this);
+        Attach();
     }
 
     protected void ThrowIfDisposed()

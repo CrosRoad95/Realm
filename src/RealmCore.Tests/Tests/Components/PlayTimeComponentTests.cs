@@ -1,4 +1,6 @@
-﻿namespace RealmCore.Tests.Tests.Components;
+﻿using RealmCore.ECS;
+
+namespace RealmCore.Tests.Tests.Components;
 
 public class PlayTimeComponentTests
 {
@@ -15,10 +17,10 @@ public class PlayTimeComponentTests
         services.AddSingleton<IDateTimeProvider>(_testDateTimeProvider);
 
         var serviceProvider = services.BuildServiceProvider();
-        _entity1 = new(serviceProvider, "test");
-        _entity2 = new(serviceProvider, "test with initial state");
+        _entity1 = new("test");
+        _entity2 = new("test with initial state");
         _playTimeComponent = new();
-        _playTimeComponentWithInitialState = new(1000);
+        _playTimeComponentWithInitialState = new(1000, _testDateTimeProvider);
         _entity1.AddComponent(_playTimeComponent);
         _entity2.AddComponent(_playTimeComponentWithInitialState);
     }

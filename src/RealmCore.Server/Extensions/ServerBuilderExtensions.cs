@@ -62,7 +62,7 @@ public static class ServerBuilderExtensions
             services.AddCommand<ServerInfoCommand>(); 
             services.AddCommand<ReloadEntitiesCommand>();
 
-            services.AddSingleton<IECS, ECS>();
+            services.AddSingleton<IEntityEngine, EntityEngine>();
         });
 
         #region Resources
@@ -101,6 +101,7 @@ public static class ServerBuilderExtensions
         serverBuilder.AddLogic<Text3dComponentLogic>();
         serverBuilder.AddLogic<DailyVisitsCounterComponentLogic>();
         serverBuilder.AddLogic<AdminComponentLogic>();
+        serverBuilder.AddLogic<GuiSystemServiceLogic>();
         #endregion
 
         return serverBuilder;
