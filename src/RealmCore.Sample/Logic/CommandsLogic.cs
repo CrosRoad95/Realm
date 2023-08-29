@@ -18,6 +18,7 @@ using RealmCore.Persistence;
 using RealmCore.ECS;
 using RealmCore.Resources.Overlay;
 using RealmCore.Resources.Assets;
+using RealmCore.Server.Components.Players;
 
 namespace RealmCore.Console.Logic;
 
@@ -62,6 +63,27 @@ internal sealed class CommandsLogic
         _dateTimeProvider = dateTimeProvider;
         _vehiclesService = vehiclesService;
         _loadService = loadService;
+
+        #region Commands for components tests
+        _commandService.AddCommandHandler("focusablecomponent", (entity, args) =>
+        {
+            var worldObject = _entityFactory.CreateObject(ObjectModel.Gunbox, entity.Transform.Position + new Vector3(4, 0, 0), entity.Transform.Rotation);
+            var focusableComponent = worldObject.AddComponent<FocusableComponent>();
+            focusableComponent.PlayerFocused += (that, player) =>
+            {
+                _chatBox.Output($"Player {player.Name} focused, focused elements {focusableComponent.FocusedPlayerCount}");
+                _logger.LogInformation($"Player {player.Name} focused, focused elements {focusableComponent.FocusedPlayerCount}");
+            };
+            focusableComponent.PlayerLostFocus += (that, player) =>
+            {
+                _chatBox.Output($"Player {player.Name} lost focus, focused elements {focusableComponent.FocusedPlayerCount}");
+                _logger.LogInformation($"Player {player.Name} lost focus, focused elements {focusableComponent.FocusedPlayerCount}");
+            };
+
+            _chatBox.OutputTo(entity, "Created focusable component");
+        });
+        #endregion
+
         _commandService.AddCommandHandler("playtime", (entity, args) =>
         {
             if (entity.TryGetComponent(out PlayTimeComponent playTimeComponent))

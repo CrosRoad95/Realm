@@ -1,16 +1,68 @@
-﻿using RealmCore.Server.Components.Elements.Abstractions;
-
-namespace RealmCore.Server.Components.Common;
+﻿namespace RealmCore.Server.Components.Common;
 
 public class FocusableComponent : Component
 {
-    protected override void Attach()
+    private readonly object _lock = new();
+    private readonly List<Entity> _focusedPlayers = new();
+    public event Action<FocusableComponent, Entity>? PlayerFocused;
+    public event Action<FocusableComponent, Entity>? PlayerLostFocus;
+    public int FocusedPlayerCount
     {
-        Entity.GetRequiredComponent<ElementComponent>().AddFocusable();
+        get
+        {
+            lock (_lock)
+                return _focusedPlayers.Count;
+        }
     }
 
-    protected override void Detach()
+    public IEnumerable<Entity> FocusedPlayer
     {
-        Entity.GetRequiredComponent<ElementComponent>().RemoveFocusable();
+        get
+        {
+            lock (_lock)
+            {
+                foreach (var focusedPlayer in _focusedPlayers)
+                {
+                    yield return focusedPlayer;
+                }
+            }
+        }
+    }
+
+    internal void AddFocusedPlayer(Entity entity)
+    {
+        lock (_lock)
+        {
+            if (!_focusedPlayers.Contains(entity))
+            {
+                _focusedPlayers.Add(entity);
+                entity.Disposed += HandleDisposed;
+                PlayerFocused?.Invoke(this, entity);
+            }
+        }
+    }
+
+    private void HandleDisposed(Entity entity)
+    {
+        lock (_lock)
+        {
+            if (_focusedPlayers.Remove(entity))
+            {
+                entity.Disposed -= HandleDisposed;
+                PlayerLostFocus?.Invoke(this, entity);
+            }
+        }
+    }
+
+    internal void RemoveFocusedPlayer(Entity entity)
+    {
+        lock (_lock)
+        {
+            if (_focusedPlayers.Remove(entity))
+            {
+                entity.Disposed -= HandleDisposed;
+                PlayerLostFocus?.Invoke(this, entity);
+            }
+        }
     }
 }

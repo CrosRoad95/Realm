@@ -15,7 +15,6 @@ internal sealed class ClientInterfaceResourceLogic
         _logger = logger;
 
         _clientInterfaceService.ClientErrorMessage += HandleClientErrorMessage;
-        _clientInterfaceService.FocusedElementChanged += HandleFocusedElementChanged;
         _ecs.EntityCreated += HandleEntityCreated;
     }
 
@@ -37,11 +36,6 @@ internal sealed class ClientInterfaceResourceLogic
             _clientInterfaceService.AddFocusable(component.Entity.GetElement());
             interactionComponent.Detached += HandleInteractionComponentDetachedFromEntity;
         }
-        if (component is ElementComponent elementComponent)
-        {
-            elementComponent.AddFocusableHandler = _clientInterfaceService.AddFocusable;
-            elementComponent.RemoveFocusableHandler = _clientInterfaceService.RemoveFocusable;
-        }
     }
 
     private void HandleInteractionComponentDetachedFromEntity(Component component)
@@ -49,23 +43,6 @@ internal sealed class ClientInterfaceResourceLogic
         var interactionComponent = (InteractionComponent)component;
         interactionComponent.Detached -= HandleInteractionComponentDetachedFromEntity;
         _clientInterfaceService.RemoveFocusable(interactionComponent.Entity.GetElement());
-    }
-
-    private void HandleFocusedElementChanged(Player player, Element? focusedElement)
-    {
-        if (!_ecs.TryGetEntityByPlayer(player, out var playerEntity))
-            return;
-
-        if (playerEntity.TryGetComponent(out PlayerElementComponent playerElementComponent))
-        {
-            if (focusedElement == null)
-                playerElementComponent.FocusedEntity = null;
-            else
-            {
-                _ecs.TryGetByElement(focusedElement, out var entity);
-                playerElementComponent.FocusedEntity = entity;
-            }
-        }
     }
 
     private void HandleClientErrorMessage(Player player, string message, int level, string file, int line)

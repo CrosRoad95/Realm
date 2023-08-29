@@ -2,9 +2,6 @@
 
 public abstract class ElementComponent : Component
 {
-    internal Action<Element>? AddFocusableHandler { get; set; }
-    internal Action<Element>? RemoveFocusableHandler { get; set; }
-
     abstract internal Element Element { get; }
     private Player? Player { get; set; }
     private bool _isPerPlayer = false;
@@ -124,21 +121,8 @@ public abstract class ElementComponent : Component
             Element.Position = position;
     }
 
-    public void AddFocusable()
-    {
-        ThrowIfDisposed();
-        AddFocusableHandler?.Invoke(Element);
-    }
-
-    public void RemoveFocusable()
-    {
-        ThrowIfDisposed();
-        RemoveFocusableHandler?.Invoke(Element);
-    }
-
     protected override void Detach()
     {
-        RemoveFocusableHandler?.Invoke(Element);
         if (!_isPerPlayer)
         {
             Entity.Transform.PositionChanged -= HandleTransformPositionChanged;

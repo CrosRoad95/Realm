@@ -1,4 +1,5 @@
 ﻿using RealmCore.Resources.Admin.Data;
+using RealmCore.Server.Components.Elements.Abstractions;
 
 namespace RealmCore.Server.Logic.Resources;
 
@@ -78,14 +79,24 @@ internal sealed class AdminResourceLogic
         {
             case AdminTool.Entities:
                 if (state)
-                    _adminService.BroadcastEntityDebugInfoUpdateForPlayer(player, _ecs.Entities.Select(x => new EntityDebugInfo
+                    _adminService.BroadcastEntityDebugInfoUpdateForPlayer(player, _ecs.Entities.Select(x =>
                     {
-                        debugId = x.Id,
-                        element = x.GetElement(),
-                        position = x.Transform.Position,
-                        previewType = PreviewType.BoxWireframe,
-                        previewColor = Color.Red,
-                        name = x.Name,
+                        Element? element = null;
+                        Vector3 position = Vector3.Zero;
+                        if (x.TryGetComponent(out Transform transform))
+                            position = transform.Position;
+                        if (x.TryGetComponent(out ElementComponent elementComponent))
+                            element = elementComponent.Element;
+
+                        return new EntityDebugInfo
+                        {
+                            debugId = x.Id,
+                            element = element,
+                            position = position,
+                            previewType = PreviewType.BoxWireframe,
+                            previewColor = Color.Red,
+                            name = x.Name,
+                        };
                     }));
                 else
                     _adminService.BroadcastClearEntityForPlayer(player);

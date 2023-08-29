@@ -102,6 +102,7 @@ public static class ServerBuilderExtensions
         serverBuilder.AddLogic<DailyVisitsCounterComponentLogic>();
         serverBuilder.AddLogic<AdminComponentLogic>();
         serverBuilder.AddLogic<GuiSystemServiceLogic>();
+        serverBuilder.AddLogic<FocusableComponentLogic>();
         #endregion
 
         return serverBuilder;

@@ -8,14 +8,4 @@ public abstract class InteractionComponent : Component
     {
 
     }
-
-    protected override void Attach()
-    {
-        Entity.GetRequiredComponent<ElementComponent>().AddFocusable();
-    }
-
-    protected override void Detach()
-    {
-        Entity.GetRequiredComponent<ElementComponent>().RemoveFocusable();
-    }
 }

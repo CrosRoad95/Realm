@@ -1,4 +1,6 @@
-﻿namespace RealmCore.Server.Components.Players;
+﻿using RealmCore.Server.Components.Abstractions;
+
+namespace RealmCore.Server.Components.Players;
 
 [ComponentUsage(false)]
 public class DiscordIntegrationComponent : IntegrationComponent

@@ -1,6 +1,5 @@
 ﻿namespace RealmCore.Server.Components.Common;
 
-[ComponentUsage(true)]
 public class InventoryComponent : Component
 {
     private readonly List<Item> _items = new();
