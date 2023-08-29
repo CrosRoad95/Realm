@@ -1,44 +1,21 @@
 ﻿namespace RealmCore.Server.Logic.Resources;
 
-internal sealed class OutlineResourceLogic
+internal sealed class OutlineResourceLogic : ComponentLogic<OutlineComponent>
 {
-    private readonly ILogger<ClientInterfaceResourceLogic> _logger;
     private readonly IElementOutlineService _elementOutlineService;
-    private readonly IEntityEngine _ecs;
 
-    public OutlineResourceLogic(IElementOutlineService elementOutlineService, ILogger<ClientInterfaceResourceLogic> logger, IEntityEngine ecs)
+    public OutlineResourceLogic(IEntityEngine entityEngine, IElementOutlineService elementOutlineService) : base(entityEngine)
     {
         _elementOutlineService = elementOutlineService;
-        _ecs = ecs;
-        _logger = logger;
-
-        _ecs.EntityCreated += HandleEntityCreated;
     }
 
-
-    private void HandleEntityCreated(Entity entity)
+    protected override void ComponentAdded(OutlineComponent outlineComponent)
     {
-        entity.Disposed += HandleEntityDestroyed;
-        entity.ComponentAdded += HandleComponentAdded;
+        _elementOutlineService.SetElementOutline(outlineComponent.Entity.GetElement(), outlineComponent.Color);
     }
 
-    private void HandleEntityDestroyed(Entity entity)
+    protected override void ComponentDetached(OutlineComponent component)
     {
-        entity.ComponentAdded -= HandleComponentAdded;
-    }
-
-    private void HandleComponentAdded(Component component)
-    {
-        if (component is OutlineComponent outlineComponent)
-        {
-            outlineComponent.Disposed += HandleOutlineComponentDisposed;
-            _elementOutlineService.SetElementOutline(outlineComponent.Entity.GetElement(), outlineComponent.Color);
-        }
-    }
-
-    private void HandleOutlineComponentDisposed(Component component)
-    {
-        component.Disposed -= HandleOutlineComponentDisposed;
         _elementOutlineService.RemoveElementOutline(component.Entity.GetElement());
     }
 }

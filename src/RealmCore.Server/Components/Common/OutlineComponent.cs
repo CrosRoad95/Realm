@@ -17,4 +17,22 @@ public class OutlineComponent : Component
     {
         _color = color;
     }
+
+    protected override void Attach()
+    {
+        var element = Entity.GetRequiredComponent<ElementComponent>();
+        element.Detached += HandleDetached;
+    }
+    
+    protected override void Detach()
+    {
+        var element = Entity.GetRequiredComponent<ElementComponent>();
+        element.Detached -= HandleDetached;
+    }
+
+    private void HandleDetached(Component component)
+    {
+        Entity.DestroyComponent(this);
+    }
+
 }

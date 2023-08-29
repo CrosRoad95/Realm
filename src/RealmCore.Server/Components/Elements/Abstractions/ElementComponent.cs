@@ -7,6 +7,7 @@ public abstract class ElementComponent : Component
     private bool _isPerPlayer = false;
 
     internal bool BaseLoaded { get; set; } = false;
+    private Transform? _transform;
 
     public Vector3 Velocity
     {
@@ -98,21 +99,57 @@ public abstract class ElementComponent : Component
 
     public void Bind()
     {
-        var transform = Entity.GetRequiredComponent<Transform>();
-        Element.Position = transform.Position;
+        _transform = Entity.GetRequiredComponent<Transform>();
+        Element.Position = _transform.Position;
         if (Element.ElementType != ElementType.Pickup)
-            Element.Rotation = transform.Rotation;
-        Element.Interior = transform.Interior;
-        Element.Dimension = transform.Dimension;
+            Element.Rotation = _transform.Rotation;
+        Element.Interior = _transform.Interior;
+        Element.Dimension = _transform.Dimension;
 
-        Entity.Transform.PositionChanged += HandleTransformPositionChanged;
-        Entity.Transform.RotationChanged += HandleTransformRotationChanged;
+        Element.PositionChanged += HandlePositionChanged;
+        Element.RotationChanged += HandleRotationChanged;
+        Element.InteriorChanged += HandleInteriorChanged;
+        Element.DimensionChanged += HandleDimensionChanged;
+        _transform.PositionChanged += HandleTransformPositionChanged;
+        _transform.RotationChanged += HandleTransformRotationChanged;
+        _transform.InteriorChanged += HandleTransformInteriorChanged;
+        _transform.DimensionChanged += HandleTransformDimensionChanged;
     }
 
-    private void HandleTransformRotationChanged(Transform newTransform, Vector3 rotation, bool sync)
+    private void HandlePositionChanged(Element sender, ElementChangedEventArgs<Vector3> args)
     {
-        if (!_isPerPlayer)
-            Element.Rotation = rotation;
+        if (_transform == null)
+            return;
+
+        if(args.IsSync)
+            _transform.SetPosition(args.NewValue, true);
+    }
+
+    private void HandleRotationChanged(Element sender, ElementChangedEventArgs<Vector3> args)
+    {
+        if (_transform == null)
+            return;
+
+        if (args.IsSync)
+            _transform.SetRotation(args.NewValue, true);
+    }
+
+    private void HandleInteriorChanged(Element sender, ElementChangedEventArgs<byte> args)
+    {
+        if (_transform == null)
+            return;
+
+        if (args.IsSync)
+            _transform.SetInterior(args.NewValue, true);
+    }
+
+    private void HandleDimensionChanged(Element sender, ElementChangedEventArgs<ushort> args)
+    {
+        if (_transform == null)
+            return;
+
+        if (args.IsSync)
+            _transform.SetDimension(args.NewValue, true);
     }
 
     private void HandleTransformPositionChanged(Transform newTransform, Vector3 position, bool sync)
@@ -121,12 +158,39 @@ public abstract class ElementComponent : Component
             Element.Position = position;
     }
 
+    private void HandleTransformRotationChanged(Transform newTransform, Vector3 rotation, bool sync)
+    {
+        if (!_isPerPlayer)
+            Element.Rotation = rotation;
+    }
+    
+    private void HandleTransformInteriorChanged(Transform newTransform, byte interior, bool sync)
+    {
+        if (!_isPerPlayer)
+            Element.Interior = interior;
+    }
+    
+    private void HandleTransformDimensionChanged(Transform newTransform, ushort dimension, bool sync)
+    {
+        if (!_isPerPlayer)
+            Element.Dimension = dimension;
+    }
+
     protected override void Detach()
     {
         if (!_isPerPlayer)
         {
-            Entity.Transform.PositionChanged -= HandleTransformPositionChanged;
-            Entity.Transform.RotationChanged -= HandleTransformRotationChanged;
+            if(_transform != null)
+            {
+                Element.PositionChanged -= HandlePositionChanged;
+                Element.RotationChanged -= HandleRotationChanged;
+                Element.InteriorChanged -= HandleInteriorChanged;
+                Element.DimensionChanged -= HandleDimensionChanged;
+                _transform.PositionChanged -= HandleTransformPositionChanged;
+                _transform.RotationChanged -= HandleTransformRotationChanged;
+                _transform.InteriorChanged -= HandleTransformInteriorChanged;
+                _transform.DimensionChanged -= HandleTransformDimensionChanged;
+            }
         }
         if (Player != null)
         {

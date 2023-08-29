@@ -82,6 +82,26 @@ internal sealed class CommandsLogic
 
             _chatBox.OutputTo(entity, "Created focusable component");
         });
+
+        _commandService.AddAsyncCommandHandler("outlinecomponent", async (entity, args) =>
+        {
+            var worldObject = _entityFactory.CreateObject(ObjectModel.Gunbox, entity.Transform.Position + new Vector3(4, 0, 0), entity.Transform.Rotation);
+            var focusableComponent = worldObject.AddComponent(new OutlineComponent(Color.Red));
+            _chatBox.OutputTo(entity, "Created outline component");
+            await Task.Delay(2000);
+            worldObject.DestroyComponent(focusableComponent);
+            _chatBox.OutputTo(entity, "Destroyed outline component");
+        });
+
+        _commandService.AddAsyncCommandHandler("outlinecomponent2", async (entity, args) =>
+        {
+            var worldObject = _entityFactory.CreateObject(ObjectModel.Gunbox, entity.Transform.Position + new Vector3(4, 0, 0), entity.Transform.Rotation);
+            var focusableComponent = worldObject.AddComponent(new OutlineComponent(Color.Red));
+            _chatBox.OutputTo(entity, "Created outline component");
+            await Task.Delay(2000);
+            worldObject.Dispose();
+            _chatBox.OutputTo(entity, "Destroyed entity");
+        });
         #endregion
 
         _commandService.AddCommandHandler("playtime", (entity, args) =>

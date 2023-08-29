@@ -79,6 +79,43 @@ public sealed class Transform : Component
         _interior = interior;
         _dimension = dimension;
     }
+
+    public void SetPosition(Vector3 position, bool sync)
+    {
+        if (_position != position)
+        {
+            _position = position;
+            PositionChanged?.Invoke(this, position, sync);
+        }
+    }
+    
+    public void SetRotation(Vector3 rotation, bool sync)
+    {
+        if (_rotation != rotation)
+        {
+            _rotation = rotation;
+            PositionChanged?.Invoke(this, rotation, sync);
+        }
+    }
+    
+    public void SetInterior(byte interior, bool sync)
+    {
+        if (_interior != interior)
+        {
+            _interior = interior;
+            InteriorChanged?.Invoke(this, interior, sync);
+        }
+    }
+    
+    public void SetDimension(ushort dimension, bool sync)
+    {
+        if (_dimension != dimension)
+        {
+            _dimension = dimension;
+            DimensionChanged?.Invoke(this, dimension, sync);
+        }
+    }
+
     //public void Bind(Element element)
     //{
     //    if (_isBound)
