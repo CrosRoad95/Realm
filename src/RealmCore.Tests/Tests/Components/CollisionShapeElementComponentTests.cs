@@ -2,6 +2,7 @@
 using RealmCore.Resources.ClientInterface;
 using RealmCore.Server.Components.Elements.CollisionShapes;
 using RealmCore.ECS;
+using RealmCore.ECS.Components;
 
 namespace RealmCore.Tests.Tests.Components;
 
@@ -25,6 +26,7 @@ public class CollisionShapeElementComponentTests
         var entityEngine = serviceProvider.GetRequiredService<IEntityEngine>();
         _entity = entityEngine.CreateEntity("test");
         _collisionSphereElementComponent = new(new CollisionSphere(new System.Numerics.Vector3(0, 0, 0), 10), entityEngine);
+        _entity.AddComponent<Transform>();
         _entity.AddComponent(_collisionSphereElementComponent);
     }
 

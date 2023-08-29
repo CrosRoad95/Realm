@@ -10,14 +10,9 @@ public class MoneyComponentTests
 
     public MoneyComponentTests()
     {
-        var services = new ServiceCollection();
-        var configurationProvider = new TestConfigurationProvider();
-        services.Configure<GameplayOptions>(configurationProvider.GetSection("Gameplay"));
-
-        var serviceProvider = services.BuildServiceProvider();
         _entity = new("test");
         _entityB = new("test2");
-        _moneyComponent = new(1000000, 2);
+        _moneyComponent = new(1000000, 4);
         _entity.AddComponent(_moneyComponent);
     }
 

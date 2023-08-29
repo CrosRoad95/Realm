@@ -86,10 +86,6 @@ public abstract class ElementComponent : Component
 
     protected bool IsPerPlayer { get => _isPerPlayer; set => _isPerPlayer = value; }
 
-    protected ElementComponent()
-    {
-    }
-
     protected override void Attach()
     {
         if (Entity.TryGetComponent(out PlayerElementComponent playerElementComponent) && GetType() != typeof(PlayerElementComponent))

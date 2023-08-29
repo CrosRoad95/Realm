@@ -26,6 +26,7 @@ public class VehicleUpgradesComponentTests
         _entity = new("test");
         _vehicleUpgradesComponent = new(_vehicleUpgradeRegistry, vehicleEnginesRegistry);
         _vehicleElementComponent = new VehicleElementComponent(new SlipeServer.Server.Elements.Vehicle(SlipeServer.Server.Elements.VehicleModel.Perennial, Vector3.Zero), _mock.Object);
+        _entity.AddComponent<Transform>();
         _entity.AddComponent(_vehicleElementComponent);
         _entity.AddComponent(_vehicleUpgradesComponent);
 

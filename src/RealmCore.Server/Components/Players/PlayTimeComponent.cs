@@ -30,7 +30,10 @@ public class PlayTimeComponent : Component
         }
     }
 
-    public PlayTimeComponent() { }
+    public PlayTimeComponent(IDateTimeProvider dateTimeProvider)
+    {
+        _dateTimeProvider = dateTimeProvider;
+    }
 
     public PlayTimeComponent(ulong currentPlayTime, IDateTimeProvider dateTimeProvider)
     {

@@ -1,9 +1,4 @@
-﻿using RealmCore.ECS;
-using RealmCore.Server.Components.Vehicles;
-using RealmCore.Server.Concepts.Upgrades;
-using SlipeServer.Server.Constants;
-
-namespace RealmCore.Tests.Tests.Components;
+﻿namespace RealmCore.Tests.Tests.Components;
 
 public class VehicleEngineComponentTests
 {
@@ -28,6 +23,7 @@ public class VehicleEngineComponentTests
         _vehicleUpgradesComponent = new(_vehicleUpgradeRegistry, vehicleEnginesRegistry);
         _vehicleEngineComponent = new();
         _vehicleElementComponent = new VehicleElementComponent(new SlipeServer.Server.Elements.Vehicle(SlipeServer.Server.Elements.VehicleModel.Perennial, Vector3.Zero), _mock.Object);
+        _entity.AddComponent<Transform>();
         _entity.AddComponent(_vehicleElementComponent);
         _entity.AddComponent(_vehicleEngineComponent);
         _entity.AddComponent(_vehicleUpgradesComponent);

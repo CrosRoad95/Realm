@@ -13,13 +13,9 @@ public class PlayTimeComponentTests
     public PlayTimeComponentTests()
     {
         _testDateTimeProvider = new();
-        var services = new ServiceCollection();
-        services.AddSingleton<IDateTimeProvider>(_testDateTimeProvider);
-
-        var serviceProvider = services.BuildServiceProvider();
         _entity1 = new("test");
         _entity2 = new("test with initial state");
-        _playTimeComponent = new();
+        _playTimeComponent = new(_testDateTimeProvider);
         _playTimeComponentWithInitialState = new(1000, _testDateTimeProvider);
         _entity1.AddComponent(_playTimeComponent);
         _entity2.AddComponent(_playTimeComponentWithInitialState);

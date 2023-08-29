@@ -87,9 +87,9 @@ internal sealed class EntityFactory : IEntityFactory
         var vehicleEntity = _entityEngine.CreateEntity(constructionInfo?.Id ?? $"vehicle {Guid.NewGuid()}", entity =>
         {
             if (constructionInfo != null)
-                entity.AddComponent(new Transform(position, constructionInfo.Interior, constructionInfo.Dimension));
+                entity.AddComponent(new Transform(position, rotation, constructionInfo.Interior, constructionInfo.Dimension));
             else
-                entity.AddComponent(new Transform(position));
+                entity.AddComponent(new Transform(position, rotation));
 
             entity.AddComponent<VehicleTagComponent>();
             var vehicle = new Vehicle(model, position);

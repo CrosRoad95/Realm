@@ -1,5 +1,6 @@
 ﻿using RealmCore.ECS;
 using RealmCore.ECS.Attributes;
+using RealmCore.Resources.GuiSystem;
 using RealmCore.Tests.Classes.Components;
 
 namespace RealmCore.Tests.Tests;
@@ -266,7 +267,7 @@ public class EntityTests
             .Select(x => x.Name)
             .ToList();
 
-        var expectedEvents = new List<string> { "Entity/ComponentAdded", "Entity/ComponentDetached", "Component/DetachedFromEntity", "Component/Disposed" };
+        var expectedEvents = new List<string> { "Component/Attached", "Entity/ComponentAdded", "Entity/ComponentDetached", "Component/Detached", "Component/Disposed" };
 
         occurredEvents.Should().Equal(expectedEvents);
         #endregion
@@ -294,7 +295,7 @@ public class EntityTests
             .Select(x => x.Name)
             .ToList();
 
-        var expectedEvents = new List<string> { "Entity/ComponentAdded", "Entity/PreDisposed", "Entity/ComponentDetached", "Component/DetachedFromEntity", "Component/Disposed", "Entity/Disposed" };
+        var expectedEvents = new List<string> { "Component/Attached", "Entity/ComponentAdded", "Entity/PreDisposed", "Entity/ComponentDetached", "Component/Detached", "Component/Disposed", "Entity/Disposed" };
 
         occurredEvents.Should().Equal(expectedEvents);
         #endregion

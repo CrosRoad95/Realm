@@ -6,6 +6,7 @@ using SlipeServer.Server.Resources.Providers;
 using SlipeServer.Server.Resources.Interpreters;
 using SlipeServer.Server.Resources;
 using RealmCore.Resources.CEFBlazorGui;
+using RealmCore.Resources.GuiSystem;
 
 namespace RealmCore.Tests.TestServers;
 
@@ -64,6 +65,7 @@ internal class RealmTestingServer : TestingServer
         var saveServiceMock = new Mock<ISaveService>(MockBehavior.Strict);
         saveServiceMock.Setup(x => x.SaveNewPlayerInventory(It.IsAny<InventoryComponent>(), It.IsAny<int>())).ReturnsAsync(1);
         var rpgServerMock = new Mock<IRealmServer>(MockBehavior.Strict);
+        var guiSystemServiceMock = new Mock<IGuiSystemService>(MockBehavior.Strict);
         serverBuilder.ConfigureServer(testConfigurationProvider ?? new(), SlipeServer.Server.ServerBuilders.ServerBuilderDefaultBehaviours.None);
         serverBuilder.ConfigureServices(services =>
         {
@@ -90,6 +92,7 @@ internal class RealmTestingServer : TestingServer
             services.AddSingleton<ICEFBlazorGuiService, CEFBlazorGuiService>();
             services.AddSingleton<IBlazorGuiService, BlazorGuiService>();
             services.AddSingleton<IAssetEncryptionProvider, TestAssetEncryptionProvider>();
+            services.AddSingleton(guiSystemServiceMock.Object);
 
             services.AddSingleton<IServerFilesProvider>(new NullServerFilesProvider());
             services.AddLogging(x => x.AddSerilog(new LoggerConfiguration().CreateLogger(), dispose: true));

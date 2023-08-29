@@ -9,18 +9,13 @@ public class LiftableWorldObjectComponentTests
     private readonly Entity _entity1;
     private readonly Entity _entity2;
     private readonly LiftableWorldObjectComponent _liftableWorldObjectComponent;
-    private readonly Mock<ILogger<Entity>> _logger = new(MockBehavior.Strict);
 
     public LiftableWorldObjectComponentTests()
     {
-        var services = new ServiceCollection();
-
-        _logger.SetupLogger();
-        services.AddSingleton(_logger.Object);
-        var serviceProvider = services.BuildServiceProvider();
-
         _entity1 = new("test1");
         _entity2 = new("test2");
+        _entity1.AddComponent<Transform>();
+        _entity2.AddComponent<Transform>();
         _entity1.AddComponent<TestElementComponent>();
         _liftableWorldObjectComponent = _entity1.AddComponent<LiftableWorldObjectComponent>();
     }
