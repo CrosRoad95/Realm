@@ -1,6 +1,4 @@
-﻿using RealmCore.ECS;
-using RealmCore.ECS.Attributes;
-using RealmCore.Resources.GuiSystem;
+﻿using RealmCore.ECS.Attributes;
 using RealmCore.Tests.Classes.Components;
 
 namespace RealmCore.Tests.Tests;

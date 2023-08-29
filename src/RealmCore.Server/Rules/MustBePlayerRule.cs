@@ -1,6 +1,4 @@
-﻿using RealmCore.ECS;
-
-namespace RealmCore.Server.Rules;
+﻿namespace RealmCore.Server.Rules;
 
 public sealed class MustBePlayerRule : IEntityRule
 {

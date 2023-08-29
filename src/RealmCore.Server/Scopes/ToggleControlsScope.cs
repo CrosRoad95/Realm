@@ -1,6 +1,4 @@
-﻿using RealmCore.ECS;
-
-namespace RealmCore.Server.Scopes;
+﻿namespace RealmCore.Server.Scopes;
 
 public class ToggleControlsScope : IDisposable
 {

@@ -1,6 +1,4 @@
-﻿using RealmCore.ECS;
-
-namespace RealmCore.Server.Concepts.Objectives;
+﻿namespace RealmCore.Server.Concepts.Objectives;
 
 public class MarkerEnterObjective : Objective
 {

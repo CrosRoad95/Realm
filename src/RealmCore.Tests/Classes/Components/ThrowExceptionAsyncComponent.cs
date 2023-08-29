@@ -1,6 +1,4 @@
-﻿using RealmCore.ECS.Components;
-
-namespace RealmCore.Tests.Classes.Components;
+﻿namespace RealmCore.Tests.Classes.Components;
 
 internal class ThrowExceptionAsyncComponent : AsyncComponent
 {

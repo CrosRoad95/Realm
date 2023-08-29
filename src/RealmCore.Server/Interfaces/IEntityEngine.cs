@@ -1,7 +1,4 @@
-﻿using RealmCore.ECS;
-using RealmCore.ECS.Components;
-
-namespace RealmCore.Server.Interfaces;
+﻿namespace RealmCore.Server.Interfaces;
 
 public interface IEntityEngine
 {

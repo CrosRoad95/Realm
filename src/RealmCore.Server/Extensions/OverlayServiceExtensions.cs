@@ -1,6 +1,4 @@
-﻿using RealmCore.ECS;
-
-namespace RealmCore.Server.Extensions;
+﻿namespace RealmCore.Server.Extensions;
 
 public static class OverlayServiceExtensions
 {

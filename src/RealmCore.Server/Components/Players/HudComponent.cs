@@ -1,7 +1,4 @@
-﻿using RealmCore.ECS.Components;
-using RealmCore.Resources.Overlay;
-
-namespace RealmCore.Server.Components.Players;
+﻿namespace RealmCore.Server.Components.Players;
 
 internal interface IStatefulHudComponent : RealmCore.ECS.Interfaces.IComponent
 {

@@ -1,7 +1,4 @@
-﻿using RealmCore.ECS;
-using RealmCore.ECS.Components;
-
-namespace RealmCore.Server.Logic;
+﻿namespace RealmCore.Server.Logic;
 
 internal class VehiclesLogic
 {

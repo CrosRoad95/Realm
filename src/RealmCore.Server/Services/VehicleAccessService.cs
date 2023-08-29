@@ -1,6 +1,4 @@
-﻿using RealmCore.ECS;
-
-namespace RealmCore.Server.Services;
+﻿namespace RealmCore.Server.Services;
 
 internal sealed class VehicleAccessService : IVehicleAccessService
 {

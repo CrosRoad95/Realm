@@ -1,7 +1,4 @@
-﻿using RealmCore.ECS.Components;
-using SlipeServer.Server.Elements;
-
-namespace RealmCore.Server.Components.Elements.Abstractions;
+﻿namespace RealmCore.Server.Components.Elements.Abstractions;
 
 public abstract class ElementComponent : Component
 {

@@ -1,8 +1,4 @@
-﻿using RealmCore.Resources.GuiSystem;
-using RealmCore.Server.Components.Elements;
-using SlipeServer.Server.Events;
-
-namespace RealmCore.Server.Logic.Components;
+﻿namespace RealmCore.Server.Logic.Components;
 
 internal class GuiSystemServiceLogic : ComponentLogic<GuiComponent>
 {

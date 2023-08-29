@@ -1,7 +1,4 @@
-﻿using RealmCore.Resources.Overlay;
-using System.Security.Cryptography;
-
-namespace RealmCore.Server.Logic.Components;
+﻿namespace RealmCore.Server.Logic.Components;
 
 internal sealed class Hud3dComponentBaseLogic : ComponentLogic<Hud3dComponentBase>
 {

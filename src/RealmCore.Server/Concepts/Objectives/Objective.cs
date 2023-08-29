@@ -1,7 +1,4 @@
-﻿using RealmCore.ECS;
-using RealmCore.ECS.Components;
-
-namespace RealmCore.Server.Concepts.Objectives;
+﻿namespace RealmCore.Server.Concepts.Objectives;
 
 public abstract class Objective : IDisposable
 {

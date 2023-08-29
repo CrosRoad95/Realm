@@ -1,6 +1,4 @@
-﻿using RealmCore.ECS;
-using RealmCore.ECS.Components;
-using RealmCore.Server.Components.TagComponents;
+﻿using RealmCore.Server.Components.TagComponents;
 
 namespace RealmCore.Tests.Helpers;
 

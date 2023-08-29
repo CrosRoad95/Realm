@@ -1,7 +1,4 @@
-﻿using RealmCore.ECS;
-using RealmCore.ECS.Components;
-
-namespace RealmCore.Server.Rules;
+﻿namespace RealmCore.Server.Rules;
 
 public sealed class MustNotHaveComponent<TComponent> : IEntityRule
     where TComponent : Component

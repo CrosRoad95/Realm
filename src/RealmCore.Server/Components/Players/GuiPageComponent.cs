@@ -1,6 +1,4 @@
-﻿using RealmCore.ECS.Components;
-
-namespace RealmCore.Server.Components.Players;
+﻿namespace RealmCore.Server.Components.Players;
 
 public abstract class GuiPageComponent : Component
 {

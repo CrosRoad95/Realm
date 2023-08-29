@@ -1,6 +1,4 @@
-﻿using RealmCore.ECS.Components;
-
-namespace RealmCore.Server.Components.Elements.Abstractions;
+﻿namespace RealmCore.Server.Components.Elements.Abstractions;
 
 public abstract class InteractionComponent : Component
 {

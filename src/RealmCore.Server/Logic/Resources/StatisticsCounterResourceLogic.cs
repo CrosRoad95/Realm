@@ -1,6 +1,4 @@
-﻿using RealmCore.ECS;
-
-namespace RealmCore.Server.Logic.Resources;
+﻿namespace RealmCore.Server.Logic.Resources;
 
 internal sealed class StatisticsCounterResourceLogic : ComponentLogic<StatisticsCounterComponent>
 {

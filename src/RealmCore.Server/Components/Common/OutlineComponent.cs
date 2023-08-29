@@ -1,6 +1,4 @@
-﻿using RealmCore.ECS.Components;
-
-namespace RealmCore.Server.Components.Common;
+﻿namespace RealmCore.Server.Components.Common;
 
 public class OutlineComponent : Component
 {

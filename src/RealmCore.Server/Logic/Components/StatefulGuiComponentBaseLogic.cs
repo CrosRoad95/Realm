@@ -1,9 +1,4 @@
-﻿using Newtonsoft.Json.Linq;
-using RealmCore.ECS;
-using RealmCore.Resources.GuiSystem;
-using RealmCore.Server.Components.Elements;
-
-namespace RealmCore.Server.Logic.Components;
+﻿namespace RealmCore.Server.Logic.Components;
 
 internal sealed class StatefulGuiComponentBaseLogic : ComponentLogic<StatefulGuiComponentBase>
 {

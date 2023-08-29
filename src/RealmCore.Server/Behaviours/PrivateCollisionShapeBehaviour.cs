@@ -1,7 +1,4 @@
-﻿using RealmCore.ECS;
-using RealmCore.ECS.Components;
-
-namespace RealmCore.Server.Behaviours;
+﻿namespace RealmCore.Server.Behaviours;
 
 internal sealed class PrivateCollisionShapeBehaviour
 {

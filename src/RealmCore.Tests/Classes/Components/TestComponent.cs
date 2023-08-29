@@ -1,7 +1,4 @@
-﻿using Microsoft.AspNetCore.Components;
-using RealmCore.ECS.Components;
-
-namespace RealmCore.Tests.Classes.Components;
+﻿namespace RealmCore.Tests.Classes.Components;
 
 public class TestComponent : Component
 {

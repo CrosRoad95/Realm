@@ -1,7 +1,4 @@
-﻿using RealmCore.ECS;
-using RealmCore.ECS.Components;
-
-namespace RealmCore.Server.Logic.Resources;
+﻿namespace RealmCore.Server.Logic.Resources;
 
 internal sealed class OutlineResourceLogic
 {

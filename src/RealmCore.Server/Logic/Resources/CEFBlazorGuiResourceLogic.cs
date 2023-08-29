@@ -1,5 +1,4 @@
-﻿using RealmCore.ECS;
-using RealmCore.Resources.CEFBlazorGui;
+﻿using RealmCore.Resources.CEFBlazorGui;
 
 namespace RealmCore.Server.Logic.Resources;
 

@@ -1,7 +1,6 @@
 ﻿using RealmCore.Resources.GuiSystem;
 using RealmCore.Server.Components.Elements.CollisionShapes;
 using RealmCore.Tests.Classes.Components;
-using SlipeServer.Server.Elements;
 
 namespace RealmCore.Tests.Tests.Components;
 

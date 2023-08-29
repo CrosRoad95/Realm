@@ -1,6 +1,4 @@
-﻿using RealmCore.ECS;
-
-namespace RealmCore.Server.Commands;
+﻿namespace RealmCore.Server.Commands;
 
 [CommandName("serverinfo")]
 internal class ServerInfoCommand : ICommand

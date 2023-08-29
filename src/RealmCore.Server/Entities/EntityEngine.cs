@@ -1,6 +1,4 @@
-﻿using RealmCore.ECS;
-using RealmCore.ECS.Components;
-using RealmCore.Server.Components.Elements.Abstractions;
+﻿using RealmCore.Server.Components.Elements.Abstractions;
 
 namespace RealmCore.Server.Entities;
 

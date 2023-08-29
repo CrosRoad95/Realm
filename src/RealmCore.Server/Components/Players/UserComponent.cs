@@ -1,6 +1,4 @@
-﻿using Microsoft.AspNetCore.Identity;
-using RealmCore.ECS.Components;
-using RealmCore.Persistence.Data;
+﻿using RealmCore.Persistence.Data;
 
 namespace RealmCore.Server.Components.Players;
 

@@ -1,6 +1,4 @@
-﻿using RealmCore.Server.Interfaces.Abstractions;
-
-namespace RealmCore.Server.Interfaces;
+﻿namespace RealmCore.Server.Interfaces;
 
 public interface IEntityFactory : IEntityFactoryBase
 {

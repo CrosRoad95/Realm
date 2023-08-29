@@ -1,7 +1,4 @@
-﻿using RealmCore.ECS;
-using RealmCore.ECS.Attributes;
-
-namespace RealmCore.Server.Commands;
+﻿namespace RealmCore.Server.Commands;
 
 [CommandName("help")]
 internal class HelpCommand : ICommand

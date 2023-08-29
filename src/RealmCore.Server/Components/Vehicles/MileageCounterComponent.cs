@@ -1,6 +1,4 @@
-﻿using RealmCore.ECS.Components;
-
-namespace RealmCore.Server.Components.Vehicles;
+﻿namespace RealmCore.Server.Components.Vehicles;
 
 public class MileageCounterComponent : Component
 {

@@ -1,6 +1,4 @@
-﻿using RealmCore.ECS;
-
-namespace RealmCore.Server.Interfaces;
+﻿namespace RealmCore.Server.Interfaces;
 
 public interface ICommand
 {

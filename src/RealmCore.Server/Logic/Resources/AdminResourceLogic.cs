@@ -1,7 +1,4 @@
-﻿using RealmCore.ECS;
-using RealmCore.ECS.Components;
-using RealmCore.Resources.Admin.Data;
-using RealmCore.Resources.Admin.Enums;
+﻿using RealmCore.Resources.Admin.Data;
 
 namespace RealmCore.Server.Logic.Resources;
 

@@ -1,6 +1,4 @@
-﻿using RealmCore.ECS;
-
-namespace RealmCore.Tests.Tests;
+﻿namespace RealmCore.Tests.Tests;
 
 public class ECSTests
 {

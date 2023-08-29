@@ -1,8 +1,4 @@
-﻿using RealmCore.ECS;
-using SlipeServer.Server.ElementCollections;
-using SlipeServer.Server.Elements.ColShapes;
-
-namespace RealmCore.Server.Logic.Components;
+﻿namespace RealmCore.Server.Logic.Components;
 
 internal sealed class CollisionShapeElementComponentLogic : ComponentLogic<CollisionShapeElementComponent>
 {

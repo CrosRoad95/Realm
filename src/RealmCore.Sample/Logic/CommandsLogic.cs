@@ -6,7 +6,6 @@ using RealmCore.Server.Components.Peds;
 using SlipeServer.Server.Enums;
 using RealmCore.Server.Components.World;
 using RealmCore.Server.Enums;
-using RealmCore.Server.Extensions.Resources;
 using RealmCore.Console.Components.Huds;
 using RealmCore.Resources.Nametags;
 using RealmCore.Console.Components;
@@ -19,7 +18,6 @@ using RealmCore.Persistence;
 using RealmCore.ECS;
 using RealmCore.Resources.Overlay;
 using RealmCore.Resources.Assets;
-using RealmCore.Server.Registries;
 
 namespace RealmCore.Console.Logic;
 

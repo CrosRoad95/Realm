@@ -1,7 +1,4 @@
-﻿using RealmCore.ECS;
-using RealmCore.Server.Components.Vehicles;
-
-namespace RealmCore.Tests.Tests.Components;
+﻿namespace RealmCore.Tests.Tests.Components;
 
 public class VehiclePartDamageComponentTests
 {

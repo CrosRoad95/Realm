@@ -1,5 +1,4 @@
 ﻿using RealmCore.Server.Components.Players.Jobs;
-using RealmCore.Server.Concepts.Objectives;
 
 namespace RealmCore.Server.Logic.Components;
 

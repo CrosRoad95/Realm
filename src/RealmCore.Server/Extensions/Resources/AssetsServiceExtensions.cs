@@ -1,6 +1,4 @@
-﻿using RealmCore.ECS;
-
-namespace RealmCore.Server.Extensions.Resources;
+﻿namespace RealmCore.Server.Extensions.Resources;
 
 public static class AssetsServiceExtensions
 {

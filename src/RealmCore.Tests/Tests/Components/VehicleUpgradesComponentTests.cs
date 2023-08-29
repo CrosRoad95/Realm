@@ -1,9 +1,4 @@
-﻿using RealmCore.ECS;
-using RealmCore.Server.Components.Vehicles;
-using RealmCore.Server.Concepts.Upgrades;
-using SlipeServer.Server.Constants;
-
-namespace RealmCore.Tests.Tests.Components;
+﻿namespace RealmCore.Tests.Tests.Components;
 
 public class VehicleUpgradesComponentTests
 {

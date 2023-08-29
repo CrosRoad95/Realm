@@ -1,5 +1,4 @@
-﻿using RealmCore.ECS;
-using RealmCore.Resources.Base.Interfaces;
+﻿using RealmCore.Resources.Base.Interfaces;
 
 namespace RealmCore.Server.Extensions;
 

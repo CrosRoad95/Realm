@@ -5,7 +5,6 @@ using RealmCore.Resources.GuiSystem;
 using RealmCore.ECS.Components;
 using RealmCore.ECS;
 using SlipeServer.Resources.Text3d;
-using RealmCore.Server.Extensions.Resources;
 
 namespace RealmCore.Console.Logic;
 

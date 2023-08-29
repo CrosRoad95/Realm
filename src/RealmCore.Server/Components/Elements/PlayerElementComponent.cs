@@ -1,5 +1,4 @@
-﻿using RealmCore.ECS;
-using RealmCore.Server.Components.Elements.Abstractions;
+﻿using RealmCore.Server.Components.Elements.Abstractions;
 using HudComponent = SlipeServer.Server.Elements.Enums.HudComponent;
 
 namespace RealmCore.Server.Components.Elements;

@@ -1,7 +1,4 @@
-﻿using RealmCore.ECS;
-using RealmCore.ECS.Components;
-
-namespace RealmCore.Server.Components.Common;
+﻿namespace RealmCore.Server.Components.Common;
 
 public class OwnerComponent : Component
 {

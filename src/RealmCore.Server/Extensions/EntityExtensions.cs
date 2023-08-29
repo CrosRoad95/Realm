@@ -1,5 +1,4 @@
-﻿using RealmCore.ECS;
-using RealmCore.Server.Components.Elements.Abstractions;
+﻿using RealmCore.Server.Components.Elements.Abstractions;
 
 namespace RealmCore.Server.Extensions;
 

@@ -1,5 +1,4 @@
-﻿using RealmCore.ECS;
-using SlipeServer.Resources.Scoreboard;
+﻿using SlipeServer.Resources.Scoreboard;
 
 namespace RealmCore.Server.Extensions.Resources;
 

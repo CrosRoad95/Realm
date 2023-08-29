@@ -1,6 +1,4 @@
-﻿using RealmCore.ECS;
-
-namespace RealmCore.Server.Helpers;
+﻿namespace RealmCore.Server.Helpers;
 
 public static class GuiHelpers
 {

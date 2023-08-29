@@ -1,6 +1,4 @@
-﻿using RealmCore.ECS;
-
-namespace RealmCore.Tests.Tests.Components;
+﻿namespace RealmCore.Tests.Tests.Components;
 
 public class LevelComponentTests
 {

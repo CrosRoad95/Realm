@@ -3,7 +3,6 @@ global using SlipeServer.Packets.Definitions.Lua;
 global using SlipeServer.Server.Events;
 global using SlipeServer.Packets.Lua.Camera;
 global using SlipeServer.Server.Elements;
-global using Microsoft.AspNetCore.Components;
 global using RealmCore.Server;
 global using RealmCore.Console.Logic;
 global using RealmCore.Server.Components.Elements;

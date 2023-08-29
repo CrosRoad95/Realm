@@ -1,5 +1,4 @@
 ﻿using RealmCore.Resources.Overlay;
-using RealmCore.Server.Extensions.Resources;
 
 namespace RealmCore.Console.Logic;
 
