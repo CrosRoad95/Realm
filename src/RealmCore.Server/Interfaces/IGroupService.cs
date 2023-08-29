@@ -11,4 +11,5 @@ public interface IGroupService
     Task RemoveMember(int groupId, int userId);
     Task<bool> GroupExistsByNameOrShorcut(string groupName, string shortcut);
     Task<Group?> GetGroupByNameOrShorcut(string groupName, string shortcut);
+    Task<bool> IsUserInGroup(int groupId, int userId);
 }

@@ -94,6 +94,11 @@ internal class GroupService : IGroupService
         await _groupRepository.CreateNewGroupMember(groupId, userId, rank, rankName);
     }
 
+    public Task<bool> IsUserInGroup(int groupId, int userId)
+    {
+        return _groupRepository.IsUserInGroup(groupId, userId);
+    }
+
     public async Task RemoveMember(int groupId, int userId)
     {
         if (!await _groupRepository.RemoveGroupMember(groupId, userId))

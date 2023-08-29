@@ -71,6 +71,11 @@ internal class GroupRepository : IGroupRepository
         await _db.SaveChangesAsync();
         return groupMember;
     }
+    
+    public Task<bool> IsUserInGroup(int groupId, int userId)
+    {
+        return _db.GroupMembers.Where(x => x.GroupId == groupId && x.UserId == userId).AnyAsync();
+    }
 
     public async Task<GroupMemberData> CreateNewGroupMember(string groupName, int userId, int rank = 1, string rankName = "")
     {

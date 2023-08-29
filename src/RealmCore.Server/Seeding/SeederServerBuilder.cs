@@ -114,14 +114,8 @@ internal sealed class SeederServerBuilder
 
             foreach (var item in pair.Value.Members)
             {
-                try
-                {
+                if(!await _groupService.IsUserInGroup(group.id, _createdUsers[item.Key].Id))
                     await _groupService.AddMember(group.name, _createdUsers[item.Key].Id, item.Value.Rank, item.Value.RankName);
-                }
-                catch (Exception) // Maybe member is already in group
-                {
-
-                }
             }
         }
     }

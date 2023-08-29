@@ -10,5 +10,6 @@ public interface IGroupRepository : IRepositoryBase
     Task<bool> ExistsByShortcut(string shortcut);
     Task<GroupData?> GetGroupByName(string groupName);
     Task<GroupData?> GetGroupByNameOrShortcut(string groupName, string shortcut);
+    Task<bool> IsUserInGroup(int groupId, int userId);
     Task<bool> RemoveGroupMember(int groupId, int userId);
 }
