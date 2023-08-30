@@ -1,4 +1,6 @@
-﻿namespace RealmCore.Server.Extensions;
+﻿using RealmCore.Server.Components.Players.Abstractions;
+
+namespace RealmCore.Server.Extensions;
 
 public static class PickupElementComponentExtensions
 {

@@ -3,7 +3,7 @@
 namespace RealmCore.Console.Components.Gui;
 
 [ComponentUsage(false)]
-public sealed class InventoryGuiComponent : StatefulGuiComponent<InventoryGuiComponent.InventoryState>
+public sealed class InventoryGuiComponent : StatefulDxGuiComponent<InventoryGuiComponent.InventoryState>
 {
     public class InventoryState
     {

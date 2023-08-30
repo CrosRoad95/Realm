@@ -3,7 +3,7 @@
 namespace RealmCore.Console.Components.Gui;
 
 [ComponentUsage(false)]
-public sealed class BuyVehicleGuiComponent : StatefulGuiComponent<BuyVehicleGuiComponent.VehicleBuyState>
+public sealed class BuyVehicleGuiComponent : StatefulDxGuiComponent<BuyVehicleGuiComponent.VehicleBuyState>
 {
     public class VehicleBuyState
     {

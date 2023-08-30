@@ -1,26 +1,28 @@
-﻿namespace RealmCore.Server.Components.Players;
+﻿using RealmCore.Server.Components.Players.Abstractions;
 
-public abstract class StatefulGuiComponentBase : GuiComponent
+namespace RealmCore.Server.Components.Players;
+
+public abstract class StatefulDxGuiComponentBase : DxGuiComponent
 {
-    public Action<StatefulGuiComponentBase, string, bool, object?> GuiOpened;
-    public Action<StatefulGuiComponentBase, string, Dictionary<LuaValue, object?>> StateChanged;
-    public StatefulGuiComponentBase(string name, bool cursorLess)
+    public Action<StatefulDxGuiComponentBase, string, bool, object?> GuiOpened;
+    public Action<StatefulDxGuiComponentBase, string, Dictionary<LuaValue, object?>> StateChanged;
+    public StatefulDxGuiComponentBase(string name, bool cursorLess)
         : base(name, cursorLess)
     {
 
     }
 
-    protected void RelayGuiOpened(StatefulGuiComponentBase statefulGuiComponentBase, string name, bool cursorLess, object? state)
+    protected void RelayGuiOpened(StatefulDxGuiComponentBase statefulGuiComponentBase, string name, bool cursorLess, object? state)
     {
         GuiOpened?.Invoke(statefulGuiComponentBase, name, cursorLess, state);
     }
 }
-public abstract class StatefulGuiComponent<TState> : StatefulGuiComponentBase
+public abstract class StatefulDxGuiComponent<TState> : StatefulDxGuiComponentBase
 {
     private readonly TState _state;
     private readonly Dictionary<LuaValue, object?> _stateChange = new();
 
-    public StatefulGuiComponent(string name, bool cursorLess, TState initialState)
+    public StatefulDxGuiComponent(string name, bool cursorLess, TState initialState)
         : base(name, cursorLess)
     {
         _state = initialState;

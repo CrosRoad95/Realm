@@ -1,17 +1,18 @@
 ﻿using RealmCore.Resources.GuiSystem;
+using RealmCore.Server.Components.Players.Abstractions;
 
 namespace RealmCore.Server.Logic.Components;
 
-internal sealed class GuiSystemServiceLogic : ComponentLogic<GuiComponent>
+internal sealed class DxGuiSystemServiceLogic : ComponentLogic<DxGuiComponent>
 {
     private readonly IEntityEngine _entityEngine;
     private readonly IGuiSystemService? _guiSystemService;
     private readonly FromLuaValueMapper _fromLuaValueMapper;
-    private readonly ILogger<GuiSystemServiceLogic> _logger;
+    private readonly ILogger<DxGuiSystemServiceLogic> _logger;
     private readonly IServiceProvider _serviceProvider;
-    private ConcurrentDictionary<string, GuiComponent> _guiComponents = new();
+    private ConcurrentDictionary<string, DxGuiComponent> _guiComponents = new();
 
-    public GuiSystemServiceLogic(IEntityEngine entityEngine, FromLuaValueMapper fromLuaValueMapper, ILogger<GuiSystemServiceLogic> logger, IServiceProvider serviceProvider, IGuiSystemService? guiSystemService = null) : base(entityEngine)
+    public DxGuiSystemServiceLogic(IEntityEngine entityEngine, FromLuaValueMapper fromLuaValueMapper, ILogger<DxGuiSystemServiceLogic> logger, IServiceProvider serviceProvider, IGuiSystemService? guiSystemService = null) : base(entityEngine)
     {
         _entityEngine = entityEngine;
         _fromLuaValueMapper = fromLuaValueMapper;
@@ -25,21 +26,21 @@ internal sealed class GuiSystemServiceLogic : ComponentLogic<GuiComponent>
         }
     }
 
-    protected override void ComponentAdded(GuiComponent component)
+    protected override void ComponentAdded(DxGuiComponent dxGuiComponent)
     {
         if(_guiSystemService != null)
         {
-            _guiSystemService.OpenGui(component.Entity.GetPlayer(), component.Name, component.Cursorless);
-            _guiComponents.TryAdd(component.Name, component);
+            _guiSystemService.OpenGui(dxGuiComponent.Entity.GetPlayer(), dxGuiComponent.Name, dxGuiComponent.Cursorless);
+            _guiComponents.TryAdd(dxGuiComponent.Name, dxGuiComponent);
         }
     }
 
-    protected override void ComponentDetached(GuiComponent component)
+    protected override void ComponentDetached(DxGuiComponent dxGuiComponent)
     {
         if (_guiSystemService != null)
         {
-            _guiSystemService.CloseGui(component.Entity.GetPlayer(), component.Name, component.Cursorless);
-            _guiComponents.TryRemove(component.Name, out var _);
+            _guiSystemService.CloseGui(dxGuiComponent.Entity.GetPlayer(), dxGuiComponent.Name, dxGuiComponent.Cursorless);
+            _guiComponents.TryRemove(dxGuiComponent.Name, out var _);
         }
     }
 
@@ -50,11 +51,11 @@ internal sealed class GuiSystemServiceLogic : ComponentLogic<GuiComponent>
             try
             {
                 var (id, guiName, actionName, data) = luaEvent.Read<string, string, string, LuaValue>(_fromLuaValueMapper);
-                if (_guiComponents.TryGetValue(guiName, out GuiComponent guiComponent))
+                if (_guiComponents.TryGetValue(guiName, out DxGuiComponent dxGuiComponent))
                 {
                     try
                     {
-                        await guiComponent.InternalHandleAction(new ActionContext(actionName, data));
+                        await dxGuiComponent.InternalHandleAction(new ActionContext(actionName, data));
                     }
                     catch (Exception ex)
                     {
@@ -76,12 +77,12 @@ internal sealed class GuiSystemServiceLogic : ComponentLogic<GuiComponent>
             try
             {
                 var (id, guiName, formName, data) = luaEvent.Read<string, string, string, LuaValue>(_fromLuaValueMapper);
-                if (_guiComponents.TryGetValue(guiName, out GuiComponent guiComponent))
+                if (_guiComponents.TryGetValue(guiName, out DxGuiComponent dxGuiComponent))
                 {
                     var formContext = new FormContext(luaEvent.Player, formName, data, _guiSystemService, _entityEngine, _serviceProvider);
                     try
                     {
-                        await guiComponent.InternalkHandleForm(formContext);
+                        await dxGuiComponent.InternalkHandleForm(formContext);
                     }
                     catch (Exception ex)
                     {

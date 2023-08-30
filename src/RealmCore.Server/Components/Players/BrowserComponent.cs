@@ -1,12 +1,12 @@
 ﻿namespace RealmCore.Server.Components.Players;
 
 [ComponentUsage(false)]
-public class BrowserGuiComponent : Component
+public class BrowserComponent : Component
 {
-    public event Action<BrowserGuiComponent, string?, bool, GuiPageType, GuiPageChangeSource>? PathChanged;
-    public event Action<BrowserGuiComponent, string>? RemotePathChanged;
-    public event Action<BrowserGuiComponent, bool>? DevToolsStateChanged;
-    public event Action<BrowserGuiComponent, bool>? VisibleChanged;
+    public event Action<BrowserComponent, string?, bool, GuiPageType, GuiPageChangeSource>? PathChanged;
+    public event Action<BrowserComponent, string>? RemotePathChanged;
+    public event Action<BrowserComponent, bool>? DevToolsStateChanged;
+    public event Action<BrowserComponent, bool>? VisibleChanged;
 
     private string? _path;
     public string? Path

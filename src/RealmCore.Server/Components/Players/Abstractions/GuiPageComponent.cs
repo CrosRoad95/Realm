@@ -1,10 +1,10 @@
-﻿namespace RealmCore.Server.Components.Players;
+﻿namespace RealmCore.Server.Components.Players.Abstractions;
 
 public abstract class GuiPageComponent : Component
 {
-    private BrowserGuiComponent? _blazorGuiComponent;
+    private BrowserComponent? _blazorGuiComponent;
 
-    protected BrowserGuiComponent BlazorGuiComponent => _blazorGuiComponent ?? throw new InvalidOperationException();
+    protected BrowserComponent BlazorGuiComponent => _blazorGuiComponent ?? throw new InvalidOperationException();
 
     public string Path { get; }
     public bool IsAsync { get; }
@@ -18,14 +18,14 @@ public abstract class GuiPageComponent : Component
 
     protected override void Attach()
     {
-        _blazorGuiComponent = Entity.GetRequiredComponent<BrowserGuiComponent>();
+        _blazorGuiComponent = Entity.GetRequiredComponent<BrowserComponent>();
         BlazorGuiComponent.Open(Path, false, IsAsync);
         _loaded = true;
     }
 
     public override void Dispose()
     {
-        if(_loaded)
+        if (_loaded)
         {
             BlazorGuiComponent.Path = "index";
             BlazorGuiComponent.Visible = false;

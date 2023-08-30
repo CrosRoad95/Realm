@@ -11,14 +11,14 @@ internal class BlazorGuiLogic
         _logger = logger;
     }
 
-    private Task HandleInvokeVoidAsync(BrowserGuiComponent blazorGuiComponent, string identifier, string args)
+    private Task HandleInvokeVoidAsync(BrowserComponent blazorGuiComponent, string identifier, string args)
     {
         _logger.LogInformation("HandleInvokeVoidAsync: {identifier}={args}", identifier, args);
         return Task.CompletedTask;
     }
 
     int a = 0;
-    private async Task<object?> HandleInvokeAsync(BrowserGuiComponent blazorGuiComponent, string identifier, string args)
+    private async Task<object?> HandleInvokeAsync(BrowserComponent blazorGuiComponent, string identifier, string args)
     {
         _logger.LogInformation("HandleInvokeAsync: {identifier}={args}", identifier, args);
         return new

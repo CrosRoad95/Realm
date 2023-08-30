@@ -2,10 +2,10 @@
 
 internal class BlazorGuiService : IBlazorGuiService
 {
-    public Func<BrowserGuiComponent, string, string, Task>? InvokeVoidAsync { get; set; }
-    public Func<BrowserGuiComponent, string, string, Task<object?>>? InvokeAsync { get; set; }
+    public Func<BrowserComponent, string, string, Task>? InvokeVoidAsync { get; set; }
+    public Func<BrowserComponent, string, string, Task<object?>>? InvokeAsync { get; set; }
 
-    public async Task RelayInvokeVoidAsync(BrowserGuiComponent component, string identifier, string args)
+    public async Task RelayInvokeVoidAsync(BrowserComponent component, string identifier, string args)
     {
         switch (identifier)
         {
@@ -32,7 +32,7 @@ internal class BlazorGuiService : IBlazorGuiService
         }
     } 
 
-    public Task<object?> RelayInvokeAsync(BrowserGuiComponent component, string identifier, string args)
+    public Task<object?> RelayInvokeAsync(BrowserComponent component, string identifier, string args)
     {
         if(InvokeAsync != null)
             return InvokeAsync(component, identifier, args);

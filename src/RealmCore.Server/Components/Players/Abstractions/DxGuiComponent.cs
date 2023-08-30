@@ -1,13 +1,13 @@
-﻿namespace RealmCore.Server.Components.Players;
+﻿namespace RealmCore.Server.Components.Players.Abstractions;
 
-public abstract class GuiComponent : Component
+public abstract class DxGuiComponent : GuiComponent
 {
     protected readonly string _name;
     protected readonly bool _cursorless;
     public string Name => _name;
     public bool Cursorless => _cursorless;
 
-    protected GuiComponent(string name, bool cursorless)
+    protected DxGuiComponent(string name, bool cursorless)
     {
         _name = name;
         _cursorless = cursorless;

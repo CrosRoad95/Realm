@@ -1,4 +1,6 @@
-﻿namespace RealmCore.Server.Logic;
+﻿using RealmCore.Server.Components.Players.Abstractions;
+
+namespace RealmCore.Server.Logic;
 
 internal class GuiLogic
 {

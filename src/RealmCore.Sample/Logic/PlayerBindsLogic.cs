@@ -2,6 +2,7 @@
 using RealmCore.Server.Helpers;
 using RealmCore.ECS.Components;
 using RealmCore.ECS;
+using RealmCore.Server.Components.Players.Abstractions;
 
 namespace RealmCore.Console.Logic;
 
@@ -63,7 +64,7 @@ internal sealed class PlayerBindsLogic
 
             playerElementComponent.SetBind("F2", entity =>
             {
-                if (entity.TryGetComponent(out BrowserGuiComponent blazorGuiComponent))
+                if (entity.TryGetComponent(out BrowserComponent blazorGuiComponent))
                 {
                     if (blazorGuiComponent.Visible)
                     {
@@ -78,7 +79,7 @@ internal sealed class PlayerBindsLogic
 
             playerElementComponent.SetBind("F3", entity =>
             {
-                if (entity.TryGetComponent(out BrowserGuiComponent blazorGuiComponent))
+                if (entity.TryGetComponent(out BrowserComponent blazorGuiComponent))
                 {
                     if(blazorGuiComponent.Visible)
                     {
@@ -94,7 +95,7 @@ internal sealed class PlayerBindsLogic
 
             playerElementComponent.SetBind("F4", entity =>
             {
-                if (entity.TryGetComponent(out BrowserGuiComponent blazorGuiComponent))
+                if (entity.TryGetComponent(out BrowserComponent blazorGuiComponent))
                 {
                     blazorGuiComponent.Path = "index";
                     blazorGuiComponent.Visible = false;

@@ -1,9 +1,9 @@
-﻿using RealmCore.Server.Contexts.Interfaces;
+﻿using RealmCore.Server.Components.Players.Abstractions;
+using RealmCore.Server.Contexts.Interfaces;
 
 namespace RealmCore.Console.Components.Gui;
 
-[ComponentUsage(false)]
-public sealed class LoginGuiComponent : GuiComponent
+public sealed class LoginGuiComponent : DxGuiComponent
 {
     private readonly IUsersService _usersService;
     private readonly ILogger<LoginGuiComponent> _loggerLoginGuiComponent;

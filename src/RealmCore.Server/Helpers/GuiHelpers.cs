@@ -1,4 +1,6 @@
-﻿namespace RealmCore.Server.Helpers;
+﻿using RealmCore.Server.Components.Players.Abstractions;
+
+namespace RealmCore.Server.Helpers;
 
 public static class GuiHelpers
 {

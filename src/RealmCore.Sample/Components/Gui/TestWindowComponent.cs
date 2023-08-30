@@ -6,7 +6,7 @@ public class SampleState
 }
 
 [ComponentUsage(false)]
-public sealed class TestWindowComponent : StatefulGuiComponent<SampleState>
+public sealed class TestWindowComponent : StatefulDxGuiComponent<SampleState>
 {
     private static int _i = 0;
     public TestWindowComponent() : base("test", true, new())
