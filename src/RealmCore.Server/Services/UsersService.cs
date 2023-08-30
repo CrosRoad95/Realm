@@ -18,13 +18,14 @@ internal class UsersService : IUsersService
     private readonly IActiveUsers _activeUsers;
     private readonly IElementCollection _elementCollection;
     private readonly IEntityEngine _ecs;
+    private readonly LevelsRegistry _levelsRegistry;
     private static readonly JsonSerializerSettings _jsonSerializerSettings = new JsonSerializerSettings
     {
         Converters = new List<JsonConverter> { new DoubleConverter() }
     };
 
     public UsersService(ItemsRegistry itemsRegistry, SignInManager<UserData> signInManager, UserManager<UserData> userManager, ILogger<UsersService> logger, IOptions<GameplayOptions> gameplayOptions,
-        IDateTimeProvider dateTimeProvider, IAuthorizationService authorizationService, IDb db, IActiveUsers activeUsers, IElementCollection elementCollection, IEntityEngine ecs)
+        IDateTimeProvider dateTimeProvider, IAuthorizationService authorizationService, IDb db, IActiveUsers activeUsers, IElementCollection elementCollection, IEntityEngine ecs, LevelsRegistry levelsRegistry)
     {
         _itemsRegistry = itemsRegistry;
         _signInManager = signInManager;
@@ -37,6 +38,7 @@ internal class UsersService : IUsersService
         _activeUsers = activeUsers;
         _elementCollection = elementCollection;
         _ecs = ecs;
+        _levelsRegistry = levelsRegistry;
     }
 
     public async Task<int> SignUp(string username, string password)
@@ -135,7 +137,7 @@ internal class UsersService : IUsersService
 
             entity.AddComponent(new LicensesComponent(user.Licenses, _dateTimeProvider));
             entity.AddComponent(new PlayTimeComponent(user.PlayTime, _dateTimeProvider));
-            entity.AddComponent(new LevelComponent(user.Level, user.Experience));
+            entity.AddComponent(new LevelComponent(user.Level, user.Experience, _levelsRegistry));
             entity.AddComponent(new MoneyComponent(user.Money, _gameplayOptions.Value.MoneyLimit, _gameplayOptions.Value.MoneyPrecision));
             entity.AddComponent<AFKComponent>();
             return true;

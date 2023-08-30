@@ -1,6 +1,6 @@
-﻿namespace RealmCore.Server.Logic.Resources;
+﻿namespace RealmCore.Server.Logic.Components;
 
-internal class Text3dComponentLogic : ComponentLogic<Text3dComponent>
+internal sealed class Text3dComponentLogic : ComponentLogic<Text3dComponent>
 {
     private readonly Text3dService _text3DService;
 
@@ -16,7 +16,7 @@ internal class Text3dComponentLogic : ComponentLogic<Text3dComponent>
 
     protected override void ComponentDetached(Text3dComponent text3DComponent)
     {
-        if(text3DComponent.Text3dId != null)
+        if (text3DComponent.Text3dId != null)
         {
             _text3DService.RemoveText3d(text3DComponent.Text3dId.Value);
             text3DComponent.Text3dId = null;

@@ -76,27 +76,14 @@ internal sealed class ScopedEntityFactory : IScopedEntityFactory
         }
     }
 
-    private void AssociateWithPlayerEntity(ElementComponent elementComponent, Entity playerEntity)
-    {
-        var element = elementComponent.Element;
-
-        element.Id = (ElementId)playerEntity.GetRequiredComponent<PlayerElementComponent>().MapIdGenerator.GetId();
-        var player = playerEntity.GetPlayer();
-        element.AssociateWith(player);
-        if (element is Pickup pickup)
-        {
-            pickup.CollisionShape.AssociateWith(player);
-        }
-        if (elementComponent is MarkerElementComponent markerElementComponent)
-        {
-            markerElementComponent.CollisionShape.AssociateWith(player);
-        }
-    }
-
-
     public Entity CreateCollisionSphere(Vector3 position, float radius, ConstructionInfo? constructionInfo = null, Action<Entity>? entityBuilder = null)
     {
-        throw new NotImplementedException();
+        var collisionSphere = new CollisionSphere(position, radius);
+
+        var collisionSphereElementComponent = _entity.AddComponent(PlayerPrivateElementComponent.Create(new CollisionSphereElementComponent(collisionSphere, _entityEngine)));
+        AssociateWithPlayerEntity(collisionSphereElementComponent, _entity);
+        return _entity;
+
     }
 
     public Entity CreateMarker(MarkerType markerType, Vector3 position, ConstructionInfo? constructionInfo = null, Action<Entity>? entityBuilder = null)
@@ -135,7 +122,11 @@ internal sealed class ScopedEntityFactory : IScopedEntityFactory
 
     public Entity CreateBlip(BlipIcon blipIcon, Vector3 position, ConstructionInfo? constructionInfo = null, Action<Entity>? entityBuilder = null)
     {
-        throw new NotImplementedException();
+        var blip = new Blip(position, blipIcon, 250);
+
+        var blipElementComponent = _entity.AddComponent(PlayerPrivateElementComponent.Create(new BlipElementComponent(blip)));
+        AssociateWithPlayerEntity(blipElementComponent, _entity);
+        return _entity;
     }
 
     public Entity CreatePickup(ushort model, Vector3 position, ConstructionInfo? constructionInfo = null, Action<Entity>? entityBuilder = null)
@@ -150,7 +141,11 @@ internal sealed class ScopedEntityFactory : IScopedEntityFactory
 
     public Entity CreateRadarArea(Vector2 position, Vector2 size, Color color, ConstructionInfo? constructionInfo = null, Action<Entity>? entityBuilder = null)
     {
-        throw new NotImplementedException();
+        var radarArea = new RadarArea(position, size, color);
+
+        var radarAreaElementComponent = _entity.AddComponent(PlayerPrivateElementComponent.Create(new RadarAreaElementComponent(radarArea)));
+        AssociateWithPlayerEntity(radarAreaElementComponent, _entity);
+        return _entity;
     }
 
     public Entity CreateCollisionCircle(Vector2 position, float radius, ConstructionInfo? constructionInfo = null, Action<Entity>? entityBuilder = null)
@@ -177,43 +172,6 @@ internal sealed class ScopedEntityFactory : IScopedEntityFactory
     {
         throw new NotImplementedException();
     }
-
-    public PlayerPrivateElementComponent<BlipElementComponent> CreateBlipFor(Entity playerEntity, BlipIcon blipIcon, Vector3 position)
-    {
-        if (!playerEntity.HasComponent<PlayerTagComponent>())
-            throw new ArgumentException("Entity must be a player entity");
-
-        var blip = new Blip(position, blipIcon, 250);
-
-        var blipElementComponent = playerEntity.AddComponent(PlayerPrivateElementComponent.Create(new BlipElementComponent(blip)));
-        AssociateWithPlayerEntity(blipElementComponent, playerEntity);
-        return blipElementComponent;
-    }
-
-
-    public PlayerPrivateElementComponent<RadarAreaElementComponent> CreateRadarAreaFor(Entity playerEntity, Vector2 position, Vector2 size, Color color)
-    {
-        if (!playerEntity.HasComponent<PlayerTagComponent>())
-            throw new ArgumentException("Entity must be a player entity");
-
-        var radarArea = new RadarArea(position, size, color);
-
-        var radarAreaElementComponent = playerEntity.AddComponent(PlayerPrivateElementComponent.Create(new RadarAreaElementComponent(radarArea)));
-        AssociateWithPlayerEntity(radarAreaElementComponent, playerEntity);
-        return radarAreaElementComponent;
-    }
-
-    //public PlayerPrivateElementComponent<CollisionSphereElementComponent> CreateCollisionSphereFor(Entity playerEntity, Vector3 position, float radius)
-    //{
-    //    if (!playerEntity.HasComponent<PlayerTagComponent>())
-    //        throw new ArgumentException("Entity must be a player entity");
-
-    //    var collisionSphere = new CollisionSphere(position, radius);
-
-    //    var collisionSphereElementComponent = playerEntity.AddComponent(PlayerPrivateElementComponent.Create(new CollisionSphereElementComponent(collisionSphere)));
-    //    AssociateWithPlayerEntity(collisionSphereElementComponent, playerEntity);
-    //    return collisionSphereElementComponent;
-    //}
 
     private void ThrowIfDisposed()
     {

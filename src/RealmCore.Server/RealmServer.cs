@@ -35,8 +35,16 @@ public class RealmServer : MtaServer, IRealmServer
 
     public new async Task Start()
     {
+        var logger = GetRequiredService<ILogger<RealmServer>>();
         await GetRequiredService<IDb>().MigrateAsync();
-        await GetRequiredService<SeederServerBuilder>().Build();
+        try
+        {
+            await GetRequiredService<SeederServerBuilder>().Build();
+        }
+        catch(Exception ex)
+        {
+            logger.LogHandleError(ex);
+        }
         await GetRequiredService<ILoadService>().LoadAll();
 
         var gameplayOptions = GetRequiredService<IOptions<GameplayOptions>>();
@@ -45,7 +53,6 @@ public class RealmServer : MtaServer, IRealmServer
         var realmCommandService = GetRequiredService<RealmCommandService>();
 
         base.Start();
-        var logger = GetRequiredService<ILogger<RealmServer>>();
         logger.LogInformation("Server started.");
         logger.LogInformation("Found resources: {resourcesCount}", RealmResourceServer._resourceCounter);
         logger.LogInformation("Created commands: {commandsCount}", realmCommandService.Count);

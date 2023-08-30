@@ -63,10 +63,11 @@ public class LevelComponent : Component
         _levelsRegistry = levelsRegistry;
     }
 
-    public LevelComponent(uint level, uint experience)
+    public LevelComponent(uint level, uint experience, LevelsRegistry levelsRegistry)
     {
         _level = level;
         _experience = experience;
+        _levelsRegistry = levelsRegistry;
     }
 
     public void GiveExperience(uint amount)

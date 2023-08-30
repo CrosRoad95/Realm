@@ -15,7 +15,6 @@ internal sealed class JobSessionComponentLogic : ComponentLogic<JobSessionCompon
 
     protected override void ComponentAdded(JobSessionComponent jobSessionComponent)
     {
-        base.ComponentAdded(jobSessionComponent);
         jobSessionComponent.ObjectiveAdded += HandleObjectiveAdded;
     }
 
@@ -26,6 +25,6 @@ internal sealed class JobSessionComponentLogic : ComponentLogic<JobSessionCompon
 
     protected override void ComponentDetached(JobSessionComponent jobSessionComponent)
     {
-        base.ComponentDetached(jobSessionComponent);
+        jobSessionComponent.ObjectiveAdded -= HandleObjectiveAdded;
     }
 }

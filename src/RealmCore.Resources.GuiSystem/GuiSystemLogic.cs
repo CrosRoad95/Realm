@@ -6,7 +6,7 @@ using SlipeServer.Server.Services;
 
 namespace RealmCore.Resources.GuiSystem;
 
-internal class GuiSystemLogic
+internal sealed class GuiSystemLogic
 {
     private readonly IGuiSystemService _GuiSystemService;
     private readonly ILogger<GuiSystemLogic> _logger;

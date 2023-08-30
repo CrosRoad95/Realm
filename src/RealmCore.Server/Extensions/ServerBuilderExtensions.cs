@@ -89,22 +89,31 @@ public static class ServerBuilderExtensions
         #endregion
 
         #region Resources Logics
-        serverBuilder.AddLogic<ClientInterfaceResourceLogic>();
-        serverBuilder.AddLogic<StatisticsCounterResourceLogic>();
-        serverBuilder.AddLogic<AFKResourceLogic>();
         serverBuilder.AddLogic<AdminResourceLogic>();
-        serverBuilder.AddLogic<OutlineResourceLogic>();
-        serverBuilder.AddLogic<WatermarkResourceLogic>();
-        serverBuilder.AddLogic<CEFBlazorGuiResourceLogic>();
-        serverBuilder.AddLogic<NametagResourceLogic>();
+        serverBuilder.AddLogic<AFKResourceLogic>();
         serverBuilder.AddLogic<BoneAttachResourceLogic>();
+        serverBuilder.AddLogic<CEFBlazorGuiResourceLogic>();
+        serverBuilder.AddLogic<ClientInterfaceResourceLogic>();
+        serverBuilder.AddLogic<NametagResourceLogic>();
+        serverBuilder.AddLogic<OutlineResourceLogic>();
+        serverBuilder.AddLogic<StatisticsCounterResourceLogic>();
         serverBuilder.AddLogic<Text3dComponentLogic>();
+        serverBuilder.AddLogic<WatermarkResourceLogic>();
         serverBuilder.AddLogic<DailyVisitsCounterComponentLogic>();
         serverBuilder.AddLogic<AdminComponentLogic>();
-        serverBuilder.AddLogic<GuiSystemServiceLogic>();
         serverBuilder.AddLogic<FocusableComponentLogic>();
+        serverBuilder.AddLogic<StatefulGuiComponentBaseLogic>();
+        serverBuilder.AddLogic<StatefulHudComponentLogic>();
+        serverBuilder.AddLogic<CollisionShapeElementComponentLogic>();
         #endregion
 
         return serverBuilder;
     }
+
+    public static ServerBuilder WithGuiSystem(this ServerBuilder serverBuilder)
+    {
+        serverBuilder.AddLogic<GuiSystemServiceLogic>();
+        return serverBuilder;
+    }
+
 }

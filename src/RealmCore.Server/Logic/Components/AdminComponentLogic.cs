@@ -1,6 +1,6 @@
-﻿namespace RealmCore.Server.Logic;
+﻿namespace RealmCore.Server.Logic.Components;
 
-internal class AdminComponentLogic : ComponentLogic<AdminComponent>
+internal sealed class AdminComponentLogic : ComponentLogic<AdminComponent>
 {
     private readonly NoClipService _noClipService;
     private readonly DebugLog _debugLog;

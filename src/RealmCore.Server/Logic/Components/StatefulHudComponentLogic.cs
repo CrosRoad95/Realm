@@ -1,6 +1,6 @@
 ﻿namespace RealmCore.Server.Logic.Components;
 
-internal class StatefulHudComponentLogic : ComponentLogic<IStatefulHudComponent>
+internal sealed class StatefulHudComponentLogic : ComponentLogic<IStatefulHudComponent>
 {
     private readonly IOverlayService _overlayService;
 

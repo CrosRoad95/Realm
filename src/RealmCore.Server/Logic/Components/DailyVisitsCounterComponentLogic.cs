@@ -1,6 +1,6 @@
 ﻿namespace RealmCore.Server.Logic.Components;
 
-internal class DailyVisitsCounterComponentLogic : ComponentLogic<DailyVisitsCounterComponent>
+internal sealed class DailyVisitsCounterComponentLogic : ComponentLogic<DailyVisitsCounterComponent>
 {
     private readonly IDateTimeProvider _dateTimeProvider;
 

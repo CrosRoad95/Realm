@@ -30,6 +30,7 @@ public class SampleServer
         {
             if (withDgs)
             {
+                serverBuilder.WithGuiSystem();
                 serverBuilder.AddDGSResource(DGSVersion.Release_3_520);
                 serverBuilder.AddGuiSystemResource(builder =>
                 {
