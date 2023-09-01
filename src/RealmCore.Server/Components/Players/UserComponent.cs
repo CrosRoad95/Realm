@@ -24,6 +24,8 @@ public class UserComponent : AsyncComponent
     public event Action<UserComponent, int>? UpgradeAdded;
     public event Action<UserComponent, int>? UpgradeRemoved;
     public event Action<UserComponent, ClaimsPrincipal>? ClaimsPrincipalUpdated;
+    public event Action<UserComponent, int, string>? SettingChanged;
+    public event Action<UserComponent, int, string>? SettingRemoved;
     private readonly List<string> _roles = new();
 
     internal UserComponent(UserData user, SignInManager<UserData> signInManager, UserManager<UserData> userManager)
@@ -266,9 +268,8 @@ public class UserComponent : AsyncComponent
     {
         ThrowIfDisposed();
 
-        if (value.Length > 255)
-            throw new ArgumentException("Value is too long", nameof(value));
         _settings[settingId] = value;
+        SettingChanged?.Invoke(this, settingId, value);
     }
 
     public string? GetSetting(int settingId)
@@ -283,6 +284,7 @@ public class UserComponent : AsyncComponent
     {
         ThrowIfDisposed();
 
-        _settings.TryRemove(settingId, out var _);
+        if(_settings.TryRemove(settingId, out var value))
+            SettingRemoved?.Invoke(this, settingId, value);
     }
 }

@@ -102,8 +102,6 @@ public static class ServerBuilderExtensions
         serverBuilder.AddLogic<DailyVisitsCounterComponentLogic>();
         serverBuilder.AddLogic<AdminComponentLogic>();
         serverBuilder.AddLogic<FocusableComponentLogic>();
-        serverBuilder.AddLogic<StatefulGuiComponentBaseLogic>();
-        serverBuilder.AddLogic<StatefulHudComponentLogic>();
         serverBuilder.AddLogic<CollisionShapeElementComponentLogic>();
         #endregion
 
@@ -113,6 +111,8 @@ public static class ServerBuilderExtensions
     public static ServerBuilder WithGuiSystem(this ServerBuilder serverBuilder)
     {
         serverBuilder.AddLogic<DxGuiSystemServiceLogic>();
+        serverBuilder.AddLogic<StatefulGuiComponentBaseLogic>();
+        serverBuilder.AddLogic<StatefulHudComponentLogic>();
         return serverBuilder;
     }
 
