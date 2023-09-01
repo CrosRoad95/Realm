@@ -1,6 +1,6 @@
 ﻿namespace RealmCore.Server.Services;
 
-internal class BlazorGuiService : IBlazorGuiService
+internal sealed class BlazorGuiService : IBlazorGuiService
 {
     public Func<BrowserComponent, string, string, Task>? InvokeVoidAsync { get; set; }
     public Func<BrowserComponent, string, string, Task<object?>>? InvokeAsync { get; set; }

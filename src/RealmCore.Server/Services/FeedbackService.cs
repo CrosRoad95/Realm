@@ -1,8 +1,6 @@
-﻿using RealmCore.Persistence.Interfaces;
+﻿namespace RealmCore.Server.Services;
 
-namespace RealmCore.Server.Services;
-
-internal class FeedbackService : IFeedbackService
+internal sealed class FeedbackService : IFeedbackService
 {
     private readonly IRatingRepository _ratingRepository;
     private readonly IOpinionRepository _opinionRepository;

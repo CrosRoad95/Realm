@@ -1,6 +1,4 @@
-﻿using RealmCore.Server.Components.Elements.Abstractions;
-
-namespace RealmCore.Server.Logic.Resources;
+﻿namespace RealmCore.Server.Logic.Resources;
 
 internal sealed class BoneAttachResourceLogic : ComponentLogic<AttachedEntityComponent>
 {

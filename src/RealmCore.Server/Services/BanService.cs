@@ -1,9 +1,6 @@
-﻿using RealmCore.Persistence.Data;
-using RealmCore.Persistence.Interfaces;
+﻿namespace RealmCore.Server.Services;
 
-namespace RealmCore.Server.Services;
-
-public class BanService : IBanService
+internal sealed class BanService : IBanService
 {
     private readonly IBanRepository _banRepository;
     private readonly IDateTimeProvider _dateTimeProvider;

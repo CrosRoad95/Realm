@@ -1,6 +1,4 @@
-﻿using RealmCore.Server.Components.Elements.Abstractions;
-
-namespace RealmCore.Server.Components.Object;
+﻿namespace RealmCore.Server.Components.Object;
 
 [ComponentUsage(false)]
 public class LiftableWorldObjectComponent : InteractionComponent

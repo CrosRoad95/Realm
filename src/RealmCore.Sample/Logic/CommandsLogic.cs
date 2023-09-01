@@ -223,7 +223,7 @@ internal sealed class CommandsLogic
 
             foreach (var vehicleAccess in privateVehicleComponent.Access.PlayerAccesses)
             {
-                _chatBox.OutputTo(entity, $"Access: ({vehicleAccess.UserId}) = Ownership={vehicleAccess.AccessType == 0}");
+                _chatBox.OutputTo(entity, $"Access: ({vehicleAccess.userId}) = Ownership={vehicleAccess.accessType == 0}");
             }
         });
 
@@ -241,7 +241,7 @@ internal sealed class CommandsLogic
 
             foreach (var vehicleAccess in access.PlayerAccesses)
             {
-                _chatBox.OutputTo(entity, $"Access: ({vehicleAccess.UserId}) = Ownership={vehicleAccess.AccessType == 0}");
+                _chatBox.OutputTo(entity, $"Access: ({vehicleAccess.userId}) = Ownership={vehicleAccess.accessType == 0}");
             }
         });
 

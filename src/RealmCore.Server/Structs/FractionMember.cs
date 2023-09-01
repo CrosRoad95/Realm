@@ -1,6 +1,6 @@
-﻿namespace RealmCore.Server.Concepts;
+﻿namespace RealmCore.Server.Structs;
 
-public struct GroupMember
+public struct FractionMember
 {
     public int userId;
     public int rank;

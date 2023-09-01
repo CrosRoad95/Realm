@@ -1,5 +1,4 @@
-﻿using RealmCore.Resources.GuiSystem;
-using RealmCore.Server.Components.Players.Abstractions;
+﻿using RealmCore.Server.Components.Players.Abstractions;
 
 namespace RealmCore.Server.Logic.Components;
 

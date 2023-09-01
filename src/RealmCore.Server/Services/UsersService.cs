@@ -1,12 +1,10 @@
 ﻿using Microsoft.AspNetCore.Authorization;
-using RealmCore.Persistence.Data;
 using RealmCore.Persistence.Extensions;
-using RealmCore.Persistence.Interfaces;
 using RealmCore.Server.Json.Converters;
 
 namespace RealmCore.Server.Services;
 
-internal class UsersService : IUsersService
+internal sealed class UsersService : IUsersService
 {
     private readonly ItemsRegistry _itemsRegistry;
     private readonly SignInManager<UserData> _signInManager;

@@ -1,6 +1,4 @@
-﻿using RealmCore.Server.Components.Elements.Abstractions;
-
-namespace RealmCore.Server.Components.Common;
+﻿namespace RealmCore.Server.Components.Common;
 
 public abstract class DurationBasedHoldInteractionComponent : InteractionComponent
 {

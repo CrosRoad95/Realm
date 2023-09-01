@@ -1,6 +1,4 @@
-﻿using RealmCore.Persistence.Data;
-
-namespace RealmCore.Server.Components.Vehicles;
+﻿namespace RealmCore.Server.Components.Vehicles;
 
 public class VehiclePartDamageComponent : Component
 {

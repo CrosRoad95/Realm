@@ -1,10 +1,9 @@
-﻿using RealmCore.Persistence.Interfaces;
-using Fraction = RealmCore.Server.Concepts.Fraction;
-using FractionMember = RealmCore.Server.Concepts.FractionMember;
+﻿using Fraction = RealmCore.Server.Structs.Fraction;
+using FractionMember = RealmCore.Server.Structs.FractionMember;
 
 namespace RealmCore.Server.Services;
 
-internal class FractionService : IFractionService
+internal sealed class FractionService : IFractionService
 {
     private readonly Dictionary<int, Fraction> _fractions = new();
     private readonly object _lock = new();

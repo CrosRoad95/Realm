@@ -1,6 +1,6 @@
 ﻿namespace RealmCore.Server.Services;
 
-internal class LoadService : ILoadService
+internal sealed class LoadService : ILoadService
 {
     private readonly RepositoryFactory _repositoryFactory;
     private readonly ILogger<LoadService> _logger;

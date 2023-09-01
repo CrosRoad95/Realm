@@ -1,4 +1,4 @@
-﻿namespace RealmCore.Server.Concepts;
+﻿namespace RealmCore.Server.Structs;
 
 public struct BoundingBox
 {

@@ -1,6 +1,4 @@
-﻿using RealmCore.Server.Components.Elements.Abstractions;
-
-namespace RealmCore.Server.Entities;
+﻿namespace RealmCore.Server.Entities;
 
 internal sealed class ScopedEntityFactory : IScopedEntityFactory
 {

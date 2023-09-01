@@ -1,6 +1,4 @@
-﻿using RealmCore.Persistence.Interfaces;
-using RealmCore.Server.Components.Elements.Abstractions;
-using Vehicle = SlipeServer.Server.Elements.Vehicle;
+﻿using Vehicle = SlipeServer.Server.Elements.Vehicle;
 
 namespace RealmCore.Server.Entities;
 

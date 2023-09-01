@@ -1,4 +1,6 @@
-﻿namespace RealmCore.Tests.Tests.Components;
+﻿using RealmCore.Server.Structs;
+
+namespace RealmCore.Tests.Tests.Components;
 
 public class JobStatisticsComponentTests
 {

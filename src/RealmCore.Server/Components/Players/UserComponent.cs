@@ -1,6 +1,4 @@
-﻿using RealmCore.Persistence.Data;
-
-namespace RealmCore.Server.Components.Players;
+﻿namespace RealmCore.Server.Components.Players;
 
 [ComponentUsage(false)]
 public class UserComponent : AsyncComponent

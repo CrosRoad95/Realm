@@ -9,7 +9,6 @@ public class ItemsLogic : ComponentLogic<InventoryComponent>
 
     public ItemsLogic(ItemsRegistry itemsRegistry, IEntityEngine ecs, ChatBox chatBox) : base(ecs)
     {
-        itemsRegistry.UseCallback = Use;
         itemsRegistry.Add(1, new ItemRegistryEntry
         {
             Size = 1,

@@ -1,12 +1,11 @@
-﻿using RealmCore.Persistence.Data;
-using RealmCore.Persistence.Data.Helpers;
+﻿using RealmCore.Persistence.Data.Helpers;
 using RealmCore.Persistence.Extensions;
 using static RealmCore.Persistence.Data.Helpers.VehicleDamageState;
 using static RealmCore.Persistence.Data.Helpers.VehicleWheelStatus;
 
 namespace RealmCore.Server.Services;
 
-internal class SaveService : ISaveService
+internal sealed class SaveService : ISaveService
 {
     private readonly IDb _dbContext;
     private readonly IEnumerable<IUserDataSaver> _userDataSavers;
@@ -84,12 +83,12 @@ internal class SaveService : ISaveService
         vehicleData.TransformAndMotion = entity.Transform.GetTransformAndMotion();
         vehicleData.UserAccesses = privateVehicleComponent.Access.PlayerAccesses.Select(x => new VehicleUserAccessData
         {
-            Id = x.Id,
-            UserId = x.UserId,
+            Id = x.id,
+            UserId = x.userId,
             VehicleId = vehicleData.Id,
             Vehicle = vehicleData,
-            AccessType = x.AccessType,
-            CustomValue = x.CustomValue
+            AccessType = x.accessType,
+            CustomValue = x.customValue
         }).ToList();
 
         if (entity.TryGetComponent(out VehicleUpgradesComponent vehicleUpgradesComponent))

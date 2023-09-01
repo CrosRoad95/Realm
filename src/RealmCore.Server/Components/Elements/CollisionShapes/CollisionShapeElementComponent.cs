@@ -1,6 +1,4 @@
-﻿using RealmCore.Server.Components.Elements.Abstractions;
-
-namespace RealmCore.Server.Components.Elements.CollisionShapes;
+﻿namespace RealmCore.Server.Components.Elements.CollisionShapes;
 
 public abstract class CollisionShapeElementComponent : ElementComponent
 {

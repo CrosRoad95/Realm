@@ -1,8 +1,6 @@
-﻿using RealmCore.Persistence.Interfaces;
+﻿namespace RealmCore.Server.Services;
 
-namespace RealmCore.Server.Services;
-
-internal class RewardService : IRewardService
+internal sealed class RewardService : IRewardService
 {
     private readonly IUserRewardRepository _userRewardRepository;
 

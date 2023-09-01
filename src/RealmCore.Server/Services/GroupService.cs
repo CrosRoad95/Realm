@@ -1,9 +1,8 @@
-﻿using RealmCore.Persistence.Data;
-using RealmCore.Persistence.Interfaces;
+﻿using RealmCore.Server.Structs;
 
 namespace RealmCore.Server.Services;
 
-internal class GroupService : IGroupService
+internal sealed class GroupService : IGroupService
 {
     private readonly IGroupRepository _groupRepository;
 

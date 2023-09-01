@@ -1,6 +1,6 @@
 ﻿namespace RealmCore.Server.Services;
 
-internal class MapsService : IMapsService
+internal sealed class MapsService : IMapsService
 {
     private readonly MapIdGenerator _mapIdGenerator;
     private readonly Dictionary<string, Map> _maps = new();

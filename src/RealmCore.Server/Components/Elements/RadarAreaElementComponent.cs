@@ -1,6 +1,4 @@
-﻿using RealmCore.Server.Components.Elements.Abstractions;
-
-namespace RealmCore.Server.Components.Elements;
+﻿namespace RealmCore.Server.Components.Elements;
 
 public class RadarAreaElementComponent : ElementComponent
 {

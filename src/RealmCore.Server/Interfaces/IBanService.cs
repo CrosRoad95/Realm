@@ -1,6 +1,4 @@
-﻿using RealmCore.Persistence.Data;
-
-namespace RealmCore.Server.Interfaces;
+﻿namespace RealmCore.Server.Interfaces;
 
 public interface IBanService
 {

@@ -1,4 +1,4 @@
-﻿using RealmCore.Persistence.Data;
+﻿using RealmCore.Server.Structs;
 
 namespace RealmCore.Server.Contexts;
 
@@ -13,10 +13,10 @@ public class VehicleAccess : IDisposable
     {
         _vehiclePlayerAccesses = vehicleUserAccessData.Select(x => new VehiclePlayerAccess
         {
-            Id = x.Id,
-            UserId = x.User.Id,
-            AccessType = x.AccessType,
-            CustomValue = x.CustomValue
+            id = x.Id,
+            userId = x.User.Id,
+            accessType = x.AccessType,
+            customValue = x.CustomValue
         }).ToList();
 
         _component = component;
@@ -49,7 +49,7 @@ public class VehicleAccess : IDisposable
         {
             ThrowIfDisposed();
             lock (_lock)
-                return new List<VehiclePlayerAccess>(_vehiclePlayerAccesses.Where(x => x.AccessType == 0));
+                return new List<VehiclePlayerAccess>(_vehiclePlayerAccesses.Where(x => x.accessType == 0));
         }
     }
 
@@ -64,7 +64,7 @@ public class VehicleAccess : IDisposable
         var userId = entity.GetRequiredComponent<UserComponent>().Id;
         lock (_lock)
         {
-            var index = _vehiclePlayerAccesses.FindIndex(x => x.UserId == userId);
+            var index = _vehiclePlayerAccesses.FindIndex(x => x.userId == userId);
             if (index >= 0)
             {
                 vehicleAccess = _vehiclePlayerAccesses[index];
@@ -100,9 +100,9 @@ public class VehicleAccess : IDisposable
         {
             _vehiclePlayerAccesses.Add(new VehiclePlayerAccess
             {
-                UserId = entity.GetRequiredComponent<UserComponent>().Id,
-                AccessType = accessType,
-                CustomValue = customValue
+                userId = entity.GetRequiredComponent<UserComponent>().Id,
+                accessType = accessType,
+                customValue = customValue
             });
             return _vehiclePlayerAccesses.Last();
         }

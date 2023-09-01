@@ -1,9 +1,6 @@
-﻿using RealmCore.Persistence.Interfaces;
-using JobStatistics = RealmCore.Server.Interfaces.IJobService.JobStatistics;
+﻿namespace RealmCore.Server.Services;
 
-namespace RealmCore.Server.Services;
-
-internal class JobService : IJobService
+internal sealed class JobService : IJobService
 {
     private readonly IJobRepository _jobRepository;
 
@@ -19,8 +16,8 @@ internal class JobService : IJobService
         {
             return new JobStatistics
             {
-                points = queryResult.Points,
-                timePlayed = queryResult.TimePlayed
+                points = (ulong)queryResult.Points,
+                timePlayed = (ulong)queryResult.TimePlayed
             };
         }
         return null;
@@ -32,8 +29,8 @@ internal class JobService : IJobService
 
         return results.ToDictionary(x => x.Key, x => new JobStatistics
         {
-            points = x.Value.Points,
-            timePlayed = x.Value.TimePlayed
+            points = (ulong)x.Value.Points,
+            timePlayed = (ulong)x.Value.TimePlayed
         });
     }
 }

@@ -118,6 +118,9 @@ global using RealmCore.Resources.Admin.Enums;
 global using RealmCore.ECS;
 global using RealmCore.Server.Interfaces.Abstractions;
 global using RealmCore.Server.Components.Elements.Abstractions;
+global using RealmCore.Persistence.Data;
+global using RealmCore.Persistence.Interfaces;
+global using RealmCore.Server.Structs;
 
 global using ILogger = Microsoft.Extensions.Logging.ILogger;
 
