@@ -27,7 +27,7 @@ public class EntityTests
         #region Arrange & Act
         bool componentAdded = false;
         bool componentDetached = false;
-        var entity = new Entity("foo");
+        var entity = new Entity();
         entity.ComponentAdded += e =>
         {
             componentAdded = true;
@@ -53,7 +53,7 @@ public class EntityTests
     {
         #region Arrange & Act
         int addedComponents = 0;
-        var entity = new Entity("foo");
+        var entity = new Entity();
         entity.ComponentAdded += e =>
         {
             Interlocked.Increment(ref addedComponents);
@@ -77,7 +77,7 @@ public class EntityTests
     public void ComponentShouldNotBeAddedIfFailedToLoad()
     {
         #region Arrange & Act
-        var entity = new Entity("foo");
+        var entity = new Entity();
         var component = new ThrowExceptionComponent();
 
         var action = () => entity.AddComponent(component);
@@ -93,7 +93,7 @@ public class EntityTests
     public async Task ComponentShouldNotBeAddedIfFailedToAsyncLoad()
     {
         #region Arrange & Act
-        var entity = new Entity("foo");
+        var entity = new Entity();
         var component = new ThrowExceptionAsyncComponent();
 
         var action = async () => await entity.AddComponentAsync(component);
@@ -109,7 +109,7 @@ public class EntityTests
     public async Task ComponentShouldBeRemovedIfAsyncLoadThrowException()
     {
         #region Arrange & Act
-        var entity = new Entity("foo");
+        var entity = new Entity();
         var component = new ThrowExceptionAsyncComponent();
 
         #endregion
@@ -135,7 +135,7 @@ public class EntityTests
     public void AsyncComponentCanNotBeAddedToNonAsyncEntity()
     {
         #region Arrange
-        var entity = new Entity("foo");
+        var entity = new Entity();
         var component = new ThrowExceptionAsyncComponent();
 
         #endregion
@@ -153,7 +153,7 @@ public class EntityTests
     public void ComponentUsageShouldPreventYouFromAddingOneComponentTwoTimes()
     {
         #region Arrange
-        var entity = new Entity("foo");
+        var entity = new Entity();
         var action = () => entity.AddComponent<OneComponent>();
         #endregion
 
@@ -167,7 +167,7 @@ public class EntityTests
     public void ComponentShouldBeAbleToDisposeOtherComponentsInDisposeMethod()
     {
         #region Arrange
-        var entity = new Entity("foo");
+        var entity = new Entity();
         entity.AddComponent<ParentComponent>();
         entity.AddComponent<ChildComponent>();
         #endregion
@@ -185,7 +185,7 @@ public class EntityTests
     public void ComponentShouldBeAbleToDisposeOtherComponentsInDispose2Method()
     {
         #region Arrange
-        var entity = new Entity("foo");
+        var entity = new Entity();
         var test1 = entity.AddComponent<TestComponent>();
         var test2 = entity.AddComponent<TestComponent>();
 
@@ -208,7 +208,7 @@ public class EntityTests
     public void ComponentShouldBeAbleToDisposeOtherComponentsInDispose3Method()
     {
         #region Arrange
-        var entity = new Entity("foo");
+        var entity = new Entity();
         var test1 = entity.AddComponent<TestComponent>();
         var test2 = entity.AddComponent<ParentComponent>();
 
@@ -247,7 +247,7 @@ public class EntityTests
     public void TestEntityAndItsComponentLifecycle1()
     {
         #region Arrange & Act
-        var entity = new Entity("foo");
+        var entity = new Entity();
         var component = new TestComponent();
         using var entityMonitor = entity.Monitor();
         using var componentMonitor = component.Monitor();
@@ -275,7 +275,7 @@ public class EntityTests
     public void TestEntityAndItsComponentLifecycle2()
     {
         #region Arrange & Act
-        var entity = new Entity("foo");
+        var entity = new Entity();
         var component = new TestComponent();
         using var entityMonitor = entity.Monitor();
         using var componentMonitor = component.Monitor();

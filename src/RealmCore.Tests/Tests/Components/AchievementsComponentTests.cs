@@ -7,7 +7,7 @@ public class AchievementsComponentTests
 
     public AchievementsComponentTests()
     {
-        _entity = new("test");
+        _entity = new();
         _achievementsComponent = new();
         _entity.AddComponent(_achievementsComponent);
     }

@@ -7,9 +7,7 @@ internal sealed class EntityEngine : IEntityEngine
     private readonly ConcurrentDictionary<Player, Entity> _entityByPlayer = new();
     private readonly ConcurrentDictionary<Element, Entity> _entityByElement = new();
     private readonly ConcurrentDictionary<string, Entity> _entityById = new();
-    private readonly ConcurrentDictionary<string, Entity> _entityByName = new();
     private readonly ConcurrentDictionary<int, Entity> _vehicleById = new();
-    private readonly IServiceProvider _serviceProvider;
     private readonly IElementCollection _elementCollection;
     private readonly ILogger<EntityEngine> _logger;
 
@@ -68,10 +66,9 @@ internal sealed class EntityEngine : IEntityEngine
 
     public EntityEngine(IServiceProvider serviceProvider, IElementCollection elementCollection, ILogger<EntityEngine> logger)
     {
-        _serviceProvider = serviceProvider;
         _elementCollection = elementCollection;
         _logger = logger;
-        Console = CreateEntity("console", e =>
+        Console = CreateEntity(e =>
         {
             e.AddComponent<ConsoleTagComponent>();
         });
@@ -130,23 +127,19 @@ internal sealed class EntityEngine : IEntityEngine
         try
         {
             _entities.Add(entity);
+            _entityById[entity.Id] = entity;
+            entity.ComponentAdded += HandleComponentAdded;
+            entity.Disposed += HandleEntityDisposed;
         }
         finally
         {
             _entitiesLock.ExitWriteLock();
         }
-        _entityById[entity.Id] = entity;
-        _entityByName[entity.Name] = entity;
-        entity.ComponentAdded += HandleComponentAdded;
-        entity.Disposed += HandleEntityDisposed;
     }
 
-    public Entity CreateEntity(string name, Action<Entity>? entityBuilder = null)
+    public Entity CreateEntity(Action<Entity>? entityBuilder = null)
     {
-        if (_entityByName.ContainsKey(name))
-            throw new EntityAlreadyExistsException(name);
-
-        var newlyCreatedEntity = new Entity(name);
+        var newlyCreatedEntity = new Entity();
 
         InternalEntityCreated(newlyCreatedEntity);
         entityBuilder?.Invoke(newlyCreatedEntity);
@@ -162,7 +155,6 @@ internal sealed class EntityEngine : IEntityEngine
     public void RemoveEntity(Entity entity)
     {
         _entityById.Remove(entity.Id, out var _);
-        _entityByName.Remove(entity.Name, out var _);
 
         _entitiesLock.EnterWriteLock();
         try
@@ -228,12 +220,10 @@ internal sealed class EntityEngine : IEntityEngine
     private void HandleDisposed(Entity entity)
     {
         _entityById.TryRemove(entity.Id, out var _);
-        _entityByName.TryRemove(entity.Name, out var _);
         entity.Disposed -= HandleDisposed;
     }
 
     public bool GetEntityById(string id, out Entity? entity) => _entityById.TryGetValue(id, out entity);
-    public bool GetEntityByName(string name, out Entity? entity) => _entityByName.TryGetValue(name, out entity);
     public bool GetVehicleById(int id, out Entity? entity) => _vehicleById.TryGetValue(id, out entity);
 
     public IEnumerable<Entity> GetWithinRange(Vector3 position, float range)

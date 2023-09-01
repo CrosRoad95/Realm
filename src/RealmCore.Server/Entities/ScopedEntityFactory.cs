@@ -4,7 +4,6 @@ internal sealed class ScopedEntityFactory : IScopedEntityFactory
 {
     private readonly Entity _entity;
     private readonly IElementCollection _elementCollection;
-    private readonly IEntityFactory _entityFactory;
     private readonly IEntityEngine _entityEngine;
     private PlayerPrivateElementComponentBase? _lastCreatedComponent;
     private bool _disposed;
@@ -30,14 +29,13 @@ internal sealed class ScopedEntityFactory : IScopedEntityFactory
 
     public event Action<IScopedEntityFactory, PlayerPrivateElementComponentBase>? ComponentCreated;
 
-    public ScopedEntityFactory(Entity entity, IElementCollection elementCollection, IEntityFactory entityFactory, IEntityEngine entityEngine)
+    public ScopedEntityFactory(Entity entity, IElementCollection elementCollection, IEntityEngine entityEngine)
     {
         if (!entity.HasComponent<PlayerTagComponent>())
             throw new ArgumentException("Entity must be a player entity");
 
         _entity = entity;
         _elementCollection = elementCollection;
-        _entityFactory = entityFactory;
         _entityEngine = entityEngine;
         _entity.Disposed += HandleEntityDisposed;
     }
@@ -74,9 +72,13 @@ internal sealed class ScopedEntityFactory : IScopedEntityFactory
         }
     }
 
-    public Entity CreateCollisionSphere(Vector3 position, float radius, ConstructionInfo? constructionInfo = null, Action<Entity>? entityBuilder = null)
+    public Entity CreateCollisionSphere(Vector3 position, float radius, byte interior = 0, ushort dimension = 0, Action<Entity>? entityBuilder = null)
     {
-        var collisionSphere = new CollisionSphere(position, radius);
+        var collisionSphere = new CollisionSphere(position, radius)
+        {
+            Interior = interior,
+            Dimension = dimension
+        };
 
         var collisionSphereElementComponent = _entity.AddComponent(PlayerPrivateElementComponent.Create(new CollisionSphereElementComponent(collisionSphere, _entityEngine)));
         AssociateWithPlayerEntity(collisionSphereElementComponent, _entity);
@@ -84,11 +86,13 @@ internal sealed class ScopedEntityFactory : IScopedEntityFactory
 
     }
 
-    public Entity CreateMarker(MarkerType markerType, Vector3 position, ConstructionInfo? constructionInfo = null, Action<Entity>? entityBuilder = null)
+    public Entity CreateMarker(MarkerType markerType, Vector3 position, Color color, byte interior = 0, ushort dimension = 0, Action<Entity>? entityBuilder = null)
     {
         var marker = new Marker(position, markerType)
         {
-            Color = Color.White
+            Color = color,
+            Interior = interior,
+            Dimension = dimension
         };
 
         var markerElementComponent = _entity.AddComponent(PlayerPrivateElementComponent.Create(new MarkerElementComponent(marker, _elementCollection, _entityEngine)));
@@ -96,21 +100,23 @@ internal sealed class ScopedEntityFactory : IScopedEntityFactory
         return _entity;
     }
 
-    public Task<Entity> CreateNewPrivateVehicle(ushort model, Vector3 position, Vector3 rotation, ConstructionInfo? constructionInfo = null, Action<Entity>? entityBuilder = null)
+    public Task<Entity> CreateNewPrivateVehicle(ushort model, Vector3 position, Vector3 rotation, byte interior = 0, ushort dimension = 0, Action<Entity>? entityBuilder = null)
     {
         throw new NotImplementedException();
     }
 
-    public Entity CreateVehicle(ushort model, Vector3 position, Vector3 rotation, ConstructionInfo? constructionInfo = null, Action<Entity>? entityBuilder = null)
+    public Entity CreateVehicle(ushort model, Vector3 position, Vector3 rotation, byte interior = 0, ushort dimension = 0, Action<Entity>? entityBuilder = null)
     {
         throw new NotImplementedException();
     }
 
-    public Entity CreateObject(ObjectModel model, Vector3 position, Vector3 rotation, ConstructionInfo? constructionInfo = null, Action<Entity>? entityBuilder = null)
+    public Entity CreateObject(ObjectModel model, Vector3 position, Vector3 rotation, byte interior = 0, ushort dimension = 0, Action<Entity>? entityBuilder = null)
     {
         var worldObject = new WorldObject(model, position)
         {
-            Rotation = rotation
+            Rotation = rotation,
+            Interior = interior,
+            Dimension = dimension
         };
 
         var worldObjectElementComponent = _entity.AddComponent(PlayerPrivateElementComponent.Create(new WorldObjectComponent(worldObject)));
@@ -118,55 +124,65 @@ internal sealed class ScopedEntityFactory : IScopedEntityFactory
         return _entity;
     }
 
-    public Entity CreateBlip(BlipIcon blipIcon, Vector3 position, ConstructionInfo? constructionInfo = null, Action<Entity>? entityBuilder = null)
+    public Entity CreateBlip(BlipIcon blipIcon, Vector3 position, byte interior = 0, ushort dimension = 0, Action<Entity>? entityBuilder = null)
     {
-        var blip = new Blip(position, blipIcon, 250);
+        var blip = new Blip(position, blipIcon, 250)
+        {
+            Interior = interior,
+            Dimension = dimension
+        };
+
 
         var blipElementComponent = _entity.AddComponent(PlayerPrivateElementComponent.Create(new BlipElementComponent(blip)));
         AssociateWithPlayerEntity(blipElementComponent, _entity);
         return _entity;
     }
 
-    public Entity CreatePickup(ushort model, Vector3 position, ConstructionInfo? constructionInfo = null, Action<Entity>? entityBuilder = null)
+    public Entity CreatePickup(ushort model, Vector3 position, byte interior = 0, ushort dimension = 0, Action<Entity>? entityBuilder = null)
     {
         throw new NotImplementedException();
     }
 
-    public Entity CreatePed(PedModel pedModel, Vector3 position, ConstructionInfo? constructionInfo = null, Action<Entity>? entityBuilder = null)
+    public Entity CreatePed(PedModel pedModel, Vector3 position, byte interior = 0, ushort dimension = 0, Action<Entity>? entityBuilder = null)
     {
         throw new NotImplementedException();
     }
 
-    public Entity CreateRadarArea(Vector2 position, Vector2 size, Color color, ConstructionInfo? constructionInfo = null, Action<Entity>? entityBuilder = null)
+    public Entity CreateRadarArea(Vector2 position, Vector2 size, Color color, byte interior = 0, ushort dimension = 0, Action<Entity>? entityBuilder = null)
     {
-        var radarArea = new RadarArea(position, size, color);
+        var radarArea = new RadarArea(position, size, color)
+        {
+            Interior = interior,
+            Dimension = dimension
+        };
+
 
         var radarAreaElementComponent = _entity.AddComponent(PlayerPrivateElementComponent.Create(new RadarAreaElementComponent(radarArea)));
         AssociateWithPlayerEntity(radarAreaElementComponent, _entity);
         return _entity;
     }
 
-    public Entity CreateCollisionCircle(Vector2 position, float radius, ConstructionInfo? constructionInfo = null, Action<Entity>? entityBuilder = null)
+    public Entity CreateCollisionCircle(Vector2 position, float radius, byte interior = 0, ushort dimension = 0, Action<Entity>? entityBuilder = null)
     {
         throw new NotImplementedException();
     }
 
-    public Entity CreateCollisionCuboid(Vector3 position, Vector3 dimensions, ConstructionInfo? constructionInfo = null, Action<Entity>? entityBuilder = null)
+    public Entity CreateCollisionCuboid(Vector3 position, Vector3 dimensions, byte interior = 0, ushort dimension = 0, Action<Entity>? entityBuilder = null)
     {
         throw new NotImplementedException();
     }
 
-    public Entity CreateCollisionPolygon(Vector3 position, IEnumerable<Vector2> vertices, ConstructionInfo? constructionInfo = null, Action<Entity>? entityBuilder = null)
+    public Entity CreateCollisionPolygon(Vector3 position, IEnumerable<Vector2> vertices, byte interior = 0, ushort dimension = 0, Action<Entity>? entityBuilder = null)
     {
         throw new NotImplementedException();
     }
 
-    public Entity CreateCollisionRectangle(Vector2 position, Vector2 dimensions, ConstructionInfo? constructionInfo = null, Action<Entity>? entityBuilder = null)
+    public Entity CreateCollisionRectangle(Vector2 position, Vector2 dimensions, byte interior = 0, ushort dimension = 0, Action<Entity>? entityBuilder = null)
     {
         throw new NotImplementedException();
     }
 
-    public Entity CreateCollisionTube(Vector3 position, float radius, float height, ConstructionInfo? constructionInfo = null, Action<Entity>? entityBuilder = null)
+    public Entity CreateCollisionTube(Vector3 position, float radius, float height, byte interior = 0, ushort dimension = 0, Action<Entity>? entityBuilder = null)
     {
         throw new NotImplementedException();
     }
@@ -182,5 +198,4 @@ internal sealed class ScopedEntityFactory : IScopedEntityFactory
         Disposed?.Invoke(this);
         _disposed = true;
     }
-
 }

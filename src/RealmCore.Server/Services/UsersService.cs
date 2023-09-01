@@ -173,7 +173,7 @@ internal sealed class UsersService : IUsersService
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Failed to destroy player entity {entityName}", entity.Name);
+            _logger.LogError(ex, "Failed to destroy player entity");
             throw;
         }
     }

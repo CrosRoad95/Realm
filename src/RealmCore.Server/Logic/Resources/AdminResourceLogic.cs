@@ -94,7 +94,7 @@ internal sealed class AdminResourceLogic
                             position = position,
                             previewType = PreviewType.BoxWireframe,
                             previewColor = Color.Red,
-                            name = x.Name,
+                            name = x.GetType().ToString(),
                         };
                     }));
                 else

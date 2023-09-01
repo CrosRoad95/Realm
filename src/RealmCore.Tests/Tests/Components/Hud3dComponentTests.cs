@@ -30,7 +30,7 @@ public class Hud3dComponentTests
     public void TestHud3dComponentShouldProduceAppropriateCallback()
     {
         #region Arrange
-        var entity = new Entity("test");
+        var entity = new Entity();
         entity.Transform.Position = new Vector3(100, 100, 100);
         int callCount = 0;
         string _id = string.Empty;
@@ -76,7 +76,7 @@ public class Hud3dComponentTests
     public void TestDetectedDynamicHudComponents()
     {
         #region Arrange
-        var entity = new Entity("test");
+        var entity = new Entity();
         #endregion
 
         #region Act
@@ -95,7 +95,7 @@ public class Hud3dComponentTests
     public void UpdateStateShouldProduceAppropriateCallback()
     {
         #region Arrange
-        var entity = new Entity("test");
+        var entity = new Entity();
 
         int callsCount = 0;
         string _id = string.Empty;
@@ -134,7 +134,7 @@ public class Hud3dComponentTests
     public void Hud3dShouldBeRemovedWhenComponentGetRemoved()
     {
         #region Arrange
-        var entity = new Entity("test");
+        var entity = new Entity();
 
         string _id = string.Empty;
         _overlayService.Hud3dRemoved = id =>
@@ -158,7 +158,7 @@ public class Hud3dComponentTests
     public void ItIsNotAllowedToUpdateStatelessHud()
     {
         #region Arrange
-        var entity = new Entity("test");
+        var entity = new Entity();
         var hud3d = entity.AddComponent<SampleStateLessHud3d>();
         #endregion
 

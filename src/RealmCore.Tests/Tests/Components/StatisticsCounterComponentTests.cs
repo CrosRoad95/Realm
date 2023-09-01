@@ -7,11 +7,7 @@ public class StatisticsCounterComponentTests
 
     public StatisticsCounterComponentTests()
     {
-        var services = new ServiceCollection();
-
-        var serviceProvider = services.BuildServiceProvider();
-
-        _entity = new("test");
+        _entity = new();
         _statisticsCounterComponent = new();
         _entity.AddComponent(_statisticsCounterComponent);
     }

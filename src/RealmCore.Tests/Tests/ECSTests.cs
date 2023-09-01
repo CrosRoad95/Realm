@@ -22,7 +22,7 @@ public class ECSTests
         {
             created = true;
         };
-        var entity = _ecs.CreateEntity("foo");
+        var entity = _ecs.CreateEntity();
         entity.Dispose();
         #endregion
 
@@ -44,7 +44,7 @@ public class ECSTests
 
         await ParallelHelpers.Run((x,i) =>
         {
-            var entity = _ecs.CreateEntity($"foo{x}{i}");
+            var entity = _ecs.CreateEntity();
             entity.Dispose();
         });
         #endregion

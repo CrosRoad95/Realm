@@ -11,8 +11,7 @@ public class DailyVisitsCounterComponentTests
         _testDateTimeProvider = new();
         var services = new ServiceCollection();
 
-        var serviceProvider = services.BuildServiceProvider();
-        _entity = new("test");
+        _entity = new();
         _dailyVisitsCounterComponent = new();
         _entity.AddComponent(_dailyVisitsCounterComponent);
     }

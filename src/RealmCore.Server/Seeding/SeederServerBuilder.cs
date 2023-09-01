@@ -50,9 +50,9 @@ internal sealed class SeederServerBuilder
         {
             if (Enum.IsDefined(typeof(BlipIcon), pair.Value.Icon))
             {
-                var entity = _entityFactory.CreateBlip((BlipIcon)pair.Value.Icon, pair.Value.Position, new ConstructionInfo
+                var entity = _entityFactory.CreateBlip((BlipIcon)pair.Value.Icon, pair.Value.Position, entityBuilder: x =>
                 {
-                    Id = pair.Key
+                    x.AddComponent(new NameComponent(pair.Key));
                 });
                 _logger.LogInformation("Seeder: Created blip of id {elementId} with icon {blipIcon} at position {position}", pair.Key, pair.Value.Icon, pair.Value.Position);
             }
@@ -67,9 +67,9 @@ internal sealed class SeederServerBuilder
     {
         foreach (var pair in pickups)
         {
-            var entity = _entityFactory.CreatePickup(pair.Value.Model, pair.Value.Position, new ConstructionInfo
+            var entity = _entityFactory.CreatePickup(pair.Value.Model, pair.Value.Position, entityBuilder: x =>
             {
-                Id = pair.Key,
+                x.AddComponent(new NameComponent(pair.Key));
             });
             if (pair.Value.Text3d != null)
             {
@@ -85,9 +85,9 @@ internal sealed class SeederServerBuilder
         {
             if (Enum.IsDefined(typeof(MarkerType), pair.Value.MarkerType))
             {
-                var entity = _entityFactory.CreateMarker(pair.Value.MarkerType, pair.Value.Position, new ConstructionInfo
+                var entity = _entityFactory.CreateMarker(pair.Value.MarkerType, pair.Value.Position, pair.Value.Color, entityBuilder: x =>
                 {
-                    Id = pair.Key,
+                    x.AddComponent(new NameComponent(pair.Key));
                 });
                 _logger.LogInformation("Seeder: Created marker of id {elementId} at {position}", pair.Key, pair.Value.Position);
             }

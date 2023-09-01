@@ -20,7 +20,7 @@ public class MarkerEnterObjective : Objective
     {
         _playerEntity = playerEntity;
         using var scopedEntityFactory = entityFactory.CreateScopedEntityFactory(playerEntity);
-        scopedEntityFactory.CreateMarker(MarkerType.Arrow, _position);
+        scopedEntityFactory.CreateMarker(MarkerType.Arrow, _position, Color.White);
         _markerElementComponent = scopedEntityFactory.LastCreatedComponent as PlayerPrivateElementComponent<MarkerElementComponent>;
         scopedEntityFactory.CreateCollisionSphere(_position, 2);
         _collisionSphereElementComponent = scopedEntityFactory.LastCreatedComponent as PlayerPrivateElementComponent<CollisionSphereElementComponent>;

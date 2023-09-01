@@ -8,18 +8,14 @@ public class LevelComponentTests
 
     public LevelComponentTests()
     {
-        var services = new ServiceCollection();
-        services.AddSingleton<LevelsRegistry>();
-
-        var serviceProvider = services.BuildServiceProvider();
-        var levelsRegistry = serviceProvider.GetRequiredService<LevelsRegistry>();
-        for(int i = 0; i < 10;i++)
+        var levelsRegistry = new LevelsRegistry();
+        for (int i = 0; i < 10;i++)
         {
             var requiredExperience = (uint)(10 * i + 10);
             levelsRegistry.Add((uint)i + 1, new LevelRegistryEntry(requiredExperience));
             _totalRequiredExperience += requiredExperience;
         }
-        _entity = new("test");
+        _entity = new();
         _levelComponent = new(levelsRegistry);
         _entity.AddComponent(_levelComponent);
     }

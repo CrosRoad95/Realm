@@ -54,7 +54,7 @@ public class InventoryComponentTests
 
         var services = new ServiceCollection();
         services.AddSingleton<IRealmConfigurationProvider>(new TestConfigurationProvider());
-        _entity = new("test");
+        _entity = new();
         _inventoryComponent = new(100);
         _entity.AddComponent(_inventoryComponent);
     }

@@ -48,7 +48,7 @@ internal sealed class ClientInterfaceResourceLogic
         if (!_ecs.TryGetEntityByPlayer(player, out var playerEntity))
             return;
 
-        var playerName = playerEntity?.Name ?? player.Name;
+        var playerName = player.Name;
         switch (level)
         {
             case 0: // Custom

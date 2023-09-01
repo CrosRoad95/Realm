@@ -8,8 +8,8 @@ public class MoneyComponentTests
 
     public MoneyComponentTests()
     {
-        _entity = new("test");
-        _entityB = new("test2");
+        _entity = new();
+        _entityB = new();
         _moneyComponent = new(1000000, 4);
         _entity.AddComponent(_moneyComponent);
     }

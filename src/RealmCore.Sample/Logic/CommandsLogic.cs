@@ -71,13 +71,15 @@ internal sealed class CommandsLogic
             var focusableComponent = worldObject.AddComponent<FocusableComponent>();
             focusableComponent.PlayerFocused += (that, player) =>
             {
-                _chatBox.Output($"Player {player.Name} focused, focused elements {focusableComponent.FocusedPlayerCount}");
-                _logger.LogInformation($"Player {player.Name} focused, focused elements {focusableComponent.FocusedPlayerCount}");
+                var playerName = player.GetRequiredComponent<PlayerElementComponent>().Name;
+                _chatBox.Output($"Player {playerName} focused, focused elements {focusableComponent.FocusedPlayerCount}");
+                _logger.LogInformation($"Player {playerName} focused, focused elements {focusableComponent.FocusedPlayerCount}");
             };
             focusableComponent.PlayerLostFocus += (that, player) =>
             {
-                _chatBox.Output($"Player {player.Name} lost focus, focused elements {focusableComponent.FocusedPlayerCount}");
-                _logger.LogInformation($"Player {player.Name} lost focus, focused elements {focusableComponent.FocusedPlayerCount}");
+                var playerName = player.GetRequiredComponent<PlayerElementComponent>().Name;
+                _chatBox.Output($"Player {playerName} lost focus, focused elements {focusableComponent.FocusedPlayerCount}");
+                _logger.LogInformation($"Player {playerName} lost focus, focused elements {focusableComponent.FocusedPlayerCount}");
             };
 
             _chatBox.OutputTo(entity, "Created focusable component");
@@ -437,7 +439,7 @@ internal sealed class CommandsLogic
 
         _commandService.AddAsyncCommandHandler("hud3d", async (entity, args) =>
         {
-            using var e = _ecs.CreateEntity(Guid.NewGuid().ToString());
+            using var e = _ecs.CreateEntity();
             e.Transform.Position = entity.Transform.Position + new Vector3(-4, 0, 0);
             e.AddComponent(new Hud3dComponent<TestState>(e => e
                 .AddRectangle(Vector2.Zero, new Size(100, 100), Color.Red)
@@ -453,7 +455,7 @@ internal sealed class CommandsLogic
 
         _commandService.AddAsyncCommandHandler("hud3d2", async (entity, args) =>
         {
-            var e = _ecs.CreateEntity(Guid.NewGuid().ToString());
+            var e = _ecs.CreateEntity();
             e.Transform.Position = entity.Transform.Position + new Vector3(-4, 0, 0);
             var hud3d = e.AddComponent(new Hud3dComponent<TestState>(e => e
                 .AddRectangle(Vector2.Zero, new Size(200, 200), Color.Red)
@@ -860,7 +862,7 @@ internal sealed class CommandsLogic
 
         _commandService.AddCommandHandler("text3dcomp", (entity, args) =>
         {
-            var markerEntity = entityFactory.CreateMarker(MarkerType.Arrow, entity.Transform.Position);
+            var markerEntity = entityFactory.CreateMarker(MarkerType.Arrow, entity.Transform.Position, Color.White);
             markerEntity.AddComponent(new Text3dComponent("test1"));
             markerEntity.AddComponent(new Text3dComponent("offset z+1", new Vector3(0, 0, 1)));
         });
@@ -1168,7 +1170,7 @@ internal sealed class CommandsLogic
             }
 
             using var scopedEntityFactory = _entityFactory.CreateScopedEntityFactory(entity);
-            scopedEntityFactory.CreateMarker(MarkerType.Checkpoint, entity.Transform.Position with { X = entity.Transform.Position.X + 4 });
+            scopedEntityFactory.CreateMarker(MarkerType.Checkpoint, entity.Transform.Position with { X = entity.Transform.Position.X + 4 }, Color.White);
             var marker = scopedEntityFactory.LastCreatedComponent as PlayerPrivateElementComponent<MarkerElementComponent>;
             marker.ElementComponent.EntityEntered = handleEntityEntered;
         });
@@ -1176,7 +1178,7 @@ internal sealed class CommandsLogic
         _commandService.AddAsyncCommandHandler("createmarkerforme", async (entity, args) =>
         {
             using var scopedEntityFactory = _entityFactory.CreateScopedEntityFactory(entity);
-            scopedEntityFactory.CreateMarker(MarkerType.Cylinder, entity.Transform.Position);
+            scopedEntityFactory.CreateMarker(MarkerType.Cylinder, entity.Transform.Position, Color.White);
             var component = scopedEntityFactory.LastCreatedComponent as PlayerPrivateElementComponent<MarkerElementComponent>;
             component.ElementComponent.Size = 4;
             component.ElementComponent.Color = Color.Red;
@@ -1199,7 +1201,7 @@ internal sealed class CommandsLogic
         _commandService.AddAsyncCommandHandler("createmarkerforme2", async (entity, args) =>
         {
             using var scopedEntityFactory = _entityFactory.CreateScopedEntityFactory(entity);
-            scopedEntityFactory.CreateMarker(MarkerType.Cylinder, new Vector3(-600.8877f, 240.88867f, 26.091864f));
+            scopedEntityFactory.CreateMarker(MarkerType.Cylinder, new Vector3(-600.8877f, 240.88867f, 26.091864f), Color.White);
             var marker = scopedEntityFactory.LastCreatedComponent as PlayerPrivateElementComponent<MarkerElementComponent>;
             marker.ElementComponent.Size = 4;
             marker.ElementComponent.Color = Color.Red;
@@ -1208,7 +1210,7 @@ internal sealed class CommandsLogic
         _commandService.AddCommandHandler("createmarkerforme3", (entity, args) =>
         {
             using var scopedEntityFactory = _entityFactory.CreateScopedEntityFactory(entity);
-            scopedEntityFactory.CreateMarker(MarkerType.Cylinder, entity.Transform.Position);
+            scopedEntityFactory.CreateMarker(MarkerType.Cylinder, entity.Transform.Position, Color.White);
             var marker = scopedEntityFactory.LastCreatedComponent as PlayerPrivateElementComponent<MarkerElementComponent>;
             marker.ElementComponent.Size = 4;
             marker.ElementComponent.Color = Color.Red;

@@ -17,7 +17,7 @@ internal sealed class EntityFactory : IEntityFactory
 
     public IScopedEntityFactory CreateScopedEntityFactory(Entity entity)
     {
-        return new ScopedEntityFactory(entity, _elementCollection, this, _entityEngine);
+        return new ScopedEntityFactory(entity, _elementCollection, _entityEngine);
     }
 
     private void AssociateWithServer(Entity entity)
@@ -41,55 +41,16 @@ internal sealed class EntityFactory : IEntityFactory
         }
     }
 
-    private void AssociateWithPlayerEntity<TElementComponent>(PlayerPrivateElementComponent<TElementComponent> elementComponent, Entity playerEntity) where TElementComponent : ElementComponent
+    public Entity CreateVehicle(ushort model, Vector3 position, Vector3 rotation, byte interior = 0, ushort dimension = 0, Action<Entity>? entityBuilder = null)
     {
-        var element = elementComponent.Element;
-        var player = playerEntity.GetPlayer();
-        element.AssociateWith(player);
-        if (element is Pickup pickup)
+        var vehicleEntity = _entityEngine.CreateEntity(entity =>
         {
-            pickup.CollisionShape.AssociateWith(player);
-        }
-
-        if (elementComponent.ElementComponent is MarkerElementComponent markerElementComponent)
-        {
-            markerElementComponent.CollisionShape.AssociateWith(player);
-        }
-    }
-
-    private void AssociateWithPlayerEntity(ElementComponent elementComponent, Entity playerEntity)
-    {
-        var element = elementComponent.Element;
-
-        element.Id = (ElementId)playerEntity.GetRequiredComponent<PlayerElementComponent>().MapIdGenerator.GetId();
-        var player = playerEntity.GetPlayer();
-        element.AssociateWith(player);
-        if (element is Pickup pickup)
-        {
-            pickup.CollisionShape.AssociateWith(player);
-        }
-        if (elementComponent is MarkerElementComponent markerElementComponent)
-        {
-            markerElementComponent.CollisionShape.AssociateWith(player);
-        }
-    }
-
-    public Entity CreateVehicle(ushort model, Vector3 position, Vector3 rotation, ConstructionInfo? constructionInfo = null, Action<Entity>? entityBuilder = null)
-    {
-        var vehicleEntity = _entityEngine.CreateEntity(constructionInfo?.Id ?? $"vehicle {Guid.NewGuid()}", entity =>
-        {
-            if (constructionInfo != null)
-                entity.AddComponent(new Transform(position, rotation, constructionInfo.Interior, constructionInfo.Dimension));
-            else
-                entity.AddComponent(new Transform(position, rotation));
+            entity.AddComponent(new Transform(position, rotation, interior, dimension));
 
             entity.AddComponent<VehicleTagComponent>();
             var vehicle = new Vehicle(model, position);
 
             var vehicleElementComponent = entity.AddComponent(new VehicleElementComponent(vehicle, _entityEngine));
-
-            vehicle.RespawnPosition = position;
-            vehicle.RespawnRotation = rotation;
 
             AssociateWithServer(entity);
             entityBuilder?.Invoke(entity);
@@ -98,37 +59,28 @@ internal sealed class EntityFactory : IEntityFactory
         return vehicleEntity;
     }
 
-    public Entity CreateMarker(MarkerType markerType, Vector3 position, ConstructionInfo? constructionInfo = null, Action<Entity>? entityBuilder = null)
+    public Entity CreateMarker(MarkerType markerType, Vector3 position, Color color, byte interior = 0, ushort dimension = 0, Action<Entity>? entityBuilder = null)
     {
-        return _entityEngine.CreateEntity(constructionInfo?.Id ?? $"marker {Guid.NewGuid()}", entity =>
+        return _entityEngine.CreateEntity(entity =>
         {
-            if (constructionInfo != null)
-                entity.AddComponent(new Transform(position, constructionInfo.Interior, constructionInfo.Dimension));
-            else
-                entity.AddComponent(new Transform(position));
-
+            entity.AddComponent(new Transform(position, interior, dimension));
             entity.AddComponent<MarkerTagComponent>();
-            var marker = new Marker(new Vector3(0, 0, 1000), markerType)
-            {
-                Color = Color.White
-            };
 
-            var markerElementComponent = entity.AddComponent(new MarkerElementComponent(marker, _elementCollection, _entityEngine));
+            var markerElementComponent = entity.AddComponent(new MarkerElementComponent(new Marker(new Vector3(0, 0, 1000), markerType)
+            {
+                Color = color
+            }, _elementCollection, _entityEngine));
 
             AssociateWithServer(entity);
             entityBuilder?.Invoke(entity);
         });
     }
 
-    public Entity CreatePickup(ushort model, Vector3 position, ConstructionInfo? constructionInfo = null, Action<Entity>? entityBuilder = null)
+    public Entity CreatePickup(ushort model, Vector3 position, byte interior = 0, ushort dimension = 0, Action<Entity>? entityBuilder = null)
     {
-        var pickupEntity = _entityEngine.CreateEntity(constructionInfo?.Id ?? $"marker {Guid.NewGuid()}", entity =>
+        var pickupEntity = _entityEngine.CreateEntity(entity =>
         {
-            if (constructionInfo != null)
-                entity.AddComponent(new Transform(position, constructionInfo.Interior, constructionInfo.Dimension));
-            else
-                entity.AddComponent(new Transform(position));
-
+            entity.AddComponent(new Transform(position, interior, dimension));
             entity.AddComponent<PickupTagComponent>();
             entity.AddComponent(new PickupElementComponent(new Pickup(Vector3.Zero, model), _entityEngine));
 
@@ -139,15 +91,11 @@ internal sealed class EntityFactory : IEntityFactory
         return pickupEntity;
     }
 
-    public Entity CreateBlip(BlipIcon blipIcon, Vector3 position, ConstructionInfo? constructionInfo = null, Action<Entity>? entityBuilder = null)
+    public Entity CreateBlip(BlipIcon blipIcon, Vector3 position, byte interior = 0, ushort dimension = 0, Action<Entity>? entityBuilder = null)
     {
-        var blipEntity = _entityEngine.CreateEntity(constructionInfo?.Id ?? $"marker {Guid.NewGuid()}", entity =>
+        var blipEntity = _entityEngine.CreateEntity(entity =>
         {
-            if (constructionInfo != null)
-                entity.AddComponent(new Transform(position, constructionInfo.Interior, constructionInfo.Dimension));
-            else
-                entity.AddComponent(new Transform(position));
-
+            entity.AddComponent(new Transform(position, interior, dimension));
             entity.AddComponent<BlipTagComponent>();
             entity.AddComponent(new BlipElementComponent(new Blip(Vector3.Zero, blipIcon, 250)));
 
@@ -158,15 +106,11 @@ internal sealed class EntityFactory : IEntityFactory
         return blipEntity;
     }
 
-    public Entity CreateRadarArea(Vector2 position, Vector2 size, Color color, ConstructionInfo? constructionInfo = null, Action<Entity>? entityBuilder = null)
+    public Entity CreateRadarArea(Vector2 position, Vector2 size, Color color, byte interior = 0, ushort dimension = 0, Action<Entity>? entityBuilder = null)
     {
-        var blipEntity = _entityEngine.CreateEntity(constructionInfo?.Id ?? $"radarArea {Guid.NewGuid()}", entity =>
+        var blipEntity = _entityEngine.CreateEntity(entity =>
         {
-            if (constructionInfo != null)
-                entity.AddComponent(new Transform(new Vector3(position, 0), constructionInfo.Interior, constructionInfo.Dimension));
-            else
-                entity.AddComponent(new Transform(new Vector3(position, 0)));
-
+            entity.AddComponent(new Transform(new Vector3(position, 0), interior, dimension));
             entity.AddComponent<RadarAreaTagComponent>();
             entity.AddComponent(new RadarAreaElementComponent(new RadarArea(position, size, color)));
 
@@ -177,15 +121,11 @@ internal sealed class EntityFactory : IEntityFactory
         return blipEntity;
     }
 
-    public Entity CreateObject(ObjectModel model, Vector3 position, Vector3 rotation, ConstructionInfo? constructionInfo = null, Action<Entity>? entityBuilder = null)
+    public Entity CreateObject(ObjectModel model, Vector3 position, Vector3 rotation, byte interior = 0, ushort dimension = 0, Action<Entity>? entityBuilder = null)
     {
-        return _entityEngine.CreateEntity(constructionInfo?.Id ?? $"object {Guid.NewGuid()}", entity =>
+        return _entityEngine.CreateEntity(entity =>
         {
-            if (constructionInfo != null)
-                entity.AddComponent(new Transform(position, rotation, constructionInfo.Interior, constructionInfo.Dimension));
-            else
-                entity.AddComponent(new Transform(position, rotation));
-
+            entity.AddComponent(new Transform(position, rotation, interior, dimension));
             entity.AddComponent<WorldObjectTagComponent>();
             entity.AddComponent(new WorldObjectComponent(new WorldObject(model, position)));
 
@@ -195,15 +135,11 @@ internal sealed class EntityFactory : IEntityFactory
     }
 
     #region Collision shapes
-    public Entity CreateCollisionCircle(Vector2 position, float radius, ConstructionInfo? constructionInfo = null, Action<Entity>? entityBuilder = null)
+    public Entity CreateCollisionCircle(Vector2 position, float radius, byte interior = 0, ushort dimension = 0, Action<Entity>? entityBuilder = null)
     {
-        return _entityEngine.CreateEntity(constructionInfo?.Id ?? $"collision circle {Guid.NewGuid()}", entity =>
+        return _entityEngine.CreateEntity(entity =>
         {
-            if (constructionInfo != null)
-                entity.AddComponent(new Transform(new Vector3(position, 0), constructionInfo.Interior, constructionInfo.Dimension));
-            else
-                entity.AddComponent(new Transform(new Vector3(position, 0)));
-
+            entity.AddComponent(new Transform(new Vector3(position, 0), interior, dimension));
             entity.AddComponent<CollisionShapeTagComponent>();
             entity.AddComponent(new CollisionCircleElementComponent(new CollisionCircle(new Vector2(0, 0), radius), _entityEngine));
 
@@ -212,19 +148,14 @@ internal sealed class EntityFactory : IEntityFactory
         });
     }
 
-    public Entity CreateCollisionCuboid(Vector3 position, Vector3 dimensions, ConstructionInfo? constructionInfo = null, Action<Entity>? entityBuilder = null)
+    public Entity CreateCollisionCuboid(Vector3 position, Vector3 dimensions, byte interior = 0, ushort dimension = 0, Action<Entity>? entityBuilder = null)
     {
-        return _entityEngine.CreateEntity(constructionInfo?.Id ?? $"collision cuboid {Guid.NewGuid()}", entity =>
+        return _entityEngine.CreateEntity(entity =>
         {
-            if (constructionInfo != null)
-                entity.AddComponent(new Transform(position, constructionInfo.Interior, constructionInfo.Dimension));
-            else
-                entity.AddComponent(new Transform(position));
-
+            entity.AddComponent(new Transform(position, interior, dimension));
             entity.AddComponent<CollisionShapeTagComponent>();
-            var collisionCuboid = new CollisionCuboid(position, dimensions);
 
-            var collisionCuboidElementComponent = entity.AddComponent(new CollisionCuboidElementComponent(collisionCuboid, _entityEngine));
+            var collisionCuboidElementComponent = entity.AddComponent(new CollisionCuboidElementComponent(new CollisionCuboid(position, dimensions), _entityEngine));
 
             AssociateWithServer(entity);
 
@@ -232,15 +163,11 @@ internal sealed class EntityFactory : IEntityFactory
         });
     }
 
-    public Entity CreateCollisionPolygon(Vector3 position, IEnumerable<Vector2> vertices, ConstructionInfo? constructionInfo = null, Action<Entity>? entityBuilder = null)
+    public Entity CreateCollisionPolygon(Vector3 position, IEnumerable<Vector2> vertices, byte interior = 0, ushort dimension = 0, Action<Entity>? entityBuilder = null)
     {
-        return _entityEngine.CreateEntity(constructionInfo?.Id ?? $"collision polygon {Guid.NewGuid()}", entity =>
+        return _entityEngine.CreateEntity(entity =>
         {
-            if (constructionInfo != null)
-                entity.AddComponent(new Transform(position, constructionInfo.Interior, constructionInfo.Dimension));
-            else
-                entity.AddComponent(new Transform(position));
-
+            entity.AddComponent(new Transform(position, interior, dimension));
             entity.AddComponent<CollisionShapeTagComponent>();
             entity.AddComponent(new CollisionPolygonElementComponent(new CollisionPolygon(position, vertices), _entityEngine));
 
@@ -249,15 +176,11 @@ internal sealed class EntityFactory : IEntityFactory
         });
     }
 
-    public Entity CreateCollisionRectangle(Vector2 position, Vector2 dimensions, ConstructionInfo? constructionInfo = null, Action<Entity>? entityBuilder = null)
+    public Entity CreateCollisionRectangle(Vector2 position, Vector2 dimensions, byte interior = 0, ushort dimension = 0, Action<Entity>? entityBuilder = null)
     {
-        return _entityEngine.CreateEntity(constructionInfo?.Id ?? $"collision rectangle {Guid.NewGuid()}", entity =>
+        return _entityEngine.CreateEntity(entity =>
         {
-            if (constructionInfo != null)
-                entity.AddComponent(new Transform(new Vector3(position, 0), constructionInfo.Interior, constructionInfo.Dimension));
-            else
-                entity.AddComponent(new Transform(new Vector3(position, 0)));
-
+            entity.AddComponent(new Transform(new Vector3(position, 0), interior, dimension));
             entity.AddComponent<CollisionShapeTagComponent>();
             entity.AddComponent(new CollisionRectangleElementComponent(new CollisionRectangle(position, dimensions), _entityEngine));
 
@@ -266,15 +189,11 @@ internal sealed class EntityFactory : IEntityFactory
         });
     }
 
-    public Entity CreateCollisionSphere(Vector3 position, float radius, ConstructionInfo? constructionInfo = null, Action<Entity>? entityBuilder = null)
+    public Entity CreateCollisionSphere(Vector3 position, float radius, byte interior = 0, ushort dimension = 0, Action<Entity>? entityBuilder = null)
     {
-        return _entityEngine.CreateEntity(constructionInfo?.Id ?? $"collision sphere {Guid.NewGuid()}", entity =>
+        return _entityEngine.CreateEntity(entity =>
         {
-            if (constructionInfo != null)
-                entity.AddComponent(new Transform(position, constructionInfo.Interior, constructionInfo.Dimension));
-            else
-                entity.AddComponent(new Transform(position));
-
+            entity.AddComponent(new Transform(position, interior, dimension));
             entity.AddComponent<CollisionShapeTagComponent>();
             entity.AddComponent(new CollisionSphereElementComponent(new CollisionSphere(new Vector3(0, 0, 1000), radius), _entityEngine));
 
@@ -283,15 +202,11 @@ internal sealed class EntityFactory : IEntityFactory
         });
     }
 
-    public Entity CreateCollisionTube(Vector3 position, float radius, float height, ConstructionInfo? constructionInfo = null, Action<Entity>? entityBuilder = null)
+    public Entity CreateCollisionTube(Vector3 position, float radius, float height, byte interior = 0, ushort dimension = 0, Action<Entity>? entityBuilder = null)
     {
-        return _entityEngine.CreateEntity(constructionInfo?.Id ?? $"collision tube {Guid.NewGuid()}", entity =>
+        return _entityEngine.CreateEntity(entity =>
         {
-            if (constructionInfo != null)
-                entity.AddComponent(new Transform(position, constructionInfo.Interior, constructionInfo.Dimension));
-            else
-                entity.AddComponent(new Transform(position));
-
+            entity.AddComponent(new Transform(position, interior, dimension));
             entity.AddComponent<CollisionShapeTagComponent>();
             entity.AddComponent(new CollisionTubeElementComponent(new CollisionTube(position, radius, height), _entityEngine));
 
@@ -300,15 +215,11 @@ internal sealed class EntityFactory : IEntityFactory
         });
     }
 
-    public Entity CreatePed(PedModel pedModel, Vector3 position, ConstructionInfo? constructionInfo = null, Action<Entity>? entityBuilder = null)
+    public Entity CreatePed(PedModel pedModel, Vector3 position, byte interior = 0, ushort dimension = 0, Action<Entity>? entityBuilder = null)
     {
-        return _entityEngine.CreateEntity(constructionInfo?.Id ?? $"ped {Guid.NewGuid()}", entity =>
+        return _entityEngine.CreateEntity(entity =>
         {
-            if (constructionInfo != null)
-                entity.AddComponent(new Transform(position, constructionInfo.Interior, constructionInfo.Dimension));
-            else
-                entity.AddComponent(new Transform(position));
-
+            entity.AddComponent(new Transform(position, interior, dimension));
             entity.AddComponent<PedTagComponent>();
             entity.AddComponent(new PedElementComponent(new Ped(pedModel, position)));
 

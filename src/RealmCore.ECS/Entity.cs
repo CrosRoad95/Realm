@@ -8,14 +8,9 @@ namespace RealmCore.ECS;
 
 public sealed class Entity : IDisposable
 {
-    private object _transactionLock = new();
-    private byte _version;
-    private bool _hasPendingTransaction;
-
     private bool _disposed = false;
 
     public string Id { get; } = Guid.NewGuid().ToString();
-    public string Name { get; set; } = "";
 
     private readonly ReaderWriterLockSlim _componentsLock = new(LockRecursionPolicy.SupportsRecursion);
     private readonly List<Component> _components = new();
@@ -57,10 +52,7 @@ public sealed class Entity : IDisposable
     public event Action<Entity>? Disposed;
     public event Action<Entity>? PreDisposed;
 
-    public Entity(string name = "")
-    {
-        Name = name;
-    }
+    public Entity() { }
 
     private void CheckCanBeAdded<TComponent>() where TComponent : Component
     {
@@ -79,8 +71,6 @@ public sealed class Entity : IDisposable
         {
             CheckCanBeAdded<TComponent>();
             _components.Add(component);
-            lock (_transactionLock)
-                component._version = _version;
         }
         finally
         {
@@ -369,8 +359,6 @@ public sealed class Entity : IDisposable
         DetachComponent(component);
         component.Dispose();
     }
-
-    public override string ToString() => Name;
 
     public void ThrowIfDisposed()
     {

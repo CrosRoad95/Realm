@@ -14,12 +14,10 @@ public class CurrentInteractEntityComponentTests
         _logger.SetupLogger();
         services.AddSingleton(_logger.Object);
 
-        var serviceProvider = services.BuildServiceProvider();
-
-        _entity = new("test1");
-        _testEntity = new("test2");
-        _entity2 = new("test3");
-        _testEntity2 = new("test4");
+        _entity = new();
+        _testEntity = new();
+        _entity2 = new();
+        _testEntity2 = new();
     }
 
     [Fact]

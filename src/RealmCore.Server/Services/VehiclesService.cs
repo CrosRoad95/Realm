@@ -36,7 +36,7 @@ internal sealed class VehiclesService : IVehiclesService
     public async Task<Entity> CreateVehicle(ushort model, Vector3 position, Vector3 rotation)
     {
         var vehicleData = await _vehicleRepository.CreateNewVehicle(model, _dateTimeProvider.Now);
-        return _entityFactory.CreateVehicle(model, position, rotation, null, entity =>
+        return _entityFactory.CreateVehicle(model, position, rotation, entityBuilder: entity =>
         {
             entity.AddComponent(new PrivateVehicleComponent(vehicleData));
         });
@@ -120,12 +120,7 @@ internal sealed class VehiclesService : IVehiclesService
         if(vehicleData.IsRemoved)
             throw new VehicleRemovedException(vehicleData.Id);
 
-        var entity = _entityFactory.CreateVehicle(vehicleData.Model, vehicleData.TransformAndMotion.Position, vehicleData.TransformAndMotion.Rotation, new ConstructionInfo
-        {
-            Id = $"vehicle {vehicleData.Id}",
-            Interior = vehicleData.TransformAndMotion.Interior,
-            Dimension = vehicleData.TransformAndMotion.Dimension,
-        },
+        var entity = _entityFactory.CreateVehicle(vehicleData.Model, vehicleData.TransformAndMotion.Position, vehicleData.TransformAndMotion.Rotation, vehicleData.TransformAndMotion.Interior, vehicleData.TransformAndMotion.Dimension,
             entity =>
             {
                 entity.AddComponent(new PrivateVehicleComponent(vehicleData));

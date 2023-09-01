@@ -10,9 +10,7 @@ public class AFKComponentTests
         var services = new ServiceCollection();
         _testDateTimeProvider = new();
 
-        var serviceProvider = services.BuildServiceProvider();
-
-        _entity = new("test");
+        _entity = new();
         _afkComponent = _entity.AddComponent<AFKComponent>();
     }
 

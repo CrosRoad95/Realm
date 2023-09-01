@@ -26,7 +26,7 @@ public class TransportEntityObjective : Objective
         using var scopedEntityFactory = entityFactory.CreateScopedEntityFactory(playerEntity);
         if (_createMarker)
         {
-            scopedEntityFactory.CreateMarker(MarkerType.Arrow, _position);
+            scopedEntityFactory.CreateMarker(MarkerType.Arrow, _position, Color.White);
             _markerElementComponent = scopedEntityFactory.LastCreatedComponent as PlayerPrivateElementComponent<MarkerElementComponent>;
         }
 

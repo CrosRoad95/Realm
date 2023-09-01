@@ -16,7 +16,7 @@ internal class EntityHelper
 
     public Entity CreatePlayerEntity()
     {
-        var entity = new Entity(Guid.NewGuid().ToString()[..8]);
+        var entity = new Entity();
         var player = _testingServer.AddFakePlayer();
         player.TriggerResourceStarted(420);
         entity.AddComponent<Transform>();
@@ -28,7 +28,7 @@ internal class EntityHelper
 
     public Entity CreateObjectEntity()
     {
-        var entity = new Entity(Guid.NewGuid().ToString()[..8]);
+        var entity = new Entity();
         entity.AddComponent<Transform>();
         entity.AddComponent<WorldObjectTagComponent>();
         entity.AddComponent(new WorldObjectComponent(new SlipeServer.Server.Elements.WorldObject(SlipeServer.Server.Enums.ObjectModel.Vegtree3, Vector3.Zero)));

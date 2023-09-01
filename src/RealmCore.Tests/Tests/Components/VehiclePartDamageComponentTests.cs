@@ -7,11 +7,7 @@ public class VehiclePartDamageComponentTests
 
     public VehiclePartDamageComponentTests()
     {
-        var services = new ServiceCollection();
-
-        var serviceProvider = services.BuildServiceProvider();
-
-        _entity = new("test");
+        _entity = new();
         _vehiclePartDamageComponent = new();
         _entity.AddComponent(_vehiclePartDamageComponent);
     }

@@ -82,7 +82,7 @@ internal class PlayersLogic
             var screenSize = await taskWaitForScreenSize.Task;
             var cultureInfo = await taskWaitForCultureInfo.Task;
 
-            _entityEngine.CreateEntity("Player " + player.Name, entity =>
+            _entityEngine.CreateEntity(entity =>
             {
                 entity.AddComponent<Transform>();
                 entity.AddComponent<PlayerTagComponent>();

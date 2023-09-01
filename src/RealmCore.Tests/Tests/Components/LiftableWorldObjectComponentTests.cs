@@ -11,8 +11,8 @@ public class LiftableWorldObjectComponentTests
 
     public LiftableWorldObjectComponentTests()
     {
-        _entity1 = new("test1");
-        _entity2 = new("test2");
+        _entity1 = new();
+        _entity2 = new();
         _entity1.AddComponent<Transform>();
         _entity2.AddComponent<Transform>();
         _entity1.AddComponent<TestElementComponent>();

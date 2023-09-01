@@ -4,9 +4,7 @@ namespace RealmCore.ECS.Components;
 
 public abstract class Component : IComponent, IDisposable
 {
-    internal object _versionLock = new();
     internal object _entityLock = new();
-    internal byte _version;
 
     protected bool _disposed = false;
 

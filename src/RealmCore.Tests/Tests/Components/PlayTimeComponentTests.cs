@@ -11,8 +11,8 @@ public class PlayTimeComponentTests
     public PlayTimeComponentTests()
     {
         _testDateTimeProvider = new();
-        _entity1 = new("test");
-        _entity2 = new("test with initial state");
+        _entity1 = new();
+        _entity2 = new();
         _playTimeComponent = new(_testDateTimeProvider);
         _playTimeComponentWithInitialState = new(1000, _testDateTimeProvider);
         _entity1.AddComponent(_playTimeComponent);

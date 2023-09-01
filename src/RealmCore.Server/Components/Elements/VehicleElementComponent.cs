@@ -1,4 +1,6 @@
-﻿namespace RealmCore.Server.Components.Elements;
+﻿using SlipeServer.Server.Elements;
+
+namespace RealmCore.Server.Components.Elements;
 
 public class VehicleElementComponent : ElementComponent
 {
@@ -290,6 +292,9 @@ public class VehicleElementComponent : ElementComponent
 
     protected override void Attach()
     {
+        _vehicle.RespawnPosition = _vehicle.Position;
+        _vehicle.RespawnRotation = _vehicle.Rotation;
+
         _vehicle.Pushed += HandlePushed;
         _vehicle.LightStateChanged += HandleLightStateChanged;
         _vehicle.PanelStateChanged += HandlePanelStateChanged;
