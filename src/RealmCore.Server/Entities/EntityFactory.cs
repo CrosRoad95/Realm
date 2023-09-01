@@ -5,17 +5,13 @@ namespace RealmCore.Server.Entities;
 internal sealed class EntityFactory : IEntityFactory
 {
     private readonly IEntityEngine _entityEngine;
-    private readonly IVehicleRepository _vehicleRepository;
     private readonly IRealmServer _realmServer;
-    private readonly IDateTimeProvider _dateTimeProvider;
     private readonly IElementCollection _elementCollection;
 
-    public EntityFactory(IEntityEngine entityEngine, IVehicleRepository vehicleRepository, IRealmServer realmServer, IDateTimeProvider dateTimeProvider, IElementCollection elementCollection)
+    public EntityFactory(IEntityEngine entityEngine, IRealmServer realmServer, IElementCollection elementCollection)
     {
         _entityEngine = entityEngine;
-        _vehicleRepository = vehicleRepository;
         _realmServer = realmServer;
-        _dateTimeProvider = dateTimeProvider;
         _elementCollection = elementCollection;
     }
 
@@ -98,32 +94,6 @@ internal sealed class EntityFactory : IEntityFactory
             AssociateWithServer(entity);
             entityBuilder?.Invoke(entity);
         });
-
-        return vehicleEntity;
-    }
-
-    public async Task<Entity> CreateNewPrivateVehicle(ushort model, Vector3 position, Vector3 rotation, ConstructionInfo? constructionInfo = null, Action<Entity>? entityBuilder = null)
-    {
-        var vehicleEntity = _entityEngine.CreateEntity(constructionInfo?.Id ?? $"vehicle {Guid.NewGuid()}", entity =>
-        {
-            if (constructionInfo != null)
-                entity.AddComponent(new Transform(position, constructionInfo.Interior, constructionInfo.Dimension));
-            else
-                entity.AddComponent(new Transform(position));
-
-            entity.AddComponent<VehicleTagComponent>();
-            var vehicle = new Vehicle(model, position);
-            vehicle.Handling = VehicleHandlingConstants.DefaultVehicleHandling[vehicle.Model];
-            var vehicleElementComponent = entity.AddComponent(new VehicleElementComponent(vehicle, _entityEngine));
-
-            vehicle.RespawnPosition = position;
-            vehicle.RespawnRotation = rotation;
-
-            AssociateWithServer(entity);
-            entityBuilder?.Invoke(entity);
-        });
-
-        vehicleEntity.AddComponent(new PrivateVehicleComponent(await _vehicleRepository.CreateNewVehicle(model, _dateTimeProvider.Now)));
 
         return vehicleEntity;
     }

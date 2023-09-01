@@ -27,7 +27,6 @@ public class SaveLoadServiceTests
         services.AddPersistence<SQLiteDb>(db => db.UseSqlite($"Filename=./{Path.GetRandomFileName().Replace(".", "")}.db"));
         services.AddSingleton<ISaveService, SaveService>();
         services.AddSingleton<ILoadService, LoadService>();
-        services.AddSingleton<RepositoryFactory>();
         services.AddSingleton<IEntityFactory, EntityFactory>();
         services.AddSingleton<IVehicleRepository, VehicleRepository>();
         services.AddSingleton<IEntityEngine, EntityEngine>();
@@ -52,7 +51,7 @@ public class SaveLoadServiceTests
         var vehiclesService = _services.GetRequiredService<IVehiclesService>();
         var loadService = _services.GetRequiredService<ILoadService>();
 
-        var vehicleEntity = await entityFactory.CreateNewPrivateVehicle(404, new Vector3(1, 2, 3), new Vector3(4, 5, 6));
+        var vehicleEntity = await vehiclesService.CreateVehicle(404, new Vector3(1, 2, 3), new Vector3(4, 5, 6));
         var vehicleElementComponent = vehicleEntity.GetRequiredComponent<VehicleElementComponent>();
         vehicleEntity.Transform.Position = new Vector3(10, 20, 30);
         vehicleEntity.Transform.Rotation = new Vector3(40, 50, 60);

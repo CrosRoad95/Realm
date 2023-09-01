@@ -23,7 +23,6 @@ public static class ServiceCollectionExtensions
         Action<DbContextOptionsBuilder> dbOptions, ServiceLifetime serviceLifetime = ServiceLifetime.Transient) where T : DbContext, IDb
     {
         services.AddSingleton<RealmDbContextFactory>();
-        services.AddSingleton<RepositoryFactory>();
 
         services.AddTransient<IVehicleRepository, VehicleRepository>();
         services.AddTransient<IGroupRepository, GroupRepository>();

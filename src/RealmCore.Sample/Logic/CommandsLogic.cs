@@ -18,6 +18,7 @@ using RealmCore.Persistence;
 using RealmCore.ECS;
 using RealmCore.Resources.Overlay;
 using RealmCore.Resources.Assets;
+using RealmCore.Persistence.Interfaces;
 
 namespace RealmCore.Console.Logic;
 
@@ -25,7 +26,6 @@ internal sealed class CommandsLogic
 {
     private readonly RealmCommandService _commandService;
     private readonly IEntityFactory _entityFactory;
-    private readonly RepositoryFactory _repositoryFactory;
     private readonly ItemsRegistry _itemsRegistry;
     private readonly IEntityEngine _ecs;
     private readonly IBanService _banService;
@@ -34,6 +34,7 @@ internal sealed class CommandsLogic
     private readonly IDateTimeProvider _dateTimeProvider;
     private readonly IVehiclesService _vehiclesService;
     private readonly ILoadService _loadService;
+    private readonly IUserRepository _userRepository;
 
     private class TestState
     {
@@ -46,14 +47,13 @@ internal sealed class CommandsLogic
         Test2,
     }
 
-    public CommandsLogic(RealmCommandService commandService, IEntityFactory entityFactory, RepositoryFactory repositoryFactory,
+    public CommandsLogic(RealmCommandService commandService, IEntityFactory entityFactory,
         ItemsRegistry itemsRegistry, IEntityEngine ecs, IBanService banService, ChatBox chatBox, ILogger<CommandsLogic> logger,
         IDateTimeProvider dateTimeProvider, INametagsService nametagsService, IUsersService userManager, IVehiclesService vehiclesService,
-        GameWorld gameWorld, IElementOutlineService elementOutlineService, IAssetsService assetsService, ISpawnMarkersService spawnMarkersService, ILoadService loadService, IFeedbackService feedbackService, IOverlayService overlayService, AssetsRegistry assetsRegistry, VehicleUpgradeRegistry vehicleUpgradeRegistry, VehicleEnginesRegistry vehicleEnginesRegistry)
+        GameWorld gameWorld, IElementOutlineService elementOutlineService, IAssetsService assetsService, ISpawnMarkersService spawnMarkersService, ILoadService loadService, IFeedbackService feedbackService, IOverlayService overlayService, AssetsRegistry assetsRegistry, VehicleUpgradeRegistry vehicleUpgradeRegistry, VehicleEnginesRegistry vehicleEnginesRegistry, IUserRepository userRepository)
     {
         _commandService = commandService;
         _entityFactory = entityFactory;
-        _repositoryFactory = repositoryFactory;
         _itemsRegistry = itemsRegistry;
         _ecs = ecs;
         _banService = banService;
@@ -62,6 +62,7 @@ internal sealed class CommandsLogic
         _dateTimeProvider = dateTimeProvider;
         _vehiclesService = vehiclesService;
         _loadService = loadService;
+        _userRepository = userRepository;
 
         #region Commands for components tests
         _commandService.AddCommandHandler("focusablecomponent", (entity, args) =>
@@ -151,7 +152,6 @@ internal sealed class CommandsLogic
 
         _commandService.AddCommandHandler("cv", (entity, args) =>
         {
-            using var vehicleRepository = _repositoryFactory.GetVehicleRepository();
             var vehicleEntity = _entityFactory.CreateVehicle(args.ReadUShort(), entity.Transform.Position + new Vector3(4, 0, 0), entity.Transform.Rotation);
             vehicleEntity.AddComponent(new VehicleUpgradesComponent(vehicleUpgradeRegistry, vehicleEnginesRegistry));
             vehicleEntity.AddComponent<MileageCounterComponent>();
@@ -162,8 +162,7 @@ internal sealed class CommandsLogic
 
         _commandService.AddAsyncCommandHandler("cvprivate", async (entity, args) =>
         {
-            using var vehicleRepository = _repositoryFactory.GetVehicleRepository();
-            var vehicleEntity = await _entityFactory.CreateNewPrivateVehicle(404, entity.Transform.Position + new Vector3(4, 0, 0), entity.Transform.Rotation);
+            var vehicleEntity = await _vehiclesService.CreateVehicle(404, entity.Transform.Position + new Vector3(4, 0, 0), entity.Transform.Rotation);
             vehicleEntity.AddComponent(new VehicleUpgradesComponent(vehicleUpgradeRegistry, vehicleEnginesRegistry)).AddUpgrade(1);
             vehicleEntity.AddComponent<MileageCounterComponent>();
             vehicleEntity.AddComponent<VehicleEngineComponent>();
@@ -174,7 +173,6 @@ internal sealed class CommandsLogic
 
         _commandService.AddCommandHandler("exclusivecv", (entity, args) =>
         {
-            using var vehicleRepository = _repositoryFactory.GetVehicleRepository();
             var vehicleEntity = _entityFactory.CreateVehicle(404, entity.Transform.Position + new Vector3(4, 0, 0), entity.Transform.Rotation);
             vehicleEntity.AddComponent(new VehicleUpgradesComponent(vehicleUpgradeRegistry, vehicleEnginesRegistry));
             vehicleEntity.AddComponent<MileageCounterComponent>();
@@ -184,7 +182,6 @@ internal sealed class CommandsLogic
 
         _commandService.AddCommandHandler("noaccesscv", (entity, args) =>
         {
-            using var vehicleRepository = _repositoryFactory.GetVehicleRepository();
             var vehicleEntity = _entityFactory.CreateVehicle(404, entity.Transform.Position + new Vector3(4, 0, 0), entity.Transform.Rotation);
             vehicleEntity.AddComponent(new VehicleUpgradesComponent(vehicleUpgradeRegistry, vehicleEnginesRegistry));
             vehicleEntity.AddComponent<MileageCounterComponent>();
@@ -195,7 +192,6 @@ internal sealed class CommandsLogic
         _commandService.AddAsyncCommandHandler("privateblip", async (entity, args) =>
         {
             using var scopedEntityFactory = _entityFactory.CreateScopedEntityFactory(entity);
-            using var vehicleRepository = _repositoryFactory.GetVehicleRepository();
             var blipElementComponent = scopedEntityFactory.CreateBlip(BlipIcon.Pizza, entity.Transform.Position);
             await Task.Delay(1000);
             entity.DestroyComponent(scopedEntityFactory.LastCreatedComponent);
@@ -350,8 +346,7 @@ internal sealed class CommandsLogic
             }
 
             {
-                using var vehicleRepository = _repositoryFactory.GetVehicleRepository();
-                var vehicleEntity = await _entityFactory.CreateNewPrivateVehicle(404, entity.Transform.Position + new Vector3(4, 0, 0), entity.Transform.Rotation);
+                var vehicleEntity = await _vehiclesService.CreateVehicle(404, entity.Transform.Position + new Vector3(4, 0, 0), entity.Transform.Rotation);
                 vehicleEntity.AddComponent(new VehicleUpgradesComponent(vehicleUpgradeRegistry, vehicleEnginesRegistry)).AddUpgrade(1);
                 vehicleEntity.AddComponent(new MileageCounterComponent());
                 vehicleEntity.AddComponent(new FuelComponent(1, 20, 20, 0.01, 2)).Active = true;
@@ -1068,9 +1063,8 @@ internal sealed class CommandsLogic
 
         _commandService.AddAsyncCommandHandler("usernames", async (entity, args) =>
         {
-            await using var userRepository = repositoryFactory.GetUserRepository();
             var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();
-            var userNames = await userRepository.GetUserNamesByIds(new int[] { 1 });
+            var userNames = await _userRepository.GetUserNamesByIds(new int[] { 1 });
             foreach (var item in userNames)
             {
                 _chatBox.OutputTo(entity, $"{item.Key} = {item.Value}");

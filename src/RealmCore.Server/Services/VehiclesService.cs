@@ -33,6 +33,15 @@ internal sealed class VehiclesService : IVehiclesService
         };
     }
 
+    public async Task<Entity> CreateVehicle(ushort model, Vector3 position, Vector3 rotation)
+    {
+        var vehicleData = await _vehicleRepository.CreateNewVehicle(model, _dateTimeProvider.Now);
+        return _entityFactory.CreateVehicle(model, position, rotation, null, entity =>
+        {
+            entity.AddComponent(new PrivateVehicleComponent(vehicleData));
+        });
+    }
+
     public async Task<Entity> ConvertToPrivateVehicle(Entity vehicleEntity)
     {
         if (!vehicleEntity.HasComponent<VehicleTagComponent>())
