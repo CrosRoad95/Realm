@@ -561,6 +561,11 @@ namespace RealmCore.Persistence.MySql.Migrations
                     b.Property<ulong>("PlayTime")
                         .HasColumnType("bigint unsigned");
 
+                    b.Property<bool>("QuickLogin")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("tinyint(1)")
+                        .HasDefaultValue(false);
+
                     b.Property<string>("RegisterIp")
                         .HasColumnType("longtext");
 

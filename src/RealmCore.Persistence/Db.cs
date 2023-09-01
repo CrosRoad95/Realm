@@ -186,6 +186,10 @@ public abstract class Db<T> : IdentityDbContext<UserData, RoleData, int,
             entityBuilder.Property(x => x.IsDisabled)
                 .HasDefaultValue(false)
                 .IsRequired();
+
+            entityBuilder.Property(x => x.QuickLogin)
+                .HasDefaultValue(false)
+                .IsRequired();
         });
 
         modelBuilder.Entity<InventoryData>(entityBuilder =>

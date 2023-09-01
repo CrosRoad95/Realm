@@ -18,6 +18,7 @@ public sealed class UserData : IdentityUser<int>
     public uint Level { get; set; }
     public uint Experience { get; set; }
     public bool IsDisabled { get; set; }
+    public bool QuickLogin { get; set; }
     public TransformAndMotion? LastTransformAndMotion { get; set; } = null;
 #pragma warning restore CS8618
 

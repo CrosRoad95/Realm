@@ -17,6 +17,7 @@ public interface IUsersService
     Task<int> SignUp(string username, string password);
     Task<bool> TryAddWhitelistedSerial(int userId, string serial);
     bool TryGetPlayerByName(string name, out Entity playerEntity);
+    Task<bool> QuickSignIn(Entity entity);
     Task<bool> TryRemoveWhitelistedSerial(int userId, string serial);
     Task<bool> TryUpdateLastNickName(Entity playerEntity);
 }

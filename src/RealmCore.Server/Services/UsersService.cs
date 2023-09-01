@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using RealmCore.Persistence.Data;
 using RealmCore.Persistence.Extensions;
+using RealmCore.Persistence.Interfaces;
 using RealmCore.Server.Json.Converters;
 
 namespace RealmCore.Server.Services;
@@ -19,13 +20,14 @@ internal class UsersService : IUsersService
     private readonly IElementCollection _elementCollection;
     private readonly IEntityEngine _ecs;
     private readonly LevelsRegistry _levelsRegistry;
+    private readonly IUserRepository _userRepository;
     private static readonly JsonSerializerSettings _jsonSerializerSettings = new JsonSerializerSettings
     {
         Converters = new List<JsonConverter> { new DoubleConverter() }
     };
 
     public UsersService(ItemsRegistry itemsRegistry, SignInManager<UserData> signInManager, UserManager<UserData> userManager, ILogger<UsersService> logger, IOptions<GameplayOptions> gameplayOptions,
-        IDateTimeProvider dateTimeProvider, IAuthorizationService authorizationService, IDb db, IActiveUsers activeUsers, IElementCollection elementCollection, IEntityEngine ecs, LevelsRegistry levelsRegistry)
+        IDateTimeProvider dateTimeProvider, IAuthorizationService authorizationService, IDb db, IActiveUsers activeUsers, IElementCollection elementCollection, IEntityEngine ecs, LevelsRegistry levelsRegistry, IUserRepository userRepository)
     {
         _itemsRegistry = itemsRegistry;
         _signInManager = signInManager;
@@ -39,6 +41,7 @@ internal class UsersService : IUsersService
         _elementCollection = elementCollection;
         _ecs = ecs;
         _levelsRegistry = levelsRegistry;
+        _userRepository = userRepository;
     }
 
     public async Task<int> SignUp(string username, string password)
@@ -57,6 +60,19 @@ internal class UsersService : IUsersService
 
         _logger.LogError("Failed to create a user {userName} because: {identityResultErrors}", username, identityResult.Errors.Select(x => x.Description));
         throw new Exception("Failed to create a user");
+    }
+
+    public async Task<bool> QuickSignIn(Entity entity)
+    {
+        var serial = entity.GetPlayer().Client.Serial;
+        var userData = await _userRepository.GetUserBySerial(serial);
+        if(userData == null)
+            throw new Exception("No account found.");
+
+        if(!userData.QuickLogin)
+            throw new Exception("Quick login not enabled");
+
+        return await SignIn(entity, userData);
     }
 
     public async Task<bool> SignIn(Entity entity, UserData user)
