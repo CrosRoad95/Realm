@@ -3,7 +3,7 @@ using RealmCore.Logging;
 
 namespace RealmCore.Server.Services;
 
-public class RealmCommandService
+public sealed class RealmCommandService
 {
 
     public abstract class CommandInfo

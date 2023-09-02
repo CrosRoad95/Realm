@@ -1,11 +1,10 @@
-﻿using RealmCore.Persistence.DTOs;
+﻿namespace RealmCore.Persistence.Interfaces;
 
-namespace RealmCore.Persistence.Interfaces;
-
-public interface IVehicleRepository : IRepositoryBase
+public interface IVehicleRepository
 {
-    Task<VehicleData> CreateNewVehicle(ushort model, DateTime now);
+    Task<VehicleData> CreateVehicle(ushort model, DateTime now);
     Task<List<VehicleData>> GetAllSpawnedVehicles();
+    Task<List<VehicleUserAccessData>> GetAllVehicleAccesses(int vehicleId);
     Task<LightInfoVehicleDTO?> GetLightVehicleById(int vehicleId);
     Task<List<LightInfoVehicleDTO>> GetLightVehiclesByUserId(int userId);
     Task<VehicleData?> GetReadOnlyVehicleById(int id);

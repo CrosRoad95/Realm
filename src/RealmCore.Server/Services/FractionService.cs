@@ -69,8 +69,7 @@ internal sealed class FractionService : IFractionService
             });
 
         if (!await _fractionRepository.Exists(fractionId, fractionCode, fractionName))
-            _fractionRepository.CreateFraction(fractionId, fractionName, fractionCode);
-        await _fractionRepository.Commit();
+            await _fractionRepository.CreateFraction(fractionId, fractionName, fractionCode);
     }
 
     public async Task<bool> TryAddMember(int fractionId, int userId, int rank, string rankName)
@@ -82,8 +81,6 @@ internal sealed class FractionService : IFractionService
             InternalAddMember(fractionId, userId, rank, rankName);
         }
 
-        _fractionRepository.AddFractionMember(fractionId, userId, rank, rankName);
-        await _fractionRepository.Commit();
-        return true;
+        return await _fractionRepository.AddMember(fractionId, userId, rank, rankName).ConfigureAwait(false);
     }
 }

@@ -1,6 +1,4 @@
-﻿using SlipeServer.Server.Elements;
-
-namespace RealmCore.Server.Components.Elements;
+﻿namespace RealmCore.Server.Components.Elements;
 
 public class VehicleElementComponent : ElementComponent
 {

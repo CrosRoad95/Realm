@@ -22,7 +22,7 @@ public sealed class CreateGroupCommand : IInGameCommand
         try
         {
             var group = await _groupService.CreateGroup(name, "");
-            await _groupService.AddMember(group.id, entity, 100, "Leader");
+            await _groupService.AddMember(entity, group.id, 100, "Leader");
 
             _chatBox.OutputTo(entity, $"Group: '{name}' has been created");
         }

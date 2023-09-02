@@ -5,37 +5,60 @@ internal sealed class BanService : IBanService
     private readonly IBanRepository _banRepository;
     private readonly IDateTimeProvider _dateTimeProvider;
 
-    public event Action<BanData>? BanAdded;
-    public event Action<BanData>? BanRemoved;
     public BanService(IBanRepository banRepository, IDateTimeProvider dateTimeProvider)
     {
         _banRepository = banRepository;
         _dateTimeProvider = dateTimeProvider;
     }
 
-    public async Task BanSerial(string serial, DateTime? until = null, string? reason = null, string? responsible = null, int type = 0)
+    public async Task BanAccount(Entity entity, DateTime? until = null, string? reason = null, string? responsible = null, int type = 0)
     {
-        var banData = _banRepository.CreateBanForSerial(serial, until, reason, responsible, type);
-        if (await _banRepository.Commit() > 0)
-            BanAdded?.Invoke(banData);
+        if (entity.TryGetComponent(out UserComponent userComponent))
+            await _banRepository.CreateBanForUser(userComponent.Id, until, reason, responsible, type).ConfigureAwait(false);
     }
 
-    public async Task BanUserId(int userId, DateTime? until = null, string? reason = null, string? responsible = null, int type = 0)
+    public async Task BanPlayer(Entity entity, DateTime? until = null, string? reason = null, string? responsible = null, int type = 0)
     {
-        _banRepository.CreateBanForUser(userId, until, reason, responsible, type);
-        await _banRepository.Commit();
+        if (entity.TryGetComponent(out PlayerElementComponent playerElementComponent))
+            await _banRepository.CreateBanForSerial(playerElementComponent.Client.Serial, until, reason, responsible, type).ConfigureAwait(false);
+    }
+    
+    public async Task Ban(Entity entity, DateTime? until = null, string? reason = null, string? responsible = null, int type = 0)
+    {
+        await BanAccount(entity, until, reason, responsible, type).ConfigureAwait(false);
+        await BanPlayer(entity, until, reason, responsible, type).ConfigureAwait(false);
     }
 
-    public async Task RemoveBan(BanData ban)
+    public async Task<bool> RemoveBan(Entity entity, int type = 0)
     {
-        _banRepository.RemoveBan(ban);
-        await _banRepository.Commit();
-        BanRemoved?.Invoke(ban);
+        if (entity.TryGetComponent(out PlayerElementComponent playerElementComponent))
+        {
+            var serial = entity.GetRequiredComponent<PlayerElementComponent>().Client.Serial;
+            await _banRepository.DeleteBySerial(serial, type).ConfigureAwait(false);
+            if (entity.TryGetComponent(out UserComponent userComponent))
+            {
+                await _banRepository.DeleteByUserId(userComponent.Id, type).ConfigureAwait(false);
+            }
+            return true;
+        }
+        return false;
     }
 
-    public Task<List<BanData>> GetBansBySerial(string serial) => _banRepository.GetBansBySerial(serial, _dateTimeProvider.Now);
+    public async Task<List<BanData>> GetBans(Entity entity)
+    {
+        if (entity.TryGetComponent(out PlayerElementComponent playerElementComponent))
+        {
+            var serial = entity.GetRequiredComponent<PlayerElementComponent>().Client.Serial;
+            if (entity.TryGetComponent(out UserComponent userComponent))
+            {
+                return await _banRepository.GetBansByUserIdOrSerial(userComponent.Id, serial, _dateTimeProvider.Now).ConfigureAwait(false);
+            }
+            else
+            {
+                return await _banRepository.GetBansBySerial(serial, _dateTimeProvider.Now).ConfigureAwait(false);
+            }
+        }
 
-    public Task<List<BanData>> GetBansByUserId(int userId) => _banRepository.GetBansByUserId(userId, _dateTimeProvider.Now);
-
-    public Task<BanData?> GetBanBySerialAndBanType(string serial, int banType) => _banRepository.GetBanBySerialAndBanType(serial, banType, _dateTimeProvider.Now);
+        return new();
+    }
 }

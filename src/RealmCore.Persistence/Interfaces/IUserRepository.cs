@@ -1,6 +1,6 @@
 ﻿namespace RealmCore.Persistence.Interfaces;
 
-public interface IUserRepository : IRepositoryBase
+public interface IUserRepository
 {
     Task<int> CountUsersBySerial(string serial);
     Task DisableUser(int userId);

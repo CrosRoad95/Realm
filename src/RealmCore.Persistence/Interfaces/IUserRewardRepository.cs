@@ -1,6 +1,6 @@
 ﻿namespace RealmCore.Persistence.Interfaces;
 
-public interface IUserRewardRepository : IRepositoryBase
+public interface IUserRewardRepository
 {
     Task<bool> TryAddReward(int userId, int rewardId);
 }

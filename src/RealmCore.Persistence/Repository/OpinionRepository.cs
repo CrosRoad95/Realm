@@ -1,6 +1,6 @@
 ﻿namespace RealmCore.Persistence.Repository;
 
-internal class OpinionRepository : IOpinionRepository
+internal sealed class OpinionRepository : IOpinionRepository
 {
     private readonly IDb _db;
 
@@ -9,7 +9,7 @@ internal class OpinionRepository : IOpinionRepository
         _db = db;
     }
 
-    public async Task AddOpinion(int userId, int opinionId, string opinion, DateTime dateTime)
+    public async Task<bool> AddOpinion(int userId, int opinionId, string opinion, DateTime dateTime)
     {
         _db.Opinions.Add(new OpinionData
         {
@@ -19,7 +19,7 @@ internal class OpinionRepository : IOpinionRepository
             DateTime = dateTime
         });
 
-        await _db.SaveChangesAsync();
+        return await _db.SaveChangesAsync().ConfigureAwait(false) == 1;
     }
 
     public async Task<DateTime?> GetLastOpinionDateTime(int userId, int opinionId)
@@ -27,11 +27,9 @@ internal class OpinionRepository : IOpinionRepository
         var query = _db.Opinions
             .Where(x => x.UserId == userId && x.OpinionId == opinionId)
             .OrderByDescending(x => x.DateTime);
-        var opinionData = await query.FirstOrDefaultAsync();
 
-        if (opinionData == null)
-            return null;
+        var opinionData = await query.FirstOrDefaultAsync().ConfigureAwait(false);
 
-        return opinionData.DateTime;
+        return opinionData?.DateTime;
     }
 }

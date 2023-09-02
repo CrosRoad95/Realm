@@ -14,7 +14,6 @@ using RealmCore.Resources.Assets.Factories;
 using RealmCore.Resources.Assets.Interfaces;
 using RealmCore.Server.Concepts.Spawning;
 using RealmCore.Server.Components.Vehicles.Access;
-using RealmCore.Persistence;
 using RealmCore.ECS;
 using RealmCore.Resources.Overlay;
 using RealmCore.Resources.Assets;
@@ -36,6 +35,7 @@ internal sealed class CommandsLogic
     private readonly ILoadService _loadService;
     private readonly IUserRepository _userRepository;
     private readonly IUserWhitelistedSerialsRepository _userWhitelistedSerialsRepository;
+    private readonly IVehicleRepository _vehicleRepository;
 
     private class TestState
     {
@@ -51,7 +51,7 @@ internal sealed class CommandsLogic
     public CommandsLogic(RealmCommandService commandService, IEntityFactory entityFactory,
         ItemsRegistry itemsRegistry, IEntityEngine ecs, IBanService banService, ChatBox chatBox, ILogger<CommandsLogic> logger,
         IDateTimeProvider dateTimeProvider, INametagsService nametagsService, IUsersService userManager, IVehiclesService vehiclesService,
-        GameWorld gameWorld, IElementOutlineService elementOutlineService, IAssetsService assetsService, ISpawnMarkersService spawnMarkersService, ILoadService loadService, IFeedbackService feedbackService, IOverlayService overlayService, AssetsRegistry assetsRegistry, VehicleUpgradeRegistry vehicleUpgradeRegistry, VehicleEnginesRegistry vehicleEnginesRegistry, IUserRepository userRepository, IUserWhitelistedSerialsRepository userWhitelistedSerialsRepository)
+        GameWorld gameWorld, IElementOutlineService elementOutlineService, IAssetsService assetsService, ISpawnMarkersService spawnMarkersService, ILoadService loadService, IFeedbackService feedbackService, IOverlayService overlayService, AssetsRegistry assetsRegistry, VehicleUpgradeRegistry vehicleUpgradeRegistry, VehicleEnginesRegistry vehicleEnginesRegistry, IUserRepository userRepository, IUserWhitelistedSerialsRepository userWhitelistedSerialsRepository, IVehicleRepository vehicleRepository)
     {
         _commandService = commandService;
         _entityFactory = entityFactory;
@@ -65,6 +65,7 @@ internal sealed class CommandsLogic
         _loadService = loadService;
         _userRepository = userRepository;
         _userWhitelistedSerialsRepository = userWhitelistedSerialsRepository;
+        _vehicleRepository = vehicleRepository;
 
         #region Commands for components tests
         _commandService.AddCommandHandler("focusablecomponent", (entity, args) =>
@@ -229,7 +230,7 @@ internal sealed class CommandsLogic
 
         _commandService.AddAsyncCommandHandler("accessinfobyid", async (entity, args) =>
         {
-            using var access = await vehiclesService.GetVehicleAccess(args.ReadInt());
+            var access = await _vehicleRepository.GetAllVehicleAccesses(args.ReadInt());
             if (access == null)
             {
                 _chatBox.OutputTo(entity, "Vehicle not found");
@@ -239,9 +240,9 @@ internal sealed class CommandsLogic
 
             _chatBox.OutputTo(entity, "Access info:");
 
-            foreach (var vehicleAccess in access.PlayerAccesses)
+            foreach (var vehicleAccess in access)
             {
-                _chatBox.OutputTo(entity, $"Access: ({vehicleAccess.userId}) = Ownership={vehicleAccess.accessType == 0}");
+                _chatBox.OutputTo(entity, $"Access: ({vehicleAccess.UserId}) = Ownership={vehicleAccess.AccessType == 0}");
             }
         });
 
@@ -653,7 +654,7 @@ internal sealed class CommandsLogic
         {
             var userComponent = entity.GetRequiredComponent<UserComponent>();
             var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();
-            await _banService.BanUserId(userComponent.Id);
+            await _banService.Ban(entity);
             playerElementComponent.Kick("test 123");
         });
 

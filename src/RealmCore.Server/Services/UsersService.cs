@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Authorization;
-using RealmCore.Persistence.Extensions;
 using RealmCore.Server.Json.Converters;
 
 namespace RealmCore.Server.Services;
@@ -18,14 +17,13 @@ internal sealed class UsersService : IUsersService
     private readonly LevelsRegistry _levelsRegistry;
     private readonly IUserRepository _userRepository;
     private readonly UserManager<UserData> _userManager;
-    private readonly IUserWhitelistedSerialsRepository _userWhitelistedSerialsRepository;
     private static readonly JsonSerializerSettings _jsonSerializerSettings = new JsonSerializerSettings
     {
         Converters = new List<JsonConverter> { new DoubleConverter() }
     };
 
     public UsersService(ItemsRegistry itemsRegistry, SignInManager<UserData> signInManager, ILogger<UsersService> logger, IOptions<GameplayOptions> gameplayOptions,
-        IDateTimeProvider dateTimeProvider, IAuthorizationService authorizationService, IActiveUsers activeUsers, IElementCollection elementCollection, IEntityEngine ecs, LevelsRegistry levelsRegistry, IUserRepository userRepository, UserManager<UserData> userManager, IUserWhitelistedSerialsRepository userWhitelistedSerialsRepository)
+        IDateTimeProvider dateTimeProvider, IAuthorizationService authorizationService, IActiveUsers activeUsers, IElementCollection elementCollection, IEntityEngine ecs, LevelsRegistry levelsRegistry, IUserRepository userRepository, UserManager<UserData> userManager)
     {
         _itemsRegistry = itemsRegistry;
         _signInManager = signInManager;
@@ -39,7 +37,6 @@ internal sealed class UsersService : IUsersService
         _levelsRegistry = levelsRegistry;
         _userRepository = userRepository;
         _userManager = userManager;
-        _userWhitelistedSerialsRepository = userWhitelistedSerialsRepository;
     }
 
     public async Task<int> SignUp(string username, string password)
@@ -164,20 +161,6 @@ internal sealed class UsersService : IUsersService
         }
     }
 
-    private void HandlePreDisposed(Entity entity)
-    {
-        try
-        {
-            var userComponent = entity.GetRequiredComponent<UserComponent>();
-            _activeUsers.TrySetInactive(userComponent.Id);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Failed to destroy player entity");
-            throw;
-        }
-    }
-
     public async Task<bool> AuthorizePolicy(UserComponent userComponent, string policy)
     {
         var result = await _authorizationService.AuthorizeAsync(userComponent.ClaimsPrincipal, policy);
@@ -200,14 +183,14 @@ internal sealed class UsersService : IUsersService
         return _ecs.TryGetEntityByPlayer(player, out playerEntity);
     }
     
-    public Task<bool> TryUpdateLastNickName(Entity playerEntity)
+    public async Task<bool> TryUpdateLastNickName(Entity playerEntity)
     {
         var nick = playerEntity.GetPlayer().Name;
         if (playerEntity.TryGetComponent(out UserComponent userComponent) && userComponent.Nick != nick)
         {
-            return _userRepository.TryUpdateLastNickName(userComponent.Id, playerEntity.GetPlayer().Name);
+            return await _userRepository.TryUpdateLastNickName(userComponent.Id, playerEntity.GetPlayer().Name).ConfigureAwait(false);
         }
-        return Task.FromResult(false);
+        return false;
     }
     
     public IEnumerable<Entity> SearchPlayersByName(string pattern)
@@ -217,6 +200,20 @@ internal sealed class UsersService : IUsersService
         {
             if (_ecs.TryGetEntityByPlayer(player, out var playerEntity))
                 yield return playerEntity;
+        }
+    }
+
+    private void HandlePreDisposed(Entity entity)
+    {
+        try
+        {
+            var userComponent = entity.GetRequiredComponent<UserComponent>();
+            _activeUsers.TrySetInactive(userComponent.Id);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to destroy player entity");
+            throw;
         }
     }
 }

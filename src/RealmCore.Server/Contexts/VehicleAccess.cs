@@ -1,6 +1,4 @@
-﻿using RealmCore.Server.Structs;
-
-namespace RealmCore.Server.Contexts;
+﻿namespace RealmCore.Server.Contexts;
 
 public class VehicleAccess : IDisposable
 {

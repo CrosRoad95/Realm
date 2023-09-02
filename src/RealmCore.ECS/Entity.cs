@@ -1,5 +1,4 @@
 ﻿using RealmCore.ECS.Attributes;
-using RealmCore.ECS.Components;
 using RealmCore.ECS.Interfaces;
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
@@ -164,6 +163,26 @@ public sealed class Entity : IDisposable
             _componentsLock.ExitReadLock();
         }
     }
+    
+    public TComponent? FindComponent<TComponent>(Func<TComponent, bool> callback) where TComponent : Component
+    {
+        ThrowIfDisposed();
+
+        _componentsLock.EnterReadLock();
+        try
+        {
+            foreach (var component in _components.OfType<TComponent>())
+            {
+                if (callback(component))
+                    return component;
+            }
+        }
+        finally
+        {
+            _componentsLock.ExitReadLock();
+        }
+        return null;
+    }
 
     public IReadOnlyList<TComponent> GetComponents<TComponent>() where TComponent : Component
     {
@@ -220,6 +239,26 @@ public sealed class Entity : IDisposable
             _componentsLock.ExitReadLock();
         }
         return has;
+    }
+    
+    public bool HasComponent<TComponent>(Func<TComponent, bool> callback) where TComponent : Component
+    {
+        ThrowIfDisposed();
+
+        _componentsLock.EnterReadLock();
+        try
+        {
+            foreach (var component in _components.OfType<TComponent>())
+            {
+                if (callback(component))
+                    return true;
+            }
+        }
+        finally
+        {
+            _componentsLock.ExitReadLock();
+        }
+        return false;
     }
 
     public bool HasComponent(Type type)

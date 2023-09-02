@@ -1,6 +1,6 @@
 ﻿namespace RealmCore.Persistence.Repository;
 
-internal class UserRepository : IUserRepository
+internal sealed class UserRepository : IUserRepository
 {
     private readonly IDb _db;
     private readonly UserManager<UserData> _userManager;
@@ -11,146 +11,174 @@ internal class UserRepository : IUserRepository
         _userManager = userManager;
     }
 
-    public Task<UserData?> GetUserBySerial(string serial)
-        => _db.Users
-            .AsNoTrackingWithIdentityResolution()
+    public async Task<UserData?> GetUserBySerial(string serial)
+    {
+        var query = _db.Users
+            .AsNoTracking()
+            .TagWith(nameof(UserRepository))
             .Where(x => !x.IsDisabled)
-            .Where(x => x.RegisterSerial == serial)
-            .FirstOrDefaultAsync();
-    
-    public Task<string?> GetUserNameById(int id)
-        => _db.Users
-            .AsNoTrackingWithIdentityResolution()
+            .Where(x => x.RegisterSerial == serial);
+        return await query.FirstOrDefaultAsync().ConfigureAwait(false);
+    }
+
+    public async Task<string?> GetUserNameById(int id)
+    {
+        var query = _db.Users
+            .AsNoTracking()
+            .TagWith(nameof(UserRepository))
             .Where(x => !x.IsDisabled)
             .Where(x => x.Id == id)
-            .Select(x => x.UserName)
-            .FirstOrDefaultAsync();
-    
-    public Task<int> GetUserIdBySerial(string serial)
-        => _db.Users
-            .AsNoTrackingWithIdentityResolution()
+            .Select(x => x.UserName);
+        return await query.FirstOrDefaultAsync().ConfigureAwait(false);
+    }
+
+    public async Task<int> GetUserIdBySerial(string serial)
+    {
+        var query = _db.Users
+            .AsNoTracking()
+            .TagWith(nameof(UserRepository))
             .Where(x => !x.IsDisabled)
             .Where(x => x.RegisterSerial == serial)
-            .Select(x => x.Id)
-            .FirstOrDefaultAsync();
+            .Select(x => x.Id);
+        return await query.FirstOrDefaultAsync().ConfigureAwait(false);
+    }
 
-    public Task<string?> GetUserBySerial(int id)
-        => _db.Users
-            .AsNoTrackingWithIdentityResolution()
+    public async Task<string?> GetUserBySerial(int id)
+    {
+        var query = _db.Users
+            .AsNoTracking()
+            .TagWith(nameof(UserRepository))
             .Where(x => !x.IsDisabled)
             .Where(x => x.Id == id)
-            .Select(x => x.UserName)
-            .FirstOrDefaultAsync();
+            .Select(x => x.UserName);
 
-    public Task<Dictionary<int, string?>> GetUserNamesByIds(IEnumerable<int> ids)
-        => _db.Users
-            .AsNoTrackingWithIdentityResolution()
-            .Where(x => !x.IsDisabled)
-            .Where(x => ids.Contains(x.Id))
-            .ToDictionaryAsync(x => x.Id, x => x.UserName);
+        return await query.FirstOrDefaultAsync().ConfigureAwait(false);
+    }
 
-    public Task DisableUser(int userId)
-        => _db.Users.Where(x => x.Id == userId)
-            .ExecuteUpdateAsync(x => x.SetProperty(y => y.IsDisabled, true));
-    
-    public Task SetQuickLoginEnabled(int userId, bool enabled)
-        => _db.Users
+    public async Task<Dictionary<int, string?>> GetUserNamesByIds(IEnumerable<int> ids)
+    {
+        var query = _db.Users
+            .AsNoTracking()
+            .TagWith(nameof(UserRepository))
             .Where(x => !x.IsDisabled)
-            .Where(x => x.Id == userId)
-            .ExecuteUpdateAsync(x => x.SetProperty(y => y.QuickLogin, enabled));
-        
-    public Task<bool> IsQuickLoginEnabledBySerial(string serial)
-        => _db.Users
+            .Where(x => ids.Contains(x.Id));
+        return await query.ToDictionaryAsync(x => x.Id, x => x.UserName).ConfigureAwait(false);
+    }
+
+    public async Task DisableUser(int userId)
+    {
+        var query = _db.Users
+            .AsNoTracking()
+            .TagWith(nameof(UserRepository))
+            .Where(x => x.Id == userId);
+        await query.ExecuteUpdateAsync(x => x.SetProperty(y => y.IsDisabled, true)).ConfigureAwait(false);
+    }
+
+
+    public async Task SetQuickLoginEnabled(int userId, bool enabled)
+    {
+        var query = _db.Users
+            .AsNoTracking()
+            .TagWith(nameof(UserRepository))
+            .Where(x => !x.IsDisabled)
+            .Where(x => x.Id == userId);
+        await query.ExecuteUpdateAsync(x => x.SetProperty(y => y.QuickLogin, enabled)).ConfigureAwait(false);
+    }
+
+    public async Task<bool> IsQuickLoginEnabledBySerial(string serial)
+    {
+        var query = _db.Users
+            .AsNoTracking()
+            .TagWith(nameof(UserRepository))
             .Where(x => !x.IsDisabled)
             .Where(x => x.RegisterSerial == serial)
-            .Select(x => x.QuickLogin)
-            .FirstOrDefaultAsync();
-    
-    public Task<bool> IsQuickLoginEnabledById(int id)
-        => _db.Users
+            .Select(x => x.QuickLogin);
+        return await query.FirstOrDefaultAsync().ConfigureAwait(false);
+    }
+
+    public async Task<bool> IsQuickLoginEnabledById(int id)
+    {
+        var query = _db.Users
+            .AsNoTracking()
+            .TagWith(nameof(UserRepository))
             .Where(x => !x.IsDisabled)
             .Where(x => x.Id == id)
-            .Select(x => x.QuickLogin)
-            .FirstOrDefaultAsync();
+            .Select(x => x.QuickLogin);
+        return await query.FirstOrDefaultAsync().ConfigureAwait(false);
+    }
 
-    public Task<UserData?> GetUserByLogin(string login)
+    public async Task<UserData?> GetUserByLogin(string login)
     {
-        return _userManager.Users
+        var query = _userManager.Users
+            .AsNoTracking()
             .TagWith(nameof(UserRepository))
             .IncludeAll()
-            .Where(u => u.UserName == login)
-            .AsNoTrackingWithIdentityResolution()
-            .FirstOrDefaultAsync();
+            .Where(u => u.UserName == login);
+        return await query.FirstOrDefaultAsync();
     }
 
-    public Task<UserData?> GetUserByLoginCaseInsensitive(string login)
+    public async Task<UserData?> GetUserByLoginCaseInsensitive(string login)
     {
-        return _userManager.Users
+        var query = _userManager.Users
+            .AsNoTracking()
             .TagWith(nameof(UserRepository))
             .IncludeAll()
-            .Where(u => u.NormalizedUserName == login.ToUpper())
-            .AsNoTrackingWithIdentityResolution()
-            .FirstOrDefaultAsync();
+            .Where(u => u.NormalizedUserName == login.ToUpper());
+        return await query.FirstOrDefaultAsync();
     }
 
-    public Task<int> CountUsersBySerial(string serial)
+    public async Task<int> CountUsersBySerial(string serial)
     {
-        return _userManager.Users
+        var query = _userManager.Users
             .TagWith(nameof(UserRepository))
-            .Where(u => u.RegisterSerial == serial)
-            .AsNoTrackingWithIdentityResolution()
-            .CountAsync();
+            .Where(u => u.RegisterSerial == serial);
+        return await query.CountAsync().ConfigureAwait(false);
     }
 
-    public Task<List<UserData>> GetUsersBySerial(string serial)
+    public async Task<List<UserData>> GetUsersBySerial(string serial)
     {
-        return _userManager.Users
-            .TagWith(nameof(UserRepository))
-            .IncludeAll()
-            .Where(u => u.RegisterSerial == serial)
-            .AsNoTrackingWithIdentityResolution()
-            .ToListAsync();
-    }
-
-    public Task<UserData?> GetUserById(int id)
-    {
-        return _userManager.Users
+        var query = _userManager.Users
+            .AsNoTracking()
             .TagWith(nameof(UserRepository))
             .IncludeAll()
-            .Where(u => u.Id == id)
-            .AsNoTrackingWithIdentityResolution()
-            .FirstOrDefaultAsync();
+            .Where(u => u.RegisterSerial == serial);
+        return await query.ToListAsync().ConfigureAwait(false);
     }
 
-    public Task<bool> IsUserNameInUse(string userName)
+    public async Task<UserData?> GetUserById(int id)
     {
-        return _userManager.Users.AnyAsync(u => u.UserName == userName);
+        var query = _userManager.Users
+            .AsNoTracking()
+            .TagWith(nameof(UserRepository))
+            .IncludeAll()
+            .Where(u => u.Id == id);
+
+        return await query.FirstOrDefaultAsync().ConfigureAwait(false);
     }
 
-    public Task<bool> IsUserNameInUseCaseInsensitive(string userName)
+    public async Task<bool> IsUserNameInUse(string userName)
     {
-        return _userManager.Users.AnyAsync(u => u.NormalizedUserName == userName.ToUpper());
+        var query = _userManager.Users
+            .AsNoTracking()
+            .Where(x => x.UserName == userName);
+        return await query.AnyAsync().ConfigureAwait(false);
+    }
+
+    public async Task<bool> IsUserNameInUseCaseInsensitive(string userName)
+    {
+        var query = _userManager.Users
+            .AsNoTracking()
+            .TagWith(nameof(UserRepository))
+            .Where(x => x.NormalizedUserName == userName.ToUpper());
+        return await query.AnyAsync().ConfigureAwait(false);
     }
 
     public async Task<bool> TryUpdateLastNickName(int userId, string nick)
     {
-        return await _db.Users.Where(x => x.Id == userId)
-            .ExecuteUpdateAsync(x => x.SetProperty(y => y.Nick, nick)) == 1;
-    }
-
-    public void Dispose()
-    {
-        _db.Dispose();
-    }
-
-    public Task<int> Commit()
-    {
-        return _db.SaveChangesAsync();
-    }
-
-    public async ValueTask DisposeAsync()
-    {
-        await Commit();
-        Dispose();
+        var query = _db.Users
+            .AsNoTracking()
+            .TagWith(nameof(UserRepository))
+            .Where(x => x.Id == userId);
+        return await query.ExecuteUpdateAsync(x => x.SetProperty(y => y.Nick, nick)).ConfigureAwait(false) == 1;
     }
 }

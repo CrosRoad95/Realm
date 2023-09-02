@@ -1,6 +1,6 @@
 ﻿namespace RealmCore.Persistence.Repository;
 
-internal class BanRepository : IBanRepository
+internal sealed class BanRepository : IBanRepository
 {
     private readonly IDb _db;
 
@@ -9,7 +9,7 @@ internal class BanRepository : IBanRepository
         _db = db;
     }
 
-    public BanData CreateBanForSerial(string serial, DateTime? until = null, string? reason = null, string? responsible = null, int type = 0)
+    public async Task<BanData> CreateBanForSerial(string serial, DateTime? until = null, string? reason = null, string? responsible = null, int type = 0)
     {
         var ban = new BanData
         {
@@ -20,10 +20,11 @@ internal class BanRepository : IBanRepository
             Type = type,
         };
         _db.Bans.Add(ban);
+        await _db.SaveChangesAsync().ConfigureAwait(false);
         return ban;
     }
 
-    public BanData CreateBanForUser(int userId, DateTime? until = null, string? reason = null, string? responsible = null, int type = 0)
+    public async Task<BanData> CreateBanForUser(int userId, DateTime? until = null, string? reason = null, string? responsible = null, int type = 0)
     {
         var ban = new BanData
         {
@@ -34,51 +35,72 @@ internal class BanRepository : IBanRepository
             Type = type,
         };
         _db.Bans.Add(ban);
+        await _db.SaveChangesAsync().ConfigureAwait(false);
         return ban;
     }
 
-    public Task<List<BanData>> GetBansBySerial(string serial, DateTime now)
+    public async Task<List<BanData>> GetBansBySerial(string serial, DateTime now)
     {
         var query = _db.Bans
+            .AsNoTracking()
             .TagWithSource(nameof(BanRepository))
             .Where(x => x.Serial == serial && x.End > now);
-        return query.ToListAsync();
-    }
 
-    public Task<BanData?> GetBanBySerialAndBanType(string serial, int banType, DateTime now)
+        return await query.ToListAsync().ConfigureAwait(false);
+    }
+    
+    public async Task<BanData?> GetBanBySerialAndType(string serial, int type, DateTime now)
     {
         var query = _db.Bans
+            .AsNoTracking()
             .TagWithSource(nameof(BanRepository))
-            .Where(x => x.Serial == serial && x.Type == banType && x.End > now);
-        return query.FirstOrDefaultAsync();
+            .Where(x => x.Serial == serial && x.Type == type && x.End > now);
+
+        return await query.FirstOrDefaultAsync().ConfigureAwait(false);
     }
 
     public async Task<List<BanData>> GetBansByUserId(int userId, DateTime now)
     {
-        return await _db.Bans
+        var query = _db.Bans
+            .AsNoTracking()
             .TagWithSource(nameof(BanRepository))
-            .Where(x => x.UserId == userId && x.End > now)
-            .ToListAsync();
+            .Where(x => x.UserId == userId && x.End > now);
+
+        return await query.ToListAsync().ConfigureAwait(false);
     }
 
-    public void RemoveBan(BanData ban)
+    public async Task<List<BanData>> GetBansByUserIdOrSerial(int userId, string serial, DateTime now)
     {
-        _db.Bans.Remove(ban);
+        var query = _db.Bans
+            .AsNoTracking()
+            .TagWithSource(nameof(BanRepository))
+            .Where(x => x.Serial == serial || x.UserId == userId && x.End > now);
+        return await query.ToListAsync().ConfigureAwait(false);
     }
 
-    public void Dispose()
+    public async Task<bool> Delete(int id)
     {
-        _db.Dispose();
+        var query = _db.Bans.Where(x => x.Id == id)
+            .AsNoTracking()
+            .TagWithSource(nameof(BanRepository));
+        return await _db.Bans.Where(x => x.Id == id).ExecuteDeleteAsync().ConfigureAwait(false) == 1;
     }
 
-    public Task<int> Commit()
+    public async Task<bool> DeleteByUserId(int userId, int type = 0)
     {
-        return _db.SaveChangesAsync();
+        var query = _db.Bans.Where(x => x.UserId == userId && x.Type == type)
+            .AsNoTracking()
+            .TagWithSource(nameof(BanRepository));
+
+        return await query.ExecuteDeleteAsync().ConfigureAwait(false) > 0;
     }
 
-    public async ValueTask DisposeAsync()
+    public async Task<bool> DeleteBySerial(string serial, int type = 0)
     {
-        await Commit();
-        Dispose();
+        var query = _db.Bans.Where(x => x.Serial == serial && x.Type == type)
+            .AsNoTracking()
+            .TagWithSource(nameof(BanRepository));
+
+        return await query.ExecuteDeleteAsync().ConfigureAwait(false) > 0;
     }
 }

@@ -1,8 +1,6 @@
-﻿using RealmCore.Persistence.DTOs;
+﻿namespace RealmCore.Persistence.Repository;
 
-namespace RealmCore.Persistence.Repository;
-
-internal class JobRepository : IJobRepository
+internal sealed class JobRepository : IJobRepository
 {
     private readonly IDb _db;
 
@@ -11,7 +9,7 @@ internal class JobRepository : IJobRepository
         _db = db;
     }
 
-    public Task<Dictionary<int, UserJobStatisticsDTO>> GetJobStatistics(short jobId, int limit = 10)
+    public async Task<Dictionary<int, UserJobStatisticsDTO>> GetJobStatistics(short jobId, int limit = 10)
     {
         var query = _db.JobPoints
             .TagWithSource(nameof(JobRepository))
@@ -27,10 +25,10 @@ internal class JobRepository : IJobRepository
             .OrderBy(x => x.Points)
             .Take(limit);
 
-        return query.ToDictionaryAsync(x => x.UserId);
+        return await query.ToDictionaryAsync(x => x.UserId).ConfigureAwait(false);
     }
 
-    public Task<JobStatisticsDTO?> GetUserJobStatistics(int userId, short jobId)
+    public async Task<JobStatisticsDTO?> GetUserJobStatistics(int userId, short jobId)
     {
         var query = _db.JobPoints
             .TagWithSource(nameof(JobRepository))
@@ -43,22 +41,6 @@ internal class JobRepository : IJobRepository
                 TimePlayed = x.Sum(y => (int)y.TimePlayed)
             });
 
-        return query.FirstOrDefaultAsync();
-    }
-
-    public void Dispose()
-    {
-        _db.Dispose();
-    }
-
-    public Task<int> Commit()
-    {
-        return _db.SaveChangesAsync();
-    }
-
-    public async ValueTask DisposeAsync()
-    {
-        await Commit();
-        Dispose();
+        return await query.FirstOrDefaultAsync().ConfigureAwait(false);
     }
 }

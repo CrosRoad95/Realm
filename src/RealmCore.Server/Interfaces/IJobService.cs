@@ -1,6 +1,4 @@
-﻿using RealmCore.Server.Structs;
-
-namespace RealmCore.Server.Interfaces;
+﻿namespace RealmCore.Server.Interfaces;
 
 public interface IJobService
 {

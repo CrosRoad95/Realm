@@ -1,6 +1,6 @@
 ﻿namespace RealmCore.Persistence.Repository;
 
-internal class UserRewardRepository : IUserRewardRepository
+internal sealed class UserRewardRepository : IUserRewardRepository
 {
     private readonly IDb _db;
 
@@ -18,28 +18,12 @@ internal class UserRewardRepository : IUserRewardRepository
                 RewardId = rewardId,
                 UserId = userId
             });
-            await Commit();
+            await _db.SaveChangesAsync().ConfigureAwait(false);
             return true;
         }
         catch (Exception)
         {
             return false;
         }
-    }
-
-    public void Dispose()
-    {
-        _db.Dispose();
-    }
-
-    public Task<int> Commit()
-    {
-        return _db.SaveChangesAsync();
-    }
-
-    public async ValueTask DisposeAsync()
-    {
-        await Commit();
-        Dispose();
     }
 }

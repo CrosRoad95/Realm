@@ -4,20 +4,17 @@ namespace RealmCore.Server.Interfaces;
 
 public interface IVehiclesService
 {
-    Task AddVehicleEvent(int id, int eventId);
-    Task AddVehicleEvent(Entity entity, int eventId);
+    Task<bool> AddVehicleEvent(Entity vehicleEntity, int eventId);
     Task<Entity> ConvertToPrivateVehicle(Entity vehicleEntity);
     Task<Entity> CreateVehicle(ushort model, Vector3 position, Vector3 rotation);
     Task Destroy(Entity entity);
-    Task<List<VehicleEventDTO>> GetAllVehicleEvents(int id);
-    Task<List<VehicleEventDTO>> GetAllVehicleEvents(Entity entity);
-    Task<LightInfoVehicleDTO?> GetLightVehicleById(int vehicleId);
-    Task<List<LightInfoVehicleDTO>> GetLightVehiclesByUserId(int userId);
-    Task<VehicleAccess> GetVehicleAccess(int vehicleId);
-    Task<List<VehicleData>> GetVehiclesByUserId(int userId);
-    Task<bool> SetVehicleKind(int id, byte kind);
+    Task<List<VehicleData>> GetAllSpawnedVehicles();
+    Task<List<VehicleEventData>> GetAllVehicleEvents(Entity vehicleEntity);
+    Task<List<LightInfoVehicleDTO>> GetAllLightVehicles(Entity entity);
+    Task<VehicleAccess?> GetVehicleAccess(Entity vehicleEntity);
+    Task<List<VehicleData>> GetAllVehicles(Entity entity);
     Task<bool> SetVehicleKind(Entity vehicleEntity, byte kind);
+    Task<bool> SetVehicleKind(int id, byte kind);
     Task<bool> SetVehicleSpawned(Entity vehicleEntity, bool spawned = true);
-    Task<bool> SetVehicleSpawned(int id, bool spawned = true);
-    internal Entity Spawn(VehicleData vehicleData);
+    Entity Spawn(VehicleData vehicleData);
 }

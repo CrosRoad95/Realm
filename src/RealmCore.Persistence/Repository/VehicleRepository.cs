@@ -1,8 +1,6 @@
-﻿using RealmCore.Persistence.DTOs;
+﻿namespace RealmCore.Persistence.Repository;
 
-namespace RealmCore.Persistence.Repository;
-
-internal class VehicleRepository : IVehicleRepository
+internal sealed class VehicleRepository : IVehicleRepository
 {
     private readonly IDb _db;
 
@@ -11,7 +9,7 @@ internal class VehicleRepository : IVehicleRepository
         _db = db;
     }
 
-    public async Task<VehicleData> CreateNewVehicle(ushort model, DateTime now)
+    public async Task<VehicleData> CreateVehicle(ushort model, DateTime now)
     {
         var vehicle = new VehicleData
         {
@@ -27,16 +25,16 @@ internal class VehicleRepository : IVehicleRepository
             Spawned = true,
         };
         _db.Vehicles.Add(vehicle);
-        await _db.SaveChangesAsync();
+        await _db.SaveChangesAsync().ConfigureAwait(false);
         return vehicle;
     }
 
-    public Task<List<LightInfoVehicleDTO>> GetLightVehiclesByUserId(int userId)
+    public async Task<List<LightInfoVehicleDTO>> GetLightVehiclesByUserId(int userId)
     {
         var query = _db.Vehicles
-            .Where(x => !x.IsRemoved)
+            .AsNoTracking()
             .TagWithSource(nameof(VehicleRepository))
-            .AsNoTrackingWithIdentityResolution()
+            .Where(x => !x.IsRemoved)
             .Where(x => x.UserAccesses.Any(x => x.UserId == userId))
             .Select(x => new LightInfoVehicleDTO
             {
@@ -45,15 +43,15 @@ internal class VehicleRepository : IVehicleRepository
                 Position = x.TransformAndMotion.Position
             });
 
-        return query.ToListAsync();
+        return await query.ToListAsync().ConfigureAwait(false);
     }
 
-    public Task<LightInfoVehicleDTO?> GetLightVehicleById(int vehicleId)
+    public async Task<LightInfoVehicleDTO?> GetLightVehicleById(int vehicleId)
     {
         var query = _db.Vehicles
-            .Where(x => !x.IsRemoved)
+            .AsNoTracking()
             .TagWithSource(nameof(VehicleRepository))
-            .AsNoTrackingWithIdentityResolution()
+            .Where(x => !x.IsRemoved)
             .Where(x => x.Id == vehicleId)
             .Select(x => new LightInfoVehicleDTO
             {
@@ -62,112 +60,110 @@ internal class VehicleRepository : IVehicleRepository
                 Position = x.TransformAndMotion.Position
             });
 
-        return query.FirstOrDefaultAsync();
+        return await query.FirstOrDefaultAsync().ConfigureAwait(false);
     }
 
-    public Task<List<VehicleData>> GetVehiclesByUserId(int userId)
+    public async Task<List<VehicleData>> GetVehiclesByUserId(int userId)
     {
         var query = _db.Vehicles
-            .Where(x => !x.IsRemoved)
+            .AsNoTracking()
             .TagWithSource(nameof(VehicleRepository))
-            .AsNoTrackingWithIdentityResolution()
+            .Where(x => !x.IsRemoved)
             .Where(x => x.UserAccesses.Any(x => x.UserId == userId));
 
-        return query.ToListAsync();
+        return await query.ToListAsync().ConfigureAwait(false);
     }
 
-    public Task<VehicleData?> GetReadOnlyVehicleById(int id)
+    public async Task<VehicleData?> GetReadOnlyVehicleById(int id)
     {
         var query = _db.Vehicles
-            .Where(x => !x.IsRemoved)
+            .AsNoTracking()
             .TagWithSource(nameof(VehicleRepository))
-            .AsNoTrackingWithIdentityResolution()
+            .Where(x => !x.IsRemoved)
             .Where(x => x.Id == id);
 
-        return query.FirstOrDefaultAsync();
+        return await query.FirstOrDefaultAsync().ConfigureAwait(false);
     }
 
-    public Task<List<VehicleData>> GetAllSpawnedVehicles()
+    public async Task<List<VehicleData>> GetAllSpawnedVehicles()
     {
         var query = _db.Vehicles
-            .Where(x => !x.IsRemoved)
+            .AsNoTracking()
             .TagWithSource(nameof(VehicleRepository))
-            .AsNoTrackingWithIdentityResolution()
+            .Where(x => !x.IsRemoved)
             .IncludeAll()
             .IsSpawned();
 
-        return query.ToListAsync();
+        return await query.ToListAsync().ConfigureAwait(false);
     }
 
-    public Task<VehicleData?> GetVehicleById(int id)
+    public async Task<VehicleData?> GetVehicleById(int id)
     {
         var query = _db.Vehicles
-            .Where(x => !x.IsRemoved)
+            .AsNoTracking()
             .TagWithSource(nameof(VehicleRepository))
-            .AsNoTrackingWithIdentityResolution()
+            .Where(x => !x.IsRemoved)
             .Where(x => x.Id == id)
             .IncludeAll();
 
-        return query.FirstOrDefaultAsync();
+        return await query.FirstOrDefaultAsync().ConfigureAwait(false);
     }
 
     public async Task<bool> SetSpawned(int id, bool spawned)
     {
         var query = _db.Vehicles
-            .Where(x => !x.IsRemoved)
+            .AsNoTracking()
             .TagWithSource(nameof(VehicleRepository))
+            .Where(x => !x.IsRemoved)
             .Where(x => x.Id == id);
 
-        var result = await query.ExecuteUpdateAsync(x => x.SetProperty(y => y.Spawned, spawned));
+        var result = await query.ExecuteUpdateAsync(x => x.SetProperty(y => y.Spawned, spawned)).ConfigureAwait(false);
         return result > 0;
     }
 
     public async Task<bool> SetKind(int id, byte kind)
     {
         var query = _db.Vehicles
-            .Where(x => !x.IsRemoved)
+            .AsNoTracking()
             .TagWithSource(nameof(VehicleRepository))
+            .Where(x => !x.IsRemoved)
             .Where(x => x.Id == id);
 
-        var result = await query.ExecuteUpdateAsync(x => x.SetProperty(y => y.Kind, kind));
+        var result = await query.ExecuteUpdateAsync(x => x.SetProperty(y => y.Kind, kind)).ConfigureAwait(false);
         return result > 0;
     }
 
     public async Task<bool> IsSpawned(int id)
     {
         var query = _db.Vehicles
-            .Where(x => !x.IsRemoved)
+            .AsNoTracking()
             .TagWithSource(nameof(VehicleRepository))
+            .Where(x => !x.IsRemoved)
             .Where(x => x.Id == id)
             .Select(x => x.Spawned);
 
-        return await query.FirstAsync();
+        return await query.FirstAsync().ConfigureAwait(false);
     }
 
     public async Task<bool> SoftRemove(int id)
     {
         var query = _db.Vehicles
-            .Where(x => !x.IsRemoved)
+            .AsNoTracking()
             .TagWithSource(nameof(VehicleRepository))
+            .Where(x => !x.IsRemoved)
             .Where(x => x.Id == id);
 
-        var result = await query.ExecuteUpdateAsync(x => x.SetProperty(y => y.IsRemoved, true));
+        var result = await query.ExecuteUpdateAsync(x => x.SetProperty(y => y.IsRemoved, true)).ConfigureAwait(false);
         return result > 0;
     }
 
-    public void Dispose()
+    public async Task<List<VehicleUserAccessData>> GetAllVehicleAccesses(int vehicleId)
     {
-        _db.Dispose();
-    }
-
-    public Task<int> Commit()
-    {
-        return _db.SaveChangesAsync();
-    }
-
-    public async ValueTask DisposeAsync()
-    {
-        await Commit();
-        Dispose();
+        var query = _db.VehicleUserAccess
+            .AsNoTracking()
+            .TagWithSource(nameof(VehicleEventRepository))
+            .Include(x => x.User)
+            .Where(x => x.VehicleId == vehicleId);
+        return await query.ToListAsync().ConfigureAwait(false);
     }
 }

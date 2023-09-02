@@ -1,8 +1,6 @@
-﻿using RealmCore.Persistence.DTOs;
+﻿namespace RealmCore.Persistence.Repository;
 
-namespace RealmCore.Persistence.Repository;
-
-internal class VehicleEventRepository : IVehicleEventRepository
+internal sealed class VehicleEventRepository : IVehicleEventRepository
 {
     private readonly IDb _db;
 
@@ -11,7 +9,7 @@ internal class VehicleEventRepository : IVehicleEventRepository
         _db = db;
     }
 
-    public void AddEvent(int vehicleId, int eventType, DateTime dateTime)
+    public async Task AddEvent(int vehicleId, int eventType, DateTime dateTime)
     {
         _db.VehicleEvents.Add(new VehicleEventData
         {
@@ -19,43 +17,15 @@ internal class VehicleEventRepository : IVehicleEventRepository
             EventType = eventType,
             DateTime = dateTime
         });
+        await _db.SaveChangesAsync().ConfigureAwait(false);
     }
 
-    public async Task<List<VehicleEventDTO>> GetAllEventsByVehicleId(int vehicleId)
+    public async Task<List<VehicleEventData>> GetAllEventsByVehicleId(int vehicleId)
     {
-        return await _db.VehicleEvents
+        var query = _db.VehicleEvents
+            .AsNoTracking()
             .TagWithSource(nameof(VehicleEventRepository))
-            .Where(x => x.VehicleId == vehicleId)
-            .Select(x => new VehicleEventDTO
-            {
-                EventType = x.EventType,
-                DateTime = x.DateTime
-            })
-            .ToListAsync();
-    }
-
-    public async Task<List<VehicleUserAccessData>> GetAllVehicleAccesses(int vehicleId)
-    {
-        var query = _db.VehicleUserAccess
-            .TagWithSource(nameof(VehicleEventRepository))
-            .Include(x => x.User)
             .Where(x => x.VehicleId == vehicleId);
-        return await query.ToListAsync();
-    }
-
-    public void Dispose()
-    {
-        _db.Dispose();
-    }
-
-    public Task<int> Commit()
-    {
-        return _db.SaveChangesAsync();
-    }
-
-    public async ValueTask DisposeAsync()
-    {
-        await Commit();
-        Dispose();
+        return await query.ToListAsync().ConfigureAwait(false);
     }
 }

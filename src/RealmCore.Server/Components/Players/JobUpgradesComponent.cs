@@ -1,6 +1,4 @@
-﻿using RealmCore.Server.Structs;
-
-namespace RealmCore.Server.Components.Players;
+﻿namespace RealmCore.Server.Components.Players;
 
 [ComponentUsage(false)]
 public class JobUpgradesComponent : Component

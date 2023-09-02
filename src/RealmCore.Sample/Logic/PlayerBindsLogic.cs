@@ -3,6 +3,7 @@ using RealmCore.Server.Helpers;
 using RealmCore.ECS.Components;
 using RealmCore.ECS;
 using RealmCore.Server.Components.Players.Abstractions;
+using RealmCore.Persistence.Interfaces;
 
 namespace RealmCore.Console.Logic;
 
@@ -31,12 +32,14 @@ internal sealed class PlayerBindsLogic
     private readonly IEntityEngine _ecs;
     private readonly IVehiclesService _vehiclesService;
     private readonly IServiceProvider _serviceProvider;
+    private readonly IVehicleRepository _vehicleRepository;
 
-    public PlayerBindsLogic(IEntityEngine ecs, IVehiclesService vehiclesService, IServiceProvider serviceProvider)
+    public PlayerBindsLogic(IEntityEngine ecs, IVehiclesService vehiclesService, IServiceProvider serviceProvider, IVehicleRepository vehicleRepository)
     {
         _ecs = ecs;
         _vehiclesService = vehiclesService;
         _serviceProvider = serviceProvider;
+        _vehicleRepository = vehicleRepository;
         _ecs.EntityCreated += HandleEntityCreated;
     }
 
@@ -127,7 +130,7 @@ internal sealed class PlayerBindsLogic
                 if (entity.TryGetComponent(out MoneyComponent moneyComponent))
                     state.Money = (double)moneyComponent.Money;
 
-                var vehiclesWithModelAndPositionDTos = await _vehiclesService.GetLightVehiclesByUserId(userComponent.Id);
+                var vehiclesWithModelAndPositionDTos = await _vehicleRepository.GetLightVehiclesByUserId(userComponent.Id);
                 state.VehicleLightInfos = vehiclesWithModelAndPositionDTos.Select(x => new VehicleLightInfoDTO
                 {
                     Id = x.Id,

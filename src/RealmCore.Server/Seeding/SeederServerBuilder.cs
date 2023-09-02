@@ -1,5 +1,4 @@
 ﻿using RealmCore.Persistence.Extensions;
-using RealmCore.Server.Structs;
 using static RealmCore.Server.Seeding.SeedData;
 
 namespace RealmCore.Server.Seeding;
@@ -13,6 +12,7 @@ internal sealed class SeederServerBuilder
     private readonly IGroupService _groupService;
     private readonly IEntityFactory _entityFactory;
     private readonly IFractionService _fractionService;
+    private readonly IGroupRepository _groupRepository;
     private readonly Dictionary<string, ISeederProvider> _seederProviders = new();
     private readonly Dictionary<string, IAsyncSeederProvider> _asyncSeederProviders = new();
     private readonly ILogger<SeederServerBuilder> _logger;
@@ -21,7 +21,7 @@ internal sealed class SeederServerBuilder
     public SeederServerBuilder(ILogger<SeederServerBuilder> logger, IEntityEngine ecs,
         IServerFilesProvider serverFilesProvider, UserManager<UserData> userManager, RoleManager<RoleData> roleManager,
         IGroupService groupService, IEntityFactory entityFactory, IFractionService fractionService, IEnumerable<ISeederProvider> seederProviders,
-        IEnumerable<IAsyncSeederProvider> asyncSeederProviders)
+        IEnumerable<IAsyncSeederProvider> asyncSeederProviders, IGroupRepository groupRepository)
     {
         _logger = logger;
         _ecs = ecs;
@@ -31,6 +31,7 @@ internal sealed class SeederServerBuilder
         _groupService = groupService;
         _entityFactory = entityFactory;
         _fractionService = fractionService;
+        _groupRepository = groupRepository;
         foreach (var seederProvider in seederProviders)
         {
             _seederProviders[seederProvider.SeedKey] = seederProvider;
@@ -114,8 +115,8 @@ internal sealed class SeederServerBuilder
 
             foreach (var item in pair.Value.Members)
             {
-                if(!await _groupService.IsUserInGroup(group.id, _createdUsers[item.Key].Id))
-                    await _groupService.AddMember(group.name, _createdUsers[item.Key].Id, item.Value.Rank, item.Value.RankName);
+                if(!await _groupRepository.IsUserInGroup(group.id, _createdUsers[item.Key].Id))
+                    await _groupRepository.AddMember(group.id, _createdUsers[item.Key].Id, item.Value.Rank, item.Value.RankName);
             }
         }
     }

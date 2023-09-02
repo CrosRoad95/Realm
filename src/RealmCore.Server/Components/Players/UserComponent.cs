@@ -45,7 +45,7 @@ public class UserComponent : AsyncComponent
 
     private async Task UpdateClaimsPrincipal()
     {
-        if (_user == null)
+        if (_user == null || _signInManager == null)
             return;
 
         _roles.Clear();
@@ -147,7 +147,7 @@ public class UserComponent : AsyncComponent
     {
         ThrowIfDisposed();
 
-        if (_user == null)
+        if (_user == null || _userManager == null)
             return new List<string>().AsReadOnly();
 
         return (await _userManager.GetClaimsAsync(_user)).Select(x => x.Type).ToList();
@@ -157,7 +157,7 @@ public class UserComponent : AsyncComponent
     {
         ThrowIfDisposed();
 
-        if (_user == null)
+        if (_user == null || _userManager == null)
             return new List<string>().AsReadOnly();
 
         return (await _userManager.GetRolesAsync(_user)).ToList().AsReadOnly();

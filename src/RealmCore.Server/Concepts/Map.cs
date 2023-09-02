@@ -1,6 +1,4 @@
-﻿using RealmCore.Server.Structs;
-
-namespace RealmCore.Server.Concepts;
+﻿namespace RealmCore.Server.Concepts;
 
 internal sealed class Map
 {

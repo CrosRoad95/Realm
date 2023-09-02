@@ -1,11 +1,10 @@
 ﻿namespace RealmCore.Server.Components.Players;
 
-[ComponentUsage(true)]
 public class GroupMemberComponent : Component
 {
-    public int GroupId { get; private set; }
-    public int Rank { get; private set; }
-    public string RankName { get; private set; }
+    public int GroupId { get; }
+    public int Rank { get; }
+    public string RankName { get; }
 
     internal GroupMemberComponent(GroupMemberData groupMemberData)
     {

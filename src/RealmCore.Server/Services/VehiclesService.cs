@@ -1,4 +1,6 @@
-﻿using RealmCore.Persistence.DTOs;
+﻿using RealmCore.ECS;
+using RealmCore.Persistence.DTOs;
+using RealmCore.Server.Components.Vehicles;
 using RealmCore.Server.Json.Converters;
 
 namespace RealmCore.Server.Services;
@@ -35,7 +37,7 @@ internal sealed class VehiclesService : IVehiclesService
 
     public async Task<Entity> CreateVehicle(ushort model, Vector3 position, Vector3 rotation)
     {
-        var vehicleData = await _vehicleRepository.CreateNewVehicle(model, _dateTimeProvider.Now);
+        var vehicleData = await _vehicleRepository.CreateVehicle(model, _dateTimeProvider.Now);
         return _entityFactory.CreateVehicle(model, position, rotation, entityBuilder: entity =>
         {
             entity.AddComponent(new PrivateVehicleComponent(vehicleData));
@@ -51,33 +53,31 @@ internal sealed class VehiclesService : IVehiclesService
             throw new InvalidOperationException();
 
         var vehicleElementComponent = vehicleEntity.GetRequiredComponent<VehicleElementComponent>();
-        vehicleEntity.AddComponent(new PrivateVehicleComponent(await _vehicleRepository.CreateNewVehicle(vehicleElementComponent.Model, _dateTimeProvider.Now)));
+        vehicleEntity.AddComponent(new PrivateVehicleComponent(await _vehicleRepository.CreateVehicle(vehicleElementComponent.Model, _dateTimeProvider.Now)));
         return vehicleEntity;
     }
 
-    public Task<List<LightInfoVehicleDTO>> GetLightVehiclesByUserId(int userId)
+    public async Task<List<LightInfoVehicleDTO>> GetAllLightVehicles(Entity entity)
     {
-        return _vehicleRepository.GetLightVehiclesByUserId(userId);
+        if (entity.TryGetComponent(out UserComponent userComponent))
+        {
+            return await _vehicleRepository.GetLightVehiclesByUserId(userComponent.Id).ConfigureAwait(false);
+        }
+        return new();
     }
 
-    public Task<LightInfoVehicleDTO?> GetLightVehicleById(int vehicleId)
+    public async Task<List<VehicleData>> GetAllVehicles(Entity entity)
     {
-        return _vehicleRepository.GetLightVehicleById(vehicleId);
-    }
-
-    public Task<List<VehicleData>> GetVehiclesByUserId(int userId)
-    {
-        return _vehicleRepository.GetVehiclesByUserId(userId);
+        if(entity.TryGetComponent(out UserComponent userComponent))
+        {
+            return await _vehicleRepository.GetVehiclesByUserId(userComponent.Id).ConfigureAwait(false);
+        }
+        return new();
     }
 
     public Task<List<VehicleData>> GetAllSpawnedVehicles()
     {
         return _vehicleRepository.GetAllSpawnedVehicles();
-    }
-
-    public Task<VehicleData?> GetVehicleById(int id)
-    {
-        return _vehicleRepository.GetReadOnlyVehicleById(id);
     }
 
     public async Task Destroy(Entity entity)
@@ -101,18 +101,23 @@ internal sealed class VehiclesService : IVehiclesService
         return _vehicleRepository.SetKind(id, kind);
     }
     
-    public Task<bool> SetVehicleSpawned(Entity vehicleEntity, bool spawned = true)
-        => SetVehicleSpawned(vehicleEntity.GetRequiredComponent<PrivateVehicleComponent>().Id, spawned);
-
-    public Task<bool> SetVehicleSpawned(int id, bool spawned = true)
+    public async Task<bool> SetVehicleSpawned(Entity vehicleEntity, bool spawned = true)
     {
-        return _vehicleRepository.SetSpawned(id, spawned);
+        if (vehicleEntity.TryGetComponent(out PrivateVehicleComponent privateVehicleComponent))
+        {
+            return await _vehicleRepository.SetSpawned(privateVehicleComponent.Id, spawned).ConfigureAwait(false);
+        }
+        return false;
     }
 
-    public async Task<VehicleAccess> GetVehicleAccess(int vehicleId)
+    public async Task<VehicleAccess?> GetVehicleAccess(Entity vehicleEntity)
     {
-        var vehiclesAccesses = await _vehicleEventRepository.GetAllVehicleAccesses(vehicleId);
-        return new VehicleAccess(vehiclesAccesses);
+        if (vehicleEntity.TryGetComponent(out PrivateVehicleComponent privateVehicleComponent))
+        {
+            var vehiclesAccesses = await _vehicleRepository.GetAllVehicleAccesses(privateVehicleComponent.Id);
+            return new VehicleAccess(vehiclesAccesses);
+        }
+        return null;
     }
 
     public Entity Spawn(VehicleData vehicleData)
@@ -156,18 +161,22 @@ internal sealed class VehiclesService : IVehiclesService
         return entity;
     }
 
-    public async Task AddVehicleEvent(int id, int eventId)
+    public async Task<bool> AddVehicleEvent(Entity vehicleEntity, int eventId)
     {
-        _vehicleEventRepository.AddEvent(id, eventId, _dateTimeProvider.Now);
-        await _vehicleEventRepository.Commit();
+        if(vehicleEntity.TryGetComponent(out PrivateVehicleComponent privateVehicleComponent))
+        {
+            await _vehicleEventRepository.AddEvent(privateVehicleComponent.Id, eventId, _dateTimeProvider.Now).ConfigureAwait(false);
+            return true;
+        }
+        return false;
     }
 
-    public async Task AddVehicleEvent(Entity entity, int eventId)
+    public async Task<List<VehicleEventData>> GetAllVehicleEvents(Entity vehicleEntity)
     {
-        await AddVehicleEvent(entity.GetRequiredComponent<PrivateVehicleComponent>().Id, eventId);
+        if (vehicleEntity.TryGetComponent(out PrivateVehicleComponent privateVehicleComponent))
+        {
+            return await _vehicleEventRepository.GetAllEventsByVehicleId(privateVehicleComponent.Id).ConfigureAwait(false);
+        }
+        return new();
     }
-
-    public Task<List<VehicleEventDTO>> GetAllVehicleEvents(int id) => _vehicleEventRepository.GetAllEventsByVehicleId(id);
-
-    public Task<List<VehicleEventDTO>> GetAllVehicleEvents(Entity entity) => _vehicleEventRepository.GetAllEventsByVehicleId(entity.GetRequiredComponent<PrivateVehicleComponent>().Id);
 }

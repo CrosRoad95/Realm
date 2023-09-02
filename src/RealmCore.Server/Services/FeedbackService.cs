@@ -13,28 +13,48 @@ internal sealed class FeedbackService : IFeedbackService
         _dateTimeProvider = dateTimeProvider;
     }
 
-    public async Task Rate(Entity playerEntity, int ratingId, int rating)
+    public async Task<bool> Rate(Entity playerEntity, int ratingId, int rating)
     {
-        await _ratingRepository.Rate(playerEntity.GetRequiredComponent<UserComponent>().Id, ratingId, rating, _dateTimeProvider.Now);
+        if(playerEntity.TryGetComponent(out UserComponent userComponent))
+        {
+            return await _ratingRepository.Rate(userComponent.Id, ratingId, rating, _dateTimeProvider.Now).ConfigureAwait(false);
+        }
+        return false;
     }
     
     public async Task ChangeLastRating(Entity playerEntity, int ratingId, int rating)
     {
-        await _ratingRepository.ChangeLastRating(playerEntity.GetRequiredComponent<UserComponent>().Id, ratingId, rating, _dateTimeProvider.Now);
+        if (playerEntity.TryGetComponent(out UserComponent userComponent))
+        {
+            await _ratingRepository.ChangeLastRating(userComponent.Id, ratingId, rating, _dateTimeProvider.Now);
+        }
     }
 
     public async Task<(int, DateTime)?> GetLastRating(Entity playerEntity, int ratingId)
     {
-        return await _ratingRepository.GetLastRating(playerEntity.GetRequiredComponent<UserComponent>().Id, ratingId);
+        if (playerEntity.TryGetComponent(out UserComponent userComponent))
+        {
+            return await _ratingRepository.GetLastRating(userComponent.Id, ratingId);
+        }
+        return null;
     }
 
-    public async Task AddOpinion(Entity playerEntity, int opinionId, string opinion)
+    public async Task<bool> AddOpinion(Entity playerEntity, int opinionId, string opinion)
     {
-        await _opinionRepository.AddOpinion(playerEntity.GetRequiredComponent<UserComponent>().Id, opinionId, opinion, _dateTimeProvider.Now);
+        if (playerEntity.TryGetComponent(out UserComponent userComponent))
+        {
+            return await _opinionRepository.AddOpinion(userComponent.Id, opinionId, opinion, _dateTimeProvider.Now);
+        }
+        return false;
     }
 
     public async Task<DateTime?> GetLastOpinionDateTime(Entity playerEntity, int opinionId)
     {
-        return await _opinionRepository.GetLastOpinionDateTime(playerEntity.GetRequiredComponent<UserComponent>().Id, opinionId);
+        if (playerEntity.TryGetComponent(out UserComponent userComponent))
+        {
+            return await _opinionRepository.GetLastOpinionDateTime(userComponent.Id, opinionId);
+        }
+
+        return null;
     }
 }
