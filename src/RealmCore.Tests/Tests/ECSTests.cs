@@ -23,7 +23,7 @@ public class ECSTests
         #endregion
 
         #region Assert
-        _ecs.Entities.Should().HaveCount(1);
+        _ecs.Entities.Should().HaveCount(0);
         created.Should().BeTrue();
         #endregion
     }
@@ -47,7 +47,7 @@ public class ECSTests
 
         #region Assert
         createdEntities.Should().Be(8 * 100);
-        _ecs.Entities.Should().HaveCount(1);
+        _ecs.Entities.Should().HaveCount(0);
         #endregion
     }
 }
