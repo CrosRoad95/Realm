@@ -8,38 +8,38 @@ internal sealed class UsersService : IUsersService
 {
     private readonly ItemsRegistry _itemsRegistry;
     private readonly SignInManager<UserData> _signInManager;
-    private readonly UserManager<UserData> _userManager;
     private readonly ILogger<UsersService> _logger;
     private readonly IOptions<GameplayOptions> _gameplayOptions;
     private readonly IDateTimeProvider _dateTimeProvider;
     private readonly IAuthorizationService _authorizationService;
-    private readonly IDb _db;
     private readonly IActiveUsers _activeUsers;
     private readonly IElementCollection _elementCollection;
     private readonly IEntityEngine _ecs;
     private readonly LevelsRegistry _levelsRegistry;
     private readonly IUserRepository _userRepository;
+    private readonly UserManager<UserData> _userManager;
+    private readonly IUserWhitelistedSerialsRepository _userWhitelistedSerialsRepository;
     private static readonly JsonSerializerSettings _jsonSerializerSettings = new JsonSerializerSettings
     {
         Converters = new List<JsonConverter> { new DoubleConverter() }
     };
 
-    public UsersService(ItemsRegistry itemsRegistry, SignInManager<UserData> signInManager, UserManager<UserData> userManager, ILogger<UsersService> logger, IOptions<GameplayOptions> gameplayOptions,
-        IDateTimeProvider dateTimeProvider, IAuthorizationService authorizationService, IDb db, IActiveUsers activeUsers, IElementCollection elementCollection, IEntityEngine ecs, LevelsRegistry levelsRegistry, IUserRepository userRepository)
+    public UsersService(ItemsRegistry itemsRegistry, SignInManager<UserData> signInManager, ILogger<UsersService> logger, IOptions<GameplayOptions> gameplayOptions,
+        IDateTimeProvider dateTimeProvider, IAuthorizationService authorizationService, IActiveUsers activeUsers, IElementCollection elementCollection, IEntityEngine ecs, LevelsRegistry levelsRegistry, IUserRepository userRepository, UserManager<UserData> userManager, IUserWhitelistedSerialsRepository userWhitelistedSerialsRepository)
     {
         _itemsRegistry = itemsRegistry;
         _signInManager = signInManager;
-        _userManager = userManager;
         _logger = logger;
         _gameplayOptions = gameplayOptions;
         _dateTimeProvider = dateTimeProvider;
         _authorizationService = authorizationService;
-        _db = db;
         _activeUsers = activeUsers;
         _elementCollection = elementCollection;
         _ecs = ecs;
         _levelsRegistry = levelsRegistry;
         _userRepository = userRepository;
+        _userManager = userManager;
+        _userWhitelistedSerialsRepository = userWhitelistedSerialsRepository;
     }
 
     public async Task<int> SignUp(string username, string password)
@@ -184,128 +184,6 @@ internal sealed class UsersService : IUsersService
         return result.Succeeded;
     }
 
-    public Task<UserData?> GetUserByLogin(string login)
-    {
-        return _userManager.Users
-            .TagWith(nameof(UsersService))
-            .IncludeAll()
-            .Where(u => u.UserName == login)
-            .AsNoTrackingWithIdentityResolution()
-            .FirstOrDefaultAsync();
-    }
-
-    public Task<UserData?> GetUserByLoginCaseInsensitive(string login)
-    {
-        return _userManager.Users
-            .TagWith(nameof(UsersService))
-            .IncludeAll()
-            .Where(u => u.NormalizedUserName == login.ToUpper())
-            .AsNoTrackingWithIdentityResolution()
-            .FirstOrDefaultAsync();
-    }
-    
-    public Task<int> CountUsersBySerial(string serial)
-    {
-        return _userManager.Users
-            .TagWith(nameof(UsersService))
-            .Where(u => u.RegisterSerial == serial)
-            .AsNoTrackingWithIdentityResolution()
-            .CountAsync();
-    }
-    
-    public Task<List<UserData>> GetUsersBySerial(string serial)
-    {
-        return _userManager.Users
-            .TagWith(nameof(UsersService))
-            .IncludeAll()
-            .Where(u => u.RegisterSerial == serial)
-            .AsNoTrackingWithIdentityResolution()
-            .ToListAsync();
-    }
-
-    public Task<UserData?> GetUserById(int id)
-    {
-        return _userManager.Users
-            .TagWith(nameof(UsersService))
-            .IncludeAll()
-            .Where(u => u.Id == id)
-            .AsNoTrackingWithIdentityResolution()
-            .FirstOrDefaultAsync();
-    }
-
-    public Task<bool> CheckPasswordAsync(UserData user, string password)
-    {
-        return _userManager.CheckPasswordAsync(user, password);
-    }
-
-    public Task<bool> IsUserNameInUse(string userName)
-    {
-        return _userManager.Users.AnyAsync(u => u.UserName == userName);
-    }
-
-    public Task<bool> IsUserNameInUseCaseInsensitive(string userName)
-    {
-        return _userManager.Users.AnyAsync(u => u.NormalizedUserName == userName.ToUpper());
-    }
-
-    public Task<bool> IsSerialWhitelisted(int userId, string serial)
-    {
-        var query = _db.UserWhitelistedSerials
-            .TagWith(nameof(UsersService))
-            .Where(x => x.UserId == userId && x.Serial == serial);
-        return query.AnyAsync();
-    }
-
-    public async Task<bool> TryAddWhitelistedSerial(int userId, string serial)
-    {
-        if (serial.Length != 32)
-            throw new ArgumentException(null, nameof(serial));
-
-        try
-        {
-            _db.UserWhitelistedSerials.Add(new UserWhitelistedSerialData
-            {
-                Serial = serial,
-                UserId = userId
-            });
-
-            var added = await _db.SaveChangesAsync();
-            return added > 0;
-        }
-        catch (Exception)
-        {
-            return false;
-        }
-        finally
-        {
-            _db.ChangeTracker.Clear();
-        }
-    }
-
-    public async Task<bool> TryRemoveWhitelistedSerial(int userId, string serial)
-    {
-        if (serial.Length != 32)
-            throw new ArgumentException(null, nameof(serial));
-
-        try
-        {
-            var deleted = await _db.UserWhitelistedSerials
-                .TagWith(nameof(UsersService))
-                .Where(x => x.UserId == userId && x.Serial == serial)
-                .ExecuteDeleteAsync();
-
-            return deleted > 0;
-        }
-        catch (Exception)
-        {
-            return false;
-        }
-        finally
-        {
-            _db.ChangeTracker.Clear();
-        }
-    }
-
     public void Kick(Entity entity, string reason)
     {
         entity.GetPlayer().Kick(reason);
@@ -322,16 +200,14 @@ internal sealed class UsersService : IUsersService
         return _ecs.TryGetEntityByPlayer(player, out playerEntity);
     }
     
-    public async Task<bool> TryUpdateLastNickName(Entity playerEntity)
+    public Task<bool> TryUpdateLastNickName(Entity playerEntity)
     {
         var nick = playerEntity.GetPlayer().Name;
         if (playerEntity.TryGetComponent(out UserComponent userComponent) && userComponent.Nick != nick)
         {
-            await _db.Users.Where(x => x.Id == userComponent.Id)
-                .ExecuteUpdateAsync(x => x.SetProperty(y => y.Nick, playerEntity.GetPlayer().Name));
-            return true;
+            return _userRepository.TryUpdateLastNickName(userComponent.Id, playerEntity.GetPlayer().Name);
         }
-        return false;
+        return Task.FromResult(false);
     }
     
     public IEnumerable<Entity> SearchPlayersByName(string pattern)

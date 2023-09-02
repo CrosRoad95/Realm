@@ -35,6 +35,7 @@ internal sealed class CommandsLogic
     private readonly IVehiclesService _vehiclesService;
     private readonly ILoadService _loadService;
     private readonly IUserRepository _userRepository;
+    private readonly IUserWhitelistedSerialsRepository _userWhitelistedSerialsRepository;
 
     private class TestState
     {
@@ -50,7 +51,7 @@ internal sealed class CommandsLogic
     public CommandsLogic(RealmCommandService commandService, IEntityFactory entityFactory,
         ItemsRegistry itemsRegistry, IEntityEngine ecs, IBanService banService, ChatBox chatBox, ILogger<CommandsLogic> logger,
         IDateTimeProvider dateTimeProvider, INametagsService nametagsService, IUsersService userManager, IVehiclesService vehiclesService,
-        GameWorld gameWorld, IElementOutlineService elementOutlineService, IAssetsService assetsService, ISpawnMarkersService spawnMarkersService, ILoadService loadService, IFeedbackService feedbackService, IOverlayService overlayService, AssetsRegistry assetsRegistry, VehicleUpgradeRegistry vehicleUpgradeRegistry, VehicleEnginesRegistry vehicleEnginesRegistry, IUserRepository userRepository)
+        GameWorld gameWorld, IElementOutlineService elementOutlineService, IAssetsService assetsService, ISpawnMarkersService spawnMarkersService, ILoadService loadService, IFeedbackService feedbackService, IOverlayService overlayService, AssetsRegistry assetsRegistry, VehicleUpgradeRegistry vehicleUpgradeRegistry, VehicleEnginesRegistry vehicleEnginesRegistry, IUserRepository userRepository, IUserWhitelistedSerialsRepository userWhitelistedSerialsRepository)
     {
         _commandService = commandService;
         _entityFactory = entityFactory;
@@ -63,6 +64,7 @@ internal sealed class CommandsLogic
         _vehiclesService = vehiclesService;
         _loadService = loadService;
         _userRepository = userRepository;
+        _userWhitelistedSerialsRepository = userWhitelistedSerialsRepository;
 
         #region Commands for components tests
         _commandService.AddCommandHandler("focusablecomponent", (entity, args) =>
@@ -817,7 +819,7 @@ internal sealed class CommandsLogic
             var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();
             var userComponent = entity.GetRequiredComponent<UserComponent>();
 
-            if (await userManager.TryAddWhitelistedSerial(userComponent.Id, playerElementComponent.Client.Serial))
+            if (await _userWhitelistedSerialsRepository.TryAddWhitelistedSerial(userComponent.Id, playerElementComponent.Client.Serial))
             {
                 _chatBox.OutputTo(entity, $"Dodano serial");
             }
@@ -832,7 +834,7 @@ internal sealed class CommandsLogic
             var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();
             var userComponent = entity.GetRequiredComponent<UserComponent>();
 
-            if (await userManager.TryRemoveWhitelistedSerial(userComponent.Id, playerElementComponent.Client.Serial))
+            if (await _userWhitelistedSerialsRepository.TryRemoveWhitelistedSerial(userComponent.Id, playerElementComponent.Client.Serial))
             {
                 _chatBox.OutputTo(entity, $"Usunięto serial");
             }

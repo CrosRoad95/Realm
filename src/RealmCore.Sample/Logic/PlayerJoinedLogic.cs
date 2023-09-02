@@ -5,6 +5,9 @@ using RealmCore.Resources.GuiSystem;
 using RealmCore.ECS.Components;
 using RealmCore.ECS;
 using SlipeServer.Resources.Text3d;
+using RealmCore.Persistence.Interfaces;
+using Microsoft.AspNetCore.Identity;
+using RealmCore.Persistence.Data;
 
 namespace RealmCore.Console.Logic;
 
@@ -18,9 +21,11 @@ internal sealed class PlayerJoinedLogic
     private readonly IUsersService _usersService;
     private readonly ChatBox _chatBox;
     private readonly Text3dService _text3DService;
+    private readonly IUserRepository _userRepository;
+    private readonly UserManager<UserData> _userManager;
     private readonly IGuiSystemService? _guiSystemService;
 
-    public PlayerJoinedLogic(IEntityEngine ecs, ILogger<PlayerJoinedLogic> logger, ILogger<LoginGuiComponent> loggerLoginGuiComponent, ILogger<RegisterGuiComponent> loggerRegisterGuiComponent, INametagsService nametagsService, IUsersService usersService, ChatBox chatBox, Text3dService text3DService, IGuiSystemService? guiSystemService = null)
+    public PlayerJoinedLogic(IEntityEngine ecs, ILogger<PlayerJoinedLogic> logger, ILogger<LoginGuiComponent> loggerLoginGuiComponent, ILogger<RegisterGuiComponent> loggerRegisterGuiComponent, INametagsService nametagsService, IUsersService usersService, ChatBox chatBox, Text3dService text3DService, IUserRepository userRepository, UserManager<UserData> userManager, IGuiSystemService? guiSystemService = null)
     {
         _entityEngine = ecs;
         _logger = logger;
@@ -30,6 +35,8 @@ internal sealed class PlayerJoinedLogic
         _usersService = usersService;
         _chatBox = chatBox;
         _text3DService = text3DService;
+        _userRepository = userRepository;
+        _userManager = userManager;
         _guiSystemService = guiSystemService;
         _entityEngine.EntityCreated += HandleEntityCreated;
     }
@@ -49,7 +56,7 @@ internal sealed class PlayerJoinedLogic
         var adminComponent = entity.AddComponent(new AdminComponent(new List<AdminTool> { AdminTool.Entities, AdminTool.Components, AdminTool.ShowSpawnMarkers }));
         adminComponent.DebugView = true;
         adminComponent.DevelopmentMode = true;
-        entity.AddComponent(new LoginGuiComponent(_usersService, _loggerLoginGuiComponent, _loggerRegisterGuiComponent));
+        entity.AddComponent(new LoginGuiComponent(_usersService, _loggerLoginGuiComponent, _loggerRegisterGuiComponent, _userRepository, _userManager));
 
         entity.ComponentAdded += HandleComponentAdded;
         entity.Disposed += HandleDisposed;

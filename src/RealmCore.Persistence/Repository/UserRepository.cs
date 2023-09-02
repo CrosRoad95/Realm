@@ -3,10 +3,12 @@
 internal class UserRepository : IUserRepository
 {
     private readonly IDb _db;
+    private readonly UserManager<UserData> _userManager;
 
-    public UserRepository(IDb db)
+    public UserRepository(IDb db, UserManager<UserData> userManager)
     {
         _db = db;
+        _userManager = userManager;
     }
 
     public Task<UserData?> GetUserBySerial(string serial)
@@ -70,6 +72,71 @@ internal class UserRepository : IUserRepository
             .Where(x => x.Id == id)
             .Select(x => x.QuickLogin)
             .FirstOrDefaultAsync();
+
+    public Task<UserData?> GetUserByLogin(string login)
+    {
+        return _userManager.Users
+            .TagWith(nameof(UserRepository))
+            .IncludeAll()
+            .Where(u => u.UserName == login)
+            .AsNoTrackingWithIdentityResolution()
+            .FirstOrDefaultAsync();
+    }
+
+    public Task<UserData?> GetUserByLoginCaseInsensitive(string login)
+    {
+        return _userManager.Users
+            .TagWith(nameof(UserRepository))
+            .IncludeAll()
+            .Where(u => u.NormalizedUserName == login.ToUpper())
+            .AsNoTrackingWithIdentityResolution()
+            .FirstOrDefaultAsync();
+    }
+
+    public Task<int> CountUsersBySerial(string serial)
+    {
+        return _userManager.Users
+            .TagWith(nameof(UserRepository))
+            .Where(u => u.RegisterSerial == serial)
+            .AsNoTrackingWithIdentityResolution()
+            .CountAsync();
+    }
+
+    public Task<List<UserData>> GetUsersBySerial(string serial)
+    {
+        return _userManager.Users
+            .TagWith(nameof(UserRepository))
+            .IncludeAll()
+            .Where(u => u.RegisterSerial == serial)
+            .AsNoTrackingWithIdentityResolution()
+            .ToListAsync();
+    }
+
+    public Task<UserData?> GetUserById(int id)
+    {
+        return _userManager.Users
+            .TagWith(nameof(UserRepository))
+            .IncludeAll()
+            .Where(u => u.Id == id)
+            .AsNoTrackingWithIdentityResolution()
+            .FirstOrDefaultAsync();
+    }
+
+    public Task<bool> IsUserNameInUse(string userName)
+    {
+        return _userManager.Users.AnyAsync(u => u.UserName == userName);
+    }
+
+    public Task<bool> IsUserNameInUseCaseInsensitive(string userName)
+    {
+        return _userManager.Users.AnyAsync(u => u.NormalizedUserName == userName.ToUpper());
+    }
+
+    public async Task<bool> TryUpdateLastNickName(int userId, string nick)
+    {
+        return await _db.Users.Where(x => x.Id == userId)
+            .ExecuteUpdateAsync(x => x.SetProperty(y => y.Nick, nick)) == 1;
+    }
 
     public void Dispose()
     {

@@ -1,4 +1,7 @@
-﻿using RealmCore.Server.Components.Players.Abstractions;
+﻿using Microsoft.AspNetCore.Identity;
+using RealmCore.Persistence.Data;
+using RealmCore.Persistence.Interfaces;
+using RealmCore.Server.Components.Players.Abstractions;
 using RealmCore.Server.Contexts.Interfaces;
 
 namespace RealmCore.Console.Components.Gui;
@@ -8,12 +11,16 @@ public sealed class LoginGuiComponent : DxGuiComponent
     private readonly IUsersService _usersService;
     private readonly ILogger<LoginGuiComponent> _loggerLoginGuiComponent;
     private readonly ILogger<RegisterGuiComponent> _loggerRegisterGuiComponent;
+    private readonly IUserRepository _userRepository;
+    private readonly UserManager<UserData> _userManager;
 
-    public LoginGuiComponent(IUsersService usersService, ILogger<LoginGuiComponent> loggerLoginGuiComponent, ILogger<RegisterGuiComponent> loggerRegisterGuiComponent) : base("login", false)
+    public LoginGuiComponent(IUsersService usersService, ILogger<LoginGuiComponent> loggerLoginGuiComponent, ILogger<RegisterGuiComponent> loggerRegisterGuiComponent, IUserRepository userRepository, UserManager<UserData> userManager) : base("login", false)
     {
         _usersService = usersService;
         _loggerLoginGuiComponent = loggerLoginGuiComponent;
         _loggerRegisterGuiComponent = loggerRegisterGuiComponent;
+        _userRepository = userRepository;
+        _userManager = userManager;
     }
 
     protected override async Task HandleForm(IFormContext formContext)
@@ -32,7 +39,7 @@ public sealed class LoginGuiComponent : DxGuiComponent
                     return;
                 }
 
-                var user = await _usersService.GetUserByLogin(loginData.Login);
+                var user = await _userRepository.GetUserByLogin(loginData.Login);
 
                 if (user == null)
                 {
@@ -47,7 +54,7 @@ public sealed class LoginGuiComponent : DxGuiComponent
                 //    return;
                 //}
 
-                if (!await _usersService.CheckPasswordAsync(user, loginData.Password))
+                if (!await _userManager.CheckPasswordAsync(user, loginData.Password))
                 {
                     formContext.ErrorResponse("Login lub hasło jest niepoprawne.");
                     return;
@@ -78,7 +85,7 @@ public sealed class LoginGuiComponent : DxGuiComponent
         switch (actionContext.ActionName)
         {
             case "navigateToRegister":
-                Entity.AddComponent(new RegisterGuiComponent(_usersService, _loggerRegisterGuiComponent, _loggerLoginGuiComponent));
+                Entity.AddComponent(new RegisterGuiComponent(_usersService, _loggerRegisterGuiComponent, _loggerLoginGuiComponent, _userRepository, _userManager));
                 Entity.DestroyComponent(this);
                 break;
             default:
