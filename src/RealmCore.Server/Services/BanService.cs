@@ -20,7 +20,10 @@ internal sealed class BanService : IBanService
     public async Task BanPlayer(Entity entity, DateTime? until = null, string? reason = null, string? responsible = null, int type = 0)
     {
         if (entity.TryGetComponent(out PlayerElementComponent playerElementComponent))
-            await _banRepository.CreateBanForSerial(playerElementComponent.Client.Serial, until, reason, responsible, type).ConfigureAwait(false);
+        {
+            var serial = playerElementComponent.Client.Serial ?? throw new InvalidOperationException();
+            await _banRepository.CreateBanForSerial(serial, until, reason, responsible, type).ConfigureAwait(false);
+        }
     }
     
     public async Task Ban(Entity entity, DateTime? until = null, string? reason = null, string? responsible = null, int type = 0)
@@ -33,7 +36,7 @@ internal sealed class BanService : IBanService
     {
         if (entity.TryGetComponent(out PlayerElementComponent playerElementComponent))
         {
-            var serial = entity.GetRequiredComponent<PlayerElementComponent>().Client.Serial;
+            var serial = playerElementComponent.Client.Serial ?? throw new InvalidOperationException();
             await _banRepository.DeleteBySerial(serial, type).ConfigureAwait(false);
             if (entity.TryGetComponent(out UserComponent userComponent))
             {
@@ -48,7 +51,7 @@ internal sealed class BanService : IBanService
     {
         if (entity.TryGetComponent(out PlayerElementComponent playerElementComponent))
         {
-            var serial = entity.GetRequiredComponent<PlayerElementComponent>().Client.Serial;
+            var serial = playerElementComponent.Client.Serial ?? throw new InvalidOperationException();
             if (entity.TryGetComponent(out UserComponent userComponent))
             {
                 return await _banRepository.GetBansByUserIdOrSerial(userComponent.Id, serial, _dateTimeProvider.Now).ConfigureAwait(false);

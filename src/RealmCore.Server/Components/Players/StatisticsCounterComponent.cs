@@ -3,7 +3,7 @@
 [ComponentUsage(false)]
 public sealed class StatisticsCounterComponent : Component
 {
-    private readonly ConcurrentDictionary<int, float> _stats = new ConcurrentDictionary<int, float>();
+    private readonly ConcurrentDictionary<int, float> _stats = new();
 
     public IEnumerable<int> GetStatsIds => _stats.Keys;
 

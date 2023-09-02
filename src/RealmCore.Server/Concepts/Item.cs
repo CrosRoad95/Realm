@@ -120,9 +120,7 @@ public class Item : IEquatable<Item>, IEquatable<Dictionary<string, object>>
         {
             if (_metaData.ContainsKey(key))
             {
-                var value = callback((T)_metaData[key]);
-                if (value == null)
-                    throw new NullReferenceException("Callback result can not be null");
+                var value = callback((T)_metaData[key]) ?? throw new NullReferenceException("Callback result can not be null");
                 _metaData[key] = value;
                 MetadataChanged?.Invoke(this, key);
             }

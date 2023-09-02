@@ -5,18 +5,11 @@ namespace RealmCore.Tests.Tests;
 
 public class EntityTests
 {
-    private readonly IServiceProvider _serviceProvider;
     private readonly RealmTestingServer _server;
     private readonly EntityHelper _entityHelper;
 
-    private readonly Mock<ILogger<Entity>> _logger = new(MockBehavior.Strict);
     public EntityTests()
     {
-        var services = new ServiceCollection();
-        services.AddSingleton(new object());
-        _logger.SetupLogger();
-        services.AddSingleton(_logger.Object);
-        _serviceProvider = services.BuildServiceProvider();
         _server = new();
         _entityHelper = new(_server);
     }
@@ -115,7 +108,7 @@ public class EntityTests
         #endregion
 
         #region Act
-        var action = async () => await entity.AddComponentAsync(component);
+        async Task<ThrowExceptionAsyncComponent> action() => await entity.AddComponentAsync(component);
         #endregion
 
         #region Assert

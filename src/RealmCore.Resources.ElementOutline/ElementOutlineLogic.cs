@@ -40,7 +40,7 @@ internal class ElementOutlineLogic
         try
         {
             await _resource.StartForAsync(player);
-            if (_outlineInfos.Any())
+            if (_outlineInfos.Count != 0)
             {
                 var elements = _outlineInfos.Keys.ToArray();
                 var colors = _outlineInfos.Values.Select(x => x.color).ToArray();

@@ -6,10 +6,10 @@ public class UserComponent : AsyncComponent
     private readonly UserData? _user;
     private readonly SignInManager<UserData> _signInManager;
     private readonly UserManager<UserData> _userManager;
-    private ClaimsPrincipal _claimsPrincipal = default!;
-    private List<int> _upgrades = new();
-    private object _upgradesLock = new();
+    private readonly List<int> _upgrades = new();
+    private readonly object _upgradesLock = new();
     private readonly ConcurrentDictionary<int, string> _settings = new();
+    private ClaimsPrincipal _claimsPrincipal = default!;
 
     public UserData User => _user ?? throw new InvalidOperationException();
     public ClaimsPrincipal ClaimsPrincipal => _claimsPrincipal ?? throw new ArgumentNullException(nameof(_claimsPrincipal));
@@ -53,7 +53,8 @@ public class UserComponent : AsyncComponent
         _claimsPrincipal = await _signInManager.CreateUserPrincipalAsync(_user);
         foreach (var role in _roles)
         {
-            ((ClaimsIdentity)_claimsPrincipal.Identity).AddClaim(new Claim(ClaimTypes.Role, role));
+            if(_claimsPrincipal.Identity is ClaimsIdentity claimsIdentity)
+                claimsIdentity.AddClaim(new Claim(ClaimTypes.Role, role));
         }
         ClaimsPrincipalUpdated?.Invoke(this, _claimsPrincipal);
     }

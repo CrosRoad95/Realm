@@ -37,15 +37,7 @@ public class RealmServer : MtaServer, IRealmServer
     {
         var logger = GetRequiredService<ILogger<RealmServer>>();
         await GetRequiredService<IDb>().MigrateAsync();
-        try
-        {
-            await GetRequiredService<SeederServerBuilder>().Build();
-        }
-        catch(Exception ex)
-        {
-            logger.LogHandleError(ex);
-        }
-        await GetRequiredService<ILoadService>().LoadAll();
+        await Task.WhenAll(GetRequiredService<SeederServerBuilder>().Build(), GetRequiredService<ILoadService>().LoadAll());
 
         var gameplayOptions = GetRequiredService<IOptions<GameplayOptions>>();
         CultureInfo.CurrentCulture = gameplayOptions.Value.Culture;

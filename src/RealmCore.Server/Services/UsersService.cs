@@ -17,7 +17,7 @@ internal sealed class UsersService : IUsersService
     private readonly LevelsRegistry _levelsRegistry;
     private readonly IUserRepository _userRepository;
     private readonly UserManager<UserData> _userManager;
-    private static readonly JsonSerializerSettings _jsonSerializerSettings = new JsonSerializerSettings
+    private static readonly JsonSerializerSettings _jsonSerializerSettings = new()
     {
         Converters = new List<JsonConverter> { new DoubleConverter() }
     };
@@ -59,12 +59,9 @@ internal sealed class UsersService : IUsersService
 
     public async Task<bool> QuickSignIn(Entity entity)
     {
-        var serial = entity.GetPlayer().Client.Serial;
-        var userData = await _userRepository.GetUserBySerial(serial);
-        if(userData == null)
-            throw new Exception("No account found.");
-
-        if(!userData.QuickLogin)
+        var serial = entity.GetPlayer().Client.Serial ?? throw new InvalidOperationException();
+        var userData = await _userRepository.GetUserBySerial(serial) ?? throw new Exception("No account found.");
+        if (!userData.QuickLogin)
             throw new Exception("Quick login not enabled");
 
         return await SignIn(entity, userData);
@@ -92,7 +89,7 @@ internal sealed class UsersService : IUsersService
         {
             await entity.AddComponentAsync(new UserComponent(user, _signInManager, _userManager));
             await TryUpdateLastNickName(entity);
-            if (user.Inventories != null && user.Inventories.Any())
+            if (user.Inventories != null && user.Inventories.Count != 0)
             {
                 foreach (var inventory in user.Inventories)
                 {
@@ -195,7 +192,7 @@ internal sealed class UsersService : IUsersService
     
     public IEnumerable<Entity> SearchPlayersByName(string pattern)
     {
-        var players = _elementCollection.GetByType<Player>().Where(x => x.Name.ToLower().Contains(pattern.ToLower()));
+        var players = _elementCollection.GetByType<Player>().Where(x => x.Name.Contains(pattern.ToLower(), StringComparison.CurrentCultureIgnoreCase));
         foreach (var player in players)
         {
             if (_ecs.TryGetEntityByPlayer(player, out var playerEntity))

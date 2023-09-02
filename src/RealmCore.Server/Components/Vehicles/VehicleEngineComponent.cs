@@ -48,7 +48,7 @@ public sealed class VehicleEngineComponent : Component
     {
         _activeVehicleEngineId = vehicleEngines.First(x => x.Selected).EngineId;
         _vehicleEngineIds = vehicleEngines.Select(x => (int)x.EngineId).ToList();
-        if (!_vehicleEngineIds.Any())
+        if (_vehicleEngineIds.Count == 0)
         {
             throw new Exception("No vehicle engines loaded");
         }

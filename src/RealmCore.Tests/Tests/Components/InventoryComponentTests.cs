@@ -5,6 +5,7 @@ public class InventoryComponentTests
     private readonly ItemsRegistry _itemsRegistry;
     private readonly Entity _entity;
     private readonly InventoryComponent _inventoryComponent;
+    private static readonly int[] _metadata = new int[] { 1, 2, 3 };
 
     public InventoryComponentTests()
     {
@@ -78,7 +79,7 @@ public class InventoryComponentTests
         _inventoryComponent.AddItem(_itemsRegistry, 3, 1, null, true);
 
         _inventoryComponent.Items.Should().HaveCount(1);
-        _inventoryComponent.Items.First().Number.Should().Be(8);
+        _inventoryComponent.Items[0].Number.Should().Be(8);
     }
 
     [InlineData(true)]
@@ -185,7 +186,7 @@ public class InventoryComponentTests
     [Fact]
     public void HasItemWithMetadataShouldWork()
     {
-        var item = _inventoryComponent.AddSingleItem(_itemsRegistry, 1, new Dictionary<string, object> { ["foo"] = 1 });
+        _inventoryComponent.AddSingleItem(_itemsRegistry, 1, new Dictionary<string, object> { ["foo"] = 1 });
         _inventoryComponent.AddItem(_itemsRegistry, 1, 1, new Dictionary<string, object> { ["foo"] = 2 });
         _inventoryComponent.AddItem(_itemsRegistry, 1, 1, new Dictionary<string, object> { ["foo"] = 3 });
 
@@ -230,14 +231,14 @@ public class InventoryComponentTests
         _inventoryComponent.HasSpaceForItem(1, 101, _itemsRegistry).Should().BeFalse();
     }
 
+    private void HandleItemUsed(InventoryComponent inventoryComponent, Item usedItem, ItemAction flags)
+    {
+        usedItem.SetMetadata("counter", usedItem.GetMetadata<int>("counter") - 1);
+    }
+
     [Fact]
     public void YouShouldBeAbleToUseItem()
     {
-        void HandleItemUsed(InventoryComponent inventoryComponent, Item usedItem, ItemAction flags)
-        {
-            usedItem.SetMetadata("counter", usedItem.GetMetadata<int>("counter") - 1);
-        }
-
         _inventoryComponent.ItemUsed += HandleItemUsed;
         _inventoryComponent.Size = 100;
         var item = _inventoryComponent.AddSingleItem(_itemsRegistry, 1, new Dictionary<string, object> { ["counter"] = 10 });
@@ -274,7 +275,7 @@ public class InventoryComponentTests
     [Fact]
     public void RemoveItemByIdShouldWork()
     {
-        var item = _inventoryComponent.AddSingleItem(_itemsRegistry, 1);
+        _inventoryComponent.AddSingleItem(_itemsRegistry, 1);
         _inventoryComponent.RemoveItem(1);
         _inventoryComponent.Items.Should().BeEmpty();
     }
@@ -282,7 +283,7 @@ public class InventoryComponentTests
     [Fact]
     public void RemoveItemByIdShouldNotRemoveAnyStackIfThereIsNotEnough()
     {
-        var item = _inventoryComponent.AddItem(_itemsRegistry, 1, 20);
+        _inventoryComponent.AddItem(_itemsRegistry, 1, 20);
         _inventoryComponent.RemoveItem(30);
         _inventoryComponent.Number.Should().Be(20);
     }
@@ -296,7 +297,7 @@ public class InventoryComponentTests
 
         var items = _inventoryComponent.Items;
         items.Should().HaveCount(1);
-        items.First().Number.Should().Be(3);
+        items[0].Number.Should().Be(3);
     }
 
     [Fact]
@@ -373,14 +374,14 @@ public class InventoryComponentTests
         {
             ["number"] = 123,
             ["string"] = "123",
-            ["object"] = new int[] { 1, 2, 3 }
+            ["object"] = _metadata
         });
 
         item.TryGetMetadata("number", out int numberValue).Should().BeTrue();
         numberValue.Should().Be(123);
-        item.TryGetMetadata("string", out string stringValue).Should().BeTrue();
+        item.TryGetMetadata("string", out string? stringValue).Should().BeTrue();
         stringValue.Should().Be("123");
-        item.TryGetMetadata("object", out int[] objectValue).Should().BeTrue();
+        item.TryGetMetadata("object", out int[]? objectValue).Should().BeTrue();
         objectValue.Should().BeEquivalentTo(new int[] { 1, 2, 3 });
     }
 

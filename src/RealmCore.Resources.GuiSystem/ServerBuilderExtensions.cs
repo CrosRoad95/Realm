@@ -12,7 +12,7 @@ public static class ServerBuilderExtensions
         var options = new GuiSystemOptions();
         optionsBuilder(options);
 
-        if (!options._providers.Any())
+        if (options._providers.Count == 0)
             throw new Exception("No gui provider found");
 
         builder.AddBuildStep(server =>

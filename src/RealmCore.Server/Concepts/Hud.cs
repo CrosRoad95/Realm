@@ -43,7 +43,7 @@ internal class Hud<TState> : IHud<TState> where TState : class
     public void UpdateState(Action<TState> callback)
     {
         ThrowIfDisposed();
-        if (_state == null || _dynamicHudComponents == null || !_dynamicHudComponents.Any())
+        if (_state == null || _dynamicHudComponents == null || _dynamicHudComponents.Count == 0)
             throw new Exception("Hud has no state");
 
         callback(_state);
@@ -54,7 +54,7 @@ internal class Hud<TState> : IHud<TState> where TState : class
             stateChange.Add(item.ComponentId, value);
         }
 
-        if (stateChange.Any())
+        if (stateChange.Count != 0)
             _overlayService.SetHudState(_player, Name, stateChange);
     }
 

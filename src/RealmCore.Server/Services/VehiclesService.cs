@@ -131,19 +131,19 @@ internal sealed class VehiclesService : IVehiclesService
                 entity.AddComponent(new PrivateVehicleComponent(vehicleData));
                 entity.AddComponent(new VehicleUpgradesComponent(vehicleData.Upgrades, _vehicleUpgradeRegistry, _vehicleEnginesRegistry));
                 entity.AddComponent(new MileageCounterComponent(vehicleData.Mileage));
-                if (vehicleData.VehicleEngines.Any())
+                if (vehicleData.VehicleEngines.Count != 0)
                     entity.AddComponent(new VehicleEngineComponent(vehicleData.VehicleEngines));
                 else
                     entity.AddComponent<VehicleEngineComponent>();
                 entity.AddComponent(new VehiclePartDamageComponent(vehicleData.PartDamages));
 
-                if (vehicleData.Fuels.Any())
+                if (vehicleData.Fuels.Count != 0)
                 {
                     foreach (var vehicleFuel in vehicleData.Fuels)
                         entity.AddComponent(new FuelComponent(vehicleFuel.FuelType, vehicleFuel.Amount, vehicleFuel.MaxCapacity, vehicleFuel.FuelConsumptionPerOneKm, vehicleFuel.MinimumDistanceThreshold)).Active = vehicleFuel.Active;
                 }
 
-                if (vehicleData.Inventories != null && vehicleData.Inventories.Any())
+                if (vehicleData.Inventories != null && vehicleData.Inventories.Count != 0)
                 {
                     foreach (var inventory in vehicleData.Inventories)
                     {

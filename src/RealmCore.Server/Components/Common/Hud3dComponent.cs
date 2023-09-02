@@ -49,7 +49,7 @@ public class Hud3dComponent<TState> : Hud3dComponentBase where TState : class
     public void UpdateState(Action<TState> callback)
     {
         ThrowIfDisposed();
-        if (_state == null || _dynamicHudComponents == null || !_dynamicHudComponents.Any())
+        if (_state == null || _dynamicHudComponents == null || _dynamicHudComponents.Count == 0)
             throw new HudException("Hud3d has no state");
 
         callback(_state);
@@ -60,7 +60,7 @@ public class Hud3dComponent<TState> : Hud3dComponentBase where TState : class
             stateChange.Add(item.ComponentId, objectValue);
         }
 
-        if (stateChange.Any())
+        if (stateChange.Count != 0)
             SetHud3dState(_id, stateChange);
     }
 

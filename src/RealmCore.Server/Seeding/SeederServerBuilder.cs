@@ -16,15 +16,13 @@ internal sealed class SeederServerBuilder
     private readonly Dictionary<string, ISeederProvider> _seederProviders = new();
     private readonly Dictionary<string, IAsyncSeederProvider> _asyncSeederProviders = new();
     private readonly ILogger<SeederServerBuilder> _logger;
-    private readonly IEntityEngine _ecs;
     private readonly Dictionary<string, UserData> _createdUsers = new();
-    public SeederServerBuilder(ILogger<SeederServerBuilder> logger, IEntityEngine ecs,
+    public SeederServerBuilder(ILogger<SeederServerBuilder> logger,
         IServerFilesProvider serverFilesProvider, UserManager<UserData> userManager, RoleManager<RoleData> roleManager,
         IGroupService groupService, IEntityFactory entityFactory, IFractionService fractionService, IEnumerable<ISeederProvider> seederProviders,
         IEnumerable<IAsyncSeederProvider> asyncSeederProviders, IGroupRepository groupRepository)
     {
         _logger = logger;
-        _ecs = ecs;
         _serverFilesProvider = serverFilesProvider;
         _userManager = userManager;
         _roleManager = roleManager;
@@ -249,9 +247,7 @@ internal sealed class SeederServerBuilder
         {
             try
             {
-                var data = JsonConvert.DeserializeObject<SeedData>(File.ReadAllText(seedFileName));
-                if (data == null)
-                    throw new Exception("Something went wrong while deserializing.");
+                var data = JsonConvert.DeserializeObject<SeedData>(File.ReadAllText(seedFileName)) ?? throw new Exception("Something went wrong while deserializing.");
                 seedDataList.Add(data);
             }
             catch (Exception ex)
@@ -269,9 +265,7 @@ internal sealed class SeederServerBuilder
             });
         }
 
-        var seedData = result.ToObject<SeedData>();
-        if (seedData == null)
-            throw new Exception("Failed to load seed data.");
+        var seedData = result.ToObject<SeedData>() ?? throw new Exception("Failed to load seed data.");
         await BuildFrom(seedData);
 
         var seedKeyValuePairs = result.ToObject<Dictionary<string, Dictionary<string, JObject>>>();

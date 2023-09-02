@@ -316,7 +316,7 @@ public sealed class PlayerElementComponent : PedElementComponent
 
     private void UpdateFight()
     {
-        _player.Controls.FireEnabled = _enableFightFlags.Any();
+        _player.Controls.FireEnabled = _enableFightFlags.Count != 0;
     }
 
     public bool AddEnableFightFlag(short flag)

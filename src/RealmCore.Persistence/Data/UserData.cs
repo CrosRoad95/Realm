@@ -4,7 +4,6 @@ namespace RealmCore.Persistence.Data;
 
 public sealed class UserData : IdentityUser<int>
 {
-#pragma warning disable CS8618
     public string? Nick { get; set; }
     public DateTime? RegisteredDateTime { get; set; }
     public DateTime? LastLoginDateTime { get; set; }
@@ -20,7 +19,6 @@ public sealed class UserData : IdentityUser<int>
     public bool IsDisabled { get; set; }
     public bool QuickLogin { get; set; }
     public TransformAndMotion? LastTransformAndMotion { get; set; } = null;
-#pragma warning restore CS8618
 
     public ICollection<UserLicenseData> Licenses { get; set; } = new List<UserLicenseData>();
     public ICollection<VehicleUserAccessData> VehicleUserAccesses { get; set; } = new List<VehicleUserAccessData>();

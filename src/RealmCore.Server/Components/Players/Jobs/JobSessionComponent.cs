@@ -25,7 +25,7 @@ public abstract class JobSessionComponent : SessionComponent
         {
             _objectives.Remove(objective);
             if (!_disposing)
-                empty = !_objectives.Any();
+                empty = _objectives.Count == 0;
         }
 
         if (empty && !_disposing)

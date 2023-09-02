@@ -148,7 +148,7 @@ internal sealed class SaveService : ISaveService
         .Where(x => x.Id != 0)
         .ToList();
 
-        if (inventoryComponents.Any())
+        if (inventoryComponents.Count != 0)
         {
             foreach (var inventory in vehicleData.Inventories)
             {
@@ -268,7 +268,7 @@ internal sealed class SaveService : ISaveService
             .Where(x => x.Id != 0)
             .ToList();
 
-        if (inventoryComponents.Any())
+        if (inventoryComponents.Count != 0)
         {
             foreach (var inventory in user.Inventories)
             {

@@ -72,7 +72,7 @@ internal class AdminLogic
             case BroadcastEntityDebugInfoMessage broadcastEntityDebugInfoMessage:
                 lock (_enabledForPlayersLock)
                 {
-                    if (!_enabledForPlayers.Any())
+                    if (_enabledForPlayers.Count == 0)
                         return;
 
                     var luaValue = new LuaValue[] { _luaValueMapper.Map(broadcastEntityDebugInfoMessage.EntityDebugInfo) };
@@ -82,7 +82,7 @@ internal class AdminLogic
             case BroadcastEntitiesDebugInfoMessage broadcastEntitiesDebugInfoMessage:
                 lock (_enabledForPlayersLock)
                 {
-                    if (!_enabledForPlayers.Any())
+                    if (_enabledForPlayers.Count == 0)
                         return;
 
                     var luaValues = broadcastEntitiesDebugInfoMessage.EntitiesDebugInfo.Select(x => _luaValueMapper.Map(x));

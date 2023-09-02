@@ -4,13 +4,9 @@ public class ECSTests
 {
     private readonly IEntityEngine _ecs; 
     private readonly Mock<IElementCollection> _elementCollection = new();
-    private readonly Mock<ILogger<Entity>> _logger = new(MockBehavior.Strict);
     public ECSTests()
     {
-        var services = new ServiceCollection();
-        _logger.SetupLogger();
-        services.AddSingleton(_logger.Object);
-        _ecs = new EntityEngine(services.BuildServiceProvider(), _elementCollection.Object, null);
+        _ecs = new EntityEngine(_elementCollection.Object, null);
     }
 
     [Fact]

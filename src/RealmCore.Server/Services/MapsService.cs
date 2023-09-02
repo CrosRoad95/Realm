@@ -69,7 +69,7 @@ internal sealed class MapsService : IMapsService
             xmlMap = (XmlMap)serializer.Deserialize(reader);
         }
 
-        if (!xmlMap.Objects.Any())
+        if (xmlMap.Objects.Count == 0)
             throw new InvalidOperationException("Map contains no objects");
 
         AddMap(name, new Map(_mapIdGenerator, xmlMap.Objects.Select(x => new WorldObject((ObjectModel)x.Model, new Vector3(x.PosX, x.PosY, x.PosZ))

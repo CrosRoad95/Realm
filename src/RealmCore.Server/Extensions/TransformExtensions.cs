@@ -4,7 +4,7 @@ namespace RealmCore.Server.Extensions;
 
 internal static class TransformExtensions
 {
-    internal static TransformAndMotion GetTransformAndMotion(this Transform transform) => new TransformAndMotion
+    internal static TransformAndMotion GetTransformAndMotion(this Transform transform) => new()
     {
         Position = transform.Position,
         Rotation = transform.Rotation,

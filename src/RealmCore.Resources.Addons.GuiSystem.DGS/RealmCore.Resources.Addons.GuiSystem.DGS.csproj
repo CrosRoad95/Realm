@@ -15,6 +15,6 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="SlipeServer.Resources.DGS" Version="0.1.0-CI-20230802-045859" />
+		<PackageReference Include="SlipeServer.Resources.DGS" Version="0.1.0-CI-20230902-173215" />
 	</ItemGroup>
 </Project>

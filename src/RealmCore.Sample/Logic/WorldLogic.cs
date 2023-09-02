@@ -20,7 +20,7 @@ internal class WorldLogic
         }
     }
 
-    private readonly Dictionary<int, DiscoveryInfo> _discoveryInfos = new Dictionary<int, DiscoveryInfo>
+    private readonly Dictionary<int, DiscoveryInfo> _discoveryInfos = new()
     {
         [1] = new DiscoveryInfo(BlipIcon.Pizza, new Vector3(327.11523f, -65.00488f, 1.5703526f)),
         [2] = new DiscoveryInfo(BlipIcon.Pizza, new Vector3(307.69336f, -71.15039f, 1.4296875f)),

@@ -12,7 +12,7 @@ internal sealed class ScopedEntityFactory : IScopedEntityFactory
     private readonly List<PlayerPrivateElementComponentBase> _createdComponents = new();
 
     public Entity Entity => _entity;
-    public PlayerPrivateElementComponentBase? LastCreatedComponent => _lastCreatedComponent;
+    public PlayerPrivateElementComponentBase LastCreatedComponent => _lastCreatedComponent ?? throw new NullReferenceException();
     public IEnumerable<PlayerPrivateElementComponentBase> CreatedComponents
     {
         get
@@ -74,6 +74,7 @@ internal sealed class ScopedEntityFactory : IScopedEntityFactory
 
     public Entity CreateCollisionSphere(Vector3 position, float radius, byte interior = 0, ushort dimension = 0, Action<Entity>? entityBuilder = null)
     {
+        ThrowIfDisposed();
         var collisionSphere = new CollisionSphere(position, radius)
         {
             Interior = interior,
@@ -88,6 +89,7 @@ internal sealed class ScopedEntityFactory : IScopedEntityFactory
 
     public Entity CreateMarker(MarkerType markerType, Vector3 position, Color color, byte interior = 0, ushort dimension = 0, Action<Entity>? entityBuilder = null)
     {
+        ThrowIfDisposed();
         var marker = new Marker(position, markerType)
         {
             Color = color,
@@ -102,16 +104,19 @@ internal sealed class ScopedEntityFactory : IScopedEntityFactory
 
     public Task<Entity> CreateNewPrivateVehicle(ushort model, Vector3 position, Vector3 rotation, byte interior = 0, ushort dimension = 0, Action<Entity>? entityBuilder = null)
     {
+        ThrowIfDisposed();
         throw new NotImplementedException();
     }
 
     public Entity CreateVehicle(ushort model, Vector3 position, Vector3 rotation, byte interior = 0, ushort dimension = 0, Action<Entity>? entityBuilder = null)
     {
+        ThrowIfDisposed();
         throw new NotImplementedException();
     }
 
     public Entity CreateObject(ObjectModel model, Vector3 position, Vector3 rotation, byte interior = 0, ushort dimension = 0, Action<Entity>? entityBuilder = null)
     {
+        ThrowIfDisposed();
         var worldObject = new WorldObject(model, position)
         {
             Rotation = rotation,
@@ -126,6 +131,7 @@ internal sealed class ScopedEntityFactory : IScopedEntityFactory
 
     public Entity CreateBlip(BlipIcon blipIcon, Vector3 position, byte interior = 0, ushort dimension = 0, Action<Entity>? entityBuilder = null)
     {
+        ThrowIfDisposed();
         var blip = new Blip(position, blipIcon, 250)
         {
             Interior = interior,
@@ -140,16 +146,19 @@ internal sealed class ScopedEntityFactory : IScopedEntityFactory
 
     public Entity CreatePickup(ushort model, Vector3 position, byte interior = 0, ushort dimension = 0, Action<Entity>? entityBuilder = null)
     {
+        ThrowIfDisposed();
         throw new NotImplementedException();
     }
 
     public Entity CreatePed(PedModel pedModel, Vector3 position, byte interior = 0, ushort dimension = 0, Action<Entity>? entityBuilder = null)
     {
+        ThrowIfDisposed();
         throw new NotImplementedException();
     }
 
     public Entity CreateRadarArea(Vector2 position, Vector2 size, Color color, byte interior = 0, ushort dimension = 0, Action<Entity>? entityBuilder = null)
     {
+        ThrowIfDisposed();
         var radarArea = new RadarArea(position, size, color)
         {
             Interior = interior,
@@ -164,26 +173,31 @@ internal sealed class ScopedEntityFactory : IScopedEntityFactory
 
     public Entity CreateCollisionCircle(Vector2 position, float radius, byte interior = 0, ushort dimension = 0, Action<Entity>? entityBuilder = null)
     {
+        ThrowIfDisposed();
         throw new NotImplementedException();
     }
 
     public Entity CreateCollisionCuboid(Vector3 position, Vector3 dimensions, byte interior = 0, ushort dimension = 0, Action<Entity>? entityBuilder = null)
     {
+        ThrowIfDisposed();
         throw new NotImplementedException();
     }
 
     public Entity CreateCollisionPolygon(Vector3 position, IEnumerable<Vector2> vertices, byte interior = 0, ushort dimension = 0, Action<Entity>? entityBuilder = null)
     {
+        ThrowIfDisposed();
         throw new NotImplementedException();
     }
 
     public Entity CreateCollisionRectangle(Vector2 position, Vector2 dimensions, byte interior = 0, ushort dimension = 0, Action<Entity>? entityBuilder = null)
     {
+        ThrowIfDisposed();
         throw new NotImplementedException();
     }
 
     public Entity CreateCollisionTube(Vector3 position, float radius, float height, byte interior = 0, ushort dimension = 0, Action<Entity>? entityBuilder = null)
     {
+        ThrowIfDisposed();
         throw new NotImplementedException();
     }
 

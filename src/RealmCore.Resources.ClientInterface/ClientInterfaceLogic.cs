@@ -78,7 +78,7 @@ internal class ClientInterfaceLogic
         try
         {
             await _resource.StartForAsync(player);
-            if (_focusableElements.Any())
+            if (_focusableElements.Count != 0)
                 _luaEventHub.Invoke(player, x => x.AddFocusables(_focusableElements));
         }
         catch (Exception ex)

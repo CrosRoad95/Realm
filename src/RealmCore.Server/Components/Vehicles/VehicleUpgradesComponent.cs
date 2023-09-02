@@ -156,7 +156,7 @@ public class VehicleUpgradesComponent : Component
             throw new InvalidOperationException("Sequence contains no elements");
 
         var visualUpgrades = upgradeDescriptions.Where(x => x?.Visuals != null).Select(x => x!.Visuals!).ToList();
-        if (visualUpgrades.Any())
+        if (visualUpgrades.Count != 0)
         {
             vehicleUpgrades.Hood = visualUpgrades.Where(x => x.Hood != null).Select(x => x.Hood).FirstOrDefault() ?? 0;
             vehicleUpgrades.Vent = visualUpgrades.Where(x => x.Vent != null).Select(x => x.Vent).FirstOrDefault() ?? 0;
@@ -220,7 +220,7 @@ public class VehicleUpgradesComponent : Component
             if (!_dirtyState)
                 return;
 
-            if (_upgrades.Any())
+            if (_upgrades.Count != 0)
             {
                 IEnumerable<VehicleUpgradeRegistryEntry> upgradesEntries = _upgrades.Select(_vehicleUpgradeRegistry.Get);
 

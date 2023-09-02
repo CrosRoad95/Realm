@@ -315,7 +315,7 @@ public class VehicleElementComponent : ElementComponent
         PedEntered?.Invoke(this, _entityEngine.GetByElement(ped));
     }
 
-    private void HandleBlown(Element sender)
+    private void HandleBlown(Element sender, VehicleBlownEventArgs e)
     {
         Blown?.Invoke(this);
     }

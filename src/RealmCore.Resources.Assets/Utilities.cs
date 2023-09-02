@@ -23,7 +23,7 @@ internal static class Utilities
 
     public static byte[] ReadFully(Stream input)
     {
-        using (MemoryStream ms = new MemoryStream())
+        using (MemoryStream ms = new())
         {
             input.CopyTo(ms);
             ms.Position = 0;

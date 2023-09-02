@@ -130,7 +130,7 @@ public class MarkerElementComponent : ElementComponent
             var elements = _elementCollection.GetWithinRange(_collisionShape.Position, collisionSphere.Radius);
             foreach (var element in elements)
             {
-                if (_entityEngine.TryGetByElement(element, out Entity entity))
+                if (_entityEngine.TryGetByElement(element, out Entity? entity) && entity != null)
                     CheckCollisionWith(entity);
             }
         }
@@ -166,7 +166,7 @@ public class MarkerElementComponent : ElementComponent
         if (element.Interior != _marker.Interior || element.Dimension != _marker.Dimension)
             return;
 
-        if (!_entityEngine.TryGetByElement(element, out Entity entity))
+        if (!_entityEngine.TryGetByElement(element, out Entity? entity) || entity == null)
             return;
 
         var tag = entity.GetRequiredComponent<TagComponent>();
@@ -200,7 +200,7 @@ public class MarkerElementComponent : ElementComponent
         if (element.Interior != _marker.Interior || element.Dimension != _marker.Dimension)
             return;
 
-        if (!_entityEngine.TryGetByElement(element, out Entity entity))
+        if (!_entityEngine.TryGetByElement(element, out Entity? entity) || entity == null)
             return;
 
         var tag = entity.GetRequiredComponent<TagComponent>();

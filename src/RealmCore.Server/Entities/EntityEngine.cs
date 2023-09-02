@@ -62,16 +62,11 @@ internal sealed class EntityEngine : IEntityEngine
 
 
     public event Action<Entity>? EntityCreated;
-    public Entity Console { get; }
 
-    public EntityEngine(IServiceProvider serviceProvider, IElementCollection elementCollection, ILogger<EntityEngine> logger)
+    public EntityEngine(IElementCollection elementCollection, ILogger<EntityEngine> logger)
     {
         _elementCollection = elementCollection;
         _logger = logger;
-        Console = CreateEntity(e =>
-        {
-            e.AddComponent<ConsoleTagComponent>();
-        });
     }
 
     public bool ContainsEntity(Entity entity)
@@ -89,7 +84,7 @@ internal sealed class EntityEngine : IEntityEngine
         return _entityByElement[element];
     }
 
-    public bool TryGetEntityByPed(Ped ped, out Entity result, bool ignoreDestroyed = false)
+    public bool TryGetEntityByPed(Ped ped, out Entity? result, bool ignoreDestroyed = false)
     {
         if (ped.IsDestroyed && !ignoreDestroyed)
         {
@@ -101,7 +96,7 @@ internal sealed class EntityEngine : IEntityEngine
         return _entityByElement.TryGetValue(ped, out result);
     }
     
-    public bool TryGetEntityByPlayer(Player player, out Entity result, bool ignoreDestroyed = false)
+    public bool TryGetEntityByPlayer(Player player, out Entity? result, bool ignoreDestroyed = false)
     {
         if (player.IsDestroyed && !ignoreDestroyed)
         {
@@ -111,7 +106,7 @@ internal sealed class EntityEngine : IEntityEngine
         return _entityByPlayer.TryGetValue(player, out result);
     }
 
-    public bool TryGetByElement(Element element, out Entity result)
+    public bool TryGetByElement(Element element, out Entity? result)
     {
         if (element.IsDestroyed)
         {

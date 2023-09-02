@@ -20,10 +20,7 @@ internal sealed class LoadService : ILoadService
 
     public async Task<Entity> LoadVehicleById(int id)
     {
-        var vehicleData = await _vehicleRepository.GetVehicleById(id).ConfigureAwait(false);
-        if (vehicleData == null)
-            throw new Exception($"Failed to load vehicle data of id {id}");
-
+        var vehicleData = await _vehicleRepository.GetVehicleById(id).ConfigureAwait(false) ?? throw new Exception($"Failed to load vehicle data of id {id}");
         try
         {
             return _vehiclesService.Spawn(vehicleData);

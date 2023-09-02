@@ -20,13 +20,23 @@ public sealed class RealmCommandService
     {
         public override bool IsAsync => false;
 
-        internal Action<Entity, CommandArguments> Callback { get; set; }
+        internal Action<Entity, CommandArguments> Callback { get; }
+
+        public SyncCommandInfo(Action<Entity, CommandArguments> callback)
+        {
+            Callback = callback;
+        }
     }
 
     internal class AsyncCommandInfo : CommandInfo
     {
         public override bool IsAsync => true;
-        internal Func<Entity, CommandArguments, Task> Callback { get; set; }
+        internal Func<Entity, CommandArguments, Task> Callback { get; }
+
+        public AsyncCommandInfo(Func<Entity, CommandArguments, Task> callback)
+        {
+            Callback = callback;
+        }
     }
 
     private readonly CommandService _commandService;
@@ -76,10 +86,9 @@ public sealed class RealmCommandService
         CheckIfCommandExists(commandName);
 
         var command = _commandService.AddCommand(commandName);
-        _asyncCommands.Add(commandName, new AsyncCommandInfo
+        _asyncCommands.Add(commandName, new AsyncCommandInfo(callback)
         {
             CommandName = commandName,
-            Callback = callback,
             RequiredPolicies = requiredPolicies,
             Description = description,
             Usage = usage,
@@ -98,10 +107,8 @@ public sealed class RealmCommandService
         CheckIfCommandExists(commandName);
 
         var command = _commandService.AddCommand(commandName);
-        _commands.Add(commandName, new SyncCommandInfo
+        _commands.Add(commandName, new SyncCommandInfo(callback)
         {
-            CommandName = commandName,
-            Callback = callback,
             RequiredPolicies = requiredPolicies,
             Description = description,
             Usage = usage,

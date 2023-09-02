@@ -23,7 +23,7 @@ app.UseStaticFiles();
 
 app.MapRazorComponents<App>();
 
-Task.Run(async () =>
+var _ = Task.Run(async () =>
 {
     try
     {
