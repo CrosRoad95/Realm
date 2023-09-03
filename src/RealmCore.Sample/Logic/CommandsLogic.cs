@@ -1210,7 +1210,19 @@ internal sealed class CommandsLogic
             marker.ElementComponent.Color = Color.Red;
         });
 
-        _commandService.AddCommandHandler("createmarkerforme3", (entity, args) =>
+        _commandService.AddCommandHandler("markerhittest1", (entity, args) =>
+        {
+            var markerEntity = _entityFactory.CreateMarker(MarkerType.Cylinder, entity.Transform.Position, Color.White);
+            var marker = markerEntity.GetRequiredComponent<MarkerElementComponent>();
+            marker.Size = 4;
+            marker.Color = Color.Red;
+            marker.EntityEntered = (markerElementComponent, enteredMarker, enteredEntity) =>
+            {
+                System.Console.WriteLine("entity entered (public marker)");
+            };
+        });
+
+        _commandService.AddCommandHandler("markerhittest2", (entity, args) =>
         {
             using var scopedEntityFactory = _entityFactory.CreateScopedEntityFactory(entity);
             scopedEntityFactory.CreateMarker(MarkerType.Cylinder, entity.Transform.Position, Color.White);
@@ -1219,10 +1231,9 @@ internal sealed class CommandsLogic
             marker.ElementComponent.Color = Color.Red;
             marker.ElementComponent.EntityEntered = (markerElementComponent, enteredMarker, enteredEntity) =>
             {
-                ;
+                System.Console.WriteLine("entity entered (private marker)");
             };
         });
-
         _commandService.AddCommandHandler("setinterior", (entity, args) =>
         {
             if (entity.Transform.Interior == 1)
@@ -1286,11 +1297,17 @@ internal sealed class CommandsLogic
             _chatBox.OutputTo(entity, $"Enum value: {args.ReadEnum<TestEnum>()}");
         }, new string[] { "Admin" });
         
-        _commandService.AddCommandHandler("cefblazor", (entity, args) =>
+        _commandService.AddCommandHandler("cefloadcounter", (entity, args) =>
         {
             entity.GetRequiredComponent<BrowserComponent>().LoadRemotePage("counter");
             _chatBox.OutputTo(entity, "Loaded");
         });
+        _commandService.AddCommandHandler("cefloadindex", (entity, args) =>
+        {
+            entity.GetRequiredComponent<BrowserComponent>().LoadRemotePage("/");
+            _chatBox.OutputTo(entity, "Loaded");
+        });
+
         _commandService.AddCommandHandler("closeblazor", (entity, args) =>
         {
             entity.GetRequiredComponent<BrowserComponent>().Close();

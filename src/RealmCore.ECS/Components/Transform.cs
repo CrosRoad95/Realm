@@ -94,7 +94,7 @@ public sealed class Transform : Component
         if (_rotation != rotation)
         {
             _rotation = rotation;
-            PositionChanged?.Invoke(this, rotation, sync);
+            RotationChanged?.Invoke(this, rotation, sync);
         }
     }
     
