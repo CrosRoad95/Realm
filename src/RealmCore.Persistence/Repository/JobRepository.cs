@@ -9,7 +9,7 @@ internal sealed class JobRepository : IJobRepository
         _db = db;
     }
 
-    public async Task<Dictionary<int, UserJobStatisticsDTO>> GetJobStatistics(short jobId, int limit = 10)
+    public async Task<Dictionary<int, UserJobStatisticsDTO>> GetJobStatistics(short jobId, int limit = 10, CancellationToken cancellationToken = default)
     {
         var query = _db.JobPoints
             .TagWithSource(nameof(JobRepository))
@@ -25,10 +25,10 @@ internal sealed class JobRepository : IJobRepository
             .OrderBy(x => x.Points)
             .Take(limit);
 
-        return await query.ToDictionaryAsync(x => x.UserId).ConfigureAwait(false);
+        return await query.ToDictionaryAsync(x => x.UserId, cancellationToken).ConfigureAwait(false);
     }
 
-    public async Task<JobStatisticsDTO?> GetUserJobStatistics(int userId, short jobId)
+    public async Task<JobStatisticsDTO?> GetUserJobStatistics(int userId, short jobId, CancellationToken cancellationToken = default)
     {
         var query = _db.JobPoints
             .TagWithSource(nameof(JobRepository))
@@ -41,6 +41,6 @@ internal sealed class JobRepository : IJobRepository
                 TimePlayed = x.Sum(y => (int)y.TimePlayed)
             });
 
-        return await query.FirstOrDefaultAsync().ConfigureAwait(false);
+        return await query.FirstOrDefaultAsync(cancellationToken).ConfigureAwait(false);
     }
 }

@@ -9,7 +9,7 @@ internal sealed class VehicleEventRepository : IVehicleEventRepository
         _db = db;
     }
 
-    public async Task AddEvent(int vehicleId, int eventType, DateTime dateTime)
+    public async Task AddEvent(int vehicleId, int eventType, DateTime dateTime, CancellationToken cancellationToken = default)
     {
         _db.VehicleEvents.Add(new VehicleEventData
         {
@@ -17,15 +17,15 @@ internal sealed class VehicleEventRepository : IVehicleEventRepository
             EventType = eventType,
             DateTime = dateTime
         });
-        await _db.SaveChangesAsync().ConfigureAwait(false);
+        await _db.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
     }
 
-    public async Task<List<VehicleEventData>> GetAllEventsByVehicleId(int vehicleId)
+    public async Task<List<VehicleEventData>> GetAllEventsByVehicleId(int vehicleId, CancellationToken cancellationToken = default)
     {
         var query = _db.VehicleEvents
             .AsNoTracking()
             .TagWithSource(nameof(VehicleEventRepository))
             .Where(x => x.VehicleId == vehicleId);
-        return await query.ToListAsync().ConfigureAwait(false);
+        return await query.ToListAsync(cancellationToken).ConfigureAwait(false);
     }
 }

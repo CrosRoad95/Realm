@@ -2,13 +2,13 @@
 
 public interface IGroupRepository
 {
-    Task<GroupData> Create(string groupName, string shortcut, byte kind = 1);
-    Task<GroupMemberData> AddMember(int groupId, int userId, int rank = 1, string rankName = "");
-    Task<bool> ExistsByName(string groupName);
-    Task<bool> ExistsByNameOrShortcut(string groupName, string shortcut);
-    Task<bool> ExistsByShortcut(string shortcut);
-    Task<GroupData?> GetByName(string groupName);
-    Task<GroupData?> GetGroupByNameOrShortcut(string groupName, string shortcut);
-    Task<bool> IsUserInGroup(int groupId, int userId);
-    Task<bool> RemoveMember(int groupId, int userId);
+    Task<GroupData> Create(string groupName, string shortcut, byte kind = 1, CancellationToken cancellationToken = default);
+    Task<GroupMemberData> AddMember(int groupId, int userId, int rank = 1, string rankName = "", CancellationToken cancellationToken = default);
+    Task<bool> ExistsByName(string groupName, CancellationToken cancellationToken = default);
+    Task<bool> ExistsByNameOrShortcut(string groupName, string shortcut, CancellationToken cancellationToken = default);
+    Task<bool> ExistsByShortcut(string shortcut, CancellationToken cancellationToken = default);
+    Task<GroupData?> GetByName(string groupName, CancellationToken cancellationToken = default);
+    Task<GroupData?> GetGroupByNameOrShortcut(string groupName, string shortcut, CancellationToken cancellationToken = default);
+    Task<bool> IsUserInGroup(int groupId, int userId, CancellationToken cancellationToken = default);
+    Task<bool> RemoveMember(int groupId, int userId, CancellationToken cancellationToken = default);
 }

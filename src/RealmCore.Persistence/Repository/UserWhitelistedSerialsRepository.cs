@@ -9,16 +9,16 @@ internal sealed class UserWhitelistedSerialsRepository : IUserWhitelistedSerials
         _db = db;
     }
 
-    public async Task<bool> IsSerialWhitelisted(int userId, string serial)
+    public async Task<bool> IsSerialWhitelisted(int userId, string serial, CancellationToken cancellationToken = default)
     {
         var query = _db.UserWhitelistedSerials
             .AsNoTracking()
             .TagWith(nameof(UserWhitelistedSerialsRepository))
             .Where(x => x.UserId == userId && x.Serial == serial);
-        return await query.AnyAsync().ConfigureAwait(false);
+        return await query.AnyAsync(cancellationToken).ConfigureAwait(false);
     }
 
-    public async Task<bool> TryAddWhitelistedSerial(int userId, string serial)
+    public async Task<bool> TryAddWhitelistedSerial(int userId, string serial, CancellationToken cancellationToken = default)
     {
         if (serial.Length != 32)
             throw new ArgumentException(null, nameof(serial));
@@ -31,7 +31,7 @@ internal sealed class UserWhitelistedSerialsRepository : IUserWhitelistedSerials
                 UserId = userId
             });
 
-            var added = await _db.SaveChangesAsync().ConfigureAwait(false);
+            var added = await _db.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
             return added > 0;
         }
         catch (Exception)
@@ -44,7 +44,7 @@ internal sealed class UserWhitelistedSerialsRepository : IUserWhitelistedSerials
         }
     }
 
-    public async Task<bool> TryRemoveWhitelistedSerial(int userId, string serial)
+    public async Task<bool> TryRemoveWhitelistedSerial(int userId, string serial, CancellationToken cancellationToken = default)
     {
         if (serial.Length != 32)
             throw new ArgumentException(null, nameof(serial));
@@ -55,7 +55,7 @@ internal sealed class UserWhitelistedSerialsRepository : IUserWhitelistedSerials
                 .AsNoTracking()
                 .TagWith(nameof(UserWhitelistedSerialsRepository))
                 .Where(x => x.UserId == userId && x.Serial == serial)
-                .ExecuteDeleteAsync().ConfigureAwait(false);
+                .ExecuteDeleteAsync(cancellationToken).ConfigureAwait(false);
 
             return deleted > 0;
         }

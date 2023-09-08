@@ -9,7 +9,7 @@ internal sealed class OpinionRepository : IOpinionRepository
         _db = db;
     }
 
-    public async Task<bool> AddOpinion(int userId, int opinionId, string opinion, DateTime dateTime)
+    public async Task<bool> AddOpinion(int userId, int opinionId, string opinion, DateTime dateTime, CancellationToken cancellationToken = default)
     {
         _db.Opinions.Add(new OpinionData
         {
@@ -19,16 +19,16 @@ internal sealed class OpinionRepository : IOpinionRepository
             DateTime = dateTime
         });
 
-        return await _db.SaveChangesAsync().ConfigureAwait(false) == 1;
+        return await _db.SaveChangesAsync(cancellationToken).ConfigureAwait(false) == 1;
     }
 
-    public async Task<DateTime?> GetLastOpinionDateTime(int userId, int opinionId)
+    public async Task<DateTime?> GetLastOpinionDateTime(int userId, int opinionId, CancellationToken cancellationToken = default)
     {
         var query = _db.Opinions
             .Where(x => x.UserId == userId && x.OpinionId == opinionId)
             .OrderByDescending(x => x.DateTime);
 
-        var opinionData = await query.FirstOrDefaultAsync().ConfigureAwait(false);
+        var opinionData = await query.FirstOrDefaultAsync(cancellationToken).ConfigureAwait(false);
 
         return opinionData?.DateTime;
     }

@@ -11,17 +11,17 @@ internal sealed class UserRepository : IUserRepository
         _userManager = userManager;
     }
 
-    public async Task<UserData?> GetUserBySerial(string serial)
+    public async Task<UserData?> GetUserBySerial(string serial, CancellationToken cancellationToken = default)
     {
         var query = _db.Users
             .AsNoTracking()
             .TagWith(nameof(UserRepository))
             .Where(x => !x.IsDisabled)
             .Where(x => x.RegisterSerial == serial);
-        return await query.FirstOrDefaultAsync().ConfigureAwait(false);
+        return await query.FirstOrDefaultAsync(cancellationToken).ConfigureAwait(false);
     }
 
-    public async Task<string?> GetUserNameById(int id)
+    public async Task<string?> GetUserNameById(int id, CancellationToken cancellationToken = default)
     {
         var query = _db.Users
             .AsNoTracking()
@@ -29,10 +29,10 @@ internal sealed class UserRepository : IUserRepository
             .Where(x => !x.IsDisabled)
             .Where(x => x.Id == id)
             .Select(x => x.UserName);
-        return await query.FirstOrDefaultAsync().ConfigureAwait(false);
+        return await query.FirstOrDefaultAsync(cancellationToken).ConfigureAwait(false);
     }
 
-    public async Task<int> GetUserIdBySerial(string serial)
+    public async Task<int> GetUserIdBySerial(string serial, CancellationToken cancellationToken = default)
     {
         var query = _db.Users
             .AsNoTracking()
@@ -40,10 +40,10 @@ internal sealed class UserRepository : IUserRepository
             .Where(x => !x.IsDisabled)
             .Where(x => x.RegisterSerial == serial)
             .Select(x => x.Id);
-        return await query.FirstOrDefaultAsync().ConfigureAwait(false);
+        return await query.FirstOrDefaultAsync(cancellationToken).ConfigureAwait(false);
     }
 
-    public async Task<string?> GetUserBySerial(int id)
+    public async Task<string?> GetUserBySerial(int id, CancellationToken cancellationToken = default)
     {
         var query = _db.Users
             .AsNoTracking()
@@ -52,40 +52,40 @@ internal sealed class UserRepository : IUserRepository
             .Where(x => x.Id == id)
             .Select(x => x.UserName);
 
-        return await query.FirstOrDefaultAsync().ConfigureAwait(false);
+        return await query.FirstOrDefaultAsync(cancellationToken).ConfigureAwait(false);
     }
 
-    public async Task<Dictionary<int, string?>> GetUserNamesByIds(IEnumerable<int> ids)
+    public async Task<Dictionary<int, string?>> GetUserNamesByIds(IEnumerable<int> ids, CancellationToken cancellationToken = default)
     {
         var query = _db.Users
             .AsNoTracking()
             .TagWith(nameof(UserRepository))
             .Where(x => !x.IsDisabled)
             .Where(x => ids.Contains(x.Id));
-        return await query.ToDictionaryAsync(x => x.Id, x => x.UserName).ConfigureAwait(false);
+        return await query.ToDictionaryAsync(x => x.Id, x => x.UserName, cancellationToken).ConfigureAwait(false);
     }
 
-    public async Task DisableUser(int userId)
+    public async Task DisableUser(int userId, CancellationToken cancellationToken = default)
     {
         var query = _db.Users
             .AsNoTracking()
             .TagWith(nameof(UserRepository))
             .Where(x => x.Id == userId);
-        await query.ExecuteUpdateAsync(x => x.SetProperty(y => y.IsDisabled, true)).ConfigureAwait(false);
+        await query.ExecuteUpdateAsync(x => x.SetProperty(y => y.IsDisabled, true), cancellationToken).ConfigureAwait(false);
     }
 
 
-    public async Task SetQuickLoginEnabled(int userId, bool enabled)
+    public async Task SetQuickLoginEnabled(int userId, bool enabled, CancellationToken cancellationToken = default)
     {
         var query = _db.Users
             .AsNoTracking()
             .TagWith(nameof(UserRepository))
             .Where(x => !x.IsDisabled)
             .Where(x => x.Id == userId);
-        await query.ExecuteUpdateAsync(x => x.SetProperty(y => y.QuickLogin, enabled)).ConfigureAwait(false);
+        await query.ExecuteUpdateAsync(x => x.SetProperty(y => y.QuickLogin, enabled), cancellationToken).ConfigureAwait(false);
     }
 
-    public async Task<bool> IsQuickLoginEnabledBySerial(string serial)
+    public async Task<bool> IsQuickLoginEnabledBySerial(string serial, CancellationToken cancellationToken = default)
     {
         var query = _db.Users
             .AsNoTracking()
@@ -93,10 +93,10 @@ internal sealed class UserRepository : IUserRepository
             .Where(x => !x.IsDisabled)
             .Where(x => x.RegisterSerial == serial)
             .Select(x => x.QuickLogin);
-        return await query.FirstOrDefaultAsync().ConfigureAwait(false);
+        return await query.FirstOrDefaultAsync(cancellationToken).ConfigureAwait(false);
     }
 
-    public async Task<bool> IsQuickLoginEnabledById(int id)
+    public async Task<bool> IsQuickLoginEnabledById(int id, CancellationToken cancellationToken = default)
     {
         var query = _db.Users
             .AsNoTracking()
@@ -104,48 +104,48 @@ internal sealed class UserRepository : IUserRepository
             .Where(x => !x.IsDisabled)
             .Where(x => x.Id == id)
             .Select(x => x.QuickLogin);
-        return await query.FirstOrDefaultAsync().ConfigureAwait(false);
+        return await query.FirstOrDefaultAsync(cancellationToken).ConfigureAwait(false);
     }
 
-    public async Task<UserData?> GetUserByLogin(string login)
+    public async Task<UserData?> GetUserByLogin(string login, CancellationToken cancellationToken = default)
     {
         var query = _userManager.Users
             .AsNoTracking()
             .TagWith(nameof(UserRepository))
             .IncludeAll()
             .Where(u => u.UserName == login);
-        return await query.FirstOrDefaultAsync();
+        return await query.FirstOrDefaultAsync(cancellationToken);
     }
 
-    public async Task<UserData?> GetUserByLoginCaseInsensitive(string login)
+    public async Task<UserData?> GetUserByLoginCaseInsensitive(string login, CancellationToken cancellationToken = default)
     {
         var query = _userManager.Users
             .AsNoTracking()
             .TagWith(nameof(UserRepository))
             .IncludeAll()
             .Where(u => u.NormalizedUserName == login.ToUpper());
-        return await query.FirstOrDefaultAsync();
+        return await query.FirstOrDefaultAsync(cancellationToken);
     }
 
-    public async Task<int> CountUsersBySerial(string serial)
+    public async Task<int> CountUsersBySerial(string serial, CancellationToken cancellationToken = default)
     {
         var query = _userManager.Users
             .TagWith(nameof(UserRepository))
             .Where(u => u.RegisterSerial == serial);
-        return await query.CountAsync().ConfigureAwait(false);
+        return await query.CountAsync(cancellationToken).ConfigureAwait(false);
     }
 
-    public async Task<List<UserData>> GetUsersBySerial(string serial)
+    public async Task<List<UserData>> GetUsersBySerial(string serial, CancellationToken cancellationToken = default)
     {
         var query = _userManager.Users
             .AsNoTracking()
             .TagWith(nameof(UserRepository))
             .IncludeAll()
             .Where(u => u.RegisterSerial == serial);
-        return await query.ToListAsync().ConfigureAwait(false);
+        return await query.ToListAsync(cancellationToken).ConfigureAwait(false);
     }
 
-    public async Task<UserData?> GetUserById(int id)
+    public async Task<UserData?> GetUserById(int id, CancellationToken cancellationToken = default)
     {
         var query = _userManager.Users
             .AsNoTracking()
@@ -153,32 +153,32 @@ internal sealed class UserRepository : IUserRepository
             .IncludeAll()
             .Where(u => u.Id == id);
 
-        return await query.FirstOrDefaultAsync().ConfigureAwait(false);
+        return await query.FirstOrDefaultAsync(cancellationToken).ConfigureAwait(false);
     }
 
-    public async Task<bool> IsUserNameInUse(string userName)
+    public async Task<bool> IsUserNameInUse(string userName, CancellationToken cancellationToken = default)
     {
         var query = _userManager.Users
             .AsNoTracking()
             .Where(x => x.UserName == userName);
-        return await query.AnyAsync().ConfigureAwait(false);
+        return await query.AnyAsync(cancellationToken).ConfigureAwait(false);
     }
 
-    public async Task<bool> IsUserNameInUseCaseInsensitive(string userName)
+    public async Task<bool> IsUserNameInUseCaseInsensitive(string userName, CancellationToken cancellationToken = default)
     {
         var query = _userManager.Users
             .AsNoTracking()
             .TagWith(nameof(UserRepository))
             .Where(x => x.NormalizedUserName == userName.ToUpper());
-        return await query.AnyAsync().ConfigureAwait(false);
+        return await query.AnyAsync(cancellationToken).ConfigureAwait(false);
     }
 
-    public async Task<bool> TryUpdateLastNickName(int userId, string nick)
+    public async Task<bool> TryUpdateLastNickName(int userId, string nick, CancellationToken cancellationToken = default)
     {
         var query = _db.Users
             .AsNoTracking()
             .TagWith(nameof(UserRepository))
             .Where(x => x.Id == userId);
-        return await query.ExecuteUpdateAsync(x => x.SetProperty(y => y.Nick, nick)).ConfigureAwait(false) == 1;
+        return await query.ExecuteUpdateAsync(x => x.SetProperty(y => y.Nick, nick), cancellationToken).ConfigureAwait(false) == 1;
     }
 }

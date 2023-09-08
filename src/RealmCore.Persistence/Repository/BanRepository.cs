@@ -9,7 +9,7 @@ internal sealed class BanRepository : IBanRepository
         _db = db;
     }
 
-    public async Task<BanData> CreateBanForSerial(string serial, DateTime? until = null, string? reason = null, string? responsible = null, int type = 0)
+    public async Task<BanData> CreateBanForSerial(string serial, DateTime? until = null, string? reason = null, string? responsible = null, int type = 0, CancellationToken cancellationToken = default)
     {
         var ban = new BanData
         {
@@ -20,11 +20,11 @@ internal sealed class BanRepository : IBanRepository
             Type = type,
         };
         _db.Bans.Add(ban);
-        await _db.SaveChangesAsync().ConfigureAwait(false);
+        await _db.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
         return ban;
     }
 
-    public async Task<BanData> CreateBanForUser(int userId, DateTime? until = null, string? reason = null, string? responsible = null, int type = 0)
+    public async Task<BanData> CreateBanForUser(int userId, DateTime? until = null, string? reason = null, string? responsible = null, int type = 0, CancellationToken cancellationToken = default)
     {
         var ban = new BanData
         {
@@ -35,72 +35,72 @@ internal sealed class BanRepository : IBanRepository
             Type = type,
         };
         _db.Bans.Add(ban);
-        await _db.SaveChangesAsync().ConfigureAwait(false);
+        await _db.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
         return ban;
     }
 
-    public async Task<List<BanData>> GetBansBySerial(string serial, DateTime now)
+    public async Task<List<BanData>> GetBansBySerial(string serial, DateTime now, CancellationToken cancellationToken = default)
     {
         var query = _db.Bans
             .AsNoTracking()
             .TagWithSource(nameof(BanRepository))
             .Where(x => x.Serial == serial && x.End > now);
 
-        return await query.ToListAsync().ConfigureAwait(false);
+        return await query.ToListAsync(cancellationToken).ConfigureAwait(false);
     }
     
-    public async Task<BanData?> GetBanBySerialAndType(string serial, int type, DateTime now)
+    public async Task<BanData?> GetBanBySerialAndType(string serial, int type, DateTime now, CancellationToken cancellationToken = default)
     {
         var query = _db.Bans
             .AsNoTracking()
             .TagWithSource(nameof(BanRepository))
             .Where(x => x.Serial == serial && x.Type == type && x.End > now);
 
-        return await query.FirstOrDefaultAsync().ConfigureAwait(false);
+        return await query.FirstOrDefaultAsync(cancellationToken).ConfigureAwait(false);
     }
 
-    public async Task<List<BanData>> GetBansByUserId(int userId, DateTime now)
+    public async Task<List<BanData>> GetBansByUserId(int userId, DateTime now, CancellationToken cancellationToken = default)
     {
         var query = _db.Bans
             .AsNoTracking()
             .TagWithSource(nameof(BanRepository))
             .Where(x => x.UserId == userId && x.End > now);
 
-        return await query.ToListAsync().ConfigureAwait(false);
+        return await query.ToListAsync(cancellationToken).ConfigureAwait(false);
     }
 
-    public async Task<List<BanData>> GetBansByUserIdOrSerial(int userId, string serial, DateTime now)
+    public async Task<List<BanData>> GetBansByUserIdOrSerial(int userId, string serial, DateTime now, CancellationToken cancellationToken = default)
     {
         var query = _db.Bans
             .AsNoTracking()
             .TagWithSource(nameof(BanRepository))
             .Where(x => x.Serial == serial || x.UserId == userId && x.End > now);
-        return await query.ToListAsync().ConfigureAwait(false);
+        return await query.ToListAsync(cancellationToken).ConfigureAwait(false);
     }
 
-    public async Task<bool> Delete(int id)
+    public async Task<bool> Delete(int id, CancellationToken cancellationToken = default)
     {
         var query = _db.Bans.Where(x => x.Id == id)
             .AsNoTracking()
             .TagWithSource(nameof(BanRepository));
-        return await _db.Bans.Where(x => x.Id == id).ExecuteDeleteAsync().ConfigureAwait(false) == 1;
+        return await _db.Bans.Where(x => x.Id == id).ExecuteDeleteAsync(cancellationToken).ConfigureAwait(false) == 1;
     }
 
-    public async Task<bool> DeleteByUserId(int userId, int type = 0)
+    public async Task<bool> DeleteByUserId(int userId, int type = 0, CancellationToken cancellationToken = default)
     {
         var query = _db.Bans.Where(x => x.UserId == userId && x.Type == type)
             .AsNoTracking()
             .TagWithSource(nameof(BanRepository));
 
-        return await query.ExecuteDeleteAsync().ConfigureAwait(false) > 0;
+        return await query.ExecuteDeleteAsync(cancellationToken).ConfigureAwait(false) > 0;
     }
 
-    public async Task<bool> DeleteBySerial(string serial, int type = 0)
+    public async Task<bool> DeleteBySerial(string serial, int type = 0, CancellationToken cancellationToken = default)
     {
         var query = _db.Bans.Where(x => x.Serial == serial && x.Type == type)
             .AsNoTracking()
             .TagWithSource(nameof(BanRepository));
 
-        return await query.ExecuteDeleteAsync().ConfigureAwait(false) > 0;
+        return await query.ExecuteDeleteAsync(cancellationToken).ConfigureAwait(false) > 0;
     }
 }

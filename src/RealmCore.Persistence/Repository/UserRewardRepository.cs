@@ -9,7 +9,7 @@ internal sealed class UserRewardRepository : IUserRewardRepository
         _db = db;
     }
 
-    public async Task<bool> TryAddReward(int userId, int rewardId)
+    public async Task<bool> TryAddReward(int userId, int rewardId, CancellationToken cancellationToken = default)
     {
         try
         {
@@ -18,7 +18,7 @@ internal sealed class UserRewardRepository : IUserRewardRepository
                 RewardId = rewardId,
                 UserId = userId
             });
-            await _db.SaveChangesAsync().ConfigureAwait(false);
+            await _db.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
             return true;
         }
         catch (Exception)

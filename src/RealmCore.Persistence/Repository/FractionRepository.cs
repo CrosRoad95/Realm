@@ -9,26 +9,26 @@ internal sealed class FractionRepository : IFractionRepository
         _db = db;
     }
 
-    public async Task<List<FractionMemberData>> GetAllMembers(int fractionId)
+    public async Task<List<FractionMemberData>> GetAllMembers(int fractionId, CancellationToken cancellationToken = default)
     {
         var query = _db.FractionMembers.Where(x => x.FractionId == fractionId)
             .TagWithSource(nameof(FractionRepository))
             .AsNoTracking();
 
-        return await query.ToListAsync().ConfigureAwait(false);
+        return await query.ToListAsync(cancellationToken).ConfigureAwait(false);
     }
 
-    public async Task<bool> Exists(int id, string code, string name)
+    public async Task<bool> Exists(int id, string code, string name, CancellationToken cancellationToken = default)
     {
         var query = _db.Fractions
             .TagWithSource(nameof(FractionRepository))
             .AsNoTracking()
             .Where(x => x.Id == id && x.Code == code && x.Name == name);
 
-        return await query.AnyAsync().ConfigureAwait(false);
+        return await query.AnyAsync(cancellationToken).ConfigureAwait(false);
     }
 
-    public async Task<bool> CreateFraction(int id, string fractionName, string fractionCode)
+    public async Task<bool> CreateFraction(int id, string fractionName, string fractionCode, CancellationToken cancellationToken = default)
     {
         _db.Fractions.Add(new FractionData
         {
@@ -37,10 +37,10 @@ internal sealed class FractionRepository : IFractionRepository
             Code = fractionCode
         });
 
-        return await _db.SaveChangesAsync().ConfigureAwait(false) == 1;
+        return await _db.SaveChangesAsync(cancellationToken).ConfigureAwait(false) == 1;
     }
 
-    public async Task<bool> AddMember(int fractionId, int userId, int rank = 1, string rankName = "")
+    public async Task<bool> AddMember(int fractionId, int userId, int rank = 1, string rankName = "", CancellationToken cancellationToken = default)
     {
         _db.FractionMembers.Add(new FractionMemberData
         {
@@ -50,6 +50,6 @@ internal sealed class FractionRepository : IFractionRepository
             RankName = rankName,
         });
 
-        return await _db.SaveChangesAsync().ConfigureAwait(false) == 1;
+        return await _db.SaveChangesAsync(cancellationToken).ConfigureAwait(false) == 1;
     }
 }

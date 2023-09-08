@@ -2,6 +2,6 @@
 
 public interface IJobRepository
 {
-    Task<Dictionary<int, UserJobStatisticsDTO>> GetJobStatistics(short jobId, int limit = 10);
-    Task<JobStatisticsDTO?> GetUserJobStatistics(int userId, short jobId);
+    Task<Dictionary<int, UserJobStatisticsDTO>> GetJobStatistics(short jobId, int limit = 10, CancellationToken cancellationToken = default);
+    Task<JobStatisticsDTO?> GetUserJobStatistics(int userId, short jobId, CancellationToken cancellationToken = default);
 }

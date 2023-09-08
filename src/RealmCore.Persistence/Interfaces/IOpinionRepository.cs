@@ -2,6 +2,6 @@
 
 public interface IOpinionRepository
 {
-    Task<bool> AddOpinion(int userId, int opinionId, string opinion, DateTime dateTime);
-    Task<DateTime?> GetLastOpinionDateTime(int userId, int opinionId);
+    Task<bool> AddOpinion(int userId, int opinionId, string opinion, DateTime dateTime, CancellationToken cancellationToken = default);
+    Task<DateTime?> GetLastOpinionDateTime(int userId, int opinionId, CancellationToken cancellationToken = default);
 }

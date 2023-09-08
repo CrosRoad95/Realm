@@ -9,7 +9,7 @@ internal sealed class VehicleRepository : IVehicleRepository
         _db = db;
     }
 
-    public async Task<VehicleData> CreateVehicle(ushort model, DateTime now)
+    public async Task<VehicleData> CreateVehicle(ushort model, DateTime now, CancellationToken cancellationToken = default)
     {
         var vehicle = new VehicleData
         {
@@ -25,11 +25,11 @@ internal sealed class VehicleRepository : IVehicleRepository
             Spawned = true,
         };
         _db.Vehicles.Add(vehicle);
-        await _db.SaveChangesAsync().ConfigureAwait(false);
+        await _db.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
         return vehicle;
     }
 
-    public async Task<List<LightInfoVehicleDTO>> GetLightVehiclesByUserId(int userId)
+    public async Task<List<LightInfoVehicleDTO>> GetLightVehiclesByUserId(int userId, CancellationToken cancellationToken = default)
     {
         var query = _db.Vehicles
             .AsNoTracking()
@@ -43,10 +43,10 @@ internal sealed class VehicleRepository : IVehicleRepository
                 Position = x.TransformAndMotion.Position
             });
 
-        return await query.ToListAsync().ConfigureAwait(false);
+        return await query.ToListAsync(cancellationToken).ConfigureAwait(false);
     }
 
-    public async Task<LightInfoVehicleDTO?> GetLightVehicleById(int vehicleId)
+    public async Task<LightInfoVehicleDTO?> GetLightVehicleById(int vehicleId, CancellationToken cancellationToken = default)
     {
         var query = _db.Vehicles
             .AsNoTracking()
@@ -60,10 +60,10 @@ internal sealed class VehicleRepository : IVehicleRepository
                 Position = x.TransformAndMotion.Position
             });
 
-        return await query.FirstOrDefaultAsync().ConfigureAwait(false);
+        return await query.FirstOrDefaultAsync(cancellationToken).ConfigureAwait(false);
     }
 
-    public async Task<List<VehicleData>> GetVehiclesByUserId(int userId)
+    public async Task<List<VehicleData>> GetVehiclesByUserId(int userId, CancellationToken cancellationToken = default)
     {
         var query = _db.Vehicles
             .AsNoTracking()
@@ -71,10 +71,10 @@ internal sealed class VehicleRepository : IVehicleRepository
             .Where(x => !x.IsRemoved)
             .Where(x => x.UserAccesses.Any(x => x.UserId == userId));
 
-        return await query.ToListAsync().ConfigureAwait(false);
+        return await query.ToListAsync(cancellationToken).ConfigureAwait(false);
     }
 
-    public async Task<VehicleData?> GetReadOnlyVehicleById(int id)
+    public async Task<VehicleData?> GetReadOnlyVehicleById(int id, CancellationToken cancellationToken = default)
     {
         var query = _db.Vehicles
             .AsNoTracking()
@@ -82,10 +82,10 @@ internal sealed class VehicleRepository : IVehicleRepository
             .Where(x => !x.IsRemoved)
             .Where(x => x.Id == id);
 
-        return await query.FirstOrDefaultAsync().ConfigureAwait(false);
+        return await query.FirstOrDefaultAsync(cancellationToken).ConfigureAwait(false);
     }
 
-    public async Task<List<VehicleData>> GetAllSpawnedVehicles()
+    public async Task<List<VehicleData>> GetAllSpawnedVehicles(CancellationToken cancellationToken = default)
     {
         var query = _db.Vehicles
             .AsNoTracking()
@@ -94,10 +94,10 @@ internal sealed class VehicleRepository : IVehicleRepository
             .IncludeAll()
             .IsSpawned();
 
-        return await query.ToListAsync().ConfigureAwait(false);
+        return await query.ToListAsync(cancellationToken).ConfigureAwait(false);
     }
 
-    public async Task<VehicleData?> GetVehicleById(int id)
+    public async Task<VehicleData?> GetVehicleById(int id, CancellationToken cancellationToken = default)
     {
         var query = _db.Vehicles
             .AsNoTracking()
@@ -106,10 +106,10 @@ internal sealed class VehicleRepository : IVehicleRepository
             .Where(x => x.Id == id)
             .IncludeAll();
 
-        return await query.FirstOrDefaultAsync().ConfigureAwait(false);
+        return await query.FirstOrDefaultAsync(cancellationToken).ConfigureAwait(false);
     }
 
-    public async Task<bool> SetSpawned(int id, bool spawned)
+    public async Task<bool> SetSpawned(int id, bool spawned, CancellationToken cancellationToken = default)
     {
         var query = _db.Vehicles
             .AsNoTracking()
@@ -117,11 +117,11 @@ internal sealed class VehicleRepository : IVehicleRepository
             .Where(x => !x.IsRemoved)
             .Where(x => x.Id == id);
 
-        var result = await query.ExecuteUpdateAsync(x => x.SetProperty(y => y.Spawned, spawned)).ConfigureAwait(false);
+        var result = await query.ExecuteUpdateAsync(x => x.SetProperty(y => y.Spawned, spawned), cancellationToken).ConfigureAwait(false);
         return result > 0;
     }
 
-    public async Task<bool> SetKind(int id, byte kind)
+    public async Task<bool> SetKind(int id, byte kind, CancellationToken cancellationToken = default)
     {
         var query = _db.Vehicles
             .AsNoTracking()
@@ -129,11 +129,11 @@ internal sealed class VehicleRepository : IVehicleRepository
             .Where(x => !x.IsRemoved)
             .Where(x => x.Id == id);
 
-        var result = await query.ExecuteUpdateAsync(x => x.SetProperty(y => y.Kind, kind)).ConfigureAwait(false);
+        var result = await query.ExecuteUpdateAsync(x => x.SetProperty(y => y.Kind, kind), cancellationToken).ConfigureAwait(false);
         return result > 0;
     }
 
-    public async Task<bool> IsSpawned(int id)
+    public async Task<bool> IsSpawned(int id, CancellationToken cancellationToken = default)
     {
         var query = _db.Vehicles
             .AsNoTracking()
@@ -142,10 +142,10 @@ internal sealed class VehicleRepository : IVehicleRepository
             .Where(x => x.Id == id)
             .Select(x => x.Spawned);
 
-        return await query.FirstAsync().ConfigureAwait(false);
+        return await query.FirstAsync(cancellationToken).ConfigureAwait(false);
     }
 
-    public async Task<bool> SoftRemove(int id)
+    public async Task<bool> SoftRemove(int id, CancellationToken cancellationToken = default)
     {
         var query = _db.Vehicles
             .AsNoTracking()
@@ -153,17 +153,17 @@ internal sealed class VehicleRepository : IVehicleRepository
             .Where(x => !x.IsRemoved)
             .Where(x => x.Id == id);
 
-        var result = await query.ExecuteUpdateAsync(x => x.SetProperty(y => y.IsRemoved, true)).ConfigureAwait(false);
+        var result = await query.ExecuteUpdateAsync(x => x.SetProperty(y => y.IsRemoved, true), cancellationToken).ConfigureAwait(false);
         return result > 0;
     }
 
-    public async Task<List<VehicleUserAccessData>> GetAllVehicleAccesses(int vehicleId)
+    public async Task<List<VehicleUserAccessData>> GetAllVehicleAccesses(int vehicleId, CancellationToken cancellationToken = default)
     {
         var query = _db.VehicleUserAccess
             .AsNoTracking()
             .TagWithSource(nameof(VehicleEventRepository))
             .Include(x => x.User)
             .Where(x => x.VehicleId == vehicleId);
-        return await query.ToListAsync().ConfigureAwait(false);
+        return await query.ToListAsync(cancellationToken).ConfigureAwait(false);
     }
 }
