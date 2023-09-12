@@ -45,9 +45,10 @@ public class BrowserComponent : Component
         }
     }
 
-    public void LoadRemotePage(string path)
+    public void LoadRemotePage(string path, bool andOpen = true)
     {
-        Visible = true;
+        if(andOpen)
+            Visible = true;
         RemotePathChanged?.Invoke(this, path);
     }
 
