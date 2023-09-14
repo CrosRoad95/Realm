@@ -50,7 +50,7 @@ internal sealed class FractionService : IFractionService
         _fractions[fractionId] = fraction;
     }
 
-    public async Task InternalCreateFraction(int fractionId, string fractionName, string fractionCode, Vector3 position)
+    public async Task<bool> InternalCreateFraction(int fractionId, string fractionName, string fractionCode, Vector3 position)
     {
         var members = await _fractionRepository.GetAllMembers(fractionId);
         lock (_lock)
@@ -69,7 +69,11 @@ internal sealed class FractionService : IFractionService
             });
 
         if (!await _fractionRepository.Exists(fractionId, fractionCode, fractionName))
+        {
             await _fractionRepository.CreateFraction(fractionId, fractionName, fractionCode);
+            return true;
+        }
+        return false;
     }
 
     public async Task<bool> TryAddMember(int fractionId, int userId, int rank, string rankName)

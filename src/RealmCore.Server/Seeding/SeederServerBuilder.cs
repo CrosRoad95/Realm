@@ -17,6 +17,8 @@ internal sealed class SeederServerBuilder
     private readonly Dictionary<string, IAsyncSeederProvider> _asyncSeederProviders = new();
     private readonly ILogger<SeederServerBuilder> _logger;
     private readonly Dictionary<string, UserData> _createdUsers = new();
+    private bool _isUpToDate = true;
+
     public SeederServerBuilder(ILogger<SeederServerBuilder> logger,
         IServerFilesProvider serverFilesProvider, UserManager<UserData> userManager, RoleManager<RoleData> roleManager,
         IGroupService groupService, IEntityFactory entityFactory, IFractionService fractionService, IEnumerable<ISeederProvider> seederProviders,
@@ -108,13 +110,16 @@ internal sealed class SeederServerBuilder
             else
             {
                 group = await _groupService.GetGroupByNameOrShorcut(pair.Key, pair.Value.Shortcut) ?? throw new Exception("Failed to get group by name or shortcut");
-                _logger.LogInformation("Seeder: Updated group {elementId} with members {members}", pair.Key, pair.Value.Members.Select(x => x.Key));
             }
 
             foreach (var item in pair.Value.Members)
             {
                 if(!await _groupRepository.IsUserInGroup(group.id, _createdUsers[item.Key].Id))
+                {
                     await _groupRepository.AddMember(group.id, _createdUsers[item.Key].Id, item.Value.Rank, item.Value.RankName);
+                    _logger.LogInformation("Seeder: Updated group {elementId} with members {members}", pair.Key, pair.Value.Members.Select(x => x.Key));
+                    _isUpToDate = false;
+                }
             }
         }
     }
@@ -131,9 +136,8 @@ internal sealed class SeederServerBuilder
                     Name = roleName.Key
                 });
                 _logger.LogInformation("Seeder: Created role {roleName}", roleName);
+                _isUpToDate = false;
             }
-            else
-                _logger.LogInformation("Seeder: Role {roleName} already exists", roleName);
         }
     }
 
@@ -157,6 +161,7 @@ internal sealed class SeederServerBuilder
                 {
                     user = await _userManager.FindByNameAsync(pair.Key);
                     _logger.LogInformation("Seeder: Created user {userName}", pair.Key);
+                    _isUpToDate = false;
                 }
                 else
                 {
@@ -164,8 +169,6 @@ internal sealed class SeederServerBuilder
                     _logger.LogError("Seeder: Failed to create user {userName}, reason: {identityResultError}", pair.Key, identityResultError);
                 }
             }
-            else
-                _logger.LogInformation("Seeder: User {userName} already exists", pair.Key);
 
             if (user == null)
                 throw new Exception($"Failed to create user '{pair.Key}'");
@@ -207,8 +210,11 @@ internal sealed class SeederServerBuilder
                     if (user.DiscordIntegration != null)
                         user.DiscordIntegration.DiscordUserId = discordUserId;
                     else
+                    {
                         user.DiscordIntegration = new DiscordIntegrationData { DiscordUserId = discordUserId };
-                    _logger.LogInformation("Seeder: Added discord integration with discord user id {discordUserId} for user {userName}", discordUserId, pair.Key);
+                        _logger.LogInformation("Seeder: Added discord integration with discord user id {discordUserId} for user {userName}", discordUserId, pair.Key);
+                        _isUpToDate = false;
+                    }
                 }
             }
             await _userManager.UpdateAsync(user);
@@ -222,7 +228,11 @@ internal sealed class SeederServerBuilder
         foreach (var fraction in fractions)
         {
             var id = fraction.Value.Id;
-            await _fractionService.InternalCreateFraction(id, fraction.Key, fraction.Value.Code, fraction.Value.Position);
+            if(await _fractionService.InternalCreateFraction(id, fraction.Key, fraction.Value.Code, fraction.Value.Position))
+            {
+                _logger.LogInformation("Seeder: Created fraction of id {fractionId} name: {fractionName}, code: {fractionCode}.", id, fraction.Key, fraction.Value.Code);
+                _isUpToDate = false;
+            }
 
             foreach (var member in fraction.Value.Members)
             {
@@ -230,7 +240,10 @@ internal sealed class SeederServerBuilder
                 if (!_fractionService.HasMember(id, userId))
                 {
                     if (await _fractionService.TryAddMember(id, userId, member.Value.Rank, member.Value.RankName))
+                    {
                         _logger.LogInformation("Seeder: Added member {userId} with rank: {fractionRank} ({fractionRankName}) to the fraction with id {fractionId}.", userId, member.Value.Rank, member.Value.RankName, id);
+                        _isUpToDate = false;
+                    }
                 }
             }
             _logger.LogInformation("Seeder: Created fraction '{fractionCode}' with id {fractionId}.", fraction.Value.Code, id);
@@ -302,5 +315,9 @@ internal sealed class SeederServerBuilder
         BuildMarkers(seedData.Markers);
         await BuildGroups(seedData.Groups);
         _createdUsers.Clear();
+        if (_isUpToDate)
+        {
+            _logger.LogInformation("Seeder: Everything is up to date.");
+        }
     }
 }
