@@ -2,11 +2,16 @@
 using SlipeServer.Server;
 using SlipeServer.Server.Resources;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using Microsoft.AspNetCore.Hosting.Server;
 
 namespace RealmCore.Resources.CEFBlazorGui;
 
 internal class CEFBlazorGuiResource : Resource
 {
+    private readonly MtaServer _server;
+    private readonly string? _directoryPath;
+
     internal Dictionary<string, byte[]> AdditionalFiles { get; } = new Dictionary<string, byte[]>()
     {
         ["cefBlazorGui.lua"] = ResourceFiles.CEFBlazorGui,
@@ -16,22 +21,31 @@ internal class CEFBlazorGuiResource : Resource
     internal CEFBlazorGuiResource(MtaServer server, string? directoryPath)
         : base(server, server.GetRequiredService<RootElement>(), "CEFBlazorGui")
     {
+        var blazorOptions = server.GetRequiredService<IOptions<BlazorOptions>>();
         foreach (var (path, content) in AdditionalFiles)
             Files.Add(ResourceFileFactory.FromBytes(content, path));
+        _server = server;
+        _directoryPath = directoryPath;
 
+        if(blazorOptions.Value.Mode == CEFGuiBlazorMode.Local)
+            IncludeClientsideWebAssemblyFiles();
+    }
+
+    private void IncludeClientsideWebAssemblyFiles()
+    {
         string currentDir = Directory.GetCurrentDirectory();
-        if (directoryPath != null)
+        if (_directoryPath != null)
         {
-            var filesPath = System.IO.Path.Combine(currentDir, directoryPath);
+            var filesPath = System.IO.Path.Combine(currentDir, _directoryPath);
             try
             {
                 string searchPattern = "*.*";
-                string[] files = Directory.GetFiles(directoryPath, searchPattern, SearchOption.AllDirectories);
+                string[] files = Directory.GetFiles(_directoryPath, searchPattern, SearchOption.AllDirectories);
 
                 Dictionary<string, byte[]> dlls = new();
                 foreach (var file in files)
                 {
-                    var path = System.IO.Path.GetRelativePath(directoryPath, file);
+                    var path = System.IO.Path.GetRelativePath(_directoryPath, file);
                     if (path.EndsWith(".br") || path.EndsWith(".gz"))
                         continue;
 
@@ -86,7 +100,7 @@ internal class CEFBlazorGuiResource : Resource
             }
             catch (Exception ex)
             {
-                server.GetRequiredService<ILogger<CEFBlazorGuiResource>>().LogError(ex, "Failed to find production files.");
+                _server.GetRequiredService<ILogger<CEFBlazorGuiResource>>().LogError(ex, "Failed to find production files.");
             }
         }
     }
