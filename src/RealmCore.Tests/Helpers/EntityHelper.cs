@@ -21,7 +21,7 @@ internal class EntityHelper
         player.TriggerResourceStarted(420);
         entity.AddComponent<Transform>();
         entity.AddComponent<PlayerTagComponent>();
-        entity.AddComponent(new PlayerElementComponent(player, new Vector2(1920, 1080), new System.Globalization.CultureInfo("pl-PL"), null, null));
+        entity.AddComponent(new PlayerElementComponent(player, new Vector2(1920, 1080), new System.Globalization.CultureInfo("pl-PL"), null, _serviceProvider.GetRequiredService<IDateTimeProvider>()));
 
         return entity;
     }

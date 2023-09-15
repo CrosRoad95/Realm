@@ -42,7 +42,7 @@ public class GroupServiceTests
             .WithMessage($"Group '{groupName}' is already in use");
     }
 
-    //[Fact]
+    [Fact]
     public async Task YouCanAddMemberToGroup()
     {
         var userId = 1;
@@ -58,14 +58,11 @@ public class GroupServiceTests
 
         await groupService.AddMember(entity, group.id, 1, "Leader");
 
-        entity.GetRequiredComponent<GroupMemberComponent>().Should().BeEquivalentTo(new GroupMemberComponent(new GroupMemberData
-        {
-            UserId = userId,
-            GroupId = group.id,
-            RankName = "Leader",
-            Rank = 1,
-        }));
+        var groupMemberComponent = entity.GetRequiredComponent<GroupMemberComponent>();
         var group2 = await groupService.GetGroupByName("Test group3");
+        groupMemberComponent.GroupId.Should().Be(group.id);
+        groupMemberComponent.RankName.Should().Be("Leader");
+        groupMemberComponent.Rank.Should().Be(1);
         group2.Value.members.Should().HaveCount(1);
         group2.Value.members[0].userId.Should().Be(userId);
     }

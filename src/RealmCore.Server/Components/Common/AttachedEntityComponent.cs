@@ -64,5 +64,6 @@ public class AttachedEntityComponent : Component
     public override void Dispose()
     {
         _attachedEntity.Disposed -= HandleAttachedEntityDestroyed;
+        base.Dispose();
     }
 }

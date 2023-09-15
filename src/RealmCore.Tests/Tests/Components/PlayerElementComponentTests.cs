@@ -14,7 +14,7 @@ public class PlayerElementComponentTests
         _entityHelper = new(_server);
     }
 
-    //[Fact]
+    [Fact]
     public async Task TestAsyncBindsCooldown()
     {
         #region Arrange
@@ -38,7 +38,7 @@ public class PlayerElementComponentTests
         #endregion
     }
 
-    //[Fact]
+    [Fact]
     public async Task TestAsyncBindsThrowingException()
     {
         #region Arrange
@@ -60,7 +60,7 @@ public class PlayerElementComponentTests
         #endregion
     }
 
-    //[Fact]
+    [Fact]
     public void PlayerShouldBeAbleToFightWhenAtLeastOneFlagIsEnabled()
     {
         #region Arrange
@@ -78,7 +78,7 @@ public class PlayerElementComponentTests
         #endregion
     }
 
-    //[Fact]
+    [Fact]
     public void PlayerShouldNotBeAbleToFightWhenNoFlagIsSet()
     {
         #region Arrange

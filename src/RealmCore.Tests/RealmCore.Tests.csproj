@@ -29,5 +29,10 @@
 		<ProjectReference Include="..\RealmCore.Server\RealmCore.Server.csproj" />
 		<ProjectReference Include="..\RealmCore.SQLite\RealmCore.SQLite.csproj" />
 	</ItemGroup>
-
+	
+	<ItemGroup>
+		<None Update="xunit.runner.json">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
+	</ItemGroup>
 </Project>
