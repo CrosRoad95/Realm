@@ -18,6 +18,7 @@ using RealmCore.ECS;
 using RealmCore.Resources.Overlay;
 using RealmCore.Resources.Assets;
 using RealmCore.Persistence.Interfaces;
+using RealmCore.Server.Components.Elements.CollisionShapes;
 
 namespace RealmCore.Console.Logic;
 
@@ -1299,22 +1300,97 @@ internal sealed class CommandsLogic
         
         _commandService.AddCommandHandler("cefloadcounter", (entity, args) =>
         {
-            entity.GetRequiredComponent<BrowserComponent>().LoadRemotePage("counter");
-            _chatBox.OutputTo(entity, "Loaded");
+            entity.GetRequiredComponent<BrowserComponent>().LoadRemotePage("counter", false);
+            _chatBox.OutputTo(entity, "Loaded counter");
         });
         _commandService.AddCommandHandler("cefloadindex", (entity, args) =>
         {
-            entity.GetRequiredComponent<BrowserComponent>().LoadRemotePage("/");
-            _chatBox.OutputTo(entity, "Loaded");
+            entity.GetRequiredComponent<BrowserComponent>().LoadRemotePage("/", false);
+            _chatBox.OutputTo(entity, "Loaded /");
         });
 
+        _commandService.AddCommandHandler("openblazor", (entity, args) =>
+        {
+            entity.GetRequiredComponent<BrowserComponent>().Visible = true;
+            _chatBox.OutputTo(entity, "Open");
+        });
         _commandService.AddCommandHandler("closeblazor", (entity, args) =>
         {
             entity.GetRequiredComponent<BrowserComponent>().Close();
             _chatBox.OutputTo(entity, "Closed");
         });
 
+        _commandService.AddCommandHandler("collisionshapes", (entity, args) =>
+        {
+            var col1 = _entityFactory.CreateCollisionSphere(entity.Transform.Position + new Vector3(6, 0, 0), 3);
+            var col2 = _entityFactory.CreateCollisionSphere(entity.Transform.Position + new Vector3(-6, 0, 0), 3);
 
+            var collisionSphere1 = col1.GetRequiredComponent<CollisionSphereElementComponent>();
+            var collisionSphere2 = col2.GetRequiredComponent<CollisionSphereElementComponent>();
+
+            collisionSphere1.EntityEntered += (a, b) =>
+            {
+                _chatBox.OutputTo(entity, "Entered collisionSphere 1");
+            };
+            collisionSphere2.EntityEntered += (a, b) =>
+            {
+                _chatBox.OutputTo(entity, "Entered collisionSphere 2");
+            };
+            collisionSphere1.EntityLeft += (a, b) =>
+            {
+                _chatBox.OutputTo(entity, "Left collisionSphere 1");
+            };
+            collisionSphere2.EntityLeft += (a, b) =>
+            {
+                _chatBox.OutputTo(entity, "Left collisionSphere 2");
+            };
+        });
+
+        _commandService.AddAsyncCommandHandler("collisionshapes2", async (entity, args) =>
+        {
+            var pos1 = entity.Transform.Position + new Vector3(6, 0, 0);
+            var pos2 = entity.Transform.Position + new Vector3(-6, 0, 0);
+            var col1 = _entityFactory.CreateCollisionSphere(pos1, 3);
+            var col2 = _entityFactory.CreateCollisionSphere(pos2, 3);
+
+            var collisionSphere1 = col1.GetRequiredComponent<CollisionSphereElementComponent>();
+            var collisionSphere2 = col2.GetRequiredComponent<CollisionSphereElementComponent>();
+
+            collisionSphere1.EntityEntered += (a, b) =>
+            {
+                _chatBox.OutputTo(entity, "Entered collisionSphere 1");
+            };
+            collisionSphere2.EntityEntered += (a, b) =>
+            {
+                _chatBox.OutputTo(entity, "Entered collisionSphere 2");
+            };
+            collisionSphere1.EntityLeft += (a, b) =>
+            {
+                _chatBox.OutputTo(entity, "Left collisionSphere 1");
+            };
+            collisionSphere2.EntityLeft += (a, b) =>
+            {
+                _chatBox.OutputTo(entity, "Left collisionSphere 2");
+            };
+
+            int counter = 20;
+            bool a = false;
+            while (true)
+            {
+                a = !a;
+                if (a)
+                {
+                    entity.Transform.Position = pos1;
+                }
+                else
+                {
+                    entity.Transform.Position = pos2;
+                }
+                await Task.Delay(500);
+                if (counter-- == 0)
+                    break;
+            }
+        });
     }
 
     static int _hudPosition = 0;

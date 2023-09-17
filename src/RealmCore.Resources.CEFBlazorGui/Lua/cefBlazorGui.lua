@@ -98,12 +98,10 @@ function handleSetPath(path, force, isAsync)
 	end
 end
 
-local scheduledVisibility = false;
 function handleSetRemotePath(path)
 	currentPath = path;
 	isRemote = true;
 	loadBrowserURL(webBrowser, path)
-	scheduledVisibility = true;
 	showCursor(true, false);
 end
 
@@ -137,12 +135,6 @@ local function handleLoad(mode, x, y, remoteUrl, requestWhitelistUrl)
 				end
 
 				addEventHandler ( "onClientBrowserDocumentReady", sourceBrowser, handleClientBrowserDocumentReady)
-				addEventHandler ( "onClientBrowserDocumentReady", sourceBrowser, function(...)
-					if(scheduledVisibility)then
-						internalSetVisible(true)
-						scheduledVisibility = false
-					end
-				end)
 				itrace("Request: ",requestWhitelistUrl)
 				if(isBrowserDomainBlocked ( requestWhitelistUrl ))then
 					requestBrowserDomains({ requestWhitelistUrl })
