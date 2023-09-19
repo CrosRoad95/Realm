@@ -104,6 +104,10 @@ public static class ServerBuilderExtensions
         serverBuilder.AddLogic<FocusableComponentLogic>();
         serverBuilder.AddLogic<CollisionShapeElementComponentLogic>();
         serverBuilder.AddLogic<StatefulHudComponentLogic>();
+        serverBuilder.AddLogic<JobSessionComponentLogic>();
+        serverBuilder.AddLogic<InteractionComponentLogic>();
+        serverBuilder.AddLogic<Hud3dComponentBaseLogic>();
+        serverBuilder.AddLogic<LiftableWorldObjectComponentLogic>();
         #endregion
 
         return serverBuilder;

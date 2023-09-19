@@ -22,7 +22,10 @@ internal sealed class FocusableComponentLogic : ComponentLogic<FocusableComponen
         {
             if(playerElementComponent.FocusedEntity != null)
             {
-                playerElementComponent.FocusedEntity.GetRequiredComponent<FocusableComponent>().RemoveFocusedPlayer(playerEntity);
+                if(playerElementComponent.FocusedEntity.TryGetComponent(out FocusableComponent focusableComponent))
+                {
+                    focusableComponent.RemoveFocusedPlayer(playerEntity);
+                }
             }
         }
         else

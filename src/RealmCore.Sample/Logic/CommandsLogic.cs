@@ -1391,6 +1391,18 @@ internal sealed class CommandsLogic
                     break;
             }
         });
+
+        _commandService.AddCommandHandler("privateelementdisposable", async (entity, args) =>
+        {
+            using var scopedEntityFactory = _entityFactory.CreateScopedEntityFactory(entity);
+            scopedEntityFactory.CreateMarker(MarkerType.Cylinder, entity.Transform.Position, Color.White);
+            var marker = scopedEntityFactory.GetLastCreatedComponent<PlayerPrivateElementComponent<MarkerElementComponent>>();
+            marker.ElementComponent.Size = 4;
+            marker.ElementComponent.Color = Color.Red;
+            await Task.Delay(1000);
+            entity.DestroyComponent(marker);
+            _chatBox.Output("destory marker");
+        });
     }
 
     static int _hudPosition = 0;

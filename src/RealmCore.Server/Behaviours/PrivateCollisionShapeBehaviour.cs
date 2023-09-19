@@ -73,19 +73,19 @@ internal sealed class PrivateCollisionShapeBehaviour
             _markerElementComponentsLock.EnterWriteLock();
             try
             {
-                // TODO: run outside write lock
-                foreach (var markerElementComponent in _markerElementComponents)
-                {
-                    markerElementComponent.RefreshColliders();
-                }
-
-                if(_markerElementsToRemove.Count > 0)
+                if (_markerElementsToRemove.Count > 0)
                 {
                     foreach (var item in _markerElementsToRemove)
                     {
                         _markerElementComponents.Remove(item);
                     }
                     _markerElementsToRemove.Clear();
+                }
+
+                // TODO: run outside write lock
+                foreach (var markerElementComponent in _markerElementComponents)
+                {
+                    markerElementComponent.RefreshColliders();
                 }
             }
             catch(Exception ex)

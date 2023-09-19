@@ -27,6 +27,11 @@ internal sealed class ScopedEntityFactory : IScopedEntityFactory
         }
     }
 
+    public T GetLastCreatedComponent<T>() where T: PlayerPrivateElementComponentBase
+    {
+        return (T)LastCreatedComponent;
+    }
+
     public event Action<IScopedEntityFactory, PlayerPrivateElementComponentBase>? ComponentCreated;
 
     public ScopedEntityFactory(Entity entity, IElementCollection elementCollection, IEntityEngine entityEngine)

@@ -92,7 +92,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RealmCore.Console.Extra", "
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RealmCore.BlazorGuiHelper", "src\RealmCore.BlazorGuiHelper\RealmCore.BlazorGuiHelper.csproj", "{1AF3CD22-DF43-4020-90DA-C60893022289}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RealmCore.ECS", "src\RealmCore.ECS\RealmCore.ECS.csproj", "{71FAB860-EDB8-4BA3-9F85-D8C05DB5B594}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RealmCore.ECS", "src\RealmCore.ECS\RealmCore.ECS.csproj", "{71FAB860-EDB8-4BA3-9F85-D8C05DB5B594}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

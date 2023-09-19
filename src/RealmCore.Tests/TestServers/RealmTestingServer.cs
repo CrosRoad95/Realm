@@ -91,6 +91,7 @@ internal class RealmTestingServer : TestingServer
             services.AddSingleton<ISpawnMarkersService, SpawnMarkersService>();
             services.AddSingleton<ICEFBlazorGuiService, CEFBlazorGuiService>();
             services.AddSingleton<IBlazorGuiService, BlazorGuiService>();
+            services.AddSingleton<IEntityFactory, EntityFactory>();
             services.AddSingleton<IAssetEncryptionProvider, TestAssetEncryptionProvider>();
             services.AddSingleton(guiSystemServiceMock.Object);
 

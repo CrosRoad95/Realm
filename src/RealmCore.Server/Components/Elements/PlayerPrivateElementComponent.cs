@@ -70,7 +70,8 @@ public class PlayerPrivateElementComponent<TElementComponent> : PlayerPrivateEle
     protected override void Detach()
     {
         _elementComponent.Detached -= HandleDetachedFromEntity;
-        Entity.TryDestroyComponent(_elementComponent);
+        _elementComponent.InternalDetach();
+        _elementComponent.Dispose();
     }
 }
 

@@ -13,9 +13,15 @@ public class TransportEntityObjective : Objective
 
     public override Vector3 Position => _position;
 
-    public TransportEntityObjective(Entity? entity, Vector3 position, bool createMarker = true)
+    public TransportEntityObjective(Entity entity, Vector3 position, bool createMarker = true)
     {
         _entity = entity;
+        _position = position;
+        _createMarker = createMarker;
+    }
+    
+    public TransportEntityObjective(Vector3 position, bool createMarker = true)
+    {
         _position = position;
         _createMarker = createMarker;
     }
@@ -27,11 +33,11 @@ public class TransportEntityObjective : Objective
         if (_createMarker)
         {
             scopedEntityFactory.CreateMarker(MarkerType.Arrow, _position, Color.White);
-            _markerElementComponent = scopedEntityFactory.LastCreatedComponent as PlayerPrivateElementComponent<MarkerElementComponent>;
+            _markerElementComponent = scopedEntityFactory.GetLastCreatedComponent<PlayerPrivateElementComponent<MarkerElementComponent>>();
         }
 
         scopedEntityFactory.CreateCollisionSphere(_position, 1.5f);
-        _collisionSphereElementComponent = scopedEntityFactory.LastCreatedComponent as PlayerPrivateElementComponent<CollisionSphereElementComponent>;
+        _collisionSphereElementComponent = scopedEntityFactory.GetLastCreatedComponent<PlayerPrivateElementComponent<CollisionSphereElementComponent>>();
         _collisionSphereElementComponent.ElementComponent.EntityEntered = EntityEntered;
         _checkEnteredTimer = new System.Timers.Timer(TimeSpan.FromSeconds(0.25f));
         _checkEnteredTimer.Elapsed += HandleElapsed;

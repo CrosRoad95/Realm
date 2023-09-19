@@ -223,9 +223,6 @@ public class MarkerElementComponent : ElementComponent
     private void HandlePreDisposed(Entity entity)
     {
         entity.PreDisposed -= HandlePreDisposed;
-        _collisionShape.ElementEntered -= HandleElementEntered;
-        _collisionShape.ElementLeft -= HandleElementLeft;
-        _collisionShape.Destroy();
     }
 
     protected override void Attach()
@@ -251,6 +248,10 @@ public class MarkerElementComponent : ElementComponent
     {
         if (!IsPerPlayer)
             Entity.Transform.PositionChanged -= HandlePositionChanged;
+
+        _collisionShape.ElementEntered -= HandleElementEntered;
+        _collisionShape.ElementLeft -= HandleElementLeft;
+
         base.Detach();
     }
 

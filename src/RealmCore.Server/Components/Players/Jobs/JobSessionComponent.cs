@@ -6,37 +6,43 @@ public abstract class JobSessionComponent : SessionComponent
 
     private readonly List<Objective> _objectives = new();
     private readonly object _lock = new();
-    private bool _disposing = false;
     private int _completedObjectives = 0;
+    private bool _disposing = false;
 
     public IEnumerable<Objective> Objectives => _objectives;
     public int CompletedObjectives => _completedObjectives;
     public event Action<JobSessionComponent>? CompletedAllObjectives;
-    public event Action<JobSessionComponent, Objective> ObjectiveAdded;
+    public event Action<JobSessionComponent, Objective>? ObjectiveAdded;
     public JobSessionComponent()
     {
 
     }
 
-    protected void RemoveObjective(Objective objective)
+    protected bool RemoveObjective(Objective objective)
     {
+        ThrowIfDisposed();
+
         var empty = false;
         lock (_lock)
         {
-            _objectives.Remove(objective);
-            if (!_disposing)
-                empty = _objectives.Count == 0;
+            if (!_objectives.Remove(objective))
+                return false;
+            empty = _objectives.Count == 0;
         }
 
         if (empty && !_disposing)
             CompletedAllObjectives?.Invoke(this);
+        return true;
     }
 
     protected TObjective AddObjective<TObjective>(TObjective objective) where TObjective : Objective
     {
+        ThrowIfDisposed();
+
         objective.Entity = Entity;
         lock (_lock)
             _objectives.Add(objective);
+
         ObjectiveAdded?.Invoke(this, objective);
         objective.Completed += HandleCompleted;
         objective.Disposed += HandleDisposed;
@@ -58,9 +64,10 @@ public abstract class JobSessionComponent : SessionComponent
         _completedObjectives++;
     }
 
-    public override void Dispose()
+    protected override void Detach()
     {
         _disposing = true;
+
         lock (_lock)
         {
             while (_objectives.Count > 0)
@@ -70,6 +77,5 @@ public abstract class JobSessionComponent : SessionComponent
                 RemoveObjective(objective);
             }
         }
-        base.Dispose();
     }
 }

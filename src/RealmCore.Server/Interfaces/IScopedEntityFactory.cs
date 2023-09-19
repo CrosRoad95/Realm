@@ -7,4 +7,6 @@ public interface IScopedEntityFactory : IEntityFactoryBase, IDisposable
     PlayerPrivateElementComponentBase? LastCreatedComponent { get; }
 
     event Action<IScopedEntityFactory, PlayerPrivateElementComponentBase>? ComponentCreated;
+
+    T GetLastCreatedComponent<T>() where T : PlayerPrivateElementComponentBase;
 }
