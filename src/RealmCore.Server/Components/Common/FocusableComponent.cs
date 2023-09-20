@@ -66,4 +66,17 @@ public class FocusableComponent : Component
             }
         }
     }
+
+    protected override void Detach()
+    {
+        lock (_lock)
+        {
+            foreach (var focusedPlayer in _focusedPlayers)
+            {
+                if (focusedPlayer.TryGetComponent(out PlayerElementComponent playerElementComponent) && playerElementComponent.FocusedEntity == Entity)
+                    playerElementComponent.FocusedEntity = null;
+            }
+        }
+        base.Detach();
+    }
 }

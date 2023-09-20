@@ -10,13 +10,13 @@ public class OwnerDisposableComponent : Component
         OwningEntity.PreDisposed += HandlePreDisposed;
     }
 
-    private void HandlePreDisposed(Entity entity)
+    protected override void Detach()
     {
-        Entity.Dispose();
+        OwningEntity.PreDisposed -= HandlePreDisposed;
     }
 
-    public override void Dispose()
+    private void HandlePreDisposed(Entity entity)
     {
-        OwningEntity.Disposed -= HandlePreDisposed;
+        Dispose();
     }
 }

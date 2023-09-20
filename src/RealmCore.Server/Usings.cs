@@ -121,6 +121,8 @@ global using RealmCore.Server.Components.Elements.Abstractions;
 global using RealmCore.Persistence.Data;
 global using RealmCore.Persistence.Interfaces;
 global using RealmCore.Server.Structs;
+global using RealmCore.ECS.Interfaces;
+global using RealmCore.Server.Events;
 
 global using ILogger = Microsoft.Extensions.Logging.ILogger;
 

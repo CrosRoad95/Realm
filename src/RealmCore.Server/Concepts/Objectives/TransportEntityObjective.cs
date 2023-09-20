@@ -8,7 +8,6 @@ public class TransportEntityObjective : Objective
     private PlayerPrivateElementComponent<MarkerElementComponent>? _markerElementComponent;
     private PlayerPrivateElementComponent<CollisionSphereElementComponent> _collisionSphereElementComponent = default!;
     private Entity _playerEntity = default!;
-    private System.Timers.Timer _checkEnteredTimer = default!;
     public Func<Entity, bool>? CheckEntity { get; set; }
 
     public override Vector3 Position => _position;
@@ -18,8 +17,19 @@ public class TransportEntityObjective : Objective
         _entity = entity;
         _position = position;
         _createMarker = createMarker;
+
+        _entity.Disposed += HandleDisposed;
     }
-    
+
+    private void HandleDisposed(Entity entity)
+    {
+        if(_entity != null)
+        {
+            _entity.Disposed -= HandleDisposed;
+            Incomplete(this);
+        }
+    }
+
     public TransportEntityObjective(Vector3 position, bool createMarker = true)
     {
         _position = position;
@@ -39,37 +49,28 @@ public class TransportEntityObjective : Objective
         scopedEntityFactory.CreateCollisionSphere(_position, 1.5f);
         _collisionSphereElementComponent = scopedEntityFactory.GetLastCreatedComponent<PlayerPrivateElementComponent<CollisionSphereElementComponent>>();
         _collisionSphereElementComponent.ElementComponent.EntityEntered = EntityEntered;
-        _checkEnteredTimer = new System.Timers.Timer(TimeSpan.FromSeconds(0.25f));
-        _checkEnteredTimer.Elapsed += HandleElapsed;
-        _checkEnteredTimer.Start();
+
     }
 
-    private void HandleElapsed(object? sender, System.Timers.ElapsedEventArgs e)
+    public override void Update()
     {
-        try
-        {
-            ThrowIfDisposed();
+        ThrowIfDisposed();
 
-            if(_entity == null)
+        if (_entity == null)
+        {
+            _collisionSphereElementComponent.ElementComponent.RefreshColliders();
+        }
+        else
+        {
+            if (_entity.TryGetComponent(out LiftableWorldObjectComponent liftableWorldObjectComponent))
             {
-                _collisionSphereElementComponent.ElementComponent.RefreshColliders();
+                if (liftableWorldObjectComponent.Owner == null) // Accept only dropped entities.
+                    _collisionSphereElementComponent.ElementComponent.CheckCollisionWith(_entity);
             }
             else
             {
-                if (_entity.TryGetComponent(out LiftableWorldObjectComponent liftableWorldObjectComponent))
-                {
-                    if (liftableWorldObjectComponent.Owner == null) // Accept only dropped entities.
-                        _collisionSphereElementComponent.ElementComponent.CheckCollisionWith(_entity);
-                }
-                else
-                {
-                    _collisionSphereElementComponent.ElementComponent.CheckCollisionWith(_entity);
-                }
+                _collisionSphereElementComponent.ElementComponent.CheckCollisionWith(_entity);
             }
-        }
-        catch (Exception)
-        {
-            // TODO: Capture
         }
     }
 
@@ -97,17 +98,14 @@ public class TransportEntityObjective : Objective
         }
         else
         {
+            _entity.Disposed -= HandleDisposed;
             if (entity == _entity)
-                Complete(this);
+                Complete(this, entity);
         }
     }
 
     public override void Dispose()
     {
-        if(_entity != null)
-            _entity.Dispose();
-        _checkEnteredTimer.Stop();
-        _checkEnteredTimer.Dispose();
         if(_markerElementComponent != null)
             _playerEntity.TryDestroyComponent(_markerElementComponent);
         _playerEntity.TryDestroyComponent(_collisionSphereElementComponent);

@@ -19,6 +19,7 @@ internal class TestJobComponent : JobSessionComponent
 
         var objectEntity = _entityFactory.CreateObject(SlipeServer.Server.Enums.ObjectModel.Gunbox, new Vector3(379.00f, -102.77f, 1.24f), Vector3.Zero);
         objectEntity.AddComponent<LiftableWorldObjectComponent>();
+        objectEntity.AddComponent(new OwnerDisposableComponent(Entity));
         var objective2 = AddObjective(new TransportEntityObjective(objectEntity, new Vector3(379.00f, -112.77f, 2.0f)));
         objective2.Completed += ObjectiveBCompleted;
         var objective3 = AddObjective(new TransportEntityObjective(new Vector3(379.00f, -105.77f, 2.0f)));

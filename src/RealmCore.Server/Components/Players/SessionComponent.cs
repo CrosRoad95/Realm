@@ -38,10 +38,9 @@ public abstract class SessionComponent : Component
         _stopwatch.Reset();
         _stopwatch.Start();
         SessionStarted?.Invoke(Entity);
-        Entity.Disposed += HandleDisposed;
     }
 
-    private void HandleDisposed(Entity entity)
+    protected override void Detach()
     {
         End();
     }
@@ -49,8 +48,6 @@ public abstract class SessionComponent : Component
     public void End()
     {
         ThrowIfDisposed();
-
-        Entity.Disposed -= HandleDisposed;
         SessionEnded?.Invoke(Entity);
         _stopwatch.Stop();
     }

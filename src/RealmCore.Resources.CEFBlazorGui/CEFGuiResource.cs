@@ -3,7 +3,6 @@ using SlipeServer.Server;
 using SlipeServer.Server.Resources;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Microsoft.AspNetCore.Hosting.Server;
 
 namespace RealmCore.Resources.CEFBlazorGui;
 

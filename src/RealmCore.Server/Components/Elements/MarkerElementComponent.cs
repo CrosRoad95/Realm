@@ -123,8 +123,6 @@ public class MarkerElementComponent : ElementComponent
 
     public void RefreshColliders()
     {
-        ThrowIfDisposed();
-
         if (_collisionShape is CollisionSphere collisionSphere)
         {
             var elements = _elementCollection.GetWithinRange(_collisionShape.Position, collisionSphere.Radius);
@@ -138,8 +136,6 @@ public class MarkerElementComponent : ElementComponent
 
     public void CheckCollisionWith(Entity entity)
     {
-        ThrowIfDisposed();
-
         if (entity.TryGetComponent(out ElementComponent elementComponent))
         {
             _collisionShape.CheckElementWithin(elementComponent.Element);

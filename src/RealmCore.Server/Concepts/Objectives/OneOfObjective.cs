@@ -5,7 +5,8 @@ public class OneOfObjective : Objective
     private readonly Objective[] _objectives;
     private bool _completed = false;
     private object _lock = new();
-    public override Vector3 Position => throw new NotImplementedException();
+
+    public override Vector3 Position => throw new NotSupportedException();
 
     public OneOfObjective(params Objective[] objectives)
     {
@@ -21,6 +22,24 @@ public class OneOfObjective : Objective
             item.Entity = playerEntity;
             item.LoadInternal(entityFactory, playerEntity, Logger);
         }
+    }
+
+    public override void Update()
+    {
+        bool completed = false;
+        void handleCompleted(Objective _1, object? _2)
+        {
+            completed = true;
+        }
+        Completed += handleCompleted;
+        var objectives = new List<Objective>(_objectives);
+        foreach (var item in objectives)
+        {
+            if (completed)
+                break;
+            item.Update();
+        }
+        Completed -= handleCompleted;
     }
 
     private void HandleIncompleted(Objective objective)
@@ -45,7 +64,7 @@ public class OneOfObjective : Objective
             _completed = true;
         }
 
-        Complete(this);
+        Complete(this, data);
         DisposeChildObjectives(objective);
     }
 

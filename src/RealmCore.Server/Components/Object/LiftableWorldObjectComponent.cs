@@ -58,7 +58,7 @@ public class LiftableWorldObjectComponent : InteractionComponent
             if (Owner == null)
                 return false;
 
-            Owner.Disposed -= HandleOwnerPreDisposed;
+            Owner.PreDisposed -= HandleOwnerPreDisposed;
             Dropped?.Invoke(this, Owner);
             Owner = null;
         }

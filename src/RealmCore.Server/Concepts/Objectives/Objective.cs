@@ -19,6 +19,7 @@ public abstract class Objective : IDisposable
     public abstract Vector3 Position { get; }
     protected ILogger Logger { get; set; } = default!;
     protected abstract void Load(IEntityFactory entityFactory, Entity playerEntity);
+    public virtual void Update() { }
 
     internal void LoadInternal(IEntityFactory entityFactory, Entity playerEntity, ILogger logger)
     {
@@ -71,7 +72,7 @@ public abstract class Objective : IDisposable
 
         using var scopedEntityFactory = _entityFactory.CreateScopedEntityFactory(Entity);
         scopedEntityFactory.CreateBlip(blipIcon, Position);
-        _blipElementComponent = scopedEntityFactory.LastCreatedComponent as PlayerPrivateElementComponent<BlipElementComponent>;
+        _blipElementComponent = scopedEntityFactory.GetLastCreatedComponent<PlayerPrivateElementComponent<BlipElementComponent>>();
         _blipElementComponent.Disposed += HandleBlipElementComponentDisposed;
     }
 
@@ -102,9 +103,6 @@ public abstract class Objective : IDisposable
         ThrowIfDisposed();
         if (_blipElementComponent != null)
             RemoveBlip();
-
-        if (!_isFulfilled)
-            Incomplete(this);
 
         _disposed = true;
 

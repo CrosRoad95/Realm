@@ -1,6 +1,6 @@
 ﻿namespace RealmCore.Server.Logic.Components;
 
-internal sealed class CollisionShapeElementComponentLogic : ComponentLogic<CollisionShapeElementComponent>
+internal sealed class CollisionShapeElementComponentLogic : ComponentLogic<CollisionShapeElementComponent, PlayerPrivateElementComponentBase>
 {
     private readonly IEntityEngine _entityEngine;
     private readonly IElementCollection _elementCollection;
@@ -19,6 +19,22 @@ internal sealed class CollisionShapeElementComponentLogic : ComponentLogic<Colli
     protected override void ComponentDetached(CollisionShapeElementComponent collisionShapeElementComponent)
     {
         collisionShapeElementComponent.CollidersRefreshed = null;
+    }
+
+    protected override void ComponentAdded(PlayerPrivateElementComponentBase playerPrivateElementComponentBase)
+    {
+        if (playerPrivateElementComponentBase is PlayerPrivateElementComponent<CollisionSphereElementComponent> privateCollisionSphereElementComponent)
+        {
+            ComponentAdded(privateCollisionSphereElementComponent.ElementComponent);
+        }
+    }
+
+    protected override void ComponentDetached(PlayerPrivateElementComponentBase playerPrivateElementComponentBase)
+    {
+        if (playerPrivateElementComponentBase is PlayerPrivateElementComponent<CollisionSphereElementComponent> privateCollisionSphereElementComponent)
+        {
+            ComponentDetached(privateCollisionSphereElementComponent.ElementComponent);
+        }
     }
 
     private void HandleCollidersRefreshed(CollisionShapeElementComponent collisionShapeElementComponent)

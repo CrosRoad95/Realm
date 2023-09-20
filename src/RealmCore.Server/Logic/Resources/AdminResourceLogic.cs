@@ -51,7 +51,7 @@ internal sealed class AdminResourceLogic
         }
     }
 
-    private LuaValue GetDebugComponent(RealmCore.ECS.Interfaces.IComponent component)
+    private LuaValue GetDebugComponent(IComponent component)
     {
         var data = new Dictionary<LuaValue, LuaValue>
         {

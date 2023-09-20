@@ -1,6 +1,6 @@
 ﻿namespace RealmCore.Server.Components.Players;
 
-internal interface IStatefulHudComponent : RealmCore.ECS.Interfaces.IComponent
+internal interface IStatefulHudComponent : IComponent
 {
     internal string Id { get; }
 

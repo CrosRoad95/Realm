@@ -14,7 +14,7 @@ internal sealed class FocusableComponentLogic : ComponentLogic<FocusableComponen
 
     private void HandleFocusedElementChanged(Player player, Element? focusedElement)
     {
-        if (!_entityEngine.TryGetEntityByPlayer(player, out var playerEntity))
+        if (!_entityEngine.TryGetEntityByPlayer(player, out var playerEntity) || playerEntity == null)
             return;
 
         var playerElementComponent = playerEntity.GetRequiredComponent<PlayerElementComponent>();
@@ -30,7 +30,7 @@ internal sealed class FocusableComponentLogic : ComponentLogic<FocusableComponen
         }
         else
         {
-            if(_entityEngine.TryGetByElement(focusedElement, out var elementEntity))
+            if(_entityEngine.TryGetByElement(focusedElement, out var elementEntity) && elementEntity != null)
             {
                 elementEntity.GetRequiredComponent<FocusableComponent>().AddFocusedPlayer(playerEntity);
             }

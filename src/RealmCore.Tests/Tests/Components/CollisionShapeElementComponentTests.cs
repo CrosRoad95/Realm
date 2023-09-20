@@ -23,7 +23,7 @@ public class CollisionShapeElementComponentTests
         var serviceProvider = services.BuildServiceProvider();
         var entityEngine = serviceProvider.GetRequiredService<IEntityEngine>();
         _entity = entityEngine.CreateEntity();
-        _collisionSphereElementComponent = new(new CollisionSphere(new System.Numerics.Vector3(0, 0, 0), 10), entityEngine);
+        _collisionSphereElementComponent = new(new CollisionSphere(new Vector3(0, 0, 0), 10), entityEngine);
         _entity.AddComponent<Transform>();
         _entity.AddComponent(_collisionSphereElementComponent);
     }
