@@ -62,6 +62,7 @@ public class SampleServer
             serverBuilder.AddLogic<DefaultBanLogic>();
             serverBuilder.AddLogic<DefaultChatLogic>();
             serverBuilder.AddLogic<BlazorGuiLogic>();
+            serverBuilder.AddLogic<PlayTimeComponentLogic>();
 
 #if DEBUG
             if (withDgs)
