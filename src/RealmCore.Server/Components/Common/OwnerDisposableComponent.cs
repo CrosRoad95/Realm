@@ -7,6 +7,13 @@ public class OwnerDisposableComponent : Component
     public OwnerDisposableComponent(Entity owningEntity)
     {
         OwningEntity = owningEntity;
+    }
+
+    protected override void Attach()
+    {
+        if (OwningEntity == Entity)
+            throw new ArgumentException(nameof(OwningEntity));
+
         OwningEntity.PreDisposed += HandlePreDisposed;
     }
 
@@ -17,6 +24,6 @@ public class OwnerDisposableComponent : Component
 
     private void HandlePreDisposed(Entity entity)
     {
-        Dispose();
+        Entity.Dispose();
     }
 }
