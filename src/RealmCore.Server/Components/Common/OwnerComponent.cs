@@ -7,16 +7,24 @@ public class OwnerComponent : Component
     public OwnerComponent(Entity owningEntity)
     {
         OwningEntity = owningEntity;
-        OwningEntity.Disposed += HandleDisposed;
     }
 
-    private void HandleDisposed(Entity entity)
+    protected override void Attach()
+    {
+        if (OwningEntity == Entity)
+            throw new ArgumentException(nameof(OwningEntity));
+
+        OwningEntity.PreDisposed += HandlePreDisposed;
+        base.Attach();
+    }
+
+    private void HandlePreDisposed(Entity entity)
     {
         Entity.DestroyComponent(this);
     }
 
     public override void Dispose()
     {
-        OwningEntity.Disposed -= HandleDisposed;
+        OwningEntity.PreDisposed -= HandlePreDisposed;
     }
 }
