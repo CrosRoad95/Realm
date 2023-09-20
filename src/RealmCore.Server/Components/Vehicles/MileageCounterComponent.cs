@@ -1,10 +1,13 @@
 ﻿namespace RealmCore.Server.Components.Vehicles;
 
-public class MileageCounterComponent : Component
+public class MileageCounterComponent : Component, IUpdateCallback
 {
     private Vector3 _lastPosition;
     private float _mileage;
     private float _minimumDistanceThreshold;
+    private VehicleElementComponent? _vehicleElementComponent;
+
+    public event Action<MileageCounterComponent, float, float>? Traveled;
 
     public float Mileage
     {
@@ -50,34 +53,29 @@ public class MileageCounterComponent : Component
 
     protected override void Attach()
     {
-        Entity.Transform.PositionChanged += HandlePositionChanged;
+        _vehicleElementComponent = Entity.GetRequiredComponent<VehicleElementComponent>();
     }
 
-    protected override void Detach()
+    public void Update()
     {
-        Entity.Transform.PositionChanged -= HandlePositionChanged;
-    }
+        if (_vehicleElementComponent == null)
+            return;
 
-    private void HandlePositionChanged(Transform transform, Vector3 position, bool sync)
-    {
-        Update();
-    }
-
-    private void Update()
-    {
-        var vehicle = Entity.GetRequiredComponent<VehicleElementComponent>();
-        if (!vehicle.IsEngineOn)
+        var transform = Entity.Transform;
+        if (!_vehicleElementComponent.IsEngineOn)
         {
-            _lastPosition = Entity.Transform.Position;
+            _lastPosition = transform.Position;
             return;
         }
-        if (!vehicle.IsEngineOn || vehicle.IsFrozen)
+        if (!_vehicleElementComponent.IsEngineOn || _vehicleElementComponent.IsFrozen)
             return;
 
-        var traveledDistance = Entity.Transform.Position - _lastPosition;
-        if (_minimumDistanceThreshold > traveledDistance.Length())
+        var traveledDistance = transform.Position - _lastPosition;
+        var traveledDistanceNumber = traveledDistance.Length();
+        if (_minimumDistanceThreshold > traveledDistanceNumber)
             return;
-        _lastPosition = Entity.Transform.Position;
-        _mileage += traveledDistance.Length();
+        _lastPosition = transform.Position;
+        _mileage += traveledDistanceNumber;
+        Traveled?.Invoke(this, _mileage, traveledDistanceNumber);
     }
 }
