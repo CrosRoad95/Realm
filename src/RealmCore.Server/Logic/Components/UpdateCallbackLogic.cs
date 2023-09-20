@@ -1,22 +1,40 @@
-﻿namespace RealmCore.Server.Logic.Components;
+﻿using RealmCore.Server.Events;
 
-internal sealed class UpdateCallbackLogic : ComponentLogic<IUpdateCallback>
+namespace RealmCore.Server.Logic.Components;
+
+internal sealed class UpdateCallbackLogic : ComponentLogic<IUpdateCallback, IRareUpdateCallback>
 {
     private readonly System.Timers.Timer _updateTimer;
+    private readonly System.Timers.Timer _rareUpdateTimer;
     private readonly ILogger<UpdateCallbackLogic> _logger;
-    private List<IUpdateCallback> _updateCallbacks = new();
-    private List<IUpdateCallback> _updateCallbacksToAdd = new();
-    private List<IUpdateCallback> _updateCallbacksToRemove = new();
-    private object _updateCallbacksLock = new();
-    private object _updateCallbacksToAddLock = new();
-    private object _updateCallbacksToRemoveLock = new();
+
+    private readonly List<IUpdateCallback> _updateCallbacks = new();
+    private readonly List<IUpdateCallback> _updateCallbacksToAdd = new();
+    private readonly List<IUpdateCallback> _updateCallbacksToRemove = new();
+    private readonly object _updateCallbacksLock = new();
+    private readonly object _updateCallbacksToAddLock = new();
+    private readonly object _updateCallbacksToRemoveLock = new();
+
+    private readonly List<IRareUpdateCallback> _rareUpdateCallbacks = new();
+    private readonly List<IRareUpdateCallback> _rareUpdateCallbacksToAdd = new();
+    private readonly List<IRareUpdateCallback> _rareUpdateCallbacksToRemove = new();
+    private readonly object _rareUpdateCallbacksLock = new();
+    private readonly object _rareUpdateCallbacksToAddLock = new();
+    private readonly object _rareUpdateCallbacksToRemoveLock = new();
 
     public UpdateCallbackLogic(IEntityEngine entityEngine, ILogger<UpdateCallbackLogic> logger) : base(entityEngine)
     {
-        _updateTimer = new System.Timers.Timer(1000.0f/20.0f);
+        _logger = logger;
+
+        _updateTimer = new System.Timers.Timer();
+        _updateTimer.Interval = 1000.0f / 20.0f;
         _updateTimer.Elapsed += HandleElapsed;
         _updateTimer.Start();
-        _logger = logger;
+
+        _rareUpdateTimer = new System.Timers.Timer();
+        _rareUpdateTimer.Interval = 1000;
+        _rareUpdateTimer.Elapsed += HandleRareElapsed;
+        _rareUpdateTimer.Start();
     }
 
     private void HandleElapsed(object? sender, System.Timers.ElapsedEventArgs e)
@@ -57,15 +75,65 @@ internal sealed class UpdateCallbackLogic : ComponentLogic<IUpdateCallback>
         }
     }
 
+    private void HandleRareElapsed(object? sender, System.Timers.ElapsedEventArgs e)
+    {
+        lock (_rareUpdateCallbacksLock)
+        {
+            lock (_rareUpdateCallbacksToAdd)
+            {
+                _rareUpdateCallbacks.AddRange(_rareUpdateCallbacksToAdd);
+                _rareUpdateCallbacksToAdd.Clear();
+            }
+        }
+
+        lock (_rareUpdateCallbacksLock)
+        {
+            foreach (var rareUpdateCallback in _rareUpdateCallbacks)
+            {
+                try
+                {
+                    rareUpdateCallback.RareUpdate();
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogHandleError(ex);
+                }
+            }
+        }
+
+        lock (_rareUpdateCallbacksLock)
+        {
+            lock (_rareUpdateCallbacksToRemove)
+            {
+                foreach (var rareUpdateCallback in _rareUpdateCallbacksToRemove)
+                {
+                    _rareUpdateCallbacks.Remove(rareUpdateCallback);
+                }
+            }
+        }
+    }
+
     protected override void ComponentAdded(IUpdateCallback updateCallback)
     {
         lock (_updateCallbacksToAddLock)
             _updateCallbacksToAdd.Add(updateCallback);
     }
 
-    protected override void ComponentDetached(IUpdateCallback component)
+    protected override void ComponentDetached(IUpdateCallback updateCallback)
     {
         lock(_updateCallbacksToRemoveLock)
-            _updateCallbacksToRemove.Add(component);
+            _updateCallbacksToRemove.Add(updateCallback);
+    }
+
+    protected override void ComponentAdded(IRareUpdateCallback rareUpdateCallback)
+    {
+        lock (_rareUpdateCallbacksToAddLock)
+            _rareUpdateCallbacksToAdd.Add(rareUpdateCallback);
+    }
+
+    protected override void ComponentDetached(IRareUpdateCallback rareUpdateCallback)
+    {
+        lock (_rareUpdateCallbacksToRemoveLock)
+            _rareUpdateCallbacksToRemove.Add(rareUpdateCallback);
     }
 }

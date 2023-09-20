@@ -1,6 +1,6 @@
 ﻿namespace RealmCore.Server.Components.Vehicles;
 
-public class MileageCounterComponent : Component, IUpdateCallback
+public class MileageCounterComponent : Component, IRareUpdateCallback
 {
     private Vector3 _lastPosition;
     private float _mileage;
@@ -56,7 +56,7 @@ public class MileageCounterComponent : Component, IUpdateCallback
         _vehicleElementComponent = Entity.GetRequiredComponent<VehicleElementComponent>();
     }
 
-    public void Update()
+    public void RareUpdate()
     {
         if (_vehicleElementComponent == null)
             return;
