@@ -1,4 +1,5 @@
-﻿using RealmCore.Server.Policies;
+﻿using RealmCore.Persistence.Data;
+using RealmCore.Server.Policies;
 using SlipeServer.Server.Concepts;
 using SlipeServer.Server.Elements;
 using SlipeServer.Server.Events;
@@ -28,10 +29,10 @@ public class RealmCommandServiceTests
         _sut = new RealmCommandService(_commandService, _logger.Object, _ecsMock.Object, _usersServiceMock.Object, _policyDrivenCommandExecutor, _chatBox);
     }
 
-    //[InlineData("foo", "FOO", true)]
-    //[InlineData("foo", "foo", true)]
-    //[InlineData("foo", "bar", false)]
-    //[Theory]
+    [InlineData("foo", "FOO", true)]
+    [InlineData("foo", "foo", true)]
+    [InlineData("foo", "bar", false)]
+    [Theory]
     public void YouCanNotCreateTwoSameCommands(string command1, string command2, bool shouldThrow)
     {
         _sut.ClearCommands();
@@ -51,10 +52,10 @@ public class RealmCommandServiceTests
         }
     }
 
-    //[InlineData("foo", "FOO", true)]
-    //[InlineData("foo", "foo", true)]
-    //[InlineData("foo", "bar", false)]
-    //[Theory]
+    [InlineData("foo", "FOO", true)]
+    [InlineData("foo", "foo", true)]
+    [InlineData("foo", "bar", false)]
+    [Theory]
     public void YouCanNotCreateTwoSameCommandsMixedAsyncAndNotAsync(string command1, string command2, bool shouldThrow)
     {
         _sut.ClearCommands();
@@ -74,10 +75,10 @@ public class RealmCommandServiceTests
         }
     }
 
-    //[InlineData("foo", "FOO", true)]
-    //[InlineData("foo", "foo", true)]
-    //[InlineData("foo", "bar", false)]
-    //[Theory]
+    [InlineData("foo", "FOO", true)]
+    [InlineData("foo", "foo", true)]
+    [InlineData("foo", "bar", false)]
+    [Theory]
     public void YouCanNotCreateTwoSameAsyncCommands(string command1, string command2, bool shouldThrow)
     {
         _sut.ClearCommands();
@@ -97,14 +98,17 @@ public class RealmCommandServiceTests
         }
     }
 
-    //[InlineData(true)]
-    //[InlineData(false)]
-    //[Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    [Theory]
     public async Task AddCommandHandlerShouldWork(bool useAsyncHandler)
     {
         var player = new Player();
         var playerEntity = _entityHelper.CreatePlayerEntity();
-        await playerEntity.AddComponentAsync(new UserComponent(null, null, null));
+        await playerEntity.AddComponentAsync(new UserComponent(new UserData
+        {
+            Upgrades = new List<UserUpgradeData>()
+        }, null, null));
 
         _ecsMock.Setup(x => x.TryGetEntityByPlayer(player, out playerEntity, false)).Returns(true);
         _sut.ClearCommands();

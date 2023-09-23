@@ -5,7 +5,6 @@ namespace RealmCore.Server.Services;
 
 public sealed class RealmCommandService
 {
-
     public abstract class CommandInfo
     {
         public string CommandName { get; init; }
@@ -109,6 +108,7 @@ public sealed class RealmCommandService
         var command = _commandService.AddCommand(commandName);
         _commands.Add(commandName, new SyncCommandInfo(callback)
         {
+            CommandName = commandName,
             RequiredPolicies = requiredPolicies,
             Description = description,
             Usage = usage,
