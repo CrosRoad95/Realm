@@ -34,5 +34,4 @@ public class OutlineComponent : Component
     {
         Entity.DestroyComponent(this);
     }
-
 }

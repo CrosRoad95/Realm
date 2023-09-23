@@ -114,4 +114,29 @@ public class LiftableWorldObjectComponentTests
         monitored.Should().Raise(nameof(LiftableWorldObjectComponent.Dropped));
         #endregion
     }
+
+    [Fact]
+    public void OnlyWhitelistedEntitiesShouldBeAbleToLiftOtherEntity()
+    {
+        #region Arrange
+        var entity1 = new Entity();
+        var entity2 = new Entity();
+        var entity3 = new Entity();
+        entity1.AddComponent<Transform>();
+        entity1.AddComponent<TestElementComponent>();
+        var liftableWorldObjectComponent = entity1.AddComponent(new LiftableWorldObjectComponent(entity2));
+        #endregion
+
+        #region Act
+        bool lifted1 = liftableWorldObjectComponent.TryLift(entity2);
+        if (lifted1)
+            liftableWorldObjectComponent.TryDrop();
+        bool lifted2 = liftableWorldObjectComponent.TryLift(entity3);
+        #endregion
+
+        #region Assert
+        lifted1.Should().BeTrue();
+        lifted2.Should().BeFalse();
+        #endregion
+    }
 }
