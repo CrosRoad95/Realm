@@ -11,15 +11,19 @@ public class FocusableComponent : Component
     {
         get
         {
+            ThrowIfDisposed();
+
             lock (_lock)
                 return _focusedPlayers.Count;
         }
     }
 
-    public IEnumerable<Entity> FocusedPlayer
+    public IEnumerable<Entity> FocusedPlayers
     {
         get
         {
+            ThrowIfDisposed();
+
             lock (_lock)
             {
                 foreach (var focusedPlayer in _focusedPlayers)
@@ -30,8 +34,13 @@ public class FocusableComponent : Component
         }
     }
 
-    internal void AddFocusedPlayer(Entity entity)
+    internal bool AddFocusedPlayer(Entity entity)
     {
+        ThrowIfDisposed();
+
+        if (entity == Entity)
+            throw new InvalidOperationException(nameof(entity));
+
         lock (_lock)
         {
             if (!_focusedPlayers.Contains(entity))
@@ -39,23 +48,32 @@ public class FocusableComponent : Component
                 _focusedPlayers.Add(entity);
                 entity.Disposed += HandleDisposed;
                 PlayerFocused?.Invoke(this, entity);
+                return true;
             }
         }
+        return false;
     }
 
-    private void HandleDisposed(Entity entity)
+    internal bool RemoveFocusedPlayer(Entity entity)
     {
+        ThrowIfDisposed();
+
+        if (entity == Entity)
+            throw new InvalidOperationException(nameof(entity));
+
         lock (_lock)
         {
             if (_focusedPlayers.Remove(entity))
             {
                 entity.Disposed -= HandleDisposed;
                 PlayerLostFocus?.Invoke(this, entity);
+                return true;
             }
         }
+        return false;
     }
 
-    internal void RemoveFocusedPlayer(Entity entity)
+    private void HandleDisposed(Entity entity)
     {
         lock (_lock)
         {
@@ -73,6 +91,7 @@ public class FocusableComponent : Component
         {
             foreach (var focusedPlayer in _focusedPlayers)
             {
+                PlayerLostFocus?.Invoke(this, focusedPlayer);
                 if (focusedPlayer.TryGetComponent(out PlayerElementComponent playerElementComponent) && playerElementComponent.FocusedEntity == Entity)
                     playerElementComponent.FocusedEntity = null;
             }
