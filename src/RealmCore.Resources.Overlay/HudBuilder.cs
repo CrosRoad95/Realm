@@ -60,7 +60,7 @@ internal class HudBuilder<TState> : IHudBuilder<TState>
         }
     }
 
-    public int AllocateId() => ++_id;
+    public int AllocateId() => Interlocked.Increment(ref _id);
 
     public ITextAndHudBuilder<TState> AddText(Action<ITextHudBuilder<TState>> textBuilderCallback)
     {

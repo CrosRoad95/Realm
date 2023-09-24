@@ -16,7 +16,7 @@ public static class LuaEventExtensions
     {
         if (typeof(T) == typeof(LuaValue))
             return (T)(object)luaValue;
-        return (T)fromLuaValueMapper.Map(typeof(T), luaValue);
+        return (T?)fromLuaValueMapper.Map(typeof(T), luaValue) ?? throw new InvalidOperationException();
     }
 
     public static T Read<T>(this LuaEvent luaEvent, FromLuaValueMapper fromLuaValueMapper)

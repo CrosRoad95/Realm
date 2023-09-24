@@ -12,7 +12,10 @@ public static class LoggerExtensions
         if (entity.TryGetComponent(out UserComponent userComponent))
             data["userId"] = userComponent.Id;
         if (entity.TryGetComponent(out PlayerElementComponent playerElementComponent))
-            data["serial"] = playerElementComponent.Client.Serial;
+        {
+            if(playerElementComponent.Client.Serial != null)
+                data["serial"] = playerElementComponent.Client.Serial;
+        }
         if (entity.TryGetComponent(out PrivateVehicleComponent privateVehicleComponent))
             data["vehicleId"] = privateVehicleComponent.Id;
 
@@ -33,7 +36,8 @@ public static class LoggerExtensions
         {
             case Player player:
                 data["name"] = player.Name;
-                data["serial"] = player.Client.Serial;
+                if(player.Client.Serial != null)
+                    data["serial"] = player.Client.Serial;
                 break;
         }
         return logger.BeginScope(data);

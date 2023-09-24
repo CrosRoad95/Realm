@@ -45,7 +45,7 @@ internal sealed class CollisionShapeElementComponentLogic : ComponentLogic<Colli
             var elements = _elementCollection.GetWithinRange(collisionSphere.Position, collisionSphere.Radius);
             foreach (var element2 in elements)
             {
-                if (_entityEngine.TryGetByElement(element2, out Entity entity))
+                if (_entityEngine.TryGetByElement(element2, out Entity? entity) && entity != null)
                     collisionShapeElementComponent.CheckCollisionWith(entity);
             }
         }

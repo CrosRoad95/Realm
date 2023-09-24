@@ -137,7 +137,7 @@ public sealed class RealmCommandService
             return;
 
         var player = args.Player;
-        if (!_ecs.TryGetEntityByPlayer(player, out var entity))
+        if (!_ecs.TryGetEntityByPlayer(player, out var entity) || entity == null)
             return;
 
         if (!entity.TryGetComponent<UserComponent>(out var userComponent) || !entity.TryGetComponent<PlayerElementComponent>(out var playerElementComponent))
@@ -233,7 +233,7 @@ public sealed class RealmCommandService
             return;
 
         var player = args.Player;
-        if (!_ecs.TryGetEntityByPlayer(player, out var entity))
+        if (!_ecs.TryGetEntityByPlayer(player, out var entity) || entity == null)
             return;
 
         if (!entity.TryGetComponent<UserComponent>(out var userComponent) || !entity.TryGetComponent<PlayerElementComponent>(out var playerElementComponent))

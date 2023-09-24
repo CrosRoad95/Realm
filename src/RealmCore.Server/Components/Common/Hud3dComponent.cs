@@ -1,6 +1,6 @@
 ﻿namespace RealmCore.Server.Components.Common;
 
-public class Hud3dComponentBase : Component
+public abstract class Hud3dComponentBase : Component
 {
     private static int _idCounter = 0;
     protected readonly int _id;
@@ -23,10 +23,7 @@ public class Hud3dComponentBase : Component
         Removed?.Invoke(this, _id);
     }
 
-    internal void BuildHud(IOverlayService overlayService)
-    {
-        throw new NotImplementedException();
-    }
+    internal abstract void BuildHud(IOverlayService overlayService);
 }
 
 public class Hud3dComponent<TState> : Hud3dComponentBase where TState : class
@@ -69,7 +66,7 @@ public class Hud3dComponent<TState> : Hud3dComponentBase where TState : class
         _dynamicHudComponents.Add(dynamicHudComponent);
     }
 
-    internal void BuildHud(IOverlayService overlayService)
+    internal override void BuildHud(IOverlayService overlayService)
     {
         overlayService.CreateHud3d(_id.ToString(), e =>
         {

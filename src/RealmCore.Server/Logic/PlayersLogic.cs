@@ -166,7 +166,7 @@ internal class PlayersLogic
 
     private async void HandlePlayerDisconnected(Player player, PlayerQuitEventArgs e)
     {
-        if (!_entityEngine.TryGetEntityByPlayer(player, out var playerEntity, true))
+        if (!_entityEngine.TryGetEntityByPlayer(player, out var playerEntity, true) || playerEntity == null)
             return;
         try
         {

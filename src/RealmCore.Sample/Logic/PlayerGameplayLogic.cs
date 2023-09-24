@@ -69,6 +69,9 @@ internal sealed class PlayerGameplayLogic
         else if (playerEntity.TryGetComponent(out CurrentInteractEntityComponent currentInteractEntityComponent))
         {
             var currentInteractEntity = currentInteractEntityComponent.CurrentInteractEntity;
+            if (currentInteractEntity == null)
+                return;
+
             if (currentInteractEntity.TryGetComponent(out InteractionComponent interactionComponent) && playerEntity.DistanceTo(currentInteractEntity) < interactionComponent.MaxInteractionDistance)
             {
                 var playerElementComponent = playerEntity.GetRequiredComponent<PlayerElementComponent>();

@@ -177,7 +177,13 @@ internal sealed class UsersService : IUsersService
             playerEntity = null!;
             return false;
         }
-        return _ecs.TryGetEntityByPlayer(player, out playerEntity);
+        if(_ecs.TryGetEntityByPlayer(player, out var foundPlayerEntity) && foundPlayerEntity != null)
+        {
+            playerEntity = foundPlayerEntity;
+            return true;
+        }
+        playerEntity = null!;
+        return false;
     }
     
     public async Task<bool> TryUpdateLastNickName(Entity playerEntity)
@@ -195,7 +201,7 @@ internal sealed class UsersService : IUsersService
         var players = _elementCollection.GetByType<Player>().Where(x => x.Name.Contains(pattern.ToLower(), StringComparison.CurrentCultureIgnoreCase));
         foreach (var player in players)
         {
-            if (_ecs.TryGetEntityByPlayer(player, out var playerEntity))
+            if (_ecs.TryGetEntityByPlayer(player, out var playerEntity) && playerEntity != null)
                 yield return playerEntity;
         }
     }

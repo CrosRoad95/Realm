@@ -226,7 +226,7 @@ internal sealed class EntityEngine : IEntityEngine
         var elements = _elementCollection.GetWithinRange(position, range);
         foreach (var element in elements)
         {
-            if (TryGetByElement(element, out var entity))
+            if (TryGetByElement(element, out var entity) && entity != null)
                 yield return entity;
         }
     }

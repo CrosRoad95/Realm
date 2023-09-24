@@ -90,8 +90,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RealmCore.Sample", "src\Rea
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RealmCore.Console.Extra", "src\RealmCore.Console.Extra\RealmCore.Console.Extra.csproj", "{8841B6ED-B3AD-4589-9EE6-C09D353CFAC6}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RealmCore.BlazorGuiHelper", "src\RealmCore.BlazorGuiHelper\RealmCore.BlazorGuiHelper.csproj", "{1AF3CD22-DF43-4020-90DA-C60893022289}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RealmCore.ECS", "src\RealmCore.ECS\RealmCore.ECS.csproj", "{71FAB860-EDB8-4BA3-9F85-D8C05DB5B594}"
 EndProject
 Global
@@ -382,14 +380,6 @@ Global
 		{8841B6ED-B3AD-4589-9EE6-C09D353CFAC6}.Release|Any CPU.Build.0 = Release|Any CPU
 		{8841B6ED-B3AD-4589-9EE6-C09D353CFAC6}.Release|x64.ActiveCfg = Release|x64
 		{8841B6ED-B3AD-4589-9EE6-C09D353CFAC6}.Release|x64.Build.0 = Release|x64
-		{1AF3CD22-DF43-4020-90DA-C60893022289}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{1AF3CD22-DF43-4020-90DA-C60893022289}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{1AF3CD22-DF43-4020-90DA-C60893022289}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{1AF3CD22-DF43-4020-90DA-C60893022289}.Debug|x64.Build.0 = Debug|Any CPU
-		{1AF3CD22-DF43-4020-90DA-C60893022289}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{1AF3CD22-DF43-4020-90DA-C60893022289}.Release|Any CPU.Build.0 = Release|Any CPU
-		{1AF3CD22-DF43-4020-90DA-C60893022289}.Release|x64.ActiveCfg = Release|Any CPU
-		{1AF3CD22-DF43-4020-90DA-C60893022289}.Release|x64.Build.0 = Release|Any CPU
 		{71FAB860-EDB8-4BA3-9F85-D8C05DB5B594}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{71FAB860-EDB8-4BA3-9F85-D8C05DB5B594}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{71FAB860-EDB8-4BA3-9F85-D8C05DB5B594}.Debug|x64.ActiveCfg = Debug|Any CPU
