@@ -51,6 +51,9 @@ public abstract class HudComponent<TState> : Component, IStatefulHudComponent wh
     public HudComponent(TState defaultState, Vector2? offset = null)
     {
         _defaultState = defaultState;
+        var initialState = GetInitialState();
+        if (initialState != null)
+            _defaultState = initialState;
         _offset = offset;
     }
 
@@ -58,7 +61,19 @@ public abstract class HudComponent<TState> : Component, IStatefulHudComponent wh
 
     protected void UpdateState(Action<TState> callback)
     {
-        _hud.UpdateState(callback);
+        if (_hud == null)
+        {
+            callback(_defaultState);
+        }
+        else
+        {
+            _hud.UpdateState(callback);
+        }
+    }
+
+    protected virtual TState? GetInitialState()
+    {
+        return null;
     }
 
     protected abstract void Build(IHudBuilder<TState> hudBuilderCallback);

@@ -1,13 +1,9 @@
 ﻿using RealmCore.Resources.Assets.Interfaces;
 using RealmCore.Resources.Overlay.Enums;
-using SlipeServer.Packets.Definitions.Lua;
-using System.Drawing;
-using System.Numerics;
-using RealmCore.Resources.Base.Extensions;
 using RealmCore.Resources.Overlay.Builders.Interfaces;
-using RealmCore.Resources.Overlay.Extensions;
 using System.Reflection;
 using System.Linq.Expressions;
+using RealmCore.Resources.Overlay.ConstructionInfos;
 
 namespace RealmCore.Resources.Overlay.Builders;
 
@@ -40,6 +36,8 @@ internal class TextHudBuilder<TState> : ITextHudBuilder<TState>
     private readonly int _id;
     private readonly TState _state;
     private readonly IAssetsService _assetsService;
+    public bool IsDynamic { get; private set; }
+    private List<PropertyInfo> _propertyInfos = new();
 
     public Action<DynamicHudComponent>? DynamicHudComponentAdded { get; set; }
 
@@ -68,6 +66,7 @@ internal class TextHudBuilder<TState> : ITextHudBuilder<TState>
         visitor.Visit(expression);
         var factory = expression.Compile();
         var value = factory(_state);
+        _propertyInfos = visitor.Properties;
         foreach (var propertyInfo in visitor.Properties)
             DynamicHudComponentAdded?.Invoke(new DynamicHudComponent
             {
@@ -75,12 +74,13 @@ internal class TextHudBuilder<TState> : ITextHudBuilder<TState>
                 PropertyInfo = propertyInfo,
             });
 
+        IsDynamic = true;
         return value;
     }
 
     public ITextHudBuilder<TState> WithText(Expression<Func<TState, string>> expression)
     {
-        _text = WithProperty(expression);
+        _text = WithProperty(expression) ?? string.Empty;
         return this;
     }
 
@@ -138,41 +138,40 @@ internal class TextHudBuilder<TState> : ITextHudBuilder<TState>
         return this;
     }
 
-    public LuaValue[] Build()
+    public TextConstructionInfo Build()
     {
         if (_computedValueType == null)
-            return new LuaValue[]
-            {
-                "text",
-                _id,
-                _text,
-                _position.X,
-                _position.Y,
-                _size.Width,
-                _size.Height,
-                _color.ToLuaColor(),
-                _scale?.Width ?? 1,
-                _scale?.Height ?? 1,
-                (_font != null) ? _assetsService.MapHandle(_font) : _stringFont,
-                _alignX.AsString(),
-                _alignY.AsString()
-            };
-
-        return new LuaValue[]
         {
-            "computedValue",
-            _id,
-            _computedValueType.Value.ToString(),
-            _position.X,
-            _position.Y,
-            _size.Width,
-            _size.Height,
-            _color.ToLuaColor(),
-            _scale?.Width ?? 1,
-            _scale?.Height ?? 1,
-            (_font != null) ? _assetsService.MapHandle(_font) : _stringFont,
-            _alignX.AsString(),
-            _alignY.AsString()
+            return new TextConstructionInfo
+            {
+                isDynamic = IsDynamic,
+                propertyInfos = _propertyInfos,
+                parentId = _id,
+                id = _id,
+                text = _text,
+                position = _position,
+                size = _size,
+                color = _color,
+                scale = _scale ?? new Size(1,1),
+                font = (_font != null) ? _assetsService.MapHandle(_font) : _stringFont,
+                alignX = _alignX,
+                alignY = _alignY
+            };
+        }
+
+        return new TextConstructionInfo
+        {
+            isComputed = true,
+            parentId = _id,
+            id = _id,
+            text = _computedValueType.Value.ToString(),
+            position = _position,
+            size = _size,
+            color = _color,
+            scale = _scale ?? new Size(1, 1),
+            font = (_font != null) ? _assetsService.MapHandle(_font) : _stringFont,
+            alignX = _alignX,
+            alignY = _alignY
         };
     }
 }

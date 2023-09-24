@@ -19,6 +19,7 @@ using RealmCore.Resources.Overlay;
 using RealmCore.Resources.Assets;
 using RealmCore.Persistence.Interfaces;
 using RealmCore.Server.Components.Elements.CollisionShapes;
+using RealmCore.Sample.Components.Huds;
 
 namespace RealmCore.Console.Logic;
 
@@ -590,6 +591,16 @@ internal sealed class CommandsLogic
         {
             var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();
             entity.AddComponent(new SampleHud2(assetsRegistry));
+        });
+
+        _commandService.AddCommandHandler("createhud3", async (entity, args) =>
+        {
+            var hud = entity.AddComponent(new SampleHud3());
+            while (true)
+            {
+                await Task.Delay(1000);
+                hud.Update();
+            }
         });
 
         _commandService.AddCommandHandler("updatestate2", (entity, args) =>

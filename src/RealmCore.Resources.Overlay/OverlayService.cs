@@ -2,8 +2,6 @@
 using RealmCore.Resources.Overlay.Interfaces;
 using SlipeServer.Packets.Definitions.Lua;
 using SlipeServer.Server.Elements;
-using System.Drawing;
-using System.Numerics;
 
 namespace RealmCore.Resources.Overlay;
 

@@ -91,7 +91,7 @@ public abstract class JobSessionComponent : SessionComponent, IUpdateCallback
         }
     }
 
-    public void Update()
+    public virtual void Update()
     {
         List<Objective> objectives;
         lock (_objectivesLock)

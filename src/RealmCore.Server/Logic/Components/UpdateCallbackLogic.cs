@@ -1,6 +1,4 @@
-﻿using RealmCore.Server.Events;
-
-namespace RealmCore.Server.Logic.Components;
+﻿namespace RealmCore.Server.Logic.Components;
 
 internal sealed class UpdateCallbackLogic : ComponentLogic<IUpdateCallback, IRareUpdateCallback>
 {
@@ -50,6 +48,17 @@ internal sealed class UpdateCallbackLogic : ComponentLogic<IUpdateCallback, IRar
 
         lock (_updateCallbacksLock)
         {
+            lock (_updateCallbacksToRemove)
+            {
+                foreach (var updateCallback in _updateCallbacksToRemove)
+                {
+                    _updateCallbacks.Remove(updateCallback);
+                }
+            }
+        }
+
+        lock (_updateCallbacksLock)
+        {
             foreach (var updateCallback in _updateCallbacks)
             {
                 try
@@ -59,17 +68,6 @@ internal sealed class UpdateCallbackLogic : ComponentLogic<IUpdateCallback, IRar
                 catch(Exception ex)
                 {
                     _logger.LogHandleError(ex);
-                }
-            }
-        }
-
-        lock (_updateCallbacksLock)
-        {
-            lock (_updateCallbacksToRemove)
-            {
-                foreach (var updateCallback in _updateCallbacksToRemove)
-                {
-                    _updateCallbacks.Remove(updateCallback);
                 }
             }
         }
@@ -88,6 +86,17 @@ internal sealed class UpdateCallbackLogic : ComponentLogic<IUpdateCallback, IRar
 
         lock (_rareUpdateCallbacksLock)
         {
+            lock (_rareUpdateCallbacksToRemove)
+            {
+                foreach (var rareUpdateCallback in _rareUpdateCallbacksToRemove)
+                {
+                    _rareUpdateCallbacks.Remove(rareUpdateCallback);
+                }
+            }
+        }
+
+        lock (_rareUpdateCallbacksLock)
+        {
             foreach (var rareUpdateCallback in _rareUpdateCallbacks)
             {
                 try
@@ -97,17 +106,6 @@ internal sealed class UpdateCallbackLogic : ComponentLogic<IUpdateCallback, IRar
                 catch (Exception ex)
                 {
                     _logger.LogHandleError(ex);
-                }
-            }
-        }
-
-        lock (_rareUpdateCallbacksLock)
-        {
-            lock (_rareUpdateCallbacksToRemove)
-            {
-                foreach (var rareUpdateCallback in _rareUpdateCallbacksToRemove)
-                {
-                    _rareUpdateCallbacks.Remove(rareUpdateCallback);
                 }
             }
         }
