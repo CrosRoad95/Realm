@@ -6,7 +6,7 @@ public class AFKComponent : Component
     public DateTime? LastAFK { get; private set; }
     public bool IsAFK { get; private set; }
     public event Action<AFKComponent, bool, TimeSpan>? StateChanged;
-    private object _lock = new();
+    private readonly object _lock = new();
 
     protected virtual void StateHasChanged(DateTime now)
     {

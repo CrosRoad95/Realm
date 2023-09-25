@@ -29,7 +29,7 @@ internal sealed class VehicleAccessService : IVehicleAccessService
         if (CanEnter == null)
             return false;
 
-        foreach (Func<Entity, Entity, bool> handler in CanEnter.GetInvocationList())
+        foreach (Func<Entity, Entity, bool> handler in CanEnter.GetInvocationList().Cast<Func<Entity, Entity, bool>>())
         {
             if (!handler.Invoke(pedEntity, vehicleEntity))
             {

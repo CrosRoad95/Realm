@@ -1,4 +1,5 @@
 ﻿using RealmCore.Server.Logic.Components;
+using RealmCore.Server.Logic.Elements;
 using RealmCore.SQLite;
 using SlipeServer.Resources.Scoreboard;
 
@@ -109,6 +110,7 @@ public static class ServerBuilderExtensions
         serverBuilder.AddLogic<Hud3dComponentBaseLogic>();
         serverBuilder.AddLogic<LiftableWorldObjectComponentLogic>();
         serverBuilder.AddLogic<UpdateCallbackLogic>();
+        serverBuilder.AddLogic<PickupElementComponentLogic>();
         #endregion
 
         return serverBuilder;

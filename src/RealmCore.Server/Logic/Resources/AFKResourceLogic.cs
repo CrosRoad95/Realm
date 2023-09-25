@@ -17,10 +17,12 @@ internal sealed class AFKResourceLogic
 
     private void HandlePlayerAFKStarted(Player player)
     {
-        if (_ecs.TryGetEntityByPlayer(player, out var entity))
+        if (_ecs.TryGetEntityByPlayer(player, out var entity) && entity != null)
         {
             if (entity.TryGetComponent(out AFKComponent afkComponent))
             {
+                using var _ = _logger.BeginEntity(entity);
+                _logger.LogInformation("Player started AFK");
                 afkComponent.HandlePlayerAFKStarted(_dateTimeProvider.Now);
             }
         }
@@ -28,10 +30,12 @@ internal sealed class AFKResourceLogic
 
     private void HandlePlayerAFKStopped(Player player)
     {
-        if (_ecs.TryGetEntityByPlayer(player, out var entity))
+        if (_ecs.TryGetEntityByPlayer(player, out var entity) && entity != null)
         {
             if (entity.TryGetComponent(out AFKComponent afkComponent))
             {
+                using var _ = _logger.BeginEntity(entity);
+                _logger.LogInformation("Player stopped AFK");
                 afkComponent.HandlePlayerAFKStopped(_dateTimeProvider.Now);
             }
         }
