@@ -8,15 +8,18 @@ internal sealed class AssetsLogic
 
     public AssetsLogic(AssetsRegistry assetsRegistry)
     {
-        foreach (var item in Directory.GetFiles(_basePath, "*.*", SearchOption.AllDirectories))
+        if(Directory.Exists(_basePath))
         {
-            var fileName = Path.GetRelativePath(_basePath, item);
-
-            switch (Path.GetDirectoryName(fileName))
+            foreach (var item in Directory.GetFiles(_basePath, "*.*", SearchOption.AllDirectories))
             {
-                case "Fonts":
-                    assetsRegistry.AddFont(Path.GetFileName(fileName), $"Server/Assets/{fileName}");
-                    break;
+                var fileName = Path.GetRelativePath(_basePath, item);
+
+                switch (Path.GetDirectoryName(fileName))
+                {
+                    case "Fonts":
+                        assetsRegistry.AddFont(Path.GetFileName(fileName), $"Server/Assets/{fileName}");
+                        break;
+                }
             }
         }
     }

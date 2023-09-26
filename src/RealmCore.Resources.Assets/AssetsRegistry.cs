@@ -14,7 +14,11 @@ public class AssetsRegistry : IServerAssetsProvider
 
     public AssetsRegistry()
     {
-        Directory.CreateDirectory("Server/Assets/Models/Procedural");
+        try
+        {
+            Directory.CreateDirectory("Server/Assets/Models/Procedural");
+        }
+        catch(Exception) { }
     }
 
     internal IAsset InternalGetAsset(string name)

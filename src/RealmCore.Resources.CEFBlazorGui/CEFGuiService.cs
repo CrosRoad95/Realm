@@ -1,7 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using RealmCore.Resources.Base.Interfaces;
-using RealmCore.Resources.CEFBlazorGui.DebugServer;
 using SlipeServer.Server.ElementCollections;
 using SlipeServer.Server.Elements;
 
@@ -11,7 +10,6 @@ internal sealed class CEFBlazorGuiService : ICEFBlazorGuiService
 {
     public event Action<Player>? PlayerCEFBlazorGuiStarted;
     public event Action<Player>? PlayerCEFBlazorGuiStopped;
-    private BlazorDebugServer? _blazorDebugServer;
     private readonly IElementCollection _elementCollection;
     private readonly ILogger<CEFBlazorGuiService> _logger;
 
@@ -32,12 +30,7 @@ internal sealed class CEFBlazorGuiService : ICEFBlazorGuiService
         _logger = logger;
         if (blazorOptions.Value.DebuggingServer)
         {
-            _blazorDebugServer = new()
-            {
-                InvokeAsyncHandler = HandleInvokeAsyncHandler,
-                InvokeVoidAsyncHandler = HandleInvokeVoidAsyncHandler
-            };
-            Task.Run(_blazorDebugServer.Start);
+            // TODO:
         }
     }
 
