@@ -12,3 +12,5 @@ RealmRPG/
 *.exe
 /src/RealmCore.Console/Server/BlazorGui
 *.keys
+src/RealmCore.BlazorGui/Properties/PublishProfiles/
+*.user
