@@ -1414,6 +1414,20 @@ internal sealed class CommandsLogic
             entity.DestroyComponent(marker);
             _chatBox.Output("destory marker");
         });
+
+        _commandService.AddCommandHandler("focusedelements", (entity, args) =>
+        {
+            var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();
+            _chatBox.OutputTo(entity, $"Focused entity: {playerElementComponent.FocusedEntity}");
+            if(playerElementComponent.FocusedEntity != null)
+            {
+                var focusableComponent = playerElementComponent.FocusedEntity.GetRequiredComponent<FocusableComponent>();
+                foreach (var focusedPlayer in focusableComponent.FocusedPlayers)
+                {
+                    _chatBox.OutputTo(entity, $"Focused player: {focusedPlayer}");
+                }
+            }
+        });
     }
 
     static int _hudPosition = 0;
