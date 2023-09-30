@@ -69,6 +69,22 @@ internal sealed class CommandsLogic
         _userWhitelistedSerialsRepository = userWhitelistedSerialsRepository;
         _vehicleRepository = vehicleRepository;
 
+        _commandService.AddAsyncCommandHandler("fadecamera", async (entity, args) =>
+        {
+            var playerEntity = entity.GetRequiredComponent<PlayerElementComponent>();
+            await playerEntity.FadeCameraAsync(CameraFade.Out, 5);
+            await playerEntity.FadeCameraAsync(CameraFade.In, 5);
+        });
+        
+        _commandService.AddAsyncCommandHandler("fadecamera2", async (entity, args) =>
+        {
+            var cancelationTokenSource = new CancellationTokenSource();
+            cancelationTokenSource.CancelAfter(2000);
+            var playerEntity = entity.GetRequiredComponent<PlayerElementComponent>();
+            await playerEntity.FadeCameraAsync(CameraFade.Out, 5, cancelationTokenSource.Token);
+            await playerEntity.FadeCameraAsync(CameraFade.In, 5);
+        });
+
         #region Commands for components tests
         _commandService.AddCommandHandler("focusablecomponent", (entity, args) =>
         {

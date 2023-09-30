@@ -392,11 +392,29 @@ public sealed class PlayerElementComponent : PedElementComponent
         _player.Camera.Fade(cameraFade, fadeTime);
     }
 
-    public Task FadeCameraAsync(CameraFade cameraFade, float fadeTime = 0.5f)
+    public async Task FadeCameraAsync(CameraFade cameraFade, float fadeTime = 0.5f, CancellationToken cancellationToken = default)
     {
         ThrowIfDisposed();
+        var cancellationTokenSource = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+        void handleDetached(Component component)
+        {
+            cancellationTokenSource.Cancel();
+        }
+        Detached += handleDetached;
         _player.Camera.Fade(cameraFade, fadeTime);
-        return Task.Delay(TimeSpan.FromSeconds(fadeTime));
+        try
+        {
+            await Task.Delay(TimeSpan.FromSeconds(fadeTime), cancellationTokenSource.Token);
+        }
+        catch(Exception)
+        {
+            _player.Camera.Fade(cameraFade == CameraFade.In ? CameraFade.Out : CameraFade.In, 0);
+            throw;
+        }
+        finally
+        {
+            Detached -= handleDetached;
+        }
     }
 
     public void SetCameraTarget(Entity entity)

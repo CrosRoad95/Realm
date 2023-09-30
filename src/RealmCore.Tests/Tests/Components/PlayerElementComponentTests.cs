@@ -82,7 +82,6 @@ public class PlayerElementComponentTests
     public void PlayerShouldNotBeAbleToFightWhenNoFlagIsSet()
     {
         #region Arrange
-
         var playerEntity = _entityHelper.CreatePlayerEntity();
         var playerElementComponent = playerEntity.GetRequiredComponent<PlayerElementComponent>();
         #endregion
@@ -94,6 +93,60 @@ public class PlayerElementComponentTests
 
         #region Assert
         playerElementComponent.Player.Controls.FireEnabled.Should().BeFalse();
+        #endregion
+    }
+
+    [Fact]
+    public async Task FadeCameraShouldWork()
+    {
+        #region Arrange
+        var playerEntity = _entityHelper.CreatePlayerEntity();
+        var playerElementComponent = playerEntity.GetRequiredComponent<PlayerElementComponent>();
+        #endregion
+
+        #region Act & Assert
+        await playerElementComponent.FadeCameraAsync(SlipeServer.Packets.Lua.Camera.CameraFade.Out, 0.1f);
+        await playerElementComponent.FadeCameraAsync(SlipeServer.Packets.Lua.Camera.CameraFade.In, 0.1f);
+        #endregion
+    }
+
+    [Fact]
+    public async Task FadeCameraShouldBeCancelable()
+    {
+        #region Arrange
+        var playerEntity = _entityHelper.CreatePlayerEntity();
+        var playerElementComponent = playerEntity.GetRequiredComponent<PlayerElementComponent>();
+        var cancellationTokenSource = new CancellationTokenSource(100);
+        #endregion
+
+        #region Act
+        var act = async () => await playerElementComponent.FadeCameraAsync(SlipeServer.Packets.Lua.Camera.CameraFade.Out, 10.0f, cancellationTokenSource.Token);
+        #endregion
+
+        #region Asset
+        await act.Should().ThrowAsync<OperationCanceledException>();
+        #endregion
+    }
+
+    [Fact]
+    public async Task FadeCameraShouldBeCanceledWhenPlayerQuit()
+    {
+        #region Arrange
+        var playerEntity = _entityHelper.CreatePlayerEntity();
+        var playerElementComponent = playerEntity.GetRequiredComponent<PlayerElementComponent>();
+        var _ = Task.Run(async () =>
+        {
+            await Task.Delay(100);
+            playerEntity.Dispose();
+        });
+        #endregion
+
+        #region Act
+        var act = async () => await playerElementComponent.FadeCameraAsync(SlipeServer.Packets.Lua.Camera.CameraFade.Out, 10.0f);
+        #endregion
+
+        #region Asset
+        await act.Should().ThrowAsync<OperationCanceledException>();
         #endregion
     }
 }
