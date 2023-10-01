@@ -42,9 +42,9 @@ public class PickupElementComponent : ElementComponent
 
     protected override void Detach()
     {
+        base.Detach();
         _pickup.CollisionShape.ElementEntered -= HandleElementEntered;
         _pickup.CollisionShape.ElementLeft -= HandleElementLeft;
-        base.Detach();
     }
 
     protected override void Attach()
@@ -77,5 +77,6 @@ public class PickupElementComponent : ElementComponent
         ElementLeft = null;
         _entityRuleFailed = null;
         Entity.Transform.PositionChanged -= HandlePositionChanged;
+        base.Dispose();
     }
 }

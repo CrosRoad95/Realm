@@ -89,6 +89,7 @@ public abstract class JobSessionComponent : SessionComponent, IUpdateCallback
                 RemoveObjective(objective);
             }
         }
+        base.Detach();
     }
 
     public virtual void Update()

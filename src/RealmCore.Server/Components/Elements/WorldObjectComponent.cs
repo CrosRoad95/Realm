@@ -23,9 +23,4 @@ public class WorldObjectComponent : ElementComponent
     {
         _worldObject = worldObject;
     }
-
-    public override void Dispose()
-    {
-        base.Dispose();
-    }
 }

@@ -228,6 +228,12 @@ public class VehicleElementComponent : ElementComponent
     public event Action<VehicleElementComponent, Entity>? PedLeft;
     public event Action<VehicleElementComponent>? Damaged;
 
+    internal VehicleElementComponent(Vehicle vehicle, IEntityEngine entityEngine)
+    {
+        _vehicle = vehicle;
+        _entityEngine = entityEngine;
+    }
+
     public void BlowUp()
     {
         ThrowIfDisposed();
@@ -282,12 +288,6 @@ public class VehicleElementComponent : ElementComponent
         _vehicle.RemovePassenger((Ped)pedEntity.GetElement(), warpsOut);
     }
 
-    internal VehicleElementComponent(Vehicle vehicle, IEntityEngine entityEngine)
-    {
-        _vehicle = vehicle;
-        _entityEngine = entityEngine;
-    }
-
     protected override void Attach()
     {
         _vehicle.RespawnPosition = _vehicle.Position;
@@ -303,6 +303,26 @@ public class VehicleElementComponent : ElementComponent
         _vehicle.PedEntered += HandlePedEntered;
         _vehicle.PedLeft += HandlePedLeft;
         base.Attach();
+    }
+
+    protected override void Detach()
+    {
+        _vehicle.Pushed -= HandlePushed;
+        _vehicle.LightStateChanged -= HandleLightStateChanged;
+        _vehicle.PanelStateChanged -= HandlePanelStateChanged;
+        _vehicle.WheelStateChanged -= HandleWheelStateChanged;
+        _vehicle.DoorStateChanged -= HandleDoorStateChanged;
+        _vehicle.HealthChanged -= HandleHealthChanged;
+        _vehicle.Blown -= HandleBlown;
+        _vehicle.PedEntered -= HandlePedEntered;
+        _vehicle.PedLeft -= HandlePedLeft;
+        base.Detach();
+    }
+
+    public void Fix()
+    {
+        ThrowIfDisposed();
+        _vehicle.Fix();
     }
 
     private void HandlePedLeft(Element ped, VehicleLeftEventArgs e)

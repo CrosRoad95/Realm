@@ -206,9 +206,4 @@ public abstract class ElementComponent : Component
             var destroyed = Element.Destroy();
         }
     }
-
-    public override void Dispose()
-    {
-        base.Dispose();
-    }
 }

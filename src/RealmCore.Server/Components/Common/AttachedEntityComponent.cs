@@ -42,7 +42,7 @@ public class AttachedEntityComponent : Component
         Entity.TryDestroyComponent(this);
     }
 
-    public bool TryDetach(out Entity entity)
+    public bool TryDetach(out Entity? entity)
     {
         lock (_lock)
         {
@@ -59,6 +59,7 @@ public class AttachedEntityComponent : Component
     protected override void Attach()
     {
         _attachedEntity.Disposed += HandleAttachedEntityDestroyed;
+        base.Attach();
     }
 
     public override void Dispose()

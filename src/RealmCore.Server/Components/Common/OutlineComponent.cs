@@ -22,12 +22,14 @@ public class OutlineComponent : Component
     {
         var element = Entity.GetRequiredComponent<ElementComponent>();
         element.Detached += HandleDetached;
+        base.Attach();
     }
     
     protected override void Detach()
     {
         var element = Entity.GetRequiredComponent<ElementComponent>();
         element.Detached -= HandleDetached;
+        base.Detach();
     }
 
     private void HandleDetached(Component component)
