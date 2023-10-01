@@ -158,9 +158,12 @@ internal sealed class UsersService : IUsersService
         }
     }
 
-    public async Task<bool> AuthorizePolicy(UserComponent userComponent, string policy)
+    public async ValueTask<bool> AuthorizePolicy(UserComponent userComponent, string policy, bool useCache = true)
     {
+        if (useCache && userComponent.HasAuthorizedPolicy(policy, out bool wasAuthorized))
+            return wasAuthorized;
         var result = await _authorizationService.AuthorizeAsync(userComponent.ClaimsPrincipal, policy);
+        userComponent.AddAuthorizedPolicy(policy, result.Succeeded);
         return result.Succeeded;
     }
 

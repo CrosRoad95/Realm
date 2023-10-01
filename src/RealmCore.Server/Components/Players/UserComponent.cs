@@ -3,6 +3,12 @@
 [ComponentUsage(false)]
 public class UserComponent : AsyncComponent
 {
+    private struct PolicyCache
+    {
+        public string policy;
+        public bool authorized;
+    }
+
     private readonly UserData? _user;
     private readonly SignInManager<UserData> _signInManager;
     private readonly UserManager<UserData> _userManager;
@@ -25,6 +31,8 @@ public class UserComponent : AsyncComponent
     public event Action<UserComponent, int, string>? SettingChanged;
     public event Action<UserComponent, int, string>? SettingRemoved;
     private readonly List<string> _roles = new();
+    private readonly object _authorizedPoliciesLock = new();
+    private readonly List<PolicyCache> _authorizedPolicies = new();
 
     internal UserComponent(UserData user, SignInManager<UserData> signInManager, UserManager<UserData> userManager)
     {
@@ -38,6 +46,34 @@ public class UserComponent : AsyncComponent
         }
     }
 
+    internal void AddAuthorizedPolicy(string policy, bool authorized)
+    {
+        lock (_authorizedPoliciesLock)
+        {
+            _authorizedPolicies.Add(new PolicyCache
+            {
+                policy = policy,
+                authorized = authorized
+            });
+        }
+    }
+
+    internal bool HasAuthorizedPolicy(string policy, out bool authorized)
+    {
+        lock (_authorizedPoliciesLock)
+        {
+            var index = _authorizedPolicies.FindIndex(x => x.policy == policy);
+            if (index == -1)
+            {
+                authorized = false;
+                return false;
+            }
+
+            authorized = _authorizedPolicies[index].authorized;
+            return true;
+        }
+    }
+
     protected override async Task LoadAsync()
     {
         await UpdateClaimsPrincipal();
@@ -48,6 +84,8 @@ public class UserComponent : AsyncComponent
         if (_user == null || _signInManager == null)
             return;
 
+        lock (_authorizedPoliciesLock)
+            _authorizedPolicies.Clear();
         _roles.Clear();
         _roles.AddRange(await GetRolesAsync());
         _claimsPrincipal = await _signInManager.CreateUserPrincipalAsync(_user);

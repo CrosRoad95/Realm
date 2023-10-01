@@ -52,7 +52,7 @@ internal sealed class CommandsLogic
 
     public CommandsLogic(RealmCommandService commandService, IEntityFactory entityFactory,
         ItemsRegistry itemsRegistry, IEntityEngine ecs, IBanService banService, ChatBox chatBox, ILogger<CommandsLogic> logger,
-        IDateTimeProvider dateTimeProvider, INametagsService nametagsService, IUsersService userManager, IVehiclesService vehiclesService,
+        IDateTimeProvider dateTimeProvider, INametagsService nametagsService, IUsersService usersService, IVehiclesService vehiclesService,
         GameWorld gameWorld, IElementOutlineService elementOutlineService, IAssetsService assetsService, ISpawnMarkersService spawnMarkersService, ILoadService loadService, IFeedbackService feedbackService, IOverlayService overlayService, AssetsRegistry assetsRegistry, VehicleUpgradeRegistry vehicleUpgradeRegistry, VehicleEnginesRegistry vehicleEnginesRegistry, IUserRepository userRepository, IUserWhitelistedSerialsRepository userWhitelistedSerialsRepository, IVehicleRepository vehicleRepository)
     {
         _commandService = commandService;
@@ -1151,12 +1151,12 @@ internal sealed class CommandsLogic
 
         _commandService.AddCommandHandler("kickme", (entity, args) =>
         {
-            userManager.Kick(entity, "test");
+            usersService.Kick(entity, "test");
         });
 
         _commandService.AddCommandHandler("getplayerbyname", (entity, args) =>
         {
-            if (userManager.TryGetPlayerByName(args.ReadArgument(), out var foundPlayer))
+            if (usersService.TryGetPlayerByName(args.ReadArgument(), out var foundPlayer))
             {
                 _chatBox.OutputTo(entity, "found");
             }
@@ -1166,7 +1166,7 @@ internal sealed class CommandsLogic
 
         _commandService.AddCommandHandler("findbyname", (entity, args) =>
         {
-            var players = userManager.SearchPlayersByName(args.ReadArgument());
+            var players = usersService.SearchPlayersByName(args.ReadArgument());
             _chatBox.OutputTo(entity, "found:");
             foreach (var item in players)
             {
@@ -1443,6 +1443,12 @@ internal sealed class CommandsLogic
                     _chatBox.OutputTo(entity, $"Focused player: {focusedPlayer}");
                 }
             }
+        });
+
+        _commandService.AddAsyncCommandHandler("testpolicy", async (entity, args) =>
+        {
+            bool authorized = await usersService.AuthorizePolicy(entity.GetRequiredComponent<UserComponent>(), "Admin");
+            _chatBox.OutputTo(entity, $"authorized: {authorized}");
         });
     }
 

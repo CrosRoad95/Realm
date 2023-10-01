@@ -2,7 +2,7 @@
 
 public interface IUsersService
 {
-    Task<bool> AuthorizePolicy(UserComponent userComponent, string policy);
+    ValueTask<bool> AuthorizePolicy(UserComponent userComponent, string policy, bool useCache = true);
     void Kick(Entity entity, string reason);
     Task<bool> QuickSignIn(Entity entity);
     IEnumerable<Entity> SearchPlayersByName(string pattern);
