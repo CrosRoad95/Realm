@@ -39,7 +39,6 @@ public class UserComponentTests
     public async Task ChangingRoleShouldClearPolicyAuthorizedCache()
     {
         #region Arrange
-
         var usersService = _server.GetRequiredService<IUsersService>();
         var player = _entityHelper.CreatePlayerEntity();
         var userComponent = await _entityHelper.LogInEntity(player);
@@ -58,6 +57,31 @@ public class UserComponentTests
         await userComponent.AddRole("Admin");
         isInCache = userComponent.HasAuthorizedPolicy("Admin", out bool _);
         isInCache.Should().BeFalse();
+        #endregion
+    }
+
+    [Fact]
+    public async Task SettingsShouldWork()
+    {
+        #region Arrange
+        var player = _entityHelper.CreatePlayerEntity();
+        var userComponent = await _entityHelper.LogInEntity(player);
+        #endregion
+
+        #region Acy
+        userComponent.SetSetting(1, "foo");
+        bool hasSetting = userComponent.TryGetSetting(1, out var settingValue);
+        string? gotSettingValue = userComponent.GetSetting(1);
+        bool removedSetting = userComponent.RemoveSetting(1);
+        string? gotSettingAfterRemove = userComponent.GetSetting(1);
+        #endregion
+
+        #region Assert
+        hasSetting.Should().BeTrue();
+        settingValue.Should().Be("foo");
+        gotSettingValue.Should().Be("foo");
+        removedSetting.Should().BeTrue();
+        gotSettingAfterRemove.Should().BeNull();
         #endregion
     }
 }

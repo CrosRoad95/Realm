@@ -317,11 +317,23 @@ public class UserComponent : AsyncComponent
         return null;
     }
 
-    public void RemoveSetting(int settingId)
+    public bool TryGetSetting(int settingId, out string? value)
+    {
+        ThrowIfDisposed();
+        if (_settings.TryGetValue(settingId, out value))
+            return true;
+        return false;
+    }
+
+    public bool RemoveSetting(int settingId)
     {
         ThrowIfDisposed();
 
         if(_settings.TryRemove(settingId, out var value))
+        {
             SettingRemoved?.Invoke(this, settingId, value);
+            return true;
+        }
+        return false;
     }
 }
