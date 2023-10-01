@@ -15,7 +15,6 @@ public class OwnerComponent : Component
             throw new ArgumentException(nameof(OwningEntity));
 
         OwningEntity.PreDisposed += HandlePreDisposed;
-        base.Attach();
     }
 
     private void HandlePreDisposed(Entity entity)

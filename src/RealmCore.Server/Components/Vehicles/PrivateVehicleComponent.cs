@@ -77,5 +77,4 @@ public class PrivateVehicleComponent : Component
         vehicle.Health = _vehicleData.Health;
         vehicle.IsFrozen = _vehicleData.IsFrozen;
     }
-
 }

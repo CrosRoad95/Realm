@@ -96,6 +96,5 @@ public class FocusableComponent : Component
                     playerElementComponent.FocusedEntity = null;
             }
         }
-        base.Detach();
     }
 }

@@ -59,7 +59,6 @@ public class AttachedEntityComponent : Component
     protected override void Attach()
     {
         _attachedEntity.Disposed += HandleAttachedEntityDestroyed;
-        base.Attach();
     }
 
     public override void Dispose()

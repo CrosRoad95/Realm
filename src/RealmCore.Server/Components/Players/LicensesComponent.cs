@@ -13,6 +13,7 @@ public class LicensesComponent : Component
                 return new List<License>(_licenses).AsReadOnly();
         }
     }
+
     private readonly object _lock = new();
     private readonly IDateTimeProvider _dateTimeProvider;
 
