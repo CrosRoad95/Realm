@@ -5,14 +5,16 @@ namespace RealmCore.Tests.Tests.Services;
 
 public class MapServiceTests
 {
+    private readonly Mock<ILogger<MapsService>> _logger = new(MockBehavior.Strict);
     public MapServiceTests()
     {
+        _logger.SetupLogger();
     }
 
     [Fact]
     public void YouCanNotRegisterEmptyMapFromMemory()
     {
-        var mapsService = new MapsService();
+        var mapsService = new MapsService(_logger.Object, null);
 
         var act = () => mapsService.RegisterMapFromMemory("empty", Enumerable.Empty<WorldObject>());
 
@@ -22,7 +24,7 @@ public class MapServiceTests
     [Fact]
     public void YouCanNotAddTwoMapsWithTheSameName()
     {
-        var mapsService = new MapsService();
+        var mapsService = new MapsService(_logger.Object, null);
 
         var act = () => mapsService.RegisterMapFromMemory("duplicate", new WorldObject[] { new WorldObject(ObjectModel.Vegtree3, Vector3.Zero) });
 

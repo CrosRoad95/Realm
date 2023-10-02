@@ -1,17 +1,20 @@
 ﻿namespace RealmCore.Server.Concepts;
 
-internal sealed class Map
+public sealed class Map : IDisposable
 {
     private readonly object _lock = new();
     private readonly List<WorldObject> _worldObjects;
     private readonly BoundingBox _boundingBox;
-    private readonly List<Player> _createdForPlayers = new();
-    public List<Player> CreatedForPlayers
+    private readonly List<Entity> _createdForEntities = new();
+    private bool _disposed = false;
+
+    public List<Entity> CreatedForPlayers
     {
         get
         {
-            lock(_lock)
-                return new List<Player>(_createdForPlayers);
+            ThrowIfDisposed();
+            lock (_lock)
+                return new List<Entity>(_createdForEntities);
         }
     }
 
@@ -48,38 +51,80 @@ internal sealed class Map
         _boundingBox = new BoundingBox((min + max) * 0.5f, max - min);
     }
 
-    public bool IsCreatedFor(Entity entity) => IsCreatedFor(entity.GetPlayer());
-    public bool IsCreatedFor(Player player)
+    private void ThrowIfDisposed()
+    {
+        if (_disposed)
+            throw new ObjectDisposedException(GetType().Name);
+    }
+
+    public bool IsCreatedFor(Entity entity)
+    {
+        ThrowIfDisposed();
+        lock (_lock)
+            return _createdForEntities.Contains(entity);
+    }
+
+    public bool LoadFor(Entity entity)
+    {
+        ThrowIfDisposed();
+        lock (_lock)
+        {
+            if (_createdForEntities.Contains(entity))
+                return false;
+
+            _createdForEntities.Add(entity);
+            entity.Disposed += HandleDisposed;
+        }
+
+        var player = entity.GetPlayer();
+        foreach (var worldObject in _worldObjects)
+            worldObject.CreateFor(player);
+        return true;
+    }
+
+    private void HandleDisposed(Entity entity)
     {
         lock (_lock)
         {
-            return _createdForPlayers.Contains(player);
+            entity.Disposed -= HandleDisposed;
+            _createdForEntities.Remove(entity);
         }
     }
 
-    public bool LoadForPlayer(Entity entity) => LoadForPlayer(entity.GetPlayer());
-    public bool LoadForPlayer(Player player)
+    public bool UnloadFor(Entity entity)
     {
-        lock(_lock)
-        {
-            if (_createdForPlayers.Contains(player))
+        ThrowIfDisposed();
+        lock (_lock)
+            if (!_createdForEntities.Remove(entity))
                 return false;
 
-            _createdForPlayers.Add(player);
-            player.Disconnected += HandleDisconnected;
+        var player = entity.GetPlayer();
+        foreach (var worldObject in _worldObjects)
+            worldObject.DestroyFor(player);
 
-            foreach (var worldObject in _worldObjects)
-                worldObject.CreateFor(player);
-            return true;
-        }
+        return true;
     }
 
-    private void HandleDisconnected(Player sender, PlayerQuitEventArgs e)
+    public void Dispose()
     {
-        lock(_lock)
+        ThrowIfDisposed();
+        lock (_lock)
         {
-            sender.Disconnected -= HandleDisconnected;
-            _createdForPlayers.Remove(sender);
+            foreach (var entity in _createdForEntities)
+            {
+                try
+                {
+                    var player = entity.GetPlayer();
+                    foreach (var worldObject in _worldObjects)
+                        worldObject.DestroyFor(player);
+                }
+                catch (Exception)
+                {
+                    // TODO: Probably not needed
+                }
+            }
+            _createdForEntities.Clear();
         }
+        _disposed = true;
     }
 }

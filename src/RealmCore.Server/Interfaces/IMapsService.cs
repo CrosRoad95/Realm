@@ -7,5 +7,7 @@ public interface IMapsService
     void LoadAllMapsFor(Entity entity);
     void LoadMapFor(string name, Entity entity);
     void RegisterMapFromMemory(string name, IEnumerable<WorldObject> worldObjects);
-    void RegisterMapFromXml(string name, string fileName);
+    Map RegisterMapFromMapFile(string name, string fileName);
+    MapsWatcherRegistration RegisterMapsPath(string path);
+    void LoadMapForAll(Map map);
 }

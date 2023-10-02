@@ -5,6 +5,9 @@ internal sealed class MapsService : IMapsService
     private readonly MapIdGenerator _mapIdGenerator;
     private readonly Dictionary<string, Map> _maps = new();
     private readonly object _lock = new();
+    private readonly List<MapsDirectoryWatcher> _mapsDirectoryWatchers = new();
+    private readonly ILogger<MapsService> _logger;
+    private readonly IEntityEngine _entityEngine;
 
     public List<string> Maps
     {
@@ -15,9 +18,11 @@ internal sealed class MapsService : IMapsService
         }
     }
 
-    public MapsService()
+    public MapsService(ILogger<MapsService> logger, IEntityEngine entityEngine)
     {
         _mapIdGenerator = new(IdGeneratorConstants.WorldMapIdStart, IdGeneratorConstants.WorldMapIdStop);
+        _logger = logger;
+        _entityEngine = entityEngine;
     }
 
     private void AddMap(string name, Map map)
@@ -30,55 +35,89 @@ internal sealed class MapsService : IMapsService
             }
             _maps.Add(name, map);
         }
+        _logger.LogInformation("Map {mapName} added", name);
+    }
+    
+    public void RemoveMapByName(string name)
+    {
+        lock (_lock)
+        {
+            if(_maps.TryGetValue(name, out var map))
+            {
+                map.Dispose();
+                _maps.Remove(name);
+            }
+            else
+                throw new Exception($"Map of name '{name}' doesn't exists");
+        }
+        _logger.LogInformation("Map {mapName} removed", name);
     }
 
     public void LoadMapFor(string name, Entity entity)
     {
-        var player = entity.GetPlayer();
         lock (_lock)
         {
             if (!_maps.TryGetValue(name, out var map))
             {
                 throw new Exception($"Map of name '{name}' doesn't exists");
             }
-            map.LoadForPlayer(player);
+            map.LoadFor(entity);
         }
     }
     
     public void LoadAllMapsFor(Entity entity)
     {
-        var player = entity.GetPlayer();
         lock (_lock)
         {
             foreach (var map in _maps)
-                map.Value.LoadForPlayer(player);
+                map.Value.LoadFor(entity);
         }
     }
 
-    public void RegisterMapFromXml(string name, string fileName)
+    internal void UnregisterWatcher(MapsDirectoryWatcher mapsDirectoryWatcher)
     {
-        if(_maps.ContainsKey(name))
-            throw new InvalidOperationException($"Map of name {name} already exists");
+        if(_mapsDirectoryWatchers.Remove(mapsDirectoryWatcher))
+           mapsDirectoryWatcher.Dispose();
+    }
+
+    public MapsWatcherRegistration RegisterMapsPath(string path)
+    {
+        if (!Directory.Exists(path))
+            throw new DirectoryNotFoundException(path);
+
+        var mapsDirectoryWatcher = new MapsDirectoryWatcher(path, this);
+        _mapsDirectoryWatchers.Add(mapsDirectoryWatcher);
+        return new MapsWatcherRegistration(mapsDirectoryWatcher, this);
+    }
+
+    public Map RegisterMapFromMapFile(string name, string fileName)
+    {
+        lock (_lock)
+        {
+            if (_maps.ContainsKey(name))
+                throw new InvalidOperationException($"Map of name {name} already exists");
+        }
 
         XmlSerializer serializer = new(typeof(XmlMap), "");
 
-        XmlMap xmlMap;
+        XmlMap? xmlMap = null;
         {
             using var fileStream = File.OpenRead(fileName);
             using var reader = new NamespaceIgnorantXmlTextReader(fileStream);
-            xmlMap = (XmlMap)serializer.Deserialize(reader);
+            xmlMap = (XmlMap?)serializer.Deserialize(reader);
         }
 
-        if (xmlMap.Objects.Count == 0)
+        if (xmlMap == null || xmlMap.Objects.Count == 0)
             throw new InvalidOperationException("Map contains no objects");
 
-        AddMap(name, new Map(_mapIdGenerator, xmlMap.Objects.Select(x => new WorldObject((ObjectModel)x.Model, new Vector3(x.PosX, x.PosY, x.PosZ))
+        var map = new Map(_mapIdGenerator, xmlMap.Objects.Select(x => new WorldObject((ObjectModel)x.Model, new Vector3(x.PosX, x.PosY, x.PosZ))
         {
             Rotation = new Vector3(x.RotX, x.RotY, x.RotZ),
             Interior = x.Interior,
             Dimension = x.Dimension
-        })));
-
+        }));
+        AddMap(name, map);
+        return map;
     }
 
     public void RegisterMapFromMemory(string name, IEnumerable<WorldObject> worldObjects)
@@ -87,5 +126,13 @@ internal sealed class MapsService : IMapsService
             throw new InvalidOperationException("Map contains no objects");
 
         AddMap(name, new Map(_mapIdGenerator, worldObjects));
+    }
+
+    public void LoadMapForAll(Map map)
+    {
+        foreach (var entity in _entityEngine.PlayerEntities)
+        {
+            map.LoadFor(entity);
+        }
     }
 }
