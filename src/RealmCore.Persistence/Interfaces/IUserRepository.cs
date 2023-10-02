@@ -4,6 +4,7 @@ public interface IUserRepository
 {
     Task<int> CountUsersBySerial(string serial, CancellationToken cancellationToken = default);
     Task DisableUser(int userId, CancellationToken cancellationToken = default);
+    Task<string?> GetLastNickName(int userId, CancellationToken cancellationToken = default);
     Task<UserData?> GetUserById(int id, CancellationToken cancellationToken = default);
     Task<UserData?> GetUserByLogin(string login, CancellationToken cancellationToken = default);
     Task<UserData?> GetUserByLoginCaseInsensitive(string login, CancellationToken cancellationToken = default);

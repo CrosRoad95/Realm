@@ -176,9 +176,24 @@ internal sealed class UserRepository : IUserRepository
     public async Task<bool> TryUpdateLastNickName(int userId, string nick, CancellationToken cancellationToken = default)
     {
         var query = _db.Users
+            .TagWith(nameof(UserRepository))
+            .Where(x => x.Id == userId);
+        var user = await query.FirstOrDefaultAsync();
+        if (user == null)
+            return false;
+
+        user.Nick = nick;
+        return await _db.SaveChangesAsync(cancellationToken) == 1;
+        //return await query.ExecuteUpdateAsync(x => x.SetProperty(y => y.Nick, nick), cancellationToken).ConfigureAwait(false) == 1;
+    }
+
+    public async Task<string?> GetLastNickName(int userId, CancellationToken cancellationToken = default)
+    {
+        var query = _db.Users
             .AsNoTracking()
             .TagWith(nameof(UserRepository))
             .Where(x => x.Id == userId);
-        return await query.ExecuteUpdateAsync(x => x.SetProperty(y => y.Nick, nick), cancellationToken).ConfigureAwait(false) == 1;
+        var user = await query.FirstOrDefaultAsync();
+        return user?.Nick;
     }
 }

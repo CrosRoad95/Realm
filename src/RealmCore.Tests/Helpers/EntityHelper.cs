@@ -20,6 +20,7 @@ internal class EntityHelper
     {
         var entity = new Entity();
         var player = _testingServer.AddFakePlayer();
+        player.Name = "CrosRoad95";
         player.TriggerResourceStarted(420);
         entity.AddComponent<Transform>();
         entity.AddComponent<PlayerTagComponent>();
