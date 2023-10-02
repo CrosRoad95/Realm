@@ -45,4 +45,57 @@ public class UsersServiceTests
         lastNick.Should().Be("CrosRoad95");
         #endregion
     }
+
+    [InlineData("CrosRoad95", true)]
+    [InlineData("CrosRoad69", false)]
+    [Theory]
+    public void TryGetPlayerByNameTests(string nick, bool shouldExists)
+    {
+        #region Arrange
+        var playerEntity = _entityHelper.CreatePlayerEntity();
+        #endregion
+
+        #region Act
+        bool found = _signInService.TryGetPlayerByName(nick, out var foundPlayerEntity);
+        #endregion
+
+        #region Assert
+        if (shouldExists)
+        {
+            found.Should().BeTrue();
+            (playerEntity == foundPlayerEntity).Should().BeTrue();
+        }
+        else
+        {
+            found.Should().BeFalse();
+            foundPlayerEntity.Should().BeNull();
+        }
+        #endregion
+    }
+
+    [InlineData("road", true)]
+    [InlineData("asd", false)]
+    [Theory]
+    public void SearchPlayersByNameTests(string pattern, bool shouldExists)
+    {
+        #region Arrange
+        var playerEntity = _entityHelper.CreatePlayerEntity();
+        #endregion
+
+        #region Act
+        var found = _signInService.SearchPlayersByName(pattern);
+        #endregion
+
+        #region Assert
+        if (shouldExists)
+        {
+            var foundPlayerEntity = found.First();
+            (playerEntity == foundPlayerEntity).Should().BeTrue();
+        }
+        else
+        {
+            found.Should().BeEmpty();
+        }
+        #endregion
+    }
 }

@@ -7,18 +7,20 @@ namespace RealmCore.Tests.Helpers;
 
 internal class EntityHelper
 {
-    private readonly IServiceProvider _serviceProvider;
     private readonly TestingServer _testingServer;
+    private readonly IServiceProvider _serviceProvider;
+    private readonly IEntityEngine _entityEngine;
 
     public EntityHelper(TestingServer testingServer)
     {
         _testingServer = testingServer;
         _serviceProvider = _testingServer.GetRequiredService<IServiceProvider>();
+        _entityEngine = _testingServer.GetRequiredService<IEntityEngine>();
     }
 
     public Entity CreatePlayerEntity()
     {
-        var entity = new Entity();
+        var entity = _entityEngine.CreateEntity();
         var player = _testingServer.AddFakePlayer();
         player.Name = "CrosRoad95";
         player.TriggerResourceStarted(420);

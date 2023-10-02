@@ -28,7 +28,7 @@ internal sealed class BoneAttachResourceLogic : ComponentLogic<AttachedEntityCom
         component.Detached -= HandleDetachedFromEntity;
         if(component is AttachedEntityComponent attachedEntityComponent)
         {
-            var element = attachedEntityComponent.AttachedEntity.GetElement();
+            var element = attachedEntityComponent.Entity.GetElement();
             if (_boneAttachService.IsAttached(element))
                 _boneAttachService.Detach(element);
         }

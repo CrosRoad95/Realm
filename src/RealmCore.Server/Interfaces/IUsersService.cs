@@ -8,6 +8,6 @@ public interface IUsersService
     IEnumerable<Entity> SearchPlayersByName(string pattern);
     Task<bool> SignIn(Entity entity, UserData user);
     Task<int> SignUp(string username, string password);
-    bool TryGetPlayerByName(string name, out Entity playerEntity);
+    bool TryGetPlayerByName(string name, out Entity? playerEntity);
     Task<bool> TryUpdateLastNickName(Entity playerEntity);
 }

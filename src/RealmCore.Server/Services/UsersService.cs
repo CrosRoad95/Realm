@@ -13,7 +13,7 @@ internal sealed class UsersService : IUsersService
     private readonly IAuthorizationService _authorizationService;
     private readonly IActiveUsers _activeUsers;
     private readonly IElementCollection _elementCollection;
-    private readonly IEntityEngine _ecs;
+    private readonly IEntityEngine _entityEngine;
     private readonly LevelsRegistry _levelsRegistry;
     private readonly IUserRepository _userRepository;
     private readonly UserManager<UserData> _userManager;
@@ -33,7 +33,7 @@ internal sealed class UsersService : IUsersService
         _authorizationService = authorizationService;
         _activeUsers = activeUsers;
         _elementCollection = elementCollection;
-        _ecs = ecs;
+        _entityEngine = ecs;
         _levelsRegistry = levelsRegistry;
         _userRepository = userRepository;
         _userManager = userManager;
@@ -172,7 +172,7 @@ internal sealed class UsersService : IUsersService
         entity.GetPlayer().Kick(reason);
     }
 
-    public bool TryGetPlayerByName(string name, out Entity playerEntity)
+    public bool TryGetPlayerByName(string name, out Entity? playerEntity)
     {
         var player = _elementCollection.GetByType<Player>().Where(x => x.Name == name).FirstOrDefault();
         if (player == null)
@@ -180,12 +180,12 @@ internal sealed class UsersService : IUsersService
             playerEntity = null!;
             return false;
         }
-        if(_ecs.TryGetEntityByPlayer(player, out var foundPlayerEntity) && foundPlayerEntity != null)
+        if(_entityEngine.TryGetEntityByPlayer(player, out var foundPlayerEntity) && foundPlayerEntity != null)
         {
             playerEntity = foundPlayerEntity;
             return true;
         }
-        playerEntity = null!;
+        playerEntity = null;
         return false;
     }
     
@@ -204,7 +204,7 @@ internal sealed class UsersService : IUsersService
         var players = _elementCollection.GetByType<Player>().Where(x => x.Name.Contains(pattern.ToLower(), StringComparison.CurrentCultureIgnoreCase));
         foreach (var player in players)
         {
-            if (_ecs.TryGetEntityByPlayer(player, out var playerEntity) && playerEntity != null)
+            if (_entityEngine.TryGetEntityByPlayer(player, out var playerEntity) && playerEntity != null)
                 yield return playerEntity;
         }
     }
