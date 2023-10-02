@@ -1,11 +1,11 @@
 ﻿namespace RealmCore.Server.Security;
 
-internal class ActiveUsers : IActiveUsers
+internal sealed class ActiveUsers : IActiveUsers
 {
     private readonly object _lock = new();
     private readonly List<int> _activeUsersIds = new();
 
-    public List<int> ActiveUsersIds
+    public IReadOnlyList<int> ActiveUsersIds
     {
         get
         {
