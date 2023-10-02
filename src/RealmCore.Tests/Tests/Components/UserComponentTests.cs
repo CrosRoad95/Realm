@@ -68,7 +68,7 @@ public class UserComponentTests
         var userComponent = await _entityHelper.LogInEntity(player);
         #endregion
 
-        #region Acy
+        #region Act
         userComponent.SetSetting(1, "foo");
         bool hasSetting = userComponent.TryGetSetting(1, out var settingValue);
         string? gotSettingValue = userComponent.GetSetting(1);
@@ -82,6 +82,35 @@ public class UserComponentTests
         gotSettingValue.Should().Be("foo");
         removedSetting.Should().BeTrue();
         gotSettingAfterRemove.Should().BeNull();
+        #endregion
+    }
+
+    [Fact]
+    public async Task UpgradesShouldWork()
+    {
+        #region Arrange
+        var player = _entityHelper.CreatePlayerEntity();
+        var userComponent = await _entityHelper.LogInEntity(player);
+        #endregion
+
+        #region Act
+        var hasSomeUpgrade1 = userComponent.HasUpgrade(1);
+        var added1 = userComponent.TryAddUpgrade(1);
+        var added2 = userComponent.TryAddUpgrade(1);
+        var hasSomeUpgrade2 = userComponent.HasUpgrade(1);
+        var removed1 = userComponent.TryRemoveUpgrade(1);
+        var removed2 = userComponent.TryRemoveUpgrade(1);
+        var hasSomeUpgrade3 = userComponent.HasUpgrade(1);
+        #endregion
+
+        #region Assert
+        hasSomeUpgrade1.Should().BeFalse();
+        added1.Should().BeTrue();
+        added2.Should().BeFalse();
+        hasSomeUpgrade2.Should().BeTrue();
+        removed1.Should().BeTrue();
+        removed2.Should().BeFalse();
+        hasSomeUpgrade3.Should().BeFalse();
         #endregion
     }
 }
