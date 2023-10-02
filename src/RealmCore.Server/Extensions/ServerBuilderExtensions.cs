@@ -1,4 +1,5 @@
-﻿using RealmCore.Server.Logic.Components;
+﻿using RealmCore.Resources.CEFBlazorGui;
+using RealmCore.Server.Logic.Components;
 using RealmCore.Server.Logic.Elements;
 using RealmCore.SQLite;
 using SlipeServer.Resources.Scoreboard;
@@ -35,6 +36,7 @@ public static class ServerBuilderExtensions
             services.Configure<GameplayOptions>(realmConfigurationProvider.GetSection("Gameplay"));
             services.Configure<ServerListOptions>(realmConfigurationProvider.GetSection("ServerList"));
             services.Configure<AssetsOptions>(realmConfigurationProvider.GetSection("Assets"));
+            services.Configure<BrowserOptions>(realmConfigurationProvider.GetSection("Browser"));
 
             var databaseProvider = realmConfigurationProvider.Get<string>("Database:Provider");
             switch (databaseProvider)

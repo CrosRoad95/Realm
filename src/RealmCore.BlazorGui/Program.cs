@@ -21,7 +21,8 @@ app.UseHttpsRedirection();
 
 app.UseStaticFiles();
 
-app.MapRazorComponents<App>();
+app.MapRazorComponents<App>()
+    .AddServerRenderMode();
 
 var _ = Task.Run(async () =>
 {

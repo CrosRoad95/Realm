@@ -17,11 +17,11 @@ internal class CEFBlazorGuiLogic
     private readonly ILogger<CEFBlazorGuiLogic> _logger;
     private readonly ILuaEventHub<ICEFBlazorGuiEventHub> _luaEventHub;
     private readonly FromLuaValueMapper _fromLuaValueMapper;
-    private readonly IOptions<BlazorOptions> _blazorOptions;
+    private readonly IOptions<BrowserOptions> _blazorOptions;
     private readonly CEFBlazorGuiResource _resource;
 
     public CEFBlazorGuiLogic(MtaServer mtaServer, LuaEventService luaEventService, ICEFBlazorGuiService CEFBlazorGuiService,
-        ILogger<CEFBlazorGuiLogic> logger, ILuaEventHub<ICEFBlazorGuiEventHub> luaEventHub, FromLuaValueMapper fromLuaValueMapper, IOptions<BlazorOptions> blazorOptions)
+        ILogger<CEFBlazorGuiLogic> logger, ILuaEventHub<ICEFBlazorGuiEventHub> luaEventHub, FromLuaValueMapper fromLuaValueMapper, IOptions<BrowserOptions> blazorOptions)
     {
         luaEventService.AddEventHandler("internalCEFInvokeVoidAsync", HandleCEFInvokeVoidAsync);
         luaEventService.AddEventHandler("internalCEFInvokeAsync", HandleCEFInvokeAsync);
@@ -43,8 +43,8 @@ internal class CEFBlazorGuiLogic
         {
             await _resource.StartForAsync(player);
             var mode = _blazorOptions.Value.Mode.ToString().ToLower();
-            var width = _blazorOptions.Value.BrowserSize.Width;
-            var height = _blazorOptions.Value.BrowserSize.Height;
+            var width = _blazorOptions.Value.BrowserWidth;
+            var height = _blazorOptions.Value.BrowserHeight;
             var remoteUrl = _blazorOptions.Value.BaseRemoteUrl;
             var requestWhitelistUrl = _blazorOptions.Value.RequestWhitelistUrl;
             _luaEventHub.Invoke(player, x => x.Load(mode, width, height, remoteUrl, requestWhitelistUrl));

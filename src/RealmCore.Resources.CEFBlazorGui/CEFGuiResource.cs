@@ -20,7 +20,7 @@ internal class CEFBlazorGuiResource : Resource
     internal CEFBlazorGuiResource(MtaServer server, string? directoryPath)
         : base(server, server.GetRequiredService<RootElement>(), "CEFBlazorGui")
     {
-        var blazorOptions = server.GetRequiredService<IOptions<BlazorOptions>>();
+        var blazorOptions = server.GetRequiredService<IOptions<BrowserOptions>>();
         foreach (var (path, content) in AdditionalFiles)
             Files.Add(ResourceFileFactory.FromBytes(content, path));
         _server = server;

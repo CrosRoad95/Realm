@@ -69,10 +69,11 @@ internal class RealmTestingServer : TestingServer
         serverBuilder.ConfigureServer(testConfigurationProvider ?? new(), SlipeServer.Server.ServerBuilders.ServerBuilderDefaultBehaviours.None);
         serverBuilder.ConfigureServices(services =>
         {
-            services.Configure<BlazorOptions>(options =>
+            services.Configure<BrowserOptions>(options =>
             {
                 options.Mode = CEFGuiBlazorMode.Local;
-                options.BrowserSize = new Size(1024, 768);
+                options.BrowserWidth = 1024;
+                options.BrowserHeight = 768;
                 options.BaseRemoteUrl = "https://localhost:7149";
                 options.RequestWhitelistUrl = "localhost";
             });

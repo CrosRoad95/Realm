@@ -22,7 +22,7 @@ internal sealed class CEFBlazorGuiService : ICEFBlazorGuiService
 
     private readonly Uri? _baseUrl;
 
-    public CEFBlazorGuiService(IOptions<BlazorOptions> blazorOptions, IElementCollection elementCollection, ILogger<CEFBlazorGuiService> logger)
+    public CEFBlazorGuiService(IOptions<BrowserOptions> blazorOptions, IElementCollection elementCollection, ILogger<CEFBlazorGuiService> logger)
     {
         if(blazorOptions.Value.BaseRemoteUrl != null)
             _baseUrl = new Uri(blazorOptions.Value.BaseRemoteUrl);

@@ -91,13 +91,14 @@ public class SampleServer
                 services.AddInGameCommand<CurrencyCommand>();
                 #endregion
 
-                services.Configure<BlazorOptions>(options =>
-                {
-                    options.Mode = CEFGuiBlazorMode.Remote;
-                    options.BrowserSize = new System.Drawing.Size(1024, 768);
-                    options.BaseRemoteUrl = "https://localhost:7149";
-                    options.RequestWhitelistUrl = "localhost";
-                });
+                //services.Configure<BrowserOptions>(options =>
+                //{
+                //    options.Mode = CEFGuiBlazorMode.Remote;
+                //    options.BrowserWidth = 1024;
+                //    options.BrowserHeight = 768;
+                //    options.BaseRemoteUrl = "https://localhost:7149";
+                //    options.RequestWhitelistUrl = "localhost";
+                //});
 
                 var realmLogger = new RealmLogger("RealmCore", LogEventLevel.Information);
                 services.AddLogging(x => x.AddSerilog(realmLogger.GetLogger(), dispose: true));

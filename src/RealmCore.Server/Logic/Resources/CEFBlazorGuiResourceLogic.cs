@@ -7,10 +7,10 @@ internal sealed class CEFBlazorGuiResourceLogic : ComponentLogic<BrowserComponen
     private readonly IEntityEngine _ecs;
     private readonly ICEFBlazorGuiService _cefBlazorGuiService;
     private readonly IBlazorGuiService _blazorGuiService;
-    private readonly IOptions<BlazorOptions> _blazorOptions;
+    private readonly IOptions<BrowserOptions> _blazorOptions;
     private readonly ChatBox _chatBox;
 
-    public CEFBlazorGuiResourceLogic(IEntityEngine ecs, ICEFBlazorGuiService cefBlazorGuiService, IBlazorGuiService blazorGuiService, IOptions<BlazorOptions> blazorOptions, ChatBox chatBox) : base(ecs)
+    public CEFBlazorGuiResourceLogic(IEntityEngine ecs, ICEFBlazorGuiService cefBlazorGuiService, IBlazorGuiService blazorGuiService, IOptions<BrowserOptions> blazorOptions, ChatBox chatBox) : base(ecs)
     {
         _ecs = ecs;
         _cefBlazorGuiService = cefBlazorGuiService;
