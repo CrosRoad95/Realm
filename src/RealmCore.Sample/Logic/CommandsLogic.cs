@@ -173,6 +173,21 @@ internal sealed class CommandsLogic
             }
         });
 
+        _commandService.AddCommandHandler("cvwithlicenserequired", (entity, args) =>
+        {
+            var vehicleEntity = _entityFactory.CreateVehicle(args.ReadUShort(), entity.Transform.Position + new Vector3(4, 0, 0), entity.Transform.Rotation);
+            vehicleEntity.AddComponent(new VehicleLicenseRequiremenetAccessComponent(10));
+        });
+
+        _commandService.AddCommandHandler("givelicense10", (entity, args) =>
+        {
+            if (entity.TryGetComponent(out LicensesComponent licenseComponent))
+            {
+                if (licenseComponent.TryAddLicense(10))
+                    _chatBox.OutputTo(entity, $"License 10 added");
+            }
+        });
+        
         _commandService.AddCommandHandler("cv", (entity, args) =>
         {
             var vehicleEntity = _entityFactory.CreateVehicle(args.ReadUShort(), entity.Transform.Position + new Vector3(4, 0, 0), entity.Transform.Rotation);
