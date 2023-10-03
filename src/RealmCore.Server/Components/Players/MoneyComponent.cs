@@ -4,10 +4,13 @@
 public class MoneyComponent : Component
 {
     private decimal _money = 0;
-    private readonly decimal _moneyLimit;
-    private readonly byte _moneyPrecision;
+    private decimal _moneyLimit;
+    private byte _moneyPrecision;
     private readonly ReaderWriterLockSlim _moneyLock = new();
+    private readonly IOptionsMonitor<GameplayOptions>? _gameplayOptions;
 
+    public event Action<MoneyComponent, decimal>? MoneyLimitChanged;
+    public event Action<MoneyComponent, byte>? MoneyPrecisionChanged;
     public event Action<MoneyComponent, decimal>? MoneySet;
     public event Action<MoneyComponent, decimal>? MoneyAdded;
     public event Action<MoneyComponent, decimal>? MoneyTaken;
@@ -50,6 +53,15 @@ public class MoneyComponent : Component
         }
     }
 
+    public MoneyComponent(decimal initialMoney, IOptionsMonitor<GameplayOptions> gameplayOptions)
+    {
+        _money = initialMoney;
+        _gameplayOptions = gameplayOptions;
+        _moneyLimit = _gameplayOptions.CurrentValue.MoneyLimit;
+        _moneyPrecision = _gameplayOptions.CurrentValue.MoneyPrecision;
+        _gameplayOptions.OnChange(HandleGameplayOptionsChanged);
+    }
+
     public MoneyComponent(decimal moneyLimit, byte moneyPrecision)
     {
         _money = 0;
@@ -62,6 +74,20 @@ public class MoneyComponent : Component
         _money = initialMoney;
         _moneyLimit = moneyLimit;
         _moneyPrecision = moneyPrecision;
+    }
+
+    private void HandleGameplayOptionsChanged(GameplayOptions gameplayOptions)
+    {
+        if (_moneyLimit != gameplayOptions.MoneyLimit)
+        {
+            _moneyLimit = gameplayOptions.MoneyLimit;
+            MoneyLimitChanged?.Invoke(this, _moneyLimit);
+        }
+        if (_moneyPrecision != gameplayOptions.MoneyPrecision)
+        {
+            _moneyPrecision = gameplayOptions.MoneyPrecision;
+            MoneyPrecisionChanged?.Invoke(this, _moneyPrecision);
+        }
     }
 
     private decimal Normalize(decimal amount) => amount.Truncate(_moneyPrecision);

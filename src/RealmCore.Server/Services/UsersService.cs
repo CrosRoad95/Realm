@@ -8,7 +8,7 @@ internal sealed class UsersService : IUsersService
     private readonly ItemsRegistry _itemsRegistry;
     private readonly SignInManager<UserData> _signInManager;
     private readonly ILogger<UsersService> _logger;
-    private readonly IOptions<GameplayOptions> _gameplayOptions;
+    private readonly IOptionsMonitor<GameplayOptions> _gameplayOptions;
     private readonly IDateTimeProvider _dateTimeProvider;
     private readonly IAuthorizationService _authorizationService;
     private readonly IActiveUsers _activeUsers;
@@ -22,7 +22,7 @@ internal sealed class UsersService : IUsersService
         Converters = new List<JsonConverter> { new DoubleConverter() }
     };
 
-    public UsersService(ItemsRegistry itemsRegistry, SignInManager<UserData> signInManager, ILogger<UsersService> logger, IOptions<GameplayOptions> gameplayOptions,
+    public UsersService(ItemsRegistry itemsRegistry, SignInManager<UserData> signInManager, ILogger<UsersService> logger, IOptionsMonitor<GameplayOptions> gameplayOptions,
         IDateTimeProvider dateTimeProvider, IAuthorizationService authorizationService, IActiveUsers activeUsers, IElementCollection elementCollection, IEntityEngine ecs, LevelsRegistry levelsRegistry, IUserRepository userRepository, UserManager<UserData> userManager)
     {
         _itemsRegistry = itemsRegistry;
@@ -102,7 +102,7 @@ internal sealed class UsersService : IUsersService
                 }
             }
             else
-                entity.AddComponent(new InventoryComponent(_gameplayOptions.Value.DefaultInventorySize));
+                entity.AddComponent(new InventoryComponent(_gameplayOptions.CurrentValue.DefaultInventorySize));
 
             if (user.DailyVisits != null)
                 entity.AddComponent(new DailyVisitsCounterComponent(user.DailyVisits));
@@ -146,7 +146,7 @@ internal sealed class UsersService : IUsersService
             entity.AddComponent(new LicensesComponent(user.Licenses, _dateTimeProvider));
             entity.AddComponent(new PlayTimeComponent(user.PlayTime, _dateTimeProvider));
             entity.AddComponent(new LevelComponent(user.Level, user.Experience, _levelsRegistry));
-            entity.AddComponent(new MoneyComponent(user.Money, _gameplayOptions.Value.MoneyLimit, _gameplayOptions.Value.MoneyPrecision));
+            entity.AddComponent(new MoneyComponent(user.Money, _gameplayOptions));
             entity.AddComponent<AFKComponent>();
             return true;
 
