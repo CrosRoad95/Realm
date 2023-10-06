@@ -22,7 +22,7 @@ public sealed class GiveItemCommand : IInGameCommand
         {
             uint itemId = args.ReadUInt();
             uint count = args.ReadUInt();
-            inventoryComponent.AddItem(_itemsRegistry, itemId, count, new Dictionary<string, object>
+            inventoryComponent.AddItem(_itemsRegistry, itemId, count, new Metadata
             {
                 ["foo"] = 10
             });

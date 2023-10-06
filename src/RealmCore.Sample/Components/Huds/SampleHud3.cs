@@ -1,5 +1,4 @@
-﻿using RealmCore.Resources.Overlay;
-using RealmCore.Resources.Overlay.Enums;
+﻿using RealmCore.Resources.Overlay.Enums;
 using RealmCore.Resources.Overlay.Interfaces;
 using System.Drawing;
 

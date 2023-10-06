@@ -104,7 +104,7 @@ public class InventoryComponentTests
     [Fact]
     public void ItemsShouldNotBeStackedWhenHaveDifferentMetadata()
     {
-        var metaData = new Dictionary<string, object>
+        var metaData = new Metadata
         {
             ["foo"] = 1,
         };
@@ -162,9 +162,9 @@ public class InventoryComponentTests
     [Fact]
     public void GetItemsByIdWithMetadataShouldWork()
     {
-        var item = _inventoryComponent.AddItem(_itemsRegistry, 1, 1, new Dictionary<string, object> { ["foo"] = 1 }).First();
-        _inventoryComponent.AddItem(_itemsRegistry, 1, 1, new Dictionary<string, object> { ["foo"] = 2 });
-        _inventoryComponent.AddItem(_itemsRegistry, 1, 1, new Dictionary<string, object> { ["foo"] = 3 });
+        var item = _inventoryComponent.AddItem(_itemsRegistry, 1, 1, new Metadata { ["foo"] = 1 }).First();
+        _inventoryComponent.AddItem(_itemsRegistry, 1, 1, new Metadata { ["foo"] = 2 });
+        _inventoryComponent.AddItem(_itemsRegistry, 1, 1, new Metadata { ["foo"] = 3 });
 
         _inventoryComponent.GetItemsByIdWithMetadata(1, "foo", 1).Should().BeEquivalentTo(new List<Item>
         {
@@ -175,9 +175,9 @@ public class InventoryComponentTests
     [Fact]
     public void GetItemsByIdWithMetadataAsDictionaryShouldWork()
     {
-        var item = _inventoryComponent.AddSingleItem(_itemsRegistry, 1, new Dictionary<string, object> { ["foo"] = 1 });
+        var item = _inventoryComponent.AddSingleItem(_itemsRegistry, 1, new Metadata { ["foo"] = 1 });
 
-        _inventoryComponent.GetSingleItemByIdWithMetadata(1, new Dictionary<string, object>
+        _inventoryComponent.GetSingleItemByIdWithMetadata(1, new Metadata
         {
             ["foo"] = 1
         }).Should().BeEquivalentTo(item);
@@ -186,9 +186,9 @@ public class InventoryComponentTests
     [Fact]
     public void HasItemWithMetadataShouldWork()
     {
-        _inventoryComponent.AddSingleItem(_itemsRegistry, 1, new Dictionary<string, object> { ["foo"] = 1 });
-        _inventoryComponent.AddItem(_itemsRegistry, 1, 1, new Dictionary<string, object> { ["foo"] = 2 });
-        _inventoryComponent.AddItem(_itemsRegistry, 1, 1, new Dictionary<string, object> { ["foo"] = 3 });
+        _inventoryComponent.AddSingleItem(_itemsRegistry, 1, new Metadata { ["foo"] = 1 });
+        _inventoryComponent.AddItem(_itemsRegistry, 1, 1, new Metadata { ["foo"] = 2 });
+        _inventoryComponent.AddItem(_itemsRegistry, 1, 1, new Metadata { ["foo"] = 3 });
 
         _inventoryComponent.HasItemWithMetadata(1, "foo", 1).Should().BeTrue();
         _inventoryComponent.HasItemWithMetadata(1, "foo", 4).Should().BeFalse();
@@ -197,8 +197,8 @@ public class InventoryComponentTests
     [Fact]
     public void YouShouldBeAbleToAddAndGetItemByMetadata()
     {
-        var item = _inventoryComponent.AddSingleItem(_itemsRegistry, 1, new Dictionary<string, object> { ["foo"] = 1 });
-        var found = _inventoryComponent.TryGetByIdAndMetadata(1, new Dictionary<string, object> { ["foo"] = 1 }, out Item foundItem);
+        var item = _inventoryComponent.AddSingleItem(_itemsRegistry, 1, new Metadata { ["foo"] = 1 });
+        var found = _inventoryComponent.TryGetByIdAndMetadata(1, new Metadata { ["foo"] = 1 }, out Item foundItem);
 
         found.Should().BeTrue();
         item.Should().Be(foundItem);
@@ -241,7 +241,7 @@ public class InventoryComponentTests
     {
         _inventoryComponent.ItemUsed += HandleItemUsed;
         _inventoryComponent.Size = 100;
-        var item = _inventoryComponent.AddSingleItem(_itemsRegistry, 1, new Dictionary<string, object> { ["counter"] = 10 });
+        var item = _inventoryComponent.AddSingleItem(_itemsRegistry, 1, new Metadata { ["counter"] = 10 });
 
         _inventoryComponent.TryUseItem(item, ItemAction.Use).Should().BeTrue();
         item.GetMetadata("counter").Should().Be(9);
@@ -348,7 +348,7 @@ public class InventoryComponentTests
         #region Arrange
         _inventoryComponent.Clear();
         var destinationInventory = new InventoryComponent(10);
-        var metaData = new Dictionary<string, object>
+        var metaData = new Metadata
         {
             ["foo"] = 1
         };
@@ -370,7 +370,7 @@ public class InventoryComponentTests
     [Fact]
     public void TryGetMetaDataShouldWork()
     {
-        var item = _inventoryComponent.AddSingleItem(_itemsRegistry, 1, new Dictionary<string, object>
+        var item = _inventoryComponent.AddSingleItem(_itemsRegistry, 1, new Metadata
         {
             ["number"] = 123,
             ["string"] = "123",
@@ -407,7 +407,7 @@ public class InventoryComponentTests
     [Fact]
     public void ItemMetaDataPropertyShouldReturnCopyOfMetaData()
     {
-        var metaData = new Dictionary<string, object>
+        var metaData = new Metadata
         {
             ["foo"] = 1
         };
@@ -420,7 +420,7 @@ public class InventoryComponentTests
     [Fact]
     public void ItemMetaDataKeysPropertyShouldReturnCopyOfMetaDataKeys()
     {
-        var metaData = new Dictionary<string, object>
+        var metaData = new Metadata
         {
             ["foo"] = 1
         };
@@ -433,7 +433,7 @@ public class InventoryComponentTests
     [Fact]
     public void YouShouldBeAbleToRemoveMetaData()
     {
-        var metaData = new Dictionary<string, object>
+        var metaData = new Metadata
         {
             ["foo"] = 1
         };
@@ -450,7 +450,7 @@ public class InventoryComponentTests
     [Fact]
     public void YouShouldBeAbleToChangeMetaData()
     {
-        var metaData = new Dictionary<string, object>
+        var metaData = new Metadata
         {
             ["foo"] = 1
         };
@@ -462,7 +462,7 @@ public class InventoryComponentTests
         ((int?)item.GetMetadata("foo")).Should().Be(2);
 
         monitoredItem.Should().Raise(nameof(Item.MetadataChanged));
-        item.MetaData.Should().BeEquivalentTo(new Dictionary<string, object>
+        item.MetaData.Should().BeEquivalentTo(new Metadata
         {
             ["foo"] = 2
         });
@@ -471,7 +471,7 @@ public class InventoryComponentTests
     [Fact]
     public void HasMetadataShouldWork()
     {
-        var metaData = new Dictionary<string, object>
+        var metaData = new Metadata
         {
             ["foo"] = 1
         };
@@ -506,7 +506,7 @@ public class InventoryComponentTests
     [Fact]
     public void RemoveAndGetItemByIdShouldWork()
     {
-        var metaData = new Dictionary<string, object>
+        var metaData = new Metadata
         {
             ["foo"] = 1
         };
@@ -520,7 +520,7 @@ public class InventoryComponentTests
     [Fact]
     public void RemoveAndGetItemByIdShouldWorkForManyItems()
     {
-        var metaData = new Dictionary<string, object>
+        var metaData = new Metadata
         {
             ["foo"] = 1
         };
@@ -534,7 +534,7 @@ public class InventoryComponentTests
     [Fact]
     public void RemovingOneItemAndGetItemByIdShouldWorkForManyItems()
     {
-        var metaData = new Dictionary<string, object>
+        var metaData = new Metadata
         {
             ["foo"] = 1
         };

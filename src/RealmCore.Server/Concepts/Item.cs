@@ -1,6 +1,6 @@
 ﻿namespace RealmCore.Server.Concepts;
 
-public class Item : IEquatable<Item>, IEquatable<Dictionary<string, object>>
+public class Item : IEquatable<Item>, IEquatable<Metadata>
 {
     private readonly object _lock = new();
     public string Id { get; internal set; } = Guid.NewGuid().ToString();
@@ -35,13 +35,13 @@ public class Item : IEquatable<Item>, IEquatable<Dictionary<string, object>>
     public string Name { get; init; }
     public decimal Size { get; init; }
     public ItemAction AvailableActions { get; init; }
-    private readonly Dictionary<string, object> _metaData;
-    public IReadOnlyDictionary<string, object> MetaData
+    private readonly Metadata _metaData;
+    public Metadata MetaData
     {
         get
         {
             lock (_lock)
-                return new Dictionary<string, object>(_metaData);
+                return new Metadata(_metaData);
         }
     }
 
@@ -64,11 +64,11 @@ public class Item : IEquatable<Item>, IEquatable<Dictionary<string, object>>
         Size = item.Size;
         Name = item.Name;
         _number = item.Number;
-        _metaData = new Dictionary<string, object>(item.MetaData);
+        _metaData = new Metadata(item.MetaData);
         AvailableActions = item.AvailableActions;
     }
 
-    internal Item(ItemsRegistry itemsRegistry, uint itemId, uint number, Dictionary<string, object>? metaData = null)
+    internal Item(ItemsRegistry itemsRegistry, uint itemId, uint number, Metadata? metaData = null)
     {
         var itemRegistryEntry = itemsRegistry.Get(itemId);
         AvailableActions = itemRegistryEntry.AvailableActions;
@@ -195,7 +195,7 @@ public class Item : IEquatable<Item>, IEquatable<Dictionary<string, object>>
         return Equals(other._metaData);
     }
 
-    public bool Equals(Dictionary<string, object>? other)
+    public bool Equals(Metadata? other)
     {
         if (other == null)
             return false;

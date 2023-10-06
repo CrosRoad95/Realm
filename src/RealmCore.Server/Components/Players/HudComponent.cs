@@ -78,6 +78,8 @@ public abstract class HudComponent<TState> : Component, IStatefulHudComponent wh
 
     protected abstract void Build(IHudBuilder<TState> hudBuilderCallback);
 
+    protected virtual void HudCreated() { }
+
     void IStatefulHudComponent.BuildHud(IOverlayService overlayService)
     {
         var playerElementComponent = Entity.GetRequiredComponent<PlayerElementComponent>();
@@ -102,6 +104,7 @@ public abstract class HudComponent<TState> : Component, IStatefulHudComponent wh
 
         _hud = new Hud<TState>(_id, playerElementComponent.Player, overlayService, _offset, _defaultState, dynamicHudComponents);
         Visible = true;
+        HudCreated();
     }
 }
 

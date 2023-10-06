@@ -147,7 +147,7 @@ internal sealed class VehiclesService : IVehiclesService
                     {
                         var items = inventory.InventoryItems
                             .Select(x =>
-                                new Item(_itemsRegistry, x.ItemId, x.Number, JsonConvert.DeserializeObject<Dictionary<string, object>>(x.MetaData, _jsonSerializerSettings))
+                                new Item(_itemsRegistry, x.ItemId, x.Number, JsonConvert.DeserializeObject<Metadata>(x.MetaData, _jsonSerializerSettings))
                             )
                             .ToList();
                         entity.AddComponent(new InventoryComponent(inventory.Size, inventory.Id, items));

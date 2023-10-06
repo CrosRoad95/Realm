@@ -837,6 +837,12 @@ public sealed class PlayerElementComponent : PedElementComponent
         Entity.Transform.Dimension = vehicle.Dimension;
         _player.WarpIntoVehicle(vehicle, seat);
     }
+    
+    public void RemoveFromVehicle(bool warpOut = true)
+    {
+        ThrowIfDisposed();
+        _player.RemoveFromVehicle(warpOut);
+    }
 
     public override void Dispose()
     {

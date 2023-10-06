@@ -1,6 +1,4 @@
-﻿using Microsoft.Extensions.Options;
-
-namespace RealmCore.Server.Logic.Defaults;
+﻿namespace RealmCore.Server.Logic.Defaults;
 
 public class DefaultBanLogic
 {

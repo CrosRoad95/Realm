@@ -224,8 +224,8 @@ public class VehicleElementComponent : ElementComponent
     public event Action<VehicleElementComponent, VehicleDoorStateChangedArgs>? DoorStateChanged;
     public event Action<VehicleElementComponent, float, float>? HealthChanged;
     public event Action<VehicleElementComponent>? Blown;
-    public event Action<VehicleElementComponent, Entity>? PedEntered;
-    public event Action<VehicleElementComponent, Entity>? PedLeft;
+    public event Action<VehicleElementComponent, Entity, byte, bool>? PedEntered;
+    public event Action<VehicleElementComponent, Entity, byte, bool>? PedLeft;
     public event Action<VehicleElementComponent>? Damaged;
 
     internal VehicleElementComponent(Vehicle vehicle, IEntityEngine entityEngine)
@@ -252,10 +252,22 @@ public class VehicleElementComponent : ElementComponent
         _vehicle.SetDoorState(door, state, spawnFlyingComponent);
     }
 
+    public VehicleDoorState GetDoorState(VehicleDoor door)
+    {
+        ThrowIfDisposed();
+        return _vehicle.GetDoorState(door);
+    }
+
     public void SetWheelState(VehicleWheel wheel, VehicleWheelState state)
     {
         ThrowIfDisposed();
         _vehicle.SetWheelState(wheel, state);
+    }
+
+    public VehicleWheelState GetWheelState(VehicleWheel wheel)
+    {
+        ThrowIfDisposed();
+        return _vehicle.GetWheelState(wheel);
     }
 
     public void SetPanelState(VehiclePanel panel, VehiclePanelState state)
@@ -264,16 +276,34 @@ public class VehicleElementComponent : ElementComponent
         _vehicle.SetPanelState(panel, state);
     }
 
+    public VehiclePanelState GetPanelState(VehiclePanel panel)
+    {
+        ThrowIfDisposed();
+        return _vehicle.GetPanelState(panel);
+    }
+
     public void SetLightState(VehicleLight light, VehicleLightState state)
     {
         ThrowIfDisposed();
         _vehicle.SetLightState(light, state);
+    }
+    
+    public VehicleLightState GetLightState(VehicleLight light)
+    {
+        ThrowIfDisposed();
+        return _vehicle.GetLightState(light);
     }
 
     public void SetDoorOpenRatio(VehicleDoor door, float ratio, uint time = 0u)
     {
         ThrowIfDisposed();
         _vehicle.SetDoorOpenRatio(door, ratio, time);
+    }
+
+    public float GetDoorOpenRatio(VehicleDoor door)
+    {
+        ThrowIfDisposed();
+        return _vehicle.GetDoorOpenRatio(door);
     }
 
     public void AddPassenger(byte seat, Entity pedEntity, bool warpsIn = true)
@@ -327,12 +357,12 @@ public class VehicleElementComponent : ElementComponent
 
     private void HandlePedLeft(Element ped, VehicleLeftEventArgs e)
     {
-        PedLeft?.Invoke(this, _entityEngine.GetByElement(ped));
+        PedLeft?.Invoke(this, _entityEngine.GetByElement(ped), e.Seat, e.WarpsOut);
     }
 
     private void HandlePedEntered(Element ped, VehicleEnteredEventsArgs e)
     {
-        PedEntered?.Invoke(this, _entityEngine.GetByElement(ped));
+        PedEntered?.Invoke(this, _entityEngine.GetByElement(ped), e.Seat, e.WarpsIn);
     }
 
     private void HandleBlown(Element sender, VehicleBlownEventArgs e)

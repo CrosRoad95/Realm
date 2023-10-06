@@ -4,8 +4,7 @@ internal sealed class HotReload
 {
     public event Action? OnReload;
     private readonly FileSystemWatcher _fileSystemWatcher;
-    private CancellationTokenSource? _changedTaskSource;
-    private CancellationToken? _changedTask;
+    private readonly Debounce _debounce;
 
     public HotReload(string path)
     {
@@ -16,21 +15,19 @@ internal sealed class HotReload
             IncludeSubdirectories = true,
             Filter = "*.lua"
         };
+        _debounce = new Debounce(500);
         _fileSystemWatcher.Changed += OnChanged;
         _fileSystemWatcher.EnableRaisingEvents = true;
     }
 
     private async void OnChanged(object source, FileSystemEventArgs e)
     {
-        if (_changedTaskSource != null)
-            _changedTaskSource.Cancel();
-
         try
         {
-            _changedTaskSource = new();
-            _changedTask = _changedTaskSource.Token;
-            await Task.Delay(500, _changedTask.Value);
-            OnReload?.Invoke();
+            await _debounce.InvokeAsync(() =>
+            {
+                OnReload?.Invoke();
+            });
         }
         catch (Exception)
         {

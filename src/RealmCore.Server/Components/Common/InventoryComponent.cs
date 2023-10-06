@@ -176,7 +176,7 @@ public class InventoryComponent : Component
         }
     }
     
-    public Item? GetSingleItemByIdWithMetadata(uint itemId, Dictionary<string, object> metadata)
+    public Item? GetSingleItemByIdWithMetadata(uint itemId, Metadata metadata)
     {
         ThrowIfDisposed();
         _semaphore.EnterReadLock();
@@ -235,7 +235,7 @@ public class InventoryComponent : Component
         }
     }
 
-    public bool TryGetByIdAndMetadata(uint itemId, Dictionary<string, object> metadata, out Item item)
+    public bool TryGetByIdAndMetadata(uint itemId, Metadata metadata, out Item item)
     {
         ThrowIfDisposed();
         _semaphore.EnterReadLock();
@@ -250,7 +250,7 @@ public class InventoryComponent : Component
         }
     }
 
-    public Item AddSingleItem(ItemsRegistry itemsRegistry, uint itemId, Dictionary<string, object>? metadata = null, bool tryStack = true, bool force = false)
+    public Item AddSingleItem(ItemsRegistry itemsRegistry, uint itemId, Metadata? metadata = null, bool tryStack = true, bool force = false)
     {
         ThrowIfDisposed();
         _semaphore.EnterWriteLock();
@@ -267,7 +267,7 @@ public class InventoryComponent : Component
         }
     }
 
-    public IEnumerable<Item> AddItem(ItemsRegistry itemsRegistry, uint itemId, uint number = 1, Dictionary<string, object>? metadata = null, bool tryStack = true, bool force = false)
+    public IEnumerable<Item> AddItem(ItemsRegistry itemsRegistry, uint itemId, uint number = 1, Metadata? metadata = null, bool tryStack = true, bool force = false)
     {
         ThrowIfDisposed();
         if (number <= 0)

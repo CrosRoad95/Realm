@@ -69,6 +69,17 @@ internal sealed class CommandsLogic
         _userWhitelistedSerialsRepository = userWhitelistedSerialsRepository;
         _vehicleRepository = vehicleRepository;
 
+        var debounce = new Debounce(500);
+        var debounceCounter = 0;
+        _commandService.AddAsyncCommandHandler("debounce", async (entity, args) =>
+        {
+            debounceCounter++;
+            await debounce.InvokeAsync(() =>
+            {
+                _chatBox.OutputTo(entity, $"Counter={debounceCounter}, {DateTime.Now}");
+            });
+        });
+        
         _commandService.AddAsyncCommandHandler("fadecamera", async (entity, args) =>
         {
             var playerEntity = entity.GetRequiredComponent<PlayerElementComponent>();
@@ -956,7 +967,7 @@ internal sealed class CommandsLogic
         _commandService.AddCommandHandler("itemwithmetadata", (entity, args) =>
         {
             var inv = entity.GetRequiredComponent<InventoryComponent>();
-            var item = inv.AddSingleItem(_itemsRegistry, 4, new Dictionary<string, object>
+            var item = inv.AddSingleItem(_itemsRegistry, 4, new Metadata
             {
                 ["number"] = 1m
             });
