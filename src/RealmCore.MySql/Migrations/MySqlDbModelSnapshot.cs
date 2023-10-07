@@ -866,6 +866,9 @@ namespace RealmCore.Persistence.MySql.Migrations
                     b.Property<int>("EventType")
                         .HasColumnType("int");
 
+                    b.Property<string>("Metadata")
+                        .HasColumnType("longtext");
+
                     b.Property<int>("VehicleId")
                         .HasColumnType("int");
 
