@@ -25,7 +25,7 @@ internal sealed class AdminResourceLogic
         using var _ = _logger.BeginElement(player);
         try
         {
-            if(!_ecs.TryGetEntityByPlayer(player, out var entity))
+            if(!_ecs.TryGetEntityByPlayer(player, out var entity) || entity == null)
             {
                 _logger.LogWarning("Player attempted to change admin tool {adminTool} state to {state} but entity was not found", adminTool, state);
                 return;

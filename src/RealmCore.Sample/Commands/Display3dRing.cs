@@ -1,5 +1,4 @@
-﻿using RealmCore.ECS;
-using RealmCore.Resources.Overlay;
+﻿using RealmCore.Resources.Overlay;
 
 namespace RealmCore.Console.Commands;
 

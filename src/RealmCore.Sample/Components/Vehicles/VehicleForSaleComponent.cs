@@ -1,6 +1,4 @@
-﻿using RealmCore.ECS.Components;
-
-namespace RealmCore.Console.Components.Vehicles;
+﻿namespace RealmCore.Console.Components.Vehicles;
 
 public class VehicleForSaleComponent : Component
 {

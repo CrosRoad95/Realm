@@ -1,6 +1,4 @@
-﻿using RealmCore.ECS;
-
-namespace RealmCore.Console.Commands;
+﻿namespace RealmCore.Console.Commands;
 
 [CommandName("creategroup")]
 public sealed class CreateGroupCommand : IInGameCommand

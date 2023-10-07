@@ -34,5 +34,14 @@ global using RealmCore.Server.Options;
 global using RealmCore.ECS.Attributes;
 global using RealmCore.Server.Extensions.Resources;
 global using RealmCore.Server.Utilities;
-
+global using RealmCore.Server.Components.Peds;
+global using RealmCore.Resources.Nametags;
+global using RealmCore.Resources.Admin.Enums;
+global using RealmCore.Resources.GuiSystem;
+global using RealmCore.ECS.Components;
+global using RealmCore.ECS;
+global using SlipeServer.Resources.Text3d;
+global using RealmCore.Persistence.Interfaces;
+global using Microsoft.AspNetCore.Identity;
+global using RealmCore.Persistence.Data;
 [assembly: ExcludeFromCodeCoverage]

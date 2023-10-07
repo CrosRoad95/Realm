@@ -64,7 +64,7 @@ public abstract class CollisionShapeElementComponent : ElementComponent
 
         try
         {
-            if (!_entityEngine.TryGetByElement(element, out var entity))
+            if (!_entityEngine.TryGetByElement(element, out var entity) || entity == null)
                 return;
 
             lock (_entityRulesLock)
@@ -86,7 +86,7 @@ public abstract class CollisionShapeElementComponent : ElementComponent
 
         try
         {
-            if (!_entityEngine.TryGetByElement(element, out var entity))
+            if (!_entityEngine.TryGetByElement(element, out var entity) || entity == null)
                 return;
 
             lock (_entityRulesLock)

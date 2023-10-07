@@ -26,6 +26,9 @@ internal sealed class VehicleAccessService : IVehicleAccessService
             return false;
         }
 
+        if (pedEntity == null || vehicleEntity == null)
+            return false;
+
         if (CanEnter == null)
             return false;
 

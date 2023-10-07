@@ -1,7 +1,4 @@
-﻿using RealmCore.ECS;
-using RealmCore.ECS.Components;
-
-namespace RealmCore.Console.Logic;
+﻿namespace RealmCore.Console.Logic;
 
 internal class SamplePickupsLogic
 {

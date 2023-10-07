@@ -1,6 +1,4 @@
-﻿using RealmCore.ECS;
-
-namespace RealmCore.Console.Commands;
+﻿namespace RealmCore.Console.Commands;
 
 [CommandName("givelicense")]
 public sealed class GiveLicenseCommand : IInGameCommand

@@ -1,18 +1,15 @@
-﻿using RealmCore.Resources.GuiSystem;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 
 namespace RealmCore.Console.Utilities;
 
 public sealed class HotReloadLogic
 {
-    private static HotReloadLogic? _hotReloadLogic;
     private readonly HotReload _hotReload;
     private readonly IGuiSystemService _GuiSystemService;
     private readonly ILogger<HotReloadLogic> _logger;
 
     public HotReloadLogic(IGuiSystemService GuiSystemService, ILogger<HotReloadLogic> logger, string path)
     {
-        _hotReloadLogic = this;
         _hotReload = new HotReload(path);
         _hotReload.OnReload += HandleHotReload;
         _GuiSystemService = GuiSystemService;

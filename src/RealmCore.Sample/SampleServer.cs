@@ -5,7 +5,6 @@ using RealmCore.Server.Logic.Defaults;
 using RealmCore.Console.Data.Validators;
 using RealmCore.Resources.CEFBlazorGui;
 using SlipeServer.Resources.DGS;
-using RealmCore.Resources.GuiSystem;
 using RealmCore.Resources.Addons.GuiSystem.DGS;
 using RealmCore.Configuration;
 using RealmCore.Logging;

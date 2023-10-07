@@ -1,6 +1,4 @@
-﻿using RealmCore.ECS;
-
-namespace RealmCore.Console.Commands;
+﻿namespace RealmCore.Console.Commands;
 
 [CommandName("addpoints")]
 public sealed class AddPointsCommand : IInGameCommand

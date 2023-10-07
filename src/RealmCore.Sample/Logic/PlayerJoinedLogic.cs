@@ -1,15 +1,4 @@
-﻿using RealmCore.Server.Components.Peds;
-using RealmCore.Resources.Nametags;
-using RealmCore.Resources.Admin.Enums;
-using RealmCore.Resources.GuiSystem;
-using RealmCore.ECS.Components;
-using RealmCore.ECS;
-using SlipeServer.Resources.Text3d;
-using RealmCore.Persistence.Interfaces;
-using Microsoft.AspNetCore.Identity;
-using RealmCore.Persistence.Data;
-
-namespace RealmCore.Console.Logic;
+﻿namespace RealmCore.Console.Logic;
 
 internal sealed class PlayerJoinedLogic
 {

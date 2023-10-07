@@ -1,7 +1,4 @@
-﻿using Microsoft.AspNetCore.Identity;
-using RealmCore.Persistence.Data;
-using RealmCore.Persistence.Interfaces;
-using RealmCore.Server.Components.Players.Abstractions;
+﻿using RealmCore.Server.Components.Players.Abstractions;
 using RealmCore.Server.Contexts.Interfaces;
 
 namespace RealmCore.Console.Components.Gui;

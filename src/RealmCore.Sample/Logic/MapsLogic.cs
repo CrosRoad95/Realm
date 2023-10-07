@@ -1,6 +1,4 @@
-﻿using RealmCore.ECS;
-
-namespace RealmCore.Console.Logic;
+﻿namespace RealmCore.Console.Logic;
 
 internal class MapsLogic
 {

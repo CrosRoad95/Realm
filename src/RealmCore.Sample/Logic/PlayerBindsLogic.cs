@@ -1,9 +1,6 @@
 ﻿using RealmCore.Server.DTOs;
 using RealmCore.Server.Helpers;
-using RealmCore.ECS.Components;
-using RealmCore.ECS;
 using RealmCore.Server.Components.Players.Abstractions;
-using RealmCore.Persistence.Interfaces;
 
 namespace RealmCore.Console.Logic;
 
