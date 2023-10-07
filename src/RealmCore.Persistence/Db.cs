@@ -39,6 +39,7 @@ public abstract class Db<T> : IdentityDbContext<UserData, RoleData, int,
     public DbSet<UserInventoryData> UserInventories => Set<UserInventoryData>();
     public DbSet<VehicleInventoryData> VehicleInventories => Set<VehicleInventoryData>();
     public DbSet<VehicleEventData> VehicleEvents => Set<VehicleEventData>();
+    public DbSet<UserEventData> UserEvents => Set<UserEventData>();
     public DbSet<RatingData> Ratings => Set<RatingData>();
     public DbSet<OpinionData> Opinions => Set<OpinionData>();
 
@@ -190,6 +191,11 @@ public abstract class Db<T> : IdentityDbContext<UserData, RoleData, int,
             entityBuilder.Property(x => x.QuickLogin)
                 .HasDefaultValue(false)
                 .IsRequired();
+
+            entityBuilder
+                .HasMany(x => x.UserInventories)
+                .WithOne()
+                .HasForeignKey(x => x.UserId);
         });
 
         modelBuilder.Entity<InventoryData>(entityBuilder =>
@@ -222,11 +228,17 @@ public abstract class Db<T> : IdentityDbContext<UserData, RoleData, int,
                 .HasKey(x => new { x.VehicleId, x.InventoryId });
         });
 
-
         modelBuilder.Entity<VehicleEventData>(entityBuilder =>
         {
             entityBuilder
                 .ToTable(nameof(VehicleEvents))
+                .HasKey(x => x.Id);
+        });
+
+        modelBuilder.Entity<UserEventData>(entityBuilder =>
+        {
+            entityBuilder
+                .ToTable(nameof(UserEvents))
                 .HasKey(x => x.Id);
         });
 

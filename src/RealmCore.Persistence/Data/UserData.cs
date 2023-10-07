@@ -39,4 +39,5 @@ public sealed class UserData : IdentityUser<int>
     public ICollection<UserInventoryData> UserInventories = new List<UserInventoryData>();
     public ICollection<RatingData> Ratings = new List<RatingData>();
     public ICollection<OpinionData> Opinions = new List<OpinionData>();
+    public ICollection<UserEventData> Events = new List<UserEventData>();
 }

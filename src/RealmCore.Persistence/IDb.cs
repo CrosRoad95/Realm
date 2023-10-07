@@ -36,6 +36,7 @@ public interface IDb : IDisposable
     DbSet<UserInventoryData> UserInventories { get; }
     DbSet<VehicleInventoryData> VehicleInventories { get; }
     DbSet<VehicleEventData> VehicleEvents { get; }
+    DbSet<UserEventData> UserEvents { get; }
     DbSet<RatingData> Ratings { get; }
     DbSet<OpinionData> Opinions { get; }
 

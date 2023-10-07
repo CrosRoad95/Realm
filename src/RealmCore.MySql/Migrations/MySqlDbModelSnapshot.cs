@@ -600,6 +600,29 @@ namespace RealmCore.Persistence.MySql.Migrations
                     b.ToTable("Users", (string)null);
                 });
 
+            modelBuilder.Entity("RealmCore.Persistence.Data.UserEventData", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("DateTime")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<int>("EventType")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Metadata")
+                        .HasColumnType("longtext");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("UserEvents", (string)null);
+                });
+
             modelBuilder.Entity("RealmCore.Persistence.Data.UserInventoryData", b =>
                 {
                     b.Property<int>("UserId")
@@ -608,9 +631,14 @@ namespace RealmCore.Persistence.MySql.Migrations
                     b.Property<int>("InventoryId")
                         .HasColumnType("int");
 
+                    b.Property<int?>("UserId1")
+                        .HasColumnType("int");
+
                     b.HasKey("UserId", "InventoryId");
 
                     b.HasIndex("InventoryId");
+
+                    b.HasIndex("UserId1");
 
                     b.ToTable("UserInventories", (string)null);
                 });
@@ -1176,11 +1204,15 @@ namespace RealmCore.Persistence.MySql.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("RealmCore.Persistence.Data.UserData", "User")
+                    b.HasOne("RealmCore.Persistence.Data.UserData", null)
                         .WithMany("UserInventories")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.HasOne("RealmCore.Persistence.Data.UserData", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId1");
 
                     b.Navigation("Inventory");
 
