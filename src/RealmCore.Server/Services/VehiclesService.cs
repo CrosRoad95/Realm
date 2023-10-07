@@ -159,7 +159,7 @@ internal sealed class VehiclesService : IVehiclesService
         return entity;
     }
 
-    public async Task<bool> AddVehicleEvent(Entity vehicleEntity, int eventId)
+    public async Task<bool> AddVehicleEvent(Entity vehicleEntity, int eventId, string? metadata = null)
     {
         if(vehicleEntity.TryGetComponent(out PrivateVehicleComponent privateVehicleComponent))
         {
@@ -169,11 +169,20 @@ internal sealed class VehiclesService : IVehiclesService
         return false;
     }
 
-    public async Task<List<VehicleEventData>> GetAllVehicleEvents(Entity vehicleEntity)
+    public async Task<List<VehicleEventData>> GetAllVehicleEvents(Entity vehicleEntity, IEnumerable<int>? events = null)
     {
         if (vehicleEntity.TryGetComponent(out PrivateVehicleComponent privateVehicleComponent))
         {
-            return await _vehicleEventRepository.GetAllEventsByVehicleId(privateVehicleComponent.Id).ConfigureAwait(false);
+            return await _vehicleEventRepository.GetAllEventsByVehicleId(privateVehicleComponent.Id, events).ConfigureAwait(false);
+        }
+        return new();
+    }
+
+    public async Task<List<VehicleEventData>> GetLastVehicleEvents(Entity vehicleEntity, int limit = 10, IEnumerable<int>? events = null)
+    {
+        if (vehicleEntity.TryGetComponent(out PrivateVehicleComponent privateVehicleComponent))
+        {
+            return await _vehicleEventRepository.GetLastEventsByVehicleId(privateVehicleComponent.Id, limit, events).ConfigureAwait(false);
         }
         return new();
     }

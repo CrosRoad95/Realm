@@ -32,6 +32,7 @@ public static class ServiceCollectionExtensions
         services.AddTransient<IUserRewardRepository, UserRewardRepository>();
         services.AddTransient<IVehicleEventRepository, VehicleEventRepository>();
         services.AddTransient<IUserRepository, UserRepository>();
+        services.AddTransient<IUserEventRepository, UserEventRepository>();
         services.AddTransient<IRatingRepository, RatingRepository>();
         services.AddTransient<IOpinionRepository, OpinionRepository>();
         services.AddTransient<IUserWhitelistedSerialsRepository, UserWhitelistedSerialsRepository>();

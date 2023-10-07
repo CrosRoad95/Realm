@@ -17,13 +17,14 @@ internal sealed class UsersService : IUsersService
     private readonly LevelsRegistry _levelsRegistry;
     private readonly IUserRepository _userRepository;
     private readonly UserManager<UserData> _userManager;
+    private readonly IUserEventRepository _userEventRepository;
     private static readonly JsonSerializerSettings _jsonSerializerSettings = new()
     {
         Converters = new List<JsonConverter> { new DoubleConverter() }
     };
 
     public UsersService(ItemsRegistry itemsRegistry, SignInManager<UserData> signInManager, ILogger<UsersService> logger, IOptionsMonitor<GameplayOptions> gameplayOptions,
-        IDateTimeProvider dateTimeProvider, IAuthorizationService authorizationService, IActiveUsers activeUsers, IElementCollection elementCollection, IEntityEngine ecs, LevelsRegistry levelsRegistry, IUserRepository userRepository, UserManager<UserData> userManager)
+        IDateTimeProvider dateTimeProvider, IAuthorizationService authorizationService, IActiveUsers activeUsers, IElementCollection elementCollection, IEntityEngine ecs, LevelsRegistry levelsRegistry, IUserRepository userRepository, UserManager<UserData> userManager, IUserEventRepository userEventRepository)
     {
         _itemsRegistry = itemsRegistry;
         _signInManager = signInManager;
@@ -37,6 +38,7 @@ internal sealed class UsersService : IUsersService
         _levelsRegistry = levelsRegistry;
         _userRepository = userRepository;
         _userManager = userManager;
+        _userEventRepository = userEventRepository;
     }
 
     public async Task<int> SignUp(string username, string password)
@@ -221,5 +223,33 @@ internal sealed class UsersService : IUsersService
             _logger.LogError(ex, "Failed to destroy player entity");
             throw;
         }
+    }
+
+    public async Task<bool> AddUserEvent(Entity userEntity, int eventId, string? metadata = null)
+    {
+        if (userEntity.TryGetComponent(out UserComponent userComponent))
+        {
+            await _userEventRepository.AddEvent(userComponent.Id, eventId, _dateTimeProvider.Now).ConfigureAwait(false);
+            return true;
+        }
+        return false;
+    }
+
+    public async Task<List<UserEventData>> GetAllUserEvents(Entity userEntity, IEnumerable<int>? events = null)
+    {
+        if (userEntity.TryGetComponent(out UserComponent userComponent))
+        {
+            return await _userEventRepository.GetAllEventsByUserId(userComponent.Id, events).ConfigureAwait(false);
+        }
+        return new();
+    }
+
+    public async Task<List<UserEventData>> GetLastUserEvents(Entity userEntity, int limit = 10, IEnumerable<int>? events = null)
+    {
+        if (userEntity.TryGetComponent(out UserComponent userComponent))
+        {
+            return await _userEventRepository.GetLastEventsByUserId(userComponent.Id, limit, events).ConfigureAwait(false);
+        }
+        return new();
     }
 }
