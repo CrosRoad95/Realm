@@ -1,0 +1,20 @@
+﻿@page "/realmUi/interactive"
+@using RealmCore.Sample.Components.Gui.Blazor;
+@using RealmCore.Server.Components.Elements;
+@inherits RealmGuiComponentBase<InteractiveGuiComponent>;
+
+@Component.Foo
+Hello @(Component.Entity.GetRequiredComponent<PlayerElementComponent>().Name)
+
+@code{
+    protected override void OnAfterRender(bool firstRender)
+    {
+        if (firstRender)
+        {
+            Component.FooChanged += () =>
+            {
+                InvokeAsync(StateHasChanged);
+            };
+        }
+    }
+}

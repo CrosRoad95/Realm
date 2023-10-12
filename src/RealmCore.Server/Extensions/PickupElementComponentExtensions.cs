@@ -39,11 +39,11 @@ public static class PickupElementComponentExtensions
         };
     }
 
-    public static void AddOpenGuiPageLogic<TGui>(this PickupElementComponent pickupElementComponent) where TGui : GuiPageComponent, new()
+    public static void AddOpenGuiPageLogic<TGui>(this PickupElementComponent pickupElementComponent) where TGui : GuiBlazorComponent, new()
     {
         pickupElementComponent.EntityEntered = (enteredPickup, entity) =>
         {
-            if (!entity.HasComponent<GuiPageComponent>())
+            if (!entity.HasComponent<GuiBlazorComponent>())
                 entity.AddComponent(new TGui());
         };
         pickupElementComponent.EntityLeft = (leftPickup, entity) =>
@@ -53,11 +53,11 @@ public static class PickupElementComponentExtensions
         };
     }
     
-    public static void AddOpenGuiPageLogic<TGui>(this PickupElementComponent pickupElementComponent, Func<TGui> factory) where TGui : GuiPageComponent, new()
+    public static void AddOpenGuiPageLogic<TGui>(this PickupElementComponent pickupElementComponent, Func<TGui> factory) where TGui : GuiBlazorComponent, new()
     {
         pickupElementComponent.EntityEntered = (enteredPickup, entity) =>
         {
-            if (!entity.HasComponent<GuiPageComponent>())
+            if (!entity.HasComponent<GuiBlazorComponent>())
                 entity.AddComponent(factory());
         };
         pickupElementComponent.EntityLeft = (leftPickup, entity) =>
@@ -67,11 +67,11 @@ public static class PickupElementComponentExtensions
         };
     }
     
-    public static void AddAsyncOpenGuiPageLogic<TGui>(this PickupElementComponent pickupElementComponent, Func<Task<TGui>> factory) where TGui : GuiPageComponent, new()
+    public static void AddAsyncOpenGuiPageLogic<TGui>(this PickupElementComponent pickupElementComponent, Func<Task<TGui>> factory) where TGui : GuiBlazorComponent, new()
     {
         pickupElementComponent.EntityEntered = async (enteredPickup, entity) =>
         {
-            if (!entity.HasComponent<GuiPageComponent>())
+            if (!entity.HasComponent<GuiBlazorComponent>())
                 entity.AddComponent(await factory());
         };
         pickupElementComponent.EntityLeft = (leftPickup, entity) =>

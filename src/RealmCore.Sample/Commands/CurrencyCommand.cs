@@ -1,4 +1,4 @@
-﻿namespace RealmCore.Console.Commands;
+﻿namespace RealmCore.Sample.Commands;
 
 [CommandName("currency")]
 public sealed class CurrencyCommand : IInGameCommand

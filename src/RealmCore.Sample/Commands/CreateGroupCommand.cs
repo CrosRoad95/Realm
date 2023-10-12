@@ -1,4 +1,4 @@
-﻿namespace RealmCore.Console.Commands;
+﻿namespace RealmCore.Sample.Commands;
 
 [CommandName("creategroup")]
 public sealed class CreateGroupCommand : IInGameCommand

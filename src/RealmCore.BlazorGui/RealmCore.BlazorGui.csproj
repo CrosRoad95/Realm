@@ -9,6 +9,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\RealmCore.BlazorHelpers\RealmCore.BlazorHelpers.csproj" />
     <ProjectReference Include="..\RealmCore.Sample\RealmCore.Sample.csproj" />
   </ItemGroup>
 
@@ -28,5 +29,13 @@
 		<None Update="Server\**\*">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</None>
+	</ItemGroup>
+	<ItemGroup>
+	  <Content Update="Pages\Counter2.razor">
+	    <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+	  </Content>
+	</ItemGroup>
+	<ItemGroup>
+	  <Folder Include="Services\" />
 	</ItemGroup>
 </Project>

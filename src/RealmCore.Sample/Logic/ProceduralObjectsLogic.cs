@@ -2,7 +2,7 @@
 using RealmCore.Resources.Assets;
 using SlipeServer.Server.Enums;
 
-namespace RealmCore.Console.Logic;
+namespace RealmCore.Sample.Logic;
 
 internal class ProceduralObjectsLogic
 {

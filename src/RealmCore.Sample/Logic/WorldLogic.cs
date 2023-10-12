@@ -2,7 +2,7 @@
 using RealmCore.Server.Components.Elements.CollisionShapes;
 using SlipeServer.Server.Enums;
 
-namespace RealmCore.Console.Logic;
+namespace RealmCore.Sample.Logic;
 
 internal class WorldLogic
 {

@@ -1,7 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Newtonsoft.Json;
-using RealmCore.Resources.Base;
 using RealmCore.Resources.Base.Interfaces;
 using SlipeServer.Server;
 using SlipeServer.Server.Elements;
@@ -23,8 +21,6 @@ internal class CEFBlazorGuiLogic
     public CEFBlazorGuiLogic(MtaServer mtaServer, LuaEventService luaEventService, ICEFBlazorGuiService CEFBlazorGuiService,
         ILogger<CEFBlazorGuiLogic> logger, ILuaEventHub<ICEFBlazorGuiEventHub> luaEventHub, FromLuaValueMapper fromLuaValueMapper, IOptions<BrowserOptions> blazorOptions)
     {
-        luaEventService.AddEventHandler("internalCEFInvokeVoidAsync", HandleCEFInvokeVoidAsync);
-        luaEventService.AddEventHandler("internalCEFInvokeAsync", HandleCEFInvokeAsync);
         //luaEventService.AddEventHandler("internalBrowserCreated", HandleBrowserCreated);
         luaEventService.AddEventHandler("internalBrowserDocumentReady", HandleBrowserDocumentReady);
         _CEFBlazorGuiService = CEFBlazorGuiService;
@@ -73,35 +69,6 @@ internal class CEFBlazorGuiLogic
             case SetRemotePathMessage setRemotePathMessage:
                 _luaEventHub.Invoke(setRemotePathMessage.Player, x => x.SetRemotePath(setRemotePathMessage.Path));
                 break;
-        }
-    }
-
-    private void HandleCEFInvokeVoidAsync(LuaEvent luaEvent)
-    {
-        try
-        {
-            var (identifier, args) = luaEvent.Read<string, string>(_fromLuaValueMapper);
-            _CEFBlazorGuiService.HandleInvokeVoidAsyncHandler(luaEvent.Player, identifier, args);
-        }
-        catch(Exception ex)
-        {
-            _logger.LogError(ex, "Failed to handle invokeVoidAsync");
-        }
-    }
-
-    private async void HandleCEFInvokeAsync(LuaEvent luaEvent)
-    {
-        var (identifier, promiseId, args) = luaEvent.Read<string, string, string>(_fromLuaValueMapper);
-        try
-        {
-            var value = await _CEFBlazorGuiService.HandleInvokeAsyncHandler(luaEvent.Player, identifier, args);
-            var data = JsonConvert.SerializeObject(value);
-            _luaEventHub.Invoke(luaEvent.Player, x => x.InvokeAsyncSuccess(promiseId, data));
-        }
-        catch(Exception ex)
-        {
-            _logger.LogError(ex, "Failed to handle invokeAsync");
-            _luaEventHub.Invoke(luaEvent.Player, x => x.InvokeAsyncError(promiseId, "Internal error"));
         }
     }
 

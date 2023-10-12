@@ -1,4 +1,4 @@
-﻿namespace RealmCore.Console.Commands;
+﻿namespace RealmCore.Sample.Commands;
 
 [CommandName("gp")]
 public sealed class GPCommand : IInGameCommand

@@ -1,7 +1,7 @@
 ﻿using RealmCore.Server.Enums;
 using SlipeServer.Server.Enums;
 
-namespace RealmCore.Console.Logic;
+namespace RealmCore.Sample.Logic;
 
 public class ItemsLogic : ComponentLogic<InventoryComponent>
 {

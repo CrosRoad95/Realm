@@ -1,4 +1,4 @@
-﻿namespace RealmCore.Console.Components.Vehicles;
+﻿namespace RealmCore.Sample.Components.Vehicles;
 
 public class VehicleForSaleComponent : Component
 {

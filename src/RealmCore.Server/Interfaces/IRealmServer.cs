@@ -4,5 +4,6 @@ public interface IRealmServer
 {
     event Action? ServerStarted;
 
-    public T AssociateElement<T>(T element) where T : Element;
+    T AssociateElement<T>(T element) where T : Element;
+    T GetRequiredService<T>() where T : notnull;
 }

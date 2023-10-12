@@ -1,4 +1,6 @@
-﻿namespace RealmCore.Console.Logic;
+﻿using RealmCore.Sample.Components.Gui;
+
+namespace RealmCore.Sample.Logic;
 
 internal sealed class PlayerJoinedLogic
 {

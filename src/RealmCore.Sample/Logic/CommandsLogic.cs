@@ -1,12 +1,9 @@
 ﻿using System.Diagnostics;
 using Color = System.Drawing.Color;
 using Size = System.Drawing.Size;
-using RealmCore.Console.Components.Vehicles;
 using SlipeServer.Server.Enums;
 using RealmCore.Server.Components.World;
 using RealmCore.Server.Enums;
-using RealmCore.Console.Components.Huds;
-using RealmCore.Console.Components;
 using RealmCore.Resources.ElementOutline;
 using RealmCore.Resources.Assets.Factories;
 using RealmCore.Resources.Assets.Interfaces;
@@ -16,8 +13,12 @@ using RealmCore.Resources.Overlay;
 using RealmCore.Resources.Assets;
 using RealmCore.Server.Components.Elements.CollisionShapes;
 using RealmCore.Sample.Components.Huds;
+using RealmCore.Sample.Components.Gui;
+using RealmCore.Sample.Components;
+using RealmCore.Sample.Components.Vehicles;
+using RealmCore.Sample.Components.Gui.Blazor;
 
-namespace RealmCore.Console.Logic;
+namespace RealmCore.Sample.Logic;
 
 internal sealed class CommandsLogic
 {
@@ -75,14 +76,14 @@ internal sealed class CommandsLogic
                 _chatBox.OutputTo(entity, $"Counter={debounceCounter}, {DateTime.Now}");
             });
         });
-        
+
         _commandService.AddAsyncCommandHandler("fadecamera", async (entity, args) =>
         {
             var playerEntity = entity.GetRequiredComponent<PlayerElementComponent>();
             await playerEntity.FadeCameraAsync(CameraFade.Out, 5);
             await playerEntity.FadeCameraAsync(CameraFade.In, 5);
         });
-        
+
         _commandService.AddAsyncCommandHandler("fadecamera2", async (entity, args) =>
         {
             var cancelationTokenSource = new CancellationTokenSource();
@@ -194,7 +195,7 @@ internal sealed class CommandsLogic
                     _chatBox.OutputTo(entity, $"License 10 added");
             }
         });
-        
+
         _commandService.AddCommandHandler("cv", (entity, args) =>
         {
             var vehicleEntity = _entityFactory.CreateVehicle(args.ReadUShort(), entity.Transform.Position + new Vector3(4, 0, 0), entity.Transform.Rotation);
@@ -1043,7 +1044,8 @@ internal sealed class CommandsLogic
             using var scopedEntityFactory = _entityFactory.CreateScopedEntityFactory(entity);
             var pos = entity.Transform.Position + new Vector3(3, 0, 0);
 
-            void handleComponentCreated(IScopedEntityFactory scopedEntityFactory, PlayerPrivateElementComponentBase playerPrivateElementComponentBase) {
+            void handleComponentCreated(IScopedEntityFactory scopedEntityFactory, PlayerPrivateElementComponentBase playerPrivateElementComponentBase)
+            {
                 ;
             }
             scopedEntityFactory.ComponentCreated += handleComponentCreated;
@@ -1198,7 +1200,7 @@ internal sealed class CommandsLogic
 
         _commandService.AddAsyncCommandHandler("addrating", async (entity, args) =>
         {
-            var last = (await feedbackService.GetLastRating(entity, 1)) ?? (0, DateTime.MinValue);
+            var last = await feedbackService.GetLastRating(entity, 1) ?? (0, DateTime.MinValue);
             if (last.Item2.AddSeconds(3) > dateTimeProvider.Now)
             {
                 _chatBox.OutputTo(entity, "możesz ocenić maksymalnie raz na 30sekund");
@@ -1268,7 +1270,7 @@ internal sealed class CommandsLogic
             marker.Color = Color.Red;
             marker.EntityEntered = (markerElementComponent, enteredMarker, enteredEntity) =>
             {
-                System.Console.WriteLine("entity entered (public marker)");
+                Console.WriteLine("entity entered (public marker)");
             };
         });
 
@@ -1281,7 +1283,7 @@ internal sealed class CommandsLogic
             marker.ElementComponent.Color = Color.Red;
             marker.ElementComponent.EntityEntered = (markerElementComponent, enteredMarker, enteredEntity) =>
             {
-                System.Console.WriteLine("entity entered (private marker)");
+                Console.WriteLine("entity entered (private marker)");
             };
         });
         _commandService.AddCommandHandler("setinterior", (entity, args) =>
@@ -1341,17 +1343,47 @@ internal sealed class CommandsLogic
         {
             _chatBox.OutputTo(entity, $"executed admin cmd");
         }, new string[] { "Admin" });
-        
+
         _commandService.AddCommandHandler("enum", (entity, args) =>
         {
             _chatBox.OutputTo(entity, $"Enum value: {args.ReadEnum<TestEnum>()}");
         }, new string[] { "Admin" });
-        
-        _commandService.AddCommandHandler("cefloadcounter", (entity, args) =>
+
+        _commandService.AddAsyncCommandHandler("cefloadcounter1", async (entity, args) =>
         {
-            entity.GetRequiredComponent<BrowserComponent>().LoadRemotePage("counter", false);
-            _chatBox.OutputTo(entity, "Loaded counter");
+            var browserComponent = entity.GetRequiredComponent<BrowserComponent>();
+            browserComponent.Close();
+            await Task.Delay(500);
+            browserComponent.LoadRemotePage("/realmUi/counter1", true);
+            _chatBox.OutputTo(entity, "Loaded counter 1");
         });
+        _commandService.AddAsyncCommandHandler("cefloadcounter2", async (entity, args) =>
+        {
+            var browserComponent = entity.GetRequiredComponent<BrowserComponent>();
+            browserComponent.Close();
+            await Task.Delay(500);
+            browserComponent.LoadRemotePage("/realmUi/counter2", true);
+            _chatBox.OutputTo(entity, "Loaded counter 2");
+        });
+        _commandService.AddAsyncCommandHandler("cefinteractive", async (entity, args) =>
+        {
+            var browserComponent = entity.GetRequiredComponent<BrowserComponent>();
+            browserComponent.Close();
+            await Task.Delay(500);
+            entity.AddComponent<InteractiveGuiComponent>();
+            _chatBox.OutputTo(entity, "Loaded InteractiveGuiComponent");
+        });
+        _commandService.AddAsyncCommandHandler("removecefinteractive", async (entity, args) =>
+        {
+            entity.TryDestroyComponent<InteractiveGuiComponent>();
+            _chatBox.OutputTo(entity, "Destroyed InteractiveGuiComponent");
+        });
+        _commandService.AddAsyncCommandHandler("setfoo", async (entity, args) =>
+        {
+            entity.GetRequiredComponent<InteractiveGuiComponent>().SetFoo(Guid.NewGuid().ToString());
+            _chatBox.OutputTo(entity, "Foo set");
+        });
+
         _commandService.AddCommandHandler("cefloadindex", (entity, args) =>
         {
             entity.GetRequiredComponent<BrowserComponent>().LoadRemotePage("/", false);
@@ -1457,7 +1489,7 @@ internal sealed class CommandsLogic
         {
             var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();
             _chatBox.OutputTo(entity, $"Focused entity: {playerElementComponent.FocusedEntity}");
-            if(playerElementComponent.FocusedEntity != null)
+            if (playerElementComponent.FocusedEntity != null)
             {
                 var focusableComponent = playerElementComponent.FocusedEntity.GetRequiredComponent<FocusableComponent>();
                 foreach (var focusedPlayer in focusableComponent.FocusedPlayers)

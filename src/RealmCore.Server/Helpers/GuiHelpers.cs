@@ -65,12 +65,12 @@ public static class GuiHelpers
     #endregion
 
     #region CEF Gui
-    public static void BindGuiPage<TGuiComponent>(Entity entity, string bind, IServiceProvider serviceProvider) where TGuiComponent : GuiPageComponent, new()
+    public static void BindGuiPage<TGuiComponent>(Entity entity, string bind, IServiceProvider serviceProvider) where TGuiComponent : GuiBlazorComponent, new()
     {
         BindGuiPage(entity, bind, () => new TGuiComponent(), serviceProvider);
     }
 
-    public static void BindGuiPage<TGuiComponent>(Entity entity, string bind, Func<TGuiComponent> factory, IServiceProvider serviceProvider) where TGuiComponent : GuiPageComponent
+    public static void BindGuiPage<TGuiComponent>(Entity entity, string bind, Func<TGuiComponent> factory, IServiceProvider serviceProvider) where TGuiComponent : GuiBlazorComponent
     {
         var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();
         playerElementComponent.SetBind(bind, entity =>
@@ -81,7 +81,7 @@ public static class GuiHelpers
                 return;
             }
 
-            entity.TryDestroyComponent<GuiPageComponent>();
+            entity.TryDestroyComponent<GuiBlazorComponent>();
 
             try
             {

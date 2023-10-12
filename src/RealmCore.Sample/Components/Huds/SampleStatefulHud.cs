@@ -4,7 +4,7 @@ using RealmCore.Resources.Overlay.Interfaces;
 using Color = System.Drawing.Color;
 using Size = System.Drawing.Size;
 
-namespace RealmCore.Console.Components.Huds;
+namespace RealmCore.Sample.Components.Huds;
 
 public class SampleHudState
 {

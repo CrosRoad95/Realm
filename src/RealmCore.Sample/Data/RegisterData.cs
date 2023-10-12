@@ -1,4 +1,4 @@
-﻿namespace RealmCore.Console.Data;
+﻿namespace RealmCore.Sample.Data;
 
 class RegisterData : ILuaValue
 {

@@ -1,9 +1,16 @@
 using RealmCore.BlazorGui;
+using RealmCore.BlazorHelpers;
 using RealmCore.Sample;
+using RealmCore.Server.Interfaces;
+
+Directory.SetCurrentDirectory(Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly()!.Location)!);
 
 var builder = WebApplication.CreateBuilder(args);
-
+var sampleServer = new SampleServer();
 // Add services to the container.
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddSingleton<IRealmServer>(sampleServer);
+builder.AddRealmBlazorGuiSupport();
 builder.Services.AddRazorComponents()
     .AddServerComponents();
 
@@ -20,17 +27,17 @@ if (!app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 app.UseStaticFiles();
-
 app.MapRazorComponents<App>()
+    .AddAdditionalAssemblies(typeof(RealmGuiComponentBase).Assembly)
     .AddServerRenderMode();
 
 var _ = Task.Run(async () =>
 {
     try
     {
-        await new SampleServer().Start();
+        await sampleServer.Start();
     }
-    catch(Exception ex)
+    catch (Exception ex)
     {
         Console.Write(ex.ToString());
     }

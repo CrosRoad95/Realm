@@ -1,4 +1,4 @@
-﻿namespace RealmCore.Console.Components.Jobs;
+﻿namespace RealmCore.Sample.Components.Jobs;
 
 internal class TestJobComponent : JobSessionComponent
 {

@@ -1,6 +1,6 @@
 ﻿using RealmCore.Server.Concepts.Upgrades;
 
-namespace RealmCore.Console.Logic;
+namespace RealmCore.Sample.Logic;
 
 public class VehicleUpgradesLogic
 {

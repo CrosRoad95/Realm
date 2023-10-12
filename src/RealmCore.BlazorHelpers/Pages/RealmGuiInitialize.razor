@@ -1,0 +1,26 @@
+﻿@page "/realmGuiInitialize"
+@using Microsoft.AspNetCore.Authentication;
+@using RealmCore.Server.Interfaces;
+@using RealmCore.Server.Services;
+@using System.Security.Claims;
+@inject IHttpContextAccessor _httpContextAccessor;
+@inject IRealmServer _realmServer;
+
+@code{
+    protected override async Task OnInitializedAsync()
+    {
+        var browserGuiService = _realmServer.GetRequiredService<IBrowserGuiService>();
+        if (!_httpContextAccessor.HttpContext.Request.Query.TryGetValue(browserGuiService.KeyName, out var key))
+            return;
+
+        var claims = new List<Claim>
+        {
+            new Claim(browserGuiService.KeyName, key),
+        };
+
+        var identity = new ClaimsIdentity(claims, "Cookies");
+        var principal = new System.Security.Principal.GenericPrincipal(identity, null);
+        await _httpContextAccessor.HttpContext.SignInAsync("Cookies", principal);
+        base.OnInitialized();
+    }
+}

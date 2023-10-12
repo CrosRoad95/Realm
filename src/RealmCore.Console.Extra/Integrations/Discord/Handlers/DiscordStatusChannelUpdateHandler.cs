@@ -1,4 +1,4 @@
-﻿namespace RealmCore.Console.Integrations.Discord.Handlers;
+﻿namespace RealmCore.Console.Extra.Integrations.Discord.Handlers;
 
 public class DiscordStatusChannelUpdateHandler : IDiscordStatusChannelUpdateHandler
 {

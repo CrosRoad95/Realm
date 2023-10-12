@@ -1,4 +1,4 @@
-namespace RealmCore.BlazorGui;
+namespace RealmCore.BlazorGui.Models;
 
 public class WeatherForecast
 {

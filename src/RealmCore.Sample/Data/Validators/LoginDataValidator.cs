@@ -1,4 +1,4 @@
-﻿namespace RealmCore.Console.Data.Validators;
+﻿namespace RealmCore.Sample.Data.Validators;
 
 internal class LoginDataValidator : AbstractValidator<LoginData>
 {

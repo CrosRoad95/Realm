@@ -1,6 +1,6 @@
 ﻿using RealmCore.Server.Enums;
 
-namespace RealmCore.Console.Data;
+namespace RealmCore.Sample.Data;
 
 class UseItemData : ILuaValue
 {

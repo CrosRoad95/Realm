@@ -1,4 +1,4 @@
-﻿namespace RealmCore.Console.Components.Gui;
+﻿namespace RealmCore.Sample.Components.Gui;
 
 public class SampleState
 {

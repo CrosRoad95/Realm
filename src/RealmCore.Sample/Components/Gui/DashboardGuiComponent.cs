@@ -1,7 +1,7 @@
 ﻿using RealmCore.Server.Contexts.Interfaces;
 using RealmCore.Server.DTOs;
 
-namespace RealmCore.Console.Components.Gui;
+namespace RealmCore.Sample.Components.Gui;
 
 [ComponentUsage(false)]
 public sealed class DashboardGuiComponent : StatefulDxGuiComponent<DashboardGuiComponent.DashboardState>

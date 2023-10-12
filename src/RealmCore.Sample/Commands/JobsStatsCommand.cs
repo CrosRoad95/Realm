@@ -1,4 +1,4 @@
-﻿namespace RealmCore.Console.Commands;
+﻿namespace RealmCore.Sample.Commands;
 
 [CommandName("jobstats")]
 public sealed class JobsStatsCommand : IInGameCommand

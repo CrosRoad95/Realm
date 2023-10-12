@@ -9,8 +9,6 @@ public interface ICEFBlazorGuiService
     event Action<Player>? PlayerCEFBlazorGuiStopped;
 
     Action<IMessage>? MessageHandler { get; set; }
-    Func<Player, string, string, Task>? RelayVoidAsyncInvoked { get; set; }
-    Func<Player, string, string, Task<object?>>? RelayAsyncInvoked { get; set; }
     Action<Player>? RelayPlayerBrowserReady { get; set; }
     Action<Player>? RelayPlayerBlazorReady { get; set; }
 
@@ -19,7 +17,5 @@ public interface ICEFBlazorGuiService
     void ToggleDevTools(Player player, bool enabled);
     void SetVisible(Player player, bool visible);
     void SetPath(Player player, string path, bool force, bool isAsync);
-    internal Task HandleInvokeVoidAsyncHandler(Player player, string identifier, string args);
-    internal Task<object?> HandleInvokeAsyncHandler(Player player, string identifier, string args);
     void SetRemotePath(Player player, string path);
 }

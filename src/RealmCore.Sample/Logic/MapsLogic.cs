@@ -1,4 +1,4 @@
-﻿namespace RealmCore.Console.Logic;
+﻿namespace RealmCore.Sample.Logic;
 
 internal class MapsLogic
 {

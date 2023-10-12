@@ -1,7 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using RealmCore.Configuration;
-using RealmCore.Console.Integrations.Discord.Handlers;
-using RealmCore.Console.Logic;
+using RealmCore.Console.Extra.Integrations.Discord.Handlers;
 using RealmCore.Module.Discord;
 using RealmCore.Module.Grpc;
 using RealmCore.Module.Grpc.Options;

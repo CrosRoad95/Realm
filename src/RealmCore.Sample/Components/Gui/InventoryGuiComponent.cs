@@ -1,6 +1,7 @@
-﻿using RealmCore.Server.Contexts.Interfaces;
+﻿using RealmCore.Sample.Data;
+using RealmCore.Server.Contexts.Interfaces;
 
-namespace RealmCore.Console.Components.Gui;
+namespace RealmCore.Sample.Components.Gui;
 
 [ComponentUsage(false)]
 public sealed class InventoryGuiComponent : StatefulDxGuiComponent<InventoryGuiComponent.InventoryState>

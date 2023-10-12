@@ -65,8 +65,8 @@ public static class ServiceCollectionExtensions
         services.AddTransient<IFeedbackService, FeedbackService>();
         services.AddSingleton<IMapsService, MapsService>();
         services.AddSingleton<ISpawnMarkersService, SpawnMarkersService>();
-        services.AddSingleton<IBlazorGuiService, BlazorGuiService>();
         services.AddSingleton<IVehicleAccessService, VehicleAccessService>();
+        services.AddSingleton<IBrowserGuiService, BrowserGuiService>();
         #endregion
 
         #region Policies

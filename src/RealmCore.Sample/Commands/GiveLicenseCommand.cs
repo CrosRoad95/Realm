@@ -1,4 +1,4 @@
-﻿namespace RealmCore.Console.Commands;
+﻿namespace RealmCore.Sample.Commands;
 
 [CommandName("givelicense")]
 public sealed class GiveLicenseCommand : IInGameCommand

@@ -1,20 +1,21 @@
 ﻿using RealmCore.Server.DTOs;
 using RealmCore.Server.Helpers;
 using RealmCore.Server.Components.Players.Abstractions;
+using RealmCore.Sample.Components.Gui;
 
-namespace RealmCore.Console.Logic;
+namespace RealmCore.Sample.Logic;
 
 
-internal class CounterPageComponent : GuiPageComponent
+internal class CounterPageComponent : GuiBlazorComponent
 {
-    public CounterPageComponent() : base("counter", true)
+    public CounterPageComponent() : base("counter")
     {
     }
 }
 
-internal class HomePageComponent : GuiPageComponent
+internal class HomePageComponent : GuiBlazorComponent
 {
-    public HomePageComponent() : base("home", true)
+    public HomePageComponent() : base("home")
     {
     }
 }
@@ -79,7 +80,7 @@ internal sealed class PlayerBindsLogic
             {
                 if (entity.TryGetComponent(out BrowserComponent blazorGuiComponent))
                 {
-                    if(blazorGuiComponent.Visible)
+                    if (blazorGuiComponent.Visible)
                     {
                         blazorGuiComponent.Visible = false;
                     }

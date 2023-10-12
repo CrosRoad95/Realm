@@ -4,11 +4,11 @@ local browser = nil;
 local selectedMode = "";
 local currentPath = "index"
 local isRemote = false;
-local trace = false;
+local trace = true;
 
 local function itrace(...)
 	if(trace)then
-		iprint(...)
+		iprint(getTickCount(), ...)
 	end
 end
 
@@ -18,20 +18,6 @@ local function isValidPath(path)
 	else
 		return true;
 	end
-end
-
-local function handleInvokeVoidAsync(identifier, args)
-	if(identifier == "_pageReady")then
-		if(isValidPath(currentPath))then
-			internalSetVisible(true)
-		end
-	else
-		triggerServerEvent("internalCEFInvokeVoidAsync", resourceRoot, identifier, args);
-	end
-end
-
-local function handleInvokeAsync(identifier, promiseId, args)
-	triggerServerEvent("internalCEFInvokeAsync", resourceRoot, identifier, promiseId, args);
 end
 
 local function handleRememberFrom(formName, promiseId, formData)
@@ -69,9 +55,9 @@ function handleToggleDevTools(enabled)
 end
 
 function internalSetVisible(visible)
-	itrace("internalSetVisible");
+	itrace("internalSetVisible", visible);
 	guiSetVisible(browser, visible);
-	setBrowserRenderingPaused (webBrowser, not visible);
+	--setBrowserRenderingPaused (webBrowser, not visible);
 end
 
 function handleSetVisible(visible)
@@ -101,13 +87,13 @@ end
 function handleSetRemotePath(path)
 	currentPath = path;
 	isRemote = true;
+	itrace("SetRemotePath", path)
 	loadBrowserURL(webBrowser, path)
-	showCursor(true, false);
 end
 
 local function handleLoad(mode, x, y, remoteUrl, requestWhitelistUrl)
 	selectedMode = mode;
-	itrace("internalSetVisible mode, x, y, remoteUrl", mode, x, y, remoteUrl)
+	itrace("handleLoad mode, x, y, remoteUrl", mode, x, y, remoteUrl)
 	if(mode == "remote")then
 		if(type(remoteUrl) ~= "string")then
 			error("Remote url is invalid, got: "..tostring(remoteUrl))
@@ -161,7 +147,7 @@ local function handleLoad(mode, x, y, remoteUrl, requestWhitelistUrl)
 		setAjaxHandlers(webBrowser)
 	
 		addEventHandler( "onClientBrowserCreated", webBrowser, 
-			function()
+			function()	
 				if(fileExists("index.html"))then
 					triggerServerEvent("internalBrowserCreated", resourceRoot)
 					loadBrowserURL(source, "http://mta/local/index.html" )
@@ -173,35 +159,13 @@ local function handleLoad(mode, x, y, remoteUrl, requestWhitelistUrl)
 	end
 end
 
-function resolvePromise(promiseId, data)
-	executeBrowserJavascript(webBrowser, string.format("invokeAsyncSuccess(%i, %q)", promiseId, data));
-end
-
-function rejectPromise(promiseId, reason)
-	executeBrowserJavascript(webBrowser, string.format("invokeAsyncError(%i, %q)", promiseId, reason));
-end
-
-function handleInvokeAsyncSuccess(promiseId, response)
-	resolvePromise(promiseId, response)
-end
-
-function handleInvokeAsyncError(promiseId, reason)
-	rejectPromise(promiseId, reason)
-end
-
 addEventHandler("onClientResourceStart", resourceRoot, function()
 	hubBind("Load", handleLoad)
 	hubBind("ToggleDevTools", handleToggleDevTools)
 	hubBind("SetVisible", handleSetVisible)
 	hubBind("SetPath", handleSetPath)
 	hubBind("SetRemotePath", handleSetRemotePath)
-	hubBind("InvokeAsyncSuccess", handleInvokeAsyncSuccess)
-	hubBind("InvokeAsyncError", handleInvokeAsyncError)
 	
-	addEvent("invokeVoidAsync")
-	addEventHandler("invokeVoidAsync", resourceRoot, handleInvokeVoidAsync);
-	addEvent("invokeAsync")
-	addEventHandler("invokeAsync", resourceRoot, handleInvokeAsync);
 	addEvent("rememberFrom")
 	addEventHandler("rememberFrom", resourceRoot, handleRememberFrom);
 	addEvent("getRememberFrom")

@@ -4,7 +4,7 @@ using RealmCore.Resources.Overlay.Enums;
 using RealmCore.Resources.Assets;
 using RealmCore.Resources.Overlay.Interfaces;
 
-namespace RealmCore.Console.Components.Huds;
+namespace RealmCore.Sample.Components.Huds;
 
 public class SampleHud : HudComponent
 {

@@ -1,6 +1,6 @@
 ﻿using RealmCore.Resources.Assets;
 
-namespace RealmCore.Console.Logic;
+namespace RealmCore.Sample.Logic;
 
 internal sealed class AssetsLogic
 {
@@ -8,7 +8,7 @@ internal sealed class AssetsLogic
 
     public AssetsLogic(AssetsRegistry assetsRegistry)
     {
-        if(Directory.Exists(_basePath))
+        if (Directory.Exists(_basePath))
         {
             foreach (var item in Directory.GetFiles(_basePath, "*.*", SearchOption.AllDirectories))
             {

@@ -53,11 +53,11 @@ public static class MarkerElementComponentExtensions
         };
     }
 
-    public static void AddOpenGuiPageLogic<TGui>(this MarkerElementComponent markerElementComponent) where TGui : GuiPageComponent, new()
+    public static void AddOpenGuiPageLogic<TGui>(this MarkerElementComponent markerElementComponent) where TGui : GuiBlazorComponent, new()
     {
         markerElementComponent.EntityEntered = (markerElementComponent, enteredPickup, entity) =>
         {
-            if (!entity.HasComponent<GuiPageComponent>())
+            if (!entity.HasComponent<GuiBlazorComponent>())
                 entity.AddComponent(new TGui());
         };
         markerElementComponent.EntityLeft = (markerElementComponent, leftPickup, entity) =>
@@ -67,11 +67,11 @@ public static class MarkerElementComponentExtensions
         };
     }
 
-    public static void AddOpenGuiPageLogic<TGui>(this MarkerElementComponent markerElementComponent, Func<Entity, Task<TGui>> factory) where TGui : GuiPageComponent
+    public static void AddOpenGuiPageLogic<TGui>(this MarkerElementComponent markerElementComponent, Func<Entity, Task<TGui>> factory) where TGui : GuiBlazorComponent
     {
         markerElementComponent.EntityEntered = async (markerElementComponent, enteredPickup, entity) =>
         {
-            if (!entity.HasComponent<GuiPageComponent>())
+            if (!entity.HasComponent<GuiBlazorComponent>())
                 entity.AddComponent(await factory(entity));
         };
         markerElementComponent.EntityLeft = (markerElementComponent, leftPickup, entity) =>

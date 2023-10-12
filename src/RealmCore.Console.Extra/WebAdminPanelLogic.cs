@@ -1,6 +1,6 @@
 ﻿using RealmCore.Module.Web.AdminPanel.Interfaces;
 
-namespace RealmCore.Console.Logic;
+namespace RealmCore.Console.Extra;
 
 internal class WebAdminPanelLogic
 {

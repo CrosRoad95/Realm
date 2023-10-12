@@ -92,6 +92,7 @@ public static class ServerBuilderExtensions
         #endregion
 
         #region Resources Logics
+        serverBuilder.AddLogic<BrowserGuiPageComponentLogic>();
         serverBuilder.AddLogic<AdminResourceLogic>();
         serverBuilder.AddLogic<AFKResourceLogic>();
         serverBuilder.AddLogic<BoneAttachResourceLogic>();

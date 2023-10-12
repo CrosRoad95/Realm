@@ -1,6 +1,6 @@
 ﻿using RealmCore.Resources.Overlay;
 
-namespace RealmCore.Console.Logic;
+namespace RealmCore.Sample.Logic;
 
 internal sealed class AchievementsLogic : ComponentLogic<AchievementsComponent>
 {

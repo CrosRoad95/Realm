@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics;
 
-namespace RealmCore.Console.Utilities;
+namespace RealmCore.Sample.Utilities;
 
 public sealed class HotReloadLogic
 {
