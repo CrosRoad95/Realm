@@ -1,6 +1,6 @@
 ﻿using RealmCore.Server.Logic;
 using RealmCore.Server.Logic.Defaults;
-using RealmCore.Resources.CEFBlazorGui;
+using RealmCore.Resources.Browser;
 using SlipeServer.Resources.DGS;
 using RealmCore.Resources.Addons.GuiSystem.DGS;
 using RealmCore.Configuration;
@@ -34,8 +34,8 @@ public class SampleServer : RealmServer
             }, new());
         }
 
-        serverBuilder.AddCEFBlazorGuiResource();
-        //serverBuilder.AddCEFBlazorGuiResource("../../../Server/BlazorGui/wwwroot", CEFGuiBlazorMode.Remote);
+        serverBuilder.AddBrowserResource();
+        //serverBuilder.AddBrowserResource("../../../Server/BlazorGui/wwwroot", BrowserMode.Remote);
 
         serverBuilder.AddLogic<DefaultCommandsLogic>();
 
@@ -83,15 +83,6 @@ public class SampleServer : RealmServer
             services.AddInGameCommand<Display3dRing>();
             services.AddInGameCommand<CurrencyCommand>();
             #endregion
-
-            //services.Configure<BrowserOptions>(options =>
-            //{
-            //    options.Mode = CEFGuiBlazorMode.Remote;
-            //    options.BrowserWidth = 1024;
-            //    options.BrowserHeight = 768;
-            //    options.BaseRemoteUrl = "https://localhost:7149";
-            //    options.RequestWhitelistUrl = "localhost";
-            //});
 
             var realmLogger = new RealmLogger("RealmCore", LogEventLevel.Information);
             services.AddLogging(x => x.AddSerilog(realmLogger.GetLogger(), dispose: true));

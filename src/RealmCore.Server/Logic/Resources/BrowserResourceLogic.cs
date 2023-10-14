@@ -1,21 +1,21 @@
-﻿using RealmCore.Resources.CEFBlazorGui;
+﻿using RealmCore.Resources.Browser;
 
 namespace RealmCore.Server.Logic.Resources;
 
-internal sealed class CEFBlazorGuiResourceLogic : ComponentLogic<BrowserComponent>
+internal sealed class BrowserResourceLogic : ComponentLogic<BrowserComponent>
 {
     private readonly IEntityEngine _ecs;
-    private readonly ICEFBlazorGuiService _cefBlazorGuiService;
+    private readonly IBrowserService _BrowserService;
     private readonly IOptions<BrowserOptions> _blazorOptions;
     private readonly IBrowserGuiService _browserGuiService;
 
-    public CEFBlazorGuiResourceLogic(IEntityEngine ecs, ICEFBlazorGuiService cefBlazorGuiService, IOptions<BrowserOptions> blazorOptions, IBrowserGuiService browserGuiService) : base(ecs)
+    public BrowserResourceLogic(IEntityEngine ecs, IBrowserService BrowserService, IOptions<BrowserOptions> blazorOptions, IBrowserGuiService browserGuiService) : base(ecs)
     {
         _ecs = ecs;
-        _cefBlazorGuiService = cefBlazorGuiService;
+        _BrowserService = BrowserService;
         _blazorOptions = blazorOptions;
         _browserGuiService = browserGuiService;
-        _cefBlazorGuiService.RelayPlayerBrowserReady = HandlePlayerBrowserReady;
+        _BrowserService.RelayPlayerBrowserReady = HandlePlayerBrowserReady;
     }
 
     protected override void ComponentAdded(BrowserComponent blazorGuiComponent)
@@ -46,24 +46,24 @@ internal sealed class CEFBlazorGuiResourceLogic : ComponentLogic<BrowserComponen
     {
         if(_browserGuiService.TryGetKeyByEntity(blazorGuiComponent.Entity, out var key))
         {
-            _cefBlazorGuiService.SetRemotePath(blazorGuiComponent.Entity.GetPlayer(), path);
+            _BrowserService.SetRemotePath(blazorGuiComponent.Entity.GetPlayer(), path);
         }
     }
 
     private void HandleVisibleChanged(BrowserComponent blazorGuiComponent, bool visible)
     {
-        _cefBlazorGuiService.SetVisible(blazorGuiComponent.Entity.GetPlayer(), visible);
+        _BrowserService.SetVisible(blazorGuiComponent.Entity.GetPlayer(), visible);
     }
 
     private void HandlePathChanged(BrowserComponent blazorGuiComponent, string? path, bool force, GuiPageType guiType, GuiPageChangeSource guiPageChangeSource)
     {
         if(guiPageChangeSource == GuiPageChangeSource.Server)
-            _cefBlazorGuiService.SetPath(blazorGuiComponent.Entity.GetPlayer(), path ?? "", force, guiType == GuiPageType.Async);
+            _BrowserService.SetPath(blazorGuiComponent.Entity.GetPlayer(), path ?? "", force, guiType == GuiPageType.Async);
     }
 
     private void HandleDevToolsStateChanged(BrowserComponent blazorGuiComponent, bool enabled)
     {
-        _cefBlazorGuiService.ToggleDevTools(blazorGuiComponent.Entity.GetPlayer(), enabled);
+        _BrowserService.ToggleDevTools(blazorGuiComponent.Entity.GetPlayer(), enabled);
     }
 
     private void HandlePlayerBrowserReadyCore(Entity playerEntity)

@@ -1103,7 +1103,7 @@ internal sealed class CommandsLogic
             levelComponent.LevelChanged -= handleLevelChanged;
         });
 
-        _commandService.AddCommandHandler("cefdevtools", (entity, args) =>
+        _commandService.AddCommandHandler("bropwserdevtools", (entity, args) =>
         {
             var adminComponent = entity.GetRequiredComponent<AdminComponent>();
             var blazorGuiComponent = entity.GetRequiredComponent<BrowserComponent>();
@@ -1112,7 +1112,7 @@ internal sealed class CommandsLogic
             _chatBox.OutputTo(entity, $"Devtools {blazorGuiComponent.DevTools}");
         }, null);
 
-        _commandService.AddCommandHandler("cefpath", (entity, args) =>
+        _commandService.AddCommandHandler("browserpath", (entity, args) =>
         {
             var blazorGuiComponent = entity.GetRequiredComponent<BrowserComponent>();
             _chatBox.OutputTo(entity, $"Path {blazorGuiComponent.Path}");
@@ -1349,7 +1349,7 @@ internal sealed class CommandsLogic
             _chatBox.OutputTo(entity, $"Enum value: {args.ReadEnum<TestEnum>()}");
         }, new string[] { "Admin" });
 
-        _commandService.AddAsyncCommandHandler("cefloadcounter1", async (entity, args) =>
+        _commandService.AddAsyncCommandHandler("browserloadcounter1", async (entity, args) =>
         {
             var browserComponent = entity.GetRequiredComponent<BrowserComponent>();
             browserComponent.Close();
@@ -1357,7 +1357,7 @@ internal sealed class CommandsLogic
             browserComponent.LoadRemotePage("/realmUi/counter1", true);
             _chatBox.OutputTo(entity, "Loaded counter 1");
         });
-        _commandService.AddAsyncCommandHandler("cefloadcounter2", async (entity, args) =>
+        _commandService.AddAsyncCommandHandler("browserloadcounter2", async (entity, args) =>
         {
             var browserComponent = entity.GetRequiredComponent<BrowserComponent>();
             browserComponent.Close();
@@ -1365,7 +1365,7 @@ internal sealed class CommandsLogic
             browserComponent.LoadRemotePage("/realmUi/counter2", true);
             _chatBox.OutputTo(entity, "Loaded counter 2");
         });
-        _commandService.AddAsyncCommandHandler("cefinteractive", async (entity, args) =>
+        _commandService.AddAsyncCommandHandler("browserinteractive", async (entity, args) =>
         {
             var browserComponent = entity.GetRequiredComponent<BrowserComponent>();
             browserComponent.Close();
@@ -1373,7 +1373,7 @@ internal sealed class CommandsLogic
             entity.AddComponent<InteractiveGuiComponent>();
             _chatBox.OutputTo(entity, "Loaded InteractiveGuiComponent");
         });
-        _commandService.AddAsyncCommandHandler("removecefinteractive", async (entity, args) =>
+        _commandService.AddAsyncCommandHandler("removebrowserinteractive", async (entity, args) =>
         {
             entity.TryDestroyComponent<InteractiveGuiComponent>();
             _chatBox.OutputTo(entity, "Destroyed InteractiveGuiComponent");
@@ -1384,7 +1384,7 @@ internal sealed class CommandsLogic
             _chatBox.OutputTo(entity, "Foo set");
         });
 
-        _commandService.AddCommandHandler("cefloadindex", (entity, args) =>
+        _commandService.AddCommandHandler("browserloadindex", (entity, args) =>
         {
             entity.GetRequiredComponent<BrowserComponent>().LoadRemotePage("/", false);
             _chatBox.OutputTo(entity, "Loaded /");

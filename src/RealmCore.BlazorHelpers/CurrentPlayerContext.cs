@@ -9,26 +9,26 @@ namespace RealmCore.BlazorHelpers;
 
 public class CurrentPlayerContext
 {
-    public Entity? Entity { get; }
     public IRealmServer? Server { get; }
-    protected BrowserComponent BrowserComponent { get; }
     protected IBrowserGuiService BrowserGuiService { get; }
     public ClaimsPrincipal ClaimsPrincipal { get; }
+    public Entity? Entity { get; }
+    protected BrowserComponent? BrowserComponent { get; }
 
-    public event Action<string>? PathChanged;
     public CurrentPlayerContext(IHttpContextAccessor httpContent, IRealmServer realmServer)
     {
         Server = realmServer;
         ClaimsPrincipal = httpContent.HttpContext.User;
+        BrowserGuiService = realmServer.GetRequiredService<IBrowserGuiService>();
         if (ClaimsPrincipal.Identity != null && ClaimsPrincipal.Identity.IsAuthenticated)
         {
-            var browserGuiService = realmServer.GetRequiredService<IBrowserGuiService>();
-            var keyClaim = ClaimsPrincipal.Claims.Where(x => x.Type == browserGuiService.KeyName).FirstOrDefault();
+            var keyClaim = ClaimsPrincipal.Claims.Where(x => x.Type == BrowserGuiService.KeyName).FirstOrDefault();
             if (keyClaim == null)
                 return;
-            if(browserGuiService.TryGetEntityByKey(keyClaim.Value, out var entity) && entity != null)
+            if(BrowserGuiService.TryGetEntityByKey(keyClaim.Value, out var entity) && entity != null)
             {
                 Entity = entity;
+                BrowserComponent = entity.GetRequiredComponent<BrowserComponent>();
             }
         }
     }

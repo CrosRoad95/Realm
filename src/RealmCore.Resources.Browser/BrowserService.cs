@@ -4,14 +4,12 @@ using RealmCore.Resources.Base.Interfaces;
 using SlipeServer.Server.ElementCollections;
 using SlipeServer.Server.Elements;
 
-namespace RealmCore.Resources.CEFBlazorGui;
+namespace RealmCore.Resources.Browser;
 
-internal sealed class CEFBlazorGuiService : ICEFBlazorGuiService
+internal sealed class BrowserService : IBrowserService
 {
-    public event Action<Player>? PlayerCEFBlazorGuiStarted;
-    public event Action<Player>? PlayerCEFBlazorGuiStopped;
-    private readonly IElementCollection _elementCollection;
-    private readonly ILogger<CEFBlazorGuiService> _logger;
+    public event Action<Player>? PlayerBrowserStarted;
+    public event Action<Player>? PlayerBrowserStopped;
 
     public Action<IMessage>? MessageHandler { get; set; }
 
@@ -20,7 +18,7 @@ internal sealed class CEFBlazorGuiService : ICEFBlazorGuiService
 
     private readonly Uri? _baseUrl;
 
-    public CEFBlazorGuiService(IOptions<BrowserOptions> browserOptions, IElementCollection elementCollection, ILogger<CEFBlazorGuiService> logger)
+    public BrowserService(IOptions<BrowserOptions> browserOptions, ILogger<BrowserService> logger)
     {
         if(browserOptions.Value.BaseRemoteUrl != null)
         {
@@ -33,12 +31,6 @@ internal sealed class CEFBlazorGuiService : ICEFBlazorGuiService
                 logger.LogError(ex, "Invalid URI format: {baseRemoteUrl}", browserOptions.Value.BaseRemoteUrl);
                 throw;
             }
-        }
-        _elementCollection = elementCollection;
-        _logger = logger;
-        if (browserOptions.Value.DebuggingServer)
-        {
-            // TODO:
         }
     }
 

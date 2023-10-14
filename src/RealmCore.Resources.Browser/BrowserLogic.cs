@@ -7,30 +7,30 @@ using SlipeServer.Server.Events;
 using SlipeServer.Server.Mappers;
 using SlipeServer.Server.Services;
 
-namespace RealmCore.Resources.CEFBlazorGui;
+namespace RealmCore.Resources.Browser;
 
-internal class CEFBlazorGuiLogic
+internal class BrowserLogic
 {
-    private readonly ICEFBlazorGuiService _CEFBlazorGuiService;
-    private readonly ILogger<CEFBlazorGuiLogic> _logger;
-    private readonly ILuaEventHub<ICEFBlazorGuiEventHub> _luaEventHub;
+    private readonly IBrowserService _BrowserService;
+    private readonly ILogger<BrowserLogic> _logger;
+    private readonly ILuaEventHub<IBrowserEventHub> _luaEventHub;
     private readonly FromLuaValueMapper _fromLuaValueMapper;
     private readonly IOptions<BrowserOptions> _blazorOptions;
-    private readonly CEFBlazorGuiResource _resource;
+    private readonly BrowserResource _resource;
 
-    public CEFBlazorGuiLogic(MtaServer mtaServer, LuaEventService luaEventService, ICEFBlazorGuiService CEFBlazorGuiService,
-        ILogger<CEFBlazorGuiLogic> logger, ILuaEventHub<ICEFBlazorGuiEventHub> luaEventHub, FromLuaValueMapper fromLuaValueMapper, IOptions<BrowserOptions> blazorOptions)
+    public BrowserLogic(MtaServer mtaServer, LuaEventService luaEventService, IBrowserService BrowserService,
+        ILogger<BrowserLogic> logger, ILuaEventHub<IBrowserEventHub> luaEventHub, FromLuaValueMapper fromLuaValueMapper, IOptions<BrowserOptions> blazorOptions)
     {
         //luaEventService.AddEventHandler("internalBrowserCreated", HandleBrowserCreated);
         luaEventService.AddEventHandler("internalBrowserDocumentReady", HandleBrowserDocumentReady);
-        _CEFBlazorGuiService = CEFBlazorGuiService;
+        _BrowserService = BrowserService;
         _logger = logger;
         _luaEventHub = luaEventHub;
         _fromLuaValueMapper = fromLuaValueMapper;
         _blazorOptions = blazorOptions;
-        _resource = mtaServer.GetAdditionalResource<CEFBlazorGuiResource>();
+        _resource = mtaServer.GetAdditionalResource<BrowserResource>();
         mtaServer.PlayerJoined += HandlePlayerJoin;
-        CEFBlazorGuiService.MessageHandler = HandleMessage;
+        BrowserService.MessageHandler = HandleMessage;
     }
 
     private async void HandlePlayerJoin(Player player)
@@ -74,6 +74,6 @@ internal class CEFBlazorGuiLogic
 
     private void HandleBrowserDocumentReady(LuaEvent luaEvent)
     {
-        _CEFBlazorGuiService.HandlePlayerBrowserReady(luaEvent.Player);
+        _BrowserService.HandlePlayerBrowserReady(luaEvent.Player);
     }
 }

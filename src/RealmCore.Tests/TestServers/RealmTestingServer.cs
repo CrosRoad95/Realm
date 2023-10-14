@@ -5,7 +5,7 @@ using RealmCore.Tests.Classes;
 using SlipeServer.Server.Resources.Providers;
 using SlipeServer.Server.Resources.Interpreters;
 using SlipeServer.Server.Resources;
-using RealmCore.Resources.CEFBlazorGui;
+using RealmCore.Resources.Browser;
 using RealmCore.Resources.GuiSystem;
 
 namespace RealmCore.Tests.TestServers;
@@ -71,7 +71,7 @@ internal class RealmTestingServer : TestingServer
         {
             services.Configure<BrowserOptions>(options =>
             {
-                options.Mode = CEFGuiBlazorMode.Local;
+                options.Mode = BrowserMode.Local;
                 options.BrowserWidth = 1024;
                 options.BrowserHeight = 768;
                 options.BaseRemoteUrl = "https://localhost:7149";
@@ -90,7 +90,7 @@ internal class RealmTestingServer : TestingServer
             services.AddSingleton<VehicleUpgradeRegistry>();
             services.AddSingleton<LevelsRegistry>();
             services.AddSingleton<ISpawnMarkersService, SpawnMarkersService>();
-            services.AddSingleton<ICEFBlazorGuiService, CEFBlazorGuiService>();
+            services.AddSingleton<IBrowserService, BrowserService>();
             services.AddSingleton<IEntityFactory, EntityFactory>();
             services.AddSingleton<IAssetEncryptionProvider, TestAssetEncryptionProvider>();
             services.AddSingleton<IBrowserGuiService, BrowserGuiService>();

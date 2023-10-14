@@ -1,6 +1,6 @@
-﻿namespace RealmCore.Resources.CEFBlazorGui;
+﻿namespace RealmCore.Resources.Browser;
 
-internal interface ICEFBlazorGuiEventHub
+internal interface IBrowserEventHub
 {
     void Load(string mode, int x, int y, string? remoteUrl, string? requestWhitelistUrl);
     void ToggleDevTools(bool enabled);

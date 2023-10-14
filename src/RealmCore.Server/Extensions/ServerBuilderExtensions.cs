@@ -1,4 +1,4 @@
-﻿using RealmCore.Resources.CEFBlazorGui;
+﻿using RealmCore.Resources.Browser;
 using RealmCore.Server.Logic.Components;
 using RealmCore.Server.Logic.Elements;
 using RealmCore.SQLite;
@@ -96,7 +96,7 @@ public static class ServerBuilderExtensions
         serverBuilder.AddLogic<AdminResourceLogic>();
         serverBuilder.AddLogic<AFKResourceLogic>();
         serverBuilder.AddLogic<BoneAttachResourceLogic>();
-        serverBuilder.AddLogic<CEFBlazorGuiResourceLogic>();
+        serverBuilder.AddLogic<BrowserResourceLogic>();
         serverBuilder.AddLogic<ClientInterfaceResourceLogic>();
         serverBuilder.AddLogic<NametagResourceLogic>();
         serverBuilder.AddLogic<OutlineResourceLogic>();

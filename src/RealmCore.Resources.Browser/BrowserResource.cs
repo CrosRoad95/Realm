@@ -4,21 +4,21 @@ using SlipeServer.Server.Resources;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
-namespace RealmCore.Resources.CEFBlazorGui;
+namespace RealmCore.Resources.Browser;
 
-internal class CEFBlazorGuiResource : Resource
+internal class BrowserResource : Resource
 {
     private readonly MtaServer _server;
     private readonly string? _directoryPath;
 
     internal Dictionary<string, byte[]> AdditionalFiles { get; } = new Dictionary<string, byte[]>()
     {
-        ["cefBlazorGui.lua"] = ResourceFiles.CEFBlazorGui,
+        ["Browser.lua"] = ResourceFiles.Browser,
         ["error.html"] = ResourceFiles.ErrorPage,
     };
 
-    internal CEFBlazorGuiResource(MtaServer server, string? directoryPath)
-        : base(server, server.GetRequiredService<RootElement>(), "CEFBlazorGui")
+    internal BrowserResource(MtaServer server, string? directoryPath)
+        : base(server, server.GetRequiredService<RootElement>(), "Browser")
     {
         var blazorOptions = server.GetRequiredService<IOptions<BrowserOptions>>();
         foreach (var (path, content) in AdditionalFiles)
@@ -26,7 +26,7 @@ internal class CEFBlazorGuiResource : Resource
         _server = server;
         _directoryPath = directoryPath;
 
-        if(blazorOptions.Value.Mode == CEFGuiBlazorMode.Local)
+        if(blazorOptions.Value.Mode == BrowserMode.Local)
             IncludeClientsideWebAssemblyFiles();
     }
 
@@ -99,7 +99,7 @@ internal class CEFBlazorGuiResource : Resource
             }
             catch (Exception ex)
             {
-                _server.GetRequiredService<ILogger<CEFBlazorGuiResource>>().LogError(ex, "Failed to find production files.");
+                _server.GetRequiredService<ILogger<BrowserResource>>().LogError(ex, "Failed to find production files.");
             }
         }
     }

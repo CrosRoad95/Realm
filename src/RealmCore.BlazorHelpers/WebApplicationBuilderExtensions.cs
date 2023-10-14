@@ -9,7 +9,7 @@ public static class WebApplicationBuilderExtensions
 
         builder.Services.AddAuthentication("Cookies").AddCookie(x =>
         {
-            x.LoginPath = "/";
+            x.LoginPath = "/realmGuiInitialize";
         });
         builder.Services.AddAuthorization(options =>
         {

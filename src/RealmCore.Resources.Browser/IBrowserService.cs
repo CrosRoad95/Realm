@@ -1,12 +1,12 @@
 ﻿using RealmCore.Resources.Base.Interfaces;
 using SlipeServer.Server.Elements;
 
-namespace RealmCore.Resources.CEFBlazorGui;
+namespace RealmCore.Resources.Browser;
 
-public interface ICEFBlazorGuiService
+public interface IBrowserService
 {
-    event Action<Player>? PlayerCEFBlazorGuiStarted;
-    event Action<Player>? PlayerCEFBlazorGuiStopped;
+    event Action<Player>? PlayerBrowserStarted;
+    event Action<Player>? PlayerBrowserStopped;
 
     Action<IMessage>? MessageHandler { get; set; }
     Action<Player>? RelayPlayerBrowserReady { get; set; }
