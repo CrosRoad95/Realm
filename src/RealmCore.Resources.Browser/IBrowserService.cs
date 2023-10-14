@@ -10,12 +10,10 @@ public interface IBrowserService
 
     Action<IMessage>? MessageHandler { get; set; }
     Action<Player>? RelayPlayerBrowserReady { get; set; }
-    Action<Player>? RelayPlayerBlazorReady { get; set; }
 
     internal void HandlePlayerBrowserReady(Player player);
 
     void ToggleDevTools(Player player, bool enabled);
     void SetVisible(Player player, bool visible);
-    void SetPath(Player player, string path, bool force, bool isAsync);
-    void SetRemotePath(Player player, string path);
+    void SetPath(Player player, string path, bool force);
 }

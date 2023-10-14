@@ -6,4 +6,5 @@ public interface IRealmServer
 
     T AssociateElement<T>(T element) where T : Element;
     T GetRequiredService<T>() where T : notnull;
+    void Start();
 }

@@ -10,12 +10,12 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<None Remove="Lua\cefBlazorGui.lua" />
+		<None Remove="Lua\browser.lua" />
 		<None Remove="Lua\error.html" />
 	</ItemGroup>
 
 	<ItemGroup>
-		<EmbeddedResource Include="Lua\cefBlazorGui.lua">
+		<EmbeddedResource Include="Lua\Browser.lua">
 			<CopyToOutputDirectory>Never</CopyToOutputDirectory>
 		</EmbeddedResource>
 		<EmbeddedResource Include="Lua\error.html" />

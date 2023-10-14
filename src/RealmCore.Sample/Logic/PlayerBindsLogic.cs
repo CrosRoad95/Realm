@@ -6,14 +6,14 @@ using RealmCore.Sample.Components.Gui;
 namespace RealmCore.Sample.Logic;
 
 
-internal class CounterPageComponent : GuiBlazorComponent
+internal class CounterPageComponent : BrowserGuiComponent
 {
     public CounterPageComponent() : base("counter")
     {
     }
 }
 
-internal class HomePageComponent : GuiBlazorComponent
+internal class HomePageComponent : BrowserGuiComponent
 {
     public HomePageComponent() : base("home")
     {
@@ -63,41 +63,35 @@ internal sealed class PlayerBindsLogic
 
             playerElementComponent.SetBind("F2", entity =>
             {
-                if (entity.TryGetComponent(out BrowserComponent blazorGuiComponent))
+                if (entity.TryGetComponent(out BrowserComponent browserComponent))
                 {
-                    if (blazorGuiComponent.Visible)
+                    if (browserComponent.Visible)
                     {
-                        blazorGuiComponent.Close();
+                        browserComponent.Close();
                     }
                     else
                     {
-                        blazorGuiComponent.Open("counter");
+                        browserComponent.Path = "/realmUi/counter1";
+                        browserComponent.Visible = true;
                     }
                 }
             });
 
             playerElementComponent.SetBind("F3", entity =>
             {
-                if (entity.TryGetComponent(out BrowserComponent blazorGuiComponent))
+                if (entity.TryGetComponent(out BrowserComponent browserComponent))
                 {
-                    if (blazorGuiComponent.Visible)
-                    {
-                        blazorGuiComponent.Visible = false;
-                    }
-                    else
-                    {
-                        blazorGuiComponent.Visible = true;
-                        blazorGuiComponent.Path = "fetchdata";
-                    }
+                    browserComponent.Path = "/realmUi/counter1";
+                    browserComponent.Visible = true;
                 }
             });
 
             playerElementComponent.SetBind("F4", entity =>
             {
-                if (entity.TryGetComponent(out BrowserComponent blazorGuiComponent))
+                if (entity.TryGetComponent(out BrowserComponent browserComponent))
                 {
-                    blazorGuiComponent.Path = "index";
-                    blazorGuiComponent.Visible = false;
+                    browserComponent.Path = "index";
+                    browserComponent.Visible = false;
                 }
             });
 

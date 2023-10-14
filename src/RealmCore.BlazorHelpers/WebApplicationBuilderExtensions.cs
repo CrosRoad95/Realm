@@ -9,16 +9,13 @@ public static class WebApplicationBuilderExtensions
 
         builder.Services.AddAuthentication("Cookies").AddCookie(x =>
         {
-            x.LoginPath = "/realmGuiInitialize";
+            x.LoginPath = "/realmGuiInitializeNotAllowed";
         });
-        builder.Services.AddAuthorization(options =>
-        {
-            options.AddPolicy("Cookies", policy =>
+        builder.Services.AddAuthorizationBuilder()
+            .AddPolicy("Cookies", policy =>
             {
                 policy.AddAuthenticationSchemes("Cookies");
                 policy.RequireAuthenticatedUser();
             });
-        });
-
     }
 }

@@ -1103,19 +1103,19 @@ internal sealed class CommandsLogic
             levelComponent.LevelChanged -= handleLevelChanged;
         });
 
-        _commandService.AddCommandHandler("bropwserdevtools", (entity, args) =>
+        _commandService.AddCommandHandler("browserdevtools", (entity, args) =>
         {
             var adminComponent = entity.GetRequiredComponent<AdminComponent>();
-            var blazorGuiComponent = entity.GetRequiredComponent<BrowserComponent>();
+            var browserComponent = entity.GetRequiredComponent<BrowserComponent>();
             adminComponent.DevelopmentMode = true;
-            blazorGuiComponent.DevTools = !blazorGuiComponent.DevTools;
-            _chatBox.OutputTo(entity, $"Devtools {blazorGuiComponent.DevTools}");
+            browserComponent.DevTools = !browserComponent.DevTools;
+            _chatBox.OutputTo(entity, $"Devtools {browserComponent.DevTools}");
         }, null);
 
         _commandService.AddCommandHandler("browserpath", (entity, args) =>
         {
-            var blazorGuiComponent = entity.GetRequiredComponent<BrowserComponent>();
-            _chatBox.OutputTo(entity, $"Path {blazorGuiComponent.Path}");
+            var browserComponent = entity.GetRequiredComponent<BrowserComponent>();
+            _chatBox.OutputTo(entity, $"Path {browserComponent.Path}");
         }, null);
 
         _commandService.AddAsyncCommandHandler("usernames", async (entity, args) =>
@@ -1163,12 +1163,12 @@ internal sealed class CommandsLogic
             }
         });
 
-        _commandService.AddCommandHandler("blazorguiopen", (entity, args) =>
+        _commandService.AddCommandHandler("browserguiopen", (entity, args) =>
         {
             entity.GetRequiredComponent<BrowserComponent>().Path = "Counter";
         });
 
-        _commandService.AddCommandHandler("blazorguiclose", (entity, args) =>
+        _commandService.AddCommandHandler("browserguiclose", (entity, args) =>
         {
             entity.GetRequiredComponent<BrowserComponent>().Path = null;
         });
@@ -1354,7 +1354,7 @@ internal sealed class CommandsLogic
             var browserComponent = entity.GetRequiredComponent<BrowserComponent>();
             browserComponent.Close();
             await Task.Delay(500);
-            browserComponent.LoadRemotePage("/realmUi/counter1", true);
+            browserComponent.Path = "/realmUi/counter1";
             _chatBox.OutputTo(entity, "Loaded counter 1");
         });
         _commandService.AddAsyncCommandHandler("browserloadcounter2", async (entity, args) =>
@@ -1362,15 +1362,23 @@ internal sealed class CommandsLogic
             var browserComponent = entity.GetRequiredComponent<BrowserComponent>();
             browserComponent.Close();
             await Task.Delay(500);
-            browserComponent.LoadRemotePage("/realmUi/counter2", true);
+            browserComponent.Path = "/realmUi/counter2";
             _chatBox.OutputTo(entity, "Loaded counter 2");
+        });
+        _commandService.AddAsyncCommandHandler("navigatetest", async (entity, args) =>
+        {
+            var browserComponent = entity.GetRequiredComponent<BrowserComponent>();
+            browserComponent.Path = "/realmUi/counter2";
+            _chatBox.OutputTo(entity, "navigated");
         });
         _commandService.AddAsyncCommandHandler("browserinteractive", async (entity, args) =>
         {
             var browserComponent = entity.GetRequiredComponent<BrowserComponent>();
             browserComponent.Close();
             await Task.Delay(500);
+            entity.TryDestroyComponent<InteractiveGuiComponent>();
             entity.AddComponent<InteractiveGuiComponent>();
+            browserComponent.Visible = true;
             _chatBox.OutputTo(entity, "Loaded InteractiveGuiComponent");
         });
         _commandService.AddAsyncCommandHandler("removebrowserinteractive", async (entity, args) =>
@@ -1386,16 +1394,16 @@ internal sealed class CommandsLogic
 
         _commandService.AddCommandHandler("browserloadindex", (entity, args) =>
         {
-            entity.GetRequiredComponent<BrowserComponent>().LoadRemotePage("/", false);
+            entity.GetRequiredComponent<BrowserComponent>().Path = "/";
             _chatBox.OutputTo(entity, "Loaded /");
         });
 
-        _commandService.AddCommandHandler("openblazor", (entity, args) =>
+        _commandService.AddCommandHandler("openbrowser", (entity, args) =>
         {
             entity.GetRequiredComponent<BrowserComponent>().Visible = true;
             _chatBox.OutputTo(entity, "Open");
         });
-        _commandService.AddCommandHandler("closeblazor", (entity, args) =>
+        _commandService.AddCommandHandler("closebrowser", (entity, args) =>
         {
             entity.GetRequiredComponent<BrowserComponent>().Close();
             _chatBox.OutputTo(entity, "Closed");

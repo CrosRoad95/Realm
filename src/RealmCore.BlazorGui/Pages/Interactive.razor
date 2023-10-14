@@ -1,9 +1,7 @@
 ﻿@page "/realmUi/interactive"
-@using RealmCore.Sample.Components.Gui.Blazor;
-@using RealmCore.Server.Components.Elements;
 @inherits RealmGuiComponentBase<InteractiveGuiComponent>;
 
-@Component.Foo
+Foo=@Component.Foo
 Hello @(Component.Entity.GetRequiredComponent<PlayerElementComponent>().Name)
 
 @code{

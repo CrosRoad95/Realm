@@ -2,7 +2,7 @@
 
 namespace RealmCore.Server.Logic.Resources;
 
-internal sealed class BrowserGuiPageComponentLogic : ComponentLogic<GuiBlazorComponent>
+internal sealed class BrowserGuiPageComponentLogic : ComponentLogic<BrowserGuiComponent>
 {
     private readonly IBrowserGuiService _browserGuiService;
     private readonly ILogger<BrowserGuiPageComponentLogic> _logger;
@@ -13,35 +13,23 @@ internal sealed class BrowserGuiPageComponentLogic : ComponentLogic<GuiBlazorCom
         _logger = logger;
     }
 
-    protected override void ComponentAdded(GuiBlazorComponent guiBlazorComponent)
+    protected override void ComponentAdded(BrowserGuiComponent browserGuiComponent)
     {
-        using var _ = _logger.BeginEntity(guiBlazorComponent.Entity);
-        if(_browserGuiService.TryGetKeyByEntity(guiBlazorComponent.Entity, out var key))
+        using var _ = _logger.BeginEntity(browserGuiComponent.Entity);
+        if(_browserGuiService.TryGetKeyByEntity(browserGuiComponent.Entity, out var key))
         {
-            //var url = $"{guiBlazorComponent.Path}?{_browserGuiService.KeyName}={key}";
-            var url = guiBlazorComponent.Path;
-            guiBlazorComponent.Entity.GetRequiredComponent<BrowserComponent>().LoadRemotePage(url, true);
-            //guiBlazorComponent.NavigationRequested += HandleNavigationRequested;
+            var url = browserGuiComponent.Path;
+            browserGuiComponent.Entity.GetRequiredComponent<BrowserComponent>().Path = url;
 
-            _logger.LogInformation("Gui {guiPageType} opened", guiBlazorComponent.GetType().Name);
+            _logger.LogInformation("Gui {guiPageType} opened", browserGuiComponent.GetType().Name);
         }
-        ;
     }
 
-    private void HandleNavigationRequested(GuiBlazorComponent that, GuiBlazorComponent targetComponent)
+    protected override void ComponentDetached(BrowserGuiComponent browserGuiComponent)
     {
-        var entity = that.Entity;
-        entity.DestroyComponent(that);
-        entity.AddComponent(targetComponent);
-    }
+        var browserComponent = browserGuiComponent.Entity.GetRequiredComponent<BrowserComponent>();
+        browserComponent.Visible = false;
 
-    protected override void ComponentDetached(GuiBlazorComponent guiBlazorComponent)
-    {
-        var browserGuiComponent = guiBlazorComponent.Entity.GetRequiredComponent<BrowserComponent>();
-        guiBlazorComponent.NavigationRequested -= HandleNavigationRequested;
-        //browserGuiComponent.LoadRemotePage("/");
-        browserGuiComponent.Visible = false;
-
-        _logger.LogInformation("Gui {guiPageType} closed", guiBlazorComponent.GetType().Name);
+        _logger.LogInformation("Gui {guiPageType} closed", browserGuiComponent.GetType().Name);
     }
 }

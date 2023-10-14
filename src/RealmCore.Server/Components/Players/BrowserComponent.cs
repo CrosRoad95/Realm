@@ -3,18 +3,16 @@
 [ComponentUsage(false)]
 public class BrowserComponent : Component
 {
-    public event Action<BrowserComponent, string?, bool, GuiPageType, GuiPageChangeSource>? PathChanged;
-    public event Action<BrowserComponent, string>? RemotePathChanged;
+    public event Action<BrowserComponent, string, bool>? PathChanged;
     public event Action<BrowserComponent, bool>? DevToolsStateChanged;
     public event Action<BrowserComponent, bool>? VisibleChanged;
 
-    private string? _path;
-    public string? Path
+    private string _path = "/";
+    public string Path
     {
         get => _path; set
         {
-            if (_path == value) return;
-            PathChanged?.Invoke(this, value, false, GuiPageType.Unknown, GuiPageChangeSource.Server);
+            PathChanged?.Invoke(this, value, false);
             _path = value;
         }
     }
@@ -45,40 +43,14 @@ public class BrowserComponent : Component
         }
     }
 
-    public void LoadRemotePage(string path, bool andOpen = true)
+    public void SetPath(string path, bool clientSide = true)
     {
-        RemotePathChanged?.Invoke(this, path);
-        if (andOpen)
-            Visible = true;
-    }
-
-    public void Open(string path, bool force = false, bool isAsync = false)
-    {
-        if (isAsync)
-        {
-            //Visible = true;
-            _visible = true;
-        }
-        else
-        {
-            Visible = true;
-        }
-
-        if (path == _path && !force)
-            return;
+        PathChanged?.Invoke(this, path, clientSide);
         _path = path;
-
-        PathChanged?.Invoke(this, path, force, isAsync ? GuiPageType.Async : GuiPageType.Sync, GuiPageChangeSource.Server);
     }
 
     public void Close()
     {
         Visible = false;
-    }
-
-    internal void InternalSetPath(string path)
-    {
-        _path = path;
-        PathChanged?.Invoke(this, path, false, GuiPageType.Unknown, GuiPageChangeSource.Client);
     }
 }

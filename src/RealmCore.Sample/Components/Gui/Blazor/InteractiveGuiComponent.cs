@@ -2,7 +2,7 @@
 
 namespace RealmCore.Sample.Components.Gui.Blazor;
 
-public class InteractiveGuiComponent : GuiBlazorComponent
+public class InteractiveGuiComponent : BrowserGuiComponent
 {
     public string Foo { get; private set; } = "default";
     public event Action? FooChanged;

@@ -1,3 +1,3 @@
 ﻿using RealmCore.Sample;
 
-await new SampleServer().Start();
+new SampleServer().Start();

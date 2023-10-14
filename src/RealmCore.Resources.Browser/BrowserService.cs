@@ -1,7 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using RealmCore.Resources.Base.Interfaces;
-using SlipeServer.Server.ElementCollections;
 using SlipeServer.Server.Elements;
 
 namespace RealmCore.Resources.Browser;
@@ -14,7 +13,6 @@ internal sealed class BrowserService : IBrowserService
     public Action<IMessage>? MessageHandler { get; set; }
 
     public Action<Player>? RelayPlayerBrowserReady { get; set; }
-    public Action<Player>? RelayPlayerBlazorReady { get; set; }
 
     private readonly Uri? _baseUrl;
 
@@ -39,11 +37,6 @@ internal sealed class BrowserService : IBrowserService
         RelayPlayerBrowserReady?.Invoke(player);
     }
 
-    public void HandlePlayerBlazorReady(Player player)
-    {
-        RelayPlayerBlazorReady?.Invoke(player);
-    }
-
     public void ToggleDevTools(Player player, bool enabled)
     {
         MessageHandler?.Invoke(new ToggleDevToolsMessage(player, enabled));
@@ -54,16 +47,8 @@ internal sealed class BrowserService : IBrowserService
         MessageHandler?.Invoke(new SetVisibleMessage(player, visible));
     }
 
-    public void SetPath(Player player, string path, bool force, bool isAsync)
+    public void SetPath(Player player, string path, bool force)
     {
-        MessageHandler?.Invoke(new SetPathMessage(player, path, force, isAsync));
-    }
-
-    public void SetRemotePath(Player player, string path)
-    {
-        if (_baseUrl == null)
-            throw new Exception("Failed to navigate to remote path without base url");
-        var uri = new Uri(_baseUrl, path).ToString();
-        MessageHandler?.Invoke(new SetRemotePathMessage(player, uri));
+        MessageHandler?.Invoke(new SetPathMessage(player, path, force));
     }
 }

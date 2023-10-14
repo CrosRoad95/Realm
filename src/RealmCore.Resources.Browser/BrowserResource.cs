@@ -20,13 +20,13 @@ internal class BrowserResource : Resource
     internal BrowserResource(MtaServer server, string? directoryPath)
         : base(server, server.GetRequiredService<RootElement>(), "Browser")
     {
-        var blazorOptions = server.GetRequiredService<IOptions<BrowserOptions>>();
+        var browserOptions = server.GetRequiredService<IOptions<BrowserOptions>>();
         foreach (var (path, content) in AdditionalFiles)
             Files.Add(ResourceFileFactory.FromBytes(content, path));
         _server = server;
         _directoryPath = directoryPath;
 
-        if(blazorOptions.Value.Mode == BrowserMode.Local)
+        if(browserOptions.Value.Mode == BrowserMode.Local)
             IncludeClientsideWebAssemblyFiles();
     }
 

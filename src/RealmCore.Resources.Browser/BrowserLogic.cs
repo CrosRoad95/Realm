@@ -15,11 +15,11 @@ internal class BrowserLogic
     private readonly ILogger<BrowserLogic> _logger;
     private readonly ILuaEventHub<IBrowserEventHub> _luaEventHub;
     private readonly FromLuaValueMapper _fromLuaValueMapper;
-    private readonly IOptions<BrowserOptions> _blazorOptions;
+    private readonly IOptions<BrowserOptions> _browserOptions;
     private readonly BrowserResource _resource;
 
     public BrowserLogic(MtaServer mtaServer, LuaEventService luaEventService, IBrowserService BrowserService,
-        ILogger<BrowserLogic> logger, ILuaEventHub<IBrowserEventHub> luaEventHub, FromLuaValueMapper fromLuaValueMapper, IOptions<BrowserOptions> blazorOptions)
+        ILogger<BrowserLogic> logger, ILuaEventHub<IBrowserEventHub> luaEventHub, FromLuaValueMapper fromLuaValueMapper, IOptions<BrowserOptions> browserOptions)
     {
         //luaEventService.AddEventHandler("internalBrowserCreated", HandleBrowserCreated);
         luaEventService.AddEventHandler("internalBrowserDocumentReady", HandleBrowserDocumentReady);
@@ -27,7 +27,7 @@ internal class BrowserLogic
         _logger = logger;
         _luaEventHub = luaEventHub;
         _fromLuaValueMapper = fromLuaValueMapper;
-        _blazorOptions = blazorOptions;
+        _browserOptions = browserOptions;
         _resource = mtaServer.GetAdditionalResource<BrowserResource>();
         mtaServer.PlayerJoined += HandlePlayerJoin;
         BrowserService.MessageHandler = HandleMessage;
@@ -38,11 +38,11 @@ internal class BrowserLogic
         try
         {
             await _resource.StartForAsync(player);
-            var mode = _blazorOptions.Value.Mode.ToString().ToLower();
-            var width = _blazorOptions.Value.BrowserWidth;
-            var height = _blazorOptions.Value.BrowserHeight;
-            var remoteUrl = _blazorOptions.Value.BaseRemoteUrl;
-            var requestWhitelistUrl = _blazorOptions.Value.RequestWhitelistUrl;
+            var mode = _browserOptions.Value.Mode.ToString().ToLower();
+            var width = _browserOptions.Value.BrowserWidth;
+            var height = _browserOptions.Value.BrowserHeight;
+            var remoteUrl = _browserOptions.Value.BaseRemoteUrl;
+            var requestWhitelistUrl = _browserOptions.Value.RequestWhitelistUrl;
             _luaEventHub.Invoke(player, x => x.Load(mode, width, height, remoteUrl, requestWhitelistUrl));
         }
         catch(Exception ex)
@@ -64,10 +64,7 @@ internal class BrowserLogic
                 _luaEventHub.Invoke(toggleDevToolsMessages.Player, x => x.ToggleDevTools(toggleDevToolsMessages.Enabled));
                 break;
             case SetPathMessage setPathMessage:
-                _luaEventHub.Invoke(setPathMessage.Player, x => x.SetPath(setPathMessage.Path, setPathMessage.Force, setPathMessage.IsAsync));
-                break;
-            case SetRemotePathMessage setRemotePathMessage:
-                _luaEventHub.Invoke(setRemotePathMessage.Player, x => x.SetRemotePath(setRemotePathMessage.Path));
+                _luaEventHub.Invoke(setPathMessage.Player, x => x.SetPath(setPathMessage.Path, setPathMessage.Force));
                 break;
         }
     }

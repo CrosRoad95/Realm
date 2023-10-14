@@ -6,64 +6,52 @@ internal sealed class BrowserResourceLogic : ComponentLogic<BrowserComponent>
 {
     private readonly IEntityEngine _ecs;
     private readonly IBrowserService _BrowserService;
-    private readonly IOptions<BrowserOptions> _blazorOptions;
+    private readonly IOptions<BrowserOptions> _browserOptions;
     private readonly IBrowserGuiService _browserGuiService;
 
-    public BrowserResourceLogic(IEntityEngine ecs, IBrowserService BrowserService, IOptions<BrowserOptions> blazorOptions, IBrowserGuiService browserGuiService) : base(ecs)
+    public BrowserResourceLogic(IEntityEngine ecs, IBrowserService BrowserService, IOptions<BrowserOptions> browserOptions, IBrowserGuiService browserGuiService) : base(ecs)
     {
         _ecs = ecs;
         _BrowserService = BrowserService;
-        _blazorOptions = blazorOptions;
+        _browserOptions = browserOptions;
         _browserGuiService = browserGuiService;
         _BrowserService.RelayPlayerBrowserReady = HandlePlayerBrowserReady;
     }
 
-    protected override void ComponentAdded(BrowserComponent blazorGuiComponent)
+    protected override void ComponentAdded(BrowserComponent browserComponent)
     {
-        blazorGuiComponent.DevToolsStateChanged += HandleDevToolsStateChanged;
-        blazorGuiComponent.PathChanged += HandlePathChanged;
-        blazorGuiComponent.VisibleChanged += HandleVisibleChanged;
-        blazorGuiComponent.RemotePathChanged += HandleRemotePathChanged;
+        browserComponent.DevToolsStateChanged += HandleDevToolsStateChanged;
+        browserComponent.PathChanged += HandlePathChanged;
+        browserComponent.VisibleChanged += HandleVisibleChanged;
 
         var key = _browserGuiService.GenerateKey();
-        _browserGuiService.AuthorizeEntity(key, blazorGuiComponent.Entity);
+        _browserGuiService.AuthorizeEntity(key, browserComponent.Entity);
 
         var url = $"/realmGuiInitialize?{_browserGuiService.KeyName}={key}";
-        blazorGuiComponent.LoadRemotePage(url, false);
+        browserComponent.SetPath(url);
+    }
+    private void HandlePathChanged(BrowserComponent browserComponent, string path, bool clientSide)
+    {
+        _BrowserService.SetPath(browserComponent.Entity.GetPlayer(), path, clientSide);
     }
 
-    protected override void ComponentDetached(BrowserComponent blazorGuiComponent)
+    protected override void ComponentDetached(BrowserComponent browserComponent)
     {
-        blazorGuiComponent.DevToolsStateChanged -= HandleDevToolsStateChanged;
-        blazorGuiComponent.PathChanged -= HandlePathChanged;
-        blazorGuiComponent.VisibleChanged -= HandleVisibleChanged;
-        blazorGuiComponent.RemotePathChanged -= HandleRemotePathChanged;
+        browserComponent.DevToolsStateChanged -= HandleDevToolsStateChanged;
+        browserComponent.PathChanged -= HandlePathChanged;
+        browserComponent.VisibleChanged -= HandleVisibleChanged;
 
-        _browserGuiService.UnauthorizeEntity(blazorGuiComponent.Entity);
+        _browserGuiService.UnauthorizeEntity(browserComponent.Entity);
     }
 
-    private void HandleRemotePathChanged(BrowserComponent blazorGuiComponent, string path)
+    private void HandleVisibleChanged(BrowserComponent browserComponent, bool visible)
     {
-        if(_browserGuiService.TryGetKeyByEntity(blazorGuiComponent.Entity, out var key))
-        {
-            _BrowserService.SetRemotePath(blazorGuiComponent.Entity.GetPlayer(), path);
-        }
+        _BrowserService.SetVisible(browserComponent.Entity.GetPlayer(), visible);
     }
 
-    private void HandleVisibleChanged(BrowserComponent blazorGuiComponent, bool visible)
+    private void HandleDevToolsStateChanged(BrowserComponent browserComponent, bool enabled)
     {
-        _BrowserService.SetVisible(blazorGuiComponent.Entity.GetPlayer(), visible);
-    }
-
-    private void HandlePathChanged(BrowserComponent blazorGuiComponent, string? path, bool force, GuiPageType guiType, GuiPageChangeSource guiPageChangeSource)
-    {
-        if(guiPageChangeSource == GuiPageChangeSource.Server)
-            _BrowserService.SetPath(blazorGuiComponent.Entity.GetPlayer(), path ?? "", force, guiType == GuiPageType.Async);
-    }
-
-    private void HandleDevToolsStateChanged(BrowserComponent blazorGuiComponent, bool enabled)
-    {
-        _BrowserService.ToggleDevTools(blazorGuiComponent.Entity.GetPlayer(), enabled);
+        _BrowserService.ToggleDevTools(browserComponent.Entity.GetPlayer(), enabled);
     }
 
     private void HandlePlayerBrowserReadyCore(Entity playerEntity)

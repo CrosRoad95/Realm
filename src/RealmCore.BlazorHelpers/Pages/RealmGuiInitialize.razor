@@ -1,10 +1,15 @@
 ﻿@page "/realmGuiInitialize"
 @using Microsoft.AspNetCore.Authentication;
+@using Microsoft.AspNetCore.Components.Web;
 @using RealmCore.Server.Interfaces;
 @using RealmCore.Server.Services;
 @using System.Security.Claims;
+@attribute [RenderModeServer]
 @inject IHttpContextAccessor _httpContextAccessor;
 @inject IRealmServer _realmServer;
+@inject NavigationManager _naviagtionManager;
+
+<h1>login in</h1>
 
 @code{
     protected override async Task OnInitializedAsync()
@@ -21,6 +26,13 @@
         var identity = new ClaimsIdentity(claims, "Cookies");
         var principal = new System.Security.Principal.GenericPrincipal(identity, null);
         await _httpContextAccessor.HttpContext.SignInAsync("Cookies", principal);
-        base.OnInitialized();
+    }
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        if (firstRender && _httpContextAccessor.HttpContext.User.Identity.IsAuthenticated)
+        {
+            _naviagtionManager.NavigateTo("/realmGuiInitialized", true);
+        }
     }
 }

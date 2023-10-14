@@ -22,8 +22,8 @@ public static class GuiHelpers
                 entity.TryDestroyComponent<TGuiComponent>();
                 return;
             }
-
-            entity.TryDestroyComponent<GuiComponent>();
+            else
+                entity.TryDestroyComponent<GuiComponent>();
 
             try
             {
@@ -50,8 +50,8 @@ public static class GuiHelpers
                 entity.TryDestroyComponent<TGuiComponent>();
                 return;
             }
-
-            entity.TryDestroyComponent<GuiComponent>();
+            else
+                entity.TryDestroyComponent<GuiComponent>();
 
             try
             {
@@ -69,12 +69,12 @@ public static class GuiHelpers
     #endregion
 
     #region Browser Gui
-    public static void BindGuiPage<TGuiComponent>(Entity entity, string bind, IServiceProvider serviceProvider) where TGuiComponent : GuiBlazorComponent, new()
+    public static void BindGuiPage<TGuiComponent>(Entity entity, string bind, IServiceProvider serviceProvider) where TGuiComponent : BrowserGuiComponent, new()
     {
         BindGuiPage(entity, bind, () => new TGuiComponent(), serviceProvider);
     }
 
-    public static void BindGuiPage<TGuiComponent>(Entity entity, string bind, Func<TGuiComponent> factory, IServiceProvider serviceProvider) where TGuiComponent : GuiBlazorComponent
+    public static void BindGuiPage<TGuiComponent>(Entity entity, string bind, Func<TGuiComponent> factory, IServiceProvider serviceProvider) where TGuiComponent : BrowserGuiComponent
     {
         var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();
         var logger = serviceProvider.GetRequiredService<ILogger<TGuiComponent>>();
@@ -86,8 +86,8 @@ public static class GuiHelpers
                 entity.DestroyComponent<TGuiComponent>();
                 return;
             }
-
-            entity.TryDestroyComponent<GuiBlazorComponent>();
+            else
+                entity.TryDestroyComponent<BrowserGuiComponent>();
 
             try
             {
@@ -114,8 +114,8 @@ public static class GuiHelpers
                 entity.DestroyComponent<TGuiComponent>();
                 return;
             }
-
-            entity.TryDestroyComponent<GuiComponent>();
+            else
+                entity.TryDestroyComponent<GuiComponent>();
 
             try
             {

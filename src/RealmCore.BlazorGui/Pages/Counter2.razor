@@ -1,5 +1,6 @@
 ﻿@page "/realmUi/counter2"
 @inherits RealmGuiComponentBase;
+@inject NavigationManager _navigationManager;
 
 <PageTitle>Counter</PageTitle>
 
@@ -9,9 +10,15 @@
 <p role="status">Current count: @currentCount</p>
 
 <button class="btn btn-primary" @onclick="IncrementCount">Click me</button>
+<button class="btn btn-primary" @onclick="Navigate">Navigate</button>
 
 @code {
     private int currentCount = 0;
+
+    private void Navigate()
+    {
+        _navigationManager.NavigateTo("/realmUi/counter1");
+    }
 
     private void IncrementCount()
     {

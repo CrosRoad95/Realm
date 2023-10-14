@@ -1,13 +1,13 @@
 ﻿namespace RealmCore.Server.Components.Players.Abstractions;
 
-public abstract class GuiBlazorComponent : GuiComponent
+public abstract class BrowserGuiComponent : GuiComponent
 {
     public string Path { get; }
 
-    public event Action<GuiBlazorComponent>? Changed;
-    public event Action<GuiBlazorComponent, GuiBlazorComponent>? NavigationRequested;
+    public event Action<BrowserGuiComponent>? Changed;
+    public event Action<BrowserGuiComponent, BrowserGuiComponent>? NavigationRequested;
 
-    public GuiBlazorComponent(string path)
+    public BrowserGuiComponent(string path)
     {
         Path = path;
         //Path = path;
@@ -18,7 +18,7 @@ public abstract class GuiBlazorComponent : GuiComponent
         Changed?.Invoke(this);
     }
 
-    protected void NavigateTo(GuiBlazorComponent targetBrowserGuiPageComponent)
+    protected void NavigateTo(BrowserGuiComponent targetBrowserGuiPageComponent)
     {
         NavigationRequested?.Invoke(this, targetBrowserGuiPageComponent);
     }

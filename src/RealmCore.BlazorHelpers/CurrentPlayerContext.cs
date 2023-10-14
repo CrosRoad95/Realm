@@ -7,14 +7,17 @@ using System.Security.Claims;
 
 namespace RealmCore.BlazorHelpers;
 
-public class CurrentPlayerContext
+public class CurrentPlayerContext : IDisposable
 {
+    private readonly Entity? _entity;
+    private readonly BrowserComponent? _browserComponent;
     public IRealmServer? Server { get; }
     protected IBrowserGuiService BrowserGuiService { get; }
     public ClaimsPrincipal ClaimsPrincipal { get; }
-    public Entity? Entity { get; }
-    protected BrowserComponent? BrowserComponent { get; }
+    protected BrowserComponent BrowserComponent => _browserComponent ?? throw new ArgumentNullException(nameof(BrowserComponent));
+    public Entity Entity => _entity ?? throw new ArgumentNullException(nameof(Entity));
 
+    internal event Action<string?>? PathChanged;
     public CurrentPlayerContext(IHttpContextAccessor httpContent, IRealmServer realmServer)
     {
         Server = realmServer;
@@ -27,14 +30,29 @@ public class CurrentPlayerContext
                 return;
             if(BrowserGuiService.TryGetEntityByKey(keyClaim.Value, out var entity) && entity != null)
             {
-                Entity = entity;
-                BrowserComponent = entity.GetRequiredComponent<BrowserComponent>();
+                _entity = entity;
+                _browserComponent = entity.GetRequiredComponent<BrowserComponent>();
+                _browserComponent.PathChanged += HandlePathChanged;
             }
+        }
+    }
+
+    private void HandlePathChanged(BrowserComponent browserComponent, string path, bool clientSide)
+    {
+        if(!clientSide)
+            PathChanged?.Invoke(path);
+    }
+
+    public void Dispose()
+    {
+        if(BrowserComponent != null)
+        {
+            BrowserComponent.PathChanged -= HandlePathChanged;
         }
     }
 }
 
-public class CurrentPlayerContext<TGuiPageComponent> : CurrentPlayerContext where TGuiPageComponent : GuiBlazorComponent
+public class CurrentPlayerContext<TGuiPageComponent> : CurrentPlayerContext where TGuiPageComponent : BrowserGuiComponent
 {
     public TGuiPageComponent Component { get; }
 

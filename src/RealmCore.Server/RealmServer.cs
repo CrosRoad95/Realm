@@ -33,7 +33,19 @@ public class RealmServer : MtaServer, IRealmServer
     {
     }
 
-    public new async Task Start()
+    public override async void Start()
+    {
+        try
+        {
+            await StartCore();
+        }
+        catch(Exception ex)
+        {
+            var logger = GetRequiredService<ILogger<RealmServer>>();
+            logger.LogError(ex, "Failed to start server.");
+        }
+    }
+    public async Task StartCore()
     {
         var logger = GetRequiredService<ILogger<RealmServer>>();
         await GetRequiredService<IDb>().MigrateAsync();
