@@ -5,13 +5,12 @@ using RealmCore.Sample;
 Directory.SetCurrentDirectory(Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly()!.Location)!);
 
 var builder = WebApplication.CreateBuilder(args);
-var sampleServer = new SampleServer();
-// Add services to the container.
+
 builder.Services.AddHttpContextAccessor();
-builder.Services.AddRealmServer(sampleServer);
+builder.Services.AddRealmServer(new SampleServer());
 builder.AddRealmBlazorGuiSupport();
 builder.Services.AddRazorComponents()
-    .AddServerComponents();
+    .AddInteractiveServerComponents();
 
 var app = builder.Build();
 
@@ -26,8 +25,10 @@ if (!app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 app.UseStaticFiles();
+app.UseAntiforgery();
+
 app.MapRazorComponents<App>()
     .AddAdditionalAssemblies(typeof(RealmGuiComponentBase).Assembly)
-    .AddServerRenderMode();
+    .AddInteractiveServerRenderMode();
 
 app.Run();

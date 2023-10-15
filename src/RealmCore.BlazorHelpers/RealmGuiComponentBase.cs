@@ -6,7 +6,7 @@ using System.Security.Claims;
 namespace RealmCore.BlazorHelpers;
 
 [BlazorGuiAuthorization]
-[RenderModeServer]
+[RenderModeInteractiveServer]
 public class RealmGuiComponentBase : ComponentBase
 {
     [Inject]
@@ -28,7 +28,7 @@ public class RealmGuiComponentBase : ComponentBase
 }
 
 [BlazorGuiAuthorization]
-[RenderModeServer]
+[RenderModeInteractiveServer]
 public class RealmGuiComponentBase<TGuiPageComponent> : ComponentBase where TGuiPageComponent : BrowserGuiComponent
 {
     [Inject]
