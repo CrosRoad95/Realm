@@ -1,4 +1,5 @@
-﻿using RealmCore.Server.Interfaces;
+﻿using Microsoft.Extensions.Hosting;
+using RealmCore.Server.Interfaces;
 
 namespace RealmCore.BlazorHelpers;
 
