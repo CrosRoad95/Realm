@@ -1,5 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
-using RealmCore.ECS;
+﻿using RealmCore.ECS;
+using RealmCore.Server.Components.Elements;
 using RealmCore.Server.Components.Players;
 using RealmCore.Server.Components.Players.Abstractions;
 using RealmCore.Server.Interfaces;
@@ -17,6 +17,7 @@ public class CurrentPlayerContext : IDisposable
     public ClaimsPrincipal ClaimsPrincipal { get; }
     protected BrowserComponent BrowserComponent => _browserComponent ?? throw new ArgumentNullException(nameof(BrowserComponent));
     public Entity Entity => _entity ?? throw new ArgumentNullException(nameof(Entity));
+    public string Name => Entity.GetRequiredComponent<PlayerElementComponent>().Name;
 
     internal event Action<string?>? PathChanged;
     public CurrentPlayerContext(IHttpContextAccessor httpContent, IRealmServer realmServer)

@@ -2,7 +2,8 @@
 
 namespace RealmCore.Server.Logic.Resources;
 
-internal sealed class BrowserGuiPageComponentLogic : ComponentLogic<BrowserGuiComponent>
+internal sealed class BrowserGuiPageComponentLogic
+    : ComponentLogic<BrowserGuiComponent>
 {
     private readonly IBrowserGuiService _browserGuiService;
     private readonly ILogger<BrowserGuiPageComponentLogic> _logger;
@@ -19,8 +20,9 @@ internal sealed class BrowserGuiPageComponentLogic : ComponentLogic<BrowserGuiCo
         if(_browserGuiService.TryGetKeyByEntity(browserGuiComponent.Entity, out var key))
         {
             var url = browserGuiComponent.Path;
-            browserGuiComponent.Entity.GetRequiredComponent<BrowserComponent>().Path = url;
-
+            var browserComponent = browserGuiComponent.Entity.GetRequiredComponent<BrowserComponent>();
+            browserComponent.Path = url;
+            browserComponent.Visible = true;
             _logger.LogInformation("Gui {guiPageType} opened", browserGuiComponent.GetType().Name);
         }
     }

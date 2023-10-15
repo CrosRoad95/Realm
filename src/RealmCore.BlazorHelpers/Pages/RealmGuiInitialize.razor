@@ -7,9 +7,7 @@
 @attribute [RenderModeInteractiveServer]
 @inject IHttpContextAccessor _httpContextAccessor;
 @inject IRealmServer _realmServer;
-@inject NavigationManager _naviagtionManager;
-
-<h1>login in</h1>
+@inject NavigationManager _navigationManager;
 
 @code{
     protected override async Task OnInitializedAsync()
@@ -20,7 +18,7 @@
 
         var claims = new List<Claim>
         {
-            new Claim(browserGuiService.KeyName, key),
+            new Claim(browserGuiService.KeyName, key.ToString()),
         };
 
         var identity = new ClaimsIdentity(claims, "Cookies");
@@ -32,7 +30,7 @@
     {
         if (firstRender && _httpContextAccessor.HttpContext.User.Identity.IsAuthenticated)
         {
-            _naviagtionManager.NavigateTo("/realmGuiInitialized", true);
+            _navigationManager.NavigateTo("/realmGuiInitialized", true);
         }
     }
 }

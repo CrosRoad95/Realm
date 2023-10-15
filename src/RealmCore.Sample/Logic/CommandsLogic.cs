@@ -1371,15 +1371,13 @@ internal sealed class CommandsLogic
             browserComponent.Path = "/realmUi/counter2";
             _chatBox.OutputTo(entity, "navigated");
         });
-        _commandService.AddAsyncCommandHandler("browserinteractive", async (entity, args) =>
+        _commandService.AddCommandHandler("browserinteractive", (entity, args) =>
         {
-            var browserComponent = entity.GetRequiredComponent<BrowserComponent>();
-            browserComponent.Close();
-            await Task.Delay(500);
-            entity.TryDestroyComponent<InteractiveGuiComponent>();
-            entity.AddComponent<InteractiveGuiComponent>();
-            browserComponent.Visible = true;
-            _chatBox.OutputTo(entity, "Loaded InteractiveGuiComponent");
+            if (!entity.TryDestroyComponent<InteractiveGuiComponent>())
+            {
+                entity.AddComponent<InteractiveGuiComponent>();
+                _chatBox.OutputTo(entity, "Loaded InteractiveGuiComponent");
+            }
         });
         _commandService.AddAsyncCommandHandler("removebrowserinteractive", async (entity, args) =>
         {

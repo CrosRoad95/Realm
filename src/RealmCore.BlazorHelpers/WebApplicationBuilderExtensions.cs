@@ -1,7 +1,4 @@
-﻿using Microsoft.AspNetCore.Builder;
-using Microsoft.Extensions.DependencyInjection;
-
-namespace RealmCore.BlazorHelpers;
+﻿namespace RealmCore.BlazorHelpers;
 
 public static class WebApplicationBuilderExtensions
 {
