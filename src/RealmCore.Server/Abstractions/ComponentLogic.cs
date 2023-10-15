@@ -22,9 +22,9 @@ public class ComponentLogic<T> where T : IComponent
         entity.ComponentAdded -= HandleComponentAdded;
         entity.ComponentDetached -= HandleComponentDetached;
         entity.Disposed -= HandleDisposed;
-        foreach (var component in entity.Components.OfType<T>())
+        foreach (var component in entity.Components)
             if (component is T tComponent)
-                ComponentDetached(component);
+                ComponentDetached(tComponent);
     }
 
     private void HandleComponentDetached(Component component)
@@ -70,12 +70,12 @@ public class ComponentLogic<T1, T2>
         entity.ComponentAdded -= HandleComponentAdded;
         entity.ComponentDetached -= HandleComponentDetached;
         entity.Disposed -= HandleDisposed;
-        foreach (var component in entity.Components.OfType<T1>())
+        foreach (var component in entity.Components)
             if (component is T1 tComponent)
-                ComponentDetached(component);
-        foreach (var component in entity.Components.OfType<T2>())
+                ComponentDetached(tComponent);
+        foreach (var component in entity.Components)
             if (component is T2 tComponent)
-                ComponentDetached(component);
+                ComponentDetached(tComponent);
     }
 
     private void HandleComponentDetached(Component component)

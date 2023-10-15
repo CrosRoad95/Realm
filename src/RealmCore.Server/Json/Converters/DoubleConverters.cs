@@ -2,6 +2,9 @@
 
 public class DoubleConverter : JsonConverter
 {
+    public static DoubleConverter Instance { get; } = new DoubleConverter();
+    private DoubleConverter() { }
+
     public override bool CanConvert(Type objectType)
     {
         return objectType == typeof(object);

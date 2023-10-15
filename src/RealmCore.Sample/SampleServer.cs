@@ -56,6 +56,7 @@ public class SampleServer : RealmServer
         serverBuilder.AddLogic<DefaultBanLogic>();
         serverBuilder.AddLogic<DefaultChatLogic>();
         serverBuilder.AddLogic<PlayTimeComponentLogic>();
+        serverBuilder.AddLogic<TestLogic>();
 
 #if DEBUG
         if (withDgs)

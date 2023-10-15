@@ -27,7 +27,7 @@ internal sealed class StatisticsCounterResourceLogic : ComponentLogic<Statistics
     {
         try
         {
-            if (_ecs.TryGetEntityByPlayer(player, out Entity entity))
+            if (_ecs.TryGetEntityByPlayer(player, out Entity entity) && entity != null)
             {
                 var statisticsCounterComponent = entity.GetRequiredComponent<StatisticsCounterComponent>();
                 foreach (var item in statistics)
@@ -40,14 +40,14 @@ internal sealed class StatisticsCounterResourceLogic : ComponentLogic<Statistics
                     }
                     catch (Exception ex)
                     {
-                        _logger.LogError(ex, "Failed to increase stat for player {playerName} serial: {serial}", player.Name, player.Client.Serial);
+                        _logger.LogError(ex, "Failed to increase stat for player {playerName} serial: {serial}", player.Name, player.Client.GetSerial());
                     }
                 }
             }
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Failed to collect logs for player {playerName} serial: {serial}", player.Name, player.Client.Serial);
+            _logger.LogError(ex, "Failed to collect logs for player {playerName} serial: {serial}", player.Name, player.Client.GetSerial());
         }
     }
 

@@ -29,7 +29,7 @@ internal sealed class VehiclesService : IVehiclesService
         _vehicleEnginesRegistry = vehicleEnginesRegistry;
         _jsonSerializerSettings = new JsonSerializerSettings
         {
-            Converters = new List<JsonConverter> { new DoubleConverter() }
+            Converters = new List<JsonConverter> { DoubleConverter.Instance }
         };
     }
 

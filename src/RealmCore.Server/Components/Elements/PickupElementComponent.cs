@@ -9,7 +9,6 @@ public class PickupElementComponent : ElementComponent
     internal Pickup Pickup => _pickup;
     internal Action<PickupElementComponent, Element>? ElementEntered { get; set; }
     internal Action<PickupElementComponent, Element>? ElementLeft { get; set; }
-    private Action<Entity, IEntityRule>? _entityRuleFailed;
 
     public Action<Entity, Entity>? EntityEntered;
     public Action<Entity, Entity>? EntityLeft;
@@ -75,7 +74,6 @@ public class PickupElementComponent : ElementComponent
     {
         ElementEntered = null;
         ElementLeft = null;
-        _entityRuleFailed = null;
         Entity.Transform.PositionChanged -= HandlePositionChanged;
         base.Dispose();
     }

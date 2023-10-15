@@ -7,43 +7,30 @@ using SlipeServer.Server.Elements.Enums;
 
 namespace RealmCore.Sample.Logic;
 
-internal sealed class PlayerGameplayLogic
+internal sealed class PlayerGameplayLogic : ComponentLogic<UserComponent>
 {
-    private readonly IEntityEngine _ecs;
+    private readonly IEntityEngine _entityEntine;
     private readonly IServiceProvider _serviceProvider;
     private readonly ChatBox _chatBox;
     private readonly VehicleUpgradeRegistry _vehicleUpgradeRegistry;
     private readonly VehicleEnginesRegistry _vehicleEnginesRegistry;
     private readonly ILogger<PlayerGameplayLogic> _logger;
 
-    public PlayerGameplayLogic(IEntityEngine ecs, ILogger<PlayerGameplayLogic> logger, IServiceProvider serviceProvider, ChatBox chatBox, VehicleUpgradeRegistry vehicleUpgradeRegistry, VehicleEnginesRegistry vehicleEnginesRegistry)
+    public PlayerGameplayLogic(IEntityEngine entityEntine, ILogger<PlayerGameplayLogic> logger, IServiceProvider serviceProvider, ChatBox chatBox, VehicleUpgradeRegistry vehicleUpgradeRegistry, VehicleEnginesRegistry vehicleEnginesRegistry) : base(entityEntine)
     {
-        _ecs = ecs;
+        _entityEntine = entityEntine;
         _serviceProvider = serviceProvider;
         _chatBox = chatBox;
         _vehicleUpgradeRegistry = vehicleUpgradeRegistry;
         _vehicleEnginesRegistry = vehicleEnginesRegistry;
         _logger = logger;
-        _ecs.EntityCreated += HandleEntityCreated;
     }
 
-    private void HandleEntityCreated(Entity entity)
+    protected override void ComponentAdded(UserComponent userComponent)
     {
-        if (!entity.HasComponent<PlayerTagComponent>())
-            return;
-
-
-        entity.ComponentAdded += HandleComponentAdded;
-    }
-
-    private void HandleComponentAdded(Component component)
-    {
-        if (component is UserComponent)
-        {
-            var playerElementComponent = component.Entity.GetRequiredComponent<PlayerElementComponent>();
-            playerElementComponent.FocusedEntityChanged += HandleFocusedEntityChanged;
-            playerElementComponent.SetBindAsync("x", HandleInteract);
-        }
+        var playerElementComponent = userComponent.Entity.GetRequiredComponent<PlayerElementComponent>();
+        playerElementComponent.FocusedEntityChanged += HandleFocusedEntityChanged;
+        playerElementComponent.SetBindAsync("x", HandleInteract);
     }
 
     private async Task HandleInteract(Entity playerEntity, KeyState keyState)

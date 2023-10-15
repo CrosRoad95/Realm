@@ -18,17 +18,9 @@ public sealed class Entity : IDisposable
         get
         {
             _componentsLock.EnterReadLock();
-            try
-            {
-                foreach (var item in _components)
-                {
-                    yield return item;
-                }
-            }
-            finally
-            {
-                _componentsLock.ExitReadLock();
-            }
+            var components = new List<Component>(_components);
+            _componentsLock.ExitReadLock();
+            return components;
         }
     }
 

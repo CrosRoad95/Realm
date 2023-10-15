@@ -15,7 +15,7 @@ internal sealed class VehicleAccessService : IVehicleAccessService
     }
 
     // TODO: Refactor, remove out arguments
-    public bool InternalCanEnter(Ped ped, Vehicle vehicle, out Entity pedEntity, out Entity vehicleEntity)
+    public bool InternalCanEnter(Ped ped, Vehicle vehicle, out Entity? pedEntity, out Entity? vehicleEntity)
     {
         if(!_ecs.TryGetEntityByPed(ped, out pedEntity) || !_ecs.TryGetByElement(vehicle, out vehicleEntity))
         {

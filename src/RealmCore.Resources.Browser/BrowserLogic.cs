@@ -47,7 +47,7 @@ internal class BrowserLogic
         }
         catch(Exception ex)
         {
-            _logger.LogError(ex, "Failed to start {resourceName} resource for player: {playerName}, serial: {playerSerial}", _resource.Name, player.Name, player.Client.Serial);
+            _logger.LogError(ex, "Failed to start {resourceName} resource for player: {playerName}, serial: {playerSerial}", _resource.Name, player.Name, player.Client.Serial ?? "<no serial>");
         }
     }
 

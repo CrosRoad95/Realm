@@ -1,10 +1,11 @@
 ﻿using RealmCore.Resources.Overlay;
 using RealmCore.Server.Components.Elements.CollisionShapes;
+using RealmCore.Server.Components.Players;
 using SlipeServer.Server.Enums;
 
 namespace RealmCore.Sample.Logic;
 
-internal class WorldLogic
+internal class WorldLogic : ComponentLogic<DiscoveriesComponent>
 {
     private struct DiscoveryInfo
     {
@@ -28,36 +29,18 @@ internal class WorldLogic
     private readonly IEntityFactory _entityFactory;
     private readonly IOverlayService _overlayService;
 
-    public WorldLogic(IRealmServer realmServer, IEntityFactory entityFactory, IEntityEngine ecs, IOverlayService overlayService)
+    public WorldLogic(IRealmServer realmServer, IEntityFactory entityFactory, IEntityEngine entityEngine, IOverlayService overlayService) : base(entityEngine)
     {
         _entityFactory = entityFactory;
         _overlayService = overlayService;
         realmServer.ServerStarted += HandleServerStarted;
-        ecs.EntityCreated += HandleEntityCreated;
     }
 
-    private void HandleEntityCreated(Entity entity)
+    protected override void ComponentAdded(DiscoveriesComponent discoveriesComponent)
     {
-        if (!entity.HasComponent<PlayerTagComponent>())
-            return;
-
-        entity.ComponentAdded += HandleComponentAdded;
-        entity.Disposed += HandleDisposed;
-    }
-
-    private void HandleDisposed(Entity entity)
-    {
-        entity.ComponentAdded -= HandleComponentAdded;
-    }
-
-    private void HandleComponentAdded(Component component)
-    {
-        if (component is DiscoveriesComponent discoveriesComponent)
+        foreach (var discovery in discoveriesComponent.Discoveries)
         {
-            foreach (var discovery in discoveriesComponent.Discoveries)
-            {
-                HandlePlayerDiscover(component.Entity, discovery);
-            }
+            HandlePlayerDiscover(discoveriesComponent.Entity, discovery);
         }
     }
 

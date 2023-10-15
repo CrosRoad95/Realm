@@ -92,7 +92,7 @@ internal class PlayersLogic
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Failed to handle player joined");
+            _logger.LogHandleError(ex);
         }
     }
 
@@ -144,14 +144,9 @@ internal class PlayersLogic
                         user.LastLoginDateTime = _dateTimeProvider.Now;
                         user.LastIp = client.IPAddress?.ToString();
                         user.LastSerial = client.Serial;
-                        if (user.RegisterSerial == null)
-                            user.RegisterSerial = client.Serial;
-
-                        if (user.RegisterIp == null)
-                            user.RegisterIp = user.LastIp;
-
-                        if (user.RegisteredDateTime == null)
-                            user.RegisteredDateTime = _dateTimeProvider.Now;
+                        user.RegisterSerial ??= client.Serial;
+                        user.RegisterIp ??= user.LastIp;
+                        user.RegisteredDateTime ??= _dateTimeProvider.Now;
                         context.Users.Update(user);
                         await context.SaveChangesAsync();
                     }
@@ -160,7 +155,7 @@ internal class PlayersLogic
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Something went wrong");
+            _logger.LogHandleError(ex);
         }
     }
 
@@ -185,7 +180,7 @@ internal class PlayersLogic
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Failed to handle player disconnected");
+            _logger.LogHandleError(ex);
             if (_entityEngine.ContainsEntity(playerEntity))
             {
                 _logger.LogCritical(ex, "Failed to save and dispose entity! Executing backup disposing strategy.");

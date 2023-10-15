@@ -17,7 +17,7 @@ internal class FormContext : IFormContext
         get
         {
             _ecs.TryGetEntityByPlayer(_player, out var entity);
-            return entity;
+            return entity ?? throw new InvalidOperationException();
         }
     }
 

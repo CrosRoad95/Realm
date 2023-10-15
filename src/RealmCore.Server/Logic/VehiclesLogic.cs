@@ -58,7 +58,7 @@ internal class VehiclesLogic
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Something went wrong");
+            _logger.LogHandleError(ex);
         }
     }
 }

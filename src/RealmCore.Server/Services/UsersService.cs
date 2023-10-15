@@ -20,7 +20,7 @@ internal sealed class UsersService : IUsersService
     private readonly IUserEventRepository _userEventRepository;
     private static readonly JsonSerializerSettings _jsonSerializerSettings = new()
     {
-        Converters = new List<JsonConverter> { new DoubleConverter() }
+        Converters = new List<JsonConverter> { DoubleConverter.Instance }
     };
 
     public UsersService(ItemsRegistry itemsRegistry, SignInManager<UserData> signInManager, ILogger<UsersService> logger, IOptionsMonitor<GameplayOptions> gameplayOptions,
