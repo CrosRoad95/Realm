@@ -1,3 +1,10 @@
 ﻿@page "/realmGuiInitialized"
 @using Microsoft.AspNetCore.Components.Web;
 @inherits RealmGuiComponentBase;
+
+@code {
+    protected override void OnInitialized()
+    {
+        CurrentPlayerContext.BrowserGuiService.RelayEntityLoggedIn(CurrentPlayerContext.Entity);
+    }
+}

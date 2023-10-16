@@ -5,18 +5,21 @@ namespace RealmCore.Server.Services;
 internal class BrowserGuiService : IBrowserGuiService
 {
     private readonly ConcurrentDictionary<string, Entity> _browserEntities = new();
-    private readonly ILogger<BrowserGuiService> _logger;
 
     private readonly RandomNumberGenerator _randomNumberGenerator;
     private readonly object _lock = new();
     private readonly byte[] bytes = new byte[64];
-
+    public event Action<Entity>? Ready;
     public string KeyName => "guiKey";
 
-    public BrowserGuiService(ILogger<BrowserGuiService> logger)
+    public BrowserGuiService()
     {
-        _logger = logger;
         _randomNumberGenerator = RandomNumberGenerator.Create();
+    }
+
+    public void RelayEntityLoggedIn(Entity entity)
+    {
+        Ready?.Invoke(entity);
     }
 
     public string GenerateKey()

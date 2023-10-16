@@ -142,6 +142,8 @@ public class FuelComponent : Component, ILuaDebugDataProvider
     protected override void Attach()
     {
         var vehicle = Entity.GetRequiredComponent<VehicleElementComponent>().Vehicle;
+        _lastPosition = vehicle.RespawnPosition;
+
         vehicle.PositionChanged += HandlePositionChanged;
         if (_active)
         {
@@ -166,6 +168,7 @@ public class FuelComponent : Component, ILuaDebugDataProvider
     private void Update(bool forceUpdate = false)
     {
         var vehicle = Entity.GetRequiredComponent<VehicleElementComponent>().Vehicle;
+
         if (!vehicle.IsEngineOn && !forceUpdate)
         {
             _lastPosition = vehicle.Position;
@@ -179,6 +182,7 @@ public class FuelComponent : Component, ILuaDebugDataProvider
             return;
         _lastPosition = vehicle.Position;
         var consumedFuel = _fuelConsumptionPerOneKm / 1000.0f * traveledDistance.Length();
+
         _amount -= consumedFuel;
         if (_amount <= 0)
         {

@@ -166,7 +166,7 @@ public class MarkerElementComponent : ElementComponent
             return;
 
         var tag = entity.GetRequiredComponent<TagComponent>();
-        if (tag is not PlayerTagComponent or VehicleTagComponent)
+        if (tag is not PlayerTagComponent && tag is not VehicleTagComponent)
             return;
 
         foreach (var rule in _entityRules)

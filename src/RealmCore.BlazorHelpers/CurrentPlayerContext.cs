@@ -13,7 +13,7 @@ public class CurrentPlayerContext : IDisposable
     private readonly Entity? _entity;
     private readonly BrowserComponent? _browserComponent;
     public IRealmServer? Server { get; }
-    protected IBrowserGuiService BrowserGuiService { get; }
+    internal IBrowserGuiService BrowserGuiService { get; }
     public ClaimsPrincipal ClaimsPrincipal { get; }
     protected BrowserComponent BrowserComponent => _browserComponent ?? throw new ArgumentNullException(nameof(BrowserComponent));
     public Entity Entity => _entity ?? throw new ArgumentNullException(nameof(Entity));

@@ -19,9 +19,10 @@ function handleToggleDevTools(enabled)
 end
 
 function handleSetVisible(visible)
+	itrace("handleSetVisible", visible)
 	guiSetVisible(browser, visible);
 	setBrowserRenderingPaused(webBrowser, not visible);
-	showCursor(visible, visible);
+	showCursor(visible, false);
 end
 
 function handleSetPath(path)

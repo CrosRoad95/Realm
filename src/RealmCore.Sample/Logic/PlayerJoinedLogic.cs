@@ -16,7 +16,7 @@ internal sealed class PlayerJoinedLogic
     private readonly UserManager<UserData> _userManager;
     private readonly IGuiSystemService? _guiSystemService;
 
-    public PlayerJoinedLogic(IEntityEngine ecs, ILogger<PlayerJoinedLogic> logger, ILogger<LoginGuiComponent> loggerLoginGuiComponent, ILogger<RegisterGuiComponent> loggerRegisterGuiComponent, INametagsService nametagsService, IUsersService usersService, ChatBox chatBox, Text3dService text3DService, IUserRepository userRepository, UserManager<UserData> userManager, IGuiSystemService? guiSystemService = null)
+    public PlayerJoinedLogic(IEntityEngine ecs, ILogger<PlayerJoinedLogic> logger, ILogger<LoginGuiComponent> loggerLoginGuiComponent, ILogger<RegisterGuiComponent> loggerRegisterGuiComponent, INametagsService nametagsService, IUsersService usersService, ChatBox chatBox, Text3dService text3DService, IUserRepository userRepository, UserManager<UserData> userManager, IBrowserGuiService browserGuiService, IGuiSystemService? guiSystemService = null)
     {
         _entityEngine = ecs;
         _logger = logger;
@@ -30,6 +30,12 @@ internal sealed class PlayerJoinedLogic
         _userManager = userManager;
         _guiSystemService = guiSystemService;
         _entityEngine.EntityCreated += HandleEntityCreated;
+        browserGuiService.Ready += HandleReady;
+    }
+
+    private void HandleReady(Entity entity)
+    {
+        _chatBox.OutputTo(entity, "Browser ready");
     }
 
     private void HandleEntityCreated(Entity entity)
