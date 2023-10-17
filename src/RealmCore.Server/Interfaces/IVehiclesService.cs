@@ -16,6 +16,6 @@ public interface IVehiclesService
     Task<bool> SetVehicleKind(Entity vehicleEntity, byte kind);
     Task<bool> SetVehicleKind(int id, byte kind);
     Task<bool> SetVehicleSpawned(Entity vehicleEntity, bool spawned = true);
-    Entity Spawn(VehicleData vehicleData);
+    Task<Entity> Spawn(VehicleData vehicleData);
     Task<List<VehicleEventData>> GetLastVehicleEvents(Entity vehicleEntity, int limit = 10, IEnumerable<int>? events = null);
 }

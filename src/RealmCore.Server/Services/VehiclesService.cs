@@ -118,12 +118,12 @@ internal sealed class VehiclesService : IVehiclesService
         return null;
     }
 
-    public Entity Spawn(VehicleData vehicleData)
+    public async Task<Entity> Spawn(VehicleData vehicleData)
     {
         if(vehicleData.IsRemoved)
             throw new VehicleRemovedException(vehicleData.Id);
 
-        var entity = _entityFactory.CreateVehicle(vehicleData.Model, vehicleData.TransformAndMotion.Position, vehicleData.TransformAndMotion.Rotation, vehicleData.TransformAndMotion.Interior, vehicleData.TransformAndMotion.Dimension,
+        var vehicleEntity = _entityFactory.CreateVehicle(vehicleData.Model, vehicleData.TransformAndMotion.Position, vehicleData.TransformAndMotion.Rotation, vehicleData.TransformAndMotion.Interior, vehicleData.TransformAndMotion.Dimension,
             entity =>
             {
                 entity.AddComponent(new PrivateVehicleComponent(vehicleData));
@@ -156,7 +156,8 @@ internal sealed class VehiclesService : IVehiclesService
 
             });
 
-        return entity;
+        await SetVehicleSpawned(vehicleEntity);
+        return vehicleEntity;
     }
 
     public async Task<bool> AddVehicleEvent(Entity vehicleEntity, int eventId, string? metadata = null)

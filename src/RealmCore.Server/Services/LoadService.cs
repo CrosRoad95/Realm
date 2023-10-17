@@ -23,7 +23,7 @@ internal sealed class LoadService : ILoadService
         var vehicleData = await _vehicleRepository.GetVehicleById(id).ConfigureAwait(false) ?? throw new Exception($"Failed to load vehicle data of id {id}");
         try
         {
-            return _vehiclesService.Spawn(vehicleData);
+            return await _vehiclesService.Spawn(vehicleData);
         }
         catch (Exception ex)
         {
