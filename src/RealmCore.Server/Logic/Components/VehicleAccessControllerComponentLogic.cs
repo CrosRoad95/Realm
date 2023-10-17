@@ -13,8 +13,8 @@ internal sealed class VehicleAccessControllerComponentLogic : ComponentLogic<Veh
     {
         vehicleAccessControllerComponent.Entity.GetRequiredComponent<VehicleElementComponent>().Vehicle.CanEnter = (ped, vehicle) =>
         {
-            if (_vehicleAccessService.InternalCanEnter(ped, vehicle, out var pedEntity, out var vehicleEntity))
-                return true;
+            if (!_vehicleAccessService.InternalCanEnter(ped, vehicle, out var pedEntity, out var vehicleEntity))
+                return false;
 
             if (!vehicleAccessControllerComponent.InternalCanEnter(pedEntity, vehicleEntity))
             {

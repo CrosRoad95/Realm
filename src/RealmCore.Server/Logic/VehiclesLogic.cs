@@ -21,7 +21,7 @@ internal class VehiclesLogic
     private bool HandleCanEnter(Entity pedEntity, Entity vehicleEntity)
     {
 
-        return false;
+        return true;
     }
 
     private void HandleEntityCreated(Entity entity)

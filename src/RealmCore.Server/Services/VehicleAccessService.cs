@@ -17,7 +17,14 @@ internal sealed class VehicleAccessService : IVehicleAccessService
     // TODO: Refactor, remove out arguments
     public bool InternalCanEnter(Ped ped, Vehicle vehicle, out Entity? pedEntity, out Entity? vehicleEntity)
     {
-        if(!_ecs.TryGetEntityByPed(ped, out pedEntity) || !_ecs.TryGetByElement(vehicle, out vehicleEntity))
+        if (CanEnter == null)
+        {
+            pedEntity = null;
+            vehicleEntity = null;
+            return false;
+        }
+
+        if (!_ecs.TryGetEntityByPed(ped, out pedEntity) || !_ecs.TryGetByElement(vehicle, out vehicleEntity))
         {
             using var _ = _logger.BeginElement(ped);
             _logger.LogWarning("Player/ped attempted to enter enter vehicle that has no entity.");
@@ -27,9 +34,6 @@ internal sealed class VehicleAccessService : IVehicleAccessService
         }
 
         if (pedEntity == null || vehicleEntity == null)
-            return false;
-
-        if (CanEnter == null)
             return false;
 
         foreach (Func<Entity, Entity, bool> handler in CanEnter.GetInvocationList().Cast<Func<Entity, Entity, bool>>())

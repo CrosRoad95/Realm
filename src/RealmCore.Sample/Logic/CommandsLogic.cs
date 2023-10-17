@@ -204,6 +204,7 @@ internal sealed class CommandsLogic
             vehicleEntity.AddComponent(new FuelComponent(1, 20, 20, 0.01, 2)).Active = true;
             vehicleEntity.AddComponent<FocusableComponent>();
             vehicleEntity.AddComponent<VehiclePartDamageComponent>().AddPart(1, 1337);
+            vehicleEntity.AddComponent<DefaultAccessComponent>();
         });
 
         _commandService.AddAsyncCommandHandler("cvprivate", async (entity, args) =>
@@ -935,11 +936,13 @@ internal sealed class CommandsLogic
 
         _commandService.AddAsyncCommandHandler("spawnback", async (entity, args) =>
         {
-            var en = await _loadService.LoadVehicleById(args.ReadInt());
-            await _vehiclesService.SetVehicleSpawned(en);
+            var vehicleEntity = await _loadService.LoadVehicleById(args.ReadInt());
+            await _vehiclesService.SetVehicleSpawned(vehicleEntity);
             var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();
-            if (en != null)
+            if (vehicleEntity != null)
             {
+                vehicleEntity.Transform.Position = entity.Transform.Position;
+                playerElementComponent.WarpIntoVehicle(vehicleEntity);
                 _chatBox.OutputTo(entity, "Spawned");
             }
             else
