@@ -204,7 +204,7 @@ internal sealed class CommandsLogic
             vehicleEntity.AddComponent(new FuelComponent(1, 20, 20, 0.01, 2)).Active = true;
             vehicleEntity.AddComponent<FocusableComponent>();
             vehicleEntity.AddComponent<VehiclePartDamageComponent>().AddPart(1, 1337);
-            vehicleEntity.AddComponent<DefaultAccessComponent>();
+            vehicleEntity.AddComponent<VehicleDefaultAccessComponent>();
         });
 
         _commandService.AddAsyncCommandHandler("cvprivate", async (entity, args) =>

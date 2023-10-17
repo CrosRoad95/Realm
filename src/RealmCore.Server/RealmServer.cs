@@ -102,10 +102,4 @@ public class RealmServer : MtaServer, IRealmServer
         base.Stop();
         logger.LogInformation("Server stopped, saved: {savedEntitiesCount} entities.", i);
     }
-
-    public new T AssociateElement<T>(T element) where T : Element
-    {
-        element.AssociateWith(this);
-        return element;
-    }
 }

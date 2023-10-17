@@ -5,23 +5,13 @@ internal class VehiclesLogic
     private readonly IEntityEngine _ecs;
     private readonly ISaveService _saveService;
     private readonly ILogger<PlayersLogic> _logger;
-    private readonly IVehicleAccessService _vehicleAccessService;
 
-    public VehiclesLogic(IEntityEngine ecs, ISaveService saveService, ILogger<PlayersLogic> logger, IVehicleAccessService vehicleAccessService)
+    public VehiclesLogic(IEntityEngine ecs, ISaveService saveService, ILogger<PlayersLogic> logger)
     {
         _ecs = ecs;
         _saveService = saveService;
         _logger = logger;
-        _vehicleAccessService = vehicleAccessService;
         _ecs.EntityCreated += HandleEntityCreated;
-
-        _vehicleAccessService.CanEnter += HandleCanEnter;
-    }
-
-    private bool HandleCanEnter(Entity pedEntity, Entity vehicleEntity)
-    {
-
-        return true;
     }
 
     private void HandleEntityCreated(Entity entity)

@@ -5,14 +5,14 @@ namespace RealmCore.Server.Entities;
 internal sealed class EntityFactory : IEntityFactory
 {
     private readonly IEntityEngine _entityEngine;
-    private readonly IRealmServer _realmServer;
     private readonly IElementCollection _elementCollection;
+    private readonly MtaServer _mtaServer;
 
-    public EntityFactory(IEntityEngine entityEngine, IRealmServer realmServer, IElementCollection elementCollection)
+    public EntityFactory(IEntityEngine entityEngine, IElementCollection elementCollection, MtaServer mtaServer)
     {
         _entityEngine = entityEngine;
-        _realmServer = realmServer;
         _elementCollection = elementCollection;
+        _mtaServer = mtaServer;
     }
 
     public IScopedEntityFactory CreateScopedEntityFactory(Entity entity)
@@ -30,14 +30,14 @@ internal sealed class EntityFactory : IEntityFactory
             throw new Exception("Failed to load element entity, base.Load was not called.");
 
         var element = elementComponent.Element;
-        _realmServer.AssociateElement(element);
+        _mtaServer.AssociateElement(element);
         if (element is Pickup pickup)
         {
-            _realmServer.AssociateElement(pickup.CollisionShape);
+            _mtaServer.AssociateElement(pickup.CollisionShape);
         }
         if (elementComponent is MarkerElementComponent markerElementComponent)
         {
-            _realmServer.AssociateElement(markerElementComponent.CollisionShape);
+            _mtaServer.AssociateElement(markerElementComponent.CollisionShape);
         }
     }
 

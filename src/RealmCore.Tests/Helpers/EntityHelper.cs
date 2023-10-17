@@ -74,4 +74,12 @@ internal class EntityHelper
         entity.AddComponent(new WorldObjectComponent(new SlipeServer.Server.Elements.WorldObject(SlipeServer.Server.Enums.ObjectModel.Vegtree3, Vector3.Zero)));
         return entity;
     }
+    public Entity CreateVehicleEntity()
+    {
+        var entity = new Entity();
+        entity.AddComponent<Transform>();
+        entity.AddComponent<WorldObjectTagComponent>();
+        entity.AddComponent(new WorldObjectComponent(new SlipeServer.Server.Elements.WorldObject(SlipeServer.Server.Enums.ObjectModel.Vegtree3, Vector3.Zero)));
+        return entity;
+    }
 }

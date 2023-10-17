@@ -94,6 +94,7 @@ internal class RealmTestingServer : TestingServer
             services.AddSingleton<IEntityFactory, EntityFactory>();
             services.AddSingleton<IAssetEncryptionProvider, TestAssetEncryptionProvider>();
             services.AddSingleton<IBrowserGuiService, BrowserGuiService>();
+            services.AddSingleton<IVehicleAccessService, VehicleAccessService>();
             services.AddSingleton(guiSystemServiceMock.Object);
 
             services.AddSingleton<IServerFilesProvider>(new NullServerFilesProvider());

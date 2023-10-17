@@ -1,6 +1,6 @@
 ﻿namespace RealmCore.Server.Components.Vehicles.Access;
 
-public class PrivateVehicleAccessControllerComponent : VehicleAccessControllerComponent
+public class VehiclePrivateAccessControllerComponent : VehicleAccessControllerComponent
 {
     private PrivateVehicleComponent? _privateVehicleComponent;
 

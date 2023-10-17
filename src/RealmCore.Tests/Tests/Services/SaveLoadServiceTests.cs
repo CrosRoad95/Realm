@@ -23,7 +23,6 @@ public class SaveLoadServiceTests
 
         services.AddSingleton(_logger.Object);
         _logger.Setup(x => x.BeginScope(It.IsAny<Dictionary<string, object>>())).Returns((IDisposable)null);
-        _realmServerMock.Setup(x => x.AssociateElement<Element>(It.IsAny<Vehicle>())).Returns(It.IsAny<Vehicle>());
         services.AddPersistence<SQLiteDb>(db => db.UseSqlite($"Filename=./{Path.GetRandomFileName().Replace(".", "")}.db"));
         services.AddSingleton<ISaveService, SaveService>();
         services.AddSingleton<ILoadService, LoadService>();
