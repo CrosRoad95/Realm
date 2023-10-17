@@ -30,14 +30,14 @@ internal sealed class EntityFactory : IEntityFactory
             throw new Exception("Failed to load element entity, base.Load was not called.");
 
         var element = elementComponent.Element;
-        _mtaServer.AssociateElement(element);
+        element.AssociateWith(_mtaServer);
         if (element is Pickup pickup)
         {
-            _mtaServer.AssociateElement(pickup.CollisionShape);
+            pickup.CollisionShape.AssociateWith(_mtaServer);
         }
         if (elementComponent is MarkerElementComponent markerElementComponent)
         {
-            _mtaServer.AssociateElement(markerElementComponent.CollisionShape);
+            markerElementComponent.CollisionShape.AssociateWith(_mtaServer);
         }
     }
 
