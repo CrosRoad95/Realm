@@ -127,7 +127,7 @@ internal sealed class VehiclesService : IVehiclesService
             entity =>
             {
                 entity.AddComponent(new PrivateVehicleComponent(vehicleData));
-                entity.AddComponent(new VehicleUpgradesComponent(vehicleData.Upgrades, _vehicleUpgradeRegistry, _vehicleEnginesRegistry));
+                entity.AddComponent(new VehicleUpgradesComponent(vehicleData.Upgrades));
                 entity.AddComponent(new MileageCounterComponent(vehicleData.Mileage));
                 if (vehicleData.VehicleEngines.Count != 0)
                     entity.AddComponent(new VehicleEngineComponent(vehicleData.VehicleEngines));

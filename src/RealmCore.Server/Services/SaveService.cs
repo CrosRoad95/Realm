@@ -99,8 +99,8 @@ internal sealed class SaveService : ISaveService
                 VehicleId = vehicleData.Id
             }).ToList();
 
-            vehicleData.Paintjob = vehicleUpgradesComponent.Paintjob;
         }
+        vehicleData.Paintjob = vehicleElementComponent.PaintJob;
 
         {
             var fuelComponents = entity.Components.OfType<FuelComponent>();

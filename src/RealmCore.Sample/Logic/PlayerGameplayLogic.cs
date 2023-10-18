@@ -132,7 +132,7 @@ internal sealed class PlayerGameplayLogic : ComponentLogic<UserComponent>
                         {
                             await _serviceProvider.GetRequiredService<IVehiclesService>().ConvertToPrivateVehicle(entity);
                             entity.GetRequiredComponent<PrivateVehicleComponent>().Access.AddAsOwner(playerEntity);
-                            entity.AddComponent(new VehicleUpgradesComponent(_vehicleUpgradeRegistry, _vehicleEnginesRegistry));
+                            entity.AddComponent<VehicleUpgradesComponent>();
                             entity.AddComponent(new MileageCounterComponent());
                             entity.AddComponent(new FuelComponent(1, 20, 20, 0.01, 2)).Active = true;
                         }

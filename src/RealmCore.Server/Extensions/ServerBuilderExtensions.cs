@@ -112,6 +112,7 @@ public static class ServerBuilderExtensions
         serverBuilder.AddLogic<InteractionComponentLogic>();
         serverBuilder.AddLogic<Hud3dComponentBaseLogic>();
         serverBuilder.AddLogic<LiftableWorldObjectComponentLogic>();
+        serverBuilder.AddLogic<VehicleUpgradesComponentLogic>();
         serverBuilder.AddLogic<UpdateCallbackLogic>();
         serverBuilder.AddLogic<PickupElementComponentLogic>();
         #endregion

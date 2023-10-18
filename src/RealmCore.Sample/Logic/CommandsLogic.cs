@@ -199,7 +199,7 @@ internal sealed class CommandsLogic
         _commandService.AddCommandHandler("cv", (entity, args) =>
         {
             var vehicleEntity = _entityFactory.CreateVehicle(args.ReadUShort(), entity.Transform.Position + new Vector3(4, 0, 0), entity.Transform.Rotation);
-            vehicleEntity.AddComponent(new VehicleUpgradesComponent(vehicleUpgradeRegistry, vehicleEnginesRegistry));
+            vehicleEntity.AddComponent<VehicleUpgradesComponent>();
             vehicleEntity.AddComponent<MileageCounterComponent>();
             vehicleEntity.AddComponent(new FuelComponent(1, 20, 20, 0.01, 2)).Active = true;
             vehicleEntity.AddComponent<FocusableComponent>();
@@ -211,7 +211,7 @@ internal sealed class CommandsLogic
         _commandService.AddAsyncCommandHandler("cvprivate", async (entity, args) =>
         {
             var vehicleEntity = await _vehiclesService.CreateVehicle(404, entity.Transform.Position + new Vector3(4, 0, 0), entity.Transform.Rotation);
-            vehicleEntity.AddComponent(new VehicleUpgradesComponent(vehicleUpgradeRegistry, vehicleEnginesRegistry)).AddUpgrade(1);
+            vehicleEntity.AddComponent<VehicleUpgradesComponent>().AddUpgrade(1);
             vehicleEntity.AddComponent<MileageCounterComponent>();
             vehicleEntity.AddComponent<VehicleEngineComponent>();
             vehicleEntity.AddComponent(new FuelComponent(1, 20, 20, 0.01, 2)).Active = true;
@@ -222,7 +222,7 @@ internal sealed class CommandsLogic
         _commandService.AddCommandHandler("exclusivecv", (entity, args) =>
         {
             var vehicleEntity = _entityFactory.CreateVehicle(404, entity.Transform.Position + new Vector3(4, 0, 0), entity.Transform.Rotation);
-            vehicleEntity.AddComponent(new VehicleUpgradesComponent(vehicleUpgradeRegistry, vehicleEnginesRegistry));
+            vehicleEntity.AddComponent<VehicleUpgradesComponent>();
             vehicleEntity.AddComponent<MileageCounterComponent>();
             vehicleEntity.AddComponent(new FuelComponent(1, 20, 20, 0.01, 2)).Active = true;
             vehicleEntity.AddComponent(new VehicleExclusiveAccessComponent(entity));
@@ -231,7 +231,7 @@ internal sealed class CommandsLogic
         _commandService.AddCommandHandler("noaccesscv", (entity, args) =>
         {
             var vehicleEntity = _entityFactory.CreateVehicle(404, entity.Transform.Position + new Vector3(4, 0, 0), entity.Transform.Rotation);
-            vehicleEntity.AddComponent(new VehicleUpgradesComponent(vehicleUpgradeRegistry, vehicleEnginesRegistry));
+            vehicleEntity.AddComponent<VehicleUpgradesComponent>();
             vehicleEntity.AddComponent<MileageCounterComponent>();
             vehicleEntity.AddComponent(new FuelComponent(1, 20, 20, 0.01, 2)).Active = true;
             vehicleEntity.AddComponent<VehicleNoAccessComponent>();
@@ -395,7 +395,7 @@ internal sealed class CommandsLogic
 
             {
                 var vehicleEntity = await _vehiclesService.CreateVehicle(404, entity.Transform.Position + new Vector3(4, 0, 0), entity.Transform.Rotation);
-                vehicleEntity.AddComponent(new VehicleUpgradesComponent(vehicleUpgradeRegistry, vehicleEnginesRegistry)).AddUpgrade(1);
+                vehicleEntity.AddComponent<VehicleUpgradesComponent>().AddUpgrade(1);
                 vehicleEntity.AddComponent(new MileageCounterComponent());
                 vehicleEntity.AddComponent(new FuelComponent(1, 20, 20, 0.01, 2)).Active = true;
                 vehicleEntity.AddComponent<VehiclePartDamageComponent>().AddPart(1, 1337);
