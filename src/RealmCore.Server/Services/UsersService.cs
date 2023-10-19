@@ -85,8 +85,6 @@ internal sealed class UsersService : IUsersService
         if (!_activeUsers.TrySetActive(user.Id, entity))
             throw new Exception("Failed to login to already active account.");
 
-        entity.PreDisposed += HandlePreDisposed;
-
         try
         {
             await entity.AddComponentAsync(new UserComponent(user, _signInManager, _userManager));
@@ -208,20 +206,6 @@ internal sealed class UsersService : IUsersService
         {
             if (_entityEngine.TryGetEntityByPlayer(player, out var playerEntity) && playerEntity != null)
                 yield return playerEntity;
-        }
-    }
-
-    private void HandlePreDisposed(Entity entity)
-    {
-        try
-        {
-            var userComponent = entity.GetRequiredComponent<UserComponent>();
-            _activeUsers.TrySetInactive(userComponent.Id);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Failed to destroy player entity");
-            throw;
         }
     }
 

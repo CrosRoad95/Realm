@@ -115,6 +115,7 @@ public static class ServerBuilderExtensions
         serverBuilder.AddLogic<VehicleUpgradesComponentLogic>();
         serverBuilder.AddLogic<UpdateCallbackLogic>();
         serverBuilder.AddLogic<PickupElementComponentLogic>();
+        serverBuilder.AddLogic<UserComponentLogic>();
         #endregion
 
         return serverBuilder;
