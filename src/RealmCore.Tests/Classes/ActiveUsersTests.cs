@@ -13,8 +13,8 @@ public class ActiveUsersTests
 
         #region Act
         var preIsActive = activeUsers.IsActive(1);
-        bool set1 = activeUsers.TrySetActive(1);
-        bool set2 = activeUsers.TrySetActive(1);
+        bool set1 = activeUsers.TrySetActive(1, null);
+        bool set2 = activeUsers.TrySetActive(1, null);
         var innerIsActive = activeUsers.IsActive(1);
         var set = activeUsers.ActiveUsersIds;
         var set3 = activeUsers.TrySetInactive(1);

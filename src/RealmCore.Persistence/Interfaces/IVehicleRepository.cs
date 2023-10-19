@@ -7,6 +7,7 @@ public interface IVehicleRepository
     Task<List<VehicleUserAccessData>> GetAllVehicleAccesses(int vehicleId, CancellationToken cancellationToken = default);
     Task<LightInfoVehicleDTO?> GetLightVehicleById(int vehicleId, CancellationToken cancellationToken = default);
     Task<List<LightInfoVehicleDTO>> GetLightVehiclesByUserId(int userId, CancellationToken cancellationToken = default);
+    Task<List<int>> GetOwner(int vehicleId, CancellationToken cancellationToken = default);
     Task<VehicleData?> GetReadOnlyVehicleById(int id, CancellationToken cancellationToken = default);
     Task<VehicleData?> GetVehicleById(int id, CancellationToken cancellationToken = default);
     Task<List<VehicleData>> GetVehiclesByUserId(int userId, CancellationToken cancellationToken = default);

@@ -82,7 +82,7 @@ internal sealed class UsersService : IUsersService
 
         using var _ = _logger.BeginEntity(entity);
 
-        if (!_activeUsers.TrySetActive(user.Id))
+        if (!_activeUsers.TrySetActive(user.Id, entity))
             throw new Exception("Failed to login to already active account.");
 
         entity.PreDisposed += HandlePreDisposed;

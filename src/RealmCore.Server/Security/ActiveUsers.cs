@@ -2,50 +2,36 @@
 
 internal sealed class ActiveUsers : IActiveUsers
 {
-    private readonly object _lock = new();
-    private readonly List<int> _activeUsersIds = new();
+    private readonly ConcurrentDictionary<int, Entity> _activeUsers = new();
 
-    public IReadOnlyList<int> ActiveUsersIds
-    {
-        get
-        {
-            lock (_lock)
-                return new List<int>(_activeUsersIds);
-        }
-    }
-
-    public event Action<int>? Activated;
-    public event Action<int>? Deactivated;
+    public IEnumerable<int> ActiveUsersIds => _activeUsers.Keys;
+    public event Action<int, Entity>? Activated;
+    public event Action<int, Entity>? Deactivated;
 
     public bool IsActive(int userId)
     {
-        lock (_lock)
-            return _activeUsersIds.Contains(userId);
+        return _activeUsers.ContainsKey(userId);
     }
 
-    public bool TrySetActive(int userId)
+    public bool TrySetActive(int userId, Entity entity)
     {
-        lock (_lock)
+        if(_activeUsers.TryAdd(userId, entity))
         {
-            if (_activeUsersIds.Contains(userId))
-                return false;
-
-            _activeUsersIds.Add(userId);
-            Activated?.Invoke(userId);
+            Activated?.Invoke(userId, entity);
             return true;
         }
+        return false;
     }
 
     public bool TrySetInactive(int userId)
     {
-        lock (_lock)
+        if (_activeUsers.TryRemove(userId, out var entity))
         {
-            if (!_activeUsersIds.Contains(userId))
-                return false;
-
-            _activeUsersIds.Remove(userId);
-            Deactivated?.Invoke(userId);
+            Deactivated?.Invoke(userId, entity);
             return true;
         }
+        return false;
     }
+
+    public bool TryGetEntityByUserId(int userId, out Entity? entity) => _activeUsers.TryGetValue(userId, out entity);
 }

@@ -18,4 +18,5 @@ public interface IVehiclesService
     Task<bool> SetVehicleSpawned(Entity vehicleEntity, bool spawned = true);
     Task<Entity> Spawn(VehicleData vehicleData);
     Task<List<VehicleEventData>> GetLastVehicleEvents(Entity vehicleEntity, int limit = 10, IEnumerable<int>? events = null);
+    IEnumerable<Entity> GetOnlineOwner(Entity vehicleEntity);
 }

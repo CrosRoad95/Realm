@@ -166,4 +166,14 @@ internal sealed class VehicleRepository : IVehicleRepository
             .Where(x => x.VehicleId == vehicleId);
         return await query.ToListAsync(cancellationToken).ConfigureAwait(false);
     }
+
+    public async Task<List<int>> GetOwner(int vehicleId, CancellationToken cancellationToken = default)
+    {
+        var query = _db.VehicleUserAccess
+            .Where(x => x.VehicleId == vehicleId && x.AccessType == 0)
+            .AsNoTracking()
+            .TagWithSource(nameof(VehicleEventRepository))
+            .Select(x => x.UserId);
+        return await query.ToListAsync(cancellationToken);
+    }
 }

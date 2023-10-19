@@ -11,12 +11,13 @@ internal sealed class VehiclesService : IVehiclesService
     private readonly ItemsRegistry _itemsRegistry;
     private readonly IVehicleEventRepository _vehicleEventRepository;
     private readonly IDateTimeProvider _dateTimeProvider;
-    private readonly IEntityEngine _ecs;
+    private readonly IEntityEngine _entityEngine;
     private readonly VehicleUpgradeRegistry _vehicleUpgradeRegistry;
     private readonly VehicleEnginesRegistry _vehicleEnginesRegistry;
+    private readonly IActiveUsers _activeUsers;
     private readonly JsonSerializerSettings _jsonSerializerSettings;
 
-    public VehiclesService(IVehicleRepository vehicleRepository, IEntityFactory entityFactory, ISaveService saveService, ItemsRegistry itemsRegistry, IVehicleEventRepository vehicleEventRepository, IDateTimeProvider dateTimeProvider, IEntityEngine ecs, VehicleUpgradeRegistry vehicleUpgradeRegistry, VehicleEnginesRegistry vehicleEnginesRegistry)
+    public VehiclesService(IVehicleRepository vehicleRepository, IEntityFactory entityFactory, ISaveService saveService, ItemsRegistry itemsRegistry, IVehicleEventRepository vehicleEventRepository, IDateTimeProvider dateTimeProvider, IEntityEngine entityEngine, VehicleUpgradeRegistry vehicleUpgradeRegistry, VehicleEnginesRegistry vehicleEnginesRegistry, IActiveUsers activeUsers)
     {
         _vehicleRepository = vehicleRepository;
         _entityFactory = entityFactory;
@@ -24,9 +25,10 @@ internal sealed class VehiclesService : IVehiclesService
         _itemsRegistry = itemsRegistry;
         _vehicleEventRepository = vehicleEventRepository;
         _dateTimeProvider = dateTimeProvider;
-        _ecs = ecs;
+        _entityEngine = entityEngine;
         _vehicleUpgradeRegistry = vehicleUpgradeRegistry;
         _vehicleEnginesRegistry = vehicleEnginesRegistry;
+        _activeUsers = activeUsers;
         _jsonSerializerSettings = new JsonSerializerSettings
         {
             Converters = new List<JsonConverter> { DoubleConverter.Instance }
@@ -93,7 +95,7 @@ internal sealed class VehiclesService : IVehiclesService
 
     public Task<bool> SetVehicleKind(int id, byte kind)
     {
-        if(_ecs.GetVehicleById(id, out var entity))
+        if(_entityEngine.GetVehicleById(id, out var entity))
             entity.GetRequiredComponent<PrivateVehicleComponent>().Kind = kind;
 
         return _vehicleRepository.SetKind(id, kind);
@@ -186,5 +188,18 @@ internal sealed class VehiclesService : IVehiclesService
             return await _vehicleEventRepository.GetLastEventsByVehicleId(privateVehicleComponent.Id, limit, events).ConfigureAwait(false);
         }
         return new();
+    }
+    
+    public IEnumerable<Entity> GetOnlineOwner(Entity vehicleEntity)
+    {
+        if (vehicleEntity.TryGetComponent(out PrivateVehicleComponent privateVehicleComponent))
+        {
+            var owners = privateVehicleComponent.Access.Owners;
+            foreach (var owner in owners)
+            {
+                if (_activeUsers.TryGetEntityByUserId(owner.userId, out var playerEntity) && playerEntity != null)
+                    yield return playerEntity;
+            }
+        }
     }
 }
