@@ -18,7 +18,7 @@ internal sealed class UserRewardRepository : IUserRewardRepository
                 RewardId = rewardId,
                 UserId = userId
             });
-            await _db.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+            await _db.SaveChangesAsync(cancellationToken);
             return true;
         }
         catch (Exception)

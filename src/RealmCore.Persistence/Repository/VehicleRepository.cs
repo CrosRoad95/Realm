@@ -25,7 +25,7 @@ internal sealed class VehicleRepository : IVehicleRepository
             Spawned = true,
         };
         _db.Vehicles.Add(vehicle);
-        await _db.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        await _db.SaveChangesAsync(cancellationToken);
         return vehicle;
     }
 
@@ -43,7 +43,7 @@ internal sealed class VehicleRepository : IVehicleRepository
                 Position = x.TransformAndMotion.Position
             });
 
-        return await query.ToListAsync(cancellationToken).ConfigureAwait(false);
+        return await query.ToListAsync(cancellationToken);
     }
 
     public async Task<LightInfoVehicleDTO?> GetLightVehicleById(int vehicleId, CancellationToken cancellationToken = default)
@@ -60,7 +60,7 @@ internal sealed class VehicleRepository : IVehicleRepository
                 Position = x.TransformAndMotion.Position
             });
 
-        return await query.FirstOrDefaultAsync(cancellationToken).ConfigureAwait(false);
+        return await query.FirstOrDefaultAsync(cancellationToken);
     }
 
     public async Task<List<VehicleData>> GetVehiclesByUserId(int userId, CancellationToken cancellationToken = default)
@@ -71,7 +71,7 @@ internal sealed class VehicleRepository : IVehicleRepository
             .Where(x => !x.IsRemoved)
             .Where(x => x.UserAccesses.Any(x => x.UserId == userId));
 
-        return await query.ToListAsync(cancellationToken).ConfigureAwait(false);
+        return await query.ToListAsync(cancellationToken);
     }
 
     public async Task<VehicleData?> GetReadOnlyVehicleById(int id, CancellationToken cancellationToken = default)
@@ -82,7 +82,7 @@ internal sealed class VehicleRepository : IVehicleRepository
             .Where(x => !x.IsRemoved)
             .Where(x => x.Id == id);
 
-        return await query.FirstOrDefaultAsync(cancellationToken).ConfigureAwait(false);
+        return await query.FirstOrDefaultAsync(cancellationToken);
     }
 
     public async Task<List<VehicleData>> GetAllSpawnedVehicles(CancellationToken cancellationToken = default)
@@ -94,7 +94,7 @@ internal sealed class VehicleRepository : IVehicleRepository
             .IncludeAll()
             .IsSpawned();
 
-        return await query.ToListAsync(cancellationToken).ConfigureAwait(false);
+        return await query.ToListAsync(cancellationToken);
     }
 
     public async Task<VehicleData?> GetVehicleById(int id, CancellationToken cancellationToken = default)
@@ -106,7 +106,7 @@ internal sealed class VehicleRepository : IVehicleRepository
             .Where(x => x.Id == id)
             .IncludeAll();
 
-        return await query.FirstOrDefaultAsync(cancellationToken).ConfigureAwait(false);
+        return await query.FirstOrDefaultAsync(cancellationToken);
     }
 
     public async Task<bool> SetSpawned(int id, bool spawned, CancellationToken cancellationToken = default)
@@ -117,7 +117,7 @@ internal sealed class VehicleRepository : IVehicleRepository
             .Where(x => !x.IsRemoved)
             .Where(x => x.Id == id);
 
-        var result = await query.ExecuteUpdateAsync(x => x.SetProperty(y => y.Spawned, spawned), cancellationToken).ConfigureAwait(false);
+        var result = await query.ExecuteUpdateAsync(x => x.SetProperty(y => y.Spawned, spawned), cancellationToken);
         return result > 0;
     }
 
@@ -129,7 +129,7 @@ internal sealed class VehicleRepository : IVehicleRepository
             .Where(x => !x.IsRemoved)
             .Where(x => x.Id == id);
 
-        var result = await query.ExecuteUpdateAsync(x => x.SetProperty(y => y.Kind, kind), cancellationToken).ConfigureAwait(false);
+        var result = await query.ExecuteUpdateAsync(x => x.SetProperty(y => y.Kind, kind), cancellationToken);
         return result > 0;
     }
 
@@ -142,7 +142,7 @@ internal sealed class VehicleRepository : IVehicleRepository
             .Where(x => x.Id == id)
             .Select(x => x.Spawned);
 
-        return await query.FirstAsync(cancellationToken).ConfigureAwait(false);
+        return await query.FirstAsync(cancellationToken);
     }
 
     public async Task<bool> SoftRemove(int id, CancellationToken cancellationToken = default)
@@ -153,7 +153,7 @@ internal sealed class VehicleRepository : IVehicleRepository
             .Where(x => !x.IsRemoved)
             .Where(x => x.Id == id);
 
-        var result = await query.ExecuteUpdateAsync(x => x.SetProperty(y => y.IsRemoved, true), cancellationToken).ConfigureAwait(false);
+        var result = await query.ExecuteUpdateAsync(x => x.SetProperty(y => y.IsRemoved, true), cancellationToken);
         return result > 0;
     }
 
@@ -164,7 +164,7 @@ internal sealed class VehicleRepository : IVehicleRepository
             .TagWithSource(nameof(VehicleEventRepository))
             .Include(x => x.User)
             .Where(x => x.VehicleId == vehicleId);
-        return await query.ToListAsync(cancellationToken).ConfigureAwait(false);
+        return await query.ToListAsync(cancellationToken);
     }
 
     public async Task<List<int>> GetOwner(int vehicleId, CancellationToken cancellationToken = default)

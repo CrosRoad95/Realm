@@ -18,7 +18,7 @@ internal sealed class UserEventRepository : IUserEventRepository
             DateTime = dateTime,
             Metadata = metadata
         });
-        await _db.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        await _db.SaveChangesAsync(cancellationToken);
     }
 
     public async Task<List<UserEventData>> GetAllEventsByUserId(int userId, IEnumerable<int>? events = null, CancellationToken cancellationToken = default)
@@ -29,7 +29,7 @@ internal sealed class UserEventRepository : IUserEventRepository
             .Where(x => x.UserId == userId);
         if (events != null)
             query = query.Where(x => events.Contains(x.EventType));
-        return await query.ToListAsync(cancellationToken).ConfigureAwait(false);
+        return await query.ToListAsync(cancellationToken);
     }
 
     public async Task<List<UserEventData>> GetLastEventsByUserId(int userId, int limit = 10, IEnumerable<int>? events = null, CancellationToken cancellationToken = default)
@@ -42,6 +42,6 @@ internal sealed class UserEventRepository : IUserEventRepository
             .Take(limit);
         if (events != null)
             query = query.Where(x => events.Contains(x.EventType));
-        return await query.ToListAsync(cancellationToken).ConfigureAwait(false);
+        return await query.ToListAsync(cancellationToken);
     }
 }

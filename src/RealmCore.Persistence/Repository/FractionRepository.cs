@@ -15,7 +15,7 @@ internal sealed class FractionRepository : IFractionRepository
             .TagWithSource(nameof(FractionRepository))
             .AsNoTracking();
 
-        return await query.ToListAsync(cancellationToken).ConfigureAwait(false);
+        return await query.ToListAsync(cancellationToken);
     }
 
     public async Task<bool> Exists(int id, string code, string name, CancellationToken cancellationToken = default)
@@ -25,7 +25,7 @@ internal sealed class FractionRepository : IFractionRepository
             .AsNoTracking()
             .Where(x => x.Id == id && x.Code == code && x.Name == name);
 
-        return await query.AnyAsync(cancellationToken).ConfigureAwait(false);
+        return await query.AnyAsync(cancellationToken);
     }
 
     public async Task<bool> CreateFraction(int id, string fractionName, string fractionCode, CancellationToken cancellationToken = default)
@@ -37,7 +37,7 @@ internal sealed class FractionRepository : IFractionRepository
             Code = fractionCode
         });
 
-        return await _db.SaveChangesAsync(cancellationToken).ConfigureAwait(false) == 1;
+        return await _db.SaveChangesAsync(cancellationToken) == 1;
     }
 
     public async Task<bool> AddMember(int fractionId, int userId, int rank = 1, string rankName = "", CancellationToken cancellationToken = default)
@@ -50,6 +50,6 @@ internal sealed class FractionRepository : IFractionRepository
             RankName = rankName,
         });
 
-        return await _db.SaveChangesAsync(cancellationToken).ConfigureAwait(false) == 1;
+        return await _db.SaveChangesAsync(cancellationToken) == 1;
     }
 }

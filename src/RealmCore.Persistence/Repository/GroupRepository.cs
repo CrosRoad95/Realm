@@ -16,7 +16,7 @@ internal sealed class GroupRepository : IGroupRepository
             .Include(x => x.Members)
             .Where(x => x.Name == groupName);
 
-        return await query.FirstOrDefaultAsync(cancellationToken).ConfigureAwait(false);
+        return await query.FirstOrDefaultAsync(cancellationToken);
     }
 
     public async Task<GroupData?> GetGroupByNameOrShortcut(string groupName, string shortcut, CancellationToken cancellationToken = default)
@@ -26,7 +26,7 @@ internal sealed class GroupRepository : IGroupRepository
             .Include(x => x.Members)
             .Where(x => x.Name == groupName || x.Shortcut == shortcut);
 
-        return await query.FirstOrDefaultAsync(cancellationToken).ConfigureAwait(false);
+        return await query.FirstOrDefaultAsync(cancellationToken);
     }
 
     public async Task<bool> ExistsByName(string groupName, CancellationToken cancellationToken = default)
@@ -35,7 +35,7 @@ internal sealed class GroupRepository : IGroupRepository
             .TagWithSource(nameof(GroupRepository))
             .AsNoTrackingWithIdentityResolution()
             .Where(x => x.Name == groupName);
-        return await query.AnyAsync(cancellationToken).ConfigureAwait(false);
+        return await query.AnyAsync(cancellationToken);
     }
 
     public async Task<bool> ExistsByNameOrShortcut(string groupName, string shortcut, CancellationToken cancellationToken = default)
@@ -44,7 +44,7 @@ internal sealed class GroupRepository : IGroupRepository
             .TagWithSource(nameof(GroupRepository))
             .AsNoTrackingWithIdentityResolution()
             .Where(x => x.Name == groupName || x.Shortcut == shortcut);
-        return await query.AnyAsync(cancellationToken).ConfigureAwait(false);
+        return await query.AnyAsync(cancellationToken);
     }
 
     public async Task<bool> ExistsByShortcut(string shortcut, CancellationToken cancellationToken = default)
@@ -54,7 +54,7 @@ internal sealed class GroupRepository : IGroupRepository
             .AsNoTrackingWithIdentityResolution()
             .Where(x => x.Shortcut == shortcut);
         
-        return await query.AnyAsync(cancellationToken).ConfigureAwait(false);
+        return await query.AnyAsync(cancellationToken);
     }
 
     public async Task<int> GetGroupIdByName(string groupName, CancellationToken cancellationToken = default)
@@ -63,7 +63,7 @@ internal sealed class GroupRepository : IGroupRepository
             .TagWithSource(nameof(GroupRepository))
             .Where(x => x.Name == groupName)
             .Select(x => x.Id);
-        return await query.FirstOrDefaultAsync(cancellationToken).ConfigureAwait(false);
+        return await query.FirstOrDefaultAsync(cancellationToken);
     }
 
     public async Task<GroupData> Create(string groupName, string shortcut, byte kind = 1, CancellationToken cancellationToken = default)
@@ -75,7 +75,7 @@ internal sealed class GroupRepository : IGroupRepository
             Kind = kind,
         };
         _db.Groups.Add(group);
-        await _db.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        await _db.SaveChangesAsync(cancellationToken);
         return group;
     }
 
@@ -89,7 +89,7 @@ internal sealed class GroupRepository : IGroupRepository
             RankName = rankName,
         };
         _db.GroupMembers.Add(groupMember);
-        await _db.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        await _db.SaveChangesAsync(cancellationToken);
         return groupMember;
     }
     
@@ -99,7 +99,7 @@ internal sealed class GroupRepository : IGroupRepository
             .TagWithSource(nameof(GroupRepository))
             .Where(x => x.GroupId == groupId && x.UserId == userId);
         return await query.AnyAsync(cancellationToken)
-            .ConfigureAwait(false);
+            ;
     }
 
     public async Task<bool> RemoveMember(int groupId, int userId, CancellationToken cancellationToken = default)
@@ -108,6 +108,6 @@ internal sealed class GroupRepository : IGroupRepository
             .TagWithSource(nameof(GroupRepository))
             .Where(x => x.GroupId == groupId && x.UserId == userId);
 
-        return await query.ExecuteDeleteAsync(cancellationToken).ConfigureAwait(false) == 1;
+        return await query.ExecuteDeleteAsync(cancellationToken) == 1;
     }
 }

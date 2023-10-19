@@ -19,7 +19,7 @@ internal sealed class RatingRepository : IRatingRepository
             DateTime = dateTime
         });
 
-        return await _db.SaveChangesAsync(cancellationToken).ConfigureAwait(false) > 0;
+        return await _db.SaveChangesAsync(cancellationToken) > 0;
     }
 
     public async Task<bool> ChangeLastRating(int userId, int ratingId, int rating, DateTime dateTime, CancellationToken cancellationToken = default)
@@ -45,7 +45,7 @@ internal sealed class RatingRepository : IRatingRepository
             });
         }
 
-        return await _db.SaveChangesAsync().ConfigureAwait(false) > 0;
+        return await _db.SaveChangesAsync() > 0;
     }
 
     public async Task<(int, DateTime)?> GetLastRating(int userId, int ratingId, CancellationToken cancellationToken = default)
@@ -53,7 +53,7 @@ internal sealed class RatingRepository : IRatingRepository
         var query = _db.Ratings
             .Where(x => x.UserId == userId && x.RatingId == ratingId)
             .OrderByDescending(x => x.DateTime);
-        var ratingData = await query.FirstOrDefaultAsync(cancellationToken).ConfigureAwait(false);
+        var ratingData = await query.FirstOrDefaultAsync(cancellationToken);
 
         if (ratingData == null)
             return null;

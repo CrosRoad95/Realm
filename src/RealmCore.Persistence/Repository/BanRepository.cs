@@ -20,7 +20,7 @@ internal sealed class BanRepository : IBanRepository
             Type = type,
         };
         _db.Bans.Add(ban);
-        await _db.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        await _db.SaveChangesAsync(cancellationToken);
         return ban;
     }
 
@@ -35,7 +35,7 @@ internal sealed class BanRepository : IBanRepository
             Type = type,
         };
         _db.Bans.Add(ban);
-        await _db.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        await _db.SaveChangesAsync(cancellationToken);
         return ban;
     }
 
@@ -46,7 +46,7 @@ internal sealed class BanRepository : IBanRepository
             .TagWithSource(nameof(BanRepository))
             .Where(x => x.Serial == serial && x.End > now);
 
-        return await query.ToListAsync(cancellationToken).ConfigureAwait(false);
+        return await query.ToListAsync(cancellationToken);
     }
     
     public async Task<BanData?> GetBanBySerialAndType(string serial, int type, DateTime now, CancellationToken cancellationToken = default)
@@ -56,7 +56,7 @@ internal sealed class BanRepository : IBanRepository
             .TagWithSource(nameof(BanRepository))
             .Where(x => x.Serial == serial && x.Type == type && x.End > now);
 
-        return await query.FirstOrDefaultAsync(cancellationToken).ConfigureAwait(false);
+        return await query.FirstOrDefaultAsync(cancellationToken);
     }
 
     public async Task<List<BanData>> GetBansByUserId(int userId, DateTime now, CancellationToken cancellationToken = default)
@@ -66,7 +66,7 @@ internal sealed class BanRepository : IBanRepository
             .TagWithSource(nameof(BanRepository))
             .Where(x => x.UserId == userId && x.End > now);
 
-        return await query.ToListAsync(cancellationToken).ConfigureAwait(false);
+        return await query.ToListAsync(cancellationToken);
     }
 
     public async Task<List<BanData>> GetBansByUserIdOrSerial(int userId, string serial, DateTime now, CancellationToken cancellationToken = default)
@@ -75,7 +75,7 @@ internal sealed class BanRepository : IBanRepository
             .AsNoTracking()
             .TagWithSource(nameof(BanRepository))
             .Where(x => x.Serial == serial || x.UserId == userId && x.End > now);
-        return await query.ToListAsync(cancellationToken).ConfigureAwait(false);
+        return await query.ToListAsync(cancellationToken);
     }
 
     public async Task<bool> Delete(int id, CancellationToken cancellationToken = default)
@@ -83,7 +83,7 @@ internal sealed class BanRepository : IBanRepository
         var query = _db.Bans.Where(x => x.Id == id)
             .AsNoTracking()
             .TagWithSource(nameof(BanRepository));
-        return await _db.Bans.Where(x => x.Id == id).ExecuteDeleteAsync(cancellationToken).ConfigureAwait(false) == 1;
+        return await _db.Bans.Where(x => x.Id == id).ExecuteDeleteAsync(cancellationToken) == 1;
     }
 
     public async Task<bool> DeleteByUserId(int userId, int type = 0, CancellationToken cancellationToken = default)
@@ -92,7 +92,7 @@ internal sealed class BanRepository : IBanRepository
             .AsNoTracking()
             .TagWithSource(nameof(BanRepository));
 
-        return await query.ExecuteDeleteAsync(cancellationToken).ConfigureAwait(false) > 0;
+        return await query.ExecuteDeleteAsync(cancellationToken) > 0;
     }
 
     public async Task<bool> DeleteBySerial(string serial, int type = 0, CancellationToken cancellationToken = default)
@@ -101,6 +101,6 @@ internal sealed class BanRepository : IBanRepository
             .AsNoTracking()
             .TagWithSource(nameof(BanRepository));
 
-        return await query.ExecuteDeleteAsync(cancellationToken).ConfigureAwait(false) > 0;
+        return await query.ExecuteDeleteAsync(cancellationToken) > 0;
     }
 }

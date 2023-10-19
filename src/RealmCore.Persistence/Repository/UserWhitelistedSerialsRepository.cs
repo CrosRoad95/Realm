@@ -15,7 +15,7 @@ internal sealed class UserWhitelistedSerialsRepository : IUserWhitelistedSerials
             .AsNoTracking()
             .TagWith(nameof(UserWhitelistedSerialsRepository))
             .Where(x => x.UserId == userId && x.Serial == serial);
-        return await query.AnyAsync(cancellationToken).ConfigureAwait(false);
+        return await query.AnyAsync(cancellationToken);
     }
 
     public async Task<bool> TryAddWhitelistedSerial(int userId, string serial, CancellationToken cancellationToken = default)
@@ -31,7 +31,7 @@ internal sealed class UserWhitelistedSerialsRepository : IUserWhitelistedSerials
                 UserId = userId
             });
 
-            var added = await _db.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+            var added = await _db.SaveChangesAsync(cancellationToken);
             return added > 0;
         }
         catch (Exception)
@@ -55,7 +55,7 @@ internal sealed class UserWhitelistedSerialsRepository : IUserWhitelistedSerials
                 .AsNoTracking()
                 .TagWith(nameof(UserWhitelistedSerialsRepository))
                 .Where(x => x.UserId == userId && x.Serial == serial)
-                .ExecuteDeleteAsync(cancellationToken).ConfigureAwait(false);
+                .ExecuteDeleteAsync(cancellationToken);
 
             return deleted > 0;
         }

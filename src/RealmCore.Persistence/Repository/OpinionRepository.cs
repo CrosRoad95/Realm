@@ -19,7 +19,7 @@ internal sealed class OpinionRepository : IOpinionRepository
             DateTime = dateTime
         });
 
-        return await _db.SaveChangesAsync(cancellationToken).ConfigureAwait(false) == 1;
+        return await _db.SaveChangesAsync(cancellationToken) == 1;
     }
 
     public async Task<DateTime?> GetLastOpinionDateTime(int userId, int opinionId, CancellationToken cancellationToken = default)
@@ -28,7 +28,7 @@ internal sealed class OpinionRepository : IOpinionRepository
             .Where(x => x.UserId == userId && x.OpinionId == opinionId)
             .OrderByDescending(x => x.DateTime);
 
-        var opinionData = await query.FirstOrDefaultAsync(cancellationToken).ConfigureAwait(false);
+        var opinionData = await query.FirstOrDefaultAsync(cancellationToken);
 
         return opinionData?.DateTime;
     }
