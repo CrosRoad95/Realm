@@ -35,6 +35,7 @@ public abstract class Db<T> : IdentityDbContext<UserData, RoleData, int,
     public DbSet<UserRewardData> UserRewards => Set<UserRewardData>();
     public DbSet<UserSettingData> UserSettings => Set<UserSettingData>();
     public DbSet<UserWhitelistedSerialData> UserWhitelistedSerials => Set<UserWhitelistedSerialData>();
+    public DbSet<UserNotificationData> UserNotifications => Set<UserNotificationData>();
     public DbSet<VehicleEngineData> VehicleEngines => Set<VehicleEngineData>();
     public DbSet<UserInventoryData> UserInventories => Set<UserInventoryData>();
     public DbSet<VehicleInventoryData> VehicleInventories => Set<VehicleInventoryData>();
@@ -184,6 +185,16 @@ public abstract class Db<T> : IdentityDbContext<UserData, RoleData, int,
                 .WithOne(x => x.User)
                 .HasForeignKey(x => x.UserId);
 
+            entityBuilder
+                .HasMany(x => x.Events)
+                .WithOne()
+                .HasForeignKey(x => x.UserId);
+            
+            entityBuilder
+                .HasMany(x => x.Notifications)
+                .WithOne()
+                .HasForeignKey(x => x.UserId);
+
             entityBuilder.Property(x => x.IsDisabled)
                 .HasDefaultValue(false)
                 .IsRequired();
@@ -273,6 +284,19 @@ public abstract class Db<T> : IdentityDbContext<UserData, RoleData, int,
                 .HasKey(x => new { x.UserId, x.SettingId });
 
             entityBuilder.Property(x => x.SettingId)
+                .HasMaxLength(255);
+        });
+        
+        modelBuilder.Entity<UserNotificationData>(entityBuilder =>
+        {
+            entityBuilder
+                .ToTable(nameof(UserNotifications))
+                .HasKey(x => x.Id);
+
+            entityBuilder.Property(x => x.Title)
+                .HasMaxLength(255);
+
+            entityBuilder.Property(x => x.Excerpt)
                 .HasMaxLength(255);
         });
 

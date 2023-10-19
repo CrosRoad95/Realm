@@ -36,8 +36,9 @@ public sealed class UserData : IdentityUser<int>
     public ICollection<UserRewardData> Rewards { get; set; } = new List<UserRewardData>();
     public ICollection<UserSettingData> Settings { get; set; } = new List<UserSettingData>();
     public ICollection<UserWhitelistedSerialData> WhitelistedSerials { get; set; } = new List<UserWhitelistedSerialData>();
-    public ICollection<UserInventoryData> UserInventories = new List<UserInventoryData>();
-    public ICollection<RatingData> Ratings = new List<RatingData>();
-    public ICollection<OpinionData> Opinions = new List<OpinionData>();
-    public ICollection<UserEventData> Events = new List<UserEventData>();
+    public ICollection<UserInventoryData> UserInventories { get; set; } = new List<UserInventoryData>();
+    public ICollection<RatingData> Ratings { get; set; } = new List<RatingData>();
+    public ICollection<OpinionData> Opinions { get; set; } = new List<OpinionData>();
+    public ICollection<UserEventData> Events { get; set; } = new List<UserEventData>();
+    public ICollection<UserNotificationData> Notifications { get; set; } = new List<UserNotificationData>();
 }

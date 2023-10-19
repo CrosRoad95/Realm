@@ -618,6 +618,8 @@ namespace RealmCore.Persistence.SQLite.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("UserId");
+
                     b.ToTable("UserEvents", (string)null);
                 });
 
@@ -658,6 +660,42 @@ namespace RealmCore.Persistence.SQLite.Migrations
                     b.HasKey("UserId", "LicenseId");
 
                     b.ToTable("UserLicenses", (string)null);
+                });
+
+            modelBuilder.Entity("RealmCore.Persistence.Data.UserNotificationData", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Content")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Excerpt")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("ReadTime")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("SentTime")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("UserNotifications", (string)null);
                 });
 
             modelBuilder.Entity("RealmCore.Persistence.Data.UserRewardData", b =>
@@ -1194,6 +1232,15 @@ namespace RealmCore.Persistence.SQLite.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("RealmCore.Persistence.Data.UserEventData", b =>
+                {
+                    b.HasOne("RealmCore.Persistence.Data.UserData", null)
+                        .WithMany("Events")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("RealmCore.Persistence.Data.UserInventoryData", b =>
                 {
                     b.HasOne("RealmCore.Persistence.Data.InventoryData", "Inventory")
@@ -1221,6 +1268,15 @@ namespace RealmCore.Persistence.SQLite.Migrations
                 {
                     b.HasOne("RealmCore.Persistence.Data.UserData", null)
                         .WithMany("Licenses")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("RealmCore.Persistence.Data.UserNotificationData", b =>
+                {
+                    b.HasOne("RealmCore.Persistence.Data.UserData", null)
+                        .WithMany("Notifications")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -1383,6 +1439,8 @@ namespace RealmCore.Persistence.SQLite.Migrations
 
                     b.Navigation("Discoveries");
 
+                    b.Navigation("Events");
+
                     b.Navigation("FractionMembers");
 
                     b.Navigation("GroupMembers");
@@ -1392,6 +1450,8 @@ namespace RealmCore.Persistence.SQLite.Migrations
                     b.Navigation("JobUpgrades");
 
                     b.Navigation("Licenses");
+
+                    b.Navigation("Notifications");
 
                     b.Navigation("Opinions");
 

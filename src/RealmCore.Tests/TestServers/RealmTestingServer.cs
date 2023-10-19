@@ -91,6 +91,7 @@ internal class RealmTestingServer : TestingServer
             services.AddSingleton<LevelsRegistry>();
             services.AddSingleton<VehicleEnginesRegistry>();
             services.AddSingleton<ISpawnMarkersService, SpawnMarkersService>();
+            services.AddSingleton<IUsersNotificationsService, UsersNotificationsService>();
             services.AddSingleton<IBrowserService, BrowserService>();
             services.AddSingleton<IEntityFactory, EntityFactory>();
             services.AddSingleton<IAssetEncryptionProvider, TestAssetEncryptionProvider>();
