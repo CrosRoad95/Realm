@@ -40,6 +40,7 @@ public interface IDb : IDisposable
     DbSet<RatingData> Ratings { get; }
     DbSet<OpinionData> Opinions { get; }
     DbSet<UserNotificationData> UserNotifications { get; }
+    DbSet<UserLoginHistoryData> UserLoginHistory { get; }
 
     Task MigrateAsync();
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);

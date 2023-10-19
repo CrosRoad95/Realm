@@ -41,4 +41,5 @@ public sealed class UserData : IdentityUser<int>
     public ICollection<OpinionData> Opinions { get; set; } = new List<OpinionData>();
     public ICollection<UserEventData> Events { get; set; } = new List<UserEventData>();
     public ICollection<UserNotificationData> Notifications { get; set; } = new List<UserNotificationData>();
+    public ICollection<UserLoginHistoryData> LoginHistory { get; set; } = new List<UserLoginHistoryData>();
 }

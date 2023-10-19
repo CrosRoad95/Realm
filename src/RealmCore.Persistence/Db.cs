@@ -36,6 +36,7 @@ public abstract class Db<T> : IdentityDbContext<UserData, RoleData, int,
     public DbSet<UserSettingData> UserSettings => Set<UserSettingData>();
     public DbSet<UserWhitelistedSerialData> UserWhitelistedSerials => Set<UserWhitelistedSerialData>();
     public DbSet<UserNotificationData> UserNotifications => Set<UserNotificationData>();
+    public DbSet<UserLoginHistoryData> UserLoginHistory => Set<UserLoginHistoryData>();
     public DbSet<VehicleEngineData> VehicleEngines => Set<VehicleEngineData>();
     public DbSet<UserInventoryData> UserInventories => Set<UserInventoryData>();
     public DbSet<VehicleInventoryData> VehicleInventories => Set<VehicleInventoryData>();
@@ -189,9 +190,14 @@ public abstract class Db<T> : IdentityDbContext<UserData, RoleData, int,
                 .HasMany(x => x.Events)
                 .WithOne()
                 .HasForeignKey(x => x.UserId);
-            
+
             entityBuilder
                 .HasMany(x => x.Notifications)
+                .WithOne()
+                .HasForeignKey(x => x.UserId);
+
+            entityBuilder
+                .HasMany(x => x.LoginHistory)
                 .WithOne()
                 .HasForeignKey(x => x.UserId);
 
@@ -298,6 +304,19 @@ public abstract class Db<T> : IdentityDbContext<UserData, RoleData, int,
 
             entityBuilder.Property(x => x.Excerpt)
                 .HasMaxLength(255);
+        });
+        
+        modelBuilder.Entity<UserLoginHistoryData>(entityBuilder =>
+        {
+            entityBuilder
+                .ToTable(nameof(UserLoginHistory))
+                .HasKey(x => x.Id);
+
+            entityBuilder.Property(x => x.Ip)
+                .HasMaxLength(128);
+
+            entityBuilder.Property(x => x.Serial)
+                .HasMaxLength(32);
         });
 
         modelBuilder.Entity<UserWhitelistedSerialData>(entityBuilder =>

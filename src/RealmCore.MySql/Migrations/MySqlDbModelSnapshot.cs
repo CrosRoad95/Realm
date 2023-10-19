@@ -664,6 +664,35 @@ namespace RealmCore.Persistence.MySql.Migrations
                     b.ToTable("UserLicenses", (string)null);
                 });
 
+            modelBuilder.Entity("RealmCore.Persistence.Data.UserLoginHistoryData", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("DateTime")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("Ip")
+                        .IsRequired()
+                        .HasMaxLength(128)
+                        .HasColumnType("varchar(128)");
+
+                    b.Property<string>("Serial")
+                        .IsRequired()
+                        .HasMaxLength(32)
+                        .HasColumnType("varchar(32)");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("UserLoginHistory", (string)null);
+                });
+
             modelBuilder.Entity("RealmCore.Persistence.Data.UserNotificationData", b =>
                 {
                     b.Property<int>("Id")
@@ -1275,6 +1304,15 @@ namespace RealmCore.Persistence.MySql.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("RealmCore.Persistence.Data.UserLoginHistoryData", b =>
+                {
+                    b.HasOne("RealmCore.Persistence.Data.UserData", null)
+                        .WithMany("LoginHistory")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("RealmCore.Persistence.Data.UserNotificationData", b =>
                 {
                     b.HasOne("RealmCore.Persistence.Data.UserData", null)
@@ -1452,6 +1490,8 @@ namespace RealmCore.Persistence.MySql.Migrations
                     b.Navigation("JobUpgrades");
 
                     b.Navigation("Licenses");
+
+                    b.Navigation("LoginHistory");
 
                     b.Navigation("Notifications");
 

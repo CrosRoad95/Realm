@@ -15,6 +15,7 @@ public static class ServiceCollectionExtensions
         services.AddTransient<IUserRewardRepository, UserRewardRepository>();
         services.AddTransient<IVehicleEventRepository, VehicleEventRepository>();
         services.AddTransient<IUserNotificationRepository, UserNotificationRepository>();
+        services.AddTransient<IUserLoginHistoryRepository, UserLoginHistoryRepository>();
         services.AddTransient<IUserRepository, UserRepository>();
         services.AddTransient<IUserEventRepository, UserEventRepository>();
         services.AddTransient<IRatingRepository, RatingRepository>();

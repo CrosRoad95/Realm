@@ -18,13 +18,15 @@ internal sealed class UsersService : IUsersService
     private readonly IUserRepository _userRepository;
     private readonly UserManager<UserData> _userManager;
     private readonly IUserEventRepository _userEventRepository;
+    private readonly IUserLoginHistoryRepository _userLoginHistoryRepository;
+
     private static readonly JsonSerializerSettings _jsonSerializerSettings = new()
     {
         Converters = new List<JsonConverter> { DoubleConverter.Instance }
     };
 
     public UsersService(ItemsRegistry itemsRegistry, SignInManager<UserData> signInManager, ILogger<UsersService> logger, IOptionsMonitor<GameplayOptions> gameplayOptions,
-        IDateTimeProvider dateTimeProvider, IAuthorizationService authorizationService, IActiveUsers activeUsers, IElementCollection elementCollection, IEntityEngine ecs, LevelsRegistry levelsRegistry, IUserRepository userRepository, UserManager<UserData> userManager, IUserEventRepository userEventRepository)
+        IDateTimeProvider dateTimeProvider, IAuthorizationService authorizationService, IActiveUsers activeUsers, IElementCollection elementCollection, IEntityEngine ecs, LevelsRegistry levelsRegistry, IUserRepository userRepository, UserManager<UserData> userManager, IUserEventRepository userEventRepository, IUserLoginHistoryRepository userLoginHistoryRepository)
     {
         _itemsRegistry = itemsRegistry;
         _signInManager = signInManager;
@@ -39,6 +41,7 @@ internal sealed class UsersService : IUsersService
         _userRepository = userRepository;
         _userManager = userManager;
         _userEventRepository = userEventRepository;
+        _userLoginHistoryRepository = userLoginHistoryRepository;
     }
 
     public async Task<int> SignUp(string username, string password)
@@ -88,7 +91,6 @@ internal sealed class UsersService : IUsersService
         try
         {
             await entity.AddComponentAsync(new UserComponent(user, _signInManager, _userManager));
-            await TryUpdateLastNickName(entity);
             if (user.Inventories != null && user.Inventories.Count != 0)
             {
                 foreach (var inventory in user.Inventories)
@@ -148,6 +150,10 @@ internal sealed class UsersService : IUsersService
             entity.AddComponent(new LevelComponent(user.Level, user.Experience, _levelsRegistry));
             entity.AddComponent(new MoneyComponent(user.Money, _gameplayOptions));
             entity.AddComponent<AFKComponent>();
+            
+            var client = entity.GetPlayer().Client;
+            await TryUpdateLastNickName(entity);
+            await _userLoginHistoryRepository.Add(user.Id, _dateTimeProvider.Now, client.IPAddress?.ToString() ?? "", client.GetSerial());
             return true;
 
         }
