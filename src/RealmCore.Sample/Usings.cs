@@ -40,4 +40,6 @@ global using SlipeServer.Resources.Text3d;
 global using RealmCore.Persistence.Interfaces;
 global using Microsoft.AspNetCore.Identity;
 global using RealmCore.Persistence.Data;
+global using RealmCore.Server.Components.Players.Abstractions;
+
 [assembly: ExcludeFromCodeCoverage]

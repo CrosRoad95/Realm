@@ -2,13 +2,12 @@
 
 namespace RealmCore.Server.Logic.Resources;
 
-internal sealed class BrowserGuiPageComponentLogic
-    : ComponentLogic<BrowserGuiComponent>
+internal sealed class BrowserGuiComponentLogic : ComponentLogic<BrowserGuiComponent>
 {
     private readonly IBrowserGuiService _browserGuiService;
-    private readonly ILogger<BrowserGuiPageComponentLogic> _logger;
+    private readonly ILogger<BrowserGuiComponentLogic> _logger;
 
-    public BrowserGuiPageComponentLogic(IEntityEngine entityEngine, IBrowserGuiService browserGuiService, ILogger<BrowserGuiPageComponentLogic> logger) : base(entityEngine)
+    public BrowserGuiComponentLogic(IEntityEngine entityEngine, IBrowserGuiService browserGuiService, ILogger<BrowserGuiComponentLogic> logger) : base(entityEngine)
     {
         _browserGuiService = browserGuiService;
         _logger = logger;
@@ -25,13 +24,22 @@ internal sealed class BrowserGuiPageComponentLogic
             browserComponent.Visible = true;
             _logger.LogInformation("Gui {guiPageType} opened", browserGuiComponent.GetType().Name);
         }
+        browserGuiComponent.NavigationRequested += HandleNavigationRequested;
     }
 
     protected override void ComponentDetached(BrowserGuiComponent browserGuiComponent)
     {
+        browserGuiComponent.NavigationRequested -= HandleNavigationRequested;
         var browserComponent = browserGuiComponent.Entity.GetRequiredComponent<BrowserComponent>();
         browserComponent.Visible = false;
 
         _logger.LogInformation("Gui {guiPageType} closed", browserGuiComponent.GetType().Name);
+    }
+
+    private void HandleNavigationRequested(BrowserGuiComponent browserGuiComponent, BrowserGuiComponent targetGuiComponent)
+    {
+        var entity = browserGuiComponent.Entity;
+        entity.TryDestroyComponent<BrowserGuiComponent>();
+        entity.AddComponent(targetGuiComponent);
     }
 }

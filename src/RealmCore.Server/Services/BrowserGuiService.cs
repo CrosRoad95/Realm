@@ -8,7 +8,7 @@ internal class BrowserGuiService : IBrowserGuiService
 
     private readonly RandomNumberGenerator _randomNumberGenerator;
     private readonly object _lock = new();
-    private readonly byte[] bytes = new byte[64];
+    private readonly byte[] _bytes = new byte[64];
     public event Action<Entity>? Ready;
     public string KeyName => "guiKey";
 
@@ -26,9 +26,9 @@ internal class BrowserGuiService : IBrowserGuiService
     {
         lock (_lock)
         {
-            _randomNumberGenerator.GetBytes(bytes);
+            _randomNumberGenerator.GetBytes(_bytes);
 
-            return Convert.ToBase64String(bytes).Replace('+', '-').Replace('/', '_');
+            return Convert.ToBase64String(_bytes).Replace('+', '-').Replace('/', '_');
         }
     }
     public void AuthorizeEntity(string key, Entity entity)

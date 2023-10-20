@@ -40,14 +40,14 @@ internal sealed class StatisticsCounterResourceLogic : ComponentLogic<Statistics
                     }
                     catch (Exception ex)
                     {
-                        _logger.LogError(ex, "Failed to increase stat for player {playerName} serial: {serial}", player.Name, player.Client.GetSerial());
+                        _logger.LogError(ex, "Failed to increase stat for player {playerName} serial: {serial}", player.Name, player.Client.TryGetSerial());
                     }
                 }
             }
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Failed to collect logs for player {playerName} serial: {serial}", player.Name, player.Client.GetSerial());
+            _logger.LogError(ex, "Failed to collect logs for player {playerName} serial: {serial}", player.Name, player.Client.TryGetSerial());
         }
     }
 
