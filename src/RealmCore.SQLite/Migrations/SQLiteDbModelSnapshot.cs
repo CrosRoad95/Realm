@@ -691,6 +691,34 @@ namespace RealmCore.Persistence.SQLite.Migrations
                     b.ToTable("UserLoginHistory", (string)null);
                 });
 
+            modelBuilder.Entity("RealmCore.Persistence.Data.UserMoneyHistoryData", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<decimal>("Amount")
+                        .HasColumnType("TEXT");
+
+                    b.Property<decimal>("CurrentBalance")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("DateTime")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("UserMoneyHistory", (string)null);
+                });
+
             modelBuilder.Entity("RealmCore.Persistence.Data.UserNotificationData", b =>
                 {
                     b.Property<int>("Id")
@@ -1311,6 +1339,15 @@ namespace RealmCore.Persistence.SQLite.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("RealmCore.Persistence.Data.UserMoneyHistoryData", b =>
+                {
+                    b.HasOne("RealmCore.Persistence.Data.UserData", null)
+                        .WithMany("MoneyHistory")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("RealmCore.Persistence.Data.UserNotificationData", b =>
                 {
                     b.HasOne("RealmCore.Persistence.Data.UserData", null)
@@ -1490,6 +1527,8 @@ namespace RealmCore.Persistence.SQLite.Migrations
                     b.Navigation("Licenses");
 
                     b.Navigation("LoginHistory");
+
+                    b.Navigation("MoneyHistory");
 
                     b.Navigation("Notifications");
 

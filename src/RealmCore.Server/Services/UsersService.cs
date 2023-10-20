@@ -152,8 +152,8 @@ internal sealed class UsersService : IUsersService
             entity.AddComponent<AFKComponent>();
             
             var client = entity.GetPlayer().Client;
-            await TryUpdateLastNickName(entity);
             await _userLoginHistoryRepository.Add(user.Id, _dateTimeProvider.Now, client.IPAddress?.ToString() ?? "", client.GetSerial());
+            await TryUpdateLastNickName(entity);
             return true;
 
         }

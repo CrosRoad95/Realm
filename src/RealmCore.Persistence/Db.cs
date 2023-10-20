@@ -37,6 +37,7 @@ public abstract class Db<T> : IdentityDbContext<UserData, RoleData, int,
     public DbSet<UserWhitelistedSerialData> UserWhitelistedSerials => Set<UserWhitelistedSerialData>();
     public DbSet<UserNotificationData> UserNotifications => Set<UserNotificationData>();
     public DbSet<UserLoginHistoryData> UserLoginHistory => Set<UserLoginHistoryData>();
+    public DbSet<UserMoneyHistoryData> UserMoneyHistory => Set<UserMoneyHistoryData>();
     public DbSet<VehicleEngineData> VehicleEngines => Set<VehicleEngineData>();
     public DbSet<UserInventoryData> UserInventories => Set<UserInventoryData>();
     public DbSet<VehicleInventoryData> VehicleInventories => Set<VehicleInventoryData>();
@@ -200,6 +201,11 @@ public abstract class Db<T> : IdentityDbContext<UserData, RoleData, int,
                 .HasMany(x => x.LoginHistory)
                 .WithOne()
                 .HasForeignKey(x => x.UserId);
+            
+            entityBuilder
+                .HasMany(x => x.MoneyHistory)
+                .WithOne()
+                .HasForeignKey(x => x.UserId);
 
             entityBuilder.Property(x => x.IsDisabled)
                 .HasDefaultValue(false)
@@ -317,6 +323,13 @@ public abstract class Db<T> : IdentityDbContext<UserData, RoleData, int,
 
             entityBuilder.Property(x => x.Serial)
                 .HasMaxLength(32);
+        });
+        
+        modelBuilder.Entity<UserMoneyHistoryData>(entityBuilder =>
+        {
+            entityBuilder
+                .ToTable(nameof(UserMoneyHistory))
+                .HasKey(x => x.Id);
         });
 
         modelBuilder.Entity<UserWhitelistedSerialData>(entityBuilder =>
