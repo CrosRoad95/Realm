@@ -170,7 +170,7 @@ internal class PlayersLogic
             try
             {
                 var saveService = _serviceProvider.GetRequiredService<ISaveService>();
-                await saveService.Save(playerEntity);
+                await saveService.BeginSave(playerEntity);
                 await saveService.Commit();
             }
             finally

@@ -30,6 +30,7 @@ internal sealed class CommandsLogic
     private readonly ChatBox _chatBox;
     private readonly ILogger<CommandsLogic> _logger;
     private readonly IDateTimeProvider _dateTimeProvider;
+    private readonly IUsersService _usersService;
     private readonly IVehiclesService _vehiclesService;
     private readonly ILoadService _loadService;
     private readonly IUserRepository _userRepository;
@@ -60,6 +61,7 @@ internal sealed class CommandsLogic
         _chatBox = chatBox;
         _logger = logger;
         _dateTimeProvider = dateTimeProvider;
+        _usersService = usersService;
         _vehiclesService = vehiclesService;
         _loadService = loadService;
         _userRepository = userRepository;
@@ -1513,6 +1515,11 @@ internal sealed class CommandsLogic
         {
             bool authorized = await usersService.AuthorizePolicy(entity.GetRequiredComponent<UserComponent>(), "Admin");
             _chatBox.OutputTo(entity, $"authorized: {authorized}");
+        });
+
+        _commandService.AddAsyncCommandHandler("signout", async (entity, args) =>
+        {
+            await _usersService.SignOut(entity);
         });
     }
 

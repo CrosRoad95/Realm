@@ -23,13 +23,13 @@ internal class SaveCommand : ICommand
             try
             {
 #if DEBUG
-                if (await _saveService.Save(entity))
+                if (await _saveService.BeginSave(entity))
                 {
                     await _saveService.Commit();
                     savedEntities++;
                 }
 #else
-                if (await _saveService.Save(entity))
+                if (await _saveService.BeginSave(entity))
                     savedEntities++;
 #endif
             }

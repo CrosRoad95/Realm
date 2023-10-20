@@ -2,6 +2,7 @@
 using RealmCore.Server.Helpers;
 using RealmCore.Server.Components.Players.Abstractions;
 using RealmCore.Sample.Components.Gui;
+using RealmCore.Server.Components.Players;
 
 namespace RealmCore.Sample.Logic;
 
@@ -20,117 +21,112 @@ internal class HomePageComponent : BrowserGuiComponent
     }
 }
 
-internal sealed class PlayerBindsLogic
+internal sealed class PlayerBindsLogic : ComponentLogic<UserComponent>
 {
     public struct GuiOpenOptions
     {
         public List<Type>? allowToOpenWithGui;
     }
 
-    private readonly IEntityEngine _ecs;
     private readonly IServiceProvider _serviceProvider;
     private readonly IVehicleRepository _vehicleRepository;
 
-    public PlayerBindsLogic(IEntityEngine ecs, IServiceProvider serviceProvider, IVehicleRepository vehicleRepository)
+    public PlayerBindsLogic(IEntityEngine entityEngine, IServiceProvider serviceProvider, IVehicleRepository vehicleRepository) : base(entityEngine)
     {
-        _ecs = ecs;
         _serviceProvider = serviceProvider;
         _vehicleRepository = vehicleRepository;
-        _ecs.EntityCreated += HandleEntityCreated;
     }
 
-    private void HandleEntityCreated(Entity entity)
+    protected override void ComponentAdded(UserComponent userComponent)
     {
-        if (entity.HasComponent<PlayerTagComponent>())
-            entity.ComponentAdded += HandleComponentAdded;
-    }
+        var entity = userComponent.Entity;
+        var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();
 
-    private void HandleComponentAdded(Component component)
-    {
-        if (component is UserComponent userComponent)
+        playerElementComponent.SetBindAsync("num_0", entity =>
         {
-            var entity = component.Entity;
-            var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();
-
-            playerElementComponent.SetBindAsync("num_0", entity =>
+            if (entity.TryGetComponent(out AdminComponent adminComponent))
             {
-                if (entity.TryGetComponent(out AdminComponent adminComponent))
+                adminComponent.NoClip = !adminComponent.NoClip;
+            }
+            return Task.CompletedTask;
+        });
+
+        playerElementComponent.SetBind("F2", entity =>
+        {
+            if (entity.TryGetComponent(out BrowserComponent browserComponent))
+            {
+                if (browserComponent.Visible)
                 {
-                    adminComponent.NoClip = !adminComponent.NoClip;
+                    browserComponent.Close();
                 }
-                return Task.CompletedTask;
-            });
-
-            playerElementComponent.SetBind("F2", entity =>
-            {
-                if (entity.TryGetComponent(out BrowserComponent browserComponent))
-                {
-                    if (browserComponent.Visible)
-                    {
-                        browserComponent.Close();
-                    }
-                    else
-                    {
-                        browserComponent.Path = "/realmUi/counter1";
-                        browserComponent.Visible = true;
-                    }
-                }
-            });
-
-            playerElementComponent.SetBind("F3", entity =>
-            {
-                if (entity.TryGetComponent(out BrowserComponent browserComponent))
+                else
                 {
                     browserComponent.Path = "/realmUi/counter1";
                     browserComponent.Visible = true;
                 }
-            });
+            }
+        });
 
-            playerElementComponent.SetBind("F4", entity =>
+        playerElementComponent.SetBind("F3", entity =>
+        {
+            if (entity.TryGetComponent(out BrowserComponent browserComponent))
             {
-                if (entity.TryGetComponent(out BrowserComponent browserComponent))
-                {
-                    browserComponent.Path = "index";
-                    browserComponent.Visible = false;
-                }
-            });
+                browserComponent.Path = "/realmUi/counter1";
+                browserComponent.Visible = true;
+            }
+        });
 
-            GuiHelpers.BindGuiPage<HomePageComponent>(entity, "F6", _serviceProvider);
-            GuiHelpers.BindGuiPage<CounterPageComponent>(entity, "F7", _serviceProvider);
-
-            //playerElementComponent.SetBind("F6", entity =>
-            //{
-            //    if (entity.TryGetComponent(out BlazorGuiComponent blazorGuiComponent))
-            //    {
-            //        blazorGuiComponent.Open("home");
-            //    }
-            //});
-
-            //playerElementComponent.SetBind("F7", entity =>
-            //{
-            //    if (entity.TryGetComponent(out BlazorGuiComponent blazorGuiComponent))
-            //    {
-            //        blazorGuiComponent.Open("counter");
-            //    }
-            //});
-
-            GuiHelpers.BindGuiPage(entity, "F1", async () =>
+        playerElementComponent.SetBind("F4", entity =>
+        {
+            if (entity.TryGetComponent(out BrowserComponent browserComponent))
             {
-                DashboardGuiComponent.DashboardState state = new();
-                if (entity.TryGetComponent(out MoneyComponent moneyComponent))
-                    state.Money = (double)moneyComponent.Money;
+                browserComponent.Path = "index";
+                browserComponent.Visible = false;
+            }
+        });
 
-                var vehiclesWithModelAndPositionDTos = await _vehicleRepository.GetLightVehiclesByUserId(userComponent.Id);
-                state.VehicleLightInfos = vehiclesWithModelAndPositionDTos.Select(x => new VehicleLightInfoDTO
-                {
-                    Id = x.Id,
-                    Model = x.Model,
-                    Position = x.Position,
-                }).ToList();
-                state.Counter = 3;
-                return new DashboardGuiComponent(state);
-            }, _serviceProvider);
-            GuiHelpers.BindGui<InventoryGuiComponent>(entity, "i", _serviceProvider);
-        }
+        GuiHelpers.BindGuiPage<HomePageComponent>(entity, "F6", _serviceProvider);
+        GuiHelpers.BindGuiPage<CounterPageComponent>(entity, "F7", _serviceProvider);
+
+        //playerElementComponent.SetBind("F6", entity =>
+        //{
+        //    if (entity.TryGetComponent(out BlazorGuiComponent blazorGuiComponent))
+        //    {
+        //        blazorGuiComponent.Open("home");
+        //    }
+        //});
+
+        //playerElementComponent.SetBind("F7", entity =>
+        //{
+        //    if (entity.TryGetComponent(out BlazorGuiComponent blazorGuiComponent))
+        //    {
+        //        blazorGuiComponent.Open("counter");
+        //    }
+        //});
+
+        GuiHelpers.BindGuiPage(entity, "F1", async () =>
+        {
+            DashboardGuiComponent.DashboardState state = new();
+            if (entity.TryGetComponent(out MoneyComponent moneyComponent))
+                state.Money = (double)moneyComponent.Money;
+
+            var vehiclesWithModelAndPositionDTos = await _vehicleRepository.GetLightVehiclesByUserId(userComponent.Id);
+            state.VehicleLightInfos = vehiclesWithModelAndPositionDTos.Select(x => new VehicleLightInfoDTO
+            {
+                Id = x.Id,
+                Model = x.Model,
+                Position = x.Position,
+            }).ToList();
+            state.Counter = 3;
+            return new DashboardGuiComponent(state);
+        }, _serviceProvider);
+        GuiHelpers.BindGui<InventoryGuiComponent>(entity, "i", _serviceProvider);
+    }
+
+    protected override void ComponentDetached(UserComponent userComponent)
+    {
+        var entity = userComponent.Entity;
+        var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();
+        playerElementComponent.RemoveAllBinds();
     }
 }

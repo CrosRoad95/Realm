@@ -77,7 +77,7 @@ public class RealmServer : MtaServer, IRealmServer
         {
             try
             {
-                if (await saveService.Save(entity))
+                if (await saveService.BeginSave(entity))
                     i++;
             }
             catch (Exception ex)

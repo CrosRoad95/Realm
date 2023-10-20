@@ -23,7 +23,7 @@ internal class ReloadEntitiesCommand : ICommand
         {
             try
             {
-                if (await _saveService.Save(entity))
+                if (await _saveService.BeginSave(entity))
                 {
 #if DEBUG
                     await _saveService.Commit();

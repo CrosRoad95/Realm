@@ -392,6 +392,16 @@ internal sealed class SaveService : ISaveService
 
     public async Task<bool> Save(Entity entity)
     {
+        if (await BeginSave(entity))
+        {
+            await Commit();
+            return true;
+        }
+        return false;
+    }
+
+    public async Task<bool> BeginSave(Entity entity)
+    {
         if (!entity.TryGetComponent(out TagComponent tagComponent))
             return false;
 

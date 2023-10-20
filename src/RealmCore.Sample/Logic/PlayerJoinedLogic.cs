@@ -2,7 +2,7 @@
 
 namespace RealmCore.Sample.Logic;
 
-internal sealed class PlayerJoinedLogic
+internal sealed class PlayerJoinedLogic : ComponentLogic<UserComponent>
 {
     private readonly IEntityEngine _entityEngine;
     private readonly ILogger<PlayerJoinedLogic> _logger;
@@ -16,9 +16,9 @@ internal sealed class PlayerJoinedLogic
     private readonly UserManager<UserData> _userManager;
     private readonly IGuiSystemService? _guiSystemService;
 
-    public PlayerJoinedLogic(IEntityEngine ecs, ILogger<PlayerJoinedLogic> logger, ILogger<LoginGuiComponent> loggerLoginGuiComponent, ILogger<RegisterGuiComponent> loggerRegisterGuiComponent, INametagsService nametagsService, IUsersService usersService, ChatBox chatBox, Text3dService text3DService, IUserRepository userRepository, UserManager<UserData> userManager, IBrowserGuiService browserGuiService, IGuiSystemService? guiSystemService = null)
+    public PlayerJoinedLogic(IEntityEngine entityEngine, ILogger<PlayerJoinedLogic> logger, ILogger<LoginGuiComponent> loggerLoginGuiComponent, ILogger<RegisterGuiComponent> loggerRegisterGuiComponent, INametagsService nametagsService, IUsersService usersService, ChatBox chatBox, Text3dService text3DService, IUserRepository userRepository, UserManager<UserData> userManager, IBrowserGuiService browserGuiService, IGuiSystemService? guiSystemService = null) : base(entityEngine)
     {
-        _entityEngine = ecs;
+        _entityEngine = entityEngine;
         _logger = logger;
         _loggerLoginGuiComponent = loggerLoginGuiComponent;
         _loggerRegisterGuiComponent = loggerRegisterGuiComponent;
@@ -38,11 +38,35 @@ internal sealed class PlayerJoinedLogic
         _chatBox.OutputTo(entity, "Browser ready");
     }
 
-    private void HandleEntityCreated(Entity entity)
+    protected override async void ComponentAdded(UserComponent userComponent)
     {
-        if (!entity.HasComponent<PlayerTagComponent>())
-            return;
+        var entity = userComponent.Entity;
+        var playerElementComponent = userComponent.Entity.GetRequiredComponent<PlayerElementComponent>();
+        await playerElementComponent.FadeCameraAsync(CameraFade.Out);
+        if (_guiSystemService != null)
+            _guiSystemService.SetDebugToolsEnabled(RealmInternal.GetPlayer(playerElementComponent), true);
+        _chatBox.SetVisibleFor(entity, true);
+        _chatBox.ClearFor(entity);
+        playerElementComponent.SetCameraTarget(userComponent.Entity);
+        if (!playerElementComponent.TrySpawnAtLastPosition())
+        {
+            playerElementComponent.Spawn(new Vector3(362.58f + (float)Random.Shared.NextDouble() * 3, -91.07f + (float)Random.Shared.NextDouble() * 3, 1.38f),
+                new Vector3(0, 0, 90));
+        }
+        await Task.Delay(300);
+        await playerElementComponent.FadeCameraAsync(CameraFade.In);
+        _text3DService.SetRenderingEnabled(entity, true);
+        entity.AddComponent(new NametagComponent("KoxKociarz"));
+        _nametagsService.SetNametagRenderingEnabled(userComponent.Entity, true);
+    }
 
+    protected override void ComponentDetached(UserComponent userComponent)
+    {
+        ShowLoginSequence(userComponent.Entity);
+    }
+
+    private void ShowLoginSequence(Entity entity)
+    {
         var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();
 
         _text3DService.SetRenderingEnabled(entity, false);
@@ -50,10 +74,24 @@ internal sealed class PlayerJoinedLogic
         _chatBox.ClearFor(entity);
         playerElementComponent.FadeCamera(CameraFade.In);
         playerElementComponent.SetCameraMatrix(new Vector3(379.89844f, -92.6416f, 10.950561f), new Vector3(336.75684f, -93.018555f, 1.3956465f));
-        var adminComponent = entity.AddComponent(new AdminComponent(new List<AdminTool> { AdminTool.Entities, AdminTool.Components, AdminTool.ShowSpawnMarkers }));
-        adminComponent.DebugView = true;
-        adminComponent.DevelopmentMode = true;
-        entity.AddComponent(new LoginGuiComponent(_usersService, _loggerLoginGuiComponent, _loggerRegisterGuiComponent, _userRepository, _userManager));
+        if (!entity.HasComponent<AdminComponent>())
+        {
+            var adminComponent = entity.AddComponent(new AdminComponent(new List<AdminTool> { AdminTool.Entities, AdminTool.Components, AdminTool.ShowSpawnMarkers }));
+            adminComponent.DebugView = true;
+            adminComponent.DevelopmentMode = true;
+        }
+
+        if(!entity.HasComponent<LoginGuiComponent>())
+            entity.AddComponent(new LoginGuiComponent(_usersService, _loggerLoginGuiComponent, _loggerRegisterGuiComponent, _userRepository, _userManager));
+
+    }
+
+    private void HandleEntityCreated(Entity entity)
+    {
+        if (!entity.HasComponent<PlayerTagComponent>())
+            return;
+
+        ShowLoginSequence(entity);
 
         entity.ComponentAdded += HandleComponentAdded;
         entity.Disposed += HandleDisposed;
@@ -68,28 +106,6 @@ internal sealed class PlayerJoinedLogic
     {
         try
         {
-            if (component is UserComponent)
-            {
-                var entity = component.Entity;
-                var playerElementComponent = component.Entity.GetRequiredComponent<PlayerElementComponent>();
-                await playerElementComponent.FadeCameraAsync(CameraFade.Out);
-                if (_guiSystemService != null)
-                    _guiSystemService.SetDebugToolsEnabled(RealmInternal.GetPlayer(playerElementComponent), true);
-                _chatBox.SetVisibleFor(entity, true);
-                _chatBox.ClearFor(entity);
-                playerElementComponent.SetCameraTarget(component.Entity);
-                if (!playerElementComponent.TrySpawnAtLastPosition())
-                {
-                    playerElementComponent.Spawn(new Vector3(362.58f + (float)Random.Shared.NextDouble() * 3, -91.07f + (float)Random.Shared.NextDouble() * 3, 1.38f),
-                        new Vector3(0, 0, 90));
-                }
-                await Task.Delay(300);
-                await playerElementComponent.FadeCameraAsync(CameraFade.In);
-                _text3DService.SetRenderingEnabled(entity, true);
-                entity.AddComponent(new NametagComponent("KoxKociarz"));
-                _nametagsService.SetNametagRenderingEnabled(component.Entity, true);
-            }
-
             if (component is LevelComponent levelComponent)
             {
                 levelComponent.LevelChanged += (self, level, up) =>

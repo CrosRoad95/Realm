@@ -10,6 +10,7 @@ public interface IUsersService
     Task<bool> QuickSignIn(Entity entity);
     IEnumerable<Entity> SearchPlayersByName(string pattern);
     Task<bool> SignIn(Entity entity, UserData user);
+    Task SignOut(Entity entity);
     Task<int> SignUp(string username, string password);
     bool TryGetPlayerByName(string name, out Entity? playerEntity);
     Task<bool> TryUpdateLastNickName(Entity playerEntity);

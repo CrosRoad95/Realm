@@ -19,14 +19,17 @@ internal sealed class UsersService : IUsersService
     private readonly UserManager<UserData> _userManager;
     private readonly IUserEventRepository _userEventRepository;
     private readonly IUserLoginHistoryRepository _userLoginHistoryRepository;
-
+    private readonly ISaveService _saveService;
     private static readonly JsonSerializerSettings _jsonSerializerSettings = new()
     {
         Converters = new List<JsonConverter> { DoubleConverter.Instance }
     };
 
+    public event Action<Entity>? SignedIn;
+    public event Action<Entity>? SignedOut;
+
     public UsersService(ItemsRegistry itemsRegistry, SignInManager<UserData> signInManager, ILogger<UsersService> logger, IOptionsMonitor<GameplayOptions> gameplayOptions,
-        IDateTimeProvider dateTimeProvider, IAuthorizationService authorizationService, IActiveUsers activeUsers, IElementCollection elementCollection, IEntityEngine ecs, LevelsRegistry levelsRegistry, IUserRepository userRepository, UserManager<UserData> userManager, IUserEventRepository userEventRepository, IUserLoginHistoryRepository userLoginHistoryRepository)
+        IDateTimeProvider dateTimeProvider, IAuthorizationService authorizationService, IActiveUsers activeUsers, IElementCollection elementCollection, IEntityEngine ecs, LevelsRegistry levelsRegistry, IUserRepository userRepository, UserManager<UserData> userManager, IUserEventRepository userEventRepository, IUserLoginHistoryRepository userLoginHistoryRepository, ISaveService saveService)
     {
         _itemsRegistry = itemsRegistry;
         _signInManager = signInManager;
@@ -42,6 +45,7 @@ internal sealed class UsersService : IUsersService
         _userManager = userManager;
         _userEventRepository = userEventRepository;
         _userLoginHistoryRepository = userLoginHistoryRepository;
+        _saveService = saveService;
     }
 
     public async Task<int> SignUp(string username, string password)
@@ -154,12 +158,12 @@ internal sealed class UsersService : IUsersService
             var client = entity.GetPlayer().Client;
             await _userLoginHistoryRepository.Add(user.Id, _dateTimeProvider.Now, client.IPAddress?.ToString() ?? "", client.GetSerial());
             await TryUpdateLastNickName(entity);
+            SignedIn?.Invoke(entity);
             return true;
 
         }
         catch (Exception ex)
         {
-            entity.TryDestroyComponent<UserComponent>();
             while (entity.TryDestroyComponent<InventoryComponent>()) { }
             entity.TryDestroyComponent<DailyVisitsCounterComponent>();
             entity.TryDestroyComponent<StatisticsCounterComponent>();
@@ -175,9 +179,36 @@ internal sealed class UsersService : IUsersService
             entity.TryDestroyComponent<LevelComponent>();
             entity.TryDestroyComponent<MoneyComponent>();
             entity.TryDestroyComponent<AFKComponent>();
+            entity.TryDestroyComponent<UserComponent>();
             _logger.LogError(ex, "Failed to sign in a user.");
             return false;
         }
+    }
+
+    public async Task SignOut(Entity entity)
+    {
+        var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();
+        await _saveService.Save(entity);
+        while (entity.TryDestroyComponent<InventoryComponent>()) { }
+        entity.TryDestroyComponent<DailyVisitsCounterComponent>();
+        entity.TryDestroyComponent<StatisticsCounterComponent>();
+        entity.TryDestroyComponent<AchievementsComponent>();
+        entity.TryDestroyComponent<JobUpgradesComponent>();
+        entity.TryDestroyComponent<JobStatisticsComponent>();
+        entity.TryDestroyComponent<DiscoveriesComponent>();
+        entity.TryDestroyComponent<DiscordIntegrationComponent>();
+        while (entity.TryDestroyComponent<GroupMemberComponent>()) { }
+        while (entity.TryDestroyComponent<FractionMemberComponent>()) { }
+        entity.TryDestroyComponent<LicensesComponent>();
+        entity.TryDestroyComponent<PlayTimeComponent>();
+        entity.TryDestroyComponent<LevelComponent>();
+        entity.TryDestroyComponent<MoneyComponent>();
+        entity.TryDestroyComponent<AFKComponent>();
+        entity.TryDestroyComponent<UserComponent>();
+        playerElementComponent.Player.RemoveFromVehicle();
+        playerElementComponent.Spawned = false;
+        entity.Transform.Position = new Vector3(6000, 6000, 99999);
+        SignedOut?.Invoke(entity);
     }
 
     public async ValueTask<bool> AuthorizePolicy(UserComponent userComponent, string policy, bool useCache = true)

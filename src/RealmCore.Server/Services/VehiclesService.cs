@@ -85,7 +85,7 @@ internal sealed class VehiclesService : IVehiclesService
         if (!entity.HasComponent<VehicleTagComponent>())
             throw new InvalidOperationException("Entity is not vehicle");
         await _vehicleRepository.SetSpawned(entity.GetRequiredComponent<PrivateVehicleComponent>().Id, false);
-        await _saveService.Save(entity);
+        await _saveService.BeginSave(entity);
         await _saveService.Commit();
         entity.Dispose();
     }

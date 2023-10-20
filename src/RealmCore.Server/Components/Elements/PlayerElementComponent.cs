@@ -1,4 +1,6 @@
-﻿using HudComponent = SlipeServer.Server.Elements.Enums.HudComponent;
+﻿using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using System.Collections.Generic;
+using HudComponent = SlipeServer.Server.Elements.Enums.HudComponent;
 
 namespace RealmCore.Server.Components.Elements;
 
@@ -508,6 +510,21 @@ public sealed class PlayerElementComponent : PedElementComponent
             _asyncBinds.Remove(key);
         if (_binds.ContainsKey(key))
             _binds.Remove(key);
+        _bindsLock.Release();
+    }
+
+    public void RemoveAllBinds()
+    {
+        ThrowIfDisposed();
+        _bindsLock.Wait();
+        foreach (var pair in _asyncBinds)
+            _player.RemoveBind(pair.Key, KeyState.Both);
+        foreach (var pair in _binds)
+            _player.RemoveBind(pair.Key, KeyState.Both);
+
+        _asyncBinds.Clear();
+        _binds.Clear();
+
         _bindsLock.Release();
     }
 
