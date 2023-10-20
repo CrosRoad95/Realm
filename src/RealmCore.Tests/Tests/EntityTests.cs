@@ -291,4 +291,13 @@ public class EntityTests
         occurredEvents.Should().Equal(expectedEvents);
         #endregion
     }
+
+    [Fact]
+    public void TokenShouldBeCanceledWhenComponentDetaches()
+    {
+        var entity = new Entity();
+        var ct = Entity.CreateCancelationToken(entity);
+        entity.Dispose();
+        ct.IsCancellationRequested.Should().BeTrue();
+    }
 }

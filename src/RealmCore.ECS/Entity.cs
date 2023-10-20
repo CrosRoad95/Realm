@@ -422,4 +422,16 @@ public sealed class Entity : IDisposable
         Disposed?.Invoke(this);
         _disposed = true;
     }
+
+    public static CancellationToken CreateCancelationToken(Entity entity)
+    {
+        var cancellationTokenSource = new CancellationTokenSource();
+        void handleDisposed(Entity entity)
+        {
+            cancellationTokenSource.Cancel();
+            entity.Disposed -= handleDisposed;
+        }
+        entity.Disposed += handleDisposed;
+        return cancellationTokenSource.Token;
+    }
 }

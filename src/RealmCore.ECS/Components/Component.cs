@@ -83,4 +83,16 @@ public abstract class Component : IComponent, IDisposable
         Disposed?.Invoke(this);
         _disposed = true;
     }
+
+    public static CancellationToken CreateCancelationToken(Component component)
+    {
+        var cancellationTokenSource = new CancellationTokenSource();
+        void handleDetached(Component component)
+        {
+            cancellationTokenSource.Cancel();
+            component.Detached -= handleDetached;
+        }
+        component.Detached += handleDetached;
+        return cancellationTokenSource.Token;
+    }
 }
