@@ -46,6 +46,28 @@ public class UsersServiceTests
         #endregion
     }
 
+    [Fact]
+    public async Task SignInShouldNotAddComponentsWhenFailedToSignIn()
+    {
+        #region Arrange
+        var login = Guid.NewGuid().ToString()[..8];
+        var password = "asdASD123!@#";
+        var playerEntity = _entityHelper.CreatePlayerEntity(false);
+        #endregion
+
+        #region Act
+        var userId = await _signInService.SignUp(login, password);
+        var user = await _userRepository.GetUserByLogin(login) ?? throw new Exception("User not found");
+
+        var signedIn = await _signInService.SignIn(playerEntity, user);
+        #endregion
+
+        #region Assert
+        signedIn.Should().BeFalse();
+        playerEntity.Components.Should().HaveCount(3);
+        #endregion
+    }
+
     [InlineData("CrosRoad95", true)]
     [InlineData("CrosRoad69", false)]
     [Theory]

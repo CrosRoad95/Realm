@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using RealmCore.Persistence.Data;
 using RealmCore.Server.Components.TagComponents;
+using SlipeServer.Server.Clients;
 using System.Security.Claims;
 
 namespace RealmCore.Tests.Helpers;
@@ -18,10 +19,20 @@ internal class EntityHelper
         _entityEngine = _testingServer.GetRequiredService<IEntityEngine>();
     }
 
-    public Entity CreatePlayerEntity()
+    public Entity CreatePlayerEntity(bool withSerialAndIp = true)
     {
         var entity = _entityEngine.CreateEntity();
         var player = _testingServer.AddFakePlayer();
+
+        if (withSerialAndIp)
+        {
+            player.Client = new FakeClient(player)
+            {
+                Serial = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+                IPAddress = System.Net.IPAddress.Parse("127.0.0.1")
+            };
+        }
+
         player.Name = "CrosRoad95";
         player.TriggerResourceStarted(420);
         entity.AddComponent<Transform>();

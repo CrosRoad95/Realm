@@ -159,6 +159,22 @@ internal sealed class UsersService : IUsersService
         }
         catch (Exception ex)
         {
+            entity.TryDestroyComponent<UserComponent>();
+            while (entity.TryDestroyComponent<InventoryComponent>()) { }
+            entity.TryDestroyComponent<DailyVisitsCounterComponent>();
+            entity.TryDestroyComponent<StatisticsCounterComponent>();
+            entity.TryDestroyComponent<AchievementsComponent>();
+            entity.TryDestroyComponent<JobUpgradesComponent>();
+            entity.TryDestroyComponent<JobStatisticsComponent>();
+            entity.TryDestroyComponent<DiscoveriesComponent>();
+            entity.TryDestroyComponent<DiscordIntegrationComponent>();
+            while (entity.TryDestroyComponent<GroupMemberComponent>()) { }
+            while (entity.TryDestroyComponent<FractionMemberComponent>()) { }
+            entity.TryDestroyComponent<LicensesComponent>();
+            entity.TryDestroyComponent<PlayTimeComponent>();
+            entity.TryDestroyComponent<LevelComponent>();
+            entity.TryDestroyComponent<MoneyComponent>();
+            entity.TryDestroyComponent<AFKComponent>();
             _logger.LogError(ex, "Failed to sign in a user.");
             return false;
         }
