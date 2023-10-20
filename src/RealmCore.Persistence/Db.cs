@@ -242,6 +242,18 @@ public abstract class Db<T> : IdentityDbContext<UserData, RoleData, int,
             entityBuilder
                 .ToTable(nameof(UserInventoryData))
                 .HasKey(x => new { x.UserId, x.InventoryId });
+
+            entityBuilder
+                .HasOne(x => x.Inventory)
+                .WithMany(x => x.UserInventories)
+                .HasForeignKey(x => x.InventoryId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            entityBuilder
+                .HasOne(x => x.User)
+                .WithMany(x => x.UserInventories)
+                .HasForeignKey(x => x.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
         });
 
         modelBuilder.Entity<VehicleInventoryData>(entityBuilder =>
