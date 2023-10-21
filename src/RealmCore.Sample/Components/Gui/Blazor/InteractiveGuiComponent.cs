@@ -1,6 +1,4 @@
-﻿using RealmCore.Server.Components.Players.Abstractions;
-
-namespace RealmCore.Sample.Components.Gui.Blazor;
+﻿namespace RealmCore.Sample.Components.Gui.Blazor;
 
 public class InteractiveGuiComponent : BrowserGuiComponent
 {

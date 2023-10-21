@@ -32,7 +32,8 @@ internal sealed class BrowserResourceLogic : ComponentLogic<BrowserComponent>
     }
     private void HandlePathChanged(BrowserComponent browserComponent, string path, bool clientSide)
     {
-        _BrowserService.SetPath(browserComponent.Entity.GetPlayer(), path, clientSide);
+        if(clientSide)
+            _BrowserService.SetPath(browserComponent.Entity.GetPlayer(), path, clientSide);
     }
 
     protected override void ComponentDetached(BrowserComponent browserComponent)

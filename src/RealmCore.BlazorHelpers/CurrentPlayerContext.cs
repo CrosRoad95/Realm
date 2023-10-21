@@ -54,7 +54,7 @@ public class CurrentPlayerContext : IDisposable
     }
 }
 
-public class CurrentPlayerContext<TGuiPageComponent> : CurrentPlayerContext where TGuiPageComponent : BrowserGuiComponent
+public class CurrentPlayerContext<TGuiPageComponent> : CurrentPlayerContext where TGuiPageComponent : BrowserGuiComponent, IDisposable
 {
     public TGuiPageComponent Component { get; }
 

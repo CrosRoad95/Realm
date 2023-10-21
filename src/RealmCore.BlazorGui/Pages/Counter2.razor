@@ -1,6 +1,5 @@
 ﻿@page "/realmUi/counter2"
 @inherits RealmGuiComponentBase;
-@inject NavigationManager _navigationManager;
 
 <PageTitle>Counter</PageTitle>
 
@@ -17,7 +16,7 @@
 
     private void Navigate()
     {
-        _navigationManager.NavigateTo("/realmUi/counter1");
+        NavigationManager.NavigateTo("/realmUi/counter1");
     }
 
     private void IncrementCount()

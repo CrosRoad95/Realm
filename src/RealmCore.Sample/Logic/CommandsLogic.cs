@@ -1365,20 +1365,34 @@ internal sealed class CommandsLogic
             _chatBox.OutputTo(entity, $"Enum value: {args.ReadEnum<TestEnum>()}");
         }, new string[] { "Admin" });
 
+        _commandService.AddAsyncCommandHandler("guitest1", async (entity, args) =>
+        {
+            entity.TryDestroyComponent<GuiComponent>();
+            entity.AddComponent<Counter1GuiComponent>();
+            _chatBox.OutputTo(entity, "Loaded counter 1");
+        });
+
+        _commandService.AddAsyncCommandHandler("guitest2", async (entity, args) =>
+        {
+            entity.TryDestroyComponent<GuiComponent>();
+            entity.AddComponent<Counter2GuiComponent>();
+            _chatBox.OutputTo(entity, "Loaded counter 2");
+        });
+
         _commandService.AddAsyncCommandHandler("browserloadcounter1", async (entity, args) =>
         {
             var browserComponent = entity.GetRequiredComponent<BrowserComponent>();
             browserComponent.Close();
-            await Task.Delay(500);
             browserComponent.Path = "/realmUi/counter1";
+            browserComponent.Visible = true;
             _chatBox.OutputTo(entity, "Loaded counter 1");
         });
         _commandService.AddAsyncCommandHandler("browserloadcounter2", async (entity, args) =>
         {
             var browserComponent = entity.GetRequiredComponent<BrowserComponent>();
             browserComponent.Close();
-            await Task.Delay(500);
             browserComponent.Path = "/realmUi/counter2";
+            browserComponent.Visible = true;
             _chatBox.OutputTo(entity, "Loaded counter 2");
         });
         _commandService.AddAsyncCommandHandler("navigatetest", async (entity, args) =>
@@ -1419,7 +1433,9 @@ internal sealed class CommandsLogic
         });
         _commandService.AddCommandHandler("closebrowser", (entity, args) =>
         {
-            entity.GetRequiredComponent<BrowserComponent>().Close();
+            var browserComponent = entity.GetRequiredComponent<BrowserComponent>();
+            browserComponent.Path = "/realmEmpty";
+            browserComponent.Visible = false;
             _chatBox.OutputTo(entity, "Closed");
         });
 

@@ -20,7 +20,7 @@ internal sealed class BrowserGuiComponentLogic : ComponentLogic<BrowserGuiCompon
         {
             var url = browserGuiComponent.Path;
             var browserComponent = browserGuiComponent.Entity.GetRequiredComponent<BrowserComponent>();
-            browserComponent.Path = url;
+            browserComponent.SetPath(url, false);
             browserComponent.Visible = true;
             _logger.LogInformation("Gui {guiPageType} opened", browserGuiComponent.GetType().Name);
         }
@@ -31,7 +31,7 @@ internal sealed class BrowserGuiComponentLogic : ComponentLogic<BrowserGuiCompon
     {
         browserGuiComponent.NavigationRequested -= HandleNavigationRequested;
         var browserComponent = browserGuiComponent.Entity.GetRequiredComponent<BrowserComponent>();
-        browserComponent.Path = "/realmEmpty";
+        browserComponent.SetPath("/realmEmpty", false);
         browserComponent.Visible = false;
 
         _logger.LogInformation("Gui {guiPageType} closed", browserGuiComponent.GetType().Name);

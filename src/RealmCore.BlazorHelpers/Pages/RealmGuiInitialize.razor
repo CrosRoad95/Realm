@@ -24,13 +24,7 @@
         var identity = new ClaimsIdentity(claims, "Cookies");
         var principal = new System.Security.Principal.GenericPrincipal(identity, null);
         await _httpContextAccessor.HttpContext.SignInAsync("Cookies", principal);
-    }
-
-    protected override void OnAfterRender(bool firstRender)
-    {
-        if (firstRender && _httpContextAccessor.HttpContext.User.Identity.IsAuthenticated)
-        {
-            _navigationManager.NavigateTo("/realmGuiInitialized", true);
-        }
+        if (_httpContextAccessor.HttpContext.User.Identity?.IsAuthenticated ?? false)
+            _navigationManager.NavigateTo("/realmGuiInitialized");
     }
 }
