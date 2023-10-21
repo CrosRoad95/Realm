@@ -193,7 +193,16 @@ internal sealed class UserRepository : IUserRepository
             .AsNoTracking()
             .TagWith(nameof(UserRepository))
             .Where(x => x.Id == userId);
-        var user = await query.FirstOrDefaultAsync();
+        var user = await query.FirstOrDefaultAsync(cancellationToken);
         return user?.Nick;
+    }
+
+    public async Task<int> CountBySerial(string serial, CancellationToken cancellationToken = default)
+    {
+        var query = _db.Users
+            .AsNoTracking()
+            .TagWith(nameof(UserRepository))
+            .Where(x => x.RegisterSerial == serial);
+        return await query.CountAsync(cancellationToken);
     }
 }

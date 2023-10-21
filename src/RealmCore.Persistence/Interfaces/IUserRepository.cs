@@ -2,6 +2,7 @@
 
 public interface IUserRepository
 {
+    Task<int> CountBySerial(string serial, CancellationToken cancellationToken = default);
     Task<int> CountUsersBySerial(string serial, CancellationToken cancellationToken = default);
     Task DisableUser(int userId, CancellationToken cancellationToken = default);
     Task<string?> GetLastNickName(int userId, CancellationToken cancellationToken = default);
