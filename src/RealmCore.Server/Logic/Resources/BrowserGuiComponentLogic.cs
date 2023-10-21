@@ -31,6 +31,7 @@ internal sealed class BrowserGuiComponentLogic : ComponentLogic<BrowserGuiCompon
     {
         browserGuiComponent.NavigationRequested -= HandleNavigationRequested;
         var browserComponent = browserGuiComponent.Entity.GetRequiredComponent<BrowserComponent>();
+        browserComponent.Path = "/realmEmpty";
         browserComponent.Visible = false;
 
         _logger.LogInformation("Gui {guiPageType} closed", browserGuiComponent.GetType().Name);

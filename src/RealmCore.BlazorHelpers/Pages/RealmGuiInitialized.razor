@@ -1,10 +1,13 @@
 ﻿@page "/realmGuiInitialized"
 @using Microsoft.AspNetCore.Components.Web;
-@inherits RealmGuiComponentBase;
+@attribute [RenderModeInteractiveServer]
+@inject IRealmService<ILogger> _realmLogger;
+@inherits RealmGuiComponentBase
 
 @code {
     protected override void OnInitialized()
     {
+        _realmLogger.Service.LogInformation("Realm gui initialized");
         CurrentPlayerContext.BrowserGuiService.RelayEntityLoggedIn(CurrentPlayerContext.Entity);
     }
 }
