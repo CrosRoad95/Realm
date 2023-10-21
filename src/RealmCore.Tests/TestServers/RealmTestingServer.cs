@@ -67,8 +67,14 @@ internal class RealmTestingServer : TestingServer
         var rpgServerMock = new Mock<IRealmServer>(MockBehavior.Strict);
         var guiSystemServiceMock = new Mock<IGuiSystemService>(MockBehavior.Strict);
         serverBuilder.ConfigureServer(testConfigurationProvider ?? new(), SlipeServer.Server.ServerBuilders.ServerBuilderDefaultBehaviours.None);
+        serverBuilder.AddBrowserResource();
         serverBuilder.ConfigureServices(services =>
         {
+            services.ConfigureRealmServices();
+            services.Configure<AssetsOptions>(options =>
+            {
+                options.Base64Key = "ehFQcEzbNPfHt+CKpDJ41Q==";
+            });
             services.Configure<BrowserOptions>(options =>
             {
                 options.Mode = BrowserMode.Local;
@@ -81,28 +87,10 @@ internal class RealmTestingServer : TestingServer
             services.AddSingleton(rpgServerMock.Object);
             services.AddSingleton<TestResourceProvider>();
             services.AddSingleton<IResourceProvider>(x => x.GetRequiredService<TestResourceProvider>());
-
+            services.AddSingleton<IServerFilesProvider, NullServerFilesProvider>();
             services.AddSingleton<IDateTimeProvider, TestDateTimeProvider>();
-
-            services.AddSingleton<IActiveUsers, ActiveUsers>();
-
-            services.AddSingleton<ItemsRegistry>();
-            services.AddSingleton<VehicleUpgradeRegistry>();
-            services.AddSingleton<LevelsRegistry>();
-            services.AddSingleton<VehicleEnginesRegistry>();
-            services.AddSingleton<ISpawnMarkersService, SpawnMarkersService>();
-            services.AddSingleton<IUsersNotificationsService, UsersNotificationsService>();
-            services.AddSingleton<IBrowserService, BrowserService>();
-            services.AddSingleton<IEntityFactory, EntityFactory>();
-            services.AddSingleton<IAssetEncryptionProvider, TestAssetEncryptionProvider>();
-            services.AddSingleton<IBrowserGuiService, BrowserGuiService>();
-            services.AddSingleton<IVehicleAccessService, VehicleAccessService>();
-            services.AddSingleton(guiSystemServiceMock.Object);
-
-            services.AddSingleton<IServerFilesProvider>(new NullServerFilesProvider());
             services.AddLogging(x => x.AddSerilog(new LoggerConfiguration().CreateLogger(), dispose: true));
 
-            services.AddSingleton<IUsersService, UsersService>();
             configureServices?.Invoke(services);
         });
     })
