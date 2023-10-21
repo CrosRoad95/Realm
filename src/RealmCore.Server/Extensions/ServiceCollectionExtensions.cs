@@ -50,6 +50,7 @@ public static class ServiceCollectionExtensions
 
         #region Security
         services.AddSingleton<IActiveUsers, ActiveUsers>();
+        services.AddSingleton<IActiveVehicles, ActiveVehicles>();
         #endregion
 
         #region Common

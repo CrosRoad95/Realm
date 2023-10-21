@@ -15,9 +15,10 @@ internal sealed class VehiclesService : IVehiclesService
     private readonly VehicleUpgradeRegistry _vehicleUpgradeRegistry;
     private readonly VehicleEnginesRegistry _vehicleEnginesRegistry;
     private readonly IActiveUsers _activeUsers;
+    private readonly IActiveVehicles _activeVehicles;
     private readonly JsonSerializerSettings _jsonSerializerSettings;
 
-    public VehiclesService(IVehicleRepository vehicleRepository, IEntityFactory entityFactory, ISaveService saveService, ItemsRegistry itemsRegistry, IVehicleEventRepository vehicleEventRepository, IDateTimeProvider dateTimeProvider, IEntityEngine entityEngine, VehicleUpgradeRegistry vehicleUpgradeRegistry, VehicleEnginesRegistry vehicleEnginesRegistry, IActiveUsers activeUsers)
+    public VehiclesService(IVehicleRepository vehicleRepository, IEntityFactory entityFactory, ISaveService saveService, ItemsRegistry itemsRegistry, IVehicleEventRepository vehicleEventRepository, IDateTimeProvider dateTimeProvider, IEntityEngine entityEngine, VehicleUpgradeRegistry vehicleUpgradeRegistry, VehicleEnginesRegistry vehicleEnginesRegistry, IActiveUsers activeUsers, IActiveVehicles activeVehicles)
     {
         _vehicleRepository = vehicleRepository;
         _entityFactory = entityFactory;
@@ -29,6 +30,7 @@ internal sealed class VehiclesService : IVehiclesService
         _vehicleUpgradeRegistry = vehicleUpgradeRegistry;
         _vehicleEnginesRegistry = vehicleEnginesRegistry;
         _activeUsers = activeUsers;
+        _activeVehicles = activeVehicles;
         _jsonSerializerSettings = new JsonSerializerSettings
         {
             Converters = new List<JsonConverter> { DoubleConverter.Instance }
@@ -128,6 +130,9 @@ internal sealed class VehiclesService : IVehiclesService
         var vehicleEntity = _entityFactory.CreateVehicle(vehicleData.Model, vehicleData.TransformAndMotion.Position, vehicleData.TransformAndMotion.Rotation, vehicleData.TransformAndMotion.Interior, vehicleData.TransformAndMotion.Dimension,
             entity =>
             {
+                if (!_activeVehicles.TrySetActive(vehicleData.Id, entity))
+                    throw new Exception("Failed to create already existing vehicle.");
+
                 entity.AddComponent(new PrivateVehicleComponent(vehicleData));
                 entity.AddComponent(new VehicleUpgradesComponent(vehicleData.Upgrades));
                 entity.AddComponent(new MileageCounterComponent(vehicleData.Mileage));

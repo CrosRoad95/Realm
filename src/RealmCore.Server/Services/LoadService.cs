@@ -1,4 +1,6 @@
-﻿namespace RealmCore.Server.Services;
+﻿using RealmCore.ECS;
+
+namespace RealmCore.Server.Services;
 
 internal sealed class LoadService : ILoadService
 {
@@ -20,7 +22,8 @@ internal sealed class LoadService : ILoadService
 
     public async Task<Entity> LoadVehicleById(int id)
     {
-        var vehicleData = await _vehicleRepository.GetVehicleById(id).ConfigureAwait(false) ?? throw new Exception($"Failed to load vehicle data of id {id}");
+        var vehicleData = await _vehicleRepository.GetVehicleById(id).ConfigureAwait(false) ?? throw new PrivateVehicleNotFoundException($"Failed to load vehicle data of id {id}");
+
         try
         {
             return await _vehiclesService.Spawn(vehicleData);

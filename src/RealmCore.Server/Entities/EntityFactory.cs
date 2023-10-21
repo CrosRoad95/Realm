@@ -52,8 +52,8 @@ internal sealed class EntityFactory : IEntityFactory
 
             var vehicleElementComponent = entity.AddComponent(new VehicleElementComponent(vehicle, _entityEngine));
 
-            AssociateWithServer(entity);
             entityBuilder?.Invoke(entity);
+            AssociateWithServer(entity);
         });
 
         return vehicleEntity;

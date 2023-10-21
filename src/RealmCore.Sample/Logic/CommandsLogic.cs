@@ -939,7 +939,17 @@ internal sealed class CommandsLogic
 
         _commandService.AddAsyncCommandHandler("spawnback", async (entity, args) =>
         {
-            var vehicleEntity = await _loadService.LoadVehicleById(args.ReadInt());
+            Entity? vehicleEntity = null;
+            try
+            {
+                vehicleEntity = await _loadService.LoadVehicleById(args.ReadInt());
+            }
+            catch(Exception ex)
+            {
+                _chatBox.OutputTo(entity, "Failed to spawn vehicle");
+            }
+            if (vehicleEntity == null)
+                return;
             await _vehiclesService.SetVehicleSpawned(vehicleEntity);
             var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();
             if (vehicleEntity != null)
