@@ -10,7 +10,7 @@ public class GroupServiceTests
     public GroupServiceTests()
     {
         var services = new ServiceCollection();
-        services.AddPersistence<SQLiteDb>(db => db.UseInMemoryDatabase("inMemoryDatabase"), ServiceLifetime.Singleton);
+        services.AddPersistence<SQLiteDb>(db => db.UseInMemoryDatabase("inMemoryDatabase"));
         services.AddTransient<IGroupRepository, GroupRepository>();
         services.AddTransient<IGroupService, GroupService>();
         _serviceProvider = services.BuildServiceProvider();

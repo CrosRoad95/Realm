@@ -37,7 +37,7 @@ public static class ServiceCollectionExtensions
         #region Common
         services.AddSingleton<IDateTimeProvider, DateTimeProvider>();
         services.AddSingleton<IAssetEncryptionProvider, AssetEncryptionProvider>();
-        services.AddSingleton<SeederServerBuilder>();
+        services.AddTransient<SeederServerBuilder>();
         services.AddSingleton<RealmCommandService>();
         #endregion
 
@@ -54,16 +54,16 @@ public static class ServiceCollectionExtensions
         #endregion
 
         #region Common
-        services.AddTransient<IUsersService, UsersService>();
-        services.AddTransient<ISaveService, SaveService>();
-        services.AddTransient<ILoadService, LoadService>();
-        services.AddTransient<IVehiclesService, VehiclesService>();
-        services.AddTransient<IGroupService, GroupService>();
-        services.AddTransient<IFractionService, FractionService>();
-        services.AddTransient<IBanService, BanService>();
-        services.AddTransient<IJobService, JobService>();
-        services.AddTransient<IRewardService, RewardService>();
-        services.AddTransient<IFeedbackService, FeedbackService>();
+        services.AddScoped<IUsersService, UsersService>();
+        services.AddScoped<ISaveService, SaveService>();
+        services.AddScoped<ILoadService, LoadService>();
+        services.AddScoped<IVehiclesService, VehiclesService>();
+        services.AddScoped<IGroupService, GroupService>();
+        services.AddScoped<IFractionService, FractionService>();
+        services.AddScoped<IBanService, BanService>();
+        services.AddScoped<IJobService, JobService>();
+        services.AddScoped<IRewardService, RewardService>();
+        services.AddScoped<IFeedbackService, FeedbackService>();
         services.AddSingleton<IMapsService, MapsService>();
         services.AddSingleton<ISpawnMarkersService, SpawnMarkersService>();
         services.AddSingleton<IUsersNotificationsService, UsersNotificationsService>();
@@ -75,7 +75,7 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<IPolicyDrivenCommandExecutor, PolicyDrivenCommandExecutor>();
         #endregion
 
-        services.AddTransient<IEntityFactory, EntityFactory>();
+        services.AddScoped<IEntityFactory, EntityFactory>();
         services.AddSingleton<IElementIdGenerator, RangedCollectionBasedElementIdGenerator>(x =>
             new RangedCollectionBasedElementIdGenerator(x.GetRequiredService<IElementCollection>(), IdGeneratorConstants.PlayerIdStart, IdGeneratorConstants.PlayerIdStop)
         );

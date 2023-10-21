@@ -11,7 +11,7 @@ internal sealed class JobService : IJobService
 
     public async Task<JobStatistics?> TryGetTotalUserJobStatistics(int userId, short jobId)
     {
-        var queryResult = await _jobRepository.GetUserJobStatistics(userId, jobId).ConfigureAwait(false);
+        var queryResult = await _jobRepository.GetUserJobStatistics(userId, jobId);
         if (queryResult != null)
         {
             return new JobStatistics
@@ -25,7 +25,7 @@ internal sealed class JobService : IJobService
 
     public async Task<Dictionary<int, JobStatistics>> GetTotalJobStatistics(short jobId, int limit = 10)
     {
-        var results = await _jobRepository.GetJobStatistics(jobId, limit).ConfigureAwait(false);
+        var results = await _jobRepository.GetJobStatistics(jobId, limit);
 
         return results.ToDictionary(x => x.Key, x => new JobStatistics
         {

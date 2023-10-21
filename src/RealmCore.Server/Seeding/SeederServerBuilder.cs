@@ -102,14 +102,14 @@ internal sealed class SeederServerBuilder
         foreach (var pair in groups)
         {
             Group group;
-            if (!await _groupService.GroupExistsByNameOrShorcut(pair.Key, pair.Value.Shortcut))
+            if (!await _groupService.GroupExistsByNameOrShorCut(pair.Key, pair.Value.Shortcut))
             {
                 group = await _groupService.CreateGroup(pair.Key, pair.Value.Shortcut, pair.Value.GroupKind);
                 _logger.LogInformation("Seeder: Created group {elementId} with members {members}", pair.Key, pair.Value.Members.Select(x => x.Key));
             }
             else
             {
-                group = await _groupService.GetGroupByNameOrShorcut(pair.Key, pair.Value.Shortcut) ?? throw new Exception("Failed to get group by name or shortcut");
+                group = await _groupService.GetGroupByNameOrShortCut(pair.Key, pair.Value.Shortcut) ?? throw new Exception("Failed to get group by name or shortcut");
             }
 
             foreach (var item in pair.Value.Members)

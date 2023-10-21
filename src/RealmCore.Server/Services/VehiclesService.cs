@@ -63,7 +63,7 @@ internal sealed class VehiclesService : IVehiclesService
     {
         if (entity.TryGetComponent(out UserComponent userComponent))
         {
-            return await _vehicleRepository.GetLightVehiclesByUserId(userComponent.Id).ConfigureAwait(false);
+            return await _vehicleRepository.GetLightVehiclesByUserId(userComponent.Id);
         }
         return new();
     }
@@ -72,7 +72,7 @@ internal sealed class VehiclesService : IVehiclesService
     {
         if(entity.TryGetComponent(out UserComponent userComponent))
         {
-            return await _vehicleRepository.GetVehiclesByUserId(userComponent.Id).ConfigureAwait(false);
+            return await _vehicleRepository.GetVehiclesByUserId(userComponent.Id);
         }
         return new();
     }
@@ -107,7 +107,7 @@ internal sealed class VehiclesService : IVehiclesService
     {
         if (vehicleEntity.TryGetComponent(out PrivateVehicleComponent privateVehicleComponent))
         {
-            return await _vehicleRepository.SetSpawned(privateVehicleComponent.Id, spawned).ConfigureAwait(false);
+            return await _vehicleRepository.SetSpawned(privateVehicleComponent.Id, spawned);
         }
         return false;
     }
@@ -171,7 +171,7 @@ internal sealed class VehiclesService : IVehiclesService
     {
         if(vehicleEntity.TryGetComponent(out PrivateVehicleComponent privateVehicleComponent))
         {
-            await _vehicleEventRepository.AddEvent(privateVehicleComponent.Id, eventId, _dateTimeProvider.Now).ConfigureAwait(false);
+            await _vehicleEventRepository.AddEvent(privateVehicleComponent.Id, eventId, _dateTimeProvider.Now);
             return true;
         }
         return false;
@@ -181,7 +181,7 @@ internal sealed class VehiclesService : IVehiclesService
     {
         if (vehicleEntity.TryGetComponent(out PrivateVehicleComponent privateVehicleComponent))
         {
-            return await _vehicleEventRepository.GetAllEventsByVehicleId(privateVehicleComponent.Id, events).ConfigureAwait(false);
+            return await _vehicleEventRepository.GetAllEventsByVehicleId(privateVehicleComponent.Id, events);
         }
         return new();
     }
@@ -190,7 +190,7 @@ internal sealed class VehiclesService : IVehiclesService
     {
         if (vehicleEntity.TryGetComponent(out PrivateVehicleComponent privateVehicleComponent))
         {
-            return await _vehicleEventRepository.GetLastEventsByVehicleId(privateVehicleComponent.Id, limit, events).ConfigureAwait(false);
+            return await _vehicleEventRepository.GetLastEventsByVehicleId(privateVehicleComponent.Id, limit, events);
         }
         return new();
     }

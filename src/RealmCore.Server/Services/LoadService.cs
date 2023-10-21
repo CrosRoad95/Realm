@@ -22,7 +22,7 @@ internal sealed class LoadService : ILoadService
 
     public async Task<Entity> LoadVehicleById(int id)
     {
-        var vehicleData = await _vehicleRepository.GetVehicleById(id).ConfigureAwait(false) ?? throw new PrivateVehicleNotFoundException($"Failed to load vehicle data of id {id}");
+        var vehicleData = await _vehicleRepository.GetVehicleById(id) ?? throw new PrivateVehicleNotFoundException($"Failed to load vehicle data of id {id}");
 
         try
         {
@@ -37,7 +37,7 @@ internal sealed class LoadService : ILoadService
 
     private async Task LoadAllVehicles()
     {
-        var results = await _vehicleRepository.GetAllSpawnedVehicles().ConfigureAwait(false);
+        var results = await _vehicleRepository.GetAllSpawnedVehicles();
 
         int i = 0;
         foreach (var vehicleData in results)

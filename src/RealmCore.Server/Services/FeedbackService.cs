@@ -17,7 +17,7 @@ internal sealed class FeedbackService : IFeedbackService
     {
         if(playerEntity.TryGetComponent(out UserComponent userComponent))
         {
-            return await _ratingRepository.Rate(userComponent.Id, ratingId, rating, _dateTimeProvider.Now).ConfigureAwait(false);
+            return await _ratingRepository.Rate(userComponent.Id, ratingId, rating, _dateTimeProvider.Now);
         }
         return false;
     }

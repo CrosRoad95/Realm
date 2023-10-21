@@ -28,25 +28,25 @@ internal sealed class GroupService : IGroupService
 
     public async Task<Group?> GetGroupByName(string groupName)
     {
-        var groupData = await _groupRepository.GetByName(groupName).ConfigureAwait(false);
+        var groupData = await _groupRepository.GetByName(groupName);
         if (groupData == null)
             return null;
 
         return Map(groupData);
     }
 
-    public async Task<Group?> GetGroupByNameOrShorcut(string groupName, string shortcut)
+    public async Task<Group?> GetGroupByNameOrShortCut(string groupName, string shortcut)
     {
-        var groupData = await _groupRepository.GetGroupByNameOrShortcut(groupName, shortcut).ConfigureAwait(false);
+        var groupData = await _groupRepository.GetGroupByNameOrShortcut(groupName, shortcut);
         if (groupData == null)
             return null;
 
         return Map(groupData);
     }
 
-    public async Task<bool> GroupExistsByNameOrShorcut(string groupName, string shortcut)
+    public async Task<bool> GroupExistsByNameOrShorCut(string groupName, string shortcut)
     {
-        return await _groupRepository.ExistsByNameOrShortcut(groupName, shortcut).ConfigureAwait(false);
+        return await _groupRepository.ExistsByNameOrShortcut(groupName, shortcut);
     }
 
     public async Task<Group> CreateGroup(string groupName, string shortcut, GroupKind groupKind = GroupKind.Regular)
@@ -57,7 +57,7 @@ internal sealed class GroupService : IGroupService
         if (await _groupRepository.ExistsByShortcut(shortcut))
             throw new GroupShortcutInUseException(shortcut);
 
-        var groupData = await _groupRepository.Create(groupName, shortcut, (byte)groupKind).ConfigureAwait(false);
+        var groupData = await _groupRepository.Create(groupName, shortcut, (byte)groupKind);
         return Map(groupData);
     }
 
@@ -71,7 +71,7 @@ internal sealed class GroupService : IGroupService
             if (entity.HasComponent<GroupMemberComponent>(x => x.GroupId == groupId))
                 return false;
 
-            var groupMemberData = await _groupRepository.AddMember(groupId, userComponent.Id, rank, rankName).ConfigureAwait(false);
+            var groupMemberData = await _groupRepository.AddMember(groupId, userComponent.Id, rank, rankName);
             entity.AddComponent(new GroupMemberComponent(groupMemberData));
         }
         return false;
@@ -90,7 +90,7 @@ internal sealed class GroupService : IGroupService
             if (groupMemberComponent == null)
                 return false;
 
-            if (await _groupRepository.RemoveMember(groupId, userComponent.Id).ConfigureAwait(false))
+            if (await _groupRepository.RemoveMember(groupId, userComponent.Id))
             {
                 return entity.TryDestroyComponent(groupMemberComponent);
             }

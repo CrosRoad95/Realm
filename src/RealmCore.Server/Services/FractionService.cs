@@ -85,6 +85,6 @@ internal sealed class FractionService : IFractionService
             InternalAddMember(fractionId, userId, rank, rankName);
         }
 
-        return await _fractionRepository.AddMember(fractionId, userId, rank, rankName).ConfigureAwait(false);
+        return await _fractionRepository.AddMember(fractionId, userId, rank, rankName);
     }
 }

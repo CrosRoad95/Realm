@@ -247,7 +247,7 @@ internal sealed class UsersService : IUsersService
         var nick = playerEntity.GetPlayer().Name;
         if (playerEntity.TryGetComponent(out UserComponent userComponent) && userComponent.Nick != nick)
         {
-            return await _userRepository.TryUpdateLastNickName(userComponent.Id, playerEntity.GetPlayer().Name).ConfigureAwait(false);
+            return await _userRepository.TryUpdateLastNickName(userComponent.Id, playerEntity.GetPlayer().Name);
         }
         return false;
     }
@@ -266,7 +266,7 @@ internal sealed class UsersService : IUsersService
     {
         if (userEntity.TryGetComponent(out UserComponent userComponent))
         {
-            await _userEventRepository.AddEvent(userComponent.Id, eventId, _dateTimeProvider.Now).ConfigureAwait(false);
+            await _userEventRepository.AddEvent(userComponent.Id, eventId, _dateTimeProvider.Now);
             return true;
         }
         return false;
@@ -276,7 +276,7 @@ internal sealed class UsersService : IUsersService
     {
         if (userEntity.TryGetComponent(out UserComponent userComponent))
         {
-            return await _userEventRepository.GetAllEventsByUserId(userComponent.Id, events).ConfigureAwait(false);
+            return await _userEventRepository.GetAllEventsByUserId(userComponent.Id, events);
         }
         return new();
     }
@@ -285,7 +285,7 @@ internal sealed class UsersService : IUsersService
     {
         if (userEntity.TryGetComponent(out UserComponent userComponent))
         {
-            return await _userEventRepository.GetLastEventsByUserId(userComponent.Id, limit, events).ConfigureAwait(false);
+            return await _userEventRepository.GetLastEventsByUserId(userComponent.Id, limit, events);
         }
         return new();
     }
