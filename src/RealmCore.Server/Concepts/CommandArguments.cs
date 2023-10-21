@@ -34,6 +34,22 @@ public class CommandArguments
             throw new CommandArgumentException(_index, "Zbyt mało argumentów.", null);
         }
     }
+    
+    public bool TryReadArgument(out string argument)
+    {
+        if (_index >= 0 && _index < _args.Length)
+        {
+            var value = _args[_index++];
+            if (string.IsNullOrWhiteSpace(value))
+            {
+                argument = string.Empty;
+                return false;
+            }
+            argument = value;
+        }
+        argument = string.Empty;
+        return false;
+    }
 
     public T ReadArgument<T>()
     {
@@ -46,6 +62,24 @@ public class CommandArguments
         {
             throw new CommandArgumentException(_index, "Podany argument jest nie poprawny.", null);
         }
+    }
+    
+    public bool TryReadArgument<T>(out T argument)
+    {
+        if(TryReadArgument(out string arg))
+        {
+            try
+            {
+                argument = (T)Convert.ChangeType(arg, typeof(T));
+                return true;
+            }
+            catch(Exception)
+            {
+                throw new CommandArgumentException(_index, "Podany argument jest nie poprawny.", null);
+            }
+        }
+        argument = default;
+        return false;
     }
 
     public string ReadWordOrDefault(string defaultValue)
@@ -101,6 +135,25 @@ public class CommandArguments
         if(users.Count > 0)
             throw new CommandArgumentException(_index, "Znaleziono więcej niż 1 gracza o takiej nazwie", name);
         throw new CommandArgumentException(_index, "Gracz o takiej nazwie nie został znaleziony", name);
+    }
+    
+    public bool TryReadPlayerEntity(out Entity entity)
+    {
+        if(TryReadArgument(out string argument))
+        {
+            var name = ReadArgument();
+            var users = _usersService.SearchPlayersByName(name).ToList();
+            if (users.Count == 1)
+            {
+                entity = users[0];
+                return true;
+            }
+            if (users.Count > 0)
+                throw new CommandArgumentException(_index, "Znaleziono więcej niż 1 gracza o takiej nazwie", name);
+            throw new CommandArgumentException(_index, "Gracz o takiej nazwie nie został znaleziony", name);
+        }
+        entity = null;
+        return false;
     }
 
     public IEnumerable<Entity> ReadPlayerEntities()
