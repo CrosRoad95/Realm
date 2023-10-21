@@ -2,27 +2,52 @@
 
 public class StatisticsCounterComponentTests
 {
-    private readonly Entity _entity;
-    private readonly StatisticsCounterComponent _statisticsCounterComponent;
-
-    public StatisticsCounterComponentTests()
-    {
-        _entity = new();
-        _statisticsCounterComponent = new();
-        _entity.AddComponent(_statisticsCounterComponent);
-    }
-
     [Fact]
     public void IncreaseStatAndGetStatShouldWork()
     {
-        _statisticsCounterComponent.GetStatsIds.Should().BeEmpty();
+        Entity entity = new();
+        StatisticsCounterComponent statisticsCounterComponent = new();
+        entity.AddComponent(statisticsCounterComponent);
+        using var statisticsCounterComponentMonitor = statisticsCounterComponent.Monitor();
 
-        _statisticsCounterComponent.IncreaseStat(1, 10);
-        _statisticsCounterComponent.IncreaseStat(1, 10);
-        _statisticsCounterComponent.IncreaseStat(2, 10);
+        statisticsCounterComponent.GetStatsIds.Should().BeEmpty();
 
-        _statisticsCounterComponent.GetStat(1).Should().Be(20);
-        _statisticsCounterComponent.GetStat(2).Should().Be(10);
-        _statisticsCounterComponent.GetStatsIds.Order().Should().BeEquivalentTo(new[] { 1, 2 });
+        statisticsCounterComponent.IncreaseStat(1, 10);
+        statisticsCounterComponent.IncreaseStat(1, 10);
+        statisticsCounterComponent.IncreaseStat(2, 10);
+
+        statisticsCounterComponent.GetStat(1).Should().Be(20);
+        statisticsCounterComponent.GetStat(2).Should().Be(10);
+        statisticsCounterComponent.GetStatsIds.Order().Should().BeEquivalentTo(new[] { 1, 2 });
+        statisticsCounterComponentMonitor.GetOccurredEvents().Should().BeEquivalentTo(new List<string> { "StatIncreased", "StatIncreased", "StatIncreased" });
+    }
+
+    [Fact]
+    public void DecreaseAndSetStatShouldWork()
+    {
+        Entity entity = new();
+        StatisticsCounterComponent statisticsCounterComponent = new(new Dictionary<int, float>
+        {
+            [1] = 10,
+            [2] = 10,
+            [3] = 10,
+        });
+        entity.AddComponent(statisticsCounterComponent);
+        using var statisticsCounterComponentMonitor = statisticsCounterComponent.Monitor();
+
+        statisticsCounterComponent.GetStatsIds.Should().BeEquivalentTo(new int[] { 1, 2, 3 });
+
+        statisticsCounterComponent.DecreaseStat(1, 5);
+        statisticsCounterComponent.SetStat(2, 5);
+        statisticsCounterComponent.SetStat(3, 15);
+        statisticsCounterComponent.SetStat(3, 15); // Does nothing
+
+        statisticsCounterComponent.Statistics.Should().BeEquivalentTo(new Dictionary<int, float>
+        {
+            [1] = 5,
+            [2] = 5,
+            [3] = 15,
+        });
+        statisticsCounterComponentMonitor.GetOccurredEvents().Should().BeEquivalentTo(new List<string> { "StatDecreased", "StatDecreased", "StatIncreased" });
     }
 }
