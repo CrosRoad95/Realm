@@ -42,7 +42,7 @@ internal sealed class VehiclesService : IVehiclesService
         var vehicleData = await _vehicleRepository.CreateVehicle(model, _dateTimeProvider.Now);
         return _entityFactory.CreateVehicle(model, position, rotation, entityBuilder: entity =>
         {
-            entity.AddComponent(new PrivateVehicleComponent(vehicleData));
+            entity.AddComponent(new PrivateVehicleComponent(vehicleData, _dateTimeProvider));
         });
     }
 
@@ -55,7 +55,8 @@ internal sealed class VehiclesService : IVehiclesService
             throw new InvalidOperationException();
 
         var vehicleElementComponent = vehicleEntity.GetRequiredComponent<VehicleElementComponent>();
-        vehicleEntity.AddComponent(new PrivateVehicleComponent(await _vehicleRepository.CreateVehicle(vehicleElementComponent.Model, _dateTimeProvider.Now)));
+        var vehicleData = await _vehicleRepository.CreateVehicle(vehicleElementComponent.Model, _dateTimeProvider.Now);
+        vehicleEntity.AddComponent(new PrivateVehicleComponent(vehicleData, _dateTimeProvider));
         return vehicleEntity;
     }
 
@@ -133,7 +134,7 @@ internal sealed class VehiclesService : IVehiclesService
                 if (!_activeVehicles.TrySetActive(vehicleData.Id, entity))
                     throw new Exception("Failed to create already existing vehicle.");
 
-                entity.AddComponent(new PrivateVehicleComponent(vehicleData));
+                entity.AddComponent(new PrivateVehicleComponent(vehicleData, _dateTimeProvider));
                 entity.AddComponent(new VehicleUpgradesComponent(vehicleData.Upgrades));
                 entity.AddComponent(new MileageCounterComponent(vehicleData.Mileage));
                 if (vehicleData.VehicleEngines.Count != 0)

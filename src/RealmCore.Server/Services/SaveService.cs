@@ -160,6 +160,8 @@ internal sealed class SaveService : ISaveService
         else
             vehicleData.Inventories = new List<InventoryData>();
 
+        vehicleData.LastUsed = privateVehicleComponent.LastUsed;
+
         return true;
     }
 

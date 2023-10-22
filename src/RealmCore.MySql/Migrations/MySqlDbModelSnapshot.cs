@@ -884,6 +884,9 @@ namespace RealmCore.Persistence.MySql.Migrations
                         .HasColumnType("tinyint(1)")
                         .HasDefaultValue(true);
 
+                    b.Property<DateTime?>("LastUsed")
+                        .HasColumnType("datetime(6)");
+
                     b.Property<bool>("Locked")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("tinyint(1)")

@@ -362,6 +362,8 @@ public class VehicleElementComponent : ElementComponent
 
     private void HandlePedEntered(Element ped, VehicleEnteredEventsArgs e)
     {
+        if(Entity.TryGetComponent(out PrivateVehicleComponent privateVehicleComponent))
+            privateVehicleComponent.UpdateLastUsed();
         PedEntered?.Invoke(this, _entityEngine.GetByElement(ped), e.Seat, e.WarpsIn);
     }
 

@@ -3,6 +3,7 @@
 public class PrivateVehicleComponent : Component
 {
     private readonly VehicleData _vehicleData;
+    private readonly IDateTimeProvider _dateTimeProvider;
 
     public int Id => _vehicleData.Id;
     public byte Kind
@@ -11,6 +12,15 @@ public class PrivateVehicleComponent : Component
         internal set
         {
             _vehicleData.Kind = value;
+        }
+    }
+
+    public DateTime? LastUsed
+    {
+        get => _vehicleData.LastUsed;
+        private set
+        {
+            _vehicleData.LastUsed = value;
         }
     }
 
@@ -24,10 +34,16 @@ public class PrivateVehicleComponent : Component
         }
     }
 
-    internal PrivateVehicleComponent(VehicleData vehicleData)
+    internal PrivateVehicleComponent(VehicleData vehicleData, IDateTimeProvider dateTimeProvider)
     {
         _vehicleData = vehicleData;
+        _dateTimeProvider = dateTimeProvider;
         _access = new VehicleAccess(_vehicleData.UserAccesses, this);
+    }
+
+    public void UpdateLastUsed()
+    {
+        LastUsed = _dateTimeProvider.Now;
     }
 
     protected override void Attach()

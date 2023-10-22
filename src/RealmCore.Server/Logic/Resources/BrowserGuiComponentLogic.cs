@@ -40,7 +40,7 @@ internal sealed class BrowserGuiComponentLogic : ComponentLogic<BrowserGuiCompon
     private void HandleNavigationRequested(BrowserGuiComponent browserGuiComponent, BrowserGuiComponent targetGuiComponent)
     {
         var entity = browserGuiComponent.Entity;
-        entity.TryDestroyComponent<BrowserGuiComponent>();
+        entity.DestroyComponent(browserGuiComponent);
         entity.AddComponent(targetGuiComponent);
     }
 }
