@@ -1367,14 +1367,14 @@ internal sealed class CommandsLogic
 
         _commandService.AddAsyncCommandHandler("guitest1", async (entity, args) =>
         {
-            entity.TryDestroyComponent<GuiComponent>();
+            entity.TryDestroyComponent<BrowserGuiComponent>();
             entity.AddComponent<Counter1GuiComponent>();
             _chatBox.OutputTo(entity, "Loaded counter 1");
         });
 
         _commandService.AddAsyncCommandHandler("guitest2", async (entity, args) =>
         {
-            entity.TryDestroyComponent<GuiComponent>();
+            entity.TryDestroyComponent<BrowserGuiComponent>();
             entity.AddComponent<Counter2GuiComponent>();
             _chatBox.OutputTo(entity, "Loaded counter 2");
         });

@@ -2,7 +2,12 @@
 
 public class Counter1GuiComponent : BrowserGuiComponent
 {
-    public Counter1GuiComponent() : base("/realmUi/counter1")
+    public Counter1GuiComponent() : base("/realmUi/counter1component")
     {
+    }
+
+    public void Test()
+    {
+        var en = Entity;
     }
 }

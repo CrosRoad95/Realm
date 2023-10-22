@@ -10,9 +10,9 @@ namespace RealmCore.BlazorHelpers;
 public class RealmGuiComponentBase : ComponentBase
 {
     [Inject]
-    protected CurrentPlayerContext CurrentPlayerContext { get; private set; }
+    protected CurrentPlayerContext CurrentPlayerContext { get; private set; } = default!;
     [Inject]
-    protected NavigationManager NavigationManager { get; private set; }
+    protected NavigationManager NavigationManager { get; private set; } = default!;
     protected ClaimsPrincipal ClaimsPrincipal => CurrentPlayerContext.ClaimsPrincipal ?? throw new InvalidOperationException();
 
     protected override void OnAfterRender(bool firstRender)
@@ -32,9 +32,9 @@ public class RealmGuiComponentBase : ComponentBase
 public class RealmGuiComponentBase<TGuiPageComponent> : ComponentBase where TGuiPageComponent : BrowserGuiComponent
 {
     [Inject]
-    protected CurrentPlayerContext<TGuiPageComponent> CurrentPlayerContext { get; private set; }
+    protected CurrentPlayerContext<TGuiPageComponent> CurrentPlayerContext { get; private set; } = default!;
     [Inject]
-    protected NavigationManager NavigationManager { get; private set; }
+    protected NavigationManager NavigationManager { get; private set; } = default!;
     protected ClaimsPrincipal ClaimsPrincipal => CurrentPlayerContext.ClaimsPrincipal ?? throw new InvalidOperationException();
     protected TGuiPageComponent Component => CurrentPlayerContext.Component ?? throw new InvalidOperationException();
 

@@ -25,6 +25,15 @@
         var principal = new System.Security.Principal.GenericPrincipal(identity, null);
         await _httpContextAccessor.HttpContext.SignInAsync("Cookies", principal);
         if (_httpContextAccessor.HttpContext.User.Identity?.IsAuthenticated ?? false)
-            _navigationManager.NavigateTo("/realmGuiInitialized");
+        {
+            if(browserGuiService.TryGetEntityByKey(key, out var entity))
+            {
+                _navigationManager.NavigateTo("/realmGuiInitialized");
+            }
+            else
+            {
+                _navigationManager.NavigateTo("/realmGuiInitializeNotAllowed");
+            }
+        }
     }
 }

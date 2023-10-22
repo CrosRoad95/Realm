@@ -1,0 +1,41 @@
+﻿@page "/realmUi/counter2component"
+@inherits RealmGuiComponentBase<Counter2GuiComponent>;
+<PageTitle>Counter</PageTitle>
+
+<h1>Comp2</h1>
+<h2>is auth: @ClaimsPrincipal.Identity.IsAuthenticated claims count: @ClaimsPrincipal.Claims.Count()</h2>
+
+<p role="status">Current count: @currentCount</p>
+
+<button class="btn btn-primary" @onclick="IncrementCount">Click me</button>
+<button class="btn btn-primary" @onclick="Navigate">Navigate</button>
+
+@code {
+    private int currentCount = 0;
+
+    private void Navigate()
+    {
+        NavigationManager.NavigateTo("/realmUi/counter1component");
+    }
+
+    private void IncrementCount()
+    {
+        currentCount++;
+    }
+
+    protected override void OnInitialized()
+    {
+        Component.Test();
+        base.OnInitialized();
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await Task.Delay(500);
+            currentCount++;
+            await InvokeAsync(StateHasChanged);
+        }
+    }
+}

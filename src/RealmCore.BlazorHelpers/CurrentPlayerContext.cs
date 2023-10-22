@@ -1,4 +1,5 @@
-﻿using RealmCore.ECS;
+﻿using Microsoft.AspNetCore.Components;
+using RealmCore.ECS;
 using RealmCore.Server.Components.Elements;
 using RealmCore.Server.Components.Players;
 using RealmCore.Server.Components.Players.Abstractions;
@@ -45,7 +46,7 @@ public class CurrentPlayerContext : IDisposable
             PathChanged?.Invoke(path);
     }
 
-    public void Dispose()
+    public virtual void Dispose()
     {
         if(BrowserComponent != null)
         {
@@ -56,11 +57,10 @@ public class CurrentPlayerContext : IDisposable
 
 public class CurrentPlayerContext<TGuiPageComponent> : CurrentPlayerContext where TGuiPageComponent : BrowserGuiComponent, IDisposable
 {
-    public TGuiPageComponent Component { get; }
+    public TGuiPageComponent Component => Entity.GetRequiredComponent<TGuiPageComponent>();
 
     public CurrentPlayerContext(IHttpContextAccessor httpContent, IRealmServer realmServer) : base(httpContent, realmServer)
     {
-        Component = Entity.GetRequiredComponent<TGuiPageComponent>();
     }
 
     public void Close()
