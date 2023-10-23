@@ -38,8 +38,11 @@ internal sealed class DxGuiSystemServiceLogic : ComponentLogic<DxGuiComponent>
     {
         if (_guiSystemService != null)
         {
-            _guiSystemService.CloseGui(dxGuiComponent.Entity.GetPlayer(), dxGuiComponent.Name, dxGuiComponent.Cursorless);
-            _guiComponents.TryRemove(dxGuiComponent.Name, out var _);
+            if(dxGuiComponent.Entity.TryGetComponent(out PlayerElementComponent playerElementComponent))
+            {
+                _guiSystemService.CloseGui(playerElementComponent.Player, dxGuiComponent.Name, dxGuiComponent.Cursorless);
+                _guiComponents.TryRemove(dxGuiComponent.Name, out var _);
+            }
         }
     }
 
