@@ -15,6 +15,7 @@ public class NewsServiceTests
     public async Task AddingAndListingNewsShouldWork()
     {
         var dateTimeProvider = _server.GetRequiredService<IDateTimeProvider>();
+        var now = dateTimeProvider.Now;
         var newsService = _server.GetRequiredService<INewsService>();
         var context = _server.GetRequiredService<IDb>();
 
@@ -30,7 +31,7 @@ public class NewsServiceTests
             Title = "title1",
             Excerpt = "excerpt",
             Content = "content",
-            PublishTime = dateTimeProvider.Now,
+            PublishTime = now,
             NewsTags = new List<NewsTagData>
             {
                 new NewsTagData
@@ -48,7 +49,7 @@ public class NewsServiceTests
             Title = "title2",
             Excerpt = "excerpt",
             Content = "content",
-            PublishTime = dateTimeProvider.Now,
+            PublishTime = now,
             NewsTags = new List<NewsTagData>
             {
                 new NewsTagData
@@ -66,7 +67,7 @@ public class NewsServiceTests
             Title = "title2 not visible",
             Excerpt = "excerpt",
             Content = "content",
-            PublishTime = dateTimeProvider.Now.AddMinutes(1),
+            PublishTime = now.AddMinutes(1),
             NewsTags = new List<NewsTagData>
             {
                 new NewsTagData
@@ -90,6 +91,7 @@ public class NewsServiceTests
                 Title = "title1",
                 Excerpt = "excerpt",
                 Content = "content",
+                PublishTime = now,
                 Tags = new string[]{ "tag1", "tag2" }
             },
             new NewsDTO
@@ -98,6 +100,7 @@ public class NewsServiceTests
                 Title = "title2",
                 Excerpt = "excerpt",
                 Content = "content",
+                PublishTime = now,
                 Tags = new string[]{ "tag2", "tag3" }
             },
         });

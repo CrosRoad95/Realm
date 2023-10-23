@@ -22,6 +22,7 @@ internal sealed class NewsService : INewsService
             Title = x.Title,
             Excerpt = x.Excerpt,
             Content = x.Content,
+            PublishTime = x.PublishTime,
             Tags = x.NewsTags.Select(x => x.Tag.Tag).ToArray(),
         }).ToList();
     }
