@@ -405,6 +405,55 @@ namespace RealmCore.Persistence.SQLite.Migrations
                     b.ToTable("JobUpgrades", (string)null);
                 });
 
+            modelBuilder.Entity("RealmCore.Persistence.Data.NewsData", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Content")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<int?>("CreatedByUserId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Excerpt")
+                        .IsRequired()
+                        .HasMaxLength(1000)
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("PublishTime")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Title")
+                        .IsUnique();
+
+                    b.ToTable("News", (string)null);
+                });
+
+            modelBuilder.Entity("RealmCore.Persistence.Data.NewsTagData", b =>
+                {
+                    b.Property<int>("NewsId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("TagId")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("NewsId", "TagId");
+
+                    b.HasIndex("TagId");
+
+                    b.ToTable("NewsTags", (string)null);
+                });
+
             modelBuilder.Entity("RealmCore.Persistence.Data.OpinionData", b =>
                 {
                     b.Property<int>("Id")
@@ -483,6 +532,25 @@ namespace RealmCore.Persistence.SQLite.Migrations
                     b.ToTable("Roles", (string)null);
                 });
 
+            modelBuilder.Entity("RealmCore.Persistence.Data.TagData", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Tag")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Tag")
+                        .IsUnique();
+
+                    b.ToTable("Tags", (string)null);
+                });
+
             modelBuilder.Entity("RealmCore.Persistence.Data.UserData", b =>
                 {
                     b.Property<int>("Id")
@@ -515,6 +583,9 @@ namespace RealmCore.Persistence.SQLite.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<DateTime?>("LastLoginDateTime")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("LastNewsReadDate")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("LastSerial")
@@ -1265,6 +1336,25 @@ namespace RealmCore.Persistence.SQLite.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("RealmCore.Persistence.Data.NewsTagData", b =>
+                {
+                    b.HasOne("RealmCore.Persistence.Data.NewsData", "News")
+                        .WithMany("NewsTags")
+                        .HasForeignKey("NewsId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("RealmCore.Persistence.Data.TagData", "Tag")
+                        .WithMany("NewsTags")
+                        .HasForeignKey("TagId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("News");
+
+                    b.Navigation("Tag");
+                });
+
             modelBuilder.Entity("RealmCore.Persistence.Data.OpinionData", b =>
                 {
                     b.HasOne("RealmCore.Persistence.Data.UserData", "User")
@@ -1496,6 +1586,16 @@ namespace RealmCore.Persistence.SQLite.Migrations
                     b.Navigation("UserInventories");
 
                     b.Navigation("VehicleInventories");
+                });
+
+            modelBuilder.Entity("RealmCore.Persistence.Data.NewsData", b =>
+                {
+                    b.Navigation("NewsTags");
+                });
+
+            modelBuilder.Entity("RealmCore.Persistence.Data.TagData", b =>
+                {
+                    b.Navigation("NewsTags");
                 });
 
             modelBuilder.Entity("RealmCore.Persistence.Data.UserData", b =>

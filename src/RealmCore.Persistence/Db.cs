@@ -45,6 +45,9 @@ public abstract class Db<T> : IdentityDbContext<UserData, RoleData, int,
     public DbSet<UserEventData> UserEvents => Set<UserEventData>();
     public DbSet<RatingData> Ratings => Set<RatingData>();
     public DbSet<OpinionData> Opinions => Set<OpinionData>();
+    public DbSet<NewsData> News => Set<NewsData>();
+    public DbSet<TagData> Tags => Set<TagData>();
+    public DbSet<NewsTagData> NewsTags => Set<NewsTagData>();
 
     public Db(DbContextOptions<T> options) : base(options)
     {
@@ -730,6 +733,52 @@ public abstract class Db<T> : IdentityDbContext<UserData, RoleData, int,
             entityBuilder
                 .ToTable(nameof(Opinions))
                 .HasKey(x => x.Id);
+        });
+
+        modelBuilder.Entity<NewsData>(entityBuilder =>
+        {
+            entityBuilder
+                .ToTable(nameof(News))
+                .HasKey(x => x.Id);
+
+            entityBuilder.HasIndex(x => x.Title)
+                .IsUnique();
+
+            entityBuilder.Property(x => x.Title)
+                .HasMaxLength(255);
+
+            entityBuilder.Property(x => x.Excerpt)
+                .HasMaxLength(1000);
+
+            entityBuilder.HasMany(x => x.NewsTags)
+                .WithOne(x => x.News)
+                .HasForeignKey(x => x.NewsId)
+                .HasPrincipalKey(x => x.Id);
+        });
+
+        modelBuilder.Entity<NewsTagData>(entityBuilder =>
+        {
+            entityBuilder
+                .ToTable(nameof(NewsTags))
+                .HasKey(x => new { x.NewsId, x.TagId });
+        });
+
+        modelBuilder.Entity<TagData>(entityBuilder =>
+        {
+            entityBuilder
+                .ToTable(nameof(Tags))
+                .HasKey(x => x.Id);
+
+            entityBuilder.HasIndex(x => x.Tag)
+                .IsUnique();
+
+            entityBuilder.Property(x => x.Tag)
+                .HasMaxLength(255);
+
+            entityBuilder.HasMany(x => x.NewsTags)
+                .WithOne(x => x.Tag)
+                .HasForeignKey(x => x.TagId)
+                .HasPrincipalKey(x => x.Id);
         });
     }
 }

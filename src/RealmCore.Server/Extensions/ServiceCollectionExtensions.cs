@@ -69,6 +69,7 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<IUsersNotificationsService, UsersNotificationsService>();
         services.AddSingleton<IVehicleAccessService, VehicleAccessService>();
         services.AddSingleton<IBrowserGuiService, BrowserGuiService>();
+        services.AddSingleton<INewsService, NewsService>();
         #endregion
 
         #region Policies

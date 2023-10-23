@@ -1,9 +1,11 @@
 ﻿using Microsoft.EntityFrameworkCore.ChangeTracking;
+using Microsoft.EntityFrameworkCore.Infrastructure;
 
 namespace RealmCore.Persistence;
 
 public interface IDb : IDisposable
 {
+    DatabaseFacade Database { get; }
     ChangeTracker ChangeTracker { get; }
     EntityEntry Attach(object entity);
     DbSet<UserData> Users { get; }
@@ -42,6 +44,9 @@ public interface IDb : IDisposable
     DbSet<UserNotificationData> UserNotifications { get; }
     DbSet<UserLoginHistoryData> UserLoginHistory { get; }
     DbSet<UserMoneyHistoryData> UserMoneyHistory { get; }
+    DbSet<NewsData> News { get; }
+    DbSet<TagData> Tags { get; }
+    DbSet<NewsTagData> NewsTags { get; }
 
     Task MigrateAsync();
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);

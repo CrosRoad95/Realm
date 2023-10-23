@@ -22,6 +22,7 @@ public static class ServiceCollectionExtensions
         services.AddTransient<IRatingRepository, RatingRepository>();
         services.AddTransient<IOpinionRepository, OpinionRepository>();
         services.AddTransient<IUserWhitelistedSerialsRepository, UserWhitelistedSerialsRepository>();
+        services.AddTransient<INewsRepository, NewsRepository>();
 
         services.AddDbContext<IDb, T>(dbOptions, serviceLifetime);
 
