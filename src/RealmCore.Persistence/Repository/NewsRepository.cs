@@ -60,7 +60,7 @@ internal sealed class NewsRepository : INewsRepository
         var query = _db.News
             .AsNoTracking()
             .TagWithSource()
-            .OrderBy(x => x.PublishTime)
+            .OrderByDescending(x => x.PublishTime)
             .Where(x => now >= x.PublishTime)
             .Take(limit)
             .Include(x => x.NewsTags)

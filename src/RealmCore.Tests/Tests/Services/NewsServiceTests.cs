@@ -31,7 +31,7 @@ public class NewsServiceTests
             Title = "title1",
             Excerpt = "excerpt",
             Content = "content",
-            PublishTime = now,
+            PublishTime = now.AddMinutes(-2),
             NewsTags = new List<NewsTagData>
             {
                 new NewsTagData
@@ -49,7 +49,7 @@ public class NewsServiceTests
             Title = "title2",
             Excerpt = "excerpt",
             Content = "content",
-            PublishTime = now,
+            PublishTime = now.AddMinutes(-1),
             NewsTags = new List<NewsTagData>
             {
                 new NewsTagData
@@ -91,7 +91,7 @@ public class NewsServiceTests
                 Title = "title1",
                 Excerpt = "excerpt",
                 Content = "content",
-                PublishTime = now,
+                PublishTime = now.AddMinutes(-2),
                 Tags = new string[]{ "tag1", "tag2" }
             },
             new NewsDTO
@@ -100,7 +100,7 @@ public class NewsServiceTests
                 Title = "title2",
                 Excerpt = "excerpt",
                 Content = "content",
-                PublishTime = now,
+                PublishTime = now.AddMinutes(-1),
                 Tags = new string[]{ "tag2", "tag3" }
             },
         });
