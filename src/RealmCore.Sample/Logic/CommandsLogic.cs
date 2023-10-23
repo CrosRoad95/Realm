@@ -1547,6 +1547,11 @@ internal sealed class CommandsLogic
         {
             await _usersService.SignOut(entity);
         });
+
+        _commandService.AddAsyncCommandHandler("updateLastNewsRead", async (entity, args) =>
+        {
+            await _usersService.UpdateLastNewsRead(entity);
+        });
     }
 
     static int _hudPosition = 0;

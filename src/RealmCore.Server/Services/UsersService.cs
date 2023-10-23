@@ -241,7 +241,7 @@ internal sealed class UsersService : IUsersService
         playerEntity = null;
         return false;
     }
-    
+
     public async Task<bool> TryUpdateLastNickName(Entity playerEntity)
     {
         var nick = playerEntity.GetPlayer().Name;
@@ -251,7 +251,18 @@ internal sealed class UsersService : IUsersService
         }
         return false;
     }
-    
+
+    public async Task<bool> UpdateLastNewsRead(Entity playerEntity)
+    {
+        if (playerEntity.TryGetComponent(out UserComponent userComponent))
+        {
+            var now = _dateTimeProvider.Now;
+            userComponent.LastNewsReadDateTime = now;
+            return await _userRepository.UpdateLastNewsReadDateTime(userComponent.Id, now);
+        }
+        return false;
+    }
+
     public IEnumerable<Entity> SearchPlayersByName(string pattern)
     {
         var players = _elementCollection.GetByType<Player>().Where(x => x.Name.Contains(pattern.ToLower(), StringComparison.CurrentCultureIgnoreCase));

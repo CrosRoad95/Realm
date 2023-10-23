@@ -1,4 +1,5 @@
-﻿namespace RealmCore.Persistence.Interfaces;
+﻿
+namespace RealmCore.Persistence.Interfaces;
 
 public interface IUserRepository
 {
@@ -20,4 +21,5 @@ public interface IUserRepository
     Task<bool> IsUserNameInUseCaseInsensitive(string userName, CancellationToken cancellationToken = default);
     Task SetQuickLoginEnabled(int userId, bool enabled, CancellationToken cancellationToken = default);
     Task<bool> TryUpdateLastNickName(int userId, string nick, CancellationToken cancellationToken = default);
+    Task<bool> UpdateLastNewsReadDateTime(int userId, DateTime now, CancellationToken cancellationToken = default);
 }

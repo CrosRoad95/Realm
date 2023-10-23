@@ -585,7 +585,7 @@ namespace RealmCore.Persistence.SQLite.Migrations
                     b.Property<DateTime?>("LastLoginDateTime")
                         .HasColumnType("TEXT");
 
-                    b.Property<DateTime?>("LastNewsReadDate")
+                    b.Property<DateTime?>("LastNewsReadDateTime")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("LastSerial")

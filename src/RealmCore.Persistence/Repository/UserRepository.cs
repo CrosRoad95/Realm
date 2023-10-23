@@ -186,6 +186,19 @@ internal sealed class UserRepository : IUserRepository
         return await _db.SaveChangesAsync(cancellationToken) == 1;
         //return await query.ExecuteUpdateAsync(x => x.SetProperty(y => y.Nick, nick), cancellationToken) == 1;
     }
+    
+    public async Task<bool> UpdateLastNewsReadDateTime(int userId, DateTime now, CancellationToken cancellationToken = default)
+    {
+        var query = _db.Users
+            .TagWith(nameof(UserRepository))
+            .Where(x => x.Id == userId);
+        var user = await query.FirstOrDefaultAsync();
+        if (user == null)
+            return false;
+
+        user.LastNewsReadDateTime = now;
+        return await _db.SaveChangesAsync(cancellationToken) == 1;
+    }
 
     public async Task<string?> GetLastNickName(int userId, CancellationToken cancellationToken = default)
     {

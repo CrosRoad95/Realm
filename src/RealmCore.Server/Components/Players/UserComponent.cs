@@ -24,6 +24,17 @@ public class UserComponent : AsyncComponent
     public string? UserName => _user?.UserName;
     public IReadOnlyList<int> Upgrades => _upgrades;
     public ICollection<int> Settings => _settings.Keys;
+    public DateTime? LastNewsReadDateTime
+    {
+        get
+        {
+            return User.LastNewsReadDateTime;
+        }
+        internal set
+        {
+            User.LastNewsReadDateTime = value;
+        }
+    }
 
     public event Action<UserComponent, int>? UpgradeAdded;
     public event Action<UserComponent, int>? UpgradeRemoved;

@@ -14,4 +14,5 @@ public interface IUsersService
     Task<int> SignUp(string username, string password);
     bool TryGetPlayerByName(string name, out Entity? playerEntity);
     Task<bool> TryUpdateLastNickName(Entity playerEntity);
+    Task<bool> UpdateLastNewsRead(Entity playerEntity);
 }

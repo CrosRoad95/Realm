@@ -18,6 +18,7 @@ public sealed class UserData : IdentityUser<int>
     public uint Experience { get; set; }
     public bool IsDisabled { get; set; }
     public bool QuickLogin { get; set; }
+    public DateTime? LastNewsReadDateTime { get; set; }
     public TransformAndMotion? LastTransformAndMotion { get; set; } = null;
 
     public ICollection<UserLicenseData> Licenses { get; set; } = new List<UserLicenseData>();
