@@ -23,14 +23,15 @@ internal sealed class UserLoginHistoryRepository : IUserLoginHistoryRepository
         return userLoginHistoryData;
     }
 
-    public async Task<List<UserLoginHistoryData>> Get(int userId, int limit = 10)
+    public async Task<List<UserLoginHistoryData>> Get(int userId, int limit = 10, CancellationToken cancellationToken = default)
     {
         var query = _db.UserLoginHistory
+            .TagWithSource(nameof(UserMoneyHistoryRepository))
             .AsNoTracking()
             .Where(x => x.UserId == userId)
-            .OrderBy(x => x.DateTime)
+            .OrderByDescending(x => x.DateTime)
             .Take(limit);
 
-        return await query.ToListAsync();
+        return await query.ToListAsync(cancellationToken);
     }
 }

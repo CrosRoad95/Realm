@@ -36,6 +36,7 @@ internal sealed class CommandsLogic
     private readonly IUserRepository _userRepository;
     private readonly IUserWhitelistedSerialsRepository _userWhitelistedSerialsRepository;
     private readonly IVehicleRepository _vehicleRepository;
+    private readonly IUserMoneyHistoryService _userMoneyHistoryService;
 
     private class TestState
     {
@@ -51,7 +52,7 @@ internal sealed class CommandsLogic
     public CommandsLogic(RealmCommandService commandService, IEntityFactory entityFactory,
         ItemsRegistry itemsRegistry, IEntityEngine ecs, IBanService banService, ChatBox chatBox, ILogger<CommandsLogic> logger,
         IDateTimeProvider dateTimeProvider, INametagsService nametagsService, IUsersService usersService, IVehiclesService vehiclesService,
-        GameWorld gameWorld, IElementOutlineService elementOutlineService, IAssetsService assetsService, ISpawnMarkersService spawnMarkersService, ILoadService loadService, IFeedbackService feedbackService, IOverlayService overlayService, AssetsRegistry assetsRegistry, VehicleUpgradeRegistry vehicleUpgradeRegistry, VehicleEnginesRegistry vehicleEnginesRegistry, IUserRepository userRepository, IUserWhitelistedSerialsRepository userWhitelistedSerialsRepository, IVehicleRepository vehicleRepository)
+        GameWorld gameWorld, IElementOutlineService elementOutlineService, IAssetsService assetsService, ISpawnMarkersService spawnMarkersService, ILoadService loadService, IFeedbackService feedbackService, IOverlayService overlayService, AssetsRegistry assetsRegistry, VehicleUpgradeRegistry vehicleUpgradeRegistry, VehicleEnginesRegistry vehicleEnginesRegistry, IUserRepository userRepository, IUserWhitelistedSerialsRepository userWhitelistedSerialsRepository, IVehicleRepository vehicleRepository, IUserMoneyHistoryService userMoneyHistoryService)
     {
         _commandService = commandService;
         _entityFactory = entityFactory;
@@ -67,7 +68,7 @@ internal sealed class CommandsLogic
         _userRepository = userRepository;
         _userWhitelistedSerialsRepository = userWhitelistedSerialsRepository;
         _vehicleRepository = vehicleRepository;
-
+        _userMoneyHistoryService = userMoneyHistoryService;
         var debounce = new Debounce(500);
         var debounceCounter = 0;
         _commandService.AddAsyncCommandHandler("debounce", async (entity, args) =>
@@ -1551,6 +1552,28 @@ internal sealed class CommandsLogic
         _commandService.AddAsyncCommandHandler("updateLastNewsRead", async (entity, args) =>
         {
             await _usersService.UpdateLastNewsRead(entity);
+        });
+
+        _commandService.AddAsyncCommandHandler("addmoneyhistory1", async (entity, args) =>
+        {
+            await _userMoneyHistoryService.Add(entity, 123, 1, "add 123");
+            _chatBox.Output("Added 1");
+        });
+
+        _commandService.AddAsyncCommandHandler("addmoneyhistory2", async (entity, args) =>
+        {
+            await _userMoneyHistoryService.Add(entity, -123, 2, "remove 123");
+            _chatBox.Output("Added 2");
+        });
+
+        _commandService.AddAsyncCommandHandler("showhistory", async (entity, args) =>
+        {
+            var history = await _userMoneyHistoryService.Get(entity);
+            foreach (var item in history)
+            {
+                _chatBox.Output($"> {item.DateTime}: {item.CurrentBalance} - {item.Description}");
+
+            }
         });
     }
 

@@ -3,10 +3,10 @@
 internal class TestConfigurationProvider : IRealmConfigurationProvider
 {
     private readonly IConfiguration _configuration;
-    public TestConfigurationProvider(int? basePort = null)
+    public TestConfigurationProvider(int? basePort = null, bool useSqlLite = false)
     {
         _configuration = new ConfigurationBuilder()
-            .AddInMemoryCollection(new Dictionary<string, string>
+            .AddInMemoryCollection(new Dictionary<string, string?>
             {
                 ["server:isVoiceEnabled"] = "true",
                 ["server:serverName"] = "Default New-RealmCore Test server",
@@ -23,7 +23,8 @@ internal class TestConfigurationProvider : IRealmConfigurationProvider
                 ["Gameplay:MoneyLimit"] = "10000",
                 ["Gameplay:MoneyPrecision"] = "4",
                 ["Gameplay:DefaultInventorySize"] = "20",
-                ["Database:Provider"] = "InMemory",
+                ["Database:Provider"] = useSqlLite ? "SqlLite" : "InMemory",
+                ["Database:SqlLiteFileName"] = Guid.NewGuid().ToString(),
             }).Build();
     }
 

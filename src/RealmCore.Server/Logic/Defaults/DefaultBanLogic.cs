@@ -39,9 +39,12 @@ public class DefaultBanLogic
             return;
         }
 
-        var ban = await _banRepository.GetBanBySerialAndType(player.Client.Serial, _banType, _dateTimeProvider.Now);
-        if (ban != null)
+        var bans = await _banRepository.GetBansBySerial(player.Client.Serial, _dateTimeProvider.Now, _banType);
+        if (bans != null && bans.Count > 0)
+        {
+            var ban = bans[0];
             player.Kick($"You are banned, reason: {ban.Reason} until: {ban.End}");
+        }
     }
 
     private async void HandlePlayerJoined(Player player)

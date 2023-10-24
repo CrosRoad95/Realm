@@ -53,7 +53,7 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<IActiveVehicles, ActiveVehicles>();
         #endregion
 
-        #region Common
+        #region Services
         services.AddScoped<IUsersService, UsersService>();
         services.AddScoped<ISaveService, SaveService>();
         services.AddScoped<ILoadService, LoadService>();
@@ -64,12 +64,13 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IJobService, JobService>();
         services.AddScoped<IRewardService, RewardService>();
         services.AddScoped<IFeedbackService, FeedbackService>();
-        services.AddSingleton<IMapsService, MapsService>();
-        services.AddSingleton<ISpawnMarkersService, SpawnMarkersService>();
-        services.AddSingleton<IUsersNotificationsService, UsersNotificationsService>();
-        services.AddSingleton<IVehicleAccessService, VehicleAccessService>();
-        services.AddSingleton<IBrowserGuiService, BrowserGuiService>();
-        services.AddSingleton<INewsService, NewsService>();
+        services.AddScoped<IMapsService, MapsService>();
+        services.AddScoped<ISpawnMarkersService, SpawnMarkersService>();
+        services.AddScoped<IUsersNotificationsService, UsersNotificationsService>();
+        services.AddScoped<IVehicleAccessService, VehicleAccessService>();
+        services.AddScoped<IBrowserGuiService, BrowserGuiService>();
+        services.AddScoped<INewsService, NewsService>();
+        services.AddScoped<IUserMoneyHistoryService, UserMoneyHistoryService>();
         #endregion
 
         #region Policies

@@ -1,9 +1,8 @@
-﻿namespace RealmCore.Persistence.Data;
+﻿namespace RealmCore.Persistence.DTOs;
 
-public class UserMoneyHistoryData
+public class UserMoneyHistoryDTO
 {
     public int Id { get; set; }
-    public int UserId { get; set; }
     public DateTime DateTime { get; set; }
     public decimal Amount { get; set; }
     public decimal CurrentBalance { get; set; }

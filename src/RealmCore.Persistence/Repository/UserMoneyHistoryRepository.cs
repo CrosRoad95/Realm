@@ -9,7 +9,7 @@ internal sealed class UserMoneyHistoryRepository : IUserMoneyHistoryRepository
         _db = db;
     }
 
-    public async Task<UserMoneyHistoryData> Add(int userId, DateTime now, decimal currentBalance, decimal amount, string? description = null)
+    public async Task<UserMoneyHistoryData> Add(int userId, DateTime now, decimal currentBalance, decimal amount, int? category = null, string? description = null)
     {
         var userMoneyHistoryData = new UserMoneyHistoryData
         {
@@ -17,6 +17,7 @@ internal sealed class UserMoneyHistoryRepository : IUserMoneyHistoryRepository
             DateTime = now,
             CurrentBalance = currentBalance,
             Amount = amount,
+            Category = category,
             Description = description
         };
         _db.UserMoneyHistory.Add(userMoneyHistoryData);
@@ -24,14 +25,15 @@ internal sealed class UserMoneyHistoryRepository : IUserMoneyHistoryRepository
         return userMoneyHistoryData;
     }
 
-    public async Task<List<UserMoneyHistoryData>> Get(int userId, int limit = 10)
+    public async Task<List<UserMoneyHistoryData>> Get(int userId, int limit = 10, CancellationToken cancellationToken = default)
     {
         var query = _db.UserMoneyHistory
+            .TagWithSource(nameof(UserMoneyHistoryRepository))
             .AsNoTracking()
             .Where(x => x.UserId == userId)
-            .OrderBy(x => x.DateTime)
+            .OrderByDescending(x => x.DateTime)
             .Take(limit);
 
-        return await query.ToListAsync();
+        return await query.ToListAsync(cancellationToken);
     }
 }

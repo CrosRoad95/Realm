@@ -766,6 +766,9 @@ namespace RealmCore.Persistence.SQLite.Migrations
                     b.Property<decimal>("Amount")
                         .HasColumnType("TEXT");
 
+                    b.Property<int?>("Category")
+                        .HasColumnType("INTEGER");
+
                     b.Property<decimal>("CurrentBalance")
                         .HasColumnType("TEXT");
 

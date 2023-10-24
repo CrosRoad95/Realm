@@ -9,12 +9,13 @@ internal sealed class UserNotificationRepository : IUserNotificationRepository
         _db = db;
     }
 
-    public async Task<List<UserNotificationData>> Get(int userId, int limit = 10)
+    public async Task<List<UserNotificationData>> Get(int userId, int limit = 10, CancellationToken cancellationToken = default)
     {
         var query = _db.UserNotifications
+            .TagWithSource(nameof(UserNotificationRepository))
             .AsNoTracking()
             .Where(x => x.UserId == userId)
-            .OrderBy(x => x.SentTime)
+            .OrderByDescending(x => x.SentTime)
             .Take(limit);
 
         return await query.ToListAsync();
@@ -38,6 +39,7 @@ internal sealed class UserNotificationRepository : IUserNotificationRepository
     public async Task<int> CountUnread(int userId)
     {
         var query = _db.UserNotifications
+            .TagWithSource(nameof(UserNotificationRepository))
             .AsNoTracking()
             .Where(x => x.UserId == userId && x.ReadTime == null);
 
@@ -47,6 +49,7 @@ internal sealed class UserNotificationRepository : IUserNotificationRepository
     public async Task<bool> MarkAsRead(int id, DateTime now)
     {
         var notification = await _db.UserNotifications
+            .TagWithSource(nameof(UserNotificationRepository))
             .Where(x => x.Id == id)
             .FirstOrDefaultAsync();
 

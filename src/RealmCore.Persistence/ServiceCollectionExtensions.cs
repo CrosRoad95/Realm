@@ -1,4 +1,6 @@
-﻿namespace RealmCore.Persistence;
+﻿using RealmCore.Persistence.Context;
+
+namespace RealmCore.Persistence;
 
 public static class ServiceCollectionExtensions
 {
@@ -23,15 +25,9 @@ public static class ServiceCollectionExtensions
         services.AddTransient<IOpinionRepository, OpinionRepository>();
         services.AddTransient<IUserWhitelistedSerialsRepository, UserWhitelistedSerialsRepository>();
         services.AddTransient<INewsRepository, NewsRepository>();
+        services.AddScoped<ITransactionContext, TransactionContext>();
 
         services.AddDbContext<IDb, T>(dbOptions, serviceLifetime);
-
-        return services;
-    }
-
-    public static IServiceCollection AddPersistence<T>(this IServiceCollection services) where T : DbContext, IDb
-    {
-        services.AddDbContext<IDb, T>(ServiceLifetime.Transient);
 
         return services;
     }

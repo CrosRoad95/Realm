@@ -24,22 +24,22 @@ public class UserNotificationRepositoryTests
         var notifications = await userNotificationRepository.Get(1);
         notifications.First().Should().BeEquivalentTo(new UserNotificationData
         {
-            Id = 1,
+            Id = 20,
             UserId = 1,
             Title = "test",
             Content = "test content",
             Excerpt = "test content",
-            SentTime = dateTimeProvider.Now,
+            SentTime = dateTimeProvider.Now.AddSeconds(19),
             ReadTime = null,
         });
         notifications.Last().Should().BeEquivalentTo(new UserNotificationData
         {
-            Id = 10,
+            Id = 11,
             UserId = 1,
             Title = "test",
             Content = "test content",
             Excerpt = "test content",
-            SentTime = dateTimeProvider.Now.AddSeconds(9),
+            SentTime = dateTimeProvider.Now.AddSeconds(10),
             ReadTime = null,
         });
     }

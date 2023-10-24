@@ -25,7 +25,7 @@ internal sealed class BanService : IBanService
             await _banRepository.CreateBanForSerial(serial, until, reason, responsible, type);
         }
     }
-    
+
     public async Task Ban(Entity entity, DateTime? until = null, string? reason = null, string? responsible = null, int type = 0)
     {
         await BanAccount(entity, until, reason, responsible, type);
@@ -63,5 +63,16 @@ internal sealed class BanService : IBanService
         }
 
         return new();
+    }
+
+    public async Task<bool> IsBanned(Entity entity, int? type = null, CancellationToken cancellationToken = default)
+    {
+        if (entity.TryGetComponent(out UserComponent userComponent))
+        {
+            var bans = await _banRepository.GetBansByUserId(userComponent.Id, _dateTimeProvider.Now, type, cancellationToken);
+            return bans.Count > 0;
+        }
+
+        return false;
     }
 }

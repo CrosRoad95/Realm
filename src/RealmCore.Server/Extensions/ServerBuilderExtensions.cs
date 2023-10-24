@@ -49,7 +49,8 @@ public static class ServerBuilderExtensions
                     services.AddRealmIdentity<MySqlDb>(realmConfigurationProvider.GetRequired<IdentityConfiguration>("Identity"));
                     break;
                 case "SqlLite":
-                    services.AddPersistence<SQLiteDb>(db => db.UseSqlite("Filename=./server.db"));
+                    var sqlLiteFileName = realmConfigurationProvider.Get<string>("Database:SqlLiteFileName");
+                    services.AddPersistence<SQLiteDb>(db => db.UseSqlite($"Filename=./{sqlLiteFileName ?? "server"}.db"));
                     services.AddRealmIdentity<SQLiteDb>(realmConfigurationProvider.GetRequired<IdentityConfiguration>("Identity"));
                     break;
                 case "InMemory":
