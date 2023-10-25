@@ -1,7 +1,10 @@
-﻿namespace RealmCore.Server.Components.Players;
+﻿using System.Data;
+using System.Security.Claims;
+
+namespace RealmCore.Server.Components.Players;
 
 [ComponentUsage(false)]
-public class UserComponent : AsyncComponent
+public class UserComponent : Component
 {
     private struct PolicyCache
     {
@@ -15,10 +18,10 @@ public class UserComponent : AsyncComponent
     private readonly List<int> _upgrades = new();
     private readonly object _upgradesLock = new();
     private readonly ConcurrentDictionary<int, string> _settings = new();
-    private ClaimsPrincipal _claimsPrincipal = default!;
+    private readonly ClaimsPrincipal _claimsPrincipal;
 
     public UserData User => _user ?? throw new InvalidOperationException();
-    public ClaimsPrincipal ClaimsPrincipal => _claimsPrincipal ?? throw new ArgumentNullException(nameof(_claimsPrincipal));
+    public ClaimsPrincipal ClaimsPrincipal => _claimsPrincipal;
     public int Id => _user?.Id ?? -1;
     public string? Nick => _user?.Nick;
     public string? UserName => _user?.UserName;
@@ -38,18 +41,15 @@ public class UserComponent : AsyncComponent
 
     public event Action<UserComponent, int>? UpgradeAdded;
     public event Action<UserComponent, int>? UpgradeRemoved;
-    public event Action<UserComponent, ClaimsPrincipal>? ClaimsPrincipalUpdated;
     public event Action<UserComponent, int, string>? SettingChanged;
     public event Action<UserComponent, int, string>? SettingRemoved;
-    private readonly List<string> _roles = new();
     private readonly object _authorizedPoliciesLock = new();
     private readonly List<PolicyCache> _authorizedPolicies = new();
 
-    internal UserComponent(UserData user, SignInManager<UserData> signInManager, UserManager<UserData> userManager)
+    internal UserComponent(UserData user, ClaimsPrincipal claimsPrincipal)
     {
         _user = user;
-        _signInManager = signInManager;
-        _userManager = userManager;
+        _claimsPrincipal = claimsPrincipal;
         _upgrades = _user.Upgrades.Select(x => x.UpgradeId).ToList();
         foreach (var item in _user.Settings)
         {
@@ -85,42 +85,27 @@ public class UserComponent : AsyncComponent
         }
     }
 
-    protected override async Task LoadAsync()
+    private void ClearAuthorizedPoliciesCache()
     {
-        await UpdateClaimsPrincipal();
-    }
-
-    private async Task UpdateClaimsPrincipal()
-    {
-        if (_user == null || _signInManager == null)
-            return;
-
         lock (_authorizedPoliciesLock)
             _authorizedPolicies.Clear();
-        _roles.Clear();
-        _roles.AddRange(await GetRolesAsync());
-        _claimsPrincipal = await _signInManager.CreateUserPrincipalAsync(_user);
-        foreach (var role in _roles)
-        {
-            if(_claimsPrincipal.Identity is ClaimsIdentity claimsIdentity)
-                claimsIdentity.AddClaim(new Claim(ClaimTypes.Role, role));
-        }
-        ClaimsPrincipalUpdated?.Invoke(this, _claimsPrincipal);
     }
 
     public bool IsInRole(string role)
     {
         ThrowIfDisposed();
 
-        return _roles.Contains(role);
+        return HasClaim(ClaimTypes.Role, role);
     }
 
-    public bool HasClaim(string type)
+    public bool HasClaim(string type, string? value = null)
     {
         ThrowIfDisposed();
 
         if (_claimsPrincipal == null)
             return false;
+        if(value != null)
+            return _claimsPrincipal.HasClaim(x => x.Type == type && x.Value == type);
         return _claimsPrincipal.HasClaim(x => x.Type == type);
     }
 
@@ -133,145 +118,124 @@ public class UserComponent : AsyncComponent
         return _claimsPrincipal.Claims.First(x => x.Type == type).Value;
     }
 
-    public async Task<bool> AddClaim(string type, string value)
+    public bool AddClaim(string type, string value)
     {
         ThrowIfDisposed();
 
-        if (_user == null)
+        if (_claimsPrincipal == null)
             return false;
 
-        var result = await _userManager.AddClaimAsync(_user, new Claim(type, value));
-        if (result.Succeeded)
-            await UpdateClaimsPrincipal();
-        return result.Succeeded;
+        if(_claimsPrincipal.Identity is ClaimsIdentity claimsIdentity)
+        { 
+            claimsIdentity.AddClaim(new Claim(type, value));
+            ClearAuthorizedPoliciesCache();
+            return true;
+        }
+        return false;
     }
 
-    public async Task<bool> AddClaims(Dictionary<string, string> claims)
+    public bool AddClaims(Dictionary<string, string> claims)
     {
         ThrowIfDisposed();
 
-        if (_user == null)
+        if (_claimsPrincipal == null)
             return false;
 
-        var result = await _userManager.AddClaimsAsync(_user, claims.Select(x => new Claim(x.Key, x.Value)));
-        if (result.Succeeded)
-            await UpdateClaimsPrincipal();
-        return result.Succeeded;
+        if (_claimsPrincipal.Identity is ClaimsIdentity claimsIdentity)
+        {
+            claimsIdentity.AddClaims(claims.Select(x => new Claim(x.Key, x.Value)));
+            ClearAuthorizedPoliciesCache();
+            return true;
+        }
+        return false;
     }
 
-    public async Task<bool> AddRole(string role)
+    public bool AddRole(string role)
     {
         ThrowIfDisposed();
 
-        if (_roles.Contains(role))
+        if (_claimsPrincipal == null)
             return false;
 
-        if (_user == null)
-            return false;
-
-        var result = await _userManager.AddToRoleAsync(_user, role);
-        if (result.Succeeded)
-            await UpdateClaimsPrincipal();
-        return result.Succeeded;
+        if (_claimsPrincipal.Identity is ClaimsIdentity claimsIdentity)
+        {
+            claimsIdentity.AddClaim(new Claim(ClaimTypes.Role, role));
+            ClearAuthorizedPoliciesCache();
+            return true;
+        }
+        return false;
     }
 
-    public async Task<bool> AddRoles(IEnumerable<string> roles)
+    public bool AddRoles(IEnumerable<string> roles)
     {
         ThrowIfDisposed();
 
-        var rolesToAdd = roles.Except(_roles);
-
-        if (!rolesToAdd.Any())
+        if (_claimsPrincipal == null)
             return false;
 
-        if (_user == null)
-            return false;
-
-        var result = await _userManager.AddToRolesAsync(_user, rolesToAdd);
-        if (result.Succeeded)
-            await UpdateClaimsPrincipal();
-        return result.Succeeded;
+        if (_claimsPrincipal.Identity is ClaimsIdentity claimsIdentity)
+        {
+            claimsIdentity.AddClaims(roles.Select(x => new Claim(ClaimTypes.Role, x)));
+            ClearAuthorizedPoliciesCache();
+            return true;
+        }
+        return false;
     }
 
-    public async Task<IEnumerable<string>> GetClaims()
+    public IReadOnlyList<string> GetClaims()
     {
         ThrowIfDisposed();
 
-        if (_user == null || _userManager == null)
-            return new List<string>().AsReadOnly();
+        if (_claimsPrincipal.Identity is ClaimsIdentity claimsIdentity)
+        {
+            return claimsIdentity.Claims.Select(x => x.Type).ToList();
+        }
 
-        return (await _userManager.GetClaimsAsync(_user)).Select(x => x.Type).ToList();
-    }
-
-    public async Task<IReadOnlyList<string>> GetRolesAsync()
-    {
-        ThrowIfDisposed();
-
-        if (_user == null || _userManager == null)
-            return new List<string>().AsReadOnly();
-
-        return (await _userManager.GetRolesAsync(_user)).ToList().AsReadOnly();
+        return [];
     }
 
     public IReadOnlyList<string> GetRoles()
     {
         ThrowIfDisposed();
 
-        return new List<string>(_roles).AsReadOnly();
+        if (_claimsPrincipal.Identity is ClaimsIdentity claimsIdentity)
+        {
+            return claimsIdentity.Claims.Select(x => x.Type).Where(x => x == ClaimTypes.Role).ToList();
+        }
+
+        return [];
     }
 
-    public async Task<bool> RemoveClaim(string type, string? value = null)
+    public bool TryRemoveClaim(string type, string? value = null)
     {
         ThrowIfDisposed();
 
         if (_user == null)
             return false;
 
-        var claims = await _userManager.GetClaimsAsync(_user);
-        Claim? claim;
-        if (value != null)
-            claim = claims.FirstOrDefault(x => x.Type == type && x.Value == value);
-        else
-            claim = claims.FirstOrDefault(x => x.Type == type);
-
-        if (claim != null)
+        if (_claimsPrincipal.Identity is ClaimsIdentity claimsIdentity)
         {
-            var result = await _userManager.RemoveClaimAsync(_user, claim);
-            if (result.Succeeded)
-                await UpdateClaimsPrincipal();
-            return result.Succeeded;
+            Claim? claim = null;
+            if (value != null)
+                claim = claimsIdentity.Claims.FirstOrDefault(x => x.Type == type && x.Value == value);
+            else
+                claim = claimsIdentity.Claims.FirstOrDefault(x => x.Type == type);
+
+            if (claimsIdentity.TryRemoveClaim(claim))
+            {
+                ClearAuthorizedPoliciesCache();
+                return true;
+            }
+            return false;
         }
         return false;
     }
 
-    public async Task<bool> RemoveRole(string role)
+    public bool TryRemoveRole(string role)
     {
         ThrowIfDisposed();
 
-        if (!_roles.Contains(role))
-            return false;
-
-        if (_user == null)
-            return false;
-
-        var result = await _userManager.RemoveFromRoleAsync(_user, role);
-        if (result.Succeeded)
-            await UpdateClaimsPrincipal();
-        return result.Succeeded;
-    }
-
-    public async Task<bool> RemoveAllClaims()
-    {
-        ThrowIfDisposed();
-
-        if (_user == null)
-            return false;
-
-        var claims = await _userManager.GetClaimsAsync(_user);
-        var result = await _userManager.RemoveClaimsAsync(_user, claims);
-        if (result.Succeeded)
-            await UpdateClaimsPrincipal();
-        return result.Succeeded;
+        return TryRemoveClaim(ClaimTypes.Role, role);
     }
 
     internal bool InternalHasUpgrade(int upgradeId) => _upgrades.Contains(upgradeId);

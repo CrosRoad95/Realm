@@ -54,7 +54,7 @@ public class UserComponentTests
         isInCache.Should().BeTrue();
         cacheAuthorized.Should().Be(false);
 
-        await userComponent.AddRole("Admin");
+        userComponent.AddRole("Admin");
         isInCache = userComponent.HasAuthorizedPolicy("Admin", out bool _);
         isInCache.Should().BeFalse();
         #endregion

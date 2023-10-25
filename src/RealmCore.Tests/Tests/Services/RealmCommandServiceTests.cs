@@ -105,10 +105,10 @@ public class RealmCommandServiceTests
     {
         var player = new Player();
         var playerEntity = _entityHelper.CreatePlayerEntity();
-        await playerEntity.AddComponentAsync(new UserComponent(new UserData
+        playerEntity.AddComponent(new UserComponent(new UserData
         {
             Upgrades = new List<UserUpgradeData>()
-        }, null, null));
+        }, null));
 
         _ecsMock.Setup(x => x.TryGetEntityByPlayer(player, out playerEntity, false)).Returns(true);
         _sut.ClearCommands();

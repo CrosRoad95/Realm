@@ -27,8 +27,6 @@ public abstract class Component : IComponent, IDisposable
     public event Action<Component>? Detached;
     public event Action<Component>? Disposed;
 
-    public virtual bool IsAsync() => false;
-
     protected virtual void Attach() { }
     protected virtual void Detach() { }
 

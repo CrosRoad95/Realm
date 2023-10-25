@@ -1,5 +1,4 @@
-﻿
-namespace RealmCore.Persistence.Interfaces;
+﻿namespace RealmCore.Persistence.Interfaces;
 
 public interface INewsRepository
 {

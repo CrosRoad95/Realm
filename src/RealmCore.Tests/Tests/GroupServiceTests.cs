@@ -49,11 +49,11 @@ public class GroupServiceTests
         var groupService = _serviceProvider.GetRequiredService<IGroupService>();
         var entity = new Entity();
         entity.AddComponent<PlayerTagComponent>();
-        await entity.AddComponentAsync(new UserComponent(new UserData
+        entity.AddComponent(new UserComponent(new UserData
         {
             Id = userId,
             Upgrades = new List<UserUpgradeData>()
-        }, null, null));
+        }, null));
         var group = await groupService.CreateGroup("Test group3", "TG3", GroupKind.Regular);
 
         await groupService.AddMember(entity, group.id, 1, "Leader");
@@ -76,11 +76,11 @@ public class GroupServiceTests
 
         var entity = new Entity();
         entity.AddComponent<PlayerTagComponent>();
-        await entity.AddComponentAsync(new UserComponent(new UserData
+        entity.AddComponent(new UserComponent(new UserData
         {
             Id = userId,
             Upgrades = new List<UserUpgradeData>()
-        }, null, null));
+        }, null));
 
         await groupService.AddMember(entity, group.id, 100, "Leader");
         var removed = await groupService.RemoveMember(entity, userId);

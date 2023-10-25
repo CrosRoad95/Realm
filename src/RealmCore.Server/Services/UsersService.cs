@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using RealmCore.Server.Json.Converters;
+using System.Security.Claims;
 
 namespace RealmCore.Server.Services;
 
@@ -94,7 +95,15 @@ internal sealed class UsersService : IUsersService
 
         try
         {
-            await entity.AddComponentAsync(new UserComponent(user, _signInManager, _userManager));
+            var roles = await _userManager.GetRolesAsync(user);
+            var claimsPrincipal = await _signInManager.CreateUserPrincipalAsync(user);
+            foreach (var role in roles)
+            {
+                if (claimsPrincipal.Identity is ClaimsIdentity claimsIdentity)
+                    claimsIdentity.AddClaim(new Claim(ClaimTypes.Role, role));
+            }
+
+            entity.AddComponent(new UserComponent(user, claimsPrincipal));
             if (user.Inventories != null && user.Inventories.Count != 0)
             {
                 foreach (var inventory in user.Inventories)

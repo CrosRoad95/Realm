@@ -83,66 +83,6 @@ public class EntityTests
     }
 
     [Fact]
-    public async Task ComponentShouldNotBeAddedIfFailedToAsyncLoad()
-    {
-        #region Arrange & Act
-        var entity = new Entity();
-        var component = new ThrowExceptionAsyncComponent();
-
-        var action = async () => await entity.AddComponentAsync(component);
-        #endregion
-
-        #region Act
-        await action.Should().ThrowAsync<Exception>().WithMessage("Something went wrong");
-        entity.Components.Should().BeEmpty();
-        #endregion
-    }
-
-    [Fact]
-    public async Task ComponentShouldBeRemovedIfAsyncLoadThrowException()
-    {
-        #region Arrange & Act
-        var entity = new Entity();
-        var component = new ThrowExceptionAsyncComponent();
-
-        #endregion
-
-        #region Act
-        async Task<ThrowExceptionAsyncComponent> action() => await entity.AddComponentAsync(component);
-        #endregion
-
-        #region Assert
-        var t = new TaskCompletionSource();
-        entity.ComponentDetached += e =>
-        {
-            t.SetResult();
-        };
-
-        _ = action();
-
-        (await Task.WhenAny(t.Task, Task.Delay(5000))).Should().Be(t.Task);
-        #endregion
-    }
-
-    [Fact]
-    public void AsyncComponentCanNotBeAddedToNonAsyncEntity()
-    {
-        #region Arrange
-        var entity = new Entity();
-        var component = new ThrowExceptionAsyncComponent();
-
-        #endregion
-
-        #region Act
-        var action = () => entity.AddComponent(component);
-        #endregion
-
-        #region Act
-        action.Should().Throw<ArgumentException>().WithMessage("Can not add async component using sync method");
-        #endregion
-    }
-
-    [Fact]
     public void ComponentUsageShouldPreventYouFromAddingOneComponentTwoTimes()
     {
         #region Arrange

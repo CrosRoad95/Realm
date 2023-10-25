@@ -76,9 +76,6 @@ public sealed class Entity : IDisposable
 
     public TComponent AddComponent<TComponent>(TComponent component) where TComponent : Component
     {
-        if (component is AsyncComponent)
-            throw new ArgumentException("Can not add async component using sync method");
-
         ThrowIfDisposed();
 
         if (!component.TrySetEntity(this))
@@ -98,35 +95,6 @@ public sealed class Entity : IDisposable
             throw;
         }
 
-        ComponentAdded?.Invoke(component);
-        return component;
-    }
-
-
-    public Task<TComponent> AddComponentAsync<TComponent>() where TComponent : AsyncComponent, new()
-    {
-        return AddComponentAsync(new TComponent());
-    }
-
-    public async Task<TComponent> AddComponentAsync<TComponent>(TComponent component) where TComponent : AsyncComponent
-    {
-        ThrowIfDisposed();
-
-        if (!component.TrySetEntity(this))
-            throw new Exception("Component already attached to other entity");
-
-        InternalAddComponent(component);
-
-        try
-        {
-            component.InternalAttach();
-            await component.InternalLoadAsync().ConfigureAwait(false);
-        }
-        catch (Exception)
-        {
-            DestroyComponent(component);
-            throw;
-        }
         ComponentAdded?.Invoke(component);
         return component;
     }

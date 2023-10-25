@@ -58,6 +58,7 @@ internal class EntityHelper
         }
 
         var userManager = _serviceProvider.GetRequiredService<UserManager<UserData>>();
+        var signInManager = _serviceProvider.GetRequiredService<SignInManager<UserData>>();
 
         var user = new UserData
         {
@@ -66,14 +67,17 @@ internal class EntityHelper
         };
         await userManager.CreateAsync(user);
         await userManager.AddClaimsAsync(user, claims);
-        var userComponent = await entity.AddComponentAsync(new UserComponent(user, _serviceProvider.GetRequiredService<SignInManager<UserData>>(), _serviceProvider.GetRequiredService<UserManager<UserData>>()));
-        if(roles != null)
-        {
-            foreach (var item in roles)
+
+        var claimsPrincipal = await signInManager.CreateUserPrincipalAsync(user);
+
+        if (roles != null)
+            foreach (var role in roles)
             {
-                await userComponent.AddRole(item);
+                if (claimsPrincipal.Identity is ClaimsIdentity claimsIdentity)
+                    claimsIdentity.AddClaim(new Claim(ClaimTypes.Role, role));
             }
-        }
+
+        var userComponent = entity.AddComponent(new UserComponent(user, claimsPrincipal));
         return userComponent;
     }
 
