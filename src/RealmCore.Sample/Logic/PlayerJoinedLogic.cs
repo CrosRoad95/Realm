@@ -13,11 +13,10 @@ internal sealed class PlayerJoinedLogic : ComponentLogic<UserComponent>
     private readonly IUsersService _usersService;
     private readonly ChatBox _chatBox;
     private readonly Text3dService _text3DService;
-    private readonly IUserRepository _userRepository;
     private readonly UserManager<UserData> _userManager;
     private readonly IGuiSystemService? _guiSystemService;
 
-    public PlayerJoinedLogic(IEntityEngine entityEngine, ILogger<PlayerJoinedLogic> logger, ILogger<LoginGuiComponent> loggerLoginGuiComponent, ILogger<RegisterGuiComponent> loggerRegisterGuiComponent, INametagsService nametagsService, IUsersService usersService, ChatBox chatBox, Text3dService text3DService, IUserRepository userRepository, UserManager<UserData> userManager, IBrowserGuiService browserGuiService, IGuiSystemService? guiSystemService = null) : base(entityEngine)
+    public PlayerJoinedLogic(IEntityEngine entityEngine, ILogger<PlayerJoinedLogic> logger, ILogger<LoginGuiComponent> loggerLoginGuiComponent, ILogger<RegisterGuiComponent> loggerRegisterGuiComponent, INametagsService nametagsService, IUsersService usersService, ChatBox chatBox, Text3dService text3DService, UserManager<UserData> userManager, IBrowserGuiService browserGuiService, IGuiSystemService? guiSystemService = null) : base(entityEngine)
     {
         _entityEngine = entityEngine;
         _logger = logger;
@@ -27,7 +26,6 @@ internal sealed class PlayerJoinedLogic : ComponentLogic<UserComponent>
         _usersService = usersService;
         _chatBox = chatBox;
         _text3DService = text3DService;
-        _userRepository = userRepository;
         _userManager = userManager;
         _guiSystemService = guiSystemService;
         _entityEngine.EntityCreated += HandleEntityCreated;
@@ -83,7 +81,7 @@ internal sealed class PlayerJoinedLogic : ComponentLogic<UserComponent>
         }
 
         if(!entity.HasComponent<LoginGuiComponent>())
-            entity.AddComponent(new LoginGuiComponent(_usersService, _loggerLoginGuiComponent, _loggerRegisterGuiComponent, _userRepository, _userManager));
+            entity.AddComponent(new LoginGuiComponent(_usersService, _loggerLoginGuiComponent, _loggerRegisterGuiComponent, _userManager));
 
     }
 

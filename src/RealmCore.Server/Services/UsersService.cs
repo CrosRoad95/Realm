@@ -16,7 +16,6 @@ internal sealed class UsersService : IUsersService
     private readonly IElementCollection _elementCollection;
     private readonly IEntityEngine _entityEngine;
     private readonly LevelsRegistry _levelsRegistry;
-    private readonly IUserRepository _userRepository;
     private readonly UserManager<UserData> _userManager;
     private readonly IUserEventRepository _userEventRepository;
     private readonly IUserLoginHistoryRepository _userLoginHistoryRepository;
@@ -30,7 +29,7 @@ internal sealed class UsersService : IUsersService
     public event Action<Entity>? SignedOut;
 
     public UsersService(ItemsRegistry itemsRegistry, SignInManager<UserData> signInManager, ILogger<UsersService> logger, IOptionsMonitor<GameplayOptions> gameplayOptions,
-        IDateTimeProvider dateTimeProvider, IAuthorizationService authorizationService, IActiveUsers activeUsers, IElementCollection elementCollection, IEntityEngine ecs, LevelsRegistry levelsRegistry, IUserRepository userRepository, UserManager<UserData> userManager, IUserEventRepository userEventRepository, IUserLoginHistoryRepository userLoginHistoryRepository, ISaveService saveService)
+        IDateTimeProvider dateTimeProvider, IAuthorizationService authorizationService, IActiveUsers activeUsers, IElementCollection elementCollection, IEntityEngine ecs, LevelsRegistry levelsRegistry, UserManager<UserData> userManager, IUserEventRepository userEventRepository, IUserLoginHistoryRepository userLoginHistoryRepository, ISaveService saveService)
     {
         _itemsRegistry = itemsRegistry;
         _signInManager = signInManager;
@@ -42,7 +41,6 @@ internal sealed class UsersService : IUsersService
         _elementCollection = elementCollection;
         _entityEngine = ecs;
         _levelsRegistry = levelsRegistry;
-        _userRepository = userRepository;
         _userManager = userManager;
         _userEventRepository = userEventRepository;
         _userLoginHistoryRepository = userLoginHistoryRepository;
@@ -70,7 +68,7 @@ internal sealed class UsersService : IUsersService
     public async Task<bool> QuickSignIn(Entity entity)
     {
         var serial = entity.GetPlayer().Client.Serial ?? throw new InvalidOperationException();
-        var userData = await _userRepository.GetUserBySerial(serial) ?? throw new Exception("No account found.");
+        var userData = await _userManager.GetUserBySerial(serial) ?? throw new Exception("No account found.");
         if (!userData.QuickLogin)
             throw new Exception("Quick login not enabled");
 
@@ -256,7 +254,7 @@ internal sealed class UsersService : IUsersService
         var nick = playerEntity.GetPlayer().Name;
         if (playerEntity.TryGetComponent(out UserComponent userComponent) && userComponent.Nick != nick)
         {
-            return await _userRepository.TryUpdateLastNickName(userComponent.Id, playerEntity.GetPlayer().Name);
+            return await _userManager.TryUpdateLastNickName(userComponent.Id, playerEntity.GetPlayer().Name);
         }
         return false;
     }
@@ -267,7 +265,7 @@ internal sealed class UsersService : IUsersService
         {
             var now = _dateTimeProvider.Now;
             userComponent.LastNewsReadDateTime = now;
-            return await _userRepository.UpdateLastNewsReadDateTime(userComponent.Id, now);
+            return await _userManager.UpdateLastNewsReadDateTime(userComponent.Id, now);
         }
         return false;
     }

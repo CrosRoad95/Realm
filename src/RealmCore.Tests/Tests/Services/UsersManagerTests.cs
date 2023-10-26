@@ -3,21 +3,19 @@ using RealmCore.Persistence.Data;
 
 namespace RealmCore.Tests.Tests.Services;
 
-public class UsersServiceTests
+public class UsersManagerTests
 {
     private readonly EntityHelper _entityHelper;
     private readonly RealmTestingServer _realmTestingServer;
     private readonly IUsersService _signInService;
-    private readonly IUserRepository _userRepository;
     private readonly UserManager<UserData> _userManager;
 
-    public UsersServiceTests()
+    public UsersManagerTests()
     {
         _realmTestingServer = new();
         _entityHelper = new(_realmTestingServer);
 
         _signInService = _realmTestingServer.GetRequiredService<IUsersService>();
-        _userRepository = _realmTestingServer.GetRequiredService<IUserRepository>();
         _userManager = _realmTestingServer.GetRequiredService<UserManager<UserData>>();
     }
 
@@ -32,11 +30,11 @@ public class UsersServiceTests
 
         #region Act
         var userId = await _signInService.SignUp(login, password);
-        var user = await _userRepository.GetUserByLogin(login) ?? throw new Exception("User not found");
+        var user = await _userManager.GetUserByLogin(login) ?? throw new Exception("User not found");
 
         var validPassword = await _userManager.CheckPasswordAsync(user, password);
         var signedIn = await _signInService.SignIn(playerEntity, user);
-        var lastNick = await _userRepository.GetLastNickName(userId);
+        var lastNick = await _userManager.GetLastNickName(userId);
         #endregion
 
         #region Assert
@@ -57,7 +55,7 @@ public class UsersServiceTests
 
         #region Act
         var userId = await _signInService.SignUp(login, password);
-        var user = await _userRepository.GetUserByLogin(login) ?? throw new Exception("User not found");
+        var user = await _userManager.GetUserByLogin(login) ?? throw new Exception("User not found");
 
         var signedIn = await _signInService.SignIn(playerEntity, user);
         #endregion

@@ -33,7 +33,6 @@ internal sealed class CommandsLogic
     private readonly IUsersService _usersService;
     private readonly IVehiclesService _vehiclesService;
     private readonly ILoadService _loadService;
-    private readonly IUserRepository _userRepository;
     private readonly IUserWhitelistedSerialsRepository _userWhitelistedSerialsRepository;
     private readonly IVehicleRepository _vehicleRepository;
     private readonly IUserMoneyHistoryService _userMoneyHistoryService;
@@ -52,7 +51,7 @@ internal sealed class CommandsLogic
     public CommandsLogic(RealmCommandService commandService, IEntityFactory entityFactory,
         ItemsRegistry itemsRegistry, IEntityEngine ecs, IBanService banService, ChatBox chatBox, ILogger<CommandsLogic> logger,
         IDateTimeProvider dateTimeProvider, INametagsService nametagsService, IUsersService usersService, IVehiclesService vehiclesService,
-        GameWorld gameWorld, IElementOutlineService elementOutlineService, IAssetsService assetsService, ISpawnMarkersService spawnMarkersService, ILoadService loadService, IFeedbackService feedbackService, IOverlayService overlayService, AssetsRegistry assetsRegistry, VehicleUpgradeRegistry vehicleUpgradeRegistry, VehicleEnginesRegistry vehicleEnginesRegistry, IUserRepository userRepository, IUserWhitelistedSerialsRepository userWhitelistedSerialsRepository, IVehicleRepository vehicleRepository, IUserMoneyHistoryService userMoneyHistoryService)
+        GameWorld gameWorld, IElementOutlineService elementOutlineService, IAssetsService assetsService, ISpawnMarkersService spawnMarkersService, ILoadService loadService, IFeedbackService feedbackService, IOverlayService overlayService, AssetsRegistry assetsRegistry, VehicleUpgradeRegistry vehicleUpgradeRegistry, VehicleEnginesRegistry vehicleEnginesRegistry, IUserWhitelistedSerialsRepository userWhitelistedSerialsRepository, IVehicleRepository vehicleRepository, IUserMoneyHistoryService userMoneyHistoryService)
     {
         _commandService = commandService;
         _entityFactory = entityFactory;
@@ -65,7 +64,6 @@ internal sealed class CommandsLogic
         _usersService = usersService;
         _vehiclesService = vehiclesService;
         _loadService = loadService;
-        _userRepository = userRepository;
         _userWhitelistedSerialsRepository = userWhitelistedSerialsRepository;
         _vehicleRepository = vehicleRepository;
         _userMoneyHistoryService = userMoneyHistoryService;
@@ -1134,16 +1132,6 @@ internal sealed class CommandsLogic
             var browserComponent = entity.GetRequiredComponent<BrowserComponent>();
             _chatBox.OutputTo(entity, $"Path {browserComponent.Path}");
         }, null);
-
-        _commandService.AddAsyncCommandHandler("usernames", async (entity, args) =>
-        {
-            var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();
-            var userNames = await _userRepository.GetUserNamesByIds(new int[] { 1 });
-            foreach (var item in userNames)
-            {
-                _chatBox.OutputTo(entity, $"{item.Key} = {item.Value}");
-            }
-        });
 
         _commandService.AddAsyncCommandHandler("setkind", async (entity, args) =>
         {

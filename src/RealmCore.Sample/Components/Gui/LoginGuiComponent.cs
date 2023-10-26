@@ -9,15 +9,13 @@ public sealed class LoginGuiComponent : DxGuiComponent
     private readonly IUsersService _usersService;
     private readonly ILogger<LoginGuiComponent> _loggerLoginGuiComponent;
     private readonly ILogger<RegisterGuiComponent> _loggerRegisterGuiComponent;
-    private readonly IUserRepository _userRepository;
     private readonly UserManager<UserData> _userManager;
 
-    public LoginGuiComponent(IUsersService usersService, ILogger<LoginGuiComponent> loggerLoginGuiComponent, ILogger<RegisterGuiComponent> loggerRegisterGuiComponent, IUserRepository userRepository, UserManager<UserData> userManager) : base("login", false)
+    public LoginGuiComponent(IUsersService usersService, ILogger<LoginGuiComponent> loggerLoginGuiComponent, ILogger<RegisterGuiComponent> loggerRegisterGuiComponent, UserManager<UserData> userManager) : base("login", false)
     {
         _usersService = usersService;
         _loggerLoginGuiComponent = loggerLoginGuiComponent;
         _loggerRegisterGuiComponent = loggerRegisterGuiComponent;
-        _userRepository = userRepository;
         _userManager = userManager;
     }
 
@@ -37,7 +35,7 @@ public sealed class LoginGuiComponent : DxGuiComponent
                     return;
                 }
 
-                var user = await _userRepository.GetUserByLogin(loginData.Login);
+                var user = await _userManager.GetUserByLogin(loginData.Login);
 
                 if (user == null)
                 {
@@ -83,7 +81,7 @@ public sealed class LoginGuiComponent : DxGuiComponent
         switch (actionContext.ActionName)
         {
             case "navigateToRegister":
-                Entity.AddComponent(new RegisterGuiComponent(_usersService, _loggerRegisterGuiComponent, _loggerLoginGuiComponent, _userRepository, _userManager));
+                Entity.AddComponent(new RegisterGuiComponent(_usersService, _loggerRegisterGuiComponent, _loggerLoginGuiComponent, _userManager));
                 Entity.DestroyComponent(this);
                 break;
             default:

@@ -40,3 +40,4 @@ global using RealmCore.ECS.Components;
 global using RealmCore.Server.Components.Vehicles;
 global using RealmCore.Server.Concepts.Upgrades;
 global using SlipeServer.Server.Constants;
+global using RealmCore.Persistence.Extensions;
