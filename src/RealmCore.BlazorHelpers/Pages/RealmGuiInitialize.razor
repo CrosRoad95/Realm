@@ -13,7 +13,7 @@
     protected override async Task OnInitializedAsync()
     {
         var browserGuiService = _realmServer.GetRequiredService<IBrowserGuiService>();
-        if (!_httpContextAccessor.HttpContext.Request.Query.TryGetValue(browserGuiService.KeyName, out var key))
+        if (_httpContextAccessor.HttpContext == null || !_httpContextAccessor.HttpContext.Request.Query.TryGetValue(browserGuiService.KeyName, out var key))
             return;
 
         var claims = new List<Claim>
@@ -26,7 +26,7 @@
         await _httpContextAccessor.HttpContext.SignInAsync("Cookies", principal);
         if (_httpContextAccessor.HttpContext.User.Identity?.IsAuthenticated ?? false)
         {
-            if(browserGuiService.TryGetEntityByKey(key, out var entity))
+            if(browserGuiService.TryGetEntityByKey(key.ToString() ?? string.Empty, out var entity))
             {
                 _navigationManager.NavigateTo("/realmGuiInitialized");
             }

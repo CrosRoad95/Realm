@@ -1,8 +1,6 @@
 ﻿using RealmCore.Server.DTOs;
 using RealmCore.Server.Helpers;
-using RealmCore.Server.Components.Players.Abstractions;
 using RealmCore.Sample.Components.Gui;
-using RealmCore.Server.Components.Players;
 
 namespace RealmCore.Sample.Logic;
 

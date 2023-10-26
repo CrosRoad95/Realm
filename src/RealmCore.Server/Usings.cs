@@ -126,6 +126,7 @@ global using RealmCore.Server.Events;
 global using RealmCore.Server.World.Maps;
 global using RealmCore.Persistence.DTOs;
 global using RealmCore.Persistence.Extensions;
+global using RealmCore.Server.Utilities;
 
 global using ILogger = Microsoft.Extensions.Logging.ILogger;
 

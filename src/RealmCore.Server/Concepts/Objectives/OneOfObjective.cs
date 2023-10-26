@@ -18,7 +18,7 @@ public class OneOfObjective : Objective
         foreach (var item in _objectives)
         {
             item.Completed += HandleCompleted;
-            item.Incompleted += HandleIncompleted;
+            item.InCompleted += HandleIncompleted;
             item.Entity = playerEntity;
             item.LoadInternal(entityFactory, playerEntity, Logger);
         }
@@ -75,7 +75,7 @@ public class OneOfObjective : Objective
             if (except != item || true)
             {
                 item.Completed -= HandleCompleted;
-                item.Incompleted -= HandleIncompleted;
+                item.InCompleted -= HandleIncompleted;
                 item.Dispose();
             }
         }

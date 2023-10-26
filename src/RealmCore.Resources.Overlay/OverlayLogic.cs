@@ -53,7 +53,7 @@ internal class OverlayLogic
         _luaEventService.TriggerEventFor(player, "setHudPosition", player, hudId, x, y);
     }
 
-    public void HandleHud3dStateChanged(string hudId, Dictionary<int, object> keyValuePairs)
+    public void HandleHud3dStateChanged(string hudId, Dictionary<int, object?> keyValuePairs)
     {
         Dictionary<LuaValue, LuaValue> luaValue = new();
         foreach (var item in keyValuePairs)
@@ -63,7 +63,7 @@ internal class OverlayLogic
         _luaEventService.TriggerEvent("setHud3dState", _rootElement, hudId, new LuaValue(luaValue));
     }
 
-    public void HandleHudStateChanged(Player player, string hudId, Dictionary<int, object> keyValuePairs)
+    public void HandleHudStateChanged(Player player, string hudId, Dictionary<int, object?> keyValuePairs)
     {
         Dictionary<LuaValue, LuaValue> luaValue = new();
         foreach (var item in keyValuePairs)

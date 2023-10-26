@@ -1,6 +1,4 @@
-﻿using RealmCore.Persistence.DTOs;
-
-namespace RealmCore.Server.Services;
+﻿namespace RealmCore.Server.Services;
 
 internal sealed class NewsService : INewsService
 {

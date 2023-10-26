@@ -27,7 +27,7 @@ internal sealed class StatisticsCounterResourceLogic : ComponentLogic<Statistics
     {
         try
         {
-            if (_ecs.TryGetEntityByPlayer(player, out Entity entity) && entity != null)
+            if (_ecs.TryGetEntityByPlayer(player, out Entity? entity) && entity != null)
             {
                 var statisticsCounterComponent = entity.GetRequiredComponent<StatisticsCounterComponent>();
                 foreach (var item in statistics)

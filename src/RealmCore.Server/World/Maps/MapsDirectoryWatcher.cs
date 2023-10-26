@@ -1,4 +1,6 @@
-﻿namespace RealmCore.Server.World.Maps;
+﻿using RealmCore.Server.Utilities;
+
+namespace RealmCore.Server.World.Maps;
 
 internal class MapsDirectoryWatcher : IDisposable
 {
@@ -18,16 +20,18 @@ internal class MapsDirectoryWatcher : IDisposable
     private readonly MapsService _mapsService;
     private readonly List<MapEvent> _mapEvents = new();
     private readonly object _mapEventsLock = new();
-    private CancellationTokenSource? _cancellationTokenSource;
+    private readonly Debounce _debounce = new(250);
 
     public MapsDirectoryWatcher(string path, MapsService mapsService)
     {
         _path = path;
         _mapsService = mapsService;
         string searchPattern = "*.map";
-        _fileSystemWatcher = new FileSystemWatcher();
-        _fileSystemWatcher.Path = path;
-        _fileSystemWatcher.IncludeSubdirectories = true;
+        _fileSystemWatcher = new FileSystemWatcher
+        {
+            Path = path,
+            IncludeSubdirectories = true
+        };
         _fileSystemWatcher.Created += HandleCreated;
         _fileSystemWatcher.Changed += HandleChanged;
         _fileSystemWatcher.Deleted += HandleDeleted;
@@ -49,16 +53,9 @@ internal class MapsDirectoryWatcher : IDisposable
 
     private async Task ScheduleFlush()
     {
-        if (_cancellationTokenSource == null)
-            _cancellationTokenSource = new();
-
-        _cancellationTokenSource.Cancel();
-        _cancellationTokenSource = new();
-
         try
         {
-            await Task.Delay(250, _cancellationTokenSource.Token);
-            Flush();
+            await _debounce.InvokeAsync(Flush);
         }
         catch (Exception ex)
         {

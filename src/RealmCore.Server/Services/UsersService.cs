@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using RealmCore.Server.Json.Converters;
-using System.Security.Claims;
 
 namespace RealmCore.Server.Services;
 

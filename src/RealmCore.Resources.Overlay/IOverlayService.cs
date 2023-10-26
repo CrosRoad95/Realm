@@ -13,8 +13,8 @@ public interface IOverlayService
     internal Action<string>? Hud3dRemoved { get; set; }
     internal Action<Player, string, bool>? HudVisibilityChanged { get; set; }
     internal Action<Player, string, float, float>? HudPositionChanged { get; set; }
-    internal Action<Player, string, Dictionary<int, object>>? HudStateChanged { get; set; }
-    internal Action<string, Dictionary<int, object>>? Hud3dStateChanged { get; set; }
+    internal Action<Player, string, Dictionary<int, object?>>? HudStateChanged { get; set; }
+    internal Action<string, Dictionary<int, object?>>? Hud3dStateChanged { get; set; }
     internal Action<Player, string, Vector3, TimeSpan>? Display3dRingAdded { get; set; }
     internal Action<Player, string>? Display3dRingRemoved { get; set; }
 
@@ -26,8 +26,8 @@ public interface IOverlayService
     void RemoveHud(Player player, string hudId);
     void RemoveHud3d(string hudId);
     void RemoveRing3dDisplay(Player player, string id);
-    void SetHud3dState(string hudId, Dictionary<int, object> state);
+    void SetHud3dState(string hudId, Dictionary<int, object?> state);
     void SetHudPosition(Player player, string hudId, Vector2 position);
-    void SetHudState(Player player, string hudId, Dictionary<int, object> state);
+    void SetHudState(Player player, string hudId, Dictionary<int, object?> state);
     void SetHudVisible(Player player, string hudId, bool visible);
 }

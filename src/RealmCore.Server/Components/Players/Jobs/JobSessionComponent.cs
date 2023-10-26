@@ -47,7 +47,7 @@ public abstract class JobSessionComponent : SessionComponent, IUpdateCallback
 
         ObjectiveAdded?.Invoke(this, objective);
         objective.Completed += HandleCompleted;
-        objective.Incompleted += HandleIncompleted;
+        objective.InCompleted += HandleIncompleted;
         objective.Disposed += HandleDisposed;
         return objective;
     }
@@ -55,7 +55,7 @@ public abstract class JobSessionComponent : SessionComponent, IUpdateCallback
     private void HandleDisposed(Objective objective)
     {
         objective.Completed -= HandleCompleted;
-        objective.Incompleted -= HandleIncompleted;
+        objective.InCompleted -= HandleIncompleted;
         objective.Disposed -= HandleDisposed;
         RemoveObjective(objective);
     }

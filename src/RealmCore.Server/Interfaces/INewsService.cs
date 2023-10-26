@@ -1,6 +1,4 @@
-﻿using RealmCore.Persistence.DTOs;
-
-namespace RealmCore.Server.Interfaces;
+﻿namespace RealmCore.Server.Interfaces;
 
 public interface INewsService
 {

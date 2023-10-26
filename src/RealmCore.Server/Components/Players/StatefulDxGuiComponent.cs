@@ -4,8 +4,9 @@ namespace RealmCore.Server.Components.Players;
 
 public abstract class StatefulDxGuiComponentBase : DxGuiComponent
 {
-    public Action<StatefulDxGuiComponentBase, string, bool, object?> GuiOpened;
-    public Action<StatefulDxGuiComponentBase, string, Dictionary<LuaValue, object?>> StateChanged;
+    public Action<StatefulDxGuiComponentBase, string, bool, object?>? GuiOpened;
+    public Action<StatefulDxGuiComponentBase, string, Dictionary<LuaValue, object?>>? StateChanged;
+
     public StatefulDxGuiComponentBase(string name, bool cursorLess)
         : base(name, cursorLess)
     {
@@ -17,6 +18,7 @@ public abstract class StatefulDxGuiComponentBase : DxGuiComponent
         GuiOpened?.Invoke(statefulGuiComponentBase, name, cursorLess, state);
     }
 }
+
 public abstract class StatefulDxGuiComponent<TState> : StatefulDxGuiComponentBase
 {
     private readonly TState _state;

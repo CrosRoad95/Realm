@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Components;
-using RealmCore.ECS;
+﻿using RealmCore.ECS;
 using RealmCore.Server.Components.Elements;
 using RealmCore.Server.Components.Players;
 using RealmCore.Server.Components.Players.Abstractions;

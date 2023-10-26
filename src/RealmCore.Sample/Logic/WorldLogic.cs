@@ -1,6 +1,5 @@
 ﻿using RealmCore.Resources.Overlay;
 using RealmCore.Server.Components.Elements.CollisionShapes;
-using RealmCore.Server.Components.Players;
 using SlipeServer.Server.Enums;
 
 namespace RealmCore.Sample.Logic;

@@ -1,7 +1,4 @@
-﻿using System.Data;
-using System.Security.Claims;
-
-namespace RealmCore.Server.Components.Players;
+﻿namespace RealmCore.Server.Components.Players;
 
 [ComponentUsage(false)]
 public class UserComponent : Component
@@ -13,8 +10,6 @@ public class UserComponent : Component
     }
 
     private readonly UserData? _user;
-    private readonly SignInManager<UserData> _signInManager;
-    private readonly UserManager<UserData> _userManager;
     private readonly List<int> _upgrades = new();
     private readonly object _upgradesLock = new();
     private readonly ConcurrentDictionary<int, string> _settings = new();

@@ -10,7 +10,7 @@ public abstract class Objective : IDisposable
     public bool IsFulfilled => _isFulfilled;
 
     public event Action<Objective, object?>? Completed;
-    public event Action<Objective>? Incompleted;
+    public event Action<Objective>? InCompleted;
     public event Action<Objective>? Disposed;
 
     public Entity Entity { get => _entity ?? throw new InvalidOperationException(); internal set => _entity = value; }
@@ -59,7 +59,7 @@ public abstract class Objective : IDisposable
         if (_blipElementComponent != null)
             RemoveBlip();
 
-        Incompleted?.Invoke(objective);
+        InCompleted?.Invoke(objective);
         _isFulfilled = true;
     }
 

@@ -47,7 +47,7 @@ internal class Hud<TState> : IHud<TState> where TState : class
             throw new Exception("Hud has no state");
 
         callback(_state);
-        Dictionary<int, object> stateChange = new();
+        Dictionary<int, object?> stateChange = new();
         foreach (var item in _dynamicHudComponents)
         {
             var value = item.PropertyInfo.GetValue(_state);
