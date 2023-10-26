@@ -11,9 +11,9 @@ internal sealed class NewsService : INewsService
         _dateTimeProvider = dateTimeProvider;
     }
 
-    public async Task<List<NewsDTO>> Get(int limit = 10)
+    public async Task<List<NewsDTO>> Get(int limit = 10, CancellationToken cancellationToken = default)
     {
-        var newsDataList = await _newsRepository.Get(_dateTimeProvider.Now, limit);
+        var newsDataList = await _newsRepository.Get(_dateTimeProvider.Now, limit, cancellationToken);
         return newsDataList.Select(x => new NewsDTO
         {
             Id = x.Id,
