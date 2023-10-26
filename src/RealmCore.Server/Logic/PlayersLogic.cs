@@ -169,9 +169,7 @@ internal class PlayersLogic
             _playerResources.TryRemove(player, out var _);
             try
             {
-                var saveService = _serviceProvider.GetRequiredService<ISaveService>();
-                await saveService.BeginSave(playerEntity);
-                await saveService.Commit();
+                await _saveService.Save(playerEntity);
             }
             finally
             {

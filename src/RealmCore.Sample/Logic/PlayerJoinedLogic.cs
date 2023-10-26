@@ -36,7 +36,7 @@ internal sealed class PlayerJoinedLogic : ComponentLogic<UserComponent>
         _chatBox.OutputTo(entity, "Browser ready");
     }
 
-    protected override async void ComponentAdded(UserComponent userComponent)
+    private async Task ComponentAddedCore(UserComponent userComponent)
     {
         var entity = userComponent.Entity;
         var playerElementComponent = userComponent.Entity.GetRequiredComponent<PlayerElementComponent>();
@@ -58,9 +58,21 @@ internal sealed class PlayerJoinedLogic : ComponentLogic<UserComponent>
         _nametagsService.SetNametagRenderingEnabled(userComponent.Entity, true);
     }
 
+    protected override async void ComponentAdded(UserComponent userComponent)
+    {
+        try
+        {
+            await ComponentAddedCore(userComponent);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogHandleError(ex);
+        }
+    }
+
     protected override void ComponentDetached(UserComponent userComponent)
     {
-        ShowLoginSequence(userComponent.Entity);
+        //ShowLoginSequence(userComponent.Entity);
     }
 
     private void ShowLoginSequence(Entity entity)
@@ -82,6 +94,13 @@ internal sealed class PlayerJoinedLogic : ComponentLogic<UserComponent>
         if(!entity.HasComponent<LoginGuiComponent>())
             entity.AddComponent(new LoginGuiComponent(_usersService, _loggerLoginGuiComponent, _loggerRegisterGuiComponent, _userManager));
 
+        entity.Disposed += Entity_Disposed;
+    }
+
+    private void Entity_Disposed(Entity obj)
+    {
+
+        obj.Disposed -= Entity_Disposed;
     }
 
     private void HandleEntityCreated(Entity entity)
