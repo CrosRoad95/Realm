@@ -1,4 +1,6 @@
-﻿namespace RealmCore.Server.Components.Players;
+﻿using RealmCore.Server.DomainObjects;
+
+namespace RealmCore.Server.Components.Players;
 
 [ComponentUsage(false)]
 public class UserComponent : Component
@@ -34,6 +36,8 @@ public class UserComponent : Component
         }
     }
 
+    public Bans Bans { get; }
+
     public event Action<UserComponent, int>? UpgradeAdded;
     public event Action<UserComponent, int>? UpgradeRemoved;
     public event Action<UserComponent, int, string>? SettingChanged;
@@ -41,10 +45,11 @@ public class UserComponent : Component
     private readonly object _authorizedPoliciesLock = new();
     private readonly List<PolicyCache> _authorizedPolicies = new();
 
-    internal UserComponent(UserData user, ClaimsPrincipal claimsPrincipal)
+    internal UserComponent(UserData user, ClaimsPrincipal claimsPrincipal, Bans bans)
     {
         _user = user;
         _claimsPrincipal = claimsPrincipal;
+        Bans = bans;
         _upgrades = _user.Upgrades.Select(x => x.UpgradeId).ToList();
         foreach (var item in _user.Settings)
         {
@@ -305,5 +310,10 @@ public class UserComponent : Component
             return true;
         }
         return false;
+    }
+
+    public override void Dispose()
+    {
+        Bans.Dispose();
     }
 }

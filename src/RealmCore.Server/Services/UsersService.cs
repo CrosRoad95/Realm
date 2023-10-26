@@ -19,6 +19,7 @@ internal sealed class UsersService : IUsersService
     private readonly IUserEventRepository _userEventRepository;
     private readonly IUserLoginHistoryRepository _userLoginHistoryRepository;
     private readonly ISaveService _saveService;
+    private readonly IBanService _banService;
     private static readonly JsonSerializerSettings _jsonSerializerSettings = new()
     {
         Converters = new List<JsonConverter> { DoubleConverter.Instance }
@@ -28,7 +29,7 @@ internal sealed class UsersService : IUsersService
     public event Action<Entity>? SignedOut;
 
     public UsersService(ItemsRegistry itemsRegistry, SignInManager<UserData> signInManager, ILogger<UsersService> logger, IOptionsMonitor<GameplayOptions> gameplayOptions,
-        IDateTimeProvider dateTimeProvider, IAuthorizationService authorizationService, IActiveUsers activeUsers, IElementCollection elementCollection, IEntityEngine ecs, LevelsRegistry levelsRegistry, UserManager<UserData> userManager, IUserEventRepository userEventRepository, IUserLoginHistoryRepository userLoginHistoryRepository, ISaveService saveService)
+        IDateTimeProvider dateTimeProvider, IAuthorizationService authorizationService, IActiveUsers activeUsers, IElementCollection elementCollection, IEntityEngine ecs, LevelsRegistry levelsRegistry, UserManager<UserData> userManager, IUserEventRepository userEventRepository, IUserLoginHistoryRepository userLoginHistoryRepository, ISaveService saveService, IBanService banService)
     {
         _itemsRegistry = itemsRegistry;
         _signInManager = signInManager;
@@ -44,6 +45,7 @@ internal sealed class UsersService : IUsersService
         _userEventRepository = userEventRepository;
         _userLoginHistoryRepository = userLoginHistoryRepository;
         _saveService = saveService;
+        _banService = banService;
     }
 
     public async Task<int> SignUp(string username, string password)
@@ -92,6 +94,9 @@ internal sealed class UsersService : IUsersService
 
         try
         {
+            var client = entity.GetPlayer().Client;
+            var serial = client.GetSerial();
+
             var roles = await _userManager.GetRolesAsync(user);
             var claimsPrincipal = await _signInManager.CreateUserPrincipalAsync(user);
             foreach (var role in roles)
@@ -99,8 +104,8 @@ internal sealed class UsersService : IUsersService
                 if (claimsPrincipal.Identity is ClaimsIdentity claimsIdentity)
                     claimsIdentity.AddClaim(new Claim(ClaimTypes.Role, role));
             }
-
-            entity.AddComponent(new UserComponent(user, claimsPrincipal));
+            var bans = await _banService.GetBansByUserIdAndSerial(user.Id, serial);
+            entity.AddComponent(new UserComponent(user, claimsPrincipal, bans));
             if (user.Inventories != null && user.Inventories.Count != 0)
             {
                 foreach (var inventory in user.Inventories)
@@ -161,8 +166,7 @@ internal sealed class UsersService : IUsersService
             entity.AddComponent(new MoneyComponent(user.Money, _gameplayOptions));
             entity.AddComponent<AFKComponent>();
             
-            var client = entity.GetPlayer().Client;
-            await _userLoginHistoryRepository.Add(user.Id, _dateTimeProvider.Now, client.IPAddress?.ToString() ?? "", client.GetSerial());
+            await _userLoginHistoryRepository.Add(user.Id, _dateTimeProvider.Now, client.IPAddress?.ToString() ?? "", serial);
             await TryUpdateLastNickName(entity);
             SignedIn?.Invoke(entity);
             return true;
@@ -277,6 +281,21 @@ internal sealed class UsersService : IUsersService
             if (_entityEngine.TryGetEntityByPlayer(player, out var playerEntity) && playerEntity != null)
                 yield return playerEntity;
         }
+    }
+
+    public bool TryFindPlayerBySerial(string serial, out Entity? entity)
+    {
+        foreach (var player in _elementCollection.GetByType<Player>())
+        {
+            if(player.Client.Serial == serial)
+            {
+                if (_entityEngine.TryGetEntityByPlayer(player, out entity))
+                    return true;
+                return false;
+            }
+        }
+        entity = null;
+        return false;
     }
 
     public async Task<bool> AddUserEvent(Entity userEntity, int eventId, string? metadata = null)

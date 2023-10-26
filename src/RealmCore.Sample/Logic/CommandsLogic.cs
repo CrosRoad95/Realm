@@ -712,6 +712,29 @@ internal sealed class CommandsLogic
             playerElementComponent.Kick("test 123");
         });
 
+        _commandService.AddAsyncCommandHandler("amibanned", async (entity, args) =>
+        {
+            var userComponent = entity.GetRequiredComponent<UserComponent>();
+            var isBanned = userComponent.Bans.IsBanned(_dateTimeProvider.Now, 123);
+            _chatBox.OutputTo(entity, $"isBanned {isBanned}");
+        });
+
+        _commandService.AddAsyncCommandHandler("bantest", async (entity, args) =>
+        {
+            var userComponent = entity.GetRequiredComponent<UserComponent>();
+            await _banService.Ban(entity, type: 123);
+            var isBanned = userComponent.Bans.IsBanned(_dateTimeProvider.Now, 123);
+            _chatBox.OutputTo(entity, $"isBanned {isBanned}");
+        });
+
+        _commandService.AddAsyncCommandHandler("unbantest", async (entity, args) =>
+        {
+            var userComponent = entity.GetRequiredComponent<UserComponent>();
+            await _banService.RemoveBan(entity, 123);
+            var isBanned = userComponent.Bans.IsBanned(_dateTimeProvider.Now, 123);
+            _chatBox.OutputTo(entity, $"isBanned {isBanned}");
+        });
+
         _commandService.AddCommandHandler("attach", (entity, args) =>
         {
             var objectEntity = _entityFactory.CreateObject((ObjectModel)1337, Vector3.Zero, Vector3.Zero);

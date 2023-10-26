@@ -147,6 +147,9 @@ namespace RealmCore.Persistence.MySql.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
+                    b.Property<bool>("Active")
+                        .HasColumnType("tinyint(1)");
+
                     b.Property<DateTime>("End")
                         .HasColumnType("datetime(6)");
 

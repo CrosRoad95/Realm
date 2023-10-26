@@ -9,6 +9,7 @@ public sealed class BanData
     public string? Reason { get; set; }
     public string? Responsible { get; set; }
     public int Type { get; set; }
+    public bool Active { get; set; }
 
     public UserData? User { get; set; }
 }

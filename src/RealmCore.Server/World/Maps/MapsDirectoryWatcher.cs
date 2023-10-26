@@ -1,6 +1,4 @@
-﻿using RealmCore.Server.Utilities;
-
-namespace RealmCore.Server.World.Maps;
+﻿namespace RealmCore.Server.World.Maps;
 
 internal class MapsDirectoryWatcher : IDisposable
 {

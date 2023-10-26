@@ -108,7 +108,7 @@ public class RealmCommandServiceTests
         playerEntity.AddComponent(new UserComponent(new UserData
         {
             Upgrades = new List<UserUpgradeData>()
-        }, null));
+        }, null, new()));
 
         _ecsMock.Setup(x => x.TryGetEntityByPlayer(player, out playerEntity, false)).Returns(true);
         _sut.ClearCommands();

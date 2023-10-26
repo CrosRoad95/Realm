@@ -50,10 +50,17 @@ public class UsersManagerTests
         #region Arrange
         var login = Guid.NewGuid().ToString()[..8];
         var password = "asdASD123!@#";
-        var playerEntity = _entityHelper.CreatePlayerEntity(false);
+        var playerEntity = _entityHelper.CreatePlayerEntity(true);
         #endregion
 
         #region Act
+        var wasComponentCount = 0;
+        _signInService.SignedIn += e =>
+        {
+            wasComponentCount = e.ComponentsCount;
+            throw new Exception();
+        };
+
         var userId = await _signInService.SignUp(login, password);
         var user = await _userManager.GetUserByLogin(login) ?? throw new Exception("User not found");
 
@@ -63,6 +70,7 @@ public class UsersManagerTests
         #region Assert
         signedIn.Should().BeFalse();
         playerEntity.Components.Should().HaveCount(3);
+        wasComponentCount.Should().Be(16);
         #endregion
     }
 

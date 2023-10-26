@@ -14,6 +14,7 @@ public class RealmServer : MtaServer, IRealmServer
         serverBuilder.AddLogic<VehiclesLogic>();
         serverBuilder.AddLogic<GuiLogic>();
         serverBuilder.AddLogic<ServerLogic>();
+        serverBuilder.AddLogic<BanLogic>();
 
         serverBuilder.AddLogic<VehicleUpgradeRegistryLogic>();
         serverBuilder.AddLogic<VehicleEnginesRegistryLogic>();

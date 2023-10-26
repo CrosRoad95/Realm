@@ -11,12 +11,14 @@ internal class EntityHelper
     private readonly TestingServer _testingServer;
     private readonly IServiceProvider _serviceProvider;
     private readonly IEntityEngine _entityEngine;
+    private readonly IBanService _banService;
 
     public EntityHelper(TestingServer testingServer)
     {
         _testingServer = testingServer;
         _serviceProvider = _testingServer.GetRequiredService<IServiceProvider>();
         _entityEngine = _testingServer.GetRequiredService<IEntityEngine>();
+        _banService = _testingServer.GetRequiredService<IBanService>();
     }
 
     public Entity CreatePlayerEntity(bool withSerialAndIp = true)
@@ -76,8 +78,8 @@ internal class EntityHelper
                 if (claimsPrincipal.Identity is ClaimsIdentity claimsIdentity)
                     claimsIdentity.AddClaim(new Claim(ClaimTypes.Role, role));
             }
-
-        var userComponent = entity.AddComponent(new UserComponent(user, claimsPrincipal));
+        var bans = await _banService.GetBansByUserIdAndSerial(user.Id, "AAAA");
+        var userComponent = entity.AddComponent(new UserComponent(user, claimsPrincipal, bans));
         return userComponent;
     }
 

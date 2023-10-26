@@ -53,7 +53,7 @@ public class GroupServiceTests
         {
             Id = userId,
             Upgrades = new List<UserUpgradeData>()
-        }, null));
+        }, null, new()));
         var group = await groupService.CreateGroup("Test group3", "TG3", GroupKind.Regular);
 
         await groupService.AddMember(entity, group.id, 1, "Leader");
@@ -80,7 +80,7 @@ public class GroupServiceTests
         {
             Id = userId,
             Upgrades = new List<UserUpgradeData>()
-        }, null));
+        }, null, new()));
 
         await groupService.AddMember(entity, group.id, 100, "Leader");
         var removed = await groupService.RemoveMember(entity, userId);
