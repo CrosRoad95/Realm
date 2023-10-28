@@ -1586,6 +1586,12 @@ internal sealed class CommandsLogic
 
             }
         });
+
+        _commandService.AddAsyncCommandHandler("clickedElement", async (entity, args) =>
+        {
+            var lastClickedElement = entity.GetRequiredComponent<PlayerElementComponent>().LastClickedElement;
+            _chatBox.Output($"> {lastClickedElement}");
+        });
     }
 
     static int _hudPosition = 0;

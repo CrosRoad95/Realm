@@ -8,11 +8,12 @@ public interface IClientInterfaceService
     event Action<Player, string, int, string, int>? ClientErrorMessage;
     event Action<Player, CultureInfo>? ClientCultureInfoChanged;
     event Action<Player, int, int>? ClientScreenSizeChanged;
-    event Action<Player, Element?>? FocusedElementChanged;
+    event Action<Player, Element?, string?>? FocusedElementChanged;
 
     internal event Action<Element>? FocusableAdded;
     internal event Action<Element>? FocusableRemoved;
     internal event Action<Player, bool>? FocusableRenderingChanged;
+    event Action<Player, Element?>? ClickedElementChanged;
 
     void AddFocusable(Element element);
     void RemoveFocusable(Element element);
@@ -25,4 +26,5 @@ public interface IClientInterfaceService
     internal void BroadcastPlayerLocalizationCode(Player player, string code);
     internal void BroadcastPlayerScreenSize(Player player, int x, int y);
     internal void BroadcastPlayerElementFocusChanged(Player player, Element? newFocusedElement, string? childElement);
+    void BroadcastClickedElementChanged(Player player, Element? clickedElement);
 }

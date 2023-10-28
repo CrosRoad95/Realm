@@ -33,6 +33,7 @@ internal class ClientInterfaceLogic
         luaEventService.AddEventHandler("sendLocalizationCode", HandleLocalizationCode);
         luaEventService.AddEventHandler("sendScreenSize", HandleScreenSize);
         luaEventService.AddEventHandler("internalChangeFocusedElement", HandleFocusedElementChanged);
+        luaEventService.AddEventHandler("clickedElementChanged", HandleClickedElementChanged);
         _clientInterfaceService.FocusableAdded += HandleFocusableAdded;
         _clientInterfaceService.FocusableRemoved += HandleFocusableRemoved;
         _clientInterfaceService.FocusableRenderingChanged += HandlePlayerFocusableRenderingEnabled;
@@ -130,5 +131,15 @@ internal class ClientInterfaceLogic
         var (id, focusedElement, childElement) = luaEvent.Read<string, Element, string>(_fromLuaValueMapper);
 
         _clientInterfaceService.BroadcastPlayerElementFocusChanged(luaEvent.Player, focusedElement, childElement);
+    }
+
+    private void HandleClickedElementChanged(LuaEvent luaEvent)
+    {
+        var (id, clickedElement) = luaEvent.Read<string, Element>(_fromLuaValueMapper);
+        if(clickedElement != null)
+        {
+            ;
+        }
+        _clientInterfaceService.BroadcastClickedElementChanged(luaEvent.Player, clickedElement);
     }
 }

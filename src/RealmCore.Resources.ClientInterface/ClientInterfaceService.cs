@@ -8,7 +8,8 @@ internal sealed class ClientInterfaceService : IClientInterfaceService
     public event Action<Player, string, int, string, int>? ClientErrorMessage;
     public event Action<Player, CultureInfo>? ClientCultureInfoChanged;
     public event Action<Player, int, int>? ClientScreenSizeChanged;
-    public event Action<Player, Element?>? FocusedElementChanged;
+    public event Action<Player, Element?, string?>? FocusedElementChanged;
+    public event Action<Player, Element?>? ClickedElementChanged;
     public event Action<Element>? FocusableAdded;
     public event Action<Element>? FocusableRemoved;
     public event Action<Player, bool>? FocusableRenderingChanged;
@@ -35,7 +36,12 @@ internal sealed class ClientInterfaceService : IClientInterfaceService
 
     public void BroadcastPlayerElementFocusChanged(Player player, Element? newFocusedElement, string? childElement)
     {
-        FocusedElementChanged?.Invoke(player, newFocusedElement);
+        FocusedElementChanged?.Invoke(player, newFocusedElement, childElement);
+    }
+    
+    public void BroadcastClickedElementChanged(Player player, Element? clickedElement)
+    {
+        ClickedElementChanged?.Invoke(player, clickedElement);
     }
 
     public void SetWorldDebuggingEnabled(Player player, bool active)

@@ -1,4 +1,6 @@
-﻿namespace RealmCore.Server.Logic.Components;
+﻿using RealmCore.ECS;
+
+namespace RealmCore.Server.Logic.Components;
 
 internal sealed class FocusableComponentLogic : ComponentLogic<FocusableComponent>
 {
@@ -10,9 +12,26 @@ internal sealed class FocusableComponentLogic : ComponentLogic<FocusableComponen
         _entityEngine = entityEngine;
         _clientInterfaceService = clientInterfaceService;
         _clientInterfaceService.FocusedElementChanged += HandleFocusedElementChanged;
+        _clientInterfaceService.ClickedElementChanged += HandleClickedElementChanged;
     }
 
-    private void HandleFocusedElementChanged(Player player, Element? focusedElement)
+    private void HandleClickedElementChanged(Player player, Element? clickedElement)
+    {
+        if (!_entityEngine.TryGetEntityByPlayer(player, out var playerEntity) || playerEntity == null)
+            return;
+
+        var playerElementComponent = playerEntity.GetRequiredComponent<PlayerElementComponent>();
+        if(clickedElement != null && _entityEngine.TryGetByElement(clickedElement, out var clickedElementEntity))
+        {
+            playerElementComponent.LastClickedElement = clickedElementEntity;
+        }
+        else
+        {
+            playerElementComponent.LastClickedElement = null;
+        }
+    }
+
+    private void HandleFocusedElementChanged(Player player, Element? focusedElement, string? vehiclePart)
     {
         if (!_entityEngine.TryGetEntityByPlayer(player, out var playerEntity) || playerEntity == null)
             return;

@@ -5,6 +5,7 @@ namespace RealmCore.Server.Components.Elements;
 public sealed class PlayerElementComponent : PedElementComponent
 {
     private Entity? _focusedEntity;
+    private Entity? _lastClickedElement;
     private readonly Player _player;
     private readonly Vector2 _screenSize;
     private readonly CultureInfo _culture;
@@ -23,6 +24,7 @@ public sealed class PlayerElementComponent : PedElementComponent
     private readonly object _enableFightFlagsLock = new();
     private readonly MapIdGenerator _mapIdGenerator = new(IdGeneratorConstants.MapIdStart, IdGeneratorConstants.MapIdStop);
     public event Action<Entity, Entity?>? FocusedEntityChanged;
+    public event Action<Entity, Entity?>? ClickedEntityChanged;
     internal Player Player => _player;
     internal bool Spawned { get; set; }
 
@@ -40,6 +42,24 @@ public sealed class PlayerElementComponent : PedElementComponent
             {
                 _focusedEntity = value;
                 FocusedEntityChanged?.Invoke(Entity, value);
+            }
+        }
+    }
+
+    public Entity? LastClickedElement
+    {
+        get
+        {
+            ThrowIfDisposed();
+            return _lastClickedElement;
+        }
+        internal set
+        {
+            ThrowIfDisposed();
+            if (value != _lastClickedElement)
+            {
+                _lastClickedElement = value;
+                ClickedEntityChanged?.Invoke(Entity, value);
             }
         }
     }

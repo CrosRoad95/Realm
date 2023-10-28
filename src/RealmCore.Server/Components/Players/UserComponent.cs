@@ -200,7 +200,7 @@ public class UserComponent : Component
 
         if (_claimsPrincipal.Identity is ClaimsIdentity claimsIdentity)
         {
-            return claimsIdentity.Claims.Select(x => x.Value).Where(x => x == ClaimTypes.Role).ToList();
+            return claimsIdentity.Claims.Where(x => x.Type == ClaimTypes.Role).Select(x => x.Value).ToList();
         }
 
         return [];
