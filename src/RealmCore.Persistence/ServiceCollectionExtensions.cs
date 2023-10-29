@@ -5,25 +5,23 @@ namespace RealmCore.Persistence;
 public static class ServiceCollectionExtensions
 {
     public static IServiceCollection AddPersistence<T>(this IServiceCollection services,
-        Action<DbContextOptionsBuilder> dbOptions, ServiceLifetime serviceLifetime = ServiceLifetime.Transient) where T : DbContext, IDb
+        Action<DbContextOptionsBuilder> dbOptions, ServiceLifetime serviceLifetime = ServiceLifetime.Scoped) where T : DbContext, IDb
     {
-        services.AddSingleton<RealmDbContextFactory>();
-
-        services.AddTransient<IVehicleRepository, VehicleRepository>();
-        services.AddTransient<IGroupRepository, GroupRepository>();
-        services.AddTransient<IFractionRepository, FractionRepository>();
-        services.AddTransient<IBanRepository, BanRepository>();
-        services.AddTransient<IJobRepository, JobRepository>();
-        services.AddTransient<IUserRewardRepository, UserRewardRepository>();
-        services.AddTransient<IVehicleEventRepository, VehicleEventRepository>();
-        services.AddTransient<IUserNotificationRepository, UserNotificationRepository>();
-        services.AddTransient<IUserLoginHistoryRepository, UserLoginHistoryRepository>();
-        services.AddTransient<IUserMoneyHistoryRepository, UserMoneyHistoryRepository>();
-        services.AddTransient<IUserEventRepository, UserEventRepository>();
-        services.AddTransient<IRatingRepository, RatingRepository>();
-        services.AddTransient<IOpinionRepository, OpinionRepository>();
-        services.AddTransient<IUserWhitelistedSerialsRepository, UserWhitelistedSerialsRepository>();
-        services.AddTransient<INewsRepository, NewsRepository>();
+        services.AddScoped<IVehicleRepository, VehicleRepository>();
+        services.AddScoped<IGroupRepository, GroupRepository>();
+        services.AddScoped<IFractionRepository, FractionRepository>();
+        services.AddScoped<IBanRepository, BanRepository>();
+        services.AddScoped<IJobRepository, JobRepository>();
+        services.AddScoped<IUserRewardRepository, UserRewardRepository>();
+        services.AddScoped<IVehicleEventRepository, VehicleEventRepository>();
+        services.AddScoped<IUserNotificationRepository, UserNotificationRepository>();
+        services.AddScoped<IUserLoginHistoryRepository, UserLoginHistoryRepository>();
+        services.AddScoped<IUserMoneyHistoryRepository, UserMoneyHistoryRepository>();
+        services.AddScoped<IUserEventRepository, UserEventRepository>();
+        services.AddScoped<IRatingRepository, RatingRepository>();
+        services.AddScoped<IOpinionRepository, OpinionRepository>();
+        services.AddScoped<IUserWhitelistedSerialsRepository, UserWhitelistedSerialsRepository>();
+        services.AddScoped<INewsRepository, NewsRepository>();
         services.AddScoped<ITransactionContext, TransactionContext>();
 
         services.AddDbContext<IDb, T>(dbOptions, serviceLifetime);

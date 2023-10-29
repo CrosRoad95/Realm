@@ -1,4 +1,5 @@
 ﻿using RealmCore.Resources.Browser;
+using RealmCore.Server.Behaviours;
 using RealmCore.Server.Logic.Components;
 using RealmCore.Server.Logic.Elements;
 using RealmCore.SQLite;
@@ -93,31 +94,46 @@ public static class ServerBuilderExtensions
         #endregion
 
         #region Resources Logics
-        serverBuilder.AddLogic<BrowserGuiComponentLogic>();
-        serverBuilder.AddLogic<AdminResourceLogic>();
-        serverBuilder.AddLogic<AFKResourceLogic>();
-        serverBuilder.AddLogic<BoneAttachResourceLogic>();
-        serverBuilder.AddLogic<BrowserResourceLogic>();
-        serverBuilder.AddLogic<ClientInterfaceResourceLogic>();
-        serverBuilder.AddLogic<NametagResourceLogic>();
-        serverBuilder.AddLogic<OutlineResourceLogic>();
-        serverBuilder.AddLogic<StatisticsCounterResourceLogic>();
-        serverBuilder.AddLogic<Text3dComponentLogic>();
-        serverBuilder.AddLogic<WatermarkResourceLogic>();
-        serverBuilder.AddLogic<DailyVisitsCounterComponentLogic>();
-        serverBuilder.AddLogic<AdminComponentLogic>();
-        serverBuilder.AddLogic<FocusableComponentLogic>();
-        serverBuilder.AddLogic<CollisionShapeElementComponentLogic>();
-        serverBuilder.AddLogic<StatefulHudComponentLogic>();
-        serverBuilder.AddLogic<JobSessionComponentLogic>();
-        serverBuilder.AddLogic<InteractionComponentLogic>();
-        serverBuilder.AddLogic<Hud3dComponentBaseLogic>();
-        serverBuilder.AddLogic<LiftableWorldObjectComponentLogic>();
-        serverBuilder.AddLogic<VehicleUpgradesComponentLogic>();
-        serverBuilder.AddLogic<UpdateCallbackLogic>();
-        serverBuilder.AddLogic<PickupElementComponentLogic>();
-        serverBuilder.AddLogic<UserComponentLogic>();
-        serverBuilder.AddLogic<PrivateVehicleComponentLogic>();
+        serverBuilder.AddScopedLogic<BrowserGuiComponentLogic>();
+        serverBuilder.AddScopedLogic<AdminResourceLogic>();
+        serverBuilder.AddScopedLogic<AFKResourceLogic>();
+        serverBuilder.AddScopedLogic<BoneAttachResourceLogic>();
+        serverBuilder.AddScopedLogic<BrowserResourceLogic>();
+        serverBuilder.AddScopedLogic<ClientInterfaceResourceLogic>();
+        serverBuilder.AddScopedLogic<NametagResourceLogic>();
+        serverBuilder.AddScopedLogic<OutlineResourceLogic>();
+        serverBuilder.AddScopedLogic<StatisticsCounterResourceLogic>();
+        serverBuilder.AddScopedLogic<Text3dComponentLogic>();
+        serverBuilder.AddScopedLogic<WatermarkResourceLogic>();
+        serverBuilder.AddScopedLogic<DailyVisitsCounterComponentLogic>();
+        serverBuilder.AddScopedLogic<AdminComponentLogic>();
+        serverBuilder.AddScopedLogic<FocusableComponentLogic>();
+        serverBuilder.AddScopedLogic<CollisionShapeElementComponentLogic>();
+        serverBuilder.AddScopedLogic<StatefulHudComponentLogic>();
+        serverBuilder.AddScopedLogic<JobSessionComponentLogic>();
+        serverBuilder.AddScopedLogic<InteractionComponentLogic>();
+        serverBuilder.AddScopedLogic<Hud3dComponentBaseLogic>();
+        serverBuilder.AddScopedLogic<LiftableWorldObjectComponentLogic>();
+        serverBuilder.AddScopedLogic<VehicleUpgradesComponentLogic>();
+        serverBuilder.AddScopedLogic<UpdateCallbackLogic>();
+        serverBuilder.AddScopedLogic<PickupElementComponentLogic>();
+        serverBuilder.AddScopedLogic<UserComponentLogic>();
+        serverBuilder.AddScopedLogic<PrivateVehicleComponentLogic>();
+        serverBuilder.AddScopedLogic<InventoryComponentLogic>();
+        serverBuilder.AddScopedLogic<PlayersLogic>();
+        serverBuilder.AddScopedLogic<VehiclesLogic>();
+        serverBuilder.AddScopedLogic<GuiLogic>();
+        serverBuilder.AddScopedLogic<ServerLogic>();
+        serverBuilder.AddScopedLogic<BanLogic>();
+
+        serverBuilder.AddScopedLogic<VehicleUpgradeRegistryLogic>();
+        serverBuilder.AddScopedLogic<VehicleEnginesRegistryLogic>();
+
+        serverBuilder.AddScopedLogic<VehicleAccessControllerComponentLogic>();
+        #endregion
+
+        #region Behaviours
+        serverBuilder.AddBehaviour<PrivateCollisionShapeBehaviour>();
         #endregion
 
         return serverBuilder;

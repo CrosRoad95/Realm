@@ -10,7 +10,7 @@ public class VehicleUpgradeComponentTests
 
         var vehicleUpgradeRegistry = _realmTestingServer.GetRequiredService<VehicleUpgradeRegistry>();
 
-        vehicleUpgradeRegistry.AddUpgrade(1, new VehicleUpgradeRegistryEntry
+        vehicleUpgradeRegistry.AddUpgrade(1000000, new VehicleUpgradeRegistryEntry
         {
             MaxVelocity = new FloatValueUpgradeDescription
             {
@@ -19,7 +19,7 @@ public class VehicleUpgradeComponentTests
             },
         });
 
-        vehicleUpgradeRegistry.AddUpgrade(2, new VehicleUpgradeRegistryEntry
+        vehicleUpgradeRegistry.AddUpgrade(1000001, new VehicleUpgradeRegistryEntry
         {
             MaxVelocity = new FloatValueUpgradeDescription
             {
@@ -34,8 +34,8 @@ public class VehicleUpgradeComponentTests
         #endregion
     }
 
-    [InlineData(1, 400)]
-    [InlineData(2, 1510)]
+    [InlineData(1000000, 400)]
+    [InlineData(1000001, 1510)]
     [Theory]
     public void AddUpgradeShouldWork(int upgradeId, int expectedMaxVelocity)
     {
@@ -54,8 +54,8 @@ public class VehicleUpgradeComponentTests
         #endregion
     }
 
-    [InlineData(1, 400)]
-    [InlineData(2, 1510)]
+    [InlineData(1000000, 400)]
+    [InlineData(1000001, 1510)]
     [Theory]
     public void AddUniqueUpgradeShouldAddOnlyOneInstanceOfUpgrade(int upgradeId, int expectedMaxVelocity)
     {
@@ -79,8 +79,8 @@ public class VehicleUpgradeComponentTests
         #region Act
         var vehicleEntity = _realmTestingServer.GetRequiredService<IEntityFactory>().CreateVehicle(404, Vector3.Zero, Vector3.Zero);
         var vehicleUpgradesComponent = vehicleEntity.AddComponent<VehicleUpgradesComponent>();
-        vehicleUpgradesComponent.AddUpgrade(1);
-        vehicleUpgradesComponent.RemoveUpgrade(1);
+        vehicleUpgradesComponent.AddUpgrade(1000000);
+        vehicleUpgradesComponent.RemoveUpgrade(1000000);
         #endregion
 
         #region Assert
@@ -94,7 +94,7 @@ public class VehicleUpgradeComponentTests
         #region Act
         var vehicleEntity = _realmTestingServer.GetRequiredService<IEntityFactory>().CreateVehicle(404, Vector3.Zero, Vector3.Zero);
         var vehicleUpgradesComponent = vehicleEntity.AddComponent<VehicleUpgradesComponent>();
-        vehicleUpgradesComponent.AddUpgrades(Enumerable.Range(1, 3).Select(x => 1));
+        vehicleUpgradesComponent.AddUpgrades(Enumerable.Range(1, 3).Select(x => 1000000));
         #endregion
 
         #region Assert

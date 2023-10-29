@@ -3,7 +3,7 @@ using RealmCore.Server.Json.Converters;
 
 namespace RealmCore.Server.Services;
 
-internal sealed class UsersService : IUsersService
+internal sealed class UsersService : IUsersService, IDisposable
 {
     private readonly ItemsRegistry _itemsRegistry;
     private readonly SignInManager<UserData> _signInManager;
@@ -324,5 +324,10 @@ internal sealed class UsersService : IUsersService
             return await _userEventRepository.GetLastEventsByUserId(userComponent.Id, limit, events);
         }
         return new();
+    }
+
+    public void Dispose()
+    {
+        throw new NotImplementedException();
     }
 }

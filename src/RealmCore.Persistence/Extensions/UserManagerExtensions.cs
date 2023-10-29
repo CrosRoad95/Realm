@@ -21,10 +21,19 @@ public static class UserManagerExtensions
         return await query.FirstOrDefaultAsync(cancellationToken);
     }
 
-    public static async Task<UserData?> GetUserById(this UserManager<UserData> userManager, int id, CancellationToken cancellationToken = default)
+    public static async Task<UserData?> GetReadOnlyUserById(this UserManager<UserData> userManager, int id, CancellationToken cancellationToken = default)
     {
         var query = userManager.Users
             .AsNoTracking()
+            .TagWith(nameof(UserManagerExtensions))
+            .Where(x => x.Id == id);
+
+        return await query.FirstOrDefaultAsync(cancellationToken);
+    }
+
+    public static async Task<UserData?> GetUserById(this UserManager<UserData> userManager, int id, CancellationToken cancellationToken = default)
+    {
+        var query = userManager.Users
             .TagWith(nameof(UserManagerExtensions))
             .Where(x => x.Id == id);
 

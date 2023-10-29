@@ -1,7 +1,31 @@
-﻿using RealmCore.Server.Behaviours;
+﻿using Microsoft.Extensions.DependencyInjection;
+using RealmCore.Server.Behaviours;
 using RealmCore.Server.Logic.Components;
 
 namespace RealmCore.Server;
+
+public static class ServerBuilderExtensions
+{
+    public static T InstantiateScoped<T>(this MtaServer mtaServer, params object[] parameters)
+    {
+        var scope = mtaServer.Services.CreateScope();
+        return ActivatorUtilities.CreateInstance<T>(scope.ServiceProvider, parameters);
+    }
+
+    public static void InstantiatePersistentScoped<T>(this ServerBuilder serverBuilder, params object[] parameters)
+    {
+        object[] parameters2 = parameters;
+        serverBuilder.AddBuildStep(delegate (MtaServer server)
+        {
+            server.InstantiateScoped<T>(parameters2);
+        });
+    }
+
+    public static void AddScopedLogic<T>(this ServerBuilder serverBuilder, params object[] parameters)
+    {
+        serverBuilder.InstantiatePersistent<T>(parameters);
+    }
+}
 
 public class RealmServer : MtaServer, IRealmServer
 {
@@ -10,19 +34,6 @@ public class RealmServer : MtaServer, IRealmServer
 
     public RealmServer(IRealmConfigurationProvider realmConfigurationProvider, Action<ServerBuilder>? configureServerBuilder = null) : base(serverBuilder =>
     {
-        serverBuilder.AddLogic<PlayersLogic>();
-        serverBuilder.AddLogic<VehiclesLogic>();
-        serverBuilder.AddLogic<GuiLogic>();
-        serverBuilder.AddLogic<ServerLogic>();
-        serverBuilder.AddLogic<BanLogic>();
-
-        serverBuilder.AddLogic<VehicleUpgradeRegistryLogic>();
-        serverBuilder.AddLogic<VehicleEnginesRegistryLogic>();
-
-        serverBuilder.AddLogic<VehicleAccessControllerComponentLogic>();
-
-        serverBuilder.AddBehaviour<PrivateCollisionShapeBehaviour>();
-
         serverBuilder.ConfigureServer(realmConfigurationProvider);
         configureServerBuilder?.Invoke(serverBuilder);
 

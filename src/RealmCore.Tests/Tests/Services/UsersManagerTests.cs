@@ -70,7 +70,7 @@ public class UsersManagerTests
         #region Assert
         signedIn.Should().BeFalse();
         playerEntity.Components.Should().HaveCount(3);
-        wasComponentCount.Should().Be(16);
+        wasComponentCount.Should().Be(17);
         #endregion
     }
 
