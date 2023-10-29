@@ -42,7 +42,6 @@ public sealed class RealmCommandService
     private readonly IEntityEngine _entityEngine;
     private readonly IPolicyDrivenCommandExecutor _policyDrivenCommandExecutor;
     private readonly ChatBox _chatBox;
-    private readonly IServiceProvider _serviceProvider;
     private readonly ILogger<RealmCommandService> _logger;
 
     private readonly Dictionary<string, AsyncCommandInfo> _asyncCommands = new();
@@ -52,14 +51,13 @@ public sealed class RealmCommandService
     public List<string> CommandNames => _commands.Keys.Concat(_asyncCommands.Keys).ToList();
     public int Count => _commands.Count + _asyncCommands.Count;
 
-    public RealmCommandService(CommandService commandService, ILogger<RealmCommandService> logger, IEntityEngine entityEngine, IPolicyDrivenCommandExecutor policyDrivenCommandExecutor, ChatBox chatBox, IServiceProvider serviceProvider)
+    public RealmCommandService(CommandService commandService, ILogger<RealmCommandService> logger, IEntityEngine entityEngine, IPolicyDrivenCommandExecutor policyDrivenCommandExecutor, ChatBox chatBox)
     {
         _logger = logger;
         _commandService = commandService;
         _entityEngine = entityEngine;
         _policyDrivenCommandExecutor = policyDrivenCommandExecutor;
         _chatBox = chatBox;
-        _serviceProvider = serviceProvider;
     }
 
     internal void ClearCommands()
@@ -159,8 +157,7 @@ public sealed class RealmCommandService
 
         try
         {
-            using var scope = _serviceProvider.CreateScope();
-            var commandArguments = new CommandArguments(args.Arguments, scope.ServiceProvider);
+            var commandArguments = new CommandArguments(args.Arguments, ((RealmPlayer)args.Player).ServiceProvider);
             if (userComponent.HasClaim("commandsNoLimit"))
                 commandInfo.Callback(entity, commandArguments);
             else
@@ -257,8 +254,7 @@ public sealed class RealmCommandService
         _logger.LogInformation("{player} executed command {commandText} with arguments {commandArguments}.", entity);
         try
         {
-            using var scope = _serviceProvider.CreateScope();
-            var commandArguments = new CommandArguments(args.Arguments, scope.ServiceProvider);
+            var commandArguments = new CommandArguments(args.Arguments, ((RealmPlayer)args.Player).ServiceProvider);
             if (userComponent.HasClaim("commandsNoLimit"))
                 await commandInfo.Callback(entity, commandArguments);
             else

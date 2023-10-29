@@ -84,7 +84,7 @@ public sealed class Entity : IDisposable
     {
         return AddComponent(ActivatorUtilities.CreateInstance<TComponent>(serviceProvider, parameters));
     }
-
+    
     public TComponent AddComponent<TComponent>(TComponent component) where TComponent : Component
     {
         ThrowIfDisposed();

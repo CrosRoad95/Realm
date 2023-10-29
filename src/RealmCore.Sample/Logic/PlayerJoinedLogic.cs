@@ -10,10 +10,9 @@ internal sealed class PlayerJoinedLogic : ComponentLogic<UserComponent>
     private readonly INametagsService _nametagsService;
     private readonly ChatBox _chatBox;
     private readonly Text3dService _text3DService;
-    private readonly UserManager<UserData> _userManager;
     private readonly IGuiSystemService? _guiSystemService;
 
-    public PlayerJoinedLogic(IServiceProvider serviceProvider, IEntityEngine entityEngine, ILogger<PlayerJoinedLogic> logger, INametagsService nametagsService,ChatBox chatBox, Text3dService text3DService, UserManager<UserData> userManager, IBrowserGuiService browserGuiService, IGuiSystemService? guiSystemService = null) : base(entityEngine)
+    public PlayerJoinedLogic(IServiceProvider serviceProvider, IEntityEngine entityEngine, ILogger<PlayerJoinedLogic> logger, INametagsService nametagsService,ChatBox chatBox, Text3dService text3DService, IBrowserGuiService browserGuiService, IGuiSystemService? guiSystemService = null) : base(entityEngine)
     {
         _serviceProvider = serviceProvider;
         _entityEngine = entityEngine;
@@ -21,7 +20,6 @@ internal sealed class PlayerJoinedLogic : ComponentLogic<UserComponent>
         _nametagsService = nametagsService;
         _chatBox = chatBox;
         _text3DService = text3DService;
-        _userManager = userManager;
         _guiSystemService = guiSystemService;
         _entityEngine.EntityCreated += HandleEntityCreated;
         browserGuiService.Ready += HandleReady;

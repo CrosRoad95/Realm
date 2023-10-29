@@ -7,16 +7,12 @@ public sealed class RegisterGuiComponent : DxGuiComponent
 {
     private readonly IServiceProvider _serviceProvider;
     private readonly IUsersService _usersService;
-    private readonly ILogger<RegisterGuiComponent> _loggerRegisterGuiWindow;
-    private readonly ILogger<LoginGuiComponent> _loggerLoginGuiWindow;
     private readonly UserManager<UserData> _userManager;
 
-    public RegisterGuiComponent(IServiceProvider serviceProvider, IUsersService usersService, ILogger<RegisterGuiComponent> loggerRegisterGuiWindow, ILogger<LoginGuiComponent> loggerLoginGuiWindow, UserManager<UserData> userManager) : base("register", false)
+    public RegisterGuiComponent(IServiceProvider serviceProvider, IUsersService usersService, UserManager<UserData> userManager) : base("register", false)
     {
         _serviceProvider = serviceProvider;
         _usersService = usersService;
-        _loggerRegisterGuiWindow = loggerRegisterGuiWindow;
-        _loggerLoginGuiWindow = loggerLoginGuiWindow;
         _userManager = userManager;
     }
 
@@ -62,7 +58,7 @@ public sealed class RegisterGuiComponent : DxGuiComponent
         {
             case "navigateToLogin":
                 var scope = _serviceProvider.CreateScope();
-                Entity.AddComponent<LoginGuiComponent>(scope.ServiceProvider);
+                Entity.AddComponentWithDI<LoginGuiComponent>();
                 Entity.DestroyComponent(this);
                 break;
             default:

@@ -1,4 +1,6 @@
-﻿namespace RealmCore.Server;
+﻿using SlipeServer.Net.Wrappers;
+
+namespace RealmCore.Server;
 
 public static class ServerBuilderExtensions
 {
@@ -23,7 +25,20 @@ public static class ServerBuilderExtensions
     }
 }
 
-public class RealmServer : MtaServer, IRealmServer
+public class MtaDiPlayerServerTempFix<TPlayer> : MtaServer<TPlayer> where TPlayer : Player
+{
+    public MtaDiPlayerServerTempFix(Action<ServerBuilder> builderAction) : base(builderAction) { }
+
+    protected override IClient CreateClient(uint binaryAddress, INetWrapper netWrapper)
+    {
+        var player = this.Instantiate<TPlayer>();
+        player.Client = new Client<TPlayer>(binaryAddress, netWrapper, player);
+        return player.Client;
+    }
+}
+
+
+public class RealmServer : MtaDiPlayerServerTempFix<RealmPlayer>, IRealmServer
 {
     public Entity Console { get; private set; } = null!;
     public event Action? ServerStarted;

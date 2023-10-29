@@ -7,16 +7,14 @@ public sealed class LoginGuiComponent : DxGuiComponent
 {
     private readonly IServiceProvider _serviceProvider;
     private readonly IUsersService _usersService;
-    private readonly ILogger<LoginGuiComponent> _loggerLoginGuiComponent;
-    private readonly ILogger<RegisterGuiComponent> _loggerRegisterGuiComponent;
+    private readonly ILogger<LoginGuiComponent> _logger;
     private readonly UserManager<UserData> _userManager;
 
-    public LoginGuiComponent(IServiceProvider serviceProvider, IUsersService usersService, ILogger<LoginGuiComponent> loggerLoginGuiComponent, ILogger<RegisterGuiComponent> loggerRegisterGuiComponent, UserManager<UserData> userManager) : base("login", false)
+    public LoginGuiComponent(IServiceProvider serviceProvider, IUsersService usersService, ILogger<LoginGuiComponent> logger, UserManager<UserData> userManager) : base("login", false)
     {
         _serviceProvider = serviceProvider;
         _usersService = usersService;
-        _loggerLoginGuiComponent = loggerLoginGuiComponent;
-        _loggerRegisterGuiComponent = loggerRegisterGuiComponent;
+        _logger = logger;
         _userManager = userManager;
     }
 
@@ -68,7 +66,7 @@ public sealed class LoginGuiComponent : DxGuiComponent
                 }
                 catch (Exception ex)
                 {
-                    _loggerLoginGuiComponent.LogHandleError(ex);
+                    _logger.LogHandleError(ex);
                     formContext.ErrorResponse("Błąd podczas logowania.");
                 }
                 break;
@@ -82,8 +80,7 @@ public sealed class LoginGuiComponent : DxGuiComponent
         switch (actionContext.ActionName)
         {
             case "navigateToRegister":
-                var scope = _serviceProvider.CreateScope();
-                Entity.AddComponent<RegisterGuiComponent>(scope.ServiceProvider);
+                Entity.AddComponentWithDI<RegisterGuiComponent>();
                 Entity.DestroyComponent(this);
                 break;
             default:

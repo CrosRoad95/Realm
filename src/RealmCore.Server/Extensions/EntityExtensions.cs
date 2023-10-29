@@ -1,4 +1,6 @@
-﻿namespace RealmCore.Server.Extensions;
+﻿using Microsoft.Extensions.DependencyInjection;
+
+namespace RealmCore.Server.Extensions;
 
 public static class EntityExtensions
 {
@@ -18,6 +20,12 @@ public static class EntityExtensions
     {
         var length = (a.Transform.Position - b.Transform.Position).Length();
         return length;
+    }
+
+    public static TComponent AddComponentWithDI<TComponent>(this Entity entity, params object[] parameters) where TComponent : Component
+    {
+        var realmPlayer = (RealmPlayer)entity.GetPlayer();
+        return entity.AddComponent(ActivatorUtilities.CreateInstance<TComponent>(realmPlayer.ServiceProvider, parameters));
     }
 
     internal static bool TryGetElement(this Entity entity, out Element element)

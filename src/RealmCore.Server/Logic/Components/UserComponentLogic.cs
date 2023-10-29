@@ -3,25 +3,21 @@
 internal sealed class UserComponentLogic : ComponentLogic<UserComponent>
 {
     private readonly IActiveUsers _activeUsers;
-    private readonly UserManager<UserData> _userManager;
     private readonly IDateTimeProvider _dateTimeProvider;
     private readonly ILogger<UserComponentLogic> _logger;
-    private readonly IServiceProvider _serviceProvider;
 
-    public UserComponentLogic(IEntityEngine entityEngine, IActiveUsers activeUsers, UserManager<UserData> userManager, IDateTimeProvider dateTimeProvider, ILogger<UserComponentLogic> logger, IServiceProvider serviceProvider) : base(entityEngine)
+    public UserComponentLogic(IEntityEngine entityEngine, IActiveUsers activeUsers, IDateTimeProvider dateTimeProvider, ILogger<UserComponentLogic> logger) : base(entityEngine)
     {
         _activeUsers = activeUsers;
-        _userManager = userManager;
         _dateTimeProvider = dateTimeProvider;
         _logger = logger;
-        _serviceProvider = serviceProvider;
     }
 
     private async Task<string?> ValidatePolicies(UserComponent userComponent)
     {
-        using var scope = _serviceProvider.CreateScope();
-        var usersService = scope.ServiceProvider.GetRequiredService<IUsersService>();
-        var authorizationPoliciesProvider = scope.ServiceProvider.GetRequiredService<AuthorizationPoliciesProvider>();
+        var realmPlayer = (RealmPlayer)userComponent.Entity.GetPlayer();
+        var usersService = realmPlayer.ServiceProvider.GetRequiredService<IUsersService>();
+        var authorizationPoliciesProvider = realmPlayer.ServiceProvider.GetRequiredService<AuthorizationPoliciesProvider>();
         foreach (var policy in authorizationPoliciesProvider.Policies)
             if (!await usersService.AuthorizePolicy(userComponent, policy))
                 return policy;
@@ -34,7 +30,9 @@ internal sealed class UserComponentLogic : ComponentLogic<UserComponent>
         var entity = userComponent.Entity;
         if (entity.TryGetComponent(out PlayerElementComponent playerElementComponent))
         {
-            var user = await _userManager.GetUserById(userComponent.Id);
+            var realmPlayer = (RealmPlayer)entity.GetPlayer();
+            var userManager = realmPlayer.ServiceProvider.GetRequiredService<UserManager<UserData>>();
+            var user = await userManager.GetUserById(userComponent.Id);
             if(user != null)
             {
                 user.LastLoginDateTime = _dateTimeProvider.Now;

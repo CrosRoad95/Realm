@@ -1,23 +1,19 @@
-﻿using SlipeServer.Server.Resources.Providers;
+﻿namespace RealmCore.Server.Logic;
 
-namespace RealmCore.Server.Logic;
-
-internal class PlayersLogic
+internal sealed class PlayersLogic
 {
     private readonly IEntityEngine _entityEngine;
     private readonly MtaServer _mtaServer;
     private readonly IClientInterfaceService _clientInterfaceService;
-    private readonly ISaveService _saveService;
     private readonly ILogger<PlayersLogic> _logger;
     private readonly IResourceProvider _resourceProvider;
     private readonly ConcurrentDictionary<Player, Latch> _playerResources = new();
 
-    public PlayersLogic(IEntityEngine entityEngine, MtaServer mtaServer, IClientInterfaceService clientInterfaceService, ISaveService saveService, ILogger<PlayersLogic> logger, IResourceProvider resourceProvider)
+    public PlayersLogic(IEntityEngine entityEngine, MtaServer mtaServer, IClientInterfaceService clientInterfaceService, ILogger<PlayersLogic> logger, IResourceProvider resourceProvider)
     {
         _entityEngine = entityEngine;
         _mtaServer = mtaServer;
         _clientInterfaceService = clientInterfaceService;
-        _saveService = saveService;
         _logger = logger;
         _resourceProvider = resourceProvider;
         _mtaServer.PlayerJoined += HandlePlayerJoined;
@@ -124,11 +120,12 @@ internal class PlayersLogic
             return;
         try
         {
+            var realmPlayer = (RealmPlayer)player;
             player.Disconnected -= HandlePlayerDisconnected;
             _playerResources.TryRemove(player, out var _);
             try
             {
-                await _saveService.Save(playerEntity);
+                await realmPlayer.ServiceProvider.GetRequiredService<ISaveService>().Save(playerEntity);
             }
             finally
             {

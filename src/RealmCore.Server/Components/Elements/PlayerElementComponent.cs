@@ -864,6 +864,7 @@ public sealed class PlayerElementComponent : PedElementComponent
         _player.BindExecuted -= HandleBindExecuted;
         _player.Wasted -= HandleWasted;
         _player.Damaged -= HandleDamaged;
+        ((RealmPlayer)_player).Dispose();
         base.Dispose();
     }
 }
