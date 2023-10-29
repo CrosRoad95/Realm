@@ -16,6 +16,6 @@ public abstract class DxGuiComponent : GuiComponent
     protected virtual Task HandleForm(IFormContext formContext) { return Task.CompletedTask; }
     protected virtual Task HandleAction(IActionContext actionContext) { return Task.CompletedTask; }
 
-    internal Task InternalkHandleForm(IFormContext formContext) => HandleForm(formContext);
+    internal Task InternalHandleForm(IFormContext formContext) => HandleForm(formContext);
     internal Task InternalHandleAction(IActionContext actionContext) => HandleAction(actionContext);
 }

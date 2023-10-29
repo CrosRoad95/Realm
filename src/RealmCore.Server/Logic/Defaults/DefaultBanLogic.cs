@@ -5,26 +5,17 @@ public class DefaultBanLogic
     private readonly MtaServer _mtaServer;
     private readonly IOptionsMonitor<GameplayOptions> _gameplayOptions;
     private readonly ILogger<DefaultBanLogic> _logger;
-    private readonly IBanRepository _banRepository;
     private readonly IDateTimeProvider _dateTimeProvider;
-    private int _banType;
-    public DefaultBanLogic(MtaServer mtaServer, IOptionsMonitor<GameplayOptions> gameplayOptions, ILogger<DefaultBanLogic> logger, IBanRepository banRepository, IDateTimeProvider dateTimeProvider)
+    private readonly IServiceProvider _serviceProvider;
+
+    public DefaultBanLogic(MtaServer mtaServer, IOptionsMonitor<GameplayOptions> gameplayOptions, ILogger<DefaultBanLogic> logger, IBanRepository banRepository, IDateTimeProvider dateTimeProvider, IServiceProvider serviceProvider)
     {
         _mtaServer = mtaServer;
         _gameplayOptions = gameplayOptions;
         _logger = logger;
-        _banRepository = banRepository;
         _dateTimeProvider = dateTimeProvider;
+        _serviceProvider = serviceProvider;
         _mtaServer.PlayerJoined += HandlePlayerJoined;
-
-        _gameplayOptions.OnChange(GameplayOptionsChanged);
-        _banType = _gameplayOptions.CurrentValue.BanType;
-    }
-
-    private void GameplayOptionsChanged(GameplayOptions gameplayOptions)
-    {
-        _banType = gameplayOptions.BanType;
-        _logger.LogInformation("Changed ban type to {banType}", _banType);
     }
 
     private async Task HandlePlayerJoinedCore(Player player)
@@ -39,7 +30,8 @@ public class DefaultBanLogic
             return;
         }
 
-        var bans = await _banRepository.GetBansBySerial(player.Client.Serial, _dateTimeProvider.Now, _banType);
+        using var scope = _serviceProvider.CreateScope();
+        var bans = await scope.ServiceProvider.GetRequiredService<IBanRepository>().GetBansBySerial(player.Client.Serial, _dateTimeProvider.Now, _gameplayOptions.CurrentValue.BanType);
         if (bans != null && bans.Count > 0)
         {
             var ban = bans[0];

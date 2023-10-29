@@ -249,14 +249,14 @@ internal sealed class CommandsLogic
         _commandService.AddCommandHandler("addmeasowner", (entity, args) =>
         {
             var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();
-            var veh = playerElementComponent.OccupiedVehicle;
+            var veh = playerElementComponent.Vehicle;
             veh.GetRequiredComponent<PrivateVehicleComponent>().Access.AddAsOwner(entity);
         });
 
         _commandService.AddCommandHandler("accessinfo", (entity, args) =>
         {
             var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();
-            var veh = playerElementComponent.OccupiedVehicle;
+            var veh = playerElementComponent.Vehicle;
             if (veh == null)
             {
                 _chatBox.OutputTo(entity, "Enter vehicle!");
@@ -316,7 +316,7 @@ internal sealed class CommandsLogic
         _commandService.AddCommandHandler("addvehicleupgrade", (entity, args) =>
         {
             var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();
-            var veh = playerElementComponent.OccupiedVehicle;
+            var veh = playerElementComponent.Vehicle;
             if (veh == null)
             {
                 _chatBox.OutputTo(entity, "Enter vehicle!");
@@ -865,7 +865,7 @@ internal sealed class CommandsLogic
         _commandService.AddCommandHandler("randomvehcolor", (entity, args) =>
         {
             var rnd = Random.Shared;
-            var veh = entity.GetRequiredComponent<PlayerElementComponent>().OccupiedVehicle.GetRequiredComponent<VehicleElementComponent>();
+            var veh = entity.GetRequiredComponent<PlayerElementComponent>().Vehicle.GetRequiredComponent<VehicleElementComponent>();
             veh.PrimaryColor = Color.FromArgb(rnd.Next(256), rnd.Next(256), rnd.Next(256));
             veh.SecondaryColor = Color.FromArgb(rnd.Next(256), rnd.Next(256), rnd.Next(256));
             veh.Color3 = Color.FromArgb(rnd.Next(256), rnd.Next(256), rnd.Next(256));
@@ -925,7 +925,7 @@ internal sealed class CommandsLogic
         _commandService.AddCommandHandler("addvisualupgrade", (entity, args) =>
         {
             var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();
-            if (playerElementComponent.OccupiedVehicle.GetRequiredComponent<VehicleUpgradesComponent>().AddUniqueUpgrade(3))
+            if (playerElementComponent.Vehicle.GetRequiredComponent<VehicleUpgradesComponent>().AddUniqueUpgrade(3))
             {
                 _chatBox.OutputTo(entity, $"dodano wizualne ulepszenie");
             }
@@ -950,13 +950,13 @@ internal sealed class CommandsLogic
         _commandService.AddAsyncCommandHandler("despawn", async (entity, args) =>
         {
             var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();
-            await _vehiclesService.Destroy(playerElementComponent.OccupiedVehicle);
+            await _vehiclesService.Destroy(playerElementComponent.Vehicle);
         });
 
         _commandService.AddCommandHandler("disposeveh", (entity, args) =>
         {
             var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();
-            playerElementComponent.OccupiedVehicle.Dispose();
+            playerElementComponent.Vehicle.Dispose();
         });
 
         _commandService.AddAsyncCommandHandler("spawnback", async (entity, args) =>
@@ -1158,13 +1158,13 @@ internal sealed class CommandsLogic
 
         _commandService.AddAsyncCommandHandler("setkind", async (entity, args) =>
         {
-            await _vehiclesService.SetVehicleKind(entity.GetRequiredComponent<PlayerElementComponent>().OccupiedVehicle, 42);
+            await _vehiclesService.SetVehicleKind(entity.GetRequiredComponent<PlayerElementComponent>().Vehicle, 42);
         });
 
         _commandService.AddAsyncCommandHandler("kind", async (entity, args) =>
         {
             var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();
-            var veh = playerElementComponent.OccupiedVehicle;
+            var veh = playerElementComponent.Vehicle;
             var kind = veh.GetRequiredComponent<PrivateVehicleComponent>().Kind;
             _chatBox.OutputTo(entity, $"Kind: {kind}");
         });
@@ -1177,13 +1177,13 @@ internal sealed class CommandsLogic
 
         _commandService.AddAsyncCommandHandler("addvehevent", async (entity, args) =>
         {
-            await _vehiclesService.AddVehicleEvent(entity.GetRequiredComponent<PlayerElementComponent>().OccupiedVehicle, 1);
+            await _vehiclesService.AddVehicleEvent(entity.GetRequiredComponent<PlayerElementComponent>().Vehicle, 1);
         });
 
         _commandService.AddAsyncCommandHandler("vehevents", async (entity, args) =>
         {
             var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();
-            var events = await _vehiclesService.GetAllVehicleEvents(playerElementComponent.OccupiedVehicle);
+            var events = await _vehiclesService.GetAllVehicleEvents(playerElementComponent.Vehicle);
             _chatBox.OutputTo(entity, "Events:");
             foreach (var item in events)
             {

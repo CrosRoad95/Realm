@@ -5,13 +5,15 @@ namespace RealmCore.Sample.Components.Gui;
 
 public sealed class RegisterGuiComponent : DxGuiComponent
 {
+    private readonly IServiceProvider _serviceProvider;
     private readonly IUsersService _usersService;
     private readonly ILogger<RegisterGuiComponent> _loggerRegisterGuiWindow;
     private readonly ILogger<LoginGuiComponent> _loggerLoginGuiWindow;
     private readonly UserManager<UserData> _userManager;
 
-    public RegisterGuiComponent(IUsersService usersService, ILogger<RegisterGuiComponent> loggerRegisterGuiWindow, ILogger<LoginGuiComponent> loggerLoginGuiWindow, UserManager<UserData> userManager) : base("register", false)
+    public RegisterGuiComponent(IServiceProvider serviceProvider, IUsersService usersService, ILogger<RegisterGuiComponent> loggerRegisterGuiWindow, ILogger<LoginGuiComponent> loggerLoginGuiWindow, UserManager<UserData> userManager) : base("register", false)
     {
+        _serviceProvider = serviceProvider;
         _usersService = usersService;
         _loggerRegisterGuiWindow = loggerRegisterGuiWindow;
         _loggerLoginGuiWindow = loggerLoginGuiWindow;
@@ -39,7 +41,9 @@ public sealed class RegisterGuiComponent : DxGuiComponent
                 try
                 {
                     var userId = await _usersService.SignUp(registerData.Login, registerData.Password);
-                    Entity.AddComponent(new LoginGuiComponent(_usersService, _loggerLoginGuiWindow, _loggerRegisterGuiWindow, _userManager));
+
+                    var scope = _serviceProvider.CreateScope();
+                    Entity.AddComponent<LoginGuiComponent>(scope.ServiceProvider);
                     Entity.DestroyComponent(this);
                 }
                 catch (Exception ex)
@@ -57,7 +61,8 @@ public sealed class RegisterGuiComponent : DxGuiComponent
         switch (actionContext.ActionName)
         {
             case "navigateToLogin":
-                Entity.AddComponent(new LoginGuiComponent(_usersService, _loggerLoginGuiWindow, _loggerRegisterGuiWindow, _userManager));
+                var scope = _serviceProvider.CreateScope();
+                Entity.AddComponent<LoginGuiComponent>(scope.ServiceProvider);
                 Entity.DestroyComponent(this);
                 break;
             default:

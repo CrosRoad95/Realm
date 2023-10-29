@@ -1,4 +1,5 @@
-﻿using RealmCore.ECS.Attributes;
+﻿using Microsoft.Extensions.DependencyInjection;
+using RealmCore.ECS.Attributes;
 using RealmCore.ECS.Interfaces;
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
@@ -72,6 +73,16 @@ public sealed class Entity : IDisposable
     public TComponent AddComponent<TComponent>() where TComponent : Component, new()
     {
         return AddComponent(new TComponent());
+    }
+
+    public TComponent AddComponent<TComponent>(IServiceProvider serviceProvider) where TComponent : Component
+    {
+        return AddComponent(ActivatorUtilities.CreateInstance<TComponent>(serviceProvider));
+    }
+    
+    public TComponent AddComponent<TComponent>(IServiceProvider serviceProvider, params object[] parameters) where TComponent : Component
+    {
+        return AddComponent(ActivatorUtilities.CreateInstance<TComponent>(serviceProvider, parameters));
     }
 
     public TComponent AddComponent<TComponent>(TComponent component) where TComponent : Component

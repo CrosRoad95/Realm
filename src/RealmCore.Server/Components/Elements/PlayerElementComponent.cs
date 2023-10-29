@@ -10,7 +10,6 @@ public sealed class PlayerElementComponent : PedElementComponent
     private readonly Vector2 _screenSize;
     private readonly CultureInfo _culture;
     private readonly IEntityEngine _entityEngine;
-    private readonly IDateTimeProvider _dateTimeProvider;
     private readonly Dictionary<string, Func<Entity, KeyState, Task>> _asyncBinds = new();
     private readonly Dictionary<string, Action<Entity, KeyState>> _binds = new();
     private readonly SemaphoreSlim _bindsLock = new(1);
@@ -253,7 +252,7 @@ public sealed class PlayerElementComponent : PedElementComponent
             return _player.Controls;
         }
     }
-    
+
     public bool IsInWater
     {
         get
@@ -268,34 +267,31 @@ public sealed class PlayerElementComponent : PedElementComponent
 
     public event Action<PlayerElementComponent, PedWastedEventArgs>? Wasted;
     public event Action<PlayerElementComponent, PlayerDamagedEventArgs>? Damaged;
-    public event Action<Entity?>? OccupiedVehicleChanged;
+    public event Action<Entity?>? VehicleChanged;
 
-    public Entity? OccupiedVehicle
+    private Entity? _vehicle;
+    public Entity? Vehicle
     {
         get
         {
             ThrowIfDisposed();
-            if (_player.Vehicle == null)
-                return null;
-
-            _entityEngine.TryGetByElement(_player.Vehicle, out var entity);
-            return entity;
+            return _vehicle;
+        }
+        internal set
+        {
+            if(_vehicle != value)
+            {
+                _vehicle = value;
+                VehicleChanged?.Invoke(value);
+            }
         }
     }
 
-    internal PlayerElementComponent(Player player, Vector2 screenSize, CultureInfo cultureInfo, IEntityEngine entityEngine, IDateTimeProvider dateTimeProvider) : base(player)
+    internal PlayerElementComponent(Player player, Vector2 screenSize, CultureInfo cultureInfo) : base(player)
     {
-        player.IdChanged += Player_IdChanged;
         _player = player;
         _screenSize = screenSize;
         _culture = cultureInfo;
-        _entityEngine = entityEngine;
-        _dateTimeProvider = dateTimeProvider;
-    }
-
-    private void Player_IdChanged(Element sender, ElementChangedEventArgs<Element, ElementId> args)
-    {
-        throw new NotImplementedException();
     }
 
     protected override void Attach()
@@ -304,24 +300,9 @@ public sealed class PlayerElementComponent : PedElementComponent
         _player.BindExecuted += HandleBindExecuted;
         _player.Wasted += HandleWasted;
         _player.Damaged += HandleDamaged;
-        _player.VehicleChanged += HandleVehicleChanged;
         UpdateFight();
         _player.IsNametagShowing = false;
         base.Attach();
-    }
-
-    private void HandleVehicleChanged(Ped sender, ElementChangedEventArgs<Ped, Vehicle?> args)
-    {
-        if(args.NewValue == null)
-        {
-            OccupiedVehicleChanged?.Invoke(null);
-            return;
-        }
-
-        if(_entityEngine.TryGetByElement(args.NewValue, out var vehicleEntity))
-        {
-            OccupiedVehicleChanged?.Invoke(vehicleEntity);
-        }
     }
 
     private void HandleDamaged(Player sender, PlayerDamagedEventArgs e)
@@ -426,7 +407,7 @@ public sealed class PlayerElementComponent : PedElementComponent
         {
             await Task.Delay(TimeSpan.FromSeconds(fadeTime), cancellationTokenSource.Token);
         }
-        catch(Exception)
+        catch (Exception)
         {
             _player.Camera.Fade(cameraFade == CameraFade.In ? CameraFade.Out : CameraFade.In, 0);
             throw;
@@ -565,7 +546,7 @@ public sealed class PlayerElementComponent : PedElementComponent
         {
             await InternalHandleBindExecuted(e.Key, e.KeyState);
         }
-        catch(Exception)
+        catch (Exception)
         {
             // TODO: handle exception
         }
@@ -583,7 +564,7 @@ public sealed class PlayerElementComponent : PedElementComponent
                 _bindsUpCooldown.TryGetValue(key, out cooldownUntil);
         }
 
-        if (cooldownUntil > _dateTimeProvider.Now)
+        if (cooldownUntil > DateTime.Now)
         {
             return true;
         }
@@ -658,7 +639,7 @@ public sealed class PlayerElementComponent : PedElementComponent
             }
             finally
             {
-                TrySetCooldown(key, keyState, _dateTimeProvider.Now.AddMilliseconds(400));
+                TrySetCooldown(key, keyState, DateTime.Now.AddMilliseconds(400));
             }
         }
 
@@ -670,7 +651,7 @@ public sealed class PlayerElementComponent : PedElementComponent
             }
             finally
             {
-                TrySetCooldown(key, keyState, _dateTimeProvider.Now.AddMilliseconds(400));
+                TrySetCooldown(key, keyState, DateTime.Now.AddMilliseconds(400));
             }
         }
     }
@@ -684,7 +665,6 @@ public sealed class PlayerElementComponent : PedElementComponent
     public async Task DoComplexAnimationAsync(Animation animation, bool blockMovement = true)
     {
         ThrowIfDisposed();
-
 
         var walkEnabled = _player.Controls.WalkEnabled;
         var fireEnabled = _player.Controls.FireEnabled;
@@ -709,7 +689,7 @@ public sealed class PlayerElementComponent : PedElementComponent
                     throw new NotSupportedException();
             }
         }
-        catch(Exception)
+        catch (Exception)
         {
             throw;
         }
@@ -872,7 +852,7 @@ public sealed class PlayerElementComponent : PedElementComponent
         Entity.Transform.Dimension = vehicle.Dimension;
         _player.WarpIntoVehicle(vehicle, seat);
     }
-    
+
     public void RemoveFromVehicle(bool warpOut = true)
     {
         ThrowIfDisposed();
@@ -884,8 +864,6 @@ public sealed class PlayerElementComponent : PedElementComponent
         _player.BindExecuted -= HandleBindExecuted;
         _player.Wasted -= HandleWasted;
         _player.Damaged -= HandleDamaged;
-        _player.VehicleChanged -= HandleVehicleChanged;
-        _player.Kick(PlayerDisconnectType.SHUTDOWN);
         base.Dispose();
     }
 }

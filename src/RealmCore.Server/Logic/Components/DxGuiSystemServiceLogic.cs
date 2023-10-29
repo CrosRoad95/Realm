@@ -84,7 +84,7 @@ internal sealed class DxGuiSystemServiceLogic : ComponentLogic<DxGuiComponent>
                     var formContext = new FormContext(luaEvent.Player, formName, data, _guiSystemService, _entityEngine, _serviceProvider);
                     try
                     {
-                        await dxGuiComponent.InternalkHandleForm(formContext);
+                        await dxGuiComponent.InternalHandleForm(formContext);
                     }
                     catch (Exception ex)
                     {

@@ -6,7 +6,7 @@ public static class UserManagerExtensions
     {
         var query = userManager.Users
             .AsNoTracking()
-            .TagWith(nameof(UserManagerExtensions))
+            .TagWithSource(nameof(UserManagerExtensions))
             .Where(x => x.RegisterSerial == serial);
         return await query.FirstOrDefaultAsync(cancellationToken);
     }
@@ -15,7 +15,7 @@ public static class UserManagerExtensions
     {
         var query = userManager.Users
             .AsNoTracking()
-            .TagWith(nameof(UserManagerExtensions))
+            .TagWithSource(nameof(UserManagerExtensions))
             .Where(x => x.RegisterSerial == serial)
             .Select(x => x.Id);
         return await query.FirstOrDefaultAsync(cancellationToken);
@@ -25,7 +25,7 @@ public static class UserManagerExtensions
     {
         var query = userManager.Users
             .AsNoTracking()
-            .TagWith(nameof(UserManagerExtensions))
+            .TagWithSource(nameof(UserManagerExtensions))
             .Where(x => x.Id == id);
 
         return await query.FirstOrDefaultAsync(cancellationToken);
@@ -34,7 +34,7 @@ public static class UserManagerExtensions
     public static async Task<UserData?> GetUserById(this UserManager<UserData> userManager, int id, CancellationToken cancellationToken = default)
     {
         var query = userManager.Users
-            .TagWith(nameof(UserManagerExtensions))
+            .TagWithSource(nameof(UserManagerExtensions))
             .Where(x => x.Id == id);
 
         return await query.FirstOrDefaultAsync(cancellationToken);
@@ -44,7 +44,7 @@ public static class UserManagerExtensions
     {
         var query = userManager.Users
             .AsNoTracking()
-            .TagWith(nameof(UserManagerExtensions))
+            .TagWithSource(nameof(UserManagerExtensions))
             .Where(x => x.Id == id)
             .Select(x => x.UserName);
 
@@ -55,7 +55,7 @@ public static class UserManagerExtensions
     {
         var query = userManager.Users
             .AsNoTracking()
-            .TagWith(nameof(UserManagerExtensions))
+            .TagWithSource(nameof(UserManagerExtensions))
             .Where(x => x.Id == userId);
         await query.ExecuteUpdateAsync(x => x.SetProperty(y => y.IsDisabled, true), cancellationToken);
     }
@@ -64,7 +64,7 @@ public static class UserManagerExtensions
     {
         var query = userManager.Users
             .AsNoTracking()
-            .TagWith(nameof(UserManagerExtensions))
+            .TagWithSource(nameof(UserManagerExtensions))
             .Where(x => x.Id == userId);
         await query.ExecuteUpdateAsync(x => x.SetProperty(y => y.QuickLogin, enabled), cancellationToken);
     }
@@ -73,7 +73,7 @@ public static class UserManagerExtensions
     {
         var query = userManager.Users
             .AsNoTracking()
-            .TagWith(nameof(UserManagerExtensions))
+            .TagWithSource(nameof(UserManagerExtensions))
             .Where(x => x.RegisterSerial == serial)
             .Select(x => x.QuickLogin);
         return await query.FirstOrDefaultAsync(cancellationToken);
@@ -83,7 +83,7 @@ public static class UserManagerExtensions
     {
         var query = userManager.Users
             .AsNoTracking()
-            .TagWith(nameof(UserManagerExtensions))
+            .TagWithSource(nameof(UserManagerExtensions))
             .Where(x => x.Id == id)
             .Select(x => x.QuickLogin);
         return await query.FirstOrDefaultAsync(cancellationToken);
@@ -93,7 +93,7 @@ public static class UserManagerExtensions
     {
         var query = userManager.Users
             .AsNoTracking()
-            .TagWith(nameof(UserManagerExtensions))
+            .TagWithSource(nameof(UserManagerExtensions))
             .IncludeAll()
             .Where(u => u.UserName == login);
         return await query.FirstOrDefaultAsync(cancellationToken);
@@ -103,7 +103,7 @@ public static class UserManagerExtensions
     {
         var query = userManager.Users
             .AsNoTracking()
-            .TagWith(nameof(UserManagerExtensions))
+            .TagWithSource(nameof(UserManagerExtensions))
             .IncludeAll()
             .Where(u => u.NormalizedUserName == login.ToUpper());
         return await query.FirstOrDefaultAsync(cancellationToken);
@@ -112,7 +112,7 @@ public static class UserManagerExtensions
     public static async Task<int> CountUsersBySerial(this UserManager<UserData> userManager, string serial, CancellationToken cancellationToken = default)
     {
         var query = userManager.Users
-            .TagWith(nameof(UserManagerExtensions))
+            .TagWithSource(nameof(UserManagerExtensions))
             .Where(u => u.RegisterSerial == serial);
         return await query.CountAsync(cancellationToken);
     }
@@ -121,7 +121,7 @@ public static class UserManagerExtensions
     {
         var query = userManager.Users
             .AsNoTracking()
-            .TagWith(nameof(UserManagerExtensions))
+            .TagWithSource(nameof(UserManagerExtensions))
             .IncludeAll()
             .Where(u => u.RegisterSerial == serial);
         return await query.ToListAsync(cancellationToken);
@@ -139,7 +139,7 @@ public static class UserManagerExtensions
     {
         var query = userManager.Users
             .AsNoTracking()
-            .TagWith(nameof(UserManagerExtensions))
+            .TagWithSource(nameof(UserManagerExtensions))
             .Where(x => x.NormalizedUserName == userName.ToUpper());
         return await query.AnyAsync(cancellationToken);
     }
@@ -147,7 +147,7 @@ public static class UserManagerExtensions
     public static async Task<bool> TryUpdateLastNickName(this UserManager<UserData> userManager, int userId, string nick, CancellationToken cancellationToken = default)
     {
         var query = userManager.Users
-            .TagWith(nameof(UserManagerExtensions))
+            .TagWithSource(nameof(UserManagerExtensions))
             .Where(x => x.Id == userId);
         var user = await query.FirstOrDefaultAsync();
         if (user == null)
@@ -162,7 +162,7 @@ public static class UserManagerExtensions
     public static async Task<bool> UpdateLastNewsReadDateTime(this UserManager<UserData> userManager, int userId, DateTime now, CancellationToken cancellationToken = default)
     {
         var query = userManager.Users
-            .TagWith(nameof(UserManagerExtensions))
+            .TagWithSource(nameof(UserManagerExtensions))
             .Where(x => x.Id == userId);
         var user = await query.FirstOrDefaultAsync();
         if (user == null)
@@ -177,7 +177,7 @@ public static class UserManagerExtensions
     {
         var query = userManager.Users
             .AsNoTracking()
-            .TagWith(nameof(UserManagerExtensions))
+            .TagWithSource(nameof(UserManagerExtensions))
             .Where(x => x.Id == userId);
         var user = await query.FirstOrDefaultAsync(cancellationToken);
         return user?.Nick;
@@ -187,7 +187,7 @@ public static class UserManagerExtensions
     {
         var query = userManager.Users
             .AsNoTracking()
-            .TagWith(nameof(UserManagerExtensions))
+            .TagWithSource(nameof(UserManagerExtensions))
             .Where(x => x.RegisterSerial == serial);
         return await query.CountAsync(cancellationToken);
     }

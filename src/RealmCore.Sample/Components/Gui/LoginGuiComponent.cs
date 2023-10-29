@@ -5,13 +5,15 @@ namespace RealmCore.Sample.Components.Gui;
 
 public sealed class LoginGuiComponent : DxGuiComponent
 {
+    private readonly IServiceProvider _serviceProvider;
     private readonly IUsersService _usersService;
     private readonly ILogger<LoginGuiComponent> _loggerLoginGuiComponent;
     private readonly ILogger<RegisterGuiComponent> _loggerRegisterGuiComponent;
     private readonly UserManager<UserData> _userManager;
 
-    public LoginGuiComponent(IUsersService usersService, ILogger<LoginGuiComponent> loggerLoginGuiComponent, ILogger<RegisterGuiComponent> loggerRegisterGuiComponent, UserManager<UserData> userManager) : base("login", false)
+    public LoginGuiComponent(IServiceProvider serviceProvider, IUsersService usersService, ILogger<LoginGuiComponent> loggerLoginGuiComponent, ILogger<RegisterGuiComponent> loggerRegisterGuiComponent, UserManager<UserData> userManager) : base("login", false)
     {
+        _serviceProvider = serviceProvider;
         _usersService = usersService;
         _loggerLoginGuiComponent = loggerLoginGuiComponent;
         _loggerRegisterGuiComponent = loggerRegisterGuiComponent;
@@ -80,7 +82,8 @@ public sealed class LoginGuiComponent : DxGuiComponent
         switch (actionContext.ActionName)
         {
             case "navigateToRegister":
-                Entity.AddComponent(new RegisterGuiComponent(_usersService, _loggerRegisterGuiComponent, _loggerLoginGuiComponent, _userManager));
+                var scope = _serviceProvider.CreateScope();
+                Entity.AddComponent<RegisterGuiComponent>(scope.ServiceProvider);
                 Entity.DestroyComponent(this);
                 break;
             default:

@@ -1,5 +1,4 @@
-﻿using Org.BouncyCastle.Utilities;
-using SlipeServer.Server.Resources.Providers;
+﻿using SlipeServer.Server.Resources.Providers;
 
 namespace RealmCore.Server.Logic;
 
@@ -8,18 +7,16 @@ internal class PlayersLogic
     private readonly IEntityEngine _entityEngine;
     private readonly MtaServer _mtaServer;
     private readonly IClientInterfaceService _clientInterfaceService;
-    private readonly IDateTimeProvider _dateTimeProvider;
     private readonly ISaveService _saveService;
     private readonly ILogger<PlayersLogic> _logger;
     private readonly IResourceProvider _resourceProvider;
     private readonly ConcurrentDictionary<Player, Latch> _playerResources = new();
 
-    public PlayersLogic(IEntityEngine entityEngine, MtaServer mtaServer, IClientInterfaceService clientInterfaceService, IDateTimeProvider dateTimeProvider, ISaveService saveService, ILogger<PlayersLogic> logger, IResourceProvider resourceProvider)
+    public PlayersLogic(IEntityEngine entityEngine, MtaServer mtaServer, IClientInterfaceService clientInterfaceService, ISaveService saveService, ILogger<PlayersLogic> logger, IResourceProvider resourceProvider)
     {
         _entityEngine = entityEngine;
         _mtaServer = mtaServer;
         _clientInterfaceService = clientInterfaceService;
-        _dateTimeProvider = dateTimeProvider;
         _saveService = saveService;
         _logger = logger;
         _resourceProvider = resourceProvider;
@@ -79,7 +76,7 @@ internal class PlayersLogic
         {
             entity.AddComponent<Transform>();
             entity.AddComponent<PlayerTagComponent>();
-            entity.AddComponent(new PlayerElementComponent(player, new Vector2(screenSize.Item1, screenSize.Item2), cultureInfo, _entityEngine, _dateTimeProvider));
+            entity.AddComponent(new PlayerElementComponent(player, new Vector2(screenSize.Item1, screenSize.Item2), cultureInfo));
         });
 
         var stop = Stopwatch.GetTimestamp();
@@ -89,6 +86,12 @@ internal class PlayersLogic
         if (player.IsDestroyed)
             return;
         player.Disconnected += HandleDisconnected;
+        player.VehicleChanged += HandleVehicleChanged;
+    }
+
+    private void HandleVehicleChanged(Ped sender, ElementChangedEventArgs<Ped, Vehicle?> args)
+    {
+        throw new NotImplementedException();
     }
 
     private void HandleDisconnected(Player player, PlayerQuitEventArgs playerQuitEventArgs)

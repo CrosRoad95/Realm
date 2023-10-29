@@ -18,6 +18,7 @@ public class RealmCommandServiceTests
     private readonly RealmCommandService _sut;
     private readonly RealmTestingServer _server;
     private readonly EntityHelper _entityHelper;
+    private readonly IServiceProvider _serviceProvider;
 
     public RealmCommandServiceTests()
     {
@@ -26,7 +27,10 @@ public class RealmCommandServiceTests
         _chatBox = new ChatBox(_server, _server.GetRequiredService<RootElement>());
         _commandService = new CommandService(_server);
         _logger.SetupLogger();
-        _sut = new RealmCommandService(_commandService, _logger.Object, _ecsMock.Object, _usersServiceMock.Object, _policyDrivenCommandExecutor, _chatBox);
+        var serviceCollection = new ServiceCollection();
+        serviceCollection.AddScoped(x => _usersServiceMock.Object);
+        _serviceProvider = serviceCollection.BuildServiceProvider();
+        _sut = new RealmCommandService(_commandService, _logger.Object, _ecsMock.Object, _policyDrivenCommandExecutor, _chatBox, _serviceProvider);
     }
 
     [InlineData("foo", "FOO", true)]
@@ -113,12 +117,12 @@ public class RealmCommandServiceTests
         _ecsMock.Setup(x => x.TryGetEntityByPlayer(player, out playerEntity, false)).Returns(true);
         _sut.ClearCommands();
         bool wasExecuted = false;
-        var act = (Entity entity, CommandArguments args) =>
+        void act(Entity entity, CommandArguments args)
         {
             wasExecuted = true;
-        };
+        }
 
-        if(useAsyncHandler)
+        if (useAsyncHandler)
         {
             _sut.AddAsyncCommandHandler("foo", (e, args) => { act(e, args); return Task.CompletedTask; });
             await _sut.InternalHandleAsyncTriggered(new Command("foo"), new CommandTriggeredEventArgs(player, new string[] {"bar", "baz"}));

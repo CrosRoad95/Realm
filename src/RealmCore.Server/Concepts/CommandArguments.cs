@@ -3,16 +3,19 @@
 public class CommandArguments
 {
     private readonly string[] _args;
+    private readonly IServiceProvider _serviceProvider;
     private readonly IUsersService _usersService;
     private int _index;
 
     public int Index => _index;
     public Span<string> Arguments => _args;
+    public IServiceProvider ServiceProvider => _serviceProvider;
 
-    public CommandArguments(string[] args, IUsersService usersService)
+    public CommandArguments(string[] args, IServiceProvider serviceProvider)
     {
         _args = args;
-        _usersService = usersService;
+        _serviceProvider = serviceProvider;
+        _usersService = serviceProvider.GetRequiredService<IUsersService>();
     }
 
     public string ReadAllAsString()

@@ -138,8 +138,8 @@ public static class ServerBuilderExtensions
 
     public static ServerBuilder WithGuiSystem(this ServerBuilder serverBuilder)
     {
-        serverBuilder.AddLogic<DxGuiSystemServiceLogic>();
-        serverBuilder.AddLogic<StatefulGuiComponentBaseLogic>();
+        serverBuilder.AddScopedLogic<DxGuiSystemServiceLogic>();
+        serverBuilder.AddScopedLogic<StatefulGuiComponentBaseLogic>();
         return serverBuilder;
     }
 

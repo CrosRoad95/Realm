@@ -84,6 +84,23 @@ public class UserComponent : Component
             return true;
         }
     }
+    
+    internal bool HasAuthorizedPolicies(string[] policies)
+    {
+        lock (_authorizedPoliciesLock)
+        {
+            foreach (var policy in policies)
+            {
+                var index = _authorizedPolicies.FindIndex(x => x.policy == policy);
+                if (index == -1)
+                    return false;
+
+                if (!_authorizedPolicies[index].authorized)
+                    return false;
+            }
+            return true;
+        }
+    }
 
     private void ClearAuthorizedPoliciesCache()
     {

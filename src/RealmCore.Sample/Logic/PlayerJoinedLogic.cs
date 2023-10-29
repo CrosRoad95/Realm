@@ -4,25 +4,21 @@ namespace RealmCore.Sample.Logic;
 
 internal sealed class PlayerJoinedLogic : ComponentLogic<UserComponent>
 {
+    private readonly IServiceProvider _serviceProvider;
     private readonly IEntityEngine _entityEngine;
     private readonly ILogger<PlayerJoinedLogic> _logger;
-    private readonly ILogger<LoginGuiComponent> _loggerLoginGuiComponent;
-    private readonly ILogger<RegisterGuiComponent> _loggerRegisterGuiComponent;
     private readonly INametagsService _nametagsService;
-    private readonly IUsersService _usersService;
     private readonly ChatBox _chatBox;
     private readonly Text3dService _text3DService;
     private readonly UserManager<UserData> _userManager;
     private readonly IGuiSystemService? _guiSystemService;
 
-    public PlayerJoinedLogic(IEntityEngine entityEngine, ILogger<PlayerJoinedLogic> logger, ILogger<LoginGuiComponent> loggerLoginGuiComponent, ILogger<RegisterGuiComponent> loggerRegisterGuiComponent, INametagsService nametagsService, IUsersService usersService, ChatBox chatBox, Text3dService text3DService, UserManager<UserData> userManager, IBrowserGuiService browserGuiService, IGuiSystemService? guiSystemService = null) : base(entityEngine)
+    public PlayerJoinedLogic(IServiceProvider serviceProvider, IEntityEngine entityEngine, ILogger<PlayerJoinedLogic> logger, INametagsService nametagsService,ChatBox chatBox, Text3dService text3DService, UserManager<UserData> userManager, IBrowserGuiService browserGuiService, IGuiSystemService? guiSystemService = null) : base(entityEngine)
     {
+        _serviceProvider = serviceProvider;
         _entityEngine = entityEngine;
         _logger = logger;
-        _loggerLoginGuiComponent = loggerLoginGuiComponent;
-        _loggerRegisterGuiComponent = loggerRegisterGuiComponent;
         _nametagsService = nametagsService;
-        _usersService = usersService;
         _chatBox = chatBox;
         _text3DService = text3DService;
         _userManager = userManager;
@@ -92,7 +88,10 @@ internal sealed class PlayerJoinedLogic : ComponentLogic<UserComponent>
         }
 
         if(!entity.HasComponent<LoginGuiComponent>())
-            entity.AddComponent(new LoginGuiComponent(_usersService, _loggerLoginGuiComponent, _loggerRegisterGuiComponent, _userManager));
+        {
+            var scope = _serviceProvider.CreateScope();
+            entity.AddComponent<LoginGuiComponent>(scope.ServiceProvider);
+        }
 
         entity.Disposed += Entity_Disposed;
     }
