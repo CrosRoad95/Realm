@@ -1,4 +1,5 @@
-﻿using SlipeServer.Server.Resources.Providers;
+﻿using Org.BouncyCastle.Utilities;
+using SlipeServer.Server.Resources.Providers;
 
 namespace RealmCore.Server.Logic;
 
@@ -27,6 +28,7 @@ internal class PlayersLogic
 
     private async Task HandlePlayerJoinedCore(Player player)
     {
+        var start = Stopwatch.GetTimestamp();
         var resources = _resourceProvider.GetResources();
         _playerResources[player] = new Latch(RealmResourceServer._resourceCounter, TimeSpan.FromSeconds(60));
         player.ResourceStarted += HandlePlayerResourceStarted;
@@ -73,18 +75,33 @@ internal class PlayersLogic
         var screenSize = await taskWaitForScreenSize.Task;
         var cultureInfo = await taskWaitForCultureInfo.Task;
 
-        _entityEngine.CreateEntity(entity =>
+        var playerEntity = _entityEngine.CreateEntity(entity =>
         {
             entity.AddComponent<Transform>();
             entity.AddComponent<PlayerTagComponent>();
             entity.AddComponent(new PlayerElementComponent(player, new Vector2(screenSize.Item1, screenSize.Item2), cultureInfo, _entityEngine, _dateTimeProvider));
         });
+
+        var stop = Stopwatch.GetTimestamp();
+        double milliseconds = ((stop - start) / (float)Stopwatch.Frequency) * 1000;
+        _logger.LogInformation("Player joined in {elapsedMilliseconds}", milliseconds);
+
+        if (player.IsDestroyed)
+            return;
+        player.Disconnected += HandleDisconnected;
+    }
+
+    private void HandleDisconnected(Player player, PlayerQuitEventArgs playerQuitEventArgs)
+    {
+        _logger.LogInformation("Player {playerName} disconnected", player.Name);
+        player.Disconnected += HandleDisconnected;
     }
 
     private async void HandlePlayerJoined(Player player)
     {
         try
         {
+            using var _ = _logger.BeginElement(player);
             await HandlePlayerJoinedCore(player);
         }
         catch (Exception ex)

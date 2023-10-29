@@ -9,13 +9,13 @@ internal class ExtraCommandsLogic
 {
     private readonly IDiscordService _discordService;
     private readonly ChatBox _chatBox;
-    private readonly IEntityEngine _ecs;
+    private readonly IEntityEngine _entityEngine;
 
-    public ExtraCommandsLogic(IDiscordService discordService, RealmCommandService _commandService, ChatBox chatBox, IEntityEngine ecs)
+    public ExtraCommandsLogic(IDiscordService discordService, RealmCommandService _commandService, ChatBox chatBox, IEntityEngine entityEngine)
     {
         _discordService = discordService;
         _chatBox = chatBox;
-        _ecs = ecs;
+        _entityEngine = entityEngine;
 
         _discordService.AddTextBasedCommandHandler(1069962155539042314, "test", (userId, parameters) =>
         {
@@ -25,7 +25,7 @@ internal class ExtraCommandsLogic
 
         _discordService.AddTextBasedCommandHandler(997787973775011853, "gracze", async (userId, parameters) =>
         {
-            var playerEntities = _ecs.PlayerEntities;
+            var playerEntities = _entityEngine.PlayerEntities;
             await _discordService.SendMessage(997787973775011853, $"Gracze na serwerze: {string.Join(", ", playerEntities.Select(x => x.GetRequiredComponent<PlayerElementComponent>().Name))}");
         });
 

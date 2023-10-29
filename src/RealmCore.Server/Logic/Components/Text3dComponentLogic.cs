@@ -4,7 +4,7 @@ internal sealed class Text3dComponentLogic : ComponentLogic<Text3dComponent>
 {
     private readonly Text3dService _text3DService;
 
-    public Text3dComponentLogic(Text3dService text3DService, IEntityEngine ecs) : base(ecs)
+    public Text3dComponentLogic(Text3dService text3DService, IEntityEngine entityEngine) : base(entityEngine)
     {
         _text3DService = text3DService;
     }

@@ -1,8 +1,4 @@
-﻿using RealmCore.ECS;
-using RealmCore.Persistence.Data;
-using RealmCore.Server.DTOs;
-
-namespace RealmCore.Server.Logic;
+﻿namespace RealmCore.Server.Logic;
 
 internal sealed class BanLogic
 {

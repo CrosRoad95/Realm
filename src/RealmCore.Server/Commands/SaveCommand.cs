@@ -3,13 +3,13 @@
 [CommandName("save")]
 internal class SaveCommand : ICommand
 {
-    private readonly IEntityEngine _ecs;
+    private readonly IEntityEngine _entityEngine;
     private readonly ISaveService _saveService;
     private readonly ILogger<SaveCommand> _logger;
 
-    public SaveCommand(IEntityEngine ecs, ISaveService saveService, ILogger<SaveCommand> logger)
+    public SaveCommand(IEntityEngine entityEngine, ISaveService saveService, ILogger<SaveCommand> logger)
     {
-        _ecs = ecs;
+        _entityEngine = entityEngine;
         _saveService = saveService;
         _logger = logger;
     }
@@ -17,7 +17,7 @@ internal class SaveCommand : ICommand
     public async Task Handle(Entity consoleEntity, CommandArguments args)
     {
         int savedEntities = 0;
-        foreach (var entity in _ecs.Entities)
+        foreach (var entity in _entityEngine.Entities)
         {
             using var _ = _logger.BeginEntity(entity);
             try

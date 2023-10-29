@@ -29,7 +29,7 @@ internal sealed class UsersService : IUsersService, IDisposable
     public event Action<Entity>? SignedOut;
 
     public UsersService(ItemsRegistry itemsRegistry, SignInManager<UserData> signInManager, ILogger<UsersService> logger, IOptionsMonitor<GameplayOptions> gameplayOptions,
-        IDateTimeProvider dateTimeProvider, IAuthorizationService authorizationService, IActiveUsers activeUsers, IElementCollection elementCollection, IEntityEngine ecs, LevelsRegistry levelsRegistry, UserManager<UserData> userManager, IUserEventRepository userEventRepository, IUserLoginHistoryRepository userLoginHistoryRepository, ISaveService saveService, IBanService banService)
+        IDateTimeProvider dateTimeProvider, IAuthorizationService authorizationService, IActiveUsers activeUsers, IElementCollection elementCollection, IEntityEngine entityEngine, LevelsRegistry levelsRegistry, UserManager<UserData> userManager, IUserEventRepository userEventRepository, IUserLoginHistoryRepository userLoginHistoryRepository, ISaveService saveService, IBanService banService)
     {
         _itemsRegistry = itemsRegistry;
         _signInManager = signInManager;
@@ -39,7 +39,7 @@ internal sealed class UsersService : IUsersService, IDisposable
         _authorizationService = authorizationService;
         _activeUsers = activeUsers;
         _elementCollection = elementCollection;
-        _entityEngine = ecs;
+        _entityEngine = entityEngine;
         _levelsRegistry = levelsRegistry;
         _userManager = userManager;
         _userEventRepository = userEventRepository;

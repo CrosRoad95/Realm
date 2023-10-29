@@ -3,14 +3,14 @@
 [CommandName("reloadentities")]
 internal class ReloadEntitiesCommand : ICommand
 {
-    private readonly IEntityEngine _ecs;
+    private readonly IEntityEngine _entityEngine;
     private readonly ISaveService _saveService;
     private readonly ILogger<SaveCommand> _logger;
     private readonly ILoadService _loadService;
 
-    public ReloadEntitiesCommand(IEntityEngine ecs, ISaveService saveService, ILogger<SaveCommand> logger, ILoadService loadService)
+    public ReloadEntitiesCommand(IEntityEngine entityEngine, ISaveService saveService, ILogger<SaveCommand> logger, ILoadService loadService)
     {
-        _ecs = ecs;
+        _entityEngine = entityEngine;
         _saveService = saveService;
         _logger = logger;
         _loadService = loadService;
@@ -19,7 +19,7 @@ internal class ReloadEntitiesCommand : ICommand
     public async Task Handle(Entity consoleEntity, CommandArguments args)
     {
         int savedEntities = 0;
-        foreach (var entity in _ecs.Entities)
+        foreach (var entity in _entityEngine.Entities)
         {
             try
             {

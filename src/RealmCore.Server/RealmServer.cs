@@ -1,8 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using RealmCore.Server.Behaviours;
-using RealmCore.Server.Logic.Components;
-
-namespace RealmCore.Server;
+﻿namespace RealmCore.Server;
 
 public static class ServerBuilderExtensions
 {
@@ -84,8 +80,8 @@ public class RealmServer : MtaServer, IRealmServer
         int i = 0;
         var saveService = GetRequiredService<ISaveService>();
 
-        var ecs = GetRequiredService<IEntityEngine>();
-        var entities = ecs.Entities.ToList();
+        var entityEngine = GetRequiredService<IEntityEngine>();
+        var entities = entityEngine.Entities.ToList();
         foreach (var entity in entities)
         {
             try

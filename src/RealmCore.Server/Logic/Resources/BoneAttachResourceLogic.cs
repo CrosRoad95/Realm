@@ -4,7 +4,7 @@ internal sealed class BoneAttachResourceLogic : ComponentLogic<AttachedEntityCom
 {
     private readonly BoneAttachService _boneAttachService;
 
-    public BoneAttachResourceLogic(IEntityEngine ecs, BoneAttachService boneAttachService) : base(ecs)
+    public BoneAttachResourceLogic(IEntityEngine entityEngine, BoneAttachService boneAttachService) : base(entityEngine)
     {
         _boneAttachService = boneAttachService;
     }

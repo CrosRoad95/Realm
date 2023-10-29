@@ -3,13 +3,13 @@
 internal sealed class StatisticsCounterResourceLogic : ComponentLogic<StatisticsCounterComponent>
 {
     private readonly IStatisticsCounterService _statisticsCounterService;
-    private readonly IEntityEngine _ecs;
+    private readonly IEntityEngine _entityEngine;
     private readonly ILogger<StatisticsCounterResourceLogic> _logger;
 
-    public StatisticsCounterResourceLogic(IStatisticsCounterService statisticsCounterService, IEntityEngine ecs, ILogger<StatisticsCounterResourceLogic> logger) : base(ecs)
+    public StatisticsCounterResourceLogic(IStatisticsCounterService statisticsCounterService, IEntityEngine entityEngine, ILogger<StatisticsCounterResourceLogic> logger) : base(entityEngine)
     {
         _statisticsCounterService = statisticsCounterService;
-        _ecs = ecs;
+        _entityEngine = entityEngine;
         _logger = logger;
         statisticsCounterService.StatisticsCollected += HandleStatisticsCollected;
         //statisticsCounterService.FpsStatisticsCollected += HandleFpsStatisticsCollected;
@@ -27,7 +27,7 @@ internal sealed class StatisticsCounterResourceLogic : ComponentLogic<Statistics
     {
         try
         {
-            if (_ecs.TryGetEntityByPlayer(player, out Entity? entity) && entity != null)
+            if (_entityEngine.TryGetEntityByPlayer(player, out Entity? entity) && entity != null)
             {
                 var statisticsCounterComponent = entity.GetRequiredComponent<StatisticsCounterComponent>();
                 foreach (var item in statistics)

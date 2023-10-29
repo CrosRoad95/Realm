@@ -11,13 +11,19 @@ internal sealed class InventoryComponentLogic : ComponentLogic<InventoryComponen
 
     protected override async void ComponentAdded(InventoryComponent inventoryComponent)
     {
-        if (inventoryComponent.Id == 0)
+        if (inventoryComponent.Id != 0)
+            return;
+
+        var entity = inventoryComponent.Entity;
+        if (entity.TryGetComponent(out UserComponent userComponent))
         {
-            if (inventoryComponent.Entity.TryGetComponent(out UserComponent userComponent))
-            {
-                var inventoryId = await _saveService.SaveNewPlayerInventory(inventoryComponent, userComponent.Id);
-                inventoryComponent.Id = inventoryId;
-            }
+            var inventoryId = await _saveService.SaveNewPlayerInventory(inventoryComponent, userComponent.Id);
+            inventoryComponent.Id = inventoryId;
+        }
+        else if (entity.TryGetComponent(out PrivateVehicleComponent vehicle))
+        {
+            var inventoryId = await _saveService.SaveNewVehicleInventory(inventoryComponent, vehicle.Id);
+            inventoryComponent.Id = inventoryId;
         }
     }
 }

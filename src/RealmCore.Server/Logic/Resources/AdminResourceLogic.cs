@@ -4,18 +4,17 @@ namespace RealmCore.Server.Logic.Resources;
 
 internal sealed class AdminResourceLogic
 {
-    private readonly IEntityEngine _ecs;
+    private readonly IEntityEngine _entityEngine;
     private readonly IAdminService _adminService;
     private readonly ILogger<AdminResourceLogic> _logger;
     private readonly ISpawnMarkersService _spawnMarkersService;
 
-    public AdminResourceLogic(IEntityEngine ecs, IAdminService adminService, ILogger<AdminResourceLogic> logger, ISpawnMarkersService spawnMarkersService)
+    public AdminResourceLogic(IEntityEngine entityEngine, IAdminService adminService, ILogger<AdminResourceLogic> logger, ISpawnMarkersService spawnMarkersService)
     {
-        _ecs = ecs;
+        _entityEngine = entityEngine;
         _adminService = adminService;
         _logger = logger;
         _spawnMarkersService = spawnMarkersService;
-        _ecs.EntityCreated += HandleEntityCreated;
 
         _adminService.ToolStateChanged += HandleToolStateChanged;
     }
@@ -25,7 +24,7 @@ internal sealed class AdminResourceLogic
         using var _ = _logger.BeginElement(player);
         try
         {
-            if(!_ecs.TryGetEntityByPlayer(player, out var entity) || entity == null)
+            if(!_entityEngine.TryGetEntityByPlayer(player, out var entity) || entity == null)
             {
                 _logger.LogWarning("Player attempted to change admin tool {adminTool} state to {state} but entity was not found", adminTool, state);
                 return;
@@ -78,7 +77,7 @@ internal sealed class AdminResourceLogic
         {
             case AdminTool.Entities:
                 if (state)
-                    _adminService.BroadcastEntityDebugInfoUpdateForPlayer(player, _ecs.Entities.Select(x =>
+                    _adminService.BroadcastEntityDebugInfoUpdateForPlayer(player, _entityEngine.Entities.Select(x =>
                     {
                         Element? element = null;
                         Vector3 position = Vector3.Zero;
@@ -104,7 +103,7 @@ internal sealed class AdminResourceLogic
                 if (state)
                 {
                     var components = new Dictionary<LuaValue, LuaValue>();
-                    foreach (var item in _ecs.Entities)
+                    foreach (var item in _entityEngine.Entities)
                     {
                         components[item.Id] = new LuaValue(GetDebugComponents(item));
                     }
@@ -144,24 +143,5 @@ internal sealed class AdminResourceLogic
                     _adminService.BroadcastClearSpawnMarkersForPlayer(player);
                 break;
         }
-    }
-
-    private void HandleEntityCreated(Entity entity)
-    {
-        entity.Disposed += HandleDisposed;
-        entity.ComponentAdded += HandleComponentAdded;
-    }
-
-    private void HandleComponentAdded(Component component)
-    {
-        if (component is not AdminComponent adminComponent)
-            return;
-
-    }
-
-    private void HandleDisposed(Entity entity)
-    {
-        entity.Disposed -= HandleDisposed;
-        entity.ComponentAdded -= HandleComponentAdded;
     }
 }

@@ -121,14 +121,11 @@ public static class ServerBuilderExtensions
         serverBuilder.AddScopedLogic<PrivateVehicleComponentLogic>();
         serverBuilder.AddScopedLogic<InventoryComponentLogic>();
         serverBuilder.AddScopedLogic<PlayersLogic>();
-        serverBuilder.AddScopedLogic<VehiclesLogic>();
         serverBuilder.AddScopedLogic<GuiLogic>();
         serverBuilder.AddScopedLogic<ServerLogic>();
         serverBuilder.AddScopedLogic<BanLogic>();
-
         serverBuilder.AddScopedLogic<VehicleUpgradeRegistryLogic>();
         serverBuilder.AddScopedLogic<VehicleEnginesRegistryLogic>();
-
         serverBuilder.AddScopedLogic<VehicleAccessControllerComponentLogic>();
         #endregion
 

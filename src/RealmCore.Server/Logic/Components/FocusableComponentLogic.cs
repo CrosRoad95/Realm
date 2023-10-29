@@ -1,6 +1,4 @@
-﻿using RealmCore.ECS;
-
-namespace RealmCore.Server.Logic.Components;
+﻿namespace RealmCore.Server.Logic.Components;
 
 internal sealed class FocusableComponentLogic : ComponentLogic<FocusableComponent>
 {

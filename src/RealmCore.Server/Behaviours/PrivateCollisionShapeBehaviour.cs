@@ -8,9 +8,9 @@ internal sealed class PrivateCollisionShapeBehaviour
     private readonly Task _refreshPrivateCollisionShapeCollidersTask;
     private readonly ILogger<PrivateCollisionShapeBehaviour> _logger;
 
-    public PrivateCollisionShapeBehaviour(IEntityEngine ecs, ILogger<PrivateCollisionShapeBehaviour> logger)
+    public PrivateCollisionShapeBehaviour(IEntityEngine entityEngine, ILogger<PrivateCollisionShapeBehaviour> logger)
     {
-        foreach (var playerEntity in ecs.PlayerEntities)
+        foreach (var playerEntity in entityEngine.PlayerEntities)
         {
             var privateMarkerElementComponents = playerEntity.GetComponents<PlayerPrivateElementComponent<MarkerElementComponent>>();
             foreach (var markerElementComponent in privateMarkerElementComponents)
@@ -18,7 +18,7 @@ internal sealed class PrivateCollisionShapeBehaviour
                 Add(markerElementComponent);
             }
         }
-        ecs.EntityCreated += HandleEntityCreated;
+        entityEngine.EntityCreated += HandleEntityCreated;
         _refreshPrivateCollisionShapeCollidersTask = Task.Run(RefreshPrivateCollisionShapeColliders);
         _logger = logger;
     }

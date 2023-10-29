@@ -25,7 +25,7 @@ internal sealed class CommandsLogic
     private readonly RealmCommandService _commandService;
     private readonly IEntityFactory _entityFactory;
     private readonly ItemsRegistry _itemsRegistry;
-    private readonly IEntityEngine _ecs;
+    private readonly IEntityEngine _entityEngine;
     private readonly IBanService _banService;
     private readonly ChatBox _chatBox;
     private readonly ILogger<CommandsLogic> _logger;
@@ -49,14 +49,14 @@ internal sealed class CommandsLogic
     }
 
     public CommandsLogic(RealmCommandService commandService, IEntityFactory entityFactory,
-        ItemsRegistry itemsRegistry, IEntityEngine ecs, IBanService banService, ChatBox chatBox, ILogger<CommandsLogic> logger,
+        ItemsRegistry itemsRegistry, IEntityEngine entityEngine, IBanService banService, ChatBox chatBox, ILogger<CommandsLogic> logger,
         IDateTimeProvider dateTimeProvider, INametagsService nametagsService, IUsersService usersService, IVehiclesService vehiclesService,
         GameWorld gameWorld, IElementOutlineService elementOutlineService, IAssetsService assetsService, ISpawnMarkersService spawnMarkersService, ILoadService loadService, IFeedbackService feedbackService, IOverlayService overlayService, AssetsRegistry assetsRegistry, VehicleUpgradeRegistry vehicleUpgradeRegistry, VehicleEnginesRegistry vehicleEnginesRegistry, IUserWhitelistedSerialsRepository userWhitelistedSerialsRepository, IVehicleRepository vehicleRepository, IUserMoneyHistoryService userMoneyHistoryService)
     {
         _commandService = commandService;
         _entityFactory = entityFactory;
         _itemsRegistry = itemsRegistry;
-        _ecs = ecs;
+        _entityEngine = entityEngine;
         _banService = banService;
         _chatBox = chatBox;
         _logger = logger;
@@ -486,7 +486,7 @@ internal sealed class CommandsLogic
 
         _commandService.AddAsyncCommandHandler("hud3d", async (entity, args) =>
         {
-            using var e = _ecs.CreateEntity();
+            using var e = _entityEngine.CreateEntity();
             e.Transform.Position = entity.Transform.Position + new Vector3(-4, 0, 0);
             e.AddComponent(new Hud3dComponent<TestState>(e => e
                 .AddRectangle(Vector2.Zero, new Size(100, 100), Color.Red)
@@ -502,7 +502,7 @@ internal sealed class CommandsLogic
 
         _commandService.AddAsyncCommandHandler("hud3d2", async (entity, args) =>
         {
-            var e = _ecs.CreateEntity();
+            var e = _entityEngine.CreateEntity();
             e.Transform.Position = entity.Transform.Position + new Vector3(-4, 0, 0);
             var hud3d = e.AddComponent(new Hud3dComponent<TestState>(e => e
                 .AddRectangle(Vector2.Zero, new Size(200, 200), Color.Red)

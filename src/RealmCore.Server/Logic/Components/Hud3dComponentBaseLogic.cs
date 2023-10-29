@@ -4,7 +4,7 @@ internal sealed class Hud3dComponentBaseLogic : ComponentLogic<Hud3dComponentBas
 {
     private readonly IOverlayService _overlayService;
 
-    public Hud3dComponentBaseLogic(IEntityEngine ecs, IOverlayService overlayService) : base(ecs)
+    public Hud3dComponentBaseLogic(IEntityEngine entityEngine, IOverlayService overlayService) : base(entityEngine)
     {
         _overlayService = overlayService;
     }

@@ -6,13 +6,13 @@ public class DefaultChatLogic
 {
     private readonly ChatBox _chatBox;
     private readonly ILogger<DefaultChatLogic> _logger;
-    private readonly IEntityEngine _ecs;
+    private readonly IEntityEngine _entityEngine;
 
-    public DefaultChatLogic(MtaServer server, ChatBox chatBox, ILogger<DefaultChatLogic> logger, IEntityEngine ecs)
+    public DefaultChatLogic(MtaServer server, ChatBox chatBox, ILogger<DefaultChatLogic> logger, IEntityEngine entityEngine)
     {
         _chatBox = chatBox;
         _logger = logger;
-        _ecs = ecs;
+        _entityEngine = entityEngine;
 
         server.PlayerJoined += (player) =>
         {
@@ -25,11 +25,11 @@ public class DefaultChatLogic
         switch (arguments.Command)
         {
             case "say":
-                if (_ecs.TryGetEntityByPlayer(player, out var playerEntity))
+                if (_entityEngine.TryGetEntityByPlayer(player, out var playerEntity))
                     if (playerEntity.HasComponent<UserComponent>())
                     {
                         string message = $"{player.NametagColor.ToColorCode()}{player.Name}: #ffffff{string.Join(' ', arguments.Arguments)}";
-                        foreach (var targetPlayerEntity in _ecs.PlayerEntities.Where(x => x.HasComponent<UserComponent>()))
+                        foreach (var targetPlayerEntity in _entityEngine.PlayerEntities.Where(x => x.HasComponent<UserComponent>()))
                             _chatBox.OutputTo(targetPlayerEntity, message, Color.White, true);
 
                         _logger.LogInformation("{message}", message);

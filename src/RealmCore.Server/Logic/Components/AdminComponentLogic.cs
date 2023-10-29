@@ -7,7 +7,7 @@ internal sealed class AdminComponentLogic : ComponentLogic<AdminComponent>
     private readonly IClientInterfaceService _clientInterfaceService;
     private readonly IAdminService _adminService;
 
-    public AdminComponentLogic(IEntityEngine ecs, NoClipService noClipService, DebugLog debugLog, IClientInterfaceService clientInterfaceService, IAdminService adminService) : base(ecs)
+    public AdminComponentLogic(IEntityEngine entityEngine, NoClipService noClipService, DebugLog debugLog, IClientInterfaceService clientInterfaceService, IAdminService adminService) : base(entityEngine)
     {
         _noClipService = noClipService;
         _debugLog = debugLog;

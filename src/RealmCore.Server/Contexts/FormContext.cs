@@ -2,12 +2,12 @@
 
 internal class FormContext : IFormContext
 {
-    private bool _responsed = false;
+    private bool _responded = false;
     private readonly Player _player;
     private readonly string _formName;
     private readonly LuaValue _data;
     private readonly IGuiSystemService _GuiSystemService;
-    private readonly IEntityEngine _ecs;
+    private readonly IEntityEngine _entityEngine;
     private readonly IServiceProvider _serviceProvider;
 
     public string FormName => _formName;
@@ -16,18 +16,18 @@ internal class FormContext : IFormContext
     {
         get
         {
-            _ecs.TryGetEntityByPlayer(_player, out var entity);
+            _entityEngine.TryGetEntityByPlayer(_player, out var entity);
             return entity ?? throw new InvalidOperationException();
         }
     }
 
-    public FormContext(Player player, string formName, LuaValue data, IGuiSystemService GuiSystemService, IEntityEngine ecs, IServiceProvider serviceProvider)
+    public FormContext(Player player, string formName, LuaValue data, IGuiSystemService GuiSystemService, IEntityEngine entityEngine, IServiceProvider serviceProvider)
     {
         _player = player;
         _formName = formName;
         _data = data;
         _GuiSystemService = GuiSystemService;
-        _ecs = ecs;
+        _entityEngine = entityEngine;
         _serviceProvider = serviceProvider;
     }
 
@@ -45,19 +45,19 @@ internal class FormContext : IFormContext
 
     public void SuccessResponse(params object[] data)
     {
-        if (_responsed)
+        if (_responded)
             throw new Exception("Form already got response.");
 
         _GuiSystemService.SendFormResponse(_player, "", FormName, true, data);
-        _responsed = true;
+        _responded = true;
     }
 
     public void ErrorResponse(params object[] data)
     {
-        if (_responsed)
+        if (_responded)
             throw new Exception("Form already got response.");
 
         _GuiSystemService.SendFormResponse(_player, "", FormName, false, data);
-        _responsed = true;
+        _responded = true;
     }
 }

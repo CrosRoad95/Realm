@@ -6,7 +6,7 @@ internal sealed class NametagResourceLogic : ComponentLogic<NametagComponent>
 {
     private readonly INametagsService _nametagsService;
 
-    public NametagResourceLogic(IEntityEngine ecs, INametagsService nametagsService) : base(ecs)
+    public NametagResourceLogic(IEntityEngine entityEngine, INametagsService nametagsService) : base(entityEngine)
     {
         _nametagsService = nametagsService;
     }

@@ -1,12 +1,12 @@
 ﻿namespace RealmCore.Tests.Tests;
 
-public class ECSTests
+public class EntityEngineTests
 {
-    private readonly IEntityEngine _ecs; 
+    private readonly IEntityEngine _entityEngine; 
     private readonly Mock<IElementCollection> _elementCollection = new();
-    public ECSTests()
+    public EntityEngineTests()
     {
-        _ecs = new EntityEngine(_elementCollection.Object, null);
+        _entityEngine = new EntityEngine(_elementCollection.Object, null);
     }
 
     [Fact]
@@ -14,16 +14,16 @@ public class ECSTests
     {
         #region Arrange & Act
         bool created = false;
-        _ecs.EntityCreated += e =>
+        _entityEngine.EntityCreated += e =>
         {
             created = true;
         };
-        var entity = _ecs.CreateEntity();
+        var entity = _entityEngine.CreateEntity();
         entity.Dispose();
         #endregion
 
         #region Assert
-        _ecs.Entities.Should().HaveCount(0);
+        _entityEngine.Entities.Should().HaveCount(0);
         created.Should().BeTrue();
         #endregion
     }
@@ -33,21 +33,21 @@ public class ECSTests
     {
         #region Arrange & Act
         int createdEntities = 0;
-        _ecs.EntityCreated += e =>
+        _entityEngine.EntityCreated += e =>
         {
             Interlocked.Increment(ref createdEntities);
         };
 
         await ParallelHelpers.Run((x,i) =>
         {
-            var entity = _ecs.CreateEntity();
+            var entity = _entityEngine.CreateEntity();
             entity.Dispose();
         });
         #endregion
 
         #region Assert
         createdEntities.Should().Be(8 * 100);
-        _ecs.Entities.Should().HaveCount(0);
+        _entityEngine.Entities.Should().HaveCount(0);
         #endregion
     }
 }

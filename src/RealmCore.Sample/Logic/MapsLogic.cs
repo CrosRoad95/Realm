@@ -3,13 +3,13 @@
 internal class MapsLogic
 {
     private readonly IMapsService _mapsService;
-    private readonly IEntityEngine _ecs;
+    private readonly IEntityEngine _entityEngine;
 
-    public MapsLogic(IMapsService mapsService, IEntityEngine ecs)
+    public MapsLogic(IMapsService mapsService, IEntityEngine entityEngine)
     {
         _mapsService = mapsService;
-        _ecs = ecs;
-        _ecs.EntityCreated += HandleEntityCreated;
+        _entityEngine = entityEngine;
+        _entityEngine.EntityCreated += HandleEntityCreated;
 
         //mapsService.RegisterMapFromMemory("testmap", new List<WorldObject>
         //{

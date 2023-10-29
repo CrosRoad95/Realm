@@ -4,14 +4,14 @@ namespace RealmCore.Server.Logic.Resources;
 
 internal sealed class BrowserResourceLogic : ComponentLogic<BrowserComponent>
 {
-    private readonly IEntityEngine _ecs;
+    private readonly IEntityEngine _entityEngine;
     private readonly IBrowserService _BrowserService;
     private readonly IOptions<BrowserOptions> _browserOptions;
     private readonly IBrowserGuiService _browserGuiService;
 
-    public BrowserResourceLogic(IEntityEngine ecs, IBrowserService BrowserService, IOptions<BrowserOptions> browserOptions, IBrowserGuiService browserGuiService) : base(ecs)
+    public BrowserResourceLogic(IEntityEngine entityEngine, IBrowserService BrowserService, IOptions<BrowserOptions> browserOptions, IBrowserGuiService browserGuiService) : base(entityEngine)
     {
-        _ecs = ecs;
+        _entityEngine = entityEngine;
         _BrowserService = BrowserService;
         _browserOptions = browserOptions;
         _browserGuiService = browserGuiService;
@@ -63,7 +63,7 @@ internal sealed class BrowserResourceLogic : ComponentLogic<BrowserComponent>
 
     private void HandlePlayerBrowserReady(Player player)
     {
-        if (_ecs.TryGetEntityByPlayer(player, out var entity))
+        if (_entityEngine.TryGetEntityByPlayer(player, out var entity))
             HandlePlayerBrowserReadyCore(entity);
     }
 }

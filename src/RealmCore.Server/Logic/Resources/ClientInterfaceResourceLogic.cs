@@ -4,16 +4,16 @@ internal sealed class ClientInterfaceResourceLogic
 {
     private readonly ILogger<ClientInterfaceResourceLogic> _logger;
     private readonly IClientInterfaceService _clientInterfaceService;
-    private readonly IEntityEngine _ecs;
+    private readonly IEntityEngine _entityEngine;
 
-    public ClientInterfaceResourceLogic(IClientInterfaceService clientInterfaceService, ILogger<ClientInterfaceResourceLogic> logger, IEntityEngine ecs)
+    public ClientInterfaceResourceLogic(IClientInterfaceService clientInterfaceService, ILogger<ClientInterfaceResourceLogic> logger, IEntityEngine entityEngine)
     {
         _clientInterfaceService = clientInterfaceService;
-        _ecs = ecs;
+        _entityEngine = entityEngine;
         _logger = logger;
 
         _clientInterfaceService.ClientErrorMessage += HandleClientErrorMessage;
-        _ecs.EntityCreated += HandleEntityCreated;
+        _entityEngine.EntityCreated += HandleEntityCreated;
     }
 
     private void HandleEntityCreated(Entity entity)
@@ -45,7 +45,7 @@ internal sealed class ClientInterfaceResourceLogic
 
     private void HandleClientErrorMessage(Player player, string message, int level, string file, int line)
     {
-        if (!_ecs.TryGetEntityByPlayer(player, out var playerEntity))
+        if (!_entityEngine.TryGetEntityByPlayer(player, out var playerEntity))
             return;
 
         var playerName = player.Name;

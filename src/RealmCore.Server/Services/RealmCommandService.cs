@@ -39,7 +39,7 @@ public sealed class RealmCommandService
     }
 
     private readonly CommandService _commandService;
-    private readonly IEntityEngine _ecs;
+    private readonly IEntityEngine _entityEngine;
     private readonly IUsersService _usersService;
     private readonly IPolicyDrivenCommandExecutor _policyDrivenCommandExecutor;
     private readonly ChatBox _chatBox;
@@ -52,11 +52,11 @@ public sealed class RealmCommandService
     public List<string> CommandNames => _commands.Keys.Concat(_asyncCommands.Keys).ToList();
     public int Count => _commands.Count + _asyncCommands.Count;
 
-    public RealmCommandService(CommandService commandService, ILogger<RealmCommandService> logger, IEntityEngine ecs, IUsersService usersService, IPolicyDrivenCommandExecutor policyDrivenCommandExecutor, ChatBox chatBox)
+    public RealmCommandService(CommandService commandService, ILogger<RealmCommandService> logger, IEntityEngine entityEngine, IUsersService usersService, IPolicyDrivenCommandExecutor policyDrivenCommandExecutor, ChatBox chatBox)
     {
         _logger = logger;
         _commandService = commandService;
-        _ecs = ecs;
+        _entityEngine = entityEngine;
         _usersService = usersService;
         _policyDrivenCommandExecutor = policyDrivenCommandExecutor;
         _chatBox = chatBox;
@@ -137,7 +137,7 @@ public sealed class RealmCommandService
             return;
 
         var player = args.Player;
-        if (!_ecs.TryGetEntityByPlayer(player, out var entity) || entity == null)
+        if (!_entityEngine.TryGetEntityByPlayer(player, out var entity) || entity == null)
             return;
 
         if (!entity.TryGetComponent<UserComponent>(out var userComponent) || !entity.TryGetComponent<PlayerElementComponent>(out var playerElementComponent))
@@ -233,7 +233,7 @@ public sealed class RealmCommandService
             return;
 
         var player = args.Player;
-        if (!_ecs.TryGetEntityByPlayer(player, out var entity) || entity == null)
+        if (!_entityEngine.TryGetEntityByPlayer(player, out var entity) || entity == null)
             return;
 
         if (!entity.TryGetComponent<UserComponent>(out var userComponent) || !entity.TryGetComponent<PlayerElementComponent>(out var playerElementComponent))

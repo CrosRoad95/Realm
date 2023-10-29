@@ -5,16 +5,16 @@ namespace RealmCore.Sample.Logic;
 
 internal class SamplePickupsLogic
 {
-    private readonly IEntityEngine _ecs;
+    private readonly IEntityEngine _entityEngine;
     private readonly IEntityFactory _entityFactory;
     private readonly ChatBox _chatBox;
 
-    public SamplePickupsLogic(IEntityEngine ecs, IEntityFactory entityFactory, ChatBox chatBox)
+    public SamplePickupsLogic(IEntityEngine entityEngine, IEntityFactory entityFactory, ChatBox chatBox)
     {
-        _ecs = ecs;
+        _entityEngine = entityEngine;
         _entityFactory = entityFactory;
         _chatBox = chatBox;
-        _ecs.EntityCreated += EntityCreated;
+        _entityEngine.EntityCreated += EntityCreated;
     }
 
     private void EntityCreated(Entity entity)

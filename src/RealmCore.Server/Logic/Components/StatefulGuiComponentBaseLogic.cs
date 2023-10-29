@@ -2,13 +2,13 @@
 
 internal sealed class StatefulGuiComponentBaseLogic : ComponentLogic<StatefulDxGuiComponentBase>
 {
-    private readonly IEntityEngine _ecs;
+    private readonly IEntityEngine _entityEngine;
     private readonly IGuiSystemService _guiSystemService;
     private readonly LuaValueMapper _luaValueMapper;
 
-    public StatefulGuiComponentBaseLogic(IEntityEngine ecs, IGuiSystemService guiSystemService, LuaValueMapper luaValueMapper) : base(ecs)
+    public StatefulGuiComponentBaseLogic(IEntityEngine entityEngine, IGuiSystemService guiSystemService, LuaValueMapper luaValueMapper) : base(entityEngine)
     {
-        _ecs = ecs;
+        _entityEngine = entityEngine;
         _guiSystemService = guiSystemService;
         _luaValueMapper = luaValueMapper;
     }

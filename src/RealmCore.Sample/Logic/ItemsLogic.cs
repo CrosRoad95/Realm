@@ -7,7 +7,7 @@ public class ItemsLogic : ComponentLogic<InventoryComponent>
 {
     private readonly ChatBox _chatBox;
 
-    public ItemsLogic(ItemsRegistry itemsRegistry, IEntityEngine ecs, ChatBox chatBox) : base(ecs)
+    public ItemsLogic(ItemsRegistry itemsRegistry, IEntityEngine entityEngine, ChatBox chatBox) : base(entityEngine)
     {
         itemsRegistry.Add(1, new ItemRegistryEntry
         {

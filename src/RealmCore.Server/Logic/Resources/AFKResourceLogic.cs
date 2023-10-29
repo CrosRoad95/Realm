@@ -2,13 +2,13 @@
 
 internal sealed class AFKResourceLogic
 {
-    private readonly IEntityEngine _ecs;
+    private readonly IEntityEngine _entityEngine;
     private readonly ILogger<StatisticsCounterResourceLogic> _logger;
     private readonly IDateTimeProvider _dateTimeProvider;
 
-    public AFKResourceLogic(IAFKService afkService, IEntityEngine ecs, ILogger<StatisticsCounterResourceLogic> logger, IDateTimeProvider dateTimeProvider)
+    public AFKResourceLogic(IAFKService afkService, IEntityEngine entityEngine, ILogger<StatisticsCounterResourceLogic> logger, IDateTimeProvider dateTimeProvider)
     {
-        _ecs = ecs;
+        _entityEngine = entityEngine;
         _logger = logger;
         _dateTimeProvider = dateTimeProvider;
         afkService.PlayerAFKStarted += HandlePlayerAFKStarted;
@@ -17,7 +17,7 @@ internal sealed class AFKResourceLogic
 
     private void HandlePlayerAFKStarted(Player player)
     {
-        if (_ecs.TryGetEntityByPlayer(player, out var entity) && entity != null)
+        if (_entityEngine.TryGetEntityByPlayer(player, out var entity) && entity != null)
         {
             if (entity.TryGetComponent(out AFKComponent afkComponent))
             {
@@ -30,7 +30,7 @@ internal sealed class AFKResourceLogic
 
     private void HandlePlayerAFKStopped(Player player)
     {
-        if (_ecs.TryGetEntityByPlayer(player, out var entity) && entity != null)
+        if (_entityEngine.TryGetEntityByPlayer(player, out var entity) && entity != null)
         {
             if (entity.TryGetComponent(out AFKComponent afkComponent))
             {

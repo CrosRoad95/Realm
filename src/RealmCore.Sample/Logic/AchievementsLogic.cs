@@ -6,7 +6,7 @@ internal sealed class AchievementsLogic : ComponentLogic<AchievementsComponent>
 {
     private readonly IOverlayService _overlayService;
 
-    public AchievementsLogic(IEntityEngine ecs, IOverlayService overlayService) : base(ecs)
+    public AchievementsLogic(IEntityEngine entityEngine, IOverlayService overlayService) : base(entityEngine)
     {
         _overlayService = overlayService;
     }

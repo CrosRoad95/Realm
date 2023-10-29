@@ -2,15 +2,15 @@
 
 internal sealed class VehicleAccessService : IVehicleAccessService
 {
-    private readonly IEntityEngine _ecs;
+    private readonly IEntityEngine _entityEngine;
     private readonly ILogger<VehicleAccessService> _logger;
 
     public event Func<Entity, Entity, bool>? CanEnter;
     public event Action<Entity, Entity, VehicleAccessControllerComponent>? FailedToEnter;
 
-    public VehicleAccessService(IEntityEngine ecs, ILogger<VehicleAccessService> logger)
+    public VehicleAccessService(IEntityEngine entityEngine, ILogger<VehicleAccessService> logger)
     {
-        _ecs = ecs;
+        _entityEngine = entityEngine;
         _logger = logger;
     }
 
