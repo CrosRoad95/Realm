@@ -60,11 +60,11 @@ internal sealed class ScopedEntityFactory : IScopedEntityFactory
         }
     }
 
-    private void AssociateWithPlayerEntity<TElementComponent>(PlayerPrivateElementComponent<TElementComponent> elementComponent, Entity playerEntity) where TElementComponent : ElementComponent
+    private void AssociateWithPlayerEntity<TElementComponent>(PlayerPrivateElementComponent<TElementComponent> elementComponent, Entity playerEntity) where TElementComponent : Element, IComponent
     {
         Add(elementComponent);
         var element = elementComponent.Element;
-        var player = playerEntity.GetPlayer();
+        var player = playerEntity.GetRequiredComponent<PlayerElementComponent>();
         element.AssociateWith(player);
         if (element is Pickup pickup)
         {
@@ -80,16 +80,14 @@ internal sealed class ScopedEntityFactory : IScopedEntityFactory
     public Entity CreateCollisionSphere(Vector3 position, float radius, byte interior = 0, ushort dimension = 0, Action<Entity>? entityBuilder = null)
     {
         ThrowIfDisposed();
-        var collisionSphere = new CollisionSphere(position, radius)
+
+        var collisionSphereElementComponent = _entity.AddComponent(PlayerPrivateElementComponent.Create(new CollisionSphereElementComponent(position, radius)
         {
             Interior = interior,
             Dimension = dimension
-        };
-
-        var collisionSphereElementComponent = _entity.AddComponent(PlayerPrivateElementComponent.Create(new CollisionSphereElementComponent(collisionSphere, _entityEngine)));
+        }));
         AssociateWithPlayerEntity(collisionSphereElementComponent, _entity);
         return _entity;
-
     }
 
     public Entity CreateMarker(MarkerType markerType, Vector3 position, Color color, byte interior = 0, ushort dimension = 0, Action<Entity>? entityBuilder = null)
@@ -102,7 +100,12 @@ internal sealed class ScopedEntityFactory : IScopedEntityFactory
             Dimension = dimension
         };
 
-        var markerElementComponent = _entity.AddComponent(PlayerPrivateElementComponent.Create(new MarkerElementComponent(marker, _elementCollection, _entityEngine)));
+        var markerElementComponent = _entity.AddComponent(PlayerPrivateElementComponent.Create(new MarkerElementComponent(position, 2, markerType)
+        {
+            Color = color,
+            Interior = interior,
+            Dimension = dimension
+        }));
         AssociateWithPlayerEntity(markerElementComponent, _entity);
         return _entity;
     }
@@ -122,14 +125,14 @@ internal sealed class ScopedEntityFactory : IScopedEntityFactory
     public Entity CreateObject(ObjectModel model, Vector3 position, Vector3 rotation, byte interior = 0, ushort dimension = 0, Action<Entity>? entityBuilder = null)
     {
         ThrowIfDisposed();
-        var worldObject = new WorldObject(model, position)
+        var worldObject = new WorldObjectComponent(model, position)
         {
             Rotation = rotation,
             Interior = interior,
             Dimension = dimension
         };
 
-        var worldObjectElementComponent = _entity.AddComponent(PlayerPrivateElementComponent.Create(new WorldObjectComponent(worldObject)));
+        var worldObjectElementComponent = _entity.AddComponent(PlayerPrivateElementComponent.Create(worldObject));
         AssociateWithPlayerEntity(worldObjectElementComponent, _entity);
         return _entity;
     }
@@ -144,8 +147,8 @@ internal sealed class ScopedEntityFactory : IScopedEntityFactory
         };
 
 
-        var blipElementComponent = _entity.AddComponent(PlayerPrivateElementComponent.Create(new BlipElementComponent(blip)));
-        AssociateWithPlayerEntity(blipElementComponent, _entity);
+        //var blipElementComponent = _entity.AddComponent(PlayerPrivateElementComponent.Create(new BlipElementComponent(blip)));
+        //AssociateWithPlayerEntity(blipElementComponent, _entity);
         return _entity;
     }
 
@@ -171,8 +174,8 @@ internal sealed class ScopedEntityFactory : IScopedEntityFactory
         };
 
 
-        var radarAreaElementComponent = _entity.AddComponent(PlayerPrivateElementComponent.Create(new RadarAreaElementComponent(radarArea)));
-        AssociateWithPlayerEntity(radarAreaElementComponent, _entity);
+        //var radarAreaElementComponent = _entity.AddComponent(PlayerPrivateElementComponent.Create(new RadarAreaElementComponent(radarArea)));
+        //AssociateWithPlayerEntity(radarAreaElementComponent, _entity);
         return _entity;
     }
 

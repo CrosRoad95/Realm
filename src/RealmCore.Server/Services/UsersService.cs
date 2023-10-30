@@ -68,7 +68,7 @@ internal sealed class UsersService : IUsersService
 
     public async Task<bool> QuickSignIn(Entity entity)
     {
-        var serial = entity.GetPlayer().Client.Serial ?? throw new InvalidOperationException();
+        var serial = entity.GetRequiredComponent<PlayerElementComponent>().Client.Serial ?? throw new InvalidOperationException();
         var userData = await _userManager.GetUserBySerial(serial) ?? throw new Exception("No account found.");
         if (!userData.QuickLogin)
             throw new Exception("Quick login not enabled");
@@ -94,7 +94,7 @@ internal sealed class UsersService : IUsersService
 
         try
         {
-            var client = entity.GetPlayer().Client;
+            var client = entity.GetRequiredComponent<PlayerElementComponent>().Client;
             var serial = client.GetSerial();
 
             var roles = await _userManager.GetRolesAsync(user);
@@ -215,9 +215,8 @@ internal sealed class UsersService : IUsersService
         entity.TryDestroyComponent<MoneyComponent>();
         entity.TryDestroyComponent<AFKComponent>();
         entity.TryDestroyComponent<UserComponent>();
-        playerElementComponent.Player.RemoveFromVehicle();
-        playerElementComponent.Spawned = false;
-        entity.Transform.Position = new Vector3(6000, 6000, 99999);
+        playerElementComponent.RemoveFromVehicle();
+        playerElementComponent.Position = new Vector3(6000, 6000, 99999);
         SignedOut?.Invoke(entity);
     }
 
@@ -232,7 +231,7 @@ internal sealed class UsersService : IUsersService
 
     public void Kick(Entity entity, string reason)
     {
-        entity.GetPlayer().Kick(reason);
+        entity.GetRequiredComponent<PlayerElementComponent>().Kick(reason);
     }
 
     public bool TryGetPlayerByName(string name, out Entity? playerEntity)
@@ -243,21 +242,16 @@ internal sealed class UsersService : IUsersService
             playerEntity = null!;
             return false;
         }
-        if(_entityEngine.TryGetEntityByPlayer(player, out var foundPlayerEntity) && foundPlayerEntity != null)
-        {
-            playerEntity = foundPlayerEntity;
-            return true;
-        }
-        playerEntity = null;
-        return false;
+        playerEntity = ((PlayerElementComponent)player).Entity;
+        return true;
     }
 
     public async Task<bool> TryUpdateLastNickName(Entity playerEntity)
     {
-        var nick = playerEntity.GetPlayer().Name;
+        var nick = playerEntity.GetRequiredComponent<PlayerElementComponent>().Name;
         if (playerEntity.TryGetComponent(out UserComponent userComponent) && userComponent.Nick != nick)
         {
-            return await _userManager.TryUpdateLastNickName(userComponent.Id, playerEntity.GetPlayer().Name);
+            return await _userManager.TryUpdateLastNickName(userComponent.Id, playerEntity.GetRequiredComponent<PlayerElementComponent>().Name);
         }
         return false;
     }
@@ -278,8 +272,7 @@ internal sealed class UsersService : IUsersService
         var players = _elementCollection.GetByType<Player>().Where(x => x.Name.Contains(pattern.ToLower(), StringComparison.CurrentCultureIgnoreCase));
         foreach (var player in players)
         {
-            if (_entityEngine.TryGetEntityByPlayer(player, out var playerEntity) && playerEntity != null)
-                yield return playerEntity;
+            yield return ((PlayerElementComponent)player).Entity;
         }
     }
 
@@ -289,9 +282,8 @@ internal sealed class UsersService : IUsersService
         {
             if(player.Client.Serial == serial)
             {
-                if (_entityEngine.TryGetEntityByPlayer(player, out entity))
-                    return true;
-                return false;
+                entity = ((PlayerElementComponent)player).Entity;
+                return true;
             }
         }
         entity = null;

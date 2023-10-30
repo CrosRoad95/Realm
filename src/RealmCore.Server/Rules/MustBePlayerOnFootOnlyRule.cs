@@ -7,7 +7,7 @@ public sealed class MustBePlayerOnFootOnlyRule : IEntityRule
         if (!entity.HasComponent<PlayerTagComponent>())
             return false;
 
-        var player = entity.GetPlayer();
+        var player = entity.GetRequiredComponent<PlayerElementComponent>();
         if (player.HasJetpack)
             return false;
 

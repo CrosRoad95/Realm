@@ -1,7 +1,7 @@
 ﻿namespace RealmCore.Server.Components.Players;
 
 [ComponentUsage(false)]
-public class CurrentInteractEntityComponent : Component
+public class CurrentInteractEntityComponent : ComponentLifecycle
 {
     public Entity? CurrentInteractEntity { get; private set; }
     private object _lock = new();

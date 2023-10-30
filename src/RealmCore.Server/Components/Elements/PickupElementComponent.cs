@@ -1,12 +1,7 @@
 ﻿namespace RealmCore.Server.Components.Elements;
 
-public class PickupElementComponent : ElementComponent
+public class PickupElementComponent : Pickup, IElementComponent
 {
-    protected readonly Pickup _pickup;
-    private readonly IEntityEngine _entityEngine;
-
-    internal override Element Element => _pickup;
-    internal Pickup Pickup => _pickup;
     internal Action<PickupElementComponent, Element>? ElementEntered { get; set; }
     internal Action<PickupElementComponent, Element>? ElementLeft { get; set; }
 
@@ -14,46 +9,29 @@ public class PickupElementComponent : ElementComponent
     public Action<Entity, Entity>? EntityLeft;
 
     public Action<Entity, IEntityRule>? EntityRuleFailed { get; set; }
+    public Entity Entity { get; set; }
+
     private readonly List<IEntityRule> _entityRules = new();
 
-    internal PickupElementComponent(Pickup pickup, IEntityEngine entityEngine)
+    public PickupElementComponent(Vector3 position, ushort model) : base(position, model)
     {
-        _pickup = pickup;
-        _entityEngine = entityEngine;
-        _pickup.RespawnTime = 500;
     }
 
     public void AddRule(IEntityRule entityRule)
     {
-        ThrowIfDisposed();
+        this.ThrowIfDestroyed();
 
         _entityRules.Add(entityRule);
     }
 
     public void AddRule<TEntityRole>() where TEntityRole : IEntityRule, new()
     {
-        ThrowIfDisposed();
+        this.ThrowIfDestroyed();
 
         _entityRules.Add(new TEntityRole());
     }
 
     internal bool CheckRules(Entity entity) => _entityRules.All(x => x.Check(entity));
-
-    protected override void Detach()
-    {
-        base.Detach();
-        _pickup.CollisionShape.ElementEntered -= HandleElementEntered;
-        _pickup.CollisionShape.ElementLeft -= HandleElementLeft;
-    }
-
-    protected override void Attach()
-    {
-        base.Attach();
-        _pickup.CollisionShape.ElementEntered += HandleElementEntered;
-        _pickup.CollisionShape.ElementLeft += HandleElementLeft;
-        _pickup.CollisionShape.Position = _pickup.Position;
-        Entity.Transform.PositionChanged += HandlePositionChanged;
-    }
 
     private void HandleElementEntered(Element element)
     {
@@ -65,16 +43,19 @@ public class PickupElementComponent : ElementComponent
         ElementLeft?.Invoke(this, element);
     }
 
-    private void HandlePositionChanged(Transform transform, Vector3 position, bool sync)
-    {
-        _pickup.CollisionShape.Position = position;
-    }
-
-    public override void Dispose()
+    public void Dispose()
     {
         ElementEntered = null;
         ElementLeft = null;
-        Entity.Transform.PositionChanged -= HandlePositionChanged;
-        base.Dispose();
+    }
+
+    public void Attach()
+    {
+        throw new NotImplementedException();
+    }
+
+    public void Detach()
+    {
+        throw new NotImplementedException();
     }
 }

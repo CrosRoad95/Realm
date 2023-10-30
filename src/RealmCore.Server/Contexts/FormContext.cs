@@ -12,14 +12,7 @@ internal class FormContext : IFormContext
 
     public string FormName => _formName;
 
-    public Entity Entity
-    {
-        get
-        {
-            _entityEngine.TryGetEntityByPlayer(_player, out var entity);
-            return entity ?? throw new InvalidOperationException();
-        }
-    }
+    public Entity Entity => _player.UpCast();
 
     public FormContext(Player player, string formName, LuaValue data, IGuiSystemService GuiSystemService, IEntityEngine entityEngine, IServiceProvider serviceProvider)
     {

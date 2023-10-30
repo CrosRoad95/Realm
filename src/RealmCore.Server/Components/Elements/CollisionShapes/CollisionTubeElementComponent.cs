@@ -1,9 +1,10 @@
 ﻿namespace RealmCore.Server.Components.Elements.CollisionShapes;
 
-public class CollisionTubeElementComponent : CollisionShapeElementComponent
+public class CollisionTubeElementComponent : CollisionTube, ICollisionShape
 {
-    internal CollisionTubeElementComponent(CollisionTube collisionTube, IEntityEngine entityEngine) : base(collisionTube, entityEngine)
+    public CollisionTubeElementComponent(Vector3 position, float Radius, float Height) : base(position, Radius, Height)
     {
-
     }
+
+    public Entity Entity { get; set; }
 }

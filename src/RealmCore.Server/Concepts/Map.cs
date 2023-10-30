@@ -76,7 +76,7 @@ public sealed class Map : IDisposable
             entity.Disposed += HandleDisposed;
         }
 
-        var player = entity.GetPlayer();
+        var player = entity.GetRequiredComponent<PlayerElementComponent>();
         foreach (var worldObject in _worldObjects)
             worldObject.CreateFor(player);
         return true;
@@ -98,7 +98,7 @@ public sealed class Map : IDisposable
             if (!_createdForEntities.Remove(entity))
                 return false;
 
-        var player = entity.GetPlayer();
+        var player = entity.GetRequiredComponent<PlayerElementComponent>();
         foreach (var worldObject in _worldObjects)
             worldObject.DestroyFor(player);
 
@@ -114,7 +114,7 @@ public sealed class Map : IDisposable
             {
                 try
                 {
-                    var player = entity.GetPlayer();
+                    var player = entity.GetRequiredComponent<PlayerElementComponent>();
                     foreach (var worldObject in _worldObjects)
                         worldObject.DestroyFor(player);
                 }

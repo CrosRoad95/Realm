@@ -17,12 +17,10 @@ public class InventoryComponent : Component
     {
         get
         {
-            ThrowIfDisposed();
             return _size;
         }
         set
         {
-            ThrowIfDisposed();
             SizeChanged?.Invoke(this, value);
             _size = value;
         }
@@ -34,7 +32,6 @@ public class InventoryComponent : Component
     {
         get
         {
-            ThrowIfDisposed();
             _semaphore.EnterReadLock();
             try
             {
@@ -51,7 +48,6 @@ public class InventoryComponent : Component
     {
         get
         {
-            ThrowIfDisposed();
             _semaphore.EnterReadLock();
             try
             {
@@ -78,7 +74,6 @@ public class InventoryComponent : Component
 
     public bool HasItemById(uint itemId)
     {
-        ThrowIfDisposed();
         _semaphore.EnterReadLock();
         try
         {
@@ -92,7 +87,6 @@ public class InventoryComponent : Component
     
     public bool HasItem(Func<Item, bool> callback)
     {
-        ThrowIfDisposed();
         _semaphore.EnterReadLock();
         try
         {
@@ -106,7 +100,6 @@ public class InventoryComponent : Component
 
     public bool HasItem(Item item)
     {
-        ThrowIfDisposed();
         _semaphore.EnterReadLock();
         try
         {
@@ -120,8 +113,6 @@ public class InventoryComponent : Component
 
     public int SumItemsById(uint itemId)
     {
-        ThrowIfDisposed();
-
         _semaphore.EnterReadLock();
         try
         {
@@ -135,8 +126,6 @@ public class InventoryComponent : Component
 
     public int SumItemsNumberById(uint itemId)
     {
-        ThrowIfDisposed();
-
         _semaphore.EnterReadLock();
         try
         {
@@ -150,7 +139,6 @@ public class InventoryComponent : Component
 
     public IReadOnlyList<Item> GetItemsById(uint itemId)
     {
-        ThrowIfDisposed();
         _semaphore.EnterReadLock();
         try
         {
@@ -164,7 +152,6 @@ public class InventoryComponent : Component
 
     public IReadOnlyList<Item> GetItemsByIdWithMetadata(uint itemId, string key, object? metadata)
     {
-        ThrowIfDisposed();
         _semaphore.EnterReadLock();
         try
         {
@@ -178,7 +165,6 @@ public class InventoryComponent : Component
     
     public Item? GetSingleItemByIdWithMetadata(uint itemId, Metadata metadata)
     {
-        ThrowIfDisposed();
         _semaphore.EnterReadLock();
         try
         {
@@ -192,8 +178,6 @@ public class InventoryComponent : Component
 
     public bool HasItemWithMetadata(uint itemId, string key, object? metadata)
     {
-        ThrowIfDisposed();
-
         _semaphore.EnterReadLock();
         try
         {
@@ -207,7 +191,6 @@ public class InventoryComponent : Component
 
     public bool TryGetByLocalId(string localId, out Item item)
     {
-        ThrowIfDisposed();
         _semaphore.EnterReadLock();
         try
         {
@@ -222,7 +205,6 @@ public class InventoryComponent : Component
 
     public bool TryGetByItemId(uint itemId, out Item item)
     {
-        ThrowIfDisposed();
         _semaphore.EnterReadLock();
         try
         {
@@ -237,7 +219,6 @@ public class InventoryComponent : Component
 
     public bool TryGetByIdAndMetadata(uint itemId, Metadata metadata, out Item item)
     {
-        ThrowIfDisposed();
         _semaphore.EnterReadLock();
         try
         {
@@ -252,7 +233,6 @@ public class InventoryComponent : Component
 
     public Item AddSingleItem(ItemsRegistry itemsRegistry, uint itemId, Metadata? metadata = null, bool tryStack = true, bool force = false)
     {
-        ThrowIfDisposed();
         _semaphore.EnterWriteLock();
         try
         {
@@ -269,7 +249,6 @@ public class InventoryComponent : Component
 
     public IEnumerable<Item> AddItem(ItemsRegistry itemsRegistry, uint itemId, uint number = 1, Metadata? metadata = null, bool tryStack = true, bool force = false)
     {
-        ThrowIfDisposed();
         if (number <= 0)
             throw new ArgumentOutOfRangeException(nameof(number));
 
@@ -325,8 +304,6 @@ public class InventoryComponent : Component
 
     public void AddItem(ItemsRegistry itemsRegistry, Item newItem, bool force = false)
     {
-        ThrowIfDisposed();
-        
         if(!force)
         {
             var itemRegistryEntry = itemsRegistry.Get(newItem.ItemId);
@@ -350,8 +327,6 @@ public class InventoryComponent : Component
     
     public void AddItems(ItemsRegistry itemsRegistry, IEnumerable<Item> newItems, bool force = false)
     {
-        ThrowIfDisposed();
-
         _semaphore.EnterWriteLock();
 
         if (!force)
@@ -390,7 +365,6 @@ public class InventoryComponent : Component
     public bool RemoveItemStack(Item item) => RemoveItem(item, item.Number);
     public bool RemoveItemStack(uint id)
     {
-        ThrowIfDisposed();
         _semaphore.EnterWriteLock();
         try
         {
@@ -419,8 +393,6 @@ public class InventoryComponent : Component
 
     public bool RemoveItem(Item item, out uint removedNumber, out bool stackRemoved, uint number = 1)
     {
-        ThrowIfDisposed();
-
         if (number <= 0)
             throw new ArgumentOutOfRangeException(nameof(number));
 
@@ -461,7 +433,6 @@ public class InventoryComponent : Component
 
     public bool RemoveItem(uint id, uint number = 1)
     {
-        ThrowIfDisposed();
         _semaphore.EnterWriteLock();
         try
         {
@@ -488,7 +459,6 @@ public class InventoryComponent : Component
 
     private IEnumerable<Item> RemoveAndGetItemByIdInternal(uint id, uint number = 1)
     {
-        ThrowIfDisposed();
         _semaphore.EnterWriteLock();
         try
         {
@@ -522,8 +492,6 @@ public class InventoryComponent : Component
 
     public bool TryUseItem(Item item, ItemAction flags)
     {
-        ThrowIfDisposed();
-
         _semaphore.EnterReadLock();
         try
         {
@@ -543,28 +511,21 @@ public class InventoryComponent : Component
 
     public bool HasSpace(decimal space)
     {
-        ThrowIfDisposed();
         return Number + space <= Size;
     }
     
     public bool HasSpaceForItem(uint itemId, ItemsRegistry itemsRegistry)
     {
-        ThrowIfDisposed();
-
         return Number + itemsRegistry.Get(itemId).Size <= Size;
     }
     
     public bool HasSpaceForItem(uint itemId, uint number, ItemsRegistry itemsRegistry)
     {
-        ThrowIfDisposed();
-
         return Number + itemsRegistry.Get(itemId).Size * number <= Size;
     }
 
     public bool TransferItem(InventoryComponent destination, ItemsRegistry itemsRegistry, uint itemId, uint number, bool force)
     {
-        ThrowIfDisposed();
-
         if (SumItemsNumberById(itemId) >= number || force)
         {
             var removedItems = RemoveAndGetItemById(itemId, number);
@@ -584,8 +545,6 @@ public class InventoryComponent : Component
 
     public void Clear()
     {
-        ThrowIfDisposed();
-
         var items = Items.ToList();
         foreach (var item in items)
             RemoveItem(item, item.Number);

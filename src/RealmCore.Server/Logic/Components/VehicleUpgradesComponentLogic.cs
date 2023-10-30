@@ -56,7 +56,7 @@ internal sealed class VehicleUpgradesComponentLogic : ComponentLogic<VehicleUpgr
     {
         var entity = vehicleUpgradesComponent.Entity;
         var upgrades = vehicleUpgradesComponent.Upgrades;
-        var vehicle = entity.GetRequiredComponent<VehicleElementComponent>().Vehicle;
+        var vehicle = entity.GetRequiredComponent<VehicleElementComponent>();
         var vehicleHandling = VehicleHandlingConstants.DefaultVehicleHandling[vehicle.Model];
         object boxedVehicleHandling = vehicleHandling;
 

@@ -16,8 +16,6 @@ public class PlayTimeComponent : Component, IRareUpdateCallback
     {
         get
         {
-            ThrowIfDisposed();
-
             if (_startDateTime == null)
                 return TimeSpan.Zero;
             return _dateTimeProvider.Now - _startDateTime.Value;
@@ -28,7 +26,6 @@ public class PlayTimeComponent : Component, IRareUpdateCallback
     {
         get
         {
-            ThrowIfDisposed();
             return PlayTime + TimeSpan.FromSeconds(_totalPlayTime);
         }
     }
@@ -43,17 +40,11 @@ public class PlayTimeComponent : Component, IRareUpdateCallback
         _totalPlayTime = totalPlayTime;
         _dateTimeProvider = dateTimeProvider;
         _lastMinuteTotal = (int)TotalPlayTime.TotalMinutes;
-    }
-
-    protected override void Attach()
-    {
         _startDateTime = _dateTimeProvider.Now;
     }
 
     public void Reset()
     {
-        ThrowIfDisposed();
-
         _startDateTime = _dateTimeProvider.Now;
     }
 

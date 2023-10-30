@@ -1,9 +1,11 @@
-﻿namespace RealmCore.Server.Components.Elements.CollisionShapes;
+﻿
+namespace RealmCore.Server.Components.Elements.CollisionShapes;
 
-public class CollisionPolygonElementComponent : CollisionShapeElementComponent
+public class CollisionPolygonElementComponent : CollisionPolygon, ICollisionShape
 {
-    internal CollisionPolygonElementComponent(CollisionPolygon collisionPolygon, IEntityEngine entityEngine) : base(collisionPolygon, entityEngine)
+    public CollisionPolygonElementComponent(Vector3 position, IEnumerable<Vector2> vertices) : base(position, vertices)
     {
-
     }
+
+    public Entity Entity { get; set; }
 }

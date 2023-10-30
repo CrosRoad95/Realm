@@ -43,8 +43,6 @@ public class AchievementsComponent : Component
 
     public void SetAchievementValue(int achievementId, object value)
     {
-        ThrowIfDisposed();
-
         lock (_lock)
         {
             TryInitializeAchievementInternal(achievementId);
@@ -57,8 +55,6 @@ public class AchievementsComponent : Component
 
     public T? GetAchievementValue<T>(int achievementId)
     {
-        ThrowIfDisposed();
-
         lock (_lock)
         {
             TryInitializeAchievementInternal(achievementId);
@@ -70,8 +66,6 @@ public class AchievementsComponent : Component
 
     public float GetProgress(int achievementId)
     {
-        ThrowIfDisposed();
-
         lock (_lock)
         {
             TryInitializeAchievementInternal(achievementId);
@@ -81,8 +75,6 @@ public class AchievementsComponent : Component
 
     public bool HasReachedProgressThreshold(int achievementId, float progress)
     {
-        ThrowIfDisposed();
-
         if (progress < 0)
             throw new ArgumentOutOfRangeException(nameof(progress));
 
@@ -106,8 +98,6 @@ public class AchievementsComponent : Component
 
     public bool TryReceiveReward(int achievementId, float requiredProgress)
     {
-        ThrowIfDisposed();
-
         if (requiredProgress < 0)
             throw new ArgumentOutOfRangeException(nameof(requiredProgress));
 
@@ -132,8 +122,6 @@ public class AchievementsComponent : Component
 
     public bool SetProgress(int achievementId, float progress, float maximumProgress)
     {
-        ThrowIfDisposed();
-
         if (progress < 0)
             throw new ArgumentOutOfRangeException(nameof(progress));
 

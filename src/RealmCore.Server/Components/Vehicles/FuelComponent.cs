@@ -23,12 +23,10 @@ public class FuelComponent : Component, ILuaDebugDataProvider
     {
         get
         {
-            ThrowIfDisposed();
             return _active;
         }
         set
         {
-            ThrowIfDisposed();
             if (value)
                 Update(true);
 
@@ -41,11 +39,9 @@ public class FuelComponent : Component, ILuaDebugDataProvider
     {
         get
         {
-            ThrowIfDisposed();
             return _fuelType;
         }
         set {
-            ThrowIfDisposed();
             _fuelType = value;
             FuelTypeChanged?.Invoke(this, value);
         }
@@ -55,12 +51,10 @@ public class FuelComponent : Component, ILuaDebugDataProvider
     {
         get
         {
-            ThrowIfDisposed();
             return _minimumDistanceThreshold;
         }
         set
         {
-            ThrowIfDisposed();
             if (value < 0.0f) value = 0.0f;
             _minimumDistanceThreshold = value;
             MinimumDistanceThresholdChanged?.Invoke(this, value);
@@ -71,12 +65,10 @@ public class FuelComponent : Component, ILuaDebugDataProvider
     {
         get
         {
-            ThrowIfDisposed();
             return _fuelConsumptionPerOneKm;
         }
         set
         {
-            ThrowIfDisposed();
             if (value < 0.0f) value = 0.0f;
             _fuelConsumptionPerOneKm = value;
             FuelConsumptionPerOneKmChanged?.Invoke(this, value);
@@ -87,12 +79,10 @@ public class FuelComponent : Component, ILuaDebugDataProvider
     {
         get
         {
-            ThrowIfDisposed();
             return _amount;
         }
         set
         {
-            ThrowIfDisposed();
             if (value < 0.0f)
                 value = 0.0f;
             if (value >= MaxCapacity)
@@ -107,13 +97,11 @@ public class FuelComponent : Component, ILuaDebugDataProvider
     {
         get
         {
-            ThrowIfDisposed();
             return _maxCapacity;
         }
 
         set
         {
-            ThrowIfDisposed();
             if (value < 0.0f)
                 _maxCapacity = 0;
             else
@@ -139,9 +127,9 @@ public class FuelComponent : Component, ILuaDebugDataProvider
         _fuelType = fuelType;
     }
 
-    protected override void Attach()
+    public void Attach()
     {
-        var vehicle = Entity.GetRequiredComponent<VehicleElementComponent>().Vehicle;
+        var vehicle = Entity.GetRequiredComponent<VehicleElementComponent>();
         _lastPosition = vehicle.RespawnPosition;
 
         vehicle.PositionChanged += HandlePositionChanged;
@@ -153,9 +141,9 @@ public class FuelComponent : Component, ILuaDebugDataProvider
         }
     }
 
-    protected override void Detach()
+    public void Detach()
     {
-        var vehicle = Entity.GetRequiredComponent<VehicleElementComponent>().Vehicle;
+        var vehicle = Entity.GetRequiredComponent<VehicleElementComponent>();
         vehicle.PositionChanged -= HandlePositionChanged;
     }
 
@@ -167,7 +155,7 @@ public class FuelComponent : Component, ILuaDebugDataProvider
 
     private void Update(bool forceUpdate = false)
     {
-        var vehicle = Entity.GetRequiredComponent<VehicleElementComponent>().Vehicle;
+        var vehicle = Entity.GetRequiredComponent<VehicleElementComponent>();
 
         if (!vehicle.IsEngineOn && !forceUpdate)
         {

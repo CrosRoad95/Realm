@@ -1,6 +1,6 @@
 ﻿namespace RealmCore.Server.Logic.Components;
 
-internal sealed class CollisionShapeElementComponentLogic : ComponentLogic<CollisionShapeElementComponent, PlayerPrivateElementComponentBase>
+internal sealed class CollisionShapeElementComponentLogic : ComponentLogic<ICollisionShape, PlayerPrivateElementComponentBase>
 {
     private readonly IEntityEngine _entityEngine;
     private readonly IElementCollection _elementCollection;
@@ -11,14 +11,14 @@ internal sealed class CollisionShapeElementComponentLogic : ComponentLogic<Colli
         _elementCollection = elementCollection;
     }
 
-    protected override void ComponentAdded(CollisionShapeElementComponent collisionShapeElementComponent)
+    protected override void ComponentAdded(ICollisionShape collisionShapeElementComponent)
     {
-        collisionShapeElementComponent.CollidersRefreshed = HandleCollidersRefreshed;
+
     }
 
-    protected override void ComponentDetached(CollisionShapeElementComponent collisionShapeElementComponent)
+    protected override void ComponentDetached(ICollisionShape collisionShapeElementComponent)
     {
-        collisionShapeElementComponent.CollidersRefreshed = null;
+
     }
 
     protected override void ComponentAdded(PlayerPrivateElementComponentBase playerPrivateElementComponentBase)
@@ -34,20 +34,6 @@ internal sealed class CollisionShapeElementComponentLogic : ComponentLogic<Colli
         if (playerPrivateElementComponentBase is PlayerPrivateElementComponent<CollisionSphereElementComponent> privateCollisionSphereElementComponent)
         {
             ComponentDetached(privateCollisionSphereElementComponent.ElementComponent);
-        }
-    }
-
-    private void HandleCollidersRefreshed(CollisionShapeElementComponent collisionShapeElementComponent)
-    {
-        var element = collisionShapeElementComponent.Element;
-        if (element is CollisionSphere collisionSphere)
-        {
-            var elements = _elementCollection.GetWithinRange(collisionSphere.Position, collisionSphere.Radius);
-            foreach (var element2 in elements)
-            {
-                if (_entityEngine.TryGetByElement(element2, out Entity? entity) && entity != null)
-                    collisionShapeElementComponent.CheckCollisionWith(entity);
-            }
         }
     }
 }

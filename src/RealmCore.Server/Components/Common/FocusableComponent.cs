@@ -1,7 +1,7 @@
 ﻿namespace RealmCore.Server.Components.Common;
 
 [ComponentUsage(false)]
-public class FocusableComponent : Component
+public class FocusableComponent : ComponentLifecycle
 {
     private readonly object _lock = new();
     private readonly List<Entity> _focusedPlayers = new();
@@ -11,8 +11,6 @@ public class FocusableComponent : Component
     {
         get
         {
-            ThrowIfDisposed();
-
             lock (_lock)
                 return _focusedPlayers.Count;
         }
@@ -22,8 +20,6 @@ public class FocusableComponent : Component
     {
         get
         {
-            ThrowIfDisposed();
-
             lock (_lock)
             {
                 foreach (var focusedPlayer in _focusedPlayers)
@@ -36,8 +32,6 @@ public class FocusableComponent : Component
 
     internal bool AddFocusedPlayer(Entity entity)
     {
-        ThrowIfDisposed();
-
         if (entity == Entity)
             throw new InvalidOperationException(nameof(entity));
 
@@ -54,10 +48,8 @@ public class FocusableComponent : Component
         return false;
     }
 
-    internal bool RemoveFocusedPlayer(Entity entity)
+    public bool RemoveFocusedPlayer(Entity entity)
     {
-        ThrowIfDisposed();
-
         if (entity == Entity)
             throw new InvalidOperationException(nameof(entity));
 
@@ -85,7 +77,7 @@ public class FocusableComponent : Component
         }
     }
 
-    protected override void Detach()
+    public override void Detach()
     {
         lock (_lock)
         {

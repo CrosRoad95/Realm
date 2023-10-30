@@ -1,4 +1,6 @@
-﻿namespace RealmCore.Server.Concepts.Objectives;
+﻿using Microsoft.Extensions.DependencyInjection;
+
+namespace RealmCore.Server.Concepts.Objectives;
 
 public class MarkerEnterObjective : Objective
 {
@@ -15,28 +17,27 @@ public class MarkerEnterObjective : Objective
         _position = position;
     }
 
-    protected override void Load(IEntityFactory entityFactory, Entity playerEntity)
+    protected override void Load(IServiceProvider serviceProvider, Entity playerEntity)
     {
         _playerEntity = playerEntity;
+        var entityFactory = serviceProvider.GetRequiredService<IEntityFactory>();
         using var scopedEntityFactory = entityFactory.CreateScopedEntityFactory(playerEntity);
         scopedEntityFactory.CreateMarker(MarkerType.Arrow, _position, Color.White);
         _markerElementComponent = scopedEntityFactory.GetLastCreatedComponent<PlayerPrivateElementComponent<MarkerElementComponent>>();
         scopedEntityFactory.CreateCollisionSphere(_position, 2);
         _collisionSphereElementComponent = scopedEntityFactory.GetLastCreatedComponent<PlayerPrivateElementComponent<CollisionSphereElementComponent>>();
-        _collisionSphereElementComponent.ElementComponent.EntityEntered = EntityEntered;
+        _collisionSphereElementComponent.ElementComponent.ElementEntered += HandleElementEntered;
+    }
+
+    private void HandleElementEntered(Element element)
+    {
+        if (Entity == element.TryUpCast())
+            Complete(this);
     }
 
     public override void Update()
     {
-        _collisionSphereElementComponent.ElementComponent.CheckCollisionWith(_playerEntity);
-    }
-
-    private void EntityEntered(Entity colshapeEntity, Entity entity)
-    {
-        ThrowIfDisposed();
-
-        if (entity == Entity)
-            Complete(this);
+        _collisionSphereElementComponent.ElementComponent.CheckElementWithin(_playerEntity.GetElement());
     }
 
     public override void Dispose()

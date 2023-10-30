@@ -1,6 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using RealmCore.ECS.Attributes;
-using RealmCore.ECS.Interfaces;
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 
@@ -13,13 +12,13 @@ public sealed class Entity : IDisposable
     public string Id { get; } = Guid.NewGuid().ToString();
 
     private readonly ReaderWriterLockSlim _componentsLock = new(LockRecursionPolicy.SupportsRecursion);
-    private readonly List<Component> _components = new();
+    private readonly List<IComponent> _components = new();
     public IEnumerable<IComponent> Components
     {
         get
         {
             _componentsLock.EnterReadLock();
-            var components = new List<Component>(_components);
+            var components = new List<IComponent>(_components);
             _componentsLock.ExitReadLock();
             return components;
         }
@@ -36,17 +35,14 @@ public sealed class Entity : IDisposable
         }
     }
 
-    public Transform Transform => GetRequiredComponent<Transform>();
-
-    public event Action<Component>? ComponentAdded;
-    public event Action<Component>? ComponentDetached;
+    public event Action<IComponent>? ComponentAdded;
+    public event Action<IComponent>? ComponentDetached;
 
     public event Action<Entity>? Disposed;
-    public event Action<Entity>? PreDisposed;
 
     public Entity() { }
 
-    private void CheckCanBeAdded<TComponent>() where TComponent : Component
+    private void CheckCanBeAdded<TComponent>() where TComponent : IComponent
     {
         var componentUsageAttribute = typeof(TComponent).GetCustomAttribute<ComponentUsageAttribute>();
         if (componentUsageAttribute == null || componentUsageAttribute.AllowMultiple)
@@ -56,7 +52,7 @@ public sealed class Entity : IDisposable
             throw new ComponentCanNotBeAddedException<TComponent>();
     }
 
-    private void InternalAddComponent<TComponent>(TComponent component) where TComponent : Component
+    private void InternalAddComponent<TComponent>(TComponent component) where TComponent : IComponent
     {
         _componentsLock.EnterWriteLock();
         try
@@ -70,39 +66,50 @@ public sealed class Entity : IDisposable
         }
     }
 
-    public TComponent AddComponent<TComponent>() where TComponent : Component, new()
+    private bool InternalTryDetachComponent<TComponent>(TComponent component) where TComponent : IComponent
+    {
+        if (_components.Contains(component))
+        {
+            if (component is IComponentLifecycle componentLifecycle)
+                componentLifecycle.Detach();
+            _components.Remove(component);
+            return true;
+        }
+        return false;
+    }
+
+    public TComponent AddComponent<TComponent>() where TComponent : IComponent, new()
     {
         return AddComponent(new TComponent());
     }
 
-    public TComponent AddComponent<TComponent>(IServiceProvider serviceProvider) where TComponent : Component
+    public TComponent AddComponent<TComponent>(IServiceProvider serviceProvider) where TComponent : IComponent
     {
         return AddComponent(ActivatorUtilities.CreateInstance<TComponent>(serviceProvider));
     }
     
-    public TComponent AddComponent<TComponent>(IServiceProvider serviceProvider, params object[] parameters) where TComponent : Component
+    public TComponent AddComponent<TComponent>(IServiceProvider serviceProvider, params object[] parameters) where TComponent : IComponent
     {
         return AddComponent(ActivatorUtilities.CreateInstance<TComponent>(serviceProvider, parameters));
     }
     
-    public TComponent AddComponent<TComponent>(TComponent component) where TComponent : Component
+    public TComponent AddComponent<TComponent>(TComponent component) where TComponent : IComponent
     {
         ThrowIfDisposed();
 
-        if (!component.TrySetEntity(this))
+        if (component.Entity != this)
             throw new Exception("Component already attached to other entity");
+        component.Entity = this;
 
         InternalAddComponent(component);
         try
         {
-            component.InternalAttach();
+            if(component is IComponentLifecycle componentLifecycle)
+                componentLifecycle.Attach();
         }
         catch (Exception)
         {
-            component.TryRemoveEntity(() =>
-            {
-                DestroyComponent(component);
-            });
+            component.Entity = null;
             throw;
         }
 
@@ -110,17 +117,17 @@ public sealed class Entity : IDisposable
         return component;
     }
 
-    private TComponent? InternalGetComponent<TComponent>() where TComponent : Component
+    private TComponent? InternalGetComponent<TComponent>() where TComponent : IComponent
     {
         return _components.OfType<TComponent>().FirstOrDefault();
     }
 
-    private IEnumerable<TComponent> InternalGetComponents<TComponent>() where TComponent : Component
+    private IEnumerable<TComponent> InternalGetComponents<TComponent>() where TComponent : IComponent
     {
         return _components.OfType<TComponent>();
     }
 
-    public TComponent? GetComponent<TComponent>() where TComponent : Component
+    public TComponent? GetComponent<TComponent>() where TComponent : IComponent
     {
         ThrowIfDisposed();
 
@@ -135,7 +142,7 @@ public sealed class Entity : IDisposable
         }
     }
     
-    public TComponent? FindComponent<TComponent>(Func<TComponent, bool> callback) where TComponent : Component
+    public TComponent? FindComponent<TComponent>(Func<TComponent, bool> callback) where TComponent : class, IComponent
     {
         ThrowIfDisposed();
 
@@ -155,7 +162,7 @@ public sealed class Entity : IDisposable
         return null;
     }
 
-    public IReadOnlyList<TComponent> GetComponents<TComponent>() where TComponent : Component
+    public IReadOnlyList<TComponent> GetComponents<TComponent>() where TComponent : IComponent
     {
         ThrowIfDisposed();
 
@@ -170,17 +177,17 @@ public sealed class Entity : IDisposable
         }
     }
 
-    internal bool InternalHasComponent<TComponent>(TComponent component) where TComponent : Component
+    internal bool InternalHasComponent<TComponent>(TComponent component) where TComponent : IComponent
     {
         return _components.Contains(component);
     }
 
-    internal bool InternalHasComponent<TComponent>() where TComponent : Component
+    internal bool InternalHasComponent<TComponent>() where TComponent : IComponent
     {
         return _components.OfType<TComponent>().Any();
     }
 
-    public bool HasComponent<TComponent>() where TComponent : Component
+    public bool HasComponent<TComponent>() where TComponent : IComponent
     {
         ThrowIfDisposed();
 
@@ -195,7 +202,7 @@ public sealed class Entity : IDisposable
         }
     }
 
-    public bool HasComponent<TComponent>(TComponent component) where TComponent : Component
+    public bool HasComponent<TComponent>(TComponent component) where TComponent : IComponent
     {
         ThrowIfDisposed();
         bool has;
@@ -212,7 +219,7 @@ public sealed class Entity : IDisposable
         return has;
     }
     
-    public bool HasComponent<TComponent>(Func<TComponent, bool> callback) where TComponent : Component
+    public bool HasComponent<TComponent>(Func<TComponent, bool> callback) where TComponent : IComponent
     {
         ThrowIfDisposed();
 
@@ -249,39 +256,7 @@ public sealed class Entity : IDisposable
         return has;
     }
 
-    public bool TryGetComponent<TComponent>([NotNullWhen(true)] out TComponent component) where TComponent : Component
-    {
-        component = GetComponent<TComponent>()!;
-        return component != null;
-    }
-
-    public TComponent GetRequiredComponent<TComponent>() where TComponent : Component
-    {
-        var component = InternalGetComponent<TComponent>();
-        return component ?? throw new ComponentNotFoundException<TComponent>();
-    }
-
-    private void InternalDetachComponent<TComponent>(TComponent component) where TComponent : Component
-    {
-        component.TryRemoveEntity(() =>
-        {
-            try
-            {
-                ComponentDetached?.Invoke(component);
-                component.InternalDetach();
-            }
-            catch (Exception)
-            {
-                throw;
-            }
-            finally
-            {
-                _components.Remove(component);
-            }
-        });
-    }
-
-    public void DetachComponent<TComponent>(TComponent component) where TComponent : Component
+    public void DetachComponent<TComponent>(TComponent component) where TComponent : IComponent
     {
         ThrowIfDisposed();
 
@@ -290,7 +265,7 @@ public sealed class Entity : IDisposable
             _componentsLock.EnterWriteLock();
             try
             {
-                InternalDetachComponent(component);
+                InternalTryDetachComponent(component);
             }
             finally
             {
@@ -299,24 +274,38 @@ public sealed class Entity : IDisposable
         }
     }
 
-    public void DestroyComponent<TComponent>(TComponent component) where TComponent : Component
+    public bool TryGetComponent<TComponent>([NotNullWhen(true)] out TComponent component) where TComponent : IComponent
     {
-        ThrowIfDisposed();
-        DetachComponent(component);
-        component.Dispose();
+        component = GetComponent<TComponent>()!;
+        return component != null;
     }
 
-    public bool TryDestroyComponent<TComponent>(TComponent component) where TComponent : Component
+    public TComponent GetRequiredComponent<TComponent>() where TComponent : IComponent
+    {
+        var component = InternalGetComponent<TComponent>();
+        return component ?? throw new ComponentNotFoundException<TComponent>();
+    }
+
+    public void DestroyComponent<TComponent>(TComponent component) where TComponent : IComponent
+    {
+        ThrowIfDisposed();
+        if (component is IComponentLifecycle componentLifecycle)
+            componentLifecycle.Dispose();
+
+        component.Entity = null;
+    }
+
+    public bool TryDestroyComponent<TComponent>(TComponent component) where TComponent : IComponent
     {
         ThrowIfDisposed();
 
         _componentsLock.EnterWriteLock();
         try
         {
-            if (InternalHasComponent(component))
+            if (InternalTryDetachComponent(component))
             {
-                InternalDetachComponent(component);
-                component.Dispose();
+                if (component is IComponentLifecycle componentLifecycle)
+                    componentLifecycle.Dispose();
                 return true;
             }
         }
@@ -333,7 +322,7 @@ public sealed class Entity : IDisposable
         return false;
     }
 
-    public bool TryDestroyComponent<TComponent>() where TComponent : Component
+    public bool TryDestroyComponent<TComponent>() where TComponent : IComponent
     {
         ThrowIfDisposed();
 
@@ -345,8 +334,12 @@ public sealed class Entity : IDisposable
                 return false;
             try
             {
-                InternalDetachComponent(component);
-                component.Dispose();
+                if (InternalTryDetachComponent(component))
+                {
+                    if (component is IComponentLifecycle componentLifecycle)
+                        componentLifecycle.Dispose();
+                    return true;
+                }
             }
             catch (ObjectDisposedException)
             { }
@@ -362,12 +355,16 @@ public sealed class Entity : IDisposable
         return true;
     }
 
-    public void DestroyComponent<TComponent>() where TComponent : Component
+    public void DestroyComponent<TComponent>() where TComponent : IComponent
     {
         ThrowIfDisposed();
         var component = GetRequiredComponent<TComponent>();
-        DetachComponent(component);
-        component.Dispose();
+        if (!InternalTryDetachComponent(component))
+        {
+            throw new ComponentNotFoundException<TComponent>();
+        }
+        if (component is IComponentLifecycle componentLifecycle)
+            componentLifecycle.Dispose();
     }
 
     public void ThrowIfDisposed()
@@ -380,9 +377,7 @@ public sealed class Entity : IDisposable
     {
         ThrowIfDisposed();
 
-        PreDisposed?.Invoke(this);
-
-        List<Component> componentsToDestroy;
+        List<IComponent> componentsToDestroy;
         _componentsLock.EnterReadLock();
         try
         {

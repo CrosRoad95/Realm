@@ -11,7 +11,7 @@ internal sealed class Text3dComponentLogic : ComponentLogic<Text3dComponent>
 
     protected override void ComponentAdded(Text3dComponent text3DComponent)
     {
-        text3DComponent.Text3dId = _text3DService.CreateText3d(text3DComponent.Entity.Transform.Position + text3DComponent.Offset, text3DComponent.Text);
+        text3DComponent.Text3dId = _text3DService.CreateText3d(text3DComponent.Position, text3DComponent.Text);
     }
 
     protected override void ComponentDetached(Text3dComponent text3DComponent)

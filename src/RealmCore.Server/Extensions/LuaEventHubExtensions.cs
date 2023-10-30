@@ -6,6 +6,6 @@ public static class LuaEventHubExtensions
 {
     public static void Invoke<THub>(this ILuaEventHub<THub> luaEventHub, Entity entity, Expression<Action<THub>> expression)
     {
-        luaEventHub.Invoke(entity.GetPlayer(), expression);
+        luaEventHub.Invoke(entity.GetRequiredComponent<PlayerElementComponent>(), expression);
     }
 }

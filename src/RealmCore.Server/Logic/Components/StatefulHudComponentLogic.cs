@@ -16,6 +16,6 @@ internal sealed class StatefulHudComponentLogic : ComponentLogic<IStatefulHudCom
 
     protected override void ComponentDetached(IStatefulHudComponent statefulHudComponent)
     {
-        _overlayService.RemoveHud(statefulHudComponent.Entity.GetPlayer(), statefulHudComponent.Id);
+        _overlayService.RemoveHud(statefulHudComponent.Entity.GetRequiredComponent<PlayerElementComponent>(), statefulHudComponent.Id);
     }
 }

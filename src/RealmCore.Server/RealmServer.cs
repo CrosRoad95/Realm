@@ -38,7 +38,7 @@ public class MtaDiPlayerServerTempFix<TPlayer> : MtaServer<TPlayer> where TPlaye
 }
 
 
-public class RealmServer : MtaDiPlayerServerTempFix<RealmPlayer>, IRealmServer
+public class RealmServer : MtaDiPlayerServerTempFix<PlayerElementComponent>, IRealmServer
 {
     public Entity Console { get; private set; } = null!;
     public event Action? ServerStarted;

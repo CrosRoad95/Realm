@@ -1,15 +1,12 @@
-﻿using HudComponent = SlipeServer.Server.Elements.Enums.HudComponent;
+﻿namespace RealmCore.Server.Components.Elements;
 
-namespace RealmCore.Server.Components.Elements;
-
-public sealed class PlayerElementComponent : PedElementComponent
+public sealed class PlayerElementComponent : RealmPlayer, IElementComponent
 {
     private Entity? _focusedEntity;
     private Entity? _lastClickedElement;
-    private readonly Player _player;
-    private readonly Vector2 _screenSize;
+    public Vector2 ScreenSize { get; internal set; }
+    public CultureInfo CultureInfo { get; internal set; }
     private readonly CultureInfo _culture;
-    private readonly IEntityEngine _entityEngine;
     private readonly Dictionary<string, Func<Entity, KeyState, Task>> _asyncBinds = new();
     private readonly Dictionary<string, Action<Entity, KeyState>> _binds = new();
     private readonly SemaphoreSlim _bindsLock = new(1);
@@ -22,21 +19,26 @@ public sealed class PlayerElementComponent : PedElementComponent
     private readonly List<short> _enableFightFlags = new();
     private readonly object _enableFightFlagsLock = new();
     private readonly MapIdGenerator _mapIdGenerator = new(IdGeneratorConstants.MapIdStart, IdGeneratorConstants.MapIdStop);
+
+    public PlayerElementComponent(IServiceProvider serviceProvider) : base(serviceProvider)
+    {
+    }
+
     public event Action<Entity, Entity?>? FocusedEntityChanged;
     public event Action<Entity, Entity?>? ClickedEntityChanged;
-    internal Player Player => _player;
-    internal bool Spawned { get; set; }
+
+    public Entity Entity { get; set; }
 
     public Entity? FocusedEntity
     {
         get
         {
-            ThrowIfDisposed();
+            this.ThrowIfDestroyed();
             return _focusedEntity;
         }
         internal set
         {
-            ThrowIfDisposed();
+            this.ThrowIfDestroyed();
             if (value != _focusedEntity)
             {
                 _focusedEntity = value;
@@ -49,12 +51,12 @@ public sealed class PlayerElementComponent : PedElementComponent
     {
         get
         {
-            ThrowIfDisposed();
+            this.ThrowIfDestroyed();
             return _lastClickedElement;
         }
         internal set
         {
-            ThrowIfDisposed();
+            this.ThrowIfDestroyed();
             if (value != _lastClickedElement)
             {
                 _lastClickedElement = value;
@@ -63,266 +65,36 @@ public sealed class PlayerElementComponent : PedElementComponent
         }
     }
 
-    public Vector2 ScreenSize
-    {
-        get
-        {
-            ThrowIfDisposed();
-            return _screenSize;
-        }
-    }
-
     public CultureInfo Culture
     {
         get
         {
-            ThrowIfDisposed();
+            this.ThrowIfDestroyed();
             return _culture;
         }
     }
 
-    public string Name
-    {
-        get
-        {
-            ThrowIfDisposed();
-            return _player.Name;
-        }
-        set
-        {
-            ThrowIfDisposed();
-            _player.Name = value;
-        }
-    }
-
-    public byte WantedLevel
-    {
-        get
-        {
-            ThrowIfDisposed();
-            return _player.WantedLevel;
-        }
-        set
-        {
-            ThrowIfDisposed();
-            _player.WantedLevel = value;
-        }
-    }
-
-    public Vector3 AimOrigin
-    {
-        get
-        {
-            ThrowIfDisposed();
-            return _player.AimOrigin;
-        }
-        set
-        {
-            ThrowIfDisposed();
-            _player.AimOrigin = value;
-        }
-    }
-
-    public Vector3 AimDirection
-    {
-        get
-        {
-            ThrowIfDisposed();
-            return _player.AimDirection;
-        }
-        set
-        {
-            ThrowIfDisposed();
-            _player.AimDirection = value;
-        }
-    }
-
-    public Vector3 CameraPosition
-    {
-        get
-        {
-            ThrowIfDisposed();
-            return _player.CameraPosition;
-        }
-        set
-        {
-            ThrowIfDisposed();
-            _player.CameraPosition = value;
-        }
-    }
-
-    public Vector3 CameraDirection
-    {
-        get
-        {
-            ThrowIfDisposed();
-            return _player.CameraDirection;
-        }
-        set
-        {
-            ThrowIfDisposed();
-            _player.CameraDirection = value;
-        }
-    }
-
-    public float CameraRotation
-    {
-        get
-        {
-            ThrowIfDisposed();
-            return _player.CameraRotation;
-        }
-        set
-        {
-            ThrowIfDisposed();
-            _player.CameraRotation = value;
-        }
-    }
-
-    public bool IsOnGround
-    {
-        get
-        {
-            ThrowIfDisposed();
-            return _player.IsOnGround;
-        }
-        set
-        {
-            ThrowIfDisposed();
-            _player.IsOnGround = value;
-        }
-    }
-
-    public bool WearsGoggles
-    {
-        get
-        {
-            ThrowIfDisposed();
-            return _player.WearsGoggles;
-        }
-        set
-        {
-            ThrowIfDisposed();
-            _player.WearsGoggles = value;
-        }
-    }
-
-    public bool HasContact
-    {
-        get
-        {
-            ThrowIfDisposed();
-            return _player.HasContact;
-        }
-        set
-        {
-            ThrowIfDisposed();
-            _player.HasContact = value;
-        }
-    }
-
-    public bool IsChoking
-    {
-        get
-        {
-            ThrowIfDisposed();
-            return _player.IsChoking;
-        }
-        set
-        {
-            ThrowIfDisposed();
-            _player.IsChoking = value;
-        }
-    }
-
-    public IClient Client
-    {
-        get
-        {
-            ThrowIfDisposed();
-            return _player.Client;
-        }
-    }
-
-    public Controls Controls
-    {
-        get
-        {
-            ThrowIfDisposed();
-            return _player.Controls;
-        }
-    }
-
-    public bool IsInWater
-    {
-        get
-        {
-            ThrowIfDisposed();
-            return _player.IsInWater;
-        }
-    }
-
-    internal override Element Element => _player;
     internal MapIdGenerator MapIdGenerator => _mapIdGenerator;
 
     public event Action<PlayerElementComponent, PedWastedEventArgs>? Wasted;
     public event Action<PlayerElementComponent, PlayerDamagedEventArgs>? Damaged;
     public event Action<Entity?>? VehicleChanged;
 
-    private Entity? _vehicle;
-    public Entity? Vehicle
+    public void Attach()
     {
-        get
-        {
-            ThrowIfDisposed();
-            return _vehicle;
-        }
-        internal set
-        {
-            if(_vehicle != value)
-            {
-                _vehicle = value;
-                VehicleChanged?.Invoke(value);
-            }
-        }
-    }
-
-    internal PlayerElementComponent(Player player, Vector2 screenSize, CultureInfo cultureInfo) : base(player)
-    {
-        _player = player;
-        _screenSize = screenSize;
-        _culture = cultureInfo;
-    }
-
-    protected override void Attach()
-    {
-        ThrowIfDisposed();
-        _player.BindExecuted += HandleBindExecuted;
-        _player.Wasted += HandleWasted;
-        _player.Damaged += HandleDamaged;
+        BindExecuted += HandleBindExecuted;
+        IsNametagShowing = false;
         UpdateFight();
-        _player.IsNametagShowing = false;
-        base.Attach();
-    }
-
-    private void HandleDamaged(Player sender, PlayerDamagedEventArgs e)
-    {
-        Damaged?.Invoke(this, e);
-    }
-
-    private void HandleWasted(Ped sender, PedWastedEventArgs e)
-    {
-        Wasted?.Invoke(this, e);
     }
 
     private void UpdateFight()
     {
-        _player.Controls.FireEnabled = _enableFightFlags.Count != 0;
+        Controls.FireEnabled = _enableFightFlags.Count != 0;
     }
 
     public bool AddEnableFightFlag(short flag)
     {
-        ThrowIfDisposed();
+        this.ThrowIfDestroyed();
         lock (_enableFightFlagsLock)
         {
             if (!_enableFightFlags.Contains(flag))
@@ -337,7 +109,7 @@ public sealed class PlayerElementComponent : PedElementComponent
 
     public bool RemoveEnableFightFlag(short flag)
     {
-        ThrowIfDisposed();
+        this.ThrowIfDestroyed();
         lock (_enableFightFlagsLock)
         {
             if (_enableFightFlags.Contains(flag))
@@ -350,11 +122,9 @@ public sealed class PlayerElementComponent : PedElementComponent
         return false;
     }
 
-    public bool Compare(Player player) => _player == player;
-
     public bool TrySpawnAtLastPosition()
     {
-        ThrowIfDisposed();
+        this.ThrowIfDestroyed();
         var userComponent = Entity.GetComponent<UserComponent>();
         if (userComponent != null)
         {
@@ -362,8 +132,8 @@ public sealed class PlayerElementComponent : PedElementComponent
             if (lastTransformAndMotion != null)
             {
                 Spawn(lastTransformAndMotion.Position, lastTransformAndMotion.Rotation);
-                Entity.Transform.Interior = lastTransformAndMotion.Interior;
-                Entity.Transform.Dimension = lastTransformAndMotion.Dimension;
+                Interior = lastTransformAndMotion.Interior;
+                Dimension = lastTransformAndMotion.Dimension;
                 return true;
             }
         }
@@ -373,61 +143,28 @@ public sealed class PlayerElementComponent : PedElementComponent
 
     public void Spawn(Vector3 position, Vector3? rotation = null)
     {
-        ThrowIfDisposed();
-        _player.Spawn(position, 0, 0, 0, 0);
-        _player.Camera.Target = _player;
-        Entity.Transform.Position = position;
-        Entity.Transform.Rotation = rotation ?? Vector3.Zero;
-        Spawned = true;
-    }
-
-    public void SetCameraMatrix(Vector3 from, Vector3 to)
-    {
-        ThrowIfDisposed();
-        _player.Camera.SetMatrix(from, to);
-    }
-
-    public void FadeCamera(CameraFade cameraFade, float fadeTime = 0.5f)
-    {
-        ThrowIfDisposed();
-        _player.Camera.Fade(cameraFade, fadeTime);
+        Spawn(position, 0, 0, 0, 0);
+        Camera.Target = this;
     }
 
     public async Task FadeCameraAsync(CameraFade cameraFade, float fadeTime = 0.5f, CancellationToken cancellationToken = default)
     {
-        ThrowIfDisposed();
-        var cancellationTokenSource = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
-        void handleDetached(Component component)
-        {
-            cancellationTokenSource.Cancel();
-        }
-        Detached += handleDetached;
-        _player.Camera.Fade(cameraFade, fadeTime);
+        this.ThrowIfDestroyed();
+        Camera.Fade(cameraFade, fadeTime);
         try
         {
-            await Task.Delay(TimeSpan.FromSeconds(fadeTime), cancellationTokenSource.Token);
+            await Task.Delay(TimeSpan.FromSeconds(fadeTime), cancellationToken);
         }
         catch (Exception)
         {
-            _player.Camera.Fade(cameraFade == CameraFade.In ? CameraFade.Out : CameraFade.In, 0);
+            Camera.Fade(cameraFade == CameraFade.In ? CameraFade.Out : CameraFade.In, 0);
             throw;
         }
-        finally
-        {
-            Detached -= handleDetached;
-        }
-    }
-
-    public void SetCameraTarget(Entity entity)
-    {
-        ThrowIfDisposed();
-        var elementComponent = entity.GetRequiredComponent<ElementComponent>();
-        _player.Camera.Target = elementComponent.Element;
     }
 
     public void SetBindAsync(string key, Func<Entity, KeyState, Task> callback)
     {
-        ThrowIfDisposed();
+        this.ThrowIfDestroyed();
 
         _bindsLock.Wait();
         if (_asyncBinds.ContainsKey(key))
@@ -436,14 +173,14 @@ public sealed class PlayerElementComponent : PedElementComponent
             throw new BindAlreadyExistsException(key);
         }
 
-        _player.SetBind(key, KeyState.Both);
+        SetBind(key, KeyState.Both);
         _asyncBinds[key] = callback;
         _bindsLock.Release();
     }
 
     public void SetBindAsync(string key, Func<Entity, Task> callback)
     {
-        ThrowIfDisposed();
+        this.ThrowIfDestroyed();
         _bindsLock.Wait();
         if (_asyncBinds.ContainsKey(key))
         {
@@ -451,7 +188,7 @@ public sealed class PlayerElementComponent : PedElementComponent
             throw new BindAlreadyExistsException(key);
         }
 
-        _player.SetBind(key, KeyState.Down);
+        SetBind(key, KeyState.Down);
         _asyncBinds[key] = async (entity, keyState) =>
         {
             if (keyState == KeyState.Down)
@@ -462,7 +199,7 @@ public sealed class PlayerElementComponent : PedElementComponent
 
     public void SetBind(string key, Action<Entity, KeyState> callback)
     {
-        ThrowIfDisposed();
+        this.ThrowIfDestroyed();
 
         _bindsLock.Wait();
         if (_asyncBinds.ContainsKey(key))
@@ -471,14 +208,14 @@ public sealed class PlayerElementComponent : PedElementComponent
             throw new BindAlreadyExistsException(key);
         }
 
-        _player.SetBind(key, KeyState.Both);
+        SetBind(key, KeyState.Both);
         _binds[key] = callback;
         _bindsLock.Release();
     }
 
     public void SetBind(string key, Action<Entity> callback)
     {
-        ThrowIfDisposed();
+        this.ThrowIfDestroyed();
         _bindsLock.Wait();
         if (_binds.ContainsKey(key))
         {
@@ -486,7 +223,7 @@ public sealed class PlayerElementComponent : PedElementComponent
             throw new BindAlreadyExistsException(key);
         }
 
-        _player.SetBind(key, KeyState.Down);
+        SetBind(key, KeyState.Down);
         _binds[key] = (entity, keyState) =>
         {
             if (keyState == KeyState.Down)
@@ -497,14 +234,14 @@ public sealed class PlayerElementComponent : PedElementComponent
 
     public void Unbind(string key)
     {
-        ThrowIfDisposed();
+        this.ThrowIfDestroyed();
         _bindsLock.Wait();
         if (!_asyncBinds.ContainsKey(key) || !_binds.ContainsKey(key))
         {
             _bindsLock.Release();
             throw new BindDoesNotExistsException(key);
         }
-        _player.RemoveBind(key, KeyState.Both);
+        RemoveBind(key, KeyState.Both);
         if (_asyncBinds.ContainsKey(key))
             _asyncBinds.Remove(key);
         if (_binds.ContainsKey(key))
@@ -514,12 +251,12 @@ public sealed class PlayerElementComponent : PedElementComponent
 
     public void RemoveAllBinds()
     {
-        ThrowIfDisposed();
+        this.ThrowIfDestroyed();
         _bindsLock.Wait();
         foreach (var pair in _asyncBinds)
-            _player.RemoveBind(pair.Key, KeyState.Both);
+            RemoveBind(pair.Key, KeyState.Both);
         foreach (var pair in _binds)
-            _player.RemoveBind(pair.Key, KeyState.Both);
+            RemoveBind(pair.Key, KeyState.Both);
 
         _asyncBinds.Clear();
         _binds.Clear();
@@ -529,7 +266,7 @@ public sealed class PlayerElementComponent : PedElementComponent
 
     public void ResetCooldown(string key, KeyState keyState = KeyState.Down)
     {
-        ThrowIfDisposed();
+        this.ThrowIfDestroyed();
 
         lock (_bindsCooldownLock)
         {
@@ -573,7 +310,7 @@ public sealed class PlayerElementComponent : PedElementComponent
 
     public bool IsCooldownActive(string key, KeyState keyState = KeyState.Down)
     {
-        ThrowIfDisposed();
+        this.ThrowIfDestroyed();
 
         if (keyState == KeyState.Down)
             _bindsDownLock.Wait();
@@ -622,7 +359,7 @@ public sealed class PlayerElementComponent : PedElementComponent
 
     internal async Task InternalHandleBindExecuted(string key, KeyState keyState)
     {
-        ThrowIfDisposed();
+        this.ThrowIfDestroyed();
 
         if (IsCooldownActive(key, keyState))
             return;
@@ -656,24 +393,18 @@ public sealed class PlayerElementComponent : PedElementComponent
         }
     }
 
-    public void ToggleAllControls(bool isEnabled, bool gtaControls = true, bool mtaControls = true)
-    {
-        ThrowIfDisposed();
-        _player.ToggleAllControls(isEnabled, gtaControls, mtaControls);
-    }
-
     public async Task DoComplexAnimationAsync(Animation animation, bool blockMovement = true)
     {
-        ThrowIfDisposed();
+        this.ThrowIfDestroyed();
 
-        var walkEnabled = _player.Controls.WalkEnabled;
-        var fireEnabled = _player.Controls.FireEnabled;
-        var jumpEnabled = _player.Controls.JumpEnabled;
+        var walkEnabled = Controls.WalkEnabled;
+        var fireEnabled = Controls.FireEnabled;
+        var jumpEnabled = Controls.JumpEnabled;
         if (blockMovement)
         {
-            _player.Controls.WalkEnabled = false;
-            _player.Controls.FireEnabled = false;
-            _player.Controls.JumpEnabled = false;
+            Controls.WalkEnabled = false;
+            Controls.FireEnabled = false;
+            Controls.JumpEnabled = false;
         }
 
         try
@@ -681,9 +412,9 @@ public sealed class PlayerElementComponent : PedElementComponent
             switch (animation)
             {
                 case Animation.ComplexLiftUp:
-                    _player.SetAnimation("freeweights", "gym_free_pickup", TimeSpan.FromSeconds(3f), false, false, false, false, null, true);
+                    SetAnimation("freeweights", "gym_free_pickup", TimeSpan.FromSeconds(3f), false, false, false, false, null, true);
                     await Task.Delay(TimeSpan.FromSeconds(3f));
-                    _player.SetAnimation("CARRY", "crry_prtial", TimeSpan.FromSeconds(0.2f), true);
+                    SetAnimation("CARRY", "crry_prtial", TimeSpan.FromSeconds(0.2f), true);
                     break;
                 default:
                     throw new NotSupportedException();
@@ -697,21 +428,16 @@ public sealed class PlayerElementComponent : PedElementComponent
         {
             if (blockMovement)
             {
-                _player.Controls.WalkEnabled = walkEnabled;
-                _player.Controls.FireEnabled = fireEnabled;
-                _player.Controls.JumpEnabled = jumpEnabled;
+                Controls.WalkEnabled = walkEnabled;
+                Controls.FireEnabled = fireEnabled;
+                Controls.JumpEnabled = jumpEnabled;
             }
         }
     }
 
-    public void StopAnimation()
-    {
-        _player.StopAnimation();
-    }
-
     public void DoAnimation(Animation animation, TimeSpan? timeSpan = null)
     {
-        ThrowIfDisposed();
+        this.ThrowIfDestroyed();
 
         DoAnimationInternal(animation, ref timeSpan);
     }
@@ -722,51 +448,51 @@ public sealed class PlayerElementComponent : PedElementComponent
         {
             case Animation.StartCarry:
                 timeSpan ??= TimeSpan.FromSeconds(1);
-                _player.SetAnimation("CARRY", "crry_prtial", timeSpan, true, false);
+                SetAnimation("CARRY", "crry_prtial", timeSpan, true, false);
                 break;
             case Animation.CrouchAndTakeALook:
                 timeSpan ??= TimeSpan.FromSeconds(1);
-                _player.SetAnimation("COP_AMBIENT", "Copbrowse_nod", timeSpan, true, false);
+                SetAnimation("COP_AMBIENT", "Copbrowse_nod", timeSpan, true, false);
                 break;
             case Animation.Swing:
                 timeSpan ??= TimeSpan.FromSeconds(0.5f);
-                _player.SetAnimation("SWORD", "sword_block", timeSpan, false, false);
+                SetAnimation("SWORD", "sword_block", timeSpan, false, false);
                 break;
             case Animation.Click:
                 timeSpan ??= TimeSpan.FromSeconds(1);
-                _player.SetAnimation("CRIB", "CRIB_Use_Switch", timeSpan, true, false);
+                SetAnimation("CRIB", "CRIB_Use_Switch", timeSpan, true, false);
                 break;
             case Animation.Eat:
                 timeSpan ??= TimeSpan.FromSeconds(1);
-                _player.SetAnimation("FOOD", "EAT_Burger", timeSpan, true, false);
+                SetAnimation("FOOD", "EAT_Burger", timeSpan, true, false);
                 break;
             case Animation.Sit:
                 timeSpan ??= TimeSpan.FromSeconds(1);
-                _player.SetAnimation("BEACH", "ParkSit_M_loop", timeSpan, true, false);
+                SetAnimation("BEACH", "ParkSit_M_loop", timeSpan, true, false);
                 break;
             case Animation.CarryLiftUp:
                 timeSpan ??= TimeSpan.FromSeconds(1.0f);
-                _player.SetAnimation("CARRY", "liftup", timeSpan, false, false, false, false);
+                SetAnimation("CARRY", "liftup", timeSpan, false, false, false, false);
                 break;
             case Animation.CarryPutDown:
                 timeSpan ??= TimeSpan.FromSeconds(1.0f);
-                _player.SetAnimation("CARRY", "putdwn", timeSpan, false, false, false, false);
+                SetAnimation("CARRY", "putdwn", timeSpan, false, false, false, false);
                 break;
             case Animation.CarryLiftUpFromTable:
                 timeSpan ??= TimeSpan.FromSeconds(1.25f);
-                _player.SetAnimation("CARRY", "liftup105", timeSpan, false, false, false, false);
+                SetAnimation("CARRY", "liftup105", timeSpan, false, false, false, false);
                 break;
             case Animation.CarryPutDownOnTable:
                 timeSpan ??= TimeSpan.FromSeconds(1.0f);
-                _player.SetAnimation("CARRY", "putdwn105", timeSpan, false, false, false, false);
+                SetAnimation("CARRY", "putdwn105", timeSpan, false, false, false, false);
                 break;
             case Animation.PlantBomb:
                 timeSpan ??= TimeSpan.FromSeconds(1.5f);
-                _player.SetAnimation("BOMBER", "BOM_Plant", timeSpan, false, false, false, false);
+                SetAnimation("BOMBER", "BOM_Plant", timeSpan, false, false, false, false);
                 break;
             case Animation.StartFishing:
                 timeSpan ??= TimeSpan.FromSeconds(1.5f);
-                _player.SetAnimation("SWORD", "sword_block", timeSpan, false, false, false, true);
+                SetAnimation("SWORD", "sword_block", timeSpan, false, false, false, true);
                 break;
             default:
                 throw new NotSupportedException();
@@ -775,16 +501,16 @@ public sealed class PlayerElementComponent : PedElementComponent
 
     public async Task DoAnimationAsync(Animation animation, TimeSpan? timeSpan = null, bool blockMovement = true)
     {
-        ThrowIfDisposed();
+        this.ThrowIfDestroyed();
 
-        var walkEnabled = _player.Controls.WalkEnabled;
-        var fireEnabled = _player.Controls.FireEnabled;
-        var jumpEnabled = _player.Controls.JumpEnabled;
+        var walkEnabled = Controls.WalkEnabled;
+        var fireEnabled = Controls.FireEnabled;
+        var jumpEnabled = Controls.JumpEnabled;
         if (blockMovement)
         {
-            _player.Controls.WalkEnabled = false;
-            _player.Controls.FireEnabled = false;
-            _player.Controls.JumpEnabled = false;
+            Controls.WalkEnabled = false;
+            Controls.FireEnabled = false;
+            Controls.JumpEnabled = false;
         }
 
         try
@@ -801,70 +527,10 @@ public sealed class PlayerElementComponent : PedElementComponent
         {
             if (blockMovement)
             {
-                _player.Controls.WalkEnabled = walkEnabled;
-                _player.Controls.FireEnabled = fireEnabled;
-                _player.Controls.JumpEnabled = jumpEnabled;
+                Controls.WalkEnabled = walkEnabled;
+                Controls.FireEnabled = fireEnabled;
+                Controls.JumpEnabled = jumpEnabled;
             }
         }
-    }
-
-    public void Kick(PlayerDisconnectType playerDisconnectType)
-    {
-        ThrowIfDisposed();
-        _player.Kick(playerDisconnectType);
-    }
-
-    public void Kick(string reason)
-    {
-        ThrowIfDisposed();
-        _player.Kick(reason);
-    }
-
-    public void ShowHudComponent(HudComponent hudComponent, bool isVisible)
-    {
-        ThrowIfDisposed();
-        _player.ShowHudComponent(hudComponent, isVisible);
-    }
-
-    public void SetFpsLimit(ushort limit)
-    {
-        ThrowIfDisposed();
-        _player.SetFpsLimit(limit);
-    }
-
-    public void PlaySound(byte sound)
-    {
-        ThrowIfDisposed();
-        _player.PlaySound(sound);
-    }
-
-    public void SetTransferBoxVisible(bool visible)
-    {
-        ThrowIfDisposed();
-        _player.SetTransferBoxVisible(visible);
-    }
-
-    public void WarpIntoVehicle(Entity vehicleEntity, byte seat = 0)
-    {
-        ThrowIfDisposed();
-        var vehicle = vehicleEntity.GetVehicle();
-        Entity.Transform.Interior = vehicle.Interior;
-        Entity.Transform.Dimension = vehicle.Dimension;
-        _player.WarpIntoVehicle(vehicle, seat);
-    }
-
-    public void RemoveFromVehicle(bool warpOut = true)
-    {
-        ThrowIfDisposed();
-        _player.RemoveFromVehicle(warpOut);
-    }
-
-    public override void Dispose()
-    {
-        _player.BindExecuted -= HandleBindExecuted;
-        _player.Wasted -= HandleWasted;
-        _player.Damaged -= HandleDamaged;
-        ((RealmPlayer)_player).Dispose();
-        base.Dispose();
     }
 }

@@ -17,27 +17,23 @@ internal sealed class AFKResourceLogic
 
     private void HandlePlayerAFKStarted(Player player)
     {
-        if (_entityEngine.TryGetEntityByPlayer(player, out var entity) && entity != null)
+        var entity = ((PlayerElementComponent)player).Entity;
+        if (entity.TryGetComponent(out AFKComponent afkComponent))
         {
-            if (entity.TryGetComponent(out AFKComponent afkComponent))
-            {
-                using var _ = _logger.BeginEntity(entity);
-                _logger.LogInformation("Player started AFK");
-                afkComponent.HandlePlayerAFKStarted(_dateTimeProvider.Now);
-            }
+            using var _ = _logger.BeginEntity(entity);
+            _logger.LogInformation("Player started AFK");
+            afkComponent.HandlePlayerAFKStarted(_dateTimeProvider.Now);
         }
     }
 
     private void HandlePlayerAFKStopped(Player player)
     {
-        if (_entityEngine.TryGetEntityByPlayer(player, out var entity) && entity != null)
+        var entity = ((PlayerElementComponent)player).Entity;
+        if (entity.TryGetComponent(out AFKComponent afkComponent))
         {
-            if (entity.TryGetComponent(out AFKComponent afkComponent))
-            {
-                using var _ = _logger.BeginEntity(entity);
-                _logger.LogInformation("Player stopped AFK");
-                afkComponent.HandlePlayerAFKStopped(_dateTimeProvider.Now);
-            }
+            using var _ = _logger.BeginEntity(entity);
+            _logger.LogInformation("Player stopped AFK");
+            afkComponent.HandlePlayerAFKStopped(_dateTimeProvider.Now);
         }
     }
 }

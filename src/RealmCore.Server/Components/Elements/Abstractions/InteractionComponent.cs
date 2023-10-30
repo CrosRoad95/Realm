@@ -1,6 +1,6 @@
 ﻿namespace RealmCore.Server.Components.Elements.Abstractions;
 
-public abstract class InteractionComponent : Component
+public abstract class InteractionComponent : ComponentLifecycle
 {
     public virtual float MaxInteractionDistance { get; } = 1.3f;
 

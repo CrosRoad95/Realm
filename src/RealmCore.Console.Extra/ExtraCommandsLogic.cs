@@ -1,6 +1,4 @@
-﻿using RealmCore.Server;
-using RealmCore.Server.Components.Elements;
-using RealmCore.Server.Components.Elements.Abstractions;
+﻿using RealmCore.Server.Components.Elements;
 using RealmCore.Server.Services;
 
 namespace RealmCore.Console.Extra;
@@ -33,14 +31,14 @@ internal class ExtraCommandsLogic
         {
             var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();
             var messageId = await _discordService.SendMessage(1079342213097607399, args.ReadAllAsString());
-            _chatBox.OutputTo(RealmInternal.GetPlayer(entity.GetRequiredComponent<ElementComponent>()), $"Wysłano wiadomość, id: {messageId}");
+            _chatBox.OutputTo(entity.GetRequiredComponent<PlayerElementComponent>(), $"Wysłano wiadomość, id: {messageId}");
         });
 
         _commandService.AddAsyncCommandHandler("discordsendmessagetouser", async (entity, args) =>
         {
             var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();
             var messageId = await _discordService.SendMessageToUser(659910279353729086, args.ReadAllAsString());
-            _chatBox.OutputTo(RealmInternal.GetPlayer(entity.GetRequiredComponent<ElementComponent>()), $"Wysłano wiadomość, id: {messageId}");
+            _chatBox.OutputTo(entity.GetRequiredComponent<PlayerElementComponent>(), $"Wysłano wiadomość, id: {messageId}");
         });
 
         Stream generateStreamFromString(string s)
@@ -57,7 +55,7 @@ internal class ExtraCommandsLogic
         {
             var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();
             var messageId = await _discordService.SendFile(997787973775011853, generateStreamFromString("dowody"), "dowody_na_borsuka.txt", "potwierdzam");
-            _chatBox.OutputTo(RealmInternal.GetPlayer(entity.GetRequiredComponent<ElementComponent>()), $"Wysłano plik, id: {messageId}");
+            _chatBox.OutputTo(entity.GetRequiredComponent<PlayerElementComponent>(), $"Wysłano plik, id: {messageId}");
         });
 
 

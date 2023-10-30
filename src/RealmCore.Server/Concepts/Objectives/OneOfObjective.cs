@@ -13,14 +13,14 @@ public class OneOfObjective : Objective
         _objectives = objectives;
     }
 
-    protected override void Load(IEntityFactory entityFactory, Entity playerEntity)
+    protected override void Load(IServiceProvider serviceProvider, Entity playerEntity)
     {
         foreach (var item in _objectives)
         {
             item.Completed += HandleCompleted;
             item.InCompleted += HandleIncompleted;
             item.Entity = playerEntity;
-            item.LoadInternal(entityFactory, playerEntity, Logger);
+            item.LoadInternal(serviceProvider, playerEntity, Logger);
         }
     }
 

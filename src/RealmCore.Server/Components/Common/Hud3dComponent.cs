@@ -1,6 +1,6 @@
 ﻿namespace RealmCore.Server.Components.Common;
 
-public abstract class Hud3dComponentBase : Component
+public abstract class Hud3dComponentBase : ComponentLifecycle
 {
     private static int _idCounter = 0;
     protected readonly int _id;
@@ -18,7 +18,7 @@ public abstract class Hud3dComponentBase : Component
 
     protected void SetHud3dState(int id, Dictionary<int, object?> state) => StateChanged?.Invoke(this, id, state);
 
-    protected override void Detach()
+    public override void Detach()
     {
         Removed?.Invoke(this, _id);
     }
@@ -31,21 +31,20 @@ public class Hud3dComponent<TState> : Hud3dComponentBase where TState : class
     private readonly Action<IHudBuilder<TState>> _hudBuilderCallback;
     private readonly List<DynamicHudComponent> _dynamicHudComponents = new();
     private readonly TState? _state;
-    private readonly Vector3 _offset;
 
-    public Vector3 Offset => _offset;
     internal IEnumerable<DynamicHudComponent> DynamicHudComponents => _dynamicHudComponents;
 
-    public Hud3dComponent(Action<IHudBuilder<TState>> hudBuilderCallback, TState? defaultState = null, Vector3? offset = null) : base()
+    public Vector3 Position { get; }
+
+    public Hud3dComponent(Action<IHudBuilder<TState>> hudBuilderCallback, Vector3 position, TState? defaultState = null) : base()
     {
         _hudBuilderCallback = hudBuilderCallback;
+        Position = position;
         _state = defaultState;
-        _offset = offset ?? Vector3.Zero;
     }
 
     public void UpdateState(Action<TState> callback)
     {
-        ThrowIfDisposed();
         if (_state == null || _dynamicHudComponents == null || _dynamicHudComponents.Count == 0)
             throw new HudException("Hud3d has no state");
 
@@ -83,13 +82,13 @@ public class Hud3dComponent<TState> : Hud3dComponentBase where TState : class
             {
                 e.DynamicHudComponentAdded = null;
             }
-        }, _state, Entity.Transform.Position + _offset);
+        }, _state, Position);
     }
 }
 
 public class Hud3dComponent : Hud3dComponent<object>
 {
-    public Hud3dComponent(Action<IHudBuilder<object>> hudBuilderCallback, Vector3? offset = null) : base(hudBuilderCallback, null, offset)
+    public Hud3dComponent(Action<IHudBuilder<object>> hudBuilderCallback, Vector3 position) : base(hudBuilderCallback, position)
     {
     }
 }

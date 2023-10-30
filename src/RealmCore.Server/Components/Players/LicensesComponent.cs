@@ -38,16 +38,12 @@ public class LicensesComponent : Component
 
     public License? GetLicense(int licenseId)
     {
-        ThrowIfDisposed();
-
         lock (_lock)
             return _licenses.Where(x => x.licenseId == licenseId).FirstOrDefault();
     }
 
     public bool IsLicenseSuspended(int licenseId)
     {
-        ThrowIfDisposed();
-
         lock (_lock)
             return _licenses
                 .Where(x => x.licenseId == licenseId && x.IsSuspended(_dateTimeProvider))
@@ -56,8 +52,6 @@ public class LicensesComponent : Component
 
     public string? GetLastLicenseSuspensionReason(int licenseId)
     {
-        ThrowIfDisposed();
-
         lock (_lock)
             return _licenses
                 .Where(x => x.licenseId == licenseId)
@@ -67,8 +61,6 @@ public class LicensesComponent : Component
 
     public bool TryAddLicense(int licenseId)
     {
-        ThrowIfDisposed();
-
         var userLicense = new License
         {
             licenseId = licenseId,
@@ -98,16 +90,12 @@ public class LicensesComponent : Component
 
     public bool HasLicense(int licenseId, bool includeSuspended = false)
     {
-        ThrowIfDisposed();
-
         lock (_lock)
             return InternalHasLicense(licenseId, includeSuspended);
     }
 
     public void SuspendLicense(int licenseId, TimeSpan timeSpan, string? reason = null)
     {
-        ThrowIfDisposed();
-
         if (timeSpan.Ticks <= 0)
             throw new Exception();
 
@@ -127,8 +115,6 @@ public class LicensesComponent : Component
 
     public void UnSuspendLicense(int licenseId)
     {
-        ThrowIfDisposed();
-
         lock (_lock)
         {
             var index = _licenses.FindIndex(x => x.licenseId == licenseId);

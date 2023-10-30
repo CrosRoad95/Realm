@@ -4,6 +4,6 @@ public static class OverlayServiceExtensions
 {
     public static void AddNotification(this IOverlayService overlayService, Entity entity, string message)
     {
-        overlayService.AddNotification(entity.GetPlayer(), message);
+        overlayService.AddNotification(entity.GetRequiredComponent<PlayerElementComponent>(), message);
     }
 }

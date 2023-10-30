@@ -20,12 +20,10 @@ public abstract class HudComponent<TState> : Component, IStatefulHudComponent wh
     {
         get
         {
-            ThrowIfDisposed();
             return _visible;
         }
         set
         {
-            ThrowIfDisposed();
             if (_visible != value)
             {
                 _visible = value;
@@ -38,12 +36,10 @@ public abstract class HudComponent<TState> : Component, IStatefulHudComponent wh
     {
         get
         {
-            ThrowIfDisposed();
             return _hud.Position;
         }
         set
         {
-            ThrowIfDisposed();
             _hud.Position = value;
         }
     }
@@ -85,7 +81,7 @@ public abstract class HudComponent<TState> : Component, IStatefulHudComponent wh
         var playerElementComponent = Entity.GetRequiredComponent<PlayerElementComponent>();
         List<DynamicHudComponent> dynamicHudComponents = new();
 
-        overlayService.CreateHud(playerElementComponent.Player, _id, e =>
+        overlayService.CreateHud(playerElementComponent, _id, e =>
         {
             e.DynamicHudComponentAdded = dynamicHudComponents.Add;
             try
@@ -102,7 +98,7 @@ public abstract class HudComponent<TState> : Component, IStatefulHudComponent wh
             }
         }, playerElementComponent.ScreenSize, _offset, _defaultState);
 
-        _hud = new Hud<TState>(_id, playerElementComponent.Player, overlayService, _offset, _defaultState, dynamicHudComponents);
+        _hud = new Hud<TState>(_id, playerElementComponent, overlayService, _offset, _defaultState, dynamicHudComponents);
         Visible = true;
         HudCreated();
     }

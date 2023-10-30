@@ -7,8 +7,9 @@ internal sealed class PrivateCollisionShapeBehaviour
     private readonly ReaderWriterLockSlim _markerElementComponentsLock = new();
     private readonly Task _refreshPrivateCollisionShapeCollidersTask;
     private readonly ILogger<PrivateCollisionShapeBehaviour> _logger;
+    private readonly IElementCollection _elementCollection;
 
-    public PrivateCollisionShapeBehaviour(IEntityEngine entityEngine, ILogger<PrivateCollisionShapeBehaviour> logger)
+    public PrivateCollisionShapeBehaviour(IEntityEngine entityEngine, ILogger<PrivateCollisionShapeBehaviour> logger, IElementCollection elementCollection)
     {
         foreach (var playerEntity in entityEngine.PlayerEntities)
         {
@@ -21,6 +22,7 @@ internal sealed class PrivateCollisionShapeBehaviour
         entityEngine.EntityCreated += HandleEntityCreated;
         _refreshPrivateCollisionShapeCollidersTask = Task.Run(RefreshPrivateCollisionShapeColliders);
         _logger = logger;
+        _elementCollection = elementCollection;
     }
 
     private void HandleEntityCreated(Entity entity)
@@ -35,7 +37,7 @@ internal sealed class PrivateCollisionShapeBehaviour
         entity.ComponentAdded -= HandleComponentAdded;
     }
 
-    private void HandleComponentAdded(Component component)
+    private void HandleComponentAdded(IComponent component)
     {
         if (component is PlayerPrivateElementComponent<MarkerElementComponent> privateMarkerElementComponent)
         {
@@ -50,7 +52,6 @@ internal sealed class PrivateCollisionShapeBehaviour
         try
         {
             _markerElementComponents.Add(markerElementComponent.ElementComponent);
-            markerElementComponent.Disposed += HandleMarkerElementComponentDisposed;
         }
         finally
         {
@@ -85,7 +86,9 @@ internal sealed class PrivateCollisionShapeBehaviour
                 // TODO: run outside write lock
                 foreach (var markerElementComponent in _markerElementComponents)
                 {
-                    markerElementComponent.RefreshColliders();
+                    var elements = _elementCollection.GetWithinRange(markerElementComponent.CollisionShape.Position, markerElementComponent.CollisionShape.Radius);
+                    foreach (var element in elements)
+                        markerElementComponent.CollisionShape.CheckElementWithin(element);
                 }
             }
             catch(Exception ex)

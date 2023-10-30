@@ -4,12 +4,8 @@ internal sealed class EntityEngine : IEntityEngine
 {
     private readonly ReaderWriterLockSlim _entitiesLock = new();
     private readonly List<Entity> _entities = new();
-    private readonly ConcurrentDictionary<Player, Entity> _entityByPlayer = new();
-    private readonly ConcurrentDictionary<Element, Entity> _entityByElement = new();
     private readonly ConcurrentDictionary<string, Entity> _entityById = new();
     private readonly ConcurrentDictionary<int, Entity> _vehicleById = new();
-    private readonly IElementCollection _elementCollection;
-    private readonly ILogger<EntityEngine> _logger;
 
     public IReadOnlyCollection<Entity> Entities
     {
@@ -60,60 +56,11 @@ internal sealed class EntityEngine : IEntityEngine
     public IEnumerable<Entity> VehicleEntities => GetEntitiesContainingComponent<VehicleTagComponent>();
     public IEnumerable<Entity> PlayerEntities => GetEntitiesContainingComponent<PlayerTagComponent>();
 
-
     public event Action<Entity>? EntityCreated;
-
-    public EntityEngine(IElementCollection elementCollection, ILogger<EntityEngine> logger)
-    {
-        _elementCollection = elementCollection;
-        _logger = logger;
-    }
 
     public bool ContainsEntity(Entity entity)
     {
         return _entities.Contains(entity);
-    }
-
-    public Entity GetEntityByPlayer(Player player)
-    {
-        return _entityByPlayer[player];
-    }
-
-    public Entity GetByElement(Element element)
-    {
-        return _entityByElement[element];
-    }
-
-    public bool TryGetEntityByPed(Ped ped, out Entity? result, bool ignoreDestroyed = false)
-    {
-        if (ped.IsDestroyed && !ignoreDestroyed)
-        {
-            result = null;
-            return false;
-        }
-        if(ped is Player player)
-            return _entityByPlayer.TryGetValue(player, out result);
-        return _entityByElement.TryGetValue(ped, out result);
-    }
-    
-    public bool TryGetEntityByPlayer(Player player, out Entity? result, bool ignoreDestroyed = false)
-    {
-        if (player.IsDestroyed && !ignoreDestroyed)
-        {
-            result = null;
-            return false;
-        }
-        return _entityByPlayer.TryGetValue(player, out result);
-    }
-
-    public bool TryGetByElement(Element element, out Entity? result)
-    {
-        if (element.IsDestroyed)
-        {
-            result = null;
-            return false;
-        }
-        return _entityByElement.TryGetValue(element, out result);
     }
 
     private void InternalEntityCreated(Entity entity)
@@ -123,7 +70,6 @@ internal sealed class EntityEngine : IEntityEngine
         {
             _entities.Add(entity);
             _entityById[entity.Id] = entity;
-            entity.ComponentAdded += HandleComponentAdded;
             entity.Disposed += HandleEntityDisposed;
         }
         finally
@@ -160,56 +106,6 @@ internal sealed class EntityEngine : IEntityEngine
         {
             _entitiesLock.ExitWriteLock();
         }
-
-        entity.ComponentAdded -= HandleComponentAdded;
-    }
-
-    private void HandleComponentAdded(Component component)
-    {
-        if (component is ElementComponent elementComponent)
-        {
-            _entityByElement[elementComponent.Element] = component.Entity;
-            component.Entity.PreDisposed += HandleElementEntityPreDisposed;
-        }
-
-        if (component is PlayerElementComponent playerElementComponent)
-        {
-            var player = playerElementComponent.Player;
-            _entityByPlayer[playerElementComponent.Player] = component.Entity;
-            component.Entity.PreDisposed += HandleElementEntityPreDisposed;
-        }
-
-        switch(component)
-        {
-            case PrivateVehicleComponent vehicleComponent:
-                if(_vehicleById.TryAdd(vehicleComponent.Id, component.Entity))
-                {
-                    component.Entity.PreDisposed += HandleElementEntityPreDisposed;
-                }
-                else
-                {
-                    _logger.LogWarning("Duplicated private vehicle component {vehicleId}", vehicleComponent.Id);
-                }
-                break;
-        }
-    }
-
-    private void HandleVehicleEntityPreDisposed(Entity entity)
-    {
-        _vehicleById.TryRemove(entity.GetRequiredComponent<PrivateVehicleComponent>().Id, out _);
-        entity.PreDisposed += HandleVehicleEntityPreDisposed;
-    }
-
-    private void HandleElementEntityPreDisposed(Entity elementEntity)
-    {
-        _entityByElement.Remove(elementEntity.GetElement(), out var _);
-        elementEntity.PreDisposed -= HandleElementEntityPreDisposed;
-    }
-
-    private void HandlePlayerEntityDestroyed(Entity playerEntity)
-    {
-        playerEntity.Disposed -= HandlePlayerEntityDestroyed;
-        _entityByPlayer.Remove(playerEntity.GetPlayer(), out var _);
     }
 
     private void HandleDisposed(Entity entity)
@@ -220,14 +116,4 @@ internal sealed class EntityEngine : IEntityEngine
 
     public bool GetEntityById(string id, out Entity? entity) => _entityById.TryGetValue(id, out entity);
     public bool GetVehicleById(int id, out Entity? entity) => _vehicleById.TryGetValue(id, out entity);
-
-    public IEnumerable<Entity> GetWithinRange(Vector3 position, float range)
-    {
-        var elements = _elementCollection.GetWithinRange(position, range);
-        foreach (var element in elements)
-        {
-            if (TryGetByElement(element, out var entity) && entity != null)
-                yield return entity;
-        }
-    }
 }

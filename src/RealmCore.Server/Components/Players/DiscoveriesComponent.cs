@@ -9,7 +9,6 @@ public class DiscoveriesComponent : Component
     {
         get
         {
-            ThrowIfDisposed();
             lock (_lock)
                 return new List<int>(_discoveries).AsReadOnly();
         }
@@ -26,8 +25,6 @@ public class DiscoveriesComponent : Component
 
     public bool TryDiscover(int discoveryId)
     {
-        ThrowIfDisposed();
-
         lock (_lock)
         {
             var success = _discoveries.Add(discoveryId);
@@ -39,7 +36,6 @@ public class DiscoveriesComponent : Component
 
     public bool IsDiscovered(int discoveryId)
     {
-        ThrowIfDisposed();
         return _discoveries.Contains(discoveryId);
     }
 }

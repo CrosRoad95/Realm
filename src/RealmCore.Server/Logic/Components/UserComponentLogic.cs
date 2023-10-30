@@ -15,7 +15,7 @@ internal sealed class UserComponentLogic : ComponentLogic<UserComponent>
 
     private async Task<string?> ValidatePolicies(UserComponent userComponent)
     {
-        var realmPlayer = (RealmPlayer)userComponent.Entity.GetPlayer();
+        var realmPlayer = (RealmPlayer)userComponent.Entity.GetRequiredComponent<PlayerElementComponent>();
         var usersService = realmPlayer.ServiceProvider.GetRequiredService<IUsersService>();
         var authorizationPoliciesProvider = realmPlayer.ServiceProvider.GetRequiredService<AuthorizationPoliciesProvider>();
         foreach (var policy in authorizationPoliciesProvider.Policies)
@@ -30,13 +30,13 @@ internal sealed class UserComponentLogic : ComponentLogic<UserComponent>
         var entity = userComponent.Entity;
         if (entity.TryGetComponent(out PlayerElementComponent playerElementComponent))
         {
-            var realmPlayer = (RealmPlayer)entity.GetPlayer();
+            var realmPlayer = (RealmPlayer)entity.GetRequiredComponent<PlayerElementComponent>();
             var userManager = realmPlayer.ServiceProvider.GetRequiredService<UserManager<UserData>>();
             var user = await userManager.GetUserById(userComponent.Id);
             if(user != null)
             {
                 user.LastLoginDateTime = _dateTimeProvider.Now;
-                var client = playerElementComponent.Player.Client;
+                var client = playerElementComponent.Client;
                 user.LastIp = client.IPAddress?.ToString();
                 user.LastSerial = client.Serial;
                 user.RegisterSerial ??= client.Serial;

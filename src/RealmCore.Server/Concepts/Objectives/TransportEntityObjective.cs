@@ -8,6 +8,7 @@ public class TransportEntityObjective : Objective
     private PlayerPrivateElementComponent<MarkerElementComponent>? _markerElementComponent;
     private PlayerPrivateElementComponent<CollisionSphereElementComponent> _collisionSphereElementComponent = default!;
     private Entity _playerEntity = default!;
+    private IElementCollection _elementCollection = default!;
     public Func<Entity, bool>? CheckEntity { get; set; }
 
     public override Vector3 Position => _position;
@@ -36,8 +37,10 @@ public class TransportEntityObjective : Objective
         _createMarker = createMarker;
     }
 
-    protected override void Load(IEntityFactory entityFactory, Entity playerEntity)
+    protected override void Load(IServiceProvider serviceProvider, Entity playerEntity)
     {
+        var entityFactory = serviceProvider.GetRequiredService<IEntityFactory>();
+        _elementCollection = serviceProvider.GetRequiredService<IElementCollection>();
         _playerEntity = playerEntity;
         using var scopedEntityFactory = entityFactory.CreateScopedEntityFactory(playerEntity);
         if (_createMarker)
@@ -48,59 +51,55 @@ public class TransportEntityObjective : Objective
 
         scopedEntityFactory.CreateCollisionSphere(_position, 1.5f);
         _collisionSphereElementComponent = scopedEntityFactory.GetLastCreatedComponent<PlayerPrivateElementComponent<CollisionSphereElementComponent>>();
-        _collisionSphereElementComponent.ElementComponent.EntityEntered = EntityEntered;
+        _collisionSphereElementComponent.ElementComponent.ElementEntered += HandleElementEntered;
 
+    }
+
+    private void HandleElementEntered(Element element)
+    {
+        var entity = element.TryUpCast();
+        if (_entity == null || entity == null)
+            return;
+
+        if (entity.TryGetComponent(out OwnerComponent ownerComponent))
+        {
+            if (ownerComponent.OwningEntity == _playerEntity)
+            {
+                if (CheckEntity != null)
+                {
+                    if (CheckEntity(entity))
+                    {
+                        Complete(this, entity);
+                        return;
+                    }
+                }
+                Complete(this, entity);
+            }
+        }
     }
 
     public override void Update()
     {
-        ThrowIfDisposed();
-
         if (_entity == null)
         {
-            _collisionSphereElementComponent.ElementComponent.RefreshColliders();
+            var elements = _elementCollection.GetWithinRange(_collisionSphereElementComponent.ElementComponent.Position, _collisionSphereElementComponent.ElementComponent.Radius);
+            foreach (var element in elements)
+                _collisionSphereElementComponent.ElementComponent.CheckElementWithin(element);
         }
         else
         {
-            if (_entity.TryGetComponent(out LiftableWorldObjectComponent liftableWorldObjectComponent))
+            if(_entity.TryGetElement(out var element))
             {
-                if (liftableWorldObjectComponent.Owner == null) // Accept only dropped entities.
-                    _collisionSphereElementComponent.ElementComponent.CheckCollisionWith(_entity);
-            }
-            else
-            {
-                _collisionSphereElementComponent.ElementComponent.CheckCollisionWith(_entity);
-            }
-        }
-    }
-
-    private void EntityEntered(Entity colShapeEntity, Entity entity)
-    {
-        ThrowIfDisposed();
-
-        if (_entity == null)
-        {
-            if(entity.TryGetComponent(out OwnerComponent ownerComponent))
-            {
-                if(ownerComponent.OwningEntity == _playerEntity)
+                if (_entity.TryGetComponent(out LiftableWorldObjectComponent liftableWorldObjectComponent))
                 {
-                    if(CheckEntity != null)
-                    {
-                        if(CheckEntity(entity))
-                        {
-                            Complete(this, entity);
-                            return;
-                        }
-                    }
-                    Complete(this, entity);
+                    if (liftableWorldObjectComponent.Owner == null) // Accept only dropped entities.
+                        _collisionSphereElementComponent.ElementComponent.CheckElementWithin(element);
+                }
+                else
+                {
+                    _collisionSphereElementComponent.ElementComponent.CheckElementWithin(element);
                 }
             }
-        }
-        else
-        {
-            _entity.Disposed -= HandleDisposed;
-            if (entity == _entity)
-                Complete(this, entity);
         }
     }
 

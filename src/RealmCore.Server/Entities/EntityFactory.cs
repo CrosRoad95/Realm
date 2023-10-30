@@ -1,6 +1,4 @@
-﻿using Vehicle = SlipeServer.Server.Elements.Vehicle;
-
-namespace RealmCore.Server.Entities;
+﻿namespace RealmCore.Server.Entities;
 
 internal sealed class EntityFactory : IEntityFactory
 {
@@ -24,12 +22,9 @@ internal sealed class EntityFactory : IEntityFactory
     {
         //if (!_realmServer.IsReady)
         //    throw new InvalidOperationException("Could not create entities in logics constructors.");
-        var elementComponent = entity.GetRequiredComponent<ElementComponent>();
+        var elementComponent = entity.GetRequiredComponent<IElementComponent>();
 
-        if (!elementComponent.BaseLoaded)
-            throw new Exception("Failed to load element entity, base.Load was not called.");
-
-        var element = elementComponent.Element;
+        var element = (Element)elementComponent;
         element.AssociateWith(_mtaServer);
         if (element is Pickup pickup)
         {
@@ -45,12 +40,9 @@ internal sealed class EntityFactory : IEntityFactory
     {
         var vehicleEntity = _entityEngine.CreateEntity(entity =>
         {
-            entity.AddComponent(new Transform(position, rotation, interior, dimension));
-
             entity.AddComponent<VehicleTagComponent>();
-            var vehicle = new Vehicle(model, position);
 
-            var vehicleElementComponent = entity.AddComponent(new VehicleElementComponent(vehicle, _entityEngine));
+            var vehicleElementComponent = entity.AddComponent(new VehicleElementComponent(model, position));
 
             entityBuilder?.Invoke(entity);
             AssociateWithServer(entity);
@@ -63,13 +55,12 @@ internal sealed class EntityFactory : IEntityFactory
     {
         return _entityEngine.CreateEntity(entity =>
         {
-            entity.AddComponent(new Transform(position, interior, dimension));
             entity.AddComponent<MarkerTagComponent>();
 
-            var markerElementComponent = entity.AddComponent(new MarkerElementComponent(new Marker(new Vector3(0, 0, 1000), markerType)
+            var markerElementComponent = entity.AddComponent(new MarkerElementComponent(new Vector3(0, 0, 1000), 2, markerType)
             {
                 Color = color
-            }, _elementCollection, _entityEngine));
+            });
 
             AssociateWithServer(entity);
             entityBuilder?.Invoke(entity);
@@ -80,9 +71,8 @@ internal sealed class EntityFactory : IEntityFactory
     {
         var pickupEntity = _entityEngine.CreateEntity(entity =>
         {
-            entity.AddComponent(new Transform(position, interior, dimension));
             entity.AddComponent<PickupTagComponent>();
-            entity.AddComponent(new PickupElementComponent(new Pickup(Vector3.Zero, model), _entityEngine));
+            entity.AddComponent(new PickupElementComponent(Vector3.Zero, model));
 
             AssociateWithServer(entity);
             entityBuilder?.Invoke(entity);
@@ -95,9 +85,8 @@ internal sealed class EntityFactory : IEntityFactory
     {
         var blipEntity = _entityEngine.CreateEntity(entity =>
         {
-            entity.AddComponent(new Transform(position, interior, dimension));
             entity.AddComponent<BlipTagComponent>();
-            entity.AddComponent(new BlipElementComponent(new Blip(Vector3.Zero, blipIcon, 250)));
+            entity.AddComponent(new BlipElementComponent(Vector3.Zero, blipIcon, 250));
 
             AssociateWithServer(entity);
             entityBuilder?.Invoke(entity);
@@ -110,9 +99,8 @@ internal sealed class EntityFactory : IEntityFactory
     {
         var blipEntity = _entityEngine.CreateEntity(entity =>
         {
-            entity.AddComponent(new Transform(new Vector3(position, 0), interior, dimension));
             entity.AddComponent<RadarAreaTagComponent>();
-            entity.AddComponent(new RadarAreaElementComponent(new RadarArea(position, size, color)));
+            entity.AddComponent(new RadarAreaElementComponent(position, size, color));
 
             AssociateWithServer(entity);
             entityBuilder?.Invoke(entity);
@@ -125,9 +113,8 @@ internal sealed class EntityFactory : IEntityFactory
     {
         return _entityEngine.CreateEntity(entity =>
         {
-            entity.AddComponent(new Transform(position, rotation, interior, dimension));
             entity.AddComponent<WorldObjectTagComponent>();
-            entity.AddComponent(new WorldObjectComponent(new WorldObject(model, position)));
+            entity.AddComponent(new WorldObjectComponent(model, position));
 
             AssociateWithServer(entity);
             entityBuilder?.Invoke(entity);
@@ -139,9 +126,8 @@ internal sealed class EntityFactory : IEntityFactory
     {
         return _entityEngine.CreateEntity(entity =>
         {
-            entity.AddComponent(new Transform(new Vector3(position, 0), interior, dimension));
             entity.AddComponent<CollisionShapeTagComponent>();
-            entity.AddComponent(new CollisionCircleElementComponent(new CollisionCircle(new Vector2(0, 0), radius), _entityEngine));
+            entity.AddComponent(new CollisionCircleElementComponent(new Vector2(0, 0), radius));
 
             AssociateWithServer(entity);
             entityBuilder?.Invoke(entity);
@@ -152,10 +138,9 @@ internal sealed class EntityFactory : IEntityFactory
     {
         return _entityEngine.CreateEntity(entity =>
         {
-            entity.AddComponent(new Transform(position, interior, dimension));
             entity.AddComponent<CollisionShapeTagComponent>();
 
-            var collisionCuboidElementComponent = entity.AddComponent(new CollisionCuboidElementComponent(new CollisionCuboid(position, dimensions), _entityEngine));
+            var collisionCuboidElementComponent = entity.AddComponent(new CollisionCuboidElementComponent(position, dimensions));
 
             AssociateWithServer(entity);
 
@@ -167,9 +152,8 @@ internal sealed class EntityFactory : IEntityFactory
     {
         return _entityEngine.CreateEntity(entity =>
         {
-            entity.AddComponent(new Transform(position, interior, dimension));
             entity.AddComponent<CollisionShapeTagComponent>();
-            entity.AddComponent(new CollisionPolygonElementComponent(new CollisionPolygon(position, vertices), _entityEngine));
+            entity.AddComponent(new CollisionPolygonElementComponent(position, vertices));
 
             AssociateWithServer(entity);
             entityBuilder?.Invoke(entity);
@@ -180,9 +164,8 @@ internal sealed class EntityFactory : IEntityFactory
     {
         return _entityEngine.CreateEntity(entity =>
         {
-            entity.AddComponent(new Transform(new Vector3(position, 0), interior, dimension));
             entity.AddComponent<CollisionShapeTagComponent>();
-            entity.AddComponent(new CollisionRectangleElementComponent(new CollisionRectangle(position, dimensions), _entityEngine));
+            entity.AddComponent(new CollisionRectangleElementComponent(position, dimensions));
 
             AssociateWithServer(entity);
             entityBuilder?.Invoke(entity);
@@ -193,9 +176,8 @@ internal sealed class EntityFactory : IEntityFactory
     {
         return _entityEngine.CreateEntity(entity =>
         {
-            entity.AddComponent(new Transform(position, interior, dimension));
             entity.AddComponent<CollisionShapeTagComponent>();
-            entity.AddComponent(new CollisionSphereElementComponent(new CollisionSphere(new Vector3(0, 0, 1000), radius), _entityEngine));
+            entity.AddComponent(new CollisionSphereElementComponent(new Vector3(0, 0, 1000), radius));
 
             AssociateWithServer(entity);
             entityBuilder?.Invoke(entity);
@@ -206,9 +188,8 @@ internal sealed class EntityFactory : IEntityFactory
     {
         return _entityEngine.CreateEntity(entity =>
         {
-            entity.AddComponent(new Transform(position, interior, dimension));
             entity.AddComponent<CollisionShapeTagComponent>();
-            entity.AddComponent(new CollisionTubeElementComponent(new CollisionTube(position, radius, height), _entityEngine));
+            entity.AddComponent(new CollisionTubeElementComponent(position, radius, height));
 
             AssociateWithServer(entity);
             entityBuilder?.Invoke(entity);
@@ -219,9 +200,8 @@ internal sealed class EntityFactory : IEntityFactory
     {
         return _entityEngine.CreateEntity(entity =>
         {
-            entity.AddComponent(new Transform(position, interior, dimension));
             entity.AddComponent<PedTagComponent>();
-            entity.AddComponent(new PedElementComponent(new Ped(pedModel, position)));
+            entity.AddComponent(new PedElementComponent(pedModel, position));
 
             AssociateWithServer(entity);
             entityBuilder?.Invoke(entity);

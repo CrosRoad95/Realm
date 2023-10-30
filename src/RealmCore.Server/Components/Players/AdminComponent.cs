@@ -1,7 +1,7 @@
 ﻿namespace RealmCore.Server.Components.Players;
 
 [ComponentUsage(false)]
-public class AdminComponent : Component
+public class AdminComponent : ComponentLifecycle
 {
     private bool _debugView = false;
     private bool _adminMode = false;
@@ -29,12 +29,10 @@ public class AdminComponent : Component
     {
         get
         {
-            ThrowIfDisposed();
             return _developmentMode;
         }
         set
         {
-            ThrowIfDisposed();
             if (_developmentMode != value)
             {
                 _developmentMode = value;
@@ -47,12 +45,10 @@ public class AdminComponent : Component
     {
         get
         {
-            ThrowIfDisposed();
             return _debugView;
         }
         set
         {
-            ThrowIfDisposed();
             if (_debugView != value)
             {
                 _debugView = value;
@@ -65,12 +61,10 @@ public class AdminComponent : Component
     {
         get
         {
-            ThrowIfDisposed();
             return _adminMode;
         }
         set
         {
-            ThrowIfDisposed();
             if (_adminMode != value)
             {
                 _adminMode = value;
@@ -83,12 +77,10 @@ public class AdminComponent : Component
     {
         get
         {
-            ThrowIfDisposed();
             return _noClip;
         }
         set
         {
-            ThrowIfDisposed();
             if (_noClip != value)
             {
                 _noClip = value;
@@ -101,12 +93,10 @@ public class AdminComponent : Component
     {
         get
         {
-            ThrowIfDisposed();
             return _interactionDebugRenderingEnabled;
         }
         set
         {
-            ThrowIfDisposed();
             if (_interactionDebugRenderingEnabled != value)
             {
                 _interactionDebugRenderingEnabled = value;
@@ -115,7 +105,7 @@ public class AdminComponent : Component
         }
     }
 
-    protected override void Detach()
+    public override void Detach()
     {
         DevelopmentMode = false;
         DebugView = false;

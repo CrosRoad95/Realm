@@ -24,11 +24,7 @@ internal sealed class AdminResourceLogic
         using var _ = _logger.BeginElement(player);
         try
         {
-            if(!_entityEngine.TryGetEntityByPlayer(player, out var entity) || entity == null)
-            {
-                _logger.LogWarning("Player attempted to change admin tool {adminTool} state to {state} but entity was not found", adminTool, state);
-                return;
-            }
+            var entity = player.UpCast();
             using var _2 = _logger.BeginEntity(entity);
             if(!entity.TryGetComponent(out AdminComponent adminComponent))
             {
@@ -77,25 +73,26 @@ internal sealed class AdminResourceLogic
         {
             case AdminTool.Entities:
                 if (state)
-                    _adminService.BroadcastEntityDebugInfoUpdateForPlayer(player, _entityEngine.Entities.Select(x =>
+                {
+                    List<EntityDebugInfo> debugInfoList = [];
+                    foreach (var entity in _entityEngine.Entities)
                     {
-                        Element? element = null;
-                        Vector3 position = Vector3.Zero;
-                        if (x.TryGetComponent(out Transform transform))
-                            position = transform.Position;
-                        if (x.TryGetComponent(out ElementComponent elementComponent))
-                            element = elementComponent.Element;
-
-                        return new EntityDebugInfo
+                        if (entity.TryGetComponent(out IElementComponent elementComponent))
                         {
-                            debugId = x.Id,
-                            element = element,
-                            position = position,
-                            previewType = PreviewType.BoxWireframe,
-                            previewColor = Color.Red,
-                            name = x.GetType().ToString(),
-                        };
-                    }));
+                            var element = (Element)elementComponent;
+                            debugInfoList.Add(new EntityDebugInfo
+                            {
+                                debugId = entity.Id,
+                                element = element,
+                                position = element.Position,
+                                previewType = PreviewType.BoxWireframe,
+                                previewColor = Color.Red,
+                                name = entity.GetType().ToString(),
+                            });
+                        }
+                    }
+                    _adminService.BroadcastEntityDebugInfoUpdateForPlayer(player, debugInfoList);
+                }
                 else
                     _adminService.BroadcastClearEntityForPlayer(player);
                 break;

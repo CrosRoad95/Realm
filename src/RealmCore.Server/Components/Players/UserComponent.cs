@@ -3,7 +3,7 @@
 namespace RealmCore.Server.Components.Players;
 
 [ComponentUsage(false)]
-public class UserComponent : Component
+public class UserComponent : ComponentLifecycle
 {
     private struct PolicyCache
     {
@@ -110,15 +110,11 @@ public class UserComponent : Component
 
     public bool IsInRole(string role)
     {
-        ThrowIfDisposed();
-
         return HasClaim(ClaimTypes.Role, role);
     }
 
     public bool HasClaim(string type, string? value = null)
     {
-        ThrowIfDisposed();
-
         if (_claimsPrincipal == null)
             return false;
         if(value != null)
@@ -128,8 +124,6 @@ public class UserComponent : Component
 
     public string? GetClaimValue(string type)
     {
-        ThrowIfDisposed();
-
         if (_claimsPrincipal == null)
             return null;
         return _claimsPrincipal.Claims.First(x => x.Type == type).Value;
@@ -137,8 +131,6 @@ public class UserComponent : Component
 
     public bool AddClaim(string type, string value)
     {
-        ThrowIfDisposed();
-
         if (_claimsPrincipal == null)
             return false;
 
@@ -153,8 +145,6 @@ public class UserComponent : Component
 
     public bool AddClaims(Dictionary<string, string> claims)
     {
-        ThrowIfDisposed();
-
         if (_claimsPrincipal == null)
             return false;
 
@@ -169,8 +159,6 @@ public class UserComponent : Component
 
     public bool AddRole(string role)
     {
-        ThrowIfDisposed();
-
         if (_claimsPrincipal == null)
             return false;
 
@@ -185,8 +173,6 @@ public class UserComponent : Component
 
     public bool AddRoles(IEnumerable<string> roles)
     {
-        ThrowIfDisposed();
-
         if (_claimsPrincipal == null)
             return false;
 
@@ -201,8 +187,6 @@ public class UserComponent : Component
 
     public IReadOnlyList<string> GetClaims()
     {
-        ThrowIfDisposed();
-
         if (_claimsPrincipal.Identity is ClaimsIdentity claimsIdentity)
         {
             return claimsIdentity.Claims.Select(x => x.Type).ToList();
@@ -213,8 +197,6 @@ public class UserComponent : Component
 
     public IReadOnlyList<string> GetRoles()
     {
-        ThrowIfDisposed();
-
         if (_claimsPrincipal.Identity is ClaimsIdentity claimsIdentity)
         {
             return claimsIdentity.Claims.Where(x => x.Type == ClaimTypes.Role).Select(x => x.Value).ToList();
@@ -225,8 +207,6 @@ public class UserComponent : Component
 
     public bool TryRemoveClaim(string type, string? value = null)
     {
-        ThrowIfDisposed();
-
         if (_user == null)
             return false;
 
@@ -250,8 +230,6 @@ public class UserComponent : Component
 
     public bool TryRemoveRole(string role)
     {
-        ThrowIfDisposed();
-
         return TryRemoveClaim(ClaimTypes.Role, role);
     }
 
@@ -259,16 +237,12 @@ public class UserComponent : Component
 
     public bool HasUpgrade(int upgradeId)
     {
-        ThrowIfDisposed();
-
         lock (_upgradesLock)
             return InternalHasUpgrade(upgradeId);
     }
 
     public bool TryAddUpgrade(int upgradeId)
     {
-        ThrowIfDisposed();
-
         lock (_upgradesLock)
         {
             if (InternalHasUpgrade(upgradeId))
@@ -281,8 +255,6 @@ public class UserComponent : Component
 
     public bool TryRemoveUpgrade(int upgradeId)
     {
-        ThrowIfDisposed();
-
         lock (_upgradesLock)
         {
             if (!InternalHasUpgrade(upgradeId))
@@ -295,15 +267,12 @@ public class UserComponent : Component
 
     public void SetSetting(int settingId, string value)
     {
-        ThrowIfDisposed();
-
         _settings[settingId] = value;
         SettingChanged?.Invoke(this, settingId, value);
     }
 
     public string? GetSetting(int settingId)
     {
-        ThrowIfDisposed();
         if (_settings.TryGetValue(settingId, out var value))
             return value;
         return null;
@@ -311,7 +280,6 @@ public class UserComponent : Component
 
     public bool TryGetSetting(int settingId, out string? value)
     {
-        ThrowIfDisposed();
         if (_settings.TryGetValue(settingId, out value))
             return true;
         return false;
@@ -319,8 +287,6 @@ public class UserComponent : Component
 
     public bool RemoveSetting(int settingId)
     {
-        ThrowIfDisposed();
-
         if(_settings.TryRemove(settingId, out var value))
         {
             SettingRemoved?.Invoke(this, settingId, value);

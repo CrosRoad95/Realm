@@ -8,7 +8,6 @@ public class JobStatisticsComponent : Component
     {
         get
         {
-            ThrowIfDisposed();
             lock (_lock)
                 return new Dictionary<short, JobStatistics>(_jobStatistics);
         }
@@ -51,8 +50,6 @@ public class JobStatisticsComponent : Component
 
     public void AddPoints(short jobId, ulong points)
     {
-        ThrowIfDisposed();
-
         lock (_lock)
         {
             EnsureJobIsInitialized(jobId);
@@ -66,8 +63,6 @@ public class JobStatisticsComponent : Component
 
     public void AddTimePlayed(short jobId, ulong timePlayed)
     {
-        ThrowIfDisposed();
-
         lock (_lock)
         {
             EnsureJobIsInitialized(jobId);

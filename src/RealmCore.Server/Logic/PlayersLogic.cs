@@ -21,6 +21,7 @@ internal sealed class PlayersLogic
 
     private async Task HandlePlayerJoinedCore(Player player)
     {
+        var playerElementComponent = (PlayerElementComponent)player;
         var start = Stopwatch.GetTimestamp();
         var resources = _resourceProvider.GetResources();
         _playerResources[player] = new Latch(RealmResourceServer._resourceCounter, TimeSpan.FromSeconds(60));
@@ -70,9 +71,10 @@ internal sealed class PlayersLogic
 
         var playerEntity = _entityEngine.CreateEntity(entity =>
         {
-            entity.AddComponent<Transform>();
             entity.AddComponent<PlayerTagComponent>();
-            entity.AddComponent(new PlayerElementComponent(player, new Vector2(screenSize.Item1, screenSize.Item2), cultureInfo));
+            playerElementComponent.ScreenSize = new Vector2(screenSize.Item1, screenSize.Item2);
+            playerElementComponent.CultureInfo = cultureInfo;
+            entity.AddComponent(playerElementComponent);
         });
 
         var stop = Stopwatch.GetTimestamp();
@@ -116,8 +118,7 @@ internal sealed class PlayersLogic
 
     private async void HandlePlayerDisconnected(Player player, PlayerQuitEventArgs e)
     {
-        if (!_entityEngine.TryGetEntityByPlayer(player, out var playerEntity, true) || playerEntity == null)
-            return;
+        var playerEntity = player.UpCast();
         try
         {
             var realmPlayer = (RealmPlayer)player;

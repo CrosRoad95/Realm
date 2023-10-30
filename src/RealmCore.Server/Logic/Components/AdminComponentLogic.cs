@@ -17,29 +17,29 @@ internal sealed class AdminComponentLogic : ComponentLogic<AdminComponent>
 
     private void HandleNoClipStateChanged(AdminComponent adminComponent, bool enabled)
     {
-        _noClipService.SetEnabledTo(adminComponent.Entity.GetPlayer(), enabled);
+        _noClipService.SetEnabledTo(adminComponent.Entity.GetRequiredComponent<PlayerElementComponent>(), enabled);
     }
 
     private void HandleDebugViewStateChanged(AdminComponent adminComponent, bool enabled)
     {
-        _debugLog.SetVisibleTo(adminComponent.Entity.GetPlayer(), enabled);
+        _debugLog.SetVisibleTo(adminComponent.Entity.GetRequiredComponent<PlayerElementComponent>(), enabled);
     }
 
     private void HandleDevelopmentModeStateChanged(AdminComponent adminComponent, bool enabled)
     {
-        _clientInterfaceService.SetDevelopmentModeEnabled(adminComponent.Entity.GetPlayer(), enabled);
+        _clientInterfaceService.SetDevelopmentModeEnabled(adminComponent.Entity.GetRequiredComponent<PlayerElementComponent>(), enabled);
     }
 
     private void HandleInteractionDebugRenderingStateChanged(AdminComponent adminComponent, bool enabled)
     {
-        _clientInterfaceService.SetFocusableRenderingEnabled(adminComponent.Entity.GetPlayer(), enabled);
+        _clientInterfaceService.SetFocusableRenderingEnabled(adminComponent.Entity.GetRequiredComponent<PlayerElementComponent>(), enabled);
     }
 
     private void AdminComponent_AdminModeChanged(AdminComponent adminComponent, bool enabled)
     {
-        _adminService.SetAdminModeEnabledForPlayer(adminComponent.Entity.GetPlayer(), enabled);
+        _adminService.SetAdminModeEnabledForPlayer(adminComponent.Entity.GetRequiredComponent<PlayerElementComponent>(), enabled);
         if (enabled)
-            _adminService.SetAdminTools(adminComponent.Entity.GetPlayer(), adminComponent.AdminTools);
+            _adminService.SetAdminTools(adminComponent.Entity.GetRequiredComponent<PlayerElementComponent>(), adminComponent.AdminTools);
 
     }
 

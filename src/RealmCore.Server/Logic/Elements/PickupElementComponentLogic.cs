@@ -22,8 +22,9 @@ internal sealed class PickupElementComponentLogic : ComponentLogic<PickupElement
         if (pickupElementComponent.EntityEntered == null)
             return;
 
-        if (!_entityEngine.TryGetByElement(element, out var entity) || entity == null)
+        if (element is not IElementComponent elementComponent)
             return;
+        var entity = elementComponent.Entity;
 
         var tag = entity.GetRequiredComponent<TagComponent>();
         if (tag is not PlayerTagComponent or VehicleTagComponent)
@@ -56,8 +57,9 @@ internal sealed class PickupElementComponentLogic : ComponentLogic<PickupElement
         if (pickupElementComponent.EntityLeft == null)
             return;
 
-        if (!_entityEngine.TryGetByElement(element, out var entity) || entity == null)
+        if (element is not IElementComponent elementComponent)
             return;
+        var entity = elementComponent.Entity;
 
         var tag = entity.GetRequiredComponent<TagComponent>();
         if (tag is not PlayerTagComponent or VehicleTagComponent)

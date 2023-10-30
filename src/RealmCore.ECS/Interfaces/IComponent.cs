@@ -2,5 +2,5 @@
 
 public interface IComponent
 {
-    public Entity Entity { get; }
+    public Entity Entity { get; set; }
 }

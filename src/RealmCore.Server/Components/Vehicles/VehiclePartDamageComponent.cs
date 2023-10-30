@@ -8,15 +8,7 @@ public class VehiclePartDamageComponent : Component
     public event Action<VehiclePartDamageComponent, short>? PartDestroyed;
     private readonly ConcurrentDictionary<short, float> _partDamages = new();
 
-    public ICollection<short> Parts
-    {
-        get
-        {
-            ThrowIfDisposed();
-            return _partDamages.Keys;
-        }
-    }
-
+    public ICollection<short> Parts => _partDamages.Keys;
     public VehiclePartDamageComponent() { }
 
     internal VehiclePartDamageComponent(ICollection<VehiclePartDamageData> vehiclePartDamages)
@@ -27,8 +19,6 @@ public class VehiclePartDamageComponent : Component
 
     public void AddPart(short partId, float state)
     {
-        ThrowIfDisposed();
-
         if (state < 0)
             throw new ArgumentOutOfRangeException(nameof(state));
         if (!_partDamages.TryAdd(partId, state))
@@ -40,8 +30,6 @@ public class VehiclePartDamageComponent : Component
 
     public bool RemovePart(short partId)
     {
-        ThrowIfDisposed();
-
         if (_partDamages.TryRemove(partId, out _))
         {
             PartDestroyed?.Invoke(this, partId);
@@ -52,8 +40,6 @@ public class VehiclePartDamageComponent : Component
 
     public void Modify(short partId, float difference)
     {
-        ThrowIfDisposed();
-
         if (_partDamages.TryGetValue(partId, out var state))
         {
             var newState = state + difference;
@@ -67,8 +53,6 @@ public class VehiclePartDamageComponent : Component
 
     public float? Get(short partId)
     {
-        ThrowIfDisposed();
-
         if (_partDamages.TryGetValue(partId, out var state))
             return state;
         return null;

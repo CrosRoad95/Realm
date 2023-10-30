@@ -42,5 +42,7 @@ global using Microsoft.AspNetCore.Identity;
 global using RealmCore.Persistence.Data;
 global using RealmCore.Server.Components.Players.Abstractions;
 global using RealmCore.Persistence.Extensions;
+global using RealmCore.ECS.Interfaces;
+global using RealmCore.Sample.Components.Gui;
 
 [assembly: ExcludeFromCodeCoverage]

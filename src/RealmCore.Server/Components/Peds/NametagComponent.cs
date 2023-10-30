@@ -11,12 +11,10 @@ public sealed class NametagComponent : Component
     {
         get
         {
-            ThrowIfDisposed();
             return _text;
         }
         set
         {
-            ThrowIfDisposed();
             lock (_lock)
             {
                 _text = value;

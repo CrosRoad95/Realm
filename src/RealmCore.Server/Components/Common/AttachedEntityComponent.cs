@@ -1,27 +1,13 @@
 ﻿namespace RealmCore.Server.Components.Common;
 
 [ComponentUsage(true)]
-public class AttachedEntityComponent : Component
+public class AttachedEntityComponent : ComponentLifecycle
 {
     private readonly BoneId _boneId;
     private readonly Vector3? _positionOffset;
     private readonly Vector3? _rotationOffset;
     private readonly object _lock = new();
-
-    private Entity _attachedEntity;
-    public Entity AttachedEntity
-    {
-        get
-        {
-            ThrowIfDisposed();
-            return _attachedEntity;
-        }
-        private set
-        {
-            ThrowIfDisposed();
-            _attachedEntity = value;
-        }
-    }
+    public Entity? AttachedEntity { get; set; }
 
     public BoneId BoneId => _boneId;
 
@@ -31,39 +17,25 @@ public class AttachedEntityComponent : Component
 
     public AttachedEntityComponent(Entity entity, BoneId boneId, Vector3? positionOffset = null, Vector3? rotationOffset = null)
     {
-        _attachedEntity = entity;
+        AttachedEntity = entity;
         _boneId = boneId;
         _positionOffset = positionOffset;
         _rotationOffset = rotationOffset;
-    }
-
-    private void HandleAttachedEntityDestroyed(Entity entity)
-    {
-        Entity.TryDestroyComponent(this);
     }
 
     public bool TryDetach(out Entity? entity)
     {
         lock (_lock)
         {
-            if(_disposed)
+            if(AttachedEntity != null)
             {
-                entity = null;
-                return false;
+                entity = AttachedEntity;
+                AttachedEntity = null;
+                return true;
             }
-            entity = _attachedEntity;
-            return Entity.TryDestroyComponent(this);
+            Entity.TryDestroyComponent(this);
+            entity = null;
+            return false;
         }
-    }
-
-    protected override void Attach()
-    {
-        _attachedEntity.Disposed += HandleAttachedEntityDestroyed;
-    }
-
-    public override void Dispose()
-    {
-        _attachedEntity.Disposed -= HandleAttachedEntityDestroyed;
-        base.Dispose();
     }
 }

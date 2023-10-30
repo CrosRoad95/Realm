@@ -1,6 +1,4 @@
-﻿using RealmCore.Sample.Components.Gui;
-
-namespace RealmCore.Sample.Logic;
+﻿namespace RealmCore.Sample.Logic;
 
 internal sealed class PlayerJoinedLogic : ComponentLogic<UserComponent>
 {
@@ -116,7 +114,7 @@ internal sealed class PlayerJoinedLogic : ComponentLogic<UserComponent>
         entity.ComponentAdded -= HandleComponentAdded;
     }
 
-    private async void HandleComponentAdded(Component component)
+    private async void HandleComponentAdded(IComponent component)
     {
         try
         {

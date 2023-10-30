@@ -27,8 +27,7 @@ internal sealed class SaveService : ISaveService
             .Where(x => x.Id == privateVehicleComponent.Id)
             .FirstAsync();
 
-        var vehicleElementComponent = entity.GetRequiredComponent<VehicleElementComponent>();
-        var vehicle = vehicleElementComponent.Vehicle;
+        var vehicle = entity.GetRequiredComponent<VehicleElementComponent>();
 
         vehicleData.Model = vehicle.Model;
         vehicleData.Color = new VehicleColor(vehicle.Colors.Primary, vehicle.Colors.Secondary, vehicle.Colors.Color3, vehicle.Colors.Color4, vehicle.HeadlightColor);
@@ -79,7 +78,7 @@ internal sealed class SaveService : ISaveService
         vehicleData.TaxiLightState = vehicle.IsTaxiLightOn;
         vehicleData.Health = vehicle.Health;
         vehicleData.IsFrozen = vehicle.IsFrozen;
-        vehicleData.TransformAndMotion = entity.Transform.GetTransformAndMotion();
+        vehicleData.TransformAndMotion = vehicle.GetTransformAndMotion();
         vehicleData.UserAccesses = privateVehicleComponent.Access.PlayerAccesses.Select(x => new VehicleUserAccessData
         {
             Id = x.id,
@@ -99,7 +98,7 @@ internal sealed class SaveService : ISaveService
             }).ToList();
 
         }
-        vehicleData.Paintjob = vehicleElementComponent.PaintJob;
+        vehicleData.Paintjob = vehicle.PaintJob;
 
         {
             var fuelComponents = entity.Components.OfType<FuelComponent>();
@@ -235,8 +234,8 @@ internal sealed class SaveService : ISaveService
             Value = userComponent.GetSetting(x) ?? ""
         }).ToList();
 
-        if (entity.TryGetComponent(out PlayerElementComponent playerElementComponent) && playerElementComponent.Spawned)
-            user.LastTransformAndMotion = entity.Transform.GetTransformAndMotion();
+        if (entity.TryGetComponent(out PlayerElementComponent playerElementComponent))
+            user.LastTransformAndMotion = playerElementComponent.GetTransformAndMotion();
 
         if (entity.TryGetComponent(out MoneyComponent moneyComponent))
             user.Money = moneyComponent.Money;

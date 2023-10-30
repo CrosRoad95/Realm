@@ -39,7 +39,6 @@ public sealed class RealmCommandService
     }
 
     private readonly CommandService _commandService;
-    private readonly IEntityEngine _entityEngine;
     private readonly IPolicyDrivenCommandExecutor _policyDrivenCommandExecutor;
     private readonly ChatBox _chatBox;
     private readonly ILogger<RealmCommandService> _logger;
@@ -51,11 +50,10 @@ public sealed class RealmCommandService
     public List<string> CommandNames => _commands.Keys.Concat(_asyncCommands.Keys).ToList();
     public int Count => _commands.Count + _asyncCommands.Count;
 
-    public RealmCommandService(CommandService commandService, ILogger<RealmCommandService> logger, IEntityEngine entityEngine, IPolicyDrivenCommandExecutor policyDrivenCommandExecutor, ChatBox chatBox)
+    public RealmCommandService(CommandService commandService, ILogger<RealmCommandService> logger, IPolicyDrivenCommandExecutor policyDrivenCommandExecutor, ChatBox chatBox)
     {
         _logger = logger;
         _commandService = commandService;
-        _entityEngine = entityEngine;
         _policyDrivenCommandExecutor = policyDrivenCommandExecutor;
         _chatBox = chatBox;
     }
@@ -127,8 +125,7 @@ public sealed class RealmCommandService
             return;
 
         var player = args.Player;
-        if (!_entityEngine.TryGetEntityByPlayer(player, out var entity) || entity == null)
-            return;
+        var entity = player.UpCast();
 
         if (!entity.TryGetComponent<UserComponent>(out var userComponent) || !entity.TryGetComponent<PlayerElementComponent>(out var playerElementComponent))
             return;
@@ -224,8 +221,8 @@ public sealed class RealmCommandService
             return;
 
         var player = args.Player;
-        if (!_entityEngine.TryGetEntityByPlayer(player, out var entity) || entity == null)
-            return;
+        var entity = player.UpCast();
+
 
         if (!entity.TryGetComponent<UserComponent>(out var userComponent) || !entity.TryGetComponent<PlayerElementComponent>(out var playerElementComponent))
             return;

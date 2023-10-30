@@ -7,7 +7,6 @@ public class LevelComponent : Component
     {
         get
         {
-            ThrowIfDisposed();
             return _levelsRegistry.GetExperienceRequiredForLevel(Level + 1);
         }
     }
@@ -72,8 +71,6 @@ public class LevelComponent : Component
 
     public void GiveExperience(uint amount)
     {
-        ThrowIfDisposed();
-
         lock (_lock)
         {
             _experience += amount;

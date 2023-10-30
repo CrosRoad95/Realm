@@ -21,11 +21,11 @@ internal sealed class StatefulGuiComponentBaseLogic : ComponentLogic<StatefulDxG
 
     private void HandleGuiOpened(StatefulDxGuiComponentBase statefulGuiComponentBase, string name, bool cursorLess, object? state)
     {
-        _guiSystemService.OpenGui(statefulGuiComponentBase.Entity.GetPlayer(), name, cursorLess, _luaValueMapper.UniversalMap(state));
+        _guiSystemService.OpenGui(statefulGuiComponentBase.Entity.GetRequiredComponent<PlayerElementComponent>(), name, cursorLess, _luaValueMapper.UniversalMap(state));
     }
     private void HandleStateChanged(StatefulDxGuiComponentBase statefulGuiComponentBase, string name, Dictionary<LuaValue, object?> state)
     {
         var newState = state.ToDictionary(x => x.Key, y => _luaValueMapper.Map(y.Value));
-        _guiSystemService.SendStateChanged(statefulGuiComponentBase.Entity.GetPlayer(), name, newState);
+        _guiSystemService.SendStateChanged(statefulGuiComponentBase.Entity.GetRequiredComponent<PlayerElementComponent>(), name, newState);
     }
 }

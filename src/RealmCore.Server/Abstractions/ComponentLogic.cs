@@ -27,13 +27,13 @@ public class ComponentLogic<T> where T : IComponent
                 ComponentDetached(tComponent);
     }
 
-    private void HandleComponentDetached(Component component)
+    private void HandleComponentDetached(IComponent component)
     {
         if (component is T tComponent)
             ComponentDetached(tComponent);
     }
 
-    private void HandleComponentAdded(Component component)
+    private void HandleComponentAdded(IComponent component)
     {
         if (component is T tComponent)
             ComponentAdded(tComponent);
@@ -78,7 +78,7 @@ public class ComponentLogic<T1, T2>
                 ComponentDetached(tComponent);
     }
 
-    private void HandleComponentDetached(Component component)
+    private void HandleComponentDetached(IComponent component)
     {
         if (component is T1 t1Component)
             ComponentDetached(t1Component);
@@ -86,7 +86,7 @@ public class ComponentLogic<T1, T2>
             ComponentDetached(t2Component);
     }
 
-    private void HandleComponentAdded(Component component)
+    private void HandleComponentAdded(IComponent component)
     {
         if (component is T1 t1Component)
             ComponentAdded(t1Component);

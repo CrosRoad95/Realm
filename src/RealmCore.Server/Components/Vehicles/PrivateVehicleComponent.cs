@@ -25,20 +25,13 @@ public class PrivateVehicleComponent : Component
     }
 
     private readonly VehicleAccess _access;
-    public VehicleAccess Access
-    {
-        get
-        {
-            ThrowIfDisposed();
-            return _access;
-        }
-    }
+    public VehicleAccess Access => _access;
 
     internal PrivateVehicleComponent(VehicleData vehicleData, IDateTimeProvider dateTimeProvider)
     {
         _vehicleData = vehicleData;
         _dateTimeProvider = dateTimeProvider;
-        _access = new VehicleAccess(_vehicleData.UserAccesses, this);
+        _access = new VehicleAccess(_vehicleData.UserAccesses);
     }
 
     public void UpdateLastUsed()
@@ -46,10 +39,10 @@ public class PrivateVehicleComponent : Component
         LastUsed = _dateTimeProvider.Now;
     }
 
-    protected override void Attach()
+    public void Attach()
     {
         var vehicleElementComponent = Entity.GetRequiredComponent<VehicleElementComponent>();
-        var vehicle = vehicleElementComponent.Vehicle;
+        var vehicle = vehicleElementComponent;
         vehicle.Colors.Primary = _vehicleData.Color.Color1;
         vehicle.Colors.Secondary = _vehicleData.Color.Color2;
         vehicle.Colors.Color3 = _vehicleData.Color.Color3;

@@ -1,46 +1,17 @@
 ﻿namespace RealmCore.Server.Components.Elements;
 
-public abstract class PlayerPrivateElementComponentBase : ElementComponent { }
+public abstract class PlayerPrivateElementComponentBase : Component, IElementComponent { }
 
-public class PlayerPrivateElementComponent<TElementComponent> : PlayerPrivateElementComponentBase where TElementComponent : ElementComponent
+public class PlayerPrivateElementComponent<TElementComponent> : PlayerPrivateElementComponentBase where TElementComponent : Element
 {
-    internal override Element Element => _elementComponent.Element;
-
     private readonly TElementComponent _elementComponent;
-
-    public Vector3 Position
-    {
-        get
-        {
-            ThrowIfDisposed();
-            return Element.Position;
-        }
-        set
-        {
-            ThrowIfDisposed();
-            Element.Position = value;
-        }
-    }
-
-    public Vector3 Rotation
-    {
-        get
-        {
-            ThrowIfDisposed();
-            return Element.Rotation;
-        }
-        set
-        {
-            ThrowIfDisposed();
-            Element.Rotation = value;
-        }
-    }
+    internal Element Element => _elementComponent;
 
     public TElementComponent ElementComponent
     {
         get
         {
-            ThrowIfDisposed();
+            _elementComponent.ThrowIfDestroyed();
             return _elementComponent;
         }
     }
@@ -48,40 +19,40 @@ public class PlayerPrivateElementComponent<TElementComponent> : PlayerPrivateEle
     public PlayerPrivateElementComponent(TElementComponent elementComponent)
     {
         _elementComponent = elementComponent;
-        _elementComponent.Detached += HandleDetachedFromEntity;
+        //_elementComponent.Detached += HandleDetachedFromEntity;
     }
 
-    private void HandleDetachedFromEntity(Component elementComponent)
-    {
-        _elementComponent.Detached -= HandleDetachedFromEntity;
-        Entity.DestroyComponent(this);
-    }
+    //private void HandleDetachedFromEntity(Component elementComponent)
+    //{
+    //    _elementComponent.Detached -= HandleDetachedFromEntity;
+    //    Entity.DestroyComponent(this);
+    //}
 
-    protected override void Attach()
-    {
-        base.Attach();
+    //protected override void Attach()
+    //{
+    //    base.Attach();
 
-        if (!_elementComponent.TrySetEntity(Entity))
-            throw new ComponentCanNotBeAddedException<PlayerPrivateElementComponent>();
+    //    if (!_elementComponent.TrySetEntity(Entity))
+    //        throw new ComponentCanNotBeAddedException<PlayerPrivateElementComponent>();
 
-        _elementComponent.InternalAttach();
-    }
+    //    _elementComponent.InternalAttach();
+    //}
 
-    protected override void Detach()
-    {
-        _elementComponent.Detached -= HandleDetachedFromEntity;
-        _elementComponent.InternalDetach();
-        _elementComponent.Dispose();
-    }
+    //protected override void Detach()
+    //{
+    //    _elementComponent.Detached -= HandleDetachedFromEntity;
+    //    _elementComponent.InternalDetach();
+    //    _elementComponent.Dispose();
+    //}
 }
 
-class PlayerPrivateElementComponent : PlayerPrivateElementComponent<ElementComponent>
+public class PlayerPrivateElementComponent : PlayerPrivateElementComponent<Element>
 {
-    public PlayerPrivateElementComponent(ElementComponent elementComponent) : base(elementComponent)
+    public PlayerPrivateElementComponent(Element elementComponent) : base(elementComponent)
     {
     }
 
-    public static PlayerPrivateElementComponent<T> Create<T>(T component) where T : ElementComponent
+    public static PlayerPrivateElementComponent<T> Create<T>(T component) where T : Element, IComponent
     {
         return new PlayerPrivateElementComponent<T>(component);
     }

@@ -33,7 +33,7 @@ internal sealed class BrowserResourceLogic : ComponentLogic<BrowserComponent>
     private void HandlePathChanged(BrowserComponent browserComponent, string path, bool clientSide)
     {
         if(clientSide)
-            _BrowserService.SetPath(browserComponent.Entity.GetPlayer(), path, clientSide);
+            _BrowserService.SetPath(browserComponent.Entity.GetRequiredComponent<PlayerElementComponent>(), path, clientSide);
     }
 
     protected override void ComponentDetached(BrowserComponent browserComponent)
@@ -47,12 +47,12 @@ internal sealed class BrowserResourceLogic : ComponentLogic<BrowserComponent>
 
     private void HandleVisibleChanged(BrowserComponent browserComponent, bool visible)
     {
-        _BrowserService.SetVisible(browserComponent.Entity.GetPlayer(), visible);
+        _BrowserService.SetVisible(browserComponent.Entity.GetRequiredComponent<PlayerElementComponent>(), visible);
     }
 
     private void HandleDevToolsStateChanged(BrowserComponent browserComponent, bool enabled)
     {
-        _BrowserService.ToggleDevTools(browserComponent.Entity.GetPlayer(), enabled);
+        _BrowserService.ToggleDevTools(browserComponent.Entity.GetRequiredComponent<PlayerElementComponent>(), enabled);
     }
 
     private void HandlePlayerBrowserReadyCore(Entity playerEntity)
@@ -63,7 +63,6 @@ internal sealed class BrowserResourceLogic : ComponentLogic<BrowserComponent>
 
     private void HandlePlayerBrowserReady(Player player)
     {
-        if (_entityEngine.TryGetEntityByPlayer(player, out var entity))
-            HandlePlayerBrowserReadyCore(entity);
+        HandlePlayerBrowserReadyCore(player.UpCast());
     }
 }

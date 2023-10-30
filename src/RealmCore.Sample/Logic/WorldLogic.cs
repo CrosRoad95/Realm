@@ -50,7 +50,7 @@ internal class WorldLogic : ComponentLogic<DiscoveriesComponent>
         _entityFactory.CreateObject((ObjectModel)1338, new Vector3(0, 0, 10), Vector3.Zero);
         var veh = _entityFactory.CreateVehicle(404, new Vector3(0, 0, 4), Vector3.Zero);
         var ped = _entityFactory.CreatePed(SlipeServer.Server.Elements.Enums.PedModel.Cj, new Vector3(5, 0, 4));
-        veh.GetRequiredComponent<VehicleElementComponent>().AddPassenger(0, ped);
+        veh.GetRequiredComponent<VehicleElementComponent>().AddPassenger(0, (Ped)ped.GetElement());
 
         foreach (var item in _discoveryInfos)
         {

@@ -16,15 +16,9 @@ public class MoneyComponent : Component
     public event Action<MoneyComponent, decimal>? MoneyTaken;
     public decimal Money
     {
-        get
-        {
-            ThrowIfDisposed();
-            return _money;
-        }
+        get => _money;
         set
         {
-            ThrowIfDisposed();
-
             value = Normalize(value);
 
             if (Math.Abs(value) > _moneyLimit)
@@ -94,8 +88,6 @@ public class MoneyComponent : Component
 
     public void GiveMoney(decimal amount)
     {
-        ThrowIfDisposed();
-
         if (amount == 0)
             return;
 
@@ -145,8 +137,6 @@ public class MoneyComponent : Component
 
     public void TakeMoney(decimal amount, bool force = false)
     {
-        ThrowIfDisposed();
-
         _moneyLock.EnterWriteLock();
         try
         {
@@ -166,8 +156,6 @@ public class MoneyComponent : Component
 
     public bool HasMoney(decimal amount, bool force = false)
     {
-        ThrowIfDisposed();
-
         _moneyLock.EnterReadLock();
         try
         {
@@ -181,8 +169,6 @@ public class MoneyComponent : Component
 
     public bool TryTakeMoney(decimal amount, bool force = false)
     {
-        ThrowIfDisposed();
-
         try
         {
             TakeMoney(amount, force);
@@ -196,8 +182,6 @@ public class MoneyComponent : Component
 
     public bool TryTakeMoneyWithCallback(decimal amount, Func<bool> action, bool force = false)
     {
-        ThrowIfDisposed();
-
         _moneyLock.EnterWriteLock();
         try
         {
@@ -223,8 +207,6 @@ public class MoneyComponent : Component
 
     public async Task<bool> TryTakeMoneyWithCallbackAsync(decimal amount, Func<Task<bool>> action, bool force = false)
     {
-        ThrowIfDisposed();
-
         _moneyLock.EnterWriteLock();
 
         try
@@ -251,8 +233,6 @@ public class MoneyComponent : Component
 
     public void TransferMoney(MoneyComponent moneyComponent, decimal amount, bool force = false)
     {
-        ThrowIfDisposed();
-
         if (amount == 0)
             return;
 

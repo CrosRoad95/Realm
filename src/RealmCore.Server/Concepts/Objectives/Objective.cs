@@ -2,7 +2,6 @@
 
 public abstract class Objective : IDisposable
 {
-    private bool _disposed = false;
     private bool _isFulfilled = false;
     private Entity? _entity;
     private IEntityFactory? _entityFactory;
@@ -18,21 +17,18 @@ public abstract class Objective : IDisposable
     private PlayerPrivateElementComponent<BlipElementComponent>? _blipElementComponent;
     public abstract Vector3 Position { get; }
     protected ILogger Logger { get; set; } = default!;
-    protected abstract void Load(IEntityFactory entityFactory, Entity playerEntity);
+    protected abstract void Load(IServiceProvider serviceProvider, Entity playerEntity);
     public virtual void Update() { }
 
-    internal void LoadInternal(IEntityFactory entityFactory, Entity playerEntity, ILogger logger)
+    internal void LoadInternal(IServiceProvider serviceProvider, Entity playerEntity, ILogger logger)
     {
-        ThrowIfDisposed();
         Logger = logger;
-        _entityFactory = entityFactory;
-        Load(entityFactory, playerEntity);
+        _entityFactory = serviceProvider.GetRequiredService<IEntityFactory>();
+        Load(serviceProvider, playerEntity);
     }
 
     protected void Complete(Objective objective, object? data = null)
     {
-        ThrowIfDisposed();
-
         if (Entity == null)
             throw new ArgumentNullException(nameof(Entity), "Entity cannot be null.");
 
@@ -48,8 +44,6 @@ public abstract class Objective : IDisposable
 
     public void Incomplete(Objective objective)
     {
-        ThrowIfDisposed();
-
         if (Entity == null)
             throw new ArgumentNullException(nameof(Entity), "Entity cannot be null.");
 
@@ -65,21 +59,16 @@ public abstract class Objective : IDisposable
 
     public void AddBlip(BlipIcon blipIcon)
     {
-        ThrowIfDisposed();
-
         if (_blipElementComponent != null)
             throw new InvalidOperationException();
 
         using var scopedEntityFactory = _entityFactory.CreateScopedEntityFactory(Entity);
         scopedEntityFactory.CreateBlip(blipIcon, Position);
         _blipElementComponent = scopedEntityFactory.GetLastCreatedComponent<PlayerPrivateElementComponent<BlipElementComponent>>();
-        _blipElementComponent.Disposed += HandleBlipElementComponentDisposed;
     }
 
     public void RemoveBlip()
     {
-        ThrowIfDisposed();
-
         if (_blipElementComponent == null)
             throw new InvalidOperationException();
 
@@ -87,24 +76,10 @@ public abstract class Objective : IDisposable
         _blipElementComponent = null;
     }
 
-    private void HandleBlipElementComponentDisposed(Component _)
-    {
-        _blipElementComponent = null;
-    }
-
-    protected void ThrowIfDisposed()
-    {
-        if (_disposed)
-            throw new ObjectDisposedException(nameof(Objective));
-    }
-
     public virtual void Dispose()
     {
-        ThrowIfDisposed();
         if (_blipElementComponent != null)
             RemoveBlip();
-
-        _disposed = true;
 
         Disposed?.Invoke(this);
     }

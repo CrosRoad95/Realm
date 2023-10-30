@@ -27,26 +27,25 @@ internal sealed class ClientInterfaceResourceLogic
         entity.ComponentAdded -= HandleComponentAdded;
     }
 
-    private void HandleComponentAdded(Component component)
+    private void HandleComponentAdded(IComponent component)
     {
         if (component is InteractionComponent interactionComponent)
         {
-            _clientInterfaceService.AddFocusable(component.Entity.GetElement());
+            _clientInterfaceService.AddFocusable((Element)component.Entity.GetRequiredComponent<IElementComponent>());
             interactionComponent.Detached += HandleInteractionComponentDetachedFromEntity;
         }
     }
 
-    private void HandleInteractionComponentDetachedFromEntity(Component component)
+    private void HandleInteractionComponentDetachedFromEntity(IComponentLifecycle component)
     {
         var interactionComponent = (InteractionComponent)component;
         interactionComponent.Detached -= HandleInteractionComponentDetachedFromEntity;
-        _clientInterfaceService.RemoveFocusable(interactionComponent.Entity.GetElement());
+        _clientInterfaceService.RemoveFocusable((Element)interactionComponent.Entity.GetRequiredComponent<IElementComponent>());
     }
 
     private void HandleClientErrorMessage(Player player, string message, int level, string file, int line)
     {
-        if (!_entityEngine.TryGetEntityByPlayer(player, out var playerEntity))
-            return;
+        var playerEntity = player.UpCast();
 
         var playerName = player.Name;
         switch (level)

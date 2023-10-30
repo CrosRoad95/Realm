@@ -4,12 +4,12 @@ namespace RealmCore.Server.Logic.Components;
 
 internal sealed class JobSessionComponentLogic : ComponentLogic<JobSessionComponent>
 {
-    private readonly IEntityFactory _entityFactory;
+    private readonly IServiceProvider _serviceProvider;
     private readonly ILogger _logger;
 
-    public JobSessionComponentLogic(IEntityEngine entityEngine, IEntityFactory entityFactory, ILogger logger) : base(entityEngine)
+    public JobSessionComponentLogic(IEntityEngine entityEngine, IServiceProvider serviceProvider, ILogger logger) : base(entityEngine)
     {
-        _entityFactory = entityFactory;
+        _serviceProvider = serviceProvider;
         _logger = logger;
     }
 
@@ -18,13 +18,13 @@ internal sealed class JobSessionComponentLogic : ComponentLogic<JobSessionCompon
         jobSessionComponent.ObjectiveAdded += HandleObjectiveAdded;
     }
 
-    private void HandleObjectiveAdded(JobSessionComponent jobSessionComponent, Objective objective)
-    {
-        objective.LoadInternal(_entityFactory, jobSessionComponent.Entity, _logger);
-    }
-
     protected override void ComponentDetached(JobSessionComponent jobSessionComponent)
     {
         jobSessionComponent.ObjectiveAdded -= HandleObjectiveAdded;
+    }
+
+    private void HandleObjectiveAdded(JobSessionComponent jobSessionComponent, Objective objective)
+    {
+        objective.LoadInternal(_serviceProvider, jobSessionComponent.Entity, _logger);
     }
 }

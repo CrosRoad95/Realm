@@ -76,7 +76,6 @@ global using SlipeServer.Resources.BoneAttach;
 global using RealmCore.Server.Rules;
 global using SlipeServer.Packets.Structs;
 global using SlipeServer.Server.ElementConcepts;
-global using SlipeServer.Server.Elements.Structs;
 global using SlipeServer.Server.Enums;
 global using SlipeServer.Packets.Lua.Camera;
 global using SlipeServer.Server.Clients;
@@ -130,6 +129,7 @@ global using RealmCore.Server.Utilities;
 global using RealmCore.Server.DTOs;
 global using RealmCore.Server.Elements;
 global using SlipeServer.Server.Resources.Providers;
+global using RealmCore.ECS.Common;
 
 global using ILogger = Microsoft.Extensions.Logging.ILogger;
 

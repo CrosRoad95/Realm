@@ -1,26 +1,10 @@
 ﻿namespace RealmCore.Server.Components.Elements;
 
-public class WorldObjectComponent : ElementComponent
+public class WorldObjectComponent : WorldObject, IElementComponent
 {
-    protected readonly WorldObject _worldObject;
-    internal override Element Element => _worldObject;
-
-    public ushort Model
+    public WorldObjectComponent(ObjectModel model, Vector3 position) : base(model, position)
     {
-        get
-        {
-            ThrowIfDisposed();
-            return _worldObject.Model;
-        }
-        set
-        {
-            ThrowIfDisposed();
-            _worldObject.Model = value;
-        }
     }
 
-    internal WorldObjectComponent(WorldObject worldObject)
-    {
-        _worldObject = worldObject;
-    }
+    public Entity? Entity { get; set; }
 }

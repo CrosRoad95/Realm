@@ -1,6 +1,8 @@
-﻿namespace RealmCore.Sample.Components.Vehicles;
+﻿using RealmCore.ECS.Common;
 
-public class VehicleForSaleComponent : Component
+namespace RealmCore.Sample.Components.Vehicles;
+
+public class VehicleForSaleComponent : ComponentLifecycle
 {
     public decimal Price { get; }
 
@@ -12,7 +14,7 @@ public class VehicleForSaleComponent : Component
         Price = price;
     }
 
-    protected override void Attach()
+    public override void Attach()
     {
         var vehicleElementComponent = Entity.GetRequiredComponent<VehicleElementComponent>();
         vehicleElementComponent.IsFrozen = true;

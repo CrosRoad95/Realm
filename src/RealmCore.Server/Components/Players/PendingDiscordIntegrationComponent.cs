@@ -15,16 +15,12 @@ public class PendingDiscordIntegrationComponent : Component
 
     private bool HasPendingDiscordConnectionCode()
     {
-        ThrowIfDisposed();
-
         lock (_lock)
             return _discordConnectionCodeValidUntil != null && _discordConnectionCodeValidUntil > _dateTimeProvider.Now;
     }
 
     public bool Verify(string code)
     {
-        ThrowIfDisposed();
-
         lock (_lock)
         {
             if (!HasPendingDiscordConnectionCode())
@@ -36,8 +32,6 @@ public class PendingDiscordIntegrationComponent : Component
 
     public string GenerateAndGetDiscordConnectionCode(TimeSpan? validFor = null)
     {
-        ThrowIfDisposed();
-
         lock (_lock)
         {
             _discordConnectionCode = Guid.NewGuid().ToString();

@@ -19,8 +19,6 @@ public class LiftableWorldObjectComponent : InteractionComponent
 
     public bool TryLift(Entity entity)
     {
-        ThrowIfDisposed();
-
         if (!IsAllowedToLift(entity))
             return false;
 
@@ -32,7 +30,7 @@ public class LiftableWorldObjectComponent : InteractionComponent
             if (Owner == null)
             {
                 Owner = entity;
-                Owner.PreDisposed += HandleOwnerPreDisposed;
+                Owner.Disposed += HandleOwnerDisposed;
                 Lifted?.Invoke(this, entity);
                 return true;
             }
@@ -42,23 +40,21 @@ public class LiftableWorldObjectComponent : InteractionComponent
 
     public bool IsAllowedToLift(Entity entity) => AllowedForEntities == null || AllowedForEntities.Contains(entity);
 
-    private void HandleOwnerPreDisposed(Entity disposedEntity)
+    private void HandleOwnerDisposed(Entity disposedEntity)
     {
         Debug.Assert(Owner != null);
-        Owner.PreDisposed -= HandleOwnerPreDisposed;
+        Owner.Disposed -= HandleOwnerDisposed;
         TryDrop();
     }
 
     public bool TryDrop()
     {
-        ThrowIfDisposed();
-
         lock (_lock)
         {
             if (Owner == null)
                 return false;
 
-            Owner.PreDisposed -= HandleOwnerPreDisposed;
+            Owner.Disposed -= HandleOwnerDisposed;
             Dropped?.Invoke(this, Owner);
             Owner = null;
         }

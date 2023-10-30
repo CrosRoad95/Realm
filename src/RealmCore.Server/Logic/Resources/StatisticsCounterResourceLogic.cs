@@ -27,21 +27,19 @@ internal sealed class StatisticsCounterResourceLogic : ComponentLogic<Statistics
     {
         try
         {
-            if (_entityEngine.TryGetEntityByPlayer(player, out Entity? entity) && entity != null)
+            var entity = player.UpCast();
+            var statisticsCounterComponent = entity.GetRequiredComponent<StatisticsCounterComponent>();
+            foreach (var item in statistics)
             {
-                var statisticsCounterComponent = entity.GetRequiredComponent<StatisticsCounterComponent>();
-                foreach (var item in statistics)
+                try
                 {
-                    try
-                    {
-                        if (item.Key < 0 || item.Key > 1000)
-                            throw new Exception($"Received out of range statId from client: {item.Key}");
-                        statisticsCounterComponent.IncreaseStat(item.Key, item.Value);
-                    }
-                    catch (Exception ex)
-                    {
-                        _logger.LogError(ex, "Failed to increase stat for player {playerName} serial: {serial}", player.Name, player.Client.TryGetSerial());
-                    }
+                    if (item.Key < 0 || item.Key > 1000)
+                        throw new Exception($"Received out of range statId from client: {item.Key}");
+                    statisticsCounterComponent.IncreaseStat(item.Key, item.Value);
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "Failed to increase stat for player {playerName} serial: {serial}", player.Name, player.Client.TryGetSerial());
                 }
             }
         }
@@ -54,12 +52,12 @@ internal sealed class StatisticsCounterResourceLogic : ComponentLogic<Statistics
     protected override void ComponentAdded(StatisticsCounterComponent component)
     {
         var playerElementComponent = component.Entity.GetRequiredComponent<PlayerElementComponent>();
-        _statisticsCounterService.SetCounterEnabledFor(playerElementComponent.Player, true);
+        _statisticsCounterService.SetCounterEnabledFor(playerElementComponent, true);
     }
 
     protected override void ComponentDetached(StatisticsCounterComponent component)
     {
         var playerElementComponent = component.Entity.GetRequiredComponent<PlayerElementComponent>();
-        _statisticsCounterService.SetCounterEnabledFor(playerElementComponent.Player, false);
+        _statisticsCounterService.SetCounterEnabledFor(playerElementComponent, false);
     }
 }

@@ -6,14 +6,7 @@ namespace RealmCore.Server.Components.Players;
 public class DiscordIntegrationComponent : IntegrationComponent
 {
     private readonly ulong _discordUserId;
-    public ulong DiscordUserId
-    {
-        get
-        {
-            ThrowIfDisposed();
-            return _discordUserId;
-        }
-    }
+    public ulong DiscordUserId => _discordUserId;
 
     public DiscordIntegrationComponent(ulong discordId)
     {

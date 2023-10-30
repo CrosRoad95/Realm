@@ -22,8 +22,6 @@ public abstract class JobSessionComponent : SessionComponent, IUpdateCallback
 
     protected bool RemoveObjective(Objective objective)
     {
-        ThrowIfDisposed();
-
         var empty = false;
         lock (_objectivesLock)
         {
@@ -39,15 +37,13 @@ public abstract class JobSessionComponent : SessionComponent, IUpdateCallback
 
     protected TObjective AddObjective<TObjective>(TObjective objective) where TObjective : Objective
     {
-        ThrowIfDisposed();
-
         objective.Entity = Entity;
         lock (_objectivesLock)
             _objectives.Add(objective);
 
         ObjectiveAdded?.Invoke(this, objective);
         objective.Completed += HandleCompleted;
-        objective.InCompleted += HandleIncompleted;
+        objective.InCompleted += HandleInCompleted;
         objective.Disposed += HandleDisposed;
         return objective;
     }
@@ -55,7 +51,7 @@ public abstract class JobSessionComponent : SessionComponent, IUpdateCallback
     private void HandleDisposed(Objective objective)
     {
         objective.Completed -= HandleCompleted;
-        objective.InCompleted -= HandleIncompleted;
+        objective.InCompleted -= HandleInCompleted;
         objective.Disposed -= HandleDisposed;
         RemoveObjective(objective);
     }
@@ -70,13 +66,13 @@ public abstract class JobSessionComponent : SessionComponent, IUpdateCallback
         _completedObjectives++;
     }
 
-    private void HandleIncompleted(Objective objective)
+    private void HandleInCompleted(Objective objective)
     {
         ObjectiveIncompleted?.Invoke(this, objective);
         objective.Dispose();
     }
 
-    protected override void Detach()
+    public override void Detach()
     {
         _disposing = true;
 

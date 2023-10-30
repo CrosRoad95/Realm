@@ -1,7 +1,7 @@
 ﻿namespace RealmCore.Server.Components.Vehicles;
 
 [ComponentUsage(false)]
-public class VehicleUpgradesComponent : Component
+public class VehicleUpgradesComponent : ComponentLifecycle
 {
     private readonly List<int> _upgrades = new();
     private readonly object _lock = new();
@@ -10,7 +10,6 @@ public class VehicleUpgradesComponent : Component
     {
         get
         {
-            ThrowIfDisposed();
             lock (_lock)
                 return new List<int>(_upgrades).AsReadOnly();
         }
@@ -32,7 +31,7 @@ public class VehicleUpgradesComponent : Component
         _upgrades = vehicleUpgrades.Select(x => x.UpgradeId).ToList();
     }
 
-    protected override void Attach()
+    public override void Attach()
     {
         if (_upgrades.Count > 0)
             Rebuild?.Invoke(this);
@@ -42,14 +41,12 @@ public class VehicleUpgradesComponent : Component
 
     public bool HasUpgrade(int upgradeId)
     {
-        ThrowIfDisposed();
         lock (_lock)
             return InternalHasUpgrade(upgradeId);
     }
 
     public bool AddUpgrades(IEnumerable<int> upgradeIds, bool rebuild = true)
     {
-        ThrowIfDisposed();
         lock (_lock)
         {
             _upgrades.AddRange(upgradeIds);
@@ -64,7 +61,6 @@ public class VehicleUpgradesComponent : Component
 
     public bool AddUpgrade(int upgradeId, bool rebuild = true)
     {
-        ThrowIfDisposed();
         lock (_lock)
         {
             _upgrades.Add(upgradeId);
@@ -77,7 +73,6 @@ public class VehicleUpgradesComponent : Component
 
     public bool AddUniqueUpgrade(int upgradeId, bool rebuild = true)
     {
-        ThrowIfDisposed();
         lock (_lock)
         {
             if (InternalHasUpgrade(upgradeId))
@@ -95,7 +90,6 @@ public class VehicleUpgradesComponent : Component
 
     public void RemoveAllUpgrades(bool rebuild = true)
     {
-        ThrowIfDisposed();
         List<int> copy;
         lock (_lock)
         {
@@ -112,7 +106,6 @@ public class VehicleUpgradesComponent : Component
 
     public bool RemoveUpgrade(int upgradeId, bool rebuild = true)
     {
-        ThrowIfDisposed();
         bool result;
         lock (_upgrades)
         {

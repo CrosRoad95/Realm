@@ -1,6 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-
-namespace RealmCore.Server.Extensions;
+﻿namespace RealmCore.Server.Extensions;
 
 public static class EntityExtensions
 {
@@ -10,29 +8,25 @@ public static class EntityExtensions
         if (tag is not PlayerTagComponent)
             throw new InvalidOperationException();
 
-        var t = (a.Transform.Position.FindRotation(b.Transform.Position) + a.Transform.Rotation.Z) % 360;
+        var elementA = (Element)a.GetRequiredComponent<IElementComponent>();
+        var elementB = (Element)b.GetRequiredComponent<IElementComponent>();
+        var t = (elementA.Position.FindRotation(elementB.Position) + elementA.Rotation.Z) % 360;
         if (t > 180)
             t -= 360;
         return Math.Abs(t) < tolerance;
     }
 
-    public static float DistanceTo(this Entity a, Entity b)
-    {
-        var length = (a.Transform.Position - b.Transform.Position).Length();
-        return length;
-    }
-
     public static TComponent AddComponentWithDI<TComponent>(this Entity entity, params object[] parameters) where TComponent : Component
     {
-        var realmPlayer = (RealmPlayer)entity.GetPlayer();
+        var realmPlayer = (RealmPlayer)entity.GetRequiredComponent<PlayerElementComponent>();
         return entity.AddComponent(ActivatorUtilities.CreateInstance<TComponent>(realmPlayer.ServiceProvider, parameters));
     }
 
-    internal static bool TryGetElement(this Entity entity, out Element element)
+    public static bool TryGetElement(this Entity entity, out Element element)
     {
-        if (entity.TryGetComponent(out ElementComponent elementComponent))
+        if (entity.TryGetComponent(out IElementComponent elementComponent))
         {
-            element = elementComponent.Element;
+            element = (Element)elementComponent;
             return true;
         }
 
@@ -40,7 +34,5 @@ public static class EntityExtensions
         return false;
     }
 
-    internal static Player GetPlayer(this Entity entity) => entity.GetRequiredComponent<PlayerElementComponent>().Player;
-    internal static Vehicle GetVehicle(this Entity entity) => entity.GetRequiredComponent<VehicleElementComponent>().Vehicle;
-    internal static Element GetElement(this Entity entity) => entity.GetRequiredComponent<ElementComponent>().Element;
+    public static Element GetElement(this Entity entity) => (Element)entity.GetRequiredComponent<IElementComponent>();
 }

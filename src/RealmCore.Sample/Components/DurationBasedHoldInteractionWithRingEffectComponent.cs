@@ -21,7 +21,8 @@ internal class DurationBasedHoldInteractionWithRingEffectComponent : DurationBas
         if (owningEntity.HasComponent<PlayerTagComponent>())
             lock (_lock)
             {
-                _ringId = _overlayService.AddRing3dDisplay(owningEntity, Entity.Transform.Position, time);
+                // TODO:
+                //_ringId = _overlayService.AddRing3dDisplay(owningEntity, Entity.Transform.Position, time);
             }
     }
 

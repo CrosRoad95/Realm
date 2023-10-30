@@ -29,7 +29,7 @@ internal sealed class DxGuiSystemServiceLogic : ComponentLogic<DxGuiComponent>
     {
         if(_guiSystemService != null)
         {
-            _guiSystemService.OpenGui(dxGuiComponent.Entity.GetPlayer(), dxGuiComponent.Name, dxGuiComponent.Cursorless);
+            _guiSystemService.OpenGui(dxGuiComponent.Entity.GetRequiredComponent<PlayerElementComponent>(), dxGuiComponent.Name, dxGuiComponent.Cursorless);
             _guiComponents.TryAdd(dxGuiComponent.Name, dxGuiComponent);
         }
     }
@@ -40,7 +40,7 @@ internal sealed class DxGuiSystemServiceLogic : ComponentLogic<DxGuiComponent>
         {
             if(dxGuiComponent.Entity.TryGetComponent(out PlayerElementComponent playerElementComponent))
             {
-                _guiSystemService.CloseGui(playerElementComponent.Player, dxGuiComponent.Name, dxGuiComponent.Cursorless);
+                _guiSystemService.CloseGui(playerElementComponent, dxGuiComponent.Name, dxGuiComponent.Cursorless);
                 _guiComponents.TryRemove(dxGuiComponent.Name, out var _);
             }
         }

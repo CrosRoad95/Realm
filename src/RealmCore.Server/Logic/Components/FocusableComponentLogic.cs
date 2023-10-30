@@ -2,12 +2,10 @@
 
 internal sealed class FocusableComponentLogic : ComponentLogic<FocusableComponent>
 {
-    private readonly IEntityEngine _entityEngine;
     private readonly IClientInterfaceService _clientInterfaceService;
 
     public FocusableComponentLogic(IEntityEngine entityEngine, IClientInterfaceService clientInterfaceService) : base(entityEngine)
     {
-        _entityEngine = entityEngine;
         _clientInterfaceService = clientInterfaceService;
         _clientInterfaceService.FocusedElementChanged += HandleFocusedElementChanged;
         _clientInterfaceService.ClickedElementChanged += HandleClickedElementChanged;
@@ -15,13 +13,10 @@ internal sealed class FocusableComponentLogic : ComponentLogic<FocusableComponen
 
     private void HandleClickedElementChanged(Player player, Element? clickedElement)
     {
-        if (!_entityEngine.TryGetEntityByPlayer(player, out var playerEntity) || playerEntity == null)
-            return;
-
-        var playerElementComponent = playerEntity.GetRequiredComponent<PlayerElementComponent>();
-        if(clickedElement != null && _entityEngine.TryGetByElement(clickedElement, out var clickedElementEntity))
+        var playerElementComponent = (PlayerElementComponent)player;
+        if (clickedElement is IElementComponent elementComponent)
         {
-            playerElementComponent.LastClickedElement = clickedElementEntity;
+            playerElementComponent.LastClickedElement = elementComponent.Entity;
         }
         else
         {
@@ -31,9 +26,7 @@ internal sealed class FocusableComponentLogic : ComponentLogic<FocusableComponen
 
     private void HandleFocusedElementChanged(Player player, Element? focusedElement, string? vehiclePart)
     {
-        if (!_entityEngine.TryGetEntityByPlayer(player, out var playerEntity) || playerEntity == null)
-            return;
-
+        var playerEntity = ((PlayerElementComponent)player).Entity;
         var playerElementComponent = playerEntity.GetRequiredComponent<PlayerElementComponent>();
         if(focusedElement == null)
         {
@@ -47,9 +40,9 @@ internal sealed class FocusableComponentLogic : ComponentLogic<FocusableComponen
         }
         else
         {
-            if(_entityEngine.TryGetByElement(focusedElement, out var elementEntity) && elementEntity != null)
+            if (focusedElement is IElementComponent elementComponent)
             {
-                elementEntity.GetRequiredComponent<FocusableComponent>().AddFocusedPlayer(playerEntity);
+                elementComponent.Entity.GetRequiredComponent<FocusableComponent>().AddFocusedPlayer(playerEntity);
             }
         }
 
@@ -57,8 +50,10 @@ internal sealed class FocusableComponentLogic : ComponentLogic<FocusableComponen
             playerElementComponent.FocusedEntity = null;
         else
         {
-            _entityEngine.TryGetByElement(focusedElement, out var entity);
-            playerElementComponent.FocusedEntity = entity;
+            if (focusedElement is IElementComponent elementComponent)
+                playerElementComponent.FocusedEntity = elementComponent.Entity;
+            else
+                playerElementComponent.FocusedEntity = null;
         }
 
     }

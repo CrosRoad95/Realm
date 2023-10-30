@@ -1,9 +1,10 @@
 ﻿namespace RealmCore.Server.Components.Elements.CollisionShapes;
 
-public class CollisionSphereElementComponent : CollisionShapeElementComponent
+public class CollisionSphereElementComponent : CollisionSphere, ICollisionShape
 {
-    internal CollisionSphereElementComponent(CollisionSphere collisionSphere, IEntityEngine entityEngine) : base(collisionSphere, entityEngine)
+    public CollisionSphereElementComponent(Vector3 position, float Radius) : base(position, Radius)
     {
-
     }
+
+    public Entity Entity { get; set; }
 }

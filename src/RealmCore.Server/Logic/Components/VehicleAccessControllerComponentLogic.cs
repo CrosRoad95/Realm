@@ -15,9 +15,11 @@ internal sealed class VehicleAccessControllerComponentLogic : ComponentLogic<Veh
 
     protected override void ComponentAdded(VehicleAccessControllerComponent vehicleAccessControllerComponent)
     {
-        vehicleAccessControllerComponent.Entity.GetRequiredComponent<VehicleElementComponent>().Vehicle.CanEnter = (ped, vehicle) =>
+        vehicleAccessControllerComponent.Entity.GetRequiredComponent<VehicleElementComponent>().CanEnter = (ped, vehicle) =>
         {
-            if (!_entityEngine.TryGetEntityByPed(ped, out var pedEntity) || !_entityEngine.TryGetByElement(vehicle, out var vehicleEntity) || pedEntity == null || vehicleEntity == null)
+            var pedEntity = ped.TryUpCast();
+            var vehicleEntity = vehicle.TryUpCast();
+            if (pedEntity == null || vehicleEntity == null)
             {
                 using var _ = _logger.BeginElement(ped);
                 _logger.LogWarning("Player/ped attempted to enter enter vehicle that has no entity.");
@@ -33,6 +35,6 @@ internal sealed class VehicleAccessControllerComponentLogic : ComponentLogic<Veh
 
     protected override void ComponentDetached(VehicleAccessControllerComponent vehicleAccessControllerComponent)
     {
-        vehicleAccessControllerComponent.Entity.GetRequiredComponent<VehicleElementComponent>().Vehicle.CanEnter = null;
+        vehicleAccessControllerComponent.Entity.GetRequiredComponent<VehicleElementComponent>().CanEnter = null;
     }
 }

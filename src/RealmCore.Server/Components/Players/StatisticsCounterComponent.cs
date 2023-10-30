@@ -30,8 +30,6 @@ public sealed class StatisticsCounterComponent : Component
 
     public void IncreaseStat(int statId, float value)
     {
-        ThrowIfDisposed();
-
         if (value <= 0) throw new ArgumentOutOfRangeException(nameof(value));
 
         if (_stats.TryGetValue(statId, out var stat))
@@ -48,8 +46,6 @@ public sealed class StatisticsCounterComponent : Component
 
     public void DecreaseStat(int statId, float value)
     {
-        ThrowIfDisposed();
-
         if (value <= 0) throw new ArgumentOutOfRangeException(nameof(value));
 
         if (_stats.TryGetValue(statId, out var stat))
@@ -66,8 +62,6 @@ public sealed class StatisticsCounterComponent : Component
 
     public void SetStat(int statId, float value)
     {
-        ThrowIfDisposed();
-
         if (_stats.TryGetValue(statId, out var previousStat))
         {
             if (_stats.TryUpdate(statId, value, previousStat))
@@ -96,8 +90,6 @@ public sealed class StatisticsCounterComponent : Component
 
     public float GetStat(int statId)
     {
-        ThrowIfDisposed();
-
         _stats.TryGetValue(statId, out var statValue);
         return statValue;
     }

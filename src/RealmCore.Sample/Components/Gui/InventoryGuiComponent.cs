@@ -28,7 +28,7 @@ public sealed class InventoryGuiComponent : StatefulDxGuiComponent<InventoryGuiC
 
     }
 
-    protected override void Attach()
+    public override void Attach()
     {
         var inventory = Entity.GetRequiredComponent<InventoryComponent>();
         inventory.ItemAdded += HandleItemAdded;
@@ -80,8 +80,6 @@ public sealed class InventoryGuiComponent : StatefulDxGuiComponent<InventoryGuiC
 
     protected override void PreGuiOpen(InventoryState state)
     {
-        ThrowIfDisposed();
-
         var inventory = Entity.GetRequiredComponent<InventoryComponent>();
         state.Size = (double)inventory.Size;
         state.Number = (double)inventory.Number;
@@ -91,12 +89,10 @@ public sealed class InventoryGuiComponent : StatefulDxGuiComponent<InventoryGuiC
 
     protected override async Task HandleForm(IFormContext formContext)
     {
-        ThrowIfDisposed();
     }
 
     protected override async Task HandleAction(IActionContext actionContext)
     {
-        ThrowIfDisposed();
         switch (actionContext.ActionName)
         {
             case "doItemAction":

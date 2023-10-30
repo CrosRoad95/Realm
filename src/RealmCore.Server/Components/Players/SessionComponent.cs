@@ -1,29 +1,15 @@
 ﻿namespace RealmCore.Server.Components.Players;
 
-public abstract class SessionComponent : Component
+public abstract class SessionComponent : ComponentLifecycle
 {
     private readonly Stopwatch _stopwatch = new();
 
     public event Action<Entity>? SessionStarted;
     public event Action<Entity>? SessionEnded;
 
-    public TimeSpan Elapsed
-    {
-        get
-        {
-            ThrowIfDisposed();
-            return _stopwatch.Elapsed;
-        }
-    }
+    public TimeSpan Elapsed => _stopwatch.Elapsed;
 
-    public bool IsRunning
-    {
-        get
-        {
-            ThrowIfDisposed();
-            return _stopwatch.IsRunning;
-        }
-    }
+    public bool IsRunning => _stopwatch.IsRunning;
 
     public SessionComponent()
     {
@@ -31,8 +17,6 @@ public abstract class SessionComponent : Component
 
     public void Start()
     {
-        ThrowIfDisposed();
-
         if (IsRunning)
             throw new SessionAlreadyRunningException();
         _stopwatch.Reset();
@@ -40,14 +24,13 @@ public abstract class SessionComponent : Component
         SessionStarted?.Invoke(Entity);
     }
 
-    protected override void Detach()
+    public override void Detach()
     {
         End();
     }
 
     public void End()
     {
-        ThrowIfDisposed();
         SessionEnded?.Invoke(Entity);
         _stopwatch.Stop();
     }

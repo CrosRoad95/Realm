@@ -36,7 +36,6 @@ global using SlipeServer.Server.ElementCollections;
 global using System.Drawing;
 global using System.Numerics;
 global using RealmCore.ECS;
-global using RealmCore.ECS.Components;
 global using RealmCore.Server.Components.Vehicles;
 global using RealmCore.Server.Concepts.Upgrades;
 global using SlipeServer.Server.Constants;
