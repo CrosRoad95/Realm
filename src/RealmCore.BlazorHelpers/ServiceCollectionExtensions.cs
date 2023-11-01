@@ -1,12 +1,12 @@
-﻿using RealmCore.Server.Interfaces;
+﻿using RealmCore.Server;
 
 namespace RealmCore.BlazorHelpers;
 
 public static class ServiceCollectionExtensions
 {
-    public static IServiceCollection AddRealmServer<T>(this IServiceCollection services, T realmServer) where T : class, IRealmServer
+    public static IServiceCollection AddRealmServer<T>(this IServiceCollection services, T realmServer) where T : RealmServer
     {
-        services.AddSingleton<IRealmServer>(realmServer);
+        services.AddSingleton<RealmServer>(realmServer);
         services.AddSingleton(realmServer);
         services.AddScoped(typeof(IRealmService<>), typeof(RealmService<>));
         services.AddHostedService<RealmServerHostedService>();

@@ -27,7 +27,7 @@ public class ComponentLogic<T> where T : IComponent
         var components = hasComponents.Components;
         components.ComponentAdded -= HandleComponentAdded;
         components.ComponentDetached -= HandleComponentDetached;
-        element.Destroyed += HandleDestroyed;
+        element.Destroyed -= HandleDestroyed;
         foreach (var component in components.ComponentsLists)
             if (component is T tComponent)
                 ComponentDetached(tComponent);

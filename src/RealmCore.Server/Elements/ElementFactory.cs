@@ -24,6 +24,11 @@ internal sealed class ElementFactory : IElementFactory
         }
     }
 
+    public void RelayCreated(Element element)
+    {
+        ElementCreated?.Invoke(element);
+    }
+
     private void AssociateWithServer(Element element)
     {
         element.AssociateWith(_mtaServer);
@@ -35,7 +40,7 @@ internal sealed class ElementFactory : IElementFactory
         {
             marker.CollisionShape.AssociateWith(_mtaServer);
         }
-        ElementCreated?.Invoke(element);
+        RelayCreated(element);
     }
 
     public RealmVehicle CreateVehicle(ushort model, Vector3 position, Vector3 rotation, byte interior = 0, ushort dimension = 0, Func<RealmVehicle, IEnumerable<IComponent>>? elementBuilder = null)

@@ -92,7 +92,7 @@ public static class ServiceCollectionExtensions
         var serverFilesProvider = new ServerFilesProvider("Server");
 #endif
         services.AddSingleton<IServerFilesProvider>(serverFilesProvider);
-        services.AddSingleton<IRealmServer>(x => (RealmServer)x.GetRequiredService<MtaServer>());
+        services.AddSingleton(x => (RealmServer)x.GetRequiredService<MtaServer>());
 
         return services;
     }

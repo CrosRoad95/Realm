@@ -26,7 +26,7 @@ internal class WorldLogic : ComponentLogic<DiscoveriesComponent>
     private readonly IElementFactory _elementFactory;
     private readonly IOverlayService _overlayService;
 
-    public WorldLogic(IRealmServer realmServer, IElementFactory elementFactory, IOverlayService overlayService) : base(elementFactory)
+    public WorldLogic(RealmServer realmServer, IElementFactory elementFactory, IOverlayService overlayService) : base(elementFactory)
     {
         _elementFactory = elementFactory;
         _overlayService = overlayService;

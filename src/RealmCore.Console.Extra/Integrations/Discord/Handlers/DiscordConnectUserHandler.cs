@@ -15,7 +15,7 @@ public class DiscordConnectUserHandler : IDiscordConnectUserHandler
     {
         try
         {
-            foreach (var player in _elementCollection.GetByType<Player>().Cast<RealmPlayer>())
+            foreach (var player in _elementCollection.GetByType<RealmPlayer>())
             {
                 if (player.TryGetComponent<PendingDiscordIntegrationComponent>(out var component))
                 {

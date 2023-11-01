@@ -38,7 +38,7 @@ public class MtaDiPlayerServerTempFix<TPlayer> : MtaServer<TPlayer> where TPlaye
 }
 
 
-public class RealmServer : MtaDiPlayerServerTempFix<RealmPlayer>, IRealmServer
+public class RealmServer : MtaDiPlayerServerTempFix<RealmPlayer>
 {
     public event Action? ServerStarted;
 

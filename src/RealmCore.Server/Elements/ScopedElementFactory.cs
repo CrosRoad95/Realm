@@ -11,7 +11,7 @@ internal sealed class ScopedElementFactory : IScopedElementFactory
     private readonly List<Element> _createdElements = new();
     private readonly MapIdGenerator _elementIdGenerator;
 
-    public Element LastCreatedElement => _lastCreatedElement ?? throw new NullReferenceException();
+    public Element? LastCreatedElement => _lastCreatedElement ?? throw new NullReferenceException();
     public IEnumerable<Element> CreatedElements
     {
         get
@@ -28,7 +28,7 @@ internal sealed class ScopedElementFactory : IScopedElementFactory
 
     public T GetLastCreatedElement<T>() where T : Element
     {
-        return (T)LastCreatedElement;
+        return (T)LastCreatedElement ?? throw new InvalidOperationException();
     }
 
     private void ExecuteElementBuilder<TElement>(Func<TElement, IEnumerable<IComponent>>? builder, TElement element) where TElement : IComponents
@@ -48,6 +48,19 @@ internal sealed class ScopedElementFactory : IScopedElementFactory
         _player = playerContext.Player;
         _player.Destroyed += HandlePlayerDestroyed;
         _elementIdGenerator = elementIdGenerator;
+    }
+
+    event Action<Element>? IElementFactory.ElementCreated
+    {
+        add
+        {
+            throw new NotImplementedException();
+        }
+
+        remove
+        {
+            throw new NotImplementedException();
+        }
     }
 
     private void HandlePlayerDestroyed(Element _)
@@ -193,6 +206,81 @@ internal sealed class ScopedElementFactory : IScopedElementFactory
     public RealmVehicle CreateVehicle(ushort model, Vector3 position, Vector3 rotation, byte interior = 0, ushort dimension = 0, Func<RealmVehicle, IEnumerable<IComponent>>? elementBuilder = null)
     {
         throw new NotImplementedException();
+    }
+
+    T IScopedElementFactory.GetLastCreatedElement<T>()
+    {
+        throw new NotImplementedException();
+    }
+
+    RealmBlip IElementFactory.CreateBlip(Vector3 position, BlipIcon blipIcon, byte interior, ushort dimension, Func<RealmBlip, IEnumerable<IComponent>>? elementBuilder)
+    {
+        throw new NotImplementedException();
+    }
+
+    CollisionCircle IElementFactory.CreateCollisionCircle(Vector2 position, float radius, byte interior, ushort dimension, Action<Element>? elementBuilder)
+    {
+        throw new NotImplementedException();
+    }
+
+    CollisionCuboid IElementFactory.CreateCollisionCuboid(Vector3 position, Vector3 dimensions, byte interior, ushort dimension, Action<Element>? elementBuilder)
+    {
+        throw new NotImplementedException();
+    }
+
+    CollisionPolygon IElementFactory.CreateCollisionPolygon(Vector3 position, IEnumerable<Vector2> vertices, byte interior, ushort dimension, Action<Element>? elementBuilder)
+    {
+        throw new NotImplementedException();
+    }
+
+    CollisionRectangle IElementFactory.CreateCollisionRectangle(Vector2 position, Vector2 dimensions, byte interior, ushort dimension, Action<Element>? elementBuilder)
+    {
+        throw new NotImplementedException();
+    }
+
+    RealmCollisionSphere IElementFactory.CreateCollisionSphere(Vector3 position, float radius, byte interior, ushort dimension, Func<RealmCollisionSphere, IEnumerable<IComponent>>? elementBuilder)
+    {
+        throw new NotImplementedException();
+    }
+
+    CollisionTube IElementFactory.CreateCollisionTube(Vector3 position, float radius, float height, byte interior, ushort dimension, Action<Element>? elementBuilder)
+    {
+        throw new NotImplementedException();
+    }
+
+    RealmMarker IElementFactory.CreateMarker(Vector3 position, MarkerType markerType, Color color, byte interior, ushort dimension, Action<Element>? elementBuilder)
+    {
+        throw new NotImplementedException();
+    }
+
+    RealmObject IElementFactory.CreateObject(ObjectModel model, Vector3 position, Vector3 rotation, byte interior, ushort dimension, Func<RealmObject, IEnumerable<IComponent>>? elementBuilder)
+    {
+        throw new NotImplementedException();
+    }
+
+    Ped IElementFactory.CreatePed(PedModel pedModel, Vector3 position, byte interior, ushort dimension, Action<Element>? elementBuilder)
+    {
+        throw new NotImplementedException();
+    }
+
+    RealmPickup IElementFactory.CreatePickup(Vector3 position, ushort model, byte interior, ushort dimension, Func<RealmPickup, IEnumerable<IComponent>>? elementBuilder)
+    {
+        throw new NotImplementedException();
+    }
+
+    RadarArea IElementFactory.CreateRadarArea(Vector2 position, Vector2 size, Color color, byte interior, ushort dimension, Action<Element>? elementBuilder)
+    {
+        throw new NotImplementedException();
+    }
+
+    RealmVehicle IElementFactory.CreateVehicle(ushort model, Vector3 position, Vector3 rotation, byte interior, ushort dimension, Func<RealmVehicle, IEnumerable<IComponent>>? elementBuilder)
+    {
+        throw new NotImplementedException();
+    }
+
+    void IElementFactory.RelayCreated(Element element)
+    {
+        throw new NotSupportedException();
     }
 
     private void ThrowIfDisposed()

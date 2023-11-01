@@ -21,8 +21,8 @@ internal class ServerInfoCommand : ICommand
     public Task Handle(RealmPlayer player, CommandArguments args)
     {
         _logger.LogInformation("Server uptime: {uptime}", _dateTimeProvider.Now - _mtaServer.StartDatetime);
-        _logger.LogInformation("Players: {playerCount}, logged in players: {loggedInPlayers}", _elementCollection.GetByType<Player>().Count(), _elementCollection.GetByType<Player>().Cast<RealmPlayer>().Where(x => x.HasComponent<UserComponent>()));
-        _logger.LogInformation("Vehicles: {vehiclesCount}", _elementCollection.GetByType<Vehicle>());
+        _logger.LogInformation("Players: {playerCount}, logged in players: {loggedInPlayers}", _elementCollection.GetByType<RealmPlayer>().Count(), _elementCollection.GetByType<RealmPlayer>().Where(x => x.IsLoggedIn).Count());
+        _logger.LogInformation("Vehicles: {vehiclesCount}", _elementCollection.GetByType<RealmVehicle>());
         _logger.LogInformation("Elements count: {elementsCount}", _elementCollection.Count);
         _logger.LogInformation("Loaded maps: {loadedMaps}", _mapsService.Maps);
 

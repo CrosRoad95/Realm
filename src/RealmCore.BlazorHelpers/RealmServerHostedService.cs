@@ -1,14 +1,14 @@
-﻿using RealmCore.Server.Extensions;
-using RealmCore.Server.Interfaces;
+﻿using RealmCore.Server;
+using RealmCore.Server.Extensions;
 
 namespace RealmCore.BlazorHelpers;
 
 internal class RealmServerHostedService : IHostedService
 {
-    private readonly IRealmServer _realmServer;
+    private readonly RealmServer _realmServer;
     private readonly ILogger<RealmServerHostedService> _logger;
 
-    public RealmServerHostedService(IRealmServer realmServer, ILogger<RealmServerHostedService> logger)
+    public RealmServerHostedService(RealmServer realmServer, ILogger<RealmServerHostedService> logger)
     {
         _realmServer = realmServer;
         _logger = logger;

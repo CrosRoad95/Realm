@@ -7,7 +7,7 @@ internal class GuiLogic
     private readonly IServiceProvider _serviceProvider;
     private readonly IElementCollection _elementCollection;
 
-    public GuiLogic(IServiceProvider serviceProvider, IRealmServer realmServer, IElementCollection elementCollection)
+    public GuiLogic(IServiceProvider serviceProvider, RealmServer realmServer, IElementCollection elementCollection)
     {
         _serviceProvider = serviceProvider;
         _elementCollection = elementCollection;
@@ -23,7 +23,7 @@ internal class GuiLogic
 
     private Task HandleGuiFilesChanged()
     {
-        foreach (var player in _elementCollection.GetByType<Player>().Cast<RealmPlayer>())
+        foreach (var player in _elementCollection.GetByType<RealmPlayer>())
         {
             var guiComponents = player.Components.ComponentsLists.OfType<GuiComponent>().ToList();
             foreach (var guiComponent in guiComponents)

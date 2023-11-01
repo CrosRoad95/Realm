@@ -1,4 +1,6 @@
-﻿namespace RealmCore.Server.Elements;
+﻿using RealmCore.Server.Scopes;
+
+namespace RealmCore.Server.Elements;
 
 public class RealmPlayer : Player, IComponents
 {
@@ -29,52 +31,6 @@ public class RealmPlayer : Player, IComponents
 
     public event Action<RealmPlayer, Element?>? FocusedElementChanged;
     public event Action<RealmPlayer, Element?>? ClickedElementChanged;
-
-    public TComponent GetRequiredComponent<TComponent>() where TComponent : IComponent
-    {
-        return Components.GetRequiredComponent<TComponent>();
-    }
-
-    public bool TryDestroyComponent<TComponent>() where TComponent : IComponent
-    {
-        return Components.TryDestroyComponent<TComponent>();
-    }
-
-    public void DestroyComponent<TComponent>() where TComponent : IComponent
-    {
-        Components.DestroyComponent<TComponent>();
-    }
-    
-    public void DestroyComponent<TComponent>(TComponent component) where TComponent : IComponent
-    {
-        Components.DestroyComponent(component);
-    }
-
-    public bool TryGetComponent<TComponent>(out TComponent component) where TComponent : IComponent
-    {
-        if(Components.TryGetComponent(out TComponent tempComponent))
-        {
-            component = tempComponent;
-            return true;
-        }
-        component = default!;
-        return false;
-    }
-
-    public bool HasComponent<TComponent>() where TComponent : IComponent
-    {
-        return Components.HasComponent<TComponent>();
-    }
-
-    public TComponent AddComponent<TComponent>() where TComponent : IComponent, new()
-    {
-        return Components.AddComponent<TComponent>();
-    }
-
-    public TComponent AddComponent<TComponent>(TComponent component) where TComponent : IComponent
-    {
-        return Components.AddComponent(component);
-    }
 
     public Element? FocusedElement
     {
@@ -121,6 +77,9 @@ public class RealmPlayer : Player, IComponents
         }
     }
 
+    private bool _isLoggedIn = false;
+    public bool IsLoggedIn => _isLoggedIn;
+
     public RealmPlayer(IServiceProvider serviceProvider)
     {
         _serviceScope = serviceProvider.CreateScope();
@@ -130,6 +89,70 @@ public class RealmPlayer : Player, IComponents
         BindExecuted += HandleBindExecuted;
         IsNametagShowing = false;
         UpdateFight();
+        Components.ComponentAdded += HandleComponentAdded;
+        Components.ComponentDetached += HandleComponentDetached;
+    }
+
+    private void HandleComponentAdded(IComponent component)
+    {
+        if (component is UserComponent userComponent)
+        {
+            _isLoggedIn = true;
+        }
+    }
+
+    private void HandleComponentDetached(IComponent component)
+    {
+        if(component is UserComponent userComponent)
+        {
+            _isLoggedIn = false;
+        }
+    }
+
+    public TComponent GetRequiredComponent<TComponent>() where TComponent : IComponent
+    {
+        return Components.GetRequiredComponent<TComponent>();
+    }
+
+    public bool TryDestroyComponent<TComponent>() where TComponent : IComponent
+    {
+        return Components.TryDestroyComponent<TComponent>();
+    }
+
+    public void DestroyComponent<TComponent>() where TComponent : IComponent
+    {
+        Components.DestroyComponent<TComponent>();
+    }
+    
+    public void DestroyComponent<TComponent>(TComponent component) where TComponent : IComponent
+    {
+        Components.DestroyComponent(component);
+    }
+
+    public bool TryGetComponent<TComponent>(out TComponent component) where TComponent : IComponent
+    {
+        if(Components.TryGetComponent(out TComponent tempComponent))
+        {
+            component = tempComponent;
+            return true;
+        }
+        component = default!;
+        return false;
+    }
+
+    public bool HasComponent<TComponent>() where TComponent : IComponent
+    {
+        return Components.HasComponent<TComponent>();
+    }
+
+    public TComponent AddComponent<TComponent>() where TComponent : IComponent, new()
+    {
+        return Components.AddComponent<TComponent>();
+    }
+
+    public TComponent AddComponent<TComponent>(TComponent component) where TComponent : IComponent
+    {
+        return Components.AddComponent(component);
     }
 
     private void UpdateFight()
@@ -188,7 +211,7 @@ public class RealmPlayer : Player, IComponents
 
     public void Spawn(Vector3 position, Vector3? rotation = null)
     {
-        Spawn(position, 0, 0, 0, 0);
+        Spawn(position, rotation?.X ?? 0, 0, 0, 0);
         Camera.Target = this;
     }
 
@@ -442,9 +465,7 @@ public class RealmPlayer : Player, IComponents
     {
         this.ThrowIfDestroyed();
 
-        var walkEnabled = Controls.WalkEnabled;
-        var fireEnabled = Controls.FireEnabled;
-        var jumpEnabled = Controls.JumpEnabled;
+        using var scope = new ToggleControlsScope(this);
         if (blockMovement)
         {
             Controls.WalkEnabled = false;
@@ -471,12 +492,7 @@ public class RealmPlayer : Player, IComponents
         }
         finally
         {
-            if (blockMovement)
-            {
-                Controls.WalkEnabled = walkEnabled;
-                Controls.FireEnabled = fireEnabled;
-                Controls.JumpEnabled = jumpEnabled;
-            }
+            scope.Dispose();
         }
     }
 
@@ -548,9 +564,7 @@ public class RealmPlayer : Player, IComponents
     {
         this.ThrowIfDestroyed();
 
-        var walkEnabled = Controls.WalkEnabled;
-        var fireEnabled = Controls.FireEnabled;
-        var jumpEnabled = Controls.JumpEnabled;
+        using var scope = new ToggleControlsScope(this);
         if (blockMovement)
         {
             Controls.WalkEnabled = false;
@@ -570,12 +584,7 @@ public class RealmPlayer : Player, IComponents
         }
         finally
         {
-            if (blockMovement)
-            {
-                Controls.WalkEnabled = walkEnabled;
-                Controls.FireEnabled = fireEnabled;
-                Controls.JumpEnabled = jumpEnabled;
-            }
+            scope.Dispose();
         }
     }
 

@@ -12,7 +12,7 @@ internal sealed class PrivateCollisionShapeBehaviour
 
     //public PrivateCollisionShapeBehaviour(IElementCollection elementCollection, IElementFactory elementFactory, ILogger<PrivateCollisionShapeBehaviour> logger)
     //{
-    //    foreach (var player in elementCollection.GetByType<Player>().Cast<RealmPlayer>())
+    //    foreach (var player in elementCollection.GetByType<RealmPlayer>())
     //    {
     //        var privateMarkerElementComponents = player.GetComponents<PlayerPrivateElementComponent<MarkerElementComponent>>();
     //        foreach (var markerElementComponent in privateMarkerElementComponents)

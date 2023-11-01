@@ -75,6 +75,7 @@ public sealed class Components : IDisposable
         {
             if (component is IComponentLifecycle componentLifecycle)
                 componentLifecycle.Detach();
+            ComponentDetached?.Invoke(component);
             _components.Remove(component);
             return true;
         }

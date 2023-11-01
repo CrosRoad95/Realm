@@ -1,7 +1,7 @@
-﻿using RealmCore.Server.Components.Players;
+﻿using RealmCore.Server;
+using RealmCore.Server.Components.Players;
 using RealmCore.Server.Components.Players.Abstractions;
 using RealmCore.Server.Elements;
-using RealmCore.Server.Interfaces;
 using RealmCore.Server.Services;
 using System.Security.Claims;
 
@@ -11,7 +11,7 @@ public class CurrentPlayerContext : IDisposable
 {
     private readonly RealmPlayer? _player;
     private readonly BrowserComponent? _browserComponent;
-    public IRealmServer? Server { get; }
+    public RealmServer? Server { get; }
     internal IBrowserGuiService BrowserGuiService { get; }
     public ClaimsPrincipal ClaimsPrincipal { get; }
     protected BrowserComponent BrowserComponent => _browserComponent ?? throw new ArgumentNullException(nameof(BrowserComponent));
@@ -19,7 +19,7 @@ public class CurrentPlayerContext : IDisposable
     public string Name => _player.Name;
 
     internal event Action<string?>? PathChanged;
-    public CurrentPlayerContext(IHttpContextAccessor httpContent, IRealmServer realmServer)
+    public CurrentPlayerContext(IHttpContextAccessor httpContent, RealmServer realmServer)
     {
         Server = realmServer;
         ClaimsPrincipal = httpContent.HttpContext.User;
@@ -57,7 +57,7 @@ public class CurrentPlayerContext<TGuiPageComponent> : CurrentPlayerContext wher
 {
     public TGuiPageComponent Component => Player.GetRequiredComponent<TGuiPageComponent>();
 
-    public CurrentPlayerContext(IHttpContextAccessor httpContent, IRealmServer realmServer) : base(httpContent, realmServer)
+    public CurrentPlayerContext(IHttpContextAccessor httpContent, RealmServer realmServer) : base(httpContent, realmServer)
     {
     }
 

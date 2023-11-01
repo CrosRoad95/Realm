@@ -8,7 +8,7 @@ public class DefaultChatLogic
     private readonly ILogger<DefaultChatLogic> _logger;
     private readonly IElementCollection _elementCollection;
 
-    public DefaultChatLogic(MtaServer server, ChatBox chatBox, ILogger<DefaultChatLogic> logger, IElementCollection elementCollection)
+    public DefaultChatLogic(RealmServer server, ChatBox chatBox, ILogger<DefaultChatLogic> logger, IElementCollection elementCollection)
     {
         _chatBox = chatBox;
         _logger = logger;
@@ -25,20 +25,22 @@ public class DefaultChatLogic
         {
             case "say":
                 var player = (RealmPlayer)plr;
-                if (player.HasComponent<UserComponent>())
+                if (player.IsLoggedIn)
                 {
-                    string message = $"{plr.NametagColor.ToColorCode()}{plr.Name}: #ffffff{string.Join(' ', arguments.Arguments)}";
-                    foreach (var targetPlayer in _elementCollection.GetByType<Player>().Cast<RealmPlayer>())
+                    var messageContent = string.Join(' ', arguments.Arguments);
+                    string message = $"{player.Name}: {messageContent}";
+                    string messageWithColors = $"{player.NametagColor.ToColorCode()}{player.Name}: #ffffff{messageContent}";
+                    foreach (var targetPlayer in _elementCollection.GetByType<RealmPlayer>())
                     {
-                        if(targetPlayer.HasComponent<UserComponent>())
-                            _chatBox.OutputTo(targetPlayer, message, Color.White, true);
+                        if(targetPlayer.IsLoggedIn)
+                            _chatBox.OutputTo(targetPlayer, messageWithColors, Color.White, true);
                     }
 
                     _logger.LogInformation("{message}", message);
                 }
                 else
                 {
-                    _chatBox.OutputTo(plr, "Nie możesz pisać ponieważ nie jesteś zalogowany.");
+                    _chatBox.OutputTo(player, "Nie możesz pisać ponieważ nie jesteś zalogowany.");
                 }
                 break;
         }
