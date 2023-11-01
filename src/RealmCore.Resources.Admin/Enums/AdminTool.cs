@@ -2,7 +2,7 @@
 
 public enum AdminTool
 {
-    Entities,
+    Elements,
     Components,
     ShowSpawnMarkers,
 }

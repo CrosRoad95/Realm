@@ -4,7 +4,7 @@ public class RealmCollisionSphere : CollisionSphere
 {
     public Concepts.Components Components { get; private set; }
 
-    private readonly List<IElementRule> _entityRules = new();
+    private readonly List<IElementRule> _elementRules = new();
 
     public event Action<RealmCollisionSphere, Element>? Entered;
     public event Action<RealmCollisionSphere, Element>? Left;
@@ -55,20 +55,20 @@ public class RealmCollisionSphere : CollisionSphere
         return Components.AddComponent(component);
     }
 
-    public void AddRule(IElementRule entityRule)
+    public void AddRule(IElementRule elementRule)
     {
-        _entityRules.Add(entityRule);
+        _elementRules.Add(elementRule);
     }
 
-    public void AddRule<TEntityRole>() where TEntityRole : IElementRule, new()
+    public void AddRule<TElementRule>() where TElementRule : IElementRule, new()
     {
         this.ThrowIfDestroyed();
-        _entityRules.Add(new TEntityRole());
+        _elementRules.Add(new TElementRule());
     }
 
     public bool CheckRules(Element element)
     {
-        foreach (var rule in _entityRules)
+        foreach (var rule in _elementRules)
         {
             if (!rule.Check(element))
                 return false;

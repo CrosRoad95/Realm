@@ -26,9 +26,9 @@ internal class WorldLogic : ComponentLogic<DiscoveriesComponent>
     private readonly IElementFactory _elementFactory;
     private readonly IOverlayService _overlayService;
 
-    public WorldLogic(IRealmServer realmServer, IElementFactory entityFactory, IOverlayService overlayService, IElementFactory elementFactory) : base(elementFactory)
+    public WorldLogic(IRealmServer realmServer, IElementFactory elementFactory, IOverlayService overlayService) : base(elementFactory)
     {
-        _elementFactory = entityFactory;
+        _elementFactory = elementFactory;
         _overlayService = overlayService;
         realmServer.ServerStarted += HandleServerStarted;
     }
@@ -68,8 +68,8 @@ internal class WorldLogic : ComponentLogic<DiscoveriesComponent>
         if (_discoveryInfoDictionary.TryGetValue(discoverId, out var value))
         {
             // TODO:
-            //using var scopedEntityFactory = _elementFactory.CreateScopedEntityFactory(player);
-            //scopedEntityFactory.CreateBlip(value.blipIcon, value.position);
+            //using var scopedelementFactory = _elementFactory.CreateScopedelementFactory(player);
+            //scopedelementFactory.CreateBlip(value.blipIcon, value.position);
         }
     }
 

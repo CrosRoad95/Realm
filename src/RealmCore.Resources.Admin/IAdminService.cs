@@ -15,13 +15,13 @@ public interface IAdminService
     internal void RelayToolStateChanged(Player player, AdminTool adminTool, bool state);
     void SetAdminModeEnabledForPlayer(Player player, bool enabled);
     void SetAdminTools(Player player, IEnumerable<AdminTool> adminTools);
-    void BroadcastEntityDebugInfoUpdate(EntityDebugInfo entityDebugInfo);
-    void BroadcastEntityDebugInfoUpdate(IEnumerable<EntityDebugInfo> entityDebugInfo);
-    void BroadcastEntityDebugInfoUpdateForPlayer(Player player, EntityDebugInfo entityDebugInfo);
-    void BroadcastEntityDebugInfoUpdateForPlayer(Player player, IEnumerable<EntityDebugInfo> entitiesDebugInfo);
-    void BroadcastClearEntityForPlayer(Player player);
-    void BroadcastSpawnMarkersForPlayer(Player player, IEnumerable<LuaValue> entitiesDebugInfo);
+    void BroadcastElementDebugInfoUpdate(ElementDebugInfo elementDebugInfo);
+    void BroadcastElementDebugInfoUpdate(IEnumerable<ElementDebugInfo> elementDebugInfo);
+    void BroadcastElementDebugInfoUpdateForPlayer(Player player, ElementDebugInfo elementDebugInfo);
+    void BroadcastElementDebugInfoUpdateForPlayer(Player player, IEnumerable<ElementDebugInfo> elementsDebugInfo);
+    void BroadcastClearElementsForPlayer(Player player);
+    void BroadcastSpawnMarkersForPlayer(Player player, IEnumerable<LuaValue> elementsDebugInfo);
     void BroadcastClearSpawnMarkersForPlayer(Player player);
-    void BroadcastEntitiesComponents(Player player, LuaValue entitiesComponents);
-    void BroadcastClearEntitiesComponents(Player player);
+    void BroadcastElementsComponents(Player player, LuaValue elementsComponents);
+    void BroadcastClearElementsComponents(Player player);
 }

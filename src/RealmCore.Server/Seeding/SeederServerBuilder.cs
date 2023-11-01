@@ -20,7 +20,7 @@ internal sealed class SeederServerBuilder
 
     public SeederServerBuilder(ILogger<SeederServerBuilder> logger,
         IServerFilesProvider serverFilesProvider, UserManager<UserData> userManager, RoleManager<RoleData> roleManager,
-        IGroupService groupService, IElementFactory entityFactory, IFractionService fractionService, IEnumerable<ISeederProvider> seederProviders,
+        IGroupService groupService, IElementFactory elementFactory, IFractionService fractionService, IEnumerable<ISeederProvider> seederProviders,
         IEnumerable<IAsyncSeederProvider> asyncSeederProviders, IGroupRepository groupRepository)
     {
         _logger = logger;
@@ -28,7 +28,7 @@ internal sealed class SeederServerBuilder
         _userManager = userManager;
         _roleManager = roleManager;
         _groupService = groupService;
-        _elementFactory = entityFactory;
+        _elementFactory = elementFactory;
         _fractionService = fractionService;
         _groupRepository = groupRepository;
         foreach (var seederProvider in seederProviders)
@@ -50,7 +50,7 @@ internal sealed class SeederServerBuilder
         {
             if (Enum.IsDefined(typeof(BlipIcon), pair.Value.Icon))
             {
-                var entity = _elementFactory.CreateBlip(pair.Value.Position, (BlipIcon)pair.Value.Icon, elementBuilder: x =>
+                var blip = _elementFactory.CreateBlip(pair.Value.Position, (BlipIcon)pair.Value.Icon, elementBuilder: x =>
                 {
                     ((IComponents)x).AddComponent(new NameComponent(pair.Key));
                 });
@@ -85,7 +85,7 @@ internal sealed class SeederServerBuilder
         {
             if (Enum.IsDefined(typeof(MarkerType), pair.Value.MarkerType))
             {
-                var entity = _elementFactory.CreateMarker(pair.Value.Position, pair.Value.MarkerType, pair.Value.Color, elementBuilder: x =>
+                var marker = _elementFactory.CreateMarker(pair.Value.Position, pair.Value.MarkerType, pair.Value.Color, elementBuilder: x =>
                 {
                     ((IComponents)x).AddComponent(new NameComponent(pair.Key));
                 });

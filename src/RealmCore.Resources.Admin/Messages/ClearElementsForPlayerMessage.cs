@@ -3,4 +3,4 @@ using SlipeServer.Server.Elements;
 
 namespace RealmCore.Resources.Admin.Messages;
 
-internal record struct ClearEntitiesForPlayerMessage(Player player) : IMessage;
+internal record struct ClearElementsForPlayerMessage(Player player) : IMessage;

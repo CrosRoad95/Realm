@@ -62,7 +62,7 @@ public class VehicleAccess
     public VehiclePlayerAccess AddAccess(RealmPlayer player, byte accessType, string? customValue = null)
     {
         if (TryGetAccess(player, out var _))
-            throw new EntityAccessDefinedException();
+            throw new VehicleAccessDefinedException();
 
         lock (_lock)
         {

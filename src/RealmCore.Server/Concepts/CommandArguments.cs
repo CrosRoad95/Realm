@@ -140,7 +140,7 @@ public class CommandArguments
         throw new CommandArgumentException(_index, "Gracz o takiej nazwie nie został znaleziony", name);
     }
     
-    public bool TryReadPlayerEntity(out RealmPlayer? player)
+    public bool TryReadPlayerPlayer(out RealmPlayer? player)
     {
         if(TryReadArgument(out string argument))
         {

@@ -15,12 +15,12 @@ public class DefaultCommandsLogic
             }
 
             var commandName = commandNameAttribute.Name.ToLower();
-            commandService.AddAsyncCommandHandler(commandName, async (entity, args) =>
+            commandService.AddAsyncCommandHandler(commandName, async (element, args) =>
             {
                 if (serviceProvider.GetRequiredService(type) is not IInGameCommand inGameCommand)
                     throw new InvalidOperationException();
 
-                await inGameCommand.Handle(entity, args);
+                await inGameCommand.Handle(element, args);
             });
         }
     }

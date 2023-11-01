@@ -4,4 +4,4 @@ using SlipeServer.Server.Elements;
 
 namespace RealmCore.Resources.Admin.Messages;
 
-internal record struct UpdateEntitiesComponentsMessage(Player Player, LuaValue entitiesComponents) : IMessage;
+internal record struct UpdateElementsComponentsMessage(Player Player, LuaValue elementsComponents) : IMessage;

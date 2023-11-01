@@ -1,21 +1,21 @@
 ﻿local tools = {}
 local adminModeEnabled = false;
 local enabledTools = {}
-local entities = {}
+local elements = {}
 local spawnMarkers = {}
 local toolIdsInUse = {}
-local entitiesComponents = {}
+local elementsComponents = {}
 
-function getEntities()
-    return entities;
+function getElements()
+    return elements;
 end
 
 function getSpawnMarkers()
     return spawnMarkers;
 end
 
-function getEntitiesComponents()
-    return entitiesComponents;
+function getElementsComponents()
+    return elementsComponents;
 end
 
 addEvent("internalOnAdminModeEnabled", false)
@@ -100,21 +100,21 @@ function addTool(name, enable, disable, id)
 end
 
 local function handleAddOrUpdateEntity(entity)
-    entities[entity.debugId] = entity
+    elements[entity.debugId] = entity
 end
 
-function handleAddOrUpdateEntities(entityOrEntities)
-	if(#entityOrEntities > 0)then
-		for i,v in ipairs(entityOrEntities)do
+function handleAddOrUpdateElements(entityOrElements)
+	if(#entityOrElements > 0)then
+		for i,v in ipairs(entityOrElements)do
 			handleAddOrUpdateEntity(v)
 		end
 	else
-		handleAddOrUpdateEntity(entityOrEntities)
+		handleAddOrUpdateEntity(entityOrElements)
 	end
 end
 
-function handleClearEntities()
-    entities = {};
+function handleClearElements()
+    elements = {};
 end
 
 function handleSetSpawnMarkers(data)
@@ -125,21 +125,21 @@ function handleClearSpawnMarkers()
     spawnMarkers = {};
 end
 
-function handleUpdateEntitiesComponents(data)
-    entitiesComponents = data;
+function handleUpdateElementsComponents(data)
+    elementsComponents = data;
 end
 
-function handleClearEntitiesComponents()
-    entitiesComponents = {}
+function handleClearElementsComponents()
+    elementsComponents = {}
 end
 
 addEventHandler("onClientResourceStart", resourceRoot, function()
 	hubBind("SetAdminEnabled", handleSetAdminEnabled)
 	hubBind("SetTools", handleSetTools)
-	hubBind("AddOrUpdateEntity", handleAddOrUpdateEntities)
-	hubBind("ClearEntities", handleClearEntities)
+	hubBind("AddOrUpdateEntity", handleAddOrUpdateElements)
+	hubBind("ClearElements", handleClearElements)
 	hubBind("SetSpawnMarkers", handleSetSpawnMarkers)
 	hubBind("ClearSpawnMarkers", handleClearSpawnMarkers)
-	hubBind("UpdateEntitiesComponents", handleUpdateEntitiesComponents)
-	hubBind("ClearEntitiesComponents", handleClearEntitiesComponents)
+	hubBind("UpdateElementsComponents", handleUpdateElementsComponents)
+	hubBind("ClearElementsComponents", handleClearElementsComponents)
 end)

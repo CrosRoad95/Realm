@@ -68,7 +68,6 @@ global using System.Reflection;
 global using RealmCore.Server.Concepts.Objectives;
 global using SlipeServer.Server.Concepts;
 global using SlipeServer.Server.Elements.Events;
-global using RealmCore.Server.Entities;
 global using SlipeServer.Packets.Enums;
 global using SlipeServer.Resources.BoneAttach;
 global using RealmCore.Server.Rules;

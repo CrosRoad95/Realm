@@ -7,11 +7,11 @@ internal class SamplePickupsLogic
     private readonly IElementFactory _elementFactory;
     private readonly ChatBox _chatBox;
 
-    public SamplePickupsLogic(IElementFactory entityFactory, ChatBox chatBox)
+    public SamplePickupsLogic(IElementFactory elementFactory, ChatBox chatBox)
     {
-        _elementFactory = entityFactory;
+        _elementFactory = elementFactory;
         _chatBox = chatBox;
-        entityFactory.ElementCreated += HandleElementCreated;
+        elementFactory.ElementCreated += HandleElementCreated;
     }
 
     private void HandleElementCreated(Element element)

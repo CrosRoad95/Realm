@@ -32,29 +32,29 @@ internal sealed class AdminService : IAdminService
         MessageHandler?.Invoke(new SetAdminToolsMessage(player, adminTools.ToList()));
     }
 
-    public void BroadcastEntityDebugInfoUpdate(EntityDebugInfo entityDebugInfo)
+    public void BroadcastElementDebugInfoUpdate(ElementDebugInfo elementDebugInfo)
     {
-        MessageHandler?.Invoke(new BroadcastEntityDebugInfoMessage(entityDebugInfo));
+        MessageHandler?.Invoke(new BroadcastElementDebugInfoMessage(elementDebugInfo));
     }
 
-    public void BroadcastEntityDebugInfoUpdate(IEnumerable<EntityDebugInfo> entitiesDebugInfo)
+    public void BroadcastElementDebugInfoUpdate(IEnumerable<ElementDebugInfo> elementsDebugInfo)
     {
-        MessageHandler?.Invoke(new BroadcastEntitiesDebugInfoMessage(entitiesDebugInfo));
+        MessageHandler?.Invoke(new BroadcastElementsDebugInfoMessage(elementsDebugInfo));
     }
 
-    public void BroadcastEntityDebugInfoUpdateForPlayer(Player player, EntityDebugInfo entityDebugInfo)
+    public void BroadcastElementDebugInfoUpdateForPlayer(Player player, ElementDebugInfo elementDebugInfo)
     {
-        MessageHandler?.Invoke(new BroadcastEntityDebugInfoMessageForPlayer(player, entityDebugInfo));
+        MessageHandler?.Invoke(new BroadcastElementDebugInfoMessageForPlayer(player, elementDebugInfo));
     }
 
-    public void BroadcastEntityDebugInfoUpdateForPlayer(Player player, IEnumerable<EntityDebugInfo> entitiesDebugInfo)
+    public void BroadcastElementDebugInfoUpdateForPlayer(Player player, IEnumerable<ElementDebugInfo> elementsDebugInfo)
     {
-        MessageHandler?.Invoke(new BroadcastEntitiesDebugInfoMessageForPlayer(player, entitiesDebugInfo));
+        MessageHandler?.Invoke(new BroadcastElementsDebugInfoMessageForPlayer(player, elementsDebugInfo));
     }
 
-    public void BroadcastClearEntityForPlayer(Player player)
+    public void BroadcastClearElementsForPlayer(Player player)
     {
-        MessageHandler?.Invoke(new ClearEntitiesForPlayerMessage(player));
+        MessageHandler?.Invoke(new ClearElementsForPlayerMessage(player));
     }
 
     public void BroadcastSpawnMarkersForPlayer(Player player, IEnumerable<LuaValue> spawnMarkers)
@@ -67,13 +67,13 @@ internal sealed class AdminService : IAdminService
         MessageHandler?.Invoke(new ClearSpawnMarkersForPlayerMessage(player));
     }
 
-    public void BroadcastEntitiesComponents(Player player, LuaValue entitiesComponents)
+    public void BroadcastElementsComponents(Player player, LuaValue elementsComponents)
     {
-        MessageHandler?.Invoke(new UpdateEntitiesComponentsMessage(player, entitiesComponents));
+        MessageHandler?.Invoke(new UpdateElementsComponentsMessage(player, elementsComponents));
     }
 
-    public void BroadcastClearEntitiesComponents(Player player)
+    public void BroadcastClearElementsComponents(Player player)
     {
-        MessageHandler?.Invoke(new ClearEntitiesComponentsMessage(player));
+        MessageHandler?.Invoke(new ClearElementsComponentsMessage(player));
     }
 }

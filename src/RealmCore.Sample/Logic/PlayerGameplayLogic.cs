@@ -24,19 +24,19 @@ internal sealed class PlayerGameplayLogic : ComponentLogic<UserComponent>
 
     protected override void ComponentAdded(UserComponent userComponent)
     {
-        var playerElementComponent = (RealmPlayer)userComponent.Element;
-        playerElementComponent.FocusedElementChanged += HandleFocusedEntityChanged;
-        playerElementComponent.SetBindAsync("x", HandleInteract);
+        var player = (RealmPlayer)userComponent.Element;
+        player.FocusedElementChanged += HandleFocusedElementChanged;
+        player.SetBindAsync("x", HandleInteract);
     }
 
     private async Task HandleInteract(RealmPlayer player, KeyState keyState)
     {
         var components = player.Components;
-        if (components.TryGetComponent(out AttachedElementComponent attachedEntityComponent))
+        if (components.TryGetComponent(out AttachedElementComponent attachedElementComponent))
         {
             await player.DoAnimationAsync(Animation.CarryPutDown);
 
-            if (attachedEntityComponent.TryDetach(out Element? detachedElement) &&
+            if (attachedElementComponent.TryDetach(out Element? detachedElement) &&
                 detachedElement is IComponents elementComponents &&
                 elementComponents.Components.GetRequiredComponent<LiftableWorldObjectComponent>().TryDrop())
             {
@@ -49,10 +49,10 @@ internal sealed class PlayerGameplayLogic : ComponentLogic<UserComponent>
                 };
             }
         }
-        else if (player.Components.TryGetComponent(out CurrentInteractElementComponent currentInteractEntityComponent))
+        else if (player.Components.TryGetComponent(out CurrentInteractElementComponent currentInteractElementComponent))
         {
-            var element = currentInteractEntityComponent.CurrentInteractElement;
-            var currentInteractElement = currentInteractEntityComponent.CurrentInteractElement as IComponents;
+            var element = currentInteractElementComponent.CurrentInteractElement;
+            var currentInteractElement = currentInteractElementComponent.CurrentInteractElement as IComponents;
             if (currentInteractElement == null)
                 return;
 
@@ -73,7 +73,7 @@ internal sealed class PlayerGameplayLogic : ComponentLogic<UserComponent>
                         if (keyState == KeyState.Down)
                         {
                             var token = new CancellationTokenSource();
-                            currentInteractEntityComponent.Disposed += e =>
+                            currentInteractElementComponent.Disposed += e =>
                             {
                                 token.Cancel();
                             };
@@ -113,7 +113,7 @@ internal sealed class PlayerGameplayLogic : ComponentLogic<UserComponent>
         }
     }
 
-    private void HandleFocusedEntityChanged(RealmPlayer player, Element? element)
+    private void HandleFocusedElementChanged(RealmPlayer player, Element? element)
     {
         if (element is IComponents components)
         {

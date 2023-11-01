@@ -2,7 +2,7 @@
 
 namespace RealmCore.Server.Extensions;
 
-public static class MarkerElementComponentExtensions
+public static class MarkerExtensions
 {
     public static void AddOpenGuiLogic<TGui>(this RealmMarker marker) where TGui : GuiComponent, new()
     {

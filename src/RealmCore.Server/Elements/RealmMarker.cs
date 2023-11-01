@@ -61,22 +61,22 @@ public class RealmMarker : Marker, IComponents
         return Components.AddComponent(component);
     }
 
-    private readonly List<IElementRule> _entityRules = new();
+    private readonly List<IElementRule> _elementRules = new();
 
-    public void AddRule(IElementRule entityRule)
+    public void AddRule(IElementRule elementRule)
     {
-        _entityRules.Add(entityRule);
+        _elementRules.Add(elementRule);
     }
 
-    public void AddRule<TEntityRole>() where TEntityRole : IElementRule, new()
+    public void AddRule<TElementRule>() where TElementRule : IElementRule, new()
     {
         this.ThrowIfDestroyed();
-        _entityRules.Add(new TEntityRole());
+        _elementRules.Add(new TElementRule());
     }
 
     public bool CheckRules(Element element)
     {
-        foreach (var rule in _entityRules)
+        foreach (var rule in _elementRules)
         {
             if (!rule.Check(element))
                 return false;

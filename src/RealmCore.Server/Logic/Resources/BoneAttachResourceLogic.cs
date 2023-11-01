@@ -9,22 +9,22 @@ internal sealed class BoneAttachResourceLogic : ComponentLogic<AttachedElementCo
         _boneAttachService = boneAttachService;
     }
 
-    protected override void ComponentAdded(AttachedElementComponent attachedEntityComponent)
+    protected override void ComponentAdded(AttachedElementComponent attachedElementComponent)
     {
-        var element = attachedEntityComponent.AttachedElement;
+        var element = attachedElementComponent.AttachedElement;
         var ped = (Ped)element;
-        _boneAttachService.Attach(element, ped, attachedEntityComponent.BoneId, attachedEntityComponent.PositionOffset, attachedEntityComponent.RotationOffset);
+        _boneAttachService.Attach(element, ped, attachedElementComponent.BoneId, attachedElementComponent.PositionOffset, attachedElementComponent.RotationOffset);
         element.AreCollisionsEnabled = false;
-        attachedEntityComponent.Detached += HandleDetachedFromEntity;
+        attachedElementComponent.Detached += HandleDetachedFromElement;
     }
 
-    private void HandleDetachedFromEntity(IComponentLifecycle component)
+    private void HandleDetachedFromElement(IComponentLifecycle component)
     {
-        component.Detached -= HandleDetachedFromEntity;
-        if(component is AttachedElementComponent attachedEntityComponent)
+        component.Detached -= HandleDetachedFromElement;
+        if(component is AttachedElementComponent attachedElementComponent)
         {
-            if (_boneAttachService.IsAttached(attachedEntityComponent.Element))
-                _boneAttachService.Detach(attachedEntityComponent.Element);
+            if (_boneAttachService.IsAttached(attachedElementComponent.Element))
+                _boneAttachService.Detach(attachedElementComponent.Element);
         }
         // bug?
     }

@@ -1,5 +1,4 @@
-﻿
-namespace RealmCore.Server.Entities;
+﻿namespace RealmCore.Server.Elements;
 
 internal sealed class ScopedElementFactory : IScopedElementFactory
 {
@@ -17,7 +16,7 @@ internal sealed class ScopedElementFactory : IScopedElementFactory
     {
         get
         {
-            lock(_lock)
+            lock (_lock)
             {
                 foreach (var item in _createdElements)
                 {
@@ -27,7 +26,7 @@ internal sealed class ScopedElementFactory : IScopedElementFactory
         }
     }
 
-    public T GetLastCreatedElement<T>() where T: Element
+    public T GetLastCreatedElement<T>() where T : Element
     {
         return (T)LastCreatedElement;
     }

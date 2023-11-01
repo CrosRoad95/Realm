@@ -13,14 +13,10 @@ internal sealed class StatisticsCounterResourceLogic : ComponentLogic<Statistics
         //statisticsCounterService.FpsStatisticsCollected += HandleFpsStatisticsCollected;
     }
 
-    // TODO:
-    //private void HandleFpsStatisticsCollected(Player player, float minFps, float maxFps, float avgFps)
-    //{
-    //    if (_entityByElement.TryGetEntityByPlayer(player, out var playerEntity))
-    //    {
-    //        playerEntity.GetRequiredComponent<PlayerElementComponent>().SendChatMessage($"Fps: {minFps}, {maxFps}, {avgFps}");
-    //    }
-    //}
+    private void HandleFpsStatisticsCollected(Player plr, float minFps, float maxFps, float avgFps)
+    {
+        // TODO:
+    }
 
     private void HandleStatisticsCollected(Player player, Dictionary<int, float> statistics)
     {

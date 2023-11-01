@@ -2,5 +2,5 @@
 using SlipeServer.Server.Elements;
 
 namespace RealmCore.Resources.Admin.Messages;
-internal record struct ClearEntitiesComponentsMessage(Player Player) : IMessage;
+internal record struct ClearElementsComponentsMessage(Player Player) : IMessage;
 

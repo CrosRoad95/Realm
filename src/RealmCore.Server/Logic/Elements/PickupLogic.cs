@@ -1,11 +1,11 @@
 ﻿namespace RealmCore.Server.Logic.Elements;
 
-internal sealed class PickupElementComponentLogic
+internal sealed class PickupLogic
 {
     private readonly IElementFactory _elementFactory;
-    private readonly ILogger<PickupElementComponentLogic> _logger;
+    private readonly ILogger<PickupLogic> _logger;
 
-    public PickupElementComponentLogic(IElementFactory elementFactory, ILogger<PickupElementComponentLogic> logger)
+    public PickupLogic(IElementFactory elementFactory, ILogger<PickupLogic> logger)
     {
         _elementFactory = elementFactory;
         _logger = logger;

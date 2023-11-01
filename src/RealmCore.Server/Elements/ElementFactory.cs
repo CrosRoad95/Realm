@@ -1,4 +1,4 @@
-﻿namespace RealmCore.Server.Entities;
+﻿namespace RealmCore.Server.Elements;
 
 internal sealed class ElementFactory : IElementFactory
 {

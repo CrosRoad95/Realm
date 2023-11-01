@@ -42,7 +42,7 @@ local function drawPreviewAtPosition(previewType, x, y, z, color)
 	return false;
 end
 
-local function drawEntities()
+local function drawElements()
 	local x,y,z;
 	local sx,sy, sx2, sy2, tx, ty, delta;
 	local camX, camY, camZ = getCameraMatrix()
@@ -50,7 +50,7 @@ local function drawEntities()
 	local fontSize = 1;
 
 	local count = 0;
-	for debugId,v in pairs(getEntities())do
+	for debugId,v in pairs(getElements())do
 		count = count + 1
 		if(isElement(v.element))then
 			x,y,z = getElementPosition(v.element)
@@ -106,14 +106,14 @@ local function drawEntities()
 	--iprint("DRAW",getTickCount(), count)
 end
 
-local function enableDrawEntities()
-	addEventHandler("onClientRender", root, drawEntities)
+local function enableDrawElements()
+	addEventHandler("onClientRender", root, drawElements)
 end
 
-local function disableDrawEntities()
-	removeEventHandler("onClientRender", root, drawEntities)
+local function disableDrawElements()
+	removeEventHandler("onClientRender", root, drawElements)
 end
 
 addEventHandler("onClientResourceStart", resourceRoot, function()
-	addTool("Show entities", enableDrawEntities, disableDrawEntities, 0)
+	addTool("Show elements", enableDrawElements, disableDrawElements, 0)
 end)

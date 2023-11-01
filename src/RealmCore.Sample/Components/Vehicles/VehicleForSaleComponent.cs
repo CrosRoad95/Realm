@@ -14,8 +14,8 @@ public class VehicleForSaleComponent : ComponentLifecycle
 
     public override void Attach()
     {
-        var vehicleElementComponent = (RealmVehicle)Element;
-        vehicleElementComponent.IsFrozen = true;
-        vehicleElementComponent.IsLocked = true;
+        var vehicle = (RealmVehicle)Element;
+        vehicle.IsFrozen = true;
+        vehicle.IsLocked = true;
     }
 }

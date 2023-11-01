@@ -61,7 +61,7 @@ internal sealed class PlayerJoinedLogic : ComponentLogic<UserComponent>
 
     protected override void ComponentDetached(UserComponent userComponent)
     {
-        //ShowLoginSequence(userComponent.Entity);
+        ShowLoginSequence((RealmPlayer)userComponent.Element);
     }
 
     private void ShowLoginSequence(RealmPlayer player)
@@ -74,7 +74,7 @@ internal sealed class PlayerJoinedLogic : ComponentLogic<UserComponent>
         var component = player.Components;
         if (!component.HasComponent<AdminComponent>())
         {
-            var adminComponent = component.AddComponent(new AdminComponent(new List<AdminTool> { AdminTool.Entities, AdminTool.Components, AdminTool.ShowSpawnMarkers }));
+            var adminComponent = component.AddComponent(new AdminComponent(new List<AdminTool> { AdminTool.Elements, AdminTool.Components, AdminTool.ShowSpawnMarkers }));
             adminComponent.DebugView = true;
             adminComponent.DevelopmentMode = true;
         }

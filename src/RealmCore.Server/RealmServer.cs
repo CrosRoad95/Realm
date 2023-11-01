@@ -95,20 +95,20 @@ public class RealmServer : MtaDiPlayerServerTempFix<RealmPlayer>, IRealmServer
         var saveService = GetRequiredService<ISaveService>();
 
         var elementCollection = GetRequiredService<IElementCollection>();
-        foreach (var entity in elementCollection.GetAll())
+        foreach (var element in elementCollection.GetAll())
         {
             try
             {
-                if (await saveService.BeginSave(entity))
+                if (await saveService.BeginSave(element))
                     i++;
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Failed to save entity.");
+                logger.LogError(ex, "Failed to save element.");
             }
             finally
             {
-                entity.Destroy();
+                element.Destroy();
             }
         }
         try
@@ -117,11 +117,11 @@ public class RealmServer : MtaDiPlayerServerTempFix<RealmPlayer>, IRealmServer
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Failed to save entities.");
+            logger.LogError(ex, "Failed to save elements.");
         }
 
         await Task.Delay(500);
         base.Stop();
-        logger.LogInformation("Server stopped, saved: {savedEntitiesCount} entities.", i);
+        logger.LogInformation("Server stopped, saved: {savedElementsCount} elements.", i);
     }
 }

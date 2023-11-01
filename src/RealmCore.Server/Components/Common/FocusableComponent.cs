@@ -85,8 +85,8 @@ public class FocusableComponent : ComponentLifecycle
             foreach (var focusedPlayer in _focusedPlayers)
             {
                 PlayerLostFocus?.Invoke(this, focusedPlayer);
-                if (focusedPlayer.FocusedEntity == Element)
-                    focusedPlayer.FocusedEntity = null;
+                if (focusedPlayer.FocusedElement == Element)
+                    focusedPlayer.FocusedElement = null;
             }
         }
     }

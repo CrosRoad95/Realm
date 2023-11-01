@@ -14,9 +14,9 @@ public class LiftableWorldObjectComponent : InteractionComponent
 
     public LiftableWorldObjectComponent() { }
 
-    public LiftableWorldObjectComponent(params Element[] allowedForEntities)
+    public LiftableWorldObjectComponent(params Element[] allowedForElements)
     {
-        AllowedForElements = allowedForEntities;
+        AllowedForElements = allowedForElements;
     }
 
     public bool TryLift(Element element)

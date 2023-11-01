@@ -20,8 +20,7 @@ internal class DurationBasedHoldInteractionWithRingEffectComponent : DurationBas
     {
         lock (_lock)
         {
-            // TODO:
-            //_ringId = _overlayService.AddRing3dDisplay(owningEntity, Entity.Transform.Position, time);
+            _ringId = _overlayService.AddRing3dDisplay(Owner, Element.Position, time);
         }
     }
 

@@ -29,7 +29,7 @@ public class RealmPlayer : Player, IComponents
     private readonly MapIdGenerator _mapIdGenerator = new(IdGeneratorConstants.MapIdStart, IdGeneratorConstants.MapIdStop);
 
     public event Action<RealmPlayer, Element?>? FocusedElementChanged;
-    public event Action<RealmPlayer, Element?>? ClickedEntityChanged;
+    public event Action<RealmPlayer, Element?>? ClickedElementChanged;
 
     public TComponent GetRequiredComponent<TComponent>() where TComponent : IComponent
     {
@@ -77,7 +77,7 @@ public class RealmPlayer : Player, IComponents
         return Components.AddComponent(component);
     }
 
-    public Element? FocusedEntity
+    public Element? FocusedElement
     {
         get
         {
@@ -108,7 +108,7 @@ public class RealmPlayer : Player, IComponents
             if (value != _lastClickedElement)
             {
                 _lastClickedElement = value;
-                ClickedEntityChanged?.Invoke(this, value);
+                ClickedElementChanged?.Invoke(this, value);
             }
         }
     }

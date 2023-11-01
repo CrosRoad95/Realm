@@ -16,10 +16,10 @@ internal sealed class VehiclesService : IVehiclesService
     private readonly IActiveVehicles _activeVehicles;
     private readonly JsonSerializerSettings _jsonSerializerSettings;
 
-    public VehiclesService(IVehicleRepository vehicleRepository, IElementFactory entityFactory, ISaveService saveService, ItemsRegistry itemsRegistry, IVehicleEventRepository vehicleEventRepository, IDateTimeProvider dateTimeProvider, VehicleUpgradeRegistry vehicleUpgradeRegistry, VehicleEnginesRegistry vehicleEnginesRegistry, IActiveUsers activeUsers, IActiveVehicles activeVehicles)
+    public VehiclesService(IVehicleRepository vehicleRepository, IElementFactory elementFactory, ISaveService saveService, ItemsRegistry itemsRegistry, IVehicleEventRepository vehicleEventRepository, IDateTimeProvider dateTimeProvider, VehicleUpgradeRegistry vehicleUpgradeRegistry, VehicleEnginesRegistry vehicleEnginesRegistry, IActiveUsers activeUsers, IActiveVehicles activeVehicles)
     {
         _vehicleRepository = vehicleRepository;
-        _elementFactory = entityFactory;
+        _elementFactory = elementFactory;
         _saveService = saveService;
         _itemsRegistry = itemsRegistry;
         _vehicleEventRepository = vehicleEventRepository;
@@ -108,7 +108,7 @@ internal sealed class VehiclesService : IVehiclesService
         if(vehicleData.IsRemoved)
             throw new VehicleRemovedException(vehicleData.Id);
 
-        var vehicleEntity = _elementFactory.CreateVehicle(vehicleData.Model, vehicleData.TransformAndMotion.Position, vehicleData.TransformAndMotion.Rotation, vehicleData.TransformAndMotion.Interior, vehicleData.TransformAndMotion.Dimension,
+        var vehicle = _elementFactory.CreateVehicle(vehicleData.Model, vehicleData.TransformAndMotion.Position, vehicleData.TransformAndMotion.Rotation, vehicleData.TransformAndMotion.Interior, vehicleData.TransformAndMotion.Dimension,
             vehicle =>
             {
                 if (!_activeVehicles.TrySetActive(vehicleData.Id, vehicle))
@@ -145,8 +145,8 @@ internal sealed class VehiclesService : IVehiclesService
 
             });
 
-        await SetVehicleSpawned(vehicleEntity);
-        return vehicleEntity;
+        await SetVehicleSpawned(vehicle);
+        return vehicle;
     }
 
     public async Task<bool> AddVehicleEvent(RealmVehicle vehicle, int eventId, string? metadata = null)

@@ -16,7 +16,7 @@ internal class SaveCommand : ICommand
 
     public async Task Handle(RealmPlayer player, CommandArguments args)
     {
-        int savedEntities = 0;
+        int savedElements = 0;
         foreach (var element in _elementCollection.GetByType<Player>())
         {
             using var _ = _logger.BeginElement(element);
@@ -26,11 +26,11 @@ internal class SaveCommand : ICommand
                 if (await _saveService.BeginSave(element))
                 {
                     await _saveService.Commit();
-                    savedEntities++;
+                    savedElements++;
                 }
 #else
                 if (await _saveService.BeginSave(element))
-                    savedEntities++;
+                    savedElements++;
 #endif
             }
             catch (Exception ex)

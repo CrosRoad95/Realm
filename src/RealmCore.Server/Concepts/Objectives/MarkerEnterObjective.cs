@@ -17,12 +17,12 @@ public class MarkerEnterObjective : Objective
     {
         // TODO:
         //_playerEntity = playerEntity;
-        //var entityFactory = serviceProvider.GetRequiredService<IElementFactory>();
-        //using var scopedEntityFactory = entityFactory.CreateScopedEntityFactory(playerEntity);
-        //scopedEntityFactory.CreateMarker(MarkerType.Arrow, _position, Color.White);
-        //_markerElementComponent = scopedEntityFactory.GetLastCreatedComponent<PlayerPrivateElementComponent<MarkerElementComponent>>();
-        //scopedEntityFactory.CreateCollisionSphere(_position, 2);
-        //_collisionSphereElementComponent = scopedEntityFactory.GetLastCreatedComponent<PlayerPrivateElementComponent<CollisionSphereElementComponent>>();
+        //var elementFactory = serviceProvider.GetRequiredService<IElementFactory>();
+        //using var scopedelementFactory = elementFactory.CreateScopedelementFactory(playerEntity);
+        //scopedelementFactory.CreateMarker(MarkerType.Arrow, _position, Color.White);
+        //_markerElementComponent = scopedelementFactory.GetLastCreatedComponent<PlayerPrivateElementComponent<MarkerElementComponent>>();
+        //scopedelementFactory.CreateCollisionSphere(_position, 2);
+        //_collisionSphereElementComponent = scopedelementFactory.GetLastCreatedComponent<PlayerPrivateElementComponent<CollisionSphereElementComponent>>();
         //_collisionSphereElementComponent.ElementComponent.ElementEntered += HandleElementEntered;
     }
 

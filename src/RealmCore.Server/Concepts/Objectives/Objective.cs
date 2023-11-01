@@ -30,7 +30,7 @@ public abstract class Objective : IDisposable
     protected void Complete(Objective objective, object? data = null)
     {
         if (Player == null)
-            throw new ArgumentNullException(nameof(Player), "Entity cannot be null.");
+            throw new ArgumentNullException(nameof(Player), "Element cannot be null.");
 
         if (_isFulfilled)
             throw new ObjectiveAlreadyFulfilledException();
@@ -44,7 +44,7 @@ public abstract class Objective : IDisposable
     public void Incomplete(Objective objective)
     {
         if (Player == null)
-            throw new ArgumentNullException(nameof(Player), "Entity cannot be null.");
+            throw new ArgumentNullException(nameof(Player), "Element cannot be null.");
 
         if (_isFulfilled)
             throw new ObjectiveAlreadyFulfilledException();

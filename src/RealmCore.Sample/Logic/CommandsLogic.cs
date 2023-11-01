@@ -36,15 +36,14 @@ internal sealed class CommandsLogic
         Test2,
     }
 
-    public CommandsLogic(RealmCommandService commandService, IElementFactory entityFactory,
-        ItemsRegistry itemsRegistry, IElementFactory elementFactory, IBanService banService, ChatBox chatBox, ILogger<CommandsLogic> logger,
+    public CommandsLogic(RealmCommandService commandService, IElementFactory elementFactory,
+        ItemsRegistry itemsRegistry, IBanService banService, ChatBox chatBox, ILogger<CommandsLogic> logger,
         IDateTimeProvider dateTimeProvider, INametagsService nametagsService, IUsersService usersService, IVehiclesService vehiclesService,
         GameWorld gameWorld, IElementOutlineService elementOutlineService, IAssetsService assetsService, ISpawnMarkersService spawnMarkersService, ILoadService loadService, IFeedbackService feedbackService, IOverlayService overlayService, AssetsRegistry assetsRegistry, VehicleUpgradeRegistry vehicleUpgradeRegistry, VehicleEnginesRegistry vehicleEnginesRegistry, IUserWhitelistedSerialsRepository userWhitelistedSerialsRepository, IVehicleRepository vehicleRepository, IUserMoneyHistoryService userMoneyHistoryService)
     {
         _commandService = commandService;
-        _elementFactory = entityFactory;
-        _itemsRegistry = itemsRegistry;
         _elementFactory = elementFactory;
+        _itemsRegistry = itemsRegistry;
         _banService = banService;
         _chatBox = chatBox;
         _logger = logger;
@@ -231,10 +230,10 @@ internal sealed class CommandsLogic
         _commandService.AddAsyncCommandHandler("privateblip", async (player, args) =>
         {
             // TODO:
-            //using var scopedEntityFactory = _elementFactory.CreateScopedEntityFactory(player);
-            //var blipElementComponent = scopedEntityFactory.CreateBlip(BlipIcon.Pizza, player.Position);
+            //using var scopedelementFactory = _elementFactory.CreateScopedelementFactory(player);
+            //var blipElementComponent = scopedelementFactory.CreateBlip(BlipIcon.Pizza, player.Position);
             //await Task.Delay(1000);
-            //player.DestroyComponent(scopedEntityFactory.LastCreatedComponent);
+            //player.DestroyComponent(scopedelementFactory.LastCreatedComponent);
         });
 
         _commandService.AddCommandHandler("addmeasowner", (player, args) =>
@@ -427,23 +426,23 @@ internal sealed class CommandsLogic
 
         _commandService.AddCommandHandler("spawnmybox", (player, args) =>
         {
-            var objectEntity = _elementFactory.CreateObject(ObjectModel.Gunbox, player.Position + new Vector3(4, 0, -0.65f), Vector3.Zero);
-            objectEntity.Components.AddComponent<LiftableWorldObjectComponent>();
-            objectEntity.Components.AddComponent(new OwnerComponent(player));
+            var @object = _elementFactory.CreateObject(ObjectModel.Gunbox, player.Position + new Vector3(4, 0, -0.65f), Vector3.Zero);
+            @object.Components.AddComponent<LiftableWorldObjectComponent>();
+            @object.Components.AddComponent(new OwnerComponent(player));
         });
 
         _commandService.AddCommandHandler("spawnmybox2", (player, args) =>
         {
-            var objectEntity = _elementFactory.CreateObject(ObjectModel.Gunbox, player.Position + new Vector3(4, 0, -0.65f), Vector3.Zero);
-            objectEntity.Components.AddComponent<LiftableWorldObjectComponent>();
-            objectEntity.Components.AddComponent(new OwnerDisposableComponent(player));
+            var @object = _elementFactory.CreateObject(ObjectModel.Gunbox, player.Position + new Vector3(4, 0, -0.65f), Vector3.Zero);
+            @object.Components.AddComponent<LiftableWorldObjectComponent>();
+            @object.Components.AddComponent(new OwnerDisposableComponent(player));
         });
 
         // TODO:
         //_commandService.AddCommandHandler("spawnboxforme", (player, args) =>
         //{
-        //    using var scopedEntityFactory = _elementFactory.CreateScopedEntityFactory(player);
-        //    var objectEntity = scopedEntityFactory.CreateObject(ObjectModel.Gunbox, player.Position + new Vector3(4, 0, -0.65f), Vector3.Zero);
+        //    using var scopedelementFactory = _elementFactory.CreateScopedelementFactory(player);
+        //    var objectEntity = scopedelementFactory.CreateObject(ObjectModel.Gunbox, player.Position + new Vector3(4, 0, -0.65f), Vector3.Zero);
         //    objectEntity.AddComponent<LiftableWorldObjectComponent>();
         //});
 
@@ -944,7 +943,7 @@ internal sealed class CommandsLogic
         //_commandService.AddCommandHandler("text3dcomp", (player, args) =>
         //{
         //    var player = player.GetRequiredComponent<PlayerElementComponent>();
-        //    var markerEntity = entityFactory.CreateMarker(MarkerType.Arrow, player.Position, Color.White);
+        //    var markerEntity = elementFactory.CreateMarker(MarkerType.Arrow, player.Position, Color.White);
         //    markerEntity.AddComponent(new Text3dComponent("test1", player.Position));
         //    markerEntity.AddComponent(new Text3dComponent("offset z+1", player.Position + new Vector3(0, 0, 1)));
         //});
@@ -1035,8 +1034,8 @@ internal sealed class CommandsLogic
         //_commandService.AddCommandHandler("createObjectFor", (player, args) =>
         //{
         //    var player = player.GetRequiredComponent<PlayerElementComponent>();
-        //    using var scopedEntityFactory = _elementFactory.CreateScopedEntityFactory(player);
-        //    scopedEntityFactory.CreateObject((ObjectModel)1337, player.Position + new Vector3(3, 0, 0), player.Rotation);
+        //    using var scopedelementFactory = _elementFactory.CreateScopedelementFactory(player);
+        //    scopedelementFactory.CreateObject((ObjectModel)1337, player.Position + new Vector3(3, 0, 0), player.Rotation);
         //});
 
         //_commandService.AddCommandHandler("tp", (player, args) =>
@@ -1091,15 +1090,15 @@ internal sealed class CommandsLogic
         //_commandService.AddAsyncCommandHandler("createObjectFor2", async (player, args) =>
         //{
         //    var player = player.GetRequiredComponent<PlayerElementComponent>();
-        //    using var scopedEntityFactory = _elementFactory.CreateScopedEntityFactory(player);
+        //    using var scopedelementFactory = _elementFactory.CreateScopedelementFactory(player);
         //    var pos = player.Position + new Vector3(3, 0, 0);
 
-        //    void handleComponentCreated(IScopedElementFactory scopedEntityFactory, PlayerPrivateElementComponentBase playerPrivateElementComponentBase)
+        //    void handleComponentCreated(IScopedElementFactory scopedelementFactory, PlayerPrivateElementComponentBase playerPrivateElementComponentBase)
         //    {
         //        ;
         //    }
-        //    scopedEntityFactory.ComponentCreated += handleComponentCreated;
-        //    scopedEntityFactory.CreateObject((ObjectModel)1337, pos, player.Rotation);
+        //    scopedelementFactory.ComponentCreated += handleComponentCreated;
+        //    scopedelementFactory.CreateObject((ObjectModel)1337, pos, player.Rotation);
         //    for (int i = 0; i < 10; i++)
         //    {
         //        await Task.Delay(2000);
@@ -1269,18 +1268,18 @@ internal sealed class CommandsLogic
         //        player.DestroyComponent(markerElementComponent);
         //    }
 
-        //    using var scopedEntityFactory = _elementFactory.CreateScopedEntityFactory(player);
-        //    scopedEntityFactory.CreateMarker(MarkerType.Checkpoint, player.Position with { X = player.Position.X + 4 }, Color.White);
-        //    var marker = scopedEntityFactory.LastCreatedComponent as PlayerPrivateElementComponent<MarkerElementComponent>;
+        //    using var scopedelementFactory = _elementFactory.CreateScopedelementFactory(player);
+        //    scopedelementFactory.CreateMarker(MarkerType.Checkpoint, player.Position with { X = player.Position.X + 4 }, Color.White);
+        //    var marker = scopedelementFactory.LastCreatedComponent as PlayerPrivateElementComponent<MarkerElementComponent>;
         //    marker.ElementComponent.EntityEntered = handleEntityEntered;
         //});
 
         //_commandService.AddAsyncCommandHandler("createmarkerforme", async (player, args) =>
         //{
         //    var player = player.GetRequiredComponent<PlayerElementComponent>();
-        //    using var scopedEntityFactory = _elementFactory.CreateScopedEntityFactory(player);
-        //    scopedEntityFactory.CreateMarker(MarkerType.Cylinder, player.Position, Color.White);
-        //    var component = scopedEntityFactory.LastCreatedComponent as PlayerPrivateElementComponent<MarkerElementComponent>;
+        //    using var scopedelementFactory = _elementFactory.CreateScopedelementFactory(player);
+        //    scopedelementFactory.CreateMarker(MarkerType.Cylinder, player.Position, Color.White);
+        //    var component = scopedelementFactory.LastCreatedComponent as PlayerPrivateElementComponent<MarkerElementComponent>;
         //    component.ElementComponent.Size = 4;
         //    component.ElementComponent.Color = Color.Red;
         //    while (true)
@@ -1301,9 +1300,9 @@ internal sealed class CommandsLogic
 
         //_commandService.AddAsyncCommandHandler("createmarkerforme2", async (player, args) =>
         //{
-        //    using var scopedEntityFactory = _elementFactory.CreateScopedEntityFactory(player);
-        //    scopedEntityFactory.CreateMarker(MarkerType.Cylinder, new Vector3(-600.8877f, 240.88867f, 26.091864f), Color.White);
-        //    var marker = scopedEntityFactory.LastCreatedComponent as PlayerPrivateElementComponent<MarkerElementComponent>;
+        //    using var scopedelementFactory = _elementFactory.CreateScopedelementFactory(player);
+        //    scopedelementFactory.CreateMarker(MarkerType.Cylinder, new Vector3(-600.8877f, 240.88867f, 26.091864f), Color.White);
+        //    var marker = scopedelementFactory.LastCreatedComponent as PlayerPrivateElementComponent<MarkerElementComponent>;
         //    marker.ElementComponent.Size = 4;
         //    marker.ElementComponent.Color = Color.Red;
         //});
@@ -1324,9 +1323,9 @@ internal sealed class CommandsLogic
         //_commandService.AddCommandHandler("markerhittest2", (player, args) =>
         //{
         //    var player = player.GetRequiredComponent<PlayerElementComponent>();
-        //    using var scopedEntityFactory = _elementFactory.CreateScopedEntityFactory(player);
-        //    scopedEntityFactory.CreateMarker(MarkerType.Cylinder, player.Position, Color.White);
-        //    var marker = scopedEntityFactory.LastCreatedComponent as PlayerPrivateElementComponent<MarkerElementComponent>;
+        //    using var scopedelementFactory = _elementFactory.CreateScopedelementFactory(player);
+        //    scopedelementFactory.CreateMarker(MarkerType.Cylinder, player.Position, Color.White);
+        //    var marker = scopedelementFactory.LastCreatedComponent as PlayerPrivateElementComponent<MarkerElementComponent>;
         //    marker.ElementComponent.Size = 4;
         //    marker.ElementComponent.Color = Color.Red;
         //    marker.ElementComponent.EntityEntered = (markerElementComponent, enteredMarker, enteredEntity) =>
@@ -1555,9 +1554,9 @@ internal sealed class CommandsLogic
 
         //_commandService.AddCommandHandler("privateelementdisposable", async (player, args) =>
         //{
-        //    using var scopedEntityFactory = _elementFactory.CreateScopedEntityFactory(player);
-        //    scopedEntityFactory.CreateMarker(MarkerType.Cylinder, player.Position, Color.White);
-        //    var marker = scopedEntityFactory.GetLastCreatedComponent<PlayerPrivateElementComponent<MarkerElementComponent>>();
+        //    using var scopedelementFactory = _elementFactory.CreateScopedelementFactory(player);
+        //    scopedelementFactory.CreateMarker(MarkerType.Cylinder, player.Position, Color.White);
+        //    var marker = scopedelementFactory.GetLastCreatedComponent<PlayerPrivateElementComponent<MarkerElementComponent>>();
         //    marker.ElementComponent.Size = 4;
         //    marker.ElementComponent.Color = Color.Red;
         //    await Task.Delay(1000);

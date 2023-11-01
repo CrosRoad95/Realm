@@ -41,7 +41,6 @@ internal sealed class BrowserGuiComponentLogic : ComponentLogic<BrowserGuiCompon
 
     private void HandleNavigationRequested(BrowserGuiComponent browserGuiComponent, BrowserGuiComponent targetGuiComponent)
     {
-        var entity = browserGuiComponent.Element;
         var player = (RealmPlayer)browserGuiComponent.Element;
         player.DestroyComponent(browserGuiComponent);
         player.AddComponent(targetGuiComponent);

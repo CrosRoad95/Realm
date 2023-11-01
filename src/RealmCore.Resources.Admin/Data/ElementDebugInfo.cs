@@ -5,7 +5,7 @@ using System.Numerics;
 
 namespace RealmCore.Resources.Admin.Data;
 
-public struct EntityDebugInfo
+public struct ElementDebugInfo
 {
     public Element? element;
     public Vector3 position;

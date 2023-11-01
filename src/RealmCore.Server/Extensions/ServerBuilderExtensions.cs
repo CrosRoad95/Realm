@@ -65,7 +65,7 @@ public static class ServerBuilderExtensions
             services.AddSingleton<HelpCommand>();
             services.AddCommand<SaveCommand>(); 
             services.AddCommand<ServerInfoCommand>(); 
-            services.AddCommand<ReloadEntitiesCommand>();
+            services.AddCommand<ReloadElementsCommand>();
         });
 
         #region Resources
@@ -113,7 +113,7 @@ public static class ServerBuilderExtensions
         serverBuilder.AddScopedLogic<LiftableWorldObjectComponentLogic>();
         serverBuilder.AddScopedLogic<VehicleUpgradesComponentLogic>();
         serverBuilder.AddScopedLogic<UpdateCallbackLogic>();
-        serverBuilder.AddScopedLogic<PickupElementComponentLogic>();
+        serverBuilder.AddScopedLogic<PickupLogic>();
         serverBuilder.AddScopedLogic<UserComponentLogic>();
         serverBuilder.AddScopedLogic<PrivateVehicleComponentLogic>();
         serverBuilder.AddScopedLogic<InventoryComponentLogic>();

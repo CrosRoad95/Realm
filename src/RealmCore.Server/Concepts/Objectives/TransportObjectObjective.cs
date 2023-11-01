@@ -7,7 +7,7 @@ public class TransportObjectObjective : Objective
     private readonly bool _createMarker;
     private RealmMarker? _marker;
     private IElementCollection _elementCollection = default!;
-    public Func<Element, bool>? CheckEntity { get; set; }
+    public Func<Element, bool>? CheckElement { get; set; }
 
     public override Vector3 Position => _position;
 
@@ -37,7 +37,7 @@ public class TransportObjectObjective : Objective
 
     protected override void Load(RealmPlayer player)
     {
-        var entityFactory = player.ServiceProvider.GetRequiredService<IElementFactory>();
+        var elementFactory = player.ServiceProvider.GetRequiredService<IElementFactory>();
         _elementCollection = player.ServiceProvider.GetRequiredService<IElementCollection>();
         // TODO: Create marker
     }
@@ -51,9 +51,9 @@ public class TransportObjectObjective : Objective
         {
             if (ownerComponent.OwningElement == element)
             {
-                if (CheckEntity != null)
+                if (CheckElement != null)
                 {
-                    if (CheckEntity(element))
+                    if (CheckElement(element))
                     {
                         Complete(this, element);
                         return;
@@ -79,7 +79,7 @@ public class TransportObjectObjective : Objective
         {
             if(_element is IComponents components && components.TryGetComponent(out LiftableWorldObjectComponent liftableWorldObjectComponent))
             {
-                if (liftableWorldObjectComponent.Owner == null) // Accept only dropped entities.
+                if (liftableWorldObjectComponent.Owner == null) // Accept only dropped elements.
                     _marker.CollisionShape.CheckElementWithin(_element);
             }
             else
@@ -92,7 +92,7 @@ public class TransportObjectObjective : Objective
     public override void Dispose()
     {
         _marker?.Destroy();
-        CheckEntity = null;
+        CheckElement = null;
         base.Dispose();
     }
 }

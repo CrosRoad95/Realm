@@ -6,10 +6,10 @@ public interface IAdminEventHub
 {
     void SetAdminEnabled(bool enabled);
     void SetTools(IEnumerable<int> enabledTools);
-    void AddOrUpdateEntity(IEnumerable<LuaValue> entityLuaValues);
-    void ClearEntities();
+    void AddOrUpdateElement(IEnumerable<LuaValue> elementsLuaValues);
+    void ClearElements();
     void SetSpawnMarkers(IEnumerable<LuaValue> spawnMarkers);
     void ClearSpawnMarkers();
-    void UpdateEntitiesComponents(LuaValue entitiesComponents);
-    void ClearEntitiesComponents();
+    void UpdateElementsComponents(LuaValue elementsComponents);
+    void ClearElementsComponents();
 }

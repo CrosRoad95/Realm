@@ -17,7 +17,7 @@ local function stringifyComponent(component)
 end
 
 function getComponents(id)
-	local components = getEntitiesComponents()[id];
+	local components = getElementsComponents()[id];
 	if(not components)then
 		return "-";
 	end

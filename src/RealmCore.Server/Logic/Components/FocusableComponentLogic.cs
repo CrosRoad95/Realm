@@ -22,7 +22,7 @@ internal sealed class FocusableComponentLogic : ComponentLogic<FocusableComponen
         var realmPlayer = ((RealmPlayer)player);
         if(focusedElement == null)
         {
-            if(realmPlayer.FocusedEntity is IComponents components)
+            if(realmPlayer.FocusedElement is IComponents components)
             {
                 if(components.Components.TryGetComponent(out FocusableComponent focusableComponent))
                 {
@@ -32,14 +32,14 @@ internal sealed class FocusableComponentLogic : ComponentLogic<FocusableComponen
         }
         else
         {
-            if (realmPlayer.FocusedEntity is IComponents components)
+            if (realmPlayer.FocusedElement is IComponents components)
             {
                 components.Components.GetRequiredComponent<FocusableComponent>().AddFocusedPlayer(realmPlayer);
 
             }
         }
 
-        realmPlayer.FocusedEntity = focusedElement;
+        realmPlayer.FocusedElement = focusedElement;
     }
 
     protected override void ComponentAdded(FocusableComponent component)

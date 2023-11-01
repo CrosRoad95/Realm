@@ -42,7 +42,7 @@ internal class AdminLogic
 
         luaEventService.AddEventHandler("internalSetToolState", HandleSetToolState);
 
-        _luaValueMapper.DefineStructMapper<EntityDebugInfo>(EntityDebugInfoToLuaValue);
+        _luaValueMapper.DefineStructMapper<ElementDebugInfo>(ElementDebugInfoToLuaValue);
     }
 
     private void HandleMessage(IMessage message)
@@ -69,50 +69,50 @@ internal class AdminLogic
                     _luaEventHub.Invoke(setAdminToolsMessage.Player, x => x.SetTools(tools));
                 }
                 break;
-            case BroadcastEntityDebugInfoMessage broadcastEntityDebugInfoMessage:
+            case BroadcastElementDebugInfoMessage broadcastElementDebugInfoMessage:
                 lock (_enabledForPlayersLock)
                 {
                     if (_enabledForPlayers.Count == 0)
                         return;
 
-                    var luaValue = new LuaValue[] { _luaValueMapper.Map(broadcastEntityDebugInfoMessage.EntityDebugInfo) };
-                    _luaEventHub.Invoke(_enabledForPlayers, x => x.AddOrUpdateEntity(luaValue));
+                    var luaValue = new LuaValue[] { _luaValueMapper.Map(broadcastElementDebugInfoMessage.ElementDebugInfo) };
+                    _luaEventHub.Invoke(_enabledForPlayers, x => x.AddOrUpdateElement(luaValue));
                 }
                 break;
-            case BroadcastEntitiesDebugInfoMessage broadcastEntitiesDebugInfoMessage:
+            case BroadcastElementsDebugInfoMessage broadcastElementsDebugInfoMessage:
                 lock (_enabledForPlayersLock)
                 {
                     if (_enabledForPlayers.Count == 0)
                         return;
 
-                    var luaValues = broadcastEntitiesDebugInfoMessage.EntitiesDebugInfo.Select(x => _luaValueMapper.Map(x));
-                    _luaEventHub.Invoke(_enabledForPlayers, x => x.AddOrUpdateEntity(luaValues));
+                    var luaValues = broadcastElementsDebugInfoMessage.ElementsDebugInfo.Select(x => _luaValueMapper.Map(x));
+                    _luaEventHub.Invoke(_enabledForPlayers, x => x.AddOrUpdateElement(luaValues));
                 }
                 break;
-            case BroadcastEntityDebugInfoMessageForPlayer broadcastEntityDebugInfoMessageForPlayer:
+            case BroadcastElementDebugInfoMessageForPlayer broadcastElementDebugInfoMessageForPlayer:
                 lock (_enabledForPlayersLock)
                 {
-                    var player = broadcastEntityDebugInfoMessageForPlayer.player;
+                    var player = broadcastElementDebugInfoMessageForPlayer.player;
                     if (!_enabledForPlayers.Contains(player))
                         return;
 
-                    var luaValue = new LuaValue[] { _luaValueMapper.Map(broadcastEntityDebugInfoMessageForPlayer.EntityDebugInfo) };
-                    _luaEventHub.Invoke(_enabledForPlayers, x => x.AddOrUpdateEntity(luaValue));
+                    var luaValue = new LuaValue[] { _luaValueMapper.Map(broadcastElementDebugInfoMessageForPlayer.ElementDebugInfo) };
+                    _luaEventHub.Invoke(_enabledForPlayers, x => x.AddOrUpdateElement(luaValue));
                 }
                 break;
-            case BroadcastEntitiesDebugInfoMessageForPlayer broadcastEntitiesDebugInfoMessageForPlayer:
+            case BroadcastElementsDebugInfoMessageForPlayer broadcastElementsDebugInfoMessageForPlayer:
                 lock (_enabledForPlayersLock)
                 {
-                    var player = broadcastEntitiesDebugInfoMessageForPlayer.player;
+                    var player = broadcastElementsDebugInfoMessageForPlayer.player;
                     if (!_enabledForPlayers.Contains(player))
                         return;
 
-                    var luaValues = broadcastEntitiesDebugInfoMessageForPlayer.EntitiesDebugInfo.Select(x => _luaValueMapper.Map(x));
-                    _luaEventHub.Invoke(player, x => x.AddOrUpdateEntity(luaValues));
+                    var luaValues = broadcastElementsDebugInfoMessageForPlayer.ElementsDebugInfo.Select(x => _luaValueMapper.Map(x));
+                    _luaEventHub.Invoke(player, x => x.AddOrUpdateElement(luaValues));
                 }
                 break;
-            case ClearEntitiesForPlayerMessage clearEntitiesForPlayerMessage:
-                _luaEventHub.Invoke(clearEntitiesForPlayerMessage.player, x => x.ClearEntities());
+            case ClearElementsForPlayerMessage clearElementsForPlayerMessage:
+                _luaEventHub.Invoke(clearElementsForPlayerMessage.player, x => x.ClearElements());
                 break;
             case BroadcastSpawnMarkersForPlayerMessage broadcastSpawnMarkersForPlayerMessage:
                 var markers = broadcastSpawnMarkersForPlayerMessage.SpawnMarkers;
@@ -121,12 +121,12 @@ internal class AdminLogic
             case ClearSpawnMarkersForPlayerMessage clearSpawnMarkersForPlayerMessage:
                 _luaEventHub.Invoke(clearSpawnMarkersForPlayerMessage.Player, x => x.ClearSpawnMarkers());
                 break;
-            case UpdateEntitiesComponentsMessage updateEntitiesComponentsMessage:
-                var components = updateEntitiesComponentsMessage.entitiesComponents;
-                _luaEventHub.Invoke(updateEntitiesComponentsMessage.Player, x => x.UpdateEntitiesComponents(components));
+            case UpdateElementsComponentsMessage updateElementsComponentsMessage:
+                var components = updateElementsComponentsMessage.elementsComponents;
+                _luaEventHub.Invoke(updateElementsComponentsMessage.Player, x => x.UpdateElementsComponents(components));
                 break;
-            case ClearEntitiesComponentsMessage clearEntitiesComponentsMessage:
-                _luaEventHub.Invoke(clearEntitiesComponentsMessage.Player, x => x.ClearEntitiesComponents());
+            case ClearElementsComponentsMessage clearElementsComponentsMessage:
+                _luaEventHub.Invoke(clearElementsComponentsMessage.Player, x => x.ClearElementsComponents());
                 break;
             default:
                 throw new NotImplementedException();
@@ -135,18 +135,18 @@ internal class AdminLogic
 
     private bool IsAdminEnabledForPlayer(Player player) => _enabledForPlayers.Contains(player);
 
-    private LuaValue EntityDebugInfoToLuaValue(EntityDebugInfo entityDebugInfo)
+    private LuaValue ElementDebugInfoToLuaValue(ElementDebugInfo elementDebugInfo)
     {
         var data = new Dictionary<LuaValue, LuaValue>
         {
-            ["debugId"] = entityDebugInfo.debugId,
-            ["name"] = entityDebugInfo.name,
-            ["previewType"] = (int)entityDebugInfo.previewType,
-            ["color"] = entityDebugInfo.previewColor.ToLuaColor(),
-            ["position"] = new LuaValue(new LuaValue[] { entityDebugInfo.position.X, entityDebugInfo.position.Y, entityDebugInfo.position.Z }),
+            ["debugId"] = elementDebugInfo.debugId,
+            ["name"] = elementDebugInfo.name,
+            ["previewType"] = (int)elementDebugInfo.previewType,
+            ["color"] = elementDebugInfo.previewColor.ToLuaColor(),
+            ["position"] = new LuaValue(new LuaValue[] { elementDebugInfo.position.X, elementDebugInfo.position.Y, elementDebugInfo.position.Z }),
         };
-        if (entityDebugInfo.element != null)
-            data["element"] = entityDebugInfo.element;
+        if (elementDebugInfo.element != null)
+            data["element"] = elementDebugInfo.element;
 
         return new LuaValue(data);
     }

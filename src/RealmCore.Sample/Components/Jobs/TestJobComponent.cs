@@ -6,9 +6,9 @@ internal class TestJobComponent : JobSessionComponent
 
     public override short JobId => 1;
 
-    public TestJobComponent(IElementFactory entityFactory)
+    public TestJobComponent(IElementFactory elementFactory)
     {
-        _elementFactory = entityFactory;
+        _elementFactory = elementFactory;
     }
 
     public void CreateObjectives()
@@ -17,10 +17,10 @@ internal class TestJobComponent : JobSessionComponent
         objective.AddBlip(BlipIcon.North);
         objective.Completed += ObjectiveACompleted;
 
-        var objectEntity = _elementFactory.CreateObject(SlipeServer.Server.Enums.ObjectModel.Gunbox, new Vector3(379.00f, -102.77f, 1.24f), Vector3.Zero);
-        objectEntity.AddComponent<LiftableWorldObjectComponent>();
-        objectEntity.AddComponent(new OwnerDisposableComponent(Element));
-        var objective2 = AddObjective(new TransportObjectObjective(objectEntity, new Vector3(379.00f, -112.77f, 2.0f)));
+        var @object = _elementFactory.CreateObject(SlipeServer.Server.Enums.ObjectModel.Gunbox, new Vector3(379.00f, -102.77f, 1.24f), Vector3.Zero);
+        @object.AddComponent<LiftableWorldObjectComponent>();
+        @object.AddComponent(new OwnerDisposableComponent(Element));
+        var objective2 = AddObjective(new TransportObjectObjective(@object, new Vector3(379.00f, -112.77f, 2.0f)));
         objective2.Completed += ObjectiveBCompleted;
         var objective3 = AddObjective(new TransportObjectObjective(new Vector3(379.00f, -105.77f, 2.0f)));
         objective3.Completed += ObjectiveDCompleted;
@@ -33,24 +33,26 @@ internal class TestJobComponent : JobSessionComponent
 
     private void ObjectiveACompleted(Objective objective, object? data = null)
     {
-        ((IComponents)Element).GetRequiredComponent<JobStatisticsComponent>().AddPoints(1, 1);
-        //ChatBox.OutputTo(Entity, $"Entered marker, objectives left: {Objectives.Count()}");
+        var player = (RealmPlayer)Element;
+        player.GetRequiredComponent<JobStatisticsComponent>().AddPoints(1, 1);
+        //ChatBox.OutputTo(player, $"Entered marker, objectives left: {Objectives.Count()}");
     }
 
     private void ObjectiveBCompleted(Objective objective, object? data = null)
     {
-        ((IComponents)Element).GetRequiredComponent<JobStatisticsComponent>().AddPoints(1, 2);
-        //ChatBox.OutputTo(Entity, $"Box delivered, objectives left: {Objectives.Count()}");
+        var player = (RealmPlayer)Element;
+        player.GetRequiredComponent<JobStatisticsComponent>().AddPoints(1, 2);
+        //ChatBox.OutputTo(player, $"Box delivered, objectives left: {Objectives.Count()}");
     }
 
     private void ObjectiveCCompleted(Objective objective, object? data = null)
     {
         ((IComponents)Element).GetRequiredComponent<JobStatisticsComponent>().AddPoints(1, 1);
-        //ChatBox.OutputTo(Entity, $"Entered one of marker, objectives left: {Objectives.Count()}");
+        //ChatBox.OutputTo(player, $"Entered one of marker, objectives left: {Objectives.Count()}");
     }
 
     private void ObjectiveDCompleted(Objective objective, object? data = null)
     {
-        //ChatBox.OutputTo(Entity, $"Entered marker, objectives left: {Objectives.Count()} {data}");
+        //ChatBox.OutputTo(player, $"Entered marker, objectives left: {Objectives.Count()} {data}");
     }
 }

@@ -1,14 +1,14 @@
 ﻿namespace RealmCore.Server.Commands;
 
-[CommandName("reloadentities")]
-internal class ReloadEntitiesCommand : ICommand
+[CommandName("reloadelements")]
+internal class ReloadElementsCommand : ICommand
 {
     private readonly IElementCollection _elementCollection;
     private readonly ISaveService _saveService;
     private readonly ILogger<SaveCommand> _logger;
     private readonly ILoadService _loadService;
 
-    public ReloadEntitiesCommand(IElementCollection elementCollection, ISaveService saveService, ILogger<SaveCommand> logger, ILoadService loadService)
+    public ReloadElementsCommand(IElementCollection elementCollection, ISaveService saveService, ILogger<SaveCommand> logger, ILoadService loadService)
     {
         _elementCollection = elementCollection;
         _saveService = saveService;
@@ -18,7 +18,7 @@ internal class ReloadEntitiesCommand : ICommand
 
     public async Task Handle(RealmPlayer player, CommandArguments args)
     {
-        int savedEntities = 0;
+        int savedElements = 0;
         foreach (var element in _elementCollection.GetAll())
         {
             try
@@ -28,7 +28,7 @@ internal class ReloadEntitiesCommand : ICommand
 #if DEBUG
                     await _saveService.Commit();
 #endif
-                    savedEntities++;
+                    savedElements++;
                     element.Destroy();
                 }
             }

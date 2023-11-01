@@ -28,7 +28,7 @@ internal sealed class AdminResourceLogic
         {
             if(!player.TryGetComponent(out AdminComponent adminComponent))
             {
-                _logger.LogInformation("Player change admin tool {adminTool} state to {state} but entity has no adminComponent", adminTool, state);
+                _logger.LogInformation("Player change admin tool {adminTool} state to {state} but element has no adminComponent", adminTool, state);
                 return;
             }
 
@@ -71,15 +71,15 @@ internal sealed class AdminResourceLogic
     {
         switch (adminTool)
         {
-            case AdminTool.Entities:
+            case AdminTool.Elements:
                 if (state)
                 {
-                    List<EntityDebugInfo> debugInfoList = [];
+                    List<ElementDebugInfo> debugInfoList = [];
                     foreach (var element in _elementCollection.GetAll())
                     {
                         if(element is IComponents components)
                         {
-                            debugInfoList.Add(new EntityDebugInfo
+                            debugInfoList.Add(new ElementDebugInfo
                             {
                                 debugId = element.Id.ToString(),
                                 element = element,
@@ -90,10 +90,10 @@ internal sealed class AdminResourceLogic
                             });
                         }
                     }
-                    _adminService.BroadcastEntityDebugInfoUpdateForPlayer(player, debugInfoList);
+                    _adminService.BroadcastElementDebugInfoUpdateForPlayer(player, debugInfoList);
                 }
                 else
-                    _adminService.BroadcastClearEntityForPlayer(player);
+                    _adminService.BroadcastClearElementsForPlayer(player);
                 break;
             case AdminTool.Components:
                 if (state)
@@ -104,10 +104,10 @@ internal sealed class AdminResourceLogic
                         if (element is IComponents components)
                             componentsDictionary[element.Id] = new LuaValue(GetDebugComponents(components));
                     }
-                    _adminService.BroadcastEntitiesComponents(player, new LuaValue(componentsDictionary));
+                    _adminService.BroadcastElementsComponents(player, new LuaValue(componentsDictionary));
                 } 
                 else
-                    _adminService.BroadcastClearEntitiesComponents(player);
+                    _adminService.BroadcastClearElementsComponents(player);
                 break;
             case AdminTool.ShowSpawnMarkers:
                 if(state)

@@ -24,7 +24,7 @@
 		<EmbeddedResource Include="Lua\admin.lua" />
 		<EmbeddedResource Include="Lua\debugDraw.lua" />
 		<EmbeddedResource Include="Lua\Tools\components.lua" />
-		<EmbeddedResource Include="Lua\Tools\entities.lua" />
+		<EmbeddedResource Include="Lua\Tools\elements.lua" />
 		<EmbeddedResource Include="Lua\Tools\spawnMarkers.lua" />
 	</ItemGroup>
 
