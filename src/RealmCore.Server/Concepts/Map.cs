@@ -2,27 +2,16 @@
 
 public sealed class Map : IDisposable
 {
-    private readonly object _lock = new();
     private readonly List<WorldObject> _worldObjects;
     private readonly BoundingBox _boundingBox;
-    private readonly List<RealmPlayer> _createdForPlayers = new();
     private bool _disposed = false;
-
-    public List<RealmPlayer> CreatedForPlayers
-    {
-        get
-        {
-            ThrowIfDisposed();
-            lock (_lock)
-                return new List<RealmPlayer>(_createdForPlayers);
-        }
-    }
 
     internal IReadOnlyCollection<WorldObject> WorldObjects => _worldObjects.AsReadOnly();
 
     public BoundingBox BoundingBox => _boundingBox;
+    public string Name { get; }
 
-    public Map(MapIdGenerator mapIdGenerator, IEnumerable<WorldObject> worldObjects)
+    public Map(IElementIdGenerator elementIdGenerator, IEnumerable<WorldObject> worldObjects, string name)
     {
         if (worldObjects.TryGetNonEnumeratedCount(out int count))
         {
@@ -37,7 +26,7 @@ public sealed class Map : IDisposable
         Vector3 max = Vector3.Zero;
         foreach (var worldObject in worldObjects)
         {
-            worldObject.Id = (ElementId)mapIdGenerator.GetId();
+            worldObject.Id = (ElementId)elementIdGenerator.GetId();
             var pos = worldObject.Position;
             if (pos.X < min.X) min.X = pos.X;
             if (pos.X > max.X) max.X = pos.X;
@@ -49,6 +38,7 @@ public sealed class Map : IDisposable
         }
 
         _boundingBox = new BoundingBox((min + max) * 0.5f, max - min);
+        Name = name;
     }
 
     private void ThrowIfDisposed()
@@ -57,71 +47,29 @@ public sealed class Map : IDisposable
             throw new ObjectDisposedException(GetType().Name);
     }
 
-    public bool IsCreatedFor(RealmPlayer player)
-    {
-        ThrowIfDisposed();
-        lock (_lock)
-            return _createdForPlayers.Contains(player);
-    }
-
     public bool LoadFor(RealmPlayer player)
     {
         ThrowIfDisposed();
-        lock (_lock)
-        {
-            if (_createdForPlayers.Contains(player))
-                return false;
-
-            _createdForPlayers.Add(player);
-            player.Destroyed += HandleDestroyed;
-        }
-
         foreach (var worldObject in _worldObjects)
             worldObject.CreateFor(player);
         return true;
     }
 
-    private void HandleDestroyed(Element element)
-    {
-        lock (_lock)
-        {
-            element.Destroyed -= HandleDestroyed;
-            _createdForPlayers.Remove((RealmPlayer)element);
-        }
-    }
-
     public bool UnloadFor(RealmPlayer player)
     {
         ThrowIfDisposed();
-        lock (_lock)
-            if (!_createdForPlayers.Remove(player))
-                return false;
-
         foreach (var worldObject in _worldObjects)
             worldObject.DestroyFor(player);
 
         return true;
     }
 
+    public event Action<Map>? Disposed;
     public void Dispose()
     {
         ThrowIfDisposed();
-        lock (_lock)
-        {
-            foreach (var player in _createdForPlayers)
-            {
-                try
-                {
-                    foreach (var worldObject in _worldObjects)
-                        worldObject.DestroyFor(player);
-                }
-                catch (Exception)
-                {
-                    // TODO: Probably not needed
-                }
-            }
-            _createdForPlayers.Clear();
-        }
+        Disposed?.Invoke(this);
+
         _disposed = true;
     }
 }

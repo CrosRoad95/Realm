@@ -1,17 +1,17 @@
 ﻿namespace RealmCore.Server.IdGenerators;
 
-public sealed class MapIdGenerator : IElementIdGenerator
+public sealed class ScopedMapIdGenerator : IElementIdGenerator
 {
     private readonly uint _start;
     private readonly uint _stop;
     private readonly object _lock = new();
     private uint _idCounter;
 
-    public MapIdGenerator()
+    public ScopedMapIdGenerator()
     {
-        _idCounter = IdGeneratorConstants.MapIdStart;
-        _start = IdGeneratorConstants.MapIdStart;
-        _stop = IdGeneratorConstants.MapIdStop;
+        _idCounter = IdGeneratorConstants.PlayerIdStart;
+        _start = IdGeneratorConstants.PlayerIdStart;
+        _stop = IdGeneratorConstants.PlayerIdStop;
     }
 
     public uint GetId()

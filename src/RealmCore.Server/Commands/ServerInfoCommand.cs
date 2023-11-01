@@ -24,7 +24,7 @@ internal class ServerInfoCommand : ICommand
         _logger.LogInformation("Players: {playerCount}, logged in players: {loggedInPlayers}", _elementCollection.GetByType<RealmPlayer>().Count(), _elementCollection.GetByType<RealmPlayer>().Where(x => x.IsLoggedIn).Count());
         _logger.LogInformation("Vehicles: {vehiclesCount}", _elementCollection.GetByType<RealmVehicle>());
         _logger.LogInformation("Elements count: {elementsCount}", _elementCollection.Count);
-        _logger.LogInformation("Loaded maps: {loadedMaps}", _mapsService.Maps);
+        _logger.LogInformation("Loaded global maps: {loadedMaps}", string.Join(", ", _mapsService.LoadedMaps));
 
         return Task.CompletedTask;
     }

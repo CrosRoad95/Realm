@@ -8,4 +8,3 @@ global using Microsoft.Extensions.Logging;
 global using RealmCore.Server.Components.Players;
 global using RealmCore.Server.Elements;
 global using SlipeServer.Server.ElementCollections;
-global using SlipeServer.Server.Elements;

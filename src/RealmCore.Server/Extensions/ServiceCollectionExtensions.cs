@@ -39,11 +39,13 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<IAssetEncryptionProvider, AssetEncryptionProvider>();
         services.AddTransient<SeederServerBuilder>();
         services.AddSingleton<RealmCommandService>();
-        services.AddScoped<MapIdGenerator>();
+        services.AddSingleton<MapIdGenerator>();
+        services.AddScoped<ScopedMapIdGenerator>();
         services.AddScoped<PlayerContext>();
         #endregion
 
         #region Registries
+        services.AddSingleton<MapsRegistry>();
         services.AddSingleton<ItemsRegistry>();
         services.AddSingleton<VehicleUpgradeRegistry>();
         services.AddSingleton<LevelsRegistry>();
@@ -66,13 +68,14 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IJobService, JobService>();
         services.AddScoped<IRewardService, RewardService>();
         services.AddScoped<IFeedbackService, FeedbackService>();
-        services.AddScoped<IMapsService, MapsService>();
         services.AddScoped<ISpawnMarkersService, SpawnMarkersService>();
         services.AddScoped<IUsersNotificationsService, UsersNotificationsService>();
         services.AddScoped<IVehicleAccessService, VehicleAccessService>();
         services.AddScoped<IBrowserGuiService, BrowserGuiService>();
         services.AddScoped<INewsService, NewsService>();
         services.AddScoped<IUserMoneyHistoryService, UserMoneyHistoryService>();
+        services.AddSingleton<IMapsService, MapsService>();
+        services.AddSingleton<IScopedMapsService, ScopedMapService>();
         #endregion
 
         #region Policies

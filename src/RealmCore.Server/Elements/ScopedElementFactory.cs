@@ -9,7 +9,7 @@ internal sealed class ScopedElementFactory : IScopedElementFactory
     public event Action<Element>? ElementCreated;
     private readonly object _lock = new();
     private readonly List<Element> _createdElements = new();
-    private readonly MapIdGenerator _elementIdGenerator;
+    private readonly ScopedMapIdGenerator _elementIdGenerator;
 
     public Element? LastCreatedElement => _lastCreatedElement ?? throw new NullReferenceException();
     public IEnumerable<Element> CreatedElements
@@ -43,7 +43,7 @@ internal sealed class ScopedElementFactory : IScopedElementFactory
         }
     }
 
-    public ScopedElementFactory(PlayerContext playerContext, MapIdGenerator elementIdGenerator)
+    public ScopedElementFactory(PlayerContext playerContext, ScopedMapIdGenerator elementIdGenerator)
     {
         _player = playerContext.Player;
         _player.Destroyed += HandlePlayerDestroyed;
@@ -71,7 +71,7 @@ internal sealed class ScopedElementFactory : IScopedElementFactory
 
     private void Add(Element element)
     {
-        element.Id = _elementIdGenerator.GetId();
+        element.Id = (ElementId)_elementIdGenerator.GetId();
         lock (_lock)
         {
             _lastCreatedElement = element;

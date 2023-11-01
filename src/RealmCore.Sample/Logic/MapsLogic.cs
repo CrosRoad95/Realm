@@ -1,15 +1,19 @@
-﻿namespace RealmCore.Sample.Logic;
+﻿using RealmCore.Server.Registries;
+
+namespace RealmCore.Sample.Logic;
 
 internal class MapsLogic
 {
     private readonly IMapsService _mapsService;
-    private readonly IElementFactory _elementFactory;
+    private readonly MapsRegistry _mapsRegistry;
+    private readonly ILogger<MapsLogic> _logger;
 
-    public MapsLogic(IMapsService mapsService, IElementFactory elementFactory)
+    public MapsLogic(IMapsService mapsService, MapsRegistry mapsRegistry, ILogger<MapsLogic> logger)
     {
         _mapsService = mapsService;
-        _elementFactory = elementFactory;
-        _elementFactory.ElementCreated += HandleElementCreated;
+        _mapsRegistry = mapsRegistry;
+        _logger = logger;
+        _mapsRegistry.MapChanged += HandleMapChanged;
 
         //mapsService.RegisterMapFromMemory("testmap", new List<WorldObject>
         //{
@@ -20,13 +24,14 @@ internal class MapsLogic
         //});
 
         //mapsService.RegisterMapsPath("C:\\Users\\sebaj\\source\\repos\\RealmCore\\src\\RealmCore.BlazorGui\\bin\\Debug\\net8.0\\Server\\Maps");
-        mapsService.RegisterMapsPath("Server/Maps");
+        mapsRegistry.RegisterMapsPath("Server/Maps", mapsService);
         //mapsService.RegisterMapFromXml("testmapxml", "Server/Maps/test.map");
     }
 
-    private void HandleElementCreated(Element element)
+    private void HandleMapChanged(string mapName, Server.World.Maps.MapEventType mapEventType)
     {
-        if(element is RealmPlayer player)
-            _mapsService.LoadAllMapsFor(player);
+        _logger.LogInformation("Map {mapName} {mapEventType}", mapName, mapEventType);
+        //if (mapEventType == Server.World.Maps.MapEventType.Add)
+        //    _mapsService.Load(mapName);
     }
 }

@@ -2,12 +2,8 @@
 
 public interface IMapsService
 {
-    List<string> Maps { get; }
-
-    void LoadAllMapsFor(RealmPlayer player);
-    void LoadMapFor(string name, RealmPlayer player);
-    void RegisterMapFromMemory(string name, IEnumerable<WorldObject> worldObjects);
-    Map RegisterMapFromMapFile(string name, string fileName);
-    MapsWatcherRegistration RegisterMapsPath(string path);
-    void LoadMapForAll(Map map);
+    IReadOnlyList<string> LoadedMaps { get; }
+    bool IsLoaded(string name);
+    bool Load(string name);
+    bool Unload(string name);
 }

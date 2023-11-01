@@ -3,16 +3,16 @@
 public struct MapsWatcherRegistration
 {
     private readonly MapsDirectoryWatcher _mapsDirectoryWatcher;
-    private readonly MapsService _mapsService;
+    private readonly MapsRegistry _mapsRegistry;
 
-    internal MapsWatcherRegistration(MapsDirectoryWatcher mapsDirectoryWatcher, MapsService mapsService)
+    internal MapsWatcherRegistration(MapsDirectoryWatcher mapsDirectoryWatcher, MapsRegistry mapsRegistry)
     {
         _mapsDirectoryWatcher = mapsDirectoryWatcher;
-        _mapsService = mapsService;
+        _mapsRegistry = mapsRegistry;
     }
 
     public void Unregister()
     {
-        _mapsService.UnregisterWatcher(_mapsDirectoryWatcher);
+        _mapsRegistry.UnregisterWatcher(_mapsDirectoryWatcher);
     }
 }

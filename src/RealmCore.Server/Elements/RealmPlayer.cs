@@ -34,14 +34,9 @@ public class RealmPlayer : Player, IComponents
 
     public Element? FocusedElement
     {
-        get
-        {
-            this.ThrowIfDestroyed();
-            return _focusedElement;
-        }
+        get => _focusedElement;
         internal set
         {
-            this.ThrowIfDestroyed();
             if (value != _focusedElement)
             {
                 _focusedElement = value;
@@ -52,14 +47,9 @@ public class RealmPlayer : Player, IComponents
 
     public Element? LastClickedElement
     {
-        get
-        {
-            this.ThrowIfDestroyed();
-            return _lastClickedElement;
-        }
+        get => _lastClickedElement;
         internal set
         {
-            this.ThrowIfDestroyed();
             if (value != _lastClickedElement)
             {
                 _lastClickedElement = value;
@@ -68,15 +58,7 @@ public class RealmPlayer : Player, IComponents
         }
     }
 
-    public CultureInfo Culture
-    {
-        get
-        {
-            this.ThrowIfDestroyed();
-            return _culture;
-        }
-    }
-
+    public CultureInfo Culture => _culture;
     private bool _isLoggedIn = false;
     public bool IsLoggedIn => _isLoggedIn;
 
@@ -162,7 +144,6 @@ public class RealmPlayer : Player, IComponents
 
     public bool AddEnableFightFlag(short flag)
     {
-        this.ThrowIfDestroyed();
         lock (_enableFightFlagsLock)
         {
             if (!_enableFightFlags.Contains(flag))
@@ -177,7 +158,6 @@ public class RealmPlayer : Player, IComponents
 
     public bool RemoveEnableFightFlag(short flag)
     {
-        this.ThrowIfDestroyed();
         lock (_enableFightFlagsLock)
         {
             if (_enableFightFlags.Contains(flag))
@@ -192,7 +172,6 @@ public class RealmPlayer : Player, IComponents
 
     public bool TrySpawnAtLastPosition()
     {
-        this.ThrowIfDestroyed();
         var userComponent = Components.GetComponent<UserComponent>();
         if (userComponent != null)
         {
@@ -217,7 +196,6 @@ public class RealmPlayer : Player, IComponents
 
     public async Task FadeCameraAsync(CameraFade cameraFade, float fadeTime = 0.5f, CancellationToken cancellationToken = default)
     {
-        this.ThrowIfDestroyed();
         Camera.Fade(cameraFade, fadeTime);
         try
         {
@@ -232,8 +210,6 @@ public class RealmPlayer : Player, IComponents
 
     public void SetBindAsync(string key, Func<RealmPlayer, KeyState, Task> callback)
     {
-        this.ThrowIfDestroyed();
-
         _bindsLock.Wait();
         if (_asyncBinds.ContainsKey(key))
         {
@@ -248,7 +224,6 @@ public class RealmPlayer : Player, IComponents
 
     public void SetBindAsync(string key, Func<RealmPlayer, Task> callback)
     {
-        this.ThrowIfDestroyed();
         _bindsLock.Wait();
         if (_asyncBinds.ContainsKey(key))
         {
@@ -267,8 +242,6 @@ public class RealmPlayer : Player, IComponents
 
     public void SetBind(string key, Action<RealmPlayer, KeyState> callback)
     {
-        this.ThrowIfDestroyed();
-
         _bindsLock.Wait();
         if (_asyncBinds.ContainsKey(key))
         {
@@ -283,7 +256,6 @@ public class RealmPlayer : Player, IComponents
 
     public void SetBind(string key, Action<RealmPlayer> callback)
     {
-        this.ThrowIfDestroyed();
         _bindsLock.Wait();
         if (_binds.ContainsKey(key))
         {
@@ -302,7 +274,6 @@ public class RealmPlayer : Player, IComponents
 
     public void Unbind(string key)
     {
-        this.ThrowIfDestroyed();
         _bindsLock.Wait();
         if (!_asyncBinds.ContainsKey(key) || !_binds.ContainsKey(key))
         {
@@ -319,7 +290,6 @@ public class RealmPlayer : Player, IComponents
 
     public void RemoveAllBinds()
     {
-        this.ThrowIfDestroyed();
         _bindsLock.Wait();
         foreach (var pair in _asyncBinds)
             RemoveBind(pair.Key, KeyState.Both);
@@ -334,8 +304,6 @@ public class RealmPlayer : Player, IComponents
 
     public void ResetCooldown(string key, KeyState keyState = KeyState.Down)
     {
-        this.ThrowIfDestroyed();
-
         lock (_bindsCooldownLock)
         {
             if (keyState == KeyState.Down)
@@ -378,8 +346,6 @@ public class RealmPlayer : Player, IComponents
 
     public bool IsCooldownActive(string key, KeyState keyState = KeyState.Down)
     {
-        this.ThrowIfDestroyed();
-
         if (keyState == KeyState.Down)
             _bindsDownLock.Wait();
         else
@@ -427,8 +393,6 @@ public class RealmPlayer : Player, IComponents
 
     internal async Task InternalHandleBindExecuted(string key, KeyState keyState)
     {
-        this.ThrowIfDestroyed();
-
         if (IsCooldownActive(key, keyState))
             return;
 
@@ -463,8 +427,6 @@ public class RealmPlayer : Player, IComponents
 
     public async Task DoComplexAnimationAsync(Animation animation, bool blockMovement = true)
     {
-        this.ThrowIfDestroyed();
-
         using var scope = new ToggleControlsScope(this);
         if (blockMovement)
         {
@@ -498,8 +460,6 @@ public class RealmPlayer : Player, IComponents
 
     public void DoAnimation(Animation animation, TimeSpan? timeSpan = null)
     {
-        this.ThrowIfDestroyed();
-
         DoAnimationInternal(animation, ref timeSpan);
     }
 
@@ -562,8 +522,6 @@ public class RealmPlayer : Player, IComponents
 
     public async Task DoAnimationAsync(Animation animation, TimeSpan? timeSpan = null, bool blockMovement = true)
     {
-        this.ThrowIfDestroyed();
-
         using var scope = new ToggleControlsScope(this);
         if (blockMovement)
         {

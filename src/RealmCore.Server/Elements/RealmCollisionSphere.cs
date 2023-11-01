@@ -67,7 +67,6 @@ public class RealmCollisionSphere : CollisionSphere, IComponents
 
     public void AddRule<TElementRule>() where TElementRule : IElementRule, new()
     {
-        this.ThrowIfDestroyed();
         _elementRules.Add(new TElementRule());
     }
 

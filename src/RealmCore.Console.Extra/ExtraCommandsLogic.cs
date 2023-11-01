@@ -21,7 +21,7 @@ internal class ExtraCommandsLogic
 
         _discordService.AddTextBasedCommandHandler(997787973775011853, "gracze", async (userId, parameters) =>
         {
-            var players = _elementCollection.GetByType<Player>();
+            var players = _elementCollection.GetByType<RealmPlayer>();
             await _discordService.SendMessage(997787973775011853, $"Gracze na serwerze: {string.Join(", ", players.Select(x => x.Name))}");
         });
 

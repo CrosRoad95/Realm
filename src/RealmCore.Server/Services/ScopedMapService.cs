@@ -1,11 +1,11 @@
 ﻿namespace RealmCore.Server.Services;
 
-internal sealed class MapsService : IMapsService
+internal sealed class ScopedMapService : IScopedMapsService
 {
     private readonly object _lock = new();
     private readonly ILogger<MapsService> _logger;
-    private readonly IElementCollection _elementCollection;
     private readonly MapsRegistry _mapsRegistry;
+    private readonly RealmPlayer _player;
     private readonly List<string> _loadedMaps = [];
 
     public IReadOnlyList<string> LoadedMaps
@@ -13,15 +13,15 @@ internal sealed class MapsService : IMapsService
         get
         {
             lock (_lock)
-                return [.._loadedMaps];
+                return [.. _loadedMaps];
         }
     }
 
-    public MapsService(ILogger<MapsService> logger, IElementCollection elementCollection, MapsRegistry mapsRegistry)
+    public ScopedMapService(ILogger<MapsService> logger, MapsRegistry mapsRegistry, PlayerContext playerContext)
     {
         _logger = logger;
-        _elementCollection = elementCollection;
         _mapsRegistry = mapsRegistry;
+        _player = playerContext.Player;
     }
 
     public bool IsLoaded(string name)
@@ -42,26 +42,7 @@ internal sealed class MapsService : IMapsService
             if (_loadedMaps.Contains(name))
                 return false;
             _loadedMaps.Add(name);
-            foreach (var player in _elementCollection.GetByType<RealmPlayer>())
-            {
-                map.LoadFor(player);
-            }
-            return true;
-        }
-    }
-    
-    public bool LoadFor(string name)
-    {
-        var map = _mapsRegistry.GetByName(name);
-        lock (_lock)
-        {
-            if (_loadedMaps.Contains(name))
-                return false;
-            _loadedMaps.Add(name);
-            foreach (var player in _elementCollection.GetByType<RealmPlayer>())
-            {
-                map.LoadFor(player);
-            }
+            map.LoadFor(_player);
             return true;
         }
     }
@@ -72,12 +53,9 @@ internal sealed class MapsService : IMapsService
         lock (_lock)
         {
             if (!_loadedMaps.Contains(name))
-                return false; 
+                return false;
             _loadedMaps.Remove(name);
-            foreach (var player in _elementCollection.GetByType<RealmPlayer>())
-            {
-                map.UnloadFor(player);
-            }
+            map.UnloadFor(_player);
             return true;
         }
     }

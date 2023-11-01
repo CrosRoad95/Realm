@@ -70,7 +70,6 @@ public class RealmMarker : Marker, IComponents
 
     public void AddRule<TElementRule>() where TElementRule : IElementRule, new()
     {
-        this.ThrowIfDestroyed();
         _elementRules.Add(new TElementRule());
     }
 

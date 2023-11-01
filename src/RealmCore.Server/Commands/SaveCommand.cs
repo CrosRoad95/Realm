@@ -17,7 +17,7 @@ internal class SaveCommand : ICommand
     public async Task Handle(RealmPlayer player, CommandArguments args)
     {
         int savedElements = 0;
-        foreach (var element in _elementCollection.GetByType<Player>())
+        foreach (var element in _elementCollection.GetByType<RealmPlayer>())
         {
             using var _ = _logger.BeginElement(element);
             try

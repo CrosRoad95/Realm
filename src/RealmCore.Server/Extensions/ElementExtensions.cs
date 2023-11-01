@@ -18,12 +18,6 @@ public static class ElementExtensions
         return length;
     }
 
-    public static void ThrowIfDestroyed(this Element element)
-    {
-        if (element.IsDestroyed)
-            throw new ElementDestroyedException();
-    }
-
     public static TransformAndMotion GetTransformAndMotion(this Element element) => new()
     {
         Position = element.Position,

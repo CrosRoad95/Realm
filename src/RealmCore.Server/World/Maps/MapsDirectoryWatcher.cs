@@ -1,11 +1,12 @@
 ﻿namespace RealmCore.Server.World.Maps;
 
+public enum MapEventType
+{
+    Add, Remove, Update
+}
+
 internal class MapsDirectoryWatcher : IDisposable
 {
-    private enum MapEventType
-    {
-        Add, Remove, Update
-    }
 
     private struct MapEvent
     {
@@ -15,14 +16,18 @@ internal class MapsDirectoryWatcher : IDisposable
 
     private readonly FileSystemWatcher _fileSystemWatcher;
     private readonly string _path;
-    private readonly MapsService _mapsService;
+    private readonly MapsRegistry _mapsRegistry;
+    private readonly IMapsService _mapsService;
     private readonly List<MapEvent> _mapEvents = new();
     private readonly object _mapEventsLock = new();
     private readonly Debounce _debounce = new(250);
 
-    public MapsDirectoryWatcher(string path, MapsService mapsService)
+    public event Action<string, MapEventType>? MapChanged;
+
+    public MapsDirectoryWatcher(string path, MapsRegistry mapsRegistry, IMapsService mapsService)
     {
         _path = path;
+        _mapsRegistry = mapsRegistry;
         _mapsService = mapsService;
         string searchPattern = "*.map";
         _fileSystemWatcher = new FileSystemWatcher
@@ -84,28 +89,36 @@ internal class MapsDirectoryWatcher : IDisposable
             _mapEvents.Clear();
         }
 
+        List<string> _loadedMaps = [];
         foreach (var mapFile in mapEvents.Where(x => x.mapEventType == MapEventType.Remove).Select(x => x.mapName))
         {
             var mapName = GetMapName(mapFile);
 
-            _mapsService.RemoveMapByName(mapName);
+            if (_mapsService.IsLoaded(mapName))
+                _loadedMaps.Add(mapName);
+            _mapsRegistry.RemoveMapByName(mapName);
+            MapChanged?.Invoke(mapName, MapEventType.Remove);
         }
 
         foreach (var mapFile in mapEvents.Where(x => x.mapEventType == MapEventType.Add).Select(x => x.mapName))
         {
             var mapName = GetMapName(mapFile);
 
-            var map = _mapsService.RegisterMapFromMapFile(mapName, Path.Combine(_path, mapFile));
-            _mapsService.LoadMapForAll(map);
+            var map = _mapsRegistry.RegisterMapFromMapFile(mapName, Path.Combine(_path, mapFile));
+            if(_loadedMaps.Contains(mapName))
+                _mapsService.Load(mapName);
+            MapChanged?.Invoke(mapName, MapEventType.Add);
         }
 
         foreach (var mapFile in mapEvents.Where(x => x.mapEventType == MapEventType.Update).Select(x => x.mapName))
         {
             var mapName = GetMapName(mapFile);
 
-            _mapsService.RemoveMapByName(mapName);
-            var map = _mapsService.RegisterMapFromMapFile(mapName, Path.Combine(_path, mapFile));
-            _mapsService.LoadMapForAll(map);
+            _mapsService.Unload(mapName);
+            _mapsRegistry.RemoveMapByName(mapName);
+            var map = _mapsRegistry.RegisterMapFromMapFile(mapName, Path.Combine(_path, mapFile));
+            _mapsService.Load(mapName);
+            MapChanged?.Invoke(mapName, MapEventType.Update);
         }
     }
 

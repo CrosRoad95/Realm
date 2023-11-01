@@ -226,7 +226,7 @@ internal sealed class UsersService : IUsersService
 
     public bool TryGetPlayerByName(string name, out RealmPlayer? foundPlayer)
     {
-        var player = _elementCollection.GetByType<Player>().Where(x => x.Name == name).FirstOrDefault();
+        var player = _elementCollection.GetByType<RealmPlayer>().Where(x => x.Name == name).FirstOrDefault();
         if (player == null)
         {
             foundPlayer = null!;
@@ -259,7 +259,7 @@ internal sealed class UsersService : IUsersService
 
     public IEnumerable<RealmPlayer> SearchPlayersByName(string pattern)
     {
-        var players = _elementCollection.GetByType<Player>().Where(x => x.Name.Contains(pattern.ToLower(), StringComparison.CurrentCultureIgnoreCase));
+        var players = _elementCollection.GetByType<RealmPlayer>().Where(x => x.Name.Contains(pattern.ToLower(), StringComparison.CurrentCultureIgnoreCase));
         foreach (var player in players)
         {
             yield return (RealmPlayer)player;
@@ -268,7 +268,7 @@ internal sealed class UsersService : IUsersService
 
     public bool TryFindPlayerBySerial(string serial, out RealmPlayer? foundPlayer)
     {
-        foreach (var player in _elementCollection.GetByType<Player>())
+        foreach (var player in _elementCollection.GetByType<RealmPlayer>())
         {
             if(player.Client.Serial == serial)
             {
