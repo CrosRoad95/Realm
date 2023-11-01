@@ -1,5 +1,4 @@
-﻿
-namespace RealmCore.Server.Components.Vehicles.Access;
+﻿namespace RealmCore.Server.Components.Vehicles.Access;
 
 public class VehicleExclusiveAccessComponent : VehicleAccessControllerComponent
 {
@@ -13,8 +12,8 @@ public class VehicleExclusiveAccessComponent : VehicleAccessControllerComponent
 
     private void HandleTargetElementDestroyed(Element obj)
     {
-        if(Element is RealmVehicle realmVehicle)
-            realmVehicle.Components.DestroyComponent(this);
+        if(Element is RealmVehicle vehicle)
+            vehicle.DestroyComponent(this);
         _ped.Destroyed -= HandleTargetElementDestroyed;
     }
 

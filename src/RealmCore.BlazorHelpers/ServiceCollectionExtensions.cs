@@ -9,6 +9,7 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<RealmServer>(realmServer);
         services.AddSingleton(realmServer);
         services.AddScoped(typeof(IRealmService<>), typeof(RealmService<>));
+        services.AddScoped(typeof(IRealmPlayerService<>), typeof(RealmPlayerService<>));
         services.AddHostedService<RealmServerHostedService>();
         return services;
     }

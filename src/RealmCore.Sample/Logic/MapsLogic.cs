@@ -1,6 +1,4 @@
-﻿using RealmCore.Server.Registries;
-
-namespace RealmCore.Sample.Logic;
+﻿namespace RealmCore.Sample.Logic;
 
 internal class MapsLogic
 {
@@ -31,7 +29,7 @@ internal class MapsLogic
     private void HandleMapChanged(string mapName, Server.World.Maps.MapEventType mapEventType)
     {
         _logger.LogInformation("Map {mapName} {mapEventType}", mapName, mapEventType);
-        //if (mapEventType == Server.World.Maps.MapEventType.Add)
-        //    _mapsService.Load(mapName);
+        if (mapEventType == Server.World.Maps.MapEventType.Add)
+            _mapsService.Load(mapName);
     }
 }

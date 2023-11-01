@@ -78,7 +78,7 @@ internal sealed class VehiclesService : IVehiclesService
 
     public async Task Destroy(RealmVehicle vehicle)
     {
-        await _vehicleRepository.SetSpawned(vehicle.Components.GetRequiredComponent<PrivateVehicleComponent>().Id, false);
+        await _vehicleRepository.SetSpawned(vehicle.GetRequiredComponent<PrivateVehicleComponent>().Id, false);
         await _saveService.BeginSave(vehicle);
         await _saveService.Commit();
         vehicle.Destroy();

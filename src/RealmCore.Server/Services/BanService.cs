@@ -19,8 +19,7 @@ internal sealed class BanService : IBanService
 
     public async Task<BanDTO> BanUser(RealmPlayer player, DateTime? until = null, string? reason = null, string? responsible = null, int type = 0, CancellationToken cancellationToken = default)
     {
-        var userComponent = player.GetRequiredComponent<UserComponent>();
-        return Map(await _banRepository.CreateBanForUser(userComponent.Id, until, reason, responsible, type, cancellationToken));
+        return Map(await _banRepository.CreateBanForUser(player.GetUserId(), until, reason, responsible, type, cancellationToken));
     }
 
     public async Task<BanDTO> BanPlayer(RealmPlayer player, DateTime? until = null, string? reason = null, string? responsible = null, int type = 0, CancellationToken cancellationToken = default)
@@ -31,9 +30,8 @@ internal sealed class BanService : IBanService
 
     public async Task<BanDTO> Ban(RealmPlayer player, DateTime? until = null, string? reason = null, string? responsible = null, int type = 0, CancellationToken cancellationToken = default)
     {
-        var userComponent = player.GetRequiredComponent<UserComponent>();
         var serial = player.Client.GetSerial();
-        var banDTO = Map(await _banRepository.CreateBanForUserIdAndSerial(userComponent.Id, serial, until, reason, responsible, type, cancellationToken));
+        var banDTO = Map(await _banRepository.CreateBanForUserIdAndSerial(player.GetUserId(), serial, until, reason, responsible, type, cancellationToken));
         Banned?.Invoke(banDTO);
         return banDTO;
     }

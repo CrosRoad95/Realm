@@ -17,8 +17,8 @@ public static class LoggerExtensions
             case RealmPlayer player:
                 data["name"] = player.Name;
                 data["serial"] = player.Client.TryGetSerial();
-                if (player.TryGetComponent(out UserComponent userComponent))
-                    data["userId"] = userComponent.Id;
+                if(player.UserId != null)
+                    data["userId"] = player.UserId;
                 break;
         }
 

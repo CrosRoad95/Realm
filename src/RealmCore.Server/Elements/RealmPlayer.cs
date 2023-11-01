@@ -59,8 +59,8 @@ public class RealmPlayer : Player, IComponents
     }
 
     public CultureInfo Culture => _culture;
-    private bool _isLoggedIn = false;
-    public bool IsLoggedIn => _isLoggedIn;
+    public bool IsLoggedIn { get; private set; }
+    public int? UserId { get; private set; }
 
     public RealmPlayer(IServiceProvider serviceProvider)
     {
@@ -75,19 +75,23 @@ public class RealmPlayer : Player, IComponents
         Components.ComponentDetached += HandleComponentDetached;
     }
 
+    public int GetUserId() => UserId ?? throw new InvalidOperationException();
+
     private void HandleComponentAdded(IComponent component)
     {
         if (component is UserComponent userComponent)
         {
-            _isLoggedIn = true;
+            IsLoggedIn = true;
+            UserId = userComponent.Id;
         }
     }
 
     private void HandleComponentDetached(IComponent component)
     {
-        if(component is UserComponent userComponent)
+        if(component is UserComponent)
         {
-            _isLoggedIn = false;
+            IsLoggedIn = false;
+            UserId = null;
         }
     }
 
@@ -551,5 +555,7 @@ public class RealmPlayer : Player, IComponents
     {
         _serviceScope.Dispose();
         _cancellationTokenSource?.Dispose();
+        Components.ComponentAdded -= HandleComponentAdded;
+        Components.ComponentDetached -= HandleComponentDetached;
     }
 }

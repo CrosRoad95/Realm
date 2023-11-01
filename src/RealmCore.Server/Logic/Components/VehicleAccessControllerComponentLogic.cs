@@ -13,11 +13,10 @@ internal sealed class VehicleAccessControllerComponentLogic : ComponentLogic<Veh
 
     protected override void ComponentAdded(VehicleAccessControllerComponent vehicleAccessControllerComponent)
     {
-        var realmVehicle = (RealmVehicle)vehicleAccessControllerComponent.Element;
-        realmVehicle.CanEnter = (ped, vehicle) =>
+        var vehicle = (RealmVehicle)vehicleAccessControllerComponent.Element;
+        vehicle.CanEnter = (ped, vehicle, seat) =>
         {
-            // TODO: add seat
-            if (!_vehicleAccessService.InternalCanEnter(ped, (RealmVehicle)vehicle, 0, vehicleAccessControllerComponent))
+            if (!_vehicleAccessService.InternalCanEnter(ped, (RealmVehicle)vehicle, seat, vehicleAccessControllerComponent))
                 return false;
 
             return true;
@@ -26,7 +25,7 @@ internal sealed class VehicleAccessControllerComponentLogic : ComponentLogic<Veh
 
     protected override void ComponentDetached(VehicleAccessControllerComponent vehicleAccessControllerComponent)
     {
-        var realmVehicle = (RealmVehicle)vehicleAccessControllerComponent.Element;
-        realmVehicle.CanEnter = null;
+        var vehicle = (RealmVehicle)vehicleAccessControllerComponent.Element;
+        vehicle.CanEnter = null;
     }
 }
