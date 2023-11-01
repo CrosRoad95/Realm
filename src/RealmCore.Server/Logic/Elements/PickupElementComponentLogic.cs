@@ -1,89 +1,59 @@
 ﻿namespace RealmCore.Server.Logic.Elements;
 
-internal sealed class PickupElementComponentLogic : ComponentLogic<PickupElementComponent>
+internal sealed class PickupElementComponentLogic
 {
-    private readonly IEntityEngine _entityEngine;
+    private readonly IElementFactory _elementFactory;
     private readonly ILogger<PickupElementComponentLogic> _logger;
 
-    public PickupElementComponentLogic(IEntityEngine entityEngine, ILogger<PickupElementComponentLogic> logger) : base(entityEngine)
+    public PickupElementComponentLogic(IElementFactory elementFactory, ILogger<PickupElementComponentLogic> logger)
     {
-        _entityEngine = entityEngine;
+        _elementFactory = elementFactory;
         _logger = logger;
+        _elementFactory.ElementCreated += HandleElementCreated;
     }
 
-    protected override void ComponentAdded(PickupElementComponent pickupElementComponent)
+    private void HandleElementCreated(Element element)
     {
-        pickupElementComponent.ElementEntered += HandleElementEntered;
-        pickupElementComponent.ElementLeft += HandleElementLeft;
-    }
-
-    private void HandleElementEntered(PickupElementComponent pickupElementComponent, Element element)
-    {
-        if (pickupElementComponent.EntityEntered == null)
+        if(element is not RealmPickup pickup)
             return;
 
-        if (element is not IElementComponent elementComponent)
-            return;
-        var entity = elementComponent.Entity;
-
-        var tag = entity.GetRequiredComponent<TagComponent>();
-        if (tag is not PlayerTagComponent or VehicleTagComponent)
-            return;
-
-        try
+        void HandleElementEntered(Element element)
         {
-            if (!pickupElementComponent.CheckRules(entity))
-                return;
-        }
-        catch (Exception ex)
-        {
-            _logger.LogHandleError(ex);
-            return;
+            try
+            {
+                if (pickup.CheckRules(element))
+                {
+                    pickup.RelayEntered(element);
+                }
+            }
+            catch(Exception ex)
+            {
+                _logger.LogHandleError(ex);
+            }
         }
 
-        try
+        void HandleElementLeft(Element element)
         {
-            pickupElementComponent.EntityEntered(pickupElementComponent.Entity, entity);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogHandleError(ex);
-            return;
-        }
-    }
-
-    private void HandleElementLeft(PickupElementComponent pickupElementComponent, Element element)
-    {
-        if (pickupElementComponent.EntityLeft == null)
-            return;
-
-        if (element is not IElementComponent elementComponent)
-            return;
-        var entity = elementComponent.Entity;
-
-        var tag = entity.GetRequiredComponent<TagComponent>();
-        if (tag is not PlayerTagComponent or VehicleTagComponent)
-            return;
-
-        try
-        {
-            if (!pickupElementComponent.CheckRules(entity))
-                return;
-        }
-        catch (Exception ex)
-        {
-            _logger.LogHandleError(ex);
-            return;
+            try
+            {
+                pickup.RelayLeft(element);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogHandleError(ex);
+            }
         }
 
-        try
+        void HandleDestroyed(Element element)
         {
-            pickupElementComponent.EntityLeft(pickupElementComponent.Entity, entity);
+            var pickup = (RealmPickup)element;
+            pickup.CollisionShape.ElementEntered -= HandleElementEntered;
+            pickup.CollisionShape.ElementLeft -= HandleElementLeft;
+            pickup.Destroyed -= HandleDestroyed;
         }
-        catch (Exception ex)
-        {
-            _logger.LogHandleError(ex);
-            return;
-        }
+
+        pickup.CollisionShape.ElementEntered += HandleElementEntered;
+        pickup.CollisionShape.ElementLeft += HandleElementLeft;
+        pickup.Destroyed += HandleDestroyed;
     }
 }

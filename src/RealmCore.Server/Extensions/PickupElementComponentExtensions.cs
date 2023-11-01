@@ -4,80 +4,111 @@ namespace RealmCore.Server.Extensions;
 
 public static class PickupElementComponentExtensions
 {
-    public static void AddOpenGuiLogic<TGui>(this PickupElementComponent pickupElementComponent) where TGui : GuiComponent, new()
+    public static void AddOpenGuiLogic<TGui>(this RealmPickup pickup) where TGui : GuiComponent, new()
     {
-        pickupElementComponent.EntityEntered = (enteredPickup, entity) =>
+        pickup.Entered += (enteredPickup, element) =>
         {
-            if (!entity.HasComponent<GuiComponent>())
-                entity.AddComponent(new TGui());
+            if (element is IComponents components)
+            {
+                if (!components.HasComponent<GuiComponent>())
+                    components.AddComponent(new TGui());
+            }
         };
-        pickupElementComponent.EntityLeft = (leftPickup, entity) =>
+        pickup.Left += (leftPickup, element) =>
         {
-            if (entity.HasComponent<TGui>())
-                entity.DestroyComponent<TGui>();
+            if (element is IComponents components)
+            {
+                if (components.HasComponent<TGui>())
+                    components.DestroyComponent<TGui>();
+            }
         };
     }
 
-    public static void AddOpenGuiLogic<TGui1, TGui2>(this PickupElementComponent pickupElementComponent)
+    public static void AddOpenGuiLogic<TGui1, TGui2>(this RealmPickup pickup)
         where TGui1 : GuiComponent, new()
         where TGui2 : GuiComponent, new()
     {
-        pickupElementComponent.EntityEntered = (enteredPickup, entity) =>
+        pickup.Entered += (enteredPickup, element) =>
         {
-            if (!entity.HasComponent<GuiComponent>())
+            if (element is IComponents components)
             {
-                entity.AddComponent(new TGui1());
-                entity.AddComponent(new TGui2());
+                if (!components.HasComponent<GuiComponent>())
+                {
+                    components.AddComponent(new TGui1());
+                    components.AddComponent(new TGui2());
+                }
             }
         };
-        pickupElementComponent.EntityLeft = (leftPickup, entity) =>
+        pickup.Left += (leftPickup, element) =>
         {
-            if (entity.HasComponent<TGui1>())
-                entity.DestroyComponent<TGui1>();
-            if (entity.HasComponent<TGui2>())
-                entity.DestroyComponent<TGui2>();
+            if (element is IComponents components)
+            {
+                if (components.HasComponent<TGui1>())
+                    components.DestroyComponent<TGui1>();
+                if (components.HasComponent<TGui2>())
+                    components.DestroyComponent<TGui2>();
+            }
         };
     }
 
-    public static void AddOpenGuiPageLogic<TGui>(this PickupElementComponent pickupElementComponent) where TGui : BrowserGuiComponent, new()
+    public static void AddOpenGuiPageLogic<TGui>(this RealmPickup pickup) where TGui : BrowserGuiComponent, new()
     {
-        pickupElementComponent.EntityEntered = (enteredPickup, entity) =>
+        pickup.Entered += (enteredPickup, element) =>
         {
-            if (!entity.HasComponent<BrowserGuiComponent>())
-                entity.AddComponent(new TGui());
+            if (element is IComponents components)
+            {
+                if (!components.HasComponent<BrowserGuiComponent>())
+                    components.AddComponent(new TGui());
+            }
         };
-        pickupElementComponent.EntityLeft = (leftPickup, entity) =>
+        pickup.Left += (leftPickup, element) =>
         {
-            if (entity.HasComponent<TGui>())
-                entity.DestroyComponent<TGui>();
+            if (element is IComponents components)
+            {
+                if (components.HasComponent<TGui>())
+                    components.DestroyComponent<TGui>();
+            }
         };
     }
-    
-    public static void AddOpenGuiPageLogic<TGui>(this PickupElementComponent pickupElementComponent, Func<TGui> factory) where TGui : BrowserGuiComponent, new()
+
+    public static void AddOpenGuiPageLogic<TGui>(this RealmPickup pickup, Func<TGui> factory) where TGui : BrowserGuiComponent, new()
     {
-        pickupElementComponent.EntityEntered = (enteredPickup, entity) =>
+        pickup.Entered += (enteredPickup, element) =>
         {
-            if (!entity.HasComponent<BrowserGuiComponent>())
-                entity.AddComponent(factory());
+            if (element is IComponents components)
+            {
+                if (!components.HasComponent<BrowserGuiComponent>())
+                    components.AddComponent(factory());
+            }
         };
-        pickupElementComponent.EntityLeft = (leftPickup, entity) =>
+        pickup.Left += (leftPickup, element) =>
         {
-            if (entity.HasComponent<TGui>())
-                entity.DestroyComponent<TGui>();
+            if (element is IComponents components)
+            {
+
+                if (components.HasComponent<TGui>())
+                    components.DestroyComponent<TGui>();
+            }
         };
     }
-    
-    public static void AddAsyncOpenGuiPageLogic<TGui>(this PickupElementComponent pickupElementComponent, Func<Task<TGui>> factory) where TGui : BrowserGuiComponent, new()
+
+    public static void AddAsyncOpenGuiPageLogic<TGui>(this RealmPickup pickup, Func<Task<TGui>> factory) where TGui : BrowserGuiComponent, new()
     {
-        pickupElementComponent.EntityEntered = async (enteredPickup, entity) =>
+        pickup.Entered += async (enteredPickup, element) =>
         {
-            if (!entity.HasComponent<BrowserGuiComponent>())
-                entity.AddComponent(await factory());
+            if (element is IComponents components)
+            {
+                if (!components.HasComponent<BrowserGuiComponent>())
+                    components.AddComponent(await factory());
+            }
         };
-        pickupElementComponent.EntityLeft = (leftPickup, entity) =>
+        pickup.Left += (leftPickup, element) =>
         {
-            if (entity.HasComponent<TGui>())
-                entity.DestroyComponent<TGui>();
+            if (element is IComponents components)
+            {
+                if (components.HasComponent<TGui>())
+                    components.DestroyComponent<TGui>();
+            }
         };
     }
 

@@ -4,7 +4,7 @@ internal sealed class InventoryComponentLogic : ComponentLogic<InventoryComponen
 {
     private readonly ISaveService _saveService;
 
-    public InventoryComponentLogic(IEntityEngine entityEngine, ISaveService saveService) : base(entityEngine)
+    public InventoryComponentLogic(IElementFactory elementFactory, ISaveService saveService) : base(elementFactory)
     {
         _saveService = saveService;
     }
@@ -14,16 +14,18 @@ internal sealed class InventoryComponentLogic : ComponentLogic<InventoryComponen
         if (inventoryComponent.Id != 0)
             return;
 
-        var entity = inventoryComponent.Entity;
-        if (entity.TryGetComponent(out UserComponent userComponent))
+        if (inventoryComponent.Element is IComponents components)
         {
-            var inventoryId = await _saveService.SaveNewPlayerInventory(inventoryComponent, userComponent.Id);
-            inventoryComponent.Id = inventoryId;
-        }
-        else if (entity.TryGetComponent(out PrivateVehicleComponent vehicle))
-        {
-            var inventoryId = await _saveService.SaveNewVehicleInventory(inventoryComponent, vehicle.Id);
-            inventoryComponent.Id = inventoryId;
+            if (components.TryGetComponent(out UserComponent userComponent))
+            {
+                var inventoryId = await _saveService.SaveNewPlayerInventory(inventoryComponent, userComponent.Id);
+                inventoryComponent.Id = inventoryId;
+            }
+            else if (components.TryGetComponent(out PrivateVehicleComponent vehicle))
+            {
+                var inventoryId = await _saveService.SaveNewVehicleInventory(inventoryComponent, vehicle.Id);
+                inventoryComponent.Id = inventoryId;
+            }
         }
     }
 }

@@ -14,9 +14,9 @@ public sealed class GiveItemCommand : IInGameCommand
         _chatBox = chatBox;
     }
 
-    public Task Handle(Entity entity, CommandArguments args)
+    public Task Handle(RealmPlayer player, CommandArguments args)
     {
-        if (entity.TryGetComponent(out InventoryComponent inventoryComponent))
+        if (player.Components.TryGetComponent(out InventoryComponent inventoryComponent))
         {
             uint itemId = args.ReadUInt();
             uint count = args.ReadUInt();
@@ -24,7 +24,7 @@ public sealed class GiveItemCommand : IInGameCommand
             {
                 ["foo"] = 10
             });
-            _chatBox.OutputTo(entity, $"Item added, {inventoryComponent.Number}/{inventoryComponent.Size}");
+            _chatBox.OutputTo(player, $"Item added, {inventoryComponent.Number}/{inventoryComponent.Size}");
         }
 
         return Task.CompletedTask;

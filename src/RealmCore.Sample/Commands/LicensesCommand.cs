@@ -12,15 +12,14 @@ public sealed class LicensesCommand : IInGameCommand
         _chatBox = chatBox;
     }
 
-    public Task Handle(Entity entity, CommandArguments args)
+    public Task Handle(RealmPlayer player, CommandArguments args)
     {
-        if (entity.TryGetComponent(out LicensesComponent licenseComponent))
+        if (player.Components.TryGetComponent(out LicensesComponent licenseComponent))
         {
-            var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();
-            _chatBox.OutputTo(entity, $"Licenses");
+            _chatBox.OutputTo(player, $"Licenses");
             foreach (var license in licenseComponent.Licenses)
             {
-                _chatBox.OutputTo(entity, $"License: {license.licenseId} = {license.IsSuspended}");
+                _chatBox.OutputTo(player, $"License: {license.licenseId} = {license.IsSuspended}");
             }
 
         }

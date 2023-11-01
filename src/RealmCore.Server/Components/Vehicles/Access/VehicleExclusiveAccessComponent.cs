@@ -1,23 +1,22 @@
-﻿namespace RealmCore.Server.Components.Vehicles.Access;
+﻿
+namespace RealmCore.Server.Components.Vehicles.Access;
 
 public class VehicleExclusiveAccessComponent : VehicleAccessControllerComponent
 {
-    private readonly Entity _targetEntity;
+    private readonly Ped _targetEntity;
 
-    public VehicleExclusiveAccessComponent(Entity targetEntity)
+    public VehicleExclusiveAccessComponent(Ped ped)
     {
-        _targetEntity = targetEntity;
-        _targetEntity.Disposed += HandleTargetEntityDestroyed;
+        _targetEntity = ped;
+        _targetEntity.Destroyed += HandleTargetEntityDestroyed;
     }
 
-    private void HandleTargetEntityDestroyed(Entity obj)
+    private void HandleTargetEntityDestroyed(Element obj)
     {
-        Entity.DestroyComponent(this);
-        _targetEntity.Disposed -= HandleTargetEntityDestroyed;
+        if(Element is RealmVehicle realmVehicle)
+            realmVehicle.Components.DestroyComponent(this);
+        _targetEntity.Destroyed -= HandleTargetEntityDestroyed;
     }
 
-    protected override bool CanEnter(Entity pedEntity, Entity vehicleEntity)
-    {
-        return _targetEntity == pedEntity;
-    }
+    protected override bool CanEnter(Ped ped, RealmVehicle vehicle, byte seat) => ped == _targetEntity;
 }

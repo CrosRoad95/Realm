@@ -15,9 +15,9 @@ public sealed class Display3dRing : IInGameCommand
         _overlayService = overlayService;
     }
 
-    public Task Handle(Entity entity, CommandArguments args)
+    public Task Handle(RealmPlayer player, CommandArguments args)
     {
-        _overlayService.AddRing3dDisplay(entity, entity.Transform.Position, TimeSpan.FromSeconds(3));
+        _overlayService.AddRing3dDisplay(player, player.Position, TimeSpan.FromSeconds(3));
         return Task.CompletedTask;
     }
 }

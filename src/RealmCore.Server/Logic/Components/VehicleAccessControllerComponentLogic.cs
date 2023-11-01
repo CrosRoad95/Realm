@@ -2,31 +2,22 @@
 
 internal sealed class VehicleAccessControllerComponentLogic : ComponentLogic<VehicleAccessControllerComponent>
 {
-    private readonly IEntityEngine _entityEngine;
     private readonly IVehicleAccessService _vehicleAccessService;
     private readonly ILogger<VehicleAccessControllerComponentLogic> _logger;
 
-    public VehicleAccessControllerComponentLogic(IEntityEngine entityEngine, IVehicleAccessService vehicleAccessService, ILogger<VehicleAccessControllerComponentLogic> logger) : base(entityEngine)
+    public VehicleAccessControllerComponentLogic(IElementFactory elementFactory, IVehicleAccessService vehicleAccessService, ILogger<VehicleAccessControllerComponentLogic> logger) : base(elementFactory)
     {
-        _entityEngine = entityEngine;
         _vehicleAccessService = vehicleAccessService;
         _logger = logger;
     }
 
     protected override void ComponentAdded(VehicleAccessControllerComponent vehicleAccessControllerComponent)
     {
-        vehicleAccessControllerComponent.Entity.GetRequiredComponent<VehicleElementComponent>().CanEnter = (ped, vehicle) =>
+        var realmVehicle = (RealmVehicle)vehicleAccessControllerComponent.Element;
+        realmVehicle.CanEnter = (ped, vehicle) =>
         {
-            var pedEntity = ped.TryUpCast();
-            var vehicleEntity = vehicle.TryUpCast();
-            if (pedEntity == null || vehicleEntity == null)
-            {
-                using var _ = _logger.BeginElement(ped);
-                _logger.LogWarning("Player/ped attempted to enter enter vehicle that has no entity.");
-                return false;
-            }
-
-            if (!_vehicleAccessService.InternalCanEnter(pedEntity, vehicleEntity, vehicleAccessControllerComponent))
+            // TODO: add seat
+            if (!_vehicleAccessService.InternalCanEnter(ped, (RealmVehicle)vehicle, 0, vehicleAccessControllerComponent))
                 return false;
 
             return true;
@@ -35,6 +26,7 @@ internal sealed class VehicleAccessControllerComponentLogic : ComponentLogic<Veh
 
     protected override void ComponentDetached(VehicleAccessControllerComponent vehicleAccessControllerComponent)
     {
-        vehicleAccessControllerComponent.Entity.GetRequiredComponent<VehicleElementComponent>().CanEnter = null;
+        var realmVehicle = (RealmVehicle)vehicleAccessControllerComponent.Element;
+        realmVehicle.CanEnter = null;
     }
 }

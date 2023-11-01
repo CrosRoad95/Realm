@@ -6,7 +6,7 @@ internal sealed class VehicleUpgradesComponentLogic : ComponentLogic<VehicleUpgr
     private readonly VehicleUpgradeRegistry _vehicleUpgradeRegistry;
     private readonly VehicleEnginesRegistry _vehicleEnginesRegistry;
 
-    public VehicleUpgradesComponentLogic(IEntityEngine entityEngine, VehicleUpgradeRegistry vehicleUpgradeRegistry, VehicleEnginesRegistry vehicleEnginesRegistry) : base(entityEngine)
+    public VehicleUpgradesComponentLogic(IElementFactory elementFactory, VehicleUpgradeRegistry vehicleUpgradeRegistry, VehicleEnginesRegistry vehicleEnginesRegistry) : base(elementFactory)
     {
         _vehicleUpgradeRegistry = vehicleUpgradeRegistry;
         _vehicleEnginesRegistry = vehicleEnginesRegistry;
@@ -54,9 +54,8 @@ internal sealed class VehicleUpgradesComponentLogic : ComponentLogic<VehicleUpgr
 
     private void HandleRebuild(VehicleUpgradesComponent vehicleUpgradesComponent)
     {
-        var entity = vehicleUpgradesComponent.Entity;
+        var vehicle = (RealmVehicle)vehicleUpgradesComponent.Element;
         var upgrades = vehicleUpgradesComponent.Upgrades;
-        var vehicle = entity.GetRequiredComponent<VehicleElementComponent>();
         var vehicleHandling = VehicleHandlingConstants.DefaultVehicleHandling[vehicle.Model];
         object boxedVehicleHandling = vehicleHandling;
 
@@ -67,7 +66,7 @@ internal sealed class VehicleUpgradesComponentLogic : ComponentLogic<VehicleUpgr
             ApplyUpgrades(boxedVehicleHandling, upgradesEntries);
             ApplyVisualUpgrades(vehicle.Upgrades, upgradesEntries);
 
-            if (entity.TryGetComponent(out VehicleEngineComponent vehicleEngineComponent))
+            if (vehicle.Components.TryGetComponent(out VehicleEngineComponent vehicleEngineComponent))
             {
                 var upgradeId = _vehicleEnginesRegistry.Get(vehicleEngineComponent.ActiveVehicleEngineId).UpgradeId;
                 ApplyUpgrades(boxedVehicleHandling, new VehicleUpgradeRegistryEntry[] { _vehicleUpgradeRegistry.Get(upgradeId) });

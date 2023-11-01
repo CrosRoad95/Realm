@@ -1,14 +1,16 @@
-﻿namespace RealmCore.Server.Components.Common;
+﻿using RealmCore.Server.Components.Abstractions;
+
+namespace RealmCore.Server.Components.Common;
 
 public abstract class DurationBasedHoldInteractionComponent : InteractionComponent
 {
     private readonly SemaphoreSlim _semaphore = new(1);
-    public Entity? Owner { get; private set; }
-    private TaskCompletionSource? _interactionTaskComplectionSource;
+    public RealmPlayer? Owner { get; private set; }
+    private TaskCompletionSource? _interactionTaskCompletionSource;
     private Task? _interactionTask;
 
-    public event Action<DurationBasedHoldInteractionComponent, Entity, TimeSpan>? InteractionStarted;
-    public event Action<DurationBasedHoldInteractionComponent, Entity, bool>? InteractionCompleted;
+    public event Action<DurationBasedHoldInteractionComponent, RealmPlayer, TimeSpan>? InteractionStarted;
+    public event Action<DurationBasedHoldInteractionComponent, RealmPlayer, bool>? InteractionCompleted;
 
     public abstract TimeSpan Time { get; }
 
@@ -17,10 +19,10 @@ public abstract class DurationBasedHoldInteractionComponent : InteractionCompone
 
     }
 
-    public async Task<bool> BeginInteraction(Entity owningEntity, CancellationToken cancellationToken = default)
+    public async Task<bool> BeginInteraction(RealmPlayer owningPlayer, CancellationToken cancellationToken = default)
     {
-        if (owningEntity == null)
-            throw new NullReferenceException(nameof(owningEntity));
+        if (owningPlayer == null)
+            throw new NullReferenceException(nameof(owningPlayer));
 
         if (!await _semaphore.WaitAsync(4, cancellationToken))
             return false;
@@ -30,10 +32,10 @@ public abstract class DurationBasedHoldInteractionComponent : InteractionCompone
             if (Owner != null)
                 return false;
 
-            Owner = owningEntity;
-            Owner.Disposed += HandleDisposed;
+            Owner = owningPlayer;
+            Owner.Destroyed += HandleDestroyed;
 
-            _interactionTaskComplectionSource = new TaskCompletionSource();
+            _interactionTaskCompletionSource = new TaskCompletionSource();
             _interactionTask = Task.Delay(Time, cancellationToken);
         }
         catch (Exception)
@@ -45,13 +47,13 @@ public abstract class DurationBasedHoldInteractionComponent : InteractionCompone
             _semaphore.Release();
         }
 
-        InteractionStarted?.Invoke(this, owningEntity, Time);
+        InteractionStarted?.Invoke(this, owningPlayer, Time);
         try
         {
-            var finishedTask = await Task.WhenAny(_interactionTaskComplectionSource.Task, _interactionTask);
+            var finishedTask = await Task.WhenAny(_interactionTaskCompletionSource.Task, _interactionTask);
             if (finishedTask == _interactionTask)
             {
-                Owner.Disposed -= HandleDisposed;
+                Owner.Destroyed -= HandleDestroyed;
                 Owner = null;
                 cancellationToken.ThrowIfCancellationRequested();
                 return true;
@@ -64,20 +66,20 @@ public abstract class DurationBasedHoldInteractionComponent : InteractionCompone
         }
         finally
         {
-            InteractionCompleted?.Invoke(this, owningEntity, false);
+            InteractionCompleted?.Invoke(this, owningPlayer, false);
         }
     }
 
-    private void HandleDisposed(Entity _)
+    private void HandleDestroyed(Element element)
     {
         _semaphore.Wait();
         try
         {
 
-            if (_interactionTaskComplectionSource != null)
+            if (_interactionTaskCompletionSource != null)
             {
-                _interactionTaskComplectionSource.SetCanceled();
-                _interactionTaskComplectionSource = null;
+                _interactionTaskCompletionSource.SetCanceled();
+                _interactionTaskCompletionSource = null;
                 _interactionTask = null;
             }
         }
@@ -87,25 +89,25 @@ public abstract class DurationBasedHoldInteractionComponent : InteractionCompone
         }
     }
 
-    public bool EndInteraction(Entity owningEntity)
+    public bool EndInteraction(RealmPlayer owningPlayer)
     {
-        if (owningEntity == null)
-            throw new NullReferenceException(nameof(owningEntity));
+        if (owningPlayer == null)
+            throw new NullReferenceException(nameof(owningPlayer));
 
         _semaphore.Wait();
 
         try
         {
-            if (Owner != owningEntity)
+            if (Owner != owningPlayer)
                 return false;
 
-            Owner.Disposed -= HandleDisposed;
+            Owner.Destroyed -= HandleDestroyed;
             Owner = null;
 
-            if (_interactionTaskComplectionSource != null)
+            if (_interactionTaskCompletionSource != null)
             {
-                _interactionTaskComplectionSource.SetCanceled();
-                _interactionTaskComplectionSource = null;
+                _interactionTaskCompletionSource.SetCanceled();
+                _interactionTaskCompletionSource = null;
             }
 
             return true;
@@ -116,7 +118,7 @@ public abstract class DurationBasedHoldInteractionComponent : InteractionCompone
         }
         finally
         {
-            InteractionCompleted?.Invoke(this, owningEntity, true);
+            InteractionCompleted?.Invoke(this, owningPlayer, true);
             _semaphore.Release();
         }
     }

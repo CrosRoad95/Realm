@@ -14,14 +14,14 @@ public sealed class TakeItemCommand : IInGameCommand
         _chatBox = chatBox;
     }
 
-    public Task Handle(Entity entity, CommandArguments args)
+    public Task Handle(RealmPlayer player, CommandArguments args)
     {
-        if (entity.TryGetComponent(out InventoryComponent inventoryComponent))
+        if (player.Components.TryGetComponent(out InventoryComponent inventoryComponent))
         {
             uint itemId = args.ReadUInt();
             uint count = args.ReadUInt();
             inventoryComponent.RemoveItem(itemId);
-            _chatBox.OutputTo(entity, $"Item removed, {inventoryComponent.Number}/{inventoryComponent.Size}");
+            _chatBox.OutputTo(player, $"Item removed, {inventoryComponent.Number}/{inventoryComponent.Size}");
         }
 
         return Task.CompletedTask;

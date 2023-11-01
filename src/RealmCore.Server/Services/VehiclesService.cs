@@ -5,27 +5,25 @@ namespace RealmCore.Server.Services;
 internal sealed class VehiclesService : IVehiclesService
 {
     private readonly IVehicleRepository _vehicleRepository;
-    private readonly IEntityFactory _entityFactory;
+    private readonly IElementFactory _elementFactory;
     private readonly ISaveService _saveService;
     private readonly ItemsRegistry _itemsRegistry;
     private readonly IVehicleEventRepository _vehicleEventRepository;
     private readonly IDateTimeProvider _dateTimeProvider;
-    private readonly IEntityEngine _entityEngine;
     private readonly VehicleUpgradeRegistry _vehicleUpgradeRegistry;
     private readonly VehicleEnginesRegistry _vehicleEnginesRegistry;
     private readonly IActiveUsers _activeUsers;
     private readonly IActiveVehicles _activeVehicles;
     private readonly JsonSerializerSettings _jsonSerializerSettings;
 
-    public VehiclesService(IVehicleRepository vehicleRepository, IEntityFactory entityFactory, ISaveService saveService, ItemsRegistry itemsRegistry, IVehicleEventRepository vehicleEventRepository, IDateTimeProvider dateTimeProvider, IEntityEngine entityEngine, VehicleUpgradeRegistry vehicleUpgradeRegistry, VehicleEnginesRegistry vehicleEnginesRegistry, IActiveUsers activeUsers, IActiveVehicles activeVehicles)
+    public VehiclesService(IVehicleRepository vehicleRepository, IElementFactory entityFactory, ISaveService saveService, ItemsRegistry itemsRegistry, IVehicleEventRepository vehicleEventRepository, IDateTimeProvider dateTimeProvider, VehicleUpgradeRegistry vehicleUpgradeRegistry, VehicleEnginesRegistry vehicleEnginesRegistry, IActiveUsers activeUsers, IActiveVehicles activeVehicles)
     {
         _vehicleRepository = vehicleRepository;
-        _entityFactory = entityFactory;
+        _elementFactory = entityFactory;
         _saveService = saveService;
         _itemsRegistry = itemsRegistry;
         _vehicleEventRepository = vehicleEventRepository;
         _dateTimeProvider = dateTimeProvider;
-        _entityEngine = entityEngine;
         _vehicleUpgradeRegistry = vehicleUpgradeRegistry;
         _vehicleEnginesRegistry = vehicleEnginesRegistry;
         _activeUsers = activeUsers;
@@ -36,41 +34,37 @@ internal sealed class VehiclesService : IVehiclesService
         };
     }
 
-    public async Task<Entity> CreateVehicle(ushort model, Vector3 position, Vector3 rotation)
+    public async Task<RealmVehicle> CreateVehicle(ushort model, Vector3 position, Vector3 rotation)
     {
         var vehicleData = await _vehicleRepository.CreateVehicle(model, _dateTimeProvider.Now);
-        return _entityFactory.CreateVehicle(model, position, rotation, entityBuilder: entity =>
+        return _elementFactory.CreateVehicle(model, position, rotation, elementBuilder: vehicle =>
         {
-            entity.AddComponent(new PrivateVehicleComponent(vehicleData, _dateTimeProvider));
+            vehicle.Components.AddComponent(new PrivateVehicleComponent(vehicleData, _dateTimeProvider));
         });
     }
 
-    public async Task<Entity> ConvertToPrivateVehicle(Entity vehicleEntity)
+    public async Task<RealmVehicle> ConvertToPrivateVehicle(RealmVehicle vehicle)
     {
-        if (!vehicleEntity.HasComponent<VehicleTagComponent>())
+        if (vehicle.Components.HasComponent<PrivateVehicleComponent>())
             throw new InvalidOperationException();
 
-        if (vehicleEntity.HasComponent<PrivateVehicleComponent>())
-            throw new InvalidOperationException();
-
-        var vehicleElementComponent = vehicleEntity.GetRequiredComponent<VehicleElementComponent>();
-        var vehicleData = await _vehicleRepository.CreateVehicle(vehicleElementComponent.Model, _dateTimeProvider.Now);
-        vehicleEntity.AddComponent(new PrivateVehicleComponent(vehicleData, _dateTimeProvider));
-        return vehicleEntity;
+        var vehicleData = await _vehicleRepository.CreateVehicle(vehicle.Model, _dateTimeProvider.Now);
+        vehicle.Components.AddComponent(new PrivateVehicleComponent(vehicleData, _dateTimeProvider));
+        return vehicle;
     }
 
-    public async Task<List<LightInfoVehicleDTO>> GetAllLightVehicles(Entity entity)
+    public async Task<List<LightInfoVehicleDTO>> GetAllLightVehicles(RealmPlayer player)
     {
-        if (entity.TryGetComponent(out UserComponent userComponent))
+        if (player.Components.TryGetComponent(out UserComponent userComponent))
         {
             return await _vehicleRepository.GetLightVehiclesByUserId(userComponent.Id);
         }
         return new();
     }
 
-    public async Task<List<VehicleData>> GetAllVehicles(Entity entity)
+    public async Task<List<VehicleData>> GetAllVehicles(RealmPlayer player)
     {
-        if(entity.TryGetComponent(out UserComponent userComponent))
+        if(player.Components.TryGetComponent(out UserComponent userComponent))
         {
             return await _vehicleRepository.GetVehiclesByUserId(userComponent.Id);
         }
@@ -82,39 +76,26 @@ internal sealed class VehiclesService : IVehiclesService
         return _vehicleRepository.GetAllSpawnedVehicles();
     }
 
-    public async Task Destroy(Entity entity)
+    public async Task Destroy(RealmVehicle vehicle)
     {
-        if (!entity.HasComponent<VehicleTagComponent>())
-            throw new InvalidOperationException("Entity is not vehicle");
-        await _vehicleRepository.SetSpawned(entity.GetRequiredComponent<PrivateVehicleComponent>().Id, false);
-        await _saveService.BeginSave(entity);
+        await _vehicleRepository.SetSpawned(vehicle.Components.GetRequiredComponent<PrivateVehicleComponent>().Id, false);
+        await _saveService.BeginSave(vehicle);
         await _saveService.Commit();
-        entity.Dispose();
+        vehicle.Destroy();
     }
 
-    public Task<bool> SetVehicleKind(Entity vehicleEntity, byte kind)
-        => SetVehicleKind(vehicleEntity.GetRequiredComponent<PrivateVehicleComponent>().Id, kind);
-
-    public Task<bool> SetVehicleKind(int id, byte kind)
+    public async Task<bool> SetVehicleSpawned(RealmVehicle vehicle, bool spawned = true)
     {
-        if(_entityEngine.GetVehicleById(id, out var entity))
-            entity.GetRequiredComponent<PrivateVehicleComponent>().Kind = kind;
-
-        return _vehicleRepository.SetKind(id, kind);
-    }
-    
-    public async Task<bool> SetVehicleSpawned(Entity vehicleEntity, bool spawned = true)
-    {
-        if (vehicleEntity.TryGetComponent(out PrivateVehicleComponent privateVehicleComponent))
+        if (vehicle.Components.TryGetComponent(out PrivateVehicleComponent privateVehicleComponent))
         {
             return await _vehicleRepository.SetSpawned(privateVehicleComponent.Id, spawned);
         }
         return false;
     }
 
-    public async Task<VehicleAccess?> GetVehicleAccess(Entity vehicleEntity)
+    public async Task<VehicleAccess?> GetVehicleAccess(RealmVehicle vehicle)
     {
-        if (vehicleEntity.TryGetComponent(out PrivateVehicleComponent privateVehicleComponent))
+        if (vehicle.Components.TryGetComponent(out PrivateVehicleComponent privateVehicleComponent))
         {
             var vehiclesAccesses = await _vehicleRepository.GetAllVehicleAccesses(privateVehicleComponent.Id);
             return new VehicleAccess(vehiclesAccesses);
@@ -122,30 +103,31 @@ internal sealed class VehiclesService : IVehiclesService
         return null;
     }
 
-    public async Task<Entity> Spawn(VehicleData vehicleData)
+    public async Task<RealmVehicle> Spawn(VehicleData vehicleData)
     {
         if(vehicleData.IsRemoved)
             throw new VehicleRemovedException(vehicleData.Id);
 
-        var vehicleEntity = _entityFactory.CreateVehicle(vehicleData.Model, vehicleData.TransformAndMotion.Position, vehicleData.TransformAndMotion.Rotation, vehicleData.TransformAndMotion.Interior, vehicleData.TransformAndMotion.Dimension,
-            entity =>
+        var vehicleEntity = _elementFactory.CreateVehicle(vehicleData.Model, vehicleData.TransformAndMotion.Position, vehicleData.TransformAndMotion.Rotation, vehicleData.TransformAndMotion.Interior, vehicleData.TransformAndMotion.Dimension,
+            vehicle =>
             {
-                if (!_activeVehicles.TrySetActive(vehicleData.Id, entity))
+                if (!_activeVehicles.TrySetActive(vehicleData.Id, vehicle))
                     throw new Exception("Failed to create already existing vehicle.");
 
-                entity.AddComponent(new PrivateVehicleComponent(vehicleData, _dateTimeProvider));
-                entity.AddComponent(new VehicleUpgradesComponent(vehicleData.Upgrades));
-                entity.AddComponent(new MileageCounterComponent(vehicleData.Mileage));
+                var components = vehicle.Components;
+                components.AddComponent(new PrivateVehicleComponent(vehicleData, _dateTimeProvider));
+                components.AddComponent(new VehicleUpgradesComponent(vehicleData.Upgrades));
+                components.AddComponent(new MileageCounterComponent(vehicleData.Mileage));
                 if (vehicleData.VehicleEngines.Count != 0)
-                    entity.AddComponent(new VehicleEngineComponent(vehicleData.VehicleEngines));
+                    components.AddComponent(new VehicleEngineComponent(vehicleData.VehicleEngines));
                 else
-                    entity.AddComponent<VehicleEngineComponent>();
-                entity.AddComponent(new VehiclePartDamageComponent(vehicleData.PartDamages));
+                    components.AddComponent<VehicleEngineComponent>();
+                components.AddComponent(new VehiclePartDamageComponent(vehicleData.PartDamages));
 
                 if (vehicleData.Fuels.Count != 0)
                 {
                     foreach (var vehicleFuel in vehicleData.Fuels)
-                        entity.AddComponent(new FuelComponent(vehicleFuel.FuelType, vehicleFuel.Amount, vehicleFuel.MaxCapacity, vehicleFuel.FuelConsumptionPerOneKm, vehicleFuel.MinimumDistanceThreshold)).Active = vehicleFuel.Active;
+                        components.AddComponent(new FuelComponent(vehicleFuel.FuelType, vehicleFuel.Amount, vehicleFuel.MaxCapacity, vehicleFuel.FuelConsumptionPerOneKm, vehicleFuel.MinimumDistanceThreshold)).Active = vehicleFuel.Active;
                 }
 
                 if (vehicleData.Inventories != null && vehicleData.Inventories.Count != 0)
@@ -157,7 +139,7 @@ internal sealed class VehiclesService : IVehiclesService
                                 new Item(_itemsRegistry, x.ItemId, x.Number, JsonConvert.DeserializeObject<Metadata>(x.MetaData, _jsonSerializerSettings))
                             )
                             .ToList();
-                        entity.AddComponent(new InventoryComponent(inventory.Size, inventory.Id, items));
+                        components.AddComponent(new InventoryComponent(inventory.Size, inventory.Id, items));
                     }
                 }
 
@@ -167,9 +149,9 @@ internal sealed class VehiclesService : IVehiclesService
         return vehicleEntity;
     }
 
-    public async Task<bool> AddVehicleEvent(Entity vehicleEntity, int eventId, string? metadata = null)
+    public async Task<bool> AddVehicleEvent(RealmVehicle vehicle, int eventId, string? metadata = null)
     {
-        if(vehicleEntity.TryGetComponent(out PrivateVehicleComponent privateVehicleComponent))
+        if(vehicle.Components.TryGetComponent(out PrivateVehicleComponent privateVehicleComponent))
         {
             await _vehicleEventRepository.AddEvent(privateVehicleComponent.Id, eventId, _dateTimeProvider.Now);
             return true;
@@ -177,33 +159,33 @@ internal sealed class VehiclesService : IVehiclesService
         return false;
     }
 
-    public async Task<List<VehicleEventData>> GetAllVehicleEvents(Entity vehicleEntity, IEnumerable<int>? events = null)
+    public async Task<List<VehicleEventData>> GetAllVehicleEvents(RealmVehicle vehicle, IEnumerable<int>? events = null)
     {
-        if (vehicleEntity.TryGetComponent(out PrivateVehicleComponent privateVehicleComponent))
+        if (vehicle.Components.TryGetComponent(out PrivateVehicleComponent privateVehicleComponent))
         {
             return await _vehicleEventRepository.GetAllEventsByVehicleId(privateVehicleComponent.Id, events);
         }
         return new();
     }
 
-    public async Task<List<VehicleEventData>> GetLastVehicleEvents(Entity vehicleEntity, int limit = 10, IEnumerable<int>? events = null)
+    public async Task<List<VehicleEventData>> GetLastVehicleEvents(RealmVehicle vehicle, int limit = 10, IEnumerable<int>? events = null)
     {
-        if (vehicleEntity.TryGetComponent(out PrivateVehicleComponent privateVehicleComponent))
+        if (vehicle.Components.TryGetComponent(out PrivateVehicleComponent privateVehicleComponent))
         {
             return await _vehicleEventRepository.GetLastEventsByVehicleId(privateVehicleComponent.Id, limit, events);
         }
         return new();
     }
     
-    public IEnumerable<Entity> GetOnlineOwner(Entity vehicleEntity)
+    public IEnumerable<RealmPlayer> GetOnlineOwner(RealmVehicle vehicle)
     {
-        if (vehicleEntity.TryGetComponent(out PrivateVehicleComponent privateVehicleComponent))
+        if (vehicle.Components.TryGetComponent(out PrivateVehicleComponent privateVehicleComponent))
         {
             var owners = privateVehicleComponent.Access.Owners;
             foreach (var owner in owners)
             {
-                if (_activeUsers.TryGetEntityByUserId(owner.userId, out var playerEntity) && playerEntity != null)
-                    yield return playerEntity;
+                if (_activeUsers.TryGetPlayerByUserId(owner.userId, out var player) && player != null)
+                    yield return player;
             }
         }
     }

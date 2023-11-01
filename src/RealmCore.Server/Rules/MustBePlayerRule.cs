@@ -1,12 +1,9 @@
 ﻿namespace RealmCore.Server.Rules;
 
-public sealed class MustBePlayerRule : IEntityRule
+public sealed class MustBePlayerRule : IElementRule
 {
-    public bool Check(Entity entity)
+    public bool Check(Element element)
     {
-        if (!entity.HasComponent<PlayerTagComponent>())
-            return false;
-
-        return true;
+        return element is Player;
     }
 }

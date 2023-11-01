@@ -8,6 +8,6 @@
     protected override void OnInitialized()
     {
         _realmLogger.Service.LogInformation("Realm gui initialized");
-        CurrentPlayerContext.BrowserGuiService.RelayEntityLoggedIn(CurrentPlayerContext.Entity);
+        CurrentPlayerContext.BrowserGuiService.RelayPlayerLoggedIn(CurrentPlayerContext.Player);
     }
 }

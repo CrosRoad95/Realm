@@ -5,7 +5,7 @@ internal sealed class UsersNotificationsService : IUsersNotificationsService
     private readonly IUserNotificationRepository _userNotificationRepository;
     private readonly IDateTimeProvider _dateTimeProvider;
 
-    public event Action<Entity, string, string, string?, int>? NotificationCreated;
+    public event Action<RealmPlayer, string, string, string?, int>? NotificationCreated;
     public event Action<int>? NotificationRead;
 
     public UsersNotificationsService(IUserNotificationRepository userNotificationRepository, IDateTimeProvider dateTimeProvider)
@@ -14,23 +14,23 @@ internal sealed class UsersNotificationsService : IUsersNotificationsService
         _dateTimeProvider = dateTimeProvider;
     }
 
-    public async Task<int> Create(Entity entity, string title, string description, string? excerpt = null)
+    public async Task<int> Create(RealmPlayer player, string title, string description, string? excerpt = null)
     {
-        var userComponent = entity.GetRequiredComponent<UserComponent>();
+        var userComponent = player.Components.GetRequiredComponent<UserComponent>();
         var notification = await _userNotificationRepository.Create(userComponent.Id, _dateTimeProvider.Now, title, description, excerpt);
-        NotificationCreated?.Invoke(entity, title, description, excerpt, notification.Id);
+        NotificationCreated?.Invoke(player, title, description, excerpt, notification.Id);
         return notification.Id;
     }
 
-    public async Task<List<UserNotificationData>> Get(Entity entity, int limit = 10)
+    public async Task<List<UserNotificationData>> Get(RealmPlayer player, int limit = 10)
     {
-        var userComponent = entity.GetRequiredComponent<UserComponent>();
+        var userComponent = player.Components.GetRequiredComponent<UserComponent>();
         return await _userNotificationRepository.Get(userComponent.Id, limit);
     }
 
-    public async Task<int> CountUnread(Entity entity)
+    public async Task<int> CountUnread(RealmPlayer player)
     {
-        var userComponent = entity.GetRequiredComponent<UserComponent>();
+        var userComponent = player.Components.GetRequiredComponent<UserComponent>();
         return await _userNotificationRepository.CountUnread(userComponent.Id);
     }
 

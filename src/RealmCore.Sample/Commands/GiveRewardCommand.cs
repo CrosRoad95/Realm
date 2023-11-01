@@ -15,15 +15,15 @@ public sealed class GiveRewardCommand : IInGameCommand
         _chatBox = chatBox;
     }
 
-    public async Task Handle(Entity entity, CommandArguments args)
+    public async Task Handle(RealmPlayer player, CommandArguments args)
     {
-        if (await _rewardService.TryGiveReward(entity, 1))
+        if (await _rewardService.TryGiveReward(player, 1))
         {
-            _chatBox.OutputTo(entity, "Nagroda id 1 została odebrana pomyślnie");
+            _chatBox.OutputTo(player, "Nagroda id 1 została odebrana pomyślnie");
         }
         else
         {
-            _chatBox.OutputTo(entity, "Już otrzymałeś nagrode id 1");
+            _chatBox.OutputTo(player, "Już otrzymałeś nagrode id 1");
         }
     }
 }

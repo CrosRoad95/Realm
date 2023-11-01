@@ -4,7 +4,7 @@ internal sealed class PrivateVehicleComponentLogic : ComponentLogic<PrivateVehic
 {
     private readonly IActiveVehicles _activeVehicles;
 
-    public PrivateVehicleComponentLogic(IEntityEngine entityEngine, IActiveVehicles activeVehicles) : base(entityEngine)
+    public PrivateVehicleComponentLogic(IElementFactory elementFactory, IActiveVehicles activeVehicles) : base(elementFactory)
     {
         _activeVehicles = activeVehicles;
     }

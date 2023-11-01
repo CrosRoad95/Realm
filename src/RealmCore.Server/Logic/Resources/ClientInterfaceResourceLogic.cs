@@ -1,37 +1,45 @@
-﻿namespace RealmCore.Server.Logic.Resources;
+﻿using RealmCore.Server.Components.Abstractions;
+
+namespace RealmCore.Server.Logic.Resources;
 
 internal sealed class ClientInterfaceResourceLogic
 {
     private readonly ILogger<ClientInterfaceResourceLogic> _logger;
     private readonly IClientInterfaceService _clientInterfaceService;
-    private readonly IEntityEngine _entityEngine;
+    private readonly IElementFactory _elementFactory;
 
-    public ClientInterfaceResourceLogic(IClientInterfaceService clientInterfaceService, ILogger<ClientInterfaceResourceLogic> logger, IEntityEngine entityEngine)
+    public ClientInterfaceResourceLogic(IClientInterfaceService clientInterfaceService, ILogger<ClientInterfaceResourceLogic> logger, IElementFactory elementFactory)
     {
         _clientInterfaceService = clientInterfaceService;
-        _entityEngine = entityEngine;
+        _elementFactory = elementFactory;
         _logger = logger;
 
         _clientInterfaceService.ClientErrorMessage += HandleClientErrorMessage;
-        _entityEngine.EntityCreated += HandleEntityCreated;
+        _elementFactory.ElementCreated += HandleElementCreated;
     }
 
-    private void HandleEntityCreated(Entity entity)
+    private void HandleElementCreated(Element element)
     {
-        entity.Disposed += HandleEntityDestroyed;
-        entity.ComponentAdded += HandleComponentAdded;
+        if(element is IComponents components)
+        {
+            element.Destroyed += HandleElementDestroyed;
+            components.Components.ComponentAdded += HandleComponentAdded;
+        }
     }
 
-    private void HandleEntityDestroyed(Entity entity)
+    private void HandleElementDestroyed(Element element)
     {
-        entity.ComponentAdded -= HandleComponentAdded;
+        if (element is IComponents components)
+        {
+            components.Components.ComponentAdded -= HandleComponentAdded;
+        }
     }
 
     private void HandleComponentAdded(IComponent component)
     {
         if (component is InteractionComponent interactionComponent)
         {
-            _clientInterfaceService.AddFocusable((Element)component.Entity.GetRequiredComponent<IElementComponent>());
+            _clientInterfaceService.AddFocusable(component.Element);
             interactionComponent.Detached += HandleInteractionComponentDetachedFromEntity;
         }
     }
@@ -40,13 +48,11 @@ internal sealed class ClientInterfaceResourceLogic
     {
         var interactionComponent = (InteractionComponent)component;
         interactionComponent.Detached -= HandleInteractionComponentDetachedFromEntity;
-        _clientInterfaceService.RemoveFocusable((Element)interactionComponent.Entity.GetRequiredComponent<IElementComponent>());
+        _clientInterfaceService.RemoveFocusable(interactionComponent.Element);
     }
 
     private void HandleClientErrorMessage(Player player, string message, int level, string file, int line)
     {
-        var playerEntity = player.UpCast();
-
         var playerName = player.Name;
         switch (level)
         {

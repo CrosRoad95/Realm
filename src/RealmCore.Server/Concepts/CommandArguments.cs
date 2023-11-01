@@ -129,7 +129,7 @@ public class CommandArguments
         throw new CommandArgumentException(_index, "Liczba jest poza zakresem", value);
     }
 
-    public Entity ReadPlayerEntity()
+    public RealmPlayer ReadPlayer()
     {
         var name = ReadArgument();
         var users = _usersService.SearchPlayersByName(name).ToList();
@@ -140,26 +140,26 @@ public class CommandArguments
         throw new CommandArgumentException(_index, "Gracz o takiej nazwie nie został znaleziony", name);
     }
     
-    public bool TryReadPlayerEntity(out Entity entity)
+    public bool TryReadPlayerEntity(out RealmPlayer? player)
     {
         if(TryReadArgument(out string argument))
         {
             var name = ReadArgument();
-            var users = _usersService.SearchPlayersByName(name).ToList();
-            if (users.Count == 1)
+            var players = _usersService.SearchPlayersByName(name).ToList();
+            if (players.Count == 1)
             {
-                entity = users[0];
+                player = players[0];
                 return true;
             }
-            if (users.Count > 0)
+            if (players.Count > 0)
                 throw new CommandArgumentException(_index, "Znaleziono więcej niż 1 gracza o takiej nazwie", name);
             throw new CommandArgumentException(_index, "Gracz o takiej nazwie nie został znaleziony", name);
         }
-        entity = null;
+        player = null;
         return false;
     }
 
-    public IEnumerable<Entity> ReadPlayerEntities()
+    public IEnumerable<RealmPlayer> ReadPlayers()
     {
         var name = ReadArgument();
         var users = _usersService.SearchPlayersByName(name).ToList();

@@ -5,3 +5,7 @@ global using RealmCore.Module.Discord.Interfaces;
 global using RealmCore.Server.Interfaces;
 global using SlipeServer.Server.Services;
 global using Microsoft.Extensions.Logging;
+global using RealmCore.Server.Components.Players;
+global using RealmCore.Server.Elements;
+global using SlipeServer.Server.ElementCollections;
+global using SlipeServer.Server.Elements;

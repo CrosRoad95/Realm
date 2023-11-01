@@ -3,8 +3,8 @@
 public abstract class Objective : IDisposable
 {
     private bool _isFulfilled = false;
-    private Entity? _entity;
-    private IEntityFactory? _entityFactory;
+    private RealmPlayer? _player;
+    private IElementFactory? _elementFactory;
 
     public bool IsFulfilled => _isFulfilled;
 
@@ -12,31 +12,30 @@ public abstract class Objective : IDisposable
     public event Action<Objective>? InCompleted;
     public event Action<Objective>? Disposed;
 
-    public Entity Entity { get => _entity ?? throw new InvalidOperationException(); internal set => _entity = value; }
+    public RealmPlayer Player { get => _player ?? throw new InvalidOperationException(); internal set => _player = value; }
 
-    private PlayerPrivateElementComponent<BlipElementComponent>? _blipElementComponent;
+    private Blip? _blip;
     public abstract Vector3 Position { get; }
     protected ILogger Logger { get; set; } = default!;
-    protected abstract void Load(IServiceProvider serviceProvider, Entity playerEntity);
+    protected abstract void Load(RealmPlayer player);
     public virtual void Update() { }
 
-    internal void LoadInternal(IServiceProvider serviceProvider, Entity playerEntity, ILogger logger)
+    internal void LoadInternal(RealmPlayer player)
     {
-        Logger = logger;
-        _entityFactory = serviceProvider.GetRequiredService<IEntityFactory>();
-        Load(serviceProvider, playerEntity);
+        Logger = player.ServiceProvider.GetRequiredService<ILogger>();
+        _elementFactory = player.ServiceProvider.GetRequiredService<IElementFactory>();
+        Load(player);
     }
 
     protected void Complete(Objective objective, object? data = null)
     {
-        if (Entity == null)
-            throw new ArgumentNullException(nameof(Entity), "Entity cannot be null.");
+        if (Player == null)
+            throw new ArgumentNullException(nameof(Player), "Entity cannot be null.");
 
         if (_isFulfilled)
             throw new ObjectiveAlreadyFulfilledException();
 
-        if (_blipElementComponent != null)
-            RemoveBlip();
+        RemoveBlip();
 
         Completed?.Invoke(objective, data);
         _isFulfilled = true;
@@ -44,14 +43,13 @@ public abstract class Objective : IDisposable
 
     public void Incomplete(Objective objective)
     {
-        if (Entity == null)
-            throw new ArgumentNullException(nameof(Entity), "Entity cannot be null.");
+        if (Player == null)
+            throw new ArgumentNullException(nameof(Player), "Entity cannot be null.");
 
         if (_isFulfilled)
             throw new ObjectiveAlreadyFulfilledException();
 
-        if (_blipElementComponent != null)
-            RemoveBlip();
+        RemoveBlip();
 
         InCompleted?.Invoke(objective);
         _isFulfilled = true;
@@ -59,27 +57,21 @@ public abstract class Objective : IDisposable
 
     public void AddBlip(BlipIcon blipIcon)
     {
-        if (_blipElementComponent != null)
+        if (_blip != null)
             throw new InvalidOperationException();
 
-        using var scopedEntityFactory = _entityFactory.CreateScopedEntityFactory(Entity);
-        scopedEntityFactory.CreateBlip(blipIcon, Position);
-        _blipElementComponent = scopedEntityFactory.GetLastCreatedComponent<PlayerPrivateElementComponent<BlipElementComponent>>();
+        // TODO:
     }
 
     public void RemoveBlip()
     {
-        if (_blipElementComponent == null)
-            throw new InvalidOperationException();
-
-        Entity.DestroyComponent(_blipElementComponent);
-        _blipElementComponent = null;
+        if (_blip != null && _blip.Destroy())
+            _blip = null;
     }
 
     public virtual void Dispose()
     {
-        if (_blipElementComponent != null)
-            RemoveBlip();
+        RemoveBlip();
 
         Disposed?.Invoke(this);
     }

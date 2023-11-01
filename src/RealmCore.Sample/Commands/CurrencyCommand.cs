@@ -14,10 +14,10 @@ public sealed class CurrencyCommand : IInGameCommand
         _chatBox = chatBox;
     }
 
-    public Task Handle(Entity entity, CommandArguments args)
+    public Task Handle(RealmPlayer player, CommandArguments args)
     {
         var money = 123.456m;
-        _chatBox.OutputTo(entity, money.FormatMoney(_gameplayOptions.Value.CurrencyCulture));
+        _chatBox.OutputTo(player, money.FormatMoney(_gameplayOptions.Value.CurrencyCulture));
         return Task.CompletedTask;
     }
 }

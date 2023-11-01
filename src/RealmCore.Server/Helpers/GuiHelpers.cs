@@ -5,63 +5,63 @@ namespace RealmCore.Server.Helpers;
 public static class GuiHelpers
 {
     #region Non-Browser gui
-    public static void BindGui<TGuiComponent>(Entity entity, string bind, IServiceProvider serviceProvider) where TGuiComponent : GuiComponent, new()
+    public static void BindGui<TGuiComponent>(RealmPlayer player, string bind, IServiceProvider serviceProvider) where TGuiComponent : GuiComponent, new()
     {
-        BindGui(entity, bind, () => new TGuiComponent(), serviceProvider);
+        BindGui(player, bind, () => new TGuiComponent(), serviceProvider);
     }
 
-    public static void BindGui<TGuiComponent>(Entity entity, string bind, Func<TGuiComponent> factory, IServiceProvider serviceProvider) where TGuiComponent : GuiComponent
+    public static void BindGui<TGuiComponent>(RealmPlayer player, string bind, Func<TGuiComponent> factory, IServiceProvider serviceProvider) where TGuiComponent : GuiComponent
     {
-        var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();
         var logger = serviceProvider.GetRequiredService<ILogger<TGuiComponent>>();
         var chatBox = serviceProvider.GetRequiredService<ChatBox>();
-        playerElementComponent.SetBind(bind, entity =>
+        player.SetBind(bind, player =>
         {
-            if (entity.HasComponent<TGuiComponent>())
+            var components = player.Components;
+            if (components.HasComponent<TGuiComponent>())
             {
-                entity.TryDestroyComponent<TGuiComponent>();
+                components.TryDestroyComponent<TGuiComponent>();
                 return;
             }
             else
-                entity.TryDestroyComponent<GuiComponent>();
+                components.TryDestroyComponent<GuiComponent>();
 
             try
             {
-                var guiComponent = entity.AddComponent(factory());
-                playerElementComponent.ResetCooldown(bind);
+                var guiComponent = components.AddComponent(factory());
+                player.ResetCooldown(bind);
             }
             catch (Exception ex)
             {
                 logger.LogError(ex, "Error while opening gui page");
-                chatBox.OutputTo(entity, "Wystąpił bład podczas próby otwarcia gui");
+                chatBox.OutputTo(player, "Wystąpił bład podczas próby otwarcia gui");
             }
         });
     }
     
-    public static void BindGui<TGuiComponent>(Entity entity, string bind, Func<Task<TGuiComponent>> factory, IServiceProvider serviceProvider) where TGuiComponent : GuiComponent
+    public static void BindGui<TGuiComponent>(RealmPlayer player, string bind, Func<Task<TGuiComponent>> factory, IServiceProvider serviceProvider) where TGuiComponent : GuiComponent
     {
-        var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();
         var logger = serviceProvider.GetRequiredService<ILogger<TGuiComponent>>();
         var chatBox = serviceProvider.GetRequiredService<ChatBox>();
-        playerElementComponent.SetBindAsync(bind, async entity =>
+        player.SetBindAsync(bind, async player =>
         {
-            if (entity.HasComponent<TGuiComponent>())
+            var components = player.Components;
+            if (components.HasComponent<TGuiComponent>())
             {
-                entity.TryDestroyComponent<TGuiComponent>();
+                components.TryDestroyComponent<TGuiComponent>();
                 return;
             }
             else
-                entity.TryDestroyComponent<GuiComponent>();
+                components.TryDestroyComponent<GuiComponent>();
 
             try
             {
-                var guiComponent = entity.AddComponent(await factory());
-                playerElementComponent.ResetCooldown(bind);
+                var guiComponent = components.AddComponent(await factory());
+                player.ResetCooldown(bind);
             }
             catch (Exception ex)
             {
                 logger.LogError(ex, "Error while opening gui page");
-                chatBox.OutputTo(entity, "Wystąpił bład podczas próby otwarcia gui");
+                chatBox.OutputTo(player, "Wystąpił bład podczas próby otwarcia gui");
             }
         });
     }
@@ -69,63 +69,63 @@ public static class GuiHelpers
     #endregion
 
     #region Browser Gui
-    public static void BindGuiPage<TGuiComponent>(Entity entity, string bind, IServiceProvider serviceProvider) where TGuiComponent : BrowserGuiComponent, new()
+    public static void BindGuiPage<TGuiComponent>(RealmPlayer player, string bind, IServiceProvider serviceProvider) where TGuiComponent : BrowserGuiComponent, new()
     {
-        BindGuiPage(entity, bind, () => new TGuiComponent(), serviceProvider);
+        BindGuiPage(player, bind, () => new TGuiComponent(), serviceProvider);
     }
 
-    public static void BindGuiPage<TGuiComponent>(Entity entity, string bind, Func<TGuiComponent> factory, IServiceProvider serviceProvider) where TGuiComponent : BrowserGuiComponent
+    public static void BindGuiPage<TGuiComponent>(RealmPlayer player, string bind, Func<TGuiComponent> factory, IServiceProvider serviceProvider) where TGuiComponent : BrowserGuiComponent
     {
-        var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();
         var logger = serviceProvider.GetRequiredService<ILogger<TGuiComponent>>();
         var chatBox = serviceProvider.GetRequiredService<ChatBox>();
-        playerElementComponent.SetBind(bind, entity =>
+        player.SetBind(bind, player =>
         {
-            if (entity.HasComponent<TGuiComponent>())
+            var components = player.Components;
+            if (components.HasComponent<TGuiComponent>())
             {
-                entity.DestroyComponent<TGuiComponent>();
+                components.DestroyComponent<TGuiComponent>();
                 return;
             }
             else
-                entity.TryDestroyComponent<BrowserGuiComponent>();
+                components.TryDestroyComponent<BrowserGuiComponent>();
 
             try
             {
-                var guiComponent = entity.AddComponent(factory());
-                playerElementComponent.ResetCooldown(bind);
+                var guiComponent = components.AddComponent(factory());
+                player.ResetCooldown(bind);
             }
             catch (Exception ex)
             {
                 logger.LogError(ex, "Error while opening gui page");
-                chatBox.OutputTo(entity, "Wystąpił bład podczas próby otwarcia gui");
+                chatBox.OutputTo(player, "Wystąpił bład podczas próby otwarcia gui");
             }
         });
     }
 
-    public static void BindGuiPage<TGuiComponent>(Entity entity, string bind, Func<Task<TGuiComponent>> factory, IServiceProvider serviceProvider) where TGuiComponent : GuiComponent
+    public static void BindGuiPage<TGuiComponent>(RealmPlayer player, string bind, Func<Task<TGuiComponent>> factory, IServiceProvider serviceProvider) where TGuiComponent : GuiComponent
     {
-        var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();
         var logger = serviceProvider.GetRequiredService<ILogger<TGuiComponent>>();
         var chatBox = serviceProvider.GetRequiredService<ChatBox>();
-        playerElementComponent.SetBindAsync(bind, async entity =>
+        player.SetBindAsync(bind, async player =>
         {
-            if (entity.HasComponent<TGuiComponent>())
+            var components = player.Components;
+            if (components.HasComponent<TGuiComponent>())
             {
-                entity.DestroyComponent<TGuiComponent>();
+                components.DestroyComponent<TGuiComponent>();
                 return;
             }
             else
-                entity.TryDestroyComponent<GuiComponent>();
+                components.TryDestroyComponent<GuiComponent>();
 
             try
             {
-                entity.AddComponent(await factory());
-                playerElementComponent.ResetCooldown(bind);
+                components.AddComponent(await factory());
+                player.ResetCooldown(bind);
             }
             catch (Exception ex)
             {
                 logger.LogError(ex, "Error while opening gui page");
-                chatBox.OutputTo(entity, "Wystąpił bład podczas próby otwarcia gui");
+                chatBox.OutputTo(player, "Wystąpił bład podczas próby otwarcia gui");
             }
         });
     }

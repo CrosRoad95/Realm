@@ -1,49 +1,51 @@
-﻿namespace RealmCore.Server.Components.Object;
+﻿using RealmCore.Server.Components.Abstractions;
+
+namespace RealmCore.Server.Components.Object;
 
 [ComponentUsage(false)]
 public class LiftableWorldObjectComponent : InteractionComponent
 {
     private readonly object _lock = new();
-    public Entity? Owner { get; private set; }
-    public Entity[]? AllowedForEntities { get; private set; }
+    public Element? Owner { get; private set; }
+    public Element[]? AllowedForElements { get; private set; }
 
-    public event Action<LiftableWorldObjectComponent, Entity>? Lifted;
-    public event Action<LiftableWorldObjectComponent, Entity>? Dropped;
+    public event Action<LiftableWorldObjectComponent, Element>? Lifted;
+    public event Action<LiftableWorldObjectComponent, Element>? Dropped;
 
     public LiftableWorldObjectComponent() { }
 
-    public LiftableWorldObjectComponent(params Entity[] allowedForEntities)
+    public LiftableWorldObjectComponent(params Element[] allowedForEntities)
     {
-        AllowedForEntities = allowedForEntities;
+        AllowedForElements = allowedForEntities;
     }
 
-    public bool TryLift(Entity entity)
+    public bool TryLift(Element element)
     {
-        if (!IsAllowedToLift(entity))
+        if (!IsAllowedToLift(element))
             return false;
 
         lock (_lock)
         {
-            if (Entity == entity)
+            if (Element == element)
                 return false;
 
             if (Owner == null)
             {
-                Owner = entity;
-                Owner.Disposed += HandleOwnerDisposed;
-                Lifted?.Invoke(this, entity);
+                Owner = element;
+                Owner.Destroyed += HandleOwnerDestroyed;
+                Lifted?.Invoke(this, element);
                 return true;
             }
         }
         return false;
     }
 
-    public bool IsAllowedToLift(Entity entity) => AllowedForEntities == null || AllowedForEntities.Contains(entity);
+    public bool IsAllowedToLift(Element element) => AllowedForElements == null || AllowedForElements.Contains(element);
 
-    private void HandleOwnerDisposed(Entity disposedEntity)
+    private void HandleOwnerDestroyed(Element element)
     {
         Debug.Assert(Owner != null);
-        Owner.Disposed -= HandleOwnerDisposed;
+        Owner.Destroyed -= HandleOwnerDestroyed;
         TryDrop();
     }
 
@@ -54,7 +56,7 @@ public class LiftableWorldObjectComponent : InteractionComponent
             if (Owner == null)
                 return false;
 
-            Owner.Disposed -= HandleOwnerDisposed;
+            Owner.Destroyed -= HandleOwnerDestroyed;
             Dropped?.Invoke(this, Owner);
             Owner = null;
         }

@@ -1,12 +1,9 @@
 ﻿namespace RealmCore.Server.Rules;
 
-public sealed class MustBeVehicleRule : IEntityRule
+public sealed class MustBeVehicleRule : IElementRule
 {
-    public bool Check(Entity entity)
+    public bool Check(Element element)
     {
-        if (!entity.HasComponent<VehicleTagComponent>())
-            return false;
-
-        return true;
+        return element is Element;
     }
 }

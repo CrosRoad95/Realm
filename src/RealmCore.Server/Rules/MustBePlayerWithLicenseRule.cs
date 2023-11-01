@@ -1,6 +1,6 @@
 ﻿namespace RealmCore.Server.Rules;
 
-public sealed class MustBePlayerWithLicenseRule : IEntityRule
+public sealed class MustBePlayerWithLicenseRule : IElementRule
 {
     private readonly int _licenseId;
     private readonly IDateTimeProvider _dateTimeProvider;
@@ -11,15 +11,10 @@ public sealed class MustBePlayerWithLicenseRule : IEntityRule
         _dateTimeProvider = dateTimeProvider;
     }
 
-    public bool Check(Entity entity)
+    public bool Check(Element element)
     {
-        if (!entity.HasComponent<PlayerTagComponent>())
-            return false;
-
-        if (entity.TryGetComponent(out LicensesComponent licensesComponent))
-        {
+        if(element is RealmPlayer player && player.Components.TryGetComponent(out LicensesComponent licensesComponent))
             return licensesComponent.HasLicense(_licenseId);
-        }
         return false;
     }
 }

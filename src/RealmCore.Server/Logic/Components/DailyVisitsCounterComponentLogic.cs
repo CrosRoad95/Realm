@@ -4,7 +4,7 @@ internal sealed class DailyVisitsCounterComponentLogic : ComponentLogic<DailyVis
 {
     private readonly IDateTimeProvider _dateTimeProvider;
 
-    public DailyVisitsCounterComponentLogic(IEntityEngine entityEngine, IDateTimeProvider dateTimeProvider) : base(entityEngine)
+    public DailyVisitsCounterComponentLogic(IElementFactory elementFactory, IDateTimeProvider dateTimeProvider) : base(elementFactory)
     {
         _dateTimeProvider = dateTimeProvider;
     }

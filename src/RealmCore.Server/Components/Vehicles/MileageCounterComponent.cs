@@ -5,7 +5,7 @@ public class MileageCounterComponent : ComponentLifecycle, IRareUpdateCallback
     private Vector3 _lastPosition;
     private float _mileage;
     private float _minimumDistanceThreshold;
-    private VehicleElementComponent? _vehicleElementComponent;
+    private RealmVehicle? _vehicle;
 
     public event Action<MileageCounterComponent, float, float>? Traveled;
 
@@ -49,27 +49,27 @@ public class MileageCounterComponent : ComponentLifecycle, IRareUpdateCallback
 
     public override void Attach()
     {
-        _vehicleElementComponent = Entity.GetRequiredComponent<VehicleElementComponent>();
+        _vehicle = (RealmVehicle)Element;
     }
 
     public void RareUpdate()
     {
-        if (_vehicleElementComponent == null)
+        if (_vehicle == null)
             return;
 
-        if (!_vehicleElementComponent.IsEngineOn)
+        if (!_vehicle.IsEngineOn)
         {
-            _lastPosition = _vehicleElementComponent.Position;
+            _lastPosition = _vehicle.Position;
             return;
         }
-        if (!_vehicleElementComponent.IsEngineOn || _vehicleElementComponent.IsFrozen)
+        if (!_vehicle.IsEngineOn || _vehicle.IsFrozen)
             return;
 
-        var traveledDistance = _vehicleElementComponent.Position - _lastPosition;
+        var traveledDistance = _vehicle.Position - _lastPosition;
         var traveledDistanceNumber = traveledDistance.Length();
         if (_minimumDistanceThreshold > traveledDistanceNumber)
             return;
-        _lastPosition = _vehicleElementComponent.Position;
+        _lastPosition = _vehicle.Position;
         _mileage += traveledDistanceNumber;
         Traveled?.Invoke(this, _mileage, traveledDistanceNumber);
     }

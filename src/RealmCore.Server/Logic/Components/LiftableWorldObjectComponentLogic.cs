@@ -2,7 +2,7 @@
 
 internal sealed class LiftableWorldObjectComponentLogic : ComponentLogic<LiftableWorldObjectComponent>
 {
-    public LiftableWorldObjectComponentLogic(IEntityEngine entityEngine) : base(entityEngine)
+    public LiftableWorldObjectComponentLogic(IElementFactory elementFactory) : base(elementFactory)
     {
     }
 
@@ -16,11 +16,14 @@ internal sealed class LiftableWorldObjectComponentLogic : ComponentLogic<Liftabl
         liftableWorldObjectComponent.Lifted -= HandleLifted;
     }
 
-    private void HandleLifted(LiftableWorldObjectComponent liftableWorldObjectComponent, Entity entity)
+    private void HandleLifted(LiftableWorldObjectComponent liftableWorldObjectComponent, Element element)
     {
-        if (!liftableWorldObjectComponent.Entity.HasComponent<OwnerComponent>())
+        if(liftableWorldObjectComponent.Element is IComponents components)
         {
-            liftableWorldObjectComponent.Entity.AddComponent(new OwnerComponent(entity));
+            if (!components.HasComponent<OwnerComponent>())
+            {
+                components.AddComponent(new OwnerComponent(element));
+            }
         }
     }
 }

@@ -3,6 +3,6 @@
 [ComponentUsage(true)]
 public abstract class VehicleAccessControllerComponent : Component
 {
-    protected abstract bool CanEnter(Entity pedEntity, Entity vehicleEntity);
-    internal bool InternalCanEnter(Entity pedEntity, Entity vehicleEntity) => CanEnter(pedEntity, vehicleEntity);
+    protected abstract bool CanEnter(Ped ped, RealmVehicle vehicle, byte seat);
+    internal bool InternalCanEnter(Ped ped, RealmVehicle vehicle, byte seat) => CanEnter(ped, vehicle, seat);
 }

@@ -4,7 +4,7 @@ internal sealed class StatefulHudComponentLogic : ComponentLogic<IStatefulHudCom
 {
     private readonly IOverlayService _overlayService;
 
-    public StatefulHudComponentLogic(IEntityEngine entityEngine, IOverlayService overlayService) : base(entityEngine)
+    public StatefulHudComponentLogic(IElementFactory elementFactory, IOverlayService overlayService) : base(elementFactory)
     {
         _overlayService = overlayService;
     }
@@ -16,6 +16,6 @@ internal sealed class StatefulHudComponentLogic : ComponentLogic<IStatefulHudCom
 
     protected override void ComponentDetached(IStatefulHudComponent statefulHudComponent)
     {
-        _overlayService.RemoveHud(statefulHudComponent.Entity.GetRequiredComponent<PlayerElementComponent>(), statefulHudComponent.Id);
+        _overlayService.RemoveHud((RealmPlayer)statefulHudComponent.Element, statefulHudComponent.Id);
     }
 }

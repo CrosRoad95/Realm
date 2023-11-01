@@ -1,6 +1,4 @@
-﻿using RealmCore.ECS.Common;
-
-namespace RealmCore.Sample.Components.Vehicles;
+﻿namespace RealmCore.Sample.Components.Vehicles;
 
 public class VehicleForSaleComponent : ComponentLifecycle
 {
@@ -16,7 +14,7 @@ public class VehicleForSaleComponent : ComponentLifecycle
 
     public override void Attach()
     {
-        var vehicleElementComponent = Entity.GetRequiredComponent<VehicleElementComponent>();
+        var vehicleElementComponent = (RealmVehicle)Element;
         vehicleElementComponent.IsFrozen = true;
         vehicleElementComponent.IsLocked = true;
     }

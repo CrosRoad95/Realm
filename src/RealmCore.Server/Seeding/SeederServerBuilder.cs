@@ -9,7 +9,7 @@ internal sealed class SeederServerBuilder
     private readonly UserManager<UserData> _userManager;
     private readonly RoleManager<RoleData> _roleManager;
     private readonly IGroupService _groupService;
-    private readonly IEntityFactory _entityFactory;
+    private readonly IElementFactory _elementFactory;
     private readonly IFractionService _fractionService;
     private readonly IGroupRepository _groupRepository;
     private readonly Dictionary<string, ISeederProvider> _seederProviders = new();
@@ -20,7 +20,7 @@ internal sealed class SeederServerBuilder
 
     public SeederServerBuilder(ILogger<SeederServerBuilder> logger,
         IServerFilesProvider serverFilesProvider, UserManager<UserData> userManager, RoleManager<RoleData> roleManager,
-        IGroupService groupService, IEntityFactory entityFactory, IFractionService fractionService, IEnumerable<ISeederProvider> seederProviders,
+        IGroupService groupService, IElementFactory entityFactory, IFractionService fractionService, IEnumerable<ISeederProvider> seederProviders,
         IEnumerable<IAsyncSeederProvider> asyncSeederProviders, IGroupRepository groupRepository)
     {
         _logger = logger;
@@ -28,7 +28,7 @@ internal sealed class SeederServerBuilder
         _userManager = userManager;
         _roleManager = roleManager;
         _groupService = groupService;
-        _entityFactory = entityFactory;
+        _elementFactory = entityFactory;
         _fractionService = fractionService;
         _groupRepository = groupRepository;
         foreach (var seederProvider in seederProviders)
@@ -50,9 +50,9 @@ internal sealed class SeederServerBuilder
         {
             if (Enum.IsDefined(typeof(BlipIcon), pair.Value.Icon))
             {
-                var entity = _entityFactory.CreateBlip((BlipIcon)pair.Value.Icon, pair.Value.Position, entityBuilder: x =>
+                var entity = _elementFactory.CreateBlip(pair.Value.Position, (BlipIcon)pair.Value.Icon, elementBuilder: x =>
                 {
-                    x.AddComponent(new NameComponent(pair.Key));
+                    ((IComponents)x).AddComponent(new NameComponent(pair.Key));
                 });
                 _logger.LogInformation("Seeder: Created blip of id {elementId} with icon {blipIcon} at position {position}", pair.Key, pair.Value.Icon, pair.Value.Position);
             }
@@ -67,13 +67,13 @@ internal sealed class SeederServerBuilder
     {
         foreach (var pair in pickups)
         {
-            var entity = _entityFactory.CreatePickup(pair.Value.Model, pair.Value.Position, entityBuilder: x =>
+            var pickup = _elementFactory.CreatePickup(pair.Value.Position, pair.Value.Model, elementBuilder: x =>
             {
                 x.AddComponent(new NameComponent(pair.Key));
             });
             if (pair.Value.Text3d != null)
             {
-                entity.AddComponent(new Text3dComponent(pair.Value.Text3d, new Vector3(0, 0, 0.75f)));
+                pickup.AddComponent(new Text3dComponent(pair.Value.Text3d, new Vector3(0, 0, 0.75f)));
             }
             _logger.LogInformation("Seeder: Created pickup of id {elementId} with icon {pickupModel} at {position}", pair.Key, pair.Value.Model, pair.Value.Position);
         }
@@ -85,9 +85,9 @@ internal sealed class SeederServerBuilder
         {
             if (Enum.IsDefined(typeof(MarkerType), pair.Value.MarkerType))
             {
-                var entity = _entityFactory.CreateMarker(pair.Value.MarkerType, pair.Value.Position, pair.Value.Color, entityBuilder: x =>
+                var entity = _elementFactory.CreateMarker(pair.Value.Position, pair.Value.MarkerType, pair.Value.Color, elementBuilder: x =>
                 {
-                    x.AddComponent(new NameComponent(pair.Key));
+                    ((IComponents)x).AddComponent(new NameComponent(pair.Key));
                 });
                 _logger.LogInformation("Seeder: Created marker of id {elementId} at {position}", pair.Key, pair.Value.Position);
             }

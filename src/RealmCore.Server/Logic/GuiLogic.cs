@@ -5,12 +5,12 @@ namespace RealmCore.Server.Logic;
 internal class GuiLogic
 {
     private readonly IServiceProvider _serviceProvider;
-    private readonly IEntityEngine _entityEngine;
+    private readonly IElementCollection _elementCollection;
 
-    public GuiLogic(IServiceProvider serviceProvider, IRealmServer realmServer, IEntityEngine entityEngine)
+    public GuiLogic(IServiceProvider serviceProvider, IRealmServer realmServer, IElementCollection elementCollection)
     {
         _serviceProvider = serviceProvider;
-        _entityEngine = entityEngine;
+        _elementCollection = elementCollection;
         realmServer.ServerStarted += HandleServerStarted;
     }
 
@@ -23,13 +23,13 @@ internal class GuiLogic
 
     private Task HandleGuiFilesChanged()
     {
-        foreach (var entity in _entityEngine.PlayerEntities)
+        foreach (var player in _elementCollection.GetByType<Player>().Cast<RealmPlayer>())
         {
-            var guiComponents = entity.Components.OfType<GuiComponent>().ToList();
+            var guiComponents = player.Components.ComponentsLists.OfType<GuiComponent>().ToList();
             foreach (var guiComponent in guiComponents)
             {
-                entity.DetachComponent(guiComponent);
-                entity.AddComponent(guiComponent);
+                player.Components.DetachComponent(guiComponent);
+                player.Components.AddComponent(guiComponent);
             }
         }
         return Task.CompletedTask;

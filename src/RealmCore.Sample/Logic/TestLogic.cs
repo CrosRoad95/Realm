@@ -1,28 +1,16 @@
-﻿using RealmCore.ECS.Common;
-using System.Drawing;
+﻿using System.Drawing;
 
 namespace RealmCore.Sample.Logic;
 
 public class TestComponent : Component { }
 
-internal class TestLogic : ComponentLogic<PlayerTagComponent>
+internal class TestLogic
 {
-    public TestLogic(IEntityEngine entityEngine, IEntityFactory entityFactory) : base(entityEngine)
+    public TestLogic(IElementFactory elementFactory, IElementFactory entityFactory)
     {
-        var marker = entityFactory.CreateMarker(MarkerType.Cylinder, new Vector3(335.50684f, -83.71094f, 1.4105641f), Color.Red);
-        var markerElementComponent = marker.GetRequiredComponent<MarkerElementComponent>();
-        markerElementComponent.Size = 4;
-        markerElementComponent.EntityEntered = HandleEntityEntered;
-        markerElementComponent.AddRule<MustBeVehicleRule>();
+        var marker = entityFactory.CreateMarker(new Vector3(335.50684f, -83.71094f, 1.4105641f), MarkerType.Cylinder, Color.Red);
+        marker.Size = 4;
+        marker.AddRule<MustBeVehicleRule>();
     }
 
-    private void HandleEntityEntered(MarkerElementComponent markerElementComponent, Entity enteredMarkerEntity, Entity entity)
-    {
-        ;
-    }
-
-    protected override void ComponentAdded(PlayerTagComponent component)
-    {
-        component.Entity.AddComponent<TestComponent>();
-    }
 }

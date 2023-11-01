@@ -2,13 +2,13 @@
 
 internal class TestJobComponent : JobSessionComponent
 {
-    private readonly IEntityFactory _entityFactory;
+    private readonly IElementFactory _elementFactory;
 
     public override short JobId => 1;
 
-    public TestJobComponent(IEntityFactory entityFactory)
+    public TestJobComponent(IElementFactory entityFactory)
     {
-        _entityFactory = entityFactory;
+        _elementFactory = entityFactory;
     }
 
     public void CreateObjectives()
@@ -17,12 +17,12 @@ internal class TestJobComponent : JobSessionComponent
         objective.AddBlip(BlipIcon.North);
         objective.Completed += ObjectiveACompleted;
 
-        var objectEntity = _entityFactory.CreateObject(SlipeServer.Server.Enums.ObjectModel.Gunbox, new Vector3(379.00f, -102.77f, 1.24f), Vector3.Zero);
+        var objectEntity = _elementFactory.CreateObject(SlipeServer.Server.Enums.ObjectModel.Gunbox, new Vector3(379.00f, -102.77f, 1.24f), Vector3.Zero);
         objectEntity.AddComponent<LiftableWorldObjectComponent>();
-        objectEntity.AddComponent(new OwnerDisposableComponent(Entity));
-        var objective2 = AddObjective(new TransportEntityObjective(objectEntity, new Vector3(379.00f, -112.77f, 2.0f)));
+        objectEntity.AddComponent(new OwnerDisposableComponent(Element));
+        var objective2 = AddObjective(new TransportObjectObjective(objectEntity, new Vector3(379.00f, -112.77f, 2.0f)));
         objective2.Completed += ObjectiveBCompleted;
-        var objective3 = AddObjective(new TransportEntityObjective(new Vector3(379.00f, -105.77f, 2.0f)));
+        var objective3 = AddObjective(new TransportObjectObjective(new Vector3(379.00f, -105.77f, 2.0f)));
         objective3.Completed += ObjectiveDCompleted;
 
         var subObjective1 = new MarkerEnterObjective(new Vector3(386.9004f, -89.74414f, 3.8843315f));
@@ -33,19 +33,19 @@ internal class TestJobComponent : JobSessionComponent
 
     private void ObjectiveACompleted(Objective objective, object? data = null)
     {
-        Entity.GetRequiredComponent<JobStatisticsComponent>().AddPoints(1, 1);
+        ((IComponents)Element).GetRequiredComponent<JobStatisticsComponent>().AddPoints(1, 1);
         //ChatBox.OutputTo(Entity, $"Entered marker, objectives left: {Objectives.Count()}");
     }
 
     private void ObjectiveBCompleted(Objective objective, object? data = null)
     {
-        Entity.GetRequiredComponent<JobStatisticsComponent>().AddPoints(1, 2);
+        ((IComponents)Element).GetRequiredComponent<JobStatisticsComponent>().AddPoints(1, 2);
         //ChatBox.OutputTo(Entity, $"Box delivered, objectives left: {Objectives.Count()}");
     }
 
     private void ObjectiveCCompleted(Objective objective, object? data = null)
     {
-        Entity.GetRequiredComponent<JobStatisticsComponent>().AddPoints(1, 1);
+        ((IComponents)Element).GetRequiredComponent<JobStatisticsComponent>().AddPoints(1, 1);
         //ChatBox.OutputTo(Entity, $"Entered one of marker, objectives left: {Objectives.Count()}");
     }
 

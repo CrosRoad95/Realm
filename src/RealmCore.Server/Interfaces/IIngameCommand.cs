@@ -2,5 +2,5 @@
 
 public interface IInGameCommand
 {
-    Task Handle(Entity entity, CommandArguments args);
+    Task Handle(RealmPlayer player, CommandArguments args);
 }

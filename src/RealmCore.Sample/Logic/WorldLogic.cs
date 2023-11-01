@@ -1,6 +1,4 @@
 ﻿using RealmCore.Resources.Overlay;
-using RealmCore.Server.Components.Elements.CollisionShapes;
-using SlipeServer.Server.Enums;
 
 namespace RealmCore.Sample.Logic;
 
@@ -18,19 +16,19 @@ internal class WorldLogic : ComponentLogic<DiscoveriesComponent>
         }
     }
 
-    private readonly Dictionary<int, DiscoveryInfo> _discoveryInfos = new()
+    private readonly Dictionary<int, DiscoveryInfo> _discoveryInfoDictionary = new()
     {
         [1] = new DiscoveryInfo(BlipIcon.Pizza, new Vector3(327.11523f, -65.00488f, 1.5703526f)),
         [2] = new DiscoveryInfo(BlipIcon.Pizza, new Vector3(307.69336f, -71.15039f, 1.4296875f)),
         [3] = new DiscoveryInfo(BlipIcon.Pizza, new Vector3(283.7129f, -71.95996f, 1.4339179f)),
     };
 
-    private readonly IEntityFactory _entityFactory;
+    private readonly IElementFactory _elementFactory;
     private readonly IOverlayService _overlayService;
 
-    public WorldLogic(IRealmServer realmServer, IEntityFactory entityFactory, IEntityEngine entityEngine, IOverlayService overlayService) : base(entityEngine)
+    public WorldLogic(IRealmServer realmServer, IElementFactory entityFactory, IOverlayService overlayService, IElementFactory elementFactory) : base(elementFactory)
     {
-        _entityFactory = entityFactory;
+        _elementFactory = entityFactory;
         _overlayService = overlayService;
         realmServer.ServerStarted += HandleServerStarted;
     }
@@ -39,49 +37,53 @@ internal class WorldLogic : ComponentLogic<DiscoveriesComponent>
     {
         foreach (var discovery in discoveriesComponent.Discoveries)
         {
-            HandlePlayerDiscover(discoveriesComponent.Entity, discovery);
+            HandlePlayerDiscover((RealmPlayer)discoveriesComponent.Element, discovery);
         }
     }
 
     private void HandleServerStarted()
     {
-        _entityFactory.CreateRadarArea(new Vector2(0, 0), new Vector2(50, 50), System.Drawing.Color.Pink);
+        // TODO:
+        //_elementFactory.CreateRadarArea(new Vector2(0, 0), new Vector2(50, 50), System.Drawing.Color.Pink);
 
-        _entityFactory.CreateObject((ObjectModel)1338, new Vector3(0, 0, 10), Vector3.Zero);
-        var veh = _entityFactory.CreateVehicle(404, new Vector3(0, 0, 4), Vector3.Zero);
-        var ped = _entityFactory.CreatePed(SlipeServer.Server.Elements.Enums.PedModel.Cj, new Vector3(5, 0, 4));
-        veh.GetRequiredComponent<VehicleElementComponent>().AddPassenger(0, (Ped)ped.GetElement());
+        //_elementFactory.CreateObject((ObjectModel)1338, new Vector3(0, 0, 10), Vector3.Zero);
+        //var veh = _elementFactory.CreateVehicle(404, new Vector3(0, 0, 4), Vector3.Zero);
+        //var ped = _elementFactory.CreatePed(SlipeServer.Server.Elements.Enums.PedModel.Cj, new Vector3(5, 0, 4));
+        //veh.GetRequiredComponent<VehicleElementComponent>().AddPassenger(0, (Ped)ped);
 
-        foreach (var item in _discoveryInfos)
-        {
-            var entity = _entityFactory.CreateCollisionSphere(item.Value.position, 8);
-            AttachDiscovery(entity, item.Key, HandlePlayerDiscover);
-        }
+        //foreach (var item in _discoveryInfoDictionary)
+        //{
+        //    var collisionSphere = _elementFactory.CreateCollisionSphere(item.Value.position, 8);
+        //    AttachDiscovery(collisionSphere, item.Key, HandlePlayerDiscover);
+        //}
     }
 
-    private void HandlePlayerDiscover(Entity entity, int discoverId, bool newlyDiscovered = false)
+    private void HandlePlayerDiscover(RealmPlayer player, int discoverId, bool newlyDiscovered = false)
     {
         if (newlyDiscovered)
         {
-            _overlayService.AddNotification(entity, $"Pomyślnie odkryłes miejscowke: {discoverId}");
+            _overlayService.AddNotification(player, $"Pomyślnie odkryłes miejscowke: {discoverId}");
         }
 
-        if (_discoveryInfos.TryGetValue(discoverId, out var value))
+        if (_discoveryInfoDictionary.TryGetValue(discoverId, out var value))
         {
-            using var scopedEntityFactory = _entityFactory.CreateScopedEntityFactory(entity);
-            scopedEntityFactory.CreateBlip(value.blipIcon, value.position);
+            // TODO:
+            //using var scopedEntityFactory = _elementFactory.CreateScopedEntityFactory(player);
+            //scopedEntityFactory.CreateBlip(value.blipIcon, value.position);
         }
     }
 
-    private void AttachDiscovery(Entity entity, int discoveryName, Action<Entity, int, bool> callback)
+    private void AttachDiscovery(RealmCollisionSphere collisionSphere, int discoveryName, Action<RealmPlayer, int, bool> callback)
     {
-        var collisionSphereElementComponent = entity.GetRequiredComponent<CollisionSphereElementComponent>();
-        collisionSphereElementComponent.AddRule<MustBePlayerRule>();
-        collisionSphereElementComponent.EntityEntered = (enteredColshapeEntity, enteredEntity) =>
+        collisionSphere.AddRule<MustBePlayerRule>();
+        collisionSphere.Entered += (enteredColShape, element) =>
         {
-            if (enteredEntity.GetRequiredComponent<DiscoveriesComponent>().TryDiscover(discoveryName))
+            if(element is RealmPlayer player)
             {
-                callback(enteredEntity, discoveryName, true);
+                if (player.Components.GetRequiredComponent<DiscoveriesComponent>().TryDiscover(discoveryName))
+                {
+                    callback(player, discoveryName, true);
+                }
             }
         };
     }

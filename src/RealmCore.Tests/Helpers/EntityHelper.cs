@@ -1,29 +1,22 @@
-﻿using Microsoft.AspNetCore.Identity;
-using RealmCore.Persistence.Data;
-using RealmCore.Server.Components.TagComponents;
-using SlipeServer.Server.Clients;
-using System.Security.Claims;
-
-namespace RealmCore.Tests.Helpers;
+﻿namespace RealmCore.Tests.Helpers;
 
 internal class EntityHelper
 {
     private readonly TestingServer _testingServer;
     private readonly IServiceProvider _serviceProvider;
-    private readonly IEntityEngine _entityEngine;
+    private readonly IElementFactory _elementFactory;
     private readonly IBanService _banService;
 
     public EntityHelper(TestingServer testingServer)
     {
         _testingServer = testingServer;
         _serviceProvider = _testingServer.GetRequiredService<IServiceProvider>();
-        _entityEngine = _testingServer.GetRequiredService<IEntityEngine>();
+        _elementFactory = _testingServer.GetRequiredService<IElementFactory>();
         _banService = _testingServer.GetRequiredService<IBanService>();
     }
 
-    public Entity CreatePlayerEntity(bool withSerialAndIp = true)
+    public RealmPlayer CreatePlayerEntity(bool withSerialAndIp = true)
     {
-        var entity = _entityEngine.CreateEntity();
         var player = _testingServer.AddFakePlayer();
 
         if (withSerialAndIp)
@@ -37,14 +30,12 @@ internal class EntityHelper
 
         player.Name = "CrosRoad95";
         player.TriggerResourceStarted(420);
-        entity.AddComponent<Transform>();
-        entity.AddComponent<PlayerTagComponent>();
         entity.AddComponent(new PlayerElementComponent(player, new Vector2(1920, 1080), new System.Globalization.CultureInfo("pl-PL")));
 
         return entity;
     }
 
-    public async Task<UserComponent> LogInEntity(Entity entity, string[]? roles = null)
+    public async Task<UserComponent> LogInPlayer(RealmPlayer player, string[]? roles = null)
     {
         var claims = new List<Claim>
         {
@@ -79,24 +70,7 @@ internal class EntityHelper
                     claimsIdentity.AddClaim(new Claim(ClaimTypes.Role, role));
             }
         var bans = await _banService.GetBansByUserIdAndSerial(user.Id, "AAAA");
-        var userComponent = entity.AddComponent(new UserComponent(user, claimsPrincipal, bans));
+        var userComponent = player.AddComponent(new UserComponent(user, claimsPrincipal, bans));
         return userComponent;
-    }
-
-    public Entity CreateObjectEntity()
-    {
-        var entity = new Entity();
-        entity.AddComponent<Transform>();
-        entity.AddComponent<WorldObjectTagComponent>();
-        entity.AddComponent(new WorldObjectComponent(new SlipeServer.Server.Elements.WorldObject(SlipeServer.Server.Enums.ObjectModel.Vegtree3, Vector3.Zero)));
-        return entity;
-    }
-    public Entity CreateVehicleEntity()
-    {
-        var entity = new Entity();
-        entity.AddComponent<Transform>();
-        entity.AddComponent<WorldObjectTagComponent>();
-        entity.AddComponent(new WorldObjectComponent(new SlipeServer.Server.Elements.WorldObject(SlipeServer.Server.Enums.ObjectModel.Vegtree3, Vector3.Zero)));
-        return entity;
     }
 }

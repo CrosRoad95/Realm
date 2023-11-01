@@ -1,15 +1,13 @@
-﻿using RealmCore.Server.Components.Players;
-
-namespace RealmCore.Console.Extra.Integrations.Discord.Handlers;
+﻿namespace RealmCore.Console.Extra.Integrations.Discord.Handlers;
 
 public class DiscordConnectUserHandler : IDiscordConnectUserHandler
 {
-    private readonly IEntityEngine _entityEngine;
+    private readonly IElementCollection _elementCollection;
     private readonly ILogger<DiscordConnectUserHandler> _logger;
 
-    public DiscordConnectUserHandler(IEntityEngine entityEngine, ILogger<DiscordConnectUserHandler> logger)
+    public DiscordConnectUserHandler(IElementCollection elementCollection, ILogger<DiscordConnectUserHandler> logger)
     {
-        _entityEngine = entityEngine;
+        _elementCollection = elementCollection;
         _logger = logger;
     }
 
@@ -17,13 +15,14 @@ public class DiscordConnectUserHandler : IDiscordConnectUserHandler
     {
         try
         {
-            foreach (var item in _entityEngine.PlayerEntities)
+            foreach (var player in _elementCollection.GetByType<Player>().Cast<RealmPlayer>())
             {
-                if (item.TryGetComponent<PendingDiscordIntegrationComponent>(out var component))
+                var components = player.Components;
+                if (components.TryGetComponent<PendingDiscordIntegrationComponent>(out var component))
                 {
                     if (component.Verify(code))
                     {
-                        item.AddComponent(new DiscordIntegrationComponent(userId));
+                        components.AddComponent(new DiscordIntegrationComponent(userId));
                         return Task.FromResult(new TryConnectResponse
                         {
                             message = "User connected successfully!",

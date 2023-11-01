@@ -4,7 +4,7 @@ internal class PlayTimeComponentLogic : ComponentLogic<PlayTimeComponent>
 {
     private readonly ILogger<PlayTimeComponentLogic> _logger;
 
-    public PlayTimeComponentLogic(IEntityEngine entityEngine, ILogger<PlayTimeComponentLogic> logger) : base(entityEngine)
+    public PlayTimeComponentLogic(IElementFactory elementFactory, ILogger<PlayTimeComponentLogic> logger) : base(elementFactory)
     {
         _logger = logger;
     }

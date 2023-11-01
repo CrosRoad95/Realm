@@ -2,7 +2,7 @@
 
 public class ToggleControlsScope : IDisposable
 {
-    private readonly PlayerElementComponent _playerElementComponent;
+    private readonly RealmPlayer _player;
     private readonly bool _fireEnabled;
     private readonly bool _aimWeaponEnabled;
     private readonly bool _nextWeaponEnabled;
@@ -31,12 +31,10 @@ public class ToggleControlsScope : IDisposable
     private readonly bool _hornEnabled;
     private readonly bool _enterPassengerEnabled;
 
-    public ToggleControlsScope(Entity entity) : this(entity.GetRequiredComponent<PlayerElementComponent>()) { }
-    
-    public ToggleControlsScope(PlayerElementComponent playerElementComponent)
+    public ToggleControlsScope(RealmPlayer player)
     {
-        _playerElementComponent = playerElementComponent;
-        var controls = _playerElementComponent.Controls;
+        _player = player;
+        var controls = _player.Controls;
         _fireEnabled = controls.FireEnabled;
         _aimWeaponEnabled = controls.AimWeaponEnabled;
         _nextWeaponEnabled = controls.NextWeaponEnabled;
@@ -68,7 +66,7 @@ public class ToggleControlsScope : IDisposable
 
     public void Dispose()
     {
-        var controls = _playerElementComponent.Controls;
+        var controls = _player.Controls;
         controls.FireEnabled = _fireEnabled;
         controls.AimWeaponEnabled = _aimWeaponEnabled;
         controls.NextWeaponEnabled = _nextWeaponEnabled;

@@ -4,7 +4,7 @@ internal sealed class FocusableComponentLogic : ComponentLogic<FocusableComponen
 {
     private readonly IClientInterfaceService _clientInterfaceService;
 
-    public FocusableComponentLogic(IEntityEngine entityEngine, IClientInterfaceService clientInterfaceService) : base(entityEngine)
+    public FocusableComponentLogic(IElementFactory elementFactory, IClientInterfaceService clientInterfaceService) : base(elementFactory)
     {
         _clientInterfaceService = clientInterfaceService;
         _clientInterfaceService.FocusedElementChanged += HandleFocusedElementChanged;
@@ -13,58 +13,42 @@ internal sealed class FocusableComponentLogic : ComponentLogic<FocusableComponen
 
     private void HandleClickedElementChanged(Player player, Element? clickedElement)
     {
-        var playerElementComponent = (PlayerElementComponent)player;
-        if (clickedElement is IElementComponent elementComponent)
-        {
-            playerElementComponent.LastClickedElement = elementComponent.Entity;
-        }
-        else
-        {
-            playerElementComponent.LastClickedElement = null;
-        }
+        ((RealmPlayer)player).LastClickedElement = clickedElement;
     }
 
+    // TODO:
     private void HandleFocusedElementChanged(Player player, Element? focusedElement, string? vehiclePart)
     {
-        var playerEntity = ((PlayerElementComponent)player).Entity;
-        var playerElementComponent = playerEntity.GetRequiredComponent<PlayerElementComponent>();
+        var realmPlayer = ((RealmPlayer)player);
         if(focusedElement == null)
         {
-            if(playerElementComponent.FocusedEntity != null)
+            if(realmPlayer.FocusedEntity is IComponents components)
             {
-                if(playerElementComponent.FocusedEntity.TryGetComponent(out FocusableComponent focusableComponent))
+                if(components.Components.TryGetComponent(out FocusableComponent focusableComponent))
                 {
-                    focusableComponent.RemoveFocusedPlayer(playerEntity);
+                    focusableComponent.RemoveFocusedPlayer(realmPlayer);
                 }
             }
         }
         else
         {
-            if (focusedElement is IElementComponent elementComponent)
+            if (realmPlayer.FocusedEntity is IComponents components)
             {
-                elementComponent.Entity.GetRequiredComponent<FocusableComponent>().AddFocusedPlayer(playerEntity);
+                components.Components.GetRequiredComponent<FocusableComponent>().AddFocusedPlayer(realmPlayer);
+
             }
         }
 
-        if (focusedElement == null)
-            playerElementComponent.FocusedEntity = null;
-        else
-        {
-            if (focusedElement is IElementComponent elementComponent)
-                playerElementComponent.FocusedEntity = elementComponent.Entity;
-            else
-                playerElementComponent.FocusedEntity = null;
-        }
-
+        realmPlayer.FocusedEntity = focusedElement;
     }
 
     protected override void ComponentAdded(FocusableComponent component)
     {
-        _clientInterfaceService.AddFocusable(component.Entity.GetElement());
+        _clientInterfaceService.AddFocusable(component.Element);
     }
 
     protected override void ComponentDetached(FocusableComponent component)
     {
-        _clientInterfaceService.RemoveFocusable(component.Entity.GetElement());
+        _clientInterfaceService.RemoveFocusable(component.Element);
     }
 }

@@ -1,30 +1,19 @@
-﻿using System.Diagnostics;
-using Color = System.Drawing.Color;
-using Size = System.Drawing.Size;
+﻿using Color = System.Drawing.Color;
 using SlipeServer.Server.Enums;
-using RealmCore.Server.Components.World;
-using RealmCore.Server.Enums;
 using RealmCore.Resources.ElementOutline;
-using RealmCore.Resources.Assets.Factories;
 using RealmCore.Resources.Assets.Interfaces;
-using RealmCore.Server.Concepts.Spawning;
 using RealmCore.Server.Components.Vehicles.Access;
 using RealmCore.Resources.Overlay;
 using RealmCore.Resources.Assets;
-using RealmCore.Server.Components.Elements.CollisionShapes;
-using RealmCore.Sample.Components.Huds;
-using RealmCore.Sample.Components;
 using RealmCore.Sample.Components.Vehicles;
-using RealmCore.Sample.Components.Gui.Blazor;
 
 namespace RealmCore.Sample.Logic;
 
 internal sealed class CommandsLogic
 {
     private readonly RealmCommandService _commandService;
-    private readonly IEntityFactory _entityFactory;
+    private readonly IElementFactory _elementFactory;
     private readonly ItemsRegistry _itemsRegistry;
-    private readonly IEntityEngine _entityEngine;
     private readonly IBanService _banService;
     private readonly ChatBox _chatBox;
     private readonly ILogger<CommandsLogic> _logger;
@@ -47,15 +36,15 @@ internal sealed class CommandsLogic
         Test2,
     }
 
-    public CommandsLogic(RealmCommandService commandService, IEntityFactory entityFactory,
-        ItemsRegistry itemsRegistry, IEntityEngine entityEngine, IBanService banService, ChatBox chatBox, ILogger<CommandsLogic> logger,
+    public CommandsLogic(RealmCommandService commandService, IElementFactory entityFactory,
+        ItemsRegistry itemsRegistry, IElementFactory elementFactory, IBanService banService, ChatBox chatBox, ILogger<CommandsLogic> logger,
         IDateTimeProvider dateTimeProvider, INametagsService nametagsService, IUsersService usersService, IVehiclesService vehiclesService,
         GameWorld gameWorld, IElementOutlineService elementOutlineService, IAssetsService assetsService, ISpawnMarkersService spawnMarkersService, ILoadService loadService, IFeedbackService feedbackService, IOverlayService overlayService, AssetsRegistry assetsRegistry, VehicleUpgradeRegistry vehicleUpgradeRegistry, VehicleEnginesRegistry vehicleEnginesRegistry, IUserWhitelistedSerialsRepository userWhitelistedSerialsRepository, IVehicleRepository vehicleRepository, IUserMoneyHistoryService userMoneyHistoryService)
     {
         _commandService = commandService;
-        _entityFactory = entityFactory;
+        _elementFactory = entityFactory;
         _itemsRegistry = itemsRegistry;
-        _entityEngine = entityEngine;
+        _elementFactory = elementFactory;
         _banService = banService;
         _chatBox = chatBox;
         _logger = logger;
@@ -68,1592 +57,1571 @@ internal sealed class CommandsLogic
         _userMoneyHistoryService = userMoneyHistoryService;
         var debounce = new Debounce(500);
         var debounceCounter = 0;
-        _commandService.AddAsyncCommandHandler("debounce", async (entity, args) =>
+        _commandService.AddAsyncCommandHandler("debounce", async (player, args) =>
         {
             debounceCounter++;
             await debounce.InvokeAsync(() =>
             {
-                _chatBox.OutputTo(entity, $"Counter={debounceCounter}, {DateTime.Now}");
+                _chatBox.OutputTo(player, $"Counter={debounceCounter}, {DateTime.Now}");
             });
         });
 
-        _commandService.AddAsyncCommandHandler("fadecamera", async (entity, args) =>
+        _commandService.AddAsyncCommandHandler("fadecamera", async (player, args) =>
         {
-            var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();
-            await playerElementComponent.FadeCameraAsync(CameraFade.Out, 5);
-            await playerElementComponent.FadeCameraAsync(CameraFade.In, 5);
+            await player.FadeCameraAsync(CameraFade.Out, 5);
+            await player.FadeCameraAsync(CameraFade.In, 5);
         });
 
-        _commandService.AddAsyncCommandHandler("fadecamera2", async (entity, args) =>
+        _commandService.AddAsyncCommandHandler("fadecamera2", async (player, args) =>
         {
             var cancelationTokenSource = new CancellationTokenSource();
             cancelationTokenSource.CancelAfter(2000);
-            var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();
-            await playerElementComponent.FadeCameraAsync(CameraFade.Out, 5, cancelationTokenSource.Token);
-            await playerElementComponent.FadeCameraAsync(CameraFade.In, 5);
+            await player.FadeCameraAsync(CameraFade.Out, 5, cancelationTokenSource.Token);
+            await player.FadeCameraAsync(CameraFade.In, 5);
         });
 
         #region Commands for components tests
-        _commandService.AddCommandHandler("focusablecomponent", (entity, args) =>
+        _commandService.AddCommandHandler("focusablecomponent", (player, args) =>
         {
-            var player = entity.GetRequiredComponent<PlayerElementComponent>();
-            var worldObject = _entityFactory.CreateObject(ObjectModel.Gunbox, player.Position + new Vector3(4, 0, 0), player.Rotation);
-            var focusableComponent = worldObject.AddComponent<FocusableComponent>();
+            var worldObject = _elementFactory.CreateObject(ObjectModel.Gunbox, player.Position + new Vector3(4, 0, 0), player.Rotation);
+            var focusableComponent = worldObject.Components.AddComponent<FocusableComponent>();
             focusableComponent.PlayerFocused += (that, player) =>
             {
-                var playerName = player.GetRequiredComponent<PlayerElementComponent>().Name;
+                var playerName = player.Name;
                 _chatBox.Output($"Player {playerName} focused, focused elements {focusableComponent.FocusedPlayerCount}");
                 _logger.LogInformation($"Player {playerName} focused, focused elements {focusableComponent.FocusedPlayerCount}");
             };
             focusableComponent.PlayerLostFocus += (that, player) =>
             {
-                var playerName = player.GetRequiredComponent<PlayerElementComponent>().Name;
+                var playerName = player.Name;
                 _chatBox.Output($"Player {playerName} lost focus, focused elements {focusableComponent.FocusedPlayerCount}");
                 _logger.LogInformation($"Player {playerName} lost focus, focused elements {focusableComponent.FocusedPlayerCount}");
             };
 
-            _chatBox.OutputTo(entity, "Created focusable component");
+            _chatBox.OutputTo(player, "Created focusable component");
         });
 
-        _commandService.AddAsyncCommandHandler("outlinecomponent", async (entity, args) =>
+        _commandService.AddAsyncCommandHandler("outlinecomponent", async (player, args) =>
         {
-            var player = entity.GetRequiredComponent<PlayerElementComponent>();
-            var worldObject = _entityFactory.CreateObject(ObjectModel.Gunbox, player.Position + new Vector3(4, 0, 0), player.Rotation);
-            var focusableComponent = worldObject.AddComponent(new OutlineComponent(Color.Red));
-            _chatBox.OutputTo(entity, "Created outline component");
+            var worldObject = _elementFactory.CreateObject(ObjectModel.Gunbox, player.Position + new Vector3(4, 0, 0), player.Rotation);
+            var focusableComponent = worldObject.Components.AddComponent(new OutlineComponent(Color.Red));
+            _chatBox.OutputTo(player, "Created outline component");
             await Task.Delay(2000);
-            worldObject.DestroyComponent(focusableComponent);
-            _chatBox.OutputTo(entity, "Destroyed outline component");
+            worldObject.Components.DestroyComponent(focusableComponent);
+            _chatBox.OutputTo(player, "Destroyed outline component");
         });
 
-        _commandService.AddAsyncCommandHandler("outlinecomponent2", async (entity, args) =>
+        _commandService.AddAsyncCommandHandler("outlinecomponent2", async (player, args) =>
         {
-            var player = entity.GetRequiredComponent<PlayerElementComponent>();
-            var worldObject = _entityFactory.CreateObject(ObjectModel.Gunbox, player.Position + new Vector3(4, 0, 0), player.Rotation);
-            var focusableComponent = worldObject.AddComponent(new OutlineComponent(Color.Red));
-            _chatBox.OutputTo(entity, "Created outline component");
+            var worldObject = _elementFactory.CreateObject(ObjectModel.Gunbox, player.Position + new Vector3(4, 0, 0), player.Rotation);
+            var focusableComponent = worldObject.Components.AddComponent(new OutlineComponent(Color.Red));
+            _chatBox.OutputTo(player, "Created outline component");
             await Task.Delay(2000);
-            worldObject.Dispose();
-            _chatBox.OutputTo(entity, "Destroyed entity");
+            worldObject.Destroy();
+            _chatBox.OutputTo(player, "Destroyed player");
         });
         #endregion
 
-        _commandService.AddCommandHandler("playtime", (entity, args) =>
+        _commandService.AddCommandHandler("playtime", (player, args) =>
         {
-            if (entity.TryGetComponent(out PlayTimeComponent playTimeComponent))
+            if (player.Components.TryGetComponent(out PlayTimeComponent playTimeComponent))
             {
-                _chatBox.OutputTo(entity, $"playtime: {playTimeComponent.PlayTime}, total play time: {playTimeComponent.TotalPlayTime}");
+                _chatBox.OutputTo(player, $"playtime: {playTimeComponent.PlayTime}, total play time: {playTimeComponent.TotalPlayTime}");
             }
         });
 
-        _commandService.AddCommandHandler("givemoney", (entity, args) =>
+        _commandService.AddCommandHandler("givemoney", (player, args) =>
         {
-            if (entity.TryGetComponent(out MoneyComponent moneyComponent))
+            if (player.Components.TryGetComponent(out MoneyComponent moneyComponent))
             {
                 var amount = args.ReadDecimal();
                 moneyComponent.GiveMoney(amount);
-                _chatBox.OutputTo(entity, $"gave money: {amount}, total money: {moneyComponent.Money}");
+                _chatBox.OutputTo(player, $"gave money: {amount}, total money: {moneyComponent.Money}");
             }
         });
 
-        _commandService.AddCommandHandler("takemoney", (entity, args) =>
+        _commandService.AddCommandHandler("takemoney", (player, args) =>
         {
-            if (entity.TryGetComponent(out MoneyComponent moneyComponent))
+            if (player.Components.TryGetComponent(out MoneyComponent moneyComponent))
             {
                 var amount = args.ReadDecimal();
                 moneyComponent.TakeMoney(amount);
-                _chatBox.OutputTo(entity, $"taken money: {amount}, total money: {moneyComponent.Money}");
+                _chatBox.OutputTo(player, $"taken money: {amount}, total money: {moneyComponent.Money}");
             }
         });
 
-        _commandService.AddCommandHandler("setmoney", (entity, args) =>
+        _commandService.AddCommandHandler("setmoney", (player, args) =>
         {
-            if (entity.TryGetComponent(out MoneyComponent moneyComponent))
+            if (player.Components.TryGetComponent(out MoneyComponent moneyComponent))
             {
                 var amount = args.ReadDecimal();
                 moneyComponent.Money = amount;
-                _chatBox.OutputTo(entity, $"taken money: {amount}, total money: {moneyComponent.Money}");
+                _chatBox.OutputTo(player, $"taken money: {amount}, total money: {moneyComponent.Money}");
             }
         });
 
-        _commandService.AddCommandHandler("money", (entity, args) =>
+        _commandService.AddCommandHandler("money", (player, args) =>
         {
-            if (entity.TryGetComponent(out MoneyComponent moneyComponent))
+            if (player.Components.TryGetComponent(out MoneyComponent moneyComponent))
             {
-                _chatBox.OutputTo(entity, $"total money: {moneyComponent.Money}");
+                _chatBox.OutputTo(player, $"total money: {moneyComponent.Money}");
             }
         });
 
-        _commandService.AddCommandHandler("cvwithlicenserequired", (entity, args) =>
+        _commandService.AddCommandHandler("cvwithlicenserequired", (player, args) =>
         {
-            var player = entity.GetRequiredComponent<PlayerElementComponent>();
-            var vehicleEntity = _entityFactory.CreateVehicle(args.ReadUShort(), player.Position + new Vector3(4, 0, 0), player.Rotation);
-            vehicleEntity.AddComponent(new VehicleLicenseRequiremenetAccessComponent(10));
+            var vehicle = _elementFactory.CreateVehicle(args.ReadUShort(), player.Position + new Vector3(4, 0, 0), player.Rotation);
+            vehicle.Components.AddComponent(new VehicleLicenseRequirementAccessComponent(10));
         });
 
-        _commandService.AddCommandHandler("givelicense10", (entity, args) =>
+        _commandService.AddCommandHandler("givelicense10", (player, args) =>
         {
-            if (entity.TryGetComponent(out LicensesComponent licenseComponent))
+            if (player.Components.TryGetComponent(out LicensesComponent licenseComponent))
             {
                 if (licenseComponent.TryAddLicense(10))
-                    _chatBox.OutputTo(entity, $"License 10 added");
+                    _chatBox.OutputTo(player, $"License 10 added");
             }
         });
 
-        _commandService.AddCommandHandler("cv", (entity, args) =>
+        _commandService.AddCommandHandler("cv", (player, args) =>
         {
-            var player = entity.GetRequiredComponent<PlayerElementComponent>();
-            var vehicleEntity = _entityFactory.CreateVehicle(args.ReadUShort(), player.Position + new Vector3(4, 0, 0), player.Rotation);
-            vehicleEntity.AddComponent<VehicleUpgradesComponent>();
-            vehicleEntity.AddComponent<MileageCounterComponent>();
-            vehicleEntity.AddComponent(new FuelComponent(1, 20, 20, 0.01, 2)).Active = true;
-            vehicleEntity.AddComponent<FocusableComponent>();
-            vehicleEntity.AddComponent<VehiclePartDamageComponent>().AddPart(1, 1337);
-            vehicleEntity.AddComponent(new VehicleExclusiveAccessComponent(entity));
-            _chatBox.OutputTo(entity, $"veh created");
+            var vehicle = _elementFactory.CreateVehicle(args.ReadUShort(), player.Position + new Vector3(4, 0, 0), player.Rotation);
+            var components = vehicle.Components;
+            components.AddComponent<VehicleUpgradesComponent>();
+            components.AddComponent<MileageCounterComponent>();
+            components.AddComponent(new FuelComponent(1, 20, 20, 0.01, 2)).Active = true;
+            components.AddComponent<FocusableComponent>();
+            components.AddComponent<VehiclePartDamageComponent>().AddPart(1, 1337);
+            components.AddComponent(new VehicleExclusiveAccessComponent(player));
+            _chatBox.OutputTo(player, $"veh created");
         });
 
-        _commandService.AddAsyncCommandHandler("cvprivate", async (entity, args) =>
+        _commandService.AddAsyncCommandHandler("cvprivate", async (player, args) =>
         {
-            var player = entity.GetRequiredComponent<PlayerElementComponent>();
-            var vehicleEntity = await _vehiclesService.CreateVehicle(404, player.Position + new Vector3(4, 0, 0), player.Rotation);
-            vehicleEntity.AddComponent<VehicleUpgradesComponent>().AddUpgrade(1);
-            vehicleEntity.AddComponent<MileageCounterComponent>();
-            vehicleEntity.AddComponent<VehicleEngineComponent>();
-            vehicleEntity.AddComponent(new FuelComponent(1, 20, 20, 0.01, 2)).Active = true;
-            vehicleEntity.AddComponent<VehiclePartDamageComponent>().AddPart(1, 1337);
-            vehicleEntity.GetRequiredComponent<PrivateVehicleComponent>().Access.AddAsOwner(entity);
+            var vehicle = await _vehiclesService.CreateVehicle(404, player.Position + new Vector3(4, 0, 0), player.Rotation);
+            var components = vehicle.Components;
+            components.AddComponent<VehicleUpgradesComponent>().AddUpgrade(1);
+            components.AddComponent<MileageCounterComponent>();
+            components.AddComponent<VehicleEngineComponent>();
+            components.AddComponent(new FuelComponent(1, 20, 20, 0.01, 2)).Active = true;
+            components.AddComponent<VehiclePartDamageComponent>().AddPart(1, 1337);
+            components.GetRequiredComponent<PrivateVehicleComponent>().Access.AddAsOwner(player);
         });
 
-        _commandService.AddCommandHandler("exclusivecv", (entity, args) =>
+        _commandService.AddCommandHandler("exclusivecv", (player, args) =>
         {
-            var player = entity.GetRequiredComponent<PlayerElementComponent>();
-            var vehicleEntity = _entityFactory.CreateVehicle(404, player.Position + new Vector3(4, 0, 0), player.Rotation);
-            vehicleEntity.AddComponent<VehicleUpgradesComponent>();
-            vehicleEntity.AddComponent<MileageCounterComponent>();
-            vehicleEntity.AddComponent(new FuelComponent(1, 20, 20, 0.01, 2)).Active = true;
-            vehicleEntity.AddComponent(new VehicleExclusiveAccessComponent(entity));
+            var vehicle = _elementFactory.CreateVehicle(404, player.Position + new Vector3(4, 0, 0), player.Rotation);
+            var components = vehicle.Components;
+            components.AddComponent<VehicleUpgradesComponent>();
+            components.AddComponent<MileageCounterComponent>();
+            components.AddComponent(new FuelComponent(1, 20, 20, 0.01, 2)).Active = true;
+            components.AddComponent(new VehicleExclusiveAccessComponent(player));
         });
 
-        _commandService.AddCommandHandler("noaccesscv", (entity, args) =>
+        _commandService.AddCommandHandler("noaccesscv", (player, args) =>
         {
-            var player = entity.GetRequiredComponent<PlayerElementComponent>();
-            var vehicleEntity = _entityFactory.CreateVehicle(404, player.Position + new Vector3(4, 0, 0), player.Rotation);
-            vehicleEntity.AddComponent<VehicleUpgradesComponent>();
-            vehicleEntity.AddComponent<MileageCounterComponent>();
-            vehicleEntity.AddComponent(new FuelComponent(1, 20, 20, 0.01, 2)).Active = true;
-            vehicleEntity.AddComponent<VehicleNoAccessComponent>();
+            var vehicle = _elementFactory.CreateVehicle(404, player.Position + new Vector3(4, 0, 0), player.Rotation);
+            var components = vehicle.Components;
+            components.AddComponent<VehicleUpgradesComponent>();
+            components.AddComponent<MileageCounterComponent>();
+            components.AddComponent(new FuelComponent(1, 20, 20, 0.01, 2)).Active = true;
+            components.AddComponent<VehicleNoAccessComponent>();
         });
 
-        _commandService.AddAsyncCommandHandler("privateblip", async (entity, args) =>
+        _commandService.AddAsyncCommandHandler("privateblip", async (player, args) =>
         {
-            var player = entity.GetRequiredComponent<PlayerElementComponent>();
-            using var scopedEntityFactory = _entityFactory.CreateScopedEntityFactory(entity);
-            var blipElementComponent = scopedEntityFactory.CreateBlip(BlipIcon.Pizza, player.Position);
-            await Task.Delay(1000);
-            entity.DestroyComponent(scopedEntityFactory.LastCreatedComponent);
+            // TODO:
+            //using var scopedEntityFactory = _elementFactory.CreateScopedEntityFactory(player);
+            //var blipElementComponent = scopedEntityFactory.CreateBlip(BlipIcon.Pizza, player.Position);
+            //await Task.Delay(1000);
+            //player.DestroyComponent(scopedEntityFactory.LastCreatedComponent);
         });
 
-        _commandService.AddCommandHandler("addmeasowner", (entity, args) =>
+        _commandService.AddCommandHandler("addmeasowner", (player, args) =>
         {
-            var player = entity.GetRequiredComponent<PlayerElementComponent>();
-            var veh = player.Vehicle.UpCast();
-            veh.GetRequiredComponent<PrivateVehicleComponent>().Access.AddAsOwner(entity);
+            var vehicle = (RealmVehicle)player.Vehicle;
+            vehicle.Components.GetRequiredComponent<PrivateVehicleComponent>().Access.AddAsOwner(player);
         });
 
-        _commandService.AddCommandHandler("accessinfo", (entity, args) =>
+        _commandService.AddCommandHandler("accessinfo", (player, args) =>
         {
-            var player = entity.GetRequiredComponent<PlayerElementComponent>();
-            var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();
-            var veh = playerElementComponent.Vehicle.UpCast();
-            if (veh == null)
+            var vehicle = player.Vehicle as RealmVehicle;
+            if (vehicle == null)
             {
-                _chatBox.OutputTo(entity, "Enter vehicle!");
+                _chatBox.OutputTo(player, "Enter vehicle!");
                 return;
             }
 
-            var privateVehicleComponent = veh.GetRequiredComponent<PrivateVehicleComponent>();
-            _chatBox.OutputTo(entity, "Access info:");
+            var privateVehicleComponent = vehicle.Components.GetRequiredComponent<PrivateVehicleComponent>();
+            _chatBox.OutputTo(player, "Access info:");
 
             foreach (var vehicleAccess in privateVehicleComponent.Access.PlayerAccesses)
             {
-                _chatBox.OutputTo(entity, $"Access: ({vehicleAccess.userId}) = Ownership={vehicleAccess.accessType == 0}");
+                _chatBox.OutputTo(player, $"Access: ({vehicleAccess.userId}) = Ownership={vehicleAccess.accessType == 0}");
             }
         });
 
-        _commandService.AddAsyncCommandHandler("accessinfobyid", async (entity, args) =>
+        _commandService.AddAsyncCommandHandler("accessinfobyid", async (player, args) =>
         {
             var access = await _vehicleRepository.GetAllVehicleAccesses(args.ReadInt());
             if (access == null)
             {
-                _chatBox.OutputTo(entity, "Vehicle not found");
+                _chatBox.OutputTo(player, "Vehicle not found");
                 return;
             }
 
 
-            _chatBox.OutputTo(entity, "Access info:");
+            _chatBox.OutputTo(player, "Access info:");
 
             foreach (var vehicleAccess in access)
             {
-                _chatBox.OutputTo(entity, $"Access: ({vehicleAccess.UserId}) = Ownership={vehicleAccess.AccessType == 0}");
+                _chatBox.OutputTo(player, $"Access: ({vehicleAccess.UserId}) = Ownership={vehicleAccess.AccessType == 0}");
             }
         });
 
-        _commandService.AddCommandHandler("testachievement", (entity, args) =>
+        _commandService.AddCommandHandler("testachievement", (player, args) =>
         {
-            var achievementsComponent = entity.GetRequiredComponent<AchievementsComponent>();
+            var achievementsComponent = player.Components.GetRequiredComponent<AchievementsComponent>();
             achievementsComponent.UpdateProgress(1, 2, 10);
-            _chatBox.OutputTo(entity, $"progressed achieviement 'test'");
+            _chatBox.OutputTo(player, $"progressed achieviement 'test'");
         });
 
-        _commandService.AddCommandHandler("addupgrade", (entity, args) =>
+        _commandService.AddCommandHandler("addupgrade", (player, args) =>
         {
-            var jobUpgradesComponent = entity.GetRequiredComponent<JobUpgradesComponent>();
+            var jobUpgradesComponent = player.Components.GetRequiredComponent<JobUpgradesComponent>();
             try
             {
                 if (jobUpgradesComponent.TryAddJobUpgrade(1, 1))
-                    _chatBox.OutputTo(entity, "Upgrade added");
+                    _chatBox.OutputTo(player, "Upgrade added");
                 else
-                    _chatBox.OutputTo(entity, "Failed to add upgrade");
+                    _chatBox.OutputTo(player, "Failed to add upgrade");
             }
             catch (Exception ex)
             {
-                _chatBox.OutputTo(entity, $"Failed to add upgrade: {ex.Message}");
+                _chatBox.OutputTo(player, $"Failed to add upgrade: {ex.Message}");
             }
         });
 
-        _commandService.AddCommandHandler("addvehicleupgrade", (entity, args) =>
+        _commandService.AddCommandHandler("addvehicleupgrade", (player, args) =>
         {
-            var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();
-            var veh = playerElementComponent.Vehicle.UpCast();
-            if (veh == null)
+            var vehicle = player.Vehicle as RealmVehicle;
+            if (vehicle == null)
             {
-                _chatBox.OutputTo(entity, "Enter vehicle!");
+                _chatBox.OutputTo(player, "Enter vehicle!");
                 return;
             }
 
-            var vehicleUpgradeComponent = veh.GetRequiredComponent<VehicleUpgradesComponent>();
+            var vehicleUpgradeComponent = vehicle.Components.GetRequiredComponent<VehicleUpgradesComponent>();
             if (vehicleUpgradeComponent.HasUpgrade(1))
             {
-                _chatBox.OutputTo(entity, "You already have a upgrade!");
+                _chatBox.OutputTo(player, "You already have a upgrade!");
                 return;
             }
             vehicleUpgradeComponent.AddUpgrade(1);
-            _chatBox.OutputTo(entity, "Upgrade added");
+            _chatBox.OutputTo(player, "Upgrade added");
         });
 
-        _commandService.AddCommandHandler("comps", (entity, args) =>
+        _commandService.AddCommandHandler("comps", (player, args) =>
         {
-            var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();
-            _chatBox.OutputTo(entity, "Components:");
-            foreach (var component in entity.Components)
+            _chatBox.OutputTo(player, "Components:");
+            foreach (var component in player.Components.ComponentsLists)
             {
-                _chatBox.OutputTo(entity, $"> {component}");
+                _chatBox.OutputTo(player, $"> {component}");
             }
         });
 
-        _commandService.AddCommandHandler("additem", (entity, args) =>
+        _commandService.AddCommandHandler("additem", (player, args) =>
         {
-            if (entity.TryGetComponent(out InventoryComponent inventoryComponent))
+            if (player.Components.TryGetComponent(out InventoryComponent inventoryComponent))
             {
                 inventoryComponent.AddItem(_itemsRegistry, 1);
-                _chatBox.OutputTo(entity, $"Test item added");
+                _chatBox.OutputTo(player, $"Test item added");
             }
         });
-        _commandService.AddCommandHandler("additem2", (entity, args) =>
+        _commandService.AddCommandHandler("additem2", (player, args) =>
         {
-            if (entity.TryGetComponent(out InventoryComponent inventoryComponent))
+            if (player.Components.TryGetComponent(out InventoryComponent inventoryComponent))
             {
                 inventoryComponent.AddItem(_itemsRegistry, 2);
-                _chatBox.OutputTo(entity, $"Test item added");
+                _chatBox.OutputTo(player, $"Test item added");
             }
         });
-        _commandService.AddAsyncCommandHandler("addtestdata", async (entity, args) =>
+        _commandService.AddAsyncCommandHandler("addtestdata", async (player, args) =>
         {
-            if (entity.TryGetComponent(out JobUpgradesComponent jobUpgradesComponent))
+            if (player.Components.TryGetComponent(out JobUpgradesComponent jobUpgradesComponent))
             {
                 if (jobUpgradesComponent.TryAddJobUpgrade(1, 1))
-                    _chatBox.OutputTo(entity, "Upgrade added");
+                    _chatBox.OutputTo(player, "Upgrade added");
                 else
-                    _chatBox.OutputTo(entity, "Failed to add upgrade");
+                    _chatBox.OutputTo(player, "Failed to add upgrade");
             }
 
-            if (entity.TryGetComponent(out InventoryComponent inventoryComponent))
+            if (player.Components.TryGetComponent(out InventoryComponent inventoryComponent))
             {
                 inventoryComponent.AddItem(_itemsRegistry, 1);
-                _chatBox.OutputTo(entity, $"Test item added");
+                _chatBox.OutputTo(player, $"Test item added");
             }
 
-            if (entity.TryGetComponent(out LicensesComponent licenseComponent))
+            if (player.Components.TryGetComponent(out LicensesComponent licenseComponent))
             {
                 if (licenseComponent.TryAddLicense(1))
-                    _chatBox.OutputTo(entity, $"Test license added: 'test123' of id 1");
+                    _chatBox.OutputTo(player, $"Test license added: 'test123' of id 1");
             }
 
-            if (entity.TryGetComponent(out MoneyComponent moneyComponent))
+            if (player.Components.TryGetComponent(out MoneyComponent moneyComponent))
             {
                 moneyComponent.Money = (decimal)Random.Shared.NextDouble() * 1000;
-                _chatBox.OutputTo(entity, $"Set money to: {moneyComponent.Money}");
+                _chatBox.OutputTo(player, $"Set money to: {moneyComponent.Money}");
             }
 
 
-            if (entity.TryGetComponent(out AchievementsComponent achievementsComponent))
+            if (player.Components.TryGetComponent(out AchievementsComponent achievementsComponent))
             {
                 achievementsComponent.UpdateProgress(1, 2, 10);
-                _chatBox.OutputTo(entity, $"Updated achievement 'test' progress to 2");
+                _chatBox.OutputTo(player, $"Updated achievement 'test' progress to 2");
             }
 
             {
-                var player = entity.GetRequiredComponent<PlayerElementComponent>();
-                var vehicleEntity = await _vehiclesService.CreateVehicle(404, player.Position + new Vector3(4, 0, 0), player.Rotation);
-                vehicleEntity.AddComponent<VehicleUpgradesComponent>().AddUpgrade(1);
-                vehicleEntity.AddComponent(new MileageCounterComponent());
-                vehicleEntity.AddComponent(new FuelComponent(1, 20, 20, 0.01, 2)).Active = true;
-                vehicleEntity.AddComponent<VehiclePartDamageComponent>().AddPart(1, 1337);
+                var vehicle = await _vehiclesService.CreateVehicle(404, player.Position + new Vector3(4, 0, 0), player.Rotation);
+                var components = vehicle.Components;
+                components.AddComponent<VehicleUpgradesComponent>().AddUpgrade(1);
+                components.AddComponent(new MileageCounterComponent());
+                components.AddComponent(new FuelComponent(1, 20, 20, 0.01, 2)).Active = true;
+                vehicle.Components.AddComponent<VehiclePartDamageComponent>().AddPart(1, 1337);
             }
         });
 
-        _commandService.AddCommandHandler("giveexperience", (entity, args) =>
+        _commandService.AddCommandHandler("giveexperience", (player, args) =>
         {
-            if (entity.TryGetComponent(out LevelComponent levelComponent))
+            if (player.Components.TryGetComponent(out LevelComponent levelComponent))
             {
                 var amount = args.ReadUInt();
                 levelComponent.GiveExperience(amount);
-                _chatBox.OutputTo(entity, $"gave experience: {amount}, level: {levelComponent.Level}, experience: {levelComponent.Experience}");
+                _chatBox.OutputTo(player, $"gave experience: {amount}, level: {levelComponent.Level}, experience: {levelComponent.Experience}");
             }
         });
 
-        _commandService.AddCommandHandler("cvforsale", (entity, args) =>
+        _commandService.AddCommandHandler("cvforsale", (player, args) =>
         {
-            var player = entity.GetRequiredComponent<PlayerElementComponent>();
-            _entityFactory.CreateVehicle(404, player.Position + new Vector3(4, 0, 0), Vector3.Zero, entityBuilder: entity =>
+            _elementFactory.CreateVehicle(404, player.Position + new Vector3(4, 0, 0), Vector3.Zero, elementBuilder: vehicle =>
             {
-                entity.AddComponent(new VehicleForSaleComponent(200));
+                vehicle.Components.AddComponent(new VehicleForSaleComponent(200));
             });
         });
 
-        _commandService.AddAsyncCommandHandler("privateoutlinetest", async (entity, args) =>
+        _commandService.AddAsyncCommandHandler("privateoutlinetest", async (player, args) =>
         {
-            var player = entity.GetRequiredComponent<PlayerElementComponent>();
-            var objectEntity = _entityFactory.CreateObject(ObjectModel.Gunbox, player.Position + new Vector3(4, 0, -0.65f), Vector3.Zero);
+            var @object = _elementFactory.CreateObject(ObjectModel.Gunbox, player.Position + new Vector3(4, 0, -0.65f), Vector3.Zero);
             await Task.Delay(2000);
-            elementOutlineService.SetEntityOutlineForPlayer(entity, objectEntity, Color.Red);
+            elementOutlineService.SetElementOutlineForPlayer(player, @object, Color.Red);
             await Task.Delay(1000);
-            elementOutlineService.RemoveEntityOutlineForPlayer(entity, objectEntity);
-            _chatBox.OutputTo(entity, "removed");
-        });
-
-        _commandService.AddCommandHandler("spawnbox", (entity, args) =>
-        {
-            var player = entity.GetRequiredComponent<PlayerElementComponent>();
-            var objectEntity = _entityFactory.CreateObject(ObjectModel.Gunbox, player.Position + new Vector3(4, 0, -0.65f), Vector3.Zero);
-            objectEntity.AddComponent<LiftableWorldObjectComponent>();
-        });
-
-        _commandService.AddCommandHandler("spawnmybox", (entity, args) =>
-        {
-            var player = entity.GetRequiredComponent<PlayerElementComponent>();
-            var objectEntity = _entityFactory.CreateObject(ObjectModel.Gunbox, player.Position + new Vector3(4, 0, -0.65f), Vector3.Zero);
-            objectEntity.AddComponent<LiftableWorldObjectComponent>();
-            objectEntity.AddComponent(new OwnerComponent(entity));
-        });
-
-        _commandService.AddCommandHandler("spawnmybox2", (entity, args) =>
-        {
-            var player = entity.GetRequiredComponent<PlayerElementComponent>();
-            var objectEntity = _entityFactory.CreateObject(ObjectModel.Gunbox, player.Position + new Vector3(4, 0, -0.65f), Vector3.Zero);
-            objectEntity.AddComponent<LiftableWorldObjectComponent>();
-            objectEntity.AddComponent(new OwnerDisposableComponent(entity));
-        });
-
-        _commandService.AddCommandHandler("spawnboxforme", (entity, args) =>
-        {
-            var player = entity.GetRequiredComponent<PlayerElementComponent>();
-            using var scopedEntityFactory = _entityFactory.CreateScopedEntityFactory(entity);
-            var objectEntity = scopedEntityFactory.CreateObject(ObjectModel.Gunbox, player.Position + new Vector3(4, 0, -0.65f), Vector3.Zero);
-            objectEntity.AddComponent<LiftableWorldObjectComponent>();
-        });
-
-        _commandService.AddAsyncCommandHandler("spawntempbox", async (entity, args) =>
-        {
-            var player = entity.GetRequiredComponent<PlayerElementComponent>();
-            var objectEntity = _entityFactory.CreateObject(ObjectModel.Gunbox, player.Position + new Vector3(4, 0, -0.65f), Vector3.Zero);
-            objectEntity.AddComponent(new LiftableWorldObjectComponent());
-            await Task.Delay(5000);
-            objectEntity.Dispose();
-        });
-
-        _commandService.AddCommandHandler("spawnboard", (entity, args) =>
-        {
-            var player = entity.GetRequiredComponent<PlayerElementComponent>();
-            var objectEntity = _entityFactory.CreateObject((ObjectModel)3077, player.Position + new Vector3(4, 0, -1), Vector3.Zero);
-            objectEntity.AddComponent(new LiftableWorldObjectComponent());
-        });
-
-        _commandService.AddCommandHandler("spawnboxmany", (entity, args) =>
-        {
-            var player = entity.GetRequiredComponent<PlayerElementComponent>();
-            var objectEntity = _entityFactory.CreateObject(ObjectModel.Gunbox, player.Position + new Vector3(4, 0, -0.6f), Vector3.Zero);
-            objectEntity.AddComponent(new LiftableWorldObjectComponent());
-            var objectEntity1 = _entityFactory.CreateObject(ObjectModel.Gunbox, player.Position + new Vector3(4 + 0.8f, 0, -0.6f), Vector3.Zero);
-            objectEntity1.AddComponent(new LiftableWorldObjectComponent());
-            var objectEntity2 = _entityFactory.CreateObject(ObjectModel.Gunbox, player.Position + new Vector3(4, 0 + 0.8f, -0.6f), Vector3.Zero);
-            objectEntity2.AddComponent(new LiftableWorldObjectComponent());
-            var objectEntity3 = _entityFactory.CreateObject(ObjectModel.Gunbox, player.Position + new Vector3(4 + 0.8f, 0 + 0.8f, -0.6f), Vector3.Zero);
-            objectEntity3.AddComponent(new LiftableWorldObjectComponent());
-        });
-
-        _commandService.AddAsyncCommandHandler("hud3d", async (entity, args) =>
-        {
-            var player = entity.GetRequiredComponent<PlayerElementComponent>();
-            using var e = _entityEngine.CreateEntity();
-            e.AddComponent(new Hud3dComponent<TestState>(e => e
-                .AddRectangle(Vector2.Zero, new Size(100, 100), Color.Red)
-                .AddRectangle(new Vector2(25, 25), new Size(50, 50), Color.Green)
-                .AddText(x => x.Text, new Vector2(0, 0), new Size(100, 100), Color.Blue),
-                player.Position + new Vector3(-4, 0, 0),
-                new TestState
-                {
-                    Text = "test 1",
-                }));
-
-            await Task.Delay(2000);
-        });
-
-        _commandService.AddAsyncCommandHandler("hud3d2", async (entity, args) =>
-        {
-            var player = entity.GetRequiredComponent<PlayerElementComponent>();
-            var e = _entityEngine.CreateEntity();
-            var hud3d = e.AddComponent(new Hud3dComponent<TestState>(e => e
-                .AddRectangle(Vector2.Zero, new Size(200, 200), Color.Red)
-                .AddRectangle(new Vector2(25, 25), new Size(50, 50), Color.Green)
-                .AddText(x => x.Text, new Vector2(0, 0), new Size(200, 200), Color.White),
-                player.Position + new Vector3(-4, 0, 0),
-                new TestState
-                {
-                    Text = "test 1",
-                }));
-
-            int i = 0;
-            while (true)
-            {
-                await Task.Delay(1000 / 60);
-                hud3d.UpdateState(x => x.Text = $"time {_dateTimeProvider.Now} {i++}");
-            }
-        });
-
-        _commandService.AddCommandHandler("spawnbox2", (entity, args) =>
-        {
-            var player = entity.GetRequiredComponent<PlayerElementComponent>();
-            var objectEntity = _entityFactory.CreateObject(ObjectModel.Gunbox, player.Position + new Vector3(4, 0, -0.65f), Vector3.Zero);
-            objectEntity.AddComponent(new DurationBasedHoldInteractionWithRingEffectComponent(overlayService));
-        });
-
-        _commandService.AddCommandHandler("stopanimation", (entity, args) =>
-        {
-            entity.GetRequiredComponent<PlayerElementComponent>().StopAnimation();
-        });
-
-        _commandService.AddCommandHandler("animation", (entity, args) =>
-        {
-            var animationName = args.ReadArgument();
-            if (Enum.TryParse<Animation>(animationName, out var animation))
-            {
-                try
-                {
-                    entity.GetRequiredComponent<PlayerElementComponent>().DoAnimation(animation);
-                }
-                catch (NotSupportedException)
-                {
-                    _chatBox.OutputTo(entity, $"Animation '{animationName}' is not supported");
-                }
-            }
-            else
-                _chatBox.OutputTo(entity, $"Animation '{animationName}' not found.");
-        });
-
-        _commandService.AddAsyncCommandHandler("animationasync", async (entity, args) =>
-        {
-            var animationName = args.ReadArgument();
-            var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();
-            if (Enum.TryParse<Animation>(animationName, out var animation))
-            {
-                try
-                {
-                    _chatBox.OutputTo(entity, $"Started animation '{animation}'");
-                    await playerElementComponent.DoAnimationAsync(animation);
-                    _chatBox.OutputTo(entity, $"Finished animation '{animation}'");
-                }
-                catch (NotSupportedException)
-                {
-                    _chatBox.OutputTo(entity, $"Animation '{animationName}' is not supported");
-                }
-            }
-            else
-                _chatBox.OutputTo(entity, $"Animation '{animationName}' not found.");
-
-        });
-
-        _commandService.AddAsyncCommandHandler("complexanimation", async (entity, args) =>
-        {
-            var animationName = args.ReadArgument();
-            if (Enum.TryParse<Animation>(animationName, out var animation))
-            {
-                try
-                {
-                    await entity.GetRequiredComponent<PlayerElementComponent>().DoComplexAnimationAsync(animation, true);
-                }
-                catch (NotSupportedException)
-                {
-                    _chatBox.OutputTo(entity, $"Animation '{animationName}' is not supported");
-                }
-            }
-            else
-                _chatBox.OutputTo(entity, $"Animation '{animationName}' not found.");
-        });
-
-        _commandService.AddCommandHandler("mygroups", (entity, args) =>
-        {
-            var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();
-            _chatBox.OutputTo(entity, "Groups:");
-            foreach (var item in entity.Components.OfType<GroupMemberComponent>())
-            {
-                _chatBox.OutputTo(entity, $"Group id: {item.GroupId}, rank: {item.Rank}, rank name: '{item.RankName}'");
-            }
-        });
-
-        _commandService.AddCommandHandler("myfractions", (entity, args) =>
-        {
-            var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();
-            _chatBox.OutputTo(entity, "Fractions:");
-            foreach (var item in entity.Components.OfType<FractionMemberComponent>())
-            {
-                _chatBox.OutputTo(entity, $"Fraction id: {item.FractionId}, rank: {item.Rank}, rank name: '{item.RankName}'");
-            }
-        });
-
-        _commandService.AddCommandHandler("toggleadmindebug", (entity, args) =>
-        {
-            var adminComponent = entity.GetRequiredComponent<AdminComponent>();
-            adminComponent.AdminMode = !adminComponent.AdminMode;
-            adminComponent.InteractionDebugRenderingEnabled = !adminComponent.InteractionDebugRenderingEnabled;
-        });
-
-        _commandService.AddCommandHandler("createvehiclehud", (entity, args) =>
-        {
-            var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();
-            entity.AddComponent(new SampleVehicleHud(assetsRegistry));
-        });
-
-        _commandService.AddCommandHandler("createhud", (entity, args) =>
-        {
-            var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();
-            entity.AddComponent(new SampleHud(assetsRegistry));
-        });
-
-        _commandService.AddCommandHandler("createhud2", (entity, args) =>
-        {
-            var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();
-            entity.AddComponent(new SampleHud2(assetsRegistry));
-        });
-
-        _commandService.AddCommandHandler("createhud3", async (entity, args) =>
-        {
-            var hud = entity.AddComponent(new SampleHud3());
-            while (true)
-            {
-                await Task.Delay(1000);
-                hud.Update();
-            }
-        });
-
-        _commandService.AddCommandHandler("updatestate2", (entity, args) =>
-        {
-            var sampleHud2 = entity.GetRequiredComponent<SampleHud2>();
-            sampleHud2.Update();
-        });
-
-        _commandService.AddCommandHandler("movehud", (entity, args) =>
-        {
-            var sampleHud = entity.GetRequiredComponent<SampleHud>();
-            sampleHud.Position = new Vector2(0, _hudPosition++ * 10);
-        });
-
-        _commandService.AddCommandHandler("createstatefulhud", (entity, args) =>
-        {
-            var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();
-            var sampleHud = entity.AddComponent(new SampleStatefulHud(new SampleHudState
-            {
-                Text1 = "text1",
-                Text2 = "text2",
-            }, assetsRegistry));
-        });
-
-        _commandService.AddCommandHandler("updatestate", (entity, args) =>
-        {
-            var sampleHud = entity.GetRequiredComponent<SampleStatefulHud>();
-            sampleHud.Update();
-        });
-
-        _commandService.AddCommandHandler("destroyhuds", (entity, args) =>
-        {
-            entity.TryDestroyComponent<SampleHud>();
-            entity.TryDestroyComponent<SampleStatefulHud>();
-        });
-
-        _commandService.AddCommandHandler("discord", (entity, args) =>
-        {
-            var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();
-            if (entity.HasComponent<DiscordIntegrationComponent>())
-            {
-                _chatBox.OutputTo(entity, "Twoje konto jest już połączone z discordem.");
-            }
-            entity.TryDestroyComponent<PendingDiscordIntegrationComponent>();
-            var pendingDiscordIntegrationComponent = new PendingDiscordIntegrationComponent(dateTimeProvider);
-            var code = pendingDiscordIntegrationComponent.GenerateAndGetDiscordConnectionCode();
-            entity.AddComponent(pendingDiscordIntegrationComponent);
-            _chatBox.OutputTo(entity, $"Aby połączyć konto wpisz na kanale discord #polacz-konto komendę: /polaczkonto {code}");
-        });
-
-        _commandService.AddCommandHandler("adduserupgrade", (entity, args) =>
-        {
-            var userComponent = entity.GetRequiredComponent<UserComponent>();
-            var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();
-            var i = Random.Shared.Next(0, 10);
-            if (userComponent.TryAddUpgrade(i))
-                _chatBox.OutputTo(entity, $"Pomyślnie dodano ulepszenie id {i}");
-            else
-                _chatBox.OutputTo(entity, $"Pomyślnie dodano ulepszenie id {i}");
-        });
-
-        _commandService.AddAsyncCommandHandler("ban", async (entity, args) =>
-        {
-            var userComponent = entity.GetRequiredComponent<UserComponent>();
-            var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();
-            await _banService.Ban(entity);
-            playerElementComponent.Kick("test 123");
-        });
-
-        _commandService.AddAsyncCommandHandler("amibanned", async (entity, args) =>
-        {
-            var userComponent = entity.GetRequiredComponent<UserComponent>();
-            var isBanned = userComponent.Bans.IsBanned(_dateTimeProvider.Now, 123);
-            _chatBox.OutputTo(entity, $"isBanned {isBanned}");
-        });
-
-        _commandService.AddAsyncCommandHandler("bantest", async (entity, args) =>
-        {
-            var userComponent = entity.GetRequiredComponent<UserComponent>();
-            await _banService.Ban(entity, type: 123);
-            var isBanned = userComponent.Bans.IsBanned(_dateTimeProvider.Now, 123);
-            _chatBox.OutputTo(entity, $"isBanned {isBanned}");
-        });
-
-        _commandService.AddAsyncCommandHandler("unbantest", async (entity, args) =>
-        {
-            var userComponent = entity.GetRequiredComponent<UserComponent>();
-            await _banService.RemoveBan(entity, 123);
-            var isBanned = userComponent.Bans.IsBanned(_dateTimeProvider.Now, 123);
-            _chatBox.OutputTo(entity, $"isBanned {isBanned}");
-        });
-
-        _commandService.AddCommandHandler("attach", (entity, args) =>
-        {
-            var objectEntity = _entityFactory.CreateObject((ObjectModel)1337, Vector3.Zero, Vector3.Zero);
-            //entity.AddComponent(new AttachedEntityComponent(objectEntity, SlipeServer.Packets.Enums.BoneId.Pelvis1, new Vector3(-1, -1, 1)));
-            entity.AddComponent(new OwnerDisposableComponent(objectEntity));
-            objectEntity.Disposed += e =>
-            {
-                logger.LogInformation("Disposed attached entity");
-            };
-        });
-
-        _commandService.AddCommandHandler("destroyattachedentity", (entity, args) =>
-        {
-            var userComponent = entity.GetRequiredComponent<UserComponent>();
-            var attachedEntity = entity.GetRequiredComponent<AttachedEntityComponent>();
-            var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();
-            attachedEntity.AttachedEntity.Dispose();
-            if (entity.HasComponent<AttachedEntityComponent>())
-            {
-                _chatBox.OutputTo(entity, "Nie udalo sie zniszczyc");
-            }
-            else
-            {
-                _chatBox.OutputTo(entity, "Zniszczone");
-            }
-        });
-
-        _commandService.AddCommandHandler("testrole", (entity, args) =>
-        {
-            var userComponent = entity.GetRequiredComponent<UserComponent>();
-            var isAdmin = userComponent.IsInRole("admin");
-            var roles = userComponent.GetRoles();
-            foreach (var item in roles)
-            {
-                if (!userComponent.IsInRole(item))
-                {
-                    throw new Exception();
-                }
-            }
-        });
-
-        _commandService.AddCommandHandler("testlogs", (entity, args) =>
-        {
-            _logger.LogInformation("test test 1");
-            var activity = new Activity("TestLogsActivity");
-            activity.Start();
-            _logger.LogInformation("test test 2");
-            activity.Stop();
-        });
-
-        _commandService.AddCommandHandler("nametags", (entity, args) =>
-        {
-            var player = entity.GetRequiredComponent<PlayerElementComponent>();
-            var ped = _entityFactory.CreatePed(SlipeServer.Server.Elements.Enums.PedModel.Truth, player.Position + new Vector3(4, 0, 0));
-            ped.AddComponent(new NametagComponent("[22] Borsuk"));
-        });
-
-        _commandService.AddAsyncCommandHandler("nametags2", async (entity, args) =>
-        {
-            var player = entity.GetRequiredComponent<PlayerElementComponent>();
-            var nametag = new NametagComponent("[22] Borsuk");
-            var ped = _entityFactory.CreatePed(SlipeServer.Server.Elements.Enums.PedModel.Truth, player.Position + new Vector3(4, 0, 0));
-            ped.AddComponent(nametag);
-            await Task.Delay(1000);
-            ped.DestroyComponent(nametag);
-        });
-
-        _commandService.AddAsyncCommandHandler("nametags3", async (entity, args) =>
-        {
-            var player = entity.GetRequiredComponent<PlayerElementComponent>();
-            var nametag = new NametagComponent("[22] Borsuk");
-            var ped = _entityFactory.CreatePed(SlipeServer.Server.Elements.Enums.PedModel.Truth, player.Position + new Vector3(4, 0, 0));
-            ped.AddComponent(nametag);
-            await Task.Delay(1000);
-            nametag.Text = "[100] Borsuk";
-        });
-
-        _commandService.AddCommandHandler("nametags4", (entity, args) =>
-        {
-            nametagsService.SetNametagRenderingEnabled(entity, args.ReadArgument() == "true");
-        });
-
-        _commandService.AddAsyncCommandHandler("nametags5", async (entity, args) =>
-        {
-            var player = entity.GetRequiredComponent<PlayerElementComponent>();
-            var nametag = new NametagComponent("[22] Borsuk");
-            using var ped = _entityFactory.CreatePed(SlipeServer.Server.Elements.Enums.PedModel.Truth, player.Position + new Vector3(4, 0, 0));
-            ped.AddComponent(nametag);
-            await Task.Delay(1000);
-        });
-
-        _commandService.AddCommandHandler("nametags6", (entity, args) =>
-        {
-            nametagsService.SetLocalPlayerRenderingEnabled(entity, args.ReadArgument() == "true");
-        });
-
-        _commandService.AddCommandHandler("outlinerendering", (entity, args) =>
-        {
-            elementOutlineService.SetRenderingEnabled(entity, args.ReadArgument() == "true");
-        });
-
-        _commandService.AddCommandHandler("outline1", (entity, args) =>
-        {
-            var player = entity.GetRequiredComponent<PlayerElementComponent>();
-            var ped = _entityFactory.CreatePed(SlipeServer.Server.Elements.Enums.PedModel.Truth, player.Position + new Vector3(4, 0, 0));
-            var @object = _entityFactory.CreateObject((ObjectModel)1337, player.Position + new Vector3(4, 4, 0), Vector3.Zero);
-            ped.AddComponent(new OutlineComponent(Color.Red));
-            @object.AddComponent(new OutlineComponent(Color.Red));
-        });
-
-        _commandService.AddAsyncCommandHandler("outline2", async (entity, args) =>
-        {
-            var player = entity.GetRequiredComponent<PlayerElementComponent>();
-            using var ped = _entityFactory.CreatePed(SlipeServer.Server.Elements.Enums.PedModel.Truth, player.Position + new Vector3(4, 0, 0));
-            ped.AddComponent(new OutlineComponent(Color.Red));
-            await Task.Delay(1000);
-        });
-
-        _commandService.AddAsyncCommandHandler("outline3", async (entity, args) =>
-        {
-            var player = entity.GetRequiredComponent<PlayerElementComponent>();
-            var ped = _entityFactory.CreatePed(SlipeServer.Server.Elements.Enums.PedModel.Truth, player.Position + new Vector3(4, 0, 0));
-            var outlineComponent = ped.AddComponent(new OutlineComponent(Color.Red));
-            await Task.Delay(1000);
-            ped.DestroyComponent(outlineComponent);
-        });
-
-        _commandService.AddCommandHandler("outline4", (entity, args) =>
-        {
-            var player = entity.GetRequiredComponent<PlayerElementComponent>();
-            var ped = _entityFactory.CreatePed(SlipeServer.Server.Elements.Enums.PedModel.Truth, player.Position + new Vector3(4, 0, 0));
-            var @object = _entityFactory.CreateObject((ObjectModel)1337, player.Position + new Vector3(4, 4, 0), Vector3.Zero);
-            elementOutlineService.SetEntityOutlineForPlayer(entity, ped, Color.Red);
-            elementOutlineService.SetEntityOutlineForPlayer(entity, @object, Color.Blue);
-        });
-
-        _commandService.AddCommandHandler("randomvehcolor", (entity, args) =>
-        {
-            var player = entity.GetRequiredComponent<PlayerElementComponent>();
-            var rnd = Random.Shared;
-            var veh = entity.GetRequiredComponent<PlayerElementComponent>().Vehicle.UpCast().GetRequiredComponent<VehicleElementComponent>();
-            veh.Colors.Primary = Color.FromArgb(rnd.Next(256), rnd.Next(256), rnd.Next(256));
-            veh.Colors.Secondary = Color.FromArgb(rnd.Next(256), rnd.Next(256), rnd.Next(256));
-            veh.Colors.Color3 = Color.FromArgb(rnd.Next(256), rnd.Next(256), rnd.Next(256));
-            veh.Colors.Color4 = Color.FromArgb(rnd.Next(256), rnd.Next(256), rnd.Next(256));
-        });
-
-        _commandService.AddCommandHandler("setsetting", (entity, args) =>
-        {
-            entity.GetRequiredComponent<UserComponent>().SetSetting(1, args.ReadArgument());
-        });
-
-        _commandService.AddCommandHandler("removesetting", (entity, args) =>
-        {
-            entity.GetRequiredComponent<UserComponent>().RemoveSetting(1);
-        });
-
-        _commandService.AddCommandHandler("getsetting", (entity, args) =>
-        {
-            var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();
-
-            var settingValue = entity.GetRequiredComponent<UserComponent>().GetSetting(1);
-
-            _chatBox.OutputTo(entity, $"Setting1: {settingValue}");
-        });
-
-
-        _commandService.AddAsyncCommandHandler("whitelistmyserial", async (entity, args) =>
-        {
-            var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();
-            var userComponent = entity.GetRequiredComponent<UserComponent>();
-
-            if (await _userWhitelistedSerialsRepository.TryAddWhitelistedSerial(userComponent.Id, playerElementComponent.Client.Serial))
-            {
-                _chatBox.OutputTo(entity, $"Dodano serial");
-            }
-            else
-            {
-                _chatBox.OutputTo(entity, $"Nie udało się dodać");
-            }
-        });
-
-        _commandService.AddAsyncCommandHandler("removewhitelistmyserial", async (entity, args) =>
-        {
-            var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();
-            var userComponent = entity.GetRequiredComponent<UserComponent>();
-
-            if (await _userWhitelistedSerialsRepository.TryRemoveWhitelistedSerial(userComponent.Id, playerElementComponent.Client.Serial))
-            {
-                _chatBox.OutputTo(entity, $"Usunięto serial");
-            }
-            else
-            {
-                _chatBox.OutputTo(entity, $"Nie udało się usunąć");
-            }
-        });
-
-        _commandService.AddCommandHandler("addvisualupgrade", (entity, args) =>
-        {
-            var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();
-            if (playerElementComponent.Vehicle.UpCast().GetRequiredComponent<VehicleUpgradesComponent>().AddUniqueUpgrade(3))
-            {
-                _chatBox.OutputTo(entity, $"dodano wizualne ulepszenie");
-            }
-            else
-            {
-                _chatBox.OutputTo(entity, $"Nie udało się dodać wizualnego ulepszenia");
-            }
-        });
-
-        _commandService.AddCommandHandler("addinvalidguicomponent", (entity, args) =>
-        {
-            entity.AddComponent<InvalidGuiComponent>();
-        });
-
-        _commandService.AddCommandHandler("text3dcomp", (entity, args) =>
-        {
-            var player = entity.GetRequiredComponent<PlayerElementComponent>();
-            var markerEntity = entityFactory.CreateMarker(MarkerType.Arrow, player.Position, Color.White);
-            markerEntity.AddComponent(new Text3dComponent("test1", player.Position));
-            markerEntity.AddComponent(new Text3dComponent("offset z+1", player.Position + new Vector3(0, 0, 1)));
-        });
-
-        _commandService.AddAsyncCommandHandler("despawn", async (entity, args) =>
-        {
-            var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();
-            await _vehiclesService.Destroy(playerElementComponent.Vehicle.UpCast());
-        });
-
-        _commandService.AddCommandHandler("disposeveh", (entity, args) =>
-        {
-            var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();
-            playerElementComponent.Vehicle.Destroy();
-        });
-
-        _commandService.AddAsyncCommandHandler("spawnback", async (entity, args) =>
-        {
-            var player = entity.GetRequiredComponent<PlayerElementComponent>();
-            Entity? vehicleEntity = null;
-            try
-            {
-                vehicleEntity = await _loadService.LoadVehicleById(args.ReadInt());
-            }
-            catch(Exception ex)
-            {
-                _chatBox.OutputTo(entity, "Failed to spawn vehicle");
-            }
-            if (vehicleEntity == null)
-                return;
-            await _vehiclesService.SetVehicleSpawned(vehicleEntity);
-            var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();
-            if (vehicleEntity != null)
-            {
-                var vehicle = ((Vehicle)vehicleEntity.GetRequiredComponent<IElementComponent>());
-                vehicle.Position = player.Position;
-                playerElementComponent.WarpIntoVehicle(vehicle);
-                _chatBox.OutputTo(entity, "Spawned");
-            }
-            else
-                _chatBox.OutputTo(entity, "Error while spawning");
-        });
-
-        _commandService.AddCommandHandler("inventoryoccupied", (entity, args) =>
-        {
-            var inv = entity.GetRequiredComponent<InventoryComponent>();
-            var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();
-            _chatBox.OutputTo(entity, $"Inventory: {inv.Number}/{inv.Size}");
-        });
-
-        _commandService.AddCommandHandler("giveitem4", (entity, args) =>
-        {
-            var inv = entity.GetRequiredComponent<InventoryComponent>();
-            inv.AddSingleItem(_itemsRegistry, 4);
-            var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();
-            _chatBox.OutputTo(entity, "Item given");
-        });
-
-        _commandService.AddCommandHandler("itemwithmetadata", (entity, args) =>
-        {
-            var inv = entity.GetRequiredComponent<InventoryComponent>();
-            var item = inv.AddSingleItem(_itemsRegistry, 4, new Metadata
-            {
-                ["number"] = 1m
-            });
-
-            var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();
-            _chatBox.OutputTo(entity, $"Item regular: {item.GetMetadata("number").GetType()}");
-            _chatBox.OutputTo(entity, $"Item cast<int>: {item.GetMetadata<int>("number").GetType()}");
-        });
-
-        _commandService.AddCommandHandler("proceduralobject", (entity, args) =>
-        {
-            var player = entity.GetRequiredComponent<PlayerElementComponent>();
-            var objectEntity = _entityFactory.CreateObject(ObjectModel.Gunbox, player.Position + new Vector3(4, 0, -0.65f), Vector3.Zero);
-        });
-
-        _commandService.AddCommandHandler("day", (entity, args) =>
-        {
-            gameWorld.SetTime(12, 0);
-        });
-
-        _commandService.AddCommandHandler("night", (entity, args) =>
-        {
-            gameWorld.SetTime(0, 0);
-        });
-
-        _commandService.AddCommandHandler("createObjectFor", (entity, args) =>
-        {
-            var player = entity.GetRequiredComponent<PlayerElementComponent>();
-            using var scopedEntityFactory = _entityFactory.CreateScopedEntityFactory(entity);
-            scopedEntityFactory.CreateObject((ObjectModel)1337, player.Position + new Vector3(3, 0, 0), player.Rotation);
-        });
-
-        _commandService.AddCommandHandler("tp", (entity, args) =>
-        {
-            var player = entity.GetRequiredComponent<PlayerElementComponent>();
-            player.Position = new Vector3(0, 0, 3);
-        });
-
-        _commandService.AddCommandHandler("i", (entity, args) =>
-        {
-            var player = entity.GetRequiredComponent<PlayerElementComponent>();
-            player.Interior = args.ReadByte();
-        });
-
-        _commandService.AddCommandHandler("d", (entity, args) =>
-        {
-            var player = entity.GetRequiredComponent<PlayerElementComponent>();
-            player.Dimension = args.ReadUShort();
-        });
-
-        _commandService.AddCommandHandler("runtimeobject", (entity, args) =>
-        {
-            var player = entity.GetRequiredComponent<PlayerElementComponent>();
-            var modelFactory = new ModelFactory();
-            modelFactory.AddTriangle(new Vector3(2, 2, 0), new Vector3(0, 10, 0), new Vector3(10, 0, 0), "Metal1_128");
-            modelFactory.AddTriangle(new Vector3(10, 0, 0), new Vector3(0, 10, 0), new Vector3(10, 10, 0), "Metal1_128");
-            var dff = modelFactory.BuildDff();
-            var col = modelFactory.BuildCol();
-            assetsService.ReplaceModelFor(entity, dff, col, 1339);
-            _entityFactory.CreateObject((ObjectModel)1339, player.Position + new Vector3(15, 15, -5), Vector3.Zero);
-        });
-
-
-        _commandService.AddCommandHandler("restoreobject", (entity, args) =>
-        {
-            assetsService.RestoreModelFor(entity, 1339);
-        });
-
-        _commandService.AddCommandHandler("amiinwater", (entity, args) =>
-        {
-            var player = entity.GetRequiredComponent<PlayerElementComponent>();
-            var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();
-            _chatBox.OutputTo(entity, $"amiinwater: {playerElementComponent.IsInWater} {player.Position}");
-        });
-
-        _commandService.AddCommandHandler("formatmoney", (entity, args) =>
-        {
-            var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();
-            _chatBox.OutputTo(entity, $"{123.123m.FormatMoney(new System.Globalization.CultureInfo("pl-PL"))}");
-        });
-
-        _commandService.AddAsyncCommandHandler("createObjectFor2", async (entity, args) =>
-        {
-            var player = entity.GetRequiredComponent<PlayerElementComponent>();
-            using var scopedEntityFactory = _entityFactory.CreateScopedEntityFactory(entity);
-            var pos = player.Position + new Vector3(3, 0, 0);
-
-            void handleComponentCreated(IScopedEntityFactory scopedEntityFactory, PlayerPrivateElementComponentBase playerPrivateElementComponentBase)
-            {
-                ;
-            }
-            scopedEntityFactory.ComponentCreated += handleComponentCreated;
-            scopedEntityFactory.CreateObject((ObjectModel)1337, pos, player.Rotation);
-            for (int i = 0; i < 10; i++)
-            {
-                await Task.Delay(2000);
-                //obj.Position = pos + new Vector3(i, 0, 0);
-                //obj.Rotation = player.Rotation;
-            }
-        });
-
-        _commandService.AddCommandHandler("addtestmarker1", (entity, args) =>
-        {
-            var player = entity.GetRequiredComponent<PlayerElementComponent>();
-            spawnMarkersService.AddSpawnMarker(new PointSpawnMarker("test123", player.Position));
-            _chatBox.OutputTo(entity, "marker added1");
-        });
-
-        _commandService.AddCommandHandler("addtestmarker2", (entity, args) =>
-        {
-            var player = entity.GetRequiredComponent<PlayerElementComponent>();
-            spawnMarkersService.AddSpawnMarker(new DirectionalSpawnMarker("test direct", player.Position, player.Rotation.Z));
-            _chatBox.OutputTo(entity, "marker added2");
-        });
-
-        _commandService.AddCommandHandler("testnotrace", (entity, args) =>
-        {
-            _logger.LogInformation("no trace");
-        }, null);
-
-        int counter = 0;
-        _commandService.AddCommandHandler("counter", (entity, args) =>
-        {
-            counter++;
-            _logger.LogInformation("Counter: {counter}", counter);
-        });
-
-        _commandService.AddCommandHandler("level", (entity, args) =>
-        {
-            var levelComponent = entity.GetRequiredComponent<LevelComponent>();
-            var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();
-            _chatBox.OutputTo(entity, $"Level: {levelComponent.Level}, exp: {levelComponent.Experience}");
-        });
-
-        _commandService.AddCommandHandler("setlevel", (entity, args) =>
-        {
-            uint level = args.ReadUInt();
-            var levelComponent = entity.GetRequiredComponent<LevelComponent>();
-            var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();
-            void handleLevelChanged(LevelComponent that, uint level, bool up)
-            {
-                _chatBox.OutputTo(entity, $"Level change: {level}, {up}");
-            }
-            levelComponent.LevelChanged += handleLevelChanged;
-            levelComponent.Level = level;
-            levelComponent.LevelChanged -= handleLevelChanged;
-        });
-
-        _commandService.AddCommandHandler("browserdevtools", (entity, args) =>
-        {
-            var adminComponent = entity.GetRequiredComponent<AdminComponent>();
-            var browserComponent = entity.GetRequiredComponent<BrowserComponent>();
-            adminComponent.DevelopmentMode = true;
-            browserComponent.DevTools = !browserComponent.DevTools;
-            _chatBox.OutputTo(entity, $"Devtools {browserComponent.DevTools}");
-        }, null);
-
-        _commandService.AddCommandHandler("browserpath", (entity, args) =>
-        {
-            var browserComponent = entity.GetRequiredComponent<BrowserComponent>();
-            _chatBox.OutputTo(entity, $"Path {browserComponent.Path}");
-        }, null);
-
-        _commandService.AddAsyncCommandHandler("setkind", async (entity, args) =>
-        {
-            var player = entity.GetRequiredComponent<PlayerElementComponent>();
-            await _vehiclesService.SetVehicleKind(entity.GetRequiredComponent<PlayerElementComponent>().Vehicle.UpCast(), 42);
-        });
-
-        _commandService.AddAsyncCommandHandler("kind", async (entity, args) =>
-        {
-            var player = entity.GetRequiredComponent<PlayerElementComponent>();
-            var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();
-            var veh = playerElementComponent.Vehicle;
-            var kind = veh.UpCast().GetRequiredComponent<PrivateVehicleComponent>().Kind;
-            _chatBox.OutputTo(entity, $"Kind: {kind}");
-        });
-
-        _commandService.AddAsyncCommandHandler("counterasync", async (entity, args) =>
-        {
-            counter++;
-            _logger.LogInformation("Counter: {counter}", counter);
-        });
-
-        _commandService.AddAsyncCommandHandler("addvehevent", async (entity, args) =>
-        {
-            await _vehiclesService.AddVehicleEvent(entity.GetRequiredComponent<PlayerElementComponent>().Vehicle.UpCast(), 1);
-        });
-
-        _commandService.AddAsyncCommandHandler("vehevents", async (entity, args) =>
-        {
-            var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();
-            var events = await _vehiclesService.GetAllVehicleEvents(playerElementComponent.Vehicle.UpCast());
-            _chatBox.OutputTo(entity, "Events:");
-            foreach (var item in events)
-            {
-                _chatBox.OutputTo(entity, $"Event: {item.DateTime} - {item.EventType}");
-            }
-        });
-
-        _commandService.AddCommandHandler("browserguiopen", (entity, args) =>
-        {
-            entity.GetRequiredComponent<BrowserComponent>().Path = "Counter";
-        });
-
-        _commandService.AddCommandHandler("browserguiclose", (entity, args) =>
-        {
-            entity.GetRequiredComponent<BrowserComponent>().Path = null;
-        });
-
-        _commandService.AddCommandHandler("kickme", (entity, args) =>
-        {
-            usersService.Kick(entity, "test");
-        });
-
-        _commandService.AddCommandHandler("getplayerbyname", (entity, args) =>
-        {
-            if (usersService.TryGetPlayerByName(args.ReadArgument(), out var foundPlayer))
-            {
-                _chatBox.OutputTo(entity, "found");
-            }
-            else
-                _chatBox.OutputTo(entity, "not found");
-        });
-
-        _commandService.AddCommandHandler("findbyname", (entity, args) =>
-        {
-            var players = usersService.SearchPlayersByName(args.ReadArgument());
-            _chatBox.OutputTo(entity, "found:");
-            foreach (var item in players)
-            {
-                _chatBox.OutputTo(entity, $"Player: {item.GetRequiredComponent<UserComponent>().UserName}");
-            }
-        });
-
-        _commandService.AddAsyncCommandHandler("addrating", async (entity, args) =>
-        {
-            var last = await feedbackService.GetLastRating(entity, 1) ?? (0, DateTime.MinValue);
-            if (last.Item2.AddSeconds(3) > dateTimeProvider.Now)
-            {
-                _chatBox.OutputTo(entity, "możesz ocenić maksymalnie raz na 30sekund");
-                return;
-            }
-            var rating = Random.Shared.Next(100);
-            await feedbackService.ChangeLastRating(entity, 1, rating);
-            _chatBox.OutputTo(entity, $"zmieniono ocenę z {rating} z {last.Item1}");
-        });
-
-        _commandService.AddAsyncCommandHandler("addopinion", async (entity, args) =>
-        {
-            await feedbackService.AddOpinion(entity, 1, string.Join(", ", args));
-            _chatBox.OutputTo(entity, "Opinia dodana");
-        });
-
-        _commandService.AddCommandHandler("addprivatemarker", (entity, args) =>
-        {
-            var player = entity.GetRequiredComponent<PlayerElementComponent>();
-            void handleEntityEntered(MarkerElementComponent markerElementComponent, Entity enteredMarker, Entity enteredEntity)
-            {
-                entity.DestroyComponent(markerElementComponent);
-            }
-
-            using var scopedEntityFactory = _entityFactory.CreateScopedEntityFactory(entity);
-            scopedEntityFactory.CreateMarker(MarkerType.Checkpoint, player.Position with { X = player.Position.X + 4 }, Color.White);
-            var marker = scopedEntityFactory.LastCreatedComponent as PlayerPrivateElementComponent<MarkerElementComponent>;
-            marker.ElementComponent.EntityEntered = handleEntityEntered;
-        });
-
-        _commandService.AddAsyncCommandHandler("createmarkerforme", async (entity, args) =>
-        {
-            var player = entity.GetRequiredComponent<PlayerElementComponent>();
-            using var scopedEntityFactory = _entityFactory.CreateScopedEntityFactory(entity);
-            scopedEntityFactory.CreateMarker(MarkerType.Cylinder, player.Position, Color.White);
-            var component = scopedEntityFactory.LastCreatedComponent as PlayerPrivateElementComponent<MarkerElementComponent>;
-            component.ElementComponent.Size = 4;
-            component.ElementComponent.Color = Color.Red;
-            while (true)
-            {
-                if (component.ElementComponent.Size == 4)
-                {
-                    component.ElementComponent.Size = 2;
-                    component.ElementComponent.Color = Color.Red;
-                }
-                else
-                {
-                    component.ElementComponent.Size = 4;
-                    component.ElementComponent.Color = Color.Blue;
-                }
-                await Task.Delay(500);
-            }
-        });
-
-        _commandService.AddAsyncCommandHandler("createmarkerforme2", async (entity, args) =>
-        {
-            using var scopedEntityFactory = _entityFactory.CreateScopedEntityFactory(entity);
-            scopedEntityFactory.CreateMarker(MarkerType.Cylinder, new Vector3(-600.8877f, 240.88867f, 26.091864f), Color.White);
-            var marker = scopedEntityFactory.LastCreatedComponent as PlayerPrivateElementComponent<MarkerElementComponent>;
-            marker.ElementComponent.Size = 4;
-            marker.ElementComponent.Color = Color.Red;
-        });
-
-        _commandService.AddCommandHandler("markerhittest1", (entity, args) =>
-        {
-            var player = entity.GetRequiredComponent<PlayerElementComponent>();
-            var markerEntity = _entityFactory.CreateMarker(MarkerType.Cylinder, player.Position, Color.White);
-            var marker = markerEntity.GetRequiredComponent<MarkerElementComponent>();
-            marker.Size = 4;
-            marker.Color = Color.Red;
-            marker.EntityEntered = (markerElementComponent, enteredMarker, enteredEntity) =>
-            {
-                Console.WriteLine("entity entered (public marker)");
-            };
-        });
-
-        _commandService.AddCommandHandler("markerhittest2", (entity, args) =>
-        {
-            var player = entity.GetRequiredComponent<PlayerElementComponent>();
-            using var scopedEntityFactory = _entityFactory.CreateScopedEntityFactory(entity);
-            scopedEntityFactory.CreateMarker(MarkerType.Cylinder, player.Position, Color.White);
-            var marker = scopedEntityFactory.LastCreatedComponent as PlayerPrivateElementComponent<MarkerElementComponent>;
-            marker.ElementComponent.Size = 4;
-            marker.ElementComponent.Color = Color.Red;
-            marker.ElementComponent.EntityEntered = (markerElementComponent, enteredMarker, enteredEntity) =>
-            {
-                Console.WriteLine("entity entered (private marker)");
-            };
-        });
-        _commandService.AddCommandHandler("setinterior", (entity, args) =>
-        {
-            var player = entity.GetRequiredComponent<PlayerElementComponent>();
-            if (player.Interior == 1)
-                player.Interior = 0;
-            else
-                player.Interior = 1;
-        });
-
-        _commandService.AddCommandHandler("setinterior2", (entity, args) =>
-        {
-            var player = entity.GetRequiredComponent<PlayerElementComponent>();
-            player.Interior = 1;
-            var veh = _entityFactory.CreateVehicle(404, new Vector3(338.26562f, -87.75098f, 1.5197021f), Vector3.Zero);
-            entity.GetRequiredComponent<PlayerElementComponent>().WarpIntoVehicle(veh.GetRequiredComponent<VehicleElementComponent>());
-        });
-
-        _commandService.AddAsyncCommandHandler("setinterior2b", async (entity, args) =>
-        {
-            var player = entity.GetRequiredComponent<PlayerElementComponent>();
-
-            void handleInteriorChanged(Element sender, SlipeServer.Server.Elements.Events.ElementChangedEventArgs<byte> args)
-            {
-                chatBox.OutputTo(entity, $"Changed interior to: {args.NewValue}");
-            }
-
-            player.InteriorChanged += handleInteriorChanged;
-            player.Interior = 1;
-            var veh = _entityFactory.CreateVehicle(404, new Vector3(338.26562f, -87.75098f, 1.5197021f), Vector3.Zero);
-            await Task.Delay(1000);
-            entity.GetRequiredComponent<PlayerElementComponent>().WarpIntoVehicle((Vehicle)veh.GetRequiredComponent<IElementComponent>());
-        });
-
-        _commandService.AddCommandHandler("setinterior3", (entity, args) =>
-        {
-            var player = entity.GetRequiredComponent<PlayerElementComponent>();
-            player.Interior = 1;
-            player.Interior = 0;
-        });
-
-        _commandService.AddCommandHandler("position", (entity, args) =>
-        {
-            var player = entity.GetRequiredComponent<PlayerElementComponent>();
-            _chatBox.OutputTo(entity, $"Position: {player.Position}, rot: {player.Rotation}, i: {player.Interior}, d: {player.Dimension}");
-        });
-
-        _commandService.AddCommandHandler("testargs", (entity, args) =>
-        {
-            var a = args.ReadInt();
-            var b = args.ReadByte();
-            var c = args.ReadInt();
-            _chatBox.OutputTo(entity, $"Komenda wykonana, argumenty {a}, {b}, {c}");
-        });
-
-        _commandService.AddCommandHandler("testargs2", (entity, args) =>
-        {
-            var a = args.ReadPlayerEntity();
-            var b = args.ReadPlayerEntity();
-            _chatBox.OutputTo(entity, $"Komenda wykonana, argumenty {a} {b}");
-        });
-
-        _commandService.AddCommandHandler("admincmd", (entity, args) =>
-        {
-            _chatBox.OutputTo(entity, $"executed admin cmd");
-        }, new string[] { "Admin" });
-
-        _commandService.AddCommandHandler("enum", (entity, args) =>
-        {
-            _chatBox.OutputTo(entity, $"Enum value: {args.ReadEnum<TestEnum>()}");
-        }, new string[] { "Admin" });
-
-        _commandService.AddAsyncCommandHandler("guitest1", async (entity, args) =>
-        {
-            entity.TryDestroyComponent<BrowserGuiComponent>();
-            entity.AddComponent<Counter1GuiComponent>();
-            _chatBox.OutputTo(entity, "Loaded counter 1");
-        });
-
-        _commandService.AddAsyncCommandHandler("guitest2", async (entity, args) =>
-        {
-            entity.TryDestroyComponent<BrowserGuiComponent>();
-            entity.AddComponent<Counter2GuiComponent>();
-            _chatBox.OutputTo(entity, "Loaded counter 2");
-        });
-
-        _commandService.AddAsyncCommandHandler("browserloadcounter1", async (entity, args) =>
-        {
-            var browserComponent = entity.GetRequiredComponent<BrowserComponent>();
-            browserComponent.Close();
-            browserComponent.Path = "/realmUi/counter1";
-            browserComponent.Visible = true;
-            _chatBox.OutputTo(entity, "Loaded counter 1");
-        });
-        _commandService.AddAsyncCommandHandler("browserloadcounter2", async (entity, args) =>
-        {
-            var browserComponent = entity.GetRequiredComponent<BrowserComponent>();
-            browserComponent.Close();
-            browserComponent.Path = "/realmUi/counter2";
-            browserComponent.Visible = true;
-            _chatBox.OutputTo(entity, "Loaded counter 2");
-        });
-        _commandService.AddAsyncCommandHandler("navigatetest", async (entity, args) =>
-        {
-            var browserComponent = entity.GetRequiredComponent<BrowserComponent>();
-            browserComponent.Path = "/realmUi/counter2";
-            _chatBox.OutputTo(entity, "navigated");
-        });
-        _commandService.AddCommandHandler("browserinteractive", (entity, args) =>
-        {
-            if (!entity.TryDestroyComponent<InteractiveGuiComponent>())
-            {
-                entity.AddComponent<InteractiveGuiComponent>();
-                _chatBox.OutputTo(entity, "Loaded InteractiveGuiComponent");
-            }
-        });
-        _commandService.AddAsyncCommandHandler("removebrowserinteractive", async (entity, args) =>
-        {
-            entity.TryDestroyComponent<InteractiveGuiComponent>();
-            _chatBox.OutputTo(entity, "Destroyed InteractiveGuiComponent");
-        });
-        _commandService.AddAsyncCommandHandler("setfoo", async (entity, args) =>
-        {
-            entity.GetRequiredComponent<InteractiveGuiComponent>().SetFoo(Guid.NewGuid().ToString());
-            _chatBox.OutputTo(entity, "Foo set");
-        });
-
-        _commandService.AddCommandHandler("browserloadindex", (entity, args) =>
-        {
-            entity.GetRequiredComponent<BrowserComponent>().Path = "/";
-            _chatBox.OutputTo(entity, "Loaded /");
-        });
-
-        _commandService.AddCommandHandler("openbrowser", (entity, args) =>
-        {
-            entity.GetRequiredComponent<BrowserComponent>().Visible = true;
-            _chatBox.OutputTo(entity, "Open");
-        });
-        _commandService.AddCommandHandler("closebrowser", (entity, args) =>
-        {
-            var browserComponent = entity.GetRequiredComponent<BrowserComponent>();
-            browserComponent.Path = "/realmEmpty";
-            browserComponent.Visible = false;
-            _chatBox.OutputTo(entity, "Closed");
-        });
-
-        _commandService.AddCommandHandler("collisionshapes", (entity, args) =>
-        {
-            var player = entity.GetRequiredComponent<PlayerElementComponent>();
-            var col1 = _entityFactory.CreateCollisionSphere(player.Position + new Vector3(6, 0, 0), 3);
-            var col2 = _entityFactory.CreateCollisionSphere(player.Position + new Vector3(-6, 0, 0), 3);
-
-            var collisionSphere1 = col1.GetRequiredComponent<CollisionSphereElementComponent>();
-            var collisionSphere2 = col2.GetRequiredComponent<CollisionSphereElementComponent>();
-
-            //collisionSphere1.EntityEntered += (a, b) =>
-            //{
-            //    _chatBox.OutputTo(entity, "Entered collisionSphere 1");
-            //};
-            //collisionSphere2.EntityEntered += (a, b) =>
-            //{
-            //    _chatBox.OutputTo(entity, "Entered collisionSphere 2");
-            //};
-            //collisionSphere1.EntityLeft += (a, b) =>
-            //{
-            //    _chatBox.OutputTo(entity, "Left collisionSphere 1");
-            //};
-            //collisionSphere2.EntityLeft += (a, b) =>
-            //{
-            //    _chatBox.OutputTo(entity, "Left collisionSphere 2");
-            //};
-        });
-
-        _commandService.AddAsyncCommandHandler("collisionshapes2", async (entity, args) =>
-        {
-            var player = entity.GetRequiredComponent<PlayerElementComponent>();
-            var pos1 = player.Position + new Vector3(6, 0, 0);
-            var pos2 = player.Position + new Vector3(-6, 0, 0);
-            var col1 = _entityFactory.CreateCollisionSphere(pos1, 3);
-            var col2 = _entityFactory.CreateCollisionSphere(pos2, 3);
-
-            var collisionSphere1 = col1.GetRequiredComponent<CollisionSphereElementComponent>();
-            var collisionSphere2 = col2.GetRequiredComponent<CollisionSphereElementComponent>();
-
-            //collisionSphere1.EntityEntered += (a, b) =>
-            //{
-            //    _chatBox.OutputTo(entity, "Entered collisionSphere 1");
-            //};
-            //collisionSphere2.EntityEntered += (a, b) =>
-            //{
-            //    _chatBox.OutputTo(entity, "Entered collisionSphere 2");
-            //};
-            //collisionSphere1.EntityLeft += (a, b) =>
-            //{
-            //    _chatBox.OutputTo(entity, "Left collisionSphere 1");
-            //};
-            //collisionSphere2.EntityLeft += (a, b) =>
-            //{
-            //    _chatBox.OutputTo(entity, "Left collisionSphere 2");
-            //};
-
-            int counter = 20;
-            bool a = false;
-            while (true)
-            {
-                a = !a;
-                if (a)
-                {
-                    player.Position = pos1;
-                }
-                else
-                {
-                    player.Position = pos2;
-                }
-                await Task.Delay(500);
-                if (counter-- == 0)
-                    break;
-            }
-        });
-
-        _commandService.AddCommandHandler("privateelementdisposable", async (entity, args) =>
-        {
-            var player = entity.GetRequiredComponent<PlayerElementComponent>();
-            using var scopedEntityFactory = _entityFactory.CreateScopedEntityFactory(entity);
-            scopedEntityFactory.CreateMarker(MarkerType.Cylinder, player.Position, Color.White);
-            var marker = scopedEntityFactory.GetLastCreatedComponent<PlayerPrivateElementComponent<MarkerElementComponent>>();
-            marker.ElementComponent.Size = 4;
-            marker.ElementComponent.Color = Color.Red;
-            await Task.Delay(1000);
-            entity.DestroyComponent(marker);
-            _chatBox.Output("destory marker");
-        });
-
-        _commandService.AddCommandHandler("focusedelements", (entity, args) =>
-        {
-            var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();
-            _chatBox.OutputTo(entity, $"Focused entity: {playerElementComponent.FocusedEntity}");
-            if (playerElementComponent.FocusedEntity != null)
-            {
-                var focusableComponent = playerElementComponent.FocusedEntity.GetRequiredComponent<FocusableComponent>();
-                foreach (var focusedPlayer in focusableComponent.FocusedPlayers)
-                {
-                    _chatBox.OutputTo(entity, $"Focused player: {focusedPlayer}");
-                }
-            }
-        });
-
-        _commandService.AddAsyncCommandHandler("testpolicy", async (entity, args) =>
-        {
-            bool authorized = await usersService.AuthorizePolicy(entity.GetRequiredComponent<UserComponent>(), "Admin");
-            _chatBox.OutputTo(entity, $"authorized: {authorized}");
-        });
-
-        _commandService.AddAsyncCommandHandler("signout", async (entity, args) =>
-        {
-            await _usersService.SignOut(entity);
-        });
-
-        _commandService.AddAsyncCommandHandler("updateLastNewsRead", async (entity, args) =>
-        {
-            await _usersService.UpdateLastNewsRead(entity);
-        });
-
-        _commandService.AddAsyncCommandHandler("addmoneyhistory1", async (entity, args) =>
-        {
-            await _userMoneyHistoryService.Add(entity, 123, 1, "add 123");
-            _chatBox.Output("Added 1");
-        });
-
-        _commandService.AddAsyncCommandHandler("addmoneyhistory2", async (entity, args) =>
-        {
-            await _userMoneyHistoryService.Add(entity, -123, 2, "remove 123");
-            _chatBox.Output("Added 2");
-        });
-
-        _commandService.AddAsyncCommandHandler("showhistory", async (entity, args) =>
-        {
-            var history = await _userMoneyHistoryService.Get(entity);
-            foreach (var item in history)
-            {
-                _chatBox.Output($"> {item.DateTime}: {item.CurrentBalance} - {item.Description}");
-
-            }
-        });
-
-        _commandService.AddAsyncCommandHandler("clickedElement", async (entity, args) =>
-        {
-            var lastClickedElement = entity.GetRequiredComponent<PlayerElementComponent>().LastClickedElement;
-            _chatBox.Output($"> {lastClickedElement}");
-        });
+            elementOutlineService.RemoveElementOutlineForPlayer(player, @object);
+            _chatBox.OutputTo(player, "removed");
+        });
+
+        _commandService.AddCommandHandler("spawnbox", (player, args) =>
+        {
+            var worldObject = _elementFactory.CreateObject(ObjectModel.Gunbox, player.Position + new Vector3(4, 0, -0.65f), Vector3.Zero);
+            worldObject.Components.AddComponent<LiftableWorldObjectComponent>();
+        });
+
+        _commandService.AddCommandHandler("spawnmybox", (player, args) =>
+        {
+            var objectEntity = _elementFactory.CreateObject(ObjectModel.Gunbox, player.Position + new Vector3(4, 0, -0.65f), Vector3.Zero);
+            objectEntity.Components.AddComponent<LiftableWorldObjectComponent>();
+            objectEntity.Components.AddComponent(new OwnerComponent(player));
+        });
+
+        _commandService.AddCommandHandler("spawnmybox2", (player, args) =>
+        {
+            var objectEntity = _elementFactory.CreateObject(ObjectModel.Gunbox, player.Position + new Vector3(4, 0, -0.65f), Vector3.Zero);
+            objectEntity.Components.AddComponent<LiftableWorldObjectComponent>();
+            objectEntity.Components.AddComponent(new OwnerDisposableComponent(player));
+        });
+
+        // TODO:
+        //_commandService.AddCommandHandler("spawnboxforme", (player, args) =>
+        //{
+        //    using var scopedEntityFactory = _elementFactory.CreateScopedEntityFactory(player);
+        //    var objectEntity = scopedEntityFactory.CreateObject(ObjectModel.Gunbox, player.Position + new Vector3(4, 0, -0.65f), Vector3.Zero);
+        //    objectEntity.AddComponent<LiftableWorldObjectComponent>();
+        //});
+
+        //_commandService.AddAsyncCommandHandler("spawntempbox", async (player, args) =>
+        //{
+        //    var objectEntity = _elementFactory.CreateObject(ObjectModel.Gunbox, player.Position + new Vector3(4, 0, -0.65f), Vector3.Zero);
+        //    objectEntity.AddComponent(new LiftableWorldObjectComponent());
+        //    await Task.Delay(5000);
+        //    objectEntity.Dispose();
+        //});
+
+        //_commandService.AddCommandHandler("spawnboard", (player, args) =>
+        //{
+        //    var objectEntity = _elementFactory.CreateObject((ObjectModel)3077, player.Position + new Vector3(4, 0, -1), Vector3.Zero);
+        //    objectEntity.AddComponent(new LiftableWorldObjectComponent());
+        //});
+
+        //_commandService.AddCommandHandler("spawnboxmany", (player, args) =>
+        //{
+        //    var objectEntity = _elementFactory.CreateObject(ObjectModel.Gunbox, player.Position + new Vector3(4, 0, -0.6f), Vector3.Zero);
+        //    objectEntity.AddComponent(new LiftableWorldObjectComponent());
+        //    var objectEntity1 = _elementFactory.CreateObject(ObjectModel.Gunbox, player.Position + new Vector3(4 + 0.8f, 0, -0.6f), Vector3.Zero);
+        //    objectEntity1.AddComponent(new LiftableWorldObjectComponent());
+        //    var objectEntity2 = _elementFactory.CreateObject(ObjectModel.Gunbox, player.Position + new Vector3(4, 0 + 0.8f, -0.6f), Vector3.Zero);
+        //    objectEntity2.AddComponent(new LiftableWorldObjectComponent());
+        //    var objectEntity3 = _elementFactory.CreateObject(ObjectModel.Gunbox, player.Position + new Vector3(4 + 0.8f, 0 + 0.8f, -0.6f), Vector3.Zero);
+        //    objectEntity3.AddComponent(new LiftableWorldObjectComponent());
+        //});
+
+        //_commandService.AddAsyncCommandHandler("hud3d", async (player, args) =>
+        //{
+        //    var player = player.GetRequiredComponent<PlayerElementComponent>();
+        //    using var e = _elementFactory.CreateEntity();
+        //    e.AddComponent(new Hud3dComponent<TestState>(e => e
+        //        .AddRectangle(Vector2.Zero, new Size(100, 100), Color.Red)
+        //        .AddRectangle(new Vector2(25, 25), new Size(50, 50), Color.Green)
+        //        .AddText(x => x.Text, new Vector2(0, 0), new Size(100, 100), Color.Blue),
+        //        player.Position + new Vector3(-4, 0, 0),
+        //        new TestState
+        //        {
+        //            Text = "test 1",
+        //        }));
+
+        //    await Task.Delay(2000);
+        //});
+
+        //_commandService.AddAsyncCommandHandler("hud3d2", async (player, args) =>
+        //{
+        //    var player = player.GetRequiredComponent<PlayerElementComponent>();
+        //    var e = _elementFactory.CreateEntity();
+        //    var hud3d = e.AddComponent(new Hud3dComponent<TestState>(e => e
+        //        .AddRectangle(Vector2.Zero, new Size(200, 200), Color.Red)
+        //        .AddRectangle(new Vector2(25, 25), new Size(50, 50), Color.Green)
+        //        .AddText(x => x.Text, new Vector2(0, 0), new Size(200, 200), Color.White),
+        //        player.Position + new Vector3(-4, 0, 0),
+        //        new TestState
+        //        {
+        //            Text = "test 1",
+        //        }));
+
+        //    int i = 0;
+        //    while (true)
+        //    {
+        //        await Task.Delay(1000 / 60);
+        //        hud3d.UpdateState(x => x.Text = $"time {_dateTimeProvider.Now} {i++}");
+        //    }
+        //});
+
+        //_commandService.AddCommandHandler("spawnbox2", (player, args) =>
+        //{
+        //    var player = player.GetRequiredComponent<PlayerElementComponent>();
+        //    var objectEntity = _elementFactory.CreateObject(ObjectModel.Gunbox, player.Position + new Vector3(4, 0, -0.65f), Vector3.Zero);
+        //    objectEntity.AddComponent(new DurationBasedHoldInteractionWithRingEffectComponent(overlayService));
+        //});
+
+        //_commandService.AddCommandHandler("stopanimation", (player, args) =>
+        //{
+        //    player.GetRequiredComponent<PlayerElementComponent>().StopAnimation();
+        //});
+
+        //_commandService.AddCommandHandler("animation", (player, args) =>
+        //{
+        //    var animationName = args.ReadArgument();
+        //    if (Enum.TryParse<Animation>(animationName, out var animation))
+        //    {
+        //        try
+        //        {
+        //            player.GetRequiredComponent<PlayerElementComponent>().DoAnimation(animation);
+        //        }
+        //        catch (NotSupportedException)
+        //        {
+        //            _chatBox.OutputTo(player, $"Animation '{animationName}' is not supported");
+        //        }
+        //    }
+        //    else
+        //        _chatBox.OutputTo(player, $"Animation '{animationName}' not found.");
+        //});
+
+        //_commandService.AddAsyncCommandHandler("animationasync", async (player, args) =>
+        //{
+        //    var animationName = args.ReadArgument();
+        //    var playerElementComponent = player.GetRequiredComponent<PlayerElementComponent>();
+        //    if (Enum.TryParse<Animation>(animationName, out var animation))
+        //    {
+        //        try
+        //        {
+        //            _chatBox.OutputTo(player, $"Started animation '{animation}'");
+        //            await playerElementComponent.DoAnimationAsync(animation);
+        //            _chatBox.OutputTo(player, $"Finished animation '{animation}'");
+        //        }
+        //        catch (NotSupportedException)
+        //        {
+        //            _chatBox.OutputTo(player, $"Animation '{animationName}' is not supported");
+        //        }
+        //    }
+        //    else
+        //        _chatBox.OutputTo(player, $"Animation '{animationName}' not found.");
+
+        //});
+
+        //_commandService.AddAsyncCommandHandler("complexanimation", async (player, args) =>
+        //{
+        //    var animationName = args.ReadArgument();
+        //    if (Enum.TryParse<Animation>(animationName, out var animation))
+        //    {
+        //        try
+        //        {
+        //            await player.GetRequiredComponent<PlayerElementComponent>().DoComplexAnimationAsync(animation, true);
+        //        }
+        //        catch (NotSupportedException)
+        //        {
+        //            _chatBox.OutputTo(player, $"Animation '{animationName}' is not supported");
+        //        }
+        //    }
+        //    else
+        //        _chatBox.OutputTo(player, $"Animation '{animationName}' not found.");
+        //});
+
+        //_commandService.AddCommandHandler("mygroups", (player, args) =>
+        //{
+        //    _chatBox.OutputTo(player, "Groups:");
+        //    foreach (var item in player.Components.ComponentsLists.OfType<GroupMemberComponent>())
+        //    {
+        //        _chatBox.OutputTo(player, $"Group id: {item.GroupId}, rank: {item.Rank}, rank name: '{item.RankName}'");
+        //    }
+        //});
+
+        //_commandService.AddCommandHandler("myfractions", (player, args) =>
+        //{
+        //    var playerElementComponent = player.GetRequiredComponent<PlayerElementComponent>();
+        //    _chatBox.OutputTo(player, "Fractions:");
+        //    foreach (var item in player.Components.OfType<FractionMemberComponent>())
+        //    {
+        //        _chatBox.OutputTo(player, $"Fraction id: {item.FractionId}, rank: {item.Rank}, rank name: '{item.RankName}'");
+        //    }
+        //});
+
+        //_commandService.AddCommandHandler("toggleadmindebug", (player, args) =>
+        //{
+        //    var adminComponent = player.GetRequiredComponent<AdminComponent>();
+        //    adminComponent.AdminMode = !adminComponent.AdminMode;
+        //    adminComponent.InteractionDebugRenderingEnabled = !adminComponent.InteractionDebugRenderingEnabled;
+        //});
+
+        //_commandService.AddCommandHandler("createvehiclehud", (player, args) =>
+        //{
+        //    var playerElementComponent = player.GetRequiredComponent<PlayerElementComponent>();
+        //    player.AddComponent(new SampleVehicleHud(assetsRegistry));
+        //});
+
+        //_commandService.AddCommandHandler("createhud", (player, args) =>
+        //{
+        //    var playerElementComponent = player.GetRequiredComponent<PlayerElementComponent>();
+        //    player.AddComponent(new SampleHud(assetsRegistry));
+        //});
+
+        //_commandService.AddCommandHandler("createhud2", (player, args) =>
+        //{
+        //    var playerElementComponent = player.GetRequiredComponent<PlayerElementComponent>();
+        //    player.AddComponent(new SampleHud2(assetsRegistry));
+        //});
+
+        //_commandService.AddCommandHandler("createhud3", async (player, args) =>
+        //{
+        //    var hud = player.AddComponent(new SampleHud3());
+        //    while (true)
+        //    {
+        //        await Task.Delay(1000);
+        //        hud.Update();
+        //    }
+        //});
+
+        //_commandService.AddCommandHandler("updatestate2", (player, args) =>
+        //{
+        //    var sampleHud2 = player.GetRequiredComponent<SampleHud2>();
+        //    sampleHud2.Update();
+        //});
+
+        //_commandService.AddCommandHandler("movehud", (player, args) =>
+        //{
+        //    var sampleHud = player.GetRequiredComponent<SampleHud>();
+        //    sampleHud.Position = new Vector2(0, _hudPosition++ * 10);
+        //});
+
+        //_commandService.AddCommandHandler("createstatefulhud", (player, args) =>
+        //{
+        //    var playerElementComponent = player.GetRequiredComponent<PlayerElementComponent>();
+        //    var sampleHud = player.AddComponent(new SampleStatefulHud(new SampleHudState
+        //    {
+        //        Text1 = "text1",
+        //        Text2 = "text2",
+        //    }, assetsRegistry));
+        //});
+
+        //_commandService.AddCommandHandler("updatestate", (player, args) =>
+        //{
+        //    var sampleHud = player.GetRequiredComponent<SampleStatefulHud>();
+        //    sampleHud.Update();
+        //});
+
+        //_commandService.AddCommandHandler("destroyhuds", (player, args) =>
+        //{
+        //    player.TryDestroyComponent<SampleHud>();
+        //    player.TryDestroyComponent<SampleStatefulHud>();
+        //});
+
+        //_commandService.AddCommandHandler("discord", (player, args) =>
+        //{
+        //    var playerElementComponent = player.GetRequiredComponent<PlayerElementComponent>();
+        //    if (player.HasComponent<DiscordIntegrationComponent>())
+        //    {
+        //        _chatBox.OutputTo(player, "Twoje konto jest już połączone z discordem.");
+        //    }
+        //    player.TryDestroyComponent<PendingDiscordIntegrationComponent>();
+        //    var pendingDiscordIntegrationComponent = new PendingDiscordIntegrationComponent(dateTimeProvider);
+        //    var code = pendingDiscordIntegrationComponent.GenerateAndGetDiscordConnectionCode();
+        //    player.AddComponent(pendingDiscordIntegrationComponent);
+        //    _chatBox.OutputTo(player, $"Aby połączyć konto wpisz na kanale discord #polacz-konto komendę: /polaczkonto {code}");
+        //});
+
+        //_commandService.AddCommandHandler("adduserupgrade", (player, args) =>
+        //{
+        //    var userComponent = player.GetRequiredComponent<UserComponent>();
+        //    var playerElementComponent = player.GetRequiredComponent<PlayerElementComponent>();
+        //    var i = Random.Shared.Next(0, 10);
+        //    if (userComponent.TryAddUpgrade(i))
+        //        _chatBox.OutputTo(player, $"Pomyślnie dodano ulepszenie id {i}");
+        //    else
+        //        _chatBox.OutputTo(player, $"Pomyślnie dodano ulepszenie id {i}");
+        //});
+
+        //_commandService.AddAsyncCommandHandler("ban", async (player, args) =>
+        //{
+        //    var userComponent = player.GetRequiredComponent<UserComponent>();
+        //    var playerElementComponent = player.GetRequiredComponent<PlayerElementComponent>();
+        //    await _banService.Ban(player);
+        //    playerElementComponent.Kick("test 123");
+        //});
+
+        //_commandService.AddAsyncCommandHandler("amibanned", async (player, args) =>
+        //{
+        //    var userComponent = player.GetRequiredComponent<UserComponent>();
+        //    var isBanned = userComponent.Bans.IsBanned(_dateTimeProvider.Now, 123);
+        //    _chatBox.OutputTo(player, $"isBanned {isBanned}");
+        //});
+
+        //_commandService.AddAsyncCommandHandler("bantest", async (player, args) =>
+        //{
+        //    var userComponent = player.GetRequiredComponent<UserComponent>();
+        //    await _banService.Ban(player, type: 123);
+        //    var isBanned = userComponent.Bans.IsBanned(_dateTimeProvider.Now, 123);
+        //    _chatBox.OutputTo(player, $"isBanned {isBanned}");
+        //});
+
+        //_commandService.AddAsyncCommandHandler("unbantest", async (player, args) =>
+        //{
+        //    var userComponent = player.GetRequiredComponent<UserComponent>();
+        //    await _banService.RemoveBan(player, 123);
+        //    var isBanned = userComponent.Bans.IsBanned(_dateTimeProvider.Now, 123);
+        //    _chatBox.OutputTo(player, $"isBanned {isBanned}");
+        //});
+
+        //_commandService.AddCommandHandler("attach", (player, args) =>
+        //{
+        //    var objectEntity = _elementFactory.CreateObject((ObjectModel)1337, Vector3.Zero, Vector3.Zero);
+        //    //player.AddComponent(new AttachedEntityComponent(objectEntity, SlipeServer.Packets.Enums.BoneId.Pelvis1, new Vector3(-1, -1, 1)));
+        //    player.AddComponent(new OwnerDisposableComponent(objectEntity));
+        //    objectEntity.Disposed += e =>
+        //    {
+        //        logger.LogInformation("Disposed attached player");
+        //    };
+        //});
+
+        //_commandService.AddCommandHandler("destroyattachedentity", (player, args) =>
+        //{
+        //    var userComponent = player.GetRequiredComponent<UserComponent>();
+        //    var attachedEntity = player.GetRequiredComponent<AttachedElementComponent>();
+        //    var playerElementComponent = player.GetRequiredComponent<PlayerElementComponent>();
+        //    attachedEntity.AttachedEntity.Dispose();
+        //    if (player.HasComponent<AttachedElementComponent>())
+        //    {
+        //        _chatBox.OutputTo(player, "Nie udalo sie zniszczyc");
+        //    }
+        //    else
+        //    {
+        //        _chatBox.OutputTo(player, "Zniszczone");
+        //    }
+        //});
+
+        //_commandService.AddCommandHandler("testrole", (player, args) =>
+        //{
+        //    var userComponent = player.GetRequiredComponent<UserComponent>();
+        //    var isAdmin = userComponent.IsInRole("admin");
+        //    var roles = userComponent.GetRoles();
+        //    foreach (var item in roles)
+        //    {
+        //        if (!userComponent.IsInRole(item))
+        //        {
+        //            throw new Exception();
+        //        }
+        //    }
+        //});
+
+        //_commandService.AddCommandHandler("testlogs", (player, args) =>
+        //{
+        //    _logger.LogInformation("test test 1");
+        //    var activity = new Activity("TestLogsActivity");
+        //    activity.Start();
+        //    _logger.LogInformation("test test 2");
+        //    activity.Stop();
+        //});
+
+        //_commandService.AddCommandHandler("nametags", (player, args) =>
+        //{
+        //    var player = player.GetRequiredComponent<PlayerElementComponent>();
+        //    var ped = _elementFactory.CreatePed(SlipeServer.Server.Elements.Enums.PedModel.Truth, player.Position + new Vector3(4, 0, 0));
+        //    ped.AddComponent(new NametagComponent("[22] Borsuk"));
+        //});
+
+        //_commandService.AddAsyncCommandHandler("nametags2", async (player, args) =>
+        //{
+        //    var player = player.GetRequiredComponent<PlayerElementComponent>();
+        //    var nametag = new NametagComponent("[22] Borsuk");
+        //    var ped = _elementFactory.CreatePed(SlipeServer.Server.Elements.Enums.PedModel.Truth, player.Position + new Vector3(4, 0, 0));
+        //    ped.AddComponent(nametag);
+        //    await Task.Delay(1000);
+        //    ped.DestroyComponent(nametag);
+        //});
+
+        //_commandService.AddAsyncCommandHandler("nametags3", async (player, args) =>
+        //{
+        //    var player = player.GetRequiredComponent<PlayerElementComponent>();
+        //    var nametag = new NametagComponent("[22] Borsuk");
+        //    var ped = _elementFactory.CreatePed(SlipeServer.Server.Elements.Enums.PedModel.Truth, player.Position + new Vector3(4, 0, 0));
+        //    ped.AddComponent(nametag);
+        //    await Task.Delay(1000);
+        //    nametag.Text = "[100] Borsuk";
+        //});
+
+        //_commandService.AddCommandHandler("nametags4", (player, args) =>
+        //{
+        //    nametagsService.SetNametagRenderingEnabled(player, args.ReadArgument() == "true");
+        //});
+
+        //_commandService.AddAsyncCommandHandler("nametags5", async (player, args) =>
+        //{
+        //    var player = player.GetRequiredComponent<PlayerElementComponent>();
+        //    var nametag = new NametagComponent("[22] Borsuk");
+        //    using var ped = _elementFactory.CreatePed(SlipeServer.Server.Elements.Enums.PedModel.Truth, player.Position + new Vector3(4, 0, 0));
+        //    ped.AddComponent(nametag);
+        //    await Task.Delay(1000);
+        //});
+
+        //_commandService.AddCommandHandler("nametags6", (player, args) =>
+        //{
+        //    nametagsService.SetLocalPlayerRenderingEnabled(player, args.ReadArgument() == "true");
+        //});
+
+        //_commandService.AddCommandHandler("outlinerendering", (player, args) =>
+        //{
+        //    elementOutlineService.SetRenderingEnabled(player, args.ReadArgument() == "true");
+        //});
+
+        //_commandService.AddCommandHandler("outline1", (player, args) =>
+        //{
+        //    var player = player.GetRequiredComponent<PlayerElementComponent>();
+        //    var ped = _elementFactory.CreatePed(SlipeServer.Server.Elements.Enums.PedModel.Truth, player.Position + new Vector3(4, 0, 0));
+        //    var @object = _elementFactory.CreateObject((ObjectModel)1337, player.Position + new Vector3(4, 4, 0), Vector3.Zero);
+        //    ped.AddComponent(new OutlineComponent(Color.Red));
+        //    @object.AddComponent(new OutlineComponent(Color.Red));
+        //});
+
+        //_commandService.AddAsyncCommandHandler("outline2", async (player, args) =>
+        //{
+        //    var player = player.GetRequiredComponent<PlayerElementComponent>();
+        //    using var ped = _elementFactory.CreatePed(SlipeServer.Server.Elements.Enums.PedModel.Truth, player.Position + new Vector3(4, 0, 0));
+        //    ped.AddComponent(new OutlineComponent(Color.Red));
+        //    await Task.Delay(1000);
+        //});
+
+        //_commandService.AddAsyncCommandHandler("outline3", async (player, args) =>
+        //{
+        //    var player = player.GetRequiredComponent<PlayerElementComponent>();
+        //    var ped = _elementFactory.CreatePed(SlipeServer.Server.Elements.Enums.PedModel.Truth, player.Position + new Vector3(4, 0, 0));
+        //    var outlineComponent = ped.AddComponent(new OutlineComponent(Color.Red));
+        //    await Task.Delay(1000);
+        //    ped.DestroyComponent(outlineComponent);
+        //});
+
+        //_commandService.AddCommandHandler("outline4", (player, args) =>
+        //{
+        //    var player = player.GetRequiredComponent<PlayerElementComponent>();
+        //    var ped = _elementFactory.CreatePed(SlipeServer.Server.Elements.Enums.PedModel.Truth, player.Position + new Vector3(4, 0, 0));
+        //    var @object = _elementFactory.CreateObject((ObjectModel)1337, player.Position + new Vector3(4, 4, 0), Vector3.Zero);
+        //    elementOutlineService.SetEntityOutlineForPlayer(player, ped, Color.Red);
+        //    elementOutlineService.SetEntityOutlineForPlayer(player, @object, Color.Blue);
+        //});
+
+        //_commandService.AddCommandHandler("randomvehcolor", (player, args) =>
+        //{
+        //    var player = player.GetRequiredComponent<PlayerElementComponent>();
+        //    var rnd = Random.Shared;
+        //    var veh = player.GetRequiredComponent<PlayerElementComponent>().Vehicle.UpCast().GetRequiredComponent<VehicleElementComponent>();
+        //    veh.Colors.Primary = Color.FromArgb(rnd.Next(256), rnd.Next(256), rnd.Next(256));
+        //    veh.Colors.Secondary = Color.FromArgb(rnd.Next(256), rnd.Next(256), rnd.Next(256));
+        //    veh.Colors.Color3 = Color.FromArgb(rnd.Next(256), rnd.Next(256), rnd.Next(256));
+        //    veh.Colors.Color4 = Color.FromArgb(rnd.Next(256), rnd.Next(256), rnd.Next(256));
+        //});
+
+        //_commandService.AddCommandHandler("setsetting", (player, args) =>
+        //{
+        //    player.GetRequiredComponent<UserComponent>().SetSetting(1, args.ReadArgument());
+        //});
+
+        //_commandService.AddCommandHandler("removesetting", (player, args) =>
+        //{
+        //    player.GetRequiredComponent<UserComponent>().RemoveSetting(1);
+        //});
+
+        //_commandService.AddCommandHandler("getsetting", (player, args) =>
+        //{
+        //    var playerElementComponent = player.GetRequiredComponent<PlayerElementComponent>();
+
+        //    var settingValue = player.GetRequiredComponent<UserComponent>().GetSetting(1);
+
+        //    _chatBox.OutputTo(player, $"Setting1: {settingValue}");
+        //});
+
+
+        //_commandService.AddAsyncCommandHandler("whitelistmyserial", async (player, args) =>
+        //{
+        //    var playerElementComponent = player.GetRequiredComponent<PlayerElementComponent>();
+        //    var userComponent = player.GetRequiredComponent<UserComponent>();
+
+        //    if (await _userWhitelistedSerialsRepository.TryAddWhitelistedSerial(userComponent.Id, playerElementComponent.Client.Serial))
+        //    {
+        //        _chatBox.OutputTo(player, $"Dodano serial");
+        //    }
+        //    else
+        //    {
+        //        _chatBox.OutputTo(player, $"Nie udało się dodać");
+        //    }
+        //});
+
+        //_commandService.AddAsyncCommandHandler("removewhitelistmyserial", async (player, args) =>
+        //{
+        //    var playerElementComponent = player.GetRequiredComponent<PlayerElementComponent>();
+        //    var userComponent = player.GetRequiredComponent<UserComponent>();
+
+        //    if (await _userWhitelistedSerialsRepository.TryRemoveWhitelistedSerial(userComponent.Id, playerElementComponent.Client.Serial))
+        //    {
+        //        _chatBox.OutputTo(player, $"Usunięto serial");
+        //    }
+        //    else
+        //    {
+        //        _chatBox.OutputTo(player, $"Nie udało się usunąć");
+        //    }
+        //});
+
+        //_commandService.AddCommandHandler("addvisualupgrade", (player, args) =>
+        //{
+        //    var playerElementComponent = player.GetRequiredComponent<PlayerElementComponent>();
+        //    if (playerElementComponent.Vehicle.UpCast().GetRequiredComponent<VehicleUpgradesComponent>().AddUniqueUpgrade(3))
+        //    {
+        //        _chatBox.OutputTo(player, $"dodano wizualne ulepszenie");
+        //    }
+        //    else
+        //    {
+        //        _chatBox.OutputTo(player, $"Nie udało się dodać wizualnego ulepszenia");
+        //    }
+        //});
+
+        //_commandService.AddCommandHandler("addinvalidguicomponent", (player, args) =>
+        //{
+        //    player.AddComponent<InvalidGuiComponent>();
+        //});
+
+        //_commandService.AddCommandHandler("text3dcomp", (player, args) =>
+        //{
+        //    var player = player.GetRequiredComponent<PlayerElementComponent>();
+        //    var markerEntity = entityFactory.CreateMarker(MarkerType.Arrow, player.Position, Color.White);
+        //    markerEntity.AddComponent(new Text3dComponent("test1", player.Position));
+        //    markerEntity.AddComponent(new Text3dComponent("offset z+1", player.Position + new Vector3(0, 0, 1)));
+        //});
+
+        //_commandService.AddAsyncCommandHandler("despawn", async (player, args) =>
+        //{
+        //    var playerElementComponent = player.GetRequiredComponent<PlayerElementComponent>();
+        //    await _vehiclesService.Destroy(playerElementComponent.Vehicle.UpCast());
+        //});
+
+        //_commandService.AddCommandHandler("disposeveh", (player, args) =>
+        //{
+        //    var playerElementComponent = player.GetRequiredComponent<PlayerElementComponent>();
+        //    playerElementComponent.Vehicle.Destroy();
+        //});
+
+        //_commandService.AddAsyncCommandHandler("spawnback", async (player, args) =>
+        //{
+        //    var player = player.GetRequiredComponent<PlayerElementComponent>();
+        //    Entity? vehicle = null;
+        //    try
+        //    {
+        //        vehicle = await _loadService.LoadVehicleById(args.ReadInt());
+        //    }
+        //    catch(Exception ex)
+        //    {
+        //        _chatBox.OutputTo(player, "Failed to spawn vehicle");
+        //    }
+        //    if (vehicle == null)
+        //        return;
+        //    await _vehiclesService.SetVehicleSpawned(vehicle);
+        //    var playerElementComponent = player.GetRequiredComponent<PlayerElementComponent>();
+        //    if (vehicle != null)
+        //    {
+        //        var vehicle = ((Vehicle)vehicle.GetRequiredComponent<IElementComponent>());
+        //        vehicle.Position = player.Position;
+        //        playerElementComponent.WarpIntoVehicle(vehicle);
+        //        _chatBox.OutputTo(player, "Spawned");
+        //    }
+        //    else
+        //        _chatBox.OutputTo(player, "Error while spawning");
+        //});
+
+        //_commandService.AddCommandHandler("inventoryoccupied", (player, args) =>
+        //{
+        //    var inv = player.GetRequiredComponent<InventoryComponent>();
+        //    var playerElementComponent = player.GetRequiredComponent<PlayerElementComponent>();
+        //    _chatBox.OutputTo(player, $"Inventory: {inv.Number}/{inv.Size}");
+        //});
+
+        //_commandService.AddCommandHandler("giveitem4", (player, args) =>
+        //{
+        //    var inv = player.GetRequiredComponent<InventoryComponent>();
+        //    inv.AddSingleItem(_itemsRegistry, 4);
+        //    var playerElementComponent = player.GetRequiredComponent<PlayerElementComponent>();
+        //    _chatBox.OutputTo(player, "Item given");
+        //});
+
+        //_commandService.AddCommandHandler("itemwithmetadata", (player, args) =>
+        //{
+        //    var inv = player.GetRequiredComponent<InventoryComponent>();
+        //    var item = inv.AddSingleItem(_itemsRegistry, 4, new Metadata
+        //    {
+        //        ["number"] = 1m
+        //    });
+
+        //    var playerElementComponent = player.GetRequiredComponent<PlayerElementComponent>();
+        //    _chatBox.OutputTo(player, $"Item regular: {item.GetMetadata("number").GetType()}");
+        //    _chatBox.OutputTo(player, $"Item cast<int>: {item.GetMetadata<int>("number").GetType()}");
+        //});
+
+        //_commandService.AddCommandHandler("proceduralobject", (player, args) =>
+        //{
+        //    var player = player.GetRequiredComponent<PlayerElementComponent>();
+        //    var objectEntity = _elementFactory.CreateObject(ObjectModel.Gunbox, player.Position + new Vector3(4, 0, -0.65f), Vector3.Zero);
+        //});
+
+        //_commandService.AddCommandHandler("day", (player, args) =>
+        //{
+        //    gameWorld.SetTime(12, 0);
+        //});
+
+        //_commandService.AddCommandHandler("night", (player, args) =>
+        //{
+        //    gameWorld.SetTime(0, 0);
+        //});
+
+        //_commandService.AddCommandHandler("createObjectFor", (player, args) =>
+        //{
+        //    var player = player.GetRequiredComponent<PlayerElementComponent>();
+        //    using var scopedEntityFactory = _elementFactory.CreateScopedEntityFactory(player);
+        //    scopedEntityFactory.CreateObject((ObjectModel)1337, player.Position + new Vector3(3, 0, 0), player.Rotation);
+        //});
+
+        //_commandService.AddCommandHandler("tp", (player, args) =>
+        //{
+        //    var player = player.GetRequiredComponent<PlayerElementComponent>();
+        //    player.Position = new Vector3(0, 0, 3);
+        //});
+
+        //_commandService.AddCommandHandler("i", (player, args) =>
+        //{
+        //    var player = player.GetRequiredComponent<PlayerElementComponent>();
+        //    player.Interior = args.ReadByte();
+        //});
+
+        //_commandService.AddCommandHandler("d", (player, args) =>
+        //{
+        //    var player = player.GetRequiredComponent<PlayerElementComponent>();
+        //    player.Dimension = args.ReadUShort();
+        //});
+
+        //_commandService.AddCommandHandler("runtimeobject", (player, args) =>
+        //{
+        //    var player = player.GetRequiredComponent<PlayerElementComponent>();
+        //    var modelFactory = new ModelFactory();
+        //    modelFactory.AddTriangle(new Vector3(2, 2, 0), new Vector3(0, 10, 0), new Vector3(10, 0, 0), "Metal1_128");
+        //    modelFactory.AddTriangle(new Vector3(10, 0, 0), new Vector3(0, 10, 0), new Vector3(10, 10, 0), "Metal1_128");
+        //    var dff = modelFactory.BuildDff();
+        //    var col = modelFactory.BuildCol();
+        //    assetsService.ReplaceModelFor(player, dff, col, 1339);
+        //    _elementFactory.CreateObject((ObjectModel)1339, player.Position + new Vector3(15, 15, -5), Vector3.Zero);
+        //});
+
+
+        //_commandService.AddCommandHandler("restoreobject", (player, args) =>
+        //{
+        //    assetsService.RestoreModelFor(player, 1339);
+        //});
+
+        //_commandService.AddCommandHandler("amiinwater", (player, args) =>
+        //{
+        //    var player = player.GetRequiredComponent<PlayerElementComponent>();
+        //    var playerElementComponent = player.GetRequiredComponent<PlayerElementComponent>();
+        //    _chatBox.OutputTo(player, $"amiinwater: {playerElementComponent.IsInWater} {player.Position}");
+        //});
+
+        //_commandService.AddCommandHandler("formatmoney", (player, args) =>
+        //{
+        //    var playerElementComponent = player.GetRequiredComponent<PlayerElementComponent>();
+        //    _chatBox.OutputTo(player, $"{123.123m.FormatMoney(new System.Globalization.CultureInfo("pl-PL"))}");
+        //});
+
+        //_commandService.AddAsyncCommandHandler("createObjectFor2", async (player, args) =>
+        //{
+        //    var player = player.GetRequiredComponent<PlayerElementComponent>();
+        //    using var scopedEntityFactory = _elementFactory.CreateScopedEntityFactory(player);
+        //    var pos = player.Position + new Vector3(3, 0, 0);
+
+        //    void handleComponentCreated(IScopedElementFactory scopedEntityFactory, PlayerPrivateElementComponentBase playerPrivateElementComponentBase)
+        //    {
+        //        ;
+        //    }
+        //    scopedEntityFactory.ComponentCreated += handleComponentCreated;
+        //    scopedEntityFactory.CreateObject((ObjectModel)1337, pos, player.Rotation);
+        //    for (int i = 0; i < 10; i++)
+        //    {
+        //        await Task.Delay(2000);
+        //        //obj.Position = pos + new Vector3(i, 0, 0);
+        //        //obj.Rotation = player.Rotation;
+        //    }
+        //});
+
+        //_commandService.AddCommandHandler("addtestmarker1", (player, args) =>
+        //{
+        //    var player = player.GetRequiredComponent<PlayerElementComponent>();
+        //    spawnMarkersService.AddSpawnMarker(new PointSpawnMarker("test123", player.Position));
+        //    _chatBox.OutputTo(player, "marker added1");
+        //});
+
+        //_commandService.AddCommandHandler("addtestmarker2", (player, args) =>
+        //{
+        //    var player = player.GetRequiredComponent<PlayerElementComponent>();
+        //    spawnMarkersService.AddSpawnMarker(new DirectionalSpawnMarker("test direct", player.Position, player.Rotation.Z));
+        //    _chatBox.OutputTo(player, "marker added2");
+        //});
+
+        //_commandService.AddCommandHandler("testnotrace", (player, args) =>
+        //{
+        //    _logger.LogInformation("no trace");
+        //}, null);
+
+        //int counter = 0;
+        //_commandService.AddCommandHandler("counter", (player, args) =>
+        //{
+        //    counter++;
+        //    _logger.LogInformation("Counter: {counter}", counter);
+        //});
+
+        //_commandService.AddCommandHandler("level", (player, args) =>
+        //{
+        //    var levelComponent = player.GetRequiredComponent<LevelComponent>();
+        //    var playerElementComponent = player.GetRequiredComponent<PlayerElementComponent>();
+        //    _chatBox.OutputTo(player, $"Level: {levelComponent.Level}, exp: {levelComponent.Experience}");
+        //});
+
+        //_commandService.AddCommandHandler("setlevel", (player, args) =>
+        //{
+        //    uint level = args.ReadUInt();
+        //    var levelComponent = player.GetRequiredComponent<LevelComponent>();
+        //    var playerElementComponent = player.GetRequiredComponent<PlayerElementComponent>();
+        //    void handleLevelChanged(LevelComponent that, uint level, bool up)
+        //    {
+        //        _chatBox.OutputTo(player, $"Level change: {level}, {up}");
+        //    }
+        //    levelComponent.LevelChanged += handleLevelChanged;
+        //    levelComponent.Level = level;
+        //    levelComponent.LevelChanged -= handleLevelChanged;
+        //});
+
+        //_commandService.AddCommandHandler("browserdevtools", (player, args) =>
+        //{
+        //    var adminComponent = player.GetRequiredComponent<AdminComponent>();
+        //    var browserComponent = player.GetRequiredComponent<BrowserComponent>();
+        //    adminComponent.DevelopmentMode = true;
+        //    browserComponent.DevTools = !browserComponent.DevTools;
+        //    _chatBox.OutputTo(player, $"Devtools {browserComponent.DevTools}");
+        //}, null);
+
+        //_commandService.AddCommandHandler("browserpath", (player, args) =>
+        //{
+        //    var browserComponent = player.GetRequiredComponent<BrowserComponent>();
+        //    _chatBox.OutputTo(player, $"Path {browserComponent.Path}");
+        //}, null);
+
+        //_commandService.AddAsyncCommandHandler("setkind", async (player, args) =>
+        //{
+        //    var player = player.GetRequiredComponent<PlayerElementComponent>();
+        //    await _vehiclesService.SetVehicleKind(player.GetRequiredComponent<PlayerElementComponent>().Vehicle.UpCast(), 42);
+        //});
+
+        //_commandService.AddAsyncCommandHandler("kind", async (player, args) =>
+        //{
+        //    var player = player.GetRequiredComponent<PlayerElementComponent>();
+        //    var playerElementComponent = player.GetRequiredComponent<PlayerElementComponent>();
+        //    var veh = playerElementComponent.Vehicle;
+        //    var kind = veh.UpCast().GetRequiredComponent<PrivateVehicleComponent>().Kind;
+        //    _chatBox.OutputTo(player, $"Kind: {kind}");
+        //});
+
+        //_commandService.AddAsyncCommandHandler("counterasync", async (player, args) =>
+        //{
+        //    counter++;
+        //    _logger.LogInformation("Counter: {counter}", counter);
+        //});
+
+        //_commandService.AddAsyncCommandHandler("addvehevent", async (player, args) =>
+        //{
+        //    await _vehiclesService.AddVehicleEvent(player.GetRequiredComponent<PlayerElementComponent>().Vehicle.UpCast(), 1);
+        //});
+
+        //_commandService.AddAsyncCommandHandler("vehevents", async (player, args) =>
+        //{
+        //    var playerElementComponent = player.GetRequiredComponent<PlayerElementComponent>();
+        //    var events = await _vehiclesService.GetAllVehicleEvents(playerElementComponent.Vehicle.UpCast());
+        //    _chatBox.OutputTo(player, "Events:");
+        //    foreach (var item in events)
+        //    {
+        //        _chatBox.OutputTo(player, $"Event: {item.DateTime} - {item.EventType}");
+        //    }
+        //});
+
+        //_commandService.AddCommandHandler("browserguiopen", (player, args) =>
+        //{
+        //    player.GetRequiredComponent<BrowserComponent>().Path = "Counter";
+        //});
+
+        //_commandService.AddCommandHandler("browserguiclose", (player, args) =>
+        //{
+        //    player.GetRequiredComponent<BrowserComponent>().Path = null;
+        //});
+
+        //_commandService.AddCommandHandler("kickme", (player, args) =>
+        //{
+        //    usersService.Kick(player, "test");
+        //});
+
+        //_commandService.AddCommandHandler("getplayerbyname", (player, args) =>
+        //{
+        //    if (usersService.TryGetPlayerByName(args.ReadArgument(), out var foundPlayer))
+        //    {
+        //        _chatBox.OutputTo(player, "found");
+        //    }
+        //    else
+        //        _chatBox.OutputTo(player, "not found");
+        //});
+
+        //_commandService.AddCommandHandler("findbyname", (player, args) =>
+        //{
+        //    var players = usersService.SearchPlayersByName(args.ReadArgument());
+        //    _chatBox.OutputTo(player, "found:");
+        //    foreach (var item in players)
+        //    {
+        //        _chatBox.OutputTo(player, $"Player: {item.GetRequiredComponent<UserComponent>().UserName}");
+        //    }
+        //});
+
+        //_commandService.AddAsyncCommandHandler("addrating", async (player, args) =>
+        //{
+        //    var last = await feedbackService.GetLastRating(player, 1) ?? (0, DateTime.MinValue);
+        //    if (last.Item2.AddSeconds(3) > dateTimeProvider.Now)
+        //    {
+        //        _chatBox.OutputTo(player, "możesz ocenić maksymalnie raz na 30sekund");
+        //        return;
+        //    }
+        //    var rating = Random.Shared.Next(100);
+        //    await feedbackService.ChangeLastRating(player, 1, rating);
+        //    _chatBox.OutputTo(player, $"zmieniono ocenę z {rating} z {last.Item1}");
+        //});
+
+        //_commandService.AddAsyncCommandHandler("addopinion", async (player, args) =>
+        //{
+        //    await feedbackService.AddOpinion(player, 1, string.Join(", ", args));
+        //    _chatBox.OutputTo(player, "Opinia dodana");
+        //});
+
+        //_commandService.AddCommandHandler("addprivatemarker", (player, args) =>
+        //{
+        //    var player = player.GetRequiredComponent<PlayerElementComponent>();
+        //    void handleEntityEntered(MarkerElementComponent markerElementComponent, Entity enteredMarker, Entity enteredEntity)
+        //    {
+        //        player.DestroyComponent(markerElementComponent);
+        //    }
+
+        //    using var scopedEntityFactory = _elementFactory.CreateScopedEntityFactory(player);
+        //    scopedEntityFactory.CreateMarker(MarkerType.Checkpoint, player.Position with { X = player.Position.X + 4 }, Color.White);
+        //    var marker = scopedEntityFactory.LastCreatedComponent as PlayerPrivateElementComponent<MarkerElementComponent>;
+        //    marker.ElementComponent.EntityEntered = handleEntityEntered;
+        //});
+
+        //_commandService.AddAsyncCommandHandler("createmarkerforme", async (player, args) =>
+        //{
+        //    var player = player.GetRequiredComponent<PlayerElementComponent>();
+        //    using var scopedEntityFactory = _elementFactory.CreateScopedEntityFactory(player);
+        //    scopedEntityFactory.CreateMarker(MarkerType.Cylinder, player.Position, Color.White);
+        //    var component = scopedEntityFactory.LastCreatedComponent as PlayerPrivateElementComponent<MarkerElementComponent>;
+        //    component.ElementComponent.Size = 4;
+        //    component.ElementComponent.Color = Color.Red;
+        //    while (true)
+        //    {
+        //        if (component.ElementComponent.Size == 4)
+        //        {
+        //            component.ElementComponent.Size = 2;
+        //            component.ElementComponent.Color = Color.Red;
+        //        }
+        //        else
+        //        {
+        //            component.ElementComponent.Size = 4;
+        //            component.ElementComponent.Color = Color.Blue;
+        //        }
+        //        await Task.Delay(500);
+        //    }
+        //});
+
+        //_commandService.AddAsyncCommandHandler("createmarkerforme2", async (player, args) =>
+        //{
+        //    using var scopedEntityFactory = _elementFactory.CreateScopedEntityFactory(player);
+        //    scopedEntityFactory.CreateMarker(MarkerType.Cylinder, new Vector3(-600.8877f, 240.88867f, 26.091864f), Color.White);
+        //    var marker = scopedEntityFactory.LastCreatedComponent as PlayerPrivateElementComponent<MarkerElementComponent>;
+        //    marker.ElementComponent.Size = 4;
+        //    marker.ElementComponent.Color = Color.Red;
+        //});
+
+        //_commandService.AddCommandHandler("markerhittest1", (player, args) =>
+        //{
+        //    var player = player.GetRequiredComponent<PlayerElementComponent>();
+        //    var markerEntity = _elementFactory.CreateMarker(MarkerType.Cylinder, player.Position, Color.White);
+        //    var marker = markerEntity.GetRequiredComponent<MarkerElementComponent>();
+        //    marker.Size = 4;
+        //    marker.Color = Color.Red;
+        //    marker.EntityEntered = (markerElementComponent, enteredMarker, enteredEntity) =>
+        //    {
+        //        Console.WriteLine("player entered (public marker)");
+        //    };
+        //});
+
+        //_commandService.AddCommandHandler("markerhittest2", (player, args) =>
+        //{
+        //    var player = player.GetRequiredComponent<PlayerElementComponent>();
+        //    using var scopedEntityFactory = _elementFactory.CreateScopedEntityFactory(player);
+        //    scopedEntityFactory.CreateMarker(MarkerType.Cylinder, player.Position, Color.White);
+        //    var marker = scopedEntityFactory.LastCreatedComponent as PlayerPrivateElementComponent<MarkerElementComponent>;
+        //    marker.ElementComponent.Size = 4;
+        //    marker.ElementComponent.Color = Color.Red;
+        //    marker.ElementComponent.EntityEntered = (markerElementComponent, enteredMarker, enteredEntity) =>
+        //    {
+        //        Console.WriteLine("player entered (private marker)");
+        //    };
+        //});
+        //_commandService.AddCommandHandler("setinterior", (player, args) =>
+        //{
+        //    var player = player.GetRequiredComponent<PlayerElementComponent>();
+        //    if (player.Interior == 1)
+        //        player.Interior = 0;
+        //    else
+        //        player.Interior = 1;
+        //});
+
+        //_commandService.AddCommandHandler("setinterior2", (player, args) =>
+        //{
+        //    var player = player.GetRequiredComponent<PlayerElementComponent>();
+        //    player.Interior = 1;
+        //    var veh = _elementFactory.CreateVehicle(404, new Vector3(338.26562f, -87.75098f, 1.5197021f), Vector3.Zero);
+        //    player.GetRequiredComponent<PlayerElementComponent>().WarpIntoVehicle(veh.GetRequiredComponent<VehicleElementComponent>());
+        //});
+
+        //_commandService.AddAsyncCommandHandler("setinterior2b", async (player, args) =>
+        //{
+        //    var player = player.GetRequiredComponent<PlayerElementComponent>();
+
+        //    void handleInteriorChanged(Element sender, SlipeServer.Server.Elements.Events.ElementChangedEventArgs<byte> args)
+        //    {
+        //        chatBox.OutputTo(player, $"Changed interior to: {args.NewValue}");
+        //    }
+
+        //    player.InteriorChanged += handleInteriorChanged;
+        //    player.Interior = 1;
+        //    var veh = _elementFactory.CreateVehicle(404, new Vector3(338.26562f, -87.75098f, 1.5197021f), Vector3.Zero);
+        //    await Task.Delay(1000);
+        //    player.GetRequiredComponent<PlayerElementComponent>().WarpIntoVehicle((Vehicle)veh.GetRequiredComponent<IElementComponent>());
+        //});
+
+        //_commandService.AddCommandHandler("setinterior3", (player, args) =>
+        //{
+        //    var player = player.GetRequiredComponent<PlayerElementComponent>();
+        //    player.Interior = 1;
+        //    player.Interior = 0;
+        //});
+
+        //_commandService.AddCommandHandler("position", (player, args) =>
+        //{
+        //    var player = player.GetRequiredComponent<PlayerElementComponent>();
+        //    _chatBox.OutputTo(player, $"Position: {player.Position}, rot: {player.Rotation}, i: {player.Interior}, d: {player.Dimension}");
+        //});
+
+        //_commandService.AddCommandHandler("testargs", (player, args) =>
+        //{
+        //    var a = args.ReadInt();
+        //    var b = args.ReadByte();
+        //    var c = args.ReadInt();
+        //    _chatBox.OutputTo(player, $"Komenda wykonana, argumenty {a}, {b}, {c}");
+        //});
+
+        //_commandService.AddCommandHandler("testargs2", (player, args) =>
+        //{
+        //    var a = args.ReadPlayer();
+        //    var b = args.ReadPlayer();
+        //    _chatBox.OutputTo(player, $"Komenda wykonana, argumenty {a} {b}");
+        //});
+
+        //_commandService.AddCommandHandler("admincmd", (player, args) =>
+        //{
+        //    _chatBox.OutputTo(player, $"executed admin cmd");
+        //}, new string[] { "Admin" });
+
+        //_commandService.AddCommandHandler("enum", (player, args) =>
+        //{
+        //    _chatBox.OutputTo(player, $"Enum value: {args.ReadEnum<TestEnum>()}");
+        //}, new string[] { "Admin" });
+
+        //_commandService.AddAsyncCommandHandler("guitest1", async (player, args) =>
+        //{
+        //    player.TryDestroyComponent<BrowserGuiComponent>();
+        //    player.AddComponent<Counter1GuiComponent>();
+        //    _chatBox.OutputTo(player, "Loaded counter 1");
+        //});
+
+        //_commandService.AddAsyncCommandHandler("guitest2", async (player, args) =>
+        //{
+        //    player.TryDestroyComponent<BrowserGuiComponent>();
+        //    player.AddComponent<Counter2GuiComponent>();
+        //    _chatBox.OutputTo(player, "Loaded counter 2");
+        //});
+
+        //_commandService.AddAsyncCommandHandler("browserloadcounter1", async (player, args) =>
+        //{
+        //    var browserComponent = player.GetRequiredComponent<BrowserComponent>();
+        //    browserComponent.Close();
+        //    browserComponent.Path = "/realmUi/counter1";
+        //    browserComponent.Visible = true;
+        //    _chatBox.OutputTo(player, "Loaded counter 1");
+        //});
+        //_commandService.AddAsyncCommandHandler("browserloadcounter2", async (player, args) =>
+        //{
+        //    var browserComponent = player.GetRequiredComponent<BrowserComponent>();
+        //    browserComponent.Close();
+        //    browserComponent.Path = "/realmUi/counter2";
+        //    browserComponent.Visible = true;
+        //    _chatBox.OutputTo(player, "Loaded counter 2");
+        //});
+        //_commandService.AddAsyncCommandHandler("navigatetest", async (player, args) =>
+        //{
+        //    var browserComponent = player.GetRequiredComponent<BrowserComponent>();
+        //    browserComponent.Path = "/realmUi/counter2";
+        //    _chatBox.OutputTo(player, "navigated");
+        //});
+        //_commandService.AddCommandHandler("browserinteractive", (player, args) =>
+        //{
+        //    if (!player.TryDestroyComponent<InteractiveGuiComponent>())
+        //    {
+        //        player.AddComponent<InteractiveGuiComponent>();
+        //        _chatBox.OutputTo(player, "Loaded InteractiveGuiComponent");
+        //    }
+        //});
+        //_commandService.AddAsyncCommandHandler("removebrowserinteractive", async (player, args) =>
+        //{
+        //    player.TryDestroyComponent<InteractiveGuiComponent>();
+        //    _chatBox.OutputTo(player, "Destroyed InteractiveGuiComponent");
+        //});
+        //_commandService.AddAsyncCommandHandler("setfoo", async (player, args) =>
+        //{
+        //    player.GetRequiredComponent<InteractiveGuiComponent>().SetFoo(Guid.NewGuid().ToString());
+        //    _chatBox.OutputTo(player, "Foo set");
+        //});
+
+        //_commandService.AddCommandHandler("browserloadindex", (player, args) =>
+        //{
+        //    player.GetRequiredComponent<BrowserComponent>().Path = "/";
+        //    _chatBox.OutputTo(player, "Loaded /");
+        //});
+
+        //_commandService.AddCommandHandler("openbrowser", (player, args) =>
+        //{
+        //    player.GetRequiredComponent<BrowserComponent>().Visible = true;
+        //    _chatBox.OutputTo(player, "Open");
+        //});
+        //_commandService.AddCommandHandler("closebrowser", (player, args) =>
+        //{
+        //    var browserComponent = player.GetRequiredComponent<BrowserComponent>();
+        //    browserComponent.Path = "/realmEmpty";
+        //    browserComponent.Visible = false;
+        //    _chatBox.OutputTo(player, "Closed");
+        //});
+
+        //_commandService.AddCommandHandler("collisionshapes", (player, args) =>
+        //{
+        //    var player = player.GetRequiredComponent<PlayerElementComponent>();
+        //    var col1 = _elementFactory.CreateCollisionSphere(player.Position + new Vector3(6, 0, 0), 3);
+        //    var col2 = _elementFactory.CreateCollisionSphere(player.Position + new Vector3(-6, 0, 0), 3);
+
+        //    var collisionSphere1 = col1.GetRequiredComponent<CollisionSphereElementComponent>();
+        //    var collisionSphere2 = col2.GetRequiredComponent<CollisionSphereElementComponent>();
+
+        //    //collisionSphere1.EntityEntered += (a, b) =>
+        //    //{
+        //    //    _chatBox.OutputTo(player, "Entered collisionSphere 1");
+        //    //};
+        //    //collisionSphere2.EntityEntered += (a, b) =>
+        //    //{
+        //    //    _chatBox.OutputTo(player, "Entered collisionSphere 2");
+        //    //};
+        //    //collisionSphere1.EntityLeft += (a, b) =>
+        //    //{
+        //    //    _chatBox.OutputTo(player, "Left collisionSphere 1");
+        //    //};
+        //    //collisionSphere2.EntityLeft += (a, b) =>
+        //    //{
+        //    //    _chatBox.OutputTo(player, "Left collisionSphere 2");
+        //    //};
+        //});
+
+        //_commandService.AddAsyncCommandHandler("collisionshapes2", async (player, args) =>
+        //{
+        //    var player = player.GetRequiredComponent<PlayerElementComponent>();
+        //    var pos1 = player.Position + new Vector3(6, 0, 0);
+        //    var pos2 = player.Position + new Vector3(-6, 0, 0);
+        //    var col1 = _elementFactory.CreateCollisionSphere(pos1, 3);
+        //    var col2 = _elementFactory.CreateCollisionSphere(pos2, 3);
+
+        //    var collisionSphere1 = col1.GetRequiredComponent<CollisionSphereElementComponent>();
+        //    var collisionSphere2 = col2.GetRequiredComponent<CollisionSphereElementComponent>();
+
+        //    //collisionSphere1.EntityEntered += (a, b) =>
+        //    //{
+        //    //    _chatBox.OutputTo(player, "Entered collisionSphere 1");
+        //    //};
+        //    //collisionSphere2.EntityEntered += (a, b) =>
+        //    //{
+        //    //    _chatBox.OutputTo(player, "Entered collisionSphere 2");
+        //    //};
+        //    //collisionSphere1.EntityLeft += (a, b) =>
+        //    //{
+        //    //    _chatBox.OutputTo(player, "Left collisionSphere 1");
+        //    //};
+        //    //collisionSphere2.EntityLeft += (a, b) =>
+        //    //{
+        //    //    _chatBox.OutputTo(player, "Left collisionSphere 2");
+        //    //};
+
+        //    int counter = 20;
+        //    bool a = false;
+        //    while (true)
+        //    {
+        //        a = !a;
+        //        if (a)
+        //        {
+        //            player.Position = pos1;
+        //        }
+        //        else
+        //        {
+        //            player.Position = pos2;
+        //        }
+        //        await Task.Delay(500);
+        //        if (counter-- == 0)
+        //            break;
+        //    }
+        //});
+
+        //_commandService.AddCommandHandler("privateelementdisposable", async (player, args) =>
+        //{
+        //    using var scopedEntityFactory = _elementFactory.CreateScopedEntityFactory(player);
+        //    scopedEntityFactory.CreateMarker(MarkerType.Cylinder, player.Position, Color.White);
+        //    var marker = scopedEntityFactory.GetLastCreatedComponent<PlayerPrivateElementComponent<MarkerElementComponent>>();
+        //    marker.ElementComponent.Size = 4;
+        //    marker.ElementComponent.Color = Color.Red;
+        //    await Task.Delay(1000);
+        //    player.DestroyComponent(marker);
+        //    _chatBox.Output("destory marker");
+        //});
+
+        //_commandService.AddCommandHandler("focusedelements", (player, args) =>
+        //{
+        //    var playerElementComponent = player.Components.GetRequiredComponent<PlayerElementComponent>();
+        //    _chatBox.OutputTo(player, $"Focused player: {playerElementComponent.FocusedEntity}");
+        //    if (playerElementComponent.FocusedEntity != null)
+        //    {
+        //        var focusableComponent = playerElementComponent.FocusedEntity.GetRequiredComponent<FocusableComponent>();
+        //        foreach (var focusedPlayer in focusableComponent.FocusedPlayers)
+        //        {
+        //            _chatBox.OutputTo(player, $"Focused player: {focusedPlayer}");
+        //        }
+        //    }
+        //});
+
+        //_commandService.AddAsyncCommandHandler("testpolicy", async (player, args) =>
+        //{
+        //    bool authorized = await usersService.AuthorizePolicy(player.Components.GetRequiredComponent<UserComponent>(), "Admin");
+        //    _chatBox.OutputTo(player, $"authorized: {authorized}");
+        //});
+
+        //_commandService.AddAsyncCommandHandler("signout", async (player, args) =>
+        //{
+        //    await _usersService.SignOut(player);
+        //});
+
+        //_commandService.AddAsyncCommandHandler("updateLastNewsRead", async (player, args) =>
+        //{
+        //    await _usersService.UpdateLastNewsRead(player);
+        //});
+
+        //_commandService.AddAsyncCommandHandler("addmoneyhistory1", async (player, args) =>
+        //{
+        //    await _userMoneyHistoryService.Add(player, 123, 1, "add 123");
+        //    _chatBox.Output("Added 1");
+        //});
+
+        //_commandService.AddAsyncCommandHandler("addmoneyhistory2", async (player, args) =>
+        //{
+        //    await _userMoneyHistoryService.Add(player, -123, 2, "remove 123");
+        //    _chatBox.Output("Added 2");
+        //});
+
+        //_commandService.AddAsyncCommandHandler("showhistory", async (player, args) =>
+        //{
+        //    var history = await _userMoneyHistoryService.Get(player);
+        //    foreach (var item in history)
+        //    {
+        //        _chatBox.Output($"> {item.DateTime}: {item.CurrentBalance} - {item.Description}");
+
+        //    }
+        //});
+
+        //_commandService.AddAsyncCommandHandler("clickedElement", async (player, args) =>
+        //{
+        //    var lastClickedElement = player.LastClickedElement;
+        //    _chatBox.Output($"> {lastClickedElement}");
+        //});
     }
 
     static int _hudPosition = 0;

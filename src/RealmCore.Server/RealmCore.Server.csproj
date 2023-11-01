@@ -34,7 +34,6 @@
 
 	<ItemGroup>
 		<ProjectReference Include="..\RealmCore.Configuration\RealmCore.Configuration.csproj" />
-		<ProjectReference Include="..\RealmCore.ECS\RealmCore.ECS.csproj" />
 		<ProjectReference Include="..\RealmCore.MySql\RealmCore.MySql.csproj" />
 		<ProjectReference Include="..\RealmCore.Persistence\RealmCore.Persistence.csproj" />
 		<ProjectReference Include="..\RealmCore.Resources.Addons.GuiSystem.DGS\RealmCore.Resources.Addons.GuiSystem.DGS.csproj" />

@@ -1,14 +1,10 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-
-namespace RealmCore.Server.Concepts.Objectives;
+﻿namespace RealmCore.Server.Concepts.Objectives;
 
 public class MarkerEnterObjective : Objective
 {
     private readonly Vector3 _position;
 
-    private PlayerPrivateElementComponent<MarkerElementComponent> _markerElementComponent = default!;
-    private PlayerPrivateElementComponent<CollisionSphereElementComponent> _collisionSphereElementComponent = default!;
-    private Entity _playerEntity = default!;
+    private RealmMarker _marker = default!;
 
     public override Vector3 Position => _position;
 
@@ -17,36 +13,34 @@ public class MarkerEnterObjective : Objective
         _position = position;
     }
 
-    protected override void Load(IServiceProvider serviceProvider, Entity playerEntity)
+    protected override void Load(RealmPlayer player)
     {
-        _playerEntity = playerEntity;
-        var entityFactory = serviceProvider.GetRequiredService<IEntityFactory>();
-        using var scopedEntityFactory = entityFactory.CreateScopedEntityFactory(playerEntity);
-        scopedEntityFactory.CreateMarker(MarkerType.Arrow, _position, Color.White);
-        _markerElementComponent = scopedEntityFactory.GetLastCreatedComponent<PlayerPrivateElementComponent<MarkerElementComponent>>();
-        scopedEntityFactory.CreateCollisionSphere(_position, 2);
-        _collisionSphereElementComponent = scopedEntityFactory.GetLastCreatedComponent<PlayerPrivateElementComponent<CollisionSphereElementComponent>>();
-        _collisionSphereElementComponent.ElementComponent.ElementEntered += HandleElementEntered;
+        // TODO:
+        //_playerEntity = playerEntity;
+        //var entityFactory = serviceProvider.GetRequiredService<IElementFactory>();
+        //using var scopedEntityFactory = entityFactory.CreateScopedEntityFactory(playerEntity);
+        //scopedEntityFactory.CreateMarker(MarkerType.Arrow, _position, Color.White);
+        //_markerElementComponent = scopedEntityFactory.GetLastCreatedComponent<PlayerPrivateElementComponent<MarkerElementComponent>>();
+        //scopedEntityFactory.CreateCollisionSphere(_position, 2);
+        //_collisionSphereElementComponent = scopedEntityFactory.GetLastCreatedComponent<PlayerPrivateElementComponent<CollisionSphereElementComponent>>();
+        //_collisionSphereElementComponent.ElementComponent.ElementEntered += HandleElementEntered;
     }
 
     private void HandleElementEntered(Element element)
     {
-        if (Entity == element.TryUpCast())
+        if (Player == element)
             Complete(this);
     }
 
     public override void Update()
     {
-        _collisionSphereElementComponent.ElementComponent.CheckElementWithin(_playerEntity.GetElement());
+        _marker.CollisionShape.CheckElementWithin(Player);
     }
 
     public override void Dispose()
     {
-        if (_collisionSphereElementComponent != null)
-        {
-            _playerEntity.TryDestroyComponent(_collisionSphereElementComponent);
-        }
-        _playerEntity.TryDestroyComponent(_markerElementComponent);
+        if (_marker != null)
+            _marker.Destroy();
         base.Dispose();
     }
 }

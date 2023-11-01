@@ -4,9 +4,9 @@
 public class FocusableComponent : ComponentLifecycle
 {
     private readonly object _lock = new();
-    private readonly List<Entity> _focusedPlayers = new();
-    public event Action<FocusableComponent, Entity>? PlayerFocused;
-    public event Action<FocusableComponent, Entity>? PlayerLostFocus;
+    private readonly List<RealmPlayer> _focusedPlayers = new();
+    public event Action<FocusableComponent, RealmPlayer>? PlayerFocused;
+    public event Action<FocusableComponent, RealmPlayer>? PlayerLostFocus;
     public int FocusedPlayerCount
     {
         get
@@ -16,7 +16,7 @@ public class FocusableComponent : ComponentLifecycle
         }
     }
 
-    public IEnumerable<Entity> FocusedPlayers
+    public IEnumerable<RealmPlayer> FocusedPlayers
     {
         get
         {
@@ -30,49 +30,50 @@ public class FocusableComponent : ComponentLifecycle
         }
     }
 
-    internal bool AddFocusedPlayer(Entity entity)
+    internal bool AddFocusedPlayer(RealmPlayer player)
     {
-        if (entity == Entity)
-            throw new InvalidOperationException(nameof(entity));
+        if (player == Element)
+            throw new InvalidOperationException(nameof(player));
 
         lock (_lock)
         {
-            if (!_focusedPlayers.Contains(entity))
+            if (!_focusedPlayers.Contains(player))
             {
-                _focusedPlayers.Add(entity);
-                entity.Disposed += HandleDisposed;
-                PlayerFocused?.Invoke(this, entity);
+                _focusedPlayers.Add(player);
+                player.Destroyed += HandleDestroyed;
+                PlayerFocused?.Invoke(this, player);
                 return true;
             }
         }
         return false;
     }
 
-    public bool RemoveFocusedPlayer(Entity entity)
+    public bool RemoveFocusedPlayer(RealmPlayer player)
     {
-        if (entity == Entity)
-            throw new InvalidOperationException(nameof(entity));
+        if (player == Element)
+            throw new InvalidOperationException(nameof(player));
 
         lock (_lock)
         {
-            if (_focusedPlayers.Remove(entity))
+            if (_focusedPlayers.Remove(player))
             {
-                entity.Disposed -= HandleDisposed;
-                PlayerLostFocus?.Invoke(this, entity);
+                player.Destroyed -= HandleDestroyed;
+                PlayerLostFocus?.Invoke(this, player);
                 return true;
             }
         }
         return false;
     }
 
-    private void HandleDisposed(Entity entity)
+    private void HandleDestroyed(Element element)
     {
         lock (_lock)
         {
-            if (_focusedPlayers.Remove(entity))
+            var player = (RealmPlayer)element;
+            if (_focusedPlayers.Remove(player))
             {
-                entity.Disposed -= HandleDisposed;
-                PlayerLostFocus?.Invoke(this, entity);
+                element.Destroyed -= HandleDestroyed;
+                PlayerLostFocus?.Invoke(this, player);
             }
         }
     }
@@ -84,8 +85,8 @@ public class FocusableComponent : ComponentLifecycle
             foreach (var focusedPlayer in _focusedPlayers)
             {
                 PlayerLostFocus?.Invoke(this, focusedPlayer);
-                if (focusedPlayer.TryGetComponent(out PlayerElementComponent playerElementComponent) && playerElementComponent.FocusedEntity == Entity)
-                    playerElementComponent.FocusedEntity = null;
+                if (focusedPlayer.FocusedEntity == Element)
+                    focusedPlayer.FocusedEntity = null;
             }
         }
     }

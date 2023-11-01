@@ -4,11 +4,14 @@ public class VehiclePrivateAccessControllerComponent : VehicleAccessControllerCo
 {
     private PrivateVehicleComponent? _privateVehicleComponent;
 
-    protected override bool CanEnter(Entity pedEntity, Entity vehicleEntity)
+    protected override bool CanEnter(Ped ped, RealmVehicle vehicle, byte seat)
     {
-        if (_privateVehicleComponent == null)
-            _privateVehicleComponent = Entity.GetRequiredComponent<PrivateVehicleComponent>();
+        if (ped is not RealmPlayer player)
+            return false;
 
-        return _privateVehicleComponent.Access.HasAccess(pedEntity);
+        if (_privateVehicleComponent == null)
+            _privateVehicleComponent = vehicle.Components.GetRequiredComponent<PrivateVehicleComponent>();
+
+        return _privateVehicleComponent.Access.HasAccess(player);
     }
 }

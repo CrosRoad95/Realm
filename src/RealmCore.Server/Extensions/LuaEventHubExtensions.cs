@@ -4,8 +4,8 @@ namespace RealmCore.Server.Extensions;
 
 public static class LuaEventHubExtensions
 {
-    public static void Invoke<THub>(this ILuaEventHub<THub> luaEventHub, Entity entity, Expression<Action<THub>> expression)
+    public static void Invoke<THub>(this ILuaEventHub<THub> luaEventHub, RealmPlayer player, Expression<Action<THub>> expression)
     {
-        luaEventHub.Invoke(entity.GetRequiredComponent<PlayerElementComponent>(), expression);
+        luaEventHub.Invoke(player, expression);
     }
 }

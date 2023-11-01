@@ -13,44 +13,44 @@ internal sealed class FeedbackService : IFeedbackService
         _dateTimeProvider = dateTimeProvider;
     }
 
-    public async Task<bool> Rate(Entity playerEntity, int ratingId, int rating)
+    public async Task<bool> Rate(RealmPlayer player, int ratingId, int rating)
     {
-        if(playerEntity.TryGetComponent(out UserComponent userComponent))
+        if(player.Components.TryGetComponent(out UserComponent userComponent))
         {
             return await _ratingRepository.Rate(userComponent.Id, ratingId, rating, _dateTimeProvider.Now);
         }
         return false;
     }
     
-    public async Task ChangeLastRating(Entity playerEntity, int ratingId, int rating)
+    public async Task ChangeLastRating(RealmPlayer player, int ratingId, int rating)
     {
-        if (playerEntity.TryGetComponent(out UserComponent userComponent))
+        if (player.Components.TryGetComponent(out UserComponent userComponent))
         {
             await _ratingRepository.ChangeLastRating(userComponent.Id, ratingId, rating, _dateTimeProvider.Now);
         }
     }
 
-    public async Task<(int, DateTime)?> GetLastRating(Entity playerEntity, int ratingId)
+    public async Task<(int, DateTime)?> GetLastRating(RealmPlayer player, int ratingId)
     {
-        if (playerEntity.TryGetComponent(out UserComponent userComponent))
+        if (player.Components.TryGetComponent(out UserComponent userComponent))
         {
             return await _ratingRepository.GetLastRating(userComponent.Id, ratingId);
         }
         return null;
     }
 
-    public async Task<bool> AddOpinion(Entity playerEntity, int opinionId, string opinion)
+    public async Task<bool> AddOpinion(RealmPlayer player, int opinionId, string opinion)
     {
-        if (playerEntity.TryGetComponent(out UserComponent userComponent))
+        if (player.Components.TryGetComponent(out UserComponent userComponent))
         {
             return await _opinionRepository.AddOpinion(userComponent.Id, opinionId, opinion, _dateTimeProvider.Now);
         }
         return false;
     }
 
-    public async Task<DateTime?> GetLastOpinionDateTime(Entity playerEntity, int opinionId)
+    public async Task<DateTime?> GetLastOpinionDateTime(RealmPlayer player, int opinionId)
     {
-        if (playerEntity.TryGetComponent(out UserComponent userComponent))
+        if (player.Components.TryGetComponent(out UserComponent userComponent))
         {
             return await _opinionRepository.GetLastOpinionDateTime(userComponent.Id, opinionId);
         }

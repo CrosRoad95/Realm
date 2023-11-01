@@ -10,10 +10,10 @@ public sealed class GPCommand : IInGameCommand
         _logger = logger;
     }
 
-    public Task Handle(Entity entity, CommandArguments args)
+    public Task Handle(RealmPlayer player, CommandArguments args)
     {
-        var pos = entity.Transform.Position;
-        var rot = entity.Transform.Rotation;
+        var pos = player.Position;
+        var rot = player.Rotation;
         _logger.LogInformation("{@x},{@y},{@z},{@rx},{@ry},{@rz}", pos.X, pos.Y, pos.Z, rot.X, rot.Y, rot.Z);
         return Task.CompletedTask;
     }

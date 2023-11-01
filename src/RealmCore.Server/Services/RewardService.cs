@@ -9,8 +9,8 @@ internal sealed class RewardService : IRewardService
         _userRewardRepository = userRewardRepository;
     }
 
-    public async Task<bool> TryGiveReward(Entity entity, int rewardId)
+    public async Task<bool> TryGiveReward(RealmPlayer player, int rewardId)
     {
-        return await _userRewardRepository.TryAddReward(entity.GetRequiredComponent<UserComponent>().Id, rewardId);
+        return await _userRewardRepository.TryAddReward(player.Components.GetRequiredComponent<UserComponent>().Id, rewardId);
     }
 }

@@ -3,7 +3,7 @@
 public interface IFormContext
 {
     string FormName { get; }
-    Entity Entity { get; }
+    RealmPlayer Player { get; }
 
     TData GetData<TData>(bool supressValidation = false) where TData : ILuaValue, new();
     void SuccessResponse(params object[] data);

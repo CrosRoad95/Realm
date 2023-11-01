@@ -1,19 +1,21 @@
 ﻿namespace RealmCore.Server.Rules;
 
-public sealed class MustBePlayerOnFootOnlyRule : IEntityRule
+public sealed class MustBePlayerOnFootOnlyRule : IElementRule
 {
-    public bool Check(Entity entity)
+    public bool Check(Element element)
     {
-        if (!entity.HasComponent<PlayerTagComponent>())
-            return false;
+        if(element is RealmPlayer player)
+        {
+            if (player.Vehicle != null)
+                return false;
 
-        var player = entity.GetRequiredComponent<PlayerElementComponent>();
-        if (player.HasJetpack)
-            return false;
+            if (player.HasJetpack)
+                return false;
 
-        if (player.VehicleAction != VehicleAction.None)
-            return false;
-
-        return player.Vehicle == null;
+            if (player.VehicleAction != VehicleAction.None)
+                return false;
+            return true;
+        }
+        return false;
     }
 }

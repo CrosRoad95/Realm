@@ -42,13 +42,6 @@ public sealed class LoginGuiComponent : DxGuiComponent
                     return;
                 }
 
-                //if (!await usersService.IsSerialWhitelisted(user.Id, formContext.Entity.GetRequiredComponent<PlayerElementComponent>().Client.Serial))
-                //{
-                //    Logger.LogWarning("Player logged in to not whitelisted user.");
-                //    formContext.ErrorResponse("Nie możesz zalogować się na to konto.");
-                //    return;
-                //}
-
                 if (!await _userManager.CheckPasswordAsync(user, loginData.Password))
                 {
                     formContext.ErrorResponse("Login lub hasło jest niepoprawne.");
@@ -57,9 +50,10 @@ public sealed class LoginGuiComponent : DxGuiComponent
 
                 try
                 {
-                    if (await _usersService.SignIn(Entity, user))
+                    var player = (RealmPlayer)Element;
+                    if (await _usersService.SignIn(player, user))
                     {
-                        Entity.TryDestroyComponent(this);
+                        player.Components.TryDestroyComponent(this);
                         formContext.SuccessResponse();
                         return;
                     }
@@ -80,8 +74,9 @@ public sealed class LoginGuiComponent : DxGuiComponent
         switch (actionContext.ActionName)
         {
             case "navigateToRegister":
-                Entity.AddComponentWithDI<RegisterGuiComponent>();
-                Entity.DestroyComponent(this);
+                var components = ((RealmPlayer)Element).Components;
+                components.AddComponentWithDI<RegisterGuiComponent>();
+                components.DestroyComponent(this);
                 break;
             default:
                 throw new NotImplementedException();

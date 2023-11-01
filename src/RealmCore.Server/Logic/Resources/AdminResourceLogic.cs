@@ -4,29 +4,29 @@ namespace RealmCore.Server.Logic.Resources;
 
 internal sealed class AdminResourceLogic
 {
-    private readonly IEntityEngine _entityEngine;
+    private readonly IElementFactory _elementFactory;
     private readonly IAdminService _adminService;
     private readonly ILogger<AdminResourceLogic> _logger;
     private readonly ISpawnMarkersService _spawnMarkersService;
+    private readonly IElementCollection _elementCollection;
 
-    public AdminResourceLogic(IEntityEngine entityEngine, IAdminService adminService, ILogger<AdminResourceLogic> logger, ISpawnMarkersService spawnMarkersService)
+    public AdminResourceLogic(IElementFactory elementFactory, IAdminService adminService, ILogger<AdminResourceLogic> logger, ISpawnMarkersService spawnMarkersService, IElementCollection elementCollection)
     {
-        _entityEngine = entityEngine;
+        _elementFactory = elementFactory;
         _adminService = adminService;
         _logger = logger;
         _spawnMarkersService = spawnMarkersService;
-
+        _elementCollection = elementCollection;
         _adminService.ToolStateChanged += HandleToolStateChanged;
     }
 
-    private void HandleToolStateChanged(Player player, AdminTool adminTool, bool state)
+    private void HandleToolStateChanged(Player plr, AdminTool adminTool, bool state)
     {
+        var player = (RealmPlayer)plr;
         using var _ = _logger.BeginElement(player);
         try
         {
-            var entity = player.UpCast();
-            using var _2 = _logger.BeginEntity(entity);
-            if(!entity.TryGetComponent(out AdminComponent adminComponent))
+            if(!player.TryGetComponent(out AdminComponent adminComponent))
             {
                 _logger.LogInformation("Player change admin tool {adminTool} state to {state} but entity has no adminComponent", adminTool, state);
                 return;
@@ -60,9 +60,9 @@ internal sealed class AdminResourceLogic
         return new LuaValue(data);
     }
 
-    private List<LuaValue> GetDebugComponents(Entity entity)
+    private List<LuaValue> GetDebugComponents(IComponents components)
     {
-        return entity.Components
+        return components.Components.ComponentsLists
             .Select(GetDebugComponent)
             .ToList();
     }
@@ -75,19 +75,18 @@ internal sealed class AdminResourceLogic
                 if (state)
                 {
                     List<EntityDebugInfo> debugInfoList = [];
-                    foreach (var entity in _entityEngine.Entities)
+                    foreach (var element in _elementCollection.GetAll())
                     {
-                        if (entity.TryGetComponent(out IElementComponent elementComponent))
+                        if(element is IComponents components)
                         {
-                            var element = (Element)elementComponent;
                             debugInfoList.Add(new EntityDebugInfo
                             {
-                                debugId = entity.Id,
+                                debugId = element.Id.ToString(),
                                 element = element,
                                 position = element.Position,
                                 previewType = PreviewType.BoxWireframe,
                                 previewColor = Color.Red,
-                                name = entity.GetType().ToString(),
+                                name = element.GetType().ToString(),
                             });
                         }
                     }
@@ -99,12 +98,13 @@ internal sealed class AdminResourceLogic
             case AdminTool.Components:
                 if (state)
                 {
-                    var components = new Dictionary<LuaValue, LuaValue>();
-                    foreach (var item in _entityEngine.Entities)
+                    var componentsDictionary = new Dictionary<LuaValue, LuaValue>();
+                    foreach (var element in _elementCollection.GetAll())
                     {
-                        components[item.Id] = new LuaValue(GetDebugComponents(item));
+                        if (element is IComponents components)
+                            componentsDictionary[element.Id] = new LuaValue(GetDebugComponents(components));
                     }
-                    _adminService.BroadcastEntitiesComponents(player, new LuaValue(components));
+                    _adminService.BroadcastEntitiesComponents(player, new LuaValue(componentsDictionary));
                 } 
                 else
                     _adminService.BroadcastClearEntitiesComponents(player);

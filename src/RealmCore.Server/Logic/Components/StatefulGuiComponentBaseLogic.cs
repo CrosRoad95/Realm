@@ -2,13 +2,13 @@
 
 internal sealed class StatefulGuiComponentBaseLogic : ComponentLogic<StatefulDxGuiComponentBase>
 {
-    private readonly IEntityEngine _entityEngine;
+    private readonly IElementFactory _elementFactory;
     private readonly IGuiSystemService _guiSystemService;
     private readonly LuaValueMapper _luaValueMapper;
 
-    public StatefulGuiComponentBaseLogic(IEntityEngine entityEngine, IGuiSystemService guiSystemService, LuaValueMapper luaValueMapper) : base(entityEngine)
+    public StatefulGuiComponentBaseLogic(IElementFactory elementFactory, IGuiSystemService guiSystemService, LuaValueMapper luaValueMapper) : base(elementFactory)
     {
-        _entityEngine = entityEngine;
+        _elementFactory = elementFactory;
         _guiSystemService = guiSystemService;
         _luaValueMapper = luaValueMapper;
     }
@@ -21,11 +21,11 @@ internal sealed class StatefulGuiComponentBaseLogic : ComponentLogic<StatefulDxG
 
     private void HandleGuiOpened(StatefulDxGuiComponentBase statefulGuiComponentBase, string name, bool cursorLess, object? state)
     {
-        _guiSystemService.OpenGui(statefulGuiComponentBase.Entity.GetRequiredComponent<PlayerElementComponent>(), name, cursorLess, _luaValueMapper.UniversalMap(state));
+        _guiSystemService.OpenGui((RealmPlayer)statefulGuiComponentBase.Element, name, cursorLess, _luaValueMapper.UniversalMap(state));
     }
     private void HandleStateChanged(StatefulDxGuiComponentBase statefulGuiComponentBase, string name, Dictionary<LuaValue, object?> state)
     {
         var newState = state.ToDictionary(x => x.Key, y => _luaValueMapper.Map(y.Value));
-        _guiSystemService.SendStateChanged(statefulGuiComponentBase.Entity.GetRequiredComponent<PlayerElementComponent>(), name, newState);
+        _guiSystemService.SendStateChanged((RealmPlayer)statefulGuiComponentBase.Element, name, newState);
     }
 }

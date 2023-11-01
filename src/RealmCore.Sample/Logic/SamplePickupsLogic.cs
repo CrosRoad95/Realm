@@ -4,121 +4,115 @@ namespace RealmCore.Sample.Logic;
 
 internal class SamplePickupsLogic
 {
-    private readonly IEntityEngine _entityEngine;
-    private readonly IEntityFactory _entityFactory;
+    private readonly IElementFactory _elementFactory;
     private readonly ChatBox _chatBox;
 
-    public SamplePickupsLogic(IEntityEngine entityEngine, IEntityFactory entityFactory, ChatBox chatBox)
+    public SamplePickupsLogic(IElementFactory entityFactory, ChatBox chatBox)
     {
-        _entityEngine = entityEngine;
-        _entityFactory = entityFactory;
+        _elementFactory = entityFactory;
         _chatBox = chatBox;
-        _entityEngine.EntityCreated += EntityCreated;
+        entityFactory.ElementCreated += HandleElementCreated;
     }
 
-    private void EntityCreated(Entity entity)
+    private void HandleElementCreated(Element element)
     {
-        if (entity.HasComponent<PickupTagComponent>() && entity.TryGetComponent(out NameComponent nameComponent) && nameComponent.Name.StartsWith("fractionTestPickup"))
         {
-            var pickupElementComponent = entity.GetRequiredComponent<PickupElementComponent>();
-            pickupElementComponent.AddRule(new MustBePlayerInFractionRule(1));
-            pickupElementComponent.EntityRuleFailed = (entity, rule) =>
+        if (element is RealmPickup pickup && pickup.Components.TryGetComponent(out NameComponent nameComponent) && nameComponent.Name.StartsWith("fractionTestPickup"))
             {
-                var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();
-                _chatBox.OutputTo(entity, $"No permissions, rule: {rule.GetType().Name}");
-            };
-            pickupElementComponent.EntityEntered = async (enteredPickup, entity) =>
-            {
-                if (!entity.HasComponent<PlayerTagComponent>())
-                    return;
+                pickup.AddRule(new MustBePlayerInFractionRule(1));
 
-                var sessionComponent = entity.GetComponent<SessionComponent>();
-                if (sessionComponent != null && sessionComponent is not FractionSessionComponent)
-                    return;
-
-                var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();
-                if (entity.HasComponent<FractionSessionComponent>())
+                pickup.Entered += async (enteredPickup, element) =>
                 {
-                    var fractionSessionComponent = entity.GetRequiredComponent<FractionSessionComponent>();
-                    fractionSessionComponent.End();
-                    _chatBox.OutputTo(entity, $"Session ended in: {fractionSessionComponent.Elapsed}");
-                    entity.DestroyComponent(fractionSessionComponent);
-                }
-                else
-                {
-                    var fractionSessionComponent = entity.AddComponent<FractionSessionComponent>();
-                    _chatBox.OutputTo(entity, $"Session started");
-                    fractionSessionComponent.Start();
-                }
-            };
-        }
+                    var player = (RealmPlayer)element;
+                    var sessionComponent = player.Components.GetComponent<SessionComponent>();
+                    if (sessionComponent != null && sessionComponent is not FractionSessionComponent)
+                        return;
 
-        if (entity.HasComponent<PickupTagComponent>() && entity.GetRequiredComponent<NameComponent>().Name.StartsWith("jobTestPickup"))
-        {
-            var pickupElementComponent = entity.GetRequiredComponent<PickupElementComponent>();
-            pickupElementComponent.EntityEntered = (enteredPickup, entity) =>
-            {
-                if (!entity.HasComponent<PlayerTagComponent>())
-                    return;
-
-                var sessionComponent = entity.GetComponent<SessionComponent>();
-                if (sessionComponent != null && sessionComponent is not JobSessionComponent)
-                    return;
-
-                var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();
-                if (entity.HasComponent<JobSessionComponent>())
-                {
-                    var jobSessionComponent = entity.GetRequiredComponent<JobSessionComponent>();
-                    jobSessionComponent.End();
-                    var elapsed = jobSessionComponent.Elapsed;
-                    _chatBox.OutputTo(entity, $"Job ended in: {elapsed.Hours:X2}:{elapsed.Minutes:X2}:{elapsed.Seconds:X2}, completed objectives: {jobSessionComponent.CompletedObjectives}");
-                    entity.GetRequiredComponent<JobStatisticsComponent>().AddTimePlayed(jobSessionComponent.JobId, (ulong)jobSessionComponent.Elapsed.Seconds);
-                    entity.DestroyComponent(jobSessionComponent);
-                }
-                else
-                {
-                    var jobSessionComponent = entity.AddComponent(new TestJobComponent(_entityFactory));
-                    _chatBox.OutputTo(entity, $"Job started");
-                    jobSessionComponent.Start();
-
-                    jobSessionComponent.CompletedAllObjectives += async e =>
+                    if (player.Components.HasComponent<FractionSessionComponent>())
                     {
-                        _chatBox.OutputTo(entity, $"All objectives completed!");
-                        await Task.Delay(2000);
+                        var fractionSessionComponent = player.Components.GetRequiredComponent<FractionSessionComponent>();
+                        fractionSessionComponent.End();
+                        _chatBox.OutputTo(player, $"Session ended in: {fractionSessionComponent.Elapsed}");
+                        player.Components.DestroyComponent(fractionSessionComponent);
+                    }
+                    else
+                    {
+                        var fractionSessionComponent = player.Components.AddComponent<FractionSessionComponent>();
+                        _chatBox.OutputTo(player, $"Session started");
+                        fractionSessionComponent.Start();
+                    }
+                };
+            }
+        }
+
+        {
+            if (element is RealmPickup pickup && pickup.Components.TryGetComponent(out NameComponent nameComponent) && nameComponent.Name.StartsWith("jobTestPickup"))
+            {
+                pickup.Entered += (enteredPickup, element) =>
+                {
+                    var player = (RealmPlayer)element;
+
+                    var sessionComponent = player.Components.GetComponent<SessionComponent>();
+                    if (sessionComponent != null && sessionComponent is not JobSessionComponent)
+                        return;
+
+                    if (player.Components.HasComponent<JobSessionComponent>())
+                    {
+                        var jobSessionComponent = player.Components.GetRequiredComponent<JobSessionComponent>();
+                        jobSessionComponent.End();
+                        var elapsed = jobSessionComponent.Elapsed;
+                        _chatBox.OutputTo(player, $"Job ended in: {elapsed.Hours:X2}:{elapsed.Minutes:X2}:{elapsed.Seconds:X2}, completed objectives: {jobSessionComponent.CompletedObjectives}");
+                        player.Components.GetRequiredComponent<JobStatisticsComponent>().AddTimePlayed(jobSessionComponent.JobId, (ulong)jobSessionComponent.Elapsed.Seconds);
+                        player.Components.DestroyComponent(jobSessionComponent);
+                    }
+                    else
+                    {
+                        var jobSessionComponent = player.Components.AddComponent(new TestJobComponent(_elementFactory));
+                        _chatBox.OutputTo(player, $"Job started");
+                        jobSessionComponent.Start();
+
+                        jobSessionComponent.CompletedAllObjectives += async e =>
+                        {
+                            _chatBox.OutputTo(player, $"All objectives completed!");
+                            await Task.Delay(2000);
+                            jobSessionComponent.CreateObjectives();
+                        };
                         jobSessionComponent.CreateObjectives();
-                    };
-                    jobSessionComponent.CreateObjectives();
-                }
-            };
+                    }
+                };
+            }
         }
 
-        if (entity.HasComponent<PickupTagComponent>() && entity.TryGetComponent(out nameComponent) && nameComponent.Name.StartsWith("withText3d"))
         {
-            var pickupElementComponent = entity.GetRequiredComponent<PickupElementComponent>();
-            pickupElementComponent.AddRule<MustBePlayerOnFootOnlyRule>();
-            pickupElementComponent.AddRule<MustNotHaveComponent<AttachedEntityComponent>>();
-            pickupElementComponent.AddOpenGuiLogic<TestWindowComponent>();
-        }
-
-        if (entity.HasComponent<PickupTagComponent>() && entity.TryGetComponent(out nameComponent) && nameComponent.Name.StartsWith("exampleShopPickup"))
-        {
-            var pickupElementComponent = entity.GetRequiredComponent<PickupElementComponent>();
-            pickupElementComponent.AddRule<MustBePlayerOnFootOnlyRule>();
-            pickupElementComponent.AddOpenGuiLogic<TestShopGuiComponent, InventoryGuiComponent>();
-        }
-
-        if (entity.HasComponent<MarkerTagComponent>() && entity.TryGetComponent(out nameComponent) && nameComponent.Name.StartsWith("testMarker"))
-        {
-            var pickupElementComponent = entity.GetRequiredComponent<MarkerElementComponent>();
-            pickupElementComponent.AddRule<MustBePlayerOnFootOnlyRule>();
-            pickupElementComponent.EntityEntered = (markerElementComponent, enteredPickup, entity) =>
+            if (element is RealmPickup pickup && pickup.Components.TryGetComponent(out NameComponent nameComponent) && nameComponent.Name.StartsWith("withText3d"))
             {
-                _chatBox.OutputTo(entity, $"Entered marker");
-            };
-            pickupElementComponent.EntityLeft = (markerElementComponent, leftPickup, entity) =>
+                pickup.AddRule<MustBePlayerOnFootOnlyRule>();
+                pickup.AddRule<MustNotHaveComponent<AttachedElementComponent>>();
+                pickup.AddOpenGuiLogic<TestWindowComponent>();
+            }
+        }
+
+        {
+            if (element is RealmPickup pickup && pickup.Components.TryGetComponent(out NameComponent nameComponent) && nameComponent.Name.StartsWith("exampleShopPickup"))
             {
-                _chatBox.OutputTo(entity, $"Left marker");
-            };
+                pickup.AddRule<MustBePlayerOnFootOnlyRule>();
+                pickup.AddOpenGuiLogic<TestShopGuiComponent, InventoryGuiComponent>();
+            }
+        }
+
+        {
+            if (element is RealmPickup pickup && pickup.Components.TryGetComponent(out NameComponent nameComponent) && nameComponent.Name.StartsWith("testMarker"))
+            {
+                pickup.AddRule<MustBePlayerOnFootOnlyRule>();
+                pickup.Entered += (enteredPickup, element) =>
+                {
+                    _chatBox.OutputTo((RealmPlayer)element, $"Entered marker");
+                };
+                pickup.Left += (leftPickup, element) =>
+                {
+                    _chatBox.OutputTo((RealmPlayer)element, $"Left marker");
+                };
+            }
         }
     }
 }

@@ -4,81 +4,71 @@ namespace RealmCore.Server.Extensions;
 
 public static class MarkerElementComponentExtensions
 {
-    public static void AddOpenGuiLogic<TGui>(this MarkerElementComponent markerElementComponent) where TGui : GuiComponent, new()
+    public static void AddOpenGuiLogic<TGui>(this RealmMarker marker) where TGui : GuiComponent, new()
     {
-        markerElementComponent.EntityEntered = (markerElementComponent, enteredPickup, entity) =>
+        marker.Entered += (enteredMarker, element) =>
         {
-            if (!entity.HasComponent<GuiComponent>())
-                entity.AddComponent(new TGui());
+            if(element is RealmPlayer player)
+            {
+                if(!player.Components.HasComponent<GuiComponent>())
+                    player.Components.AddComponent(new TGui());
+            }
         };
-        markerElementComponent.EntityLeft = (markerElementComponent, leftPickup, entity) =>
+        marker.Left += (leftPickup, element) =>
         {
-            if (entity.HasComponent<TGui>())
-                entity.DestroyComponent<TGui>();
+            if (element is RealmPlayer player)
+            {
+                if (!player.Components.HasComponent<TGui>())
+                    player.Components.TryDestroyComponent<TGui>();
+            }
         };
     }
 
-    public static void AddOpenGuiLogic<TGui>(this MarkerElementComponent markerElementComponent, Func<Entity, Task<TGui>> factory) where TGui : GuiComponent
+    public static void AddOpenGuiLogic<TGui>(this RealmMarker marker, Func<RealmPlayer, Task<TGui>> factory) where TGui : GuiComponent
     {
-        markerElementComponent.EntityEntered = async (markerElementComponent, enteredPickup, entity) =>
+        marker.Entered += async (enteredMarker, element) =>
         {
-            if (!entity.HasComponent<GuiComponent>())
-                entity.AddComponent(await factory(entity));
+            if (element is RealmPlayer player)
+            {
+                if (!player.Components.HasComponent<GuiComponent>())
+                    player.Components.AddComponent(await factory(player));
+            }
         };
-        markerElementComponent.EntityLeft = (markerElementComponent, leftPickup, entity) =>
+        marker.Left += (leftPickup, element) =>
         {
-            if (entity.HasComponent<TGui>())
-                entity.DestroyComponent<TGui>();
+            if (element is RealmPlayer player)
+            {
+                if (!player.Components.HasComponent<TGui>())
+                    player.Components.TryDestroyComponent<TGui>();
+            }
         };
     }
 
-    public static void AddOpenGuiLogic<TGui1, TGui2>(this MarkerElementComponent markerElementComponent)
+    public static void AddOpenGuiLogic<TGui1, TGui2>(this RealmMarker marker)
         where TGui1 : GuiComponent, new()
         where TGui2 : GuiComponent, new()
     {
-        markerElementComponent.EntityEntered = (markerElementComponent, enteredPickup, entity) =>
+        marker.Entered += (enteredPickup, element) =>
         {
-            if (!entity.HasComponent<GuiComponent>())
+            if (element is RealmPlayer player)
             {
-                entity.AddComponent(new TGui1());
-                entity.AddComponent(new TGui2());
+                if (!player.Components.HasComponent<GuiComponent>())
+                {
+                    player.Components.AddComponent(new TGui1());
+                    player.Components.AddComponent(new TGui2());
+                }
             }
         };
-        markerElementComponent.EntityLeft = (markerElementComponent, leftPickup, entity) =>
+
+        marker.Left += (leftPickup, element) =>
         {
-            if (entity.HasComponent<TGui1>())
-                entity.DestroyComponent<TGui1>();
-            if (entity.HasComponent<TGui2>())
-                entity.DestroyComponent<TGui2>();
+            if (element is RealmPlayer player)
+            {
+                if (player.Components.HasComponent<TGui1>())
+                    player.Components.DestroyComponent<TGui1>();
+                if (player.Components.HasComponent<TGui2>())
+                    player.Components.DestroyComponent<TGui2>();
+            }
         };
     }
-
-    public static void AddOpenGuiPageLogic<TGui>(this MarkerElementComponent markerElementComponent) where TGui : BrowserGuiComponent, new()
-    {
-        markerElementComponent.EntityEntered = (markerElementComponent, enteredPickup, entity) =>
-        {
-            if (!entity.HasComponent<BrowserGuiComponent>())
-                entity.AddComponent(new TGui());
-        };
-        markerElementComponent.EntityLeft = (markerElementComponent, leftPickup, entity) =>
-        {
-            if (entity.HasComponent<TGui>())
-                entity.DestroyComponent<TGui>();
-        };
-    }
-
-    public static void AddOpenGuiPageLogic<TGui>(this MarkerElementComponent markerElementComponent, Func<Entity, Task<TGui>> factory) where TGui : BrowserGuiComponent
-    {
-        markerElementComponent.EntityEntered = async (markerElementComponent, enteredPickup, entity) =>
-        {
-            if (!entity.HasComponent<BrowserGuiComponent>())
-                entity.AddComponent(await factory(entity));
-        };
-        markerElementComponent.EntityLeft = (markerElementComponent, leftPickup, entity) =>
-        {
-            if (entity.HasComponent<TGui>())
-                entity.DestroyComponent<TGui>();
-        };
-    }
-
 }

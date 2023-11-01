@@ -2,5 +2,5 @@
 
 public interface IRewardService
 {
-    Task<bool> TryGiveReward(Entity entity, int rewardId);
+    Task<bool> TryGiveReward(RealmPlayer player, int rewardId);
 }

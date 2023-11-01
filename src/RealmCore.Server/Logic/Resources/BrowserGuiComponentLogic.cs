@@ -7,7 +7,7 @@ internal sealed class BrowserGuiComponentLogic : ComponentLogic<BrowserGuiCompon
     private readonly IBrowserGuiService _browserGuiService;
     private readonly ILogger<BrowserGuiComponentLogic> _logger;
 
-    public BrowserGuiComponentLogic(IEntityEngine entityEngine, IBrowserGuiService browserGuiService, ILogger<BrowserGuiComponentLogic> logger) : base(entityEngine)
+    public BrowserGuiComponentLogic(IElementFactory elementFactory, IBrowserGuiService browserGuiService, ILogger<BrowserGuiComponentLogic> logger) : base(elementFactory)
     {
         _browserGuiService = browserGuiService;
         _logger = logger;
@@ -15,11 +15,12 @@ internal sealed class BrowserGuiComponentLogic : ComponentLogic<BrowserGuiCompon
 
     protected override void ComponentAdded(BrowserGuiComponent browserGuiComponent)
     {
-        using var _ = _logger.BeginEntity(browserGuiComponent.Entity);
-        if(_browserGuiService.TryGetKeyByEntity(browserGuiComponent.Entity, out var key))
+        using var _ = _logger.BeginElement(browserGuiComponent.Element);
+        var player = (RealmPlayer)browserGuiComponent.Element;
+        if (_browserGuiService.TryGetKeyByPlayer(player, out var key))
         {
             var url = browserGuiComponent.Path;
-            var browserComponent = browserGuiComponent.Entity.GetRequiredComponent<BrowserComponent>();
+            var browserComponent = player.GetRequiredComponent<BrowserComponent>();
             browserComponent.SetPath(url, false);
             browserComponent.Visible = true;
             _logger.LogInformation("Gui {guiPageType} opened", browserGuiComponent.GetType().Name);
@@ -30,7 +31,8 @@ internal sealed class BrowserGuiComponentLogic : ComponentLogic<BrowserGuiCompon
     protected override void ComponentDetached(BrowserGuiComponent browserGuiComponent)
     {
         browserGuiComponent.NavigationRequested -= HandleNavigationRequested;
-        var browserComponent = browserGuiComponent.Entity.GetRequiredComponent<BrowserComponent>();
+        var player = (RealmPlayer)browserGuiComponent.Element;
+        var browserComponent = player.GetRequiredComponent<BrowserComponent>();
         browserComponent.SetPath("/realmEmpty", false);
         browserComponent.Visible = false;
 
@@ -39,8 +41,9 @@ internal sealed class BrowserGuiComponentLogic : ComponentLogic<BrowserGuiCompon
 
     private void HandleNavigationRequested(BrowserGuiComponent browserGuiComponent, BrowserGuiComponent targetGuiComponent)
     {
-        var entity = browserGuiComponent.Entity;
-        entity.DestroyComponent(browserGuiComponent);
-        entity.AddComponent(targetGuiComponent);
+        var entity = browserGuiComponent.Element;
+        var player = (RealmPlayer)browserGuiComponent.Element;
+        player.DestroyComponent(browserGuiComponent);
+        player.AddComponent(targetGuiComponent);
     }
 }

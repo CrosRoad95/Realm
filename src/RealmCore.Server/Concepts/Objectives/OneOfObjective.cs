@@ -13,14 +13,14 @@ public class OneOfObjective : Objective
         _objectives = objectives;
     }
 
-    protected override void Load(IServiceProvider serviceProvider, Entity playerEntity)
+    protected override void Load(RealmPlayer player)
     {
         foreach (var item in _objectives)
         {
             item.Completed += HandleCompleted;
             item.InCompleted += HandleIncompleted;
-            item.Entity = playerEntity;
-            item.LoadInternal(serviceProvider, playerEntity, Logger);
+            item.Player = player;
+            item.LoadInternal(player);
         }
     }
 

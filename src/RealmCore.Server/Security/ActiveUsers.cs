@@ -2,22 +2,22 @@
 
 internal sealed class ActiveUsers : IActiveUsers
 {
-    private readonly ConcurrentDictionary<int, Entity> _activeUsers = new();
+    private readonly ConcurrentDictionary<int, RealmPlayer> _activeUsers = new();
 
     public IEnumerable<int> ActiveUsersIds => _activeUsers.Keys;
-    public event Action<int, Entity>? Activated;
-    public event Action<int, Entity>? Deactivated;
+    public event Action<int, RealmPlayer>? Activated;
+    public event Action<int, RealmPlayer>? Deactivated;
 
     public bool IsActive(int userId)
     {
         return _activeUsers.ContainsKey(userId);
     }
 
-    public bool TrySetActive(int userId, Entity entity)
+    public bool TrySetActive(int userId, RealmPlayer player)
     {
-        if(_activeUsers.TryAdd(userId, entity))
+        if(_activeUsers.TryAdd(userId, player))
         {
-            Activated?.Invoke(userId, entity);
+            Activated?.Invoke(userId, player);
             return true;
         }
         return false;
@@ -25,13 +25,13 @@ internal sealed class ActiveUsers : IActiveUsers
 
     public bool TrySetInactive(int userId)
     {
-        if (_activeUsers.TryRemove(userId, out var entity))
+        if (_activeUsers.TryRemove(userId, out var player))
         {
-            Deactivated?.Invoke(userId, entity);
+            Deactivated?.Invoke(userId, player);
             return true;
         }
         return false;
     }
 
-    public bool TryGetEntityByUserId(int userId, out Entity? entity) => _activeUsers.TryGetValue(userId, out entity);
+    public bool TryGetPlayerByUserId(int userId, out RealmPlayer? player) => _activeUsers.TryGetValue(userId, out player);
 }

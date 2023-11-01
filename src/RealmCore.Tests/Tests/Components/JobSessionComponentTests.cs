@@ -1,5 +1,4 @@
 ﻿using RealmCore.Resources.GuiSystem;
-using RealmCore.Server.Components.Elements.CollisionShapes;
 using RealmCore.Tests.Classes.Components;
 
 namespace RealmCore.Tests.Tests.Components;
@@ -7,7 +6,7 @@ namespace RealmCore.Tests.Tests.Components;
 public class JobSessionComponentTests
 {
     private readonly IElementCollection _elementCollection;
-    private readonly IEntityFactory _entityFactory;
+    private readonly IElementFactory _elementFactory;
     private readonly EntityHelper _entityHelper;
     private readonly Mock<IRealmServer> _realmServerMock = new(MockBehavior.Strict);
     private readonly RealmTestingServer _realmTestingServer;
@@ -17,20 +16,20 @@ public class JobSessionComponentTests
     {
         _realmTestingServer = new(null, services =>
         {
-            services.AddSingleton<IEntityFactory, EntityFactory>();
+            services.AddSingleton<IElementFactory, ElementFactory>();
             services.AddSingleton(_guiSystemService.Object);
             services.AddSingleton(_realmServerMock.Object);
         });
         _entityHelper = new(_realmTestingServer);
         _elementCollection = _realmTestingServer.GetRequiredService<IElementCollection>();
-        _entityFactory = _realmTestingServer.GetRequiredService<IEntityFactory>();
+        _elementFactory = _realmTestingServer.GetRequiredService<IElementFactory>();
     }
 
     //[Fact]
     public void JobShouldCreateExpectedAmountOfPrivateAndPublicElements()
     {
         var playerEntity = _entityHelper.CreatePlayerEntity();
-        var testJobComponent = playerEntity.AddComponent(new TestJobComponent(_entityFactory));
+        var testJobComponent = playerEntity.AddComponent(new TestJobComponent(_elementFactory));
         playerEntity.AddComponent(new JobStatisticsComponent(DateTime.Now));
         testJobComponent.CreateObjectives();
         var elements = _elementCollection.GetAll().ToList();

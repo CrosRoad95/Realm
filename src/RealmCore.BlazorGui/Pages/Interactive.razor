@@ -1,8 +1,9 @@
 ﻿@page "/realmUi/interactive"
+@using RealmCore.Server.Elements
 @inherits RealmGuiComponentBase<InteractiveGuiComponent>;
 
 Foo=@Component.Foo
-Hello @(Component.Entity.GetRequiredComponent<PlayerElementComponent>().Name)
+Hello @(((RealmPlayer)Component.Element).Name)
 
 @code{
     protected override void OnAfterRender(bool firstRender)

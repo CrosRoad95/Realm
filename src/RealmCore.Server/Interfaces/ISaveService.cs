@@ -2,11 +2,11 @@
 
 public interface ISaveService
 {
-    event Action<Entity>? EntitySaved;
+    event Action<Element>? ElementSaved;
 
-    Task<bool> BeginSave(Entity entity);
+    Task<bool> BeginSave(Element element);
     Task Commit();
-    Task<bool> Save(Entity entity);
+    Task<bool> Save(Element element);
     internal Task<int> SaveNewPlayerInventory(InventoryComponent inventoryComponent, int userId);
     internal Task<int> SaveNewVehicleInventory(InventoryComponent inventoryComponent, int vehicleId);
 }

@@ -20,7 +20,7 @@ internal sealed class UpdateCallbackLogic : ComponentLogic<IUpdateCallback, IRar
     private readonly object _rareUpdateCallbacksToAddLock = new();
     private readonly object _rareUpdateCallbacksToRemoveLock = new();
 
-    public UpdateCallbackLogic(IEntityEngine entityEngine, ILogger<UpdateCallbackLogic> logger) : base(entityEngine)
+    public UpdateCallbackLogic(IElementFactory elementFactory, ILogger<UpdateCallbackLogic> logger) : base(elementFactory)
     {
         _logger = logger;
 

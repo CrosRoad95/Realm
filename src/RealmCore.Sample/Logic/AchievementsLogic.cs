@@ -6,7 +6,7 @@ internal sealed class AchievementsLogic : ComponentLogic<AchievementsComponent>
 {
     private readonly IOverlayService _overlayService;
 
-    public AchievementsLogic(IEntityEngine entityEngine, IOverlayService overlayService) : base(entityEngine)
+    public AchievementsLogic(IElementFactory elementFactory, IOverlayService overlayService) : base(elementFactory)
     {
         _overlayService = overlayService;
     }
@@ -23,6 +23,6 @@ internal sealed class AchievementsLogic : ComponentLogic<AchievementsComponent>
 
     private void HandleAchievementUnlocked(AchievementsComponent achievementsComponent, int achievementName)
     {
-        _overlayService.AddNotification(achievementsComponent.Entity, $"Odblokowałeś osiągnięcie '{achievementName}'");
+        _overlayService.AddNotification((RealmPlayer)achievementsComponent.Element, $"Odblokowałeś osiągnięcie '{achievementName}'");
     }
 }

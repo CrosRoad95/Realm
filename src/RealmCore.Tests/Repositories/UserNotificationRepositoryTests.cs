@@ -1,6 +1,4 @@
-﻿using RealmCore.Persistence.Data;
-
-namespace RealmCore.Tests.Repositories;
+﻿namespace RealmCore.Tests.Repositories;
 
 public class UserNotificationRepositoryTests
 {

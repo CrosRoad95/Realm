@@ -16,24 +16,22 @@ internal class DurationBasedHoldInteractionWithRingEffectComponent : DurationBas
         _overlayService = overlayService;
     }
 
-    private void HandleInteractionStarted(DurationBasedHoldInteractionComponent durationBasedHoldInteractionComponent, Entity owningEntity, TimeSpan time)
+    private void HandleInteractionStarted(DurationBasedHoldInteractionComponent durationBasedHoldInteractionComponent, RealmPlayer player, TimeSpan time)
     {
-        if (owningEntity.HasComponent<PlayerTagComponent>())
-            lock (_lock)
-            {
-                // TODO:
-                //_ringId = _overlayService.AddRing3dDisplay(owningEntity, Entity.Transform.Position, time);
-            }
+        lock (_lock)
+        {
+            // TODO:
+            //_ringId = _overlayService.AddRing3dDisplay(owningEntity, Entity.Transform.Position, time);
+        }
     }
 
-    private void HandleInteractionCompleted(DurationBasedHoldInteractionComponent durationBasedHoldInteractionComponent, Entity owningEntity, bool succeed)
+    private void HandleInteractionCompleted(DurationBasedHoldInteractionComponent durationBasedHoldInteractionComponent, RealmPlayer player, bool succeed)
     {
-        if (owningEntity.HasComponent<PlayerTagComponent>())
-            lock (_lock)
-                if (_ringId != null)
-                {
-                    _overlayService.RemoveRing3dDisplay(owningEntity, _ringId);
-                    _ringId = null;
-                }
+        lock (_lock)
+            if (_ringId != null)
+            {
+                _overlayService.RemoveRing3dDisplay(player, _ringId);
+                _ringId = null;
+            }
     }
 }

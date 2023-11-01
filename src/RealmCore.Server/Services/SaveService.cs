@@ -9,7 +9,7 @@ internal sealed class SaveService : ISaveService
     private readonly IDb _dbContext;
     private readonly IEnumerable<IUserDataSaver> _userDataSavers;
 
-    public event Action<Entity>? EntitySaved;
+    public event Action<Element>? ElementSaved;
 
     public SaveService(IDb dbContext, IEnumerable<IUserDataSaver> userDataSavers)
     {
@@ -17,17 +17,15 @@ internal sealed class SaveService : ISaveService
         _userDataSavers = userDataSavers;
     }
 
-    private async Task<bool> SaveVehicle(Entity entity)
+    private async Task<bool> SaveVehicle(RealmVehicle vehicle)
     {
-        if (!entity.TryGetComponent(out PrivateVehicleComponent privateVehicleComponent))
+        if (!vehicle.Components.TryGetComponent(out PrivateVehicleComponent privateVehicleComponent))
             return false;
 
         var vehicleData = await _dbContext.Vehicles
             .IncludeAll()
             .Where(x => x.Id == privateVehicleComponent.Id)
             .FirstAsync();
-
-        var vehicle = entity.GetRequiredComponent<VehicleElementComponent>();
 
         vehicleData.Model = vehicle.Model;
         vehicleData.Color = new VehicleColor(vehicle.Colors.Primary, vehicle.Colors.Secondary, vehicle.Colors.Color3, vehicle.Colors.Color4, vehicle.HeadlightColor);
@@ -89,7 +87,7 @@ internal sealed class SaveService : ISaveService
             CustomValue = x.customValue
         }).ToList();
 
-        if (entity.TryGetComponent(out VehicleUpgradesComponent vehicleUpgradesComponent))
+        if (vehicle.Components.TryGetComponent(out VehicleUpgradesComponent vehicleUpgradesComponent))
         {
             vehicleData.Upgrades = vehicleUpgradesComponent.Upgrades.Select(x => new VehicleUpgradeData
             {
@@ -101,7 +99,7 @@ internal sealed class SaveService : ISaveService
         vehicleData.Paintjob = vehicle.PaintJob;
 
         {
-            var fuelComponents = entity.Components.OfType<FuelComponent>();
+            var fuelComponents = vehicle.Components.ComponentsLists.OfType<FuelComponent>();
             vehicleData.Fuels = fuelComponents.Select(x => new VehicleFuelData
             {
                 VehicleId = vehicleData.Id,
@@ -113,11 +111,11 @@ internal sealed class SaveService : ISaveService
                 MinimumDistanceThreshold = x.MinimumDistanceThreshold,
             }).ToList();
         }
-        if (entity.TryGetComponent(out MileageCounterComponent mileageCounterComponent))
+        if (vehicle.Components.TryGetComponent(out MileageCounterComponent mileageCounterComponent))
         {
             vehicleData.Mileage = mileageCounterComponent.Mileage;
         }
-        if (entity.TryGetComponent(out VehiclePartDamageComponent vehiclePartDamageComponent))
+        if (vehicle.Components.TryGetComponent(out VehiclePartDamageComponent vehiclePartDamageComponent))
         {
             List<VehiclePartDamageData> vehiclePartDamages = new();
             foreach (var item in vehiclePartDamageComponent.Parts)
@@ -133,7 +131,7 @@ internal sealed class SaveService : ISaveService
             vehicleData.PartDamages = vehiclePartDamages;
         }
 
-        if (entity.TryGetComponent(out VehicleEngineComponent vehicleEngineComponent))
+        if (vehicle.Components.TryGetComponent(out VehicleEngineComponent vehicleEngineComponent))
         {
             vehicleData.VehicleEngines = vehicleEngineComponent.VehicleEngineIds.Select(x => new VehicleEngineData
             {
@@ -142,9 +140,10 @@ internal sealed class SaveService : ISaveService
             }).ToList();
         }
 
-        var inventoryComponents = entity.Components.OfType<InventoryComponent>()
-        .Where(x => x.Id != 0)
-        .ToList();
+        var inventoryComponents = vehicle.Components.ComponentsLists
+            .OfType<InventoryComponent>()
+            .Where(x => x.Id != 0)
+            .ToList();
 
         if (inventoryComponents.Count != 0)
         {
@@ -211,9 +210,9 @@ internal sealed class SaveService : ISaveService
         return inventory.Id;
     }
 
-    private async Task<bool> SavePlayer(Entity entity)
+    private async Task<bool> SavePlayer(RealmPlayer player)
     {
-        if (!entity.TryGetComponent(out UserComponent userComponent))
+        if (!player.Components.TryGetComponent(out UserComponent userComponent))
             return false;
 
         var user = await _dbContext.Users
@@ -221,7 +220,7 @@ internal sealed class SaveService : ISaveService
             .Where(x => x.Id == userComponent.Id).FirstAsync();
 
         foreach (var item in _userDataSavers)
-            await item.SaveAsync(entity);
+            await item.SaveAsync(player);
 
         user.Upgrades = userComponent.Upgrades.Select(x => new UserUpgradeData
         {
@@ -234,15 +233,14 @@ internal sealed class SaveService : ISaveService
             Value = userComponent.GetSetting(x) ?? ""
         }).ToList();
 
-        if (entity.TryGetComponent(out PlayerElementComponent playerElementComponent))
-            user.LastTransformAndMotion = playerElementComponent.GetTransformAndMotion();
+        user.LastTransformAndMotion = player.GetTransformAndMotion();
 
-        if (entity.TryGetComponent(out MoneyComponent moneyComponent))
+        if (player.Components.TryGetComponent(out MoneyComponent moneyComponent))
             user.Money = moneyComponent.Money;
         else
             user.Money = 0;
 
-        if (entity.TryGetComponent(out LicensesComponent licensesComponent))
+        if (player.Components.TryGetComponent(out LicensesComponent licensesComponent))
         {
             user.Licenses = licensesComponent.Licenses.Select(x => new UserLicenseData
             {
@@ -256,7 +254,7 @@ internal sealed class SaveService : ISaveService
             user.Licenses = new List<UserLicenseData>();
         }
 
-        if (entity.TryGetComponent(out PlayTimeComponent playTimeComponent))
+        if (player.Components.TryGetComponent(out PlayTimeComponent playTimeComponent))
         {
             user.PlayTime = (ulong)playTimeComponent.TotalPlayTime.TotalSeconds;
             playTimeComponent.Reset();
@@ -264,7 +262,7 @@ internal sealed class SaveService : ISaveService
         else
             user.PlayTime = 0;
 
-        var inventoryComponents = entity.Components.OfType<InventoryComponent>()
+        var inventoryComponents = player.Components.ComponentsLists.OfType<InventoryComponent>()
             .Where(x => x.Id != 0)
             .ToList();
 
@@ -281,7 +279,7 @@ internal sealed class SaveService : ISaveService
             user.Inventories = new List<InventoryData>();
 
 
-        if (entity.TryGetComponent(out DailyVisitsCounterComponent dailyVisitsCounterComponent))
+        if (player.Components.TryGetComponent(out DailyVisitsCounterComponent dailyVisitsCounterComponent))
         {
             user.DailyVisits = new DailyVisitsData
             {
@@ -293,7 +291,7 @@ internal sealed class SaveService : ISaveService
         else
             user.DailyVisits = null;
 
-        if (entity.TryGetComponent(out StatisticsCounterComponent statisticsCounterComponent))
+        if (player.Components.TryGetComponent(out StatisticsCounterComponent statisticsCounterComponent))
         {
             user.Stats = statisticsCounterComponent.GetStatsIds.Select(x => new UserStatData
             {
@@ -305,7 +303,7 @@ internal sealed class SaveService : ISaveService
         else
             user.Stats = new List<UserStatData>();
 
-        if (entity.TryGetComponent(out AchievementsComponent achievementsComponent))
+        if (player.Components.TryGetComponent(out AchievementsComponent achievementsComponent))
         {
             user.Achievements = achievementsComponent.Achievements.Select(x => new AchievementData
             {
@@ -318,7 +316,7 @@ internal sealed class SaveService : ISaveService
         else
             user.Achievements = new List<AchievementData>();
 
-        if (entity.TryGetComponent(out JobUpgradesComponent jobUpgradesComponent))
+        if (player.Components.TryGetComponent(out JobUpgradesComponent jobUpgradesComponent))
         {
             user.JobUpgrades = jobUpgradesComponent.Upgrades.Select(x => new JobUpgradeData
             {
@@ -329,7 +327,7 @@ internal sealed class SaveService : ISaveService
         else
             user.JobUpgrades = new List<JobUpgradeData>();
 
-        if (entity.TryGetComponent(out JobStatisticsComponent jobStatisticsComponent))
+        if (player.Components.TryGetComponent(out JobStatisticsComponent jobStatisticsComponent))
         {
             var newStatistics = jobStatisticsComponent.JobStatistics.Where(x => x.Value.sessionPoints > 0 || x.Value.sessionTimePlayed > 0);
             foreach (var item in newStatistics)
@@ -356,7 +354,7 @@ internal sealed class SaveService : ISaveService
         else
             user.JobStatistics = new List<JobStatisticsData>();
 
-        if (entity.TryGetComponent(out DiscoveriesComponent discoveriesComponent))
+        if (player.Components.TryGetComponent(out DiscoveriesComponent discoveriesComponent))
         {
             user.Discoveries = discoveriesComponent.Discoveries.Select(x => new DiscoveryData
             {
@@ -364,7 +362,7 @@ internal sealed class SaveService : ISaveService
             }).ToList();
         }
 
-        if (entity.TryGetComponent(out LevelComponent levelComponent))
+        if (player.Components.TryGetComponent(out LevelComponent levelComponent))
         {
             user.Level = levelComponent.Level;
             user.Experience = levelComponent.Experience;
@@ -375,7 +373,7 @@ internal sealed class SaveService : ISaveService
             user.Experience = 0;
         }
 
-        if (entity.TryGetComponent(out DiscordIntegrationComponent discordIntegrationComponent))
+        if (player.Components.TryGetComponent(out DiscordIntegrationComponent discordIntegrationComponent))
         {
             user.DiscordIntegration = new DiscordIntegrationData
             {
@@ -390,9 +388,9 @@ internal sealed class SaveService : ISaveService
         return true;
     }
 
-    public async Task<bool> Save(Entity entity)
+    public async Task<bool> Save(Element element)
     {
-        if (await BeginSave(entity))
+        if (await BeginSave(element))
         {
             await Commit();
             return true;
@@ -400,21 +398,18 @@ internal sealed class SaveService : ISaveService
         return false;
     }
 
-    public async Task<bool> BeginSave(Entity entity)
+    public async Task<bool> BeginSave(Element element)
     {
-        if (!entity.TryGetComponent(out TagComponent tagComponent))
-            return false;
-
-        bool result = tagComponent switch
+        bool saved = element switch
         {
-            PlayerTagComponent => await SavePlayer(entity),
-            VehicleTagComponent => await SaveVehicle(entity),
+            RealmPlayer player => await SavePlayer(player),
+            RealmVehicle vehicle => await SaveVehicle(vehicle),
             _ => false
         };
 
-        if (result)
-            EntitySaved?.Invoke(entity);
-        return result;
+        if (saved)
+            ElementSaved?.Invoke(element);
+        return saved;
     }
 
     public async Task Commit()

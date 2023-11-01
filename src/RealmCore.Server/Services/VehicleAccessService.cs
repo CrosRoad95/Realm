@@ -2,25 +2,23 @@
 
 internal sealed class VehicleAccessService : IVehicleAccessService
 {
-    private readonly IEntityEngine _entityEngine;
     private readonly ILogger<VehicleAccessService> _logger;
 
-    public event Func<Entity, Entity, bool>? CanEnter;
-    public event Action<Entity, Entity, VehicleAccessControllerComponent>? FailedToEnter;
+    public event Func<Ped, RealmVehicle, byte, bool>? CanEnter;
+    public event Action<Ped, RealmVehicle, byte, VehicleAccessControllerComponent>? FailedToEnter;
 
-    public VehicleAccessService(IEntityEngine entityEngine, ILogger<VehicleAccessService> logger)
+    public VehicleAccessService(ILogger<VehicleAccessService> logger)
     {
-        _entityEngine = entityEngine;
         _logger = logger;
     }
 
-    public bool InternalCanEnter(Entity pedEntity, Entity vehicleEntity, VehicleAccessControllerComponent? vehicleAccessControllerComponent = null)
+    public bool InternalCanEnter(Ped ped, RealmVehicle vehicle, byte seat, VehicleAccessControllerComponent? vehicleAccessControllerComponent = null)
     {
         if (CanEnter != null)
         {
-            foreach (Func<Entity, Entity, bool> handler in CanEnter.GetInvocationList().Cast<Func<Entity, Entity, bool>>())
+            foreach (Func<Ped, RealmVehicle, byte, bool> handler in CanEnter.GetInvocationList().Cast<Func<Ped, RealmVehicle, byte, bool>>())
             {
-                if (handler.Invoke(pedEntity, vehicleEntity))
+                if (handler.Invoke(ped, vehicle, seat))
                 {
                     return true;
                 }
@@ -29,9 +27,9 @@ internal sealed class VehicleAccessService : IVehicleAccessService
 
         if (vehicleAccessControllerComponent != null)
         {
-            if (!vehicleAccessControllerComponent.InternalCanEnter(pedEntity, vehicleEntity))
+            if (!vehicleAccessControllerComponent.InternalCanEnter(ped, vehicle, seat))
             {
-                FailedToEnter?.Invoke(pedEntity, vehicleEntity, vehicleAccessControllerComponent);
+                FailedToEnter?.Invoke(ped, vehicle, seat, vehicleAccessControllerComponent);
                 return false;
             }
         }

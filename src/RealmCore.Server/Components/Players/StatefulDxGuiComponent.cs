@@ -40,7 +40,6 @@ public abstract class StatefulDxGuiComponent<TState> : StatefulDxGuiComponentBas
 
     private void FlushChanged()
     {
-        var playerElementComponent = Entity.GetRequiredComponent<PlayerElementComponent>();
         StateChanged?.Invoke(this, _name, _stateChange);
         _stateChange.Clear();
     }

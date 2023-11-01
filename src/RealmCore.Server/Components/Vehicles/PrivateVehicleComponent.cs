@@ -41,8 +41,7 @@ public class PrivateVehicleComponent : Component
 
     public void Attach()
     {
-        var vehicleElementComponent = Entity.GetRequiredComponent<VehicleElementComponent>();
-        var vehicle = vehicleElementComponent;
+        var vehicle = (RealmVehicle)Element;
         vehicle.Colors.Primary = _vehicleData.Color.Color1;
         vehicle.Colors.Secondary = _vehicleData.Color.Color2;
         vehicle.Colors.Color3 = _vehicleData.Color.Color3;

@@ -2,13 +2,13 @@
 
 internal sealed class AFKResourceLogic
 {
-    private readonly IEntityEngine _entityEngine;
+    private readonly IElementFactory _elementFactory;
     private readonly ILogger<StatisticsCounterResourceLogic> _logger;
     private readonly IDateTimeProvider _dateTimeProvider;
 
-    public AFKResourceLogic(IAFKService afkService, IEntityEngine entityEngine, ILogger<StatisticsCounterResourceLogic> logger, IDateTimeProvider dateTimeProvider)
+    public AFKResourceLogic(IAFKService afkService, IElementFactory elementFactory, ILogger<StatisticsCounterResourceLogic> logger, IDateTimeProvider dateTimeProvider)
     {
-        _entityEngine = entityEngine;
+        _elementFactory = elementFactory;
         _logger = logger;
         _dateTimeProvider = dateTimeProvider;
         afkService.PlayerAFKStarted += HandlePlayerAFKStarted;
@@ -17,10 +17,10 @@ internal sealed class AFKResourceLogic
 
     private void HandlePlayerAFKStarted(Player player)
     {
-        var entity = ((PlayerElementComponent)player).Entity;
-        if (entity.TryGetComponent(out AFKComponent afkComponent))
+        var realmPlayer = (RealmPlayer)player;
+        if (realmPlayer.Components.TryGetComponent(out AFKComponent afkComponent))
         {
-            using var _ = _logger.BeginEntity(entity);
+            using var _ = _logger.BeginElement(realmPlayer);
             _logger.LogInformation("Player started AFK");
             afkComponent.HandlePlayerAFKStarted(_dateTimeProvider.Now);
         }
@@ -28,10 +28,10 @@ internal sealed class AFKResourceLogic
 
     private void HandlePlayerAFKStopped(Player player)
     {
-        var entity = ((PlayerElementComponent)player).Entity;
-        if (entity.TryGetComponent(out AFKComponent afkComponent))
+        var realmPlayer = (RealmPlayer)player;
+        if (realmPlayer.Components.TryGetComponent(out AFKComponent afkComponent))
         {
-            using var _ = _logger.BeginEntity(entity);
+            using var _ = _logger.BeginElement(realmPlayer);
             _logger.LogInformation("Player stopped AFK");
             afkComponent.HandlePlayerAFKStopped(_dateTimeProvider.Now);
         }

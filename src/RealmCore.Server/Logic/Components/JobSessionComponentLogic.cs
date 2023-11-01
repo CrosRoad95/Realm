@@ -7,7 +7,7 @@ internal sealed class JobSessionComponentLogic : ComponentLogic<JobSessionCompon
     private readonly IServiceProvider _serviceProvider;
     private readonly ILogger _logger;
 
-    public JobSessionComponentLogic(IEntityEngine entityEngine, IServiceProvider serviceProvider, ILogger logger) : base(entityEngine)
+    public JobSessionComponentLogic(IElementFactory elementFactory, IServiceProvider serviceProvider, ILogger logger) : base(elementFactory)
     {
         _serviceProvider = serviceProvider;
         _logger = logger;
@@ -25,6 +25,6 @@ internal sealed class JobSessionComponentLogic : ComponentLogic<JobSessionCompon
 
     private void HandleObjectiveAdded(JobSessionComponent jobSessionComponent, Objective objective)
     {
-        objective.LoadInternal(_serviceProvider, jobSessionComponent.Entity, _logger);
+        objective.LoadInternal((RealmPlayer)jobSessionComponent.Element);
     }
 }

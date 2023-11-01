@@ -28,7 +28,7 @@ internal sealed class PlayerBindsLogic : ComponentLogic<UserComponent>
     private readonly IServiceProvider _serviceProvider;
     private readonly IVehicleRepository _vehicleRepository;
 
-    public PlayerBindsLogic(IEntityEngine entityEngine, IServiceProvider serviceProvider, IVehicleRepository vehicleRepository) : base(entityEngine)
+    public PlayerBindsLogic(IElementFactory elementFactory, IServiceProvider serviceProvider, IVehicleRepository vehicleRepository) : base(elementFactory)
     {
         _serviceProvider = serviceProvider;
         _vehicleRepository = vehicleRepository;
@@ -36,21 +36,20 @@ internal sealed class PlayerBindsLogic : ComponentLogic<UserComponent>
 
     protected override void ComponentAdded(UserComponent userComponent)
     {
-        var entity = userComponent.Entity;
-        var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();
+        var player = (RealmPlayer)userComponent.Element;
 
-        playerElementComponent.SetBindAsync("num_0", entity =>
+        player.SetBindAsync("num_0", player =>
         {
-            if (entity.TryGetComponent(out AdminComponent adminComponent))
+            if (player.Components.TryGetComponent(out AdminComponent adminComponent))
             {
                 adminComponent.NoClip = !adminComponent.NoClip;
             }
             return Task.CompletedTask;
         });
 
-        playerElementComponent.SetBind("F2", entity =>
+        player.SetBind("F2", player =>
         {
-            if (entity.TryGetComponent(out BrowserComponent browserComponent))
+            if (player.Components.TryGetComponent(out BrowserComponent browserComponent))
             {
                 if (browserComponent.Visible)
                 {
@@ -64,47 +63,31 @@ internal sealed class PlayerBindsLogic : ComponentLogic<UserComponent>
             }
         });
 
-        playerElementComponent.SetBind("F3", entity =>
+        player.SetBind("F3", player =>
         {
-            if (entity.TryGetComponent(out BrowserComponent browserComponent))
+            if (player.Components.TryGetComponent(out BrowserComponent browserComponent))
             {
                 browserComponent.Path = "/realmUi/counter1";
                 browserComponent.Visible = true;
             }
         });
 
-        playerElementComponent.SetBind("F4", entity =>
+        player.SetBind("F4", player =>
         {
-            if (entity.TryGetComponent(out BrowserComponent browserComponent))
+            if (player.Components.TryGetComponent(out BrowserComponent browserComponent))
             {
                 browserComponent.Path = "index";
                 browserComponent.Visible = false;
             }
         });
 
-        GuiHelpers.BindGuiPage<HomePageComponent>(entity, "F6", _serviceProvider);
-        GuiHelpers.BindGuiPage<CounterPageComponent>(entity, "F7", _serviceProvider);
+        GuiHelpers.BindGuiPage<HomePageComponent>(player, "F6", _serviceProvider);
+        GuiHelpers.BindGuiPage<CounterPageComponent>(player, "F7", _serviceProvider);
 
-        //playerElementComponent.SetBind("F6", entity =>
-        //{
-        //    if (entity.TryGetComponent(out BlazorGuiComponent blazorGuiComponent))
-        //    {
-        //        blazorGuiComponent.Open("home");
-        //    }
-        //});
-
-        //playerElementComponent.SetBind("F7", entity =>
-        //{
-        //    if (entity.TryGetComponent(out BlazorGuiComponent blazorGuiComponent))
-        //    {
-        //        blazorGuiComponent.Open("counter");
-        //    }
-        //});
-
-        GuiHelpers.BindGuiPage(entity, "F1", async () =>
+        GuiHelpers.BindGuiPage(player, "F1", async () =>
         {
             DashboardGuiComponent.DashboardState state = new();
-            if (entity.TryGetComponent(out MoneyComponent moneyComponent))
+            if (player.Components.TryGetComponent(out MoneyComponent moneyComponent))
                 state.Money = (double)moneyComponent.Money;
 
             var vehiclesWithModelAndPositionDTos = await _vehicleRepository.GetLightVehiclesByUserId(userComponent.Id);
@@ -117,13 +100,12 @@ internal sealed class PlayerBindsLogic : ComponentLogic<UserComponent>
             state.Counter = 3;
             return new DashboardGuiComponent(state);
         }, _serviceProvider);
-        GuiHelpers.BindGui<InventoryGuiComponent>(entity, "i", _serviceProvider);
+        GuiHelpers.BindGui<InventoryGuiComponent>(player, "i", _serviceProvider);
     }
 
     protected override void ComponentDetached(UserComponent userComponent)
     {
-        var entity = userComponent.Entity;
-        var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();
-        playerElementComponent.RemoveAllBinds();
+        var player = (RealmPlayer)userComponent.Element;
+        player.RemoveAllBinds();
     }
 }

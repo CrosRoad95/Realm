@@ -5,7 +5,7 @@ public interface IActiveVehicles
     IEnumerable<int> ActiveVehiclesIds { get; }
 
     bool IsActive(int vehicleId);
-    bool TryGetEntityByVehicleId(int vehicleId, out Entity? entity);
-    bool TrySetActive(int vehicleId, Entity entity);
+    bool TryGetVehicleById(int vehicleId, out RealmVehicle? vehicle);
+    bool TrySetActive(int vehicleId, RealmVehicle vehicle);
     bool TrySetInactive(int vehicleId);
 }

@@ -66,8 +66,6 @@ public static class ServerBuilderExtensions
             services.AddCommand<SaveCommand>(); 
             services.AddCommand<ServerInfoCommand>(); 
             services.AddCommand<ReloadEntitiesCommand>();
-
-            services.AddSingleton<IEntityEngine, EntityEngine>();
         });
 
         #region Resources
@@ -108,7 +106,6 @@ public static class ServerBuilderExtensions
         serverBuilder.AddScopedLogic<DailyVisitsCounterComponentLogic>();
         serverBuilder.AddScopedLogic<AdminComponentLogic>();
         serverBuilder.AddScopedLogic<FocusableComponentLogic>();
-        serverBuilder.AddScopedLogic<CollisionShapeElementComponentLogic>();
         serverBuilder.AddScopedLogic<StatefulHudComponentLogic>();
         serverBuilder.AddScopedLogic<JobSessionComponentLogic>();
         serverBuilder.AddScopedLogic<InteractionComponentLogic>();

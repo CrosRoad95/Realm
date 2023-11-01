@@ -14,11 +14,10 @@ public sealed class JobsStatsCommand : IInGameCommand
         _chatBox = chatBox;
     }
 
-    public async Task Handle(Entity entity, CommandArguments args)
+    public async Task Handle(RealmPlayer player, CommandArguments args)
     {
-        var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();
-        var userComponent = entity.GetRequiredComponent<UserComponent>();
+        var userComponent = player.Components.GetRequiredComponent<UserComponent>();
         var stats = await _jobService.TryGetTotalUserJobStatistics(userComponent.Id, 1);
-        _chatBox.OutputTo(entity, $"stats: {stats.Value.points}, time: {stats.Value.timePlayed}");
+        _chatBox.OutputTo(player, $"stats: {stats.Value.points}, time: {stats.Value.timePlayed}");
     }
 }

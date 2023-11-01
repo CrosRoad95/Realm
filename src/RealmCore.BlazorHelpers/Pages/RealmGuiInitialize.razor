@@ -26,7 +26,7 @@
         await _httpContextAccessor.HttpContext.SignInAsync("Cookies", principal);
         if (_httpContextAccessor.HttpContext.User.Identity?.IsAuthenticated ?? false)
         {
-            if(browserGuiService.TryGetEntityByKey(key.ToString() ?? string.Empty, out var entity))
+            if(browserGuiService.TryGetPlayerByKey(key.ToString() ?? string.Empty, out var player))
             {
                 _navigationManager.NavigateTo("/realmGuiInitialized");
             }

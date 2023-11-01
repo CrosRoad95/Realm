@@ -8,7 +8,6 @@ public class OutlineComponentTests
     public void SimpleOutlineComponentShouldWork()
     {
         var entity = new Entity();
-        entity.AddComponent<Transform>();
         entity.AddComponent<TestElementComponent>();
         entity.AddComponent(new OutlineComponent(Color.Red));
     }
@@ -17,10 +16,9 @@ public class OutlineComponentTests
     public void OutlineComponentShouldWork()
     {
         var realmTestingServer = new RealmTestingServer(null);
-        var entityEngine = realmTestingServer.GetRequiredService<IEntityEngine>();
-        var entity = entityEngine.CreateEntity();
+        var elementFactory = realmTestingServer.GetRequiredService<IElementFactory>();
+        var entity = elementFactory.CreateObject();
 
-        entity.AddComponent<Transform>();
         entity.AddComponent<TestElementComponent>();
         entity.AddComponent(new OutlineComponent(Color.Red));
     }

@@ -4,12 +4,12 @@ namespace RealmCore.Server.Services;
 
 internal class BrowserGuiService : IBrowserGuiService
 {
-    private readonly ConcurrentDictionary<string, Entity> _browserEntities = new();
+    private readonly ConcurrentDictionary<string, RealmPlayer> _browserPlayers = new();
 
     private readonly RandomNumberGenerator _randomNumberGenerator;
     private readonly object _lock = new();
     private readonly byte[] _bytes = new byte[64];
-    public event Action<Entity>? Ready;
+    public event Action<RealmPlayer>? Ready;
     public string KeyName => "guiKey";
 
     public BrowserGuiService()
@@ -17,9 +17,9 @@ internal class BrowserGuiService : IBrowserGuiService
         _randomNumberGenerator = RandomNumberGenerator.Create();
     }
 
-    public void RelayEntityLoggedIn(Entity entity)
+    public void RelayPlayerLoggedIn(RealmPlayer realmPlayer)
     {
-        Ready?.Invoke(entity);
+        Ready?.Invoke(realmPlayer);
     }
 
     public string GenerateKey()
@@ -31,33 +31,33 @@ internal class BrowserGuiService : IBrowserGuiService
             return Convert.ToBase64String(_bytes).Replace('+', '-').Replace('/', '_');
         }
     }
-    public void AuthorizeEntity(string key, Entity entity)
+    public void AuthorizePlayer(string key, RealmPlayer realmPlayer)
     {
-        _browserEntities.TryAdd(key, entity);
+        _browserPlayers.TryAdd(key, realmPlayer);
     }
 
-    public void UnauthorizeEntity(Entity entity)
+    public void UnauthorizePlayer(RealmPlayer realmPlayer)
     {
-        var itemsToRemove = _browserEntities.Where(x => x.Value == entity).FirstOrDefault();
+        var itemsToRemove = _browserPlayers.Where(x => x.Value == realmPlayer).FirstOrDefault();
 
-        _browserEntities.TryRemove(itemsToRemove.Key, out var _);
+        _browserPlayers.TryRemove(itemsToRemove.Key, out var _);
     }
     
-    public bool TryGetKeyByEntity(Entity entity, out string? key)
+    public bool TryGetKeyByPlayer(RealmPlayer realmPlayer, out string? key)
     {
-        var browserEntities = _browserEntities.Where(x => x.Value == entity).ToList();
-        if (browserEntities.Count == 0)
+        var browserPlayers = _browserPlayers.Where(x => x.Value == realmPlayer).ToList();
+        if (browserPlayers.Count == 0)
         {
             key = null;
             return false;
         }
-        key = browserEntities[0].Key;
+        key = browserPlayers[0].Key;
         return true;
     }
 
-    public bool TryGetEntityByKey(string key, out Entity? entity)
+    public bool TryGetPlayerByKey(string key, out RealmPlayer? realmPlayer)
     {
-        bool found = _browserEntities.TryGetValue(key, out entity);
+        bool found = _browserPlayers.TryGetValue(key, out realmPlayer);
 
         return found;
     }

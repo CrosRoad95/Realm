@@ -4,8 +4,8 @@ public abstract class SessionComponent : ComponentLifecycle
 {
     private readonly Stopwatch _stopwatch = new();
 
-    public event Action<Entity>? SessionStarted;
-    public event Action<Entity>? SessionEnded;
+    public event Action<SessionComponent>? SessionStarted;
+    public event Action<SessionComponent>? SessionEnded;
 
     public TimeSpan Elapsed => _stopwatch.Elapsed;
 
@@ -21,7 +21,7 @@ public abstract class SessionComponent : ComponentLifecycle
             throw new SessionAlreadyRunningException();
         _stopwatch.Reset();
         _stopwatch.Start();
-        SessionStarted?.Invoke(Entity);
+        SessionStarted?.Invoke(this);
     }
 
     public override void Detach()
@@ -31,7 +31,7 @@ public abstract class SessionComponent : ComponentLifecycle
 
     public void End()
     {
-        SessionEnded?.Invoke(Entity);
+        SessionEnded?.Invoke(this);
         _stopwatch.Stop();
     }
 }

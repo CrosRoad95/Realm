@@ -7,7 +7,7 @@ internal sealed class AdminComponentLogic : ComponentLogic<AdminComponent>
     private readonly IClientInterfaceService _clientInterfaceService;
     private readonly IAdminService _adminService;
 
-    public AdminComponentLogic(IEntityEngine entityEngine, NoClipService noClipService, DebugLog debugLog, IClientInterfaceService clientInterfaceService, IAdminService adminService) : base(entityEngine)
+    public AdminComponentLogic(IElementFactory elementFactory, NoClipService noClipService, DebugLog debugLog, IClientInterfaceService clientInterfaceService, IAdminService adminService) : base(elementFactory)
     {
         _noClipService = noClipService;
         _debugLog = debugLog;
@@ -17,29 +17,29 @@ internal sealed class AdminComponentLogic : ComponentLogic<AdminComponent>
 
     private void HandleNoClipStateChanged(AdminComponent adminComponent, bool enabled)
     {
-        _noClipService.SetEnabledTo(adminComponent.Entity.GetRequiredComponent<PlayerElementComponent>(), enabled);
+        _noClipService.SetEnabledTo((RealmPlayer)adminComponent.Element, enabled);
     }
 
     private void HandleDebugViewStateChanged(AdminComponent adminComponent, bool enabled)
     {
-        _debugLog.SetVisibleTo(adminComponent.Entity.GetRequiredComponent<PlayerElementComponent>(), enabled);
+        _debugLog.SetVisibleTo((RealmPlayer)adminComponent.Element, enabled);
     }
 
     private void HandleDevelopmentModeStateChanged(AdminComponent adminComponent, bool enabled)
     {
-        _clientInterfaceService.SetDevelopmentModeEnabled(adminComponent.Entity.GetRequiredComponent<PlayerElementComponent>(), enabled);
+        _clientInterfaceService.SetDevelopmentModeEnabled((RealmPlayer)adminComponent.Element, enabled);
     }
 
     private void HandleInteractionDebugRenderingStateChanged(AdminComponent adminComponent, bool enabled)
     {
-        _clientInterfaceService.SetFocusableRenderingEnabled(adminComponent.Entity.GetRequiredComponent<PlayerElementComponent>(), enabled);
+        _clientInterfaceService.SetFocusableRenderingEnabled((RealmPlayer)adminComponent.Element, enabled);
     }
 
     private void AdminComponent_AdminModeChanged(AdminComponent adminComponent, bool enabled)
     {
-        _adminService.SetAdminModeEnabledForPlayer(adminComponent.Entity.GetRequiredComponent<PlayerElementComponent>(), enabled);
+        _adminService.SetAdminModeEnabledForPlayer((RealmPlayer)adminComponent.Element, enabled);
         if (enabled)
-            _adminService.SetAdminTools(adminComponent.Entity.GetRequiredComponent<PlayerElementComponent>(), adminComponent.AdminTools);
+            _adminService.SetAdminTools((RealmPlayer)adminComponent.Element, adminComponent.AdminTools);
 
     }
 

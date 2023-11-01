@@ -1,7 +1,4 @@
-﻿using Microsoft.AspNetCore.Identity;
-using RealmCore.Persistence.Data;
-
-namespace RealmCore.Tests.Tests.Services;
+﻿namespace RealmCore.Tests.Tests.Services;
 
 public class UsersManagerTests
 {

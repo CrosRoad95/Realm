@@ -48,7 +48,7 @@ internal class TestResourceProvider : IResourceProvider
     }
 }
 
-internal class RealmTestingServer : TestingServer
+internal class RealmTestingServer : TestingServer<RealmTestingPlayer>
 {
     public TestDateTimeProvider TestDateTimeProvider => GetRequiredService<TestDateTimeProvider>();
 

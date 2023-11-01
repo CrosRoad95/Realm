@@ -2,5 +2,5 @@
 
 public interface IUserDataSaver
 {
-    Task SaveAsync(Entity entity);
+    Task SaveAsync(RealmPlayer player);
 }

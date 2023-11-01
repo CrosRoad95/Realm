@@ -14,19 +14,19 @@ public sealed class CreateGroupCommand : IInGameCommand
         _chatBox = chatBox;
     }
 
-    public async Task Handle(Entity entity, CommandArguments args)
+    public async Task Handle(RealmPlayer player, CommandArguments args)
     {
         var name = args.ReadWordOrDefault("default");
         try
         {
             var group = await _groupService.CreateGroup(name, "");
-            await _groupService.AddMember(entity, group.id, 100, "Leader");
+            await _groupService.AddMember(player, group.id, 100, "Leader");
 
-            _chatBox.OutputTo(entity, $"Group: '{name}' has been created");
+            _chatBox.OutputTo(player, $"Group: '{name}' has been created");
         }
         catch (Exception)
         {
-            _chatBox.OutputTo(entity, $"Failed to create group: '{name}'");
+            _chatBox.OutputTo(player, $"Failed to create group: '{name}'");
             throw;
         }
     }

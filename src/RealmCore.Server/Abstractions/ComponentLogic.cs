@@ -2,27 +2,33 @@
 
 public class ComponentLogic<T> where T : IComponent
 {
-    public ComponentLogic(IEntityEngine entityEngine)
+    public ComponentLogic(IElementFactory elementFactory)
     {
-        entityEngine.EntityCreated += HandleEntityCreated;
+        elementFactory.ElementCreated += HandleElementCreated;
     }
 
-    private void HandleEntityCreated(Entity entity)
+    private void HandleElementCreated(Element element)
     {
-        entity.ComponentAdded += HandleComponentAdded;
-        entity.ComponentDetached += HandleComponentDetached;
-        entity.Disposed += HandleDisposed;
-        foreach (var component in entity.Components)
+        if (element is not IComponents hasComponents)
+            return;
+        var components = hasComponents.Components;
+        components.ComponentAdded += HandleComponentAdded;
+        components.ComponentDetached += HandleComponentDetached;
+        element.Destroyed += HandleDestroyed;
+        foreach (var component in components.ComponentsLists)
             if (component is T tComponent)
                 ComponentAdded(tComponent);
     }
 
-    private void HandleDisposed(Entity entity)
+    private void HandleDestroyed(Element element)
     {
-        entity.ComponentAdded -= HandleComponentAdded;
-        entity.ComponentDetached -= HandleComponentDetached;
-        entity.Disposed -= HandleDisposed;
-        foreach (var component in entity.Components)
+        if (element is not IComponents hasComponents)
+            return;
+        var components = hasComponents.Components;
+        components.ComponentAdded -= HandleComponentAdded;
+        components.ComponentDetached -= HandleComponentDetached;
+        element.Destroyed += HandleDestroyed;
+        foreach (var component in components.ComponentsLists)
             if (component is T tComponent)
                 ComponentDetached(tComponent);
     }
@@ -47,33 +53,41 @@ public class ComponentLogic<T1, T2>
     where T1 : IComponent
     where T2 : IComponent
 {
-    public ComponentLogic(IEntityEngine entityEngine)
+    public ComponentLogic(IElementFactory elementFactory)
     {
-        entityEngine.EntityCreated += HandleEntityCreated;
+        elementFactory.ElementCreated += HandleElementCreated;
     }
 
-    private void HandleEntityCreated(Entity entity)
+    private void HandleElementCreated(Element element)
     {
-        entity.ComponentAdded += HandleComponentAdded;
-        entity.ComponentDetached += HandleComponentDetached;
-        entity.Disposed += HandleDisposed;
-        foreach (var component in entity.Components)
+        if (element is not IComponents hasComponents)
+            return;
+        var components = hasComponents.Components;
+
+        components.ComponentAdded += HandleComponentAdded;
+        components.ComponentDetached += HandleComponentDetached;
+        element.Destroyed += HandleDestroyed;
+        foreach (var component in components.ComponentsLists)
             if (component is T1 tComponent)
                 ComponentAdded(tComponent);
-        foreach (var component in entity.Components)
+        foreach (var component in components.ComponentsLists)
             if (component is T2 tComponent)
                 ComponentAdded(tComponent);
     }
 
-    private void HandleDisposed(Entity entity)
+    private void HandleDestroyed(Element element)
     {
-        entity.ComponentAdded -= HandleComponentAdded;
-        entity.ComponentDetached -= HandleComponentDetached;
-        entity.Disposed -= HandleDisposed;
-        foreach (var component in entity.Components)
+        if (element is not IComponents hasComponents)
+            return;
+        var components = hasComponents.Components;
+
+        components.ComponentAdded -= HandleComponentAdded;
+        components.ComponentDetached -= HandleComponentDetached;
+        element.Destroyed -= HandleDestroyed;
+        foreach (var component in components.ComponentsLists)
             if (component is T1 tComponent)
                 ComponentDetached(tComponent);
-        foreach (var component in entity.Components)
+        foreach (var component in components.ComponentsLists)
             if (component is T2 tComponent)
                 ComponentDetached(tComponent);
     }

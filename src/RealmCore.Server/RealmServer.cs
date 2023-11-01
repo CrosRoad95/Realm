@@ -38,9 +38,8 @@ public class MtaDiPlayerServerTempFix<TPlayer> : MtaServer<TPlayer> where TPlaye
 }
 
 
-public class RealmServer : MtaDiPlayerServerTempFix<PlayerElementComponent>, IRealmServer
+public class RealmServer : MtaDiPlayerServerTempFix<RealmPlayer>, IRealmServer
 {
-    public Entity Console { get; private set; } = null!;
     public event Action? ServerStarted;
 
     public RealmServer(IRealmConfigurationProvider realmConfigurationProvider, Action<ServerBuilder>? configureServerBuilder = null) : base(serverBuilder =>
@@ -95,9 +94,8 @@ public class RealmServer : MtaDiPlayerServerTempFix<PlayerElementComponent>, IRe
         int i = 0;
         var saveService = GetRequiredService<ISaveService>();
 
-        var entityEngine = GetRequiredService<IEntityEngine>();
-        var entities = entityEngine.Entities.ToList();
-        foreach (var entity in entities)
+        var elementCollection = GetRequiredService<IElementCollection>();
+        foreach (var entity in elementCollection.GetAll())
         {
             try
             {
@@ -110,7 +108,7 @@ public class RealmServer : MtaDiPlayerServerTempFix<PlayerElementComponent>, IRe
             }
             finally
             {
-                entity.Dispose();
+                entity.Destroy();
             }
         }
         try

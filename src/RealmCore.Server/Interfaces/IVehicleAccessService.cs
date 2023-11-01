@@ -2,8 +2,8 @@
 
 public interface IVehicleAccessService
 {
-    event Func<Entity, Entity, bool>? CanEnter;
-    event Action<Entity, Entity, VehicleAccessControllerComponent>? FailedToEnter;
+    event Func<Ped, RealmVehicle, byte, bool>? CanEnter;
+    event Action<Ped, RealmVehicle, byte, VehicleAccessControllerComponent>? FailedToEnter;
 
-    internal bool InternalCanEnter(Entity pedEntity, Entity vehicleEntity, VehicleAccessControllerComponent? vehicleAccessControllerComponent = null);
+    internal bool InternalCanEnter(Ped ped, RealmVehicle vehicle, byte seat, VehicleAccessControllerComponent? vehicleAccessControllerComponent = null);
 }

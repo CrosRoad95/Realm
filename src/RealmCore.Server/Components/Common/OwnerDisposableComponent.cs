@@ -2,10 +2,10 @@
 
 public class OwnerDisposableComponent : Component
 {
-    public Entity OwningEntity { get; }
+    public Element OwnerElement { get; }
 
-    public OwnerDisposableComponent(Entity owningEntity)
+    public OwnerDisposableComponent(Element ownerElement)
     {
-        OwningEntity = owningEntity;
+        OwnerElement = ownerElement;
     }
 }

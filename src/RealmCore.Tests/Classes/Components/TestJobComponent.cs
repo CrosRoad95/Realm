@@ -1,19 +1,18 @@
 ﻿using RealmCore.Server.Components.Object;
 using RealmCore.Server.Components.Players.Jobs;
 using RealmCore.Server.Concepts.Objectives;
-using SlipeServer.Server.Elements;
 
 namespace RealmCore.Tests.Classes.Components;
 
 internal class TestJobComponent : JobSessionComponent
 {
-    private readonly IEntityFactory _entityFactory;
+    private readonly IElementFactory _elementFactory;
 
     public override short JobId => 1;
 
-    public TestJobComponent(IEntityFactory entityFactory)
+    public TestJobComponent(IElementFactory entityFactory)
     {
-        _entityFactory = entityFactory;
+        _elementFactory = entityFactory;
     }
 
     public void CreateObjectives()
@@ -22,7 +21,7 @@ internal class TestJobComponent : JobSessionComponent
         objective.AddBlip(BlipIcon.North);
         objective.Completed += ObjectiveACompleted;
 
-        var objectEntity = _entityFactory.CreateObject(SlipeServer.Server.Enums.ObjectModel.Gunbox, new Vector3(379.00f, -102.77f, 1.24f), Vector3.Zero);
+        var objectEntity = _elementFactory.CreateObject(SlipeServer.Server.Enums.ObjectModel.Gunbox, new Vector3(379.00f, -102.77f, 1.24f), Vector3.Zero);
         objectEntity.AddComponent<LiftableWorldObjectComponent>();
         var objective2 = AddObjective(new TransportEntityObjective(objectEntity, new Vector3(379.00f, -112.77f, 2.0f)));
         objective2.Completed += ObjectiveBCompleted;
@@ -35,17 +34,17 @@ internal class TestJobComponent : JobSessionComponent
 
     private void ObjectiveACompleted(Objective objective, object? data = null)
     {
-        Entity.GetRequiredComponent<JobStatisticsComponent>().AddPoints(1, 1);
+        Element.GetRequiredComponent<JobStatisticsComponent>().AddPoints(1, 1);
     }
 
     private void ObjectiveBCompleted(Objective objective, object? data = null)
     {
-        Entity.GetRequiredComponent<JobStatisticsComponent>().AddPoints(1, 2);
+        Element.GetRequiredComponent<JobStatisticsComponent>().AddPoints(1, 2);
     }
 
     private void ObjectiveCCompleted(Objective objective, object? data = null)
     {
-        Entity.GetRequiredComponent<JobStatisticsComponent>().AddPoints(1, 1);
+        Element.GetRequiredComponent<JobStatisticsComponent>().AddPoints(1, 1);
     }
 
 }

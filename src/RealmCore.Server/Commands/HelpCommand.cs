@@ -12,7 +12,7 @@ internal class HelpCommand : ICommand
         _logger = logger;
     }
 
-    public Task Handle(Entity entity, CommandArguments args)
+    public Task Handle(RealmPlayer player, CommandArguments args)
     {
         _logger.LogInformation("Commands:");
         _logger.LogInformation("\t{commands}", string.Join('\t', _commands.Select(x => x.Type.GetCustomAttribute<CommandNameAttribute>()!.Name)));

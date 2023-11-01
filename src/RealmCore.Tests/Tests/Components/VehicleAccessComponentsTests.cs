@@ -9,7 +9,7 @@ public class VehicleAccessComponentsTests
     {
         var realmTestingServer = new RealmTestingServer(null);
         var entityHelper = new EntityHelper(realmTestingServer);
-        var entityFactory = realmTestingServer.GetRequiredService<IEntityFactory>();
+        var entityFactory = realmTestingServer.GetRequiredService<IElementFactory>();
 
         var player = entityHelper.CreatePlayerEntity();
         var vehicle = entityFactory.CreateVehicle(404, Vector3.Zero, Vector3.Zero);
@@ -23,7 +23,7 @@ public class VehicleAccessComponentsTests
     {
         var realmTestingServer = new RealmTestingServer(null);
         var entityHelper = new EntityHelper(realmTestingServer);
-        var entityFactory = realmTestingServer.GetRequiredService<IEntityFactory>();
+        var entityFactory = realmTestingServer.GetRequiredService<IElementFactory>();
 
         var player1 = entityHelper.CreatePlayerEntity();
         var player2 = entityHelper.CreatePlayerEntity();
@@ -42,7 +42,7 @@ public class VehicleAccessComponentsTests
     {
         var realmTestingServer = new RealmTestingServer(null);
         var entityHelper = new EntityHelper(realmTestingServer);
-        var entityFactory = realmTestingServer.GetRequiredService<IEntityFactory>();
+        var entityFactory = realmTestingServer.GetRequiredService<IElementFactory>();
 
         var player = entityHelper.CreatePlayerEntity();
         var vehicle = entityFactory.CreateVehicle(404, Vector3.Zero, Vector3.Zero);
@@ -58,7 +58,7 @@ public class VehicleAccessComponentsTests
     {
         var realmTestingServer = new RealmTestingServer(null);
         var entityHelper = new EntityHelper(realmTestingServer);
-        var entityFactory = realmTestingServer.GetRequiredService<IEntityFactory>();
+        var entityFactory = realmTestingServer.GetRequiredService<IElementFactory>();
 
         var player = entityHelper.CreatePlayerEntity();
         var vehicle = entityFactory.CreateVehicle(404, Vector3.Zero, Vector3.Zero);
@@ -74,7 +74,7 @@ public class VehicleAccessComponentsTests
     {
         var realmTestingServer = new RealmTestingServer(null);
         var entityHelper = new EntityHelper(realmTestingServer);
-        var entityFactory = realmTestingServer.GetRequiredService<IEntityFactory>();
+        var entityFactory = realmTestingServer.GetRequiredService<IElementFactory>();
 
         var player1 = entityHelper.CreatePlayerEntity();
         var player2 = entityHelper.CreatePlayerEntity();

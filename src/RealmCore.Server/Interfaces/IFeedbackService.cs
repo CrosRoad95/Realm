@@ -2,9 +2,9 @@
 
 public interface IFeedbackService
 {
-    Task<bool> AddOpinion(Entity playerEntity, int opinionId, string opinion);
-    Task ChangeLastRating(Entity playerEntity, int ratingId, int rating);
-    Task<DateTime?> GetLastOpinionDateTime(Entity playerEntity, int opinionId);
-    Task<(int, DateTime)?> GetLastRating(Entity playerEntity, int ratingId);
-    Task<bool> Rate(Entity playerEntity, int ratingId, int rating);
+    Task<bool> AddOpinion(RealmPlayer player, int opinionId, string opinion);
+    Task ChangeLastRating(RealmPlayer player, int ratingId, int rating);
+    Task<DateTime?> GetLastOpinionDateTime(RealmPlayer player, int opinionId);
+    Task<(int, DateTime)?> GetLastRating(RealmPlayer player, int ratingId);
+    Task<bool> Rate(RealmPlayer player, int ratingId, int rating);
 }

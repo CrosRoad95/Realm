@@ -1,20 +1,18 @@
-﻿using SlipeServer.Server.Elements;
-
-namespace RealmCore.Tests.Classes.Components;
+﻿namespace RealmCore.Tests.Classes.Components;
 
 public class TestElement : Element
 {
 
 }
 
-internal class TestElementComponent : ElementComponent
+internal class TestElementComponent : IComponent
 {
-    private readonly TestElement _testElement;
+    private Element _testElement;
 
     public TestElementComponent()
     {
         _testElement = new TestElement();
     }
 
-    internal override Element Element => _testElement;
+    public Element Element { get => _testElement; set => _testElement = value; }
 }

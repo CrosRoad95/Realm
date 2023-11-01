@@ -37,7 +37,7 @@ public abstract class JobSessionComponent : SessionComponent, IUpdateCallback
 
     protected TObjective AddObjective<TObjective>(TObjective objective) where TObjective : Objective
     {
-        objective.Entity = Entity;
+        objective.Player = (RealmPlayer)Element;
         lock (_objectivesLock)
             _objectives.Add(objective);
 
@@ -58,8 +58,8 @@ public abstract class JobSessionComponent : SessionComponent, IUpdateCallback
 
     private void HandleCompleted(Objective objective, object? data = null)
     {
-        if (data is Entity entity)
-            entity.Dispose();
+        if (data is Element element)
+            element.Destroy();
 
         ObjectiveCompleted?.Invoke(this, objective);
         objective.Dispose();

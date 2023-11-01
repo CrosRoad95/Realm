@@ -1,6 +1,6 @@
 ﻿namespace RealmCore.Server.Rules;
 
-public sealed class MustBePlayerInFractionRule : IEntityRule
+public sealed class MustBePlayerInFractionRule : IElementRule
 {
     private readonly int _fractionId;
 
@@ -9,11 +9,12 @@ public sealed class MustBePlayerInFractionRule : IEntityRule
         _fractionId = fractionId;
     }
 
-    public bool Check(Entity entity)
+    public bool Check(Element element)
     {
-        if (!entity.HasComponent<PlayerTagComponent>())
-            return false;
-
-        return entity.Components.OfType<FractionMemberComponent>().Where(x => x.FractionId == _fractionId).Any();
+        if(element is RealmPlayer realmPlayer)
+        {
+            return realmPlayer.Components.ComponentsLists.OfType<FractionMemberComponent>().Where(x => x.FractionId == _fractionId).Any();
+        }
+        return false;
     }
 }

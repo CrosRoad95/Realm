@@ -40,7 +40,7 @@ public class VehicleUpgradeComponentTests
     public void AddUpgradeShouldWork(int upgradeId, int expectedMaxVelocity)
     {
         #region Arrange
-        var vehicleEntity = _realmTestingServer.GetRequiredService<IEntityFactory>().CreateVehicle(404, Vector3.Zero, Vector3.Zero);
+        var vehicleEntity = _realmTestingServer.GetRequiredService<IElementFactory>().CreateVehicle(404, Vector3.Zero, Vector3.Zero);
 
         var vehicleUpgradesComponent = vehicleEntity.AddComponent<VehicleUpgradesComponent>();
         #endregion
@@ -60,7 +60,7 @@ public class VehicleUpgradeComponentTests
     public void AddUniqueUpgradeShouldAddOnlyOneInstanceOfUpgrade(int upgradeId, int expectedMaxVelocity)
     {
         #region Act
-        var vehicleEntity = _realmTestingServer.GetRequiredService<IEntityFactory>().CreateVehicle(404, Vector3.Zero, Vector3.Zero);
+        var vehicleEntity = _realmTestingServer.GetRequiredService<IElementFactory>().CreateVehicle(404, Vector3.Zero, Vector3.Zero);
         var vehicleUpgradesComponent = vehicleEntity.AddComponent<VehicleUpgradesComponent>();
         var resultA = vehicleUpgradesComponent.AddUniqueUpgrade(upgradeId);
         var resultB = vehicleUpgradesComponent.AddUniqueUpgrade(upgradeId);
@@ -77,7 +77,7 @@ public class VehicleUpgradeComponentTests
     public void UpgradesCanBeRemoved()
     {
         #region Act
-        var vehicleEntity = _realmTestingServer.GetRequiredService<IEntityFactory>().CreateVehicle(404, Vector3.Zero, Vector3.Zero);
+        var vehicleEntity = _realmTestingServer.GetRequiredService<IElementFactory>().CreateVehicle(404, Vector3.Zero, Vector3.Zero);
         var vehicleUpgradesComponent = vehicleEntity.AddComponent<VehicleUpgradesComponent>();
         vehicleUpgradesComponent.AddUpgrade(1000000);
         vehicleUpgradesComponent.RemoveUpgrade(1000000);
@@ -92,7 +92,7 @@ public class VehicleUpgradeComponentTests
     public void MultipleUpgradesOfSameTypeCanBeAdded()
     {
         #region Act
-        var vehicleEntity = _realmTestingServer.GetRequiredService<IEntityFactory>().CreateVehicle(404, Vector3.Zero, Vector3.Zero);
+        var vehicleEntity = _realmTestingServer.GetRequiredService<IElementFactory>().CreateVehicle(404, Vector3.Zero, Vector3.Zero);
         var vehicleUpgradesComponent = vehicleEntity.AddComponent<VehicleUpgradesComponent>();
         vehicleUpgradesComponent.AddUpgrades(Enumerable.Range(1, 3).Select(x => 1000000));
         #endregion

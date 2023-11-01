@@ -3,24 +3,24 @@
 internal class FormContext : IFormContext
 {
     private bool _responded = false;
-    private readonly Player _player;
+    private readonly RealmPlayer _player;
     private readonly string _formName;
     private readonly LuaValue _data;
     private readonly IGuiSystemService _GuiSystemService;
-    private readonly IEntityEngine _entityEngine;
+    private readonly IElementFactory _elementFactory;
     private readonly IServiceProvider _serviceProvider;
 
     public string FormName => _formName;
 
-    public Entity Entity => _player.UpCast();
+    public RealmPlayer Player => _player;
 
-    public FormContext(Player player, string formName, LuaValue data, IGuiSystemService GuiSystemService, IEntityEngine entityEngine, IServiceProvider serviceProvider)
+    public FormContext(RealmPlayer player, string formName, LuaValue data, IGuiSystemService GuiSystemService, IElementFactory elementFactory, IServiceProvider serviceProvider)
     {
         _player = player;
         _formName = formName;
         _data = data;
         _GuiSystemService = GuiSystemService;
-        _entityEngine = entityEngine;
+        _elementFactory = elementFactory;
         _serviceProvider = serviceProvider;
     }
 

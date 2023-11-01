@@ -1,5 +1,5 @@
 ﻿using RealmCore.Sample.Components.Vehicles;
-using RealmCore.Server.Components.Elements.Abstractions;
+using RealmCore.Server.Components.Abstractions;
 using RealmCore.Server.Enums;
 using SlipeServer.Server.Elements.Enums;
 
@@ -7,16 +7,14 @@ namespace RealmCore.Sample.Logic;
 
 internal sealed class PlayerGameplayLogic : ComponentLogic<UserComponent>
 {
-    private readonly IEntityEngine _entityEntine;
     private readonly IServiceProvider _serviceProvider;
     private readonly ChatBox _chatBox;
     private readonly VehicleUpgradeRegistry _vehicleUpgradeRegistry;
     private readonly VehicleEnginesRegistry _vehicleEnginesRegistry;
     private readonly ILogger<PlayerGameplayLogic> _logger;
 
-    public PlayerGameplayLogic(IEntityEngine entityEntine, ILogger<PlayerGameplayLogic> logger, IServiceProvider serviceProvider, ChatBox chatBox, VehicleUpgradeRegistry vehicleUpgradeRegistry, VehicleEnginesRegistry vehicleEnginesRegistry) : base(entityEntine)
+    public PlayerGameplayLogic(ILogger<PlayerGameplayLogic> logger, IServiceProvider serviceProvider, ChatBox chatBox, VehicleUpgradeRegistry vehicleUpgradeRegistry, VehicleEnginesRegistry vehicleEnginesRegistry, IElementFactory elementFactory) : base(elementFactory)
     {
-        _entityEntine = entityEntine;
         _serviceProvider = serviceProvider;
         _chatBox = chatBox;
         _vehicleUpgradeRegistry = vehicleUpgradeRegistry;
@@ -26,47 +24,48 @@ internal sealed class PlayerGameplayLogic : ComponentLogic<UserComponent>
 
     protected override void ComponentAdded(UserComponent userComponent)
     {
-        var playerElementComponent = userComponent.Entity.GetRequiredComponent<PlayerElementComponent>();
-        playerElementComponent.FocusedEntityChanged += HandleFocusedEntityChanged;
+        var playerElementComponent = (RealmPlayer)userComponent.Element;
+        playerElementComponent.FocusedElementChanged += HandleFocusedEntityChanged;
         playerElementComponent.SetBindAsync("x", HandleInteract);
     }
 
-    private async Task HandleInteract(Entity playerEntity, KeyState keyState)
+    private async Task HandleInteract(RealmPlayer player, KeyState keyState)
     {
-        if (playerEntity.TryGetComponent(out AttachedEntityComponent attachedEntityComponent))
+        var components = player.Components;
+        if (components.TryGetComponent(out AttachedElementComponent attachedEntityComponent))
         {
-            await playerEntity.GetRequiredComponent<PlayerElementComponent>().DoAnimationAsync(Animation.CarryPutDown);
+            await player.DoAnimationAsync(Animation.CarryPutDown);
 
-            if (attachedEntityComponent.TryDetach(out Entity? detachedEntity) &&
-                detachedEntity != null &&
-                detachedEntity.GetRequiredComponent<LiftableWorldObjectComponent>().TryDrop())
+            if (attachedEntityComponent.TryDetach(out Element? detachedElement) &&
+                detachedElement is IComponents elementComponents &&
+                elementComponents.Components.GetRequiredComponent<LiftableWorldObjectComponent>().TryDrop())
             {
-                detachedEntity.Transform.Position = playerEntity.Transform.Position + playerEntity.Transform.Forward * 1.0f - new Vector3(0, 0, 0.55f);
-                detachedEntity.Transform.Rotation = new Vector3
+                detachedElement.Position = player.Position + player.Forward * 1.0f - new Vector3(0, 0, 0.55f);
+                detachedElement.Rotation = new Vector3
                 {
                     X = 0,
                     Y = 0,
-                    Z = playerEntity.Transform.Rotation.Z
+                    Z = player.Rotation.Z
                 };
             }
         }
-        else if (playerEntity.TryGetComponent(out CurrentInteractEntityComponent currentInteractEntityComponent))
+        else if (player.Components.TryGetComponent(out CurrentInteractElementComponent currentInteractEntityComponent))
         {
-            var currentInteractEntity = currentInteractEntityComponent.CurrentInteractEntity;
-            if (currentInteractEntity == null)
+            var element = currentInteractEntityComponent.CurrentInteractElement;
+            var currentInteractElement = currentInteractEntityComponent.CurrentInteractElement as IComponents;
+            if (currentInteractElement == null)
                 return;
 
-            if (currentInteractEntity.TryGetComponent(out InteractionComponent interactionComponent) && playerEntity.DistanceTo(currentInteractEntity) < interactionComponent.MaxInteractionDistance)
+            if (currentInteractElement.TryGetComponent(out InteractionComponent interactionComponent) && player.DistanceTo(element) < interactionComponent.MaxInteractionDistance)
             {
-                var playerElementComponent = playerEntity.GetRequiredComponent<PlayerElementComponent>();
                 switch (interactionComponent)
                 {
                     case LiftableWorldObjectComponent liftableWorldObjectComponent when keyState == KeyState.Down:
-                        if (playerEntity.IsLookingAt(currentInteractEntity) && liftableWorldObjectComponent.TryLift(playerEntity))
+                        if (player.IsLookingAt(element) && liftableWorldObjectComponent.TryLift(player))
                         {
-                            await playerElementComponent.DoAnimationAsync(Animation.CarryLiftUp);
-                            playerElementComponent.DoAnimation(Animation.StartCarry);
-                            playerEntity.AddComponent(new AttachedEntityComponent(currentInteractEntity, SlipeServer.Packets.Enums.BoneId.LeftHand, new Vector3(0.2f, 0.2f, -0), new Vector3(0, -20, 0)));
+                            await player.DoAnimationAsync(Animation.CarryLiftUp);
+                            player.DoAnimation(Animation.StartCarry);
+                            player.Components.AddComponent(new AttachedElementComponent(element, SlipeServer.Packets.Enums.BoneId.LeftHand, new Vector3(0.2f, 0.2f, -0), new Vector3(0, -20, 0)));
                         }
                         break;
                     case DurationBasedHoldInteractionComponent durationBasedHoldInteractionComponent:
@@ -80,9 +79,9 @@ internal sealed class PlayerGameplayLogic : ComponentLogic<UserComponent>
                             };
                             try
                             {
-                                if (await durationBasedHoldInteractionComponent.BeginInteraction(playerEntity, token.Token))
+                                if (await durationBasedHoldInteractionComponent.BeginInteraction(player, token.Token))
                                 {
-                                    _chatBox.OutputTo(playerEntity, "okk");
+                                    _chatBox.OutputTo(player, "okk");
                                     _logger.LogInformation("Interaction completed");
                                 }
                                 else
@@ -97,7 +96,7 @@ internal sealed class PlayerGameplayLogic : ComponentLogic<UserComponent>
                         }
                         else
                         {
-                            if (durationBasedHoldInteractionComponent.EndInteraction(playerEntity))
+                            if (durationBasedHoldInteractionComponent.EndInteraction(player))
                             {
                                 _logger.LogInformation("Interaction ended");
                             }
@@ -114,39 +113,40 @@ internal sealed class PlayerGameplayLogic : ComponentLogic<UserComponent>
         }
     }
 
-    private void HandleFocusedEntityChanged(Entity playerEntity, Entity? entity)
+    private void HandleFocusedEntityChanged(RealmPlayer player, Element? element)
     {
-        if (entity != null)
+        if (element is IComponents components)
         {
-            if (entity.TryGetComponent(out VehicleForSaleComponent vehicleForSaleComponent))
+            if (components.Components.TryGetComponent(out VehicleForSaleComponent vehicleForSaleComponent))
             {
-                if (!playerEntity.HasComponent<GuiComponent>())
+                if (!player.Components.HasComponent<GuiComponent>())
                 {
-                    var vehicleName = entity.GetRequiredComponent<VehicleElementComponent>().Name;
-                    playerEntity.AddComponent(new BuyVehicleGuiComponent(vehicleName, vehicleForSaleComponent.Price)).Bought = async () =>
+                    var vehicle = ((RealmVehicle)element);
+                    var vehicleName = ((RealmVehicle)element).Name;
+                    player.Components.AddComponent(new BuyVehicleGuiComponent(vehicleName, vehicleForSaleComponent.Price)).Bought = async () =>
                     {
-                        playerEntity.TryDestroyComponent<BuyVehicleGuiComponent>();
-                        if (entity.TryDestroyComponent<VehicleForSaleComponent>())
+                        player.Components.TryDestroyComponent<BuyVehicleGuiComponent>();
+                        if (vehicle.Components.TryDestroyComponent<VehicleForSaleComponent>())
                         {
-                            await _serviceProvider.GetRequiredService<IVehiclesService>().ConvertToPrivateVehicle(entity);
-                            entity.GetRequiredComponent<PrivateVehicleComponent>().Access.AddAsOwner(playerEntity);
-                            entity.AddComponent<VehicleUpgradesComponent>();
-                            entity.AddComponent(new MileageCounterComponent());
-                            entity.AddComponent(new FuelComponent(1, 20, 20, 0.01, 2)).Active = true;
+                            await _serviceProvider.GetRequiredService<IVehiclesService>().ConvertToPrivateVehicle(vehicle);
+                            vehicle.Components.GetRequiredComponent<PrivateVehicleComponent>().Access.AddAsOwner(player);
+                            vehicle.Components.AddComponent<VehicleUpgradesComponent>();
+                            vehicle.Components.AddComponent(new MileageCounterComponent());
+                            vehicle.Components.AddComponent(new FuelComponent(1, 20, 20, 0.01, 2)).Active = true;
                         }
                     };
                 }
             }
-            else if (entity.TryGetComponent(out InteractionComponent interactionComponent))
+            else if (components.Components.TryGetComponent(out InteractionComponent interactionComponent))
             {
-                playerEntity.TryDestroyComponent<CurrentInteractEntityComponent>();
-                playerEntity.AddComponent(new CurrentInteractEntityComponent(entity));
+                player.Components.TryDestroyComponent<CurrentInteractElementComponent>();
+                player.Components.AddComponent(new CurrentInteractElementComponent(element));
             }
         }
         else
         {
-            playerEntity.TryDestroyComponent<CurrentInteractEntityComponent>();
-            playerEntity.TryDestroyComponent<BuyVehicleGuiComponent>();
+            player.Components.TryDestroyComponent<CurrentInteractElementComponent>();
+            player.Components.TryDestroyComponent<BuyVehicleGuiComponent>();
         }
     }
 }

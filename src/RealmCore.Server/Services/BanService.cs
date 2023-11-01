@@ -17,34 +17,31 @@ internal sealed class BanService : IBanService
         _dateTimeProvider = dateTimeProvider;
     }
 
-    public async Task<BanDTO> BanUser(Entity entity, DateTime? until = null, string? reason = null, string? responsible = null, int type = 0, CancellationToken cancellationToken = default)
+    public async Task<BanDTO> BanUser(RealmPlayer player, DateTime? until = null, string? reason = null, string? responsible = null, int type = 0, CancellationToken cancellationToken = default)
     {
-        var userComponent = entity.GetRequiredComponent<UserComponent>();
+        var userComponent = player.Components.GetRequiredComponent<UserComponent>();
         return Map(await _banRepository.CreateBanForUser(userComponent.Id, until, reason, responsible, type, cancellationToken));
     }
 
-    public async Task<BanDTO> BanPlayer(Entity entity, DateTime? until = null, string? reason = null, string? responsible = null, int type = 0, CancellationToken cancellationToken = default)
+    public async Task<BanDTO> BanPlayer(RealmPlayer player, DateTime? until = null, string? reason = null, string? responsible = null, int type = 0, CancellationToken cancellationToken = default)
     {
-        var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();
-        var serial = playerElementComponent.Client.GetSerial();
+        var serial = player.Client.GetSerial();
         return Map(await _banRepository.CreateBanForSerial(serial, until, reason, responsible, type, cancellationToken));
     }
 
-    public async Task<BanDTO> Ban(Entity entity, DateTime? until = null, string? reason = null, string? responsible = null, int type = 0, CancellationToken cancellationToken = default)
+    public async Task<BanDTO> Ban(RealmPlayer player, DateTime? until = null, string? reason = null, string? responsible = null, int type = 0, CancellationToken cancellationToken = default)
     {
-        var userComponent = entity.GetRequiredComponent<UserComponent>();
-        var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();
-        var serial = playerElementComponent.Client.GetSerial();
+        var userComponent = player.Components.GetRequiredComponent<UserComponent>();
+        var serial = player.Client.GetSerial();
         var banDTO = Map(await _banRepository.CreateBanForUserIdAndSerial(userComponent.Id, serial, until, reason, responsible, type, cancellationToken));
         Banned?.Invoke(banDTO);
         return banDTO;
     }
 
-    public async Task RemoveBan(Entity entity, int? type = null, CancellationToken cancellationToken = default)
+    public async Task RemoveBan(RealmPlayer player, int? type = null, CancellationToken cancellationToken = default)
     {
-        var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();
-        var serial = playerElementComponent.Client.GetSerial();
-        if (entity.TryGetComponent(out UserComponent userComponent))
+        var serial = player.Client.GetSerial();
+        if (player.Components.TryGetComponent(out UserComponent userComponent))
         {
             var deletedBansIds = await _banRepository.DeleteByUserIdOrSerial(userComponent.Id, serial, type, cancellationToken);
             foreach (var banId in deletedBansIds)
@@ -63,13 +60,12 @@ internal sealed class BanService : IBanService
         }
     }
 
-    public async Task<Bans> GetBans(Entity entity, int? type = null, CancellationToken cancellationToken = default)
+    public async Task<Bans> GetBans(RealmPlayer player, int? type = null, CancellationToken cancellationToken = default)
     {
-        var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();
         List<BanData> bansData;
 
-        var serial = playerElementComponent.Client.Serial ?? throw new InvalidOperationException();
-        if (entity.TryGetComponent(out UserComponent userComponent))
+        var serial = player.Client.GetSerial();
+        if (player.Components.TryGetComponent(out UserComponent userComponent))
         {
             bansData = await _banRepository.GetBansByUserIdOrSerial(userComponent.Id, serial, _dateTimeProvider.Now, type, cancellationToken);
         }
@@ -102,9 +98,9 @@ internal sealed class BanService : IBanService
         return new(bansData.Select(Map).ToList());
     }
 
-    public async Task<bool> IsBanned(Entity entity, int? type = null, CancellationToken cancellationToken = default)
+    public async Task<bool> IsBanned(RealmPlayer player, int? type = null, CancellationToken cancellationToken = default)
     {
-        if (entity.TryGetComponent(out UserComponent userComponent))
+        if (player.Components.TryGetComponent(out UserComponent userComponent))
         {
             var bans = await _banRepository.GetBansByUserId(userComponent.Id, _dateTimeProvider.Now, type, cancellationToken);
             return bans.Count > 0;

@@ -19,9 +19,9 @@ public sealed class RealmCommandService
     {
         public override bool IsAsync => false;
 
-        internal Action<Entity, CommandArguments> Callback { get; }
+        internal Action<RealmPlayer, CommandArguments> Callback { get; }
 
-        public SyncCommandInfo(Action<Entity, CommandArguments> callback)
+        public SyncCommandInfo(Action<RealmPlayer, CommandArguments> callback)
         {
             Callback = callback;
         }
@@ -30,9 +30,9 @@ public sealed class RealmCommandService
     internal class AsyncCommandInfo : CommandInfo
     {
         public override bool IsAsync => true;
-        internal Func<Entity, CommandArguments, Task> Callback { get; }
+        internal Func<RealmPlayer, CommandArguments, Task> Callback { get; }
 
-        public AsyncCommandInfo(Func<Entity, CommandArguments, Task> callback)
+        public AsyncCommandInfo(Func<RealmPlayer, CommandArguments, Task> callback)
         {
             Callback = callback;
         }
@@ -76,7 +76,7 @@ public sealed class RealmCommandService
         }
     }
 
-    public void AddAsyncCommandHandler(string commandName, Func<Entity, CommandArguments, Task> callback, string[]? requiredPolicies = null, string? description = null, string? usage = null, string? category = null)
+    public void AddAsyncCommandHandler(string commandName, Func<RealmPlayer, CommandArguments, Task> callback, string[]? requiredPolicies = null, string? description = null, string? usage = null, string? category = null)
     {
         CheckIfCommandExists(commandName);
 
@@ -97,7 +97,7 @@ public sealed class RealmCommandService
             _logger.LogInformation("Created async command {commandName}", commandName);
     }
 
-    public void AddCommandHandler(string commandName, Action<Entity, CommandArguments> callback, string[]? requiredPolicies = null, string? description = null, string? usage = null, string? category = null)
+    public void AddCommandHandler(string commandName, Action<RealmPlayer, CommandArguments> callback, string[]? requiredPolicies = null, string? description = null, string? usage = null, string? category = null)
     {
         CheckIfCommandExists(commandName);
 
@@ -124,17 +124,16 @@ public sealed class RealmCommandService
         if (!_commands.TryGetValue(commandText, out var commandInfo))
             return;
 
-        var player = args.Player;
-        var entity = player.UpCast();
+        var player = (RealmPlayer)args.Player;
 
-        if (!entity.TryGetComponent<UserComponent>(out var userComponent) || !entity.TryGetComponent<PlayerElementComponent>(out var playerElementComponent))
+        if (!player.Components.TryGetComponent(out UserComponent userComponent))
             return;
 
         var activity = new Activity("CommandHandler");
         activity.Start();
         var start = Stopwatch.GetTimestamp();
 
-        using var _ = _logger.BeginEntity(entity);
+        using var _ = _logger.BeginElement(player);
         using var _commandContextScope = _logger.BeginScope(new Dictionary<string, object>
         {
             ["commandText"] = commandText,
@@ -156,42 +155,42 @@ public sealed class RealmCommandService
         {
             var commandArguments = new CommandArguments(args.Arguments, ((RealmPlayer)args.Player).ServiceProvider);
             if (userComponent.HasClaim("commandsNoLimit"))
-                commandInfo.Callback(entity, commandArguments);
+                commandInfo.Callback(player, commandArguments);
             else
                 _policyDrivenCommandExecutor.Execute(() =>
                 {
-                    commandInfo.Callback(entity, commandArguments);
+                    commandInfo.Callback(player, commandArguments);
                 }, userComponent.Id.ToString());
         }
         catch (RateLimitRejectedException ex)
         {
-            _chatBox.OutputTo(entity, "Zbyt szybko wysyłasz komendy. Poczekaj chwilę.");
+            _chatBox.OutputTo(player, "Zbyt szybko wysyłasz komendy. Poczekaj chwilę.");
             _logger.LogError(ex, "Rate limit exception thrown while executing command {commandText} with arguments {commandArguments}", commandText, args.Arguments);
         }
         catch (CommandArgumentException ex)
         {
             if (ex.Argument != null)
             {
-                _chatBox.OutputTo(entity, $"Wystąpił błąd podczas wykonywania komendy '{commandText}'");
+                _chatBox.OutputTo(player, $"Wystąpił błąd podczas wykonywania komendy '{commandText}'");
                 if (string.IsNullOrWhiteSpace(ex.Argument))
-                    _chatBox.OutputTo(entity, $"Argument {ex.Index} jest niepoprawny ponieważ: {ex.Message}");
+                    _chatBox.OutputTo(player, $"Argument {ex.Index} jest niepoprawny ponieważ: {ex.Message}");
                 else
                     if(ex.Message != null)
                     {
-                        _chatBox.OutputTo(entity, $"Argument {ex.Index} '{ex.Argument}' jest niepoprawny ponieważ: {ex.Message}");
+                        _chatBox.OutputTo(player, $"Argument {ex.Index} '{ex.Argument}' jest niepoprawny ponieważ: {ex.Message}");
                     }
                     else
-                        _chatBox.OutputTo(entity, $"Argument {ex.Index} '{ex.Argument}' jest niepoprawny.");
+                        _chatBox.OutputTo(player, $"Argument {ex.Index} '{ex.Argument}' jest niepoprawny.");
             }
             else
             {
-                _chatBox.OutputTo(entity, $"Wystąpił błąd podczas wykonywania komendy '{commandText}'. {ex.Message}");
+                _chatBox.OutputTo(player, $"Wystąpił błąd podczas wykonywania komendy '{commandText}'. {ex.Message}");
             }
             _logger.LogWarning("Command argument exception was thrown while executing command {commandText} with arguments {commandArguments}, argument index: {argumentIndex}", commandText, args.Arguments, ex.Index);
         }
         catch (Exception ex)
         {
-            _chatBox.OutputTo(entity, "Wystąpił nieznany błąd. Jeśli się powtórzy zgłoś się do administracji.");
+            _chatBox.OutputTo(player, "Wystąpił nieznany błąd. Jeśli się powtórzy zgłoś się do administracji.");
             _logger.LogError(ex, "Exception thrown while executing command {commandText} with arguments {commandArguments}", commandText, args.Arguments);
         }
         finally
@@ -220,18 +219,16 @@ public sealed class RealmCommandService
         if (!_asyncCommands.TryGetValue(commandText, out var commandInfo))
             return;
 
-        var player = args.Player;
-        var entity = player.UpCast();
+        var player = (RealmPlayer)args.Player;
 
-
-        if (!entity.TryGetComponent<UserComponent>(out var userComponent) || !entity.TryGetComponent<PlayerElementComponent>(out var playerElementComponent))
+        if (!player.Components.TryGetComponent(out UserComponent userComponent))
             return;
 
         var activity = new Activity("CommandHandler");
         activity.Start();
         var start = Stopwatch.GetTimestamp();
 
-        using var _ = _logger.BeginEntity(entity);
+        using var _ = _logger.BeginElement(player);
         using var _commandContextScope = _logger.BeginScope(new Dictionary<string, object>
         {
             ["commandText"] = commandText,
@@ -248,42 +245,42 @@ public sealed class RealmCommandService
                 return;
             }
         }
-        _logger.LogInformation("{player} executed command {commandText} with arguments {commandArguments}.", entity);
+        _logger.LogInformation("{player} executed command {commandText} with arguments {commandArguments}.", player);
         try
         {
             var commandArguments = new CommandArguments(args.Arguments, ((RealmPlayer)args.Player).ServiceProvider);
             if (userComponent.HasClaim("commandsNoLimit"))
-                await commandInfo.Callback(entity, commandArguments);
+                await commandInfo.Callback(player, commandArguments);
             else
                 await _policyDrivenCommandExecutor.ExecuteAsync(async () =>
                 {
-                    await commandInfo.Callback(entity, commandArguments);
+                    await commandInfo.Callback(player, commandArguments);
                 }, userComponent.Id.ToString());
         }
         catch (RateLimitRejectedException ex)
         {
-            _chatBox.OutputTo(entity, "Zbyt szybko wysyłasz komendy. Poczekaj chwilę.");
+            _chatBox.OutputTo(player, "Zbyt szybko wysyłasz komendy. Poczekaj chwilę.");
             _logger.LogError(ex, "Rate limit exception thrown while executing command {commandText} with arguments {commandArguments}", commandText, args.Arguments);
         }
         catch (CommandArgumentException ex)
         {
             if (ex.Argument != null)
             {
-                _chatBox.OutputTo(entity, $"Wystąpił błąd podczas wykonywania komendy '{commandText}'");
-                _chatBox.OutputTo(entity, $"Argument {ex.Index} '{ex.Argument}' jest niepoprawny ponieważ: {ex.Message}");
+                _chatBox.OutputTo(player, $"Wystąpił błąd podczas wykonywania komendy '{commandText}'");
+                _chatBox.OutputTo(player, $"Argument {ex.Index} '{ex.Argument}' jest niepoprawny ponieważ: {ex.Message}");
             }
             else
             {
-                _chatBox.OutputTo(entity, $"Wystąpił błąd podczas wykonywania komendy '{commandText}'");
+                _chatBox.OutputTo(player, $"Wystąpił błąd podczas wykonywania komendy '{commandText}'");
                 if (string.IsNullOrWhiteSpace(ex.Argument))
-                    _chatBox.OutputTo(entity, $"Argument {ex.Index} jest niepoprawny ponieważ: {ex.Message}");
+                    _chatBox.OutputTo(player, $"Argument {ex.Index} jest niepoprawny ponieważ: {ex.Message}");
                 else
                     if(ex.Message != null)
                     {
-                        _chatBox.OutputTo(entity, $"Argument {ex.Index} '{ex.Argument}' jest niepoprawny ponieważ: {ex.Message}");
+                        _chatBox.OutputTo(player, $"Argument {ex.Index} '{ex.Argument}' jest niepoprawny ponieważ: {ex.Message}");
                     }
                     else
-                        _chatBox.OutputTo(entity, $"Argument {ex.Index} '{ex.Argument}' jest niepoprawny.");
+                        _chatBox.OutputTo(player, $"Argument {ex.Index} '{ex.Argument}' jest niepoprawny.");
             }
             _logger.LogWarning("Command argument exception was thrown while executing command {commandText} with arguments {commandArguments}, argument index: {argumentIndex}", commandText, args.Arguments, ex.Index);
         }

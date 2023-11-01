@@ -78,10 +78,10 @@ public abstract class HudComponent<TState> : Component, IStatefulHudComponent wh
 
     void IStatefulHudComponent.BuildHud(IOverlayService overlayService)
     {
-        var playerElementComponent = Entity.GetRequiredComponent<PlayerElementComponent>();
+        var player = (RealmPlayer)Element;
         List<DynamicHudComponent> dynamicHudComponents = new();
 
-        overlayService.CreateHud(playerElementComponent, _id, e =>
+        overlayService.CreateHud(player, _id, e =>
         {
             e.DynamicHudComponentAdded = dynamicHudComponents.Add;
             try
@@ -96,9 +96,9 @@ public abstract class HudComponent<TState> : Component, IStatefulHudComponent wh
             {
                 e.DynamicHudComponentAdded = null;
             }
-        }, playerElementComponent.ScreenSize, _offset, _defaultState);
+        }, player.ScreenSize, _offset, _defaultState);
 
-        _hud = new Hud<TState>(_id, playerElementComponent, overlayService, _offset, _defaultState, dynamicHudComponents);
+        _hud = new Hud<TState>(_id, player, overlayService, _offset, _defaultState, dynamicHudComponents);
         Visible = true;
         HudCreated();
     }

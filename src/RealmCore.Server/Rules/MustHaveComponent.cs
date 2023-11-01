@@ -1,10 +1,12 @@
 ﻿namespace RealmCore.Server.Rules;
 
-public sealed class MustHaveComponent<TComponent> : IEntityRule
+public sealed class MustHaveComponent<TComponent> : IElementRule
     where TComponent : Component
 {
-    public bool Check(Entity entity)
+    public bool Check(Element element)
     {
-        return entity.HasComponent<TComponent>();
+        if(element is RealmPlayer player)
+            return player.Components.HasComponent<TComponent>();
+        return false;
     }
 }

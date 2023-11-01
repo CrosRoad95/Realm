@@ -28,18 +28,18 @@ public sealed class InventoryGuiComponent : StatefulDxGuiComponent<InventoryGuiC
 
     }
 
-    public override void Attach()
+    public void Attach()
     {
-        var inventory = Entity.GetRequiredComponent<InventoryComponent>();
+        var inventory = ((IComponents)Element).GetRequiredComponent<InventoryComponent>();
         inventory.ItemAdded += HandleItemAdded;
         inventory.ItemRemoved += HandleItemRemoved;
         inventory.ItemChanged += HandleItemChanged;
         base.Attach();
     }
 
-    public override void Dispose()
+    public void Dispose()
     {
-        var inventory = Entity.GetRequiredComponent<InventoryComponent>();
+        var inventory = ((IComponents)Element).GetRequiredComponent<InventoryComponent>();
         inventory.ItemAdded -= HandleItemAdded;
         inventory.ItemRemoved -= HandleItemRemoved;
         inventory.ItemChanged -= HandleItemChanged;
@@ -66,7 +66,7 @@ public sealed class InventoryGuiComponent : StatefulDxGuiComponent<InventoryGuiC
 
     private IEnumerable<InventoryState.InventoryItem> MapItems()
     {
-        var inventory = Entity.GetRequiredComponent<InventoryComponent>();
+        var inventory = ((IComponents)Element).GetRequiredComponent<InventoryComponent>();
         return inventory.Items.Select(x => new InventoryState.InventoryItem
         {
             localId = x.LocalId,
@@ -80,7 +80,7 @@ public sealed class InventoryGuiComponent : StatefulDxGuiComponent<InventoryGuiC
 
     protected override void PreGuiOpen(InventoryState state)
     {
-        var inventory = Entity.GetRequiredComponent<InventoryComponent>();
+        var inventory = ((IComponents)Element).GetRequiredComponent<InventoryComponent>();
         state.Size = (double)inventory.Size;
         state.Number = (double)inventory.Number;
         state.Items.Clear();
@@ -97,7 +97,7 @@ public sealed class InventoryGuiComponent : StatefulDxGuiComponent<InventoryGuiC
         {
             case "doItemAction":
                 var useItemData = actionContext.GetData<UseItemData>();
-                var inventory = Entity.GetRequiredComponent<InventoryComponent>();
+                var inventory = ((IComponents)Element).GetRequiredComponent<InventoryComponent>();
                 if (inventory.TryGetByLocalId(useItemData.LocalId, out Item item))
                     inventory.TryUseItem(item, useItemData.ItemAction);
                 break;

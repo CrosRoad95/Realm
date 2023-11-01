@@ -7,7 +7,7 @@ public class ItemsLogic : ComponentLogic<InventoryComponent>
 {
     private readonly ChatBox _chatBox;
 
-    public ItemsLogic(ItemsRegistry itemsRegistry, IEntityEngine entityEngine, ChatBox chatBox) : base(entityEngine)
+    public ItemsLogic(ItemsRegistry itemsRegistry, IElementFactory elementFactory, ChatBox chatBox) : base(elementFactory)
     {
         itemsRegistry.Add(1, new ItemRegistryEntry
         {
@@ -61,9 +61,9 @@ public class ItemsLogic : ComponentLogic<InventoryComponent>
             case 3:
                 if (!inventoryComponent.HasItemById(itemId))
                 {
-                    var playerElementComponent = inventoryComponent.Entity.GetRequiredComponent<PlayerElementComponent>();
-                    playerElementComponent.GiveWeapon(WeaponId.Bat);
-                    _chatBox.OutputTo(inventoryComponent.Entity, "Bat taken");
+                    var player = (RealmPlayer)inventoryComponent.Element;
+                    player.Weapons.Add(new SlipeServer.Server.Elements.Structs.Weapon(WeaponId.Bat, 1));
+                    _chatBox.OutputTo(player, "Bat taken");
                 }
                 break;
         }
@@ -75,11 +75,11 @@ public class ItemsLogic : ComponentLogic<InventoryComponent>
         switch (itemId)
         {
             case 3:
-                var playerElementComponent = inventoryComponent.Entity.GetRequiredComponent<PlayerElementComponent>();
-                if (!playerElementComponent.HasWeapon(WeaponId.Bat))
+                var player = (RealmPlayer)inventoryComponent.Element;
+                if (!player.Weapons.Any(x => x.Type == WeaponId.Bat && x.Ammo > 0))
                 {
-                    playerElementComponent.GiveWeapon(WeaponId.Bat, 1);
-                    _chatBox.OutputTo(inventoryComponent.Entity, "Bat taken");
+                    player.Weapons.Add(new SlipeServer.Server.Elements.Structs.Weapon(WeaponId.Bat, 1));
+                    _chatBox.OutputTo(player, "Bat taken");
                 }
                 break;
         }
@@ -90,7 +90,7 @@ public class ItemsLogic : ComponentLogic<InventoryComponent>
         switch (action)
         {
             case ItemAction.Use:
-                _chatBox.OutputTo(inventoryComponent.Entity, $"Item used: {item.Name}");
+                _chatBox.OutputTo((RealmPlayer)inventoryComponent.Element, $"Item used: {item.Name}");
                 inventoryComponent.RemoveItem(item);
                 break;
         }

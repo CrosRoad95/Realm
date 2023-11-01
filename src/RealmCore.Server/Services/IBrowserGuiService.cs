@@ -5,12 +5,12 @@ public interface IBrowserGuiService
 {
     string KeyName { get; }
 
-    event Action<Entity>? Ready;
+    event Action<RealmPlayer>? Ready;
 
     string GenerateKey();
-    void AuthorizeEntity(string key, Entity entity);
-    void UnauthorizeEntity(Entity entity);
-    bool TryGetEntityByKey(string key, out Entity? entity);
-    bool TryGetKeyByEntity(Entity entity, out string? key);
-    void RelayEntityLoggedIn(Entity entity);
+    void AuthorizePlayer(string key, RealmPlayer realmPlayer);
+    void UnauthorizePlayer(RealmPlayer realmPlayer);
+    bool TryGetPlayerByKey(string key, out RealmPlayer? realmPlayer);
+    bool TryGetKeyByPlayer(RealmPlayer realmPlayer, out string? key);
+    void RelayPlayerLoggedIn(RealmPlayer realmPlayer);
 }

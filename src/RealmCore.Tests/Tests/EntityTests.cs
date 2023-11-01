@@ -1,5 +1,4 @@
-﻿using RealmCore.ECS.Attributes;
-using RealmCore.Tests.Classes.Components;
+﻿using RealmCore.Tests.Classes.Components;
 
 namespace RealmCore.Tests.Tests;
 

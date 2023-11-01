@@ -4,8 +4,8 @@ public interface IMapsService
 {
     List<string> Maps { get; }
 
-    void LoadAllMapsFor(Entity entity);
-    void LoadMapFor(string name, Entity entity);
+    void LoadAllMapsFor(RealmPlayer player);
+    void LoadMapFor(string name, RealmPlayer player);
     void RegisterMapFromMemory(string name, IEnumerable<WorldObject> worldObjects);
     Map RegisterMapFromMapFile(string name, string fileName);
     MapsWatcherRegistration RegisterMapsPath(string path);

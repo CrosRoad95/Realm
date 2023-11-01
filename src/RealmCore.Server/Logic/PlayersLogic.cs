@@ -2,16 +2,16 @@
 
 internal sealed class PlayersLogic
 {
-    private readonly IEntityEngine _entityEngine;
+    private readonly IElementFactory _elementFactory;
     private readonly MtaServer _mtaServer;
     private readonly IClientInterfaceService _clientInterfaceService;
     private readonly ILogger<PlayersLogic> _logger;
     private readonly IResourceProvider _resourceProvider;
     private readonly ConcurrentDictionary<Player, Latch> _playerResources = new();
 
-    public PlayersLogic(IEntityEngine entityEngine, MtaServer mtaServer, IClientInterfaceService clientInterfaceService, ILogger<PlayersLogic> logger, IResourceProvider resourceProvider)
+    public PlayersLogic(IElementFactory elementFactory, MtaServer mtaServer, IClientInterfaceService clientInterfaceService, ILogger<PlayersLogic> logger, IResourceProvider resourceProvider)
     {
-        _entityEngine = entityEngine;
+        _elementFactory = elementFactory;
         _mtaServer = mtaServer;
         _clientInterfaceService = clientInterfaceService;
         _logger = logger;
@@ -19,9 +19,9 @@ internal sealed class PlayersLogic
         _mtaServer.PlayerJoined += HandlePlayerJoined;
     }
 
-    private async Task HandlePlayerJoinedCore(Player player)
+    private async Task HandlePlayerJoinedCore(Player plr)
     {
-        var playerElementComponent = (PlayerElementComponent)player;
+        var player = (RealmPlayer)plr;
         var start = Stopwatch.GetTimestamp();
         var resources = _resourceProvider.GetResources();
         _playerResources[player] = new Latch(RealmResourceServer._resourceCounter, TimeSpan.FromSeconds(60));
@@ -69,13 +69,8 @@ internal sealed class PlayersLogic
         var screenSize = await taskWaitForScreenSize.Task;
         var cultureInfo = await taskWaitForCultureInfo.Task;
 
-        var playerEntity = _entityEngine.CreateEntity(entity =>
-        {
-            entity.AddComponent<PlayerTagComponent>();
-            playerElementComponent.ScreenSize = new Vector2(screenSize.Item1, screenSize.Item2);
-            playerElementComponent.CultureInfo = cultureInfo;
-            entity.AddComponent(playerElementComponent);
-        });
+        player.ScreenSize = new Vector2(screenSize.Item1, screenSize.Item2);
+        player.CultureInfo = cultureInfo;
 
         var stop = Stopwatch.GetTimestamp();
         double milliseconds = ((stop - start) / (float)Stopwatch.Frequency) * 1000;
@@ -118,36 +113,16 @@ internal sealed class PlayersLogic
 
     private async void HandlePlayerDisconnected(Player player, PlayerQuitEventArgs e)
     {
-        var playerEntity = player.UpCast();
         try
         {
             var realmPlayer = (RealmPlayer)player;
             player.Disconnected -= HandlePlayerDisconnected;
             _playerResources.TryRemove(player, out var _);
-            try
-            {
-                await realmPlayer.ServiceProvider.GetRequiredService<ISaveService>().Save(playerEntity);
-            }
-            finally
-            {
-                playerEntity.Dispose();
-            }
+            await realmPlayer.ServiceProvider.GetRequiredService<ISaveService>().Save(realmPlayer);
         }
         catch (Exception ex)
         {
             _logger.LogHandleError(ex);
-            if (_entityEngine.ContainsEntity(playerEntity))
-            {
-                _logger.LogCritical(ex, "Failed to save and dispose entity! Executing backup disposing strategy.");
-                try
-                {
-                    _entityEngine.RemoveEntity(playerEntity);
-                }
-                catch(Exception ex2)
-                {
-                    _logger.LogCritical(ex2, "Backup entity dispose strategy failed.");
-                }
-            }
         }
     }
 }

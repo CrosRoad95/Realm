@@ -77,7 +77,7 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<IPolicyDrivenCommandExecutor, PolicyDrivenCommandExecutor>();
         #endregion
 
-        services.AddScoped<IEntityFactory, EntityFactory>();
+        services.AddScoped<IElementFactory, ElementFactory>();
         services.AddSingleton<IElementIdGenerator, RangedCollectionBasedElementIdGenerator>(x =>
             new RangedCollectionBasedElementIdGenerator(x.GetRequiredService<IElementCollection>(), IdGeneratorConstants.PlayerIdStart, IdGeneratorConstants.PlayerIdStop)
         );

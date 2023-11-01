@@ -3,13 +3,13 @@
 internal class MapsLogic
 {
     private readonly IMapsService _mapsService;
-    private readonly IEntityEngine _entityEngine;
+    private readonly IElementFactory _elementFactory;
 
-    public MapsLogic(IMapsService mapsService, IEntityEngine entityEngine)
+    public MapsLogic(IMapsService mapsService, IElementFactory elementFactory)
     {
         _mapsService = mapsService;
-        _entityEngine = entityEngine;
-        _entityEngine.EntityCreated += HandleEntityCreated;
+        _elementFactory = elementFactory;
+        _elementFactory.ElementCreated += HandleElementCreated;
 
         //mapsService.RegisterMapFromMemory("testmap", new List<WorldObject>
         //{
@@ -24,11 +24,9 @@ internal class MapsLogic
         //mapsService.RegisterMapFromXml("testmapxml", "Server/Maps/test.map");
     }
 
-    private void HandleEntityCreated(Entity entity)
+    private void HandleElementCreated(Element element)
     {
-        if (!entity.HasComponent<PlayerTagComponent>())
-            return;
-
-        _mapsService.LoadAllMapsFor(entity);
+        if(element is RealmPlayer player)
+            _mapsService.LoadAllMapsFor(player);
     }
 }

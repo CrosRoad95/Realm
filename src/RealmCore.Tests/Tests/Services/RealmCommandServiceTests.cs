@@ -1,7 +1,5 @@
-﻿using RealmCore.Persistence.Data;
-using RealmCore.Server.Policies;
+﻿using RealmCore.Server.Policies;
 using SlipeServer.Server.Concepts;
-using SlipeServer.Server.Elements;
 using SlipeServer.Server.Events;
 using SlipeServer.Server.Services;
 
@@ -11,7 +9,6 @@ public class RealmCommandServiceTests
 {
     private readonly Mock<ILogger<RealmCommandService>> _logger = new(MockBehavior.Strict);
     private readonly CommandService _commandService;
-    private readonly Mock<IEntityEngine> _ecsMock = new(MockBehavior.Strict);
     private readonly ChatBox _chatBox;
     private readonly PolicyDrivenCommandExecutor _policyDrivenCommandExecutor = new();
     private readonly RealmCommandService _sut;
@@ -25,7 +22,7 @@ public class RealmCommandServiceTests
         _chatBox = new ChatBox(_server, _server.GetRequiredService<RootElement>());
         _commandService = new CommandService(_server);
         _logger.SetupLogger();
-        _sut = new RealmCommandService(_commandService, _logger.Object, _ecsMock.Object, _policyDrivenCommandExecutor, _chatBox);
+        _sut = new RealmCommandService(_commandService, _logger.Object, _policyDrivenCommandExecutor, _chatBox);
     }
 
     [InlineData("foo", "FOO", true)]
@@ -109,10 +106,9 @@ public class RealmCommandServiceTests
             Upgrades = new List<UserUpgradeData>()
         }, null, new()));
 
-        _ecsMock.Setup(x => x.TryGetEntityByPlayer(player, out playerEntity, false)).Returns(true);
         _sut.ClearCommands();
         bool wasExecuted = false;
-        void act(Entity entity, CommandArguments args)
+        void act(Element elements, CommandArguments args)
         {
             wasExecuted = true;
         }

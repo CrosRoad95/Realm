@@ -6,7 +6,7 @@ public interface IActiveUsers
     IEnumerable<int> ActiveUsersIds { get; }
 
     bool IsActive(int userId);
-    bool TryGetEntityByUserId(int userId, out Entity? entity);
-    bool TrySetActive(int userId, Entity entity);
+    bool TryGetPlayerByUserId(int userId, out RealmPlayer? player);
+    bool TrySetActive(int userId, RealmPlayer player);
     bool TrySetInactive(int userId);
 }

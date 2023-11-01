@@ -7,7 +7,7 @@ internal sealed class MapsService : IMapsService
     private readonly object _lock = new();
     private readonly List<MapsDirectoryWatcher> _mapsDirectoryWatchers = new();
     private readonly ILogger<MapsService> _logger;
-    private readonly IEntityEngine _entityEngine;
+    private readonly IElementCollection _elementCollection;
 
     public List<string> Maps
     {
@@ -18,11 +18,11 @@ internal sealed class MapsService : IMapsService
         }
     }
 
-    public MapsService(ILogger<MapsService> logger, IEntityEngine entityEngine)
+    public MapsService(ILogger<MapsService> logger, IElementCollection elementCollection)
     {
         _mapIdGenerator = new(IdGeneratorConstants.WorldMapIdStart, IdGeneratorConstants.WorldMapIdStop);
         _logger = logger;
-        _entityEngine = entityEngine;
+        _elementCollection = elementCollection;
     }
 
     private void AddMap(string name, Map map)
@@ -53,7 +53,7 @@ internal sealed class MapsService : IMapsService
         _logger.LogInformation("Map {mapName} removed", name);
     }
 
-    public void LoadMapFor(string name, Entity entity)
+    public void LoadMapFor(string name, RealmPlayer player)
     {
         lock (_lock)
         {
@@ -61,16 +61,16 @@ internal sealed class MapsService : IMapsService
             {
                 throw new Exception($"Map of name '{name}' doesn't exists");
             }
-            map.LoadFor(entity);
+            map.LoadFor(player);
         }
     }
     
-    public void LoadAllMapsFor(Entity entity)
+    public void LoadAllMapsFor(RealmPlayer player)
     {
         lock (_lock)
         {
             foreach (var map in _maps)
-                map.Value.LoadFor(entity);
+                map.Value.LoadFor(player);
         }
     }
 
@@ -130,9 +130,9 @@ internal sealed class MapsService : IMapsService
 
     public void LoadMapForAll(Map map)
     {
-        foreach (var entity in _entityEngine.PlayerEntities)
+        foreach (var player in _elementCollection.GetByType<Player>())
         {
-            map.LoadFor(entity);
+            map.LoadFor((RealmPlayer)player);
         }
     }
 }

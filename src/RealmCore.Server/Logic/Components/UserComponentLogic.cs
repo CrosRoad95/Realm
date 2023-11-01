@@ -6,7 +6,7 @@ internal sealed class UserComponentLogic : ComponentLogic<UserComponent>
     private readonly IDateTimeProvider _dateTimeProvider;
     private readonly ILogger<UserComponentLogic> _logger;
 
-    public UserComponentLogic(IEntityEngine entityEngine, IActiveUsers activeUsers, IDateTimeProvider dateTimeProvider, ILogger<UserComponentLogic> logger) : base(entityEngine)
+    public UserComponentLogic(IElementFactory elementFactory, IActiveUsers activeUsers, IDateTimeProvider dateTimeProvider, ILogger<UserComponentLogic> logger) : base(elementFactory)
     {
         _activeUsers = activeUsers;
         _dateTimeProvider = dateTimeProvider;
@@ -15,7 +15,7 @@ internal sealed class UserComponentLogic : ComponentLogic<UserComponent>
 
     private async Task<string?> ValidatePolicies(UserComponent userComponent)
     {
-        var realmPlayer = (RealmPlayer)userComponent.Entity.GetRequiredComponent<PlayerElementComponent>();
+        var realmPlayer = (RealmPlayer)userComponent.Element;
         var usersService = realmPlayer.ServiceProvider.GetRequiredService<IUsersService>();
         var authorizationPoliciesProvider = realmPlayer.ServiceProvider.GetRequiredService<AuthorizationPoliciesProvider>();
         foreach (var policy in authorizationPoliciesProvider.Policies)
@@ -27,23 +27,20 @@ internal sealed class UserComponentLogic : ComponentLogic<UserComponent>
     private async Task ComponentAddedCore(UserComponent userComponent)
     {
         await ValidatePolicies(userComponent);
-        var entity = userComponent.Entity;
-        if (entity.TryGetComponent(out PlayerElementComponent playerElementComponent))
+        var player = (RealmPlayer)userComponent.Element;
+
+        var userManager = player.ServiceProvider.GetRequiredService<UserManager<UserData>>();
+        var user = await userManager.GetUserById(userComponent.Id);
+        if(user != null)
         {
-            var realmPlayer = (RealmPlayer)entity.GetRequiredComponent<PlayerElementComponent>();
-            var userManager = realmPlayer.ServiceProvider.GetRequiredService<UserManager<UserData>>();
-            var user = await userManager.GetUserById(userComponent.Id);
-            if(user != null)
-            {
-                user.LastLoginDateTime = _dateTimeProvider.Now;
-                var client = playerElementComponent.Client;
-                user.LastIp = client.IPAddress?.ToString();
-                user.LastSerial = client.Serial;
-                user.RegisterSerial ??= client.Serial;
-                user.RegisterIp ??= user.LastIp;
-                user.RegisteredDateTime ??= _dateTimeProvider.Now;
-                //await _userManager.UpdateAsync(user);
-            }
+            user.LastLoginDateTime = _dateTimeProvider.Now;
+            var client = player.Client;
+            user.LastIp = client.IPAddress?.ToString();
+            user.LastSerial = client.Serial;
+            user.RegisterSerial ??= client.Serial;
+            user.RegisterIp ??= user.LastIp;
+            user.RegisteredDateTime ??= _dateTimeProvider.Now;
+            //await _userManager.UpdateAsync(user);
         }
     }
 
@@ -51,7 +48,7 @@ internal sealed class UserComponentLogic : ComponentLogic<UserComponent>
     {
         try
         {
-            using var _ = _logger.BeginEntity(userComponent.Entity);
+            using var _ = _logger.BeginElement(userComponent.Element);
             await ComponentAddedCore(userComponent);
         }
         catch(Exception ex)

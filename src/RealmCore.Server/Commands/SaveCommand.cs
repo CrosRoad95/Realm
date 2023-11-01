@@ -3,39 +3,39 @@
 [CommandName("save")]
 internal class SaveCommand : ICommand
 {
-    private readonly IEntityEngine _entityEngine;
+    private readonly IElementCollection _elementCollection;
     private readonly ISaveService _saveService;
     private readonly ILogger<SaveCommand> _logger;
 
-    public SaveCommand(IEntityEngine entityEngine, ISaveService saveService, ILogger<SaveCommand> logger)
+    public SaveCommand(IElementCollection elementCollection, ISaveService saveService, ILogger<SaveCommand> logger)
     {
-        _entityEngine = entityEngine;
+        _elementCollection = elementCollection;
         _saveService = saveService;
         _logger = logger;
     }
 
-    public async Task Handle(Entity consoleEntity, CommandArguments args)
+    public async Task Handle(RealmPlayer player, CommandArguments args)
     {
         int savedEntities = 0;
-        foreach (var entity in _entityEngine.Entities)
+        foreach (var element in _elementCollection.GetByType<Player>())
         {
-            using var _ = _logger.BeginEntity(entity);
+            using var _ = _logger.BeginElement(element);
             try
             {
 #if DEBUG
-                if (await _saveService.BeginSave(entity))
+                if (await _saveService.BeginSave(element))
                 {
                     await _saveService.Commit();
                     savedEntities++;
                 }
 #else
-                if (await _saveService.BeginSave(entity))
+                if (await _saveService.BeginSave(element))
                     savedEntities++;
 #endif
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Failed to save entity: {entityName}", entity.ToString());
+                _logger.LogError(ex, "Failed to save element: {elementName}", element.ToString());
             }
         }
 #if !DEBUG

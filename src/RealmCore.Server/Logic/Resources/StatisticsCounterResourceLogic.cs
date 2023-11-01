@@ -3,18 +3,17 @@
 internal sealed class StatisticsCounterResourceLogic : ComponentLogic<StatisticsCounterComponent>
 {
     private readonly IStatisticsCounterService _statisticsCounterService;
-    private readonly IEntityEngine _entityEngine;
     private readonly ILogger<StatisticsCounterResourceLogic> _logger;
 
-    public StatisticsCounterResourceLogic(IStatisticsCounterService statisticsCounterService, IEntityEngine entityEngine, ILogger<StatisticsCounterResourceLogic> logger) : base(entityEngine)
+    public StatisticsCounterResourceLogic(IStatisticsCounterService statisticsCounterService, IElementFactory elementFactory, ILogger<StatisticsCounterResourceLogic> logger) : base(elementFactory)
     {
         _statisticsCounterService = statisticsCounterService;
-        _entityEngine = entityEngine;
         _logger = logger;
         statisticsCounterService.StatisticsCollected += HandleStatisticsCollected;
         //statisticsCounterService.FpsStatisticsCollected += HandleFpsStatisticsCollected;
     }
 
+    // TODO:
     //private void HandleFpsStatisticsCollected(Player player, float minFps, float maxFps, float avgFps)
     //{
     //    if (_entityByElement.TryGetEntityByPlayer(player, out var playerEntity))
@@ -27,8 +26,7 @@ internal sealed class StatisticsCounterResourceLogic : ComponentLogic<Statistics
     {
         try
         {
-            var entity = player.UpCast();
-            var statisticsCounterComponent = entity.GetRequiredComponent<StatisticsCounterComponent>();
+            var statisticsCounterComponent = ((RealmPlayer)player).Components.GetRequiredComponent<StatisticsCounterComponent>();
             foreach (var item in statistics)
             {
                 try
@@ -51,13 +49,13 @@ internal sealed class StatisticsCounterResourceLogic : ComponentLogic<Statistics
 
     protected override void ComponentAdded(StatisticsCounterComponent component)
     {
-        var playerElementComponent = component.Entity.GetRequiredComponent<PlayerElementComponent>();
-        _statisticsCounterService.SetCounterEnabledFor(playerElementComponent, true);
+        var player = (RealmPlayer)component.Element;
+        _statisticsCounterService.SetCounterEnabledFor(player, true);
     }
 
     protected override void ComponentDetached(StatisticsCounterComponent component)
     {
-        var playerElementComponent = component.Entity.GetRequiredComponent<PlayerElementComponent>();
-        _statisticsCounterService.SetCounterEnabledFor(playerElementComponent, false);
+        var player = (RealmPlayer)component.Element;
+        _statisticsCounterService.SetCounterEnabledFor(player, false);
     }
 }

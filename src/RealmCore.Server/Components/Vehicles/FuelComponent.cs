@@ -129,22 +129,22 @@ public class FuelComponent : Component, ILuaDebugDataProvider
 
     public void Attach()
     {
-        var vehicle = Entity.GetRequiredComponent<VehicleElementComponent>();
+        var components = (IComponents)Element;
+        var vehicle = (RealmVehicle)Element;
         _lastPosition = vehicle.RespawnPosition;
 
-        vehicle.PositionChanged += HandlePositionChanged;
+        Element.PositionChanged += HandlePositionChanged;
         if (_active)
         {
             // Turn off other fuel components if this is active.
-            foreach (var item in Entity.Components.OfType<FuelComponent>().Where(x => x != this))
+            foreach (var item in components.Components.ComponentsLists.OfType<FuelComponent>().Where(x => x != this))
                 item.Active = false;
         }
     }
 
     public void Detach()
     {
-        var vehicle = Entity.GetRequiredComponent<VehicleElementComponent>();
-        vehicle.PositionChanged -= HandlePositionChanged;
+        Element.PositionChanged -= HandlePositionChanged;
     }
 
     private void HandlePositionChanged(Element sender, ElementChangedEventArgs<Vector3> args)
@@ -155,7 +155,7 @@ public class FuelComponent : Component, ILuaDebugDataProvider
 
     private void Update(bool forceUpdate = false)
     {
-        var vehicle = Entity.GetRequiredComponent<VehicleElementComponent>();
+        var vehicle = (RealmVehicle)Element;
 
         if (!vehicle.IsEngineOn && !forceUpdate)
         {

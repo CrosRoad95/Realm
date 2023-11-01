@@ -2,10 +2,10 @@
 
 public class OwnerComponent : Component
 {
-    public Entity OwningEntity { get; }
+    public Element OwningElement { get; }
 
-    public OwnerComponent(Entity owningEntity)
+    public OwnerComponent(Element owningElement)
     {
-        OwningEntity = owningEntity;
+        OwningElement = owningElement;
     }
 }

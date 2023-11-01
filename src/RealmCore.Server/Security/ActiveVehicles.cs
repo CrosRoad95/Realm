@@ -2,22 +2,22 @@
 
 internal sealed class ActiveVehicles : IActiveVehicles
 {
-    private readonly ConcurrentDictionary<int, Entity> _activeVehicles = new();
+    private readonly ConcurrentDictionary<int, RealmVehicle> _activeVehicles = new();
 
     public IEnumerable<int> ActiveVehiclesIds => _activeVehicles.Keys;
-    public event Action<int, Entity>? Activated;
-    public event Action<int, Entity>? Deactivated;
+    public event Action<int, RealmVehicle>? Activated;
+    public event Action<int, RealmVehicle>? Deactivated;
 
     public bool IsActive(int vehicleId)
     {
         return _activeVehicles.ContainsKey(vehicleId);
     }
 
-    public bool TrySetActive(int vehicleId, Entity entity)
+    public bool TrySetActive(int vehicleId, RealmVehicle vehicle)
     {
-        if (_activeVehicles.TryAdd(vehicleId, entity))
+        if (_activeVehicles.TryAdd(vehicleId, vehicle))
         {
-            Activated?.Invoke(vehicleId, entity);
+            Activated?.Invoke(vehicleId, vehicle);
             return true;
         }
         return false;
@@ -25,13 +25,13 @@ internal sealed class ActiveVehicles : IActiveVehicles
 
     public bool TrySetInactive(int vehicleId)
     {
-        if (_activeVehicles.TryRemove(vehicleId, out var entity))
+        if (_activeVehicles.TryRemove(vehicleId, out var vehicle))
         {
-            Deactivated?.Invoke(vehicleId, entity);
+            Deactivated?.Invoke(vehicleId, vehicle);
             return true;
         }
         return false;
     }
 
-    public bool TryGetEntityByVehicleId(int userId, out Entity? entity) => _activeVehicles.TryGetValue(userId, out entity);
+    public bool TryGetVehicleById(int userId, out RealmVehicle? vehicle) => _activeVehicles.TryGetValue(userId, out vehicle);
 }

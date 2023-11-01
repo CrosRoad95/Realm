@@ -25,7 +25,7 @@ public class SaveLoadServiceTests
         services.AddPersistence<SQLiteDb>(db => db.UseSqlite($"Filename=./{Path.GetRandomFileName().Replace(".", "")}.db"));
         services.AddSingleton<ISaveService, SaveService>();
         services.AddSingleton<ILoadService, LoadService>();
-        services.AddSingleton<IEntityFactory, EntityFactory>();
+        services.AddSingleton<IElementFactory, ElementFactory>();
         services.AddSingleton<IVehicleRepository, VehicleRepository>();
         services.AddSingleton<IEntityEngine, EntityEngine>();
         services.AddSingleton<IVehiclesService, VehiclesService>();
@@ -45,7 +45,7 @@ public class SaveLoadServiceTests
     {
         #region Arrange
         await _services.GetRequiredService<IDb>().MigrateAsync();
-        var entityFactory = _services.GetRequiredService<IEntityFactory>();
+        var entityFactory = _services.GetRequiredService<IElementFactory>();
         var vehiclesService = _services.GetRequiredService<IVehiclesService>();
         var loadService = _services.GetRequiredService<ILoadService>();
 

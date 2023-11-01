@@ -1,5 +1,4 @@
-﻿using RealmCore.Server.Components.Elements;
-using RealmCore.Server.Services;
+﻿using RealmCore.Server.Services;
 
 namespace RealmCore.Console.Extra;
 
@@ -7,14 +6,13 @@ internal class ExtraCommandsLogic
 {
     private readonly IDiscordService _discordService;
     private readonly ChatBox _chatBox;
-    private readonly IEntityEngine _entityEngine;
+    private readonly IElementCollection _elementCollection;
 
-    public ExtraCommandsLogic(IDiscordService discordService, RealmCommandService _commandService, ChatBox chatBox, IEntityEngine entityEngine)
+    public ExtraCommandsLogic(IDiscordService discordService, RealmCommandService _commandService, ChatBox chatBox, IElementCollection elementCollection)
     {
         _discordService = discordService;
         _chatBox = chatBox;
-        _entityEngine = entityEngine;
-
+        _elementCollection = elementCollection;
         _discordService.AddTextBasedCommandHandler(1069962155539042314, "test", (userId, parameters) =>
         {
             _chatBox.Output($"Użytkownik o id {userId} wpisał komendę 'test' z parametrami: {parameters}");
@@ -23,22 +21,20 @@ internal class ExtraCommandsLogic
 
         _discordService.AddTextBasedCommandHandler(997787973775011853, "gracze", async (userId, parameters) =>
         {
-            var playerEntities = _entityEngine.PlayerEntities;
-            await _discordService.SendMessage(997787973775011853, $"Gracze na serwerze: {string.Join(", ", playerEntities.Select(x => x.GetRequiredComponent<PlayerElementComponent>().Name))}");
+            var players = _elementCollection.GetByType<Player>();
+            await _discordService.SendMessage(997787973775011853, $"Gracze na serwerze: {string.Join(", ", players.Select(x => x.Name))}");
         });
 
-        _commandService.AddAsyncCommandHandler("discordsendmessage", async (entity, args) =>
+        _commandService.AddAsyncCommandHandler("discordsendmessage", async (player, args) =>
         {
-            var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();
             var messageId = await _discordService.SendMessage(1079342213097607399, args.ReadAllAsString());
-            _chatBox.OutputTo(entity.GetRequiredComponent<PlayerElementComponent>(), $"Wysłano wiadomość, id: {messageId}");
+            _chatBox.OutputTo(player, $"Wysłano wiadomość, id: {messageId}");
         });
 
-        _commandService.AddAsyncCommandHandler("discordsendmessagetouser", async (entity, args) =>
+        _commandService.AddAsyncCommandHandler("discordsendmessagetouser", async (player, args) =>
         {
-            var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();
             var messageId = await _discordService.SendMessageToUser(659910279353729086, args.ReadAllAsString());
-            _chatBox.OutputTo(entity.GetRequiredComponent<PlayerElementComponent>(), $"Wysłano wiadomość, id: {messageId}");
+            _chatBox.OutputTo(player, $"Wysłano wiadomość, id: {messageId}");
         });
 
         Stream generateStreamFromString(string s)
@@ -51,11 +47,10 @@ internal class ExtraCommandsLogic
             return stream;
         }
 
-        _commandService.AddAsyncCommandHandler("discordsendfile", async (entity, args) =>
+        _commandService.AddAsyncCommandHandler("discordsendfile", async (player, args) =>
         {
-            var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();
             var messageId = await _discordService.SendFile(997787973775011853, generateStreamFromString("dowody"), "dowody_na_borsuka.txt", "potwierdzam");
-            _chatBox.OutputTo(entity.GetRequiredComponent<PlayerElementComponent>(), $"Wysłano plik, id: {messageId}");
+            _chatBox.OutputTo(player, $"Wysłano plik, id: {messageId}");
         });
 
 

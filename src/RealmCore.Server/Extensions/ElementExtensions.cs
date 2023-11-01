@@ -4,6 +4,20 @@ namespace RealmCore.Server.Extensions;
 
 public static class ElementExtensions
 {
+    public static bool IsLookingAt(this Element a, Element b, float tolerance = 25.0f)
+    {
+        var t = (a.Position.FindRotation(b.Position) + a.Rotation.Z) % 360;
+        if (t > 180)
+            t -= 360;
+        return Math.Abs(t) < tolerance;
+    }
+
+    public static float DistanceTo(this Element a, Element b)
+    {
+        var length = (a.Position - b.Position).Length();
+        return length;
+    }
+
     public static void ThrowIfDestroyed(this Element element)
     {
         if (element.IsDestroyed)
@@ -17,12 +31,4 @@ public static class ElementExtensions
         Interior = element.Interior,
         Dimension = element.Dimension,
     };
-
-    public static Entity UpCast(this Element element) => ((IElementComponent)element).Entity;
-    public static Entity? TryUpCast(this Element element)
-    {
-        if (element is IElementComponent elementComponent)
-            return elementComponent.Entity;
-        return null;
-    }
 }

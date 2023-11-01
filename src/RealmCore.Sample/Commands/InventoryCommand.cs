@@ -12,15 +12,14 @@ public sealed class InventoryCommand : IInGameCommand
         _chatBox = chatBox;
     }
 
-    public Task Handle(Entity entity, CommandArguments args)
+    public Task Handle(RealmPlayer player, CommandArguments args)
     {
-        if (entity.TryGetComponent(out InventoryComponent inventoryComponent))
+        if (player.Components.TryGetComponent(out InventoryComponent inventoryComponent))
         {
-            var playerElementComponent = entity.GetRequiredComponent<PlayerElementComponent>();
-            _chatBox.OutputTo(entity, $"Inventory, {inventoryComponent.Number}/{inventoryComponent.Size}");
+            _chatBox.OutputTo(player, $"Inventory, {inventoryComponent.Number}/{inventoryComponent.Size}");
             foreach (var item in inventoryComponent.Items)
             {
-                _chatBox.OutputTo(entity, $"Item, {item.ItemId} = {item.Name}");
+                _chatBox.OutputTo(player, $"Item, {item.ItemId} = {item.Name}");
             }
 
         }

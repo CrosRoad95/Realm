@@ -34,13 +34,9 @@ public class VehicleAccess
         }
     }
 
-    public bool TryGetAccess(Entity entity, out VehiclePlayerAccess vehicleAccess)
+    public bool TryGetAccess(RealmPlayer player, out VehiclePlayerAccess vehicleAccess)
     {
-        var tag = entity.GetRequiredComponent<TagComponent>();
-        if (tag is not PlayerTagComponent)
-            throw new InvalidOperationException();
-
-        var userId = entity.GetRequiredComponent<UserComponent>().Id;
+        var userId = player.Components.GetRequiredComponent<UserComponent>().Id;
         lock (_lock)
         {
             var index = _vehiclePlayerAccesses.FindIndex(x => x.userId == userId);
@@ -54,29 +50,25 @@ public class VehicleAccess
         return false;
     }
 
-    public bool HasAccess(Entity entity)
+    public bool HasAccess(RealmPlayer player)
     {
-        if (TryGetAccess(entity, out VehiclePlayerAccess vehiclePlayerAccess))
+        if (TryGetAccess(player, out VehiclePlayerAccess vehiclePlayerAccess))
         {
             return true;
         }
         return false;
     }
 
-    public VehiclePlayerAccess AddAccess(Entity entity, byte accessType, string? customValue = null)
+    public VehiclePlayerAccess AddAccess(RealmPlayer player, byte accessType, string? customValue = null)
     {
-        var tag = entity.GetRequiredComponent<TagComponent>();
-        if (tag is not PlayerTagComponent)
-            throw new InvalidOperationException();
-
-        if (TryGetAccess(entity, out var _))
+        if (TryGetAccess(player, out var _))
             throw new EntityAccessDefinedException();
 
         lock (_lock)
         {
             _vehiclePlayerAccesses.Add(new VehiclePlayerAccess
             {
-                userId = entity.GetRequiredComponent<UserComponent>().Id,
+                userId = player.Components.GetRequiredComponent<UserComponent>().Id,
                 accessType = accessType,
                 customValue = customValue
             });
@@ -84,8 +76,8 @@ public class VehicleAccess
         }
     }
 
-    public VehiclePlayerAccess AddAsOwner(Entity entity, string? customValue = null)
+    public VehiclePlayerAccess AddAsOwner(RealmPlayer player, string? customValue = null)
     {
-        return AddAccess(entity, 0, customValue);
+        return AddAccess(player, 0, customValue);
     }
 }

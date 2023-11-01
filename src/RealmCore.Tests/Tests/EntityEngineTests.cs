@@ -2,11 +2,11 @@
 
 public class EntityEngineTests
 {
-    private readonly IEntityEngine _entityEngine; 
+    private readonly IElementFactory _elementFactory; 
     private readonly Mock<IElementCollection> _elementCollection = new();
     public EntityEngineTests()
     {
-        _entityEngine = new EntityEngine(_elementCollection.Object, null);
+        _elementFactory = new EntityEngine(_elementCollection.Object, null);
     }
 
     [Fact]
@@ -14,16 +14,16 @@ public class EntityEngineTests
     {
         #region Arrange & Act
         bool created = false;
-        _entityEngine.EntityCreated += e =>
+        _elementFactory.EntityCreated += e =>
         {
             created = true;
         };
-        var entity = _entityEngine.CreateEntity();
+        var entity = _elementFactory.CreateEntity();
         entity.Dispose();
         #endregion
 
         #region Assert
-        _entityEngine.Entities.Should().HaveCount(0);
+        _elementFactory.Entities.Should().HaveCount(0);
         created.Should().BeTrue();
         #endregion
     }
@@ -33,21 +33,21 @@ public class EntityEngineTests
     {
         #region Arrange & Act
         int createdEntities = 0;
-        _entityEngine.EntityCreated += e =>
+        _elementFactory.EntityCreated += e =>
         {
             Interlocked.Increment(ref createdEntities);
         };
 
         await ParallelHelpers.Run((x,i) =>
         {
-            var entity = _entityEngine.CreateEntity();
+            var entity = _elementFactory.CreateEntity();
             entity.Dispose();
         });
         #endregion
 
         #region Assert
         createdEntities.Should().Be(8 * 100);
-        _entityEngine.Entities.Should().HaveCount(0);
+        _elementFactory.Entities.Should().HaveCount(0);
         #endregion
     }
 }

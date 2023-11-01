@@ -7,6 +7,6 @@ public class Counter2GuiComponent : BrowserGuiComponent
     }
     public void Test()
     {
-        var en = Entity;
+        var en = Element;
     }
 }

@@ -1,23 +1,18 @@
 ﻿namespace RealmCore.Server.Logic.Resources;
 
-internal sealed class BoneAttachResourceLogic : ComponentLogic<AttachedEntityComponent>
+internal sealed class BoneAttachResourceLogic : ComponentLogic<AttachedElementComponent>
 {
     private readonly BoneAttachService _boneAttachService;
 
-    public BoneAttachResourceLogic(IEntityEngine entityEngine, BoneAttachService boneAttachService) : base(entityEngine)
+    public BoneAttachResourceLogic(IElementFactory elementFactory, BoneAttachService boneAttachService) : base(elementFactory)
     {
         _boneAttachService = boneAttachService;
     }
 
-    protected override void ComponentAdded(AttachedEntityComponent attachedEntityComponent)
+    protected override void ComponentAdded(AttachedElementComponent attachedEntityComponent)
     {
-        if(!attachedEntityComponent.Entity.TryGetComponent(out IElementComponent elementComponent))
-        {
-            // TODO: not supported
-            return;
-        }
-        var element = (Element)attachedEntityComponent.AttachedEntity.GetRequiredComponent<IElementComponent>();
-        var ped = (Ped)elementComponent;
+        var element = attachedEntityComponent.AttachedElement;
+        var ped = (Ped)element;
         _boneAttachService.Attach(element, ped, attachedEntityComponent.BoneId, attachedEntityComponent.PositionOffset, attachedEntityComponent.RotationOffset);
         element.AreCollisionsEnabled = false;
         attachedEntityComponent.Detached += HandleDetachedFromEntity;
@@ -26,11 +21,10 @@ internal sealed class BoneAttachResourceLogic : ComponentLogic<AttachedEntityCom
     private void HandleDetachedFromEntity(IComponentLifecycle component)
     {
         component.Detached -= HandleDetachedFromEntity;
-        if(component is AttachedEntityComponent attachedEntityComponent)
+        if(component is AttachedElementComponent attachedEntityComponent)
         {
-            var element = (Element)attachedEntityComponent.Entity.GetRequiredComponent<IElementComponent>();
-            if (_boneAttachService.IsAttached(element))
-                _boneAttachService.Detach(element);
+            if (_boneAttachService.IsAttached(attachedEntityComponent.Element))
+                _boneAttachService.Detach(attachedEntityComponent.Element);
         }
         // bug?
     }

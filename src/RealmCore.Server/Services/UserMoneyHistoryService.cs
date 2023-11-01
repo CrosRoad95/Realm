@@ -11,17 +11,17 @@ internal sealed class UserMoneyHistoryService : IUserMoneyHistoryService
         _dateTimeProvider = dateTimeProvider;
     }
 
-    public async Task Add(Entity entity, decimal change, int? category = null, string? description = null)
+    public async Task Add(RealmPlayer player, decimal change, int? category = null, string? description = null)
     {
-        var userComponent = entity.GetRequiredComponent<UserComponent>();
-        var moneyComponent = entity.GetRequiredComponent<MoneyComponent>();
+        var userComponent = player.Components.GetRequiredComponent<UserComponent>();
+        var moneyComponent = player.Components.GetRequiredComponent<MoneyComponent>();
         var money = moneyComponent.Money;
         await _userMoneyHistoryRepository.Add(userComponent.Id, _dateTimeProvider.Now, money + change, change, category, description);
     }
 
-    public async Task<List<UserMoneyHistoryDTO>> Get(Entity entity, int limit = 10)
+    public async Task<List<UserMoneyHistoryDTO>> Get(RealmPlayer player, int limit = 10)
     {
-        var moneyHistory = await _userMoneyHistoryRepository.Get(entity.GetRequiredComponent<UserComponent>().Id, limit);
+        var moneyHistory = await _userMoneyHistoryRepository.Get(player.Components.GetRequiredComponent<UserComponent>().Id, limit);
 
         return moneyHistory.Select(x => new UserMoneyHistoryDTO
         {

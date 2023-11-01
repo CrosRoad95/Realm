@@ -38,9 +38,10 @@ public sealed class RegisterGuiComponent : DxGuiComponent
                 {
                     var userId = await _usersService.SignUp(registerData.Login, registerData.Password);
 
-                    var scope = _serviceProvider.CreateScope();
-                    Entity.AddComponent<LoginGuiComponent>(scope.ServiceProvider);
-                    Entity.DestroyComponent(this);
+                    var player = (RealmPlayer)Element;
+                    var components = ((RealmPlayer)Element).Components;
+                    components.AddComponentWithDI<LoginGuiComponent>();
+                    components.DestroyComponent(this);
                 }
                 catch (Exception ex)
                 {
@@ -57,9 +58,10 @@ public sealed class RegisterGuiComponent : DxGuiComponent
         switch (actionContext.ActionName)
         {
             case "navigateToLogin":
-                var scope = _serviceProvider.CreateScope();
-                Entity.AddComponentWithDI<LoginGuiComponent>();
-                Entity.DestroyComponent(this);
+                var player = (RealmPlayer)Element;
+                var components = ((RealmPlayer)Element).Components;
+                components.AddComponentWithDI<LoginGuiComponent>();
+                components.DestroyComponent(this);
                 break;
             default:
                 throw new NotImplementedException();

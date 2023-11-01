@@ -13,8 +13,6 @@ public class LiftableWorldObjectComponentTests
     {
         _entity1 = new();
         _entity2 = new();
-        _entity1.AddComponent<Transform>();
-        _entity2.AddComponent<Transform>();
         _entity1.AddComponent<TestElementComponent>();
         _liftableWorldObjectComponent = _entity1.AddComponent<LiftableWorldObjectComponent>();
     }
@@ -69,7 +67,7 @@ public class LiftableWorldObjectComponentTests
     public void YouCanNotLiftYourself()
     {
         #region Act
-        var result = _liftableWorldObjectComponent.TryLift(_liftableWorldObjectComponent.Entity);
+        var result = _liftableWorldObjectComponent.TryLift(_liftableWorldObjectComponent.Element);
         #endregion
 
         #region Assert
@@ -122,7 +120,6 @@ public class LiftableWorldObjectComponentTests
         var entity1 = new Entity();
         var entity2 = new Entity();
         var entity3 = new Entity();
-        entity1.AddComponent<Transform>();
         entity1.AddComponent<TestElementComponent>();
         var liftableWorldObjectComponent = entity1.AddComponent(new LiftableWorldObjectComponent(entity2));
         #endregion

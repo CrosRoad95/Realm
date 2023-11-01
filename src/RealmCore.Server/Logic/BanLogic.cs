@@ -20,9 +20,9 @@ internal sealed class BanLogic
 
     private void HandleUserUnbanned(int userId, int banId, int? banType)
     {
-        if(_activeUsers.TryGetEntityByUserId(userId, out var entity) && entity != null)
+        if(_activeUsers.TryGetPlayerByUserId(userId, out var player) && player != null)
         {
-            if (entity.TryGetComponent(out UserComponent userComponent))
+            if (player.TryGetComponent(out UserComponent userComponent))
             {
                 userComponent.Bans.RemoveBan(banId);
             }
@@ -36,19 +36,19 @@ internal sealed class BanLogic
 
     private void HandleBanned(BanDTO banDTO)
     {
-        Entity? entity = null;
+        RealmPlayer? player = null;
         if (banDTO.UserId != null)
         {
-            _activeUsers.TryGetEntityByUserId(banDTO.UserId.Value, out entity);
+            _activeUsers.TryGetPlayerByUserId(banDTO.UserId.Value, out player);
         }
         else if(banDTO.Serial != null)
         {
-            _usersService.TryFindPlayerBySerial(banDTO.Serial, out entity);
+            _usersService.TryFindPlayerBySerial(banDTO.Serial, out player);
         }
 
-        if(entity != null)
+        if(player != null)
         {
-            if(entity.TryGetComponent(out UserComponent userComponent))
+            if(player.TryGetComponent(out UserComponent userComponent))
             {
                 userComponent.Bans.AddBan(banDTO);
             }

@@ -61,38 +61,35 @@ internal sealed class GroupService : IGroupService
         return Map(groupData);
     }
 
-    public async Task<bool> AddMember(Entity entity, int groupId, int rank = 1, string rankName = "")
+    public async Task<bool> AddMember(RealmPlayer player, int groupId, int rank = 1, string rankName = "")
     {
-        if (!entity.HasComponent<PlayerTagComponent>())
-            throw new InvalidOperationException();
-
-        if (entity.TryGetComponent(out UserComponent userComponent))
+        if (player.Components.TryGetComponent(out UserComponent userComponent))
         {
-            if (entity.HasComponent<GroupMemberComponent>(x => x.GroupId == groupId))
+            if (player.Components.HasComponent<GroupMemberComponent>(x => x.GroupId == groupId))
                 return false;
 
             var groupMemberData = await _groupRepository.AddMember(groupId, userComponent.Id, rank, rankName);
-            entity.AddComponent(new GroupMemberComponent(groupMemberData));
+            player.Components.AddComponent(new GroupMemberComponent(groupMemberData));
         }
         return false;
     }
 
-    public bool IsUserInGroup(Entity entity, int groupId)
+    public bool IsUserInGroup(RealmPlayer player, int groupId)
     {
-        return entity.HasComponent<GroupMemberComponent>(x => x.GroupId == groupId);
+        return player.Components.HasComponent<GroupMemberComponent>(x => x.GroupId == groupId);
     }
 
-    public async Task<bool> RemoveMember(Entity entity, int groupId)
+    public async Task<bool> RemoveMember(RealmPlayer player, int groupId)
     {
-        if (entity.TryGetComponent(out UserComponent userComponent))
+        if (player.Components.TryGetComponent(out UserComponent userComponent))
         {
-            var groupMemberComponent = entity.FindComponent<GroupMemberComponent>(x => x.GroupId == groupId);
+            var groupMemberComponent = player.Components.FindComponent<GroupMemberComponent>(x => x.GroupId == groupId);
             if (groupMemberComponent == null)
                 return false;
 
             if (await _groupRepository.RemoveMember(groupId, userComponent.Id))
             {
-                return entity.TryDestroyComponent(groupMemberComponent);
+                return player.Components.TryDestroyComponent(groupMemberComponent);
             }
         }
         return false;
