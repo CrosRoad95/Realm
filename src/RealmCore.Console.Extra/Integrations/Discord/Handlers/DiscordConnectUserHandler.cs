@@ -17,12 +17,11 @@ public class DiscordConnectUserHandler : IDiscordConnectUserHandler
         {
             foreach (var player in _elementCollection.GetByType<Player>().Cast<RealmPlayer>())
             {
-                var components = player.Components;
-                if (components.TryGetComponent<PendingDiscordIntegrationComponent>(out var component))
+                if (player.TryGetComponent<PendingDiscordIntegrationComponent>(out var component))
                 {
                     if (component.Verify(code))
                     {
-                        components.AddComponent(new DiscordIntegrationComponent(userId));
+                        player.AddComponent(new DiscordIntegrationComponent(userId));
                         return Task.FromResult(new TryConnectResponse
                         {
                             message = "User connected successfully!",

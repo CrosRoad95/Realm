@@ -18,9 +18,9 @@ internal sealed class MapsService : IMapsService
         }
     }
 
-    public MapsService(ILogger<MapsService> logger, IElementCollection elementCollection)
+    public MapsService(ILogger<MapsService> logger, IElementCollection elementCollection, MapIdGenerator mapIdGenerator)
     {
-        _mapIdGenerator = new(IdGeneratorConstants.WorldMapIdStart, IdGeneratorConstants.WorldMapIdStop);
+        _mapIdGenerator = mapIdGenerator;
         _logger = logger;
         _elementCollection = elementCollection;
     }

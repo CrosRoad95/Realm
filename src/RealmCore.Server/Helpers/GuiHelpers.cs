@@ -16,18 +16,17 @@ public static class GuiHelpers
         var chatBox = serviceProvider.GetRequiredService<ChatBox>();
         player.SetBind(bind, player =>
         {
-            var components = player.Components;
-            if (components.HasComponent<TGuiComponent>())
+            if (player.HasComponent<TGuiComponent>())
             {
-                components.TryDestroyComponent<TGuiComponent>();
+                player.TryDestroyComponent<TGuiComponent>();
                 return;
             }
             else
-                components.TryDestroyComponent<GuiComponent>();
+                player.TryDestroyComponent<GuiComponent>();
 
             try
             {
-                var guiComponent = components.AddComponent(factory());
+                var guiComponent = player.AddComponent(factory());
                 player.ResetCooldown(bind);
             }
             catch (Exception ex)
@@ -44,7 +43,7 @@ public static class GuiHelpers
         var chatBox = serviceProvider.GetRequiredService<ChatBox>();
         player.SetBindAsync(bind, async player =>
         {
-            var components = player.Components;
+            var components = player;
             if (components.HasComponent<TGuiComponent>())
             {
                 components.TryDestroyComponent<TGuiComponent>();
@@ -80,7 +79,7 @@ public static class GuiHelpers
         var chatBox = serviceProvider.GetRequiredService<ChatBox>();
         player.SetBind(bind, player =>
         {
-            var components = player.Components;
+            var components = player;
             if (components.HasComponent<TGuiComponent>())
             {
                 components.DestroyComponent<TGuiComponent>();
@@ -108,7 +107,7 @@ public static class GuiHelpers
         var chatBox = serviceProvider.GetRequiredService<ChatBox>();
         player.SetBindAsync(bind, async player =>
         {
-            var components = player.Components;
+            var components = player;
             if (components.HasComponent<TGuiComponent>())
             {
                 components.DestroyComponent<TGuiComponent>();

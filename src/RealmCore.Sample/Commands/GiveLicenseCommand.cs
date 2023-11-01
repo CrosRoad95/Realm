@@ -14,7 +14,7 @@ public sealed class GiveLicenseCommand : IInGameCommand
 
     public Task Handle(RealmPlayer player, CommandArguments args)
     {
-        if (player.Components.TryGetComponent(out LicensesComponent licenseComponent))
+        if (player.TryGetComponent(out LicensesComponent licenseComponent))
         {
             var license = args.ReadInt();
             if (licenseComponent.TryAddLicense(license))

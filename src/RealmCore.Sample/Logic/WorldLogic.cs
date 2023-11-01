@@ -80,7 +80,7 @@ internal class WorldLogic : ComponentLogic<DiscoveriesComponent>
         {
             if(element is RealmPlayer player)
             {
-                if (player.Components.GetRequiredComponent<DiscoveriesComponent>().TryDiscover(discoveryName))
+                if (player.GetRequiredComponent<DiscoveriesComponent>().TryDiscover(discoveryName))
                 {
                     callback(player, discoveryName, true);
                 }

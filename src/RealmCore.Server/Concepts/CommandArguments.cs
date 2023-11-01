@@ -9,7 +9,6 @@ public class CommandArguments
 
     public int Index => _index;
     public Span<string> Arguments => _args;
-    public IServiceProvider ServiceProvider => _serviceProvider;
 
     public CommandArguments(string[] args, IServiceProvider serviceProvider)
     {

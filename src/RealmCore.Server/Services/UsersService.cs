@@ -87,7 +87,7 @@ internal sealed class UsersService : IUsersService
         if (!_activeUsers.TrySetActive(user.Id, player))
             throw new Exception("Failed to login to already active account.");
 
-        var components = player.Components;
+        var components = player;
         try
         {
             var serial = player.Client.GetSerial();
@@ -192,7 +192,7 @@ internal sealed class UsersService : IUsersService
 
     public async Task SignOut(RealmPlayer player)
     {
-        var components = player.Components;
+        var components = player;
         await _saveService.Save(player);
         while (components.TryDestroyComponent<InventoryComponent>()) { }
         components.TryDestroyComponent<DailyVisitsCounterComponent>();
@@ -239,7 +239,7 @@ internal sealed class UsersService : IUsersService
     public async Task<bool> TryUpdateLastNickName(RealmPlayer player)
     {
         var newNick = player.Name;
-        if (player.Components.TryGetComponent(out UserComponent userComponent) && userComponent.Nick != newNick)
+        if (player.TryGetComponent(out UserComponent userComponent) && userComponent.Nick != newNick)
         {
             return await _userManager.TryUpdateLastNickName(userComponent.Id, newNick);
         }
@@ -248,7 +248,7 @@ internal sealed class UsersService : IUsersService
 
     public async Task<bool> UpdateLastNewsRead(RealmPlayer player)
     {
-        if (player.Components.TryGetComponent(out UserComponent userComponent))
+        if (player.TryGetComponent(out UserComponent userComponent))
         {
             var now = _dateTimeProvider.Now;
             userComponent.LastNewsReadDateTime = now;
@@ -282,7 +282,7 @@ internal sealed class UsersService : IUsersService
 
     public async Task<bool> AddUserEvent(RealmPlayer player, int eventId, string? metadata = null)
     {
-        if (player.Components.TryGetComponent(out UserComponent userComponent))
+        if (player.TryGetComponent(out UserComponent userComponent))
         {
             await _userEventRepository.AddEvent(userComponent.Id, eventId, _dateTimeProvider.Now);
             return true;
@@ -292,7 +292,7 @@ internal sealed class UsersService : IUsersService
 
     public async Task<List<UserEventData>> GetAllUserEvents(RealmPlayer player, IEnumerable<int>? events = null)
     {
-        if (player.Components.TryGetComponent(out UserComponent userComponent))
+        if (player.TryGetComponent(out UserComponent userComponent))
         {
             return await _userEventRepository.GetAllEventsByUserId(userComponent.Id, events);
         }
@@ -301,7 +301,7 @@ internal sealed class UsersService : IUsersService
 
     public async Task<List<UserEventData>> GetLastUserEvents(RealmPlayer player, int limit = 10, IEnumerable<int>? events = null)
     {
-        if (player.Components.TryGetComponent(out UserComponent userComponent))
+        if (player.TryGetComponent(out UserComponent userComponent))
         {
             return await _userEventRepository.GetLastEventsByUserId(userComponent.Id, limit, events);
         }

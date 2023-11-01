@@ -39,6 +39,8 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<IAssetEncryptionProvider, AssetEncryptionProvider>();
         services.AddTransient<SeederServerBuilder>();
         services.AddSingleton<RealmCommandService>();
+        services.AddScoped<MapIdGenerator>();
+        services.AddScoped<PlayerContext>();
         #endregion
 
         #region Registries
@@ -78,6 +80,7 @@ public static class ServiceCollectionExtensions
         #endregion
 
         services.AddScoped<IElementFactory, ElementFactory>();
+        services.AddScoped<IScopedElementFactory, ScopedElementFactory>();
         services.AddSingleton<IElementIdGenerator, RangedCollectionBasedElementIdGenerator>(x =>
             new RangedCollectionBasedElementIdGenerator(x.GetRequiredService<IElementCollection>(), IdGeneratorConstants.PlayerIdStart, IdGeneratorConstants.PlayerIdStop)
         );

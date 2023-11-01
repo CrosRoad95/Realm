@@ -10,16 +10,16 @@ public static class MarkerExtensions
         {
             if(element is RealmPlayer player)
             {
-                if(!player.Components.HasComponent<GuiComponent>())
-                    player.Components.AddComponent(new TGui());
+                if(!player.HasComponent<GuiComponent>())
+                    player.AddComponent(new TGui());
             }
         };
         marker.Left += (leftPickup, element) =>
         {
             if (element is RealmPlayer player)
             {
-                if (!player.Components.HasComponent<TGui>())
-                    player.Components.TryDestroyComponent<TGui>();
+                if (!player.HasComponent<TGui>())
+                    player.TryDestroyComponent<TGui>();
             }
         };
     }
@@ -30,16 +30,16 @@ public static class MarkerExtensions
         {
             if (element is RealmPlayer player)
             {
-                if (!player.Components.HasComponent<GuiComponent>())
-                    player.Components.AddComponent(await factory(player));
+                if (!player.HasComponent<GuiComponent>())
+                    player.AddComponent(await factory(player));
             }
         };
         marker.Left += (leftPickup, element) =>
         {
             if (element is RealmPlayer player)
             {
-                if (!player.Components.HasComponent<TGui>())
-                    player.Components.TryDestroyComponent<TGui>();
+                if (!player.HasComponent<TGui>())
+                    player.TryDestroyComponent<TGui>();
             }
         };
     }
@@ -52,10 +52,10 @@ public static class MarkerExtensions
         {
             if (element is RealmPlayer player)
             {
-                if (!player.Components.HasComponent<GuiComponent>())
+                if (!player.HasComponent<GuiComponent>())
                 {
-                    player.Components.AddComponent(new TGui1());
-                    player.Components.AddComponent(new TGui2());
+                    player.AddComponent(new TGui1());
+                    player.AddComponent(new TGui2());
                 }
             }
         };
@@ -64,10 +64,10 @@ public static class MarkerExtensions
         {
             if (element is RealmPlayer player)
             {
-                if (player.Components.HasComponent<TGui1>())
-                    player.Components.DestroyComponent<TGui1>();
-                if (player.Components.HasComponent<TGui2>())
-                    player.Components.DestroyComponent<TGui2>();
+                if (player.HasComponent<TGui1>())
+                    player.DestroyComponent<TGui1>();
+                if (player.HasComponent<TGui2>())
+                    player.DestroyComponent<TGui2>();
             }
         };
     }

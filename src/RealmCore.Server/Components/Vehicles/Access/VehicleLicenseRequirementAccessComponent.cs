@@ -13,7 +13,7 @@ public class VehicleLicenseRequirementAccessComponent : VehicleAccessControllerC
     {
         if(ped is RealmPlayer player)
         {
-            if(player.Components.TryGetComponent(out LicensesComponent licensesComponent))
+            if(player.TryGetComponent(out LicensesComponent licensesComponent))
             {
                 return licensesComponent.HasLicense(_licenseId);
             }

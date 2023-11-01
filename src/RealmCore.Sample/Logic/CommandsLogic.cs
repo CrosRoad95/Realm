@@ -83,7 +83,7 @@ internal sealed class CommandsLogic
         _commandService.AddCommandHandler("focusablecomponent", (player, args) =>
         {
             var worldObject = _elementFactory.CreateObject(ObjectModel.Gunbox, player.Position + new Vector3(4, 0, 0), player.Rotation);
-            var focusableComponent = worldObject.Components.AddComponent<FocusableComponent>();
+            var focusableComponent = worldObject.AddComponent<FocusableComponent>();
             focusableComponent.PlayerFocused += (that, player) =>
             {
                 var playerName = player.Name;
@@ -103,17 +103,17 @@ internal sealed class CommandsLogic
         _commandService.AddAsyncCommandHandler("outlinecomponent", async (player, args) =>
         {
             var worldObject = _elementFactory.CreateObject(ObjectModel.Gunbox, player.Position + new Vector3(4, 0, 0), player.Rotation);
-            var focusableComponent = worldObject.Components.AddComponent(new OutlineComponent(Color.Red));
+            var focusableComponent = worldObject.AddComponent(new OutlineComponent(Color.Red));
             _chatBox.OutputTo(player, "Created outline component");
             await Task.Delay(2000);
-            worldObject.Components.DestroyComponent(focusableComponent);
+            worldObject.DestroyComponent(focusableComponent);
             _chatBox.OutputTo(player, "Destroyed outline component");
         });
 
         _commandService.AddAsyncCommandHandler("outlinecomponent2", async (player, args) =>
         {
             var worldObject = _elementFactory.CreateObject(ObjectModel.Gunbox, player.Position + new Vector3(4, 0, 0), player.Rotation);
-            var focusableComponent = worldObject.Components.AddComponent(new OutlineComponent(Color.Red));
+            var focusableComponent = worldObject.AddComponent(new OutlineComponent(Color.Red));
             _chatBox.OutputTo(player, "Created outline component");
             await Task.Delay(2000);
             worldObject.Destroy();
@@ -123,7 +123,7 @@ internal sealed class CommandsLogic
 
         _commandService.AddCommandHandler("playtime", (player, args) =>
         {
-            if (player.Components.TryGetComponent(out PlayTimeComponent playTimeComponent))
+            if (player.TryGetComponent(out PlayTimeComponent playTimeComponent))
             {
                 _chatBox.OutputTo(player, $"playtime: {playTimeComponent.PlayTime}, total play time: {playTimeComponent.TotalPlayTime}");
             }
@@ -131,7 +131,7 @@ internal sealed class CommandsLogic
 
         _commandService.AddCommandHandler("givemoney", (player, args) =>
         {
-            if (player.Components.TryGetComponent(out MoneyComponent moneyComponent))
+            if (player.TryGetComponent(out MoneyComponent moneyComponent))
             {
                 var amount = args.ReadDecimal();
                 moneyComponent.GiveMoney(amount);
@@ -141,7 +141,7 @@ internal sealed class CommandsLogic
 
         _commandService.AddCommandHandler("takemoney", (player, args) =>
         {
-            if (player.Components.TryGetComponent(out MoneyComponent moneyComponent))
+            if (player.TryGetComponent(out MoneyComponent moneyComponent))
             {
                 var amount = args.ReadDecimal();
                 moneyComponent.TakeMoney(amount);
@@ -151,7 +151,7 @@ internal sealed class CommandsLogic
 
         _commandService.AddCommandHandler("setmoney", (player, args) =>
         {
-            if (player.Components.TryGetComponent(out MoneyComponent moneyComponent))
+            if (player.TryGetComponent(out MoneyComponent moneyComponent))
             {
                 var amount = args.ReadDecimal();
                 moneyComponent.Money = amount;
@@ -161,7 +161,7 @@ internal sealed class CommandsLogic
 
         _commandService.AddCommandHandler("money", (player, args) =>
         {
-            if (player.Components.TryGetComponent(out MoneyComponent moneyComponent))
+            if (player.TryGetComponent(out MoneyComponent moneyComponent))
             {
                 _chatBox.OutputTo(player, $"total money: {moneyComponent.Money}");
             }
@@ -170,12 +170,12 @@ internal sealed class CommandsLogic
         _commandService.AddCommandHandler("cvwithlicenserequired", (player, args) =>
         {
             var vehicle = _elementFactory.CreateVehicle(args.ReadUShort(), player.Position + new Vector3(4, 0, 0), player.Rotation);
-            vehicle.Components.AddComponent(new VehicleLicenseRequirementAccessComponent(10));
+            vehicle.AddComponent(new VehicleLicenseRequirementAccessComponent(10));
         });
 
         _commandService.AddCommandHandler("givelicense10", (player, args) =>
         {
-            if (player.Components.TryGetComponent(out LicensesComponent licenseComponent))
+            if (player.TryGetComponent(out LicensesComponent licenseComponent))
             {
                 if (licenseComponent.TryAddLicense(10))
                     _chatBox.OutputTo(player, $"License 10 added");
@@ -185,7 +185,7 @@ internal sealed class CommandsLogic
         _commandService.AddCommandHandler("cv", (player, args) =>
         {
             var vehicle = _elementFactory.CreateVehicle(args.ReadUShort(), player.Position + new Vector3(4, 0, 0), player.Rotation);
-            var components = vehicle.Components;
+            var components = vehicle;
             components.AddComponent<VehicleUpgradesComponent>();
             components.AddComponent<MileageCounterComponent>();
             components.AddComponent(new FuelComponent(1, 20, 20, 0.01, 2)).Active = true;
@@ -198,7 +198,7 @@ internal sealed class CommandsLogic
         _commandService.AddAsyncCommandHandler("cvprivate", async (player, args) =>
         {
             var vehicle = await _vehiclesService.CreateVehicle(404, player.Position + new Vector3(4, 0, 0), player.Rotation);
-            var components = vehicle.Components;
+            var components = vehicle;
             components.AddComponent<VehicleUpgradesComponent>().AddUpgrade(1);
             components.AddComponent<MileageCounterComponent>();
             components.AddComponent<VehicleEngineComponent>();
@@ -210,7 +210,7 @@ internal sealed class CommandsLogic
         _commandService.AddCommandHandler("exclusivecv", (player, args) =>
         {
             var vehicle = _elementFactory.CreateVehicle(404, player.Position + new Vector3(4, 0, 0), player.Rotation);
-            var components = vehicle.Components;
+            var components = vehicle;
             components.AddComponent<VehicleUpgradesComponent>();
             components.AddComponent<MileageCounterComponent>();
             components.AddComponent(new FuelComponent(1, 20, 20, 0.01, 2)).Active = true;
@@ -220,7 +220,7 @@ internal sealed class CommandsLogic
         _commandService.AddCommandHandler("noaccesscv", (player, args) =>
         {
             var vehicle = _elementFactory.CreateVehicle(404, player.Position + new Vector3(4, 0, 0), player.Rotation);
-            var components = vehicle.Components;
+            var components = vehicle;
             components.AddComponent<VehicleUpgradesComponent>();
             components.AddComponent<MileageCounterComponent>();
             components.AddComponent(new FuelComponent(1, 20, 20, 0.01, 2)).Active = true;
@@ -239,7 +239,7 @@ internal sealed class CommandsLogic
         _commandService.AddCommandHandler("addmeasowner", (player, args) =>
         {
             var vehicle = (RealmVehicle)player.Vehicle;
-            vehicle.Components.GetRequiredComponent<PrivateVehicleComponent>().Access.AddAsOwner(player);
+            vehicle.GetRequiredComponent<PrivateVehicleComponent>().Access.AddAsOwner(player);
         });
 
         _commandService.AddCommandHandler("accessinfo", (player, args) =>
@@ -251,7 +251,7 @@ internal sealed class CommandsLogic
                 return;
             }
 
-            var privateVehicleComponent = vehicle.Components.GetRequiredComponent<PrivateVehicleComponent>();
+            var privateVehicleComponent = vehicle.GetRequiredComponent<PrivateVehicleComponent>();
             _chatBox.OutputTo(player, "Access info:");
 
             foreach (var vehicleAccess in privateVehicleComponent.Access.PlayerAccesses)
@@ -280,14 +280,14 @@ internal sealed class CommandsLogic
 
         _commandService.AddCommandHandler("testachievement", (player, args) =>
         {
-            var achievementsComponent = player.Components.GetRequiredComponent<AchievementsComponent>();
+            var achievementsComponent = player.GetRequiredComponent<AchievementsComponent>();
             achievementsComponent.UpdateProgress(1, 2, 10);
             _chatBox.OutputTo(player, $"progressed achieviement 'test'");
         });
 
         _commandService.AddCommandHandler("addupgrade", (player, args) =>
         {
-            var jobUpgradesComponent = player.Components.GetRequiredComponent<JobUpgradesComponent>();
+            var jobUpgradesComponent = player.GetRequiredComponent<JobUpgradesComponent>();
             try
             {
                 if (jobUpgradesComponent.TryAddJobUpgrade(1, 1))
@@ -310,7 +310,7 @@ internal sealed class CommandsLogic
                 return;
             }
 
-            var vehicleUpgradeComponent = vehicle.Components.GetRequiredComponent<VehicleUpgradesComponent>();
+            var vehicleUpgradeComponent = vehicle.GetRequiredComponent<VehicleUpgradesComponent>();
             if (vehicleUpgradeComponent.HasUpgrade(1))
             {
                 _chatBox.OutputTo(player, "You already have a upgrade!");
@@ -331,7 +331,7 @@ internal sealed class CommandsLogic
 
         _commandService.AddCommandHandler("additem", (player, args) =>
         {
-            if (player.Components.TryGetComponent(out InventoryComponent inventoryComponent))
+            if (player.TryGetComponent(out InventoryComponent inventoryComponent))
             {
                 inventoryComponent.AddItem(_itemsRegistry, 1);
                 _chatBox.OutputTo(player, $"Test item added");
@@ -339,7 +339,7 @@ internal sealed class CommandsLogic
         });
         _commandService.AddCommandHandler("additem2", (player, args) =>
         {
-            if (player.Components.TryGetComponent(out InventoryComponent inventoryComponent))
+            if (player.TryGetComponent(out InventoryComponent inventoryComponent))
             {
                 inventoryComponent.AddItem(_itemsRegistry, 2);
                 _chatBox.OutputTo(player, $"Test item added");
@@ -347,7 +347,7 @@ internal sealed class CommandsLogic
         });
         _commandService.AddAsyncCommandHandler("addtestdata", async (player, args) =>
         {
-            if (player.Components.TryGetComponent(out JobUpgradesComponent jobUpgradesComponent))
+            if (player.TryGetComponent(out JobUpgradesComponent jobUpgradesComponent))
             {
                 if (jobUpgradesComponent.TryAddJobUpgrade(1, 1))
                     _chatBox.OutputTo(player, "Upgrade added");
@@ -355,26 +355,26 @@ internal sealed class CommandsLogic
                     _chatBox.OutputTo(player, "Failed to add upgrade");
             }
 
-            if (player.Components.TryGetComponent(out InventoryComponent inventoryComponent))
+            if (player.TryGetComponent(out InventoryComponent inventoryComponent))
             {
                 inventoryComponent.AddItem(_itemsRegistry, 1);
                 _chatBox.OutputTo(player, $"Test item added");
             }
 
-            if (player.Components.TryGetComponent(out LicensesComponent licenseComponent))
+            if (player.TryGetComponent(out LicensesComponent licenseComponent))
             {
                 if (licenseComponent.TryAddLicense(1))
                     _chatBox.OutputTo(player, $"Test license added: 'test123' of id 1");
             }
 
-            if (player.Components.TryGetComponent(out MoneyComponent moneyComponent))
+            if (player.TryGetComponent(out MoneyComponent moneyComponent))
             {
                 moneyComponent.Money = (decimal)Random.Shared.NextDouble() * 1000;
                 _chatBox.OutputTo(player, $"Set money to: {moneyComponent.Money}");
             }
 
 
-            if (player.Components.TryGetComponent(out AchievementsComponent achievementsComponent))
+            if (player.TryGetComponent(out AchievementsComponent achievementsComponent))
             {
                 achievementsComponent.UpdateProgress(1, 2, 10);
                 _chatBox.OutputTo(player, $"Updated achievement 'test' progress to 2");
@@ -382,17 +382,17 @@ internal sealed class CommandsLogic
 
             {
                 var vehicle = await _vehiclesService.CreateVehicle(404, player.Position + new Vector3(4, 0, 0), player.Rotation);
-                var components = vehicle.Components;
+                var components = vehicle;
                 components.AddComponent<VehicleUpgradesComponent>().AddUpgrade(1);
                 components.AddComponent(new MileageCounterComponent());
                 components.AddComponent(new FuelComponent(1, 20, 20, 0.01, 2)).Active = true;
-                vehicle.Components.AddComponent<VehiclePartDamageComponent>().AddPart(1, 1337);
+                vehicle.AddComponent<VehiclePartDamageComponent>().AddPart(1, 1337);
             }
         });
 
         _commandService.AddCommandHandler("giveexperience", (player, args) =>
         {
-            if (player.Components.TryGetComponent(out LevelComponent levelComponent))
+            if (player.TryGetComponent(out LevelComponent levelComponent))
             {
                 var amount = args.ReadUInt();
                 levelComponent.GiveExperience(amount);
@@ -404,7 +404,7 @@ internal sealed class CommandsLogic
         {
             _elementFactory.CreateVehicle(404, player.Position + new Vector3(4, 0, 0), Vector3.Zero, elementBuilder: vehicle =>
             {
-                vehicle.Components.AddComponent(new VehicleForSaleComponent(200));
+                return [new VehicleForSaleComponent(200)];
             });
         });
 
@@ -421,21 +421,21 @@ internal sealed class CommandsLogic
         _commandService.AddCommandHandler("spawnbox", (player, args) =>
         {
             var worldObject = _elementFactory.CreateObject(ObjectModel.Gunbox, player.Position + new Vector3(4, 0, -0.65f), Vector3.Zero);
-            worldObject.Components.AddComponent<LiftableWorldObjectComponent>();
+            worldObject.AddComponent<LiftableWorldObjectComponent>();
         });
 
         _commandService.AddCommandHandler("spawnmybox", (player, args) =>
         {
             var @object = _elementFactory.CreateObject(ObjectModel.Gunbox, player.Position + new Vector3(4, 0, -0.65f), Vector3.Zero);
-            @object.Components.AddComponent<LiftableWorldObjectComponent>();
-            @object.Components.AddComponent(new OwnerComponent(player));
+            @object.AddComponent<LiftableWorldObjectComponent>();
+            @object.AddComponent(new OwnerComponent(player));
         });
 
         _commandService.AddCommandHandler("spawnmybox2", (player, args) =>
         {
             var @object = _elementFactory.CreateObject(ObjectModel.Gunbox, player.Position + new Vector3(4, 0, -0.65f), Vector3.Zero);
-            @object.Components.AddComponent<LiftableWorldObjectComponent>();
-            @object.Components.AddComponent(new OwnerDisposableComponent(player));
+            @object.AddComponent<LiftableWorldObjectComponent>();
+            @object.AddComponent(new OwnerDisposableComponent(player));
         });
 
         // TODO:
@@ -584,7 +584,7 @@ internal sealed class CommandsLogic
         //_commandService.AddCommandHandler("mygroups", (player, args) =>
         //{
         //    _chatBox.OutputTo(player, "Groups:");
-        //    foreach (var item in player.Components.ComponentsLists.OfType<GroupMemberComponent>())
+        //    foreach (var item in playerLists.OfType<GroupMemberComponent>())
         //    {
         //        _chatBox.OutputTo(player, $"Group id: {item.GroupId}, rank: {item.Rank}, rank name: '{item.RankName}'");
         //    }
@@ -594,7 +594,7 @@ internal sealed class CommandsLogic
         //{
         //    var playerElementComponent = player.GetRequiredComponent<PlayerElementComponent>();
         //    _chatBox.OutputTo(player, "Fractions:");
-        //    foreach (var item in player.Components.OfType<FractionMemberComponent>())
+        //    foreach (var item in player.OfType<FractionMemberComponent>())
         //    {
         //        _chatBox.OutputTo(player, $"Fraction id: {item.FractionId}, rank: {item.Rank}, rank name: '{item.RankName}'");
         //    }
@@ -1566,7 +1566,7 @@ internal sealed class CommandsLogic
 
         //_commandService.AddCommandHandler("focusedelements", (player, args) =>
         //{
-        //    var playerElementComponent = player.Components.GetRequiredComponent<PlayerElementComponent>();
+        //    var playerElementComponent = player.GetRequiredComponent<PlayerElementComponent>();
         //    _chatBox.OutputTo(player, $"Focused player: {playerElementComponent.FocusedEntity}");
         //    if (playerElementComponent.FocusedEntity != null)
         //    {
@@ -1580,7 +1580,7 @@ internal sealed class CommandsLogic
 
         //_commandService.AddAsyncCommandHandler("testpolicy", async (player, args) =>
         //{
-        //    bool authorized = await usersService.AuthorizePolicy(player.Components.GetRequiredComponent<UserComponent>(), "Admin");
+        //    bool authorized = await usersService.AuthorizePolicy(player.GetRequiredComponent<UserComponent>(), "Admin");
         //    _chatBox.OutputTo(player, $"authorized: {authorized}");
         //});
 

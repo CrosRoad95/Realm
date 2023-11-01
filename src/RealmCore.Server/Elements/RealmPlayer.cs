@@ -26,7 +26,6 @@ public class RealmPlayer : Player, IComponents
     private readonly Dictionary<string, DateTime> _bindsUpCooldown = new();
     private readonly List<short> _enableFightFlags = new();
     private readonly object _enableFightFlagsLock = new();
-    private readonly MapIdGenerator _mapIdGenerator = new(IdGeneratorConstants.MapIdStart, IdGeneratorConstants.MapIdStop);
 
     public event Action<RealmPlayer, Element?>? FocusedElementChanged;
     public event Action<RealmPlayer, Element?>? ClickedElementChanged;
@@ -122,12 +121,11 @@ public class RealmPlayer : Player, IComponents
         }
     }
 
-    internal MapIdGenerator MapIdGenerator => _mapIdGenerator;
-
     public RealmPlayer(IServiceProvider serviceProvider)
     {
         _serviceScope = serviceProvider.CreateScope();
         _serviceProvider = _serviceScope.ServiceProvider;
+        _serviceProvider.GetRequiredService<PlayerContext>().Player = this;
         Components = new(_serviceProvider, this);
         BindExecuted += HandleBindExecuted;
         IsNametagShowing = false;

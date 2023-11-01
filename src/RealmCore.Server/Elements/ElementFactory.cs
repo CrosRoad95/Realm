@@ -12,6 +12,18 @@ internal sealed class ElementFactory : IElementFactory
         _serviceProvider = serviceProvider;
     }
 
+    private void ExecuteElementBuilder<TElement>(Func<TElement, IEnumerable<IComponent>>? builder, TElement element) where TElement : IComponents
+    {
+        if (builder == null)
+            return;
+
+        var components = builder(element);
+        foreach (var component in components)
+        {
+            element.AddComponent(component);
+        }
+    }
+
     private void AssociateWithServer(Element element)
     {
         element.AssociateWith(_mtaServer);
@@ -26,7 +38,7 @@ internal sealed class ElementFactory : IElementFactory
         ElementCreated?.Invoke(element);
     }
 
-    public RealmVehicle CreateVehicle(ushort model, Vector3 position, Vector3 rotation, byte interior = 0, ushort dimension = 0, Action<RealmVehicle>? elementBuilder = null)
+    public RealmVehicle CreateVehicle(ushort model, Vector3 position, Vector3 rotation, byte interior = 0, ushort dimension = 0, Func<RealmVehicle, IEnumerable<IComponent>>? elementBuilder = null)
     {
         var vehicle = new RealmVehicle(_serviceProvider, model, position)
         {
@@ -49,12 +61,12 @@ internal sealed class ElementFactory : IElementFactory
             Color = color
         };
 
-        AssociateWithServer(marker);
         elementBuilder?.Invoke(marker);
+        AssociateWithServer(marker);
         return marker;
     }
 
-    public RealmPickup CreatePickup(Vector3 position, ushort model, byte interior = 0, ushort dimension = 0, Action<RealmPickup>? elementBuilder = null)
+    public RealmPickup CreatePickup(Vector3 position, ushort model, byte interior = 0, ushort dimension = 0, Func<RealmPickup, IEnumerable<IComponent>>? elementBuilder = null)
     {
         var pickup = new RealmPickup(_serviceProvider, position, model)
         {
@@ -62,21 +74,21 @@ internal sealed class ElementFactory : IElementFactory
             Dimension = dimension,
         };
 
+        ExecuteElementBuilder(elementBuilder, pickup);
         AssociateWithServer(pickup);
-        elementBuilder?.Invoke(pickup);
         return pickup;
     }
 
-    public Blip CreateBlip(Vector3 position, BlipIcon blipIcon, byte interior = 0, ushort dimension = 0, Action<Element>? elementBuilder = null)
+    public RealmBlip CreateBlip(Vector3 position, BlipIcon blipIcon, byte interior = 0, ushort dimension = 0, Func<RealmBlip, IEnumerable<IComponent>>? elementBuilder = null)
     {
-        var blip = new Blip(position, blipIcon)
+        var blip = new RealmBlip(_serviceProvider, position, blipIcon)
         {
             Interior = interior,
             Dimension = dimension,
         };
 
+        ExecuteElementBuilder(elementBuilder, blip);
         AssociateWithServer(blip);
-        elementBuilder?.Invoke(blip);
         return blip;
     }
 
@@ -88,12 +100,12 @@ internal sealed class ElementFactory : IElementFactory
             Dimension = dimension,
         };
 
-        AssociateWithServer(radarArea);
         elementBuilder?.Invoke(radarArea);
+        AssociateWithServer(radarArea);
         return radarArea;
     }
 
-    public RealmObject CreateObject(ObjectModel model, Vector3 position, Vector3 rotation, byte interior = 0, ushort dimension = 0, Action<RealmObject>? elementBuilder = null)
+    public RealmObject CreateObject(ObjectModel model, Vector3 position, Vector3 rotation, byte interior = 0, ushort dimension = 0, Func<RealmObject, IEnumerable<IComponent>>? elementBuilder = null)
     {
         var worldObject = new RealmObject(_serviceProvider, model, position)
         {
@@ -102,8 +114,8 @@ internal sealed class ElementFactory : IElementFactory
             Dimension = dimension,
         };
 
-        AssociateWithServer(worldObject);
         elementBuilder?.Invoke(worldObject);
+        AssociateWithServer(worldObject);
         return worldObject;
     }
 
@@ -111,24 +123,24 @@ internal sealed class ElementFactory : IElementFactory
     public CollisionCircle CreateCollisionCircle(Vector2 position, float radius, byte interior = 0, ushort dimension = 0, Action<Element>? elementBuilder = null)
     {
         var collisionSphere = new CollisionCircle(new Vector2(0, 0), radius);
-        AssociateWithServer(collisionSphere);
         elementBuilder?.Invoke(collisionSphere);
+        AssociateWithServer(collisionSphere);
         return collisionSphere;
     }
 
     public CollisionCuboid CreateCollisionCuboid(Vector3 position, Vector3 dimensions, byte interior = 0, ushort dimension = 0, Action<Element>? elementBuilder = null)
     {
         var collisionCuboid = new CollisionCuboid(position, dimensions);
-        AssociateWithServer(collisionCuboid);
         elementBuilder?.Invoke(collisionCuboid);
+        AssociateWithServer(collisionCuboid);
         return collisionCuboid;
     }
 
     public CollisionPolygon CreateCollisionPolygon(Vector3 position, IEnumerable<Vector2> vertices, byte interior = 0, ushort dimension = 0, Action<Element>? elementBuilder = null)
     {
         var collisionPolygon = new CollisionPolygon(position, vertices);
-        AssociateWithServer(collisionPolygon);
         elementBuilder?.Invoke(collisionPolygon);
+        AssociateWithServer(collisionPolygon);
         return collisionPolygon;
     }
 
@@ -140,16 +152,16 @@ internal sealed class ElementFactory : IElementFactory
             Dimension = dimension,
         };
 
-        AssociateWithServer(collisionRectangle);
         elementBuilder?.Invoke(collisionRectangle);
+        AssociateWithServer(collisionRectangle);
         return collisionRectangle;
     }
 
-    public RealmCollisionSphere CreateCollisionSphere(Vector3 position, float radius, byte interior = 0, ushort dimension = 0, Action<RealmCollisionSphere>? elementBuilder = null)
+    public RealmCollisionSphere CreateCollisionSphere(Vector3 position, float radius, byte interior = 0, ushort dimension = 0, Func<RealmCollisionSphere, IEnumerable<IComponent>>? elementBuilder = null)
     {
         var collisionSphere = new RealmCollisionSphere(_serviceProvider, new Vector3(0, 0, 1000), radius);
-        AssociateWithServer(collisionSphere);
         elementBuilder?.Invoke(collisionSphere);
+        AssociateWithServer(collisionSphere);
         return collisionSphere;
     }
 
@@ -161,8 +173,8 @@ internal sealed class ElementFactory : IElementFactory
             Dimension = dimension,
         };
 
-        AssociateWithServer(collisionTube);
         elementBuilder?.Invoke(collisionTube);
+        AssociateWithServer(collisionTube);
         return collisionTube;
     }
 
@@ -174,8 +186,8 @@ internal sealed class ElementFactory : IElementFactory
             Dimension = dimension,
         };
 
-        AssociateWithServer(ped);
         elementBuilder?.Invoke(ped);
+        AssociateWithServer(ped);
         return ped;
     }
     #endregion

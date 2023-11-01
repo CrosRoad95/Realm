@@ -126,7 +126,7 @@ public sealed class RealmCommandService
 
         var player = (RealmPlayer)args.Player;
 
-        if (!player.Components.TryGetComponent(out UserComponent userComponent))
+        if (!player.TryGetComponent(out UserComponent userComponent))
             return;
 
         var activity = new Activity("CommandHandler");
@@ -221,7 +221,7 @@ public sealed class RealmCommandService
 
         var player = (RealmPlayer)args.Player;
 
-        if (!player.Components.TryGetComponent(out UserComponent userComponent))
+        if (!player.TryGetComponent(out UserComponent userComponent))
             return;
 
         var activity = new Activity("CommandHandler");

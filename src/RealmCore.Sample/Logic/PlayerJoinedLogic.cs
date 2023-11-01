@@ -43,7 +43,7 @@ internal sealed class PlayerJoinedLogic : ComponentLogic<UserComponent>
         await Task.Delay(300);
         await player.FadeCameraAsync(CameraFade.In);
         _text3DService.SetRenderingEnabled(player, true);
-        player.Components.AddComponent(new NametagComponent("KoxKociarz"));
+        player.AddComponent(new NametagComponent("KoxKociarz"));
         _nametagsService.SetNametagRenderingEnabled(player, true);
     }
 
@@ -71,7 +71,7 @@ internal sealed class PlayerJoinedLogic : ComponentLogic<UserComponent>
         _chatBox.ClearFor(player);
         player.Camera.Fade(CameraFade.In);
         player.Camera.SetMatrix(new Vector3(379.89844f, -92.6416f, 10.950561f), new Vector3(336.75684f, -93.018555f, 1.3956465f));
-        var component = player.Components;
+        var component = player;
         if (!component.HasComponent<AdminComponent>())
         {
             var adminComponent = component.AddComponent(new AdminComponent(new List<AdminTool> { AdminTool.Elements, AdminTool.Components, AdminTool.ShowSpawnMarkers }));
@@ -81,7 +81,7 @@ internal sealed class PlayerJoinedLogic : ComponentLogic<UserComponent>
 
         if(!component.HasComponent<LoginGuiComponent>())
         {
-            component.AddComponentWithDI<LoginGuiComponent>();
+            component.Components.AddComponentWithDI<LoginGuiComponent>();
         }
     }
 

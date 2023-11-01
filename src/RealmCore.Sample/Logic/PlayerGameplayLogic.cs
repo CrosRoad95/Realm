@@ -31,14 +31,14 @@ internal sealed class PlayerGameplayLogic : ComponentLogic<UserComponent>
 
     private async Task HandleInteract(RealmPlayer player, KeyState keyState)
     {
-        var components = player.Components;
+        var components = player;
         if (components.TryGetComponent(out AttachedElementComponent attachedElementComponent))
         {
             await player.DoAnimationAsync(Animation.CarryPutDown);
 
             if (attachedElementComponent.TryDetach(out Element? detachedElement) &&
                 detachedElement is IComponents elementComponents &&
-                elementComponents.Components.GetRequiredComponent<LiftableWorldObjectComponent>().TryDrop())
+                elementComponents.GetRequiredComponent<LiftableWorldObjectComponent>().TryDrop())
             {
                 detachedElement.Position = player.Position + player.Forward * 1.0f - new Vector3(0, 0, 0.55f);
                 detachedElement.Rotation = new Vector3
@@ -49,7 +49,7 @@ internal sealed class PlayerGameplayLogic : ComponentLogic<UserComponent>
                 };
             }
         }
-        else if (player.Components.TryGetComponent(out CurrentInteractElementComponent currentInteractElementComponent))
+        else if (player.TryGetComponent(out CurrentInteractElementComponent currentInteractElementComponent))
         {
             var element = currentInteractElementComponent.CurrentInteractElement;
             var currentInteractElement = currentInteractElementComponent.CurrentInteractElement as IComponents;
@@ -65,7 +65,7 @@ internal sealed class PlayerGameplayLogic : ComponentLogic<UserComponent>
                         {
                             await player.DoAnimationAsync(Animation.CarryLiftUp);
                             player.DoAnimation(Animation.StartCarry);
-                            player.Components.AddComponent(new AttachedElementComponent(element, SlipeServer.Packets.Enums.BoneId.LeftHand, new Vector3(0.2f, 0.2f, -0), new Vector3(0, -20, 0)));
+                            player.AddComponent(new AttachedElementComponent(element, SlipeServer.Packets.Enums.BoneId.LeftHand, new Vector3(0.2f, 0.2f, -0), new Vector3(0, -20, 0)));
                         }
                         break;
                     case DurationBasedHoldInteractionComponent durationBasedHoldInteractionComponent:
@@ -117,36 +117,36 @@ internal sealed class PlayerGameplayLogic : ComponentLogic<UserComponent>
     {
         if (element is IComponents components)
         {
-            if (components.Components.TryGetComponent(out VehicleForSaleComponent vehicleForSaleComponent))
+            if (components.TryGetComponent(out VehicleForSaleComponent vehicleForSaleComponent))
             {
-                if (!player.Components.HasComponent<GuiComponent>())
+                if (!player.HasComponent<GuiComponent>())
                 {
                     var vehicle = ((RealmVehicle)element);
                     var vehicleName = ((RealmVehicle)element).Name;
-                    player.Components.AddComponent(new BuyVehicleGuiComponent(vehicleName, vehicleForSaleComponent.Price)).Bought = async () =>
+                    player.AddComponent(new BuyVehicleGuiComponent(vehicleName, vehicleForSaleComponent.Price)).Bought = async () =>
                     {
-                        player.Components.TryDestroyComponent<BuyVehicleGuiComponent>();
-                        if (vehicle.Components.TryDestroyComponent<VehicleForSaleComponent>())
+                        player.TryDestroyComponent<BuyVehicleGuiComponent>();
+                        if (vehicle.TryDestroyComponent<VehicleForSaleComponent>())
                         {
                             await _serviceProvider.GetRequiredService<IVehiclesService>().ConvertToPrivateVehicle(vehicle);
-                            vehicle.Components.GetRequiredComponent<PrivateVehicleComponent>().Access.AddAsOwner(player);
-                            vehicle.Components.AddComponent<VehicleUpgradesComponent>();
-                            vehicle.Components.AddComponent(new MileageCounterComponent());
-                            vehicle.Components.AddComponent(new FuelComponent(1, 20, 20, 0.01, 2)).Active = true;
+                            vehicle.GetRequiredComponent<PrivateVehicleComponent>().Access.AddAsOwner(player);
+                            vehicle.AddComponent<VehicleUpgradesComponent>();
+                            vehicle.AddComponent(new MileageCounterComponent());
+                            vehicle.AddComponent(new FuelComponent(1, 20, 20, 0.01, 2)).Active = true;
                         }
                     };
                 }
             }
             else if (components.Components.TryGetComponent(out InteractionComponent interactionComponent))
             {
-                player.Components.TryDestroyComponent<CurrentInteractElementComponent>();
-                player.Components.AddComponent(new CurrentInteractElementComponent(element));
+                player.TryDestroyComponent<CurrentInteractElementComponent>();
+                player.AddComponent(new CurrentInteractElementComponent(element));
             }
         }
         else
         {
-            player.Components.TryDestroyComponent<CurrentInteractElementComponent>();
-            player.Components.TryDestroyComponent<BuyVehicleGuiComponent>();
+            player.TryDestroyComponent<CurrentInteractElementComponent>();
+            player.TryDestroyComponent<BuyVehicleGuiComponent>();
         }
     }
 }

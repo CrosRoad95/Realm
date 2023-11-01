@@ -1,15 +1,11 @@
-﻿namespace RealmCore.Server.Elements;
+﻿
+namespace RealmCore.Server.Elements;
 
-public class RealmCollisionSphere : CollisionSphere, IComponents
+public class RealmBlip : Blip, IComponents
 {
     public Concepts.Components Components { get; private set; }
 
-    private readonly List<IElementRule> _elementRules = new();
-
-    public event Action<RealmCollisionSphere, Element>? Entered;
-    public event Action<RealmCollisionSphere, Element>? Left;
-
-    public RealmCollisionSphere(IServiceProvider serviceProvider, Vector3 position, float Radius) : base(position, Radius)
+    public RealmBlip(IServiceProvider serviceProvider, Vector3 position, BlipIcon icon, ushort visibleDistance = 16000, short ordering = 0) : base(position, icon, visibleDistance, ordering)
     {
         Components = new(serviceProvider, this);
     }
@@ -60,34 +56,4 @@ public class RealmCollisionSphere : CollisionSphere, IComponents
         return Components.AddComponent(component);
     }
 
-    public void AddRule(IElementRule elementRule)
-    {
-        _elementRules.Add(elementRule);
-    }
-
-    public void AddRule<TElementRule>() where TElementRule : IElementRule, new()
-    {
-        this.ThrowIfDestroyed();
-        _elementRules.Add(new TElementRule());
-    }
-
-    public bool CheckRules(Element element)
-    {
-        foreach (var rule in _elementRules)
-        {
-            if (!rule.Check(element))
-                return false;
-        }
-        return true;
-    }
-
-    internal void RelayEntered(Element element)
-    {
-        Entered?.Invoke(this, element);
-    }
-
-    internal void RelayLeft(Element element)
-    {
-        Left?.Invoke(this, element);
-    }
 }

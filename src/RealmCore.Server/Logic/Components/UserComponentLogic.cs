@@ -15,9 +15,9 @@ internal sealed class UserComponentLogic : ComponentLogic<UserComponent>
 
     private async Task<string?> ValidatePolicies(UserComponent userComponent)
     {
-        var realmPlayer = (RealmPlayer)userComponent.Element;
-        var usersService = realmPlayer.ServiceProvider.GetRequiredService<IUsersService>();
-        var authorizationPoliciesProvider = realmPlayer.ServiceProvider.GetRequiredService<AuthorizationPoliciesProvider>();
+        var player = (RealmPlayer)userComponent.Element;
+        var usersService = player.ServiceProvider.GetRequiredService<IUsersService>();
+        var authorizationPoliciesProvider = player.ServiceProvider.GetRequiredService<AuthorizationPoliciesProvider>();
         foreach (var policy in authorizationPoliciesProvider.Policies)
             if (!await usersService.AuthorizePolicy(userComponent, policy))
                 return policy;

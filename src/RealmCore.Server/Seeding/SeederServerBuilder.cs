@@ -50,9 +50,10 @@ internal sealed class SeederServerBuilder
         {
             if (Enum.IsDefined(typeof(BlipIcon), pair.Value.Icon))
             {
+
                 var blip = _elementFactory.CreateBlip(pair.Value.Position, (BlipIcon)pair.Value.Icon, elementBuilder: x =>
                 {
-                    ((IComponents)x).AddComponent(new NameComponent(pair.Key));
+                    return [new NameComponent(pair.Key)];
                 });
                 _logger.LogInformation("Seeder: Created blip of id {elementId} with icon {blipIcon} at position {position}", pair.Key, pair.Value.Icon, pair.Value.Position);
             }
@@ -69,7 +70,7 @@ internal sealed class SeederServerBuilder
         {
             var pickup = _elementFactory.CreatePickup(pair.Value.Position, pair.Value.Model, elementBuilder: x =>
             {
-                x.AddComponent(new NameComponent(pair.Key));
+                return [new NameComponent(pair.Key)];
             });
             if (pair.Value.Text3d != null)
             {

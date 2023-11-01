@@ -19,18 +19,18 @@ public class DefaultChatLogic
         };
     }
 
-    private void HandlePlayerCommandEntered(Player player, PlayerCommandEventArgs arguments)
+    private void HandlePlayerCommandEntered(Player plr, PlayerCommandEventArgs arguments)
     {
         switch (arguments.Command)
         {
             case "say":
-                var realmPlayer = (RealmPlayer)player;
-                if (realmPlayer.Components.HasComponent<UserComponent>())
+                var player = (RealmPlayer)plr;
+                if (player.HasComponent<UserComponent>())
                 {
-                    string message = $"{player.NametagColor.ToColorCode()}{player.Name}: #ffffff{string.Join(' ', arguments.Arguments)}";
+                    string message = $"{plr.NametagColor.ToColorCode()}{plr.Name}: #ffffff{string.Join(' ', arguments.Arguments)}";
                     foreach (var targetPlayer in _elementCollection.GetByType<Player>().Cast<RealmPlayer>())
                     {
-                        if(targetPlayer.Components.HasComponent<UserComponent>())
+                        if(targetPlayer.HasComponent<UserComponent>())
                             _chatBox.OutputTo(targetPlayer, message, Color.White, true);
                     }
 
@@ -38,7 +38,7 @@ public class DefaultChatLogic
                 }
                 else
                 {
-                    _chatBox.OutputTo(player, "Nie możesz pisać ponieważ nie jesteś zalogowany.");
+                    _chatBox.OutputTo(plr, "Nie możesz pisać ponieważ nie jesteś zalogowany.");
                 }
                 break;
         }

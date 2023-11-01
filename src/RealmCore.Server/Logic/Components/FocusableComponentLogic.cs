@@ -17,29 +17,29 @@ internal sealed class FocusableComponentLogic : ComponentLogic<FocusableComponen
     }
 
     // TODO:
-    private void HandleFocusedElementChanged(Player player, Element? focusedElement, string? vehiclePart)
+    private void HandleFocusedElementChanged(Player plr, Element? focusedElement, string? vehiclePart)
     {
-        var realmPlayer = ((RealmPlayer)player);
+        var player = ((RealmPlayer)plr);
         if(focusedElement == null)
         {
-            if(realmPlayer.FocusedElement is IComponents components)
+            if(player.FocusedElement is IComponents components)
             {
                 if(components.Components.TryGetComponent(out FocusableComponent focusableComponent))
                 {
-                    focusableComponent.RemoveFocusedPlayer(realmPlayer);
+                    focusableComponent.RemoveFocusedPlayer(player);
                 }
             }
         }
         else
         {
-            if (realmPlayer.FocusedElement is IComponents components)
+            if (player.FocusedElement is IComponents components)
             {
-                components.Components.GetRequiredComponent<FocusableComponent>().AddFocusedPlayer(realmPlayer);
+                components.Components.GetRequiredComponent<FocusableComponent>().AddFocusedPlayer(player);
 
             }
         }
 
-        realmPlayer.FocusedElement = focusedElement;
+        player.FocusedElement = focusedElement;
     }
 
     protected override void ComponentAdded(FocusableComponent component)

@@ -111,14 +111,14 @@ internal sealed class PlayersLogic
         _playerResources[player].Decrement();
     }
 
-    private async void HandlePlayerDisconnected(Player player, PlayerQuitEventArgs e)
+    private async void HandlePlayerDisconnected(Player plr, PlayerQuitEventArgs e)
     {
         try
         {
-            var realmPlayer = (RealmPlayer)player;
-            player.Disconnected -= HandlePlayerDisconnected;
-            _playerResources.TryRemove(player, out var _);
-            await realmPlayer.ServiceProvider.GetRequiredService<ISaveService>().Save(realmPlayer);
+            var player = (RealmPlayer)plr;
+            plr.Disconnected -= HandlePlayerDisconnected;
+            _playerResources.TryRemove(plr, out var _);
+            await player.ServiceProvider.GetRequiredService<ISaveService>().Save(player);
         }
         catch (Exception ex)
         {

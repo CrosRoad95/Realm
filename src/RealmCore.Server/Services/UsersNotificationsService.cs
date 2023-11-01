@@ -16,7 +16,7 @@ internal sealed class UsersNotificationsService : IUsersNotificationsService
 
     public async Task<int> Create(RealmPlayer player, string title, string description, string? excerpt = null)
     {
-        var userComponent = player.Components.GetRequiredComponent<UserComponent>();
+        var userComponent = player.GetRequiredComponent<UserComponent>();
         var notification = await _userNotificationRepository.Create(userComponent.Id, _dateTimeProvider.Now, title, description, excerpt);
         NotificationCreated?.Invoke(player, title, description, excerpt, notification.Id);
         return notification.Id;
@@ -24,13 +24,13 @@ internal sealed class UsersNotificationsService : IUsersNotificationsService
 
     public async Task<List<UserNotificationData>> Get(RealmPlayer player, int limit = 10)
     {
-        var userComponent = player.Components.GetRequiredComponent<UserComponent>();
+        var userComponent = player.GetRequiredComponent<UserComponent>();
         return await _userNotificationRepository.Get(userComponent.Id, limit);
     }
 
     public async Task<int> CountUnread(RealmPlayer player)
     {
-        var userComponent = player.Components.GetRequiredComponent<UserComponent>();
+        var userComponent = player.GetRequiredComponent<UserComponent>();
         return await _userNotificationRepository.CountUnread(userComponent.Id);
     }
 

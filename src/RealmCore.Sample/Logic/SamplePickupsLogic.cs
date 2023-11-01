@@ -28,16 +28,16 @@ internal class SamplePickupsLogic
                     if (sessionComponent != null && sessionComponent is not FractionSessionComponent)
                         return;
 
-                    if (player.Components.HasComponent<FractionSessionComponent>())
+                    if (player.HasComponent<FractionSessionComponent>())
                     {
-                        var fractionSessionComponent = player.Components.GetRequiredComponent<FractionSessionComponent>();
+                        var fractionSessionComponent = player.GetRequiredComponent<FractionSessionComponent>();
                         fractionSessionComponent.End();
                         _chatBox.OutputTo(player, $"Session ended in: {fractionSessionComponent.Elapsed}");
-                        player.Components.DestroyComponent(fractionSessionComponent);
+                        player.DestroyComponent(fractionSessionComponent);
                     }
                     else
                     {
-                        var fractionSessionComponent = player.Components.AddComponent<FractionSessionComponent>();
+                        var fractionSessionComponent = player.AddComponent<FractionSessionComponent>();
                         _chatBox.OutputTo(player, $"Session started");
                         fractionSessionComponent.Start();
                     }
@@ -56,18 +56,18 @@ internal class SamplePickupsLogic
                     if (sessionComponent != null && sessionComponent is not JobSessionComponent)
                         return;
 
-                    if (player.Components.HasComponent<JobSessionComponent>())
+                    if (player.HasComponent<JobSessionComponent>())
                     {
-                        var jobSessionComponent = player.Components.GetRequiredComponent<JobSessionComponent>();
+                        var jobSessionComponent = player.GetRequiredComponent<JobSessionComponent>();
                         jobSessionComponent.End();
                         var elapsed = jobSessionComponent.Elapsed;
                         _chatBox.OutputTo(player, $"Job ended in: {elapsed.Hours:X2}:{elapsed.Minutes:X2}:{elapsed.Seconds:X2}, completed objectives: {jobSessionComponent.CompletedObjectives}");
-                        player.Components.GetRequiredComponent<JobStatisticsComponent>().AddTimePlayed(jobSessionComponent.JobId, (ulong)jobSessionComponent.Elapsed.Seconds);
-                        player.Components.DestroyComponent(jobSessionComponent);
+                        player.GetRequiredComponent<JobStatisticsComponent>().AddTimePlayed(jobSessionComponent.JobId, (ulong)jobSessionComponent.Elapsed.Seconds);
+                        player.DestroyComponent(jobSessionComponent);
                     }
                     else
                     {
-                        var jobSessionComponent = player.Components.AddComponent(new TestJobComponent(_elementFactory));
+                        var jobSessionComponent = player.AddComponent(new TestJobComponent(_elementFactory));
                         _chatBox.OutputTo(player, $"Job started");
                         jobSessionComponent.Start();
 

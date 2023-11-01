@@ -1,20 +1,20 @@
 ﻿namespace RealmCore.Server.IdGenerators;
 
-public class MapIdGenerator : IElementIdGenerator
+public sealed class MapIdGenerator
 {
     private readonly uint _start;
     private readonly uint _stop;
     private readonly object _lock = new();
     private uint _idCounter;
 
-    public MapIdGenerator(uint start, uint stop)
+    public MapIdGenerator()
     {
-        _idCounter = start;
-        _start = start;
-        _stop = stop;
+        _idCounter = IdGeneratorConstants.MapIdStart;
+        _start = IdGeneratorConstants.MapIdStart;
+        _stop = IdGeneratorConstants.MapIdStop;
     }
 
-    public uint GetId()
+    public ElementId GetId()
     {
         lock (_lock)
         {
@@ -22,7 +22,10 @@ public class MapIdGenerator : IElementIdGenerator
             if (_idCounter > _stop)
                 _idCounter = _start;
 
-            return _idCounter;
+            return new ElementId
+            {
+                Value = _idCounter
+            };
         }
     }
 }

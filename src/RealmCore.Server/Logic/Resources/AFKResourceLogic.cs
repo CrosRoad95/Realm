@@ -15,23 +15,23 @@ internal sealed class AFKResourceLogic
         afkService.PlayerAFKStopped += HandlePlayerAFKStopped;
     }
 
-    private void HandlePlayerAFKStarted(Player player)
+    private void HandlePlayerAFKStarted(Player plr)
     {
-        var realmPlayer = (RealmPlayer)player;
-        if (realmPlayer.Components.TryGetComponent(out AFKComponent afkComponent))
+        var player = (RealmPlayer)plr;
+        if (player.TryGetComponent(out AFKComponent afkComponent))
         {
-            using var _ = _logger.BeginElement(realmPlayer);
+            using var _ = _logger.BeginElement(player);
             _logger.LogInformation("Player started AFK");
             afkComponent.HandlePlayerAFKStarted(_dateTimeProvider.Now);
         }
     }
 
-    private void HandlePlayerAFKStopped(Player player)
+    private void HandlePlayerAFKStopped(Player plr)
     {
-        var realmPlayer = (RealmPlayer)player;
-        if (realmPlayer.Components.TryGetComponent(out AFKComponent afkComponent))
+        var player = (RealmPlayer)plr;
+        if (player.TryGetComponent(out AFKComponent afkComponent))
         {
-            using var _ = _logger.BeginElement(realmPlayer);
+            using var _ = _logger.BeginElement(player);
             _logger.LogInformation("Player stopped AFK");
             afkComponent.HandlePlayerAFKStopped(_dateTimeProvider.Now);
         }

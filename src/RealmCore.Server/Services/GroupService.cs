@@ -63,13 +63,13 @@ internal sealed class GroupService : IGroupService
 
     public async Task<bool> AddMember(RealmPlayer player, int groupId, int rank = 1, string rankName = "")
     {
-        if (player.Components.TryGetComponent(out UserComponent userComponent))
+        if (player.TryGetComponent(out UserComponent userComponent))
         {
             if (player.Components.HasComponent<GroupMemberComponent>(x => x.GroupId == groupId))
                 return false;
 
             var groupMemberData = await _groupRepository.AddMember(groupId, userComponent.Id, rank, rankName);
-            player.Components.AddComponent(new GroupMemberComponent(groupMemberData));
+            player.AddComponent(new GroupMemberComponent(groupMemberData));
         }
         return false;
     }
@@ -81,7 +81,7 @@ internal sealed class GroupService : IGroupService
 
     public async Task<bool> RemoveMember(RealmPlayer player, int groupId)
     {
-        if (player.Components.TryGetComponent(out UserComponent userComponent))
+        if (player.TryGetComponent(out UserComponent userComponent))
         {
             var groupMemberComponent = player.Components.FindComponent<GroupMemberComponent>(x => x.GroupId == groupId);
             if (groupMemberComponent == null)

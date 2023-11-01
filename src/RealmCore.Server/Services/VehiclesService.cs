@@ -39,7 +39,7 @@ internal sealed class VehiclesService : IVehiclesService
         var vehicleData = await _vehicleRepository.CreateVehicle(model, _dateTimeProvider.Now);
         return _elementFactory.CreateVehicle(model, position, rotation, elementBuilder: vehicle =>
         {
-            vehicle.Components.AddComponent(new PrivateVehicleComponent(vehicleData, _dateTimeProvider));
+            return [new PrivateVehicleComponent(vehicleData, _dateTimeProvider)];
         });
     }
 
@@ -55,7 +55,7 @@ internal sealed class VehiclesService : IVehiclesService
 
     public async Task<List<LightInfoVehicleDTO>> GetAllLightVehicles(RealmPlayer player)
     {
-        if (player.Components.TryGetComponent(out UserComponent userComponent))
+        if (player.TryGetComponent(out UserComponent userComponent))
         {
             return await _vehicleRepository.GetLightVehiclesByUserId(userComponent.Id);
         }
@@ -64,7 +64,7 @@ internal sealed class VehiclesService : IVehiclesService
 
     public async Task<List<VehicleData>> GetAllVehicles(RealmPlayer player)
     {
-        if(player.Components.TryGetComponent(out UserComponent userComponent))
+        if(player.TryGetComponent(out UserComponent userComponent))
         {
             return await _vehicleRepository.GetVehiclesByUserId(userComponent.Id);
         }
@@ -143,6 +143,7 @@ internal sealed class VehiclesService : IVehiclesService
                     }
                 }
 
+                return []; // TODO:
             });
 
         await SetVehicleSpawned(vehicle);

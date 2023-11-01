@@ -14,7 +14,7 @@ public sealed class LicensesCommand : IInGameCommand
 
     public Task Handle(RealmPlayer player, CommandArguments args)
     {
-        if (player.Components.TryGetComponent(out LicensesComponent licenseComponent))
+        if (player.TryGetComponent(out LicensesComponent licenseComponent))
         {
             _chatBox.OutputTo(player, $"Licenses");
             foreach (var license in licenseComponent.Licenses)

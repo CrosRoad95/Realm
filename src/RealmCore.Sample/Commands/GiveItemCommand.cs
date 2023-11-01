@@ -16,7 +16,7 @@ public sealed class GiveItemCommand : IInGameCommand
 
     public Task Handle(RealmPlayer player, CommandArguments args)
     {
-        if (player.Components.TryGetComponent(out InventoryComponent inventoryComponent))
+        if (player.TryGetComponent(out InventoryComponent inventoryComponent))
         {
             uint itemId = args.ReadUInt();
             uint count = args.ReadUInt();

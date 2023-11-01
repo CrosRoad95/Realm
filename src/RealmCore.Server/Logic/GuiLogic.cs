@@ -29,7 +29,7 @@ internal class GuiLogic
             foreach (var guiComponent in guiComponents)
             {
                 player.Components.DetachComponent(guiComponent);
-                player.Components.AddComponent(guiComponent);
+                player.AddComponent(guiComponent);
             }
         }
         return Task.CompletedTask;

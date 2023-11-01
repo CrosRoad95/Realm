@@ -11,9 +11,9 @@ public sealed class MustBePlayerInFractionRule : IElementRule
 
     public bool Check(Element element)
     {
-        if(element is RealmPlayer realmPlayer)
+        if(element is RealmPlayer player)
         {
-            return realmPlayer.Components.ComponentsLists.OfType<FractionMemberComponent>().Where(x => x.FractionId == _fractionId).Any();
+            return player.Components.ComponentsLists.OfType<FractionMemberComponent>().Where(x => x.FractionId == _fractionId).Any();
         }
         return false;
     }

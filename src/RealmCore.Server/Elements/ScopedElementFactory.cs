@@ -9,8 +9,8 @@ internal sealed class ScopedElementFactory : IScopedElementFactory
     public event Action<Element>? ElementCreated;
     private readonly object _lock = new();
     private readonly List<Element> _createdElements = new();
+    private readonly MapIdGenerator _elementIdGenerator;
 
-    public RealmPlayer Player => _player;
     public Element LastCreatedElement => _lastCreatedElement ?? throw new NullReferenceException();
     public IEnumerable<Element> CreatedElements
     {
@@ -31,10 +31,23 @@ internal sealed class ScopedElementFactory : IScopedElementFactory
         return (T)LastCreatedElement;
     }
 
-    public ScopedElementFactory(RealmPlayer player)
+    private void ExecuteElementBuilder<TElement>(Func<TElement, IEnumerable<IComponent>>? builder, TElement element) where TElement : IComponents
     {
-        _player = player;
+        if (builder == null)
+            return;
+
+        var components = builder(element);
+        foreach (var component in components)
+        {
+            element.AddComponent(component);
+        }
+    }
+
+    public ScopedElementFactory(PlayerContext playerContext, MapIdGenerator elementIdGenerator)
+    {
+        _player = playerContext.Player;
         _player.Destroyed += HandlePlayerDestroyed;
+        _elementIdGenerator = elementIdGenerator;
     }
 
     private void HandlePlayerDestroyed(Element _)
@@ -45,6 +58,7 @@ internal sealed class ScopedElementFactory : IScopedElementFactory
 
     private void Add(Element element)
     {
+        element.Id = _elementIdGenerator.GetId();
         lock (_lock)
         {
             _lastCreatedElement = element;
@@ -57,19 +71,18 @@ internal sealed class ScopedElementFactory : IScopedElementFactory
     {
         Add(element);
         element.AssociateWith(_player);
-        if (element is Pickup pickup)
+        if (element is RealmMarker pickup)
         {
             pickup.CollisionShape.AssociateWith(_player);
         }
 
-        if (element is Marker marker)
+        if (element is RealmMarker marker)
         {
-            // TODO:
-            //marker.CollisionShape.AssociateWith(_player);
+            marker.CollisionShape.AssociateWith(_player);
         }
     }
 
-    public RealmCollisionSphere CreateCollisionSphere(Vector3 position, float radius, byte interior = 0, ushort dimension = 0, Action<RealmCollisionSphere>? elementBuilder = null)
+    public RealmCollisionSphere CreateCollisionSphere(Vector3 position, float radius, byte interior = 0, ushort dimension = 0, Func<RealmCollisionSphere, IEnumerable<IComponent>>? elementBuilder = null)
     {
         ThrowIfDisposed();
         var collisionSphere = new RealmCollisionSphere(_player.ServiceProvider, position, radius)
@@ -78,11 +91,12 @@ internal sealed class ScopedElementFactory : IScopedElementFactory
             Dimension = dimension
         };
 
+        ExecuteElementBuilder(elementBuilder, collisionSphere);
         AssociateWithPlayer(collisionSphere);
         return collisionSphere;
     }
 
-    public RealmMarker CreateMarker(MarkerType markerType, Vector3 position, Color color, byte interior = 0, ushort dimension = 0, Action<Marker>? elementBuilder = null)
+    public RealmMarker CreateMarker(MarkerType markerType, Vector3 position, Color color, byte interior = 0, ushort dimension = 0, Func<RealmMarker, IEnumerable<IComponent>>? elementBuilder = null)
     {
         ThrowIfDisposed();
         var marker = new RealmMarker(_player.ServiceProvider, position, markerType, 2)
@@ -92,11 +106,12 @@ internal sealed class ScopedElementFactory : IScopedElementFactory
             Dimension = dimension
         };
 
+        ExecuteElementBuilder(elementBuilder, marker);
         AssociateWithPlayer(marker);
         return marker;
     }
 
-    public RealmObject CreateObject(ObjectModel model, Vector3 position, Vector3 rotation, byte interior = 0, ushort dimension = 0, Action<RealmObject>? elementBuilder = null)
+    public RealmObject CreateObject(ObjectModel model, Vector3 position, Vector3 rotation, byte interior = 0, ushort dimension = 0, Func<RealmObject, IEnumerable<IComponent>>? elementBuilder = null)
     {
         ThrowIfDisposed();
         var worldObject = new RealmObject(_player.ServiceProvider, model, position)
@@ -106,25 +121,23 @@ internal sealed class ScopedElementFactory : IScopedElementFactory
             Dimension = dimension
         };
 
+        ExecuteElementBuilder(elementBuilder, worldObject);
         AssociateWithPlayer(worldObject);
         return worldObject;
     }
 
-    private void ThrowIfDisposed()
+    public RealmBlip CreateBlip(Vector3 position, BlipIcon blipIcon, byte interior = 0, ushort dimension = 0, Func<RealmBlip, IEnumerable<IComponent>>? elementBuilder = null)
     {
-        if (_disposed)
-            throw new ObjectDisposedException(GetType().Name);
-    }
+        ThrowIfDisposed();
+        var blip = new RealmBlip(_player.ServiceProvider, position, blipIcon)
+        {
+            Interior = interior,
+            Dimension = dimension
+        };
 
-    public void Dispose()
-    {
-        Disposed?.Invoke(this);
-        _disposed = true;
-    }
-
-    public Blip CreateBlip(Vector3 position, BlipIcon blipIcon, byte interior = 0, ushort dimension = 0, Action<Element>? elementBuilder = null)
-    {
-        throw new NotImplementedException();
+        ExecuteElementBuilder(elementBuilder, blip);
+        AssociateWithPlayer(blip);
+        return blip;
     }
 
     public CollisionCircle CreateCollisionCircle(Vector2 position, float radius, byte interior = 0, ushort dimension = 0, Action<Element>? elementBuilder = null)
@@ -162,17 +175,12 @@ internal sealed class ScopedElementFactory : IScopedElementFactory
         throw new NotImplementedException();
     }
 
-    public WorldObject CreateObject(ObjectModel model, Vector3 position, Vector3 rotation, byte interior = 0, ushort dimension = 0, Action<Element>? elementBuilder = null)
-    {
-        throw new NotImplementedException();
-    }
-
     public Ped CreatePed(PedModel pedModel, Vector3 position, byte interior = 0, ushort dimension = 0, Action<Element>? elementBuilder = null)
     {
         throw new NotImplementedException();
     }
 
-    public RealmPickup CreatePickup(Vector3 position, ushort model, byte interior = 0, ushort dimension = 0, Action<RealmPickup>? elementBuilder = null)
+    public RealmPickup CreatePickup(Vector3 position, ushort model, byte interior = 0, ushort dimension = 0, Func<RealmPickup, IEnumerable<IComponent>>? elementBuilder = null)
     {
         throw new NotImplementedException();
     }
@@ -182,8 +190,20 @@ internal sealed class ScopedElementFactory : IScopedElementFactory
         throw new NotImplementedException();
     }
 
-    public RealmVehicle CreateVehicle(ushort model, Vector3 position, Vector3 rotation, byte interior = 0, ushort dimension = 0, Action<RealmVehicle>? elementBuilder = null)
+    public RealmVehicle CreateVehicle(ushort model, Vector3 position, Vector3 rotation, byte interior = 0, ushort dimension = 0, Func<RealmVehicle, IEnumerable<IComponent>>? elementBuilder = null)
     {
         throw new NotImplementedException();
+    }
+
+    private void ThrowIfDisposed()
+    {
+        if (_disposed)
+            throw new ObjectDisposedException(GetType().Name);
+    }
+
+    public void Dispose()
+    {
+        Disposed?.Invoke(this);
+        _disposed = true;
     }
 }

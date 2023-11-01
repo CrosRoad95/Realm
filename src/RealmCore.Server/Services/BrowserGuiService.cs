@@ -17,9 +17,9 @@ internal class BrowserGuiService : IBrowserGuiService
         _randomNumberGenerator = RandomNumberGenerator.Create();
     }
 
-    public void RelayPlayerLoggedIn(RealmPlayer realmPlayer)
+    public void RelayPlayerLoggedIn(RealmPlayer player)
     {
-        Ready?.Invoke(realmPlayer);
+        Ready?.Invoke(player);
     }
 
     public string GenerateKey()
@@ -31,21 +31,21 @@ internal class BrowserGuiService : IBrowserGuiService
             return Convert.ToBase64String(_bytes).Replace('+', '-').Replace('/', '_');
         }
     }
-    public void AuthorizePlayer(string key, RealmPlayer realmPlayer)
+    public void AuthorizePlayer(string key, RealmPlayer player)
     {
-        _browserPlayers.TryAdd(key, realmPlayer);
+        _browserPlayers.TryAdd(key, player);
     }
 
-    public void UnauthorizePlayer(RealmPlayer realmPlayer)
+    public void UnauthorizePlayer(RealmPlayer player)
     {
-        var itemsToRemove = _browserPlayers.Where(x => x.Value == realmPlayer).FirstOrDefault();
+        var itemsToRemove = _browserPlayers.Where(x => x.Value == player).FirstOrDefault();
 
         _browserPlayers.TryRemove(itemsToRemove.Key, out var _);
     }
     
-    public bool TryGetKeyByPlayer(RealmPlayer realmPlayer, out string? key)
+    public bool TryGetKeyByPlayer(RealmPlayer player, out string? key)
     {
-        var browserPlayers = _browserPlayers.Where(x => x.Value == realmPlayer).ToList();
+        var browserPlayers = _browserPlayers.Where(x => x.Value == player).ToList();
         if (browserPlayers.Count == 0)
         {
             key = null;
@@ -55,9 +55,9 @@ internal class BrowserGuiService : IBrowserGuiService
         return true;
     }
 
-    public bool TryGetPlayerByKey(string key, out RealmPlayer? realmPlayer)
+    public bool TryGetPlayerByKey(string key, out RealmPlayer? player)
     {
-        bool found = _browserPlayers.TryGetValue(key, out realmPlayer);
+        bool found = _browserPlayers.TryGetValue(key, out player);
 
         return found;
     }

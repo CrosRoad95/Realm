@@ -13,7 +13,7 @@ public sealed class MustBePlayerWithLicenseRule : IElementRule
 
     public bool Check(Element element)
     {
-        if(element is RealmPlayer player && player.Components.TryGetComponent(out LicensesComponent licensesComponent))
+        if(element is RealmPlayer player && player.TryGetComponent(out LicensesComponent licensesComponent))
             return licensesComponent.HasLicense(_licenseId);
         return false;
     }

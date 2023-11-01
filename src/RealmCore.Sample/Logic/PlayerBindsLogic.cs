@@ -40,7 +40,7 @@ internal sealed class PlayerBindsLogic : ComponentLogic<UserComponent>
 
         player.SetBindAsync("num_0", player =>
         {
-            if (player.Components.TryGetComponent(out AdminComponent adminComponent))
+            if (player.TryGetComponent(out AdminComponent adminComponent))
             {
                 adminComponent.NoClip = !adminComponent.NoClip;
             }
@@ -49,7 +49,7 @@ internal sealed class PlayerBindsLogic : ComponentLogic<UserComponent>
 
         player.SetBind("F2", player =>
         {
-            if (player.Components.TryGetComponent(out BrowserComponent browserComponent))
+            if (player.TryGetComponent(out BrowserComponent browserComponent))
             {
                 if (browserComponent.Visible)
                 {
@@ -65,7 +65,7 @@ internal sealed class PlayerBindsLogic : ComponentLogic<UserComponent>
 
         player.SetBind("F3", player =>
         {
-            if (player.Components.TryGetComponent(out BrowserComponent browserComponent))
+            if (player.TryGetComponent(out BrowserComponent browserComponent))
             {
                 browserComponent.Path = "/realmUi/counter1";
                 browserComponent.Visible = true;
@@ -74,7 +74,7 @@ internal sealed class PlayerBindsLogic : ComponentLogic<UserComponent>
 
         player.SetBind("F4", player =>
         {
-            if (player.Components.TryGetComponent(out BrowserComponent browserComponent))
+            if (player.TryGetComponent(out BrowserComponent browserComponent))
             {
                 browserComponent.Path = "index";
                 browserComponent.Visible = false;
@@ -87,7 +87,7 @@ internal sealed class PlayerBindsLogic : ComponentLogic<UserComponent>
         GuiHelpers.BindGuiPage(player, "F1", async () =>
         {
             DashboardGuiComponent.DashboardState state = new();
-            if (player.Components.TryGetComponent(out MoneyComponent moneyComponent))
+            if (player.TryGetComponent(out MoneyComponent moneyComponent))
                 state.Money = (double)moneyComponent.Money;
 
             var vehiclesWithModelAndPositionDTos = await _vehicleRepository.GetLightVehiclesByUserId(userComponent.Id);

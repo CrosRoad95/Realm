@@ -6,7 +6,7 @@ public sealed class MustHaveComponent<TComponent> : IElementRule
     public bool Check(Element element)
     {
         if(element is RealmPlayer player)
-            return player.Components.HasComponent<TComponent>();
+            return player.HasComponent<TComponent>();
         return false;
     }
 }

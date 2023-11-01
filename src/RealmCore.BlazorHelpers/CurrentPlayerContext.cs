@@ -32,7 +32,7 @@ public class CurrentPlayerContext : IDisposable
             if(BrowserGuiService.TryGetPlayerByKey(keyClaim.Value, out var player) && player != null)
             {
                 _player = player;
-                _browserComponent = player.Components.GetRequiredComponent<BrowserComponent>();
+                _browserComponent = player.GetRequiredComponent<BrowserComponent>();
                 _browserComponent.PathChanged += HandlePathChanged;
             }
         }
@@ -55,7 +55,7 @@ public class CurrentPlayerContext : IDisposable
 
 public class CurrentPlayerContext<TGuiPageComponent> : CurrentPlayerContext where TGuiPageComponent : BrowserGuiComponent, IDisposable
 {
-    public TGuiPageComponent Component => Player.Components.GetRequiredComponent<TGuiPageComponent>();
+    public TGuiPageComponent Component => Player.GetRequiredComponent<TGuiPageComponent>();
 
     public CurrentPlayerContext(IHttpContextAccessor httpContent, IRealmServer realmServer) : base(httpContent, realmServer)
     {
@@ -63,6 +63,6 @@ public class CurrentPlayerContext<TGuiPageComponent> : CurrentPlayerContext wher
 
     public void Close()
     {
-        Player.Components.DestroyComponent(Component);
+        Player.DestroyComponent(Component);
     }
 }

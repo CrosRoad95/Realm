@@ -212,7 +212,7 @@ internal sealed class SaveService : ISaveService
 
     private async Task<bool> SavePlayer(RealmPlayer player)
     {
-        if (!player.Components.TryGetComponent(out UserComponent userComponent))
+        if (!player.TryGetComponent(out UserComponent userComponent))
             return false;
 
         var user = await _dbContext.Users
@@ -235,12 +235,12 @@ internal sealed class SaveService : ISaveService
 
         user.LastTransformAndMotion = player.GetTransformAndMotion();
 
-        if (player.Components.TryGetComponent(out MoneyComponent moneyComponent))
+        if (player.TryGetComponent(out MoneyComponent moneyComponent))
             user.Money = moneyComponent.Money;
         else
             user.Money = 0;
 
-        if (player.Components.TryGetComponent(out LicensesComponent licensesComponent))
+        if (player.TryGetComponent(out LicensesComponent licensesComponent))
         {
             user.Licenses = licensesComponent.Licenses.Select(x => new UserLicenseData
             {
@@ -254,7 +254,7 @@ internal sealed class SaveService : ISaveService
             user.Licenses = new List<UserLicenseData>();
         }
 
-        if (player.Components.TryGetComponent(out PlayTimeComponent playTimeComponent))
+        if (player.TryGetComponent(out PlayTimeComponent playTimeComponent))
         {
             user.PlayTime = (ulong)playTimeComponent.TotalPlayTime.TotalSeconds;
             playTimeComponent.Reset();
@@ -279,7 +279,7 @@ internal sealed class SaveService : ISaveService
             user.Inventories = new List<InventoryData>();
 
 
-        if (player.Components.TryGetComponent(out DailyVisitsCounterComponent dailyVisitsCounterComponent))
+        if (player.TryGetComponent(out DailyVisitsCounterComponent dailyVisitsCounterComponent))
         {
             user.DailyVisits = new DailyVisitsData
             {
@@ -291,7 +291,7 @@ internal sealed class SaveService : ISaveService
         else
             user.DailyVisits = null;
 
-        if (player.Components.TryGetComponent(out StatisticsCounterComponent statisticsCounterComponent))
+        if (player.TryGetComponent(out StatisticsCounterComponent statisticsCounterComponent))
         {
             user.Stats = statisticsCounterComponent.GetStatsIds.Select(x => new UserStatData
             {
@@ -303,7 +303,7 @@ internal sealed class SaveService : ISaveService
         else
             user.Stats = new List<UserStatData>();
 
-        if (player.Components.TryGetComponent(out AchievementsComponent achievementsComponent))
+        if (player.TryGetComponent(out AchievementsComponent achievementsComponent))
         {
             user.Achievements = achievementsComponent.Achievements.Select(x => new AchievementData
             {
@@ -316,7 +316,7 @@ internal sealed class SaveService : ISaveService
         else
             user.Achievements = new List<AchievementData>();
 
-        if (player.Components.TryGetComponent(out JobUpgradesComponent jobUpgradesComponent))
+        if (player.TryGetComponent(out JobUpgradesComponent jobUpgradesComponent))
         {
             user.JobUpgrades = jobUpgradesComponent.Upgrades.Select(x => new JobUpgradeData
             {
@@ -327,7 +327,7 @@ internal sealed class SaveService : ISaveService
         else
             user.JobUpgrades = new List<JobUpgradeData>();
 
-        if (player.Components.TryGetComponent(out JobStatisticsComponent jobStatisticsComponent))
+        if (player.TryGetComponent(out JobStatisticsComponent jobStatisticsComponent))
         {
             var newStatistics = jobStatisticsComponent.JobStatistics.Where(x => x.Value.sessionPoints > 0 || x.Value.sessionTimePlayed > 0);
             foreach (var item in newStatistics)
@@ -354,7 +354,7 @@ internal sealed class SaveService : ISaveService
         else
             user.JobStatistics = new List<JobStatisticsData>();
 
-        if (player.Components.TryGetComponent(out DiscoveriesComponent discoveriesComponent))
+        if (player.TryGetComponent(out DiscoveriesComponent discoveriesComponent))
         {
             user.Discoveries = discoveriesComponent.Discoveries.Select(x => new DiscoveryData
             {
@@ -362,7 +362,7 @@ internal sealed class SaveService : ISaveService
             }).ToList();
         }
 
-        if (player.Components.TryGetComponent(out LevelComponent levelComponent))
+        if (player.TryGetComponent(out LevelComponent levelComponent))
         {
             user.Level = levelComponent.Level;
             user.Experience = levelComponent.Experience;
@@ -373,7 +373,7 @@ internal sealed class SaveService : ISaveService
             user.Experience = 0;
         }
 
-        if (player.Components.TryGetComponent(out DiscordIntegrationComponent discordIntegrationComponent))
+        if (player.TryGetComponent(out DiscordIntegrationComponent discordIntegrationComponent))
         {
             user.DiscordIntegration = new DiscordIntegrationData
             {
