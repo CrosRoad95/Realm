@@ -9,9 +9,9 @@ public class VehicleAccessComponentsTests
     {
         var realmTestingServer = new RealmTestingServer();
         var player = realmTestingServer.CreatePlayer();
-        var entityFactory = realmTestingServer.GetRequiredService<IElementFactory>();
+        var elementFactory = realmTestingServer.GetRequiredService<IElementFactory>();
 
-        var vehicle = entityFactory.CreateVehicle(404, Vector3.Zero, Vector3.Zero);
+        var vehicle = elementFactory.CreateVehicle(404, Vector3.Zero, Vector3.Zero);
         var vehicleAccessService = realmTestingServer.GetRequiredService<IVehicleAccessService>();
         var canEnter = vehicleAccessService.InternalCanEnter(player, vehicle, 0);
         canEnter.Should().BeTrue();
@@ -23,9 +23,9 @@ public class VehicleAccessComponentsTests
         var realmTestingServer = new RealmTestingServer();
         var player1 = realmTestingServer.CreatePlayer();
         var player2 = realmTestingServer.CreatePlayer();
-        var entityFactory = realmTestingServer.GetRequiredService<IElementFactory>();
+        var elementFactory = realmTestingServer.GetRequiredService<IElementFactory>();
 
-        var vehicle = entityFactory.CreateVehicle(404, Vector3.Zero, Vector3.Zero);
+        var vehicle = elementFactory.CreateVehicle(404, Vector3.Zero, Vector3.Zero);
         var accessComponent = vehicle.AddComponent(new VehicleExclusiveAccessComponent(player1));
         var vehicleAccessService = realmTestingServer.GetRequiredService<IVehicleAccessService>();
 
@@ -40,9 +40,9 @@ public class VehicleAccessComponentsTests
     {
         var realmTestingServer = new RealmTestingServer();
         var player = realmTestingServer.CreatePlayer();
-        var entityFactory = realmTestingServer.GetRequiredService<IElementFactory>();
+        var elementFactory = realmTestingServer.GetRequiredService<IElementFactory>();
 
-        var vehicle = entityFactory.CreateVehicle(404, Vector3.Zero, Vector3.Zero);
+        var vehicle = elementFactory.CreateVehicle(404, Vector3.Zero, Vector3.Zero);
         var accessComponent = vehicle.AddComponent<VehicleNoAccessComponent>();
         var vehicleAccessService = realmTestingServer.GetRequiredService<IVehicleAccessService>();
 
@@ -55,9 +55,9 @@ public class VehicleAccessComponentsTests
     {
         var realmTestingServer = new RealmTestingServer();
         var player = realmTestingServer.CreatePlayer();
-        var entityFactory = realmTestingServer.GetRequiredService<IElementFactory>();
+        var elementFactory = realmTestingServer.GetRequiredService<IElementFactory>();
 
-        var vehicle = entityFactory.CreateVehicle(404, Vector3.Zero, Vector3.Zero);
+        var vehicle = elementFactory.CreateVehicle(404, Vector3.Zero, Vector3.Zero);
         var accessComponent = vehicle.AddComponent<VehicleDefaultAccessComponent>();
         var vehicleAccessService = realmTestingServer.GetRequiredService<IVehicleAccessService>();
 
@@ -71,13 +71,13 @@ public class VehicleAccessComponentsTests
         var realmTestingServer = new RealmTestingServer();
         var player1 = realmTestingServer.CreatePlayer();
         var player2 = realmTestingServer.CreatePlayer();
-        var entityFactory = realmTestingServer.GetRequiredService<IElementFactory>();
+        var elementFactory = realmTestingServer.GetRequiredService<IElementFactory>();
 
-        var vehicle = entityFactory.CreateVehicle(404, Vector3.Zero, Vector3.Zero);
+        var vehicle = elementFactory.CreateVehicle(404, Vector3.Zero, Vector3.Zero);
         var accessComponent = vehicle.AddComponent<VehicleNoAccessComponent>();
         var vehicleAccessService = realmTestingServer.GetRequiredService<IVehicleAccessService>();
 
-        vehicleAccessService.CanEnter += (pedEntity, vehicleEntity, seat) => pedEntity == player1;
+        vehicleAccessService.CanEnter += (ped, vehicle, seat) => ped == player1;
 
         var player1CanEnter = vehicleAccessService.InternalCanEnter(player1, vehicle, 0, accessComponent);
         var player2CanEnter = vehicleAccessService.InternalCanEnter(player2, vehicle, 0, accessComponent);

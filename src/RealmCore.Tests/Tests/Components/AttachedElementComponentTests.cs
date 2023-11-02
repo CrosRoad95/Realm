@@ -1,9 +1,9 @@
 ﻿namespace RealmCore.Tests.Tests.Components;
 
-public class AttachedEntityComponentTests
+public class AttachedElementComponentTests
 {
     [Fact]
-    public void YouShouldBeAbleAttachObjectToPlayerEntity()
+    public void YouShouldBeAbleAttachObjectToPlayer()
     {
         #region Arrange
         var realmTestingServer = new RealmTestingServer();
@@ -21,7 +21,7 @@ public class AttachedEntityComponentTests
     }
 
     [Fact]
-    public void AttachedEntityComponentShouldBeRemovedIfEntityDisposed()
+    public void AttachedElementComponentShouldBeRemovedIfElementGetsDestroyed()
     {
         #region Arrange
         var realmTestingServer = new RealmTestingServer();
@@ -35,8 +35,7 @@ public class AttachedEntityComponentTests
         #endregion
 
         #region Assert
-        var tryAccessAttachedEntity = () => attachedElementComponent.AttachedElement;
-        tryAccessAttachedEntity.Should().NotThrow<ObjectDisposedException>();
+        attachedElementComponent.AttachedElement.Should().BeNull();
         player.Components.ComponentsList.Should().BeEmpty();
         attachedElementComponent.Element.Should().BeNull();
         #endregion

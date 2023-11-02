@@ -29,7 +29,7 @@ public class FocusableComponentTests
     }
 
     [Fact]
-    public void FocusedEntityShouldBeRemovedWhenItDisposes()
+    public void FocusedElementShouldBeRemovedWhenItDisposes()
     {
         var realmTestingServer = new RealmTestingServer();
         var player1 = realmTestingServer.CreatePlayer();
@@ -43,7 +43,7 @@ public class FocusableComponentTests
     }
     
     [Fact]
-    public void YouCanNotFocusOneEntityTwoTimes()
+    public void YouCanNotFocusOneElementTwoTimes()
     {
         var realmTestingServer = new RealmTestingServer();
         var player1 = realmTestingServer.CreatePlayer();

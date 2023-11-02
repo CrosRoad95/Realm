@@ -75,19 +75,19 @@ public class UsersManagerTests
         #endregion
 
         #region Act
-        bool found = usersService.TryGetPlayerByName(nick, out var foundPlayerEntity);
+        bool found = usersService.TryGetPlayerByName(nick, out var foundPlayer);
         #endregion
 
         #region Assert
         if (shouldExists)
         {
             found.Should().BeTrue();
-            (player == foundPlayerEntity).Should().BeTrue();
+            (player == foundPlayer).Should().BeTrue();
         }
         else
         {
             found.Should().BeFalse();
-            foundPlayerEntity.Should().BeNull();
+            foundPlayer.Should().BeNull();
         }
         #endregion
     }
@@ -110,8 +110,8 @@ public class UsersManagerTests
         #region Assert
         if (shouldExists)
         {
-            var foundPlayerEntity = found.First();
-            (player == foundPlayerEntity).Should().BeTrue();
+            var foundPlayer = found.First();
+            (player == foundPlayer).Should().BeTrue();
         }
         else
         {

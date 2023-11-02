@@ -10,9 +10,9 @@ internal class TestJobComponent : JobSessionComponent
 
     public override short JobId => 1;
 
-    public TestJobComponent(IElementFactory entityFactory)
+    public TestJobComponent(IElementFactory elementFactory)
     {
-        _elementFactory = entityFactory;
+        _elementFactory = elementFactory;
     }
 
     public void CreateObjectives()
@@ -21,9 +21,9 @@ internal class TestJobComponent : JobSessionComponent
         objective.AddBlip(BlipIcon.North);
         objective.Completed += ObjectiveACompleted;
 
-        var objectEntity = _elementFactory.CreateObject(SlipeServer.Server.Enums.ObjectModel.Gunbox, new Vector3(379.00f, -102.77f, 1.24f), Vector3.Zero);
-        objectEntity.AddComponent<LiftableWorldObjectComponent>();
-        var objective2 = AddObjective(new TransportObjectObjective(objectEntity, new Vector3(379.00f, -112.77f, 2.0f)));
+        var worldObject = _elementFactory.CreateObject(SlipeServer.Server.Enums.ObjectModel.Gunbox, new Vector3(379.00f, -102.77f, 1.24f), Vector3.Zero);
+        worldObject.AddComponent<LiftableWorldObjectComponent>();
+        var objective2 = AddObjective(new TransportObjectObjective(worldObject, new Vector3(379.00f, -112.77f, 2.0f)));
         objective2.Completed += ObjectiveBCompleted;
 
         var subObjective1 = new MarkerEnterObjective(new Vector3(386.9004f, -89.74414f, 3.8843315f));

@@ -12,7 +12,7 @@ public class PlayerElementComponentTests
         int executionCount = 0;
         var realmTestingServer = new RealmTestingServer();
         var player = realmTestingServer.CreatePlayer();
-        player.SetBind("x", (entity, keyState) =>
+        player.SetBind("x", (player, keyState) =>
         {
             executionCount++;
         });
@@ -35,7 +35,7 @@ public class PlayerElementComponentTests
         #region Arrange
         var realmTestingServer = new RealmTestingServer();
         var player = realmTestingServer.CreatePlayer();
-        player.SetBindAsync("x", (entity, keyState) =>
+        player.SetBindAsync("x", (player, keyState) =>
         {
             throw new Exception("test123");
         });

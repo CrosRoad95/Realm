@@ -165,7 +165,7 @@ public class ElementsComponentsTests
     }
 
     [Fact]
-    public void TestEntityAndItsComponentLifecycle1()
+    public void TestElementAndItsComponentLifecycle1()
     {
         #region Arrange & Act
         var realmTestingServer = new RealmTestingServer();
@@ -179,10 +179,10 @@ public class ElementsComponentsTests
         #endregion
 
         #region Act
-        var entityEvents = componentsMonitor.GetEvents("Element");
+        var elementEvents = componentsMonitor.GetEvents("Element");
         var componentEvents = componentMonitor.GetEvents("Component");
 
-        var occurredEvents = entityEvents
+        var occurredEvents = elementEvents
             .Concat(componentEvents)
             .OrderBy(x => x.TimestampUtc)
             .Select(x => x.Name)
@@ -195,24 +195,24 @@ public class ElementsComponentsTests
     }
 
     [Fact]
-    public void TestEntityAndItsComponentLifecycle2()
+    public void TestElementAndItsComponentLifecycle2()
     {
         #region Arrange & Act
         var realmTestingServer = new RealmTestingServer();
         var player = realmTestingServer.CreatePlayer();
 
         var component = new TestComponent();
-        using var entityMonitor = player.Components.Monitor();
+        using var elementMonitor = player.Components.Monitor();
         using var componentMonitor = component.Monitor();
         player.AddComponent(component);
         player.Destroy();
         #endregion
 
         #region Act
-        var entityEvents = entityMonitor.GetEvents("Element");
+        var elementEvents = elementMonitor.GetEvents("Element");
         var componentEvents = componentMonitor.GetEvents("Component");
 
-        var occurredEvents = entityEvents
+        var occurredEvents = elementEvents
             .Concat(componentEvents)
             .OrderBy(x => x.TimestampUtc)
             .Select(x => x.Name)

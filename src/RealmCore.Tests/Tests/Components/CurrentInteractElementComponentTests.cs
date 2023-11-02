@@ -1,6 +1,6 @@
 ﻿namespace RealmCore.Tests.Tests.Components;
 
-public class CurrentInteractEntityComponentTests
+public class CurrentInteractElementComponentTests
 {
     [Fact]
     public void DestroyingComponentShouldReset()
@@ -25,7 +25,7 @@ public class CurrentInteractEntityComponentTests
     }
 
     [Fact]
-    public void DestroyingEntityShouldResetAndRemoveComponent()
+    public void DestroyingElementShouldResetAndRemoveComponent()
     {
         #region Arrange
         TestDateTimeProvider testDateTimeProvider = new();

@@ -39,8 +39,8 @@ function handleSetTools(newEnabledTools)
     end
 end
 
-function handleAddEntity(entity)
-    iprint("entity", entity)
+function handleAddElement(element)
+    iprint("element", element)
 end
 
 function getTools()
@@ -99,17 +99,17 @@ function addTool(name, enable, disable, id)
     tools[name] = {enable, disable, false, id} -- enable callback, disable callback, state, id
 end
 
-local function handleAddOrUpdateEntity(entity)
-    elements[entity.debugId] = entity
+local function handleAddOrUpdateElement(element)
+    elements[element.debugId] = element
 end
 
-function handleAddOrUpdateElements(entityOrElements)
-	if(#entityOrElements > 0)then
-		for i,v in ipairs(entityOrElements)do
-			handleAddOrUpdateEntity(v)
+function handleAddOrUpdateElements(elementOrElements)
+	if(#elementOrElements > 0)then
+		for i,v in ipairs(elementOrElements)do
+			handleAddOrUpdateElement(v)
 		end
 	else
-		handleAddOrUpdateEntity(entityOrElements)
+		handleAddOrUpdateElement(elementOrElements)
 	end
 end
 
@@ -136,7 +136,7 @@ end
 addEventHandler("onClientResourceStart", resourceRoot, function()
 	hubBind("SetAdminEnabled", handleSetAdminEnabled)
 	hubBind("SetTools", handleSetTools)
-	hubBind("AddOrUpdateEntity", handleAddOrUpdateElements)
+	hubBind("AddOrUpdateElement", handleAddOrUpdateElements)
 	hubBind("ClearElements", handleClearElements)
 	hubBind("SetSpawnMarkers", handleSetSpawnMarkers)
 	hubBind("ClearSpawnMarkers", handleClearSpawnMarkers)

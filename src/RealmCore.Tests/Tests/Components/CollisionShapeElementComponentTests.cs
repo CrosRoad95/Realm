@@ -10,10 +10,10 @@ public class CollisionShapeElementComponentTests
         var player = realmTestingServer.CreatePlayer();
         var elementFactory = realmTestingServer.GetRequiredService<IElementFactory>();
         var collisionSphere  = elementFactory.CreateCollisionSphere(Vector3.Zero, 10);
-        bool entityEntered = false;
+        bool elementEntered = false;
         collisionSphere.Entered += (that, e) =>
         {
-            entityEntered = true;
+            elementEntered = true;
         };
         #endregion
 
@@ -22,7 +22,7 @@ public class CollisionShapeElementComponentTests
         #endregion
 
         #region Assert
-        entityEntered.Should().BeTrue();
+        elementEntered.Should().BeTrue();
         #endregion
     }
 }

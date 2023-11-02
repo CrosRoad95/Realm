@@ -6,7 +6,7 @@ namespace RealmCore.Tests.Tests.Components;
 public class LiftableWorldObjectComponentTests
 {
     [Fact]
-    public void YouShouldBeAbleToLiftEntityAndDropEntity()
+    public void YouShouldBeAbleToLiftElementAndDropElement()
     {
         #region Act
         var realmTestingServer = new RealmTestingServer();
@@ -30,7 +30,7 @@ public class LiftableWorldObjectComponentTests
     }
 
     [Fact]
-    public void EntityCanBeLiftedOnce()
+    public void ElementCanBeLiftedOnce()
     {
         #region Act
         var realmTestingServer = new RealmTestingServer();
@@ -48,7 +48,7 @@ public class LiftableWorldObjectComponentTests
     }
 
     [Fact]
-    public void EntityCanBeDroppedOnce()
+    public void ElementCanBeDroppedOnce()
     {
         var realmTestingServer = new RealmTestingServer();
         var player = realmTestingServer.CreatePlayer();
@@ -83,7 +83,7 @@ public class LiftableWorldObjectComponentTests
     }
 
     [Fact]
-    public void EntityShouldBeDroppedUponDispose()
+    public void ElementhouldBeDroppedUponDispose()
     {
         var realmTestingServer = new RealmTestingServer();
         var player = realmTestingServer.CreatePlayer();
@@ -106,7 +106,7 @@ public class LiftableWorldObjectComponentTests
     }
 
     [Fact]
-    public void EntityShouldBeDroppedUponDispose2()
+    public void ElementShouldBeDroppedUponDispose2()
     {
         var realmTestingServer = new RealmTestingServer();
         var player = realmTestingServer.CreatePlayer();
@@ -130,7 +130,7 @@ public class LiftableWorldObjectComponentTests
     }
 
     [Fact]
-    public void OnlyWhitelistedEntitiesShouldBeAbleToLiftOtherEntity()
+    public void OnlyWhitelistedEntitiesShouldBeAbleToLiftOtherElement()
     {
         #region Arrange
         var realmTestingServer = new RealmTestingServer();
