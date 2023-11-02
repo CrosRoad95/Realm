@@ -323,7 +323,7 @@ internal sealed class CommandsLogic
         _commandService.AddCommandHandler("comps", (player, args) =>
         {
             _chatBox.OutputTo(player, "Components:");
-            foreach (var component in player.Components.ComponentsLists)
+            foreach (var component in player.Components.ComponentsList)
             {
                 _chatBox.OutputTo(player, $"> {component}");
             }
@@ -429,13 +429,6 @@ internal sealed class CommandsLogic
             var @object = _elementFactory.CreateObject(ObjectModel.Gunbox, player.Position + new Vector3(4, 0, -0.65f), Vector3.Zero);
             @object.AddComponent<LiftableWorldObjectComponent>();
             @object.AddComponent(new OwnerComponent(player));
-        });
-
-        _commandService.AddCommandHandler("spawnmybox2", (player, args) =>
-        {
-            var @object = _elementFactory.CreateObject(ObjectModel.Gunbox, player.Position + new Vector3(4, 0, -0.65f), Vector3.Zero);
-            @object.AddComponent<LiftableWorldObjectComponent>();
-            @object.AddComponent(new OwnerDisposableComponent(player));
         });
 
         // TODO:

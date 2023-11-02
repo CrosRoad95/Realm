@@ -2,30 +2,21 @@
 
 public class AttachedEntityComponentTests
 {
-    private readonly RealmTestingServer _server;
-    private readonly EntityHelper _entityHelper;
-
-    public AttachedEntityComponentTests()
-    {
-        _server = new();
-        _entityHelper = new(_server);
-    }
-
     [Fact]
     public void YouShouldBeAbleAttachObjectToPlayerEntity()
     {
         #region Arrange
-
-        var playerEntity = _entityHelper.CreatePlayerEntity();
-        var elementEntity = _entityHelper.CreateObjectEntity();
+        var realmTestingServer = new RealmTestingServer();
+        var player = realmTestingServer.CreatePlayer();
+        var worldObject = realmTestingServer.CreateObject();
         #endregion
 
         #region Act
-        var attachedEntityComponent = playerEntity.AddComponent(new AttachedEntityComponent(elementEntity, SlipeServer.Packets.Enums.BoneId.Pelvis, null, null));
+        var attachedElementComponent = player.AddComponent(new AttachedElementComponent(worldObject, SlipeServer.Packets.Enums.BoneId.Pelvis, null, null));
         #endregion
 
         #region Assert
-        attachedEntityComponent.AttachedEntity.Should().Be(elementEntity);
+        attachedElementComponent.AttachedElement.Should().Be(worldObject);
         #endregion
     }
 
@@ -33,20 +24,21 @@ public class AttachedEntityComponentTests
     public void AttachedEntityComponentShouldBeRemovedIfEntityDisposed()
     {
         #region Arrange
-
-        var playerEntity = _entityHelper.CreatePlayerEntity();
-        var elementEntity = _entityHelper.CreateObjectEntity();
+        var realmTestingServer = new RealmTestingServer();
+        var player = realmTestingServer.CreatePlayer();
+        var worldObject = realmTestingServer.CreateObject();
         #endregion
 
         #region Act
-        var attachedEntityComponent = playerEntity.AddComponent(new AttachedEntityComponent(elementEntity, SlipeServer.Packets.Enums.BoneId.Pelvis, null, null));
-        elementEntity.Dispose();
+        var attachedElementComponent = player.AddComponent(new AttachedElementComponent(worldObject, SlipeServer.Packets.Enums.BoneId.Pelvis, null, null));
+        worldObject.Destroy();
         #endregion
 
         #region Assert
-        var tryAccessAttachedEntity = () => attachedEntityComponent.AttachedEntity;
-        tryAccessAttachedEntity.Should().Throw<ObjectDisposedException>();
-        playerEntity.Components.Should().NotContain(attachedEntityComponent);
+        var tryAccessAttachedEntity = () => attachedElementComponent.AttachedElement;
+        tryAccessAttachedEntity.Should().NotThrow<ObjectDisposedException>();
+        player.Components.ComponentsList.Should().BeEmpty();
+        attachedElementComponent.Element.Should().BeNull();
         #endregion
     }
 }

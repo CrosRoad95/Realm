@@ -1,8 +1,8 @@
 ﻿namespace RealmCore.Tests.Classes.Components;
 
-public class ThrowExceptionComponent : Component
+public class ThrowExceptionComponent : ComponentLifecycle
 {
-    protected override void Attach()
+    public override void Attach()
     {
         throw new Exception("Something went wrong");
     }

@@ -8,7 +8,7 @@ public class DefaultChatLogic
     private readonly ILogger<DefaultChatLogic> _logger;
     private readonly IElementCollection _elementCollection;
 
-    public DefaultChatLogic(RealmServer server, ChatBox chatBox, ILogger<DefaultChatLogic> logger, IElementCollection elementCollection)
+    public DefaultChatLogic(MtaServer server, ChatBox chatBox, ILogger<DefaultChatLogic> logger, IElementCollection elementCollection)
     {
         _chatBox = chatBox;
         _logger = logger;

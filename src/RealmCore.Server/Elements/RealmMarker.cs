@@ -61,6 +61,11 @@ public class RealmMarker : Marker, IComponents
         return Components.AddComponent(component);
     }
 
+    public TComponent AddComponentWithDI<TComponent>(params object[] parameters) where TComponent : IComponent
+    {
+        return Components.AddComponentWithDI<TComponent>(parameters);
+    }
+
     private readonly List<IElementRule> _elementRules = new();
 
     public void AddRule(IElementRule elementRule)

@@ -164,7 +164,7 @@ internal sealed class ElementFactory : IElementFactory
 
     public RealmCollisionSphere CreateCollisionSphere(Vector3 position, float radius, byte interior = 0, ushort dimension = 0, Func<RealmCollisionSphere, IEnumerable<IComponent>>? elementBuilder = null)
     {
-        var collisionSphere = new RealmCollisionSphere(_serviceProvider, new Vector3(0, 0, 1000), radius);
+        var collisionSphere = new RealmCollisionSphere(_serviceProvider, position, radius);
         elementBuilder?.Invoke(collisionSphere);
         AssociateWithServer(collisionSphere);
         return collisionSphere;

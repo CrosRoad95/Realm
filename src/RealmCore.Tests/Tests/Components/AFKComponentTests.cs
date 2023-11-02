@@ -2,42 +2,34 @@
 
 public class AFKComponentTests
 {
-    private readonly Entity _entity;
-    private readonly AFKComponent _afkComponent;
-    private readonly TestDateTimeProvider _testDateTimeProvider;
-    public AFKComponentTests()
-    {
-        var services = new ServiceCollection();
-        _testDateTimeProvider = new();
-
-        _entity = new();
-        _afkComponent = _entity.AddComponent<AFKComponent>();
-    }
-
     [Fact]
     public void DestroyingComponentShouldReset()
     {
+        var realmTestingServer = new RealmTestingServer();
+        var player = realmTestingServer.CreatePlayer();
+        var afkComponent = player.AddComponent<AFKComponent>();
+
         bool _isAfk = false;
         TimeSpan _elapsed = TimeSpan.Zero;
 
-        _afkComponent.StateChanged += (AFKComponent _, bool isAfk, TimeSpan elapsed) =>
+        afkComponent.StateChanged += (AFKComponent _, bool isAfk, TimeSpan elapsed) =>
         {
             _isAfk = isAfk;
             _elapsed = elapsed;
         };
 
-        _afkComponent.IsAFK.Should().BeFalse();
+        afkComponent.IsAFK.Should().BeFalse();
 
-        _afkComponent.HandlePlayerAFKStarted(_testDateTimeProvider.Now);
+        afkComponent.HandlePlayerAFKStarted(realmTestingServer.TestDateTimeProvider.Now);
         _elapsed.Should().Be(TimeSpan.Zero);
         _isAfk.Should().BeTrue();
-        _afkComponent.IsAFK.Should().BeTrue();
+        afkComponent.IsAFK.Should().BeTrue();
 
-        _testDateTimeProvider.AddOffset(TimeSpan.FromMinutes(5));
-        _afkComponent.HandlePlayerAFKStopped(_testDateTimeProvider.Now);
+        realmTestingServer.TestDateTimeProvider.AddOffset(TimeSpan.FromMinutes(5));
+        afkComponent.HandlePlayerAFKStopped(realmTestingServer.TestDateTimeProvider.Now);
 
         _elapsed.Should().Be(TimeSpan.FromMinutes(5));
         _isAfk.Should().BeFalse();
-        _afkComponent.IsAFK.Should().BeFalse();
+        afkComponent.IsAFK.Should().BeFalse();
     }
 }

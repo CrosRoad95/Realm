@@ -2,18 +2,6 @@
 
 public class MoneyComponentTests
 {
-    private readonly Entity _entity;
-    private readonly Entity _entityB;
-    private readonly MoneyComponent _moneyComponent;
-
-    public MoneyComponentTests()
-    {
-        _entity = new();
-        _entityB = new();
-        _moneyComponent = new(1000000, 4);
-        _entity.AddComponent(_moneyComponent);
-    }
-
     [InlineData(0, 0, 1)]
     [InlineData(1, 1, 1)]
     [InlineData(1.234567890, 1.2345, 1)]
@@ -21,26 +9,30 @@ public class MoneyComponentTests
     [Theory]
     public void GiveAndTakeMoneyShouldGiveExpectedAmountOfMoney(decimal moneyGiven, decimal expectedAmount, int times)
     {
+        var realmTestingServer = new RealmTestingServer();
+        var player = realmTestingServer.CreatePlayer();
+        var moneyComponent = player.AddComponent(new MoneyComponent(1000000, 4));
+
         decimal moneyAdded = 0;
         decimal moneyTaken = 0;
-        _moneyComponent.MoneyAdded += (moneyComponent, amount) =>
+        moneyComponent.MoneyAdded += (moneyComponent, amount) =>
         {
             moneyAdded += amount;
         };
-        _moneyComponent.MoneyTaken += (moneyComponent, amount) =>
+        moneyComponent.MoneyTaken += (moneyComponent, amount) =>
         {
             moneyTaken += amount;
         };
 
         for (int i = 0; i < times; i++)
-            _moneyComponent.GiveMoney(moneyGiven);
-        _moneyComponent.Money.Should().Be(expectedAmount);
+            moneyComponent.GiveMoney(moneyGiven);
+        moneyComponent.Money.Should().Be(expectedAmount);
         moneyAdded.Should().Be(expectedAmount);
 
         for (int i = 0; i < times; i++)
-            _moneyComponent.TakeMoney(moneyGiven);
+            moneyComponent.TakeMoney(moneyGiven);
 
-        _moneyComponent.Money.Should().Be(0);
+        moneyComponent.Money.Should().Be(0);
         moneyTaken.Should().Be(expectedAmount);
     }
 
@@ -51,15 +43,23 @@ public class MoneyComponentTests
     [Theory]
     public void SettingAndGettingMoneyShouldWork(decimal moneySet, decimal expectedMoney)
     {
-        _moneyComponent.Money = moneySet;
-        _moneyComponent.Money.Should().Be(expectedMoney);
+        var realmTestingServer = new RealmTestingServer();
+        var player = realmTestingServer.CreatePlayer();
+        var moneyComponent = player.AddComponent(new MoneyComponent(1000000, 4));
+
+        moneyComponent.Money = moneySet;
+        moneyComponent.Money.Should().Be(expectedMoney);
     }
 
     [Fact]
     public void GiveAndTakeMoneyShouldNotAllowNegativeValues()
     {
-        Action actGiveMoney = () => { _moneyComponent.GiveMoney(-1); };
-        Action actTakeMoney = () => { _moneyComponent.TakeMoney(-1); };
+        var realmTestingServer = new RealmTestingServer();
+        var player = realmTestingServer.CreatePlayer();
+        var moneyComponent = player.AddComponent(new MoneyComponent(1000000, 4));
+
+        Action actGiveMoney = () => { moneyComponent.GiveMoney(-1); };
+        Action actTakeMoney = () => { moneyComponent.TakeMoney(-1); };
 
         actGiveMoney.Should().Throw<GameplayException>()
             .WithMessage("Unable to give money, amount can not get negative.");
@@ -72,9 +72,13 @@ public class MoneyComponentTests
     [Theory]
     public void YouCanNotGiveTakeOrSetMoneyBeyondLimit(decimal amount)
     {
-        Action actGiveMoney = () => { _moneyComponent.GiveMoney(amount); };
-        Action actTakeMoney = () => { _moneyComponent.TakeMoney(amount); };
-        Action actSetMoney = () => { _moneyComponent.Money = amount; };
+        var realmTestingServer = new RealmTestingServer();
+        var player = realmTestingServer.CreatePlayer();
+        var moneyComponent = player.AddComponent(new MoneyComponent(1000000, 4));
+
+        Action actGiveMoney = () => { moneyComponent.GiveMoney(amount); };
+        Action actTakeMoney = () => { moneyComponent.TakeMoney(amount); };
+        Action actSetMoney = () => { moneyComponent.Money = amount; };
 
         if (amount > 0)
         {
@@ -90,65 +94,83 @@ public class MoneyComponentTests
     [Fact]
     public async Task TestIfMoneyComponentIsThreadSafe()
     {
-        await ParallelHelpers.Run(() =>
-        {
-            _moneyComponent.GiveMoney(1);
-        });
-
-        _moneyComponent.Money.Should().Be(800);
+        var realmTestingServer = new RealmTestingServer();
+        var player = realmTestingServer.CreatePlayer();
+        var moneyComponent = player.AddComponent(new MoneyComponent(1000000, 4));
 
         await ParallelHelpers.Run(() =>
         {
-            _moneyComponent.TakeMoney(1);
+            moneyComponent.GiveMoney(1);
         });
 
-        _moneyComponent.Money.Should().Be(0);
+        moneyComponent.Money.Should().Be(800);
+
+        await ParallelHelpers.Run(() =>
+        {
+            moneyComponent.TakeMoney(1);
+        });
+
+        moneyComponent.Money.Should().Be(0);
     }
 
     [Fact]
     public void YouShouldNotBeAbleToTakeMoneyIfThereIsNotEnoughOfThem()
     {
-        _moneyComponent.Money = 15;
-        Action take = () => { _moneyComponent.TakeMoney(10); };
+        var realmTestingServer = new RealmTestingServer();
+        var player = realmTestingServer.CreatePlayer();
+        var moneyComponent = player.AddComponent(new MoneyComponent(1000000, 4));
+
+        moneyComponent.Money = 15;
+        Action take = () => { moneyComponent.TakeMoney(10); };
 
         take.Should().NotThrow<GameplayException>();
         take.Should().Throw<GameplayException>()
             .WithMessage("Unable to take money, not enough money.");
-        _moneyComponent.Money.Should().Be(5);
+        moneyComponent.Money.Should().Be(5);
     }
 
     [Fact]
     public void YouShouldBeAbleToForceTakeMoneyIfThereIsNotEnoughOfThem()
     {
-        _moneyComponent.Money = 15;
-        Action take = () => { _moneyComponent.TakeMoney(10, true); };
+        var realmTestingServer = new RealmTestingServer();
+        var player = realmTestingServer.CreatePlayer();
+        var moneyComponent = player.AddComponent(new MoneyComponent(1000000, 4));
+
+        moneyComponent.Money = 15;
+        Action take = () => { moneyComponent.TakeMoney(10, true); };
 
         take.Should().NotThrow<GameplayException>();
         take.Should().NotThrow<GameplayException>();
-        _moneyComponent.Money.Should().Be(-5);
+        moneyComponent.Money.Should().Be(-5);
     }
 
     [Fact]
     public void YouShouldBeAbleToTransferMoneyBetweenMoneyComponents()
     {
-        var targetMoneyComponent = new MoneyComponent(1000000, 2);
-        _entityB.AddComponent(targetMoneyComponent);
+        var realmTestingServer = new RealmTestingServer();
+        var player1 = realmTestingServer.CreatePlayer();
+        var player2 = realmTestingServer.CreatePlayer();
+        var moneyComponent = player1.AddComponent(new MoneyComponent(1000000, 2));
+        var targetMoneyComponent = player2.AddComponent(new MoneyComponent(1000000, 2));
 
-        _moneyComponent.Money = 15;
-        _moneyComponent.TransferMoney(targetMoneyComponent, 10);
+        moneyComponent.Money = 15;
+        moneyComponent.TransferMoney(targetMoneyComponent, 10);
 
-        _moneyComponent.Money.Should().Be(5);
+        moneyComponent.Money.Should().Be(5);
         targetMoneyComponent.Money.Should().Be(10);
     }
 
     [Fact]
     public void YouCannotTransferMoreMoneyThanYouHave()
     {
-        var targetMoneyComponent = new MoneyComponent(1000000, 2);
-        _entityB.AddComponent(targetMoneyComponent);
+        var realmTestingServer = new RealmTestingServer();
+        var player1 = realmTestingServer.CreatePlayer();
+        var player2 = realmTestingServer.CreatePlayer();
+        var moneyComponent = player1.AddComponent(new MoneyComponent(1000000, 2));
+        var targetMoneyComponent = player2.AddComponent(new MoneyComponent(1000000, 2));
 
-        _moneyComponent.Money = 15;
-        Action transfer = () => { _moneyComponent.TransferMoney(targetMoneyComponent, 20, false); };
+        moneyComponent.Money = 15;
+        Action transfer = () => { moneyComponent.TransferMoney(targetMoneyComponent, 20, false); };
 
         transfer.Should().Throw<GameplayException>().WithMessage("Unable to take money, not enough money.");
     }
@@ -156,17 +178,20 @@ public class MoneyComponentTests
     [Fact]
     public async Task TransferMoneyShouldBeThreadSafety()
     {
-        var targetMoneyComponent = new MoneyComponent(1000000, 2);
-        _entityB.AddComponent(targetMoneyComponent);
+        var realmTestingServer = new RealmTestingServer();
+        var player1 = realmTestingServer.CreatePlayer();
+        var player2 = realmTestingServer.CreatePlayer();
+        var moneyComponent = player1.AddComponent(new MoneyComponent(1000000, 2));
+        var targetMoneyComponent = player2.AddComponent(new MoneyComponent(1000000, 2));
 
-        _moneyComponent.Money = 800;
+        moneyComponent.Money = 800;
 
         await ParallelHelpers.Run(() =>
         {
-            _moneyComponent.TransferMoney(targetMoneyComponent, 1);
+            moneyComponent.TransferMoney(targetMoneyComponent, 1);
         });
 
-        _moneyComponent.Money.Should().Be(0);
+        moneyComponent.Money.Should().Be(0);
         targetMoneyComponent.Money.Should().Be(800);
     }
 
@@ -177,11 +202,12 @@ public class MoneyComponentTests
     [Theory]
     public void HasMoneyShouldReturnExpectedValue(decimal amount, decimal requiredAmount, bool force, bool expectedResult)
     {
-        var moneyComponent = new MoneyComponent(1000000, 2);
-        _entityB.AddComponent(moneyComponent);
+        var realmTestingServer = new RealmTestingServer();
+        var player1 = realmTestingServer.CreatePlayer();
+        var moneyComponent = player1.AddComponent(new MoneyComponent(1000000, 2));
 
-        _moneyComponent.Money = amount;
-        _moneyComponent.HasMoney(requiredAmount, force).Should().Be(expectedResult);
+        moneyComponent.Money = amount;
+        moneyComponent.HasMoney(requiredAmount, force).Should().Be(expectedResult);
     }
 
     [InlineData(6, 4)]
@@ -189,91 +215,97 @@ public class MoneyComponentTests
     [Theory]
     public void TryTakeMoneyShouldWork(decimal takenMoney, decimal expectedMoney)
     {
-        var moneyComponent = new MoneyComponent(1000000, 2);
-        _entityB.AddComponent(moneyComponent);
+        var realmTestingServer = new RealmTestingServer();
+        var player = realmTestingServer.CreatePlayer();
+        var moneyComponent = player.AddComponent(new MoneyComponent(1000000, 4));
 
-        _moneyComponent.Money = 10;
-        _moneyComponent.TryTakeMoney(takenMoney);
-        _moneyComponent.Money.Should().Be(expectedMoney);
+        moneyComponent.Money = 10;
+        moneyComponent.TryTakeMoney(takenMoney);
+        moneyComponent.Money.Should().Be(expectedMoney);
     }
 
     [Fact]
     public void TryTakeMoneyWithCallbackShouldSucceed()
     {
-        var moneyComponent = new MoneyComponent(1000000, 2);
-        _entityB.AddComponent(moneyComponent);
-
-        _moneyComponent.Money = 10;
-        _moneyComponent.TryTakeMoneyWithCallback(5, () =>
+        var realmTestingServer = new RealmTestingServer();
+        var player = realmTestingServer.CreatePlayer();
+        var moneyComponent = player.AddComponent(new MoneyComponent(1000000, 4));
+        
+        moneyComponent.Money = 10;
+        moneyComponent.TryTakeMoneyWithCallback(5, () =>
         {
             return true;
         });
-        _moneyComponent.Money.Should().Be(5);
+        moneyComponent.Money.Should().Be(5);
     }
 
     [Fact]
     public void TryTakeMoneyWithCallbackShouldFail()
     {
-        var moneyComponent = new MoneyComponent(1000000, 2);
-        _entityB.AddComponent(moneyComponent);
+        var realmTestingServer = new RealmTestingServer();
+        var player = realmTestingServer.CreatePlayer();
+        var moneyComponent = player.AddComponent(new MoneyComponent(1000000, 2));
 
-        _moneyComponent.Money = 10;
-        _moneyComponent.TryTakeMoneyWithCallback(5, () =>
+        moneyComponent.Money = 10;
+        moneyComponent.TryTakeMoneyWithCallback(5, () =>
         {
             return false;
         });
-        _moneyComponent.Money.Should().Be(10);
+        moneyComponent.Money.Should().Be(10);
     }
 
     [Fact]
     public void TryTakeMoneyWithCallbackShouldFailOnException()
     {
-        var moneyComponent = new MoneyComponent(1000000, 2);
-        _entityB.AddComponent(moneyComponent);
+        var realmTestingServer = new RealmTestingServer();
+        var player = realmTestingServer.CreatePlayer();
+        var moneyComponent = player.AddComponent(new MoneyComponent(1000000, 2));
 
-        _moneyComponent.Money = 10;
+        moneyComponent.Money = 10;
         var act = () =>
         {
-            _moneyComponent.TryTakeMoneyWithCallback(5, () =>
+            moneyComponent.TryTakeMoneyWithCallback(5, () =>
             {
                 throw new InvalidOperationException();
             });
         };
 
         act.Should().ThrowExactly<InvalidOperationException>();
-        _moneyComponent.Money.Should().Be(10);
+        moneyComponent.Money.Should().Be(10);
     }
 
     [Fact]
     public async Task TryTakeMoneyWithCallbackAsyncShouldFailOnException()
     {
-        var moneyComponent = new MoneyComponent(1000000, 2);
-        _entityB.AddComponent(moneyComponent);
+        var realmTestingServer = new RealmTestingServer();
+        var player = realmTestingServer.CreatePlayer();
+        var moneyComponent = player.AddComponent(new MoneyComponent(1000000, 4));
 
-        _moneyComponent.Money = 10;
+        moneyComponent.Money = 10;
         var act = async () =>
         {
-            await _moneyComponent.TryTakeMoneyWithCallbackAsync(5, () =>
+            await moneyComponent.TryTakeMoneyWithCallbackAsync(5, () =>
             {
                 throw new InvalidOperationException();
             });
         };
 
         await act.Should().ThrowExactlyAsync<InvalidOperationException>();
-        _moneyComponent.Money.Should().Be(10);
+        moneyComponent.Money.Should().Be(10);
     }
 
     [Fact]
     public async Task TryTakeMoneyWithCallbackAsyncShouldNotFail()
     {
-        var moneyComponent = new MoneyComponent(1000000, 2);
-        _entityB.AddComponent(moneyComponent);
+        var realmTestingServer = new RealmTestingServer();
+        var player = realmTestingServer.CreatePlayer();
+        var moneyComponent = player.AddComponent(new MoneyComponent(1000000, 4));
 
-        _moneyComponent.Money = 100;
+        moneyComponent.Money = 100;
         bool success = false;
         var act = async () =>
         {
-            success = await _moneyComponent.TryTakeMoneyWithCallbackAsync(5, () =>
+            success = await moneyComponent.TryTakeMoneyWithCallbackAsync(5, () =>
             {
                 return Task.FromResult(true);
             });
@@ -284,89 +316,94 @@ public class MoneyComponentTests
             await act.Should().NotThrowAsync();
             success.Should().BeTrue();
         }
-        _moneyComponent.Money.Should().Be(0);
+        moneyComponent.Money.Should().Be(0);
     }
 
     [Fact]
     public void TryTakeMoneyWithCallbackShouldFailIfHasNotEnoughMoney()
     {
-        var moneyComponent = new MoneyComponent(1000000, 2);
-        _entityB.AddComponent(moneyComponent);
+        var realmTestingServer = new RealmTestingServer();
+        var player = realmTestingServer.CreatePlayer();
+        var moneyComponent = player.AddComponent(new MoneyComponent(1000000, 4));
 
-        _moneyComponent.Money = 100;
-        bool success = _moneyComponent.TryTakeMoneyWithCallback(101, () =>
+        moneyComponent.Money = 100;
+        bool success = moneyComponent.TryTakeMoneyWithCallback(101, () =>
         {
             return true;
         });
 
         success.Should().BeFalse();
-        _moneyComponent.Money.Should().Be(100);
+        moneyComponent.Money.Should().Be(100);
     }
 
     [Fact]
     public async Task TryTakeMoneyWithCallbackAsyncShouldFailIfHasNotEnoughMoney()
     {
-        var moneyComponent = new MoneyComponent(1000000, 2);
-        _entityB.AddComponent(moneyComponent);
+        var realmTestingServer = new RealmTestingServer();
+        var player = realmTestingServer.CreatePlayer();
+        var moneyComponent = player.AddComponent(new MoneyComponent(1000000, 4));
 
-        _moneyComponent.Money = 100;
-        bool success = await _moneyComponent.TryTakeMoneyWithCallbackAsync(101, () =>
+        moneyComponent.Money = 100;
+        bool success = await moneyComponent.TryTakeMoneyWithCallbackAsync(101, () =>
         {
             return Task.FromResult(true);
         });
 
         success.Should().BeFalse();
-        _moneyComponent.Money.Should().Be(100);
+        moneyComponent.Money.Should().Be(100);
     }
 
     [Fact]
     public void TryTakeMoneyWithCallbackShouldShouldNotTakeMoneyIfCallbackReturnFalse()
     {
-        var moneyComponent = new MoneyComponent(1000000, 2);
-        _entityB.AddComponent(moneyComponent);
+        var realmTestingServer = new RealmTestingServer();
+        var player = realmTestingServer.CreatePlayer();
+        var moneyComponent = player.AddComponent(new MoneyComponent(1000000, 4));
 
-        _moneyComponent.Money = 100;
-        bool success = _moneyComponent.TryTakeMoneyWithCallback(50, () =>
+        moneyComponent.Money = 100;
+        bool success = moneyComponent.TryTakeMoneyWithCallback(50, () =>
         {
             return false;
         });
 
         success.Should().BeFalse();
-        _moneyComponent.Money.Should().Be(100);
+        moneyComponent.Money.Should().Be(100);
     }
 
     [Fact]
     public async Task TryTakeMoneyWithCallbackAsyncShouldNotTakeMoneyIfCallbackReturnFalse()
     {
-        var moneyComponent = new MoneyComponent(1000000, 2);
-        _entityB.AddComponent(moneyComponent);
+        var realmTestingServer = new RealmTestingServer();
+        var player = realmTestingServer.CreatePlayer();
+        var moneyComponent = player.AddComponent(new MoneyComponent(1000000, 4));
 
-        _moneyComponent.Money = 100;
-        bool success = await _moneyComponent.TryTakeMoneyWithCallbackAsync(50, () =>
+        moneyComponent.Money = 100;
+        bool success = await moneyComponent.TryTakeMoneyWithCallbackAsync(50, () =>
         {
             return Task.FromResult(false);
         });
 
         success.Should().BeFalse();
-        _moneyComponent.Money.Should().Be(100);
+        moneyComponent.Money.Should().Be(100);
     }
 
     [Fact]
     public void YouShouldNotBeAbleToSetMoneyInMoneyComponentEvents()
     {
-        var moneyComponent = new MoneyComponent(1000000, 2);
-        _entityB.AddComponent(moneyComponent);
+        var realmTestingServer = new RealmTestingServer();
+        var player = realmTestingServer.CreatePlayer();
+        var moneyComponent = player.AddComponent(new MoneyComponent(1000000, 2));
 
         var act = () =>
         {
-            _moneyComponent.MoneySet += (that, amount) =>
+            moneyComponent.MoneySet += (that, amount) =>
             {
                 that.Money = 50;
             };
-            _moneyComponent.Money = 100;
+            moneyComponent.Money = 100;
         };
 
         act.Should().Throw<LockRecursionException>();
-        _moneyComponent.Money.Should().Be(100);
+        moneyComponent.Money.Should().Be(100);
     }
 }

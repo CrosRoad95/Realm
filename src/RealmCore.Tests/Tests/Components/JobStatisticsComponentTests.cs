@@ -4,20 +4,15 @@ namespace RealmCore.Tests.Tests.Components;
 
 public class JobStatisticsComponentTests
 {
-    private readonly Entity _entity;
     private readonly JobStatisticsComponent _jobStatisticsComponent;
 
     public JobStatisticsComponentTests()
     {
-        var services = new ServiceCollection();
-        var configurationProvider = new TestConfigurationProvider();
-        services.Configure<GameplayOptions>(configurationProvider.GetSection("Gameplay"));
-        services.AddSingleton<IDateTimeProvider, TestDateTimeProvider>();
-
-        var serviceProvider = services.BuildServiceProvider();
-        _entity = new();
-        _jobStatisticsComponent = new(serviceProvider.GetRequiredService<IDateTimeProvider>().Now);
-        _entity.AddComponent(_jobStatisticsComponent);
+        var realmTestingServer = new RealmTestingServer();
+        var player = realmTestingServer.CreatePlayer();
+        var worldObject = realmTestingServer.CreateObject();
+        _jobStatisticsComponent = new(realmTestingServer.GetRequiredService<IDateTimeProvider>().Now);
+        player.AddComponent(_jobStatisticsComponent);
     }
 
     [Fact]

@@ -60,6 +60,11 @@ public class RealmCollisionSphere : CollisionSphere, IComponents
         return Components.AddComponent(component);
     }
 
+    public TComponent AddComponentWithDI<TComponent>(params object[] parameters) where TComponent : IComponent
+    {
+        return Components.AddComponentWithDI<TComponent>(parameters);
+    }
+
     public void AddRule(IElementRule elementRule)
     {
         _elementRules.Add(elementRule);

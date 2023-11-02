@@ -137,7 +137,7 @@ public class FuelComponent : Component, ILuaDebugDataProvider
         if (_active)
         {
             // Turn off other fuel components if this is active.
-            foreach (var item in components.Components.ComponentsLists.OfType<FuelComponent>().Where(x => x != this))
+            foreach (var item in components.Components.ComponentsList.OfType<FuelComponent>().Where(x => x != this))
                 item.Active = false;
         }
     }

@@ -23,7 +23,7 @@ internal class TestJobComponent : JobSessionComponent
 
         var objectEntity = _elementFactory.CreateObject(SlipeServer.Server.Enums.ObjectModel.Gunbox, new Vector3(379.00f, -102.77f, 1.24f), Vector3.Zero);
         objectEntity.AddComponent<LiftableWorldObjectComponent>();
-        var objective2 = AddObjective(new TransportEntityObjective(objectEntity, new Vector3(379.00f, -112.77f, 2.0f)));
+        var objective2 = AddObjective(new TransportObjectObjective(objectEntity, new Vector3(379.00f, -112.77f, 2.0f)));
         objective2.Completed += ObjectiveBCompleted;
 
         var subObjective1 = new MarkerEnterObjective(new Vector3(386.9004f, -89.74414f, 3.8843315f));
@@ -34,17 +34,17 @@ internal class TestJobComponent : JobSessionComponent
 
     private void ObjectiveACompleted(Objective objective, object? data = null)
     {
-        Element.GetRequiredComponent<JobStatisticsComponent>().AddPoints(1, 1);
+        ((RealmPlayer)Element).GetRequiredComponent<JobStatisticsComponent>().AddPoints(1, 1);
     }
 
     private void ObjectiveBCompleted(Objective objective, object? data = null)
     {
-        Element.GetRequiredComponent<JobStatisticsComponent>().AddPoints(1, 2);
+        ((RealmPlayer)Element).GetRequiredComponent<JobStatisticsComponent>().AddPoints(1, 2);
     }
 
     private void ObjectiveCCompleted(Objective objective, object? data = null)
     {
-        Element.GetRequiredComponent<JobStatisticsComponent>().AddPoints(1, 1);
+        ((RealmPlayer)Element).GetRequiredComponent<JobStatisticsComponent>().AddPoints(1, 1);
     }
 
 }

@@ -2,62 +2,50 @@
 
 public class InventoryComponentTests
 {
-    private readonly ItemsRegistry _itemsRegistry;
-    private readonly Entity _entity;
-    private readonly InventoryComponent _inventoryComponent;
-    private static readonly int[] _metadata = new int[] { 1, 2, 3 };
-
-    public InventoryComponentTests()
+    private void PopulateItemsRegistry(ItemsRegistry itemsRegistry)
     {
-        _itemsRegistry = new();
-        _itemsRegistry.Add(1, new ItemRegistryEntry
+        itemsRegistry.Add(1, new ItemRegistryEntry
         {
             Name = "test item id 1",
             Size = 1,
             StackSize = 8,
             AvailableActions = ItemAction.Use,
         });
-        _itemsRegistry.Add(2, new ItemRegistryEntry
+        itemsRegistry.Add(2, new ItemRegistryEntry
         {
             Name = "test item id 2",
             Size = 2,
             StackSize = 1,
             AvailableActions = ItemAction.Use,
         });
-        _itemsRegistry.Add(3, new ItemRegistryEntry
+        itemsRegistry.Add(3, new ItemRegistryEntry
         {
             Name = "test item id 3",
             Size = 1,
             StackSize = 8,
             AvailableActions = ItemAction.Use | ItemAction.Drop | ItemAction.Eat,
         });
-        _itemsRegistry.Add(4, new ItemRegistryEntry
+        itemsRegistry.Add(4, new ItemRegistryEntry
         {
             Name = "test item id 4",
             Size = 100,
             StackSize = 8,
             AvailableActions = ItemAction.Use,
         });
-        _itemsRegistry.Add(5, new ItemRegistryEntry
+        itemsRegistry.Add(5, new ItemRegistryEntry
         {
             Name = "test item id 5",
             Size = 101,
             StackSize = 8,
             AvailableActions = ItemAction.Use,
         });
-        _itemsRegistry.Add(6, new ItemRegistryEntry
+        itemsRegistry.Add(6, new ItemRegistryEntry
         {
             Name = "test item id 6",
             Size = 1,
             StackSize = 1,
             AvailableActions = ItemAction.Use,
         });
-
-        var services = new ServiceCollection();
-        services.AddSingleton<IRealmConfigurationProvider>(new TestConfigurationProvider());
-        _entity = new();
-        _inventoryComponent = new(100);
-        _entity.AddComponent(_inventoryComponent);
     }
 
     [InlineData(1, 1, 1)]
@@ -65,21 +53,33 @@ public class InventoryComponentTests
     [Theory]
     public void AddItemShouldWork(uint itemId, uint number, uint expectedNumber)
     {
-        _inventoryComponent.AddItem(_itemsRegistry, itemId, number);
+        var realmTestingServer = new RealmTestingServer();
+        var player = realmTestingServer.CreatePlayer();
+        var itemsRegistry = realmTestingServer.GetRequiredService<ItemsRegistry>();
+        PopulateItemsRegistry(itemsRegistry);
 
-        _inventoryComponent.Number.Should().Be(expectedNumber);
+        var inventoryComponent = player.AddComponent(new InventoryComponent(100));
+        inventoryComponent.AddItem(itemsRegistry, itemId, number);
+
+        inventoryComponent.Number.Should().Be(expectedNumber);
     }
 
     [Fact]
     public void ItemsShouldBeAppropriatelyStackedWhenAddedOneStack()
     {
-        _inventoryComponent.AddItem(_itemsRegistry, 3, 2, null, true);
-        _inventoryComponent.AddItem(_itemsRegistry, 3, 3, null, true);
-        _inventoryComponent.AddItem(_itemsRegistry, 3, 2, null, true);
-        _inventoryComponent.AddItem(_itemsRegistry, 3, 1, null, true);
+        var realmTestingServer = new RealmTestingServer();
+        var player = realmTestingServer.CreatePlayer();
+        var itemsRegistry = realmTestingServer.GetRequiredService<ItemsRegistry>();
+        PopulateItemsRegistry(itemsRegistry);
 
-        _inventoryComponent.Items.Should().HaveCount(1);
-        _inventoryComponent.Items[0].Number.Should().Be(8);
+        var inventoryComponent = player.AddComponent(new InventoryComponent(100));
+        inventoryComponent.AddItem(itemsRegistry, 3, 2, null, true);
+        inventoryComponent.AddItem(itemsRegistry, 3, 3, null, true);
+        inventoryComponent.AddItem(itemsRegistry, 3, 2, null, true);
+        inventoryComponent.AddItem(itemsRegistry, 3, 1, null, true);
+
+        inventoryComponent.Items.Should().HaveCount(1);
+        inventoryComponent.Items[0].Number.Should().Be(8);
     }
 
     [InlineData(true)]
@@ -87,73 +87,109 @@ public class InventoryComponentTests
     [Theory]
     public void ItemsShouldBeAppropriatelyStackedWhenAddedMultipleStacks(bool tryStack)
     {
-        _inventoryComponent.AddItem(_itemsRegistry, 3, 2, null, tryStack);
-        _inventoryComponent.AddItem(_itemsRegistry, 3, 22, null, tryStack);
+        var realmTestingServer = new RealmTestingServer();
+        var player = realmTestingServer.CreatePlayer();
+        var itemsRegistry = realmTestingServer.GetRequiredService<ItemsRegistry>();
+        PopulateItemsRegistry(itemsRegistry);
+        var inventoryComponent = player.AddComponent(new InventoryComponent(100));
+
+        inventoryComponent.AddItem(itemsRegistry, 3, 2, null, tryStack);
+        inventoryComponent.AddItem(itemsRegistry, 3, 22, null, tryStack);
 
         if (tryStack)
         {
-            _inventoryComponent.Items.Should().HaveCount(3); // 8 + 8 + 8
+            inventoryComponent.Items.Should().HaveCount(3); // 8 + 8 + 8
         }
         else
         {
-            _inventoryComponent.Items.Should().HaveCount(4); // 2 + 8 + 8 + 6
+            inventoryComponent.Items.Should().HaveCount(4); // 2 + 8 + 8 + 6
         }
-        _inventoryComponent.Items.Sum(x => x.Number).Should().Be(24);
+        inventoryComponent.Items.Sum(x => x.Number).Should().Be(24);
     }
 
     [Fact]
     public void ItemsShouldNotBeStackedWhenHaveDifferentMetadata()
     {
+        var realmTestingServer = new RealmTestingServer();
+        var player = realmTestingServer.CreatePlayer();
+        var itemsRegistry = realmTestingServer.GetRequiredService<ItemsRegistry>();
+        PopulateItemsRegistry(itemsRegistry);
+        var inventoryComponent = player.AddComponent(new InventoryComponent(100));
+
         var metaData = new Metadata
         {
             ["foo"] = 1,
         };
 
-        _inventoryComponent.AddItem(_itemsRegistry, 3, 2, null);
-        _inventoryComponent.AddItem(_itemsRegistry, 3, 2, null);
-        _inventoryComponent.AddItem(_itemsRegistry, 3, 2, metaData);
-        _inventoryComponent.AddItem(_itemsRegistry, 3, 2, metaData);
+        inventoryComponent.AddItem(itemsRegistry, 3, 2, null);
+        inventoryComponent.AddItem(itemsRegistry, 3, 2, null);
+        inventoryComponent.AddItem(itemsRegistry, 3, 2, metaData);
+        inventoryComponent.AddItem(itemsRegistry, 3, 2, metaData);
 
-        _inventoryComponent.Items.Should().HaveCount(2);
-        _inventoryComponent.Items.Sum(x => x.Number).Should().Be(8);
+        inventoryComponent.Items.Should().HaveCount(2);
+        inventoryComponent.Items.Sum(x => x.Number).Should().Be(8);
     }
 
     [Fact]
     public void HasItemByIdShouldWork()
     {
-        _inventoryComponent.AddItem(_itemsRegistry, 1, 1);
+        var realmTestingServer = new RealmTestingServer();
+        var player = realmTestingServer.CreatePlayer();
+        var itemsRegistry = realmTestingServer.GetRequiredService<ItemsRegistry>();
+        PopulateItemsRegistry(itemsRegistry);
+        var inventoryComponent = player.AddComponent(new InventoryComponent(100));
 
-        _inventoryComponent.HasItemById(1).Should().BeTrue();
+        inventoryComponent.AddItem(itemsRegistry, 1, 1);
+
+        inventoryComponent.HasItemById(1).Should().BeTrue();
     }
     
     [Fact]
     public void SumItemsByIdShouldWork()
     {
-        _inventoryComponent.AddItem(_itemsRegistry, 2, 1);
-        _inventoryComponent.AddItem(_itemsRegistry, 2, 1);
-        _inventoryComponent.AddItem(_itemsRegistry, 6, 1);
+        var realmTestingServer = new RealmTestingServer();
+        var player = realmTestingServer.CreatePlayer();
+        var itemsRegistry = realmTestingServer.GetRequiredService<ItemsRegistry>();
+        PopulateItemsRegistry(itemsRegistry);
+        var inventoryComponent = player.AddComponent(new InventoryComponent(100));
 
-        _inventoryComponent.SumItemsById(2).Should().Be(2);
+        inventoryComponent.AddItem(itemsRegistry, 2, 1);
+        inventoryComponent.AddItem(itemsRegistry, 2, 1);
+        inventoryComponent.AddItem(itemsRegistry, 6, 1);
+
+        inventoryComponent.SumItemsById(2).Should().Be(2);
     }
     
     [Fact]
     public void SumItemsNumberByIdShouldWork()
     {
-        _inventoryComponent.AddItem(_itemsRegistry, 2, 4);
-        _inventoryComponent.AddItem(_itemsRegistry, 2, 3);
-        _inventoryComponent.AddItem(_itemsRegistry, 6, 5);
+        var realmTestingServer = new RealmTestingServer();
+        var player = realmTestingServer.CreatePlayer();
+        var itemsRegistry = realmTestingServer.GetRequiredService<ItemsRegistry>();
+        PopulateItemsRegistry(itemsRegistry);
+        var inventoryComponent = player.AddComponent(new InventoryComponent(100));
 
-        _inventoryComponent.SumItemsById(2).Should().Be(7);
+        inventoryComponent.AddItem(itemsRegistry, 2, 4);
+        inventoryComponent.AddItem(itemsRegistry, 2, 3);
+        inventoryComponent.AddItem(itemsRegistry, 6, 5);
+
+        inventoryComponent.SumItemsById(2).Should().Be(7);
     }
     
     [Fact]
     public void GetItemsByIdShouldWork()
     {
-        var item1 = _inventoryComponent.AddItem(_itemsRegistry, 2, 1).First();
-        var item2 = _inventoryComponent.AddItem(_itemsRegistry, 2, 1).First();
-        _inventoryComponent.AddItem(_itemsRegistry, 6, 1);
+        var realmTestingServer = new RealmTestingServer();
+        var player = realmTestingServer.CreatePlayer();
+        var itemsRegistry = realmTestingServer.GetRequiredService<ItemsRegistry>();
+        PopulateItemsRegistry(itemsRegistry);
+        var inventoryComponent = player.AddComponent(new InventoryComponent(100));
 
-        _inventoryComponent.GetItemsById(2).Should().BeEquivalentTo(new List<Item>
+        var item1 = inventoryComponent.AddItem(itemsRegistry, 2, 1).First();
+        var item2 = inventoryComponent.AddItem(itemsRegistry, 2, 1).First();
+        inventoryComponent.AddItem(itemsRegistry, 6, 1);
+
+        inventoryComponent.GetItemsById(2).Should().BeEquivalentTo(new List<Item>
         {
             item1, item2
         });
@@ -162,11 +198,17 @@ public class InventoryComponentTests
     [Fact]
     public void GetItemsByIdWithMetadataShouldWork()
     {
-        var item = _inventoryComponent.AddItem(_itemsRegistry, 1, 1, new Metadata { ["foo"] = 1 }).First();
-        _inventoryComponent.AddItem(_itemsRegistry, 1, 1, new Metadata { ["foo"] = 2 });
-        _inventoryComponent.AddItem(_itemsRegistry, 1, 1, new Metadata { ["foo"] = 3 });
+        var realmTestingServer = new RealmTestingServer();
+        var player = realmTestingServer.CreatePlayer();
+        var itemsRegistry = realmTestingServer.GetRequiredService<ItemsRegistry>();
+        PopulateItemsRegistry(itemsRegistry);
+        var inventoryComponent = player.AddComponent(new InventoryComponent(100));
 
-        _inventoryComponent.GetItemsByIdWithMetadata(1, "foo", 1).Should().BeEquivalentTo(new List<Item>
+        var item = inventoryComponent.AddItem(itemsRegistry, 1, 1, new Metadata { ["foo"] = 1 }).First();
+        inventoryComponent.AddItem(itemsRegistry, 1, 1, new Metadata { ["foo"] = 2 });
+        inventoryComponent.AddItem(itemsRegistry, 1, 1, new Metadata { ["foo"] = 3 });
+
+        inventoryComponent.GetItemsByIdWithMetadata(1, "foo", 1).Should().BeEquivalentTo(new List<Item>
         {
             item
         });
@@ -175,9 +217,15 @@ public class InventoryComponentTests
     [Fact]
     public void GetItemsByIdWithMetadataAsDictionaryShouldWork()
     {
-        var item = _inventoryComponent.AddSingleItem(_itemsRegistry, 1, new Metadata { ["foo"] = 1 });
+        var realmTestingServer = new RealmTestingServer();
+        var player = realmTestingServer.CreatePlayer();
+        var itemsRegistry = realmTestingServer.GetRequiredService<ItemsRegistry>();
+        PopulateItemsRegistry(itemsRegistry);
+        var inventoryComponent = player.AddComponent(new InventoryComponent(100));
 
-        _inventoryComponent.GetSingleItemByIdWithMetadata(1, new Metadata
+        var item = inventoryComponent.AddSingleItem(itemsRegistry, 1, new Metadata { ["foo"] = 1 });
+
+        inventoryComponent.GetSingleItemByIdWithMetadata(1, new Metadata
         {
             ["foo"] = 1
         }).Should().BeEquivalentTo(item);
@@ -186,19 +234,31 @@ public class InventoryComponentTests
     [Fact]
     public void HasItemWithMetadataShouldWork()
     {
-        _inventoryComponent.AddSingleItem(_itemsRegistry, 1, new Metadata { ["foo"] = 1 });
-        _inventoryComponent.AddItem(_itemsRegistry, 1, 1, new Metadata { ["foo"] = 2 });
-        _inventoryComponent.AddItem(_itemsRegistry, 1, 1, new Metadata { ["foo"] = 3 });
+        var realmTestingServer = new RealmTestingServer();
+        var player = realmTestingServer.CreatePlayer();
+        var itemsRegistry = realmTestingServer.GetRequiredService<ItemsRegistry>();
+        PopulateItemsRegistry(itemsRegistry);
+        var inventoryComponent = player.AddComponent(new InventoryComponent(100));
 
-        _inventoryComponent.HasItemWithMetadata(1, "foo", 1).Should().BeTrue();
-        _inventoryComponent.HasItemWithMetadata(1, "foo", 4).Should().BeFalse();
+        inventoryComponent.AddSingleItem(itemsRegistry, 1, new Metadata { ["foo"] = 1 });
+        inventoryComponent.AddItem(itemsRegistry, 1, 1, new Metadata { ["foo"] = 2 });
+        inventoryComponent.AddItem(itemsRegistry, 1, 1, new Metadata { ["foo"] = 3 });
+
+        inventoryComponent.HasItemWithMetadata(1, "foo", 1).Should().BeTrue();
+        inventoryComponent.HasItemWithMetadata(1, "foo", 4).Should().BeFalse();
     }
     
     [Fact]
     public void YouShouldBeAbleToAddAndGetItemByMetadata()
     {
-        var item = _inventoryComponent.AddSingleItem(_itemsRegistry, 1, new Metadata { ["foo"] = 1 });
-        var found = _inventoryComponent.TryGetByIdAndMetadata(1, new Metadata { ["foo"] = 1 }, out Item foundItem);
+        var realmTestingServer = new RealmTestingServer();
+        var player = realmTestingServer.CreatePlayer();
+        var itemsRegistry = realmTestingServer.GetRequiredService<ItemsRegistry>();
+        PopulateItemsRegistry(itemsRegistry);
+        var inventoryComponent = player.AddComponent(new InventoryComponent(100));
+
+        var item = inventoryComponent.AddSingleItem(itemsRegistry, 1, new Metadata { ["foo"] = 1 });
+        var found = inventoryComponent.TryGetByIdAndMetadata(1, new Metadata { ["foo"] = 1 }, out Item foundItem);
 
         found.Should().BeTrue();
         item.Should().Be(foundItem);
@@ -207,7 +267,13 @@ public class InventoryComponentTests
     [Fact]
     public void YouShouldNotBeAbleToAddItemWithLessThanOneNumber()
     {
-        var act = () => _inventoryComponent.AddItem(_itemsRegistry, 1, 0);
+        var realmTestingServer = new RealmTestingServer();
+        var player = realmTestingServer.CreatePlayer();
+        var itemsRegistry = realmTestingServer.GetRequiredService<ItemsRegistry>();
+        PopulateItemsRegistry(itemsRegistry);
+        var inventoryComponent = player.AddComponent(new InventoryComponent(100));
+
+        var act = () => inventoryComponent.AddItem(itemsRegistry, 1, 0);
 
         act.Should().Throw<ArgumentOutOfRangeException>();
     }
@@ -215,20 +281,32 @@ public class InventoryComponentTests
     [Fact]
     public void InventoryShouldBeResizable()
     {
-        _inventoryComponent.HasSpace(200).Should().BeFalse();
-        _inventoryComponent.Size = 500;
-        _inventoryComponent.HasSpace(200).Should().BeTrue();
+        var realmTestingServer = new RealmTestingServer();
+        var player = realmTestingServer.CreatePlayer();
+        var itemsRegistry = realmTestingServer.GetRequiredService<ItemsRegistry>();
+        PopulateItemsRegistry(itemsRegistry);
+        var inventoryComponent = player.AddComponent(new InventoryComponent(100));
+
+        inventoryComponent.HasSpace(200).Should().BeFalse();
+        inventoryComponent.Size = 500;
+        inventoryComponent.HasSpace(200).Should().BeTrue();
     }
 
     [Fact]
     public void YouShouldBeAbleToCheckIfItemWillFitIntoInventory()
     {
-        _inventoryComponent.Size = 100;
-        _inventoryComponent.HasSpaceForItem(1, _itemsRegistry).Should().BeTrue();
-        _inventoryComponent.HasSpaceForItem(4, _itemsRegistry).Should().BeTrue();
-        _inventoryComponent.HasSpaceForItem(5, _itemsRegistry).Should().BeFalse();
-        _inventoryComponent.HasSpaceForItem(1, 100, _itemsRegistry).Should().BeTrue();
-        _inventoryComponent.HasSpaceForItem(1, 101, _itemsRegistry).Should().BeFalse();
+        var realmTestingServer = new RealmTestingServer();
+        var player = realmTestingServer.CreatePlayer();
+        var itemsRegistry = realmTestingServer.GetRequiredService<ItemsRegistry>();
+        PopulateItemsRegistry(itemsRegistry);
+        var inventoryComponent = player.AddComponent(new InventoryComponent(100));
+
+        inventoryComponent.Size = 100;
+        inventoryComponent.HasSpaceForItem(1, itemsRegistry).Should().BeTrue();
+        inventoryComponent.HasSpaceForItem(4, itemsRegistry).Should().BeTrue();
+        inventoryComponent.HasSpaceForItem(5, itemsRegistry).Should().BeFalse();
+        inventoryComponent.HasSpaceForItem(1, 100, itemsRegistry).Should().BeTrue();
+        inventoryComponent.HasSpaceForItem(1, 101, itemsRegistry).Should().BeFalse();
     }
 
     private void HandleItemUsed(InventoryComponent inventoryComponent, Item usedItem, ItemAction flags)
@@ -239,63 +317,105 @@ public class InventoryComponentTests
     [Fact]
     public void YouShouldBeAbleToUseItem()
     {
-        _inventoryComponent.ItemUsed += HandleItemUsed;
-        _inventoryComponent.Size = 100;
-        var item = _inventoryComponent.AddSingleItem(_itemsRegistry, 1, new Metadata { ["counter"] = 10 });
+        var realmTestingServer = new RealmTestingServer();
+        var player = realmTestingServer.CreatePlayer();
+        var itemsRegistry = realmTestingServer.GetRequiredService<ItemsRegistry>();
+        PopulateItemsRegistry(itemsRegistry);
+        var inventoryComponent = player.AddComponent(new InventoryComponent(100));
 
-        _inventoryComponent.TryUseItem(item, ItemAction.Use).Should().BeTrue();
+        inventoryComponent.ItemUsed += HandleItemUsed;
+        inventoryComponent.Size = 100;
+        var item = inventoryComponent.AddSingleItem(itemsRegistry, 1, new Metadata { ["counter"] = 10 });
+
+        inventoryComponent.TryUseItem(item, ItemAction.Use).Should().BeTrue();
         item.GetMetadata("counter").Should().Be(9);
     }
 
     [Fact]
     public void YouCanNotUseItemIfItDoesNotSupportIt()
     {
-        _inventoryComponent.Size = 100;
-        var item = _inventoryComponent.AddSingleItem(_itemsRegistry, 1);
-        _inventoryComponent.TryUseItem(item, ItemAction.Close).Should().BeFalse();
+        var realmTestingServer = new RealmTestingServer();
+        var player = realmTestingServer.CreatePlayer();
+        var itemsRegistry = realmTestingServer.GetRequiredService<ItemsRegistry>();
+        PopulateItemsRegistry(itemsRegistry);
+        var inventoryComponent = player.AddComponent(new InventoryComponent(100));
+
+        inventoryComponent.Size = 100;
+        var item = inventoryComponent.AddSingleItem(itemsRegistry, 1);
+        inventoryComponent.TryUseItem(item, ItemAction.Close).Should().BeFalse();
     }
 
     [Fact]
     public void RemoveItemShouldWork()
     {
-        var item = _inventoryComponent.AddSingleItem(_itemsRegistry, 1);
-        _inventoryComponent.RemoveItem(item);
-        _inventoryComponent.Items.Should().BeEmpty();
+        var realmTestingServer = new RealmTestingServer();
+        var player = realmTestingServer.CreatePlayer();
+        var itemsRegistry = realmTestingServer.GetRequiredService<ItemsRegistry>();
+        PopulateItemsRegistry(itemsRegistry);
+        var inventoryComponent = player.AddComponent(new InventoryComponent(100));
+
+        var item = inventoryComponent.AddSingleItem(itemsRegistry, 1);
+        inventoryComponent.RemoveItem(item);
+        inventoryComponent.Items.Should().BeEmpty();
     }
     
     [Fact]
     public void RemoveItemRemoveMultipleStacks()
     {
-        _inventoryComponent.AddItem(_itemsRegistry, 1, 20);
-        _inventoryComponent.RemoveItem(1, 20);
-        _inventoryComponent.Number.Should().Be(0);
-        _inventoryComponent.Items.Should().BeEmpty();
+        var realmTestingServer = new RealmTestingServer();
+        var player = realmTestingServer.CreatePlayer();
+        var itemsRegistry = realmTestingServer.GetRequiredService<ItemsRegistry>();
+        PopulateItemsRegistry(itemsRegistry);
+        var inventoryComponent = player.AddComponent(new InventoryComponent(100));
+
+        inventoryComponent.AddItem(itemsRegistry, 1, 20);
+        inventoryComponent.RemoveItem(1, 20);
+        inventoryComponent.Number.Should().Be(0);
+        inventoryComponent.Items.Should().BeEmpty();
     }
 
     [Fact]
     public void RemoveItemByIdShouldWork()
     {
-        _inventoryComponent.AddSingleItem(_itemsRegistry, 1);
-        _inventoryComponent.RemoveItem(1);
-        _inventoryComponent.Items.Should().BeEmpty();
+        var realmTestingServer = new RealmTestingServer();
+        var player = realmTestingServer.CreatePlayer();
+        var itemsRegistry = realmTestingServer.GetRequiredService<ItemsRegistry>();
+        PopulateItemsRegistry(itemsRegistry);
+        var inventoryComponent = player.AddComponent(new InventoryComponent(100));
+
+        inventoryComponent.AddSingleItem(itemsRegistry, 1);
+        inventoryComponent.RemoveItem(1);
+        inventoryComponent.Items.Should().BeEmpty();
     }
 
     [Fact]
     public void RemoveItemByIdShouldNotRemoveAnyStackIfThereIsNotEnough()
     {
-        _inventoryComponent.AddItem(_itemsRegistry, 1, 20);
-        _inventoryComponent.RemoveItem(30);
-        _inventoryComponent.Number.Should().Be(20);
+        var realmTestingServer = new RealmTestingServer();
+        var player = realmTestingServer.CreatePlayer();
+        var itemsRegistry = realmTestingServer.GetRequiredService<ItemsRegistry>();
+        PopulateItemsRegistry(itemsRegistry);
+        var inventoryComponent = player.AddComponent(new InventoryComponent(100));
+
+        inventoryComponent.AddItem(itemsRegistry, 1, 20);
+        inventoryComponent.RemoveItem(30);
+        inventoryComponent.Number.Should().Be(20);
     }
 
     [Fact]
     public void RemoveItemShouldRemoveSingleItemWork()
     {
-        _inventoryComponent.Size = 100;
-        _inventoryComponent.AddItem(_itemsRegistry, 1, 4);
-        _inventoryComponent.RemoveItem(1);
+        var realmTestingServer = new RealmTestingServer();
+        var player = realmTestingServer.CreatePlayer();
+        var itemsRegistry = realmTestingServer.GetRequiredService<ItemsRegistry>();
+        PopulateItemsRegistry(itemsRegistry);
+        var inventoryComponent = player.AddComponent(new InventoryComponent(100));
 
-        var items = _inventoryComponent.Items;
+        inventoryComponent.Size = 100;
+        inventoryComponent.AddItem(itemsRegistry, 1, 4);
+        inventoryComponent.RemoveItem(1);
+
+        var items = inventoryComponent.Items;
         items.Should().HaveCount(1);
         items[0].Number.Should().Be(3);
     }
@@ -303,18 +423,30 @@ public class InventoryComponentTests
     [Fact]
     public void RemoveItemStackShouldRemoveEntireStack()
     {
-        _inventoryComponent.Size = 100;
-        _inventoryComponent.AddItem(_itemsRegistry, 1, 4);
-        _inventoryComponent.RemoveItemStack(1);
+        var realmTestingServer = new RealmTestingServer();
+        var player = realmTestingServer.CreatePlayer();
+        var itemsRegistry = realmTestingServer.GetRequiredService<ItemsRegistry>();
+        PopulateItemsRegistry(itemsRegistry);
+        var inventoryComponent = player.AddComponent(new InventoryComponent(100));
 
-        _inventoryComponent.Items.Should().BeEmpty();
+        inventoryComponent.Size = 100;
+        inventoryComponent.AddItem(itemsRegistry, 1, 4);
+        inventoryComponent.RemoveItemStack(1);
+
+        inventoryComponent.Items.Should().BeEmpty();
     }
 
     [Fact]
     public void AddItemShouldThrowAppropriateException()
     {
-        _inventoryComponent.Size = 5;
-        var act = () => _inventoryComponent.AddItem(_itemsRegistry, 1, 4);
+        var realmTestingServer = new RealmTestingServer();
+        var player = realmTestingServer.CreatePlayer();
+        var itemsRegistry = realmTestingServer.GetRequiredService<ItemsRegistry>();
+        PopulateItemsRegistry(itemsRegistry);
+        var inventoryComponent = player.AddComponent(new InventoryComponent(100));
+
+        inventoryComponent.Size = 5;
+        var act = () => inventoryComponent.AddItem(itemsRegistry, 1, 4);
 
         act.Should().NotThrow();
         act.Should().Throw<InventoryNotEnoughSpaceException>().Where(x => x.InventorySize == 5 && x.RequiredSpace == 8);
@@ -323,19 +455,25 @@ public class InventoryComponentTests
     [Fact]
     public void Clear()
     {
+        var realmTestingServer = new RealmTestingServer();
+        var player = realmTestingServer.CreatePlayer();
+        var itemsRegistry = realmTestingServer.GetRequiredService<ItemsRegistry>();
+        PopulateItemsRegistry(itemsRegistry);
+        var inventoryComponent = player.AddComponent(new InventoryComponent(100));
+
         #region Arrange
-        _inventoryComponent.AddItem(_itemsRegistry, 1, 2);
-        _inventoryComponent.AddItem(_itemsRegistry, 2, 3);
-        _inventoryComponent.AddItem(_itemsRegistry, 3, 4);
+        inventoryComponent.AddItem(itemsRegistry, 1, 2);
+        inventoryComponent.AddItem(itemsRegistry, 2, 3);
+        inventoryComponent.AddItem(itemsRegistry, 3, 4);
         #endregion
 
         #region Act
-        _inventoryComponent.Clear();
+        inventoryComponent.Clear();
         #endregion
 
         #region Assert
-        _inventoryComponent.Number.Should().Be(0);
-        _inventoryComponent.Items.Should().BeEmpty();
+        inventoryComponent.Number.Should().Be(0);
+        inventoryComponent.Items.Should().BeEmpty();
         #endregion
     }
 
@@ -345,23 +483,29 @@ public class InventoryComponentTests
     [Theory]
     public void TransferItemTest(uint numberOfItemsToTransfer, bool success, int expectedNumberOfItemsInSourceInventory, int expectedNumberOfItemsInDestinationInventory)
     {
+        var realmTestingServer = new RealmTestingServer();
+        var player = realmTestingServer.CreatePlayer();
+        var itemsRegistry = realmTestingServer.GetRequiredService<ItemsRegistry>();
+        PopulateItemsRegistry(itemsRegistry);
+        var inventoryComponent = player.AddComponent(new InventoryComponent(100));
+
         #region Arrange
-        _inventoryComponent.Clear();
+        inventoryComponent.Clear();
         var destinationInventory = new InventoryComponent(10);
         var metaData = new Metadata
         {
             ["foo"] = 1
         };
-        _inventoryComponent.AddItem(_itemsRegistry, 1, 10, metaData);
+        inventoryComponent.AddItem(itemsRegistry, 1, 10, metaData);
         #endregion
 
         #region Act
-        var isSuccess = _inventoryComponent.TransferItem(destinationInventory, _itemsRegistry, 1, numberOfItemsToTransfer, false);
+        var isSuccess = inventoryComponent.TransferItem(destinationInventory, itemsRegistry, 1, numberOfItemsToTransfer, false);
         #endregion
 
         #region Assert
         isSuccess.Should().Be(success);
-        _inventoryComponent.Number.Should().Be(expectedNumberOfItemsInSourceInventory);
+        inventoryComponent.Number.Should().Be(expectedNumberOfItemsInSourceInventory);
         destinationInventory.Number.Should().Be(expectedNumberOfItemsInDestinationInventory);
         destinationInventory.Items.Select(x => x.MetaData).Should().AllBeEquivalentTo(metaData);
         #endregion
@@ -370,11 +514,17 @@ public class InventoryComponentTests
     [Fact]
     public void TryGetMetaDataShouldWork()
     {
-        var item = _inventoryComponent.AddSingleItem(_itemsRegistry, 1, new Metadata
+        var realmTestingServer = new RealmTestingServer();
+        var player = realmTestingServer.CreatePlayer();
+        var itemsRegistry = realmTestingServer.GetRequiredService<ItemsRegistry>();
+        PopulateItemsRegistry(itemsRegistry);
+        var inventoryComponent = player.AddComponent(new InventoryComponent(100));
+
+        var item = inventoryComponent.AddSingleItem(itemsRegistry, 1, new Metadata
         {
             ["number"] = 123,
             ["string"] = "123",
-            ["object"] = _metadata
+            ["object"] = new int[] { 1, 2, 3 }
         });
 
         item.TryGetMetadata("number", out int numberValue).Should().BeTrue();
@@ -390,29 +540,46 @@ public class InventoryComponentTests
     [InlineData(2, false)]
     public void TestHasItemWithCallback(uint itemId, bool has)
     {
-        _inventoryComponent.AddSingleItem(_itemsRegistry, 1);
-        _inventoryComponent.HasItem(x => x.ItemId == itemId).Should().Be(has);
+        var realmTestingServer = new RealmTestingServer();
+        var player = realmTestingServer.CreatePlayer();
+        var itemsRegistry = realmTestingServer.GetRequiredService<ItemsRegistry>();
+        PopulateItemsRegistry(itemsRegistry);
+        var inventoryComponent = player.AddComponent(new InventoryComponent(100));
+
+        inventoryComponent.AddSingleItem(itemsRegistry, 1);
+        inventoryComponent.HasItem(x => x.ItemId == itemId).Should().Be(has);
     }
 
     [Fact]
     public void ItShouldBePossibleToCreateNewInventoryComponentWithItems()
     {
-        var inventoryComponent = new InventoryComponent(10, 0, new List<Item>
+        var realmTestingServer = new RealmTestingServer();
+        var player = realmTestingServer.CreatePlayer();
+        var itemsRegistry = realmTestingServer.GetRequiredService<ItemsRegistry>();
+        PopulateItemsRegistry(itemsRegistry);
+
+        var inventoryComponent = player.AddComponent(new InventoryComponent(10, 0, new List<Item>
         {
-            new Item(_itemsRegistry, 1, 1)
-        });
+            new Item(itemsRegistry, 1, 1)
+        }));
         inventoryComponent.Number.Should().Be(1);
     }
 
     [Fact]
     public void ItemMetaDataPropertyShouldReturnCopyOfMetaData()
     {
+        var realmTestingServer = new RealmTestingServer();
+        var player = realmTestingServer.CreatePlayer();
+        var itemsRegistry = realmTestingServer.GetRequiredService<ItemsRegistry>();
+        PopulateItemsRegistry(itemsRegistry);
+        var inventoryComponent = player.AddComponent(new InventoryComponent(100));
+
         var metaData = new Metadata
         {
             ["foo"] = 1
         };
 
-        var item = _inventoryComponent.AddSingleItem(_itemsRegistry, 1, metaData);
+        var item = inventoryComponent.AddSingleItem(itemsRegistry, 1, metaData);
 
         item.MetaData.Should().BeEquivalentTo(metaData);
     }
@@ -420,12 +587,18 @@ public class InventoryComponentTests
     [Fact]
     public void ItemMetaDataKeysPropertyShouldReturnCopyOfMetaDataKeys()
     {
+        var realmTestingServer = new RealmTestingServer();
+        var player = realmTestingServer.CreatePlayer();
+        var itemsRegistry = realmTestingServer.GetRequiredService<ItemsRegistry>();
+        PopulateItemsRegistry(itemsRegistry);
+        var inventoryComponent = player.AddComponent(new InventoryComponent(100));
+
         var metaData = new Metadata
         {
             ["foo"] = 1
         };
 
-        var item = _inventoryComponent.AddSingleItem(_itemsRegistry, 1, metaData);
+        var item = inventoryComponent.AddSingleItem(itemsRegistry, 1, metaData);
 
         item.MetaDataKeys.Should().BeEquivalentTo(new List<string> { "foo" });
     }
@@ -433,12 +606,18 @@ public class InventoryComponentTests
     [Fact]
     public void YouShouldBeAbleToRemoveMetaData()
     {
+        var realmTestingServer = new RealmTestingServer();
+        var player = realmTestingServer.CreatePlayer();
+        var itemsRegistry = realmTestingServer.GetRequiredService<ItemsRegistry>();
+        PopulateItemsRegistry(itemsRegistry);
+        var inventoryComponent = player.AddComponent(new InventoryComponent(100));
+
         var metaData = new Metadata
         {
             ["foo"] = 1
         };
 
-        var item = _inventoryComponent.AddSingleItem(_itemsRegistry, 1, metaData);
+        var item = inventoryComponent.AddSingleItem(itemsRegistry, 1, metaData);
         using var monitoredItem = item.Monitor();
 
         item.RemoveMetadata("foo");
@@ -450,12 +629,18 @@ public class InventoryComponentTests
     [Fact]
     public void YouShouldBeAbleToChangeMetaData()
     {
+        var realmTestingServer = new RealmTestingServer();
+        var player = realmTestingServer.CreatePlayer();
+        var itemsRegistry = realmTestingServer.GetRequiredService<ItemsRegistry>();
+        PopulateItemsRegistry(itemsRegistry);
+        var inventoryComponent = player.AddComponent(new InventoryComponent(100));
+
         var metaData = new Metadata
         {
             ["foo"] = 1
         };
 
-        var item = _inventoryComponent.AddSingleItem(_itemsRegistry, 1, metaData);
+        var item = inventoryComponent.AddSingleItem(itemsRegistry, 1, metaData);
         using var monitoredItem = item.Monitor();
 
         item.ChangeMetadata<int>("foo", x => x + 1);
@@ -471,12 +656,18 @@ public class InventoryComponentTests
     [Fact]
     public void HasMetadataShouldWork()
     {
+        var realmTestingServer = new RealmTestingServer();
+        var player = realmTestingServer.CreatePlayer();
+        var itemsRegistry = realmTestingServer.GetRequiredService<ItemsRegistry>();
+        PopulateItemsRegistry(itemsRegistry);
+        var inventoryComponent = player.AddComponent(new InventoryComponent(100));
+
         var metaData = new Metadata
         {
             ["foo"] = 1
         };
 
-        var item = _inventoryComponent.AddSingleItem(_itemsRegistry, 1, metaData);
+        var item = inventoryComponent.AddSingleItem(itemsRegistry, 1, metaData);
 
         item.HasMetadata("foo").Should().BeTrue();
     }
@@ -484,21 +675,27 @@ public class InventoryComponentTests
     [Fact]
     public async Task TransferItemShouldBeThreadSafe()
     {
+        var realmTestingServer = new RealmTestingServer();
+        var player = realmTestingServer.CreatePlayer();
+        var itemsRegistry = realmTestingServer.GetRequiredService<ItemsRegistry>();
+        PopulateItemsRegistry(itemsRegistry);
+        var inventoryComponent = player.AddComponent(new InventoryComponent(100));
+
         #region Arrange
-        _inventoryComponent.Clear();
+        inventoryComponent.Clear();
         var destinationInventory = new InventoryComponent(800);
-        _inventoryComponent.AddItem(_itemsRegistry, 1, 800, null, true, true);
+        inventoryComponent.AddItem(itemsRegistry, 1, 800, null, true, true);
         #endregion
 
         #region Act
         await ParallelHelpers.Run(() =>
         {
-            var isSuccess = _inventoryComponent.TransferItem(destinationInventory, _itemsRegistry, 1, 1, false);
+            var isSuccess = inventoryComponent.TransferItem(destinationInventory, itemsRegistry, 1, 1, false);
         });
         #endregion
 
         #region Assert
-        _inventoryComponent.Number.Should().Be(0);
+        inventoryComponent.Number.Should().Be(0);
         destinationInventory.IsFull.Should().BeTrue();
         #endregion
     }
@@ -506,13 +703,19 @@ public class InventoryComponentTests
     [Fact]
     public void RemoveAndGetItemByIdShouldWork()
     {
+        var realmTestingServer = new RealmTestingServer();
+        var player = realmTestingServer.CreatePlayer();
+        var itemsRegistry = realmTestingServer.GetRequiredService<ItemsRegistry>();
+        PopulateItemsRegistry(itemsRegistry);
+        var inventoryComponent = player.AddComponent(new InventoryComponent(100));
+
         var metaData = new Metadata
         {
             ["foo"] = 1
         };
 
-        var addedItem = _inventoryComponent.AddSingleItem(_itemsRegistry, 1, metaData);
-        var removedItem = _inventoryComponent.RemoveAndGetItemById(1).First();
+        var addedItem = inventoryComponent.AddSingleItem(itemsRegistry, 1, metaData);
+        var removedItem = inventoryComponent.RemoveAndGetItemById(1).First();
 
         addedItem.Should().BeEquivalentTo(removedItem);
     }
@@ -520,13 +723,19 @@ public class InventoryComponentTests
     [Fact]
     public void RemoveAndGetItemByIdShouldWorkForManyItems()
     {
+        var realmTestingServer = new RealmTestingServer();
+        var player = realmTestingServer.CreatePlayer();
+        var itemsRegistry = realmTestingServer.GetRequiredService<ItemsRegistry>();
+        PopulateItemsRegistry(itemsRegistry);
+        var inventoryComponent = player.AddComponent(new InventoryComponent(100));
+
         var metaData = new Metadata
         {
             ["foo"] = 1
         };
 
-        var addedItem = _inventoryComponent.AddItem(_itemsRegistry, 1, 20, metaData);
-        var removedItem = _inventoryComponent.RemoveAndGetItemById(1, 20);
+        var addedItem = inventoryComponent.AddItem(itemsRegistry, 1, 20, metaData);
+        var removedItem = inventoryComponent.RemoveAndGetItemById(1, 20);
 
         addedItem.Should().BeEquivalentTo(removedItem);
     }
@@ -534,14 +743,20 @@ public class InventoryComponentTests
     [Fact]
     public void RemovingOneItemAndGetItemByIdShouldWorkForManyItems()
     {
+        var realmTestingServer = new RealmTestingServer();
+        var player = realmTestingServer.CreatePlayer();
+        var itemsRegistry = realmTestingServer.GetRequiredService<ItemsRegistry>();
+        PopulateItemsRegistry(itemsRegistry);
+        var inventoryComponent = player.AddComponent(new InventoryComponent(100));
+
         var metaData = new Metadata
         {
             ["foo"] = 1
         };
 
-        _inventoryComponent.AddItem(_itemsRegistry, 1, 20, metaData);
-        var removedItem = _inventoryComponent.RemoveAndGetItemById(1, 1);
-        _inventoryComponent.Number.Should().Be(19);
+        inventoryComponent.AddItem(itemsRegistry, 1, 20, metaData);
+        var removedItem = inventoryComponent.RemoveAndGetItemById(1, 1);
+        inventoryComponent.Number.Should().Be(19);
         removedItem.Should().HaveCount(1);
         removedItem.First().MetaData.Should().BeEquivalentTo(metaData);
     }

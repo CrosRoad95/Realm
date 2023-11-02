@@ -99,7 +99,7 @@ internal sealed class SaveService : ISaveService
         vehicleData.Paintjob = vehicle.PaintJob;
 
         {
-            var fuelComponents = vehicle.Components.ComponentsLists.OfType<FuelComponent>();
+            var fuelComponents = vehicle.Components.ComponentsList.OfType<FuelComponent>();
             vehicleData.Fuels = fuelComponents.Select(x => new VehicleFuelData
             {
                 VehicleId = vehicleData.Id,
@@ -140,7 +140,7 @@ internal sealed class SaveService : ISaveService
             }).ToList();
         }
 
-        var inventoryComponents = vehicle.Components.ComponentsLists
+        var inventoryComponents = vehicle.Components.ComponentsList
             .OfType<InventoryComponent>()
             .Where(x => x.Id != 0)
             .ToList();
@@ -262,7 +262,7 @@ internal sealed class SaveService : ISaveService
         else
             user.PlayTime = 0;
 
-        var inventoryComponents = player.Components.ComponentsLists.OfType<InventoryComponent>()
+        var inventoryComponents = player.Components.ComponentsList.OfType<InventoryComponent>()
             .Where(x => x.Id != 0)
             .ToList();
 

@@ -7,6 +7,7 @@ public interface IComponents
 
     TComponent AddComponent<TComponent>() where TComponent : IComponent, new();
     TComponent AddComponent<TComponent>(TComponent component) where TComponent : IComponent;
+    TComponent AddComponentWithDI<TComponent>(params object[] parameters) where TComponent : IComponent;
     void DestroyComponent<TComponent>() where TComponent : IComponent;
     void DestroyComponent<TComponent>(TComponent component) where TComponent : IComponent;
     TComponent GetRequiredComponent<TComponent>() where TComponent : IComponent;

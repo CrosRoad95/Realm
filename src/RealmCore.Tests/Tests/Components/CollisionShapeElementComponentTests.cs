@@ -1,45 +1,24 @@
-﻿using SlipeServer.Server.Elements.ColShapes;
-using RealmCore.Resources.ClientInterface;
-
-namespace RealmCore.Tests.Tests.Components;
+﻿namespace RealmCore.Tests.Tests.Components;
 
 public class CollisionShapeElementComponentTests
 {
-    private readonly Entity _entity;
-    private readonly CollisionSphereElementComponent _collisionSphereElementComponent;
-    private readonly IClientInterfaceService _clientInterfaceServiceMock = new ClientInterfaceService();
-    private readonly Mock<IElementCollection> _elementCollectionMock = new(MockBehavior.Strict);
-
-    public CollisionShapeElementComponentTests()
-    {
-        var services = new ServiceCollection();
-        services.AddSingleton<IRealmConfigurationProvider>(new TestConfigurationProvider());
-        services.AddSingleton<IEntityEngine, EntityEngine>();
-        services.AddSingleton(_elementCollectionMock.Object);
-        services.AddSingleton(_clientInterfaceServiceMock);
-        services.AddLogging(x => x.AddSerilog(new LoggerConfiguration().CreateLogger(), dispose: true));
-
-        var serviceProvider = services.BuildServiceProvider();
-        var elementFactory = serviceProvider.GetRequiredService<IEntityEngine>();
-        _entity = elementFactory.CreateEntity();
-        _collisionSphereElementComponent = new(new CollisionSphere(new Vector3(0, 0, 0), 10), elementFactory);
-        _entity.AddComponent(_collisionSphereElementComponent);
-    }
-
     [Fact]
     public void TestBasicCollisionDetection()
     {
         #region Arrange
-
+        var realmTestingServer = new RealmTestingServer();
+        var player = realmTestingServer.CreatePlayer();
+        var elementFactory = realmTestingServer.GetRequiredService<IElementFactory>();
+        var collisionSphere  = elementFactory.CreateCollisionSphere(Vector3.Zero, 10);
         bool entityEntered = false;
-        _collisionSphereElementComponent.EntityEntered += (enteredColshape, e) =>
+        collisionSphere.Entered += (that, e) =>
         {
             entityEntered = true;
         };
         #endregion
 
         #region Act
-        _collisionSphereElementComponent.CheckCollisionWith(_entity);
+        collisionSphere.CheckElementWithin(player);
         #endregion
 
         #region Assert

@@ -2,42 +2,33 @@
 
 public class UsersManagerTests
 {
-    private readonly EntityHelper _entityHelper;
-    private readonly RealmTestingServer _realmTestingServer;
-    private readonly IUsersService _signInService;
-    private readonly UserManager<UserData> _userManager;
-
-    public UsersManagerTests()
-    {
-        _realmTestingServer = new();
-        _entityHelper = new(_realmTestingServer);
-
-        _signInService = _realmTestingServer.GetRequiredService<IUsersService>();
-        _userManager = _realmTestingServer.GetRequiredService<UserManager<UserData>>();
-    }
-
     [Fact]
     public async Task TestSignInFlow()
     {
         #region Arrange
+        var realmTestingServer = new RealmTestingServer();
+        var player = realmTestingServer.CreatePlayer(true);
+        var usersService = player.GetRequiredService<IUsersService>();
+        var userManager = player.GetRequiredService<UserManager<UserData>>();
         var login = Guid.NewGuid().ToString()[..8];
         var password = "asdASD123!@#";
-        var playerEntity = _entityHelper.CreatePlayerEntity();
         #endregion
 
         #region Act
-        var userId = await _signInService.SignUp(login, password);
-        var user = await _userManager.GetUserByLogin(login) ?? throw new Exception("User not found");
+        var userId = await usersService.SignUp(login, password);
+        var user = await userManager.GetUserByLogin(login) ?? throw new Exception("User not found");
 
-        var validPassword = await _userManager.CheckPasswordAsync(user, password);
-        var signedIn = await _signInService.SignIn(playerEntity, user);
-        var lastNick = await _userManager.GetLastNickName(userId);
+        var validPassword = await userManager.CheckPasswordAsync(user, password);
+        var signedIn = await usersService.SignIn(player, user);
+        var lastNick = await userManager.GetLastNickName(userId);
         #endregion
 
         #region Assert
         validPassword.Should().BeTrue();
         signedIn.Should().BeTrue();
         lastNick.Should().Be("CrosRoad95");
+        player.IsLoggedIn.Should().BeTrue();
+        player.UserId.Should().Be(userId);
         #endregion
     }
 
@@ -47,27 +38,28 @@ public class UsersManagerTests
         #region Arrange
         var login = Guid.NewGuid().ToString()[..8];
         var password = "asdASD123!@#";
-        var playerEntity = _entityHelper.CreatePlayerEntity(true);
+
+        var realmTestingServer = new RealmTestingServer();
+        var player = realmTestingServer.CreatePlayer(false);
+        var usersService = player.GetRequiredService<IUsersService>();
+        var userManager = player.GetRequiredService<UserManager<UserData>>();
         #endregion
 
         #region Act
-        var wasComponentCount = 0;
-        _signInService.SignedIn += e =>
+        usersService.SignedIn += e =>
         {
-            wasComponentCount = e.ComponentsCount;
             throw new Exception();
         };
 
-        var userId = await _signInService.SignUp(login, password);
-        var user = await _userManager.GetUserByLogin(login) ?? throw new Exception("User not found");
+        var userId = await usersService.SignUp(login, password);
+        var user = await userManager.GetUserByLogin(login) ?? throw new Exception("User not found");
 
-        var signedIn = await _signInService.SignIn(playerEntity, user);
+        var signedIn = await usersService.SignIn(player, user);
         #endregion
 
         #region Assert
         signedIn.Should().BeFalse();
-        playerEntity.Components.Should().HaveCount(3);
-        wasComponentCount.Should().Be(17);
+        player.Components.ComponentsList.Should().BeEmpty();
         #endregion
     }
 
@@ -77,18 +69,20 @@ public class UsersManagerTests
     public void TryGetPlayerByNameTests(string nick, bool shouldExists)
     {
         #region Arrange
-        var playerEntity = _entityHelper.CreatePlayerEntity();
+        var realmTestingServer = new RealmTestingServer();
+        var player = realmTestingServer.CreatePlayer(false);
+        var usersService = player.GetRequiredService<IUsersService>();
         #endregion
 
         #region Act
-        bool found = _signInService.TryGetPlayerByName(nick, out var foundPlayerEntity);
+        bool found = usersService.TryGetPlayerByName(nick, out var foundPlayerEntity);
         #endregion
 
         #region Assert
         if (shouldExists)
         {
             found.Should().BeTrue();
-            (playerEntity == foundPlayerEntity).Should().BeTrue();
+            (player == foundPlayerEntity).Should().BeTrue();
         }
         else
         {
@@ -104,18 +98,20 @@ public class UsersManagerTests
     public void SearchPlayersByNameTests(string pattern, bool shouldExists)
     {
         #region Arrange
-        var playerEntity = _entityHelper.CreatePlayerEntity();
+        var realmTestingServer = new RealmTestingServer();
+        var player = realmTestingServer.CreatePlayer(false);
+        var usersService = player.GetRequiredService<IUsersService>();
         #endregion
 
         #region Act
-        var found = _signInService.SearchPlayersByName(pattern);
+        var found = usersService.SearchPlayersByName(pattern);
         #endregion
 
         #region Assert
         if (shouldExists)
         {
             var foundPlayerEntity = found.First();
-            (playerEntity == foundPlayerEntity).Should().BeTrue();
+            (player == foundPlayerEntity).Should().BeTrue();
         }
         else
         {

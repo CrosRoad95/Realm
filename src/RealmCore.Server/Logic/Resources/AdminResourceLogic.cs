@@ -62,7 +62,7 @@ internal sealed class AdminResourceLogic
 
     private List<LuaValue> GetDebugComponents(IComponents components)
     {
-        return components.Components.ComponentsLists
+        return components.Components.ComponentsList
             .Select(GetDebugComponent)
             .ToList();
     }

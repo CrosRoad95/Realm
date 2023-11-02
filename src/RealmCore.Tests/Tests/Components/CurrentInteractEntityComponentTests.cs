@@ -2,38 +2,25 @@
 
 public class CurrentInteractEntityComponentTests
 {
-    private readonly Entity _entity;
-    private readonly Entity _entity2;
-    private readonly Entity _testEntity;
-    private readonly Entity _testEntity2;
-    private readonly Mock<ILogger<Entity>> _logger = new(MockBehavior.Strict);
-
-    public CurrentInteractEntityComponentTests()
-    {
-        var services = new ServiceCollection();
-        _logger.SetupLogger();
-        services.AddSingleton(_logger.Object);
-
-        _entity = new();
-        _testEntity = new();
-        _entity2 = new();
-        _testEntity2 = new();
-    }
-
     [Fact]
     public void DestroyingComponentShouldReset()
     {
         #region Arrange
-        var currentInteractionComponent = _entity.AddComponent(new CurrentInteractEntityComponent(_testEntity));
-        currentInteractionComponent.CurrentInteractEntity.Should().Be(_testEntity);
+        TestDateTimeProvider testDateTimeProvider = new();
+        var realmTestingServer = new RealmTestingServer();
+        var player = realmTestingServer.CreatePlayer();
+        var worldObject = realmTestingServer.CreateObject();
+
+        var currentInteractionComponent = player.AddComponent(new CurrentInteractElementComponent(worldObject));
+        currentInteractionComponent.CurrentInteractElement.Should().Be(worldObject);
         #endregion
 
         #region Act
-        _entity.DestroyComponent(currentInteractionComponent);
+        worldObject.Destroy();
         #endregion
 
         #region Assert
-        currentInteractionComponent.CurrentInteractEntity.Should().BeNull();
+        currentInteractionComponent.CurrentInteractElement.Should().BeNull();
         #endregion
     }
 
@@ -41,17 +28,22 @@ public class CurrentInteractEntityComponentTests
     public void DestroyingEntityShouldResetAndRemoveComponent()
     {
         #region Arrange
-        var currentInteractionComponent = _entity2.AddComponent(new CurrentInteractEntityComponent(_testEntity2));
-        currentInteractionComponent.CurrentInteractEntity.Should().Be(_testEntity2);
+        TestDateTimeProvider testDateTimeProvider = new();
+        var realmTestingServer = new RealmTestingServer();
+        var player = realmTestingServer.CreatePlayer();
+        var worldObject = realmTestingServer.CreateObject();
+
+        var currentInteractionComponent = player.AddComponent(new CurrentInteractElementComponent(worldObject));
+        currentInteractionComponent.CurrentInteractElement.Should().Be(worldObject);
         #endregion
 
         #region Act
-        _testEntity2.Dispose();
+        worldObject.Destroy();
         #endregion
 
         #region Assert
-        currentInteractionComponent.CurrentInteractEntity.Should().BeNull();
-        _entity2.Components.Should().BeEmpty();
+        currentInteractionComponent.CurrentInteractElement.Should().BeNull();
+        worldObject.Components.ComponentsList.Should().BeEmpty();
         #endregion
     }
 }

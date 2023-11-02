@@ -14,7 +14,7 @@ public sealed class Components : IDisposable
     private readonly IServiceProvider _serviceProvider;
     private readonly Element _element;
 
-    public IEnumerable<IComponent> ComponentsLists
+    public IEnumerable<IComponent> ComponentsList
     {
         get
         {
@@ -103,7 +103,8 @@ public sealed class Components : IDisposable
         }
         catch (Exception)
         {
-            component.Element = null;
+            component.Element = null!;
+            _components.Remove(component);
             throw;
         }
 
@@ -288,10 +289,11 @@ public sealed class Components : IDisposable
     public void DestroyComponent<TComponent>(TComponent component) where TComponent : IComponent
     {
         ThrowIfDisposed();
-        if (component is IComponentLifecycle componentLifecycle)
-            componentLifecycle.Dispose();
+        if(InternalTryDetachComponent(component))
+            if (component is IComponentLifecycle componentLifecycle)
+                componentLifecycle.Dispose();
 
-        component.Element = null;
+        component.Element = null!;
     }
 
     public bool TryDestroyComponent<TComponent>(TComponent component) where TComponent : IComponent
@@ -305,11 +307,10 @@ public sealed class Components : IDisposable
             {
                 if (component is IComponentLifecycle componentLifecycle)
                     componentLifecycle.Dispose();
+                component.Element = null!;
                 return true;
             }
         }
-        catch (ObjectDisposedException)
-        { }
         catch (Exception)
         {
             throw;

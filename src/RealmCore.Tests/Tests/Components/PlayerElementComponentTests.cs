@@ -5,36 +5,27 @@ namespace RealmCore.Tests.Tests.Components;
 [Collection("Sequential")]
 public class PlayerElementComponentTests
 {
-    private readonly RealmTestingServer _server;
-    private readonly EntityHelper _entityHelper;
-
-    public PlayerElementComponentTests()
-    {
-        _server = new();
-        _entityHelper = new(_server);
-    }
-
     [Fact]
     public async Task TestAsyncBindsCooldown()
     {
         #region Arrange
         int executionCount = 0;
-        var playerEntity = _entityHelper.CreatePlayerEntity();
-        var playerElementComponent = playerEntity.GetRequiredComponent<PlayerElementComponent>();
-        playerElementComponent.SetBind("x", (entity, keyState) =>
+        var realmTestingServer = new RealmTestingServer();
+        var player = realmTestingServer.CreatePlayer();
+        player.SetBind("x", (entity, keyState) =>
         {
             executionCount++;
         });
         #endregion
 
         #region Act
-        await playerElementComponent.InternalHandleBindExecuted("x", KeyState.Down);
-        await playerElementComponent.InternalHandleBindExecuted("x", KeyState.Down);
+        await player.InternalHandleBindExecuted("x", KeyState.Down);
+        await player.InternalHandleBindExecuted("x", KeyState.Down);
         #endregion
 
         #region Assert
         executionCount.Should().Be(1);
-        playerElementComponent.IsCooldownActive("x").Should().BeTrue();
+        player.IsCooldownActive("x").Should().BeTrue();
         #endregion
     }
 
@@ -42,21 +33,21 @@ public class PlayerElementComponentTests
     public async Task TestAsyncBindsThrowingException()
     {
         #region Arrange
-        var playerEntity = _entityHelper.CreatePlayerEntity();
-        var playerElementComponent = playerEntity.GetRequiredComponent<PlayerElementComponent>();
-        playerElementComponent.SetBindAsync("x", (entity, keyState) =>
+        var realmTestingServer = new RealmTestingServer();
+        var player = realmTestingServer.CreatePlayer();
+        player.SetBindAsync("x", (entity, keyState) =>
         {
             throw new Exception("test123");
         });
         #endregion
 
         #region Act
-        var action = async () => await playerElementComponent.InternalHandleBindExecuted("x", KeyState.Down);
+        var action = async () => await player.InternalHandleBindExecuted("x", KeyState.Down);
         #endregion
 
         #region Assert
         await action.Should().ThrowAsync<Exception>().WithMessage("test123");
-        playerElementComponent.IsCooldownActive("x").Should().BeTrue();
+        player.IsCooldownActive("x").Should().BeTrue();
         #endregion
     }
 
@@ -64,17 +55,16 @@ public class PlayerElementComponentTests
     public void PlayerShouldBeAbleToFightWhenAtLeastOneFlagIsEnabled()
     {
         #region Arrange
-
-        var playerEntity = _entityHelper.CreatePlayerEntity();
-        var playerElementComponent = playerEntity.GetRequiredComponent<PlayerElementComponent>();
+        var realmTestingServer = new RealmTestingServer();
+        var player = realmTestingServer.CreatePlayer();
         #endregion
 
         #region Act
-        playerElementComponent.AddEnableFightFlag(1);
+        player.AddEnableFightFlag(1);
         #endregion
 
         #region Assert
-        playerElementComponent.Player.Controls.FireEnabled.Should().BeTrue();
+        player.Controls.FireEnabled.Should().BeTrue();
         #endregion
     }
 
@@ -82,17 +72,17 @@ public class PlayerElementComponentTests
     public void PlayerShouldNotBeAbleToFightWhenNoFlagIsSet()
     {
         #region Arrange
-        var playerEntity = _entityHelper.CreatePlayerEntity();
-        var playerElementComponent = playerEntity.GetRequiredComponent<PlayerElementComponent>();
+        var realmTestingServer = new RealmTestingServer();
+        var player = realmTestingServer.CreatePlayer();
         #endregion
 
         #region Act
-        playerElementComponent.AddEnableFightFlag(1);
-        playerElementComponent.RemoveEnableFightFlag(1);
+        player.AddEnableFightFlag(1);
+        player.RemoveEnableFightFlag(1);
         #endregion
 
         #region Assert
-        playerElementComponent.Player.Controls.FireEnabled.Should().BeFalse();
+        player.Controls.FireEnabled.Should().BeFalse();
         #endregion
     }
 
@@ -100,13 +90,13 @@ public class PlayerElementComponentTests
     public async Task FadeCameraShouldWork()
     {
         #region Arrange
-        var playerEntity = _entityHelper.CreatePlayerEntity();
-        var playerElementComponent = playerEntity.GetRequiredComponent<PlayerElementComponent>();
+        var realmTestingServer = new RealmTestingServer();
+        var player = realmTestingServer.CreatePlayer();
         #endregion
 
         #region Act & Assert
-        await playerElementComponent.FadeCameraAsync(SlipeServer.Packets.Lua.Camera.CameraFade.Out, 0.1f);
-        await playerElementComponent.FadeCameraAsync(SlipeServer.Packets.Lua.Camera.CameraFade.In, 0.1f);
+        await player.FadeCameraAsync(SlipeServer.Packets.Lua.Camera.CameraFade.Out, 0.1f);
+        await player.FadeCameraAsync(SlipeServer.Packets.Lua.Camera.CameraFade.In, 0.1f);
         #endregion
     }
 
@@ -114,13 +104,13 @@ public class PlayerElementComponentTests
     public async Task FadeCameraShouldBeCancelable()
     {
         #region Arrange
-        var playerEntity = _entityHelper.CreatePlayerEntity();
-        var playerElementComponent = playerEntity.GetRequiredComponent<PlayerElementComponent>();
+        var realmTestingServer = new RealmTestingServer();
+        var player = realmTestingServer.CreatePlayer();
         var cancellationTokenSource = new CancellationTokenSource(100);
         #endregion
 
         #region Act
-        var act = async () => await playerElementComponent.FadeCameraAsync(SlipeServer.Packets.Lua.Camera.CameraFade.Out, 10.0f, cancellationTokenSource.Token);
+        var act = async () => await player.FadeCameraAsync(SlipeServer.Packets.Lua.Camera.CameraFade.Out, 10.0f, cancellationTokenSource.Token);
         #endregion
 
         #region Asset
@@ -132,17 +122,18 @@ public class PlayerElementComponentTests
     public async Task FadeCameraShouldBeCanceledWhenPlayerQuit()
     {
         #region Arrange
-        var playerEntity = _entityHelper.CreatePlayerEntity();
-        var playerElementComponent = playerEntity.GetRequiredComponent<PlayerElementComponent>();
+        var realmTestingServer = new RealmTestingServer();
+        var player = realmTestingServer.CreatePlayer();
+
         var _ = Task.Run(async () =>
         {
             await Task.Delay(100);
-            playerEntity.Dispose();
+            player.Destroy();
         });
         #endregion
 
         #region Act
-        var act = async () => await playerElementComponent.FadeCameraAsync(SlipeServer.Packets.Lua.Camera.CameraFade.Out, 10.0f);
+        var act = async () => await player.FadeCameraAsync(SlipeServer.Packets.Lua.Camera.CameraFade.Out, 2.0f);
         #endregion
 
         #region Asset

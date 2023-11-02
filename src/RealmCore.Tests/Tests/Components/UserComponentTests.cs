@@ -1,35 +1,28 @@
-﻿namespace RealmCore.Tests.Tests.Components;
+﻿using System.Data;
+
+namespace RealmCore.Tests.Tests.Components;
 
 public class UserComponentTests
 {
-    private readonly RealmTestingServer _server;
-    private readonly EntityHelper _entityHelper;
-
-    public UserComponentTests()
-    {
-        _server = new();
-        _entityHelper = new(_server);
-    }
-
     [InlineData(new string[] { }, false)]
     [InlineData(new string[] { "Admin" }, true)]
     [Theory]
     public async Task UserShouldAuthorize(string[] roles, bool expectedAuthorized)
     {
         #region Arrange
-
-        var usersService = _server.GetRequiredService<IUsersService>();
-        var player = _entityHelper.CreatePlayerEntity();
-        var userComponent = await _entityHelper.LogInEntity(player, roles);
+        var realmTestingServer = new RealmTestingServer();
+        var player = realmTestingServer.CreatePlayer();
+        await realmTestingServer.SignInPlayer(player, roles);
+        var usersService = player.GetRequiredService<IUsersService>();
         #endregion
 
         #region Act
-        var authorized = await usersService.AuthorizePolicy(userComponent, "Admin");
+        var authorized = await usersService.AuthorizePolicy(player.GetRequiredComponent<UserComponent>(), "Admin");
         #endregion
 
         #region Assert
         authorized.Should().Be(expectedAuthorized);
-        var isInCache = userComponent.HasAuthorizedPolicy("Admin", out bool cacheAuthorized);
+        var isInCache = player.GetRequiredComponent<UserComponent>().HasAuthorizedPolicy("Admin", out bool cacheAuthorized);
         isInCache.Should().BeTrue();
         cacheAuthorized.Should().Be(expectedAuthorized);
         #endregion
@@ -39,9 +32,11 @@ public class UserComponentTests
     public async Task ChangingRoleShouldClearPolicyAuthorizedCache()
     {
         #region Arrange
-        var usersService = _server.GetRequiredService<IUsersService>();
-        var player = _entityHelper.CreatePlayerEntity();
-        var userComponent = await _entityHelper.LogInEntity(player);
+        var realmTestingServer = new RealmTestingServer();
+        var player = realmTestingServer.CreatePlayer();
+        await realmTestingServer.SignInPlayer(player);
+        var userComponent = player.GetRequiredComponent<UserComponent>();
+        var usersService = player.GetRequiredService<IUsersService>();
         #endregion
 
         #region Act
@@ -64,8 +59,10 @@ public class UserComponentTests
     public async Task SettingsShouldWork()
     {
         #region Arrange
-        var player = _entityHelper.CreatePlayerEntity();
-        var userComponent = await _entityHelper.LogInEntity(player);
+        var realmTestingServer = new RealmTestingServer();
+        var player = realmTestingServer.CreatePlayer();
+        await realmTestingServer.SignInPlayer(player);
+        var userComponent = player.GetRequiredComponent<UserComponent>();
         #endregion
 
         #region Act
@@ -89,8 +86,10 @@ public class UserComponentTests
     public async Task UpgradesShouldWork()
     {
         #region Arrange
-        var player = _entityHelper.CreatePlayerEntity();
-        var userComponent = await _entityHelper.LogInEntity(player);
+        var realmTestingServer = new RealmTestingServer();
+        var player = realmTestingServer.CreatePlayer();
+        await realmTestingServer.SignInPlayer(player);
+        var userComponent = player.GetRequiredComponent<UserComponent>();
         #endregion
 
         #region Act

@@ -55,4 +55,8 @@ public class RealmObject : WorldObject, IComponents
         return Components.AddComponent(component);
     }
 
+    public TComponent AddComponentWithDI<TComponent>(params object[] parameters) where TComponent : IComponent
+    {
+        return Components.AddComponentWithDI<TComponent>(parameters);
+    }
 }

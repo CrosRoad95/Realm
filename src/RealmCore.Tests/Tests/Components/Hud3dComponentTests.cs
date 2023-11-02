@@ -30,8 +30,9 @@ public class Hud3dComponentTests
     public void TestHud3dComponentShouldProduceAppropriateCallback()
     {
         #region Arrange
-        var entity = new Entity();
-        entity.Transform.Position = new Vector3(100, 100, 100);
+        var realmTestingServer = new RealmTestingServer();
+        var player = realmTestingServer.CreatePlayer();
+        player.Position = new Vector3(100, 100, 100);
         int callCount = 0;
         string _id = string.Empty;
         Vector3 _position = Vector3.Zero;
@@ -47,7 +48,7 @@ public class Hud3dComponentTests
         #endregion
 
         #region Act
-        var hud3d = entity.AddComponent<SampleHud3d>();
+        var hud3d = player.AddComponent<SampleHud3d>();
         #endregion
 
         #region Assert
@@ -76,11 +77,12 @@ public class Hud3dComponentTests
     public void TestDetectedDynamicHudComponents()
     {
         #region Arrange
-        var entity = new Entity();
+        var realmTestingServer = new RealmTestingServer();
+        var player = realmTestingServer.CreatePlayer();
         #endregion
 
         #region Act
-        var hud3d = entity.AddComponent<SampleHud3d2>();
+        var hud3d = player.AddComponent<SampleHud3d2>();
         #endregion
 
         #region Assert
@@ -95,7 +97,8 @@ public class Hud3dComponentTests
     public void UpdateStateShouldProduceAppropriateCallback()
     {
         #region Arrange
-        var entity = new Entity();
+        var realmTestingServer = new RealmTestingServer();
+        var player = realmTestingServer.CreatePlayer();
 
         int callsCount = 0;
         string _id = string.Empty;
@@ -108,7 +111,7 @@ public class Hud3dComponentTests
             _data = data;
         };
 
-        var hud3d = entity.AddComponent<SampleHud3d>();
+        var hud3d = player.AddComponent<SampleHud3d>();
         #endregion
 
         #region Act
@@ -134,8 +137,8 @@ public class Hud3dComponentTests
     public void Hud3dShouldBeRemovedWhenComponentGetRemoved()
     {
         #region Arrange
-        var entity = new Entity();
-
+        var realmTestingServer = new RealmTestingServer();
+        var player = realmTestingServer.CreatePlayer();
         string _id = string.Empty;
         _overlayService.Hud3dRemoved = id =>
         {
@@ -145,8 +148,8 @@ public class Hud3dComponentTests
         #endregion
 
         #region Act
-        var hud3d = entity.AddComponent<SampleHud3d2>();
-        entity.DestroyComponent(hud3d);
+        var hud3d = player.AddComponent<SampleHud3d2>();
+        player.DestroyComponent(hud3d);
         #endregion
 
         #region Assert
@@ -158,8 +161,9 @@ public class Hud3dComponentTests
     public void ItIsNotAllowedToUpdateStatelessHud()
     {
         #region Arrange
-        var entity = new Entity();
-        var hud3d = entity.AddComponent<SampleStateLessHud3d>();
+        var realmTestingServer = new RealmTestingServer();
+        var player = realmTestingServer.CreatePlayer();
+        var hud3d = player.AddComponent<SampleStateLessHud3d>();
         #endregion
 
         #region Act
@@ -179,11 +183,11 @@ internal class SampleHud3d : Hud3dComponent<SampleState>
             x.AddText(x => x.Text, new Vector2(10, 10), new Size(10, 10));
             x.AddText(x => x.Number, new Vector2(20, 20), new Size(20, 20));
             x.AddRectangle(new Vector2(30, 30), new Size(30, 30), Color.DeepPink);
-        }, new SampleState
+        }, new Vector3(4, 2, 0), new SampleState
         {
             Text = "sample text",
             Number = "420"
-        }, new Vector3(4, 2, 0))
+        })
     {
     }
 }
@@ -197,11 +201,11 @@ internal class SampleHud3d2 : Hud3dComponent<SampleState>
             x.AddText(x => x.Text, new Vector2(10, 10), new Size(10, 10));
             x.AddText("test", new Vector2(20, 20), new Size(20, 20), font: "default");
             x.AddText(x => x.Text, new Vector2(10, 10), new Size(10, 10));
-        }, new SampleState
+        }, new Vector3(4, 2, 0), new SampleState
         {
             Text = "sample text",
             Number = "420"
-        }, new Vector3(4, 2, 0))
+        })
     {
     }
 }

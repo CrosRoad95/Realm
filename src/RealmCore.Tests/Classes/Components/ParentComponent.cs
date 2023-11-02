@@ -1,9 +1,9 @@
 ﻿namespace RealmCore.Tests.Classes.Components;
 
-internal class ParentComponent : Component
+internal class ParentComponent : ComponentLifecycle
 {
-    protected override void Detach()
+    public override void Detach()
     {
-        Entity.TryDestroyComponent<ChildComponent>();
+        ((IComponents)Element).TryDestroyComponent<ChildComponent>();
     }
 }

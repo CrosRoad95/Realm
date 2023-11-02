@@ -1,16 +1,17 @@
 ﻿using RealmCore.Server;
 using RealmCore.Server.Extensions;
+using SlipeServer.Server;
 
 namespace RealmCore.BlazorHelpers;
 
 internal class RealmServerHostedService : IHostedService
 {
-    private readonly RealmServer _realmServer;
+    private readonly MtaServer _realmServer;
     private readonly ILogger<RealmServerHostedService> _logger;
 
-    public RealmServerHostedService(RealmServer realmServer, ILogger<RealmServerHostedService> logger)
+    public RealmServerHostedService(MtaServer mtaServer, ILogger<RealmServerHostedService> logger)
     {
-        _realmServer = realmServer;
+        _realmServer = mtaServer;
         _logger = logger;
     }
 

@@ -7,7 +7,7 @@ public class AttachedElementComponent : ComponentLifecycle
     private readonly Vector3? _positionOffset;
     private readonly Vector3? _rotationOffset;
     private readonly object _lock = new();
-    public Element? AttachedElement { get; set; }
+    public Element? AttachedElement { get; private set; }
 
     public BoneId BoneId => _boneId;
 
@@ -21,6 +21,25 @@ public class AttachedElementComponent : ComponentLifecycle
         _boneId = boneId;
         _positionOffset = positionOffset;
         _rotationOffset = rotationOffset;
+        AttachedElement.Destroyed += HandleDestroyed;
+    }
+
+    private void HandleDestroyed(Element element)
+    {
+        if(AttachedElement != null)
+        {
+            AttachedElement.Destroyed -= HandleDestroyed;
+            TryDetach(out var _);
+        }
+    }
+
+    public override void Detach()
+    {
+        if (AttachedElement != null)
+        {
+            AttachedElement.Destroyed -= HandleDestroyed;
+            TryDetach(out var _);
+        }
     }
 
     public bool TryDetach(out Element? element)
@@ -31,6 +50,7 @@ public class AttachedElementComponent : ComponentLifecycle
             {
                 element = AttachedElement;
                 AttachedElement = null;
+                ((IComponents)Element).Components.TryDestroyComponent(this);
                 return true;
             }
             ((IComponents)Element).Components.TryDestroyComponent(this);

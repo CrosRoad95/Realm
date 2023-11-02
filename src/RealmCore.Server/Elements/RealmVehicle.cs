@@ -1,6 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-
-namespace RealmCore.Server.Elements;
+﻿namespace RealmCore.Server.Elements;
 
 public class RealmVehicle : Vehicle, IComponents
 {
@@ -82,10 +80,19 @@ public class RealmVehicle : Vehicle, IComponents
         return Components.AddComponent(component);
     }
 
-    // TODO: remove "new"
-    public new void Destroy()
+    public TComponent AddComponentWithDI<TComponent>(params object[] parameters) where TComponent : IComponent
     {
-        Components.ComponentAdded -= HandleComponentAdded;
-        Components.ComponentDetached -= HandleComponentDetached;
+        return Components.AddComponentWithDI<TComponent>(parameters);
+    }
+
+    public override bool Destroy()
+    {
+        if (base.Destroy())
+        {
+            Components.ComponentAdded -= HandleComponentAdded;
+            Components.ComponentDetached -= HandleComponentDetached;
+            return true;
+        }
+        return false;
     }
 }

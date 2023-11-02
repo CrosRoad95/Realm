@@ -2,33 +2,28 @@
 
 public class PendingDiscordIntegrationComponentTests
 {
-    private readonly Entity _entity1;
-    private readonly PendingDiscordIntegrationComponent _pendingDiscordIntegration;
-    private readonly TestDateTimeProvider _testDateTimeProvider;
-
-    public PendingDiscordIntegrationComponentTests()
-    {
-        _testDateTimeProvider = new();
-        _entity1 = new();
-        _pendingDiscordIntegration = new(_testDateTimeProvider);
-        _entity1.AddComponent(_pendingDiscordIntegration);
-    }
-
     [Fact]
     public void DiscordVerificationCodeShouldWork()
     {
-        var code = _pendingDiscordIntegration.GenerateAndGetDiscordConnectionCode();
+        var realmTestingServer = new RealmTestingServer();
+        var player = realmTestingServer.CreatePlayer();
+        var pendingDiscordIntegration = player.AddComponentWithDI<PendingDiscordIntegrationComponent>();
 
-        _pendingDiscordIntegration.Verify(code).Should().BeTrue();
+        var code = pendingDiscordIntegration.GenerateAndGetDiscordConnectionCode();
+
+        pendingDiscordIntegration.Verify(code).Should().BeTrue();
     }
 
     [Fact]
     public void DiscordVerificationCodeShouldExpireAfter2Minutes()
     {
-        var code = _pendingDiscordIntegration.GenerateAndGetDiscordConnectionCode();
+        var realmTestingServer = new RealmTestingServer();
+        var player = realmTestingServer.CreatePlayer();
+        var pendingDiscordIntegration = player.AddComponentWithDI<PendingDiscordIntegrationComponent>();
+        var code = pendingDiscordIntegration.GenerateAndGetDiscordConnectionCode();
 
-        _testDateTimeProvider.AddOffset(TimeSpan.FromMinutes(3));
+        realmTestingServer.TestDateTimeProvider.AddOffset(TimeSpan.FromMinutes(3));
 
-        _pendingDiscordIntegration.Verify(code).Should().BeFalse();
+        pendingDiscordIntegration.Verify(code).Should().BeFalse();
     }
 }

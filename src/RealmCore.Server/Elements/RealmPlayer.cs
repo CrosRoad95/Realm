@@ -7,8 +7,8 @@ public class RealmPlayer : Player, IComponents
     private readonly IServiceProvider _serviceProvider;
     private readonly IServiceScope _serviceScope;
 
-    private CancellationTokenSource? _cancellationTokenSource;
-    protected CancellationToken CancellationToken => (_cancellationTokenSource ??= new()).Token;
+    private CancellationTokenSource _cancellationTokenSource = new();
+    protected CancellationToken CancellationToken => _cancellationTokenSource.Token;
     public IServiceProvider ServiceProvider => _serviceProvider;
     public Concepts.Components Components { get; private set; }
 
@@ -77,6 +77,11 @@ public class RealmPlayer : Player, IComponents
 
     public int GetUserId() => UserId ?? throw new InvalidOperationException();
 
+    public T GetRequiredService<T>() where T : notnull
+    {
+        return _serviceProvider.GetRequiredService<T>();
+    }
+
     private void HandleComponentAdded(IComponent component)
     {
         if (component is UserComponent userComponent)
@@ -140,6 +145,11 @@ public class RealmPlayer : Player, IComponents
     {
         return Components.AddComponent(component);
     }
+    
+    public TComponent AddComponentWithDI<TComponent>(params object[] parameters) where TComponent : IComponent
+    {
+        return Components.AddComponentWithDI<TComponent>(parameters);
+    }
 
     private void UpdateFight()
     {
@@ -200,10 +210,12 @@ public class RealmPlayer : Player, IComponents
 
     public async Task FadeCameraAsync(CameraFade cameraFade, float fadeTime = 0.5f, CancellationToken cancellationToken = default)
     {
+        var linkedCancellationToken = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, CancellationToken);
+
         Camera.Fade(cameraFade, fadeTime);
         try
         {
-            await Task.Delay(TimeSpan.FromSeconds(fadeTime), cancellationToken);
+            await Task.Delay(TimeSpan.FromSeconds(fadeTime), linkedCancellationToken.Token);
         }
         catch (Exception)
         {
@@ -550,12 +562,18 @@ public class RealmPlayer : Player, IComponents
         }
     }
 
-    // TODO: remove "new"
-    public new void Destroy()
+    public override bool Destroy()
     {
-        _serviceScope.Dispose();
-        _cancellationTokenSource?.Dispose();
-        Components.ComponentAdded -= HandleComponentAdded;
-        Components.ComponentDetached -= HandleComponentDetached;
+        if (base.Destroy())
+        {
+            Components.ComponentAdded -= HandleComponentAdded;
+            Components.ComponentDetached -= HandleComponentDetached;
+            _serviceScope.Dispose();
+            _cancellationTokenSource.Cancel();
+            _cancellationTokenSource.Dispose();
+            Components.Dispose();
+            return true;
+        }
+        return false;
     }
 }

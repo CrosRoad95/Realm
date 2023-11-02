@@ -15,7 +15,7 @@ public class ComponentLogic<T> where T : IComponent
         components.ComponentAdded += HandleComponentAdded;
         components.ComponentDetached += HandleComponentDetached;
         element.Destroyed += HandleDestroyed;
-        foreach (var component in components.ComponentsLists)
+        foreach (var component in components.ComponentsList)
             if (component is T tComponent)
                 ComponentAdded(tComponent);
     }
@@ -28,7 +28,7 @@ public class ComponentLogic<T> where T : IComponent
         components.ComponentAdded -= HandleComponentAdded;
         components.ComponentDetached -= HandleComponentDetached;
         element.Destroyed -= HandleDestroyed;
-        foreach (var component in components.ComponentsLists)
+        foreach (var component in components.ComponentsList)
             if (component is T tComponent)
                 ComponentDetached(tComponent);
     }
@@ -67,10 +67,10 @@ public class ComponentLogic<T1, T2>
         components.ComponentAdded += HandleComponentAdded;
         components.ComponentDetached += HandleComponentDetached;
         element.Destroyed += HandleDestroyed;
-        foreach (var component in components.ComponentsLists)
+        foreach (var component in components.ComponentsList)
             if (component is T1 tComponent)
                 ComponentAdded(tComponent);
-        foreach (var component in components.ComponentsLists)
+        foreach (var component in components.ComponentsList)
             if (component is T2 tComponent)
                 ComponentAdded(tComponent);
     }
@@ -84,10 +84,10 @@ public class ComponentLogic<T1, T2>
         components.ComponentAdded -= HandleComponentAdded;
         components.ComponentDetached -= HandleComponentDetached;
         element.Destroyed -= HandleDestroyed;
-        foreach (var component in components.ComponentsLists)
+        foreach (var component in components.ComponentsList)
             if (component is T1 tComponent)
                 ComponentDetached(tComponent);
-        foreach (var component in components.ComponentsLists)
+        foreach (var component in components.ComponentsList)
             if (component is T2 tComponent)
                 ComponentDetached(tComponent);
     }

@@ -2,38 +2,28 @@
 
 public class PlayTimeComponentTests
 {
-    private readonly Entity _entity1;
-    private readonly Entity _entity2;
-    private readonly PlayTimeComponent _playTimeComponent;
-    private readonly PlayTimeComponent _playTimeComponentWithInitialState;
-    private readonly TestDateTimeProvider _testDateTimeProvider;
-
-    public PlayTimeComponentTests()
-    {
-        _testDateTimeProvider = new();
-        _entity1 = new();
-        _entity2 = new();
-        _playTimeComponent = new(_testDateTimeProvider);
-        _playTimeComponentWithInitialState = new(1000, _testDateTimeProvider);
-        _entity1.AddComponent(_playTimeComponent);
-        _entity2.AddComponent(_playTimeComponentWithInitialState);
-    }
-
     [Fact]
     public void TestIfCounterWorksCorrectly()
     {
-        _playTimeComponent.PlayTime.Should().Be(TimeSpan.Zero);
-        _playTimeComponent.TotalPlayTime.Should().Be(TimeSpan.Zero);
+        var realmTestingServer = new RealmTestingServer();
+        var player1 = realmTestingServer.CreatePlayer();
+        var player2 = realmTestingServer.CreatePlayer();
+        var dateTimeProvider = realmTestingServer.TestDateTimeProvider;
 
-        _playTimeComponentWithInitialState.PlayTime.Should().Be(TimeSpan.Zero);
-        _playTimeComponentWithInitialState.TotalPlayTime.Should().Be(TimeSpan.FromSeconds(1000));
+        var playTimeComponent = player1.AddComponent(new PlayTimeComponent(dateTimeProvider));
+        var playTimeComponentWithInitialState = player2.AddComponent(new PlayTimeComponent(dateTimeProvider, 1000));
+        playTimeComponent.PlayTime.Should().Be(TimeSpan.Zero);
+        playTimeComponent.TotalPlayTime.Should().Be(TimeSpan.Zero);
 
-        _testDateTimeProvider.AddOffset(TimeSpan.FromSeconds(50));
+        playTimeComponentWithInitialState.PlayTime.Should().Be(TimeSpan.Zero);
+        playTimeComponentWithInitialState.TotalPlayTime.Should().Be(TimeSpan.FromSeconds(1000));
 
-        _playTimeComponent.PlayTime.Should().Be(TimeSpan.FromSeconds(50));
-        _playTimeComponent.TotalPlayTime.Should().Be(TimeSpan.FromSeconds(50));
+        dateTimeProvider.AddOffset(TimeSpan.FromSeconds(50));
 
-        _playTimeComponentWithInitialState.PlayTime.Should().Be(TimeSpan.FromSeconds(50));
-        _playTimeComponentWithInitialState.TotalPlayTime.Should().Be(TimeSpan.FromSeconds(1050));
+        playTimeComponent.PlayTime.Should().Be(TimeSpan.FromSeconds(50));
+        playTimeComponent.TotalPlayTime.Should().Be(TimeSpan.FromSeconds(50));
+
+        playTimeComponentWithInitialState.PlayTime.Should().Be(TimeSpan.FromSeconds(50));
+        playTimeComponentWithInitialState.TotalPlayTime.Should().Be(TimeSpan.FromSeconds(1050));
     }
 }

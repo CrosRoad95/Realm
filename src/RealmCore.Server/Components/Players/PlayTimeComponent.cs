@@ -3,7 +3,7 @@
 [ComponentUsage(false)]
 public class PlayTimeComponent : Component, IRareUpdateCallback
 {
-    private DateTime? _startDateTime;
+    private DateTime _startDateTime;
     private readonly ulong _totalPlayTime = 0;
     private readonly IDateTimeProvider _dateTimeProvider;
     private int _lastMinute = 0;
@@ -12,33 +12,19 @@ public class PlayTimeComponent : Component, IRareUpdateCallback
     public event Action<PlayTimeComponent>? MinutePlayed;
     public event Action<PlayTimeComponent>? MinuteTotalPlayed;
 
-    public TimeSpan PlayTime
-    {
-        get
-        {
-            if (_startDateTime == null)
-                return TimeSpan.Zero;
-            return _dateTimeProvider.Now - _startDateTime.Value;
-        }
-    }
-
-    public TimeSpan TotalPlayTime
-    {
-        get
-        {
-            return PlayTime + TimeSpan.FromSeconds(_totalPlayTime);
-        }
-    }
+    public TimeSpan PlayTime => _dateTimeProvider.Now - _startDateTime;
+    public TimeSpan TotalPlayTime => PlayTime + TimeSpan.FromSeconds(_totalPlayTime);
 
     public PlayTimeComponent(IDateTimeProvider dateTimeProvider)
     {
         _dateTimeProvider = dateTimeProvider;
+        _startDateTime = _dateTimeProvider.Now;
     }
 
-    public PlayTimeComponent(ulong totalPlayTime, IDateTimeProvider dateTimeProvider)
+    public PlayTimeComponent(IDateTimeProvider dateTimeProvider, ulong totalPlayTime)
     {
-        _totalPlayTime = totalPlayTime;
         _dateTimeProvider = dateTimeProvider;
+        _totalPlayTime = totalPlayTime;
         _lastMinuteTotal = (int)TotalPlayTime.TotalMinutes;
         _startDateTime = _dateTimeProvider.Now;
     }

@@ -50,7 +50,7 @@ public class VehicleUpgradeComponentTests
         #endregion
 
         #region Assert
-        vehicleEntity.GetRequiredComponent<VehicleElementComponent>().Vehicle.Handling!.Value.MaxVelocity.Should().Be(expectedMaxVelocity);
+        vehicleEntity.Handling!.Value.MaxVelocity.Should().Be(expectedMaxVelocity);
         #endregion
     }
 
@@ -69,7 +69,7 @@ public class VehicleUpgradeComponentTests
         #region Assert
         resultA.Should().BeTrue();
         resultB.Should().BeFalse();
-        vehicleEntity.GetRequiredComponent<VehicleElementComponent>().Vehicle.Handling.Value.MaxVelocity.Should().Be(expectedMaxVelocity);
+        vehicleEntity.Handling.Value.MaxVelocity.Should().Be(expectedMaxVelocity);
         #endregion
     }
 
@@ -84,7 +84,7 @@ public class VehicleUpgradeComponentTests
         #endregion
 
         #region Assert
-        vehicleEntity.GetRequiredComponent<VehicleElementComponent>().Vehicle.Handling.Value.MaxVelocity.Should().Be(150);
+        vehicleEntity.Handling.Value.MaxVelocity.Should().Be(150);
         #endregion
     }
 
@@ -98,7 +98,7 @@ public class VehicleUpgradeComponentTests
         #endregion
 
         #region Assert
-        vehicleEntity.GetRequiredComponent<VehicleElementComponent>().Vehicle.Handling.Value.MaxVelocity.Should().Be(1200);
+        vehicleEntity.Handling.Value.MaxVelocity.Should().Be(1200);
         #endregion
     }
 }

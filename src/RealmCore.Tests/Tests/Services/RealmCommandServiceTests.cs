@@ -1,37 +1,20 @@
-﻿using RealmCore.Server.Policies;
-using SlipeServer.Server.Concepts;
+﻿using SlipeServer.Server.Concepts;
 using SlipeServer.Server.Events;
-using SlipeServer.Server.Services;
 
 namespace RealmCore.Tests.Tests.Services;
 
 public class RealmCommandServiceTests
 {
-    private readonly Mock<ILogger<RealmCommandService>> _logger = new(MockBehavior.Strict);
-    private readonly CommandService _commandService;
-    private readonly ChatBox _chatBox;
-    private readonly PolicyDrivenCommandExecutor _policyDrivenCommandExecutor = new();
-    private readonly RealmCommandService _sut;
-    private readonly RealmTestingServer _server;
-    private readonly EntityHelper _entityHelper;
-
-    public RealmCommandServiceTests()
-    {
-        _server = new();
-        _entityHelper = new(_server);
-        _chatBox = new ChatBox(_server, _server.GetRequiredService<RootElement>());
-        _commandService = new CommandService(_server);
-        _logger.SetupLogger();
-        _sut = new RealmCommandService(_commandService, _logger.Object, _policyDrivenCommandExecutor, _chatBox);
-    }
-
     [InlineData("foo", "FOO", true)]
     [InlineData("foo", "foo", true)]
     [InlineData("foo", "bar", false)]
     [Theory]
     public void YouCanNotCreateTwoSameCommands(string command1, string command2, bool shouldThrow)
     {
-        _sut.ClearCommands();
+        var realmTestingServer = new RealmTestingServer();
+        var player = realmTestingServer.CreatePlayer();
+        var _sut = realmTestingServer.GetRequiredService<RealmCommandService>();
+
         var act = () =>
         {
             _sut.AddCommandHandler(command1, (e, args) => { });
@@ -54,7 +37,10 @@ public class RealmCommandServiceTests
     [Theory]
     public void YouCanNotCreateTwoSameCommandsMixedAsyncAndNotAsync(string command1, string command2, bool shouldThrow)
     {
-        _sut.ClearCommands();
+        var realmTestingServer = new RealmTestingServer();
+        var player = realmTestingServer.CreatePlayer();
+        var _sut = realmTestingServer.GetRequiredService<RealmCommandService>();
+
         var act = () =>
         {
             _sut.AddCommandHandler(command2, (e, args) => { });
@@ -77,7 +63,10 @@ public class RealmCommandServiceTests
     [Theory]
     public void YouCanNotCreateTwoSameAsyncCommands(string command1, string command2, bool shouldThrow)
     {
-        _sut.ClearCommands();
+        var realmTestingServer = new RealmTestingServer();
+        var player = realmTestingServer.CreatePlayer();
+        var _sut = realmTestingServer.GetRequiredService<RealmCommandService>();
+
         var act = () =>
         {
             _sut.AddAsyncCommandHandler(command1, (e, args) => { return Task.CompletedTask; });
@@ -99,14 +88,10 @@ public class RealmCommandServiceTests
     //[Theory]
     public async Task AddCommandHandlerShouldWork(bool useAsyncHandler)
     {
-        var player = new Player();
-        var playerEntity = _entityHelper.CreatePlayerEntity();
-        playerEntity.AddComponent(new UserComponent(new UserData
-        {
-            Upgrades = new List<UserUpgradeData>()
-        }, null, new()));
+        var realmTestingServer = new RealmTestingServer();
+        var player = realmTestingServer.CreatePlayer();
+        var _sut = realmTestingServer.GetRequiredService<RealmCommandService>();
 
-        _sut.ClearCommands();
         bool wasExecuted = false;
         void act(Element elements, CommandArguments args)
         {

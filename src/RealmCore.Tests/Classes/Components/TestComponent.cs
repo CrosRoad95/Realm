@@ -1,17 +1,6 @@
 ﻿namespace RealmCore.Tests.Classes.Components;
 
-public class TestComponent : Component
+public class TestComponent : ComponentLifecycle
 {
-    public bool IsDisposed()
-    {
-        try
-        {
-            ThrowIfDisposed();
-            return false;
-        }
-        catch
-        {
-            return true;
-        }
-    }
+    public bool IsDisposed() => Element == null;
 }

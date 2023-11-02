@@ -1,4 +1,5 @@
 ﻿using RealmCore.Server;
+using SlipeServer.Server;
 
 namespace RealmCore.BlazorHelpers;
 
@@ -6,9 +7,9 @@ public class RealmService<T> : IRealmService<T> where T : notnull
 {
     public T Service { get; private set; }
 
-    public RealmService(RealmServer realmServer)
+    public RealmService(MtaServer mtaServer)
     {
-        Service = realmServer.GetRequiredService<T>();
+        Service = mtaServer.GetRequiredService<T>();
     }
 }
 

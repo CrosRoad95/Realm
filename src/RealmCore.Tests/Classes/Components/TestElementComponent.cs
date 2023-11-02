@@ -7,12 +7,11 @@ public class TestElement : Element
 
 internal class TestElementComponent : IComponent
 {
-    private Element _testElement;
+    public Element TestElement { get; set; }
+    public Element Element { get; set; }
 
     public TestElementComponent()
     {
-        _testElement = new TestElement();
+        TestElement = new TestElement();
     }
-
-    public Element Element { get => _testElement; set => _testElement = value; }
 }

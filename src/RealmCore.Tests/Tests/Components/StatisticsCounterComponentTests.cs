@@ -5,9 +5,10 @@ public class StatisticsCounterComponentTests
     [Fact]
     public void IncreaseStatAndGetStatShouldWork()
     {
-        Entity entity = new();
-        StatisticsCounterComponent statisticsCounterComponent = new();
-        entity.AddComponent(statisticsCounterComponent);
+        var realmTestingServer = new RealmTestingServer();
+        var player = realmTestingServer.CreatePlayer();
+        var statisticsCounterComponent = player.AddComponent<StatisticsCounterComponent>();
+
         using var statisticsCounterComponentMonitor = statisticsCounterComponent.Monitor();
 
         statisticsCounterComponent.GetStatsIds.Should().BeEmpty();
@@ -25,14 +26,14 @@ public class StatisticsCounterComponentTests
     [Fact]
     public void DecreaseAndSetStatShouldWork()
     {
-        Entity entity = new();
-        StatisticsCounterComponent statisticsCounterComponent = new(new Dictionary<int, float>
+        var realmTestingServer = new RealmTestingServer();
+        var player = realmTestingServer.CreatePlayer();
+        var statisticsCounterComponent = player.AddComponent(new StatisticsCounterComponent(new Dictionary<int, float>
         {
             [1] = 10,
             [2] = 10,
             [3] = 10,
-        });
-        entity.AddComponent(statisticsCounterComponent);
+        }));
         using var statisticsCounterComponentMonitor = statisticsCounterComponent.Monitor();
 
         statisticsCounterComponent.GetStatsIds.Should().BeEquivalentTo(new int[] { 1, 2, 3 });

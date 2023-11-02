@@ -2,41 +2,41 @@
 
 public class LevelComponentTests
 {
-    private readonly Entity _entity;
-    private readonly LevelComponent _levelComponent;
-    private readonly uint _totalRequiredExperience = 0;
-
-    public LevelComponentTests()
+    private uint PopulateLevelsRegistry(LevelsRegistry levelsRegistry)
     {
-        var levelsRegistry = new LevelsRegistry();
-        for (int i = 0; i < 10;i++)
+        uint totalRequiredExperience = 0;
+        for (int i = 0; i < 10; i++)
         {
             var requiredExperience = (uint)(10 * i + 10);
             levelsRegistry.Add((uint)i + 1, new LevelRegistryEntry(requiredExperience));
-            _totalRequiredExperience += requiredExperience;
+            totalRequiredExperience += requiredExperience;
         }
-        _entity = new();
-        _levelComponent = new(levelsRegistry);
-        _entity.AddComponent(_levelComponent);
+        return totalRequiredExperience;
     }
 
     [Fact]
     public void TestIfLevelsAreCountingCorrectly()
     {
+        var realmTestingServer = new RealmTestingServer();
+        var player = realmTestingServer.CreatePlayer();
+        var levelsRegistry = realmTestingServer.GetRequiredService<LevelsRegistry>();
+        var totalRequiredExperience = PopulateLevelsRegistry(levelsRegistry);
+        var levelComponent = player.AddComponentWithDI<LevelComponent>();
+
         int addedLevels = 0;
-        _levelComponent.LevelChanged += (e, level, up) =>
+        levelComponent.LevelChanged += (e, level, up) =>
         {
             addedLevels++;
         };
 
-        _levelComponent.GiveExperience(50);
+        levelComponent.GiveExperience(50);
         addedLevels.Should().Be(2);
-        _levelComponent.Experience.Should().Be(20);
-        _levelComponent.NextLevelRequiredExperience.Should().Be(30);
+        levelComponent.Experience.Should().Be(20);
+        levelComponent.NextLevelRequiredExperience.Should().Be(30);
 
-        _levelComponent.GiveExperience(1000);
+        levelComponent.GiveExperience(1000);
         addedLevels.Should().Be(10);
-        _levelComponent.Experience.Should().Be(1050 - _totalRequiredExperience);
-        _levelComponent.NextLevelRequiredExperience.Should().Be(uint.MaxValue);
+        levelComponent.Experience.Should().Be(1050 - totalRequiredExperience);
+        levelComponent.NextLevelRequiredExperience.Should().Be(uint.MaxValue);
     }
 }

@@ -26,11 +26,11 @@ internal class WorldLogic : ComponentLogic<DiscoveriesComponent>
     private readonly IElementFactory _elementFactory;
     private readonly IOverlayService _overlayService;
 
-    public WorldLogic(RealmServer realmServer, IElementFactory elementFactory, IOverlayService overlayService) : base(elementFactory)
+    public WorldLogic(IElementFactory elementFactory, IOverlayService overlayService) : base(elementFactory)
     {
         _elementFactory = elementFactory;
         _overlayService = overlayService;
-        realmServer.ServerStarted += HandleServerStarted;
+        HandleServerStarted();
     }
 
     protected override void ComponentAdded(DiscoveriesComponent discoveriesComponent)

@@ -5,21 +5,24 @@ public class FocusableComponentTests
     [Fact]
     public void FocusableComponentShouldWork()
     {
-        Entity entity1 = new();
-        Entity entity2 = new();
-        var focusableComponent = entity1.AddComponent<FocusableComponent>();
-        focusableComponent.AddFocusedPlayer(entity2);
+        var realmTestingServer = new RealmTestingServer();
+        var player1 = realmTestingServer.CreatePlayer();
+        var player2 = realmTestingServer.CreatePlayer();
+        var focusableComponent = player1.AddComponent<FocusableComponent>();
+        focusableComponent.AddFocusedPlayer(player2);
 
         focusableComponent.FocusedPlayerCount.Should().Be(1);
-        focusableComponent.FocusedPlayers.Should().BeEquivalentTo(entity2);
+        focusableComponent.FocusedPlayers.Should().BeEquivalentTo(player2);
     }
 
     [Fact]
     public void YouShouldNotBeAbleToFocusItself()
     {
-        Entity entity = new();
-        var focusableComponent = entity.AddComponent<FocusableComponent>();
-        var act = () => focusableComponent.AddFocusedPlayer(entity);
+        var realmTestingServer = new RealmTestingServer();
+        var player = realmTestingServer.CreatePlayer();
+
+        var focusableComponent = player.AddComponent<FocusableComponent>();
+        var act = () => focusableComponent.AddFocusedPlayer(player);
 
         act.Should().Throw<InvalidOperationException>();
         focusableComponent.FocusedPlayerCount.Should().Be(0);
@@ -28,12 +31,13 @@ public class FocusableComponentTests
     [Fact]
     public void FocusedEntityShouldBeRemovedWhenItDisposes()
     {
-        Entity entity1 = new();
-        Entity entity2 = new();
-        var focusableComponent = entity1.AddComponent<FocusableComponent>();
+        var realmTestingServer = new RealmTestingServer();
+        var player1 = realmTestingServer.CreatePlayer();
+        var player2 = realmTestingServer.CreatePlayer();
+        var focusableComponent = player1.AddComponent<FocusableComponent>();
 
-        focusableComponent.AddFocusedPlayer(entity2);
-        entity2.Dispose();
+        focusableComponent.AddFocusedPlayer(player2);
+        player2.Destroy();
 
         focusableComponent.FocusedPlayerCount.Should().Be(0);
     }
@@ -41,10 +45,11 @@ public class FocusableComponentTests
     [Fact]
     public void YouCanNotFocusOneEntityTwoTimes()
     {
-        Entity entity1 = new();
-        Entity entity2 = new();
-        var focusableComponent = entity1.AddComponent<FocusableComponent>();
-        var act = () => focusableComponent.AddFocusedPlayer(entity2);
+        var realmTestingServer = new RealmTestingServer();
+        var player1 = realmTestingServer.CreatePlayer();
+        var player2 = realmTestingServer.CreatePlayer();
+        var focusableComponent = player1.AddComponent<FocusableComponent>();
+        var act = () => focusableComponent.AddFocusedPlayer(player2);
 
         act().Should().BeTrue();
         act().Should().BeFalse();
@@ -54,13 +59,14 @@ public class FocusableComponentTests
     [Fact]
     public void YouShouldBeAbleToRemoveFocusedPlayer()
     {
-        Entity entity1 = new();
-        Entity entity2 = new();
-        var focusableComponent = entity1.AddComponent<FocusableComponent>();
+        var realmTestingServer = new RealmTestingServer();
+        var player1 = realmTestingServer.CreatePlayer();
+        var player2 = realmTestingServer.CreatePlayer();
+        var focusableComponent = player1.AddComponent<FocusableComponent>();
 
-        focusableComponent.AddFocusedPlayer(entity2).Should().BeTrue();
-        focusableComponent.RemoveFocusedPlayer(entity2).Should().BeTrue();
-        focusableComponent.RemoveFocusedPlayer(entity2).Should().BeFalse();
+        focusableComponent.AddFocusedPlayer(player2).Should().BeTrue();
+        focusableComponent.RemoveFocusedPlayer(player2).Should().BeTrue();
+        focusableComponent.RemoveFocusedPlayer(player2).Should().BeFalse();
         focusableComponent.FocusedPlayerCount.Should().Be(0);
     }
     
@@ -68,19 +74,20 @@ public class FocusableComponentTests
     [Fact]
     public void RemovedFocusedComponentShouldWork()
     {
-        Entity entity1 = new();
-        Entity entity2 = new();
-        var focusableComponent = entity1.AddComponent<FocusableComponent>();
+        var realmTestingServer = new RealmTestingServer();
+        var player1 = realmTestingServer.CreatePlayer();
+        var player2 = realmTestingServer.CreatePlayer();
+        var focusableComponent = player1.AddComponent<FocusableComponent>();
 
         bool lostFocus = false;
         focusableComponent.PlayerLostFocus += (s, e) =>
         {
-            if (e == entity2)
+            if (e == player2)
                 lostFocus = true;
         };
 
-        focusableComponent.AddFocusedPlayer(entity2);
-        entity1.DestroyComponent(focusableComponent);
+        focusableComponent.AddFocusedPlayer(player2);
+        player1.DestroyComponent(focusableComponent);
         lostFocus.Should().BeTrue();
     }
 

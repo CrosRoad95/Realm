@@ -5,12 +5,13 @@ public class OwnerComponentTests
     [Fact]
     public void OwnerComponentTestsShouldWork()
     {
-        var entity1 = new Entity();
-        var entity2 = new Entity();
+        var realmTestingServer = new RealmTestingServer();
+        var player1 = realmTestingServer.CreatePlayer();
+        var worldObject = realmTestingServer.CreateObject();
 
-        entity1.AddComponent(new OwnerComponent(entity2));
-        entity2.Dispose();
+        player1.AddComponent(new OwnerComponent(worldObject));
+        worldObject.Destroy();
 
-        entity1.Components.Should().BeEmpty();
+        player1.Components.ComponentsList.Should().BeEmpty();
     }
 }

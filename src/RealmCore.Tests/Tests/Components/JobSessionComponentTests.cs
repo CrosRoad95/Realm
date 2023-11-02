@@ -1,41 +1,19 @@
-﻿using RealmCore.Resources.GuiSystem;
-using RealmCore.Tests.Classes.Components;
+﻿using RealmCore.Tests.Classes.Components;
 
 namespace RealmCore.Tests.Tests.Components;
 
 public class JobSessionComponentTests
 {
-    private readonly IElementCollection _elementCollection;
-    private readonly IElementFactory _elementFactory;
-    private readonly EntityHelper _entityHelper;
-    private readonly Mock<IRealmServer> _realmServerMock = new(MockBehavior.Strict);
-    private readonly RealmTestingServer _realmTestingServer;
-    private readonly Mock<IGuiSystemService> _guiSystemService = new(MockBehavior.Strict);
-
-    public JobSessionComponentTests()
-    {
-        _realmTestingServer = new(null, services =>
-        {
-            services.AddSingleton<IElementFactory, ElementFactory>();
-            services.AddSingleton(_guiSystemService.Object);
-            services.AddSingleton(_realmServerMock.Object);
-        });
-        _entityHelper = new(_realmTestingServer);
-        _elementCollection = _realmTestingServer.GetRequiredService<IElementCollection>();
-        _elementFactory = _realmTestingServer.GetRequiredService<IElementFactory>();
-    }
-
     //[Fact]
     public void JobShouldCreateExpectedAmountOfPrivateAndPublicElements()
     {
-        var playerEntity = _entityHelper.CreatePlayerEntity();
-        var testJobComponent = playerEntity.AddComponent(new TestJobComponent(_elementFactory));
-        playerEntity.AddComponent(new JobStatisticsComponent(DateTime.Now));
+        var realmTestingServer = new RealmTestingServer();
+        var player = realmTestingServer.CreatePlayer();
+
+        var testJobComponent = player.AddComponentWithDI< TestJobComponent>();
+        player.AddComponent(new JobStatisticsComponent(DateTime.Now));
         testJobComponent.CreateObjectives();
-        var elements = _elementCollection.GetAll().ToList();
-        var components =  playerEntity.Components.ToList();
-        components.OfType<PlayerPrivateElementComponent<MarkerElementComponent>>().Should().HaveCount(4);
-        components.OfType<PlayerPrivateElementComponent<CollisionSphereElementComponent>>().Should().HaveCount(4);
-        components.OfType<PlayerPrivateElementComponent<BlipElementComponent>>().Should().HaveCount(1);
+        var elements = realmTestingServer.GetRequiredService<IElementCollection>().GetAll().ToList();
+        // TODO
     }
 }

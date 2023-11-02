@@ -35,6 +35,7 @@ internal sealed class GroupRepository : IGroupRepository
             .TagWithSource(nameof(GroupRepository))
             .AsNoTrackingWithIdentityResolution()
             .Where(x => x.Name == groupName);
+
         return await query.AnyAsync(cancellationToken);
     }
 

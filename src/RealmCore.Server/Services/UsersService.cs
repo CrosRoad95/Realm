@@ -156,7 +156,7 @@ internal sealed class UsersService : IUsersService
                 components.AddComponent(new FractionMemberComponent(fractionMemberData));
 
             components.AddComponent(new LicensesComponent(user.Licenses, _dateTimeProvider));
-            components.AddComponent(new PlayTimeComponent(user.PlayTime, _dateTimeProvider));
+            components.AddComponent(new PlayTimeComponent(_dateTimeProvider, user.PlayTime));
             components.AddComponent(new LevelComponent(user.Level, user.Experience, _levelsRegistry));
             components.AddComponent(new MoneyComponent(user.Money, _gameplayOptions));
             components.AddComponent<AFKComponent>();
