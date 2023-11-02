@@ -1,4 +1,6 @@
-﻿namespace RealmCore.Server.Concepts;
+﻿using Newtonsoft.Json.Linq;
+
+namespace RealmCore.Server.Concepts;
 
 public class CommandArguments
 {
@@ -8,13 +10,25 @@ public class CommandArguments
     private int _index;
 
     public int Index => _index;
-    public Span<string> Arguments => _args;
 
     public CommandArguments(string[] args, IServiceProvider serviceProvider)
     {
         _args = args;
         _serviceProvider = serviceProvider;
-        _usersService = serviceProvider.GetRequiredService<IUsersService>();
+        _usersService = _serviceProvider.GetRequiredService<IUsersService>();
+    }
+
+    internal void Left() // For test purpose
+    {
+        _index--;
+        if (_index < 0)
+            throw new InvalidOperationException();
+    }
+    
+    public void End()
+    {
+        if(_index < _args.Length)
+            throw new CommandArgumentException(_index, "Zbyt dużo argumentów.", null);
     }
 
     public string ReadAllAsString()
@@ -28,7 +42,7 @@ public class CommandArguments
         {
             var value = _args[_index++];
             if(string.IsNullOrWhiteSpace(value))
-                throw new CommandArgumentException(_index, "Argument jest pusty", null);
+                throw new CommandArgumentException(_index, "Argument jest pusty.", null);
             return value;
         }
         else
@@ -37,20 +51,24 @@ public class CommandArguments
         }
     }
     
-    public bool TryReadArgument(out string argument)
+    private bool TryReadArgument(out string argument)
     {
         if (_index >= 0 && _index < _args.Length)
         {
             var value = _args[_index++];
             if (string.IsNullOrWhiteSpace(value))
             {
-                argument = string.Empty;
+                argument = default;
                 return false;
             }
             argument = value;
+            return true;
         }
-        argument = string.Empty;
-        return false;
+        else
+        {
+            argument = default;
+            return false;
+        }
     }
 
     public T ReadArgument<T>()
@@ -86,9 +104,12 @@ public class CommandArguments
 
     public string ReadWordOrDefault(string defaultValue)
     {
-        var value = ReadArgument();
-        return value ?? defaultValue;
+        if (TryReadArgument(out var argument))
+            return argument;
+        return defaultValue;
     }
+
+    public string ReadWord() => ReadArgument();
 
     public int ReadInt()
     {

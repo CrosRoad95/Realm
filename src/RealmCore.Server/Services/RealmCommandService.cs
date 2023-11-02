@@ -30,37 +30,59 @@ public sealed class RealmCommandService
     internal class AsyncCommandInfo : CommandInfo
     {
         public override bool IsAsync => true;
-        internal Func<RealmPlayer, CommandArguments, Task> Callback { get; }
+        internal Func<RealmPlayer, CommandArguments, CancellationToken, Task> Callback { get; }
 
-        public AsyncCommandInfo(Func<RealmPlayer, CommandArguments, Task> callback)
+        public AsyncCommandInfo(Func<RealmPlayer, CommandArguments, CancellationToken, Task> callback)
         {
             Callback = callback;
         }
     }
 
-    private readonly CommandService _commandService;
-    private readonly IPolicyDrivenCommandExecutor _policyDrivenCommandExecutor;
     private readonly ChatBox _chatBox;
     private readonly ILogger<RealmCommandService> _logger;
 
-    private readonly Dictionary<string, AsyncCommandInfo> _asyncCommands = new();
-    private readonly Dictionary<string, SyncCommandInfo> _commands = new();
+    private readonly Dictionary<string, CommandInfo> _commands = new();
 
-    public List<CommandInfo> Commands => _commands.Select(x => (CommandInfo)x.Value).Concat(_asyncCommands.Select(x => (CommandInfo)x.Value)).ToList();
-    public List<string> CommandNames => _commands.Keys.Concat(_asyncCommands.Keys).ToList();
-    public int Count => _commands.Count + _asyncCommands.Count;
+    public List<CommandInfo> Commands => _commands.Select(x => x.Value).ToList();
+    public List<string> CommandNames => _commands.Keys.Concat(_commands.Keys).ToList();
+    public int Count => _commands.Count;
 
-    public RealmCommandService(CommandService commandService, ILogger<RealmCommandService> logger, IPolicyDrivenCommandExecutor policyDrivenCommandExecutor, ChatBox chatBox)
+    public RealmCommandService(ILogger<RealmCommandService> logger, ChatBox chatBox, MtaServer mtaServer)
     {
         _logger = logger;
-        _commandService = commandService;
-        _policyDrivenCommandExecutor = policyDrivenCommandExecutor;
         _chatBox = chatBox;
+        mtaServer.PlayerJoined += HandlePlayerJoined;
+    }
+
+    private void HandlePlayerJoined(Player player)
+    {
+        player.Destroyed += HandleDestroyed;
+        player.CommandEntered += HandleCommandEntered;
+    }
+
+    private async void HandleCommandEntered(Player player, PlayerCommandEventArgs eventArgs)
+    {
+        try
+        {
+            await InternalHandleAsyncTriggered((RealmPlayer)eventArgs.Source, eventArgs.Command, eventArgs.Arguments);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogCritical(ex, "Unexpected exception was thrown while executing async command {command} with arguments {commandArguments}", eventArgs.Command, eventArgs.Arguments);
+        }
+    }
+
+    private void HandleDestroyed(Element element)
+    {
+        if(element is RealmPlayer realmPlayer)
+        {
+            realmPlayer.Destroyed -= HandleDestroyed;
+            realmPlayer.CommandEntered += HandleCommandEntered;
+        }
     }
 
     internal void ClearCommands()
     {
-        _asyncCommands.Clear();
         _commands.Clear();
     }
 
@@ -70,18 +92,13 @@ public sealed class RealmCommandService
         {
             throw new CommandExistsException($"Command with name '{commandName}' already exists");
         }
-        if (_asyncCommands.Keys.Any(x => string.Equals(x, commandName, StringComparison.OrdinalIgnoreCase)))
-        {
-            throw new CommandExistsException($"Async command with name '{commandName}' already exists");
-        }
     }
 
-    public void AddAsyncCommandHandler(string commandName, Func<RealmPlayer, CommandArguments, Task> callback, string[]? requiredPolicies = null, string? description = null, string? usage = null, string? category = null)
+    public void AddAsyncCommandHandler(string commandName, Func<RealmPlayer, CommandArguments, CancellationToken, Task> callback, string[]? requiredPolicies = null, string? description = null, string? usage = null, string? category = null)
     {
         CheckIfCommandExists(commandName);
 
-        var command = _commandService.AddCommand(commandName);
-        _asyncCommands.Add(commandName, new AsyncCommandInfo(callback)
+        _commands.Add(commandName, new AsyncCommandInfo(callback)
         {
             CommandName = commandName,
             RequiredPolicies = requiredPolicies,
@@ -89,7 +106,6 @@ public sealed class RealmCommandService
             Usage = usage,
             Category = category
         });
-        command.Triggered += HandleAsyncTriggered;
 
         if (requiredPolicies != null)
             _logger.LogInformation("Created async command {commandName} with required policies: {requiredPolicies}", commandName, requiredPolicies);
@@ -101,7 +117,6 @@ public sealed class RealmCommandService
     {
         CheckIfCommandExists(commandName);
 
-        var command = _commandService.AddCommand(commandName);
         _commands.Add(commandName, new SyncCommandInfo(callback)
         {
             CommandName = commandName,
@@ -110,7 +125,6 @@ public sealed class RealmCommandService
             Usage = usage,
             Category = category
         });
-        command.Triggered += HandleTriggered;
 
         if (requiredPolicies != null)
             _logger.LogInformation("Created sync command {commandName} with required policies: {requiredPolicies}", commandName, requiredPolicies);
@@ -118,160 +132,75 @@ public sealed class RealmCommandService
             _logger.LogInformation("Created sync command {commandName}", commandName);
     }
 
-    internal async Task InternalHandleTriggered(object? sender, CommandTriggeredEventArgs args)
+    internal async Task InternalHandleAsyncTriggered(RealmPlayer player, string command, string[] arguments)
     {
-        var commandText = ((Command)sender!).CommandText;
-        if (!_commands.TryGetValue(commandText, out var commandInfo))
+        if (!_commands.TryGetValue(command, out var commandInfo))
             return;
-
-        var player = (RealmPlayer)args.Player;
 
         if (!player.TryGetComponent(out UserComponent userComponent))
             return;
 
-        var activity = new Activity("CommandHandler");
-        activity.Start();
+        var activity = new Activity("CommandHandler").Start();
         var start = Stopwatch.GetTimestamp();
 
         using var _ = _logger.BeginElement(player);
         using var _commandContextScope = _logger.BeginScope(new Dictionary<string, object>
         {
-            ["commandText"] = commandText,
-            ["commandArguments"] = args.Arguments
+            ["command"] = command,
+            ["commandArguments"] = arguments
         });
-        _logger.LogInformation("Begin command {commandText} with arguments {commandArguments} traceId={TraceId}", commandText);
 
+        _logger.LogInformation("Begin command {command} execution", command);
+        var commandThrottlingPolicy = player.GetRequiredService<ICommandThrottlingPolicy>();
         if (commandInfo.RequiredPolicies != null && commandInfo.RequiredPolicies.Length > 0)
         {
             var authorized = userComponent.HasAuthorizedPolicies(commandInfo.RequiredPolicies);
             if (!authorized)
             {
-                _logger.LogInformation("Failed to execute command {commandText} because one of authorized policy failed", commandText);
+                _logger.LogInformation("Failed to execute command {command} because one of authorized policy failed", command);
                 return;
             }
         }
-
+        _logger.LogInformation("{player} executed command {command} with arguments {commandArguments}.", player, command, arguments);
         try
         {
-            var commandArguments = new CommandArguments(args.Arguments, ((RealmPlayer)args.Player).ServiceProvider);
-            if (userComponent.HasClaim("commandsNoLimit"))
-                commandInfo.Callback(player, commandArguments);
-            else
-                _policyDrivenCommandExecutor.Execute(() =>
-                {
-                    commandInfo.Callback(player, commandArguments);
-                }, userComponent.Id.ToString());
-        }
-        catch (RateLimitRejectedException ex)
-        {
-            _chatBox.OutputTo(player, "Zbyt szybko wysyłasz komendy. Poczekaj chwilę.");
-            _logger.LogError(ex, "Rate limit exception thrown while executing command {commandText} with arguments {commandArguments}", commandText, args.Arguments);
-        }
-        catch (CommandArgumentException ex)
-        {
-            if (ex.Argument != null)
+            var commandArguments = new CommandArguments(arguments, player.ServiceProvider);
+            if(commandInfo is SyncCommandInfo syncCommandInfo)
             {
-                _chatBox.OutputTo(player, $"Wystąpił błąd podczas wykonywania komendy '{commandText}'");
-                if (string.IsNullOrWhiteSpace(ex.Argument))
-                    _chatBox.OutputTo(player, $"Argument {ex.Index} jest niepoprawny ponieważ: {ex.Message}");
+                if (userComponent.HasClaim("commandsNoLimit"))
+                    syncCommandInfo.Callback(player, commandArguments);
                 else
-                    if(ex.Message != null)
+                    commandThrottlingPolicy.Execute(() =>
                     {
-                        _chatBox.OutputTo(player, $"Argument {ex.Index} '{ex.Argument}' jest niepoprawny ponieważ: {ex.Message}");
-                    }
-                    else
-                        _chatBox.OutputTo(player, $"Argument {ex.Index} '{ex.Argument}' jest niepoprawny.");
+                        syncCommandInfo.Callback(player, commandArguments);
+                    });
             }
-            else
+            else if(commandInfo is AsyncCommandInfo asyncCommandInfo)
             {
-                _chatBox.OutputTo(player, $"Wystąpił błąd podczas wykonywania komendy '{commandText}'. {ex.Message}");
+                if (userComponent.HasClaim("commandsNoLimit"))
+                    await asyncCommandInfo.Callback(player, commandArguments, player.CancellationToken);
+                else
+                    await commandThrottlingPolicy.ExecuteAsync(async (cancellationToken) =>
+                    {
+                        await asyncCommandInfo.Callback(player, commandArguments, cancellationToken);
+                    }, player.CancellationToken);
             }
-            _logger.LogWarning("Command argument exception was thrown while executing command {commandText} with arguments {commandArguments}, argument index: {argumentIndex}", commandText, args.Arguments, ex.Index);
-        }
-        catch (Exception ex)
-        {
-            _chatBox.OutputTo(player, "Wystąpił nieznany błąd. Jeśli się powtórzy zgłoś się do administracji.");
-            _logger.LogError(ex, "Exception thrown while executing command {commandText} with arguments {commandArguments}", commandText, args.Arguments);
-        }
-        finally
-        {
-            _logger.LogInformation("Ended command {commandText} execution with traceId={TraceId} in {totalMilliseconds}milliseconds", commandText, activity.GetTraceId(), (Stopwatch.GetTimestamp() - start) / (float)TimeSpan.TicksPerMillisecond);
-            activity.Stop();
-        }
-    }
-
-    private async void HandleTriggered(object? sender, CommandTriggeredEventArgs args)
-    {
-        try
-        {
-            await InternalHandleTriggered(sender, args);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogCritical(ex, "Unexpected exception was thrown while executing command {commandText} with arguments {commandArguments}", ((Command)sender!).CommandText, args.Arguments);
-        }
-    }
-
-    internal async Task InternalHandleAsyncTriggered(object? sender, CommandTriggeredEventArgs args)
-    {
-        var commandText = ((Command)sender!).CommandText;
-
-        if (!_asyncCommands.TryGetValue(commandText, out var commandInfo))
-            return;
-
-        var player = (RealmPlayer)args.Player;
-
-        if (!player.TryGetComponent(out UserComponent userComponent))
-            return;
-
-        var activity = new Activity("CommandHandler");
-        activity.Start();
-        var start = Stopwatch.GetTimestamp();
-
-        using var _ = _logger.BeginElement(player);
-        using var _commandContextScope = _logger.BeginScope(new Dictionary<string, object>
-        {
-            ["commandText"] = commandText,
-            ["commandArguments"] = args.Arguments
-        });
-        _logger.LogInformation("Begin async command {commandText} execution with traceId={TraceId}", commandText);
-
-        if (commandInfo.RequiredPolicies != null && commandInfo.RequiredPolicies.Length > 0)
-        {
-            var authorized = userComponent.HasAuthorizedPolicies(commandInfo.RequiredPolicies);
-            if (!authorized)
-            {
-                _logger.LogInformation("Failed to execute command {commandText} because one of authorized policy failed", commandText);
-                return;
-            }
-        }
-        _logger.LogInformation("{player} executed command {commandText} with arguments {commandArguments}.", player);
-        try
-        {
-            var commandArguments = new CommandArguments(args.Arguments, ((RealmPlayer)args.Player).ServiceProvider);
-            if (userComponent.HasClaim("commandsNoLimit"))
-                await commandInfo.Callback(player, commandArguments);
-            else
-                await _policyDrivenCommandExecutor.ExecuteAsync(async () =>
-                {
-                    await commandInfo.Callback(player, commandArguments);
-                }, userComponent.Id.ToString());
         }
         catch (RateLimitRejectedException ex)
         {
             _chatBox.OutputTo(player, "Zbyt szybko wysyłasz komendy. Poczekaj chwilę.");
-            _logger.LogError(ex, "Rate limit exception thrown while executing command {commandText} with arguments {commandArguments}", commandText, args.Arguments);
+            _logger.LogError(ex, "Rate limit exception thrown while executing command {command} with arguments {commandArguments}", command, arguments);
         }
         catch (CommandArgumentException ex)
         {
             if (ex.Argument != null)
             {
-                _chatBox.OutputTo(player, $"Wystąpił błąd podczas wykonywania komendy '{commandText}'");
+                _chatBox.OutputTo(player, $"Wystąpił błąd podczas wykonywania komendy '{command}'");
                 _chatBox.OutputTo(player, $"Argument {ex.Index} '{ex.Argument}' jest niepoprawny ponieważ: {ex.Message}");
             }
             else
             {
-                _chatBox.OutputTo(player, $"Wystąpił błąd podczas wykonywania komendy '{commandText}'");
+                _chatBox.OutputTo(player, $"Wystąpił błąd podczas wykonywania komendy '{command}'");
                 if (string.IsNullOrWhiteSpace(ex.Argument))
                     _chatBox.OutputTo(player, $"Argument {ex.Index} jest niepoprawny ponieważ: {ex.Message}");
                 else
@@ -282,28 +211,16 @@ public sealed class RealmCommandService
                     else
                         _chatBox.OutputTo(player, $"Argument {ex.Index} '{ex.Argument}' jest niepoprawny.");
             }
-            _logger.LogWarning("Command argument exception was thrown while executing command {commandText} with arguments {commandArguments}, argument index: {argumentIndex}", commandText, args.Arguments, ex.Index);
+            _logger.LogWarning("Command argument exception was thrown while executing command {command} with arguments {commandArguments}, argument index: {argumentIndex}", command, arguments, ex.Index);
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Exception thrown while executing command {commandText} with arguments {commandArguments}", commandText, args.Arguments);
+            _logger.LogError(ex, "Exception thrown while executing command {command} with arguments {commandArguments}", command, arguments);
         }
         finally
         {
-            _logger.LogInformation("Ended async command {commandText} execution with traceId={TraceId} in {totalMilliseconds}milliseconds", commandText, activity.GetTraceId(), (Stopwatch.GetTimestamp() - start) / (float)TimeSpan.TicksPerMillisecond);
+            _logger.LogInformation("Ended async command {command} execution with in {totalMilliseconds}milliseconds", command, (Stopwatch.GetTimestamp() - start) / (float)TimeSpan.TicksPerMillisecond);
             activity.Stop();
-        }
-    }
-
-    private async void HandleAsyncTriggered(object? sender, CommandTriggeredEventArgs args)
-    {
-        try
-        {
-            await InternalHandleAsyncTriggered(sender, args);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogCritical(ex, "Unexpected exception was thrown while executing async command {commandText} with arguments {commandArguments}", ((Command)sender!).CommandText, args.Arguments);
         }
     }
 }

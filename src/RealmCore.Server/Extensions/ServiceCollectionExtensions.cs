@@ -79,7 +79,7 @@ public static class ServiceCollectionExtensions
         #endregion
 
         #region Policies
-        services.AddSingleton<IPolicyDrivenCommandExecutor, PolicyDrivenCommandExecutor>();
+        services.AddScoped<ICommandThrottlingPolicy, CommandThrottlingPolicy>();
         #endregion
 
         services.AddScoped<IElementFactory, ElementFactory>();

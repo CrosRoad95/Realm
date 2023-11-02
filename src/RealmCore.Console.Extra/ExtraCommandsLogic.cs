@@ -25,13 +25,13 @@ internal class ExtraCommandsLogic
             await _discordService.SendMessage(997787973775011853, $"Gracze na serwerze: {string.Join(", ", players.Select(x => x.Name))}");
         });
 
-        _commandService.AddAsyncCommandHandler("discordsendmessage", async (player, args) =>
+        _commandService.AddAsyncCommandHandler("discordsendmessage", async (player, args, token) =>
         {
             var messageId = await _discordService.SendMessage(1079342213097607399, args.ReadAllAsString());
             _chatBox.OutputTo(player, $"Wysłano wiadomość, id: {messageId}");
         });
 
-        _commandService.AddAsyncCommandHandler("discordsendmessagetouser", async (player, args) =>
+        _commandService.AddAsyncCommandHandler("discordsendmessagetouser", async (player, args, token) =>
         {
             var messageId = await _discordService.SendMessageToUser(659910279353729086, args.ReadAllAsString());
             _chatBox.OutputTo(player, $"Wysłano wiadomość, id: {messageId}");
@@ -47,7 +47,7 @@ internal class ExtraCommandsLogic
             return stream;
         }
 
-        _commandService.AddAsyncCommandHandler("discordsendfile", async (player, args) =>
+        _commandService.AddAsyncCommandHandler("discordsendfile", async (player, args, token) =>
         {
             var messageId = await _discordService.SendFile(997787973775011853, generateStreamFromString("dowody"), "dowody_na_borsuka.txt", "potwierdzam");
             _chatBox.OutputTo(player, $"Wysłano plik, id: {messageId}");

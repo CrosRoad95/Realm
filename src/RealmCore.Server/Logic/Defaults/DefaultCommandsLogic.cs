@@ -4,9 +4,9 @@ public class DefaultCommandsLogic
 {
     public DefaultCommandsLogic(RealmCommandService commandService, IServiceProvider serviceProvider, IEnumerable<IInGameCommand> ingameCommands, ILogger<DefaultCommandsLogic> logger)
     {
-        foreach (var ingameCommand in ingameCommands)
+        foreach (var inGameCommand in ingameCommands)
         {
-            var type = ingameCommand.GetType();
+            var type = inGameCommand.GetType();
             var commandNameAttribute = type.GetCustomAttribute<CommandNameAttribute>();
             if (commandNameAttribute == null)
             {
@@ -15,7 +15,7 @@ public class DefaultCommandsLogic
             }
 
             var commandName = commandNameAttribute.Name.ToLower();
-            commandService.AddAsyncCommandHandler(commandName, async (element, args) =>
+            commandService.AddAsyncCommandHandler(commandName, async (element, args, token) =>
             {
                 if (serviceProvider.GetRequiredService(type) is not IInGameCommand inGameCommand)
                     throw new InvalidOperationException();

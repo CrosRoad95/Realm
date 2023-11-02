@@ -56,7 +56,7 @@ internal sealed class CommandsLogic
         _userMoneyHistoryService = userMoneyHistoryService;
         var debounce = new Debounce(500);
         var debounceCounter = 0;
-        _commandService.AddAsyncCommandHandler("debounce", async (player, args) =>
+        _commandService.AddAsyncCommandHandler("debounce", async (player, args, token) =>
         {
             debounceCounter++;
             await debounce.InvokeAsync(() =>
@@ -65,13 +65,13 @@ internal sealed class CommandsLogic
             });
         });
 
-        _commandService.AddAsyncCommandHandler("fadecamera", async (player, args) =>
+        _commandService.AddAsyncCommandHandler("fadecamera", async (player, args, token) =>
         {
             await player.FadeCameraAsync(CameraFade.Out, 5);
             await player.FadeCameraAsync(CameraFade.In, 5);
         });
 
-        _commandService.AddAsyncCommandHandler("fadecamera2", async (player, args) =>
+        _commandService.AddAsyncCommandHandler("fadecamera2", async (player, args, token) =>
         {
             var cancelationTokenSource = new CancellationTokenSource();
             cancelationTokenSource.CancelAfter(2000);
@@ -100,7 +100,7 @@ internal sealed class CommandsLogic
             _chatBox.OutputTo(player, "Created focusable component");
         });
 
-        _commandService.AddAsyncCommandHandler("outlinecomponent", async (player, args) =>
+        _commandService.AddAsyncCommandHandler("outlinecomponent", async (player, args, token) =>
         {
             var worldObject = _elementFactory.CreateObject(ObjectModel.Gunbox, player.Position + new Vector3(4, 0, 0), player.Rotation);
             var focusableComponent = worldObject.AddComponent(new OutlineComponent(Color.Red));
@@ -110,7 +110,7 @@ internal sealed class CommandsLogic
             _chatBox.OutputTo(player, "Destroyed outline component");
         });
 
-        _commandService.AddAsyncCommandHandler("outlinecomponent2", async (player, args) =>
+        _commandService.AddAsyncCommandHandler("outlinecomponent2", async (player, args, token) =>
         {
             var worldObject = _elementFactory.CreateObject(ObjectModel.Gunbox, player.Position + new Vector3(4, 0, 0), player.Rotation);
             var focusableComponent = worldObject.AddComponent(new OutlineComponent(Color.Red));
@@ -195,7 +195,7 @@ internal sealed class CommandsLogic
             _chatBox.OutputTo(player, $"veh created");
         });
 
-        _commandService.AddAsyncCommandHandler("cvprivate", async (player, args) =>
+        _commandService.AddAsyncCommandHandler("cvprivate", async (player, args, token) =>
         {
             var vehicle = await _vehiclesService.CreateVehicle(404, player.Position + new Vector3(4, 0, 0), player.Rotation);
             var components = vehicle;
@@ -227,7 +227,7 @@ internal sealed class CommandsLogic
             components.AddComponent<VehicleNoAccessComponent>();
         });
 
-        _commandService.AddAsyncCommandHandler("privateblip", async (player, args) =>
+        _commandService.AddAsyncCommandHandler("privateblip", async (player, args, token) =>
         {
             // TODO:
             //using var scopedelementFactory = _elementFactory.CreateScopedelementFactory(player);
@@ -260,7 +260,7 @@ internal sealed class CommandsLogic
             }
         });
 
-        _commandService.AddAsyncCommandHandler("accessinfobyid", async (player, args) =>
+        _commandService.AddAsyncCommandHandler("accessinfobyid", async (player, args, token) =>
         {
             var access = await _vehicleRepository.GetAllVehicleAccesses(args.ReadInt());
             if (access == null)
@@ -345,7 +345,7 @@ internal sealed class CommandsLogic
                 _chatBox.OutputTo(player, $"Test item added");
             }
         });
-        _commandService.AddAsyncCommandHandler("addtestdata", async (player, args) =>
+        _commandService.AddAsyncCommandHandler("addtestdata", async (player, args, token) =>
         {
             if (player.TryGetComponent(out JobUpgradesComponent jobUpgradesComponent))
             {
@@ -408,7 +408,7 @@ internal sealed class CommandsLogic
             });
         });
 
-        _commandService.AddAsyncCommandHandler("privateoutlinetest", async (player, args) =>
+        _commandService.AddAsyncCommandHandler("privateoutlinetest", async (player, args, token) =>
         {
             var @object = _elementFactory.CreateObject(ObjectModel.Gunbox, player.Position + new Vector3(4, 0, -0.65f), Vector3.Zero);
             await Task.Delay(2000);

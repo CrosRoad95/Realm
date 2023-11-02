@@ -8,7 +8,7 @@ public class RealmPlayer : Player, IComponents
     private readonly IServiceScope _serviceScope;
 
     private CancellationTokenSource _cancellationTokenSource = new();
-    protected CancellationToken CancellationToken => _cancellationTokenSource.Token;
+    public CancellationToken CancellationToken => _cancellationTokenSource.Token;
     public IServiceProvider ServiceProvider => _serviceProvider;
     public Concepts.Components Components { get; private set; }
 
