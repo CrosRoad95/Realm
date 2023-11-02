@@ -232,7 +232,7 @@ internal sealed class UsersService : IUsersService
             foundPlayer = null!;
             return false;
         }
-        foundPlayer = (RealmPlayer)player;
+        foundPlayer = player;
         return true;
     }
 
@@ -259,10 +259,11 @@ internal sealed class UsersService : IUsersService
 
     public IEnumerable<RealmPlayer> SearchPlayersByName(string pattern)
     {
-        var players = _elementCollection.GetByType<RealmPlayer>().Where(x => x.Name.Contains(pattern.ToLower(), StringComparison.CurrentCultureIgnoreCase));
-        foreach (var player in players)
+        foreach (var player in _elementCollection.GetByType<RealmPlayer>())
         {
-            yield return (RealmPlayer)player;
+            if(player.IsLoggedIn)
+                if(player.Name.Contains(pattern.ToLower(), StringComparison.CurrentCultureIgnoreCase))
+                    yield return player;
         }
     }
 
@@ -272,7 +273,7 @@ internal sealed class UsersService : IUsersService
         {
             if(player.Client.Serial == serial)
             {
-                foundPlayer = (RealmPlayer)player;
+                foundPlayer = player;
                 return true;
             }
         }

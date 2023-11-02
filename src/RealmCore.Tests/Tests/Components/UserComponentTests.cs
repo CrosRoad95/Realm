@@ -1,6 +1,4 @@
-﻿using System.Data;
-
-namespace RealmCore.Tests.Tests.Components;
+﻿namespace RealmCore.Tests.Tests.Components;
 
 public class UserComponentTests
 {

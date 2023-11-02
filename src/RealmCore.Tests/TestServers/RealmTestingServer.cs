@@ -4,7 +4,6 @@ using SlipeServer.Server.Resources;
 using RealmCore.Resources.Browser;
 using RealmCore.Resources.GuiSystem;
 using SlipeServer.Net.Wrappers;
-using RealmCore.Server;
 
 namespace RealmCore.Tests.TestServers;
 

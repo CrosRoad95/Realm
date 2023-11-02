@@ -13,15 +13,14 @@ internal sealed class UserMoneyHistoryService : IUserMoneyHistoryService
 
     public async Task Add(RealmPlayer player, decimal change, int? category = null, string? description = null)
     {
-        var userComponent = player.GetRequiredComponent<UserComponent>();
         var moneyComponent = player.GetRequiredComponent<MoneyComponent>();
         var money = moneyComponent.Money;
-        await _userMoneyHistoryRepository.Add(userComponent.Id, _dateTimeProvider.Now, money + change, change, category, description);
+        await _userMoneyHistoryRepository.Add(player.GetUserId(), _dateTimeProvider.Now, money + change, change, category, description);
     }
 
     public async Task<List<UserMoneyHistoryDTO>> Get(RealmPlayer player, int limit = 10)
     {
-        var moneyHistory = await _userMoneyHistoryRepository.Get(player.GetRequiredComponent<UserComponent>().Id, limit);
+        var moneyHistory = await _userMoneyHistoryRepository.Get(player.GetUserId(), limit);
 
         return moneyHistory.Select(x => new UserMoneyHistoryDTO
         {

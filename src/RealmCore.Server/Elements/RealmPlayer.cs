@@ -1,6 +1,4 @@
-﻿using RealmCore.Server.Scopes;
-
-namespace RealmCore.Server.Elements;
+﻿namespace RealmCore.Server.Elements;
 
 public class RealmPlayer : Player, IComponents
 {

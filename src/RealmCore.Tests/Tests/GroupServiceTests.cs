@@ -1,6 +1,4 @@
-﻿using RealmCore.SQLite;
-
-namespace RealmCore.Tests.Tests;
+﻿namespace RealmCore.Tests.Tests;
 
 public class GroupServiceTests
 {

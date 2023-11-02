@@ -1,5 +1,4 @@
 ﻿using Polly.RateLimit;
-using RealmCore.Logging;
 
 namespace RealmCore.Server.Services;
 
@@ -151,7 +150,6 @@ public sealed class RealmCommandService
         });
 
         _logger.LogInformation("Begin command {command} execution", command);
-        var commandThrottlingPolicy = player.GetRequiredService<ICommandThrottlingPolicy>();
         if (commandInfo.RequiredPolicies != null && commandInfo.RequiredPolicies.Length > 0)
         {
             var authorized = userComponent.HasAuthorizedPolicies(commandInfo.RequiredPolicies);
@@ -164,6 +162,7 @@ public sealed class RealmCommandService
         _logger.LogInformation("{player} executed command {command} with arguments {commandArguments}.", player, command, arguments);
         try
         {
+            var commandThrottlingPolicy = player.GetRequiredService<ICommandThrottlingPolicy>();
             var commandArguments = new CommandArguments(arguments, player.ServiceProvider);
             if(commandInfo is SyncCommandInfo syncCommandInfo)
             {
