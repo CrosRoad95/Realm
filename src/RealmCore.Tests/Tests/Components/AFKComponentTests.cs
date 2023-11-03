@@ -3,11 +3,12 @@
 public class AFKComponentTests
 {
     [Fact]
-    public void DestroyingComponentShouldReset()
+    public async Task DestroyingComponentShouldReset()
     {
-        var realmTestingServer = new RealmTestingServer();
+        var realmTestingServer = new RealmTestingServer(new TestConfigurationProvider());
         var player = realmTestingServer.CreatePlayer();
-        var afkComponent = player.AddComponent<AFKComponent>();
+        var afkComponent = player.AddComponentWithDI<AFKComponent>();
+        var dateTimeProvider = realmTestingServer.TestDateTimeProvider;
 
         bool _isAfk = false;
         TimeSpan _elapsed = TimeSpan.Zero;
@@ -20,13 +21,14 @@ public class AFKComponentTests
 
         afkComponent.IsAFK.Should().BeFalse();
 
-        afkComponent.HandlePlayerAFKStarted(realmTestingServer.TestDateTimeProvider.Now);
+        afkComponent.HandlePlayerAFKStarted(dateTimeProvider.Now);
+        await Task.Delay(200);
         _elapsed.Should().Be(TimeSpan.Zero);
         _isAfk.Should().BeTrue();
         afkComponent.IsAFK.Should().BeTrue();
 
-        realmTestingServer.TestDateTimeProvider.AddOffset(TimeSpan.FromMinutes(5));
-        afkComponent.HandlePlayerAFKStopped(realmTestingServer.TestDateTimeProvider.Now);
+        dateTimeProvider.AddOffset(TimeSpan.FromMinutes(5));
+        afkComponent.HandlePlayerAFKStopped(dateTimeProvider.Now);
 
         _elapsed.Should().Be(TimeSpan.FromMinutes(5));
         _isAfk.Should().BeFalse();

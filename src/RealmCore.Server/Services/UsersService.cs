@@ -177,7 +177,7 @@ internal sealed class UsersService : IUsersService
             components.AddComponent(new PlayTimeComponent(_dateTimeProvider, user.PlayTime));
             components.AddComponent(new LevelComponent(user.Level, user.Experience, _levelsRegistry));
             components.AddComponent(new MoneyComponent(user.Money, _gameplayOptions));
-            components.AddComponent<AFKComponent>();
+            components.AddComponentWithDI<AFKComponent>();
             
             await _userLoginHistoryRepository.Add(user.Id, _dateTimeProvider.Now, player.Client.IPAddress?.ToString() ?? "", serial);
             await UpdateLastData(player);

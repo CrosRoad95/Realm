@@ -10,4 +10,5 @@ public class GameplayOptions
     public int BanType { get; set; }
     public string Watermark { get; set; }
     public string? Password { get; set; }
+    public int? AfkCooldown { get; set; }
 }

@@ -23,6 +23,7 @@ internal class TestConfigurationProvider : IRealmConfigurationProvider
                 ["Gameplay:MoneyLimit"] = "10000",
                 ["Gameplay:MoneyPrecision"] = "4",
                 ["Gameplay:DefaultInventorySize"] = "20",
+                ["Gameplay:AfkCooldown"] = "20",
                 ["Database:Provider"] = useSqlLite ? "SqlLite" : "InMemory",
                 ["Database:SqlLiteFileName"] = Guid.NewGuid().ToString(),
             }).Build();
