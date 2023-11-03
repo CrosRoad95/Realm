@@ -5,12 +5,12 @@ namespace RealmCore.BlazorHelpers;
 
 internal class RealmServerHostedService : IHostedService
 {
-    private readonly MtaServer _realmServer;
+    private readonly MtaServer _mtaServer;
     private readonly ILogger<RealmServerHostedService> _logger;
 
     public RealmServerHostedService(MtaServer mtaServer, ILogger<RealmServerHostedService> logger)
     {
-        _realmServer = mtaServer;
+        _mtaServer = mtaServer;
         _logger = logger;
     }
 
@@ -18,7 +18,7 @@ internal class RealmServerHostedService : IHostedService
     {
         try
         {
-            _realmServer.Start();
+            _mtaServer.Start();
         }
         catch(Exception ex)
         {

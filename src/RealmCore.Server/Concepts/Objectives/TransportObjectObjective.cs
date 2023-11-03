@@ -37,8 +37,8 @@ public class TransportObjectObjective : Objective
 
     protected override void Load(RealmPlayer player)
     {
-        var elementFactory = player.ServiceProvider.GetRequiredService<IElementFactory>();
-        _elementCollection = player.ServiceProvider.GetRequiredService<IElementCollection>();
+        var elementFactory = player.GetRequiredService<IElementFactory>();
+        _elementCollection = player.GetRequiredService<IElementCollection>();
         // TODO: Create marker
     }
 

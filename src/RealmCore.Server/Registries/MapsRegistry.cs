@@ -38,7 +38,6 @@ public class MapsRegistry
             _maps.Add(name, map);
             MapAdded?.Invoke(name, map);
         }
-        _logger.LogInformation("Map {mapName} added", name);
     }
 
     public void RemoveMapByName(string name)
@@ -54,7 +53,6 @@ public class MapsRegistry
             else
                 throw new Exception($"Map of name '{name}' doesn't exists");
         }
-        _logger.LogInformation("Map {mapName} removed", name);
     }
 
     internal void UnregisterWatcher(MapsDirectoryWatcher mapsDirectoryWatcher)

@@ -73,10 +73,10 @@ public sealed class RealmCommandService
 
     private void HandleDestroyed(Element element)
     {
-        if(element is RealmPlayer realmPlayer)
+        if(element is RealmPlayer player)
         {
-            realmPlayer.Destroyed -= HandleDestroyed;
-            realmPlayer.CommandEntered += HandleCommandEntered;
+            player.Destroyed -= HandleDestroyed;
+            player.CommandEntered += HandleCommandEntered;
         }
     }
 

@@ -1,7 +1,7 @@
 ﻿using RealmCore.Server;
-using RealmCore.Server.Components.Players;
 using RealmCore.Server.Components.Players.Abstractions;
 using RealmCore.Server.Elements;
+using RealmCore.Server.Interfaces;
 using RealmCore.Server.Services;
 using System.Security.Claims;
 
@@ -10,13 +10,13 @@ namespace RealmCore.BlazorHelpers;
 public class CurrentPlayerContext : IDisposable
 {
     private readonly RealmPlayer? _player;
-    private readonly BrowserComponent? _browserComponent;
+    private readonly IRealmBrowserService? _browserComponent;
     public RealmServer? Server { get; }
     internal IBrowserGuiService BrowserGuiService { get; }
     public ClaimsPrincipal ClaimsPrincipal { get; }
-    protected BrowserComponent BrowserComponent => _browserComponent ?? throw new ArgumentNullException(nameof(BrowserComponent));
+    protected IRealmBrowserService BrowserService => _browserComponent ?? throw new ArgumentNullException(nameof(BrowserService));
     public RealmPlayer Player => _player ?? throw new ArgumentNullException(nameof(RealmPlayer));
-    public string Name => _player.Name;
+    public string Name => Player.Name;
 
     internal event Action<string?>? PathChanged;
     public CurrentPlayerContext(IHttpContextAccessor httpContent, RealmServer realmServer)
@@ -32,13 +32,13 @@ public class CurrentPlayerContext : IDisposable
             if(BrowserGuiService.TryGetPlayerByKey(keyClaim.Value, out var player) && player != null)
             {
                 _player = player;
-                _browserComponent = player.GetRequiredComponent<BrowserComponent>();
+                _browserComponent = player.GetRequiredService<IRealmBrowserService>();
                 _browserComponent.PathChanged += HandlePathChanged;
             }
         }
     }
 
-    private void HandlePathChanged(BrowserComponent browserComponent, string path, bool clientSide)
+    private void HandlePathChanged(string path, bool clientSide)
     {
         if(!clientSide)
             PathChanged?.Invoke(path);
@@ -46,9 +46,9 @@ public class CurrentPlayerContext : IDisposable
 
     public virtual void Dispose()
     {
-        if(BrowserComponent != null)
+        if(BrowserService != null)
         {
-            BrowserComponent.PathChanged -= HandlePathChanged;
+            BrowserService.PathChanged -= HandlePathChanged;
         }
     }
 }

@@ -7,7 +7,7 @@ internal sealed class PlayersLogic
     private readonly IClientInterfaceService _clientInterfaceService;
     private readonly ILogger<PlayersLogic> _logger;
     private readonly IResourceProvider _resourceProvider;
-    private readonly ConcurrentDictionary<Player, Latch> _playerResources = new();
+    private readonly ConcurrentDictionary<RealmPlayer, Latch> _playerResources = new();
 
     public PlayersLogic(IElementFactory elementFactory, MtaServer mtaServer, IClientInterfaceService clientInterfaceService, ILogger<PlayersLogic> logger, IResourceProvider resourceProvider)
     {
@@ -26,7 +26,7 @@ internal sealed class PlayersLogic
         var resources = _resourceProvider.GetResources();
         _playerResources[player] = new Latch(RealmResourceServer._resourceCounter, TimeSpan.FromSeconds(60));
         player.ResourceStarted += HandlePlayerResourceStarted;
-        player.Disconnected += HandlePlayerDisconnected;
+        player.Destroyed += HandlePlayerDestroyed;
 
         var taskWaitForScreenSize = new TaskCompletionSource<(int, int)>();
         var taskWaitForCultureInfo = new TaskCompletionSource<CultureInfo>();
@@ -75,7 +75,7 @@ internal sealed class PlayersLogic
         var stop = Stopwatch.GetTimestamp();
         double milliseconds = ((stop - start) / (float)Stopwatch.Frequency) * 1000;
         _elementFactory.RelayCreated(player);
-        _logger.LogInformation("Player joined in {elapsedMilliseconds}", milliseconds);
+        _logger.LogInformation("Player joined in {elapsedMilliseconds}ms", (ulong)milliseconds);
 
         if (player.IsDestroyed)
             return;
@@ -109,17 +109,26 @@ internal sealed class PlayersLogic
 
     private void HandlePlayerResourceStarted(Player player, PlayerResourceStartedEventArgs e)
     {
-        _playerResources[player].Decrement();
+        _playerResources[(RealmPlayer)player].Decrement();
     }
 
-    private async void HandlePlayerDisconnected(Player plr, PlayerQuitEventArgs e)
+    private async void HandlePlayerDestroyed(Element plr)
     {
+        var player = (RealmPlayer)plr;
         try
         {
-            var player = (RealmPlayer)plr;
-            plr.Disconnected -= HandlePlayerDisconnected;
-            _playerResources.TryRemove(plr, out var _);
-            await player.ServiceProvider.GetRequiredService<ISaveService>().Save(player);
+            plr.Destroyed -= HandlePlayerDestroyed;
+            _playerResources.TryRemove(player, out var _);
+            await player.GetRequiredService<ISaveService>().Save(player);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogHandleError(ex);
+        }
+
+        try
+        {
+            player.Dispose();
         }
         catch (Exception ex)
         {

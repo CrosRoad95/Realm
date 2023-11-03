@@ -3,14 +3,14 @@
 public abstract class DxGuiComponent : GuiComponent
 {
     protected readonly string _name;
-    protected readonly bool _cursorless;
+    protected readonly bool _cursorLess;
     public string Name => _name;
-    public bool Cursorless => _cursorless;
+    public bool CursorLess => _cursorLess;
 
-    protected DxGuiComponent(string name, bool cursorless)
+    protected DxGuiComponent(string name, bool cursorLess)
     {
         _name = name;
-        _cursorless = cursorless;
+        _cursorLess = cursorLess;
     }
 
     protected virtual Task HandleForm(IFormContext formContext) { return Task.CompletedTask; }

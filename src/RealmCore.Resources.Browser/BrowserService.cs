@@ -7,12 +7,12 @@ namespace RealmCore.Resources.Browser;
 
 internal sealed class BrowserService : IBrowserService
 {
-    public event Action<Player>? PlayerBrowserStarted;
-    public event Action<Player>? PlayerBrowserStopped;
+    public event Action<Player>? BrowserStarted;
+    public event Action<Player>? BrowserStopped;
+    public event Action<Player>? BrowserReady;
 
     public Action<IMessage>? MessageHandler { get; set; }
 
-    public Action<Player>? RelayPlayerBrowserReady { get; set; }
 
     private readonly Uri? _baseUrl;
 
@@ -32,9 +32,14 @@ internal sealed class BrowserService : IBrowserService
         }
     }
 
-    public void HandlePlayerBrowserReady(Player player)
+    public void RelayBrowserReady(Player player)
     {
-        RelayPlayerBrowserReady?.Invoke(player);
+        BrowserReady?.Invoke(player);
+    }
+    
+    public void RelayBrowserStarted(Player player)
+    {
+        BrowserStarted?.Invoke(player);
     }
 
     public void ToggleDevTools(Player player, bool enabled)
@@ -47,8 +52,9 @@ internal sealed class BrowserService : IBrowserService
         MessageHandler?.Invoke(new SetVisibleMessage(player, visible));
     }
 
-    public void SetPath(Player player, string path, bool force)
+    public void SetPath(Player player, string path)
     {
-        MessageHandler?.Invoke(new SetPathMessage(player, path, force));
+        var fullUrl = new Uri(_baseUrl, path).ToString();
+        MessageHandler?.Invoke(new SetPathMessage(player, fullUrl));
     }
 }

@@ -71,11 +71,12 @@ public static class ServiceCollectionExtensions
         services.AddScoped<ISpawnMarkersService, SpawnMarkersService>();
         services.AddScoped<IUsersNotificationsService, UsersNotificationsService>();
         services.AddScoped<IVehicleAccessService, VehicleAccessService>();
-        services.AddScoped<IBrowserGuiService, BrowserGuiService>();
         services.AddScoped<INewsService, NewsService>();
         services.AddScoped<IUserMoneyHistoryService, UserMoneyHistoryService>();
+        services.AddScoped<IRealmBrowserService, RealmBrowserService>();
+        services.AddScoped<IScopedMapsService, ScopedMapService>();
+        services.AddSingleton<IBrowserGuiService, BrowserGuiService>();
         services.AddSingleton<IMapsService, MapsService>();
-        services.AddSingleton<IScopedMapsService, ScopedMapService>();
         #endregion
 
         #region Policies

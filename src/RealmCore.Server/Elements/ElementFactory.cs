@@ -10,6 +10,12 @@ internal sealed class ElementFactory : IElementFactory
     {
         _mtaServer = mtaServer;
         _serviceProvider = serviceProvider;
+        _mtaServer.PlayerJoined += HandlePlayerJoined;
+    }
+
+    private void HandlePlayerJoined(Player player)
+    {
+        ElementCreated?.Invoke(player);
     }
 
     private void ExecuteElementBuilder<TElement>(Func<TElement, IEnumerable<IComponent>>? builder, TElement element) where TElement : IComponents

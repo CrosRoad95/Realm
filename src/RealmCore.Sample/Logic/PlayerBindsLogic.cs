@@ -49,36 +49,27 @@ internal sealed class PlayerBindsLogic : ComponentLogic<UserComponent>
 
         player.SetBind("F2", player =>
         {
-            if (player.TryGetComponent(out BrowserComponent browserComponent))
+            var browserService = player.GetRequiredService<IRealmBrowserService>();
+            if (browserService.IsVisible)
             {
-                if (browserComponent.Visible)
-                {
-                    browserComponent.Close();
-                }
-                else
-                {
-                    browserComponent.Path = "/realmUi/counter1";
-                    browserComponent.Visible = true;
-                }
+                browserService.Close();
+            }
+            else
+            {
+                browserService.Open("/realmUi/counter1");
             }
         });
 
         player.SetBind("F3", player =>
         {
-            if (player.TryGetComponent(out BrowserComponent browserComponent))
-            {
-                browserComponent.Path = "/realmUi/counter1";
-                browserComponent.Visible = true;
-            }
+            var browserService = player.GetRequiredService<IRealmBrowserService>();
+            browserService.Open("/realmUi/counter2");
         });
 
         player.SetBind("F4", player =>
         {
-            if (player.TryGetComponent(out BrowserComponent browserComponent))
-            {
-                browserComponent.Path = "index";
-                browserComponent.Visible = false;
-            }
+            var browserService = player.GetRequiredService<IRealmBrowserService>();
+            browserService.Open("/realmUi/index");
         });
 
         GuiHelpers.BindGuiPage<HomePageComponent>(player, "F6", _serviceProvider);

@@ -17,6 +17,5 @@ public interface IUsersService
     Task<int> SignUp(string username, string password);
     bool TryFindPlayerBySerial(string serial, out RealmPlayer? player);
     bool TryGetPlayerByName(string name, out RealmPlayer? player);
-    Task<bool> TryUpdateLastNickName(RealmPlayer player);
     Task<bool> UpdateLastNewsRead(RealmPlayer player);
 }

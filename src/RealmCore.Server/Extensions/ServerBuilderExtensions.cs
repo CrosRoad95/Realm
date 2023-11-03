@@ -96,7 +96,6 @@ public static class ServerBuilderExtensions
         serverBuilder.AddScopedLogic<AdminResourceLogic>();
         serverBuilder.AddScopedLogic<AFKResourceLogic>();
         serverBuilder.AddScopedLogic<BoneAttachResourceLogic>();
-        serverBuilder.AddScopedLogic<BrowserResourceLogic>();
         serverBuilder.AddScopedLogic<ClientInterfaceResourceLogic>();
         serverBuilder.AddScopedLogic<NametagResourceLogic>();
         serverBuilder.AddScopedLogic<OutlineResourceLogic>();

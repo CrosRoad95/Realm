@@ -28,7 +28,7 @@ end
 function handleSetPath(path)
 	currentPath = path;
 	itrace("handleSetPath", path)
-	loadBrowserURL(webBrowser, baseRemoteUrl..path)
+	loadBrowserURL(webBrowser, path)
 end
 
 local function createLocalBrowser(x, y)
@@ -61,12 +61,6 @@ local function createRemoteBrowser(x, y, remoteUrl, requestWhitelistUrl)
 		function( )
 			itrace("onClientBrowserCreated")
 			local sourceBrowser = source;
-			addEventHandler ( "onClientBrowserNavigate", sourceBrowser, function(...)
-				--if(url == remoteUrl)then
-					itrace("onClientBrowserNavigate", ...);
-					triggerServerEvent("internalBrowserDocumentReady", resourceRoot)
-				--end
-			end)
 			local function handleClientBrowserDocumentReady(url)
 				if(string.find(url, remoteUrl))then
 					itrace("handleClientBrowserDocumentReady", url);

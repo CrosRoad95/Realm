@@ -11,6 +11,7 @@ public abstract class Db<T> : IdentityDbContext<UserData, RoleData, int,
         IdentityRoleClaim<int>,
         IdentityUserToken<int>>, IDb where T : Db<T>
 {
+    private SemaphoreSlim _semaphoreSlim = new(1);
     public DbSet<UserLicenseData> UserLicenses => Set<UserLicenseData>();
     public DbSet<VehicleData> Vehicles => Set<VehicleData>();
     public DbSet<VehicleUserAccessData> VehicleUserAccess => Set<VehicleUserAccessData>();
@@ -781,4 +782,41 @@ public abstract class Db<T> : IdentityDbContext<UserData, RoleData, int,
                 .HasPrincipalKey(x => x.Id);
         });
     }
+
+    public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+    {
+        await _semaphoreSlim.WaitAsync(cancellationToken);
+        try
+        {
+            return await base.SaveChangesAsync(cancellationToken);
+        }
+        finally
+        {
+            _semaphoreSlim.Release();
+        }
+    }
+
+    public override ValueTask DisposeAsync()
+    {
+        return base.DisposeAsync();
+    }
+
+    public override void Dispose()
+    {
+        base.Dispose();
+    }
+    //public override int SaveChanges()
+    //{
+    //    return base.SaveChanges();
+    //}
+
+    //public override int SaveChanges(bool acceptAllChangesOnSuccess)
+    //{
+    //    return base.SaveChanges(acceptAllChangesOnSuccess);
+    //}
+
+    //public override Task<int> SaveChangesAsync(bool acceptAllChangesOnSuccess, CancellationToken cancellationToken = default)
+    //{
+    //    return base.SaveChangesAsync(acceptAllChangesOnSuccess, cancellationToken);
+    //}
 }

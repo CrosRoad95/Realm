@@ -5,14 +5,12 @@ namespace RealmCore.Sample.Components.Gui;
 
 public sealed class LoginGuiComponent : DxGuiComponent
 {
-    private readonly IServiceProvider _serviceProvider;
     private readonly IUsersService _usersService;
     private readonly ILogger<LoginGuiComponent> _logger;
     private readonly UserManager<UserData> _userManager;
 
-    public LoginGuiComponent(IServiceProvider serviceProvider, IUsersService usersService, ILogger<LoginGuiComponent> logger, UserManager<UserData> userManager) : base("login", false)
+    public LoginGuiComponent(IUsersService usersService, ILogger<LoginGuiComponent> logger, UserManager<UserData> userManager) : base("login", false)
     {
-        _serviceProvider = serviceProvider;
         _usersService = usersService;
         _logger = logger;
         _userManager = userManager;
@@ -74,9 +72,9 @@ public sealed class LoginGuiComponent : DxGuiComponent
         switch (actionContext.ActionName)
         {
             case "navigateToRegister":
-                var components = ((RealmPlayer)Element).Components;
-                components.AddComponentWithDI<RegisterGuiComponent>();
-                components.DestroyComponent(this);
+                var player = ((RealmPlayer)Element);
+                player.AddComponentWithDI<RegisterGuiComponent>();
+                player.DestroyComponent(this);
                 break;
             default:
                 throw new NotImplementedException();

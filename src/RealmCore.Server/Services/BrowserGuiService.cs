@@ -31,6 +31,7 @@ internal class BrowserGuiService : IBrowserGuiService
             return Convert.ToBase64String(_bytes).Replace('+', '-').Replace('/', '_');
         }
     }
+
     public void AuthorizePlayer(string key, RealmPlayer player)
     {
         _browserPlayers.TryAdd(key, player);

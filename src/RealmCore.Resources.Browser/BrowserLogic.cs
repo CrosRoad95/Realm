@@ -11,7 +11,7 @@ namespace RealmCore.Resources.Browser;
 
 internal class BrowserLogic
 {
-    private readonly IBrowserService _BrowserService;
+    private readonly IBrowserService _browserService;
     private readonly ILogger<BrowserLogic> _logger;
     private readonly ILuaEventHub<IBrowserEventHub> _luaEventHub;
     private readonly FromLuaValueMapper _fromLuaValueMapper;
@@ -21,9 +21,9 @@ internal class BrowserLogic
     public BrowserLogic(MtaServer mtaServer, LuaEventService luaEventService, IBrowserService BrowserService,
         ILogger<BrowserLogic> logger, ILuaEventHub<IBrowserEventHub> luaEventHub, FromLuaValueMapper fromLuaValueMapper, IOptions<BrowserOptions> browserOptions)
     {
-        //luaEventService.AddEventHandler("internalBrowserCreated", HandleBrowserCreated);
+        luaEventService.AddEventHandler("internalBrowserCreated", HandleBrowserCreated);
         luaEventService.AddEventHandler("internalBrowserDocumentReady", HandleBrowserDocumentReady);
-        _BrowserService = BrowserService;
+        _browserService = BrowserService;
         _logger = logger;
         _luaEventHub = luaEventHub;
         _fromLuaValueMapper = fromLuaValueMapper;
@@ -64,13 +64,18 @@ internal class BrowserLogic
                 _luaEventHub.Invoke(toggleDevToolsMessages.Player, x => x.ToggleDevTools(toggleDevToolsMessages.Enabled));
                 break;
             case SetPathMessage setPathMessage:
-                _luaEventHub.Invoke(setPathMessage.Player, x => x.SetPath(setPathMessage.Path, setPathMessage.Force));
+                _luaEventHub.Invoke(setPathMessage.Player, x => x.SetPath(setPathMessage.Path));
                 break;
         }
     }
 
     private void HandleBrowserDocumentReady(LuaEvent luaEvent)
     {
-        _BrowserService.HandlePlayerBrowserReady(luaEvent.Player);
+        _browserService.RelayBrowserReady(luaEvent.Player);
+    }
+
+    private void HandleBrowserCreated(LuaEvent luaEvent)
+    {
+        _browserService.RelayBrowserStarted(luaEvent.Player);
     }
 }

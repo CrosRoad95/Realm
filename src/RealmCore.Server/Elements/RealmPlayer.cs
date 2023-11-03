@@ -1,6 +1,6 @@
 ﻿namespace RealmCore.Server.Elements;
 
-public class RealmPlayer : Player, IComponents
+public class RealmPlayer : Player, IComponents, IDisposable
 {
     private readonly IServiceProvider _serviceProvider;
     private readonly IServiceScope _serviceScope;
@@ -24,8 +24,7 @@ public class RealmPlayer : Player, IComponents
 
     private readonly Dictionary<string, DateTime> _bindsDownCooldown = new();
     private readonly Dictionary<string, DateTime> _bindsUpCooldown = new();
-    private readonly List<short> _enableFightFlags = new();
-    private readonly object _enableFightFlagsLock = new();
+    private readonly ConcurrentDictionary<int, bool> _enableFightFlags = new();
 
     public event Action<RealmPlayer, Element?>? FocusedElementChanged;
     public event Action<RealmPlayer, Element?>? ClickedElementChanged;
@@ -64,7 +63,11 @@ public class RealmPlayer : Player, IComponents
     {
         _serviceScope = serviceProvider.CreateScope();
         _serviceProvider = _serviceScope.ServiceProvider;
+        #region Initialize scope services
         _serviceProvider.GetRequiredService<PlayerContext>().Player = this;
+        _serviceProvider.GetRequiredService<IRealmBrowserService>();
+        #endregion
+
         Components = new(_serviceProvider, this);
         BindExecuted += HandleBindExecuted;
         IsNametagShowing = false;
@@ -151,33 +154,28 @@ public class RealmPlayer : Player, IComponents
 
     private void UpdateFight()
     {
-        Controls.FireEnabled = _enableFightFlags.Count != 0;
+        var canFight = _enableFightFlags.Count != 0;
+        Controls.FireEnabled = canFight;
+        Controls.AimWeaponEnabled = canFight;
+        GetRequiredService<ILogger>().LogInformation("Can fight {canFight}", canFight);
     }
 
-    public bool AddEnableFightFlag(short flag)
+    public bool AddEnableFightFlag(int flag)
     {
-        lock (_enableFightFlagsLock)
+        if (!_enableFightFlags.TryAdd(flag, true))
         {
-            if (!_enableFightFlags.Contains(flag))
-            {
-                _enableFightFlags.Add(flag);
-                UpdateFight();
-                return true;
-            }
+            UpdateFight();
+            return true;
         }
         return false;
     }
 
-    public bool RemoveEnableFightFlag(short flag)
+    public bool RemoveEnableFightFlag(int flag)
     {
-        lock (_enableFightFlagsLock)
+        if (_enableFightFlags.TryRemove(flag, out var _))
         {
-            if (_enableFightFlags.Contains(flag))
-            {
-                _enableFightFlags.Remove(flag);
-                UpdateFight();
-                return true;
-            }
+            UpdateFight();
+            return true;
         }
         return false;
     }
@@ -204,6 +202,7 @@ public class RealmPlayer : Player, IComponents
     {
         Spawn(position, rotation?.X ?? 0, 0, 0, 0);
         Camera.Target = this;
+        UpdateFight();
     }
 
     public async Task FadeCameraAsync(CameraFade cameraFade, float fadeTime = 0.5f, CancellationToken cancellationToken = default)
@@ -560,18 +559,13 @@ public class RealmPlayer : Player, IComponents
         }
     }
 
-    public override bool Destroy()
+    public void Dispose()
     {
-        if (base.Destroy())
-        {
-            Components.ComponentAdded -= HandleComponentAdded;
-            Components.ComponentDetached -= HandleComponentDetached;
-            _serviceScope.Dispose();
-            _cancellationTokenSource.Cancel();
-            _cancellationTokenSource.Dispose();
-            Components.Dispose();
-            return true;
-        }
-        return false;
+        Components.ComponentAdded -= HandleComponentAdded;
+        Components.ComponentDetached -= HandleComponentDetached;
+        _serviceScope.Dispose();
+        _cancellationTokenSource.Cancel();
+        _cancellationTokenSource.Dispose();
+        Components.Dispose();
     }
 }

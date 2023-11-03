@@ -20,9 +20,8 @@ internal sealed class BrowserGuiComponentLogic : ComponentLogic<BrowserGuiCompon
         if (_browserGuiService.TryGetKeyByPlayer(player, out var key))
         {
             var url = browserGuiComponent.Path;
-            var browserComponent = player.GetRequiredComponent<BrowserComponent>();
-            browserComponent.SetPath(url, false);
-            browserComponent.Visible = true;
+            var browserService = player.GetRequiredService<IRealmBrowserService>();
+            browserService.Open(url);
             _logger.LogInformation("Gui {guiPageType} opened", browserGuiComponent.GetType().Name);
         }
         browserGuiComponent.NavigationRequested += HandleNavigationRequested;
@@ -32,9 +31,9 @@ internal sealed class BrowserGuiComponentLogic : ComponentLogic<BrowserGuiCompon
     {
         browserGuiComponent.NavigationRequested -= HandleNavigationRequested;
         var player = (RealmPlayer)browserGuiComponent.Element;
-        var browserComponent = player.GetRequiredComponent<BrowserComponent>();
-        browserComponent.SetPath("/realmEmpty", false);
-        browserComponent.Visible = false;
+        var browserService = player.GetRequiredService<IRealmBrowserService>();
+        browserService.SetPath("/realmEmpty");
+        browserService.Close();
 
         _logger.LogInformation("Gui {guiPageType} closed", browserGuiComponent.GetType().Name);
     }

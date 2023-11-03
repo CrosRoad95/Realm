@@ -5,7 +5,7 @@ namespace RealmCore.Persistence;
 public static class ServiceCollectionExtensions
 {
     public static IServiceCollection AddPersistence<T>(this IServiceCollection services,
-        Action<DbContextOptionsBuilder> dbOptions, ServiceLifetime serviceLifetime = ServiceLifetime.Scoped) where T : DbContext, IDb
+        Action<DbContextOptionsBuilder> dbOptions) where T : DbContext, IDb
     {
         services.AddScoped<IVehicleRepository, VehicleRepository>();
         services.AddScoped<IGroupRepository, GroupRepository>();
@@ -24,7 +24,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<INewsRepository, NewsRepository>();
         services.AddScoped<ITransactionContext, TransactionContext>();
 
-        services.AddDbContext<IDb, T>(dbOptions, serviceLifetime);
+        services.AddDbContext<IDb, T>(dbOptions);
 
         return services;
     }

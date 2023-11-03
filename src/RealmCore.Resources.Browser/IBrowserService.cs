@@ -5,15 +5,16 @@ namespace RealmCore.Resources.Browser;
 
 public interface IBrowserService
 {
-    event Action<Player>? PlayerBrowserStarted;
-    event Action<Player>? PlayerBrowserStopped;
+    event Action<Player>? BrowserStarted;
+    event Action<Player>? BrowserStopped;
+    event Action<Player>? BrowserReady;
 
     Action<IMessage>? MessageHandler { get; set; }
-    Action<Player>? RelayPlayerBrowserReady { get; set; }
 
-    internal void HandlePlayerBrowserReady(Player player);
+    internal void RelayBrowserReady(Player player);
 
     void ToggleDevTools(Player player, bool enabled);
     void SetVisible(Player player, bool visible);
-    void SetPath(Player player, string path, bool force);
+    void SetPath(Player player, string path);
+    void RelayBrowserStarted(Player player);
 }

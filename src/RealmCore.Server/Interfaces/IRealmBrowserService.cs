@@ -1,0 +1,16 @@
+﻿
+namespace RealmCore.Server.Interfaces;
+
+public interface IRealmBrowserService
+{
+    bool IsVisible { get; }
+    bool Visible { get; set; }
+
+    event Action<string, bool>? PathChanged;
+    event Action<bool>? DevToolsStateChanged;
+    event Action<bool>? VisibleChanged;
+
+    void Close();
+    void Open(string path);
+    void SetPath(string path, bool clientSide = false);
+}

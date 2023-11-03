@@ -74,6 +74,24 @@ internal sealed class UsersService : IUsersService
         return await SignIn(player, userData);
     }
 
+    private async Task UpdateLastData(RealmPlayer player)
+    {
+        var userManager = player.GetRequiredService<UserManager<UserData>>();
+        var user = await userManager.GetUserById(player.GetUserId());
+        if (user != null)
+        {
+            user.LastLoginDateTime = _dateTimeProvider.Now;
+            var client = player.Client;
+            user.LastIp = client.IPAddress?.ToString();
+            user.LastSerial = client.Serial;
+            user.RegisterSerial ??= client.Serial;
+            user.RegisterIp ??= user.LastIp;
+            user.RegisteredDateTime ??= _dateTimeProvider.Now;;
+            user.Nick = player.Name;
+            await _userManager.UpdateAsync(user);
+        }
+    }
+
     public async Task<bool> SignIn(RealmPlayer player, UserData user)
     {
         if (player == null)
@@ -162,7 +180,7 @@ internal sealed class UsersService : IUsersService
             components.AddComponent<AFKComponent>();
             
             await _userLoginHistoryRepository.Add(user.Id, _dateTimeProvider.Now, player.Client.IPAddress?.ToString() ?? "", serial);
-            await TryUpdateLastNickName(player);
+            await UpdateLastData(player);
             SignedIn?.Invoke(player);
             return true;
 
@@ -212,6 +230,8 @@ internal sealed class UsersService : IUsersService
         components.TryDestroyComponent<UserComponent>();
         player.RemoveFromVehicle();
         player.Position = new Vector3(6000, 6000, 99999);
+        player.Interior = 0;
+        player.Dimension = 0;
         SignedOut?.Invoke(player);
     }
 
@@ -234,16 +254,6 @@ internal sealed class UsersService : IUsersService
         }
         foundPlayer = player;
         return true;
-    }
-
-    public async Task<bool> TryUpdateLastNickName(RealmPlayer player)
-    {
-        var newNick = player.Name;
-        if (player.TryGetComponent(out UserComponent userComponent) && userComponent.Nick != newNick)
-        {
-            return await _userManager.TryUpdateLastNickName(userComponent.Id, newNick);
-        }
-        return false;
     }
 
     public async Task<bool> UpdateLastNewsRead(RealmPlayer player)

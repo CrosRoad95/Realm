@@ -22,8 +22,8 @@ public abstract class Objective : IDisposable
 
     internal void LoadInternal(RealmPlayer player)
     {
-        Logger = player.ServiceProvider.GetRequiredService<ILogger>();
-        _elementFactory = player.ServiceProvider.GetRequiredService<IElementFactory>();
+        Logger = player.GetRequiredService<ILogger>();
+        _elementFactory = player.GetRequiredService<IElementFactory>();
         Load(player);
     }
 

@@ -39,9 +39,8 @@ public sealed class RegisterGuiComponent : DxGuiComponent
                     var userId = await _usersService.SignUp(registerData.Login, registerData.Password);
 
                     var player = (RealmPlayer)Element;
-                    var components = ((RealmPlayer)Element).Components;
-                    components.AddComponentWithDI<LoginGuiComponent>();
-                    components.DestroyComponent(this);
+                    player.AddComponentWithDI<LoginGuiComponent>();
+                    player.DestroyComponent(this);
                 }
                 catch (Exception ex)
                 {

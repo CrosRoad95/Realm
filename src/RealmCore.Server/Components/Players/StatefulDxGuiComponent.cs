@@ -35,7 +35,7 @@ public abstract class StatefulDxGuiComponent<TState> : StatefulDxGuiComponentBas
     protected void OpenGui()
     {
         PreGuiOpen(_state);
-        GuiOpened?.Invoke(this, _name, _cursorless, _state);
+        GuiOpened?.Invoke(this, _name, _cursorLess, _state);
     }
 
     private void FlushChanged()

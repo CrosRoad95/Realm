@@ -4,12 +4,10 @@ namespace RealmCore.Server.Logic;
 
 internal class GuiLogic
 {
-    private readonly IServiceProvider _serviceProvider;
     private readonly IElementCollection _elementCollection;
 
-    public GuiLogic(IServiceProvider serviceProvider, IElementCollection elementCollection, IGuiSystemService? guiSystemService = null)
+    public GuiLogic(IElementCollection elementCollection, IGuiSystemService? guiSystemService = null)
     {
-        _serviceProvider = serviceProvider;
         _elementCollection = elementCollection;
         if (guiSystemService != null)
             guiSystemService.GuiFilesChanged = HandleGuiFilesChanged;

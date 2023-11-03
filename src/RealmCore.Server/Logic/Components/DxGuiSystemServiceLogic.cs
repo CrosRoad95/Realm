@@ -4,19 +4,15 @@ namespace RealmCore.Server.Logic.Components;
 
 internal sealed class DxGuiSystemServiceLogic : ComponentLogic<DxGuiComponent>
 {
-    private readonly IElementFactory _elementFactory;
     private readonly IGuiSystemService? _guiSystemService;
     private readonly FromLuaValueMapper _fromLuaValueMapper;
     private readonly ILogger<DxGuiSystemServiceLogic> _logger;
-    private readonly IServiceProvider _serviceProvider;
     private ConcurrentDictionary<string, DxGuiComponent> _guiComponents = new();
 
-    public DxGuiSystemServiceLogic(IElementFactory elementFactory, FromLuaValueMapper fromLuaValueMapper, ILogger<DxGuiSystemServiceLogic> logger, IServiceProvider serviceProvider, IGuiSystemService? guiSystemService = null) : base(elementFactory)
+    public DxGuiSystemServiceLogic(IElementFactory elementFactory, FromLuaValueMapper fromLuaValueMapper, ILogger<DxGuiSystemServiceLogic> logger, IGuiSystemService? guiSystemService = null) : base(elementFactory)
     {
-        _elementFactory = elementFactory;
         _fromLuaValueMapper = fromLuaValueMapper;
         _logger = logger;
-        _serviceProvider = serviceProvider;
         if (guiSystemService != null)
         {
             guiSystemService.FormSubmitted += HandleFormSubmitted;
@@ -29,7 +25,7 @@ internal sealed class DxGuiSystemServiceLogic : ComponentLogic<DxGuiComponent>
     {
         if(_guiSystemService != null)
         {
-            _guiSystemService.OpenGui((RealmPlayer)dxGuiComponent.Element, dxGuiComponent.Name, dxGuiComponent.Cursorless);
+            _guiSystemService.OpenGui((RealmPlayer)dxGuiComponent.Element, dxGuiComponent.Name, dxGuiComponent.CursorLess);
             _guiComponents.TryAdd(dxGuiComponent.Name, dxGuiComponent);
         }
     }
@@ -39,7 +35,7 @@ internal sealed class DxGuiSystemServiceLogic : ComponentLogic<DxGuiComponent>
         if (_guiSystemService != null)
         {
             var player = (RealmPlayer)dxGuiComponent.Element;
-            _guiSystemService.CloseGui(player, dxGuiComponent.Name, dxGuiComponent.Cursorless);
+            _guiSystemService.CloseGui(player, dxGuiComponent.Name, dxGuiComponent.CursorLess);
             _guiComponents.TryRemove(dxGuiComponent.Name, out var _);
         }
     }
@@ -79,7 +75,7 @@ internal sealed class DxGuiSystemServiceLogic : ComponentLogic<DxGuiComponent>
                 var (id, guiName, formName, data) = luaEvent.Read<string, string, string, LuaValue>(_fromLuaValueMapper);
                 if (_guiComponents.TryGetValue(guiName, out DxGuiComponent dxGuiComponent))
                 {
-                    var formContext = new FormContext((RealmPlayer)luaEvent.Player, formName, data, _guiSystemService, _elementFactory, _serviceProvider);
+                    var formContext = new FormContext((RealmPlayer)luaEvent.Player, formName, data, _guiSystemService);
                     try
                     {
                         await dxGuiComponent.InternalHandleForm(formContext);

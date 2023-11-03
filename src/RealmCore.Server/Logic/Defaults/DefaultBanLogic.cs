@@ -18,8 +18,9 @@ public class DefaultBanLogic
         _mtaServer.PlayerJoined += HandlePlayerJoined;
     }
 
-    private async Task HandlePlayerJoinedCore(Player player)
+    private async Task HandlePlayerJoinedCore(Player plr)
     {
+        var player = (RealmPlayer)plr;
         var serial = player.Client.Serial;
         if (serial == null)
             player.Client.FetchSerial();
@@ -30,8 +31,7 @@ public class DefaultBanLogic
             return;
         }
 
-        using var scope = _serviceProvider.CreateScope();
-        var bans = await scope.ServiceProvider.GetRequiredService<IBanRepository>().GetBansBySerial(player.Client.Serial, _dateTimeProvider.Now, _gameplayOptions.CurrentValue.BanType);
+        var bans = await player.GetRequiredService<IBanRepository>().GetBansBySerial(player.Client.Serial, _dateTimeProvider.Now, _gameplayOptions.CurrentValue.BanType);
         if (bans != null && bans.Count > 0)
         {
             var ban = bans[0];
