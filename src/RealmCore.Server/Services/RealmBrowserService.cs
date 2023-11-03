@@ -68,10 +68,11 @@ public class RealmBrowserService : IRealmBrowserService, IDisposable
             return;
 
         var key = _browserGuiService.GenerateKey();
-        _browserGuiService.AuthorizePlayer(key, _player);
-
-        var url = $"/realmGuiInitialize?{_browserGuiService.KeyName}={key}";
-        SetPath(url, true);
+        if(_browserGuiService.AuthorizePlayer(key, _player))
+        {
+            var url = $"/realmGuiInitialize?{_browserGuiService.KeyName}={key}";
+            SetPath(url, true);
+        }
     }
 
     public void SetPath(string path, bool clientSide = false)

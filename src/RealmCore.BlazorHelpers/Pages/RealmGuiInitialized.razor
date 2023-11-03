@@ -5,9 +5,13 @@
 @inherits RealmGuiComponentBase
 
 @code {
-    protected override void OnInitialized()
+    protected override void OnAfterRender(bool firstRender)
     {
-        _realmLogger.Service.LogInformation("Realm gui initialized");
-        CurrentPlayerContext.BrowserGuiService.RelayPlayerLoggedIn(CurrentPlayerContext.Player);
+        if (firstRender)
+        {
+            _realmLogger.Service.LogInformation("Realm gui initialized");
+            CurrentPlayerContext.BrowserGuiService.RelayPlayerLoggedIn(CurrentPlayerContext.Player);
+        }
+        base.OnAfterRender(firstRender);
     }
 }

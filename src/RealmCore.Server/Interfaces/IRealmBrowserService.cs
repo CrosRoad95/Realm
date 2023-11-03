@@ -5,6 +5,7 @@ public interface IRealmBrowserService
 {
     bool IsVisible { get; }
     bool Visible { get; set; }
+    bool DevTools { get; set; }
 
     event Action<string, bool>? PathChanged;
     event Action<bool>? DevToolsStateChanged;

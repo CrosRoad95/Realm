@@ -32,16 +32,16 @@ internal class BrowserGuiService : IBrowserGuiService
         }
     }
 
-    public void AuthorizePlayer(string key, RealmPlayer player)
+    public bool AuthorizePlayer(string key, RealmPlayer player)
     {
-        _browserPlayers.TryAdd(key, player);
+        return _browserPlayers.TryAdd(key, player);
     }
 
-    public void UnauthorizePlayer(RealmPlayer player)
+    public bool UnauthorizePlayer(RealmPlayer player)
     {
         var itemsToRemove = _browserPlayers.Where(x => x.Value == player).FirstOrDefault();
 
-        _browserPlayers.TryRemove(itemsToRemove.Key, out var _);
+        return _browserPlayers.TryRemove(itemsToRemove.Key, out var _);
     }
     
     public bool TryGetKeyByPlayer(RealmPlayer player, out string? key)

@@ -6,6 +6,7 @@ using RealmCore.Server.Components.Vehicles.Access;
 using RealmCore.Resources.Overlay;
 using RealmCore.Resources.Assets;
 using RealmCore.Sample.Components.Vehicles;
+using RealmCore.Resources.Browser;
 
 namespace RealmCore.Sample.Logic;
 
@@ -1147,14 +1148,14 @@ internal sealed class CommandsLogic
         //    levelComponent.LevelChanged -= handleLevelChanged;
         //});
 
-        //_commandService.AddCommandHandler("browserdevtools", (player, args) =>
-        //{
-        //    var adminComponent = player.GetRequiredComponent<AdminComponent>();
-        //    var browserComponent = player.GetRequiredComponent<BrowserComponent>();
-        //    adminComponent.DevelopmentMode = true;
-        //    browserComponent.DevTools = !browserComponent.DevTools;
-        //    _chatBox.OutputTo(player, $"Devtools {browserComponent.DevTools}");
-        //}, null);
+        _commandService.AddCommandHandler("devtools", (player, args) =>
+        {
+            var adminComponent = player.GetRequiredComponent<AdminComponent>();
+            var browserComponent = player.GetRequiredService<IRealmBrowserService>();
+            adminComponent.DevelopmentMode = true;
+            browserComponent.DevTools = !browserComponent.DevTools;
+            _chatBox.OutputTo(player, $"Devtools {browserComponent.DevTools}");
+        }, null);
 
         //_commandService.AddCommandHandler("browserpath", (player, args) =>
         //{
