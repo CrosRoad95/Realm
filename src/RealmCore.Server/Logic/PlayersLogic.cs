@@ -1,4 +1,6 @@
-﻿namespace RealmCore.Server.Logic;
+﻿using System.Threading.Tasks;
+
+namespace RealmCore.Server.Logic;
 
 internal sealed class PlayersLogic
 {
@@ -30,26 +32,26 @@ internal sealed class PlayersLogic
 
         var taskWaitForScreenSize = new TaskCompletionSource<(int, int)>();
         var taskWaitForCultureInfo = new TaskCompletionSource<CultureInfo>();
-        void HandleClientScreenSizeChanged(Player player2, int x, int y)
+        void handleClientScreenSizeChanged(Player player2, int x, int y)
         {
             if (player2 == player)
             {
-                _clientInterfaceService.ClientScreenSizeChanged -= HandleClientScreenSizeChanged;
+                _clientInterfaceService.ClientScreenSizeChanged -= handleClientScreenSizeChanged;
                 taskWaitForScreenSize.SetResult((x, y));
             }
         }
 
-        void HandleClientCultureInfoChanged(Player player2, CultureInfo cultureInfo)
+        void handleClientCultureInfoChanged(Player player2, CultureInfo cultureInfo)
         {
             if (player2 == player)
             {
-                _clientInterfaceService.ClientCultureInfoChanged -= HandleClientCultureInfoChanged;
+                _clientInterfaceService.ClientCultureInfoChanged -= handleClientCultureInfoChanged;
                 taskWaitForCultureInfo.SetResult(cultureInfo);
             }
         }
 
-        _clientInterfaceService.ClientScreenSizeChanged += HandleClientScreenSizeChanged;
-        _clientInterfaceService.ClientCultureInfoChanged += HandleClientCultureInfoChanged;
+        _clientInterfaceService.ClientScreenSizeChanged += handleClientScreenSizeChanged;
+        _clientInterfaceService.ClientCultureInfoChanged += handleClientCultureInfoChanged;
 
         try
         {
@@ -66,6 +68,13 @@ internal sealed class PlayersLogic
             _playerResources.TryRemove(player, out var _);
         }
 
+        var timeoutTask = Task.Delay(3_000);
+        var completedTask = await Task.WhenAny(Task.WhenAll(taskWaitForScreenSize.Task, taskWaitForCultureInfo.Task), timeoutTask);
+        if (completedTask == timeoutTask)
+        {
+            player.Kick("Failed to get culture and screen size");
+            return;
+        }
         var screenSize = await taskWaitForScreenSize.Task;
         var cultureInfo = await taskWaitForCultureInfo.Task;
 

@@ -12,8 +12,7 @@ internal sealed class BoneAttachResourceLogic : ComponentLogic<AttachedElementCo
     protected override void ComponentAdded(AttachedElementComponent attachedElementComponent)
     {
         var element = attachedElementComponent.AttachedElement;
-        var ped = (Ped)element;
-        _boneAttachService.Attach(element, ped, attachedElementComponent.BoneId, attachedElementComponent.PositionOffset, attachedElementComponent.RotationOffset);
+        _boneAttachService.Attach(attachedElementComponent.AttachedElement, (Ped)attachedElementComponent.Element, attachedElementComponent.BoneId, attachedElementComponent.PositionOffset, attachedElementComponent.RotationOffset);
         element.AreCollisionsEnabled = false;
         attachedElementComponent.Detached += HandleDetachedFromElement;
     }

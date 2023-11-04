@@ -135,6 +135,7 @@ public class RealmCommandServiceTests
         var player1 = realmTestingServer.CreatePlayer(name: "CrosRoad95");
         var player2 = realmTestingServer.CreatePlayer(name: "Index00");
         await realmTestingServer.SignInPlayer(player1);
+        await realmTestingServer.SignInPlayer(player2);
 
         bool commandExecutedSuccessfully = false;
         sut.AddCommandHandler("foo", (e, args) => {

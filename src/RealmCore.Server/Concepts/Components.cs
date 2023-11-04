@@ -101,7 +101,7 @@ public sealed class Components : IDisposable
             if (component is IComponentLifecycle componentLifecycle)
                 componentLifecycle.Attach();
         }
-        catch (Exception)
+        catch (Exception ex)
         {
             component.Element = null!;
             _components.Remove(component);

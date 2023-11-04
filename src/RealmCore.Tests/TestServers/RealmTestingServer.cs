@@ -36,7 +36,7 @@ internal class TestResourceProvider : IResourceProvider
 
     public IEnumerable<Resource> GetResources()
     {
-        throw new NotImplementedException();
+        yield break;
     }
 
     public void Refresh()
@@ -66,8 +66,8 @@ internal class RealmTestingServer : TestingServer<RealmTestingPlayer>
 
         resourceProvider.Setup(x => x.Refresh());
 
-        var saveServiceMock = new Mock<ISaveService>(MockBehavior.Strict);
-        saveServiceMock.Setup(x => x.SaveNewPlayerInventory(It.IsAny<InventoryComponent>(), It.IsAny<int>())).ReturnsAsync(1);
+        //var saveServiceMock = new Mock<ISaveService>(MockBehavior.Strict);
+        //saveServiceMock.Setup(x => x.SaveNewPlayerInventory(It.IsAny<InventoryComponent>(), It.IsAny<int>())).ReturnsAsync(1);
         var guiSystemServiceMock = new Mock<IGuiSystemService>(MockBehavior.Strict);
         serverBuilder.ConfigureServer(testConfigurationProvider ?? new(), SlipeServer.Server.ServerBuilders.ServerBuilderDefaultBehaviours.None);
         serverBuilder.AddBrowserResource();
@@ -86,7 +86,7 @@ internal class RealmTestingServer : TestingServer<RealmTestingPlayer>
                 options.BaseRemoteUrl = "https://localhost:7149";
                 options.RequestWhitelistUrl = "localhost";
             });
-            services.AddSingleton(saveServiceMock.Object);
+            //services.AddSingleton(saveServiceMock.Object);
             services.AddSingleton<TestResourceProvider>();
             services.AddSingleton<IResourceProvider>(x => x.GetRequiredService<TestResourceProvider>());
             services.AddSingleton<IServerFilesProvider, NullServerFilesProvider>();
@@ -114,10 +114,18 @@ internal class RealmTestingServer : TestingServer<RealmTestingPlayer>
 
         player.Name = name;
         player.TriggerResourceStarted(420);
-        player.ScreenSize = new Vector2(1920, 1080);
-        player.CultureInfo = new System.Globalization.CultureInfo("pl-PL");
+        //player.ScreenSize = new Vector2(1920, 1080);
+        //player.CultureInfo = new System.Globalization.CultureInfo("pl-PL");
+        player.TriggerLuaEvent("sendScreenSize", player, "id", 1920, 1080);
+        player.TriggerLuaEvent("sendLocalizationCode", player, "id", "pl-PL");
+        player.ResourceStarted += HandleResourceStarted;
 
         return player;
+    }
+
+    private void HandleResourceStarted(Player sender, SlipeServer.Server.Elements.Events.PlayerResourceStartedEventArgs e)
+    {
+        throw new NotImplementedException();
     }
 
     public RealmObject CreateObject()

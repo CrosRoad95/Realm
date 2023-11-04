@@ -205,7 +205,7 @@ public class ElementsComponentsTests
         using var elementMonitor = player.Components.Monitor();
         using var componentMonitor = component.Monitor();
         player.AddComponent(component);
-        player.Destroy();
+        player.TriggerDisconnected(SlipeServer.Server.Enums.QuitReason.Quit);
         #endregion
 
         #region Act

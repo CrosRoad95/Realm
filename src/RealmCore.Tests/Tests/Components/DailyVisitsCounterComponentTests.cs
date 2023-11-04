@@ -27,17 +27,8 @@ public class DailyVisitsCounterComponentTests
             _record = record;
         };
 
-        dailyVisitsCounterComponent.VisitsInRow.Should().Be(0);
-        dailyVisitsCounterComponent.VisitsInRowRecord.Should().Be(0);
-
-        testDateTimeProvider.AddOffset(TimeSpan.FromDays(1));
-        dailyVisitsCounterComponent.Update(testDateTimeProvider.Now);
-
         dailyVisitsCounterComponent.VisitsInRow.Should().Be(1);
         dailyVisitsCounterComponent.VisitsInRowRecord.Should().Be(1);
-        _day.Should().Be(1);
-        _reset.Should().BeFalse();
-        _record.Should().Be(1);
 
         testDateTimeProvider.AddOffset(TimeSpan.FromDays(1));
         dailyVisitsCounterComponent.Update(testDateTimeProvider.Now);
@@ -48,13 +39,22 @@ public class DailyVisitsCounterComponentTests
         _reset.Should().BeFalse();
         _record.Should().Be(2);
 
+        testDateTimeProvider.AddOffset(TimeSpan.FromDays(1));
+        dailyVisitsCounterComponent.Update(testDateTimeProvider.Now);
+
+        dailyVisitsCounterComponent.VisitsInRow.Should().Be(3);
+        dailyVisitsCounterComponent.VisitsInRowRecord.Should().Be(3);
+        _day.Should().Be(3);
+        _reset.Should().BeFalse();
+        _record.Should().Be(3);
+
         testDateTimeProvider.AddOffset(TimeSpan.FromDays(2));
         dailyVisitsCounterComponent.Update(testDateTimeProvider.Now);
 
         dailyVisitsCounterComponent.VisitsInRow.Should().Be(0);
-        dailyVisitsCounterComponent.VisitsInRowRecord.Should().Be(2);
+        dailyVisitsCounterComponent.VisitsInRowRecord.Should().Be(3);
         _day.Should().Be(0);
         _reset.Should().BeTrue();
-        _record.Should().Be(2);
+        _record.Should().Be(3);
     }
 }

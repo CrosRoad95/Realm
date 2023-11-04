@@ -267,13 +267,18 @@ internal sealed class UsersService : IUsersService
         return false;
     }
 
-    public IEnumerable<RealmPlayer> SearchPlayersByName(string pattern)
+    public IEnumerable<RealmPlayer> SearchPlayersByName(string pattern, bool loggedIn = true)
     {
         foreach (var player in _elementCollection.GetByType<RealmPlayer>())
         {
-            if(player.IsLoggedIn)
-                if(player.Name.Contains(pattern.ToLower(), StringComparison.CurrentCultureIgnoreCase))
-                    yield return player;
+            if (loggedIn)
+            {
+                if (!player.IsLoggedIn)
+                    continue;
+            }
+                
+            if(player.Name.Contains(pattern.ToLower(), StringComparison.CurrentCultureIgnoreCase))
+                yield return player;
         }
     }
 

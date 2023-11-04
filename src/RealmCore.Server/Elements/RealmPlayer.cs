@@ -162,7 +162,7 @@ public class RealmPlayer : Player, IComponents, IDisposable
 
     public bool AddEnableFightFlag(int flag)
     {
-        if (!_enableFightFlags.TryAdd(flag, true))
+        if (_enableFightFlags.TryAdd(flag, true))
         {
             UpdateFight();
             return true;

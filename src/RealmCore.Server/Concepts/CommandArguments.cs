@@ -147,10 +147,10 @@ public class CommandArguments
         throw new CommandArgumentException(_index, "Liczba jest poza zakresem", value);
     }
 
-    public RealmPlayer ReadPlayer()
+    public RealmPlayer ReadPlayer(bool loggedIn = true)
     {
         var name = ReadArgument();
-        var users = _usersService.SearchPlayersByName(name).ToList();
+        var users = _usersService.SearchPlayersByName(name, loggedIn).ToList();
         if (users.Count == 1)
             return users[0];
         if(users.Count > 0)

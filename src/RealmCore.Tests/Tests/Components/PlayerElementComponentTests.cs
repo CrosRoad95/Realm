@@ -1,4 +1,5 @@
 ﻿using SlipeServer.Server.Elements.Enums;
+using SlipeServer.Server.Enums;
 
 namespace RealmCore.Tests.Tests.Components;
 
@@ -128,7 +129,7 @@ public class PlayerElementComponentTests
         var _ = Task.Run(async () =>
         {
             await Task.Delay(100);
-            player.Destroy();
+            player.TriggerDisconnected(QuitReason.Quit);
         });
         #endregion
 

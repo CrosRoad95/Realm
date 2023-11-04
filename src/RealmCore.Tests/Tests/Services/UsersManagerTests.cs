@@ -104,7 +104,7 @@ public class UsersManagerTests
         #endregion
 
         #region Act
-        var found = usersService.SearchPlayersByName(pattern);
+        var found = usersService.SearchPlayersByName(pattern, false);
         #endregion
 
         #region Assert
