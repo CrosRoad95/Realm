@@ -25,4 +25,55 @@ public static class ElementExtensions
         Interior = element.Interior,
         Dimension = element.Dimension,
     };
+
+    public static TComponent GetRequiredComponent<TComponent>(this Element element) where TComponent : IComponent
+    {
+        return ((IComponents)element).GetRequiredComponent<TComponent>();
+    }
+
+    public static bool TryDestroyComponent<TComponent>(this Element element) where TComponent : IComponent
+    {
+        return ((IComponents)element).TryDestroyComponent<TComponent>();
+    }
+
+    public static void DestroyComponent<TComponent>(this Element element) where TComponent : IComponent
+    {
+        ((IComponents)element).DestroyComponent<TComponent>();
+    }
+
+    public static void DestroyComponent<TComponent>(this Element element, TComponent component) where TComponent : IComponent
+    {
+        ((IComponents)element).DestroyComponent(component);
+    }
+
+    public static bool TryGetComponent<TComponent>(this Element element, out TComponent component) where TComponent : IComponent
+    {
+        if (((IComponents)element).TryGetComponent(out TComponent tempComponent))
+        {
+            component = tempComponent;
+            return true;
+        }
+        component = default!;
+        return false;
+    }
+
+    public static bool HasComponent<TComponent>(this Element element) where TComponent : IComponent
+    {
+        return ((IComponents)element).HasComponent<TComponent>();
+    }
+
+    public static TComponent AddComponent<TComponent>(this Element element) where TComponent : IComponent, new()
+    {
+        return ((IComponents)element).AddComponent<TComponent>();
+    }
+
+    public static TComponent AddComponent<TComponent>(this Element element, TComponent component) where TComponent : IComponent
+    {
+        return ((IComponents)element).AddComponent(component);
+    }
+
+    public static TComponent AddComponentWithDI<TComponent>(this Element element, params object[] parameters) where TComponent : IComponent
+    {
+        return ((IComponents)element).AddComponentWithDI<TComponent>(parameters);
+    }
 }

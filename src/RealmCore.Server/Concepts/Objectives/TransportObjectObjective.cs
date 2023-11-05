@@ -1,23 +1,33 @@
-﻿namespace RealmCore.Server.Concepts.Objectives;
+﻿using SlipeServer.Server.Elements;
+
+namespace RealmCore.Server.Concepts.Objectives;
 
 public class TransportObjectObjective : Objective
 {
     private readonly Element? _element;
-    private readonly Vector3 _position;
-    private readonly bool _createMarker;
+    private readonly Vector3 _destination;
+    private readonly float _range;
     private RealmMarker? _marker;
+    private bool _loaded = false;
     private IElementCollection _elementCollection = default!;
+    private IScopedElementFactory _scopedElementFactory = default!;
     public Func<Element, bool>? CheckElement { get; set; }
 
-    public override Vector3 Position => _position;
+    public override Vector3 Position => _destination;
 
-    public TransportObjectObjective(Element element, Vector3 position, bool createMarker = true)
+    public TransportObjectObjective(Element element, Vector3 destination, float range = 2)
     {
         _element = element;
-        _position = position;
-        _createMarker = createMarker;
+        _destination = destination;
+        _range = range;
 
         _element.Destroyed += HandleDestroyed;
+    }
+
+    public TransportObjectObjective(Vector3 destination, float range = 2)
+    {
+        _destination = destination;
+        _range = range;
     }
 
     private void HandleDestroyed(Element element)
@@ -29,69 +39,73 @@ public class TransportObjectObjective : Objective
         }
     }
 
-    public TransportObjectObjective(Vector3 position, bool createMarker = true)
+    public void WithMarker()
     {
-        _position = position;
-        _createMarker = createMarker;
+        if (!_loaded)
+            throw new InvalidOperationException();
     }
 
-    protected override void Load(RealmPlayer player)
+    protected override void Load()
     {
-        var elementFactory = player.GetRequiredService<IElementFactory>();
-        _elementCollection = player.GetRequiredService<IElementCollection>();
-        // TODO: Create marker
-    }
-
-    private void HandleElementEntered(Element element)
-    {
-        if (element is not IComponents components)
-            return;
-
-        if (components.TryGetComponent(out OwnerComponent ownerComponent))
-        {
-            if (ownerComponent.OwningElement == element)
-            {
-                if (CheckElement != null)
-                {
-                    if (CheckElement(element))
-                    {
-                        Complete(this, element);
-                        return;
-                    }
-                }
-                Complete(this, element);
-            }
-        }
+        _elementCollection = Player.GetRequiredService<IElementCollection>();
+        _scopedElementFactory = Player.GetRequiredService<IScopedElementFactory>();
+        _loaded = true;
     }
 
     public override void Update()
     {
-        if (_marker == null)
-            return;
-
         if (_element == null)
         {
-            var elements = _elementCollection.GetWithinRange(_marker.Position, _marker.CollisionShape.Radius);
-            foreach (var element in elements)
-                _marker.CollisionShape.CheckElementWithin(element);
+            var elementsInRange = _elementCollection.GetWithinRange(_destination, _range);
+            foreach (var element in elementsInRange)
+            {
+                if (element.TryGetComponent(out OwnerComponent ownerComponent))
+                {
+                    if (ownerComponent.OwningElement == Player)
+                    {
+                        if (element.TryGetComponent(out LiftableWorldObjectComponent liftableWorldObjectComponent))
+                        {
+                            if (liftableWorldObjectComponent.Owner == null)
+                                Complete(this, element);
+                        }
+                        else
+                            Complete(this, element);
+                    }
+                }
+            }
+            foreach (var element in _scopedElementFactory.CreatedElements.ToList())
+            {
+                if (element.TryGetComponent(out OwnerComponent ownerComponent))
+                {
+                    if (ownerComponent.OwningElement == Player)
+                    {
+                        if (element.TryGetComponent(out LiftableWorldObjectComponent liftableWorldObjectComponent))
+                        {
+                            if (liftableWorldObjectComponent.Owner == null)
+                                Complete(this, element);
+                        }
+                        else
+                            Complete(this, element);
+                    }
+                }
+            }
         }
         else
         {
-            if(_element is IComponents components && components.TryGetComponent(out LiftableWorldObjectComponent liftableWorldObjectComponent))
+            if(Vector3.DistanceSquared(_element.Position, _destination) <= (_range * _range))
             {
-                if (liftableWorldObjectComponent.Owner == null) // Accept only dropped elements.
-                    _marker.CollisionShape.CheckElementWithin(_element);
-            }
-            else
-            {
-                _marker.CollisionShape.CheckElementWithin(_element);
+                if(_element.TryGetComponent(out LiftableWorldObjectComponent liftableWorldObjectComponent))
+                    if (liftableWorldObjectComponent.Owner == null)
+                        Complete(this, _element);
             }
         }
     }
 
     public override void Dispose()
     {
-        _marker?.Destroy();
+        if (_marker != null && _marker.Destroy())
+            _marker = null;
+
         CheckElement = null;
         base.Dispose();
     }

@@ -1,9 +1,10 @@
 ﻿namespace RealmCore.Server.Elements;
 
-public class RealmCollisionCircle : CollisionCircle, IComponents
+public class RealmCollisionCircle : CollisionCircle, IComponents, ICollisionDetection
 {
     public Concepts.Components Components { get; private set; }
     public Concepts.CollisionDetection<RealmCollisionCircle> CollisionDetection { get; private set; }
+    public CollisionDetection InternalCollisionDetection => CollisionDetection;
 
     public RealmCollisionCircle(IServiceProvider serviceProvider, Vector2 position, float radius) : base(position, radius)
     {

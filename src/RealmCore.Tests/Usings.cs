@@ -28,7 +28,6 @@ global using Microsoft.Extensions.Logging;
 global using RealmCore.Persistence;
 global using RealmCore.Persistence.Interfaces;
 global using RealmCore.Tests.Extensions;
-global using SlipeServer.Server.ElementCollections;
 global using System.Numerics;
 global using RealmCore.Server.Components.Vehicles;
 global using RealmCore.Server.Concepts.Upgrades;

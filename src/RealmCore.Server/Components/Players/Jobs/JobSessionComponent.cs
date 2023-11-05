@@ -8,16 +8,25 @@ public abstract class JobSessionComponent : SessionComponent, IUpdateCallback
     private readonly List<Objective> _objectives = new();
     private int _completedObjectives = 0;
     private bool _disposing = false;
+    private IScopedElementFactory? _elementFactory;
 
     public IEnumerable<Objective> Objectives => _objectives;
     public int CompletedObjectives => _completedObjectives;
     public event Action<JobSessionComponent>? CompletedAllObjectives;
     public event Action<JobSessionComponent, Objective>? ObjectiveAdded;
     public event Action<JobSessionComponent, Objective>? ObjectiveCompleted;
-    public event Action<JobSessionComponent, Objective>? ObjectiveIncompleted;
+    public event Action<JobSessionComponent, Objective>? ObjectiveInCompleted;
+    protected IScopedElementFactory ElementFactory => _elementFactory ?? throw new InvalidOperationException();
+    public IScopedElementFactory InternalElementFactory => _elementFactory ?? throw new InvalidOperationException();
     public JobSessionComponent()
     {
 
+    }
+
+    public override void Attach()
+    {
+        _elementFactory = this.GetRequiredService<IScopedElementFactory>().CreateScope();
+        base.Attach();
     }
 
     protected bool RemoveObjective(Objective objective)
@@ -68,13 +77,15 @@ public abstract class JobSessionComponent : SessionComponent, IUpdateCallback
 
     private void HandleInCompleted(Objective objective)
     {
-        ObjectiveIncompleted?.Invoke(this, objective);
+        ObjectiveInCompleted?.Invoke(this, objective);
         objective.Dispose();
     }
 
     public override void Detach()
     {
         _disposing = true;
+
+        _elementFactory?.Dispose();
 
         lock (_objectivesLock)
         {

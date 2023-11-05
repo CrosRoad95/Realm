@@ -1,9 +1,10 @@
 ﻿namespace RealmCore.Server.Elements;
 
-public class RealmCollisionRectangle : CollisionRectangle, IComponents
+public class RealmCollisionRectangle : CollisionRectangle, IComponents, ICollisionDetection
 {
     public Concepts.Components Components { get; private set; }
     public CollisionDetection<RealmCollisionRectangle> CollisionDetection { get; private set; }
+    public CollisionDetection InternalCollisionDetection => CollisionDetection;
 
     public RealmCollisionRectangle(IServiceProvider serviceProvider, Vector2 position, Vector2 dimensions) : base(position, dimensions)
     {

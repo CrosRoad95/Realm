@@ -1,17 +1,38 @@
 ﻿namespace RealmCore.Server.Elements;
 
-public class RealmMarker : Marker, IComponents
+public class RealmMarker : Marker, IComponents, ICollisionDetection
 {
+    public event Action<Element>? ElementEntered;
+    public event Action<Element>? ElementLeft;
+
     public Concepts.Components Components { get; private set; }
     public CollisionSphere CollisionShape { get; private set; }
     public CollisionDetection<RealmMarker> CollisionDetection { get; private set; }
+    public CollisionDetection InternalCollisionDetection => CollisionDetection;
 
     public RealmMarker(IServiceProvider serviceProvider, Vector3 position, MarkerType markerType, float size) : base(position, markerType)
     {
         Size = size;
         Components = new(serviceProvider, this);
         CollisionDetection = new(serviceProvider, this);
-        CollisionShape = new CollisionSphere(position, size); 
+        CollisionShape = new CollisionSphere(position, size);
+        CollisionShape.ElementEntered += HandleElementEntered;
+        CollisionShape.ElementLeft += HandleElementLeft;
+    }
+
+    private void HandleElementLeft(Element leftElement)
+    {
+        ElementLeft?.Invoke(leftElement);
+    }
+
+    private void HandleElementEntered(Element enteredElement)
+    {
+        ElementEntered?.Invoke(enteredElement);
+    }
+
+    public void CheckElementWithin(Element element)
+    {
+        CollisionShape.CheckElementWithin(element);
     }
 
     public TComponent GetRequiredComponent<TComponent>() where TComponent : IComponent

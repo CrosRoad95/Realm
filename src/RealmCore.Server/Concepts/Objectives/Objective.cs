@@ -4,7 +4,8 @@ public abstract class Objective : IDisposable
 {
     private bool _isFulfilled = false;
     private RealmPlayer? _player;
-    private IElementFactory? _elementFactory;
+    private IScopedElementFactory? _elementFactory;
+    protected IScopedElementFactory ElementFactory => _elementFactory ?? throw new InvalidOperationException();
 
     public bool IsFulfilled => _isFulfilled;
 
@@ -17,14 +18,14 @@ public abstract class Objective : IDisposable
     private Blip? _blip;
     public abstract Vector3 Position { get; }
     protected ILogger Logger { get; set; } = default!;
-    protected abstract void Load(RealmPlayer player);
+    protected abstract void Load();
     public virtual void Update() { }
 
-    internal void LoadInternal(RealmPlayer player)
+    internal void LoadInternal(RealmPlayer player, IScopedElementFactory scopedElementFactory)
     {
         Logger = player.GetRequiredService<ILogger>();
-        _elementFactory = player.GetRequiredService<IElementFactory>();
-        Load(player);
+        _elementFactory = scopedElementFactory;
+        Load();
     }
 
     protected void Complete(Objective objective, object? data = null)
@@ -34,8 +35,6 @@ public abstract class Objective : IDisposable
 
         if (_isFulfilled)
             throw new ObjectiveAlreadyFulfilledException();
-
-        RemoveBlip();
 
         Completed?.Invoke(objective, data);
         _isFulfilled = true;
@@ -49,8 +48,6 @@ public abstract class Objective : IDisposable
         if (_isFulfilled)
             throw new ObjectiveAlreadyFulfilledException();
 
-        RemoveBlip();
-
         InCompleted?.Invoke(objective);
         _isFulfilled = true;
     }
@@ -60,7 +57,7 @@ public abstract class Objective : IDisposable
         if (_blip != null)
             throw new InvalidOperationException();
 
-        // TODO:
+        _blip = ElementFactory.CreateBlip(Position, blipIcon);
     }
 
     public void RemoveBlip()

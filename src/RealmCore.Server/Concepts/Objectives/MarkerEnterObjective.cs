@@ -4,7 +4,7 @@ public class MarkerEnterObjective : Objective
 {
     private readonly Vector3 _position;
 
-    private RealmMarker _marker = default!;
+    private RealmMarker? _marker;
 
     public override Vector3 Position => _position;
 
@@ -13,34 +13,25 @@ public class MarkerEnterObjective : Objective
         _position = position;
     }
 
-    protected override void Load(RealmPlayer player)
+    protected override void Load()
     {
-        // TODO:
-        //_playerEntity = playerEntity;
-        //var elementFactory = serviceProvider.GetRequiredService<IElementFactory>();
-        //using var scopedelementFactory = elementFactory.CreateScopedelementFactory(playerEntity);
-        //scopedelementFactory.CreateMarker(MarkerType.Arrow, _position, Color.White);
-        //_markerElementComponent = scopedelementFactory.GetLastCreatedComponent<PlayerPrivateElementComponent<MarkerElementComponent>>();
-        //scopedelementFactory.CreateCollisionSphere(_position, 2);
-        //_collisionSphereElementComponent = scopedelementFactory.GetLastCreatedComponent<PlayerPrivateElementComponent<CollisionSphereElementComponent>>();
-        //_collisionSphereElementComponent.ElementComponent.ElementEntered += HandleElementEntered;
+        _marker = ElementFactory.CreateMarker(_position, MarkerType.Arrow, Color.White);
+        _marker.CollisionDetection.Entered += HandleEntered;
     }
 
-    private void HandleElementEntered(Element element)
+    private void HandleEntered(RealmMarker marker, Element enteredElement)
     {
-        if (Player == element)
+        if (Player == enteredElement)
             Complete(this);
-    }
-
-    public override void Update()
-    {
-        _marker.CollisionShape.CheckElementWithin(Player);
     }
 
     public override void Dispose()
     {
-        if (_marker != null)
-            _marker.Destroy();
+        if(_marker != null)
+        {
+            _marker.CollisionDetection.Entered -= HandleEntered;
+            _marker?.Destroy();
+        }
         base.Dispose();
     }
 }

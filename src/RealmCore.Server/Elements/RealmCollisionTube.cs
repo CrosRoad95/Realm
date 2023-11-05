@@ -1,9 +1,10 @@
 ﻿namespace RealmCore.Server.Elements;
 
-public class RealmCollisionTube : CollisionTube
+public class RealmCollisionTube : CollisionTube, IComponents, ICollisionDetection
 {
     public Concepts.Components Components { get; private set; }
-    public Concepts.CollisionDetection<RealmCollisionTube> CollisionDetection { get; private set; }
+    public CollisionDetection<RealmCollisionTube> CollisionDetection { get; private set; }
+    public CollisionDetection InternalCollisionDetection => CollisionDetection;
 
     public RealmCollisionTube(IServiceProvider serviceProvider, Vector3 position, float Radius, float Height) : base(position, Radius, Height)
     {

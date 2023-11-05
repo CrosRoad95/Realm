@@ -1,6 +1,4 @@
-﻿using SlipeServer.Server.Elements.ColShapes;
-
-namespace RealmCore.Server.Elements;
+﻿namespace RealmCore.Server.Elements;
 
 internal sealed class InnerScopedElementFactory : ScopedElementFactory
 {
@@ -12,16 +10,14 @@ internal sealed class InnerScopedElementFactory : ScopedElementFactory
 internal class ScopedElementFactory : IScopedElementFactory
 {
     private readonly RealmPlayer _player;
-    private Element? _lastCreatedElement;
     private bool _disposed;
     public event Action<ScopedElementFactory>? Disposed;
     public event Action<Element>? ElementCreated;
     private readonly object _lock = new();
     private readonly List<Element> _createdElements = new();
-    private readonly List<CollisionShape> _collisionShapes = new();
+    private readonly List<ICollisionDetection> _collisionDetection = new();
     private readonly ScopedMapIdGenerator _elementIdGenerator;
 
-    public Element? LastCreatedElement => _lastCreatedElement ?? throw new NullReferenceException();
     public IEnumerable<Element> CreatedElements
     {
         get
@@ -36,13 +32,13 @@ internal class ScopedElementFactory : IScopedElementFactory
         }
     }
 
-    public IEnumerable<CollisionShape> CollisionShapes
+    public IEnumerable<ICollisionDetection> CreatedCollisionDetectionElements
     {
         get
         {
             lock (_lock)
             {
-                foreach (var collisionShape in _collisionShapes)
+                foreach (var collisionShape in _collisionDetection)
                 {
                     yield return collisionShape;
                 }
@@ -81,11 +77,6 @@ internal class ScopedElementFactory : IScopedElementFactory
         Dispose();
     }
 
-    public T GetLastCreatedElement<T>() where T : Element
-    {
-        return (T?)LastCreatedElement ?? throw new InvalidOperationException();
-    }
-
     private void ExecuteElementBuilder<TElement>(Func<TElement, IEnumerable<IComponent>>? builder, TElement element) where TElement : IComponents
     {
         if (builder == null)
@@ -105,10 +96,9 @@ internal class ScopedElementFactory : IScopedElementFactory
 
         lock (_lock)
         {
-            _lastCreatedElement = element;
             _createdElements.Add(element);
-            if (element is CollisionShape collisionShape)
-                _collisionShapes.Add(collisionShape);
+            if (element is ICollisionDetection collisionDetection)
+                _collisionDetection.Add(collisionDetection);
             ElementCreated?.Invoke(element);
             element.Destroyed += HandleDestroyed;
         }
@@ -120,23 +110,28 @@ internal class ScopedElementFactory : IScopedElementFactory
         {
             element.Destroyed -= HandleDestroyed;
             _createdElements.Remove(element);
-            if (element is CollisionShape collisionShape)
-                _collisionShapes.Remove(collisionShape);
+            if (element is ICollisionDetection collisionDetection)
+                _collisionDetection.Remove(collisionDetection);
         }
     }
 
     private void AssociateWithPlayer(Element element)
     {
-        element.Id = (ElementId)_elementIdGenerator.GetId();
+        if(element.Id.Value == 0)
+            element.Id = (ElementId)_elementIdGenerator.GetId();
         Add(element);
         element.AssociateWith(_player);
         if (element is RealmMarker pickup)
         {
+            if(pickup.CollisionShape.Id.Value == 0)
+                pickup.CollisionShape.Id = (ElementId)_elementIdGenerator.GetId();
             pickup.CollisionShape.AssociateWith(_player);
         }
 
         if (element is RealmMarker marker)
         {
+            if (marker.CollisionShape.Id.Value == 0)
+                marker.CollisionShape.Id = (ElementId)_elementIdGenerator.GetId();
             marker.CollisionShape.AssociateWith(_player);
         }
     }

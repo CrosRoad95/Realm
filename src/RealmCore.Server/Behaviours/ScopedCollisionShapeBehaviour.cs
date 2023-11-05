@@ -15,10 +15,9 @@ internal sealed class ScopedCollisionShapeBehaviour
         var player = (RealmPlayer)plr;
         var scopedElementFactory = player.GetRequiredService<IScopedElementFactory>();
 
-
         void handleElementCreated(Element element)
         {
-            if (element is not ICollisionDetection collisionShape)
+            if (element is not ICollisionDetection collisionDetection)
                 return;
 
             void handleElementEntered(Element enteredElement)
@@ -27,9 +26,9 @@ internal sealed class ScopedCollisionShapeBehaviour
                     return;
                 try
                 {
-                    if (collisionShape.InternalCollisionDetection.CheckRules(enteredElement))
+                    if (collisionDetection.InternalCollisionDetection.CheckRules(enteredElement))
                     {
-                        collisionShape.InternalCollisionDetection.RelayEntered(enteredElement);
+                        collisionDetection.InternalCollisionDetection.RelayEntered(enteredElement);
                     }
                 }
                 catch (Exception ex)
@@ -43,20 +42,21 @@ internal sealed class ScopedCollisionShapeBehaviour
                 if (leftElement != player)
                     return;
 
-                collisionShape.InternalCollisionDetection.RelayLeft(leftElement);
+                collisionDetection.InternalCollisionDetection.RelayLeft(leftElement);
             }
 
-            collisionShape.ElementEntered += handleElementEntered;
-            collisionShape.ElementLeft += handleElementLeft;
+            collisionDetection.ElementEntered += handleElementEntered;
+            collisionDetection.ElementLeft += handleElementLeft;
         }
 
         void handlePositionChanged(Element sender, ElementChangedEventArgs<Vector3> args)
         {
-            foreach (var collisionShape in scopedElementFactory.CollisionShapes)
+            foreach (var collisionDetection in scopedElementFactory.CreatedCollisionDetectionElements.ToList())
             {
-                collisionShape.CheckElementWithin(player);
+                collisionDetection.CheckElementWithin(player);
             }
         }
+
         void handleDisconnected(Player sender, PlayerQuitEventArgs e)
         {
             player.Disconnected -= handleDisconnected;

@@ -1,6 +1,4 @@
-﻿using System.Threading.Tasks;
-
-namespace RealmCore.Server.Logic;
+﻿namespace RealmCore.Server.Logic;
 
 internal sealed class PlayersLogic
 {

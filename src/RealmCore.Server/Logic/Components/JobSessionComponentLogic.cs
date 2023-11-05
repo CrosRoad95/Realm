@@ -25,6 +25,14 @@ internal sealed class JobSessionComponentLogic : ComponentLogic<JobSessionCompon
 
     private void HandleObjectiveAdded(JobSessionComponent jobSessionComponent, Objective objective)
     {
-        objective.LoadInternal((RealmPlayer)jobSessionComponent.Element);
+        try
+        {
+            objective.LoadInternal((RealmPlayer)jobSessionComponent.Element, jobSessionComponent.InternalElementFactory);
+        }
+        catch(Exception ex)
+        {
+            objective.Dispose();
+            _logger.LogError(ex, "Failed to load objective.");
+        }
     }
 }

@@ -4,9 +4,7 @@ namespace RealmCore.Server.Interfaces;
 public interface IScopedElementFactory : IElementFactory, IDisposable
 {
     IEnumerable<Element> CreatedElements { get; }
-    Element? LastCreatedElement { get; }
-    IEnumerable<CollisionShape> CollisionShapes { get; }
+    internal IEnumerable<ICollisionDetection> CreatedCollisionDetectionElements { get; }
 
     IScopedElementFactory CreateScope();
-    T GetLastCreatedElement<T>() where T : Element;
 }

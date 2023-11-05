@@ -8,6 +8,7 @@ public class RealmPlayer : Player, IComponents, IDisposable
     private CancellationTokenSource _cancellationTokenSource = new();
     public CancellationToken CancellationToken => _cancellationTokenSource.Token;
     public IServiceProvider ServiceProvider => _serviceProvider;
+    public IScopedElementFactory ElementFactory => GetRequiredService<IScopedElementFactory>();
     public Concepts.Components Components { get; private set; }
 
     private Element? _focusedElement;
