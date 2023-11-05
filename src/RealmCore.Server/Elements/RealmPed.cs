@@ -1,15 +1,12 @@
 ﻿namespace RealmCore.Server.Elements;
 
-public class RealmCollisionSphere : CollisionSphere, IComponents, ICollisionDetection
+public class RealmPed : Ped, IComponents
 {
     public Concepts.Components Components { get; private set; }
-    public CollisionDetection<RealmCollisionSphere> CollisionDetection { get; private set; }
-    public CollisionDetection InternalCollisionDetection => CollisionDetection;
 
-    public RealmCollisionSphere(IServiceProvider serviceProvider, Vector3 position, float Radius) : base(position, Radius)
+    public RealmPed(IServiceProvider serviceProvider, PedModel model, Vector3 position) : base(model, position)
     {
         Components = new(serviceProvider, this);
-        CollisionDetection = new(serviceProvider, this);
     }
 
     public TComponent GetRequiredComponent<TComponent>() where TComponent : IComponent

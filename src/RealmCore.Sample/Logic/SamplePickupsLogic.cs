@@ -19,9 +19,9 @@ internal class SamplePickupsLogic
         {
         if (element is RealmPickup pickup && pickup.Components.TryGetComponent(out NameComponent nameComponent) && nameComponent.Name.StartsWith("fractionTestPickup"))
             {
-                pickup.AddRule(new MustBePlayerInFractionRule(1));
+                pickup.CollisionDetection.AddRule(new MustBePlayerInFractionRule(1));
 
-                pickup.Entered += async (enteredPickup, element) =>
+                pickup.CollisionDetection.Entered += async (enteredPickup, element) =>
                 {
                     var player = (RealmPlayer)element;
                     var sessionComponent = player.Components.GetComponent<SessionComponent>();
@@ -48,7 +48,7 @@ internal class SamplePickupsLogic
         {
             if (element is RealmPickup pickup && pickup.Components.TryGetComponent(out NameComponent nameComponent) && nameComponent.Name.StartsWith("jobTestPickup"))
             {
-                pickup.Entered += (enteredPickup, element) =>
+                pickup.CollisionDetection.Entered += (enteredPickup, element) =>
                 {
                     var player = (RealmPlayer)element;
 
@@ -86,8 +86,8 @@ internal class SamplePickupsLogic
         {
             if (element is RealmPickup pickup && pickup.Components.TryGetComponent(out NameComponent nameComponent) && nameComponent.Name.StartsWith("withText3d"))
             {
-                pickup.AddRule<MustBePlayerOnFootOnlyRule>();
-                pickup.AddRule<MustNotHaveComponent<AttachedElementComponent>>();
+                pickup.CollisionDetection.AddRule<MustBePlayerOnFootOnlyRule>();
+                pickup.CollisionDetection.AddRule<MustNotHaveComponent<AttachedElementComponent>>();
                 pickup.AddOpenGuiLogic<TestWindowComponent>();
             }
         }
@@ -95,7 +95,7 @@ internal class SamplePickupsLogic
         {
             if (element is RealmPickup pickup && pickup.Components.TryGetComponent(out NameComponent nameComponent) && nameComponent.Name.StartsWith("exampleShopPickup"))
             {
-                pickup.AddRule<MustBePlayerOnFootOnlyRule>();
+                pickup.CollisionDetection.AddRule<MustBePlayerOnFootOnlyRule>();
                 pickup.AddOpenGuiLogic<TestShopGuiComponent, InventoryGuiComponent>();
             }
         }
@@ -103,12 +103,12 @@ internal class SamplePickupsLogic
         {
             if (element is RealmPickup pickup && pickup.Components.TryGetComponent(out NameComponent nameComponent) && nameComponent.Name.StartsWith("testMarker"))
             {
-                pickup.AddRule<MustBePlayerOnFootOnlyRule>();
-                pickup.Entered += (enteredPickup, element) =>
+                pickup.CollisionDetection.AddRule<MustBePlayerOnFootOnlyRule>();
+                pickup.CollisionDetection.Entered += (enteredPickup, element) =>
                 {
                     _chatBox.OutputTo((RealmPlayer)element, $"Entered marker");
                 };
-                pickup.Left += (leftPickup, element) =>
+                pickup.CollisionDetection.Left += (leftPickup, element) =>
                 {
                     _chatBox.OutputTo((RealmPlayer)element, $"Left marker");
                 };

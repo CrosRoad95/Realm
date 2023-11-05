@@ -102,6 +102,7 @@ internal class RealmTestingServer : TestingServer<RealmTestingPlayer>
     public RealmPlayer CreatePlayer(bool withSerialAndIp = true, string name = "CrosRoad95")
     {
         var player = AddFakePlayer();
+        player.Name = name;
 
         if (withSerialAndIp)
         {
@@ -112,14 +113,8 @@ internal class RealmTestingServer : TestingServer<RealmTestingPlayer>
             };
         }
 
-        player.Name = name;
         player.TriggerResourceStarted(420);
-        //player.ScreenSize = new Vector2(1920, 1080);
-        //player.CultureInfo = new System.Globalization.CultureInfo("pl-PL");
-        player.TriggerLuaEvent("sendScreenSize", player, "id", 1920, 1080);
-        player.TriggerLuaEvent("sendLocalizationCode", player, "id", "pl-PL");
         player.ResourceStarted += HandleResourceStarted;
-
         return player;
     }
 

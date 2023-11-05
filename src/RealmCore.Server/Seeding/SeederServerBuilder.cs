@@ -88,7 +88,7 @@ internal sealed class SeederServerBuilder
             {
                 var marker = _elementFactory.CreateMarker(pair.Value.Position, pair.Value.MarkerType, pair.Value.Color, elementBuilder: x =>
                 {
-                    ((IComponents)x).AddComponent(new NameComponent(pair.Key));
+                    return [new NameComponent(pair.Key)];
                 });
                 _logger.LogInformation("Seeder: Created marker of id {elementId} at {position}", pair.Key, pair.Value.Position);
             }

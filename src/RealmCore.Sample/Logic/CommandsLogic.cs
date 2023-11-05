@@ -1615,6 +1615,14 @@ internal sealed class CommandsLogic
         //    var lastClickedElement = player.LastClickedElement;
         //    _chatBox.Output($"> {lastClickedElement}");
         //});
+
+
+        _commandService.AddAsyncCommandHandler("scopedelements", async (player, args, token) =>
+        {
+            using var scope = player.GetRequiredService<IScopedElementFactory>().CreateScope();
+            scope.CreateObject((ObjectModel)1337, player.Position + new Vector3(3, 0, 0), Vector3.Zero);
+            await Task.Delay(1000);
+        });
     }
 
     static int _hudPosition = 0;

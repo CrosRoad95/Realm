@@ -21,15 +21,8 @@ internal sealed class PlayersLogic
         _mtaServer.PlayerJoined += HandlePlayerJoined;
     }
 
-    private async Task HandlePlayerJoinedCore(Player plr)
+    private async Task FetchClientData(RealmPlayer player)
     {
-        var player = (RealmPlayer)plr;
-        var start = Stopwatch.GetTimestamp();
-        var resources = _resourceProvider.GetResources();
-        _playerResources[player] = new Latch(RealmResourceServer._resourceCounter, TimeSpan.FromSeconds(60));
-        player.ResourceStarted += HandlePlayerResourceStarted;
-        player.Destroyed += HandlePlayerDestroyed;
-
         var taskWaitForScreenSize = new TaskCompletionSource<(int, int)>();
         var taskWaitForCultureInfo = new TaskCompletionSource<CultureInfo>();
         void handleClientScreenSizeChanged(Player player2, int x, int y)
@@ -53,6 +46,24 @@ internal sealed class PlayersLogic
         _clientInterfaceService.ClientScreenSizeChanged += handleClientScreenSizeChanged;
         _clientInterfaceService.ClientCultureInfoChanged += handleClientCultureInfoChanged;
 
+        await StartAllResourcesForPlayer(player);
+
+        var timeoutTask = Task.Delay(10_000);
+        var completedTask = await Task.WhenAny(Task.WhenAll(taskWaitForScreenSize.Task, taskWaitForCultureInfo.Task), timeoutTask);
+        if (completedTask == timeoutTask)
+        {
+            player.Kick("Failed to get culture and screen size");
+            return;
+        }
+        var screenSize = await taskWaitForScreenSize.Task;
+        var cultureInfo = await taskWaitForCultureInfo.Task;
+
+        player.ScreenSize = new Vector2(screenSize.Item1, screenSize.Item2);
+        player.CultureInfo = cultureInfo;
+    }
+
+    private async Task StartAllResourcesForPlayer(RealmPlayer player)
+    {
         try
         {
             await _playerResources[player].WaitAsync();
@@ -68,18 +79,25 @@ internal sealed class PlayersLogic
             _playerResources.TryRemove(player, out var _);
         }
 
-        var timeoutTask = Task.Delay(3_000);
-        var completedTask = await Task.WhenAny(Task.WhenAll(taskWaitForScreenSize.Task, taskWaitForCultureInfo.Task), timeoutTask);
-        if (completedTask == timeoutTask)
-        {
-            player.Kick("Failed to get culture and screen size");
-            return;
-        }
-        var screenSize = await taskWaitForScreenSize.Task;
-        var cultureInfo = await taskWaitForCultureInfo.Task;
+    }
 
-        player.ScreenSize = new Vector2(screenSize.Item1, screenSize.Item2);
-        player.CultureInfo = cultureInfo;
+    private async Task HandlePlayerJoinedCore(Player plr)
+    {
+        var player = (RealmPlayer)plr;
+        var start = Stopwatch.GetTimestamp();
+        var resources = _resourceProvider.GetResources();
+        _playerResources[player] = new Latch(RealmResourceServer._resourceCounter, TimeSpan.FromSeconds(60));
+        player.ResourceStarted += HandlePlayerResourceStarted;
+        player.Destroyed += HandlePlayerDestroyed;
+
+        if(player.ScreenSize.X == 0)
+        {
+            await FetchClientData(player);
+        }
+        else
+        {
+            await StartAllResourcesForPlayer(player);
+        }
 
         var stop = Stopwatch.GetTimestamp();
         double milliseconds = ((stop - start) / (float)Stopwatch.Frequency) * 1000;

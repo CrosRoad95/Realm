@@ -4,14 +4,13 @@ public class RealmMarker : Marker, IComponents
 {
     public Concepts.Components Components { get; private set; }
     public CollisionSphere CollisionShape { get; private set; }
-
-    public event Action<RealmMarker, Element>? Entered;
-    public event Action<RealmMarker, Element>? Left;
+    public CollisionDetection<RealmMarker> CollisionDetection { get; private set; }
 
     public RealmMarker(IServiceProvider serviceProvider, Vector3 position, MarkerType markerType, float size) : base(position, markerType)
     {
         Size = size;
         Components = new(serviceProvider, this);
+        CollisionDetection = new(serviceProvider, this);
         CollisionShape = new CollisionSphere(position, size); 
     }
 
@@ -64,37 +63,5 @@ public class RealmMarker : Marker, IComponents
     public TComponent AddComponentWithDI<TComponent>(params object[] parameters) where TComponent : IComponent
     {
         return Components.AddComponentWithDI<TComponent>(parameters);
-    }
-
-    private readonly List<IElementRule> _elementRules = new();
-
-    public void AddRule(IElementRule elementRule)
-    {
-        _elementRules.Add(elementRule);
-    }
-
-    public void AddRule<TElementRule>() where TElementRule : IElementRule, new()
-    {
-        _elementRules.Add(new TElementRule());
-    }
-
-    public bool CheckRules(Element element)
-    {
-        foreach (var rule in _elementRules)
-        {
-            if (!rule.Check(element))
-                return false;
-        }
-        return true;
-    }
-
-    internal void RelayEntered(Element element)
-    {
-        Entered?.Invoke(this, element);
-    }
-
-    internal void RelayLeft(Element element)
-    {
-        Left?.Invoke(this, element);
     }
 }

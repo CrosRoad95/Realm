@@ -6,7 +6,7 @@ public static class PickupElementComponentExtensions
 {
     public static void AddOpenGuiLogic<TGui>(this RealmPickup pickup) where TGui : GuiComponent, new()
     {
-        pickup.Entered += (enteredPickup, element) =>
+        pickup.CollisionDetection.Entered += (enteredPickup, element) =>
         {
             if (element is IComponents components)
             {
@@ -14,7 +14,7 @@ public static class PickupElementComponentExtensions
                     components.AddComponent(new TGui());
             }
         };
-        pickup.Left += (leftPickup, element) =>
+        pickup.CollisionDetection.Left += (leftPickup, element) =>
         {
             if (element is IComponents components)
             {
@@ -28,7 +28,7 @@ public static class PickupElementComponentExtensions
         where TGui1 : GuiComponent, new()
         where TGui2 : GuiComponent, new()
     {
-        pickup.Entered += (enteredPickup, element) =>
+        pickup.CollisionDetection.Entered += (enteredPickup, element) =>
         {
             if (element is IComponents components)
             {
@@ -39,7 +39,7 @@ public static class PickupElementComponentExtensions
                 }
             }
         };
-        pickup.Left += (leftPickup, element) =>
+        pickup.CollisionDetection.Left += (leftPickup, element) =>
         {
             if (element is IComponents components)
             {
@@ -53,7 +53,7 @@ public static class PickupElementComponentExtensions
 
     public static void AddOpenGuiPageLogic<TGui>(this RealmPickup pickup) where TGui : BrowserGuiComponent, new()
     {
-        pickup.Entered += (enteredPickup, element) =>
+        pickup.CollisionDetection.Entered += (enteredPickup, element) =>
         {
             if (element is IComponents components)
             {
@@ -61,7 +61,7 @@ public static class PickupElementComponentExtensions
                     components.AddComponent(new TGui());
             }
         };
-        pickup.Left += (leftPickup, element) =>
+        pickup.CollisionDetection.Left += (leftPickup, element) =>
         {
             if (element is IComponents components)
             {
@@ -73,7 +73,7 @@ public static class PickupElementComponentExtensions
 
     public static void AddOpenGuiPageLogic<TGui>(this RealmPickup pickup, Func<TGui> factory) where TGui : BrowserGuiComponent, new()
     {
-        pickup.Entered += (enteredPickup, element) =>
+        pickup.CollisionDetection.Entered += (enteredPickup, element) =>
         {
             if (element is IComponents components)
             {
@@ -81,7 +81,7 @@ public static class PickupElementComponentExtensions
                     components.AddComponent(factory());
             }
         };
-        pickup.Left += (leftPickup, element) =>
+        pickup.CollisionDetection.Left += (leftPickup, element) =>
         {
             if (element is IComponents components)
             {
@@ -94,7 +94,7 @@ public static class PickupElementComponentExtensions
 
     public static void AddAsyncOpenGuiPageLogic<TGui>(this RealmPickup pickup, Func<Task<TGui>> factory) where TGui : BrowserGuiComponent, new()
     {
-        pickup.Entered += async (enteredPickup, element) =>
+        pickup.CollisionDetection.Entered += async (enteredPickup, element) =>
         {
             if (element is IComponents components)
             {
@@ -102,7 +102,7 @@ public static class PickupElementComponentExtensions
                     components.AddComponent(await factory());
             }
         };
-        pickup.Left += (leftPickup, element) =>
+        pickup.CollisionDetection.Left += (leftPickup, element) =>
         {
             if (element is IComponents components)
             {

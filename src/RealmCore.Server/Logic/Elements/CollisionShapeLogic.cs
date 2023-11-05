@@ -21,9 +21,9 @@ internal sealed class CollisionShapeLogic
         {
             try
             {
-                if (sphere.CheckRules(element))
+                if (sphere.CollisionDetection.CheckRules(element))
                 {
-                    sphere.RelayEntered(element);
+                    sphere.CollisionDetection.RelayEntered(element);
                 }
             }
             catch(Exception ex)
@@ -36,7 +36,7 @@ internal sealed class CollisionShapeLogic
         {
             try
             {
-                sphere.RelayLeft(element);
+                sphere.CollisionDetection.RelayLeft(element);
             }
             catch (Exception ex)
             {

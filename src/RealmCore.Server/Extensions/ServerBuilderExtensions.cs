@@ -128,7 +128,7 @@ public static class ServerBuilderExtensions
         #endregion
 
         #region Behaviours
-        serverBuilder.AddBehaviour<PrivateCollisionShapeBehaviour>();
+        serverBuilder.AddBehaviour<ScopedCollisionShapeBehaviour>();
         #endregion
 
         return serverBuilder;

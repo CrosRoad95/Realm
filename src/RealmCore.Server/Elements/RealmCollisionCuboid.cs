@@ -1,12 +1,12 @@
-﻿namespace RealmCore.Server.Elements;
+﻿
+namespace RealmCore.Server.Elements;
 
-public class RealmCollisionSphere : CollisionSphere, IComponents, ICollisionDetection
+public class RealmCollisionCuboid : CollisionCuboid, IComponents
 {
     public Concepts.Components Components { get; private set; }
-    public CollisionDetection<RealmCollisionSphere> CollisionDetection { get; private set; }
-    public CollisionDetection InternalCollisionDetection => CollisionDetection;
+    public Concepts.CollisionDetection<RealmCollisionCuboid> CollisionDetection { get; private set; }
 
-    public RealmCollisionSphere(IServiceProvider serviceProvider, Vector3 position, float Radius) : base(position, Radius)
+    public RealmCollisionCuboid(IServiceProvider serviceProvider, Vector3 position, Vector3 dimensions) : base(position, dimensions)
     {
         Components = new(serviceProvider, this);
         CollisionDetection = new(serviceProvider, this);

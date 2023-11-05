@@ -63,7 +63,7 @@ internal sealed class ElementFactory : IElementFactory
         return vehicle;
     }
 
-    public RealmMarker CreateMarker(Vector3 position, MarkerType markerType, Color color, byte? interior = null, ushort? dimension = null, Action<Element>? elementBuilder = null)
+    public RealmMarker CreateMarker(Vector3 position, MarkerType markerType, Color color, byte? interior = null, ushort? dimension = null, Func<RealmMarker, IEnumerable<IComponent>>? elementBuilder = null)
     {
         var marker = new RealmMarker(_serviceProvider, position, markerType, 2)
         {
@@ -103,15 +103,15 @@ internal sealed class ElementFactory : IElementFactory
         return blip;
     }
 
-    public RadarArea CreateRadarArea(Vector2 position, Vector2 size, Color color, byte? interior = null, ushort? dimension = null, Action<Element>? elementBuilder = null)
+    public RealmRadarArea CreateRadarArea(Vector2 position, Vector2 size, Color color, byte? interior = null, ushort? dimension = null, Func<RealmRadarArea, IEnumerable<IComponent>>? elementBuilder = null)
     {
-        var radarArea = new RadarArea(position, size, color)
+        var radarArea = new RealmRadarArea(_serviceProvider, position, size, color)
         {
             Interior = interior ?? 0,
             Dimension = dimension ?? 0,
         };
 
-        elementBuilder?.Invoke(radarArea);
+        ExecuteElementBuilder(elementBuilder, radarArea);
         AssociateWithServer(radarArea);
         return radarArea;
     }
@@ -131,9 +131,9 @@ internal sealed class ElementFactory : IElementFactory
     }
 
     #region Collision shapes
-    public CollisionCircle CreateCollisionCircle(Vector2 position, float radius, byte? interior = null, ushort? dimension = null, Action<Element>? elementBuilder = null)
+    public RealmCollisionCircle CreateCollisionCircle(Vector2 position, float radius, byte? interior = null, ushort? dimension = null, Func<RealmCollisionCircle, IEnumerable<IComponent>>? elementBuilder = null)
     {
-        var collisionSphere = new CollisionCircle(new Vector2(0, 0), radius)
+        var collisionSphere = new RealmCollisionCircle(_serviceProvider, new Vector2(0, 0), radius)
         {
             Interior = interior ?? 0,
             Dimension = dimension ?? 0,
@@ -144,9 +144,9 @@ internal sealed class ElementFactory : IElementFactory
         return collisionSphere;
     }
 
-    public CollisionCuboid CreateCollisionCuboid(Vector3 position, Vector3 dimensions, byte? interior = null, ushort? dimension = null, Action<Element>? elementBuilder = null)
+    public RealmCollisionCuboid CreateCollisionCuboid(Vector3 position, Vector3 dimensions, byte? interior = null, ushort? dimension = null, Func<RealmCollisionCuboid, IEnumerable<IComponent>>? elementBuilder = null)
     {
-        var collisionCuboid = new CollisionCuboid(position, dimensions)
+        var collisionCuboid = new RealmCollisionCuboid(_serviceProvider, position, dimensions)
         {
             Interior = interior ?? 0,
             Dimension = dimension ?? 0,
@@ -157,9 +157,9 @@ internal sealed class ElementFactory : IElementFactory
         return collisionCuboid;
     }
 
-    public CollisionPolygon CreateCollisionPolygon(Vector3 position, IEnumerable<Vector2> vertices, byte? interior = null, ushort? dimension = null, Action<Element>? elementBuilder = null)
+    public RealmCollisionPolygon CreateCollisionPolygon(Vector3 position, IEnumerable<Vector2> vertices, byte? interior = null, ushort? dimension = null, Func<RealmCollisionPolygon, IEnumerable<IComponent>>? elementBuilder = null)
     {
-        var collisionPolygon = new CollisionPolygon(position, vertices)
+        var collisionPolygon = new RealmCollisionPolygon(_serviceProvider, position, vertices)
         {
             Interior = interior ?? 0,
             Dimension = dimension ?? 0,
@@ -170,9 +170,9 @@ internal sealed class ElementFactory : IElementFactory
         return collisionPolygon;
     }
 
-    public CollisionRectangle CreateCollisionRectangle(Vector2 position, Vector2 dimensions, byte? interior = null, ushort? dimension = null, Action<Element>? elementBuilder = null)
+    public RealmCollisionRectangle CreateCollisionRectangle(Vector2 position, Vector2 dimensions, byte? interior = null, ushort? dimension = null, Func<RealmCollisionRectangle, IEnumerable<IComponent>>? elementBuilder = null)
     {
-        var collisionRectangle = new CollisionRectangle(position, dimensions)
+        var collisionRectangle = new RealmCollisionRectangle(_serviceProvider, position, dimensions)
         {
             Interior = interior ?? 0,
             Dimension = dimension ?? 0,
@@ -196,9 +196,9 @@ internal sealed class ElementFactory : IElementFactory
         return collisionSphere;
     }
 
-    public CollisionTube CreateCollisionTube(Vector3 position, float radius, float height, byte? interior = null, ushort? dimension = null, Action<Element>? elementBuilder = null)
+    public RealmCollisionTube CreateCollisionTube(Vector3 position, float radius, float height, byte? interior = null, ushort? dimension = null, Func<RealmCollisionTube, IEnumerable<IComponent>>? elementBuilder = null)
     {
-        var collisionTube = new CollisionTube(position, radius, height)
+        var collisionTube = new RealmCollisionTube(_serviceProvider, position, radius, height)
         {
             Interior = interior ?? 0,
             Dimension = dimension ?? 0,
@@ -209,9 +209,9 @@ internal sealed class ElementFactory : IElementFactory
         return collisionTube;
     }
 
-    public Ped CreatePed(PedModel pedModel, Vector3 position, byte? interior = null, ushort? dimension = null, Action<Element>? elementBuilder = null)
+    public RealmPed CreatePed(PedModel pedModel, Vector3 position, byte? interior = null, ushort? dimension = null, Func<RealmPed, IEnumerable<IComponent>>? elementBuilder = null)
     {
-        var ped = new Ped(pedModel, position)
+        var ped = new RealmPed(_serviceProvider, pedModel, position)
         {
             Interior = interior ?? 0,
             Dimension = dimension ?? 0,

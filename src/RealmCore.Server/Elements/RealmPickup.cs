@@ -3,15 +3,12 @@
 public class RealmPickup : Pickup, IComponents
 {
     public Concepts.Components Components { get; private set; }
-
-    private readonly List<IElementRule> _elementRules = new();
-
-    public event Action<RealmPickup, Element>? Entered;
-    public event Action<RealmPickup, Element>? Left;
+    public CollisionDetection<RealmPickup> CollisionDetection { get; private set; }
 
     public RealmPickup(IServiceProvider serviceProvider, Vector3 position, ushort model) : base(position, model)
     {
         Components = new(serviceProvider, this);
+        CollisionDetection = new(serviceProvider, this);
     }
 
     public TComponent GetRequiredComponent<TComponent>() where TComponent : IComponent
@@ -63,35 +60,5 @@ public class RealmPickup : Pickup, IComponents
     public TComponent AddComponentWithDI<TComponent>(params object[] parameters) where TComponent : IComponent
     {
         return Components.AddComponentWithDI<TComponent>(parameters);
-    }
-
-    public void AddRule(IElementRule elementRule)
-    {
-        _elementRules.Add(elementRule);
-    }
-
-    public void AddRule<TElementRule>() where TElementRule : IElementRule, new()
-    {
-        _elementRules.Add(new TElementRule());
-    }
-
-    public bool CheckRules(Element element)
-    {
-        foreach (var rule in _elementRules)
-        {
-            if (!rule.Check(element))
-                return false;
-        }
-        return true;
-    }
-
-    internal void RelayEntered(Element element)
-    {
-        Entered?.Invoke(this, element);
-    }
-
-    internal void RelayLeft(Element element)
-    {
-        Left?.Invoke(this, element);
     }
 }

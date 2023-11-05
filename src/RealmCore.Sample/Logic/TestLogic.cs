@@ -10,7 +10,6 @@ internal class TestLogic
     {
         var marker = elementFactory.CreateMarker(new Vector3(335.50684f, -83.71094f, 1.4105641f), MarkerType.Cylinder, Color.Red);
         marker.Size = 4;
-        marker.AddRule<MustBeVehicleRule>();
+        marker.CollisionDetection.AddRule<MustBeVehicleRule>();
     }
-
 }

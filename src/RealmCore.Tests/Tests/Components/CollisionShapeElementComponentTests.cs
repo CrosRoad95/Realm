@@ -11,7 +11,7 @@ public class CollisionShapeElementComponentTests
         var elementFactory = realmTestingServer.GetRequiredService<IElementFactory>();
         var collisionSphere  = elementFactory.CreateCollisionSphere(Vector3.Zero, 10);
         bool elementEntered = false;
-        collisionSphere.Entered += (that, e) =>
+        collisionSphere.CollisionDetection.Entered += (that, e) =>
         {
             elementEntered = true;
         };

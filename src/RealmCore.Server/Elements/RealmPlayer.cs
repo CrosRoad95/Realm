@@ -12,8 +12,8 @@ public class RealmPlayer : Player, IComponents, IDisposable
 
     private Element? _focusedElement;
     private Element? _lastClickedElement;
-    public Vector2 ScreenSize { get; internal set; }
-    public CultureInfo CultureInfo { get; internal set; }
+    public virtual Vector2 ScreenSize { get; internal set; }
+    public virtual CultureInfo CultureInfo { get; internal set; }
     private readonly CultureInfo _culture;
     private readonly Dictionary<string, Func<RealmPlayer, KeyState, Task>> _asyncBinds = new();
     private readonly Dictionary<string, Action<RealmPlayer, KeyState>> _binds = new();

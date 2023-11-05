@@ -21,9 +21,9 @@ internal sealed class PickupLogic
         {
             try
             {
-                if (pickup.CheckRules(element))
+                if (pickup.CollisionDetection.CheckRules(element))
                 {
-                    pickup.RelayEntered(element);
+                    pickup.CollisionDetection.RelayEntered(element);
                 }
             }
             catch(Exception ex)
@@ -36,7 +36,7 @@ internal sealed class PickupLogic
         {
             try
             {
-                pickup.RelayLeft(element);
+                pickup.CollisionDetection.RelayLeft(element);
             }
             catch (Exception ex)
             {

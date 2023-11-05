@@ -6,7 +6,7 @@ public static class MarkerExtensions
 {
     public static void AddOpenGuiLogic<TGui>(this RealmMarker marker) where TGui : GuiComponent, new()
     {
-        marker.Entered += (enteredMarker, element) =>
+        marker.CollisionDetection.Entered += (enteredMarker, element) =>
         {
             if(element is RealmPlayer player)
             {
@@ -14,7 +14,7 @@ public static class MarkerExtensions
                     player.AddComponent(new TGui());
             }
         };
-        marker.Left += (leftPickup, element) =>
+        marker.CollisionDetection.Left += (leftPickup, element) =>
         {
             if (element is RealmPlayer player)
             {
@@ -26,7 +26,7 @@ public static class MarkerExtensions
 
     public static void AddOpenGuiLogic<TGui>(this RealmMarker marker, Func<RealmPlayer, Task<TGui>> factory) where TGui : GuiComponent
     {
-        marker.Entered += async (enteredMarker, element) =>
+        marker.CollisionDetection.Entered += async (enteredMarker, element) =>
         {
             if (element is RealmPlayer player)
             {
@@ -34,7 +34,7 @@ public static class MarkerExtensions
                     player.AddComponent(await factory(player));
             }
         };
-        marker.Left += (leftPickup, element) =>
+        marker.CollisionDetection.Left += (leftPickup, element) =>
         {
             if (element is RealmPlayer player)
             {
@@ -48,7 +48,7 @@ public static class MarkerExtensions
         where TGui1 : GuiComponent, new()
         where TGui2 : GuiComponent, new()
     {
-        marker.Entered += (enteredPickup, element) =>
+        marker.CollisionDetection.Entered += (enteredPickup, element) =>
         {
             if (element is RealmPlayer player)
             {
@@ -60,7 +60,7 @@ public static class MarkerExtensions
             }
         };
 
-        marker.Left += (leftPickup, element) =>
+        marker.CollisionDetection.Left += (leftPickup, element) =>
         {
             if (element is RealmPlayer player)
             {

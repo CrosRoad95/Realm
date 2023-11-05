@@ -75,8 +75,8 @@ internal class WorldLogic : ComponentLogic<DiscoveriesComponent>
 
     private void AttachDiscovery(RealmCollisionSphere collisionSphere, int discoveryName, Action<RealmPlayer, int, bool> callback)
     {
-        collisionSphere.AddRule<MustBePlayerRule>();
-        collisionSphere.Entered += (enteredColShape, element) =>
+        collisionSphere.CollisionDetection.AddRule<MustBePlayerRule>();
+        collisionSphere.CollisionDetection.Entered += (enteredColShape, element) =>
         {
             if(element is RealmPlayer player)
             {
