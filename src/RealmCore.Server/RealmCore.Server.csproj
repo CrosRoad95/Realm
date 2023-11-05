@@ -75,8 +75,4 @@
 			<LastGenOutput>RPGServer.pl-PL.Designer.cs</LastGenOutput>
 		</EmbeddedResource>
 	</ItemGroup>
-
-	<ItemGroup>
-	  <Folder Include="Concepts\Interfaces\" />
-	</ItemGroup>
 </Project>

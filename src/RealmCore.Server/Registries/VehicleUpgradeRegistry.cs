@@ -1,4 +1,6 @@
-﻿namespace RealmCore.Server.Registries;
+﻿using RealmCore.Server.Concepts.Interfaces;
+
+namespace RealmCore.Server.Registries;
 
 public class VehicleUpgradeRegistry
 {
@@ -21,5 +23,10 @@ public class VehicleUpgradeRegistry
         }
         vehicleUpgradeRegistryEntry.Id = id;
         _vehicleUpgradesRegistryEntries[id] = vehicleUpgradeRegistryEntry;
+    }
+
+    public void AddUpgrade(int id, IVehicleHandlingModifier vehicleHandlingModifier)
+    {
+        AddUpgrade(id, new VehicleUpgradeRegistryEntry(vehicleHandlingModifier));
     }
 }

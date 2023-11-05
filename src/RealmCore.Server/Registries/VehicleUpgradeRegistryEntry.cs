@@ -1,10 +1,15 @@
-﻿namespace RealmCore.Server.Registries;
+﻿using RealmCore.Server.Concepts.Interfaces;
+
+namespace RealmCore.Server.Registries;
 
 public class VehicleUpgradeRegistryEntry
 {
     internal int Id { get; set; }
 
-    public FloatValueUpgradeDescription? MaxVelocity { get; set; } = null;
-    public FloatValueUpgradeDescription? EngineAcceleration { get; set; } = null;
-    public VisualUpgradeDescription? Visuals { get; set; } = null;
+    public IVehicleHandlingModifier VehicleUpgrade { get; }
+
+    public VehicleUpgradeRegistryEntry(IVehicleHandlingModifier vehicleUpgrade)
+    {
+        VehicleUpgrade = vehicleUpgrade;
+    }
 }

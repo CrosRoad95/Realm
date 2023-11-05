@@ -79,7 +79,6 @@ global using SlipeServer.Server.Clients;
 global using RealmCore.Resources.Nametags;
 global using RealmCore.Server.Contexts;
 global using RealmCore.Server.Contexts.Interfaces;
-global using RealmCore.Server.Concepts.Upgrades;
 global using SlipeServer.Packets.Definitions.Entities.Structs;
 global using SlipeServer.Server.Constants;
 global using System.Collections.Concurrent;

@@ -1,32 +1,59 @@
-﻿namespace RealmCore.Tests.Tests.Components;
+﻿using RealmCore.Server.Concepts.Interfaces;
+using SlipeServer.Packets.Definitions.Entities.Structs;
 
-public class VehicleUpgradeComponentTests
+namespace RealmCore.Tests.Tests.Components;
+
+public class VehicleUpgrade1 : IVehicleHandlingModifier
+{
+    public void Apply(VehicleHandlingContext context, HandlingDelegate next)
+    {
+        context.Modify((ref VehicleHandling vehicleHandling) =>
+        {
+            vehicleHandling.MaxVelocity *= 2;
+            vehicleHandling.MaxVelocity += 100;
+        });
+        next(context);
+    }
+}
+
+public class VehicleUpgrade2 : IVehicleHandlingModifier
+{
+    public void Apply(VehicleHandlingContext context, HandlingDelegate next)
+    {
+        context.Modify((ref VehicleHandling vehicleHandling) =>
+        {
+            vehicleHandling.MaxVelocity *= 10;
+            vehicleHandling.MaxVelocity += 10;
+        });
+        next(context);
+    }
+}
+
+public class VehicleUpgrade3 : IVehicleHandlingModifier
+{
+    public void Apply(VehicleHandlingContext context, HandlingDelegate next)
+    {
+        next(context);
+        context.Modify((ref VehicleHandling vehicleHandling) =>
+        {
+            vehicleHandling.MaxVelocity /= 2;
+        });
+    }
+}
+
+public class VehicleUpgradesComponentTests
 {
     private readonly RealmTestingServer _realmTestingServer;
 
-    public VehicleUpgradeComponentTests()
+    public VehicleUpgradesComponentTests()
     {
         _realmTestingServer = new RealmTestingServer();
 
         var vehicleUpgradeRegistry = _realmTestingServer.GetRequiredService<VehicleUpgradeRegistry>();
 
-        vehicleUpgradeRegistry.AddUpgrade(1000000, new VehicleUpgradeRegistryEntry
-        {
-            MaxVelocity = new FloatValueUpgradeDescription
-            {
-                IncreaseByUnits = 100,
-                MultipleBy = 2,
-            },
-        });
-
-        vehicleUpgradeRegistry.AddUpgrade(1000001, new VehicleUpgradeRegistryEntry
-        {
-            MaxVelocity = new FloatValueUpgradeDescription
-            {
-                IncreaseByUnits = 10,
-                MultipleBy = 10,
-            },
-        });
+        vehicleUpgradeRegistry.AddUpgrade(1000000, new VehicleUpgradeRegistryEntry(new VehicleUpgrade1()));
+        vehicleUpgradeRegistry.AddUpgrade(1000001, new VehicleUpgradeRegistryEntry(new VehicleUpgrade2()));
+        vehicleUpgradeRegistry.AddUpgrade(1000002, new VehicleUpgradeRegistryEntry(new VehicleUpgrade3()));
 
         #region Assert default handling
         var handling = VehicleHandlingConstants.DefaultVehicleHandling[(ushort)SlipeServer.Server.Elements.VehicleModel.Perennial];
@@ -98,7 +125,29 @@ public class VehicleUpgradeComponentTests
         #endregion
 
         #region Assert
-        vehicle.Handling.Value.MaxVelocity.Should().Be(1200);
+        // 150 - base
+        // ((150 * 2 + 100) * 2 + 100) * 2 + 100
+        vehicle.Handling.Value.MaxVelocity.Should().Be(1900);
+        #endregion
+    }
+
+    [InlineData(new int[] { 1000002, 1000000, 1000000, 1000000 })]
+    [InlineData(new int[] { 1000000, 1000002, 1000000, 1000000 })]
+    [InlineData(new int[] { 1000000, 1000000, 1000002, 1000000 })]
+    [InlineData(new int[] { 1000000, 1000000, 1000000, 1000002 })]
+    [Theory]
+    public void UpgradesMiddlewareShouldBeOrderIndependent(int[] upgrades)
+    {
+        #region Act
+        var vehicle = _realmTestingServer.GetRequiredService<IElementFactory>().CreateVehicle(404, Vector3.Zero, Vector3.Zero);
+        var vehicleUpgradesComponent = vehicle.AddComponent<VehicleUpgradesComponent>();
+        vehicleUpgradesComponent.AddUpgrades(upgrades);
+        #endregion
+
+        #region Assert
+        // 150 - base
+        // (((150 * 2 + 100) * 2 + 100) * 2 + 100) / 2
+        vehicle.Handling.Value.MaxVelocity.Should().Be(950);
         #endregion
     }
 }

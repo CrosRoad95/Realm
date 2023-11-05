@@ -30,7 +30,6 @@ global using RealmCore.Persistence.Interfaces;
 global using RealmCore.Tests.Extensions;
 global using System.Numerics;
 global using RealmCore.Server.Components.Vehicles;
-global using RealmCore.Server.Concepts.Upgrades;
 global using SlipeServer.Server.Constants;
 global using RealmCore.Persistence.Extensions;
 global using Microsoft.AspNetCore.Identity;

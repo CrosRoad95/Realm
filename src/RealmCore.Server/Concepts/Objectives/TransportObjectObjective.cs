@@ -1,6 +1,4 @@
-﻿using SlipeServer.Server.Elements;
-
-namespace RealmCore.Server.Concepts.Objectives;
+﻿namespace RealmCore.Server.Concepts.Objectives;
 
 public class TransportObjectObjective : Objective
 {

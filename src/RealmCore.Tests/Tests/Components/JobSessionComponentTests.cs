@@ -1,5 +1,4 @@
-﻿using RealmCore.Server.Components.Object;
-using RealmCore.Server.Components.Players.Jobs;
+﻿using RealmCore.Server.Components.Players.Jobs;
 using RealmCore.Server.Concepts.Objectives;
 using SlipeServer.Server.Enums;
 

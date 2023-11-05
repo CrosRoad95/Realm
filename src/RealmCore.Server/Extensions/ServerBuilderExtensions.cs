@@ -121,7 +121,6 @@ public static class ServerBuilderExtensions
         serverBuilder.AddScopedLogic<GuiLogic>();
         serverBuilder.AddScopedLogic<ServerLogic>();
         serverBuilder.AddScopedLogic<BanLogic>();
-        serverBuilder.AddScopedLogic<VehicleUpgradeRegistryLogic>();
         serverBuilder.AddScopedLogic<VehicleEnginesRegistryLogic>();
         serverBuilder.AddScopedLogic<VehicleAccessControllerComponentLogic>();
         serverBuilder.AddScopedLogic<MapsLogic>();
