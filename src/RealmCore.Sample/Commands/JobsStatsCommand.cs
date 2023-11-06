@@ -16,7 +16,7 @@ public sealed class JobsStatsCommand : IInGameCommand
 
     public async Task Handle(RealmPlayer player, CommandArguments args)
     {
-        var stats = await _jobService.TryGetTotalUserJobStatistics(player.GetUserId(), 1);
+        var stats = await _jobService.TryGetTotalUserJobStatistics(player.UserId, 1);
         _chatBox.OutputTo(player, $"stats: {stats.Value.points}, time: {stats.Value.timePlayed}");
     }
 }

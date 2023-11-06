@@ -6,7 +6,6 @@ namespace RealmCore.Server.Services;
 internal sealed class UsersService : IUsersService
 {
     private readonly ItemsRegistry _itemsRegistry;
-    private readonly SignInManager<UserData> _signInManager;
     private readonly ILogger<UsersService> _logger;
     private readonly IOptionsMonitor<GameplayOptions> _gameplayOptions;
     private readonly IDateTimeProvider _dateTimeProvider;
@@ -14,11 +13,9 @@ internal sealed class UsersService : IUsersService
     private readonly IActiveUsers _activeUsers;
     private readonly IElementCollection _elementCollection;
     private readonly LevelsRegistry _levelsRegistry;
-    private readonly UserManager<UserData> _userManager;
     private readonly IUserEventRepository _userEventRepository;
-    private readonly IUserLoginHistoryRepository _userLoginHistoryRepository;
     private readonly ISaveService _saveService;
-    private readonly IBanService _banService;
+    private readonly IServiceProvider _serviceProvider;
     private static readonly JsonSerializerSettings _jsonSerializerSettings = new()
     {
         Converters = new List<JsonConverter> { DoubleConverter.Instance }
@@ -27,11 +24,10 @@ internal sealed class UsersService : IUsersService
     public event Action<RealmPlayer>? SignedIn;
     public event Action<RealmPlayer>? SignedOut;
 
-    public UsersService(ItemsRegistry itemsRegistry, SignInManager<UserData> signInManager, ILogger<UsersService> logger, IOptionsMonitor<GameplayOptions> gameplayOptions,
-        IDateTimeProvider dateTimeProvider, IAuthorizationService authorizationService, IActiveUsers activeUsers, IElementCollection elementCollection, LevelsRegistry levelsRegistry, UserManager<UserData> userManager, IUserEventRepository userEventRepository, IUserLoginHistoryRepository userLoginHistoryRepository, ISaveService saveService, IBanService banService)
+    public UsersService(ItemsRegistry itemsRegistry, ILogger<UsersService> logger, IOptionsMonitor<GameplayOptions> gameplayOptions,
+        IDateTimeProvider dateTimeProvider, IAuthorizationService authorizationService, IActiveUsers activeUsers, IElementCollection elementCollection, LevelsRegistry levelsRegistry, IUserEventRepository userEventRepository, ISaveService saveService, IServiceProvider serviceProvider)
     {
         _itemsRegistry = itemsRegistry;
-        _signInManager = signInManager;
         _logger = logger;
         _gameplayOptions = gameplayOptions;
         _dateTimeProvider = dateTimeProvider;
@@ -39,11 +35,9 @@ internal sealed class UsersService : IUsersService
         _activeUsers = activeUsers;
         _elementCollection = elementCollection;
         _levelsRegistry = levelsRegistry;
-        _userManager = userManager;
         _userEventRepository = userEventRepository;
-        _userLoginHistoryRepository = userLoginHistoryRepository;
         _saveService = saveService;
-        _banService = banService;
+        _serviceProvider = serviceProvider;
     }
 
     public async Task<int> SignUp(string username, string password)
@@ -53,7 +47,8 @@ internal sealed class UsersService : IUsersService
             UserName = username,
         };
 
-        var identityResult = await _userManager.CreateAsync(user, password);
+        var userManager = _serviceProvider.GetRequiredService<UserManager<UserData>>();
+        var identityResult = await userManager.CreateAsync(user, password);
         if (identityResult.Succeeded)
         {
             _logger.LogInformation("Created a user of id {userId} {userName}", user.Id, username);
@@ -67,17 +62,17 @@ internal sealed class UsersService : IUsersService
     public async Task<bool> QuickSignIn(RealmPlayer player)
     {
         var serial = player.Client.GetSerial();
-        var userData = await _userManager.GetUserBySerial(serial) ?? throw new Exception("No account found.");
+        var userManager = player.GetRequiredService<UserManager<UserData>>();
+        var userData = await userManager.GetUserBySerial(serial) ?? throw new Exception("No account found.");
         if (!userData.QuickLogin)
             throw new Exception("Quick login not enabled");
 
         return await SignIn(player, userData);
     }
 
-    private async Task UpdateLastData(RealmPlayer player)
+    private void UpdateLastData(RealmPlayer player)
     {
-        var userManager = player.GetRequiredService<UserManager<UserData>>();
-        var user = await userManager.GetUserById(player.GetUserId());
+        var user = player.User.User;
         if (user != null)
         {
             user.LastLoginDateTime = _dateTimeProvider.Now;
@@ -88,8 +83,16 @@ internal sealed class UsersService : IUsersService
             user.RegisterIp ??= user.LastIp;
             user.RegisteredDateTime ??= _dateTimeProvider.Now;;
             user.Nick = player.Name;
-            await _userManager.UpdateAsync(user);
         }
+    }
+
+    private async Task<string?> ValidatePolicies(RealmPlayer player)
+    {
+        var authorizationPoliciesProvider = player.GetRequiredService<AuthorizationPoliciesProvider>();
+        foreach (var policy in authorizationPoliciesProvider.Policies)
+            if (!await AuthorizePolicy(player, policy))
+                return policy;
+        return null;
     }
 
     public async Task<bool> SignIn(RealmPlayer player, UserData user)
@@ -105,20 +108,24 @@ internal sealed class UsersService : IUsersService
         if (!_activeUsers.TrySetActive(user.Id, player))
             throw new Exception("Failed to login to already active account.");
 
-        var components = player;
+        var userManager = player.GetRequiredService<UserManager<UserData>>();
+        var signInManager = player.GetRequiredService<SignInManager<UserData>>();
+        var userLoginHistoryRepository = player.GetRequiredService<IUserLoginHistoryRepository>();
+        var db = player.GetRequiredService<IDb>();
+        var banService = player.GetRequiredService<IBanService>();
         try
         {
             var serial = player.Client.GetSerial();
 
-            var roles = await _userManager.GetRolesAsync(user);
-            var claimsPrincipal = await _signInManager.CreateUserPrincipalAsync(user);
+            var roles = await userManager.GetRolesAsync(user);
+            var claimsPrincipal = await signInManager.CreateUserPrincipalAsync(user);
             foreach (var role in roles)
             {
                 if (claimsPrincipal.Identity is ClaimsIdentity claimsIdentity)
                     claimsIdentity.AddClaim(new Claim(ClaimTypes.Role, role));
             }
-            var bans = await _banService.GetBansByUserIdAndSerial(user.Id, serial);
-            components.AddComponent(new UserComponent(user, claimsPrincipal, bans));
+            var bans = await banService.GetBansByUserIdAndSerial(user.Id, serial);
+            player.User.SignIn(user, claimsPrincipal, bans);
             if (user.Inventories != null && user.Inventories.Count != 0)
             {
                 foreach (var inventory in user.Inventories)
@@ -128,102 +135,106 @@ internal sealed class UsersService : IUsersService
                             new Item(_itemsRegistry, x.ItemId, x.Number, JsonConvert.DeserializeObject<Metadata>(x.MetaData, _jsonSerializerSettings))
                         )
                         .ToList();
-                    components.AddComponent(new InventoryComponent(inventory.Size, inventory.Id, items));
+                    player.AddComponent(new InventoryComponent(inventory.Size, inventory.Id, items));
                 }
             }
             else
-                components.AddComponent(new InventoryComponent(_gameplayOptions.CurrentValue.DefaultInventorySize));
+                player.AddComponent(new InventoryComponent(_gameplayOptions.CurrentValue.DefaultInventorySize));
 
             if (user.DailyVisits != null)
-                components.AddComponent(new DailyVisitsCounterComponent(user.DailyVisits));
+                player.AddComponent(new DailyVisitsCounterComponent(user.DailyVisits));
             else
-                components.AddComponent<DailyVisitsCounterComponent>();
+                player.AddComponent<DailyVisitsCounterComponent>();
 
             if (user.Stats != null)
-                components.AddComponent(new StatisticsCounterComponent(user.Stats));
+                player.AddComponent(new StatisticsCounterComponent(user.Stats));
             else
-                components.AddComponent<StatisticsCounterComponent>();
+                player.AddComponent<StatisticsCounterComponent>();
 
             if (user.Achievements != null)
-                components.AddComponent(new AchievementsComponent(user.Achievements));
+                player.AddComponent(new AchievementsComponent(user.Achievements));
             else
-                components.AddComponent<AchievementsComponent>();
+                player.AddComponent<AchievementsComponent>();
 
             if (user.JobUpgrades != null)
-                components.AddComponent(new JobUpgradesComponent(user.JobUpgrades));
+                player.AddComponent(new JobUpgradesComponent(user.JobUpgrades));
             else
-                components.AddComponent<JobUpgradesComponent>();
+                player.AddComponent<JobUpgradesComponent>();
 
             if (user.JobStatistics != null)
-                components.AddComponent(new JobStatisticsComponent(_dateTimeProvider.Now, user.JobStatistics));
+                player.AddComponent(new JobStatisticsComponent(_dateTimeProvider.Now, user.JobStatistics));
             else
-                components.AddComponent(new JobStatisticsComponent(_dateTimeProvider.Now));
+                player.AddComponent(new JobStatisticsComponent(_dateTimeProvider.Now));
 
             if (user.Discoveries != null)
-                components.AddComponent(new DiscoveriesComponent(user.Discoveries));
+                player.AddComponent(new DiscoveriesComponent(user.Discoveries));
             else
-                components.AddComponent<DiscoveriesComponent>();
+                player.AddComponent<DiscoveriesComponent>();
 
             if (user.DiscordIntegration != null)
-                components.AddComponent(new DiscordIntegrationComponent(user.DiscordIntegration.DiscordUserId));
+                player.AddComponent(new DiscordIntegrationComponent(user.DiscordIntegration.DiscordUserId));
 
             foreach (var groupMemberData in user.GroupMembers)
-                components.AddComponent(new GroupMemberComponent(groupMemberData));
+                player.AddComponent(new GroupMemberComponent(groupMemberData));
 
             foreach (var fractionMemberData in user.FractionMembers)
-                components.AddComponent(new FractionMemberComponent(fractionMemberData));
+                player.AddComponent(new FractionMemberComponent(fractionMemberData));
 
-            components.AddComponent(new LicensesComponent(user.Licenses, _dateTimeProvider));
-            components.AddComponent(new PlayTimeComponent(_dateTimeProvider, user.PlayTime));
-            components.AddComponent(new LevelComponent(user.Level, user.Experience, _levelsRegistry));
+            player.AddComponent(new LicensesComponent(user.Licenses, _dateTimeProvider));
+            player.AddComponent(new PlayTimeComponent(_dateTimeProvider, user.PlayTime));
+            player.AddComponent(new LevelComponent(user.Level, user.Experience, _levelsRegistry));
             player.Money.SetMoneyInternal(user.Money);
+            await ValidatePolicies(player);
+            await userLoginHistoryRepository.Add(user.Id, _dateTimeProvider.Now, player.Client.IPAddress?.ToString() ?? "", serial);
+            UpdateLastData(player);
+            db.Users.Update(user);
+            await db.SaveChangesAsync();
 
-            await _userLoginHistoryRepository.Add(user.Id, _dateTimeProvider.Now, player.Client.IPAddress?.ToString() ?? "", serial);
-            await UpdateLastData(player);
             SignedIn?.Invoke(player);
             return true;
 
         }
         catch (Exception ex)
         {
-            while (components.TryDestroyComponent<InventoryComponent>()) { }
-            components.TryDestroyComponent<DailyVisitsCounterComponent>();
-            components.TryDestroyComponent<StatisticsCounterComponent>();
-            components.TryDestroyComponent<AchievementsComponent>();
-            components.TryDestroyComponent<JobUpgradesComponent>();
-            components.TryDestroyComponent<JobStatisticsComponent>();
-            components.TryDestroyComponent<DiscoveriesComponent>();
-            components.TryDestroyComponent<DiscordIntegrationComponent>();
-            while (components.TryDestroyComponent<GroupMemberComponent>()) { }
-            while (components.TryDestroyComponent<FractionMemberComponent>()) { }
-            components.TryDestroyComponent<LicensesComponent>();
-            components.TryDestroyComponent<PlayTimeComponent>();
-            components.TryDestroyComponent<LevelComponent>();
-            components.TryDestroyComponent<UserComponent>();
+            _activeUsers.TrySetInactive(user.Id);
+            while (player.TryDestroyComponent<InventoryComponent>()) { }
+            player.TryDestroyComponent<DailyVisitsCounterComponent>();
+            player.TryDestroyComponent<StatisticsCounterComponent>();
+            player.TryDestroyComponent<AchievementsComponent>();
+            player.TryDestroyComponent<JobUpgradesComponent>();
+            player.TryDestroyComponent<JobStatisticsComponent>();
+            player.TryDestroyComponent<DiscoveriesComponent>();
+            player.TryDestroyComponent<DiscordIntegrationComponent>();
+            while (player.TryDestroyComponent<GroupMemberComponent>()) { }
+            while (player.TryDestroyComponent<FractionMemberComponent>()) { }
+            player.TryDestroyComponent<LicensesComponent>();
+            player.TryDestroyComponent<PlayTimeComponent>();
+            player.TryDestroyComponent<LevelComponent>();
+            if(player.User.IsSignedIn)
+                player.User.SignOut();
             player.Money.SetMoneyInternal(0);
-            _logger.LogError(ex, "Failed to sign in a user.");
+                _logger.LogError(ex, "Failed to sign in a user.");
             return false;
         }
     }
 
     public async Task SignOut(RealmPlayer player)
     {
-        var components = player;
         await _saveService.Save(player);
-        while (components.TryDestroyComponent<InventoryComponent>()) { }
-        components.TryDestroyComponent<DailyVisitsCounterComponent>();
-        components.TryDestroyComponent<StatisticsCounterComponent>();
-        components.TryDestroyComponent<AchievementsComponent>();
-        components.TryDestroyComponent<JobUpgradesComponent>();
-        components.TryDestroyComponent<JobStatisticsComponent>();
-        components.TryDestroyComponent<DiscoveriesComponent>();
-        components.TryDestroyComponent<DiscordIntegrationComponent>();
-        while (components.TryDestroyComponent<GroupMemberComponent>()) { }
-        while (components.TryDestroyComponent<FractionMemberComponent>()) { }
-        components.TryDestroyComponent<LicensesComponent>();
-        components.TryDestroyComponent<PlayTimeComponent>();
-        components.TryDestroyComponent<LevelComponent>();
-        components.TryDestroyComponent<UserComponent>();
+        _activeUsers.TrySetInactive(player.UserId);
+        while (player.TryDestroyComponent<InventoryComponent>()) { }
+        player.TryDestroyComponent<DailyVisitsCounterComponent>();
+        player.TryDestroyComponent<StatisticsCounterComponent>();
+        player.TryDestroyComponent<AchievementsComponent>();
+        player.TryDestroyComponent<JobUpgradesComponent>();
+        player.TryDestroyComponent<JobStatisticsComponent>();
+        player.TryDestroyComponent<DiscoveriesComponent>();
+        player.TryDestroyComponent<DiscordIntegrationComponent>();
+        while (player.TryDestroyComponent<GroupMemberComponent>()) { }
+        while (player.TryDestroyComponent<FractionMemberComponent>()) { }
+        player.TryDestroyComponent<LicensesComponent>();
+        player.TryDestroyComponent<PlayTimeComponent>();
+        player.TryDestroyComponent<LevelComponent>();
         player.RemoveFromVehicle();
         player.Position = new Vector3(6000, 6000, 99999);
         player.Interior = 0;
@@ -232,12 +243,12 @@ internal sealed class UsersService : IUsersService
         SignedOut?.Invoke(player);
     }
 
-    public async ValueTask<bool> AuthorizePolicy(UserComponent userComponent, string policy, bool useCache = true)
+    public async ValueTask<bool> AuthorizePolicy(RealmPlayer player, string policy, bool useCache = true)
     {
-        if (useCache && userComponent.HasAuthorizedPolicy(policy, out bool wasAuthorized))
+        if (useCache && player.User.HasAuthorizedPolicy(policy, out bool wasAuthorized))
             return wasAuthorized;
-        var result = await _authorizationService.AuthorizeAsync(userComponent.ClaimsPrincipal, policy);
-        userComponent.AddAuthorizedPolicy(policy, result.Succeeded);
+        var result = await _authorizationService.AuthorizeAsync(player.User.ClaimsPrincipal, policy);
+        player.User.AddAuthorizedPolicy(policy, result.Succeeded);
         return result.Succeeded;
     }
 
@@ -253,24 +264,13 @@ internal sealed class UsersService : IUsersService
         return true;
     }
 
-    public async Task<bool> UpdateLastNewsRead(RealmPlayer player)
-    {
-        if (player.TryGetComponent(out UserComponent userComponent))
-        {
-            var now = _dateTimeProvider.Now;
-            userComponent.LastNewsReadDateTime = now;
-            return await _userManager.UpdateLastNewsReadDateTime(userComponent.Id, now);
-        }
-        return false;
-    }
-
     public IEnumerable<RealmPlayer> SearchPlayersByName(string pattern, bool loggedIn = true)
     {
         foreach (var player in _elementCollection.GetByType<RealmPlayer>())
         {
             if (loggedIn)
             {
-                if (!player.IsLoggedIn)
+                if (!player.IsSignedIn)
                     continue;
             }
                 
@@ -293,31 +293,18 @@ internal sealed class UsersService : IUsersService
         return false;
     }
 
-    public async Task<bool> AddUserEvent(RealmPlayer player, int eventId, string? metadata = null)
+    public async Task AddUserEvent(RealmPlayer player, int eventId, string? metadata = null)
     {
-        if (player.TryGetComponent(out UserComponent userComponent))
-        {
-            await _userEventRepository.AddEvent(userComponent.Id, eventId, _dateTimeProvider.Now);
-            return true;
-        }
-        return false;
+        await _userEventRepository.AddEvent(player.UserId, eventId, _dateTimeProvider.Now);
     }
 
     public async Task<List<UserEventData>> GetAllUserEvents(RealmPlayer player, IEnumerable<int>? events = null)
     {
-        if (player.TryGetComponent(out UserComponent userComponent))
-        {
-            return await _userEventRepository.GetAllEventsByUserId(userComponent.Id, events);
-        }
-        return new();
+        return await _userEventRepository.GetAllEventsByUserId(player.UserId, events);
     }
 
     public async Task<List<UserEventData>> GetLastUserEvents(RealmPlayer player, int limit = 10, IEnumerable<int>? events = null)
     {
-        if (player.TryGetComponent(out UserComponent userComponent))
-        {
-            return await _userEventRepository.GetLastEventsByUserId(userComponent.Id, limit, events);
-        }
-        return new();
+        return await _userEventRepository.GetLastEventsByUserId(player.UserId, limit, events);
     }
 }

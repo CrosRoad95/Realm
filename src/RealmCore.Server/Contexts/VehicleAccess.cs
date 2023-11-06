@@ -36,7 +36,7 @@ public class VehicleAccess
 
     public bool TryGetAccess(RealmPlayer player, out VehiclePlayerAccess vehicleAccess)
     {
-        var userId = player.GetUserId();
+        var userId = player.UserId;
         lock (_lock)
         {
             var index = _vehiclePlayerAccesses.FindIndex(x => x.userId == userId);
@@ -68,7 +68,7 @@ public class VehicleAccess
         {
             _vehiclePlayerAccesses.Add(new VehiclePlayerAccess
             {
-                userId = player.GetUserId(),
+                userId = player.UserId,
                 accessType = accessType,
                 customValue = customValue
             });

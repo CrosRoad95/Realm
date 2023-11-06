@@ -55,18 +55,18 @@ internal sealed class VehiclesService : IVehiclesService
 
     public async Task<List<LightInfoVehicleDTO>> GetAllLightVehicles(RealmPlayer player)
     {
-        if (player.TryGetComponent(out UserComponent userComponent))
+        if (player.IsSignedIn)
         {
-            return await _vehicleRepository.GetLightVehiclesByUserId(userComponent.Id);
+            return await _vehicleRepository.GetLightVehiclesByUserId(player.UserId);
         }
         return new();
     }
 
     public async Task<List<VehicleData>> GetAllVehicles(RealmPlayer player)
     {
-        if(player.TryGetComponent(out UserComponent userComponent))
+        if(player.IsSignedIn)
         {
-            return await _vehicleRepository.GetVehiclesByUserId(userComponent.Id);
+            return await _vehicleRepository.GetVehiclesByUserId(player.UserId);
         }
         return new();
     }

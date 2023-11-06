@@ -5,7 +5,7 @@ using SlipeServer.Server.Elements.Enums;
 
 namespace RealmCore.Sample.Logic;
 
-internal sealed class PlayerGameplayLogic : ComponentLogic<UserComponent>
+internal sealed class PlayerGameplayLogic
 {
     private readonly IServiceProvider _serviceProvider;
     private readonly ChatBox _chatBox;
@@ -13,18 +13,18 @@ internal sealed class PlayerGameplayLogic : ComponentLogic<UserComponent>
     private readonly VehicleEnginesRegistry _vehicleEnginesRegistry;
     private readonly ILogger<PlayerGameplayLogic> _logger;
 
-    public PlayerGameplayLogic(ILogger<PlayerGameplayLogic> logger, IServiceProvider serviceProvider, ChatBox chatBox, VehicleUpgradeRegistry vehicleUpgradeRegistry, VehicleEnginesRegistry vehicleEnginesRegistry, IElementFactory elementFactory) : base(elementFactory)
+    public PlayerGameplayLogic(ILogger<PlayerGameplayLogic> logger, IServiceProvider serviceProvider, ChatBox chatBox, VehicleUpgradeRegistry vehicleUpgradeRegistry, VehicleEnginesRegistry vehicleEnginesRegistry, IUsersService usersService)
     {
         _serviceProvider = serviceProvider;
         _chatBox = chatBox;
         _vehicleUpgradeRegistry = vehicleUpgradeRegistry;
         _vehicleEnginesRegistry = vehicleEnginesRegistry;
         _logger = logger;
+        usersService.SignedIn += HandleSignedIn;
     }
 
-    protected override void ComponentAdded(UserComponent userComponent)
+    private void HandleSignedIn(RealmPlayer player)
     {
-        var player = (RealmPlayer)userComponent.Element;
         player.FocusedElementChanged += HandleFocusedElementChanged;
         player.SetBindAsync("x", HandleInteract);
     }

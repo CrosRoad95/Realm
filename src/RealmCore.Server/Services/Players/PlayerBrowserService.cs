@@ -1,9 +1,8 @@
 ﻿using RealmCore.Resources.Browser;
-using RealmCore.Server.Interfaces.Players;
 
 namespace RealmCore.Server.Services.Players;
 
-public class PlayerBrowserService : IPlayerBrowserService, IDisposable
+internal sealed class PlayerBrowserService : IPlayerBrowserService, IDisposable
 {
     public event Action<string, bool>? PathChanged;
     public event Action<bool>? DevToolsStateChanged;
@@ -11,7 +10,6 @@ public class PlayerBrowserService : IPlayerBrowserService, IDisposable
 
     private readonly IBrowserGuiService _browserGuiService;
     private readonly IBrowserService _browserService;
-    private readonly RealmPlayer _player;
 
     private string _path = "/";
     public string Path
@@ -32,7 +30,7 @@ public class PlayerBrowserService : IPlayerBrowserService, IDisposable
             {
                 _devTools = value;
                 DevToolsStateChanged?.Invoke(value);
-                _browserService.ToggleDevTools(_player, value);
+                _browserService.ToggleDevTools(Player, value);
             }
         }
     }
@@ -48,10 +46,12 @@ public class PlayerBrowserService : IPlayerBrowserService, IDisposable
             {
                 _visible = value;
                 VisibleChanged?.Invoke(value);
-                _browserService.SetVisible(_player, value);
+                _browserService.SetVisible(Player, value);
             }
         }
     }
+
+    public RealmPlayer Player { get; private set; }
 
     public PlayerBrowserService(IBrowserGuiService browserGuiService, IBrowserService browserService, PlayerContext playerContext)
     {
@@ -59,17 +59,17 @@ public class PlayerBrowserService : IPlayerBrowserService, IDisposable
         browserGuiService.AuthorizePlayer(key, playerContext.Player);
         _browserGuiService = browserGuiService;
         _browserService = browserService;
-        _player = playerContext.Player;
+        Player = playerContext.Player;
         browserService.BrowserStarted += HandleBrowserStarted;
     }
 
     private void HandleBrowserStarted(Player player)
     {
-        if (player != _player)
+        if (player != Player)
             return;
 
         var key = _browserGuiService.GenerateKey();
-        if (_browserGuiService.AuthorizePlayer(key, _player))
+        if (_browserGuiService.AuthorizePlayer(key, Player))
         {
             var url = $"/realmGuiInitialize?{_browserGuiService.KeyName}={key}";
             SetPath(url, true);
@@ -81,7 +81,7 @@ public class PlayerBrowserService : IPlayerBrowserService, IDisposable
         PathChanged?.Invoke(path, clientSide);
         _path = path;
         if (clientSide)
-            _browserService.SetPath(_player, _path);
+            _browserService.SetPath(Player, _path);
     }
 
     /// <summary>
@@ -101,6 +101,6 @@ public class PlayerBrowserService : IPlayerBrowserService, IDisposable
 
     public void Dispose()
     {
-        _browserGuiService.UnauthorizePlayer(_player);
+        _browserGuiService.UnauthorizePlayer(Player);
     }
 }

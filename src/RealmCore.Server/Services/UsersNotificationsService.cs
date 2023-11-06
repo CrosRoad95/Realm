@@ -16,19 +16,19 @@ internal sealed class UsersNotificationsService : IUsersNotificationsService
 
     public async Task<int> Create(RealmPlayer player, string title, string description, string? excerpt = null)
     {
-        var notification = await _userNotificationRepository.Create(player.GetUserId(), _dateTimeProvider.Now, title, description, excerpt);
+        var notification = await _userNotificationRepository.Create(player.UserId, _dateTimeProvider.Now, title, description, excerpt);
         NotificationCreated?.Invoke(player, title, description, excerpt, notification.Id);
         return notification.Id;
     }
 
     public async Task<List<UserNotificationData>> Get(RealmPlayer player, int limit = 10)
     {
-        return await _userNotificationRepository.Get(player.GetUserId(), limit);
+        return await _userNotificationRepository.Get(player.UserId, limit);
     }
 
     public async Task<int> CountUnread(RealmPlayer player)
     {
-        return await _userNotificationRepository.CountUnread(player.GetUserId());
+        return await _userNotificationRepository.CountUnread(player.UserId);
     }
 
     public async Task<bool> MarkAsRead(int notificationId)

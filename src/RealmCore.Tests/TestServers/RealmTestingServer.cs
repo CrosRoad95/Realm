@@ -128,7 +128,7 @@ internal class RealmTestingServer : TestingServer<RealmTestingPlayer>
         return GetRequiredService<IElementFactory>().CreateObject(SlipeServer.Server.Enums.ObjectModel.Bin1, Vector3.Zero, Vector3.Zero);
     }
 
-    public async Task<UserComponent> SignInPlayer(RealmPlayer player, string[]? roles = null)
+    public async Task SignInPlayer(RealmPlayer player, string[]? roles = null)
     {
         var claims = new List<Claim>
         {
@@ -164,7 +164,6 @@ internal class RealmTestingServer : TestingServer<RealmTestingPlayer>
             }
 
         var bans = await GetRequiredService<IBanService>().GetBansByUserIdAndSerial(user.Id, "AAAA");
-        var userComponent = player.AddComponent(new UserComponent(user, claimsPrincipal, bans));
-        return userComponent;
+        player.GetRequiredService<IPlayerUserService>().SignIn(user, claimsPrincipal, bans);
     }
 }

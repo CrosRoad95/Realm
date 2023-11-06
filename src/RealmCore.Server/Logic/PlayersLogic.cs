@@ -7,15 +7,17 @@ internal sealed class PlayersLogic
     private readonly IClientInterfaceService _clientInterfaceService;
     private readonly ILogger<PlayersLogic> _logger;
     private readonly IResourceProvider _resourceProvider;
+    private readonly IActiveUsers _activeUsers;
     private readonly ConcurrentDictionary<RealmPlayer, Latch> _playerResources = new();
 
-    public PlayersLogic(IElementFactory elementFactory, MtaServer mtaServer, IClientInterfaceService clientInterfaceService, ILogger<PlayersLogic> logger, IResourceProvider resourceProvider)
+    public PlayersLogic(IElementFactory elementFactory, MtaServer mtaServer, IClientInterfaceService clientInterfaceService, ILogger<PlayersLogic> logger, IResourceProvider resourceProvider, IActiveUsers activeUsers)
     {
         _elementFactory = elementFactory;
         _mtaServer = mtaServer;
         _clientInterfaceService = clientInterfaceService;
         _logger = logger;
         _resourceProvider = resourceProvider;
+        _activeUsers = activeUsers;
         _mtaServer.PlayerJoined += HandlePlayerJoined;
     }
 
@@ -144,6 +146,7 @@ internal sealed class PlayersLogic
         {
             plr.Destroyed -= HandlePlayerDestroyed;
             _playerResources.TryRemove(player, out var _);
+            _activeUsers.TrySetInactive(player.UserId);
             await player.GetRequiredService<ISaveService>().Save(player);
         }
         catch (Exception ex)

@@ -13,48 +13,28 @@ internal sealed class FeedbackService : IFeedbackService
         _dateTimeProvider = dateTimeProvider;
     }
 
-    public async Task<bool> Rate(RealmPlayer player, int ratingId, int rating)
+    public async Task Rate(RealmPlayer player, int ratingId, int rating)
     {
-        if(player.TryGetComponent(out UserComponent userComponent))
-        {
-            return await _ratingRepository.Rate(userComponent.Id, ratingId, rating, _dateTimeProvider.Now);
-        }
-        return false;
+        await _ratingRepository.Rate(player.UserId, ratingId, rating, _dateTimeProvider.Now);
     }
     
     public async Task ChangeLastRating(RealmPlayer player, int ratingId, int rating)
     {
-        if (player.TryGetComponent(out UserComponent userComponent))
-        {
-            await _ratingRepository.ChangeLastRating(userComponent.Id, ratingId, rating, _dateTimeProvider.Now);
-        }
+        await _ratingRepository.ChangeLastRating(player.UserId, ratingId, rating, _dateTimeProvider.Now);
     }
 
     public async Task<(int, DateTime)?> GetLastRating(RealmPlayer player, int ratingId)
     {
-        if (player.TryGetComponent(out UserComponent userComponent))
-        {
-            return await _ratingRepository.GetLastRating(userComponent.Id, ratingId);
-        }
-        return null;
+        return await _ratingRepository.GetLastRating(player.UserId, ratingId);
     }
 
-    public async Task<bool> AddOpinion(RealmPlayer player, int opinionId, string opinion)
+    public async Task AddOpinion(RealmPlayer player, int opinionId, string opinion)
     {
-        if (player.TryGetComponent(out UserComponent userComponent))
-        {
-            return await _opinionRepository.AddOpinion(userComponent.Id, opinionId, opinion, _dateTimeProvider.Now);
-        }
-        return false;
+        await _opinionRepository.AddOpinion(player.UserId, opinionId, opinion, _dateTimeProvider.Now);
     }
 
     public async Task<DateTime?> GetLastOpinionDateTime(RealmPlayer player, int opinionId)
     {
-        if (player.TryGetComponent(out UserComponent userComponent))
-        {
-            return await _opinionRepository.GetLastOpinionDateTime(userComponent.Id, opinionId);
-        }
-
-        return null;
+        return await _opinionRepository.GetLastOpinionDateTime(player.UserId, opinionId);
     }
 }

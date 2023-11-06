@@ -212,33 +212,34 @@ internal sealed class SaveService : ISaveService
 
     private async Task<bool> SavePlayer(RealmPlayer player)
     {
-        if (!player.TryGetComponent(out UserComponent userComponent))
+        if (!player.IsSignedIn)
             return false;
 
-        var user = await _dbContext.Users
+        var user = player.User;
+        var userData = await _dbContext.Users
             .IncludeAll()
-            .Where(x => x.Id == userComponent.Id).FirstAsync();
+            .Where(x => x.Id == user.Id).FirstAsync();
 
         foreach (var item in _userDataSavers)
             await item.SaveAsync(player);
 
-        user.Upgrades = userComponent.Upgrades.Select(x => new UserUpgradeData
+        userData.Upgrades = user.Upgrades.Select(x => new UserUpgradeData
         {
             UpgradeId = x
         }).ToList();
 
-        user.Settings = userComponent.Settings.Select(x => new UserSettingData
+        userData.Settings = user.Settings.Select(x => new UserSettingData
         {
             SettingId = x,
-            Value = userComponent.GetSetting(x) ?? ""
+            Value = user.GetSetting(x) ?? ""
         }).ToList();
 
-        user.LastTransformAndMotion = player.GetTransformAndMotion();
-        user.Money = player.Money.Amount;
+        userData.LastTransformAndMotion = player.GetTransformAndMotion();
+        userData.Money = player.Money.Amount;
 
         if (player.TryGetComponent(out LicensesComponent licensesComponent))
         {
-            user.Licenses = licensesComponent.Licenses.Select(x => new UserLicenseData
+            userData.Licenses = licensesComponent.Licenses.Select(x => new UserLicenseData
             {
                 LicenseId = x.licenseId,
                 SuspendedReason = x.suspendedReason,
@@ -247,16 +248,16 @@ internal sealed class SaveService : ISaveService
         }
         else
         {
-            user.Licenses = new List<UserLicenseData>();
+            userData.Licenses = new List<UserLicenseData>();
         }
 
         if (player.TryGetComponent(out PlayTimeComponent playTimeComponent))
         {
-            user.PlayTime = (ulong)playTimeComponent.TotalPlayTime.TotalSeconds;
+            userData.PlayTime = (ulong)playTimeComponent.TotalPlayTime.TotalSeconds;
             playTimeComponent.Reset();
         }
         else
-            user.PlayTime = 0;
+            userData.PlayTime = 0;
 
         var inventoryComponents = player.Components.ComponentsList.OfType<InventoryComponent>()
             .Where(x => x.Id != 0)
@@ -264,7 +265,7 @@ internal sealed class SaveService : ISaveService
 
         if (inventoryComponents.Count != 0)
         {
-            foreach (var inventory in user.Inventories)
+            foreach (var inventory in userData.Inventories)
             {
                 var inventoryComponent = inventoryComponents.Where(x => x.Id == inventory.Id).First();
                 inventory.Size = inventoryComponent.Size;
@@ -272,12 +273,12 @@ internal sealed class SaveService : ISaveService
             }
         }
         else
-            user.Inventories = new List<InventoryData>();
+            userData.Inventories = new List<InventoryData>();
 
 
         if (player.TryGetComponent(out DailyVisitsCounterComponent dailyVisitsCounterComponent))
         {
-            user.DailyVisits = new DailyVisitsData
+            userData.DailyVisits = new DailyVisitsData
             {
                 LastVisit = dailyVisitsCounterComponent.LastVisit,
                 VisitsInRow = dailyVisitsCounterComponent.VisitsInRow,
@@ -285,23 +286,23 @@ internal sealed class SaveService : ISaveService
             };
         }
         else
-            user.DailyVisits = null;
+            userData.DailyVisits = null;
 
         if (player.TryGetComponent(out StatisticsCounterComponent statisticsCounterComponent))
         {
-            user.Stats = statisticsCounterComponent.GetStatsIds.Select(x => new UserStatData
+            userData.Stats = statisticsCounterComponent.GetStatsIds.Select(x => new UserStatData
             {
                 StatId = x,
                 Value = statisticsCounterComponent.GetStat(x)
             }).ToList();
-            _dbContext.UserStats.AddRange(user.Stats);
+            _dbContext.UserStats.AddRange(userData.Stats);
         }
         else
-            user.Stats = new List<UserStatData>();
+            userData.Stats = new List<UserStatData>();
 
         if (player.TryGetComponent(out AchievementsComponent achievementsComponent))
         {
-            user.Achievements = achievementsComponent.Achievements.Select(x => new AchievementData
+            userData.Achievements = achievementsComponent.Achievements.Select(x => new AchievementData
             {
                 AchievementId = x.Key,
                 Value = JsonConvert.SerializeObject(x.Value.value, Formatting.None),
@@ -310,28 +311,28 @@ internal sealed class SaveService : ISaveService
             }).ToList();
         }
         else
-            user.Achievements = new List<AchievementData>();
+            userData.Achievements = new List<AchievementData>();
 
         if (player.TryGetComponent(out JobUpgradesComponent jobUpgradesComponent))
         {
-            user.JobUpgrades = jobUpgradesComponent.Upgrades.Select(x => new JobUpgradeData
+            userData.JobUpgrades = jobUpgradesComponent.Upgrades.Select(x => new JobUpgradeData
             {
                 JobId = x.jobId,
                 UpgradeId = x.upgradeId,
             }).ToList();
         }
         else
-            user.JobUpgrades = new List<JobUpgradeData>();
+            userData.JobUpgrades = new List<JobUpgradeData>();
 
         if (player.TryGetComponent(out JobStatisticsComponent jobStatisticsComponent))
         {
             var newStatistics = jobStatisticsComponent.JobStatistics.Where(x => x.Value.sessionPoints > 0 || x.Value.sessionTimePlayed > 0);
             foreach (var item in newStatistics)
             {
-                var first = user.JobStatistics.FirstOrDefault(x => x.JobId == item.Value.jobId && x.Date == jobStatisticsComponent.Date);
+                var first = userData.JobStatistics.FirstOrDefault(x => x.JobId == item.Value.jobId && x.Date == jobStatisticsComponent.Date);
                 if (first == null)
                 {
-                    user.JobStatistics.Add(new JobStatisticsData
+                    userData.JobStatistics.Add(new JobStatisticsData
                     {
                         Date = jobStatisticsComponent.Date,
                         JobId = item.Key,
@@ -348,11 +349,11 @@ internal sealed class SaveService : ISaveService
             jobStatisticsComponent.Reset();
         }
         else
-            user.JobStatistics = new List<JobStatisticsData>();
+            userData.JobStatistics = new List<JobStatisticsData>();
 
         if (player.TryGetComponent(out DiscoveriesComponent discoveriesComponent))
         {
-            user.Discoveries = discoveriesComponent.Discoveries.Select(x => new DiscoveryData
+            userData.Discoveries = discoveriesComponent.Discoveries.Select(x => new DiscoveryData
             {
                 DiscoveryId = x,
             }).ToList();
@@ -360,25 +361,25 @@ internal sealed class SaveService : ISaveService
 
         if (player.TryGetComponent(out LevelComponent levelComponent))
         {
-            user.Level = levelComponent.Level;
-            user.Experience = levelComponent.Experience;
+            userData.Level = levelComponent.Level;
+            userData.Experience = levelComponent.Experience;
         }
         else
         {
-            user.Level = 0;
-            user.Experience = 0;
+            userData.Level = 0;
+            userData.Experience = 0;
         }
 
         if (player.TryGetComponent(out DiscordIntegrationComponent discordIntegrationComponent))
         {
-            user.DiscordIntegration = new DiscordIntegrationData
+            userData.DiscordIntegration = new DiscordIntegrationData
             {
                 DiscordUserId = discordIntegrationComponent.DiscordUserId
             };
         }
         else
         {
-            user.DiscordIntegration = null;
+            userData.DiscordIntegration = null;
         }
 
         return true;

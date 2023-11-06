@@ -1,7 +1,4 @@
-﻿using Microsoft.Extensions.Options;
-using RealmCore.Server.Interfaces.Players;
-
-namespace RealmCore.Server.Elements;
+﻿namespace RealmCore.Server.Elements;
 
 public class RealmPlayer : Player, IComponents, IDisposable
 {
@@ -60,11 +57,12 @@ public class RealmPlayer : Player, IComponents, IDisposable
     }
 
     public CultureInfo Culture => _culture;
-    public bool IsLoggedIn { get; private set; }
-    public int? UserId { get; private set; }
+    public bool IsSignedIn => User.IsSignedIn;
+    public int UserId => User.Id;
 
     public new IPlayerMoneyService Money => _serviceProvider.GetRequiredService<IPlayerMoneyService>();
     public IPlayerAFKService AFK => _serviceProvider.GetRequiredService<IPlayerAFKService>();
+    public IPlayerUserService User => _serviceProvider.GetRequiredService<IPlayerUserService>();
     public RealmPlayer(IServiceProvider serviceProvider)
     {
         _serviceScope = serviceProvider.CreateScope();
@@ -78,33 +76,11 @@ public class RealmPlayer : Player, IComponents, IDisposable
         BindExecuted += HandleBindExecuted;
         IsNametagShowing = false;
         UpdateFight();
-        Components.ComponentAdded += HandleComponentAdded;
-        Components.ComponentDetached += HandleComponentDetached;
     }
-
-    public int GetUserId() => UserId ?? throw new InvalidOperationException();
 
     public T GetRequiredService<T>() where T : notnull
     {
         return _serviceProvider.GetRequiredService<T>();
-    }
-
-    private void HandleComponentAdded(IComponent component)
-    {
-        if (component is UserComponent userComponent)
-        {
-            IsLoggedIn = true;
-            UserId = userComponent.Id;
-        }
-    }
-
-    private void HandleComponentDetached(IComponent component)
-    {
-        if(component is UserComponent)
-        {
-            IsLoggedIn = false;
-            UserId = null;
-        }
     }
 
     public TComponent GetRequiredComponent<TComponent>() where TComponent : IComponent
@@ -188,19 +164,14 @@ public class RealmPlayer : Player, IComponents, IDisposable
 
     public bool TrySpawnAtLastPosition()
     {
-        var userComponent = Components.GetComponent<UserComponent>();
-        if (userComponent != null)
+        var lastTransformAndMotion = User.LastTransformAndMotion;
+        if (lastTransformAndMotion != null)
         {
-            var lastTransformAndMotion = userComponent.User.LastTransformAndMotion;
-            if (lastTransformAndMotion != null)
-            {
-                Spawn(lastTransformAndMotion.Position, lastTransformAndMotion.Rotation);
-                Interior = lastTransformAndMotion.Interior;
-                Dimension = lastTransformAndMotion.Dimension;
-                return true;
-            }
+            Spawn(lastTransformAndMotion.Position, lastTransformAndMotion.Rotation);
+            Interior = lastTransformAndMotion.Interior;
+            Dimension = lastTransformAndMotion.Dimension;
+            return true;
         }
-
         return false;
     }
 
@@ -567,8 +538,6 @@ public class RealmPlayer : Player, IComponents, IDisposable
 
     public void Dispose()
     {
-        Components.ComponentAdded -= HandleComponentAdded;
-        Components.ComponentDetached -= HandleComponentDetached;
         _serviceScope.Dispose();
         _cancellationTokenSource.Cancel();
         _cancellationTokenSource.Dispose();

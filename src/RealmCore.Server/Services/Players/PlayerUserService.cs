@@ -1,9 +1,9 @@
-﻿using RealmCore.Server.DomainObjects;
+﻿using RealmCore.Persistence.Data.Helpers;
+using RealmCore.Server.DomainObjects;
 
-namespace RealmCore.Server.Components.Players;
+namespace RealmCore.Server.Services.Players;
 
-[ComponentUsage(false)]
-public class UserComponent : ComponentLifecycle
+internal sealed class PlayerUserService : IPlayerUserService, IDisposable
 {
     private struct PolicyCache
     {
@@ -11,55 +11,77 @@ public class UserComponent : ComponentLifecycle
         public bool authorized;
     }
 
-    private readonly UserData? _user;
+    private UserData? _user;
     private readonly List<int> _upgrades = new();
-    private readonly object _upgradesLock = new();
+    private readonly object _lock = new();
     private readonly ConcurrentDictionary<int, string> _settings = new();
-    private readonly ClaimsPrincipal _claimsPrincipal;
+    private readonly List<PolicyCache> _authorizedPolicies = new();
+    private readonly IDateTimeProvider _dateTimeProvider;
+    private readonly IUserEventRepository _userEventRepository;
+    private ClaimsPrincipal? _claimsPrincipal;
+    private Bans? _bans;
 
-    public UserData User => _user ?? throw new InvalidOperationException();
-    public ClaimsPrincipal ClaimsPrincipal => _claimsPrincipal;
+    public UserData User => _user ?? throw new UserNotSignedInException();
+    public ClaimsPrincipal ClaimsPrincipal => _claimsPrincipal ?? throw new UserNotSignedInException();
+    public bool IsSignedIn => _user != null;
     public int Id => _user?.Id ?? -1;
-    public string? Nick => _user?.Nick;
-    public string? UserName => _user?.UserName;
+    public string Nick => _user?.Nick ?? throw new UserNotSignedInException();
+    public string UserName => _user?.UserName ?? throw new UserNotSignedInException();
     public IReadOnlyList<int> Upgrades => _upgrades;
     public ICollection<int> Settings => _settings.Keys;
-    public DateTime? LastNewsReadDateTime
+    public DateTime? LastNewsReadDateTime => User.LastNewsReadDateTime;
+    public TransformAndMotion? LastTransformAndMotion => User.LastTransformAndMotion;
+    public Bans Bans => _bans ?? throw new UserNotSignedInException();
+
+
+    public event Action<IPlayerUserService, int>? UpgradeAdded;
+    public event Action<IPlayerUserService, int>? UpgradeRemoved;
+    public event Action<IPlayerUserService, int, string>? SettingChanged;
+    public event Action<IPlayerUserService, int, string>? SettingRemoved;
+
+    public RealmPlayer Player { get; }
+    public PlayerUserService(PlayerContext playerContext, IDateTimeProvider dateTimeProvider, IUserEventRepository userEventRepository)
     {
-        get
+        Player = playerContext.Player;
+        _dateTimeProvider = dateTimeProvider;
+        _userEventRepository = userEventRepository;
+    }
+
+    public void SignIn(UserData user, ClaimsPrincipal claimsPrincipal, Bans bans)
+    {
+        lock (_lock)
         {
-            return User.LastNewsReadDateTime;
-        }
-        internal set
-        {
-            User.LastNewsReadDateTime = value;
+            if(user == null)
+                throw new InvalidOperationException();
+            _user = user;
+            _claimsPrincipal = claimsPrincipal;
+            _bans = bans;
+            _upgrades.AddRange(_user.Upgrades.Select(x => x.UpgradeId));
+            foreach (var item in _user.Settings)
+            {
+                _settings[item.SettingId] = item.Value;
+            }
         }
     }
 
-    public Bans Bans { get; }
-
-    public event Action<UserComponent, int>? UpgradeAdded;
-    public event Action<UserComponent, int>? UpgradeRemoved;
-    public event Action<UserComponent, int, string>? SettingChanged;
-    public event Action<UserComponent, int, string>? SettingRemoved;
-    private readonly object _authorizedPoliciesLock = new();
-    private readonly List<PolicyCache> _authorizedPolicies = new();
-
-    internal UserComponent(UserData user, ClaimsPrincipal claimsPrincipal, Bans bans)
+    public void SignOut()
     {
-        _user = user;
-        _claimsPrincipal = claimsPrincipal;
-        Bans = bans;
-        _upgrades = _user.Upgrades.Select(x => x.UpgradeId).ToList();
-        foreach (var item in _user.Settings)
+        lock (_lock)
         {
-            _settings[item.SettingId] = item.Value;
+            if (_user == null)
+                throw new InvalidOperationException();
+            _user = null;
+            _claimsPrincipal = null;
+            _bans = null;
+            _upgrades.Clear();
+            _settings.Clear();
         }
+        ClearAuthorizedPoliciesCache();
     }
 
-    internal void AddAuthorizedPolicy(string policy, bool authorized)
+    public void AddAuthorizedPolicy(string policy, bool authorized)
     {
-        lock (_authorizedPoliciesLock)
+        lock (_lock)
         {
             _authorizedPolicies.Add(new PolicyCache
             {
@@ -69,9 +91,9 @@ public class UserComponent : ComponentLifecycle
         }
     }
 
-    internal bool HasAuthorizedPolicy(string policy, out bool authorized)
+    public bool HasAuthorizedPolicy(string policy, out bool authorized)
     {
-        lock (_authorizedPoliciesLock)
+        lock (_lock)
         {
             var index = _authorizedPolicies.FindIndex(x => x.policy == policy);
             if (index == -1)
@@ -84,10 +106,10 @@ public class UserComponent : ComponentLifecycle
             return true;
         }
     }
-    
-    internal bool HasAuthorizedPolicies(string[] policies)
+
+    public bool HasAuthorizedPolicies(string[] policies)
     {
-        lock (_authorizedPoliciesLock)
+        lock (_lock)
         {
             foreach (var policy in policies)
             {
@@ -104,8 +126,7 @@ public class UserComponent : ComponentLifecycle
 
     private void ClearAuthorizedPoliciesCache()
     {
-        lock (_authorizedPoliciesLock)
-            _authorizedPolicies.Clear();
+        _authorizedPolicies.Clear();
     }
 
     public bool IsInRole(string role)
@@ -117,7 +138,7 @@ public class UserComponent : ComponentLifecycle
     {
         if (_claimsPrincipal == null)
             return false;
-        if(value != null)
+        if (value != null)
             return _claimsPrincipal.HasClaim(x => x.Type == type && x.Value == type);
         return _claimsPrincipal.HasClaim(x => x.Type == type);
     }
@@ -134,8 +155,8 @@ public class UserComponent : ComponentLifecycle
         if (_claimsPrincipal == null)
             return false;
 
-        if(_claimsPrincipal.Identity is ClaimsIdentity claimsIdentity)
-        { 
+        if (_claimsPrincipal.Identity is ClaimsIdentity claimsIdentity)
+        {
             claimsIdentity.AddClaim(new Claim(type, value));
             ClearAuthorizedPoliciesCache();
             return true;
@@ -237,13 +258,13 @@ public class UserComponent : ComponentLifecycle
 
     public bool HasUpgrade(int upgradeId)
     {
-        lock (_upgradesLock)
+        lock (_lock)
             return InternalHasUpgrade(upgradeId);
     }
 
     public bool TryAddUpgrade(int upgradeId)
     {
-        lock (_upgradesLock)
+        lock (_lock)
         {
             if (InternalHasUpgrade(upgradeId))
                 return false;
@@ -255,7 +276,7 @@ public class UserComponent : ComponentLifecycle
 
     public bool TryRemoveUpgrade(int upgradeId)
     {
-        lock (_upgradesLock)
+        lock (_lock)
         {
             if (!InternalHasUpgrade(upgradeId))
                 return false;
@@ -287,7 +308,7 @@ public class UserComponent : ComponentLifecycle
 
     public bool RemoveSetting(int settingId)
     {
-        if(_settings.TryRemove(settingId, out var value))
+        if (_settings.TryRemove(settingId, out var value))
         {
             SettingRemoved?.Invoke(this, settingId, value);
             return true;
@@ -295,8 +316,14 @@ public class UserComponent : ComponentLifecycle
         return false;
     }
 
-    public override void Dispose()
+    public void UpdateLastNewsRead()
     {
-        Bans.Dispose();
+        User.LastNewsReadDateTime = _dateTimeProvider.Now;
+    }
+
+    public void Dispose()
+    {
+        if(IsSignedIn)
+            SignOut();
     }
 }

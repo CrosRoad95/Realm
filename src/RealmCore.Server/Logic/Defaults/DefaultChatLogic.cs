@@ -25,14 +25,14 @@ public class DefaultChatLogic
         {
             case "say":
                 var player = (RealmPlayer)plr;
-                if (player.IsLoggedIn)
+                if (player.IsSignedIn)
                 {
                     var messageContent = string.Join(' ', arguments.Arguments);
                     string message = $"{player.Name}: {messageContent}";
                     string messageWithColors = $"{player.NametagColor.ToColorCode()}{player.Name}: #ffffff{messageContent}";
                     foreach (var targetPlayer in _elementCollection.GetByType<RealmPlayer>())
                     {
-                        if(targetPlayer.IsLoggedIn)
+                        if(targetPlayer.IsSignedIn)
                             _chatBox.OutputTo(targetPlayer, messageWithColors, Color.White, true);
                     }
 

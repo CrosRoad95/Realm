@@ -83,7 +83,6 @@ global using SlipeServer.Packets.Definitions.Entities.Structs;
 global using SlipeServer.Server.Constants;
 global using System.Collections.Concurrent;
 global using RealmCore.Server.Components.Object;
-global using SlipeServer.Packets.Enums.VehicleUpgrades;
 global using RealmCore.MySql;
 global using SlipeServer.Resources.Watermark;
 global using RealmCore.Server.Options;

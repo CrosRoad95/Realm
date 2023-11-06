@@ -1,5 +1,4 @@
-﻿using RealmCore.Server.Interfaces.Players;
-using RealmCore.Server.Services.Players;
+﻿using RealmCore.Server.Services.Players;
 
 namespace RealmCore.Server.Extensions;
 
@@ -61,7 +60,7 @@ public static class ServiceCollectionExtensions
         #endregion
 
         #region Services
-        services.AddScoped<IUsersService, UsersService>();
+        services.AddSingleton<IUsersService, UsersService>();
         services.AddScoped<ISaveService, SaveService>();
         services.AddScoped<ILoadService, LoadService>();
         services.AddScoped<IVehiclesService, VehiclesService>();
@@ -84,6 +83,8 @@ public static class ServiceCollectionExtensions
         #region Player services
         services.AddScoped<IPlayerBrowserService, PlayerBrowserService>();
         services.AddScoped<IPlayerAFKService, PlayerAFKService>();
+        services.AddScoped<IPlayerMoneyService, PlayerMoneyService>();
+        services.AddScoped<IPlayerUserService, PlayerUserService>();
         #endregion
 
         #region Policies

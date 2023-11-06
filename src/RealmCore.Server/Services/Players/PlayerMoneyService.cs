@@ -1,6 +1,6 @@
 ﻿namespace RealmCore.Server.Services.Players;
 
-internal class PlayerMoneyService : IPlayerMoneyService
+internal sealed class PlayerMoneyService : IPlayerMoneyService
 {
     private decimal _money = 0;
     private decimal _moneyLimit;

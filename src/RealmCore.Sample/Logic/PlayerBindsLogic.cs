@@ -19,7 +19,7 @@ internal class HomePageComponent : BrowserGuiComponent
     }
 }
 
-internal sealed class PlayerBindsLogic : ComponentLogic<UserComponent>
+internal sealed class PlayerBindsLogic
 {
     public struct GuiOpenOptions
     {
@@ -29,16 +29,16 @@ internal sealed class PlayerBindsLogic : ComponentLogic<UserComponent>
     private readonly IServiceProvider _serviceProvider;
     private readonly IVehicleRepository _vehicleRepository;
 
-    public PlayerBindsLogic(IElementFactory elementFactory, IServiceProvider serviceProvider, IVehicleRepository vehicleRepository) : base(elementFactory)
+    public PlayerBindsLogic(IUsersService usersService, IServiceProvider serviceProvider, IVehicleRepository vehicleRepository)
     {
         _serviceProvider = serviceProvider;
         _vehicleRepository = vehicleRepository;
+        usersService.SignedIn += HandleSignedIn;
+        usersService.SignedOut += HandleSignedOut;
     }
-
-    protected override void ComponentAdded(UserComponent userComponent)
+    
+    private void HandleSignedIn(RealmPlayer player)
     {
-        var player = (RealmPlayer)userComponent.Element;
-
         player.SetBindAsync("num_0", player =>
         {
             if (player.TryGetComponent(out AdminComponent adminComponent))
@@ -81,7 +81,7 @@ internal sealed class PlayerBindsLogic : ComponentLogic<UserComponent>
             DashboardGuiComponent.DashboardState state = new();
             state.Money = (double)player.Money.Amount;
 
-            var vehiclesWithModelAndPositionDTos = await _vehicleRepository.GetLightVehiclesByUserId(userComponent.Id);
+            var vehiclesWithModelAndPositionDTos = await _vehicleRepository.GetLightVehiclesByUserId(player.UserId);
             state.VehicleLightInfos = vehiclesWithModelAndPositionDTos.Select(x => new VehicleLightInfoDTO
             {
                 Id = x.Id,
@@ -94,9 +94,8 @@ internal sealed class PlayerBindsLogic : ComponentLogic<UserComponent>
         GuiHelpers.BindGui<InventoryGuiComponent>(player, "i", _serviceProvider);
     }
 
-    protected override void ComponentDetached(UserComponent userComponent)
+    private void HandleSignedOut(RealmPlayer player)
     {
-        var player = (RealmPlayer)userComponent.Element;
         player.RemoveAllBinds();
     }
 }

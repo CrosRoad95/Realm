@@ -63,15 +63,12 @@ internal sealed class GroupService : IGroupService
 
     public async Task<bool> AddMember(RealmPlayer player, int groupId, int rank = 1, string rankName = "")
     {
-        if (player.TryGetComponent(out UserComponent userComponent))
-        {
-            if (player.Components.HasComponent<GroupMemberComponent>(x => x.GroupId == groupId))
-                return false;
+        if (player.Components.HasComponent<GroupMemberComponent>(x => x.GroupId == groupId))
+            return false;
 
-            var groupMemberData = await _groupRepository.AddMember(groupId, userComponent.Id, rank, rankName);
-            player.AddComponent(new GroupMemberComponent(groupMemberData));
-        }
-        return false;
+        var groupMemberData = await _groupRepository.AddMember(groupId, player.UserId, rank, rankName);
+        player.AddComponent(new GroupMemberComponent(groupMemberData));
+        return true;
     }
 
     public bool IsUserInGroup(RealmPlayer player, int groupId)
@@ -81,16 +78,13 @@ internal sealed class GroupService : IGroupService
 
     public async Task<bool> RemoveMember(RealmPlayer player, int groupId)
     {
-        if (player.TryGetComponent(out UserComponent userComponent))
-        {
-            var groupMemberComponent = player.Components.FindComponent<GroupMemberComponent>(x => x.GroupId == groupId);
-            if (groupMemberComponent == null)
-                return false;
+        var groupMemberComponent = player.Components.FindComponent<GroupMemberComponent>(x => x.GroupId == groupId);
+        if (groupMemberComponent == null)
+            return false;
 
-            if (await _groupRepository.RemoveMember(groupId, userComponent.Id))
-            {
-                return player.Components.TryDestroyComponent(groupMemberComponent);
-            }
+        if (await _groupRepository.RemoveMember(groupId, player.UserId))
+        {
+            return player.Components.TryDestroyComponent(groupMemberComponent);
         }
         return false;
     }

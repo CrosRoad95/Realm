@@ -1,5 +1,4 @@
 ﻿using RealmCore.Server.Components.Players.Abstractions;
-using RealmCore.Server.Interfaces.Players;
 
 namespace RealmCore.Server.Logic.Resources;
 

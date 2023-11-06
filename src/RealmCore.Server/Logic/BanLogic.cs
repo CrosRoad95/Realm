@@ -22,10 +22,7 @@ internal sealed class BanLogic
     {
         if(_activeUsers.TryGetPlayerByUserId(userId, out var player) && player != null)
         {
-            if (player.TryGetComponent(out UserComponent userComponent))
-            {
-                userComponent.Bans.RemoveBan(banId);
-            }
+            player.User.Bans.RemoveBan(banId);
         }
     }
 
@@ -48,10 +45,7 @@ internal sealed class BanLogic
 
         if(player != null)
         {
-            if(player.TryGetComponent(out UserComponent userComponent))
-            {
-                userComponent.Bans.AddBan(banDTO);
-            }
+            player.User.Bans.AddBan(banDTO);
         }
     }
 }

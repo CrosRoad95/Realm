@@ -136,7 +136,7 @@ public sealed class RealmCommandService
         if (!_commands.TryGetValue(command, out var commandInfo))
             return;
 
-        if (!player.TryGetComponent(out UserComponent userComponent))
+        if (!player.IsSignedIn)
             return;
 
         var activity = new Activity("CommandHandler").Start();
@@ -152,7 +152,7 @@ public sealed class RealmCommandService
         _logger.LogInformation("Begin command {command} execution", command);
         if (commandInfo.RequiredPolicies != null && commandInfo.RequiredPolicies.Length > 0)
         {
-            var authorized = userComponent.HasAuthorizedPolicies(commandInfo.RequiredPolicies);
+            var authorized = player.User.HasAuthorizedPolicies(commandInfo.RequiredPolicies);
             if (!authorized)
             {
                 _logger.LogInformation("Failed to execute command {command} because one of authorized policy failed", command);
@@ -166,7 +166,7 @@ public sealed class RealmCommandService
             var commandArguments = new CommandArguments(arguments, player.ServiceProvider);
             if(commandInfo is SyncCommandInfo syncCommandInfo)
             {
-                if (userComponent.HasClaim("commandsNoLimit"))
+                if (player.User.HasClaim("commandsNoLimit"))
                     syncCommandInfo.Callback(player, commandArguments);
                 else
                     commandThrottlingPolicy.Execute(() =>
@@ -176,7 +176,7 @@ public sealed class RealmCommandService
             }
             else if(commandInfo is AsyncCommandInfo asyncCommandInfo)
             {
-                if (userComponent.HasClaim("commandsNoLimit"))
+                if (player.User.HasClaim("commandsNoLimit"))
                     await asyncCommandInfo.Callback(player, commandArguments, player.CancellationToken);
                 else
                     await commandThrottlingPolicy.ExecuteAsync(async (cancellationToken) =>

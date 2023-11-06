@@ -11,9 +11,10 @@ internal sealed class PlayerAFKService : IPlayerAFKService, IDisposable
     private readonly ILogger<PlayerAFKService> _logger;
     private readonly Debounce _debounce;
     private readonly object _lock = new();
-
-    public PlayerAFKService(IOptionsMonitor<GameplayOptions> gameplayOptions, IDateTimeProvider dateTimeProvider, ILogger<PlayerAFKService> logger)
+    public RealmPlayer Player { get; private set; }
+    public PlayerAFKService(PlayerContext playerContext, IOptionsMonitor<GameplayOptions> gameplayOptions, IDateTimeProvider dateTimeProvider, ILogger<PlayerAFKService> logger)
     {
+        Player = playerContext.Player;
         _gameplayOptions = gameplayOptions;
         _dateTimeProvider = dateTimeProvider;
         _logger = logger;

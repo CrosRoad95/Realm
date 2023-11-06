@@ -2,7 +2,7 @@
 
 namespace RealmCore.Sample.Logic;
 
-internal sealed class PlayerJoinedLogic : ComponentLogic<UserComponent>
+internal sealed class PlayerJoinedLogic
 {
     private readonly ILogger<PlayerJoinedLogic> _logger;
     private readonly INametagsService _nametagsService;
@@ -10,7 +10,7 @@ internal sealed class PlayerJoinedLogic : ComponentLogic<UserComponent>
     private readonly Text3dService _text3DService;
     private readonly IGuiSystemService? _guiSystemService;
 
-    public PlayerJoinedLogic(ILogger<PlayerJoinedLogic> logger, INametagsService nametagsService,ChatBox chatBox, Text3dService text3DService, IBrowserGuiService browserGuiService, MtaServer mtaServer, IElementFactory elementFactory, IGuiSystemService? guiSystemService = null) : base(elementFactory)
+    public PlayerJoinedLogic(ILogger<PlayerJoinedLogic> logger, INametagsService nametagsService,ChatBox chatBox, Text3dService text3DService, IBrowserGuiService browserGuiService, MtaServer mtaServer, IElementFactory elementFactory, IUsersService usersService, IGuiSystemService? guiSystemService = null)
     {
         _logger = logger;
         _nametagsService = nametagsService;
@@ -19,6 +19,8 @@ internal sealed class PlayerJoinedLogic : ComponentLogic<UserComponent>
         _guiSystemService = guiSystemService;
         browserGuiService.Ready += HandleReady;
         mtaServer.PlayerJoined += HandlePlayerJoined;
+        usersService.SignedIn += HandleSignedIn;
+        usersService.SignedOut += HandleSignedOut;
     }
 
     private void HandleReady(RealmPlayer player)
@@ -26,9 +28,8 @@ internal sealed class PlayerJoinedLogic : ComponentLogic<UserComponent>
         _chatBox.OutputTo(player, "Browser ready");
     }
 
-    private async Task ComponentAddedCore(UserComponent userComponent)
+    private async Task HandleSignedInCore(RealmPlayer player)
     {
-        var player = (RealmPlayer)userComponent.Element;
         await player.FadeCameraAsync(CameraFade.Out);
         if (_guiSystemService != null)
             _guiSystemService.SetDebugToolsEnabled(player, true);
@@ -47,11 +48,11 @@ internal sealed class PlayerJoinedLogic : ComponentLogic<UserComponent>
         _nametagsService.SetNametagRenderingEnabled(player, true);
     }
 
-    protected override async void ComponentAdded(UserComponent userComponent)
+    private async void HandleSignedIn(RealmPlayer player)
     {
         try
         {
-            await ComponentAddedCore(userComponent);
+            await HandleSignedInCore(player);
         }
         catch (Exception ex)
         {
@@ -59,9 +60,9 @@ internal sealed class PlayerJoinedLogic : ComponentLogic<UserComponent>
         }
     }
 
-    protected override void ComponentDetached(UserComponent userComponent)
+    private void HandleSignedOut(RealmPlayer player)
     {
-        ShowLoginSequence((RealmPlayer)userComponent.Element);
+        ShowLoginSequence(player);
     }
 
     private void ShowLoginSequence(RealmPlayer player)

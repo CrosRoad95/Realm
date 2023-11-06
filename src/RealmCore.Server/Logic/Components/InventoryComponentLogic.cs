@@ -3,29 +3,43 @@
 internal sealed class InventoryComponentLogic : ComponentLogic<InventoryComponent>
 {
     private readonly ISaveService _saveService;
+    private readonly ILogger<InventoryComponentLogic> _logger;
 
-    public InventoryComponentLogic(IElementFactory elementFactory, ISaveService saveService) : base(elementFactory)
+    public InventoryComponentLogic(IElementFactory elementFactory, ISaveService saveService, ILogger<InventoryComponentLogic> logger) : base(elementFactory)
     {
         _saveService = saveService;
+        _logger = logger;
     }
 
-    protected override async void ComponentAdded(InventoryComponent inventoryComponent)
+    private async Task ComponentAddedCore(InventoryComponent inventoryComponent)
     {
         if (inventoryComponent.Id != 0)
             return;
 
-        if (inventoryComponent.Element is IComponents components)
+        if (inventoryComponent.Element is RealmPlayer player)
         {
-            if (components.TryGetComponent(out UserComponent userComponent))
+            var inventoryId = await _saveService.SaveNewPlayerInventory(inventoryComponent, player.UserId);
+            inventoryComponent.Id = inventoryId;
+        }
+        else if (inventoryComponent.Element is RealmVehicle vehicle)
+        {
+            if (vehicle.TryGetComponent(out PrivateVehicleComponent privateVehicle))
             {
-                var inventoryId = await _saveService.SaveNewPlayerInventory(inventoryComponent, userComponent.Id);
+                var inventoryId = await _saveService.SaveNewVehicleInventory(inventoryComponent, privateVehicle.Id);
                 inventoryComponent.Id = inventoryId;
             }
-            else if (components.TryGetComponent(out PrivateVehicleComponent vehicle))
-            {
-                var inventoryId = await _saveService.SaveNewVehicleInventory(inventoryComponent, vehicle.Id);
-                inventoryComponent.Id = inventoryId;
-            }
+        }
+    }
+
+    protected override async void ComponentAdded(InventoryComponent inventoryComponent)
+    {
+        try
+        {
+            await ComponentAddedCore(inventoryComponent);
+        }
+        catch(Exception ex)
+        {
+            _logger.LogHandleError(ex);
         }
     }
 }

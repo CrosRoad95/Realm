@@ -15,12 +15,12 @@ public class UserComponentTests
         #endregion
 
         #region Act
-        var authorized = await usersService.AuthorizePolicy(player.GetRequiredComponent<UserComponent>(), "Admin");
+        var authorized = await usersService.AuthorizePolicy(player, "Admin");
         #endregion
 
         #region Assert
         authorized.Should().Be(expectedAuthorized);
-        var isInCache = player.GetRequiredComponent<UserComponent>().HasAuthorizedPolicy("Admin", out bool cacheAuthorized);
+        var isInCache = player.User.HasAuthorizedPolicy("Admin", out bool cacheAuthorized);
         isInCache.Should().BeTrue();
         cacheAuthorized.Should().Be(expectedAuthorized);
         #endregion
@@ -33,22 +33,22 @@ public class UserComponentTests
         var realmTestingServer = new RealmTestingServer();
         var player = realmTestingServer.CreatePlayer();
         await realmTestingServer.SignInPlayer(player);
-        var userComponent = player.GetRequiredComponent<UserComponent>();
+        var user = player.User;
         var usersService = player.GetRequiredService<IUsersService>();
         #endregion
 
         #region Act
-        var authorized = await usersService.AuthorizePolicy(userComponent, "Admin");
+        var authorized = await usersService.AuthorizePolicy(player, "Admin");
         #endregion
 
-        #region Acy & Assert
+        #region Act & Assert
         authorized.Should().Be(false);
-        var isInCache = userComponent.HasAuthorizedPolicy("Admin", out bool cacheAuthorized);
+        var isInCache = user.HasAuthorizedPolicy("Admin", out bool cacheAuthorized);
         isInCache.Should().BeTrue();
         cacheAuthorized.Should().Be(false);
 
-        userComponent.AddRole("Admin");
-        isInCache = userComponent.HasAuthorizedPolicy("Admin", out bool _);
+        user.AddRole("Admin");
+        isInCache = user.HasAuthorizedPolicy("Admin", out bool _);
         isInCache.Should().BeFalse();
         #endregion
     }
@@ -60,15 +60,15 @@ public class UserComponentTests
         var realmTestingServer = new RealmTestingServer();
         var player = realmTestingServer.CreatePlayer();
         await realmTestingServer.SignInPlayer(player);
-        var userComponent = player.GetRequiredComponent<UserComponent>();
         #endregion
 
         #region Act
-        userComponent.SetSetting(1, "foo");
-        bool hasSetting = userComponent.TryGetSetting(1, out var settingValue);
-        string? gotSettingValue = userComponent.GetSetting(1);
-        bool removedSetting = userComponent.RemoveSetting(1);
-        string? gotSettingAfterRemove = userComponent.GetSetting(1);
+        var user = player.User;
+        user.SetSetting(1, "foo");
+        bool hasSetting = user.TryGetSetting(1, out var settingValue);
+        string? gotSettingValue = user.GetSetting(1);
+        bool removedSetting = user.RemoveSetting(1);
+        string? gotSettingAfterRemove = user.GetSetting(1);
         #endregion
 
         #region Assert
@@ -87,17 +87,17 @@ public class UserComponentTests
         var realmTestingServer = new RealmTestingServer();
         var player = realmTestingServer.CreatePlayer();
         await realmTestingServer.SignInPlayer(player);
-        var userComponent = player.GetRequiredComponent<UserComponent>();
         #endregion
 
         #region Act
-        var hasSomeUpgrade1 = userComponent.HasUpgrade(1);
-        var added1 = userComponent.TryAddUpgrade(1);
-        var added2 = userComponent.TryAddUpgrade(1);
-        var hasSomeUpgrade2 = userComponent.HasUpgrade(1);
-        var removed1 = userComponent.TryRemoveUpgrade(1);
-        var removed2 = userComponent.TryRemoveUpgrade(1);
-        var hasSomeUpgrade3 = userComponent.HasUpgrade(1);
+        var user = player.User;
+        var hasSomeUpgrade1 = user.HasUpgrade(1);
+        var added1 = user.TryAddUpgrade(1);
+        var added2 = user.TryAddUpgrade(1);
+        var hasSomeUpgrade2 = user.HasUpgrade(1);
+        var removed1 = user.TryRemoveUpgrade(1);
+        var removed2 = user.TryRemoveUpgrade(1);
+        var hasSomeUpgrade3 = user.HasUpgrade(1);
         #endregion
 
         #region Assert

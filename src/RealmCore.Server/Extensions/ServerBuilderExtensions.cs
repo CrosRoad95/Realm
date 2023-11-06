@@ -114,7 +114,6 @@ public static class ServerBuilderExtensions
         serverBuilder.AddLogic<UpdateCallbackLogic>();
         serverBuilder.AddLogic<PickupLogic>();
         serverBuilder.AddLogic<CollisionShapeLogic>();
-        serverBuilder.AddScopedLogic<UserComponentLogic>();
         serverBuilder.AddScopedLogic<PrivateVehicleComponentLogic>();
         serverBuilder.AddScopedLogic<InventoryComponentLogic>();
         serverBuilder.AddScopedLogic<PlayersLogic>();

@@ -27,7 +27,7 @@ public class UsersManagerTests
         validPassword.Should().BeTrue();
         signedIn.Should().BeTrue();
         lastNick.Should().Be("CrosRoad95");
-        player.IsLoggedIn.Should().BeTrue();
+        player.IsSignedIn.Should().BeTrue();
         player.UserId.Should().Be(userId);
         #endregion
     }
