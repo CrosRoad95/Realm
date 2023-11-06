@@ -177,7 +177,6 @@ internal sealed class UsersService : IUsersService
             components.AddComponent(new PlayTimeComponent(_dateTimeProvider, user.PlayTime));
             components.AddComponent(new LevelComponent(user.Level, user.Experience, _levelsRegistry));
             components.AddComponent(new MoneyComponent(user.Money, _gameplayOptions));
-            components.AddComponentWithDI<AFKComponent>();
             
             await _userLoginHistoryRepository.Add(user.Id, _dateTimeProvider.Now, player.Client.IPAddress?.ToString() ?? "", serial);
             await UpdateLastData(player);
@@ -201,7 +200,6 @@ internal sealed class UsersService : IUsersService
             components.TryDestroyComponent<PlayTimeComponent>();
             components.TryDestroyComponent<LevelComponent>();
             components.TryDestroyComponent<MoneyComponent>();
-            components.TryDestroyComponent<AFKComponent>();
             components.TryDestroyComponent<UserComponent>();
             _logger.LogError(ex, "Failed to sign in a user.");
             return false;
@@ -226,7 +224,6 @@ internal sealed class UsersService : IUsersService
         components.TryDestroyComponent<PlayTimeComponent>();
         components.TryDestroyComponent<LevelComponent>();
         components.TryDestroyComponent<MoneyComponent>();
-        components.TryDestroyComponent<AFKComponent>();
         components.TryDestroyComponent<UserComponent>();
         player.RemoveFromVehicle();
         player.Position = new Vector3(6000, 6000, 99999);

@@ -1,14 +1,12 @@
 ﻿namespace RealmCore.Server.Logic.Resources;
 
-internal sealed class AFKResourceLogic : ComponentLogic<AFKComponent>
+internal sealed class AFKResourceLogic
 {
     private readonly ILogger<StatisticsCounterResourceLogic> _logger;
-    private readonly IDateTimeProvider _dateTimeProvider;
 
-    public AFKResourceLogic(IAFKService afkService, ILogger<StatisticsCounterResourceLogic> logger, IDateTimeProvider dateTimeProvider, IElementFactory elementFactory) : base(elementFactory)
+    public AFKResourceLogic(IAFKService afkService, ILogger<StatisticsCounterResourceLogic> logger)
     {
         _logger = logger;
-        _dateTimeProvider = dateTimeProvider;
         afkService.PlayerAFKStarted += HandlePlayerAFKStarted;
         afkService.PlayerAFKStopped += HandlePlayerAFKStopped;
     }
@@ -16,37 +14,14 @@ internal sealed class AFKResourceLogic : ComponentLogic<AFKComponent>
     private void HandlePlayerAFKStarted(Player plr)
     {
         var player = (RealmPlayer)plr;
-        if (player.TryGetComponent(out AFKComponent afkComponent))
-        {
-            using var _ = _logger.BeginElement(player);
-            afkComponent.HandlePlayerAFKStarted(_dateTimeProvider.Now);
-        }
+        using var _ = _logger.BeginElement(player);
+        player.GetRequiredService<IPlayerAFKService>().HandleAFKStarted();
     }
 
     private void HandlePlayerAFKStopped(Player plr)
     {
         var player = (RealmPlayer)plr;
-        if (player.TryGetComponent(out AFKComponent afkComponent))
-        {
-            using var _ = _logger.BeginElement(player);
-            afkComponent.HandlePlayerAFKStopped(_dateTimeProvider.Now);
-        }
+        using var _ = _logger.BeginElement(player);
+        player.GetRequiredService<IPlayerAFKService>().HandleAFKStopped();
     }
-
-    protected override void ComponentAdded(AFKComponent afkComponent)
-    {
-        afkComponent.StateChanged += HandleStateChanged;
-    }
-
-    protected override void ComponentDetached(AFKComponent afkComponent)
-    {
-        afkComponent.StateChanged -= HandleStateChanged;
-    }
-
-    private void HandleStateChanged(AFKComponent afkComponent, bool isAfk, TimeSpan elapsed)
-    {
-        using var _ = _logger.BeginElement(afkComponent.Element);
-        _logger.LogInformation("Player {isAfk} afk", isAfk ? "started" : "stopped");
-    }
-
 }

@@ -83,6 +83,7 @@ public static class ServiceCollectionExtensions
 
         #region Player services
         services.AddScoped<IPlayerBrowserService, PlayerBrowserService>();
+        services.AddScoped<IPlayerAFKService, PlayerAFKService>();
         #endregion
 
         #region Policies

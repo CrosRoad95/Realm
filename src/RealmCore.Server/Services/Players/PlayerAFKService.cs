@@ -1,21 +1,30 @@
-﻿namespace RealmCore.Server.Components.Players;
+﻿namespace RealmCore.Server.Services.Players;
 
-[ComponentUsage(false)]
-public class AFKComponent : Component
+internal sealed class PlayerAFKService : IPlayerAFKService, IDisposable
 {
     public DateTime? LastAFK { get; private set; }
     public bool IsAFK { get; private set; }
-    public event Action<AFKComponent, bool, TimeSpan>? StateChanged;
+    public event Action<IPlayerAFKService, bool, TimeSpan>? StateChanged;
     private event Action<bool>? InternalStateChanged;
     private readonly IOptionsMonitor<GameplayOptions> _gameplayOptions;
+    private readonly IDateTimeProvider _dateTimeProvider;
+    private readonly ILogger<PlayerAFKService> _logger;
     private readonly Debounce _debounce;
     private readonly object _lock = new();
 
-    public AFKComponent(IOptionsMonitor<GameplayOptions> gameplayOptions)
+    public PlayerAFKService(IOptionsMonitor<GameplayOptions> gameplayOptions, IDateTimeProvider dateTimeProvider, ILogger<PlayerAFKService> logger)
     {
         _gameplayOptions = gameplayOptions;
+        _dateTimeProvider = dateTimeProvider;
+        _logger = logger;
         _gameplayOptions.OnChange(HandleOptionsChanged);
         _debounce = new(_gameplayOptions.CurrentValue.AfkCooldown ?? 5000);
+        StateChanged += HandleStateChanged;
+    }
+
+    private void HandleStateChanged(IPlayerAFKService afkService, bool isAfk, TimeSpan elapsed)
+    {
+        _logger.LogInformation("Player {isAfk} afk", isAfk ? "started" : "stopped");
     }
 
     private void HandleOptionsChanged(GameplayOptions gameplayOptions)
@@ -23,13 +32,13 @@ public class AFKComponent : Component
         _debounce.Milliseconds = gameplayOptions.AfkCooldown ?? 5000;
     }
 
-    protected virtual void StateHasChanged(DateTime now)
+    private void StateHasChanged(DateTime now)
     {
         TimeSpan elapsed = (TimeSpan)(LastAFK == null ? TimeSpan.Zero : now - LastAFK);
         StateChanged?.Invoke(this, IsAFK, elapsed);
     }
 
-    internal void HandlePlayerAFKStopped(DateTime now)
+    public void HandleAFKStopped()
     {
         InternalStateChanged?.Invoke(true);
         lock (_lock)
@@ -37,13 +46,14 @@ public class AFKComponent : Component
             if (IsAFK)
             {
                 IsAFK = false;
+                var now = _dateTimeProvider.Now;
                 StateHasChanged(now);
                 LastAFK = now;
             }
         }
     }
 
-    internal void HandlePlayerAFKStarted(DateTime now)
+    public void HandleAFKStarted()
     {
         InternalStateChanged?.Invoke(false);
         _debounce.Invoke(() =>
@@ -53,6 +63,7 @@ public class AFKComponent : Component
                 if (!IsAFK)
                 {
                     IsAFK = true;
+                    var now = _dateTimeProvider.Now;
                     StateHasChanged(now);
                     LastAFK = now;
                 }
@@ -69,7 +80,7 @@ public class AFKComponent : Component
         var cancellationTokenSource = new CancellationTokenSource();
         void handleStateChanged(bool isAfk)
         {
-            if(expectedAfkState == null || isAfk == expectedAfkState)
+            if (expectedAfkState == null || isAfk == expectedAfkState)
             {
                 cancellationTokenSource.Cancel();
                 InternalStateChanged -= handleStateChanged;
@@ -77,5 +88,9 @@ public class AFKComponent : Component
         }
         InternalStateChanged += handleStateChanged;
         return cancellationTokenSource.Token;
+    }
+
+    public void Dispose()
+    {
     }
 }
