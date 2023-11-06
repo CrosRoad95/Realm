@@ -79,8 +79,7 @@ internal sealed class PlayerBindsLogic : ComponentLogic<UserComponent>
         GuiHelpers.BindGuiPage(player, "F1", async () =>
         {
             DashboardGuiComponent.DashboardState state = new();
-            if (player.TryGetComponent(out MoneyComponent moneyComponent))
-                state.Money = (double)moneyComponent.Money;
+            state.Money = (double)player.Money.Amount;
 
             var vehiclesWithModelAndPositionDTos = await _vehicleRepository.GetLightVehiclesByUserId(userComponent.Id);
             state.VehicleLightInfos = vehiclesWithModelAndPositionDTos.Select(x => new VehicleLightInfoDTO

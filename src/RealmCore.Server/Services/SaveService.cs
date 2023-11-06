@@ -234,11 +234,7 @@ internal sealed class SaveService : ISaveService
         }).ToList();
 
         user.LastTransformAndMotion = player.GetTransformAndMotion();
-
-        if (player.TryGetComponent(out MoneyComponent moneyComponent))
-            user.Money = moneyComponent.Money;
-        else
-            user.Money = 0;
+        user.Money = player.Money.Amount;
 
         if (player.TryGetComponent(out LicensesComponent licensesComponent))
         {

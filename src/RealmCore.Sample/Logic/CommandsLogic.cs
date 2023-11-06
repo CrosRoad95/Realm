@@ -132,40 +132,28 @@ internal sealed class CommandsLogic
 
         _commandService.AddCommandHandler("givemoney", (player, args) =>
         {
-            if (player.TryGetComponent(out MoneyComponent moneyComponent))
-            {
-                var amount = args.ReadDecimal();
-                moneyComponent.GiveMoney(amount);
-                _chatBox.OutputTo(player, $"gave money: {amount}, total money: {moneyComponent.Money}");
-            }
+            var amount = args.ReadDecimal();
+            player.Money.GiveMoney(amount);
+            _chatBox.OutputTo(player, $"gave money: {amount}, total money: {player.Money}");
         });
 
         _commandService.AddCommandHandler("takemoney", (player, args) =>
         {
-            if (player.TryGetComponent(out MoneyComponent moneyComponent))
-            {
-                var amount = args.ReadDecimal();
-                moneyComponent.TakeMoney(amount);
-                _chatBox.OutputTo(player, $"taken money: {amount}, total money: {moneyComponent.Money}");
-            }
+            var amount = args.ReadDecimal();
+            player.Money.TakeMoney(amount);
+            _chatBox.OutputTo(player, $"taken money: {amount}, total money: {player.Money}");
         });
 
         _commandService.AddCommandHandler("setmoney", (player, args) =>
         {
-            if (player.TryGetComponent(out MoneyComponent moneyComponent))
-            {
-                var amount = args.ReadDecimal();
-                moneyComponent.Money = amount;
-                _chatBox.OutputTo(player, $"taken money: {amount}, total money: {moneyComponent.Money}");
-            }
+            var amount = args.ReadDecimal();
+            player.Money.Amount = amount;
+            _chatBox.OutputTo(player, $"taken money: {amount}, total money: {player.Money}");
         });
 
         _commandService.AddCommandHandler("money", (player, args) =>
         {
-            if (player.TryGetComponent(out MoneyComponent moneyComponent))
-            {
-                _chatBox.OutputTo(player, $"total money: {moneyComponent.Money}");
-            }
+            _chatBox.OutputTo(player, $"total money: {player.Money}");
         });
 
         _commandService.AddCommandHandler("cvwithlicenserequired", (player, args) =>
@@ -368,11 +356,8 @@ internal sealed class CommandsLogic
                     _chatBox.OutputTo(player, $"Test license added: 'test123' of id 1");
             }
 
-            if (player.TryGetComponent(out MoneyComponent moneyComponent))
-            {
-                moneyComponent.Money = (decimal)Random.Shared.NextDouble() * 1000;
-                _chatBox.OutputTo(player, $"Set money to: {moneyComponent.Money}");
-            }
+            player.Money.Amount = (decimal)Random.Shared.NextDouble() * 1000;
+            _chatBox.OutputTo(player, $"Set money to: {player.Money}");
 
 
             if (player.TryGetComponent(out AchievementsComponent achievementsComponent))

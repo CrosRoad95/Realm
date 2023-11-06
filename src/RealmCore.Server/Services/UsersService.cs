@@ -176,8 +176,8 @@ internal sealed class UsersService : IUsersService
             components.AddComponent(new LicensesComponent(user.Licenses, _dateTimeProvider));
             components.AddComponent(new PlayTimeComponent(_dateTimeProvider, user.PlayTime));
             components.AddComponent(new LevelComponent(user.Level, user.Experience, _levelsRegistry));
-            components.AddComponent(new MoneyComponent(user.Money, _gameplayOptions));
-            
+            player.Money.SetMoneyInternal(user.Money);
+
             await _userLoginHistoryRepository.Add(user.Id, _dateTimeProvider.Now, player.Client.IPAddress?.ToString() ?? "", serial);
             await UpdateLastData(player);
             SignedIn?.Invoke(player);
@@ -199,8 +199,8 @@ internal sealed class UsersService : IUsersService
             components.TryDestroyComponent<LicensesComponent>();
             components.TryDestroyComponent<PlayTimeComponent>();
             components.TryDestroyComponent<LevelComponent>();
-            components.TryDestroyComponent<MoneyComponent>();
             components.TryDestroyComponent<UserComponent>();
+            player.Money.SetMoneyInternal(0);
             _logger.LogError(ex, "Failed to sign in a user.");
             return false;
         }
@@ -223,12 +223,12 @@ internal sealed class UsersService : IUsersService
         components.TryDestroyComponent<LicensesComponent>();
         components.TryDestroyComponent<PlayTimeComponent>();
         components.TryDestroyComponent<LevelComponent>();
-        components.TryDestroyComponent<MoneyComponent>();
         components.TryDestroyComponent<UserComponent>();
         player.RemoveFromVehicle();
         player.Position = new Vector3(6000, 6000, 99999);
         player.Interior = 0;
         player.Dimension = 0;
+        player.Money.SetMoneyInternal(0);
         SignedOut?.Invoke(player);
     }
 

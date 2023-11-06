@@ -20,7 +20,7 @@ internal class TestConfigurationProvider : IRealmConfigurationProvider
                 ["discord:statusChannel:channelId"] = "1025774028255932497",
                 ["Identity:Policies:Admin:RequireRoles:0"] = "Admin",
                 ["Identity:Policies:Admin:RequireClaims:Test"] = "true",
-                ["Gameplay:MoneyLimit"] = "10000",
+                ["Gameplay:MoneyLimit"] = "1000000",
                 ["Gameplay:MoneyPrecision"] = "4",
                 ["Gameplay:DefaultInventorySize"] = "20",
                 ["Gameplay:AfkCooldown"] = "20",

@@ -13,8 +13,7 @@ internal sealed class UserMoneyHistoryService : IUserMoneyHistoryService
 
     public async Task Add(RealmPlayer player, decimal change, int? category = null, string? description = null)
     {
-        var moneyComponent = player.GetRequiredComponent<MoneyComponent>();
-        var money = moneyComponent.Money;
+        var money = player.Money.Amount;
         await _userMoneyHistoryRepository.Add(player.GetUserId(), _dateTimeProvider.Now, money + change, change, category, description);
     }
 

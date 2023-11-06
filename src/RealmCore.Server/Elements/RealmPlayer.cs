@@ -1,4 +1,5 @@
-﻿using RealmCore.Server.Interfaces.Players;
+﻿using Microsoft.Extensions.Options;
+using RealmCore.Server.Interfaces.Players;
 
 namespace RealmCore.Server.Elements;
 
@@ -62,6 +63,8 @@ public class RealmPlayer : Player, IComponents, IDisposable
     public bool IsLoggedIn { get; private set; }
     public int? UserId { get; private set; }
 
+    public new IPlayerMoneyService Money => _serviceProvider.GetRequiredService<IPlayerMoneyService>();
+    public IPlayerAFKService AFK => _serviceProvider.GetRequiredService<IPlayerAFKService>();
     public RealmPlayer(IServiceProvider serviceProvider)
     {
         _serviceScope = serviceProvider.CreateScope();
