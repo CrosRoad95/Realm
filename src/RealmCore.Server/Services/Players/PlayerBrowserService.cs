@@ -1,8 +1,9 @@
 ﻿using RealmCore.Resources.Browser;
+using RealmCore.Server.Interfaces.Players;
 
-namespace RealmCore.Server.Services;
+namespace RealmCore.Server.Services.Players;
 
-public class RealmBrowserService : IRealmBrowserService, IDisposable
+public class PlayerBrowserService : IPlayerBrowserService, IDisposable
 {
     public event Action<string, bool>? PathChanged;
     public event Action<bool>? DevToolsStateChanged;
@@ -40,7 +41,8 @@ public class RealmBrowserService : IRealmBrowserService, IDisposable
 
     public bool Visible
     {
-        get => _visible; set
+        get => _visible;
+        set
         {
             if (_visible != value)
             {
@@ -51,8 +53,7 @@ public class RealmBrowserService : IRealmBrowserService, IDisposable
         }
     }
 
-    public bool IsVisible => _visible;
-    public RealmBrowserService(IBrowserGuiService browserGuiService, IBrowserService browserService, PlayerContext playerContext)
+    public PlayerBrowserService(IBrowserGuiService browserGuiService, IBrowserService browserService, PlayerContext playerContext)
     {
         var key = browserGuiService.GenerateKey();
         browserGuiService.AuthorizePlayer(key, playerContext.Player);
@@ -68,7 +69,7 @@ public class RealmBrowserService : IRealmBrowserService, IDisposable
             return;
 
         var key = _browserGuiService.GenerateKey();
-        if(_browserGuiService.AuthorizePlayer(key, _player))
+        if (_browserGuiService.AuthorizePlayer(key, _player))
         {
             var url = $"/realmGuiInitialize?{_browserGuiService.KeyName}={key}";
             SetPath(url, true);

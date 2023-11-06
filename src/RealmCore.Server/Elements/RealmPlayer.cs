@@ -1,4 +1,6 @@
-﻿namespace RealmCore.Server.Elements;
+﻿using RealmCore.Server.Interfaces.Players;
+
+namespace RealmCore.Server.Elements;
 
 public class RealmPlayer : Player, IComponents, IDisposable
 {
@@ -66,7 +68,7 @@ public class RealmPlayer : Player, IComponents, IDisposable
         _serviceProvider = _serviceScope.ServiceProvider;
         #region Initialize scope services
         _serviceProvider.GetRequiredService<PlayerContext>().Player = this;
-        _serviceProvider.GetRequiredService<IRealmBrowserService>();
+        _serviceProvider.GetRequiredService<IPlayerBrowserService>();
         #endregion
 
         Components = new(_serviceProvider, this);

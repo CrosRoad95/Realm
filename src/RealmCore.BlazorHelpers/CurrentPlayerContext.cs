@@ -1,7 +1,7 @@
 ﻿using RealmCore.Server;
 using RealmCore.Server.Components.Players.Abstractions;
 using RealmCore.Server.Elements;
-using RealmCore.Server.Interfaces;
+using RealmCore.Server.Interfaces.Players;
 using RealmCore.Server.Services;
 using System.Security.Claims;
 
@@ -10,11 +10,11 @@ namespace RealmCore.BlazorHelpers;
 public class CurrentPlayerContext : IDisposable
 {
     private readonly RealmPlayer? _player;
-    private readonly IRealmBrowserService? _browserComponent;
+    private readonly IPlayerBrowserService? _browserComponent;
     public RealmServer? Server { get; }
     internal IBrowserGuiService BrowserGuiService { get; }
     public ClaimsPrincipal ClaimsPrincipal { get; }
-    protected IRealmBrowserService BrowserService => _browserComponent ?? throw new ArgumentNullException(nameof(BrowserService));
+    protected IPlayerBrowserService BrowserService => _browserComponent ?? throw new ArgumentNullException(nameof(BrowserService));
     public RealmPlayer Player => _player ?? throw new ArgumentNullException(nameof(RealmPlayer));
     public string Name => Player.Name;
 
@@ -32,7 +32,7 @@ public class CurrentPlayerContext : IDisposable
             if(BrowserGuiService.TryGetPlayerByKey(keyClaim.Value, out var player) && player != null)
             {
                 _player = player;
-                _browserComponent = player.GetRequiredService<IRealmBrowserService>();
+                _browserComponent = player.GetRequiredService<IPlayerBrowserService>();
                 _browserComponent.PathChanged += HandlePathChanged;
             }
         }

@@ -1,5 +1,6 @@
 ﻿using RealmCore.Server.DTOs;
 using RealmCore.Server.Helpers;
+using RealmCore.Server.Interfaces.Players;
 
 namespace RealmCore.Sample.Logic;
 
@@ -49,8 +50,8 @@ internal sealed class PlayerBindsLogic : ComponentLogic<UserComponent>
 
         player.SetBind("F2", player =>
         {
-            var browserService = player.GetRequiredService<IRealmBrowserService>();
-            if (browserService.IsVisible)
+            var browserService = player.GetRequiredService<IPlayerBrowserService>();
+            if (browserService.Visible)
             {
                 browserService.Close();
             }
@@ -62,13 +63,13 @@ internal sealed class PlayerBindsLogic : ComponentLogic<UserComponent>
 
         player.SetBind("F3", player =>
         {
-            var browserService = player.GetRequiredService<IRealmBrowserService>();
+            var browserService = player.GetRequiredService<IPlayerBrowserService>();
             browserService.Open("/realmUi/counter2");
         });
 
         player.SetBind("F4", player =>
         {
-            var browserService = player.GetRequiredService<IRealmBrowserService>();
+            var browserService = player.GetRequiredService<IPlayerBrowserService>();
             browserService.Open("/realmUi/index");
         });
 

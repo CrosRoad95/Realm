@@ -1,4 +1,5 @@
 ﻿using RealmCore.Server.Components.Players.Abstractions;
+using RealmCore.Server.Interfaces.Players;
 
 namespace RealmCore.Server.Logic.Resources;
 
@@ -20,7 +21,7 @@ internal sealed class BrowserGuiComponentLogic : ComponentLogic<BrowserGuiCompon
         if (_browserGuiService.TryGetKeyByPlayer(player, out var key))
         {
             var url = browserGuiComponent.Path;
-            var browserService = player.GetRequiredService<IRealmBrowserService>();
+            var browserService = player.GetRequiredService<IPlayerBrowserService>();
             browserService.Open(url);
             _logger.LogInformation("Gui {guiPageType} opened", browserGuiComponent.GetType().Name);
         }
@@ -31,7 +32,7 @@ internal sealed class BrowserGuiComponentLogic : ComponentLogic<BrowserGuiCompon
     {
         browserGuiComponent.NavigationRequested -= HandleNavigationRequested;
         var player = (RealmPlayer)browserGuiComponent.Element;
-        var browserService = player.GetRequiredService<IRealmBrowserService>();
+        var browserService = player.GetRequiredService<IPlayerBrowserService>();
         browserService.SetPath("/realmEmpty");
         browserService.Close();
 
