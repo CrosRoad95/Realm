@@ -86,6 +86,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IPlayerMoneyService, PlayerMoneyService>();
         services.AddScoped<IPlayerUserService, PlayerUserService>();
         services.AddScoped<IPlayerDailyVisitsService, PlayerDailyVisitsService>();
+        services.AddScoped<IPlayerSettingsService, PlayerSettingsService>();
         #endregion
 
         #region Policies

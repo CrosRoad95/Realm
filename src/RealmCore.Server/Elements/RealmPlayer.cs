@@ -60,10 +60,16 @@ public class RealmPlayer : Player, IComponents, IDisposable
     public bool IsSignedIn => User.IsSignedIn;
     public int UserId => User.Id;
 
-    public new IPlayerMoneyService Money => _serviceProvider.GetRequiredService<IPlayerMoneyService>();
-    public IPlayerAFKService AFK => _serviceProvider.GetRequiredService<IPlayerAFKService>();
-    public IPlayerUserService User => _serviceProvider.GetRequiredService<IPlayerUserService>();
-    public IPlayerDailyVisitsService DailyVisits => _serviceProvider.GetRequiredService<IPlayerDailyVisitsService>();
+    public IPlayerMoneyService? _money;
+    public IPlayerAFKService? _afk;
+    public IPlayerUserService? _user;
+    public IPlayerDailyVisitsService _dailyVisits;
+    public IPlayerSettingsService _settings;
+    public new IPlayerMoneyService Money => _money ??= _serviceProvider.GetRequiredService<IPlayerMoneyService>();
+    public IPlayerAFKService AFK => _afk ??= _serviceProvider.GetRequiredService<IPlayerAFKService>();
+    public IPlayerUserService User => _user ??= _serviceProvider.GetRequiredService<IPlayerUserService>();
+    public IPlayerDailyVisitsService DailyVisits => _dailyVisits ??= _serviceProvider.GetRequiredService<IPlayerDailyVisitsService>();
+    public IPlayerSettingsService Settings => _settings ??= _serviceProvider.GetRequiredService<IPlayerSettingsService>();
     public RealmPlayer(IServiceProvider serviceProvider)
     {
         _serviceScope = serviceProvider.CreateScope();

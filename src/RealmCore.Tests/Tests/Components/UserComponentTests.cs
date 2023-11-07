@@ -63,12 +63,12 @@ public class UserComponentTests
         #endregion
 
         #region Act
-        var user = player.User;
-        user.SetSetting(1, "foo");
-        bool hasSetting = user.TryGetSetting(1, out var settingValue);
-        string? gotSettingValue = user.GetSetting(1);
-        bool removedSetting = user.RemoveSetting(1);
-        string? gotSettingAfterRemove = user.GetSetting(1);
+        var settings = player.Settings;
+        settings.Set(1, "foo");
+        bool hasSetting = settings.TryGet(1, out var settingValue);
+        string gotSettingValue = settings.Get(1);
+        bool removedSetting = settings.Remove(1);
+        bool exists = settings.Has(1);
         #endregion
 
         #region Assert
@@ -76,7 +76,7 @@ public class UserComponentTests
         settingValue.Should().Be("foo");
         gotSettingValue.Should().Be("foo");
         removedSetting.Should().BeTrue();
-        gotSettingAfterRemove.Should().BeNull();
+        exists.Should().BeFalse();
         #endregion
     }
 

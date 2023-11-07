@@ -14,7 +14,6 @@ internal sealed class PlayerUserService : IPlayerUserService, IDisposable
     private UserData? _user;
     private readonly List<int> _upgrades = new();
     private readonly object _lock = new();
-    private readonly ConcurrentDictionary<int, string> _settings = new();
     private readonly List<PolicyCache> _authorizedPolicies = new();
     private readonly IDateTimeProvider _dateTimeProvider;
     private readonly IUserEventRepository _userEventRepository;
@@ -28,16 +27,14 @@ internal sealed class PlayerUserService : IPlayerUserService, IDisposable
     public string Nick => _user?.Nick ?? throw new UserNotSignedInException();
     public string UserName => _user?.UserName ?? throw new UserNotSignedInException();
     public IReadOnlyList<int> Upgrades => _upgrades;
-    public ICollection<int> Settings => _settings.Keys;
     public DateTime? LastNewsReadDateTime => User.LastNewsReadDateTime;
     public TransformAndMotion? LastTransformAndMotion => User.LastTransformAndMotion;
     public Bans Bans => _bans ?? throw new UserNotSignedInException();
 
-
     public event Action<IPlayerUserService, int>? UpgradeAdded;
     public event Action<IPlayerUserService, int>? UpgradeRemoved;
-    public event Action<IPlayerUserService, int, string>? SettingChanged;
-    public event Action<IPlayerUserService, int, string>? SettingRemoved;
+    public event Action<IPlayerUserService>? SignedIn;
+    public event Action<IPlayerUserService>? SignedOut;
 
     public RealmPlayer Player { get; }
     public PlayerUserService(PlayerContext playerContext, IDateTimeProvider dateTimeProvider, IUserEventRepository userEventRepository)
@@ -57,10 +54,7 @@ internal sealed class PlayerUserService : IPlayerUserService, IDisposable
             _claimsPrincipal = claimsPrincipal;
             _bans = bans;
             _upgrades.AddRange(_user.Upgrades.Select(x => x.UpgradeId));
-            foreach (var item in _user.Settings)
-            {
-                _settings[item.SettingId] = item.Value;
-            }
+            SignedIn?.Invoke(this);
         }
     }
 
@@ -74,7 +68,7 @@ internal sealed class PlayerUserService : IPlayerUserService, IDisposable
             _claimsPrincipal = null;
             _bans = null;
             _upgrades.Clear();
-            _settings.Clear();
+            SignedOut?.Invoke(this);
         }
         ClearAuthorizedPoliciesCache();
     }
@@ -284,36 +278,6 @@ internal sealed class PlayerUserService : IPlayerUserService, IDisposable
             UpgradeRemoved?.Invoke(this, upgradeId);
             return true;
         }
-    }
-
-    public void SetSetting(int settingId, string value)
-    {
-        _settings[settingId] = value;
-        SettingChanged?.Invoke(this, settingId, value);
-    }
-
-    public string? GetSetting(int settingId)
-    {
-        if (_settings.TryGetValue(settingId, out var value))
-            return value;
-        return null;
-    }
-
-    public bool TryGetSetting(int settingId, out string? value)
-    {
-        if (_settings.TryGetValue(settingId, out value))
-            return true;
-        return false;
-    }
-
-    public bool RemoveSetting(int settingId)
-    {
-        if (_settings.TryRemove(settingId, out var value))
-        {
-            SettingRemoved?.Invoke(this, settingId, value);
-            return true;
-        }
-        return false;
     }
 
     public void UpdateLastNewsRead()
