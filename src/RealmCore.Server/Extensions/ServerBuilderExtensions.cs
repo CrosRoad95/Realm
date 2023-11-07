@@ -102,7 +102,6 @@ public static class ServerBuilderExtensions
         serverBuilder.AddScopedLogic<StatisticsCounterResourceLogic>();
         serverBuilder.AddScopedLogic<Text3dComponentLogic>();
         serverBuilder.AddScopedLogic<WatermarkResourceLogic>();
-        serverBuilder.AddScopedLogic<DailyVisitsCounterComponentLogic>();
         serverBuilder.AddScopedLogic<AdminComponentLogic>();
         serverBuilder.AddLogic<FocusableComponentLogic>();
         serverBuilder.AddScopedLogic<StatefulHudComponentLogic>();

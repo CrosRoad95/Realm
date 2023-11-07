@@ -92,7 +92,6 @@ public static class UserManagerExtensions
     public static async Task<UserData?> GetUserByLogin(this UserManager<UserData> userManager, string login, CancellationToken cancellationToken = default)
     {
         var query = userManager.Users
-            .AsNoTracking()
             .TagWithSource(nameof(UserManagerExtensions))
             .IncludeAll()
             .Where(u => u.UserName == login);

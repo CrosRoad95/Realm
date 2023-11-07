@@ -141,10 +141,7 @@ internal sealed class UsersService : IUsersService
             else
                 player.AddComponent(new InventoryComponent(_gameplayOptions.CurrentValue.DefaultInventorySize));
 
-            if (user.DailyVisits != null)
-                player.AddComponent(new DailyVisitsCounterComponent(user.DailyVisits));
-            else
-                player.AddComponent<DailyVisitsCounterComponent>();
+            player.GetRequiredService<IPlayerDailyVisitsService>();
 
             if (user.Stats != null)
                 player.AddComponent(new StatisticsCounterComponent(user.Stats));
@@ -185,7 +182,7 @@ internal sealed class UsersService : IUsersService
             player.AddComponent(new LevelComponent(user.Level, user.Experience, _levelsRegistry));
             player.Money.SetMoneyInternal(user.Money);
             await ValidatePolicies(player);
-            await userLoginHistoryRepository.Add(user.Id, _dateTimeProvider.Now, player.Client.IPAddress?.ToString() ?? "", serial);
+            userLoginHistoryRepository.Add(user.Id, _dateTimeProvider.Now, player.Client.IPAddress?.ToString() ?? "", serial);
             UpdateLastData(player);
             db.Users.Update(user);
             await db.SaveChangesAsync();
@@ -198,7 +195,6 @@ internal sealed class UsersService : IUsersService
         {
             _activeUsers.TrySetInactive(user.Id);
             while (player.TryDestroyComponent<InventoryComponent>()) { }
-            player.TryDestroyComponent<DailyVisitsCounterComponent>();
             player.TryDestroyComponent<StatisticsCounterComponent>();
             player.TryDestroyComponent<AchievementsComponent>();
             player.TryDestroyComponent<JobUpgradesComponent>();
@@ -223,7 +219,6 @@ internal sealed class UsersService : IUsersService
         await _saveService.Save(player);
         _activeUsers.TrySetInactive(player.UserId);
         while (player.TryDestroyComponent<InventoryComponent>()) { }
-        player.TryDestroyComponent<DailyVisitsCounterComponent>();
         player.TryDestroyComponent<StatisticsCounterComponent>();
         player.TryDestroyComponent<AchievementsComponent>();
         player.TryDestroyComponent<JobUpgradesComponent>();

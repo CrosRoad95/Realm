@@ -63,6 +63,7 @@ public class RealmPlayer : Player, IComponents, IDisposable
     public new IPlayerMoneyService Money => _serviceProvider.GetRequiredService<IPlayerMoneyService>();
     public IPlayerAFKService AFK => _serviceProvider.GetRequiredService<IPlayerAFKService>();
     public IPlayerUserService User => _serviceProvider.GetRequiredService<IPlayerUserService>();
+    public IPlayerDailyVisitsService DailyVisits => _serviceProvider.GetRequiredService<IPlayerDailyVisitsService>();
     public RealmPlayer(IServiceProvider serviceProvider)
     {
         _serviceScope = serviceProvider.CreateScope();

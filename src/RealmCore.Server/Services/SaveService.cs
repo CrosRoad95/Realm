@@ -216,171 +216,163 @@ internal sealed class SaveService : ISaveService
             return false;
 
         var user = player.User;
-        var userData = await _dbContext.Users
-            .IncludeAll()
-            .Where(x => x.Id == user.Id).FirstAsync();
-
-        foreach (var item in _userDataSavers)
-            await item.SaveAsync(player);
-
-        userData.Upgrades = user.Upgrades.Select(x => new UserUpgradeData
-        {
-            UpgradeId = x
-        }).ToList();
-
-        userData.Settings = user.Settings.Select(x => new UserSettingData
-        {
-            SettingId = x,
-            Value = user.GetSetting(x) ?? ""
-        }).ToList();
-
+        var db = player.GetRequiredService<IDb>();
+        ;
+        var userData = user.User;
         userData.LastTransformAndMotion = player.GetTransformAndMotion();
-        userData.Money = player.Money.Amount;
+        db.Users.Update(userData);
+        await db.SaveChangesAsync();
+        //var userData = await _dbContext.Users
+        //    .IncludeAll()
+        //    .Where(x => x.Id == user.Id).FirstAsync();
 
-        if (player.TryGetComponent(out LicensesComponent licensesComponent))
-        {
-            userData.Licenses = licensesComponent.Licenses.Select(x => new UserLicenseData
-            {
-                LicenseId = x.licenseId,
-                SuspendedReason = x.suspendedReason,
-                SuspendedUntil = x.suspendedUntil,
-            }).ToList();
-        }
-        else
-        {
-            userData.Licenses = new List<UserLicenseData>();
-        }
+        //foreach (var item in _userDataSavers)
+        //    await item.SaveAsync(player);
 
-        if (player.TryGetComponent(out PlayTimeComponent playTimeComponent))
-        {
-            userData.PlayTime = (ulong)playTimeComponent.TotalPlayTime.TotalSeconds;
-            playTimeComponent.Reset();
-        }
-        else
-            userData.PlayTime = 0;
+        //userData.Upgrades = user.Upgrades.Select(x => new UserUpgradeData
+        //{
+        //    UpgradeId = x
+        //}).ToList();
 
-        var inventoryComponents = player.Components.ComponentsList.OfType<InventoryComponent>()
-            .Where(x => x.Id != 0)
-            .ToList();
+        //userData.Settings = user.Settings.Select(x => new UserSettingData
+        //{
+        //    SettingId = x,
+        //    Value = user.GetSetting(x) ?? ""
+        //}).ToList();
 
-        if (inventoryComponents.Count != 0)
-        {
-            foreach (var inventory in userData.Inventories)
-            {
-                var inventoryComponent = inventoryComponents.Where(x => x.Id == inventory.Id).First();
-                inventory.Size = inventoryComponent.Size;
-                inventory.InventoryItems = MapItems(inventoryComponent);
-            }
-        }
-        else
-            userData.Inventories = new List<InventoryData>();
+        //userData.Money = player.Money.Amount;
 
+        //if (player.TryGetComponent(out LicensesComponent licensesComponent))
+        //{
+        //    userData.Licenses = licensesComponent.Licenses.Select(x => new UserLicenseData
+        //    {
+        //        LicenseId = x.licenseId,
+        //        SuspendedReason = x.suspendedReason,
+        //        SuspendedUntil = x.suspendedUntil,
+        //    }).ToList();
+        //}
+        //else
+        //{
+        //    userData.Licenses = new List<UserLicenseData>();
+        //}
 
-        if (player.TryGetComponent(out DailyVisitsCounterComponent dailyVisitsCounterComponent))
-        {
-            userData.DailyVisits = new DailyVisitsData
-            {
-                LastVisit = dailyVisitsCounterComponent.LastVisit,
-                VisitsInRow = dailyVisitsCounterComponent.VisitsInRow,
-                VisitsInRowRecord = dailyVisitsCounterComponent.VisitsInRowRecord,
-            };
-        }
-        else
-            userData.DailyVisits = null;
+        //if (player.TryGetComponent(out PlayTimeComponent playTimeComponent))
+        //{
+        //    userData.PlayTime = (ulong)playTimeComponent.TotalPlayTime.TotalSeconds;
+        //    playTimeComponent.Reset();
+        //}
+        //else
+        //    userData.PlayTime = 0;
 
-        if (player.TryGetComponent(out StatisticsCounterComponent statisticsCounterComponent))
-        {
-            userData.Stats = statisticsCounterComponent.GetStatsIds.Select(x => new UserStatData
-            {
-                StatId = x,
-                Value = statisticsCounterComponent.GetStat(x)
-            }).ToList();
-            _dbContext.UserStats.AddRange(userData.Stats);
-        }
-        else
-            userData.Stats = new List<UserStatData>();
+        //var inventoryComponents = player.Components.ComponentsList.OfType<InventoryComponent>()
+        //    .Where(x => x.Id != 0)
+        //    .ToList();
 
-        if (player.TryGetComponent(out AchievementsComponent achievementsComponent))
-        {
-            userData.Achievements = achievementsComponent.Achievements.Select(x => new AchievementData
-            {
-                AchievementId = x.Key,
-                Value = JsonConvert.SerializeObject(x.Value.value, Formatting.None),
-                PrizeReceived = x.Value.rewardReceived,
-                Progress = x.Value.progress,
-            }).ToList();
-        }
-        else
-            userData.Achievements = new List<AchievementData>();
+        //if (inventoryComponents.Count != 0)
+        //{
+        //    foreach (var inventory in userData.Inventories)
+        //    {
+        //        var inventoryComponent = inventoryComponents.Where(x => x.Id == inventory.Id).First();
+        //        inventory.Size = inventoryComponent.Size;
+        //        inventory.InventoryItems = MapItems(inventoryComponent);
+        //    }
+        //}
+        //else
+        //    userData.Inventories = new List<InventoryData>();
 
-        if (player.TryGetComponent(out JobUpgradesComponent jobUpgradesComponent))
-        {
-            userData.JobUpgrades = jobUpgradesComponent.Upgrades.Select(x => new JobUpgradeData
-            {
-                JobId = x.jobId,
-                UpgradeId = x.upgradeId,
-            }).ToList();
-        }
-        else
-            userData.JobUpgrades = new List<JobUpgradeData>();
+        //if (player.TryGetComponent(out StatisticsCounterComponent statisticsCounterComponent))
+        //{
+        //    userData.Stats = statisticsCounterComponent.GetStatsIds.Select(x => new UserStatData
+        //    {
+        //        StatId = x,
+        //        Value = statisticsCounterComponent.GetStat(x)
+        //    }).ToList();
+        //    _dbContext.UserStats.AddRange(userData.Stats);
+        //}
+        //else
+        //    userData.Stats = new List<UserStatData>();
 
-        if (player.TryGetComponent(out JobStatisticsComponent jobStatisticsComponent))
-        {
-            var newStatistics = jobStatisticsComponent.JobStatistics.Where(x => x.Value.sessionPoints > 0 || x.Value.sessionTimePlayed > 0);
-            foreach (var item in newStatistics)
-            {
-                var first = userData.JobStatistics.FirstOrDefault(x => x.JobId == item.Value.jobId && x.Date == jobStatisticsComponent.Date);
-                if (first == null)
-                {
-                    userData.JobStatistics.Add(new JobStatisticsData
-                    {
-                        Date = jobStatisticsComponent.Date,
-                        JobId = item.Key,
-                        Points = item.Value.sessionPoints,
-                        TimePlayed = item.Value.sessionTimePlayed
-                    });
-                }
-                else
-                {
-                    first.Points += item.Value.sessionPoints;
-                    first.TimePlayed += item.Value.sessionTimePlayed;
-                }
-            }
-            jobStatisticsComponent.Reset();
-        }
-        else
-            userData.JobStatistics = new List<JobStatisticsData>();
+        //if (player.TryGetComponent(out AchievementsComponent achievementsComponent))
+        //{
+        //    userData.Achievements = achievementsComponent.Achievements.Select(x => new AchievementData
+        //    {
+        //        AchievementId = x.Key,
+        //        Value = JsonConvert.SerializeObject(x.Value.value, Formatting.None),
+        //        PrizeReceived = x.Value.rewardReceived,
+        //        Progress = x.Value.progress,
+        //    }).ToList();
+        //}
+        //else
+        //    userData.Achievements = new List<AchievementData>();
 
-        if (player.TryGetComponent(out DiscoveriesComponent discoveriesComponent))
-        {
-            userData.Discoveries = discoveriesComponent.Discoveries.Select(x => new DiscoveryData
-            {
-                DiscoveryId = x,
-            }).ToList();
-        }
+        //if (player.TryGetComponent(out JobUpgradesComponent jobUpgradesComponent))
+        //{
+        //    userData.JobUpgrades = jobUpgradesComponent.Upgrades.Select(x => new JobUpgradeData
+        //    {
+        //        JobId = x.jobId,
+        //        UpgradeId = x.upgradeId,
+        //    }).ToList();
+        //}
+        //else
+        //    userData.JobUpgrades = new List<JobUpgradeData>();
 
-        if (player.TryGetComponent(out LevelComponent levelComponent))
-        {
-            userData.Level = levelComponent.Level;
-            userData.Experience = levelComponent.Experience;
-        }
-        else
-        {
-            userData.Level = 0;
-            userData.Experience = 0;
-        }
+        //if (player.TryGetComponent(out JobStatisticsComponent jobStatisticsComponent))
+        //{
+        //    var newStatistics = jobStatisticsComponent.JobStatistics.Where(x => x.Value.sessionPoints > 0 || x.Value.sessionTimePlayed > 0);
+        //    foreach (var item in newStatistics)
+        //    {
+        //        var first = userData.JobStatistics.FirstOrDefault(x => x.JobId == item.Value.jobId && x.Date == jobStatisticsComponent.Date);
+        //        if (first == null)
+        //        {
+        //            userData.JobStatistics.Add(new JobStatisticsData
+        //            {
+        //                Date = jobStatisticsComponent.Date,
+        //                JobId = item.Key,
+        //                Points = item.Value.sessionPoints,
+        //                TimePlayed = item.Value.sessionTimePlayed
+        //            });
+        //        }
+        //        else
+        //        {
+        //            first.Points += item.Value.sessionPoints;
+        //            first.TimePlayed += item.Value.sessionTimePlayed;
+        //        }
+        //    }
+        //    jobStatisticsComponent.Reset();
+        //}
+        //else
+        //    userData.JobStatistics = new List<JobStatisticsData>();
 
-        if (player.TryGetComponent(out DiscordIntegrationComponent discordIntegrationComponent))
-        {
-            userData.DiscordIntegration = new DiscordIntegrationData
-            {
-                DiscordUserId = discordIntegrationComponent.DiscordUserId
-            };
-        }
-        else
-        {
-            userData.DiscordIntegration = null;
-        }
+        //if (player.TryGetComponent(out DiscoveriesComponent discoveriesComponent))
+        //{
+        //    userData.Discoveries = discoveriesComponent.Discoveries.Select(x => new DiscoveryData
+        //    {
+        //        DiscoveryId = x,
+        //    }).ToList();
+        //}
+
+        //if (player.TryGetComponent(out LevelComponent levelComponent))
+        //{
+        //    userData.Level = levelComponent.Level;
+        //    userData.Experience = levelComponent.Experience;
+        //}
+        //else
+        //{
+        //    userData.Level = 0;
+        //    userData.Experience = 0;
+        //}
+
+        //if (player.TryGetComponent(out DiscordIntegrationComponent discordIntegrationComponent))
+        //{
+        //    userData.DiscordIntegration = new DiscordIntegrationData
+        //    {
+        //        DiscordUserId = discordIntegrationComponent.DiscordUserId
+        //    };
+        //}
+        //else
+        //{
+        //    userData.DiscordIntegration = null;
+        //}
 
         return true;
     }
