@@ -5,7 +5,7 @@ internal sealed class UpdateCallbackLogic : ComponentLogic<IUpdateCallback, IRar
     private readonly System.Timers.Timer _updateTimer;
     private readonly System.Timers.Timer _rareUpdateTimer;
     private readonly ILogger<UpdateCallbackLogic> _logger;
-
+    private readonly IUpdateService _updateService;
     private readonly List<IUpdateCallback> _updateCallbacks = new();
     private readonly List<IUpdateCallback> _updateCallbacksToAdd = new();
     private readonly List<IUpdateCallback> _updateCallbacksToRemove = new();
@@ -20,10 +20,10 @@ internal sealed class UpdateCallbackLogic : ComponentLogic<IUpdateCallback, IRar
     private readonly object _rareUpdateCallbacksToAddLock = new();
     private readonly object _rareUpdateCallbacksToRemoveLock = new();
 
-    public UpdateCallbackLogic(IElementFactory elementFactory, ILogger<UpdateCallbackLogic> logger) : base(elementFactory)
+    public UpdateCallbackLogic(IElementFactory elementFactory, ILogger<UpdateCallbackLogic> logger, IUpdateService updateService) : base(elementFactory)
     {
         _logger = logger;
-
+        _updateService = updateService;
         _updateTimer = new System.Timers.Timer();
         _updateTimer.Interval = 1000.0f / 20.0f;
         _updateTimer.Elapsed += HandleElapsed;
@@ -37,6 +37,15 @@ internal sealed class UpdateCallbackLogic : ComponentLogic<IUpdateCallback, IRar
 
     private void HandleElapsed(object? sender, System.Timers.ElapsedEventArgs e)
     {
+        try
+        {
+            _updateService.RelayUpdate();
+        }
+        catch(Exception ex)
+        {
+            _logger.LogHandleError(ex);
+        }
+
         lock (_updateCallbacksLock)
         {
             lock (_updateCallbacksToAdd)
@@ -75,6 +84,15 @@ internal sealed class UpdateCallbackLogic : ComponentLogic<IUpdateCallback, IRar
 
     private void HandleRareElapsed(object? sender, System.Timers.ElapsedEventArgs e)
     {
+        try
+        {
+            _updateService.RelayRareUpdate();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogHandleError(ex);
+        }
+
         lock (_rareUpdateCallbacksLock)
         {
             lock (_rareUpdateCallbacksToAdd)

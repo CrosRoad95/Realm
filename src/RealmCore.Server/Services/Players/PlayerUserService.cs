@@ -11,7 +11,6 @@ internal sealed class PlayerUserService : IPlayerUserService, IDisposable
     }
 
     private UserData? _user;
-    private readonly List<int> _upgrades = new();
     private readonly object _lock = new();
     private readonly List<PolicyCache> _authorizedPolicies = new();
     private readonly IDateTimeProvider _dateTimeProvider;
@@ -24,12 +23,9 @@ internal sealed class PlayerUserService : IPlayerUserService, IDisposable
     public int Id => _user?.Id ?? -1;
     public string Nick => _user?.Nick ?? throw new UserNotSignedInException();
     public string UserName => _user?.UserName ?? throw new UserNotSignedInException();
-    public IReadOnlyList<int> Upgrades => _upgrades;
     public DateTime? LastNewsReadDateTime => User.LastNewsReadDateTime;
     public TransformAndMotion? LastTransformAndMotion => User.LastTransformAndMotion;
 
-    public event Action<IPlayerUserService, int>? UpgradeAdded;
-    public event Action<IPlayerUserService, int>? UpgradeRemoved;
     public event Action<IPlayerUserService>? SignedIn;
     public event Action<IPlayerUserService>? SignedOut;
 
@@ -49,7 +45,6 @@ internal sealed class PlayerUserService : IPlayerUserService, IDisposable
                 throw new InvalidOperationException();
             _user = user;
             _claimsPrincipal = claimsPrincipal;
-            _upgrades.AddRange(_user.Upgrades.Select(x => x.UpgradeId));
             SignedIn?.Invoke(this);
         }
     }
@@ -62,7 +57,6 @@ internal sealed class PlayerUserService : IPlayerUserService, IDisposable
                 throw new InvalidOperationException();
             _user = null;
             _claimsPrincipal = null;
-            _upgrades.Clear();
             SignedOut?.Invoke(this);
         }
         ClearAuthorizedPoliciesCache();
@@ -241,38 +235,6 @@ internal sealed class PlayerUserService : IPlayerUserService, IDisposable
     public bool TryRemoveRole(string role)
     {
         return TryRemoveClaim(ClaimTypes.Role, role);
-    }
-
-    internal bool InternalHasUpgrade(int upgradeId) => _upgrades.Contains(upgradeId);
-
-    public bool HasUpgrade(int upgradeId)
-    {
-        lock (_lock)
-            return InternalHasUpgrade(upgradeId);
-    }
-
-    public bool TryAddUpgrade(int upgradeId)
-    {
-        lock (_lock)
-        {
-            if (InternalHasUpgrade(upgradeId))
-                return false;
-            _upgrades.Add(upgradeId);
-            UpgradeAdded?.Invoke(this, upgradeId);
-            return true;
-        }
-    }
-
-    public bool TryRemoveUpgrade(int upgradeId)
-    {
-        lock (_lock)
-        {
-            if (!InternalHasUpgrade(upgradeId))
-                return false;
-            _upgrades.Remove(upgradeId);
-            UpgradeRemoved?.Invoke(this, upgradeId);
-            return true;
-        }
     }
 
     public void UpdateLastNewsRead()

@@ -1,7 +1,6 @@
-﻿
-namespace RealmCore.Server.Interfaces.Players;
+﻿namespace RealmCore.Server.Interfaces.Players;
 
-public interface IPlayerDailyVisitsService
+public interface IPlayerDailyVisitsService : IPlayerService
 {
     DateTime LastVisit { get; set; }
     int VisitsInRow { get; set; }

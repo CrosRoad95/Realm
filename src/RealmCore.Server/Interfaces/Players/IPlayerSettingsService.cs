@@ -1,10 +1,9 @@
 ﻿
 namespace RealmCore.Server.Interfaces.Players;
 
-public interface IPlayerSettingsService
+public interface IPlayerSettingsService : IPlayerService
 {
     ICollection<int> Settings { get; }
-    RealmPlayer Player { get; }
 
     event Action<IPlayerSettingsService, int, string>? Changed;
     event Action<IPlayerSettingsService, int, string>? Removed;

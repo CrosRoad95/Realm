@@ -124,10 +124,7 @@ internal sealed class CommandsLogic
 
         _commandService.AddCommandHandler("playtime", (player, args) =>
         {
-            if (player.TryGetComponent(out PlayTimeComponent playTimeComponent))
-            {
-                _chatBox.OutputTo(player, $"playtime: {playTimeComponent.PlayTime}, total play time: {playTimeComponent.TotalPlayTime}");
-            }
+            _chatBox.OutputTo(player, $"playtime: {player.PlayTime.PlayTime}, total play time: {player.PlayTime.TotalPlayTime}");
         });
 
         _commandService.AddCommandHandler("givemoney", (player, args) =>

@@ -63,15 +63,19 @@ public class RealmPlayer : Player, IComponents, IDisposable
     public IPlayerMoneyService? _money;
     public IPlayerAFKService? _afk;
     public IPlayerUserService? _user;
-    public IPlayerDailyVisitsService _dailyVisits;
-    public IPlayerSettingsService _settings;
-    public IPlayerBansService _bans;
+    public IPlayerDailyVisitsService? _dailyVisits;
+    public IPlayerSettingsService? _settings;
+    public IPlayerBansService? _bans;
+    public IPlayersUpgradeService? _upgrades;
+    public IPlayerPlayTimeService? _playTime;
     public new IPlayerMoneyService Money => _money ??= _serviceProvider.GetRequiredService<IPlayerMoneyService>();
     public IPlayerAFKService AFK => _afk ??= _serviceProvider.GetRequiredService<IPlayerAFKService>();
     public IPlayerUserService User => _user ??= _serviceProvider.GetRequiredService<IPlayerUserService>();
     public IPlayerDailyVisitsService DailyVisits => _dailyVisits ??= _serviceProvider.GetRequiredService<IPlayerDailyVisitsService>();
     public IPlayerSettingsService Settings => _settings ??= _serviceProvider.GetRequiredService<IPlayerSettingsService>();
     public IPlayerBansService Bans => _bans ??= _serviceProvider.GetRequiredService<IPlayerBansService>();
+    public IPlayersUpgradeService Upgrades => _upgrades ??= _serviceProvider.GetRequiredService<IPlayersUpgradeService>();
+    public IPlayerPlayTimeService PlayTime => _playTime ??= _serviceProvider.GetRequiredService<IPlayerPlayTimeService>();
     public RealmPlayer(IServiceProvider serviceProvider)
     {
         _serviceScope = serviceProvider.CreateScope();

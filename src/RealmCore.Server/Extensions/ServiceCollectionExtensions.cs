@@ -78,6 +78,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IScopedMapsService, ScopedMapService>();
         services.AddSingleton<IBrowserGuiService, BrowserGuiService>();
         services.AddSingleton<IMapsService, MapsService>();
+        services.AddSingleton<IUpdateService, UpdateService>();
         #endregion
 
         #region Player services
@@ -88,6 +89,8 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IPlayerDailyVisitsService, PlayerDailyVisitsService>();
         services.AddScoped<IPlayerSettingsService, PlayerSettingsService>();
         services.AddScoped<IPlayerBansService, PlayerBansService>();
+        services.AddScoped<IPlayersUpgradeService, PlayersUpgradeService>();
+        services.AddScoped<IPlayerPlayTimeService, PlayerPlayTimeService>();
         #endregion
 
         #region Policies

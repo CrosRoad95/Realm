@@ -90,14 +90,14 @@ public class UserComponentTests
         #endregion
 
         #region Act
-        var user = player.User;
-        var hasSomeUpgrade1 = user.HasUpgrade(1);
-        var added1 = user.TryAddUpgrade(1);
-        var added2 = user.TryAddUpgrade(1);
-        var hasSomeUpgrade2 = user.HasUpgrade(1);
-        var removed1 = user.TryRemoveUpgrade(1);
-        var removed2 = user.TryRemoveUpgrade(1);
-        var hasSomeUpgrade3 = user.HasUpgrade(1);
+        var upgrades = player.Upgrades;
+        var hasSomeUpgrade1 = upgrades.Has(1);
+        var added1 = upgrades.TryAdd(1);
+        var added2 = upgrades.TryAdd(1);
+        var hasSomeUpgrade2 = upgrades.Has(1);
+        var removed1 = upgrades.TryRemove(1);
+        var removed2 = upgrades.TryRemove(1);
+        var hasSomeUpgrade3 = upgrades.Has(1);
         #endregion
 
         #region Assert

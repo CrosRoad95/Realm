@@ -15,7 +15,7 @@ internal class PlayerBansService : IPlayerBansService, IDisposable
         {
             var now = _dateTimeProvider.Now;
             lock (_lock)
-                return new List<BanDTO>(_bans.Where(x => x.End > now).Select(Map).ToList());
+                return new List<BanDTO>(_bans.Where(x => x.End > now && x.Active).Select(Map));
         }
     }
 

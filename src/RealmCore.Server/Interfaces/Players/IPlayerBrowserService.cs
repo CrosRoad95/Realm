@@ -1,6 +1,6 @@
 ﻿namespace RealmCore.Server.Interfaces.Players;
 
-public interface IPlayerBrowserService
+public interface IPlayerBrowserService : IPlayerService
 {
     bool Visible { get; set; }
     bool DevTools { get; set; }

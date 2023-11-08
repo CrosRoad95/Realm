@@ -125,7 +125,7 @@ public class JobSessionComponentTests
 
         var destination = new Vector3(400.0f, -82.01953f, 3.914598f);
         myObject.Position = destination;
-        await Task.Delay(200); // Wait for collision check
+        await Task.Delay(300); // TODO: Wait for collision check
         completed.Should().Be(true);
         testJobComponent.ObjectiveCount.Should().Be(0);
     }

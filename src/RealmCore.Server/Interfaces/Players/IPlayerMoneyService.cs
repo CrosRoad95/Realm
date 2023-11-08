@@ -1,10 +1,7 @@
-﻿
+﻿namespace RealmCore.Server.Interfaces.Players;
 
-namespace RealmCore.Server.Interfaces.Players;
-
-public interface IPlayerMoneyService
+public interface IPlayerMoneyService : IPlayerService
 {
-    RealmPlayer Player { get; }
     decimal Amount { get; set; }
 
     event Action<IPlayerMoneyService, decimal>? MoneyLimitChanged;
