@@ -17,7 +17,8 @@ internal class PlayerSettingsService : IPlayerSettingsService, IDisposable
     public RealmPlayer Player { get; }
     public event Action<IPlayerSettingsService, int, string>? Changed;
     public event Action<IPlayerSettingsService, int, string>? Removed;
-    public PlayerSettingsService(PlayerContext playerContext, IPlayerUserService playerUserService, IDateTimeProvider dateTimeProvider)
+
+    public PlayerSettingsService(PlayerContext playerContext, IPlayerUserService playerUserService)
     {
         Player = playerContext.Player;
         playerUserService.SignedIn += HandleSignedIn;

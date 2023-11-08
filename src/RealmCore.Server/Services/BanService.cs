@@ -1,6 +1,4 @@
-﻿using RealmCore.Server.DomainObjects;
-
-namespace RealmCore.Server.Services;
+﻿namespace RealmCore.Server.Services;
 
 internal sealed class BanService : IBanService
 {
@@ -58,7 +56,7 @@ internal sealed class BanService : IBanService
         }
     }
 
-    public async Task<Bans> GetBans(RealmPlayer player, int? type = null, CancellationToken cancellationToken = default)
+    public async Task<IReadOnlyList<BanDTO>> GetBans(RealmPlayer player, int? type = null, CancellationToken cancellationToken = default)
     {
         List<BanData> bansData;
 
@@ -72,28 +70,28 @@ internal sealed class BanService : IBanService
             bansData = await _banRepository.GetBansBySerial(serial, _dateTimeProvider.Now, type, cancellationToken);
         }
 
-        return new(bansData.Select(Map).ToList());
+        return bansData.Select(Map).ToList();
     }
 
-    public async Task<Bans> GetBansByUserIdAndSerial(int userId, string serial, int? type = null, CancellationToken cancellationToken = default)
+    public async Task<IReadOnlyList<BanDTO>> GetBansByUserIdAndSerial(int userId, string serial, int? type = null, CancellationToken cancellationToken = default)
     {
         List<BanData> bansData = await _banRepository.GetBansByUserIdOrSerial(userId, serial, _dateTimeProvider.Now, type, cancellationToken);
 
-        return new(bansData.Select(Map).ToList());
+        return bansData.Select(Map).ToList();
     }
 
-    public async Task<Bans> GetBansByUserId(int userId, int? type = null, CancellationToken cancellationToken = default)
+    public async Task<IReadOnlyList<BanDTO>> GetBansByUserId(int userId, int? type = null, CancellationToken cancellationToken = default)
     {
         List<BanData> bansData = await _banRepository.GetBansByUserId(userId, _dateTimeProvider.Now, type, cancellationToken);
 
-        return new(bansData.Select(Map).ToList());
+        return bansData.Select(Map).ToList();
     }
 
-    public async Task<Bans> GetBansBySerial(string serial, int? type = null, CancellationToken cancellationToken = default)
+    public async Task<IReadOnlyList<BanDTO>> GetBansBySerial(string serial, int? type = null, CancellationToken cancellationToken = default)
     {
         List<BanData> bansData = await _banRepository.GetBansBySerial(serial, _dateTimeProvider.Now, type, cancellationToken);
 
-        return new(bansData.Select(Map).ToList());
+        return bansData.Select(Map).ToList();
     }
 
     public async Task<bool> IsBanned(RealmPlayer player, int? type = null, CancellationToken cancellationToken = default)

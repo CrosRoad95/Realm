@@ -124,8 +124,7 @@ internal sealed class UsersService : IUsersService
                 if (claimsPrincipal.Identity is ClaimsIdentity claimsIdentity)
                     claimsIdentity.AddClaim(new Claim(ClaimTypes.Role, role));
             }
-            var bans = await banService.GetBansByUserIdAndSerial(user.Id, serial);
-            player.User.SignIn(user, claimsPrincipal, bans);
+            player.User.SignIn(user, claimsPrincipal);
             if (user.Inventories != null && user.Inventories.Count != 0)
             {
                 foreach (var inventory in user.Inventories)

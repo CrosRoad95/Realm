@@ -1,5 +1,4 @@
 ﻿using RealmCore.Persistence.Data.Helpers;
-using RealmCore.Server.DomainObjects;
 
 namespace RealmCore.Server.Interfaces.Players;
 
@@ -12,7 +11,6 @@ public interface IPlayerUserService
     string UserName { get; }
     IReadOnlyList<int> Upgrades { get; }
     DateTime? LastNewsReadDateTime { get; }
-    Bans Bans { get; }
     bool IsSignedIn { get; }
     TransformAndMotion? LastTransformAndMotion { get; }
 
@@ -34,7 +32,7 @@ public interface IPlayerUserService
     bool HasClaim(string type, string? value = null);
     bool HasUpgrade(int upgradeId);
     bool IsInRole(string role);
-    void SignIn(UserData user, ClaimsPrincipal claimsPrincipal, Bans bans);
+    void SignIn(UserData user, ClaimsPrincipal claimsPrincipal);
     void SignOut();
     bool TryAddUpgrade(int upgradeId);
     bool TryRemoveClaim(string type, string? value = null);

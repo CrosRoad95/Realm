@@ -1,5 +1,4 @@
 ﻿using RealmCore.Persistence.Data.Helpers;
-using RealmCore.Server.DomainObjects;
 
 namespace RealmCore.Server.Services.Players;
 
@@ -18,7 +17,6 @@ internal sealed class PlayerUserService : IPlayerUserService, IDisposable
     private readonly IDateTimeProvider _dateTimeProvider;
     private readonly IUserEventRepository _userEventRepository;
     private ClaimsPrincipal? _claimsPrincipal;
-    private Bans? _bans;
 
     public UserData User => _user ?? throw new UserNotSignedInException();
     public ClaimsPrincipal ClaimsPrincipal => _claimsPrincipal ?? throw new UserNotSignedInException();
@@ -29,7 +27,6 @@ internal sealed class PlayerUserService : IPlayerUserService, IDisposable
     public IReadOnlyList<int> Upgrades => _upgrades;
     public DateTime? LastNewsReadDateTime => User.LastNewsReadDateTime;
     public TransformAndMotion? LastTransformAndMotion => User.LastTransformAndMotion;
-    public Bans Bans => _bans ?? throw new UserNotSignedInException();
 
     public event Action<IPlayerUserService, int>? UpgradeAdded;
     public event Action<IPlayerUserService, int>? UpgradeRemoved;
@@ -44,7 +41,7 @@ internal sealed class PlayerUserService : IPlayerUserService, IDisposable
         _userEventRepository = userEventRepository;
     }
 
-    public void SignIn(UserData user, ClaimsPrincipal claimsPrincipal, Bans bans)
+    public void SignIn(UserData user, ClaimsPrincipal claimsPrincipal)
     {
         lock (_lock)
         {
@@ -52,7 +49,6 @@ internal sealed class PlayerUserService : IPlayerUserService, IDisposable
                 throw new InvalidOperationException();
             _user = user;
             _claimsPrincipal = claimsPrincipal;
-            _bans = bans;
             _upgrades.AddRange(_user.Upgrades.Select(x => x.UpgradeId));
             SignedIn?.Invoke(this);
         }
@@ -66,7 +62,6 @@ internal sealed class PlayerUserService : IPlayerUserService, IDisposable
                 throw new InvalidOperationException();
             _user = null;
             _claimsPrincipal = null;
-            _bans = null;
             _upgrades.Clear();
             SignedOut?.Invoke(this);
         }

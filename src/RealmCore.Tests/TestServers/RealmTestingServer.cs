@@ -163,7 +163,6 @@ internal class RealmTestingServer : TestingServer<RealmTestingPlayer>
                     claimsIdentity.AddClaim(new Claim(ClaimTypes.Role, role));
             }
 
-        var bans = await GetRequiredService<IBanService>().GetBansByUserIdAndSerial(user.Id, "AAAA");
-        player.GetRequiredService<IPlayerUserService>().SignIn(user, claimsPrincipal, bans);
+        player.GetRequiredService<IPlayerUserService>().SignIn(user, claimsPrincipal);
     }
 }

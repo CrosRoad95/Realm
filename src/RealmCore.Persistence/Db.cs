@@ -190,6 +190,11 @@ public abstract class Db<T> : IdentityDbContext<UserData, RoleData, int,
                 .HasMany(x => x.Opinions)
                 .WithOne(x => x.User)
                 .HasForeignKey(x => x.UserId);
+            
+            entityBuilder
+                .HasMany(x => x.Bans)
+                .WithOne(x => x.User)
+                .HasForeignKey(x => x.UserId);
 
             entityBuilder
                 .HasMany(x => x.Events)
