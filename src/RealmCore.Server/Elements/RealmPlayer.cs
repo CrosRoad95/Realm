@@ -70,10 +70,12 @@ public class RealmPlayer : Player, IComponents, IDisposable
     public IPlayerPlayTimeService PlayTime { get; private set; }
     public IPlayerLevelService Level { get; private set; }
     public IPlayerLicensesService Licenses { get; private set; }
+    public IPlayerStatisticsService Statistics { get; private set; }
     public RealmPlayer(IServiceProvider serviceProvider)
     {
         _serviceScope = serviceProvider.CreateScope();
         _serviceProvider = _serviceScope.ServiceProvider;
+
         #region Initialize scope services
         _serviceProvider.GetRequiredService<PlayerContext>().Player = this;
         Money = _serviceProvider.GetRequiredService<IPlayerMoneyService>();
@@ -82,10 +84,11 @@ public class RealmPlayer : Player, IComponents, IDisposable
         DailyVisits = _serviceProvider.GetRequiredService<IPlayerDailyVisitsService>();
         Settings = _serviceProvider.GetRequiredService<IPlayerSettingsService>();
         Bans = _serviceProvider.GetRequiredService<IPlayerBansService>();
-        Upgrades ??= _serviceProvider.GetRequiredService<IPlayersUpgradeService>();
-        PlayTime ??= _serviceProvider.GetRequiredService<IPlayerPlayTimeService>();
-        Level ??= _serviceProvider.GetRequiredService<IPlayerLevelService>();
-        Licenses ??= _serviceProvider.GetRequiredService<IPlayerLicensesService>();
+        Upgrades = _serviceProvider.GetRequiredService<IPlayersUpgradeService>();
+        PlayTime = _serviceProvider.GetRequiredService<IPlayerPlayTimeService>();
+        Level = _serviceProvider.GetRequiredService<IPlayerLevelService>();
+        Licenses = _serviceProvider.GetRequiredService<IPlayerLicensesService>();
+        Statistics = _serviceProvider.GetRequiredService<IPlayerStatisticsService>();
         #endregion
 
         Components = new(_serviceProvider, this);

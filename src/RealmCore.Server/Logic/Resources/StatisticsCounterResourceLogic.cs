@@ -1,16 +1,23 @@
 ﻿namespace RealmCore.Server.Logic.Resources;
 
-internal sealed class StatisticsCounterResourceLogic : ComponentLogic<StatisticsCounterComponent>
+internal sealed class StatisticsCounterResourceLogic
 {
     private readonly IStatisticsCounterService _statisticsCounterService;
     private readonly ILogger<StatisticsCounterResourceLogic> _logger;
 
-    public StatisticsCounterResourceLogic(IStatisticsCounterService statisticsCounterService, IElementFactory elementFactory, ILogger<StatisticsCounterResourceLogic> logger) : base(elementFactory)
+    public StatisticsCounterResourceLogic(IStatisticsCounterService statisticsCounterService, ILogger<StatisticsCounterResourceLogic> logger, MtaServer mtaServer)
     {
         _statisticsCounterService = statisticsCounterService;
         _logger = logger;
         statisticsCounterService.StatisticsCollected += HandleStatisticsCollected;
         //statisticsCounterService.FpsStatisticsCollected += HandleFpsStatisticsCollected;
+        mtaServer.PlayerJoined += HandlePlayerJoined;
+    }
+
+    private void HandlePlayerJoined(Player plr)
+    {
+        var player = (RealmPlayer)plr;
+        _statisticsCounterService.SetCounterEnabledFor(player, true);
     }
 
     private void HandleFpsStatisticsCollected(Player plr, float minFps, float maxFps, float avgFps)
@@ -18,18 +25,18 @@ internal sealed class StatisticsCounterResourceLogic : ComponentLogic<Statistics
         // TODO:
     }
 
-    private void HandleStatisticsCollected(Player player, Dictionary<int, float> statistics)
+    private void HandleStatisticsCollected(Player plr, Dictionary<int, float> statistics)
     {
+        var player = (RealmPlayer)plr;
         try
         {
-            var statisticsCounterComponent = ((RealmPlayer)player).Components.GetRequiredComponent<StatisticsCounterComponent>();
             foreach (var item in statistics)
             {
                 try
                 {
                     if (item.Key < 0 || item.Key > 1000)
                         throw new Exception($"Received out of range statId from client: {item.Key}");
-                    statisticsCounterComponent.IncreaseStat(item.Key, item.Value);
+                    player.Statistics.Increase(item.Key, item.Value);
                 }
                 catch (Exception ex)
                 {
@@ -41,17 +48,5 @@ internal sealed class StatisticsCounterResourceLogic : ComponentLogic<Statistics
         {
             _logger.LogError(ex, "Failed to collect logs for player {playerName} serial: {serial}", player.Name, player.Client.TryGetSerial());
         }
-    }
-
-    protected override void ComponentAdded(StatisticsCounterComponent component)
-    {
-        var player = (RealmPlayer)component.Element;
-        _statisticsCounterService.SetCounterEnabledFor(player, true);
-    }
-
-    protected override void ComponentDetached(StatisticsCounterComponent component)
-    {
-        var player = (RealmPlayer)component.Element;
-        _statisticsCounterService.SetCounterEnabledFor(player, false);
     }
 }

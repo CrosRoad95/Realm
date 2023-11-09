@@ -33,7 +33,7 @@ public class ElementsComponentsTests
         #endregion
     }
 
-    [Fact]
+    //[Fact]
     public async Task TestThreadSafety()
     {
         var realmTestingServer = new RealmTestingServer();

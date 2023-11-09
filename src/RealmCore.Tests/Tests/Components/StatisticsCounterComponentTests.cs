@@ -7,20 +7,20 @@ public class StatisticsCounterComponentTests
     {
         var realmTestingServer = new RealmTestingServer();
         var player = realmTestingServer.CreatePlayer();
-        var statisticsCounterComponent = player.AddComponent<StatisticsCounterComponent>();
+        var statistics = player.Statistics;
 
-        using var statisticsCounterComponentMonitor = statisticsCounterComponent.Monitor();
+        using var statisticsCounterComponentMonitor = statistics.Monitor();
 
-        statisticsCounterComponent.GetStatsIds.Should().BeEmpty();
+        statistics.StatsIds.Should().BeEmpty();
 
-        statisticsCounterComponent.IncreaseStat(1, 10);
-        statisticsCounterComponent.IncreaseStat(1, 10);
-        statisticsCounterComponent.IncreaseStat(2, 10);
+        statistics.Increase(1, 10);
+        statistics.Increase(1, 10);
+        statistics.Increase(2, 10);
 
-        statisticsCounterComponent.GetStat(1).Should().Be(20);
-        statisticsCounterComponent.GetStat(2).Should().Be(10);
-        statisticsCounterComponent.GetStatsIds.Order().Should().BeEquivalentTo(new[] { 1, 2 });
-        statisticsCounterComponentMonitor.GetOccurredEvents().Should().BeEquivalentTo(new List<string> { "StatIncreased", "StatIncreased", "StatIncreased" });
+        statistics.Get(1).Should().Be(20);
+        statistics.Get(2).Should().Be(10);
+        statistics.StatsIds.Order().Should().BeEquivalentTo(new[] { 1, 2 });
+        statisticsCounterComponentMonitor.GetOccurredEvents().Should().BeEquivalentTo(new List<string> { "Increased", "Increased", "Increased" });
     }
 
     [Fact]
@@ -28,27 +28,26 @@ public class StatisticsCounterComponentTests
     {
         var realmTestingServer = new RealmTestingServer();
         var player = realmTestingServer.CreatePlayer();
-        var statisticsCounterComponent = player.AddComponent(new StatisticsCounterComponent(new Dictionary<int, float>
-        {
-            [1] = 10,
-            [2] = 10,
-            [3] = 10,
-        }));
-        using var statisticsCounterComponentMonitor = statisticsCounterComponent.Monitor();
+        var statistics = player.Statistics;
+        statistics.Set(1, 10);
+        statistics.Set(2, 10);
+        statistics.Set(3, 20);
 
-        statisticsCounterComponent.GetStatsIds.Should().BeEquivalentTo(new int[] { 1, 2, 3 });
+        using var statisticsCounterComponentMonitor = statistics.Monitor();
 
-        statisticsCounterComponent.DecreaseStat(1, 5);
-        statisticsCounterComponent.SetStat(2, 5);
-        statisticsCounterComponent.SetStat(3, 15);
-        statisticsCounterComponent.SetStat(3, 15); // Does nothing
+        statistics.StatsIds.Should().BeEquivalentTo(new int[] { 1, 2, 3 });
 
-        statisticsCounterComponent.Statistics.Should().BeEquivalentTo(new Dictionary<int, float>
+        statistics.Decrease(1, 5);
+        statistics.Set(2, 5);
+        statistics.Set(3, 15);
+        statistics.Set(3, 15); // Does nothing
+
+        statistics.ToDictionary(x => x.StatId, x => x.Value).Should().BeEquivalentTo(new Dictionary<int, float>
         {
             [1] = 5,
             [2] = 5,
             [3] = 15,
         });
-        statisticsCounterComponentMonitor.GetOccurredEvents().Should().BeEquivalentTo(new List<string> { "StatDecreased", "StatDecreased", "StatIncreased" });
+        statisticsCounterComponentMonitor.GetOccurredEvents().Should().BeEquivalentTo(new List<string> { "Decreased", "Decreased", "Increased" });
     }
 }

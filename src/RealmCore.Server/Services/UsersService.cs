@@ -142,11 +142,6 @@ internal sealed class UsersService : IUsersService
 
             player.GetRequiredService<IPlayerDailyVisitsService>();
 
-            if (user.Stats != null)
-                player.AddComponent(new StatisticsCounterComponent(user.Stats));
-            else
-                player.AddComponent<StatisticsCounterComponent>();
-
             if (user.Achievements != null)
                 player.AddComponent(new AchievementsComponent(user.Achievements));
             else
@@ -191,7 +186,6 @@ internal sealed class UsersService : IUsersService
         {
             _activeUsers.TrySetInactive(user.Id);
             while (player.TryDestroyComponent<InventoryComponent>()) { }
-            player.TryDestroyComponent<StatisticsCounterComponent>();
             player.TryDestroyComponent<AchievementsComponent>();
             player.TryDestroyComponent<JobUpgradesComponent>();
             player.TryDestroyComponent<JobStatisticsComponent>();
@@ -212,7 +206,6 @@ internal sealed class UsersService : IUsersService
         await _saveService.Save(player);
         _activeUsers.TrySetInactive(player.UserId);
         while (player.TryDestroyComponent<InventoryComponent>()) { }
-        player.TryDestroyComponent<StatisticsCounterComponent>();
         player.TryDestroyComponent<AchievementsComponent>();
         player.TryDestroyComponent<JobUpgradesComponent>();
         player.TryDestroyComponent<JobStatisticsComponent>();
