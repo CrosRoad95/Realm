@@ -177,7 +177,7 @@ internal sealed class UsersService : IUsersService
                 player.AddComponent(new FractionMemberComponent(fractionMemberData));
 
             player.AddComponent(new LicensesComponent(user.Licenses, _dateTimeProvider));
-            player.AddComponent(new LevelComponent(user.Level, user.Experience, _levelsRegistry));
+
             player.Money.SetMoneyInternal(user.Money);
             await ValidatePolicies(player);
             userLoginHistoryRepository.Add(user.Id, _dateTimeProvider.Now, player.Client.IPAddress?.ToString() ?? "", serial);
@@ -202,7 +202,6 @@ internal sealed class UsersService : IUsersService
             while (player.TryDestroyComponent<GroupMemberComponent>()) { }
             while (player.TryDestroyComponent<FractionMemberComponent>()) { }
             player.TryDestroyComponent<LicensesComponent>();
-            player.TryDestroyComponent<LevelComponent>();
             if(player.User.IsSignedIn)
                 player.User.SignOut();
             player.Money.SetMoneyInternal(0);
@@ -225,7 +224,6 @@ internal sealed class UsersService : IUsersService
         while (player.TryDestroyComponent<GroupMemberComponent>()) { }
         while (player.TryDestroyComponent<FractionMemberComponent>()) { }
         player.TryDestroyComponent<LicensesComponent>();
-        player.TryDestroyComponent<LevelComponent>();
         player.RemoveFromVehicle();
         player.Position = new Vector3(6000, 6000, 99999);
         player.Interior = 0;

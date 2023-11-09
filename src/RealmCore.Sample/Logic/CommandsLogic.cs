@@ -7,6 +7,7 @@ using RealmCore.Resources.Overlay;
 using RealmCore.Resources.Assets;
 using RealmCore.Sample.Components.Vehicles;
 using RealmCore.Server.Interfaces.Players;
+using System.Reflection.Emit;
 
 namespace RealmCore.Sample.Logic;
 
@@ -375,12 +376,9 @@ internal sealed class CommandsLogic
 
         _commandService.AddCommandHandler("giveexperience", (player, args) =>
         {
-            if (player.TryGetComponent(out LevelComponent levelComponent))
-            {
-                var amount = args.ReadUInt();
-                levelComponent.GiveExperience(amount);
-                _chatBox.OutputTo(player, $"gave experience: {amount}, level: {levelComponent.Level}, experience: {levelComponent.Experience}");
-            }
+            var amount = args.ReadUInt();
+            player.Level.GiveExperience(amount);
+            _chatBox.OutputTo(player, $"gave experience: {amount}, level: {player.Level.Level}, experience: {player.Level.Experience}");
         });
 
         _commandService.AddCommandHandler("cvforsale", (player, args) =>

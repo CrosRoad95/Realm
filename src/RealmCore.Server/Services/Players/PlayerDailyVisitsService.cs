@@ -1,8 +1,12 @@
-﻿namespace RealmCore.Server.Services.Players;
+﻿using RealmCore.Server.Providers;
+
+namespace RealmCore.Server.Services.Players;
 
 internal sealed class PlayerDailyVisitsService : IPlayerDailyVisitsService, IDisposable
 {
-    private readonly DailyVisitsData _dailyVisitsData;
+    private readonly object _lock = new();
+    private readonly IDateTimeProvider _dateTimeProvider;
+    private DailyVisitsData? _dailyVisitsData;
     public DateTime LastVisit { get => _dailyVisitsData.LastVisit; set => _dailyVisitsData.LastVisit = value; }
     public int VisitsInRow { get => _dailyVisitsData.VisitsInRow; set => _dailyVisitsData.VisitsInRow = value; }
     public int VisitsInRowRecord { get => _dailyVisitsData.VisitsInRowRecord; set => _dailyVisitsData.VisitsInRowRecord = value; }
@@ -14,20 +18,36 @@ internal sealed class PlayerDailyVisitsService : IPlayerDailyVisitsService, IDis
     public PlayerDailyVisitsService(PlayerContext playerContext, IPlayerUserService playerUserService, IDateTimeProvider dateTimeProvider)
     {
         Player = playerContext.Player;
-        if(playerUserService.User.DailyVisits != null)
+        playerUserService.SignedIn += HandleSignedIn;
+        playerUserService.SignedOut += HandleSignedOut;
+        _dateTimeProvider = dateTimeProvider;
+    }
+
+    private void HandleSignedIn(IPlayerUserService playerUserService)
+    {
+        lock (_lock)
         {
-            _dailyVisitsData = playerUserService.User.DailyVisits;
-        }
-        else
-        {
-            _dailyVisitsData = new DailyVisitsData
+            if(playerUserService.User?.DailyVisits != null)
             {
-                LastVisit = dateTimeProvider.Now,
-                VisitsInRow = 0,
-                VisitsInRowRecord = 0,
-            };
+                _dailyVisitsData = playerUserService.User?.DailyVisits;
+            }
+            else
+            {
+                _dailyVisitsData = new DailyVisitsData
+                {
+                    LastVisit = _dateTimeProvider.Now,
+                    VisitsInRow = 0,
+                    VisitsInRowRecord = 0,
+                };
+            }
         }
-        Update(dateTimeProvider.Now);
+        Update(_dateTimeProvider.Now);
+    }
+
+    private void HandleSignedOut(IPlayerUserService playerUserService)
+    {
+        lock (_lock)
+            _dailyVisitsData = null;
     }
 
     public void Update(DateTime now)

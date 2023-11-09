@@ -21,22 +21,22 @@ public class LevelComponentTests
         var player = realmTestingServer.CreatePlayer();
         var levelsRegistry = realmTestingServer.GetRequiredService<LevelsRegistry>();
         var totalRequiredExperience = PopulateLevelsRegistry(levelsRegistry);
-        var levelComponent = player.AddComponentWithDI<LevelComponent>();
+        var level = player.Level;
 
         int addedLevels = 0;
-        levelComponent.LevelChanged += (e, level, up) =>
+        level.LevelChanged += (e, level, up) =>
         {
             addedLevels++;
         };
 
-        levelComponent.GiveExperience(50);
+        level.GiveExperience(50);
         addedLevels.Should().Be(2);
-        levelComponent.Experience.Should().Be(20);
-        levelComponent.NextLevelRequiredExperience.Should().Be(30);
+        level.Experience.Should().Be(20);
+        level.NextLevelRequiredExperience.Should().Be(30);
 
-        levelComponent.GiveExperience(1000);
+        level.GiveExperience(1000);
         addedLevels.Should().Be(10);
-        levelComponent.Experience.Should().Be(1050 - totalRequiredExperience);
-        levelComponent.NextLevelRequiredExperience.Should().Be(uint.MaxValue);
+        level.Experience.Should().Be(1050 - totalRequiredExperience);
+        level.NextLevelRequiredExperience.Should().Be(uint.MaxValue);
     }
 }

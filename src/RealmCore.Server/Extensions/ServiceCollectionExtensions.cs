@@ -1,4 +1,5 @@
-﻿using RealmCore.Server.Services.Players;
+﻿using Microsoft.Extensions.DependencyInjection;
+using RealmCore.Server.Services.Players;
 
 namespace RealmCore.Server.Extensions;
 
@@ -91,6 +92,17 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IPlayerBansService, PlayerBansService>();
         services.AddScoped<IPlayersUpgradeService, PlayersUpgradeService>();
         services.AddScoped<IPlayerPlayTimeService, PlayerPlayTimeService>();
+        services.AddScoped<IPlayerLevelService, PlayerLevelService>();
+        services.AddScoped<IPlayerService>(x => x.GetRequiredService<IPlayerBrowserService>());
+        services.AddScoped<IPlayerService>(x => x.GetRequiredService<IPlayerAFKService>());
+        services.AddScoped<IPlayerService>(x => x.GetRequiredService<IPlayerMoneyService>());
+        services.AddScoped<IPlayerService>(x => x.GetRequiredService<IPlayerUserService>());
+        services.AddScoped<IPlayerService>(x => x.GetRequiredService<IPlayerDailyVisitsService>());
+        services.AddScoped<IPlayerService>(x => x.GetRequiredService<IPlayerSettingsService>());
+        services.AddScoped<IPlayerService>(x => x.GetRequiredService<IPlayerBansService>());
+        services.AddScoped<IPlayerService>(x => x.GetRequiredService<IPlayersUpgradeService>());
+        services.AddScoped<IPlayerService>(x => x.GetRequiredService<IPlayerPlayTimeService>());
+        services.AddScoped<IPlayerService>(x => x.GetRequiredService<IPlayerLevelService>());
         #endregion
 
         #region Policies

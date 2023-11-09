@@ -1,8 +1,40 @@
-﻿namespace RealmCore.Server.Components.Players;
+﻿namespace RealmCore.Server.Services.Players;
 
-[ComponentUsage(false)]
-public class LevelComponent : Component
+internal class PlayerLevelService : IPlayerLevelService
 {
+    private readonly object _lock = new();
+    private readonly LevelsRegistry _levelsRegistry;
+    private uint _level;
+    private uint _experience;
+
+    public RealmPlayer Player { get; private set; }
+    public PlayerLevelService(PlayerContext playerContext, LevelsRegistry levelsRegistry, IPlayerUserService playerUserService)
+    {
+        Player = playerContext.Player;
+        playerUserService.SignedIn += HandleSignedIn;
+        playerUserService.SignedOut += HandleSignedOut;
+        _levelsRegistry = levelsRegistry;
+    }
+
+    private void HandleSignedIn(IPlayerUserService playerUserService)
+    {
+        lock (_lock)
+        {
+            _level = playerUserService.User.Level;
+            _experience = playerUserService.User.Experience;
+        }
+    }
+
+    private void HandleSignedOut(IPlayerUserService playerUserService)
+    {
+        lock (_lock)
+        {
+            _level = 0;
+            _experience = 0;
+        }
+    }
+
+
     public uint NextLevelRequiredExperience
     {
         get
@@ -10,9 +42,6 @@ public class LevelComponent : Component
             return _levelsRegistry.GetExperienceRequiredForLevel(Level + 1);
         }
     }
-
-    private uint _level;
-    private uint _experience;
 
     public uint Level
     {
@@ -51,23 +80,8 @@ public class LevelComponent : Component
         }
     }
 
-    private readonly object _lock = new();
-    private readonly LevelsRegistry _levelsRegistry;
-
-    public event Action<LevelComponent, uint, bool>? LevelChanged;
-    public event Action<LevelComponent, uint>? ExperienceChanged;
-
-    public LevelComponent(LevelsRegistry levelsRegistry)
-    {
-        _levelsRegistry = levelsRegistry;
-    }
-
-    public LevelComponent(uint level, uint experience, LevelsRegistry levelsRegistry)
-    {
-        _level = level;
-        _experience = experience;
-        _levelsRegistry = levelsRegistry;
-    }
+    public event Action<IPlayerLevelService, uint, bool>? LevelChanged;
+    public event Action<IPlayerLevelService, uint>? ExperienceChanged;
 
     public void GiveExperience(uint amount)
     {
