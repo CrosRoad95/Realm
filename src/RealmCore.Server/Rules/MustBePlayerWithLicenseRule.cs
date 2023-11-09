@@ -3,18 +3,16 @@
 public sealed class MustBePlayerWithLicenseRule : IElementRule
 {
     private readonly int _licenseId;
-    private readonly IDateTimeProvider _dateTimeProvider;
 
-    public MustBePlayerWithLicenseRule(int licenseId, IDateTimeProvider dateTimeProvider)
+    public MustBePlayerWithLicenseRule(int licenseId)
     {
         _licenseId = licenseId;
-        _dateTimeProvider = dateTimeProvider;
     }
 
     public bool Check(Element element)
     {
-        if(element is RealmPlayer player && player.TryGetComponent(out LicensesComponent licensesComponent))
-            return licensesComponent.HasLicense(_licenseId);
+        if(element is RealmPlayer player)
+            return player.Licenses.Has(_licenseId);
         return false;
     }
 }

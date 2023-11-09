@@ -1,10 +1,8 @@
 ﻿
 namespace RealmCore.Server.Interfaces.Players;
 
-public interface IPlayerSettingsService : IPlayerService
+public interface IPlayerSettingsService : IPlayerService, IEnumerable<UserSettingDTO>
 {
-    ICollection<int> Settings { get; }
-
     event Action<IPlayerSettingsService, int, string>? Changed;
     event Action<IPlayerSettingsService, int, string>? Removed;
 

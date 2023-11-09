@@ -162,11 +162,8 @@ internal sealed class CommandsLogic
 
         _commandService.AddCommandHandler("givelicense10", (player, args) =>
         {
-            if (player.TryGetComponent(out LicensesComponent licenseComponent))
-            {
-                if (licenseComponent.TryAddLicense(10))
-                    _chatBox.OutputTo(player, $"License 10 added");
-            }
+            if (player.Licenses.TryAdd(10))
+                _chatBox.OutputTo(player, $"License 10 added");
         });
 
         _commandService.AddCommandHandler("cv", (player, args) =>
@@ -348,11 +345,8 @@ internal sealed class CommandsLogic
                 _chatBox.OutputTo(player, $"Test item added");
             }
 
-            if (player.TryGetComponent(out LicensesComponent licenseComponent))
-            {
-                if (licenseComponent.TryAddLicense(1))
-                    _chatBox.OutputTo(player, $"Test license added: 'test123' of id 1");
-            }
+            if (player.Licenses.TryAdd(1))
+                _chatBox.OutputTo(player, $"Test license added: 'test123' of id 1");
 
             player.Money.Amount = (decimal)Random.Shared.NextDouble() * 1000;
             _chatBox.OutputTo(player, $"Set money to: {player.Money}");

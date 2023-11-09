@@ -93,6 +93,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IPlayersUpgradeService, PlayersUpgradeService>();
         services.AddScoped<IPlayerPlayTimeService, PlayerPlayTimeService>();
         services.AddScoped<IPlayerLevelService, PlayerLevelService>();
+        services.AddScoped<IPlayerLicensesService, PlayerLicensesService>();
         services.AddScoped<IPlayerService>(x => x.GetRequiredService<IPlayerBrowserService>());
         services.AddScoped<IPlayerService>(x => x.GetRequiredService<IPlayerAFKService>());
         services.AddScoped<IPlayerService>(x => x.GetRequiredService<IPlayerMoneyService>());
@@ -103,6 +104,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IPlayerService>(x => x.GetRequiredService<IPlayersUpgradeService>());
         services.AddScoped<IPlayerService>(x => x.GetRequiredService<IPlayerPlayTimeService>());
         services.AddScoped<IPlayerService>(x => x.GetRequiredService<IPlayerLevelService>());
+        services.AddScoped<IPlayerService>(x => x.GetRequiredService<IPlayerLicensesService>());
         #endregion
 
         #region Policies

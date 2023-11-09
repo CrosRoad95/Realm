@@ -12,12 +12,8 @@ public class VehicleLicenseRequirementAccessComponent : VehicleAccessControllerC
     protected override bool CanEnter(Ped ped, RealmVehicle vehicle, byte seat)
     {
         if(ped is RealmPlayer player)
-        {
-            if(player.TryGetComponent(out LicensesComponent licensesComponent))
-            {
-                return licensesComponent.HasLicense(_licenseId);
-            }
-        }
+            return player.Licenses.Has(_licenseId);
+
         return false;
     }
 }

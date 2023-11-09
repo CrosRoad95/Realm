@@ -1,19 +1,11 @@
-﻿namespace RealmCore.Server.Services.Players;
+﻿using System.Collections;
+
+namespace RealmCore.Server.Services.Players;
 
 internal class PlayerSettingsService : IPlayerSettingsService, IDisposable
 {
     private object _lock = new();
     private ICollection<UserSettingData> _settings = [];
-    public ICollection<int> Settings
-    {
-        get
-        {
-            lock(_lock)
-            {
-                return _settings.Select(x => x.SettingId).ToList();
-            }
-        }
-    }
     public RealmPlayer Player { get; }
     public event Action<IPlayerSettingsService, int, string>? Changed;
     public event Action<IPlayerSettingsService, int, string>? Removed;
@@ -89,8 +81,28 @@ internal class PlayerSettingsService : IPlayerSettingsService, IDisposable
         return false;
     }
 
+    private static UserSettingDTO? Map(UserSettingData? userSettingData)
+    {
+        if (userSettingData == null)
+            return null;
+
+        return new UserSettingDTO
+        {
+            SettingId = userSettingData.SettingId,
+            Value = userSettingData.Value
+        };
+    }
+
     public void Dispose()
     {
 
     }
+
+    public IEnumerator<UserSettingDTO> GetEnumerator()
+    {
+        lock (_lock)
+            return new List<UserSettingDTO>(_settings.Select(Map)).GetEnumerator();
+    }
+
+    IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 }

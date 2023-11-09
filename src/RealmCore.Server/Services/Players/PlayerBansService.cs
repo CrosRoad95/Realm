@@ -1,4 +1,6 @@
-﻿namespace RealmCore.Server.Services.Players;
+﻿using System.Collections;
+
+namespace RealmCore.Server.Services.Players;
 
 internal class PlayerBansService : IPlayerBansService, IDisposable
 {
@@ -8,16 +10,6 @@ internal class PlayerBansService : IPlayerBansService, IDisposable
 
     public event Action<BanDTO>? Added;
     public event Action<BanDTO>? Removed;
-
-    public IReadOnlyList<BanDTO> AllActive
-    {
-        get
-        {
-            var now = _dateTimeProvider.Now;
-            lock (_lock)
-                return new List<BanDTO>(_bans.Where(x => x.End > now && x.Active).Select(Map));
-        }
-    }
 
     public RealmPlayer Player { get; }
     public PlayerBansService(PlayerContext playerContext, IPlayerUserService playerUserService, IDateTimeProvider dateTimeProvider)
@@ -154,4 +146,13 @@ internal class PlayerBansService : IPlayerBansService, IDisposable
     public void Dispose()
     {
     }
+
+    public IEnumerator<BanDTO> GetEnumerator()
+    {
+        var now = _dateTimeProvider.Now;
+        lock (_lock)
+            return new List<BanDTO>(_bans.Where(x => x.End > now && x.Active).Select(Map)).GetEnumerator();
+    }
+
+    IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 }

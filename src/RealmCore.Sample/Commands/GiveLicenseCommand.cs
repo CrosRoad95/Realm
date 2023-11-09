@@ -14,17 +14,14 @@ public sealed class GiveLicenseCommand : IInGameCommand
 
     public Task Handle(RealmPlayer player, CommandArguments args)
     {
-        if (player.TryGetComponent(out LicensesComponent licenseComponent))
+        var license = args.ReadInt();
+        if (player.Licenses.TryAdd(license))
         {
-            var license = args.ReadInt();
-            if (licenseComponent.TryAddLicense(license))
-            {
-                _chatBox.OutputTo(player, $"license added: '{license}'");
-            }
-            else
-            {
-                _chatBox.OutputTo(player, $"failed to add license: '{license}'");
-            }
+            _chatBox.OutputTo(player, $"license added: '{license}'");
+        }
+        else
+        {
+            _chatBox.OutputTo(player, $"failed to add license: '{license}'");
         }
         return Task.CompletedTask;
     }

@@ -1,9 +1,7 @@
 ﻿namespace RealmCore.Server.Interfaces.Players;
 
-public interface IPlayerBansService : IPlayerService
+public interface IPlayerBansService : IPlayerService, IEnumerable<BanDTO>
 {
-    IReadOnlyList<BanDTO> AllActive { get; }
-
     event Action<BanDTO>? Added;
     event Action<BanDTO>? Removed;
 

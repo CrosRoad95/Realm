@@ -1,13 +1,10 @@
-﻿namespace RealmCore.Persistence.Data;
+﻿namespace RealmCore.Server.DTOs;
 
-public sealed class UserLicenseData
+public class LicenseDTO
 {
-#pragma warning disable CS8618
-    public int UserId { get; set; }
     public int LicenseId { get; set; }
     public DateTime? SuspendedUntil { get; set; }
     public string? SuspendedReason { get; set; }
 
     public bool IsSuspended(DateTime now) => SuspendedUntil != null && SuspendedUntil > now;
-#pragma warning restore CS8618
 }
