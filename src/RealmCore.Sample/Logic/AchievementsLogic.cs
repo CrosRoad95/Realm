@@ -1,28 +1,26 @@
 ﻿using RealmCore.Resources.Overlay;
+using RealmCore.Server.Interfaces.Players;
+using SlipeServer.Server;
 
 namespace RealmCore.Sample.Logic;
 
-internal sealed class AchievementsLogic : ComponentLogic<AchievementsComponent>
+internal sealed class AchievementsLogic
 {
     private readonly IOverlayService _overlayService;
 
-    public AchievementsLogic(IElementFactory elementFactory, IOverlayService overlayService) : base(elementFactory)
+    public AchievementsLogic(MtaServer mtaServer)
     {
-        _overlayService = overlayService;
+        mtaServer.PlayerJoined += HandlePlayerJoined;
     }
 
-    protected override void ComponentAdded(AchievementsComponent achievementsComponent)
+    private void HandlePlayerJoined(Player plr)
     {
-        achievementsComponent.AchievementUnlocked += HandleAchievementUnlocked;
+        var player = (RealmPlayer)plr;
+        player.Achievements.Unlocked += HandleUnlocked;
     }
 
-    protected override void ComponentDetached(AchievementsComponent achievementsComponent)
+    private void HandleUnlocked(IPlayerAchievementsService achievementService, int achievementId)
     {
-        achievementsComponent.AchievementUnlocked -= HandleAchievementUnlocked;
-    }
-
-    private void HandleAchievementUnlocked(AchievementsComponent achievementsComponent, int achievementName)
-    {
-        _overlayService.AddNotification((RealmPlayer)achievementsComponent.Element, $"Odblokowałeś osiągnięcie '{achievementName}'");
+        _overlayService.AddNotification(achievementService.Player, $"Odblokowałeś osiągnięcie '{achievementId}'");
     }
 }

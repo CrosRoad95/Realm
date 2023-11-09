@@ -264,8 +264,7 @@ internal sealed class CommandsLogic
 
         _commandService.AddCommandHandler("testachievement", (player, args) =>
         {
-            var achievementsComponent = player.GetRequiredComponent<AchievementsComponent>();
-            achievementsComponent.UpdateProgress(1, 2, 10);
+            player.Achievements.UpdateProgress(1, 2, 10);
             _chatBox.OutputTo(player, $"progressed achieviement 'test'");
         });
 
@@ -352,11 +351,8 @@ internal sealed class CommandsLogic
             _chatBox.OutputTo(player, $"Set money to: {player.Money}");
 
 
-            if (player.TryGetComponent(out AchievementsComponent achievementsComponent))
-            {
-                achievementsComponent.UpdateProgress(1, 2, 10);
-                _chatBox.OutputTo(player, $"Updated achievement 'test' progress to 2");
-            }
+            player.Achievements.UpdateProgress(1, 2, 10);
+            _chatBox.OutputTo(player, $"Updated achievement 'test' progress to 2");
 
             {
                 var vehicle = await _vehiclesService.CreateVehicle(404, player.Position + new Vector3(4, 0, 0), player.Rotation);

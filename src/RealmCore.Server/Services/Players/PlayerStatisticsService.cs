@@ -119,8 +119,5 @@ internal class PlayerStatisticsService : IPlayerStatisticsService
             return new List<UserStatDTO>(_stats.Select(Map)).GetEnumerator();
     }
 
-    IEnumerator IEnumerable.GetEnumerator()
-    {
-        throw new NotImplementedException();
-    }
+    IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 }
