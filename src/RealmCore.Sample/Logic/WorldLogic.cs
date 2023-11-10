@@ -1,8 +1,9 @@
 ﻿using RealmCore.Resources.Overlay;
+using SlipeServer.Server;
 
 namespace RealmCore.Sample.Logic;
 
-internal class WorldLogic : ComponentLogic<DiscoveriesComponent>
+internal class WorldLogic
 {
     private struct DiscoveryInfo
     {
@@ -26,18 +27,19 @@ internal class WorldLogic : ComponentLogic<DiscoveriesComponent>
     private readonly IElementFactory _elementFactory;
     private readonly IOverlayService _overlayService;
 
-    public WorldLogic(IElementFactory elementFactory, IOverlayService overlayService) : base(elementFactory)
+    public WorldLogic(IElementFactory elementFactory, MtaServer mtaServer)
     {
         _elementFactory = elementFactory;
-        _overlayService = overlayService;
         HandleServerStarted();
+        mtaServer.PlayerJoined += HandlePlayerJoined;
     }
 
-    protected override void ComponentAdded(DiscoveriesComponent discoveriesComponent)
+    private void HandlePlayerJoined(Player plr)
     {
-        foreach (var discovery in discoveriesComponent.Discoveries)
+        var player = (RealmPlayer)plr;
+        foreach (var discovery in player.Discoveries)
         {
-            HandlePlayerDiscover((RealmPlayer)discoveriesComponent.Element, discovery);
+            HandlePlayerDiscover(player, discovery);
         }
     }
 
@@ -73,16 +75,16 @@ internal class WorldLogic : ComponentLogic<DiscoveriesComponent>
         }
     }
 
-    private void AttachDiscovery(RealmCollisionSphere collisionSphere, int discoveryName, Action<RealmPlayer, int, bool> callback)
+    private void AttachDiscovery(RealmCollisionSphere collisionSphere, int discoveryId, Action<RealmPlayer, int, bool> callback)
     {
         collisionSphere.CollisionDetection.AddRule<MustBePlayerRule>();
         collisionSphere.CollisionDetection.Entered += (enteredColShape, element) =>
         {
             if(element is RealmPlayer player)
             {
-                if (player.GetRequiredComponent<DiscoveriesComponent>().TryDiscover(discoveryName))
+                if (player.Discoveries.TryDiscover(discoveryId))
                 {
-                    callback(player, discoveryName, true);
+                    callback(player, discoveryId, true);
                 }
             }
         };

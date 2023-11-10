@@ -145,11 +145,6 @@ internal sealed class UsersService : IUsersService
             else
                 player.AddComponent(new JobStatisticsComponent(_dateTimeProvider.Now));
 
-            if (user.Discoveries != null)
-                player.AddComponent(new DiscoveriesComponent(user.Discoveries));
-            else
-                player.AddComponent<DiscoveriesComponent>();
-
             if (user.DiscordIntegration != null)
                 player.AddComponent(new DiscordIntegrationComponent(user.DiscordIntegration.DiscordUserId));
 
@@ -175,7 +170,6 @@ internal sealed class UsersService : IUsersService
             _activeUsers.TrySetInactive(user.Id);
             while (player.TryDestroyComponent<InventoryComponent>()) { }
             player.TryDestroyComponent<JobStatisticsComponent>();
-            player.TryDestroyComponent<DiscoveriesComponent>();
             player.TryDestroyComponent<DiscordIntegrationComponent>();
             while (player.TryDestroyComponent<GroupMemberComponent>()) { }
             while (player.TryDestroyComponent<FractionMemberComponent>()) { }
@@ -193,7 +187,6 @@ internal sealed class UsersService : IUsersService
         _activeUsers.TrySetInactive(player.UserId);
         while (player.TryDestroyComponent<InventoryComponent>()) { }
         player.TryDestroyComponent<JobStatisticsComponent>();
-        player.TryDestroyComponent<DiscoveriesComponent>();
         player.TryDestroyComponent<DiscordIntegrationComponent>();
         while (player.TryDestroyComponent<GroupMemberComponent>()) { }
         while (player.TryDestroyComponent<FractionMemberComponent>()) { }
