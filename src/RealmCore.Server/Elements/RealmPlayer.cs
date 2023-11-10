@@ -74,6 +74,7 @@ public class RealmPlayer : Player, IComponents, IDisposable
     public IPlayerAchievementsService Achievements { get; private set; }
     public IPlayerJobUpgradesService JobUpgrades { get; private set; }
     public IPlayerDiscoveriesService Discoveries { get; private set; }
+    public IPlayerJobStatisticsService JobStatistics { get; private set; }
     public RealmPlayer(IServiceProvider serviceProvider)
     {
         _serviceScope = serviceProvider.CreateScope();
@@ -95,6 +96,7 @@ public class RealmPlayer : Player, IComponents, IDisposable
         Achievements = _serviceProvider.GetRequiredService<IPlayerAchievementsService>();
         JobUpgrades = _serviceProvider.GetRequiredService<IPlayerJobUpgradesService>();
         Discoveries = _serviceProvider.GetRequiredService<IPlayerDiscoveriesService>();
+        JobStatistics = _serviceProvider.GetRequiredService<IPlayerJobStatisticsService>();
         #endregion
 
         Components = new(_serviceProvider, this);

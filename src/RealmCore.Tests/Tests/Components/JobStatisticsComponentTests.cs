@@ -1,54 +1,41 @@
-﻿using RealmCore.Server.Structs;
+﻿using RealmCore.Persistence.DTOs;
+using RealmCore.Server.DTOs;
+using RealmCore.Server.Structs;
 
 namespace RealmCore.Tests.Tests.Components;
 
 public class JobStatisticsComponentTests
 {
-    private readonly JobStatisticsComponent _jobStatisticsComponent;
-
-    public JobStatisticsComponentTests()
-    {
-        var realmTestingServer = new RealmTestingServer();
-        var player = realmTestingServer.CreatePlayer();
-        var worldObject = realmTestingServer.CreateObject();
-        _jobStatisticsComponent = new(realmTestingServer.GetRequiredService<IDateTimeProvider>().Now);
-        player.AddComponent(_jobStatisticsComponent);
-    }
-
     [Fact]
     public void AddPointsTimePlayedShouldWork()
     {
-        #region Arrange
-        _jobStatisticsComponent.Reset();
-        #endregion
+        var realmTestingServer = new RealmTestingServer();
+        var player = realmTestingServer.CreatePlayer();
+        var statistics = player.JobStatistics;
 
         #region Act
-        _jobStatisticsComponent.AddPoints(1, 2);
-        _jobStatisticsComponent.AddPoints(1, 2);
-        _jobStatisticsComponent.AddPoints(2, 2);
-        _jobStatisticsComponent.AddTimePlayed(1, 2);
-        _jobStatisticsComponent.AddTimePlayed(1, 2);
-        _jobStatisticsComponent.AddTimePlayed(2, 2);
+        statistics.AddPoints(1, 2);
+        statistics.AddPoints(1, 2);
+        statistics.AddPoints(2, 2);
+        statistics.AddTimePlayed(1, 2);
+        statistics.AddTimePlayed(1, 2);
+        statistics.AddTimePlayed(2, 2);
         #endregion
 
         #region Assert
-        _jobStatisticsComponent.JobStatistics.Should().BeEquivalentTo(new Dictionary<int, JobStatistics>
+        statistics.Should().BeEquivalentTo(new List<UserJobStatisticsDTO>
         {
-            [1] = new JobStatistics
+            new UserJobStatisticsDTO
             {
-                jobId = 1,
-                points = 4,
-                sessionPoints = 4,
-                sessionTimePlayed = 4,
-                timePlayed = 4
+                JobId = 1,
+                Points = 4,
+                TimePlayed = 4
             },
-            [2] = new JobStatistics
+            new UserJobStatisticsDTO
             {
-                jobId = 2,
-                points = 2,
-                sessionPoints = 2,
-                sessionTimePlayed = 2,
-                timePlayed = 2
+                JobId = 2,
+                Points = 2,
+                TimePlayed = 2
             }
         });
         #endregion

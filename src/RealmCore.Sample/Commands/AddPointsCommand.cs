@@ -14,7 +14,7 @@ public sealed class AddPointsCommand : IInGameCommand
 
     public Task Handle(RealmPlayer player, CommandArguments args)
     {
-        player.GetRequiredComponent<JobStatisticsComponent>().AddPoints(1, 1);
+        player.JobStatistics.AddPoints(1, 1);
         _chatBox.OutputTo(player, "added 1 point to job id 1");
         return Task.CompletedTask;
     }

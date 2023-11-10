@@ -30,6 +30,15 @@ public static class ServiceCollectionExtensions
         return services;
     }
 
+    internal static ServiceCollection AddPlayerScopedService<T1, T2>(this ServiceCollection services)
+        where T1 : class, IPlayerService
+        where T2: class, T1
+    {
+        services.AddScoped<T1, T2>();
+        services.AddScoped<IPlayerService>(x => x.GetRequiredService<T1>()); 
+        return services;
+    }
+
     internal static ServiceCollection ConfigureRealmServices(this ServiceCollection services)
     {
         var consoleLogger = services.Where(x => x.ImplementationType == typeof(ConsoleLoggerProvider)).FirstOrDefault();
@@ -67,7 +76,6 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IGroupService, GroupService>();
         services.AddScoped<IFractionService, FractionService>();
         services.AddScoped<IBanService, BanService>();
-        services.AddScoped<IJobService, JobService>();
         services.AddScoped<IRewardService, RewardService>();
         services.AddScoped<IFeedbackService, FeedbackService>();
         services.AddScoped<ISpawnMarkersService, SpawnMarkersService>();
@@ -82,34 +90,22 @@ public static class ServiceCollectionExtensions
         #endregion
 
         #region Player services
-        services.AddScoped<IPlayerBrowserService, PlayerBrowserService>();
-        services.AddScoped<IPlayerAFKService, PlayerAFKService>();
-        services.AddScoped<IPlayerMoneyService, PlayerMoneyService>();
-        services.AddScoped<IPlayerUserService, PlayerUserService>();
-        services.AddScoped<IPlayerDailyVisitsService, PlayerDailyVisitsService>();
-        services.AddScoped<IPlayerSettingsService, PlayerSettingsService>();
-        services.AddScoped<IPlayerBansService, PlayerBansService>();
-        services.AddScoped<IPlayersUpgradeService, PlayersUpgradeService>();
-        services.AddScoped<IPlayerPlayTimeService, PlayerPlayTimeService>();
-        services.AddScoped<IPlayerLevelService, PlayerLevelService>();
-        services.AddScoped<IPlayerLicensesService, PlayerLicensesService>();
-        services.AddScoped<IPlayerStatisticsService, PlayerStatisticsService>();
-        services.AddScoped<IPlayerAchievementsService, PlayerAchievementsService>();
-        services.AddScoped<IPlayerJobUpgradesService, PlayerJobUpgradesService>();
-        services.AddScoped<IPlayerService>(x => x.GetRequiredService<IPlayerBrowserService>());
-        services.AddScoped<IPlayerService>(x => x.GetRequiredService<IPlayerAFKService>());
-        services.AddScoped<IPlayerService>(x => x.GetRequiredService<IPlayerMoneyService>());
-        services.AddScoped<IPlayerService>(x => x.GetRequiredService<IPlayerUserService>());
-        services.AddScoped<IPlayerService>(x => x.GetRequiredService<IPlayerDailyVisitsService>());
-        services.AddScoped<IPlayerService>(x => x.GetRequiredService<IPlayerSettingsService>());
-        services.AddScoped<IPlayerService>(x => x.GetRequiredService<IPlayerBansService>());
-        services.AddScoped<IPlayerService>(x => x.GetRequiredService<IPlayersUpgradeService>());
-        services.AddScoped<IPlayerService>(x => x.GetRequiredService<IPlayerPlayTimeService>());
-        services.AddScoped<IPlayerService>(x => x.GetRequiredService<IPlayerLevelService>());
-        services.AddScoped<IPlayerService>(x => x.GetRequiredService<IPlayerLicensesService>());
-        services.AddScoped<IPlayerService>(x => x.GetRequiredService<IPlayerStatisticsService>());
-        services.AddScoped<IPlayerService>(x => x.GetRequiredService<IPlayerAchievementsService>());
-        services.AddScoped<IPlayerService>(x => x.GetRequiredService<IPlayerJobUpgradesService>());
+        services.AddPlayerScopedService<IPlayerBrowserService, PlayerBrowserService>();
+        services.AddPlayerScopedService<IPlayerAFKService, PlayerAFKService>();
+        services.AddPlayerScopedService<IPlayerMoneyService, PlayerMoneyService>();
+        services.AddPlayerScopedService<IPlayerUserService, PlayerUserService>();
+        services.AddPlayerScopedService<IPlayerDailyVisitsService, PlayerDailyVisitsService>();
+        services.AddPlayerScopedService<IPlayerSettingsService, PlayerSettingsService>();
+        services.AddPlayerScopedService<IPlayerBansService, PlayerBansService>();
+        services.AddPlayerScopedService<IPlayersUpgradeService, PlayersUpgradeService>();
+        services.AddPlayerScopedService<IPlayerPlayTimeService, PlayerPlayTimeService>();
+        services.AddPlayerScopedService<IPlayerLevelService, PlayerLevelService>();
+        services.AddPlayerScopedService<IPlayerLicensesService, PlayerLicensesService>();
+        services.AddPlayerScopedService<IPlayerStatisticsService, PlayerStatisticsService>();
+        services.AddPlayerScopedService<IPlayerAchievementsService, PlayerAchievementsService>();
+        services.AddPlayerScopedService<IPlayerDiscoveriesService, PlayerDiscoveriesService>();
+        services.AddPlayerScopedService<IPlayerJobUpgradesService, PlayerJobUpgradesService>();
+        services.AddPlayerScopedService<IPlayerJobStatisticsService, PlayerJobStatisticsService>();
         #endregion
 
         #region Policies

@@ -9,7 +9,7 @@ internal sealed class JobRepository : IJobRepository
         _db = db;
     }
 
-    public async Task<Dictionary<int, UserJobStatisticsDTO>> GetJobStatistics(short jobId, int limit = 10, CancellationToken cancellationToken = default)
+    public async Task<List<UserJobStatisticsDTO>> GetJobStatistics(short jobId, int limit = 10, CancellationToken cancellationToken = default)
     {
         var query = _db.JobPoints
             .TagWithSource(nameof(JobRepository))
@@ -19,26 +19,29 @@ internal sealed class JobRepository : IJobRepository
             .Select(x => new UserJobStatisticsDTO
             {
                 UserId = x.Key,
-                Points = x.Sum(y => (int)y.Points),
-                TimePlayed = x.Sum(y => (int)y.TimePlayed)
+                JobId = jobId,
+                Points = (ulong)x.Sum(y => (uint)y.Points),
+                TimePlayed = (ulong)x.Sum(y => (uint)y.TimePlayed)
             })
             .OrderBy(x => x.Points)
             .Take(limit);
 
-        return await query.ToDictionaryAsync(x => x.UserId, cancellationToken);
+        return await query.ToListAsync(cancellationToken);
     }
 
-    public async Task<JobStatisticsDTO?> GetUserJobStatistics(int userId, short jobId, CancellationToken cancellationToken = default)
+    public async Task<UserJobStatisticsDTO?> GetUserJobStatistics(int userId, short jobId, CancellationToken cancellationToken = default)
     {
         var query = _db.JobPoints
             .TagWithSource(nameof(JobRepository))
             .AsNoTrackingWithIdentityResolution()
             .Where(x => x.JobId == jobId)
             .GroupBy(x => true)
-            .Select(x => new JobStatisticsDTO
+            .Select(x => new UserJobStatisticsDTO
             {
-                Points = x.Sum(y => (int)y.Points),
-                TimePlayed = x.Sum(y => (int)y.TimePlayed)
+                JobId = jobId,
+                UserId = userId,
+                Points = (ulong)x.Sum(y => (uint)y.Points),
+                TimePlayed = (ulong)x.Sum(y => (uint)y.TimePlayed)
             });
 
         return await query.FirstOrDefaultAsync(cancellationToken);

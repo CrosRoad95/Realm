@@ -34,20 +34,21 @@ internal class TestJobComponent : JobSessionComponent
     private void ObjectiveACompleted(Objective objective, object? data = null)
     {
         var player = (RealmPlayer)Element;
-        player.GetRequiredComponent<JobStatisticsComponent>().AddPoints(1, 1);
+        player.JobStatistics.AddPoints(1, 1);
         //ChatBox.OutputTo(player, $"Entered marker, objectives left: {Objectives.Count()}");
     }
 
     private void ObjectiveBCompleted(Objective objective, object? data = null)
     {
         var player = (RealmPlayer)Element;
-        player.GetRequiredComponent<JobStatisticsComponent>().AddPoints(1, 2);
+        player.JobStatistics.AddPoints(1, 2);
         //ChatBox.OutputTo(player, $"Box delivered, objectives left: {Objectives.Count()}");
     }
 
     private void ObjectiveCCompleted(Objective objective, object? data = null)
     {
-        ((IComponents)Element).GetRequiredComponent<JobStatisticsComponent>().AddPoints(1, 1);
+        var player = (RealmPlayer)Element;
+        player.JobStatistics.AddPoints(1, 1);
         //ChatBox.OutputTo(player, $"Entered one of marker, objectives left: {Objectives.Count()}");
     }
 

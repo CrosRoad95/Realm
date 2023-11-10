@@ -62,7 +62,7 @@ internal class SamplePickupsLogic
                         jobSessionComponent.End();
                         var elapsed = jobSessionComponent.Elapsed;
                         _chatBox.OutputTo(player, $"Job ended in: {elapsed.Hours:X2}:{elapsed.Minutes:X2}:{elapsed.Seconds:X2}, completed objectives: {jobSessionComponent.CompletedObjectives}");
-                        player.GetRequiredComponent<JobStatisticsComponent>().AddTimePlayed(jobSessionComponent.JobId, (ulong)jobSessionComponent.Elapsed.Seconds);
+                        player.JobStatistics.AddTimePlayed(jobSessionComponent.JobId, (ulong)jobSessionComponent.Elapsed.Seconds);
                         player.DestroyComponent(jobSessionComponent);
                     }
                     else
