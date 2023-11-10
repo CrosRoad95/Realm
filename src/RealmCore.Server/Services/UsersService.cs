@@ -140,9 +140,6 @@ internal sealed class UsersService : IUsersService
             else
                 player.AddComponent(new InventoryComponent(_gameplayOptions.CurrentValue.DefaultInventorySize));
 
-            if (user.DiscordIntegration != null)
-                player.AddComponent(new DiscordIntegrationComponent(user.DiscordIntegration.DiscordUserId));
-
             foreach (var groupMemberData in user.GroupMembers)
                 player.AddComponent(new GroupMemberComponent(groupMemberData));
 
@@ -164,7 +161,6 @@ internal sealed class UsersService : IUsersService
         {
             _activeUsers.TrySetInactive(user.Id);
             while (player.TryDestroyComponent<InventoryComponent>()) { }
-            player.TryDestroyComponent<DiscordIntegrationComponent>();
             while (player.TryDestroyComponent<GroupMemberComponent>()) { }
             while (player.TryDestroyComponent<FractionMemberComponent>()) { }
             if(player.User.IsSignedIn)
@@ -180,7 +176,6 @@ internal sealed class UsersService : IUsersService
         await _saveService.Save(player);
         _activeUsers.TrySetInactive(player.UserId);
         while (player.TryDestroyComponent<InventoryComponent>()) { }
-        player.TryDestroyComponent<DiscordIntegrationComponent>();
         while (player.TryDestroyComponent<GroupMemberComponent>()) { }
         while (player.TryDestroyComponent<FractionMemberComponent>()) { }
         player.RemoveFromVehicle();

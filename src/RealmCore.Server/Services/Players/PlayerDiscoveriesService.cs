@@ -1,5 +1,4 @@
 ﻿using System.Collections;
-using System.Linq;
 
 namespace RealmCore.Server.Services.Players;
 
@@ -11,7 +10,7 @@ internal class PlayerDiscoveriesService : IPlayerDiscoveriesService
     public event Action<IPlayerDiscoveriesService, int>? Discovered;
 
     public RealmPlayer Player { get; private set; }
-    internal PlayerDiscoveriesService(PlayerContext playerContext, IPlayerUserService playerUserService)
+    public PlayerDiscoveriesService(PlayerContext playerContext, IPlayerUserService playerUserService)
     {
         Player = playerContext.Player;
         playerUserService.SignedIn += HandleSignedIn;

@@ -11,24 +11,25 @@ public class DiscordConnectUserHandler : IDiscordConnectUserHandler
         _logger = logger;
     }
 
-    public Task<TryConnectResponse> HandleConnectUser(string code, ulong userId, CancellationToken cancellationToken)
+    public Task<TryConnectResponse> HandleConnectUser(string code, ulong discordUserId, CancellationToken cancellationToken)
     {
         try
         {
             foreach (var player in _elementCollection.GetByType<RealmPlayer>())
             {
-                if (player.TryGetComponent<PendingDiscordIntegrationComponent>(out var component))
-                {
-                    if (component.Verify(code))
-                    {
-                        player.AddComponent(new DiscordIntegrationComponent(userId));
-                        return Task.FromResult(new TryConnectResponse
-                        {
-                            message = "User connected successfully!",
-                            success = true,
-                        });
-                    }
-                }
+                // TODO:
+                //if (player.TryGetComponent<PendingDiscordIntegrationComponent>(out var component))
+                //{
+                //    if (component.Verify(code))
+                //    {
+                //        player.AddComponent(new DiscordIntegrationComponent(discordUserId));
+                //        return Task.FromResult(new TryConnectResponse
+                //        {
+                //            message = "User connected successfully!",
+                //            success = true,
+                //        });
+                //    }
+                //}
             }
 
             return Task.FromResult(new TryConnectResponse

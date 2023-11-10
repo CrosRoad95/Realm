@@ -120,6 +120,7 @@ global using RealmCore.Server.Components;
 global using RealmCore.Server.Scopes;
 global using RealmCore.Server.Interfaces.Players;
 global using System.Diagnostics.CodeAnalysis;
+global using RealmCore.Server.Interfaces.Integrations;
 
 global using ILogger = Microsoft.Extensions.Logging.ILogger;
 

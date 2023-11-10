@@ -1,4 +1,7 @@
-﻿namespace RealmCore.Server.Services.Players;
+﻿using RealmCore.Persistence.Data;
+using System.Collections;
+
+namespace RealmCore.Server.Services.Players;
 
 internal class PlayerJobStatisticsService : IPlayerJobStatisticsService
 {
@@ -102,4 +105,27 @@ internal class PlayerJobStatisticsService : IPlayerJobStatisticsService
             return (totalPoints, totalTimePlayed);
         }
     }
+
+    [return: NotNullIfNotNull(nameof(userJobStatisticsData))]
+    private static UserJobStatisticsDTO? Map(JobStatisticsData? userJobStatisticsData)
+    {
+        if (userJobStatisticsData == null)
+            return null;
+
+        return new UserJobStatisticsDTO
+        {
+            JobId = userJobStatisticsData.JobId,
+            Points = userJobStatisticsData.Points,
+            TimePlayed = userJobStatisticsData.TimePlayed,
+            UserId = userJobStatisticsData.UserId
+        };
+    }
+
+    public IEnumerator<UserJobStatisticsDTO> GetEnumerator()
+    {
+        lock (_lock)
+            return _jobStatistics.Select(Map).ToList().GetEnumerator();
+    }
+
+    IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 }
