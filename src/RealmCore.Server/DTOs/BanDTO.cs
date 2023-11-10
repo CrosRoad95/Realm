@@ -13,4 +13,23 @@ public class BanDTO : IEqualityComparer<BanDTO>
     public bool Equals(BanDTO? x, BanDTO? y) => x?.Id == y?.Id;
 
     public int GetHashCode([DisallowNull] BanDTO obj) => obj.Id;
+
+    [return: NotNullIfNotNull(nameof(banData))]
+    public static BanDTO? Map(BanData? banData)
+    {
+        if (banData == null)
+            return null;
+
+        return new()
+        {
+            Id = banData.Id,
+            End = banData.End,
+            UserId = banData.UserId,
+            Reason = banData.Reason,
+            Responsible = banData.Responsible,
+            Serial = banData.Serial,
+            Type = banData.Type
+        };
+    }
+
 }

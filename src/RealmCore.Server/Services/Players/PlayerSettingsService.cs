@@ -81,19 +81,6 @@ internal class PlayerSettingsService : IPlayerSettingsService, IDisposable
         return false;
     }
 
-    [return: NotNullIfNotNull(nameof(userSettingData))]
-    private static UserSettingDTO? Map(UserSettingData? userSettingData)
-    {
-        if (userSettingData == null)
-            return null;
-
-        return new UserSettingDTO
-        {
-            SettingId = userSettingData.SettingId,
-            Value = userSettingData.Value
-        };
-    }
-
     public void Dispose()
     {
 
@@ -102,7 +89,7 @@ internal class PlayerSettingsService : IPlayerSettingsService, IDisposable
     public IEnumerator<UserSettingDTO> GetEnumerator()
     {
         lock (_lock)
-            return new List<UserSettingDTO>(_settings.Select(Map)).GetEnumerator();
+            return new List<UserSettingDTO>(_settings.Select(UserSettingDTO.Map)).GetEnumerator();
     }
 
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();

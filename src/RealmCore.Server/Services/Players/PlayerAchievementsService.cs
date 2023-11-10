@@ -128,25 +128,10 @@ internal class PlayerAchievementsService : IPlayerAchievementsService
         }
     }
 
-    [return: NotNullIfNotNull(nameof(achievementData))]
-    private static AchievementDTO? Map(AchievementData? achievementData)
-    {
-        if (achievementData == null)
-            return null;
-
-        return new AchievementDTO
-        {
-            AchievementId = achievementData.AchievementId,
-            PrizeReceived = achievementData.PrizeReceived,
-            Progress = achievementData.Progress,
-            Value = achievementData.Value
-        };
-    }
-
     public IEnumerator<AchievementDTO> GetEnumerator()
     {
         lock (_lock)
-            return new List<AchievementDTO>(_achievements.Select(Map)).GetEnumerator();
+            return new List<AchievementDTO>(_achievements.Select(AchievementDTO.Map)).GetEnumerator();
     }
 
     System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator() => GetEnumerator();

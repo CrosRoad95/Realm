@@ -101,22 +101,10 @@ internal class PlayerStatisticsService : IPlayerStatisticsService
         }
     }
 
-    private static UserStatDTO? Map(UserStatData? userStatData)
-    {
-        if (userStatData == null)
-            return null;
-
-        return new UserStatDTO
-        {
-            StatId = userStatData.StatId,
-            Value = userStatData.Value,
-        };
-    }
-
     public IEnumerator<UserStatDTO> GetEnumerator()
     {
         lock (_lock)
-            return new List<UserStatDTO>(_stats.Select(Map)).GetEnumerator();
+            return new List<UserStatDTO>(_stats.Select(UserStatDTO.Map)).GetEnumerator();
     }
 
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();

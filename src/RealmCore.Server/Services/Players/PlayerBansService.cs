@@ -8,8 +8,8 @@ internal class PlayerBansService : IPlayerBansService, IDisposable
     private readonly object _lock = new();
     private readonly IDateTimeProvider _dateTimeProvider;
 
-    public event Action<BanDTO>? Added;
-    public event Action<BanDTO>? Removed;
+    public event Action<IPlayerBansService, BanDTO>? Added;
+    public event Action<IPlayerBansService, BanDTO>? Removed;
 
     public RealmPlayer Player { get; }
     public PlayerBansService(PlayerContext playerContext, IPlayerUserService playerUserService, IDateTimeProvider dateTimeProvider)
@@ -53,7 +53,7 @@ internal class PlayerBansService : IPlayerBansService, IDisposable
             _bans.Add(banData);
         }
 
-        Added?.Invoke(Map(banData));
+        Added?.Invoke(this, BanDTO.Map(banData));
     }
 
     public bool RemoveByType(int type)
@@ -69,7 +69,7 @@ internal class PlayerBansService : IPlayerBansService, IDisposable
 
         if (removed && ban != null)
         {
-            Removed?.Invoke(Map(ban));
+            Removed?.Invoke(this, BanDTO.Map(ban));
             return true;
         }
         return false;
@@ -88,7 +88,7 @@ internal class PlayerBansService : IPlayerBansService, IDisposable
 
         if (removed && ban != null)
         {
-            Removed?.Invoke(Map(ban));
+            Removed?.Invoke(this, BanDTO.Map(ban));
             return true;
         }
         return false;
@@ -119,7 +119,7 @@ internal class PlayerBansService : IPlayerBansService, IDisposable
             {
                 if (banDTO.Type == type && now > banDTO.End)
                 {
-                    return Map(banDTO);
+                    return BanDTO.Map(banDTO);
                 }
             }
         }
@@ -132,24 +132,6 @@ internal class PlayerBansService : IPlayerBansService, IDisposable
         return _bans.FirstOrDefault(x => x.Type == type && x.End < now && x.Active);
     }
 
-    [return: NotNullIfNotNull(nameof(banData))]
-    private static BanDTO? Map(BanData? banData)
-    {
-        if (banData == null)
-            return null;
-
-        return new()
-        {
-            Id = banData.Id,
-            End = banData.End,
-            UserId = banData.UserId,
-            Reason = banData.Reason,
-            Responsible = banData.Responsible,
-            Serial = banData.Serial,
-            Type = banData.Type
-        };
-    }
-
     public void Dispose()
     {
     }
@@ -158,7 +140,7 @@ internal class PlayerBansService : IPlayerBansService, IDisposable
     {
         var now = _dateTimeProvider.Now;
         lock (_lock)
-            return new List<BanDTO>(_bans.Where(x => x.End > now && x.Active).Select(Map)).GetEnumerator();
+            return new List<BanDTO>(_bans.Where(x => x.End > now && x.Active).Select(BanDTO.Map)).GetEnumerator();
     }
 
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();

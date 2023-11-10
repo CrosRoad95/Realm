@@ -106,6 +106,7 @@ public static class ServiceCollectionExtensions
         services.AddPlayerScopedService<IPlayerDiscoveriesService, PlayerDiscoveriesService>();
         services.AddPlayerScopedService<IPlayerJobUpgradesService, PlayerJobUpgradesService>();
         services.AddPlayerScopedService<IPlayerJobStatisticsService, PlayerJobStatisticsService>();
+        services.AddPlayerScopedService<IPlayerEventsService, PlayerEventsService>();
         #endregion
 
         #region Policies

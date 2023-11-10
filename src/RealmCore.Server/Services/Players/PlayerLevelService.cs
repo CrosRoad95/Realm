@@ -7,6 +7,9 @@ internal class PlayerLevelService : IPlayerLevelService
     private uint _level;
     private uint _experience;
 
+    public event Action<IPlayerLevelService, uint, bool>? LevelChanged;
+    public event Action<IPlayerLevelService, uint>? ExperienceChanged;
+
     public RealmPlayer Player { get; private set; }
     public PlayerLevelService(PlayerContext playerContext, LevelsRegistry levelsRegistry, IPlayerUserService playerUserService)
     {
@@ -79,9 +82,6 @@ internal class PlayerLevelService : IPlayerLevelService
             }
         }
     }
-
-    public event Action<IPlayerLevelService, uint, bool>? LevelChanged;
-    public event Action<IPlayerLevelService, uint>? ExperienceChanged;
 
     public void GiveExperience(uint amount)
     {

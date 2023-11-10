@@ -1,4 +1,5 @@
-﻿namespace RealmCore.Server.Interfaces.Players;
+﻿
+namespace RealmCore.Server.Interfaces.Players;
 
 public interface IPlayerService
 {

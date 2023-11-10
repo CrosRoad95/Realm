@@ -35,7 +35,7 @@ internal class PlayerJobUpgradesService : IPlayerJobUpgradesService
     public IEnumerable<JobUpgradeDTO> GetAllByJobId(short jobId)
     {
         lock (_lock)
-            return new List<JobUpgradeDTO>(_jobUpgrades.Where(x => x.JobId == jobId).Select(Map));
+            return new List<JobUpgradeDTO>(_jobUpgrades.Where(x => x.JobId == jobId).Select(JobUpgradeDTO.Map));
     }
     
     public bool Has(short jobId, int upgradeId)
@@ -57,7 +57,7 @@ internal class PlayerJobUpgradesService : IPlayerJobUpgradesService
             };
 
             _jobUpgrades.Add(jobUpgradeData);
-            Added?.Invoke(this, Map(jobUpgradeData));
+            Added?.Invoke(this, JobUpgradeDTO.Map(jobUpgradeData));
             return true;
         }
     }
@@ -70,28 +70,15 @@ internal class PlayerJobUpgradesService : IPlayerJobUpgradesService
             if (upgrade == null)
                 return false;
             _jobUpgrades.Remove(upgrade);
-            Removed?.Invoke(this, Map(upgrade));
+            Removed?.Invoke(this, JobUpgradeDTO.Map(upgrade));
             return true;
         }
-    }
-
-    [return: NotNullIfNotNull(nameof(jobUpgradeData))]
-    private static JobUpgradeDTO? Map(JobUpgradeData? jobUpgradeData)
-    {
-        if (jobUpgradeData == null)
-            return null;
-
-        return new JobUpgradeDTO
-        {
-            JobId = jobUpgradeData.JobId,
-            UpgradeId = jobUpgradeData.UpgradeId
-        };
     }
 
     public IEnumerator<JobUpgradeDTO> GetEnumerator()
     {
         lock (_lock)
-            return new List<JobUpgradeDTO>(_jobUpgrades.Select(Map)).GetEnumerator();
+            return new List<JobUpgradeDTO>(_jobUpgrades.Select(JobUpgradeDTO.Map)).GetEnumerator();
     }
 
     System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator() => GetEnumerator();

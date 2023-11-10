@@ -12,8 +12,6 @@ internal sealed class UsersService : IUsersService
     private readonly IAuthorizationService _authorizationService;
     private readonly IActiveUsers _activeUsers;
     private readonly IElementCollection _elementCollection;
-    private readonly LevelsRegistry _levelsRegistry;
-    private readonly IUserEventRepository _userEventRepository;
     private readonly ISaveService _saveService;
     private readonly IServiceProvider _serviceProvider;
     private static readonly JsonSerializerSettings _jsonSerializerSettings = new()
@@ -25,7 +23,7 @@ internal sealed class UsersService : IUsersService
     public event Action<RealmPlayer>? SignedOut;
 
     public UsersService(ItemsRegistry itemsRegistry, ILogger<UsersService> logger, IOptionsMonitor<GameplayOptions> gameplayOptions,
-        IDateTimeProvider dateTimeProvider, IAuthorizationService authorizationService, IActiveUsers activeUsers, IElementCollection elementCollection, LevelsRegistry levelsRegistry, IUserEventRepository userEventRepository, ISaveService saveService, IServiceProvider serviceProvider)
+        IDateTimeProvider dateTimeProvider, IAuthorizationService authorizationService, IActiveUsers activeUsers, IElementCollection elementCollection, ISaveService saveService, IServiceProvider serviceProvider)
     {
         _itemsRegistry = itemsRegistry;
         _logger = logger;
@@ -34,8 +32,6 @@ internal sealed class UsersService : IUsersService
         _authorizationService = authorizationService;
         _activeUsers = activeUsers;
         _elementCollection = elementCollection;
-        _levelsRegistry = levelsRegistry;
-        _userEventRepository = userEventRepository;
         _saveService = saveService;
         _serviceProvider = serviceProvider;
     }
@@ -140,12 +136,6 @@ internal sealed class UsersService : IUsersService
             else
                 player.AddComponent(new InventoryComponent(_gameplayOptions.CurrentValue.DefaultInventorySize));
 
-            foreach (var groupMemberData in user.GroupMembers)
-                player.AddComponent(new GroupMemberComponent(groupMemberData));
-
-            foreach (var fractionMemberData in user.FractionMembers)
-                player.AddComponent(new FractionMemberComponent(fractionMemberData));
-
             player.Money.SetMoneyInternal(user.Money);
             await ValidatePolicies(player);
             userLoginHistoryRepository.Add(user.Id, _dateTimeProvider.Now, player.Client.IPAddress?.ToString() ?? "", serial);
@@ -161,8 +151,6 @@ internal sealed class UsersService : IUsersService
         {
             _activeUsers.TrySetInactive(user.Id);
             while (player.TryDestroyComponent<InventoryComponent>()) { }
-            while (player.TryDestroyComponent<GroupMemberComponent>()) { }
-            while (player.TryDestroyComponent<FractionMemberComponent>()) { }
             if(player.User.IsSignedIn)
                 player.User.SignOut();
             player.Money.SetMoneyInternal(0);
@@ -176,8 +164,6 @@ internal sealed class UsersService : IUsersService
         await _saveService.Save(player);
         _activeUsers.TrySetInactive(player.UserId);
         while (player.TryDestroyComponent<InventoryComponent>()) { }
-        while (player.TryDestroyComponent<GroupMemberComponent>()) { }
-        while (player.TryDestroyComponent<FractionMemberComponent>()) { }
         player.RemoveFromVehicle();
         player.Position = new Vector3(6000, 6000, 99999);
         player.Interior = 0;
@@ -224,6 +210,9 @@ internal sealed class UsersService : IUsersService
 
     public bool TryFindPlayerBySerial(string serial, out RealmPlayer? foundPlayer)
     {
+        if (serial.Length != 32)
+            throw new ArgumentException(nameof(serial));
+
         foreach (var player in _elementCollection.GetByType<RealmPlayer>())
         {
             if(player.Client.Serial == serial)
@@ -234,20 +223,5 @@ internal sealed class UsersService : IUsersService
         }
         foundPlayer = null;
         return false;
-    }
-
-    public async Task AddUserEvent(RealmPlayer player, int eventId, string? metadata = null)
-    {
-        await _userEventRepository.AddEvent(player.UserId, eventId, _dateTimeProvider.Now);
-    }
-
-    public async Task<List<UserEventData>> GetAllUserEvents(RealmPlayer player, IEnumerable<int>? events = null)
-    {
-        return await _userEventRepository.GetAllEventsByUserId(player.UserId, events);
-    }
-
-    public async Task<List<UserEventData>> GetLastUserEvents(RealmPlayer player, int limit = 10, IEnumerable<int>? events = null)
-    {
-        return await _userEventRepository.GetLastEventsByUserId(player.UserId, limit, events);
     }
 }

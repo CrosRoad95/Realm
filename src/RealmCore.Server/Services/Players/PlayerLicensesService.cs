@@ -35,7 +35,7 @@ internal class PlayerLicensesService : IPlayerLicensesService
     public LicenseDTO? Get(int licenseId)
     {
         lock (_lock)
-            return Map(_licenses.Where(x => x.LicenseId == licenseId).FirstOrDefault());
+            return LicenseDTO.Map(_licenses.Where(x => x.LicenseId == licenseId).FirstOrDefault());
     }
 
     public bool IsSuspended(int licenseId)
@@ -111,24 +111,10 @@ internal class PlayerLicensesService : IPlayerLicensesService
         }
     }
 
-    [return: NotNullIfNotNull(nameof(userLicenseData))]
-    private static LicenseDTO? Map(UserLicenseData? userLicenseData)
-    {
-        if (userLicenseData == null)
-            return null;
-
-        return new LicenseDTO
-        {
-            LicenseId = userLicenseData.LicenseId,
-            SuspendedReason = userLicenseData.SuspendedReason,
-            SuspendedUntil = userLicenseData.SuspendedUntil
-        };
-    }
-
     public IEnumerator<LicenseDTO> GetEnumerator()
     {
         lock (_lock)
-            return new List<LicenseDTO>(_licenses.Select(Map)).AsReadOnly().GetEnumerator();
+            return new List<LicenseDTO>(_licenses.Select(LicenseDTO.Map)).AsReadOnly().GetEnumerator();
     }
 
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
