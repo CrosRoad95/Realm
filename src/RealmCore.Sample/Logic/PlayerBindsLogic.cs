@@ -64,12 +64,22 @@ internal sealed class PlayerBindsLogic
         player.SetBind("F3", player =>
         {
             var browserService = player.GetRequiredService<IPlayerBrowserService>();
+            if(browserService.Visible)
+            {
+                browserService.Close();
+                return;
+            }
             browserService.Open("/realmUi/counter2");
         });
 
         player.SetBind("F4", player =>
         {
             var browserService = player.GetRequiredService<IPlayerBrowserService>();
+            if (browserService.Visible)
+            {
+                browserService.Close();
+                return;
+            }
             browserService.Open("/realmUi/index");
         });
 

@@ -61,6 +61,7 @@ public class RealmPlayer : Player, IComponents, IDisposable
     public int UserId => User.Id;
 
     public new IPlayerMoneyService Money { get; private set; }
+    public IPlayerBrowserService Browser { get; private set; }
     public IPlayerAFKService AFK { get; private set; }
     public IPlayerUserService User { get; private set; }
     public IPlayerDailyVisitsService DailyVisits { get; private set; }
@@ -85,6 +86,7 @@ public class RealmPlayer : Player, IComponents, IDisposable
         _serviceProvider.GetRequiredService<PlayerContext>().Player = this;
         Money = _serviceProvider.GetRequiredService<IPlayerMoneyService>();
         AFK = _serviceProvider.GetRequiredService<IPlayerAFKService>();
+        Browser = _serviceProvider.GetRequiredService<IPlayerBrowserService>();
         User = _serviceProvider.GetRequiredService<IPlayerUserService>();
         DailyVisits = _serviceProvider.GetRequiredService<IPlayerDailyVisitsService>();
         Settings = _serviceProvider.GetRequiredService<IPlayerSettingsService>();
