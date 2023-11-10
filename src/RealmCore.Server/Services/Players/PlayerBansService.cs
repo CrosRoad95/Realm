@@ -132,16 +132,23 @@ internal class PlayerBansService : IPlayerBansService, IDisposable
         return _bans.FirstOrDefault(x => x.Type == type && x.End < now && x.Active);
     }
 
-    private static BanDTO Map(BanData banData) => new()
+    [return: NotNullIfNotNull(nameof(banData))]
+    private static BanDTO? Map(BanData? banData)
     {
-        Id = banData.Id,
-        End = banData.End,
-        UserId = banData.UserId,
-        Reason = banData.Reason,
-        Responsible = banData.Responsible,
-        Serial = banData.Serial,
-        Type = banData.Type
-    };
+        if (banData == null)
+            return null;
+
+        return new()
+        {
+            Id = banData.Id,
+            End = banData.End,
+            UserId = banData.UserId,
+            Reason = banData.Reason,
+            Responsible = banData.Responsible,
+            Serial = banData.Serial,
+            Type = banData.Type
+        };
+    }
 
     public void Dispose()
     {

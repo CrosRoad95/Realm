@@ -119,6 +119,7 @@ global using SlipeServer.Server.Resources.Providers;
 global using RealmCore.Server.Components;
 global using RealmCore.Server.Scopes;
 global using RealmCore.Server.Interfaces.Players;
+global using System.Diagnostics.CodeAnalysis;
 
 global using ILogger = Microsoft.Extensions.Logging.ILogger;
 

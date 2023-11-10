@@ -81,6 +81,7 @@ internal class PlayerSettingsService : IPlayerSettingsService, IDisposable
         return false;
     }
 
+    [return: NotNullIfNotNull(nameof(userSettingData))]
     private static UserSettingDTO? Map(UserSettingData? userSettingData)
     {
         if (userSettingData == null)

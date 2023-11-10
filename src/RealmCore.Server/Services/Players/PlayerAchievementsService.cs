@@ -128,7 +128,8 @@ internal class PlayerAchievementsService : IPlayerAchievementsService
         }
     }
 
-    private static AchievementDTO Map(AchievementData? achievementData)
+    [return: NotNullIfNotNull(nameof(achievementData))]
+    private static AchievementDTO? Map(AchievementData? achievementData)
     {
         if (achievementData == null)
             return null;

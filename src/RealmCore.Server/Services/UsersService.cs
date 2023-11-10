@@ -140,13 +140,6 @@ internal sealed class UsersService : IUsersService
             else
                 player.AddComponent(new InventoryComponent(_gameplayOptions.CurrentValue.DefaultInventorySize));
 
-            player.GetRequiredService<IPlayerDailyVisitsService>();
-
-            if (user.JobUpgrades != null)
-                player.AddComponent(new JobUpgradesComponent(user.JobUpgrades));
-            else
-                player.AddComponent<JobUpgradesComponent>();
-
             if (user.JobStatistics != null)
                 player.AddComponent(new JobStatisticsComponent(_dateTimeProvider.Now, user.JobStatistics));
             else
@@ -181,7 +174,6 @@ internal sealed class UsersService : IUsersService
         {
             _activeUsers.TrySetInactive(user.Id);
             while (player.TryDestroyComponent<InventoryComponent>()) { }
-            player.TryDestroyComponent<JobUpgradesComponent>();
             player.TryDestroyComponent<JobStatisticsComponent>();
             player.TryDestroyComponent<DiscoveriesComponent>();
             player.TryDestroyComponent<DiscordIntegrationComponent>();
@@ -200,7 +192,6 @@ internal sealed class UsersService : IUsersService
         await _saveService.Save(player);
         _activeUsers.TrySetInactive(player.UserId);
         while (player.TryDestroyComponent<InventoryComponent>()) { }
-        player.TryDestroyComponent<JobUpgradesComponent>();
         player.TryDestroyComponent<JobStatisticsComponent>();
         player.TryDestroyComponent<DiscoveriesComponent>();
         player.TryDestroyComponent<DiscordIntegrationComponent>();

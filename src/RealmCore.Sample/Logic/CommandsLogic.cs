@@ -7,7 +7,6 @@ using RealmCore.Resources.Overlay;
 using RealmCore.Resources.Assets;
 using RealmCore.Sample.Components.Vehicles;
 using RealmCore.Server.Interfaces.Players;
-using System.Reflection.Emit;
 
 namespace RealmCore.Sample.Logic;
 
@@ -270,18 +269,10 @@ internal sealed class CommandsLogic
 
         _commandService.AddCommandHandler("addupgrade", (player, args) =>
         {
-            var jobUpgradesComponent = player.GetRequiredComponent<JobUpgradesComponent>();
-            try
-            {
-                if (jobUpgradesComponent.TryAddJobUpgrade(1, 1))
-                    _chatBox.OutputTo(player, "Upgrade added");
-                else
-                    _chatBox.OutputTo(player, "Failed to add upgrade");
-            }
-            catch (Exception ex)
-            {
-                _chatBox.OutputTo(player, $"Failed to add upgrade: {ex.Message}");
-            }
+            if (player.JobUpgrades.TryAdd(1, 1))
+                _chatBox.OutputTo(player, "Upgrade added");
+            else
+                _chatBox.OutputTo(player, "Failed to add upgrade");
         });
 
         _commandService.AddCommandHandler("addvehicleupgrade", (player, args) =>
@@ -330,13 +321,10 @@ internal sealed class CommandsLogic
         });
         _commandService.AddAsyncCommandHandler("addtestdata", async (player, args, token) =>
         {
-            if (player.TryGetComponent(out JobUpgradesComponent jobUpgradesComponent))
-            {
-                if (jobUpgradesComponent.TryAddJobUpgrade(1, 1))
-                    _chatBox.OutputTo(player, "Upgrade added");
-                else
-                    _chatBox.OutputTo(player, "Failed to add upgrade");
-            }
+            if (player.JobUpgrades.TryAdd(1, 1))
+                _chatBox.OutputTo(player, "Upgrade added");
+            else
+                _chatBox.OutputTo(player, "Failed to add upgrade");
 
             if (player.TryGetComponent(out InventoryComponent inventoryComponent))
             {

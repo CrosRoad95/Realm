@@ -111,6 +111,7 @@ internal class PlayerLicensesService : IPlayerLicensesService
         }
     }
 
+    [return: NotNullIfNotNull(nameof(userLicenseData))]
     private static LicenseDTO? Map(UserLicenseData? userLicenseData)
     {
         if (userLicenseData == null)

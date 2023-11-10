@@ -1,5 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using RealmCore.Server.Services.Players;
+﻿using RealmCore.Server.Services.Players;
 
 namespace RealmCore.Server.Extensions;
 
@@ -96,6 +95,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IPlayerLicensesService, PlayerLicensesService>();
         services.AddScoped<IPlayerStatisticsService, PlayerStatisticsService>();
         services.AddScoped<IPlayerAchievementsService, PlayerAchievementsService>();
+        services.AddScoped<IPlayerJobUpgradesService, PlayerJobUpgradesService>();
         services.AddScoped<IPlayerService>(x => x.GetRequiredService<IPlayerBrowserService>());
         services.AddScoped<IPlayerService>(x => x.GetRequiredService<IPlayerAFKService>());
         services.AddScoped<IPlayerService>(x => x.GetRequiredService<IPlayerMoneyService>());
@@ -109,6 +109,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IPlayerService>(x => x.GetRequiredService<IPlayerLicensesService>());
         services.AddScoped<IPlayerService>(x => x.GetRequiredService<IPlayerStatisticsService>());
         services.AddScoped<IPlayerService>(x => x.GetRequiredService<IPlayerAchievementsService>());
+        services.AddScoped<IPlayerService>(x => x.GetRequiredService<IPlayerJobUpgradesService>());
         #endregion
 
         #region Policies

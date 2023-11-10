@@ -1,6 +1,4 @@
-﻿using System.Diagnostics.CodeAnalysis;
-
-namespace RealmCore.Server.Concepts;
+﻿namespace RealmCore.Server.Concepts;
 
 
 public sealed class Components : IDisposable

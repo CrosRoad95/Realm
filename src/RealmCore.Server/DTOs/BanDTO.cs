@@ -1,6 +1,4 @@
-﻿using System.Diagnostics.CodeAnalysis;
-
-namespace RealmCore.Server.DTOs;
+﻿namespace RealmCore.Server.DTOs;
 
 public class BanDTO : IEqualityComparer<BanDTO>
 {
