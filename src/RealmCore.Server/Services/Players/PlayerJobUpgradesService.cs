@@ -4,6 +4,7 @@ internal class PlayerJobUpgradesService : IPlayerJobUpgradesService
 {
     private ICollection<JobUpgradeData> _jobUpgrades = [];
     private readonly object _lock = new();
+    private readonly IPlayerUserService _playerUserService;
 
     public event Action<IPlayerJobUpgradesService, JobUpgradeDTO>? Added;
     public event Action<IPlayerJobUpgradesService, JobUpgradeDTO>? Removed;
@@ -14,15 +15,16 @@ internal class PlayerJobUpgradesService : IPlayerJobUpgradesService
         Player = playerContext.Player;
         playerUserService.SignedIn += HandleSignedIn;
         playerUserService.SignedOut += HandleSignedOut;
+        _playerUserService = playerUserService;
     }
 
-    private void HandleSignedIn(IPlayerUserService playerUserService)
+    private void HandleSignedIn(IPlayerUserService playerUserService, RealmPlayer _)
     {
         lock (_lock)
             _jobUpgrades = playerUserService.User.JobUpgrades;
     }
 
-    private void HandleSignedOut(IPlayerUserService playerUserService)
+    private void HandleSignedOut(IPlayerUserService playerUserService, RealmPlayer _)
     {
         lock (_lock)
             _jobUpgrades = [];
@@ -56,6 +58,7 @@ internal class PlayerJobUpgradesService : IPlayerJobUpgradesService
             };
 
             _jobUpgrades.Add(jobUpgradeData);
+            _playerUserService.IncreaseVersion();
             Added?.Invoke(this, JobUpgradeDTO.Map(jobUpgradeData));
             return true;
         }
@@ -69,6 +72,7 @@ internal class PlayerJobUpgradesService : IPlayerJobUpgradesService
             if (upgrade == null)
                 return false;
             _jobUpgrades.Remove(upgrade);
+            _playerUserService.IncreaseVersion();
             Removed?.Invoke(this, JobUpgradeDTO.Map(upgrade));
             return true;
         }

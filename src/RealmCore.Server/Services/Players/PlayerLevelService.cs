@@ -4,6 +4,7 @@ internal class PlayerLevelService : IPlayerLevelService
 {
     private readonly object _lock = new();
     private readonly LevelsRegistry _levelsRegistry;
+    private readonly IPlayerUserService _playerUserService;
     private uint _level;
     private uint _experience;
 
@@ -17,9 +18,10 @@ internal class PlayerLevelService : IPlayerLevelService
         playerUserService.SignedIn += HandleSignedIn;
         playerUserService.SignedOut += HandleSignedOut;
         _levelsRegistry = levelsRegistry;
+        _playerUserService = playerUserService;
     }
 
-    private void HandleSignedIn(IPlayerUserService playerUserService)
+    private void HandleSignedIn(IPlayerUserService playerUserService, RealmPlayer _)
     {
         lock (_lock)
         {
@@ -28,7 +30,7 @@ internal class PlayerLevelService : IPlayerLevelService
         }
     }
 
-    private void HandleSignedOut(IPlayerUserService playerUserService)
+    private void HandleSignedOut(IPlayerUserService playerUserService, RealmPlayer _)
     {
         lock (_lock)
         {
@@ -98,6 +100,7 @@ internal class PlayerLevelService : IPlayerLevelService
         {
             _experience -= NextLevelRequiredExperience;
             _level++;
+            _playerUserService.IncreaseVersion();
             LevelChanged?.Invoke(this, _level, true);
             CheckForNextLevel();
         }

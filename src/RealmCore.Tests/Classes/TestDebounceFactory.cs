@@ -1,10 +1,20 @@
-﻿namespace RealmCore.Server.Utilities;
+﻿using RealmCore.Server.Factories.Interfaces;
+using RealmCore.Server.Utilities.Interfaces;
+using System.Threading.Tasks;
 
-public class Debounce : IDebounce
+namespace RealmCore.Tests.Classes;
+
+internal class TestDebounce : IDebounce
 {
     private int _milliseconds;
-    private CancellationTokenSource? _cancelationTokenSource;
-    private CancellationToken? _changedTask;
+    private SemaphoreSlim _semaphore = new(0);
+    private TaskCompletionSource? _taskCompletionSource;
+    public async Task Release()
+    {
+        _taskCompletionSource = new();
+        _semaphore.Release();
+        await _taskCompletionSource.Task;
+    }
 
     public int Milliseconds
     {
@@ -17,7 +27,7 @@ public class Debounce : IDebounce
         }
     }
 
-    public Debounce(int milliseconds)
+    public TestDebounce(int milliseconds)
     {
         _milliseconds = milliseconds;
     }
@@ -39,15 +49,11 @@ public class Debounce : IDebounce
 
     public async Task InvokeAsync(Action action, CancellationToken cancellationToken = default)
     {
-        if (_cancelationTokenSource != null)
-            _cancelationTokenSource.Cancel();
-
         try
         {
-            _cancelationTokenSource = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
-            _changedTask = _cancelationTokenSource.Token;
-            await Task.Delay(_milliseconds, _changedTask.Value);
+            await _semaphore.WaitAsync(cancellationToken);
             action();
+            _taskCompletionSource?.SetResult();
         }
         catch (TaskCanceledException)
         {
@@ -61,14 +67,11 @@ public class Debounce : IDebounce
 
     public async Task InvokeAsync(Func<Task> task, CancellationToken cancellationToken = default)
     {
-        _cancelationTokenSource?.Cancel();
-
         try
         {
-            _cancelationTokenSource = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
-            _changedTask = _cancelationTokenSource.Token;
-            await Task.Delay(_milliseconds, _changedTask.Value);
+            await _semaphore.WaitAsync(cancellationToken);
             await task();
+            _taskCompletionSource?.SetResult();
         }
         catch (TaskCanceledException)
         {
@@ -78,5 +81,15 @@ public class Debounce : IDebounce
         {
             throw;
         }
+    }
+}
+
+internal class TestDebounceFactory : IDebounceFactory
+{
+    public TestDebounce LastDebounce { get; private set; }
+    public IDebounce Create(int milliseconds)
+    {
+        LastDebounce = new TestDebounce(milliseconds);
+        return LastDebounce;
     }
 }

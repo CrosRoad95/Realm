@@ -4,12 +4,10 @@ namespace RealmCore.Server.Logic.Components;
 
 internal sealed class JobSessionComponentLogic : ComponentLogic<JobSessionComponent>
 {
-    private readonly IServiceProvider _serviceProvider;
     private readonly ILogger _logger;
 
-    public JobSessionComponentLogic(IElementFactory elementFactory, IServiceProvider serviceProvider, ILogger logger) : base(elementFactory)
+    public JobSessionComponentLogic(IElementFactory elementFactory, ILogger logger) : base(elementFactory)
     {
-        _serviceProvider = serviceProvider;
         _logger = logger;
     }
 

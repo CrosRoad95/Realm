@@ -8,24 +8,16 @@ internal sealed class PlayerAFKService : IPlayerAFKService
     private event Action<bool>? InternalStateChanged;
     private readonly IOptionsMonitor<GameplayOptions> _gameplayOptions;
     private readonly IDateTimeProvider _dateTimeProvider;
-    private readonly ILogger<PlayerAFKService> _logger;
-    private readonly Debounce _debounce;
+    private readonly IDebounce _debounce;
     private readonly object _lock = new();
     public RealmPlayer Player { get; private set; }
-    public PlayerAFKService(PlayerContext playerContext, IOptionsMonitor<GameplayOptions> gameplayOptions, IDateTimeProvider dateTimeProvider, ILogger<PlayerAFKService> logger)
+    public PlayerAFKService(PlayerContext playerContext, IOptionsMonitor<GameplayOptions> gameplayOptions, IDateTimeProvider dateTimeProvider, IDebounceFactory debounceFactory)
     {
         Player = playerContext.Player;
         _gameplayOptions = gameplayOptions;
         _dateTimeProvider = dateTimeProvider;
-        _logger = logger;
         _gameplayOptions.OnChange(HandleOptionsChanged);
-        _debounce = new(_gameplayOptions.CurrentValue.AfkCooldown ?? 5000);
-        StateChanged += HandleStateChanged;
-    }
-
-    private void HandleStateChanged(IPlayerAFKService afkService, bool isAfk, TimeSpan elapsed)
-    {
-        _logger.LogInformation("Player {isAfk} afk", isAfk ? "started" : "stopped");
+        _debounce = debounceFactory.Create(_gameplayOptions.CurrentValue.AfkCooldown ?? 5000);
     }
 
     private void HandleOptionsChanged(GameplayOptions gameplayOptions)

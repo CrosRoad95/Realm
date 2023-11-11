@@ -221,13 +221,14 @@ internal sealed class SaveService : ISaveService
         var userData = user.User;
         userData.LastTransformAndMotion = player.GetTransformAndMotion();
         db.Users.Update(userData);
+
+        foreach (var item in _userDataSavers)
+            await item.SaveAsync(player);
+
         await db.SaveChangesAsync();
         //var userData = await _dbContext.Users
         //    .IncludeAll()
         //    .Where(x => x.Id == user.Id).FirstAsync();
-
-        //foreach (var item in _userDataSavers)
-        //    await item.SaveAsync(player);
 
         //userData.Upgrades = user.Upgrades.Select(x => new UserUpgradeData
         //{

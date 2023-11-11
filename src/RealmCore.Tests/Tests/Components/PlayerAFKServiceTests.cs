@@ -21,8 +21,9 @@ public class PlayerAFKServiceTests
 
         afkService.IsAFK.Should().BeFalse();
 
+        var debounce = realmTestingServer.TestDebounceFactory.LastDebounce;
         afkService.HandleAFKStarted();
-        await Task.Delay(200);
+        await debounce.Release();
         _elapsed.Should().Be(TimeSpan.Zero);
         _isAfk.Should().BeTrue();
         afkService.IsAFK.Should().BeTrue();

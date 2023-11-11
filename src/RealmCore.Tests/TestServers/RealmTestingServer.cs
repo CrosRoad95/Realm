@@ -4,6 +4,8 @@ using SlipeServer.Server.Resources;
 using RealmCore.Resources.Browser;
 using RealmCore.Resources.GuiSystem;
 using SlipeServer.Net.Wrappers;
+using RealmCore.Server.Factories.Interfaces;
+using RealmCore.Tests.Classes;
 
 namespace RealmCore.Tests.TestServers;
 
@@ -52,6 +54,7 @@ internal class TestResourceProvider : IResourceProvider
 internal class RealmTestingServer : TestingServer<RealmTestingPlayer>
 {
     public TestDateTimeProvider TestDateTimeProvider => (TestDateTimeProvider)GetRequiredService<IDateTimeProvider>();
+    public TestDebounceFactory TestDebounceFactory => (TestDebounceFactory)GetRequiredService<IDebounceFactory>();
 
     protected override IClient CreateClient(uint binaryAddress, INetWrapper netWrapper)
     {
@@ -91,6 +94,7 @@ internal class RealmTestingServer : TestingServer<RealmTestingPlayer>
             services.AddSingleton<IResourceProvider>(x => x.GetRequiredService<TestResourceProvider>());
             services.AddSingleton<IServerFilesProvider, NullServerFilesProvider>();
             services.AddSingleton<IDateTimeProvider, TestDateTimeProvider>();
+            services.AddSingleton<IDebounceFactory, TestDebounceFactory>();
             services.AddLogging(x => x.AddSerilog(new LoggerConfiguration().CreateLogger(), dispose: true));
 
             configureServices?.Invoke(services);

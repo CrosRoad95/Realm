@@ -101,7 +101,6 @@ internal sealed class PlayersLogic
 
         var stop = Stopwatch.GetTimestamp();
         double milliseconds = ((stop - start) / (float)Stopwatch.Frequency) * 1000;
-        _elementFactory.RelayCreated(player);
         _logger.LogInformation("Player joined in {elapsedMilliseconds}ms", (ulong)milliseconds);
 
         if (player.IsDestroyed)

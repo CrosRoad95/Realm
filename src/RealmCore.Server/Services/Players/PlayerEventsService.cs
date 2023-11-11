@@ -5,6 +5,7 @@ namespace RealmCore.Server.Services.Players;
 internal class PlayerEventsService : IPlayerEventsService
 {
     private readonly object _lock = new();
+    private readonly IPlayerUserService _playerUserService;
     private readonly IDateTimeProvider _dateTimeProvider;
     private ICollection<UserEventData> _userEventData = [];
     public event Action<IPlayerEventsService, UserEventDTO>? Added;
@@ -14,16 +15,17 @@ internal class PlayerEventsService : IPlayerEventsService
         Player = playerContext.Player;
         playerUserService.SignedIn += HandleSignedIn;
         playerUserService.SignedOut += HandleSignedOut;
+        _playerUserService = playerUserService;
         _dateTimeProvider = dateTimeProvider;
     }
 
-    private void HandleSignedIn(IPlayerUserService playerUserService)
+    private void HandleSignedIn(IPlayerUserService playerUserService, RealmPlayer _)
     {
         lock (_lock)
             _userEventData = playerUserService.User.Events;
     }
 
-    private void HandleSignedOut(IPlayerUserService playerUserService)
+    private void HandleSignedOut(IPlayerUserService playerUserService, RealmPlayer _)
     {
         lock (_lock)
             _userEventData = [];
@@ -42,6 +44,7 @@ internal class PlayerEventsService : IPlayerEventsService
         {
             _userEventData.Add(userEvent);
         }
+        _playerUserService.IncreaseVersion();
     }
 
     public IReadOnlyCollection<UserEventData> Get(IEnumerable<int>? events = null, int limit = 10)

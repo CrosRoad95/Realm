@@ -16,6 +16,7 @@ internal sealed class PlayerUserService : IPlayerUserService, IDisposable
     private readonly IDateTimeProvider _dateTimeProvider;
     private readonly IUserEventRepository _userEventRepository;
     private ClaimsPrincipal? _claimsPrincipal;
+    private int _version = 0;
 
     public UserData User => _user ?? throw new UserNotSignedInException();
     public ClaimsPrincipal ClaimsPrincipal => _claimsPrincipal ?? throw new UserNotSignedInException();
@@ -27,8 +28,8 @@ internal sealed class PlayerUserService : IPlayerUserService, IDisposable
     public DateTime? RegisteredDateTime => User.RegisteredDateTime;
     public TransformAndMotion? LastTransformAndMotion => User.LastTransformAndMotion;
 
-    public event Action<IPlayerUserService>? SignedIn;
-    public event Action<IPlayerUserService>? SignedOut;
+    public event Action<IPlayerUserService, RealmPlayer>? SignedIn;
+    public event Action<IPlayerUserService, RealmPlayer>? SignedOut;
 
     public RealmPlayer Player { get; }
     public PlayerUserService(PlayerContext playerContext, IDateTimeProvider dateTimeProvider, IUserEventRepository userEventRepository)
@@ -47,7 +48,7 @@ internal sealed class PlayerUserService : IPlayerUserService, IDisposable
         {
             _user = user;
             _claimsPrincipal = claimsPrincipal;
-            SignedIn?.Invoke(this);
+            SignedIn?.Invoke(this, Player);
         }
     }
 
@@ -59,9 +60,14 @@ internal sealed class PlayerUserService : IPlayerUserService, IDisposable
                 throw new InvalidOperationException();
             _user = null;
             _claimsPrincipal = null;
-            SignedOut?.Invoke(this);
+            SignedOut?.Invoke(this, Player);
         }
         ClearAuthorizedPoliciesCache();
+    }
+
+    public void IncreaseVersion()
+    {
+        Interlocked.Increment(ref _version);
     }
 
     public void AddAuthorizedPolicy(string policy, bool authorized)

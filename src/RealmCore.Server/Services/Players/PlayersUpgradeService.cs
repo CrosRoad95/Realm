@@ -7,21 +7,24 @@ internal class PlayersUpgradeService : IPlayersUpgradeService
 
     private ICollection<UserUpgradeData> _upgrades = [];
     private readonly object _lock = new();
+    private readonly IPlayerUserService _playerUserService;
+
     public RealmPlayer Player { get; }
     public PlayersUpgradeService(PlayerContext playerContext, IPlayerUserService playerUserService, IDateTimeProvider dateTimeProvider)
     {
         Player = playerContext.Player;
         playerUserService.SignedIn += HandleSignedIn;
         playerUserService.SignedOut += HandleSignedOut;
+        _playerUserService = playerUserService;
     }
 
-    private void HandleSignedIn(IPlayerUserService playerUserService)
+    private void HandleSignedIn(IPlayerUserService playerUserService, RealmPlayer _)
     {
         lock (_lock)
             _upgrades = playerUserService.User.Upgrades;
     }
 
-    private void HandleSignedOut(IPlayerUserService playerUserService)
+    private void HandleSignedOut(IPlayerUserService playerUserService, RealmPlayer _)
     {
         lock (_lock)
             _upgrades = [];
@@ -46,6 +49,7 @@ internal class PlayersUpgradeService : IPlayersUpgradeService
             {
                 UpgradeId = upgradeId,
             });
+            _playerUserService.IncreaseVersion();
             Added?.Invoke(this, upgradeId);
             return true;
         }
@@ -59,6 +63,7 @@ internal class PlayersUpgradeService : IPlayersUpgradeService
             if (upgrade == null)
                 return false;
             _upgrades.Remove(upgrade);
+            _playerUserService.IncreaseVersion();
             Removed?.Invoke(this, upgradeId);
             return true;
         }

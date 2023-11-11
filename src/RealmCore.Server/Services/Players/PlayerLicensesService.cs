@@ -6,6 +6,7 @@ internal class PlayerLicensesService : IPlayerLicensesService
 {
     private readonly object _lock = new();
     private readonly IDateTimeProvider _dateTimeProvider;
+    private readonly IPlayerUserService _playerUserService;
     private ICollection<UserLicenseData> _licenses = [];
 
     public event Action<IPlayerLicensesService, int>? Added;
@@ -16,17 +17,18 @@ internal class PlayerLicensesService : IPlayerLicensesService
     {
         Player = playerContext.Player;
         _dateTimeProvider = dateTimeProvider;
+        _playerUserService = playerUserService;
         playerUserService.SignedIn += HandleSignedIn;
         playerUserService.SignedOut += HandleSignedOut;
     }
 
-    private void HandleSignedIn(IPlayerUserService playerUserService)
+    private void HandleSignedIn(IPlayerUserService playerUserService, RealmPlayer _)
     {
         lock(_lock)
             _licenses = playerUserService.User.Licenses;
     }
 
-    private void HandleSignedOut(IPlayerUserService playerUserService)
+    private void HandleSignedOut(IPlayerUserService playerUserService, RealmPlayer _)
     {
         lock (_lock)
             _licenses = [];
@@ -59,6 +61,7 @@ internal class PlayerLicensesService : IPlayerLicensesService
                 return false;
 
             _licenses.Add(userLicense);
+            _playerUserService.IncreaseVersion();
             Added?.Invoke(this, licenseId);
             return true;
         }
@@ -94,6 +97,7 @@ internal class PlayerLicensesService : IPlayerLicensesService
 
             license.SuspendedUntil = _dateTimeProvider.Now + timeSpan;
             license.SuspendedReason = reason;
+            _playerUserService.IncreaseVersion();
             Suspended?.Invoke(this, licenseId, license.SuspendedUntil.Value, license.SuspendedReason);
         }
     }
@@ -107,6 +111,7 @@ internal class PlayerLicensesService : IPlayerLicensesService
                 throw new Exception();
 
             license.SuspendedUntil = null;
+            _playerUserService.IncreaseVersion();
             UnSuspended?.Invoke(this, licenseId);
         }
     }

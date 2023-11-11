@@ -14,13 +14,13 @@ public class PlayerIntegrationsService : IPlayerIntegrationsService
         playerUserService.SignedOut += HandleSignedOut;
     }
 
-    private void HandleSignedIn(IPlayerUserService playerUserService)
+    private void HandleSignedIn(IPlayerUserService playerUserService, RealmPlayer _)
     {
         if (playerUserService.User.DiscordIntegration != null)
             Discord.DiscordUserId = playerUserService.User.DiscordIntegration.DiscordUserId;
     }
 
-    private void HandleSignedOut(IPlayerUserService playerUserService)
+    private void HandleSignedOut(IPlayerUserService playerUserService, RealmPlayer _)
     {
         throw new NotImplementedException();
     }

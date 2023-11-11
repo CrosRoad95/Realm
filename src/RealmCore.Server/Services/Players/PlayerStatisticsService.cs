@@ -5,6 +5,7 @@ namespace RealmCore.Server.Services.Players;
 internal class PlayerStatisticsService : IPlayerStatisticsService
 {
     private readonly object _lock = new();
+    private readonly IPlayerUserService _playerUserService;
     private ICollection<UserStatData> _stats = [];
 
     public event Action<IPlayerStatisticsService, int, float>? Decreased;
@@ -24,15 +25,16 @@ internal class PlayerStatisticsService : IPlayerStatisticsService
         Player = playerContext.Player;
         playerUserService.SignedIn += HandleSignedIn;
         playerUserService.SignedOut += HandleSignedOut;
+        _playerUserService = playerUserService;
     }
 
-    private void HandleSignedIn(IPlayerUserService playerUserService)
+    private void HandleSignedIn(IPlayerUserService playerUserService, RealmPlayer _)
     {
         lock (_lock)
             _stats = playerUserService.User.Stats;
     }
 
-    private void HandleSignedOut(IPlayerUserService playerUserService)
+    private void HandleSignedOut(IPlayerUserService playerUserService, RealmPlayer _)
     {
         lock (_lock)
             _stats = [];
@@ -49,6 +51,7 @@ internal class PlayerStatisticsService : IPlayerStatisticsService
                 Value = 0
             };
             _stats.Add(stat);
+            _playerUserService.IncreaseVersion();
             return stat;
         }
         return stat;
@@ -62,6 +65,7 @@ internal class PlayerStatisticsService : IPlayerStatisticsService
         {
             var stat = GetStatById(statId);
             stat.Value += value;
+            _playerUserService.IncreaseVersion();
             Increased?.Invoke(this, statId, stat.Value);
         }
     }
@@ -74,6 +78,7 @@ internal class PlayerStatisticsService : IPlayerStatisticsService
         {
             var stat = GetStatById(statId);
             stat.Value -= value;
+            _playerUserService.IncreaseVersion();
             Increased?.Invoke(this, statId, stat.Value);
         }
     }
@@ -89,6 +94,7 @@ internal class PlayerStatisticsService : IPlayerStatisticsService
                 Increased?.Invoke(this, statId, stat.Value);
             else if(stat.Value < old)
                 Decreased?.Invoke(this, statId, stat.Value);
+            _playerUserService.IncreaseVersion();
         }
     }
 

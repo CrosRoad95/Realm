@@ -5,6 +5,7 @@ internal class PlayerPlayTimeService : IPlayerPlayTimeService
     private readonly object _lock = new();
     private DateTime _startDateTime;
     private ulong _totalPlayTime = 0;
+    private readonly IPlayerUserService _playerUserService;
     private readonly IDateTimeProvider _dateTimeProvider;
     private readonly IUpdateService _updateService;
     private int _lastMinute = 0;
@@ -20,6 +21,7 @@ internal class PlayerPlayTimeService : IPlayerPlayTimeService
     public PlayerPlayTimeService(PlayerContext playerContext, IPlayerUserService playerUserService, IDateTimeProvider dateTimeProvider, IUpdateService updateService)
     {
         Player = playerContext.Player;
+        _playerUserService = playerUserService;
         _dateTimeProvider = dateTimeProvider;
         _updateService = updateService;
         _startDateTime = _dateTimeProvider.Now;
@@ -28,13 +30,13 @@ internal class PlayerPlayTimeService : IPlayerPlayTimeService
         _updateService.RareUpdate += HandleRareUpdate;
     }
 
-    private void HandleSignedIn(IPlayerUserService playerUserService)
+    private void HandleSignedIn(IPlayerUserService playerUserService, RealmPlayer _)
     {
         lock (_lock)
             _totalPlayTime = playerUserService.User.PlayTime;
     }
 
-    private void HandleSignedOut(IPlayerUserService playerUserService)
+    private void HandleSignedOut(IPlayerUserService playerUserService, RealmPlayer _)
     {
         lock (_lock)
             _totalPlayTime = 0;
@@ -62,6 +64,7 @@ internal class PlayerPlayTimeService : IPlayerPlayTimeService
         {
             _lastMinuteTotal = (int)TotalPlayTime.TotalMinutes;
             MinuteTotalPlayed?.Invoke(this);
+            _playerUserService.IncreaseVersion();
         }
     }
 }

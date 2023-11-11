@@ -92,35 +92,35 @@ public static class ServerBuilderExtensions
         #endregion
 
         #region Resources Logics
-        serverBuilder.AddScopedLogic<BrowserGuiComponentLogic>();
-        serverBuilder.AddScopedLogic<AdminResourceLogic>();
-        serverBuilder.AddScopedLogic<AFKResourceLogic>();
-        serverBuilder.AddScopedLogic<BoneAttachResourceLogic>();
-        serverBuilder.AddScopedLogic<ClientInterfaceResourceLogic>();
-        serverBuilder.AddScopedLogic<NametagResourceLogic>();
-        serverBuilder.AddScopedLogic<OutlineResourceLogic>();
-        serverBuilder.AddScopedLogic<StatisticsCounterResourceLogic>();
-        serverBuilder.AddScopedLogic<Text3dComponentLogic>();
-        serverBuilder.AddScopedLogic<WatermarkResourceLogic>();
-        serverBuilder.AddScopedLogic<AdminComponentLogic>();
+        serverBuilder.AddLogic<BrowserGuiComponentLogic>();
+        serverBuilder.AddLogic<AdminResourceLogic>();
+        serverBuilder.AddLogic<AFKResourceLogic>();
+        serverBuilder.AddLogic<BoneAttachResourceLogic>();
+        serverBuilder.AddLogic<ClientInterfaceResourceLogic>();
+        serverBuilder.AddLogic<NametagResourceLogic>();
+        serverBuilder.AddLogic<OutlineResourceLogic>();
+        serverBuilder.AddLogic<StatisticsCounterResourceLogic>();
+        serverBuilder.AddLogic<Text3dComponentLogic>();
+        serverBuilder.AddLogic<WatermarkResourceLogic>();
+        serverBuilder.AddLogic<AdminComponentLogic>();
         serverBuilder.AddLogic<FocusableComponentLogic>();
-        serverBuilder.AddScopedLogic<StatefulHudComponentLogic>();
-        serverBuilder.AddScopedLogic<JobSessionComponentLogic>();
-        serverBuilder.AddScopedLogic<InteractionComponentLogic>();
-        serverBuilder.AddScopedLogic<Hud3dComponentBaseLogic>();
-        serverBuilder.AddScopedLogic<LiftableWorldObjectComponentLogic>();
+        serverBuilder.AddLogic<StatefulHudComponentLogic>();
+        serverBuilder.AddLogic<JobSessionComponentLogic>();
+        serverBuilder.AddLogic<InteractionComponentLogic>();
+        serverBuilder.AddLogic<Hud3dComponentBaseLogic>();
+        serverBuilder.AddLogic<LiftableWorldObjectComponentLogic>();
         serverBuilder.AddLogic<VehicleUpgradesComponentLogic>();
         serverBuilder.AddLogic<UpdateCallbackLogic>();
         serverBuilder.AddLogic<PickupLogic>();
         serverBuilder.AddLogic<CollisionShapeLogic>();
-        serverBuilder.AddScopedLogic<PrivateVehicleComponentLogic>();
-        serverBuilder.AddScopedLogic<InventoryComponentLogic>();
-        serverBuilder.AddScopedLogic<PlayersLogic>();
-        serverBuilder.AddScopedLogic<GuiLogic>();
-        serverBuilder.AddScopedLogic<ServerLogic>();
-        serverBuilder.AddScopedLogic<VehicleEnginesRegistryLogic>();
-        serverBuilder.AddScopedLogic<VehicleAccessControllerComponentLogic>();
-        serverBuilder.AddScopedLogic<MapsLogic>();
+        serverBuilder.AddLogic<PrivateVehicleComponentLogic>();
+        serverBuilder.AddLogic<InventoryComponentLogic>();
+        serverBuilder.AddLogic<PlayersLogic>();
+        serverBuilder.AddLogic<GuiLogic>();
+        serverBuilder.AddLogic<ServerLogic>();
+        serverBuilder.AddLogic<VehicleEnginesRegistryLogic>();
+        serverBuilder.AddLogic<VehicleAccessControllerComponentLogic>();
+        serverBuilder.AddLogic<MapsLogic>();
         #endregion
 
         #region Behaviours

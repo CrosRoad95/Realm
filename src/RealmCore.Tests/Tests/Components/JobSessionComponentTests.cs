@@ -52,11 +52,11 @@ public class JobSessionComponentTests
 
         var testJobComponent = player.AddComponentWithDI<TestJobComponent>();
         var objective = testJobComponent.CreateMarkerObjective(withBlip);
-        var elements = player.GetRequiredService<IScopedElementFactory>().CreatedElements.ToList();
+        var elements = player.ElementFactory.CreatedElements.ToList();
         elements.Select(x => x.ElementType).Should().BeEquivalentTo(createdElementTypes);
         testJobComponent.ObjectiveCount.Should().Be(1);
         objective.Dispose();
-        elements = player.GetRequiredService<IScopedElementFactory>().CreatedElements.ToList();
+        elements = player.ElementFactory.CreatedElements.ToList();
         testJobComponent.ObjectiveCount.Should().Be(0);
         elements.Count.Should().Be(0);
     }

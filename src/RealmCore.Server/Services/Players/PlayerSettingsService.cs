@@ -6,6 +6,8 @@ internal class PlayerSettingsService : IPlayerSettingsService, IDisposable
 {
     private object _lock = new();
     private ICollection<UserSettingData> _settings = [];
+    private readonly IPlayerUserService _playerUserService;
+
     public RealmPlayer Player { get; }
     public event Action<IPlayerSettingsService, int, string>? Changed;
     public event Action<IPlayerSettingsService, int, string>? Removed;
@@ -15,15 +17,16 @@ internal class PlayerSettingsService : IPlayerSettingsService, IDisposable
         Player = playerContext.Player;
         playerUserService.SignedIn += HandleSignedIn;
         playerUserService.SignedOut += HandleSignedOut;
+        _playerUserService = playerUserService;
     }
 
-    private void HandleSignedIn(IPlayerUserService playerUserService)
+    private void HandleSignedIn(IPlayerUserService playerUserService, RealmPlayer _)
     {
         lock (_lock)
             _settings = playerUserService.User.Settings;
     }
 
-    private void HandleSignedOut(IPlayerUserService playerUserService)
+    private void HandleSignedOut(IPlayerUserService playerUserService, RealmPlayer _)
     {
         lock (_lock)
             _settings = [];
@@ -49,6 +52,7 @@ internal class PlayerSettingsService : IPlayerSettingsService, IDisposable
                     Value = value
                 });
         }
+        _playerUserService.IncreaseVersion();
         Changed?.Invoke(this, settingId, value);
     }
 
@@ -76,6 +80,7 @@ internal class PlayerSettingsService : IPlayerSettingsService, IDisposable
         if (setting != null)
         {
             _settings.Remove(setting);
+            _playerUserService.IncreaseVersion();
             return true;
         }
         return false;

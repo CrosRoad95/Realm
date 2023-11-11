@@ -121,6 +121,8 @@ global using RealmCore.Server.Scopes;
 global using RealmCore.Server.Interfaces.Players;
 global using System.Diagnostics.CodeAnalysis;
 global using RealmCore.Server.Interfaces.Integrations;
+global using RealmCore.Server.Utilities.Interfaces;
+global using RealmCore.Server.Factories.Interfaces;
 
 global using ILogger = Microsoft.Extensions.Logging.ILogger;
 

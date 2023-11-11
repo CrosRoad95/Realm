@@ -3,10 +3,13 @@
 internal sealed class PlayerMoneyService : IPlayerMoneyService
 {
     private decimal _money = 0;
+    private decimal _previousMoney = 0;
     private decimal _moneyLimit;
     private byte _moneyPrecision;
     private readonly ReaderWriterLockSlim _moneyLock = new();
     private readonly IOptionsMonitor<GameplayOptions>? _gameplayOptions;
+    private readonly IPlayerUserService _playerUserService;
+
     public RealmPlayer Player { get; private set; }
 
     public event Action<IPlayerMoneyService, decimal>? Set;
@@ -28,6 +31,7 @@ internal sealed class PlayerMoneyService : IPlayerMoneyService
                 if (_money == value)
                     return;
                 _money = value;
+                TryUpdateVersion();
 
                 if (Set == null)
                     return;
@@ -45,13 +49,23 @@ internal sealed class PlayerMoneyService : IPlayerMoneyService
         }
     }
 
-    public PlayerMoneyService(PlayerContext playerContext, IOptionsMonitor<GameplayOptions> gameplayOptions)
+    public PlayerMoneyService(PlayerContext playerContext, IOptionsMonitor<GameplayOptions> gameplayOptions, IPlayerUserService playerUserService)
     {
         Player = playerContext.Player;
         _gameplayOptions = gameplayOptions;
+        _playerUserService = playerUserService;
         _moneyLimit = _gameplayOptions.CurrentValue.MoneyLimit;
         _moneyPrecision = _gameplayOptions.CurrentValue.MoneyPrecision;
         _gameplayOptions.OnChange(HandleGameplayOptionsChanged);
+    }
+
+    private void TryUpdateVersion()
+    {
+        if (Math.Abs(_money - _previousMoney) > 200)
+        {
+            _previousMoney = _money;
+            _playerUserService.IncreaseVersion();
+        }
     }
 
     public void SetMoneyInternal(decimal amount)
@@ -84,6 +98,7 @@ internal sealed class PlayerMoneyService : IPlayerMoneyService
                 throw new GameplayException("Unable to give money beyond limit.");
 
             _money += amount;
+            TryUpdateVersion();
             Added?.Invoke(this, amount);
         }
         catch (Exception)
@@ -113,6 +128,7 @@ internal sealed class PlayerMoneyService : IPlayerMoneyService
             throw new GameplayException("Unable to take money, not enough money.");
 
         _money -= amount;
+        TryUpdateVersion();
         Taken?.Invoke(this, amount);
     }
 

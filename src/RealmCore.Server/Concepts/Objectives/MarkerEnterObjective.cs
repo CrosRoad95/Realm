@@ -15,6 +15,10 @@ public class MarkerEnterObjective : Objective
 
     protected override void Load()
     {
+        if(_marker != null)
+        {
+            ;
+        }
         _marker = ElementFactory.CreateMarker(_position, MarkerType.Arrow, Color.White);
         _marker.CollisionDetection.Entered += HandleEntered;
     }

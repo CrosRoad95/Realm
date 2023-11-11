@@ -6,6 +6,7 @@ internal class PlayerJobStatisticsService : IPlayerJobStatisticsService
 {
     private ICollection<JobStatisticsData> _jobStatistics = [];
     private readonly object _lock = new();
+    private readonly IPlayerUserService _playerUserService;
     private readonly IDateTimeProvider _dateTimeProvider;
 
     public event Action<IPlayerJobStatisticsService, short, ulong>? PointsAdded;
@@ -17,16 +18,17 @@ internal class PlayerJobStatisticsService : IPlayerJobStatisticsService
         Player = playerContext.Player;
         playerUserService.SignedIn += HandleSignedIn;
         playerUserService.SignedOut += HandleSignedOut;
+        _playerUserService = playerUserService;
         _dateTimeProvider = dateTimeProvider;
     }
 
-    private void HandleSignedIn(IPlayerUserService playerUserService)
+    private void HandleSignedIn(IPlayerUserService playerUserService, RealmPlayer _)
     {
         lock (_lock)
             _jobStatistics = playerUserService.User.JobStatistics;
     }
 
-    private void HandleSignedOut(IPlayerUserService playerUserService)
+    private void HandleSignedOut(IPlayerUserService playerUserService, RealmPlayer _)
     {
         lock (_lock)
             _jobStatistics = [];
@@ -43,6 +45,7 @@ internal class PlayerJobStatisticsService : IPlayerJobStatisticsService
                 JobId = jobId,
                 Date = today,
             };
+            _playerUserService.IncreaseVersion();
             _jobStatistics.Add(jobStatisticsData);
         }
         return jobStatisticsData;
@@ -56,6 +59,7 @@ internal class PlayerJobStatisticsService : IPlayerJobStatisticsService
         {
             var jobStatisticsData = GetJobStatisticsData(jobId);
             jobStatisticsData.Points += points;
+            _playerUserService.IncreaseVersion();
             PointsAdded?.Invoke(this, jobId, jobStatisticsData.Points);
         }
     }
@@ -68,6 +72,7 @@ internal class PlayerJobStatisticsService : IPlayerJobStatisticsService
         {
             var jobStatisticsData = GetJobStatisticsData(jobId);
             jobStatisticsData.TimePlayed += timePlayed;
+            _playerUserService.IncreaseVersion();
             TimePlayedAdded?.Invoke(this, jobId, jobStatisticsData.TimePlayed);
         }
     }
@@ -82,6 +87,7 @@ internal class PlayerJobStatisticsService : IPlayerJobStatisticsService
             var jobStatisticsData = GetJobStatisticsData(jobId);
             jobStatisticsData.Points += points;
             jobStatisticsData.TimePlayed += timePlayed;
+            _playerUserService.IncreaseVersion();
             PointsAdded?.Invoke(this, jobId, jobStatisticsData.Points);
             TimePlayedAdded?.Invoke(this, jobId, jobStatisticsData.TimePlayed);
         }

@@ -6,6 +6,7 @@ internal class PlayerBansService : IPlayerBansService
 {
     private ICollection<BanData> _bans = [];
     private readonly object _lock = new();
+    private readonly IPlayerUserService _playerUserService;
     private readonly IDateTimeProvider _dateTimeProvider;
 
     public event Action<IPlayerBansService, BanDTO>? Added;
@@ -17,16 +18,17 @@ internal class PlayerBansService : IPlayerBansService
         Player = playerContext.Player;
         playerUserService.SignedIn += HandleSignedIn;
         playerUserService.SignedOut += HandleSignedOut;
+        _playerUserService = playerUserService;
         _dateTimeProvider = dateTimeProvider;
     }
 
-    private void HandleSignedIn(IPlayerUserService playerUserService)
+    private void HandleSignedIn(IPlayerUserService playerUserService, RealmPlayer _)
     {
         lock (_lock)
             _bans = playerUserService.User.Bans;
     }
 
-    private void HandleSignedOut(IPlayerUserService playerUserService)
+    private void HandleSignedOut(IPlayerUserService playerUserService, RealmPlayer _)
     {
         lock (_lock)
             _bans = [];
@@ -53,6 +55,7 @@ internal class PlayerBansService : IPlayerBansService
             _bans.Add(banData);
         }
 
+        _playerUserService.IncreaseVersion();
         Added?.Invoke(this, BanDTO.Map(banData));
     }
 
@@ -69,6 +72,7 @@ internal class PlayerBansService : IPlayerBansService
 
         if (removed && ban != null)
         {
+            _playerUserService.IncreaseVersion();
             Removed?.Invoke(this, BanDTO.Map(ban));
             return true;
         }
@@ -88,6 +92,7 @@ internal class PlayerBansService : IPlayerBansService
 
         if (removed && ban != null)
         {
+            _playerUserService.IncreaseVersion();
             Removed?.Invoke(this, BanDTO.Map(ban));
             return true;
         }

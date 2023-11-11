@@ -1,4 +1,5 @@
-﻿using RealmCore.Server.Services.Players;
+﻿using RealmCore.Server.Factories;
+using RealmCore.Server.Services.Players;
 
 namespace RealmCore.Server.Extensions;
 
@@ -48,6 +49,7 @@ public static class ServiceCollectionExtensions
         #region Common
         services.AddSingleton<IDateTimeProvider, DateTimeProvider>();
         services.AddSingleton<IAssetEncryptionProvider, AssetEncryptionProvider>();
+        services.AddSingleton<IDebounceFactory, DebounceFactory>();
         services.AddTransient<SeederServerBuilder>();
         services.AddSingleton<RealmCommandService>();
         services.AddSingleton<MapIdGenerator>();

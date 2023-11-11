@@ -12,9 +12,10 @@ public interface IPlayerUserService : IPlayerService
     DateTime? LastNewsReadDateTime { get; }
     bool IsSignedIn { get; }
     TransformAndMotion? LastTransformAndMotion { get; }
+    DateTime? RegisteredDateTime { get; }
 
-    event Action<IPlayerUserService>? SignedIn;
-    event Action<IPlayerUserService>? SignedOut;
+    event Action<IPlayerUserService, RealmPlayer>? SignedIn;
+    event Action<IPlayerUserService, RealmPlayer>? SignedOut;
 
     void AddAuthorizedPolicy(string policy, bool authorized);
     bool AddClaim(string type, string value);
@@ -33,4 +34,5 @@ public interface IPlayerUserService : IPlayerService
     bool TryRemoveClaim(string type, string? value = null);
     bool TryRemoveRole(string role);
     void UpdateLastNewsRead();
+    void IncreaseVersion();
 }

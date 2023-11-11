@@ -3,6 +3,7 @@
 internal sealed class PlayerDailyVisitsService : IPlayerDailyVisitsService, IDisposable
 {
     private readonly object _lock = new();
+    private readonly IPlayerUserService _playerUserService;
     private readonly IDateTimeProvider _dateTimeProvider;
     private DailyVisitsData? _dailyVisitsData;
     public DateTime LastVisit { get => _dailyVisitsData.LastVisit; set => _dailyVisitsData.LastVisit = value; }
@@ -18,10 +19,11 @@ internal sealed class PlayerDailyVisitsService : IPlayerDailyVisitsService, IDis
         Player = playerContext.Player;
         playerUserService.SignedIn += HandleSignedIn;
         playerUserService.SignedOut += HandleSignedOut;
+        _playerUserService = playerUserService;
         _dateTimeProvider = dateTimeProvider;
     }
 
-    private void HandleSignedIn(IPlayerUserService playerUserService)
+    private void HandleSignedIn(IPlayerUserService playerUserService, RealmPlayer _)
     {
         lock (_lock)
         {
@@ -42,7 +44,7 @@ internal sealed class PlayerDailyVisitsService : IPlayerDailyVisitsService, IDis
         Update(_dateTimeProvider.Now);
     }
 
-    private void HandleSignedOut(IPlayerUserService playerUserService)
+    private void HandleSignedOut(IPlayerUserService playerUserService, RealmPlayer _)
     {
         lock (_lock)
             _dailyVisitsData = null;
@@ -72,6 +74,7 @@ internal sealed class PlayerDailyVisitsService : IPlayerDailyVisitsService, IDis
             VisitsRecord?.Invoke(this, VisitsInRowRecord);
         }
 
+        _playerUserService.IncreaseVersion();
         Visited?.Invoke(this, VisitsInRow, reset);
         LastVisit = nowDate;
     }

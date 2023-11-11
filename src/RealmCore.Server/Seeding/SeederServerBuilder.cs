@@ -74,7 +74,7 @@ internal sealed class SeederServerBuilder
             });
             if (pair.Value.Text3d != null)
             {
-                pickup.AddComponent(new Text3dComponent(pair.Value.Text3d, new Vector3(0, 0, 0.75f)));
+                pickup.AddComponent(new Text3dComponent(pair.Value.Text3d, pickup.Position + new Vector3(0, 0, 0.75f)));
             }
             _logger.LogInformation("Seeder: Created pickup of id {elementId} with icon {pickupModel} at {position}", pair.Key, pair.Value.Model, pair.Value.Position);
         }

@@ -4,6 +4,7 @@ internal class PlayerAchievementsService : IPlayerAchievementsService
 {
     private ICollection<AchievementData> _achievements = [];
     private readonly object _lock = new();
+    private readonly IPlayerUserService _playerUserService;
 
     public event Action<IPlayerAchievementsService, int>? Unlocked;
     public event Action<IPlayerAchievementsService, int, float>? Progressed;
@@ -14,15 +15,16 @@ internal class PlayerAchievementsService : IPlayerAchievementsService
         Player = playerContext.Player;
         playerUserService.SignedIn += HandleSignedIn;
         playerUserService.SignedOut += HandleSignedOut;
+        _playerUserService = playerUserService;
     }
 
-    private void HandleSignedIn(IPlayerUserService playerUserService)
+    private void HandleSignedIn(IPlayerUserService playerUserService, RealmPlayer _)
     {
         lock (_lock)
             _achievements = playerUserService.User.Achievements;
     }
 
-    private void HandleSignedOut(IPlayerUserService playerUserService)
+    private void HandleSignedOut(IPlayerUserService playerUserService, RealmPlayer _)
     {
         lock (_lock)
             _achievements = [];
@@ -95,6 +97,7 @@ internal class PlayerAchievementsService : IPlayerAchievementsService
                 return false;
 
             achievement.PrizeReceived = true;
+            _playerUserService.IncreaseVersion();
             return true;
         }
     }
