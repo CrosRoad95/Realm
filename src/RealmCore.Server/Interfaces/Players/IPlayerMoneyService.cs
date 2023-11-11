@@ -4,11 +4,9 @@ public interface IPlayerMoneyService : IPlayerService
 {
     decimal Amount { get; set; }
 
-    event Action<IPlayerMoneyService, decimal>? MoneyLimitChanged;
-    event Action<IPlayerMoneyService, byte>? MoneyPrecisionChanged;
-    event Action<IPlayerMoneyService, decimal>? MoneySet;
-    event Action<IPlayerMoneyService, decimal>? MoneyAdded;
-    event Action<IPlayerMoneyService, decimal>? MoneyTaken;
+    event Action<IPlayerMoneyService, decimal>? Set;
+    event Action<IPlayerMoneyService, decimal>? Added;
+    event Action<IPlayerMoneyService, decimal>? Taken;
 
     internal void SetMoneyInternal(decimal amount);
     void GiveMoney(decimal amount);

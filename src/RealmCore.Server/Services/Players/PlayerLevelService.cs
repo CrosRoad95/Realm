@@ -37,7 +37,6 @@ internal class PlayerLevelService : IPlayerLevelService
         }
     }
 
-
     public uint NextLevelRequiredExperience
     {
         get

@@ -6,8 +6,8 @@ public interface IPlayerDailyVisitsService : IPlayerService
     int VisitsInRow { get; set; }
     int VisitsInRowRecord { get; set; }
 
-    event Action<IPlayerDailyVisitsService, int, bool>? PlayerVisited;
-    event Action<IPlayerDailyVisitsService, int>? PlayerVisitsRecord;
+    event Action<IPlayerDailyVisitsService, int, bool>? Visited;
+    event Action<IPlayerDailyVisitsService, int>? VisitsRecord;
 
     internal void Update(DateTime now);
 }

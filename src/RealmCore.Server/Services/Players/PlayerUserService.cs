@@ -24,6 +24,7 @@ internal sealed class PlayerUserService : IPlayerUserService, IDisposable
     public string Nick => _user?.Nick ?? throw new UserNotSignedInException();
     public string UserName => _user?.UserName ?? throw new UserNotSignedInException();
     public DateTime? LastNewsReadDateTime => User.LastNewsReadDateTime;
+    public DateTime? RegisteredDateTime => User.RegisteredDateTime;
     public TransformAndMotion? LastTransformAndMotion => User.LastTransformAndMotion;
 
     public event Action<IPlayerUserService>? SignedIn;
@@ -39,10 +40,11 @@ internal sealed class PlayerUserService : IPlayerUserService, IDisposable
 
     public void SignIn(UserData user, ClaimsPrincipal claimsPrincipal)
     {
+        if (user == null)
+            throw new InvalidOperationException();
+
         lock (_lock)
         {
-            if(user == null)
-                throw new InvalidOperationException();
             _user = user;
             _claimsPrincipal = claimsPrincipal;
             SignedIn?.Invoke(this);

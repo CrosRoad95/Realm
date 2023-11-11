@@ -9,11 +9,9 @@ internal sealed class PlayerMoneyService : IPlayerMoneyService
     private readonly IOptionsMonitor<GameplayOptions>? _gameplayOptions;
     public RealmPlayer Player { get; private set; }
 
-    public event Action<IPlayerMoneyService, decimal>? MoneyLimitChanged;
-    public event Action<IPlayerMoneyService, byte>? MoneyPrecisionChanged;
-    public event Action<IPlayerMoneyService, decimal>? MoneySet;
-    public event Action<IPlayerMoneyService, decimal>? MoneyAdded;
-    public event Action<IPlayerMoneyService, decimal>? MoneyTaken;
+    public event Action<IPlayerMoneyService, decimal>? Set;
+    public event Action<IPlayerMoneyService, decimal>? Added;
+    public event Action<IPlayerMoneyService, decimal>? Taken;
     public decimal Amount
     {
         get => _money;
@@ -31,10 +29,10 @@ internal sealed class PlayerMoneyService : IPlayerMoneyService
                     return;
                 _money = value;
 
-                if (MoneySet == null)
+                if (Set == null)
                     return;
 
-                MoneySet?.Invoke(this, _money);
+                Set?.Invoke(this, _money);
             }
             catch (Exception)
             {
@@ -63,16 +61,8 @@ internal sealed class PlayerMoneyService : IPlayerMoneyService
 
     private void HandleGameplayOptionsChanged(GameplayOptions gameplayOptions)
     {
-        if (_moneyLimit != gameplayOptions.MoneyLimit)
-        {
-            _moneyLimit = gameplayOptions.MoneyLimit;
-            MoneyLimitChanged?.Invoke(this, _moneyLimit);
-        }
-        if (_moneyPrecision != gameplayOptions.MoneyPrecision)
-        {
-            _moneyPrecision = gameplayOptions.MoneyPrecision;
-            MoneyPrecisionChanged?.Invoke(this, _moneyPrecision);
-        }
+        _moneyLimit = gameplayOptions.MoneyLimit;
+        _moneyPrecision = gameplayOptions.MoneyPrecision;
     }
 
     private decimal Normalize(decimal amount) => amount.Truncate(_moneyPrecision);
@@ -94,7 +84,7 @@ internal sealed class PlayerMoneyService : IPlayerMoneyService
                 throw new GameplayException("Unable to give money beyond limit.");
 
             _money += amount;
-            MoneyAdded?.Invoke(this, amount);
+            Added?.Invoke(this, amount);
         }
         catch (Exception)
         {
@@ -123,7 +113,7 @@ internal sealed class PlayerMoneyService : IPlayerMoneyService
             throw new GameplayException("Unable to take money, not enough money.");
 
         _money -= amount;
-        MoneyTaken?.Invoke(this, amount);
+        Taken?.Invoke(this, amount);
     }
 
     public void TakeMoney(decimal amount, bool force = false)

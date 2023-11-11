@@ -1,6 +1,6 @@
 ﻿namespace RealmCore.Server.Services.Players;
 
-internal sealed class PlayerAFKService : IPlayerAFKService, IDisposable
+internal sealed class PlayerAFKService : IPlayerAFKService
 {
     public DateTime? LastAFK { get; private set; }
     public bool IsAFK { get; private set; }
@@ -89,9 +89,5 @@ internal sealed class PlayerAFKService : IPlayerAFKService, IDisposable
         }
         InternalStateChanged += handleStateChanged;
         return cancellationTokenSource.Token;
-    }
-
-    public void Dispose()
-    {
     }
 }

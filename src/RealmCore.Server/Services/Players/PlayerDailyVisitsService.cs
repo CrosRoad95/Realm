@@ -9,8 +9,8 @@ internal sealed class PlayerDailyVisitsService : IPlayerDailyVisitsService, IDis
     public int VisitsInRow { get => _dailyVisitsData.VisitsInRow; set => _dailyVisitsData.VisitsInRow = value; }
     public int VisitsInRowRecord { get => _dailyVisitsData.VisitsInRowRecord; set => _dailyVisitsData.VisitsInRowRecord = value; }
 
-    public event Action<IPlayerDailyVisitsService, int, bool>? PlayerVisited;
-    public event Action<IPlayerDailyVisitsService, int>? PlayerVisitsRecord;
+    public event Action<IPlayerDailyVisitsService, int, bool>? Visited;
+    public event Action<IPlayerDailyVisitsService, int>? VisitsRecord;
     
     public RealmPlayer Player { get; }
     public PlayerDailyVisitsService(PlayerContext playerContext, IPlayerUserService playerUserService, IDateTimeProvider dateTimeProvider)
@@ -69,10 +69,10 @@ internal sealed class PlayerDailyVisitsService : IPlayerDailyVisitsService, IDis
         if (VisitsInRow > VisitsInRowRecord) // Doesn't check if day passed because value can be arbitrarily changed
         {
             VisitsInRowRecord = VisitsInRow;
-            PlayerVisitsRecord?.Invoke(this, VisitsInRowRecord);
+            VisitsRecord?.Invoke(this, VisitsInRowRecord);
         }
 
-        PlayerVisited?.Invoke(this, VisitsInRow, reset);
+        Visited?.Invoke(this, VisitsInRow, reset);
         LastVisit = nowDate;
     }
 

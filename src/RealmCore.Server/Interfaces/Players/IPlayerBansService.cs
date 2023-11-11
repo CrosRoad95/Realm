@@ -9,5 +9,5 @@ public interface IPlayerBansService : IPlayerService, IEnumerable<BanDTO>
     bool IsBanned(int type);
     bool RemoveById(int banId);
     bool RemoveByType(int type);
-    BanDTO? TryGetBan(int type);
+    BanDTO? TryGet(int type);
 }

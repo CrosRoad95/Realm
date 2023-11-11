@@ -14,11 +14,11 @@ public class playerTests
 
         decimal moneyAdded = 0;
         decimal moneyTaken = 0;
-        player.Money.MoneyAdded += (player, amount) =>
+        player.Money.Added += (player, amount) =>
         {
             moneyAdded += amount;
         };
-        player.Money.MoneyTaken += (player, amount) =>
+        player.Money.Taken += (player, amount) =>
         {
             moneyTaken += amount;
         };
@@ -390,7 +390,7 @@ public class playerTests
 
         var act = () =>
         {
-            player.Money.MoneySet += (that, amount) =>
+            player.Money.Set += (that, amount) =>
             {
                 that.Amount = 50;
             };

@@ -28,7 +28,6 @@ internal class PlayerJobUpgradesService : IPlayerJobUpgradesService
             _jobUpgrades = [];
     }
 
-
     private JobUpgradeData? InternalGetUpgrade(short jobId, int upgradeId) => _jobUpgrades.FirstOrDefault(x => x.JobId == jobId && x.UpgradeId == upgradeId);
     private bool InternalHasUpgrade(short jobId, int upgradeId) => _jobUpgrades.Any(x => x.JobId == jobId && x.UpgradeId == upgradeId);
 

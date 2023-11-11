@@ -13,4 +13,5 @@ public interface IPlayerAchievementsService : IPlayerService, IEnumerable<Achiev
     void SetValue(int achievementId, object value);
     bool TryReceiveReward(int achievementId, float requiredProgress);
     bool UpdateProgress(int achievementId, float progress, float maximumProgress);
+    bool IsRewardReceived(int achievementId);
 }

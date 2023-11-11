@@ -98,6 +98,16 @@ internal class PlayerAchievementsService : IPlayerAchievementsService
             return true;
         }
     }
+    
+    public bool IsRewardReceived(int achievementId)
+    {
+        lock (_lock)
+        {
+            var achievement = GetById(achievementId);
+
+            return achievement.PrizeReceived;
+        }
+    }
 
     public bool UpdateProgress(int achievementId, float progress, float maximumProgress)
     {

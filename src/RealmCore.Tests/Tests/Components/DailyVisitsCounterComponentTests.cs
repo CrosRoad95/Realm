@@ -18,13 +18,13 @@ public class DailyVisitsCounterComponentTests
         int _day = 0;
         bool _reset = false;
         int? _record = 0;
-        dailyVisitsCounterComponent.PlayerVisited += (e, day, wasReset) =>
+        dailyVisitsCounterComponent.Visited += (e, day, wasReset) =>
         {
             _day = day;
             _reset = wasReset;
         };
 
-        dailyVisitsCounterComponent.PlayerVisitsRecord += (e, record) =>
+        dailyVisitsCounterComponent.VisitsRecord += (e, record) =>
         {
             _record = record;
         };

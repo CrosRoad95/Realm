@@ -2,7 +2,7 @@
 
 namespace RealmCore.Server.Services.Players;
 
-internal class PlayerBansService : IPlayerBansService, IDisposable
+internal class PlayerBansService : IPlayerBansService
 {
     private ICollection<BanData> _bans = [];
     private readonly object _lock = new();
@@ -110,7 +110,7 @@ internal class PlayerBansService : IPlayerBansService, IDisposable
         return false;
     }
 
-    public BanDTO? TryGetBan(int type)
+    public BanDTO? TryGet(int type)
     {
         var now = _dateTimeProvider.Now;
         lock (_lock)
@@ -130,10 +130,6 @@ internal class PlayerBansService : IPlayerBansService, IDisposable
     {
         var now = _dateTimeProvider.Now;
         return _bans.FirstOrDefault(x => x.Type == type && x.End < now && x.Active);
-    }
-
-    public void Dispose()
-    {
     }
 
     public IEnumerator<BanDTO> GetEnumerator()
