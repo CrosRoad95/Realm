@@ -11,7 +11,7 @@ public interface IPlayerUserService : IPlayerService
     string UserName { get; }
     DateTime? LastNewsReadDateTime { get; }
     bool IsSignedIn { get; }
-    TransformAndMotion? LastTransformAndMotion { get; }
+    TransformAndMotion? LastTransformAndMotion { get; internal set; }
     DateTime? RegisteredDateTime { get; }
 
     event Action<IPlayerUserService, RealmPlayer>? SignedIn;

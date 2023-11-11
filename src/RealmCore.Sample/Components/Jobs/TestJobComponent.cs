@@ -22,7 +22,7 @@ internal class TestJobComponent : JobSessionComponent
         @object.AddComponent(new OwnerComponent(Element));
         var objective2 = AddObjective(new TransportObjectObjective(@object, new Vector3(379.00f, -112.77f, 2.0f)));
         objective2.Completed += ObjectiveBCompleted;
-        var objective3 = AddObjective(new TransportObjectObjective(new Vector3(379.00f, -105.77f, 2.0f)));
+        var objective3 = AddObjective(new TransportObjectObjective(new Vector3(379.00f, -105.77f, 2.0f), 2, true));
         objective3.Completed += ObjectiveDCompleted;
 
         var subObjective1 = new MarkerEnterObjective(new Vector3(386.9004f, -89.74414f, 3.8843315f));

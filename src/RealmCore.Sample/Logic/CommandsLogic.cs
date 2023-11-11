@@ -552,13 +552,6 @@ internal sealed class CommandsLogic
         //    }
         //});
 
-        //_commandService.AddCommandHandler("toggleadmindebug", (player, args) =>
-        //{
-        //    var adminComponent = player.GetRequiredComponent<AdminComponent>();
-        //    adminComponent.AdminMode = !adminComponent.AdminMode;
-        //    adminComponent.InteractionDebugRenderingEnabled = !adminComponent.InteractionDebugRenderingEnabled;
-        //});
-
         //_commandService.AddCommandHandler("createvehiclehud", (player, args) =>
         //{
         //    var playerElementComponent = player.GetRequiredComponent<PlayerElementComponent>();
@@ -1582,9 +1575,23 @@ internal sealed class CommandsLogic
             await Task.Delay(1000);
         });
 
-        _commandService.AddCommandHandler("createelementsforme", async (player, args) =>
+        _commandService.AddCommandHandler("createelementsforme", (player, args) =>
         {
             player.ElementFactory.CreateObject((ObjectModel)1337, player.Position + new Vector3(3, 0, 0), Vector3.Zero);
+        });
+
+        _commandService.AddCommandHandler("listevents", (player, args) =>
+        {
+            _chatBox.OutputTo(player, "Events:");
+            foreach (var item in player.Events)
+            {
+                _chatBox.OutputTo(player, $"Event: {item.Id} - {item.EventType}: {item.Metadata}");
+            }
+        });
+        _commandService.AddCommandHandler("addevent", (player, args) =>
+        {
+            player.Events.Add(1, "asdf");
+            _chatBox.OutputTo(player, "Added");
         });
     }
 

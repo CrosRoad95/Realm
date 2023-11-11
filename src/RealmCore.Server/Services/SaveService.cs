@@ -215,12 +215,11 @@ internal sealed class SaveService : ISaveService
         if (!player.IsSignedIn)
             return false;
 
-        var user = player.User;
+        var user = player.User.User;
         var db = player.GetRequiredService<IDb>();
-        ;
-        var userData = user.User;
-        userData.LastTransformAndMotion = player.GetTransformAndMotion();
-        db.Users.Update(userData);
+
+        user.LastTransformAndMotion = player.GetTransformAndMotion();
+        db.Users.Update(user);
 
         foreach (var item in _userDataSavers)
             await item.SaveAsync(player);

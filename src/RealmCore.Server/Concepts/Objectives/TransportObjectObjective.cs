@@ -5,6 +5,7 @@ public class TransportObjectObjective : Objective
     private readonly Element? _element;
     private readonly Vector3 _destination;
     private readonly float _range;
+    private readonly bool _withMarker;
     private RealmMarker? _marker;
     private bool _loaded = false;
     private IElementCollection _elementCollection = default!;
@@ -22,10 +23,11 @@ public class TransportObjectObjective : Objective
         _element.Destroyed += HandleDestroyed;
     }
 
-    public TransportObjectObjective(Vector3 destination, float range = 2)
+    public TransportObjectObjective(Vector3 destination, float range = 2, bool withMarker = false)
     {
         _destination = destination;
         _range = range;
+        _withMarker = withMarker;
     }
 
     private void HandleDestroyed(Element element)
@@ -37,16 +39,12 @@ public class TransportObjectObjective : Objective
         }
     }
 
-    public void WithMarker()
-    {
-        if (!_loaded)
-            throw new InvalidOperationException();
-    }
-
     protected override void Load()
     {
         _elementCollection = Player.GetRequiredService<IElementCollection>();
         _scopedElementFactory = Player.GetRequiredService<IScopedElementFactory>();
+        if(_withMarker)
+            _marker = ElementFactory.CreateMarker(_destination, MarkerType.Cylinder, Color.Red);
         _loaded = true;
     }
 

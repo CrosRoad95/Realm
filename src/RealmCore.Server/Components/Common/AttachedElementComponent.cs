@@ -39,6 +39,7 @@ public class AttachedElementComponent : ComponentLifecycle
         {
             AttachedElement.Destroyed -= HandleDestroyed;
             TryDetach(out var _);
+            base.Detach();
         }
     }
 
@@ -48,12 +49,12 @@ public class AttachedElementComponent : ComponentLifecycle
         {
             if(AttachedElement != null)
             {
+                base.Detach();
                 element = AttachedElement;
                 AttachedElement = null;
                 ((IComponents)Element).Components.TryDestroyComponent(this);
                 return true;
             }
-            ((IComponents)Element).Components.TryDestroyComponent(this);
             element = null;
             return false;
         }

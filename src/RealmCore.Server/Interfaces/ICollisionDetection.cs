@@ -1,6 +1,6 @@
 ﻿namespace RealmCore.Server.Interfaces;
 
-internal interface ICollisionDetection
+public interface ICollisionDetection
 {
     event Action<Element>? ElementEntered;
     event Action<Element>? ElementLeft;

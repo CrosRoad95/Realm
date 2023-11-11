@@ -26,7 +26,7 @@ internal sealed class PlayerUserService : IPlayerUserService, IDisposable
     public string UserName => _user?.UserName ?? throw new UserNotSignedInException();
     public DateTime? LastNewsReadDateTime => User.LastNewsReadDateTime;
     public DateTime? RegisteredDateTime => User.RegisteredDateTime;
-    public TransformAndMotion? LastTransformAndMotion => User.LastTransformAndMotion;
+    public TransformAndMotion? LastTransformAndMotion { get => User.LastTransformAndMotion; set => User.LastTransformAndMotion = value; }
 
     public event Action<IPlayerUserService, RealmPlayer>? SignedIn;
     public event Action<IPlayerUserService, RealmPlayer>? SignedOut;

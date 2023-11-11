@@ -33,6 +33,9 @@ public static class QuerableExtensions
             .Include(x => x.DiscordIntegration)
             .Include(x => x.Upgrades)
             .Include(x => x.Settings)
+            .Include(x => x.Events)
+            .Include(x => x.WhitelistedSerials)
+            .Include(x => x.Bans)
             .Include(x => x.Inventories)
             .ThenInclude(x => x!.InventoryItems);
     }
