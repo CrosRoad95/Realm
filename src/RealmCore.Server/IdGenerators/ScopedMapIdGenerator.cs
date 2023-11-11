@@ -9,9 +9,9 @@ public sealed class ScopedMapIdGenerator : IElementIdGenerator
 
     public ScopedMapIdGenerator()
     {
-        _idCounter = IdGeneratorConstants.PlayerIdStart;
-        _start = IdGeneratorConstants.PlayerIdStart;
-        _stop = IdGeneratorConstants.PlayerIdStop;
+        _idCounter = IdGeneratorConstants.MapIdStart;
+        _start = IdGeneratorConstants.MapIdStart;
+        _stop = IdGeneratorConstants.MapIdStop;
     }
 
     public uint GetId()

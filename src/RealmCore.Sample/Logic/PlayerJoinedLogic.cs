@@ -1,4 +1,5 @@
-﻿using SlipeServer.Server;
+﻿using RealmCore.Sample.Components.Gui.Blazor;
+using SlipeServer.Server;
 
 namespace RealmCore.Sample.Logic;
 
@@ -26,6 +27,7 @@ internal sealed class PlayerJoinedLogic
     private void HandleReady(RealmPlayer player)
     {
         _chatBox.OutputTo(player, "Browser ready");
+        //player.AddComponent<Counter2GuiComponent>();
     }
 
     private async Task HandleSignedInCore(RealmPlayer player)

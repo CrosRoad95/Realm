@@ -16,9 +16,10 @@ public class ElementFactoryTests
             wasDestroyed = true;
         }
 
-        var elementFactory = player.GetRequiredService<IScopedElementFactory>();
+        var elementFactory = player.ElementFactory;
         var obj = elementFactory.CreateObject((ObjectModel)1337, Vector3.Zero, Vector3.Zero);
         obj.Destroyed += handleDestroyed;
+        obj.Id.Value.Should().Be(30001);
 
         player.TriggerDisconnected(QuitReason.Quit);
 
@@ -38,7 +39,7 @@ public class ElementFactoryTests
         }
 
         {
-            using var scope = player.GetRequiredService<IScopedElementFactory>().CreateScope();
+            using var scope = player.ElementFactory.CreateScope();
             var obj = scope.CreateObject((ObjectModel)1337, Vector3.Zero, Vector3.Zero);
             obj.Destroyed += handleDestroyed;
         }
@@ -52,7 +53,7 @@ public class ElementFactoryTests
         var realmTestingServer = new RealmTestingServer();
         var player = realmTestingServer.CreatePlayer();
 
-        var rootElementFactory = player.GetRequiredService<IScopedElementFactory>();
+        var rootElementFactory = player.ElementFactory;
         var obj1 = rootElementFactory.CreateObject((ObjectModel)1337, Vector3.Zero, Vector3.Zero);
         var scope = rootElementFactory.CreateScope();
         var obj2 = scope.CreateObject((ObjectModel)1337, Vector3.Zero, Vector3.Zero);
@@ -71,7 +72,7 @@ public class ElementFactoryTests
         var realmTestingServer = new RealmTestingServer();
         var player = realmTestingServer.CreatePlayer();
 
-        var rootElementFactory = player.GetRequiredService<IScopedElementFactory>();
+        var rootElementFactory = player.ElementFactory;
         var obj1 = rootElementFactory.CreateObject((ObjectModel)1337, Vector3.Zero, Vector3.Zero);
         {
             using var scope = rootElementFactory.CreateScope();
@@ -94,7 +95,7 @@ public class ElementFactoryTests
         var player = realmTestingServer.CreatePlayer();
         player.Interior = 13;
         player.Dimension = 56;
-        var rootElementFactory = player.GetRequiredService<IScopedElementFactory>();
+        var rootElementFactory = player.ElementFactory;
 
         var obj = rootElementFactory.CreateObject((ObjectModel)1337, Vector3.Zero, Vector3.Zero);
         obj.Interior.Should().Be(13);
@@ -108,7 +109,7 @@ public class ElementFactoryTests
         var player1 = realmTestingServer.CreatePlayer();
         var player2 = realmTestingServer.CreatePlayer();
 
-        var rootElementFactory = player1.GetRequiredService<IScopedElementFactory>();
+        var rootElementFactory = player1.ElementFactory;
         var collisionSphere = rootElementFactory.CreateCollisionSphere(new Vector3(10, 0, 0), 3);
 
         int entered = 0;

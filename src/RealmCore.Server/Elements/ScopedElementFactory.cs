@@ -117,8 +117,6 @@ internal class ScopedElementFactory : IScopedElementFactory
 
     private void AssociateWithPlayer(Element element)
     {
-        if(element.Id.Value == 0)
-            element.Id = (ElementId)_elementIdGenerator.GetId();
         Add(element);
         element.AssociateWith(_player);
         if (element is RealmMarker pickup)

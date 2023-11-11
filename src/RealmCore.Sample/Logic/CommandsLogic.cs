@@ -1581,6 +1581,11 @@ internal sealed class CommandsLogic
             scope.CreateObject((ObjectModel)1337, player.Position + new Vector3(3, 0, 0), Vector3.Zero);
             await Task.Delay(1000);
         });
+
+        _commandService.AddCommandHandler("createelementsforme", async (player, args) =>
+        {
+            player.ElementFactory.CreateObject((ObjectModel)1337, player.Position + new Vector3(3, 0, 0), Vector3.Zero);
+        });
     }
 
     static int _hudPosition = 0;
