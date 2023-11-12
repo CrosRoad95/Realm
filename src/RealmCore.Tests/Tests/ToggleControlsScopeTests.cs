@@ -1,6 +1,4 @@
-﻿using RealmCore.Server.Scopes;
-
-namespace RealmCore.Tests.Tests;
+﻿namespace RealmCore.Tests.Tests;
 
 public class ToggleControlsScopeTests
 {
