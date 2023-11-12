@@ -2,7 +2,7 @@
 
 public class TransportObjectObjective : Objective
 {
-    private readonly Element? _element;
+    private Element? _element;
     private readonly Vector3 _destination;
     private readonly float _range;
     private readonly bool _withMarker;
@@ -44,7 +44,7 @@ public class TransportObjectObjective : Objective
         _elementCollection = Player.GetRequiredService<IElementCollection>();
         _scopedElementFactory = Player.GetRequiredService<IScopedElementFactory>();
         if(_withMarker)
-            _marker = ElementFactory.CreateMarker(_destination, MarkerType.Cylinder, Color.Red);
+            _marker = ElementFactory.CreateMarker(_destination, MarkerType.Cylinder, 1, Color.Red);
         _loaded = true;
     }
 
@@ -99,8 +99,17 @@ public class TransportObjectObjective : Objective
 
     public override void Dispose()
     {
-        if (_marker != null && _marker.Destroy())
+        if (_element != null)
+        {
+            _element.Destroy();
+            _element = null;
+        }
+        
+        if (_marker != null)
+        {
+            _marker.Destroy();
             _marker = null;
+        }
 
         CheckElement = null;
         base.Dispose();

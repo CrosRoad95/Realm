@@ -19,7 +19,7 @@ public class MarkerEnterObjective : Objective
         {
             ;
         }
-        _marker = ElementFactory.CreateMarker(_position, MarkerType.Arrow, Color.White);
+        _marker = ElementFactory.CreateMarker(_position, MarkerType.Arrow, 1, Color.White);
         _marker.CollisionDetection.Entered += HandleEntered;
     }
 

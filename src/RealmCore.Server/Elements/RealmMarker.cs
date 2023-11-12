@@ -22,12 +22,12 @@ public class RealmMarker : Marker, IComponents, ICollisionDetection
 
     private void HandleElementLeft(Element leftElement)
     {
-        ElementLeft?.Invoke(leftElement);
+        CollisionDetection.RelayLeft(leftElement);
     }
 
     private void HandleElementEntered(Element enteredElement)
     {
-        ElementEntered?.Invoke(enteredElement);
+        CollisionDetection.RelayEntered(enteredElement);
     }
 
     public void CheckElementWithin(Element element)

@@ -18,10 +18,10 @@ public class AttachedElementComponent : ComponentLifecycle
     public AttachedElementComponent(Element element, BoneId boneId, Vector3? positionOffset = null, Vector3? rotationOffset = null)
     {
         AttachedElement = element;
+        AttachedElement.Destroyed += HandleDestroyed;
         _boneId = boneId;
         _positionOffset = positionOffset;
         _rotationOffset = rotationOffset;
-        AttachedElement.Destroyed += HandleDestroyed;
     }
 
     private void HandleDestroyed(Element element)
@@ -29,7 +29,8 @@ public class AttachedElementComponent : ComponentLifecycle
         if(AttachedElement != null)
         {
             AttachedElement.Destroyed -= HandleDestroyed;
-            TryDetach(out var _);
+            AttachedElement = null;
+            ((IComponents)Element).Components.TryDestroyComponent(this);
         }
     }
 
@@ -37,9 +38,8 @@ public class AttachedElementComponent : ComponentLifecycle
     {
         if (AttachedElement != null)
         {
-            AttachedElement.Destroyed -= HandleDestroyed;
-            TryDetach(out var _);
             base.Detach();
+            TryDetach(out var _);
         }
     }
 
@@ -50,6 +50,7 @@ public class AttachedElementComponent : ComponentLifecycle
             if(AttachedElement != null)
             {
                 base.Detach();
+                AttachedElement.Destroyed -= HandleDestroyed;
                 element = AttachedElement;
                 AttachedElement = null;
                 ((IComponents)Element).Components.TryDestroyComponent(this);

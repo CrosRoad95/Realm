@@ -86,7 +86,7 @@ internal sealed class SeederServerBuilder
         {
             if (Enum.IsDefined(typeof(MarkerType), pair.Value.MarkerType))
             {
-                var marker = _elementFactory.CreateMarker(pair.Value.Position, pair.Value.MarkerType, pair.Value.Color, elementBuilder: x =>
+                var marker = _elementFactory.CreateMarker(pair.Value.Position, pair.Value.MarkerType, 1, pair.Value.Color, elementBuilder: x =>
                 {
                     return [new NameComponent(pair.Key)];
                 });

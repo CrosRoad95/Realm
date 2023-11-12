@@ -148,10 +148,10 @@ internal class ScopedElementFactory : IScopedElementFactory
         return collisionSphere;
     }
 
-    public RealmMarker CreateMarker(Vector3 position, MarkerType markerType, Color color, byte? interior = null, ushort? dimension = null, Func<RealmMarker, IEnumerable<IComponent>>? elementBuilder = null)
+    public RealmMarker CreateMarker(Vector3 position, MarkerType markerType, float size, Color color, byte? interior = null, ushort? dimension = null, Func<RealmMarker, IEnumerable<IComponent>>? elementBuilder = null)
     {
         ThrowIfDisposed();
-        var marker = new RealmMarker(_player.ServiceProvider, position, markerType, 2)
+        var marker = new RealmMarker(_player.ServiceProvider, position, markerType, size)
         {
             Color = color,
             Interior = interior ?? _player.Interior,

@@ -32,7 +32,7 @@ internal sealed class PlayerGameplayLogic
     private async Task HandleInteract(RealmPlayer player, KeyState keyState)
     {
         var components = player;
-        if (components.TryGetComponent(out AttachedElementComponent attachedElementComponent))
+        if (components.TryGetComponent(out AttachedElementComponent attachedElementComponent) && keyState == KeyState.Down)
         {
             await player.DoAnimationAsync(Animation.CarryPutDown);
 

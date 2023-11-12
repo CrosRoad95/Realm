@@ -1,14 +1,24 @@
 ﻿namespace RealmCore.Server.Elements;
 
-public class RealmPickup : Pickup, IComponents
+public class RealmPickup : Pickup, IComponents, ICollisionDetection
 {
+    public event Action<Element>? ElementEntered;
+    public event Action<Element>? ElementLeft;
+
     public Concepts.Components Components { get; private set; }
     public CollisionDetection<RealmPickup> CollisionDetection { get; private set; }
+    public CollisionDetection InternalCollisionDetection => CollisionDetection;
 
     public RealmPickup(IServiceProvider serviceProvider, Vector3 position, ushort model) : base(position, model)
     {
         Components = new(serviceProvider, this);
         CollisionDetection = new(serviceProvider, this);
+        CollisionShape = new CollisionSphere(position, 1.5f);
+    }
+
+    public void CheckElementWithin(Element element)
+    {
+        CollisionShape.CheckElementWithin(element);
     }
 
     public TComponent GetRequiredComponent<TComponent>() where TComponent : IComponent

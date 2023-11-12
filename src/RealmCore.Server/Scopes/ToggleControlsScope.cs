@@ -34,6 +34,13 @@ public class ToggleControlsScope : IDisposable
     public ToggleControlsScope(RealmPlayer player)
     {
         _player = player;
+
+        if (_player.IsDestroyed)
+            return;
+
+        if (!player.TryEnterToggleControlScope())
+            throw new InvalidOperationException("Only one toggleControlScope is allowed per player");
+
         var controls = _player.Controls;
         _fireEnabled = controls.FireEnabled;
         _aimWeaponEnabled = controls.AimWeaponEnabled;
@@ -66,6 +73,9 @@ public class ToggleControlsScope : IDisposable
 
     public void Dispose()
     {
+        if (_player.IsDestroyed)
+            return;
+
         var controls = _player.Controls;
         controls.FireEnabled = _fireEnabled;
         controls.AimWeaponEnabled = _aimWeaponEnabled;
@@ -94,5 +104,7 @@ public class ToggleControlsScope : IDisposable
         controls.BrakeReverseEnabled = _brakeReverseEnabled;
         controls.HornEnabled = _hornEnabled;
         controls.EnterPassengerEnabled = _enterPassengerEnabled;
+
+        _player.ExitToggleControlScope();
     }
 }

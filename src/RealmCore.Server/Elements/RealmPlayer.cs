@@ -107,6 +107,17 @@ public class RealmPlayer : Player, IComponents, IDisposable
         BindExecuted += HandleBindExecuted;
         IsNametagShowing = false;
         UpdateFight();
+
+        Controls.StateChanged += Controls_StateChanged;
+    }
+
+    private void Controls_StateChanged(Player sender, PlayerControlsChangedArgs e)
+    {
+        if(e.Control == "jump")
+        {
+            var skldjfklsdfjklsdjflsdljkf = e.NewState;
+            Console.WriteLine("JUMP {0}", e.NewState);
+        }
     }
 
     public T GetRequiredService<T>() where T : notnull
@@ -448,9 +459,10 @@ public class RealmPlayer : Player, IComponents, IDisposable
 
     public async Task DoComplexAnimationAsync(Animation animation, bool blockMovement = true)
     {
-        using var scope = new ToggleControlsScope(this);
+        ToggleControlsScope? scope = null;
         if (blockMovement)
         {
+            scope = new ToggleControlsScope(this);
             Controls.WalkEnabled = false;
             Controls.FireEnabled = false;
             Controls.JumpEnabled = false;
@@ -475,7 +487,7 @@ public class RealmPlayer : Player, IComponents, IDisposable
         }
         finally
         {
-            scope.Dispose();
+            scope?.Dispose();
         }
     }
 
@@ -541,11 +553,24 @@ public class RealmPlayer : Player, IComponents, IDisposable
         }
     }
 
+    private int inToggleControlScopeFlag = 0;
+
+    internal bool TryEnterToggleControlScope()
+    {
+        return Interlocked.Exchange(ref inToggleControlScopeFlag, 1) == 0;
+    }
+
+    internal void ExitToggleControlScope()
+    {
+        Interlocked.Exchange(ref inToggleControlScopeFlag, 0);
+    }
+
     public async Task DoAnimationAsync(Animation animation, TimeSpan? timeSpan = null, bool blockMovement = true)
     {
-        using var scope = new ToggleControlsScope(this);
+        ToggleControlsScope? scope = null;
         if (blockMovement)
         {
+            scope = new ToggleControlsScope(this);
             Controls.WalkEnabled = false;
             Controls.FireEnabled = false;
             Controls.JumpEnabled = false;
@@ -563,7 +588,7 @@ public class RealmPlayer : Player, IComponents, IDisposable
         }
         finally
         {
-            scope.Dispose();
+            scope?.Dispose();
         }
     }
 

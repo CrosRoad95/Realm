@@ -18,7 +18,7 @@ public class OneOfObjective : Objective
         foreach (var item in _objectives)
         {
             item.Completed += HandleCompleted;
-            item.InCompleted += HandleIncompleted;
+            item.InCompleted += HandleInCompleted;
             item.Player = Player;
             item.LoadInternal(Player, ElementFactory);
         }
@@ -42,7 +42,7 @@ public class OneOfObjective : Objective
         Completed -= handleCompleted;
     }
 
-    private void HandleIncompleted(Objective objective)
+    private void HandleInCompleted(Objective objective)
     {
         lock (_lock)
         {
@@ -75,7 +75,7 @@ public class OneOfObjective : Objective
             if (except != item || true)
             {
                 item.Completed -= HandleCompleted;
-                item.InCompleted -= HandleIncompleted;
+                item.InCompleted -= HandleInCompleted;
                 item.Dispose();
             }
         }

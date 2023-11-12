@@ -63,9 +63,9 @@ internal sealed class ElementFactory : IElementFactory
         return vehicle;
     }
 
-    public RealmMarker CreateMarker(Vector3 position, MarkerType markerType, Color color, byte? interior = null, ushort? dimension = null, Func<RealmMarker, IEnumerable<IComponent>>? elementBuilder = null)
+    public RealmMarker CreateMarker(Vector3 position, MarkerType markerType, float size, Color color, byte? interior = null, ushort? dimension = null, Func<RealmMarker, IEnumerable<IComponent>>? elementBuilder = null)
     {
-        var marker = new RealmMarker(_serviceProvider, position, markerType, 2)
+        var marker = new RealmMarker(_serviceProvider, position, markerType, size)
         {
             Interior = interior ?? 0,
             Dimension = dimension ?? 0,
