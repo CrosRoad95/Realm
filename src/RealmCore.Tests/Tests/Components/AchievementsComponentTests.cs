@@ -20,7 +20,7 @@ public class AchievementsComponentTests
         };
         achievements.UpdateProgress(1, 5, 100);
         achievements.UpdateProgress(1, 15, 100);
-        achievements.Get(1).Should().Be(20);
+        achievements.GetProgress(1).Should().Be(20);
         progressedTimes.Should().Be(2);
         progressedAchievementId.Should().Be(1);
         progressedAchievement.Should().Be(20);
