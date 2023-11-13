@@ -63,12 +63,12 @@ internal class PlayerAchievementsService : IPlayerAchievementsService
         }
     }
 
-    public float Get(int achievementId)
+    public AchievementDTO Get(int achievementId)
     {
         lock (_lock)
         {
             var achievement = GetById(achievementId);
-            return achievement.Progress;
+            return AchievementDTO.Map(achievement);
         }
     }
 
@@ -84,7 +84,7 @@ internal class PlayerAchievementsService : IPlayerAchievementsService
         }
     }
 
-    public bool TryReceiveReward(int achievementId, float requiredProgress)
+    public bool TryReceiveReward(int achievementId, float requiredProgress, DateTime now)
     {
         if (requiredProgress < 0)
             throw new ArgumentOutOfRangeException(nameof(requiredProgress));
@@ -93,10 +93,10 @@ internal class PlayerAchievementsService : IPlayerAchievementsService
         {
             var achievement = GetById(achievementId);
 
-            if (achievement.PrizeReceived || achievement.Progress < requiredProgress)
+            if (achievement.PrizeReceivedDateTime != null || achievement.Progress < requiredProgress)
                 return false;
 
-            achievement.PrizeReceived = true;
+            achievement.PrizeReceivedDateTime = now;
             _playerUserService.IncreaseVersion();
             return true;
         }
@@ -108,7 +108,7 @@ internal class PlayerAchievementsService : IPlayerAchievementsService
         {
             var achievement = GetById(achievementId);
 
-            return achievement.PrizeReceived;
+            return achievement.PrizeReceivedDateTime != null;
         }
     }
 
@@ -124,7 +124,7 @@ internal class PlayerAchievementsService : IPlayerAchievementsService
 
     public bool UpdateProgress(int achievementId, float progress, float maximumProgress)
     {
-        return SetProgress(achievementId, Math.Min(progress + Get(achievementId), maximumProgress), maximumProgress);
+        return SetProgress(achievementId, Math.Min(progress + GetProgress(achievementId), maximumProgress), maximumProgress);
     }
 
     public bool SetProgress(int achievementId, float progress, float maximumProgress)
@@ -138,7 +138,7 @@ internal class PlayerAchievementsService : IPlayerAchievementsService
         lock (_lock)
         {
             var achievement = GetById(achievementId);
-            if (achievement.PrizeReceived || HasReachedProgressThreshold(achievementId, maximumProgress))
+            if (achievement.PrizeReceivedDateTime != null || HasReachedProgressThreshold(achievementId, maximumProgress))
                 return false;
 
             achievement.Progress = Math.Min(progress, maximumProgress);

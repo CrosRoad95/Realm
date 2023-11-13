@@ -124,8 +124,8 @@ namespace RealmCore.Persistence.SQLite.Migrations
                     b.Property<int>("AchievementId")
                         .HasColumnType("INTEGER");
 
-                    b.Property<bool>("PrizeReceived")
-                        .HasColumnType("INTEGER");
+                    b.Property<DateTime?>("PrizeReceivedDateTime")
+                        .HasColumnType("TEXT");
 
                     b.Property<float>("Progress")
                         .HasColumnType("REAL");
@@ -1240,7 +1240,7 @@ namespace RealmCore.Persistence.SQLite.Migrations
             modelBuilder.Entity("RealmCore.Persistence.Data.BanData", b =>
                 {
                     b.HasOne("RealmCore.Persistence.Data.UserData", "User")
-                        .WithMany()
+                        .WithMany("Bans")
                         .HasForeignKey("UserId");
 
                     b.Navigation("User");
@@ -1607,6 +1607,8 @@ namespace RealmCore.Persistence.SQLite.Migrations
             modelBuilder.Entity("RealmCore.Persistence.Data.UserData", b =>
                 {
                     b.Navigation("Achievements");
+
+                    b.Navigation("Bans");
 
                     b.Navigation("DailyVisits");
 

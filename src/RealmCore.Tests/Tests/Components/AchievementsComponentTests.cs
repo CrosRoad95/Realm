@@ -40,11 +40,12 @@ public class AchievementsComponentTests
             unlockedAchievement = achievementId;
         };
 
-        achievements.TryReceiveReward(2, 100).Should().BeFalse();
+        var now = realmTestingServer.TestDateTimeProvider.Now;
+        achievements.TryReceiveReward(2, 100, now).Should().BeFalse();
 
         achievements.UpdateProgress(2, 100, 100);
-        achievements.TryReceiveReward(2, 100).Should().BeTrue();
-        achievements.TryReceiveReward(2, 100).Should().BeFalse();
+        achievements.TryReceiveReward(2, 100, now).Should().BeTrue();
+        achievements.TryReceiveReward(2, 100, now).Should().BeFalse();
         unlockedAchievement.Should().Be(2);
     }
 }

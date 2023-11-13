@@ -7,11 +7,11 @@ public interface IPlayerAchievementsService : IPlayerService, IEnumerable<Achiev
     event Action<IPlayerAchievementsService, int, float>? Progressed;
 
     T? GetAchievementValue<T>(int achievementId);
-    float Get(int achievementId);
+    AchievementDTO Get(int achievementId);
     bool HasReachedProgressThreshold(int achievementId, float progress);
     bool SetProgress(int achievementId, float progress, float maximumProgress);
     void SetValue(int achievementId, object value);
-    bool TryReceiveReward(int achievementId, float requiredProgress);
+    bool TryReceiveReward(int achievementId, float requiredProgress, DateTime now);
     bool UpdateProgress(int achievementId, float progress, float maximumProgress);
     bool IsRewardReceived(int achievementId);
     float GetProgress(int achievementId);

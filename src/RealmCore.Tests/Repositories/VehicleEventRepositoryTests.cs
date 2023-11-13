@@ -2,17 +2,12 @@
 
 public class VehicleEventRepositoryTests
 {
-    private readonly RealmTestingServer _server;
-    public VehicleEventRepositoryTests()
-    {
-        _server = new();
-    }
-
     [Fact]
     public async Task VehicleEventRepositoryShouldWork()
     {
-        var dateTimeProvider = _server.GetRequiredService<IDateTimeProvider>();
-        var vehicleEventRepository = _server.GetRequiredService<IVehicleEventRepository>();
+        var testingServer = new RealmTestingServer();
+        var dateTimeProvider = testingServer.GetRequiredService<IDateTimeProvider>();
+        var vehicleEventRepository = testingServer.GetRequiredService<IVehicleEventRepository>();
         
         await vehicleEventRepository.AddEvent(1, 1, dateTimeProvider.Now, "a");
         await vehicleEventRepository.AddEvent(1, 1, dateTimeProvider.Now.AddMinutes(1), "b");
