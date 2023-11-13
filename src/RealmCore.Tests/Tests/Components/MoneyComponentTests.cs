@@ -226,7 +226,7 @@ public class playerTests
         player.Money.SetMoneyInternal(1000000);
         
         player.Money.Amount = 10;
-        player.Money.TryTakeMoneyWithCallback(5, () =>
+        player.Money.TryTakeMoney(5, () =>
         {
             return true;
         });
@@ -241,7 +241,7 @@ public class playerTests
         player.Money.SetMoneyInternal(1000000);
 
         player.Money.Amount = 10;
-        player.Money.TryTakeMoneyWithCallback(5, () =>
+        player.Money.TryTakeMoney(5, () =>
         {
             return false;
         });
@@ -258,7 +258,7 @@ public class playerTests
         player.Money.Amount = 10;
         var act = () =>
         {
-            player.Money.TryTakeMoneyWithCallback(5, () =>
+            player.Money.TryTakeMoney(5, () =>
             {
                 throw new InvalidOperationException();
             });
@@ -278,7 +278,7 @@ public class playerTests
         player.Money.Amount = 10;
         var act = async () =>
         {
-            await player.Money.TryTakeMoneyWithCallbackAsync(5, () =>
+            await player.Money.TryTakeMoneyAsync(5, () =>
             {
                 throw new InvalidOperationException();
             });
@@ -299,7 +299,7 @@ public class playerTests
         bool success = false;
         var act = async () =>
         {
-            success = await player.Money.TryTakeMoneyWithCallbackAsync(5, () =>
+            success = await player.Money.TryTakeMoneyAsync(5, () =>
             {
                 return Task.FromResult(true);
             });
@@ -321,7 +321,7 @@ public class playerTests
         player.Money.SetMoneyInternal(1000000);
 
         player.Money.Amount = 100;
-        bool success = player.Money.TryTakeMoneyWithCallback(101, () =>
+        bool success = player.Money.TryTakeMoney(101, () =>
         {
             return true;
         });
@@ -338,7 +338,7 @@ public class playerTests
         player.Money.SetMoneyInternal(1000000);
 
         player.Money.Amount = 100;
-        bool success = await player.Money.TryTakeMoneyWithCallbackAsync(101, () =>
+        bool success = await player.Money.TryTakeMoneyAsync(101, () =>
         {
             return Task.FromResult(true);
         });
@@ -355,7 +355,7 @@ public class playerTests
         player.Money.SetMoneyInternal(1000000);
 
         player.Money.Amount = 100;
-        bool success = player.Money.TryTakeMoneyWithCallback(50, () =>
+        bool success = player.Money.TryTakeMoney(50, () =>
         {
             return false;
         });
@@ -372,7 +372,7 @@ public class playerTests
         player.Money.SetMoneyInternal(1000000);
 
         player.Money.Amount = 100;
-        bool success = await player.Money.TryTakeMoneyWithCallbackAsync(50, () =>
+        bool success = await player.Money.TryTakeMoneyAsync(50, () =>
         {
             return Task.FromResult(false);
         });

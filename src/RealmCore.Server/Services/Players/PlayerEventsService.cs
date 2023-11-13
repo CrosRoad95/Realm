@@ -45,6 +45,7 @@ internal class PlayerEventsService : IPlayerEventsService
             _userEventData.Add(userEvent);
         }
         _playerUserService.IncreaseVersion();
+        Added?.Invoke(this, UserEventDTO.Map(userEvent));
     }
 
     public IReadOnlyCollection<UserEventData> Get(IEnumerable<int>? events = null, int limit = 10)

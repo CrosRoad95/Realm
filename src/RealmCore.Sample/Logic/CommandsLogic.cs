@@ -7,6 +7,7 @@ using RealmCore.Resources.Overlay;
 using RealmCore.Resources.Assets;
 using RealmCore.Sample.Components.Vehicles;
 using RealmCore.Server.Interfaces.Players;
+using RealmCore.Sample.Components.Gui.Blazor;
 
 namespace RealmCore.Sample.Logic;
 
@@ -1349,12 +1350,11 @@ internal sealed class CommandsLogic
         //    _chatBox.OutputTo(player, $"Enum value: {args.ReadEnum<TestEnum>()}");
         //}, new string[] { "Admin" });
 
-        //_commandService.AddAsyncCommandHandler("guitest1", async (player, args) =>
-        //{
-        //    player.TryDestroyComponent<BrowserGuiComponent>();
-        //    player.AddComponent<Counter1GuiComponent>();
-        //    _chatBox.OutputTo(player, "Loaded counter 1");
-        //});
+        _commandService.AddCommandHandler("guitest1", (player, args) =>
+        {
+            player.TryDestroyComponent<BrowserGuiComponent>();
+            player.AddComponent<Counter1GuiComponent>();
+        });
 
         //_commandService.AddAsyncCommandHandler("guitest2", async (player, args) =>
         //{
@@ -1590,7 +1590,7 @@ internal sealed class CommandsLogic
         });
         _commandService.AddCommandHandler("addevent", (player, args) =>
         {
-            player.Events.Add(1, "asdf");
+            player.Events.Add(1, args.ReadAllAsString());
             _chatBox.OutputTo(player, "Added");
         });
     }

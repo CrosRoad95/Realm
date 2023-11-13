@@ -13,7 +13,7 @@ public interface IPlayerMoneyService : IPlayerService
     bool HasMoney(decimal amount, bool force = false);
     void TakeMoney(decimal amount, bool force = false);
     bool TryTakeMoney(decimal amount, bool force = false);
-    bool TryTakeMoneyWithCallback(decimal amount, Func<bool> action, bool force = false);
-    Task<bool> TryTakeMoneyWithCallbackAsync(decimal amount, Func<Task<bool>> action, bool force = false);
+    bool TryTakeMoney(decimal amount, Func<bool> action, bool force = false);
+    Task<bool> TryTakeMoneyAsync(decimal amount, Func<Task<bool>> action, bool force = false);
     void TransferMoney(RealmPlayer player, decimal amount, bool force = false);
 }

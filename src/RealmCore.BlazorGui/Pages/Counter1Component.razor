@@ -10,6 +10,11 @@
 <button class="btn btn-primary" @onclick="IncrementCount">Click me</button>
 <button class="btn btn-primary" @onclick="Navigate">Navigate</button>
 
+@foreach (var events in CurrentPlayerContext.Player.Events)
+{
+    <div>@events.DateTime - @events.Metadata</div>
+}
+
 @code {
     private int currentCount = 0;
 
@@ -22,10 +27,11 @@
     {
         currentCount++;
     }
-    
+
     protected override void OnInitialized()
     {
         Component.Test();
+        CurrentPlayerContext.Player.Events.Added += (_1, _2) => InvokeAsync(StateHasChanged);
         base.OnInitialized();
     }
 

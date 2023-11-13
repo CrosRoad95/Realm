@@ -177,7 +177,7 @@ internal sealed class PlayerMoneyService : IPlayerMoneyService
         }
     }
 
-    public bool TryTakeMoneyWithCallback(decimal amount, Func<bool> action, bool force = false)
+    public bool TryTakeMoney(decimal amount, Func<bool> action, bool force = false)
     {
         _moneyLock.EnterWriteLock();
         try
@@ -202,7 +202,7 @@ internal sealed class PlayerMoneyService : IPlayerMoneyService
         }
     }
 
-    public async Task<bool> TryTakeMoneyWithCallbackAsync(decimal amount, Func<Task<bool>> action, bool force = false)
+    public async Task<bool> TryTakeMoneyAsync(decimal amount, Func<Task<bool>> action, bool force = false)
     {
         _moneyLock.EnterWriteLock();
 
