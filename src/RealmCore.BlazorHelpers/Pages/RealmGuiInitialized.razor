@@ -1,8 +1,7 @@
 ﻿@page "/realmGuiInitialized"
-@using Microsoft.AspNetCore.Components.Web;
-@attribute [RenderModeInteractiveServer]
 @inject IRealmService<ILogger> _realmLogger;
 @inherits RealmGuiComponentBase
+@using Microsoft.AspNetCore.Components.Web;
 
 @code {
     protected override void OnAfterRender(bool firstRender)
