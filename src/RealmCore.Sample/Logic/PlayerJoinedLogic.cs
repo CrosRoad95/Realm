@@ -1,6 +1,4 @@
-﻿using SlipeServer.Server;
-
-namespace RealmCore.Sample.Logic;
+﻿namespace RealmCore.Sample.Logic;
 
 internal sealed class PlayerJoinedLogic
 {
@@ -10,7 +8,7 @@ internal sealed class PlayerJoinedLogic
     private readonly Text3dService _text3DService;
     private readonly IGuiSystemService? _guiSystemService;
 
-    public PlayerJoinedLogic(ILogger<PlayerJoinedLogic> logger, INametagsService nametagsService,ChatBox chatBox, Text3dService text3DService, IBrowserGuiService browserGuiService, MtaServer mtaServer, IElementFactory elementFactory, IUsersService usersService, IGuiSystemService? guiSystemService = null)
+    public PlayerJoinedLogic(ILogger<PlayerJoinedLogic> logger, INametagsService nametagsService,ChatBox chatBox, Text3dService text3DService, IBrowserGuiService browserGuiService, MtaServer mtaServer, IUsersService usersService, IGuiSystemService? guiSystemService = null)
     {
         _logger = logger;
         _nametagsService = nametagsService;
@@ -18,7 +16,7 @@ internal sealed class PlayerJoinedLogic
         _text3DService = text3DService;
         _guiSystemService = guiSystemService;
         browserGuiService.Ready += HandleReady;
-        mtaServer.PlayerJoined += HandlePlayerJoined;
+        ((RealmServer)mtaServer).PlayerLoaded += HandlePlayerLoaded;
         usersService.SignedIn += HandleSignedIn;
         usersService.SignedOut += HandleSignedOut;
     }
@@ -87,27 +85,14 @@ internal sealed class PlayerJoinedLogic
         }
     }
 
-    private void HandlePlayerJoined(Player player)
+    private void HandlePlayerLoaded(RealmPlayer player)
     {
-        ShowLoginSequence((RealmPlayer)player);
+        ShowLoginSequence(player);
+        player.Level.LevelChanged += HandleLevelChanged;
     }
 
-    // TODO:
-    //private async void HandleComponentAdded(IComponent component)
-    //{
-    //    try
-    //    {
-    //        if (component is LevelComponent levelComponent)
-    //        {
-    //            levelComponent.LevelChanged += (self, level, up) =>
-    //            {
-    //                _logger.LogInformation("Player leveled up: {level}", level);
-    //            };
-    //        }
-    //    }
-    //    catch (Exception ex)
-    //    {
-    //        _logger.LogError(ex, "Failed to add component.");
-    //    }
-    //}
+    private void HandleLevelChanged(IPlayerLevelService levelService, uint level, bool arg3)
+    {
+        _logger.LogInformation("Player leveled up: {level}", level);
+    }
 }

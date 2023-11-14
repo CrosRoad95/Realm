@@ -1,4 +1,6 @@
-﻿namespace RealmCore.Server.Logic;
+﻿using SlipeServer.Server;
+
+namespace RealmCore.Server.Logic;
 
 internal sealed class PlayersLogic
 {
@@ -106,13 +108,10 @@ internal sealed class PlayersLogic
         if (player.IsDestroyed)
             return;
         player.Disconnected += HandleDisconnected;
-        player.VehicleChanged += HandleVehicleChanged;
+
+        ((RealmServer)_mtaServer).RelayPlayerLoaded(player);
     }
 
-    private void HandleVehicleChanged(Ped sender, ElementChangedEventArgs<Ped, Vehicle?> args)
-    {
-        throw new NotImplementedException();
-    }
 
     private void HandleDisconnected(Player player, PlayerQuitEventArgs playerQuitEventArgs)
     {

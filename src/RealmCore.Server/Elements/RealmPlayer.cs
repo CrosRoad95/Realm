@@ -107,17 +107,6 @@ public class RealmPlayer : Player, IComponents, IDisposable
         BindExecuted += HandleBindExecuted;
         IsNametagShowing = false;
         UpdateFight();
-
-        Controls.StateChanged += Controls_StateChanged;
-    }
-
-    private void Controls_StateChanged(Player sender, PlayerControlsChangedArgs e)
-    {
-        if(e.Control == "jump")
-        {
-            var skldjfklsdfjklsdjflsdljkf = e.NewState;
-            Console.WriteLine("JUMP {0}", e.NewState);
-        }
     }
 
     public T GetRequiredService<T>() where T : notnull

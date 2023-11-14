@@ -2,22 +2,13 @@
 
 internal sealed class StatisticsCounterResourceLogic
 {
-    private readonly IStatisticsCounterService _statisticsCounterService;
     private readonly ILogger<StatisticsCounterResourceLogic> _logger;
 
-    public StatisticsCounterResourceLogic(IStatisticsCounterService statisticsCounterService, ILogger<StatisticsCounterResourceLogic> logger, MtaServer mtaServer)
+    public StatisticsCounterResourceLogic(IStatisticsCounterService statisticsCounterService, ILogger<StatisticsCounterResourceLogic> logger)
     {
-        _statisticsCounterService = statisticsCounterService;
         _logger = logger;
         statisticsCounterService.StatisticsCollected += HandleStatisticsCollected;
         //statisticsCounterService.FpsStatisticsCollected += HandleFpsStatisticsCollected;
-        mtaServer.PlayerJoined += HandlePlayerJoined;
-    }
-
-    private void HandlePlayerJoined(Player plr)
-    {
-        var player = (RealmPlayer)plr;
-        _statisticsCounterService.SetCounterEnabledFor(player, true);
     }
 
     private void HandleFpsStatisticsCollected(Player plr, float minFps, float maxFps, float avgFps)

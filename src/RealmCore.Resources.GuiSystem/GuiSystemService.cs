@@ -34,15 +34,15 @@ internal sealed class GuiSystemService : IGuiSystemService
         ActionExecuted?.Invoke(luaEvent);
     }
 
-    private void EnsurePlayerGuisAreInitialized(Player player)
+    private void EnsurePlayerGuiAreInitialized(Player player)
     {
         _playersGuis.GetOrAdd(player, x => new());
         _playersLocks.GetOrAdd(player, x => new());
     }
 
-    public bool OpenGui(Player player, string gui, bool cursorless, LuaValue? arg1 = null)
+    public bool OpenGui(Player player, string gui, bool cursorLess, LuaValue? arg1 = null)
     {
-        EnsurePlayerGuisAreInitialized(player);
+        EnsurePlayerGuiAreInitialized(player);
 
         lock (_playersLocks[player])
         {
@@ -50,14 +50,14 @@ internal sealed class GuiSystemService : IGuiSystemService
                 return false;
 
             _playersGuis[player].Add(gui);
-            player.TriggerLuaEvent("internalUiOpenGui", player, gui, cursorless, arg1 ?? new LuaValue());
+            player.TriggerLuaEvent("internalUiOpenGui", player, gui, cursorLess, arg1 ?? new LuaValue());
         }
         return true;
     }
 
     public bool CloseGui(Player player, string gui, bool cursorless)
     {
-        EnsurePlayerGuisAreInitialized(player);
+        EnsurePlayerGuiAreInitialized(player);
 
         lock (_playersLocks[player])
         {
@@ -72,7 +72,7 @@ internal sealed class GuiSystemService : IGuiSystemService
 
     public void CloseAllGuis(Player player)
     {
-        EnsurePlayerGuisAreInitialized(player);
+        EnsurePlayerGuiAreInitialized(player);
 
         lock (_playersLocks[player])
         {
@@ -89,7 +89,7 @@ internal sealed class GuiSystemService : IGuiSystemService
 
     public void SendFormResponse(Player player, string id, string name, params object[] values)
     {
-        EnsurePlayerGuisAreInitialized(player);
+        EnsurePlayerGuiAreInitialized(player);
 
         var luaValues = values.Select(_luaValueMapper.Map).ToArray();
         player.TriggerLuaEvent("internalSubmitFormResponse", player, id, name, luaValues);
@@ -97,7 +97,7 @@ internal sealed class GuiSystemService : IGuiSystemService
 
     public void SendStateChanged(Player player, string guiName, Dictionary<LuaValue, LuaValue> changes)
     {
-        EnsurePlayerGuisAreInitialized(player);
+        EnsurePlayerGuiAreInitialized(player);
 
         player.TriggerLuaEvent("internalUiStateChanged", player, guiName, new LuaValue(changes));
     }

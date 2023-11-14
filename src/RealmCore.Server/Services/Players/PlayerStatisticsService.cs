@@ -26,6 +26,7 @@ internal class PlayerStatisticsService : IPlayerStatisticsService
         playerUserService.SignedIn += HandleSignedIn;
         playerUserService.SignedOut += HandleSignedOut;
         _playerUserService = playerUserService;
+        Player.GetRequiredService<IStatisticsCounterService>().SetCounterEnabledFor(Player, true);
     }
 
     private void HandleSignedIn(IPlayerUserService playerUserService, RealmPlayer _)
