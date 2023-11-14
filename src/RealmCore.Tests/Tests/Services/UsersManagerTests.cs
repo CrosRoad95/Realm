@@ -16,7 +16,7 @@ public class UsersManagerTests
 
         #region Act
         var userId = await usersService.SignUp(login, password);
-        var user = await userManager.GetUserByLogin(login) ?? throw new Exception("User not found");
+        var user = await userManager.GetUserByUserName(login) ?? throw new Exception("User not found");
 
         var validPassword = await userManager.CheckPasswordAsync(user, password);
         var signedIn = await usersService.SignIn(player, user);
@@ -52,7 +52,7 @@ public class UsersManagerTests
         };
 
         var userId = await usersService.SignUp(login, password);
-        var user = await userManager.GetUserByLogin(login) ?? throw new Exception("User not found");
+        var user = await userManager.GetUserByUserName(login) ?? throw new Exception("User not found");
 
         var signedIn = await usersService.SignIn(player, user);
         #endregion

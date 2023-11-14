@@ -1,6 +1,4 @@
 ﻿using RealmCore.Resources.Overlay;
-using RealmCore.Server.Interfaces.Players;
-using SlipeServer.Server;
 
 namespace RealmCore.Sample.Logic;
 

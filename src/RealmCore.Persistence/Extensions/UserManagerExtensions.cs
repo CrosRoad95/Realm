@@ -89,12 +89,12 @@ public static class UserManagerExtensions
         return await query.FirstOrDefaultAsync(cancellationToken);
     }
 
-    public static async Task<UserData?> GetUserByLogin(this UserManager<UserData> userManager, string login, CancellationToken cancellationToken = default)
+    public static async Task<UserData?> GetUserByUserName(this UserManager<UserData> userManager, string userName, CancellationToken cancellationToken = default)
     {
         var query = userManager.Users
             .TagWithSource(nameof(UserManagerExtensions))
             .IncludeAll()
-            .Where(u => u.UserName == login);
+            .Where(u => u.UserName == userName);
         return await query.FirstOrDefaultAsync(cancellationToken);
     }
 
@@ -130,6 +130,7 @@ public static class UserManagerExtensions
     {
         var query = userManager.Users
             .AsNoTracking()
+            .TagWithSource(nameof(UserManagerExtensions))
             .Where(x => x.UserName == userName);
         return await query.AnyAsync(cancellationToken);
     }

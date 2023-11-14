@@ -2,7 +2,7 @@
 
 namespace RealmCore.Persistence.Data;
 
-public sealed class UserData : IdentityUser<int>
+public class UserData : IdentityUser<int>
 {
     public string? Nick { get; set; }
     public DateTime? RegisteredDateTime { get; set; }
@@ -40,7 +40,7 @@ public sealed class UserData : IdentityUser<int>
     public ICollection<UserInventoryData> UserInventories { get; set; } = new List<UserInventoryData>();
     public ICollection<RatingData> Ratings { get; set; } = new List<RatingData>();
     public ICollection<OpinionData> Opinions { get; set; } = new List<OpinionData>();
-    public ICollection<UserEventData> Events { get; set; } = new List<UserEventData>();
+    public virtual ICollection<UserEventData> Events { get; set; } = new List<UserEventData>();
     public ICollection<UserNotificationData> Notifications { get; set; } = new List<UserNotificationData>();
     public ICollection<UserLoginHistoryData> LoginHistory { get; set; } = new List<UserLoginHistoryData>();
     public ICollection<UserMoneyHistoryData> MoneyHistory { get; set; } = new List<UserMoneyHistoryData>();

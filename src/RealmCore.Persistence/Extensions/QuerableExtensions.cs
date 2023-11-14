@@ -20,7 +20,6 @@ public static class QuerableExtensions
     public static IQueryable<UserData> IncludeAll(this IQueryable<UserData> query)
     {
         return query
-            .AsSplitQuery()
             .Include(x => x.Licenses)
             .Include(x => x.JobUpgrades)
             .Include(x => x.JobStatistics)
@@ -33,9 +32,9 @@ public static class QuerableExtensions
             .Include(x => x.DiscordIntegration)
             .Include(x => x.Upgrades)
             .Include(x => x.Settings)
-            .Include(x => x.Events)
+            .Include(x => x.Events.OrderByDescending(x => x.Id).Take(10))
             .Include(x => x.WhitelistedSerials)
-            .Include(x => x.Bans)
+            .Include(x => x.Bans.OrderByDescending(x => x.Id).Take(10))
             .Include(x => x.Inventories)
             .ThenInclude(x => x!.InventoryItems);
     }

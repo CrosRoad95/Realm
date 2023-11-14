@@ -6,8 +6,6 @@ using RealmCore.Server.Components.Vehicles.Access;
 using RealmCore.Resources.Overlay;
 using RealmCore.Resources.Assets;
 using RealmCore.Sample.Components.Vehicles;
-using RealmCore.Server.Interfaces.Players;
-using RealmCore.Sample.Components.Gui.Blazor;
 
 namespace RealmCore.Sample.Logic;
 
@@ -1592,6 +1590,12 @@ internal sealed class CommandsLogic
         {
             player.Events.Add(1, args.ReadAllAsString());
             _chatBox.OutputTo(player, "Added");
+        });
+
+        _commandService.AddAsyncCommandHandler("fetchmoreevents", async (player, args, token) =>
+        {
+            var fetched = await player.Events.FetchMore();
+            _chatBox.OutputTo(player, $"fetched {fetched.Count} more events");
         });
     }
 

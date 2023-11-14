@@ -4,34 +4,50 @@ namespace RealmCore.Server.Services.Players;
 
 internal class PlayerBansService : IPlayerBansService
 {
+    private readonly SemaphoreSlim _lock = new(1);
     private ICollection<BanData> _bans = [];
-    private readonly object _lock = new();
     private readonly IPlayerUserService _playerUserService;
     private readonly IDateTimeProvider _dateTimeProvider;
+    private readonly IDb _db;
 
     public event Action<IPlayerBansService, BanDTO>? Added;
     public event Action<IPlayerBansService, BanDTO>? Removed;
 
     public RealmPlayer Player { get; }
-    public PlayerBansService(PlayerContext playerContext, IPlayerUserService playerUserService, IDateTimeProvider dateTimeProvider)
+    public PlayerBansService(PlayerContext playerContext, IPlayerUserService playerUserService, IDateTimeProvider dateTimeProvider, IDb db)
     {
         Player = playerContext.Player;
         playerUserService.SignedIn += HandleSignedIn;
         playerUserService.SignedOut += HandleSignedOut;
         _playerUserService = playerUserService;
         _dateTimeProvider = dateTimeProvider;
+        _db = db;
     }
 
     private void HandleSignedIn(IPlayerUserService playerUserService, RealmPlayer _)
     {
-        lock (_lock)
+        _lock.Wait();
+        try
+        {
             _bans = playerUserService.User.Bans;
+        }
+        finally
+        {
+            _lock.Release();
+        }
     }
 
     private void HandleSignedOut(IPlayerUserService playerUserService, RealmPlayer _)
     {
-        lock (_lock)
+        _lock.Wait();
+        try
+        {
             _bans = [];
+        }
+        finally
+        {
+            _lock.Release();
+        }
     }
 
     public void Add(int type, DateTime? until = null, string? reason = null, string? responsible = null)
@@ -46,7 +62,8 @@ internal class PlayerBansService : IPlayerBansService
             Active = true
         };
 
-        lock (_lock)
+        _lock.Wait();
+        try
         {
             var ban = GetBanByType(type);
             if (ban != null)
@@ -54,20 +71,54 @@ internal class PlayerBansService : IPlayerBansService
 
             _bans.Add(banData);
         }
+        finally
+        {
+            _lock.Release();
+        }
 
         _playerUserService.IncreaseVersion();
         Added?.Invoke(this, BanDTO.Map(banData));
+    }
+
+    public async Task<List<BanDTO>> FetchMore(int count = 10, CancellationToken cancellationToken = default)
+    {
+        var last = _bans.LastOrDefault();
+        if (last == null)
+            return [];
+
+
+        await _lock.WaitAsync(cancellationToken);
+        try
+        {
+            var query = _db.Bans
+                .Where(x => x.UserId == Player.UserId && x.Id < last.Id)
+                .OrderByDescending(x => x.Id)
+                .Take(count);
+
+            var results = await query.ToListAsync(cancellationToken);
+
+            return results.Select(BanDTO.Map).ToList();
+        }
+        finally
+        {
+            _lock.Release();
+        }
     }
 
     public bool RemoveByType(int type)
     {
         BanData? ban;
         bool removed = false;
-        lock (_lock)
+        _lock.Wait();
+        try
         {
             ban = GetBanByType(type);
             if (ban != null)
                 removed = _bans.Remove(ban);
+        }
+        finally
+        {
+            _lock.Release();
         }
 
         if (removed && ban != null)
@@ -83,11 +134,16 @@ internal class PlayerBansService : IPlayerBansService
     {
         BanData? ban;
         bool removed = false;
-        lock (_lock)
+        _lock.Wait();
+        try
         {
             ban = _bans.FirstOrDefault(x => x.Id == banId && x.Active);
             if (ban != null)
                 removed = _bans.Remove(ban);
+        }
+        finally
+        {
+            _lock.Release();
         }
 
         if (removed && ban != null)
@@ -102,7 +158,8 @@ internal class PlayerBansService : IPlayerBansService
     public bool IsBanned(int type)
     {
         var now = _dateTimeProvider.Now;
-        lock (_lock)
+        _lock.Wait();
+        try
         {
             foreach (var ban in _bans)
             {
@@ -111,14 +168,19 @@ internal class PlayerBansService : IPlayerBansService
                     return true;
                 }
             }
+            return false;
         }
-        return false;
+        finally
+        {
+            _lock.Release();
+        }
     }
 
     public BanDTO? TryGet(int type)
     {
         var now = _dateTimeProvider.Now;
-        lock (_lock)
+        _lock.Wait();
+        try
         {
             foreach (var banDTO in _bans)
             {
@@ -127,8 +189,12 @@ internal class PlayerBansService : IPlayerBansService
                     return BanDTO.Map(banDTO);
                 }
             }
+            return null;
         }
-        return null;
+        finally
+        {
+            _lock.Release();
+        }
     }
 
     private BanData? GetBanByType(int type)

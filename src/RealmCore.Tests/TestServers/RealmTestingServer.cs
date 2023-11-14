@@ -55,6 +55,7 @@ internal class RealmTestingServer : TestingServer<RealmTestingPlayer>
 {
     public TestDateTimeProvider TestDateTimeProvider => (TestDateTimeProvider)GetRequiredService<IDateTimeProvider>();
     public TestDebounceFactory TestDebounceFactory => (TestDebounceFactory)GetRequiredService<IDebounceFactory>();
+    private static string _userName = $"userName{Guid.NewGuid()}";
 
     protected override IClient CreateClient(uint binaryAddress, INetWrapper netWrapper)
     {
@@ -150,13 +151,17 @@ internal class RealmTestingServer : TestingServer<RealmTestingPlayer>
         var userManager = GetRequiredService<UserManager<UserData>>();
         var signInManager = GetRequiredService<SignInManager<UserData>>();
 
-        var user = new UserData
+        var user = await userManager.GetUserByUserName(_userName);
+        if(user == null)
         {
-            UserName = $"userName{Guid.NewGuid()}",
-            Upgrades = new List<UserUpgradeData>(),
-        };
-        await userManager.CreateAsync(user);
-        await userManager.AddClaimsAsync(user, claims);
+            user = new UserData
+            {
+                UserName = _userName,
+                Upgrades = new List<UserUpgradeData>(),
+            };
+            await userManager.CreateAsync(user);
+            await userManager.AddClaimsAsync(user, claims);
+        }
 
         var claimsPrincipal = await signInManager.CreateUserPrincipalAsync(user);
 

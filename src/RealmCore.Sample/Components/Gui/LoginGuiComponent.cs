@@ -32,7 +32,7 @@ public sealed class LoginGuiComponent : DxGuiComponent
                     return;
                 }
 
-                var user = await _userManager.GetUserByLogin(loginData.Login);
+                var user = await _userManager.GetUserByUserName(loginData.Login);
 
                 if (user == null)
                 {

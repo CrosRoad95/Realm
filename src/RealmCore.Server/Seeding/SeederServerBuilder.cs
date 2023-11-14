@@ -146,10 +146,7 @@ internal sealed class SeederServerBuilder
         foreach (var pair in users)
         {
             var userSeedData = pair.Value;
-            var user = await _userManager.Users
-                .IncludeAll()
-                .Where(x => x.UserName == pair.Key)
-                .FirstOrDefaultAsync();
+            var user = await _userManager.GetUserByUserName(pair.Key);
 
             if (user == null)
             {

@@ -214,6 +214,7 @@ public sealed class RealmCommandService
         }
         catch (Exception ex)
         {
+            _chatBox.OutputTo(player, "Wystąpił nieznany błąd podczas wykonywania komendy. Jeżeli się powtórzy zgłoś się do administracji", Color.Red);
             _logger.LogError(ex, "Exception thrown while executing command {command} with arguments {commandArguments}", command, arguments);
         }
         finally

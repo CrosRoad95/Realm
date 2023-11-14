@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Web;
 using RealmCore.Server.Components.Players.Abstractions;
 using System.Security.Claims;
 

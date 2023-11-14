@@ -1,6 +1,4 @@
-﻿using SlipeServer.Server;
-
-namespace RealmCore.Server.Logic;
+﻿namespace RealmCore.Server.Logic;
 
 internal sealed class PlayersLogic
 {

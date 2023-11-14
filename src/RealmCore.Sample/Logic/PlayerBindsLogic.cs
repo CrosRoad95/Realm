@@ -1,6 +1,5 @@
 ﻿using RealmCore.Server.DTOs;
 using RealmCore.Server.Helpers;
-using RealmCore.Server.Interfaces.Players;
 
 namespace RealmCore.Sample.Logic;
 
