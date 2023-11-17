@@ -46,11 +46,31 @@ public sealed class RealmCommandService
     public List<string> CommandNames => _commands.Keys.Concat(_commands.Keys).ToList();
     public int Count => _commands.Count;
 
-    public RealmCommandService(ILogger<RealmCommandService> logger, ChatBox chatBox, MtaServer mtaServer)
+    public RealmCommandService(ILogger<RealmCommandService> logger, ChatBox chatBox, MtaServer mtaServer, IEnumerable<IInGameCommand> ingameCommands)
     {
         _logger = logger;
         _chatBox = chatBox;
         mtaServer.PlayerJoined += HandlePlayerJoined;
+
+        foreach (var inGameCommand in ingameCommands)
+        {
+            var type = inGameCommand.GetType();
+            var commandNameAttribute = type.GetCustomAttribute<CommandNameAttribute>();
+            if (commandNameAttribute == null)
+            {
+                logger.LogWarning($"Command class {type.Name} has no CommandName attribute");
+                continue;
+            }
+
+            var commandName = commandNameAttribute.Name.ToLower();
+            AddAsyncCommandHandler(commandName, async (player, args, token) =>
+            {
+                if (player.GetRequiredService(type) is not IInGameCommand inGameCommand)
+                    throw new InvalidOperationException();
+
+                await inGameCommand.Handle(player, args, token);
+            });
+        }
     }
 
     private void HandlePlayerJoined(Player player)

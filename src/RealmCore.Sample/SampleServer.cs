@@ -37,8 +37,6 @@ public class SampleServer : RealmServer
         serverBuilder.AddBrowserResource();
         //serverBuilder.AddBrowserResource("../../../Server/BlazorGui/wwwroot", BrowserMode.Remote);
 
-        serverBuilder.AddLogic<DefaultCommandsLogic>();
-
         serverBuilder.AddLogic<PlayerJoinedLogic>();
         serverBuilder.AddLogic<SamplePickupsLogic>();
         serverBuilder.AddLogic<PlayerBindsLogic>();

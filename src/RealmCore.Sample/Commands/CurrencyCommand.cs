@@ -14,7 +14,7 @@ public sealed class CurrencyCommand : IInGameCommand
         _chatBox = chatBox;
     }
 
-    public Task Handle(RealmPlayer player, CommandArguments args)
+    public Task Handle(RealmPlayer player, CommandArguments args, CancellationToken cancellationToken)
     {
         var money = 123.456m;
         _chatBox.OutputTo(player, money.FormatMoney(_gameplayOptions.Value.CurrencyCulture));

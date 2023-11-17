@@ -12,7 +12,7 @@ public sealed class AddPointsCommand : IInGameCommand
         _chatBox = chatBox;
     }
 
-    public Task Handle(RealmPlayer player, CommandArguments args)
+    public Task Handle(RealmPlayer player, CommandArguments args, CancellationToken cancellationToken)
     {
         player.JobStatistics.AddPoints(1, 1);
         _chatBox.OutputTo(player, "added 1 point to job id 1");

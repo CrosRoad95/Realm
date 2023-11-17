@@ -12,7 +12,7 @@ public sealed class GiveLicenseCommand : IInGameCommand
         _chatBox = chatBox;
     }
 
-    public Task Handle(RealmPlayer player, CommandArguments args)
+    public Task Handle(RealmPlayer player, CommandArguments args, CancellationToken cancellationToken)
     {
         var license = args.ReadInt();
         if (player.Licenses.TryAdd(license))

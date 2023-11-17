@@ -14,7 +14,7 @@ public sealed class CreateGroupCommand : IInGameCommand
         _chatBox = chatBox;
     }
 
-    public async Task Handle(RealmPlayer player, CommandArguments args)
+    public async Task Handle(RealmPlayer player, CommandArguments args, CancellationToken cancellationToken)
     {
         var name = args.ReadWordOrDefault("default");
         try

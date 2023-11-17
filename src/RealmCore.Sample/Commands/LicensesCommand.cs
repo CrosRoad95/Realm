@@ -14,7 +14,7 @@ public sealed class LicensesCommand : IInGameCommand
         _dateTimeProvider = dateTimeProvider;
     }
 
-    public Task Handle(RealmPlayer player, CommandArguments args)
+    public Task Handle(RealmPlayer player, CommandArguments args, CancellationToken cancellationToken)
     {
         _chatBox.OutputTo(player, $"Licenses");
         foreach (var license in player.Licenses)

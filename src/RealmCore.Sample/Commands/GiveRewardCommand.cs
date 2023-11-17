@@ -15,7 +15,7 @@ public sealed class GiveRewardCommand : IInGameCommand
         _chatBox = chatBox;
     }
 
-    public async Task Handle(RealmPlayer player, CommandArguments args)
+    public async Task Handle(RealmPlayer player, CommandArguments args, CancellationToken cancellationToken)
     {
         if (await _rewardService.TryGiveReward(player, 1))
         {

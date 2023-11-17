@@ -10,7 +10,7 @@ public sealed class GPCommand : IInGameCommand
         _logger = logger;
     }
 
-    public Task Handle(RealmPlayer player, CommandArguments args)
+    public Task Handle(RealmPlayer player, CommandArguments args, CancellationToken cancellationToken)
     {
         var pos = player.Position;
         var rot = player.Rotation;

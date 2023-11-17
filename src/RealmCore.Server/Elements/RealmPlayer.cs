@@ -114,6 +114,11 @@ public class RealmPlayer : Player, IComponents, IDisposable
         return _serviceProvider.GetRequiredService<T>();
     }
 
+    public object GetRequiredService(Type type)
+    {
+        return _serviceProvider.GetRequiredService(type);
+    }
+
     public TComponent GetRequiredComponent<TComponent>() where TComponent : IComponent
     {
         return Components.GetRequiredComponent<TComponent>();
