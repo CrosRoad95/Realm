@@ -16,7 +16,7 @@ internal sealed class GroupService : IGroupService
             id = groupData.Id,
             name = groupData.Name,
             shortcut = groupData.Shortcut,
-            kind = (GroupKind)groupData.Kind,
+            kind = (GroupKind)(groupData.Kind ?? 0),
             members = groupData.Members.Select(x => new GroupMember
             {
                 userId = x.UserId,

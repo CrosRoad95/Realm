@@ -1,11 +1,4 @@
-﻿using RealmCore.Server;
-using RealmCore.Server.Components.Players.Abstractions;
-using RealmCore.Server.Elements;
-using RealmCore.Server.Interfaces.Players;
-using RealmCore.Server.Services;
-using System.Security.Claims;
-
-namespace RealmCore.BlazorHelpers;
+﻿namespace RealmCore.BlazorHelpers;
 
 public class CurrentPlayerContext : IDisposable
 {

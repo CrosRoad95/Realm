@@ -70,6 +70,17 @@ internal sealed class PlayerUserService : IPlayerUserService, IDisposable
         Interlocked.Increment(ref _version);
     }
 
+    public int GetVersion() => _version;
+    public bool TryFlushVersion(int minimalVersion)
+    {
+        if(minimalVersion >= _version)
+        {
+            Interlocked.Exchange(ref _version, 0);
+            return true;
+        }
+        return false;
+    }
+
     public void AddAuthorizedPolicy(string policy, bool authorized)
     {
         lock (_lock)

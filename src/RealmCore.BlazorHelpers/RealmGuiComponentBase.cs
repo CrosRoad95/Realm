@@ -1,6 +1,4 @@
 ﻿using Microsoft.AspNetCore.Components;
-using RealmCore.Server.Components.Players.Abstractions;
-using System.Security.Claims;
 
 namespace RealmCore.BlazorHelpers;
 

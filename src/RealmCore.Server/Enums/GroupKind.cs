@@ -2,6 +2,7 @@
 
 public enum GroupKind : byte
 {
+    Unknown,
     Regular,
     Criminal,
 }

@@ -3,7 +3,7 @@
 internal sealed class SpawnMarkersService : ISpawnMarkersService
 {
     private readonly object _lock = new();
-    private readonly List<SpawnMarker> _spawnMarkers = new();
+    private readonly List<SpawnMarker> _spawnMarkers = [];
 
     public event Action<SpawnMarker>? SpawnMarkerAdded;
 

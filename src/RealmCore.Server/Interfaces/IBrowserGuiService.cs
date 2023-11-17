@@ -1,4 +1,4 @@
-﻿namespace RealmCore.Server.Services;
+﻿namespace RealmCore.Server.Interfaces;
 
 public interface IBrowserGuiService
 {

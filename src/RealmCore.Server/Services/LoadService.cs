@@ -42,8 +42,7 @@ internal sealed class LoadService : ILoadService
         {
             try
             {
-                //await Task.Delay(200);
-                _vehiclesService.Spawn(vehicleData);
+                await _vehiclesService.Spawn(vehicleData);
                 i++;
             }
             catch (Exception ex)

@@ -35,4 +35,6 @@ public interface IPlayerUserService : IPlayerService
     bool TryRemoveRole(string role);
     void UpdateLastNewsRead();
     void IncreaseVersion();
+    int GetVersion();
+    bool TryFlushVersion(int minimalVersion);
 }
