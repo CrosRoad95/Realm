@@ -1,6 +1,6 @@
-﻿namespace RealmCore.Tests.Tests.Components;
+﻿namespace RealmCore.Tests.Tests.PlayerServices;
 
-public class AchievementsComponentTests
+public class PlayerAchievementsServiceTests
 {
     [Fact]
     public void TestIfAchievementProgressCountsCorrectly()
@@ -12,7 +12,7 @@ public class AchievementsComponentTests
         var progressedTimes = 0;
         var progressedAchievementId = -1;
         var progressedAchievement = -1.0f;
-        achievements.Progressed += (component, achievementId, progress) =>
+        achievements.Progressed += (that, achievementId, progress) =>
         {
             progressedAchievementId = achievementId;
             progressedAchievement = progress;
@@ -35,7 +35,7 @@ public class AchievementsComponentTests
         var achievements = player.Achievements;
 
         var unlockedAchievement = -1;
-        achievements.Unlocked += (component, achievementId) =>
+        achievements.Unlocked += (that, achievementId) =>
         {
             unlockedAchievement = achievementId;
         };

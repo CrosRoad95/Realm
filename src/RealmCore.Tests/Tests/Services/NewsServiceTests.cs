@@ -1,6 +1,4 @@
-﻿using RealmCore.Persistence.DTOs;
-
-namespace RealmCore.Tests.Tests.Services;
+﻿namespace RealmCore.Tests.Tests.Services;
 
 public class NewsServiceTests
 {

@@ -1,6 +1,6 @@
 ﻿namespace RealmCore.Server.Abstractions;
 
-public class PlayerLogic
+public abstract class PlayerLogic
 {
     public PlayerLogic(MtaServer mtaServer)
     {
@@ -11,7 +11,14 @@ public class PlayerLogic
     {
         var player = (RealmPlayer)plr;
         player.User.SignedIn += HandleSignedIn;
+        player.Disconnected += HandleDisconnected;
     }
 
-    protected virtual void HandleSignedIn(IPlayerUserService userService, RealmPlayer player) { }
+    private void HandleDisconnected(Player plr, PlayerQuitEventArgs e)
+    {
+        var player = (RealmPlayer)plr;
+        player.User.SignedIn -= HandleSignedIn;
+    }
+
+    protected abstract void HandleSignedIn(IPlayerUserService userService, RealmPlayer player);
 }

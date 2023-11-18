@@ -71,6 +71,7 @@ internal sealed class PlayerUserService : IPlayerUserService, IDisposable
     }
 
     public int GetVersion() => _version;
+
     public bool TryFlushVersion(int minimalVersion)
     {
         if(minimalVersion >= _version)

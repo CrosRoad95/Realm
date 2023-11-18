@@ -40,5 +40,5 @@ global using System.Security.Claims;
 global using RealmCore.Server.Components;
 global using SlipeServer.Server.Elements;
 global using RealmCore.Server.Attributes;
-global using RealmCore.Server.Interfaces.Players;
 global using RealmCore.Server.Scopes;
+global using RealmCore.Persistence.DTOs;

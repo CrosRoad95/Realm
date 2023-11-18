@@ -4,7 +4,7 @@ using SlipeServer.Server.Enums;
 namespace RealmCore.Tests.Tests.Components;
 
 [Collection("Sequential")]
-public class PlayerElementComponentTests
+public class RealmPlayerTests
 {
     [Fact]
     public async Task TestAsyncBindsCooldown()

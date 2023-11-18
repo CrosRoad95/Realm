@@ -13,7 +13,6 @@ internal sealed class ScopedCollisionShapeBehaviour
     private void HandlePlayerJoined(Player plr)
     {
         var player = (RealmPlayer)plr;
-        var scopedElementFactory = player.GetRequiredService<IScopedElementFactory>();
 
         void handleElementCreated(Element element)
         {
@@ -51,7 +50,7 @@ internal sealed class ScopedCollisionShapeBehaviour
 
         void handlePositionChanged(Element sender, ElementChangedEventArgs<Vector3> args)
         {
-            foreach (var collisionDetection in scopedElementFactory.CreatedCollisionDetectionElements.ToList())
+            foreach (var collisionDetection in player.ElementFactory.CreatedCollisionDetectionElements.ToList())
             {
                 collisionDetection.CheckElementWithin(player);
             }
@@ -62,7 +61,7 @@ internal sealed class ScopedCollisionShapeBehaviour
             player.Disconnected -= handleDisconnected;
             player.PositionChanged -= handlePositionChanged;
         }
-        scopedElementFactory.ElementCreated += handleElementCreated;
+        player.ElementFactory.ElementCreated += handleElementCreated;
         player.Disconnected += handleDisconnected;
         player.PositionChanged += handlePositionChanged;
     }

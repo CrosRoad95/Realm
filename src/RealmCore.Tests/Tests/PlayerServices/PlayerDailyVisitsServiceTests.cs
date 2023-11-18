@@ -1,6 +1,6 @@
-﻿namespace RealmCore.Tests.Tests.Components;
+﻿namespace RealmCore.Tests.Tests.PlayerServices;
 
-public class DailyVisitsCounterComponentTests
+public class PlayerDailyVisitsServiceTests
 {
     [InlineData(true)]
     [InlineData(false)]

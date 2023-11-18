@@ -25,7 +25,7 @@ public class CurrentPlayerContext : IDisposable
             if(BrowserGuiService.TryGetPlayerByKey(keyClaim.Value, out var player) && player != null)
             {
                 _player = player;
-                _browserComponent = player.GetRequiredService<IPlayerBrowserService>();
+                _browserComponent = player.Browser;
                 _browserComponent.PathChanged += HandlePathChanged;
             }
         }

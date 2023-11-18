@@ -49,7 +49,7 @@ internal sealed class PlayerBindsLogic
 
         player.SetBind("F2", player =>
         {
-            var browserService = player.GetRequiredService<IPlayerBrowserService>();
+            var browserService = player.Browser;
             if (browserService.Visible)
             {
                 browserService.Close();
@@ -62,7 +62,7 @@ internal sealed class PlayerBindsLogic
 
         player.SetBind("F3", player =>
         {
-            var browserService = player.GetRequiredService<IPlayerBrowserService>();
+            var browserService = player.Browser;
             if(browserService.Visible)
             {
                 browserService.Close();
@@ -73,7 +73,7 @@ internal sealed class PlayerBindsLogic
 
         player.SetBind("F4", player =>
         {
-            var browserService = player.GetRequiredService<IPlayerBrowserService>();
+            var browserService = player.Browser;
             if (browserService.Visible)
             {
                 browserService.Close();

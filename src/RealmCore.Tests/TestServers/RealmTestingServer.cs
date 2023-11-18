@@ -172,6 +172,6 @@ internal class RealmTestingServer : TestingServer<RealmTestingPlayer>
                     claimsIdentity.AddClaim(new Claim(ClaimTypes.Role, role));
             }
 
-        player.GetRequiredService<IPlayerUserService>().SignIn(user, claimsPrincipal);
+        player.User.SignIn(user, claimsPrincipal);
     }
 }

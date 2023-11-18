@@ -1,6 +1,6 @@
-﻿namespace RealmCore.Tests.Tests.Components;
+﻿namespace RealmCore.Tests.Tests.PlayerServices;
 
-public class playerTests
+public class PlayerMoneyServiceTests
 {
     [InlineData(0, 0, 1)]
     [InlineData(1, 1, 1)]
@@ -14,11 +14,11 @@ public class playerTests
 
         decimal moneyAdded = 0;
         decimal moneyTaken = 0;
-        player.Money.Added += (player, amount) =>
+        player.Money.Added += (that, amount) =>
         {
             moneyAdded += amount;
         };
-        player.Money.Taken += (player, amount) =>
+        player.Money.Taken += (that, amount) =>
         {
             moneyTaken += amount;
         };
@@ -224,7 +224,7 @@ public class playerTests
         var realmTestingServer = new RealmTestingServer();
         var player = realmTestingServer.CreatePlayer();
         player.Money.SetMoneyInternal(1000000);
-        
+
         player.Money.Amount = 10;
         player.Money.TryTakeMoney(5, () =>
         {

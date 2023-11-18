@@ -1,6 +1,6 @@
 ﻿using System.Drawing;
 
-namespace RealmCore.Tests.Tests.Components;
+namespace RealmCore.Tests.Tests;
 
 public class CollisionDetectionTests
 {

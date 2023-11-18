@@ -1,4 +1,4 @@
-﻿namespace RealmCore.Tests.Tests.Components;
+﻿namespace RealmCore.Tests.Tests.PlayerServices;
 
 public class PlayerAFKServiceTests
 {
@@ -7,13 +7,13 @@ public class PlayerAFKServiceTests
     {
         var realmTestingServer = new RealmTestingServer(new TestConfigurationProvider());
         var player = realmTestingServer.CreatePlayer();
-        var afkService = player.GetRequiredService<IPlayerAFKService>();
+        var afkService = player.AFK;
         var dateTimeProvider = realmTestingServer.TestDateTimeProvider;
 
         bool _isAfk = false;
         TimeSpan _elapsed = TimeSpan.Zero;
 
-        afkService.StateChanged += (IPlayerAFKService _, bool isAfk, TimeSpan elapsed) =>
+        afkService.StateChanged += (_, isAfk, elapsed) =>
         {
             _isAfk = isAfk;
             _elapsed = elapsed;

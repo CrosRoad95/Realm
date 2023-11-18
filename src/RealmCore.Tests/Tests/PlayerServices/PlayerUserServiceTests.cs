@@ -1,6 +1,6 @@
-﻿namespace RealmCore.Tests.Tests.Components;
+﻿namespace RealmCore.Tests.Tests.PlayerServices;
 
-public class UserComponentTests
+public class PlayerUserServiceTests
 {
     [InlineData(new string[] { }, false)]
     [InlineData(new string[] { "Admin" }, true)]

@@ -5,8 +5,6 @@ public sealed class Components : IDisposable
 {
     private bool _disposed = false;
 
-    public string Id { get; } = Guid.NewGuid().ToString();
-
     private readonly ReaderWriterLockSlim _componentsLock = new(LockRecursionPolicy.SupportsRecursion);
     private readonly List<IComponent> _components = new();
     private readonly IServiceProvider _serviceProvider;
@@ -99,7 +97,7 @@ public sealed class Components : IDisposable
             if (component is IComponentLifecycle componentLifecycle)
                 componentLifecycle.Attach();
         }
-        catch (Exception ex)
+        catch (Exception)
         {
             component.Element = null!;
             _components.Remove(component);
@@ -175,16 +173,6 @@ public sealed class Components : IDisposable
         }
     }
 
-    internal bool InternalHasComponent<TComponent>(TComponent component) where TComponent : IComponent
-    {
-        return _components.Contains(component);
-    }
-
-    internal bool InternalHasComponent<TComponent>() where TComponent : IComponent
-    {
-        return _components.OfType<TComponent>().Any();
-    }
-
     public bool HasComponent<TComponent>() where TComponent : IComponent
     {
         ThrowIfDisposed();
@@ -192,7 +180,7 @@ public sealed class Components : IDisposable
         _componentsLock.EnterReadLock();
         try
         {
-            return InternalHasComponent<TComponent>();
+            return _components.OfType<TComponent>().Any();
         }
         finally
         {
@@ -240,18 +228,16 @@ public sealed class Components : IDisposable
     public bool HasComponent(Type type)
     {
         ThrowIfDisposed();
-        bool has;
 
         _componentsLock.EnterReadLock();
         try
         {
-            has = _components.Where(x => x.GetType() == type).Any();
+            return _components.Where(x => x.GetType() == type).Any();
         }
         finally
         {
             _componentsLock.ExitReadLock();
         }
-        return has;
     }
 
     public void DetachComponent<TComponent>(TComponent component) where TComponent : IComponent
@@ -309,10 +295,6 @@ public sealed class Components : IDisposable
                 return true;
             }
         }
-        catch (Exception)
-        {
-            throw;
-        }
         finally
         {
             _componentsLock.ExitWriteLock();
@@ -330,27 +312,18 @@ public sealed class Components : IDisposable
             var component = InternalGetComponent<TComponent>();
             if (component == null)
                 return false;
-            try
+            if (InternalTryDetachComponent(component))
             {
-                if (InternalTryDetachComponent(component))
-                {
-                    if (component is IComponentLifecycle componentLifecycle)
-                        componentLifecycle.Dispose();
-                    return true;
-                }
-            }
-            catch (ObjectDisposedException)
-            { }
-            catch (Exception)
-            {
-                throw;
+                if (component is IComponentLifecycle componentLifecycle)
+                    componentLifecycle.Dispose();
+                return true;
             }
         }
         finally
         {
             _componentsLock.ExitWriteLock();
         }
-        return true;
+        return false;
     }
 
     public void DestroyComponent<TComponent>() where TComponent : IComponent

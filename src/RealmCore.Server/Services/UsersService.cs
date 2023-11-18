@@ -82,7 +82,7 @@ internal sealed class UsersService : IUsersService
         }
     }
 
-    private async Task<string?> ValidatePolicies(RealmPlayer player)
+    private async Task<string?> AuthorizePolicies(RealmPlayer player)
     {
         var authorizationPoliciesProvider = player.GetRequiredService<AuthorizationPoliciesProvider>();
         foreach (var policy in authorizationPoliciesProvider.Policies)
@@ -137,7 +137,7 @@ internal sealed class UsersService : IUsersService
                 player.AddComponent(new InventoryComponent(_gameplayOptions.CurrentValue.DefaultInventorySize));
 
             player.Money.SetMoneyInternal(user.Money);
-            await ValidatePolicies(player);
+            await AuthorizePolicies(player);
             userLoginHistoryRepository.Add(user.Id, _dateTimeProvider.Now, player.Client.IPAddress?.ToString() ?? "", serial);
             UpdateLastData(player);
             db.Users.Update(user);

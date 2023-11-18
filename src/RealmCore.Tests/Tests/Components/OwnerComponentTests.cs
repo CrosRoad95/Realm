@@ -6,12 +6,12 @@ public class OwnerComponentTests
     public void OwnerComponentTestsShouldWork()
     {
         var realmTestingServer = new RealmTestingServer();
-        var player1 = realmTestingServer.CreatePlayer();
+        var player = realmTestingServer.CreatePlayer();
         var worldObject = realmTestingServer.CreateObject();
 
-        player1.AddComponent(new OwnerComponent(worldObject));
+        player.AddComponent(new OwnerComponent(worldObject));
         worldObject.Destroy();
 
-        player1.Components.ComponentsList.Should().BeEmpty();
+        player.Components.ComponentsList.Should().BeEmpty();
     }
 }

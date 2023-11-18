@@ -1,6 +1,6 @@
-﻿namespace RealmCore.Tests.Tests.Components;
+﻿namespace RealmCore.Tests.Tests.PlayerServices;
 
-public class PlayTimeComponentTests
+public class PlayerPlayTimeServiceTests
 {
     [Fact]
     public void TestIfCounterWorksCorrectly()

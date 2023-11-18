@@ -2,7 +2,7 @@
 
 namespace RealmCore.Tests.Tests;
 
-public class ElementsComponentsTests
+public class ComponentsTests
 {
     [Fact]
     public void AddAndRemoveComponentShouldWork()

@@ -1101,10 +1101,10 @@ internal sealed class CommandsLogic
         _commandService.AddCommandHandler("devtools", (player, args) =>
         {
             var adminComponent = player.GetRequiredComponent<AdminComponent>();
-            var browserComponent = player.GetRequiredService<IPlayerBrowserService>();
+            var browser = player.Browser;
             adminComponent.DevelopmentMode = true;
-            browserComponent.DevTools = !browserComponent.DevTools;
-            _chatBox.OutputTo(player, $"Devtools {browserComponent.DevTools}");
+            browser.DevTools = !browser.DevTools;
+            _chatBox.OutputTo(player, $"Devtools {browser.DevTools}");
         }, null);
 
         //_commandService.AddCommandHandler("browserpath", (player, args) =>

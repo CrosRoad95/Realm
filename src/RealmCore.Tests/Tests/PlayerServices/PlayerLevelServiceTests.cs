@@ -1,6 +1,6 @@
-﻿namespace RealmCore.Tests.Tests.Components;
+﻿namespace RealmCore.Tests.Tests.PlayerServices;
 
-public class LevelComponentTests
+public class PlayerLevelServiceTests
 {
     private uint PopulateLevelsRegistry(LevelsRegistry levelsRegistry)
     {

@@ -1,8 +1,6 @@
-﻿using RealmCore.Persistence.DTOs;
+﻿namespace RealmCore.Tests.Tests.PlayerServices;
 
-namespace RealmCore.Tests.Tests.Components;
-
-public class JobStatisticsComponentTests
+public class PlayerJobStatisticsServiceTests
 {
     [Fact]
     public void AddPointsTimePlayedShouldWork()

@@ -15,13 +15,13 @@ internal sealed class AFKResourceLogic
     {
         var player = (RealmPlayer)plr;
         using var _ = _logger.BeginElement(player);
-        player.GetRequiredService<IPlayerAFKService>().HandleAFKStarted();
+        player.AFK.HandleAFKStarted();
     }
 
     private void HandlePlayerAFKStopped(Player plr)
     {
         var player = (RealmPlayer)plr;
         using var _ = _logger.BeginElement(player);
-        player.GetRequiredService<IPlayerAFKService>().HandleAFKStopped();
+        player.AFK.HandleAFKStopped();
     }
 }

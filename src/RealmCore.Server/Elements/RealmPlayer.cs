@@ -8,7 +8,6 @@ public class RealmPlayer : Player, IComponents, IDisposable
     private CancellationTokenSource _cancellationTokenSource = new();
     public CancellationToken CancellationToken => _cancellationTokenSource.Token;
     public IServiceProvider ServiceProvider => _serviceProvider;
-    public IScopedElementFactory ElementFactory => GetRequiredService<IScopedElementFactory>();
     public Concepts.Components Components { get; private set; }
 
     private Element? _focusedElement;
@@ -77,30 +76,32 @@ public class RealmPlayer : Player, IComponents, IDisposable
     public IPlayerDiscoveriesService Discoveries { get; private set; }
     public IPlayerJobStatisticsService JobStatistics { get; private set; }
     public IPlayerEventsService Events { get; private set; }
+    public IScopedElementFactory ElementFactory { get; private set; }
     public RealmPlayer(IServiceProvider serviceProvider)
     {
         _serviceScope = serviceProvider.CreateScope();
         _serviceProvider = _serviceScope.ServiceProvider;
 
         #region Initialize scope services
-        _serviceProvider.GetRequiredService<PlayerContext>().Player = this;
-        Money = _serviceProvider.GetRequiredService<IPlayerMoneyService>();
-        AFK = _serviceProvider.GetRequiredService<IPlayerAFKService>();
-        Browser = _serviceProvider.GetRequiredService<IPlayerBrowserService>();
-        User = _serviceProvider.GetRequiredService<IPlayerUserService>();
-        DailyVisits = _serviceProvider.GetRequiredService<IPlayerDailyVisitsService>();
-        Settings = _serviceProvider.GetRequiredService<IPlayerSettingsService>();
-        Bans = _serviceProvider.GetRequiredService<IPlayerBansService>();
-        Upgrades = _serviceProvider.GetRequiredService<IPlayersUpgradeService>();
-        PlayTime = _serviceProvider.GetRequiredService<IPlayerPlayTimeService>();
-        Level = _serviceProvider.GetRequiredService<IPlayerLevelService>();
-        Licenses = _serviceProvider.GetRequiredService<IPlayerLicensesService>();
-        Statistics = _serviceProvider.GetRequiredService<IPlayerStatisticsService>();
-        Achievements = _serviceProvider.GetRequiredService<IPlayerAchievementsService>();
-        JobUpgrades = _serviceProvider.GetRequiredService<IPlayerJobUpgradesService>();
-        Discoveries = _serviceProvider.GetRequiredService<IPlayerDiscoveriesService>();
-        JobStatistics = _serviceProvider.GetRequiredService<IPlayerJobStatisticsService>();
-        Events = _serviceProvider.GetRequiredService<IPlayerEventsService>();
+        GetRequiredService<PlayerContext>().Player = this;
+        Money = GetRequiredService<IPlayerMoneyService>();
+        AFK = GetRequiredService<IPlayerAFKService>();
+        Browser = GetRequiredService<IPlayerBrowserService>();
+        User = GetRequiredService<IPlayerUserService>();
+        DailyVisits = GetRequiredService<IPlayerDailyVisitsService>();
+        Settings = GetRequiredService<IPlayerSettingsService>();
+        Bans = GetRequiredService<IPlayerBansService>();
+        Upgrades = GetRequiredService<IPlayersUpgradeService>();
+        PlayTime = GetRequiredService<IPlayerPlayTimeService>();
+        Level = GetRequiredService<IPlayerLevelService>();
+        Licenses = GetRequiredService<IPlayerLicensesService>();
+        Statistics = GetRequiredService<IPlayerStatisticsService>();
+        Achievements = GetRequiredService<IPlayerAchievementsService>();
+        JobUpgrades = GetRequiredService<IPlayerJobUpgradesService>();
+        Discoveries = GetRequiredService<IPlayerDiscoveriesService>();
+        JobStatistics = GetRequiredService<IPlayerJobStatisticsService>();
+        Events = GetRequiredService<IPlayerEventsService>();
+        ElementFactory = GetRequiredService<IScopedElementFactory>();
         #endregion
 
         Components = new(_serviceProvider, this);
@@ -109,15 +110,9 @@ public class RealmPlayer : Player, IComponents, IDisposable
         UpdateFight();
     }
 
-    public T GetRequiredService<T>() where T : notnull
-    {
-        return _serviceProvider.GetRequiredService<T>();
-    }
+    public T GetRequiredService<T>() where T : notnull => _serviceProvider.GetRequiredService<T>();
 
-    public object GetRequiredService(Type type)
-    {
-        return _serviceProvider.GetRequiredService(type);
-    }
+    public object GetRequiredService(Type type) => _serviceProvider.GetRequiredService(type);
 
     public TComponent GetRequiredComponent<TComponent>() where TComponent : IComponent
     {

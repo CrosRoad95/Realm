@@ -1,6 +1,6 @@
-﻿namespace RealmCore.Tests.Tests.Components;
+﻿namespace RealmCore.Tests.Tests.PlayerServices;
 
-public class StatisticsCounterComponentTests
+public class PlayerStatisticsServiceTests
 {
     [Fact]
     public void IncreaseStatAndGetStatShouldWork()
