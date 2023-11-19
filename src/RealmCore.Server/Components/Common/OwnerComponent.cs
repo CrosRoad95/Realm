@@ -10,6 +10,12 @@ public class OwnerComponent : ComponentLifecycle
         OwningElement.Destroyed += HandleDestroyed;
     }
 
+    public override void Attach()
+    {
+        if (OwningElement == Element)
+            throw new InvalidOperationException();
+    }
+
     private void HandleDestroyed(Element element)
     {
         ((IComponents)Element).Components.TryDestroyComponent(this);
