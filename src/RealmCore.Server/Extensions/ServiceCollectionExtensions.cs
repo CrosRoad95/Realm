@@ -89,6 +89,7 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<IBrowserGuiService, BrowserGuiService>();
         services.AddSingleton<IMapsService, MapsService>();
         services.AddSingleton<IUpdateService, UpdateService>();
+        services.AddSingleton<IPlayersService, PlayersService>();
         #endregion
 
         #region Player services
@@ -109,6 +110,7 @@ public static class ServiceCollectionExtensions
         services.AddPlayerScopedService<IPlayerJobUpgradesService, PlayerJobUpgradesService>();
         services.AddPlayerScopedService<IPlayerJobStatisticsService, PlayerJobStatisticsService>();
         services.AddPlayerScopedService<IPlayerEventsService, PlayerEventsService>();
+        services.AddPlayerScopedService<IPlayerSessionsService, PlayerSessionsService>();
         #endregion
 
         #region Policies

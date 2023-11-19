@@ -1,13 +1,18 @@
 ﻿using RealmCore.Server.Components.Players.Jobs;
 using RealmCore.Server.Concepts.Objectives;
+using RealmCore.Server.Contexts;
 using SlipeServer.Server.Enums;
 
 namespace RealmCore.Tests.Tests.Components;
 
 public class JobSessionComponentTests
 {
-    internal class TestJobComponent : JobSessionComponent
+    internal class TestJobSession : JobSession
     {
+        public TestJobSession(IScopedElementFactory scopedElementFactory, PlayerContext playerContext, IUpdateService updateService) : base(scopedElementFactory, playerContext, updateService)
+        {
+        }
+
         public override short JobId => 1;
         public int ObjectiveCount => Objectives.Count();
 
@@ -50,7 +55,7 @@ public class JobSessionComponentTests
         var realmTestingServer = new RealmTestingServer();
         var player = realmTestingServer.CreatePlayer();
 
-        var testJobComponent = player.AddComponentWithDI<TestJobComponent>();
+        var testJobComponent = player.Sessions.BeginSession<TestJobSession>();
         var objective = testJobComponent.CreateMarkerObjective(withBlip);
         var elements = player.ElementFactory.CreatedElements.ToList();
         elements.Select(x => x.ElementType).Should().BeEquivalentTo(createdElementTypes);
@@ -67,7 +72,7 @@ public class JobSessionComponentTests
         var realmTestingServer = new RealmTestingServer();
         var player = realmTestingServer.CreatePlayer();
 
-        var testJobComponent = player.AddComponentWithDI<TestJobComponent>();
+        var testJobComponent = player.Sessions.BeginSession<TestJobSession>();
         var objective = testJobComponent.CreateMarkerObjective(false);
 
         bool completed = false;
@@ -90,7 +95,7 @@ public class JobSessionComponentTests
         var realmTestingServer = new RealmTestingServer();
         var player = realmTestingServer.CreatePlayer();
 
-        var testJobComponent = player.AddComponentWithDI<TestJobComponent>();
+        var testJobComponent = player.Sessions.BeginSession<TestJobSession>();
         var objective = testJobComponent.CreateOneOfObjective();
 
         bool completed = false;
@@ -105,12 +110,12 @@ public class JobSessionComponentTests
     }
 
     [Fact]
-    public async Task CreateTransportObjectObjectiveShouldBeCompletable()
+    public void CreateTransportObjectObjectiveShouldBeCompletable()
     {
         var realmTestingServer = new RealmTestingServer();
         var player = realmTestingServer.CreatePlayer();
 
-        var testJobComponent = player.AddComponentWithDI<TestJobComponent>();
+        var testJobComponent = player.Sessions.BeginSession<TestJobSession>();
         var myObject = player.ElementFactory.CreateObject((ObjectModel)1337, new Vector3(100, 100, 100), Vector3.Zero);
         myObject.AddComponent(new OwnerComponent(player));
         var objective = testJobComponent.CreateTransportObjectObjective1();
@@ -125,7 +130,7 @@ public class JobSessionComponentTests
 
         var destination = new Vector3(400.0f, -82.01953f, 3.914598f);
         myObject.Position = destination;
-        await Task.Delay(300); // TODO: Wait for collision check
+        realmTestingServer.ForceUpdate();
         completed.Should().Be(true);
         testJobComponent.ObjectiveCount.Should().Be(0);
     }

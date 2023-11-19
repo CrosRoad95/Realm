@@ -2,22 +2,22 @@
 
 internal sealed class PlayersLogic
 {
-    private readonly IElementFactory _elementFactory;
     private readonly MtaServer _mtaServer;
     private readonly IClientInterfaceService _clientInterfaceService;
     private readonly ILogger<PlayersLogic> _logger;
     private readonly IResourceProvider _resourceProvider;
     private readonly IActiveUsers _activeUsers;
+    private readonly IPlayersService _playersService;
     private readonly ConcurrentDictionary<RealmPlayer, Latch> _playerResources = new();
 
-    public PlayersLogic(IElementFactory elementFactory, MtaServer mtaServer, IClientInterfaceService clientInterfaceService, ILogger<PlayersLogic> logger, IResourceProvider resourceProvider, IActiveUsers activeUsers)
+    public PlayersLogic(IElementFactory elementFactory, MtaServer mtaServer, IClientInterfaceService clientInterfaceService, ILogger<PlayersLogic> logger, IResourceProvider resourceProvider, IActiveUsers activeUsers, IPlayersService playersService)
     {
-        _elementFactory = elementFactory;
         _mtaServer = mtaServer;
         _clientInterfaceService = clientInterfaceService;
         _logger = logger;
         _resourceProvider = resourceProvider;
         _activeUsers = activeUsers;
+        _playersService = playersService;
         _mtaServer.PlayerJoined += HandlePlayerJoined;
     }
 
@@ -107,7 +107,7 @@ internal sealed class PlayersLogic
             return;
         player.Disconnected += HandleDisconnected;
 
-        ((RealmServer)_mtaServer).RelayPlayerLoaded(player);
+        _playersService.RelayLoaded(player);
     }
 
 

@@ -1,15 +1,14 @@
-﻿namespace RealmCore.Sample.Components.Jobs;
+﻿using RealmCore.Server.Contexts;
 
-internal class TestJobComponent : JobSessionComponent
+namespace RealmCore.Sample.Components.Jobs;
+
+internal class TestJobComponent : JobSession
 {
-    private readonly IElementFactory _elementFactory;
+    public TestJobComponent(IScopedElementFactory scopedElementFactory, PlayerContext playerContext, IUpdateService updateService) : base(scopedElementFactory, playerContext, updateService)
+    {
+    }
 
     public override short JobId => 1;
-
-    public TestJobComponent(IElementFactory elementFactory)
-    {
-        _elementFactory = elementFactory;
-    }
 
     public void CreateObjectives()
     {
@@ -19,7 +18,7 @@ internal class TestJobComponent : JobSessionComponent
 
         var @object = _elementFactory.CreateObject(SlipeServer.Server.Enums.ObjectModel.Gunbox, new Vector3(379.00f, -102.77f, 1.24f), Vector3.Zero);
         @object.AddComponent<LiftableWorldObjectComponent>();
-        @object.AddComponent(new OwnerComponent(Element));
+        @object.AddComponent(new OwnerComponent(Player));
         var objective2 = AddObjective(new TransportObjectObjective(@object, new Vector3(379.00f, -112.77f, 2.0f)));
         objective2.Completed += ObjectiveBCompleted;
         var objective3 = AddObjective(new TransportObjectObjective(new Vector3(379.00f, -105.77f, 2.0f), 2, true));
@@ -33,22 +32,19 @@ internal class TestJobComponent : JobSessionComponent
 
     private void ObjectiveACompleted(Objective objective, object? data = null)
     {
-        var player = (RealmPlayer)Element;
-        player.JobStatistics.AddPoints(1, 1);
+        Player.JobStatistics.AddPoints(1, 1);
         //ChatBox.OutputTo(player, $"Entered marker, objectives left: {Objectives.Count()}");
     }
 
     private void ObjectiveBCompleted(Objective objective, object? data = null)
     {
-        var player = (RealmPlayer)Element;
-        player.JobStatistics.AddPoints(1, 2);
+        Player.JobStatistics.AddPoints(1, 2);
         //ChatBox.OutputTo(player, $"Box delivered, objectives left: {Objectives.Count()}");
     }
 
     private void ObjectiveCCompleted(Objective objective, object? data = null)
     {
-        var player = (RealmPlayer)Element;
-        player.JobStatistics.AddPoints(1, 1);
+        Player.JobStatistics.AddPoints(1, 1);
         //ChatBox.OutputTo(player, $"Entered one of marker, objectives left: {Objectives.Count()}");
     }
 

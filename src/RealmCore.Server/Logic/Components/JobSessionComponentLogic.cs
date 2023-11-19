@@ -1,31 +1,45 @@
 ﻿using RealmCore.Server.Components.Players.Jobs;
+using RealmCore.Server.Concepts.Sessions;
 
 namespace RealmCore.Server.Logic.Components;
 
-internal sealed class JobSessionComponentLogic : ComponentLogic<JobSessionComponent>
+internal sealed class JobSessionComponentLogic
 {
-    private readonly ILogger _logger;
+    private readonly ILogger<JobSessionComponentLogic> _logger;
 
-    public JobSessionComponentLogic(IElementFactory elementFactory, ILogger logger) : base(elementFactory)
+    public JobSessionComponentLogic(ILogger<JobSessionComponentLogic> logger, IPlayersService playersService)
     {
         _logger = logger;
+        playersService.PlayerLoaded += HandlePlayerLoaded;
     }
 
-    protected override void ComponentAdded(JobSessionComponent jobSessionComponent)
+    private void HandlePlayerLoaded(RealmPlayer player)
     {
-        jobSessionComponent.ObjectiveAdded += HandleObjectiveAdded;
+        player.Sessions.Started += HandleStarted;
+        player.Sessions.Ended += HandleEnded;
     }
 
-    protected override void ComponentDetached(JobSessionComponent jobSessionComponent)
+    private void HandleStarted(IPlayerSessionsService sessionService, Session session)
     {
-        jobSessionComponent.ObjectiveAdded -= HandleObjectiveAdded;
+        if(session is JobSession jobSession)
+        {
+            jobSession.ObjectiveAdded += HandleObjectiveAdded;
+        }
     }
 
-    private void HandleObjectiveAdded(JobSessionComponent jobSessionComponent, Objective objective)
+    private void HandleEnded(IPlayerSessionsService sessionService, Session session)
+    {
+        if (session is JobSession jobSession)
+        {
+            jobSession.ObjectiveAdded -= HandleObjectiveAdded;
+        }
+    }
+
+    private void HandleObjectiveAdded(JobSession jobSessionComponent, Objective objective)
     {
         try
         {
-            objective.LoadInternal((RealmPlayer)jobSessionComponent.Element, jobSessionComponent.InternalElementFactory);
+            objective.LoadInternal(jobSessionComponent.Player);
         }
         catch(Exception ex)
         {

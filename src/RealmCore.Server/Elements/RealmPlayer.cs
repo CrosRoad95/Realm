@@ -76,6 +76,7 @@ public class RealmPlayer : Player, IComponents, IDisposable
     public IPlayerDiscoveriesService Discoveries { get; private set; }
     public IPlayerJobStatisticsService JobStatistics { get; private set; }
     public IPlayerEventsService Events { get; private set; }
+    public IPlayerSessionsService Sessions { get; private set; }
     public IScopedElementFactory ElementFactory { get; private set; }
     public RealmPlayer(IServiceProvider serviceProvider)
     {
@@ -101,6 +102,7 @@ public class RealmPlayer : Player, IComponents, IDisposable
         Discoveries = GetRequiredService<IPlayerDiscoveriesService>();
         JobStatistics = GetRequiredService<IPlayerJobStatisticsService>();
         Events = GetRequiredService<IPlayerEventsService>();
+        Sessions = GetRequiredService<IPlayerSessionsService>();
         ElementFactory = GetRequiredService<IScopedElementFactory>();
         #endregion
 

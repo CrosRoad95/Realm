@@ -1,4 +1,5 @@
 ﻿using RealmCore.Sample.Components.Jobs;
+using RealmCore.Server.Concepts.Sessions;
 
 namespace RealmCore.Sample.Logic;
 
@@ -24,20 +25,15 @@ internal class SamplePickupsLogic
                 pickup.CollisionDetection.Entered += async (enteredPickup, element) =>
                 {
                     var player = (RealmPlayer)element;
-                    var sessionComponent = player.Components.GetComponent<SessionComponent>();
-                    if (sessionComponent != null && sessionComponent is not FractionSessionComponent)
-                        return;
-
-                    if (player.HasComponent<FractionSessionComponent>())
+                    if(player.Sessions.TryGetSession(out FractionSession fractionSession))
                     {
-                        var fractionSessionComponent = player.GetRequiredComponent<FractionSessionComponent>();
-                        fractionSessionComponent.End();
-                        _chatBox.OutputTo(player, $"Session ended in: {fractionSessionComponent.Elapsed}");
-                        player.DestroyComponent(fractionSessionComponent);
+                        fractionSession.End();
+                        _chatBox.OutputTo(player, $"Session ended in: {fractionSession.Elapsed}");
+                        player.Sessions.EndSession(fractionSession);
                     }
                     else
                     {
-                        var fractionSessionComponent = player.AddComponent<FractionSessionComponent>();
+                        var fractionSessionComponent = player.Sessions.BeginSession<FractionSession>();
                         _chatBox.OutputTo(player, $"Session started");
                         fractionSessionComponent.Start();
                     }
@@ -52,24 +48,22 @@ internal class SamplePickupsLogic
                 {
                     var player = (RealmPlayer)element;
 
-                    var sessionComponent = player.Components.GetComponent<SessionComponent>();
-                    if (sessionComponent != null && sessionComponent is not JobSessionComponent)
+                    var sessionComponent = player.Sessions.GetSession<JobSession>();
+                    if (sessionComponent != null && sessionComponent is not JobSession)
                         return;
 
-                    if (player.HasComponent<JobSessionComponent>())
+                    if (player.Sessions.TryGetSession(out JobSession jobSession))
                     {
-                        var jobSessionComponent = player.GetRequiredComponent<JobSessionComponent>();
-                        jobSessionComponent.End();
-                        var elapsed = jobSessionComponent.Elapsed;
-                        _chatBox.OutputTo(player, $"Job ended in: {elapsed.Hours:X2}:{elapsed.Minutes:X2}:{elapsed.Seconds:X2}, completed objectives: {jobSessionComponent.CompletedObjectives}");
-                        var elapsedSeconds = (ulong)jobSessionComponent.Elapsed.Seconds;
+                        player.Sessions.EndSession(jobSession);
+                        var elapsed = jobSession.Elapsed;
+                        _chatBox.OutputTo(player, $"Job ended in: {elapsed.Hours:X2}:{elapsed.Minutes:X2}:{elapsed.Seconds:X2}, completed objectives: {jobSession.CompletedObjectives}");
+                        var elapsedSeconds = (ulong)jobSession.Elapsed.Seconds;
                         if(elapsedSeconds > 0)
-                            player.JobStatistics.AddTimePlayed(jobSessionComponent.JobId, (ulong)jobSessionComponent.Elapsed.Seconds);
-                        player.DestroyComponent(jobSessionComponent);
+                            player.JobStatistics.AddTimePlayed(jobSession.JobId, (ulong)jobSession.Elapsed.Seconds);
                     }
                     else
                     {
-                        var jobSessionComponent = player.AddComponent(new TestJobComponent(_elementFactory));
+                        var jobSessionComponent = player.Sessions.BeginSession<TestJobComponent>();
                         _chatBox.OutputTo(player, $"Job started");
                         jobSessionComponent.Start();
 

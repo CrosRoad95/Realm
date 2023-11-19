@@ -1,32 +1,56 @@
-﻿namespace RealmCore.Server.Components.Players.Jobs;
+﻿using RealmCore.Server.Concepts.Sessions;
 
-public abstract class JobSessionComponent : SessionComponent, IUpdateCallback
+namespace RealmCore.Server.Components.Players.Jobs;
+
+public abstract class JobSession : Session
 {
     public abstract short JobId { get; }
 
     private readonly object _objectivesLock = new();
     private readonly List<Objective> _objectives = new();
+    protected readonly IScopedElementFactory _elementFactory;
+    private readonly IUpdateService _updateService;
     private int _completedObjectives = 0;
     private bool _disposing = false;
-    private IScopedElementFactory? _elementFactory;
 
     public IEnumerable<Objective> Objectives => _objectives;
     public int CompletedObjectives => _completedObjectives;
-    public event Action<JobSessionComponent>? CompletedAllObjectives;
-    public event Action<JobSessionComponent, Objective>? ObjectiveAdded;
-    public event Action<JobSessionComponent, Objective>? ObjectiveCompleted;
-    public event Action<JobSessionComponent, Objective>? ObjectiveInCompleted;
-    protected IScopedElementFactory ElementFactory => _elementFactory ?? throw new InvalidOperationException();
-    public IScopedElementFactory InternalElementFactory => _elementFactory ?? throw new InvalidOperationException();
-    public JobSessionComponent()
+    public event Action<JobSession>? CompletedAllObjectives;
+    public event Action<JobSession, Objective>? ObjectiveAdded;
+    public event Action<JobSession, Objective>? ObjectiveCompleted;
+    public event Action<JobSession, Objective>? ObjectiveInCompleted;
+    public JobSession(IScopedElementFactory scopedElementFactory, PlayerContext playerContext, IUpdateService updateService) : base(playerContext.Player)
     {
-
+        _elementFactory = scopedElementFactory.CreateScope();
+        _updateService = updateService;
     }
 
-    public override void Attach()
+    protected override void OnStarted()
     {
-        _elementFactory = this.GetRequiredService<IScopedElementFactory>().CreateScope();
-        base.Attach();
+        _updateService.Update += HandleUpdate;
+    }
+
+    protected override void OnEnded()
+    {
+        _updateService.Update -= HandleUpdate;
+        _disposing = true;
+
+        _elementFactory?.Dispose();
+
+        lock (_objectivesLock)
+        {
+            while (_objectives.Count > 0)
+            {
+                var objective = _objectives.Last();
+                objective.Dispose();
+                RemoveObjective(objective);
+            }
+        }
+    }
+
+    private void HandleUpdate()
+    {
+        Update();
     }
 
     protected bool RemoveObjective(Objective objective)
@@ -46,7 +70,7 @@ public abstract class JobSessionComponent : SessionComponent, IUpdateCallback
 
     protected TObjective AddObjective<TObjective>(TObjective objective) where TObjective : Objective
     {
-        objective.Player = (RealmPlayer)Element;
+        objective.Player = Player;
         lock (_objectivesLock)
             _objectives.Add(objective);
 
@@ -79,24 +103,6 @@ public abstract class JobSessionComponent : SessionComponent, IUpdateCallback
     {
         ObjectiveInCompleted?.Invoke(this, objective);
         objective.Dispose();
-    }
-
-    public override void Detach()
-    {
-        _disposing = true;
-
-        _elementFactory?.Dispose();
-
-        lock (_objectivesLock)
-        {
-            while (_objectives.Count > 0)
-            {
-                var objective = _objectives.Last();
-                objective.Dispose();
-                RemoveObjective(objective);
-            }
-        }
-        base.Detach();
     }
 
     public virtual void Update()

@@ -1,6 +1,4 @@
-﻿using System.Collections;
-
-namespace RealmCore.Server.Services.Players;
+﻿namespace RealmCore.Server.Services.Players;
 
 internal class PlayerDiscoveriesService : IPlayerDiscoveriesService
 {

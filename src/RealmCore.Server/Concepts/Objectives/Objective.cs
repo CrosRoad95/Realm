@@ -21,10 +21,10 @@ public abstract class Objective : IDisposable
     protected abstract void Load();
     public virtual void Update() { }
 
-    internal void LoadInternal(RealmPlayer player, IScopedElementFactory scopedElementFactory)
+    internal void LoadInternal(RealmPlayer player)
     {
         Logger = player.GetRequiredService<ILogger>();
-        _elementFactory = scopedElementFactory;
+        _elementFactory = player.ElementFactory.CreateScope();
         Load();
     }
 

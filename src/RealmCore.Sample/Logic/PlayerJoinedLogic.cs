@@ -8,7 +8,7 @@ internal sealed class PlayerJoinedLogic
     private readonly Text3dService _text3DService;
     private readonly IGuiSystemService? _guiSystemService;
 
-    public PlayerJoinedLogic(ILogger<PlayerJoinedLogic> logger, INametagsService nametagsService,ChatBox chatBox, Text3dService text3DService, IBrowserGuiService browserGuiService, MtaServer mtaServer, IUsersService usersService, IGuiSystemService? guiSystemService = null)
+    public PlayerJoinedLogic(ILogger<PlayerJoinedLogic> logger, INametagsService nametagsService,ChatBox chatBox, Text3dService text3DService, IBrowserGuiService browserGuiService, IPlayersService playersService, IUsersService usersService, IGuiSystemService? guiSystemService = null)
     {
         _logger = logger;
         _nametagsService = nametagsService;
@@ -16,7 +16,7 @@ internal sealed class PlayerJoinedLogic
         _text3DService = text3DService;
         _guiSystemService = guiSystemService;
         browserGuiService.Ready += HandleReady;
-        ((RealmServer)mtaServer).PlayerLoaded += HandlePlayerLoaded;
+        playersService.PlayerLoaded += HandlePlayerLoaded;
         usersService.SignedIn += HandleSignedIn;
         usersService.SignedOut += HandleSignedOut;
     }

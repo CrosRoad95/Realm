@@ -104,6 +104,13 @@ internal class RealmTestingServer : TestingServer<RealmTestingPlayer>
     {
     }
 
+    public void ForceUpdate()
+    {
+        var updateService = GetRequiredService<IUpdateService>();
+        updateService.RelayUpdate();
+        updateService.RelayRareUpdate();
+    }
+
     public RealmPlayer CreatePlayer(bool withSerialAndIp = true, string name = "CrosRoad95")
     {
         var player = AddFakePlayer();

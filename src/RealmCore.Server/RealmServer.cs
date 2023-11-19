@@ -17,7 +17,6 @@ public class MtaDiPlayerServerTempFix<TPlayer> : MtaServer<TPlayer> where TPlaye
 public class RealmServer : MtaDiPlayerServerTempFix<RealmPlayer>
 {
     public event Action? ServerStarted;
-    public event Action<RealmPlayer>? PlayerLoaded;
 
     public RealmServer(IRealmConfigurationProvider realmConfigurationProvider, Action<ServerBuilder>? configureServerBuilder = null) : base(serverBuilder =>
     {
@@ -100,10 +99,5 @@ public class RealmServer : MtaDiPlayerServerTempFix<RealmPlayer>
         await Task.Delay(500);
         base.Stop();
         logger.LogInformation("Server stopped, saved: {savedElementsCount} elements.", i);
-    }
-
-    public void RelayPlayerLoaded(RealmPlayer player)
-    {
-        PlayerLoaded?.Invoke(player);
     }
 }

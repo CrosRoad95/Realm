@@ -20,7 +20,7 @@ public class OneOfObjective : Objective
             item.Completed += HandleCompleted;
             item.InCompleted += HandleInCompleted;
             item.Player = Player;
-            item.LoadInternal(Player, ElementFactory);
+            item.LoadInternal(Player);
         }
     }
 
