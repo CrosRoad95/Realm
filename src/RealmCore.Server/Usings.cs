@@ -124,6 +124,7 @@ global using RealmCore.Server.Interfaces.Integrations;
 global using RealmCore.Server.Utilities.Interfaces;
 global using RealmCore.Server.Factories.Interfaces;
 global using System.Collections;
+global using RealmCore.Server.Interfaces.Vehicles;
 
 global using ILogger = Microsoft.Extensions.Logging.ILogger;
 

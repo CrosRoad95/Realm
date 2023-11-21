@@ -1,5 +1,6 @@
 ﻿using RealmCore.Server.Factories;
 using RealmCore.Server.Services.Players;
+using RealmCore.Server.Services.Vehicles;
 
 namespace RealmCore.Server.Extensions;
 
@@ -100,7 +101,7 @@ public static class ServiceCollectionExtensions
         services.AddPlayerScopedService<IPlayerDailyVisitsService, PlayerDailyVisitsService>();
         services.AddPlayerScopedService<IPlayerSettingsService, PlayerSettingsService>();
         services.AddPlayerScopedService<IPlayerBansService, PlayerBansService>();
-        services.AddPlayerScopedService<IPlayersUpgradeService, PlayersUpgradeService>();
+        services.AddPlayerScopedService<IPlayerUpgradeService, PlayerUpgradeService>();
         services.AddPlayerScopedService<IPlayerPlayTimeService, PlayerPlayTimeService>();
         services.AddPlayerScopedService<IPlayerLevelService, PlayerLevelService>();
         services.AddPlayerScopedService<IPlayerLicensesService, PlayerLicensesService>();

@@ -179,14 +179,14 @@ internal sealed class CommandsLogic
 
         _commandService.AddAsyncCommandHandler("cvprivate", async (player, args, token) =>
         {
-            var vehicle = await _vehiclesService.CreateVehicle(404, player.Position + new Vector3(4, 0, 0), player.Rotation);
+            var vehicle = await _vehiclesService.CreatePersistantVehicle(404, player.Position + new Vector3(4, 0, 0), player.Rotation);
             var components = vehicle;
             components.AddComponent<VehicleUpgradesComponent>().AddUpgrade(1);
             components.AddComponent<MileageCounterComponent>();
             components.AddComponent<VehicleEngineComponent>();
             components.AddComponent(new FuelComponent(1, 20, 20, 0.01, 2)).Active = true;
             components.AddComponent<VehiclePartDamageComponent>().AddPart(1, 1337);
-            components.GetRequiredComponent<PrivateVehicleComponent>().Access.AddAsOwner(player);
+            components.Access.AddAsOwner(player);
         });
 
         _commandService.AddCommandHandler("exclusivecv", (player, args) =>
@@ -221,7 +221,7 @@ internal sealed class CommandsLogic
         _commandService.AddCommandHandler("addmeasowner", (player, args) =>
         {
             var vehicle = (RealmVehicle)player.Vehicle;
-            vehicle.GetRequiredComponent<PrivateVehicleComponent>().Access.AddAsOwner(player);
+            vehicle.Access.AddAsOwner(player);
         });
 
         _commandService.AddCommandHandler("accessinfo", (player, args) =>
@@ -233,12 +233,11 @@ internal sealed class CommandsLogic
                 return;
             }
 
-            var privateVehicleComponent = vehicle.GetRequiredComponent<PrivateVehicleComponent>();
             _chatBox.OutputTo(player, "Access info:");
 
-            foreach (var vehicleAccess in privateVehicleComponent.Access.PlayerAccesses)
+            foreach (var vehicleAccess in vehicle.Access)
             {
-                _chatBox.OutputTo(player, $"Access: ({vehicleAccess.userId}) = Ownership={vehicleAccess.accessType == 0}");
+                _chatBox.OutputTo(player, $"Access: ({vehicleAccess.UserId}) = Ownership={vehicleAccess.IsOwner}");
             }
         });
 
@@ -342,7 +341,7 @@ internal sealed class CommandsLogic
             _chatBox.OutputTo(player, $"Updated achievement 'test' progress to 2");
 
             {
-                var vehicle = await _vehiclesService.CreateVehicle(404, player.Position + new Vector3(4, 0, 0), player.Rotation);
+                var vehicle = await _vehiclesService.CreatePersistantVehicle(404, player.Position + new Vector3(4, 0, 0), player.Rotation);
                 var components = vehicle;
                 components.AddComponent<VehicleUpgradesComponent>().AddUpgrade(1);
                 components.AddComponent(new MileageCounterComponent());

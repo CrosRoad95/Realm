@@ -23,9 +23,9 @@ internal sealed class InventoryComponentLogic : ComponentLogic<InventoryComponen
         }
         else if (inventoryComponent.Element is RealmVehicle vehicle)
         {
-            if (vehicle.TryGetComponent(out PrivateVehicleComponent privateVehicle))
+            if(vehicle.Persistance.IsLoaded)
             {
-                var inventoryId = await _saveService.SaveNewVehicleInventory(inventoryComponent, privateVehicle.Id);
+                var inventoryId = await _saveService.SaveNewVehicleInventory(inventoryComponent, vehicle.Persistance.Id);
                 inventoryComponent.Id = inventoryId;
             }
         }

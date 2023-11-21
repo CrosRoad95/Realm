@@ -19,12 +19,12 @@ internal sealed class SaveService : ISaveService
 
     private async Task<bool> SaveVehicle(RealmVehicle vehicle)
     {
-        if (!vehicle.Components.TryGetComponent(out PrivateVehicleComponent privateVehicleComponent))
+        if (!vehicle.Persistance.IsLoaded)
             return false;
 
         var vehicleData = await _dbContext.Vehicles
             .IncludeAll()
-            .Where(x => x.Id == privateVehicleComponent.Id)
+            .Where(x => x.Id == vehicle.Persistance.Id)
             .FirstAsync();
 
         vehicleData.Model = vehicle.Model;
@@ -77,14 +77,14 @@ internal sealed class SaveService : ISaveService
         vehicleData.Health = vehicle.Health;
         vehicleData.IsFrozen = vehicle.IsFrozen;
         vehicleData.TransformAndMotion = vehicle.GetTransformAndMotion();
-        vehicleData.UserAccesses = privateVehicleComponent.Access.PlayerAccesses.Select(x => new VehicleUserAccessData
+        vehicleData.UserAccesses = vehicle.Access.Select(x => new VehicleUserAccessData
         {
-            Id = x.id,
-            UserId = x.userId,
+            Id = x.Id,
+            UserId = x.UserId,
             VehicleId = vehicleData.Id,
             Vehicle = vehicleData,
-            AccessType = x.accessType,
-            CustomValue = x.customValue
+            AccessType = x.AccessType,
+            CustomValue = x.CustomValue
         }).ToList();
 
         if (vehicle.Components.TryGetComponent(out VehicleUpgradesComponent vehicleUpgradesComponent))
@@ -157,7 +157,7 @@ internal sealed class SaveService : ISaveService
         else
             vehicleData.Inventories = new List<InventoryData>();
 
-        vehicleData.LastUsed = privateVehicleComponent.LastUsed;
+        vehicleData.LastUsed = vehicle.Persistance.LastUsed;
 
         return true;
     }

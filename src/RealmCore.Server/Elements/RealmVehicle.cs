@@ -2,37 +2,35 @@
 
 public class RealmVehicle : Vehicle, IComponents
 {
+    private readonly IServiceProvider _serviceProvider;
+    private readonly IServiceScope _serviceScope;
+
+    public IServiceProvider ServiceProvider => _serviceProvider;
     public Concepts.Components Components { get; private set; }
     // TODO: refactor to something like "Vehicle Purpose"
     public bool IsPrivateVehicle { get; private set; } = false;
     public int? PrivateVehicleId { get; private set; }
 
+    public IVehicleAccessService Access { get; private set; }
+    public IVehiclePersistanceService Persistance { get; private set; }
     public RealmVehicle(IServiceProvider serviceProvider, ushort model, Vector3 position) : base(model, position)
     {
-        Components = new(serviceProvider, this);
-        Components.ComponentAdded += HandleComponentAdded;
-        Components.ComponentDetached += HandleComponentDetached;
+        _serviceScope = serviceProvider.CreateScope();
+        _serviceProvider = _serviceScope.ServiceProvider;
+        Components = new(_serviceProvider, this);
+
+        #region Initialize scope services
+        GetRequiredService<VehicleContext>().Vehicle = this;
+        Access = GetRequiredService<IVehicleAccessService>();
+        Persistance = GetRequiredService<IVehiclePersistanceService>();
+        #endregion
     }
+
+    public T GetRequiredService<T>() where T : notnull => _serviceProvider.GetRequiredService<T>();
+
+    public object GetRequiredService(Type type) => _serviceProvider.GetRequiredService(type);
 
     public int GetPrivateVehicleId() => PrivateVehicleId ?? throw new InvalidOperationException();
-
-    private void HandleComponentAdded(IComponent component)
-    {
-        if (component is PrivateVehicleComponent privateVehicleComponent)
-        {
-            IsPrivateVehicle = true;
-            PrivateVehicleId = privateVehicleComponent.Id;
-        }
-    }
-
-    private void HandleComponentDetached(IComponent component)
-    {
-        if (component is PrivateVehicleComponent)
-        {
-            IsPrivateVehicle = false;
-            PrivateVehicleId = null;
-        }
-    }
 
     public TComponent GetRequiredComponent<TComponent>() where TComponent : IComponent
     {
@@ -89,8 +87,7 @@ public class RealmVehicle : Vehicle, IComponents
     {
         if (base.Destroy())
         {
-            Components.ComponentAdded -= HandleComponentAdded;
-            Components.ComponentDetached -= HandleComponentDetached;
+            _serviceScope.Dispose();
             return true;
         }
         return false;

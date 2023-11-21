@@ -22,5 +22,4 @@ public class LicenseDTO
             SuspendedUntil = userLicenseData.SuspendedUntil
         };
     }
-
 }

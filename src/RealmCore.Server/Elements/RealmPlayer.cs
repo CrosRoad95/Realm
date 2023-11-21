@@ -66,7 +66,7 @@ public class RealmPlayer : Player, IComponents, IDisposable
     public IPlayerDailyVisitsService DailyVisits { get; private set; }
     public IPlayerSettingsService Settings { get; private set; }
     public IPlayerBansService Bans { get; private set; }
-    public IPlayersUpgradeService Upgrades { get; private set; }
+    public IPlayerUpgradeService Upgrades { get; private set; }
     public IPlayerPlayTimeService PlayTime { get; private set; }
     public IPlayerLevelService Level { get; private set; }
     public IPlayerLicensesService Licenses { get; private set; }
@@ -92,7 +92,7 @@ public class RealmPlayer : Player, IComponents, IDisposable
         DailyVisits = GetRequiredService<IPlayerDailyVisitsService>();
         Settings = GetRequiredService<IPlayerSettingsService>();
         Bans = GetRequiredService<IPlayerBansService>();
-        Upgrades = GetRequiredService<IPlayersUpgradeService>();
+        Upgrades = GetRequiredService<IPlayerUpgradeService>();
         PlayTime = GetRequiredService<IPlayerPlayTimeService>();
         Level = GetRequiredService<IPlayerLevelService>();
         Licenses = GetRequiredService<IPlayerLicensesService>();

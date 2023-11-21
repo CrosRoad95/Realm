@@ -1,6 +1,6 @@
 ﻿namespace RealmCore.Server.Interfaces;
 
-public interface IVehicleAccessService
+public interface IVehiclesAccessService
 {
     event Func<Ped, RealmVehicle, byte, bool>? CanEnter;
     event Action<Ped, RealmVehicle, byte, VehicleAccessControllerComponent>? FailedToEnter;

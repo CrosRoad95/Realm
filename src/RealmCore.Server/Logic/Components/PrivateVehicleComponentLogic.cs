@@ -1,6 +1,6 @@
 ﻿namespace RealmCore.Server.Logic.Components;
 
-internal sealed class PrivateVehicleComponentLogic : ComponentLogic<PrivateVehicleComponent>
+internal sealed class PrivateVehicleComponentLogic : VehicleLogic
 {
     private readonly IActiveVehicles _activeVehicles;
 
@@ -9,9 +9,9 @@ internal sealed class PrivateVehicleComponentLogic : ComponentLogic<PrivateVehic
         _activeVehicles = activeVehicles;
     }
 
-    protected override void ComponentDetached(PrivateVehicleComponent privateVehicleComponent)
+    protected override void HandleLoaded(IVehiclePersistanceService persistatnce, RealmVehicle vehicle)
     {
-        _activeVehicles.TrySetInactive(privateVehicleComponent.Id);
+        _activeVehicles.TrySetInactive(persistatnce.Id);
     }
 }
 

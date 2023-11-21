@@ -1,13 +1,13 @@
 ﻿namespace RealmCore.Server.Services;
 
-internal sealed class VehicleAccessService : IVehicleAccessService
+internal sealed class VehiclesAccessService : IVehiclesAccessService
 {
-    private readonly ILogger<VehicleAccessService> _logger;
+    private readonly ILogger<VehiclesAccessService> _logger;
 
     public event Func<Ped, RealmVehicle, byte, bool>? CanEnter;
     public event Action<Ped, RealmVehicle, byte, VehicleAccessControllerComponent>? FailedToEnter;
 
-    public VehicleAccessService(ILogger<VehicleAccessService> logger)
+    public VehiclesAccessService(ILogger<VehiclesAccessService> logger)
     {
         _logger = logger;
     }

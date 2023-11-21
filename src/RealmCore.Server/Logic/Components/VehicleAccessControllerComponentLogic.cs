@@ -2,10 +2,10 @@
 
 internal sealed class VehicleAccessControllerComponentLogic : ComponentLogic<VehicleAccessControllerComponent>
 {
-    private readonly IVehicleAccessService _vehicleAccessService;
+    private readonly IVehiclesAccessService _vehicleAccessService;
     private readonly ILogger<VehicleAccessControllerComponentLogic> _logger;
 
-    public VehicleAccessControllerComponentLogic(IElementFactory elementFactory, IVehicleAccessService vehicleAccessService, ILogger<VehicleAccessControllerComponentLogic> logger) : base(elementFactory)
+    public VehicleAccessControllerComponentLogic(IElementFactory elementFactory, IVehiclesAccessService vehicleAccessService, ILogger<VehicleAccessControllerComponentLogic> logger) : base(elementFactory)
     {
         _vehicleAccessService = vehicleAccessService;
         _logger = logger;

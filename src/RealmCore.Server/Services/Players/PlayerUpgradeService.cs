@@ -1,16 +1,16 @@
 ﻿namespace RealmCore.Server.Services.Players;
 
-internal class PlayersUpgradeService : IPlayersUpgradeService
+internal class PlayerUpgradeService : IPlayerUpgradeService
 {
-    public event Action<IPlayersUpgradeService, int>? Added;
-    public event Action<IPlayersUpgradeService, int>? Removed;
+    public event Action<IPlayerUpgradeService, int>? Added;
+    public event Action<IPlayerUpgradeService, int>? Removed;
 
     private ICollection<UserUpgradeData> _upgrades = [];
     private readonly object _lock = new();
     private readonly IPlayerUserService _playerUserService;
 
     public RealmPlayer Player { get; }
-    public PlayersUpgradeService(PlayerContext playerContext, IPlayerUserService playerUserService, IDateTimeProvider dateTimeProvider)
+    public PlayerUpgradeService(PlayerContext playerContext, IPlayerUserService playerUserService)
     {
         Player = playerContext.Player;
         playerUserService.SignedIn += HandleSignedIn;
