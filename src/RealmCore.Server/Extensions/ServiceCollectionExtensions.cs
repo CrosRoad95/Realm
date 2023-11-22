@@ -56,6 +56,7 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<MapIdGenerator>();
         services.AddScoped<ScopedMapIdGenerator>();
         services.AddScoped<PlayerContext>();
+        services.AddScoped<VehicleContext>();
         #endregion
 
         #region Registries
@@ -83,9 +84,6 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IFeedbackService, FeedbackService>();
         services.AddScoped<ISpawnMarkersService, SpawnMarkersService>();
         services.AddScoped<IUsersNotificationsService, UsersNotificationsService>();
-        services.AddScoped<IVehicleAccessService, VehicleAccessService>();
-        services.AddScoped<IVehiclePersistanceService, VehiclePersistanceService>();
-        services.AddScoped<IVehicleMileageService, VehicleMileageService>();
         services.AddScoped<INewsService, NewsService>();
         services.AddScoped<IUserMoneyHistoryService, UserMoneyHistoryService>();
         services.AddScoped<IScopedMapsService, ScopedMapService>();
@@ -114,6 +112,14 @@ public static class ServiceCollectionExtensions
         services.AddPlayerScopedService<IPlayerJobStatisticsService, PlayerJobStatisticsService>();
         services.AddPlayerScopedService<IPlayerEventsService, PlayerEventsService>();
         services.AddPlayerScopedService<IPlayerSessionsService, PlayerSessionsService>();
+        #endregion
+
+        #region Vehicle services
+        services.AddScoped<IVehicleAccessService, VehicleAccessService>();
+        services.AddScoped<IVehiclePersistanceService, VehiclePersistanceService>();
+        services.AddScoped<IVehicleMileageService, VehicleMileageService>();
+        services.AddScoped<IVehiclesAccessService, VehiclesAccessService>();
+        services.AddScoped<IVehicleUpgradesService, VehicleUpgradesService>();
         #endregion
 
         #region Policies

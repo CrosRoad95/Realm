@@ -12,6 +12,7 @@ public class RealmVehicle : Vehicle, IComponents
     public IVehicleAccessService Access { get; private set; }
     public IVehiclePersistanceService Persistance { get; private set; }
     public IVehicleMileageService Mileage { get; private set; }
+    public new IVehicleUpgradesService Upgrades { get; private set; }
     public RealmVehicle(IServiceProvider serviceProvider, ushort model, Vector3 position) : base(model, position)
     {
         _serviceScope = serviceProvider.CreateScope();
@@ -23,6 +24,7 @@ public class RealmVehicle : Vehicle, IComponents
         Access = GetRequiredService<IVehicleAccessService>();
         Persistance = GetRequiredService<IVehiclePersistanceService>();
         Mileage = GetRequiredService<IVehicleMileageService>();
+        Upgrades = GetRequiredService<IVehicleUpgradesService>();
         #endregion
     }
 

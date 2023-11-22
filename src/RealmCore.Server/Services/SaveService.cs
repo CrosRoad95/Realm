@@ -87,15 +87,6 @@ internal sealed class SaveService : ISaveService
             CustomValue = x.CustomValue
         }).ToList();
 
-        if (vehicle.Components.TryGetComponent(out VehicleUpgradesComponent vehicleUpgradesComponent))
-        {
-            vehicleData.Upgrades = vehicleUpgradesComponent.Upgrades.Select(x => new VehicleUpgradeData
-            {
-                UpgradeId = x,
-                VehicleId = vehicleData.Id
-            }).ToList();
-
-        }
         vehicleData.Paintjob = vehicle.PaintJob;
 
         {

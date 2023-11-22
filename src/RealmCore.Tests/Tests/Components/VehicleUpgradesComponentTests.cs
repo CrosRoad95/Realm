@@ -68,12 +68,10 @@ public class VehicleUpgradesComponentTests
     {
         #region Arrange
         var vehicle = _realmTestingServer.GetRequiredService<IElementFactory>().CreateVehicle(404, Vector3.Zero, Vector3.Zero);
-
-        var vehicleUpgradesComponent = vehicle.AddComponent<VehicleUpgradesComponent>();
         #endregion
 
         #region Act
-        vehicleUpgradesComponent.AddUpgrade(upgradeId);
+        vehicle.Upgrades.AddUpgrade(upgradeId);
         #endregion
 
         #region Assert
@@ -88,9 +86,8 @@ public class VehicleUpgradesComponentTests
     {
         #region Act
         var vehicle = _realmTestingServer.GetRequiredService<IElementFactory>().CreateVehicle(404, Vector3.Zero, Vector3.Zero);
-        var vehicleUpgradesComponent = vehicle.AddComponent<VehicleUpgradesComponent>();
-        var resultA = vehicleUpgradesComponent.AddUniqueUpgrade(upgradeId);
-        var resultB = vehicleUpgradesComponent.AddUniqueUpgrade(upgradeId);
+        var resultA = vehicle.Upgrades.AddUniqueUpgrade(upgradeId);
+        var resultB = vehicle.Upgrades.AddUniqueUpgrade(upgradeId);
         #endregion
 
         #region Assert
@@ -105,9 +102,8 @@ public class VehicleUpgradesComponentTests
     {
         #region Act
         var vehicle = _realmTestingServer.GetRequiredService<IElementFactory>().CreateVehicle(404, Vector3.Zero, Vector3.Zero);
-        var vehicleUpgradesComponent = vehicle.AddComponent<VehicleUpgradesComponent>();
-        vehicleUpgradesComponent.AddUpgrade(1000000);
-        vehicleUpgradesComponent.RemoveUpgrade(1000000);
+        vehicle.Upgrades.AddUpgrade(1000000);
+        vehicle.Upgrades.RemoveUpgrade(1000000);
         #endregion
 
         #region Assert
@@ -120,8 +116,7 @@ public class VehicleUpgradesComponentTests
     {
         #region Act
         var vehicle = _realmTestingServer.GetRequiredService<IElementFactory>().CreateVehicle(404, Vector3.Zero, Vector3.Zero);
-        var vehicleUpgradesComponent = vehicle.AddComponent<VehicleUpgradesComponent>();
-        vehicleUpgradesComponent.AddUpgrades(Enumerable.Range(1, 3).Select(x => 1000000));
+        vehicle.Upgrades.AddUpgrades(Enumerable.Range(1, 3).Select(x => 1000000));
         #endregion
 
         #region Assert
@@ -140,8 +135,7 @@ public class VehicleUpgradesComponentTests
     {
         #region Act
         var vehicle = _realmTestingServer.GetRequiredService<IElementFactory>().CreateVehicle(404, Vector3.Zero, Vector3.Zero);
-        var vehicleUpgradesComponent = vehicle.AddComponent<VehicleUpgradesComponent>();
-        vehicleUpgradesComponent.AddUpgrades(upgrades);
+        vehicle.Upgrades.AddUpgrades(upgrades);
         #endregion
 
         #region Assert

@@ -168,7 +168,6 @@ internal sealed class CommandsLogic
         {
             var vehicle = _elementFactory.CreateVehicle(args.ReadUShort(), player.Position + new Vector3(4, 0, 0), player.Rotation);
             var components = vehicle;
-            components.AddComponent<VehicleUpgradesComponent>();
             components.AddComponent(new FuelComponent(1, 20, 20, 0.01, 2)).Active = true;
             components.AddComponent<FocusableComponent>();
             components.AddComponent<VehiclePartDamageComponent>().AddPart(1, 1337);
@@ -180,7 +179,7 @@ internal sealed class CommandsLogic
         {
             var vehicle = await _vehiclesService.CreatePersistantVehicle(404, player.Position + new Vector3(4, 0, 0), player.Rotation);
             var components = vehicle;
-            components.AddComponent<VehicleUpgradesComponent>().AddUpgrade(1);
+            vehicle.Upgrades.AddUpgrade(1);
             components.AddComponent<VehicleEngineComponent>();
             components.AddComponent(new FuelComponent(1, 20, 20, 0.01, 2)).Active = true;
             components.AddComponent<VehiclePartDamageComponent>().AddPart(1, 1337);
@@ -191,7 +190,6 @@ internal sealed class CommandsLogic
         {
             var vehicle = _elementFactory.CreateVehicle(404, player.Position + new Vector3(4, 0, 0), player.Rotation);
             var components = vehicle;
-            components.AddComponent<VehicleUpgradesComponent>();
             components.AddComponent(new FuelComponent(1, 20, 20, 0.01, 2)).Active = true;
             components.AddComponent(new VehicleExclusiveAccessComponent(player));
         });
@@ -200,7 +198,6 @@ internal sealed class CommandsLogic
         {
             var vehicle = _elementFactory.CreateVehicle(404, player.Position + new Vector3(4, 0, 0), player.Rotation);
             var components = vehicle;
-            components.AddComponent<VehicleUpgradesComponent>();
             components.AddComponent(new FuelComponent(1, 20, 20, 0.01, 2)).Active = true;
             components.AddComponent<VehicleNoAccessComponent>();
         });
@@ -278,13 +275,12 @@ internal sealed class CommandsLogic
                 return;
             }
 
-            var vehicleUpgradeComponent = vehicle.GetRequiredComponent<VehicleUpgradesComponent>();
-            if (vehicleUpgradeComponent.HasUpgrade(1))
+            if (vehicle.Upgrades.HasUpgrade(1))
             {
                 _chatBox.OutputTo(player, "You already have a upgrade!");
                 return;
             }
-            vehicleUpgradeComponent.AddUpgrade(1);
+            vehicle.Upgrades.AddUpgrade(1);
             _chatBox.OutputTo(player, "Upgrade added");
         });
 
@@ -339,7 +335,7 @@ internal sealed class CommandsLogic
             {
                 var vehicle = await _vehiclesService.CreatePersistantVehicle(404, player.Position + new Vector3(4, 0, 0), player.Rotation);
                 var components = vehicle;
-                components.AddComponent<VehicleUpgradesComponent>().AddUpgrade(1);
+                vehicle.Upgrades.AddUpgrade(1);
                 components.AddComponent(new FuelComponent(1, 20, 20, 0.01, 2)).Active = true;
                 vehicle.AddComponent<VehiclePartDamageComponent>().AddPart(1, 1337);
             }

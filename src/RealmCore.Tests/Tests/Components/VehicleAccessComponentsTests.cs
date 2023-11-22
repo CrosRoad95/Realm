@@ -1,4 +1,5 @@
 ﻿using RealmCore.Server.Components.Vehicles.Access;
+using RealmCore.Server.Interfaces.Vehicles;
 
 namespace RealmCore.Tests.Tests.Components;
 

@@ -29,7 +29,7 @@ internal sealed class VehiclePersistanceService : IVehiclePersistanceService
 
     public RealmVehicle Vehicle { get; }
     public event Action<IVehiclePersistanceService, RealmVehicle>? Loaded;
-    internal VehiclePersistanceService(VehicleContext vehicleContext, IDateTimeProvider dateTimeProvider)
+    public VehiclePersistanceService(VehicleContext vehicleContext, IDateTimeProvider dateTimeProvider)
     {
         Vehicle = vehicleContext.Vehicle;
         _dateTimeProvider = dateTimeProvider;

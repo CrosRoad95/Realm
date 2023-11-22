@@ -1,4 +1,4 @@
-﻿namespace RealmCore.Server.Interfaces;
+﻿namespace RealmCore.Server.Interfaces.Vehicles;
 
 public interface IVehiclesAccessService
 {

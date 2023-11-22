@@ -2,23 +2,20 @@
 
 namespace RealmCore.Server.Logic.Components;
 
-internal sealed class VehicleUpgradesComponentLogic : ComponentLogic<VehicleUpgradesComponent>
+internal sealed class VehicleUpgradesComponentLogic
 {
     private readonly VehicleUpgradeRegistry _vehicleUpgradeRegistry;
 
-    public VehicleUpgradesComponentLogic(IElementFactory elementFactory, VehicleUpgradeRegistry vehicleUpgradeRegistry) : base(elementFactory)
+    public VehicleUpgradesComponentLogic(IElementFactory elementFactory, VehicleUpgradeRegistry vehicleUpgradeRegistry)
     {
         _vehicleUpgradeRegistry = vehicleUpgradeRegistry;
+        elementFactory.ElementCreated += HandleElementCreated;
     }
 
-    protected override void ComponentAdded(VehicleUpgradesComponent vehicleUpgradesComponent)
+    private void HandleElementCreated(Element element)
     {
-        vehicleUpgradesComponent.Rebuild += HandleRebuild;
-    }
-
-    protected override void ComponentDetached(VehicleUpgradesComponent vehicleUpgradesComponent)
-    {
-        vehicleUpgradesComponent.Rebuild -= HandleRebuild;
+        if(element is RealmVehicle vehicle)
+            vehicle.Upgrades.Rebuild += HandleRebuild;
     }
 
     public void Execute(List<IVehicleHandlingModifier> stages, VehicleHandlingContext vehicleHandlingContext)
@@ -34,14 +31,13 @@ internal sealed class VehicleUpgradesComponentLogic : ComponentLogic<VehicleUpgr
         Next(vehicleHandlingContext, 0);
     }
 
-    private void HandleRebuild(VehicleUpgradesComponent vehicleUpgradesComponent)
+    private void HandleRebuild(IVehicleUpgradesService upgrades)
     {
-        var vehicle = (RealmVehicle)vehicleUpgradesComponent.Element;
-        var upgrades = vehicleUpgradesComponent.Upgrades;
+        var vehicle = upgrades.Vehicle;
 
         var vehicleHandlingContext = new VehicleHandlingContext(vehicle.Model);
 
-        if (upgrades.Count != 0)
+        if (upgrades.Count() != 0)
         {
             var vehicleHandlingModifiers = upgrades.Select(x => _vehicleUpgradeRegistry.Get(x))
                 .Select(x => x.VehicleUpgrade)

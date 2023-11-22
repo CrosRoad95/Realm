@@ -1,5 +1,4 @@
-﻿using RealmCore.Persistence.Data;
-using RealmCore.Server.Json.Converters;
+﻿using RealmCore.Server.Json.Converters;
 
 namespace RealmCore.Server.Services;
 
@@ -117,7 +116,6 @@ internal sealed class VehiclesService : IVehiclesService
                 TrySetActive(vehicleData.Id, vehicle);
                 var components = vehicle.Components;
                 vehicle.Persistance.Load(vehicleData);
-                components.AddComponent(new VehicleUpgradesComponent(vehicleData.Upgrades));
                 if (vehicleData.VehicleEngines.Count != 0)
                     components.AddComponent(new VehicleEngineComponent(vehicleData.VehicleEngines));
                 else
