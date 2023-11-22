@@ -7,12 +7,11 @@ public class RealmVehicle : Vehicle, IComponents
 
     public IServiceProvider ServiceProvider => _serviceProvider;
     public Concepts.Components Components { get; private set; }
-    // TODO: refactor to something like "Vehicle Purpose"
-    public bool IsPrivateVehicle { get; private set; } = false;
-    public int? PrivateVehicleId { get; private set; }
+    public int? PersistantId => Persistance.IsLoaded ? Persistance.Id : null;
 
     public IVehicleAccessService Access { get; private set; }
     public IVehiclePersistanceService Persistance { get; private set; }
+    public IVehicleMileageService Mileage { get; private set; }
     public RealmVehicle(IServiceProvider serviceProvider, ushort model, Vector3 position) : base(model, position)
     {
         _serviceScope = serviceProvider.CreateScope();
@@ -23,6 +22,7 @@ public class RealmVehicle : Vehicle, IComponents
         GetRequiredService<VehicleContext>().Vehicle = this;
         Access = GetRequiredService<IVehicleAccessService>();
         Persistance = GetRequiredService<IVehiclePersistanceService>();
+        Mileage = GetRequiredService<IVehicleMileageService>();
         #endregion
     }
 
@@ -30,7 +30,7 @@ public class RealmVehicle : Vehicle, IComponents
 
     public object GetRequiredService(Type type) => _serviceProvider.GetRequiredService(type);
 
-    public int GetPrivateVehicleId() => PrivateVehicleId ?? throw new InvalidOperationException();
+    public int GetPersistantId() => PersistantId ?? throw new InvalidOperationException();
 
     public TComponent GetRequiredComponent<TComponent>() where TComponent : IComponent
     {

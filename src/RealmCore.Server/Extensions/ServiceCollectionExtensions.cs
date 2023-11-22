@@ -84,6 +84,8 @@ public static class ServiceCollectionExtensions
         services.AddScoped<ISpawnMarkersService, SpawnMarkersService>();
         services.AddScoped<IUsersNotificationsService, UsersNotificationsService>();
         services.AddScoped<IVehicleAccessService, VehicleAccessService>();
+        services.AddScoped<IVehiclePersistanceService, VehiclePersistanceService>();
+        services.AddScoped<IVehicleMileageService, VehicleMileageService>();
         services.AddScoped<INewsService, NewsService>();
         services.AddScoped<IUserMoneyHistoryService, UserMoneyHistoryService>();
         services.AddScoped<IScopedMapsService, ScopedMapService>();

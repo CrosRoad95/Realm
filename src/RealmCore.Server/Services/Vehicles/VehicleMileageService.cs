@@ -1,13 +1,15 @@
-﻿namespace RealmCore.Server.Components.Vehicles;
+﻿namespace RealmCore.Server.Services.Vehicles;
 
-public class MileageCounterComponent : ComponentLifecycle, IRareUpdateCallback
+internal class VehicleMileageService : IVehicleMileageService
 {
+    public RealmVehicle Vehicle { get; }
+
     private Vector3 _lastPosition;
     private float _mileage;
-    private float _minimumDistanceThreshold;
+    private float _minimumDistanceThreshold = 2.0f;
     private RealmVehicle? _vehicle;
 
-    public event Action<MileageCounterComponent, float, float>? Traveled;
+    public event Action<IVehicleMileageService, float, float>? Traveled;
 
     public float Mileage
     {
@@ -35,21 +37,15 @@ public class MileageCounterComponent : ComponentLifecycle, IRareUpdateCallback
         }
     }
 
-    public MileageCounterComponent()
+    public VehicleMileageService(VehicleContext vehicleContext, IVehiclePersistanceService persistance)
     {
-        _mileage = 0.0f;
-        _minimumDistanceThreshold = 2.0f;
+        Vehicle = vehicleContext.Vehicle;
+        persistance.Loaded += HandleLoaded;
     }
 
-    public MileageCounterComponent(float mileage, float minimumDistanceThreshold = 2.0f)
+    private void HandleLoaded(IVehiclePersistanceService persistance, RealmVehicle vehicle)
     {
-        _mileage = mileage;
-        _minimumDistanceThreshold = minimumDistanceThreshold;
-    }
-
-    public override void Attach()
-    {
-        _vehicle = (RealmVehicle)Element;
+        _mileage = persistance.VehicleData.Mileage;
     }
 
     public void RareUpdate()

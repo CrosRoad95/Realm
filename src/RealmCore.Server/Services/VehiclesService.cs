@@ -118,7 +118,6 @@ internal sealed class VehiclesService : IVehiclesService
                 var components = vehicle.Components;
                 vehicle.Persistance.Load(vehicleData);
                 components.AddComponent(new VehicleUpgradesComponent(vehicleData.Upgrades));
-                components.AddComponent(new MileageCounterComponent(vehicleData.Mileage));
                 if (vehicleData.VehicleEngines.Count != 0)
                     components.AddComponent(new VehicleEngineComponent(vehicleData.VehicleEngines));
                 else
