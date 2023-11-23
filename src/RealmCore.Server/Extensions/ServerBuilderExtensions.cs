@@ -102,7 +102,7 @@ public static class ServerBuilderExtensions
         serverBuilder.AddLogic<StatisticsCounterResourceLogic>();
         serverBuilder.AddLogic<Text3dComponentLogic>();
         serverBuilder.AddLogic<WatermarkResourceLogic>();
-        serverBuilder.AddLogic<AdminComponentLogic>();
+        serverBuilder.AddLogic<PlayerAdminServiceLogic>();
         serverBuilder.AddLogic<FocusableComponentLogic>();
         serverBuilder.AddLogic<StatefulHudComponentLogic>();
         serverBuilder.AddLogic<JobSessionComponentLogic>();
@@ -113,7 +113,7 @@ public static class ServerBuilderExtensions
         serverBuilder.AddLogic<UpdateCallbackLogic>();
         serverBuilder.AddLogic<PickupLogic>();
         serverBuilder.AddLogic<CollisionShapeLogic>();
-        serverBuilder.AddLogic<PrivateVehicleComponentLogic>();
+        serverBuilder.AddLogic<PeristantVehicleLogic>();
         serverBuilder.AddLogic<InventoryComponentLogic>();
         serverBuilder.AddLogic<PlayersLogic>();
         serverBuilder.AddLogic<GuiLogic>();

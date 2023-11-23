@@ -38,13 +38,9 @@ internal sealed class PlayerBindsLogic
     
     private void HandleSignedIn(RealmPlayer player)
     {
-        player.SetBindAsync("num_0", player =>
+        player.SetBind("num_0", player =>
         {
-            if (player.TryGetComponent(out AdminComponent adminComponent))
-            {
-                adminComponent.NoClip = !adminComponent.NoClip;
-            }
-            return Task.CompletedTask;
+            player.Admin.NoClip = player.Admin.NoClip;
         });
 
         player.SetBind("F2", player =>

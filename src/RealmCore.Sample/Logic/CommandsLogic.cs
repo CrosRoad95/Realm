@@ -1090,9 +1090,8 @@ internal sealed class CommandsLogic
 
         _commandService.AddCommandHandler("devtools", (player, args) =>
         {
-            var adminComponent = player.GetRequiredComponent<AdminComponent>();
             var browser = player.Browser;
-            adminComponent.DevelopmentMode = true;
+            player.Admin.DevelopmentMode = true;
             browser.DevTools = !browser.DevTools;
             _chatBox.OutputTo(player, $"Devtools {browser.DevTools}");
         }, null);

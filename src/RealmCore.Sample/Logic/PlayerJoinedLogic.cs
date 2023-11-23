@@ -71,17 +71,14 @@ internal sealed class PlayerJoinedLogic
         _chatBox.ClearFor(player);
         player.Camera.Fade(CameraFade.In);
         player.Camera.SetMatrix(new Vector3(379.89844f, -92.6416f, 10.950561f), new Vector3(336.75684f, -93.018555f, 1.3956465f));
-        var component = player;
-        if (!component.HasComponent<AdminComponent>())
-        {
-            var adminComponent = component.AddComponent(new AdminComponent(new List<AdminTool> { AdminTool.Elements, AdminTool.Components, AdminTool.ShowSpawnMarkers }));
-            adminComponent.DebugView = true;
-            adminComponent.DevelopmentMode = true;
-        }
+        var admin = player.Admin;
+        admin.DebugView = true;
+        admin.DevelopmentMode = true;
+        admin.SetTools(new List<AdminTool> { AdminTool.Elements, AdminTool.Components, AdminTool.ShowSpawnMarkers });
 
-        if(!component.HasComponent<LoginGuiComponent>())
+        if(!player.HasComponent<LoginGuiComponent>())
         {
-            component.Components.AddComponentWithDI<LoginGuiComponent>();
+            player.AddComponentWithDI<LoginGuiComponent>();
         }
     }
 

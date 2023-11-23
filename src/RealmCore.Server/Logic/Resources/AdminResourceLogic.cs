@@ -26,15 +26,9 @@ internal sealed class AdminResourceLogic
         using var _ = _logger.BeginElement(player);
         try
         {
-            if(!player.TryGetComponent(out AdminComponent adminComponent))
+            if(!player.Admin.HasTool(adminTool))
             {
-                _logger.LogInformation("Player change admin tool {adminTool} state to {state} but element has no adminComponent", adminTool, state);
-                return;
-            }
-
-            if(!adminComponent.HasAdminTool(adminTool))
-            {
-                _logger.LogInformation("Player change admin tool {adminTool} state to {state} but adminComponent is not enabled", adminTool, state);
+                _logger.LogInformation("Player change admin tool {adminTool} state to {state} but tool is not allowed", adminTool, state);
                 return;
             }
             _logger.LogInformation("Player change admin tool {adminTool} state to {state}", adminTool, state);

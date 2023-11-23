@@ -1,30 +1,29 @@
-﻿namespace RealmCore.Server.Components.Players;
+﻿namespace RealmCore.Server.Services.Players;
 
-[ComponentUsage(false)]
-public class AdminComponent : ComponentLifecycle
+internal class PlayerAdminService : IPlayerAdminService
 {
+    private object _lock = new();
     private bool _debugView = false;
     private bool _adminMode = false;
     private bool _noClip = false;
     private bool _developmentMode = false;
     private bool _interactionDebugRenderingEnabled = false;
-    private readonly List<AdminTool> _adminTools;
+    private List<AdminTool> _adminTools = [];
 
-    public event Action<AdminComponent, bool>? DebugViewStateChanged;
-    public event Action<AdminComponent, bool>? AdminModeChanged;
-    public event Action<AdminComponent, bool>? NoClipStateChanged;
-    public event Action<AdminComponent, bool>? DevelopmentModeStateChanged;
-    public event Action<AdminComponent, bool>? InteractionDebugRenderingStateChanged;
+    public event Action<IPlayerAdminService, bool>? DebugViewStateChanged;
+    public event Action<IPlayerAdminService, bool>? AdminModeChanged;
+    public event Action<IPlayerAdminService, bool>? NoClipStateChanged;
+    public event Action<IPlayerAdminService, bool>? DevelopmentModeStateChanged;
+    public event Action<IPlayerAdminService, bool>? InteractionDebugRenderingStateChanged;
 
-    public IEnumerable<AdminTool> AdminTools => _adminTools;
-
-    public AdminComponent(List<AdminTool> adminTools)
+    public IReadOnlyList<AdminTool> AdminTools
     {
-        _adminTools = adminTools;
+        get
+        {
+            lock (_lock)
+                return new List<AdminTool>(_adminTools);
+        }
     }
-
-    public bool HasAdminTool(AdminTool adminTool) => _adminTools.Contains(adminTool);
-
     public bool DevelopmentMode
     {
         get
@@ -105,12 +104,37 @@ public class AdminComponent : ComponentLifecycle
         }
     }
 
-    public override void Detach()
+    public RealmPlayer Player { get; private set; }
+    public PlayerAdminService(PlayerContext playerContext, IPlayerUserService playerUserService)
     {
-        DevelopmentMode = false;
-        DebugView = false;
-        AdminMode = false;
-        NoClip = false;
-        InteractionDebugRenderingEnabled = false;
+        Player = playerContext.Player;
+        playerUserService.SignedIn += HandleSignedIn;
+        playerUserService.SignedOut += HandleSignedOut;
+    }
+
+    public void SetTools(IEnumerable<AdminTool> adminTools)
+    {
+        lock (_lock)
+        {
+            _adminTools = new(adminTools);
+        }
+    }
+
+    public bool HasTool(AdminTool adminTool)
+    {
+        lock (_lock)
+        {
+            return _adminTools.Contains(adminTool);
+        }
+    }
+
+    private void HandleSignedIn(IPlayerUserService playerUserService, RealmPlayer _)
+    {
+
+    }
+
+    private void HandleSignedOut(IPlayerUserService playerUserService, RealmPlayer _)
+    {
+
     }
 }
