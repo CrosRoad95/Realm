@@ -140,6 +140,11 @@ internal class RealmTestingServer : TestingServer<RealmTestingPlayer>
         return GetRequiredService<IElementFactory>().CreateObject(SlipeServer.Server.Enums.ObjectModel.Bin1, Vector3.Zero, Vector3.Zero);
     }
 
+    public RealmVehicle CreateVehicle()
+    {
+        return GetRequiredService<IElementFactory>().CreateVehicle(404, Vector3.Zero, Vector3.Zero);
+    }
+
     public async Task SignInPlayer(RealmPlayer player, string[]? roles = null)
     {
         var claims = new List<Claim>

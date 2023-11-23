@@ -120,7 +120,6 @@ internal sealed class VehiclesService : IVehiclesService
                     components.AddComponent(new VehicleEngineComponent(vehicleData.VehicleEngines));
                 else
                     components.AddComponent<VehicleEngineComponent>();
-                components.AddComponent(new VehiclePartDamageComponent(vehicleData.PartDamages));
 
                 if (vehicleData.Fuels.Count != 0)
                 {

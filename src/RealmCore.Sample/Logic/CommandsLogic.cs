@@ -170,7 +170,7 @@ internal sealed class CommandsLogic
             var components = vehicle;
             components.AddComponent(new FuelComponent(1, 20, 20, 0.01, 2)).Active = true;
             components.AddComponent<FocusableComponent>();
-            components.AddComponent<VehiclePartDamageComponent>().AddPart(1, 1337);
+            components.PartDamage.AddPart(1, 1337);
             components.AddComponent(new VehicleExclusiveAccessComponent(player));
             _chatBox.OutputTo(player, $"veh created");
         });
@@ -182,7 +182,7 @@ internal sealed class CommandsLogic
             vehicle.Upgrades.AddUpgrade(1);
             components.AddComponent<VehicleEngineComponent>();
             components.AddComponent(new FuelComponent(1, 20, 20, 0.01, 2)).Active = true;
-            components.AddComponent<VehiclePartDamageComponent>().AddPart(1, 1337);
+            components.PartDamage.AddPart(1, 1337);
             components.Access.AddAsOwner(player);
         });
 
@@ -337,7 +337,7 @@ internal sealed class CommandsLogic
                 var components = vehicle;
                 vehicle.Upgrades.AddUpgrade(1);
                 components.AddComponent(new FuelComponent(1, 20, 20, 0.01, 2)).Active = true;
-                vehicle.AddComponent<VehiclePartDamageComponent>().AddPart(1, 1337);
+                vehicle.PartDamage.AddPart(1, 1337);
             }
         });
 

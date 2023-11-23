@@ -120,6 +120,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IVehicleMileageService, VehicleMileageService>();
         services.AddScoped<IVehiclesAccessService, VehiclesAccessService>();
         services.AddScoped<IVehicleUpgradesService, VehicleUpgradesService>();
+        services.AddScoped<IVehiclePartDamageService, VehiclePartDamageService>();
         #endregion
 
         #region Policies

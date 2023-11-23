@@ -102,21 +102,6 @@ internal sealed class SaveService : ISaveService
                 MinimumDistanceThreshold = x.MinimumDistanceThreshold,
             }).ToList();
         }
-        if (vehicle.Components.TryGetComponent(out VehiclePartDamageComponent vehiclePartDamageComponent))
-        {
-            List<VehiclePartDamageData> vehiclePartDamages = new();
-            foreach (var item in vehiclePartDamageComponent.Parts)
-            {
-                var state = vehiclePartDamageComponent.Get(item);
-                if (state != null)
-                    vehiclePartDamages.Add(new VehiclePartDamageData
-                    {
-                        PartId = item,
-                        State = state.Value
-                    }); 
-            }
-            vehicleData.PartDamages = vehiclePartDamages;
-        }
 
         if (vehicle.Components.TryGetComponent(out VehicleEngineComponent vehicleEngineComponent))
         {
