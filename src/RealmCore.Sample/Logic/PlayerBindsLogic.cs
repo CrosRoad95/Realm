@@ -81,12 +81,12 @@ internal sealed class PlayerBindsLogic
         GuiHelpers.BindGuiPage<HomePageComponent>(player, "F6", _serviceProvider);
         GuiHelpers.BindGuiPage<CounterPageComponent>(player, "F7", _serviceProvider);
 
-        GuiHelpers.BindGuiPage(player, "F1", async () =>
+        GuiHelpers.BindGuiPage(player, "F1", async cancellationToken =>
         {
             DashboardGuiComponent.DashboardState state = new();
             state.Money = (double)player.Money.Amount;
 
-            var vehiclesWithModelAndPositionDTos = await _vehicleRepository.GetLightVehiclesByUserId(player.UserId);
+            var vehiclesWithModelAndPositionDTos = await _vehicleRepository.GetLightVehiclesByUserId(player.UserId, cancellationToken);
             state.VehicleLightInfos = vehiclesWithModelAndPositionDTos.Select(x => new VehicleLightInfoDTO
             {
                 Id = x.Id,

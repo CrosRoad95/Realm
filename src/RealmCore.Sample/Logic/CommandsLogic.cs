@@ -20,6 +20,7 @@ internal sealed class CommandsLogic
     private readonly IDateTimeProvider _dateTimeProvider;
     private readonly IUsersService _usersService;
     private readonly IVehiclesService _vehiclesService;
+    private readonly IElementOutlineService _elementOutlineService;
     private readonly ILoadService _loadService;
     private readonly IUserWhitelistedSerialsRepository _userWhitelistedSerialsRepository;
     private readonly IVehicleRepository _vehicleRepository;
@@ -50,6 +51,7 @@ internal sealed class CommandsLogic
         _dateTimeProvider = dateTimeProvider;
         _usersService = usersService;
         _vehiclesService = vehiclesService;
+        _elementOutlineService = elementOutlineService;
         _loadService = loadService;
         _userWhitelistedSerialsRepository = userWhitelistedSerialsRepository;
         _vehicleRepository = vehicleRepository;
@@ -103,17 +105,17 @@ internal sealed class CommandsLogic
         _commandService.AddAsyncCommandHandler("outlinecomponent", async (player, args, token) =>
         {
             var worldObject = _elementFactory.CreateObject(ObjectModel.Gunbox, player.Position + new Vector3(4, 0, 0), player.Rotation);
-            var focusableComponent = worldObject.AddComponent(new OutlineComponent(Color.Red));
+            _elementOutlineService.SetElementOutline(worldObject, Color.Red);
             _chatBox.OutputTo(player, "Created outline component");
             await Task.Delay(2000);
-            worldObject.DestroyComponent(focusableComponent);
+            _elementOutlineService.RemoveElementOutline(worldObject);
             _chatBox.OutputTo(player, "Destroyed outline component");
         });
 
         _commandService.AddAsyncCommandHandler("outlinecomponent2", async (player, args, token) =>
         {
             var worldObject = _elementFactory.CreateObject(ObjectModel.Gunbox, player.Position + new Vector3(4, 0, 0), player.Rotation);
-            var focusableComponent = worldObject.AddComponent(new OutlineComponent(Color.Red));
+            _elementOutlineService.SetElementOutline(worldObject, Color.Red);
             _chatBox.OutputTo(player, "Created outline component");
             await Task.Delay(2000);
             worldObject.Destroy();
@@ -359,9 +361,9 @@ internal sealed class CommandsLogic
         _commandService.AddAsyncCommandHandler("privateoutlinetest", async (player, args, token) =>
         {
             var @object = _elementFactory.CreateObject(ObjectModel.Gunbox, player.Position + new Vector3(4, 0, -0.65f), Vector3.Zero);
-            await Task.Delay(2000);
+            await Task.Delay(2000, token);
             elementOutlineService.SetElementOutlineForPlayer(player, @object, Color.Red);
-            await Task.Delay(1000);
+            await Task.Delay(1000, token);
             elementOutlineService.RemoveElementOutlineForPlayer(player, @object);
             _chatBox.OutputTo(player, "removed");
         });

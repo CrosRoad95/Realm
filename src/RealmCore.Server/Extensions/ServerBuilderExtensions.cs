@@ -98,7 +98,6 @@ public static class ServerBuilderExtensions
         serverBuilder.AddLogic<BoneAttachResourceLogic>();
         serverBuilder.AddLogic<ClientInterfaceResourceLogic>();
         serverBuilder.AddLogic<NametagResourceLogic>();
-        serverBuilder.AddLogic<OutlineResourceLogic>();
         serverBuilder.AddLogic<StatisticsCounterResourceLogic>();
         serverBuilder.AddLogic<Text3dComponentLogic>();
         serverBuilder.AddLogic<WatermarkResourceLogic>();

@@ -29,7 +29,7 @@ internal sealed class PlayerGameplayLogic
         player.SetBindAsync("x", HandleInteract);
     }
 
-    private async Task HandleInteract(RealmPlayer player, KeyState keyState)
+    private async Task HandleInteract(RealmPlayer player, KeyState keyState, CancellationToken cancellationToken)
     {
         var components = player;
         if (components.TryGetComponent(out AttachedElementComponent attachedElementComponent) && keyState == KeyState.Down)

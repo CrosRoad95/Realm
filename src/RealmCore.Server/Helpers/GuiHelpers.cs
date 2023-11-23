@@ -37,11 +37,11 @@ public static class GuiHelpers
         });
     }
     
-    public static void BindGui<TGuiComponent>(RealmPlayer player, string bind, Func<Task<TGuiComponent>> factory, IServiceProvider serviceProvider) where TGuiComponent : GuiComponent
+    public static void BindGui<TGuiComponent>(RealmPlayer player, string bind, Func<CancellationToken, Task<TGuiComponent>> factory, IServiceProvider serviceProvider) where TGuiComponent : GuiComponent
     {
         var logger = serviceProvider.GetRequiredService<ILogger<TGuiComponent>>();
         var chatBox = serviceProvider.GetRequiredService<ChatBox>();
-        player.SetBindAsync(bind, async player =>
+        player.SetBindAsync(bind, async (player, token) =>
         {
             var components = player;
             if (components.HasComponent<TGuiComponent>())
@@ -54,7 +54,7 @@ public static class GuiHelpers
 
             try
             {
-                var guiComponent = components.AddComponent(await factory());
+                var guiComponent = components.AddComponent(await factory(token));
                 player.ResetCooldown(bind);
             }
             catch (Exception ex)
@@ -101,11 +101,11 @@ public static class GuiHelpers
         });
     }
 
-    public static void BindGuiPage<TGuiComponent>(RealmPlayer player, string bind, Func<Task<TGuiComponent>> factory, IServiceProvider serviceProvider) where TGuiComponent : GuiComponent
+    public static void BindGuiPage<TGuiComponent>(RealmPlayer player, string bind, Func<CancellationToken, Task<TGuiComponent>> factory, IServiceProvider serviceProvider) where TGuiComponent : GuiComponent
     {
         var logger = serviceProvider.GetRequiredService<ILogger<TGuiComponent>>();
         var chatBox = serviceProvider.GetRequiredService<ChatBox>();
-        player.SetBindAsync(bind, async player =>
+        player.SetBindAsync(bind, async (player, cancellationToken) =>
         {
             var components = player;
             if (components.HasComponent<TGuiComponent>())
@@ -118,7 +118,7 @@ public static class GuiHelpers
 
             try
             {
-                components.AddComponent(await factory());
+                components.AddComponent(await factory(cancellationToken));
                 player.ResetCooldown(bind);
             }
             catch (Exception ex)

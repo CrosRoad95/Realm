@@ -15,7 +15,7 @@ public class RealmPlayer : Player, IComponents, IDisposable
     public virtual Vector2 ScreenSize { get; internal set; }
     public virtual CultureInfo CultureInfo { get; internal set; }
     private readonly CultureInfo _culture;
-    private readonly Dictionary<string, Func<RealmPlayer, KeyState, Task>> _asyncBinds = new();
+    private readonly Dictionary<string, Func<RealmPlayer, KeyState, CancellationToken, Task>> _asyncBinds = new();
     private readonly Dictionary<string, Action<RealmPlayer, KeyState>> _binds = new();
     private readonly SemaphoreSlim _bindsLock = new(1);
     private readonly SemaphoreSlim _bindsUpLock = new(1);
@@ -233,7 +233,7 @@ public class RealmPlayer : Player, IComponents, IDisposable
         }
     }
 
-    public void SetBindAsync(string key, Func<RealmPlayer, KeyState, Task> callback)
+    public void SetBindAsync(string key, Func<RealmPlayer, KeyState, CancellationToken, Task> callback)
     {
         _bindsLock.Wait();
         if (_asyncBinds.ContainsKey(key))
@@ -247,7 +247,7 @@ public class RealmPlayer : Player, IComponents, IDisposable
         _bindsLock.Release();
     }
 
-    public void SetBindAsync(string key, Func<RealmPlayer, Task> callback)
+    public void SetBindAsync(string key, Func<RealmPlayer, CancellationToken, Task> callback)
     {
         _bindsLock.Wait();
         if (_asyncBinds.ContainsKey(key))
@@ -257,10 +257,10 @@ public class RealmPlayer : Player, IComponents, IDisposable
         }
 
         SetBind(key, KeyState.Down);
-        _asyncBinds[key] = async (player, keyState) =>
+        _asyncBinds[key] = async (player, keyState, cancellationToken) =>
         {
             if (keyState == KeyState.Down)
-                await callback(this);
+                await callback(this, cancellationToken);
         };
         _bindsLock.Release();
     }
@@ -441,7 +441,7 @@ public class RealmPlayer : Player, IComponents, IDisposable
         {
             try
             {
-                await asyncBindCallback(this, keyState);
+                await asyncBindCallback(this, keyState, CancellationToken);
             }
             finally
             {
