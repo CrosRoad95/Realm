@@ -211,7 +211,7 @@ internal sealed class PlayerUserService : IPlayerUserService, IDisposable
 
     public IReadOnlyList<string> GetClaims()
     {
-        if (_claimsPrincipal.Identity is ClaimsIdentity claimsIdentity)
+        if (_claimsPrincipal != null && _claimsPrincipal.Identity is ClaimsIdentity claimsIdentity)
         {
             return claimsIdentity.Claims.Select(x => x.Type).ToList();
         }
@@ -221,7 +221,7 @@ internal sealed class PlayerUserService : IPlayerUserService, IDisposable
 
     public IReadOnlyList<string> GetRoles()
     {
-        if (_claimsPrincipal.Identity is ClaimsIdentity claimsIdentity)
+        if (_claimsPrincipal != null && _claimsPrincipal.Identity is ClaimsIdentity claimsIdentity)
         {
             return claimsIdentity.Claims.Where(x => x.Type == ClaimTypes.Role).Select(x => x.Value).ToList();
         }
@@ -234,7 +234,7 @@ internal sealed class PlayerUserService : IPlayerUserService, IDisposable
         if (_user == null)
             return false;
 
-        if (_claimsPrincipal.Identity is ClaimsIdentity claimsIdentity)
+        if (_claimsPrincipal != null && _claimsPrincipal.Identity is ClaimsIdentity claimsIdentity)
         {
             Claim? claim = null;
             if (value != null)

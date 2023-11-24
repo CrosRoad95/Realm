@@ -83,7 +83,7 @@ public abstract class Db<T> : IdentityDbContext<UserData, RoleData, int,
         {
             entityBuilder.Property(x => x.LastTransformAndMotion)
                 .HasMaxLength(400)
-                .HasConversion(x => x.Serialize(), x => TransformAndMotion.CreateFromString(x))
+                .HasConversion(x => x != null ? x.Serialize() : string.Empty, x => TransformAndMotion.CreateFromString(x))
                 .HasDefaultValue(null);
 
             entityBuilder

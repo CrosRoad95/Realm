@@ -54,7 +54,10 @@ internal sealed class PlayerGameplayLogic
         else if (player.TryGetComponent(out CurrentInteractElementComponent currentInteractElementComponent))
         {
             var element = currentInteractElementComponent.CurrentInteractElement;
-            var currentInteractElement = currentInteractElementComponent.CurrentInteractElement as IComponents;
+            if (element == null)
+                return;
+
+            var currentInteractElement = element as IComponents;
             if (currentInteractElement == null)
                 return;
 

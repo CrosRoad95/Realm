@@ -15,6 +15,9 @@ public class CurrentPlayerContext : IDisposable
     public CurrentPlayerContext(IHttpContextAccessor httpContent, RealmServer realmServer)
     {
         Server = realmServer;
+        if(httpContent.HttpContext == null)
+            throw new ArgumentNullException(nameof(httpContent.HttpContext));
+
         ClaimsPrincipal = httpContent.HttpContext.User;
         BrowserGuiService = realmServer.GetRequiredService<IBrowserGuiService>();
         if (ClaimsPrincipal.Identity != null && ClaimsPrincipal.Identity.IsAuthenticated)

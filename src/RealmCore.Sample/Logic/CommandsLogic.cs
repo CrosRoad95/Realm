@@ -216,7 +216,8 @@ internal sealed class CommandsLogic
         _commandService.AddCommandHandler("addmeasowner", (player, args) =>
         {
             var vehicle = (RealmVehicle)player.Vehicle;
-            vehicle.Access.AddAsOwner(player);
+            if(vehicle != null)
+                vehicle.Access.AddAsOwner(player);
         });
 
         _commandService.AddCommandHandler("accessinfo", (player, args) =>

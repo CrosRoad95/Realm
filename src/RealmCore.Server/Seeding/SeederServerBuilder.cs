@@ -279,24 +279,27 @@ internal sealed class SeederServerBuilder
         await BuildFrom(seedData);
 
         var seedKeyValuePairs = result.ToObject<Dictionary<string, Dictionary<string, JObject>>>();
-        foreach (var seedKeyValuePair in seedKeyValuePairs)
+        if(seedKeyValuePairs != null)
         {
-            if (_seederProviders.TryGetValue(seedKeyValuePair.Key, out var value))
+            foreach (var seedKeyValuePair in seedKeyValuePairs)
             {
-                foreach (var keyValuePair in seedKeyValuePair.Value)
+                if (_seederProviders.TryGetValue(seedKeyValuePair.Key, out var value))
                 {
-                    value.Seed(seedKeyValuePair.Key, keyValuePair.Key, keyValuePair.Value);
+                    foreach (var keyValuePair in seedKeyValuePair.Value)
+                    {
+                        value.Seed(seedKeyValuePair.Key, keyValuePair.Key, keyValuePair.Value);
+                    }
                 }
             }
-        }
 
-        foreach (var seedKeyValuePair in seedKeyValuePairs)
-        {
-            if (_asyncSeederProviders.TryGetValue(seedKeyValuePair.Key, out var value))
+            foreach (var seedKeyValuePair in seedKeyValuePairs)
             {
-                foreach (var keyValuePair in seedKeyValuePair.Value)
+                if (_asyncSeederProviders.TryGetValue(seedKeyValuePair.Key, out var value))
                 {
-                    await value.SeedAsync(seedKeyValuePair.Key, keyValuePair.Key, keyValuePair.Value);
+                    foreach (var keyValuePair in seedKeyValuePair.Value)
+                    {
+                        await value.SeedAsync(seedKeyValuePair.Key, keyValuePair.Key, keyValuePair.Value);
+                    }
                 }
             }
         }

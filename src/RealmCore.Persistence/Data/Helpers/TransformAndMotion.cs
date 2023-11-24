@@ -16,6 +16,9 @@ public sealed class TransformAndMotion
 
     public static TransformAndMotion CreateFromString(string json)
     {
+        if (string.IsNullOrEmpty(json))
+            return new();
+
         return JsonConvert.DeserializeObject<TransformAndMotion>(json) ?? throw new Exception("Failed to create TransformAndMotion from string json");
     }
 }

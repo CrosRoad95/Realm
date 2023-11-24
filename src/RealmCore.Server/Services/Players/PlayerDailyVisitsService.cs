@@ -6,9 +6,33 @@ internal sealed class PlayerDailyVisitsService : IPlayerDailyVisitsService, IDis
     private readonly IPlayerUserService _playerUserService;
     private readonly IDateTimeProvider _dateTimeProvider;
     private DailyVisitsData? _dailyVisitsData;
-    public DateTime LastVisit { get => _dailyVisitsData.LastVisit; set => _dailyVisitsData.LastVisit = value; }
-    public int VisitsInRow { get => _dailyVisitsData.VisitsInRow; set => _dailyVisitsData.VisitsInRow = value; }
-    public int VisitsInRowRecord { get => _dailyVisitsData.VisitsInRowRecord; set => _dailyVisitsData.VisitsInRowRecord = value; }
+    public DateTime LastVisit
+    {
+        get => _dailyVisitsData?.LastVisit ?? throw new InvalidOperationException(); set
+        {
+            if (_dailyVisitsData == null)
+                throw new InvalidOperationException();
+            _dailyVisitsData.LastVisit = value;
+        }
+    }
+    public int VisitsInRow
+    {
+        get => _dailyVisitsData?.VisitsInRow ?? throw new InvalidOperationException(); set
+        {
+            if (_dailyVisitsData == null)
+                throw new InvalidOperationException();
+            _dailyVisitsData.VisitsInRow = value;
+        }
+    }
+    public int VisitsInRowRecord
+    {
+        get => _dailyVisitsData?.VisitsInRowRecord ?? throw new InvalidOperationException(); set
+        {
+            if (_dailyVisitsData == null)
+                throw new InvalidOperationException();
+            _dailyVisitsData.VisitsInRowRecord = value;
+        }
+    }
 
     public event Action<IPlayerDailyVisitsService, int, bool>? Visited;
     public event Action<IPlayerDailyVisitsService, int>? VisitsRecord;

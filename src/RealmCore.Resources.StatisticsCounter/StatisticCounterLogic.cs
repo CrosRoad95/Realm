@@ -67,8 +67,10 @@ internal class StatisticCounterLogic
     {
         try
         {
-            var collectedStatistics = luaEvent.Parameters[0].TableValue
-                .ToDictionary(x => x.Key.IntegerValue ?? throw new Exception(), x => float.Parse(x.Value.ToString()));
+            var table = luaEvent.Parameters.ElementAt(0)?.TableValue;
+            if (table == null)
+                return;
+            var collectedStatistics = table.ToDictionary(x => x.Key.IntegerValue ?? throw new Exception(), x => float.Parse(x.Value.ToString()));
             _statisticsCounterService.RelayCollectedStatistics(luaEvent.Player, collectedStatistics);
         }
         catch (Exception ex)

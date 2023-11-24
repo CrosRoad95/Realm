@@ -37,4 +37,10 @@
 	<ItemGroup>
 	  <Folder Include="Services\" />
 	</ItemGroup>
+	<ItemGroup>
+	  <EditorConfigFiles Remove="C:\Users\sebaj\source\repos\RealmCore\src\RealmCore.BlazorGui\.editorconfig" />
+	</ItemGroup>
+	<ItemGroup>
+	  <None Include="C:\Users\sebaj\source\repos\RealmCore\src\RealmCore.BlazorGui\.editorconfig" />
+	</ItemGroup>
 </Project>

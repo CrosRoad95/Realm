@@ -155,7 +155,7 @@ public class InventoryComponent : Component
         _semaphore.EnterReadLock();
         try
         {
-            return new List<Item>(_items.Where(x => x.ItemId == itemId && x.GetMetadata(key).Equals(metadata)));
+            return new List<Item>(_items.Where(x => x.ItemId == itemId && (x.GetMetadata(key)?.Equals(metadata) ?? false)));
         }
         finally
         {
@@ -181,7 +181,7 @@ public class InventoryComponent : Component
         _semaphore.EnterReadLock();
         try
         {
-            return _items.Any(x => x.ItemId == itemId && x.GetMetadata(key).Equals(metadata));
+            return _items.Any(x => x.ItemId == itemId && (x.GetMetadata(key)?.Equals(metadata) ?? false));
         }
         finally
         {

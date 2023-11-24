@@ -14,7 +14,7 @@ internal sealed class BrowserService : IBrowserService
     public Action<IMessage>? MessageHandler { get; set; }
 
 
-    private readonly Uri? _baseUrl;
+    private readonly Uri _baseUrl;
 
     public BrowserService(IOptions<BrowserOptions> browserOptions, ILogger<BrowserService> logger)
     {
@@ -29,6 +29,10 @@ internal sealed class BrowserService : IBrowserService
                 logger.LogError(ex, "Invalid URI format: {baseRemoteUrl}", browserOptions.Value.BaseRemoteUrl);
                 throw;
             }
+        }
+        else
+        {
+            _baseUrl = new Uri("");
         }
     }
 

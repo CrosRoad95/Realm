@@ -59,6 +59,8 @@ internal class PlayerAchievementsService : IPlayerAchievementsService
         lock (_lock)
         {
             var achievement = GetById(achievementId);
+            if (string.IsNullOrEmpty(achievement.Value))
+                return default;
             return JsonConvert.DeserializeObject<T?>(achievement.Value);
         }
     }

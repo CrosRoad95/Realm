@@ -15,7 +15,7 @@ internal class MessagingServiceStub : Messaging.MessagingBase
 
     public override async Task<SendMessageResponse> SendMessage(SendMessageRequest request, ServerCallContext context)
     {
-        var channel = _discordClient.GetChannel(request.ChannelId) as SocketTextChannel;
+        var channel = (SocketTextChannel)_discordClient.GetChannel(request.ChannelId);
         try
         {
             var message = await channel.SendMessageAsync(request.Message);
@@ -37,7 +37,7 @@ internal class MessagingServiceStub : Messaging.MessagingBase
 
     public override async Task<SendFileResponse> SendFile(SendFileRequest request, ServerCallContext context)
     {
-        var channel = _discordClient.GetChannel(request.ChannelId) as SocketTextChannel;
+        var channel = (SocketTextChannel)_discordClient.GetChannel(request.ChannelId);
         try
         {
             using var stream = new MemoryStream(request.File.Memory.ToArray());

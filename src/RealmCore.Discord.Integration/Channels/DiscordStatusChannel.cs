@@ -27,7 +27,7 @@ public sealed class DiscordStatusChannel : ChannelBase
         if (_configuration == null)
             return;
 
-        var channel = socketGuild.GetChannel(_configuration.ChannelId) as SocketTextChannel;
+        var channel = (SocketTextChannel)socketGuild.GetChannel(_configuration.ChannelId);
         _statusDiscordMessage = await channel.TryGetLastMessageSendByUser(_botIdProvider.Id) as IUserMessage;
         if (_statusDiscordMessage == null)
             _statusDiscordMessage = await channel.SendMessageAsync(string.Empty);
