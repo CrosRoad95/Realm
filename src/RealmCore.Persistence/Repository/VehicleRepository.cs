@@ -120,13 +120,17 @@ internal sealed class VehicleRepository : IVehicleRepository
     public async Task<bool> SetSpawned(int id, bool spawned, CancellationToken cancellationToken = default)
     {
         var query = _db.Vehicles
-            .AsNoTracking()
             .TagWithSource(nameof(VehicleRepository))
             .Where(x => !x.IsRemoved)
             .Where(x => x.Id == id);
 
-        var result = await query.ExecuteUpdateAsync(x => x.SetProperty(y => y.Spawned, spawned), cancellationToken);
-        return result > 0;
+        var vehicle = await query.FirstAsync(cancellationToken);
+        if (vehicle.Spawned == spawned)
+            return false;
+
+        vehicle.Spawned = spawned;
+        await _db.SaveChangesAsync(cancellationToken);
+        return true;
     }
 
     public async Task<bool> SetKind(int id, byte kind, CancellationToken cancellationToken = default)

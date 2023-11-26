@@ -1,6 +1,6 @@
 ﻿namespace RealmCore.Server.Services.Vehicles;
 
-internal class VehicleMileageService : IVehicleMileageService
+internal class VehicleMileageCounterService : IVehicleMileageCounterService, IDisposable
 {
     public RealmVehicle Vehicle { get; }
 
@@ -8,8 +8,9 @@ internal class VehicleMileageService : IVehicleMileageService
     private float _mileage;
     private float _minimumDistanceThreshold = 2.0f;
     private RealmVehicle? _vehicle;
+    private readonly IUpdateService _updateService;
 
-    public event Action<IVehicleMileageService, float, float>? Traveled;
+    public event Action<IVehicleMileageCounterService, float, float>? Traveled;
 
     public float Mileage
     {
@@ -37,10 +38,12 @@ internal class VehicleMileageService : IVehicleMileageService
         }
     }
 
-    public VehicleMileageService(VehicleContext vehicleContext, IVehiclePersistanceService persistance)
+    public VehicleMileageCounterService(VehicleContext vehicleContext, IVehiclePersistanceService persistance, IUpdateService updateService)
     {
+        _updateService = updateService;
         Vehicle = vehicleContext.Vehicle;
         persistance.Loaded += HandleLoaded;
+        _updateService.RareUpdate += HandleRareUpdate;
     }
 
     private void HandleLoaded(IVehiclePersistanceService persistance, RealmVehicle vehicle)
@@ -48,7 +51,7 @@ internal class VehicleMileageService : IVehicleMileageService
         _mileage = persistance.VehicleData.Mileage;
     }
 
-    public void RareUpdate()
+    public void HandleRareUpdate()
     {
         if (_vehicle == null)
             return;
@@ -68,5 +71,10 @@ internal class VehicleMileageService : IVehicleMileageService
         _lastPosition = _vehicle.Position;
         _mileage += traveledDistanceNumber;
         Traveled?.Invoke(this, _mileage, traveledDistanceNumber);
+    }
+
+    public void Dispose()
+    {
+        _updateService.RareUpdate -= HandleRareUpdate;
     }
 }

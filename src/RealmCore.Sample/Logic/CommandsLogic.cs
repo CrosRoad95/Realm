@@ -182,7 +182,6 @@ internal sealed class CommandsLogic
             var vehicle = await _vehiclesService.CreatePersistantVehicle(404, player.Position + new Vector3(4, 0, 0), player.Rotation);
             var components = vehicle;
             vehicle.Upgrades.AddUpgrade(1);
-            components.AddComponent<VehicleEngineComponent>();
             components.AddComponent(new FuelComponent(1, 20, 20, 0.01, 2)).Active = true;
             components.PartDamage.AddPart(1, 1337);
             components.Access.AddAsOwner(player);

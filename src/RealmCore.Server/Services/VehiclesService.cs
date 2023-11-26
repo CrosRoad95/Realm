@@ -14,9 +14,10 @@ internal sealed class VehiclesService : IVehiclesService
     private readonly VehicleEnginesRegistry _vehicleEnginesRegistry;
     private readonly IActiveUsers _activeUsers;
     private readonly IActiveVehicles _activeVehicles;
+    private readonly ILogger<VehiclesService> _logger;
     private readonly JsonSerializerSettings _jsonSerializerSettings;
 
-    public VehiclesService(IVehicleRepository vehicleRepository, IElementFactory elementFactory, ISaveService saveService, ItemsRegistry itemsRegistry, IVehicleEventRepository vehicleEventRepository, IDateTimeProvider dateTimeProvider, VehicleUpgradeRegistry vehicleUpgradeRegistry, VehicleEnginesRegistry vehicleEnginesRegistry, IActiveUsers activeUsers, IActiveVehicles activeVehicles)
+    public VehiclesService(IVehicleRepository vehicleRepository, IElementFactory elementFactory, ISaveService saveService, ItemsRegistry itemsRegistry, IVehicleEventRepository vehicleEventRepository, IDateTimeProvider dateTimeProvider, VehicleUpgradeRegistry vehicleUpgradeRegistry, VehicleEnginesRegistry vehicleEnginesRegistry, IActiveUsers activeUsers, IActiveVehicles activeVehicles, ILogger<VehiclesService> logger)
     {
         _vehicleRepository = vehicleRepository;
         _elementFactory = elementFactory;
@@ -28,16 +29,41 @@ internal sealed class VehiclesService : IVehiclesService
         _vehicleEnginesRegistry = vehicleEnginesRegistry;
         _activeUsers = activeUsers;
         _activeVehicles = activeVehicles;
+        _logger = logger;
         _jsonSerializerSettings = new JsonSerializerSettings
         {
             Converters = new List<JsonConverter> { DoubleConverter.Instance }
         };
+        _elementFactory.ElementCreated += HandleElementCreated;
+    }
+
+    private void HandleElementCreated(Element element)
+    {
+        if (element is not RealmVehicle vehicle)
+            return;
+
+        vehicle.Destroyed += HandleDestroyed;
+    }
+
+    private async void HandleDestroyed(Element element)
+    {
+        try
+        {
+            var vehicle = (RealmVehicle)element;
+            var id = vehicle.Persistance.Id;
+            _activeVehicles.TrySetInactive(id);
+            await _vehicleRepository.SetSpawned(id, false);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogHandleError(ex);
+        }
     }
 
     public async Task<RealmVehicle> CreatePersistantVehicle(ushort model, Vector3 position, Vector3 rotation)
     {
-        var vehicleData = await _vehicleRepository.CreateVehicle(model, _dateTimeProvider.Now);
         var vehicle = _elementFactory.CreateVehicle(model, position, rotation);
+        var vehicleData = await vehicle.GetRequiredService<IVehicleRepository>().CreateVehicle(model, _dateTimeProvider.Now);
         try
         {
             TrySetActive(vehicleData.Id, vehicle);
@@ -86,14 +112,6 @@ internal sealed class VehiclesService : IVehiclesService
         return _vehicleRepository.GetAllSpawnedVehicles();
     }
 
-    public async Task Destroy(RealmVehicle vehicle)
-    {
-        await _vehicleRepository.SetSpawned(vehicle.Persistance.Id, false);
-        await _saveService.BeginSave(vehicle);
-        await _saveService.Commit();
-        vehicle.Destroy();
-    }
-
     public async Task<bool> SetVehicleSpawned(RealmVehicle vehicle, bool spawned = true)
     {
         return await _vehicleRepository.SetSpawned(vehicle.Persistance.Id, spawned);
@@ -102,7 +120,7 @@ internal sealed class VehiclesService : IVehiclesService
     private void TrySetActive(int vehicleId, RealmVehicle vehicle)
     {
         if (!_activeVehicles.TrySetActive(vehicleId, vehicle))
-            throw new Exception("Failed to create already existing vehicle.");
+            throw new PersistantVehicleAlreadySpawnedException("Failed to create already existing vehicle.");
     }
 
     public async Task<RealmVehicle> Spawn(VehicleData vehicleData)
@@ -116,11 +134,6 @@ internal sealed class VehiclesService : IVehiclesService
                 TrySetActive(vehicleData.Id, vehicle);
                 var components = vehicle.Components;
                 vehicle.Persistance.Load(vehicleData);
-                if (vehicleData.VehicleEngines.Count != 0)
-                    components.AddComponent(new VehicleEngineComponent(vehicleData.VehicleEngines));
-                else
-                    components.AddComponent<VehicleEngineComponent>();
-
                 if (vehicleData.Fuels.Count != 0)
                 {
                     foreach (var vehicleFuel in vehicleData.Fuels)
@@ -144,6 +157,7 @@ internal sealed class VehiclesService : IVehiclesService
             });
 
         await SetVehicleSpawned(vehicle);
+        vehicle.Upgrades.ForceRebuild();
         return vehicle;
     }
 

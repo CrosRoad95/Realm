@@ -1,5 +1,4 @@
 ﻿using RealmCore.Server.Components.Vehicles.Access;
-using RealmCore.Server.Interfaces.Vehicles;
 
 namespace RealmCore.Tests.Tests.Components;
 
@@ -10,9 +9,8 @@ public class VehicleAccessComponentsTests
     {
         var realmTestingServer = new RealmTestingServer();
         var player = realmTestingServer.CreatePlayer();
-        var elementFactory = realmTestingServer.GetRequiredService<IElementFactory>();
+        var vehicle = realmTestingServer.CreateVehicle();
 
-        var vehicle = elementFactory.CreateVehicle(404, Vector3.Zero, Vector3.Zero);
         var vehicleAccessService = realmTestingServer.GetRequiredService<IVehiclesAccessService>();
         var canEnter = vehicleAccessService.InternalCanEnter(player, vehicle, 0);
         canEnter.Should().BeTrue();
@@ -24,9 +22,8 @@ public class VehicleAccessComponentsTests
         var realmTestingServer = new RealmTestingServer();
         var player1 = realmTestingServer.CreatePlayer();
         var player2 = realmTestingServer.CreatePlayer();
-        var elementFactory = realmTestingServer.GetRequiredService<IElementFactory>();
+        var vehicle = realmTestingServer.CreateVehicle();
 
-        var vehicle = elementFactory.CreateVehicle(404, Vector3.Zero, Vector3.Zero);
         var accessComponent = vehicle.AddComponent(new VehicleExclusiveAccessComponent(player1));
         var vehicleAccessService = realmTestingServer.GetRequiredService<IVehiclesAccessService>();
 
@@ -41,9 +38,8 @@ public class VehicleAccessComponentsTests
     {
         var realmTestingServer = new RealmTestingServer();
         var player = realmTestingServer.CreatePlayer();
-        var elementFactory = realmTestingServer.GetRequiredService<IElementFactory>();
+        var vehicle = realmTestingServer.CreateVehicle();
 
-        var vehicle = elementFactory.CreateVehicle(404, Vector3.Zero, Vector3.Zero);
         var accessComponent = vehicle.AddComponent<VehicleNoAccessComponent>();
         var vehicleAccessService = realmTestingServer.GetRequiredService<IVehiclesAccessService>();
 
@@ -56,9 +52,8 @@ public class VehicleAccessComponentsTests
     {
         var realmTestingServer = new RealmTestingServer();
         var player = realmTestingServer.CreatePlayer();
-        var elementFactory = realmTestingServer.GetRequiredService<IElementFactory>();
+        var vehicle = realmTestingServer.CreateVehicle();
 
-        var vehicle = elementFactory.CreateVehicle(404, Vector3.Zero, Vector3.Zero);
         var accessComponent = vehicle.AddComponent<VehicleDefaultAccessComponent>();
         var vehicleAccessService = realmTestingServer.GetRequiredService<IVehiclesAccessService>();
 
@@ -72,9 +67,8 @@ public class VehicleAccessComponentsTests
         var realmTestingServer = new RealmTestingServer();
         var player1 = realmTestingServer.CreatePlayer();
         var player2 = realmTestingServer.CreatePlayer();
-        var elementFactory = realmTestingServer.GetRequiredService<IElementFactory>();
+        var vehicle = realmTestingServer.CreateVehicle();
 
-        var vehicle = elementFactory.CreateVehicle(404, Vector3.Zero, Vector3.Zero);
         var accessComponent = vehicle.AddComponent<VehicleNoAccessComponent>();
         var vehicleAccessService = realmTestingServer.GetRequiredService<IVehiclesAccessService>();
 

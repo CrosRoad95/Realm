@@ -22,24 +22,15 @@ internal class SaveCommand : ICommand
             using var _ = _logger.BeginElement(element);
             try
             {
-#if DEBUG
-                if (await _saveService.BeginSave(element))
+                if (await _saveService.Save(element))
                 {
-                    await _saveService.Commit();
                     savedElements++;
                 }
-#else
-                if (await _saveService.BeginSave(element))
-                    savedElements++;
-#endif
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Failed to save element: {elementName}", element.ToString());
             }
         }
-#if !DEBUG
-        await _saveService.Commit();
-#endif
     }
 }

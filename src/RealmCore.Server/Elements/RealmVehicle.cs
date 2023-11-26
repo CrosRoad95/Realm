@@ -7,13 +7,14 @@ public class RealmVehicle : Vehicle, IComponents
 
     public IServiceProvider ServiceProvider => _serviceProvider;
     public Concepts.Components Components { get; private set; }
-    public int? PersistantId => Persistance.IsLoaded ? Persistance.Id : null;
+    public int PersistantId => Persistance.Id;
 
     public IVehicleAccessService Access { get; private set; }
     public IVehiclePersistanceService Persistance { get; private set; }
-    public IVehicleMileageService Mileage { get; private set; }
+    public IVehicleMileageCounterService MileageCounter { get; private set; }
     public new IVehicleUpgradesService Upgrades { get; private set; }
     public IVehiclePartDamageService PartDamage { get; private set; }
+    public IVehicleEnginesService Engines { get; private set; }
     public RealmVehicle(IServiceProvider serviceProvider, ushort model, Vector3 position) : base(model, position)
     {
         _serviceScope = serviceProvider.CreateScope();
@@ -24,17 +25,16 @@ public class RealmVehicle : Vehicle, IComponents
         GetRequiredService<VehicleContext>().Vehicle = this;
         Access = GetRequiredService<IVehicleAccessService>();
         Persistance = GetRequiredService<IVehiclePersistanceService>();
-        Mileage = GetRequiredService<IVehicleMileageService>();
+        MileageCounter = GetRequiredService<IVehicleMileageCounterService>();
         Upgrades = GetRequiredService<IVehicleUpgradesService>();
         PartDamage = GetRequiredService<IVehiclePartDamageService>();
+        Engines = GetRequiredService<IVehicleEnginesService>();
         #endregion
     }
 
     public T GetRequiredService<T>() where T : notnull => _serviceProvider.GetRequiredService<T>();
 
     public object GetRequiredService(Type type) => _serviceProvider.GetRequiredService(type);
-
-    public int GetPersistantId() => PersistantId ?? throw new InvalidOperationException();
 
     public TComponent GetRequiredComponent<TComponent>() where TComponent : IComponent
     {

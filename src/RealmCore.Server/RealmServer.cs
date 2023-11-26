@@ -75,7 +75,7 @@ public class RealmServer : MtaDiPlayerServerTempFix<RealmPlayer>
         {
             try
             {
-                if (await saveService.BeginSave(element))
+                if (await saveService.Save(element))
                     i++;
             }
             catch (Exception ex)
@@ -86,14 +86,6 @@ public class RealmServer : MtaDiPlayerServerTempFix<RealmPlayer>
             {
                 element.Destroy();
             }
-        }
-        try
-        {
-            await saveService.Commit();
-        }
-        catch (Exception ex)
-        {
-            logger.LogError(ex, "Failed to save elements.");
         }
 
         await Task.Delay(500);

@@ -4,7 +4,6 @@ public interface IVehiclesService
 {
     Task<RealmVehicle> ConvertToPersistantVehicle(RealmVehicle vehicle);
     Task<RealmVehicle> CreatePersistantVehicle(ushort model, Vector3 position, Vector3 rotation);
-    Task Destroy(RealmVehicle vehicle);
     Task<List<VehicleData>> GetAllSpawnedVehicles();
     Task<List<LightInfoVehicleDTO>> GetAllLightVehicles(RealmPlayer player);
     Task<List<VehicleData>> GetAllVehicles(RealmPlayer player);

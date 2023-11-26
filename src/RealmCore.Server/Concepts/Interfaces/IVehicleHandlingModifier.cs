@@ -24,3 +24,13 @@ public interface IVehicleHandlingModifier
 {
     void Apply(VehicleHandlingContext context, HandlingDelegate next);
 }
+
+public class EmptyVehicleHandlingModifier : IVehicleHandlingModifier
+{
+    private EmptyVehicleHandlingModifier() { }
+    public static IVehicleHandlingModifier Instance { get; } = new EmptyVehicleHandlingModifier();
+    public void Apply(VehicleHandlingContext context, HandlingDelegate next)
+    {
+        next(context);
+    }
+}

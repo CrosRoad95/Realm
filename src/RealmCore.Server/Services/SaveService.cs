@@ -22,11 +22,10 @@ internal sealed class SaveService : ISaveService
         if (!vehicle.Persistance.IsLoaded)
             return false;
 
-        var vehicleData = await _dbContext.Vehicles
-            .IncludeAll()
-            .Where(x => x.Id == vehicle.Persistance.Id)
-            .FirstAsync();
+        var vehicleData = vehicle.Persistance.VehicleData;
 
+        vehicleData.TransformAndMotion = vehicle.GetTransformAndMotion();
+        vehicleData.Mileage = vehicle.MileageCounter.Mileage;
         vehicleData.Model = vehicle.Model;
         vehicleData.Color = new VehicleColor(vehicle.Colors.Primary, vehicle.Colors.Secondary, vehicle.Colors.Color3, vehicle.Colors.Color4, vehicle.HeadlightColor);
         vehicleData.Paintjob = vehicle.PaintJob;
@@ -103,15 +102,6 @@ internal sealed class SaveService : ISaveService
             }).ToList();
         }
 
-        if (vehicle.Components.TryGetComponent(out VehicleEngineComponent vehicleEngineComponent))
-        {
-            vehicleData.VehicleEngines = vehicleEngineComponent.VehicleEngineIds.Select(x => new VehicleEngineData
-            {
-                EngineId = (short)x,
-                Selected = x == vehicleEngineComponent.ActiveVehicleEngineId
-            }).ToList();
-        }
-
         var inventoryComponents = vehicle.Components.ComponentsList
             .OfType<InventoryComponent>()
             .Where(x => x.Id != 0)
@@ -130,7 +120,7 @@ internal sealed class SaveService : ISaveService
             vehicleData.Inventories = new List<InventoryData>();
 
         vehicleData.LastUsed = vehicle.Persistance.LastUsed;
-
+        await vehicle.GetRequiredService<IDb>().SaveChangesAsync();
         return true;
     }
 
@@ -351,16 +341,6 @@ internal sealed class SaveService : ISaveService
 
     public async Task<bool> Save(Element element)
     {
-        if (await BeginSave(element))
-        {
-            await Commit();
-            return true;
-        }
-        return false;
-    }
-
-    public async Task<bool> BeginSave(Element element)
-    {
         bool saved = element switch
         {
             RealmPlayer player => await SavePlayer(player),
@@ -371,10 +351,5 @@ internal sealed class SaveService : ISaveService
         if (saved)
             ElementSaved?.Invoke(element);
         return saved;
-    }
-
-    public async Task Commit()
-    {
-        await _dbContext.SaveChangesAsync();
     }
 }

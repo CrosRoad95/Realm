@@ -23,11 +23,8 @@ internal class ReloadElementsCommand : ICommand
         {
             try
             {
-                if (await _saveService.BeginSave(element))
+                if (await _saveService.Save(element))
                 {
-#if DEBUG
-                    await _saveService.Commit();
-#endif
                     savedElements++;
                     element.Destroy();
                 }
@@ -37,9 +34,7 @@ internal class ReloadElementsCommand : ICommand
                 _logger.LogError(ex, "Failed to save element: {elementName}", element.ToString());
             }
         }
-#if !DEBUG
-        await _saveService.Commit();
-#endif
+
         await _loadService.LoadAll();
     }
 }

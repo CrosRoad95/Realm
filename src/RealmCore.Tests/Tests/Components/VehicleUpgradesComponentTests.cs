@@ -67,7 +67,7 @@ public class VehicleUpgradesComponentTests
     public void AddUpgradeShouldWork(int upgradeId, int expectedMaxVelocity)
     {
         #region Arrange
-        var vehicle = _realmTestingServer.GetRequiredService<IElementFactory>().CreateVehicle(404, Vector3.Zero, Vector3.Zero);
+        var vehicle = _realmTestingServer.CreateVehicle();
         #endregion
 
         #region Act
@@ -85,7 +85,7 @@ public class VehicleUpgradesComponentTests
     public void AddUniqueUpgradeShouldAddOnlyOneInstanceOfUpgrade(int upgradeId, int expectedMaxVelocity)
     {
         #region Act
-        var vehicle = _realmTestingServer.GetRequiredService<IElementFactory>().CreateVehicle(404, Vector3.Zero, Vector3.Zero);
+        var vehicle = _realmTestingServer.CreateVehicle();
         var resultA = vehicle.Upgrades.AddUniqueUpgrade(upgradeId);
         var resultB = vehicle.Upgrades.AddUniqueUpgrade(upgradeId);
         #endregion
@@ -101,7 +101,7 @@ public class VehicleUpgradesComponentTests
     public void UpgradesCanBeRemoved()
     {
         #region Act
-        var vehicle = _realmTestingServer.GetRequiredService<IElementFactory>().CreateVehicle(404, Vector3.Zero, Vector3.Zero);
+        var vehicle = _realmTestingServer.CreateVehicle();
         vehicle.Upgrades.AddUpgrade(1000000);
         vehicle.Upgrades.RemoveUpgrade(1000000);
         #endregion
@@ -115,7 +115,7 @@ public class VehicleUpgradesComponentTests
     public void MultipleUpgradesOfSameTypeCanBeAdded()
     {
         #region Act
-        var vehicle = _realmTestingServer.GetRequiredService<IElementFactory>().CreateVehicle(404, Vector3.Zero, Vector3.Zero);
+        var vehicle = _realmTestingServer.CreateVehicle();
         vehicle.Upgrades.AddUpgrades(Enumerable.Range(1, 3).Select(x => 1000000));
         #endregion
 
@@ -134,7 +134,7 @@ public class VehicleUpgradesComponentTests
     public void UpgradesMiddlewareShouldBeOrderIndependent(int[] upgrades)
     {
         #region Act
-        var vehicle = _realmTestingServer.GetRequiredService<IElementFactory>().CreateVehicle(404, Vector3.Zero, Vector3.Zero);
+        var vehicle = _realmTestingServer.CreateVehicle();
         vehicle.Upgrades.AddUpgrades(upgrades);
         #endregion
 

@@ -18,19 +18,6 @@ internal sealed class VehicleUpgradesComponentLogic
             vehicle.Upgrades.Rebuild += HandleRebuild;
     }
 
-    public void Execute(List<IVehicleHandlingModifier> stages, VehicleHandlingContext vehicleHandlingContext)
-    {
-        void Next(VehicleHandlingContext data, int index)
-        {
-            if (index < stages.Count)
-            {
-                stages[index].Apply(data, newData => Next(newData, index + 1));
-            }
-        }
-
-        Next(vehicleHandlingContext, 0);
-    }
-
     private void HandleRebuild(IVehicleUpgradesService upgrades)
     {
         var vehicle = upgrades.Vehicle;

@@ -20,7 +20,7 @@ internal sealed class LoadService : ILoadService
 
     public async Task<RealmVehicle> LoadVehicleById(int id)
     {
-        var vehicleData = await _vehicleRepository.GetVehicleById(id) ?? throw new PrivateVehicleNotFoundException($"Failed to load vehicle data of id {id}");
+        var vehicleData = await _vehicleRepository.GetVehicleById(id) ?? throw new PersistantVehicleNotFoundException($"Failed to load vehicle data of id {id}");
 
         try
         {

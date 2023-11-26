@@ -29,13 +29,22 @@ internal class VehicleAccessService : IVehicleAccessService
         }
     }
 
-    public bool TryGetAccess(RealmPlayer player, out VehicleUserAccessDTO vehicleAccess)
+    private bool InternalHasAccess(int userId)
     {
-        var userId = player.UserId;
+        var vehicleUserAccessData = _userAccesses.Where(x => x.UserId == userId).FirstOrDefault();
+        if (vehicleUserAccessData != null)
+        {
+            return true;
+        }
+        return false;
+    }
+
+    public bool TryGetAccess(int userId, out VehicleUserAccessDTO vehicleAccess)
+    {
         lock (_lock)
         {
             var vehicleUserAccessData = _userAccesses.Where(x => x.UserId == userId).FirstOrDefault();
-            if(vehicleUserAccessData != null)
+            if (vehicleUserAccessData != null)
             {
                 vehicleAccess = VehicleUserAccessDTO.Map(vehicleUserAccessData);
                 return true;
@@ -45,30 +54,34 @@ internal class VehicleAccessService : IVehicleAccessService
         return false;
     }
 
-    public bool HasAccess(RealmPlayer player)
+    public bool TryGetAccess(RealmPlayer player, out VehicleUserAccessDTO vehicleAccess)
     {
         var userId = player.UserId;
-        lock (_lock)
-        {
-            var vehicleUserAccessData = _userAccesses.Where(x => x.UserId == userId).FirstOrDefault();
-            if (vehicleUserAccessData != null)
-            {
-                return true;
-            }
-        }
-        return false;
+        return TryGetAccess(userId, out vehicleAccess);
     }
 
-    public VehicleUserAccessDTO AddAccess(RealmPlayer player, byte accessType, string? customValue = null)
+    public bool HasAccess(RealmPlayer player)
     {
-        if (TryGetAccess(player, out var _))
-            throw new VehicleAccessDefinedException();
+        lock (_lock)
+            return InternalHasAccess(player.UserId);
+    }
 
+    public bool HasAccess(int userId)
+    {
+        lock (_lock)
+            return InternalHasAccess(userId);
+    }
+
+    public VehicleUserAccessDTO AddAccess(int userId, byte accessType, string? customValue = null)
+    {
         lock (_lock)
         {
+            if(InternalHasAccess(userId))
+                throw new VehicleAccessDefinedException();
+
             var vehicleUserAccessData = new VehicleUserAccessData
             {
-                UserId = player.UserId,
+                UserId = userId,
                 AccessType = accessType,
                 CustomValue = customValue,
                 VehicleId = VehicleId
@@ -79,14 +92,34 @@ internal class VehicleAccessService : IVehicleAccessService
         }
     }
 
+    public VehicleUserAccessDTO AddAccess(RealmPlayer player, byte accessType, string? customValue = null)
+    {
+        return AddAccess(player.UserId, accessType, customValue);
+    }
+
     public VehicleUserAccessDTO AddAsOwner(RealmPlayer player, string? customValue = null)
     {
         return AddAccess(player, 0, customValue);
     }
 
+    public VehicleUserAccessDTO AddAsOwner(int userId, string? customValue = null)
+    {
+        return AddAccess(userId, 0, customValue);
+    }
+
+    public bool IsOwner(int userId)
+    {
+        if (TryGetAccess(userId, out var access))
+            return access.AccessType == 0;
+        return false;
+    }
+
+    public bool IsOwner(RealmPlayer player) => IsOwner(player.UserId);
+
     public IEnumerator<VehicleUserAccessDTO> GetEnumerator()
     {
-        throw new NotImplementedException();
+        lock (_lock)
+            return new List<VehicleUserAccessDTO>(_userAccesses.Select(VehicleUserAccessDTO.Map)).GetEnumerator();
     }
 
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();

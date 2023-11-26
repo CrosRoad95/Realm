@@ -29,9 +29,9 @@ public class VehicleUpgradesService : IVehicleUpgradesService
     private void HandleLoaded(IVehiclePersistanceService persistance, RealmVehicle vehicle)
     {
         _upgrades = persistance.VehicleData.Upgrades;
-        if (_upgrades.Count > 0)
-            Rebuild?.Invoke(this);
     }
+
+    public void ForceRebuild() => Rebuild?.Invoke(this);
 
     private bool InternalHasUpgrade(int upgradeId) => _upgrades.Any(x => x.UpgradeId == upgradeId);
 

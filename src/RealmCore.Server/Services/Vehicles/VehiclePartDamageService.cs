@@ -106,4 +106,13 @@ public class VehiclePartDamageService : IVehiclePartDamageService
             return true;
         }
     }
+
+    public float GetState(short partId)
+    {
+        lock (_lock)
+        {
+            var vehiclePartDamage = _vehiclePartDamages.First(x => x.PartId == partId);
+            return vehiclePartDamage.State;
+        }
+    }
 }
