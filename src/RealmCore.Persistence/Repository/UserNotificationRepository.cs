@@ -18,10 +18,10 @@ internal sealed class UserNotificationRepository : IUserNotificationRepository
             .OrderByDescending(x => x.SentTime)
             .Take(limit);
 
-        return await query.ToListAsync();
+        return await query.ToListAsync(cancellationToken);
     }
     
-    public async Task<UserNotificationData> Create(int userId, DateTime now, string title, string content, string? excerpt = null)
+    public async Task<UserNotificationData> Create(int userId, DateTime now, string title, string content, string? excerpt = null, CancellationToken cancellationToken = default)
     {
         var userNotificationData = new UserNotificationData
         {
@@ -32,31 +32,31 @@ internal sealed class UserNotificationRepository : IUserNotificationRepository
             Excerpt = excerpt ?? (content.Length > 250 ? content[..250] : content)
         };
         _db.UserNotifications.Add(userNotificationData);
-        await _db.SaveChangesAsync();
+        await _db.SaveChangesAsync(cancellationToken);
         return userNotificationData;
     }
 
-    public async Task<int> CountUnread(int userId)
+    public async Task<int> CountUnread(int userId, CancellationToken cancellationToken = default)
     {
         var query = _db.UserNotifications
             .TagWithSource(nameof(UserNotificationRepository))
             .AsNoTracking()
             .Where(x => x.UserId == userId && x.ReadTime == null);
 
-        return await query.CountAsync();
+        return await query.CountAsync(cancellationToken);
     }
 
-    public async Task<bool> MarkAsRead(int id, DateTime now)
+    public async Task<bool> MarkAsRead(int id, DateTime now, CancellationToken cancellationToken = default)
     {
         var notification = await _db.UserNotifications
             .TagWithSource(nameof(UserNotificationRepository))
             .Where(x => x.Id == id)
-            .FirstOrDefaultAsync();
+            .FirstOrDefaultAsync(cancellationToken);
 
         if (notification == null || notification.ReadTime != null)
             return false;
 
         notification.ReadTime = now;
-        return await _db.SaveChangesAsync() == 1;
+        return await _db.SaveChangesAsync(cancellationToken) == 1;
     }
 }

@@ -17,7 +17,7 @@ internal sealed class SaveService : ISaveService
         _userDataSavers = userDataSavers;
     }
 
-    private async Task<bool> SaveVehicle(RealmVehicle vehicle)
+    private async Task<bool> SaveVehicle(RealmVehicle vehicle, CancellationToken cancellationToken = default)
     {
         if (!vehicle.Persistance.IsLoaded)
             return false;
@@ -120,7 +120,7 @@ internal sealed class SaveService : ISaveService
             vehicleData.Inventories = new List<InventoryData>();
 
         vehicleData.LastUsed = vehicle.Persistance.LastUsed;
-        await vehicle.GetRequiredService<IDb>().SaveChangesAsync();
+        await vehicle.GetRequiredService<IDb>().SaveChangesAsync(cancellationToken);
         return true;
     }
 
@@ -148,7 +148,7 @@ internal sealed class SaveService : ISaveService
         return items;
     }
 
-    public async Task<int> SaveNewPlayerInventory(InventoryComponent inventoryComponent, int userId)
+    public async Task<int> SaveNewPlayerInventory(InventoryComponent inventoryComponent, int userId, CancellationToken cancellationToken = default)
     {
         var inventory = MapInventory(inventoryComponent);
         _dbContext.UserInventories.Add(new UserInventoryData
@@ -156,11 +156,11 @@ internal sealed class SaveService : ISaveService
             Inventory = inventory,
             UserId = userId
         });
-        await _dbContext.SaveChangesAsync();
+        await _dbContext.SaveChangesAsync(cancellationToken);
         return inventory.Id;
     }
 
-    public async Task<int> SaveNewVehicleInventory(InventoryComponent inventoryComponent, int vehicleId)
+    public async Task<int> SaveNewVehicleInventory(InventoryComponent inventoryComponent, int vehicleId, CancellationToken cancellationToken = default)
     {
         var inventory = MapInventory(inventoryComponent);
         _dbContext.VehicleInventories.Add(new VehicleInventoryData
@@ -168,11 +168,11 @@ internal sealed class SaveService : ISaveService
             Inventory = inventory,
             VehicleId = vehicleId
         });
-        await _dbContext.SaveChangesAsync();
+        await _dbContext.SaveChangesAsync(cancellationToken);
         return inventory.Id;
     }
 
-    private async Task<bool> SavePlayer(RealmPlayer player)
+    private async Task<bool> SavePlayer(RealmPlayer player, CancellationToken cancellationToken = default)
     {
         if (!player.IsSignedIn)
             return false;
@@ -186,7 +186,7 @@ internal sealed class SaveService : ISaveService
         foreach (var item in _userDataSavers)
             await item.SaveAsync(player);
 
-        await db.SaveChangesAsync();
+        await db.SaveChangesAsync(cancellationToken);
         //var userData = await _dbContext.Users
         //    .IncludeAll()
         //    .Where(x => x.Id == user.Id).FirstAsync();
@@ -339,12 +339,12 @@ internal sealed class SaveService : ISaveService
         return true;
     }
 
-    public async Task<bool> Save(Element element)
+    public async Task<bool> Save(Element element, CancellationToken cancellationToken = default)
     {
         bool saved = element switch
         {
-            RealmPlayer player => await SavePlayer(player),
-            RealmVehicle vehicle => await SaveVehicle(vehicle),
+            RealmPlayer player => await SavePlayer(player, cancellationToken),
+            RealmVehicle vehicle => await SaveVehicle(vehicle, cancellationToken),
             _ => false
         };
 

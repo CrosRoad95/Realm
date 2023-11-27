@@ -14,7 +14,7 @@ internal sealed class FractionService : IFractionService
         _fractionRepository = fractionRepository;
     }
 
-    public Task<bool> InternalExists(int id, string code, string name) => _fractionRepository.Exists(id, code, name);
+    public Task<bool> InternalExists(int id, string code, string name, CancellationToken cancellationToken = default) => _fractionRepository.Exists(id, code, name, cancellationToken);
 
     public bool Exists(int id)
     {
@@ -50,9 +50,9 @@ internal sealed class FractionService : IFractionService
         _fractions[fractionId] = fraction;
     }
 
-    public async Task<bool> InternalCreateFraction(int fractionId, string fractionName, string fractionCode, Vector3 position)
+    public async Task<bool> InternalCreateFraction(int fractionId, string fractionName, string fractionCode, Vector3 position, CancellationToken cancellationToken = default)
     {
-        var members = await _fractionRepository.GetAllMembers(fractionId);
+        var members = await _fractionRepository.GetAllMembers(fractionId, cancellationToken);
         lock (_lock)
             _fractions.Add(fractionId, new Fraction
             {
@@ -68,15 +68,15 @@ internal sealed class FractionService : IFractionService
                 }).ToList()
             });
 
-        if (!await _fractionRepository.Exists(fractionId, fractionCode, fractionName))
+        if (!await _fractionRepository.Exists(fractionId, fractionCode, fractionName, cancellationToken))
         {
-            await _fractionRepository.CreateFraction(fractionId, fractionName, fractionCode);
+            await _fractionRepository.CreateFraction(fractionId, fractionName, fractionCode, cancellationToken);
             return true;
         }
         return false;
     }
 
-    public async Task<bool> TryAddMember(int fractionId, int userId, int rank, string rankName)
+    public async Task<bool> TryAddMember(int fractionId, int userId, int rank, string rankName, CancellationToken cancellationToken = default)
     {
         lock (_lock)
         {
@@ -85,6 +85,6 @@ internal sealed class FractionService : IFractionService
             InternalAddMember(fractionId, userId, rank, rankName);
         }
 
-        return await _fractionRepository.AddMember(fractionId, userId, rank, rankName);
+        return await _fractionRepository.AddMember(fractionId, userId, rank, rankName, cancellationToken);
     }
 }

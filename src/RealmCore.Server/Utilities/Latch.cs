@@ -40,7 +40,7 @@ public class Latch
                 var completedTask = await Task.WhenAny(Task, Task.Delay(_timeout.Value, timeoutCancellationTokenSource.Token));
                 if (completedTask == Task)
                 {
-                    timeoutCancellationTokenSource.Cancel();
+                    await timeoutCancellationTokenSource.CancelAsync();
                     await Task;
                 }
                 else

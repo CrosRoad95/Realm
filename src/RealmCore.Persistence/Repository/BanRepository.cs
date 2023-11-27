@@ -126,7 +126,7 @@ internal sealed class BanRepository : IBanRepository
             .AsNoTracking()
             .TagWithSource(nameof(BanRepository));
 
-        var banData = await query.FirstOrDefaultAsync();
+        var banData = await query.FirstOrDefaultAsync(cancellationToken);
         if (banData == null)
             return false;
 
@@ -146,7 +146,7 @@ internal sealed class BanRepository : IBanRepository
         if (type != null)
             query = query.Where(x => x.Type == type);
 
-        var bansData = await query.ToListAsync();
+        var bansData = await query.ToListAsync(cancellationToken);
         if (bansData == null || bansData.Count == 0)
             return new();
 
@@ -171,7 +171,7 @@ internal sealed class BanRepository : IBanRepository
         if (type != null)
             query = query.Where(x => x.Type == type);
 
-        var bansData = await query.ToListAsync();
+        var bansData = await query.ToListAsync(cancellationToken);
         if (bansData == null || bansData.Count == 0)
             return new();
 
@@ -196,7 +196,7 @@ internal sealed class BanRepository : IBanRepository
         if (type != null)
             query = query.Where(x => x.Type == type);
 
-        var bansData = await query.ToListAsync();
+        var bansData = await query.ToListAsync(cancellationToken);
         if (bansData == null || bansData.Count == 0)
             return new();
 

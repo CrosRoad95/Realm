@@ -31,5 +31,4 @@ public class BanDTO : IEqualityComparer<BanDTO>
             Type = banData.Type
         };
     }
-
 }

@@ -1,4 +1,4 @@
-﻿namespace RealmCore.Tests.Tests.Services;
+﻿namespace RealmCore.Tests.Tests.PlayerServices;
 
 public class BanServiceTests
 {

@@ -17,13 +17,13 @@ internal class DiscordService : IDiscordService
     public PrivateMessageReceived? PrivateMessageReceived { get; set; }
     public TextBasedMessageReceived? TextBasedCommandReceived { get; set; }
 
-    public async Task<ulong> SendMessage(ulong channelId, string message)
+    public async Task<ulong> SendMessage(ulong channelId, string message, CancellationToken cancellationToken = default)
     {
         var response = await _messagingClient.SendMessageAsync(new SendMessageRequest
         {
             ChannelId = channelId,
             Message = message,
-        });
+        }, cancellationToken: cancellationToken);
 
         if (response.Success)
             return response.MessageId;
@@ -31,16 +31,16 @@ internal class DiscordService : IDiscordService
         throw new Exception("Failed to send message");
     }
 
-    public async Task<ulong> SendFile(ulong channelId, Stream file, string fileName, string message)
+    public async Task<ulong> SendFile(ulong channelId, Stream file, string fileName, string message, CancellationToken cancellationToken = default)
     {
-        var byteString = ByteString.FromStream(file);
+        var byteString = await ByteString.FromStreamAsync(file, cancellationToken);
         var response = await _messagingClient.SendFileAsync(new SendFileRequest
         {
             File = byteString,
             FileName = fileName,
             ChannelId = channelId,
             Message = message,
-        });
+        }, cancellationToken: cancellationToken);
 
         if (response.Success)
             return response.MessageId;
@@ -48,13 +48,13 @@ internal class DiscordService : IDiscordService
         throw new Exception("Failed to send file");
     }
 
-    public async Task<ulong> SendMessageToUser(ulong userId, string message)
+    public async Task<ulong> SendMessageToUser(ulong userId, string message, CancellationToken cancellationToken = default)
     {
         var response = await _messagingClient.SendMessageToUserAsync(new SendMessageToUserRequest
         {
             UserId = userId,
             Message = message,
-        });
+        }, cancellationToken: cancellationToken);
 
         if (response.Success)
             return response.MessageId;
@@ -64,7 +64,7 @@ internal class DiscordService : IDiscordService
 
     Dictionary<ulong, Dictionary<string, Func<ulong, string, Task>>> _textBasedCommandHandlers = new();
 
-    public async Task HandleTextBasedCommand(ulong userId, ulong channelId, string command)
+    public async Task HandleTextBasedCommand(ulong userId, ulong channelId, string command, CancellationToken cancellationToken = default)
     {
         if (_textBasedCommandHandlers.TryGetValue(channelId, out var channelCommands))
         {

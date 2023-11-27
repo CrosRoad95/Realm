@@ -9,7 +9,7 @@ internal sealed class UserLoginHistoryRepository : IUserLoginHistoryRepository
         _db = db;
     }
 
-    public void Add(int userId, DateTime now, string ip, string serial)
+    public async Task Add(int userId, DateTime now, string ip, string serial, CancellationToken cancellationToken = default)
     {
         var userLoginHistoryData = new UserLoginHistoryData
         {
@@ -19,6 +19,7 @@ internal sealed class UserLoginHistoryRepository : IUserLoginHistoryRepository
             Serial = serial
         };
         _db.UserLoginHistory.Add(userLoginHistoryData);
+        await _db.SaveChangesAsync(cancellationToken);
     }
 
     public async Task<List<UserLoginHistoryData>> Get(int userId, int limit = 10, CancellationToken cancellationToken = default)

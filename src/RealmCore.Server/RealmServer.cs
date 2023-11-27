@@ -43,12 +43,12 @@ public class RealmServer : MtaDiPlayerServerTempFix<RealmPlayer>
             logger.LogError(ex, "Failed to start server.");
         }
     }
-    public async Task StartCore()
+    public async Task StartCore(CancellationToken cancellationToken = default)
     {
         var logger = GetRequiredService<ILogger<RealmServer>>();
         await GetRequiredService<IDb>().MigrateAsync();
-        await GetRequiredService<SeederServerBuilder>().Build();
-        await GetRequiredService<ILoadService>().LoadAll();
+        await GetRequiredService<SeederServerBuilder>().Build(cancellationToken);
+        await GetRequiredService<ILoadService>().LoadAll(cancellationToken);
 
         var gameplayOptions = GetRequiredService<IOptions<GameplayOptions>>();
         CultureInfo.CurrentCulture = gameplayOptions.Value.Culture;
@@ -60,7 +60,7 @@ public class RealmServer : MtaDiPlayerServerTempFix<RealmPlayer>
         logger.LogInformation("Found resources: {resourcesCount}", RealmResourceServer._resourceCounter);
         logger.LogInformation("Created commands: {commandsCount}", realmCommandService.Count);
         ServerStarted?.Invoke();
-        await Task.Delay(-1);
+        await Task.Delay(-1, cancellationToken);
     }
 
     public new async Task Stop()

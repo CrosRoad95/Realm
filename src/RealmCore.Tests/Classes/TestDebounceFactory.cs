@@ -43,7 +43,7 @@ internal class TestDebounce : IDebounce
             {
                 // Ignore
             }
-        });
+        }, CancellationToken.None);
     }
 
     public async Task InvokeAsync(Action action, CancellationToken cancellationToken = default)

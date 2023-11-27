@@ -2,6 +2,6 @@
 
 public interface ILoadService
 {
-    Task LoadAll();
-    Task<RealmVehicle> LoadVehicleById(int id);
+    Task LoadAll(CancellationToken cancellationToken = default);
+    Task<RealmVehicle> LoadVehicleById(int id, CancellationToken cancellationToken = default);
 }

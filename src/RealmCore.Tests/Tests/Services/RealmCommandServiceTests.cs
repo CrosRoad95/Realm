@@ -90,10 +90,12 @@ public class RealmCommandServiceTests
         var player = realmTestingServer.CreatePlayer();
         await realmTestingServer.SignInPlayer(player);
 
+        var waitTask = new TaskCompletionSource();
         bool wasExecuted = false;
         void act(Element elements, CommandArguments args)
         {
             wasExecuted = true;
+            waitTask.SetResult();
         }
 
         if (useAsyncHandler)
@@ -105,7 +107,9 @@ public class RealmCommandServiceTests
             sut.AddCommandHandler("foo", (e, args) => { act(e, args); });
         }
 
+        //await Task.Delay(5000);
         player.TriggerCommand("foo", ["bar", "baz"]);
+        //await waitTask.Task;
         wasExecuted.Should().BeTrue();
     }
 

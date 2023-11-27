@@ -135,7 +135,7 @@ internal class CommandHandler
             // response, or at least let the user know that something went wrong during the command execution.
             if (arg.Type == InteractionType.ApplicationCommand)
             {
-                await arg.GetOriginalResponseAsync().ContinueWith(async (msg) => await msg.Result.DeleteAsync());
+                await arg.GetOriginalResponseAsync().ContinueWith(async (msg) => await (await msg).DeleteAsync());
             }
         }
     }

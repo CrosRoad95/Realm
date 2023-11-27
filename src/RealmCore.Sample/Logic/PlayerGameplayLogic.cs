@@ -69,7 +69,9 @@ internal sealed class PlayerGameplayLogic
                         if (player.IsLookingAt(element) && liftableWorldObjectComponent.TryLift(player))
                         {
                             await player.DoAnimationAsync(Animation.CarryLiftUp);
+#pragma warning disable CA1849 // Call async methods when in an async method
                             player.DoAnimation(Animation.StartCarry);
+#pragma warning restore CA1849 // Call async methods when in an async method
                             player.AddComponent(new AttachedElementComponent(element, SlipeServer.Packets.Enums.BoneId.LeftHand, new Vector3(0.2f, 0.2f, -0), new Vector3(0, -20, 0)));
                         }
                         break;

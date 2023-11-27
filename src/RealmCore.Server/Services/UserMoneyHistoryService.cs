@@ -11,24 +11,16 @@ internal sealed class UserMoneyHistoryService : IUserMoneyHistoryService
         _dateTimeProvider = dateTimeProvider;
     }
 
-    public async Task Add(RealmPlayer player, decimal change, int? category = null, string? description = null)
+    public async Task Add(RealmPlayer player, decimal change, int? category = null, string? description = null, CancellationToken cancellationToken = default)
     {
         var money = player.Money.Amount;
-        await _userMoneyHistoryRepository.Add(player.UserId, _dateTimeProvider.Now, money + change, change, category, description);
+        await _userMoneyHistoryRepository.Add(player.UserId, _dateTimeProvider.Now, money + change, change, category, description, cancellationToken);
     }
 
-    public async Task<List<UserMoneyHistoryDTO>> Get(RealmPlayer player, int limit = 10)
+    public async Task<List<UserMoneyHistoryDTO>> Get(RealmPlayer player, int limit = 10, CancellationToken cancellationToken = default)
     {
-        var moneyHistory = await _userMoneyHistoryRepository.Get(player.UserId, limit);
+        var moneyHistory = await _userMoneyHistoryRepository.Get(player.UserId, limit, cancellationToken);
 
-        return moneyHistory.Select(x => new UserMoneyHistoryDTO
-        {
-            Id = x.Id,
-            DateTime = x.DateTime,
-            Amount = x.Amount,
-            CurrentBalance = x.CurrentBalance,
-            Category = x.Category,
-            Description = x.Description
-        }).ToList();
+        return moneyHistory.Select(UserMoneyHistoryDTO.Map).ToList();
     }
 }

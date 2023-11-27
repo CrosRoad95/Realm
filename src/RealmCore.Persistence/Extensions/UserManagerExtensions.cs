@@ -149,7 +149,7 @@ public static class UserManagerExtensions
         var query = userManager.Users
             .TagWithSource(nameof(UserManagerExtensions))
             .Where(x => x.Id == userId);
-        var user = await query.FirstOrDefaultAsync();
+        var user = await query.FirstOrDefaultAsync(cancellationToken);
         if (user == null)
             return false;
 
@@ -164,7 +164,7 @@ public static class UserManagerExtensions
         var query = userManager.Users
             .TagWithSource(nameof(UserManagerExtensions))
             .Where(x => x.Id == userId);
-        var user = await query.FirstOrDefaultAsync();
+        var user = await query.FirstOrDefaultAsync(cancellationToken);
         if (user == null)
             return false;
 

@@ -132,7 +132,8 @@ internal sealed class PlayersLogic
 
     private void HandlePlayerResourceStarted(Player player, PlayerResourceStartedEventArgs e)
     {
-        _playerResources[(RealmPlayer)player].Decrement();
+        if (_playerResources.TryGetValue((RealmPlayer)player, out var latch))
+            latch.Decrement();
     }
 
     private async void HandlePlayerDestroyed(Element plr)

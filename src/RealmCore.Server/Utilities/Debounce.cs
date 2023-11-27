@@ -34,13 +34,13 @@ public class Debounce : IDebounce
             {
                 // Ignore
             }
-        });
+        }, CancellationToken.None);
     }
 
     public async Task InvokeAsync(Action action, CancellationToken cancellationToken = default)
     {
         if (_cancelationTokenSource != null)
-            _cancelationTokenSource.Cancel();
+            await _cancelationTokenSource.CancelAsync();
 
         try
         {
@@ -61,7 +61,8 @@ public class Debounce : IDebounce
 
     public async Task InvokeAsync(Func<Task> task, CancellationToken cancellationToken = default)
     {
-        _cancelationTokenSource?.Cancel();
+        if(_cancelationTokenSource != null)
+            await _cancelationTokenSource.CancelAsync();
 
         try
         {

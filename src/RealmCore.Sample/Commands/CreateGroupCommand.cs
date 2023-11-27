@@ -19,8 +19,8 @@ public sealed class CreateGroupCommand : IInGameCommand
         var name = args.ReadWordOrDefault("default");
         try
         {
-            var group = await _groupService.CreateGroup(name, "");
-            await _groupService.AddMember(player, group.id, 100, "Leader");
+            var group = await _groupService.CreateGroup(name, "", cancellationToken: cancellationToken);
+            await _groupService.AddMember(player, group.id, 100, "Leader", cancellationToken);
 
             _chatBox.OutputTo(player, $"Group: '{name}' has been created");
         }

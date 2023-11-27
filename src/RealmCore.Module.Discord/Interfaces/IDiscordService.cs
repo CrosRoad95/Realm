@@ -19,8 +19,8 @@ public interface IDiscordService
     internal TextBasedMessageReceived? TextBasedCommandReceived { get; set; }
 
     void AddTextBasedCommandHandler(ulong channelId, string command, Func<ulong, string, Task> callback);
-    Task HandleTextBasedCommand(ulong userId, ulong channelId, string command);
-    Task<ulong> SendFile(ulong channelId, Stream file, string fileName, string message);
-    Task<ulong> SendMessage(ulong channelId, string message);
-    Task<ulong> SendMessageToUser(ulong userId, string message);
+    Task HandleTextBasedCommand(ulong userId, ulong channelId, string command, CancellationToken cancellationToken = default);
+    Task<ulong> SendFile(ulong channelId, Stream file, string fileName, string message, CancellationToken cancellationToken = default);
+    Task<ulong> SendMessage(ulong channelId, string message, CancellationToken cancellationToken = default);
+    Task<ulong> SendMessageToUser(ulong userId, string message, CancellationToken cancellationToken = default);
 }

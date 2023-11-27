@@ -102,6 +102,12 @@ internal class RealmTestingServer : TestingServer<RealmTestingPlayer>
         });
     })
     {
+        PlayerJoined += HandlePlayerJoined;
+    }
+
+    private void HandlePlayerJoined(RealmTestingPlayer player)
+    {
+        player.TriggerResourceStarted(420);
     }
 
     public void ForceUpdate()
@@ -125,14 +131,8 @@ internal class RealmTestingServer : TestingServer<RealmTestingPlayer>
             };
         }
 
-        player.TriggerResourceStarted(420);
-        player.ResourceStarted += HandleResourceStarted;
+        GetRequiredService<IPlayersService>().RelayLoaded(player);
         return player;
-    }
-
-    private void HandleResourceStarted(Player sender, SlipeServer.Server.Elements.Events.PlayerResourceStartedEventArgs e)
-    {
-        throw new NotImplementedException();
     }
 
     public RealmObject CreateObject()
@@ -175,7 +175,7 @@ internal class RealmTestingServer : TestingServer<RealmTestingPlayer>
             await userManager.AddClaimsAsync(user, claims);
         }
 
-        var claimsPrincipal = await signInManager.CreateUserPrincipalAsync(user);
+        var claimsPrincipal = await signInManager.CreateUserPrincipalAsync(user ?? throw new Exception("User should not be null here"));
 
         if (roles != null)
             foreach (var role in roles)

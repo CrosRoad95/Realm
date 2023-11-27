@@ -79,7 +79,6 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IVehiclesService, VehiclesService>();
         services.AddScoped<IGroupService, GroupService>();
         services.AddScoped<IFractionService, FractionService>();
-        services.AddScoped<IBanService, BanService>();
         services.AddScoped<IRewardService, RewardService>();
         services.AddScoped<IFeedbackService, FeedbackService>();
         services.AddScoped<ISpawnMarkersService, SpawnMarkersService>();

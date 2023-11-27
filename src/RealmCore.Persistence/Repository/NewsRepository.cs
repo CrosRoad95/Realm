@@ -14,10 +14,8 @@ internal sealed class NewsRepository : INewsRepository
         _transactionContext = transactionContext;
     }
 
-    public async Task Add(string title, string excerpt, string content, DateTime publishTime, string[] tags, int? createdByUserId = null)
+    public async Task Add(string title, string excerpt, string content, DateTime publishTime, string[] tags, int? createdByUserId = null, CancellationToken cancellationToken = default)
     {
-        var executionStrategy = _db.Database.CreateExecutionStrategy();
-
         await _transactionContext.ExecuteAsync(async db =>
         {
             var newsTags = new List<NewsTagData>();
@@ -43,10 +41,9 @@ internal sealed class NewsRepository : INewsRepository
                 NewsTags = newsTags
             };
             db.News.Add(news);
-            await db.SaveChangesAsync();
-        });
+            await db.SaveChangesAsync(cancellationToken);
+        }, cancellationToken);
 
-        await _db.SaveChangesAsync();
     }
 
     public async Task<List<NewsData>> Get(DateTime now, int limit = 10, CancellationToken cancellationToken = default)

@@ -50,6 +50,9 @@ public class TransportObjectObjective : Objective
 
     public override void Update()
     {
+        if (!_loaded)
+            return;
+
         if (_element == null)
         {
             var elementsInRange = _elementCollection.GetWithinRange(_destination, _range);

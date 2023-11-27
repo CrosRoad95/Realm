@@ -27,13 +27,13 @@ internal class ExtraCommandsLogic
 
         _commandService.AddAsyncCommandHandler("discordsendmessage", async (player, args, token) =>
         {
-            var messageId = await _discordService.SendMessage(1079342213097607399, args.ReadAllAsString());
+            var messageId = await _discordService.SendMessage(1079342213097607399, args.ReadAllAsString(), token);
             _chatBox.OutputTo(player, $"Wysłano wiadomość, id: {messageId}");
         });
 
         _commandService.AddAsyncCommandHandler("discordsendmessagetouser", async (player, args, token) =>
         {
-            var messageId = await _discordService.SendMessageToUser(659910279353729086, args.ReadAllAsString());
+            var messageId = await _discordService.SendMessageToUser(659910279353729086, args.ReadAllAsString(), token);
             _chatBox.OutputTo(player, $"Wysłano wiadomość, id: {messageId}");
         });
 
@@ -49,7 +49,7 @@ internal class ExtraCommandsLogic
 
         _commandService.AddAsyncCommandHandler("discordsendfile", async (player, args, token) =>
         {
-            var messageId = await _discordService.SendFile(997787973775011853, generateStreamFromString("dowody"), "dowody_na_borsuka.txt", "potwierdzam");
+            var messageId = await _discordService.SendFile(997787973775011853, generateStreamFromString("dowody"), "dowody_na_borsuka.txt", "potwierdzam", token);
             _chatBox.OutputTo(player, $"Wysłano plik, id: {messageId}");
         });
 

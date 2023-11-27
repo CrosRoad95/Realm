@@ -1,4 +1,5 @@
 ﻿using RealmCore.Server.Concepts.Interfaces;
+using RealmCore.Server.Security.Interfaces;
 
 namespace RealmCore.Tests.Tests;
 
@@ -11,8 +12,13 @@ public class SaveServiceTests
         var vehiclesService = realmTestingServer.GetRequiredService<IVehiclesService>();
         var loadService = realmTestingServer.GetRequiredService<ILoadService>();
         var saveService = realmTestingServer.GetRequiredService<ISaveService>();
+        var activeVehicles = realmTestingServer.GetRequiredService<IActiveVehicles>();
         var vehicle = await vehiclesService.CreatePersistantVehicle(404, Vector3.Zero, Vector3.Zero);
         var id = vehicle.PersistantId;
+        activeVehicles.ActiveVehiclesIds.Should().BeEquivalentTo([id]);
+        activeVehicles.IsActive(id).Should().BeTrue();
+        activeVehicles.TryGetVehicleById(id, out var foundVehicle).Should().BeTrue();
+        foundVehicle.Should().Be(vehicle);
         await saveService.Save(vehicle);
         vehicle.Destroy();
 

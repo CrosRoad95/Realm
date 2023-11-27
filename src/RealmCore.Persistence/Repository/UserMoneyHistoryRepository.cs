@@ -9,7 +9,7 @@ internal sealed class UserMoneyHistoryRepository : IUserMoneyHistoryRepository
         _db = db;
     }
 
-    public async Task<UserMoneyHistoryData> Add(int userId, DateTime now, decimal currentBalance, decimal amount, int? category = null, string? description = null)
+    public async Task<UserMoneyHistoryData> Add(int userId, DateTime now, decimal currentBalance, decimal amount, int? category = null, string? description = null, CancellationToken cancellationToken = default)
     {
         var userMoneyHistoryData = new UserMoneyHistoryData
         {
@@ -21,7 +21,7 @@ internal sealed class UserMoneyHistoryRepository : IUserMoneyHistoryRepository
             Description = description
         };
         _db.UserMoneyHistory.Add(userMoneyHistoryData);
-        await _db.SaveChangesAsync();
+        await _db.SaveChangesAsync(cancellationToken);
         return userMoneyHistoryData;
     }
 

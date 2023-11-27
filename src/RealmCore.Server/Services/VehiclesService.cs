@@ -1,4 +1,5 @@
 ﻿using RealmCore.Server.Json.Converters;
+using System.Threading;
 
 namespace RealmCore.Server.Services;
 
@@ -60,10 +61,10 @@ internal sealed class VehiclesService : IVehiclesService
         }
     }
 
-    public async Task<RealmVehicle> CreatePersistantVehicle(ushort model, Vector3 position, Vector3 rotation)
+    public async Task<RealmVehicle> CreatePersistantVehicle(ushort model, Vector3 position, Vector3 rotation, CancellationToken cancellationToken = default)
     {
         var vehicle = _elementFactory.CreateVehicle(model, position, rotation);
-        var vehicleData = await vehicle.GetRequiredService<IVehicleRepository>().CreateVehicle(model, _dateTimeProvider.Now);
+        var vehicleData = await vehicle.GetRequiredService<IVehicleRepository>().CreateVehicle(model, _dateTimeProvider.Now, cancellationToken);
         try
         {
             TrySetActive(vehicleData.Id, vehicle);
@@ -77,44 +78,44 @@ internal sealed class VehiclesService : IVehiclesService
         }
     }
 
-    public async Task<RealmVehicle> ConvertToPersistantVehicle(RealmVehicle vehicle)
+    public async Task<RealmVehicle> ConvertToPersistantVehicle(RealmVehicle vehicle, CancellationToken cancellationToken = default)
     {
         if (vehicle.Persistance.IsLoaded)
             throw new InvalidOperationException();
 
-        var vehicleData = await _vehicleRepository.CreateVehicle(vehicle.Model, _dateTimeProvider.Now);
+        var vehicleData = await _vehicleRepository.CreateVehicle(vehicle.Model, _dateTimeProvider.Now, cancellationToken);
 
         TrySetActive(vehicleData.Id, vehicle);
         vehicle.Persistance.Load(vehicleData);
         return vehicle;
     }
 
-    public async Task<List<LightInfoVehicleDTO>> GetAllLightVehicles(RealmPlayer player)
+    public async Task<List<LightInfoVehicleDTO>> GetAllLightVehicles(RealmPlayer player, CancellationToken cancellationToken = default)
     {
         if (player.IsSignedIn)
         {
-            return await _vehicleRepository.GetLightVehiclesByUserId(player.UserId);
+            return await _vehicleRepository.GetLightVehiclesByUserId(player.UserId, cancellationToken);
         }
         return new();
     }
 
-    public async Task<List<VehicleData>> GetAllVehicles(RealmPlayer player)
+    public async Task<List<VehicleData>> GetAllVehicles(RealmPlayer player, CancellationToken cancellationToken = default)
     {
         if(player.IsSignedIn)
         {
-            return await _vehicleRepository.GetVehiclesByUserId(player.UserId);
+            return await _vehicleRepository.GetVehiclesByUserId(player.UserId, null, cancellationToken);
         }
         return new();
     }
 
-    public Task<List<VehicleData>> GetAllSpawnedVehicles()
+    public Task<List<VehicleData>> GetAllSpawnedVehicles(CancellationToken cancellationToken = default)
     {
-        return _vehicleRepository.GetAllSpawnedVehicles();
+        return _vehicleRepository.GetAllSpawnedVehicles(cancellationToken);
     }
 
-    public async Task<bool> SetVehicleSpawned(RealmVehicle vehicle, bool spawned = true)
+    public async Task<bool> SetVehicleSpawned(RealmVehicle vehicle, bool spawned = true, CancellationToken cancellationToken = default)
     {
-        return await _vehicleRepository.SetSpawned(vehicle.Persistance.Id, spawned);
+        return await _vehicleRepository.SetSpawned(vehicle.Persistance.Id, spawned, cancellationToken);
     }
 
     private void TrySetActive(int vehicleId, RealmVehicle vehicle)
@@ -123,7 +124,7 @@ internal sealed class VehiclesService : IVehiclesService
             throw new PersistantVehicleAlreadySpawnedException("Failed to create already existing vehicle.");
     }
 
-    public async Task<RealmVehicle> Spawn(VehicleData vehicleData)
+    public async Task<RealmVehicle> Spawn(VehicleData vehicleData, CancellationToken cancellationToken = default)
     {
         if(vehicleData.IsRemoved)
             throw new VehicleRemovedException(vehicleData.Id);
@@ -156,12 +157,12 @@ internal sealed class VehiclesService : IVehiclesService
                 return []; // TODO:
             });
 
-        await SetVehicleSpawned(vehicle);
+        await SetVehicleSpawned(vehicle, true, cancellationToken);
         vehicle.Upgrades.ForceRebuild();
         return vehicle;
     }
 
-    public IEnumerable<RealmPlayer> GetOnlineOwner(RealmVehicle vehicle)
+    public IEnumerable<RealmPlayer> GetOnlineOwners(RealmVehicle vehicle)
     {
         foreach (var owner in vehicle.Access.Owners)
         {

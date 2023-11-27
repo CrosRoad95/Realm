@@ -13,18 +13,18 @@ internal sealed class LoadService : ILoadService
         _vehiclesService = vehiclesService;
     }
 
-    public async Task LoadAll()
+    public async Task LoadAll(CancellationToken cancellationToken = default)
     {
-        await LoadAllVehicles();
+        await LoadAllVehicles(cancellationToken);
     }
 
-    public async Task<RealmVehicle> LoadVehicleById(int id)
+    public async Task<RealmVehicle> LoadVehicleById(int id, CancellationToken cancellationToken = default)
     {
-        var vehicleData = await _vehicleRepository.GetVehicleById(id) ?? throw new PersistantVehicleNotFoundException($"Failed to load vehicle data of id {id}");
+        var vehicleData = await _vehicleRepository.GetVehicleById(id, cancellationToken) ?? throw new PersistantVehicleNotFoundException($"Failed to load vehicle data of id {id}");
 
         try
         {
-            return await _vehiclesService.Spawn(vehicleData);
+            return await _vehiclesService.Spawn(vehicleData, cancellationToken);
         }
         catch (Exception ex)
         {
@@ -33,16 +33,16 @@ internal sealed class LoadService : ILoadService
         }
     }
 
-    private async Task LoadAllVehicles()
+    private async Task LoadAllVehicles(CancellationToken cancellationToken = default)
     {
-        var results = await _vehicleRepository.GetAllSpawnedVehicles();
+        var results = await _vehicleRepository.GetAllSpawnedVehicles(cancellationToken);
 
         int i = 0;
         foreach (var vehicleData in results)
         {
             try
             {
-                await _vehiclesService.Spawn(vehicleData);
+                await _vehiclesService.Spawn(vehicleData, cancellationToken);
                 i++;
             }
             catch (Exception ex)

@@ -1,4 +1,5 @@
-﻿using static RealmCore.Server.Seeding.SeedData;
+﻿using System.Threading;
+using static RealmCore.Server.Seeding.SeedData;
 
 namespace RealmCore.Server.Seeding;
 
@@ -247,7 +248,7 @@ internal sealed class SeederServerBuilder
         }
     }
 
-    public async Task Build()
+    public async Task Build(CancellationToken cancellationToken = default)
     {
         var result = new JObject();
         List<SeedData> seedDataList = new();
@@ -257,7 +258,7 @@ internal sealed class SeederServerBuilder
         {
             try
             {
-                var data = JsonConvert.DeserializeObject<SeedData>(File.ReadAllText(seedFileName)) ?? throw new Exception("Something went wrong while deserializing.");
+                var data = JsonConvert.DeserializeObject<SeedData>(await File.ReadAllTextAsync(seedFileName, cancellationToken)) ?? throw new Exception("Something went wrong while deserializing.");
                 seedDataList.Add(data);
             }
             catch (Exception ex)

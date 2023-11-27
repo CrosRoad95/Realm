@@ -45,6 +45,7 @@ internal sealed class JobSessionComponentLogic
         {
             objective.Dispose();
             _logger.LogError(ex, "Failed to load objective.");
+            throw;
         }
     }
 }

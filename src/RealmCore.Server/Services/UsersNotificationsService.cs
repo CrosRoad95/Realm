@@ -14,26 +14,26 @@ internal sealed class UsersNotificationsService : IUsersNotificationsService
         _dateTimeProvider = dateTimeProvider;
     }
 
-    public async Task<int> Create(RealmPlayer player, string title, string description, string? excerpt = null)
+    public async Task<int> Create(RealmPlayer player, string title, string description, string? excerpt = null, CancellationToken cancellationToken = default)
     {
-        var notification = await _userNotificationRepository.Create(player.UserId, _dateTimeProvider.Now, title, description, excerpt);
+        var notification = await _userNotificationRepository.Create(player.UserId, _dateTimeProvider.Now, title, description, excerpt, cancellationToken);
         NotificationCreated?.Invoke(player, title, description, excerpt, notification.Id);
         return notification.Id;
     }
 
-    public async Task<List<UserNotificationData>> Get(RealmPlayer player, int limit = 10)
+    public async Task<List<UserNotificationData>> Get(RealmPlayer player, int limit = 10, CancellationToken cancellationToken = default)
     {
-        return await _userNotificationRepository.Get(player.UserId, limit);
+        return await _userNotificationRepository.Get(player.UserId, limit, cancellationToken);
     }
 
-    public async Task<int> CountUnread(RealmPlayer player)
+    public async Task<int> CountUnread(RealmPlayer player, CancellationToken cancellationToken = default)
     {
-        return await _userNotificationRepository.CountUnread(player.UserId);
+        return await _userNotificationRepository.CountUnread(player.UserId, cancellationToken);
     }
 
-    public async Task<bool> MarkAsRead(int notificationId)
+    public async Task<bool> MarkAsRead(int notificationId, CancellationToken cancellationToken = default)
     {
-        if(await _userNotificationRepository.MarkAsRead(notificationId, _dateTimeProvider.Now))
+        if(await _userNotificationRepository.MarkAsRead(notificationId, _dateTimeProvider.Now, cancellationToken))
         {
             NotificationRead?.Invoke(notificationId);
             return true;

@@ -13,28 +13,28 @@ internal sealed class FeedbackService : IFeedbackService
         _dateTimeProvider = dateTimeProvider;
     }
 
-    public async Task Rate(RealmPlayer player, int ratingId, int rating)
+    public async Task Rate(RealmPlayer player, int ratingId, int rating, CancellationToken cancellationToken = default)
     {
-        await _ratingRepository.Rate(player.UserId, ratingId, rating, _dateTimeProvider.Now);
+        await _ratingRepository.Rate(player.UserId, ratingId, rating, _dateTimeProvider.Now, cancellationToken);
     }
     
-    public async Task ChangeLastRating(RealmPlayer player, int ratingId, int rating)
+    public async Task ChangeLastRating(RealmPlayer player, int ratingId, int rating, CancellationToken cancellationToken = default)
     {
-        await _ratingRepository.ChangeLastRating(player.UserId, ratingId, rating, _dateTimeProvider.Now);
+        await _ratingRepository.ChangeLastRating(player.UserId, ratingId, rating, _dateTimeProvider.Now, cancellationToken);
     }
 
-    public async Task<(int, DateTime)?> GetLastRating(RealmPlayer player, int ratingId)
+    public async Task<(int, DateTime)?> GetLastRating(RealmPlayer player, int ratingId, CancellationToken cancellationToken = default)
     {
-        return await _ratingRepository.GetLastRating(player.UserId, ratingId);
+        return await _ratingRepository.GetLastRating(player.UserId, ratingId, cancellationToken);
     }
 
-    public async Task AddOpinion(RealmPlayer player, int opinionId, string opinion)
+    public async Task AddOpinion(RealmPlayer player, int opinionId, string opinion, CancellationToken cancellationToken = default)
     {
-        await _opinionRepository.AddOpinion(player.UserId, opinionId, opinion, _dateTimeProvider.Now);
+        await _opinionRepository.AddOpinion(player.UserId, opinionId, opinion, _dateTimeProvider.Now, cancellationToken);
     }
 
-    public async Task<DateTime?> GetLastOpinionDateTime(RealmPlayer player, int opinionId)
+    public async Task<DateTime?> GetLastOpinionDateTime(RealmPlayer player, int opinionId, CancellationToken cancellationToken = default)
     {
-        return await _opinionRepository.GetLastOpinionDateTime(player.UserId, opinionId);
+        return await _opinionRepository.GetLastOpinionDateTime(player.UserId, opinionId, cancellationToken);
     }
 }

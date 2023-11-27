@@ -36,7 +36,7 @@ internal sealed class UsersService : IUsersService
         _serviceProvider = serviceProvider;
     }
 
-    public async Task<int> SignUp(string username, string password)
+    public async Task<int> SignUp(string username, string password, CancellationToken cancellationToken = default)
     {
         var user = new UserData
         {
@@ -55,15 +55,15 @@ internal sealed class UsersService : IUsersService
         throw new Exception("Failed to create a user");
     }
 
-    public async Task<bool> QuickSignIn(RealmPlayer player)
+    public async Task<bool> QuickSignIn(RealmPlayer player, CancellationToken cancellationToken = default)
     {
         var serial = player.Client.GetSerial();
         var userManager = player.GetRequiredService<UserManager<UserData>>();
-        var userData = await userManager.GetUserBySerial(serial) ?? throw new Exception("No account found.");
+        var userData = await userManager.GetUserBySerial(serial, cancellationToken) ?? throw new Exception("No account found.");
         if (!userData.QuickLogin)
             throw new Exception("Quick login not enabled");
 
-        return await SignIn(player, userData);
+        return await SignIn(player, userData, cancellationToken);
     }
 
     private void UpdateLastData(RealmPlayer player)
@@ -91,7 +91,7 @@ internal sealed class UsersService : IUsersService
         return null;
     }
 
-    public async Task<bool> SignIn(RealmPlayer player, UserData user)
+    public async Task<bool> SignIn(RealmPlayer player, UserData user, CancellationToken cancellationToken = default)
     {
         if (player == null)
             throw new NullReferenceException(nameof(player));
@@ -108,7 +108,6 @@ internal sealed class UsersService : IUsersService
         var signInManager = player.GetRequiredService<SignInManager<UserData>>();
         var userLoginHistoryRepository = player.GetRequiredService<IUserLoginHistoryRepository>();
         var db = player.GetRequiredService<IDb>();
-        var banService = player.GetRequiredService<IBanService>();
         try
         {
             var serial = player.Client.GetSerial();
@@ -138,10 +137,10 @@ internal sealed class UsersService : IUsersService
 
             player.Money.SetMoneyInternal(user.Money);
             await AuthorizePolicies(player);
-            userLoginHistoryRepository.Add(user.Id, _dateTimeProvider.Now, player.Client.IPAddress?.ToString() ?? "", serial);
+            userLoginHistoryRepository.Add(user.Id, _dateTimeProvider.Now, player.Client.IPAddress?.ToString() ?? "", serial, cancellationToken);
             UpdateLastData(player);
             db.Users.Update(user);
-            await db.SaveChangesAsync();
+            await db.SaveChangesAsync(cancellationToken);
 
             SignedIn?.Invoke(player);
             return true;
@@ -159,9 +158,9 @@ internal sealed class UsersService : IUsersService
         }
     }
 
-    public async Task SignOut(RealmPlayer player)
+    public async Task SignOut(RealmPlayer player, CancellationToken cancellationToken = default)
     {
-        await _saveService.Save(player);
+        await _saveService.Save(player, cancellationToken);
         _activeUsers.TrySetInactive(player.UserId);
         while (player.TryDestroyComponent<InventoryComponent>()) { }
         player.RemoveFromVehicle();

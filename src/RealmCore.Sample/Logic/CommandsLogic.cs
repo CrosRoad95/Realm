@@ -14,7 +14,6 @@ internal sealed class CommandsLogic
     private readonly RealmCommandService _commandService;
     private readonly IElementFactory _elementFactory;
     private readonly ItemsRegistry _itemsRegistry;
-    private readonly IBanService _banService;
     private readonly ChatBox _chatBox;
     private readonly ILogger<CommandsLogic> _logger;
     private readonly IDateTimeProvider _dateTimeProvider;
@@ -38,14 +37,13 @@ internal sealed class CommandsLogic
     }
 
     public CommandsLogic(RealmCommandService commandService, IElementFactory elementFactory,
-        ItemsRegistry itemsRegistry, IBanService banService, ChatBox chatBox, ILogger<CommandsLogic> logger,
+        ItemsRegistry itemsRegistry, ChatBox chatBox, ILogger<CommandsLogic> logger,
         IDateTimeProvider dateTimeProvider, INametagsService nametagsService, IUsersService usersService, IVehiclesService vehiclesService,
         GameWorld gameWorld, IElementOutlineService elementOutlineService, IAssetsService assetsService, ISpawnMarkersService spawnMarkersService, ILoadService loadService, IFeedbackService feedbackService, IOverlayService overlayService, AssetsRegistry assetsRegistry, VehicleUpgradeRegistry vehicleUpgradeRegistry, VehicleEnginesRegistry vehicleEnginesRegistry, IUserWhitelistedSerialsRepository userWhitelistedSerialsRepository, IVehicleRepository vehicleRepository, IUserMoneyHistoryService userMoneyHistoryService)
     {
         _commandService = commandService;
         _elementFactory = elementFactory;
         _itemsRegistry = itemsRegistry;
-        _banService = banService;
         _chatBox = chatBox;
         _logger = logger;
         _dateTimeProvider = dateTimeProvider;
@@ -64,13 +62,13 @@ internal sealed class CommandsLogic
             await debounce.InvokeAsync(() =>
             {
                 _chatBox.OutputTo(player, $"Counter={debounceCounter}, {DateTime.Now}");
-            });
+            }, token);
         });
 
         _commandService.AddAsyncCommandHandler("fadecamera", async (player, args, token) =>
         {
-            await player.FadeCameraAsync(CameraFade.Out, 5);
-            await player.FadeCameraAsync(CameraFade.In, 5);
+            await player.FadeCameraAsync(CameraFade.Out, 5, token);
+            await player.FadeCameraAsync(CameraFade.In, 5, token);
         });
 
         _commandService.AddAsyncCommandHandler("fadecamera2", async (player, args, token) =>
@@ -78,7 +76,7 @@ internal sealed class CommandsLogic
             var cancelationTokenSource = new CancellationTokenSource();
             cancelationTokenSource.CancelAfter(2000);
             await player.FadeCameraAsync(CameraFade.Out, 5, cancelationTokenSource.Token);
-            await player.FadeCameraAsync(CameraFade.In, 5);
+            await player.FadeCameraAsync(CameraFade.In, 5, token);
         });
 
         #region Commands for components tests
@@ -107,7 +105,7 @@ internal sealed class CommandsLogic
             var worldObject = _elementFactory.CreateObject(ObjectModel.Gunbox, player.Position + new Vector3(4, 0, 0), player.Rotation);
             _elementOutlineService.SetElementOutline(worldObject, Color.Red);
             _chatBox.OutputTo(player, "Created outline component");
-            await Task.Delay(2000);
+            await Task.Delay(2000, token);
             _elementOutlineService.RemoveElementOutline(worldObject);
             _chatBox.OutputTo(player, "Destroyed outline component");
         });
@@ -117,7 +115,7 @@ internal sealed class CommandsLogic
             var worldObject = _elementFactory.CreateObject(ObjectModel.Gunbox, player.Position + new Vector3(4, 0, 0), player.Rotation);
             _elementOutlineService.SetElementOutline(worldObject, Color.Red);
             _chatBox.OutputTo(player, "Created outline component");
-            await Task.Delay(2000);
+            await Task.Delay(2000, token);
             worldObject.Destroy();
             _chatBox.OutputTo(player, "Destroyed player");
         });
@@ -179,7 +177,7 @@ internal sealed class CommandsLogic
 
         _commandService.AddAsyncCommandHandler("cvprivate", async (player, args, token) =>
         {
-            var vehicle = await _vehiclesService.CreatePersistantVehicle(404, player.Position + new Vector3(4, 0, 0), player.Rotation);
+            var vehicle = await _vehiclesService.CreatePersistantVehicle(404, player.Position + new Vector3(4, 0, 0), player.Rotation, token);
             var components = vehicle;
             vehicle.Upgrades.AddUpgrade(1);
             components.AddComponent(new FuelComponent(1, 20, 20, 0.01, 2)).Active = true;
@@ -238,7 +236,7 @@ internal sealed class CommandsLogic
 
         _commandService.AddAsyncCommandHandler("accessinfobyid", async (player, args, token) =>
         {
-            var access = await _vehicleRepository.GetAllVehicleAccesses(args.ReadInt());
+            var access = await _vehicleRepository.GetAllVehicleAccesses(args.ReadInt(), token);
             if (access == null)
             {
                 _chatBox.OutputTo(player, "Vehicle not found");
@@ -335,7 +333,7 @@ internal sealed class CommandsLogic
             _chatBox.OutputTo(player, $"Updated achievement 'test' progress to 2");
 
             {
-                var vehicle = await _vehiclesService.CreatePersistantVehicle(404, player.Position + new Vector3(4, 0, 0), player.Rotation);
+                var vehicle = await _vehiclesService.CreatePersistantVehicle(404, player.Position + new Vector3(4, 0, 0), player.Rotation, token);
                 var components = vehicle;
                 vehicle.Upgrades.AddUpgrade(1);
                 components.AddComponent(new FuelComponent(1, 20, 20, 0.01, 2)).Active = true;
@@ -1561,7 +1559,7 @@ internal sealed class CommandsLogic
         {
             using var scope = player.GetRequiredService<IScopedElementFactory>().CreateScope();
             scope.CreateObject((ObjectModel)1337, player.Position + new Vector3(3, 0, 0), Vector3.Zero);
-            await Task.Delay(1000);
+            await Task.Delay(1000, token);
         });
 
         _commandService.AddCommandHandler("createelementsforme", (player, args) =>
@@ -1585,7 +1583,7 @@ internal sealed class CommandsLogic
 
         _commandService.AddAsyncCommandHandler("fetchmoreevents", async (player, args, token) =>
         {
-            var fetched = await player.Events.FetchMore();
+            var fetched = await player.Events.FetchMore(10, token);
             _chatBox.OutputTo(player, $"fetched {fetched.Count} more events");
         });
     }
