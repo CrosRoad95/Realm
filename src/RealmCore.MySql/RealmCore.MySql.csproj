@@ -12,11 +12,11 @@
 	<ItemGroup>
 		<ProjectReference Include="..\RealmCore.Configuration\RealmCore.Configuration.csproj" />
 		<ProjectReference Include="..\RealmCore.Persistence\RealmCore.Persistence.csproj" />
-		<PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="7.0.0">
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.0">
 			<PrivateAssets>all</PrivateAssets>
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
-		<PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="7.0.0" />
+		<PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="8.0.0-beta.2" />
 	</ItemGroup>
 
 	<ItemGroup>
