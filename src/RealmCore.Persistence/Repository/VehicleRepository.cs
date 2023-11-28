@@ -173,18 +173,31 @@ internal sealed class VehicleRepository : IVehicleRepository
     {
         var query = _db.VehicleUserAccess
             .AsNoTracking()
-            .TagWithSource(nameof(VehicleEventRepository))
+            .TagWithSource(nameof(VehicleRepository))
             .Include(x => x.User)
+            .Where(x => x.Vehicle != null && !x.Vehicle.IsRemoved)
             .Where(x => x.VehicleId == vehicleId);
         return await query.ToListAsync(cancellationToken);
+    }
+
+    public async Task<bool> HasUserAccessTo(int userId, int vehicleId, byte[]? accessType = null, CancellationToken cancellationToken = default)
+    {
+        var query = _db.VehicleUserAccess
+            .AsNoTracking()
+            .TagWithSource(nameof(VehicleRepository))
+            .Where(x => x.VehicleId == vehicleId && x.UserId == userId && (accessType == null || accessType.Contains(x.AccessType)))
+            .Where(x => x.Vehicle != null && !x.Vehicle.IsRemoved)
+            .Select(x => x.UserId);
+        return await query.AnyAsync(cancellationToken);
     }
 
     public async Task<List<int>> GetOwner(int vehicleId, CancellationToken cancellationToken = default)
     {
         var query = _db.VehicleUserAccess
-            .Where(x => x.VehicleId == vehicleId && x.AccessType == 0)
             .AsNoTracking()
-            .TagWithSource(nameof(VehicleEventRepository))
+            .TagWithSource(nameof(VehicleRepository))
+            .Where(x => x.Vehicle != null && !x.Vehicle.IsRemoved)
+            .Where(x => x.VehicleId == vehicleId && x.AccessType == 0)
             .Select(x => x.UserId);
         return await query.ToListAsync(cancellationToken);
     }

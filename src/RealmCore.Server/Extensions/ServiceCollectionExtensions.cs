@@ -122,6 +122,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IVehicleUpgradesService, VehicleUpgradesService>();
         services.AddScoped<IVehiclePartDamageService, VehiclePartDamageService>();
         services.AddScoped<IVehicleEnginesService, VehicleEnginesService>();
+        services.AddScoped<IVehicleEventsService, VehicleEventsService>();
         #endregion
 
         #region Policies

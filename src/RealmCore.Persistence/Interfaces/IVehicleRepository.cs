@@ -11,6 +11,7 @@ public interface IVehicleRepository
     Task<VehicleData?> GetReadOnlyVehicleById(int id, CancellationToken cancellationToken = default);
     Task<VehicleData?> GetVehicleById(int id, CancellationToken cancellationToken = default);
     Task<List<VehicleData>> GetVehiclesByUserId(int userId, IEnumerable<int>? accessTypes = null, CancellationToken cancellationToken = default);
+    Task<bool> HasUserAccessTo(int userId, int vehicleId, byte[]? accessType = null, CancellationToken cancellationToken = default);
     Task<bool> IsSpawned(int id, CancellationToken cancellationToken = default);
     Task<bool> SetKind(int id, byte kind, CancellationToken cancellationToken = default);
     Task<bool> SetSpawned(int id, bool spawned, CancellationToken cancellationToken = default);

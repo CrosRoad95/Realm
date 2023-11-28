@@ -71,7 +71,7 @@ internal sealed class PlayerSessionsService : IPlayerSessionsService, IDisposabl
         }
     }
 
-    public void EndSession<TSession>() where TSession: Session
+    public void EndSession<TSession>() where TSession : Session
     {
         Session session;
         lock (_lock)
@@ -88,8 +88,8 @@ internal sealed class PlayerSessionsService : IPlayerSessionsService, IDisposabl
         }
         Ended?.Invoke(this, session);
     }
-    
-    public void EndSession<TSession>(TSession session) where TSession: Session
+
+    public void EndSession<TSession>(TSession session) where TSession : Session
     {
         lock (_lock)
         {
@@ -105,6 +105,45 @@ internal sealed class PlayerSessionsService : IPlayerSessionsService, IDisposabl
             }
         }
         Ended?.Invoke(this, session);
+    }
+
+    public void TryEndSession<TSession>() where TSession : Session
+    {
+        Session session;
+        bool ended = false;
+        lock (_lock)
+        {
+            session = _sessions.OfType<TSession>().First();
+            try
+            {
+                session.End();
+            }
+            finally
+            {
+                ended = _sessions.Remove(session);
+            }
+        }
+        if(ended)
+            Ended?.Invoke(this, session);
+    }
+
+    public bool TryEndSession<TSession>(TSession session) where TSession : Session
+    {
+        lock (_lock)
+        {
+            if (!_sessions.Contains(session))
+                return false;
+            try
+            {
+                session.End();
+            }
+            finally
+            {
+                _sessions.Remove(session);
+            }
+        }
+        Ended?.Invoke(this, session);
+        return true;
     }
 
     public IEnumerator<Session> GetEnumerator()

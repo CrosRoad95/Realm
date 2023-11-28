@@ -13,5 +13,7 @@ public interface IPlayerSessionsService : IPlayerService, IEnumerable<Session>
     TSession GetRequiredSession<TSession>();
     TSession? GetSession<TSession>();
     bool IsDuringSession<TSession>();
+    void TryEndSession<TSession>() where TSession : Session;
+    bool TryEndSession<TSession>(TSession session) where TSession : Session;
     bool TryGetSession<TSession>(out TSession session);
 }
