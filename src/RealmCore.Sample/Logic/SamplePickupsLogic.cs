@@ -83,7 +83,7 @@ internal class SamplePickupsLogic
             if (element is RealmPickup pickup && pickup.Components.TryGetComponent(out NameComponent nameComponent) && nameComponent.Name.StartsWith("withText3d"))
             {
                 pickup.CollisionDetection.AddRule<MustBePlayerOnFootOnlyRule>();
-                pickup.CollisionDetection.AddRule<MustNotHaveComponent<AttachedElementComponent>>();
+                pickup.CollisionDetection.AddRule<MustNotHaveComponentRule<AttachedElementComponent>>();
                 pickup.AddOpenGuiLogic<TestWindowComponent>();
             }
         }

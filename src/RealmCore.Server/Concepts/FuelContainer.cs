@@ -1,8 +1,11 @@
-﻿namespace RealmCore.Server.Components.Vehicles;
+﻿using FluentValidation.Internal;
+using RealmCore.Persistence.Data;
 
-public class FuelComponent : Component, ILuaDebugDataProvider
+namespace RealmCore.Server.Concepts;
+
+public class FuelContainer
 {
-    public event Action<FuelComponent>? FuelRanOut;
+    public event Action<FuelContainer>? FuelRanOut;
 
     private Vector3 _lastPosition;
     private float _amount = 0;
@@ -11,13 +14,14 @@ public class FuelComponent : Component, ILuaDebugDataProvider
     private float _minimumDistanceThreshold;
     private short _fuelType;
     private bool _active;
+    private readonly VehicleFuelData? _vehicleFuelData;
 
-    public event Action<FuelComponent, bool>? ActiveChanged;
-    public event Action<FuelComponent, short>? FuelTypeChanged;
-    public event Action<FuelComponent, float>? MinimumDistanceThresholdChanged;
-    public event Action<FuelComponent, float>? AmountChanged;
-    public event Action<FuelComponent, float>? MaxCapacityChanged;
-    public event Action<FuelComponent, float>? FuelConsumptionPerOneKmChanged;
+    public event Action<FuelContainer, bool>? ActiveChanged;
+    public event Action<FuelContainer, short>? FuelTypeChanged;
+    public event Action<FuelContainer, float>? MinimumDistanceThresholdChanged;
+    public event Action<FuelContainer, float>? AmountChanged;
+    public event Action<FuelContainer, float>? MaxCapacityChanged;
+    public event Action<FuelContainer, float>? FuelConsumptionPerOneKmChanged;
 
     public bool Active
     {
@@ -31,6 +35,8 @@ public class FuelComponent : Component, ILuaDebugDataProvider
                 Update(true);
 
             _active = value;
+            if(_vehicleFuelData != null)
+                _vehicleFuelData.Active = value;
             ActiveChanged?.Invoke(this, value);
         }
     }
@@ -41,8 +47,11 @@ public class FuelComponent : Component, ILuaDebugDataProvider
         {
             return _fuelType;
         }
-        set {
+        set
+        {
             _fuelType = value;
+            if (_vehicleFuelData != null)
+                _vehicleFuelData.FuelType = value;
             FuelTypeChanged?.Invoke(this, value);
         }
     }
@@ -57,6 +66,8 @@ public class FuelComponent : Component, ILuaDebugDataProvider
         {
             if (value < 0.0f) value = 0.0f;
             _minimumDistanceThreshold = value;
+            if (_vehicleFuelData != null)
+                _vehicleFuelData.MinimumDistanceThreshold = value;
             MinimumDistanceThresholdChanged?.Invoke(this, value);
         }
     }
@@ -71,6 +82,8 @@ public class FuelComponent : Component, ILuaDebugDataProvider
         {
             if (value < 0.0f) value = 0.0f;
             _fuelConsumptionPerOneKm = value;
+            if (_vehicleFuelData != null)
+                _vehicleFuelData.FuelConsumptionPerOneKm = value;
             FuelConsumptionPerOneKmChanged?.Invoke(this, value);
         }
     }
@@ -88,6 +101,8 @@ public class FuelComponent : Component, ILuaDebugDataProvider
             if (value >= MaxCapacity)
                 value = MaxCapacity;
             _amount = value;
+            if (_vehicleFuelData != null)
+                _vehicleFuelData.Amount = value;
             Update(true);
             AmountChanged?.Invoke(this, value);
         }
@@ -108,12 +123,16 @@ public class FuelComponent : Component, ILuaDebugDataProvider
                 _maxCapacity = value;
             if (_maxCapacity < _amount)
                 _amount = _maxCapacity;
+            if (_vehicleFuelData != null)
+                _vehicleFuelData.MaxCapacity = value;
             Update(true);
             MaxCapacityChanged?.Invoke(this, value);
         }
     }
 
-    public FuelComponent(short fuelType, double initialAmount, double maxCapacity, double fuelConsumptionPerOneKm, double minimumDistanceThreshold)
+    public RealmVehicle Vehicle { get; }
+
+    internal FuelContainer(RealmVehicle vehicle, short fuelType, double initialAmount, double maxCapacity, double fuelConsumptionPerOneKm, double minimumDistanceThreshold)
     {
         if (initialAmount < 0) throw new ArgumentOutOfRangeException(nameof(initialAmount));
         if (minimumDistanceThreshold < 0) throw new ArgumentOutOfRangeException(nameof(minimumDistanceThreshold));
@@ -124,68 +143,39 @@ public class FuelComponent : Component, ILuaDebugDataProvider
         _maxCapacity = (float)maxCapacity;
         _fuelConsumptionPerOneKm = (float)fuelConsumptionPerOneKm;
         _minimumDistanceThreshold = (float)minimumDistanceThreshold;
+        Vehicle = vehicle;
         _fuelType = fuelType;
     }
 
-    public void Attach()
+    internal FuelContainer(RealmVehicle vehicle, VehicleFuelData vehicleFuelData) : this(vehicle, vehicleFuelData.FuelType, vehicleFuelData.Amount, vehicleFuelData.MaxCapacity, vehicleFuelData.FuelConsumptionPerOneKm, 2)
     {
-        var components = (IComponents)Element;
-        var vehicle = (RealmVehicle)Element;
-        _lastPosition = vehicle.RespawnPosition;
+        Vehicle = vehicle;
+        _vehicleFuelData = vehicleFuelData;
+    }
 
-        Element.PositionChanged += HandlePositionChanged;
-        if (_active)
+    public void Update(bool forceUpdate = false)
+    {
+        if (!Vehicle.IsEngineOn && !forceUpdate)
         {
-            // Turn off other fuel components if this is active.
-            foreach (var item in components.Components.ComponentsList.OfType<FuelComponent>().Where(x => x != this))
-                item.Active = false;
-        }
-    }
-
-    public void Detach()
-    {
-        Element.PositionChanged -= HandlePositionChanged;
-    }
-
-    private void HandlePositionChanged(Element sender, ElementChangedEventArgs<Vector3> args)
-    {
-        if (args.IsSync)
-            Update();
-    }
-
-    private void Update(bool forceUpdate = false)
-    {
-        var vehicle = (RealmVehicle)Element;
-
-        if (!vehicle.IsEngineOn && !forceUpdate)
-        {
-            _lastPosition = vehicle.Position;
+            _lastPosition = Vehicle.Position;
             return;
         }
-        if ((!vehicle.IsEngineOn || vehicle.IsFrozen) && !forceUpdate)
+        if ((!Vehicle.IsEngineOn || Vehicle.IsFrozen) && !forceUpdate)
             return;
 
-        var traveledDistance = vehicle.Position - _lastPosition;
+        var traveledDistance = Vehicle.Position - _lastPosition;
         if (_minimumDistanceThreshold > traveledDistance.Length() && !forceUpdate)
             return;
-        _lastPosition = vehicle.Position;
+        _lastPosition = Vehicle.Position;
         var consumedFuel = _fuelConsumptionPerOneKm / 1000.0f * traveledDistance.Length();
 
         _amount -= consumedFuel;
         if (_amount <= 0)
         {
             _amount = 0;
-            vehicle.IsEngineOn = false;
+            Vehicle.IsEngineOn = false;
             FuelRanOut?.Invoke(this);
         }
         AmountChanged?.Invoke(this, _amount);
-    }
-
-    public LuaValue GetLuaDebugData()
-    {
-        return new LuaValue(new Dictionary<LuaValue, LuaValue>
-        {
-            ["Paliwo"] = $"{_amount:0.00}/{_maxCapacity}"
-        });
     }
 }

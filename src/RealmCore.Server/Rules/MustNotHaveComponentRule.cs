@@ -1,6 +1,6 @@
 ﻿namespace RealmCore.Server.Rules;
 
-public sealed class MustNotHaveComponent<TComponent> : IElementRule
+public sealed class MustNotHaveComponentRule<TComponent> : IElementRule
     where TComponent : IComponent
 {
     public bool Check(Element element)

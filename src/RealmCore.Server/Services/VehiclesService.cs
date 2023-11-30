@@ -135,11 +135,6 @@ internal sealed class VehiclesService : IVehiclesService
                 TrySetActive(vehicleData.Id, vehicle);
                 var components = vehicle.Components;
                 vehicle.Persistance.Load(vehicleData);
-                if (vehicleData.Fuels.Count != 0)
-                {
-                    foreach (var vehicleFuel in vehicleData.Fuels)
-                        components.AddComponent(new FuelComponent(vehicleFuel.FuelType, vehicleFuel.Amount, vehicleFuel.MaxCapacity, vehicleFuel.FuelConsumptionPerOneKm, vehicleFuel.MinimumDistanceThreshold)).Active = vehicleFuel.Active;
-                }
 
                 if (vehicleData.Inventories != null && vehicleData.Inventories.Count != 0)
                 {

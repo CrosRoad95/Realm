@@ -137,7 +137,7 @@ internal sealed class PlayerGameplayLogic
                         {
                             await _serviceProvider.GetRequiredService<IVehiclesService>().ConvertToPersistantVehicle(vehicle);
                             vehicle.Access.AddAsOwner(player);
-                            vehicle.AddComponent(new FuelComponent(1, 20, 20, 0.01, 2)).Active = true;
+                            vehicle.Fuel.AddFuelContainer(1, 20, 20, 0.01f, 2, true);
                         }
                     };
                 }

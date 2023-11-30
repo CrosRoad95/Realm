@@ -87,21 +87,7 @@ internal sealed class SaveService : ISaveService
         }).ToList();
 
         vehicleData.Paintjob = vehicle.PaintJob;
-
-        {
-            var fuelComponents = vehicle.Components.ComponentsList.OfType<FuelComponent>();
-            vehicleData.Fuels = fuelComponents.Select(x => new VehicleFuelData
-            {
-                VehicleId = vehicleData.Id,
-                FuelType = x.FuelType,
-                Active = x.Active,
-                Amount = x.Amount,
-                FuelConsumptionPerOneKm = x.FuelConsumptionPerOneKm,
-                MaxCapacity = x.MaxCapacity,
-                MinimumDistanceThreshold = x.MinimumDistanceThreshold,
-            }).ToList();
-        }
-
+        
         var inventoryComponents = vehicle.Components.ComponentsList
             .OfType<InventoryComponent>()
             .Where(x => x.Id != 0)
