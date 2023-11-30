@@ -1,17 +1,17 @@
-﻿namespace RealmCore.Server.Components.Vehicles.Access;
+﻿namespace RealmCore.Server.Concepts.Access;
 
-public class VehicleLicenseRequirementAccessComponent : VehicleAccessControllerComponent
+public class VehicleLicenseRequirementAccessController : VehicleAccessController
 {
     private readonly int _licenseId;
 
-    public VehicleLicenseRequirementAccessComponent(int licenseId)
+    public VehicleLicenseRequirementAccessController(int licenseId)
     {
         _licenseId = licenseId;
     }
 
     protected override bool CanEnter(Ped ped, RealmVehicle vehicle, byte seat)
     {
-        if(ped is RealmPlayer player)
+        if (ped is RealmPlayer player)
             return player.Licenses.Has(_licenseId);
 
         return false;

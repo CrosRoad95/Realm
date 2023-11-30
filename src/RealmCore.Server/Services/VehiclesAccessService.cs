@@ -1,18 +1,20 @@
-﻿namespace RealmCore.Server.Services;
+﻿using RealmCore.Server.Concepts.Access;
+
+namespace RealmCore.Server.Services;
 
 internal sealed class VehiclesAccessService : IVehiclesAccessService
 {
     private readonly ILogger<VehiclesAccessService> _logger;
 
     public event Func<Ped, RealmVehicle, byte, bool>? CanEnter;
-    public event Action<Ped, RealmVehicle, byte, VehicleAccessControllerComponent>? FailedToEnter;
+    public event Action<Ped, RealmVehicle, byte, VehicleAccessController>? FailedToEnter;
 
     public VehiclesAccessService(ILogger<VehiclesAccessService> logger)
     {
         _logger = logger;
     }
 
-    public bool InternalCanEnter(Ped ped, RealmVehicle vehicle, byte seat, VehicleAccessControllerComponent? vehicleAccessControllerComponent = null)
+    public bool InternalCanEnter(Ped ped, RealmVehicle vehicle, byte seat, VehicleAccessController? vehicleAccessController = null)
     {
         if (CanEnter != null)
         {
@@ -25,11 +27,11 @@ internal sealed class VehiclesAccessService : IVehiclesAccessService
             }
         }
 
-        if (vehicleAccessControllerComponent != null)
+        if (vehicleAccessController != null)
         {
-            if (!vehicleAccessControllerComponent.InternalCanEnter(ped, vehicle, seat))
+            if (!vehicleAccessController.InternalCanEnter(ped, vehicle, seat))
             {
-                FailedToEnter?.Invoke(ped, vehicle, seat, vehicleAccessControllerComponent);
+                FailedToEnter?.Invoke(ped, vehicle, seat, vehicleAccessController);
                 return false;
             }
         }

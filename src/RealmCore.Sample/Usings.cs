@@ -8,7 +8,6 @@ global using RealmCore.Server.Components.Players;
 global using RealmCore.Server.Interfaces;
 global using RealmCore.Server.Registries;
 global using RealmCore.Server.Components.Common;
-global using RealmCore.Server.Components.Vehicles;
 global using RealmCore.Server.Services;
 global using RealmCore.Server.Components.Players.Jobs;
 global using RealmCore.Server.Concepts.Objectives;

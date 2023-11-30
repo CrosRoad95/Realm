@@ -1,4 +1,6 @@
-﻿namespace RealmCore.Server.Elements;
+﻿using RealmCore.Server.Concepts.Access;
+
+namespace RealmCore.Server.Elements;
 
 public class RealmVehicle : Vehicle, IComponents
 {
@@ -17,6 +19,7 @@ public class RealmVehicle : Vehicle, IComponents
     public IVehicleEnginesService Engines { get; private set; }
     public IVehicleEventsService Events { get; private set; }
     public IVehicleFuelService Fuel { get; private set; }
+    public VehicleAccessController AccessController { get; set; } = VehicleDefaultAccessController.Instance;
     public RealmVehicle(IServiceProvider serviceProvider, ushort model, Vector3 position) : base(model, position)
     {
         _serviceScope = serviceProvider.CreateScope();

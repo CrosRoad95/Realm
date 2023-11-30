@@ -1,4 +1,4 @@
-﻿using RealmCore.Server.Components.Vehicles.Access;
+﻿using RealmCore.Server.Concepts.Access;
 
 namespace RealmCore.Tests.Tests.Components;
 
@@ -24,11 +24,11 @@ public class VehicleAccessComponentsTests
         var player2 = realmTestingServer.CreatePlayer();
         var vehicle = realmTestingServer.CreateVehicle();
 
-        var accessComponent = vehicle.AddComponent(new VehicleExclusiveAccessComponent(player1));
+        vehicle.AccessController = new VehicleExclusiveAccessController(player1);
         var vehicleAccessService = realmTestingServer.GetRequiredService<IVehiclesAccessService>();
 
-        var player1CanEnter = vehicleAccessService.InternalCanEnter(player1, vehicle, 0, accessComponent);
-        var player2CanEnter = vehicleAccessService.InternalCanEnter(player2, vehicle, 0, accessComponent);
+        var player1CanEnter = vehicleAccessService.InternalCanEnter(player1, vehicle, 0, vehicle.AccessController);
+        var player2CanEnter = vehicleAccessService.InternalCanEnter(player2, vehicle, 0, vehicle.AccessController);
         player1CanEnter.Should().BeTrue();
         player2CanEnter.Should().BeFalse();
     }
@@ -40,10 +40,10 @@ public class VehicleAccessComponentsTests
         var player = realmTestingServer.CreatePlayer();
         var vehicle = realmTestingServer.CreateVehicle();
 
-        var accessComponent = vehicle.AddComponent<VehicleNoAccessComponent>();
+        vehicle.AccessController = VehicleNoAccessController.Instance;
         var vehicleAccessService = realmTestingServer.GetRequiredService<IVehiclesAccessService>();
 
-        var canEnter = vehicleAccessService.InternalCanEnter(player, vehicle, 0, accessComponent);
+        var canEnter = vehicleAccessService.InternalCanEnter(player, vehicle, 0, vehicle.AccessController);
         canEnter.Should().BeFalse();
     }
 
@@ -54,10 +54,10 @@ public class VehicleAccessComponentsTests
         var player = realmTestingServer.CreatePlayer();
         var vehicle = realmTestingServer.CreateVehicle();
 
-        var accessComponent = vehicle.AddComponent<VehicleDefaultAccessComponent>();
+        vehicle.AccessController = VehicleDefaultAccessController.Instance;
         var vehicleAccessService = realmTestingServer.GetRequiredService<IVehiclesAccessService>();
 
-        var canEnter = vehicleAccessService.InternalCanEnter(player, vehicle, 0, accessComponent);
+        var canEnter = vehicleAccessService.InternalCanEnter(player, vehicle, 0, vehicle.AccessController);
         canEnter.Should().BeTrue();
     }
 
@@ -69,13 +69,13 @@ public class VehicleAccessComponentsTests
         var player2 = realmTestingServer.CreatePlayer();
         var vehicle = realmTestingServer.CreateVehicle();
 
-        var accessComponent = vehicle.AddComponent<VehicleNoAccessComponent>();
+        vehicle.AccessController = VehicleNoAccessController.Instance;
         var vehicleAccessService = realmTestingServer.GetRequiredService<IVehiclesAccessService>();
 
         vehicleAccessService.CanEnter += (ped, vehicle, seat) => ped == player1;
 
-        var player1CanEnter = vehicleAccessService.InternalCanEnter(player1, vehicle, 0, accessComponent);
-        var player2CanEnter = vehicleAccessService.InternalCanEnter(player2, vehicle, 0, accessComponent);
+        var player1CanEnter = vehicleAccessService.InternalCanEnter(player1, vehicle, 0, vehicle.AccessController);
+        var player2CanEnter = vehicleAccessService.InternalCanEnter(player2, vehicle, 0, vehicle.AccessController);
         player1CanEnter.Should().BeTrue();
         player2CanEnter.Should().BeFalse();
     }

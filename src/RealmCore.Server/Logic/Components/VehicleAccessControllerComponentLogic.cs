@@ -1,31 +1,33 @@
-﻿namespace RealmCore.Server.Logic.Components;
+﻿using RealmCore.Server.Concepts.Access;
 
-internal sealed class VehicleAccessControllerComponentLogic : ComponentLogic<VehicleAccessControllerComponent>
+namespace RealmCore.Server.Logic.Components;
+
+internal sealed class VehicleAccessControllerComponentLogic
 {
     private readonly IVehiclesAccessService _vehicleAccessService;
     private readonly ILogger<VehicleAccessControllerComponentLogic> _logger;
 
-    public VehicleAccessControllerComponentLogic(IElementFactory elementFactory, IVehiclesAccessService vehicleAccessService, ILogger<VehicleAccessControllerComponentLogic> logger) : base(elementFactory)
+    public VehicleAccessControllerComponentLogic(IElementFactory elementFactory, IVehiclesAccessService vehicleAccessService, ILogger<VehicleAccessControllerComponentLogic> logger)
     {
         _vehicleAccessService = vehicleAccessService;
         _logger = logger;
+        elementFactory.ElementCreated += HandleElementCreated;
     }
 
-    protected override void ComponentAdded(VehicleAccessControllerComponent vehicleAccessControllerComponent)
+    private void HandleElementCreated(Element element)
     {
-        var vehicle = (RealmVehicle)vehicleAccessControllerComponent.Element;
-        vehicle.CanEnter = (ped, vehicle, seat) =>
-        {
-            if (!_vehicleAccessService.InternalCanEnter(ped, (RealmVehicle)vehicle, seat, vehicleAccessControllerComponent))
-                return false;
+        if (element is not RealmVehicle vehicle)
+            return;
 
-            return true;
-        };
+        vehicle.CanEnter = HandleCanEnter;
     }
 
-    protected override void ComponentDetached(VehicleAccessControllerComponent vehicleAccessControllerComponent)
+    private bool HandleCanEnter(Ped ped, Vehicle veh, byte seat)
     {
-        var vehicle = (RealmVehicle)vehicleAccessControllerComponent.Element;
-        vehicle.CanEnter = null;
+        var vehicle = (RealmVehicle)veh;
+        if (!_vehicleAccessService.InternalCanEnter(ped, vehicle, seat, vehicle.AccessController))
+            return false;
+
+        return true;
     }
 }

@@ -1,6 +1,6 @@
-﻿namespace RealmCore.Server.Components.Vehicles.Access;
+﻿namespace RealmCore.Server.Concepts.Access;
 
-public class VehiclePrivateAccessControllerComponent : VehicleAccessControllerComponent
+public class VehiclePrivateAccessController : VehicleAccessController
 {
     protected override bool CanEnter(Ped ped, RealmVehicle vehicle, byte seat)
     {

@@ -2,10 +2,10 @@
 using SlipeServer.Server.Enums;
 using RealmCore.Resources.ElementOutline;
 using RealmCore.Resources.Assets.Interfaces;
-using RealmCore.Server.Components.Vehicles.Access;
 using RealmCore.Resources.Overlay;
 using RealmCore.Resources.Assets;
 using RealmCore.Sample.Components.Vehicles;
+using RealmCore.Server.Concepts.Access;
 
 namespace RealmCore.Sample.Logic;
 
@@ -155,7 +155,7 @@ internal sealed class CommandsLogic
         _commandService.AddCommandHandler("cvwithlicenserequired", (player, args) =>
         {
             var vehicle = _elementFactory.CreateVehicle(args.ReadUShort(), player.Position + new Vector3(4, 0, 0), player.Rotation);
-            vehicle.AddComponent(new VehicleLicenseRequirementAccessComponent(10));
+            vehicle.AccessController = new VehicleLicenseRequirementAccessController(10);
         });
 
         _commandService.AddCommandHandler("givelicense10", (player, args) =>
@@ -171,7 +171,7 @@ internal sealed class CommandsLogic
             vehicle.Fuel.AddFuelContainer(1, 20, 20, 0.01f, 2, true);
             components.AddComponent<FocusableComponent>();
             components.PartDamage.AddPart(1, 1337);
-            components.AddComponent(new VehicleExclusiveAccessComponent(player));
+            components.AccessController = new VehicleExclusiveAccessController(player);
             _chatBox.OutputTo(player, $"veh created");
         });
 
@@ -190,7 +190,7 @@ internal sealed class CommandsLogic
             var vehicle = _elementFactory.CreateVehicle(404, player.Position + new Vector3(4, 0, 0), player.Rotation);
             var components = vehicle;
             vehicle.Fuel.AddFuelContainer(1, 20, 20, 0.01f, 2, true);
-            components.AddComponent(new VehicleExclusiveAccessComponent(player));
+            components.AccessController = new VehicleExclusiveAccessController(player);
         });
 
         _commandService.AddCommandHandler("noaccesscv", (player, args) =>
@@ -198,7 +198,7 @@ internal sealed class CommandsLogic
             var vehicle = _elementFactory.CreateVehicle(404, player.Position + new Vector3(4, 0, 0), player.Rotation);
             var components = vehicle;
             vehicle.Fuel.AddFuelContainer(1, 20, 20, 0.01f, 2, true);
-            components.AddComponent<VehicleNoAccessComponent>();
+            components.AccessController = VehicleNoAccessController.Instance;
         });
 
         _commandService.AddAsyncCommandHandler("privateblip", async (player, args, token) =>
