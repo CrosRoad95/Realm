@@ -51,9 +51,9 @@ internal sealed class PlayerGameplayLogic
                 }
             }
         }
-        else if (player.TryGetComponent(out CurrentInteractElementComponent currentInteractElementComponent))
+        else if (player.CurrentInteractElement != null)
         {
-            var element = currentInteractElementComponent.CurrentInteractElement;
+            var element = player.CurrentInteractElement;
             if (element == null)
                 return;
 
@@ -80,7 +80,7 @@ internal sealed class PlayerGameplayLogic
                         if (keyState == KeyState.Down)
                         {
                             var token = new CancellationTokenSource();
-                            currentInteractElementComponent.Disposed += e =>
+                            player.CurrentInteractElement.Destroyed += e =>
                             {
                                 token.Cancel();
                             };
@@ -144,13 +144,12 @@ internal sealed class PlayerGameplayLogic
             }
             else if (components.Components.TryGetComponent(out InteractionComponent interactionComponent))
             {
-                player.TryDestroyComponent<CurrentInteractElementComponent>();
-                player.AddComponent(new CurrentInteractElementComponent(element));
+                player.CurrentInteractElement = element;
             }
         }
         else
         {
-            player.TryDestroyComponent<CurrentInteractElementComponent>();
+            player.CurrentInteractElement = null;
             player.TryDestroyComponent<BuyVehicleGuiComponent>();
         }
     }

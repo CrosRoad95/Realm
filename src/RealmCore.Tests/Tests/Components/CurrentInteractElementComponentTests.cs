@@ -11,8 +11,8 @@ public class CurrentInteractElementComponentTests
         var player = realmTestingServer.CreatePlayer();
         var worldObject = realmTestingServer.CreateObject();
 
-        var currentInteractionComponent = player.AddComponent(new CurrentInteractElementComponent(worldObject));
-        currentInteractionComponent.CurrentInteractElement.Should().Be(worldObject);
+        player.CurrentInteractElement = worldObject;
+        player.CurrentInteractElement.Should().Be(worldObject);
         #endregion
 
         #region Act
@@ -20,7 +20,7 @@ public class CurrentInteractElementComponentTests
         #endregion
 
         #region Assert
-        currentInteractionComponent.CurrentInteractElement.Should().BeNull();
+        player.CurrentInteractElement.Should().BeNull();
         #endregion
     }
 
@@ -33,8 +33,8 @@ public class CurrentInteractElementComponentTests
         var player = realmTestingServer.CreatePlayer();
         var worldObject = realmTestingServer.CreateObject();
 
-        var currentInteractionComponent = player.AddComponent(new CurrentInteractElementComponent(worldObject));
-        currentInteractionComponent.CurrentInteractElement.Should().Be(worldObject);
+        player.CurrentInteractElement = worldObject;
+        player.CurrentInteractElement.Should().Be(worldObject);
         #endregion
 
         #region Act
@@ -42,7 +42,7 @@ public class CurrentInteractElementComponentTests
         #endregion
 
         #region Assert
-        currentInteractionComponent.CurrentInteractElement.Should().BeNull();
+        player.CurrentInteractElement.Should().BeNull();
         worldObject.Components.ComponentsList.Should().BeEmpty();
         #endregion
     }

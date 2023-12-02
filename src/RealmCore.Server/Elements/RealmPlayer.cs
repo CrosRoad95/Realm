@@ -12,6 +12,8 @@ public class RealmPlayer : Player, IComponents, IDisposable
 
     private Element? _focusedElement;
     private Element? _lastClickedElement;
+    private readonly object _currentInteractElementLock = new();
+    private Element? _currentInteractElement;
     public virtual Vector2 ScreenSize { get; internal set; }
     public virtual CultureInfo CultureInfo { get; internal set; }
     private readonly CultureInfo _culture;
@@ -28,6 +30,7 @@ public class RealmPlayer : Player, IComponents, IDisposable
 
     public event Action<RealmPlayer, Element?>? FocusedElementChanged;
     public event Action<RealmPlayer, Element?>? ClickedElementChanged;
+    public event Action<RealmPlayer, Element?>? CurrentInteractElementChanged;
 
     public Element? FocusedElement
     {
@@ -53,6 +56,33 @@ public class RealmPlayer : Player, IComponents, IDisposable
                 ClickedElementChanged?.Invoke(this, value);
             }
         }
+    }
+
+    public Element? CurrentInteractElement
+    {
+        get => _currentInteractElement; set
+        {
+            bool changed = false;
+            lock (_currentInteractElementLock)
+            {
+                if (value != _currentInteractElement)
+                {
+                    if (_currentInteractElement != null)
+                        _currentInteractElement.Destroyed -= HandleCurrentInteractElementDestroyed;
+                    _currentInteractElement = value;
+                    if (_currentInteractElement != null)
+                        _currentInteractElement.Destroyed += HandleCurrentInteractElementDestroyed;
+                    changed = true;
+                }
+            }
+            if (changed)
+                CurrentInteractElementChanged?.Invoke(this, value);
+        }
+    }
+
+    private void HandleCurrentInteractElementDestroyed(Element _)
+    {
+        CurrentInteractElement = null;
     }
 
     public CultureInfo Culture => _culture;

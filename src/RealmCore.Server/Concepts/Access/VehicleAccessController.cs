@@ -1,6 +1,5 @@
 ﻿namespace RealmCore.Server.Concepts.Access;
 
-[ComponentUsage(true)]
 public abstract class VehicleAccessController
 {
     protected abstract bool CanEnter(Ped ped, RealmVehicle vehicle, byte seat);
