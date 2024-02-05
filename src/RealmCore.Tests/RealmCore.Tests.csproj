@@ -35,4 +35,51 @@
 			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
 	</ItemGroup>
+
+	<ItemGroup>
+		<Using Include="System" />
+		<Using Include="System.Collections.Generic" />
+		<Using Include="Xunit" />
+
+		<Using Include="Microsoft.Extensions.Configuration" />
+		<Using Include="Microsoft.Extensions.DependencyInjection" />
+		<Using Include="SlipeServer.Server.TestTools" />
+		<Using Include="RealmCore.Tests.TestServers" />
+		<Using Include="FluentAssertions" />
+		<Using Include="RealmCore.Tests.Providers" />
+		<Using Include="RealmCore.Server.Options" />
+		<Using Include="RealmCore.Tests.Helpers" />
+		<Using Include="RealmCore.Configuration" />
+		<Using Include="RealmCore.Server.Components.Common" />
+		<Using Include="RealmCore.Server.Registries" />
+		<Using Include="RealmCore.Server.Concepts" />
+		<Using Include="Moq" />
+		<Using Include="RealmCore.Interfaces.Providers" />
+		<Using Include="RealmCore.Server.Extensions" />
+		<Using Include="RealmCore.Server.Interfaces" />
+		<Using Include="RealmCore.Server.Providers" />
+		<Using Include="RealmCore.Server.Services" />
+		<Using Include="Serilog" />
+		<Using Include="RealmCore.Server.Enums" />
+		<Using Include="RealmCore.Server.Exceptions" />
+		<Using Include="Microsoft.Extensions.Logging" />
+		<Using Include="RealmCore.Persistence" />
+		<Using Include="RealmCore.Persistence.Interfaces" />
+		<Using Include="RealmCore.Tests.Extensions" />
+		<Using Include="System.Numerics" />
+		<Using Include="SlipeServer.Server.Constants" />
+		<Using Include="RealmCore.Persistence.Extensions" />
+		<Using Include="Microsoft.AspNetCore.Identity" />
+		<Using Include="RealmCore.Persistence.Data" />
+		<Using Include="RealmCore.Server.Elements" />
+		<Using Include="SlipeServer.Server.Clients" />
+		<Using Include="System.Security.Claims" />
+		<Using Include="RealmCore.Server.Components" />
+		<Using Include="SlipeServer.Server.Elements" />
+		<Using Include="RealmCore.Server.Attributes" />
+		<Using Include="RealmCore.Server.Scopes" />
+		<Using Include="RealmCore.Persistence.DTOs" />
+		<Using Include="RealmCore.Server.Interfaces.Vehicles" />
+	</ItemGroup>
+
 </Project>

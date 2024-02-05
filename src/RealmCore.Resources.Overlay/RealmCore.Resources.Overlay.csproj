@@ -21,9 +21,20 @@
 		<EmbeddedResource Include="Lua\utility.lua" />
 	</ItemGroup>
 
-
 	<ItemGroup>
 		<ProjectReference Include="..\RealmCore.Resources.Assets\RealmCore.Resources.Assets.csproj" />
 		<ProjectReference Include="..\RealmCore.Resources.Base\RealmCore.Resources.Base.csproj" />
 	</ItemGroup>
+
+	<ItemGroup>
+		<Using Include="System" />
+		<Using Include="System.Collections.Generic" />
+		<Using Include="System.Numerics" />
+		<Using Include="System.Drawing" />
+		<Using Include="System.Runtime.CompilerServices" />
+		<Using Include="Microsoft.Extensions.DependencyInjection" />
+		<Using Include="RealmCore.Resources.Assets" />
+		<Using Include="SlipeServer.Server.ServerBuilders" />
+	</ItemGroup>
+
 </Project>

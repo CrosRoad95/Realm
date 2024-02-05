@@ -38,4 +38,13 @@
 		</Protobuf>
 	</ItemGroup>
 
+	<ItemGroup>
+		<Using Include="System.Threading.Tasks" />
+		<Using Include="Microsoft.Extensions.DependencyInjection" />
+		<Using Include="Grpc.Core" />
+		<Using Include="Greet" />
+		<Using Include="RealmCore.Module.Grpc.Stubs" />
+	</ItemGroup>
+
+	
 </Project>

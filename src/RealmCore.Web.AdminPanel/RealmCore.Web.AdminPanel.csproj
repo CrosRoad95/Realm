@@ -42,4 +42,14 @@
 		</EmbeddedResource>
 	</ItemGroup>
 
+	<ItemGroup>
+		<Using Include="System.Security.Claims" />
+		<Using Include="System.Diagnostics" />
+		<Using Include="Microsoft.Extensions.DependencyInjection" />
+		<Using Include="Microsoft.AspNetCore.Mvc" />
+		<Using Include="Microsoft.AspNetCore.Mvc.RazorPages" />
+		<Using Include="MudBlazor.Services" />
+		<Using Include="RealmCore.Web.AdminPanel.Services" />
+	</ItemGroup>
+
 </Project>

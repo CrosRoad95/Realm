@@ -45,4 +45,22 @@
 		<Folder Include="Protos\" />
 	</ItemGroup>
 
+	<ItemGroup>
+		<Using Include="System" />
+		<Using Include="System.Collections.Generic" />
+		<Using Include="System.Linq" />
+		<Using Include="System.Threading.Tasks" />
+		<Using Include="Microsoft.Extensions.DependencyInjection" />
+
+		<Using Include="Discord" />
+		<Using Include="Discord.WebSocket" />
+		<Using Include="Discord.Interactions" />
+		<Using Include="Microsoft.Extensions.Logging" />
+		<Using Include="Grpc.Net.Client" />
+		<Using Include="Microsoft.Extensions.Options" />
+		<Using Include="RealmCore.Discord.Integration.Channels" />
+		<Using Include="RealmCore.Discord.Integration.Interfaces" />
+		<Using Include="RealmCore.Discord.Integration.Services" />
+	</ItemGroup>
+
 </Project>

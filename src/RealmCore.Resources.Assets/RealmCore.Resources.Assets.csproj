@@ -18,4 +18,8 @@
 		<PackageReference Include="RenderWareBuilders" Version="0.1.0-CI-20221009-163717" />
 		<PackageReference Include="RenderWareIo" Version="0.1.0-CI-20221009-163717" />
 	</ItemGroup>
+
+	<ItemGroup>
+	  <Using Include="System.Runtime.CompilerServices" />
+	</ItemGroup>
 </Project>

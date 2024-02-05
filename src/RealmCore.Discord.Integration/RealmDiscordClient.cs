@@ -1,4 +1,6 @@
-﻿namespace RealmCore.Discord.Integration;
+﻿global using ILogger = Microsoft.Extensions.Logging.ILogger;
+
+namespace RealmCore.Discord.Integration;
 
 internal class RealmDiscordClient : IRealmDiscordClient
 {

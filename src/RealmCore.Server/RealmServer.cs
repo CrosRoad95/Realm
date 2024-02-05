@@ -1,4 +1,8 @@
-﻿using SlipeServer.Net.Wrappers;
+﻿global using ILogger = Microsoft.Extensions.Logging.ILogger;
+using SlipeServer.Net.Wrappers;
+
+[assembly: InternalsVisibleTo("RealmCore.Tests")]
+[assembly: InternalsVisibleTo("DynamicProxyGenAssembly2")]
 
 namespace RealmCore.Server;
 

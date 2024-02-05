@@ -1,4 +1,4 @@
-﻿using RealmCore.Persistence.Context;
+﻿[assembly: InternalsVisibleTo("RealmCore.Tests")]
 
 namespace RealmCore.Persistence;
 

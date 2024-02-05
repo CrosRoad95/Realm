@@ -1,6 +1,9 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using RealmCore.Resources.Base;
 using SlipeServer.Server.ServerBuilders;
+using System.Runtime.CompilerServices;
+
+[assembly: InternalsVisibleTo("RealmCore.Tests")]
 
 namespace RealmCore.Resources.ClientInterface;
 

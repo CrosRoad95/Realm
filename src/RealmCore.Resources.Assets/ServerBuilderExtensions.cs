@@ -2,6 +2,9 @@
 using RealmCore.Resources.Assets.Interfaces;
 using SlipeServer.Server.ServerBuilders;
 
+[assembly: InternalsVisibleTo("RealmCore.Tests")]
+[assembly: InternalsVisibleTo("DynamicProxyGenAssembly2")]
+
 namespace RealmCore.Resources.Assets;
 
 public static class ServerBuilderExtensions

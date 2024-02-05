@@ -25,4 +25,8 @@
 		<ProjectReference Include="..\RealmCore.Resources.Base\RealmCore.Resources.Base.csproj" />
 	</ItemGroup>
 
+	<ItemGroup>
+	  <Using Include="System.Runtime.CompilerServices" />
+	</ItemGroup>
+
 </Project>

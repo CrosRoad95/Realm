@@ -14,5 +14,12 @@
 		<ProjectReference Include="..\RealmCore.Interfaces\RealmCore.Interfaces.csproj" />
 		<ProjectReference Include="..\RealmCore.Module.Grpc\RealmCore.Module.Grpc.csproj" />
 	</ItemGroup>
-
+	
+	<ItemGroup>
+		<Using Include="Microsoft.Extensions.DependencyInjection" />
+		<Using Include="RealmCore.Interfaces.Extend" />
+		<Using Include="RealmCore.Module.Web.AdminPanel.Interfaces" />
+		<Using Include="RealmCore.Module.Web.AdminPanel.Services" />
+		<Using Include="RealmCore.Module.Web.AdminPanel.Stubs" />
+	</ItemGroup>
 </Project>

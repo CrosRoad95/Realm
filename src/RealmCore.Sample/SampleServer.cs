@@ -13,6 +13,8 @@ using RealmCore.Sample.Commands;
 using RealmCore.Sample.Data.Validators;
 using RealmCore.Sample.Data;
 
+[assembly: ExcludeFromCodeCoverage]
+
 namespace RealmCore.Sample;
 
 //using RealmCore.Console.Extra;

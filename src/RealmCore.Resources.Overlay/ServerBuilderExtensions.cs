@@ -1,6 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using RealmCore.Resources.Assets;
-using SlipeServer.Server.ServerBuilders;
+﻿[assembly: InternalsVisibleTo("RealmCore.Tests")]
 
 namespace RealmCore.Resources.Overlay;
 

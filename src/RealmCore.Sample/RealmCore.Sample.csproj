@@ -10,4 +10,49 @@
 	<ItemGroup>
 		<ProjectReference Include="..\RealmCore.Server\RealmCore.Server.csproj" />
 	</ItemGroup>
+
+	<ItemGroup>
+		<Using Include="System.Numerics" />
+		<Using Include="SlipeServer.Packets.Definitions.Lua" />
+		<Using Include="SlipeServer.Server.Events" />
+		<Using Include="SlipeServer.Packets.Lua.Camera" />
+		<Using Include="SlipeServer.Server.Elements" />
+		<Using Include="RealmCore.Server" />
+		<Using Include="RealmCore.Server.Components.Players" />
+		<Using Include="RealmCore.Server.Interfaces" />
+		<Using Include="RealmCore.Server.Registries" />
+		<Using Include="RealmCore.Server.Components.Common" />
+		<Using Include="RealmCore.Server.Services" />
+		<Using Include="RealmCore.Server.Components.Players.Jobs" />
+		<Using Include="RealmCore.Server.Concepts.Objectives" />
+		<Using Include="Microsoft.Extensions.DependencyInjection" />
+		<Using Include="Microsoft.Extensions.Logging" />
+		<Using Include="RealmCore.Server.Components.Object" />
+		<Using Include="RealmCore.Server.Attributes" />
+		<Using Include="FluentValidation" />
+		<Using Include="System.Diagnostics.CodeAnalysis" />
+		<Using Include="RealmCore.Server.Concepts" />
+		<Using Include="RealmCore.Server.Extensions" />
+		<Using Include="SlipeServer.Server.Services" />
+		<Using Include="RealmCore.Server.Abstractions" />
+		<Using Include="RealmCore.Server.Rules" />
+		<Using Include="Microsoft.Extensions.Options" />
+		<Using Include="RealmCore.Server.Options" />
+		<Using Include="RealmCore.Server.Utilities" />
+		<Using Include="RealmCore.Resources.Nametags" />
+		<Using Include="RealmCore.Resources.Admin.Enums" />
+		<Using Include="RealmCore.Resources.GuiSystem" />
+		<Using Include="SlipeServer.Resources.Text3d" />
+		<Using Include="RealmCore.Persistence.Interfaces" />
+		<Using Include="Microsoft.AspNetCore.Identity" />
+		<Using Include="RealmCore.Persistence.Data" />
+		<Using Include="RealmCore.Server.Components.Players.Abstractions" />
+		<Using Include="RealmCore.Persistence.Extensions" />
+		<Using Include="RealmCore.Sample.Components.Gui" />
+		<Using Include="RealmCore.Server.Elements" />
+		<Using Include="RealmCore.Server.Components" />
+		<Using Include="RealmCore.Sample.Components.Gui.Blazor" />
+		<Using Include="SlipeServer.Server" />
+	</ItemGroup>
+
 </Project>
