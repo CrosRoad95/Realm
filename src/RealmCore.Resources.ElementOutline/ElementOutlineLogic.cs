@@ -18,7 +18,7 @@ internal class ElementOutlineLogic
     private readonly ILogger<ElementOutlineLogic> _logger;
     private readonly ElementOutlineResource _resource;
 
-    private readonly Dictionary<Element, OutlineInfo> _outlineInfos = new();
+    private readonly Dictionary<Element, OutlineInfo> _outlineInfoDictionary = new();
 
     public ElementOutlineLogic(MtaServer server, IElementOutlineService elementOutlineService, ILuaEventHub<IElementOutlineEventHub> luaEventHub, ILogger<ElementOutlineLogic> logger)
     {
@@ -40,10 +40,10 @@ internal class ElementOutlineLogic
         try
         {
             await _resource.StartForAsync(player);
-            if (_outlineInfos.Count != 0)
+            if (_outlineInfoDictionary.Count != 0)
             {
-                var elements = _outlineInfos.Keys.ToArray();
-                var colors = _outlineInfos.Values.Select(x => x.color).ToArray();
+                var elements = _outlineInfoDictionary.Keys.ToArray();
+                var colors = _outlineInfoDictionary.Values.Select(x => x.color).ToArray();
                 _luaEventHub.Invoke(player, x => x.SetOutlines(elements, colors));
             }
         }
@@ -55,13 +55,13 @@ internal class ElementOutlineLogic
 
     private void HandleOutlineRemoved(Element element)
     {
-        _outlineInfos.Remove(element);
+        _outlineInfoDictionary.Remove(element);
         _luaEventHub.Broadcast(x => x.RemoveOutline(element));
     }
 
     private void HandleOutlineChanged(Element element, Color color)
     {
-        _outlineInfos[element] = new OutlineInfo
+        _outlineInfoDictionary[element] = new OutlineInfo
         {
             color = color,
         };

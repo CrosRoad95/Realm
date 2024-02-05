@@ -11,7 +11,6 @@
 	<ItemGroup>
 		<ProjectReference Include="..\RealmCore.Module.Discord\RealmCore.Module.Discord.csproj" />
 		<ProjectReference Include="..\RealmCore.Module.Grpc\RealmCore.Module.Grpc.csproj" />
-		<ProjectReference Include="..\RealmCore.Module.Web.AdminPanel\RealmCore.Module.Web.AdminPanel.csproj" />
 		<ProjectReference Include="..\RealmCore.Server\RealmCore.Server.csproj" />
 	</ItemGroup>
 

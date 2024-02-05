@@ -4,7 +4,6 @@ using RealmCore.Console.Extra.Integrations.Discord.Handlers;
 using RealmCore.Module.Discord;
 using RealmCore.Module.Grpc;
 using RealmCore.Module.Grpc.Options;
-using RealmCore.Module.Web.AdminPanel;
 
 namespace RealmCore.Console.Extra;
 
@@ -25,12 +24,10 @@ public static class ServerBuilderExtensions
 
             services.AddGrpcModule();
             services.AddDiscordModule();
-            services.AddWebAdminPanelModule();
 
         });
 
         serverBuilder.AddLogic<GRpcLogic>();
         serverBuilder.AddLogic<DiscordIntegrationLogic>();
-        serverBuilder.AddLogic<WebAdminPanelLogic>();
     }
 }
