@@ -116,7 +116,7 @@ internal sealed class SeederServerBuilder
             {
                 if(!await _groupRepository.IsUserInGroup(group.id, _createdUsers[item.Key].Id))
                 {
-                    await _groupRepository.AddMember(group.id, _createdUsers[item.Key].Id, item.Value.Rank, item.Value.RankName);
+                    await _groupRepository.TryAddMember(group.id, _createdUsers[item.Key].Id, item.Value.Rank, item.Value.RankName);
                     _logger.LogInformation("Seeder: Updated group {elementId} with members {members}", pair.Key, pair.Value.Members.Select(x => x.Key));
                     _isUpToDate = false;
                 }

@@ -1,30 +1,30 @@
-﻿using RealmCore.Server.Components.Peds;
+﻿namespace RealmCore.Server.Logic.Resources;
 
-namespace RealmCore.Server.Logic.Resources;
-
-internal sealed class NametagResourceLogic : ComponentLogic<NametagComponent>
+internal sealed class NametagResourceLogic
 {
     private readonly INametagsService _nametagsService;
 
-    public NametagResourceLogic(IElementFactory elementFactory, INametagsService nametagsService) : base(elementFactory)
+    public NametagResourceLogic(MtaServer mtaServer, INametagsService nametagsService)
     {
+        mtaServer.PlayerJoined += HandlePlayerJoined;
         _nametagsService = nametagsService;
     }
 
-    protected override void ComponentAdded(NametagComponent nametagComponent)
+    private void HandlePlayerJoined(Player plr)
     {
-        _nametagsService.SetNametag((Ped)nametagComponent.Element, nametagComponent.Text);
-        nametagComponent.TextChanged += HandleTextChanged;
+        var player = (RealmPlayer)plr;
+        player.NametagTextChanged += HandleNametagTextChanged;
     }
 
-    protected override void ComponentDetached(NametagComponent nametagComponent)
+    private void HandleNametagTextChanged(RealmPlayer player, string? nametagText)
     {
-        _nametagsService.RemoveNametag((Ped)nametagComponent.Element);
+        if(nametagText != null)
+        {
+            _nametagsService.SetNametag((Ped)player, nametagText);
+        }
+        else
+        {
+            _nametagsService.RemoveNametag((Ped)player);
+        }
     }
-
-    private void HandleTextChanged(NametagComponent nametagComponent, string text)
-    {
-        _nametagsService.SetNametag((Ped)nametagComponent.Element, text);
-    }
-
 }

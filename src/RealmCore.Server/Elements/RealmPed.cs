@@ -4,6 +4,18 @@ public class RealmPed : Ped, IComponents
 {
     public Concepts.Components Components { get; private set; }
 
+    private string? _nametagText;
+    public event Action<RealmPed, string?>? NametagTextChanged;
+    public string? NametagText
+    {
+        get => _nametagText;
+        set
+        {
+            _nametagText = value;
+            NametagTextChanged?.Invoke(this, _nametagText);
+        }
+    }
+
     public RealmPed(IServiceProvider serviceProvider, PedModel model, Vector3 position) : base(model, position)
     {
         Components = new(serviceProvider, this);

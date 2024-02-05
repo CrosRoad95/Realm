@@ -40,13 +40,13 @@ public class GroupServiceTests
 
         var group = await groupService.CreateGroup("Test group3", "TG3", GroupKind.Regular);
 
-        await groupService.AddMember(player, group.id, 1, "Leader");
+        await groupService.TryAddMember(player, group.id, 1, "Leader");
 
-        var groupMemberComponent = player.GetRequiredComponent<GroupMemberComponent>();
+        var member = player.Groups.GetMemberOrDefault(group.id) ?? throw new InvalidOperationException();
         var group2 = await groupService.GetGroupByName("Test group3");
-        groupMemberComponent.GroupId.Should().Be(group.id);
-        groupMemberComponent.RankName.Should().Be("Leader");
-        groupMemberComponent.Rank.Should().Be(1);
+        member.GroupId.Should().Be(group.id);
+        member.RankName.Should().Be("Leader");
+        member.Rank.Should().Be(1);
         group2.Value.members.Should().HaveCount(1);
         group2.Value.members[0].userId.Should().Be(player.UserId);
     }
@@ -60,10 +60,10 @@ public class GroupServiceTests
         var groupService = realmTestingServer.GetRequiredService<IGroupService>();
         var group = await groupService.CreateGroup("Test group4", "TG4", GroupKind.Regular);
 
-        await groupService.AddMember(player, group.id, 100, "Leader");
+        await groupService.TryAddMember(player, group.id, 100, "Leader");
         var removed = await groupService.RemoveMember(player, userId);
 
-        player.HasComponent<GroupMemberComponent>().Should().BeFalse();
+        player.Groups.IsMember(group.id).Should().BeFalse();
         var group2 = await groupService.GetGroupByName("Test group4");
         removed.Should().BeTrue();
         group2.Value.members.Should().BeEmpty();

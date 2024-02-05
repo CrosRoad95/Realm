@@ -69,4 +69,8 @@
 			<LastGenOutput>RPGServer.pl-PL.Designer.cs</LastGenOutput>
 		</EmbeddedResource>
 	</ItemGroup>
+
+	<ItemGroup>
+	  <Folder Include="Components\Peds\" />
+	</ItemGroup>
 </Project>

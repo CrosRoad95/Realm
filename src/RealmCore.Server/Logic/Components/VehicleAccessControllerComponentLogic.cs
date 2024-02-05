@@ -1,6 +1,4 @@
-﻿using RealmCore.Server.Concepts.Access;
-
-namespace RealmCore.Server.Logic.Components;
+﻿namespace RealmCore.Server.Logic.Components;
 
 internal sealed class VehicleAccessControllerComponentLogic
 {

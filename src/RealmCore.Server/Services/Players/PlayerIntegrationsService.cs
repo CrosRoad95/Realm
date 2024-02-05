@@ -22,7 +22,6 @@ public class PlayerIntegrationsService : IPlayerIntegrationsService
 
     private void HandleSignedOut(IPlayerUserService playerUserService, RealmPlayer _)
     {
-        throw new NotImplementedException();
     }
 
 }

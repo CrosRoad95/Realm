@@ -1,4 +1,6 @@
-﻿namespace RealmCore.Server.Services;
+﻿using RealmCore.Persistence.Data;
+
+namespace RealmCore.Server.Services;
 
 internal sealed class GroupService : IGroupService
 {
@@ -61,25 +63,27 @@ internal sealed class GroupService : IGroupService
         return Map(groupData);
     }
 
-    public async Task<bool> AddMember(RealmPlayer player, int groupId, int rank = 1, string rankName = "", CancellationToken cancellationToken = default)
+    public async Task<bool> TryAddMember(RealmPlayer player, int groupId, int rank = 1, string rankName = "", CancellationToken cancellationToken = default)
     {
-        if (player.Components.HasComponent<GroupMemberComponent>(x => x.GroupId == groupId))
+        if (player.Groups.IsMember(groupId))
             return false;
 
-        var groupMemberData = await _groupRepository.AddMember(groupId, player.UserId, rank, rankName, cancellationToken);
-        player.AddComponent(new GroupMemberComponent(groupMemberData));
+        var groupMemberData = await _groupRepository.TryAddMember(groupId, player.UserId, rank, rankName, cancellationToken);
+        if (groupMemberData == null)
+            return false;
+
+        player.Groups.AddGroupMember(groupMemberData);
         return true;
     }
 
     public async Task<bool> RemoveMember(RealmPlayer player, int groupId, CancellationToken cancellationToken = default)
     {
-        var groupMemberComponent = player.Components.FindComponent<GroupMemberComponent>(x => x.GroupId == groupId);
-        if (groupMemberComponent == null)
+        if (!player.Groups.IsMember(groupId))
             return false;
 
-        if (await _groupRepository.RemoveMember(groupId, player.UserId, cancellationToken))
+        if (await _groupRepository.TryRemoveMember(groupId, player.UserId, cancellationToken))
         {
-            return player.Components.TryDestroyComponent(groupMemberComponent);
+            player.Groups.RemoveGroupMember(groupId);
         }
         return false;
     }

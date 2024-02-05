@@ -14,6 +14,7 @@ public class RealmPlayer : Player, IComponents, IDisposable
     private Element? _lastClickedElement;
     private readonly object _currentInteractElementLock = new();
     private Element? _currentInteractElement;
+    private string? _nametagText;
     public virtual Vector2 ScreenSize { get; internal set; }
     public virtual CultureInfo CultureInfo { get; internal set; }
     private readonly CultureInfo _culture;
@@ -31,6 +32,7 @@ public class RealmPlayer : Player, IComponents, IDisposable
     public event Action<RealmPlayer, Element?>? FocusedElementChanged;
     public event Action<RealmPlayer, Element?>? ClickedElementChanged;
     public event Action<RealmPlayer, Element?>? CurrentInteractElementChanged;
+    public new event Action<RealmPlayer, string?>? NametagTextChanged;
 
     public Element? FocusedElement
     {
@@ -80,6 +82,16 @@ public class RealmPlayer : Player, IComponents, IDisposable
         }
     }
 
+    public new string? NametagText
+    {
+        get => _nametagText;
+        set
+        {
+            _nametagText = value;
+            NametagTextChanged?.Invoke(this, _nametagText);
+        }
+    }
+
     private void HandleCurrentInteractElementDestroyed(Element _)
     {
         CurrentInteractElement = null;
@@ -108,6 +120,7 @@ public class RealmPlayer : Player, IComponents, IDisposable
     public IPlayerEventsService Events { get; private set; }
     public IPlayerSessionsService Sessions { get; private set; }
     public IPlayerAdminService Admin { get; private set; }
+    public IPlayerGroupsService Groups { get; private set; }
     public IScopedElementFactory ElementFactory { get; private set; }
     public RealmPlayer(IServiceProvider serviceProvider)
     {
@@ -135,6 +148,7 @@ public class RealmPlayer : Player, IComponents, IDisposable
         Events = GetRequiredService<IPlayerEventsService>();
         Sessions = GetRequiredService<IPlayerSessionsService>();
         Admin = GetRequiredService<IPlayerAdminService>();
+        Groups = GetRequiredService<IPlayerGroupsService>();
         ElementFactory = GetRequiredService<IScopedElementFactory>();
         #endregion
 

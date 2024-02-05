@@ -25,7 +25,6 @@ global using RealmCore.Server.Rules;
 global using Microsoft.Extensions.Options;
 global using RealmCore.Server.Options;
 global using RealmCore.Server.Utilities;
-global using RealmCore.Server.Components.Peds;
 global using RealmCore.Resources.Nametags;
 global using RealmCore.Resources.Admin.Enums;
 global using RealmCore.Resources.GuiSystem;

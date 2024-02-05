@@ -80,7 +80,7 @@ internal sealed class GroupRepository : IGroupRepository
         return group;
     }
 
-    public async Task<GroupMemberData> AddMember(int groupId, int userId, int rank = 1, string rankName = "", CancellationToken cancellationToken = default)
+    public async Task<GroupMemberData?> TryAddMember(int groupId, int userId, int rank = 1, string rankName = "", CancellationToken cancellationToken = default)
     {
         var groupMember = new GroupMemberData
         {
@@ -90,8 +90,15 @@ internal sealed class GroupRepository : IGroupRepository
             RankName = rankName,
         };
         _db.GroupMembers.Add(groupMember);
-        await _db.SaveChangesAsync(cancellationToken);
-        return groupMember;
+        try
+        {
+            await _db.SaveChangesAsync(cancellationToken);
+            return groupMember;
+        }
+        catch (Exception)
+        {
+            return null;
+        }
     }
     
     public async Task<bool> IsUserInGroup(int groupId, int userId, CancellationToken cancellationToken = default)
@@ -99,11 +106,11 @@ internal sealed class GroupRepository : IGroupRepository
         var query = _db.GroupMembers
             .TagWithSource(nameof(GroupRepository))
             .Where(x => x.GroupId == groupId && x.UserId == userId);
-        return await query.AnyAsync(cancellationToken)
-            ;
+
+        return await query.AnyAsync(cancellationToken);
     }
 
-    public async Task<bool> RemoveMember(int groupId, int userId, CancellationToken cancellationToken = default)
+    public async Task<bool> TryRemoveMember(int groupId, int userId, CancellationToken cancellationToken = default)
     {
         var query = _db.GroupMembers
             .TagWithSource(nameof(GroupRepository))

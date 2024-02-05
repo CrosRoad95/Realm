@@ -43,7 +43,7 @@ internal sealed class PlayerJoinedLogic
         await Task.Delay(300);
         await player.FadeCameraAsync(CameraFade.In);
         _text3DService.SetRenderingEnabled(player, true);
-        player.AddComponent(new NametagComponent("KoxKociarz"));
+
         _nametagsService.SetNametagRenderingEnabled(player, true);
     }
 
