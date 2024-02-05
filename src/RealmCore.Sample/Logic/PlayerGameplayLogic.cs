@@ -1,11 +1,10 @@
-﻿using RealmCore.Sample.Components.Vehicles;
-using RealmCore.Server.Components.Abstractions;
+﻿using RealmCore.Server.Components.Abstractions;
 using RealmCore.Server.Enums;
 using SlipeServer.Server.Elements.Enums;
 
 namespace RealmCore.Sample.Logic;
 
-internal sealed class PlayerGameplayLogic
+internal sealed partial class PlayerGameplayLogic
 {
     private readonly IServiceProvider _serviceProvider;
     private readonly ChatBox _chatBox;
@@ -122,27 +121,27 @@ internal sealed class PlayerGameplayLogic
 
     private void HandleFocusedElementChanged(RealmPlayer player, Element? element)
     {
+        if(element is RealmVehicleForSale realmVehicleForSale)
+        {
+            if (!player.HasComponent<GuiComponent>())
+            {
+                var vehicle = ((RealmVehicle)element);
+                var vehicleName = ((RealmVehicle)element).Name;
+                player.AddComponent(new BuyVehicleGuiComponent(vehicleName, realmVehicleForSale.Price)).Bought = async () =>
+                {
+                    player.TryDestroyComponent<BuyVehicleGuiComponent>();
+                    if (realmVehicleForSale.TrySell())
+                    {
+                        await player.GetRequiredService<IVehiclesService>().ConvertToPersistantVehicle(vehicle);
+                        vehicle.Access.AddAsOwner(player);
+                        vehicle.Fuel.AddFuelContainer(1, 20, 20, 0.01f, 2, true);
+                    }
+                };
+            }
+        }
         if (element is IComponents components)
         {
-            if (components.TryGetComponent(out VehicleForSaleComponent vehicleForSaleComponent))
-            {
-                if (!player.HasComponent<GuiComponent>())
-                {
-                    var vehicle = ((RealmVehicle)element);
-                    var vehicleName = ((RealmVehicle)element).Name;
-                    player.AddComponent(new BuyVehicleGuiComponent(vehicleName, vehicleForSaleComponent.Price)).Bought = async () =>
-                    {
-                        player.TryDestroyComponent<BuyVehicleGuiComponent>();
-                        if (vehicle.TryDestroyComponent<VehicleForSaleComponent>())
-                        {
-                            await _serviceProvider.GetRequiredService<IVehiclesService>().ConvertToPersistantVehicle(vehicle);
-                            vehicle.Access.AddAsOwner(player);
-                            vehicle.Fuel.AddFuelContainer(1, 20, 20, 0.01f, 2, true);
-                        }
-                    };
-                }
-            }
-            else if (components.Components.TryGetComponent(out InteractionComponent interactionComponent))
+            if (components.Components.TryGetComponent(out InteractionComponent interactionComponent))
             {
                 player.CurrentInteractElement = element;
             }

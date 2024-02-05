@@ -135,7 +135,7 @@ internal class RealmTestingServer : TestingServer<RealmTestingPlayer>
         return player;
     }
 
-    public RealmObject CreateObject()
+    public RealmWorldObject CreateObject()
     {
         return GetRequiredService<IElementFactory>().CreateObject(SlipeServer.Server.Enums.ObjectModel.Bin1, Vector3.Zero, Vector3.Zero);
     }

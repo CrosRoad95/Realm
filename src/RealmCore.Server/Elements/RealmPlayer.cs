@@ -41,8 +41,28 @@ public class RealmPlayer : Player, IComponents, IDisposable
         {
             if (value != _focusedElement)
             {
+                switch (_focusedElement)
+                {
+                    case RealmVehicle vehicle:
+                        vehicle.RelayFocused(this, false);
+                        break;
+                    case RealmWorldObject worldObject:
+                        worldObject.RelayFocused(this, false);
+                        break;
+                }
+
                 _focusedElement = value;
                 FocusedElementChanged?.Invoke(this, value);
+
+                switch (value)
+                {
+                    case RealmVehicle vehicle:
+                        vehicle.RelayFocused(this, true);
+                        break;
+                    case RealmWorldObject worldObject:
+                        worldObject.RelayFocused(this, true);
+                        break;
+                }
             }
         }
     }

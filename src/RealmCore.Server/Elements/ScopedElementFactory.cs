@@ -227,10 +227,10 @@ internal class ScopedElementFactory : IScopedElementFactory
         throw new NotImplementedException();
     }
 
-    public RealmObject CreateObject(ObjectModel model, Vector3 position, Vector3 rotation, byte? interior = null, ushort? dimension = null, Func<RealmObject, IEnumerable<IComponent>>? elementBuilder = null)
+    public RealmWorldObject CreateObject(ObjectModel model, Vector3 position, Vector3 rotation, byte? interior = null, ushort? dimension = null, Func<RealmWorldObject, IEnumerable<IComponent>>? elementBuilder = null)
     {
         ThrowIfDisposed();
-        var worldObject = new RealmObject(_player.ServiceProvider, model, position)
+        var worldObject = new RealmWorldObject(_player.ServiceProvider, model, position)
         {
             Rotation = rotation,
             Interior = interior ?? _player.Interior,

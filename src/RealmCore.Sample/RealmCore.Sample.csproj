@@ -55,4 +55,8 @@
 		<Using Include="SlipeServer.Server" />
 	</ItemGroup>
 
+	<ItemGroup>
+	  <Folder Include="Components\Vehicles\" />
+	</ItemGroup>
+
 </Project>

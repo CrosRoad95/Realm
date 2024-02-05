@@ -4,7 +4,6 @@ using RealmCore.Resources.ElementOutline;
 using RealmCore.Resources.Assets.Interfaces;
 using RealmCore.Resources.Overlay;
 using RealmCore.Resources.Assets;
-using RealmCore.Sample.Components.Vehicles;
 using RealmCore.Server.Concepts.Access;
 
 namespace RealmCore.Sample.Logic;
@@ -352,7 +351,7 @@ internal sealed class CommandsLogic
         {
             _elementFactory.CreateVehicle(404, player.Position + new Vector3(4, 0, 0), Vector3.Zero, elementBuilder: vehicle =>
             {
-                return [new VehicleForSaleComponent(200)];
+                return []; // TODO:
             });
         });
 

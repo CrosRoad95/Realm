@@ -116,9 +116,9 @@ internal sealed class ElementFactory : IElementFactory
         return radarArea;
     }
 
-    public RealmObject CreateObject(ObjectModel model, Vector3 position, Vector3 rotation, byte? interior = null, ushort? dimension = null, Func<RealmObject, IEnumerable<IComponent>>? elementBuilder = null)
+    public RealmWorldObject CreateObject(ObjectModel model, Vector3 position, Vector3 rotation, byte? interior = null, ushort? dimension = null, Func<RealmWorldObject, IEnumerable<IComponent>>? elementBuilder = null)
     {
-        var worldObject = new RealmObject(_serviceProvider, model, position)
+        var worldObject = new RealmWorldObject(_serviceProvider, model, position)
         {
             Rotation = rotation,
             Interior = interior ?? 0,
