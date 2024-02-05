@@ -63,7 +63,7 @@ internal class SamplePickupsLogic
                     }
                     else
                     {
-                        var jobSessionComponent = player.Sessions.BeginSession<TestJobComponent>();
+                        var jobSessionComponent = player.Sessions.BeginSession<TestJob>();
                         _chatBox.OutputTo(player, $"Job started");
                         jobSessionComponent.Start();
 
@@ -84,15 +84,7 @@ internal class SamplePickupsLogic
             {
                 pickup.CollisionDetection.AddRule<MustBePlayerOnFootOnlyRule>();
                 pickup.CollisionDetection.AddRule<MustNotHaveComponentRule<AttachedElementComponent>>();
-                pickup.AddOpenGuiLogic<TestWindowComponent>();
-            }
-        }
-
-        {
-            if (element is RealmPickup pickup && pickup.Components.TryGetComponent(out NameComponent nameComponent) && nameComponent.Name.StartsWith("exampleShopPickup"))
-            {
-                pickup.CollisionDetection.AddRule<MustBePlayerOnFootOnlyRule>();
-                pickup.AddOpenGuiLogic<TestShopGuiComponent, InventoryGuiComponent>();
+                pickup.AddOpenGuiLogic<TestGui>();
             }
         }
 

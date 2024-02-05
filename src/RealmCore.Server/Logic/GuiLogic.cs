@@ -1,6 +1,4 @@
-﻿using RealmCore.Server.Components.Players.Abstractions;
-
-namespace RealmCore.Server.Logic;
+﻿namespace RealmCore.Server.Logic;
 
 internal class GuiLogic
 {
@@ -17,12 +15,9 @@ internal class GuiLogic
     {
         foreach (var player in _elementCollection.GetByType<RealmPlayer>())
         {
-            var guiComponents = player.Components.ComponentsList.OfType<GuiComponent>().ToList();
-            foreach (var guiComponent in guiComponents)
-            {
-                player.Components.DetachComponent(guiComponent);
-                player.AddComponent(guiComponent);
-            }
+            var gui = player.Gui.Current;
+            player.Gui.Current = null;
+            player.Gui.Current = gui;
         }
         return Task.CompletedTask;
     }

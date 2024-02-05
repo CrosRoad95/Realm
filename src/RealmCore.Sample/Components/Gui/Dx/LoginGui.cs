@@ -1,22 +1,19 @@
-﻿using RealmCore.Sample.Data;
-using RealmCore.Server.Contexts.Interfaces;
+﻿namespace RealmCore.Sample.Components.Gui.Dx;
 
-namespace RealmCore.Sample.Components.Gui;
-
-public sealed class LoginGuiComponent : DxGuiComponent
+public sealed class LoginGui : DxGui, IGuiHandlers
 {
     private readonly IUsersService _usersService;
-    private readonly ILogger<LoginGuiComponent> _logger;
+    private readonly ILogger<LoginGui> _logger;
     private readonly UserManager<UserData> _userManager;
 
-    public LoginGuiComponent(IUsersService usersService, ILogger<LoginGuiComponent> logger, UserManager<UserData> userManager) : base("login", false)
+    public LoginGui(IUsersService usersService, ILogger<LoginGui> logger, UserManager<UserData> userManager, PlayerContext playerContext) : base(playerContext.Player, "login", false)
     {
         _usersService = usersService;
         _logger = logger;
         _userManager = userManager;
     }
 
-    protected override async Task HandleForm(IFormContext formContext)
+    public async Task HandleForm(IFormContext formContext)
     {
         switch (formContext.FormName)
         {
@@ -48,10 +45,9 @@ public sealed class LoginGuiComponent : DxGuiComponent
 
                 try
                 {
-                    var player = (RealmPlayer)Element;
-                    if (await _usersService.SignIn(player, user))
+                    if (await _usersService.SignIn(formContext.Player, user))
                     {
-                        player.Components.TryDestroyComponent(this);
+                        formContext.Player.Gui.Current = null;
                         formContext.SuccessResponse();
                         return;
                     }
@@ -67,14 +63,12 @@ public sealed class LoginGuiComponent : DxGuiComponent
         }
     }
 
-    protected override async Task HandleAction(IActionContext actionContext)
+    public async Task HandleAction(IActionContext actionContext)
     {
         switch (actionContext.ActionName)
         {
             case "navigateToRegister":
-                var player = ((RealmPlayer)Element);
-                player.AddComponentWithDI<RegisterGuiComponent>();
-                player.DestroyComponent(this);
+                actionContext.Player.Gui.SetCurrentWithDI<RegisterDxGui>();
                 break;
             default:
                 throw new NotImplementedException();

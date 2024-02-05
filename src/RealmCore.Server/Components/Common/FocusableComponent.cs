@@ -1,6 +1,5 @@
 ﻿namespace RealmCore.Server.Components.Common;
 
-[ComponentUsage(false)]
 public class FocusableComponent : ComponentLifecycle
 {
     private readonly object _lock = new();

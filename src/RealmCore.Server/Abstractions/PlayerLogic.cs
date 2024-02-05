@@ -12,13 +12,18 @@ public abstract class PlayerLogic
         var player = (RealmPlayer)plr;
         player.User.SignedIn += HandleSignedIn;
         player.Disconnected += HandleDisconnected;
+        PlayerJoined(player);
     }
 
     private void HandleDisconnected(Player plr, PlayerQuitEventArgs e)
     {
         var player = (RealmPlayer)plr;
         player.User.SignedIn -= HandleSignedIn;
+        player.Disconnected -= HandleDisconnected;
+        PlayerLeft(player);
     }
 
-    protected abstract void HandleSignedIn(IPlayerUserService userService, RealmPlayer player);
+    protected abstract void PlayerJoined(RealmPlayer player);
+    protected abstract void PlayerLeft(RealmPlayer player);
+    protected virtual void HandleSignedIn(IPlayerUserService userService, RealmPlayer player) { }
 }

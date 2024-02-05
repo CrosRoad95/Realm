@@ -41,22 +41,11 @@ public sealed class Components : IDisposable
         _element = element;
     }
 
-    private void CheckCanBeAdded<TComponent>() where TComponent : IComponent
-    {
-        var componentUsageAttribute = typeof(TComponent).GetCustomAttribute<ComponentUsageAttribute>();
-        if (componentUsageAttribute == null || componentUsageAttribute.AllowMultiple)
-            return;
-
-        if (_components.OfType<TComponent>().Any())
-            throw new ComponentCanNotBeAddedException<TComponent>();
-    }
-
     private void InternalAddComponent<TComponent>(TComponent component) where TComponent : IComponent
     {
         _componentsLock.EnterWriteLock();
         try
         {
-            CheckCanBeAdded<TComponent>();
             _components.Add(component);
         }
         finally

@@ -78,9 +78,9 @@ internal sealed class PlayerJoinedLogic
         admin.DevelopmentMode = true;
         admin.SetTools(new List<AdminTool> { AdminTool.Elements, AdminTool.Components, AdminTool.ShowSpawnMarkers });
 
-        if(!player.HasComponent<LoginGuiComponent>())
+        if (player.Gui.Current == null)
         {
-            player.AddComponentWithDI<LoginGuiComponent>();
+            player.Gui.SetCurrentWithDI<LoginGui>();
         }
     }
 

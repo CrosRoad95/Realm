@@ -1,6 +1,4 @@
-﻿using RealmCore.Server.Components.Players.Abstractions;
-
-namespace RealmCore.Server.Extensions;
+﻿namespace RealmCore.Server.Extensions;
 
 public static class CollisionDetectionExtensions
 {
@@ -34,28 +32,28 @@ public static class CollisionDetectionExtensions
         };
     }
 
-    public static void AddOpenGuiLogic<TGui>(this ICollisionDetection collisionDetection) where TGui : GuiComponent, new()
+    public static void AddOpenGuiLogic<TGui>(this ICollisionDetection collisionDetection) where TGui : IPlayerGui
     {
         collisionDetection.ElementEntered += (element) =>
         {
             if (element is RealmPlayer player)
             {
-                if (!player.HasComponent<GuiComponent>() && !player.Browser.Visible)
-                    player.AddComponent(new TGui());
+                if (player.Gui.Current == null && !player.Browser.Visible)
+                    player.Gui.SetCurrentWithDI<TGui>();
             }
         };
         collisionDetection.ElementLeft += (element) =>
         {
             if (element is RealmPlayer player)
             {
-                if (!player.HasComponent<TGui>())
-                    player.TryDestroyComponent<TGui>();
+                if(player.Gui.Current is TGui)
+                    player.Gui.Current = null;
                 player.Browser.Close();
             }
         };
     }
 
-    public static void AddOpenGuiLogic<TGui>(this ICollisionDetection collisionDetection, Func<RealmPlayer, Task<TGui>> factory, Action<Exception>? exceptionHandler) where TGui : GuiComponent
+    public static void AddOpenGuiLogic<TGui>(this ICollisionDetection collisionDetection, Func<RealmPlayer, Task<TGui>> factory, Action<Exception>? exceptionHandler) where TGui : IPlayerGui
     {
         collisionDetection.ElementEntered += async (element) =>
         {
@@ -63,8 +61,8 @@ public static class CollisionDetectionExtensions
             {
                 if (element is RealmPlayer player)
                 {
-                    if (!player.HasComponent<GuiComponent>() && !player.Browser.Visible)
-                        player.AddComponent(await factory(player));
+                    if (player.Gui.Current == null && !player.Browser.Visible)
+                        player.Gui.Current = await factory(player);
                 }
             }
             catch (Exception ex)
@@ -76,79 +74,50 @@ public static class CollisionDetectionExtensions
         {
             if (element is RealmPlayer player)
             {
-                if (!player.HasComponent<TGui>())
-                    player.TryDestroyComponent<TGui>();
+                if (player.Gui.Current is TGui)
+                    player.Gui.Current = null;
                 player.Browser.Close();
             }
         };
     }
 
-    public static void AddOpenGuiLogic<TGui>(this ICollisionDetection collisionDetection, Func<RealmPlayer, TGui> factory) where TGui : GuiComponent
+    public static void AddOpenGuiLogic<TGui>(this ICollisionDetection collisionDetection, Func<RealmPlayer, TGui> factory) where TGui : IPlayerGui
     {
         collisionDetection.ElementEntered += (element) =>
         {
             if (element is RealmPlayer player)
             {
-                if (!player.HasComponent<GuiComponent>() && !player.Browser.Visible)
-                    player.AddComponent(factory(player));
+                if (player.Gui.Current == null && !player.Browser.Visible)
+                    player.Gui.Current = factory(player);
             }
         };
         collisionDetection.ElementLeft += (element) =>
         {
             if (element is RealmPlayer player)
             {
-                if (!player.HasComponent<TGui>())
-                    player.TryDestroyComponent<TGui>();
+                if (player.Gui.Current is TGui)
+                    player.Gui.Current = null;
                 player.Browser.Close();
             }
         };
     }
 
-    public static void AddOpenGuiLogic<TGui>(this ICollisionDetection collisionDetection, Func<TGui> factory) where TGui : GuiComponent
+    public static void AddOpenGuiLogic<TGui>(this ICollisionDetection collisionDetection, Func<TGui> factory) where TGui : IPlayerGui
     {
         collisionDetection.ElementEntered += (element) =>
         {
             if (element is RealmPlayer player)
             {
-                if (!player.HasComponent<GuiComponent>() && !player.Browser.Visible)
-                    player.AddComponent(factory());
+                if (player.Gui.Current == null && !player.Browser.Visible)
+                    player.Gui.Current = factory();
             }
         };
         collisionDetection.ElementLeft += (element) =>
         {
             if (element is RealmPlayer player)
             {
-                if (!player.HasComponent<TGui>())
-                    player.TryDestroyComponent<TGui>();
-                player.Browser.Close();
-            }
-        };
-    }
-
-    public static void AddOpenGuiLogic<TGui1, TGui2>(this ICollisionDetection collisionDetection)
-        where TGui1 : GuiComponent, new()
-        where TGui2 : GuiComponent, new()
-    {
-        collisionDetection.ElementEntered += (element) =>
-        {
-            if (element is RealmPlayer player)
-            {
-                if (!player.HasComponent<GuiComponent>() && !player.Browser.Visible)
-                {
-                    player.AddComponent(new TGui1());
-                    player.AddComponent(new TGui2());
-                }
-            }
-        };
-
-        collisionDetection.ElementLeft += (element) =>
-        {
-            if (element is RealmPlayer player)
-            {
-                if (player.HasComponent<TGui1>())
-                    player.DestroyComponent<TGui1>();
-                if (player.HasComponent<TGui2>())
-                    player.DestroyComponent<TGui2>();
+                if (player.Gui.Current is TGui)
+                    player.Gui.Current = null;
                 player.Browser.Close();
             }
         };

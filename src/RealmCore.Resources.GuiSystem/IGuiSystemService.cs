@@ -4,7 +4,6 @@ using SlipeServer.Server.Events;
 
 namespace RealmCore.Resources.GuiSystem;
 
-
 public delegate Task GuiChangedDelegate();
 
 public interface IGuiSystemService
@@ -13,9 +12,9 @@ public interface IGuiSystemService
     event Action<LuaEvent>? FormSubmitted;
     event Action<LuaEvent>? ActionExecuted;
 
-    void CloseAllGuis(Player player);
-    bool CloseGui(Player player, string gui, bool cursorless);
-    bool OpenGui(Player player, string gui, bool cursorless, LuaValue? arg1 = null);
+    void CloseAllGui(Player player);
+    bool CloseGui(Player player, string gui, bool cursorLess);
+    bool OpenGui(Player player, string gui, bool cursorLess, LuaValue? arg1 = null);
     void SendFormResponse(Player player, string id, string name, params object[] values);
     void SendStateChanged(Player player, string guiName, Dictionary<LuaValue, LuaValue> changes);
     void SetDebugToolsEnabled(Player player, bool enabled);

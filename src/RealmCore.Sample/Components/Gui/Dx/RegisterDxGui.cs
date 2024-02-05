@@ -1,22 +1,17 @@
-﻿using RealmCore.Sample.Data;
-using RealmCore.Server.Contexts.Interfaces;
+﻿namespace RealmCore.Sample.Components.Gui.Dx;
 
-namespace RealmCore.Sample.Components.Gui;
-
-public sealed class RegisterGuiComponent : DxGuiComponent
+public sealed class RegisterDxGui : DxGui, IGuiHandlers
 {
-    private readonly IServiceProvider _serviceProvider;
     private readonly IUsersService _usersService;
     private readonly UserManager<UserData> _userManager;
 
-    public RegisterGuiComponent(IServiceProvider serviceProvider, IUsersService usersService, UserManager<UserData> userManager) : base("register", false)
+    public RegisterDxGui(IUsersService usersService, UserManager<UserData> userManager, PlayerContext playerContext) : base(playerContext.Player, "register", false)
     {
-        _serviceProvider = serviceProvider;
         _usersService = usersService;
         _userManager = userManager;
     }
 
-    protected override async Task HandleForm(IFormContext formContext)
+    public async Task HandleForm(IFormContext formContext)
     {
         switch (formContext.FormName)
         {
@@ -38,9 +33,7 @@ public sealed class RegisterGuiComponent : DxGuiComponent
                 {
                     var userId = await _usersService.SignUp(registerData.Login, registerData.Password);
 
-                    var player = (RealmPlayer)Element;
-                    player.AddComponentWithDI<LoginGuiComponent>();
-                    player.DestroyComponent(this);
+                    formContext.Player.Gui.SetCurrentWithDI<LoginGui>();
                 }
                 catch (Exception ex)
                 {
@@ -52,18 +45,17 @@ public sealed class RegisterGuiComponent : DxGuiComponent
         }
     }
 
-    protected override async Task HandleAction(IActionContext actionContext)
+    public Task HandleAction(IActionContext actionContext)
     {
         switch (actionContext.ActionName)
         {
             case "navigateToLogin":
-                var player = (RealmPlayer)Element;
-                var components = ((RealmPlayer)Element).Components;
-                components.AddComponentWithDI<LoginGuiComponent>();
-                components.DestroyComponent(this);
+                actionContext.Player.Gui.SetCurrentWithDI<LoginGui>();
                 break;
             default:
                 throw new NotImplementedException();
         }
+
+        return Task.CompletedTask;
     }
 }

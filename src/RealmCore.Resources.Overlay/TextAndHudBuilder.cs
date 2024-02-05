@@ -26,7 +26,7 @@ internal class TextAndHudBuilder<TState> : ITextAndHudBuilder<TState>
         {
             foreach (var propertyInfo in constructionInfo.propertyInfos)
             {
-                _innerHudBuilder.DynamicHudComponentAdded.Invoke(new DynamicHudComponent
+                _innerHudBuilder.DynamicHudComponentAdded.Invoke(new DynamicHudElement
                 {
                     ComponentId = constructionInfo.id,
                     PropertyInfo = propertyInfo

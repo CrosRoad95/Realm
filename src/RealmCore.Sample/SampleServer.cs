@@ -11,7 +11,6 @@ using RealmCore.Sample.Logic;
 using RealmCore.Sample.Utilities;
 using RealmCore.Sample.Commands;
 using RealmCore.Sample.Data.Validators;
-using RealmCore.Sample.Data;
 
 [assembly: ExcludeFromCodeCoverage]
 

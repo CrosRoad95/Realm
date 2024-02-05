@@ -2,15 +2,15 @@
 @using RealmCore.Server.Elements
 @inherits RealmGuiComponentBase<InteractiveGuiComponent>;
 
-Foo=@Component.Foo
-Hello @(((RealmPlayer)Component.Element).Name)
+Foo=@PlayerGui.Foo
+Hello @(((RealmPlayer)PlayerGui.Player).Name)
 
 @code{
     protected override void OnAfterRender(bool firstRender)
     {
         if (firstRender)
         {
-            Component.FooChanged += () =>
+            PlayerGui.FooChanged += () =>
             {
                 InvokeAsync(StateHasChanged);
             };

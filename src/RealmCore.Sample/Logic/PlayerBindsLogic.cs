@@ -4,16 +4,16 @@ using RealmCore.Server.Helpers;
 namespace RealmCore.Sample.Logic;
 
 
-internal class CounterPageComponent : BrowserGuiComponent
+internal class CounterPageGui : BrowserGui
 {
-    public CounterPageComponent() : base("counter")
+    public CounterPageGui(RealmPlayer player) : base(player, "counter")
     {
     }
 }
 
-internal class HomePageComponent : BrowserGuiComponent
+internal class HomePageGui : BrowserGui
 {
-    public HomePageComponent() : base("home")
+    public HomePageGui(RealmPlayer player) : base(player, "home")
     {
     }
 }
@@ -78,12 +78,12 @@ internal sealed class PlayerBindsLogic
             browserService.Open("/realmUi/index");
         });
 
-        GuiHelpers.BindGuiPage<HomePageComponent>(player, "F6", _serviceProvider);
-        GuiHelpers.BindGuiPage<CounterPageComponent>(player, "F7", _serviceProvider);
+        GuiHelpers.BindGuiPage<HomePageGui>(player, "F6");
+        GuiHelpers.BindGuiPage<CounterPageGui>(player, "F7");
 
         GuiHelpers.BindGuiPage(player, "F1", async cancellationToken =>
         {
-            DashboardGuiComponent.DashboardState state = new();
+            DashboardGui.DashboardState state = new();
             state.Money = (double)player.Money.Amount;
 
             var vehiclesWithModelAndPositionDTos = await _vehicleRepository.GetLightVehiclesByUserId(player.UserId, cancellationToken);
@@ -94,9 +94,9 @@ internal sealed class PlayerBindsLogic
                 Position = x.Position,
             }).ToList();
             state.Counter = 3;
-            return new DashboardGuiComponent(state);
-        }, _serviceProvider);
-        GuiHelpers.BindGui<InventoryGuiComponent>(player, "i", _serviceProvider);
+            return new DashboardGui(player, state);
+        });
+        GuiHelpers.BindGui<InventoryGui>(player, "i");
     }
 
     private void HandleSignedOut(RealmPlayer player)

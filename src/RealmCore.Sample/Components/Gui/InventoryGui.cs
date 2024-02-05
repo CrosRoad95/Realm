@@ -1,10 +1,6 @@
-﻿using RealmCore.Sample.Data;
-using RealmCore.Server.Contexts.Interfaces;
+﻿namespace RealmCore.Sample.Components.Gui;
 
-namespace RealmCore.Sample.Components.Gui;
-
-[ComponentUsage(false)]
-public sealed class InventoryGuiComponent : StatefulDxGuiComponent<InventoryGuiComponent.InventoryState>
+public sealed class InventoryGui : ReactiveDxGui<InventoryGui.InventoryState>, IGuiHandlers
 {
     public class InventoryState
     {
@@ -23,23 +19,17 @@ public sealed class InventoryGuiComponent : StatefulDxGuiComponent<InventoryGuiC
         public List<InventoryItem> Items { get; set; } = new();
     }
 
-    public InventoryGuiComponent() : base("inventory", false, new())
+    public InventoryGui(PlayerContext playerContext) : base(playerContext.Player, "inventory", false, new())
     {
-
-    }
-
-    public void Attach()
-    {
-        var inventory = ((IComponents)Element).GetRequiredComponent<InventoryComponent>();
+        var inventory = Player.GetRequiredComponent<InventoryComponent>();
         inventory.ItemAdded += HandleItemAdded;
         inventory.ItemRemoved += HandleItemRemoved;
         inventory.ItemChanged += HandleItemChanged;
-        base.Attach();
     }
 
-    public void Dispose()
+    public override void Dispose()
     {
-        var inventory = ((IComponents)Element).GetRequiredComponent<InventoryComponent>();
+        var inventory = Player.GetRequiredComponent<InventoryComponent>();
         inventory.ItemAdded -= HandleItemAdded;
         inventory.ItemRemoved -= HandleItemRemoved;
         inventory.ItemChanged -= HandleItemChanged;
@@ -66,7 +56,7 @@ public sealed class InventoryGuiComponent : StatefulDxGuiComponent<InventoryGuiC
 
     private IEnumerable<InventoryState.InventoryItem> MapItems()
     {
-        var inventory = ((IComponents)Element).GetRequiredComponent<InventoryComponent>();
+        var inventory = Player.GetRequiredComponent<InventoryComponent>();
         return inventory.Items.Select(x => new InventoryState.InventoryItem
         {
             localId = x.LocalId,
@@ -80,29 +70,32 @@ public sealed class InventoryGuiComponent : StatefulDxGuiComponent<InventoryGuiC
 
     protected override void PreGuiOpen(InventoryState state)
     {
-        var inventory = ((IComponents)Element).GetRequiredComponent<InventoryComponent>();
+        var inventory = Player.GetRequiredComponent<InventoryComponent>();
         state.Size = (double)inventory.Size;
         state.Number = (double)inventory.Number;
         state.Items.Clear();
         state.Items.AddRange(MapItems());
     }
 
-    protected override async Task HandleForm(IFormContext formContext)
-    {
-    }
-
-    protected override async Task HandleAction(IActionContext actionContext)
+    public Task HandleAction(IActionContext actionContext)
     {
         switch (actionContext.ActionName)
         {
             case "doItemAction":
                 var useItemData = actionContext.GetData<UseItemData>();
-                var inventory = ((IComponents)Element).GetRequiredComponent<InventoryComponent>();
+                var inventory = Player.GetRequiredComponent<InventoryComponent>();
                 if (inventory.TryGetByLocalId(useItemData.LocalId, out Item item))
                     inventory.TryUseItem(item, useItemData.ItemAction);
                 break;
             default:
                 throw new NotImplementedException();
         }
+
+        return Task.CompletedTask;
+    }
+
+    public Task HandleForm(IFormContext formContext)
+    {
+        return Task.CompletedTask;
     }
 }

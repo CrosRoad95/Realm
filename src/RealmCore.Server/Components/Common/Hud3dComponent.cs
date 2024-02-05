@@ -29,10 +29,10 @@ public abstract class Hud3dComponentBase : ComponentLifecycle
 public class Hud3dComponent<TState> : Hud3dComponentBase where TState : class
 {
     private readonly Action<IHudBuilder<TState>> _hudBuilderCallback;
-    private readonly List<DynamicHudComponent> _dynamicHudComponents = new();
+    private readonly List<DynamicHudElement> _dynamicHudComponents = new();
     private readonly TState? _state;
 
-    internal IEnumerable<DynamicHudComponent> DynamicHudComponents => _dynamicHudComponents;
+    internal IEnumerable<DynamicHudElement> DynamicHudComponents => _dynamicHudComponents;
 
     public Vector3 Position { get; }
 
@@ -60,7 +60,7 @@ public class Hud3dComponent<TState> : Hud3dComponentBase where TState : class
             SetHud3dState(_id, stateChange);
     }
 
-    private void HandleDynamicHudComponentAdded(DynamicHudComponent dynamicHudComponent)
+    private void HandleDynamicHudComponentAdded(DynamicHudElement dynamicHudComponent)
     {
         _dynamicHudComponents.Add(dynamicHudComponent);
     }

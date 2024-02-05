@@ -123,13 +123,14 @@ internal sealed partial class PlayerGameplayLogic
     {
         if(element is RealmVehicleForSale realmVehicleForSale)
         {
-            if (!player.HasComponent<GuiComponent>())
+            if (player.Gui.Current == null)
             {
                 var vehicle = ((RealmVehicle)element);
                 var vehicleName = ((RealmVehicle)element).Name;
-                player.AddComponent(new BuyVehicleGuiComponent(vehicleName, realmVehicleForSale.Price)).Bought = async () =>
+                var buyVehicleGui = new BuyVehicleGui(player, vehicleName, realmVehicleForSale.Price);
+                buyVehicleGui.Bought = async () =>
                 {
-                    player.TryDestroyComponent<BuyVehicleGuiComponent>();
+                    player.Gui.Close<BuyVehicleGui>();
                     if (realmVehicleForSale.TrySell())
                     {
                         await player.GetRequiredService<IVehiclesService>().ConvertToPersistantVehicle(vehicle);
@@ -137,6 +138,7 @@ internal sealed partial class PlayerGameplayLogic
                         vehicle.Fuel.AddFuelContainer(1, 20, 20, 0.01f, 2, true);
                     }
                 };
+                player.Gui.Current = buyVehicleGui;
             }
         }
         if (element is IComponents components)
@@ -149,7 +151,7 @@ internal sealed partial class PlayerGameplayLogic
         else
         {
             player.CurrentInteractElement = null;
-            player.TryDestroyComponent<BuyVehicleGuiComponent>();
+            player.Gui.Close<BuyVehicleGui>();
         }
     }
 }

@@ -5,7 +5,7 @@ internal class Hud<TState> : IHud<TState> where TState : class
     private readonly Player _player;
     private readonly IOverlayService _overlayService;
     private readonly TState? _state;
-    private readonly List<DynamicHudComponent>? _dynamicHudComponents;
+    private readonly List<DynamicHudElement>? _dynamicHudComponents;
     private bool _disposed = false;
     private Vector2 _position;
 
@@ -23,7 +23,7 @@ internal class Hud<TState> : IHud<TState> where TState : class
         }
     }
 
-    public Hud(string name, Player player, IOverlayService overlayService, Vector2? position = null, TState? state = default, List<DynamicHudComponent>? dynamicHudComponents = null)
+    public Hud(string name, Player player, IOverlayService overlayService, Vector2? position = null, TState? state = default, List<DynamicHudElement>? dynamicHudComponents = null)
     {
         Name = name;
         _player = player;

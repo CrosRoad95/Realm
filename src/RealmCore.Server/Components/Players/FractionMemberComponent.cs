@@ -1,6 +1,5 @@
 ﻿namespace RealmCore.Server.Components.Players;
 
-[ComponentUsage(true)]
 public class FractionMemberComponent : Component
 {
     public int FractionId { get; private set; }

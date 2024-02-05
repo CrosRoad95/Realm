@@ -17,7 +17,7 @@ public interface ITextHudBuilder<TState>
     ITextHudBuilder<TState> WithText(string text);
     ITextHudBuilder<TState> WithText(Expression<Func<TState, string>> expression);
     ITextHudBuilder<TState> WithVerticalAlign(VerticalAlign alignY);
-    internal Action<DynamicHudComponent>? DynamicHudComponentAdded { get; set; }
+    internal Action<DynamicHudElement>? DynamicHudComponentAdded { get; set; }
     bool IsDynamic { get; }
 
     internal TextConstructionInfo Build();

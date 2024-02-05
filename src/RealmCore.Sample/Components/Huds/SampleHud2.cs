@@ -6,14 +6,12 @@ using RealmCore.Resources.Overlay.Interfaces;
 
 namespace RealmCore.Sample.Components.Huds;
 
-
 public class SampleHud2State
 {
     public string Text1 { get; set; }
     public string Text2 { get; set; }
 }
 
-[ComponentUsage(false)]
 public class SampleHud2 : HudComponent<SampleHud2State>
 {
     private readonly AssetsRegistry _assetsRegistry;

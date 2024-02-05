@@ -1,31 +1,29 @@
-﻿using RealmCore.Server.Components.Players.Abstractions;
+﻿namespace RealmCore.Server.Components.Players;
 
-namespace RealmCore.Server.Components.Players;
-
-public abstract class StatefulDxGuiComponentBase : DxGuiComponent
+public abstract class ReactiveDxGui : DxGui
 {
-    public Action<StatefulDxGuiComponentBase, string, bool, object?>? GuiOpened;
-    public Action<StatefulDxGuiComponentBase, string, Dictionary<LuaValue, object?>>? StateChanged;
+    public Action<ReactiveDxGui, string, bool, object?>? GuiOpened;
+    public Action<ReactiveDxGui, string, Dictionary<LuaValue, object?>>? StateChanged;
 
-    public StatefulDxGuiComponentBase(string name, bool cursorLess)
-        : base(name, cursorLess)
+    public ReactiveDxGui(RealmPlayer player, string name, bool cursorLess)
+        : base(player, name, cursorLess)
     {
 
     }
 
-    protected void RelayGuiOpened(StatefulDxGuiComponentBase statefulGuiComponentBase, string name, bool cursorLess, object? state)
+    protected void RelayGuiOpened(ReactiveDxGui statefulGuiComponentBase, string name, bool cursorLess, object? state)
     {
         GuiOpened?.Invoke(statefulGuiComponentBase, name, cursorLess, state);
     }
 }
 
-public abstract class StatefulDxGuiComponent<TState> : StatefulDxGuiComponentBase
+public abstract class ReactiveDxGui<TState> : ReactiveDxGui
 {
     private readonly TState _state;
     private readonly Dictionary<LuaValue, object?> _stateChange = new();
 
-    public StatefulDxGuiComponent(string name, bool cursorLess, TState initialState)
-        : base(name, cursorLess)
+    public ReactiveDxGui(RealmPlayer player, string name, bool cursorLess, TState initialState)
+        : base(player, name, cursorLess)
     {
         _state = initialState;
     }

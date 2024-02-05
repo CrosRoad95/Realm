@@ -92,7 +92,7 @@ public static class ServerBuilderExtensions
         #endregion
 
         #region Resources Logics
-        serverBuilder.AddLogic<BrowserGuiComponentLogic>();
+        serverBuilder.AddLogic<BrowserGuiLogic>();
         serverBuilder.AddLogic<AdminResourceLogic>();
         serverBuilder.AddLogic<AFKResourceLogic>();
         serverBuilder.AddLogic<BoneAttachResourceLogic>();
@@ -132,7 +132,7 @@ public static class ServerBuilderExtensions
     public static ServerBuilder WithGuiSystem(this ServerBuilder serverBuilder)
     {
         serverBuilder.AddScopedLogic<DxGuiSystemServiceLogic>();
-        serverBuilder.AddScopedLogic<StatefulGuiComponentBaseLogic>();
+        serverBuilder.AddScopedLogic<ReactiveDxGuiLogic>();
         return serverBuilder;
     }
 

@@ -76,6 +76,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<Using Include="RealmCore.Server.Components.Players.Abstractions" />
 		<Using Include="System" />
 		<Using Include="System.Collections.Generic" />
 		<Using Include="System.Linq" />
@@ -155,7 +156,6 @@
 		<Using Include="SlipeServer.Server.Clients" />
 		<Using Include="RealmCore.Resources.Nametags" />
 		<Using Include="RealmCore.Server.Contexts" />
-		<Using Include="RealmCore.Server.Contexts.Interfaces" />
 		<Using Include="SlipeServer.Packets.Definitions.Entities.Structs" />
 		<Using Include="SlipeServer.Server.Constants" />
 		<Using Include="System.Collections.Concurrent" />

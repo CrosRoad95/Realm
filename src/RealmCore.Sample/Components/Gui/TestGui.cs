@@ -5,11 +5,10 @@ public class SampleState
     public int Foo { get; set; }
 }
 
-[ComponentUsage(false)]
-public sealed class TestWindowComponent : StatefulDxGuiComponent<SampleState>
+public sealed class TestGui : ReactiveDxGui<SampleState>
 {
     private static int _i = 0;
-    public TestWindowComponent() : base("test", true, new())
+    public TestGui(RealmPlayer player) : base(player, "test", true, new())
     {
 
     }

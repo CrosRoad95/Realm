@@ -1,10 +1,10 @@
 ﻿namespace RealmCore.Sample.Components.Gui.Blazor;
 
-public class InteractiveGuiComponent : BrowserGuiComponent
+public class InteractiveGuiComponent : BrowserGui
 {
     public string Foo { get; private set; } = "default";
     public event Action? FooChanged;
-    public InteractiveGuiComponent() : base("/realmUi/interactive")
+    public InteractiveGuiComponent(RealmPlayer player) : base(player, "/realmUi/interactive")
     {
     }
 

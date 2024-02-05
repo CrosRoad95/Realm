@@ -1,5 +1,15 @@
 ﻿namespace RealmCore.Server.Contexts;
 
+public interface IFormContext
+{
+    string FormName { get; }
+    RealmPlayer Player { get; }
+
+    TData GetData<TData>(bool suppressValidation = false) where TData : ILuaValue, new();
+    void SuccessResponse(params object[] data);
+    void ErrorResponse(params object[] data);
+}
+
 internal class FormContext : IFormContext
 {
     private bool _responded = false;
@@ -20,11 +30,11 @@ internal class FormContext : IFormContext
         _GuiSystemService = GuiSystemService;
     }
 
-    public TData GetData<TData>(bool supressValidation = false) where TData : ILuaValue, new()
+    public TData GetData<TData>(bool suppressValidation = false) where TData : ILuaValue, new()
     {
         var data = new TData();
         data.Parse(_data);
-        if(!supressValidation)
+        if(!suppressValidation)
         {
             var validator = _player.GetRequiredService<IValidator<TData>>();
             validator.ValidateAndThrow(data);

@@ -12,6 +12,8 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<Using Include="RealmCore.Sample.Components.Gui.Dx" />
+		<Using Include="RealmCore.Sample.Data" />
 		<Using Include="System.Numerics" />
 		<Using Include="SlipeServer.Packets.Definitions.Lua" />
 		<Using Include="SlipeServer.Server.Events" />
@@ -53,6 +55,7 @@
 		<Using Include="RealmCore.Server.Components" />
 		<Using Include="RealmCore.Sample.Components.Gui.Blazor" />
 		<Using Include="SlipeServer.Server" />
+		<Using Include="RealmCore.Server.Contexts" />
 	</ItemGroup>
 
 	<ItemGroup>

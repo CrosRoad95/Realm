@@ -1,15 +1,12 @@
-﻿using RealmCore.Server.Components.Players.Abstractions;
+﻿namespace RealmCore.Server.Logic.Components;
 
-namespace RealmCore.Server.Logic.Components;
-
-internal sealed class DxGuiSystemServiceLogic : ComponentLogic<DxGuiComponent>
+internal sealed class DxGuiSystemServiceLogic : PlayerLogic
 {
     private readonly IGuiSystemService? _guiSystemService;
     private readonly FromLuaValueMapper _fromLuaValueMapper;
     private readonly ILogger<DxGuiSystemServiceLogic> _logger;
-    private ConcurrentDictionary<string, DxGuiComponent> _guiComponents = new();
 
-    public DxGuiSystemServiceLogic(IElementFactory elementFactory, FromLuaValueMapper fromLuaValueMapper, ILogger<DxGuiSystemServiceLogic> logger, IGuiSystemService? guiSystemService = null) : base(elementFactory)
+    public DxGuiSystemServiceLogic(FromLuaValueMapper fromLuaValueMapper, ILogger<DxGuiSystemServiceLogic> logger, MtaServer mtaServer, IGuiSystemService? guiSystemService = null) : base(mtaServer)
     {
         _fromLuaValueMapper = fromLuaValueMapper;
         _logger = logger;
@@ -21,76 +18,85 @@ internal sealed class DxGuiSystemServiceLogic : ComponentLogic<DxGuiComponent>
         }
     }
 
-    protected override void ComponentAdded(DxGuiComponent dxGuiComponent)
+    protected override void PlayerJoined(RealmPlayer player)
     {
-        if(_guiSystemService != null)
-        {
-            _guiSystemService.OpenGui((RealmPlayer)dxGuiComponent.Element, dxGuiComponent.Name, dxGuiComponent.CursorLess);
-            _guiComponents.TryAdd(dxGuiComponent.Name, dxGuiComponent);
-        }
+        player.Gui.Changed += HandleGuiChanged;
     }
 
-    protected override void ComponentDetached(DxGuiComponent dxGuiComponent)
+    protected override void PlayerLeft(RealmPlayer player)
     {
-        if (_guiSystemService != null)
+        player.Gui.Changed -= HandleGuiChanged;
+    }
+
+    private void HandleGuiChanged(IPlayerGuiService playerGuiService, RealmPlayer player, IPlayerGui? previousGui, IPlayerGui? currentGui)
+    {
+        if (_guiSystemService == null)
+            return;
+
+        if(currentGui is DxGui currentDxGui)
         {
-            var player = (RealmPlayer)dxGuiComponent.Element;
-            _guiSystemService.CloseGui(player, dxGuiComponent.Name, dxGuiComponent.CursorLess);
-            _guiComponents.TryRemove(dxGuiComponent.Name, out var _);
+            _guiSystemService.OpenGui(player, currentDxGui.Name, currentDxGui.CursorLess);
+        }
+        else if(previousGui is DxGui previousDxGui)
+        {
+            _guiSystemService.CloseGui(player, previousDxGui.Name, previousDxGui.CursorLess);
         }
     }
 
     private async void HandleActionExecuted(LuaEvent luaEvent)
     {
-        if (_guiSystemService != null)
+        if (_guiSystemService == null)
+            return;
+
+        try
         {
-            try
+            var player = (RealmPlayer)luaEvent.Player;
+            if(player.Gui.Current is IGuiHandlers guiHandlers)
             {
                 var (id, guiName, actionName, data) = luaEvent.Read<string, string, string, LuaValue>(_fromLuaValueMapper);
-                if (_guiComponents.TryGetValue(guiName, out DxGuiComponent dxGuiComponent))
+
+                try
                 {
-                    try
-                    {
-                        await dxGuiComponent.InternalHandleAction(new ActionContext(actionName, data));
-                    }
-                    catch (Exception ex)
-                    {
-                        _logger.LogError(ex, "Failed to execute action {actionName}.", actionName);
-                    }
+                    await guiHandlers.HandleAction(new ActionContext(player, actionName, data));
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogHandleError(ex);
                 }
             }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Failed to read luaEvent parameters");
-            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to read luaEvent parameters");
         }
     }
 
     private async void HandleFormSubmitted(LuaEvent luaEvent)
     {
-        if (_guiSystemService != null)
+        if (_guiSystemService == null)
+            return;
+
+        try
         {
-            try
+            var player = (RealmPlayer)luaEvent.Player;
+            if (player.Gui.Current is IGuiHandlers guiHandlers)
             {
                 var (id, guiName, formName, data) = luaEvent.Read<string, string, string, LuaValue>(_fromLuaValueMapper);
-                if (_guiComponents.TryGetValue(guiName, out DxGuiComponent dxGuiComponent))
+
+                try
                 {
-                    var formContext = new FormContext((RealmPlayer)luaEvent.Player, formName, data, _guiSystemService);
-                    try
-                    {
-                        await dxGuiComponent.InternalHandleForm(formContext);
-                    }
-                    catch (Exception ex)
-                    {
-                        _logger.LogHandleError(ex);
-                        formContext.ErrorResponse("Wystąpił nieznany błąd.");
-                    }
+                    var formContext = new FormContext(player, formName, data, _guiSystemService);
+                    await guiHandlers.HandleForm(formContext);
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogHandleError(ex);
                 }
             }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Failed to read luaEvent parameters");
-            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to read luaEvent parameters");
         }
     }
 }

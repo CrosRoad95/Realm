@@ -79,7 +79,7 @@ public abstract class HudComponent<TState> : Component, IStatefulHudComponent wh
     void IStatefulHudComponent.BuildHud(IOverlayService overlayService)
     {
         var player = (RealmPlayer)Element;
-        List<DynamicHudComponent> dynamicHudComponents = new();
+        List<DynamicHudElement> dynamicHudComponents = new();
 
         overlayService.CreateHud(player, _id, e =>
         {
@@ -104,7 +104,6 @@ public abstract class HudComponent<TState> : Component, IStatefulHudComponent wh
     }
 }
 
-[ComponentUsage(true)]
 public abstract class HudComponent : HudComponent<object>
 {
     public HudComponent(Vector2? offset = null) : base(new(), offset)

@@ -1,10 +1,8 @@
-﻿using RealmCore.Server.Contexts.Interfaces;
-using RealmCore.Server.DTOs;
+﻿using RealmCore.Server.DTOs;
 
 namespace RealmCore.Sample.Components.Gui;
 
-[ComponentUsage(false)]
-public sealed class DashboardGuiComponent : StatefulDxGuiComponent<DashboardGuiComponent.DashboardState>
+public sealed class DashboardGui : ReactiveDxGui<DashboardGui.DashboardState>, IGuiHandlers
 {
     public class DashboardState
     {
@@ -13,12 +11,12 @@ public sealed class DashboardGuiComponent : StatefulDxGuiComponent<DashboardGuiC
         public List<VehicleLightInfoDTO> VehicleLightInfos { get; set; }
     }
 
-    public DashboardGuiComponent(DashboardState state) : base("dashboard", false, state)
+    public DashboardGui(RealmPlayer realmPlayer, DashboardState state) : base(realmPlayer, "dashboard", false, state)
     {
 
     }
 
-    protected override async Task HandleAction(IActionContext actionContext)
+    public async Task HandleAction(IActionContext actionContext)
     {
         switch (actionContext.ActionName)
         {
@@ -31,5 +29,10 @@ public sealed class DashboardGuiComponent : StatefulDxGuiComponent<DashboardGuiC
             default:
                 throw new NotImplementedException();
         }
+    }
+
+    public Task HandleForm(IFormContext formContext)
+    {
+        throw new NotImplementedException();
     }
 }

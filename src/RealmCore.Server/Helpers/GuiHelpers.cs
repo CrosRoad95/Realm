@@ -1,32 +1,28 @@
-﻿using RealmCore.Server.Components.Players.Abstractions;
-
-namespace RealmCore.Server.Helpers;
+﻿namespace RealmCore.Server.Helpers;
 
 public static class GuiHelpers
 {
     #region Non-Browser gui
-    public static void BindGui<TGuiComponent>(RealmPlayer player, string bind, IServiceProvider serviceProvider) where TGuiComponent : GuiComponent, new()
+    public static void BindGui<TGui>(RealmPlayer player, string bind) where TGui : IPlayerGui
     {
-        BindGui(player, bind, () => new TGuiComponent(), serviceProvider);
+        BindGui(player, bind, () => ActivatorUtilities.CreateInstance<TGui>(player.ServiceProvider));
     }
 
-    public static void BindGui<TGuiComponent>(RealmPlayer player, string bind, Func<TGuiComponent> factory, IServiceProvider serviceProvider) where TGuiComponent : GuiComponent
+    public static void BindGui<TGui>(RealmPlayer player, string bind, Func<TGui> factory) where TGui : IPlayerGui
     {
-        var logger = serviceProvider.GetRequiredService<ILogger<TGuiComponent>>();
-        var chatBox = serviceProvider.GetRequiredService<ChatBox>();
+        var logger = player.GetRequiredService<ILogger<TGui>>();
+        var chatBox = player.GetRequiredService<ChatBox>();
         player.SetBind(bind, player =>
         {
-            if (player.HasComponent<TGuiComponent>())
+            if(player.Gui.Current is TGui)
             {
-                player.TryDestroyComponent<TGuiComponent>();
+                player.Gui.Current = null;
                 return;
             }
-            else
-                player.TryDestroyComponent<GuiComponent>();
 
             try
             {
-                var guiComponent = player.AddComponent(factory());
+                player.Gui.Current = factory();
                 player.ResetCooldown(bind);
             }
             catch (Exception ex)
@@ -37,24 +33,21 @@ public static class GuiHelpers
         });
     }
     
-    public static void BindGui<TGuiComponent>(RealmPlayer player, string bind, Func<CancellationToken, Task<TGuiComponent>> factory, IServiceProvider serviceProvider) where TGuiComponent : GuiComponent
+    public static void BindGui<TGui>(RealmPlayer player, string bind, Func<CancellationToken, Task<TGui>> factory) where TGui : IPlayerGui
     {
-        var logger = serviceProvider.GetRequiredService<ILogger<TGuiComponent>>();
-        var chatBox = serviceProvider.GetRequiredService<ChatBox>();
+        var logger = player.GetRequiredService<ILogger<TGui>>();
+        var chatBox = player.GetRequiredService<ChatBox>();
         player.SetBindAsync(bind, async (player, token) =>
         {
-            var components = player;
-            if (components.HasComponent<TGuiComponent>())
+            if (player.Gui.Current is TGui)
             {
-                components.TryDestroyComponent<TGuiComponent>();
+                player.Gui.Current = null;
                 return;
             }
-            else
-                components.TryDestroyComponent<GuiComponent>();
 
             try
             {
-                var guiComponent = components.AddComponent(await factory(token));
+                player.Gui.Current = await factory(token);
                 player.ResetCooldown(bind);
             }
             catch (Exception ex)
@@ -68,29 +61,26 @@ public static class GuiHelpers
     #endregion
 
     #region Browser Gui
-    public static void BindGuiPage<TGuiComponent>(RealmPlayer player, string bind, IServiceProvider serviceProvider) where TGuiComponent : BrowserGuiComponent, new()
+    public static void BindGuiPage<TGui>(RealmPlayer player, string bind) where TGui : BrowserGui
     {
-        BindGuiPage(player, bind, () => new TGuiComponent(), serviceProvider);
+        BindGuiPage(player, bind, () => ActivatorUtilities.CreateInstance<TGui>(player.ServiceProvider));
     }
 
-    public static void BindGuiPage<TGuiComponent>(RealmPlayer player, string bind, Func<TGuiComponent> factory, IServiceProvider serviceProvider) where TGuiComponent : BrowserGuiComponent
+    public static void BindGuiPage<TGui>(RealmPlayer player, string bind, Func<TGui> factory) where TGui : BrowserGui
     {
-        var logger = serviceProvider.GetRequiredService<ILogger<TGuiComponent>>();
-        var chatBox = serviceProvider.GetRequiredService<ChatBox>();
+        var logger = player.GetRequiredService<ILogger<TGui>>();
+        var chatBox = player.GetRequiredService<ChatBox>();
         player.SetBind(bind, player =>
         {
-            var components = player;
-            if (components.HasComponent<TGuiComponent>())
+            if (player.Gui.Current is TGui)
             {
-                components.DestroyComponent<TGuiComponent>();
+                player.Gui.Current = null;
                 return;
             }
-            else
-                components.TryDestroyComponent<BrowserGuiComponent>();
 
             try
             {
-                var guiComponent = components.AddComponent(factory());
+                player.Gui.Current = factory();
                 player.ResetCooldown(bind);
             }
             catch (Exception ex)
@@ -101,24 +91,21 @@ public static class GuiHelpers
         });
     }
 
-    public static void BindGuiPage<TGuiComponent>(RealmPlayer player, string bind, Func<CancellationToken, Task<TGuiComponent>> factory, IServiceProvider serviceProvider) where TGuiComponent : GuiComponent
+    public static void BindGuiPage<TGui>(RealmPlayer player, string bind, Func<CancellationToken, Task<TGui>> factory) where TGui : IPlayerGui
     {
-        var logger = serviceProvider.GetRequiredService<ILogger<TGuiComponent>>();
-        var chatBox = serviceProvider.GetRequiredService<ChatBox>();
-        player.SetBindAsync(bind, async (player, cancellationToken) =>
+        var logger = player.GetRequiredService<ILogger<TGui>>();
+        var chatBox = player.GetRequiredService<ChatBox>();
+        player.SetBindAsync(bind, async (player, token) =>
         {
-            var components = player;
-            if (components.HasComponent<TGuiComponent>())
+            if (player.Gui.Current is TGui)
             {
-                components.DestroyComponent<TGuiComponent>();
+                player.Gui.Current = null;
                 return;
             }
-            else
-                components.TryDestroyComponent<GuiComponent>();
 
             try
             {
-                components.AddComponent(await factory(cancellationToken));
+                player.Gui.Current = await factory(token);
                 player.ResetCooldown(bind);
             }
             catch (Exception ex)

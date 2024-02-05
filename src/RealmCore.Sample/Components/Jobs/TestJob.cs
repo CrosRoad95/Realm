@@ -1,10 +1,8 @@
-﻿using RealmCore.Server.Contexts;
+﻿namespace RealmCore.Sample.Components.Jobs;
 
-namespace RealmCore.Sample.Components.Jobs;
-
-internal class TestJobComponent : JobSession
+internal class TestJob : JobSession
 {
-    public TestJobComponent(IScopedElementFactory scopedElementFactory, PlayerContext playerContext, IUpdateService updateService) : base(scopedElementFactory, playerContext, updateService)
+    public TestJob(IScopedElementFactory scopedElementFactory, PlayerContext playerContext, IUpdateService updateService) : base(scopedElementFactory, playerContext, updateService)
     {
     }
 

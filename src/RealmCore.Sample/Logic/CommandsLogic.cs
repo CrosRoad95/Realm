@@ -1338,8 +1338,7 @@ internal sealed class CommandsLogic
 
         _commandService.AddCommandHandler("guitest1", (player, args) =>
         {
-            player.TryDestroyComponent<BrowserGuiComponent>();
-            player.AddComponent<Counter1GuiComponent>();
+            player.Gui.Current = new Counter1Gui(player);
         });
 
         //_commandService.AddAsyncCommandHandler("guitest2", async (player, args) =>

@@ -21,7 +21,7 @@ internal class HudBuilder<TState> : IHudBuilder<TState>
     private int _id = 0;
 
     internal IEnumerable<LuaValue> HudElementsDefinitions => _luaValues;
-    public Action<DynamicHudComponent>? DynamicHudComponentAdded { get; set; }
+    public Action<DynamicHudElement>? DynamicHudComponentAdded { get; set; }
 
     public HudBuilder(TState? defaultState, IAssetsService assetsService, Vector2 screenSize)
     {

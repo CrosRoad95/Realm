@@ -39,7 +39,7 @@ internal class TextHudBuilder<TState> : ITextHudBuilder<TState>
     public bool IsDynamic { get; private set; }
     private List<PropertyInfo> _propertyInfos = new();
 
-    public Action<DynamicHudComponent>? DynamicHudComponentAdded { get; set; }
+    public Action<DynamicHudElement>? DynamicHudComponentAdded { get; set; }
 
     public TextHudBuilder(int id, TState state, IAssetsService assetsService)
     {
@@ -68,7 +68,7 @@ internal class TextHudBuilder<TState> : ITextHudBuilder<TState>
         var value = factory(_state);
         _propertyInfos = visitor.Properties;
         foreach (var propertyInfo in visitor.Properties)
-            DynamicHudComponentAdded?.Invoke(new DynamicHudComponent
+            DynamicHudComponentAdded?.Invoke(new DynamicHudElement
             {
                 ComponentId = _id,
                 PropertyInfo = propertyInfo,

@@ -79,22 +79,6 @@ public class ComponentsTests
     }
 
     [Fact]
-    public void ComponentUsageShouldPreventYouFromAddingOneComponentTwoTimes()
-    {
-        var realmTestingServer = new RealmTestingServer();
-        var player = realmTestingServer.CreatePlayer();
-
-        #region Arrange
-        var action = () => player.AddComponent<OneComponent>();
-        #endregion
-
-        #region Act & Assert
-        action.Should().NotThrow();
-        action.Should().Throw<ComponentCanNotBeAddedException<OneComponent>>().WithMessage("Only one instance of component 'OneComponent' can be added to one element");
-        #endregion
-    }
-
-    [Fact]
     public void ComponentShouldBeAbleToDisposeOtherComponentsInDisposeMethod()
     {
         #region Arrange

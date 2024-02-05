@@ -49,9 +49,9 @@ public class CurrentPlayerContext : IDisposable
     }
 }
 
-public class CurrentPlayerContext<TGuiPageComponent> : CurrentPlayerContext where TGuiPageComponent : BrowserGuiComponent, IDisposable
+public class CurrentPlayerContext<TGui> : CurrentPlayerContext where TGui : BrowserGui, IDisposable
 {
-    public TGuiPageComponent Component => Player.GetRequiredComponent<TGuiPageComponent>();
+    public TGui Gui => (TGui)Player.Gui.Current;
 
     public CurrentPlayerContext(IHttpContextAccessor httpContent, RealmServer realmServer) : base(httpContent, realmServer)
     {
@@ -59,6 +59,6 @@ public class CurrentPlayerContext<TGuiPageComponent> : CurrentPlayerContext wher
 
     public void Close()
     {
-        Player.DestroyComponent(Component);
+        Player.Gui.Current = null;
     }
 }

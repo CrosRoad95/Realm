@@ -2,7 +2,6 @@
 
 namespace RealmCore.Server.Components.Object;
 
-[ComponentUsage(false)]
 public class LiftableWorldObjectComponent : InteractionComponent
 {
     private readonly object _lock = new();

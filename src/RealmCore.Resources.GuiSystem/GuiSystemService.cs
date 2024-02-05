@@ -70,7 +70,7 @@ internal sealed class GuiSystemService : IGuiSystemService
         return true;
     }
 
-    public void CloseAllGuis(Player player)
+    public void CloseAllGui(Player player)
     {
         EnsurePlayerGuiAreInitialized(player);
 
@@ -109,7 +109,7 @@ internal sealed class GuiSystemService : IGuiSystemService
         var players = _playersGuis.Keys;
         foreach (var player in players)
         {
-            CloseAllGuis(player);
+            CloseAllGui(player);
             resource.StopFor(player);
             await resource.StartForAsync(player);
         }
