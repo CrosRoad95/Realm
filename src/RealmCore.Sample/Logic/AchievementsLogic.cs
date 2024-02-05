@@ -1,4 +1,5 @@
 ﻿using RealmCore.Resources.Overlay;
+using RealmCore.Server.Services.Players;
 
 namespace RealmCore.Sample.Logic;
 
@@ -6,9 +7,10 @@ internal sealed class AchievementsLogic
 {
     private readonly IOverlayService _overlayService;
 
-    public AchievementsLogic(MtaServer mtaServer)
+    public AchievementsLogic(MtaServer mtaServer, IOverlayService overlayService)
     {
         mtaServer.PlayerJoined += HandlePlayerJoined;
+        _overlayService = overlayService;
     }
 
     private void HandlePlayerJoined(Player plr)

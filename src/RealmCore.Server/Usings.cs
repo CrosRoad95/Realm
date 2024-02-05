@@ -116,13 +116,13 @@ global using RealmCore.Server.Elements;
 global using SlipeServer.Server.Resources.Providers;
 global using RealmCore.Server.Components;
 global using RealmCore.Server.Scopes;
-global using RealmCore.Server.Interfaces.Players;
 global using System.Diagnostics.CodeAnalysis;
 global using RealmCore.Server.Interfaces.Integrations;
 global using RealmCore.Server.Utilities.Interfaces;
 global using RealmCore.Server.Factories.Interfaces;
 global using System.Collections;
 global using RealmCore.Server.Interfaces.Vehicles;
+global using RealmCore.Server.Services.Players;
 
 global using ILogger = Microsoft.Extensions.Logging.ILogger;
 

@@ -1,5 +1,21 @@
 ﻿namespace RealmCore.Server.Services.Players;
 
+public interface IPlayerAchievementsService : IPlayerService, IEnumerable<AchievementDTO>
+{
+    event Action<IPlayerAchievementsService, int>? Unlocked;
+    event Action<IPlayerAchievementsService, int, float>? Progressed;
+
+    T? GetAchievementValue<T>(int achievementId);
+    AchievementDTO Get(int achievementId);
+    bool HasReachedProgressThreshold(int achievementId, float progress);
+    bool SetProgress(int achievementId, float progress, float maximumProgress);
+    void SetValue(int achievementId, object value);
+    bool TryReceiveReward(int achievementId, float requiredProgress, DateTime now);
+    bool UpdateProgress(int achievementId, float progress, float maximumProgress);
+    bool IsRewardReceived(int achievementId);
+    float GetProgress(int achievementId);
+}
+
 internal class PlayerAchievementsService : IPlayerAchievementsService
 {
     private ICollection<AchievementData> _achievements = [];

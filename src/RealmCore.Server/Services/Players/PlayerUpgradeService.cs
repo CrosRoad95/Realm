@@ -1,5 +1,16 @@
 ﻿namespace RealmCore.Server.Services.Players;
 
+public interface IPlayerUpgradeService : IPlayerService
+{
+
+    event Action<IPlayerUpgradeService, int>? Added;
+    event Action<IPlayerUpgradeService, int>? Removed;
+
+    bool Has(int upgradeId);
+    bool TryAdd(int upgradeId);
+    bool TryRemove(int upgradeId);
+}
+
 internal class PlayerUpgradeService : IPlayerUpgradeService
 {
     public event Action<IPlayerUpgradeService, int>? Added;

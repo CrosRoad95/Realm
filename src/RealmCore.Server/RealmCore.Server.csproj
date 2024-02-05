@@ -72,5 +72,6 @@
 
 	<ItemGroup>
 	  <Folder Include="Components\Peds\" />
+	  <Folder Include="Interfaces\Players\" />
 	</ItemGroup>
 </Project>

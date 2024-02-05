@@ -1,4 +1,4 @@
-﻿namespace RealmCore.Server.Concepts.Interfaces;
+﻿namespace RealmCore.Server.Concepts;
 
 public delegate void HandlingDelegate(VehicleHandlingContext vehicleHandlingContext);
 public delegate void ModifyHandlingDelegate(ref VehicleHandling vehicleHandling);

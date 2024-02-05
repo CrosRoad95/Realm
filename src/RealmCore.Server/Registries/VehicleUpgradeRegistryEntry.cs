@@ -1,6 +1,4 @@
-﻿using RealmCore.Server.Concepts.Interfaces;
-
-namespace RealmCore.Server.Registries;
+﻿namespace RealmCore.Server.Registries;
 
 public class VehicleUpgradeRegistryEntry
 {

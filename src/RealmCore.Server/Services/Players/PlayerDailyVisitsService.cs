@@ -1,5 +1,17 @@
 ﻿namespace RealmCore.Server.Services.Players;
 
+public interface IPlayerDailyVisitsService : IPlayerService
+{
+    DateTime LastVisit { get; set; }
+    int VisitsInRow { get; set; }
+    int VisitsInRowRecord { get; set; }
+
+    event Action<IPlayerDailyVisitsService, int, bool>? Visited;
+    event Action<IPlayerDailyVisitsService, int>? VisitsRecord;
+
+    internal void Update(DateTime now);
+}
+
 internal sealed class PlayerDailyVisitsService : IPlayerDailyVisitsService, IDisposable
 {
     private readonly object _lock = new();

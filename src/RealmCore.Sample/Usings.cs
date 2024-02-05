@@ -38,7 +38,6 @@ global using RealmCore.Sample.Components.Gui;
 global using RealmCore.Server.Elements;
 global using RealmCore.Server.Components;
 global using RealmCore.Sample.Components.Gui.Blazor;
-global using RealmCore.Server.Interfaces.Players;
 global using SlipeServer.Server;
 
 [assembly: ExcludeFromCodeCoverage]

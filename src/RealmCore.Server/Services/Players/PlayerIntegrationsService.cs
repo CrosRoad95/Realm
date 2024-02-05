@@ -2,6 +2,10 @@
 
 namespace RealmCore.Server.Services.Players;
 
+public interface IPlayerIntegrationsService : IPlayerService
+{
+}
+
 public class PlayerIntegrationsService : IPlayerIntegrationsService
 {
     public IDiscordIntegration Discord { get; private set; }

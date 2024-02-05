@@ -1,5 +1,4 @@
-﻿using RealmCore.Server.Concepts.Interfaces;
-using SlipeServer.Packets.Definitions.Entities.Structs;
+﻿using SlipeServer.Packets.Definitions.Entities.Structs;
 
 namespace RealmCore.Tests.Tests.Components;
 
