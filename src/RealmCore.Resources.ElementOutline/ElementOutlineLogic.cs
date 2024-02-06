@@ -18,7 +18,7 @@ internal class ElementOutlineLogic
     private readonly ILogger<ElementOutlineLogic> _logger;
     private readonly ElementOutlineResource _resource;
 
-    private readonly Dictionary<Element, OutlineInfo> _outlineInfoDictionary = new();
+    private readonly Dictionary<Element, OutlineInfo> _outlineInfoDictionary = [];
 
     public ElementOutlineLogic(MtaServer server, IElementOutlineService elementOutlineService, ILuaEventHub<IElementOutlineEventHub> luaEventHub, ILogger<ElementOutlineLogic> logger)
     {

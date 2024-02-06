@@ -18,9 +18,9 @@ internal class AdminLogic
     private readonly FromLuaValueMapper _fromLuaValueMapper;
     private readonly LuaValueMapper _luaValueMapper;
     private readonly object _debugWorldSubscribersLock = new();
-    private readonly List<Player> _debugWorldSubscribers = new();
+    private readonly List<Player> _debugWorldSubscribers = [];
     private readonly object _enabledForPlayersLock = new();
-    private readonly List<Player> _enabledForPlayers = new();
+    private readonly List<Player> _enabledForPlayers = [];
 
     public AdminLogic(MtaServer mtaServer, LuaEventService luaEventService, IAdminService adminService, IElementCollection elementCollection, ILuaEventHub<IAdminEventHub> luaEventHub, FromLuaValueMapper fromLuaValueMapper, LuaValueMapper luaValueMapper)
     {

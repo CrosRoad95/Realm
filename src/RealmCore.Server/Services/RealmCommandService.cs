@@ -40,19 +40,19 @@ public sealed class RealmCommandService
     private readonly ChatBox _chatBox;
     private readonly ILogger<RealmCommandService> _logger;
 
-    private readonly Dictionary<string, CommandInfo> _commands = new();
+    private readonly Dictionary<string, CommandInfo> _commands = [];
 
     public List<CommandInfo> Commands => _commands.Select(x => x.Value).ToList();
     public List<string> CommandNames => _commands.Keys.Concat(_commands.Keys).ToList();
     public int Count => _commands.Count;
 
-    public RealmCommandService(ILogger<RealmCommandService> logger, ChatBox chatBox, MtaServer mtaServer, IEnumerable<IInGameCommand> ingameCommands)
+    public RealmCommandService(ILogger<RealmCommandService> logger, ChatBox chatBox, MtaServer mtaServer, IEnumerable<IInGameCommand> inGameCommands)
     {
         _logger = logger;
         _chatBox = chatBox;
         mtaServer.PlayerJoined += HandlePlayerJoined;
 
-        foreach (var inGameCommand in ingameCommands)
+        foreach (var inGameCommand in inGameCommands)
         {
             var type = inGameCommand.GetType();
             var commandNameAttribute = type.GetCustomAttribute<CommandNameAttribute>();

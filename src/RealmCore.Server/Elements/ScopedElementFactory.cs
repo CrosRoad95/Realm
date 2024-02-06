@@ -14,8 +14,8 @@ internal class ScopedElementFactory : IScopedElementFactory
     public event Action<ScopedElementFactory>? Disposed;
     public event Action<Element>? ElementCreated;
     private readonly object _lock = new();
-    private readonly List<Element> _createdElements = new();
-    private readonly List<ICollisionDetection> _collisionDetection = new();
+    private readonly List<Element> _createdElements = [];
+    private readonly List<ICollisionDetection> _collisionDetection = [];
     private readonly ScopedMapIdGenerator _elementIdGenerator;
 
     public IEnumerable<Element> CreatedElements

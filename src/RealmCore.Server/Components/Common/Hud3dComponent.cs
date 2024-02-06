@@ -29,7 +29,7 @@ public abstract class Hud3dComponentBase : ComponentLifecycle
 public class Hud3dComponent<TState> : Hud3dComponentBase where TState : class
 {
     private readonly Action<IHudBuilder<TState>> _hudBuilderCallback;
-    private readonly List<DynamicHudElement> _dynamicHudComponents = new();
+    private readonly List<DynamicHudElement> _dynamicHudComponents = [];
     private readonly TState? _state;
 
     internal IEnumerable<DynamicHudElement> DynamicHudComponents => _dynamicHudComponents;
@@ -49,7 +49,7 @@ public class Hud3dComponent<TState> : Hud3dComponentBase where TState : class
             throw new HudException("Hud3d has no state");
 
         callback(_state);
-        Dictionary<int, object?> stateChange = new();
+        Dictionary<int, object?> stateChange = [];
         foreach (var item in _dynamicHudComponents)
         {
             var objectValue = item.PropertyInfo.GetValue(_state);

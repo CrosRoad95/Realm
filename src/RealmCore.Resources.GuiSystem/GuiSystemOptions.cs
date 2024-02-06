@@ -4,8 +4,8 @@ namespace RealmCore.Resources.GuiSystem;
 
 public class GuiSystemOptions
 {
-    internal readonly Dictionary<string, byte[]?> _providers = new();
-    internal readonly Dictionary<string, byte[]> _guis = new();
+    internal readonly Dictionary<string, byte[]?> _providers = [];
+    internal readonly Dictionary<string, byte[]> _guis = [];
     internal byte[]? _selectedGuiProvider = null;
 
     public GuiSystemOptions()

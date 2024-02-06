@@ -41,7 +41,7 @@ internal class BrowserResource : Resource
                 string searchPattern = "*.*";
                 string[] files = Directory.GetFiles(_directoryPath, searchPattern, SearchOption.AllDirectories);
 
-                Dictionary<string, byte[]> dlls = new();
+                Dictionary<string, byte[]> dlls = [];
                 foreach (var file in files)
                 {
                     var path = System.IO.Path.GetRelativePath(_directoryPath, file);

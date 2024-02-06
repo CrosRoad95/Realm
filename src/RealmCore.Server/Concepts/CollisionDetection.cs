@@ -2,7 +2,7 @@
 
 public abstract class CollisionDetection
 {
-    private readonly List<IElementRule> _elementRules = new();
+    private readonly List<IElementRule> _elementRules = [];
     private readonly IServiceProvider _serviceProvider;
 
     public CollisionDetection(IServiceProvider serviceProvider)

@@ -5,12 +5,10 @@ namespace RealmCore.Sample.Logic;
 
 internal class SamplePickupsLogic
 {
-    private readonly IElementFactory _elementFactory;
     private readonly ChatBox _chatBox;
 
     public SamplePickupsLogic(IElementFactory elementFactory, ChatBox chatBox)
     {
-        _elementFactory = elementFactory;
         _chatBox = chatBox;
         elementFactory.ElementCreated += HandleElementCreated;
     }
@@ -49,7 +47,7 @@ internal class SamplePickupsLogic
                     var player = (RealmPlayer)element;
 
                     var sessionComponent = player.Sessions.GetSession<JobSession>();
-                    if (sessionComponent != null && sessionComponent is not JobSession)
+                    if (sessionComponent != null || sessionComponent is not JobSession)
                         return;
 
                     if (player.Sessions.TryGetSession(out JobSession jobSession))

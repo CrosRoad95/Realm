@@ -12,7 +12,7 @@ namespace RealmCore.Resources.Overlay;
 
 internal class HudBuilder<TState> : IHudBuilder<TState>
 {
-    private readonly List<LuaValue> _luaValues = new();
+    private readonly List<LuaValue> _luaValues = [];
     private readonly TState _state;
     private readonly IAssetsService _assetsService;
     private readonly Vector2 _screenSize;
@@ -23,9 +23,9 @@ internal class HudBuilder<TState> : IHudBuilder<TState>
     internal IEnumerable<LuaValue> HudElementsDefinitions => _luaValues;
     public Action<DynamicHudElement>? DynamicHudComponentAdded { get; set; }
 
-    public HudBuilder(TState? defaultState, IAssetsService assetsService, Vector2 screenSize)
+    public HudBuilder(TState defaultState, IAssetsService assetsService, Vector2 screenSize)
     {
-        _state = defaultState ?? default;
+        _state = defaultState;
         _assetsService = assetsService;
         _screenSize = screenSize;
     }

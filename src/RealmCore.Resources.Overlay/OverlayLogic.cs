@@ -55,7 +55,7 @@ internal class OverlayLogic
 
     public void HandleHud3dStateChanged(string hudId, Dictionary<int, object?> keyValuePairs)
     {
-        Dictionary<LuaValue, LuaValue> luaValue = new();
+        Dictionary<LuaValue, LuaValue> luaValue = [];
         foreach (var item in keyValuePairs)
         {
             luaValue.Add(item.Key, _luaValueMapper.Map(item.Value));
@@ -65,7 +65,7 @@ internal class OverlayLogic
 
     public void HandleHudStateChanged(Player player, string hudId, Dictionary<int, object?> keyValuePairs)
     {
-        Dictionary<LuaValue, LuaValue> luaValue = new();
+        Dictionary<LuaValue, LuaValue> luaValue = [];
         foreach (var item in keyValuePairs)
         {
             luaValue.Add(item.Key, _luaValueMapper.Map(item.Value));

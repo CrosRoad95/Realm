@@ -18,7 +18,7 @@ internal class MapsDirectoryWatcher : IDisposable
     private readonly string _path;
     private readonly MapsRegistry _mapsRegistry;
     private readonly IMapsService _mapsService;
-    private readonly List<MapEvent> _mapEvents = new();
+    private readonly List<MapEvent> _mapEvents = [];
     private readonly object _mapEventsLock = new();
     private readonly Debounce _debounce = new(250);
 
@@ -60,7 +60,7 @@ internal class MapsDirectoryWatcher : IDisposable
         {
             await _debounce.InvokeAsync(Flush);
         }
-        catch (Exception ex)
+        catch (Exception)
         {
             // Ignore
         }

@@ -107,7 +107,7 @@ internal sealed class VehiclesService : IVehiclesService
         {
             return await _vehicleRepository.GetLightVehiclesByUserId(player.UserId, cancellationToken);
         }
-        return new();
+        return [];
     }
 
     public async Task<List<VehicleData>> GetAllVehicles(RealmPlayer player, CancellationToken cancellationToken = default)
@@ -116,7 +116,7 @@ internal sealed class VehiclesService : IVehiclesService
         {
             return await _vehicleRepository.GetVehiclesByUserId(player.UserId, null, cancellationToken);
         }
-        return new();
+        return [];
     }
 
     public Task<List<VehicleData>> GetAllSpawnedVehicles(CancellationToken cancellationToken = default)

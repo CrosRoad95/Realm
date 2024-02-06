@@ -12,10 +12,10 @@ internal sealed class SeederServerBuilder
     private readonly IElementFactory _elementFactory;
     private readonly IFractionService _fractionService;
     private readonly IGroupRepository _groupRepository;
-    private readonly Dictionary<string, ISeederProvider> _seederProviders = new();
-    private readonly Dictionary<string, IAsyncSeederProvider> _asyncSeederProviders = new();
+    private readonly Dictionary<string, ISeederProvider> _seederProviders = [];
+    private readonly Dictionary<string, IAsyncSeederProvider> _asyncSeederProviders = [];
     private readonly ILogger<SeederServerBuilder> _logger;
-    private readonly Dictionary<string, UserData> _createdUsers = new();
+    private readonly Dictionary<string, UserData> _createdUsers = [];
     private bool _isUpToDate = true;
 
     public SeederServerBuilder(ILogger<SeederServerBuilder> logger,
@@ -250,7 +250,7 @@ internal sealed class SeederServerBuilder
     public async Task Build(CancellationToken cancellationToken = default)
     {
         var result = new JObject();
-        List<SeedData> seedDataList = new();
+        List<SeedData> seedDataList = [];
         var seedFiles = _serverFilesProvider.GetFiles(_basePath).ToList();
         _logger.LogInformation("Found seed files: {seedFiles}", seedFiles);
         foreach (var seedFileName in seedFiles)

@@ -4,7 +4,6 @@ namespace RealmCore.Persistence.Repository;
 
 internal sealed class NewsRepository : INewsRepository
 {
-    private readonly IsolationLevel _isolationLevel = IsolationLevel.ReadCommitted;
     private readonly IDb _db;
     private readonly ITransactionContext _transactionContext;
 

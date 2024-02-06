@@ -6,16 +6,16 @@ internal sealed class UpdateCallbackLogic : ComponentLogic<IUpdateCallback, IRar
     private readonly System.Timers.Timer _rareUpdateTimer;
     private readonly ILogger<UpdateCallbackLogic> _logger;
     private readonly IUpdateService _updateService;
-    private readonly List<IUpdateCallback> _updateCallbacks = new();
-    private readonly List<IUpdateCallback> _updateCallbacksToAdd = new();
-    private readonly List<IUpdateCallback> _updateCallbacksToRemove = new();
+    private readonly List<IUpdateCallback> _updateCallbacks = [];
+    private readonly List<IUpdateCallback> _updateCallbacksToAdd = [];
+    private readonly List<IUpdateCallback> _updateCallbacksToRemove = [];
     private readonly object _updateCallbacksLock = new();
     private readonly object _updateCallbacksToAddLock = new();
     private readonly object _updateCallbacksToRemoveLock = new();
 
-    private readonly List<IRareUpdateCallback> _rareUpdateCallbacks = new();
-    private readonly List<IRareUpdateCallback> _rareUpdateCallbacksToAdd = new();
-    private readonly List<IRareUpdateCallback> _rareUpdateCallbacksToRemove = new();
+    private readonly List<IRareUpdateCallback> _rareUpdateCallbacks = [];
+    private readonly List<IRareUpdateCallback> _rareUpdateCallbacksToAdd = [];
+    private readonly List<IRareUpdateCallback> _rareUpdateCallbacksToRemove = [];
     private readonly object _rareUpdateCallbacksLock = new();
     private readonly object _rareUpdateCallbacksToAddLock = new();
     private readonly object _rareUpdateCallbacksToRemoveLock = new();

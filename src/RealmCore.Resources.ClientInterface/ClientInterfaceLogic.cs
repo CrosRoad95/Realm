@@ -16,7 +16,7 @@ internal class ClientInterfaceLogic
     private readonly ILogger<ClientInterfaceLogic> _logger;
     private readonly ILuaEventHub<IClientInterfaceEventHub> _luaEventHub;
     private readonly ClientInterfaceResource _resource;
-    private readonly List<Element> _focusableElements = new();
+    private readonly List<Element> _focusableElements = [];
     private readonly object _focusableElementsLock = new();
 
     public ClientInterfaceLogic(MtaServer server, LuaEventService luaEventService, FromLuaValueMapper fromLuaValueMapper,

@@ -148,9 +148,9 @@ internal sealed class BanRepository : IBanRepository
 
         var bansData = await query.ToListAsync(cancellationToken);
         if (bansData == null || bansData.Count == 0)
-            return new();
+            return [];
 
-        List<int> deletedBansIds = new();
+        List<int> deletedBansIds = [];
         foreach (var banData in bansData)
         {
             if (!banData.Active)
@@ -173,9 +173,9 @@ internal sealed class BanRepository : IBanRepository
 
         var bansData = await query.ToListAsync(cancellationToken);
         if (bansData == null || bansData.Count == 0)
-            return new();
+            return [];
 
-        List<int> deletedBansIds = new();
+        List<int> deletedBansIds = [];
         foreach (var banData in bansData)
         {
             if (!banData.Active)
@@ -198,9 +198,9 @@ internal sealed class BanRepository : IBanRepository
 
         var bansData = await query.ToListAsync(cancellationToken);
         if (bansData == null || bansData.Count == 0)
-            return new();
+            return [];
 
-        List<int> deletedBansIds = new();
+        List<int> deletedBansIds = [];
         foreach (var banData in bansData)
         {
             if (!banData.Active)

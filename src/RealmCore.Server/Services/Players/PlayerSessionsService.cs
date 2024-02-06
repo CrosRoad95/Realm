@@ -60,12 +60,21 @@ internal sealed class PlayerSessionsService : IPlayerSessionsService, IDisposabl
         }
     }
 
-    public bool TryGetSession<TSession>(out TSession session)
+    public bool TryGetSession<TSession>(out TSession outSession)
     {
         lock (_lock)
         {
-            session = _sessions.OfType<TSession>().FirstOrDefault();
-            return session != null;
+            foreach (var session in _sessions)
+            {
+                if(session is TSession foundSession)
+                {
+                    outSession = foundSession;
+                    return true;
+                }
+            }
+
+            outSession = default!;
+            return false;
         }
     }
 

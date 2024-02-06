@@ -5,7 +5,7 @@ public class RealmPlayer : Player, IComponents, IDisposable
     private readonly IServiceProvider _serviceProvider;
     private readonly IServiceScope _serviceScope;
 
-    private CancellationTokenSource _cancellationTokenSource = new();
+    private readonly CancellationTokenSource _cancellationTokenSource = new();
     public CancellationToken CancellationToken => _cancellationTokenSource.Token;
     public IServiceProvider ServiceProvider => _serviceProvider;
     public Concepts.Components Components { get; private set; }
@@ -18,15 +18,15 @@ public class RealmPlayer : Player, IComponents, IDisposable
     public virtual Vector2 ScreenSize { get; internal set; }
     public virtual CultureInfo CultureInfo { get; internal set; }
     private readonly CultureInfo _culture;
-    private readonly Dictionary<string, Func<RealmPlayer, KeyState, CancellationToken, Task>> _asyncBinds = new();
-    private readonly Dictionary<string, Action<RealmPlayer, KeyState>> _binds = new();
+    private readonly Dictionary<string, Func<RealmPlayer, KeyState, CancellationToken, Task>> _asyncBinds = [];
+    private readonly Dictionary<string, Action<RealmPlayer, KeyState>> _binds = [];
     private readonly SemaphoreSlim _bindsLock = new(1);
     private readonly SemaphoreSlim _bindsUpLock = new(1);
     private readonly SemaphoreSlim _bindsDownLock = new(1);
     private readonly object _bindsCooldownLock = new();
 
-    private readonly Dictionary<string, DateTime> _bindsDownCooldown = new();
-    private readonly Dictionary<string, DateTime> _bindsUpCooldown = new();
+    private readonly Dictionary<string, DateTime> _bindsDownCooldown = [];
+    private readonly Dictionary<string, DateTime> _bindsUpCooldown = [];
     private readonly ConcurrentDictionary<int, bool> _enableFightFlags = new();
 
     public event Action<RealmPlayer, Element?>? FocusedElementChanged;
@@ -241,7 +241,7 @@ public class RealmPlayer : Player, IComponents, IDisposable
 
     private void UpdateFight()
     {
-        var canFight = _enableFightFlags.Count != 0;
+        var canFight = !_enableFightFlags.IsEmpty;
         Controls.FireEnabled = canFight;
         Controls.AimWeaponEnabled = canFight;
         GetRequiredService<ILogger>().LogInformation("Can fight {canFight}", canFight);
@@ -376,10 +376,9 @@ public class RealmPlayer : Player, IComponents, IDisposable
             throw new BindDoesNotExistsException(key);
         }
         RemoveBind(key, KeyState.Both);
-        if (_asyncBinds.ContainsKey(key))
-            _asyncBinds.Remove(key);
-        if (_binds.ContainsKey(key))
-            _binds.Remove(key);
+        _asyncBinds.Remove(key);
+        _binds.Remove(key);
+
         _bindsLock.Release();
     }
 
@@ -616,16 +615,16 @@ public class RealmPlayer : Player, IComponents, IDisposable
         }
     }
 
-    private int inToggleControlScopeFlag = 0;
+    private int _inToggleControlScopeFlag = 0;
 
     internal bool TryEnterToggleControlScope()
     {
-        return Interlocked.Exchange(ref inToggleControlScopeFlag, 1) == 0;
+        return Interlocked.Exchange(ref _inToggleControlScopeFlag, 1) == 0;
     }
 
     internal void ExitToggleControlScope()
     {
-        Interlocked.Exchange(ref inToggleControlScopeFlag, 0);
+        Interlocked.Exchange(ref _inToggleControlScopeFlag, 0);
     }
 
     public async Task DoAnimationAsync(Animation animation, TimeSpan? timeSpan = null, bool blockMovement = true)

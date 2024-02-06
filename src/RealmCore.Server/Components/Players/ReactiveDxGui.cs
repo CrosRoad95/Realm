@@ -20,7 +20,7 @@ public abstract class ReactiveDxGui : DxGui
 public abstract class ReactiveDxGui<TState> : ReactiveDxGui
 {
     private readonly TState _state;
-    private readonly Dictionary<LuaValue, object?> _stateChange = new();
+    private readonly Dictionary<LuaValue, object?> _stateChange = [];
 
     public ReactiveDxGui(RealmPlayer player, string name, bool cursorLess, TState initialState)
         : base(player, name, cursorLess)

@@ -16,7 +16,7 @@ internal class FormContext : IFormContext
     private readonly RealmPlayer _player;
     private readonly string _formName;
     private readonly LuaValue _data;
-    private readonly IGuiSystemService _GuiSystemService;
+    private readonly IGuiSystemService _guiSystemService;
 
     public string FormName => _formName;
 
@@ -27,7 +27,7 @@ internal class FormContext : IFormContext
         _player = player;
         _formName = formName;
         _data = data;
-        _GuiSystemService = GuiSystemService;
+        _guiSystemService = GuiSystemService;
     }
 
     public TData GetData<TData>(bool suppressValidation = false) where TData : ILuaValue, new()
@@ -47,7 +47,7 @@ internal class FormContext : IFormContext
         if (_responded)
             throw new Exception("Form already got response.");
 
-        _GuiSystemService.SendFormResponse(_player, "", FormName, true, data);
+        _guiSystemService.SendFormResponse(_player, "", FormName, true, data);
         _responded = true;
     }
 
@@ -56,7 +56,7 @@ internal class FormContext : IFormContext
         if (_responded)
             throw new Exception("Form already got response.");
 
-        _GuiSystemService.SendFormResponse(_player, "", FormName, false, data);
+        _guiSystemService.SendFormResponse(_player, "", FormName, false, data);
         _responded = true;
     }
 }

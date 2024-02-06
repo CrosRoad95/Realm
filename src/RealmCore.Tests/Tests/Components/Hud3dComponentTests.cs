@@ -102,7 +102,7 @@ public class Hud3dComponentTests
 
         int callsCount = 0;
         string _id = string.Empty;
-        Dictionary<int, object> _data = new();
+        Dictionary<int, object> _data = [];
 
         _overlayService.Hud3dStateChanged = (id, data) =>
         {

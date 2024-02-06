@@ -9,7 +9,7 @@ namespace RealmCore.Resources.Overlay.Builders;
 
 internal class PropertyExpressionVisitor : ExpressionVisitor
 {
-    public List<PropertyInfo> Properties { get; private set; } = new();
+    public List<PropertyInfo> Properties { get; private set; } = [];
 
     protected override Expression VisitMember(MemberExpression node)
     {
@@ -37,7 +37,7 @@ internal class TextHudBuilder<TState> : ITextHudBuilder<TState>
     private readonly TState _state;
     private readonly IAssetsService _assetsService;
     public bool IsDynamic { get; private set; }
-    private List<PropertyInfo> _propertyInfos = new();
+    private List<PropertyInfo> _propertyInfos = [];
 
     public Action<DynamicHudElement>? DynamicHudComponentAdded { get; set; }
 

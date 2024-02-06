@@ -49,7 +49,7 @@ public class CommandArguments
         }
     }
     
-    private bool TryReadArgument(out string argument)
+    private bool TryReadArgument(out string? argument)
     {
         if (_index >= 0 && _index < _args.Length)
         {
@@ -82,9 +82,9 @@ public class CommandArguments
         }
     }
     
-    public bool TryReadArgument<T>(out T argument)
+    public bool TryReadArgument<T>(out T? argument)
     {
-        if(TryReadArgument(out string arg))
+        if(TryReadArgument(out string? arg) && arg != null)
         {
             try
             {
@@ -100,9 +100,16 @@ public class CommandArguments
         return false;
     }
 
-    public string ReadWordOrDefault(string defaultValue)
+    public string? ReadWordOrDefault()
     {
         if (TryReadArgument(out var argument))
+            return argument;
+        return null;
+    }
+
+    public string ReadWordOrDefault(string defaultValue)
+    {
+        if (TryReadArgument(out var argument) && argument != null)
             return argument;
         return defaultValue;
     }
@@ -160,9 +167,8 @@ public class CommandArguments
     
     public bool TryReadPlayerPlayer(out RealmPlayer? player)
     {
-        if(TryReadArgument(out string argument))
+        if(TryReadArgument(out string? name) && name != null)
         {
-            var name = ReadArgument();
             var players = _usersService.SearchPlayersByName(name).ToList();
             if (players.Count == 1)
             {

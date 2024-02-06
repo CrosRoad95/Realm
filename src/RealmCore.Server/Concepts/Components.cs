@@ -6,7 +6,7 @@ public sealed class Components : IDisposable
     private bool _disposed = false;
 
     private readonly ReaderWriterLockSlim _componentsLock = new(LockRecursionPolicy.SupportsRecursion);
-    private readonly List<IComponent> _components = new();
+    private readonly List<IComponent> _components = [];
     private readonly IServiceProvider _serviceProvider;
     private readonly Element _element;
 

@@ -12,7 +12,7 @@ public interface IFractionService
 
 internal sealed class FractionService : IFractionService
 {
-    private readonly Dictionary<int, FractionData> _fractions = new();
+    private readonly Dictionary<int, FractionData> _fractions = [];
     private readonly object _lock = new();
     private readonly IFractionRepository _fractionRepository;
 

@@ -265,8 +265,7 @@ internal sealed class CommandsLogic
 
         _commandService.AddCommandHandler("addvehicleupgrade", (player, args) =>
         {
-            var vehicle = player.Vehicle as RealmVehicle;
-            if (vehicle == null)
+            if (player.Vehicle is not RealmVehicle vehicle)
             {
                 _chatBox.OutputTo(player, "Enter vehicle!");
                 return;

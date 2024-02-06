@@ -71,9 +71,7 @@ public class VehiclePartDamageService : IVehiclePartDamageService
     {
         lock (_lock)
         {
-            var vehiclePartDamage = _vehiclePartDamages.FirstOrDefault(x => x.PartId == partId);
-            if (vehiclePartDamage == null)
-                throw new ArgumentException("Part id doesn't exists");
+            var vehiclePartDamage = _vehiclePartDamages.FirstOrDefault(x => x.PartId == partId) ?? throw new ArgumentException("Part id doesn't exists");
             _vehiclePartDamages.Remove(vehiclePartDamage);
         }
         PartDestroyed?.Invoke(this, partId);
@@ -84,10 +82,7 @@ public class VehiclePartDamageService : IVehiclePartDamageService
         float newState = 0;
         lock (_lock)
         {
-            var vehiclePartDamage = _vehiclePartDamages.FirstOrDefault(x => x.PartId == partId);
-            if (vehiclePartDamage == null)
-                throw new ArgumentException("Part id doesn't exists");
-
+            var vehiclePartDamage = _vehiclePartDamages.FirstOrDefault(x => x.PartId == partId) ?? throw new ArgumentException("Part id doesn't exists");
             vehiclePartDamage.State += difference;
             if (vehiclePartDamage.State <= 0)
                 vehiclePartDamage.State = 0;

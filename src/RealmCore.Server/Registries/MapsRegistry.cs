@@ -3,8 +3,8 @@
 public class MapsRegistry
 {
     private readonly MapIdGenerator _mapIdGenerator;
-    private readonly List<MapsDirectoryWatcher> _mapsDirectoryWatchers = new();
-    private readonly Dictionary<string, Map> _maps = new();
+    private readonly List<MapsDirectoryWatcher> _mapsDirectoryWatchers = [];
+    private readonly Dictionary<string, Map> _maps = [];
     private readonly object _lock = new();
     private readonly ILogger<MapsRegistry> _logger;
 

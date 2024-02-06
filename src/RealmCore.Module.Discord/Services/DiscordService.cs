@@ -84,7 +84,7 @@ internal class DiscordService : IDiscordService
         throw new Exception("Failed to send message");
     }
 
-    Dictionary<ulong, Dictionary<string, Func<ulong, string, Task>>> _textBasedCommandHandlers = new();
+    Dictionary<ulong, Dictionary<string, Func<ulong, string, Task>>> _textBasedCommandHandlers = [];
 
     public async Task HandleTextBasedCommand(ulong userId, ulong channelId, string command, CancellationToken cancellationToken = default)
     {
@@ -102,7 +102,7 @@ internal class DiscordService : IDiscordService
     {
         if (!_textBasedCommandHandlers.ContainsKey(channelId))
         {
-            _textBasedCommandHandlers[channelId] = new();
+            _textBasedCommandHandlers[channelId] = [];
         }
 
         _textBasedCommandHandlers[channelId][command] = callback;

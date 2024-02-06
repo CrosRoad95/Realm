@@ -82,7 +82,7 @@ public class Item : IEquatable<Item>, IEquatable<Metadata>
         }
         else
         {
-            _metaData = new();
+            _metaData = [];
         }
     }
 

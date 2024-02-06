@@ -16,7 +16,7 @@ public sealed class InventoryGui : ReactiveDxGui<InventoryGui.InventoryState>, I
 
         public double Number { get; set; }
         public double Size { get; set; }
-        public List<InventoryItem> Items { get; set; } = new();
+        public List<InventoryItem> Items { get; set; } = [];
     }
 
     public InventoryGui(PlayerContext playerContext) : base(playerContext.Player, "inventory", false, new())

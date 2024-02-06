@@ -3,10 +3,9 @@
 [CommandName("jobstatsall")]
 public sealed class JobsStatsAllCommand : IInGameCommand
 {
-    private readonly ILogger<JobsStatsAllCommand> _logger;
     private readonly ChatBox _chatBox;
 
-    public JobsStatsAllCommand(ILogger<JobsStatsAllCommand> logger, ChatBox chatBox)
+    public JobsStatsAllCommand(ChatBox chatBox)
     {
         _chatBox = chatBox;
     }

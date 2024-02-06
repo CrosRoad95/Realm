@@ -78,7 +78,7 @@ public abstract class HudLayer<TState> : IHudLayer where TState : class, new()
 
     public void BuildHud(IOverlayService overlayService, RealmPlayer player)
     {
-        List<DynamicHudElement> dynamicHudComponents = new();
+        List<DynamicHudElement> dynamicHudComponents = [];
 
         overlayService.CreateHud(player, _id, e =>
         {

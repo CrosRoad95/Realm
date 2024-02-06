@@ -57,8 +57,7 @@ internal sealed partial class PlayerGameplayLogic
             if (element == null)
                 return;
 
-            var currentInteractElement = element as IComponents;
-            if (currentInteractElement == null)
+            if (element is not IComponents currentInteractElement)
                 return;
 
             if (currentInteractElement.TryGetComponent(out InteractionComponent interactionComponent) && player.DistanceTo(element) < interactionComponent.MaxInteractionDistance)
@@ -128,15 +127,17 @@ internal sealed partial class PlayerGameplayLogic
             {
                 var vehicle = ((RealmVehicle)element);
                 var vehicleName = ((RealmVehicle)element).Name;
-                var buyVehicleGui = new BuyVehicleGui(player, vehicleName, realmVehicleForSale.Price);
-                buyVehicleGui.Bought = async () =>
+                var buyVehicleGui = new BuyVehicleGui(player, vehicleName, realmVehicleForSale.Price)
                 {
-                    player.Gui.Close<BuyVehicleGui>();
-                    if (realmVehicleForSale.TrySell())
+                    Bought = async () =>
                     {
-                        await player.GetRequiredService<IVehiclesService>().ConvertToPersistantVehicle(vehicle);
-                        vehicle.Access.AddAsOwner(player);
-                        vehicle.Fuel.AddFuelContainer(1, 20, 20, 0.01f, 2, true);
+                        player.Gui.Close<BuyVehicleGui>();
+                        if (realmVehicleForSale.TrySell())
+                        {
+                            await player.GetRequiredService<IVehiclesService>().ConvertToPersistantVehicle(vehicle);
+                            vehicle.Access.AddAsOwner(player);
+                            vehicle.Fuel.AddFuelContainer(1, 20, 20, 0.01f, 2, true);
+                        }
                     }
                 };
                 player.Gui.Current = buyVehicleGui;

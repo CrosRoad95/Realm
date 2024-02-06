@@ -7,8 +7,8 @@ namespace RealmCore.Resources.Assets;
 public class AssetsRegistry : IServerAssetsProvider
 {
     private readonly object _lock = new();
-    private readonly Dictionary<string, IAsset> _assets = new();
-    private readonly Dictionary<ObjectModel, string> _replacedModels = new();
+    private readonly Dictionary<string, IAsset> _assets = [];
+    private readonly Dictionary<ObjectModel, string> _replacedModels = [];
     public IReadOnlyDictionary<string, IAsset> Assets => _assets;
     public IReadOnlyDictionary<ObjectModel, string> ReplacedModels => _replacedModels;
 

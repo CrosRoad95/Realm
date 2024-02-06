@@ -17,7 +17,7 @@ internal sealed class AFKService : IAFKService
 {
     public event Action<Player>? PlayerAFKStarted;
     public event Action<Player>? PlayerAFKStopped;
-    private readonly HashSet<Player> _afkPlayers = new();
+    private readonly HashSet<Player> _afkPlayers = [];
 
     public AFKService()
     {

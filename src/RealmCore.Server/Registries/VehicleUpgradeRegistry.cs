@@ -2,7 +2,7 @@
 
 public class VehicleUpgradeRegistry
 {
-    private readonly Dictionary<int, VehicleUpgradeRegistryEntry> _vehicleUpgradesRegistryEntries = new();
+    private readonly Dictionary<int, VehicleUpgradeRegistryEntry> _vehicleUpgradesRegistryEntries = [];
     public VehicleUpgradeRegistry()
     {
 

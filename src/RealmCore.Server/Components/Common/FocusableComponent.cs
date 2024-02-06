@@ -3,7 +3,7 @@
 public class FocusableComponent : ComponentLifecycle
 {
     private readonly object _lock = new();
-    private readonly List<RealmPlayer> _focusedPlayers = new();
+    private readonly List<RealmPlayer> _focusedPlayers = [];
     public event Action<FocusableComponent, RealmPlayer>? PlayerFocused;
     public event Action<FocusableComponent, RealmPlayer>? PlayerLostFocus;
     public int FocusedPlayerCount

@@ -78,14 +78,14 @@ internal class SeedData
         public Dictionary<string, GroupMemberSeedData> Members { get; set; }
     }
 
-    public Dictionary<string, BlipSeedData> Blips = new();
-    public Dictionary<string, PickupSeedData> Pickups = new();
-    public Dictionary<string, MarkerSeedData> Markers = new();
-    public Dictionary<string, FractionSeedData> Fractions = new();
-    public Dictionary<string, object> Roles = new();
-    public Dictionary<string, UserSeedData> Users = new();
-    public Dictionary<string, VehicleUpgradeDescriptionSeedData> Upgrades = new();
-    public Dictionary<string, GroupSeedData> Groups = new();
+    public Dictionary<string, BlipSeedData> Blips = [];
+    public Dictionary<string, PickupSeedData> Pickups = [];
+    public Dictionary<string, MarkerSeedData> Markers = [];
+    public Dictionary<string, FractionSeedData> Fractions = [];
+    public Dictionary<string, object> Roles = [];
+    public Dictionary<string, UserSeedData> Users = [];
+    public Dictionary<string, VehicleUpgradeDescriptionSeedData> Upgrades = [];
+    public Dictionary<string, GroupSeedData> Groups = [];
 }
 
 #pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.

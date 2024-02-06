@@ -12,9 +12,10 @@ public sealed class JobsStatsCommand : IInGameCommand
         _chatBox = chatBox;
     }
 
-    public async Task Handle(RealmPlayer player, CommandArguments args, CancellationToken cancellationToken)
+    public Task Handle(RealmPlayer player, CommandArguments args, CancellationToken cancellationToken)
     {
         var stats = player.JobStatistics.GetTotalPoints(1);
         _chatBox.OutputTo(player, $"stats: {stats.Item1}, time: {stats.Item2}");
+        return Task.CompletedTask;
     }
 }

@@ -49,7 +49,7 @@ internal sealed class PlayerUserService : IPlayerUserService, IDisposable
 
     private UserData? _user;
     private readonly object _lock = new();
-    private readonly List<PolicyCache> _authorizedPolicies = new();
+    private readonly List<PolicyCache> _authorizedPolicies = [];
     private readonly IDateTimeProvider _dateTimeProvider;
     private readonly IUserEventRepository _userEventRepository;
     private ClaimsPrincipal? _claimsPrincipal;

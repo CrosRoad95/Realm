@@ -7,7 +7,7 @@ namespace RealmCore.Resources.Assets.Factories;
 public class ModelFactory
 {
     private readonly RenderWareBuilder _renderWareBuilder;
-    private readonly Dictionary<string, Material> _materials = new();
+    private readonly Dictionary<string, Material> _materials = [];
     public ModelFactory()
     {
         _renderWareBuilder = new RenderWareBuilder();

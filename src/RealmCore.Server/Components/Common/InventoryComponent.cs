@@ -2,7 +2,7 @@
 
 public class InventoryComponent : Component
 {
-    private readonly List<Item> _items = new();
+    private readonly List<Item> _items = [];
     private readonly ReaderWriterLockSlim _semaphore = new(LockRecursionPolicy.SupportsRecursion);
     public event Action<InventoryComponent, Item>? ItemAdded;
     public event Action<InventoryComponent, Item>? ItemRemoved;
@@ -239,7 +239,7 @@ public class InventoryComponent : Component
             var item = AddItem(itemsRegistry, itemId, 1, metadata, tryStack, force);
             if (item.Any())
                 return item.First();
-            return GetSingleItemByIdWithMetadata(itemId, metadata ?? new()) ?? throw new InvalidOperationException();
+            return GetSingleItemByIdWithMetadata(itemId, metadata ?? []) ?? throw new InvalidOperationException();
         }
         finally
         {
@@ -252,7 +252,7 @@ public class InventoryComponent : Component
         if (number <= 0)
             throw new ArgumentOutOfRangeException(nameof(number));
 
-        metadata ??= new();
+        metadata ??= [];
 
         var itemRegistryEntry = itemsRegistry.Get(itemId);
         var requiredSpace = Number + itemRegistryEntry.Size * number;
@@ -262,7 +262,7 @@ public class InventoryComponent : Component
         _semaphore.EnterWriteLock();
         try
         {
-            List<Item> newItems = new();
+            List<Item> newItems = [];
             if (tryStack)
             {
                 foreach (var item in _items.Where(x => x.ItemId == itemId))

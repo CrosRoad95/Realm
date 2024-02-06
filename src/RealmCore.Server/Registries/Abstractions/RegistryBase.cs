@@ -3,7 +3,7 @@
 public abstract class RegistryBase<TKey, TEntry> where TEntry : RegistryEntryBase<TKey>
     where TKey : unmanaged
 {
-    protected readonly Dictionary<TKey, TEntry> _entries = new();
+    protected readonly Dictionary<TKey, TEntry> _entries = [];
 
     public TEntry Get(TKey id)
     {

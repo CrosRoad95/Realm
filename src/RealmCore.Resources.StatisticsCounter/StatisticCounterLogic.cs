@@ -16,7 +16,7 @@ internal class StatisticCounterLogic
     private readonly IStatisticsCounterService _statisticsCounterService;
     private readonly ILogger<StatisticCounterLogic> _logger;
     private readonly FromLuaValueMapper _fromLuaValueMapper;
-    private readonly HashSet<Player> _players = new();
+    private readonly HashSet<Player> _players = [];
 
     public StatisticCounterLogic(MtaServer server, LuaEventService luaEventService,
         IStatisticsCounterService statisticsCounterResource, ILogger<StatisticCounterLogic> logger, FromLuaValueMapper fromLuaValueMapper)
