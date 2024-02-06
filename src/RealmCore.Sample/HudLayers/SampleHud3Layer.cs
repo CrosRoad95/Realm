@@ -1,6 +1,4 @@
-﻿using System.Drawing;
-
-namespace RealmCore.Sample.Huds;
+﻿namespace RealmCore.Sample.HudLayers;
 
 public class SampleHud3State
 {

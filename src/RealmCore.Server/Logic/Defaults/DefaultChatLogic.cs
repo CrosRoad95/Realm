@@ -1,6 +1,4 @@
-﻿using SlipeServer.Server.Extensions;
-
-namespace RealmCore.Server.Logic.Defaults;
+﻿namespace RealmCore.Server.Logic.Defaults;
 
 public class DefaultChatLogic
 {

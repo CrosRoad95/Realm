@@ -1,4 +1,4 @@
-﻿namespace RealmCore.Sample.Logic;
+﻿namespace RealmCore.Sample.Elements;
 
 public class RealmVehicleForSale : RealmVehicle
 {

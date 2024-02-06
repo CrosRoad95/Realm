@@ -1,11 +1,4 @@
-﻿using RealmCore.Resources.Browser;
-using RealmCore.Server.Behaviours;
-using RealmCore.Server.Logic.Components;
-using RealmCore.Server.Logic.Elements;
-using RealmCore.SQLite;
-using SlipeServer.Resources.Scoreboard;
-
-namespace RealmCore.Server.Extensions;
+﻿namespace RealmCore.Server.Extensions;
 
 public static class ServerBuilderExtensions
 {

@@ -1,7 +1,7 @@
 ﻿using Color = System.Drawing.Color;
 using Size = System.Drawing.Size;
 
-namespace RealmCore.Sample.Huds;
+namespace RealmCore.Sample.HudLayers;
 
 public class SampleHudState
 {

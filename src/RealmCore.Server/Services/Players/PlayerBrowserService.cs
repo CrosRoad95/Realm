@@ -1,6 +1,4 @@
-﻿using RealmCore.Resources.Browser;
-
-namespace RealmCore.Server.Services.Players;
+﻿namespace RealmCore.Server.Services.Players;
 
 public interface IPlayerBrowserService : IPlayerService
 {

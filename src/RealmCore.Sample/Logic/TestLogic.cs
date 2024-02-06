@@ -1,6 +1,4 @@
-﻿using System.Drawing;
-
-namespace RealmCore.Sample.Logic;
+﻿namespace RealmCore.Sample.Logic;
 
 public class TestComponent : Component { }
 

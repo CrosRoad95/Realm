@@ -1,6 +1,4 @@
-﻿using RealmCore.Resources.Admin.Data;
-
-namespace RealmCore.Server.Logic.Resources;
+﻿namespace RealmCore.Server.Logic.Resources;
 
 internal sealed class AdminResourceLogic
 {

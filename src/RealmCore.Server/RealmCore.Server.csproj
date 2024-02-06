@@ -209,6 +209,16 @@
 		<Using Include="System.Collections" />
 		<Using Include="RealmCore.Server.Services.Players" />
 		<Using Include="RealmCore.Server.Services.Vehicles" />
+		<Using Include="RealmCore.Server.Concepts.Sessions" />
+		<Using Include="RealmCore.Server.Components.Players.Jobs" />
+		<Using Include="SlipeServer.Server.Extensions" />
+		<Using Include="RealmCore.Resources.Admin.Data" />
+		<Using Include="SlipeServer.Resources.Scoreboard" />
+		<Using Include="RealmCore.SQLite" />
+		<Using Include="RealmCore.Server.Logic.Elements" />
+		<Using Include="RealmCore.Server.Logic.Components" />
+		<Using Include="RealmCore.Server.Behaviours" />
+		<Using Include="RealmCore.Resources.Browser" />
 	</ItemGroup>
 
 </Project>

@@ -1,7 +1,4 @@
-﻿using RealmCore.Server.Components.Players.Jobs;
-using RealmCore.Server.Concepts.Sessions;
-
-namespace RealmCore.Server.Logic.Components;
+﻿namespace RealmCore.Server.Logic.Components;
 
 internal sealed class JobSessionComponentLogic
 {

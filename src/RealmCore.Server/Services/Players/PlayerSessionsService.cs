@@ -1,6 +1,4 @@
-﻿using RealmCore.Server.Concepts.Sessions;
-
-namespace RealmCore.Server.Services.Players;
+﻿namespace RealmCore.Server.Services.Players;
 
 public interface IPlayerSessionsService : IPlayerService, IEnumerable<Session>
 {
