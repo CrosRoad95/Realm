@@ -6,6 +6,8 @@ using RealmCore.Resources.GuiSystem;
 using SlipeServer.Net.Wrappers;
 using RealmCore.Server.Factories.Interfaces;
 using RealmCore.Tests.Classes;
+using Microsoft.AspNetCore.Identity;
+using System.Security.Claims;
 
 namespace RealmCore.Tests.TestServers;
 
@@ -145,45 +147,19 @@ internal class RealmTestingServer : TestingServer<RealmTestingPlayer>
         return GetRequiredService<IElementFactory>().CreateVehicle(404, Vector3.Zero, Vector3.Zero);
     }
 
-    public async Task SignInPlayer(RealmPlayer player, string[]? roles = null)
+    public async Task SignInPlayer(RealmPlayer player)
     {
-        var claims = new List<Claim>
-        {
-            new("test", "true"),
-        };
-        var roleManager = GetRequiredService<RoleManager<RoleData>>();
-        foreach (var roleName in new string[] { "Admin" })
-        {
-            await roleManager.CreateAsync(new RoleData
-            {
-                Name = roleName
-            });
-        }
-
         var userManager = GetRequiredService<UserManager<UserData>>();
-        var signInManager = GetRequiredService<SignInManager<UserData>>();
-
-        var user = await userManager.GetUserByUserName(_userName);
-        if(user == null)
+        var user = await userManager.GetUserByUserName(player.Name);
+        if (user == null)
         {
             user = new UserData
             {
-                UserName = _userName,
+                UserName = player.Name,
                 Upgrades = new List<UserUpgradeData>(),
             };
             await userManager.CreateAsync(user);
-            await userManager.AddClaimsAsync(user, claims);
         }
-
-        var claimsPrincipal = await signInManager.CreateUserPrincipalAsync(user ?? throw new Exception("User should not be null here"));
-
-        if (roles != null)
-            foreach (var role in roles)
-            {
-                if (claimsPrincipal.Identity is ClaimsIdentity claimsIdentity)
-                    claimsIdentity.AddClaim(new Claim(ClaimTypes.Role, role));
-            }
-
-        player.User.SignIn(user, claimsPrincipal);
+        await player.GetRequiredService<IUsersService>().SignIn(player, user);
     }
 }

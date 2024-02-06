@@ -91,6 +91,18 @@ internal sealed class UsersService : IUsersService
         return null;
     }
 
+    public async Task<bool> AddToRole(RealmPlayer player, string role)
+    {
+        var userManager = player.GetRequiredService<UserManager<UserData>>();
+        var result = await userManager.AddToRoleAsync(player.User.User, role);
+        if (result.Succeeded)
+        {
+            player.User.AddRole(role);
+            return true;
+        }
+        return false;
+    }
+
     public async Task<bool> SignIn(RealmPlayer player, UserData user, CancellationToken cancellationToken = default)
     {
         if (player == null)
@@ -137,7 +149,7 @@ internal sealed class UsersService : IUsersService
 
             player.Money.SetMoneyInternal(user.Money);
             await AuthorizePolicies(player);
-            userLoginHistoryRepository.Add(user.Id, _dateTimeProvider.Now, player.Client.IPAddress?.ToString() ?? "", serial, cancellationToken);
+            await userLoginHistoryRepository.Add(user.Id, _dateTimeProvider.Now, player.Client.IPAddress?.ToString() ?? "", serial, cancellationToken);
             UpdateLastData(player);
             db.Users.Update(user);
             await db.SaveChangesAsync(cancellationToken);

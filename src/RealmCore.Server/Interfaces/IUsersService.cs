@@ -6,6 +6,7 @@ public interface IUsersService
     event Action<RealmPlayer>? SignedIn;
     event Action<RealmPlayer>? SignedOut;
 
+    Task<bool> AddToRole(RealmPlayer player, string role);
     ValueTask<bool> AuthorizePolicy(RealmPlayer player, string policy, bool useCache = true);
     Task<bool> QuickSignIn(RealmPlayer player, CancellationToken cancellationToken = default);
     IEnumerable<RealmPlayer> SearchPlayersByName(string pattern, bool loggedIn = true);

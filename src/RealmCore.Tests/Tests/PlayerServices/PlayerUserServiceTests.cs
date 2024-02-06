@@ -10,8 +10,18 @@ public class PlayerUserServiceTests
         #region Arrange
         var realmTestingServer = new RealmTestingServer();
         var player = realmTestingServer.CreatePlayer();
-        await realmTestingServer.SignInPlayer(player, roles);
+
+        await realmTestingServer.SignInPlayer(player);
         var usersService = player.GetRequiredService<IUsersService>();
+        foreach (var roleName in roles)
+        {
+            var roleManager = player.GetRequiredService<RoleManager<RoleData>>();
+            await roleManager.CreateAsync(new RoleData
+            {
+                Name = roleName
+            });
+            await usersService.AddToRole(player, roleName);
+        }
         #endregion
 
         #region Act
