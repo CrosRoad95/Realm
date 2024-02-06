@@ -1,5 +1,13 @@
 ﻿namespace RealmCore.Server.Services.Vehicles;
 
+public interface IVehicleMileageCounterService : IVehicleService
+{
+    float Mileage { get; set; }
+    float MinimumDistanceThreshold { get; set; }
+
+    event Action<IVehicleMileageCounterService, float, float>? Traveled;
+}
+
 internal class VehicleMileageCounterService : IVehicleMileageCounterService, IDisposable
 {
     public RealmVehicle Vehicle { get; }

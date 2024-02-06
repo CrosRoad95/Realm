@@ -1,5 +1,13 @@
 ﻿namespace RealmCore.Server.Services.Integrations;
 
+public interface IDiscordIntegration : IIntegration
+{
+    ulong DiscordUserId { get; internal set; }
+
+    string GenerateAndGetConnectionCode(TimeSpan? validFor = null);
+    bool Verify(string code, ulong discordUserId);
+}
+
 internal class DiscordIntegration : IDiscordIntegration
 {
     private string? _discordConnectionCode = null;

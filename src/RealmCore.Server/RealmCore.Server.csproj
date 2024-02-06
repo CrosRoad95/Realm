@@ -12,6 +12,15 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+	  <Compile Remove="Interfaces\Players\**" />
+	  <Compile Remove="Interfaces\Vehicles\**" />
+	  <EmbeddedResource Remove="Interfaces\Players\**" />
+	  <EmbeddedResource Remove="Interfaces\Vehicles\**" />
+	  <None Remove="Interfaces\Players\**" />
+	  <None Remove="Interfaces\Vehicles\**" />
+	</ItemGroup>
+
+	<ItemGroup>
 		<PackageReference Include="BCrypt.Net-Next" Version="4.0.3" />
 		<PackageReference Include="FluentValidation" Version="11.2.2" />
 		<PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="8.0.0" />
@@ -72,11 +81,11 @@
 
 	<ItemGroup>
 	  <Folder Include="Components\Peds\" />
-	  <Folder Include="Interfaces\Players\" />
 	</ItemGroup>
 
 	<ItemGroup>
 		<Using Include="RealmCore.Server.Components.Players.Abstractions" />
+		<Using Include="RealmCore.Server.Concepts.Access" />
 		<Using Include="System" />
 		<Using Include="System.Collections.Generic" />
 		<Using Include="System.Linq" />
@@ -195,12 +204,11 @@
 		<Using Include="RealmCore.Server.Components" />
 		<Using Include="RealmCore.Server.Scopes" />
 		<Using Include="System.Diagnostics.CodeAnalysis" />
-		<Using Include="RealmCore.Server.Interfaces.Integrations" />
 		<Using Include="RealmCore.Server.Utilities.Interfaces" />
 		<Using Include="RealmCore.Server.Factories.Interfaces" />
 		<Using Include="System.Collections" />
-		<Using Include="RealmCore.Server.Interfaces.Vehicles" />
 		<Using Include="RealmCore.Server.Services.Players" />
+		<Using Include="RealmCore.Server.Services.Vehicles" />
 	</ItemGroup>
 
 </Project>

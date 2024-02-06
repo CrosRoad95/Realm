@@ -1,4 +1,4 @@
-﻿using RealmCore.Resources.Assets.Interfaces;
+﻿using RealmCore.Resources.Assets;
 using RealmCore.Resources.Overlay;
 using SlipeServer.Packets.Definitions.Lua;
 using Color = System.Drawing.Color;

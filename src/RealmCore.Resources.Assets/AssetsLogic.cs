@@ -3,7 +3,6 @@ using SlipeServer.Server;
 using SlipeServer.Server.Services;
 using SlipeServer.Server.Events;
 using SlipeServer.Packets.Definitions.Lua;
-using RealmCore.Resources.Assets.Interfaces;
 
 namespace RealmCore.Resources.Assets;
 

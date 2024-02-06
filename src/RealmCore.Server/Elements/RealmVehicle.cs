@@ -1,6 +1,4 @@
-﻿using RealmCore.Server.Concepts.Access;
-
-namespace RealmCore.Server.Elements;
+﻿namespace RealmCore.Server.Elements;
 
 public class RealmVehicle : Vehicle, IComponents
 {

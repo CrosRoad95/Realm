@@ -1,6 +1,12 @@
-﻿using RealmCore.Server.Concepts.Access;
+﻿namespace RealmCore.Server.Services;
 
-namespace RealmCore.Server.Services;
+public interface IVehiclesAccessService
+{
+    event Func<Ped, RealmVehicle, byte, bool>? CanEnter;
+    event Action<Ped, RealmVehicle, byte, VehicleAccessController>? FailedToEnter;
+
+    internal bool InternalCanEnter(Ped ped, RealmVehicle vehicle, byte seat, VehicleAccessController? vehicleAccessControllerComponent = null);
+}
 
 internal sealed class VehiclesAccessService : IVehiclesAccessService
 {

@@ -1,7 +1,3 @@
-﻿using RealmCore.Resources.Base.Interfaces;
-using SlipeServer.Packets.Definitions.Lua;
-using SlipeServer.Server.Elements;
-
-namespace RealmCore.Resources.Admin.Messages;
+﻿namespace RealmCore.Resources.Admin.Messages;
 
 internal record struct UpdateElementsComponentsMessage(Player Player, LuaValue elementsComponents) : IMessage;

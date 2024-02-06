@@ -2,6 +2,11 @@
 
 namespace RealmCore.BlazorHelpers;
 
+public interface IRealmService<T>
+{
+    T Service { get; }
+}
+
 public class RealmService<T> : IRealmService<T> where T : notnull
 {
     public T Service { get; private set; }

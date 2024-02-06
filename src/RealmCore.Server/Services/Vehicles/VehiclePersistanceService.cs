@@ -1,5 +1,18 @@
 ﻿namespace RealmCore.Server.Services.Vehicles;
 
+public interface IVehiclePersistanceService : IVehicleService
+{
+    int Id { get; }
+    byte Kind { get; }
+    DateTime? LastUsed { get; }
+    bool IsLoaded { get; }
+    internal VehicleData VehicleData { get; }
+
+    event Action<IVehiclePersistanceService, RealmVehicle>? Loaded;
+
+    void Load(VehicleData vehicleData);
+}
+
 internal sealed class VehiclePersistanceService : IVehiclePersistanceService
 {
     private readonly object _lock = new();

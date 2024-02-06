@@ -1,5 +1,10 @@
 ﻿namespace RealmCore.Server.Services.Vehicles;
 
+public interface IVehicleEventsService : IVehicleService, IEnumerable<VehicleEventDTO>
+{
+    void AddEvent(int eventType, string? metadata = null);
+}
+
 internal class VehicleEventsService : IVehicleEventsService
 {
     private readonly object _lock = new();

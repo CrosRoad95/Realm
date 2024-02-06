@@ -1,8 +1,4 @@
-﻿using RealmCore.Resources.Admin.Data;
-using RealmCore.Resources.Base.Interfaces;
-using SlipeServer.Server.Elements;
-
-namespace RealmCore.Resources.Admin.Messages;
+﻿namespace RealmCore.Resources.Admin.Messages;
 
 internal record struct BroadcastElementDebugInfoMessage(ElementDebugInfo ElementDebugInfo) : IMessage;
 internal record struct BroadcastElementsDebugInfoMessage(IEnumerable<ElementDebugInfo> ElementsDebugInfo) : IMessage;

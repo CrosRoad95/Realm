@@ -2,6 +2,17 @@
 
 namespace RealmCore.Resources.AFK;
 
+public interface IAFKService
+{
+    event Action<Player>? PlayerAFKStarted;
+    event Action<Player>? PlayerAFKStopped;
+
+    internal void HandleAFKStart(Player player);
+    internal void HandleAFKStop(Player player);
+
+    bool IsAFK(Player player);
+}
+
 internal sealed class AFKService : IAFKService
 {
     public event Action<Player>? PlayerAFKStarted;

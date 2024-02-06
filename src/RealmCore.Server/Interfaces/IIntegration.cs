@@ -1,4 +1,4 @@
-﻿namespace RealmCore.Server.Interfaces.Integrations;
+﻿namespace RealmCore.Server.Interfaces;
 
 public interface IIntegration
 {

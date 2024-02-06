@@ -1,6 +1,4 @@
-﻿using SlipeServer.Packets.Definitions.Lua;
-
-namespace RealmCore.Resources.Admin;
+﻿namespace RealmCore.Resources.Admin;
 
 public interface IAdminEventHub
 {

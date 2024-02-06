@@ -1,5 +1,11 @@
 ﻿namespace RealmCore.Server.Services;
 
+public interface ILoadService
+{
+    Task LoadAll(CancellationToken cancellationToken = default);
+    Task<RealmVehicle> LoadVehicleById(int id, CancellationToken cancellationToken = default);
+}
+
 internal sealed class LoadService : ILoadService
 {
     private readonly IVehicleRepository _vehicleRepository;

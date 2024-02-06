@@ -1,5 +1,14 @@
 ﻿namespace RealmCore.Server.Services;
 
+public interface IUpdateService
+{
+    event Action? Update;
+    event Action? RareUpdate;
+
+    internal void RelayRareUpdate();
+    internal void RelayUpdate();
+}
+
 internal class UpdateService : IUpdateService
 {
     public event Action? Update;

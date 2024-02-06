@@ -1,5 +1,10 @@
 ﻿namespace RealmCore.Server.Services;
 
+public interface IRewardService
+{
+    Task<bool> TryGiveReward(RealmPlayer player, int rewardId, CancellationToken cancellationToken = default);
+}
+
 internal sealed class RewardService : IRewardService
 {
     private readonly IUserRewardRepository _userRewardRepository;

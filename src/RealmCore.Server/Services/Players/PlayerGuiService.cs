@@ -1,6 +1,4 @@
-﻿using SlipeServer.Server.Elements;
-
-namespace RealmCore.Server.Services.Players;
+﻿namespace RealmCore.Server.Services.Players;
 
 public interface IPlayerGui : IDisposable
 {

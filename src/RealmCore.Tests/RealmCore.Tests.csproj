@@ -79,7 +79,7 @@
 		<Using Include="RealmCore.Server.Attributes" />
 		<Using Include="RealmCore.Server.Scopes" />
 		<Using Include="RealmCore.Persistence.DTOs" />
-		<Using Include="RealmCore.Server.Interfaces.Vehicles" />
+		<Using Include="RealmCore.Server.Services.Vehicles" />
 	</ItemGroup>
 
 </Project>

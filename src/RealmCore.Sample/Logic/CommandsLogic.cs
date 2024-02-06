@@ -1,7 +1,6 @@
 ﻿using Color = System.Drawing.Color;
 using SlipeServer.Server.Enums;
 using RealmCore.Resources.ElementOutline;
-using RealmCore.Resources.Assets.Interfaces;
 using RealmCore.Resources.Overlay;
 using RealmCore.Resources.Assets;
 using RealmCore.Server.Concepts.Access;

@@ -1,5 +1,11 @@
 ﻿namespace RealmCore.Server.Services;
 
+public interface IUserMoneyHistoryService
+{
+    Task Add(RealmPlayer player, decimal change, int? category = null, string? description = null, CancellationToken cancellationToken = default);
+    Task<List<UserMoneyHistoryDTO>> Get(RealmPlayer player, int limit = 10, CancellationToken cancellationToken = default);
+}
+
 internal sealed class UserMoneyHistoryService : IUserMoneyHistoryService
 {
     private readonly IUserMoneyHistoryRepository _userMoneyHistoryRepository;

@@ -20,6 +20,7 @@
 	  <Using Include="RealmCore.Server.Elements" />
 	  <Using Include="RealmCore.Server.Interfaces" />
 	  <Using Include="RealmCore.Server.Services.Players" />
+	  <Using Include="RealmCore.Server.Services" />
 	  <Using Include="System.Security.Claims" />
 	</ItemGroup>
 

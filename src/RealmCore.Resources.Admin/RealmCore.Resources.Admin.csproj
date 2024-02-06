@@ -32,4 +32,13 @@
 		<ProjectReference Include="..\RealmCore.Resources.Base\RealmCore.Resources.Base.csproj" />
 	</ItemGroup>
 
+	<ItemGroup>
+	  <Using Include="RealmCore.Resources.Admin.Data" />
+	  <Using Include="RealmCore.Resources.Admin.Enums" />
+	  <Using Include="RealmCore.Resources.Admin.Messages" />
+	  <Using Include="RealmCore.Resources.Base.Interfaces" />
+	  <Using Include="SlipeServer.Packets.Definitions.Lua" />
+	  <Using Include="SlipeServer.Server.Elements" />
+	</ItemGroup>
+
 </Project>
