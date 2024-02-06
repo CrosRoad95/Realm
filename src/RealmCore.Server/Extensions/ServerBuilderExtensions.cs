@@ -103,7 +103,7 @@ public static class ServerBuilderExtensions
         serverBuilder.AddLogic<WatermarkResourceLogic>();
         serverBuilder.AddLogic<PlayerAdminServiceLogic>();
         serverBuilder.AddLogic<FocusableComponentLogic>();
-        serverBuilder.AddLogic<StatefulHudComponentLogic>();
+        serverBuilder.AddLogic<PlayerHudLogic>();
         serverBuilder.AddLogic<JobSessionComponentLogic>();
         serverBuilder.AddLogic<InteractionComponentLogic>();
         serverBuilder.AddLogic<Hud3dComponentBaseLogic>();

@@ -1,10 +1,7 @@
 ﻿using Size = System.Drawing.Size;
 using Color = System.Drawing.Color;
-using RealmCore.Resources.Overlay.Enums;
-using RealmCore.Resources.Assets;
-using RealmCore.Resources.Overlay.Interfaces;
 
-namespace RealmCore.Sample.Components.Huds;
+namespace RealmCore.Sample.Huds;
 
 public class SampleHud2State
 {
@@ -12,11 +9,11 @@ public class SampleHud2State
     public string Text2 { get; set; }
 }
 
-public class SampleHud2 : HudComponent<SampleHud2State>
+public class SampleHud2Layer : HudLayer<SampleHud2State>
 {
     private readonly AssetsRegistry _assetsRegistry;
 
-    public SampleHud2(AssetsRegistry assetsRegistry) : base(new SampleHud2State
+    public SampleHud2Layer(AssetsRegistry assetsRegistry) : base(new SampleHud2State
     {
         Text1 = "text1",
         Text2 = "text2"

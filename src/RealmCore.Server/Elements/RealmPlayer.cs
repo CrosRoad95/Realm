@@ -143,6 +143,7 @@ public class RealmPlayer : Player, IComponents, IDisposable
     public IPlayerGroupsService Groups { get; private set; }
     public IPlayerFractionsService Fractions { get; private set; }
     public IPlayerGuiService Gui { get; private set; }
+    public IPlayerHudService Hud { get; private set; }
     public IScopedElementFactory ElementFactory { get; private set; }
     public RealmPlayer(IServiceProvider serviceProvider)
     {
@@ -173,6 +174,7 @@ public class RealmPlayer : Player, IComponents, IDisposable
         Groups = GetRequiredService<IPlayerGroupsService>();
         Fractions = GetRequiredService<IPlayerFractionsService>();
         Gui = GetRequiredService<IPlayerGuiService>();
+        Hud = GetRequiredService<IPlayerHudService>();
         ElementFactory = GetRequiredService<IScopedElementFactory>();
         #endregion
 

@@ -1,5 +1,4 @@
 ﻿using RealmCore.Resources.Overlay;
-using RealmCore.Server.Services.Players;
 
 namespace RealmCore.Sample.Logic;
 

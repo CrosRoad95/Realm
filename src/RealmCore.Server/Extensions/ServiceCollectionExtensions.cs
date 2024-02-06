@@ -113,6 +113,7 @@ public static class ServiceCollectionExtensions
         services.AddPlayerScopedService<IPlayerGroupsService, PlayerGroupsService>();
         services.AddPlayerScopedService<IPlayerFractionsService, PlayerFractionsService>();
         services.AddPlayerScopedService<IPlayerGuiService, PlayerGuiService>();
+        services.AddPlayerScopedService<IPlayerHudService, PlayerHudService>();
         #endregion
 
         #region Vehicle services

@@ -1,6 +1,4 @@
-﻿using RealmCore.Resources.Assets;
-
-namespace RealmCore.Sample.Logic;
+﻿namespace RealmCore.Sample.Logic;
 
 internal sealed class AssetsLogic
 {

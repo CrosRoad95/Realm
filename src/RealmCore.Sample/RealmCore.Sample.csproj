@@ -56,6 +56,11 @@
 		<Using Include="RealmCore.Sample.Components.Gui.Blazor" />
 		<Using Include="SlipeServer.Server" />
 		<Using Include="RealmCore.Server.Contexts" />
+		<Using Include="RealmCore.Server.Services.Players" />
+		<Using Include="RealmCore.Resources.Overlay.Enums" />
+		<Using Include="RealmCore.Resources.Assets" />
+		<Using Include="RealmCore.Resources.Overlay.Interfaces" />
+		<Using Include="System.Drawing" />
 	</ItemGroup>
 
 	<ItemGroup>

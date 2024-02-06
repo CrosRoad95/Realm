@@ -2,7 +2,6 @@
 using SlipeServer.Server.Enums;
 using RealmCore.Resources.ElementOutline;
 using RealmCore.Resources.Overlay;
-using RealmCore.Resources.Assets;
 using RealmCore.Server.Concepts.Access;
 
 namespace RealmCore.Sample.Logic;

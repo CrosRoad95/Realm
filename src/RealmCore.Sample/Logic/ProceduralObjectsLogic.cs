@@ -1,5 +1,4 @@
 ﻿using RealmCore.Resources.Assets.Factories;
-using RealmCore.Resources.Assets;
 using SlipeServer.Server.Enums;
 
 namespace RealmCore.Sample.Logic;

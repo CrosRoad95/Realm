@@ -1,6 +1,4 @@
-﻿using RealmCore.Server.Services.Players;
-
-namespace RealmCore.Sample.Logic;
+﻿namespace RealmCore.Sample.Logic;
 
 internal sealed class PlayerJoinedLogic
 {

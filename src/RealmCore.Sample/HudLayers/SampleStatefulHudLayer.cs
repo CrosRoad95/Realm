@@ -1,10 +1,7 @@
-﻿using RealmCore.Resources.Assets;
-using RealmCore.Resources.Overlay.Enums;
-using RealmCore.Resources.Overlay.Interfaces;
-using Color = System.Drawing.Color;
+﻿using Color = System.Drawing.Color;
 using Size = System.Drawing.Size;
 
-namespace RealmCore.Sample.Components.Huds;
+namespace RealmCore.Sample.Huds;
 
 public class SampleHudState
 {
@@ -13,11 +10,11 @@ public class SampleHudState
 }
 
 
-public class SampleStatefulHud : HudComponent<SampleHudState>
+public class SampleStatefulHudLayer : HudLayer<SampleHudState>
 {
     private readonly AssetsRegistry _assetsRegistry;
 
-    public SampleStatefulHud(SampleHudState defaultState, AssetsRegistry assetsRegistry) : base(defaultState)
+    public SampleStatefulHudLayer(SampleHudState defaultState, AssetsRegistry assetsRegistry) : base(defaultState)
     {
         _assetsRegistry = assetsRegistry;
     }
