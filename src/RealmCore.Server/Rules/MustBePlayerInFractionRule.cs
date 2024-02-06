@@ -13,7 +13,7 @@ public sealed class MustBePlayerInFractionRule : IElementRule
     {
         if(element is RealmPlayer player)
         {
-            return player.Components.ComponentsList.OfType<FractionMemberComponent>().Where(x => x.FractionId == _fractionId).Any();
+            return player.Fractions.IsMember(_fractionId);
         }
         return false;
     }

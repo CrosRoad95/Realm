@@ -51,6 +51,7 @@ public class RealmServer : MtaDiPlayerServerTempFix<RealmPlayer>
     {
         var logger = GetRequiredService<ILogger<RealmServer>>();
         await GetRequiredService<IDb>().MigrateAsync();
+        await GetRequiredService<IFractionService>().LoadFractions(cancellationToken);
         await GetRequiredService<SeederServerBuilder>().Build(cancellationToken);
         await GetRequiredService<ILoadService>().LoadAll(cancellationToken);
 

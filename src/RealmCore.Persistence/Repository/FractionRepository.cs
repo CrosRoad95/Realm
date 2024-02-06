@@ -9,6 +9,16 @@ internal sealed class FractionRepository : IFractionRepository
         _db = db;
     }
 
+    public async Task<List<FractionData>> GetAll(CancellationToken cancellationToken = default)
+    {
+        var query = _db.Fractions
+            .Include(x => x.Members)
+            .TagWithSource(nameof(FractionRepository))
+            .AsNoTracking();
+
+        return await query.ToListAsync(cancellationToken);
+    }
+
     public async Task<List<FractionMemberData>> GetAllMembers(int fractionId, CancellationToken cancellationToken = default)
     {
         var query = _db.FractionMembers.Where(x => x.FractionId == fractionId)
@@ -39,17 +49,49 @@ internal sealed class FractionRepository : IFractionRepository
 
         return await _db.SaveChangesAsync(cancellationToken) == 1;
     }
-
-    public async Task<bool> AddMember(int fractionId, int userId, int rank = 1, string rankName = "", CancellationToken cancellationToken = default)
+    
+    public async Task<FractionData?> TryCreateFraction(int id, string fractionName, string fractionCode, CancellationToken cancellationToken = default)
     {
-        _db.FractionMembers.Add(new FractionMemberData
+        var fractionData = new FractionData
+        {
+            Id = id,
+            Name = fractionName,
+            Code = fractionCode
+        };
+
+        _db.Fractions.Add(fractionData);
+
+        try
+        {
+            await _db.SaveChangesAsync(cancellationToken);
+            return fractionData;
+        }
+        catch (Exception)
+        {
+            return null;
+        }
+    }
+
+    public async Task<FractionMemberData?> TryAddMember(int fractionId, int userId, int rank = 1, string rankName = "", CancellationToken cancellationToken = default)
+    {
+        var fractionMember = new FractionMemberData
         {
             FractionId = fractionId,
             UserId = userId,
             Rank = rank,
             RankName = rankName,
-        });
+        };
 
-        return await _db.SaveChangesAsync(cancellationToken) == 1;
+        _db.FractionMembers.Add(fractionMember);
+
+        try
+        {
+            await _db.SaveChangesAsync(cancellationToken);
+            return fractionMember;
+        }
+        catch (Exception)
+        {
+            return null;
+        }
     }
 }

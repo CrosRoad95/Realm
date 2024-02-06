@@ -225,7 +225,7 @@ internal sealed class SeederServerBuilder
         foreach (var fraction in fractions)
         {
             var id = fraction.Value.Id;
-            if(await _fractionService.InternalCreateFraction(id, fraction.Key, fraction.Value.Code, fraction.Value.Position))
+            if(await _fractionService.TryCreateFraction(id, fraction.Key, fraction.Value.Code, fraction.Value.Position))
             {
                 _logger.LogInformation("Seeder: Created fraction of id {fractionId} name: {fractionName}, code: {fractionCode}.", id, fraction.Key, fraction.Value.Code);
                 _isUpToDate = false;

@@ -1,17 +1,26 @@
-﻿using Fraction = RealmCore.Server.Structs.Fraction;
-using FractionMember = RealmCore.Server.Structs.FractionMember;
-
-namespace RealmCore.Server.Services;
+﻿namespace RealmCore.Server.Services;
 
 internal sealed class FractionService : IFractionService
 {
-    private readonly Dictionary<int, Fraction> _fractions = new();
+    private readonly Dictionary<int, FractionData> _fractions = new();
     private readonly object _lock = new();
     private readonly IFractionRepository _fractionRepository;
 
     public FractionService(IFractionRepository fractionRepository)
     {
         _fractionRepository = fractionRepository;
+    }
+
+    public async Task LoadFractions(CancellationToken cancellationToken)
+    {
+        var fractions = await _fractionRepository.GetAll(cancellationToken);
+        lock(_lock)
+        {
+            foreach (var fraction in fractions)
+            {
+                _fractions[fraction.Id] = fraction;
+            }
+        }
     }
 
     public Task<bool> InternalExists(int id, string code, string name, CancellationToken cancellationToken = default) => _fractionRepository.Exists(id, code, name, cancellationToken);
@@ -27,7 +36,7 @@ internal sealed class FractionService : IFractionService
         if (!_fractions.ContainsKey(fractionId))
             return false;
 
-        return _fractions[fractionId].members.Any(x => x.userId == userId);
+        return _fractions[fractionId].Members.Any(x => x.UserId == userId);
     }
 
     public bool HasMember(int fractionId, int userId)
@@ -36,55 +45,31 @@ internal sealed class FractionService : IFractionService
             return InternalHasMember(fractionId, userId);
     }
 
-    private void InternalAddMember(int fractionId, int userId, int rank, string rankName)
+    public async Task<bool> TryAddMember(int fractionId, int userId, int rank, string rankName)
     {
-        var fraction = _fractions[fractionId];
-        if (fraction.members.Any(x => x.userId == userId))
-            throw new FractionMemberAlreadyAddedException(userId, fractionId);
-        fraction.members.Add(new FractionMember
-        {
-            rank = rank,
-            userId = userId,
-            rankName = rankName
-        });
-        _fractions[fractionId] = fraction;
+        var memberData = await _fractionRepository.TryAddMember(fractionId, userId, rank, rankName);
+        if (memberData == null)
+            return false;
+
+        lock (_lock)
+            _fractions[fractionId].Members.Add(memberData);
+        return true;
     }
 
-    public async Task<bool> InternalCreateFraction(int fractionId, string fractionName, string fractionCode, Vector3 position, CancellationToken cancellationToken = default)
+    public async Task TryAddMember(int fractionId, RealmPlayer player, int rank, string rankName)
     {
-        var members = await _fractionRepository.GetAllMembers(fractionId, cancellationToken);
-        lock (_lock)
-            _fractions.Add(fractionId, new Fraction
-            {
-                id = fractionId,
-                name = fractionName,
-                code = fractionCode,
-                position = position,
-                members = members.Select(x => new FractionMember
-                {
-                    userId = x.UserId,
-                    rank = x.Rank,
-                    rankName = x.RankName,
-                }).ToList()
-            });
+        var memberData = await _fractionRepository.TryAddMember(fractionId, player.UserId, rank, rankName);
+        if(memberData == null)
+            throw new FractionMemberAlreadyAddedException(player.UserId, fractionId);
+        player.Fractions.AddFractionMember(memberData);
 
-        if (!await _fractionRepository.Exists(fractionId, fractionCode, fractionName, cancellationToken))
-        {
-            await _fractionRepository.CreateFraction(fractionId, fractionName, fractionCode, cancellationToken);
-            return true;
-        }
-        return false;
+        lock (_lock)
+            _fractions[fractionId].Members.Add(memberData);
     }
 
-    public async Task<bool> TryAddMember(int fractionId, int userId, int rank, string rankName, CancellationToken cancellationToken = default)
+    public async Task<bool> TryCreateFraction(int fractionId, string fractionName, string fractionCode, Vector3 position, CancellationToken cancellationToken = default)
     {
-        lock (_lock)
-        {
-            if (InternalHasMember(fractionId, userId))
-                return false;
-            InternalAddMember(fractionId, userId, rank, rankName);
-        }
-
-        return await _fractionRepository.AddMember(fractionId, userId, rank, rankName, cancellationToken);
+        var fraction = await _fractionRepository.TryCreateFraction(fractionId, fractionCode, fractionName, cancellationToken);
+        return fraction != null;
     }
 }
