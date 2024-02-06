@@ -18,7 +18,6 @@ public class RealmVehicle : Vehicle, IComponents
     public IVehicleEventsService Events { get; private set; }
     public IVehicleFuelService Fuel { get; private set; }
     public VehicleAccessController AccessController { get; set; } = VehicleDefaultAccessController.Instance;
-    public event Action<RealmPlayer, bool>? PlayerFocused;
 
     public RealmVehicle(IServiceProvider serviceProvider, ushort model, Vector3 position) : base(model, position)
     {
@@ -37,11 +36,6 @@ public class RealmVehicle : Vehicle, IComponents
         Events = GetRequiredService<IVehicleEventsService>();
         Fuel = GetRequiredService<IVehicleFuelService>();
         #endregion
-    }
-
-    public void RelayFocused(RealmPlayer player, bool focused)
-    {
-        PlayerFocused?.Invoke(player, focused);
     }
 
     public T GetRequiredService<T>() where T : notnull => _serviceProvider.GetRequiredService<T>();

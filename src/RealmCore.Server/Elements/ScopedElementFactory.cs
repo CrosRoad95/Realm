@@ -242,6 +242,21 @@ internal class ScopedElementFactory : IScopedElementFactory
         return worldObject;
     }
 
+    public FocusableRealmWorldObject CreateFocusableObject(ObjectModel model, Vector3 position, Vector3 rotation, byte? interior = null, ushort? dimension = null, Func<RealmWorldObject, IEnumerable<IComponent>>? elementBuilder = null)
+    {
+        ThrowIfDisposed();
+        var worldObject = new FocusableRealmWorldObject(_player.ServiceProvider, model, position)
+        {
+            Rotation = rotation,
+            Interior = interior ?? _player.Interior,
+            Dimension = dimension ?? _player.Dimension
+        };
+
+        ExecuteElementBuilder(elementBuilder, worldObject);
+        AssociateWithPlayer(worldObject);
+        return worldObject;
+    }
+
     RealmPickup IElementFactory.CreatePickup(Vector3 position, ushort model, byte? interior = null, ushort? dimension = null, Func<RealmPickup, IEnumerable<IComponent>>? elementBuilder = null)
     {
         throw new NotImplementedException();

@@ -80,19 +80,18 @@ internal sealed class CommandsLogic
         #region Commands for components tests
         _commandService.AddCommandHandler("focusablecomponent", (player, args) =>
         {
-            var worldObject = _elementFactory.CreateObject(ObjectModel.Gunbox, player.Position + new Vector3(4, 0, 0), player.Rotation);
-            var focusableComponent = worldObject.AddComponent<FocusableComponent>();
-            focusableComponent.PlayerFocused += (that, player) =>
+            var worldObject = _elementFactory.CreateFocusableObject(ObjectModel.Gunbox, player.Position + new Vector3(4, 0, 0), player.Rotation);
+            worldObject.PlayerFocused += (that, player) =>
             {
                 var playerName = player.Name;
-                _chatBox.Output($"Player {playerName} focused, focused elements {focusableComponent.FocusedPlayerCount}");
-                _logger.LogInformation($"Player {playerName} focused, focused elements {focusableComponent.FocusedPlayerCount}");
+                _chatBox.Output($"Player {playerName} focused, focused elements {worldObject.FocusedPlayerCount}");
+                _logger.LogInformation($"Player {playerName} focused, focused elements {worldObject.FocusedPlayerCount}");
             };
-            focusableComponent.PlayerLostFocus += (that, player) =>
+            worldObject.PlayerLostFocus += (that, player) =>
             {
                 var playerName = player.Name;
-                _chatBox.Output($"Player {playerName} lost focus, focused elements {focusableComponent.FocusedPlayerCount}");
-                _logger.LogInformation($"Player {playerName} lost focus, focused elements {focusableComponent.FocusedPlayerCount}");
+                _chatBox.Output($"Player {playerName} lost focus, focused elements {worldObject.FocusedPlayerCount}");
+                _logger.LogInformation($"Player {playerName} lost focus, focused elements {worldObject.FocusedPlayerCount}");
             };
 
             _chatBox.OutputTo(player, "Created focusable component");
@@ -167,7 +166,6 @@ internal sealed class CommandsLogic
             var vehicle = _elementFactory.CreateVehicle(args.ReadUShort(), player.Position + new Vector3(4, 0, 0), player.Rotation);
             var components = vehicle;
             vehicle.Fuel.AddFuelContainer(1, 20, 20, 0.01f, 2, true);
-            components.AddComponent<FocusableComponent>();
             components.PartDamage.AddPart(1, 1337);
             components.AccessController = new VehicleExclusiveAccessController(player);
             _chatBox.OutputTo(player, $"veh created");

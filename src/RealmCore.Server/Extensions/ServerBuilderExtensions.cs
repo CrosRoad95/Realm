@@ -95,10 +95,9 @@ public static class ServerBuilderExtensions
         serverBuilder.AddLogic<Text3dComponentLogic>();
         serverBuilder.AddLogic<WatermarkResourceLogic>();
         serverBuilder.AddLogic<PlayerAdminServiceLogic>();
-        serverBuilder.AddLogic<FocusableComponentLogic>();
+        serverBuilder.AddLogic<FocusableElementsLogic>();
         serverBuilder.AddLogic<PlayerHudLogic>();
         serverBuilder.AddLogic<JobSessionComponentLogic>();
-        serverBuilder.AddLogic<InteractionComponentLogic>();
         serverBuilder.AddLogic<Hud3dComponentBaseLogic>();
         serverBuilder.AddLogic<LiftableWorldObjectComponentLogic>();
         serverBuilder.AddLogic<VehicleUpgradesComponentLogic>();

@@ -1,11 +1,11 @@
-﻿namespace RealmCore.Server.Components.Common;
+﻿namespace RealmCore.Server.Elements;
 
-public class FocusableComponent : ComponentLifecycle
+public class FocusableRealmWorldObject : RealmWorldObject, IFocusableElement
 {
     private readonly object _lock = new();
     private readonly List<RealmPlayer> _focusedPlayers = [];
-    public event Action<FocusableComponent, RealmPlayer>? PlayerFocused;
-    public event Action<FocusableComponent, RealmPlayer>? PlayerLostFocus;
+    public event Action<Element, RealmPlayer>? PlayerFocused;
+    public event Action<Element, RealmPlayer>? PlayerLostFocus;
     public int FocusedPlayerCount
     {
         get
@@ -29,17 +29,18 @@ public class FocusableComponent : ComponentLifecycle
         }
     }
 
-    internal bool AddFocusedPlayer(RealmPlayer player)
+    public FocusableRealmWorldObject(IServiceProvider serviceProvider, ObjectModel model, Vector3 position) : base(serviceProvider, model, position)
     {
-        if (player == Element)
-            throw new InvalidOperationException(nameof(player));
+    }
 
+    public bool AddFocusedPlayer(RealmPlayer player)
+    {
         lock (_lock)
         {
             if (!_focusedPlayers.Contains(player))
             {
                 _focusedPlayers.Add(player);
-                player.Destroyed += HandleDestroyed;
+                player.Destroyed += HandlePlayerDestroyed;
                 PlayerFocused?.Invoke(this, player);
                 return true;
             }
@@ -49,14 +50,11 @@ public class FocusableComponent : ComponentLifecycle
 
     public bool RemoveFocusedPlayer(RealmPlayer player)
     {
-        if (player == Element)
-            throw new InvalidOperationException(nameof(player));
-
         lock (_lock)
         {
             if (_focusedPlayers.Remove(player))
             {
-                player.Destroyed -= HandleDestroyed;
+                player.Destroyed -= HandlePlayerDestroyed;
                 PlayerLostFocus?.Invoke(this, player);
                 return true;
             }
@@ -64,28 +62,15 @@ public class FocusableComponent : ComponentLifecycle
         return false;
     }
 
-    private void HandleDestroyed(Element element)
+    private void HandlePlayerDestroyed(Element element)
     {
         lock (_lock)
         {
             var player = (RealmPlayer)element;
             if (_focusedPlayers.Remove(player))
             {
-                element.Destroyed -= HandleDestroyed;
+                element.Destroyed -= HandlePlayerDestroyed;
                 PlayerLostFocus?.Invoke(this, player);
-            }
-        }
-    }
-
-    public override void Detach()
-    {
-        lock (_lock)
-        {
-            foreach (var focusedPlayer in _focusedPlayers)
-            {
-                PlayerLostFocus?.Invoke(this, focusedPlayer);
-                if (focusedPlayer.FocusedElement == Element)
-                    focusedPlayer.FocusedElement = null;
             }
         }
     }

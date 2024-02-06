@@ -13,6 +13,7 @@ public interface IElementFactory
     RealmCollisionRectangle CreateCollisionRectangle(Vector2 position, Vector2 dimensions, byte? interior = null, ushort? dimension = null, Func<RealmCollisionRectangle, IEnumerable<IComponent>>? elementBuilder = null);
     RealmCollisionSphere CreateCollisionSphere(Vector3 position, float radius, byte? interior = null, ushort? dimension = null, Func<RealmCollisionSphere, IEnumerable<IComponent>>? elementBuilder = null);
     RealmCollisionTube CreateCollisionTube(Vector3 position, float radius, float height, byte? interior = null, ushort? dimension = null, Func<RealmCollisionTube, IEnumerable<IComponent>>? elementBuilder = null);
+    FocusableRealmWorldObject CreateFocusableObject(ObjectModel model, Vector3 position, Vector3 rotation, byte? interior = null, ushort? dimension = null, Func<RealmWorldObject, IEnumerable<IComponent>>? elementBuilder = null);
     RealmMarker CreateMarker(Vector3 position, MarkerType markerType, float size, Color color, byte? interior = null, ushort? dimension = null, Func<RealmMarker, IEnumerable<IComponent>>? elementBuilder = null);
     RealmWorldObject CreateObject(ObjectModel model, Vector3 position, Vector3 rotation, byte? interior = null, ushort? dimension = null, Func<RealmWorldObject, IEnumerable<IComponent>>? elementBuilder = null);
     RealmPed CreatePed(PedModel pedModel, Vector3 position, byte? interior = null, ushort? dimension = null, Func<RealmPed, IEnumerable<IComponent>>? elementBuilder = null);

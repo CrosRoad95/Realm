@@ -43,11 +43,11 @@ public class RealmPlayer : Player, IComponents, IDisposable
             {
                 switch (_focusedElement)
                 {
-                    case RealmVehicle vehicle:
-                        vehicle.RelayFocused(this, false);
+                    case FocusableRealmVehicle vehicle:
+                        vehicle.RemoveFocusedPlayer(this);
                         break;
-                    case RealmWorldObject worldObject:
-                        worldObject.RelayFocused(this, false);
+                    case FocusableRealmWorldObject worldObject:
+                        worldObject.RemoveFocusedPlayer(this);
                         break;
                 }
 
@@ -56,11 +56,11 @@ public class RealmPlayer : Player, IComponents, IDisposable
 
                 switch (value)
                 {
-                    case RealmVehicle vehicle:
-                        vehicle.RelayFocused(this, true);
+                    case FocusableRealmVehicle vehicle:
+                        vehicle.AddFocusedPlayer(this);
                         break;
-                    case RealmWorldObject worldObject:
-                        worldObject.RelayFocused(this, true);
+                    case FocusableRealmWorldObject worldObject:
+                        worldObject.AddFocusedPlayer(this);
                         break;
                 }
             }

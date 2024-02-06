@@ -2,18 +2,11 @@
 
 public class RealmWorldObject : WorldObject, IComponents
 {
-    public event Action<RealmPlayer, bool>? PlayerFocused;
-
     public Concepts.Components Components { get; private set; }
 
     public RealmWorldObject(IServiceProvider serviceProvider, ObjectModel model, Vector3 position) : base(model, position)
     {
         Components = new(serviceProvider, this);
-    }
-
-    public void RelayFocused(RealmPlayer player, bool focused)
-    {
-        PlayerFocused?.Invoke(player, focused);
     }
 
     public TComponent GetRequiredComponent<TComponent>() where TComponent : IComponent

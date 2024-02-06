@@ -1,4 +1,5 @@
 ﻿
+
 namespace RealmCore.Server.Interfaces;
 
 public interface IScopedElementFactory : IElementFactory, IDisposable

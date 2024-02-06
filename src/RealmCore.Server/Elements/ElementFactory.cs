@@ -130,6 +130,20 @@ internal sealed class ElementFactory : IElementFactory
         return worldObject;
     }
 
+    public FocusableRealmWorldObject CreateFocusableObject(ObjectModel model, Vector3 position, Vector3 rotation, byte? interior = null, ushort? dimension = null, Func<RealmWorldObject, IEnumerable<IComponent>>? elementBuilder = null)
+    {
+        var worldObject = new FocusableRealmWorldObject(_serviceProvider, model, position)
+        {
+            Rotation = rotation,
+            Interior = interior ?? 0,
+            Dimension = dimension ?? 0,
+        };
+
+        elementBuilder?.Invoke(worldObject);
+        AssociateWithServer(worldObject);
+        return worldObject;
+    }
+
     #region Collision shapes
     public RealmCollisionCircle CreateCollisionCircle(Vector2 position, float radius, byte? interior = null, ushort? dimension = null, Func<RealmCollisionCircle, IEnumerable<IComponent>>? elementBuilder = null)
     {
