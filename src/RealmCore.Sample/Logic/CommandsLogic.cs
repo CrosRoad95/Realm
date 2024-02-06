@@ -3,6 +3,7 @@ using SlipeServer.Server.Enums;
 using RealmCore.Resources.ElementOutline;
 using RealmCore.Resources.Overlay;
 using RealmCore.Server.Concepts.Access;
+using RealmCore.Sample.HudLayers;
 
 namespace RealmCore.Sample.Logic;
 
@@ -543,11 +544,20 @@ internal sealed class CommandsLogic
         //    player.AddComponent(new SampleVehicleHud(assetsRegistry));
         //});
 
-        //_commandService.AddCommandHandler("createhud", (player, args) =>
-        //{
-        //    var playerElementComponent = player.GetRequiredComponent<PlayerElementComponent>();
-        //    player.AddComponent(new SampleHud(assetsRegistry));
-        //});
+        _commandService.AddAsyncCommandHandler("createhud", async (player, args, token) =>
+        {
+            var hud = player.Hud.AddLayer<SampleHudLayer>();
+            if (hud == null)
+                return;
+
+            await Task.Delay(1000, token);
+            hud.Offset = new Vector2(0, 100);
+        });
+
+        _commandService.AddCommandHandler("destroyHud", (player, args) =>
+        {
+            player.Hud.RemoveLayer<SampleHudLayer>();
+        });
 
         //_commandService.AddCommandHandler("createhud2", (player, args) =>
         //{

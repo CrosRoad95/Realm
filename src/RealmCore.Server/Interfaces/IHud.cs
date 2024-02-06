@@ -2,7 +2,7 @@
 
 public interface IHud : IDisposable
 {
-    Vector2 Position { get; set; }
+    Vector2 Offset { get; set; }
     void SetVisible(bool visible);
 }
 

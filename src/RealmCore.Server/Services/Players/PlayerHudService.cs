@@ -3,6 +3,7 @@
 public interface IHudLayer
 {
     bool Visible { get; set; }
+    Vector2 Offset { get; set; }
     internal string Id { get; }
     internal void BuildHud(IOverlayService overlayService, RealmPlayer player);
 }
@@ -32,15 +33,15 @@ public abstract class HudLayer<TState> : IHudLayer where TState : class, new()
         }
     }
 
-    public Vector2 Position
+    public Vector2 Offset
     {
         get
         {
-            return _hud.Position;
+            return _hud.Offset;
         }
         set
         {
-            _hud.Position = value;
+            _hud.Offset = value;
         }
     }
 
@@ -119,7 +120,9 @@ public interface IPlayerHudService : IPlayerService
     event Action<IPlayerHudService, IHudLayer>? LayerRemoved;
 
     bool AddLayer(IHudLayer hudLayer);
+    THudLayer? AddLayer<THudLayer>(params object[] parameters) where THudLayer : IHudLayer;
     bool RemoveLayer(IHudLayer hudLayer);
+    bool RemoveLayer<THudLayer>() where THudLayer : IHudLayer;
 }
 
 internal sealed class PlayerHudService : IPlayerHudService
@@ -161,15 +164,36 @@ internal sealed class PlayerHudService : IPlayerHudService
         return true;
     }
 
+    public THudLayer? AddLayer<THudLayer>(params object[] parameters) where THudLayer: IHudLayer
+    {
+        var layer = ActivatorUtilities.CreateInstance<THudLayer>(Player.ServiceProvider, parameters);
+        if (AddLayer(layer))
+            return layer;
+        return default;
+    }
+
     public bool RemoveLayer(IHudLayer hudLayer)
     {
         lock (_lock)
         {
-            if (_hudLayers.Remove(hudLayer))
+            if (!_hudLayers.Remove(hudLayer))
                 return false;
         }
 
         LayerRemoved?.Invoke(this, hudLayer);
-        return false;
+        return true;
+    }
+
+    public bool RemoveLayer<THudLayer>() where THudLayer : IHudLayer
+    {
+        IHudLayer? hudLayer;
+        lock (_lock)
+        {
+            hudLayer = _hudLayers.OfType<THudLayer>().FirstOrDefault();
+        }
+
+        if (hudLayer == null)
+            return false;
+        return RemoveLayer(hudLayer);
     }
 }

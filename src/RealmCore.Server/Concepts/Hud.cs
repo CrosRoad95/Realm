@@ -13,7 +13,7 @@ internal class Hud<TState> : IHud<TState> where TState : class
 
     public string Name { get; }
 
-    public Vector2 Position
+    public Vector2 Offset
     {
         get => _position; set
         {
@@ -31,7 +31,7 @@ internal class Hud<TState> : IHud<TState> where TState : class
         _state = state;
         _dynamicHudComponents = dynamicHudComponents;
         if (position != null)
-            _position = Position;
+            _position = Offset;
     }
 
     public void SetVisible(bool visible)

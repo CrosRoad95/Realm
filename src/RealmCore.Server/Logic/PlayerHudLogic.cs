@@ -28,6 +28,6 @@ internal sealed class PlayerHudLogic : PlayerLogic
 
     private void HandleLayerRemoved(IPlayerHudService hudService, IHudLayer hudLayer)
     {
-        _overlayService.RemoveHud(hudService.Player, hudLayer.Id);
+        _overlayService.RemoveHudLayer(hudService.Player, hudLayer.Id);
     }
 }

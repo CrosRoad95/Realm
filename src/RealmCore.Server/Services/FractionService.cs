@@ -79,7 +79,7 @@ internal sealed class FractionService : IFractionService
 
     public async Task<bool> TryCreateFraction(int fractionId, string fractionName, string fractionCode, Vector3 position, CancellationToken cancellationToken = default)
     {
-        var fraction = await _fractionRepository.TryCreateFraction(fractionId, fractionCode, fractionName, cancellationToken);
+        var fraction = await _fractionRepository.TryCreateFraction(fractionId, fractionName, fractionCode, cancellationToken);
         return fraction != null;
     }
 }

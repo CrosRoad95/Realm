@@ -23,7 +23,7 @@ public interface IOverlayService
     void CreateHud(Player player, string hudId, Action<IHudBuilder<object>> hudBuilderCallback, Vector2 screenSize, Vector2? position = null);
     void CreateHud<TState>(Player player, string hudId, Action<IHudBuilder<TState>> hudBuilderCallback, Vector2 screenSize, Vector2? position, TState defaultState) where TState : class;
     void CreateHud3d<TState>(string hudId, Action<IHudBuilder<TState>> hudBuilderCallback, TState state, Vector3? position = null) where TState : class;
-    void RemoveHud(Player player, string hudId);
+    void RemoveHudLayer(Player player, string hudId);
     void RemoveHud3d(string hudId);
     void RemoveRing3dDisplay(Player player, string id);
     void SetHud3dState(string hudId, Dictionary<int, object?> state);
@@ -108,7 +108,7 @@ internal sealed class OverlayService : IOverlayService
         HudCreated?.Invoke(player, hudId, position ?? Vector2.Zero, hudBuilder.HudElementsDefinitions);
     }
 
-    public void RemoveHud(Player player, string hudId)
+    public void RemoveHudLayer(Player player, string hudId)
     {
         HudRemoved?.Invoke(player, hudId);
     }
