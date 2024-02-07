@@ -1,5 +1,11 @@
 ﻿namespace RealmCore.Persistence.Repository;
 
+public interface IUserLoginHistoryRepository
+{
+    Task Add(int userId, DateTime now, string ip, string serial, CancellationToken cancellationToken = default);
+    Task<List<UserLoginHistoryData>> Get(int userId, int limit = 10, CancellationToken cancellationToken = default);
+}
+
 internal sealed class UserLoginHistoryRepository : IUserLoginHistoryRepository
 {
     private readonly IDb _db;

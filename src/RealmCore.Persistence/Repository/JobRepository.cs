@@ -1,5 +1,11 @@
 ﻿namespace RealmCore.Persistence.Repository;
 
+public interface IJobRepository
+{
+    Task<List<UserJobStatisticsDTO>> GetJobStatistics(short jobId, int limit = 10, CancellationToken cancellationToken = default);
+    Task<UserJobStatisticsDTO?> GetUserJobStatistics(int userId, short jobId, CancellationToken cancellationToken = default);
+}
+
 internal sealed class JobRepository : IJobRepository
 {
     private readonly IDb _db;

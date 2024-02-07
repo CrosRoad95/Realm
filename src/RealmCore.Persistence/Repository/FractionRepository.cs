@@ -1,12 +1,24 @@
 ﻿namespace RealmCore.Persistence.Repository;
 
+public interface IFractionRepository
+{
+    Task<bool> CreateFraction(int id, string fractionName, string fractionCode, CancellationToken cancellationToken = default);
+    Task<bool> Exists(int id, string code, string name, CancellationToken cancellationToken = default);
+    Task<List<FractionData>> GetAll(CancellationToken cancellationToken = default);
+    Task<List<FractionMemberData>> GetAllMembers(int fractionId, CancellationToken cancellationToken = default);
+    Task<FractionMemberData?> TryAddMember(int fractionId, int userId, int rank = 1, string rankName = "", CancellationToken cancellationToken = default);
+    Task<FractionData?> TryCreateFraction(int id, string fractionName, string fractionCode, CancellationToken cancellationToken = default);
+}
+
 internal sealed class FractionRepository : IFractionRepository
 {
     private readonly IDb _db;
+    private readonly ITransactionContext _transactionContext;
 
-    public FractionRepository(IDb db)
+    public FractionRepository(IDb db, ITransactionContext transactionContext)
     {
         _db = db;
+        _transactionContext = transactionContext;
     }
 
     public async Task<List<FractionData>> GetAll(CancellationToken cancellationToken = default)
@@ -19,9 +31,9 @@ internal sealed class FractionRepository : IFractionRepository
         return await query.ToListAsync(cancellationToken);
     }
 
-    public async Task<List<FractionMemberData>> GetAllMembers(int fractionId, CancellationToken cancellationToken = default)
+    public async Task<List<FractionMemberData>> GetAllMembers(int id, CancellationToken cancellationToken = default)
     {
-        var query = _db.FractionMembers.Where(x => x.FractionId == fractionId)
+        var query = _db.FractionMembers.Where(x => x.FractionId == id)
             .TagWithSource(nameof(FractionRepository))
             .AsNoTracking();
 
@@ -38,38 +50,42 @@ internal sealed class FractionRepository : IFractionRepository
         return await query.AnyAsync(cancellationToken);
     }
 
-    public async Task<bool> CreateFraction(int id, string fractionName, string fractionCode, CancellationToken cancellationToken = default)
+    public async Task<bool> CreateFraction(int id, string name, string code, CancellationToken cancellationToken = default)
     {
         _db.Fractions.Add(new FractionData
         {
             Id = id,
-            Name = fractionName,
-            Code = fractionCode
+            Name = name,
+            Code = code
         });
 
         return await _db.SaveChangesAsync(cancellationToken) == 1;
     }
     
-    public async Task<FractionData?> TryCreateFraction(int id, string fractionName, string fractionCode, CancellationToken cancellationToken = default)
+    public async Task<FractionData?> TryCreateFraction(int id, string name, string code, CancellationToken cancellationToken = default)
     {
-        var fractionData = new FractionData
+        var result = await _transactionContext.ExecuteAsync(async (db) =>
         {
-            Id = id,
-            Name = fractionName,
-            Code = fractionCode
-        };
+            var existsQuery = _db.Fractions
+                .TagWithSource(nameof(FractionRepository))
+                .AsNoTracking()
+                .Where(x => x.Id == id && x.Code == code && x.Name == name);
+            if (await existsQuery.AnyAsync(cancellationToken))
+                return null;
 
-        _db.Fractions.Add(fractionData);
+            var fractionData = new FractionData
+            {
+                Id = id,
+                Name = name,
+                Code = code
+            };
 
-        try
-        {
+            _db.Fractions.Add(fractionData);
             await _db.SaveChangesAsync(cancellationToken);
             return fractionData;
-        }
-        catch (Exception)
-        {
-            return null;
-        }
+        }, cancellationToken);
+
+        return result;
     }
 
     public async Task<FractionMemberData?> TryAddMember(int fractionId, int userId, int rank = 1, string rankName = "", CancellationToken cancellationToken = default)

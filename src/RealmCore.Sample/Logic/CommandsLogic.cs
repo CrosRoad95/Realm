@@ -1,9 +1,4 @@
 ﻿using Color = System.Drawing.Color;
-using SlipeServer.Server.Enums;
-using RealmCore.Resources.ElementOutline;
-using RealmCore.Resources.Overlay;
-using RealmCore.Server.Concepts.Access;
-using RealmCore.Sample.HudLayers;
 
 namespace RealmCore.Sample.Logic;
 

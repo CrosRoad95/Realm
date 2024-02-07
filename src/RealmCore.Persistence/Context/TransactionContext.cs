@@ -2,6 +2,12 @@
 
 namespace RealmCore.Persistence.Context;
 
+public interface ITransactionContext
+{
+    Task ExecuteAsync(Func<IDb, Task> operation, CancellationToken cancellationToken = default);
+    Task<T> ExecuteAsync<T>(Func<IDb, Task<T>> operation, CancellationToken cancellationToken = default);
+}
+
 internal sealed class TransactionContext : ITransactionContext
 {
     private readonly IsolationLevel _isolationLevel = IsolationLevel.ReadCommitted;

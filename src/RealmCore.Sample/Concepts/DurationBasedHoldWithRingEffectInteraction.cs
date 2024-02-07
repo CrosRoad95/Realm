@@ -1,6 +1,4 @@
-﻿using RealmCore.Resources.Overlay;
-
-namespace RealmCore.Sample.Concepts;
+﻿namespace RealmCore.Sample.Concepts;
 
 internal class DurationBasedHoldWithRingEffectInteraction : DurationBasedHoldInteraction
 {

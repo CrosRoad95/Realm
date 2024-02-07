@@ -182,7 +182,7 @@
 		<Using Include="RealmCore.Server.Abstractions" />
 		<Using Include="RealmCore.Resources.Admin.Enums" />
 		<Using Include="RealmCore.Persistence.Data" />
-		<Using Include="RealmCore.Persistence.Interfaces" />
+		<Using Include="RealmCore.Persistence.Repository" />
 		<Using Include="RealmCore.Server.Structs" />
 		<Using Include="RealmCore.Server.Events" />
 		<Using Include="RealmCore.Server.World.Maps" />

@@ -1,6 +1,4 @@
-﻿using RealmCore.Resources.Overlay;
-
-namespace RealmCore.Sample.Commands;
+﻿namespace RealmCore.Sample.Commands;
 
 
 [CommandName("display3ring")]

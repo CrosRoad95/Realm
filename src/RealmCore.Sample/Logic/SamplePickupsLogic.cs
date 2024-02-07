@@ -1,5 +1,4 @@
-﻿using RealmCore.Sample.Concepts.Gui;
-using RealmCore.Sample.Concepts.Jobs;
+﻿using RealmCore.Sample.Concepts.Jobs;
 
 namespace RealmCore.Sample.Logic;
 

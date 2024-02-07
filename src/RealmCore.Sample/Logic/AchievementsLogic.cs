@@ -1,6 +1,4 @@
-﻿using RealmCore.Resources.Overlay;
-
-namespace RealmCore.Sample.Logic;
+﻿namespace RealmCore.Sample.Logic;
 
 internal sealed class AchievementsLogic
 {

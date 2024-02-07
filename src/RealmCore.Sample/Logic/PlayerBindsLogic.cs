@@ -1,5 +1,4 @@
-﻿using RealmCore.Sample.Concepts.Gui;
-using RealmCore.Server.Concepts.Gui;
+﻿using RealmCore.Server.Concepts.Gui;
 using RealmCore.Server.DTOs;
 using RealmCore.Server.Helpers;
 

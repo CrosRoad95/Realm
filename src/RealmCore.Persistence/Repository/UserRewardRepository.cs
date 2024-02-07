@@ -1,5 +1,11 @@
 ﻿namespace RealmCore.Persistence.Repository;
 
+
+public interface IUserRewardRepository
+{
+    Task<bool> TryAddReward(int userId, int rewardId, CancellationToken cancellationToken = default);
+}
+
 internal sealed class UserRewardRepository : IUserRewardRepository
 {
     private readonly IDb _db;

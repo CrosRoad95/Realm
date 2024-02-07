@@ -33,7 +33,6 @@
 		<Using Include="Newtonsoft.Json" />
 		<Using Include="System.Runtime.CompilerServices" />
 		<Using Include="RealmCore.Persistence.Data" />
-		<Using Include="RealmCore.Persistence.Interfaces" />
 		<Using Include="RealmCore.Persistence.Extensions" />
 		<Using Include="RealmCore.Persistence.DTOs" />
 		<Using Include="RealmCore.Persistence.Repository" />

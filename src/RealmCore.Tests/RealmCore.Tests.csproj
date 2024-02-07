@@ -63,7 +63,6 @@
 		<Using Include="RealmCore.Server.Exceptions" />
 		<Using Include="Microsoft.Extensions.Logging" />
 		<Using Include="RealmCore.Persistence" />
-		<Using Include="RealmCore.Persistence.Interfaces" />
 		<Using Include="RealmCore.Tests.Extensions" />
 		<Using Include="System.Numerics" />
 		<Using Include="SlipeServer.Server.Constants" />
@@ -78,6 +77,7 @@
 		<Using Include="RealmCore.Server.Scopes" />
 		<Using Include="RealmCore.Persistence.DTOs" />
 		<Using Include="RealmCore.Server.Services.Vehicles" />
+		<Using Include="RealmCore.Persistence.Repository" />
 	</ItemGroup>
 
 </Project>

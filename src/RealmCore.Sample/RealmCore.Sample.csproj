@@ -47,7 +47,6 @@
 		<Using Include="RealmCore.Resources.Admin.Enums" />
 		<Using Include="RealmCore.Resources.GuiSystem" />
 		<Using Include="SlipeServer.Resources.Text3d" />
-		<Using Include="RealmCore.Persistence.Interfaces" />
 		<Using Include="Microsoft.AspNetCore.Identity" />
 		<Using Include="RealmCore.Persistence.Data" />
 		<Using Include="RealmCore.Persistence.Extensions" />
@@ -63,6 +62,12 @@
 		<Using Include="System.Drawing" />
 		<Using Include="RealmCore.Server.Concepts.Interactions" />
 		<Using Include="RealmCore.Server.Concepts.Sessions" />
+		<Using Include="RealmCore.Persistence.Repository" />
+		<Using Include="RealmCore.Sample.HudLayers" />
+		<Using Include="RealmCore.Server.Concepts.Access" />
+		<Using Include="RealmCore.Resources.Overlay" />
+		<Using Include="RealmCore.Resources.ElementOutline" />
+		<Using Include="SlipeServer.Server.Enums" />
 	</ItemGroup>
 
 </Project>
