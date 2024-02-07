@@ -67,11 +67,7 @@ local function drawElements()
 						delta = debugTextScreenMaxDistance / math.max(debugTextScreenMaxDistance, calculateDistanceToScreenCenter(sx2,sy2), 0)
 						alpha = getEasingValue(delta, "OutQuad") * 255
 						if(cameraDistance < 10)then
-							if(isComponentDrawingEnabled())then
-								debugText = string.format("Id: %s\nNazwa: %s\n%s", v.debugId, v.name, getComponents(v.debugId))
-							else
-								debugText = string.format("Id: %s\nNazwa: %s", v.debugId, v.name)
-							end
+							debugText = string.format("Id: %s\nNazwa: %s", v.debugId, v.name)
 							fontSize = 1.5
 						elseif(cameraDistance < 100)then
 							debugText = string.format("Id: %s\nNazwa: %s", string.sub(v.debugId, 1, 8), v.name)

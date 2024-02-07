@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Authorization;
-using RealmCore.Server.Json.Converters;
 
 namespace RealmCore.Server.Services;
 
@@ -14,10 +13,6 @@ internal sealed class UsersService : IUsersService
     private readonly IElementCollection _elementCollection;
     private readonly ISaveService _saveService;
     private readonly IServiceProvider _serviceProvider;
-    private static readonly JsonSerializerSettings _jsonSerializerSettings = new()
-    {
-        Converters = new List<JsonConverter> { DoubleConverter.Instance }
-    };
 
     public event Action<RealmPlayer>? SignedIn;
     public event Action<RealmPlayer>? SignedOut;
@@ -132,20 +127,7 @@ internal sealed class UsersService : IUsersService
                     claimsIdentity.AddClaim(new Claim(ClaimTypes.Role, role));
             }
             player.User.SignIn(user, claimsPrincipal);
-            if (user.Inventories != null && user.Inventories.Count != 0)
-            {
-                foreach (var inventory in user.Inventories)
-                {
-                    var items = inventory.InventoryItems
-                        .Select(x =>
-                            new Item(_itemsRegistry, x.ItemId, x.Number, JsonConvert.DeserializeObject<Metadata>(x.MetaData, _jsonSerializerSettings))
-                        )
-                        .ToList();
-                    player.AddComponent(new InventoryComponent(inventory.Size, inventory.Id, items));
-                }
-            }
-            else
-                player.AddComponent(new InventoryComponent(_gameplayOptions.CurrentValue.DefaultInventorySize));
+
 
             player.Money.SetMoneyInternal(user.Money);
             await AuthorizePolicies(player);
@@ -161,7 +143,6 @@ internal sealed class UsersService : IUsersService
         catch (Exception ex)
         {
             _activeUsers.TrySetInactive(user.Id);
-            while (player.TryDestroyComponent<InventoryComponent>()) { }
             if(player.User.IsSignedIn)
                 player.User.SignOut();
             player.Money.SetMoneyInternal(0);
@@ -172,9 +153,10 @@ internal sealed class UsersService : IUsersService
 
     public async Task SignOut(RealmPlayer player, CancellationToken cancellationToken = default)
     {
+        if (player.User.IsSignedIn)
+            player.User.SignOut();
         await _saveService.Save(player, cancellationToken);
         _activeUsers.TrySetInactive(player.UserId);
-        while (player.TryDestroyComponent<InventoryComponent>()) { }
         player.RemoveFromVehicle();
         player.Position = new Vector3(6000, 6000, 99999);
         player.Interior = 0;

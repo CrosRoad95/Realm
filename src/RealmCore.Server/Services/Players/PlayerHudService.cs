@@ -79,11 +79,11 @@ public abstract class HudLayer<TState> : IHudLayer where TState : class, new()
 
     public void BuildHud(IOverlayService overlayService, RealmPlayer player)
     {
-        List<DynamicHudElement> dynamicHudComponents = [];
+        List<DynamicHudElement> dynamicHudElement = [];
 
         overlayService.CreateHud(player, _id, e =>
         {
-            e.DynamicHudComponentAdded = dynamicHudComponents.Add;
+            e.DynamicHudElementAdded = dynamicHudElement.Add;
             try
             {
                 Build(e);
@@ -94,11 +94,11 @@ public abstract class HudLayer<TState> : IHudLayer where TState : class, new()
             }
             finally
             {
-                e.DynamicHudComponentAdded = null;
+                e.DynamicHudElementAdded = null;
             }
         }, player.ScreenSize, _offset, _defaultState);
 
-        _hud = new Hud<TState>(_id, player, overlayService, _offset, _defaultState, dynamicHudComponents);
+        _hud = new Hud<TState>(_id, player, overlayService, _offset, _defaultState, dynamicHudElement);
         Visible = true;
         HudCreated();
     }

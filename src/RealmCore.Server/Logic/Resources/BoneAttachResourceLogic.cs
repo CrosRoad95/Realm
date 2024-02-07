@@ -1,32 +1,36 @@
 ﻿namespace RealmCore.Server.Logic.Resources;
 
-internal sealed class BoneAttachResourceLogic : ComponentLogic<AttachedElementComponent>
+internal sealed class BoneAttachResourceLogic : PlayerLogic
 {
     private readonly BoneAttachService _boneAttachService;
+    private readonly MtaServer _mtaServer;
 
-    public BoneAttachResourceLogic(IElementFactory elementFactory, BoneAttachService boneAttachService) : base(elementFactory)
+    public BoneAttachResourceLogic(BoneAttachService boneAttachService, MtaServer mtaServer) : base(mtaServer)
     {
         _boneAttachService = boneAttachService;
+        _mtaServer = mtaServer;
     }
 
-    protected override void ComponentAdded(AttachedElementComponent attachedElementComponent)
+    protected override void PlayerJoined(RealmPlayer player)
     {
-        var element = attachedElementComponent.AttachedElement;
-        if (element == null)
-            return;
-        _boneAttachService.Attach(element, (Ped)attachedElementComponent.Element, attachedElementComponent.BoneId, attachedElementComponent.PositionOffset, attachedElementComponent.RotationOffset);
-        element.AreCollisionsEnabled = false;
-        attachedElementComponent.Detached += HandleDetachedFromElement;
+        player.WorldObjectAttached += HandleWorldObjectAttached;
+        player.WorldObjectDetached += HandleWorldObjectDetached;
     }
 
-    private void HandleDetachedFromElement(IComponentLifecycle component)
+    protected override void PlayerLeft(RealmPlayer player)
     {
-        component.Detached -= HandleDetachedFromElement;
-        if(component is AttachedElementComponent attachedElementComponent)
-        {
-            if (attachedElementComponent.AttachedElement != null && _boneAttachService.IsAttached(attachedElementComponent.AttachedElement))
-                _boneAttachService.Detach(attachedElementComponent.AttachedElement);
-        }
-        // bug?
+        player.WorldObjectAttached -= HandleWorldObjectAttached;
+        player.WorldObjectDetached -= HandleWorldObjectDetached;
+    }
+
+    private void HandleWorldObjectDetached(RealmPlayer player, AttachedBoneWorldObject attachedBoneWorldObject)
+    {
+        _boneAttachService.Detach(attachedBoneWorldObject.WorldObject);
+    }
+
+    private void HandleWorldObjectAttached(RealmPlayer player, AttachedBoneWorldObject attachedBoneWorldObject)
+    {
+        _boneAttachService.Attach(attachedBoneWorldObject.WorldObject, player, attachedBoneWorldObject.BoneId, attachedBoneWorldObject.PositionOffset, attachedBoneWorldObject.RotationOffset);
+        attachedBoneWorldObject.WorldObject.AreCollisionsEnabled = false; // TODO: remember previous state
     }
 }

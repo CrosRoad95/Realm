@@ -1,13 +1,14 @@
 ﻿using RealmCore.Server.Enums;
+using RealmCore.Server.Services.Elements;
 using SlipeServer.Server.Enums;
 
 namespace RealmCore.Sample.Logic;
 
-public class ItemsLogic : ComponentLogic<InventoryComponent>
+public class ItemsLogic : PlayerLogic
 {
     private readonly ChatBox _chatBox;
 
-    public ItemsLogic(ItemsRegistry itemsRegistry, IElementFactory elementFactory, ChatBox chatBox) : base(elementFactory)
+    public ItemsLogic(MtaServer mtaServer, ItemsRegistry itemsRegistry, IElementFactory elementFactory, ChatBox chatBox) : base(mtaServer)
     {
         itemsRegistry.Add(1, new ItemRegistryEntry
         {
@@ -41,57 +42,76 @@ public class ItemsLogic : ComponentLogic<InventoryComponent>
         _chatBox = chatBox;
     }
 
-    protected override void ComponentAdded(InventoryComponent inventoryComponent)
+    protected override void PlayerJoined(RealmPlayer player)
     {
-        inventoryComponent.ItemAdded += HandleInventoryComponentItemAdded;
-        inventoryComponent.ItemRemoved += HandleInventoryComponentItemRemoved;
+        player.Inventory.PrimarySet += HandlePrimarySet;
     }
 
-    protected override void ComponentDetached(InventoryComponent inventoryComponent)
+
+    protected override void PlayerLeft(RealmPlayer player)
     {
-        inventoryComponent.ItemAdded -= HandleInventoryComponentItemAdded;
-        inventoryComponent.ItemRemoved -= HandleInventoryComponentItemRemoved;
+        player.Inventory.PrimarySet -= HandlePrimarySet;
+
+        var primary = player.Inventory.Primary;
+        if (primary != null)
+        {
+            primary.ItemAdded -= HandleInventoryItemAdded;
+            primary.ItemRemoved -= HandleInventoryItemRemoved;
+        }
     }
 
-    private void HandleInventoryComponentItemRemoved(InventoryComponent inventoryComponent, Item item)
+    private void HandlePrimarySet(IElementInventoryService inventoryService, Inventory inventory)
+    {
+        inventory.ItemAdded += HandleInventoryItemAdded;
+        inventory.ItemRemoved += HandleInventoryItemRemoved;
+    }
+
+    private void HandleInventoryItemRemoved(Inventory inventory, Item item)
     {
         var itemId = item.ItemId;
         switch (itemId)
         {
             case 3:
-                if (!inventoryComponent.HasItemById(itemId))
+                if (!inventory.HasItemById(itemId))
                 {
-                    var player = (RealmPlayer)inventoryComponent.Element;
-                    player.Weapons.Add(new SlipeServer.Server.Elements.Structs.Weapon(WeaponId.Bat, 1));
-                    _chatBox.OutputTo(player, "Bat taken");
+                    if(inventory.Owner is RealmPlayer player)
+                    {
+                        player.Weapons.Add(new SlipeServer.Server.Elements.Structs.Weapon(WeaponId.Bat, 1));
+                        _chatBox.OutputTo(player, "Bat taken");
+                    }
                 }
                 break;
         }
     }
 
-    private void HandleInventoryComponentItemAdded(InventoryComponent inventoryComponent, Item item)
+    private void HandleInventoryItemAdded(Inventory inventory, Item item)
     {
         var itemId = item.ItemId;
         switch (itemId)
         {
             case 3:
-                var player = (RealmPlayer)inventoryComponent.Element;
-                if (!player.Weapons.Any(x => x.Type == WeaponId.Bat && x.Ammo > 0))
+                if (inventory.Owner is RealmPlayer player)
                 {
-                    player.Weapons.Add(new SlipeServer.Server.Elements.Structs.Weapon(WeaponId.Bat, 1));
-                    _chatBox.OutputTo(player, "Bat taken");
+                    if (!player.Weapons.Any(x => x.Type == WeaponId.Bat && x.Ammo > 0))
+                    {
+                        player.Weapons.Add(new SlipeServer.Server.Elements.Structs.Weapon(WeaponId.Bat, 1));
+                        _chatBox.OutputTo(player, "Bat taken");
+                    }
                 }
                 break;
         }
     }
 
-    private Task Use(InventoryComponent inventoryComponent, Item item, ItemAction action)
+    private Task Use(Inventory inventory, Item item, ItemAction action)
     {
         switch (action)
         {
             case ItemAction.Use:
-                _chatBox.OutputTo((RealmPlayer)inventoryComponent.Element, $"Item used: {item.Name}");
-                inventoryComponent.RemoveItem(item);
+                if (inventory.Owner is RealmPlayer player)
+                {
+                    _chatBox.OutputTo(player, $"Item used: {item.Name}");
+                    inventory.RemoveItem(item);
+                }
                 break;
         }
         return Task.CompletedTask;

@@ -32,37 +32,6 @@ public class UsersManagerTests
         #endregion
     }
 
-    [Fact]
-    public async Task SignInShouldNotAddComponentsWhenFailedToSignIn()
-    {
-        #region Arrange
-        var login = Guid.NewGuid().ToString()[..8];
-        var password = "asdASD123!@#";
-
-        var realmTestingServer = new RealmTestingServer();
-        var player = realmTestingServer.CreatePlayer(false);
-        var usersService = player.GetRequiredService<IUsersService>();
-        var userManager = player.GetRequiredService<UserManager<UserData>>();
-        #endregion
-
-        #region Act
-        usersService.SignedIn += e =>
-        {
-            throw new Exception();
-        };
-
-        var userId = await usersService.SignUp(login, password);
-        var user = await userManager.GetUserByUserName(login) ?? throw new Exception("User not found");
-
-        var signedIn = await usersService.SignIn(player, user);
-        #endregion
-
-        #region Assert
-        signedIn.Should().BeFalse();
-        player.Components.ComponentsList.Should().BeEmpty();
-        #endregion
-    }
-
     [InlineData("CrosRoad95", true)]
     [InlineData("CrosRoad69", false)]
     [Theory]

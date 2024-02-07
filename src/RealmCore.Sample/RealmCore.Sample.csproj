@@ -7,12 +7,18 @@
 	<IsPackable>false</IsPackable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <Compile Remove="Concepts\Vehicles\**" />
+    <EmbeddedResource Remove="Concepts\Vehicles\**" />
+    <None Remove="Concepts\Vehicles\**" />
+  </ItemGroup>
+
 	<ItemGroup>
 		<ProjectReference Include="..\RealmCore.Server\RealmCore.Server.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>
-		<Using Include="RealmCore.Sample.Components.Gui.Dx" />
+		<Using Include="RealmCore.Sample.Concepts.Gui.Dx" />
 		<Using Include="RealmCore.Sample.Data" />
 		<Using Include="System.Numerics" />
 		<Using Include="SlipeServer.Packets.Definitions.Lua" />
@@ -20,16 +26,12 @@
 		<Using Include="SlipeServer.Packets.Lua.Camera" />
 		<Using Include="SlipeServer.Server.Elements" />
 		<Using Include="RealmCore.Server" />
-		<Using Include="RealmCore.Server.Components.Players" />
 		<Using Include="RealmCore.Server.Interfaces" />
 		<Using Include="RealmCore.Server.Registries" />
-		<Using Include="RealmCore.Server.Components.Common" />
 		<Using Include="RealmCore.Server.Services" />
-		<Using Include="RealmCore.Server.Components.Players.Jobs" />
 		<Using Include="RealmCore.Server.Concepts.Objectives" />
 		<Using Include="Microsoft.Extensions.DependencyInjection" />
 		<Using Include="Microsoft.Extensions.Logging" />
-		<Using Include="RealmCore.Server.Components.Object" />
 		<Using Include="RealmCore.Server.Attributes" />
 		<Using Include="FluentValidation" />
 		<Using Include="System.Diagnostics.CodeAnalysis" />
@@ -48,12 +50,10 @@
 		<Using Include="RealmCore.Persistence.Interfaces" />
 		<Using Include="Microsoft.AspNetCore.Identity" />
 		<Using Include="RealmCore.Persistence.Data" />
-		<Using Include="RealmCore.Server.Components.Players.Abstractions" />
 		<Using Include="RealmCore.Persistence.Extensions" />
-		<Using Include="RealmCore.Sample.Components.Gui" />
+		<Using Include="RealmCore.Sample.Concepts.Gui" />
 		<Using Include="RealmCore.Server.Elements" />
-		<Using Include="RealmCore.Server.Components" />
-		<Using Include="RealmCore.Sample.Components.Gui.Blazor" />
+		<Using Include="RealmCore.Sample.Concepts.Gui.Blazor" />
 		<Using Include="SlipeServer.Server" />
 		<Using Include="RealmCore.Server.Contexts" />
 		<Using Include="RealmCore.Server.Services.Players" />
@@ -61,10 +61,8 @@
 		<Using Include="RealmCore.Resources.Assets" />
 		<Using Include="RealmCore.Resources.Overlay.Interfaces" />
 		<Using Include="System.Drawing" />
-	</ItemGroup>
-
-	<ItemGroup>
-	  <Folder Include="Components\Vehicles\" />
+		<Using Include="RealmCore.Server.Concepts.Interactions" />
+		<Using Include="RealmCore.Server.Concepts.Sessions" />
 	</ItemGroup>
 
 </Project>

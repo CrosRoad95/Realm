@@ -80,11 +80,6 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <Folder Include="Components\Peds\" />
-	</ItemGroup>
-
-	<ItemGroup>
-		<Using Include="RealmCore.Server.Components.Players.Abstractions" />
 		<Using Include="RealmCore.Server.Concepts.Access" />
 		<Using Include="System" />
 		<Using Include="System.Collections.Generic" />
@@ -119,11 +114,8 @@
 		<Using Include="RealmCore.Resources.Overlay" />
 		<Using Include="RealmCore.Server.Providers" />
 		<Using Include="RealmCore.Interfaces.Providers" />
-		<Using Include="RealmCore.Server.Components.Common" />
-		<Using Include="RealmCore.Server.Components.Players" />
 		<Using Include="FluentValidation" />
 		<Using Include="Microsoft.AspNetCore.Identity" />
-		<Using Include="RealmCore.Server.Components.World" />
 		<Using Include="System.Security.Claims" />
 		<Using Include="Microsoft.Extensions.Logging" />
 		<Using Include="RealmCore.Server.Attributes" />
@@ -168,7 +160,6 @@
 		<Using Include="SlipeServer.Packets.Definitions.Entities.Structs" />
 		<Using Include="SlipeServer.Server.Constants" />
 		<Using Include="System.Collections.Concurrent" />
-		<Using Include="RealmCore.Server.Components.Object" />
 		<Using Include="RealmCore.MySql" />
 		<Using Include="SlipeServer.Resources.Watermark" />
 		<Using Include="RealmCore.Server.Options" />
@@ -201,7 +192,6 @@
 		<Using Include="RealmCore.Server.DTOs" />
 		<Using Include="RealmCore.Server.Elements" />
 		<Using Include="SlipeServer.Server.Resources.Providers" />
-		<Using Include="RealmCore.Server.Components" />
 		<Using Include="RealmCore.Server.Scopes" />
 		<Using Include="System.Diagnostics.CodeAnalysis" />
 		<Using Include="RealmCore.Server.Utilities.Interfaces" />
@@ -210,15 +200,14 @@
 		<Using Include="RealmCore.Server.Services.Players" />
 		<Using Include="RealmCore.Server.Services.Vehicles" />
 		<Using Include="RealmCore.Server.Concepts.Sessions" />
-		<Using Include="RealmCore.Server.Components.Players.Jobs" />
 		<Using Include="SlipeServer.Server.Extensions" />
 		<Using Include="RealmCore.Resources.Admin.Data" />
 		<Using Include="SlipeServer.Resources.Scoreboard" />
 		<Using Include="RealmCore.SQLite" />
 		<Using Include="RealmCore.Server.Logic.Elements" />
-		<Using Include="RealmCore.Server.Logic.Components" />
 		<Using Include="RealmCore.Server.Behaviours" />
 		<Using Include="RealmCore.Resources.Browser" />
+		<Using Include="RealmCore.Server.Json.Converters" />
 	</ItemGroup>
 
 </Project>

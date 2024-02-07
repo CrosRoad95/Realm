@@ -51,7 +51,7 @@ internal class Hud<TState> : IHud<TState> where TState : class
         foreach (var item in _dynamicHudComponents)
         {
             var value = item.PropertyInfo.GetValue(_state);
-            stateChange.Add(item.ComponentId, value);
+            stateChange.Add(item.Id, value);
         }
 
         if (stateChange.Count != 0)

@@ -1,4 +1,6 @@
-﻿namespace RealmCore.Server.Helpers;
+﻿using RealmCore.Server.Concepts.Gui;
+
+namespace RealmCore.Server.Helpers;
 
 public static class GuiHelpers
 {

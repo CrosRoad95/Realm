@@ -1,12 +1,13 @@
-﻿namespace RealmCore.Server.Elements;
+﻿using RealmCore.Server.Services.Elements;
 
-public class RealmVehicle : Vehicle, IComponents
+namespace RealmCore.Server.Elements;
+
+public class RealmVehicle : Vehicle
 {
     private readonly IServiceProvider _serviceProvider;
     private readonly IServiceScope _serviceScope;
 
     public IServiceProvider ServiceProvider => _serviceProvider;
-    public Concepts.Components Components { get; private set; }
     public int PersistantId => Persistance.Id;
 
     public IVehicleAccessService Access { get; private set; }
@@ -17,13 +18,13 @@ public class RealmVehicle : Vehicle, IComponents
     public IVehicleEnginesService Engines { get; private set; }
     public IVehicleEventsService Events { get; private set; }
     public IVehicleFuelService Fuel { get; private set; }
+    public IVehicleInventoryService Inventory { get; private set; }
     public VehicleAccessController AccessController { get; set; } = VehicleDefaultAccessController.Instance;
 
     public RealmVehicle(IServiceProvider serviceProvider, ushort model, Vector3 position) : base(model, position)
     {
         _serviceScope = serviceProvider.CreateScope();
         _serviceProvider = _serviceScope.ServiceProvider;
-        Components = new(_serviceProvider, this);
 
         #region Initialize scope services
         GetRequiredService<VehicleContext>().Vehicle = this;
@@ -35,63 +36,12 @@ public class RealmVehicle : Vehicle, IComponents
         Engines = GetRequiredService<IVehicleEnginesService>();
         Events = GetRequiredService<IVehicleEventsService>();
         Fuel = GetRequiredService<IVehicleFuelService>();
+        Inventory = GetRequiredService<IVehicleInventoryService>();
         #endregion
     }
 
-    public T GetRequiredService<T>() where T : notnull => _serviceProvider.GetRequiredService<T>();
-
+    private T GetRequiredService<T>() where T : notnull => _serviceProvider.GetRequiredService<T>();
     public object GetRequiredService(Type type) => _serviceProvider.GetRequiredService(type);
-
-    public TComponent GetRequiredComponent<TComponent>() where TComponent : IComponent
-    {
-        return Components.GetRequiredComponent<TComponent>();
-    }
-
-    public bool TryDestroyComponent<TComponent>() where TComponent : IComponent
-    {
-        return Components.TryDestroyComponent<TComponent>();
-    }
-
-    public void DestroyComponent<TComponent>() where TComponent : IComponent
-    {
-        Components.DestroyComponent<TComponent>();
-    }
-
-    public void DestroyComponent<TComponent>(TComponent component) where TComponent : IComponent
-    {
-        Components.DestroyComponent(component);
-    }
-
-    public bool TryGetComponent<TComponent>(out TComponent component) where TComponent : IComponent
-    {
-        if (Components.TryGetComponent(out TComponent tempComponent))
-        {
-            component = tempComponent;
-            return true;
-        }
-        component = default!;
-        return false;
-    }
-
-    public bool HasComponent<TComponent>() where TComponent : IComponent
-    {
-        return Components.HasComponent<TComponent>();
-    }
-
-    public TComponent AddComponent<TComponent>() where TComponent : IComponent, new()
-    {
-        return Components.AddComponent<TComponent>();
-    }
-
-    public TComponent AddComponent<TComponent>(TComponent component) where TComponent : IComponent
-    {
-        return Components.AddComponent(component);
-    }
-
-    public TComponent AddComponentWithDI<TComponent>(params object[] parameters) where TComponent : IComponent
-    {
-        return Components.AddComponentWithDI<TComponent>(parameters);
-    }
 
     public override bool Destroy()
     {

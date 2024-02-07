@@ -1,6 +1,6 @@
 ﻿namespace RealmCore.Server.Events;
 
-public interface IUpdateCallback : IComponent
+public interface IUpdateCallback
 {
     void Update();
 }

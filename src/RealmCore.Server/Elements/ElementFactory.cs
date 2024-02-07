@@ -18,18 +18,6 @@ internal sealed class ElementFactory : IElementFactory
         ElementCreated?.Invoke(player);
     }
 
-    private void ExecuteElementBuilder<TElement>(Func<TElement, IEnumerable<IComponent>>? builder, TElement element) where TElement : IComponents
-    {
-        if (builder == null)
-            return;
-
-        var components = builder(element);
-        foreach (var component in components)
-        {
-            element.AddComponent(component);
-        }
-    }
-
     public void RelayCreated(Element element)
     {
         ElementCreated?.Invoke(element);
@@ -49,7 +37,7 @@ internal sealed class ElementFactory : IElementFactory
         RelayCreated(element);
     }
 
-    public RealmVehicle CreateVehicle(ushort model, Vector3 position, Vector3 rotation, byte? interior = null, ushort? dimension = null, Func<RealmVehicle, IEnumerable<IComponent>>? elementBuilder = null)
+    public RealmVehicle CreateVehicle(ushort model, Vector3 position, Vector3 rotation, byte? interior = null, ushort? dimension = null, Action<RealmVehicle>? elementBuilder = null)
     {
         var vehicle = new RealmVehicle(_serviceProvider, model, position)
         {
@@ -63,7 +51,7 @@ internal sealed class ElementFactory : IElementFactory
         return vehicle;
     }
 
-    public RealmMarker CreateMarker(Vector3 position, MarkerType markerType, float size, Color color, byte? interior = null, ushort? dimension = null, Func<RealmMarker, IEnumerable<IComponent>>? elementBuilder = null)
+    public RealmMarker CreateMarker(Vector3 position, MarkerType markerType, float size, Color color, byte? interior = null, ushort? dimension = null, Action<RealmMarker>? elementBuilder = null)
     {
         var marker = new RealmMarker(_serviceProvider, position, markerType, size)
         {
@@ -77,7 +65,7 @@ internal sealed class ElementFactory : IElementFactory
         return marker;
     }
 
-    public RealmPickup CreatePickup(Vector3 position, ushort model, byte? interior = null, ushort? dimension = null, Func<RealmPickup, IEnumerable<IComponent>>? elementBuilder = null)
+    public RealmPickup CreatePickup(Vector3 position, ushort model, byte? interior = null, ushort? dimension = null, Action<RealmPickup>? elementBuilder = null)
     {
         var pickup = new RealmPickup(_serviceProvider, position, model)
         {
@@ -85,40 +73,40 @@ internal sealed class ElementFactory : IElementFactory
             Dimension = dimension ?? 0,
         };
 
-        ExecuteElementBuilder(elementBuilder, pickup);
+        elementBuilder?.Invoke(pickup);
         AssociateWithServer(pickup);
         return pickup;
     }
 
-    public RealmBlip CreateBlip(Vector3 position, BlipIcon blipIcon, byte? interior = null, ushort? dimension = null, Func<RealmBlip, IEnumerable<IComponent>>? elementBuilder = null)
+    public RealmBlip CreateBlip(Vector3 position, BlipIcon blipIcon, byte? interior = null, ushort? dimension = null, Action<RealmBlip>? elementBuilder = null)
     {
-        var blip = new RealmBlip(_serviceProvider, position, blipIcon)
+        var blip = new RealmBlip(position, blipIcon)
         {
             Interior = interior ?? 0,
             Dimension = dimension ?? 0,
         };
 
-        ExecuteElementBuilder(elementBuilder, blip);
+        elementBuilder?.Invoke(blip);
         AssociateWithServer(blip);
         return blip;
     }
 
-    public RealmRadarArea CreateRadarArea(Vector2 position, Vector2 size, Color color, byte? interior = null, ushort? dimension = null, Func<RealmRadarArea, IEnumerable<IComponent>>? elementBuilder = null)
+    public RealmRadarArea CreateRadarArea(Vector2 position, Vector2 size, Color color, byte? interior = null, ushort? dimension = null, Action<RealmRadarArea>? elementBuilder = null)
     {
-        var radarArea = new RealmRadarArea(_serviceProvider, position, size, color)
+        var radarArea = new RealmRadarArea(position, size, color)
         {
             Interior = interior ?? 0,
             Dimension = dimension ?? 0,
         };
 
-        ExecuteElementBuilder(elementBuilder, radarArea);
+        elementBuilder?.Invoke(radarArea);
         AssociateWithServer(radarArea);
         return radarArea;
     }
 
-    public RealmWorldObject CreateObject(ObjectModel model, Vector3 position, Vector3 rotation, byte? interior = null, ushort? dimension = null, Func<RealmWorldObject, IEnumerable<IComponent>>? elementBuilder = null)
+    public RealmWorldObject CreateObject(ObjectModel model, Vector3 position, Vector3 rotation, byte? interior = null, ushort? dimension = null, Action<RealmWorldObject>? elementBuilder = null)
     {
-        var worldObject = new RealmWorldObject(_serviceProvider, model, position)
+        var worldObject = new RealmWorldObject(model, position)
         {
             Rotation = rotation,
             Interior = interior ?? 0,
@@ -130,9 +118,9 @@ internal sealed class ElementFactory : IElementFactory
         return worldObject;
     }
 
-    public FocusableRealmWorldObject CreateFocusableObject(ObjectModel model, Vector3 position, Vector3 rotation, byte? interior = null, ushort? dimension = null, Func<RealmWorldObject, IEnumerable<IComponent>>? elementBuilder = null)
+    public FocusableRealmWorldObject CreateFocusableObject(ObjectModel model, Vector3 position, Vector3 rotation, byte? interior = null, ushort? dimension = null, Action<RealmWorldObject>? elementBuilder = null)
     {
-        var worldObject = new FocusableRealmWorldObject(_serviceProvider, model, position)
+        var worldObject = new FocusableRealmWorldObject(model, position)
         {
             Rotation = rotation,
             Interior = interior ?? 0,
@@ -145,7 +133,7 @@ internal sealed class ElementFactory : IElementFactory
     }
 
     #region Collision shapes
-    public RealmCollisionCircle CreateCollisionCircle(Vector2 position, float radius, byte? interior = null, ushort? dimension = null, Func<RealmCollisionCircle, IEnumerable<IComponent>>? elementBuilder = null)
+    public RealmCollisionCircle CreateCollisionCircle(Vector2 position, float radius, byte? interior = null, ushort? dimension = null, Action<RealmCollisionCircle>? elementBuilder = null)
     {
         var collisionSphere = new RealmCollisionCircle(_serviceProvider, new Vector2(0, 0), radius)
         {
@@ -158,7 +146,7 @@ internal sealed class ElementFactory : IElementFactory
         return collisionSphere;
     }
 
-    public RealmCollisionCuboid CreateCollisionCuboid(Vector3 position, Vector3 dimensions, byte? interior = null, ushort? dimension = null, Func<RealmCollisionCuboid, IEnumerable<IComponent>>? elementBuilder = null)
+    public RealmCollisionCuboid CreateCollisionCuboid(Vector3 position, Vector3 dimensions, byte? interior = null, ushort? dimension = null, Action<RealmCollisionCuboid>? elementBuilder = null)
     {
         var collisionCuboid = new RealmCollisionCuboid(_serviceProvider, position, dimensions)
         {
@@ -171,7 +159,7 @@ internal sealed class ElementFactory : IElementFactory
         return collisionCuboid;
     }
 
-    public RealmCollisionPolygon CreateCollisionPolygon(Vector3 position, IEnumerable<Vector2> vertices, byte? interior = null, ushort? dimension = null, Func<RealmCollisionPolygon, IEnumerable<IComponent>>? elementBuilder = null)
+    public RealmCollisionPolygon CreateCollisionPolygon(Vector3 position, IEnumerable<Vector2> vertices, byte? interior = null, ushort? dimension = null, Action<RealmCollisionPolygon>? elementBuilder = null)
     {
         var collisionPolygon = new RealmCollisionPolygon(_serviceProvider, position, vertices)
         {
@@ -184,7 +172,7 @@ internal sealed class ElementFactory : IElementFactory
         return collisionPolygon;
     }
 
-    public RealmCollisionRectangle CreateCollisionRectangle(Vector2 position, Vector2 dimensions, byte? interior = null, ushort? dimension = null, Func<RealmCollisionRectangle, IEnumerable<IComponent>>? elementBuilder = null)
+    public RealmCollisionRectangle CreateCollisionRectangle(Vector2 position, Vector2 dimensions, byte? interior = null, ushort? dimension = null, Action<RealmCollisionRectangle>? elementBuilder = null)
     {
         var collisionRectangle = new RealmCollisionRectangle(_serviceProvider, position, dimensions)
         {
@@ -197,7 +185,7 @@ internal sealed class ElementFactory : IElementFactory
         return collisionRectangle;
     }
 
-    public RealmCollisionSphere CreateCollisionSphere(Vector3 position, float radius, byte? interior = null, ushort? dimension = null, Func<RealmCollisionSphere, IEnumerable<IComponent>>? elementBuilder = null)
+    public RealmCollisionSphere CreateCollisionSphere(Vector3 position, float radius, byte? interior = null, ushort? dimension = null, Action<RealmCollisionSphere>? elementBuilder = null)
     {
         var collisionSphere = new RealmCollisionSphere(_serviceProvider, position, radius)
         {
@@ -210,7 +198,7 @@ internal sealed class ElementFactory : IElementFactory
         return collisionSphere;
     }
 
-    public RealmCollisionTube CreateCollisionTube(Vector3 position, float radius, float height, byte? interior = null, ushort? dimension = null, Func<RealmCollisionTube, IEnumerable<IComponent>>? elementBuilder = null)
+    public RealmCollisionTube CreateCollisionTube(Vector3 position, float radius, float height, byte? interior = null, ushort? dimension = null, Action<RealmCollisionTube>? elementBuilder = null)
     {
         var collisionTube = new RealmCollisionTube(_serviceProvider, position, radius, height)
         {
@@ -223,9 +211,9 @@ internal sealed class ElementFactory : IElementFactory
         return collisionTube;
     }
 
-    public RealmPed CreatePed(PedModel pedModel, Vector3 position, byte? interior = null, ushort? dimension = null, Func<RealmPed, IEnumerable<IComponent>>? elementBuilder = null)
+    public RealmPed CreatePed(PedModel pedModel, Vector3 position, byte? interior = null, ushort? dimension = null, Action<RealmPed>? elementBuilder = null)
     {
-        var ped = new RealmPed(_serviceProvider, pedModel, position)
+        var ped = new RealmPed(pedModel, position)
         {
             Interior = interior ?? 0,
             Dimension = dimension ?? 0,

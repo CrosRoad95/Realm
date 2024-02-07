@@ -1,14 +1,16 @@
-﻿namespace RealmCore.Server.Elements;
+﻿using RealmCore.Server.Services.Elements;
 
-public class RealmPlayer : Player, IComponents, IDisposable
+namespace RealmCore.Server.Elements;
+
+public class RealmPlayer : Player, IDisposable
 {
+    private readonly object _lock = new();
     private readonly IServiceProvider _serviceProvider;
     private readonly IServiceScope _serviceScope;
 
     private readonly CancellationTokenSource _cancellationTokenSource = new();
     public CancellationToken CancellationToken => _cancellationTokenSource.Token;
     public IServiceProvider ServiceProvider => _serviceProvider;
-    public Concepts.Components Components { get; private set; }
 
     private Element? _focusedElement;
     private Element? _lastClickedElement;
@@ -28,11 +30,17 @@ public class RealmPlayer : Player, IComponents, IDisposable
     private readonly Dictionary<string, DateTime> _bindsDownCooldown = [];
     private readonly Dictionary<string, DateTime> _bindsUpCooldown = [];
     private readonly ConcurrentDictionary<int, bool> _enableFightFlags = new();
+    private readonly List<AttachedBoneWorldObject> _attachedBoneElements = [];
 
     public event Action<RealmPlayer, Element?>? FocusedElementChanged;
     public event Action<RealmPlayer, Element?>? ClickedElementChanged;
     public event Action<RealmPlayer, Element?>? CurrentInteractElementChanged;
+    public event Action<RealmPlayer, AttachedBoneWorldObject>? WorldObjectAttached;
+    public event Action<RealmPlayer, AttachedBoneWorldObject>? WorldObjectDetached;
     public new event Action<RealmPlayer, string?>? NametagTextChanged;
+
+    public List<AttachedBoneWorldObject> AttachedBoneElements => _attachedBoneElements;
+    public int AttachedBoneElementsCount => _attachedBoneElements.Count;
 
     public Element? FocusedElement
     {
@@ -144,6 +152,7 @@ public class RealmPlayer : Player, IComponents, IDisposable
     public IPlayerFractionsService Fractions { get; private set; }
     public IPlayerGuiService Gui { get; private set; }
     public IPlayerHudService Hud { get; private set; }
+    public IPlayerInventoryService Inventory { get; private set; }
     public IScopedElementFactory ElementFactory { get; private set; }
     public RealmPlayer(IServiceProvider serviceProvider)
     {
@@ -175,10 +184,10 @@ public class RealmPlayer : Player, IComponents, IDisposable
         Fractions = GetRequiredService<IPlayerFractionsService>();
         Gui = GetRequiredService<IPlayerGuiService>();
         Hud = GetRequiredService<IPlayerHudService>();
+        Inventory = GetRequiredService<IPlayerInventoryService>();
         ElementFactory = GetRequiredService<IScopedElementFactory>();
         #endregion
 
-        Components = new(_serviceProvider, this);
         BindExecuted += HandleBindExecuted;
         IsNametagShowing = false;
         UpdateFight();
@@ -187,57 +196,6 @@ public class RealmPlayer : Player, IComponents, IDisposable
     public T GetRequiredService<T>() where T : notnull => _serviceProvider.GetRequiredService<T>();
 
     public object GetRequiredService(Type type) => _serviceProvider.GetRequiredService(type);
-
-    public TComponent GetRequiredComponent<TComponent>() where TComponent : IComponent
-    {
-        return Components.GetRequiredComponent<TComponent>();
-    }
-
-    public bool TryDestroyComponent<TComponent>() where TComponent : IComponent
-    {
-        return Components.TryDestroyComponent<TComponent>();
-    }
-
-    public void DestroyComponent<TComponent>() where TComponent : IComponent
-    {
-        Components.DestroyComponent<TComponent>();
-    }
-    
-    public void DestroyComponent<TComponent>(TComponent component) where TComponent : IComponent
-    {
-        Components.DestroyComponent(component);
-    }
-
-    public bool TryGetComponent<TComponent>(out TComponent component) where TComponent : IComponent
-    {
-        if(Components.TryGetComponent(out TComponent tempComponent))
-        {
-            component = tempComponent;
-            return true;
-        }
-        component = default!;
-        return false;
-    }
-
-    public bool HasComponent<TComponent>() where TComponent : IComponent
-    {
-        return Components.HasComponent<TComponent>();
-    }
-
-    public TComponent AddComponent<TComponent>() where TComponent : IComponent, new()
-    {
-        return Components.AddComponent<TComponent>();
-    }
-
-    public TComponent AddComponent<TComponent>(TComponent component) where TComponent : IComponent
-    {
-        return Components.AddComponent(component);
-    }
-    
-    public TComponent AddComponentWithDI<TComponent>(params object[] parameters) where TComponent : IComponent
-    {
-        return Components.AddComponentWithDI<TComponent>(parameters);
-    }
 
     private void UpdateFight()
     {
@@ -654,11 +612,53 @@ public class RealmPlayer : Player, IComponents, IDisposable
         }
     }
 
+    public bool Attach(RealmWorldObject worldObject, BoneId boneId, Vector3? positionOffset = null, Vector3? rotationOffset = null)
+    {
+        lock (_lock)
+        {
+            if (_attachedBoneElements.Any(x => x.WorldObject == worldObject))
+                return false;
+            var attachedBoneWorldObject = new AttachedBoneWorldObject(worldObject, boneId, positionOffset, rotationOffset);
+            AttachedBoneElements.Add(attachedBoneWorldObject);
+            WorldObjectAttached?.Invoke(this, attachedBoneWorldObject);
+            worldObject.Destroyed += HandleAttachedWorldObjectDestroyed;
+            return true;
+        }
+    }
+
+    private void HandleAttachedWorldObjectDestroyed(Element element)
+    {
+        if(element is RealmWorldObject realmWorldObject)
+            Detach(realmWorldObject);
+    }
+
+    public bool IsAttached(RealmWorldObject worldObject)
+    {
+        lock (_lock)
+            return _attachedBoneElements.Any(x => x.WorldObject == worldObject);
+    }
+
+    public bool Detach(RealmWorldObject worldObject)
+    {
+        lock (_lock)
+        {
+            var attachedBoneWorldObject = _attachedBoneElements.FirstOrDefault(x => x.WorldObject == worldObject);
+            if (attachedBoneWorldObject == null)
+                return false;
+            if (_attachedBoneElements.Remove(attachedBoneWorldObject))
+            {
+                worldObject.Destroyed -= HandleAttachedWorldObjectDestroyed;
+                WorldObjectAttached?.Invoke(this, attachedBoneWorldObject);
+                return true;
+            }
+            return false;
+        }
+    }
+
     public void Dispose()
     {
         _serviceScope.Dispose();
         _cancellationTokenSource.Cancel();
         _cancellationTokenSource.Dispose();
-        Components.Dispose();
     }
 }

@@ -1,4 +1,6 @@
-﻿namespace RealmCore.Server.Logic.Resources;
+﻿using RealmCore.Server.Concepts.Gui;
+
+namespace RealmCore.Server.Logic.Resources;
 
 internal sealed class BrowserGuiLogic : PlayerLogic
 {

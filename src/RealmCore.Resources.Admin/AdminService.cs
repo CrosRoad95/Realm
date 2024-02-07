@@ -16,8 +16,6 @@ public interface IAdminService
     void BroadcastClearElementsForPlayer(Player player);
     void BroadcastSpawnMarkersForPlayer(Player player, IEnumerable<LuaValue> elementsDebugInfo);
     void BroadcastClearSpawnMarkersForPlayer(Player player);
-    void BroadcastElementsComponents(Player player, LuaValue elementsComponents);
-    void BroadcastClearElementsComponents(Player player);
 }
 
 internal sealed class AdminService : IAdminService
@@ -78,15 +76,5 @@ internal sealed class AdminService : IAdminService
     public void BroadcastClearSpawnMarkersForPlayer(Player player)
     {
         MessageHandler?.Invoke(new ClearSpawnMarkersForPlayerMessage(player));
-    }
-
-    public void BroadcastElementsComponents(Player player, LuaValue elementsComponents)
-    {
-        MessageHandler?.Invoke(new UpdateElementsComponentsMessage(player, elementsComponents));
-    }
-
-    public void BroadcastClearElementsComponents(Player player)
-    {
-        MessageHandler?.Invoke(new ClearElementsComponentsMessage(player));
     }
 }

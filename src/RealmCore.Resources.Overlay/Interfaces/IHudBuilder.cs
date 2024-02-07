@@ -10,7 +10,7 @@ public interface IHudBuilder<TState>
     float Right { get; }
     float Bottom { get; }
 
-    Action<DynamicHudElement>? DynamicHudComponentAdded { get; set; }
+    Action<DynamicHudElement>? DynamicHudElementAdded { get; set; }
 
     IHudBuilder<TState> AddRectangle(Vector2 position, Size size, Color color);
     ITextAndHudBuilder<TState> AddText(string text, Vector2 position, Size size, Color? color = null, Size? scale = null, string font = "default", HorizontalAlign alignX = HorizontalAlign.Left, VerticalAlign alignY = VerticalAlign.Top);

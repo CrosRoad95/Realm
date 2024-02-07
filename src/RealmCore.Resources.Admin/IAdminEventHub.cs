@@ -8,6 +8,4 @@ public interface IAdminEventHub
     void ClearElements();
     void SetSpawnMarkers(IEnumerable<LuaValue> spawnMarkers);
     void ClearSpawnMarkers();
-    void UpdateElementsComponents(LuaValue elementsComponents);
-    void ClearElementsComponents();
 }

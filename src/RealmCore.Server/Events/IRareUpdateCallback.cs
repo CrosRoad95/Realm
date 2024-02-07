@@ -1,6 +1,6 @@
 ﻿namespace RealmCore.Server.Events;
 
-public interface IRareUpdateCallback : IComponent
+public interface IRareUpdateCallback
 {
     void RareUpdate();
 }

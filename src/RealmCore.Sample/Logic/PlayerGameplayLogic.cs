@@ -1,5 +1,5 @@
-﻿using RealmCore.Sample.Elements;
-using RealmCore.Server.Components.Abstractions;
+﻿using RealmCore.Sample.Concepts.Gui;
+using RealmCore.Sample.Elements;
 using RealmCore.Server.Enums;
 using SlipeServer.Server.Elements.Enums;
 
@@ -31,24 +31,21 @@ internal sealed partial class PlayerGameplayLogic
 
     private async Task HandleInteract(RealmPlayer player, KeyState keyState, CancellationToken cancellationToken)
     {
-        var components = player;
-        if (components.TryGetComponent(out AttachedElementComponent attachedElementComponent) && keyState == KeyState.Down)
+        var worldObject = player.AttachedBoneElements.FirstOrDefault()?.WorldObject;
+        if (worldObject != null && keyState == KeyState.Down)
         {
             await player.DoAnimationAsync(Animation.CarryPutDown);
 
-            var detached = attachedElementComponent.TryDetach(out Element? detachedElement);
-            if (detached && detachedElement != null)
+            var liftableInteraction = worldObject.Interaction as LiftableInteraction;
+            if (liftableInteraction != null && liftableInteraction.TryDrop() && player.Detach(worldObject))
             {
-                if (detachedElement.GetRequiredComponent<LiftableWorldObjectComponent>().TryDrop())
+                worldObject.Position = player.Position + player.Forward * 1.0f - new Vector3(0, 0, 0.55f);
+                worldObject.Rotation = new Vector3
                 {
-                    detachedElement.Position = player.Position + player.Forward * 1.0f - new Vector3(0, 0, 0.55f);
-                    detachedElement.Rotation = new Vector3
-                    {
-                        X = 0,
-                        Y = 0,
-                        Z = player.Rotation.Z
-                    };
-                }
+                    X = 0,
+                    Y = 0,
+                    Z = player.Rotation.Z
+                };
             }
         }
         else if (player.CurrentInteractElement != null)
@@ -57,24 +54,21 @@ internal sealed partial class PlayerGameplayLogic
             if (element == null)
                 return;
 
-            if (element is not IComponents currentInteractElement)
-                return;
-
-            if (currentInteractElement.TryGetComponent(out InteractionComponent interactionComponent) && player.DistanceTo(element) < interactionComponent.MaxInteractionDistance)
+            if (element is RealmWorldObject interactWorldObject && element is IInteraction interaction && interaction.Interaction != null && player.DistanceTo(element) < interaction.Interaction.MaxDistance)
             {
-                switch (interactionComponent)
+                switch (interaction)
                 {
-                    case LiftableWorldObjectComponent liftableWorldObjectComponent when keyState == KeyState.Down:
-                        if (player.IsLookingAt(element) && liftableWorldObjectComponent.TryLift(player))
+                    case LiftableInteraction liftableInteraction when keyState == KeyState.Down:
+                        if (player.IsLookingAt(element) && liftableInteraction.TryLift(player))
                         {
                             await player.DoAnimationAsync(Animation.CarryLiftUp);
 #pragma warning disable CA1849 // Call async methods when in an async method
                             player.DoAnimation(Animation.StartCarry);
 #pragma warning restore CA1849 // Call async methods when in an async method
-                            player.AddComponent(new AttachedElementComponent(element, SlipeServer.Packets.Enums.BoneId.LeftHand, new Vector3(0.2f, 0.2f, -0), new Vector3(0, -20, 0)));
+                            player.Attach(interactWorldObject, SlipeServer.Packets.Enums.BoneId.LeftHand, new Vector3(0.2f, 0.2f, -0), new Vector3(0, -20, 0));
                         }
                         break;
-                    case DurationBasedHoldInteractionComponent durationBasedHoldInteractionComponent:
+                    case DurationBasedHoldInteraction duractionBasedHoldInteraction:
                         _logger.LogInformation("Interaction begin {keyState}", keyState);
                         if (keyState == KeyState.Down)
                         {
@@ -85,7 +79,7 @@ internal sealed partial class PlayerGameplayLogic
                             };
                             try
                             {
-                                if (await durationBasedHoldInteractionComponent.BeginInteraction(player, token.Token))
+                                if (await duractionBasedHoldInteraction.BeginInteraction(player, token.Token))
                                 {
                                     _chatBox.OutputTo(player, "okk");
                                     _logger.LogInformation("Interaction completed");
@@ -102,7 +96,7 @@ internal sealed partial class PlayerGameplayLogic
                         }
                         else
                         {
-                            if (durationBasedHoldInteractionComponent.EndInteraction(player))
+                            if (duractionBasedHoldInteraction.EndInteraction(player))
                             {
                                 _logger.LogInformation("Interaction ended");
                             }
@@ -143,9 +137,9 @@ internal sealed partial class PlayerGameplayLogic
                 player.Gui.Current = buyVehicleGui;
             }
         }
-        if (element is IComponents components)
+        if (element is IInteraction interaction)
         {
-            if (components.Components.TryGetComponent(out InteractionComponent interactionComponent))
+            if (interaction.Interaction != null)
             {
                 player.CurrentInteractElement = element;
             }

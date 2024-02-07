@@ -22,13 +22,13 @@ internal class TextAndHudBuilder<TState> : ITextAndHudBuilder<TState>
             position = _textConstructionInfo.position + offset
         };
 
-        if(_innerHudBuilder.DynamicHudComponentAdded != null)
+        if(_innerHudBuilder.DynamicHudElementAdded != null)
         {
             foreach (var propertyInfo in constructionInfo.propertyInfos)
             {
-                _innerHudBuilder.DynamicHudComponentAdded.Invoke(new DynamicHudElement
+                _innerHudBuilder.DynamicHudElementAdded.Invoke(new DynamicHudElement
                 {
-                    ComponentId = constructionInfo.id,
+                    Id = constructionInfo.id,
                     PropertyInfo = propertyInfo
                 });
             }

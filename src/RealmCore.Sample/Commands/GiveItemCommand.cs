@@ -16,15 +16,15 @@ public sealed class GiveItemCommand : IInGameCommand
 
     public Task Handle(RealmPlayer player, CommandArguments args, CancellationToken cancellationToken)
     {
-        if (player.TryGetComponent(out InventoryComponent inventoryComponent))
+        if (player.Inventory.TryGetPrimary(out var inventory))
         {
             uint itemId = args.ReadUInt();
             uint count = args.ReadUInt();
-            inventoryComponent.AddItem(_itemsRegistry, itemId, count, new Metadata
+            inventory.AddItem(_itemsRegistry, itemId, count, new Metadata
             {
                 ["foo"] = 10
             });
-            _chatBox.OutputTo(player, $"Item added, {inventoryComponent.Number}/{inventoryComponent.Size}");
+            _chatBox.OutputTo(player, $"Item added, {inventory.Number}/{inventory.Size}");
         }
 
         return Task.CompletedTask;

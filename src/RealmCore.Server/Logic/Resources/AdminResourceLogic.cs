@@ -38,27 +38,6 @@ internal sealed class AdminResourceLogic
         }
     }
 
-    private LuaValue GetDebugComponent(IComponent component)
-    {
-        var data = new Dictionary<LuaValue, LuaValue>
-        {
-            ["name"] = component.GetType().Name
-        };
-        if(component is ILuaDebugDataProvider luaDebugDataProvider)
-        {
-            data["data"] = luaDebugDataProvider.GetLuaDebugData();
-        }
-
-        return new LuaValue(data);
-    }
-
-    private List<LuaValue> GetDebugComponents(IComponents components)
-    {
-        return components.Components.ComponentsList
-            .Select(GetDebugComponent)
-            .ToList();
-    }
-
     private void InternalHandleToolStateChanged(Player player, AdminTool adminTool, bool state)
     {
         switch (adminTool)
@@ -69,37 +48,20 @@ internal sealed class AdminResourceLogic
                     List<ElementDebugInfo> debugInfoList = [];
                     foreach (var element in _elementCollection.GetAll())
                     {
-                        if(element is IComponents components)
+                        debugInfoList.Add(new ElementDebugInfo
                         {
-                            debugInfoList.Add(new ElementDebugInfo
-                            {
-                                debugId = element.Id.ToString(),
-                                element = element,
-                                position = element.Position,
-                                previewType = PreviewType.BoxWireframe,
-                                previewColor = Color.Red,
-                                name = element.GetType().ToString(),
-                            });
-                        }
+                            debugId = element.Id.ToString(),
+                            element = element,
+                            position = element.Position,
+                            previewType = PreviewType.BoxWireframe,
+                            previewColor = Color.Red,
+                            name = element.GetType().ToString(),
+                        });
                     }
                     _adminService.BroadcastElementDebugInfoUpdateForPlayer(player, debugInfoList);
                 }
                 else
                     _adminService.BroadcastClearElementsForPlayer(player);
-                break;
-            case AdminTool.Components:
-                if (state)
-                {
-                    var componentsDictionary = new Dictionary<LuaValue, LuaValue>();
-                    foreach (var element in _elementCollection.GetAll())
-                    {
-                        if (element is IComponents components)
-                            componentsDictionary[element.Id] = new LuaValue(GetDebugComponents(components));
-                    }
-                    _adminService.BroadcastElementsComponents(player, new LuaValue(componentsDictionary));
-                } 
-                else
-                    _adminService.BroadcastClearElementsComponents(player);
                 break;
             case AdminTool.ShowSpawnMarkers:
                 if(state)

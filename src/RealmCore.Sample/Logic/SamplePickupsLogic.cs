@@ -1,5 +1,5 @@
-﻿using RealmCore.Sample.Components.Jobs;
-using RealmCore.Server.Concepts.Sessions;
+﻿using RealmCore.Sample.Concepts.Gui;
+using RealmCore.Sample.Concepts.Jobs;
 
 namespace RealmCore.Sample.Logic;
 
@@ -16,41 +16,41 @@ internal class SamplePickupsLogic
     private void HandleElementCreated(Element element)
     {
         {
-        if (element is RealmPickup pickup && pickup.Components.TryGetComponent(out NameComponent nameComponent) && nameComponent.Name.StartsWith("fractionTestPickup"))
+        if (element is RealmPickup pickup && pickup.ElementName != null && pickup.ElementName.StartsWith("fractionTestPickup"))
             {
                 pickup.CollisionDetection.AddRule(new MustBePlayerInFractionRule(1));
 
                 pickup.CollisionDetection.Entered += async (enteredPickup, element) =>
                 {
                     var player = (RealmPlayer)element;
-                    if(player.Sessions.TryGetSession(out FractionSession fractionSession))
+                    if(player.Sessions.TryGetSession(out FractionSession pendingFractionSession))
                     {
-                        fractionSession.End();
-                        _chatBox.OutputTo(player, $"Session ended in: {fractionSession.Elapsed}");
-                        player.Sessions.EndSession(fractionSession);
+                        pendingFractionSession.End();
+                        _chatBox.OutputTo(player, $"Session ended in: {pendingFractionSession.Elapsed}");
+                        player.Sessions.EndSession(pendingFractionSession);
                     }
                     else
                     {
-                        var fractionSessionComponent = player.Sessions.BeginSession<FractionSession>();
+                        var fractionSession = player.Sessions.BeginSession<FractionSession>();
                         _chatBox.OutputTo(player, $"Session started");
-                        fractionSessionComponent.Start();
+                        fractionSession.Start();
                     }
                 };
             }
         }
 
         {
-            if (element is RealmPickup pickup && pickup.Components.TryGetComponent(out NameComponent nameComponent) && nameComponent.Name.StartsWith("jobTestPickup"))
+            if (element is RealmPickup pickup && pickup.ElementName != null && pickup.ElementName.StartsWith("jobTestPickup"))
             {
                 pickup.CollisionDetection.Entered += (enteredPickup, element) =>
                 {
                     var player = (RealmPlayer)element;
 
-                    var sessionComponent = player.Sessions.GetSession<JobSession>();
-                    if (sessionComponent != null || sessionComponent is not JobSession)
+                    var jobSession = player.Sessions.GetSession<JobSession>();
+                    if (jobSession != null || jobSession is not JobSession)
                         return;
 
-                    if (player.Sessions.TryGetSession(out JobSession jobSession))
+                    if (player.Sessions.TryGetSession(out JobSession pendingJobSession))
                     {
                         player.Sessions.EndSession(jobSession);
                         var elapsed = jobSession.Elapsed;
@@ -61,33 +61,33 @@ internal class SamplePickupsLogic
                     }
                     else
                     {
-                        var jobSessionComponent = player.Sessions.BeginSession<TestJob>();
+                        var testJob = player.Sessions.BeginSession<TestJob>();
                         _chatBox.OutputTo(player, $"Job started");
-                        jobSessionComponent.Start();
+                        testJob.Start();
 
-                        jobSessionComponent.CompletedAllObjectives += async e =>
+                        testJob.CompletedAllObjectives += async e =>
                         {
                             _chatBox.OutputTo(player, $"All objectives completed!");
                             await Task.Delay(2000);
-                            jobSessionComponent.CreateObjectives();
+                            testJob.CreateObjectives();
                         };
-                        jobSessionComponent.CreateObjectives();
+                        testJob.CreateObjectives();
                     }
                 };
             }
         }
 
         {
-            if (element is RealmPickup pickup && pickup.Components.TryGetComponent(out NameComponent nameComponent) && nameComponent.Name.StartsWith("withText3d"))
+            if (element is RealmPickup pickup && pickup.ElementName != null && pickup.ElementName.StartsWith("withText3d"))
             {
                 pickup.CollisionDetection.AddRule<MustBePlayerOnFootOnlyRule>();
-                pickup.CollisionDetection.AddRule<MustNotHaveComponentRule<AttachedElementComponent>>();
+                pickup.CollisionDetection.AddRule<MustHaveNoWorldObjectAttachedRule>();
                 pickup.AddOpenGuiLogic<TestGui>();
             }
         }
 
         {
-            if (element is RealmPickup pickup && pickup.Components.TryGetComponent(out NameComponent nameComponent) && nameComponent.Name.StartsWith("testMarker"))
+            if (element is RealmPickup pickup && pickup.ElementName != null && pickup.ElementName.StartsWith("testMarker"))
             {
                 pickup.CollisionDetection.AddRule<MustBePlayerOnFootOnlyRule>();
                 pickup.CollisionDetection.Entered += (enteredPickup, element) =>
@@ -97,7 +97,7 @@ internal class SamplePickupsLogic
                 pickup.CollisionDetection.Left += (leftPickup, element) =>
                 {
                     _chatBox.OutputTo((RealmPlayer)element, $"Left marker");
-                };
+                };  
             }
         }
     }

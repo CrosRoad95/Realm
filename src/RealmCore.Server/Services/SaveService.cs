@@ -9,8 +9,8 @@ public interface ISaveService
     event Action<Element>? ElementSaved;
 
     Task<bool> Save(Element element, CancellationToken cancellationToken = default);
-    internal Task<int> SaveNewPlayerInventory(InventoryComponent inventoryComponent, int userId, CancellationToken cancellationToken = default);
-    internal Task<int> SaveNewVehicleInventory(InventoryComponent inventoryComponent, int vehicleId, CancellationToken cancellationToken = default);
+    internal Task<int> SaveNewPlayerInventory(Inventory inventory, int userId, CancellationToken cancellationToken = default);
+    internal Task<int> SaveNewVehicleInventory(Inventory inventory, int vehicleId, CancellationToken cancellationToken = default);
 }
 
 internal sealed class SaveService : ISaveService
@@ -97,70 +97,31 @@ internal sealed class SaveService : ISaveService
 
         vehicleData.Paintjob = vehicle.PaintJob;
         
-        var inventoryComponents = vehicle.Components.ComponentsList
-            .OfType<InventoryComponent>()
-            .Where(x => x.Id != 0)
-            .ToList();
-
-        if (inventoryComponents.Count != 0)
-        {
-            foreach (var inventory in vehicleData.Inventories)
-            {
-                var inventoryComponent = inventoryComponents.Where(x => x.Id == inventory.Id).First();
-                inventory.Size = inventoryComponent.Size;
-                inventory.InventoryItems = MapItems(inventoryComponent);
-            }
-        }
-        else
-            vehicleData.Inventories = new List<InventoryData>();
-
+        if(vehicle.Inventory.TryGetPrimary(out var inventory))
+            vehicleData.Inventories = [Inventory.CreateData(inventory)];
         vehicleData.LastUsed = vehicle.Persistance.LastUsed;
-        await vehicle.GetRequiredService<IDb>().SaveChangesAsync(cancellationToken);
+        await vehicle.ServiceProvider.GetRequiredService<IDb>().SaveChangesAsync(cancellationToken);
         return true;
     }
 
-    private InventoryData MapInventory(InventoryComponent inventoryComponent)
+    public async Task<int> SaveNewPlayerInventory(Inventory inventory, int userId, CancellationToken cancellationToken = default)
     {
-        var inventory = new InventoryData
-        {
-            Size = inventoryComponent.Size,
-            Id = inventoryComponent.Id,
-            InventoryItems = MapItems(inventoryComponent),
-        };
-        return inventory;
-    }
-
-    private List<InventoryItemData> MapItems(InventoryComponent inventoryComponent)
-    {
-        var items = inventoryComponent.Items.Select(item => new InventoryItemData
-        {
-            Id = item.Id,
-            ItemId = item.ItemId,
-            Number = item.Number,
-            MetaData = JsonConvert.SerializeObject(item.MetaData, Formatting.None),
-        }).ToList();
-
-        return items;
-    }
-
-    public async Task<int> SaveNewPlayerInventory(InventoryComponent inventoryComponent, int userId, CancellationToken cancellationToken = default)
-    {
-        var inventory = MapInventory(inventoryComponent);
+        var inventoryData = Inventory.CreateData(inventory);
         _dbContext.UserInventories.Add(new UserInventoryData
         {
-            Inventory = inventory,
+            Inventory = inventoryData,
             UserId = userId
         });
         await _dbContext.SaveChangesAsync(cancellationToken);
         return inventory.Id;
     }
 
-    public async Task<int> SaveNewVehicleInventory(InventoryComponent inventoryComponent, int vehicleId, CancellationToken cancellationToken = default)
+    public async Task<int> SaveNewVehicleInventory(Inventory inventory, int vehicleId, CancellationToken cancellationToken = default)
     {
-        var inventory = MapInventory(inventoryComponent);
+        var inventoryData = Inventory.CreateData(inventory);
         _dbContext.VehicleInventories.Add(new VehicleInventoryData
         {
-            Inventory = inventory,
+            Inventory = inventoryData,
             VehicleId = vehicleId
         });
         await _dbContext.SaveChangesAsync(cancellationToken);
@@ -182,154 +143,6 @@ internal sealed class SaveService : ISaveService
             await item.SaveAsync(player);
 
         await db.SaveChangesAsync(cancellationToken);
-        //var userData = await _dbContext.Users
-        //    .IncludeAll()
-        //    .Where(x => x.Id == user.Id).FirstAsync();
-
-        //userData.Upgrades = user.Upgrades.Select(x => new UserUpgradeData
-        //{
-        //    UpgradeId = x
-        //}).ToList();
-
-        //userData.Settings = user.Settings.Select(x => new UserSettingData
-        //{
-        //    SettingId = x,
-        //    Value = user.GetSetting(x) ?? ""
-        //}).ToList();
-
-        //userData.Money = player.Money.Amount;
-
-        //if (player.TryGetComponent(out LicensesComponent licensesComponent))
-        //{
-        //    userData.Licenses = licensesComponent.Licenses.Select(x => new UserLicenseData
-        //    {
-        //        LicenseId = x.licenseId,
-        //        SuspendedReason = x.suspendedReason,
-        //        SuspendedUntil = x.suspendedUntil,
-        //    }).ToList();
-        //}
-        //else
-        //{
-        //    userData.Licenses = new List<UserLicenseData>();
-        //}
-
-        //if (player.TryGetComponent(out PlayTimeComponent playTimeComponent))
-        //{
-        //    userData.PlayTime = (ulong)playTimeComponent.TotalPlayTime.TotalSeconds;
-        //    playTimeComponent.Reset();
-        //}
-        //else
-        //    userData.PlayTime = 0;
-
-        //var inventoryComponents = player.Components.ComponentsList.OfType<InventoryComponent>()
-        //    .Where(x => x.Id != 0)
-        //    .ToList();
-
-        //if (inventoryComponents.Count != 0)
-        //{
-        //    foreach (var inventory in userData.Inventories)
-        //    {
-        //        var inventoryComponent = inventoryComponents.Where(x => x.Id == inventory.Id).First();
-        //        inventory.Size = inventoryComponent.Size;
-        //        inventory.InventoryItems = MapItems(inventoryComponent);
-        //    }
-        //}
-        //else
-        //    userData.Inventories = new List<InventoryData>();
-
-        //if (player.TryGetComponent(out StatisticsCounterComponent statisticsCounterComponent))
-        //{
-        //    userData.Stats = statisticsCounterComponent.GetStatsIds.Select(x => new UserStatData
-        //    {
-        //        StatId = x,
-        //        Value = statisticsCounterComponent.GetStat(x)
-        //    }).ToList();
-        //    _dbContext.UserStats.AddRange(userData.Stats);
-        //}
-        //else
-        //    userData.Stats = new List<UserStatData>();
-
-        //if (player.TryGetComponent(out AchievementsComponent achievementsComponent))
-        //{
-        //    userData.Achievements = achievementsComponent.Achievements.Select(x => new AchievementData
-        //    {
-        //        AchievementId = x.Key,
-        //        Value = JsonConvert.SerializeObject(x.Value.value, Formatting.None),
-        //        PrizeReceived = x.Value.rewardReceived,
-        //        Progress = x.Value.progress,
-        //    }).ToList();
-        //}
-        //else
-        //    userData.Achievements = new List<AchievementData>();
-
-        //if (player.TryGetComponent(out JobUpgradesComponent jobUpgradesComponent))
-        //{
-        //    userData.JobUpgrades = jobUpgradesComponent.Upgrades.Select(x => new JobUpgradeData
-        //    {
-        //        JobId = x.jobId,
-        //        UpgradeId = x.upgradeId,
-        //    }).ToList();
-        //}
-        //else
-        //    userData.JobUpgrades = new List<JobUpgradeData>();
-
-        //if (player.TryGetComponent(out JobStatisticsComponent jobStatisticsComponent))
-        //{
-        //    var newStatistics = jobStatisticsComponent.JobStatistics.Where(x => x.Value.sessionPoints > 0 || x.Value.sessionTimePlayed > 0);
-        //    foreach (var item in newStatistics)
-        //    {
-        //        var first = userData.JobStatistics.FirstOrDefault(x => x.JobId == item.Value.jobId && x.Date == jobStatisticsComponent.Date);
-        //        if (first == null)
-        //        {
-        //            userData.JobStatistics.Add(new JobStatisticsData
-        //            {
-        //                Date = jobStatisticsComponent.Date,
-        //                JobId = item.Key,
-        //                Points = item.Value.sessionPoints,
-        //                TimePlayed = item.Value.sessionTimePlayed
-        //            });
-        //        }
-        //        else
-        //        {
-        //            first.Points += item.Value.sessionPoints;
-        //            first.TimePlayed += item.Value.sessionTimePlayed;
-        //        }
-        //    }
-        //    jobStatisticsComponent.Reset();
-        //}
-        //else
-        //    userData.JobStatistics = new List<JobStatisticsData>();
-
-        //if (player.TryGetComponent(out DiscoveriesComponent discoveriesComponent))
-        //{
-        //    userData.Discoveries = discoveriesComponent.Discoveries.Select(x => new DiscoveryData
-        //    {
-        //        DiscoveryId = x,
-        //    }).ToList();
-        //}
-
-        //if (player.TryGetComponent(out LevelComponent levelComponent))
-        //{
-        //    userData.Level = levelComponent.Level;
-        //    userData.Experience = levelComponent.Experience;
-        //}
-        //else
-        //{
-        //    userData.Level = 0;
-        //    userData.Experience = 0;
-        //}
-
-        //if (player.TryGetComponent(out DiscordIntegrationComponent discordIntegrationComponent))
-        //{
-        //    userData.DiscordIntegration = new DiscordIntegrationData
-        //    {
-        //        DiscordUserId = discordIntegrationComponent.DiscordUserId
-        //    };
-        //}
-        //else
-        //{
-        //    userData.DiscordIntegration = null;
-        //}
 
         return true;
     }

@@ -16,14 +16,12 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<None Remove="Lua\Tools\components.lua" />
 		<None Remove="Lua\Tools\spawnMarkers.lua" />
 	</ItemGroup>
 
 	<ItemGroup>
 		<EmbeddedResource Include="Lua\admin.lua" />
 		<EmbeddedResource Include="Lua\debugDraw.lua" />
-		<EmbeddedResource Include="Lua\Tools\components.lua" />
 		<EmbeddedResource Include="Lua\Tools\elements.lua" />
 		<EmbeddedResource Include="Lua\Tools\spawnMarkers.lua" />
 	</ItemGroup>
@@ -35,7 +33,6 @@
 	<ItemGroup>
 	  <Using Include="RealmCore.Resources.Admin.Data" />
 	  <Using Include="RealmCore.Resources.Admin.Enums" />
-	  <Using Include="RealmCore.Resources.Admin.Messages" />
 	  <Using Include="RealmCore.Resources.Base.Interfaces" />
 	  <Using Include="SlipeServer.Packets.Definitions.Lua" />
 	  <Using Include="SlipeServer.Server.Elements" />

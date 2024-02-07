@@ -16,7 +16,6 @@
 
 	<ItemGroup>
 	  <Using Include="RealmCore.Server" />
-	  <Using Include="RealmCore.Server.Components.Players.Abstractions" />
 	  <Using Include="RealmCore.Server.Elements" />
 	  <Using Include="RealmCore.Server.Interfaces" />
 	  <Using Include="RealmCore.Server.Services.Players" />

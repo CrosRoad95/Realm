@@ -14,14 +14,13 @@ public sealed class InventoryCommand : IInGameCommand
 
     public Task Handle(RealmPlayer player, CommandArguments args, CancellationToken cancellationToken)
     {
-        if (player.TryGetComponent(out InventoryComponent inventoryComponent))
+        if(player.Inventory.TryGetPrimary(out var inventory))
         {
-            _chatBox.OutputTo(player, $"Inventory, {inventoryComponent.Number}/{inventoryComponent.Size}");
-            foreach (var item in inventoryComponent.Items)
+            _chatBox.OutputTo(player, $"Inventory, {inventory.Number}/{inventory.Size}");
+            foreach (var item in inventory.Items)
             {
                 _chatBox.OutputTo(player, $"Item, {item.ItemId} = {item.Name}");
             }
-
         }
 
         return Task.CompletedTask;

@@ -6,8 +6,6 @@ using RealmCore.Resources.GuiSystem;
 using SlipeServer.Net.Wrappers;
 using RealmCore.Server.Factories.Interfaces;
 using RealmCore.Tests.Classes;
-using Microsoft.AspNetCore.Identity;
-using System.Security.Claims;
 
 namespace RealmCore.Tests.TestServers;
 
@@ -115,8 +113,8 @@ internal class RealmTestingServer : TestingServer<RealmTestingPlayer>
     public void ForceUpdate()
     {
         var updateService = GetRequiredService<IUpdateService>();
-        updateService.RelayUpdate();
-        updateService.RelayRareUpdate();
+        updateService.InvokeUpdate();
+        updateService.InvokeRareUpdate();
     }
 
     public RealmPlayer CreatePlayer(bool withSerialAndIp = true, string name = "CrosRoad95")

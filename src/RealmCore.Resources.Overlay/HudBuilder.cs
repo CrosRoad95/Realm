@@ -21,7 +21,7 @@ internal class HudBuilder<TState> : IHudBuilder<TState>
     private int _id = 0;
 
     internal IEnumerable<LuaValue> HudElementsDefinitions => _luaValues;
-    public Action<DynamicHudElement>? DynamicHudComponentAdded { get; set; }
+    public Action<DynamicHudElement>? DynamicHudElementAdded { get; set; }
 
     public HudBuilder(TState defaultState, IAssetsService assetsService, Vector2 screenSize)
     {
@@ -66,7 +66,7 @@ internal class HudBuilder<TState> : IHudBuilder<TState>
     {
         var builder = new TextHudBuilder<TState>(AllocateId(), _state, _assetsService)
         {
-            DynamicHudComponentAdded = DynamicHudComponentAdded
+            DynamicHudElementAdded = DynamicHudElementAdded
         };
 
         try
@@ -75,7 +75,7 @@ internal class HudBuilder<TState> : IHudBuilder<TState>
         }
         finally
         {
-            builder.DynamicHudComponentAdded = null;
+            builder.DynamicHudElementAdded = null;
         }
         var textConstructionInfo = builder.Build();
         AddLuaValue(textConstructionInfo);

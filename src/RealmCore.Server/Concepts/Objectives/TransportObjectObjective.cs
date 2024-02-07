@@ -1,4 +1,6 @@
-﻿namespace RealmCore.Server.Concepts.Objectives;
+﻿using RealmCore.Server.Concepts.Interactions;
+
+namespace RealmCore.Server.Concepts.Objectives;
 
 public class TransportObjectObjective : Objective
 {
@@ -58,13 +60,13 @@ public class TransportObjectObjective : Objective
             var elementsInRange = _elementCollection.GetWithinRange(_destination, _range);
             foreach (var element in elementsInRange)
             {
-                if (element.TryGetComponent(out OwnerComponent ownerComponent))
+                if (element is RealmWorldObject worldObject)
                 {
-                    if (ownerComponent.OwningElement == Player)
+                    if (worldObject.Owner == Player)
                     {
-                        if (element.TryGetComponent(out LiftableWorldObjectComponent liftableWorldObjectComponent))
+                        if(worldObject.Interaction is LiftableInteraction liftableInteraction)
                         {
-                            if (liftableWorldObjectComponent.Owner == null)
+                            if (liftableInteraction.Owner == null)
                                 Complete(this, element);
                         }
                         else
@@ -74,13 +76,13 @@ public class TransportObjectObjective : Objective
             }
             foreach (var element in _scopedElementFactory.CreatedElements.ToList())
             {
-                if (element.TryGetComponent(out OwnerComponent ownerComponent))
+                if (element is RealmWorldObject worldObject)
                 {
-                    if (ownerComponent.OwningElement == Player)
+                    if (worldObject.Owner == Player)
                     {
-                        if (element.TryGetComponent(out LiftableWorldObjectComponent liftableWorldObjectComponent))
+                        if (worldObject.Interaction is LiftableInteraction liftableInteraction)
                         {
-                            if (liftableWorldObjectComponent.Owner == null)
+                            if (liftableInteraction.Owner == null)
                                 Complete(this, element);
                         }
                         else
@@ -93,9 +95,12 @@ public class TransportObjectObjective : Objective
         {
             if(Vector3.DistanceSquared(_element.Position, _destination) <= (_range * _range))
             {
-                if(_element.TryGetComponent(out LiftableWorldObjectComponent liftableWorldObjectComponent))
-                    if (liftableWorldObjectComponent.Owner == null)
-                        Complete(this, _element);
+                if (_element is RealmWorldObject worldObject)
+                {
+                    if (worldObject.Interaction is LiftableInteraction liftableInteraction)
+                        if (liftableInteraction.Owner == null)
+                            Complete(this, _element);
+                }
             }
         }
     }

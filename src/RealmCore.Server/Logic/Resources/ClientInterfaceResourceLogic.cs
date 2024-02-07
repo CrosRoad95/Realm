@@ -1,6 +1,4 @@
-﻿using RealmCore.Server.Components.Abstractions;
-
-namespace RealmCore.Server.Logic.Resources;
+﻿namespace RealmCore.Server.Logic.Resources;
 
 internal sealed class ClientInterfaceResourceLogic
 {
@@ -20,35 +18,17 @@ internal sealed class ClientInterfaceResourceLogic
 
     private void HandleElementCreated(Element element)
     {
-        if(element is IComponents components)
+        if(element is IFocusableElement focusableElement)
         {
+            _clientInterfaceService.AddFocusable(element);
             element.Destroyed += HandleElementDestroyed;
-            components.Components.ComponentAdded += HandleComponentAdded;
         }
     }
 
     private void HandleElementDestroyed(Element element)
     {
-        if (element is IComponents components)
-        {
-            components.Components.ComponentAdded -= HandleComponentAdded;
-        }
-    }
-
-    private void HandleComponentAdded(IComponent component)
-    {
-        if (component is InteractionComponent interactionComponent)
-        {
-            _clientInterfaceService.AddFocusable(component.Element);
-            interactionComponent.Detached += HandleInteractionComponentDetachedFromElement;
-        }
-    }
-
-    private void HandleInteractionComponentDetachedFromElement(IComponentLifecycle component)
-    {
-        var interactionComponent = (InteractionComponent)component;
-        interactionComponent.Detached -= HandleInteractionComponentDetachedFromElement;
-        _clientInterfaceService.RemoveFocusable(interactionComponent.Element);
+        _clientInterfaceService.RemoveFocusable(element);
+        element.Destroyed -= HandleElementDestroyed;
     }
 
     private void HandleClientErrorMessage(Player player, string message, int level, string file, int line)

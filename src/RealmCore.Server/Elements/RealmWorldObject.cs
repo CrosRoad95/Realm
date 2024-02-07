@@ -1,62 +1,88 @@
-﻿namespace RealmCore.Server.Elements;
+﻿using RealmCore.Server.Concepts.Interactions;
 
-public class RealmWorldObject : WorldObject, IComponents
+namespace RealmCore.Server.Elements;
+
+public class RealmWorldObject : WorldObject, IInteraction
 {
-    public Concepts.Components Components { get; private set; }
+    private object _lock = new();
+    private RealmPlayer? _owner;
+    private Interaction? _interaction;
 
-    public RealmWorldObject(IServiceProvider serviceProvider, ObjectModel model, Vector3 position) : base(model, position)
-    {
-        Components = new(serviceProvider, this);
-    }
+    public RealmPlayer? Owner => _owner;
 
-    public TComponent GetRequiredComponent<TComponent>() where TComponent : IComponent
+    public event Action<RealmWorldObject, RealmPlayer?>? OwnerChanged;
+    public event Action<Element, Interaction?, Interaction?>? InteractionChanged;
+    public Interaction? Interaction
     {
-        return Components.GetRequiredComponent<TComponent>();
-    }
-
-    public bool TryDestroyComponent<TComponent>() where TComponent : IComponent
-    {
-        return Components.TryDestroyComponent<TComponent>();
-    }
-
-    public void DestroyComponent<TComponent>() where TComponent : IComponent
-    {
-        Components.DestroyComponent<TComponent>();
-    }
-
-    public void DestroyComponent<TComponent>(TComponent component) where TComponent : IComponent
-    {
-        Components.DestroyComponent(component);
-    }
-
-    public bool TryGetComponent<TComponent>(out TComponent component) where TComponent : IComponent
-    {
-        if (Components.TryGetComponent(out TComponent tempComponent))
+        get => _interaction; set
         {
-            component = tempComponent;
-            return true;
+            if (_interaction != value)
+            {
+                var previous = _interaction;
+                _interaction = value;
+                InteractionChanged?.Invoke(this, previous, value);
+            }
         }
-        component = default!;
-        return false;
     }
 
-    public bool HasComponent<TComponent>() where TComponent : IComponent
+    public RealmWorldObject(ObjectModel model, Vector3 position) : base(model, position)
     {
-        return Components.HasComponent<TComponent>();
+        Destroyed += HandleDestroyed;
     }
 
-    public TComponent AddComponent<TComponent>() where TComponent : IComponent, new()
+    public bool TrySetOwner(RealmPlayer player)
     {
-        return Components.AddComponent<TComponent>();
+        lock (_lock)
+        {
+            if (_owner != null)
+                return false;
+
+            _owner = player;
+            _owner.Destroyed += HandleOwnerDestroyed;
+        }
+        OwnerChanged?.Invoke(this, player);
+        return true;
     }
 
-    public TComponent AddComponent<TComponent>(TComponent component) where TComponent : IComponent
+    public bool TryRemoveOwner(RealmPlayer? player)
     {
-        return Components.AddComponent(component);
+        lock (_lock)
+        {
+            if (_owner == null)
+                return false;
+
+            if (player != null && _owner != player)
+            {
+                return false;
+            }
+
+            _owner.Destroyed -= HandleOwnerDestroyed;
+            _owner = null;
+        }
+        OwnerChanged?.Invoke(this, null);
+        return true;
     }
 
-    public TComponent AddComponentWithDI<TComponent>(params object[] parameters) where TComponent : IComponent
+    private void HandleOwnerDestroyed(Element obj)
     {
-        return Components.AddComponentWithDI<TComponent>(parameters);
+        Destroy();
+        if (_owner != null)
+        {
+            _owner.Destroyed -= HandleOwnerDestroyed;
+            _owner = null;
+        }
+    }
+
+    private void HandleDestroyed(Element obj)
+    {
+        lock (_lock)
+        {
+            if (_owner == null)
+                return;
+
+            _owner.Destroyed += HandleOwnerDestroyed;
+            _owner = null;
+        }
+        OwnerChanged?.Invoke(this, null);
     }
 }

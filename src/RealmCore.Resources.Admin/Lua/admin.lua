@@ -4,7 +4,6 @@ local enabledTools = {}
 local elements = {}
 local spawnMarkers = {}
 local toolIdsInUse = {}
-local elementsComponents = {}
 
 function getElements()
     return elements;
@@ -12,10 +11,6 @@ end
 
 function getSpawnMarkers()
     return spawnMarkers;
-end
-
-function getElementsComponents()
-    return elementsComponents;
 end
 
 addEvent("internalOnAdminModeEnabled", false)
@@ -125,13 +120,6 @@ function handleClearSpawnMarkers()
     spawnMarkers = {};
 end
 
-function handleUpdateElementsComponents(data)
-    elementsComponents = data;
-end
-
-function handleClearElementsComponents()
-    elementsComponents = {}
-end
 
 addEventHandler("onClientResourceStart", resourceRoot, function()
 	hubBind("SetAdminEnabled", handleSetAdminEnabled)
@@ -140,6 +128,4 @@ addEventHandler("onClientResourceStart", resourceRoot, function()
 	hubBind("ClearElements", handleClearElements)
 	hubBind("SetSpawnMarkers", handleSetSpawnMarkers)
 	hubBind("ClearSpawnMarkers", handleClearSpawnMarkers)
-	hubBind("UpdateElementsComponents", handleUpdateElementsComponents)
-	hubBind("ClearElementsComponents", handleClearElementsComponents)
 end)

@@ -3,6 +3,5 @@
 public enum AdminTool
 {
     Elements,
-    Components,
     ShowSpawnMarkers,
 }

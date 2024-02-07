@@ -10,7 +10,6 @@ internal class AdminResource : Resource
         ["debugDraw.lua"] = ResourceFiles.DebugDraw,
         ["admin.lua"] = ResourceFiles.Admin,
         ["tools/elements.lua"] = ResourceFiles.ToolElements,
-        ["tools/components.lua"] = ResourceFiles.ToolComponents,
         ["tools/spawnMarkers.lua"] = ResourceFiles.ToolSpawnMarkers,
     };
 

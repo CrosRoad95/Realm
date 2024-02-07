@@ -4,24 +4,22 @@
 public sealed class TakeItemCommand : IInGameCommand
 {
     private readonly ILogger<TakeItemCommand> _logger;
-    private readonly ItemsRegistry _itemsRegistry;
     private readonly ChatBox _chatBox;
 
-    public TakeItemCommand(ILogger<TakeItemCommand> logger, ItemsRegistry itemsRegistry, ChatBox chatBox)
+    public TakeItemCommand(ILogger<TakeItemCommand> logger, ChatBox chatBox)
     {
         _logger = logger;
-        _itemsRegistry = itemsRegistry;
         _chatBox = chatBox;
     }
 
     public Task Handle(RealmPlayer player, CommandArguments args, CancellationToken cancellationToken)
     {
-        if (player.TryGetComponent(out InventoryComponent inventoryComponent))
+        if (player.Inventory.TryGetPrimary(out var inventory))
         {
             uint itemId = args.ReadUInt();
             uint count = args.ReadUInt();
-            inventoryComponent.RemoveItem(itemId);
-            _chatBox.OutputTo(player, $"Item removed, {inventoryComponent.Number}/{inventoryComponent.Size}");
+            inventory.RemoveItem(itemId);
+            _chatBox.OutputTo(player, $"Item removed, {inventory.Number}/{inventory.Size}");
         }
 
         return Task.CompletedTask;

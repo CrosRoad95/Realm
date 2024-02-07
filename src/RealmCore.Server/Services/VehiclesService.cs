@@ -1,6 +1,4 @@
-﻿using RealmCore.Server.Json.Converters;
-
-namespace RealmCore.Server.Services;
+﻿namespace RealmCore.Server.Services;
 
 public interface IVehiclesService
 {
@@ -75,7 +73,7 @@ internal sealed class VehiclesService : IVehiclesService
     public async Task<RealmVehicle> CreatePersistantVehicle(ushort model, Vector3 position, Vector3 rotation, CancellationToken cancellationToken = default)
     {
         var vehicle = _elementFactory.CreateVehicle(model, position, rotation);
-        var vehicleData = await vehicle.GetRequiredService<IVehicleRepository>().CreateVehicle(model, _dateTimeProvider.Now, cancellationToken);
+        var vehicleData = await vehicle.ServiceProvider.GetRequiredService<IVehicleRepository>().CreateVehicle(model, _dateTimeProvider.Now, cancellationToken);
         try
         {
             TrySetActive(vehicleData.Id, vehicle);
@@ -144,23 +142,7 @@ internal sealed class VehiclesService : IVehiclesService
             vehicle =>
             {
                 TrySetActive(vehicleData.Id, vehicle);
-                var components = vehicle.Components;
                 vehicle.Persistance.Load(vehicleData);
-
-                if (vehicleData.Inventories != null && vehicleData.Inventories.Count != 0)
-                {
-                    foreach (var inventory in vehicleData.Inventories)
-                    {
-                        var items = inventory.InventoryItems
-                            .Select(x =>
-                                new Item(_itemsRegistry, x.ItemId, x.Number, JsonConvert.DeserializeObject<Metadata>(x.MetaData, _jsonSerializerSettings))
-                            )
-                            .ToList();
-                        components.AddComponent(new InventoryComponent(inventory.Size, inventory.Id, items));
-                    }
-                }
-
-                return []; // TODO:
             });
 
         await SetVehicleSpawned(vehicle, true, cancellationToken);

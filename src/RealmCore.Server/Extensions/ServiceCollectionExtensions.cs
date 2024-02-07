@@ -1,4 +1,5 @@
 ﻿using RealmCore.Server.Factories;
+using RealmCore.Server.Services.Elements;
 
 namespace RealmCore.Server.Extensions;
 
@@ -114,6 +115,7 @@ public static class ServiceCollectionExtensions
         services.AddPlayerScopedService<IPlayerFractionsService, PlayerFractionsService>();
         services.AddPlayerScopedService<IPlayerGuiService, PlayerGuiService>();
         services.AddPlayerScopedService<IPlayerHudService, PlayerHudService>();
+        services.AddPlayerScopedService<IPlayerInventoryService, PlayerInventoryService>();
         #endregion
 
         #region Vehicle services
@@ -126,6 +128,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IVehicleEnginesService, VehicleEnginesService>();
         services.AddScoped<IVehicleEventsService, VehicleEventsService>();
         services.AddScoped<IVehicleFuelService, VehicleFuelService>();
+        services.AddScoped<IVehicleInventoryService, VehicleInventoryService>();
         #endregion
 
         #region Policies

@@ -29,7 +29,7 @@ public class FocusableRealmWorldObject : RealmWorldObject, IFocusableElement
         }
     }
 
-    public FocusableRealmWorldObject(IServiceProvider serviceProvider, ObjectModel model, Vector3 position) : base(serviceProvider, model, position)
+    public FocusableRealmWorldObject(ObjectModel model, Vector3 position) : base(model, position)
     {
     }
 

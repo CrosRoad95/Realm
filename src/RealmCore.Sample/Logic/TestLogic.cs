@@ -1,7 +1,5 @@
 ﻿namespace RealmCore.Sample.Logic;
 
-public class TestComponent : Component { }
-
 internal class TestLogic
 {
     public TestLogic(IElementFactory elementFactory)

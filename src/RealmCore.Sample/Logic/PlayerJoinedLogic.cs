@@ -1,4 +1,6 @@
-﻿namespace RealmCore.Sample.Logic;
+﻿using RealmCore.Sample.Concepts.Gui.Dx;
+
+namespace RealmCore.Sample.Logic;
 
 internal sealed class PlayerJoinedLogic
 {
@@ -24,7 +26,6 @@ internal sealed class PlayerJoinedLogic
     private void HandleReady(RealmPlayer player)
     {
         _chatBox.OutputTo(player, "Browser ready");
-        //player.AddComponent<Counter2GuiComponent>();
     }
 
     private async Task HandleSignedInCore(RealmPlayer player)
@@ -74,7 +75,7 @@ internal sealed class PlayerJoinedLogic
         var admin = player.Admin;
         admin.DebugView = true;
         admin.DevelopmentMode = true;
-        admin.SetTools(new List<AdminTool> { AdminTool.Elements, AdminTool.Components, AdminTool.ShowSpawnMarkers });
+        admin.SetTools(new List<AdminTool> { AdminTool.Elements, AdminTool.ShowSpawnMarkers });
 
         if (player.Gui.Current == null)
         {
