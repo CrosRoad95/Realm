@@ -20,10 +20,10 @@ internal sealed class PlayerSessionsService : IPlayerSessionsService, IDisposabl
 {
     private readonly object _lock = new();
     private readonly List<Session> _sessions = [];
-    public RealmPlayer Player { get; }
     public event Action<IPlayerSessionsService, Session>? Started;
     public event Action<IPlayerSessionsService, Session>? Ended;
 
+    public RealmPlayer Player { get; init; }
     public PlayerSessionsService(PlayerContext playerContext)
     {
         Player = playerContext.Player;

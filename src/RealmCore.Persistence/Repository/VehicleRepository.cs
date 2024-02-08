@@ -118,6 +118,7 @@ internal sealed class VehicleRepository : IVehicleRepository
             .TagWithSource(nameof(VehicleRepository))
             .Where(x => !x.IsRemoved)
             .IncludeAll()
+            .AsSplitQuery()
             .IsSpawned();
 
         return await query.ToListAsync(cancellationToken);

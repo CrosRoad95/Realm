@@ -1,11 +1,13 @@
-﻿namespace RealmCore.Server.Services.Players;
+﻿using RealmCore.Server.Dto;
 
-public interface IPlayerEventsService : IPlayerService, IEnumerable<UserEventDTO>
+namespace RealmCore.Server.Services.Players;
+
+public interface IPlayerEventsService : IPlayerService, IEnumerable<UserEventDto>
 {
-    event Action<IPlayerEventsService, IEnumerable<UserEventDTO>>? Added;
+    event Action<IPlayerEventsService, IEnumerable<UserEventDto>>? Added;
 
     void Add(int eventType, string? metadata = null);
-    Task<List<UserEventDTO>> FetchMore(int count = 10, CancellationToken cancellationToken = default);
+    Task<List<UserEventDto>> FetchMore(int count = 10, CancellationToken cancellationToken = default);
     IReadOnlyCollection<UserEventData> Get(IEnumerable<int>? events = null, int limit = 10);
 }
 
@@ -16,8 +18,8 @@ internal class PlayerEventsService : IPlayerEventsService
     private readonly IDateTimeProvider _dateTimeProvider;
     private readonly IDb _db;
     private ICollection<UserEventData> _userEventData = [];
-    public event Action<IPlayerEventsService, IEnumerable<UserEventDTO>>? Added;
-    public RealmPlayer Player { get; private set; }
+    public event Action<IPlayerEventsService, IEnumerable<UserEventDto>>? Added;
+    public RealmPlayer Player { get; init; }
     public PlayerEventsService(PlayerContext playerContext, IPlayerUserService playerUserService, IDateTimeProvider dateTimeProvider, IDb db)
     {
         Player = playerContext.Player;
@@ -54,7 +56,7 @@ internal class PlayerEventsService : IPlayerEventsService
         }
     }
 
-    public async Task<List<UserEventDTO>> FetchMore(int count = 10, CancellationToken cancellationToken = default)
+    public async Task<List<UserEventDto>> FetchMore(int count = 10, CancellationToken cancellationToken = default)
     {
         var last = _userEventData.LastOrDefault();
         if (last == null)
@@ -71,7 +73,7 @@ internal class PlayerEventsService : IPlayerEventsService
 
             var results = await query.ToListAsync(cancellationToken);
 
-            return results.Select(UserEventDTO.Map).ToList();
+            return results.Select(UserEventDto.Map).ToList();
         }
         finally
         {
@@ -93,7 +95,7 @@ internal class PlayerEventsService : IPlayerEventsService
             _userEventData.Add(userEvent);
         }
         _playerUserService.IncreaseVersion();
-        Added?.Invoke(this, [UserEventDTO.Map(userEvent)]);
+        Added?.Invoke(this, [UserEventDto.Map(userEvent)]);
     }
 
     public IReadOnlyCollection<UserEventData> Get(IEnumerable<int>? events = null, int limit = 10)
@@ -105,10 +107,10 @@ internal class PlayerEventsService : IPlayerEventsService
         }
     }
 
-    public IEnumerator<UserEventDTO> GetEnumerator()
+    public IEnumerator<UserEventDto> GetEnumerator()
     {
         lock (_lock)
-            return _userEventData.Select(UserEventDTO.Map).ToList().GetEnumerator();
+            return _userEventData.Select(UserEventDto.Map).ToList().GetEnumerator();
     }
 
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();

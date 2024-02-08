@@ -1,4 +1,7 @@
-﻿using RealmCore.Server.Services.Elements;
+﻿using RealmCore.Server.Modules.Players.Gui;
+using RealmCore.Server.Modules.Players.Gui.Browser;
+using RealmCore.Server.Modules.Players.Gui.Dx;
+using RealmCore.Server.Services.Elements;
 
 namespace RealmCore.Server.Elements;
 
@@ -227,7 +230,7 @@ public class RealmPlayer : Player, IDisposable
 
     public bool TrySpawnAtLastPosition()
     {
-        var lastTransformAndMotion = User.LastTransformAndMotion;
+        var lastTransformAndMotion = User.User.LastTransformAndMotion;
         if (lastTransformAndMotion != null)
         {
             Spawn(lastTransformAndMotion.Position, lastTransformAndMotion.Rotation);

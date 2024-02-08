@@ -11,7 +11,9 @@ internal sealed class VehicleFuelService : IVehicleFuelService
     private readonly object _lock = new();
     private ICollection<VehicleFuelData> _vehicleFuelData = [];
     private readonly List<FuelContainer> _fuelContainers = [];
-    public RealmVehicle Vehicle { get; }
+
+    public RealmVehicle Vehicle { get; init; }
+
     public VehicleFuelService(VehicleContext vehicleContext, IVehiclePersistanceService persistanceService)
     {
         Vehicle = vehicleContext.Vehicle;

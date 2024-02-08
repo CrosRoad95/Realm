@@ -1,12 +1,14 @@
-﻿namespace RealmCore.Server.Services.Players;
+﻿using RealmCore.Server.Dto;
 
-public interface IPlayerLicensesService : IPlayerService, IEnumerable<LicenseDTO>
+namespace RealmCore.Server.Services.Players;
+
+public interface IPlayerLicensesService : IPlayerService, IEnumerable<LicenseDto>
 {
     event Action<IPlayerLicensesService, int>? Added;
     event Action<IPlayerLicensesService, int, DateTime, string?>? Suspended;
     event Action<IPlayerLicensesService, int>? UnSuspended;
 
-    LicenseDTO? Get(int licenseId);
+    LicenseDto? Get(int licenseId);
     bool Has(int licenseId, bool includeSuspended = false);
     bool IsSuspended(int licenseId);
     void Suspend(int licenseId, TimeSpan timeSpan, string? reason = null);
@@ -14,7 +16,7 @@ public interface IPlayerLicensesService : IPlayerService, IEnumerable<LicenseDTO
     void UnSuspend(int licenseId);
 }
 
-internal class PlayerLicensesService : IPlayerLicensesService
+internal sealed class PlayerLicensesService : IPlayerLicensesService
 {
     private readonly object _lock = new();
     private readonly IDateTimeProvider _dateTimeProvider;
@@ -24,7 +26,7 @@ internal class PlayerLicensesService : IPlayerLicensesService
     public event Action<IPlayerLicensesService, int>? Added;
     public event Action<IPlayerLicensesService, int, DateTime, string?>? Suspended;
     public event Action<IPlayerLicensesService, int>? UnSuspended;
-    public RealmPlayer Player { get; private set; }
+    public RealmPlayer Player { get; init; }
     public PlayerLicensesService(PlayerContext playerContext, IDateTimeProvider dateTimeProvider, IPlayerUserService playerUserService)
     {
         Player = playerContext.Player;
@@ -46,10 +48,10 @@ internal class PlayerLicensesService : IPlayerLicensesService
             _licenses = [];
     }
 
-    public LicenseDTO? Get(int licenseId)
+    public LicenseDto? Get(int licenseId)
     {
         lock (_lock)
-            return LicenseDTO.Map(_licenses.Where(x => x.LicenseId == licenseId).FirstOrDefault());
+            return LicenseDto.Map(_licenses.Where(x => x.LicenseId == licenseId).FirstOrDefault());
     }
 
     public bool IsSuspended(int licenseId)
@@ -128,10 +130,10 @@ internal class PlayerLicensesService : IPlayerLicensesService
         }
     }
 
-    public IEnumerator<LicenseDTO> GetEnumerator()
+    public IEnumerator<LicenseDto> GetEnumerator()
     {
         lock (_lock)
-            return new List<LicenseDTO>(_licenses.Select(LicenseDTO.Map)).AsReadOnly().GetEnumerator();
+            return new List<LicenseDto>(_licenses.Select(LicenseDto.Map)).AsReadOnly().GetEnumerator();
     }
 
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();

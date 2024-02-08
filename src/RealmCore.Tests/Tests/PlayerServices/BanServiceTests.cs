@@ -3,16 +3,16 @@
 public class BanServiceTests
 {
     [Fact]
-    public async Task BanShouldWork()
+    public void BanShouldWork()
     {
         var realmTestingServer = new RealmTestingServer();
         var player = realmTestingServer.CreatePlayer();
 
-        await realmTestingServer.GetRequiredService<IDb>().MigrateAsync();
-        var ban = player.Bans;
+        //await realmTestingServer.GetRequiredService<IDb>().MigrateAsync();
+        var bans = player.Bans;
 
-        ban.Add(type: 0, reason: "sample reason");
-        var isBanned = ban.IsBanned(0);
+        bans.Add(type: 0, reason: "sample reason");
+        var isBanned = bans.IsBanned(0);
         isBanned.Should().BeTrue();
     }
 }

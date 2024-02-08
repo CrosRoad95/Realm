@@ -5,6 +5,48 @@ namespace RealmCore.Tests.Tests;
 
 public class RealmPlayerTests
 {
+    [Fact]
+    public async Task SavingAndLoadingPlayerShouldWork()
+    {
+        var realmTestingServer = new RealmTestingServer();
+        var now = realmTestingServer.TestDateTimeProvider.Now;
+        {
+            var player = realmTestingServer.CreatePlayer();
+            player.Name = "foo";
+            await realmTestingServer.SignInPlayer(player);
+
+            player.Position = new Vector3(1, 2, 3);
+            player.Money.Amount = 12.345m;
+            player.DailyVisits.Update(now.AddHours(24));
+            player.DailyVisits.VisitsInRow.Should().Be(2);
+            player.Settings.Set(1, "test");
+            player.Bans.Add(1);
+            player.Upgrades.TryAdd(1);
+
+            await realmTestingServer.GetRequiredService<ISaveService>().Save(player);
+            player.TriggerDisconnected(QuitReason.Quit);
+
+            player.Money.Amount.Should().Be(0);
+        }
+
+        realmTestingServer.TestDateTimeProvider.AddOffset(TimeSpan.FromDays(1));
+
+        {
+            var player = realmTestingServer.CreatePlayer();
+            player.Name = "foo";
+            await realmTestingServer.SignInPlayer(player);
+            player.TrySpawnAtLastPosition();
+
+            player.Position.Should().Be(new Vector3(1, 2, 3));
+            player.Money.Amount.Should().Be(12.345m);
+            player.DailyVisits.VisitsInRow.Should().Be(2);
+            player.DailyVisits.LastVisit.Should().Be(realmTestingServer.TestDateTimeProvider.Now.Date);
+            player.Settings.Get(1).Should().Be("test");
+            player.Bans.IsBanned(1).Should().BeTrue();
+            player.Upgrades.Has(1).Should().BeTrue();
+        }
+    }
+
     //[Fact]
     public async Task Test1()
     {

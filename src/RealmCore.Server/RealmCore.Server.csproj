@@ -189,7 +189,7 @@
 		<Using Include="RealmCore.Persistence.DTOs" />
 		<Using Include="RealmCore.Persistence.Extensions" />
 		<Using Include="RealmCore.Server.Utilities" />
-		<Using Include="RealmCore.Server.DTOs" />
+		<Using Include="RealmCore.Server.Dto" />
 		<Using Include="RealmCore.Server.Elements" />
 		<Using Include="SlipeServer.Server.Resources.Providers" />
 		<Using Include="RealmCore.Server.Scopes" />
@@ -208,6 +208,7 @@
 		<Using Include="RealmCore.Server.Behaviours" />
 		<Using Include="RealmCore.Resources.Browser" />
 		<Using Include="RealmCore.Server.Json.Converters" />
+		<Using Include="RealmCore.Server.Services.Integrations" />
 	</ItemGroup>
 
 </Project>

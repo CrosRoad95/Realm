@@ -14,6 +14,7 @@ public interface IPlayerAFKService : IPlayerService
 
 internal sealed class PlayerAFKService : IPlayerAFKService
 {
+    private readonly object _lock = new();
     public DateTime? LastAFK { get; private set; }
     public bool IsAFK { get; private set; }
     public event Action<IPlayerAFKService, bool, TimeSpan>? StateChanged;
@@ -21,8 +22,7 @@ internal sealed class PlayerAFKService : IPlayerAFKService
     private readonly IOptionsMonitor<GameplayOptions> _gameplayOptions;
     private readonly IDateTimeProvider _dateTimeProvider;
     private readonly IDebounce _debounce;
-    private readonly object _lock = new();
-    public RealmPlayer Player { get; private set; }
+    public RealmPlayer Player { get; init; }
     public PlayerAFKService(PlayerContext playerContext, IOptionsMonitor<GameplayOptions> gameplayOptions, IDateTimeProvider dateTimeProvider, IDebounceFactory debounceFactory)
     {
         Player = playerContext.Player;

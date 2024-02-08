@@ -4,6 +4,9 @@ public interface IVehiclePartDamageService : IVehicleService
 {
     IReadOnlyList<short> Parts { get; }
 
+    /// <summary>
+    /// Triggered when part damage drop to zero.
+    /// </summary>
     event Action<IVehiclePartDamageService, short>? PartDestroyed;
 
     void AddPart(short partId, float state);
@@ -14,13 +17,10 @@ public interface IVehiclePartDamageService : IVehicleService
     bool TryGetState(short partId, out float state);
 }
 
-public class VehiclePartDamageService : IVehiclePartDamageService
+internal sealed class VehiclePartDamageService : IVehiclePartDamageService
 {
-    private object _lock = new();
+    private readonly object _lock = new();
     private ICollection<VehiclePartDamageData> _vehiclePartDamages = [];
-    /// <summary>
-    /// Triggered when part damage drop to zero.
-    /// </summary>
     public event Action<IVehiclePartDamageService, short>? PartDestroyed;
 
     public IReadOnlyList<short> Parts
@@ -34,7 +34,8 @@ public class VehiclePartDamageService : IVehiclePartDamageService
         }
     }
 
-    public RealmVehicle Vehicle { get; }
+    public RealmVehicle Vehicle { get; init; }
+
     public VehiclePartDamageService(VehicleContext vehicleContext, IVehiclePersistanceService vehiclePersistanceService)
     {
         Vehicle = vehicleContext.Vehicle;

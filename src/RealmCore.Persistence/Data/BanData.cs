@@ -12,4 +12,6 @@ public sealed class BanData
     public bool Active { get; set; }
 
     public UserData? User { get; set; }
+
+    public bool IsActive(DateTime now) => Active && End > now;
 }

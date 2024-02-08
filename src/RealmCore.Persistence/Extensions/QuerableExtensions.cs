@@ -47,8 +47,7 @@ public static class QuerableExtensions
             .Include(x => x.VehicleEngines)
             .Include(x => x.Inventories)
             .ThenInclude(x => x!.InventoryItems)
-            .Include(x => x.UserAccesses)
-            .ThenInclude(x => x.User);
+            .Include(x => x.UserAccesses);
     }
 
     public static IQueryable<VehicleData> IsSpawned(this IQueryable<VehicleData> query)

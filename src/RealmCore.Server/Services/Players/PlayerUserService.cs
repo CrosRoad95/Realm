@@ -1,6 +1,4 @@
-﻿using RealmCore.Persistence.Data.Helpers;
-
-namespace RealmCore.Server.Services.Players;
+﻿namespace RealmCore.Server.Services.Players;
 
 public interface IPlayerUserService : IPlayerService
 {
@@ -11,22 +9,17 @@ public interface IPlayerUserService : IPlayerService
     string UserName { get; }
     DateTime? LastNewsReadDateTime { get; }
     bool IsSignedIn { get; }
-    TransformAndMotion? LastTransformAndMotion { get; internal set; }
     DateTime? RegisteredDateTime { get; }
+    string[] AuthorizedPolicies { get; }
 
     event Action<IPlayerUserService, RealmPlayer>? SignedIn;
     event Action<IPlayerUserService, RealmPlayer>? SignedOut;
 
-    void AddAuthorizedPolicy(string policy, bool authorized);
-    bool AddClaim(string type, string value);
-    bool AddClaims(Dictionary<string, string> claims);
-    bool AddRole(string role);
-    bool AddRoles(IEnumerable<string> roles);
     IReadOnlyList<string> GetClaims();
-    string? GetClaimValue(string type);
     IReadOnlyList<string> GetRoles();
+    string? GetClaimValue(string type);
     bool HasAuthorizedPolicies(string[] policies);
-    bool HasAuthorizedPolicy(string policy, out bool authorized);
+    bool HasAuthorizedPolicy(string policy);
     bool HasClaim(string type, string? value = null);
     bool IsInRole(string role);
     void SignIn(UserData user, ClaimsPrincipal claimsPrincipal);
@@ -37,19 +30,18 @@ public interface IPlayerUserService : IPlayerService
     void IncreaseVersion();
     int GetVersion();
     bool TryFlushVersion(int minimalVersion);
+    internal bool AddClaim(string type, string value);
+    internal bool AddClaims(Dictionary<string, string> claims);
+    internal bool AddRole(string role);
+    internal bool AddRoles(IEnumerable<string> roles);
+    internal void SetAuthorizedPolicyState(string policy, bool authorized);
 }
 
 internal sealed class PlayerUserService : IPlayerUserService, IDisposable
 {
-    private struct PolicyCache
-    {
-        public string policy;
-        public bool authorized;
-    }
-
-    private UserData? _user;
     private readonly object _lock = new();
-    private readonly List<PolicyCache> _authorizedPolicies = [];
+    private UserData? _user;
+    private readonly Dictionary<string, bool> _authorizedPoliciesCache = [];
     private readonly IDateTimeProvider _dateTimeProvider;
     private readonly IUserEventRepository _userEventRepository;
     private ClaimsPrincipal? _claimsPrincipal;
@@ -63,12 +55,21 @@ internal sealed class PlayerUserService : IPlayerUserService, IDisposable
     public string UserName => _user?.UserName ?? throw new UserNotSignedInException();
     public DateTime? LastNewsReadDateTime => User.LastNewsReadDateTime;
     public DateTime? RegisteredDateTime => User.RegisteredDateTime;
-    public TransformAndMotion? LastTransformAndMotion { get => User.LastTransformAndMotion; set => User.LastTransformAndMotion = value; }
+
+    public string[] AuthorizedPolicies
+    {
+        get
+        {
+            lock (_lock)
+                return _authorizedPoliciesCache.Where(x => x.Value).Select(x => x.Key).ToArray();
+
+        }
+    }
 
     public event Action<IPlayerUserService, RealmPlayer>? SignedIn;
     public event Action<IPlayerUserService, RealmPlayer>? SignedOut;
 
-    public RealmPlayer Player { get; }
+    public RealmPlayer Player { get; init; }
     public PlayerUserService(PlayerContext playerContext, IDateTimeProvider dateTimeProvider, IUserEventRepository userEventRepository)
     {
         Player = playerContext.Player;
@@ -119,31 +120,21 @@ internal sealed class PlayerUserService : IPlayerUserService, IDisposable
         return false;
     }
 
-    public void AddAuthorizedPolicy(string policy, bool authorized)
+    public void SetAuthorizedPolicyState(string policy, bool authorized)
     {
         lock (_lock)
         {
-            _authorizedPolicies.Add(new PolicyCache
-            {
-                policy = policy,
-                authorized = authorized
-            });
+            _authorizedPoliciesCache[policy] = authorized;
         }
     }
 
-    public bool HasAuthorizedPolicy(string policy, out bool authorized)
+    public bool HasAuthorizedPolicy(string policy)
     {
         lock (_lock)
         {
-            var index = _authorizedPolicies.FindIndex(x => x.policy == policy);
-            if (index == -1)
-            {
-                authorized = false;
-                return false;
-            }
-
-            authorized = _authorizedPolicies[index].authorized;
-            return true;
+            if(_authorizedPoliciesCache.TryGetValue(policy, out var authorized))
+                return authorized;
+            return false;
         }
     }
 
@@ -153,11 +144,7 @@ internal sealed class PlayerUserService : IPlayerUserService, IDisposable
         {
             foreach (var policy in policies)
             {
-                var index = _authorizedPolicies.FindIndex(x => x.policy == policy);
-                if (index == -1)
-                    return false;
-
-                if (!_authorizedPolicies[index].authorized)
+                if (_authorizedPoliciesCache.TryGetValue(policy, out var authorized) && !authorized)
                     return false;
             }
             return true;
@@ -166,7 +153,8 @@ internal sealed class PlayerUserService : IPlayerUserService, IDisposable
 
     private void ClearAuthorizedPoliciesCache()
     {
-        _authorizedPolicies.Clear();
+        lock (_lock)
+            _authorizedPoliciesCache.Clear();
     }
 
     public bool IsInRole(string role)

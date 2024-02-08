@@ -1,26 +1,28 @@
-﻿namespace RealmCore.Server.Services.Players;
+﻿using RealmCore.Server.Dto;
 
-public interface IPlayerJobUpgradesService : IPlayerService, IEnumerable<JobUpgradeDTO>
+namespace RealmCore.Server.Services.Players;
+
+public interface IPlayerJobUpgradesService : IPlayerService, IEnumerable<JobUpgradeDto>
 {
-    event Action<IPlayerJobUpgradesService, JobUpgradeDTO>? Added;
-    event Action<IPlayerJobUpgradesService, JobUpgradeDTO>? Removed;
+    event Action<IPlayerJobUpgradesService, JobUpgradeDto>? Added;
+    event Action<IPlayerJobUpgradesService, JobUpgradeDto>? Removed;
 
-    IEnumerable<JobUpgradeDTO> GetAllByJobId(short jobId);
+    IEnumerable<JobUpgradeDto> GetAllByJobId(short jobId);
     bool Has(short jobId, int upgradeId);
     bool TryAdd(short jobId, int upgradeId);
     bool TryRemove(short jobId, int upgradeId);
 }
 
-internal class PlayerJobUpgradesService : IPlayerJobUpgradesService
+internal sealed class PlayerJobUpgradesService : IPlayerJobUpgradesService
 {
-    private ICollection<JobUpgradeData> _jobUpgrades = [];
     private readonly object _lock = new();
+    private ICollection<JobUpgradeData> _jobUpgrades = [];
     private readonly IPlayerUserService _playerUserService;
 
-    public event Action<IPlayerJobUpgradesService, JobUpgradeDTO>? Added;
-    public event Action<IPlayerJobUpgradesService, JobUpgradeDTO>? Removed;
+    public event Action<IPlayerJobUpgradesService, JobUpgradeDto>? Added;
+    public event Action<IPlayerJobUpgradesService, JobUpgradeDto>? Removed;
 
-    public RealmPlayer Player { get; private set; }
+    public RealmPlayer Player { get; init; }
     public PlayerJobUpgradesService(PlayerContext playerContext, IPlayerUserService playerUserService)
     {
         Player = playerContext.Player;
@@ -42,12 +44,13 @@ internal class PlayerJobUpgradesService : IPlayerJobUpgradesService
     }
 
     private JobUpgradeData? InternalGetUpgrade(short jobId, int upgradeId) => _jobUpgrades.FirstOrDefault(x => x.JobId == jobId && x.UpgradeId == upgradeId);
+
     private bool InternalHasUpgrade(short jobId, int upgradeId) => _jobUpgrades.Any(x => x.JobId == jobId && x.UpgradeId == upgradeId);
 
-    public IEnumerable<JobUpgradeDTO> GetAllByJobId(short jobId)
+    public IEnumerable<JobUpgradeDto> GetAllByJobId(short jobId)
     {
         lock (_lock)
-            return new List<JobUpgradeDTO>(_jobUpgrades.Where(x => x.JobId == jobId).Select(JobUpgradeDTO.Map));
+            return new List<JobUpgradeDto>(_jobUpgrades.Where(x => x.JobId == jobId).Select(JobUpgradeDto.Map));
     }
     
     public bool Has(short jobId, int upgradeId)
@@ -70,7 +73,7 @@ internal class PlayerJobUpgradesService : IPlayerJobUpgradesService
 
             _jobUpgrades.Add(jobUpgradeData);
             _playerUserService.IncreaseVersion();
-            Added?.Invoke(this, JobUpgradeDTO.Map(jobUpgradeData));
+            Added?.Invoke(this, JobUpgradeDto.Map(jobUpgradeData));
             return true;
         }
     }
@@ -84,16 +87,16 @@ internal class PlayerJobUpgradesService : IPlayerJobUpgradesService
                 return false;
             _jobUpgrades.Remove(upgrade);
             _playerUserService.IncreaseVersion();
-            Removed?.Invoke(this, JobUpgradeDTO.Map(upgrade));
+            Removed?.Invoke(this, JobUpgradeDto.Map(upgrade));
             return true;
         }
     }
 
-    public IEnumerator<JobUpgradeDTO> GetEnumerator()
+    public IEnumerator<JobUpgradeDto> GetEnumerator()
     {
         lock (_lock)
-            return new List<JobUpgradeDTO>(_jobUpgrades.Select(JobUpgradeDTO.Map)).GetEnumerator();
+            return new List<JobUpgradeDto>(_jobUpgrades.Select(JobUpgradeDto.Map)).GetEnumerator();
     }
 
-    System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator() => GetEnumerator();
+    IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 }

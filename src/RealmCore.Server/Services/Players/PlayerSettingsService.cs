@@ -1,6 +1,8 @@
-﻿namespace RealmCore.Server.Services.Players;
+﻿using RealmCore.Server.Dto;
 
-public interface IPlayerSettingsService : IPlayerService, IEnumerable<UserSettingDTO>
+namespace RealmCore.Server.Services.Players;
+
+public interface IPlayerSettingsService : IPlayerService, IEnumerable<UserSettingDto>
 {
     event Action<IPlayerSettingsService, int, string>? Changed;
     event Action<IPlayerSettingsService, int, string>? Removed;
@@ -12,16 +14,16 @@ public interface IPlayerSettingsService : IPlayerService, IEnumerable<UserSettin
     bool Has(int settingId);
 }
 
-internal class PlayerSettingsService : IPlayerSettingsService, IDisposable
+internal sealed class PlayerSettingsService : IPlayerSettingsService, IDisposable
 {
     private object _lock = new();
     private ICollection<UserSettingData> _settings = [];
     private readonly IPlayerUserService _playerUserService;
 
-    public RealmPlayer Player { get; }
     public event Action<IPlayerSettingsService, int, string>? Changed;
     public event Action<IPlayerSettingsService, int, string>? Removed;
 
+    public RealmPlayer Player { get; init; }
     public PlayerSettingsService(PlayerContext playerContext, IPlayerUserService playerUserService)
     {
         Player = playerContext.Player;
@@ -101,10 +103,10 @@ internal class PlayerSettingsService : IPlayerSettingsService, IDisposable
 
     }
 
-    public IEnumerator<UserSettingDTO> GetEnumerator()
+    public IEnumerator<UserSettingDto> GetEnumerator()
     {
         lock (_lock)
-            return new List<UserSettingDTO>(_settings.Select(UserSettingDTO.Map)).GetEnumerator();
+            return new List<UserSettingDto>(_settings.Select(UserSettingDto.Map)).GetEnumerator();
     }
 
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();

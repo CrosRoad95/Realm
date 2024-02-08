@@ -12,7 +12,7 @@ public interface IPlayerLevelService : IPlayerService
     void GiveExperience(uint amount);
 }
 
-internal class PlayerLevelService : IPlayerLevelService
+internal sealed class PlayerLevelService : IPlayerLevelService
 {
     private readonly object _lock = new();
     private readonly LevelsRegistry _levelsRegistry;
@@ -23,7 +23,7 @@ internal class PlayerLevelService : IPlayerLevelService
     public event Action<IPlayerLevelService, uint, bool>? LevelChanged;
     public event Action<IPlayerLevelService, uint>? ExperienceChanged;
 
-    public RealmPlayer Player { get; private set; }
+    public RealmPlayer Player { get; init; }
     public PlayerLevelService(PlayerContext playerContext, LevelsRegistry levelsRegistry, IPlayerUserService playerUserService)
     {
         Player = playerContext.Player;
@@ -63,23 +63,26 @@ internal class PlayerLevelService : IPlayerLevelService
     {
         get => _level; set
         {
-            if (value > _level)
+            lock (_lock)
             {
-                for (var i = _level; value > _level; i++)
+                if (value > _level)
                 {
-                    _level = i;
-                    LevelChanged?.Invoke(this, i, true);
+                    for (var i = _level; value > _level; i++)
+                    {
+                        _level = i;
+                        LevelChanged?.Invoke(this, i, true);
+                    }
                 }
-            }
-            else
-            {
-                for (var i = _level; value < _level; i--)
+                else
                 {
-                    _level = i;
-                    LevelChanged?.Invoke(this, i, false);
+                    for (var i = _level; value < _level; i--)
+                    {
+                        _level = i;
+                        LevelChanged?.Invoke(this, i, false);
+                    }
                 }
+                _level = value;
             }
-            _level = value;
         }
     }
 
@@ -87,11 +90,14 @@ internal class PlayerLevelService : IPlayerLevelService
     {
         get => _experience; set
         {
-            if (_experience != value)
+            lock (_lock)
             {
-                _experience = value;
-                CheckForNextLevel();
-                ExperienceChanged?.Invoke(this, value);
+                if (_experience != value)
+                {
+                    _experience = value;
+                    CheckForNextLevel();
+                    ExperienceChanged?.Invoke(this, value);
+                }
             }
         }
     }

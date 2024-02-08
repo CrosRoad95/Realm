@@ -1,27 +1,29 @@
-﻿namespace RealmCore.Server.Services.Vehicles;
+﻿using RealmCore.Server.Dto;
 
-public interface IVehicleAccessService : IVehicleService, IEnumerable<VehicleUserAccessDTO>
+namespace RealmCore.Server.Services.Vehicles;
+
+public interface IVehicleAccessService : IVehicleService, IEnumerable<VehicleUserAccessDto>
 {
-    IReadOnlyList<VehicleUserAccessDTO> Owners { get; }
+    IReadOnlyList<VehicleUserAccessDto> Owners { get; }
 
-    VehicleUserAccessDTO AddAccess(int userId, byte accessType, string? customValue = null);
-    VehicleUserAccessDTO AddAccess(RealmPlayer player, byte accessType, string? customValue = null);
-    VehicleUserAccessDTO AddAsOwner(RealmPlayer player, string? customValue = null);
-    VehicleUserAccessDTO AddAsOwner(int userId, string? customValue = null);
+    VehicleUserAccessDto AddAccess(int userId, byte accessType, string? customValue = null);
+    VehicleUserAccessDto AddAccess(RealmPlayer player, byte accessType, string? customValue = null);
+    VehicleUserAccessDto AddAsOwner(RealmPlayer player, string? customValue = null);
+    VehicleUserAccessDto AddAsOwner(int userId, string? customValue = null);
     bool HasAccess(RealmPlayer player);
     bool HasAccess(int userId);
     bool IsOwner(int userId);
     bool IsOwner(RealmPlayer player);
-    bool TryGetAccess(RealmPlayer player, out VehicleUserAccessDTO vehicleAccess);
+    bool TryGetAccess(RealmPlayer player, out VehicleUserAccessDto vehicleAccess);
 }
 
-internal class VehicleAccessService : IVehicleAccessService
+internal sealed class VehicleAccessService : IVehicleAccessService
 {
+    private readonly object _lock = new();
     private ICollection<VehicleUserAccessData> _userAccesses = [];
     private int VehicleId { get; set; }
-    private readonly object _lock = new();
 
-    public RealmVehicle Vehicle { get; }
+    public RealmVehicle Vehicle { get; init; }
 
     public VehicleAccessService(VehicleContext vehicleContext, IVehiclePersistanceService vehiclePersistanceService)
     {
@@ -35,12 +37,12 @@ internal class VehicleAccessService : IVehicleAccessService
         VehicleId = persistance.Id;
     }
 
-    public IReadOnlyList<VehicleUserAccessDTO> Owners
+    public IReadOnlyList<VehicleUserAccessDto> Owners
     {
         get
         {
             lock (_lock)
-                return new List<VehicleUserAccessDTO>(_userAccesses.Where(x => x.AccessType == 0).Select(VehicleUserAccessDTO.Map));
+                return new List<VehicleUserAccessDto>(_userAccesses.Where(x => x.AccessType == 0).Select(VehicleUserAccessDto.Map));
         }
     }
 
@@ -54,14 +56,14 @@ internal class VehicleAccessService : IVehicleAccessService
         return false;
     }
 
-    public bool TryGetAccess(int userId, out VehicleUserAccessDTO vehicleAccess)
+    public bool TryGetAccess(int userId, out VehicleUserAccessDto vehicleAccess)
     {
         lock (_lock)
         {
             var vehicleUserAccessData = _userAccesses.Where(x => x.UserId == userId).FirstOrDefault();
             if (vehicleUserAccessData != null)
             {
-                vehicleAccess = VehicleUserAccessDTO.Map(vehicleUserAccessData);
+                vehicleAccess = VehicleUserAccessDto.Map(vehicleUserAccessData);
                 return true;
             }
         }
@@ -69,7 +71,7 @@ internal class VehicleAccessService : IVehicleAccessService
         return false;
     }
 
-    public bool TryGetAccess(RealmPlayer player, out VehicleUserAccessDTO vehicleAccess)
+    public bool TryGetAccess(RealmPlayer player, out VehicleUserAccessDto vehicleAccess)
     {
         var userId = player.UserId;
         return TryGetAccess(userId, out vehicleAccess);
@@ -87,7 +89,7 @@ internal class VehicleAccessService : IVehicleAccessService
             return InternalHasAccess(userId);
     }
 
-    public VehicleUserAccessDTO AddAccess(int userId, byte accessType, string? customValue = null)
+    public VehicleUserAccessDto AddAccess(int userId, byte accessType, string? customValue = null)
     {
         lock (_lock)
         {
@@ -103,21 +105,21 @@ internal class VehicleAccessService : IVehicleAccessService
             };
 
             _userAccesses.Add(vehicleUserAccessData);
-            return VehicleUserAccessDTO.Map(vehicleUserAccessData);
+            return VehicleUserAccessDto.Map(vehicleUserAccessData);
         }
     }
 
-    public VehicleUserAccessDTO AddAccess(RealmPlayer player, byte accessType, string? customValue = null)
+    public VehicleUserAccessDto AddAccess(RealmPlayer player, byte accessType, string? customValue = null)
     {
         return AddAccess(player.UserId, accessType, customValue);
     }
 
-    public VehicleUserAccessDTO AddAsOwner(RealmPlayer player, string? customValue = null)
+    public VehicleUserAccessDto AddAsOwner(RealmPlayer player, string? customValue = null)
     {
         return AddAccess(player, 0, customValue);
     }
 
-    public VehicleUserAccessDTO AddAsOwner(int userId, string? customValue = null)
+    public VehicleUserAccessDto AddAsOwner(int userId, string? customValue = null)
     {
         return AddAccess(userId, 0, customValue);
     }
@@ -131,10 +133,10 @@ internal class VehicleAccessService : IVehicleAccessService
 
     public bool IsOwner(RealmPlayer player) => IsOwner(player.UserId);
 
-    public IEnumerator<VehicleUserAccessDTO> GetEnumerator()
+    public IEnumerator<VehicleUserAccessDto> GetEnumerator()
     {
         lock (_lock)
-            return new List<VehicleUserAccessDTO>(_userAccesses.Select(VehicleUserAccessDTO.Map)).GetEnumerator();
+            return new List<VehicleUserAccessDto>(_userAccesses.Select(VehicleUserAccessDto.Map)).GetEnumerator();
     }
 
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();

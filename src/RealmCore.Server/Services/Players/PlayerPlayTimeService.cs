@@ -12,7 +12,7 @@ public interface IPlayerPlayTimeService : IPlayerService
     void Reset();
 }
 
-internal class PlayerPlayTimeService : IPlayerPlayTimeService
+internal sealed class PlayerPlayTimeService : IPlayerPlayTimeService
 {
     private readonly object _lock = new();
     private DateTime _startDateTime;
@@ -29,7 +29,7 @@ internal class PlayerPlayTimeService : IPlayerPlayTimeService
     public TimeSpan PlayTime => _dateTimeProvider.Now - _startDateTime;
     public TimeSpan TotalPlayTime => PlayTime + TimeSpan.FromSeconds(_totalPlayTime);
 
-    public RealmPlayer Player { get; private set; }
+    public RealmPlayer Player { get; init; }
     public PlayerPlayTimeService(PlayerContext playerContext, IPlayerUserService playerUserService, IDateTimeProvider dateTimeProvider, IUpdateService updateService)
     {
         Player = playerContext.Player;

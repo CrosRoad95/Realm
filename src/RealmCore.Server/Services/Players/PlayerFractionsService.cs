@@ -13,7 +13,7 @@ internal sealed class PlayerFractionsService : IPlayerFractionsService
     private readonly SemaphoreSlim _lock = new(1);
     private readonly IPlayerUserService _playerUserService;
     private ICollection<FractionMemberData> _fractionMembers = [];
-    public RealmPlayer Player { get; private set; }
+    public RealmPlayer Player { get; init; }
     public PlayerFractionsService(PlayerContext playerContext, IPlayerUserService playerUserService)
     {
         Player = playerContext.Player;

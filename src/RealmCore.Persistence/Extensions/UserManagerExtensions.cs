@@ -94,6 +94,7 @@ public static class UserManagerExtensions
         var query = userManager.Users
             .TagWithSource(nameof(UserManagerExtensions))
             .IncludeAll()
+            .AsSplitQuery()
             .Where(u => u.UserName == userName);
         return await query.FirstOrDefaultAsync(cancellationToken);
     }

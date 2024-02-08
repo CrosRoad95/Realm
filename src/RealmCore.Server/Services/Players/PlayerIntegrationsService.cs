@@ -1,15 +1,14 @@
-﻿using RealmCore.Server.Services.Integrations;
-
-namespace RealmCore.Server.Services.Players;
+﻿namespace RealmCore.Server.Services.Players;
 
 public interface IPlayerIntegrationsService : IPlayerService
 {
+    IDiscordIntegration Discord { get; }
 }
 
-public class PlayerIntegrationsService : IPlayerIntegrationsService
+internal sealed class PlayerIntegrationsService : IPlayerIntegrationsService
 {
     public IDiscordIntegration Discord { get; private set; }
-    public RealmPlayer Player { get; private set; }
+    public RealmPlayer Player { get; init; }
     public PlayerIntegrationsService(PlayerContext playerContext, IDateTimeProvider dateTimeProvider, IPlayerUserService playerUserService)
     {
         Player = playerContext.Player;
@@ -27,5 +26,4 @@ public class PlayerIntegrationsService : IPlayerIntegrationsService
     private void HandleSignedOut(IPlayerUserService playerUserService, RealmPlayer _)
     {
     }
-
 }

@@ -30,36 +30,10 @@ public class PlayerUserServiceTests
 
         #region Assert
         authorized.Should().Be(expectedAuthorized);
-        var isInCache = player.User.HasAuthorizedPolicy("Admin", out bool cacheAuthorized);
-        isInCache.Should().BeTrue();
-        cacheAuthorized.Should().Be(expectedAuthorized);
-        #endregion
-    }
-
-    [Fact]
-    public async Task ChangingRoleShouldClearPolicyAuthorizedCache()
-    {
-        #region Arrange
-        var realmTestingServer = new RealmTestingServer();
-        var player = realmTestingServer.CreatePlayer();
-        await realmTestingServer.SignInPlayer(player);
-        var user = player.User;
-        var usersService = player.GetRequiredService<IUsersService>();
-        #endregion
-
-        #region Act
-        var authorized = await usersService.AuthorizePolicy(player, "Admin");
-        #endregion
-
-        #region Act & Assert
-        authorized.Should().Be(false);
-        var isInCache = user.HasAuthorizedPolicy("Admin", out bool cacheAuthorized);
-        isInCache.Should().BeTrue();
-        cacheAuthorized.Should().Be(false);
-
-        user.AddRole("Admin");
-        isInCache = user.HasAuthorizedPolicy("Admin", out bool _);
-        isInCache.Should().BeFalse();
+        if(expectedAuthorized)
+            player.User.AuthorizedPolicies.Should().BeEquivalentTo(["Admin"]);
+        else
+            player.User.AuthorizedPolicies.Should().BeEquivalentTo([]);
         #endregion
     }
 

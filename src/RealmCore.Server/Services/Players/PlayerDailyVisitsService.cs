@@ -16,7 +16,6 @@ internal sealed class PlayerDailyVisitsService : IPlayerDailyVisitsService, IDis
 {
     private readonly object _lock = new();
     private readonly IPlayerUserService _playerUserService;
-    private readonly IDateTimeProvider _dateTimeProvider;
     private DailyVisitsData? _dailyVisitsData;
     public DateTime LastVisit
     {
@@ -48,19 +47,19 @@ internal sealed class PlayerDailyVisitsService : IPlayerDailyVisitsService, IDis
 
     public event Action<IPlayerDailyVisitsService, int, bool>? Visited;
     public event Action<IPlayerDailyVisitsService, int>? VisitsRecord;
-    
-    public RealmPlayer Player { get; }
-    public PlayerDailyVisitsService(PlayerContext playerContext, IPlayerUserService playerUserService, IDateTimeProvider dateTimeProvider)
+
+    public RealmPlayer Player { get; init; }
+    public PlayerDailyVisitsService(PlayerContext playerContext, IPlayerUserService playerUserService)
     {
         Player = playerContext.Player;
         playerUserService.SignedIn += HandleSignedIn;
         playerUserService.SignedOut += HandleSignedOut;
         _playerUserService = playerUserService;
-        _dateTimeProvider = dateTimeProvider;
     }
 
-    private void HandleSignedIn(IPlayerUserService playerUserService, RealmPlayer _)
+    private void HandleSignedIn(IPlayerUserService playerUserService, RealmPlayer player)
     {
+        var now = player.GetRequiredService<IDateTimeProvider>().Now;
         lock (_lock)
         {
             if(playerUserService.User?.DailyVisits != null)
@@ -71,13 +70,13 @@ internal sealed class PlayerDailyVisitsService : IPlayerDailyVisitsService, IDis
             {
                 _dailyVisitsData = new DailyVisitsData
                 {
-                    LastVisit = _dateTimeProvider.Now,
+                    LastVisit = now,
                     VisitsInRow = 0,
                     VisitsInRowRecord = 0,
                 };
             }
         }
-        Update(_dateTimeProvider.Now);
+        Update(now);
     }
 
     private void HandleSignedOut(IPlayerUserService playerUserService, RealmPlayer _)

@@ -14,10 +14,10 @@ public interface IVehicleEnginesService : IVehicleService
     void Remove(short engineId);
 }
 
-public sealed class VehicleEnginesService : IVehicleEnginesService
+internal sealed class VehicleEnginesService : IVehicleEnginesService
 {
+    private readonly object _lock = new();
     private ICollection<VehicleEngineData> _vehicleEngine = [];
-    private object _lock = new();
 
     public event Action<IVehicleEnginesService, short>? ActiveEngineChanged;
     public event Action<IVehicleEnginesService, short>? EngineAdded;
@@ -55,6 +55,7 @@ public sealed class VehicleEnginesService : IVehicleEnginesService
     }
 
     public RealmVehicle Vehicle { get; }
+
     public VehicleEnginesService(VehicleContext vehicleContext, IVehiclePersistanceService vehiclePersistanceService)
     {
         Vehicle = vehicleContext.Vehicle;

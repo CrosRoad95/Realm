@@ -1,12 +1,14 @@
-﻿namespace RealmCore.Server.Services.Players;
+﻿using RealmCore.Server.Dto;
 
-public interface IPlayerAchievementsService : IPlayerService, IEnumerable<AchievementDTO>
+namespace RealmCore.Server.Services.Players;
+
+public interface IPlayerAchievementsService : IPlayerService, IEnumerable<AchievementDto>
 {
     event Action<IPlayerAchievementsService, int>? Unlocked;
     event Action<IPlayerAchievementsService, int, float>? Progressed;
 
     T? GetAchievementValue<T>(int achievementId);
-    AchievementDTO Get(int achievementId);
+    AchievementDto Get(int achievementId);
     bool HasReachedProgressThreshold(int achievementId, float progress);
     bool SetProgress(int achievementId, float progress, float maximumProgress);
     void SetValue(int achievementId, object value);
@@ -16,16 +18,16 @@ public interface IPlayerAchievementsService : IPlayerService, IEnumerable<Achiev
     float GetProgress(int achievementId);
 }
 
-internal class PlayerAchievementsService : IPlayerAchievementsService
+internal sealed class PlayerAchievementsService : IPlayerAchievementsService
 {
-    private ICollection<AchievementData> _achievements = [];
     private readonly object _lock = new();
+    private ICollection<AchievementData> _achievements = [];
     private readonly IPlayerUserService _playerUserService;
 
     public event Action<IPlayerAchievementsService, int>? Unlocked;
     public event Action<IPlayerAchievementsService, int, float>? Progressed;
 
-    public RealmPlayer Player { get; private set; }
+    public RealmPlayer Player { get; init; }
     public PlayerAchievementsService(PlayerContext playerContext, IPlayerUserService playerUserService)
     {
         Player = playerContext.Player;
@@ -81,12 +83,12 @@ internal class PlayerAchievementsService : IPlayerAchievementsService
         }
     }
 
-    public AchievementDTO Get(int achievementId)
+    public AchievementDto Get(int achievementId)
     {
         lock (_lock)
         {
             var achievement = GetById(achievementId);
-            return AchievementDTO.Map(achievement);
+            return AchievementDto.Map(achievement);
         }
     }
 
@@ -169,10 +171,10 @@ internal class PlayerAchievementsService : IPlayerAchievementsService
         }
     }
 
-    public IEnumerator<AchievementDTO> GetEnumerator()
+    public IEnumerator<AchievementDto> GetEnumerator()
     {
         lock (_lock)
-            return new List<AchievementDTO>(_achievements.Select(AchievementDTO.Map)).GetEnumerator();
+            return new List<AchievementDto>(_achievements.Select(AchievementDto.Map)).GetEnumerator();
     }
 
     System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator() => GetEnumerator();

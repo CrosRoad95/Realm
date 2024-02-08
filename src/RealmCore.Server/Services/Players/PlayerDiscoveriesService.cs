@@ -8,15 +8,15 @@ public interface IPlayerDiscoveriesService : IPlayerService, IEnumerable<int>
     bool TryDiscover(int discoveryId);
 }
 
-internal class PlayerDiscoveriesService : IPlayerDiscoveriesService
+internal sealed class PlayerDiscoveriesService : IPlayerDiscoveriesService
 {
-    private ICollection<DiscoveryData> _discoveries = [];
     private readonly object _lock = new();
+    private ICollection<DiscoveryData> _discoveries = [];
     private readonly IPlayerUserService _playerUserService;
 
     public event Action<IPlayerDiscoveriesService, int>? Discovered;
 
-    public RealmPlayer Player { get; private set; }
+    public RealmPlayer Player { get; init; }
     public PlayerDiscoveriesService(PlayerContext playerContext, IPlayerUserService playerUserService)
     {
         Player = playerContext.Player;

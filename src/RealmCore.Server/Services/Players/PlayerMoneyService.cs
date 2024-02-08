@@ -20,15 +20,15 @@ public interface IPlayerMoneyService : IPlayerService
 
 internal sealed class PlayerMoneyService : IPlayerMoneyService
 {
+    private readonly ReaderWriterLockSlim _lock = new();
     private decimal _money = 0;
     private decimal _previousMoney = 0;
     private decimal _moneyLimit;
     private byte _moneyPrecision;
-    private readonly ReaderWriterLockSlim _moneyLock = new();
     private readonly IOptionsMonitor<GameplayOptions>? _gameplayOptions;
     private readonly IPlayerUserService _playerUserService;
 
-    public RealmPlayer Player { get; private set; }
+    public RealmPlayer Player { get; init; }
 
     public event Action<IPlayerMoneyService, decimal>? Set;
     public event Action<IPlayerMoneyService, decimal>? Added;
@@ -43,16 +43,16 @@ internal sealed class PlayerMoneyService : IPlayerMoneyService
             if (Math.Abs(value) > _moneyLimit)
                 throw new GameplayException("Unable to set money beyond limit.");
 
-            _moneyLock.EnterWriteLock();
+            _lock.EnterWriteLock();
             try
             {
                 if (_money == value)
                     return;
                 _money = value;
-                TryUpdateVersion();
 
-                if (Set == null)
-                    return;
+                if(_playerUserService.IsSignedIn)
+                    _playerUserService.User.Money = _money;
+                TryUpdateVersion();
 
                 Set?.Invoke(this, _money);
             }
@@ -62,7 +62,7 @@ internal sealed class PlayerMoneyService : IPlayerMoneyService
             }
             finally
             {
-                _moneyLock.ExitWriteLock();
+                _lock.ExitWriteLock();
             }
         }
     }
@@ -75,6 +75,19 @@ internal sealed class PlayerMoneyService : IPlayerMoneyService
         _moneyLimit = _gameplayOptions.CurrentValue.MoneyLimit;
         _moneyPrecision = _gameplayOptions.CurrentValue.MoneyPrecision;
         _gameplayOptions.OnChange(HandleGameplayOptionsChanged);
+
+        _playerUserService.SignedIn += HandleSignedIn;
+        _playerUserService.SignedOut += HandleSignedOut;
+    }
+
+    private void HandleSignedIn(IPlayerUserService userService, RealmPlayer player)
+    {
+        Amount = userService.User.Money;
+    }
+
+    private void HandleSignedOut(IPlayerUserService userService, RealmPlayer player)
+    {
+        Amount = 0;
     }
 
     private void TryUpdateVersion()
@@ -109,7 +122,7 @@ internal sealed class PlayerMoneyService : IPlayerMoneyService
         if (amount < 0)
             throw new GameplayException("Unable to give money, amount can not get negative.");
 
-        _moneyLock.EnterWriteLock();
+        _lock.EnterWriteLock();
         try
         {
             if (Math.Abs(_money) + amount > _moneyLimit)
@@ -125,7 +138,7 @@ internal sealed class PlayerMoneyService : IPlayerMoneyService
         }
         finally
         {
-            _moneyLock.ExitWriteLock();
+            _lock.ExitWriteLock();
         }
     }
 
@@ -152,7 +165,7 @@ internal sealed class PlayerMoneyService : IPlayerMoneyService
 
     public void TakeMoney(decimal amount, bool force = false)
     {
-        _moneyLock.EnterWriteLock();
+        _lock.EnterWriteLock();
         try
         {
             TakeMoneyCore(amount, force);
@@ -163,7 +176,7 @@ internal sealed class PlayerMoneyService : IPlayerMoneyService
         }
         finally
         {
-            _moneyLock.ExitWriteLock();
+            _lock.ExitWriteLock();
         }
     }
 
@@ -171,14 +184,14 @@ internal sealed class PlayerMoneyService : IPlayerMoneyService
 
     public bool HasMoney(decimal amount, bool force = false)
     {
-        _moneyLock.EnterReadLock();
+        _lock.EnterReadLock();
         try
         {
             return InternalHasMoney(amount, force);
         }
         finally
         {
-            _moneyLock.ExitReadLock();
+            _lock.ExitReadLock();
         }
     }
 
@@ -197,7 +210,7 @@ internal sealed class PlayerMoneyService : IPlayerMoneyService
 
     public bool TryTakeMoney(decimal amount, Func<bool> action, bool force = false)
     {
-        _moneyLock.EnterWriteLock();
+        _lock.EnterWriteLock();
         try
         {
             if (!InternalHasMoney(amount, force))
@@ -216,13 +229,13 @@ internal sealed class PlayerMoneyService : IPlayerMoneyService
         }
         finally
         {
-            _moneyLock.ExitWriteLock();
+            _lock.ExitWriteLock();
         }
     }
 
     public async Task<bool> TryTakeMoneyAsync(decimal amount, Func<Task<bool>> action, bool force = false)
     {
-        _moneyLock.EnterWriteLock();
+        _lock.EnterWriteLock();
 
         try
         {
@@ -242,7 +255,7 @@ internal sealed class PlayerMoneyService : IPlayerMoneyService
         }
         finally
         {
-            _moneyLock.ExitWriteLock();
+            _lock.ExitWriteLock();
         }
     }
 

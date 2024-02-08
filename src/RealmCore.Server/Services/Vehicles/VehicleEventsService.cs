@@ -1,17 +1,19 @@
-﻿namespace RealmCore.Server.Services.Vehicles;
+﻿using RealmCore.Server.Dto;
 
-public interface IVehicleEventsService : IVehicleService, IEnumerable<VehicleEventDTO>
+namespace RealmCore.Server.Services.Vehicles;
+
+public interface IVehicleEventsService : IVehicleService, IEnumerable<VehicleEventDto>
 {
     void AddEvent(int eventType, string? metadata = null);
 }
 
-internal class VehicleEventsService : IVehicleEventsService
+internal sealed class VehicleEventsService : IVehicleEventsService
 {
     private readonly object _lock = new();
     private ICollection<VehicleEventData> _vehicleEvents = [];
     private readonly IDateTimeProvider _dateTimeProvider;
 
-    public RealmVehicle Vehicle { get; }
+    public RealmVehicle Vehicle { get; init; }
 
     public VehicleEventsService(VehicleContext vehicleContext, IVehiclePersistanceService vehiclePersistanceService, IDateTimeProvider dateTimeProvider)
     {
@@ -39,10 +41,10 @@ internal class VehicleEventsService : IVehicleEventsService
         }
     }
 
-    public IEnumerator<VehicleEventDTO> GetEnumerator()
+    public IEnumerator<VehicleEventDto> GetEnumerator()
     {
         lock (_lock)
-            return new List<VehicleEventDTO>(_vehicleEvents.Select(VehicleEventDTO.Map)).GetEnumerator();
+            return new List<VehicleEventDto>(_vehicleEvents.Select(VehicleEventDto.Map)).GetEnumerator();
     }
 
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();

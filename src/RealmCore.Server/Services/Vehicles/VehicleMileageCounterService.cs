@@ -8,14 +8,11 @@ public interface IVehicleMileageCounterService : IVehicleService
     event Action<IVehicleMileageCounterService, float, float>? Traveled;
 }
 
-internal class VehicleMileageCounterService : IVehicleMileageCounterService, IDisposable
+internal sealed class VehicleMileageCounterService : IVehicleMileageCounterService, IDisposable
 {
-    public RealmVehicle Vehicle { get; }
-
     private Vector3 _lastPosition;
     private float _mileage;
     private float _minimumDistanceThreshold = 2.0f;
-    private RealmVehicle? _vehicle;
     private readonly IUpdateService _updateService;
 
     public event Action<IVehicleMileageCounterService, float, float>? Traveled;
@@ -46,6 +43,8 @@ internal class VehicleMileageCounterService : IVehicleMileageCounterService, IDi
         }
     }
 
+    public RealmVehicle Vehicle { get; init; }
+
     public VehicleMileageCounterService(VehicleContext vehicleContext, IVehiclePersistanceService persistance, IUpdateService updateService)
     {
         _updateService = updateService;
@@ -61,22 +60,22 @@ internal class VehicleMileageCounterService : IVehicleMileageCounterService, IDi
 
     public void HandleRareUpdate()
     {
-        if (_vehicle == null)
+        if (Vehicle == null)
             return;
 
-        if (!_vehicle.IsEngineOn)
+        if (!Vehicle.IsEngineOn)
         {
-            _lastPosition = _vehicle.Position;
+            _lastPosition = Vehicle.Position;
             return;
         }
-        if (!_vehicle.IsEngineOn || _vehicle.IsFrozen)
+        if (!Vehicle.IsEngineOn || Vehicle.IsFrozen)
             return;
 
-        var traveledDistance = _vehicle.Position - _lastPosition;
+        var traveledDistance = Vehicle.Position - _lastPosition;
         var traveledDistanceNumber = traveledDistance.Length();
         if (_minimumDistanceThreshold > traveledDistanceNumber)
             return;
-        _lastPosition = _vehicle.Position;
+        _lastPosition = Vehicle.Position;
         _mileage += traveledDistanceNumber;
         Traveled?.Invoke(this, _mileage, traveledDistanceNumber);
     }

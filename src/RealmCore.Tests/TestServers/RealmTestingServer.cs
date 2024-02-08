@@ -131,7 +131,7 @@ internal class RealmTestingServer : TestingServer<RealmTestingPlayer>
             };
         }
 
-        GetRequiredService<IPlayersService>().RelayLoaded(player);
+        GetRequiredService<IPlayerEventManager>().RelayLoaded(player);
         return player;
     }
 
@@ -154,15 +154,25 @@ internal class RealmTestingServer : TestingServer<RealmTestingPlayer>
     {
         var userManager = GetRequiredService<UserManager<UserData>>();
         var user = await userManager.GetUserByUserName(player.Name);
+
+        if(user != null)
+        {
+            // Fix for in memory database
+            user.Settings = user.Settings.DistinctBy(x => x.SettingId).ToList();
+            user.Bans = user.Bans.DistinctBy(x => x.Id).ToList();
+            user.Upgrades = user.Upgrades.DistinctBy(x => x.UpgradeId).ToList();
+        }
         if (user == null)
         {
             user = new UserData
             {
                 UserName = player.Name,
                 Upgrades = new List<UserUpgradeData>(),
+                DailyVisits = new(),
             };
             await userManager.CreateAsync(user);
         }
-        await player.GetRequiredService<IUsersService>().SignIn(player, user);
+        var success = await player.GetRequiredService<IUsersService>().SignIn(player, user);
+        success.Should().BeTrue();
     }
 }

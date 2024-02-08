@@ -8,17 +8,17 @@ public interface IPlayerJobStatisticsService : IPlayerService, IEnumerable<UserJ
     (ulong, ulong) GetTotalPoints(short jobId);
 }
 
-internal class PlayerJobStatisticsService : IPlayerJobStatisticsService
+internal sealed class PlayerJobStatisticsService : IPlayerJobStatisticsService
 {
-    private ICollection<JobStatisticsData> _jobStatistics = [];
     private readonly object _lock = new();
+    private ICollection<JobStatisticsData> _jobStatistics = [];
     private readonly IPlayerUserService _playerUserService;
     private readonly IDateTimeProvider _dateTimeProvider;
 
     public event Action<IPlayerJobStatisticsService, short, ulong>? PointsAdded;
     public event Action<IPlayerJobStatisticsService, short, ulong>? TimePlayedAdded;
 
-    public RealmPlayer Player { get; private set; }
+    public RealmPlayer Player { get; init; }
     public PlayerJobStatisticsService(PlayerContext playerContext, IPlayerUserService playerUserService, IDateTimeProvider dateTimeProvider)
     {
         Player = playerContext.Player;
@@ -43,18 +43,22 @@ internal class PlayerJobStatisticsService : IPlayerJobStatisticsService
     private JobStatisticsData GetJobStatisticsData(short jobId)
     {
         var today = DateOnly.FromDateTime(_dateTimeProvider.Now);
-        var jobStatisticsData = _jobStatistics.Where(x => x.JobId == jobId && x.Date == today).FirstOrDefault();
-        if(jobStatisticsData == null)
+        lock (_lock)
         {
-            jobStatisticsData = new JobStatisticsData
+            var jobStatisticsData = _jobStatistics.Where(x => x.JobId == jobId && x.Date == today).FirstOrDefault();
+            if (jobStatisticsData == null)
             {
-                JobId = jobId,
-                Date = today,
-            };
-            _playerUserService.IncreaseVersion();
-            _jobStatistics.Add(jobStatisticsData);
+                jobStatisticsData = new JobStatisticsData
+                {
+                    JobId = jobId,
+                    Date = today,
+                };
+                _playerUserService.IncreaseVersion();
+                _jobStatistics.Add(jobStatisticsData);
+            }
+
+            return jobStatisticsData;
         }
-        return jobStatisticsData;
     }
 
     public void AddPoints(short jobId, ulong points)

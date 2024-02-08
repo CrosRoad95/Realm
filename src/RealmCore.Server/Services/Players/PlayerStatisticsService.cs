@@ -1,6 +1,8 @@
-﻿namespace RealmCore.Server.Services.Players;
+﻿using RealmCore.Server.Dto;
 
-public interface IPlayerStatisticsService : IPlayerService, IEnumerable<UserStatDTO>
+namespace RealmCore.Server.Services.Players;
+
+public interface IPlayerStatisticsService : IPlayerService, IEnumerable<UserStatDto>
 {
     IReadOnlyList<int> StatsIds { get; }
 
@@ -13,7 +15,7 @@ public interface IPlayerStatisticsService : IPlayerService, IEnumerable<UserStat
     float Get(int statId);
 }
 
-internal class PlayerStatisticsService : IPlayerStatisticsService
+internal sealed class PlayerStatisticsService : IPlayerStatisticsService
 {
     private readonly object _lock = new();
     private readonly IPlayerUserService _playerUserService;
@@ -30,7 +32,7 @@ internal class PlayerStatisticsService : IPlayerStatisticsService
         }
     }
 
-    public RealmPlayer Player { get; private set; }
+    public RealmPlayer Player { get; init; }
     public PlayerStatisticsService(PlayerContext playerContext, IPlayerUserService playerUserService)
     {
         Player = playerContext.Player;
@@ -119,10 +121,10 @@ internal class PlayerStatisticsService : IPlayerStatisticsService
         }
     }
 
-    public IEnumerator<UserStatDTO> GetEnumerator()
+    public IEnumerator<UserStatDto> GetEnumerator()
     {
         lock (_lock)
-            return new List<UserStatDTO>(_stats.Select(UserStatDTO.Map)).GetEnumerator();
+            return new List<UserStatDto>(_stats.Select(UserStatDto.Map)).GetEnumerator();
     }
 
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();

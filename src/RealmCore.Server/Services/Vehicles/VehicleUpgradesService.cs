@@ -17,10 +17,10 @@ public interface IVehicleUpgradesService : IVehicleService, IEnumerable<int>
     bool RemoveUpgrade(int upgradeId, bool rebuild = true);
 }
 
-public class VehicleUpgradesService : IVehicleUpgradesService
+internal sealed class VehicleUpgradesService : IVehicleUpgradesService
 {
-    private ICollection<VehicleUpgradeData> _upgrades = [];
     private readonly object _lock = new();
+    private ICollection<VehicleUpgradeData> _upgrades = [];
 
     public IReadOnlyCollection<int> Upgrades
     {
@@ -35,7 +35,8 @@ public class VehicleUpgradesService : IVehicleUpgradesService
     public event Action<IVehicleUpgradesService, int>? UpgradeRemoved;
     public event Action<IVehicleUpgradesService>? Rebuild;
 
-    public RealmVehicle Vehicle { get; }
+    public RealmVehicle Vehicle { get; init; }
+
     public VehicleUpgradesService(VehicleContext vehicleContext, IVehiclePersistanceService persistance)
     {
         Vehicle = vehicleContext.Vehicle;

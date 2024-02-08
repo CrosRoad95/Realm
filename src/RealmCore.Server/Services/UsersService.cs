@@ -2,6 +2,22 @@
 
 namespace RealmCore.Server.Services;
 
+public interface IUsersService
+{
+    event Action<RealmPlayer>? SignedIn;
+    event Action<RealmPlayer>? SignedOut;
+
+    Task<bool> AddToRole(RealmPlayer player, string role);
+    ValueTask<bool> AuthorizePolicy(RealmPlayer player, string policy);
+    Task<bool> QuickSignIn(RealmPlayer player, CancellationToken cancellationToken = default);
+    IEnumerable<RealmPlayer> SearchPlayersByName(string pattern, bool loggedIn = true);
+    Task<bool> SignIn(RealmPlayer player, UserData user, CancellationToken cancellationToken = default);
+    Task SignOut(RealmPlayer player, CancellationToken cancellationToken = default);
+    Task<int> SignUp(string username, string password, CancellationToken cancellationToken = default);
+    bool TryFindPlayerBySerial(string serial, out RealmPlayer? player);
+    bool TryGetPlayerByName(string name, out RealmPlayer? player);
+}
+
 internal sealed class UsersService : IUsersService
 {
     private readonly ItemsRegistry _itemsRegistry;
@@ -128,8 +144,6 @@ internal sealed class UsersService : IUsersService
             }
             player.User.SignIn(user, claimsPrincipal);
 
-
-            player.Money.SetMoneyInternal(user.Money);
             await AuthorizePolicies(player);
             await userLoginHistoryRepository.Add(user.Id, _dateTimeProvider.Now, player.Client.IPAddress?.ToString() ?? "", serial, cancellationToken);
             UpdateLastData(player);
@@ -161,16 +175,13 @@ internal sealed class UsersService : IUsersService
         player.Position = new Vector3(6000, 6000, 99999);
         player.Interior = 0;
         player.Dimension = 0;
-        player.Money.SetMoneyInternal(0);
         SignedOut?.Invoke(player);
     }
 
-    public async ValueTask<bool> AuthorizePolicy(RealmPlayer player, string policy, bool useCache = true)
+    public async ValueTask<bool> AuthorizePolicy(RealmPlayer player, string policy)
     {
-        if (useCache && player.User.HasAuthorizedPolicy(policy, out bool wasAuthorized))
-            return wasAuthorized;
         var result = await _authorizationService.AuthorizeAsync(player.User.ClaimsPrincipal, policy);
-        player.User.AddAuthorizedPolicy(policy, result.Succeeded);
+        player.User.SetAuthorizedPolicyState(policy, result.Succeeded);
         return result.Succeeded;
     }
 

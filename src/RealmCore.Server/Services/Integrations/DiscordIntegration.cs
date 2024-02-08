@@ -8,7 +8,7 @@ public interface IDiscordIntegration : IIntegration
     bool Verify(string code, ulong discordUserId);
 }
 
-internal class DiscordIntegration : IDiscordIntegration
+internal sealed class DiscordIntegration : IDiscordIntegration
 {
     private string? _discordConnectionCode = null;
     private DateTime? _discordConnectionCodeValidUntil = null;

@@ -19,9 +19,9 @@ public interface IPlayerAdminService : IPlayerService
     void SetTools(IEnumerable<AdminTool> adminTools);
 }
 
-internal class PlayerAdminService : IPlayerAdminService
+internal sealed class PlayerAdminService : IPlayerAdminService
 {
-    private object _lock = new();
+    private readonly object _lock = new();
     private bool _debugView = false;
     private bool _adminMode = false;
     private bool _noClip = false;
@@ -123,7 +123,7 @@ internal class PlayerAdminService : IPlayerAdminService
         }
     }
 
-    public RealmPlayer Player { get; private set; }
+    public RealmPlayer Player { get; init; }
     public PlayerAdminService(PlayerContext playerContext, IPlayerUserService playerUserService)
     {
         Player = playerContext.Player;

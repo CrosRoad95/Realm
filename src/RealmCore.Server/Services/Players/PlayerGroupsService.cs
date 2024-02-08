@@ -13,7 +13,7 @@ internal sealed class PlayerGroupsService : IPlayerGroupsService
     private readonly SemaphoreSlim _lock = new(1);
     private readonly IPlayerUserService _playerUserService;
     private ICollection<GroupMemberData> _groupMembers = [];
-    public RealmPlayer Player { get; private set; }
+    public RealmPlayer Player { get; init; }
     public PlayerGroupsService(PlayerContext playerContext, IPlayerUserService playerUserService)
     {
         Player = playerContext.Player;

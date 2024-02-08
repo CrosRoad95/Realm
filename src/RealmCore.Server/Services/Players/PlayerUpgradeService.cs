@@ -11,7 +11,7 @@ public interface IPlayerUpgradeService : IPlayerService
     bool TryRemove(int upgradeId);
 }
 
-internal class PlayerUpgradeService : IPlayerUpgradeService
+internal sealed class PlayerUpgradeService : IPlayerUpgradeService
 {
     public event Action<IPlayerUpgradeService, int>? Added;
     public event Action<IPlayerUpgradeService, int>? Removed;
@@ -20,7 +20,7 @@ internal class PlayerUpgradeService : IPlayerUpgradeService
     private readonly object _lock = new();
     private readonly IPlayerUserService _playerUserService;
 
-    public RealmPlayer Player { get; }
+    public RealmPlayer Player { get; init; }
     public PlayerUpgradeService(PlayerContext playerContext, IPlayerUserService playerUserService)
     {
         Player = playerContext.Player;
