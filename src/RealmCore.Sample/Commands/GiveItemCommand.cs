@@ -4,13 +4,13 @@
 public sealed class GiveItemCommand : IInGameCommand
 {
     private readonly ILogger<GiveItemCommand> _logger;
-    private readonly ItemsRegistry _itemsRegistry;
+    private readonly ItemsCollection _itemsCollection;
     private readonly ChatBox _chatBox;
 
-    public GiveItemCommand(ILogger<GiveItemCommand> logger, ItemsRegistry itemsRegistry, ChatBox chatBox)
+    public GiveItemCommand(ILogger<GiveItemCommand> logger, ItemsCollection itemsCollection, ChatBox chatBox)
     {
         _logger = logger;
-        _itemsRegistry = itemsRegistry;
+        _itemsCollection = itemsCollection;
         _chatBox = chatBox;
     }
 
@@ -20,7 +20,7 @@ public sealed class GiveItemCommand : IInGameCommand
         {
             uint itemId = args.ReadUInt();
             uint count = args.ReadUInt();
-            inventory.AddItem(_itemsRegistry, itemId, count, new Metadata
+            inventory.AddItem(_itemsCollection, itemId, count, new Metadata
             {
                 ["foo"] = 10
             });

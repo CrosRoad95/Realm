@@ -4,7 +4,7 @@ internal sealed class ScopedMapService : IScopedMapsService
 {
     private readonly object _lock = new();
     private readonly ILogger<MapsService> _logger;
-    private readonly MapsRegistry _mapsRegistry;
+    private readonly MapsCollection _mapsCollection;
     private readonly RealmPlayer _player;
     private readonly List<string> _loadedMaps = [];
 
@@ -17,10 +17,10 @@ internal sealed class ScopedMapService : IScopedMapsService
         }
     }
 
-    public ScopedMapService(ILogger<MapsService> logger, MapsRegistry mapsRegistry, PlayerContext playerContext)
+    public ScopedMapService(ILogger<MapsService> logger, MapsCollection mapsCollection, PlayerContext playerContext)
     {
         _logger = logger;
-        _mapsRegistry = mapsRegistry;
+        _mapsCollection = mapsCollection;
         _player = playerContext.Player;
     }
 
@@ -36,7 +36,7 @@ internal sealed class ScopedMapService : IScopedMapsService
 
     public bool Load(string name)
     {
-        var map = _mapsRegistry.GetByName(name);
+        var map = _mapsCollection.GetByName(name);
         lock (_lock)
         {
             if (_loadedMaps.Contains(name))
@@ -49,7 +49,7 @@ internal sealed class ScopedMapService : IScopedMapsService
 
     public bool Unload(string name)
     {
-        var map = _mapsRegistry.GetByName(name);
+        var map = _mapsCollection.GetByName(name);
         lock (_lock)
         {
             if (!_loadedMaps.Contains(name))

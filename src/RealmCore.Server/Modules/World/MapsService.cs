@@ -5,7 +5,7 @@ internal sealed class MapsService : IMapsService
     private readonly object _lock = new();
     private readonly ILogger<MapsService> _logger;
     private readonly IElementCollection _elementCollection;
-    private readonly MapsRegistry _mapsRegistry;
+    private readonly MapsCollection _mapsCollection;
     private readonly List<string> _loadedMaps = [];
 
     public IReadOnlyList<string> LoadedMaps
@@ -17,11 +17,11 @@ internal sealed class MapsService : IMapsService
         }
     }
 
-    public MapsService(ILogger<MapsService> logger, IElementCollection elementCollection, MapsRegistry mapsRegistry)
+    public MapsService(ILogger<MapsService> logger, IElementCollection elementCollection, MapsCollection mapsCollection)
     {
         _logger = logger;
         _elementCollection = elementCollection;
-        _mapsRegistry = mapsRegistry;
+        _mapsCollection = mapsCollection;
     }
 
     public bool IsLoaded(string name)
@@ -36,7 +36,7 @@ internal sealed class MapsService : IMapsService
 
     public bool Load(string name)
     {
-        var map = _mapsRegistry.GetByName(name);
+        var map = _mapsCollection.GetByName(name);
         lock (_lock)
         {
             if (_loadedMaps.Contains(name))
@@ -52,7 +52,7 @@ internal sealed class MapsService : IMapsService
 
     public bool LoadFor(string name)
     {
-        var map = _mapsRegistry.GetByName(name);
+        var map = _mapsCollection.GetByName(name);
         lock (_lock)
         {
             if (_loadedMaps.Contains(name))
@@ -68,7 +68,7 @@ internal sealed class MapsService : IMapsService
 
     public bool Unload(string name)
     {
-        var map = _mapsRegistry.GetByName(name);
+        var map = _mapsCollection.GetByName(name);
         lock (_lock)
         {
             if (!_loadedMaps.Contains(name))

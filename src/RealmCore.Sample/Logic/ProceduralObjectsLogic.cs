@@ -19,7 +19,7 @@ internal class ProceduralObjectsLogic
         }
     }
 
-    public ProceduralObjectsLogic(AssetsRegistry assetsRegistry)
+    public ProceduralObjectsLogic(AssetsCollection assetsCollection)
     {
         var modelFactory = new ModelFactory();
         modelFactory.AddTriangle(new Vector3(2, 2, 0), new Vector3(0, 10, 0), new Vector3(10, 0, 0), "Metal1_128");
@@ -32,8 +32,8 @@ internal class ProceduralObjectsLogic
         File.WriteAllBytes("testoutput/debugmodel.dff", ReadFully(dff));
         File.WriteAllBytes("testoutput/debugmodel.col", ReadFully(col));
 #endif
-        var model = assetsRegistry.AddModel("test", col, dff);
-        assetsRegistry.ReplaceModel((ObjectModel)1338, model);
+        var model = assetsCollection.AddModel("test", col, dff);
+        assetsCollection.ReplaceModel((ObjectModel)1338, model);
         ;
     }
 }

@@ -4,30 +4,30 @@ public class ItemsLogic : PlayerLogic
 {
     private readonly ChatBox _chatBox;
 
-    public ItemsLogic(MtaServer mtaServer, ItemsRegistry itemsRegistry, IElementFactory elementFactory, ChatBox chatBox) : base(mtaServer)
+    public ItemsLogic(MtaServer mtaServer, ItemsCollection itemsCollection, IElementFactory elementFactory, ChatBox chatBox) : base(mtaServer)
     {
-        itemsRegistry.Add(1, new ItemRegistryEntry
+        itemsCollection.Add(1, new ItemsCollectionItem
         {
             Size = 1,
             StackSize = 4,
             Name = "Test item id 1",
             AvailableActions = ItemAction.Use,
         });
-        itemsRegistry.Add(2, new ItemRegistryEntry
+        itemsCollection.Add(2, new ItemsCollectionItem
         {
             Size = 2,
             StackSize = 4,
             Name = "Foo item id 2",
             AvailableActions = ItemAction.Use,
         });
-        itemsRegistry.Add(3, new ItemRegistryEntry
+        itemsCollection.Add(3, new ItemsCollectionItem
         {
             Size = 1,
             StackSize = 1,
             Name = "Sample weapon",
             AvailableActions = ItemAction.None,
         });
-        itemsRegistry.Add(4, new ItemRegistryEntry
+        itemsCollection.Add(4, new ItemsCollectionItem
         {
             Size = 0.05m,
             StackSize = 10,

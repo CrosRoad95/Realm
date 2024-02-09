@@ -20,7 +20,7 @@ public interface IUsersService
 
 internal sealed class UsersService : IUsersService
 {
-    private readonly ItemsRegistry _itemsRegistry;
+    private readonly ItemsCollection _itemsCollection;
     private readonly ILogger<UsersService> _logger;
     private readonly IOptionsMonitor<GameplayOptions> _gameplayOptions;
     private readonly IDateTimeProvider _dateTimeProvider;
@@ -33,10 +33,10 @@ internal sealed class UsersService : IUsersService
     public event Action<RealmPlayer>? SignedIn;
     public event Action<RealmPlayer>? SignedOut;
 
-    public UsersService(ItemsRegistry itemsRegistry, ILogger<UsersService> logger, IOptionsMonitor<GameplayOptions> gameplayOptions,
+    public UsersService(ItemsCollection itemsCollection, ILogger<UsersService> logger, IOptionsMonitor<GameplayOptions> gameplayOptions,
         IDateTimeProvider dateTimeProvider, IAuthorizationService authorizationService, IActiveUsers activeUsers, IElementCollection elementCollection, ISaveService saveService, IServiceProvider serviceProvider)
     {
-        _itemsRegistry = itemsRegistry;
+        _itemsCollection = itemsCollection;
         _logger = logger;
         _gameplayOptions = gameplayOptions;
         _dateTimeProvider = dateTimeProvider;

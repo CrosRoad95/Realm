@@ -1,6 +1,6 @@
 ﻿namespace RealmCore.Server.Modules.Server;
 
-public abstract class RegistryBase<TKey, TEntry> where TEntry : RegistryEntryBase<TKey>
+public abstract class CollectionBase<TKey, TEntry> where TEntry : CollectionItemBase<TKey>
     where TKey : unmanaged
 {
     protected readonly Dictionary<TKey, TEntry> _entries = [];
@@ -27,7 +27,7 @@ public abstract class RegistryBase<TKey, TEntry> where TEntry : RegistryEntryBas
 }
 
 
-public abstract class RegistryBase<TEntry> : RegistryBase<int, TEntry>
-     where TEntry : RegistryEntryBase<int>
+public abstract class CollectionBase<TEntry> : CollectionBase<int, TEntry>
+     where TEntry : CollectionItemBase<int>
 {
 }

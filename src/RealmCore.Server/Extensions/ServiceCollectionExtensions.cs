@@ -56,11 +56,11 @@ public static class ServiceCollectionExtensions
         #endregion
 
         #region Registries
-        services.AddSingleton<MapsRegistry>();
-        services.AddSingleton<ItemsRegistry>();
-        services.AddSingleton<VehicleUpgradeRegistry>();
-        services.AddSingleton<LevelsRegistry>();
-        services.AddSingleton<VehicleEnginesRegistry>();
+        services.AddSingleton<MapsCollection>();
+        services.AddSingleton<ItemsCollection>();
+        services.AddSingleton<VehicleUpgradeCollection>();
+        services.AddSingleton<LevelsCollection>();
+        services.AddSingleton<VehicleEnginesCollection>();
         #endregion
 
         #region Security

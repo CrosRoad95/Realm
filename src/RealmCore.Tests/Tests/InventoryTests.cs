@@ -4,44 +4,44 @@ namespace RealmCore.Tests.Tests;
 
 public class InventoryTests
 {
-    private void PopulateItemsRegistry(ItemsRegistry itemsRegistry)
+    private void PopulateItemsCollection(ItemsCollection itemsCollection)
     {
-        itemsRegistry.Add(1, new ItemRegistryEntry
+        itemsCollection.Add(1, new ItemsCollectionItem
         {
             Name = "test item id 1",
             Size = 1,
             StackSize = 8,
             AvailableActions = ItemAction.Use,
         });
-        itemsRegistry.Add(2, new ItemRegistryEntry
+        itemsCollection.Add(2, new ItemsCollectionItem
         {
             Name = "test item id 2",
             Size = 2,
             StackSize = 1,
             AvailableActions = ItemAction.Use,
         });
-        itemsRegistry.Add(3, new ItemRegistryEntry
+        itemsCollection.Add(3, new ItemsCollectionItem
         {
             Name = "test item id 3",
             Size = 1,
             StackSize = 8,
             AvailableActions = ItemAction.Use | ItemAction.Drop | ItemAction.Eat,
         });
-        itemsRegistry.Add(4, new ItemRegistryEntry
+        itemsCollection.Add(4, new ItemsCollectionItem
         {
             Name = "test item id 4",
             Size = 100,
             StackSize = 8,
             AvailableActions = ItemAction.Use,
         });
-        itemsRegistry.Add(5, new ItemRegistryEntry
+        itemsCollection.Add(5, new ItemsCollectionItem
         {
             Name = "test item id 5",
             Size = 101,
             StackSize = 8,
             AvailableActions = ItemAction.Use,
         });
-        itemsRegistry.Add(6, new ItemRegistryEntry
+        itemsCollection.Add(6, new ItemsCollectionItem
         {
             Name = "test item id 6",
             Size = 1,
@@ -57,11 +57,11 @@ public class InventoryTests
     {
         var realmTestingServer = new RealmTestingServer();
         var player = realmTestingServer.CreatePlayer();
-        var itemsRegistry = realmTestingServer.GetRequiredService<ItemsRegistry>();
-        PopulateItemsRegistry(itemsRegistry);
+        var itemsCollection = realmTestingServer.GetRequiredService<ItemsCollection>();
+        PopulateItemsCollection(itemsCollection);
 
         var inventory = player.Inventory.CreatePrimaryInventory(100);
-        inventory.AddItem(itemsRegistry, itemId, number);
+        inventory.AddItem(itemsCollection, itemId, number);
 
         inventory.Number.Should().Be(expectedNumber);
     }
@@ -71,14 +71,14 @@ public class InventoryTests
     {
         var realmTestingServer = new RealmTestingServer();
         var player = realmTestingServer.CreatePlayer();
-        var itemsRegistry = realmTestingServer.GetRequiredService<ItemsRegistry>();
-        PopulateItemsRegistry(itemsRegistry);
+        var itemsCollection = realmTestingServer.GetRequiredService<ItemsCollection>();
+        PopulateItemsCollection(itemsCollection);
 
         var inventory = player.Inventory.CreatePrimaryInventory(100);
-        inventory.AddItem(itemsRegistry, 3, 2, null, true);
-        inventory.AddItem(itemsRegistry, 3, 3, null, true);
-        inventory.AddItem(itemsRegistry, 3, 2, null, true);
-        inventory.AddItem(itemsRegistry, 3, 1, null, true);
+        inventory.AddItem(itemsCollection, 3, 2, null, true);
+        inventory.AddItem(itemsCollection, 3, 3, null, true);
+        inventory.AddItem(itemsCollection, 3, 2, null, true);
+        inventory.AddItem(itemsCollection, 3, 1, null, true);
 
         inventory.Items.Should().HaveCount(1);
         inventory.Items[0].Number.Should().Be(8);
@@ -91,12 +91,12 @@ public class InventoryTests
     {
         var realmTestingServer = new RealmTestingServer();
         var player = realmTestingServer.CreatePlayer();
-        var itemsRegistry = realmTestingServer.GetRequiredService<ItemsRegistry>();
-        PopulateItemsRegistry(itemsRegistry);
+        var itemsCollection = realmTestingServer.GetRequiredService<ItemsCollection>();
+        PopulateItemsCollection(itemsCollection);
         var inventory = player.Inventory.CreatePrimaryInventory(100);
 
-        inventory.AddItem(itemsRegistry, 3, 2, null, tryStack);
-        inventory.AddItem(itemsRegistry, 3, 22, null, tryStack);
+        inventory.AddItem(itemsCollection, 3, 2, null, tryStack);
+        inventory.AddItem(itemsCollection, 3, 22, null, tryStack);
 
         if (tryStack)
         {
@@ -114,8 +114,8 @@ public class InventoryTests
     {
         var realmTestingServer = new RealmTestingServer();
         var player = realmTestingServer.CreatePlayer();
-        var itemsRegistry = realmTestingServer.GetRequiredService<ItemsRegistry>();
-        PopulateItemsRegistry(itemsRegistry);
+        var itemsCollection = realmTestingServer.GetRequiredService<ItemsCollection>();
+        PopulateItemsCollection(itemsCollection);
         var inventory = player.Inventory.CreatePrimaryInventory(100);
 
         var metaData = new Metadata
@@ -123,10 +123,10 @@ public class InventoryTests
             ["foo"] = 1,
         };
 
-        inventory.AddItem(itemsRegistry, 3, 2, null);
-        inventory.AddItem(itemsRegistry, 3, 2, null);
-        inventory.AddItem(itemsRegistry, 3, 2, metaData);
-        inventory.AddItem(itemsRegistry, 3, 2, metaData);
+        inventory.AddItem(itemsCollection, 3, 2, null);
+        inventory.AddItem(itemsCollection, 3, 2, null);
+        inventory.AddItem(itemsCollection, 3, 2, metaData);
+        inventory.AddItem(itemsCollection, 3, 2, metaData);
 
         inventory.Items.Should().HaveCount(2);
         inventory.Items.Sum(x => x.Number).Should().Be(8);
@@ -137,11 +137,11 @@ public class InventoryTests
     {
         var realmTestingServer = new RealmTestingServer();
         var player = realmTestingServer.CreatePlayer();
-        var itemsRegistry = realmTestingServer.GetRequiredService<ItemsRegistry>();
-        PopulateItemsRegistry(itemsRegistry);
+        var itemsCollection = realmTestingServer.GetRequiredService<ItemsCollection>();
+        PopulateItemsCollection(itemsCollection);
         var inventory = player.Inventory.CreatePrimaryInventory(100);
 
-        inventory.AddItem(itemsRegistry, 1, 1);
+        inventory.AddItem(itemsCollection, 1, 1);
 
         inventory.HasItemById(1).Should().BeTrue();
     }
@@ -151,13 +151,13 @@ public class InventoryTests
     {
         var realmTestingServer = new RealmTestingServer();
         var player = realmTestingServer.CreatePlayer();
-        var itemsRegistry = realmTestingServer.GetRequiredService<ItemsRegistry>();
-        PopulateItemsRegistry(itemsRegistry);
+        var itemsCollection = realmTestingServer.GetRequiredService<ItemsCollection>();
+        PopulateItemsCollection(itemsCollection);
         var inventory = player.Inventory.CreatePrimaryInventory(100);
 
-        inventory.AddItem(itemsRegistry, 2, 1);
-        inventory.AddItem(itemsRegistry, 2, 1);
-        inventory.AddItem(itemsRegistry, 6, 1);
+        inventory.AddItem(itemsCollection, 2, 1);
+        inventory.AddItem(itemsCollection, 2, 1);
+        inventory.AddItem(itemsCollection, 6, 1);
 
         inventory.SumItemsById(2).Should().Be(2);
     }
@@ -167,13 +167,13 @@ public class InventoryTests
     {
         var realmTestingServer = new RealmTestingServer();
         var player = realmTestingServer.CreatePlayer();
-        var itemsRegistry = realmTestingServer.GetRequiredService<ItemsRegistry>();
-        PopulateItemsRegistry(itemsRegistry);
+        var itemsCollection = realmTestingServer.GetRequiredService<ItemsCollection>();
+        PopulateItemsCollection(itemsCollection);
         var inventory = player.Inventory.CreatePrimaryInventory(100);
 
-        inventory.AddItem(itemsRegistry, 2, 4);
-        inventory.AddItem(itemsRegistry, 2, 3);
-        inventory.AddItem(itemsRegistry, 6, 5);
+        inventory.AddItem(itemsCollection, 2, 4);
+        inventory.AddItem(itemsCollection, 2, 3);
+        inventory.AddItem(itemsCollection, 6, 5);
 
         inventory.SumItemsById(2).Should().Be(7);
     }
@@ -183,13 +183,13 @@ public class InventoryTests
     {
         var realmTestingServer = new RealmTestingServer();
         var player = realmTestingServer.CreatePlayer();
-        var itemsRegistry = realmTestingServer.GetRequiredService<ItemsRegistry>();
-        PopulateItemsRegistry(itemsRegistry);
+        var itemsCollection = realmTestingServer.GetRequiredService<ItemsCollection>();
+        PopulateItemsCollection(itemsCollection);
         var inventory = player.Inventory.CreatePrimaryInventory(100);
 
-        var item1 = inventory.AddItem(itemsRegistry, 2, 1).First();
-        var item2 = inventory.AddItem(itemsRegistry, 2, 1).First();
-        inventory.AddItem(itemsRegistry, 6, 1);
+        var item1 = inventory.AddItem(itemsCollection, 2, 1).First();
+        var item2 = inventory.AddItem(itemsCollection, 2, 1).First();
+        inventory.AddItem(itemsCollection, 6, 1);
 
         inventory.GetItemsById(2).Should().BeEquivalentTo(new List<Item>
         {
@@ -202,13 +202,13 @@ public class InventoryTests
     {
         var realmTestingServer = new RealmTestingServer();
         var player = realmTestingServer.CreatePlayer();
-        var itemsRegistry = realmTestingServer.GetRequiredService<ItemsRegistry>();
-        PopulateItemsRegistry(itemsRegistry);
+        var itemsCollection = realmTestingServer.GetRequiredService<ItemsCollection>();
+        PopulateItemsCollection(itemsCollection);
         var inventory = player.Inventory.CreatePrimaryInventory(100);
 
-        var item = inventory.AddItem(itemsRegistry, 1, 1, new Metadata { ["foo"] = 1 }).First();
-        inventory.AddItem(itemsRegistry, 1, 1, new Metadata { ["foo"] = 2 });
-        inventory.AddItem(itemsRegistry, 1, 1, new Metadata { ["foo"] = 3 });
+        var item = inventory.AddItem(itemsCollection, 1, 1, new Metadata { ["foo"] = 1 }).First();
+        inventory.AddItem(itemsCollection, 1, 1, new Metadata { ["foo"] = 2 });
+        inventory.AddItem(itemsCollection, 1, 1, new Metadata { ["foo"] = 3 });
 
         inventory.GetItemsByIdWithMetadata(1, "foo", 1).Should().BeEquivalentTo(new List<Item>
         {
@@ -221,11 +221,11 @@ public class InventoryTests
     {
         var realmTestingServer = new RealmTestingServer();
         var player = realmTestingServer.CreatePlayer();
-        var itemsRegistry = realmTestingServer.GetRequiredService<ItemsRegistry>();
-        PopulateItemsRegistry(itemsRegistry);
+        var itemsCollection = realmTestingServer.GetRequiredService<ItemsCollection>();
+        PopulateItemsCollection(itemsCollection);
         var inventory = player.Inventory.CreatePrimaryInventory(100);
 
-        var item = inventory.AddSingleItem(itemsRegistry, 1, new Metadata { ["foo"] = 1 });
+        var item = inventory.AddSingleItem(itemsCollection, 1, new Metadata { ["foo"] = 1 });
 
         inventory.GetSingleItemByIdWithMetadata(1, new Metadata
         {
@@ -238,13 +238,13 @@ public class InventoryTests
     {
         var realmTestingServer = new RealmTestingServer();
         var player = realmTestingServer.CreatePlayer();
-        var itemsRegistry = realmTestingServer.GetRequiredService<ItemsRegistry>();
-        PopulateItemsRegistry(itemsRegistry);
+        var itemsCollection = realmTestingServer.GetRequiredService<ItemsCollection>();
+        PopulateItemsCollection(itemsCollection);
         var inventory = player.Inventory.CreatePrimaryInventory(100);
 
-        inventory.AddSingleItem(itemsRegistry, 1, new Metadata { ["foo"] = 1 });
-        inventory.AddItem(itemsRegistry, 1, 1, new Metadata { ["foo"] = 2 });
-        inventory.AddItem(itemsRegistry, 1, 1, new Metadata { ["foo"] = 3 });
+        inventory.AddSingleItem(itemsCollection, 1, new Metadata { ["foo"] = 1 });
+        inventory.AddItem(itemsCollection, 1, 1, new Metadata { ["foo"] = 2 });
+        inventory.AddItem(itemsCollection, 1, 1, new Metadata { ["foo"] = 3 });
 
         inventory.HasItemWithMetadata(1, "foo", 1).Should().BeTrue();
         inventory.HasItemWithMetadata(1, "foo", 4).Should().BeFalse();
@@ -255,11 +255,11 @@ public class InventoryTests
     {
         var realmTestingServer = new RealmTestingServer();
         var player = realmTestingServer.CreatePlayer();
-        var itemsRegistry = realmTestingServer.GetRequiredService<ItemsRegistry>();
-        PopulateItemsRegistry(itemsRegistry);
+        var itemsCollection = realmTestingServer.GetRequiredService<ItemsCollection>();
+        PopulateItemsCollection(itemsCollection);
         var inventory = player.Inventory.CreatePrimaryInventory(100);
 
-        var item = inventory.AddSingleItem(itemsRegistry, 1, new Metadata { ["foo"] = 1 });
+        var item = inventory.AddSingleItem(itemsCollection, 1, new Metadata { ["foo"] = 1 });
         var found = inventory.TryGetByIdAndMetadata(1, new Metadata { ["foo"] = 1 }, out Item foundItem);
 
         found.Should().BeTrue();
@@ -271,11 +271,11 @@ public class InventoryTests
     {
         var realmTestingServer = new RealmTestingServer();
         var player = realmTestingServer.CreatePlayer();
-        var itemsRegistry = realmTestingServer.GetRequiredService<ItemsRegistry>();
-        PopulateItemsRegistry(itemsRegistry);
+        var itemsCollection = realmTestingServer.GetRequiredService<ItemsCollection>();
+        PopulateItemsCollection(itemsCollection);
         var inventory = player.Inventory.CreatePrimaryInventory(100);
 
-        var act = () => inventory.AddItem(itemsRegistry, 1, 0);
+        var act = () => inventory.AddItem(itemsCollection, 1, 0);
 
         act.Should().Throw<ArgumentOutOfRangeException>();
     }
@@ -285,8 +285,8 @@ public class InventoryTests
     {
         var realmTestingServer = new RealmTestingServer();
         var player = realmTestingServer.CreatePlayer();
-        var itemsRegistry = realmTestingServer.GetRequiredService<ItemsRegistry>();
-        PopulateItemsRegistry(itemsRegistry);
+        var itemsCollection = realmTestingServer.GetRequiredService<ItemsCollection>();
+        PopulateItemsCollection(itemsCollection);
         var inventory = player.Inventory.CreatePrimaryInventory(100);
 
         inventory.HasSpace(200).Should().BeFalse();
@@ -299,16 +299,16 @@ public class InventoryTests
     {
         var realmTestingServer = new RealmTestingServer();
         var player = realmTestingServer.CreatePlayer();
-        var itemsRegistry = realmTestingServer.GetRequiredService<ItemsRegistry>();
-        PopulateItemsRegistry(itemsRegistry);
+        var itemsCollection = realmTestingServer.GetRequiredService<ItemsCollection>();
+        PopulateItemsCollection(itemsCollection);
         var inventory = player.Inventory.CreatePrimaryInventory(100);
 
         inventory.Size = 100;
-        inventory.HasSpaceForItem(1, itemsRegistry).Should().BeTrue();
-        inventory.HasSpaceForItem(4, itemsRegistry).Should().BeTrue();
-        inventory.HasSpaceForItem(5, itemsRegistry).Should().BeFalse();
-        inventory.HasSpaceForItem(1, 100, itemsRegistry).Should().BeTrue();
-        inventory.HasSpaceForItem(1, 101, itemsRegistry).Should().BeFalse();
+        inventory.HasSpaceForItem(1, itemsCollection).Should().BeTrue();
+        inventory.HasSpaceForItem(4, itemsCollection).Should().BeTrue();
+        inventory.HasSpaceForItem(5, itemsCollection).Should().BeFalse();
+        inventory.HasSpaceForItem(1, 100, itemsCollection).Should().BeTrue();
+        inventory.HasSpaceForItem(1, 101, itemsCollection).Should().BeFalse();
     }
 
     private void HandleItemUsed(Inventory inventory, Item usedItem, ItemAction flags)
@@ -321,13 +321,13 @@ public class InventoryTests
     {
         var realmTestingServer = new RealmTestingServer();
         var player = realmTestingServer.CreatePlayer();
-        var itemsRegistry = realmTestingServer.GetRequiredService<ItemsRegistry>();
-        PopulateItemsRegistry(itemsRegistry);
+        var itemsCollection = realmTestingServer.GetRequiredService<ItemsCollection>();
+        PopulateItemsCollection(itemsCollection);
         var inventory = player.Inventory.CreatePrimaryInventory(100);
 
         inventory.ItemUsed += HandleItemUsed;
         inventory.Size = 100;
-        var item = inventory.AddSingleItem(itemsRegistry, 1, new Metadata { ["counter"] = 10 });
+        var item = inventory.AddSingleItem(itemsCollection, 1, new Metadata { ["counter"] = 10 });
 
         inventory.TryUseItem(item, ItemAction.Use).Should().BeTrue();
         item.GetMetadata("counter").Should().Be(9);
@@ -338,12 +338,12 @@ public class InventoryTests
     {
         var realmTestingServer = new RealmTestingServer();
         var player = realmTestingServer.CreatePlayer();
-        var itemsRegistry = realmTestingServer.GetRequiredService<ItemsRegistry>();
-        PopulateItemsRegistry(itemsRegistry);
+        var itemsCollection = realmTestingServer.GetRequiredService<ItemsCollection>();
+        PopulateItemsCollection(itemsCollection);
         var inventory = player.Inventory.CreatePrimaryInventory(100);
 
         inventory.Size = 100;
-        var item = inventory.AddSingleItem(itemsRegistry, 1);
+        var item = inventory.AddSingleItem(itemsCollection, 1);
         inventory.TryUseItem(item, ItemAction.Close).Should().BeFalse();
     }
 
@@ -352,11 +352,11 @@ public class InventoryTests
     {
         var realmTestingServer = new RealmTestingServer();
         var player = realmTestingServer.CreatePlayer();
-        var itemsRegistry = realmTestingServer.GetRequiredService<ItemsRegistry>();
-        PopulateItemsRegistry(itemsRegistry);
+        var itemsCollection = realmTestingServer.GetRequiredService<ItemsCollection>();
+        PopulateItemsCollection(itemsCollection);
         var inventory = player.Inventory.CreatePrimaryInventory(100);
 
-        var item = inventory.AddSingleItem(itemsRegistry, 1);
+        var item = inventory.AddSingleItem(itemsCollection, 1);
         inventory.RemoveItem(item);
         inventory.Items.Should().BeEmpty();
     }
@@ -366,11 +366,11 @@ public class InventoryTests
     {
         var realmTestingServer = new RealmTestingServer();
         var player = realmTestingServer.CreatePlayer();
-        var itemsRegistry = realmTestingServer.GetRequiredService<ItemsRegistry>();
-        PopulateItemsRegistry(itemsRegistry);
+        var itemsCollection = realmTestingServer.GetRequiredService<ItemsCollection>();
+        PopulateItemsCollection(itemsCollection);
         var inventory = player.Inventory.CreatePrimaryInventory(100);
 
-        inventory.AddItem(itemsRegistry, 1, 20);
+        inventory.AddItem(itemsCollection, 1, 20);
         inventory.RemoveItem(1, 20);
         inventory.Number.Should().Be(0);
         inventory.Items.Should().BeEmpty();
@@ -381,11 +381,11 @@ public class InventoryTests
     {
         var realmTestingServer = new RealmTestingServer();
         var player = realmTestingServer.CreatePlayer();
-        var itemsRegistry = realmTestingServer.GetRequiredService<ItemsRegistry>();
-        PopulateItemsRegistry(itemsRegistry);
+        var itemsCollection = realmTestingServer.GetRequiredService<ItemsCollection>();
+        PopulateItemsCollection(itemsCollection);
         var inventory = player.Inventory.CreatePrimaryInventory(100);
 
-        inventory.AddSingleItem(itemsRegistry, 1);
+        inventory.AddSingleItem(itemsCollection, 1);
         inventory.RemoveItem(1);
         inventory.Items.Should().BeEmpty();
     }
@@ -395,11 +395,11 @@ public class InventoryTests
     {
         var realmTestingServer = new RealmTestingServer();
         var player = realmTestingServer.CreatePlayer();
-        var itemsRegistry = realmTestingServer.GetRequiredService<ItemsRegistry>();
-        PopulateItemsRegistry(itemsRegistry);
+        var itemsCollection = realmTestingServer.GetRequiredService<ItemsCollection>();
+        PopulateItemsCollection(itemsCollection);
         var inventory = player.Inventory.CreatePrimaryInventory(100);
 
-        inventory.AddItem(itemsRegistry, 1, 20);
+        inventory.AddItem(itemsCollection, 1, 20);
         inventory.RemoveItem(30);
         inventory.Number.Should().Be(20);
     }
@@ -409,12 +409,12 @@ public class InventoryTests
     {
         var realmTestingServer = new RealmTestingServer();
         var player = realmTestingServer.CreatePlayer();
-        var itemsRegistry = realmTestingServer.GetRequiredService<ItemsRegistry>();
-        PopulateItemsRegistry(itemsRegistry);
+        var itemsCollection = realmTestingServer.GetRequiredService<ItemsCollection>();
+        PopulateItemsCollection(itemsCollection);
         var inventory = player.Inventory.CreatePrimaryInventory(100);
 
         inventory.Size = 100;
-        inventory.AddItem(itemsRegistry, 1, 4);
+        inventory.AddItem(itemsCollection, 1, 4);
         inventory.RemoveItem(1);
 
         var items = inventory.Items;
@@ -427,12 +427,12 @@ public class InventoryTests
     {
         var realmTestingServer = new RealmTestingServer();
         var player = realmTestingServer.CreatePlayer();
-        var itemsRegistry = realmTestingServer.GetRequiredService<ItemsRegistry>();
-        PopulateItemsRegistry(itemsRegistry);
+        var itemsCollection = realmTestingServer.GetRequiredService<ItemsCollection>();
+        PopulateItemsCollection(itemsCollection);
         var inventory = player.Inventory.CreatePrimaryInventory(100);
 
         inventory.Size = 100;
-        inventory.AddItem(itemsRegistry, 1, 4);
+        inventory.AddItem(itemsCollection, 1, 4);
         inventory.RemoveItemStack(1);
 
         inventory.Items.Should().BeEmpty();
@@ -443,12 +443,12 @@ public class InventoryTests
     {
         var realmTestingServer = new RealmTestingServer();
         var player = realmTestingServer.CreatePlayer();
-        var itemsRegistry = realmTestingServer.GetRequiredService<ItemsRegistry>();
-        PopulateItemsRegistry(itemsRegistry);
+        var itemsCollection = realmTestingServer.GetRequiredService<ItemsCollection>();
+        PopulateItemsCollection(itemsCollection);
         var inventory = player.Inventory.CreatePrimaryInventory(100);
 
         inventory.Size = 5;
-        var act = () => inventory.AddItem(itemsRegistry, 1, 4);
+        var act = () => inventory.AddItem(itemsCollection, 1, 4);
 
         act.Should().NotThrow();
         act.Should().Throw<InventoryNotEnoughSpaceException>().Where(x => x.InventorySize == 5 && x.RequiredSpace == 8);
@@ -459,14 +459,14 @@ public class InventoryTests
     {
         var realmTestingServer = new RealmTestingServer();
         var player = realmTestingServer.CreatePlayer();
-        var itemsRegistry = realmTestingServer.GetRequiredService<ItemsRegistry>();
-        PopulateItemsRegistry(itemsRegistry);
+        var itemsCollection = realmTestingServer.GetRequiredService<ItemsCollection>();
+        PopulateItemsCollection(itemsCollection);
         var inventory = player.Inventory.CreatePrimaryInventory(100);
 
         #region Arrange
-        inventory.AddItem(itemsRegistry, 1, 2);
-        inventory.AddItem(itemsRegistry, 2, 3);
-        inventory.AddItem(itemsRegistry, 3, 4);
+        inventory.AddItem(itemsCollection, 1, 2);
+        inventory.AddItem(itemsCollection, 2, 3);
+        inventory.AddItem(itemsCollection, 3, 4);
         #endregion
 
         #region Act
@@ -487,8 +487,8 @@ public class InventoryTests
     {
         var realmTestingServer = new RealmTestingServer();
         var player = realmTestingServer.CreatePlayer();
-        var itemsRegistry = realmTestingServer.GetRequiredService<ItemsRegistry>();
-        PopulateItemsRegistry(itemsRegistry);
+        var itemsCollection = realmTestingServer.GetRequiredService<ItemsCollection>();
+        PopulateItemsCollection(itemsCollection);
         var inventory = player.Inventory.CreatePrimaryInventory(100);
 
         #region Arrange
@@ -498,11 +498,11 @@ public class InventoryTests
         {
             ["foo"] = 1
         };
-        inventory.AddItem(itemsRegistry, 1, 10, metaData);
+        inventory.AddItem(itemsCollection, 1, 10, metaData);
         #endregion
 
         #region Act
-        var isSuccess = inventory.TransferItem(destinationInventory, itemsRegistry, 1, numberOfItemsToTransfer, false);
+        var isSuccess = inventory.TransferItem(destinationInventory, itemsCollection, 1, numberOfItemsToTransfer, false);
         #endregion
 
         #region Assert
@@ -518,11 +518,11 @@ public class InventoryTests
     {
         var realmTestingServer = new RealmTestingServer();
         var player = realmTestingServer.CreatePlayer();
-        var itemsRegistry = realmTestingServer.GetRequiredService<ItemsRegistry>();
-        PopulateItemsRegistry(itemsRegistry);
+        var itemsCollection = realmTestingServer.GetRequiredService<ItemsCollection>();
+        PopulateItemsCollection(itemsCollection);
         var inventory = player.Inventory.CreatePrimaryInventory(100);
 
-        var item = inventory.AddSingleItem(itemsRegistry, 1, new Metadata
+        var item = inventory.AddSingleItem(itemsCollection, 1, new Metadata
         {
             ["number"] = 123,
             ["string"] = "123",
@@ -544,11 +544,11 @@ public class InventoryTests
     {
         var realmTestingServer = new RealmTestingServer();
         var player = realmTestingServer.CreatePlayer();
-        var itemsRegistry = realmTestingServer.GetRequiredService<ItemsRegistry>();
-        PopulateItemsRegistry(itemsRegistry);
+        var itemsCollection = realmTestingServer.GetRequiredService<ItemsCollection>();
+        PopulateItemsCollection(itemsCollection);
         var inventory = player.Inventory.CreatePrimaryInventory(100);
 
-        inventory.AddSingleItem(itemsRegistry, 1);
+        inventory.AddSingleItem(itemsCollection, 1);
         inventory.HasItem(x => x.ItemId == itemId).Should().Be(has);
     }
 
@@ -557,12 +557,12 @@ public class InventoryTests
     {
         var realmTestingServer = new RealmTestingServer();
         var player = realmTestingServer.CreatePlayer();
-        var itemsRegistry = realmTestingServer.GetRequiredService<ItemsRegistry>();
-        PopulateItemsRegistry(itemsRegistry);
+        var itemsCollection = realmTestingServer.GetRequiredService<ItemsCollection>();
+        PopulateItemsCollection(itemsCollection);
 
         var inventory = new Inventory(player, 10, 0, new List<Item>
         {
-            new Item(itemsRegistry, 1, 1)
+            new Item(itemsCollection, 1, 1)
         });
         inventory.Number.Should().Be(1);
     }
@@ -572,8 +572,8 @@ public class InventoryTests
     {
         var realmTestingServer = new RealmTestingServer();
         var player = realmTestingServer.CreatePlayer();
-        var itemsRegistry = realmTestingServer.GetRequiredService<ItemsRegistry>();
-        PopulateItemsRegistry(itemsRegistry);
+        var itemsCollection = realmTestingServer.GetRequiredService<ItemsCollection>();
+        PopulateItemsCollection(itemsCollection);
         var inventory = player.Inventory.CreatePrimaryInventory(100);
 
         var metaData = new Metadata
@@ -581,7 +581,7 @@ public class InventoryTests
             ["foo"] = 1
         };
 
-        var item = inventory.AddSingleItem(itemsRegistry, 1, metaData);
+        var item = inventory.AddSingleItem(itemsCollection, 1, metaData);
 
         item.MetaData.Should().BeEquivalentTo(metaData);
     }
@@ -591,8 +591,8 @@ public class InventoryTests
     {
         var realmTestingServer = new RealmTestingServer();
         var player = realmTestingServer.CreatePlayer();
-        var itemsRegistry = realmTestingServer.GetRequiredService<ItemsRegistry>();
-        PopulateItemsRegistry(itemsRegistry);
+        var itemsCollection = realmTestingServer.GetRequiredService<ItemsCollection>();
+        PopulateItemsCollection(itemsCollection);
         var inventory = player.Inventory.CreatePrimaryInventory(100);
 
         var metaData = new Metadata
@@ -600,7 +600,7 @@ public class InventoryTests
             ["foo"] = 1
         };
 
-        var item = inventory.AddSingleItem(itemsRegistry, 1, metaData);
+        var item = inventory.AddSingleItem(itemsCollection, 1, metaData);
 
         item.MetaDataKeys.Should().BeEquivalentTo(new List<string> { "foo" });
     }
@@ -610,8 +610,8 @@ public class InventoryTests
     {
         var realmTestingServer = new RealmTestingServer();
         var player = realmTestingServer.CreatePlayer();
-        var itemsRegistry = realmTestingServer.GetRequiredService<ItemsRegistry>();
-        PopulateItemsRegistry(itemsRegistry);
+        var itemsCollection = realmTestingServer.GetRequiredService<ItemsCollection>();
+        PopulateItemsCollection(itemsCollection);
         var inventory = player.Inventory.CreatePrimaryInventory(100);
 
         var metaData = new Metadata
@@ -619,7 +619,7 @@ public class InventoryTests
             ["foo"] = 1
         };
 
-        var item = inventory.AddSingleItem(itemsRegistry, 1, metaData);
+        var item = inventory.AddSingleItem(itemsCollection, 1, metaData);
     using var monitoredItem = item.Monitor();
 
         item.RemoveMetadata("foo");
@@ -633,8 +633,8 @@ public class InventoryTests
     {
         var realmTestingServer = new RealmTestingServer();
         var player = realmTestingServer.CreatePlayer();
-        var itemsRegistry = realmTestingServer.GetRequiredService<ItemsRegistry>();
-        PopulateItemsRegistry(itemsRegistry);
+        var itemsCollection = realmTestingServer.GetRequiredService<ItemsCollection>();
+        PopulateItemsCollection(itemsCollection);
         var inventory = player.Inventory.CreatePrimaryInventory(100);
 
         var metaData = new Metadata
@@ -642,7 +642,7 @@ public class InventoryTests
             ["foo"] = 1
         };
 
-        var item = inventory.AddSingleItem(itemsRegistry, 1, metaData);
+        var item = inventory.AddSingleItem(itemsCollection, 1, metaData);
     using var monitoredItem = item.Monitor();
 
         item.ChangeMetadata<int>("foo", x => x + 1);
@@ -660,8 +660,8 @@ public class InventoryTests
     {
         var realmTestingServer = new RealmTestingServer();
         var player = realmTestingServer.CreatePlayer();
-        var itemsRegistry = realmTestingServer.GetRequiredService<ItemsRegistry>();
-        PopulateItemsRegistry(itemsRegistry);
+        var itemsCollection = realmTestingServer.GetRequiredService<ItemsCollection>();
+        PopulateItemsCollection(itemsCollection);
         var inventory = player.Inventory.CreatePrimaryInventory(100);
 
         var metaData = new Metadata
@@ -669,7 +669,7 @@ public class InventoryTests
             ["foo"] = 1
         };
 
-        var item = inventory.AddSingleItem(itemsRegistry, 1, metaData);
+        var item = inventory.AddSingleItem(itemsCollection, 1, metaData);
 
         item.HasMetadata("foo").Should().BeTrue();
     }
@@ -679,20 +679,20 @@ public class InventoryTests
     {
         var realmTestingServer = new RealmTestingServer();
         var player = realmTestingServer.CreatePlayer();
-        var itemsRegistry = realmTestingServer.GetRequiredService<ItemsRegistry>();
-        PopulateItemsRegistry(itemsRegistry);
+        var itemsCollection = realmTestingServer.GetRequiredService<ItemsCollection>();
+        PopulateItemsCollection(itemsCollection);
         var inventory = player.Inventory.CreatePrimaryInventory(100);
 
         #region Arrange
         inventory.Clear();
         var destinationInventory = new Inventory(player, 800);
-        inventory.AddItem(itemsRegistry, 1, 800, null, true, true);
+        inventory.AddItem(itemsCollection, 1, 800, null, true, true);
         #endregion
 
         #region Act
         await ParallelHelpers.Run(() =>
         {
-            var isSuccess = inventory.TransferItem(destinationInventory, itemsRegistry, 1, 1, false);
+            var isSuccess = inventory.TransferItem(destinationInventory, itemsCollection, 1, 1, false);
         });
         #endregion
 
@@ -707,8 +707,8 @@ public class InventoryTests
     {
         var realmTestingServer = new RealmTestingServer();
         var player = realmTestingServer.CreatePlayer();
-        var itemsRegistry = realmTestingServer.GetRequiredService<ItemsRegistry>();
-        PopulateItemsRegistry(itemsRegistry);
+        var itemsCollection = realmTestingServer.GetRequiredService<ItemsCollection>();
+        PopulateItemsCollection(itemsCollection);
         var inventory = player.Inventory.CreatePrimaryInventory(100);
 
         var metaData = new Metadata
@@ -716,7 +716,7 @@ public class InventoryTests
             ["foo"] = 1
         };
 
-        var addedItem = inventory.AddSingleItem(itemsRegistry, 1, metaData);
+        var addedItem = inventory.AddSingleItem(itemsCollection, 1, metaData);
         var removedItem = inventory.RemoveAndGetItemById(1).First();
 
         addedItem.Should().BeEquivalentTo(removedItem);
@@ -727,8 +727,8 @@ public class InventoryTests
     {
         var realmTestingServer = new RealmTestingServer();
         var player = realmTestingServer.CreatePlayer();
-        var itemsRegistry = realmTestingServer.GetRequiredService<ItemsRegistry>();
-        PopulateItemsRegistry(itemsRegistry);
+        var itemsCollection = realmTestingServer.GetRequiredService<ItemsCollection>();
+        PopulateItemsCollection(itemsCollection);
         var inventory = player.Inventory.CreatePrimaryInventory(100);
 
         var metaData = new Metadata
@@ -736,7 +736,7 @@ public class InventoryTests
             ["foo"] = 1
         };
 
-        var addedItem = inventory.AddItem(itemsRegistry, 1, 20, metaData);
+        var addedItem = inventory.AddItem(itemsCollection, 1, 20, metaData);
         var removedItem = inventory.RemoveAndGetItemById(1, 20);
 
         addedItem.Should().BeEquivalentTo(removedItem);
@@ -747,8 +747,8 @@ public class InventoryTests
     {
         var realmTestingServer = new RealmTestingServer();
         var player = realmTestingServer.CreatePlayer();
-        var itemsRegistry = realmTestingServer.GetRequiredService<ItemsRegistry>();
-        PopulateItemsRegistry(itemsRegistry);
+        var itemsCollection = realmTestingServer.GetRequiredService<ItemsCollection>();
+        PopulateItemsCollection(itemsCollection);
         var inventory = player.Inventory.CreatePrimaryInventory(100);
 
         var metaData = new Metadata
@@ -756,7 +756,7 @@ public class InventoryTests
             ["foo"] = 1
         };
 
-        inventory.AddItem(itemsRegistry, 1, 20, metaData);
+        inventory.AddItem(itemsCollection, 1, 20, metaData);
         var removedItem = inventory.RemoveAndGetItemById(1, 1);
         inventory.Number.Should().Be(19);
         removedItem.Should().HaveCount(1);

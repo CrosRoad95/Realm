@@ -8,7 +8,7 @@ internal sealed class CommandsLogic
 {
     private readonly RealmCommandService _commandService;
     private readonly IElementFactory _elementFactory;
-    private readonly ItemsRegistry _itemsRegistry;
+    private readonly ItemsCollection _itemsCollection;
     private readonly ChatBox _chatBox;
     private readonly ILogger<CommandsLogic> _logger;
     private readonly IDateTimeProvider _dateTimeProvider;
@@ -32,13 +32,13 @@ internal sealed class CommandsLogic
     }
 
     public CommandsLogic(RealmCommandService commandService, IElementFactory elementFactory,
-        ItemsRegistry itemsRegistry, ChatBox chatBox, ILogger<CommandsLogic> logger,
+        ItemsCollection itemsCollection, ChatBox chatBox, ILogger<CommandsLogic> logger,
         IDateTimeProvider dateTimeProvider, INametagsService nametagsService, IUsersService usersService, IVehiclesService vehiclesService,
-        GameWorld gameWorld, IElementOutlineService elementOutlineService, IAssetsService assetsService, ISpawnMarkersService spawnMarkersService, ILoadService loadService, IFeedbackService feedbackService, IOverlayService overlayService, AssetsRegistry assetsRegistry, VehicleUpgradeRegistry vehicleUpgradeRegistry, VehicleEnginesRegistry vehicleEnginesRegistry, IUserWhitelistedSerialsRepository userWhitelistedSerialsRepository, IVehicleRepository vehicleRepository, IPlayerMoneyHistoryService userMoneyHistoryService)
+        GameWorld gameWorld, IElementOutlineService elementOutlineService, IAssetsService assetsService, ISpawnMarkersService spawnMarkersService, ILoadService loadService, IFeedbackService feedbackService, IOverlayService overlayService, AssetsCollection assetsCollection, VehicleUpgradeCollection vehicleUpgradeCollection, VehicleEnginesCollection vehicleEnginesCollection, IUserWhitelistedSerialsRepository userWhitelistedSerialsRepository, IVehicleRepository vehicleRepository, IPlayerMoneyHistoryService userMoneyHistoryService)
     {
         _commandService = commandService;
         _elementFactory = elementFactory;
-        _itemsRegistry = itemsRegistry;
+        _itemsCollection = itemsCollection;
         _chatBox = chatBox;
         _logger = logger;
         _dateTimeProvider = dateTimeProvider;
@@ -276,7 +276,7 @@ internal sealed class CommandsLogic
         {
             if (player.Inventory.TryGetPrimary(out var inventory))
             {
-                inventory.AddItem(_itemsRegistry, 1);
+                inventory.AddItem(_itemsCollection, 1);
                 _chatBox.OutputTo(player, $"Test item added");
             }
         });
@@ -284,7 +284,7 @@ internal sealed class CommandsLogic
         {
             if (player.Inventory.TryGetPrimary(out var inventory))
             {
-                inventory.AddItem(_itemsRegistry, 2);
+                inventory.AddItem(_itemsCollection, 2);
                 _chatBox.OutputTo(player, $"Test item added");
             }
         });
@@ -297,7 +297,7 @@ internal sealed class CommandsLogic
 
             if (player.Inventory.TryGetPrimary(out var inventory))
             {
-                inventory.AddItem(_itemsRegistry, 1);
+                inventory.AddItem(_itemsCollection, 1);
                 _chatBox.OutputTo(player, $"Test item added");
             }
 

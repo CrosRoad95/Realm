@@ -1,10 +1,10 @@
 ﻿namespace RealmCore.Tests.Classes;
 
-internal class TestItemsRegistry : ItemsRegistry
+internal class TestItemsCollection : ItemsCollection
 {
-    public TestItemsRegistry()
+    public TestItemsCollection()
     {
-        Add(1, new ItemRegistryEntry
+        Add(1, new ItemsCollectionItem
         {
             AvailableActions = ItemAction.Use,
             Name = "Test item id 1",

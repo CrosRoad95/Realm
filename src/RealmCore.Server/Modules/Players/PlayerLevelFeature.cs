@@ -15,7 +15,7 @@ public interface IPlayerLevelFeature : IPlayerFeature
 internal sealed class PlayerLevelFeature : IPlayerLevelFeature
 {
     private readonly object _lock = new();
-    private readonly LevelsRegistry _levelsRegistry;
+    private readonly LevelsCollection _levelsCollection;
     private readonly IPlayerUserFeature _playerUserService;
     private uint _level;
     private uint _experience;
@@ -24,12 +24,12 @@ internal sealed class PlayerLevelFeature : IPlayerLevelFeature
     public event Action<IPlayerLevelFeature, uint>? ExperienceChanged;
 
     public RealmPlayer Player { get; init; }
-    public PlayerLevelFeature(PlayerContext playerContext, LevelsRegistry levelsRegistry, IPlayerUserFeature playerUserService)
+    public PlayerLevelFeature(PlayerContext playerContext, LevelsCollection levelsCollection, IPlayerUserFeature playerUserService)
     {
         Player = playerContext.Player;
         playerUserService.SignedIn += HandleSignedIn;
         playerUserService.SignedOut += HandleSignedOut;
-        _levelsRegistry = levelsRegistry;
+        _levelsCollection = levelsCollection;
         _playerUserService = playerUserService;
     }
 
@@ -55,7 +55,7 @@ internal sealed class PlayerLevelFeature : IPlayerLevelFeature
     {
         get
         {
-            return _levelsRegistry.GetExperienceRequiredForLevel(Level + 1);
+            return _levelsCollection.GetExperienceRequiredForLevel(Level + 1);
         }
     }
 

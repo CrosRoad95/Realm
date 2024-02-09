@@ -3,15 +3,15 @@
 internal class MapsLogic
 {
     private readonly IMapsService _mapsService;
-    private readonly MapsRegistry _mapsRegistry;
+    private readonly MapsCollection _mapsCollection;
     private readonly ILogger<MapsLogic> _logger;
 
-    public MapsLogic(IMapsService mapsService, MapsRegistry mapsRegistry, ILogger<MapsLogic> logger)
+    public MapsLogic(IMapsService mapsService, MapsCollection mapsCollection, ILogger<MapsLogic> logger)
     {
         _mapsService = mapsService;
-        _mapsRegistry = mapsRegistry;
+        _mapsCollection = mapsCollection;
         _logger = logger;
-        _mapsRegistry.MapChanged += HandleMapChanged;
+        _mapsCollection.MapChanged += HandleMapChanged;
 
         //mapsService.RegisterMapFromMemory("testmap", new List<WorldObject>
         //{
@@ -22,7 +22,7 @@ internal class MapsLogic
         //});
 
         //mapsService.RegisterMapsPath("C:\\Users\\sebaj\\source\\repos\\RealmCore\\src\\RealmCore.BlazorGui\\bin\\Debug\\net8.0\\Server\\Maps");
-        mapsRegistry.RegisterMapsPath("Server/Maps", mapsService);
+        mapsCollection.RegisterMapsPath("Server/Maps", mapsService);
         //mapsService.RegisterMapFromXml("testmapxml", "Server/Maps/test.map");
     }
 

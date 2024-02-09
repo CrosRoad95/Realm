@@ -17,26 +17,26 @@ internal sealed class VehiclesService : IVehiclesService
     private readonly IVehicleRepository _vehicleRepository;
     private readonly IElementFactory _elementFactory;
     private readonly ISaveService _saveService;
-    private readonly ItemsRegistry _itemsRegistry;
+    private readonly ItemsCollection _itemsCollection;
     private readonly IVehicleEventRepository _vehicleEventRepository;
     private readonly IDateTimeProvider _dateTimeProvider;
-    private readonly VehicleUpgradeRegistry _vehicleUpgradeRegistry;
-    private readonly VehicleEnginesRegistry _vehicleEnginesRegistry;
+    private readonly VehicleUpgradeCollection _vehicleUpgradesCollection;
+    private readonly VehicleEnginesCollection _vehicleEnginesCollection;
     private readonly IActiveUsers _activeUsers;
     private readonly IActiveVehicles _activeVehicles;
     private readonly ILogger<VehiclesService> _logger;
     private readonly JsonSerializerSettings _jsonSerializerSettings;
 
-    public VehiclesService(IVehicleRepository vehicleRepository, IElementFactory elementFactory, ISaveService saveService, ItemsRegistry itemsRegistry, IVehicleEventRepository vehicleEventRepository, IDateTimeProvider dateTimeProvider, VehicleUpgradeRegistry vehicleUpgradeRegistry, VehicleEnginesRegistry vehicleEnginesRegistry, IActiveUsers activeUsers, IActiveVehicles activeVehicles, ILogger<VehiclesService> logger)
+    public VehiclesService(IVehicleRepository vehicleRepository, IElementFactory elementFactory, ISaveService saveService, ItemsCollection itemsCollection, IVehicleEventRepository vehicleEventRepository, IDateTimeProvider dateTimeProvider, VehicleUpgradeCollection vehicleUpgradeCollection, VehicleEnginesCollection vehicleEnginesCollection, IActiveUsers activeUsers, IActiveVehicles activeVehicles, ILogger<VehiclesService> logger)
     {
         _vehicleRepository = vehicleRepository;
         _elementFactory = elementFactory;
         _saveService = saveService;
-        _itemsRegistry = itemsRegistry;
+        _itemsCollection = itemsCollection;
         _vehicleEventRepository = vehicleEventRepository;
         _dateTimeProvider = dateTimeProvider;
-        _vehicleUpgradeRegistry = vehicleUpgradeRegistry;
-        _vehicleEnginesRegistry = vehicleEnginesRegistry;
+        _vehicleUpgradesCollection = vehicleUpgradeCollection;
+        _vehicleEnginesCollection = vehicleEnginesCollection;
         _activeUsers = activeUsers;
         _activeVehicles = activeVehicles;
         _logger = logger;

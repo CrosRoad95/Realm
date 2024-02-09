@@ -9,12 +9,12 @@ namespace RealmCore.Resources.Assets;
 internal class AssetsLogic
 {
     private readonly AssetsResource _resource;
-    private readonly AssetsRegistry _assetsRegistry;
+    private readonly AssetsCollection _assetsCollection;
     private readonly IAssetsService _assetsService;
     private readonly LuaEventService _luaEventService;
-    public AssetsLogic(MtaServer mtaServer, AssetsRegistry assetsRegistry, IAssetsService assetsService, LuaEventService luaEventService)
+    public AssetsLogic(MtaServer mtaServer, AssetsCollection assetsCollection, IAssetsService assetsService, LuaEventService luaEventService)
     {
-        _assetsRegistry = assetsRegistry;
+        _assetsCollection = assetsCollection;
         _assetsService = assetsService;
         _luaEventService = luaEventService;
         luaEventService.AddEventHandler("internalRequestAssets", HandleInternalRequestAssets);
@@ -33,7 +33,7 @@ internal class AssetsLogic
 
     private void HandleInternalRequestAssets(LuaEvent luaEvent)
     {
-        var luaValue = _assetsRegistry.Assets.ToDictionary(x => new LuaValue(x.Key), x => _assetsService.Map(x.Value));
+        var luaValue = _assetsCollection.Assets.ToDictionary(x => new LuaValue(x.Key), x => _assetsService.Map(x.Value));
         _luaEventService.TriggerEventFor(luaEvent.Player, "internalResponseRequestAsset", luaEvent.Player, new LuaValue(luaValue));
     }
 

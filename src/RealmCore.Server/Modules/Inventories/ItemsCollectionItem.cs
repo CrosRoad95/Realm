@@ -1,6 +1,6 @@
 ﻿namespace RealmCore.Server.Modules.Inventories;
 
-public class ItemRegistryEntry : RegistryEntryBase<uint>
+public class ItemsCollectionItem : CollectionItemBase<uint>
 {
     public decimal Size { get; set; }
     public string Name { get; set; }

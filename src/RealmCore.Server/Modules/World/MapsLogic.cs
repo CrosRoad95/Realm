@@ -3,12 +3,12 @@
 internal sealed class MapsLogic
 {
     private readonly IMapsService _mapsService;
-    private readonly MapsRegistry _mapsRegistry;
+    private readonly MapsCollection _mapsCollection;
 
-    public MapsLogic(IMapsService mapsService, MtaServer mtaServer, MapsRegistry mapsRegistry)
+    public MapsLogic(IMapsService mapsService, MtaServer mtaServer, MapsCollection mapsCollection)
     {
         _mapsService = mapsService;
-        _mapsRegistry = mapsRegistry;
+        _mapsCollection = mapsCollection;
         mtaServer.PlayerJoined += HandlePlayerJoined;
     }
 
@@ -16,7 +16,7 @@ internal sealed class MapsLogic
     {
         foreach (var map in _mapsService.LoadedMaps)
         {
-            _mapsRegistry.GetByName(map).LoadFor((RealmPlayer)player);
+            _mapsCollection.GetByName(map).LoadFor((RealmPlayer)player);
         }
     }
 }

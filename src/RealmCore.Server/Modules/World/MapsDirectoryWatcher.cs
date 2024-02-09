@@ -16,7 +16,7 @@ internal class MapsDirectoryWatcher : IDisposable
 
     private readonly FileSystemWatcher _fileSystemWatcher;
     private readonly string _path;
-    private readonly MapsRegistry _mapsRegistry;
+    private readonly MapsCollection _mapsCollection;
     private readonly IMapsService _mapsService;
     private readonly List<MapEvent> _mapEvents = [];
     private readonly object _mapEventsLock = new();
@@ -24,10 +24,10 @@ internal class MapsDirectoryWatcher : IDisposable
 
     public event Action<string, MapEventType>? MapChanged;
 
-    public MapsDirectoryWatcher(string path, MapsRegistry mapsRegistry, IMapsService mapsService)
+    public MapsDirectoryWatcher(string path, MapsCollection mapsCollection, IMapsService mapsService)
     {
         _path = path;
-        _mapsRegistry = mapsRegistry;
+        _mapsCollection = mapsCollection;
         _mapsService = mapsService;
         string searchPattern = "*.map";
         _fileSystemWatcher = new FileSystemWatcher
@@ -96,7 +96,7 @@ internal class MapsDirectoryWatcher : IDisposable
 
             if (_mapsService.IsLoaded(mapName))
                 _loadedMaps.Add(mapName);
-            _mapsRegistry.RemoveMapByName(mapName);
+            _mapsCollection.RemoveMapByName(mapName);
             MapChanged?.Invoke(mapName, MapEventType.Remove);
         }
 
@@ -104,7 +104,7 @@ internal class MapsDirectoryWatcher : IDisposable
         {
             var mapName = GetMapName(mapFile);
 
-            var map = _mapsRegistry.RegisterMapFromMapFile(mapName, Path.Combine(_path, mapFile));
+            var map = _mapsCollection.RegisterMapFromMapFile(mapName, Path.Combine(_path, mapFile));
             if (_loadedMaps.Contains(mapName))
                 _mapsService.Load(mapName);
             MapChanged?.Invoke(mapName, MapEventType.Add);
@@ -115,8 +115,8 @@ internal class MapsDirectoryWatcher : IDisposable
             var mapName = GetMapName(mapFile);
 
             _mapsService.Unload(mapName);
-            _mapsRegistry.RemoveMapByName(mapName);
-            var map = _mapsRegistry.RegisterMapFromMapFile(mapName, Path.Combine(_path, mapFile));
+            _mapsCollection.RemoveMapByName(mapName);
+            var map = _mapsCollection.RegisterMapFromMapFile(mapName, Path.Combine(_path, mapFile));
             _mapsService.Load(mapName);
             MapChanged?.Invoke(mapName, MapEventType.Update);
         }

@@ -68,13 +68,13 @@ public class Item : IEquatable<Item>, IEquatable<Metadata>
         AvailableActions = item.AvailableActions;
     }
 
-    internal Item(ItemsRegistry itemsRegistry, uint itemId, uint number, Metadata? metaData = null)
+    internal Item(ItemsCollection itemsCollection, uint itemId, uint number, Metadata? metaData = null)
     {
-        var itemRegistryEntry = itemsRegistry.Get(itemId);
-        AvailableActions = itemRegistryEntry.AvailableActions;
-        Size = itemRegistryEntry.Size;
-        Name = itemRegistryEntry.Name;
-        ItemId = itemRegistryEntry.Id;
+        var itemsCollectionItem = itemsCollection.Get(itemId);
+        AvailableActions = itemsCollectionItem.AvailableActions;
+        Size = itemsCollectionItem.Size;
+        Name = itemsCollectionItem.Name;
+        ItemId = itemsCollectionItem.Id;
         _number = number;
         if (metaData != null)
         {

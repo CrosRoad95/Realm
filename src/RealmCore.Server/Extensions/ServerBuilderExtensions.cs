@@ -105,7 +105,7 @@ public static class ServerBuilderExtensions
         serverBuilder.AddLogic<PlayersLogic>();
         serverBuilder.AddLogic<GuiLogic>();
         serverBuilder.AddLogic<ServerLogic>();
-        serverBuilder.AddLogic<VehicleEnginesRegistryLogic>();
+        serverBuilder.AddLogic<VehicleEnginesCollectionLogic>();
         serverBuilder.AddLogic<VehicleAccessControllerComponentLogic>();
         serverBuilder.AddLogic<MapsLogic>();
         #endregion

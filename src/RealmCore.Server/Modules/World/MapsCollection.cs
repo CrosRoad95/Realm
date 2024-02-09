@@ -1,12 +1,12 @@
 ﻿namespace RealmCore.Server.Modules.World;
 
-public class MapsRegistry
+public class MapsCollection
 {
     private readonly MapIdGenerator _mapIdGenerator;
     private readonly List<MapsDirectoryWatcher> _mapsDirectoryWatchers = [];
     private readonly Dictionary<string, Map> _maps = [];
     private readonly object _lock = new();
-    private readonly ILogger<MapsRegistry> _logger;
+    private readonly ILogger<MapsCollection> _logger;
 
     public event Action<string, MapEventType>? MapChanged;
 
@@ -21,7 +21,7 @@ public class MapsRegistry
     public event Action<string, Map>? MapAdded;
     public event Action<string, Map>? MapRemoved;
 
-    public MapsRegistry(ILogger<MapsRegistry> logger, MapIdGenerator mapIdGenerator)
+    public MapsCollection(ILogger<MapsCollection> logger, MapIdGenerator mapIdGenerator)
     {
         _logger = logger;
         _mapIdGenerator = mapIdGenerator;

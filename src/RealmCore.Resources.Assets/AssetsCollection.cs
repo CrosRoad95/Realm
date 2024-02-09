@@ -4,7 +4,7 @@ using SlipeServer.Server.Enums;
 
 namespace RealmCore.Resources.Assets;
 
-public class AssetsRegistry : IServerAssetsProvider
+public class AssetsCollection : IServerAssetsProvider
 {
     private readonly object _lock = new();
     private readonly Dictionary<string, IAsset> _assets = [];
@@ -12,7 +12,7 @@ public class AssetsRegistry : IServerAssetsProvider
     public IReadOnlyDictionary<string, IAsset> Assets => _assets;
     public IReadOnlyDictionary<ObjectModel, string> ReplacedModels => _replacedModels;
 
-    public AssetsRegistry()
+    public AssetsCollection()
     {
         try
         {

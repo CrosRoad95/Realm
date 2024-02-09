@@ -48,11 +48,11 @@ public class VehicleUpgradesTests
     {
         _realmTestingServer = new RealmTestingServer();
 
-        var vehicleUpgradeRegistry = _realmTestingServer.GetRequiredService<VehicleUpgradeRegistry>();
+        var vehicleUpgradesCollection = _realmTestingServer.GetRequiredService<VehicleUpgradeCollection>();
 
-        vehicleUpgradeRegistry.AddUpgrade(1000000, new VehicleUpgradeRegistryEntry(new VehicleUpgrade1()));
-        vehicleUpgradeRegistry.AddUpgrade(1000001, new VehicleUpgradeRegistryEntry(new VehicleUpgrade2()));
-        vehicleUpgradeRegistry.AddUpgrade(1000002, new VehicleUpgradeRegistryEntry(new VehicleUpgrade3()));
+        vehicleUpgradesCollection.Add(1000000, new VehicleUpgradesCollectionItem(new VehicleUpgrade1()));
+        vehicleUpgradesCollection.Add(1000001, new VehicleUpgradesCollectionItem(new VehicleUpgrade2()));
+        vehicleUpgradesCollection.Add(1000002, new VehicleUpgradesCollectionItem(new VehicleUpgrade3()));
 
         #region Assert default handling
         var handling = VehicleHandlingConstants.DefaultVehicleHandling[(ushort)VehicleModel.Perennial];

@@ -21,8 +21,8 @@ public static class ServerBuilderExtensions
         builder.ConfigureServices(services =>
         {
             services.AddSingleton<IAssetsService, AssetsService>();
-            services.AddSingleton<AssetsRegistry>();
-            services.AddSingleton<IServerAssetsProvider>(x => x.GetRequiredService<AssetsRegistry>());
+            services.AddSingleton<AssetsCollection>();
+            services.AddSingleton<IServerAssetsProvider>(x => x.GetRequiredService<AssetsCollection>());
         });
 
         builder.AddLogic<AssetsLogic>();

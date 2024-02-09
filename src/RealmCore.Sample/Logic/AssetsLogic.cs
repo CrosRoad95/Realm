@@ -4,7 +4,7 @@ internal sealed class AssetsLogic
 {
     private const string _basePath = "../../../Server/Assets";
 
-    public AssetsLogic(AssetsRegistry assetsRegistry)
+    public AssetsLogic(AssetsCollection assetsCollection)
     {
         if (Directory.Exists(_basePath))
         {
@@ -15,7 +15,7 @@ internal sealed class AssetsLogic
                 switch (Path.GetDirectoryName(fileName))
                 {
                     case "Fonts":
-                        assetsRegistry.AddFont(Path.GetFileName(fileName), $"Server/Assets/{fileName}");
+                        assetsCollection.AddFont(Path.GetFileName(fileName), $"Server/Assets/{fileName}");
                         break;
                 }
             }

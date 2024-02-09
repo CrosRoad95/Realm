@@ -21,21 +21,21 @@ public interface IVehicleInventoryFeature : IVehicleFeature, IElementInventoryFe
 
 internal sealed class PlayerInventoryFeature : ElementInventoryFeature, IPlayerInventoryService
 {
-    private readonly ItemsRegistry _itemsRegistry;
+    private readonly ItemsCollection _itemsCollection;
 
     public RealmPlayer Player { get; }
     protected override Element Element => Player;
 
-    public PlayerInventoryFeature(PlayerContext playerContext, IPlayerUserFeature playerUserService, ItemsRegistry itemsRegistry)
+    public PlayerInventoryFeature(PlayerContext playerContext, IPlayerUserFeature playerUserService, ItemsCollection itemsCollection)
     {
         Player = playerContext.Player;
         playerUserService.SignedIn += HandleSignedIn;
-        _itemsRegistry = itemsRegistry;
+        _itemsCollection = itemsCollection;
     }
 
     private void HandleSignedIn(IPlayerUserFeature userService, RealmPlayer player)
     {
-        Load(Player, userService.User.Inventories, _itemsRegistry);
+        Load(Player, userService.User.Inventories, _itemsCollection);
     }
 }
 
@@ -62,13 +62,13 @@ internal abstract class ElementInventoryFeature : IElementInventoryFeature
         return inventory != null;
     }
 
-    protected bool Load(Element element, ICollection<InventoryData> inventories, ItemsRegistry itemsRegistry)
+    protected bool Load(Element element, ICollection<InventoryData> inventories, ItemsCollection itemsCollection)
     {
         if (inventories != null && inventories.Count != 0)
         {
             var inventory = inventories.First();
 
-            Primary = Inventory.CreateFromData(element, inventory, itemsRegistry);
+            Primary = Inventory.CreateFromData(element, inventory, itemsCollection);
             PrimarySet?.Invoke(this, Primary);
             return true;
         }

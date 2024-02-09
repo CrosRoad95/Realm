@@ -2,13 +2,13 @@
 
 public class PlayerLevelServiceTests
 {
-    private uint PopulateLevelsRegistry(LevelsRegistry levelsRegistry)
+    private uint PopulateLevelsCollection(LevelsCollection levelsCollection)
     {
         uint totalRequiredExperience = 0;
         for (int i = 0; i < 10; i++)
         {
             var requiredExperience = (uint)(10 * i + 10);
-            levelsRegistry.Add((uint)i + 1, new LevelRegistryEntry(requiredExperience));
+            levelsCollection.Add((uint)i + 1, new LevelsCollectionItem(requiredExperience));
             totalRequiredExperience += requiredExperience;
         }
         return totalRequiredExperience;
@@ -19,8 +19,8 @@ public class PlayerLevelServiceTests
     {
         var realmTestingServer = new RealmTestingServer();
         var player = realmTestingServer.CreatePlayer();
-        var levelsRegistry = realmTestingServer.GetRequiredService<LevelsRegistry>();
-        var totalRequiredExperience = PopulateLevelsRegistry(levelsRegistry);
+        var levelsCollection = realmTestingServer.GetRequiredService<LevelsCollection>();
+        var totalRequiredExperience = PopulateLevelsCollection(levelsCollection);
         var level = player.Level;
 
         int addedLevels = 0;

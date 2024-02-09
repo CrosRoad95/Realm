@@ -37,7 +37,7 @@ end
     {
         var serverAssetsProviders = server.GetRequiredService<IEnumerable<IServerAssetsProvider>>();
         var encryptionProvider = server.GetRequiredService<IAssetEncryptionProvider>();
-        var assetsRegistry = server.GetRequiredService<AssetsRegistry>();
+        var assetsCollection = server.GetRequiredService<AssetsCollection>();
 
         foreach (var (path, content) in AdditionalFiles)
             Files.Add(ResourceFileFactory.FromBytes(content, path));
@@ -69,12 +69,12 @@ end
         var keyBase64 = Convert.ToBase64String(encryptionProvider.Key);
         var decryptString = string.Format(_decryptScript, keyBase64, "{", "}");
 
-        if(assetsRegistry.ReplacedModels.Any())
+        if(assetsCollection.ReplacedModels.Any())
         {
             var modelsToReplace = new StringBuilder();
-            foreach (var item in assetsRegistry.ReplacedModels)
+            foreach (var item in assetsCollection.ReplacedModels)
             {
-                var asset = assetsRegistry.GetAsset<IModel>(item.Value);
+                var asset = assetsCollection.GetAsset<IModel>(item.Value);
                 var col = Utilities.CreateMD5(asset.ColPath);
                 var dff = Utilities.CreateMD5(asset.DffPath);
                 modelsToReplace.AppendLine($"local col = engineLoadCOL(decryptAsset(\"{col}\"));engineReplaceCOL(col,{(int)item.Key});");

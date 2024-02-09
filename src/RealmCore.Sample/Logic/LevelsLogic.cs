@@ -2,14 +2,11 @@
 
 internal class LevelsLogic
 {
-    private readonly LevelsRegistry _levelsRegistry;
-
-    public LevelsLogic(LevelsRegistry levelsRegistry)
+    public LevelsLogic(LevelsCollection levelsCollection)
     {
-        _levelsRegistry = levelsRegistry;
         for (uint i = 1; i < 100; i++)
         {
-            _levelsRegistry.Add(i, new LevelRegistryEntry(i * 25));
+            levelsCollection.Add(i, new LevelsCollectionItem(i * 25));
         }
     }
 }

@@ -235,12 +235,12 @@ public class Inventory
         }
     }
 
-    public Item AddSingleItem(ItemsRegistry itemsRegistry, uint itemId, Metadata? metadata = null, bool tryStack = true, bool force = false)
+    public Item AddSingleItem(ItemsCollection itemsCollection, uint itemId, Metadata? metadata = null, bool tryStack = true, bool force = false)
     {
         _semaphore.EnterWriteLock();
         try
         {
-            var item = AddItem(itemsRegistry, itemId, 1, metadata, tryStack, force);
+            var item = AddItem(itemsCollection, itemId, 1, metadata, tryStack, force);
             if (item.Any())
                 return item.First();
             return GetSingleItemByIdWithMetadata(itemId, metadata ?? []) ?? throw new InvalidOperationException();
@@ -251,15 +251,15 @@ public class Inventory
         }
     }
 
-    public IEnumerable<Item> AddItem(ItemsRegistry itemsRegistry, uint itemId, uint number = 1, Metadata? metadata = null, bool tryStack = true, bool force = false)
+    public IEnumerable<Item> AddItem(ItemsCollection itemsCollection, uint itemId, uint number = 1, Metadata? metadata = null, bool tryStack = true, bool force = false)
     {
         if (number <= 0)
             throw new ArgumentOutOfRangeException(nameof(number));
 
         metadata ??= [];
 
-        var itemRegistryEntry = itemsRegistry.Get(itemId);
-        var requiredSpace = Number + itemRegistryEntry.Size * number;
+        var itemsCollectionItem = itemsCollection.Get(itemId);
+        var requiredSpace = Number + itemsCollectionItem.Size * number;
         if (requiredSpace > Size && !force)
             throw new InventoryNotEnoughSpaceException(Size, requiredSpace);
 
@@ -274,7 +274,7 @@ public class Inventory
                     if (!item.Equals(metadata))
                         continue;
 
-                    var added = Math.Min(number, itemRegistryEntry.StackSize - item.Number);
+                    var added = Math.Min(number, itemsCollectionItem.StackSize - item.Number);
                     item.Number += added;
                     number -= added;
                 }
@@ -282,9 +282,9 @@ public class Inventory
 
             while (number > 0)
             {
-                var thisItemNumber = Math.Min(number, itemRegistryEntry.StackSize);
+                var thisItemNumber = Math.Min(number, itemsCollectionItem.StackSize);
                 number -= thisItemNumber;
-                var item = new Item(itemsRegistry, itemId, number, metadata)
+                var item = new Item(itemsCollection, itemId, number, metadata)
                 {
                     Number = thisItemNumber
                 };
@@ -306,12 +306,12 @@ public class Inventory
         }
     }
 
-    public void AddItem(ItemsRegistry itemsRegistry, Item newItem, bool force = false)
+    public void AddItem(ItemsCollection itemsCollection, Item newItem, bool force = false)
     {
         if (!force)
         {
-            var itemRegistryEntry = itemsRegistry.Get(newItem.ItemId);
-            var requiredSpace = Number + itemRegistryEntry.Size * newItem.Number;
+            var itemsCollectionItem = itemsCollection.Get(newItem.ItemId);
+            var requiredSpace = Number + itemsCollectionItem.Size * newItem.Number;
             if (requiredSpace > Size)
                 throw new InventoryNotEnoughSpaceException(Size, requiredSpace);
         }
@@ -329,7 +329,7 @@ public class Inventory
         }
     }
 
-    public void AddItems(ItemsRegistry itemsRegistry, IEnumerable<Item> newItems, bool force = false)
+    public void AddItems(ItemsCollection itemsCollection, IEnumerable<Item> newItems, bool force = false)
     {
         _semaphore.EnterWriteLock();
 
@@ -338,8 +338,8 @@ public class Inventory
             decimal requiredSpace = 0;
             foreach (var newItem in newItems)
             {
-                var itemRegistryEntry = itemsRegistry.Get(newItem.ItemId);
-                requiredSpace += Number + itemRegistryEntry.Size * newItem.Number;
+                var itemsCollectionItem = itemsCollection.Get(newItem.ItemId);
+                requiredSpace += Number + itemsCollectionItem.Size * newItem.Number;
             }
 
             if (requiredSpace > Size)
@@ -518,29 +518,29 @@ public class Inventory
         return Number + space <= Size;
     }
 
-    public bool HasSpaceForItem(uint itemId, ItemsRegistry itemsRegistry)
+    public bool HasSpaceForItem(uint itemId, ItemsCollection itemsCollection)
     {
-        return Number + itemsRegistry.Get(itemId).Size <= Size;
+        return Number + itemsCollection.Get(itemId).Size <= Size;
     }
 
-    public bool HasSpaceForItem(uint itemId, uint number, ItemsRegistry itemsRegistry)
+    public bool HasSpaceForItem(uint itemId, uint number, ItemsCollection itemsCollection)
     {
-        return Number + itemsRegistry.Get(itemId).Size * number <= Size;
+        return Number + itemsCollection.Get(itemId).Size * number <= Size;
     }
 
-    public bool TransferItem(Inventory destination, ItemsRegistry itemsRegistry, uint itemId, uint number, bool force)
+    public bool TransferItem(Inventory destination, ItemsCollection itemsCollection, uint itemId, uint number, bool force)
     {
         if (SumItemsNumberById(itemId) >= number || force)
         {
             var removedItems = RemoveAndGetItemById(itemId, number);
             try
             {
-                destination.AddItems(itemsRegistry, removedItems, force: force);
+                destination.AddItems(itemsCollection, removedItems, force: force);
                 return true;
             }
             catch (InventoryNotEnoughSpaceException)
             {
-                AddItems(itemsRegistry, removedItems);
+                AddItems(itemsCollection, removedItems);
                 return false;
             }
         }
@@ -559,16 +559,15 @@ public class Inventory
         Converters = new List<JsonConverter> { DoubleConverter.Instance }
     };
 
-    public static Inventory CreateFromData(Element element, InventoryData inventory, ItemsRegistry itemsRegistry)
+    public static Inventory CreateFromData(Element element, InventoryData inventory, ItemsCollection itemsCollection)
     {
         var items = inventory.InventoryItems
             .Select(x =>
-                new Item(itemsRegistry, x.ItemId, x.Number, JsonConvert.DeserializeObject<Metadata>(x.MetaData, _jsonSerializerSettings))
+                new Item(itemsCollection, x.ItemId, x.Number, JsonConvert.DeserializeObject<Metadata>(x.MetaData, _jsonSerializerSettings))
             )
             .ToList();
         return new Inventory(element, inventory.Size, inventory.Id, items);
     }
-
 
     public static InventoryData CreateData(Inventory inventory)
     {

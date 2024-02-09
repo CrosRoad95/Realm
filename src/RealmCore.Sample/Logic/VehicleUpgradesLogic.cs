@@ -28,9 +28,9 @@ public class VehicleUpgradesLogic
         }
     }
 
-    public VehicleUpgradesLogic(VehicleUpgradeRegistry vehicleUpgradeRegistry)
+    public VehicleUpgradesLogic(VehicleUpgradeCollection vehicleUpgradeCollection)
     {
-        vehicleUpgradeRegistry.AddUpgrade(1, new SampleUpgrade1());
-        vehicleUpgradeRegistry.AddUpgrade(2, new SampleUpgrade2());
+        vehicleUpgradeCollection.Add(1, new(new SampleUpgrade1()));
+        vehicleUpgradeCollection.Add(2, new(new SampleUpgrade2()));
     }
 }

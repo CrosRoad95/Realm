@@ -8,16 +8,16 @@ internal sealed partial class PlayerGameplayLogic
 {
     private readonly IServiceProvider _serviceProvider;
     private readonly ChatBox _chatBox;
-    private readonly VehicleUpgradeRegistry _vehicleUpgradeRegistry;
-    private readonly VehicleEnginesRegistry _vehicleEnginesRegistry;
+    private readonly VehicleUpgradeCollection _vehicleUpgradeCollection;
+    private readonly VehicleEnginesCollection _vehicleEnginesCollection;
     private readonly ILogger<PlayerGameplayLogic> _logger;
 
-    public PlayerGameplayLogic(ILogger<PlayerGameplayLogic> logger, IServiceProvider serviceProvider, ChatBox chatBox, VehicleUpgradeRegistry vehicleUpgradeRegistry, VehicleEnginesRegistry vehicleEnginesRegistry, IUsersService usersService)
+    public PlayerGameplayLogic(ILogger<PlayerGameplayLogic> logger, IServiceProvider serviceProvider, ChatBox chatBox, VehicleUpgradeCollection vehicleUpgradeCollection, VehicleEnginesCollection vehicleEnginesCollection, IUsersService usersService)
     {
         _serviceProvider = serviceProvider;
         _chatBox = chatBox;
-        _vehicleUpgradeRegistry = vehicleUpgradeRegistry;
-        _vehicleEnginesRegistry = vehicleEnginesRegistry;
+        _vehicleUpgradeCollection = vehicleUpgradeCollection;
+        _vehicleEnginesCollection = vehicleEnginesCollection;
         _logger = logger;
         usersService.SignedIn += HandleSignedIn;
     }

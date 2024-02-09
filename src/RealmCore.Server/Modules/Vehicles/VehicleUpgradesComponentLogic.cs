@@ -2,11 +2,11 @@
 
 internal sealed class VehicleUpgradesComponentLogic
 {
-    private readonly VehicleUpgradeRegistry _vehicleUpgradeRegistry;
+    private readonly VehicleUpgradeCollection _vehicleUpgradesCollection;
 
-    public VehicleUpgradesComponentLogic(IElementFactory elementFactory, VehicleUpgradeRegistry vehicleUpgradeRegistry)
+    public VehicleUpgradesComponentLogic(IElementFactory elementFactory, VehicleUpgradeCollection vehicleUpgradesCollection)
     {
-        _vehicleUpgradeRegistry = vehicleUpgradeRegistry;
+        _vehicleUpgradesCollection = vehicleUpgradesCollection;
         elementFactory.ElementCreated += HandleElementCreated;
     }
 
@@ -24,7 +24,7 @@ internal sealed class VehicleUpgradesComponentLogic
 
         if (upgrades.Count() != 0)
         {
-            var vehicleHandlingModifiers = upgrades.Select(x => _vehicleUpgradeRegistry.Get(x))
+            var vehicleHandlingModifiers = upgrades.Select(x => _vehicleUpgradesCollection.Get(x))
                 .Select(x => x.VehicleUpgrade)
                 .ToList();
 
