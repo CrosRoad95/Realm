@@ -1,7 +1,4 @@
-﻿using RealmCore.Server.Enums;
-using RealmCore.Server.Services.Elements;
-
-namespace RealmCore.Sample.Logic;
+﻿namespace RealmCore.Sample.Logic;
 
 public class ItemsLogic : PlayerLogic
 {
@@ -59,7 +56,7 @@ public class ItemsLogic : PlayerLogic
         }
     }
 
-    private void HandlePrimarySet(IElementInventoryService inventoryService, Inventory inventory)
+    private void HandlePrimarySet(IElementInventoryFeature inventoryService, Inventory inventory)
     {
         inventory.ItemAdded += HandleInventoryItemAdded;
         inventory.ItemRemoved += HandleInventoryItemRemoved;

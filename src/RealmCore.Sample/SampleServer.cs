@@ -1,9 +1,5 @@
-﻿using RealmCore.Server.Logic;
-using RealmCore.Server.Logic.Defaults;
-using RealmCore.Resources.Browser;
-using SlipeServer.Resources.DGS;
+﻿using SlipeServer.Resources.DGS;
 using RealmCore.Resources.Addons.GuiSystem.DGS;
-using RealmCore.Configuration;
 using RealmCore.Logging;
 using Serilog.Events;
 using Serilog;
@@ -11,6 +7,9 @@ using RealmCore.Sample.Logic;
 using RealmCore.Sample.Utilities;
 using RealmCore.Sample.Commands;
 using RealmCore.Sample.Data.Validators;
+using RealmCore.Server.Modules.Chat;
+using RealmCore.Server.Modules.Integrations.External;
+using RealmCore.Sample.Data;
 
 [assembly: ExcludeFromCodeCoverage]
 

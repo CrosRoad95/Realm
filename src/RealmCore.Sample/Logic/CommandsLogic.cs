@@ -1,4 +1,6 @@
-﻿using Color = System.Drawing.Color;
+﻿using RealmCore.Sample.Concepts.Gui.Blazor;
+using RealmCore.Sample.HudLayers;
+using Color = System.Drawing.Color;
 
 namespace RealmCore.Sample.Logic;
 
@@ -16,7 +18,7 @@ internal sealed class CommandsLogic
     private readonly ILoadService _loadService;
     private readonly IUserWhitelistedSerialsRepository _userWhitelistedSerialsRepository;
     private readonly IVehicleRepository _vehicleRepository;
-    private readonly IUserMoneyHistoryService _userMoneyHistoryService;
+    private readonly IPlayerMoneyHistoryService _userMoneyHistoryService;
 
     private class TestState
     {
@@ -32,7 +34,7 @@ internal sealed class CommandsLogic
     public CommandsLogic(RealmCommandService commandService, IElementFactory elementFactory,
         ItemsRegistry itemsRegistry, ChatBox chatBox, ILogger<CommandsLogic> logger,
         IDateTimeProvider dateTimeProvider, INametagsService nametagsService, IUsersService usersService, IVehiclesService vehiclesService,
-        GameWorld gameWorld, IElementOutlineService elementOutlineService, IAssetsService assetsService, ISpawnMarkersService spawnMarkersService, ILoadService loadService, IFeedbackService feedbackService, IOverlayService overlayService, AssetsRegistry assetsRegistry, VehicleUpgradeRegistry vehicleUpgradeRegistry, VehicleEnginesRegistry vehicleEnginesRegistry, IUserWhitelistedSerialsRepository userWhitelistedSerialsRepository, IVehicleRepository vehicleRepository, IUserMoneyHistoryService userMoneyHistoryService)
+        GameWorld gameWorld, IElementOutlineService elementOutlineService, IAssetsService assetsService, ISpawnMarkersService spawnMarkersService, ILoadService loadService, IFeedbackService feedbackService, IOverlayService overlayService, AssetsRegistry assetsRegistry, VehicleUpgradeRegistry vehicleUpgradeRegistry, VehicleEnginesRegistry vehicleEnginesRegistry, IUserWhitelistedSerialsRepository userWhitelistedSerialsRepository, IVehicleRepository vehicleRepository, IPlayerMoneyHistoryService userMoneyHistoryService)
     {
         _commandService = commandService;
         _elementFactory = elementFactory;
@@ -355,7 +357,7 @@ internal sealed class CommandsLogic
         // TODO:
         //_commandService.AddCommandHandler("spawnboxforme", (player, args) =>
         //{
-        //    using var scopedelementFactory = _elementFactory.CreateScopedelementFactory(player);
+        //using var scopedelementFactory = _elementFactory.CreateScopedelementFactory(player);
         //    var objectEntity = scopedelementFactory.CreateObject(ObjectModel.Gunbox, player.Position + new Vector3(4, 0, -0.65f), Vector3.Zero);
         //    objectEntity.AddComponent<LiftableWorldObjectComponent>();
         //});
@@ -389,7 +391,7 @@ internal sealed class CommandsLogic
         //_commandService.AddAsyncCommandHandler("hud3d", async (player, args) =>
         //{
         //    var player = player.GetRequiredComponent<PlayerElementComponent>();
-        //    using var e = _elementFactory.CreateEntity();
+        //using var e = _elementFactory.CreateEntity();
         //    e.AddComponent(new Hud3dComponent<TestState>(e => e
         //        .AddRectangle(Vector2.Zero, new Size(100, 100), Color.Red)
         //        .AddRectangle(new Vector2(25, 25), new Size(50, 50), Color.Green)
@@ -727,7 +729,7 @@ internal sealed class CommandsLogic
         //{
         //    var player = player.GetRequiredComponent<PlayerElementComponent>();
         //    var nametag = new NametagComponent("[22] Borsuk");
-        //    using var ped = _elementFactory.CreatePed(SlipeServer.Server.Elements.Enums.PedModel.Truth, player.Position + new Vector3(4, 0, 0));
+        //using var ped = _elementFactory.CreatePed(SlipeServer.Server.Elements.Enums.PedModel.Truth, player.Position + new Vector3(4, 0, 0));
         //    ped.AddComponent(nametag);
         //    await Task.Delay(1000);
         //});
@@ -754,7 +756,7 @@ internal sealed class CommandsLogic
         //_commandService.AddAsyncCommandHandler("outline2", async (player, args) =>
         //{
         //    var player = player.GetRequiredComponent<PlayerElementComponent>();
-        //    using var ped = _elementFactory.CreatePed(SlipeServer.Server.Elements.Enums.PedModel.Truth, player.Position + new Vector3(4, 0, 0));
+        //using var ped = _elementFactory.CreatePed(SlipeServer.Server.Elements.Enums.PedModel.Truth, player.Position + new Vector3(4, 0, 0));
         //    ped.AddComponent(new OutlineComponent(Color.Red));
         //    await Task.Delay(1000);
         //});
@@ -950,7 +952,7 @@ internal sealed class CommandsLogic
         //_commandService.AddCommandHandler("createObjectFor", (player, args) =>
         //{
         //    var player = player.GetRequiredComponent<PlayerElementComponent>();
-        //    using var scopedelementFactory = _elementFactory.CreateScopedelementFactory(player);
+        //using var scopedelementFactory = _elementFactory.CreateScopedelementFactory(player);
         //    scopedelementFactory.CreateObject((ObjectModel)1337, player.Position + new Vector3(3, 0, 0), player.Rotation);
         //});
 
@@ -1006,7 +1008,7 @@ internal sealed class CommandsLogic
         //_commandService.AddAsyncCommandHandler("createObjectFor2", async (player, args) =>
         //{
         //    var player = player.GetRequiredComponent<PlayerElementComponent>();
-        //    using var scopedelementFactory = _elementFactory.CreateScopedelementFactory(player);
+        //using var scopedelementFactory = _elementFactory.CreateScopedelementFactory(player);
         //    var pos = player.Position + new Vector3(3, 0, 0);
 
         //    void handleComponentCreated(IScopedElementFactory scopedelementFactory, PlayerPrivateElementComponentBase playerPrivateElementComponentBase)
@@ -1183,7 +1185,7 @@ internal sealed class CommandsLogic
         //        player.DestroyComponent(markerElementComponent);
         //    }
 
-        //    using var scopedelementFactory = _elementFactory.CreateScopedelementFactory(player);
+        //using var scopedelementFactory = _elementFactory.CreateScopedelementFactory(player);
         //    scopedelementFactory.CreateMarker(MarkerType.Checkpoint, player.Position with { X = player.Position.X + 4 }, Color.White);
         //    var marker = scopedelementFactory.LastCreatedComponent as PlayerPrivateElementComponent<MarkerElementComponent>;
         //    marker.ElementComponent.EntityEntered = handleEntityEntered;
@@ -1192,7 +1194,7 @@ internal sealed class CommandsLogic
         //_commandService.AddAsyncCommandHandler("createmarkerforme", async (player, args) =>
         //{
         //    var player = player.GetRequiredComponent<PlayerElementComponent>();
-        //    using var scopedelementFactory = _elementFactory.CreateScopedelementFactory(player);
+        //using var scopedelementFactory = _elementFactory.CreateScopedelementFactory(player);
         //    scopedelementFactory.CreateMarker(MarkerType.Cylinder, player.Position, Color.White);
         //    var component = scopedelementFactory.LastCreatedComponent as PlayerPrivateElementComponent<MarkerElementComponent>;
         //    component.ElementComponent.Size = 4;
@@ -1215,7 +1217,7 @@ internal sealed class CommandsLogic
 
         //_commandService.AddAsyncCommandHandler("createmarkerforme2", async (player, args) =>
         //{
-        //    using var scopedelementFactory = _elementFactory.CreateScopedelementFactory(player);
+        //using var scopedelementFactory = _elementFactory.CreateScopedelementFactory(player);
         //    scopedelementFactory.CreateMarker(MarkerType.Cylinder, new Vector3(-600.8877f, 240.88867f, 26.091864f), Color.White);
         //    var marker = scopedelementFactory.LastCreatedComponent as PlayerPrivateElementComponent<MarkerElementComponent>;
         //    marker.ElementComponent.Size = 4;
@@ -1238,7 +1240,7 @@ internal sealed class CommandsLogic
         //_commandService.AddCommandHandler("markerhittest2", (player, args) =>
         //{
         //    var player = player.GetRequiredComponent<PlayerElementComponent>();
-        //    using var scopedelementFactory = _elementFactory.CreateScopedelementFactory(player);
+        //using var scopedelementFactory = _elementFactory.CreateScopedelementFactory(player);
         //    scopedelementFactory.CreateMarker(MarkerType.Cylinder, player.Position, Color.White);
         //    var marker = scopedelementFactory.LastCreatedComponent as PlayerPrivateElementComponent<MarkerElementComponent>;
         //    marker.ElementComponent.Size = 4;
@@ -1467,7 +1469,7 @@ internal sealed class CommandsLogic
 
         //_commandService.AddCommandHandler("privateelementdisposable", async (player, args) =>
         //{
-        //    using var scopedelementFactory = _elementFactory.CreateScopedelementFactory(player);
+        //using var scopedelementFactory = _elementFactory.CreateScopedelementFactory(player);
         //    scopedelementFactory.CreateMarker(MarkerType.Cylinder, player.Position, Color.White);
         //    var marker = scopedelementFactory.GetLastCreatedComponent<PlayerPrivateElementComponent<MarkerElementComponent>>();
         //    marker.ElementComponent.Size = 4;
@@ -1538,7 +1540,7 @@ internal sealed class CommandsLogic
 
         _commandService.AddAsyncCommandHandler("scopedelements", async (player, args, token) =>
         {
-            using var scope = player.GetRequiredService<IScopedElementFactory>().CreateScope();
+        using var scope = player.GetRequiredService<IScopedElementFactory>().CreateScope();
             scope.CreateObject((ObjectModel)1337, player.Position + new Vector3(3, 0, 0), Vector3.Zero);
             await Task.Delay(1000, token);
         });

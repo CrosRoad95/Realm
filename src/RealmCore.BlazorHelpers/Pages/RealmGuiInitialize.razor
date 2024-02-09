@@ -2,9 +2,10 @@
 @using Microsoft.AspNetCore.Authentication;
 @using Microsoft.AspNetCore.Components.Web;
 @using RealmCore.Server
-@using RealmCore.Server.Interfaces;
-@using RealmCore.Server.Services;
+@using RealmCore.Server.Modules.Players.Gui.Browser
 @using System.Security.Claims;
+@using RealmCore.Server.Modules.Players.Gui;
+@using RealmCore.Server.Modules.Server;
 @inject IHttpContextAccessor _httpContextAccessor;
 @inject RealmServer _realmServer;
 @inject NavigationManager _navigationManager;

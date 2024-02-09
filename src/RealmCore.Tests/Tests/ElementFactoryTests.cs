@@ -39,7 +39,7 @@ public class ElementFactoryTests
         }
 
         {
-            using var scope = player.ElementFactory.CreateScope();
+        using var scope = player.ElementFactory.CreateScope();
             var obj = scope.CreateObject((ObjectModel)1337, Vector3.Zero, Vector3.Zero);
             obj.Destroyed += handleDestroyed;
         }
@@ -75,7 +75,7 @@ public class ElementFactoryTests
         var rootElementFactory = player.ElementFactory;
         var obj1 = rootElementFactory.CreateObject((ObjectModel)1337, Vector3.Zero, Vector3.Zero);
         {
-            using var scope = rootElementFactory.CreateScope();
+        using var scope = rootElementFactory.CreateScope();
             var obj2 = scope.CreateObject((ObjectModel)1337, Vector3.Zero, Vector3.Zero);
 
             scope.CreatedElements.Should().BeEquivalentTo([obj2]);

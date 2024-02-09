@@ -26,10 +26,10 @@ internal class MapsLogic
         //mapsService.RegisterMapFromXml("testmapxml", "Server/Maps/test.map");
     }
 
-    private void HandleMapChanged(string mapName, Server.World.Maps.MapEventType mapEventType)
+    private void HandleMapChanged(string mapName, MapEventType mapEventType)
     {
         _logger.LogInformation("Map {mapName} {mapEventType}", mapName, mapEventType);
-        if (mapEventType == Server.World.Maps.MapEventType.Add)
+        if (mapEventType == MapEventType.Add)
             _mapsService.Load(mapName);
     }
 }

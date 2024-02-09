@@ -1,5 +1,6 @@
 ﻿using RealmCore.Module.Discord.Services;
-using RealmCore.Server.Services;
+using RealmCore.Server.Modules.Commands;
+using RealmCore.Server.Modules.Elements;
 
 namespace RealmCore.Console.Extra;
 

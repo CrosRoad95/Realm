@@ -1,6 +1,4 @@
-﻿using System.Diagnostics;
-
-namespace RealmCore.Persistence.Data;
+﻿namespace RealmCore.Persistence.Data;
 
 [DebuggerDisplay("{DebuggerDisplay,nq}")]
 public class UserEventData

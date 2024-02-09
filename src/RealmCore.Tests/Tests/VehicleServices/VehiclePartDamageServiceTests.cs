@@ -39,7 +39,7 @@ public class VehiclePartDamageServiceTests
         var vehicle = realmTestingServer.CreateVehicle();
 
         bool destroyed = false;
-        void handlePartDestroyed(IVehiclePartDamageService arg1, short partId)
+        void handlePartDestroyed(IVehiclePartDamageFeature arg1, short partId)
         {
             destroyed = true;
         }
@@ -70,7 +70,7 @@ public class VehiclePartDamageServiceTests
         var vehicle = realmTestingServer.CreateVehicle();
 
         bool destroyed = false;
-        void handlePartDestroyed(IVehiclePartDamageService arg1, short partId)
+        void handlePartDestroyed(IVehiclePartDamageFeature arg1, short partId)
         {
             destroyed = true;
         }

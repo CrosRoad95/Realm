@@ -45,7 +45,7 @@ internal class DiscordLogger : IDiscordLogger
             ["discordUserDiscriminator"] = userMessage.Author.Discriminator
         };
 
-        using var _ = _logger.BeginScope(logProperties);
+    using var _ = _logger.BeginScope(logProperties);
 
         _logger.LogInformation("Reaction {discordEmoteName} removed by {discordUsername}#{discordUserDiscriminator}", logProperties["discordEmoteName"], logProperties["discordUsername"], logProperties["discordUserDiscriminator"]);
     }
@@ -64,7 +64,7 @@ internal class DiscordLogger : IDiscordLogger
             ["discordUserDiscriminator"] = userMessage.Author.Discriminator
         };
 
-        using var _ = _logger.BeginScope(logProperties);
+    using var _ = _logger.BeginScope(logProperties);
 
         _logger.LogInformation("Reaction {discordEmoteName} added by {discordUsername}#{discordUserDiscriminator}", logProperties["discordEmoteName"], logProperties["discordUsername"], logProperties["discordUserDiscriminator"]);
     }
@@ -79,7 +79,7 @@ internal class DiscordLogger : IDiscordLogger
             ["discordUserDiscriminator"] = user.Discriminator
         };
 
-        using var _ = _logger.BeginScope(logProperties);
+    using var _ = _logger.BeginScope(logProperties);
 
         _logger.LogInformation("User {discordUsername}#{discordUserDiscriminator} left", logProperties["discordUsername"], logProperties["discordUserDiscriminator"]);
 
@@ -96,7 +96,7 @@ internal class DiscordLogger : IDiscordLogger
             ["discordUserDiscriminator"] = user.Discriminator
         };
 
-        using var _ = _logger.BeginScope(logProperties);
+    using var _ = _logger.BeginScope(logProperties);
 
         _logger.LogInformation("User {discordUsername}#{discordUserDiscriminator} joined", logProperties["discordUsername"], logProperties["discordUserDiscriminator"]);
 
@@ -113,7 +113,7 @@ internal class DiscordLogger : IDiscordLogger
             ["discordChannelId"] = messageChannel.Id.ToString()
         };
 
-        using var _ = _logger.BeginScope(logProperties);
+    using var _ = _logger.BeginScope(logProperties);
 
         _logger.LogInformation("Message {discordMessageId} deleted", logProperties["discordMessageId"]);
     }
@@ -131,7 +131,7 @@ internal class DiscordLogger : IDiscordLogger
             ["discordMessage"] = message.Content
         };
 
-        using var _ = _logger.BeginScope(logProperties);
+    using var _ = _logger.BeginScope(logProperties);
 
         _logger.LogInformation("{discordUsername}#{discordUserDiscriminator}: {discordMessage}", logProperties["discordUsername"], logProperties["discordUserDiscriminator"], logProperties["discordMessage"]);
 

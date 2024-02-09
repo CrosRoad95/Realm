@@ -1,6 +1,4 @@
-﻿using RealmCore.Server.Concepts.Gui;
-using RealmCore.Server.DTOs;
-using RealmCore.Server.Helpers;
+﻿using RealmCore.Sample.Concepts.Gui;
 
 namespace RealmCore.Sample.Logic;
 
@@ -88,7 +86,7 @@ internal sealed class PlayerBindsLogic
             state.Money = (double)player.Money.Amount;
 
             var vehiclesWithModelAndPositionDTos = await _vehicleRepository.GetLightVehiclesByUserId(player.UserId, cancellationToken);
-            state.VehicleLightInfos = vehiclesWithModelAndPositionDTos.Select(x => new VehicleLightInfoDTO
+            state.VehicleLightInfos = vehiclesWithModelAndPositionDTos.Select(x => new VehicleLightInfoDto
             {
                 Id = x.Id,
                 Model = x.Model,

@@ -1,6 +1,4 @@
-﻿using RealmCore.Persistence.Data.Helpers;
-
-namespace RealmCore.Persistence.Data;
+﻿namespace RealmCore.Persistence.Data;
 
 public class UserData : IdentityUser<int>
 {

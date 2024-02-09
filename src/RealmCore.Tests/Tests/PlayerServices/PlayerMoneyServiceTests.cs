@@ -1,4 +1,6 @@
-﻿namespace RealmCore.Tests.Tests.PlayerServices;
+﻿using RealmCore.Tests.Helpers;
+
+namespace RealmCore.Tests.Tests.PlayerServices;
 
 public class PlayerMoneyServiceTests
 {

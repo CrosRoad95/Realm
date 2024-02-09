@@ -9,7 +9,7 @@ public class PlayerStatisticsServiceTests
         var player = realmTestingServer.CreatePlayer();
         var statistics = player.Statistics;
 
-        using var statisticsCounterComponentMonitor = statistics.Monitor();
+    using var statisticsCounterComponentMonitor = statistics.Monitor();
 
         statistics.StatsIds.Should().BeEmpty();
 

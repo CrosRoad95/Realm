@@ -16,7 +16,7 @@ internal sealed class AchievementsLogic
         player.Achievements.Unlocked += HandleUnlocked;
     }
 
-    private void HandleUnlocked(IPlayerAchievementsService achievementService, int achievementId)
+    private void HandleUnlocked(IPlayerAchievementsFeature achievementService, int achievementId)
     {
         _overlayService.AddNotification(achievementService.Player, $"Odblokowałeś osiągnięcie '{achievementId}'");
     }

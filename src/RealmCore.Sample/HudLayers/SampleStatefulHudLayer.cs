@@ -1,4 +1,5 @@
-﻿using Color = System.Drawing.Color;
+﻿using RealmCore.Resources.Overlay.Enums;
+using Color = System.Drawing.Color;
 using Size = System.Drawing.Size;
 
 namespace RealmCore.Sample.HudLayers;

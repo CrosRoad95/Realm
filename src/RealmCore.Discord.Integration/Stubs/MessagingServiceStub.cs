@@ -40,7 +40,7 @@ internal class MessagingServiceStub : Messaging.MessagingBase
         var channel = (SocketTextChannel)_discordClient.GetChannel(request.ChannelId);
         try
         {
-            using var stream = new MemoryStream(request.File.Memory.ToArray());
+        using var stream = new MemoryStream(request.File.Memory.ToArray());
             var message = await channel.SendFileAsync(stream, request.FileName, request.Message);
             return new SendFileResponse
             {

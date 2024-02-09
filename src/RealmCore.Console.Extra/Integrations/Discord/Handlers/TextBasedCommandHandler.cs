@@ -1,4 +1,5 @@
-﻿using RealmCore.Module.Discord.Services;
+﻿using RealmCore.Module.Discord.Interfaces;
+using RealmCore.Module.Discord.Services;
 
 namespace RealmCore.Console.Extra.Integrations.Discord.Handlers;
 

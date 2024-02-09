@@ -1,6 +1,4 @@
-﻿using RealmCore.Server.Concepts.Gui;
-
-namespace RealmCore.Sample.Concepts.Gui.Blazor;
+﻿namespace RealmCore.Sample.Concepts.Gui.Blazor;
 
 public class Counter2Gui : BrowserGui
 {

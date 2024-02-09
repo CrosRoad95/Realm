@@ -1,6 +1,4 @@
-﻿using RealmCore.Server.Concepts.Interactions;
-
-namespace RealmCore.Tests.Tests;
+﻿namespace RealmCore.Tests.Tests;
 
 public class LiftableWorldObjectTests
 {
@@ -14,7 +12,7 @@ public class LiftableWorldObjectTests
         var interaction = new LiftableInteraction();
         worldObject.Interaction = new LiftableInteraction();
 
-        using var monitored = interaction.Monitor();
+    using var monitored = interaction.Monitor();
         var result1 = interaction.TryLift(player);
         var wasOwner = interaction.Owner;
         var result2 = interaction.TryDrop();
@@ -78,7 +76,7 @@ public class LiftableWorldObjectTests
         worldObject.Interaction = new LiftableInteraction();
 
         #region Arrange
-        using var monitored = interaction.Monitor();
+    using var monitored = interaction.Monitor();
         interaction.TryLift(player);
         #endregion
 
@@ -103,7 +101,7 @@ public class LiftableWorldObjectTests
         worldObject.Interaction = new LiftableInteraction();
 
         #region Arrange
-        using var monitored = interaction.Monitor();
+    using var monitored = interaction.Monitor();
         interaction.TryLift(player);
         #endregion
 

@@ -1,6 +1,4 @@
-﻿using RealmCore.Server.Security;
-
-namespace RealmCore.Tests.Classes;
+﻿namespace RealmCore.Tests.Classes;
 
 public class ActiveUsersTests
 {

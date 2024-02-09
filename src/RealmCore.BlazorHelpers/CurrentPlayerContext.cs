@@ -1,15 +1,17 @@
-﻿using RealmCore.Server.Concepts.Gui;
+﻿using RealmCore.Server.Modules.Elements;
+using RealmCore.Server.Modules.Players.Gui.Browser;
+using RealmCore.Server.Modules.Server;
 
 namespace RealmCore.BlazorHelpers;
 
 public class CurrentPlayerContext : IDisposable
 {
     private readonly RealmPlayer? _player;
-    private readonly IPlayerBrowserService? _browserService;
+    private readonly IPlayerBrowserFeature? _browserService;
     public RealmServer? Server { get; }
     internal IBrowserGuiService BrowserGuiService { get; }
     public ClaimsPrincipal ClaimsPrincipal { get; }
-    protected IPlayerBrowserService BrowserService => _browserService ?? throw new ArgumentNullException(nameof(BrowserService));
+    protected IPlayerBrowserFeature BrowserService => _browserService ?? throw new ArgumentNullException(nameof(BrowserService));
     public RealmPlayer Player => _player ?? throw new ArgumentNullException(nameof(RealmPlayer));
     public string Name => Player.Name;
 

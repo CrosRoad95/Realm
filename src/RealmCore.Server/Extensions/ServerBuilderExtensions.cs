@@ -93,7 +93,7 @@ public static class ServerBuilderExtensions
         serverBuilder.AddLogic<NametagResourceLogic>();
         serverBuilder.AddLogic<StatisticsCounterResourceLogic>();
         serverBuilder.AddLogic<WatermarkResourceLogic>();
-        serverBuilder.AddLogic<PlayerAdminServiceLogic>();
+        serverBuilder.AddLogic<PlayerAdministrationServiceLogic>();
         serverBuilder.AddLogic<FocusableElementsLogic>();
         serverBuilder.AddLogic<PlayerHudLogic>();
         serverBuilder.AddLogic<JobSessionComponentLogic>();

@@ -1,6 +1,4 @@
-﻿using RealmCore.Server.Concepts.Gui;
-
-namespace RealmCore.Sample.Concepts.Gui;
+﻿namespace RealmCore.Sample.Concepts.Gui;
 
 public sealed class InvalidGui : DxGui
 {

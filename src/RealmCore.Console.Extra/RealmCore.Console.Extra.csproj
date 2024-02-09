@@ -18,11 +18,8 @@
 		<Using Include="System" />
 		<Using Include="System.Linq" />
 		<Using Include="System.Threading.Tasks" />
-		<Using Include="RealmCore.Module.Discord.Interfaces" />
-		<Using Include="RealmCore.Server.Interfaces" />
 		<Using Include="SlipeServer.Server.Services" />
 		<Using Include="Microsoft.Extensions.Logging" />
-		<Using Include="RealmCore.Server.Elements" />
 		<Using Include="SlipeServer.Server.ElementCollections" />
 	</ItemGroup>
 

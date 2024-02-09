@@ -11,20 +11,20 @@ public class UserMoneyHistoryDTO
     public int? Category { get; set; }
     public string? Description { get; set; }
 
-    [return: NotNullIfNotNull(nameof(aserMoneyHistoryData))]
-    public static UserMoneyHistoryDTO? Map(UserMoneyHistoryData? aserMoneyHistoryData)
+    [return: NotNullIfNotNull(nameof(userMoneyHistoryData))]
+    public static UserMoneyHistoryDTO? Map(UserMoneyHistoryData? userMoneyHistoryData)
     {
-        if (aserMoneyHistoryData == null)
+        if (userMoneyHistoryData == null)
             return null;
 
         return new UserMoneyHistoryDTO
         {
-            Id = aserMoneyHistoryData.Id,
-            DateTime = aserMoneyHistoryData.DateTime,
-            Amount = aserMoneyHistoryData.Amount,
-            CurrentBalance = aserMoneyHistoryData.CurrentBalance,
-            Category = aserMoneyHistoryData.Category,
-            Description = aserMoneyHistoryData.Description
+            Id = userMoneyHistoryData.Id,
+            DateTime = userMoneyHistoryData.DateTime,
+            Amount = userMoneyHistoryData.Amount,
+            CurrentBalance = userMoneyHistoryData.CurrentBalance,
+            Category = userMoneyHistoryData.Category,
+            Description = userMoneyHistoryData.Description
         };
     }
 }

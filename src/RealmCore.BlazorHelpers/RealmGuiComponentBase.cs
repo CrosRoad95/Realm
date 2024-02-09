@@ -1,5 +1,5 @@
 ﻿using Microsoft.AspNetCore.Components;
-using RealmCore.Server.Concepts.Gui;
+using RealmCore.Server.Modules.Players.Gui.Browser;
 
 namespace RealmCore.BlazorHelpers;
 

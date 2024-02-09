@@ -1,4 +1,6 @@
-﻿namespace RealmCore.Sample.HudLayers;
+﻿using RealmCore.Resources.Overlay.Enums;
+
+namespace RealmCore.Sample.HudLayers;
 
 public class SampleHud3State
 {

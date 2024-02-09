@@ -37,6 +37,8 @@
 		<Using Include="RealmCore.Persistence.DTOs" />
 		<Using Include="RealmCore.Persistence.Repository" />
 		<Using Include="RealmCore.Persistence.Context" />
+		<Using Include="System.Diagnostics" />
+		<Using Include="RealmCore.Persistence.Data.Helpers" />
 	</ItemGroup>
 
 </Project>

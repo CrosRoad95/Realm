@@ -1,5 +1,5 @@
-﻿using RealmCore.Sample.Elements;
-using RealmCore.Server.Enums;
+﻿using RealmCore.Sample.Concepts.Gui;
+using RealmCore.Sample.Elements;
 using SlipeServer.Server.Elements.Enums;
 
 namespace RealmCore.Sample.Logic;

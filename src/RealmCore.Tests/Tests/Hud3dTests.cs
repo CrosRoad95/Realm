@@ -1,5 +1,4 @@
-﻿using RealmCore.Resources.Assets;
-using RealmCore.Resources.Overlay;
+﻿using RealmCore.Tests.Providers;
 using Color = System.Drawing.Color;
 using Size = System.Drawing.Size;
 

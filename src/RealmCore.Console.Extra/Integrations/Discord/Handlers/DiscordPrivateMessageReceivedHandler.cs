@@ -1,4 +1,6 @@
-﻿namespace RealmCore.Console.Extra.Integrations.Discord.Handlers;
+﻿using RealmCore.Module.Discord.Interfaces;
+
+namespace RealmCore.Console.Extra.Integrations.Discord.Handlers;
 
 public class DiscordPrivateMessageReceivedHandler : IDiscordPrivateMessageReceived
 {

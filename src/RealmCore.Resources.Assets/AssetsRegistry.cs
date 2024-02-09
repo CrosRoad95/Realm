@@ -57,9 +57,9 @@ public class AssetsRegistry : IServerAssetsProvider
         var colFileName = $"Server/Assets/Models/Procedural/{name}.col";
         var dffFileName = $"Server/Assets/Models/Procedural/{name}.dff";
 
-        using (var fileStream = File.Create(colFileName))
+    using (var fileStream = File.Create(colFileName))
             colStream.CopyTo(fileStream);
-        using (var fileStream = File.Create(dffFileName))
+    using (var fileStream = File.Create(dffFileName))
             dffStream.CopyTo(fileStream);
 
         var model = new Model(name, colFileName, dffFileName);

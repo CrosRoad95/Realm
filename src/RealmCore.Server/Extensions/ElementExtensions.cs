@@ -1,6 +1,4 @@
-﻿using RealmCore.Persistence.Data.Helpers;
-
-namespace RealmCore.Server.Extensions;
+﻿namespace RealmCore.Server.Extensions;
 
 public static class ElementExtensions
 {

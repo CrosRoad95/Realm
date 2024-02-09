@@ -2,6 +2,7 @@
 using RealmCore.Configuration;
 using RealmCore.Console.Extra.Integrations.Discord.Handlers;
 using RealmCore.Module.Discord;
+using RealmCore.Module.Discord.Interfaces;
 using RealmCore.Module.Grpc;
 using RealmCore.Module.Grpc.Options;
 

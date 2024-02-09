@@ -1,4 +1,6 @@
-﻿namespace RealmCore.Sample.Logic;
+﻿using RealmCore.Sample.Concepts.Gui.Dx;
+
+namespace RealmCore.Sample.Logic;
 
 internal sealed class PlayerJoinedLogic
 {
@@ -8,7 +10,7 @@ internal sealed class PlayerJoinedLogic
     private readonly Text3dService _text3DService;
     private readonly IGuiSystemService? _guiSystemService;
 
-    public PlayerJoinedLogic(ILogger<PlayerJoinedLogic> logger, INametagsService nametagsService,ChatBox chatBox, Text3dService text3DService, IBrowserGuiService browserGuiService, IPlayersService playersService, IUsersService usersService, IGuiSystemService? guiSystemService = null)
+    public PlayerJoinedLogic(ILogger<PlayerJoinedLogic> logger, INametagsService nametagsService,ChatBox chatBox, Text3dService text3DService, IBrowserGuiService browserGuiService, IPlayerEventManager playersService, IUsersService usersService, IGuiSystemService? guiSystemService = null)
     {
         _logger = logger;
         _nametagsService = nametagsService;
@@ -87,7 +89,7 @@ internal sealed class PlayerJoinedLogic
         player.Level.LevelChanged += HandleLevelChanged;
     }
 
-    private void HandleLevelChanged(IPlayerLevelService levelService, uint level, bool arg3)
+    private void HandleLevelChanged(IPlayerLevelFeature levelService, uint level, bool arg3)
     {
         _logger.LogInformation("Player leveled up: {level}", level);
     }

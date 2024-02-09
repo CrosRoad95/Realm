@@ -1,4 +1,4 @@
-﻿using RealmCore.Server.Concepts.Gui;
+﻿using RealmCore.Sample.Data;
 
 namespace RealmCore.Sample.Concepts.Gui;
 

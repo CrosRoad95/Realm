@@ -1,4 +1,6 @@
-﻿namespace RealmCore.Tests.Tests;
+﻿using RealmCore.Tests.Helpers;
+
+namespace RealmCore.Tests.Tests;
 
 public class InventoryTests
 {
@@ -618,7 +620,7 @@ public class InventoryTests
         };
 
         var item = inventory.AddSingleItem(itemsRegistry, 1, metaData);
-        using var monitoredItem = item.Monitor();
+    using var monitoredItem = item.Monitor();
 
         item.RemoveMetadata("foo");
 
@@ -641,7 +643,7 @@ public class InventoryTests
         };
 
         var item = inventory.AddSingleItem(itemsRegistry, 1, metaData);
-        using var monitoredItem = item.Monitor();
+    using var monitoredItem = item.Monitor();
 
         item.ChangeMetadata<int>("foo", x => x + 1);
         ((int?)item.GetMetadata("foo")).Should().Be(2);
