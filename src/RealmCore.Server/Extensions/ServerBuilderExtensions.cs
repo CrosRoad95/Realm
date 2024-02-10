@@ -96,7 +96,6 @@ public static class ServerBuilderExtensions
         serverBuilder.AddLogic<PlayerAdministrationServiceLogic>();
         serverBuilder.AddLogic<FocusableElementsLogic>();
         serverBuilder.AddLogic<PlayerHudLogic>();
-        serverBuilder.AddLogic<JobSessionComponentLogic>();
         serverBuilder.AddLogic<VehicleUpgradesComponentLogic>();
         serverBuilder.AddLogic<PickupLogic>();
         serverBuilder.AddLogic<CollisionShapeLogic>();

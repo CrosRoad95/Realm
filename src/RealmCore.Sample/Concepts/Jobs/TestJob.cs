@@ -14,7 +14,7 @@ internal class TestJob : JobSession
         objective.AddBlip(BlipIcon.North);
         objective.Completed += ObjectiveACompleted;
 
-        var worldObject = _elementFactory.CreateObject(SlipeServer.Server.Enums.ObjectModel.Gunbox, new Vector3(379.00f, -102.77f, 1.24f), Vector3.Zero);
+        var worldObject = _elementFactory.CreateObject(ObjectModel.Gunbox, new Vector3(379.00f, -102.77f, 1.24f), Vector3.Zero);
         worldObject.Interaction = new LiftableInteraction();
         worldObject.TrySetOwner(Player);
         var objective2 = AddObjective(new TransportObjectObjective(worldObject, new Vector3(379.00f, -112.77f, 2.0f)));

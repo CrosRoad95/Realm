@@ -19,6 +19,7 @@ internal sealed class PlayerJobStatisticsFeature : IPlayerJobStatisticsFeature
     public event Action<IPlayerJobStatisticsFeature, short, ulong>? TimePlayedAdded;
 
     public RealmPlayer Player { get; init; }
+
     public PlayerJobStatisticsFeature(PlayerContext playerContext, IPlayerUserFeature playerUserService, IDateTimeProvider dateTimeProvider)
     {
         Player = playerContext.Player;

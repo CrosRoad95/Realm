@@ -135,7 +135,7 @@ internal sealed class PlayerBansFeature : IPlayerBansFeature
         try
         {
             var query = _db.Bans
-                .Where(x => x.UserId == Player.UserId && x.Id < last.Id)
+                .Where(x => x.UserId == Player.PersistentId && x.Id < last.Id)
                 .OrderByDescending(x => x.Id)
                 .Take(count);
 

@@ -65,7 +65,7 @@ internal class PlayerEventsFeature : IPlayerEventsFeature
         try
         {
             var query = _db.UserEvents
-                .Where(x => x.UserId == Player.UserId && x.Id < last.Id)
+                .Where(x => x.UserId == Player.PersistentId && x.Id < last.Id)
                 .OrderByDescending(x => x.Id)
                 .Take(count);
 

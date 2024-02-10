@@ -23,13 +23,13 @@ internal sealed class VehicleAccessFeature : IVehicleAccessFeature
 
     public RealmVehicle Vehicle { get; init; }
 
-    public VehicleAccessFeature(VehicleContext vehicleContext, IVehiclePersistanceFeature vehiclePersistanceService)
+    public VehicleAccessFeature(VehicleContext vehicleContext, IVehiclePersistenceFeature vehiclePersistanceService)
     {
         Vehicle = vehicleContext.Vehicle;
         vehiclePersistanceService.Loaded += HandleLoaded;
     }
 
-    private void HandleLoaded(IVehiclePersistanceFeature persistance, RealmVehicle vehicle)
+    private void HandleLoaded(IVehiclePersistenceFeature persistance, RealmVehicle vehicle)
     {
         _userAccesses = persistance.VehicleData.UserAccesses;
         VehicleId = persistance.Id;
@@ -71,14 +71,14 @@ internal sealed class VehicleAccessFeature : IVehicleAccessFeature
 
     public bool TryGetAccess(RealmPlayer player, out VehicleUserAccessDto vehicleAccess)
     {
-        var userId = player.UserId;
+        var userId = player.PersistentId;
         return TryGetAccess(userId, out vehicleAccess);
     }
 
     public bool HasAccess(RealmPlayer player)
     {
         lock (_lock)
-            return InternalHasAccess(player.UserId);
+            return InternalHasAccess(player.PersistentId);
     }
 
     public bool HasAccess(int userId)
@@ -109,7 +109,7 @@ internal sealed class VehicleAccessFeature : IVehicleAccessFeature
 
     public VehicleUserAccessDto AddAccess(RealmPlayer player, byte accessType, string? customValue = null)
     {
-        return AddAccess(player.UserId, accessType, customValue);
+        return AddAccess(player.PersistentId, accessType, customValue);
     }
 
     public VehicleUserAccessDto AddAsOwner(RealmPlayer player, string? customValue = null)
@@ -129,7 +129,7 @@ internal sealed class VehicleAccessFeature : IVehicleAccessFeature
         return false;
     }
 
-    public bool IsOwner(RealmPlayer player) => IsOwner(player.UserId);
+    public bool IsOwner(RealmPlayer player) => IsOwner(player.PersistentId);
 
     public IEnumerator<VehicleUserAccessDto> GetEnumerator()
     {

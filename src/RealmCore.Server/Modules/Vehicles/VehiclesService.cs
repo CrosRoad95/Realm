@@ -60,7 +60,7 @@ internal sealed class VehiclesService : IVehiclesService
         try
         {
             var vehicle = (RealmVehicle)element;
-            var id = vehicle.Persistance.Id;
+            var id = vehicle.Persistence.Id;
             _activeVehicles.TrySetInactive(id);
             await _vehicleRepository.SetSpawned(id, false);
         }
@@ -77,7 +77,7 @@ internal sealed class VehiclesService : IVehiclesService
         try
         {
             TrySetActive(vehicleData.Id, vehicle);
-            vehicle.Persistance.Load(vehicleData);
+            vehicle.Persistence.Load(vehicleData);
             return vehicle;
         }
         catch (Exception)
@@ -89,13 +89,13 @@ internal sealed class VehiclesService : IVehiclesService
 
     public async Task<RealmVehicle> ConvertToPersistantVehicle(RealmVehicle vehicle, CancellationToken cancellationToken = default)
     {
-        if (vehicle.Persistance.IsLoaded)
+        if (vehicle.Persistence.IsLoaded)
             throw new InvalidOperationException();
 
         var vehicleData = await _vehicleRepository.CreateVehicle(vehicle.Model, _dateTimeProvider.Now, cancellationToken);
 
         TrySetActive(vehicleData.Id, vehicle);
-        vehicle.Persistance.Load(vehicleData);
+        vehicle.Persistence.Load(vehicleData);
         return vehicle;
     }
 
@@ -103,7 +103,7 @@ internal sealed class VehiclesService : IVehiclesService
     {
         if (player.IsSignedIn)
         {
-            return await _vehicleRepository.GetLightVehiclesByUserId(player.UserId, cancellationToken);
+            return await _vehicleRepository.GetLightVehiclesByUserId(player.PersistentId, cancellationToken);
         }
         return [];
     }
@@ -112,7 +112,7 @@ internal sealed class VehiclesService : IVehiclesService
     {
         if (player.IsSignedIn)
         {
-            return await _vehicleRepository.GetVehiclesByUserId(player.UserId, null, cancellationToken);
+            return await _vehicleRepository.GetVehiclesByUserId(player.PersistentId, null, cancellationToken);
         }
         return [];
     }
@@ -124,7 +124,7 @@ internal sealed class VehiclesService : IVehiclesService
 
     public async Task<bool> SetVehicleSpawned(RealmVehicle vehicle, bool spawned = true, CancellationToken cancellationToken = default)
     {
-        return await _vehicleRepository.SetSpawned(vehicle.Persistance.Id, spawned, cancellationToken);
+        return await _vehicleRepository.SetSpawned(vehicle.Persistence.Id, spawned, cancellationToken);
     }
 
     private void TrySetActive(int vehicleId, RealmVehicle vehicle)
@@ -142,7 +142,7 @@ internal sealed class VehiclesService : IVehiclesService
             vehicle =>
             {
                 TrySetActive(vehicleData.Id, vehicle);
-                vehicle.Persistance.Load(vehicleData);
+                vehicle.Persistence.Load(vehicleData);
             });
 
         await SetVehicleSpawned(vehicle, true, cancellationToken);

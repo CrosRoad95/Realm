@@ -45,7 +45,7 @@ internal sealed class VehicleMileageCounterFeature : IVehicleMileageCounterFeatu
 
     public RealmVehicle Vehicle { get; init; }
 
-    public VehicleMileageCounterFeature(VehicleContext vehicleContext, IVehiclePersistanceFeature persistance, IUpdateService updateService)
+    public VehicleMileageCounterFeature(VehicleContext vehicleContext, IVehiclePersistenceFeature persistance, IUpdateService updateService)
     {
         _updateService = updateService;
         Vehicle = vehicleContext.Vehicle;
@@ -53,7 +53,7 @@ internal sealed class VehicleMileageCounterFeature : IVehicleMileageCounterFeatu
         _updateService.RareUpdate += HandleRareUpdate;
     }
 
-    private void HandleLoaded(IVehiclePersistanceFeature persistance, RealmVehicle vehicle)
+    private void HandleLoaded(IVehiclePersistenceFeature persistance, RealmVehicle vehicle)
     {
         _mileage = persistance.VehicleData.Mileage;
     }

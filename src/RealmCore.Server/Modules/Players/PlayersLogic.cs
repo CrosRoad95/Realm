@@ -143,7 +143,7 @@ internal sealed class PlayersLogic
         {
             plr.Destroyed -= HandlePlayerDestroyed;
             _playerResources.TryRemove(player, out var _);
-            _activeUsers.TrySetInactive(player.UserId);
+            _activeUsers.TrySetInactive(player.PersistentId);
             await player.GetRequiredService<ISaveService>().Save(player);
         }
         catch (Exception ex)

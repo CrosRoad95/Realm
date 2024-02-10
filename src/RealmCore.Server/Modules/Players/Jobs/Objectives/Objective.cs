@@ -1,4 +1,6 @@
-﻿namespace RealmCore.Server.Modules.Jobs.Objectives;
+﻿using System.Security.AccessControl;
+
+namespace RealmCore.Server.Modules.Players.Jobs.Objectives;
 
 public abstract class Objective : IDisposable
 {
@@ -17,13 +19,12 @@ public abstract class Objective : IDisposable
 
     private Blip? _blip;
     public abstract Vector3 Position { get; }
-    protected ILogger Logger { get; set; } = default!;
     protected abstract void Load();
     public virtual void Update() { }
 
     internal void LoadInternal(RealmPlayer player)
     {
-        Logger = player.GetRequiredService<ILogger>();
+        Player = player;
         _elementFactory = player.ElementFactory.CreateScope();
         Load();
     }

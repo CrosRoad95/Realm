@@ -2,10 +2,10 @@
 
 public sealed class FractionMemberDto : IEquatable<FractionMemberDto>
 {
-    public int FractionId { get; set; }
-    public int UserId { get; set; }
-    public int Rank { get; set; }
-    public string RankName { get; set; }
+    public int FractionId { get; init; }
+    public int UserId { get; init; }
+    public int Rank { get; init; }
+    public string RankName { get; init; }
 
     [return: NotNullIfNotNull(nameof(fractionMemberData))]
     public static FractionMemberDto? Map(FractionMemberData? fractionMemberData)

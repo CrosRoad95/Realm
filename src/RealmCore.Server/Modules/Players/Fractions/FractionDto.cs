@@ -2,10 +2,10 @@
 
 public sealed class FractionDto : IEquatable<FractionDto>
 {
-    public int Id { get; set; }
-    public string Name { get; set; }
-    public string? Code { get; set; }
-    public List<FractionMemberDto> Members { get; set; }
+    public int Id { get; init; }
+    public string Name { get; init; }
+    public string? Code { get; init; }
+    public List<FractionMemberDto> Members { get; init; }
 
     [return: NotNullIfNotNull(nameof(fractionData))]
     public static FractionDto? Map(FractionData? fractionData)
@@ -24,6 +24,9 @@ public sealed class FractionDto : IEquatable<FractionDto>
 
     public bool Equals(FractionDto? other)
     {
-        return other?.Id == Id;
+        if (other == null)
+            return false;
+
+        return other.Id == Id;
     }
 }

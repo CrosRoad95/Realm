@@ -1,4 +1,4 @@
-﻿namespace RealmCore.Server.Modules.Jobs.Objectives;
+﻿namespace RealmCore.Server.Modules.Players.Jobs.Objectives;
 
 public class ObjectiveAlreadyFulfilledException : Exception
 {

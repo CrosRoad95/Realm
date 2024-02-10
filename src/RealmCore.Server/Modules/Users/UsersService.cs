@@ -170,7 +170,7 @@ internal sealed class UsersService : IUsersService
         if (player.User.IsSignedIn)
             player.User.SignOut();
         await _saveService.Save(player, cancellationToken);
-        _activeUsers.TrySetInactive(player.UserId);
+        _activeUsers.TrySetInactive(player.PersistentId);
         player.RemoveFromVehicle();
         player.Position = new Vector3(6000, 6000, 99999);
         player.Interior = 0;

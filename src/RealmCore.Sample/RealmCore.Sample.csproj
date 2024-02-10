@@ -49,7 +49,6 @@
 		<Using Include="RealmCore.Server.Modules.Commands.Administration" />
 		<Using Include="RealmCore.Server.Modules.Core" />
 		<Using Include="RealmCore.Server.Modules.Inventories" />
-		<Using Include="RealmCore.Server.Modules.Jobs" />
 		<Using Include="RealmCore.Server.Modules.Persistence" />
 		<Using Include="RealmCore.Server.Modules.Players.Administration" />
 		<Using Include="RealmCore.Server.Modules.Players.Gui.Dx" />
@@ -75,6 +74,7 @@
 		<Using Include="RealmCore.Server.Modules.Players.Bans" />
 		<Using Include="RealmCore.Server.Modules.Players.Gui.Browser" />
 		<Using Include="RealmCore.Server.Modules.Players.Jobs" />
+		<Using Include="RealmCore.Server.Modules.Players.Jobs.Objectives" />
 		<Using Include="RealmCore.Server.Modules.Players.Licenses" />
 		<Using Include="RealmCore.Server.Modules.Players.Membership" />
 		<Using Include="RealmCore.Server.Modules.Players.Persistence" />
@@ -92,7 +92,6 @@
 		<Using Include="RealmCore.Persistence.Repository" />
 		<Using Include="RealmCore.Interfaces.Extend" />
 		<Using Include="RealmCore.Server.Json.Converters" />
-		<Using Include="RealmCore.Server.Modules.Jobs.Objectives" />
 		<Using Include="RealmCore.Resources.Admin.Data" />
 		<Using Include="RealmCore.Resources.Admin.Enums" />
 		<Using Include="RealmCore.Resources.Overlay.Interfaces" />

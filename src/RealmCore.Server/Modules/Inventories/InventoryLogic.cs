@@ -18,14 +18,14 @@ internal sealed class InventoryLogic : PlayerLogic
 
         if (inventory.Owner is RealmPlayer player)
         {
-            var inventoryId = await _saveService.SaveNewPlayerInventory(inventory, player.UserId);
+            var inventoryId = await _saveService.SaveNewPlayerInventory(inventory, player.PersistentId);
             inventory.Id = inventoryId;
         }
         else if (inventory.Owner is RealmVehicle vehicle)
         {
-            if (vehicle.Persistance.IsLoaded)
+            if (vehicle.Persistence.IsLoaded)
             {
-                var inventoryId = await _saveService.SaveNewVehicleInventory(inventory, vehicle.Persistance.Id);
+                var inventoryId = await _saveService.SaveNewVehicleInventory(inventory, vehicle.Persistence.Id);
                 inventory.Id = inventoryId;
             }
         }

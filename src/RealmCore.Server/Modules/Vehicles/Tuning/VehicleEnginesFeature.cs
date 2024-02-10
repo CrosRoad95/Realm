@@ -56,13 +56,13 @@ internal sealed class VehicleEnginesFeature : IVehicleEnginesFeature
 
     public RealmVehicle Vehicle { get; }
 
-    public VehicleEnginesFeature(VehicleContext vehicleContext, IVehiclePersistanceFeature vehiclePersistanceService)
+    public VehicleEnginesFeature(VehicleContext vehicleContext, IVehiclePersistenceFeature vehiclePersistanceService)
     {
         Vehicle = vehicleContext.Vehicle;
         vehiclePersistanceService.Loaded += HandleLoaded;
     }
 
-    private void HandleLoaded(IVehiclePersistanceFeature persistance, RealmVehicle vehicle)
+    private void HandleLoaded(IVehiclePersistenceFeature persistance, RealmVehicle vehicle)
     {
         _vehicleEngine = persistance.VehicleData.VehicleEngines;
     }

@@ -1,21 +1,20 @@
 ﻿namespace RealmCore.Server.Modules.Players.Licenses;
 
-public class LicenseDto
+public class PlayerLicenseDto
 {
-    public int LicenseId { get; set; }
-    public DateTime? SuspendedUntil { get; set; }
-    public string? SuspendedReason { get; set; }
+    public int LicenseId { get; init; }
+    public DateTime? SuspendedUntil { get; init; }
+    public string? SuspendedReason { get; init; }
 
     public bool IsSuspended(DateTime now) => SuspendedUntil != null && SuspendedUntil > now;
 
-
     [return: NotNullIfNotNull(nameof(userLicenseData))]
-    public static LicenseDto? Map(UserLicenseData? userLicenseData)
+    public static PlayerLicenseDto? Map(UserLicenseData? userLicenseData)
     {
         if (userLicenseData == null)
             return null;
 
-        return new LicenseDto
+        return new PlayerLicenseDto
         {
             LicenseId = userLicenseData.LicenseId,
             SuspendedReason = userLicenseData.SuspendedReason,

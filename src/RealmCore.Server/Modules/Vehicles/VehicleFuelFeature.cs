@@ -14,7 +14,7 @@ internal sealed class VehicleFuelFeature : IVehicleFuelFeature
 
     public RealmVehicle Vehicle { get; init; }
 
-    public VehicleFuelFeature(VehicleContext vehicleContext, IVehiclePersistanceFeature persistanceService)
+    public VehicleFuelFeature(VehicleContext vehicleContext, IVehiclePersistenceFeature persistanceService)
     {
         Vehicle = vehicleContext.Vehicle;
         persistanceService.Loaded += HandleLoaded;
@@ -65,7 +65,7 @@ internal sealed class VehicleFuelFeature : IVehicleFuelFeature
         }
     }
 
-    private void HandleLoaded(IVehiclePersistanceFeature persistance, RealmVehicle vehicle)
+    private void HandleLoaded(IVehiclePersistenceFeature persistance, RealmVehicle vehicle)
     {
         _vehicleFuelData = persistance.VehicleData.Fuels;
         lock (_lock)

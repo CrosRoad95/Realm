@@ -1,6 +1,6 @@
 ﻿namespace RealmCore.Server.Modules.Vehicles.Vehicles;
 
-public interface IVehiclePersistanceFeature : IVehicleFeature
+public interface IVehiclePersistenceFeature : IVehicleFeature
 {
     int Id { get; }
     byte Kind { get; }
@@ -8,12 +8,12 @@ public interface IVehiclePersistanceFeature : IVehicleFeature
     bool IsLoaded { get; }
     internal VehicleData VehicleData { get; }
 
-    event Action<IVehiclePersistanceFeature, RealmVehicle>? Loaded;
+    event Action<IVehiclePersistenceFeature, RealmVehicle>? Loaded;
 
     void Load(VehicleData vehicleData);
 }
 
-internal sealed class VehiclePersistanceFeature : IVehiclePersistanceFeature
+internal sealed class VehiclePersistanceFeature : IVehiclePersistenceFeature
 {
     private readonly object _lock = new();
     private VehicleData? _vehicleData;
@@ -40,7 +40,7 @@ internal sealed class VehiclePersistanceFeature : IVehiclePersistanceFeature
         }
     }
 
-    public event Action<IVehiclePersistanceFeature, RealmVehicle>? Loaded;
+    public event Action<IVehiclePersistenceFeature, RealmVehicle>? Loaded;
 
     public RealmVehicle Vehicle { get; init; }
 

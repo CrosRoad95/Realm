@@ -13,14 +13,14 @@ internal sealed class VehicleEventsFeature : IVehicleEventsFeature
 
     public RealmVehicle Vehicle { get; init; }
 
-    public VehicleEventsFeature(VehicleContext vehicleContext, IVehiclePersistanceFeature vehiclePersistanceService, IDateTimeProvider dateTimeProvider)
+    public VehicleEventsFeature(VehicleContext vehicleContext, IVehiclePersistenceFeature vehiclePersistanceService, IDateTimeProvider dateTimeProvider)
     {
         Vehicle = vehicleContext.Vehicle;
         vehiclePersistanceService.Loaded += HandleLoaded;
         _dateTimeProvider = dateTimeProvider;
     }
 
-    private void HandleLoaded(IVehiclePersistanceFeature persistanceService, RealmVehicle vehicle)
+    private void HandleLoaded(IVehiclePersistenceFeature persistanceService, RealmVehicle vehicle)
     {
         _vehicleEvents = persistanceService.VehicleData.VehicleEvents;
     }
@@ -32,7 +32,7 @@ internal sealed class VehicleEventsFeature : IVehicleEventsFeature
             _vehicleEvents.Add(new VehicleEventData
             {
                 DateTime = _dateTimeProvider.Now,
-                VehicleId = Vehicle.PersistantId,
+                VehicleId = Vehicle.PersistentId,
                 EventType = eventType,
                 Metadata = metadata,
             });

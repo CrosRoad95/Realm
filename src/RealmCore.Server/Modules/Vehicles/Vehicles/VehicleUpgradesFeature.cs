@@ -37,13 +37,13 @@ internal sealed class VehicleUpgradesFeature : IVehicleUpgradesFeature
 
     public RealmVehicle Vehicle { get; init; }
 
-    public VehicleUpgradesFeature(VehicleContext vehicleContext, IVehiclePersistanceFeature persistance)
+    public VehicleUpgradesFeature(VehicleContext vehicleContext, IVehiclePersistenceFeature persistance)
     {
         Vehicle = vehicleContext.Vehicle;
         persistance.Loaded += HandleLoaded;
     }
 
-    private void HandleLoaded(IVehiclePersistanceFeature persistance, RealmVehicle vehicle)
+    private void HandleLoaded(IVehiclePersistenceFeature persistance, RealmVehicle vehicle)
     {
         _upgrades = persistance.VehicleData.Upgrades;
     }

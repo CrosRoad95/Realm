@@ -76,7 +76,7 @@ internal sealed class GroupService : IGroupService
         if (player.Groups.IsMember(groupId))
             return false;
 
-        var groupMemberData = await _groupRepository.TryAddMember(groupId, player.UserId, rank, rankName, cancellationToken);
+        var groupMemberData = await _groupRepository.TryAddMember(groupId, player.PersistentId, rank, rankName, cancellationToken);
         if (groupMemberData == null)
             return false;
 
@@ -89,7 +89,7 @@ internal sealed class GroupService : IGroupService
         if (!player.Groups.IsMember(groupId))
             return false;
 
-        if (await _groupRepository.TryRemoveMember(groupId, player.UserId, cancellationToken))
+        if (await _groupRepository.TryRemoveMember(groupId, player.PersistentId, cancellationToken))
         {
             player.Groups.RemoveGroupMember(groupId);
         }

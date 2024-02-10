@@ -11,9 +11,9 @@ public abstract class VehicleLogic
     {
         if (element is RealmVehicle vehicle)
         {
-            vehicle.Persistance.Loaded += HandleLoaded;
+            vehicle.Persistence.Loaded += HandleLoaded;
         }
     }
 
-    protected abstract void HandleLoaded(IVehiclePersistanceFeature persistatnce, RealmVehicle vehicle);
+    protected abstract void HandleLoaded(IVehiclePersistenceFeature persistatnce, RealmVehicle vehicle);
 }

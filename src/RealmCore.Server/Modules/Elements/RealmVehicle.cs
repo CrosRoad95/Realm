@@ -1,15 +1,15 @@
 ﻿namespace RealmCore.Server.Modules.Elements;
 
-public class RealmVehicle : Vehicle
+public class RealmVehicle : Vehicle, IPersistentElement
 {
     private readonly IServiceProvider _serviceProvider;
     private readonly IServiceScope _serviceScope;
 
     public IServiceProvider ServiceProvider => _serviceProvider;
-    public int PersistantId => Persistance.Id;
+    public int PersistentId => Persistence.Id;
 
     public IVehicleAccessFeature Access { get; private set; }
-    public IVehiclePersistanceFeature Persistance { get; private set; }
+    public IVehiclePersistenceFeature Persistence { get; private set; }
     public IVehicleMileageCounterFeature MileageCounter { get; private set; }
     public new IVehicleUpgradesFeature Upgrades { get; private set; }
     public IVehiclePartDamageFeature PartDamage { get; private set; }
@@ -27,7 +27,7 @@ public class RealmVehicle : Vehicle
         #region Initialize scope services
         GetRequiredService<VehicleContext>().Vehicle = this;
         Access = GetRequiredService<IVehicleAccessFeature>();
-        Persistance = GetRequiredService<IVehiclePersistanceFeature>();
+        Persistence = GetRequiredService<IVehiclePersistenceFeature>();
         MileageCounter = GetRequiredService<IVehicleMileageCounterFeature>();
         Upgrades = GetRequiredService<IVehicleUpgradesFeature>();
         PartDamage = GetRequiredService<IVehiclePartDamageFeature>();

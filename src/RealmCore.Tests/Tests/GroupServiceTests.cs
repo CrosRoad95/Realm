@@ -50,7 +50,7 @@ public class GroupServiceTests
         member.RankName.Should().Be("Leader");
         member.Rank.Should().Be(1);
         group2.Value.members.Should().HaveCount(1);
-        group2.Value.members[0].userId.Should().Be(player.UserId);
+        group2.Value.members[0].userId.Should().Be(player.PersistentId);
     }
 
     //[Fact]

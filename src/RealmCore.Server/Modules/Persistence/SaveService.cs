@@ -27,10 +27,10 @@ internal sealed class SaveService : ISaveService
 
     private async Task<bool> SaveVehicle(RealmVehicle vehicle, CancellationToken cancellationToken = default)
     {
-        if (!vehicle.Persistance.IsLoaded)
+        if (!vehicle.Persistence.IsLoaded)
             return false;
 
-        var vehicleData = vehicle.Persistance.VehicleData;
+        var vehicleData = vehicle.Persistence.VehicleData;
 
         vehicleData.TransformAndMotion = vehicle.GetTransformAndMotion();
         vehicleData.Mileage = vehicle.MileageCounter.Mileage;
@@ -98,7 +98,7 @@ internal sealed class SaveService : ISaveService
 
         if (vehicle.Inventory.TryGetPrimary(out var inventory))
             vehicleData.Inventories = [Inventory.CreateData(inventory)];
-        vehicleData.LastUsed = vehicle.Persistance.LastUsed;
+        vehicleData.LastUsed = vehicle.Persistence.LastUsed;
         await vehicle.ServiceProvider.GetRequiredService<IDb>().SaveChangesAsync(cancellationToken);
         return true;
     }

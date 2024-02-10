@@ -1,4 +1,4 @@
-﻿namespace RealmCore.Server.Modules.Jobs;
+﻿namespace RealmCore.Server.Modules.Players.Jobs;
 
 public abstract class JobSession : Session
 {
@@ -68,10 +68,19 @@ public abstract class JobSession : Session
 
     protected TObjective AddObjective<TObjective>(TObjective objective) where TObjective : Objective
     {
-        objective.Player = Player;
         lock (_objectivesLock)
             _objectives.Add(objective);
 
+        try
+        {
+            objective.LoadInternal(Player);
+        }
+        catch (Exception)
+        {
+            lock (_objectivesLock)
+                _objectives.Remove(objective);
+            throw;
+        }
         ObjectiveAdded?.Invoke(this, objective);
         objective.Completed += HandleCompleted;
         objective.InCompleted += HandleInCompleted;

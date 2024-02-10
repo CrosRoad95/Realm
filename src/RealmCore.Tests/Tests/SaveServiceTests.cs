@@ -11,7 +11,7 @@ public class SaveServiceTests
         var saveService = realmTestingServer.GetRequiredService<ISaveService>();
         var activeVehicles = realmTestingServer.GetRequiredService<IVehiclesInUse>();
         var vehicle = await vehiclesService.CreatePersistantVehicle(404, Vector3.Zero, Vector3.Zero);
-        var id = vehicle.PersistantId;
+        var id = vehicle.PersistentId;
         activeVehicles.ActiveVehiclesIds.Should().BeEquivalentTo([id]);
         activeVehicles.IsActive(id).Should().BeTrue();
         activeVehicles.TryGetVehicleById(id, out var foundVehicle).Should().BeTrue();
@@ -40,7 +40,7 @@ public class SaveServiceTests
         vehicle1.Upgrades.AddUpgrade(250, false);
         vehicle1.PartDamage.AddPart(200, 300);
         vehicle1.Engines.Add(50);
-        var id = vehicle1.PersistantId;
+        var id = vehicle1.PersistentId;
         await saveService.Save(vehicle1);
         vehicle1.Destroy();
 

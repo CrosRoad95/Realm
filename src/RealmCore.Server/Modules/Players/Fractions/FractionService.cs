@@ -76,9 +76,9 @@ internal sealed class FractionService : IFractionService
 
     public async Task AddMember(int fractionId, RealmPlayer player, int rank, string rankName, CancellationToken cancellationToken = default)
     {
-        var memberData = await _fractionRepository.TryAddMember(fractionId, player.UserId, rank, rankName, cancellationToken);
+        var memberData = await _fractionRepository.TryAddMember(fractionId, player.PersistentId, rank, rankName, cancellationToken);
         if (memberData == null)
-            throw new FractionMemberAlreadyAddedException(player.UserId, fractionId);
+            throw new FractionMemberAlreadyAddedException(player.PersistentId, fractionId);
         player.Fractions.AddMember(memberData);
 
         lock (_lock)

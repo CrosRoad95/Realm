@@ -119,7 +119,7 @@ public static class ServiceCollectionExtensions
 
         #region Vehicle services
         services.AddScoped<IVehicleAccessFeature, VehicleAccessFeature>();
-        services.AddScoped<IVehiclePersistanceFeature, VehiclePersistanceFeature>();
+        services.AddScoped<IVehiclePersistenceFeature, VehiclePersistanceFeature>();
         services.AddScoped<IVehicleMileageCounterFeature, VehicleMileageCounterFeature>();
         services.AddScoped<IVehiclesAccessService, VehiclesAccessService>();
         services.AddScoped<IVehicleUpgradesFeature, VehicleUpgradesFeature>();

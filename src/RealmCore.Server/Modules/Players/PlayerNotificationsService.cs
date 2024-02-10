@@ -27,19 +27,19 @@ internal sealed class PlayerNotificationsService : IPlayerNotificationsService
 
     public async Task<int> Create(RealmPlayer player, string title, string description, string? excerpt = null, CancellationToken cancellationToken = default)
     {
-        var notification = await _userNotificationRepository.Create(player.UserId, _dateTimeProvider.Now, title, description, excerpt, cancellationToken);
+        var notification = await _userNotificationRepository.Create(player.PersistentId, _dateTimeProvider.Now, title, description, excerpt, cancellationToken);
         NotificationCreated?.Invoke(player, title, description, excerpt, notification.Id);
         return notification.Id;
     }
 
     public async Task<List<UserNotificationData>> Get(RealmPlayer player, int limit = 10, CancellationToken cancellationToken = default)
     {
-        return await _userNotificationRepository.Get(player.UserId, limit, cancellationToken);
+        return await _userNotificationRepository.Get(player.PersistentId, limit, cancellationToken);
     }
 
     public async Task<int> CountUnread(RealmPlayer player, CancellationToken cancellationToken = default)
     {
-        return await _userNotificationRepository.CountUnread(player.UserId, cancellationToken);
+        return await _userNotificationRepository.CountUnread(player.PersistentId, cancellationToken);
     }
 
     public async Task<bool> MarkAsRead(int notificationId, CancellationToken cancellationToken = default)

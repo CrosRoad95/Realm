@@ -9,7 +9,7 @@ internal sealed class PeristantVehicleLogic : VehicleLogic
         _activeVehicles = activeVehicles;
     }
 
-    protected override void HandleLoaded(IVehiclePersistanceFeature persistatnce, RealmVehicle vehicle)
+    protected override void HandleLoaded(IVehiclePersistenceFeature persistatnce, RealmVehicle vehicle)
     {
         _activeVehicles.TrySetActive(persistatnce.Id, vehicle);
     }

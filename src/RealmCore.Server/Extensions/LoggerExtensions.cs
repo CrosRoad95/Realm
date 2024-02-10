@@ -17,8 +17,8 @@ public static class LoggerExtensions
             case RealmPlayer player:
                 data["name"] = player.Name;
                 data["serial"] = player.Client.GetSerialOrDefault();
-                if(player.UserId != null)
-                    data["userId"] = player.UserId;
+                if(player.PersistentId != null)
+                    data["userId"] = player.PersistentId;
                 break;
         }
 

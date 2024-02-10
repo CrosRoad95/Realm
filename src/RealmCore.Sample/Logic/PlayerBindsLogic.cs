@@ -85,7 +85,7 @@ internal sealed class PlayerBindsLogic
             DashboardGui.DashboardState state = new();
             state.Money = (double)player.Money.Amount;
 
-            var vehiclesWithModelAndPositionDTos = await _vehicleRepository.GetLightVehiclesByUserId(player.UserId, cancellationToken);
+            var vehiclesWithModelAndPositionDTos = await _vehicleRepository.GetLightVehiclesByUserId(player.PersistentId, cancellationToken);
             state.VehicleLightInfos = vehiclesWithModelAndPositionDTos.Select(x => new VehicleLightInfoDto
             {
                 Id = x.Id,

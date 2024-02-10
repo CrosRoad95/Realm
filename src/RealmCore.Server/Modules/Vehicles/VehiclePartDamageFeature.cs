@@ -36,13 +36,13 @@ internal sealed class VehiclePartDamageFeature : IVehiclePartDamageFeature
 
     public RealmVehicle Vehicle { get; init; }
 
-    public VehiclePartDamageFeature(VehicleContext vehicleContext, IVehiclePersistanceFeature vehiclePersistanceService)
+    public VehiclePartDamageFeature(VehicleContext vehicleContext, IVehiclePersistenceFeature vehiclePersistanceService)
     {
         Vehicle = vehicleContext.Vehicle;
         vehiclePersistanceService.Loaded += HandleLoaded;
     }
 
-    private void HandleLoaded(IVehiclePersistanceFeature persistance, RealmVehicle vehicle)
+    private void HandleLoaded(IVehiclePersistenceFeature persistance, RealmVehicle vehicle)
     {
         _vehiclePartDamages = persistance.VehicleData.PartDamages;
     }

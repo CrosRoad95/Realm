@@ -2,7 +2,7 @@
 
 namespace RealmCore.Server.Modules.Elements;
 
-public class RealmPlayer : Player, IDisposable
+public class RealmPlayer : Player, IDisposable, IPersistentElement
 {
     private readonly object _lock = new();
     private readonly IServiceProvider _serviceProvider;
@@ -127,7 +127,7 @@ public class RealmPlayer : Player, IDisposable
 
     public CultureInfo Culture => _culture;
     public bool IsSignedIn => User.IsSignedIn;
-    public int UserId => User.Id;
+    public int PersistentId => User.Id;
 
     public new IPlayerMoneyFeature Money { get; private set; }
     public IPlayerBrowserFeature Browser { get; private set; }
