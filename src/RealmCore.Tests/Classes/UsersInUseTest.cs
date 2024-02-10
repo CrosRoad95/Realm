@@ -1,12 +1,12 @@
 ﻿namespace RealmCore.Tests.Classes;
 
-public class ActiveUsersTests
+public class UsersInUseTest
 {
     [Fact]
-    public void TestSettingActiveInactive()
+    public void UsersInUseShouldWork()
     {
         #region Arrange
-        var activeUsers = new ActiveUsers();
+        var activeUsers = new UsersInUse();
         #endregion
 
         #region Act

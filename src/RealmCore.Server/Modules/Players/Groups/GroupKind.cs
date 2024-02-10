@@ -1,4 +1,4 @@
-﻿namespace RealmCore.Server.Modules.Groups;
+﻿namespace RealmCore.Server.Modules.Players.Groups;
 
 public enum GroupKind : byte
 {

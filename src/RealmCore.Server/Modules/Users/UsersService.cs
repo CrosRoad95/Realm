@@ -25,7 +25,7 @@ internal sealed class UsersService : IUsersService
     private readonly IOptionsMonitor<GameplayOptions> _gameplayOptions;
     private readonly IDateTimeProvider _dateTimeProvider;
     private readonly IAuthorizationService _authorizationService;
-    private readonly IActiveUsers _activeUsers;
+    private readonly IUsersInUse _activeUsers;
     private readonly IElementCollection _elementCollection;
     private readonly ISaveService _saveService;
     private readonly IServiceProvider _serviceProvider;
@@ -34,7 +34,7 @@ internal sealed class UsersService : IUsersService
     public event Action<RealmPlayer>? SignedOut;
 
     public UsersService(ItemsCollection itemsCollection, ILogger<UsersService> logger, IOptionsMonitor<GameplayOptions> gameplayOptions,
-        IDateTimeProvider dateTimeProvider, IAuthorizationService authorizationService, IActiveUsers activeUsers, IElementCollection elementCollection, ISaveService saveService, IServiceProvider serviceProvider)
+        IDateTimeProvider dateTimeProvider, IAuthorizationService authorizationService, IUsersInUse activeUsers, IElementCollection elementCollection, ISaveService saveService, IServiceProvider serviceProvider)
     {
         _itemsCollection = itemsCollection;
         _logger = logger;

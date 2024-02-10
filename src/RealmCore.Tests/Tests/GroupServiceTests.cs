@@ -1,4 +1,6 @@
-﻿namespace RealmCore.Tests.Tests;
+﻿using RealmCore.Server.Modules.Players.Groups;
+
+namespace RealmCore.Tests.Tests;
 
 public class GroupServiceTests
 {

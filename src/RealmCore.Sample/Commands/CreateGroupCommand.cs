@@ -1,4 +1,6 @@
-﻿namespace RealmCore.Sample.Commands;
+﻿using RealmCore.Server.Modules.Players.Groups;
+
+namespace RealmCore.Sample.Commands;
 
 [CommandName("creategroup")]
 public sealed class CreateGroupCommand : IInGameCommand

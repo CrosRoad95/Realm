@@ -1,4 +1,4 @@
-﻿namespace RealmCore.Server.Modules.Vehicles;
+﻿namespace RealmCore.Server.Modules.Vehicles.Access;
 
 internal sealed class VehicleAccessControllerComponentLogic
 {

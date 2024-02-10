@@ -9,7 +9,7 @@ public class SaveServiceTests
         var vehiclesService = realmTestingServer.GetRequiredService<IVehiclesService>();
         var loadService = realmTestingServer.GetRequiredService<ILoadService>();
         var saveService = realmTestingServer.GetRequiredService<ISaveService>();
-        var activeVehicles = realmTestingServer.GetRequiredService<IActiveVehicles>();
+        var activeVehicles = realmTestingServer.GetRequiredService<IVehiclesInUse>();
         var vehicle = await vehiclesService.CreatePersistantVehicle(404, Vector3.Zero, Vector3.Zero);
         var id = vehicle.PersistantId;
         activeVehicles.ActiveVehiclesIds.Should().BeEquivalentTo([id]);

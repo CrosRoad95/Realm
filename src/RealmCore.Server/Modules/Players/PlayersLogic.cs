@@ -6,11 +6,11 @@ internal sealed class PlayersLogic
     private readonly IClientInterfaceService _clientInterfaceService;
     private readonly ILogger<PlayersLogic> _logger;
     private readonly IResourceProvider _resourceProvider;
-    private readonly IActiveUsers _activeUsers;
+    private readonly IUsersInUse _activeUsers;
     private readonly IPlayerEventManager _playersService;
     private readonly ConcurrentDictionary<RealmPlayer, Latch> _playerResources = new();
 
-    public PlayersLogic(IElementFactory elementFactory, MtaServer mtaServer, IClientInterfaceService clientInterfaceService, ILogger<PlayersLogic> logger, IResourceProvider resourceProvider, IActiveUsers activeUsers, IPlayerEventManager playersService)
+    public PlayersLogic(IElementFactory elementFactory, MtaServer mtaServer, IClientInterfaceService clientInterfaceService, ILogger<PlayersLogic> logger, IResourceProvider resourceProvider, IUsersInUse activeUsers, IPlayerEventManager playersService)
     {
         _mtaServer = mtaServer;
         _clientInterfaceService = clientInterfaceService;

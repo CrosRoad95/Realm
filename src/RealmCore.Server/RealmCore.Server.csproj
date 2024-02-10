@@ -166,8 +166,6 @@
 		<Using Include="RealmCore.Interfaces.Providers" />
 		<Using Include="RealmCore.Resources.Assets.Interfaces" />
 		<Using Include="RealmCore.Server.Modules.Commands" />
-		<Using Include="RealmCore.Server.Modules.Fractions" />
-		<Using Include="RealmCore.Server.Modules.Groups" />
 		<Using Include="RealmCore.Server.Modules.Players.Achievements" />
 		<Using Include="RealmCore.Server.Modules.Players.Bans" />
 		<Using Include="RealmCore.Server.Modules.Players.Gui.Browser" />
@@ -200,7 +198,12 @@
 		<Using Include="RealmCore.Persistence.Extensions" />
 		<Using Include="RealmCore.Server.Modules.World.Xml" />
 		<Using Include="RealmCore.Server.Modules.World.Xml.Map" />
+		<Using Include="RealmCore.Server.Modules.Players.Fractions" />
 		
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Folder Include="Modules\Fractions\" />
 	</ItemGroup>
 
 </Project>

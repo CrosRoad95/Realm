@@ -1,4 +1,4 @@
-﻿namespace RealmCore.Server.Modules.Vehicles;
+﻿namespace RealmCore.Server.Modules.Vehicles.Access;
 
 public class VehicleAccessDefinedException : Exception
 {

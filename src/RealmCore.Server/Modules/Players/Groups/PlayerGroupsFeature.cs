@@ -1,4 +1,4 @@
-﻿namespace RealmCore.Server.Modules.Players.Membership;
+﻿namespace RealmCore.Server.Modules.Players.Groups;
 
 public interface IPlayerGroupsFeature : IPlayerFeature
 {

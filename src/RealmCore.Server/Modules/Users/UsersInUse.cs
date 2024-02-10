@@ -1,6 +1,6 @@
 ﻿namespace RealmCore.Server.Modules.Users;
 
-public interface IActiveUsers
+public interface IUsersInUse
 {
     IEnumerable<int> ActiveUsersIds { get; }
 
@@ -10,7 +10,7 @@ public interface IActiveUsers
     bool TrySetInactive(int userId);
 }
 
-internal sealed class ActiveUsers : IActiveUsers
+internal sealed class UsersInUse : IUsersInUse
 {
     private readonly ConcurrentDictionary<int, RealmPlayer> _activeUsers = new();
 

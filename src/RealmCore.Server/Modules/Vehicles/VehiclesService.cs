@@ -22,12 +22,12 @@ internal sealed class VehiclesService : IVehiclesService
     private readonly IDateTimeProvider _dateTimeProvider;
     private readonly VehicleUpgradeCollection _vehicleUpgradesCollection;
     private readonly VehicleEnginesCollection _vehicleEnginesCollection;
-    private readonly IActiveUsers _activeUsers;
-    private readonly IActiveVehicles _activeVehicles;
+    private readonly IUsersInUse _activeUsers;
+    private readonly IVehiclesInUse _activeVehicles;
     private readonly ILogger<VehiclesService> _logger;
     private readonly JsonSerializerSettings _jsonSerializerSettings;
 
-    public VehiclesService(IVehicleRepository vehicleRepository, IElementFactory elementFactory, ISaveService saveService, ItemsCollection itemsCollection, IVehicleEventRepository vehicleEventRepository, IDateTimeProvider dateTimeProvider, VehicleUpgradeCollection vehicleUpgradeCollection, VehicleEnginesCollection vehicleEnginesCollection, IActiveUsers activeUsers, IActiveVehicles activeVehicles, ILogger<VehiclesService> logger)
+    public VehiclesService(IVehicleRepository vehicleRepository, IElementFactory elementFactory, ISaveService saveService, ItemsCollection itemsCollection, IVehicleEventRepository vehicleEventRepository, IDateTimeProvider dateTimeProvider, VehicleUpgradeCollection vehicleUpgradeCollection, VehicleEnginesCollection vehicleEnginesCollection, IUsersInUse activeUsers, IVehiclesInUse activeVehicles, ILogger<VehiclesService> logger)
     {
         _vehicleRepository = vehicleRepository;
         _elementFactory = elementFactory;

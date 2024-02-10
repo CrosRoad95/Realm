@@ -1,6 +1,6 @@
 ﻿namespace RealmCore.Server.Modules.Vehicles;
 
-public interface IActiveVehicles
+public interface IVehiclesInUse
 {
     IEnumerable<int> ActiveVehiclesIds { get; }
 
@@ -10,7 +10,7 @@ public interface IActiveVehicles
     bool TrySetInactive(int vehicleId);
 }
 
-internal sealed class ActiveVehicles : IActiveVehicles
+internal sealed class VehiclesInUse : IVehiclesInUse
 {
     private readonly ConcurrentDictionary<int, RealmVehicle> _activeVehicles = new();
 

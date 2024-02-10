@@ -1,4 +1,4 @@
-﻿namespace RealmCore.Server.Modules.Vehicles.Vehicles;
+﻿namespace RealmCore.Server.Modules.Vehicles;
 
 public interface IVehicleFuelFeature : IVehicleFeature, IEnumerable<FuelContainer>
 {

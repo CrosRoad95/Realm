@@ -1,4 +1,6 @@
-﻿namespace RealmCore.Server.Extensions;
+﻿using RealmCore.Server.Modules.Players.Groups;
+
+namespace RealmCore.Server.Extensions;
 
 public static class ServiceCollectionExtensions
 {
@@ -64,8 +66,8 @@ public static class ServiceCollectionExtensions
         #endregion
 
         #region Security
-        services.AddSingleton<IActiveUsers, ActiveUsers>();
-        services.AddSingleton<IActiveVehicles, ActiveVehicles>();
+        services.AddSingleton<IUsersInUse, UsersInUse>();
+        services.AddSingleton<IVehiclesInUse, VehiclesInUse>();
         #endregion
 
         #region Services

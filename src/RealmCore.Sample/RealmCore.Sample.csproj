@@ -71,8 +71,6 @@
 		<Using Include="RealmCore.Interfaces.Providers" />
 		<Using Include="RealmCore.Resources.Assets.Interfaces" />
 		<Using Include="RealmCore.Server.Modules.Commands" />
-		<Using Include="RealmCore.Server.Modules.Fractions" />
-		<Using Include="RealmCore.Server.Modules.Groups" />
 		<Using Include="RealmCore.Server.Modules.Players.Achievements" />
 		<Using Include="RealmCore.Server.Modules.Players.Bans" />
 		<Using Include="RealmCore.Server.Modules.Players.Gui.Browser" />

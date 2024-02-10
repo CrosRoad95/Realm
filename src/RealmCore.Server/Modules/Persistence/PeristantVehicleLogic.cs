@@ -2,9 +2,9 @@
 
 internal sealed class PeristantVehicleLogic : VehicleLogic
 {
-    private readonly IActiveVehicles _activeVehicles;
+    private readonly IVehiclesInUse _activeVehicles;
 
-    public PeristantVehicleLogic(IElementFactory elementFactory, IActiveVehicles activeVehicles) : base(elementFactory)
+    public PeristantVehicleLogic(IElementFactory elementFactory, IVehiclesInUse activeVehicles) : base(elementFactory)
     {
         _activeVehicles = activeVehicles;
     }

@@ -1,4 +1,4 @@
-﻿namespace RealmCore.Server.Modules.Fractions;
+﻿namespace RealmCore.Server.Modules.Players.Fractions;
 
 public class FractionSession : Session
 {
