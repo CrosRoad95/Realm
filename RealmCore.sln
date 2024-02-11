@@ -68,8 +68,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RealmCore.Resources.Admin",
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RealmCore.Discord.Bot", "src\RealmCore.Discord.Bot\RealmCore.Discord.Bot.csproj", "{447FC985-3B2C-4362-B898-9399BBAEE80A}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RealmCore.Module.Web.AdminPanel", "src\RealmCore.Module.Web.AdminPanel\RealmCore.Module.Web.AdminPanel.csproj", "{05C3D8A0-1ACF-45BC-B4F6-0F692430D89E}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RealmCore.Persistence", "src\RealmCore.Persistence\RealmCore.Persistence.csproj", "{06466159-618E-45E7-A40B-20ED0D8F0CA7}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RealmCore.BlazorGui", "src\RealmCore.BlazorGui\RealmCore.BlazorGui.csproj", "{DE9A730B-0676-45CF-916C-E7A150D6AEC6}"
