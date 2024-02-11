@@ -451,7 +451,6 @@ local function entrypoint()
 
 	addEvent("internalUiOpenGui", true)
 	addEventHandler("internalUiOpenGui", localPlayer, function(guiName, cursorless, defaultState)
-		outputConsole("internalUiOpenGui")
 		openGui(guiName, cursorless, defaultState);
 	end)
 	

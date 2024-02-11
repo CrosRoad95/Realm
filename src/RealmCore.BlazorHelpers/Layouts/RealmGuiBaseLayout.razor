@@ -1,0 +1,19 @@
+﻿@inherits LayoutComponentBase
+@layout RealmBaseLayout
+@typeparam TBrowserGui where TBrowserGui: BrowserGui
+
+@if(Gui != null)
+{
+    <CascadingValue Value="Gui">
+        @Body
+    </CascadingValue>
+}
+else
+{
+    <p>Bład</p>
+}
+@code {
+    [CascadingParameter]
+    private IPlayerGui? PlayerGui { get; set; }
+    private TBrowserGui? Gui => PlayerGui as TBrowserGui;
+}

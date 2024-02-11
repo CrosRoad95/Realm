@@ -8,9 +8,11 @@ internal sealed class PlayersLogic
     private readonly IResourceProvider _resourceProvider;
     private readonly IUsersInUse _activeUsers;
     private readonly IPlayerEventManager _playersService;
+    private readonly IOptions<GuiBrowserOptions> _guiBrowserOptions;
+    private readonly ClientConsole _clientConsole;
     private readonly ConcurrentDictionary<RealmPlayer, Latch> _playerResources = new();
 
-    public PlayersLogic(IElementFactory elementFactory, MtaServer mtaServer, IClientInterfaceService clientInterfaceService, ILogger<PlayersLogic> logger, IResourceProvider resourceProvider, IUsersInUse activeUsers, IPlayerEventManager playersService)
+    public PlayersLogic(MtaServer mtaServer, IClientInterfaceService clientInterfaceService, ILogger<PlayersLogic> logger, IResourceProvider resourceProvider, IUsersInUse activeUsers, IPlayerEventManager playersService, IOptions<GuiBrowserOptions> guiBrowserOptions, ClientConsole clientConsole)
     {
         _mtaServer = mtaServer;
         _clientInterfaceService = clientInterfaceService;
@@ -18,10 +20,12 @@ internal sealed class PlayersLogic
         _resourceProvider = resourceProvider;
         _activeUsers = activeUsers;
         _playersService = playersService;
+        _guiBrowserOptions = guiBrowserOptions;
+        _clientConsole = clientConsole;
         _mtaServer.PlayerJoined += HandlePlayerJoined;
     }
 
-    private async Task FetchClientData(RealmPlayer player)
+    private async Task FetchClientData(RealmPlayer player, CancellationToken cancellationToken = default)
     {
         var taskWaitForScreenSize = new TaskCompletionSource<(int, int)>();
         var taskWaitForCultureInfo = new TaskCompletionSource<CultureInfo>();
@@ -46,44 +50,60 @@ internal sealed class PlayersLogic
         _clientInterfaceService.ClientScreenSizeChanged += handleClientScreenSizeChanged;
         _clientInterfaceService.ClientCultureInfoChanged += handleClientCultureInfoChanged;
 
-        await StartAllResourcesForPlayer(player);
+        await StartAllResourcesForPlayer(player, cancellationToken);
 
-        var timeoutTask = Task.Delay(10_000);
+        var timeoutTask = Task.Delay(10_000, cancellationToken);
         var completedTask = await Task.WhenAny(Task.WhenAll(taskWaitForScreenSize.Task, taskWaitForCultureInfo.Task), timeoutTask);
-        if (completedTask == timeoutTask)
-        {
-            player.Kick("Failed to get culture and screen size");
-            return;
-        }
+        cancellationToken.ThrowIfCancellationRequested();
+
         var screenSize = await taskWaitForScreenSize.Task;
         var cultureInfo = await taskWaitForCultureInfo.Task;
 
         player.ScreenSize = new Vector2(screenSize.Item1, screenSize.Item2);
-        player.CultureInfo = cultureInfo;
+        player.Culture = cultureInfo;
     }
 
-    private async Task StartAllResourcesForPlayer(RealmPlayer player)
+    private async Task StartAllResourcesForPlayer(RealmPlayer player, CancellationToken cancellationToken = default)
     {
         try
         {
-            await _playerResources[player].WaitAsync();
+            await _playerResources[player].WaitAsync(cancellationToken);
         }
         catch (Exception)
         {
-            player.Kick("Resources took to long to load. Please reconnect.");
-            return;
-        }
-        finally
-        {
             player.ResourceStarted -= HandlePlayerResourceStarted;
             _playerResources.TryRemove(player, out var _);
+            throw;
         }
-
     }
 
-    private async Task HandlePlayerJoinedCore(Player plr)
+    private async Task WaitForBrowser(RealmPlayer player, TimeSpan timeout, CancellationToken cancellationToken)
     {
-        var player = (RealmPlayer)plr;
+        if (player.Browser.IsReady)
+            return;
+
+        var waitForBrowser = new TaskCompletionSource();
+        void handleBrowserReady()
+        {
+            if (waitForBrowser.TrySetResult())
+                player.Browser.Ready -= handleBrowserReady;
+        }
+        player.Browser.Ready += handleBrowserReady;
+
+        if (player.Browser.IsReady)
+        {
+            if (waitForBrowser.TrySetResult())
+                player.Browser.Ready -= handleBrowserReady;
+        }
+
+        if(!await waitForBrowser.WaitWithWithout(timeout, cancellationToken))
+        {
+            throw new BrowserLoadingTimeoutException();
+        }
+    }
+
+    private async Task HandlePlayerJoinedCore(RealmPlayer player, CancellationToken cancellationToken)
+    {
         var start = Stopwatch.GetTimestamp();
         var resources = _resourceProvider.GetResources();
         _playerResources[player] = new Latch(RealmResourceServer._resourceCounter, TimeSpan.FromSeconds(60));
@@ -92,11 +112,16 @@ internal sealed class PlayersLogic
 
         if (player.ScreenSize.X == 0)
         {
-            await FetchClientData(player);
+            await FetchClientData(player, cancellationToken);
         }
         else
         {
-            await StartAllResourcesForPlayer(player);
+            await StartAllResourcesForPlayer(player, cancellationToken);
+        }
+
+        if (_guiBrowserOptions.Value.BrowserSupport)
+        {
+            await WaitForBrowser(player, TimeSpan.FromSeconds(60), cancellationToken);
         }
 
         var stop = Stopwatch.GetTimestamp();
@@ -117,16 +142,35 @@ internal sealed class PlayersLogic
         player.Disconnected += HandleDisconnected;
     }
 
-    private async void HandlePlayerJoined(Player player)
+    private async void HandlePlayerJoined(Player plr)
     {
+        var player = (RealmPlayer)plr;
+        using var _ = _logger.BeginElement(player);
+        using var handlePlayerJoinedActivity = new Activity("HandlePlayerJoined").Start();
         try
         {
-        using var _ = _logger.BeginElement(player);
-            await HandlePlayerJoinedCore(player);
+            await HandlePlayerJoinedCore(player, player.CancellationToken);
+        }
+        catch (OperationCanceledException ex)
+        {
+            // Ignore
         }
         catch (Exception ex)
         {
             _logger.LogHandleError(ex);
+            if (player.IsDestroyed || !player.Client.IsConnected)
+            {
+                return;
+            }
+            string what = "Wystąpił nieznany błąd.";
+            if(ex is BrowserLoadingTimeoutException)
+            {
+                what = "Gui przeglądarki ładowało się zbyt długo.";
+            }
+            var traceId = Activity.Current?.TraceId.ToString() ?? "<nieznany>";
+            var message = $"{what}. Jeżeli błąd się powtórzy zgłoś się do administracji.\n\nTrace id: {traceId}";
+            _clientConsole.OutputTo(player, message);
+            player.Kick(message);
         }
     }
 

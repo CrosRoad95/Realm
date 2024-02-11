@@ -30,6 +30,7 @@ public static class ServerBuilderExtensions
             services.Configure<GameplayOptions>(realmConfigurationProvider.GetSection("Gameplay"));
             services.Configure<ServerListOptions>(realmConfigurationProvider.GetSection("ServerList"));
             services.Configure<AssetsOptions>(realmConfigurationProvider.GetSection("Assets"));
+            services.Configure<GuiBrowserOptions>(realmConfigurationProvider.GetSection("GuiBrowser"));
             services.Configure<BrowserOptions>(realmConfigurationProvider.GetSection("Browser"));
 
             var databaseProvider = realmConfigurationProvider.Get<string>("Database:Provider");

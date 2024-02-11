@@ -4,31 +4,32 @@ namespace RealmCore.Server.Modules.Players.Gui.Browser;
 
 public interface IBrowserGuiService
 {
-    string KeyName { get; }
-
     event Action<RealmPlayer>? Ready;
 
     string GenerateKey();
     bool AuthorizePlayer(string key, RealmPlayer player);
     bool UnauthorizePlayer(RealmPlayer player);
     bool TryGetPlayerByKey(string key, out RealmPlayer? player);
-    bool TryGetKeyByPlayer(RealmPlayer player, out string? key);
     void RelayPlayerLoggedIn(RealmPlayer player);
+    bool IsAuthorized(RealmPlayer player);
 }
 
 internal class BrowserGuiService : IBrowserGuiService
 {
-    private readonly ConcurrentDictionary<string, RealmPlayer> _browserPlayers = new();
+    private readonly object _lock = new();
+    private readonly Dictionary<string, RealmPlayer> _playerByKey = new();
+    private readonly List<RealmPlayer> _players = new();
 
     private readonly RandomNumberGenerator _randomNumberGenerator;
-    private readonly object _lock = new();
     private readonly byte[] _bytes = new byte[64];
-    public event Action<RealmPlayer>? Ready;
-    public string KeyName => "guiKey";
+    private readonly IOptions<GuiBrowserOptions> _guiBrowserOptions;
 
-    public BrowserGuiService()
+    public event Action<RealmPlayer>? Ready;
+
+    public BrowserGuiService(IOptions<GuiBrowserOptions> guiBrowserOptions)
     {
         _randomNumberGenerator = RandomNumberGenerator.Create();
+        _guiBrowserOptions = guiBrowserOptions;
     }
 
     public void RelayPlayerLoggedIn(RealmPlayer player)
@@ -46,34 +47,48 @@ internal class BrowserGuiService : IBrowserGuiService
         }
     }
 
+    public bool IsAuthorized(RealmPlayer player)
+    {
+        lock (_lock)
+        {
+            return _players.Contains(player);
+        }
+    }
+
     public bool AuthorizePlayer(string key, RealmPlayer player)
     {
-        return _browserPlayers.TryAdd(key, player);
+        if (!_guiBrowserOptions.Value.BrowserSupport)
+            throw new BrowserNotEnabledException();
+
+        lock (_lock)
+        {
+            if (_players.Contains(player) || _playerByKey.ContainsKey(key))
+                return false;
+            _players.Add(player);
+            _playerByKey[key] = player;
+            return true;
+        }
     }
 
     public bool UnauthorizePlayer(RealmPlayer player)
     {
-        var itemsToRemove = _browserPlayers.Where(x => x.Value == player).FirstOrDefault();
-
-        return _browserPlayers.TryRemove(itemsToRemove.Key, out var _);
-    }
-
-    public bool TryGetKeyByPlayer(RealmPlayer player, out string? key)
-    {
-        var browserPlayers = _browserPlayers.Where(x => x.Value == player).ToList();
-        if (browserPlayers.Count == 0)
+        lock (_lock)
         {
-            key = null;
-            return false;
+            if (_players.Contains(player))
+                return false;
+            _players.Add(player);
+            _playerByKey.Remove(player.Browser.Key);
+            return true;
         }
-        key = browserPlayers[0].Key;
-        return true;
     }
 
     public bool TryGetPlayerByKey(string key, out RealmPlayer? player)
     {
-        bool found = _browserPlayers.TryGetValue(key, out player);
+        lock (_lock)
+        {
+            bool found = _playerByKey.TryGetValue(key, out player);
 
-        return found;
+            return found;
+        }
     }
 }

@@ -1,4 +1,7 @@
-﻿namespace RealmCore.Sample.Logic;
+﻿using RealmCore.Sample.Concepts.Gui.Blazor;
+using SlipeServer.Resources.Scoreboard;
+
+namespace RealmCore.Sample.Logic;
 
 internal sealed class PlayerJoinedLogic
 {
@@ -6,14 +9,16 @@ internal sealed class PlayerJoinedLogic
     private readonly INametagsService _nametagsService;
     private readonly ChatBox _chatBox;
     private readonly Text3dService _text3DService;
+    private readonly ScoreboardService _scoreboardService;
     private readonly IGuiSystemService? _guiSystemService;
 
-    public PlayerJoinedLogic(ILogger<PlayerJoinedLogic> logger, INametagsService nametagsService,ChatBox chatBox, Text3dService text3DService, IBrowserGuiService browserGuiService, IPlayerEventManager playersService, IUsersService usersService, IGuiSystemService? guiSystemService = null)
+    public PlayerJoinedLogic(ILogger<PlayerJoinedLogic> logger, INametagsService nametagsService,ChatBox chatBox, Text3dService text3DService, IBrowserGuiService browserGuiService, IPlayerEventManager playersService, IUsersService usersService, ScoreboardService scoreboardService, IGuiSystemService? guiSystemService = null)
     {
         _logger = logger;
         _nametagsService = nametagsService;
         _chatBox = chatBox;
         _text3DService = text3DService;
+        _scoreboardService = scoreboardService;
         _guiSystemService = guiSystemService;
         browserGuiService.Ready += HandleReady;
         playersService.PlayerLoaded += HandlePlayerLoaded;
@@ -44,6 +49,7 @@ internal sealed class PlayerJoinedLogic
         _text3DService.SetRenderingEnabled(player, true);
 
         _nametagsService.SetNametagRenderingEnabled(player, true);
+        _scoreboardService.SetEnabledTo(player, true);
     }
 
     private async void HandleSignedIn(RealmPlayer player)
@@ -65,6 +71,7 @@ internal sealed class PlayerJoinedLogic
 
     private void ShowLoginSequence(RealmPlayer player)
     {
+        _scoreboardService.SetEnabledTo(player, false);
         _text3DService.SetRenderingEnabled(player, false);
         _chatBox.SetVisibleFor(player, false);
         _chatBox.ClearFor(player);
@@ -77,6 +84,7 @@ internal sealed class PlayerJoinedLogic
 
         if (player.Gui.Current == null)
         {
+            //player.Gui.Current = new Counter1Gui(player);
             player.Gui.SetCurrentWithDI<LoginGui>();
         }
     }

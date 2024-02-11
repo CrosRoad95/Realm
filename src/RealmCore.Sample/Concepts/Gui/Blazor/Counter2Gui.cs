@@ -2,7 +2,7 @@
 
 public class Counter2Gui : BrowserGui
 {
-    public Counter2Gui(RealmPlayer player) : base(player, "/realmUi/counter2component")
+    public Counter2Gui(RealmPlayer player) : base(player, "/realmUi/counter2B")
     {
     }
     public void Test()

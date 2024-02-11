@@ -1,6 +1,10 @@
-﻿<Router AppAssembly="@typeof(App).Assembly" AdditionalAssemblies="new[] { typeof(RealmGuiComponentBase).Assembly }">
+﻿@using RealmCore.BlazorHelpers.Pages
+<Router AppAssembly="@typeof(App).Assembly" AdditionalAssemblies="new[] { typeof(RealmGuiIndex).Assembly }">
     <Found Context="routeData">
         <RouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)" />
         <FocusOnNavigate RouteData="@routeData" Selector="h1" />
     </Found>
+    <NotFound>
+        Not found
+    </NotFound>
 </Router>

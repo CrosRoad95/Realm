@@ -167,10 +167,12 @@ internal sealed class UsersService : IUsersService
 
     public async Task SignOut(RealmPlayer player, CancellationToken cancellationToken = default)
     {
-        if (player.User.IsSignedIn)
-            player.User.SignOut();
-        await _saveService.Save(player, cancellationToken);
+        if (!player.User.IsSignedIn)
+            throw new UserNotSignedInException();
+
         _activeUsers.TrySetInactive(player.PersistentId);
+        await _saveService.Save(player, cancellationToken);
+        player.User.SignOut();
         player.RemoveFromVehicle();
         player.Position = new Vector3(6000, 6000, 99999);
         player.Interior = 0;

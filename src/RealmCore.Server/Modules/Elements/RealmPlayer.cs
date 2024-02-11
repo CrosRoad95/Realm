@@ -18,8 +18,7 @@ public class RealmPlayer : Player, IDisposable, IPersistentElement
     private Element? _currentInteractElement;
     private string? _nametagText;
     public virtual Vector2 ScreenSize { get; internal set; }
-    public virtual CultureInfo CultureInfo { get; internal set; }
-    private readonly CultureInfo _culture;
+    private CultureInfo _culture = new CultureInfo("pl-PL");
     private readonly Dictionary<string, Func<RealmPlayer, KeyState, CancellationToken, Task>> _asyncBinds = [];
     private readonly Dictionary<string, Action<RealmPlayer, KeyState>> _binds = [];
     private readonly SemaphoreSlim _bindsLock = new(1);
@@ -120,12 +119,7 @@ public class RealmPlayer : Player, IDisposable, IPersistentElement
         }
     }
 
-    private void HandleCurrentInteractElementDestroyed(Element _)
-    {
-        CurrentInteractElement = null;
-    }
-
-    public CultureInfo Culture => _culture;
+    public CultureInfo Culture { get => _culture; set => _culture = value; }
     public bool IsSignedIn => User.IsSignedIn;
     public int PersistentId => User.Id;
 
@@ -653,6 +647,11 @@ public class RealmPlayer : Player, IDisposable, IPersistentElement
             }
             return false;
         }
+    }
+
+    private void HandleCurrentInteractElementDestroyed(Element _)
+    {
+        CurrentInteractElement = null;
     }
 
     public void Dispose()

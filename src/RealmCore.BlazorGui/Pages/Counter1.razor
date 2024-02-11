@@ -1,11 +1,10 @@
 ﻿@page "/realmUi/counter1"
-@inherits RealmGuiComponentBase;
+@inject NavigationManager _navigationManager
 <PageTitle>Counter</PageTitle>
 
-<h1>Elo siemasdkljasdfklsdjfklsdjfklsdjklf: @CurrentPlayerContext.Name</h1>
+<h1>Counter1: @Player.Name</h1>
 <img src="https://i.imgur.com/lVlPvCB.gif" />
 <iframe width="560" height="315" src="https://www.youtube.com/embed/pdjQThUc0dk?si=u7paJkAoUjRxYMfv" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
-<h2>is auth: @ClaimsPrincipal.Identity.IsAuthenticated claims count: @ClaimsPrincipal.Claims.Count()</h2>
 
 <p role="status">Current count: @currentCount</p>
 
@@ -13,11 +12,14 @@
 <button class="btn btn-primary" @onclick="Navigate">Navigate</button>
 
 @code {
+    [CascadingParameter]
+    private RealmPlayer Player { get; set; }
+
     private int currentCount = 0;
 
     private void Navigate()
     {
-        NavigationManager.NavigateTo("/realmUi/counter2");
+        _navigationManager.NavigateTo("/realmUi/counter2");
     }
 
     private void IncrementCount()

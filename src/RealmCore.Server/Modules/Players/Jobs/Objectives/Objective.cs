@@ -1,6 +1,4 @@
-﻿using System.Security.AccessControl;
-
-namespace RealmCore.Server.Modules.Players.Jobs.Objectives;
+﻿namespace RealmCore.Server.Modules.Players.Jobs.Objectives;
 
 public abstract class Objective : IDisposable
 {

@@ -6,6 +6,7 @@ Directory.SetCurrentDirectory(Path.GetDirectoryName(System.Reflection.Assembly.G
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Services.AddCascadingAuthenticationState();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddRealmServer(new SampleServer());
 builder.AddRealmBlazorGuiSupport();
@@ -28,7 +29,7 @@ app.UseStaticFiles();
 app.UseAntiforgery();
 
 app.MapRazorComponents<App>()
-    .AddAdditionalAssemblies(typeof(RealmGuiComponentBase).Assembly)
+    .AddRealmBlazor()
     .AddInteractiveServerRenderMode();
 
 app.Run();

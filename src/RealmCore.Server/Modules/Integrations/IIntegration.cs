@@ -4,6 +4,9 @@ public interface IIntegration
 {
     RealmPlayer Player { get; }
 
+    event Action<IIntegration>? Created;
+    event Action<IIntegration>? Removed;
+
     bool IsIntegrated();
-    void Remove();
+    bool TryRemove();
 }

@@ -1,16 +1,17 @@
 ﻿@page "/realmUi/interactive"
-@using RealmCore.Server.Modules.Elements
-@inherits RealmGuiComponentBase<InteractiveGui>;
 
-Foo=@PlayerGui.Foo
-Hello @(((RealmPlayer)PlayerGui.Player).Name)
+Foo=@Gui.Foo
+Hello @(Gui.Player.Name)
 
 @code{
+    [CascadingParameter]
+    private InteractiveGui Gui { get; set; }
+
     protected override void OnAfterRender(bool firstRender)
     {
         if (firstRender)
         {
-            PlayerGui.FooChanged += () =>
+            Gui.FooChanged += () =>
             {
                 InvokeAsync(StateHasChanged);
             };

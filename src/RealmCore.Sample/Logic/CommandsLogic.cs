@@ -1323,7 +1323,10 @@ internal sealed class CommandsLogic
 
         _commandService.AddCommandHandler("guitest1", (player, args) =>
         {
-            player.Gui.Current = new Counter1Gui(player);
+            if (player.Gui.Current == null)
+                player.Gui.Current = new Counter1Gui(player);
+            else
+                player.Gui.Current = null;
         });
 
         //_commandService.AddAsyncCommandHandler("guitest2", async (player, args) =>
@@ -1333,14 +1336,16 @@ internal sealed class CommandsLogic
         //    _chatBox.OutputTo(player, "Loaded counter 2");
         //});
 
-        //_commandService.AddAsyncCommandHandler("browserloadcounter1", async (player, args) =>
-        //{
-        //    var browserComponent = player.GetRequiredComponent<BrowserComponent>();
-        //    browserComponent.Close();
-        //    browserComponent.Path = "/realmUi/counter1";
-        //    browserComponent.Visible = true;
-        //    _chatBox.OutputTo(player, "Loaded counter 1");
-        //});
+        commandService.AddCommandHandler("browserloadcounter1", (player, args) =>
+        {
+            if (player.Browser.Visible)
+            {
+                player.Browser.Visible = false;
+                return;
+            }
+            player.Browser.Open("/realmUi/counter1");
+            _chatBox.OutputTo(player, "Loaded counter 1");
+        });
         //_commandService.AddAsyncCommandHandler("browserloadcounter2", async (player, args) =>
         //{
         //    var browserComponent = player.GetRequiredComponent<BrowserComponent>();
@@ -1499,10 +1504,10 @@ internal sealed class CommandsLogic
         //    _chatBox.OutputTo(player, $"authorized: {authorized}");
         //});
 
-        //_commandService.AddAsyncCommandHandler("signout", async (player, args) =>
-        //{
-        //    await _usersService.SignOut(player);
-        //});
+        _commandService.AddAsyncCommandHandler("signout", async (player, args, token) =>
+        {
+            await _usersService.SignOut(player, token);
+        });
 
         //_commandService.AddAsyncCommandHandler("updateLastNewsRead", async (player, args) =>
         //{

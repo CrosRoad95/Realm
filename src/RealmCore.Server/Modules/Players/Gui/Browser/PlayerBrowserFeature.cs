@@ -1,16 +1,21 @@
-﻿namespace RealmCore.Server.Modules.Players.Gui.Browser;
+﻿using Microsoft.AspNetCore.WebUtilities;
+
+namespace RealmCore.Server.Modules.Players.Gui.Browser;
 
 public interface IPlayerBrowserFeature : IPlayerFeature
 {
     bool Visible { get; set; }
     bool DevTools { get; set; }
+    string Key { get; init; }
+    bool IsReady { get; }
 
     event Action<string, bool>? PathChanged;
     event Action<bool>? DevToolsStateChanged;
     event Action<bool>? VisibleChanged;
+    event Action? Ready;
 
     void Close();
-    void Open(string path);
+    void Open(string path, IReadOnlyDictionary<string, string?>? queryParameters = null);
     void SetPath(string path, bool clientSide = false);
 }
 
@@ -19,15 +24,21 @@ internal sealed class PlayerBrowserFeature : IPlayerBrowserFeature, IDisposable
     public event Action<string, bool>? PathChanged;
     public event Action<bool>? DevToolsStateChanged;
     public event Action<bool>? VisibleChanged;
+    public event Action? Ready;
 
     private readonly IBrowserGuiService _browserGuiService;
     private readonly IBrowserService _browserService;
+
+    public bool IsReady { get; private set; }
 
     private string _path = "/";
     public string Path
     {
         get => _path; set
         {
+            if (!IsReady)
+                throw new BrowserNotReadyException();
+
             PathChanged?.Invoke(value, false);
             _path = value;
         }
@@ -38,6 +49,9 @@ internal sealed class PlayerBrowserFeature : IPlayerBrowserFeature, IDisposable
     {
         get => _devTools; set
         {
+            if (!IsReady)
+                throw new BrowserNotReadyException();
+
             if (_devTools != value)
             {
                 _devTools = value;
@@ -54,6 +68,9 @@ internal sealed class PlayerBrowserFeature : IPlayerBrowserFeature, IDisposable
         get => _visible;
         set
         {
+            if (!IsReady)
+                throw new BrowserNotReadyException();
+
             if (_visible != value)
             {
                 _visible = value;
@@ -62,13 +79,13 @@ internal sealed class PlayerBrowserFeature : IPlayerBrowserFeature, IDisposable
             }
         }
     }
+    public string Key { get; init; }
 
     public RealmPlayer Player { get; init; }
 
     public PlayerBrowserFeature(IBrowserGuiService browserGuiService, IBrowserService browserService, PlayerContext playerContext)
     {
-        var key = browserGuiService.GenerateKey();
-        browserGuiService.AuthorizePlayer(key, playerContext.Player);
+        Key = browserGuiService.GenerateKey();
         _browserGuiService = browserGuiService;
         _browserService = browserService;
         Player = playerContext.Player;
@@ -80,16 +97,21 @@ internal sealed class PlayerBrowserFeature : IPlayerBrowserFeature, IDisposable
         if (player != Player)
             return;
 
-        var key = _browserGuiService.GenerateKey();
-        if (_browserGuiService.AuthorizePlayer(key, Player))
+        IsReady = true;
+        Ready?.Invoke();
+
+        if (_browserGuiService.AuthorizePlayer(Key, Player))
         {
-            var url = $"/realmGuiInitialize?{_browserGuiService.KeyName}={key}";
+            var url = $"/realmGuiIndex/?{BrowserConstants.QueryParameterName}={Key}";
             SetPath(url, true);
         }
     }
 
     public void SetPath(string path, bool clientSide = false)
     {
+        if (!IsReady)
+            throw new BrowserNotReadyException();
+
         PathChanged?.Invoke(path, clientSide);
         _path = path;
         if (clientSide)
@@ -100,14 +122,23 @@ internal sealed class PlayerBrowserFeature : IPlayerBrowserFeature, IDisposable
     /// Server side only
     /// </summary>
     /// <param name="path"></param>
-    public void Open(string path)
+    public void Open(string path, IReadOnlyDictionary<string, string?>? queryParameters = null)
     {
+        if (!IsReady)
+            throw new BrowserNotReadyException();
+
+        if (queryParameters != null)
+            path = QueryHelpers.AddQueryString(path, queryParameters);
         Path = path;
         Visible = true;
     }
 
     public void Close()
     {
+        if (!IsReady)
+            throw new BrowserNotReadyException();
+
+        SetPath(BrowserConstants.DefaultPage);
         Visible = false;
     }
 

@@ -15,9 +15,10 @@ public interface IPlayerGuiFeature : IPlayerFeature
     TGui SetCurrentWithDI<TGui>(params object[] parameters) where TGui : IPlayerGui;
 }
 
-internal sealed class PlayerGuiFeature : IPlayerGuiFeature
+internal sealed class PlayerGuiFeature : IPlayerGuiFeature, IDisposable
 {
     private readonly object _lock = new();
+    private readonly IPlayerUserFeature _userFeature;
     private IPlayerGui? _current;
 
     public IPlayerGui? Current
@@ -44,9 +45,16 @@ internal sealed class PlayerGuiFeature : IPlayerGuiFeature
     public RealmPlayer Player { get; init; }
 
     public event Action<IPlayerGuiFeature, RealmPlayer, IPlayerGui?, IPlayerGui?>? Changed;
-    public PlayerGuiFeature(PlayerContext playerContext)
+    public PlayerGuiFeature(PlayerContext playerContext, IPlayerUserFeature userFeature)
     {
+        _userFeature = userFeature;
         Player = playerContext.Player;
+        userFeature.SignedOut += HandleSignedOut;
+    }
+
+    private void HandleSignedOut(IPlayerUserFeature userFeature, RealmPlayer player)
+    {
+        Close();
     }
 
     public TGui SetCurrentWithDI<TGui>(params object[] parameters) where TGui : IPlayerGui
@@ -63,8 +71,21 @@ internal sealed class PlayerGuiFeature : IPlayerGuiFeature
     {
         lock (_lock)
         {
-            if (Player.Gui.Current is TGui)
-                Player.Gui.Current = null;
+            if (Current is TGui)
+                Current = null;
         }
+    }
+
+    public void Close()
+    {
+        lock (_lock)
+        {
+            Current = null;
+        }
+    }
+
+    public void Dispose()
+    {
+        _userFeature.SignedOut -= HandleSignedOut;
     }
 }

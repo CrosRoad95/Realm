@@ -2,7 +2,10 @@
 
 public class Counter1Gui : BrowserGui
 {
-    public Counter1Gui(RealmPlayer player) : base(player, "/realmUi/counter1component")
+    public Counter1Gui(RealmPlayer player) : base(player, "/realmUi/counter1B", new Dictionary<string, string?>
+    {
+        ["initialCounter"] = "1337"
+    })
     {
     }
 

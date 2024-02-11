@@ -1,6 +1,4 @@
-﻿using RealmCore.Server.Modules.Server;
-using SlipeServer.Server;
-
+﻿using RealmCore.Server.Modules.Players;
 namespace RealmCore.BlazorHelpers;
 
 public static class ServiceCollectionExtensions
@@ -11,7 +9,6 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<RealmServer>(x => x.GetRequiredService<T>());
         services.AddSingleton(realmServer);
         services.AddScoped(typeof(IRealmService<>), typeof(RealmService<>));
-        services.AddScoped(typeof(IRealmPlayerService<>), typeof(RealmPlayerService<>));
         services.AddHostedService<RealmServerHostedService>();
         return services;
     }

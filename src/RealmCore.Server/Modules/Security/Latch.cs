@@ -28,26 +28,15 @@ public class Latch
         }
     }
 
-    public async Task WaitAsync()
+    public async Task WaitAsync(CancellationToken cancellationToken = default)
     {
         if (_count == 0)
             _taskCompletionSource.TrySetResult(new object());
 
         if (_timeout != null)
         {
-        using (var timeoutCancellationTokenSource = new CancellationTokenSource())
-            {
-                var completedTask = await Task.WhenAny(Task, Task.Delay(_timeout.Value, timeoutCancellationTokenSource.Token));
-                if (completedTask == Task)
-                {
-                    await timeoutCancellationTokenSource.CancelAsync();
-                    await Task;
-                }
-                else
-                {
-                    throw new TimeoutException($"The operation has timed out after {_timeout:mm\\:ss}");
-                }
-            }
+            await Task.WhenAny(Task, Task.Delay(_timeout.Value, cancellationToken));
+            cancellationToken.ThrowIfCancellationRequested();
         }
 
         await Task;

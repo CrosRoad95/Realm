@@ -4,9 +4,6 @@ public static class WebApplicationBuilderExtensions
 {
     public static void AddRealmBlazorGuiSupport(this WebApplicationBuilder builder)
     {
-        builder.Services.AddScoped<CurrentPlayerContext>();
-        builder.Services.AddScoped(typeof(CurrentPlayerContext<>));
-
         builder.Services.AddAuthentication("Cookies").AddCookie(x =>
         {
             x.LoginPath = "/realmGuiInitializeNotAllowed";

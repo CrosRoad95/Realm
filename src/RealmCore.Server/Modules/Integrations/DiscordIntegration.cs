@@ -2,20 +2,25 @@
 
 public interface IDiscordIntegration : IIntegration
 {
-    ulong DiscordUserId { get; internal set; }
+    ulong DiscordUserId { get; }
 
     string GenerateAndGetConnectionCode(TimeSpan? validFor = null);
-    bool Verify(string code, ulong discordUserId);
+    void Integrate(ulong discordUserId);
+    bool TryVerify(string code, ulong discordUserId);
 }
 
 internal sealed class DiscordIntegration : IDiscordIntegration
 {
+    private readonly object _lock = new();
     private string? _discordConnectionCode = null;
     private DateTime? _discordConnectionCodeValidUntil = null;
-    private readonly object _lock = new();
     private readonly IDateTimeProvider _dateTimeProvider;
 
-    public ulong DiscordUserId { get; set; }
+    public ulong DiscordUserId { get; private set; }
+
+    public event Action<IIntegration>? Created;
+    public event Action<IIntegration>? Removed;
+
     public RealmPlayer Player { get; }
     public DiscordIntegration(RealmPlayer player, IDateTimeProvider dateTimeProvider)
     {
@@ -23,27 +28,44 @@ internal sealed class DiscordIntegration : IDiscordIntegration
         _dateTimeProvider = dateTimeProvider;
     }
 
+    public void Integrate(ulong discordUserId)
+    {
+        lock (_lock)
+        {
+            if (IsIntegrated())
+                throw new IntegrationAlreadyCreatedException();
+
+            DiscordUserId = discordUserId;
+            Created?.Invoke(this);
+        }
+    }
+
     private bool HasPendingDiscordConnectionCode()
     {
         lock (_lock)
+        {
+            if (IsIntegrated())
+                return false;
+
             return _discordConnectionCodeValidUntil != null && _discordConnectionCodeValidUntil > _dateTimeProvider.Now;
+        }
     }
 
-    public bool Verify(string code, ulong discordUserId)
+    public bool TryVerify(string code, ulong discordUserId)
     {
         ArgumentOutOfRangeException.ThrowIfZero(discordUserId);
 
-        if (IsIntegrated())
-            throw new InvalidOperationException();
-
         lock (_lock)
         {
+            if (IsIntegrated())
+                throw new IntegrationAlreadyCreatedException();
+
             if (!HasPendingDiscordConnectionCode())
                 return false;
 
             if (_discordConnectionCode == code)
             {
-                DiscordUserId = discordUserId;
+                Integrate(discordUserId);
                 return true;
             }
         }
@@ -53,20 +75,30 @@ internal sealed class DiscordIntegration : IDiscordIntegration
 
     public string GenerateAndGetConnectionCode(TimeSpan? validFor = null)
     {
-        if (IsIntegrated())
-            throw new InvalidOperationException();
-
         lock (_lock)
         {
+            if (IsIntegrated())
+                throw new IntegrationAlreadyCreatedException();
+
             _discordConnectionCode = Guid.NewGuid().ToString();
             _discordConnectionCodeValidUntil = _dateTimeProvider.Now.Add(validFor ?? TimeSpan.FromMinutes(2));
             return _discordConnectionCode;
         }
     }
+
     public bool IsIntegrated() => DiscordUserId != 0;
 
-    public void Remove()
+    public bool TryRemove()
     {
-        DiscordUserId = 0;
+        lock( _lock)
+        {
+            if(DiscordUserId == 0)
+            {
+                DiscordUserId = 0;
+                Removed?.Invoke(this);
+                return true;
+            }
+            return false;
+        }
     }
 }
