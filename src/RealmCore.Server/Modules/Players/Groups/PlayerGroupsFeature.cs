@@ -11,23 +11,23 @@ public interface IPlayerGroupsFeature : IPlayerFeature
 internal sealed class PlayerGroupsFeature : IPlayerGroupsFeature
 {
     private readonly SemaphoreSlim _lock = new(1);
-    private readonly IPlayerUserFeature _playerUserService;
+    private readonly IPlayerUserFeature _playerUserFeature;
     private ICollection<GroupMemberData> _groupMembers = [];
     public RealmPlayer Player { get; init; }
-    public PlayerGroupsFeature(PlayerContext playerContext, IPlayerUserFeature playerUserService)
+    public PlayerGroupsFeature(PlayerContext playerContext, IPlayerUserFeature playerUserFeature)
     {
         Player = playerContext.Player;
-        playerUserService.SignedIn += HandleSignedIn;
-        playerUserService.SignedOut += HandleSignedOut;
-        _playerUserService = playerUserService;
+        playerUserFeature.SignedIn += HandleSignedIn;
+        playerUserFeature.SignedOut += HandleSignedOut;
+        _playerUserFeature = playerUserFeature;
     }
 
-    private void HandleSignedIn(IPlayerUserFeature playerUserService, RealmPlayer _)
+    private void HandleSignedIn(IPlayerUserFeature playerUserFeature, RealmPlayer _)
     {
         _lock.Wait();
         try
         {
-            _groupMembers = playerUserService.User.GroupMembers;
+            _groupMembers = playerUserFeature.User.GroupMembers;
         }
         finally
         {
@@ -50,7 +50,7 @@ internal sealed class PlayerGroupsFeature : IPlayerGroupsFeature
         {
             _lock.Release();
         }
-        _playerUserService.IncreaseVersion();
+        _playerUserFeature.IncreaseVersion();
         return true;
     }
 
@@ -68,7 +68,7 @@ internal sealed class PlayerGroupsFeature : IPlayerGroupsFeature
         {
             _lock.Release();
         }
-        _playerUserService.IncreaseVersion();
+        _playerUserFeature.IncreaseVersion();
         return true;
     }
 
@@ -99,7 +99,7 @@ internal sealed class PlayerGroupsFeature : IPlayerGroupsFeature
         }
     }
 
-    private void HandleSignedOut(IPlayerUserFeature playerUserService, RealmPlayer _)
+    private void HandleSignedOut(IPlayerUserFeature playerUserFeature, RealmPlayer _)
     {
 
     }

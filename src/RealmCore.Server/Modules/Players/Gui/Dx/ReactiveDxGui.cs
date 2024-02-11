@@ -11,9 +11,9 @@ public abstract class ReactiveDxGui : DxGui
 
     }
 
-    protected void RelayGuiOpened(ReactiveDxGui statefulGuiComponentBase, string name, bool cursorLess, object? state)
+    protected void RelayGuiOpened(ReactiveDxGui reactiveDxGui, string name, bool cursorLess, object? state)
     {
-        GuiOpened?.Invoke(statefulGuiComponentBase, name, cursorLess, state);
+        GuiOpened?.Invoke(reactiveDxGui, name, cursorLess, state);
     }
 }
 

@@ -37,6 +37,7 @@ public class RealmPlayer : Player, IDisposable, IPersistentElement
     public event Action<RealmPlayer, AttachedBoneWorldObject>? WorldObjectAttached;
     public event Action<RealmPlayer, AttachedBoneWorldObject>? WorldObjectDetached;
     public new event Action<RealmPlayer, string?>? NametagTextChanged;
+    public event Action<RealmPlayer, bool>? FightEnabled;
 
     public List<AttachedBoneWorldObject> AttachedBoneElements => _attachedBoneElements;
     public int AttachedBoneElementsCount => _attachedBoneElements.Count;
@@ -146,7 +147,7 @@ public class RealmPlayer : Player, IDisposable, IPersistentElement
     public IPlayerFractionsFeature Fractions { get; private set; }
     public IPlayerGuiFeature Gui { get; private set; }
     public IPlayerHudFeature Hud { get; private set; }
-    public IPlayerInventoryService Inventory { get; private set; }
+    public IPlayerInventoryFeature Inventory { get; private set; }
     public IScopedElementFactory ElementFactory { get; private set; }
     public RealmPlayer(IServiceProvider serviceProvider)
     {
@@ -178,7 +179,7 @@ public class RealmPlayer : Player, IDisposable, IPersistentElement
         Fractions = GetRequiredService<IPlayerFractionsFeature>();
         Gui = GetRequiredService<IPlayerGuiFeature>();
         Hud = GetRequiredService<IPlayerHudFeature>();
-        Inventory = GetRequiredService<IPlayerInventoryService>();
+        Inventory = GetRequiredService<IPlayerInventoryFeature>();
         ElementFactory = GetRequiredService<IScopedElementFactory>();
         #endregion
 
@@ -190,13 +191,12 @@ public class RealmPlayer : Player, IDisposable, IPersistentElement
     public T GetRequiredService<T>() where T : notnull => _serviceProvider.GetRequiredService<T>();
 
     public object GetRequiredService(Type type) => _serviceProvider.GetRequiredService(type);
-
     private void UpdateFight()
     {
         var canFight = !_enableFightFlags.IsEmpty;
         Controls.FireEnabled = canFight;
         Controls.AimWeaponEnabled = canFight;
-        GetRequiredService<ILogger>().LogInformation("Can fight {canFight}", canFight);
+        FightEnabled?.Invoke(this, canFight);
     }
 
     public bool AddEnableFightFlag(int flag)

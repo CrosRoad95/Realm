@@ -1,11 +1,11 @@
 ﻿namespace RealmCore.Server.Modules.Vehicles.Access;
 
-internal sealed class VehicleAccessControllerComponentLogic
+internal sealed class VehicleAccessControllerLogic
 {
     private readonly IVehiclesAccessService _vehicleAccessService;
-    private readonly ILogger<VehicleAccessControllerComponentLogic> _logger;
+    private readonly ILogger<VehicleAccessControllerLogic> _logger;
 
-    public VehicleAccessControllerComponentLogic(IElementFactory elementFactory, IVehiclesAccessService vehicleAccessService, ILogger<VehicleAccessControllerComponentLogic> logger)
+    public VehicleAccessControllerLogic(IElementFactory elementFactory, IVehiclesAccessService vehicleAccessService, ILogger<VehicleAccessControllerLogic> logger)
     {
         _vehicleAccessService = vehicleAccessService;
         _logger = logger;

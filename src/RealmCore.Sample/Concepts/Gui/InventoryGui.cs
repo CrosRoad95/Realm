@@ -41,22 +41,22 @@ public sealed class InventoryGui : ReactiveDxGui<InventoryGui.InventoryState>, I
         base.Dispose();
     }
 
-    private void HandleItemAdded(Inventory inventoryComponent, Item item)
+    private void HandleItemAdded(Inventory inventory, Item item)
     {
         ChangeState(x => x.Items, MapItems().ToList());
-        ChangeState(x => x.Number, (double)inventoryComponent.Number);
+        ChangeState(x => x.Number, (double)inventory.Number);
     }
 
-    private void HandleItemRemoved(Inventory inventoryComponent, Item item)
+    private void HandleItemRemoved(Inventory inventory, Item item)
     {
         ChangeState(x => x.Items, MapItems().ToList());
-        ChangeState(x => x.Number, (double)inventoryComponent.Number);
+        ChangeState(x => x.Number, (double)inventory.Number);
     }
 
-    private void HandleItemChanged(Inventory inventoryComponent, Item item)
+    private void HandleItemChanged(Inventory inventory, Item item)
     {
         ChangeState(x => x.Items, MapItems().ToList());
-        ChangeState(x => x.Number, (double)inventoryComponent.Number);
+        ChangeState(x => x.Number, (double)inventory.Number);
     }
 
     private IEnumerable<InventoryState.InventoryItem> MapItems()

@@ -16,27 +16,27 @@ internal sealed class PlayerSettingsFeature : IPlayerSettingsFeature, IDisposabl
 {
     private object _lock = new();
     private ICollection<UserSettingData> _settings = [];
-    private readonly IPlayerUserFeature _playerUserService;
+    private readonly IPlayerUserFeature _playerUserFeature;
 
     public event Action<IPlayerSettingsFeature, int, string>? Changed;
     public event Action<IPlayerSettingsFeature, int, string>? Removed;
 
     public RealmPlayer Player { get; init; }
-    public PlayerSettingsFeature(PlayerContext playerContext, IPlayerUserFeature playerUserService)
+    public PlayerSettingsFeature(PlayerContext playerContext, IPlayerUserFeature playerUserFeature)
     {
         Player = playerContext.Player;
-        playerUserService.SignedIn += HandleSignedIn;
-        playerUserService.SignedOut += HandleSignedOut;
-        _playerUserService = playerUserService;
+        playerUserFeature.SignedIn += HandleSignedIn;
+        playerUserFeature.SignedOut += HandleSignedOut;
+        _playerUserFeature = playerUserFeature;
     }
 
-    private void HandleSignedIn(IPlayerUserFeature playerUserService, RealmPlayer _)
+    private void HandleSignedIn(IPlayerUserFeature playerUserFeature, RealmPlayer _)
     {
         lock (_lock)
-            _settings = playerUserService.User.Settings;
+            _settings = playerUserFeature.User.Settings;
     }
 
-    private void HandleSignedOut(IPlayerUserFeature playerUserService, RealmPlayer _)
+    private void HandleSignedOut(IPlayerUserFeature playerUserFeature, RealmPlayer _)
     {
         lock (_lock)
             _settings = [];
@@ -62,7 +62,7 @@ internal sealed class PlayerSettingsFeature : IPlayerSettingsFeature, IDisposabl
                     Value = value
                 });
         }
-        _playerUserService.IncreaseVersion();
+        _playerUserFeature.IncreaseVersion();
         Changed?.Invoke(this, settingId, value);
     }
 
@@ -90,7 +90,7 @@ internal sealed class PlayerSettingsFeature : IPlayerSettingsFeature, IDisposabl
         if (setting != null)
         {
             _settings.Remove(setting);
-            _playerUserService.IncreaseVersion();
+            _playerUserFeature.IncreaseVersion();
             return true;
         }
         return false;

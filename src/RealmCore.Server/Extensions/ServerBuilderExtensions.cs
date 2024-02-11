@@ -97,7 +97,7 @@ public static class ServerBuilderExtensions
         serverBuilder.AddLogic<PlayerAdministrationServiceLogic>();
         serverBuilder.AddLogic<FocusableElementsLogic>();
         serverBuilder.AddLogic<PlayerHudLogic>();
-        serverBuilder.AddLogic<VehicleUpgradesComponentLogic>();
+        serverBuilder.AddLogic<VehicleUpgradesLogic>();
         serverBuilder.AddLogic<PickupLogic>();
         serverBuilder.AddLogic<CollisionShapeLogic>();
         serverBuilder.AddLogic<PeristantVehicleLogic>();
@@ -106,7 +106,7 @@ public static class ServerBuilderExtensions
         serverBuilder.AddLogic<GuiLogic>();
         serverBuilder.AddLogic<ServerLogic>();
         serverBuilder.AddLogic<VehicleEnginesCollectionLogic>();
-        serverBuilder.AddLogic<VehicleAccessControllerComponentLogic>();
+        serverBuilder.AddLogic<VehicleAccessControllerLogic>();
         serverBuilder.AddLogic<MapsLogic>();
         #endregion
 

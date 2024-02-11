@@ -5,7 +5,7 @@ internal class Hud<TState> : IHud<TState> where TState : class
     private readonly Player _player;
     private readonly IOverlayService _overlayService;
     private readonly TState? _state;
-    private readonly List<DynamicHudElement>? _dynamicHudComponents;
+    private readonly List<DynamicHudElement>? _dynamicHudElements;
     private bool _disposed = false;
     private Vector2 _position;
 
@@ -23,13 +23,13 @@ internal class Hud<TState> : IHud<TState> where TState : class
         }
     }
 
-    public Hud(string name, Player player, IOverlayService overlayService, Vector2? position = null, TState? state = default, List<DynamicHudElement>? dynamicHudComponents = null)
+    public Hud(string name, Player player, IOverlayService overlayService, Vector2? position = null, TState? state = default, List<DynamicHudElement>? dynamicHudElements = null)
     {
         Name = name;
         _player = player;
         _overlayService = overlayService;
         _state = state;
-        _dynamicHudComponents = dynamicHudComponents;
+        _dynamicHudElements = dynamicHudElements;
         if (position != null)
             _position = Offset;
     }
@@ -43,12 +43,12 @@ internal class Hud<TState> : IHud<TState> where TState : class
     public void UpdateState(Action<TState> callback)
     {
         ThrowIfDisposed();
-        if (_state == null || _dynamicHudComponents == null || _dynamicHudComponents.Count == 0)
+        if (_state == null || _dynamicHudElements == null || _dynamicHudElements.Count == 0)
             throw new Exception("Hud has no state");
 
         callback(_state);
         Dictionary<int, object?> stateChange = [];
-        foreach (var item in _dynamicHudComponents)
+        foreach (var item in _dynamicHudElements)
         {
             var value = item.PropertyInfo.GetValue(_state);
             stateChange.Add(item.Id, value);

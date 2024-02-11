@@ -1,10 +1,10 @@
 ﻿namespace RealmCore.Server.Modules.Vehicles;
 
-internal sealed class VehicleUpgradesComponentLogic
+internal sealed class VehicleUpgradesLogic
 {
     private readonly VehicleUpgradeCollection _vehicleUpgradesCollection;
 
-    public VehicleUpgradesComponentLogic(IElementFactory elementFactory, VehicleUpgradeCollection vehicleUpgradesCollection)
+    public VehicleUpgradesLogic(IElementFactory elementFactory, VehicleUpgradeCollection vehicleUpgradesCollection)
     {
         _vehicleUpgradesCollection = vehicleUpgradesCollection;
         elementFactory.ElementCreated += HandleElementCreated;

@@ -124,11 +124,11 @@ internal sealed class PlayerAdminFeature : IPlayerAdminFeature
     }
 
     public RealmPlayer Player { get; init; }
-    public PlayerAdminFeature(PlayerContext playerContext, IPlayerUserFeature playerUserService)
+    public PlayerAdminFeature(PlayerContext playerContext, IPlayerUserFeature playerUserFeature)
     {
         Player = playerContext.Player;
-        playerUserService.SignedIn += HandleSignedIn;
-        playerUserService.SignedOut += HandleSignedOut;
+        playerUserFeature.SignedIn += HandleSignedIn;
+        playerUserFeature.SignedOut += HandleSignedOut;
     }
 
     public void SetTools(IEnumerable<AdminTool> adminTools)
@@ -147,12 +147,12 @@ internal sealed class PlayerAdminFeature : IPlayerAdminFeature
         }
     }
 
-    private void HandleSignedIn(IPlayerUserFeature playerUserService, RealmPlayer _)
+    private void HandleSignedIn(IPlayerUserFeature playerUserFeature, RealmPlayer _)
     {
 
     }
 
-    private void HandleSignedOut(IPlayerUserFeature playerUserService, RealmPlayer _)
+    private void HandleSignedOut(IPlayerUserFeature playerUserFeature, RealmPlayer _)
     {
 
     }

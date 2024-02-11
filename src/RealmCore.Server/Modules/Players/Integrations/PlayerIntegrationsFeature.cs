@@ -19,21 +19,21 @@ internal sealed class PlayerIntegrationsFeature : IPlayerIntegrationsFeature
 
     public IIntegration[] Integrations => [Discord];
 
-    public PlayerIntegrationsFeature(PlayerContext playerContext, IDateTimeProvider dateTimeProvider, IPlayerUserFeature playerUserService)
+    public PlayerIntegrationsFeature(PlayerContext playerContext, IDateTimeProvider dateTimeProvider, IPlayerUserFeature playerUserFeature)
     {
         Player = playerContext.Player;
         Discord = new DiscordIntegration(Player, dateTimeProvider);
-        playerUserService.SignedIn += HandleSignedIn;
-        playerUserService.SignedOut += HandleSignedOut;
+        playerUserFeature.SignedIn += HandleSignedIn;
+        playerUserFeature.SignedOut += HandleSignedOut;
     }
 
-    private void HandleSignedIn(IPlayerUserFeature playerUserService, RealmPlayer _)
+    private void HandleSignedIn(IPlayerUserFeature playerUserFeature, RealmPlayer _)
     {
-        if (playerUserService.User.DiscordIntegration != null)
-            Discord.Integrate(playerUserService.User.DiscordIntegration.DiscordUserId);
+        if (playerUserFeature.User.DiscordIntegration != null)
+            Discord.Integrate(playerUserFeature.User.DiscordIntegration.DiscordUserId);
     }
 
-    private void HandleSignedOut(IPlayerUserFeature playerUserService, RealmPlayer _)
+    private void HandleSignedOut(IPlayerUserFeature playerUserFeature, RealmPlayer _)
     {
         Discord.TryRemove();
     }

@@ -3,7 +3,7 @@
 public class FocusableElementsTests
 {
     [Fact]
-    public void FocusableComponentShouldWork()
+    public void FocusableShouldWork()
     {
         var realmTestingServer = new RealmTestingServer();
         var player = realmTestingServer.CreatePlayer();
@@ -54,7 +54,7 @@ public class FocusableElementsTests
     }
 
     [Fact]
-    public void RemovedFocusedComponentShouldWork()
+    public void RemovedFocusedElementShouldWork()
     {
         var realmTestingServer = new RealmTestingServer();
         var player = realmTestingServer.CreatePlayer();

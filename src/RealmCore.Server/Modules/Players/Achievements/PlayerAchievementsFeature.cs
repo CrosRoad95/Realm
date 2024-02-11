@@ -20,27 +20,27 @@ internal sealed class PlayerAchievementsFeature : IPlayerAchievementsFeature
 {
     private readonly object _lock = new();
     private ICollection<AchievementData> _achievements = [];
-    private readonly IPlayerUserFeature _playerUserService;
+    private readonly IPlayerUserFeature _playerUserFeature;
 
     public event Action<IPlayerAchievementsFeature, int>? Unlocked;
     public event Action<IPlayerAchievementsFeature, int, float>? Progressed;
 
     public RealmPlayer Player { get; init; }
-    public PlayerAchievementsFeature(PlayerContext playerContext, IPlayerUserFeature playerUserService)
+    public PlayerAchievementsFeature(PlayerContext playerContext, IPlayerUserFeature playerUserFeature)
     {
         Player = playerContext.Player;
-        playerUserService.SignedIn += HandleSignedIn;
-        playerUserService.SignedOut += HandleSignedOut;
-        _playerUserService = playerUserService;
+        playerUserFeature.SignedIn += HandleSignedIn;
+        playerUserFeature.SignedOut += HandleSignedOut;
+        _playerUserFeature = playerUserFeature;
     }
 
-    private void HandleSignedIn(IPlayerUserFeature playerUserService, RealmPlayer _)
+    private void HandleSignedIn(IPlayerUserFeature playerUserFeature, RealmPlayer _)
     {
         lock (_lock)
-            _achievements = playerUserService.User.Achievements;
+            _achievements = playerUserFeature.User.Achievements;
     }
 
-    private void HandleSignedOut(IPlayerUserFeature playerUserService, RealmPlayer _)
+    private void HandleSignedOut(IPlayerUserFeature playerUserFeature, RealmPlayer _)
     {
         lock (_lock)
             _achievements = [];
@@ -115,7 +115,7 @@ internal sealed class PlayerAchievementsFeature : IPlayerAchievementsFeature
                 return false;
 
             achievement.PrizeReceivedDateTime = now;
-            _playerUserService.IncreaseVersion();
+            _playerUserFeature.IncreaseVersion();
             return true;
         }
     }

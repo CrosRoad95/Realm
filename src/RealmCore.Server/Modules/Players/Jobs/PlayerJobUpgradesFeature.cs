@@ -15,27 +15,27 @@ internal sealed class PlayerJobUpgradesFeature : IPlayerJobUpgradesFeature
 {
     private readonly object _lock = new();
     private ICollection<JobUpgradeData> _jobUpgrades = [];
-    private readonly IPlayerUserFeature _playerUserService;
+    private readonly IPlayerUserFeature _playerUserFeature;
 
     public event Action<IPlayerJobUpgradesFeature, JobUpgradeDto>? Added;
     public event Action<IPlayerJobUpgradesFeature, JobUpgradeDto>? Removed;
 
     public RealmPlayer Player { get; init; }
-    public PlayerJobUpgradesFeature(PlayerContext playerContext, IPlayerUserFeature playerUserService)
+    public PlayerJobUpgradesFeature(PlayerContext playerContext, IPlayerUserFeature playerUserFeature)
     {
         Player = playerContext.Player;
-        playerUserService.SignedIn += HandleSignedIn;
-        playerUserService.SignedOut += HandleSignedOut;
-        _playerUserService = playerUserService;
+        playerUserFeature.SignedIn += HandleSignedIn;
+        playerUserFeature.SignedOut += HandleSignedOut;
+        _playerUserFeature = playerUserFeature;
     }
 
-    private void HandleSignedIn(IPlayerUserFeature playerUserService, RealmPlayer _)
+    private void HandleSignedIn(IPlayerUserFeature playerUserFeature, RealmPlayer _)
     {
         lock (_lock)
-            _jobUpgrades = playerUserService.User.JobUpgrades;
+            _jobUpgrades = playerUserFeature.User.JobUpgrades;
     }
 
-    private void HandleSignedOut(IPlayerUserFeature playerUserService, RealmPlayer _)
+    private void HandleSignedOut(IPlayerUserFeature playerUserFeature, RealmPlayer _)
     {
         lock (_lock)
             _jobUpgrades = [];
@@ -70,7 +70,7 @@ internal sealed class PlayerJobUpgradesFeature : IPlayerJobUpgradesFeature
             };
 
             _jobUpgrades.Add(jobUpgradeData);
-            _playerUserService.IncreaseVersion();
+            _playerUserFeature.IncreaseVersion();
             Added?.Invoke(this, JobUpgradeDto.Map(jobUpgradeData));
             return true;
         }
@@ -84,7 +84,7 @@ internal sealed class PlayerJobUpgradesFeature : IPlayerJobUpgradesFeature
             if (upgrade == null)
                 return false;
             _jobUpgrades.Remove(upgrade);
-            _playerUserService.IncreaseVersion();
+            _playerUserFeature.IncreaseVersion();
             Removed?.Invoke(this, JobUpgradeDto.Map(upgrade));
             return true;
         }

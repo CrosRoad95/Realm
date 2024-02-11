@@ -16,7 +16,7 @@ internal sealed class PlayerLevelFeature : IPlayerLevelFeature
 {
     private readonly object _lock = new();
     private readonly LevelsCollection _levelsCollection;
-    private readonly IPlayerUserFeature _playerUserService;
+    private readonly IPlayerUserFeature _playerUserFeature;
     private uint _level;
     private uint _experience;
 
@@ -24,25 +24,25 @@ internal sealed class PlayerLevelFeature : IPlayerLevelFeature
     public event Action<IPlayerLevelFeature, uint>? ExperienceChanged;
 
     public RealmPlayer Player { get; init; }
-    public PlayerLevelFeature(PlayerContext playerContext, LevelsCollection levelsCollection, IPlayerUserFeature playerUserService)
+    public PlayerLevelFeature(PlayerContext playerContext, LevelsCollection levelsCollection, IPlayerUserFeature playerUserFeature)
     {
         Player = playerContext.Player;
-        playerUserService.SignedIn += HandleSignedIn;
-        playerUserService.SignedOut += HandleSignedOut;
+        playerUserFeature.SignedIn += HandleSignedIn;
+        playerUserFeature.SignedOut += HandleSignedOut;
         _levelsCollection = levelsCollection;
-        _playerUserService = playerUserService;
+        _playerUserFeature = playerUserFeature;
     }
 
-    private void HandleSignedIn(IPlayerUserFeature playerUserService, RealmPlayer _)
+    private void HandleSignedIn(IPlayerUserFeature playerUserFeature, RealmPlayer _)
     {
         lock (_lock)
         {
-            _level = playerUserService.User.Level;
-            _experience = playerUserService.User.Experience;
+            _level = playerUserFeature.User.Level;
+            _experience = playerUserFeature.User.Experience;
         }
     }
 
-    private void HandleSignedOut(IPlayerUserFeature playerUserService, RealmPlayer _)
+    private void HandleSignedOut(IPlayerUserFeature playerUserFeature, RealmPlayer _)
     {
         lock (_lock)
         {
@@ -118,7 +118,7 @@ internal sealed class PlayerLevelFeature : IPlayerLevelFeature
         {
             _experience -= NextLevelRequiredExperience;
             _level++;
-            _playerUserService.IncreaseVersion();
+            _playerUserFeature.IncreaseVersion();
             LevelChanged?.Invoke(this, _level, true);
             CheckForNextLevel();
         }

@@ -26,7 +26,7 @@ internal sealed class PlayerMoneyFeature : IPlayerMoneyFeature
     private decimal _moneyLimit;
     private byte _moneyPrecision;
     private readonly IOptionsMonitor<GameplayOptions>? _gameplayOptions;
-    private readonly IPlayerUserFeature _playerUserService;
+    private readonly IPlayerUserFeature _playerUserFeature;
 
     public RealmPlayer Player { get; init; }
 
@@ -50,8 +50,8 @@ internal sealed class PlayerMoneyFeature : IPlayerMoneyFeature
                     return;
                 _money = value;
 
-                if (_playerUserService.IsSignedIn)
-                    _playerUserService.User.Money = _money;
+                if (_playerUserFeature.IsSignedIn)
+                    _playerUserFeature.User.Money = _money;
                 TryUpdateVersion();
 
                 Set?.Invoke(this, _money);
@@ -67,17 +67,17 @@ internal sealed class PlayerMoneyFeature : IPlayerMoneyFeature
         }
     }
 
-    public PlayerMoneyFeature(PlayerContext playerContext, IOptionsMonitor<GameplayOptions> gameplayOptions, IPlayerUserFeature playerUserService)
+    public PlayerMoneyFeature(PlayerContext playerContext, IOptionsMonitor<GameplayOptions> gameplayOptions, IPlayerUserFeature playerUserFeature)
     {
         Player = playerContext.Player;
         _gameplayOptions = gameplayOptions;
-        _playerUserService = playerUserService;
+        _playerUserFeature = playerUserFeature;
         _moneyLimit = _gameplayOptions.CurrentValue.MoneyLimit;
         _moneyPrecision = _gameplayOptions.CurrentValue.MoneyPrecision;
         _gameplayOptions.OnChange(HandleGameplayOptionsChanged);
 
-        _playerUserService.SignedIn += HandleSignedIn;
-        _playerUserService.SignedOut += HandleSignedOut;
+        _playerUserFeature.SignedIn += HandleSignedIn;
+        _playerUserFeature.SignedOut += HandleSignedOut;
     }
 
     private void HandleSignedIn(IPlayerUserFeature userService, RealmPlayer player)
@@ -95,7 +95,7 @@ internal sealed class PlayerMoneyFeature : IPlayerMoneyFeature
         if (Math.Abs(_money - _previousMoney) > 200)
         {
             _previousMoney = _money;
-            _playerUserService.IncreaseVersion();
+            _playerUserFeature.IncreaseVersion();
         }
     }
 

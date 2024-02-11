@@ -18,29 +18,29 @@ internal sealed class PlayerLicensesFeature : IPlayerLicensesFeature
 {
     private readonly object _lock = new();
     private readonly IDateTimeProvider _dateTimeProvider;
-    private readonly IPlayerUserFeature _playerUserService;
+    private readonly IPlayerUserFeature _playerUserFeature;
     private ICollection<UserLicenseData> _licenses = [];
 
     public event Action<IPlayerLicensesFeature, PlayerLicenseDto>? Added;
     public event Action<IPlayerLicensesFeature, PlayerLicenseDto>? Suspended;
     public event Action<IPlayerLicensesFeature, PlayerLicenseDto>? UnSuspended;
     public RealmPlayer Player { get; init; }
-    public PlayerLicensesFeature(PlayerContext playerContext, IDateTimeProvider dateTimeProvider, IPlayerUserFeature playerUserService)
+    public PlayerLicensesFeature(PlayerContext playerContext, IDateTimeProvider dateTimeProvider, IPlayerUserFeature playerUserFeature)
     {
         Player = playerContext.Player;
         _dateTimeProvider = dateTimeProvider;
-        _playerUserService = playerUserService;
-        playerUserService.SignedIn += HandleSignedIn;
-        playerUserService.SignedOut += HandleSignedOut;
+        _playerUserFeature = playerUserFeature;
+        playerUserFeature.SignedIn += HandleSignedIn;
+        playerUserFeature.SignedOut += HandleSignedOut;
     }
 
-    private void HandleSignedIn(IPlayerUserFeature playerUserService, RealmPlayer _)
+    private void HandleSignedIn(IPlayerUserFeature playerUserFeature, RealmPlayer _)
     {
         lock (_lock)
-            _licenses = playerUserService.User.Licenses;
+            _licenses = playerUserFeature.User.Licenses;
     }
 
-    private void HandleSignedOut(IPlayerUserFeature playerUserService, RealmPlayer _)
+    private void HandleSignedOut(IPlayerUserFeature playerUserFeature, RealmPlayer _)
     {
         lock (_lock)
             _licenses = [];
@@ -77,7 +77,7 @@ internal sealed class PlayerLicensesFeature : IPlayerLicensesFeature
                 return false;
 
             _licenses.Add(userLicenseData);
-            _playerUserService.IncreaseVersion();
+            _playerUserFeature.IncreaseVersion();
             Added?.Invoke(this, PlayerLicenseDto.Map(userLicenseData));
             return true;
         }
@@ -104,7 +104,7 @@ internal sealed class PlayerLicensesFeature : IPlayerLicensesFeature
 
             userLicenseData.SuspendedUntil = now + timeSpan;
             userLicenseData.SuspendedReason = reason;
-            _playerUserService.IncreaseVersion();
+            _playerUserFeature.IncreaseVersion();
             Suspended?.Invoke(this, PlayerLicenseDto.Map(userLicenseData));
         }
     }
@@ -118,7 +118,7 @@ internal sealed class PlayerLicensesFeature : IPlayerLicensesFeature
                 throw new PlayerLicenseNotSuspendedException(licenseId);
 
             userLicenseData.SuspendedUntil = null;
-            _playerUserService.IncreaseVersion();
+            _playerUserFeature.IncreaseVersion();
             UnSuspended?.Invoke(this, PlayerLicenseDto.Map(userLicenseData));
         }
     }

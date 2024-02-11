@@ -14,7 +14,7 @@ internal class DurationBasedHoldWithRingEffectInteraction : DurationBasedHoldInt
         _overlayService = overlayService;
     }
 
-    private void HandleInteractionStarted(DurationBasedHoldInteraction durationBasedHoldInteractionComponent, RealmPlayer player, TimeSpan time)
+    private void HandleInteractionStarted(DurationBasedHoldInteraction durationBasedHoldInteraction, RealmPlayer player, TimeSpan time)
     {
         lock (_lock)
         {

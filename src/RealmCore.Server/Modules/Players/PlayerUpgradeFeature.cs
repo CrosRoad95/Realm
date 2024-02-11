@@ -18,24 +18,24 @@ internal sealed class PlayerUpgradeFeature : IPlayerUpgradeFeature
 
     private ICollection<UserUpgradeData> _upgrades = [];
     private readonly object _lock = new();
-    private readonly IPlayerUserFeature _playerUserService;
+    private readonly IPlayerUserFeature _playerUserFeature;
 
     public RealmPlayer Player { get; init; }
-    public PlayerUpgradeFeature(PlayerContext playerContext, IPlayerUserFeature playerUserService)
+    public PlayerUpgradeFeature(PlayerContext playerContext, IPlayerUserFeature playerUserFeature)
     {
         Player = playerContext.Player;
-        playerUserService.SignedIn += HandleSignedIn;
-        playerUserService.SignedOut += HandleSignedOut;
-        _playerUserService = playerUserService;
+        playerUserFeature.SignedIn += HandleSignedIn;
+        playerUserFeature.SignedOut += HandleSignedOut;
+        _playerUserFeature = playerUserFeature;
     }
 
-    private void HandleSignedIn(IPlayerUserFeature playerUserService, RealmPlayer _)
+    private void HandleSignedIn(IPlayerUserFeature playerUserFeature, RealmPlayer _)
     {
         lock (_lock)
-            _upgrades = playerUserService.User.Upgrades;
+            _upgrades = playerUserFeature.User.Upgrades;
     }
 
-    private void HandleSignedOut(IPlayerUserFeature playerUserService, RealmPlayer _)
+    private void HandleSignedOut(IPlayerUserFeature playerUserFeature, RealmPlayer _)
     {
         lock (_lock)
             _upgrades = [];
@@ -60,7 +60,7 @@ internal sealed class PlayerUpgradeFeature : IPlayerUpgradeFeature
             {
                 UpgradeId = upgradeId,
             });
-            _playerUserService.IncreaseVersion();
+            _playerUserFeature.IncreaseVersion();
             Added?.Invoke(this, upgradeId);
             return true;
         }
@@ -74,7 +74,7 @@ internal sealed class PlayerUpgradeFeature : IPlayerUpgradeFeature
             if (upgrade == null)
                 return false;
             _upgrades.Remove(upgrade);
-            _playerUserService.IncreaseVersion();
+            _playerUserFeature.IncreaseVersion();
             Removed?.Invoke(this, upgradeId);
             return true;
         }

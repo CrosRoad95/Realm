@@ -16,7 +16,7 @@ public interface IPlayerStatisticsFeature : IPlayerFeature, IEnumerable<UserStat
 internal sealed class PlayerStatisticsFeature : IPlayerStatisticsFeature
 {
     private readonly object _lock = new();
-    private readonly IPlayerUserFeature _playerUserService;
+    private readonly IPlayerUserFeature _playerUserFeature;
     private ICollection<UserStatData> _stats = [];
 
     public event Action<IPlayerStatisticsFeature, int, float>? Decreased;
@@ -31,22 +31,22 @@ internal sealed class PlayerStatisticsFeature : IPlayerStatisticsFeature
     }
 
     public RealmPlayer Player { get; init; }
-    public PlayerStatisticsFeature(PlayerContext playerContext, IPlayerUserFeature playerUserService)
+    public PlayerStatisticsFeature(PlayerContext playerContext, IPlayerUserFeature playerUserFeature)
     {
         Player = playerContext.Player;
-        playerUserService.SignedIn += HandleSignedIn;
-        playerUserService.SignedOut += HandleSignedOut;
-        _playerUserService = playerUserService;
+        playerUserFeature.SignedIn += HandleSignedIn;
+        playerUserFeature.SignedOut += HandleSignedOut;
+        _playerUserFeature = playerUserFeature;
         Player.GetRequiredService<IStatisticsCounterService>().SetCounterEnabledFor(Player, true);
     }
 
-    private void HandleSignedIn(IPlayerUserFeature playerUserService, RealmPlayer _)
+    private void HandleSignedIn(IPlayerUserFeature playerUserFeature, RealmPlayer _)
     {
         lock (_lock)
-            _stats = playerUserService.User.Stats;
+            _stats = playerUserFeature.User.Stats;
     }
 
-    private void HandleSignedOut(IPlayerUserFeature playerUserService, RealmPlayer _)
+    private void HandleSignedOut(IPlayerUserFeature playerUserFeature, RealmPlayer _)
     {
         lock (_lock)
             _stats = [];
@@ -63,7 +63,7 @@ internal sealed class PlayerStatisticsFeature : IPlayerStatisticsFeature
                 Value = 0
             };
             _stats.Add(stat);
-            _playerUserService.IncreaseVersion();
+            _playerUserFeature.IncreaseVersion();
             return stat;
         }
         return stat;
@@ -77,7 +77,7 @@ internal sealed class PlayerStatisticsFeature : IPlayerStatisticsFeature
         {
             var stat = GetStatById(statId);
             stat.Value += value;
-            _playerUserService.IncreaseVersion();
+            _playerUserFeature.IncreaseVersion();
             Increased?.Invoke(this, statId, stat.Value);
         }
     }
@@ -90,7 +90,7 @@ internal sealed class PlayerStatisticsFeature : IPlayerStatisticsFeature
         {
             var stat = GetStatById(statId);
             stat.Value -= value;
-            _playerUserService.IncreaseVersion();
+            _playerUserFeature.IncreaseVersion();
             Increased?.Invoke(this, statId, stat.Value);
         }
     }
@@ -106,7 +106,7 @@ internal sealed class PlayerStatisticsFeature : IPlayerStatisticsFeature
                 Increased?.Invoke(this, statId, stat.Value);
             else if (stat.Value < old)
                 Decreased?.Invoke(this, statId, stat.Value);
-            _playerUserService.IncreaseVersion();
+            _playerUserFeature.IncreaseVersion();
         }
     }
 

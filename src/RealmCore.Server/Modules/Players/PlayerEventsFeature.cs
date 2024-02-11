@@ -12,28 +12,28 @@ public interface IPlayerEventsFeature : IPlayerFeature, IEnumerable<UserEventDto
 internal class PlayerEventsFeature : IPlayerEventsFeature
 {
     private readonly SemaphoreSlim _lock = new(1);
-    private readonly IPlayerUserFeature _playerUserService;
+    private readonly IPlayerUserFeature _playerUserFeature;
     private readonly IDateTimeProvider _dateTimeProvider;
     private readonly IDb _db;
     private ICollection<UserEventData> _userEventData = [];
     public event Action<IPlayerEventsFeature, IEnumerable<UserEventDto>>? Added;
     public RealmPlayer Player { get; init; }
-    public PlayerEventsFeature(PlayerContext playerContext, IPlayerUserFeature playerUserService, IDateTimeProvider dateTimeProvider, IDb db)
+    public PlayerEventsFeature(PlayerContext playerContext, IPlayerUserFeature playerUserFeature, IDateTimeProvider dateTimeProvider, IDb db)
     {
         Player = playerContext.Player;
-        playerUserService.SignedIn += HandleSignedIn;
-        playerUserService.SignedOut += HandleSignedOut;
-        _playerUserService = playerUserService;
+        playerUserFeature.SignedIn += HandleSignedIn;
+        playerUserFeature.SignedOut += HandleSignedOut;
+        _playerUserFeature = playerUserFeature;
         _dateTimeProvider = dateTimeProvider;
         _db = db;
     }
 
-    private void HandleSignedIn(IPlayerUserFeature playerUserService, RealmPlayer _)
+    private void HandleSignedIn(IPlayerUserFeature playerUserFeature, RealmPlayer _)
     {
         _lock.Wait();
         try
         {
-            _userEventData = playerUserService.User.Events;
+            _userEventData = playerUserFeature.User.Events;
         }
         finally
         {
@@ -41,7 +41,7 @@ internal class PlayerEventsFeature : IPlayerEventsFeature
         }
     }
 
-    private void HandleSignedOut(IPlayerUserFeature playerUserService, RealmPlayer _)
+    private void HandleSignedOut(IPlayerUserFeature playerUserFeature, RealmPlayer _)
     {
         _lock.Wait();
         try
@@ -92,7 +92,7 @@ internal class PlayerEventsFeature : IPlayerEventsFeature
         {
             _userEventData.Add(userEvent);
         }
-        _playerUserService.IncreaseVersion();
+        _playerUserFeature.IncreaseVersion();
         Added?.Invoke(this, [UserEventDto.Map(userEvent)]);
     }
 

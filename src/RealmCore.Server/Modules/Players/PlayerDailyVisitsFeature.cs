@@ -15,7 +15,7 @@ public interface IPlayerDailyVisitsFeature : IPlayerFeature
 internal sealed class PlayerDailyVisitsFeature : IPlayerDailyVisitsFeature, IDisposable
 {
     private readonly object _lock = new();
-    private readonly IPlayerUserFeature _playerUserService;
+    private readonly IPlayerUserFeature _playerUserFeature;
     private DailyVisitsData? _dailyVisitsData;
     public DateTime LastVisit
     {
@@ -49,22 +49,22 @@ internal sealed class PlayerDailyVisitsFeature : IPlayerDailyVisitsFeature, IDis
     public event Action<IPlayerDailyVisitsFeature, int>? VisitsRecord;
 
     public RealmPlayer Player { get; init; }
-    public PlayerDailyVisitsFeature(PlayerContext playerContext, IPlayerUserFeature playerUserService)
+    public PlayerDailyVisitsFeature(PlayerContext playerContext, IPlayerUserFeature playerUserFeature)
     {
         Player = playerContext.Player;
-        playerUserService.SignedIn += HandleSignedIn;
-        playerUserService.SignedOut += HandleSignedOut;
-        _playerUserService = playerUserService;
+        playerUserFeature.SignedIn += HandleSignedIn;
+        playerUserFeature.SignedOut += HandleSignedOut;
+        _playerUserFeature = playerUserFeature;
     }
 
-    private void HandleSignedIn(IPlayerUserFeature playerUserService, RealmPlayer player)
+    private void HandleSignedIn(IPlayerUserFeature playerUserFeature, RealmPlayer player)
     {
         var now = player.GetRequiredService<IDateTimeProvider>().Now;
         lock (_lock)
         {
-            if (playerUserService.User?.DailyVisits != null)
+            if (playerUserFeature.User?.DailyVisits != null)
             {
-                _dailyVisitsData = playerUserService.User?.DailyVisits;
+                _dailyVisitsData = playerUserFeature.User?.DailyVisits;
             }
             else
             {
@@ -79,7 +79,7 @@ internal sealed class PlayerDailyVisitsFeature : IPlayerDailyVisitsFeature, IDis
         Update(now);
     }
 
-    private void HandleSignedOut(IPlayerUserFeature playerUserService, RealmPlayer _)
+    private void HandleSignedOut(IPlayerUserFeature playerUserFeature, RealmPlayer _)
     {
         lock (_lock)
             _dailyVisitsData = null;
@@ -109,7 +109,7 @@ internal sealed class PlayerDailyVisitsFeature : IPlayerDailyVisitsFeature, IDis
             VisitsRecord?.Invoke(this, VisitsInRowRecord);
         }
 
-        _playerUserService.IncreaseVersion();
+        _playerUserFeature.IncreaseVersion();
         Visited?.Invoke(this, VisitsInRow, reset);
         LastVisit = nowDate;
     }
