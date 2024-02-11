@@ -13,7 +13,7 @@ public interface IPlayerHudFeature : IPlayerFeature
     bool RemoveLayer<THudLayer>() where THudLayer : IHudLayer;
 }
 
-internal sealed class PlayerHudFeature : IPlayerHudFeature
+internal sealed class PlayerHudFeature : IPlayerHudFeature, IDisposable
 {
     private readonly object _lock = new();
 
@@ -69,6 +69,7 @@ internal sealed class PlayerHudFeature : IPlayerHudFeature
                 return false;
         }
 
+        hudLayer.Dispose();
         LayerRemoved?.Invoke(this, hudLayer);
         return true;
     }
@@ -84,5 +85,13 @@ internal sealed class PlayerHudFeature : IPlayerHudFeature
         if (hudLayer == null)
             return false;
         return RemoveLayer(hudLayer);
+    }
+
+    public void Dispose()
+    {
+        foreach (var layer in Layers)
+        {
+            RemoveLayer(layer);
+        }
     }
 }

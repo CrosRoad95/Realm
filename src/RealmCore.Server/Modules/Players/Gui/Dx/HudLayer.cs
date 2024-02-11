@@ -1,6 +1,6 @@
 ﻿namespace RealmCore.Server.Modules.Players.Gui.Dx;
 
-public interface IHudLayer
+public interface IHudLayer : IDisposable
 {
     bool Visible { get; set; }
     Vector2 Offset { get; set; }
@@ -102,6 +102,8 @@ public abstract class HudLayer<TState> : IHudLayer where TState : class, new()
         Visible = true;
         HudCreated();
     }
+
+    public virtual void Dispose() { }
 }
 
 public abstract class HudLayer : HudLayer<object>
