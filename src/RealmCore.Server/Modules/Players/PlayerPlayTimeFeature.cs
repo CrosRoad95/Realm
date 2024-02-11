@@ -1,4 +1,6 @@
-﻿namespace RealmCore.Server.Modules.Players;
+﻿using RealmCore.Server.Modules.Players.Persistence;
+
+namespace RealmCore.Server.Modules.Players;
 
 public interface IPlayerPlayTimeFeature : IPlayerFeature
 {
@@ -12,7 +14,7 @@ public interface IPlayerPlayTimeFeature : IPlayerFeature
     void Reset();
 }
 
-internal sealed class PlayerPlayTimeFeature : IPlayerPlayTimeFeature
+internal sealed class PlayerPlayTimeFeature : IPlayerPlayTimeFeature, IDisposable
 {
     private readonly object _lock = new();
     private DateTime _startDateTime;
@@ -37,8 +39,8 @@ internal sealed class PlayerPlayTimeFeature : IPlayerPlayTimeFeature
         _dateTimeProvider = dateTimeProvider;
         _updateService = updateService;
         _startDateTime = _dateTimeProvider.Now;
-        playerUserFeature.SignedIn += HandleSignedIn;
-        playerUserFeature.SignedOut += HandleSignedOut;
+        _playerUserFeature.SignedIn += HandleSignedIn;
+        _playerUserFeature.SignedOut += HandleSignedOut;
         _updateService.RareUpdate += HandleRareUpdate;
     }
 
@@ -66,17 +68,26 @@ internal sealed class PlayerPlayTimeFeature : IPlayerPlayTimeFeature
 
     public void HandleRareUpdate()
     {
-        if ((int)PlayTime.TotalMinutes != _lastMinute)
+        lock (_lock)
         {
-            _lastMinute = (int)PlayTime.TotalMinutes;
-            MinutePlayed?.Invoke(this);
-        }
+            if ((int)PlayTime.TotalMinutes != _lastMinute)
+            {
+                _lastMinute = (int)PlayTime.TotalMinutes;
+                MinutePlayed?.Invoke(this);
+            }
 
-        if ((int)TotalPlayTime.TotalMinutes != _lastMinuteTotal)
-        {
-            _lastMinuteTotal = (int)TotalPlayTime.TotalMinutes;
-            MinuteTotalPlayed?.Invoke(this);
-            _playerUserFeature.IncreaseVersion();
+            if ((int)TotalPlayTime.TotalMinutes != _lastMinuteTotal)
+            {
+                _lastMinuteTotal = (int)TotalPlayTime.TotalMinutes;
+                MinuteTotalPlayed?.Invoke(this);
+                _playerUserFeature.IncreaseVersion();
+            }
         }
+    }
+    public void Dispose()
+    {
+        _playerUserFeature.SignedIn -= HandleSignedIn;
+        _playerUserFeature.SignedOut -= HandleSignedOut;
+        _updateService.RareUpdate -= HandleRareUpdate;
     }
 }

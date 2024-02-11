@@ -2,24 +2,43 @@
 
 public interface IPlayerSettingsFeature : IPlayerFeature, IEnumerable<UserSettingDto>
 {
+    event Action<IPlayerSettingsFeature, int, string>? Added;
     event Action<IPlayerSettingsFeature, int, string>? Changed;
     event Action<IPlayerSettingsFeature, int, string>? Removed;
 
+    /// <summary>
+    /// Return an array of all settings ids
+    /// </summary>
+    int[] SettingsIds { get; }
     void Set(int settingId, string value);
     bool Remove(int settingId);
     bool TryGet(int settingId, out string? value);
     string Get(int settingId);
     bool Has(int settingId);
+    /// <summary>
+    /// Removes all settings
+    /// </summary>
+    void Reset();
 }
 
-internal sealed class PlayerSettingsFeature : IPlayerSettingsFeature, IDisposable
+internal sealed class PlayerSettingsFeature : IPlayerSettingsFeature
 {
-    private object _lock = new();
+    private readonly object _lock = new();
     private ICollection<UserSettingData> _settings = [];
     private readonly IPlayerUserFeature _playerUserFeature;
 
+    public event Action<IPlayerSettingsFeature, int, string>? Added;
     public event Action<IPlayerSettingsFeature, int, string>? Changed;
     public event Action<IPlayerSettingsFeature, int, string>? Removed;
+
+    public int[] SettingsIds
+    {
+        get
+        {
+            lock (_lock)
+                return _settings.Select(x => x.SettingId).ToArray();
+        }
+    }
 
     public RealmPlayer Player { get; init; }
     public PlayerSettingsFeature(PlayerContext playerContext, IPlayerUserFeature playerUserFeature)
@@ -36,10 +55,17 @@ internal sealed class PlayerSettingsFeature : IPlayerSettingsFeature, IDisposabl
             _settings = playerUserFeature.User.Settings;
     }
 
+    public void Reset()
+    {
+        foreach (var settingId in SettingsIds)
+        {
+            Remove(settingId);
+        }
+    }
+
     private void HandleSignedOut(IPlayerUserFeature playerUserFeature, RealmPlayer _)
     {
-        lock (_lock)
-            _settings = [];
+        Reset();
     }
 
     public bool Has(int settingId)
@@ -54,16 +80,21 @@ internal sealed class PlayerSettingsFeature : IPlayerSettingsFeature, IDisposabl
         {
             var setting = _settings.FirstOrDefault(x => x.SettingId == settingId);
             if (setting != null)
+            {
                 setting.Value = value;
+                Changed?.Invoke(this, settingId, value);
+            }
             else
+            {
                 _settings.Add(new UserSettingData
                 {
                     SettingId = settingId,
                     Value = value
                 });
+                Added?.Invoke(this, settingId, value);
+            }
         }
         _playerUserFeature.IncreaseVersion();
-        Changed?.Invoke(this, settingId, value);
     }
 
     public string Get(int settingId)
@@ -72,33 +103,35 @@ internal sealed class PlayerSettingsFeature : IPlayerSettingsFeature, IDisposabl
             return _settings.First(x => x.SettingId == settingId).Value;
     }
 
-    public bool TryGet(int settingId, out string value)
+    public bool TryGet(int settingId, out string? value)
     {
-        var setting = _settings.FirstOrDefault(x => x.SettingId == settingId);
-        if (setting != null)
+        lock (_lock)
         {
-            value = setting.Value;
-            return true;
+            var setting = _settings.FirstOrDefault(x => x.SettingId == settingId);
+            if (setting != null)
+            {
+                value = setting.Value;
+                return true;
+            }
+            value = null;
+            return false;
         }
-        value = string.Empty;
-        return false;
     }
 
     public bool Remove(int settingId)
     {
-        var setting = _settings.First(x => x.SettingId == settingId);
-        if (setting != null)
+        lock (_lock)
         {
-            _settings.Remove(setting);
-            _playerUserFeature.IncreaseVersion();
-            return true;
+            var setting = _settings.First(x => x.SettingId == settingId);
+            if (setting != null)
+            {
+                _settings.Remove(setting);
+                Removed?.Invoke(this, setting.SettingId, setting.Value);
+                _playerUserFeature.IncreaseVersion();
+                return true;
+            }
+            return false;
         }
-        return false;
-    }
-
-    public void Dispose()
-    {
-
     }
 
     public IEnumerator<UserSettingDto> GetEnumerator()

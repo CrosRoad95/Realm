@@ -2,9 +2,9 @@
 
 public class OneOfObjective : Objective
 {
+    private readonly object _lock = new();
     private readonly Objective[] _objectives;
     private bool _completed = false;
-    private object _lock = new();
 
     public override Vector3 Position => throw new NotSupportedException();
 

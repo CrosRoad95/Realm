@@ -6,15 +6,13 @@ public class DefaultBanLogic
     private readonly IOptionsMonitor<GameplayOptions> _gameplayOptions;
     private readonly ILogger<DefaultBanLogic> _logger;
     private readonly IDateTimeProvider _dateTimeProvider;
-    private readonly IServiceProvider _serviceProvider;
 
-    public DefaultBanLogic(MtaServer mtaServer, IOptionsMonitor<GameplayOptions> gameplayOptions, ILogger<DefaultBanLogic> logger, IBanRepository banRepository, IDateTimeProvider dateTimeProvider, IServiceProvider serviceProvider)
+    public DefaultBanLogic(MtaServer mtaServer, IOptionsMonitor<GameplayOptions> gameplayOptions, ILogger<DefaultBanLogic> logger,  IDateTimeProvider dateTimeProvider)
     {
         _mtaServer = mtaServer;
         _gameplayOptions = gameplayOptions;
         _logger = logger;
         _dateTimeProvider = dateTimeProvider;
-        _serviceProvider = serviceProvider;
         _mtaServer.PlayerJoined += HandlePlayerJoined;
     }
 
@@ -31,10 +29,14 @@ public class DefaultBanLogic
             return;
         }
 
+        var now = _dateTimeProvider.Now;
+        var bansRepository = player.GetRequiredService<IBanRepository>();
+
         var bans = await player.GetRequiredService<IBanRepository>().GetBansBySerial(player.Client.Serial, _dateTimeProvider.Now, _gameplayOptions.CurrentValue.BanType);
-        if (bans != null && bans.Count > 0)
+
+        var ban = bans.FirstOrDefault(x => x.IsActive(now));
+        if (ban != null)
         {
-            var ban = bans[0];
             player.Kick($"You are banned, reason: {ban.Reason} until: {ban.End}");
         }
     }

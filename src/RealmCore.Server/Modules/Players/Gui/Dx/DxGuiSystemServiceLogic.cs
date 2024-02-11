@@ -1,4 +1,4 @@
-﻿namespace RealmCore.Server.Modules.Players.Gui;
+﻿namespace RealmCore.Server.Modules.Players.Gui.Dx;
 
 internal sealed class DxGuiSystemServiceLogic : PlayerLogic
 {

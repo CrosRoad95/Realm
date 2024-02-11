@@ -11,7 +11,8 @@ public interface IPlayerGuiFeature : IPlayerFeature
 
     event Action<IPlayerGuiFeature, RealmPlayer, IPlayerGui?, IPlayerGui?>? Changed;
 
-    void Close<TGui>() where TGui : IPlayerGui;
+    bool Close<TGui>() where TGui : IPlayerGui;
+    bool Close();
     TGui SetCurrentWithDI<TGui>(params object[] parameters) where TGui : IPlayerGui;
 }
 
@@ -67,20 +68,29 @@ internal sealed class PlayerGuiFeature : IPlayerGuiFeature, IDisposable
         }
     }
 
-    public void Close<TGui>() where TGui : IPlayerGui
+    public bool Close<TGui>() where TGui : IPlayerGui
     {
         lock (_lock)
         {
             if (Current is TGui)
+            {
                 Current = null;
+                return true;
+            }
         }
+        return false;
     }
 
-    public void Close()
+    public bool Close()
     {
         lock (_lock)
         {
-            Current = null;
+            if(Current != null)
+            {
+                Current = null;
+                return true;
+            }
+            return false;
         }
     }
 

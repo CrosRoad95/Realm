@@ -21,7 +21,7 @@ internal sealed class AdminResourceLogic
     private void HandleToolStateChanged(Player plr, AdminTool adminTool, bool state)
     {
         var player = (RealmPlayer)plr;
-    using var _ = _logger.BeginElement(player);
+        using var _ = _logger.BeginElement(player);
         try
         {
             if (!player.Admin.HasTool(adminTool))

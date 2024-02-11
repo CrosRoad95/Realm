@@ -2,6 +2,7 @@
 
 public abstract class Session
 {
+    protected readonly object _lock = new();
     private readonly Stopwatch _stopwatch = new();
 
     public event Action<Session>? Started;
@@ -10,7 +11,6 @@ public abstract class Session
     public TimeSpan Elapsed => _stopwatch.Elapsed;
 
     public bool IsRunning => _stopwatch.IsRunning;
-    private object _lock = new();
     public RealmPlayer Player { get; private set; }
 
     public Session(RealmPlayer player)

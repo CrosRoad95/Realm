@@ -1,12 +1,19 @@
 ﻿namespace RealmCore.Server.Modules.Players;
 
+public enum LevelChange
+{
+    Set,
+    Increase,
+    Decrease
+}
+
 public interface IPlayerLevelFeature : IPlayerFeature
 {
     uint NextLevelRequiredExperience { get; }
     uint Level { get; set; }
     uint Experience { get; set; }
 
-    event Action<IPlayerLevelFeature, uint, bool>? LevelChanged;
+    event Action<IPlayerLevelFeature, uint, LevelChange>? LevelChanged;
     event Action<IPlayerLevelFeature, uint>? ExperienceChanged;
 
     void GiveExperience(uint amount);
@@ -20,7 +27,7 @@ internal sealed class PlayerLevelFeature : IPlayerLevelFeature
     private uint _level;
     private uint _experience;
 
-    public event Action<IPlayerLevelFeature, uint, bool>? LevelChanged;
+    public event Action<IPlayerLevelFeature, uint, LevelChange>? LevelChanged;
     public event Action<IPlayerLevelFeature, uint>? ExperienceChanged;
 
     public RealmPlayer Player { get; init; }
@@ -39,6 +46,8 @@ internal sealed class PlayerLevelFeature : IPlayerLevelFeature
         {
             _level = playerUserFeature.User.Level;
             _experience = playerUserFeature.User.Experience;
+            LevelChanged?.Invoke(this, _level, LevelChange.Set);
+            ExperienceChanged?.Invoke(this, _experience);
         }
     }
 
@@ -48,6 +57,8 @@ internal sealed class PlayerLevelFeature : IPlayerLevelFeature
         {
             _level = 0;
             _experience = 0;
+            LevelChanged?.Invoke(this, _level, LevelChange.Set);
+            ExperienceChanged?.Invoke(this, _experience);
         }
     }
 
@@ -70,7 +81,7 @@ internal sealed class PlayerLevelFeature : IPlayerLevelFeature
                     for (var i = _level; value > _level; i++)
                     {
                         _level = i;
-                        LevelChanged?.Invoke(this, i, true);
+                        LevelChanged?.Invoke(this, i, LevelChange.Increase);
                     }
                 }
                 else
@@ -78,7 +89,7 @@ internal sealed class PlayerLevelFeature : IPlayerLevelFeature
                     for (var i = _level; value < _level; i--)
                     {
                         _level = i;
-                        LevelChanged?.Invoke(this, i, false);
+                        LevelChanged?.Invoke(this, i, LevelChange.Decrease);
                     }
                 }
                 _level = value;
@@ -119,7 +130,7 @@ internal sealed class PlayerLevelFeature : IPlayerLevelFeature
             _experience -= NextLevelRequiredExperience;
             _level++;
             _playerUserFeature.IncreaseVersion();
-            LevelChanged?.Invoke(this, _level, true);
+            LevelChanged?.Invoke(this, _level, LevelChange.Increase);
             CheckForNextLevel();
         }
     }

@@ -1,9 +1,8 @@
 ﻿namespace RealmCore.Server.Modules.Players;
 
-public interface IPlayerUpgradeFeature : IPlayerFeature
+public interface IPlayerUpgradeFeature : IPlayerFeature, IEnumerable<int>
 {
-
-    event Action<IPlayerUpgradeFeature, int>? Added;
+    event Action<IPlayerUpgradeFeature, int, bool>? Added;
     event Action<IPlayerUpgradeFeature, int>? Removed;
 
     bool Has(int upgradeId);
@@ -13,7 +12,7 @@ public interface IPlayerUpgradeFeature : IPlayerFeature
 
 internal sealed class PlayerUpgradeFeature : IPlayerUpgradeFeature
 {
-    public event Action<IPlayerUpgradeFeature, int>? Added;
+    public event Action<IPlayerUpgradeFeature, int, bool>? Added;
     public event Action<IPlayerUpgradeFeature, int>? Removed;
 
     private ICollection<UserUpgradeData> _upgrades = [];
@@ -32,13 +31,25 @@ internal sealed class PlayerUpgradeFeature : IPlayerUpgradeFeature
     private void HandleSignedIn(IPlayerUserFeature playerUserFeature, RealmPlayer _)
     {
         lock (_lock)
-            _upgrades = playerUserFeature.User.Upgrades;
+        {
+            foreach (var userUpgradeData in playerUserFeature.User.Upgrades)
+            {
+                _upgrades.Add(new UserUpgradeData
+                {
+                    UpgradeId = userUpgradeData.UpgradeId,
+                });
+                Added?.Invoke(this, userUpgradeData.UpgradeId, true);
+            }
+        }
     }
 
     private void HandleSignedOut(IPlayerUserFeature playerUserFeature, RealmPlayer _)
     {
         lock (_lock)
+        {
+
             _upgrades = [];
+        }
     }
 
     internal UserUpgradeData? GetUpgrade(int upgradeId) => _upgrades.FirstOrDefault(x => x.UpgradeId == upgradeId);
@@ -61,7 +72,7 @@ internal sealed class PlayerUpgradeFeature : IPlayerUpgradeFeature
                 UpgradeId = upgradeId,
             });
             _playerUserFeature.IncreaseVersion();
-            Added?.Invoke(this, upgradeId);
+            Added?.Invoke(this, upgradeId, false);
             return true;
         }
     }
@@ -79,4 +90,12 @@ internal sealed class PlayerUpgradeFeature : IPlayerUpgradeFeature
             return true;
         }
     }
+
+    public IEnumerator<int> GetEnumerator()
+    {
+        lock (_lock)
+            return new List<int>(_upgrades.Select(x => x.UpgradeId)).GetEnumerator();
+    }
+
+    IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 }

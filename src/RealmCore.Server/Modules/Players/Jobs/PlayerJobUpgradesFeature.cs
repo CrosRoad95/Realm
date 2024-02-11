@@ -1,8 +1,10 @@
-﻿namespace RealmCore.Server.Modules.Players.Jobs;
+﻿using RealmCore.Server.Modules.Players.Persistence;
+
+namespace RealmCore.Server.Modules.Players.Jobs;
 
 public interface IPlayerJobUpgradesFeature : IPlayerFeature, IEnumerable<JobUpgradeDto>
 {
-    event Action<IPlayerJobUpgradesFeature, JobUpgradeDto>? Added;
+    event Action<IPlayerJobUpgradesFeature, JobUpgradeDto, bool>? Added;
     event Action<IPlayerJobUpgradesFeature, JobUpgradeDto>? Removed;
 
     IEnumerable<JobUpgradeDto> GetAllByJobId(short jobId);
@@ -11,13 +13,13 @@ public interface IPlayerJobUpgradesFeature : IPlayerFeature, IEnumerable<JobUpgr
     bool TryRemove(short jobId, int upgradeId);
 }
 
-internal sealed class PlayerJobUpgradesFeature : IPlayerJobUpgradesFeature
+internal sealed class PlayerJobUpgradesFeature : IPlayerJobUpgradesFeature, IDisposable
 {
     private readonly object _lock = new();
     private ICollection<JobUpgradeData> _jobUpgrades = [];
     private readonly IPlayerUserFeature _playerUserFeature;
 
-    public event Action<IPlayerJobUpgradesFeature, JobUpgradeDto>? Added;
+    public event Action<IPlayerJobUpgradesFeature, JobUpgradeDto, bool>? Added;
     public event Action<IPlayerJobUpgradesFeature, JobUpgradeDto>? Removed;
 
     public RealmPlayer Player { get; init; }
@@ -32,7 +34,13 @@ internal sealed class PlayerJobUpgradesFeature : IPlayerJobUpgradesFeature
     private void HandleSignedIn(IPlayerUserFeature playerUserFeature, RealmPlayer _)
     {
         lock (_lock)
-            _jobUpgrades = playerUserFeature.User.JobUpgrades;
+        {
+            foreach (var jobUpgradeData in playerUserFeature.User.JobUpgrades)
+            {
+                _jobUpgrades.Add(jobUpgradeData);
+                Added?.Invoke(this, JobUpgradeDto.Map(jobUpgradeData), true);
+            }
+        }
     }
 
     private void HandleSignedOut(IPlayerUserFeature playerUserFeature, RealmPlayer _)
@@ -71,7 +79,7 @@ internal sealed class PlayerJobUpgradesFeature : IPlayerJobUpgradesFeature
 
             _jobUpgrades.Add(jobUpgradeData);
             _playerUserFeature.IncreaseVersion();
-            Added?.Invoke(this, JobUpgradeDto.Map(jobUpgradeData));
+            Added?.Invoke(this, JobUpgradeDto.Map(jobUpgradeData), false);
             return true;
         }
     }
@@ -80,12 +88,12 @@ internal sealed class PlayerJobUpgradesFeature : IPlayerJobUpgradesFeature
     {
         lock (_lock)
         {
-            var upgrade = InternalGetUpgrade(jobId, upgradeId);
-            if (upgrade == null)
+            var jobUpgradeData = InternalGetUpgrade(jobId, upgradeId);
+            if (jobUpgradeData == null)
                 return false;
-            _jobUpgrades.Remove(upgrade);
+            _jobUpgrades.Remove(jobUpgradeData);
             _playerUserFeature.IncreaseVersion();
-            Removed?.Invoke(this, JobUpgradeDto.Map(upgrade));
+            Removed?.Invoke(this, JobUpgradeDto.Map(jobUpgradeData));
             return true;
         }
     }
@@ -97,4 +105,10 @@ internal sealed class PlayerJobUpgradesFeature : IPlayerJobUpgradesFeature
     }
 
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+
+    public void Dispose()
+    {
+        _playerUserFeature.SignedIn -= HandleSignedIn;
+        _playerUserFeature.SignedOut -= HandleSignedOut;
+    }
 }

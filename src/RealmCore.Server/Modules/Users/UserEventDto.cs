@@ -16,11 +16,11 @@ public class UserEventDto
 
         return new UserEventDto
         {
-            DateTime = userEventData.DateTime,
+            Id = userEventData.Id,
             UserId = userEventData.UserId,
             EventType = userEventData.EventType,
             Metadata = userEventData.Metadata,
-            Id = userEventData.Id
+            DateTime = userEventData.DateTime
         };
     }
 }

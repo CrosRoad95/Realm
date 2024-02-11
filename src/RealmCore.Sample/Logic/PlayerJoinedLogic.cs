@@ -95,7 +95,7 @@ internal sealed class PlayerJoinedLogic
         player.Level.LevelChanged += HandleLevelChanged;
     }
 
-    private void HandleLevelChanged(IPlayerLevelFeature levelService, uint level, bool arg3)
+    private void HandleLevelChanged(IPlayerLevelFeature levelService, uint level, LevelChange levelChange)
     {
         _logger.LogInformation("Player leveled up: {level}", level);
     }

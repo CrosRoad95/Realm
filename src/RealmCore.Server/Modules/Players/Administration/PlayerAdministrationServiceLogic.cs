@@ -52,7 +52,6 @@ internal sealed class PlayerAdministrationServiceLogic
     {
         _adminService.SetAdminModeEnabledForPlayer(admin.Player, enabled);
         if (enabled)
-            _adminService.SetAdminTools(admin.Player, admin.AdminTools);
-
+            _adminService.SetAdminTools(admin.Player, admin.Tools);
     }
 }

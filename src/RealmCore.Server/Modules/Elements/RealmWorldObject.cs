@@ -2,7 +2,7 @@
 
 public class RealmWorldObject : WorldObject, IInteraction
 {
-    private object _lock = new();
+    private readonly object _lock = new();
     private RealmPlayer? _owner;
     private Interaction? _interaction;
 

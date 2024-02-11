@@ -62,7 +62,6 @@ internal sealed class PlayerUserFeature : IPlayerUserFeature, IDisposable
         {
             lock (_lock)
                 return _authorizedPoliciesCache.Where(x => x.Value).Select(x => x.Key).ToArray();
-
         }
     }
 
@@ -70,6 +69,7 @@ internal sealed class PlayerUserFeature : IPlayerUserFeature, IDisposable
     public event Action<IPlayerUserFeature, RealmPlayer>? SignedOut;
 
     public RealmPlayer Player { get; init; }
+
     public PlayerUserFeature(PlayerContext playerContext, IDateTimeProvider dateTimeProvider, IUserEventRepository userEventRepository)
     {
         Player = playerContext.Player;

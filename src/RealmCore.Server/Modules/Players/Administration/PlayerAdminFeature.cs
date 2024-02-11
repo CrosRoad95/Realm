@@ -1,8 +1,11 @@
-﻿namespace RealmCore.Server.Modules.Players.Administration;
+﻿using RealmCore.Resources.Admin.Enums;
+using RealmCore.Server.Modules.Players.Persistence;
+
+namespace RealmCore.Server.Modules.Players.Administration;
 
 public interface IPlayerAdminFeature : IPlayerFeature
 {
-    IReadOnlyList<AdminTool> AdminTools { get; }
+    IReadOnlyList<AdminTool> Tools { get; }
     bool DevelopmentMode { get; set; }
     bool DebugView { get; set; }
     bool AdminMode { get; set; }
@@ -17,32 +20,36 @@ public interface IPlayerAdminFeature : IPlayerFeature
 
     bool HasTool(AdminTool adminTool);
     void SetTools(IEnumerable<AdminTool> adminTools);
+    void Reset();
 }
 
-internal sealed class PlayerAdminFeature : IPlayerAdminFeature
+internal sealed class PlayerAdminFeature : IPlayerAdminFeature, IDisposable
 {
     private readonly object _lock = new();
+    private readonly IPlayerUserFeature _playerUserFeature;
     private bool _debugView = false;
     private bool _adminMode = false;
     private bool _noClip = false;
     private bool _developmentMode = false;
     private bool _interactionDebugRenderingEnabled = false;
-    private List<AdminTool> _adminTools = [];
+    private List<AdminTool> _tools = [];
 
+    public event Action<IPlayerAdminFeature, IReadOnlyList<AdminTool>>? ToolsChanged;
     public event Action<IPlayerAdminFeature, bool>? DebugViewStateChanged;
     public event Action<IPlayerAdminFeature, bool>? AdminModeChanged;
     public event Action<IPlayerAdminFeature, bool>? NoClipStateChanged;
     public event Action<IPlayerAdminFeature, bool>? DevelopmentModeStateChanged;
     public event Action<IPlayerAdminFeature, bool>? InteractionDebugRenderingStateChanged;
 
-    public IReadOnlyList<AdminTool> AdminTools
+    public IReadOnlyList<AdminTool> Tools
     {
         get
         {
             lock (_lock)
-                return new List<AdminTool>(_adminTools);
+                return new List<AdminTool>(_tools);
         }
     }
+
     public bool DevelopmentMode
     {
         get
@@ -124,10 +131,11 @@ internal sealed class PlayerAdminFeature : IPlayerAdminFeature
     }
 
     public RealmPlayer Player { get; init; }
+
     public PlayerAdminFeature(PlayerContext playerContext, IPlayerUserFeature playerUserFeature)
     {
+        _playerUserFeature = playerUserFeature;
         Player = playerContext.Player;
-        playerUserFeature.SignedIn += HandleSignedIn;
         playerUserFeature.SignedOut += HandleSignedOut;
     }
 
@@ -135,7 +143,8 @@ internal sealed class PlayerAdminFeature : IPlayerAdminFeature
     {
         lock (_lock)
         {
-            _adminTools = new(adminTools);
+            _tools = new(adminTools);
+            ToolsChanged?.Invoke(this, _tools);
         }
     }
 
@@ -143,17 +152,27 @@ internal sealed class PlayerAdminFeature : IPlayerAdminFeature
     {
         lock (_lock)
         {
-            return _adminTools.Contains(adminTool);
+            return _tools.Contains(adminTool);
         }
     }
 
-    private void HandleSignedIn(IPlayerUserFeature playerUserFeature, RealmPlayer _)
+    public void Reset()
     {
-
+        DevelopmentMode = false;
+        DebugView = false;
+        AdminMode = false;
+        NoClip = false;
+        InteractionDebugRenderingEnabled = false;
+        SetTools([]);
     }
 
     private void HandleSignedOut(IPlayerUserFeature playerUserFeature, RealmPlayer _)
     {
+        Reset();
+    }
 
+    public void Dispose()
+    {
+        _playerUserFeature.SignedOut -= HandleSignedOut;
     }
 }
