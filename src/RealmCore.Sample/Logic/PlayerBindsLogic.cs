@@ -39,7 +39,7 @@ internal sealed class PlayerBindsLogic
     {
         player.SetBind("num_0", player =>
         {
-            player.Admin.NoClip = player.Admin.NoClip;
+            player.Admin.NoClip = !player.Admin.NoClip;
         });
 
         player.SetBind("F2", player =>

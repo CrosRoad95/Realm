@@ -77,7 +77,8 @@ internal sealed class CommandsLogic
         #region Commands for focusable tests
         _commandService.AddCommandHandler("focusable", (player, args) =>
         {
-            var worldObject = _elementFactory.CreateFocusableObject(ObjectModel.Gunbox, player.Position + new Vector3(4, 0, 0), player.Rotation);
+            var position = player.Position + player.Forward * new Vector3(4, 0, 0);
+            var worldObject = _elementFactory.CreateFocusableObject(ObjectModel.Gunbox, position, player.Rotation);
             worldObject.PlayerFocused += (that, player) =>
             {
                 var playerName = player.Name;

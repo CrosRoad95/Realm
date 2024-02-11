@@ -34,9 +34,10 @@ internal sealed class FocusableElementsLogic
 
     private void HandleFocusedElementChanged(Player plr, Element? focusedElement, string? vehiclePart)
     {
-        if (focusedElement is IFocusableElement)
+        if (focusedElement is IFocusableElement || focusedElement == null)
         {
-            ((RealmPlayer)plr).FocusedElement = focusedElement;
+            var player = (RealmPlayer)plr;
+            player.FocusedElement = focusedElement;
         }
     }
 }
