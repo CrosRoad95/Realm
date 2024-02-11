@@ -17,6 +17,8 @@ public class RealmWorldObject : WorldObject, IInteraction
             if (_interaction != value)
             {
                 var previous = _interaction;
+                previous?.Dispose();
+
                 _interaction = value;
                 InteractionChanged?.Invoke(this, previous, value);
             }
@@ -25,7 +27,7 @@ public class RealmWorldObject : WorldObject, IInteraction
 
     public RealmWorldObject(ObjectModel model, Vector3 position) : base(model, position)
     {
-        Destroyed += HandleDestroyed;
+
     }
 
     public bool TrySetOwner(RealmPlayer player)
@@ -71,16 +73,19 @@ public class RealmWorldObject : WorldObject, IInteraction
         }
     }
 
-    private void HandleDestroyed(Element obj)
+    public override bool Destroy()
     {
         lock (_lock)
         {
-            if (_owner == null)
-                return;
-
-            _owner.Destroyed += HandleOwnerDestroyed;
-            _owner = null;
+            if (_owner != null)
+            {
+                _owner.Destroyed += HandleOwnerDestroyed;
+                _owner = null;
+            }
         }
         OwnerChanged?.Invoke(this, null);
+        Interaction = null;
+
+        return base.Destroy();
     }
 }
