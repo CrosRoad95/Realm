@@ -2,6 +2,10 @@
 
 public interface IVehicleFuelFeature : IVehicleFeature, IEnumerable<FuelContainer>
 {
+    FuelContainer? Active { get; }
+
+    event Action<IVehicleFuelFeature, FuelContainer?>? ActiveChanged;
+
     FuelContainer AddFuelContainer(short fuelType, float initialAmount, float maxCapacity, float fuelConsumptionPerOneKm, float minimumDistanceThreshold, bool makeActive = false);
     void Update(bool forceUpdate = false);
 }
@@ -11,13 +15,34 @@ internal sealed class VehicleFuelFeature : IVehicleFuelFeature
     private readonly object _lock = new();
     private ICollection<VehicleFuelData> _vehicleFuelData = [];
     private readonly List<FuelContainer> _fuelContainers = [];
+    private FuelContainer? _active;
 
     public RealmVehicle Vehicle { get; init; }
+    public event Action<IVehicleFuelFeature, FuelContainer?>? ActiveChanged;
+    public FuelContainer? Active
+    {
+        get => _active; private set
+        {
+            lock (_lock)
+            {
+                if (value != Active)
+                {
+                    foreach (var item in _fuelContainers)
+                    {
+                        if (item != value)
+                            item.Active = false;
+                    }
+                    _active = value;
+                    ActiveChanged?.Invoke(this, _active);
+                }
+            }
+        }
+    }
 
-    public VehicleFuelFeature(VehicleContext vehicleContext, IVehiclePersistenceFeature persistanceService)
+    public VehicleFuelFeature(VehicleContext vehicleContext, IVehiclePersistenceFeature persistenceFeature)
     {
         Vehicle = vehicleContext.Vehicle;
-        persistanceService.Loaded += HandleLoaded;
+        persistenceFeature.Loaded += HandleLoaded;
         Vehicle.PositionChanged += HandlePositionChanged;
     }
 
@@ -61,6 +86,8 @@ internal sealed class VehicleFuelFeature : IVehicleFuelFeature
             var fuelContainer = new FuelContainer(Vehicle, fuelData);
             _vehicleFuelData.Add(fuelData);
             _fuelContainers.Add(fuelContainer);
+            if(makeActive)
+                Active = fuelContainer;
             return fuelContainer;
         }
     }

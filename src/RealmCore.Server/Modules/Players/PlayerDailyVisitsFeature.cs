@@ -49,6 +49,7 @@ internal sealed class PlayerDailyVisitsFeature : IPlayerDailyVisitsFeature, IDis
     public event Action<IPlayerDailyVisitsFeature, int>? VisitsRecord;
 
     public RealmPlayer Player { get; init; }
+
     public PlayerDailyVisitsFeature(PlayerContext playerContext, IPlayerUserFeature playerUserFeature)
     {
         Player = playerContext.Player;

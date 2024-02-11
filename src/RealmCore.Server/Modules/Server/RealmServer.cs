@@ -18,7 +18,7 @@ public class MtaDiPlayerServerTempFix<TPlayer> : MtaServer<TPlayer> where TPlaye
     }
 }
 
-public class RealmServer : MtaDiPlayerServerTempFix<RealmPlayer>
+public class RealmServer<TRealmPlayer> : MtaDiPlayerServerTempFix<TRealmPlayer> where TRealmPlayer: RealmPlayer
 {
     public event Action? ServerStarted;
 
@@ -96,5 +96,12 @@ public class RealmServer : MtaDiPlayerServerTempFix<RealmPlayer>
         await Task.Delay(500);
         base.Stop();
         logger.LogInformation("Server stopped, saved: {savedElementsCount} elements.", i);
+    }
+}
+
+public class RealmServer : RealmServer<RealmPlayer>
+{
+    public RealmServer(IRealmConfigurationProvider realmConfigurationProvider, Action<ServerBuilder>? configureServerBuilder = null) : base(realmConfigurationProvider, configureServerBuilder)
+    {
     }
 }

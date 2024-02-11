@@ -28,7 +28,7 @@ public class SaveServiceTests
     public async Task SpawnedVehicleShouldBeExactlyTheSameAsSavedOne()
     {
         var realmTestingServer = new RealmTestingServer();
-        realmTestingServer.GetRequiredService<VehicleUpgradeCollection>().Add(250, new VehicleUpgradesCollectionItem(EmptyVehicleHandlingModifier.Instance));
+        realmTestingServer.GetRequiredService<VehicleUpgradesCollection>().Add(250, new VehicleUpgradesCollectionItem(EmptyVehicleHandlingModifier.Instance));
         var player = realmTestingServer.CreatePlayer();
         await realmTestingServer.SignInPlayer(player);
         var vehiclesService = realmTestingServer.GetRequiredService<IVehiclesService>();

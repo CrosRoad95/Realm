@@ -10,7 +10,7 @@ public class VehicleUpgradesCollectionItem : CollectionItemBase
     }
 }
 
-public class VehicleUpgradeCollection : CollectionBase<VehicleUpgradesCollectionItem>
+public class VehicleUpgradesCollection : CollectionBase<VehicleUpgradesCollectionItem>
 {
 
 }

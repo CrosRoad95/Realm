@@ -8,11 +8,11 @@ internal sealed partial class PlayerGameplayLogic
 {
     private readonly IServiceProvider _serviceProvider;
     private readonly ChatBox _chatBox;
-    private readonly VehicleUpgradeCollection _vehicleUpgradeCollection;
+    private readonly VehicleUpgradesCollection _vehicleUpgradeCollection;
     private readonly VehicleEnginesCollection _vehicleEnginesCollection;
     private readonly ILogger<PlayerGameplayLogic> _logger;
 
-    public PlayerGameplayLogic(ILogger<PlayerGameplayLogic> logger, IServiceProvider serviceProvider, ChatBox chatBox, VehicleUpgradeCollection vehicleUpgradeCollection, VehicleEnginesCollection vehicleEnginesCollection, IUsersService usersService)
+    public PlayerGameplayLogic(ILogger<PlayerGameplayLogic> logger, IServiceProvider serviceProvider, ChatBox chatBox, VehicleUpgradesCollection vehicleUpgradeCollection, VehicleEnginesCollection vehicleEnginesCollection, IUsersService usersService)
     {
         _serviceProvider = serviceProvider;
         _chatBox = chatBox;

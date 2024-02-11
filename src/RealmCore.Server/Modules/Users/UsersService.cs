@@ -122,7 +122,7 @@ internal sealed class UsersService : IUsersService
         if (user.IsDisabled)
             throw new UserDisabledException(user.Id);
 
-    using var _ = _logger.BeginElement(player);
+        using var _ = _logger.BeginElement(player);
 
         if (!_activeUsers.TrySetActive(user.Id, player))
             throw new Exception("Failed to login to already active account.");

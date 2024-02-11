@@ -2,9 +2,9 @@
 
 internal sealed class VehicleUpgradesLogic
 {
-    private readonly VehicleUpgradeCollection _vehicleUpgradesCollection;
+    private readonly VehicleUpgradesCollection _vehicleUpgradesCollection;
 
-    public VehicleUpgradesLogic(IElementFactory elementFactory, VehicleUpgradeCollection vehicleUpgradesCollection)
+    public VehicleUpgradesLogic(IElementFactory elementFactory, VehicleUpgradesCollection vehicleUpgradesCollection)
     {
         _vehicleUpgradesCollection = vehicleUpgradesCollection;
         elementFactory.ElementCreated += HandleElementCreated;

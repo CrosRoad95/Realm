@@ -48,7 +48,7 @@ public class VehicleUpgradesTests
     {
         _realmTestingServer = new RealmTestingServer();
 
-        var vehicleUpgradesCollection = _realmTestingServer.GetRequiredService<VehicleUpgradeCollection>();
+        var vehicleUpgradesCollection = _realmTestingServer.GetRequiredService<VehicleUpgradesCollection>();
 
         vehicleUpgradesCollection.Add(1000000, new VehicleUpgradesCollectionItem(new VehicleUpgrade1()));
         vehicleUpgradesCollection.Add(1000001, new VehicleUpgradesCollectionItem(new VehicleUpgrade2()));

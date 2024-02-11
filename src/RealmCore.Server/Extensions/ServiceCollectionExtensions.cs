@@ -60,7 +60,7 @@ public static class ServiceCollectionExtensions
         #region Registries
         services.AddSingleton<MapsCollection>();
         services.AddSingleton<ItemsCollection>();
-        services.AddSingleton<VehicleUpgradeCollection>();
+        services.AddSingleton<VehicleUpgradesCollection>();
         services.AddSingleton<LevelsCollection>();
         services.AddSingleton<VehicleEnginesCollection>();
         #endregion

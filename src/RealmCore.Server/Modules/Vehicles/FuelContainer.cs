@@ -20,7 +20,9 @@ public class FuelContainer
     public event Action<FuelContainer, float>? MaxCapacityChanged;
     public event Action<FuelContainer, float>? FuelConsumptionPerOneKmChanged;
 
-    public bool Active
+    public bool IsActive => Active;
+
+    internal bool Active
     {
         get
         {

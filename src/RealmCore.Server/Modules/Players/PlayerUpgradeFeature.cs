@@ -32,12 +32,9 @@ internal sealed class PlayerUpgradeFeature : IPlayerUpgradeFeature
     {
         lock (_lock)
         {
+            _upgrades = playerUserFeature.User.Upgrades;
             foreach (var userUpgradeData in playerUserFeature.User.Upgrades)
             {
-                _upgrades.Add(new UserUpgradeData
-                {
-                    UpgradeId = userUpgradeData.UpgradeId,
-                });
                 Added?.Invoke(this, userUpgradeData.UpgradeId, true);
             }
         }
@@ -47,7 +44,6 @@ internal sealed class PlayerUpgradeFeature : IPlayerUpgradeFeature
     {
         lock (_lock)
         {
-
             _upgrades = [];
         }
     }
