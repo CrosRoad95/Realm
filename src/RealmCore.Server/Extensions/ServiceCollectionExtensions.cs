@@ -30,7 +30,7 @@ public static class ServiceCollectionExtensions
         return services;
     }
 
-    internal static ServiceCollection AddPlayerScopedService<T1, T2>(this ServiceCollection services)
+    public static ServiceCollection AddPlayerScopedService<T1, T2>(this ServiceCollection services)
         where T1 : class, IPlayerFeature
         where T2: class, T1
     {
@@ -98,7 +98,7 @@ public static class ServiceCollectionExtensions
         services.AddPlayerScopedService<IPlayerDailyVisitsFeature, PlayerDailyVisitsFeature>();
         services.AddPlayerScopedService<IPlayerSettingsFeature, PlayerSettingsFeature>();
         services.AddPlayerScopedService<IPlayerBansFeature, PlayerBansFeature>();
-        services.AddPlayerScopedService<IPlayerUpgradeFeature, PlayerUpgradeFeature>();
+        services.AddPlayerScopedService<IPlayerUpgradesFeature, PlayerUpgradesFeature>();
         services.AddPlayerScopedService<IPlayerPlayTimeFeature, PlayerPlayTimeFeature>();
         services.AddPlayerScopedService<IPlayerLevelFeature, PlayerLevelFeature>();
         services.AddPlayerScopedService<IPlayerLicensesFeature, PlayerLicensesFeature>();

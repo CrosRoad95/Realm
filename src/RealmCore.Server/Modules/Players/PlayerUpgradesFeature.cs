@@ -1,26 +1,26 @@
 ﻿namespace RealmCore.Server.Modules.Players;
 
-public interface IPlayerUpgradeFeature : IPlayerFeature, IEnumerable<int>
+public interface IPlayerUpgradesFeature : IPlayerFeature, IEnumerable<int>
 {
-    event Action<IPlayerUpgradeFeature, int, bool>? Added;
-    event Action<IPlayerUpgradeFeature, int>? Removed;
+    event Action<IPlayerUpgradesFeature, int, bool>? Added;
+    event Action<IPlayerUpgradesFeature, int>? Removed;
 
     bool Has(int upgradeId);
     bool TryAdd(int upgradeId);
     bool TryRemove(int upgradeId);
 }
 
-internal sealed class PlayerUpgradeFeature : IPlayerUpgradeFeature
+internal sealed class PlayerUpgradesFeature : IPlayerUpgradesFeature
 {
-    public event Action<IPlayerUpgradeFeature, int, bool>? Added;
-    public event Action<IPlayerUpgradeFeature, int>? Removed;
+    public event Action<IPlayerUpgradesFeature, int, bool>? Added;
+    public event Action<IPlayerUpgradesFeature, int>? Removed;
 
     private ICollection<UserUpgradeData> _upgrades = [];
     private readonly object _lock = new();
     private readonly IPlayerUserFeature _playerUserFeature;
 
     public RealmPlayer Player { get; init; }
-    public PlayerUpgradeFeature(PlayerContext playerContext, IPlayerUserFeature playerUserFeature)
+    public PlayerUpgradesFeature(PlayerContext playerContext, IPlayerUserFeature playerUserFeature)
     {
         Player = playerContext.Player;
         playerUserFeature.SignedIn += HandleSignedIn;
