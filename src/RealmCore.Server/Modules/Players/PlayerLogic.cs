@@ -23,7 +23,7 @@ public abstract class PlayerLogic
         PlayerLeft(player);
     }
 
-    protected abstract void PlayerJoined(RealmPlayer player);
-    protected abstract void PlayerLeft(RealmPlayer player);
+    protected void PlayerJoined(RealmPlayer player) { }
+    protected void PlayerLeft(RealmPlayer player) { }
     protected virtual void HandleSignedIn(IPlayerUserFeature userService, RealmPlayer player) { }
 }

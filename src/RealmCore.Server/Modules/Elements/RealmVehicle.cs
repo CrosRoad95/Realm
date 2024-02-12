@@ -38,7 +38,7 @@ public class RealmVehicle : Vehicle, IPersistentElement
         #endregion
     }
 
-    private T GetRequiredService<T>() where T : notnull => _serviceProvider.GetRequiredService<T>();
+    public T GetRequiredService<T>() where T : notnull => _serviceProvider.GetRequiredService<T>();
     public object GetRequiredService(Type type) => _serviceProvider.GetRequiredService(type);
 
     public override bool Destroy()

@@ -124,31 +124,31 @@ public class RealmPlayer : Player, IDisposable, IPersistentElement
     public bool IsSignedIn => User.IsSignedIn;
     public int PersistentId => User.Id;
 
-    public new IPlayerMoneyFeature Money { get; private set; }
-    public IPlayerBrowserFeature Browser { get; private set; }
-    public IPlayerAFKFeature AFK { get; private set; }
-    public IPlayerUserFeature User { get; private set; }
-    public IPlayerDailyVisitsFeature DailyVisits { get; private set; }
-    public IPlayerSettingsFeature Settings { get; private set; }
-    public IPlayerBansFeature Bans { get; private set; }
-    public IPlayerUpgradesFeature Upgrades { get; private set; }
-    public IPlayerPlayTimeFeature PlayTime { get; private set; }
-    public IPlayerLevelFeature Level { get; private set; }
-    public IPlayerLicensesFeature Licenses { get; private set; }
-    public IPlayerStatisticsFeature Statistics { get; private set; }
-    public IPlayerAchievementsFeature Achievements { get; private set; }
-    public IPlayerJobUpgradesFeature JobUpgrades { get; private set; }
-    public IPlayerDiscoveriesFeature Discoveries { get; private set; }
-    public IPlayerJobStatisticsFeature JobStatistics { get; private set; }
-    public IPlayerEventsFeature Events { get; private set; }
-    public IPlayerSessionsFeature Sessions { get; private set; }
-    public IPlayerAdminFeature Admin { get; private set; }
-    public IPlayerGroupsFeature Groups { get; private set; }
-    public IPlayerFractionsFeature Fractions { get; private set; }
-    public IPlayerGuiFeature Gui { get; private set; }
-    public IPlayerHudFeature Hud { get; private set; }
-    public IPlayerInventoryFeature Inventory { get; private set; }
-    public IScopedElementFactory ElementFactory { get; private set; }
+    public new IPlayerMoneyFeature Money { get; init; }
+    public IPlayerBrowserFeature Browser { get; init; }
+    public IPlayerAFKFeature AFK { get; init; }
+    public IPlayerUserFeature User { get; init; }
+    public IPlayerDailyVisitsFeature DailyVisits { get; init; }
+    public IPlayerSettingsFeature Settings { get; init; }
+    public IPlayerBansFeature Bans { get; init; }
+    public IPlayerUpgradesFeature Upgrades { get; init; }
+    public IPlayerPlayTimeFeature PlayTime { get; init; }
+    public IPlayerLevelFeature Level { get; init; }
+    public IPlayerLicensesFeature Licenses { get; init; }
+    public IPlayerStatisticsFeature Statistics { get; init; }
+    public IPlayerAchievementsFeature Achievements { get; init; }
+    public IPlayerJobUpgradesFeature JobUpgrades { get; init; }
+    public IPlayerDiscoveriesFeature Discoveries { get; init; }
+    public IPlayerJobStatisticsFeature JobStatistics { get; init; }
+    public IPlayerEventsFeature Events { get; init; }
+    public IPlayerSessionsFeature Sessions { get; init; }
+    public IPlayerAdminFeature Admin { get; init; }
+    public IPlayerGroupsFeature Groups { get; init; }
+    public IPlayerFractionsFeature Fractions { get; init; }
+    public IPlayerGuiFeature Gui { get; init; }
+    public IPlayerHudFeature Hud { get; init; }
+    public IPlayerInventoryFeature Inventory { get; init; }
+    public IScopedElementFactory ElementFactory { get; init; }
     public RealmPlayer(IServiceProvider serviceProvider)
     {
         _serviceScope = serviceProvider.CreateScope();
@@ -189,8 +189,8 @@ public class RealmPlayer : Player, IDisposable, IPersistentElement
     }
 
     public T GetRequiredService<T>() where T : notnull => _serviceProvider.GetRequiredService<T>();
-
     public object GetRequiredService(Type type) => _serviceProvider.GetRequiredService(type);
+
     private void UpdateFight()
     {
         var canFight = !_enableFightFlags.IsEmpty;

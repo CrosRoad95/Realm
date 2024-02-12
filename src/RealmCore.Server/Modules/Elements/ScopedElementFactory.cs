@@ -103,7 +103,12 @@ internal class ScopedElementFactory : IScopedElementFactory
         }
     }
 
-    private void AssociateWithPlayer(Element element)
+    public void AssociateWithServer(Element element)
+    {
+        throw new NotSupportedException();
+    }
+
+    public void AssociateWithPlayer(Element element)
     {
         Add(element);
         element.AssociateWith(_player);

@@ -1,6 +1,6 @@
 ﻿namespace RealmCore.Server.Modules.Elements;
 
-internal sealed class ElementFactory : IElementFactory
+public class ElementFactory : IElementFactory
 {
     private readonly MtaServer _mtaServer;
     private readonly IServiceProvider _serviceProvider;
@@ -23,7 +23,7 @@ internal sealed class ElementFactory : IElementFactory
         ElementCreated?.Invoke(element);
     }
 
-    private void AssociateWithServer(Element element)
+    public void AssociateWithServer(Element element)
     {
         element.AssociateWith(_mtaServer);
         if (element is Pickup pickup)

@@ -5,5 +5,6 @@ public interface IScopedElementFactory : IElementFactory, IDisposable
     IEnumerable<Element> CreatedElements { get; }
     internal IEnumerable<ICollisionDetection> CreatedCollisionDetectionElements { get; }
 
+    void AssociateWithPlayer(Element element);
     IScopedElementFactory CreateScope();
 }
