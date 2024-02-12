@@ -47,9 +47,4 @@ internal sealed class InventoryLogic : PlayerLogic
             _logger.LogHandleError(ex);
         }
     }
-
-    protected override void PlayerLeft(RealmPlayer player)
-    {
-
-    }
 }
