@@ -1,7 +1,4 @@
-﻿using RealmCore.Resources.Admin.Enums;
-using RealmCore.Server.Modules.Players.Persistence;
-
-namespace RealmCore.Server.Modules.Players.Administration;
+﻿namespace RealmCore.Server.Modules.Players.Administration;
 
 public interface IPlayerAdminFeature : IPlayerFeature
 {

@@ -60,9 +60,12 @@ internal sealed class VehiclesService : IVehiclesService
         try
         {
             var vehicle = (RealmVehicle)element;
-            var id = vehicle.Persistence.Id;
-            _activeVehicles.TrySetInactive(id);
-            await _vehicleRepository.SetSpawned(id, false);
+            if (vehicle.Persistence.IsLoaded)
+            {
+                var id = vehicle.Persistence.Id;
+                await _vehicleRepository.SetSpawned(id, false);
+                _activeVehicles.TrySetInactive(id);
+            }
         }
         catch (Exception ex)
         {

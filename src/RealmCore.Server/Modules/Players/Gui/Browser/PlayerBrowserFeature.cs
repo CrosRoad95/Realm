@@ -1,6 +1,4 @@
-﻿using Microsoft.AspNetCore.WebUtilities;
-
-namespace RealmCore.Server.Modules.Players.Gui.Browser;
+﻿namespace RealmCore.Server.Modules.Players.Gui.Browser;
 
 public interface IPlayerBrowserFeature : IPlayerFeature
 {

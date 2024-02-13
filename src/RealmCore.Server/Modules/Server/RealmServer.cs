@@ -1,26 +1,20 @@
 ﻿global using ILogger = Microsoft.Extensions.Logging.ILogger;
-using SlipeServer.Net.Wrappers;
 
 [assembly: InternalsVisibleTo("RealmCore.Tests")]
 [assembly: InternalsVisibleTo("DynamicProxyGenAssembly2")]
 
 namespace RealmCore.Server.Modules.Server;
 
-public class MtaDiPlayerServerTempFix<TPlayer> : MtaServer<TPlayer> where TPlayer : Player
+public class RealmServer<TRealmPlayer> : MtaServer<TRealmPlayer> where TRealmPlayer: RealmPlayer
 {
-    public MtaDiPlayerServerTempFix(Action<ServerBuilder> builderAction) : base(builderAction) { }
+    public event Action? ServerStarted;
 
     protected override IClient CreateClient(uint binaryAddress, INetWrapper netWrapper)
     {
-        var player = Instantiate<TPlayer>();
-        player.Client = new Client<TPlayer>(binaryAddress, netWrapper, player);
+        var player = Instantiate<TRealmPlayer>();
+        player.Client = new Client<TRealmPlayer>(binaryAddress, netWrapper, player);
         return player.Client;
     }
-}
-
-public class RealmServer<TRealmPlayer> : MtaDiPlayerServerTempFix<TRealmPlayer> where TRealmPlayer: RealmPlayer
-{
-    public event Action? ServerStarted;
 
     public RealmServer(IRealmConfigurationProvider realmConfigurationProvider, Action<ServerBuilder>? configureServerBuilder = null) : base(serverBuilder =>
     {

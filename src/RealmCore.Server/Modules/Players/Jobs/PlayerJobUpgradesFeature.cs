@@ -1,6 +1,4 @@
-﻿using RealmCore.Server.Modules.Players.Persistence;
-
-namespace RealmCore.Server.Modules.Players.Jobs;
+﻿namespace RealmCore.Server.Modules.Players.Jobs;
 
 public interface IPlayerJobUpgradesFeature : IPlayerFeature, IEnumerable<JobUpgradeDto>
 {
