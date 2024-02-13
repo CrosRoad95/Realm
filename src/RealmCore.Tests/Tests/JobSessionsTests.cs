@@ -6,7 +6,7 @@ public class JobSessionsTests
 {
     internal class TestJobSession : JobSession
     {
-        public TestJobSession(IScopedElementFactory scopedElementFactory, PlayerContext playerContext, IUpdateService updateService) : base(scopedElementFactory, playerContext, updateService)
+        public TestJobSession(IScopedElementFactory scopedElementFactory, PlayerContext playerContext, IPeriodicEventDispatcher updateService) : base(scopedElementFactory, playerContext, updateService)
         {
         }
 

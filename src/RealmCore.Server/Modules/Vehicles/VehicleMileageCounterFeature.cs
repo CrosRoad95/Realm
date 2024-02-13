@@ -13,7 +13,7 @@ internal sealed class VehicleMileageCounterFeature : IVehicleMileageCounterFeatu
     private Vector3 _lastPosition;
     private float _mileage;
     private float _minimumDistanceThreshold = 2.0f;
-    private readonly IUpdateService _updateService;
+    private readonly IPeriodicEventDispatcher _updateService;
 
     public event Action<IVehicleMileageCounterFeature, float, float>? Traveled;
 
@@ -45,12 +45,12 @@ internal sealed class VehicleMileageCounterFeature : IVehicleMileageCounterFeatu
 
     public RealmVehicle Vehicle { get; init; }
 
-    public VehicleMileageCounterFeature(VehicleContext vehicleContext, IVehiclePersistenceFeature persistance, IUpdateService updateService)
+    public VehicleMileageCounterFeature(VehicleContext vehicleContext, IVehiclePersistenceFeature persistance, IPeriodicEventDispatcher updateService)
     {
         _updateService = updateService;
         Vehicle = vehicleContext.Vehicle;
         persistance.Loaded += HandleLoaded;
-        _updateService.RareUpdate += HandleRareUpdate;
+        _updateService.EveryMinute += HandleRareUpdate;
     }
 
     private void HandleLoaded(IVehiclePersistenceFeature persistance, RealmVehicle vehicle)
@@ -82,6 +82,6 @@ internal sealed class VehicleMileageCounterFeature : IVehicleMileageCounterFeatu
 
     public void Dispose()
     {
-        _updateService.RareUpdate -= HandleRareUpdate;
+        _updateService.EveryMinute -= HandleRareUpdate;
     }
 }

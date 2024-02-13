@@ -7,7 +7,7 @@ public abstract class JobSession : Session
     private readonly object _objectivesLock = new();
     private readonly List<Objective> _objectives = [];
     protected readonly IScopedElementFactory _elementFactory;
-    private readonly IUpdateService _updateService;
+    private readonly IPeriodicEventDispatcher _updateService;
     private int _completedObjectives = 0;
     private bool _disposing = false;
 
@@ -17,7 +17,7 @@ public abstract class JobSession : Session
     public event Action<JobSession, Objective>? ObjectiveAdded;
     public event Action<JobSession, Objective>? ObjectiveCompleted;
     public event Action<JobSession, Objective>? ObjectiveInCompleted;
-    public JobSession(IScopedElementFactory scopedElementFactory, PlayerContext playerContext, IUpdateService updateService) : base(playerContext.Player)
+    public JobSession(IScopedElementFactory scopedElementFactory, PlayerContext playerContext, IPeriodicEventDispatcher updateService) : base(playerContext.Player)
     {
         _elementFactory = scopedElementFactory.CreateScope();
         _updateService = updateService;
@@ -25,12 +25,12 @@ public abstract class JobSession : Session
 
     protected override void OnStarted()
     {
-        _updateService.Update += HandleUpdate;
+        _updateService.EverySecond += HandleUpdate;
     }
 
     protected override void OnEnded()
     {
-        _updateService.Update -= HandleUpdate;
+        _updateService.EverySecond -= HandleUpdate;
         _disposing = true;
 
         _elementFactory?.Dispose();

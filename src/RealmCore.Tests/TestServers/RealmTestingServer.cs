@@ -110,9 +110,9 @@ internal class RealmTestingServer : TestingServer<RealmTestingPlayer>
 
     public void ForceUpdate()
     {
-        var updateService = GetRequiredService<IUpdateService>();
-        updateService.InvokeUpdate();
-        updateService.InvokeRareUpdate();
+        var updateService = GetRequiredService<IPeriodicEventDispatcher>();
+        updateService.DispatchEverySecond();
+        updateService.DispatchEveryMinute();
     }
 
     public RealmPlayer CreatePlayer(bool withSerialAndIp = true, string name = "CrosRoad95")

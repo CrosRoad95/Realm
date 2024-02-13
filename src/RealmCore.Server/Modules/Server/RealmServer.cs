@@ -41,6 +41,7 @@ public class RealmServer<TRealmPlayer> : MtaServer<TRealmPlayer> where TRealmPla
             logger.LogError(ex, "Failed to start server.");
         }
     }
+
     public async Task StartCore(CancellationToken cancellationToken = default)
     {
         var logger = GetRequiredService<ILogger<RealmServer>>();

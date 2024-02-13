@@ -19,7 +19,7 @@ internal sealed class PlayerPlayTimeFeature : IPlayerPlayTimeFeature, IDisposabl
     private ulong _totalPlayTime = 0;
     private readonly IPlayerUserFeature _playerUserFeature;
     private readonly IDateTimeProvider _dateTimeProvider;
-    private readonly IUpdateService _updateService;
+    private readonly IPeriodicEventDispatcher _updateService;
     private int _lastMinute = 0;
     private int _lastMinuteTotal = -1;
 
@@ -30,7 +30,7 @@ internal sealed class PlayerPlayTimeFeature : IPlayerPlayTimeFeature, IDisposabl
     public TimeSpan TotalPlayTime => PlayTime + TimeSpan.FromSeconds(_totalPlayTime);
 
     public RealmPlayer Player { get; init; }
-    public PlayerPlayTimeFeature(PlayerContext playerContext, IPlayerUserFeature playerUserFeature, IDateTimeProvider dateTimeProvider, IUpdateService updateService)
+    public PlayerPlayTimeFeature(PlayerContext playerContext, IPlayerUserFeature playerUserFeature, IDateTimeProvider dateTimeProvider, IPeriodicEventDispatcher updateService)
     {
         Player = playerContext.Player;
         _playerUserFeature = playerUserFeature;
@@ -39,7 +39,7 @@ internal sealed class PlayerPlayTimeFeature : IPlayerPlayTimeFeature, IDisposabl
         _startDateTime = _dateTimeProvider.Now;
         _playerUserFeature.SignedIn += HandleSignedIn;
         _playerUserFeature.SignedOut += HandleSignedOut;
-        _updateService.RareUpdate += HandleRareUpdate;
+        _updateService.EveryMinute += HandleRareUpdate;
     }
 
     private void HandleSignedIn(IPlayerUserFeature playerUserFeature, RealmPlayer _)
@@ -86,6 +86,6 @@ internal sealed class PlayerPlayTimeFeature : IPlayerPlayTimeFeature, IDisposabl
     {
         _playerUserFeature.SignedIn -= HandleSignedIn;
         _playerUserFeature.SignedOut -= HandleSignedOut;
-        _updateService.RareUpdate -= HandleRareUpdate;
+        _updateService.EveryMinute -= HandleRareUpdate;
     }
 }

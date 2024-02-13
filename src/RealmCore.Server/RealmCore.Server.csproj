@@ -19,6 +19,7 @@
 
 	<ItemGroup>
 		<PackageReference Include="BCrypt.Net-Next" Version="4.0.3" />
+		<PackageReference Include="Coravel" Version="5.0.2" />
 		<PackageReference Include="FluentValidation" Version="11.2.2" />
 		<PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="8.0.0" />
 		<PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="7.0.0" />
@@ -77,6 +78,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<Using Include="Coravel.Scheduling.Schedule.Interfaces" />
 		<Using Include="Microsoft.AspNetCore.WebUtilities" />
 		<Using Include="System" />
 		<Using Include="System.Collections.Generic" />

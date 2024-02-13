@@ -1,4 +1,6 @@
-﻿using RealmCore.Server.Modules.Players.Groups;
+﻿using Coravel;
+using Microsoft.Extensions.DependencyInjection;
+using RealmCore.Server.Modules.Players.Groups;
 
 namespace RealmCore.Server.Extensions;
 
@@ -86,7 +88,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IScopedMapsService, ScopedMapService>();
         services.AddSingleton<IBrowserGuiService, BrowserGuiService>();
         services.AddSingleton<IMapsService, MapsService>();
-        services.AddSingleton<IUpdateService, UpdateService>();
+        services.AddSingleton<IPeriodicEventDispatcher, PeriodicEventDispatcher>();
         services.AddSingleton<IPlayerEventManager, PlayerEventManager>();
         #endregion
 
@@ -135,6 +137,7 @@ public static class ServiceCollectionExtensions
         #endregion
 
         services.AddKeyedScoped<IElementFactory, ElementFactory>("ElementFactory");
+        services.AddScoped<IElementFactory>(x => x.GetRequiredKeyedService<IElementFactory>("ElementFactory"));
         services.AddScoped<IScopedElementFactory, ScopedElementFactory>();
         services.AddSingleton<IElementIdGenerator, RangedCollectionBasedElementIdGenerator>(x =>
             new RangedCollectionBasedElementIdGenerator(x.GetRequiredService<IElementCollection>(), IdGeneratorConstants.PlayerIdStart, IdGeneratorConstants.PlayerIdStop)
@@ -148,7 +151,10 @@ public static class ServiceCollectionExtensions
 #endif
         services.AddSingleton<IServerFilesProvider>(serverFilesProvider);
 
+        #region 3-rd party
+        services.AddScheduler(); // Coravel
+        #endregion
+
         return services;
     }
-
 }
