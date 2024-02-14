@@ -9,7 +9,7 @@ public class PlayerStatisticsServiceTests : RealmUnitTestingBase
         var player = CreatePlayer();
         var statistics = player.Statistics;
 
-        using var statisticsCounterComponentMonitor = statistics.Monitor();
+        using var statisticsCounterMonitor = statistics.Monitor();
 
         statistics.StatsIds.Should().BeEmpty();
 
@@ -20,7 +20,7 @@ public class PlayerStatisticsServiceTests : RealmUnitTestingBase
         statistics.Get(1).Should().Be(20);
         statistics.Get(2).Should().Be(10);
         statistics.StatsIds.Order().Should().BeEquivalentTo(new[] { 1, 2 });
-        statisticsCounterComponentMonitor.GetOccurredEvents().Should().BeEquivalentTo(new List<string> { "Increased", "Increased", "Increased" });
+        statisticsCounterMonitor.GetOccurredEvents().Should().BeEquivalentTo(new List<string> { "Increased", "Increased", "Increased" });
     }
 
     [Fact]
@@ -33,7 +33,7 @@ public class PlayerStatisticsServiceTests : RealmUnitTestingBase
         statistics.Set(2, 10);
         statistics.Set(3, 20);
 
-        using var statisticsCounterComponentMonitor = statistics.Monitor();
+        using var statisticsCounterMonitor = statistics.Monitor();
 
         statistics.StatsIds.Should().BeEquivalentTo(new int[] { 1, 2, 3 });
 
@@ -48,6 +48,6 @@ public class PlayerStatisticsServiceTests : RealmUnitTestingBase
             [2] = 5,
             [3] = 15,
         });
-        statisticsCounterComponentMonitor.GetOccurredEvents().Should().BeEquivalentTo(new List<string> { "Decreased", "Decreased", "Increased" });
+        statisticsCounterMonitor.GetOccurredEvents().Should().BeEquivalentTo(new List<string> { "Decreased", "Decreased", "Increased" });
     }
 }

@@ -43,7 +43,6 @@
 		<ProjectReference Include="..\RealmCore.Resources.StatisticsCounter\RealmCore.Resources.StatisticsCounter.csproj" />
 		<ProjectReference Include="..\RealmCore.Resources.ElementOutline\RealmCore.Resources.ElementOutline.csproj" />
 		<ProjectReference Include="..\RealmCore.Logging\RealmCore.Logging.csproj" />
-		<ProjectReference Include="..\RealmCore.SQLite\RealmCore.SQLite.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -158,7 +157,6 @@
 		<Using Include="RealmCore.Server.Modules.World" />
 		<Using Include="RealmCore.Server.Modules.World.Triggers.CollisionShapes" />
 		<Using Include="RealmCore.Server.Modules.World.Triggers.Pickups" />
-		<Using Include="RealmCore.SQLite" />
 		<Using Include="RealmCore.Resources.ClientInterface" />
 		<Using Include="RealmCore.Resources.Admin" />
 		<Using Include="RealmCore.Resources.AFK" />

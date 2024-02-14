@@ -15,7 +15,7 @@ public class VehicleAccessTests : RealmUnitTestingBase
     }
 
     [Fact]
-    public void VehicleExclusiveAccessComponentShouldWork()
+    public void VehicleExclusiveAccessControllerShouldWork()
     {
         var realmTestingServer = CreateServer();
         var player1 = CreatePlayer();
@@ -32,7 +32,7 @@ public class VehicleAccessTests : RealmUnitTestingBase
     }
 
     [Fact]
-    public void VehicleNoAccessComponentShouldWork()
+    public void VehicleNoAccessControllerShouldWork()
     {
         var realmTestingServer = CreateServer();
         var player = CreatePlayer();
@@ -46,7 +46,7 @@ public class VehicleAccessTests : RealmUnitTestingBase
     }
 
     [Fact]
-    public void DefaultAccessComponentShouldWork()
+    public void DefaultAccessControllerShouldWork()
     {
         var realmTestingServer = CreateServer();
         var player = CreatePlayer();

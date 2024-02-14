@@ -43,7 +43,7 @@ public class PlayersTests : RealmUnitTestingBase
     }
 
     [Fact]
-    public void AttachedElementComponentShouldBeRemovedIfElementGetsDestroyed()
+    public void AttachedElementShouldBeRemovedIfElementGetsDestroyed()
     {
         #region Arrange
         var realmTestingServer = CreateServer();
@@ -62,7 +62,7 @@ public class PlayersTests : RealmUnitTestingBase
     }
 
     [Fact]
-    public void OwnerComponentTestsShouldWork()
+    public void ElementOwnerShouldWorkTests()
     {
         var realmTestingServer = CreateServer();
         var player = CreatePlayer();
