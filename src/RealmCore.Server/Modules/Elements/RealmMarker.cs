@@ -29,7 +29,7 @@ public class RealmMarker : Marker, ICollisionDetection, IElementName
         CollisionDetection.RelayEntered(enteredElement);
     }
 
-    public void CheckElementWithin(Element element)
+    public void CheckElementWithin(Element element, bool matchInterior = true, bool matchDimension = true)
     {
         CollisionShape.CheckElementWithin(element);
     }

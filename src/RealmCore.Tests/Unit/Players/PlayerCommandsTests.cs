@@ -1,7 +1,31 @@
-﻿namespace RealmCore.Tests.Tests.Services;
+﻿namespace RealmCore.Tests.Unit.Players;
 
-public class RealmCommandServiceTests
+public class PlayerCommandsTests : RealmUnitTestingBase
 {
+    [InlineData("foo", "FOO", true)]
+    [InlineData("foo", "foo", true)]
+    [InlineData("foo", "bar", false)]
+    [Theory]
+    public void YouCanNotCreateTwoSameCommands(string command1, string command2, bool shouldThrow)
+    {
+        var realmTestingServer = CreateServer();
+        var _sut = realmTestingServer.GetRequiredService<RealmCommandService>();
+
+        var act = () =>
+        {
+            _sut.AddCommandHandler(command1, (e, args) => { });
+            _sut.AddCommandHandler(command2, (e, args) => { });
+        };
+
+        if (shouldThrow)
+        {
+            act.Should().Throw<Exception>().WithMessage($"Command with name '{command2}' already exists");
+        }
+        else
+        {
+            act.Should().NotThrow();
+        }
+    }
 
     [InlineData("foo", "FOO", true)]
     [InlineData("foo", "foo", true)]
@@ -9,8 +33,7 @@ public class RealmCommandServiceTests
     [Theory]
     public void YouCanNotCreateTwoSameCommandsMixedAsyncAndNotAsync(string command1, string command2, bool shouldThrow)
     {
-        var realmTestingServer = new RealmTestingServer();
-        var player = realmTestingServer.CreatePlayer();
+        var realmTestingServer = CreateServer();
         var _sut = realmTestingServer.GetRequiredService<RealmCommandService>();
 
         var act = () =>
@@ -35,8 +58,7 @@ public class RealmCommandServiceTests
     [Theory]
     public void YouCanNotCreateTwoSameAsyncCommands(string command1, string command2, bool shouldThrow)
     {
-        var realmTestingServer = new RealmTestingServer();
-        var player = realmTestingServer.CreatePlayer();
+        var realmTestingServer = CreateServer();
         var _sut = realmTestingServer.GetRequiredService<RealmCommandService>();
 
         var act = () =>
@@ -58,12 +80,11 @@ public class RealmCommandServiceTests
     [InlineData(true)]
     [InlineData(false)]
     [Theory]
-    public async Task AddCommandHandlerShouldWork(bool useAsyncHandler)
+    public void AddCommandHandlerShouldWork(bool useAsyncHandler)
     {
-        var realmTestingServer = new RealmTestingServer();
+        var realmTestingServer = CreateServer();
         var sut = realmTestingServer.GetRequiredService<RealmCommandService>();
-        var player = realmTestingServer.CreatePlayer();
-        await realmTestingServer.SignInPlayer(player);
+        var player = CreatePlayer();
 
         var waitTask = new TaskCompletionSource();
         bool wasExecuted = false;
@@ -89,12 +110,11 @@ public class RealmCommandServiceTests
     }
 
     [Fact]
-    public async Task RateLimitShouldWork()
+    public void RateLimitShouldWork()
     {
-        var realmTestingServer = new RealmTestingServer();
+        var realmTestingServer = CreateServer();
         var sut = realmTestingServer.GetRequiredService<RealmCommandService>();
-        var player = realmTestingServer.CreatePlayer();
-        await realmTestingServer.SignInPlayer(player);
+        var player = CreatePlayer();
 
         int executionCount = 0;
         sut.AddCommandHandler("foo", (e, args) => {
@@ -107,14 +127,14 @@ public class RealmCommandServiceTests
     }
 
     [Fact]
-    public async Task CommandArgumentsShouldWork1()
+    public void CommandArgumentsShouldWork1()
     {
-        var realmTestingServer = new RealmTestingServer();
+        var realmTestingServer = CreateServer();
         var sut = realmTestingServer.GetRequiredService<RealmCommandService>();
-        var player1 = realmTestingServer.CreatePlayer(name: "CrosRoad95");
-        var player2 = realmTestingServer.CreatePlayer(name: "Index00");
-        await realmTestingServer.SignInPlayer(player1);
-        await realmTestingServer.SignInPlayer(player2);
+        var player1 = CreatePlayer();
+        var player2 = CreatePlayer();
+        //await realmTestingServer.SignInPlayer(player1);
+        //await realmTestingServer.SignInPlayer(player2);
 
         bool commandExecutedSuccessfully = false;
         sut.AddCommandHandler("foo", (e, args) => {
@@ -124,18 +144,17 @@ public class RealmCommandServiceTests
             args.End();
             commandExecutedSuccessfully = true;
         });
-        player1.TriggerCommand("foo", ["bar", "2", "00"]);
+        player1.TriggerCommand("foo", ["bar", "2", "TestPlayer2"]);
 
         commandExecutedSuccessfully.Should().BeTrue();
     }
 
     [Fact]
-    public async Task CommandArgumentsShouldWork2()
+    public void CommandArgumentsShouldWork2()
     {
-        var realmTestingServer = new RealmTestingServer();
+        var realmTestingServer = CreateServer();
         var sut = realmTestingServer.GetRequiredService<RealmCommandService>();
-        var player = realmTestingServer.CreatePlayer(name: "CrosRoad95");
-        await realmTestingServer.SignInPlayer(player);
+        var player = CreatePlayer();
 
         bool tooManyArguments = false;
         sut.AddCommandHandler("foo", (e, args) => {

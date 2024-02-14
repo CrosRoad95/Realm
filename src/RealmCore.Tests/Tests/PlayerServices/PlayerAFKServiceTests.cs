@@ -5,7 +5,7 @@ public class PlayerAFKServiceTests
     [Fact]
     public async Task ServiceShouldWork()
     {
-        var realmTestingServer = new RealmTestingServer(new TestConfigurationProvider());
+        var realmTestingServer = new RealmTestingServer(new TestConfigurationProvider(""));
         var player = realmTestingServer.CreatePlayer();
         var afkService = player.AFK;
         var dateTimeProvider = realmTestingServer.TestDateTimeProvider;

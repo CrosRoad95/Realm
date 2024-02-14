@@ -182,27 +182,32 @@ public sealed class RealmCommandService
         _logger.LogInformation("{player} executed command {command} with arguments {commandArguments}.", player, command, arguments);
         try
         {
-            var commandThrottlingPolicy = player.GetRequiredService<ICommandThrottlingPolicy>();
             var commandArguments = new CommandArguments(arguments, player.ServiceProvider);
             if (commandInfo is SyncCommandInfo syncCommandInfo)
             {
                 if (player.User.HasClaim("commandsNoLimit"))
                     syncCommandInfo.Callback(player, commandArguments);
                 else
+                {
+                    var commandThrottlingPolicy = player.GetRequiredService<ICommandThrottlingPolicy>();
                     commandThrottlingPolicy.Execute(() =>
                     {
                         syncCommandInfo.Callback(player, commandArguments);
                     });
+                }
             }
             else if (commandInfo is AsyncCommandInfo asyncCommandInfo)
             {
                 if (player.User.HasClaim("commandsNoLimit"))
                     await asyncCommandInfo.Callback(player, commandArguments, player.CancellationToken);
                 else
+                {
+                    var commandThrottlingPolicy = player.GetRequiredService<ICommandThrottlingPolicy>();
                     await commandThrottlingPolicy.ExecuteAsync(async (cancellationToken) =>
                     {
                         await asyncCommandInfo.Callback(player, commandArguments, cancellationToken);
                     }, player.CancellationToken);
+                }
             }
         }
         catch (RateLimitRejectedException ex)

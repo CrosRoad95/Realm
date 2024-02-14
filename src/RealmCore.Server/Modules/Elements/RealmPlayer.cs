@@ -1,6 +1,4 @@
-﻿using RealmCore.Server.Modules.Players.Groups;
-
-namespace RealmCore.Server.Modules.Elements;
+﻿namespace RealmCore.Server.Modules.Elements;
 
 public class RealmPlayer : Player, IDisposable, IPersistentElement
 {
@@ -148,6 +146,7 @@ public class RealmPlayer : Player, IDisposable, IPersistentElement
     public IPlayerGuiFeature Gui { get; init; }
     public IPlayerHudFeature Hud { get; init; }
     public IPlayerInventoryFeature Inventory { get; init; }
+    public IPlayerNotificationsFeature Notifications { get; init; }
     public IScopedElementFactory ElementFactory { get; init; }
     public RealmPlayer(IServiceProvider serviceProvider)
     {
@@ -180,6 +179,7 @@ public class RealmPlayer : Player, IDisposable, IPersistentElement
         Gui = GetRequiredService<IPlayerGuiFeature>();
         Hud = GetRequiredService<IPlayerHudFeature>();
         Inventory = GetRequiredService<IPlayerInventoryFeature>();
+        Notifications = GetRequiredService<IPlayerNotificationsFeature>();
         ElementFactory = GetRequiredService<IScopedElementFactory>();
         #endregion
 

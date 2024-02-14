@@ -1,9 +1,9 @@
 ﻿namespace RealmCore.Tests;
 
-internal class TestConfigurationProvider : IRealmConfigurationProvider
+public class TestConfigurationProvider : IRealmConfigurationProvider
 {
     private readonly IConfiguration _configuration;
-    public TestConfigurationProvider(int? basePort = null, bool useSqlLite = false)
+    public TestConfigurationProvider(string connectionString, int? basePort = null)
     {
         _configuration = new ConfigurationBuilder()
             .AddInMemoryCollection(new Dictionary<string, string?>
@@ -24,8 +24,7 @@ internal class TestConfigurationProvider : IRealmConfigurationProvider
                 ["Gameplay:MoneyPrecision"] = "4",
                 ["Gameplay:DefaultInventorySize"] = "20",
                 ["Gameplay:AfkCooldown"] = "20",
-                ["Database:Provider"] = useSqlLite ? "SqlLite" : "InMemory",
-                ["Database:SqlLiteFileName"] = Guid.NewGuid().ToString(),
+                ["Database:ConnectionString"] = connectionString
             }).Build();
     }
 

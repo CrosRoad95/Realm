@@ -1,6 +1,4 @@
 ﻿using Coravel;
-using Microsoft.Extensions.DependencyInjection;
-using RealmCore.Server.Modules.Players.Groups;
 
 namespace RealmCore.Server.Extensions;
 
@@ -82,7 +80,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IRewardService, RewardService>();
         services.AddScoped<IFeedbackService, FeedbackService>();
         services.AddScoped<ISpawnMarkersService, SpawnMarkersService>();
-        services.AddScoped<IPlayerNotificationsService, PlayerNotificationsService>();
+        services.AddScoped<IPlayersNotifications, PlayersNotifications>();
         services.AddScoped<INewsService, NewsService>();
         services.AddScoped<IPlayerMoneyHistoryService, PlayerMoneyHistoryService>();
         services.AddScoped<IScopedMapsService, ScopedMapService>();
@@ -117,6 +115,7 @@ public static class ServiceCollectionExtensions
         services.AddPlayerScopedService<IPlayerGuiFeature, PlayerGuiFeature>();
         services.AddPlayerScopedService<IPlayerHudFeature, PlayerHudFeature>();
         services.AddPlayerScopedService<IPlayerInventoryFeature, PlayerInventoryFeature>();
+        services.AddPlayerScopedService<IPlayerNotificationsFeature, PlayerNotificationsFeature>();
         #endregion
 
         #region Vehicle services

@@ -49,11 +49,10 @@ internal class TestResourceProvider : IResourceProvider
     }
 }
 
-internal class RealmTestingServer : TestingServer<RealmTestingPlayer>
+public class RealmTestingServer : TestingServer<RealmTestingPlayer>
 {
     public TestDateTimeProvider TestDateTimeProvider => (TestDateTimeProvider)GetRequiredService<IDateTimeProvider>();
     public TestDebounceFactory TestDebounceFactory => (TestDebounceFactory)GetRequiredService<IDebounceFactory>();
-    private static string _userName = $"userName{Guid.NewGuid()}";
 
     protected override IClient CreateClient(uint binaryAddress, INetWrapper netWrapper)
     {
@@ -62,7 +61,7 @@ internal class RealmTestingServer : TestingServer<RealmTestingPlayer>
         return player.Client;
     }
 
-    public RealmTestingServer(TestConfigurationProvider? testConfigurationProvider = null, Action<ServiceCollection>? configureServices = null) : base((testConfigurationProvider ?? new()).GetRequired<SlipeServer.Server.Configuration>("server"), (serverBuilder) =>
+    public RealmTestingServer(TestConfigurationProvider testConfigurationProvider = null, Action<ServiceCollection>? configureServices = null) : base((testConfigurationProvider ?? new("")).GetRequired<SlipeServer.Server.Configuration>("server"), (serverBuilder) =>
     {
         var resourceProvider = new Mock<IResourceProvider>(MockBehavior.Strict);
 
@@ -71,7 +70,7 @@ internal class RealmTestingServer : TestingServer<RealmTestingPlayer>
         //var saveServiceMock = new Mock<ISaveService>(MockBehavior.Strict);
         //saveServiceMock.Setup(x => x.SaveNewPlayerInventory(It.IsAny<InventoryComponent>(), It.IsAny<int>())).ReturnsAsync(1);
         var guiSystemServiceMock = new Mock<IGuiSystemService>(MockBehavior.Strict);
-        serverBuilder.ConfigureServer(testConfigurationProvider ?? new(), SlipeServer.Server.ServerBuilders.ServerBuilderDefaultBehaviours.None);
+        serverBuilder.ConfigureServer(testConfigurationProvider ?? new(""), SlipeServer.Server.ServerBuilders.ServerBuilderDefaultBehaviours.None);
         serverBuilder.AddBrowserResource();
         serverBuilder.ConfigureServices(services =>
         {
@@ -115,7 +114,7 @@ internal class RealmTestingServer : TestingServer<RealmTestingPlayer>
         updateService.DispatchEveryMinute();
     }
 
-    public RealmPlayer CreatePlayer(bool withSerialAndIp = true, string name = "CrosRoad95")
+    public RealmPlayer CreatePlayer(bool withSerialAndIp = true, string name = "FakePlayer")
     {
         var player = AddFakePlayer();
         player.Name = name;
@@ -148,18 +147,18 @@ internal class RealmTestingServer : TestingServer<RealmTestingPlayer>
         return GetRequiredService<IElementFactory>().CreateVehicle(404, Vector3.Zero, Vector3.Zero);
     }
 
-    public async Task SignInPlayer(RealmPlayer player)
+    public async Task<RealmPlayer> SignInPlayer(RealmPlayer player)
     {
         var userManager = GetRequiredService<UserManager<UserData>>();
         var user = await userManager.GetUserByUserName(player.Name);
 
-        if(user != null)
-        {
-            // Fix for in memory database
-            user.Settings = user.Settings.DistinctBy(x => x.SettingId).ToList();
-            user.Bans = user.Bans.DistinctBy(x => x.Id).ToList();
-            user.Upgrades = user.Upgrades.DistinctBy(x => x.UpgradeId).ToList();
-        }
+        //if(user != null)
+        //{
+        //    // Fix for in memory database
+        //    user.Settings = user.Settings.DistinctBy(x => x.SettingId).ToList();
+        //    user.Bans = user.Bans.DistinctBy(x => x.Id).ToList();
+        //    user.Upgrades = user.Upgrades.DistinctBy(x => x.UpgradeId).ToList();
+        //}
         if (user == null)
         {
             user = new UserData
@@ -172,5 +171,6 @@ internal class RealmTestingServer : TestingServer<RealmTestingPlayer>
         }
         var success = await player.GetRequiredService<IUsersService>().SignIn(player, user);
         success.Should().BeTrue();
+        return player;
     }
 }

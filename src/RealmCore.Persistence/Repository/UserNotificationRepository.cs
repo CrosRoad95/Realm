@@ -5,6 +5,7 @@ public interface IUserNotificationRepository
     Task<int> CountUnread(int userId, CancellationToken cancellationToken = default);
     Task<UserNotificationData> Create(int userId, DateTime now, string title, string content, string? excerpt = null, CancellationToken cancellationToken = default);
     Task<List<UserNotificationData>> Get(int userId, int limit = 10, CancellationToken cancellationToken = default);
+    Task<UserNotificationData?> GetById(int notificationId, CancellationToken cancellationToken = default);
     Task<bool> MarkAsRead(int id, DateTime now, CancellationToken cancellationToken = default);
 }
 
@@ -27,6 +28,16 @@ internal sealed class UserNotificationRepository : IUserNotificationRepository
             .Take(limit);
 
         return await query.ToListAsync(cancellationToken);
+    }
+    
+    public async Task<UserNotificationData?> GetById(int notificationId, CancellationToken cancellationToken = default)
+    {
+        var query = _db.UserNotifications
+            .TagWithSource(nameof(UserNotificationRepository))
+            .AsNoTracking()
+            .Where(x => x.Id == notificationId);
+
+        return await query.FirstOrDefaultAsync(cancellationToken);
     }
     
     public async Task<UserNotificationData> Create(int userId, DateTime now, string title, string content, string? excerpt = null, CancellationToken cancellationToken = default)

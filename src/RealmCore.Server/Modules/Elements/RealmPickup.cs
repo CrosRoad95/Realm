@@ -15,8 +15,8 @@ public class RealmPickup : Pickup, ICollisionDetection, IElementName
         CollisionShape = new CollisionSphere(position, 1.5f);
     }
 
-    public void CheckElementWithin(Element element)
+    public void CheckElementWithin(Element element, bool matchInterior = true, bool matchDimension = true)
     {
-        CollisionShape.CheckElementWithin(element);
+        CollisionShape.CheckElementWithin(element, matchInterior, matchDimension);
     }
 }

@@ -1,5 +1,4 @@
-﻿using RealmCore.Server.Modules.Players.Groups;
-using static RealmCore.Server.Modules.Seeder.SeedData;
+﻿using static RealmCore.Server.Modules.Seeder.SeedData;
 
 namespace RealmCore.Server.Modules.Seeder;
 

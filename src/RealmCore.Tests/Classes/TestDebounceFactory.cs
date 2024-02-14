@@ -1,6 +1,6 @@
 ﻿namespace RealmCore.Tests.Classes;
 
-internal class TestDebounce : IDebounce
+public class TestDebounce : IDebounce
 {
     private int _milliseconds;
     private SemaphoreSlim _semaphore = new(0);
@@ -80,7 +80,7 @@ internal class TestDebounce : IDebounce
     }
 }
 
-internal class TestDebounceFactory : IDebounceFactory
+public class TestDebounceFactory : IDebounceFactory
 {
     public TestDebounce LastDebounce { get; private set; }
     public IDebounce Create(int milliseconds)

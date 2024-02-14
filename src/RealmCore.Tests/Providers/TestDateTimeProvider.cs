@@ -1,6 +1,6 @@
 ﻿namespace RealmCore.Tests.Providers;
 
-internal class TestDateTimeProvider : IDateTimeProvider
+public class TestDateTimeProvider : IDateTimeProvider
 {
     private DateTime _now;
     public TestDateTimeProvider(DateTime? now = null)

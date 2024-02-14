@@ -20,7 +20,7 @@ public static class ServerBuilderExtensions
 #if DEBUG
             serverBuilder.AddDefaults(exceptBehaviours: ServerBuilderDefaultBehaviours.MasterServerAnnouncementBehaviour | exceptBehaviours);
 #else
-                        serverBuilder.AddDefaults(exceptBehaviours: exceptBehaviours);
+            serverBuilder.AddDefaults(exceptBehaviours: exceptBehaviours);
 #endif
         }
 
@@ -33,27 +33,11 @@ public static class ServerBuilderExtensions
             services.Configure<GuiBrowserOptions>(realmConfigurationProvider.GetSection("GuiBrowser"));
             services.Configure<BrowserOptions>(realmConfigurationProvider.GetSection("Browser"));
 
-            var databaseProvider = realmConfigurationProvider.Get<string>("Database:Provider");
-            switch (databaseProvider)
+            var connectionString = realmConfigurationProvider.Get<string>("Database:ConnectionString");
+            if (!string.IsNullOrEmpty(connectionString))
             {
-                case "MySql":
-                    var connectionString = realmConfigurationProvider.Get<string>("Database:ConnectionString");
-                    if (string.IsNullOrEmpty(connectionString))
-                        throw new Exception("Connection string not found or empty.");
-                    services.AddPersistence<MySqlDb>(db => db.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString)));
-                    services.AddRealmIdentity<MySqlDb>(realmConfigurationProvider.GetRequired<IdentityConfiguration>("Identity"));
-                    break;
-                case "SqlLite":
-                    var sqlLiteFileName = realmConfigurationProvider.Get<string>("Database:SqlLiteFileName");
-                    services.AddPersistence<SQLiteDb>(db => db.UseSqlite($"Filename=./{sqlLiteFileName ?? "server"}.db"));
-                    services.AddRealmIdentity<SQLiteDb>(realmConfigurationProvider.GetRequired<IdentityConfiguration>("Identity"));
-                    break;
-                case "InMemory":
-                    services.AddPersistence<SQLiteDb>(db => db.UseInMemoryDatabase("inMemoryDatabase"));
-                    services.AddRealmIdentity<SQLiteDb>(realmConfigurationProvider.GetRequired<IdentityConfiguration>("Identity"));
-                    break;
-                default:
-                    throw new NotImplementedException($"Database provider '{databaseProvider}' is not supported. use 'MySql' or 'SqlLite' or 'InMemory'.");
+                services.AddPersistence<MySqlDb>(db => db.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString)));
+                services.AddRealmIdentity<MySqlDb>(realmConfigurationProvider.GetRequired<IdentityConfiguration>("Identity"));
             }
 
             services.AddSingleton<HelpCommand>();

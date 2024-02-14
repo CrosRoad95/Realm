@@ -24,7 +24,7 @@ internal sealed class UsersService : IUsersService
     private readonly ILogger<UsersService> _logger;
     private readonly IOptionsMonitor<GameplayOptions> _gameplayOptions;
     private readonly IDateTimeProvider _dateTimeProvider;
-    private readonly IAuthorizationService _authorizationService;
+    private readonly IAuthorizationService? _authorizationService;
     private readonly IUsersInUse _activeUsers;
     private readonly IElementCollection _elementCollection;
     private readonly ISaveService _saveService;
@@ -34,7 +34,7 @@ internal sealed class UsersService : IUsersService
     public event Action<RealmPlayer>? SignedOut;
 
     public UsersService(ItemsCollection itemsCollection, ILogger<UsersService> logger, IOptionsMonitor<GameplayOptions> gameplayOptions,
-        IDateTimeProvider dateTimeProvider, IAuthorizationService authorizationService, IUsersInUse activeUsers, IElementCollection elementCollection, ISaveService saveService, IServiceProvider serviceProvider)
+        IDateTimeProvider dateTimeProvider, IUsersInUse activeUsers, IElementCollection elementCollection, ISaveService saveService, IServiceProvider serviceProvider, IAuthorizationService? authorizationService = null)
     {
         _itemsCollection = itemsCollection;
         _logger = logger;
@@ -182,6 +182,9 @@ internal sealed class UsersService : IUsersService
 
     public async ValueTask<bool> AuthorizePolicy(RealmPlayer player, string policy)
     {
+        if (_authorizationService == null)
+            throw new NotSupportedException();
+
         var result = await _authorizationService.AuthorizeAsync(player.User.ClaimsPrincipal, policy);
         player.User.SetAuthorizedPolicyState(policy, result.Succeeded);
         return result.Succeeded;
