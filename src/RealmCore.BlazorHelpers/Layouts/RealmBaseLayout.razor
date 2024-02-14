@@ -1,6 +1,6 @@
 ﻿@using System.Security.Principal
 @inherits LayoutComponentBase
-@inject RealmServer _realmServer
+@inject MtaServer _mtaServer
 @inject NavigationManager _navigationManager
 @inject AuthenticationStateProvider _authenticationState
 @inject IRealmService<IBrowserGuiService> _realmBrowserService
@@ -64,7 +64,7 @@
     {
         var authenticationState = await _authenticationState.GetAuthenticationStateAsync();
 
-        var browserGuiService = _realmServer.GetRequiredService<IBrowserGuiService>();
+        var browserGuiService = _mtaServer.GetRequiredService<IBrowserGuiService>();
 
         if (HttpContext == null)
         {
