@@ -26,7 +26,14 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <Using Include="Microsoft.Extensions.Logging" />
+	  <Using Include="Microsoft.Extensions.Options" />
+	  <Using Include="SlipeServer.Server" />
+	  <Using Include="SlipeServer.Server.Elements" />
+	  <Using Include="SlipeServer.Server.Resources" />
 	  <Using Include="System.Runtime.CompilerServices" />
+	  <Using Include="System.Reflection" />
+	  <Using Include="SlipeServer.Resources.Base" />
 	</ItemGroup>
 
 </Project>

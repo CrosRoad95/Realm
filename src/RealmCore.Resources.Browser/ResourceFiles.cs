@@ -1,7 +1,4 @@
-﻿using SlipeServer.Resources.Base;
-using System.Reflection;
-
-namespace RealmCore.Resources.Browser;
+﻿namespace RealmCore.Resources.Browser;
 
 internal class ResourceFiles
 {

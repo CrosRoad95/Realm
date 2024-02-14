@@ -1,8 +1,4 @@
-﻿using SlipeServer.Packets.Definitions.Lua;
-using SlipeServer.Server.Events;
-using SlipeServer.Server.Mappers;
-
-namespace RealmCore.Resources.Base;
+﻿namespace RealmCore.Resources.Base;
 
 public static class LuaEventExtensions
 {

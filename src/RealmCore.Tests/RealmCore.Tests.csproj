@@ -131,6 +131,7 @@
 		<Using Include="RealmCore.Server.Modules.World.Xml.Map" />
 		<Using Include="RealmCore.Tests.Extensions" />
 		<Using Include="SlipeServer.Server.Elements.Enums" />
+		<Using Include="RealmCore.Server.Modules.Players.Groups" />
 	</ItemGroup>
 
 	<ItemGroup>

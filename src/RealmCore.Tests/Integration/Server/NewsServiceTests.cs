@@ -1,6 +1,4 @@
-﻿using Microsoft.Extensions.Options;
-
-namespace RealmCore.Tests.Integration.Server;
+﻿namespace RealmCore.Tests.Integration.Server;
 
 public class NewsServiceTests : RealmIntegrationTestingBase
 {

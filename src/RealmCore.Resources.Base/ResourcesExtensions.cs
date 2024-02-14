@@ -1,5 +1,4 @@
-﻿using SlipeServer.Server.Resources;
-using System.Reflection;
+﻿using System.Reflection;
 using System.Text;
 
 namespace RealmCore.Resources.Base;

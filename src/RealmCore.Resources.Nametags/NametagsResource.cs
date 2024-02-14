@@ -1,8 +1,4 @@
-﻿using SlipeServer.Server.Elements;
-using SlipeServer.Server;
-using SlipeServer.Server.Resources;
-
-namespace RealmCore.Resources.Nametags;
+﻿namespace RealmCore.Resources.Nametags;
 
 internal class NametagsResource : Resource
 {

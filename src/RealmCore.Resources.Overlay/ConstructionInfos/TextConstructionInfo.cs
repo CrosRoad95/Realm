@@ -1,5 +1,4 @@
 ﻿using RealmCore.Resources.Base.Extensions;
-using RealmCore.Resources.Overlay.Enums;
 using RealmCore.Resources.Overlay.Extensions;
 using SlipeServer.Packets.Definitions.Lua;
 using System.Reflection;

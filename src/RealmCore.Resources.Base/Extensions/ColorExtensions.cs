@@ -1,6 +1,4 @@
-﻿using System.Drawing;
-
-namespace RealmCore.Resources.Base.Extensions;
+﻿namespace RealmCore.Resources.Base.Extensions;
 
 public static class ColorExtensions
 {

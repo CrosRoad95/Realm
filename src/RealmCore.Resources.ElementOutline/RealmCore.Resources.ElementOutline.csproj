@@ -17,4 +17,11 @@
 		<ProjectReference Include="..\RealmCore.Resources.Base\RealmCore.Resources.Base.csproj" />
 	</ItemGroup>
 
+	<ItemGroup>
+	  <Using Include="Microsoft.Extensions.DependencyInjection" />
+	  <Using Include="RealmCore.Resources.Base" />
+	  <Using Include="SlipeServer.Server.ServerBuilders" />
+	  <Using Include="System.Runtime.CompilerServices" />
+	</ItemGroup>
+
 </Project>

@@ -1,6 +1,4 @@
-﻿using SlipeServer.Server.Resources;
-
-namespace RealmCore.Resources.Base;
+﻿namespace RealmCore.Resources.Base;
 
 public class CommonResourceOptions
 {

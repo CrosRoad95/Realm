@@ -1,6 +1,4 @@
-﻿using RealmCore.Server.Modules.Players.Groups;
-
-namespace RealmCore.Tests.Integration.Players;
+﻿namespace RealmCore.Tests.Integration.Players;
 
 public class GroupServiceTests : RealmIntegrationTestingBase
 {

@@ -1,6 +1,4 @@
-﻿using SlipeServer.Server.Elements;
-
-namespace RealmCore.Resources.Nametags;
+﻿namespace RealmCore.Resources.Nametags;
 
 public interface INametagsService
 {

@@ -1,10 +1,4 @@
-﻿using SlipeServer.Server.Elements;
-using SlipeServer.Server;
-using SlipeServer.Server.Resources;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
-
-namespace RealmCore.Resources.Browser;
+﻿namespace RealmCore.Resources.Browser;
 
 internal class BrowserResource : Resource
 {

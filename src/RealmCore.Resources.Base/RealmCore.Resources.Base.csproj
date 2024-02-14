@@ -18,4 +18,17 @@
 		<PackageReference Include="SlipeServer.Resources.Base" Version="0.1.0-CI-20240212-200207" />
 	</ItemGroup>
 
+	<ItemGroup>
+	  <Using Include="RealmCore.Resources.Base.Interfaces" />
+	  <Using Include="SlipeServer.Packets.Definitions.Lua" />
+	  <Using Include="SlipeServer.Server" />
+	  <Using Include="SlipeServer.Server.Elements" />
+	  <Using Include="SlipeServer.Server.Mappers" />
+	  <Using Include="SlipeServer.Server.Resources" />
+	  <Using Include="SlipeServer.Server.Services" />
+	  <Using Include="System.Linq.Expressions" />
+	  <Using Include="System.Drawing" />
+	  <Using Include="SlipeServer.Server.Events" />
+	</ItemGroup>
+
 </Project>

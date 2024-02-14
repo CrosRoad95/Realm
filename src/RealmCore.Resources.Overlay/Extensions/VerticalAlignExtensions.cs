@@ -1,6 +1,4 @@
-﻿using RealmCore.Resources.Overlay.Enums;
-
-namespace RealmCore.Resources.Overlay.Extensions;
+﻿namespace RealmCore.Resources.Overlay.Extensions;
 
 internal static class VerticalAlignExtensions
 {
