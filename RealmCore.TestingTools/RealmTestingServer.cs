@@ -2,51 +2,9 @@
 using SlipeServer.Server.Resources.Interpreters;
 using SlipeServer.Server.Resources;
 using SlipeServer.Net.Wrappers;
-using RealmCore.Tests.Classes;
+using RealmCore.TestingTools.Classes;
 
-namespace RealmCore.Tests;
-
-internal class TestResourceProvider : IResourceProvider
-{
-    public int Resources = 0;
-    public TestResourceProvider()
-    {
-    }
-
-    public void AddResourceInterpreter(IResourceInterpreter resourceInterpreter)
-    {
-        throw new NotImplementedException();
-    }
-
-    public byte[] GetFileContent(string resource, string file)
-    {
-        throw new NotImplementedException();
-    }
-
-    public IEnumerable<string> GetFilesForResource(string name)
-    {
-        throw new NotImplementedException();
-    }
-
-    public Resource GetResource(string name)
-    {
-        throw new NotImplementedException();
-    }
-
-    public IEnumerable<Resource> GetResources()
-    {
-        yield break;
-    }
-
-    public void Refresh()
-    {
-    }
-
-    public ushort ReserveNetId()
-    {
-        return 420;
-    }
-}
+namespace RealmCore.TestingTools;
 
 public class RealmTestingServer : TestingServer<RealmTestingPlayer>
 {
@@ -171,5 +129,47 @@ public class RealmTestingServer : TestingServer<RealmTestingPlayer>
         var success = await player.GetRequiredService<IUsersService>().SignIn(player, user);
         success.Should().BeTrue();
         return player;
+    }
+}
+
+internal class TestResourceProvider : IResourceProvider
+{
+    public int Resources = 0;
+    public TestResourceProvider()
+    {
+    }
+
+    public void AddResourceInterpreter(IResourceInterpreter resourceInterpreter)
+    {
+        throw new NotImplementedException();
+    }
+
+    public byte[] GetFileContent(string resource, string file)
+    {
+        throw new NotImplementedException();
+    }
+
+    public IEnumerable<string> GetFilesForResource(string name)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Resource GetResource(string name)
+    {
+        throw new NotImplementedException();
+    }
+
+    public IEnumerable<Resource> GetResources()
+    {
+        yield break;
+    }
+
+    public void Refresh()
+    {
+    }
+
+    public ushort ReserveNetId()
+    {
+        return 420;
     }
 }

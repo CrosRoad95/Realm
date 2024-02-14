@@ -15,7 +15,7 @@ public class RealmPlayer : Player, IDisposable, IPersistentElement
     private readonly object _currentInteractElementLock = new();
     private Element? _currentInteractElement;
     private string? _nametagText;
-    public virtual Vector2 ScreenSize { get; internal set; }
+    public virtual Vector2 ScreenSize { get; set; }
     private CultureInfo _culture = new CultureInfo("pl-PL");
     private readonly Dictionary<string, Func<RealmPlayer, KeyState, CancellationToken, Task>> _asyncBinds = [];
     private readonly Dictionary<string, Action<RealmPlayer, KeyState>> _binds = [];

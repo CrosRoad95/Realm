@@ -1,4 +1,4 @@
-﻿namespace RealmCore.Tests.Extensions;
+﻿namespace RealmCore.TestingTools.Extensions;
 
 internal static class MockExtensions
 {

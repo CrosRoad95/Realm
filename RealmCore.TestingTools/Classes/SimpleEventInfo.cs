@@ -1,6 +1,6 @@
-﻿namespace RealmCore.Tests.Classes;
+﻿namespace RealmCore.TestingTools.Classes;
 
-internal class SimpleEventInfo
+public class SimpleEventInfo
 {
     public DateTime TimestampUtc { get; set; }
     public string Name { get; set; }

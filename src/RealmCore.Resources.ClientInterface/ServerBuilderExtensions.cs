@@ -1,4 +1,5 @@
-﻿[assembly: InternalsVisibleTo("RealmCore.Tests")]
+﻿[assembly: InternalsVisibleTo("RealmCore.TestingTools")]
+[assembly: InternalsVisibleTo("RealmCore.Tests")]
 
 namespace RealmCore.Resources.ClientInterface;
 

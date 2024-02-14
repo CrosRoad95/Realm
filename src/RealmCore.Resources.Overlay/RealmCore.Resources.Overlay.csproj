@@ -27,8 +27,12 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<Using Include="RealmCore.Resources.Assets.Interfaces" />
+		<Using Include="RealmCore.Resources.Overlay.Builders.Interfaces" />
+		<Using Include="RealmCore.Resources.Overlay.Enums" />
 		<Using Include="System" />
 		<Using Include="System.Collections.Generic" />
+		<Using Include="System.Linq.Expressions" />
 		<Using Include="System.Numerics" />
 		<Using Include="System.Drawing" />
 		<Using Include="System.Runtime.CompilerServices" />

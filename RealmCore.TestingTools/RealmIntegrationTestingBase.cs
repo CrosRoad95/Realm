@@ -1,4 +1,4 @@
-﻿namespace RealmCore.Tests;
+﻿namespace RealmCore.TestingTools;
 
 public abstract class RealmIntegrationTestingBase : IAsyncLifetime
 {
@@ -18,7 +18,7 @@ public abstract class RealmIntegrationTestingBase : IAsyncLifetime
 
     protected async Task<RealmTestingServer> CreateServerAsync(Action<ServiceCollection>? configureServices = null)
     {
-        if(_server == null)
+        if (_server == null)
         {
             _server = new RealmTestingServer(new TestConfigurationProvider(_MySqlContainer.GetConnectionString()), configureServices);
             await _server.GetRequiredService<IDb>().MigrateAsync();

@@ -2,6 +2,7 @@
 using RealmCore.Resources.Assets.Interfaces;
 using SlipeServer.Server.ServerBuilders;
 
+[assembly: InternalsVisibleTo("RealmCore.TestingTools")]
 [assembly: InternalsVisibleTo("RealmCore.Tests")]
 [assembly: InternalsVisibleTo("DynamicProxyGenAssembly2")]
 

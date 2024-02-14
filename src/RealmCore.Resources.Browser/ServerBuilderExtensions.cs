@@ -2,6 +2,7 @@
 using RealmCore.Resources.Base;
 using SlipeServer.Server.ServerBuilders;
 
+[assembly: InternalsVisibleTo("RealmCore.TestingTools")]
 [assembly: InternalsVisibleTo("RealmCore.Tests")]
 
 namespace RealmCore.Resources.Browser;

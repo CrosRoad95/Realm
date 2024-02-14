@@ -1,4 +1,6 @@
-﻿namespace RealmCore.Tests.Classes;
+﻿using RealmCore.Resources.Assets.Interfaces;
+
+namespace RealmCore.TestingTools.Classes;
 
 internal class TestAssetEncryptionProvider : IAssetEncryptionProvider
 {

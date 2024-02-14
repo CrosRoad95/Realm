@@ -1,5 +1,6 @@
 ﻿global using ILogger = Microsoft.Extensions.Logging.ILogger;
 
+[assembly: InternalsVisibleTo("RealmCore.TestingTools")]
 [assembly: InternalsVisibleTo("RealmCore.Tests")]
 [assembly: InternalsVisibleTo("DynamicProxyGenAssembly2")]
 

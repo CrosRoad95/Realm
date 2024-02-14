@@ -1,4 +1,4 @@
-﻿namespace RealmCore.Tests;
+﻿namespace RealmCore.TestingTools;
 
 public class TestDateTimeProvider : IDateTimeProvider
 {

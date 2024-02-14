@@ -1,4 +1,4 @@
-﻿namespace RealmCore.Tests.Classes;
+﻿namespace RealmCore.TestingTools.Classes;
 
 public class TestDebounce : IDebounce
 {

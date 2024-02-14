@@ -4,28 +4,31 @@
 		<TargetFramework>net8.0</TargetFramework>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
-		<LangVersion>preview</LangVersion>
-		<IsPackable>false</IsPackable>
-		<Platforms>AnyCPU;x64</Platforms>
 	</PropertyGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\..\RealmCore.TestingTools\RealmCore.TestingTools.csproj" />
-		<ProjectReference Include="..\RealmCore.Console\RealmCore.Console.csproj" />
-		<ProjectReference Include="..\RealmCore.Module.Discord\RealmCore.Module.Discord.csproj" />
-		<ProjectReference Include="..\RealmCore.Server\RealmCore.Server.csproj" />
+		<PackageReference Include="Microsoft.Data.SqlClient" Version="5.1.5" />
+		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.1.0" />
+		<PackageReference Include="SlipeServer.Server.TestTools" Version="0.1.0-CI-20231101-170208" />
+		<PackageReference Include="Testcontainers" Version="3.7.0" />
+		<PackageReference Include="Testcontainers.MySql" Version="3.7.0" />
+		<PackageReference Include="xunit" Version="2.4.1" />
+		<PackageReference Include="xunit.runner.visualstudio" Version="2.4.3">
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+			<PrivateAssets>all</PrivateAssets>
+		</PackageReference>
+		<PackageReference Include="coverlet.collector" Version="3.1.2">
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+			<PrivateAssets>all</PrivateAssets>
+		</PackageReference>
 	</ItemGroup>
 
 	<ItemGroup>
-		<None Update="xunit.runner.json">
-			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
-		</None>
+	  <ProjectReference Include="..\src\RealmCore.Server\RealmCore.Server.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>
-		<Using Include="RealmCore.TestingTools" />
 		<Using Include="RealmCore.Server.Modules.Players.Notifications" />
-		<Using Include="RealmCore.Tests.Helpers" />
 		<Using Include="SlipeServer.Server.Enums" />
 		<Using Include="System" />
 		<Using Include="System.Collections.Generic" />
@@ -116,7 +119,5 @@
 		<Using Include="RealmCore.Server.Modules.World.Xml.Map" />
 		<Using Include="SlipeServer.Server.Elements.Enums" />
 		<Using Include="RealmCore.Server.Modules.Players.Groups" />
-		<Using Include="RealmCore.TestingTools.Extensions" />
 	</ItemGroup>
-
 </Project>

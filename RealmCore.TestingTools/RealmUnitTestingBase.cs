@@ -2,7 +2,7 @@
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 
-namespace RealmCore.Tests;
+namespace RealmCore.TestingTools;
 
 public abstract class RealmUnitTestingBase
 {

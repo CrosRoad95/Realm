@@ -1,9 +1,9 @@
 ﻿using FluentAssertions.Events;
-using RealmCore.Tests.Classes;
+using RealmCore.TestingTools.Classes;
 
-namespace RealmCore.Tests.Extensions;
+namespace RealmCore.TestingTools.Extensions;
 
-internal static class MonitorExtensions
+public static class MonitorExtensions
 {
     public static IEnumerable<SimpleEventInfo> GetEvents<T>(this IMonitor<T> monitor, string prefix)
     {
