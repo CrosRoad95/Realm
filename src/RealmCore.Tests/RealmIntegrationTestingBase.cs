@@ -16,23 +16,37 @@ public abstract class RealmIntegrationTestingBase : IAsyncLifetime
         }
     }
 
-    protected async Task<RealmTestingServer> CreateServerAsync()
+    protected async Task<RealmTestingServer> CreateServerAsync(Action<ServiceCollection>? configureServices = null)
     {
         if(_server == null)
         {
-            _server = new RealmTestingServer(new TestConfigurationProvider(_MySqlContainer.GetConnectionString()));
+            _server = new RealmTestingServer(new TestConfigurationProvider(_MySqlContainer.GetConnectionString()), configureServices);
             await _server.GetRequiredService<IDb>().MigrateAsync();
         }
         return _server;
     }
 
-    protected async Task<RealmPlayer> CreatePlayerAsync()
+    protected async Task<RealmPlayer> CreatePlayerAsync(bool signedIn = true)
     {
         if (_server == null)
             throw new Exception("Server not created.");
-        var player = await _server.SignInPlayer(_server.CreatePlayer());
-        player.PersistentId.Should().Be(1);
+        var player = _server.CreatePlayer();
+        if (signedIn)
+        {
+            await _server.SignInPlayer(player);
+            player.PersistentId.Should().NotBe(0);
+        }
         return player;
+    }
+
+    protected async Task<RealmVehicle> CreateVehicleAsync()
+    {
+        if (_server == null)
+            throw new Exception("Server not created.");
+        var vehiclesService = _server.GetRequiredService<IVehiclesService>();
+        var vehicle = await vehiclesService.CreatePersistantVehicle(404, Vector3.Zero, Vector3.Zero);
+        vehicle.PersistentId.Should().NotBe(0);
+        return vehicle;
     }
 
     public Task InitializeAsync() => _MySqlContainer.StartAsync();

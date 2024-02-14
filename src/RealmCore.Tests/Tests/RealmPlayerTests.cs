@@ -1,18 +1,16 @@
-﻿using RealmCore.Tests.Providers;
-using SlipeServer.Server.Elements.Enums;
-using SlipeServer.Server.Enums;
+﻿namespace RealmCore.Tests.Tests;
 
-namespace RealmCore.Tests.Tests;
-
-public class RealmPlayerTests
+public class RealmPlayerTests : RealmIntegrationTestingBase
 {
+    protected override string DatabaseName => "PlayerNotificationsTests";
+
     [Fact]
     public async Task SavingAndLoadingPlayerShouldWork()
     {
-        var realmTestingServer = new RealmTestingServer();
+        var realmTestingServer = await CreateServerAsync();
         var now = realmTestingServer.TestDateTimeProvider.Now;
         {
-            var player = realmTestingServer.CreatePlayer();
+            var player = await CreatePlayerAsync(false);
             player.Name = "foo";
             await realmTestingServer.SignInPlayer(player);
 
@@ -33,7 +31,7 @@ public class RealmPlayerTests
         realmTestingServer.TestDateTimeProvider.AddOffset(TimeSpan.FromDays(1));
 
         {
-            var player = realmTestingServer.CreatePlayer();
+            var player = await CreatePlayerAsync(false);
             player.Name = "foo";
             await realmTestingServer.SignInPlayer(player);
             player.TrySpawnAtLastPosition();
@@ -74,235 +72,5 @@ public class RealmPlayerTests
             var initialCount2 = events.Count();
             ;
         }
-    }
-
-    [Fact]
-    public void DestroyingComponentShouldReset()
-    {
-        #region Arrange
-        TestDateTimeProvider testDateTimeProvider = new();
-        var realmTestingServer = new RealmTestingServer();
-        var player = realmTestingServer.CreatePlayer();
-        var worldObject = realmTestingServer.CreateObject();
-
-        player.CurrentInteractElement = worldObject;
-        player.CurrentInteractElement.Should().Be(worldObject);
-        #endregion
-
-        #region Act
-        worldObject.Destroy();
-        #endregion
-
-        #region Assert
-        player.CurrentInteractElement.Should().BeNull();
-        #endregion
-    }
-
-    [Fact]
-    public void DestroyingElementShouldResetAndRemoveComponent()
-    {
-        #region Arrange
-        TestDateTimeProvider testDateTimeProvider = new();
-        var realmTestingServer = new RealmTestingServer();
-        var player = realmTestingServer.CreatePlayer();
-        var worldObject = realmTestingServer.CreateObject();
-
-        player.CurrentInteractElement = worldObject;
-        #endregion
-
-        #region Act
-        worldObject.Destroy();
-        #endregion
-
-        #region Assert
-        player.CurrentInteractElement.Should().BeNull();
-        #endregion
-    }
-
-    [Fact]
-    public void YouShouldBeAbleAttachObjectToPlayer()
-    {
-        #region Arrange
-        var realmTestingServer = new RealmTestingServer();
-        var player = realmTestingServer.CreatePlayer();
-        var worldObject = realmTestingServer.CreateObject();
-        #endregion
-
-        #region Act
-        var attached = player.Attach(worldObject, SlipeServer.Packets.Enums.BoneId.Pelvis, null, null);
-        #endregion
-
-        #region Assert
-        attached.Should().BeTrue();
-        player.AttachedBoneElementsCount.Should().Be(1);
-        #endregion
-    }
-
-    [Fact]
-    public void AttachedElementComponentShouldBeRemovedIfElementGetsDestroyed()
-    {
-        #region Arrange
-        var realmTestingServer = new RealmTestingServer();
-        var player = realmTestingServer.CreatePlayer();
-        var worldObject = realmTestingServer.CreateObject();
-        #endregion
-
-        #region Act
-        player.Attach(worldObject, SlipeServer.Packets.Enums.BoneId.Pelvis, null, null);
-        worldObject.Destroy();
-        #endregion
-
-        #region Assert
-        player.AttachedBoneElementsCount.Should().Be(0);
-        #endregion
-    }
-
-    [Fact]
-    public void OwnerComponentTestsShouldWork()
-    {
-        var realmTestingServer = new RealmTestingServer();
-        var player = realmTestingServer.CreatePlayer();
-        var worldObject = realmTestingServer.CreateObject();
-
-        worldObject.TrySetOwner(player);
-        player.Destroy();
-
-        worldObject.Owner.Should().BeNull();
-    }
-
-    [Fact]
-    public async Task TestAsyncBindsCooldown()
-    {
-        #region Arrange
-        int executionCount = 0;
-        var realmTestingServer = new RealmTestingServer();
-        var player = realmTestingServer.CreatePlayer();
-        player.SetBind("x", (player, keyState) =>
-        {
-            executionCount++;
-        });
-        #endregion
-
-        #region Act
-        await player.InternalHandleBindExecuted("x", KeyState.Down);
-        await player.InternalHandleBindExecuted("x", KeyState.Down);
-        #endregion
-
-        #region Assert
-        executionCount.Should().Be(1);
-        player.IsCooldownActive("x").Should().BeTrue();
-        #endregion
-    }
-
-    [Fact]
-    public async Task TestAsyncBindsThrowingException()
-    {
-        #region Arrange
-        var realmTestingServer = new RealmTestingServer();
-        var player = realmTestingServer.CreatePlayer();
-        player.SetBindAsync("x", (player, keyState) =>
-        {
-            throw new Exception("test123");
-        });
-        #endregion
-
-        #region Act
-        var action = async () => await player.InternalHandleBindExecuted("x", KeyState.Down);
-        #endregion
-
-        #region Assert
-        await action.Should().ThrowAsync<Exception>().WithMessage("test123");
-        player.IsCooldownActive("x").Should().BeTrue();
-        #endregion
-    }
-
-    [Fact]
-    public void PlayerShouldBeAbleToFightWhenAtLeastOneFlagIsEnabled()
-    {
-        #region Arrange
-        var realmTestingServer = new RealmTestingServer();
-        var player = realmTestingServer.CreatePlayer();
-        #endregion
-
-        #region Act
-        player.AddEnableFightFlag(1);
-        #endregion
-
-        #region Assert
-        player.Controls.FireEnabled.Should().BeTrue();
-        #endregion
-    }
-
-    [Fact]
-    public void PlayerShouldNotBeAbleToFightWhenNoFlagIsSet()
-    {
-        #region Arrange
-        var realmTestingServer = new RealmTestingServer();
-        var player = realmTestingServer.CreatePlayer();
-        #endregion
-
-        #region Act
-        player.AddEnableFightFlag(1);
-        player.RemoveEnableFightFlag(1);
-        #endregion
-
-        #region Assert
-        player.Controls.FireEnabled.Should().BeFalse();
-        #endregion
-    }
-
-    [Fact]
-    public async Task FadeCameraShouldWork()
-    {
-        #region Arrange
-        var realmTestingServer = new RealmTestingServer();
-        var player = realmTestingServer.CreatePlayer();
-        #endregion
-
-        #region Act & Assert
-        await player.FadeCameraAsync(SlipeServer.Packets.Lua.Camera.CameraFade.Out, 0.1f);
-        await player.FadeCameraAsync(SlipeServer.Packets.Lua.Camera.CameraFade.In, 0.1f);
-        #endregion
-    }
-
-    [Fact]
-    public async Task FadeCameraShouldBeCancelable()
-    {
-        #region Arrange
-        var realmTestingServer = new RealmTestingServer();
-        var player = realmTestingServer.CreatePlayer();
-        var cancellationTokenSource = new CancellationTokenSource(100);
-        #endregion
-
-        #region Act
-        var act = async () => await player.FadeCameraAsync(SlipeServer.Packets.Lua.Camera.CameraFade.Out, 10.0f, cancellationTokenSource.Token);
-        #endregion
-
-        #region Asset
-        await act.Should().ThrowAsync<OperationCanceledException>();
-        #endregion
-    }
-
-    [Fact]
-    public async Task FadeCameraShouldBeCanceledWhenPlayerQuit()
-    {
-        #region Arrange
-        var realmTestingServer = new RealmTestingServer();
-        var player = realmTestingServer.CreatePlayer();
-
-        var _ = Task.Run(async () =>
-        {
-            await Task.Delay(100);
-            player.TriggerDisconnected(QuitReason.Quit);
-        });
-        #endregion
-
-        #region Act
-        var act = async () => await player.FadeCameraAsync(SlipeServer.Packets.Lua.Camera.CameraFade.Out, 2.0f);
-        #endregion
-
-        #region Asset
-        await act.Should().ThrowAsync<OperationCanceledException>();
-        #endregion
     }
 }

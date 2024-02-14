@@ -41,8 +41,11 @@
 
 	<ItemGroup>
 		<Using Include="RealmCore.Server.Modules.Players.Notifications" />
+		<Using Include="RealmCore.Tests.Helpers" />
+		<Using Include="SlipeServer.Server.Enums" />
 		<Using Include="System" />
 		<Using Include="System.Collections.Generic" />
+		<Using Include="System.Drawing" />
 		<Using Include="Testcontainers.MySql" />
 		<Using Include="Xunit" />
 
@@ -128,8 +131,13 @@
 		<Using Include="RealmCore.Persistence.Extensions" />
 		<Using Include="RealmCore.Server.Modules.World.Xml" />
 		<Using Include="RealmCore.Server.Modules.World.Xml.Map" />
-		<Using Include="RealmCore.Tests.TestServers" />
 		<Using Include="RealmCore.Tests.Extensions" />
+		<Using Include="SlipeServer.Server.Elements.Enums" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Folder Include="Tests\Services\" />
+	  <Folder Include="Tests\VehicleServices\" />
 	</ItemGroup>
 
 </Project>
