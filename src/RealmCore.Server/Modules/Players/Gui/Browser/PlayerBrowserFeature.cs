@@ -7,22 +7,22 @@ public interface IPlayerBrowserFeature : IPlayerFeature
     string Key { get; init; }
     bool IsReady { get; }
 
-    event Action<string, bool>? PathChanged;
-    event Action<bool>? DevToolsStateChanged;
-    event Action<bool>? VisibleChanged;
-    event Action? Ready;
+    event Action<IPlayerBrowserFeature, string>? PathChanged;
+    event Action<IPlayerBrowserFeature, bool>? DevToolsStateChanged;
+    event Action<IPlayerBrowserFeature, bool>? VisibleChanged;
+    event Action<IPlayerBrowserFeature>? Ready;
 
     void Close();
     void Open(string path, IReadOnlyDictionary<string, string?>? queryParameters = null);
-    void SetPath(string path, bool clientSide = false);
+    void RelayReady();
 }
 
 internal sealed class PlayerBrowserFeature : IPlayerBrowserFeature, IDisposable
 {
-    public event Action<string, bool>? PathChanged;
-    public event Action<bool>? DevToolsStateChanged;
-    public event Action<bool>? VisibleChanged;
-    public event Action? Ready;
+    public event Action<IPlayerBrowserFeature, string>? PathChanged;
+    public event Action<IPlayerBrowserFeature, bool>? DevToolsStateChanged;
+    public event Action<IPlayerBrowserFeature, bool>? VisibleChanged;
+    public event Action<IPlayerBrowserFeature>? Ready;
 
     private readonly IBrowserGuiService _browserGuiService;
     private readonly IBrowserService _browserService;
@@ -37,7 +37,7 @@ internal sealed class PlayerBrowserFeature : IPlayerBrowserFeature, IDisposable
             if (!IsReady)
                 throw new BrowserNotReadyException();
 
-            PathChanged?.Invoke(value, false);
+            PathChanged?.Invoke(this, value);
             _path = value;
         }
     }
@@ -47,13 +47,10 @@ internal sealed class PlayerBrowserFeature : IPlayerBrowserFeature, IDisposable
     {
         get => _devTools; set
         {
-            if (!IsReady)
-                throw new BrowserNotReadyException();
-
             if (_devTools != value)
             {
                 _devTools = value;
-                DevToolsStateChanged?.Invoke(value);
+                DevToolsStateChanged?.Invoke(this, value);
                 _browserService.ToggleDevTools(Player, value);
             }
         }
@@ -72,7 +69,7 @@ internal sealed class PlayerBrowserFeature : IPlayerBrowserFeature, IDisposable
             if (_visible != value)
             {
                 _visible = value;
-                VisibleChanged?.Invoke(value);
+                VisibleChanged?.Invoke(this, value);
                 _browserService.SetVisible(Player, value);
             }
         }
@@ -87,33 +84,6 @@ internal sealed class PlayerBrowserFeature : IPlayerBrowserFeature, IDisposable
         _browserGuiService = browserGuiService;
         _browserService = browserService;
         Player = playerContext.Player;
-        browserService.BrowserStarted += HandleBrowserStarted;
-    }
-
-    private void HandleBrowserStarted(Player player)
-    {
-        if (player != Player)
-            return;
-
-        IsReady = true;
-        Ready?.Invoke();
-
-        if (_browserGuiService.AuthorizePlayer(Key, Player))
-        {
-            var url = $"/realmGuiIndex/?{BrowserConstants.QueryParameterName}={Key}";
-            SetPath(url, true);
-        }
-    }
-
-    public void SetPath(string path, bool clientSide = false)
-    {
-        if (!IsReady)
-            throw new BrowserNotReadyException();
-
-        PathChanged?.Invoke(path, clientSide);
-        _path = path;
-        if (clientSide)
-            _browserService.SetPath(Player, _path);
     }
 
     /// <summary>
@@ -136,8 +106,18 @@ internal sealed class PlayerBrowserFeature : IPlayerBrowserFeature, IDisposable
         if (!IsReady)
             throw new BrowserNotReadyException();
 
-        SetPath(BrowserConstants.DefaultPage);
+        Path = BrowserConstants.DefaultPage;
         Visible = false;
+    }
+
+    public void RelayReady()
+    {
+        if (IsReady)
+            throw new InvalidOperationException();
+
+        IsReady = true;
+
+        Ready?.Invoke(this);
     }
 
     public void Dispose()

@@ -83,7 +83,7 @@ internal sealed class PlayersLogic
             return;
 
         var waitForBrowser = new TaskCompletionSource();
-        void handleBrowserReady()
+        void handleBrowserReady(IPlayerBrowserFeature playerBrowser)
         {
             if (waitForBrowser.TrySetResult())
                 player.Browser.Ready -= handleBrowserReady;

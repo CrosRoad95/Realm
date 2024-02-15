@@ -1,16 +1,11 @@
-﻿using System.Security.Cryptography;
-
-namespace RealmCore.Server.Modules.Players.Gui.Browser;
+﻿namespace RealmCore.Server.Modules.Players.Gui.Browser;
 
 public interface IBrowserGuiService
 {
-    event Action<RealmPlayer>? Ready;
-
     string GenerateKey();
     bool AuthorizePlayer(string key, RealmPlayer player);
     bool UnauthorizePlayer(RealmPlayer player);
     bool TryGetPlayerByKey(string key, out RealmPlayer? player);
-    void RelayPlayerLoggedIn(RealmPlayer player);
     bool IsAuthorized(RealmPlayer player);
 }
 
@@ -18,23 +13,16 @@ internal class BrowserGuiService : IBrowserGuiService
 {
     private readonly object _lock = new();
     private readonly Dictionary<string, RealmPlayer> _playerByKey = new();
-    private readonly List<RealmPlayer> _players = new();
+    private readonly List<RealmPlayer> _players = [];
 
     private readonly RandomNumberGenerator _randomNumberGenerator;
     private readonly byte[] _bytes = new byte[64];
     private readonly IOptions<GuiBrowserOptions> _guiBrowserOptions;
 
-    public event Action<RealmPlayer>? Ready;
-
     public BrowserGuiService(IOptions<GuiBrowserOptions> guiBrowserOptions)
     {
         _randomNumberGenerator = RandomNumberGenerator.Create();
         _guiBrowserOptions = guiBrowserOptions;
-    }
-
-    public void RelayPlayerLoggedIn(RealmPlayer player)
-    {
-        Ready?.Invoke(player);
     }
 
     public string GenerateKey()
@@ -74,9 +62,9 @@ internal class BrowserGuiService : IBrowserGuiService
     {
         lock (_lock)
         {
-            if (_players.Contains(player))
+            if (!_players.Contains(player))
                 return false;
-            _players.Add(player);
+            _players.Remove(player);
             _playerByKey.Remove(player.Browser.Key);
             return true;
         }

@@ -41,16 +41,14 @@
         if (_player == null)
             return;
 
-        _realmBrowserService.Service.RelayPlayerLoggedIn(_player);
         _player.Browser.PathChanged += HandlePathChanged;
+        _player.Browser.RelayReady();
     }
 
-    private void HandlePathChanged(string path, bool clientSide)
+    private void HandlePathChanged(IPlayerBrowserFeature playerBrowser, string path)
     {
-        if (!clientSide)
-            _navigationManager.NavigateTo(path ?? "/");
+        _navigationManager.NavigateTo(path ?? "/");
     }
-
 
     public virtual void Dispose()
     {

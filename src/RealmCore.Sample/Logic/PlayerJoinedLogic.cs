@@ -1,4 +1,5 @@
-﻿using SlipeServer.Resources.Scoreboard;
+﻿using RealmCore.Sample.Concepts.Gui.Blazor;
+using SlipeServer.Resources.Scoreboard;
 
 namespace RealmCore.Sample.Logic;
 
@@ -11,7 +12,7 @@ internal sealed class PlayerJoinedLogic
     private readonly ScoreboardService _scoreboardService;
     private readonly IGuiSystemService? _guiSystemService;
 
-    public PlayerJoinedLogic(ILogger<PlayerJoinedLogic> logger, INametagsService nametagsService,ChatBox chatBox, Text3dService text3DService, IBrowserGuiService browserGuiService, IPlayerEventManager playersService, IUsersService usersService, ScoreboardService scoreboardService, IGuiSystemService? guiSystemService = null)
+    public PlayerJoinedLogic(ILogger<PlayerJoinedLogic> logger, INametagsService nametagsService,ChatBox chatBox, Text3dService text3DService, IPlayerEventManager playersService, IUsersService usersService, ScoreboardService scoreboardService, IGuiSystemService? guiSystemService = null)
     {
         _logger = logger;
         _nametagsService = nametagsService;
@@ -19,15 +20,16 @@ internal sealed class PlayerJoinedLogic
         _text3DService = text3DService;
         _scoreboardService = scoreboardService;
         _guiSystemService = guiSystemService;
-        browserGuiService.Ready += HandleReady;
         playersService.PlayerLoaded += HandlePlayerLoaded;
         usersService.SignedIn += HandleSignedIn;
         usersService.SignedOut += HandleSignedOut;
     }
 
-    private void HandleReady(RealmPlayer player)
+    private void HandleReady(IPlayerBrowserFeature playerBrowser)
     {
-        _chatBox.OutputTo(player, "Browser ready");
+        _chatBox.OutputTo(playerBrowser.Player, "Browser ready");
+        //playerBrowser.DevTools = true;
+        ShowLoginSequence(playerBrowser.Player);
     }
 
     private async Task HandleSignedInCore(RealmPlayer player)
@@ -90,6 +92,8 @@ internal sealed class PlayerJoinedLogic
 
     private void HandlePlayerLoaded(RealmPlayer player)
     {
+        player.Browser.Ready += HandleReady;
+
         ShowLoginSequence(player);
         player.Level.LevelChanged += HandleLevelChanged;
     }

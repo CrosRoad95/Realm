@@ -6,7 +6,7 @@ public interface IBrowserService
 {
     event Action<Player>? BrowserStarted;
     event Action<Player>? BrowserStopped;
-    event Action<Player>? BrowserReady;
+    event Action<Player>? BrowserLoaded;
 
     Action<IMessage>? MessageHandler { get; set; }
 
@@ -22,7 +22,7 @@ internal sealed class BrowserService : IBrowserService
 {
     public event Action<Player>? BrowserStarted;
     public event Action<Player>? BrowserStopped;
-    public event Action<Player>? BrowserReady;
+    public event Action<Player>? BrowserLoaded;
 
     public Action<IMessage>? MessageHandler { get; set; }
 
@@ -51,7 +51,7 @@ internal sealed class BrowserService : IBrowserService
 
     public void RelayBrowserReady(Player player)
     {
-        BrowserReady?.Invoke(player);
+        BrowserLoaded?.Invoke(player);
     }
     
     public void RelayBrowserStarted(Player player)
