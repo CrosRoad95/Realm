@@ -16,7 +16,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <ProjectReference Include="..\src\RealmCore.Server\RealmCore.Server.csproj" />
+	  <ProjectReference Include="..\RealmCore.Server\RealmCore.Server.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>
