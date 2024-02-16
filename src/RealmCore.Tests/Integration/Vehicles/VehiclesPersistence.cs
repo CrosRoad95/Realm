@@ -17,7 +17,7 @@ public class VehiclesPersistence : RealmIntegrationTestingBase
         var saveService = server.GetRequiredService<ISaveService>();
         var loadService = server.GetRequiredService<ILoadService>();
 
-        var vehicle = await vehicleService.CreatePersistantVehicle(404, Vector3.Zero, Vector3.Zero);
+        var vehicle = await vehicleService.CreatePersistantVehicle(Location.Zero, (VehicleModel)404);
         vehicle.Should().BeOfType<TestRealmVehicle>();
 
         await saveService.Save(vehicle);
@@ -36,7 +36,7 @@ public class VehiclesPersistence : RealmIntegrationTestingBase
         var loadService = server.GetRequiredService<ILoadService>();
         var saveService = server.GetRequiredService<ISaveService>();
         var activeVehicles = server.GetRequiredService<IVehiclesInUse>();
-        var vehicle = await vehiclesService.CreatePersistantVehicle(404, Vector3.Zero, Vector3.Zero);
+        var vehicle = await vehiclesService.CreatePersistantVehicle(Location.Zero, (VehicleModel)404);
         var id = vehicle.PersistentId;
         activeVehicles.ActiveVehiclesIds.Should().BeEquivalentTo([id]);
         activeVehicles.IsActive(id).Should().BeTrue();
@@ -60,7 +60,7 @@ public class VehiclesPersistence : RealmIntegrationTestingBase
         var vehiclesService = server.GetRequiredService<IVehiclesService>();
         var loadService = server.GetRequiredService<ILoadService>();
         var saveService = server.GetRequiredService<ISaveService>();
-        var vehicle1 = await vehiclesService.CreatePersistantVehicle(404, new Vector3(1, 2, 3), new Vector3(4, 5, 6));
+        var vehicle1 = await vehiclesService.CreatePersistantVehicle(new Location(new Vector3(1, 2, 3), new Vector3(4, 5, 6)), (VehicleModel)404);
         vehicle1.Access.AddAsOwner(player);
         vehicle1.MileageCounter.Mileage = 123;
         vehicle1.Upgrades.AddUpgrade(250, false);
@@ -91,7 +91,7 @@ public class VehiclesPersistence : RealmIntegrationTestingBase
 
 internal class TestRealmVehicle : RealmVehicle
 {
-    public TestRealmVehicle(IServiceProvider serviceProvider, ushort model, Vector3 position) : base(serviceProvider, model, position)
+    public TestRealmVehicle(IServiceProvider serviceProvider, VehicleModel model, Vector3 position) : base(serviceProvider, (ushort)model, position)
     {
     }
 }
@@ -120,7 +120,7 @@ internal class TestElementFactory : IElementFactory
         _innerFactory.AssociateWithServer(element);
     }
 
-    public RealmBlip CreateBlip(Vector3 position, BlipIcon blipIcon, byte? interior = null, ushort? dimension = null, Action<RealmBlip>? elementBuilder = null)
+    public RealmBlip CreateBlip(Location location, BlipIcon blipIcon, Action<RealmBlip>? elementBuilder = null)
     {
         throw new NotImplementedException();
     }
@@ -155,27 +155,27 @@ internal class TestElementFactory : IElementFactory
         throw new NotImplementedException();
     }
 
-    public FocusableRealmWorldObject CreateFocusableObject(ObjectModel model, Vector3 position, Vector3 rotation, byte? interior = null, ushort? dimension = null, Action<RealmWorldObject>? elementBuilder = null)
+    public FocusableRealmWorldObject CreateFocusableObject(Location location, ObjectModel model, Action<RealmWorldObject>? elementBuilder = null)
     {
         throw new NotImplementedException();
     }
 
-    public RealmMarker CreateMarker(Vector3 position, MarkerType markerType, float size, Color color, byte? interior = null, ushort? dimension = null, Action<RealmMarker>? elementBuilder = null)
+    public RealmMarker CreateMarker(Location location, MarkerType markerType, float size, Color color, Action<RealmMarker>? elementBuilder = null)
     {
         throw new NotImplementedException();
     }
 
-    public RealmWorldObject CreateObject(ObjectModel model, Vector3 position, Vector3 rotation, byte? interior = null, ushort? dimension = null, Action<RealmWorldObject>? elementBuilder = null)
+    public RealmWorldObject CreateObject(Location location, ObjectModel model, Action<RealmWorldObject>? elementBuilder = null)
     {
         throw new NotImplementedException();
     }
 
-    public RealmPed CreatePed(PedModel pedModel, Vector3 position, byte? interior = null, ushort? dimension = null, Action<RealmPed>? elementBuilder = null)
+    public RealmPed CreatePed(Location location, PedModel pedModel, Action<RealmPed>? elementBuilder = null)
     {
         throw new NotImplementedException();
     }
 
-    public RealmPickup CreatePickup(Vector3 position, ushort model, byte? interior = null, ushort? dimension = null, Action<RealmPickup>? elementBuilder = null)
+    public RealmPickup CreatePickup(Location location, ushort model, Action<RealmPickup>? elementBuilder = null)
     {
         throw new NotImplementedException();
     }
@@ -185,13 +185,13 @@ internal class TestElementFactory : IElementFactory
         throw new NotImplementedException();
     }
 
-    public RealmVehicle CreateVehicle(ushort model, Vector3 position, Vector3 rotation, byte? interior = null, ushort? dimension = null, Action<RealmVehicle>? elementBuilder = null)
+    public RealmVehicle CreateVehicle(Location location, VehicleModel model, Action<RealmVehicle>? elementBuilder = null)
     {
-        var vehicle = new TestRealmVehicle(_serviceProvider, model, position)
+        var vehicle = new TestRealmVehicle(_serviceProvider, model, location.Position)
         {
-            Rotation = rotation,
-            Interior = interior ?? 0,
-            Dimension = dimension ?? 0,
+            Rotation = location.Rotation,
+            Interior = location.Interior ?? 0,
+            Dimension = location.Dimension ?? 0,
         };
 
         elementBuilder?.Invoke(vehicle);

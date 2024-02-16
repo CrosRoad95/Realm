@@ -23,4 +23,16 @@ public static class ElementExtensions
         Interior = element.Interior,
         Dimension = element.Dimension,
     };
+
+    public static Location GetLocation(this Element element) => new(element.Position, element.Rotation, element.Interior, element.Dimension);
+
+    public static void SetLocation(this Element element, Location location)
+    {
+        element.Position = location.Position;
+        element.Rotation = location.Rotation;
+        if(location.Dimension != null)
+            element.Dimension = location.Dimension.Value;
+        if(location.Interior != null)
+            element.Interior = location.Interior.Value;
+    }
 }

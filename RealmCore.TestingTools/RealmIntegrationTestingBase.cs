@@ -44,7 +44,7 @@ public abstract class RealmIntegrationTestingBase : IAsyncLifetime
         if (_server == null)
             throw new Exception("Server not created.");
         var vehiclesService = _server.GetRequiredService<IVehiclesService>();
-        var vehicle = await vehiclesService.CreatePersistantVehicle(404, Vector3.Zero, Vector3.Zero);
+        var vehicle = await vehiclesService.CreatePersistantVehicle(Location.Zero, (VehicleModel)404);
         vehicle.PersistentId.Should().NotBe(0);
         return vehicle;
     }

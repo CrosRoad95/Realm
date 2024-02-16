@@ -1,6 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore.Metadata.Internal;
-
-namespace RealmCore.Server.Modules.Players.Gui;
+﻿namespace RealmCore.Server.Modules.Players.Gui;
 
 internal sealed class BrowserGuiLogic : PlayerLogic
 {

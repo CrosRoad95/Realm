@@ -141,14 +141,14 @@ internal class ScopedElementFactory : IScopedElementFactory
         return collisionSphere;
     }
 
-    public RealmMarker CreateMarker(Vector3 position, MarkerType markerType, float size, Color color, byte? interior = null, ushort? dimension = null, Action<RealmMarker>? elementBuilder = null)
+    public RealmMarker CreateMarker(Location location, MarkerType markerType, float size, Color color, Action<RealmMarker>? elementBuilder = null)
     {
         ThrowIfDisposed();
-        var marker = new RealmMarker(_player.ServiceProvider, position, markerType, size)
+        var marker = new RealmMarker(_player.ServiceProvider, location.Position, markerType, size)
         {
             Color = color,
-            Interior = interior ?? _player.Interior,
-            Dimension = dimension ?? _player.Dimension
+            Interior = location.Interior ?? _player.Interior,
+            Dimension = location.Dimension ?? _player.Dimension
         };
 
         elementBuilder?.Invoke(marker);
@@ -156,13 +156,13 @@ internal class ScopedElementFactory : IScopedElementFactory
         return marker;
     }
 
-    public RealmBlip CreateBlip(Vector3 position, BlipIcon blipIcon, byte? interior = null, ushort? dimension = null, Action<RealmBlip>? elementBuilder = null)
+    public RealmBlip CreateBlip(Location location, BlipIcon blipIcon, Action<RealmBlip>? elementBuilder = null)
     {
         ThrowIfDisposed();
-        var blip = new RealmBlip(position, blipIcon)
+        var blip = new RealmBlip(location.Position, blipIcon)
         {
-            Interior = interior ?? _player.Interior,
-            Dimension = dimension ?? _player.Dimension
+            Interior = location.Interior ?? _player.Interior,
+            Dimension = location.Dimension ?? _player.Dimension
         };
 
         elementBuilder?.Invoke(blip);
@@ -195,17 +195,17 @@ internal class ScopedElementFactory : IScopedElementFactory
         throw new NotImplementedException();
     }
 
-    public RealmMarker CreateMarker(Vector3 position, MarkerType markerType, Color color, byte? interior = null, ushort? dimension = null, Action<Element>? elementBuilder = null)
+    public RealmMarker CreateMarker(Location location, MarkerType markerType, Color color, Action<Element>? elementBuilder = null)
     {
         throw new NotImplementedException();
     }
 
-    public RealmPed CreatePed(PedModel pedModel, Vector3 position, byte? interior = null, ushort? dimension = null, Action<RealmPed>? elementBuilder = null)
+    public RealmPed CreatePed(Location location, PedModel pedModel, Action<RealmPed>? elementBuilder = null)
     {
         throw new NotImplementedException();
     }
 
-    public RealmPickup CreatePickup(Vector3 position, ushort model, byte? interior = null, ushort? dimension = null, Action<RealmPickup>? elementBuilder = null)
+    public RealmPickup CreatePickup(Location location, ushort model, Action<RealmPickup>? elementBuilder = null)
     {
         throw new NotImplementedException();
     }
@@ -215,19 +215,19 @@ internal class ScopedElementFactory : IScopedElementFactory
         throw new NotImplementedException();
     }
 
-    public RealmVehicle CreateVehicle(ushort model, Vector3 position, Vector3 rotation, byte? interior = null, ushort? dimension = null, Action<RealmVehicle>? elementBuilder = null)
+    public RealmVehicle CreateVehicle(Location location, VehicleModel model, Action<RealmVehicle>? elementBuilder = null)
     {
         throw new NotImplementedException();
     }
 
-    public RealmWorldObject CreateObject(ObjectModel model, Vector3 position, Vector3 rotation, byte? interior = null, ushort? dimension = null, Action<RealmWorldObject>? elementBuilder = null)
+    public RealmWorldObject CreateObject(Location location, ObjectModel model, Action<RealmWorldObject>? elementBuilder = null)
     {
         ThrowIfDisposed();
-        var worldObject = new RealmWorldObject(model, position)
+        var worldObject = new RealmWorldObject(model, location.Position)
         {
-            Rotation = rotation,
-            Interior = interior ?? _player.Interior,
-            Dimension = dimension ?? _player.Dimension
+            Rotation = location.Rotation,
+            Interior = location.Interior ?? _player.Interior,
+            Dimension = location.Dimension ?? _player.Dimension
         };
 
         elementBuilder?.Invoke(worldObject);
@@ -235,29 +235,19 @@ internal class ScopedElementFactory : IScopedElementFactory
         return worldObject;
     }
 
-    public FocusableRealmWorldObject CreateFocusableObject(ObjectModel model, Vector3 position, Vector3 rotation, byte? interior = null, ushort? dimension = null, Action<RealmWorldObject>? elementBuilder = null)
+    public FocusableRealmWorldObject CreateFocusableObject(Location location, ObjectModel model, Action<RealmWorldObject>? elementBuilder = null)
     {
         ThrowIfDisposed();
-        var worldObject = new FocusableRealmWorldObject(model, position)
+        var worldObject = new FocusableRealmWorldObject(model, location.Position)
         {
-            Rotation = rotation,
-            Interior = interior ?? _player.Interior,
-            Dimension = dimension ?? _player.Dimension
+            Rotation = location.Rotation,
+            Interior = location.Interior ?? _player.Interior,
+            Dimension = location.Dimension ?? _player.Dimension
         };
 
         elementBuilder?.Invoke(worldObject);
         AssociateWithPlayer(worldObject);
         return worldObject;
-    }
-
-    RealmPickup IElementFactory.CreatePickup(Vector3 position, ushort model, byte? interior = null, ushort? dimension = null, Action<RealmPickup>? elementBuilder = null)
-    {
-        throw new NotImplementedException();
-    }
-
-    RealmVehicle IElementFactory.CreateVehicle(ushort model, Vector3 position, Vector3 rotation, byte? interior = null, ushort? dimension = null, Action<RealmVehicle>? elementBuilder = null)
-    {
-        throw new NotImplementedException();
     }
 
     public void RelayCreated(Element element)

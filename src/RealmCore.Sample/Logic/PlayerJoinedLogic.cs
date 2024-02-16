@@ -1,5 +1,4 @@
-﻿using RealmCore.Sample.Concepts.Gui.Blazor;
-using SlipeServer.Resources.Scoreboard;
+﻿using SlipeServer.Resources.Scoreboard;
 
 namespace RealmCore.Sample.Logic;
 

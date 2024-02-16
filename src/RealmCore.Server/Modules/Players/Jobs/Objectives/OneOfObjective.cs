@@ -6,7 +6,7 @@ public class OneOfObjective : Objective
     private readonly Objective[] _objectives;
     private bool _completed = false;
 
-    public override Vector3 Position => throw new NotSupportedException();
+    public override Location Location => throw new NotSupportedException();
 
     public OneOfObjective(params Objective[] objectives)
     {

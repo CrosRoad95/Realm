@@ -128,6 +128,7 @@
 		<Using Include="SlipeServer.Server.Elements.Enums" />
 		<Using Include="RealmCore.Server.Modules.Players.Groups" />
 		<Using Include="RealmCore.TestingTools.Extensions" />
+		<Using Include="RealmCore.Server.Modules.Domain" />
 	</ItemGroup>
 
 </Project>

@@ -78,7 +78,7 @@ internal sealed class CommandsLogic
         _commandService.AddCommandHandler("focusable", (player, args) =>
         {
             var position = player.Position + player.Forward * new Vector3(4, 0, 0);
-            var worldObject = _elementFactory.CreateFocusableObject(ObjectModel.Gunbox, position, player.Rotation);
+            var worldObject = _elementFactory.CreateFocusableObject(new Location(position, player.Rotation), ObjectModel.Gunbox);
             worldObject.PlayerFocused += (that, player) =>
             {
                 var playerName = player.Name;
@@ -97,7 +97,7 @@ internal sealed class CommandsLogic
 
         _commandService.AddAsyncCommandHandler("outline1", async (player, args, token) =>
         {
-            var worldObject = _elementFactory.CreateObject(ObjectModel.Gunbox, player.Position + new Vector3(4, 0, 0), player.Rotation);
+            var worldObject = _elementFactory.CreateObject(new Location(player.Position + new Vector3(4, 0, 0), player.Rotation), ObjectModel.Gunbox);
             _elementOutlineService.SetElementOutline(worldObject, Color.Red);
             _chatBox.OutputTo(player, "Created outline");
             await Task.Delay(2000, token);
@@ -107,7 +107,7 @@ internal sealed class CommandsLogic
 
         _commandService.AddAsyncCommandHandler("outline2", async (player, args, token) =>
         {
-            var worldObject = _elementFactory.CreateObject(ObjectModel.Gunbox, player.Position + new Vector3(4, 0, 0), player.Rotation);
+            var worldObject = _elementFactory.CreateObject(new Location(player.Position + new Vector3(4, 0, 0), player.Rotation), ObjectModel.Gunbox);
             _elementOutlineService.SetElementOutline(worldObject, Color.Red);
             _chatBox.OutputTo(player, "Created outline");
             await Task.Delay(2000, token);
@@ -149,7 +149,7 @@ internal sealed class CommandsLogic
 
         _commandService.AddCommandHandler("cvwithlicenserequired", (player, args) =>
         {
-            var vehicle = _elementFactory.CreateVehicle(args.ReadUShort(), player.Position + new Vector3(4, 0, 0), player.Rotation);
+            var vehicle = _elementFactory.CreateVehicle(new Location(player.Position + new Vector3(4, 0, 0), player.Rotation), (VehicleModel)args.ReadUShort());
             vehicle.AccessController = new VehicleLicenseRequirementAccessController(10);
         });
 
@@ -161,7 +161,7 @@ internal sealed class CommandsLogic
 
         _commandService.AddCommandHandler("cv", (player, args) =>
         {
-            var vehicle = _elementFactory.CreateVehicle(args.ReadUShort(), player.Position + new Vector3(4, 0, 0), player.Rotation);
+            var vehicle = _elementFactory.CreateVehicle(new Location(player.Position + new Vector3(4, 0, 0), player.Rotation), (VehicleModel)args.ReadUShort());
             vehicle.Fuel.AddFuelContainer(1, 20, 20, 0.01f, 2, true);
             vehicle.PartDamage.AddPart(1, 1337);
             vehicle.AccessController = new VehicleExclusiveAccessController(player);
@@ -170,7 +170,7 @@ internal sealed class CommandsLogic
 
         _commandService.AddAsyncCommandHandler("cvprivate", async (player, args, token) =>
         {
-            var vehicle = await _vehiclesService.CreatePersistantVehicle(404, player.Position + new Vector3(4, 0, 0), player.Rotation, token);
+            var vehicle = await _vehiclesService.CreatePersistantVehicle(new Location(player.Position + new Vector3(4, 0, 0), player.Rotation), (VehicleModel)404, token);
             vehicle.Upgrades.AddUpgrade(1);
             vehicle.Fuel.AddFuelContainer(1, 20, 20, 0.01f, 2, true);
             vehicle.PartDamage.AddPart(1, 1337);
@@ -179,14 +179,14 @@ internal sealed class CommandsLogic
 
         _commandService.AddCommandHandler("exclusivecv", (player, args) =>
         {
-            var vehicle = _elementFactory.CreateVehicle(404, player.Position + new Vector3(4, 0, 0), player.Rotation);
+            var vehicle = _elementFactory.CreateVehicle(new Location(player.Position + new Vector3(4, 0, 0), player.Rotation), (VehicleModel)404);
             vehicle.Fuel.AddFuelContainer(1, 20, 20, 0.01f, 2, true);
             vehicle.AccessController = new VehicleExclusiveAccessController(player);
         });
 
         _commandService.AddCommandHandler("noaccesscv", (player, args) =>
         {
-            var vehicle = _elementFactory.CreateVehicle(404, player.Position + new Vector3(4, 0, 0), player.Rotation);
+            var vehicle = _elementFactory.CreateVehicle(new Location(player.Position + new Vector3(4, 0, 0), player.Rotation), (VehicleModel)404);
             vehicle.Fuel.AddFuelContainer(1, 20, 20, 0.01f, 2, true);
             vehicle.AccessController = VehicleNoAccessController.Instance;
         });
@@ -313,7 +313,7 @@ internal sealed class CommandsLogic
             _chatBox.OutputTo(player, $"Updated achievement 'test' progress to 2");
 
             {
-                var vehicle = await _vehiclesService.CreatePersistantVehicle(404, player.Position + new Vector3(4, 0, 0), player.Rotation, token);
+                var vehicle = await _vehiclesService.CreatePersistantVehicle(new Location(player.Position + new Vector3(4, 0, 0), player.Rotation), (VehicleModel)404, token);
                 vehicle.Upgrades.AddUpgrade(1);
                 vehicle.Fuel.AddFuelContainer(1, 20, 20, 0.01f, 2, true);
                 vehicle.PartDamage.AddPart(1, 1337);
@@ -329,12 +329,12 @@ internal sealed class CommandsLogic
 
         _commandService.AddCommandHandler("cvforsale", (player, args) =>
         {
-            _elementFactory.CreateVehicle(404, player.Position + new Vector3(4, 0, 0), Vector3.Zero);
+            _elementFactory.CreateVehicle(new Location(player.Position + new Vector3(4, 0, 0), Vector3.Zero), (VehicleModel)404);
         });
 
         _commandService.AddAsyncCommandHandler("privateoutlinetest", async (player, args, token) =>
         {
-            var @object = _elementFactory.CreateObject(ObjectModel.Gunbox, player.Position + new Vector3(4, 0, -0.65f), Vector3.Zero);
+            var @object = _elementFactory.CreateObject(new Location(player.Position + new Vector3(4, 0, -0.65f), Vector3.Zero), ObjectModel.Gunbox);
             await Task.Delay(2000, token);
             elementOutlineService.SetElementOutlineForPlayer(player, @object, Color.Red);
             await Task.Delay(1000, token);
@@ -344,13 +344,13 @@ internal sealed class CommandsLogic
 
         _commandService.AddCommandHandler("spawnbox", (player, args) =>
         {
-            var worldObject = _elementFactory.CreateObject(ObjectModel.Gunbox, player.Position + new Vector3(4, 0, -0.65f), Vector3.Zero);
+            var worldObject = _elementFactory.CreateObject(new Location(player.Position + new Vector3(4, 0, -0.65f), Vector3.Zero), ObjectModel.Gunbox);
             worldObject.Interaction = new LiftableInteraction();
         });
 
         _commandService.AddCommandHandler("spawnmybox", (player, args) =>
         {
-            var worldObject = _elementFactory.CreateObject(ObjectModel.Gunbox, player.Position + new Vector3(4, 0, -0.65f), Vector3.Zero);
+            var worldObject = _elementFactory.CreateObject(new Location(player.Position + new Vector3(4, 0, -0.65f), Vector3.Zero), ObjectModel.Gunbox);
             worldObject.Interaction = new LiftableInteraction();
             worldObject.TrySetOwner(player);
         });
@@ -1547,13 +1547,13 @@ internal sealed class CommandsLogic
         _commandService.AddAsyncCommandHandler("scopedelements", async (player, args, token) =>
         {
         using var scope = player.GetRequiredService<IScopedElementFactory>().CreateScope();
-            scope.CreateObject((ObjectModel)1337, player.Position + new Vector3(3, 0, 0), Vector3.Zero);
+            scope.CreateObject(new Location(player.Position + new Vector3(3, 0, 0), Vector3.Zero), (ObjectModel)1337);
             await Task.Delay(1000, token);
         });
 
         _commandService.AddCommandHandler("createelementsforme", (player, args) =>
         {
-            player.ElementFactory.CreateObject((ObjectModel)1337, player.Position + new Vector3(3, 0, 0), Vector3.Zero);
+            player.ElementFactory.CreateObject(new Location(player.Position + new Vector3(3, 0, 0), Vector3.Zero), (ObjectModel)1337);
         });
 
         _commandService.AddCommandHandler("listevents", (player, args) =>

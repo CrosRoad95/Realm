@@ -200,6 +200,7 @@
 		<Using Include="RealmCore.Server.Modules.World.Xml" />
 		<Using Include="RealmCore.Server.Modules.World.Xml.Map" />
 		<Using Include="RealmCore.Server.Modules.Players.Fractions" />
+		<Using Include="RealmCore.Server.Modules.Domain" />
 		<Using Include="System.Security.Cryptography" />
 		<Using Include="SlipeServer.Net.Wrappers" />
 		

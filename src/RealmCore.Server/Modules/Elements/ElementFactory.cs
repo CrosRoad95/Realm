@@ -37,13 +37,13 @@ public class ElementFactory : IElementFactory
         RelayCreated(element);
     }
 
-    public RealmVehicle CreateVehicle(ushort model, Vector3 position, Vector3 rotation, byte? interior = null, ushort? dimension = null, Action<RealmVehicle>? elementBuilder = null)
+    public RealmVehicle CreateVehicle(Location location, VehicleModel model, Action<RealmVehicle>? elementBuilder = null)
     {
-        var vehicle = new RealmVehicle(_serviceProvider, model, position)
+        var vehicle = new RealmVehicle(_serviceProvider, (ushort)model, location.Position)
         {
-            Rotation = rotation,
-            Interior = interior ?? 0,
-            Dimension = dimension ?? 0,
+            Rotation = location.Rotation,
+            Interior = location.Interior ?? 0,
+            Dimension = location.Dimension ?? 0,
         };
 
         elementBuilder?.Invoke(vehicle);
@@ -51,12 +51,12 @@ public class ElementFactory : IElementFactory
         return vehicle;
     }
 
-    public RealmMarker CreateMarker(Vector3 position, MarkerType markerType, float size, Color color, byte? interior = null, ushort? dimension = null, Action<RealmMarker>? elementBuilder = null)
+    public RealmMarker CreateMarker(Location location, MarkerType markerType, float size, Color color, Action<RealmMarker>? elementBuilder = null)
     {
-        var marker = new RealmMarker(_serviceProvider, position, markerType, size)
+        var marker = new RealmMarker(_serviceProvider, location.Position, markerType, size)
         {
-            Interior = interior ?? 0,
-            Dimension = dimension ?? 0,
+            Interior = location.Interior ?? 0,
+            Dimension = location.Dimension ?? 0,
             Color = color
         };
 
@@ -65,12 +65,12 @@ public class ElementFactory : IElementFactory
         return marker;
     }
 
-    public RealmPickup CreatePickup(Vector3 position, ushort model, byte? interior = null, ushort? dimension = null, Action<RealmPickup>? elementBuilder = null)
+    public RealmPickup CreatePickup(Location location, ushort model, Action<RealmPickup>? elementBuilder = null)
     {
-        var pickup = new RealmPickup(_serviceProvider, position, model)
+        var pickup = new RealmPickup(_serviceProvider, location.Position, model)
         {
-            Interior = interior ?? 0,
-            Dimension = dimension ?? 0,
+            Interior = location.Interior ?? 0,
+            Dimension = location.Dimension ?? 0,
         };
 
         elementBuilder?.Invoke(pickup);
@@ -78,12 +78,12 @@ public class ElementFactory : IElementFactory
         return pickup;
     }
 
-    public RealmBlip CreateBlip(Vector3 position, BlipIcon blipIcon, byte? interior = null, ushort? dimension = null, Action<RealmBlip>? elementBuilder = null)
+    public RealmBlip CreateBlip(Location location, BlipIcon blipIcon, Action<RealmBlip>? elementBuilder = null)
     {
-        var blip = new RealmBlip(position, blipIcon)
+        var blip = new RealmBlip(location.Position, blipIcon)
         {
-            Interior = interior ?? 0,
-            Dimension = dimension ?? 0,
+            Interior = location.Interior ?? 0,
+            Dimension = location.Dimension ?? 0,
         };
 
         elementBuilder?.Invoke(blip);
@@ -104,13 +104,13 @@ public class ElementFactory : IElementFactory
         return radarArea;
     }
 
-    public RealmWorldObject CreateObject(ObjectModel model, Vector3 position, Vector3 rotation, byte? interior = null, ushort? dimension = null, Action<RealmWorldObject>? elementBuilder = null)
+    public RealmWorldObject CreateObject(Location location, ObjectModel model, Action<RealmWorldObject>? elementBuilder = null)
     {
-        var worldObject = new RealmWorldObject(model, position)
+        var worldObject = new RealmWorldObject(model, location.Position)
         {
-            Rotation = rotation,
-            Interior = interior ?? 0,
-            Dimension = dimension ?? 0,
+            Rotation = location.Rotation,
+            Interior = location.Interior ?? 0,
+            Dimension = location.Dimension ?? 0,
         };
 
         elementBuilder?.Invoke(worldObject);
@@ -118,13 +118,13 @@ public class ElementFactory : IElementFactory
         return worldObject;
     }
 
-    public FocusableRealmWorldObject CreateFocusableObject(ObjectModel model, Vector3 position, Vector3 rotation, byte? interior = null, ushort? dimension = null, Action<RealmWorldObject>? elementBuilder = null)
+    public FocusableRealmWorldObject CreateFocusableObject(Location location, ObjectModel model, Action<RealmWorldObject>? elementBuilder = null)
     {
-        var worldObject = new FocusableRealmWorldObject(model, position)
+        var worldObject = new FocusableRealmWorldObject(model, location.Position)
         {
-            Rotation = rotation,
-            Interior = interior ?? 0,
-            Dimension = dimension ?? 0,
+            Rotation = location.Rotation,
+            Interior = location.Interior ?? 0,
+            Dimension = location.Dimension ?? 0,
         };
 
         elementBuilder?.Invoke(worldObject);
@@ -211,12 +211,13 @@ public class ElementFactory : IElementFactory
         return collisionTube;
     }
 
-    public RealmPed CreatePed(PedModel pedModel, Vector3 position, byte? interior = null, ushort? dimension = null, Action<RealmPed>? elementBuilder = null)
+    public RealmPed CreatePed(Location location, PedModel pedModel, Action<RealmPed>? elementBuilder = null)
     {
-        var ped = new RealmPed(pedModel, position)
+        var ped = new RealmPed(pedModel, location.Position)
         {
-            Interior = interior ?? 0,
-            Dimension = dimension ?? 0,
+            Rotation = location.Rotation,
+            Interior = location.Interior ?? 0,
+            Dimension = location.Dimension ?? 0,
         };
 
         elementBuilder?.Invoke(ped);

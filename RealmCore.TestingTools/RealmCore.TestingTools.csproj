@@ -110,6 +110,7 @@
 		<Using Include="RealmCore.Server.Modules.World.Xml.Map" />
 		<Using Include="SlipeServer.Server.Elements.Enums" />
 		<Using Include="RealmCore.Server.Modules.Players.Groups" />
+		<Using Include="RealmCore.Server.Modules.Domain" />
 		<Using Include="Xunit" />
 	</ItemGroup>
 </Project>

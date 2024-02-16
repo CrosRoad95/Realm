@@ -41,7 +41,7 @@ public class CollisionDetectionTests : RealmUnitTestingBase
         var realmTestingServer = CreateServer();
         var player = CreatePlayer();
         var elementFactory = realmTestingServer.GetRequiredService<IElementFactory>();
-        var marker = elementFactory.CreateMarker(Vector3.Zero, MarkerType.Cylinder, 1, Color.Red);
+        var marker = elementFactory.CreateMarker(Location.Zero, MarkerType.Cylinder, 1, Color.Red);
         int elementEntered = 0;
         int elementLeft = 0;
         marker.CollisionDetection.Entered += (that, e) =>
@@ -73,7 +73,7 @@ public class CollisionDetectionTests : RealmUnitTestingBase
         var realmTestingServer = CreateServer();
         var player = CreatePlayer();
         var elementFactory = realmTestingServer.GetRequiredService<IElementFactory>();
-        var pickup = elementFactory.CreatePickup(Vector3.Zero, 1337);
+        var pickup = elementFactory.CreatePickup(Location.Zero, 1337);
         int elementEntered = 0;
         int elementLeft = 0;
         pickup.CollisionDetection.Entered += (that, e) =>

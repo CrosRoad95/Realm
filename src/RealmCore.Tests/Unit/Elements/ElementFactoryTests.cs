@@ -15,7 +15,7 @@ public class ElementFactoryTests : RealmUnitTestingBase
         }
 
         var elementFactory = player.ElementFactory;
-        var obj = elementFactory.CreateObject((ObjectModel)1337, Vector3.Zero, Vector3.Zero);
+        var obj = elementFactory.CreateObject(Location.Zero, (ObjectModel)1337);
         obj.Destroyed += handleDestroyed;
         obj.Id.Value.Should().Be(30001);
 
@@ -38,7 +38,7 @@ public class ElementFactoryTests : RealmUnitTestingBase
 
         {
             using var scope = player.ElementFactory.CreateScope();
-            var obj = scope.CreateObject((ObjectModel)1337, Vector3.Zero, Vector3.Zero);
+            var obj = scope.CreateObject(Location.Zero, (ObjectModel)1337);
             obj.Destroyed += handleDestroyed;
         }
 
@@ -52,9 +52,9 @@ public class ElementFactoryTests : RealmUnitTestingBase
         var player = CreatePlayer();
 
         var rootElementFactory = player.ElementFactory;
-        var obj1 = rootElementFactory.CreateObject((ObjectModel)1337, Vector3.Zero, Vector3.Zero);
+        var obj1 = rootElementFactory.CreateObject(Location.Zero, (ObjectModel)1337);
         var scope = rootElementFactory.CreateScope();
-        var obj2 = scope.CreateObject((ObjectModel)1337, Vector3.Zero, Vector3.Zero);
+        var obj2 = scope.CreateObject(Location.Zero, (ObjectModel)1337);
 
         scope.CreatedElements.Should().BeEquivalentTo([obj2]);
         rootElementFactory.CreatedElements.Should().BeEquivalentTo([obj1, obj2]);
@@ -71,10 +71,10 @@ public class ElementFactoryTests : RealmUnitTestingBase
         var player = CreatePlayer();
 
         var rootElementFactory = player.ElementFactory;
-        var obj1 = rootElementFactory.CreateObject((ObjectModel)1337, Vector3.Zero, Vector3.Zero);
+        var obj1 = rootElementFactory.CreateObject(Location.Zero, (ObjectModel)1337);
         {
             using var scope = rootElementFactory.CreateScope();
-            var obj2 = scope.CreateObject((ObjectModel)1337, Vector3.Zero, Vector3.Zero);
+            var obj2 = scope.CreateObject(Location.Zero, (ObjectModel)1337);
 
             scope.CreatedElements.Should().BeEquivalentTo([obj2]);
             rootElementFactory.CreatedElements.Should().BeEquivalentTo([obj1, obj2]);
@@ -95,7 +95,7 @@ public class ElementFactoryTests : RealmUnitTestingBase
         player.Dimension = 56;
         var rootElementFactory = player.ElementFactory;
 
-        var obj = rootElementFactory.CreateObject((ObjectModel)1337, Vector3.Zero, Vector3.Zero);
+        var obj = rootElementFactory.CreateObject(Location.Zero, (ObjectModel)1337);
         obj.Interior.Should().Be(13);
         obj.Dimension.Should().Be(56);
     }

@@ -102,6 +102,7 @@
 		<Using Include="RealmCore.Server.Modules.World.Xml" />
 		<Using Include="RealmCore.Server.Modules.World.Xml.Map" />
 		<Using Include="RealmCore.Sample.Concepts.Gui.Dx" />
+		<Using Include="RealmCore.Server.Modules.Domain" />
 	</ItemGroup>
 
 </Project>

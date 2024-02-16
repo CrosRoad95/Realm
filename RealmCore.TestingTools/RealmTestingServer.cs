@@ -91,17 +91,17 @@ public class RealmTestingServer : TestingServer<RealmTestingPlayer>
 
     public RealmWorldObject CreateObject()
     {
-        return GetRequiredService<IElementFactory>().CreateObject(ObjectModel.Bin1, Vector3.Zero, Vector3.Zero);
+        return GetRequiredService<IElementFactory>().CreateObject(Location.Zero, ObjectModel.Bin1);
     }
 
     public FocusableRealmWorldObject CreateFocusableObject()
     {
-        return GetRequiredService<IElementFactory>().CreateFocusableObject(ObjectModel.Bin1, Vector3.Zero, Vector3.Zero);
+        return GetRequiredService<IElementFactory>().CreateFocusableObject(Location.Zero, ObjectModel.Bin1);
     }
 
     public RealmVehicle CreateVehicle()
     {
-        return GetRequiredService<IElementFactory>().CreateVehicle(404, Vector3.Zero, Vector3.Zero);
+        return GetRequiredService<IElementFactory>().CreateVehicle(Location.Zero, (VehicleModel)404);
     }
 
     public async Task<RealmPlayer> SignInPlayer(RealmPlayer player)

@@ -13,7 +13,7 @@ public class JobSessionsTests : RealmUnitTestingBase
 
         public Objective CreateMarkerObjective(bool withBlip = true)
         {
-            var objective = AddObjective(new MarkerEnterObjective(new Vector3(383.6543f, -82.01953f, 3.914598f)));
+            var objective = AddObjective(new MarkerEnterObjective(new Location(383.6543f, -82.01953f, 3.914598f)));
             if (withBlip)
                 objective.AddBlip(BlipIcon.North);
             return objective;
@@ -21,8 +21,8 @@ public class JobSessionsTests : RealmUnitTestingBase
 
         public Objective CreateOneOfObjective()
         {
-            var marker1 = new MarkerEnterObjective(new Vector3(400.0f, -82.01953f, 3.914598f));
-            var marker2 = new MarkerEnterObjective(new Vector3(500.0f, -82.01953f, 3.914598f));
+            var marker1 = new MarkerEnterObjective(new Location(400.0f, -82.01953f, 3.914598f));
+            var marker2 = new MarkerEnterObjective(new Location(500.0f, -82.01953f, 3.914598f));
             var objective = AddObjective(new OneOfObjective(marker1, marker2));
             return objective;
         }
@@ -32,11 +32,11 @@ public class JobSessionsTests : RealmUnitTestingBase
             Objective objective;
             if (element != null)
             {
-                objective = AddObjective(new TransportObjectObjective(element, new Vector3(400.0f, -82.01953f, 3.914598f)));
+                objective = AddObjective(new TransportObjectObjective(element, new Location(400.0f, -82.01953f, 3.914598f)));
             }
             else
             {
-                objective = AddObjective(new TransportObjectObjective(new Vector3(400.0f, -82.01953f, 3.914598f)));
+                objective = AddObjective(new TransportObjectObjective(new Location(400.0f, -82.01953f, 3.914598f)));
             }
             return objective;
         }
@@ -111,7 +111,7 @@ public class JobSessionsTests : RealmUnitTestingBase
         var player = CreatePlayer();
 
         var testJobSession = player.Sessions.BeginSession<TestJobSession>();
-        var myObject = player.ElementFactory.CreateObject((ObjectModel)1337, new Vector3(100, 100, 100), Vector3.Zero);
+        var myObject = player.ElementFactory.CreateObject(new Location(new Vector3(100, 100, 100), Vector3.Zero), (ObjectModel)1337);
         myObject.TrySetOwner(player);
         var objective = testJobSession.CreateTransportObjectObjective1();
 

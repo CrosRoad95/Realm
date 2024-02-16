@@ -3,7 +3,7 @@
 public class TransportObjectObjective : Objective
 {
     private Element? _element;
-    private readonly Vector3 _destination;
+    private readonly Location _destination;
     private readonly float _range;
     private readonly bool _withMarker;
     private RealmMarker? _marker;
@@ -12,9 +12,9 @@ public class TransportObjectObjective : Objective
     private IScopedElementFactory _scopedElementFactory = default!;
     public Func<Element, bool>? CheckElement { get; set; }
 
-    public override Vector3 Position => _destination;
+    public override Location Location => _destination;
 
-    public TransportObjectObjective(Element element, Vector3 destination, float range = 2)
+    public TransportObjectObjective(Element element, Location destination, float range = 2)
     {
         _element = element;
         _destination = destination;
@@ -23,7 +23,7 @@ public class TransportObjectObjective : Objective
         _element.Destroyed += HandleDestroyed;
     }
 
-    public TransportObjectObjective(Vector3 destination, float range = 2, bool withMarker = false)
+    public TransportObjectObjective(Location destination, float range = 2, bool withMarker = false)
     {
         _destination = destination;
         _range = range;
@@ -55,7 +55,8 @@ public class TransportObjectObjective : Objective
 
         if (_element == null)
         {
-            var elementsInRange = _elementCollection.GetWithinRange(_destination, _range);
+            // TODO: Check interior, dimension
+            var elementsInRange = _elementCollection.GetWithinRange(_destination.Position, _range);
             foreach (var element in elementsInRange)
             {
                 if (element is RealmWorldObject worldObject)
@@ -91,7 +92,8 @@ public class TransportObjectObjective : Objective
         }
         else
         {
-            if (Vector3.DistanceSquared(_element.Position, _destination) <= _range * _range)
+            // TODO: Check interior, dimension
+            if (Vector3.DistanceSquared(_element.Position, _destination.Position) <= _range * _range)
             {
                 if (_element is RealmWorldObject worldObject)
                 {

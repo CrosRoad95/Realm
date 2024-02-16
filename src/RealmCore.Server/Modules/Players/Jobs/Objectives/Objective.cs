@@ -16,7 +16,7 @@ public abstract class Objective : IDisposable
     public RealmPlayer Player { get => _player ?? throw new InvalidOperationException(); internal set => _player = value; }
 
     private Blip? _blip;
-    public abstract Vector3 Position { get; }
+    public abstract Location Location { get; }
     protected abstract void Load();
     public virtual void Update() { }
 
@@ -56,7 +56,7 @@ public abstract class Objective : IDisposable
         if (_blip != null)
             throw new InvalidOperationException();
 
-        _blip = ElementFactory.CreateBlip(Position, blipIcon);
+        _blip = ElementFactory.CreateBlip(Location, blipIcon);
     }
 
     public void RemoveBlip()

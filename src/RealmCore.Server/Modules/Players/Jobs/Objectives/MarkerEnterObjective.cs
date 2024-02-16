@@ -2,20 +2,20 @@
 
 public class MarkerEnterObjective : Objective
 {
-    private readonly Vector3 _position;
+    private readonly Location _destination;
 
     private RealmMarker? _marker;
 
-    public override Vector3 Position => _position;
+    public override Location Location => _destination;
 
-    public MarkerEnterObjective(Vector3 position)
+    public MarkerEnterObjective(Location destination)
     {
-        _position = position;
+        _destination = destination;
     }
 
     protected override void Load()
     {
-        _marker = ElementFactory.CreateMarker(_position, MarkerType.Arrow, 1, Color.White);
+        _marker = ElementFactory.CreateMarker(_destination, MarkerType.Arrow, 1, Color.White);
         _marker.CollisionDetection.Entered += HandleEntered;
     }
 
