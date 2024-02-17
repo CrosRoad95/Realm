@@ -17,7 +17,7 @@ public static class QuerableExtensions
         return query.Where(x => !x.Removed);
     }
 
-    public static IQueryable<UserData> IncludeAll(this IQueryable<UserData> query)
+    public static IQueryable<UserData> IncludeAll(this IQueryable<UserData> query, DateTime now)
     {
         return query
             .Include(x => x.Licenses)
@@ -34,9 +34,10 @@ public static class QuerableExtensions
             .Include(x => x.Settings)
             .Include(x => x.Events.OrderByDescending(x => x.Id).Take(10))
             .Include(x => x.WhitelistedSerials)
-            .Include(x => x.Bans.OrderByDescending(x => x.Id).Take(10))
+            .Include(x => x.Bans.Where(x => x.Active && x.End > now))
             .Include(x => x.Inventories)
-            .ThenInclude(x => x!.InventoryItems);
+            .ThenInclude(x => x!.InventoryItems)
+            .AsSplitQuery();
     }
 
     public static IQueryable<VehicleData> IncludeAll(this IQueryable<VehicleData> query)
@@ -47,7 +48,8 @@ public static class QuerableExtensions
             .Include(x => x.VehicleEngines)
             .Include(x => x.Inventories)
             .ThenInclude(x => x!.InventoryItems)
-            .Include(x => x.UserAccesses);
+            .Include(x => x.UserAccesses)
+            .AsSplitQuery();
     }
 
     public static IQueryable<VehicleData> IsSpawned(this IQueryable<VehicleData> query)

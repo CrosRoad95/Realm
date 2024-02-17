@@ -7,10 +7,10 @@ public class PlayerDailyVisitsServiceTests : RealmUnitTestingBase
     [Theory]
     public void VisitCounterShouldUpdateAppropriately(bool useNowDateTime)
     {
-        var realmTestingServer = CreateServer();
+        var server = CreateServer();
         var player = CreatePlayer();
 
-        var testDateTimeProvider = realmTestingServer.TestDateTimeProvider;
+        var testDateTimeProvider = server.TestDateTimeProvider;
         var dailyVisits = player.DailyVisits;
 
         dailyVisits.LastVisit = useNowDateTime ? DateTime.Now : DateTime.MinValue;

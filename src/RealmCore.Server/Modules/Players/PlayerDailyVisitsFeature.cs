@@ -63,9 +63,9 @@ internal sealed class PlayerDailyVisitsFeature : IPlayerDailyVisitsFeature, IDis
         var now = player.GetRequiredService<IDateTimeProvider>().Now;
         lock (_lock)
         {
-            if (playerUserFeature.User?.DailyVisits != null)
+            if (playerUserFeature.UserData?.DailyVisits != null)
             {
-                _dailyVisitsData = playerUserFeature.User?.DailyVisits;
+                _dailyVisitsData = playerUserFeature.UserData?.DailyVisits;
             }
             else
             {

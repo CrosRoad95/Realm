@@ -1,4 +1,4 @@
-﻿namespace RealmCore.Server.Modules.Players;
+﻿namespace RealmCore.Server.Modules.Players.Settings;
 
 public interface IPlayerSettingsFeature : IPlayerFeature, IEnumerable<UserSettingDto>
 {
@@ -11,7 +11,7 @@ public interface IPlayerSettingsFeature : IPlayerFeature, IEnumerable<UserSettin
     /// </summary>
     int[] SettingsIds { get; }
     void Set(int settingId, string value);
-    bool Remove(int settingId);
+    void Remove(int settingId);
     bool TryGet(int settingId, out string? value);
     string Get(int settingId);
     bool Has(int settingId);
@@ -19,9 +19,10 @@ public interface IPlayerSettingsFeature : IPlayerFeature, IEnumerable<UserSettin
     /// Removes all settings
     /// </summary>
     void Reset();
+    bool TryRemove(int settingId);
 }
 
-internal sealed class PlayerSettingsFeature : IPlayerSettingsFeature
+internal sealed class PlayerSettingsFeature : IPlayerSettingsFeature, IDisposable
 {
     private readonly object _lock = new();
     private ICollection<UserSettingData> _settings = [];
@@ -52,7 +53,7 @@ internal sealed class PlayerSettingsFeature : IPlayerSettingsFeature
     private void HandleSignedIn(IPlayerUserFeature playerUserFeature, RealmPlayer _)
     {
         lock (_lock)
-            _settings = playerUserFeature.User.Settings;
+            _settings = playerUserFeature.UserData.Settings;
     }
 
     public void Reset()
@@ -100,7 +101,12 @@ internal sealed class PlayerSettingsFeature : IPlayerSettingsFeature
     public string Get(int settingId)
     {
         lock (_lock)
-            return _settings.First(x => x.SettingId == settingId).Value;
+        {
+            var setting = _settings.FirstOrDefault(x => x.SettingId == settingId);
+            if (setting == null)
+                throw new SettingNotFoundException(settingId);
+            return setting.Value;
+        }
     }
 
     public bool TryGet(int settingId, out string? value)
@@ -118,7 +124,21 @@ internal sealed class PlayerSettingsFeature : IPlayerSettingsFeature
         }
     }
 
-    public bool Remove(int settingId)
+    public void Remove(int settingId)
+    {
+        lock (_lock)
+        {
+            var setting = _settings.First(x => x.SettingId == settingId);
+            if(setting == null)
+                throw new SettingNotFoundException(settingId);
+
+            _settings.Remove(setting);
+            Removed?.Invoke(this, setting.SettingId, setting.Value);
+            _playerUserFeature.IncreaseVersion();
+        }
+    }
+    
+    public bool TryRemove(int settingId)
     {
         lock (_lock)
         {
@@ -141,4 +161,10 @@ internal sealed class PlayerSettingsFeature : IPlayerSettingsFeature
     }
 
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+
+    public void Dispose()
+    {
+        lock (_lock)
+            _settings = [];
+    }
 }

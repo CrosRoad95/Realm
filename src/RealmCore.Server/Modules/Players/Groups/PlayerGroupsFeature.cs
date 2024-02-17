@@ -27,7 +27,7 @@ internal sealed class PlayerGroupsFeature : IPlayerGroupsFeature
         _lock.Wait();
         try
         {
-            _groupMembers = playerUserFeature.User.GroupMembers;
+            _groupMembers = playerUserFeature.UserData.GroupMembers;
         }
         finally
         {

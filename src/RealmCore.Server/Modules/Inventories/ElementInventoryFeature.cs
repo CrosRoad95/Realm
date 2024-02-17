@@ -35,7 +35,7 @@ internal sealed class PlayerInventoryFeature : ElementInventoryFeature, IPlayerI
 
     private void HandleSignedIn(IPlayerUserFeature playerUserFeature, RealmPlayer player)
     {
-        Load(Player, playerUserFeature.User.Inventories, _itemsCollection);
+        Load(Player, playerUserFeature.UserData.Inventories, _itemsCollection);
     }
 }
 

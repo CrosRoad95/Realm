@@ -19,7 +19,7 @@ public class UserTests : RealmIntegrationTestingBase
 
         #region Act
         var userId = await usersService.SignUp(login, password);
-        var user = await userManager.GetUserByUserName(login) ?? throw new Exception("User not found");
+        var user = await userManager.GetUserByUserName(login, server.TestDateTimeProvider.Now) ?? throw new Exception("User not found");
 
         var validPassword = await userManager.CheckPasswordAsync(user, password);
         var signIn = async () => await usersService.SignIn(player, user);

@@ -5,7 +5,7 @@ public class PlayerAchievementsServiceTests : RealmUnitTestingBase
     [Fact]
     public void TestIfAchievementProgressCountsCorrectly()
     {
-        var realmTestingServer = CreateServer();
+        var server = CreateServer();
         var player = CreatePlayer();
 
         var achievements = player.Achievements;
@@ -29,7 +29,7 @@ public class PlayerAchievementsServiceTests : RealmUnitTestingBase
     [Fact]
     public void TestIfCanReceiveReward()
     {
-        var realmTestingServer = CreateServer();
+        var server = CreateServer();
         var player = CreatePlayer();
 
         var achievements = player.Achievements;
@@ -40,7 +40,7 @@ public class PlayerAchievementsServiceTests : RealmUnitTestingBase
             unlockedAchievement = achievementId;
         };
 
-        var now = realmTestingServer.TestDateTimeProvider.Now;
+        var now = server.TestDateTimeProvider.Now;
         achievements.TryReceiveReward(2, 100, now).Should().BeFalse();
 
         achievements.UpdateProgress(2, 100, 100);

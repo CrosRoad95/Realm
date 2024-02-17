@@ -28,7 +28,7 @@ internal sealed class PlayerDiscoveriesFeature : IPlayerDiscoveriesFeature
     private void HandleSignedIn(IPlayerUserFeature playerUserFeature, RealmPlayer _)
     {
         lock (_lock)
-            _discoveries = playerUserFeature.User.Discoveries;
+            _discoveries = playerUserFeature.UserData.Discoveries;
     }
 
     private void HandleSignedOut(IPlayerUserFeature playerUserFeature, RealmPlayer _)

@@ -132,16 +132,19 @@ internal sealed class SaveService : ISaveService
         if (!player.User.IsSignedIn)
             return false;
 
-        var user = player.User.User;
+        var user = player.User.UserData;
         var db = player.GetRequiredService<IDb>();
 
-        user.LastTransformAndMotion = player.GetTransformAndMotion();
+        if(player.IsSpawned)
+            user.LastTransformAndMotion = player.GetTransformAndMotion();
+        user.PlayTime = (ulong)player.PlayTime.TotalPlayTime.TotalSeconds;
+
         db.Users.Update(user);
 
         foreach (var item in _userDataSavers)
             await item.SaveAsync(player);
 
-        await db.SaveChangesAsync(cancellationToken);
+        var savedEntities = await db.SaveChangesAsync(cancellationToken);
 
         return true;
     }

@@ -27,8 +27,8 @@ public class Hud3dTests
     //public void TestHud3dComponentShouldProduceAppropriateCallback()
     //{
     //    #region Arrange
-    //    var realmTestingServer = new RealmTestingServer();
-    //    var player = realmTestingServer.CreatePlayer();
+    //    var server = new RealmTestingServer();
+    //    var player = server.CreatePlayer();
     //    player.Position = new Vector3(100, 100, 100);
     //    int callCount = 0;
     //    string _id = string.Empty;
@@ -74,8 +74,8 @@ public class Hud3dTests
     //public void TestDetectedDynamicHudComponents()
     //{
     //    #region Arrange
-    //    var realmTestingServer = new RealmTestingServer();
-    //    var player = realmTestingServer.CreatePlayer();
+    //    var server = new RealmTestingServer();
+    //    var player = server.CreatePlayer();
     //    #endregion
 
     //    #region Act
@@ -94,8 +94,8 @@ public class Hud3dTests
     //public void UpdateStateShouldProduceAppropriateCallback()
     //{
     //    #region Arrange
-    //    var realmTestingServer = new RealmTestingServer();
-    //    var player = realmTestingServer.CreatePlayer();
+    //    var server = new RealmTestingServer();
+    //    var player = server.CreatePlayer();
 
     //    int callsCount = 0;
     //    string _id = string.Empty;
@@ -134,8 +134,8 @@ public class Hud3dTests
     //public void Hud3dShouldBeRemovedWhenComponentGetRemoved()
     //{
     //    #region Arrange
-    //    var realmTestingServer = new RealmTestingServer();
-    //    var player = realmTestingServer.CreatePlayer();
+    //    var server = new RealmTestingServer();
+    //    var player = server.CreatePlayer();
     //    string _id = string.Empty;
     //    _overlayService.Hud3dRemoved = id =>
     //    {
@@ -158,8 +158,8 @@ public class Hud3dTests
     //public void ItIsNotAllowedToUpdateStatelessHud()
     //{
     //    #region Arrange
-    //    var realmTestingServer = new RealmTestingServer();
-    //    var player = realmTestingServer.CreatePlayer();
+    //    var server = new RealmTestingServer();
+    //    var player = server.CreatePlayer();
     //    var hud3d = player.AddComponent<SampleStateLessHud3d>();
     //    #endregion
 

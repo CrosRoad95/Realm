@@ -113,15 +113,8 @@ public class RealmTestingServer : TestingServer<RealmTestingPlayer>
     public async Task<RealmPlayer> SignInPlayer(RealmPlayer player)
     {
         var userManager = GetRequiredService<UserManager<UserData>>();
-        var user = await userManager.GetUserByUserName(player.Name);
+        var user = await userManager.GetUserByUserName(player.Name, TestDateTimeProvider.Now);
 
-        //if(user != null)
-        //{
-        //    // Fix for in memory database
-        //    user.Settings = user.Settings.DistinctBy(x => x.SettingId).ToList();
-        //    user.Bans = user.Bans.DistinctBy(x => x.Id).ToList();
-        //    user.Upgrades = user.Upgrades.DistinctBy(x => x.UpgradeId).ToList();
-        //}
         if (user == null)
         {
             user = new UserData

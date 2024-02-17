@@ -5,7 +5,7 @@ public class ToggleControlsScopeTests : RealmUnitTestingBase
     [Fact]
     public void ItShouldWork()
     {
-        var realmTestingServer = CreateServer();
+        var server = CreateServer();
         var player = CreatePlayer();
 
         var scope = new ToggleControlsScope(player);
@@ -19,7 +19,7 @@ public class ToggleControlsScopeTests : RealmUnitTestingBase
     [Theory]
     public void OnlyOneScopePerPlayerIsAllowed1(bool dispose)
     {
-        var realmTestingServer = CreateServer();
+        var server = CreateServer();
         var player = CreatePlayer();
 
         var createScope = () => new ToggleControlsScope(player);

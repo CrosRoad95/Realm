@@ -33,7 +33,7 @@ internal class PlayerEventsFeature : IPlayerEventsFeature
         _lock.Wait();
         try
         {
-            _userEventData = playerUserFeature.User.Events;
+            _userEventData = playerUserFeature.UserData.Events;
         }
         finally
         {

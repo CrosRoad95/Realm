@@ -32,7 +32,7 @@ internal sealed class PlayerJobStatisticsFeature : IPlayerJobStatisticsFeature
     private void HandleSignedIn(IPlayerUserFeature playerUserFeature, RealmPlayer _)
     {
         lock (_lock)
-            _jobStatistics = playerUserFeature.User.JobStatistics;
+            _jobStatistics = playerUserFeature.UserData.JobStatistics;
     }
 
     private void HandleSignedOut(IPlayerUserFeature playerUserFeature, RealmPlayer _)

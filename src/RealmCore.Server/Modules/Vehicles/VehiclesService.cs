@@ -10,6 +10,7 @@ public interface IVehiclesService
     Task<bool> SetVehicleSpawned(RealmVehicle vehicle, bool spawned = true, CancellationToken cancellationToken = default);
     Task<RealmVehicle> Spawn(VehicleData vehicleData, CancellationToken cancellationToken = default);
     IEnumerable<RealmPlayer> GetOnlineOwners(RealmVehicle vehicle);
+    Task Destroy(RealmVehicle vehicle);
 }
 
 internal sealed class VehiclesService : IVehiclesService
@@ -23,11 +24,11 @@ internal sealed class VehiclesService : IVehiclesService
     private readonly VehicleUpgradesCollection _vehicleUpgradesCollection;
     private readonly VehicleEnginesCollection _vehicleEnginesCollection;
     private readonly IUsersInUse _activeUsers;
-    private readonly IVehiclesInUse _activeVehicles;
+    private readonly IVehiclesInUse _vehiclesInUse;
     private readonly ILogger<VehiclesService> _logger;
     private readonly JsonSerializerSettings _jsonSerializerSettings;
 
-    public VehiclesService(IVehicleRepository vehicleRepository, IElementFactory elementFactory, ISaveService saveService, ItemsCollection itemsCollection, IVehicleEventRepository vehicleEventRepository, IDateTimeProvider dateTimeProvider, VehicleUpgradesCollection vehicleUpgradeCollection, VehicleEnginesCollection vehicleEnginesCollection, IUsersInUse activeUsers, IVehiclesInUse activeVehicles, ILogger<VehiclesService> logger)
+    public VehiclesService(IVehicleRepository vehicleRepository, IElementFactory elementFactory, ISaveService saveService, ItemsCollection itemsCollection, IVehicleEventRepository vehicleEventRepository, IDateTimeProvider dateTimeProvider, VehicleUpgradesCollection vehicleUpgradeCollection, VehicleEnginesCollection vehicleEnginesCollection, IUsersInUse activeUsers, IVehiclesInUse vehiclesInUse, ILogger<VehiclesService> logger)
     {
         _vehicleRepository = vehicleRepository;
         _elementFactory = elementFactory;
@@ -38,39 +39,12 @@ internal sealed class VehiclesService : IVehiclesService
         _vehicleUpgradesCollection = vehicleUpgradeCollection;
         _vehicleEnginesCollection = vehicleEnginesCollection;
         _activeUsers = activeUsers;
-        _activeVehicles = activeVehicles;
+        _vehiclesInUse = vehiclesInUse;
         _logger = logger;
         _jsonSerializerSettings = new JsonSerializerSettings
         {
             Converters = new List<JsonConverter> { DoubleConverter.Instance }
         };
-        _elementFactory.ElementCreated += HandleElementCreated;
-    }
-
-    private void HandleElementCreated(Element element)
-    {
-        if (element is not RealmVehicle vehicle)
-            return;
-
-        vehicle.Destroyed += HandleDestroyed;
-    }
-
-    private async void HandleDestroyed(Element element)
-    {
-        try
-        {
-            var vehicle = (RealmVehicle)element;
-            if (vehicle.Persistence.IsLoaded)
-            {
-                var id = vehicle.Persistence.Id;
-                await _vehicleRepository.SetSpawned(id, false);
-                _activeVehicles.TrySetInactive(id);
-            }
-        }
-        catch (Exception ex)
-        {
-            _logger.LogHandleError(ex);
-        }
     }
 
     public async Task<RealmVehicle> CreatePersistantVehicle(Location location, VehicleModel model, CancellationToken cancellationToken = default)
@@ -132,7 +106,7 @@ internal sealed class VehiclesService : IVehiclesService
 
     private void SetActive(int vehicleId, RealmVehicle vehicle)
     {
-        if (!_activeVehicles.TrySetActive(vehicleId, vehicle))
+        if (!_vehiclesInUse.TrySetActive(vehicleId, vehicle))
             throw new PersistantVehicleAlreadySpawnedException("Failed to create already existing vehicle.");
     }
 
@@ -165,5 +139,18 @@ internal sealed class VehiclesService : IVehiclesService
             if (_activeUsers.TryGetPlayerByUserId(owner.UserId, out var player) && player != null)
                 yield return player;
         }
+    }
+
+    public async Task Destroy(RealmVehicle vehicle)
+    {
+        if(vehicle.Persistence.IsLoaded)
+        {
+            await _saveService.Save(vehicle);
+            var id = vehicle.Persistence.Id;
+            await _vehicleRepository.SetSpawned(id, false);
+            _vehiclesInUse.TrySetInactive(id);
+        }
+
+        vehicle.Destroy();
     }
 }

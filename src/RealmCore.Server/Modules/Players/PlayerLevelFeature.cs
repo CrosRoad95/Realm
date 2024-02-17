@@ -44,8 +44,8 @@ internal sealed class PlayerLevelFeature : IPlayerLevelFeature
     {
         lock (_lock)
         {
-            _level = playerUserFeature.User.Level;
-            _experience = playerUserFeature.User.Experience;
+            _level = playerUserFeature.UserData.Level;
+            _experience = playerUserFeature.UserData.Experience;
             LevelChanged?.Invoke(this, _level, LevelChange.Set);
             ExperienceChanged?.Invoke(this, _experience);
         }

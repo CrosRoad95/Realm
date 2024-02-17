@@ -62,9 +62,9 @@ public class VehicleUpgradesTests : RealmUnitTestingBase
     public void AddUpgradeShouldWork(int upgradeId, int expectedMaxVelocity)
     {
         #region Arrange
-        var realmTestingServer = CreateServer();
-        Seed(realmTestingServer);
-        var vehicle = realmTestingServer.CreateVehicle();
+        var server = CreateServer();
+        Seed(server);
+        var vehicle = server.CreateVehicle();
         #endregion
 
         #region Act
@@ -82,9 +82,9 @@ public class VehicleUpgradesTests : RealmUnitTestingBase
     public void AddUniqueUpgradeShouldAddOnlyOneInstanceOfUpgrade(int upgradeId, int expectedMaxVelocity)
     {
         #region Act
-        var realmTestingServer = CreateServer();
-        Seed(realmTestingServer);
-        var vehicle = realmTestingServer.CreateVehicle();
+        var server = CreateServer();
+        Seed(server);
+        var vehicle = server.CreateVehicle();
         var resultA = vehicle.Upgrades.AddUniqueUpgrade(upgradeId);
         var resultB = vehicle.Upgrades.AddUniqueUpgrade(upgradeId);
         #endregion
@@ -100,9 +100,9 @@ public class VehicleUpgradesTests : RealmUnitTestingBase
     public void UpgradesCanBeRemoved()
     {
         #region Act
-        var realmTestingServer = CreateServer();
-        Seed(realmTestingServer);
-        var vehicle = realmTestingServer.CreateVehicle();
+        var server = CreateServer();
+        Seed(server);
+        var vehicle = server.CreateVehicle();
         vehicle.Upgrades.AddUpgrade(1000000);
         vehicle.Upgrades.RemoveUpgrade(1000000);
         #endregion
@@ -116,9 +116,9 @@ public class VehicleUpgradesTests : RealmUnitTestingBase
     public void MultipleUpgradesOfSameTypeCanBeAdded()
     {
         #region Act
-        var realmTestingServer = CreateServer();
-        Seed(realmTestingServer);
-        var vehicle = realmTestingServer.CreateVehicle();
+        var server = CreateServer();
+        Seed(server);
+        var vehicle = server.CreateVehicle();
         vehicle.Upgrades.AddUpgrades(Enumerable.Range(1, 3).Select(x => 1000000));
         #endregion
 
@@ -137,9 +137,9 @@ public class VehicleUpgradesTests : RealmUnitTestingBase
     public void UpgradesMiddlewareShouldBeOrderIndependent(int[] upgrades)
     {
         #region Act
-        var realmTestingServer = CreateServer();
-        Seed(realmTestingServer);
-        var vehicle = realmTestingServer.CreateVehicle();
+        var server = CreateServer();
+        Seed(server);
+        var vehicle = server.CreateVehicle();
         vehicle.Upgrades.AddUpgrades(upgrades);
         #endregion
 

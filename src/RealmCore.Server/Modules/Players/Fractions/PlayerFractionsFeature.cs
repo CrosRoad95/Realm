@@ -30,7 +30,7 @@ internal sealed class PlayerFractionsFeature : IPlayerFractionsFeature
     private void HandleSignedIn(IPlayerUserFeature playerUserFeature, RealmPlayer _)
     {
         lock(_lock)
-            _fractionMembers = playerUserFeature.User.FractionMembers;
+            _fractionMembers = playerUserFeature.UserData.FractionMembers;
     }
 
     public bool IsMember(int fractionId)

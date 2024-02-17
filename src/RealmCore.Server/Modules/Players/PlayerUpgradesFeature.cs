@@ -32,8 +32,8 @@ internal sealed class PlayerUpgradesFeature : IPlayerUpgradesFeature
     {
         lock (_lock)
         {
-            _upgrades = playerUserFeature.User.Upgrades;
-            foreach (var userUpgradeData in playerUserFeature.User.Upgrades)
+            _upgrades = playerUserFeature.UserData.Upgrades;
+            foreach (var userUpgradeData in playerUserFeature.UserData.Upgrades)
             {
                 Added?.Invoke(this, userUpgradeData.UpgradeId, true);
             }

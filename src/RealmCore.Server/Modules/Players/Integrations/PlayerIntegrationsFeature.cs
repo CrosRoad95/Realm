@@ -29,8 +29,8 @@ internal sealed class PlayerIntegrationsFeature : IPlayerIntegrationsFeature
 
     private void HandleSignedIn(IPlayerUserFeature playerUserFeature, RealmPlayer _)
     {
-        if (playerUserFeature.User.DiscordIntegration != null)
-            Discord.Integrate(playerUserFeature.User.DiscordIntegration.DiscordUserId);
+        if (playerUserFeature.UserData.DiscordIntegration != null)
+            Discord.Integrate(playerUserFeature.UserData.DiscordIntegration.DiscordUserId);
     }
 
     private void HandleSignedOut(IPlayerUserFeature playerUserFeature, RealmPlayer _)

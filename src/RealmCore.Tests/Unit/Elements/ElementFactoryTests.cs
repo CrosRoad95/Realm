@@ -5,7 +5,7 @@ public class ElementFactoryTests : RealmUnitTestingBase
     [Fact]
     public void ScopedElementFactoryShouldWork()
     {
-        var realmTestingServer = CreateServer();
+        var server = CreateServer();
         var player = CreatePlayer();
 
         bool wasDestroyed = false;
@@ -27,7 +27,7 @@ public class ElementFactoryTests : RealmUnitTestingBase
     [Fact]
     public void InnerScopesForScopedElementFactoryShouldWork()
     {
-        var realmTestingServer = CreateServer();
+        var server = CreateServer();
         var player = CreatePlayer();
 
         bool wasDestroyed = false;
@@ -48,7 +48,7 @@ public class ElementFactoryTests : RealmUnitTestingBase
     [Fact]
     public void RootAndInnerScopesForScopedElementFactoryShouldWork()
     {
-        var realmTestingServer = CreateServer();
+        var server = CreateServer();
         var player = CreatePlayer();
 
         var rootElementFactory = player.ElementFactory;
@@ -67,7 +67,7 @@ public class ElementFactoryTests : RealmUnitTestingBase
     [Fact]
     public void RootAndInnerScopesForScopedElementFactoryShouldWork2()
     {
-        var realmTestingServer = CreateServer();
+        var server = CreateServer();
         var player = CreatePlayer();
 
         var rootElementFactory = player.ElementFactory;
@@ -89,7 +89,7 @@ public class ElementFactoryTests : RealmUnitTestingBase
     [Fact]
     public void ElementsShouldBeCreatedInTheSameDimensionAndInterior()
     {
-        var realmTestingServer = CreateServer();
+        var server = CreateServer();
         var player = CreatePlayer();
         player.Interior = 13;
         player.Dimension = 56;
@@ -103,7 +103,7 @@ public class ElementFactoryTests : RealmUnitTestingBase
     [Fact]
     public void CollisionsShouldWorks()
     {
-        var realmTestingServer = CreateServer();
+        var server = CreateServer();
         var player1 = CreatePlayer();
         var player2 = CreatePlayer();
 

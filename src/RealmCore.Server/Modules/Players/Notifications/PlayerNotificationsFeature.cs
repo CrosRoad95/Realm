@@ -37,7 +37,7 @@ internal sealed class PlayerNotificationsFeature : IPlayerNotificationsFeature, 
         _lock.Wait();
         try
         {
-            _userNotificationDataList = playerUserFeature.User.Notifications;
+            _userNotificationDataList = playerUserFeature.UserData.Notifications;
         }
         finally
         {

@@ -30,6 +30,7 @@ internal sealed class PlayerPlayTimeFeature : IPlayerPlayTimeFeature, IDisposabl
     public TimeSpan TotalPlayTime => PlayTime + TimeSpan.FromSeconds(_totalPlayTime);
 
     public RealmPlayer Player { get; init; }
+
     public PlayerPlayTimeFeature(PlayerContext playerContext, IPlayerUserFeature playerUserFeature, IDateTimeProvider dateTimeProvider, IPeriodicEventDispatcher updateService)
     {
         Player = playerContext.Player;
@@ -45,7 +46,7 @@ internal sealed class PlayerPlayTimeFeature : IPlayerPlayTimeFeature, IDisposabl
     private void HandleSignedIn(IPlayerUserFeature playerUserFeature, RealmPlayer _)
     {
         lock (_lock)
-            _totalPlayTime = playerUserFeature.User.PlayTime;
+            _totalPlayTime = playerUserFeature.UserData.PlayTime;
     }
 
     private void HandleSignedOut(IPlayerUserFeature playerUserFeature, RealmPlayer _)

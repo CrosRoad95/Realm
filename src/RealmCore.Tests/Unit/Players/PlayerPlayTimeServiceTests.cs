@@ -5,10 +5,10 @@ public class PlayerPlayTimeServiceTests : RealmUnitTestingBase
     [Fact]
     public void TestIfCounterWorksCorrectly()
     {
-        var realmTestingServer = CreateServer();
+        var server = CreateServer();
         var player1 = CreatePlayer();
         var player2 = CreatePlayer();
-        var dateTimeProvider = realmTestingServer.TestDateTimeProvider;
+        var dateTimeProvider = server.TestDateTimeProvider;
 
         var playTime1 = player1.PlayTime;
         var playTime2 = player2.PlayTime;

@@ -9,7 +9,7 @@ public class PlayersMoneyFeatureTests : RealmUnitTestingBase
     [Theory]
     public void GiveAndTakeMoneyShouldGiveExpectedAmountOfMoney(decimal moneyGiven, decimal expectedAmount, int times)
     {
-        var realmTestingServer = CreateServer();
+        var server = CreateServer();
         var player = CreatePlayer();
 
         decimal moneyAdded = 0;
@@ -42,7 +42,7 @@ public class PlayersMoneyFeatureTests : RealmUnitTestingBase
     [Theory]
     public void SettingAndGettingMoneyShouldWork(decimal moneySet, decimal expectedMoney)
     {
-        var realmTestingServer = CreateServer();
+        var server = CreateServer();
         var player = CreatePlayer();
         player.Money.SetMoneyInternal(1000000);
 
@@ -53,7 +53,7 @@ public class PlayersMoneyFeatureTests : RealmUnitTestingBase
     [Fact]
     public void GiveAndTakeMoneyShouldNotAllowNegativeValues()
     {
-        var realmTestingServer = CreateServer();
+        var server = CreateServer();
         var player = CreatePlayer();
         player.Money.SetMoneyInternal(1000000);
 
@@ -71,7 +71,7 @@ public class PlayersMoneyFeatureTests : RealmUnitTestingBase
     [Theory]
     public void YouCanNotGiveTakeOrSetMoneyBeyondLimit(decimal amount)
     {
-        var realmTestingServer = CreateServer();
+        var server = CreateServer();
         var player = CreatePlayer();
 
         Action actGiveMoney = () => { player.Money.GiveMoney(amount); };
@@ -92,7 +92,7 @@ public class PlayersMoneyFeatureTests : RealmUnitTestingBase
     [Fact]
     public async Task TestIfPlayerIsThreadSafe()
     {
-        var realmTestingServer = CreateServer();
+        var server = CreateServer();
         var player = CreatePlayer();
 
         await ParallelHelpers.Run(() =>
@@ -113,7 +113,7 @@ public class PlayersMoneyFeatureTests : RealmUnitTestingBase
     [Fact]
     public void YouShouldNotBeAbleToTakeMoneyIfThereIsNotEnoughOfThem()
     {
-        var realmTestingServer = CreateServer();
+        var server = CreateServer();
         var player = CreatePlayer();
         player.Money.SetMoneyInternal(1000000);
 
@@ -129,7 +129,7 @@ public class PlayersMoneyFeatureTests : RealmUnitTestingBase
     [Fact]
     public void YouShouldBeAbleToForceTakeMoneyIfThereIsNotEnoughOfThem()
     {
-        var realmTestingServer = CreateServer();
+        var server = CreateServer();
         var player = CreatePlayer();
         player.Money.SetMoneyInternal(1000000);
 
@@ -144,7 +144,7 @@ public class PlayersMoneyFeatureTests : RealmUnitTestingBase
     [Fact]
     public void YouShouldBeAbleToTransferMoneyBetweenPlayers()
     {
-        var realmTestingServer = CreateServer();
+        var server = CreateServer();
         var player1 = CreatePlayer();
         var player2 = CreatePlayer();
 
@@ -158,7 +158,7 @@ public class PlayersMoneyFeatureTests : RealmUnitTestingBase
     [Fact]
     public void YouCannotTransferMoreMoneyThanYouHave()
     {
-        var realmTestingServer = CreateServer();
+        var server = CreateServer();
         var player1 = CreatePlayer();
         var player2 = CreatePlayer();
         player1.Money.SetMoneyInternal(1000000);
@@ -173,7 +173,7 @@ public class PlayersMoneyFeatureTests : RealmUnitTestingBase
     [Fact]
     public async Task TransferMoneyShouldBeThreadSafety()
     {
-        var realmTestingServer = CreateServer();
+        var server = CreateServer();
         var player1 = CreatePlayer();
         var player2 = CreatePlayer();
         player1.Money.SetMoneyInternal(1000000);
@@ -196,7 +196,7 @@ public class PlayersMoneyFeatureTests : RealmUnitTestingBase
     [Theory]
     public void HasMoneyShouldReturnExpectedValue(decimal amount, decimal requiredAmount, bool force, bool expectedResult)
     {
-        var realmTestingServer = CreateServer();
+        var server = CreateServer();
         var player = CreatePlayer();
         player.Money.SetMoneyInternal(1000000);
 
@@ -209,7 +209,7 @@ public class PlayersMoneyFeatureTests : RealmUnitTestingBase
     [Theory]
     public void TryTakeMoneyShouldWork(decimal takenMoney, decimal expectedMoney)
     {
-        var realmTestingServer = CreateServer();
+        var server = CreateServer();
         var player = CreatePlayer();
         player.Money.SetMoneyInternal(1000000);
 
@@ -221,7 +221,7 @@ public class PlayersMoneyFeatureTests : RealmUnitTestingBase
     [Fact]
     public void TryTakeMoneyWithCallbackShouldSucceed()
     {
-        var realmTestingServer = CreateServer();
+        var server = CreateServer();
         var player = CreatePlayer();
         player.Money.SetMoneyInternal(1000000);
 
@@ -236,7 +236,7 @@ public class PlayersMoneyFeatureTests : RealmUnitTestingBase
     [Fact]
     public void TryTakeMoneyWithCallbackShouldFail()
     {
-        var realmTestingServer = CreateServer();
+        var server = CreateServer();
         var player = CreatePlayer();
         player.Money.SetMoneyInternal(1000000);
 
@@ -251,7 +251,7 @@ public class PlayersMoneyFeatureTests : RealmUnitTestingBase
     [Fact]
     public void TryTakeMoneyWithCallbackShouldFailOnException()
     {
-        var realmTestingServer = CreateServer();
+        var server = CreateServer();
         var player = CreatePlayer();
         player.Money.SetMoneyInternal(1000000);
 
@@ -271,7 +271,7 @@ public class PlayersMoneyFeatureTests : RealmUnitTestingBase
     [Fact]
     public async Task TryTakeMoneyWithCallbackAsyncShouldFailOnException()
     {
-        var realmTestingServer = CreateServer();
+        var server = CreateServer();
         var player = CreatePlayer();
         player.Money.SetMoneyInternal(1000000);
 
@@ -291,7 +291,7 @@ public class PlayersMoneyFeatureTests : RealmUnitTestingBase
     [Fact]
     public async Task TryTakeMoneyWithCallbackAsyncShouldNotFail()
     {
-        var realmTestingServer = CreateServer();
+        var server = CreateServer();
         var player = CreatePlayer();
         player.Money.SetMoneyInternal(1000000);
 
@@ -316,7 +316,7 @@ public class PlayersMoneyFeatureTests : RealmUnitTestingBase
     [Fact]
     public void TryTakeMoneyWithCallbackShouldFailIfHasNotEnoughMoney()
     {
-        var realmTestingServer = CreateServer();
+        var server = CreateServer();
         var player = CreatePlayer();
         player.Money.SetMoneyInternal(1000000);
 
@@ -333,7 +333,7 @@ public class PlayersMoneyFeatureTests : RealmUnitTestingBase
     [Fact]
     public async Task TryTakeMoneyWithCallbackAsyncShouldFailIfHasNotEnoughMoney()
     {
-        var realmTestingServer = CreateServer();
+        var server = CreateServer();
         var player = CreatePlayer();
         player.Money.SetMoneyInternal(1000000);
 
@@ -350,7 +350,7 @@ public class PlayersMoneyFeatureTests : RealmUnitTestingBase
     [Fact]
     public void TryTakeMoneyWithCallbackShouldShouldNotTakeMoneyIfCallbackReturnFalse()
     {
-        var realmTestingServer = CreateServer();
+        var server = CreateServer();
         var player = CreatePlayer();
         player.Money.SetMoneyInternal(1000000);
 
@@ -367,7 +367,7 @@ public class PlayersMoneyFeatureTests : RealmUnitTestingBase
     [Fact]
     public async Task TryTakeMoneyWithCallbackAsyncShouldNotTakeMoneyIfCallbackReturnFalse()
     {
-        var realmTestingServer = CreateServer();
+        var server = CreateServer();
         var player = CreatePlayer();
         player.Money.SetMoneyInternal(1000000);
 
@@ -384,7 +384,7 @@ public class PlayersMoneyFeatureTests : RealmUnitTestingBase
     [Fact]
     public void YouShouldNotBeAbleToSetMoneyInPlayerEvents()
     {
-        var realmTestingServer = CreateServer();
+        var server = CreateServer();
         var player = CreatePlayer();
         player.Money.SetMoneyInternal(1000000);
 

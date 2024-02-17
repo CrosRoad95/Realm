@@ -134,7 +134,7 @@ public class TestDb : IDb
 
     public void Dispose()
     {
-        throw new NotSupportedException();
+
     }
 
     public EntityEntry<TEntity> Entry<TEntity>(TEntity entity) where TEntity : class

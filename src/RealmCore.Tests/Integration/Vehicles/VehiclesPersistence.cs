@@ -21,12 +21,11 @@ public class VehiclesPersistence : RealmIntegrationTestingBase
         vehicle.Should().BeOfType<TestRealmVehicle>();
 
         await saveService.Save(vehicle);
-        vehicle.Destroy();
+        await vehicleService.Destroy(vehicle);
 
         var loadedVehicle = await loadService.LoadVehicleById(vehicle.PersistentId);
         loadedVehicle.Should().BeOfType<TestRealmVehicle>();
     }
-
 
     [Fact]
     public async Task SpawningTwoPersistentVehiclesShouldNotBeAllowed()
@@ -34,7 +33,6 @@ public class VehiclesPersistence : RealmIntegrationTestingBase
         var server = await CreateServerAsync();
         var vehiclesService = server.GetRequiredService<IVehiclesService>();
         var loadService = server.GetRequiredService<ILoadService>();
-        var saveService = server.GetRequiredService<ISaveService>();
         var activeVehicles = server.GetRequiredService<IVehiclesInUse>();
         var vehicle = await vehiclesService.CreatePersistantVehicle(Location.Zero, (VehicleModel)404);
         var id = vehicle.PersistentId;
@@ -42,8 +40,7 @@ public class VehiclesPersistence : RealmIntegrationTestingBase
         activeVehicles.IsActive(id).Should().BeTrue();
         activeVehicles.TryGetVehicleById(id, out var foundVehicle).Should().BeTrue();
         foundVehicle.Should().Be(vehicle);
-        await saveService.Save(vehicle);
-        vehicle.Destroy();
+        await vehiclesService.Destroy(vehicle);
 
         var spawn = async () => await loadService.LoadVehicleById(id);
         spawn.Should().NotThrow();
@@ -59,7 +56,6 @@ public class VehiclesPersistence : RealmIntegrationTestingBase
         await server.SignInPlayer(player);
         var vehiclesService = server.GetRequiredService<IVehiclesService>();
         var loadService = server.GetRequiredService<ILoadService>();
-        var saveService = server.GetRequiredService<ISaveService>();
         var vehicle1 = await vehiclesService.CreatePersistantVehicle(new Location(new Vector3(1, 2, 3), new Vector3(4, 5, 6)), (VehicleModel)404);
         vehicle1.Access.AddAsOwner(player);
         vehicle1.MileageCounter.Mileage = 123;
@@ -67,8 +63,7 @@ public class VehiclesPersistence : RealmIntegrationTestingBase
         vehicle1.PartDamage.AddPart(200, 300);
         vehicle1.Engines.Add(50);
         var id = vehicle1.PersistentId;
-        await saveService.Save(vehicle1);
-        vehicle1.Destroy();
+        await vehiclesService.Destroy(vehicle1);
 
         var vehicle2 = await loadService.LoadVehicleById(id);
 

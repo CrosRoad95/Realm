@@ -37,7 +37,7 @@ internal sealed class PlayerLicensesFeature : IPlayerLicensesFeature
     private void HandleSignedIn(IPlayerUserFeature playerUserFeature, RealmPlayer _)
     {
         lock (_lock)
-            _licenses = playerUserFeature.User.Licenses;
+            _licenses = playerUserFeature.UserData.Licenses;
     }
 
     private void HandleSignedOut(IPlayerUserFeature playerUserFeature, RealmPlayer _)

@@ -33,7 +33,7 @@ internal sealed class PlayerJobUpgradesFeature : IPlayerJobUpgradesFeature, IDis
     {
         lock (_lock)
         {
-            foreach (var jobUpgradeData in playerUserFeature.User.JobUpgrades)
+            foreach (var jobUpgradeData in playerUserFeature.UserData.JobUpgrades)
             {
                 _jobUpgrades.Add(jobUpgradeData);
                 Added?.Invoke(this, JobUpgradeDto.Map(jobUpgradeData), true);

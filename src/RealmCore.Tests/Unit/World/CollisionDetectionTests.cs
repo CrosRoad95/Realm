@@ -6,9 +6,9 @@ public class CollisionDetectionTests : RealmUnitTestingBase
     public void CollisionSphereDetection()
     {
         #region Arrange
-        var realmTestingServer = CreateServer();
+        var server = CreateServer();
         var player = CreatePlayer();
-        var elementFactory = realmTestingServer.GetRequiredService<IElementFactory>();
+        var elementFactory = server.GetRequiredService<IElementFactory>();
         var collisionSphere = elementFactory.CreateCollisionSphere(Vector3.Zero, 10);
         int elementEntered = 0;
         int elementLeft = 0;
@@ -38,9 +38,9 @@ public class CollisionDetectionTests : RealmUnitTestingBase
     public void MarkerDetection()
     {
         #region Arrange
-        var realmTestingServer = CreateServer();
+        var server = CreateServer();
         var player = CreatePlayer();
-        var elementFactory = realmTestingServer.GetRequiredService<IElementFactory>();
+        var elementFactory = server.GetRequiredService<IElementFactory>();
         var marker = elementFactory.CreateMarker(Location.Zero, MarkerType.Cylinder, 1, Color.Red);
         int elementEntered = 0;
         int elementLeft = 0;
@@ -70,9 +70,9 @@ public class CollisionDetectionTests : RealmUnitTestingBase
     public void PickupDetection()
     {
         #region Arrange
-        var realmTestingServer = CreateServer();
+        var server = CreateServer();
         var player = CreatePlayer();
-        var elementFactory = realmTestingServer.GetRequiredService<IElementFactory>();
+        var elementFactory = server.GetRequiredService<IElementFactory>();
         var pickup = elementFactory.CreatePickup(Location.Zero, 1337);
         int elementEntered = 0;
         int elementLeft = 0;

@@ -1,4 +1,6 @@
-﻿namespace RealmCore.Server.Modules.Elements;
+﻿using RealmCore.Server.Modules.Players.Settings;
+
+namespace RealmCore.Server.Modules.Elements;
 
 public class RealmPlayer : Player, IDisposable, IPersistentElement
 {
@@ -39,6 +41,7 @@ public class RealmPlayer : Player, IDisposable, IPersistentElement
 
     public List<AttachedBoneWorldObject> AttachedBoneElements => _attachedBoneElements;
     public int AttachedBoneElementsCount => _attachedBoneElements.Count;
+    public bool IsSpawned { get; private set; }
 
     public Element? FocusedElement
     {
@@ -185,6 +188,12 @@ public class RealmPlayer : Player, IDisposable, IPersistentElement
         BindExecuted += HandleBindExecuted;
         IsNametagShowing = false;
         UpdateFight();
+        Wasted += HandleWasted;
+    }
+
+    private void HandleWasted(Ped sender, PedWastedEventArgs e)
+    {
+        IsSpawned = false;
     }
 
     public T GetRequiredService<T>() where T : notnull => _serviceProvider.GetRequiredService<T>();
@@ -220,7 +229,7 @@ public class RealmPlayer : Player, IDisposable, IPersistentElement
 
     public bool TrySpawnAtLastPosition()
     {
-        var lastTransformAndMotion = User.User.LastTransformAndMotion;
+        var lastTransformAndMotion = User.UserData.LastTransformAndMotion;
         if (lastTransformAndMotion != null)
         {
             Spawn(lastTransformAndMotion.Position, lastTransformAndMotion.Rotation);
@@ -236,6 +245,7 @@ public class RealmPlayer : Player, IDisposable, IPersistentElement
         Spawn(position, rotation?.X ?? 0, 0, 0, 0);
         Camera.Target = this;
         UpdateFight();
+        IsSpawned = true;
     }
 
     public async Task FadeCameraAsync(CameraFade cameraFade, float fadeTime = 0.5f, CancellationToken cancellationToken = default)
@@ -655,8 +665,16 @@ public class RealmPlayer : Player, IDisposable, IPersistentElement
 
     public void Dispose()
     {
-        _serviceScope.Dispose();
-        _cancellationTokenSource.Cancel();
-        _cancellationTokenSource.Dispose();
+        IsSpawned = false;
+        Wasted -= HandleWasted;
+        try
+        {
+            _serviceScope.Dispose();
+        }
+        finally
+        {
+            _cancellationTokenSource.Cancel();
+            _cancellationTokenSource.Dispose();
+        }
     }
 }

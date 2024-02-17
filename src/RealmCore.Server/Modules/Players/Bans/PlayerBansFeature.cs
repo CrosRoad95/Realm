@@ -73,7 +73,7 @@ internal sealed class PlayerBansFeature : IPlayerBansFeature
         _lock.Wait();
         try
         {
-            _bans = playerUserFeature.User.Bans;
+            _bans = playerUserFeature.UserData.Bans;
         }
         finally
         {

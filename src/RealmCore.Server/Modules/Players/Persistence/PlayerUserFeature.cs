@@ -2,7 +2,7 @@
 
 public interface IPlayerUserFeature : IPlayerFeature
 {
-    internal UserData User { get; }
+    internal UserData UserData { get; }
     ClaimsPrincipal ClaimsPrincipal { get; }
     int Id { get; }
     string Nick { get; }
@@ -47,14 +47,14 @@ internal sealed class PlayerUserFeature : IPlayerUserFeature, IDisposable
     private ClaimsPrincipal? _claimsPrincipal;
     private int _version = 0;
 
-    public UserData User => _user ?? throw new UserNotSignedInException();
+    public UserData UserData => _user ?? throw new UserNotSignedInException();
     public ClaimsPrincipal ClaimsPrincipal => _claimsPrincipal ?? throw new UserNotSignedInException();
     public bool IsSignedIn => _user != null;
     public int Id => _user?.Id ?? -1;
     public string Nick => _user?.Nick ?? throw new UserNotSignedInException();
     public string UserName => _user?.UserName ?? throw new UserNotSignedInException();
-    public DateTime? LastNewsReadDateTime => User.LastNewsReadDateTime;
-    public DateTime? RegisteredDateTime => User.RegisteredDateTime;
+    public DateTime? LastNewsReadDateTime => UserData.LastNewsReadDateTime;
+    public DateTime? RegisteredDateTime => UserData.RegisteredDateTime;
 
     public string[] AuthorizedPolicies
     {
@@ -94,13 +94,16 @@ internal sealed class PlayerUserFeature : IPlayerUserFeature, IDisposable
     {
         lock (_lock)
         {
-            if (_user == null)
-                throw new InvalidOperationException();
-            _user = null;
-            _claimsPrincipal = null;
-            SignedOut?.Invoke(this, Player);
+            if (IsSignedIn)
+            {
+                if (_user == null)
+                    throw new InvalidOperationException();
+                _user = null;
+                _claimsPrincipal = null;
+                SignedOut?.Invoke(this, Player);
+                ClearAuthorizedPoliciesCache();
+            }
         }
-        ClearAuthorizedPoliciesCache();
     }
 
     public void IncreaseVersion()
@@ -284,12 +287,11 @@ internal sealed class PlayerUserFeature : IPlayerUserFeature, IDisposable
 
     public void UpdateLastNewsRead()
     {
-        User.LastNewsReadDateTime = _dateTimeProvider.Now;
+        UserData.LastNewsReadDateTime = _dateTimeProvider.Now;
     }
 
     public void Dispose()
     {
-        if (IsSignedIn)
-            SignOut();
+        SignOut();
     }
 }

@@ -6,9 +6,9 @@ public class LiftableWorldObjectTests : RealmUnitTestingBase
     public void YouShouldBeAbleToLiftElementAndDropElement()
     {
         #region Act
-        var realmTestingServer = CreateServer();
+        var server = CreateServer();
         var player = CreatePlayer();
-        var worldObject = realmTestingServer.CreateObject();
+        var worldObject = server.CreateObject();
         var interaction = new LiftableInteraction();
         worldObject.Interaction = new LiftableInteraction();
 
@@ -31,9 +31,9 @@ public class LiftableWorldObjectTests : RealmUnitTestingBase
     public void ElementCanBeLiftedOnce()
     {
         #region Act
-        var realmTestingServer = CreateServer();
+        var server = CreateServer();
         var player = CreatePlayer();
-        var worldObject = realmTestingServer.CreateObject();
+        var worldObject = server.CreateObject();
         var interaction = new LiftableInteraction();
         worldObject.Interaction = new LiftableInteraction();
 
@@ -49,9 +49,9 @@ public class LiftableWorldObjectTests : RealmUnitTestingBase
     [Fact]
     public void ElementCanBeDroppedOnce()
     {
-        var realmTestingServer = CreateServer();
+        var server = CreateServer();
         var player = CreatePlayer();
-        var worldObject = realmTestingServer.CreateObject();
+        var worldObject = server.CreateObject();
         var interaction = new LiftableInteraction();
         worldObject.Interaction = new LiftableInteraction();
 
@@ -69,9 +69,9 @@ public class LiftableWorldObjectTests : RealmUnitTestingBase
     [Fact]
     public void ElementShouldBeDroppedUponDispose()
     {
-        var realmTestingServer = CreateServer();
+        var server = CreateServer();
         var player = CreatePlayer();
-        var worldObject = realmTestingServer.CreateObject();
+        var worldObject = server.CreateObject();
         var interaction = new LiftableInteraction();
         worldObject.Interaction = new LiftableInteraction();
 
@@ -94,9 +94,9 @@ public class LiftableWorldObjectTests : RealmUnitTestingBase
     [Fact]
     public void ElementShouldBeDroppedUponDispose2()
     {
-        var realmTestingServer = CreateServer();
+        var server = CreateServer();
         var player = CreatePlayer();
-        var worldObject = realmTestingServer.CreateObject();
+        var worldObject = server.CreateObject();
         var interaction = new LiftableInteraction();
         worldObject.Interaction = new LiftableInteraction();
 
@@ -120,7 +120,7 @@ public class LiftableWorldObjectTests : RealmUnitTestingBase
     public void OnlyWhitelistedEntitiesShouldBeAbleToLiftOtherElement()
     {
         #region Arrange
-        var realmTestingServer = CreateServer();
+        var server = CreateServer();
         var player1 = CreatePlayer();
         var player2 = CreatePlayer();
 

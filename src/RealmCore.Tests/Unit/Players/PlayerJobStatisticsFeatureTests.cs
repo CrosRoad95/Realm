@@ -5,7 +5,7 @@ public class PlayerJobStatisticsFeatureTests : RealmUnitTestingBase
     [Fact]
     public void AddPointsTimePlayedShouldWork()
     {
-        var realmTestingServer = CreateServer();
+        var server = CreateServer();
         var player = CreatePlayer();
         var statistics = player.JobStatistics;
 

@@ -37,7 +37,7 @@ internal sealed class PlayerAchievementsFeature : IPlayerAchievementsFeature
     private void HandleSignedIn(IPlayerUserFeature playerUserFeature, RealmPlayer _)
     {
         lock (_lock)
-            _achievements = playerUserFeature.User.Achievements;
+            _achievements = playerUserFeature.UserData.Achievements;
     }
 
     private void HandleSignedOut(IPlayerUserFeature playerUserFeature, RealmPlayer _)

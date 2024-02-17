@@ -47,7 +47,7 @@ public class JobSessionsTests : RealmUnitTestingBase
     [Theory]
     public void CreatingAndRemovingObjectiveShouldWork(bool withBlip, ElementType[] createdElementTypes)
     {
-        var realmTestingServer = CreateServer();
+        var server = CreateServer();
         var player = CreatePlayer();
 
         var testJobSession = player.Sessions.BeginSession<TestJobSession>();
@@ -64,7 +64,7 @@ public class JobSessionsTests : RealmUnitTestingBase
     [Fact]
     public void MarkerObjectiveShouldBeCompletable()
     {
-        var realmTestingServer = CreateServer();
+        var server = CreateServer();
         var player = CreatePlayer();
 
         var testJobSession = player.Sessions.BeginSession<TestJobSession>();
@@ -87,7 +87,7 @@ public class JobSessionsTests : RealmUnitTestingBase
     [Theory]
     public void OneOfObjectiveShouldBeCompletable(float x, float y, float z, int expectedObjectiveCount)
     {
-        var realmTestingServer = CreateServer();
+        var server = CreateServer();
         var player = CreatePlayer();
 
         var testJobSession = player.Sessions.BeginSession<TestJobSession>();
@@ -107,7 +107,7 @@ public class JobSessionsTests : RealmUnitTestingBase
     [Fact]
     public void CreateTransportObjectObjectiveShouldBeCompletable()
     {
-        var realmTestingServer = CreateServer();
+        var server = CreateServer();
         var player = CreatePlayer();
 
         var testJobSession = player.Sessions.BeginSession<TestJobSession>();
@@ -125,7 +125,7 @@ public class JobSessionsTests : RealmUnitTestingBase
 
         var destination = new Vector3(400.0f, -82.01953f, 3.914598f);
         myObject.Position = destination;
-        realmTestingServer.ForceUpdate();
+        server.ForceUpdate();
         completed.Should().Be(true);
         testJobSession.ObjectiveCount.Should().Be(0);
     }

@@ -18,10 +18,10 @@ public class PlayerLevelServiceTests : RealmUnitTestingBase
     [Fact]
     public void TestIfLevelsAreCountingCorrectly()
     {
-        var realmTestingServer = CreateServer();
+        var server = CreateServer();
         var player = CreatePlayer();
 
-        var totalRequiredExperience = Seed(realmTestingServer);
+        var totalRequiredExperience = Seed(server);
         var level = player.Level;
 
         int addedLevels = 0;

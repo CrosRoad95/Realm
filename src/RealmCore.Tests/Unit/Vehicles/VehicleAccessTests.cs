@@ -5,11 +5,11 @@ public class VehicleAccessTests : RealmUnitTestingBase
     [Fact]
     public void PlayerShouldBeAbleToEnterVehicleIfNoAccessGetsConfigured()
     {
-        var realmTestingServer = CreateServer();
+        var server = CreateServer();
         var player = CreatePlayer();
-        var vehicle = realmTestingServer.CreateVehicle();
+        var vehicle = server.CreateVehicle();
 
-        var vehicleAccessService = realmTestingServer.GetRequiredService<IVehiclesAccessService>();
+        var vehicleAccessService = server.GetRequiredService<IVehiclesAccessService>();
         var canEnter = vehicleAccessService.InternalCanEnter(player, vehicle, 0);
         canEnter.Should().BeTrue();
     }
@@ -17,13 +17,13 @@ public class VehicleAccessTests : RealmUnitTestingBase
     [Fact]
     public void VehicleExclusiveAccessControllerShouldWork()
     {
-        var realmTestingServer = CreateServer();
+        var server = CreateServer();
         var player1 = CreatePlayer();
         var player2 = CreatePlayer();
-        var vehicle = realmTestingServer.CreateVehicle();
+        var vehicle = server.CreateVehicle();
 
         vehicle.AccessController = new VehicleExclusiveAccessController(player1);
-        var vehicleAccessService = realmTestingServer.GetRequiredService<IVehiclesAccessService>();
+        var vehicleAccessService = server.GetRequiredService<IVehiclesAccessService>();
 
         var player1CanEnter = vehicleAccessService.InternalCanEnter(player1, vehicle, 0, vehicle.AccessController);
         var player2CanEnter = vehicleAccessService.InternalCanEnter(player2, vehicle, 0, vehicle.AccessController);
@@ -34,12 +34,12 @@ public class VehicleAccessTests : RealmUnitTestingBase
     [Fact]
     public void VehicleNoAccessControllerShouldWork()
     {
-        var realmTestingServer = CreateServer();
+        var server = CreateServer();
         var player = CreatePlayer();
-        var vehicle = realmTestingServer.CreateVehicle();
+        var vehicle = server.CreateVehicle();
 
         vehicle.AccessController = VehicleNoAccessController.Instance;
-        var vehicleAccessService = realmTestingServer.GetRequiredService<IVehiclesAccessService>();
+        var vehicleAccessService = server.GetRequiredService<IVehiclesAccessService>();
 
         var canEnter = vehicleAccessService.InternalCanEnter(player, vehicle, 0, vehicle.AccessController);
         canEnter.Should().BeFalse();
@@ -48,12 +48,12 @@ public class VehicleAccessTests : RealmUnitTestingBase
     [Fact]
     public void DefaultAccessControllerShouldWork()
     {
-        var realmTestingServer = CreateServer();
+        var server = CreateServer();
         var player = CreatePlayer();
-        var vehicle = realmTestingServer.CreateVehicle();
+        var vehicle = server.CreateVehicle();
 
         vehicle.AccessController = VehicleDefaultAccessController.Instance;
-        var vehicleAccessService = realmTestingServer.GetRequiredService<IVehiclesAccessService>();
+        var vehicleAccessService = server.GetRequiredService<IVehiclesAccessService>();
 
         var canEnter = vehicleAccessService.InternalCanEnter(player, vehicle, 0, vehicle.AccessController);
         canEnter.Should().BeTrue();
@@ -62,13 +62,13 @@ public class VehicleAccessTests : RealmUnitTestingBase
     [Fact]
     public void VehicleAccessServiceCanEnterMethod()
     {
-        var realmTestingServer = CreateServer();
+        var server = CreateServer();
         var player1 = CreatePlayer();
         var player2 = CreatePlayer();
-        var vehicle = realmTestingServer.CreateVehicle();
+        var vehicle = server.CreateVehicle();
 
         vehicle.AccessController = VehicleNoAccessController.Instance;
-        var vehicleAccessService = realmTestingServer.GetRequiredService<IVehiclesAccessService>();
+        var vehicleAccessService = server.GetRequiredService<IVehiclesAccessService>();
 
         vehicleAccessService.CanEnter += (ped, vehicle, seat) => ped == player1;
 

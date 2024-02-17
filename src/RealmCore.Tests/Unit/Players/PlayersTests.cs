@@ -1,4 +1,6 @@
-﻿namespace RealmCore.Tests.Unit.Players;
+﻿using SlipeServer.Packets.Lua.Camera;
+
+namespace RealmCore.Tests.Unit.Players;
 
 public class PlayersTests : RealmUnitTestingBase
 {
@@ -6,9 +8,9 @@ public class PlayersTests : RealmUnitTestingBase
     public void DestroyingElementShouldResetCurrentInteractElement()
     {
         #region Arrange
-        var realmTestingServer = CreateServer();
+        var server = CreateServer();
         var player = CreatePlayer();
-        var worldObject = realmTestingServer.CreateObject();
+        var worldObject = server.CreateObject();
 
         player.CurrentInteractElement = worldObject;
         player.CurrentInteractElement.Should().Be(worldObject);
@@ -27,9 +29,9 @@ public class PlayersTests : RealmUnitTestingBase
     public void YouShouldBeAbleAttachObjectToPlayer()
     {
         #region Arrange
-        var realmTestingServer = CreateServer();
+        var server = CreateServer();
         var player = CreatePlayer();
-        var worldObject = realmTestingServer.CreateObject();
+        var worldObject = server.CreateObject();
         #endregion
 
         #region Act
@@ -46,9 +48,9 @@ public class PlayersTests : RealmUnitTestingBase
     public void AttachedElementShouldBeRemovedIfElementGetsDestroyed()
     {
         #region Arrange
-        var realmTestingServer = CreateServer();
+        var server = CreateServer();
         var player = CreatePlayer();
-        var worldObject = realmTestingServer.CreateObject();
+        var worldObject = server.CreateObject();
         #endregion
 
         #region Act
@@ -64,9 +66,9 @@ public class PlayersTests : RealmUnitTestingBase
     [Fact]
     public void ElementOwnerShouldWorkTests()
     {
-        var realmTestingServer = CreateServer();
+        var server = CreateServer();
         var player = CreatePlayer();
-        var worldObject = realmTestingServer.CreateObject();
+        var worldObject = server.CreateObject();
 
         worldObject.TrySetOwner(player);
         player.Destroy();
@@ -78,7 +80,7 @@ public class PlayersTests : RealmUnitTestingBase
     public async Task TestAsyncBindsCooldown()
     {
         #region Arrange
-        var realmTestingServer = CreateServer();
+        var server = CreateServer();
         var player = CreatePlayer();
         int executionCount = 0;
         player.SetBind("x", (player, keyState) =>
@@ -102,7 +104,7 @@ public class PlayersTests : RealmUnitTestingBase
     public async Task TestAsyncBindsThrowingException()
     {
         #region Arrange
-        var realmTestingServer = CreateServer();
+        var server = CreateServer();
         var player = CreatePlayer();
         player.SetBindAsync("x", (player, keyState) =>
         {
@@ -124,7 +126,7 @@ public class PlayersTests : RealmUnitTestingBase
     public void PlayerShouldBeAbleToFightWhenAtLeastOneFlagIsEnabled()
     {
         #region Arrange
-        var realmTestingServer = CreateServer();
+        var server = CreateServer();
         var player = CreatePlayer();
         #endregion
 
@@ -141,7 +143,7 @@ public class PlayersTests : RealmUnitTestingBase
     public void PlayerShouldNotBeAbleToFightWhenNoFlagIsSet()
     {
         #region Arrange
-        var realmTestingServer = CreateServer();
+        var server = CreateServer();
         var player = CreatePlayer();
         #endregion
 
@@ -159,7 +161,7 @@ public class PlayersTests : RealmUnitTestingBase
     public async Task FadeCameraShouldWork()
     {
         #region Arrange
-        var realmTestingServer = CreateServer();
+        var server = CreateServer();
         var player = CreatePlayer();
         #endregion
 
@@ -173,7 +175,7 @@ public class PlayersTests : RealmUnitTestingBase
     public async Task FadeCameraShouldBeCancelable()
     {
         #region Arrange
-        var realmTestingServer = CreateServer();
+        var server = CreateServer();
         var player = CreatePlayer();
         var cancellationTokenSource = new CancellationTokenSource(100);
         #endregion
@@ -191,18 +193,18 @@ public class PlayersTests : RealmUnitTestingBase
     public async Task FadeCameraShouldBeCanceledWhenPlayerQuit()
     {
         #region Arrange
-        var realmTestingServer = CreateServer();
+        var server = CreateServer();
         var player = CreatePlayer();
 
         var _ = Task.Run(async () =>
         {
-            await Task.Delay(100);
+            await Task.Delay(200);
             player.TriggerDisconnected(QuitReason.Quit);
         });
         #endregion
 
         #region Act
-        var act = async () => await player.FadeCameraAsync(SlipeServer.Packets.Lua.Camera.CameraFade.Out, 2.0f);
+        var act = async () => await player.FadeCameraAsync(CameraFade.Out, 2.0f);
         #endregion
 
         #region Asset
@@ -214,7 +216,7 @@ public class PlayersTests : RealmUnitTestingBase
     public void SettingsShouldWork()
     {
         #region Arrange
-        var realmTestingServer = CreateServer();
+        var server = CreateServer();
         var player = CreatePlayer();
         #endregion
 
@@ -223,7 +225,7 @@ public class PlayersTests : RealmUnitTestingBase
         settings.Set(1, "foo");
         bool hasSetting = settings.TryGet(1, out var settingValue);
         string gotSettingValue = settings.Get(1);
-        bool removedSetting = settings.Remove(1);
+        bool removedSetting = settings.TryRemove(1);
         bool exists = settings.Has(1);
         #endregion
 
@@ -240,7 +242,7 @@ public class PlayersTests : RealmUnitTestingBase
     public void UpgradesShouldWork()
     {
         #region Arrange
-        var realmTestingServer = CreateServer();
+        var server = CreateServer();
         var player = CreatePlayer();
         #endregion
 
@@ -267,8 +269,8 @@ public class PlayersTests : RealmUnitTestingBase
     }
 
 
-    [InlineData("TestPlayer1", true)]
-    [InlineData("Testplayer1", false)]
+    [InlineData("TestPlayer", true)]
+    [InlineData("Testplayer", false)]
     [InlineData("FooPlayer", false)]
     [Theory]
     public void TryGetPlayerByNameTests(string nick, bool shouldExists)

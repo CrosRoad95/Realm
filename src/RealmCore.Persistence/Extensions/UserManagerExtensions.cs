@@ -89,22 +89,20 @@ public static class UserManagerExtensions
         return await query.FirstOrDefaultAsync(cancellationToken);
     }
 
-    public static async Task<UserData?> GetUserByUserName(this UserManager<UserData> userManager, string userName, CancellationToken cancellationToken = default)
+    public static async Task<UserData?> GetUserByUserName(this UserManager<UserData> userManager, string userName, DateTime now, CancellationToken cancellationToken = default)
     {
         var query = userManager.Users
             .TagWithSource(nameof(UserManagerExtensions))
-            .IncludeAll()
-            .AsSplitQuery()
+            //.IncludeAll(now)
             .Where(u => u.UserName == userName);
         return await query.FirstOrDefaultAsync(cancellationToken);
     }
 
-    public static async Task<UserData?> GetUserByLoginCaseInsensitive(this UserManager<UserData> userManager, string login, CancellationToken cancellationToken = default)
+    public static async Task<UserData?> GetUserByLoginCaseInsensitive(this UserManager<UserData> userManager, string login, DateTime now, CancellationToken cancellationToken = default)
     {
         var query = userManager.Users
-            .AsNoTracking()
             .TagWithSource(nameof(UserManagerExtensions))
-            .IncludeAll()
+            //.IncludeAll(now)
             .Where(u => u.NormalizedUserName == login.ToUpper());
         return await query.FirstOrDefaultAsync(cancellationToken);
     }
@@ -117,12 +115,12 @@ public static class UserManagerExtensions
         return await query.CountAsync(cancellationToken);
     }
 
-    public static async Task<List<UserData>> GetUsersBySerial(this UserManager<UserData> userManager, string serial, CancellationToken cancellationToken = default)
+    public static async Task<List<UserData>> GetUsersBySerial(this UserManager<UserData> userManager, string serial, DateTime now, CancellationToken cancellationToken = default)
     {
         var query = userManager.Users
             .AsNoTracking()
             .TagWithSource(nameof(UserManagerExtensions))
-            .IncludeAll()
+            .IncludeAll(now)
             .Where(u => u.RegisterSerial == serial);
         return await query.ToListAsync(cancellationToken);
     }

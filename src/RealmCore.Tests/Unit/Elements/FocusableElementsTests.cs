@@ -5,9 +5,9 @@ public class FocusableElementsTests : RealmUnitTestingBase
     [Fact]
     public void FocusableShouldWork()
     {
-        var realmTestingServer = CreateServer();
+        var server = CreateServer();
         var player = CreatePlayer();
-        var obj = realmTestingServer.CreateFocusableObject();
+        var obj = server.CreateFocusableObject();
         obj.AddFocusedPlayer(player);
 
         obj.FocusedPlayerCount.Should().Be(1);
@@ -17,9 +17,9 @@ public class FocusableElementsTests : RealmUnitTestingBase
     [Fact]
     public void FocusedElementShouldBeRemovedWhenItDisposes()
     {
-        var realmTestingServer = CreateServer();
+        var server = CreateServer();
         var player = CreatePlayer();
-        var obj = realmTestingServer.CreateFocusableObject();
+        var obj = server.CreateFocusableObject();
 
         obj.AddFocusedPlayer(player);
         player.Destroy();
@@ -30,9 +30,9 @@ public class FocusableElementsTests : RealmUnitTestingBase
     [Fact]
     public void YouCanNotFocusOneElementTwoTimes()
     {
-        var realmTestingServer = CreateServer();
+        var server = CreateServer();
         var player = CreatePlayer();
-        var obj = realmTestingServer.CreateFocusableObject();
+        var obj = server.CreateFocusableObject();
         var act = () => obj.AddFocusedPlayer(player);
 
         act().Should().BeTrue();
@@ -43,9 +43,9 @@ public class FocusableElementsTests : RealmUnitTestingBase
     [Fact]
     public void YouShouldBeAbleToRemoveFocusedPlayer()
     {
-        var realmTestingServer = CreateServer();
+        var server = CreateServer();
         var player = CreatePlayer();
-        var obj = realmTestingServer.CreateFocusableObject();
+        var obj = server.CreateFocusableObject();
 
         obj.AddFocusedPlayer(player).Should().BeTrue();
         obj.RemoveFocusedPlayer(player).Should().BeTrue();
@@ -56,9 +56,9 @@ public class FocusableElementsTests : RealmUnitTestingBase
     [Fact]
     public void RemovedFocusedElementShouldWork()
     {
-        var realmTestingServer = CreateServer();
+        var server = CreateServer();
         var player = CreatePlayer();
-        var obj = realmTestingServer.CreateFocusableObject();
+        var obj = server.CreateFocusableObject();
 
         bool lostFocus = false;
         obj.PlayerLostFocus += (s, plr) =>

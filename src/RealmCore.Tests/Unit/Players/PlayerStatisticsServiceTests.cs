@@ -5,7 +5,7 @@ public class PlayerStatisticsServiceTests : RealmUnitTestingBase
     [Fact]
     public void IncreaseStatAndGetStatShouldWork()
     {
-        var realmTestingServer = CreateServer();
+        var server = CreateServer();
         var player = CreatePlayer();
         var statistics = player.Statistics;
 
@@ -26,7 +26,7 @@ public class PlayerStatisticsServiceTests : RealmUnitTestingBase
     [Fact]
     public void DecreaseAndSetStatShouldWork()
     {
-        var realmTestingServer = CreateServer();
+        var server = CreateServer();
         var player = CreatePlayer();
         var statistics = player.Statistics;
         statistics.Set(1, 10);

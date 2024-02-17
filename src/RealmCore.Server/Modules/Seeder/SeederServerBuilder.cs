@@ -13,6 +13,7 @@ internal sealed class SeederServerBuilder
     private readonly IFractionService _fractionService;
     private readonly IGroupRepository _groupRepository;
     private readonly Text3dService _text3dService;
+    private readonly IDateTimeProvider _dateTimeProvider;
     private readonly Dictionary<string, ISeederProvider> _seederProviders = [];
     private readonly Dictionary<string, IAsyncSeederProvider> _asyncSeederProviders = [];
     private readonly ILogger<SeederServerBuilder> _logger;
@@ -22,7 +23,7 @@ internal sealed class SeederServerBuilder
     public SeederServerBuilder(ILogger<SeederServerBuilder> logger,
         IServerFilesProvider serverFilesProvider, UserManager<UserData> userManager, RoleManager<RoleData> roleManager,
         IGroupService groupService, IElementFactory elementFactory, IFractionService fractionService, IEnumerable<ISeederProvider> seederProviders,
-        IEnumerable<IAsyncSeederProvider> asyncSeederProviders, IGroupRepository groupRepository, Text3dService text3dService)
+        IEnumerable<IAsyncSeederProvider> asyncSeederProviders, IGroupRepository groupRepository, Text3dService text3dService, IDateTimeProvider dateTimeProvider)
     {
         _logger = logger;
         _serverFilesProvider = serverFilesProvider;
@@ -33,6 +34,7 @@ internal sealed class SeederServerBuilder
         _fractionService = fractionService;
         _groupRepository = groupRepository;
         _text3dService = text3dService;
+        _dateTimeProvider = dateTimeProvider;
         foreach (var seederProvider in seederProviders)
         {
             _seederProviders[seederProvider.SeedKey] = seederProvider;
@@ -139,7 +141,7 @@ internal sealed class SeederServerBuilder
         foreach (var pair in users)
         {
             var userSeedData = pair.Value;
-            var user = await _userManager.GetUserByUserName(pair.Key);
+            var user = await _userManager.GetUserByUserName(pair.Key, _dateTimeProvider.Now);
 
             if (user == null)
             {

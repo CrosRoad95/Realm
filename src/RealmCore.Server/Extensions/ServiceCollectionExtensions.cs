@@ -1,4 +1,5 @@
 ﻿using Coravel;
+using RealmCore.Server.Modules.Players.Settings;
 
 namespace RealmCore.Server.Extensions;
 

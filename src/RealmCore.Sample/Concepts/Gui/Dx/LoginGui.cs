@@ -7,12 +7,14 @@ public sealed class LoginGui : DxGui, IGuiHandlers
     private readonly IUsersService _usersService;
     private readonly ILogger<LoginGui> _logger;
     private readonly UserManager<UserData> _userManager;
+    private readonly IDateTimeProvider _dateTimeProvider;
 
-    public LoginGui(IUsersService usersService, ILogger<LoginGui> logger, UserManager<UserData> userManager, PlayerContext playerContext) : base(playerContext.Player, "login", false)
+    public LoginGui(IUsersService usersService, ILogger<LoginGui> logger, UserManager<UserData> userManager, PlayerContext playerContext, IDateTimeProvider dateTimeProvider) : base(playerContext.Player, "login", false)
     {
         _usersService = usersService;
         _logger = logger;
         _userManager = userManager;
+        _dateTimeProvider = dateTimeProvider;
     }
 
     public async Task HandleForm(IFormContext formContext)
@@ -31,7 +33,7 @@ public sealed class LoginGui : DxGui, IGuiHandlers
                     return;
                 }
 
-                var user = await _userManager.GetUserByUserName(loginData.Login);
+                var user = await _userManager.GetUserByUserName(loginData.Login, _dateTimeProvider.Now);
 
                 if (user == null)
                 {

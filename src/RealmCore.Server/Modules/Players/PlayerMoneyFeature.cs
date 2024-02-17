@@ -18,7 +18,7 @@ public interface IPlayerMoneyFeature : IPlayerFeature
     void TransferMoney(RealmPlayer player, decimal amount, bool force = false);
 }
 
-internal sealed class PlayerMoneyFeature : IPlayerMoneyFeature
+internal sealed class PlayerMoneyFeature : IPlayerMoneyFeature, IDisposable
 {
     private readonly ReaderWriterLockSlim _lock = new();
     private decimal _money = 0;
@@ -51,7 +51,7 @@ internal sealed class PlayerMoneyFeature : IPlayerMoneyFeature
                 _money = value;
 
                 if (_playerUserFeature.IsSignedIn)
-                    _playerUserFeature.User.Money = _money;
+                    _playerUserFeature.UserData.Money = _money;
                 TryUpdateVersion();
 
                 Set?.Invoke(this, _money);
@@ -82,7 +82,7 @@ internal sealed class PlayerMoneyFeature : IPlayerMoneyFeature
 
     private void HandleSignedIn(IPlayerUserFeature userService, RealmPlayer player)
     {
-        Amount = userService.User.Money;
+        Amount = userService.UserData.Money;
     }
 
     private void HandleSignedOut(IPlayerUserFeature userService, RealmPlayer player)
@@ -266,5 +266,10 @@ internal sealed class PlayerMoneyFeature : IPlayerMoneyFeature
 
         TakeMoney(amount, force);
         player.Money.GiveMoney(amount);
+    }
+
+    public void Dispose()
+    {
+        Amount = 0;
     }
 }

@@ -43,7 +43,7 @@ internal sealed class PlayerStatisticsFeature : IPlayerStatisticsFeature
     private void HandleSignedIn(IPlayerUserFeature playerUserFeature, RealmPlayer _)
     {
         lock (_lock)
-            _stats = playerUserFeature.User.Stats;
+            _stats = playerUserFeature.UserData.Stats;
     }
 
     private void HandleSignedOut(IPlayerUserFeature playerUserFeature, RealmPlayer _)

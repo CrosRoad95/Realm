@@ -70,7 +70,7 @@ internal sealed class UsersService : IUsersService
 
     private void UpdateLastData(RealmPlayer player)
     {
-        var user = player.User.User;
+        var user = player.User.UserData;
         if (user != null)
         {
             user.LastLoginDateTime = _dateTimeProvider.Now;
@@ -96,7 +96,7 @@ internal sealed class UsersService : IUsersService
     public async Task<bool> AddToRole(RealmPlayer player, string role)
     {
         var userManager = player.GetRequiredService<UserManager<UserData>>();
-        var result = await userManager.AddToRoleAsync(player.User.User, role);
+        var result = await userManager.AddToRoleAsync(player.User.UserData, role);
         if (result.Succeeded)
         {
             player.User.AddRole(role);
@@ -126,6 +126,10 @@ internal sealed class UsersService : IUsersService
         var signInManager = player.GetRequiredService<SignInManager<UserData>>();
         var userLoginHistoryRepository = player.GetRequiredService<IUserLoginHistoryRepository>();
         var saveService = player.GetRequiredService<ISaveService>();
+
+        // TODO: Fix it
+        user.Settings = await player.GetRequiredService<IDb>().UserSettings.Where(x => x.UserId == user.Id).ToListAsync(cancellationToken);
+
         try
         {
             var serial = player.Client.GetSerial();
@@ -163,7 +167,9 @@ internal sealed class UsersService : IUsersService
         if (!player.User.IsSignedIn)
             throw new UserNotSignedInException();
 
-        _activeUsers.TrySetInactive(player.PersistentId);
+        if (!_activeUsers.TrySetInactive(player.PersistentId))
+            throw new InvalidOperationException();
+
         await _saveService.Save(player, cancellationToken);
         player.User.SignOut();
         player.RemoveFromVehicle();
