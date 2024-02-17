@@ -119,7 +119,6 @@ public class RealmPlayer : Player, IDisposable, IPersistentElement
     }
 
     public CultureInfo Culture { get => _culture; set => _culture = value; }
-    public bool IsSignedIn => User.IsSignedIn;
     public int PersistentId => User.Id;
 
     public new IPlayerMoneyFeature Money { get; init; }

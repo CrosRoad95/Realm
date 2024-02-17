@@ -10,9 +10,10 @@ internal sealed class PlayersLogic
     private readonly IPlayerEventManager _playersService;
     private readonly IOptions<GuiBrowserOptions> _guiBrowserOptions;
     private readonly ClientConsole _clientConsole;
+    private readonly IElementCollection _elementCollection;
     private readonly ConcurrentDictionary<RealmPlayer, Latch> _playerResources = new();
 
-    public PlayersLogic(MtaServer mtaServer, IClientInterfaceService clientInterfaceService, ILogger<PlayersLogic> logger, IResourceProvider resourceProvider, IUsersInUse activeUsers, IPlayerEventManager playersService, IOptions<GuiBrowserOptions> guiBrowserOptions, ClientConsole clientConsole)
+    public PlayersLogic(MtaServer mtaServer, IClientInterfaceService clientInterfaceService, ILogger<PlayersLogic> logger, IResourceProvider resourceProvider, IUsersInUse activeUsers, IPlayerEventManager playersService, IOptions<GuiBrowserOptions> guiBrowserOptions, ClientConsole clientConsole, IElementCollection elementCollection)
     {
         _mtaServer = mtaServer;
         _clientInterfaceService = clientInterfaceService;
@@ -22,6 +23,7 @@ internal sealed class PlayersLogic
         _playersService = playersService;
         _guiBrowserOptions = guiBrowserOptions;
         _clientConsole = clientConsole;
+        _elementCollection = elementCollection;
         _mtaServer.PlayerJoined += HandlePlayerJoined;
     }
 
@@ -187,7 +189,7 @@ internal sealed class PlayersLogic
         {
             plr.Destroyed -= HandlePlayerDestroyed;
             _playerResources.TryRemove(player, out var _);
-            if (player.IsSignedIn)
+            if (player.User.IsSignedIn)
             {
                 _activeUsers.TrySetInactive(player.PersistentId);
                 await player.GetRequiredService<ISaveService>().Save(player);

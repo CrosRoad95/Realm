@@ -129,7 +129,7 @@ internal sealed class SaveService : ISaveService
 
     private async Task<bool> SavePlayer(RealmPlayer player, CancellationToken cancellationToken = default)
     {
-        if (!player.IsSignedIn)
+        if (!player.User.IsSignedIn)
             return false;
 
         var user = player.User.User;

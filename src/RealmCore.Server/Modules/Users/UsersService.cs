@@ -10,39 +10,30 @@ public interface IUsersService
     Task<bool> AddToRole(RealmPlayer player, string role);
     ValueTask<bool> AuthorizePolicy(RealmPlayer player, string policy);
     Task<bool> QuickSignIn(RealmPlayer player, CancellationToken cancellationToken = default);
-    IEnumerable<RealmPlayer> SearchPlayersByName(string pattern, bool loggedIn = true);
     Task<bool> SignIn(RealmPlayer player, UserData user, CancellationToken cancellationToken = default);
     Task SignOut(RealmPlayer player, CancellationToken cancellationToken = default);
     Task<int> SignUp(string username, string password, CancellationToken cancellationToken = default);
-    bool TryFindPlayerBySerial(string serial, out RealmPlayer? player);
-    bool TryGetPlayerByName(string name, out RealmPlayer? player);
 }
 
 internal sealed class UsersService : IUsersService
 {
-    private readonly ItemsCollection _itemsCollection;
     private readonly ILogger<UsersService> _logger;
-    private readonly IOptionsMonitor<GameplayOptions> _gameplayOptions;
     private readonly IDateTimeProvider _dateTimeProvider;
     private readonly IAuthorizationService? _authorizationService;
     private readonly IUsersInUse _activeUsers;
-    private readonly IElementCollection _elementCollection;
     private readonly ISaveService _saveService;
     private readonly IServiceProvider _serviceProvider;
 
     public event Action<RealmPlayer>? SignedIn;
     public event Action<RealmPlayer>? SignedOut;
 
-    public UsersService(ItemsCollection itemsCollection, ILogger<UsersService> logger, IOptionsMonitor<GameplayOptions> gameplayOptions,
-        IDateTimeProvider dateTimeProvider, IUsersInUse activeUsers, IElementCollection elementCollection, ISaveService saveService, IServiceProvider serviceProvider, IAuthorizationService? authorizationService = null)
+    public UsersService(ILogger<UsersService> logger,
+        IDateTimeProvider dateTimeProvider, IUsersInUse activeUsers, ISaveService saveService, IServiceProvider serviceProvider, IAuthorizationService? authorizationService = null)
     {
-        _itemsCollection = itemsCollection;
         _logger = logger;
-        _gameplayOptions = gameplayOptions;
         _dateTimeProvider = dateTimeProvider;
         _authorizationService = authorizationService;
         _activeUsers = activeUsers;
-        _elementCollection = elementCollection;
         _saveService = saveService;
         _serviceProvider = serviceProvider;
     }
@@ -109,6 +100,7 @@ internal sealed class UsersService : IUsersService
         if (result.Succeeded)
         {
             player.User.AddRole(role);
+            await AuthorizePolicies(player);
             return true;
         }
         return false;
@@ -122,6 +114,9 @@ internal sealed class UsersService : IUsersService
         if (user.IsDisabled)
             throw new UserDisabledException(user.Id);
 
+        if (player.User.IsSignedIn)
+            throw new UserAlreadySignedInException();
+
         using var _ = _logger.BeginElement(player);
 
         if (!_activeUsers.TrySetActive(user.Id, player))
@@ -130,7 +125,7 @@ internal sealed class UsersService : IUsersService
         var userManager = player.GetRequiredService<UserManager<UserData>>();
         var signInManager = player.GetRequiredService<SignInManager<UserData>>();
         var userLoginHistoryRepository = player.GetRequiredService<IUserLoginHistoryRepository>();
-        var db = player.GetRequiredService<IDb>();
+        var saveService = player.GetRequiredService<ISaveService>();
         try
         {
             var serial = player.Client.GetSerial();
@@ -147,8 +142,7 @@ internal sealed class UsersService : IUsersService
             await AuthorizePolicies(player);
             await userLoginHistoryRepository.Add(user.Id, _dateTimeProvider.Now, player.Client.IPAddress?.ToString() ?? "", serial, cancellationToken);
             UpdateLastData(player);
-            db.Users.Update(user);
-            await db.SaveChangesAsync(cancellationToken);
+            await saveService.Save(player, cancellationToken);
 
             SignedIn?.Invoke(player);
             return true;
@@ -156,10 +150,9 @@ internal sealed class UsersService : IUsersService
         }
         catch (Exception ex)
         {
-            _activeUsers.TrySetInactive(user.Id);
             if (player.User.IsSignedIn)
                 player.User.SignOut();
-            player.Money.SetMoneyInternal(0);
+            _activeUsers.TrySetInactive(user.Id);
             _logger.LogError(ex, "Failed to sign in a user.");
             return false;
         }
@@ -188,49 +181,5 @@ internal sealed class UsersService : IUsersService
         var result = await _authorizationService.AuthorizeAsync(player.User.ClaimsPrincipal, policy);
         player.User.SetAuthorizedPolicyState(policy, result.Succeeded);
         return result.Succeeded;
-    }
-
-    public bool TryGetPlayerByName(string name, out RealmPlayer? foundPlayer)
-    {
-        var player = _elementCollection.GetByType<RealmPlayer>().Where(x => x.Name == name).FirstOrDefault();
-        if (player == null)
-        {
-            foundPlayer = null!;
-            return false;
-        }
-        foundPlayer = player;
-        return true;
-    }
-
-    public IEnumerable<RealmPlayer> SearchPlayersByName(string pattern, bool loggedIn = true)
-    {
-        foreach (var player in _elementCollection.GetByType<RealmPlayer>())
-        {
-            if (loggedIn)
-            {
-                if (!player.IsSignedIn)
-                    continue;
-            }
-
-            if (player.Name.Contains(pattern.ToLower(), StringComparison.CurrentCultureIgnoreCase))
-                yield return player;
-        }
-    }
-
-    public bool TryFindPlayerBySerial(string serial, out RealmPlayer? foundPlayer)
-    {
-        if (serial.Length != 32)
-            throw new ArgumentException(nameof(serial));
-
-        foreach (var player in _elementCollection.GetByType<RealmPlayer>())
-        {
-            if (player.Client.Serial == serial)
-            {
-                foundPlayer = player;
-                return true;
-            }
-        }
-        foundPlayer = null;
-        return false;
     }
 }

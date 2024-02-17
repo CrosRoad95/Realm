@@ -3,6 +3,8 @@ using SlipeServer.Server.Resources.Interpreters;
 using SlipeServer.Server.Resources;
 using SlipeServer.Net.Wrappers;
 using RealmCore.TestingTools.Classes;
+using Microsoft.AspNetCore.Identity;
+using SlipeServer.Server.Elements;
 
 namespace RealmCore.TestingTools;
 
@@ -129,6 +131,19 @@ public class RealmTestingServer : TestingServer<RealmTestingPlayer>
         var success = await player.GetRequiredService<IUsersService>().SignIn(player, user);
         success.Should().BeTrue();
         return player;
+    }
+
+    public async Task<UserData> CreateAccount(string userName)
+    {
+        var userManager = GetRequiredService<UserManager<UserData>>();
+        var user = new UserData
+        {
+            UserName = userName,
+            Upgrades = new List<UserUpgradeData>(),
+            DailyVisits = new(),
+        };
+        await userManager.CreateAsync(user);
+        return user;
     }
 }
 

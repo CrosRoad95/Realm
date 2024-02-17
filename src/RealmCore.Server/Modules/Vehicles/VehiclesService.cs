@@ -104,7 +104,7 @@ internal sealed class VehiclesService : IVehiclesService
 
     public async Task<List<LightInfoVehicleDTO>> GetAllLightVehicles(RealmPlayer player, CancellationToken cancellationToken = default)
     {
-        if (player.IsSignedIn)
+        if (player.User.IsSignedIn)
         {
             return await _vehicleRepository.GetLightVehiclesByUserId(player.PersistentId, cancellationToken);
         }
@@ -113,7 +113,7 @@ internal sealed class VehiclesService : IVehiclesService
 
     public async Task<List<VehicleData>> GetAllVehicles(RealmPlayer player, CancellationToken cancellationToken = default)
     {
-        if (player.IsSignedIn)
+        if (player.User.IsSignedIn)
         {
             return await _vehicleRepository.GetVehiclesByUserId(player.PersistentId, null, cancellationToken);
         }

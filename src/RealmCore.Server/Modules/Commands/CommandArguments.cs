@@ -4,7 +4,7 @@ public class CommandArguments
 {
     private readonly string[] _args;
     private readonly IServiceProvider _serviceProvider;
-    private readonly IUsersService _usersService;
+    private readonly IPlayersService _playersService;
     private int _index;
 
     public int Index => _index;
@@ -13,7 +13,7 @@ public class CommandArguments
     {
         _args = args;
         _serviceProvider = serviceProvider;
-        _usersService = _serviceProvider.GetRequiredService<IUsersService>();
+        _playersService = _serviceProvider.GetRequiredService<IPlayersService>();
     }
 
     internal void Left() // For test purpose
@@ -154,10 +154,10 @@ public class CommandArguments
         throw new CommandArgumentException(_index, "Liczba jest poza zakresem", value);
     }
 
-    public RealmPlayer ReadPlayer(bool loggedIn = true)
+    public RealmPlayer ReadPlayer(PlayerSearchOption searchOption = PlayerSearchOption.All)
     {
         var name = ReadArgument();
-        var users = _usersService.SearchPlayersByName(name, loggedIn).ToList();
+        var users = _playersService.SearchPlayersByName(name, searchOption).ToList();
         if (users.Count == 1)
             return users[0];
         if (users.Count > 0)
@@ -169,7 +169,7 @@ public class CommandArguments
     {
         if (TryReadArgument(out string? name) && name != null)
         {
-            var players = _usersService.SearchPlayersByName(name).ToList();
+            var players = _playersService.SearchPlayersByName(name).ToList();
             if (players.Count == 1)
             {
                 player = players[0];
@@ -186,7 +186,7 @@ public class CommandArguments
     public IEnumerable<RealmPlayer> ReadPlayers()
     {
         var name = ReadArgument();
-        var users = _usersService.SearchPlayersByName(name).ToList();
+        var users = _playersService.SearchPlayersByName(name).ToList();
         if (users.Count == 0)
             throw new CommandArgumentException(_index, "Nie znaleziono żadnego gracza o takiej nazwie", name);
         return users;

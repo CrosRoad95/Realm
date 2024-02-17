@@ -156,7 +156,7 @@ public sealed class RealmCommandService
         if (!_commands.TryGetValue(command, out var commandInfo))
             return;
 
-        if (!player.IsSignedIn)
+        if (!player.User.IsSignedIn)
             return;
 
         var activity = new Activity("CommandHandler").Start();

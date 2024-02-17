@@ -211,7 +211,7 @@ public class PlayersTests : RealmUnitTestingBase
     }
 
     [Fact]
-    public async Task SettingsShouldWork()
+    public void SettingsShouldWork()
     {
         #region Arrange
         var realmTestingServer = CreateServer();
@@ -237,7 +237,7 @@ public class PlayersTests : RealmUnitTestingBase
     }
 
     [Fact]
-    public async Task UpgradesShouldWork()
+    public void UpgradesShouldWork()
     {
         #region Arrange
         var realmTestingServer = CreateServer();
@@ -263,6 +263,67 @@ public class PlayersTests : RealmUnitTestingBase
         removed1.Should().BeTrue();
         removed2.Should().BeFalse();
         hasSomeUpgrade3.Should().BeFalse();
+        #endregion
+    }
+
+
+    [InlineData("TestPlayer1", true)]
+    [InlineData("Testplayer1", false)]
+    [InlineData("FooPlayer", false)]
+    [Theory]
+    public void TryGetPlayerByNameTests(string nick, bool shouldExists)
+    {
+        #region Arrange
+        var server = CreateServer();
+        var player = CreatePlayer();
+
+        var playersService = player.GetRequiredService<IPlayersService>();
+        #endregion
+
+        #region Act
+        bool found = playersService.TryGetPlayerByName(nick, out var foundPlayer, PlayerSearchOption.None);
+        #endregion
+
+        #region Assert
+        if (shouldExists)
+        {
+            found.Should().BeTrue();
+            (player == foundPlayer).Should().BeTrue();
+        }
+        else
+        {
+            found.Should().BeFalse();
+            foundPlayer.Should().BeNull();
+        }
+        #endregion
+    }
+
+    [InlineData("test", true)]
+    [InlineData("asd", false)]
+    [Theory]
+    public void SearchPlayersByNameTests(string pattern, bool shouldExists)
+    {
+        #region Arrange
+        var server = CreateServer();
+        var player = CreatePlayer();
+
+        var playersService = player.GetRequiredService<IPlayersService>();
+        #endregion
+
+        #region Act
+        var found = playersService.SearchPlayersByName(pattern, PlayerSearchOption.None);
+        #endregion
+
+        #region Assert
+        if (shouldExists)
+        {
+            var foundPlayer = found.First();
+            (player == foundPlayer).Should().BeTrue();
+        }
+        else
+        {
+            found.Should().BeEmpty();
+        }
         #endregion
     }
 }
