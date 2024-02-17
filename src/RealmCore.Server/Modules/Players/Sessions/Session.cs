@@ -1,7 +1,8 @@
-﻿namespace RealmCore.Server.Modules.Players;
+﻿namespace RealmCore.Server.Modules.Players.Sessions;
 
 public abstract class Session
 {
+    public bool _ended;
     protected readonly object _lock = new();
     private readonly Stopwatch _stopwatch = new();
 

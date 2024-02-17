@@ -2,9 +2,9 @@
 
 public interface IPlayerSettingsFeature : IPlayerFeature, IEnumerable<UserSettingDto>
 {
-    event Action<IPlayerSettingsFeature, int, string>? Added;
-    event Action<IPlayerSettingsFeature, int, string>? Changed;
-    event Action<IPlayerSettingsFeature, int, string>? Removed;
+    event Action<IPlayerSettingsFeature, UserSettingDto>? Added;
+    event Action<IPlayerSettingsFeature, UserSettingDto>? Changed;
+    event Action<IPlayerSettingsFeature, UserSettingDto>? Removed;
 
     /// <summary>
     /// Return an array of all settings ids
@@ -28,9 +28,9 @@ internal sealed class PlayerSettingsFeature : IPlayerSettingsFeature, IDisposabl
     private ICollection<UserSettingData> _settings = [];
     private readonly IPlayerUserFeature _playerUserFeature;
 
-    public event Action<IPlayerSettingsFeature, int, string>? Added;
-    public event Action<IPlayerSettingsFeature, int, string>? Changed;
-    public event Action<IPlayerSettingsFeature, int, string>? Removed;
+    public event Action<IPlayerSettingsFeature, UserSettingDto>? Added;
+    public event Action<IPlayerSettingsFeature, UserSettingDto>? Changed;
+    public event Action<IPlayerSettingsFeature, UserSettingDto>? Removed;
 
     public int[] SettingsIds
     {
@@ -83,16 +83,18 @@ internal sealed class PlayerSettingsFeature : IPlayerSettingsFeature, IDisposabl
             if (setting != null)
             {
                 setting.Value = value;
-                Changed?.Invoke(this, settingId, value);
+                Changed?.Invoke(this, UserSettingDto.Map(setting));
             }
             else
             {
-                _settings.Add(new UserSettingData
+                setting = new UserSettingData
                 {
                     SettingId = settingId,
                     Value = value
-                });
-                Added?.Invoke(this, settingId, value);
+                };
+
+                _settings.Add(setting);
+                Added?.Invoke(this, UserSettingDto.Map(setting));
             }
         }
         _playerUserFeature.IncreaseVersion();
@@ -133,7 +135,7 @@ internal sealed class PlayerSettingsFeature : IPlayerSettingsFeature, IDisposabl
                 throw new SettingNotFoundException(settingId);
 
             _settings.Remove(setting);
-            Removed?.Invoke(this, setting.SettingId, setting.Value);
+            Removed?.Invoke(this, UserSettingDto.Map(setting));
             _playerUserFeature.IncreaseVersion();
         }
     }
@@ -146,7 +148,7 @@ internal sealed class PlayerSettingsFeature : IPlayerSettingsFeature, IDisposabl
             if (setting != null)
             {
                 _settings.Remove(setting);
-                Removed?.Invoke(this, setting.SettingId, setting.Value);
+                Removed?.Invoke(this, UserSettingDto.Map(setting));
                 _playerUserFeature.IncreaseVersion();
                 return true;
             }

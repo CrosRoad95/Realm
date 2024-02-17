@@ -1,10 +1,10 @@
-﻿namespace RealmCore.Server.Modules.Vehicles;
+﻿namespace RealmCore.Server.Modules.Vehicles.Tuning;
 
-internal sealed class VehicleUpgradesLogic
+internal sealed class VehiclesTuningLogic
 {
     private readonly VehicleUpgradesCollection _vehicleUpgradesCollection;
 
-    public VehicleUpgradesLogic(IElementFactory elementFactory, VehicleUpgradesCollection vehicleUpgradesCollection)
+    public VehiclesTuningLogic(IElementFactory elementFactory, VehicleUpgradesCollection vehicleUpgradesCollection)
     {
         _vehicleUpgradesCollection = vehicleUpgradesCollection;
         elementFactory.ElementCreated += HandleElementCreated;
@@ -22,7 +22,7 @@ internal sealed class VehicleUpgradesLogic
 
         var vehicleHandlingContext = new VehicleHandlingContext(vehicle.Model);
 
-        if (upgrades.Count() != 0)
+        if (upgrades.Any())
         {
             var vehicleHandlingModifiers = upgrades.Select(x => _vehicleUpgradesCollection.Get(x))
                 .Select(x => x.VehicleUpgrade)

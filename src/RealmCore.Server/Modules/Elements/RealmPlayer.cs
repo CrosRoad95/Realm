@@ -1,4 +1,5 @@
-﻿using RealmCore.Server.Modules.Players.Settings;
+﻿using RealmCore.Server.Modules.Players.Money;
+using RealmCore.Server.Modules.Players.Settings;
 
 namespace RealmCore.Server.Modules.Elements;
 
@@ -651,7 +652,7 @@ public class RealmPlayer : Player, IDisposable, IPersistentElement
             if (_attachedBoneElements.Remove(attachedBoneWorldObject))
             {
                 worldObject.Destroyed -= HandleAttachedWorldObjectDestroyed;
-                WorldObjectAttached?.Invoke(this, attachedBoneWorldObject);
+                WorldObjectDetached?.Invoke(this, attachedBoneWorldObject);
                 return true;
             }
             return false;

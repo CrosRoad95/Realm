@@ -10,7 +10,7 @@ public interface IPlayerUpgradesFeature : IPlayerFeature, IEnumerable<int>
     bool TryRemove(int upgradeId);
 }
 
-internal sealed class PlayerUpgradesFeature : IPlayerUpgradesFeature
+internal sealed class PlayerUpgradesFeature : IPlayerUpgradesFeature, IDisposable
 {
     public event Action<IPlayerUpgradesFeature, int, bool>? Added;
     public event Action<IPlayerUpgradesFeature, int>? Removed;
@@ -94,4 +94,12 @@ internal sealed class PlayerUpgradesFeature : IPlayerUpgradesFeature
     }
 
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+
+    public void Dispose()
+    {
+        lock (_lock)
+        {
+            _upgrades = [];
+        }
+    }
 }

@@ -1,7 +1,7 @@
 ﻿namespace RealmCore.Server.Modules.Commands.Administration;
 
 [CommandName("reloadelements")]
-internal class ReloadElementsCommand : ICommand
+internal class ReloadElementsCommand : IInGameCommand
 {
     private readonly IElementCollection _elementCollection;
     private readonly ISaveService _saveService;
@@ -16,14 +16,14 @@ internal class ReloadElementsCommand : ICommand
         _loadService = loadService;
     }
 
-    public async Task Handle(RealmPlayer player, CommandArguments args)
+    public async Task Handle(RealmPlayer player, CommandArguments args, CancellationToken cancellationToken)
     {
         int savedElements = 0;
         foreach (var element in _elementCollection.GetAll())
         {
             try
             {
-                if (await _saveService.Save(element))
+                if (await _saveService.Save(element, cancellationToken))
                 {
                     savedElements++;
                     element.Destroy();
@@ -35,6 +35,6 @@ internal class ReloadElementsCommand : ICommand
             }
         }
 
-        await _loadService.LoadAll();
+        await _loadService.LoadAll(cancellationToken);
     }
 }

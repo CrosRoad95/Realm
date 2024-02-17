@@ -1,6 +1,4 @@
-﻿using System.Diagnostics.CodeAnalysis;
-
-namespace RealmCore.Persistence;
+﻿namespace RealmCore.Persistence;
 
 public abstract class Db<T> : IdentityDbContext<UserData, RoleData, int,
         IdentityUserClaim<int>,

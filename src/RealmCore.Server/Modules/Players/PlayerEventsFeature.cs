@@ -9,7 +9,7 @@ public interface IPlayerEventsFeature : IPlayerFeature, IEnumerable<UserEventDto
     IReadOnlyCollection<UserEventData> Get(IEnumerable<int>? events = null, int limit = 10);
 }
 
-internal class PlayerEventsFeature : IPlayerEventsFeature
+internal class PlayerEventsFeature : IPlayerEventsFeature, IDisposable
 {
     private readonly SemaphoreSlim _lock = new(1);
     private readonly IPlayerUserFeature _playerUserFeature;
@@ -112,4 +112,10 @@ internal class PlayerEventsFeature : IPlayerEventsFeature
     }
 
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+
+    public void Dispose()
+    {
+        lock (_lock)
+            _userEventData = [];
+    }
 }

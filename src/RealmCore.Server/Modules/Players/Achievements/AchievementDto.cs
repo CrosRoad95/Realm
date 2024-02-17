@@ -1,6 +1,6 @@
 ﻿namespace RealmCore.Server.Modules.Players.Achievements;
 
-public class AchievementDto
+public class AchievementDto : IEquatable<AchievementDto>
 {
     public int AchievementId { get; set; }
     public float Progress { get; set; }
@@ -20,5 +20,13 @@ public class AchievementDto
             Progress = achievementData.Progress,
             Value = achievementData.Value
         };
+    }
+
+    public bool Equals(AchievementDto? other)
+    {
+        if (other == null)
+            return false;
+
+        return other.AchievementId == AchievementId;
     }
 }

@@ -1,7 +1,7 @@
 ﻿namespace RealmCore.Server.Modules.Commands.Administration;
 
 [CommandName("help")]
-internal class HelpCommand : ICommand
+internal class HelpCommand : IInGameCommand
 {
     private readonly IEnumerable<CommandTypeWrapper> _commands;
     private readonly ILogger<HelpCommand> _logger;
@@ -12,7 +12,7 @@ internal class HelpCommand : ICommand
         _logger = logger;
     }
 
-    public Task Handle(RealmPlayer player, CommandArguments args)
+    public Task Handle(RealmPlayer player, CommandArguments args, CancellationToken cancellationToken)
     {
         _logger.LogInformation("Commands:");
         _logger.LogInformation("\t{commands}", string.Join('\t', _commands.Select(x => x.Type.GetCustomAttribute<CommandNameAttribute>()!.Name)));

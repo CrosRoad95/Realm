@@ -1,7 +1,7 @@
 ﻿namespace RealmCore.Server.Modules.Commands.Administration;
 
 [CommandName("serverinfo")]
-internal class ServerInfoCommand : ICommand
+internal class ServerInfoCommand : IInGameCommand
 {
     private readonly ILogger<HelpCommand> _logger;
     private readonly MtaServer _mtaServer;
@@ -18,7 +18,7 @@ internal class ServerInfoCommand : ICommand
         _mapsService = mapsService;
     }
 
-    public Task Handle(RealmPlayer player, CommandArguments args)
+    public Task Handle(RealmPlayer player, CommandArguments args, CancellationToken cancellationToken)
     {
         _logger.LogInformation("Server uptime: {uptime}", _dateTimeProvider.Now - _mtaServer.StartDatetime);
         _logger.LogInformation("Players: {playerCount}, logged in players: {loggedInPlayers}", _elementCollection.GetByType<RealmPlayer>().Count(), _elementCollection.GetByType<RealmPlayer>().Where(x => x.User.IsSignedIn).Count());

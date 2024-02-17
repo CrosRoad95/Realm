@@ -145,7 +145,6 @@
 		<Using Include="RealmCore.Resources.Base" />
 		<Using Include="RealmCore.Resources.Browser" />
 		<Using Include="RealmCore.Server.Modules.Commands.Administration" />
-		<Using Include="RealmCore.Server.Modules.Core" />
 		<Using Include="RealmCore.Server.Modules.Inventories" />
 		<Using Include="RealmCore.Server.Modules.Persistence" />
 		<Using Include="RealmCore.Server.Modules.Players.Administration" />
@@ -202,6 +201,7 @@
 		<Using Include="RealmCore.Server.Modules.Players.Fractions" />
 		<Using Include="RealmCore.Server.Modules.Domain" />
 		<Using Include="System.Security.Cryptography" />
+		<Using Include="RealmCore.Server.Modules.Elements.Focusable" />
 		<Using Include="SlipeServer.Net.Wrappers" />
 		
 	</ItemGroup>

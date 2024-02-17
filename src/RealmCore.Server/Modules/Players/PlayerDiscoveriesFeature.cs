@@ -8,7 +8,7 @@ public interface IPlayerDiscoveriesFeature : IPlayerFeature, IEnumerable<int>
     bool TryDiscover(int discoveryId);
 }
 
-internal sealed class PlayerDiscoveriesFeature : IPlayerDiscoveriesFeature
+internal sealed class PlayerDiscoveriesFeature : IPlayerDiscoveriesFeature, IDisposable
 {
     private readonly object _lock = new();
     private ICollection<DiscoveryData> _discoveries = [];
@@ -69,4 +69,10 @@ internal sealed class PlayerDiscoveriesFeature : IPlayerDiscoveriesFeature
     }
 
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+
+    public void Dispose()
+    {
+        lock (_lock)
+            _discoveries = [];
+    }
 }

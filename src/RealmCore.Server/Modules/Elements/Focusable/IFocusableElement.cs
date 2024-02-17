@@ -1,4 +1,4 @@
-﻿namespace RealmCore.Server.Modules.Elements;
+﻿namespace RealmCore.Server.Modules.Elements.Focusable;
 
 public interface IFocusableElement
 {

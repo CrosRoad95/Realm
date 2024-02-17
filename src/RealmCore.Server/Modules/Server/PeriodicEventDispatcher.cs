@@ -15,8 +15,6 @@ internal sealed class PeriodicEventDispatcher : IPeriodicEventDispatcher
 
     public event Action? EverySecond;
     public event Action? EveryMinute;
-    public event Func<Task>? EverySecondAsync;
-    public event Func<Task>? EveryMinuteAsync;
 
     public PeriodicEventDispatcher(ILogger<PeriodicEventDispatcher> logger, IScheduler scheduler)
     {

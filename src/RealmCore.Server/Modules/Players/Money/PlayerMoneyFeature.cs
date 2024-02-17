@@ -1,4 +1,4 @@
-﻿namespace RealmCore.Server.Modules.Players;
+﻿namespace RealmCore.Server.Modules.Players.Money;
 
 public interface IPlayerMoneyFeature : IPlayerFeature
 {

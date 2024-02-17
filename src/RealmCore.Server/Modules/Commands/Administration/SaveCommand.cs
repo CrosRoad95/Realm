@@ -1,7 +1,7 @@
 ﻿namespace RealmCore.Server.Modules.Commands.Administration;
 
 [CommandName("save")]
-internal class SaveCommand : ICommand
+internal class SaveCommand : IInGameCommand
 {
     private readonly IElementCollection _elementCollection;
     private readonly ISaveService _saveService;
@@ -14,7 +14,7 @@ internal class SaveCommand : ICommand
         _logger = logger;
     }
 
-    public async Task Handle(RealmPlayer player, CommandArguments args)
+    public async Task Handle(RealmPlayer player, CommandArguments args, CancellationToken cancellationToken)
     {
         int savedElements = 0;
         foreach (var element in _elementCollection.GetByType<RealmPlayer>())
@@ -22,7 +22,7 @@ internal class SaveCommand : ICommand
             using var _ = _logger.BeginElement(element);
             try
             {
-                if (await _saveService.Save(element))
+                if (await _saveService.Save(element, cancellationToken))
                 {
                     savedElements++;
                 }

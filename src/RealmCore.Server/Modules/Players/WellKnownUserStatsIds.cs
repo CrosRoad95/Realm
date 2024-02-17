@@ -4,7 +4,7 @@ public enum WellKnownUserStatsIds : int
 {
     Unknown,
     TraveledDistanceInVehicleAsDriver,
-    TraveledDistanceInVehicleAsPassager,
+    TraveledDistanceInVehicleAsPassenger,
     TraveledDistanceSwimming,
     TraveledDistanceByFoot,
     TraveledDistanceInAir,

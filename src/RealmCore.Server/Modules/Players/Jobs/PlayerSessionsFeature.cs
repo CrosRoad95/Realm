@@ -1,4 +1,6 @@
-﻿namespace RealmCore.Server.Modules.Players.Jobs;
+﻿using RealmCore.Server.Modules.Players.Sessions;
+
+namespace RealmCore.Server.Modules.Players.Jobs;
 
 public interface IPlayerSessionsFeature : IPlayerFeature, IEnumerable<Session>
 {
@@ -8,8 +10,7 @@ public interface IPlayerSessionsFeature : IPlayerFeature, IEnumerable<Session>
     TSession BeginSession<TSession>(params object[] parameters) where TSession : Session;
     void EndSession<TSession>() where TSession : Session;
     void EndSession<TSession>(TSession session) where TSession : Session;
-    TSession GetRequiredSession<TSession>();
-    TSession? GetSession<TSession>();
+    TSession GetSession<TSession>();
     bool IsDuringSession<TSession>();
     void TryEndSession<TSession>() where TSession : Session;
     bool TryEndSession<TSession>(TSession session) where TSession : Session;
@@ -78,19 +79,14 @@ internal sealed class PlayerSessionsFeature : IPlayerSessionsFeature, IDisposabl
         }
     }
 
-    public TSession? GetSession<TSession>()
+    public TSession GetSession<TSession>()
     {
         lock (_lock)
         {
-            return _sessions.OfType<TSession>().FirstOrDefault();
-        }
-    }
-
-    public TSession GetRequiredSession<TSession>()
-    {
-        lock (_lock)
-        {
-            return _sessions.OfType<TSession>().First();
+            var session = _sessions.OfType<TSession>().FirstOrDefault();
+            if(session == null)
+                throw new SessionNotFoundException(typeof(TSession));
+            return session;
         }
     }
 

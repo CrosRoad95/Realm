@@ -1,11 +1,12 @@
 ﻿using Coravel;
+using RealmCore.Server.Modules.Players.Money;
 using RealmCore.Server.Modules.Players.Settings;
 
 namespace RealmCore.Server.Extensions;
 
 public static class ServiceCollectionExtensions
 {
-    public static ServiceCollection AddCommand<TCommand>(this ServiceCollection services) where TCommand : class, ICommand
+    public static ServiceCollection AddCommand<TCommand>(this ServiceCollection services) where TCommand : class, IInGameCommand
     {
         services.AddSingleton(new CommandTypeWrapper(typeof(TCommand)));
         services.AddTransient<TCommand>();

@@ -1,4 +1,4 @@
-﻿namespace RealmCore.Server.Modules.Server;
+﻿namespace RealmCore.Server.Modules.Domain;
 
 public abstract class CollectionItemBase<TKey>
 {

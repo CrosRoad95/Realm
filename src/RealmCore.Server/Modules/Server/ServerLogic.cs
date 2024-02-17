@@ -1,4 +1,4 @@
-﻿namespace RealmCore.Server.Modules.Core;
+﻿namespace RealmCore.Server.Modules.Server;
 
 internal sealed class ServerLogic
 {

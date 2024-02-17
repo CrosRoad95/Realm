@@ -1,4 +1,4 @@
-﻿namespace RealmCore.Server.Modules.Players;
+﻿namespace RealmCore.Server.Modules.Users;
 
 public class SerialNullException : Exception
 {

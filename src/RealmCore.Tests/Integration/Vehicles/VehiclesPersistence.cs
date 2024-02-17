@@ -1,4 +1,6 @@
-﻿namespace RealmCore.Tests.Integration.Vehicles;
+﻿using RealmCore.Server.Modules.Elements.Focusable;
+
+namespace RealmCore.Tests.Integration.Vehicles;
 
 public class VehiclesPersistence : RealmIntegrationTestingBase
 {

@@ -19,7 +19,7 @@ public interface IPlayerLevelFeature : IPlayerFeature
     void GiveExperience(uint amount);
 }
 
-internal sealed class PlayerLevelFeature : IPlayerLevelFeature
+internal sealed class PlayerLevelFeature : IPlayerLevelFeature, IDisposable
 {
     private readonly object _lock = new();
     private readonly LevelsCollection _levelsCollection;
@@ -132,6 +132,15 @@ internal sealed class PlayerLevelFeature : IPlayerLevelFeature
             _playerUserFeature.IncreaseVersion();
             LevelChanged?.Invoke(this, _level, LevelChange.Increase);
             CheckForNextLevel();
+        }
+    }
+
+    public void Dispose()
+    {
+        lock (_lock)
+        {
+            _level = 0;
+            _experience = 0;
         }
     }
 }

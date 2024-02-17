@@ -13,7 +13,7 @@ public interface IPlayerStatisticsFeature : IPlayerFeature, IEnumerable<UserStat
     float Get(int statId);
 }
 
-internal sealed class PlayerStatisticsFeature : IPlayerStatisticsFeature
+internal sealed class PlayerStatisticsFeature : IPlayerStatisticsFeature, IDisposable
 {
     private readonly object _lock = new();
     private readonly IPlayerUserFeature _playerUserFeature;
@@ -126,4 +126,12 @@ internal sealed class PlayerStatisticsFeature : IPlayerStatisticsFeature
     }
 
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+
+    public void Dispose()
+    {
+        lock (_lock)
+        {
+            _stats = [];
+        }
+    }
 }

@@ -1,6 +1,4 @@
-﻿using System.Xml.Linq;
-
-namespace RealmCore.Server.Modules.Players;
+﻿namespace RealmCore.Server.Modules.Players;
 
 [Flags]
 public enum PlayerSearchOption
