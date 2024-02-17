@@ -1,5 +1,6 @@
 ﻿using RealmCore.Server.Modules.Players.Money;
 using RealmCore.Server.Modules.Players.Settings;
+using SlipeServer.Server.Elements;
 
 namespace RealmCore.Server.Modules.Elements;
 
@@ -632,8 +633,8 @@ public class RealmPlayer : Player, IDisposable, IPersistentElement
 
     private void HandleAttachedWorldObjectDestroyed(Element element)
     {
-        if (element is RealmWorldObject realmWorldObject)
-            Detach(realmWorldObject);
+        if (element is RealmWorldObject worldObject)
+            Detach(worldObject);
     }
 
     public bool IsAttached(RealmWorldObject worldObject)

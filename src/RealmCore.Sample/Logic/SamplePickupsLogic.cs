@@ -26,7 +26,7 @@ internal class SamplePickupsLogic
                     var player = (RealmPlayer)element;
                     if(player.Sessions.TryGetSession(out FractionSession pendingFractionSession))
                     {
-                        pendingFractionSession.End();
+                        pendingFractionSession.Dispose();
                         _chatBox.OutputTo(player, $"Session ended in: {pendingFractionSession.Elapsed}");
                         player.Sessions.EndSession(pendingFractionSession);
                     }
@@ -34,7 +34,7 @@ internal class SamplePickupsLogic
                     {
                         var fractionSession = player.Sessions.BeginSession<FractionSession>();
                         _chatBox.OutputTo(player, $"Session started");
-                        fractionSession.Start();
+                        fractionSession.TryStart();
                     }
                 };
             }
@@ -64,7 +64,7 @@ internal class SamplePickupsLogic
                     {
                         var testJob = player.Sessions.BeginSession<TestJob>();
                         _chatBox.OutputTo(player, $"Job started");
-                        testJob.Start();
+                        testJob.TryStart();
 
                         testJob.CompletedAllObjectives += async e =>
                         {

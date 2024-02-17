@@ -4,7 +4,7 @@ namespace RealmCore.Server.Modules.Players.Fractions;
 
 public class FractionSession : Session
 {
-    public FractionSession(RealmPlayer player) : base(player)
+    public FractionSession(RealmPlayer player, IDateTimeProvider dateTimeProvider) : base(player, dateTimeProvider)
     {
     }
 }

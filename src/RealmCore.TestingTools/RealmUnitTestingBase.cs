@@ -39,6 +39,12 @@ public abstract class RealmUnitTestingBase
         });
         return player;
     }
+
+    protected RealmPlayer CreateServerWithOnePlayer(string name = "TestPlayer")
+    {
+        CreateServer();
+        return CreatePlayer(name);
+    }
 }
 
 public class TestDb : IDb

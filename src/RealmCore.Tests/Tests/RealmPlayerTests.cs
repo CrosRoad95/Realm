@@ -8,7 +8,7 @@ public class RealmPlayerTests : RealmIntegrationTestingBase
     public async Task SavingAndLoadingPlayerShouldWork()
     {
         var server = await CreateServerAsync();
-        var now = server.TestDateTimeProvider.Now;
+        var now = server.DateTimeProvider.Now;
         {
             var player = await CreatePlayerAsync(false);
             player.Name = "foo";
@@ -29,7 +29,7 @@ public class RealmPlayerTests : RealmIntegrationTestingBase
             player.Money.Amount.Should().Be(0);
         }
 
-        server.TestDateTimeProvider.AddOffset(TimeSpan.FromDays(1));
+        server.DateTimeProvider.AddOffset(TimeSpan.FromDays(1));
 
         {
             var player = await CreatePlayerAsync(false);
@@ -41,7 +41,7 @@ public class RealmPlayerTests : RealmIntegrationTestingBase
             player.PlayTime.TotalPlayTime.Should().Be(TimeSpan.FromSeconds(1337));
             player.Money.Amount.Should().Be(12.345m);
             player.DailyVisits.VisitsInRow.Should().Be(2);
-            player.DailyVisits.LastVisit.Should().Be(server.TestDateTimeProvider.Now.Date);
+            player.DailyVisits.LastVisit.Should().Be(server.DateTimeProvider.Now.Date);
             player.Settings.Get(1).Should().Be("test");
             player.Bans.IsBanned(1).Should().BeTrue();
             player.Upgrades.Has(1).Should().BeTrue();

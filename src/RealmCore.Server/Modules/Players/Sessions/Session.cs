@@ -1,62 +1,62 @@
 ﻿namespace RealmCore.Server.Modules.Players.Sessions;
 
-public abstract class Session
+public abstract class Session : IDisposable
 {
-    public bool _ended;
+    public AtomicBool _disposed;
     protected readonly object _lock = new();
-    private readonly Stopwatch _stopwatch = new();
+    private readonly TimeMeasurement _timeMeasurement;
 
     public event Action<Session>? Started;
     public event Action<Session>? Ended;
 
-    public TimeSpan Elapsed => _stopwatch.Elapsed;
-
-    public bool IsRunning => _stopwatch.IsRunning;
+    public TimeSpan Elapsed => _timeMeasurement.Elapsed;
+    public bool IsRunning => _timeMeasurement.IsRunning;
     public RealmPlayer Player { get; private set; }
+    private bool _firstTime = true;
 
-    public Session(RealmPlayer player)
+    public Session(RealmPlayer player, IDateTimeProvider dateTimeProvider)
     {
         Player = player;
+        _timeMeasurement = new(dateTimeProvider);
     }
 
     protected virtual void OnStarted() { }
     protected virtual void OnEnded() { }
-    public void Start()
+
+    public void TryStart()
     {
-        lock (_lock)
+        if (_disposed)
+            throw new SessionAlreadyEndedException(this);
+
+        if (_timeMeasurement.TryStart())
         {
-            if (IsRunning)
-                throw new SessionAlreadyRunningException();
-            _stopwatch.Reset();
-            _stopwatch.Start();
-            OnStarted();
             Started?.Invoke(this);
+            if (_firstTime)
+            {
+                _firstTime = false;
+                OnStarted();
+            }
         }
     }
 
-    public void Pause()
+    public bool TryStop()
     {
-        lock (_lock)
-        {
-            _stopwatch.Stop();
-        }
+        if (_disposed)
+            throw new SessionAlreadyEndedException(this);
+
+        return _timeMeasurement.TryStop();
     }
 
-    public void Continue()
+    public void Dispose()
     {
-        lock (_lock)
-        {
-            _stopwatch.Start();
-        }
-    }
+        if (!_disposed.TrySetTrue())
+            throw new SessionAlreadyEndedException(this);
 
-    public void End()
-    {
         lock (_lock)
         {
-            _stopwatch.Stop();
-            OnEnded();
+            _timeMeasurement.TryStop();
             Ended?.Invoke(this);
+            OnEnded();
         }
     }
 }

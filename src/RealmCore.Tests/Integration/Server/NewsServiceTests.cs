@@ -9,7 +9,7 @@ public class NewsServiceTests : RealmIntegrationTestingBase
     {
         var server = await CreateServerAsync();
         var player = await CreatePlayerAsync();
-        var now = server.TestDateTimeProvider.Now;
+        var now = server.DateTimeProvider.Now;
         var newsService = server.GetRequiredService<INewsService>();
         var context = server.GetRequiredService<IDb>();
 

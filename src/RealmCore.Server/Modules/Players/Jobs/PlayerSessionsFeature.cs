@@ -1,9 +1,12 @@
 ﻿using RealmCore.Server.Modules.Players.Sessions;
+using System.Diagnostics.Contracts;
 
 namespace RealmCore.Server.Modules.Players.Jobs;
 
 public interface IPlayerSessionsFeature : IPlayerFeature, IEnumerable<Session>
 {
+    int Count { get; }
+
     event Action<IPlayerSessionsFeature, Session>? Started;
     event Action<IPlayerSessionsFeature, Session>? Ended;
 
@@ -12,7 +15,8 @@ public interface IPlayerSessionsFeature : IPlayerFeature, IEnumerable<Session>
     void EndSession<TSession>(TSession session) where TSession : Session;
     TSession GetSession<TSession>();
     bool IsDuringSession<TSession>();
-    void TryEndSession<TSession>() where TSession : Session;
+    bool IsDuringSession<TSession>(TSession session) where TSession : Session;
+    bool TryEndSession<TSession>() where TSession : Session;
     bool TryEndSession<TSession>(TSession session) where TSession : Session;
     bool TryGetSession<TSession>(out TSession session);
 }
@@ -25,6 +29,16 @@ internal sealed class PlayerSessionsFeature : IPlayerSessionsFeature, IDisposabl
     public event Action<IPlayerSessionsFeature, Session>? Ended;
 
     public RealmPlayer Player { get; init; }
+
+    public int Count
+    {
+        get
+        {
+            lock (_lock)
+                return _sessions.Count;
+        }
+    }
+
     public PlayerSessionsFeature(PlayerContext playerContext)
     {
         Player = playerContext.Player;
@@ -36,12 +50,13 @@ internal sealed class PlayerSessionsFeature : IPlayerSessionsFeature, IDisposabl
         lock (_lock)
         {
             if (_sessions.OfType<TSession>().Any())
-                throw new InvalidOperationException();
+                throw new SessionAlreadyBegunException(typeof(TSession));
+
             session = ActivatorUtilities.CreateInstance<TSession>(Player.ServiceProvider, parameters);
             _sessions.Add(session);
             try
             {
-                session.Start();
+                session.TryStart();
             }
             catch (Exception)
             {
@@ -53,15 +68,21 @@ internal sealed class PlayerSessionsFeature : IPlayerSessionsFeature, IDisposabl
         return session;
     }
 
+    private bool IsDuringSessionCore<TSession>() => _sessions.OfType<TSession>().Any();
+
     public bool IsDuringSession<TSession>()
     {
         lock (_lock)
-        {
-            return _sessions.OfType<TSession>().Any();
-        }
+            return IsDuringSessionCore<TSession>();
     }
 
-    public bool TryGetSession<TSession>(out TSession outSession)
+    public bool IsDuringSession<TSession>(TSession session) where TSession : Session
+    {
+        lock (_lock)
+            return _sessions.Contains(session);
+    }
+
+    public bool TryGetSession<TSession>([NotNullWhen(true)] out TSession outSession)
     {
         lock (_lock)
         {
@@ -92,20 +113,22 @@ internal sealed class PlayerSessionsFeature : IPlayerSessionsFeature, IDisposabl
 
     public void EndSession<TSession>() where TSession : Session
     {
-        Session session;
+        Session? session;
         lock (_lock)
         {
-            session = _sessions.OfType<TSession>().First();
+            session = _sessions.OfType<TSession>().FirstOrDefault();
+            if (session == null)
+                throw new SessionNotFoundException(typeof(TSession));
             try
             {
-                session.End();
+                session.Dispose();
             }
             finally
             {
                 _sessions.Remove(session);
+                Ended?.Invoke(this, session);
             }
         }
-        Ended?.Invoke(this, session);
     }
 
     public void EndSession<TSession>(TSession session) where TSession : Session
@@ -113,37 +136,39 @@ internal sealed class PlayerSessionsFeature : IPlayerSessionsFeature, IDisposabl
         lock (_lock)
         {
             if (!_sessions.Contains(session))
-                throw new InvalidOperationException();
+                throw new SessionNotFoundException(typeof(TSession));
+
             try
             {
-                session.End();
+                session.Dispose();
             }
             finally
             {
                 _sessions.Remove(session);
+                Ended?.Invoke(this, session);
             }
         }
-        Ended?.Invoke(this, session);
     }
 
-    public void TryEndSession<TSession>() where TSession : Session
+    public bool TryEndSession<TSession>() where TSession : Session
     {
-        Session session;
-        bool ended = false;
+        Session? session;
         lock (_lock)
         {
-            session = _sessions.OfType<TSession>().First();
+            session = _sessions.OfType<TSession>().FirstOrDefault();
+            if (session == null)
+                return false;
             try
             {
-                session.End();
+                session.Dispose();
             }
             finally
             {
-                ended = _sessions.Remove(session);
+                _sessions.Remove(session);
+                Ended?.Invoke(this, session);
             }
         }
-        if (ended)
-            Ended?.Invoke(this, session);
+        return true;
     }
 
     public bool TryEndSession<TSession>(TSession session) where TSession : Session
@@ -154,14 +179,14 @@ internal sealed class PlayerSessionsFeature : IPlayerSessionsFeature, IDisposabl
                 return false;
             try
             {
-                session.End();
+                session.Dispose();
             }
             finally
             {
                 _sessions.Remove(session);
+                Ended?.Invoke(this, session);
             }
         }
-        Ended?.Invoke(this, session);
         return true;
     }
 
@@ -177,11 +202,12 @@ internal sealed class PlayerSessionsFeature : IPlayerSessionsFeature, IDisposabl
     {
         lock (_lock)
         {
-            foreach (var session in new List<Session>(_sessions))
+            foreach (var session in this)
             {
                 try
                 {
-                    session.End();
+                    session.Dispose();
+                    Ended?.Invoke(this, session);
                 }
                 catch (Exception) { }
                 finally

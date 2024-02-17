@@ -129,6 +129,8 @@
 		<Using Include="RealmCore.Server.Modules.Players.Groups" />
 		<Using Include="RealmCore.TestingTools.Extensions" />
 		<Using Include="RealmCore.Server.Modules.Domain" />
+		<Using Include="RealmCore.Server.Modules.Core" />
+		<Using Include="RealmCore.Server.Modules.Players.Sessions" />
 	</ItemGroup>
 
 </Project>

@@ -202,6 +202,7 @@
 		<Using Include="RealmCore.Server.Modules.Domain" />
 		<Using Include="System.Security.Cryptography" />
 		<Using Include="RealmCore.Server.Modules.Elements.Focusable" />
+		<Using Include="RealmCore.Server.Modules.Core" />
 		<Using Include="SlipeServer.Net.Wrappers" />
 		
 	</ItemGroup>

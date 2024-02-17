@@ -10,7 +10,7 @@ public class PlayerDailyVisitsServiceTests : RealmUnitTestingBase
         var server = CreateServer();
         var player = CreatePlayer();
 
-        var testDateTimeProvider = server.TestDateTimeProvider;
+        var testDateTimeProvider = server.DateTimeProvider;
         var dailyVisits = player.DailyVisits;
 
         dailyVisits.LastVisit = useNowDateTime ? DateTime.Now : DateTime.MinValue;

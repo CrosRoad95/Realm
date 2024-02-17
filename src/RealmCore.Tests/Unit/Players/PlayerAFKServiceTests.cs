@@ -8,7 +8,7 @@ public class PlayerAFKServiceTests : RealmUnitTestingBase
         var server = CreateServer();
         var player = CreatePlayer();
         var afkService = player.AFK;
-        var dateTimeProvider = server.TestDateTimeProvider;
+        var dateTimeProvider = server.DateTimeProvider;
 
         bool _isAfk = false;
         TimeSpan _elapsed = TimeSpan.Zero;

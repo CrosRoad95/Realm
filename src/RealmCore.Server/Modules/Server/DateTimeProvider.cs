@@ -1,6 +1,6 @@
 ﻿namespace RealmCore.Server.Modules.Server;
 
-internal class DateTimeProvider : IDateTimeProvider
+internal sealed class DateTimeProvider : IDateTimeProvider
 {
     public DateTimeProvider()
     {

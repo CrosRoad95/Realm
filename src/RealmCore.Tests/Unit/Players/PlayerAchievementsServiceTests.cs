@@ -40,7 +40,7 @@ public class PlayerAchievementsServiceTests : RealmUnitTestingBase
             unlockedAchievement = achievementId;
         };
 
-        var now = server.TestDateTimeProvider.Now;
+        var now = server.DateTimeProvider.Now;
         achievements.TryReceiveReward(2, 100, now).Should().BeFalse();
 
         achievements.UpdateProgress(2, 100, 100);

@@ -9,7 +9,7 @@ namespace RealmCore.TestingTools;
 
 public class RealmTestingServer : TestingServer<RealmTestingPlayer>
 {
-    public TestDateTimeProvider TestDateTimeProvider => (TestDateTimeProvider)GetRequiredService<IDateTimeProvider>();
+    public TestDateTimeProvider DateTimeProvider => (TestDateTimeProvider)GetRequiredService<IDateTimeProvider>();
     public TestDebounceFactory TestDebounceFactory => (TestDebounceFactory)GetRequiredService<IDebounceFactory>();
 
     private string _createPlayerName = "";
@@ -112,7 +112,7 @@ public class RealmTestingServer : TestingServer<RealmTestingPlayer>
     public async Task<RealmPlayer> SignInPlayer(RealmPlayer player)
     {
         var userManager = GetRequiredService<UserManager<UserData>>();
-        var user = await userManager.GetUserByUserName(player.Name, TestDateTimeProvider.Now);
+        var user = await userManager.GetUserByUserName(player.Name, DateTimeProvider.Now);
 
         if (user == null)
         {

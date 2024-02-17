@@ -19,7 +19,7 @@ public abstract class JobSession : Session
     public event Action<JobSession, Objective>? ObjectiveAdded;
     public event Action<JobSession, Objective>? ObjectiveCompleted;
     public event Action<JobSession, Objective>? ObjectiveInCompleted;
-    public JobSession(IScopedElementFactory scopedElementFactory, PlayerContext playerContext, IPeriodicEventDispatcher updateService) : base(playerContext.Player)
+    public JobSession(PlayerContext playerContext, IScopedElementFactory scopedElementFactory, IPeriodicEventDispatcher updateService, IDateTimeProvider dateTimeProvider) : base(playerContext.Player, dateTimeProvider)
     {
         _elementFactory = scopedElementFactory.CreateScope();
         _updateService = updateService;

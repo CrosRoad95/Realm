@@ -20,7 +20,7 @@ public class PlayerNotificationsTests : RealmIntegrationTestingBase
         player.Notifications.Count().Should().Be(1);
         var notification = player.Notifications.First();
 
-        var now = server.TestDateTimeProvider.Now;
+        var now = server.DateTimeProvider.Now;
 
         notification.Should().BeEquivalentTo(new UserNotificationDto
         {
@@ -30,14 +30,14 @@ public class PlayerNotificationsTests : RealmIntegrationTestingBase
             Excerpt = "excerpt",
             UserId = player.PersistentId,
             ReadTime = null,
-            SentTime = server.TestDateTimeProvider.Now
+            SentTime = server.DateTimeProvider.Now
         });
 
         var unread = await playerNotifications.CountUnread(player, CancellationToken.None);
         unread.Should().Be(1);
 
-        server.TestDateTimeProvider.AddOffset(TimeSpan.FromMinutes(1));
-        var now2 = server.TestDateTimeProvider.Now;
+        server.DateTimeProvider.AddOffset(TimeSpan.FromMinutes(1));
+        var now2 = server.DateTimeProvider.Now;
 
         var markedAsRead = await playerNotifications.TryMarkAsRead(notification.Id);
         notification = player.Notifications.First();
