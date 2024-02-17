@@ -7,7 +7,6 @@ namespace RealmCore.TestingTools;
 public abstract class RealmUnitTestingBase
 {
     private RealmTestingServer? _server;
-    private int _playerCount = 0;
 
     protected RealmTestingServer CreateServer()
     {
@@ -26,7 +25,11 @@ public abstract class RealmUnitTestingBase
     {
         if (_server == null)
             throw new Exception("Server not created.");
-        var player = _server.CreatePlayer(name: $"{name}{++_playerCount}");
+
+        var player = _server.CreatePlayer(name: name);
+        if (player.IsDestroyed)
+            return player;
+
         player.User.SignIn(new UserData
         {
             UserName = player.Name

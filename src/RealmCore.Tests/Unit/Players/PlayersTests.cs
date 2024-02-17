@@ -326,4 +326,16 @@ public class PlayersTests : RealmUnitTestingBase
         }
         #endregion
     }
+
+    [Fact]
+    public void OnlyOnePlayerOfGivenNameShouldBeAbleToJoinServer()
+    {
+        CreateServer();
+
+        var player1 = CreatePlayer("TestPlayer123");
+        var player2 = CreatePlayer("TestPlayer123");
+
+        player1.IsDestroyed.Should().BeFalse();
+        player2.IsDestroyed.Should().BeTrue();
+    }
 }

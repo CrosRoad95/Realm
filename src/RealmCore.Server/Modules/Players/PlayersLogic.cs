@@ -7,23 +7,25 @@ internal sealed class PlayersLogic
     private readonly ILogger<PlayersLogic> _logger;
     private readonly IResourceProvider _resourceProvider;
     private readonly IUsersInUse _activeUsers;
-    private readonly IPlayerEventManager _playersService;
+    private readonly IPlayersEventManager _playerEventManager;
     private readonly IOptions<GuiBrowserOptions> _guiBrowserOptions;
     private readonly ClientConsole _clientConsole;
     private readonly IElementCollection _elementCollection;
+    private readonly IPlayersService _playersService;
     private readonly ConcurrentDictionary<RealmPlayer, Latch> _playerResources = new();
 
-    public PlayersLogic(MtaServer mtaServer, IClientInterfaceService clientInterfaceService, ILogger<PlayersLogic> logger, IResourceProvider resourceProvider, IUsersInUse activeUsers, IPlayerEventManager playersService, IOptions<GuiBrowserOptions> guiBrowserOptions, ClientConsole clientConsole, IElementCollection elementCollection)
+    public PlayersLogic(MtaServer mtaServer, IClientInterfaceService clientInterfaceService, ILogger<PlayersLogic> logger, IResourceProvider resourceProvider, IUsersInUse activeUsers, IPlayersEventManager playerEventManager, IOptions<GuiBrowserOptions> guiBrowserOptions, ClientConsole clientConsole, IElementCollection elementCollection, IPlayersService playersService)
     {
         _mtaServer = mtaServer;
         _clientInterfaceService = clientInterfaceService;
         _logger = logger;
         _resourceProvider = resourceProvider;
         _activeUsers = activeUsers;
-        _playersService = playersService;
+        _playerEventManager = playerEventManager;
         _guiBrowserOptions = guiBrowserOptions;
         _clientConsole = clientConsole;
         _elementCollection = elementCollection;
+        _playersService = playersService;
         _mtaServer.PlayerJoined += HandlePlayerJoined;
     }
 
@@ -106,6 +108,9 @@ internal sealed class PlayersLogic
 
     private async Task HandlePlayerJoinedCore(RealmPlayer player, CancellationToken cancellationToken)
     {
+        if (_playersService.SearchPlayersByName(player.Name, PlayerSearchOption.CaseInsensitive, player).Any())
+            throw new UserNameInUseException(player.Name);
+
         var start = Stopwatch.GetTimestamp();
         var resources = _resourceProvider.GetResources();
         _playerResources[player] = new Latch(RealmResourceServer._resourceCounter, TimeSpan.FromSeconds(60));
@@ -134,7 +139,7 @@ internal sealed class PlayersLogic
             return;
         player.Disconnected += HandleDisconnected;
 
-        _playersService.RelayLoaded(player);
+        _playerEventManager.RelayLoaded(player);
     }
 
 
@@ -152,6 +157,10 @@ internal sealed class PlayersLogic
         try
         {
             await HandlePlayerJoinedCore(player, player.CancellationToken);
+        }
+        catch (UserNameInUseException ex)
+        {
+            player.Kick("Nick jest używany przez innego gracza.");
         }
         catch (OperationCanceledException ex)
         {

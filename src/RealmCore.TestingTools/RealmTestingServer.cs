@@ -13,9 +13,12 @@ public class RealmTestingServer : TestingServer<RealmTestingPlayer>
     public TestDateTimeProvider TestDateTimeProvider => (TestDateTimeProvider)GetRequiredService<IDateTimeProvider>();
     public TestDebounceFactory TestDebounceFactory => (TestDebounceFactory)GetRequiredService<IDebounceFactory>();
 
+    private string _createPlayerName = "";
+
     protected override IClient CreateClient(uint binaryAddress, INetWrapper netWrapper)
     {
         var player = Instantiate<RealmTestingPlayer>();
+        player.Name = _createPlayerName;
         player.Client = new TestingClient(binaryAddress, netWrapper, player);
         return player.Client;
     }
@@ -75,6 +78,7 @@ public class RealmTestingServer : TestingServer<RealmTestingPlayer>
 
     public RealmPlayer CreatePlayer(bool withSerialAndIp = true, string name = "FakePlayer")
     {
+        _createPlayerName = name;
         var player = AddFakePlayer();
         player.Name = name;
 
@@ -87,7 +91,7 @@ public class RealmTestingServer : TestingServer<RealmTestingPlayer>
             };
         }
 
-        GetRequiredService<IPlayerEventManager>().RelayLoaded(player);
+        GetRequiredService<IPlayersEventManager>().RelayLoaded(player);
         return player;
     }
 

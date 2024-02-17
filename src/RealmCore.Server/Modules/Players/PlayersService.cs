@@ -13,7 +13,7 @@ public enum PlayerSearchOption
 
 public interface IPlayersService
 {
-    IEnumerable<RealmPlayer> SearchPlayersByName(string pattern, PlayerSearchOption searchOptions = PlayerSearchOption.All);
+    IEnumerable<RealmPlayer> SearchPlayersByName(string pattern, PlayerSearchOption searchOptions = PlayerSearchOption.All, RealmPlayer? ignore = null);
     bool TryFindPlayerBySerial(string serial, out RealmPlayer? foundPlayer, PlayerSearchOption searchOptions = PlayerSearchOption.All);
     bool TryGetPlayerByName(string name, out RealmPlayer? foundPlayer, PlayerSearchOption searchOptions = PlayerSearchOption.All);
 }
@@ -51,10 +51,13 @@ internal sealed class PlayersService : IPlayersService
         return true;
     }
 
-    public IEnumerable<RealmPlayer> SearchPlayersByName(string pattern, PlayerSearchOption searchOptions = PlayerSearchOption.All)
+    public IEnumerable<RealmPlayer> SearchPlayersByName(string pattern, PlayerSearchOption searchOptions = PlayerSearchOption.All, RealmPlayer? ignore = null)
     {
         foreach (var player in _elementCollection.GetByType<RealmPlayer>())
         {
+            if (ignore != null && ignore == player)
+                continue;
+
             if (searchOptions.HasFlag(PlayerSearchOption.LoggedIn))
             {
                 if (!player.User.IsSignedIn)

@@ -88,7 +88,7 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<IBrowserGuiService, BrowserGuiService>();
         services.AddSingleton<IMapsService, MapsService>();
         services.AddSingleton<IPeriodicEventDispatcher, PeriodicEventDispatcher>();
-        services.AddSingleton<IPlayerEventManager, PlayerEventManager>();
+        services.AddSingleton<IPlayersEventManager, PlayerEventManager>();
         #endregion
 
         #region Player services

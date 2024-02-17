@@ -1,13 +1,13 @@
 ﻿namespace RealmCore.Server.Modules.Players;
 
-public interface IPlayerEventManager
+public interface IPlayersEventManager
 {
     event Action<RealmPlayer>? PlayerLoaded;
 
     internal void RelayLoaded(RealmPlayer player);
 }
 
-internal sealed class PlayerEventManager : IPlayerEventManager
+internal sealed class PlayerEventManager : IPlayersEventManager
 {
     public event Action<RealmPlayer>? PlayerLoaded;
 
