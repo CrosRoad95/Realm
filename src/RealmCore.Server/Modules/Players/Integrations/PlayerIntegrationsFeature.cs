@@ -12,7 +12,7 @@ public interface IPlayerIntegrationsFeature : IPlayerFeature
     IIntegration[] Integrations { get; }
 }
 
-internal sealed class PlayerIntegrationsFeature : IPlayerIntegrationsFeature
+internal sealed class PlayerIntegrationsFeature : IPlayerIntegrationsFeature, IDisposable
 {
     public IDiscordIntegration Discord { get; private set; }
     public RealmPlayer Player { get; init; }
@@ -34,6 +34,11 @@ internal sealed class PlayerIntegrationsFeature : IPlayerIntegrationsFeature
     }
 
     private void HandleSignedOut(IPlayerUserFeature playerUserFeature, RealmPlayer _)
+    {
+        Discord.TryRemove();
+    }
+
+    public void Dispose()
     {
         Discord.TryRemove();
     }

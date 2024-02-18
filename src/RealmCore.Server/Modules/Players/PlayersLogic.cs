@@ -100,7 +100,7 @@ internal sealed class PlayersLogic
                 player.Browser.Ready -= handleBrowserReady;
         }
 
-        if(!await waitForBrowser.WaitWithWithout(timeout, cancellationToken))
+        if(!await waitForBrowser.WaitWithTimeout(timeout, cancellationToken))
         {
             throw new BrowserLoadingTimeoutException();
         }

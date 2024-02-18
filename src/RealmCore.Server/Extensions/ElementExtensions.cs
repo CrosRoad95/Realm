@@ -10,6 +10,13 @@ public static class ElementExtensions
         return Math.Abs(t) < tolerance;
     }
 
+    public static void LookAt(this Element element, Vector3 position)
+    {
+        element.Rotation = element.Rotation with { Z = -element.Position.FindRotation(position) };
+    }
+    
+    public static void LookAt(this Element element1, Element element2) => element1.LookAt(element2.Position);
+
     public static float DistanceTo(this Element a, Element b)
     {
         var length = (a.Position - b.Position).Length();
@@ -34,5 +41,10 @@ public static class ElementExtensions
             element.Dimension = location.Dimension.Value;
         if(location.Interior != null)
             element.Interior = location.Interior.Value;
+    }
+
+    public static Vector3 GetPointFromDistanceRotation(this Element element, double distance, float? angle = null)
+    {
+        return element.Position.GetPointFromDistanceRotation(distance, angle ?? -element.Rotation.Z);
     }
 }

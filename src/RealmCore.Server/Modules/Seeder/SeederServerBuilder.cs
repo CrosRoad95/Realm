@@ -209,7 +209,6 @@ internal sealed class SeederServerBuilder
                     }
                 }
             }
-            await _userManager.UpdateAsync(user);
 
             _createdUsers.Add(pair.Key, user);
         }

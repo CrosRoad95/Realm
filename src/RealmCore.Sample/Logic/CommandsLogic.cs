@@ -349,6 +349,13 @@ internal sealed class CommandsLogic
             worldObject.Interaction = new LiftableInteraction();
         });
 
+        _commandService.AddCommandHandler("spawnboxfront", (player, args) =>
+        {
+            var front = player.GetPointFromDistanceRotation(2);
+            var worldObject = _elementFactory.CreateObject(new Location(front), ObjectModel.Gunbox);
+            worldObject.LookAt(player);
+        });
+
         _commandService.AddCommandHandler("spawnmybox", (player, args) =>
         {
             var worldObject = _elementFactory.CreateObject(new Location(player.Position + new Vector3(4, 0, -0.65f), Vector3.Zero), ObjectModel.Gunbox);

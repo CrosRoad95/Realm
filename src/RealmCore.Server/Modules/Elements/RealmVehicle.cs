@@ -8,15 +8,15 @@ public class RealmVehicle : Vehicle, IPersistentElement
     public IServiceProvider ServiceProvider => _serviceProvider;
     public int PersistentId => Persistence.Id;
 
-    public IVehicleAccessFeature Access { get; private set; }
-    public IVehiclePersistenceFeature Persistence { get; private set; }
-    public IVehicleMileageCounterFeature MileageCounter { get; private set; }
-    public new IVehicleUpgradesFeature Upgrades { get; private set; }
-    public IVehiclePartDamageFeature PartDamage { get; private set; }
-    public IVehicleEnginesFeature Engines { get; private set; }
-    public IVehicleEventsFeature Events { get; private set; }
-    public IVehicleFuelFeature Fuel { get; private set; }
-    public IVehicleInventoryFeature Inventory { get; private set; }
+    public IVehicleAccessFeature Access { get; init; }
+    public IVehiclePersistenceFeature Persistence { get; init; }
+    public IVehicleMileageCounterFeature MileageCounter { get; init; }
+    public new IVehicleUpgradesFeature Upgrades { get; init; }
+    public IVehiclePartDamageFeature PartDamage { get; init; }
+    public IVehicleEnginesFeature Engines { get; init; }
+    public IVehicleEventsFeature Events { get; init; }
+    public IVehicleFuelFeature Fuel { get; init; }
+    public IVehicleInventoryFeature Inventory { get; init; }
     public VehicleAccessController AccessController { get; set; } = VehicleDefaultAccessController.Instance;
 
     public RealmVehicle(IServiceProvider serviceProvider, ushort model, Vector3 position) : base(model, position)
