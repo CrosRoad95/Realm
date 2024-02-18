@@ -363,6 +363,23 @@ internal sealed class CommandsLogic
             worldObject.TrySetOwner(player);
         });
 
+        _commandService.AddCommandHandler("setsetting", (player, args) =>
+        {
+            player.Settings.Set(1, args.ReadArgument());
+            _chatBox.OutputTo(player, "set");
+        });
+
+        _commandService.AddCommandHandler("removesetting", (player, args) =>
+        {
+            player.Settings.Remove(1);
+            _chatBox.OutputTo(player, "remove");
+        });
+
+        _commandService.AddCommandHandler("getsetting", (player, args) =>
+        {
+            _chatBox.OutputTo(player, $"Setting1: {player.Settings.Get(1)}");
+        });
+
         // TODO:
         //_commandService.AddCommandHandler("spawnboxforme", (player, args) =>
         //{
@@ -798,26 +815,6 @@ internal sealed class CommandsLogic
         //    veh.Colors.Color3 = Color.FromArgb(rnd.Next(256), rnd.Next(256), rnd.Next(256));
         //    veh.Colors.Color4 = Color.FromArgb(rnd.Next(256), rnd.Next(256), rnd.Next(256));
         //});
-
-        //_commandService.AddCommandHandler("setsetting", (player, args) =>
-        //{
-        //    player.GetRequiredComponent<UserComponent>().SetSetting(1, args.ReadArgument());
-        //});
-
-        //_commandService.AddCommandHandler("removesetting", (player, args) =>
-        //{
-        //    player.GetRequiredComponent<UserComponent>().RemoveSetting(1);
-        //});
-
-        //_commandService.AddCommandHandler("getsetting", (player, args) =>
-        //{
-        //    var playerElementComponent = player.GetRequiredComponent<PlayerElementComponent>();
-
-        //    var settingValue = player.GetRequiredComponent<UserComponent>().GetSetting(1);
-
-        //    _chatBox.OutputTo(player, $"Setting1: {settingValue}");
-        //});
-
 
         //_commandService.AddAsyncCommandHandler("whitelistmyserial", async (player, args) =>
         //{

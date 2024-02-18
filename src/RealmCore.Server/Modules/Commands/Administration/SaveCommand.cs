@@ -22,7 +22,7 @@ internal class SaveCommand : IInGameCommand
             using var _ = _logger.BeginElement(element);
             try
             {
-                if (await _saveService.Save(element, cancellationToken))
+                if (await _saveService.Save(element, false, cancellationToken))
                 {
                     savedElements++;
                 }

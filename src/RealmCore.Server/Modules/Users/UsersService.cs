@@ -146,7 +146,7 @@ internal sealed class UsersService : IUsersService
             await AuthorizePolicies(player);
             await userLoginHistoryRepository.Add(user.Id, _dateTimeProvider.Now, player.Client.IPAddress?.ToString() ?? "", serial, cancellationToken);
             UpdateLastData(player);
-            await saveService.Save(player, cancellationToken);
+            await saveService.Save(player, true, cancellationToken);
 
             SignedIn?.Invoke(player);
             return true;
@@ -170,7 +170,7 @@ internal sealed class UsersService : IUsersService
         if (!_activeUsers.TrySetInactive(player.PersistentId))
             throw new InvalidOperationException();
 
-        await _saveService.Save(player, cancellationToken);
+        await _saveService.Save(player, false, cancellationToken);
         player.User.SignOut();
         player.RemoveFromVehicle();
         player.Position = new Vector3(6000, 6000, 99999);

@@ -50,6 +50,11 @@ internal sealed class PlayerJoinedLogic
 
         _nametagsService.SetNametagRenderingEnabled(player, true);
         _scoreboardService.SetEnabledTo(player, true);
+
+        if(player.Settings.TryGet(69, out var name))
+        {
+            _chatBox.OutputTo(player, $"Witaj {name}");
+        }
     }
 
     private async void HandleSignedIn(RealmPlayer player)

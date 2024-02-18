@@ -154,7 +154,7 @@ public class CommandArguments
         throw new CommandArgumentException(_index, "Liczba jest poza zakresem", value);
     }
 
-    public RealmPlayer ReadPlayer(PlayerSearchOption searchOption = PlayerSearchOption.All)
+    public virtual RealmPlayer ReadPlayer(PlayerSearchOption searchOption = PlayerSearchOption.All)
     {
         var name = ReadArgument();
         var users = _playersService.SearchPlayersByName(name, searchOption).ToList();
@@ -165,7 +165,7 @@ public class CommandArguments
         throw new CommandArgumentException(_index, "Gracz o takiej nazwie nie został znaleziony", name);
     }
 
-    public bool TryReadPlayerPlayer(out RealmPlayer? player)
+    public virtual bool TryReadPlayerPlayer(out RealmPlayer? player)
     {
         if (TryReadArgument(out string? name) && name != null)
         {
@@ -183,7 +183,7 @@ public class CommandArguments
         return false;
     }
 
-    public IEnumerable<RealmPlayer> ReadPlayers()
+    public virtual IEnumerable<RealmPlayer> ReadPlayers()
     {
         var name = ReadArgument();
         var users = _playersService.SearchPlayersByName(name).ToList();

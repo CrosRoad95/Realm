@@ -7,7 +7,7 @@ public interface ISaveService
 {
     event Action<Element>? ElementSaved;
 
-    Task<bool> Save(Element element, CancellationToken cancellationToken = default);
+    Task<bool> Save(Element element, bool firstTime = false, CancellationToken cancellationToken = default);
     internal Task<int> SaveNewPlayerInventory(Inventory inventory, int userId, CancellationToken cancellationToken = default);
     internal Task<int> SaveNewVehicleInventory(Inventory inventory, int vehicleId, CancellationToken cancellationToken = default);
 }
@@ -25,7 +25,7 @@ internal sealed class SaveService : ISaveService
         _userDataSavers = userDataSavers;
     }
 
-    private async Task<bool> SaveVehicle(RealmVehicle vehicle, CancellationToken cancellationToken = default)
+    private async Task<bool> SaveVehicle(RealmVehicle vehicle, bool firstTime = false, CancellationToken cancellationToken = default)
     {
         if (!vehicle.Persistence.IsLoaded)
             return false;
@@ -127,7 +127,7 @@ internal sealed class SaveService : ISaveService
         return inventory.Id;
     }
 
-    private async Task<bool> SavePlayer(RealmPlayer player, CancellationToken cancellationToken = default)
+    private async Task<bool> SavePlayer(RealmPlayer player, bool firstTime = false, CancellationToken cancellationToken = default)
     {
         if (!player.User.IsSignedIn)
             return false;
@@ -142,19 +142,19 @@ internal sealed class SaveService : ISaveService
         db.Users.Update(user);
 
         foreach (var item in _userDataSavers)
-            await item.SaveAsync(player);
+            await item.SaveAsync(player, firstTime, cancellationToken);
 
         var savedEntities = await db.SaveChangesAsync(cancellationToken);
 
         return true;
     }
 
-    public async Task<bool> Save(Element element, CancellationToken cancellationToken = default)
+    public async Task<bool> Save(Element element, bool firstTime = false, CancellationToken cancellationToken = default)
     {
         bool saved = element switch
         {
-            RealmPlayer player => await SavePlayer(player, cancellationToken),
-            RealmVehicle vehicle => await SaveVehicle(vehicle, cancellationToken),
+            RealmPlayer player => await SavePlayer(player, firstTime, cancellationToken),
+            RealmVehicle vehicle => await SaveVehicle(vehicle, firstTime, cancellationToken),
             _ => false
         };
 

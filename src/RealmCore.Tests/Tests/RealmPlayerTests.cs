@@ -2,7 +2,7 @@
 
 public class RealmPlayerTests : RealmIntegrationTestingBase
 {
-    protected override string DatabaseName => "PlayerNotificationsTests";
+    protected override string DatabaseName => "RealmPlayerTests";
 
     [Fact]
     public async Task SavingAndLoadingPlayerShouldWork()
@@ -22,6 +22,8 @@ public class RealmPlayerTests : RealmIntegrationTestingBase
             player.Settings.Set(1, "test");
             player.Bans.Add(1, reason: "test");
             player.Upgrades.TryAdd(1);
+            player.Statistics.Increase(1, 1);
+            player.Statistics.Increase(2, 2);
 
             await player.GetRequiredService<IUsersService>().SignOut(player);
             player.TriggerDisconnected(QuitReason.Quit);
@@ -31,12 +33,8 @@ public class RealmPlayerTests : RealmIntegrationTestingBase
 
         server.DateTimeProvider.AddOffset(TimeSpan.FromDays(1));
 
+        void assert(RealmTestingServer server, RealmPlayer player)
         {
-            var player = await CreatePlayerAsync(false);
-            player.Name = "foo";
-            await server.SignInPlayer(player);
-            player.TrySpawnAtLastPosition().Should().BeTrue();
-
             player.Position.Should().Be(new Vector3(1, 2, 3));
             player.PlayTime.TotalPlayTime.Should().Be(TimeSpan.FromSeconds(1337));
             player.Money.Amount.Should().Be(12.345m);
@@ -45,6 +43,20 @@ public class RealmPlayerTests : RealmIntegrationTestingBase
             player.Settings.Get(1).Should().Be("test");
             player.Bans.IsBanned(1).Should().BeTrue();
             player.Upgrades.Has(1).Should().BeTrue();
+            player.Statistics.Should().BeEquivalentTo([new UserStatDto(1, 1), new UserStatDto(2, 2)]);
+        }
+
+        for(int i = 0; i < 2; i++)
+        {
+            var player = await CreatePlayerAsync(false);
+            player.Name = "foo";
+            await server.SignInPlayer(player);
+            player.TrySpawnAtLastPosition().Should().BeTrue();
+
+            assert(server, player);
+
+            await player.GetRequiredService<IUsersService>().SignOut(player);
+            player.TriggerDisconnected(QuitReason.Quit);
         }
     }
 

@@ -45,6 +45,7 @@ public class RealmPlayer : Player, IDisposable, IPersistentElement
     public int AttachedBoneElementsCount => _attachedBoneElements.Count;
     public bool IsSpawned { get; private set; }
 
+    public new RealmVehicle? Vehicle => (RealmVehicle?)base.Vehicle;
     public Element? FocusedElement
     {
         get => _focusedElement;
@@ -453,9 +454,8 @@ public class RealmPlayer : Player, IDisposable, IPersistentElement
         if (IsCooldownActive(key, keyState))
             return;
 
-        // Lock bind indefinitly in case of bind takes a long time to execute, reset cooldown to unlock
+        // Lock bind indefinitely in case of bind takes a long time to execute, reset cooldown to unlock
         SetCooldown(key, keyState, DateTime.MaxValue);
-
 
         if (_binds.TryGetValue(key, out var bindCallback))
         {

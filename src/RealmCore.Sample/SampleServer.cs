@@ -10,6 +10,7 @@ using RealmCore.Sample.Data.Validators;
 using RealmCore.Server.Modules.Chat;
 using RealmCore.Server.Modules.Integrations.External;
 using RealmCore.Sample.Data;
+using RealmCore.Sample.Server;
 
 [assembly: ExcludeFromCodeCoverage]
 
@@ -81,6 +82,8 @@ public class SampleServer : RealmServer
             services.AddInGameCommand<Display3dRing>();
             services.AddInGameCommand<CurrencyCommand>();
             #endregion
+
+            services.AddSingleton<IUserDataSaver, TestSaver>();
 
             var realmLogger = new RealmLogger("RealmCore", LogEventLevel.Information);
             services.AddLogging(x => x.AddSerilog(realmLogger.GetLogger(), dispose: true));

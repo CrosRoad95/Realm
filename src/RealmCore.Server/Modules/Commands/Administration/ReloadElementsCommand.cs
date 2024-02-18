@@ -23,7 +23,7 @@ internal class ReloadElementsCommand : IInGameCommand
         {
             try
             {
-                if (await _saveService.Save(element, cancellationToken))
+                if (await _saveService.Save(element, false, cancellationToken))
                 {
                     savedElements++;
                     element.Destroy();
