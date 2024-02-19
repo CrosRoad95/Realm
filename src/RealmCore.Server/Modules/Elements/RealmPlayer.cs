@@ -35,7 +35,7 @@ public class RealmPlayer : Player, IDisposable, IPersistentElement
 
     public event Action<RealmPlayer, Element?>? FocusedElementChanged;
     public event Action<RealmPlayer, Element?>? ClickedElementChanged;
-    public event Action<RealmPlayer, Element?>? CurrentInteractElementChanged;
+    public event Action<RealmPlayer, Element?, Element?>? CurrentInteractElementChanged;
     public event Action<RealmPlayer, AttachedBoneWorldObject>? WorldObjectAttached;
     public event Action<RealmPlayer, AttachedBoneWorldObject>? WorldObjectDetached;
     public new event Action<RealmPlayer, string?>? NametagTextChanged;
@@ -96,6 +96,7 @@ public class RealmPlayer : Player, IDisposable, IPersistentElement
     {
         get => _currentInteractElement; set
         {
+            Element? previous = _currentInteractElement;
             bool changed = false;
             lock (_currentInteractElementLock)
             {
@@ -110,7 +111,7 @@ public class RealmPlayer : Player, IDisposable, IPersistentElement
                 }
             }
             if (changed)
-                CurrentInteractElementChanged?.Invoke(this, value);
+                CurrentInteractElementChanged?.Invoke(this, previous, value);
         }
     }
 

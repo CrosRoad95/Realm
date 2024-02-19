@@ -14,6 +14,7 @@ public interface IPlayerAdminFeature : IPlayerFeature
     event Action<IPlayerAdminFeature, bool>? NoClipStateChanged;
     event Action<IPlayerAdminFeature, bool>? DevelopmentModeStateChanged;
     event Action<IPlayerAdminFeature, bool>? InteractionDebugRenderingStateChanged;
+    event Action<IPlayerAdminFeature, IReadOnlyList<AdminTool>>? ToolsChanged;
 
     bool HasTool(AdminTool adminTool);
     void SetTools(IEnumerable<AdminTool> adminTools);
