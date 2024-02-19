@@ -11,7 +11,7 @@ public interface IPlayerHudFeature : IPlayerFeature
     THudLayer? AddLayer<THudLayer>(params object[] parameters) where THudLayer : IHudLayer;
     bool RemoveLayer(IHudLayer hudLayer);
     bool RemoveLayer<THudLayer>() where THudLayer : IHudLayer;
-    bool TryGetLayer<THudLayer>(out THudLayer? layer) where THudLayer : IHudLayer;
+    bool TryGetLayer<THudLayer>(out THudLayer layer) where THudLayer : IHudLayer;
 }
 
 internal sealed class PlayerHudFeature : IPlayerHudFeature, IDisposable
@@ -88,7 +88,7 @@ internal sealed class PlayerHudFeature : IPlayerHudFeature, IDisposable
         return RemoveLayer(hudLayer);
     }
     
-    public bool TryGetLayer<THudLayer>(out THudLayer? layer) where THudLayer : IHudLayer
+    public bool TryGetLayer<THudLayer>(out THudLayer layer) where THudLayer : IHudLayer
     {
         THudLayer? hudLayer;
         lock (_lock)
@@ -96,13 +96,13 @@ internal sealed class PlayerHudFeature : IPlayerHudFeature, IDisposable
             hudLayer = _hudLayers.OfType<THudLayer>().FirstOrDefault();
         }
 
-        if (hudLayer == null)
+        if (hudLayer != null)
         {
             layer = hudLayer;
-            return false;
+            return true;
         }
-        layer = default;
-        return true;
+        layer = default!;
+        return false;
     }
 
     public void Dispose()
