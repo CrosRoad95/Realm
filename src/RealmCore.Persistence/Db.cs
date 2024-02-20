@@ -707,6 +707,15 @@ public abstract class Db<T> : IdentityDbContext<UserData, RoleData, int,
 
             entityBuilder.Property(x => x.Reason)
                 .HasMaxLength(256);
+
+            entityBuilder.Property(x => x.Responsible)
+                .HasMaxLength(256);
+
+            entityBuilder
+                .HasOne(x => x.ResponsibleUser)
+                .WithMany(x => x.ResponsibleBans)
+                .HasForeignKey(x => x.ResponsibleUserId)
+                .HasPrincipalKey(x => x.Id);
         });
 
         modelBuilder.Entity<UserInventoryData>(entityBuilder =>

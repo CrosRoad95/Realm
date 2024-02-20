@@ -43,4 +43,5 @@ public class UserData : IdentityUser<int>
     public ICollection<UserLoginHistoryData> LoginHistory { get; set; } = new List<UserLoginHistoryData>();
     public ICollection<UserMoneyHistoryData> MoneyHistory { get; set; } = new List<UserMoneyHistoryData>();
     public ICollection<BanData> Bans { get; set; } = new List<BanData>();
+    public ICollection<BanData> ResponsibleBans { get; set; } = new List<BanData>();
 }
