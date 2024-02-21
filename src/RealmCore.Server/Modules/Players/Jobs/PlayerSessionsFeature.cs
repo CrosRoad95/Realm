@@ -69,6 +69,30 @@ internal sealed class PlayerSessionsFeature : IPlayerSessionsFeature, IDisposabl
         return session;
     }
 
+    public Session BeginSession(Type sessionType, params object[] parameters)
+    {
+        Session session;
+        lock (_lock)
+        {
+            if (_sessions.Any(x => x.GetType() == sessionType))
+                throw new SessionAlreadyBegunException(sessionType);
+
+            session = (Session)ActivatorUtilities.CreateInstance(Player.ServiceProvider, sessionType, parameters);
+            _sessions.Add(session);
+            try
+            {
+                session.TryStart();
+            }
+            catch (Exception)
+            {
+                _sessions.Remove(session);
+                throw;
+            }
+        }
+        Started?.Invoke(this, session);
+        return session;
+    }
+
     private bool IsDuringSessionCore<TSession>() => _sessions.OfType<TSession>().Any();
 
     public bool IsDuringSession<TSession>()
