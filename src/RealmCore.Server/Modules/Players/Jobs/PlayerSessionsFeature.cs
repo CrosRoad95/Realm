@@ -11,6 +11,7 @@ public interface IPlayerSessionsFeature : IPlayerFeature, IEnumerable<Session>
     event Action<IPlayerSessionsFeature, Session>? Ended;
 
     TSession BeginSession<TSession>(params object[] parameters) where TSession : Session;
+    Session BeginSession(Type sessionType, params object[] parameters);
     void EndSession<TSession>() where TSession : Session;
     void EndSession<TSession>(TSession session) where TSession : Session;
     TSession GetSession<TSession>();
