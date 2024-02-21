@@ -173,8 +173,22 @@ internal sealed class SeederServerBuilder
             if (userSeedData.Claims != null)
                 claims = userSeedData.Claims.Select(x => new Claim(x.Key, x.Value)).Concat(claims).ToList();
 
-            await _userManager.RemoveClaimsAsync(user, await _userManager.GetClaimsAsync(user));
-            await _userManager.AddClaimsAsync(user, claims);
+            var allClaims = await _userManager.GetClaimsAsync(user);
+            var claimsToRemove = allClaims.Where(x => claims.Any(y => y.Type == x.Type && y.Value != x.Value)).ToList();
+            var claimsToAdd = claims.Where(x => !allClaims.Any(y => y.Type == x.Type)).ToList();
+
+            if (claimsToRemove.Count > 0)
+            {
+                await _userManager.RemoveClaimsAsync(user, claimsToRemove);
+                foreach (var claimToRemove in claimsToRemove)
+                {
+                    claimsToAdd.Add(claims.Where(x => x.Type == claimToRemove.Type).First());
+                }
+            }
+
+            if(claimsToAdd.Count > 0)
+                await _userManager.AddClaimsAsync(user, claimsToAdd);
+
             if (pair.Value.Roles != null)
                 await _userManager.AddToRolesAsync(user, pair.Value.Roles);
 
