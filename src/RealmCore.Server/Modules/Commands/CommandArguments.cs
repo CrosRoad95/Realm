@@ -192,7 +192,7 @@ public class CommandArguments
         return users;
     }
 
-    public TEnum? ReadEnum<TEnum>() where TEnum : struct
+    public TEnum ReadEnum<TEnum>() where TEnum : struct
     {
         var str = ReadArgument();
         if (int.TryParse(str, out int intValue))
@@ -208,5 +208,29 @@ public class CommandArguments
             }
         }
         throw new CommandArgumentException(_index, null, str);
+    }
+
+    public bool TryReadEnum<TEnum>(out TEnum outValue) where TEnum : struct
+    {
+        var str = ReadArgument();
+        if (int.TryParse(str, out int intValue))
+        {
+            if (Enum.IsDefined(typeof(TEnum), intValue))
+            {
+                outValue = (TEnum)Enum.ToObject(typeof(TEnum), intValue);
+                return true;
+            }
+        }
+        else
+        {
+            if (Enum.TryParse<TEnum>(str, out var value))
+            {
+                outValue = value;
+                return true;
+            }
+        }
+
+        outValue = default;
+        return false;
     }
 }
