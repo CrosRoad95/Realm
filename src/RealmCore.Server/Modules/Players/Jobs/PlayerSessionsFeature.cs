@@ -16,6 +16,7 @@ public interface IPlayerSessionsFeature : IPlayerFeature, IEnumerable<Session>
     TSession GetSession<TSession>();
     bool IsDuringSession<TSession>();
     bool IsDuringSession<TSession>(TSession session) where TSession : Session;
+    bool IsDuringSession(Type type);
     bool TryEndSession<TSession>() where TSession : Session;
     bool TryEndSession<TSession>(TSession session) where TSession : Session;
     bool TryGetSession<TSession>(out TSession session);
@@ -80,6 +81,12 @@ internal sealed class PlayerSessionsFeature : IPlayerSessionsFeature, IDisposabl
     {
         lock (_lock)
             return _sessions.Contains(session);
+    }
+    
+    public bool IsDuringSession(Type type)
+    {
+        lock (_lock)
+            return _sessions.Any(x => x.GetType() == type);
     }
 
     public bool TryGetSession<TSession>([NotNullWhen(true)] out TSession outSession)
