@@ -210,6 +210,24 @@ public class CommandArguments
         throw new CommandArgumentException(_index, null, str);
     }
 
+    public TEnum ReadEnumOrDefault<TEnum>(TEnum defaultValue = default) where TEnum : struct
+    {
+        var str = ReadArgument();
+        if (int.TryParse(str, out int intValue))
+        {
+            if (Enum.IsDefined(typeof(TEnum), intValue))
+                return (TEnum)Enum.ToObject(typeof(TEnum), intValue);
+        }
+        else
+        {
+            if (Enum.TryParse<TEnum>(str, out var value))
+            {
+                return value;
+            }
+        }
+        return defaultValue;
+    }
+
     public bool TryReadEnum<TEnum>(out TEnum outValue) where TEnum : struct
     {
         var str = ReadArgument();
