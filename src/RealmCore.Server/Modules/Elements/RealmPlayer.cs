@@ -1,12 +1,12 @@
 ﻿using RealmCore.Server.Modules.Players.Money;
 using RealmCore.Server.Modules.Players.Settings;
-using SlipeServer.Server.Elements;
 
 namespace RealmCore.Server.Modules.Elements;
 
 public class RealmPlayer : Player, IDisposable, IPersistentElement
 {
     private readonly object _lock = new();
+    private readonly AtomicBool _inToggleControlScopeFlag;
     private readonly IServiceProvider _serviceProvider;
     private readonly IServiceScope _serviceScope;
 
@@ -567,16 +567,14 @@ public class RealmPlayer : Player, IDisposable, IPersistentElement
         }
     }
 
-    private int _inToggleControlScopeFlag = 0;
-
     internal bool TryEnterToggleControlScope()
     {
-        return Interlocked.Exchange(ref _inToggleControlScopeFlag, 1) == 0;
+        return _inToggleControlScopeFlag.TrySetTrue();
     }
 
     internal void ExitToggleControlScope()
     {
-        Interlocked.Exchange(ref _inToggleControlScopeFlag, 0);
+        _inToggleControlScopeFlag.TrySetFalse();
     }
 
     public async Task DoAnimationAsync(Animation animation, TimeSpan? timeSpan = null, bool blockMovement = true)
