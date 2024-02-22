@@ -168,6 +168,9 @@ public class FuelContainer
         _lastPosition = Vehicle.Position;
         var consumedFuel = _fuelConsumptionPerOneKm / 1000.0f * traveledDistance.Length();
 
+        if(Vehicle.Driver is RealmPlayer player && player.Admin.NoClip)
+            return;
+
         _amount -= consumedFuel;
         if (_amount <= 0)
         {
