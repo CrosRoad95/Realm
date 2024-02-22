@@ -204,6 +204,7 @@
 		<Using Include="RealmCore.Server.Modules.Elements.Focusable" />
 		<Using Include="RealmCore.Server.Modules.Core" />
 		<Using Include="SlipeServer.Net.Wrappers" />
+		<Using Include="System.Text" />
 		
 	</ItemGroup>
 
