@@ -16,7 +16,7 @@ public static class ServerBuilderExtensions
         else
         {
             serverBuilder.AddResourceServer<RealmResourceServer>();
-            var exceptBehaviours = ServerBuilderDefaultBehaviours.DefaultChatBehaviour;
+            var exceptBehaviours = ServerBuilderDefaultBehaviours.DefaultChatBehaviour | ServerBuilderDefaultBehaviours.NicknameChangeBehaviour;
 #if DEBUG
             serverBuilder.AddDefaults(exceptBehaviours: ServerBuilderDefaultBehaviours.MasterServerAnnouncementBehaviour | exceptBehaviours);
 #else
