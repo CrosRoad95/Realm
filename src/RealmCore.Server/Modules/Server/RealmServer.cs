@@ -17,7 +17,7 @@ public class RealmServer<TRealmPlayer> : MtaServer<TRealmPlayer> where TRealmPla
         return player.Client;
     }
 
-    public RealmServer(IRealmConfigurationProvider realmConfigurationProvider, Action<ServerBuilder>? configureServerBuilder = null) : base(serverBuilder =>
+    public RealmServer(IRealmConfigurationProvider realmConfigurationProvider, Action<ServerBuilder>? configureServerBuilder = null, Action<ServerBuilder>? postConfigureServerBuilder = null) : base(serverBuilder =>
     {
         serverBuilder.ConfigureServer(realmConfigurationProvider);
         configureServerBuilder?.Invoke(serverBuilder);
@@ -26,6 +26,8 @@ public class RealmServer<TRealmPlayer> : MtaServer<TRealmPlayer> where TRealmPla
         {
             services.ConfigureRealmServices();
         });
+
+        postConfigureServerBuilder?.Invoke(serverBuilder);
     })
     {
     }
