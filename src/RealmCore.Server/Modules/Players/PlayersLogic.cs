@@ -10,11 +10,10 @@ internal sealed class PlayersLogic
     private readonly IPlayersEventManager _playerEventManager;
     private readonly IOptions<GuiBrowserOptions> _guiBrowserOptions;
     private readonly ClientConsole _clientConsole;
-    private readonly IElementCollection _elementCollection;
     private readonly IPlayersService _playersService;
     private readonly ConcurrentDictionary<RealmPlayer, Latch> _playerResources = new();
 
-    public PlayersLogic(MtaServer mtaServer, IClientInterfaceService clientInterfaceService, ILogger<PlayersLogic> logger, IResourceProvider resourceProvider, IUsersInUse activeUsers, IPlayersEventManager playerEventManager, IOptions<GuiBrowserOptions> guiBrowserOptions, ClientConsole clientConsole, IElementCollection elementCollection, IPlayersService playersService)
+    public PlayersLogic(MtaServer mtaServer, IClientInterfaceService clientInterfaceService, ILogger<PlayersLogic> logger, IResourceProvider resourceProvider, IUsersInUse activeUsers, IPlayersEventManager playerEventManager, IOptions<GuiBrowserOptions> guiBrowserOptions, ClientConsole clientConsole, IPlayersService playersService)
     {
         _mtaServer = mtaServer;
         _clientInterfaceService = clientInterfaceService;
@@ -24,7 +23,6 @@ internal sealed class PlayersLogic
         _playerEventManager = playerEventManager;
         _guiBrowserOptions = guiBrowserOptions;
         _clientConsole = clientConsole;
-        _elementCollection = elementCollection;
         _playersService = playersService;
         _mtaServer.PlayerJoined += HandlePlayerJoined;
     }

@@ -190,7 +190,6 @@ public class RealmPlayer : Player, IDisposable, IPersistentElement
         ElementFactory = GetRequiredService<IScopedElementFactory>();
         #endregion
 
-        BindExecuted += HandleBindExecuted;
         IsNametagShowing = false;
         UpdateFight();
         Wasted += HandleWasted;
@@ -370,18 +369,6 @@ public class RealmPlayer : Player, IDisposable, IPersistentElement
                 _bindsDownCooldown.Remove(key);
             else
                 _bindsUpCooldown.Remove(key);
-        }
-    }
-
-    private async void HandleBindExecuted(Player _, PlayerBindExecutedEventArgs e)
-    {
-        try
-        {
-            await InternalHandleBindExecuted(e.Key, e.KeyState);
-        }
-        catch (Exception)
-        {
-            // TODO: handle exception
         }
     }
 

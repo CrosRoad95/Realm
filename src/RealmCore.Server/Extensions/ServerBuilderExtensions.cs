@@ -92,6 +92,7 @@ public static class ServerBuilderExtensions
         serverBuilder.AddLogic<VehicleEnginesCollectionLogic>();
         serverBuilder.AddLogic<VehicleAccessControllerLogic>();
         serverBuilder.AddLogic<MapsLogic>();
+        serverBuilder.AddLogic<PlayersBindsLogic>();
         #endregion
 
         #region Behaviours
