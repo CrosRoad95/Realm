@@ -12,7 +12,7 @@ public abstract class HudLayer<TState> : IHudLayer where TState : class, new()
 {
     private readonly string _id = Guid.NewGuid().ToString();
     private Hud<TState> _hud = default!;
-    private readonly TState _defaultState;
+    private TState _defaultState;
     private readonly Vector2? _offset;
     private bool _visible;
 
@@ -48,9 +48,6 @@ public abstract class HudLayer<TState> : IHudLayer where TState : class, new()
     public HudLayer(TState defaultState, Vector2? offset = null)
     {
         _defaultState = defaultState;
-        var initialState = GetInitialState();
-        if (initialState != null)
-            _defaultState = initialState;
         _offset = offset;
     }
 
@@ -79,6 +76,10 @@ public abstract class HudLayer<TState> : IHudLayer where TState : class, new()
 
     public void BuildHud(IOverlayService overlayService, RealmPlayer player)
     {
+        var initialState = GetInitialState();
+        if (initialState != null)
+            _defaultState = initialState;
+
         List<DynamicHudElement> dynamicHudElement = [];
 
         overlayService.CreateHud(player, _id, e =>

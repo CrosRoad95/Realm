@@ -14,10 +14,21 @@ public class SampleHudState
 public class SampleStatefulHudLayer : HudLayer<SampleHudState>
 {
     private readonly AssetsCollection _assetsCollection;
+    private readonly RealmPlayer _player;
 
-    public SampleStatefulHudLayer(SampleHudState defaultState, AssetsCollection assetsCollection) : base(defaultState)
+    public SampleStatefulHudLayer(PlayerContext playerContext, AssetsCollection assetsCollection) : base()
     {
+        _player = playerContext.Player;
         _assetsCollection = assetsCollection;
+    }
+
+    protected override SampleHudState? GetInitialState()
+    {
+        return new SampleHudState
+        {
+            Text1 = $"INITIAL STATE1 {_player.Name}",
+            Text2 = $"INITIAL STATE2 {_player.Name}",
+        };
     }
 
     protected override void Build(IHudBuilder<SampleHudState> x)
