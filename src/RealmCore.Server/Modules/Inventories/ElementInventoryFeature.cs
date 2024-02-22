@@ -43,7 +43,7 @@ internal sealed class VehicleInventoryFeature : ElementInventoryFeature, IVehicl
 {
     public RealmVehicle Vehicle { get; }
     protected override Element Element => Vehicle;
-    public VehicleInventoryFeature(VehicleContext vehicleContext, IPlayerUserFeature playerUserFeature) : base()
+    public VehicleInventoryFeature(VehicleContext vehicleContext) : base()
     {
         Vehicle = vehicleContext.Vehicle;
     }

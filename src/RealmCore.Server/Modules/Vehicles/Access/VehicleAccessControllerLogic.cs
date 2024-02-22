@@ -3,12 +3,10 @@
 internal sealed class VehicleAccessControllerLogic
 {
     private readonly IVehiclesAccessService _vehicleAccessService;
-    private readonly ILogger<VehicleAccessControllerLogic> _logger;
 
-    public VehicleAccessControllerLogic(IElementFactory elementFactory, IVehiclesAccessService vehicleAccessService, ILogger<VehicleAccessControllerLogic> logger)
+    public VehicleAccessControllerLogic(IElementFactory elementFactory, IVehiclesAccessService vehicleAccessService)
     {
         _vehicleAccessService = vehicleAccessService;
-        _logger = logger;
         elementFactory.ElementCreated += HandleElementCreated;
     }
 
@@ -18,6 +16,7 @@ internal sealed class VehicleAccessControllerLogic
             return;
 
         vehicle.CanEnter = HandleCanEnter;
+        vehicle.CanExit = HandleCanExit;
     }
 
     private bool HandleCanEnter(Ped ped, Vehicle veh, byte seat)
@@ -25,6 +24,20 @@ internal sealed class VehicleAccessControllerLogic
         var vehicle = (RealmVehicle)veh;
         if (!_vehicleAccessService.InternalCanEnter(ped, vehicle, seat, vehicle.AccessController))
             return false;
+
+        return true;
+    }
+
+    private bool HandleCanExit(Ped ped, Vehicle veh, byte seat)
+    {
+        var vehicle = (RealmVehicle)veh;
+        if (!_vehicleAccessService.InternalCanExit(ped, vehicle, seat, vehicle.AccessController))
+            return false;
+
+        if (ped is RealmPlayer realmPlayer)
+        {
+            realmPlayer.Admin.NoClip = false;
+        }
 
         return true;
     }

@@ -104,6 +104,9 @@ internal sealed class PlayerAdminFeature : IPlayerAdminFeature, IDisposable
         }
         set
         {
+            if (Player.VehicleAction != VehicleAction.None)
+                throw new NoClipException();
+
             if (_noClip != value)
             {
                 _noClip = value;
