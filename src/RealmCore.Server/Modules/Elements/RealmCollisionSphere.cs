@@ -2,6 +2,7 @@
 
 public class RealmCollisionSphere : CollisionSphere, ICollisionDetection
 {
+    public IElementCustomDataFeature CustomData { get; init; } = new ElementCustomDataFeature();
     public CollisionDetection<RealmCollisionSphere> CollisionDetection { get; private set; }
     public CollisionDetection InternalCollisionDetection => CollisionDetection;
 

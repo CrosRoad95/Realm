@@ -5,6 +5,7 @@ public class RealmPickup : Pickup, ICollisionDetection, IElementName
     public event Action<Element>? ElementEntered;
     public event Action<Element>? ElementLeft;
 
+    public IElementCustomDataFeature CustomData { get; init; } = new ElementCustomDataFeature();
     public string? ElementName { get; set; }
     public CollisionDetection<RealmPickup> CollisionDetection { get; private set; }
     public CollisionDetection InternalCollisionDetection => CollisionDetection;

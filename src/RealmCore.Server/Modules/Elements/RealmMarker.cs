@@ -5,6 +5,7 @@ public class RealmMarker : Marker, ICollisionDetection, IElementName
     public event Action<Element>? ElementEntered;
     public event Action<Element>? ElementLeft;
 
+    public IElementCustomDataFeature CustomData { get; init; } = new ElementCustomDataFeature();
     public CollisionSphere CollisionShape { get; private set; }
     public CollisionDetection<RealmMarker> CollisionDetection { get; private set; }
     public CollisionDetection InternalCollisionDetection => CollisionDetection;

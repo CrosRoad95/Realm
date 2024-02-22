@@ -2,6 +2,7 @@
 
 public class RealmCollisionRectangle : CollisionRectangle, ICollisionDetection
 {
+    public IElementCustomDataFeature CustomData { get; init; } = new ElementCustomDataFeature();
     public CollisionDetection<RealmCollisionRectangle> CollisionDetection { get; private set; }
     public CollisionDetection InternalCollisionDetection => CollisionDetection;
 

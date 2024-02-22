@@ -128,6 +128,7 @@ public class RealmPlayer : Player, IDisposable, IPersistentElement
     public CultureInfo Culture { get => _culture; set => _culture = value; }
     public int PersistentId => User.Id;
 
+    public IElementCustomDataFeature CustomData { get; init; } = new ElementCustomDataFeature();
     public new IPlayerMoneyFeature Money { get; init; }
     public IPlayerBrowserFeature Browser { get; init; }
     public IPlayerAFKFeature AFK { get; init; }

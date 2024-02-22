@@ -93,7 +93,7 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<IPlayersEventManager, PlayerEventManager>();
         #endregion
 
-        #region Player services
+        #region Player features
         services.AddPlayerScopedService<IPlayerBrowserFeature, PlayerBrowserFeature>();
         services.AddPlayerScopedService<IPlayerAFKFeature, PlayerAFKFeature>();
         services.AddPlayerScopedService<IPlayerMoneyFeature, PlayerMoneyFeature>();
@@ -121,7 +121,7 @@ public static class ServiceCollectionExtensions
         services.AddPlayerScopedService<IPlayerNotificationsFeature, PlayerNotificationsFeature>();
         #endregion
 
-        #region Vehicle services
+        #region Vehicle features
         services.AddScoped<IVehicleAccessFeature, VehicleAccessFeature>();
         services.AddScoped<IVehiclePersistenceFeature, VehiclePersistanceFeature>();
         services.AddScoped<IVehicleMileageCounterFeature, VehicleMileageCounterFeature>();
@@ -132,6 +132,10 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IVehicleEventsFeature, VehicleEventsFeature>();
         services.AddScoped<IVehicleFuelFeature, VehicleFuelFeature>();
         services.AddScoped<IVehicleInventoryFeature, VehicleInventoryFeature>();
+        #endregion
+
+        #region Elements features
+        services.AddScoped<IElementCustomDataFeature, ElementCustomDataFeature>();
         #endregion
 
         #region Policies

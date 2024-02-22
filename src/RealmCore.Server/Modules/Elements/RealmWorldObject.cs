@@ -10,6 +10,9 @@ public class RealmWorldObject : WorldObject, IInteraction
 
     public event Action<RealmWorldObject, RealmPlayer?>? OwnerChanged;
     public event Action<Element, Interaction?, Interaction?>? InteractionChanged;
+
+    public IElementCustomDataFeature CustomData { get; init; } = new ElementCustomDataFeature();
+
     public Interaction? Interaction
     {
         get => _interaction; set

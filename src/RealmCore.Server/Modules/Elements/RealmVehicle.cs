@@ -8,6 +8,7 @@ public class RealmVehicle : Vehicle, IPersistentElement
     public IServiceProvider ServiceProvider => _serviceProvider;
     public int PersistentId => Persistence.Id;
 
+    public IElementCustomDataFeature CustomData { get; init; } = new ElementCustomDataFeature();
     public IVehicleAccessFeature Access { get; init; }
     public IVehiclePersistenceFeature Persistence { get; init; }
     public IVehicleMileageCounterFeature MileageCounter { get; init; }

@@ -2,6 +2,8 @@
 
 public class RealmPed : Ped
 {
+    public IElementCustomDataFeature CustomData { get; init; } = new ElementCustomDataFeature();
+
     private string? _nametagText;
     public event Action<RealmPed, string?>? NametagTextChanged;
     public string? NametagText
