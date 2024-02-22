@@ -2,12 +2,14 @@
 
 public sealed class PlayerContext
 {
-    public RealmPlayer Player { get; internal set; }
+    private RealmPlayer? _player;
+
+    public RealmPlayer Player { get => _player ?? throw new InvalidPlayerContextException(); internal set => _player = value; }
 
     public void Set(RealmPlayer realmPlayer)
     {
         if (Player != null)
-            throw new InvalidOperationException();
+            throw new InvalidOperationException("Player already set");
 
         Player = realmPlayer;
     }
