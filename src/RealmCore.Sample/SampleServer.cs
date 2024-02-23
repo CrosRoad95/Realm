@@ -47,7 +47,7 @@ public class SampleServer : RealmServer
         serverBuilder.AddLogic<WorldLogic>();
         serverBuilder.AddLogic<LevelsLogic>();
         serverBuilder.AddLogic<PlayerGameplayLogic>();
-        serverBuilder.AddLogic<CommandsLogic>();
+        serverBuilder.AddScopedLogic<CommandsLogic>();
         serverBuilder.AddLogic<MapsLogic>();
         serverBuilder.AddLogic<DefaultModulesLogic>();
         serverBuilder.AddLogic<ProceduralObjectsLogic>();

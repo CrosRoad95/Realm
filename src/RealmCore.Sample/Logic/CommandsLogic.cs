@@ -884,32 +884,11 @@ internal sealed class CommandsLogic
         //    playerElementComponent.Vehicle.Destroy();
         //});
 
-        //_commandService.AddAsyncCommandHandler("spawnback", async (player, args) =>
-        //{
-        //    var player = player.GetRequiredComponent<PlayerElementComponent>();
-        //    Entity? vehicle = null;
-        //    try
-        //    {
-        //        vehicle = await _loadService.LoadVehicleById(args.ReadInt());
-        //    }
-        //    catch(Exception ex)
-        //    {
-        //        _chatBox.OutputTo(player, "Failed to spawn vehicle");
-        //    }
-        //    if (vehicle == null)
-        //        return;
-        //    await _vehiclesService.SetVehicleSpawned(vehicle);
-        //    var playerElementComponent = player.GetRequiredComponent<PlayerElementComponent>();
-        //    if (vehicle != null)
-        //    {
-        //        var vehicle = ((Vehicle)vehicle.GetRequiredComponent<IElementComponent>());
-        //        vehicle.Position = player.Position;
-        //        playerElementComponent.WarpIntoVehicle(vehicle);
-        //        _chatBox.OutputTo(player, "Spawned");
-        //    }
-        //    else
-        //        _chatBox.OutputTo(player, "Error while spawning");
-        //});
+        _commandService.AddAsyncCommandHandler("spawnveh", async (player, args, token) =>
+        {
+            var vehicle = await _loadService.LoadVehicleById(args.ReadInt(), token);
+            vehicle.SetLocation(player.GetLocation());
+        });
 
         //_commandService.AddCommandHandler("inventoryoccupied", (player, args) =>
         //{

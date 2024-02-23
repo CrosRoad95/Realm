@@ -38,7 +38,7 @@ public static class CollisionDetectionExtensions
         {
             if (element is RealmPlayer player)
             {
-                if (player.Gui.Current == null && !player.Browser.Visible)
+                if (player.Gui.Current == null)
                     player.Gui.SetCurrentWithDI<TGui>();
             }
         };
@@ -46,9 +46,7 @@ public static class CollisionDetectionExtensions
         {
             if (element is RealmPlayer player)
             {
-                if(player.Gui.Current is TGui)
-                    player.Gui.Current = null;
-                player.Browser.Close();
+                player.Gui.Close<TGui>();
             }
         };
     }
@@ -61,7 +59,7 @@ public static class CollisionDetectionExtensions
             {
                 if (element is RealmPlayer player)
                 {
-                    if (player.Gui.Current == null && !player.Browser.Visible)
+                    if (player.Gui.Current == null)
                         player.Gui.Current = await factory(player);
                 }
             }
@@ -74,9 +72,7 @@ public static class CollisionDetectionExtensions
         {
             if (element is RealmPlayer player)
             {
-                if (player.Gui.Current is TGui)
-                    player.Gui.Current = null;
-                player.Browser.Close();
+                player.Gui.Close<TGui>();
             }
         };
     }
@@ -87,7 +83,7 @@ public static class CollisionDetectionExtensions
         {
             if (element is RealmPlayer player)
             {
-                if (player.Gui.Current == null && !player.Browser.Visible)
+                if (player.Gui.Current == null)
                     player.Gui.Current = factory(player);
             }
         };
@@ -95,9 +91,7 @@ public static class CollisionDetectionExtensions
         {
             if (element is RealmPlayer player)
             {
-                if (player.Gui.Current is TGui)
-                    player.Gui.Current = null;
-                player.Browser.Close();
+                player.Gui.Close<TGui>();
             }
         };
     }
@@ -108,7 +102,7 @@ public static class CollisionDetectionExtensions
         {
             if (element is RealmPlayer player)
             {
-                if (player.Gui.Current == null && !player.Browser.Visible)
+                if (player.Gui.Current == null)
                     player.Gui.Current = factory();
             }
         };
@@ -116,9 +110,7 @@ public static class CollisionDetectionExtensions
         {
             if (element is RealmPlayer player)
             {
-                if (player.Gui.Current is TGui)
-                    player.Gui.Current = null;
-                player.Browser.Close();
+                player.Gui.Close<TGui>();
             }
         };
     }

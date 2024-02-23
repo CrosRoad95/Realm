@@ -72,6 +72,8 @@ public class ElementFactory : IElementFactory
             Interior = location.Interior ?? 0,
             Dimension = location.Dimension ?? 0,
         };
+        pickup.CollisionShape.Interior = location.Interior ?? 0;
+        pickup.CollisionShape.Dimension = location.Dimension ?? 0;
 
         elementBuilder?.Invoke(pickup);
         AssociateWithServer(pickup);
