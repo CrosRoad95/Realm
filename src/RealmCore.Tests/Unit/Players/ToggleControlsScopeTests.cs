@@ -19,15 +19,25 @@ public class ToggleControlsScopeTests : RealmUnitTestingBase
     [Theory]
     public void OnlyOneScopePerPlayerIsAllowed1(bool dispose)
     {
-        var server = CreateServer();
-        var player = CreatePlayer();
+        var player = CreateServerWithOnePlayer();
 
-        var createScope = () => new ToggleControlsScope(player);
+        ToggleControlsScope? createdScope = null;
+
+        var createScope = () =>
+        {
+            createdScope = new ToggleControlsScope(player);
+            return createdScope;
+        };
+
+        createScope.Should().NotThrow();
         if (dispose)
         {
-            createScope().Dispose();
+            createdScope?.Dispose();
         }
-        createScope.Should().NotThrow();
-        createScope.Should().Throw<InvalidOperationException>();
+
+        if(dispose)
+            createScope.Should().NotThrow();
+        else
+            createScope.Should().Throw<InvalidOperationException>();
     }
 }

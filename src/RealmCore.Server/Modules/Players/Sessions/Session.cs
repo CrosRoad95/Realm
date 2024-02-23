@@ -2,7 +2,7 @@
 
 public abstract class Session : IDisposable
 {
-    public AtomicBool _disposed;
+    public AtomicBool _disposed = new();
     protected readonly object _lock = new();
     private readonly TimeMeasurement _timeMeasurement;
 

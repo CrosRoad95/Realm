@@ -5,7 +5,7 @@ public class TimeMeasurement
     private IDateTimeProvider _dateTimeProvider;
 
     private DateTime _startTime;
-    private AtomicBool _isRunning;
+    private AtomicBool _isRunning = new();
     private TimeSpan _elapsed;
 
     public bool IsRunning => _isRunning;

@@ -6,7 +6,7 @@ namespace RealmCore.Server.Modules.Elements;
 public class RealmPlayer : Player, IDisposable, IPersistentElement
 {
     private readonly object _lock = new();
-    private readonly AtomicBool _inToggleControlScopeFlag;
+    private readonly AtomicBool _inToggleControlScopeFlag = new();
     private readonly IServiceProvider _serviceProvider;
     private readonly IServiceScope _serviceScope;
 
@@ -40,6 +40,7 @@ public class RealmPlayer : Player, IDisposable, IPersistentElement
     public event Action<RealmPlayer, AttachedBoneWorldObject>? WorldObjectDetached;
     public new event Action<RealmPlayer, string?>? NametagTextChanged;
     public event Action<RealmPlayer, bool>? FightEnabled;
+    public event Action<RealmPlayer, bool>? EnteredToggleControlScope;
 
     public List<AttachedBoneWorldObject> AttachedBoneElements => _attachedBoneElements;
     public int AttachedBoneElementsCount => _attachedBoneElements.Count;
@@ -569,12 +570,22 @@ public class RealmPlayer : Player, IDisposable, IPersistentElement
 
     internal bool TryEnterToggleControlScope()
     {
-        return _inToggleControlScopeFlag.TrySetTrue();
+        if (_inToggleControlScopeFlag.TrySetTrue())
+        {
+            EnteredToggleControlScope?.Invoke(this, true);
+            return true;
+        }
+        return false;
     }
 
-    internal void ExitToggleControlScope()
+    internal bool ExitToggleControlScope()
     {
-        _inToggleControlScopeFlag.TrySetFalse();
+        if (_inToggleControlScopeFlag.TrySetFalse())
+        {
+            EnteredToggleControlScope?.Invoke(this, false);
+            return true;
+        }
+        return false;
     }
 
     public async Task DoAnimationAsync(Animation animation, TimeSpan? timeSpan = null, bool blockMovement = true)
