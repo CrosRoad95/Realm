@@ -1,6 +1,6 @@
 ﻿namespace RealmCore.Persistence.Extensions;
 
-public static class QuerableExtensions
+public static class QueryableExtensions
 {
     public static IQueryable<UserLicenseData> NotSuspended(this IQueryable<UserLicenseData> query, DateTime now)
     {

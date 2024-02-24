@@ -3,7 +3,7 @@
 public interface IPlayerMoneyHistoryService
 {
     Task Add(RealmPlayer player, decimal change, int? category = null, string? description = null, CancellationToken cancellationToken = default);
-    Task<List<UserMoneyHistoryDTO>> Get(RealmPlayer player, int limit = 10, CancellationToken cancellationToken = default);
+    Task<List<UserMoneyHistoryDto>> Get(RealmPlayer player, int limit = 10, CancellationToken cancellationToken = default);
 }
 
 internal sealed class PlayerMoneyHistoryService : IPlayerMoneyHistoryService
@@ -23,10 +23,10 @@ internal sealed class PlayerMoneyHistoryService : IPlayerMoneyHistoryService
         await _userMoneyHistoryRepository.Add(player.PersistentId, _dateTimeProvider.Now, money + change, change, category, description, cancellationToken);
     }
 
-    public async Task<List<UserMoneyHistoryDTO>> Get(RealmPlayer player, int limit = 10, CancellationToken cancellationToken = default)
+    public async Task<List<UserMoneyHistoryDto>> Get(RealmPlayer player, int limit = 10, CancellationToken cancellationToken = default)
     {
         var moneyHistory = await _userMoneyHistoryRepository.Get(player.PersistentId, limit, cancellationToken);
 
-        return moneyHistory.Select(UserMoneyHistoryDTO.Map).ToList();
+        return moneyHistory.Select(UserMoneyHistoryDto.Map).ToList();
     }
 }

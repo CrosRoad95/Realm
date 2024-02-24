@@ -2,7 +2,7 @@
 
 namespace RealmCore.Persistence.DTOs;
 
-public class NewsDTO
+public class NewsDto
 {
     public int Id { get; set; }
     public string Title { get; set; }
@@ -12,7 +12,7 @@ public class NewsDTO
     public string[] Tags { get; set; }
 
     [return: NotNullIfNotNull(nameof(newsData))]
-    public static NewsDTO? Map(NewsData? newsData)
+    public static NewsDto? Map(NewsData? newsData)
     {
         if (newsData == null)
             return null;

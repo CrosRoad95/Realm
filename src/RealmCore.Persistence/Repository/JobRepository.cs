@@ -2,8 +2,8 @@
 
 public interface IJobRepository
 {
-    Task<List<UserJobStatisticsDTO>> GetJobStatistics(short jobId, int limit = 10, CancellationToken cancellationToken = default);
-    Task<UserJobStatisticsDTO?> GetUserJobStatistics(int userId, short jobId, CancellationToken cancellationToken = default);
+    Task<List<UserJobStatisticsDto>> GetJobStatistics(short jobId, int limit = 10, CancellationToken cancellationToken = default);
+    Task<UserJobStatisticsDto?> GetUserJobStatistics(int userId, short jobId, CancellationToken cancellationToken = default);
 }
 
 internal sealed class JobRepository : IJobRepository
@@ -15,14 +15,14 @@ internal sealed class JobRepository : IJobRepository
         _db = db;
     }
 
-    public async Task<List<UserJobStatisticsDTO>> GetJobStatistics(short jobId, int limit = 10, CancellationToken cancellationToken = default)
+    public async Task<List<UserJobStatisticsDto>> GetJobStatistics(short jobId, int limit = 10, CancellationToken cancellationToken = default)
     {
         var query = _db.JobPoints
             .TagWithSource(nameof(JobRepository))
             .AsNoTrackingWithIdentityResolution()
             .Where(x => x.JobId == jobId)
             .GroupBy(x => x.UserId)
-            .Select(x => new UserJobStatisticsDTO
+            .Select(x => new UserJobStatisticsDto
             {
                 UserId = x.Key,
                 JobId = jobId,
@@ -35,14 +35,14 @@ internal sealed class JobRepository : IJobRepository
         return await query.ToListAsync(cancellationToken);
     }
 
-    public async Task<UserJobStatisticsDTO?> GetUserJobStatistics(int userId, short jobId, CancellationToken cancellationToken = default)
+    public async Task<UserJobStatisticsDto?> GetUserJobStatistics(int userId, short jobId, CancellationToken cancellationToken = default)
     {
         var query = _db.JobPoints
             .TagWithSource(nameof(JobRepository))
             .AsNoTrackingWithIdentityResolution()
             .Where(x => x.JobId == jobId)
             .GroupBy(x => true)
-            .Select(x => new UserJobStatisticsDTO
+            .Select(x => new UserJobStatisticsDto
             {
                 JobId = jobId,
                 UserId = userId,

@@ -32,12 +32,21 @@ public static class ServiceCollectionExtensions
         return services;
     }
 
-    public static ServiceCollection AddPlayerScopedService<T1, T2>(this ServiceCollection services)
+    public static ServiceCollection AddPlayerScopedFeature<T1, T2>(this ServiceCollection services)
         where T1 : class, IPlayerFeature
         where T2: class, T1
     {
         services.AddScoped<T1, T2>();
         services.AddScoped<IPlayerFeature>(x => x.GetRequiredService<T1>()); 
+        return services;
+    }
+    
+    public static ServiceCollection AddVehicleScopedFeature<T1, T2>(this ServiceCollection services)
+        where T1 : class, IVehicleFeature
+        where T2: class, T1
+    {
+        services.AddScoped<T1, T2>();
+        services.AddScoped<IVehicleFeature>(x => x.GetRequiredService<T1>()); 
         return services;
     }
 
@@ -94,44 +103,44 @@ public static class ServiceCollectionExtensions
         #endregion
 
         #region Player features
-        services.AddPlayerScopedService<IPlayerBrowserFeature, PlayerBrowserFeature>();
-        services.AddPlayerScopedService<IPlayerAFKFeature, PlayerAFKFeature>();
-        services.AddPlayerScopedService<IPlayerMoneyFeature, PlayerMoneyFeature>();
-        services.AddPlayerScopedService<IPlayerUserFeature, PlayerUserFeature>();
-        services.AddPlayerScopedService<IPlayerDailyVisitsFeature, PlayerDailyVisitsFeature>();
-        services.AddPlayerScopedService<IPlayerSettingsFeature, PlayerSettingsFeature>();
-        services.AddPlayerScopedService<IPlayerBansFeature, PlayerBansFeature>();
-        services.AddPlayerScopedService<IPlayerUpgradesFeature, PlayerUpgradesFeature>();
-        services.AddPlayerScopedService<IPlayerPlayTimeFeature, PlayerPlayTimeFeature>();
-        services.AddPlayerScopedService<IPlayerLevelFeature, PlayerLevelFeature>();
-        services.AddPlayerScopedService<IPlayerLicensesFeature, PlayerLicensesFeature>();
-        services.AddPlayerScopedService<IPlayerStatisticsFeature, PlayerStatisticsFeature>();
-        services.AddPlayerScopedService<IPlayerAchievementsFeature, PlayerAchievementsFeature>();
-        services.AddPlayerScopedService<IPlayerDiscoveriesFeature, PlayerDiscoveriesFeature>();
-        services.AddPlayerScopedService<IPlayerJobUpgradesFeature, PlayerJobUpgradesFeature>();
-        services.AddPlayerScopedService<IPlayerJobStatisticsFeature, PlayerJobStatisticsFeature>();
-        services.AddPlayerScopedService<IPlayerEventsFeature, PlayerEventsFeature>();
-        services.AddPlayerScopedService<IPlayerSessionsFeature, PlayerSessionsFeature>();
-        services.AddPlayerScopedService<IPlayerAdminFeature, PlayerAdminFeature>();
-        services.AddPlayerScopedService<IPlayerGroupsFeature, PlayerGroupsFeature>();
-        services.AddPlayerScopedService<IPlayerFractionsFeature, PlayerFractionsFeature>();
-        services.AddPlayerScopedService<IPlayerGuiFeature, PlayerGuiFeature>();
-        services.AddPlayerScopedService<IPlayerHudFeature, PlayerHudFeature>();
-        services.AddPlayerScopedService<IPlayerInventoryFeature, PlayerInventoryFeature>();
-        services.AddPlayerScopedService<IPlayerNotificationsFeature, PlayerNotificationsFeature>();
+        services.AddPlayerScopedFeature<IPlayerBrowserFeature, PlayerBrowserFeature>();
+        services.AddPlayerScopedFeature<IPlayerAFKFeature, PlayerAFKFeature>();
+        services.AddPlayerScopedFeature<IPlayerMoneyFeature, PlayerMoneyFeature>();
+        services.AddPlayerScopedFeature<IPlayerUserFeature, PlayerUserFeature>();
+        services.AddPlayerScopedFeature<IPlayerDailyVisitsFeature, PlayerDailyVisitsFeature>();
+        services.AddPlayerScopedFeature<IPlayerSettingsFeature, PlayerSettingsFeature>();
+        services.AddPlayerScopedFeature<IPlayerBansFeature, PlayerBansFeature>();
+        services.AddPlayerScopedFeature<IPlayerUpgradesFeature, PlayerUpgradesFeature>();
+        services.AddPlayerScopedFeature<IPlayerPlayTimeFeature, PlayerPlayTimeFeature>();
+        services.AddPlayerScopedFeature<IPlayerLevelFeature, PlayerLevelFeature>();
+        services.AddPlayerScopedFeature<IPlayerLicensesFeature, PlayerLicensesFeature>();
+        services.AddPlayerScopedFeature<IPlayerStatisticsFeature, PlayerStatisticsFeature>();
+        services.AddPlayerScopedFeature<IPlayerAchievementsFeature, PlayerAchievementsFeature>();
+        services.AddPlayerScopedFeature<IPlayerDiscoveriesFeature, PlayerDiscoveriesFeature>();
+        services.AddPlayerScopedFeature<IPlayerJobUpgradesFeature, PlayerJobUpgradesFeature>();
+        services.AddPlayerScopedFeature<IPlayerJobStatisticsFeature, PlayerJobStatisticsFeature>();
+        services.AddPlayerScopedFeature<IPlayerEventsFeature, PlayerEventsFeature>();
+        services.AddPlayerScopedFeature<IPlayerSessionsFeature, PlayerSessionsFeature>();
+        services.AddPlayerScopedFeature<IPlayerAdminFeature, PlayerAdminFeature>();
+        services.AddPlayerScopedFeature<IPlayerGroupsFeature, PlayerGroupsFeature>();
+        services.AddPlayerScopedFeature<IPlayerFractionsFeature, PlayerFractionsFeature>();
+        services.AddPlayerScopedFeature<IPlayerGuiFeature, PlayerGuiFeature>();
+        services.AddPlayerScopedFeature<IPlayerHudFeature, PlayerHudFeature>();
+        services.AddPlayerScopedFeature<IPlayerInventoryFeature, PlayerInventoryFeature>();
+        services.AddPlayerScopedFeature<IPlayerNotificationsFeature, PlayerNotificationsFeature>();
         #endregion
 
         #region Vehicle features
-        services.AddScoped<IVehicleAccessFeature, VehicleAccessFeature>();
-        services.AddScoped<IVehiclePersistenceFeature, VehiclePersistanceFeature>();
-        services.AddScoped<IVehicleMileageCounterFeature, VehicleMileageCounterFeature>();
-        services.AddScoped<IVehiclesAccessService, VehiclesAccessService>();
-        services.AddScoped<IVehicleUpgradesFeature, VehicleUpgradesFeature>();
-        services.AddScoped<IVehiclePartDamageFeature, VehiclePartDamageFeature>();
-        services.AddScoped<IVehicleEnginesFeature, VehicleEnginesFeature>();
-        services.AddScoped<IVehicleEventsFeature, VehicleEventsFeature>();
-        services.AddScoped<IVehicleFuelFeature, VehicleFuelFeature>();
-        services.AddScoped<IVehicleInventoryFeature, VehicleInventoryFeature>();
+        services.AddVehicleScopedFeature<IVehicleAccessFeature, VehicleAccessFeature>();
+        services.AddVehicleScopedFeature<IVehicleAccessFeature, VehicleAccessFeature>();
+        services.AddVehicleScopedFeature<IVehiclePersistenceFeature, VehiclePersistanceFeature>();
+        services.AddVehicleScopedFeature<IVehicleMileageCounterFeature, VehicleMileageCounterFeature>();
+        services.AddVehicleScopedFeature<IVehicleUpgradesFeature, VehicleUpgradesFeature>();
+        services.AddVehicleScopedFeature<IVehiclePartDamageFeature, VehiclePartDamageFeature>();
+        services.AddVehicleScopedFeature<IVehicleEnginesFeature, VehicleEnginesFeature>();
+        services.AddVehicleScopedFeature<IVehicleEventsFeature, VehicleEventsFeature>();
+        services.AddVehicleScopedFeature<IVehicleFuelFeature, VehicleFuelFeature>();
+        services.AddVehicleScopedFeature<IVehicleInventoryFeature, VehicleInventoryFeature>();
         #endregion
 
         #region Elements features
@@ -142,6 +151,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<ICommandThrottlingPolicy, CommandThrottlingPolicy>();
         #endregion
 
+        services.AddSingleton<IVehiclesAccessService, VehiclesAccessService>();
         services.AddKeyedSingleton<IElementFactory, ElementFactory>("ElementFactory");
         services.AddSingleton<IElementFactory>(x => x.GetRequiredKeyedService<IElementFactory>("ElementFactory"));
         services.AddScoped<IScopedElementFactory, ScopedElementFactory>();

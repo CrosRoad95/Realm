@@ -1,6 +1,6 @@
 ﻿namespace RealmCore.Persistence.DTOs;
 
-public class UserJobStatisticsDTO
+public class UserJobStatisticsDto
 {
     public int UserId { get; set; }
     public int JobId { get; set; }

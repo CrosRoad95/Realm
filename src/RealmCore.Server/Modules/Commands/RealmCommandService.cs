@@ -12,6 +12,11 @@ public sealed class RealmCommandService
         public string? Usage { get; init; }
         public string? Category { get; init; }
         public abstract bool IsAsync { get; }
+
+        public CommandInfo(string commandName)
+        {
+            CommandName = commandName;
+        }
     }
 
     internal class SyncCommandInfo : CommandInfo
@@ -20,7 +25,7 @@ public sealed class RealmCommandService
 
         internal Action<RealmPlayer, CommandArguments> Callback { get; }
 
-        public SyncCommandInfo(Action<RealmPlayer, CommandArguments> callback)
+        public SyncCommandInfo(string commandName, Action<RealmPlayer, CommandArguments> callback) : base(commandName)
         {
             Callback = callback;
         }
@@ -31,7 +36,7 @@ public sealed class RealmCommandService
         public override bool IsAsync => true;
         internal Func<RealmPlayer, CommandArguments, CancellationToken, Task> Callback { get; }
 
-        public AsyncCommandInfo(Func<RealmPlayer, CommandArguments, CancellationToken, Task> callback)
+        public AsyncCommandInfo(string commandName, Func<RealmPlayer, CommandArguments, CancellationToken, Task> callback) : base(commandName)
         {
             Callback = callback;
         }
@@ -58,7 +63,7 @@ public sealed class RealmCommandService
             var commandNameAttribute = type.GetCustomAttribute<CommandNameAttribute>();
             if (commandNameAttribute == null)
             {
-                logger.LogWarning($"Command class {type.Name} has no CommandName attribute");
+                logger.LogWarning("Command class {commandClass} has no CommandName attribute", type.Name);
                 continue;
             }
 
@@ -117,9 +122,8 @@ public sealed class RealmCommandService
     {
         CheckIfCommandExists(commandName);
 
-        _commands.Add(commandName, new AsyncCommandInfo(callback)
+        _commands.Add(commandName, new AsyncCommandInfo(commandName, callback)
         {
-            CommandName = commandName,
             RequiredPolicies = requiredPolicies,
             Description = description,
             Usage = usage,
@@ -136,9 +140,8 @@ public sealed class RealmCommandService
     {
         CheckIfCommandExists(commandName);
 
-        _commands.Add(commandName, new SyncCommandInfo(callback)
+        _commands.Add(commandName, new SyncCommandInfo(commandName, callback)
         {
-            CommandName = commandName,
             RequiredPolicies = requiredPolicies,
             Description = description,
             Usage = usage,

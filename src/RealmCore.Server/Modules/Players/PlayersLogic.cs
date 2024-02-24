@@ -156,11 +156,11 @@ internal sealed class PlayersLogic
         {
             await HandlePlayerJoinedCore(player, player.CreateCancellationToken());
         }
-        catch (UserNameInUseException ex)
+        catch (UserNameInUseException)
         {
             player.Kick("Nick jest używany przez innego gracza.");
         }
-        catch (OperationCanceledException ex)
+        catch (OperationCanceledException)
         {
             // Ignore
         }

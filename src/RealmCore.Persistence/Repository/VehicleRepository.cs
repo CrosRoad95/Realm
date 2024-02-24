@@ -5,8 +5,8 @@ public interface IVehicleRepository
     Task<VehicleData> CreateVehicle(ushort model, DateTime now, CancellationToken cancellationToken = default);
     Task<List<VehicleData>> GetAllSpawnedVehicles(CancellationToken cancellationToken = default);
     Task<List<VehicleUserAccessData>> GetAllVehicleAccesses(int vehicleId, CancellationToken cancellationToken = default);
-    Task<LightInfoVehicleDTO?> GetLightVehicleById(int vehicleId, CancellationToken cancellationToken = default);
-    Task<List<LightInfoVehicleDTO>> GetLightVehiclesByUserId(int userId, CancellationToken cancellationToken = default);
+    Task<LightInfoVehicleDto?> GetLightVehicleById(int vehicleId, CancellationToken cancellationToken = default);
+    Task<List<LightInfoVehicleDto>> GetLightVehiclesByUserId(int userId, CancellationToken cancellationToken = default);
     Task<List<int>> GetOwner(int vehicleId, CancellationToken cancellationToken = default);
     Task<VehicleData?> GetReadOnlyVehicleById(int id, CancellationToken cancellationToken = default);
     Task<VehicleData?> GetVehicleById(int id, CancellationToken cancellationToken = default);
@@ -47,14 +47,14 @@ internal sealed class VehicleRepository : IVehicleRepository
         return vehicle;
     }
 
-    public async Task<List<LightInfoVehicleDTO>> GetLightVehiclesByUserId(int userId, CancellationToken cancellationToken = default)
+    public async Task<List<LightInfoVehicleDto>> GetLightVehiclesByUserId(int userId, CancellationToken cancellationToken = default)
     {
         var query = _db.Vehicles
             .AsNoTracking()
             .TagWithSource(nameof(VehicleRepository))
             .Where(x => !x.IsRemoved)
             .Where(x => x.UserAccesses.Any(x => x.UserId == userId))
-            .Select(x => new LightInfoVehicleDTO
+            .Select(x => new LightInfoVehicleDto
             {
                 Id = x.Id,
                 Model = x.Model,
@@ -64,14 +64,14 @@ internal sealed class VehicleRepository : IVehicleRepository
         return await query.ToListAsync(cancellationToken);
     }
 
-    public async Task<LightInfoVehicleDTO?> GetLightVehicleById(int vehicleId, CancellationToken cancellationToken = default)
+    public async Task<LightInfoVehicleDto?> GetLightVehicleById(int vehicleId, CancellationToken cancellationToken = default)
     {
         var query = _db.Vehicles
             .AsNoTracking()
             .TagWithSource(nameof(VehicleRepository))
             .Where(x => !x.IsRemoved)
             .Where(x => x.Id == vehicleId)
-            .Select(x => new LightInfoVehicleDTO
+            .Select(x => new LightInfoVehicleDto
             {
                 Id = x.Id,
                 Model = x.Model,

@@ -2,7 +2,7 @@
 
 public interface INewsService
 {
-    Task<List<NewsDTO>> Get(int limit = 10, CancellationToken cancellationToken = default);
+    Task<List<NewsDto>> Get(int limit = 10, CancellationToken cancellationToken = default);
 }
 
 internal sealed class NewsService : INewsService
@@ -16,9 +16,9 @@ internal sealed class NewsService : INewsService
         _dateTimeProvider = dateTimeProvider;
     }
 
-    public async Task<List<NewsDTO>> Get(int limit = 10, CancellationToken cancellationToken = default)
+    public async Task<List<NewsDto>> Get(int limit = 10, CancellationToken cancellationToken = default)
     {
         var newsDataList = await _newsRepository.Get(_dateTimeProvider.Now, limit, cancellationToken);
-        return newsDataList.Select(NewsDTO.Map).ToList();
+        return newsDataList.Select(NewsDto.Map).ToList();
     }
 }

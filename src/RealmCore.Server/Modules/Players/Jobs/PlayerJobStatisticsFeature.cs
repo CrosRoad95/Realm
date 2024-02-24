@@ -1,6 +1,6 @@
 ﻿namespace RealmCore.Server.Modules.Players.Jobs;
 
-public interface IPlayerJobStatisticsFeature : IPlayerFeature, IEnumerable<UserJobStatisticsDTO>
+public interface IPlayerJobStatisticsFeature : IPlayerFeature, IEnumerable<UserJobStatisticsDto>
 {
     void AddPoints(short jobId, ulong points);
     void AddPointsAndTimePlayed(short jobId, ulong points, ulong timePlayed);
@@ -123,12 +123,12 @@ internal sealed class PlayerJobStatisticsFeature : IPlayerJobStatisticsFeature
     }
 
     [return: NotNullIfNotNull(nameof(userJobStatisticsData))]
-    private static UserJobStatisticsDTO? Map(JobStatisticsData? userJobStatisticsData)
+    private static UserJobStatisticsDto? Map(JobStatisticsData? userJobStatisticsData)
     {
         if (userJobStatisticsData == null)
             return null;
 
-        return new UserJobStatisticsDTO
+        return new UserJobStatisticsDto
         {
             JobId = userJobStatisticsData.JobId,
             Points = userJobStatisticsData.Points,
@@ -137,7 +137,7 @@ internal sealed class PlayerJobStatisticsFeature : IPlayerJobStatisticsFeature
         };
     }
 
-    public IEnumerator<UserJobStatisticsDTO> GetEnumerator()
+    public IEnumerator<UserJobStatisticsDto> GetEnumerator()
     {
         lock (_lock)
             return _jobStatistics.Select(Map).ToList().GetEnumerator();

@@ -5,7 +5,7 @@ public interface IVehiclesService
     Task<RealmVehicle> ConvertToPersistantVehicle(RealmVehicle vehicle, CancellationToken cancellationToken = default);
     Task<RealmVehicle> CreatePersistantVehicle(Location location, VehicleModel model, CancellationToken cancellationToken = default);
     Task<List<VehicleData>> GetAllSpawnedVehicles(CancellationToken cancellationToken = default);
-    Task<List<LightInfoVehicleDTO>> GetAllLightVehicles(RealmPlayer player, CancellationToken cancellationToken = default);
+    Task<List<LightInfoVehicleDto>> GetAllLightVehicles(RealmPlayer player, CancellationToken cancellationToken = default);
     Task<List<VehicleData>> GetAllVehicles(RealmPlayer player, CancellationToken cancellationToken = default);
     Task<bool> SetVehicleSpawned(RealmVehicle vehicle, bool spawned = true, CancellationToken cancellationToken = default);
     Task<RealmVehicle> Spawn(VehicleData vehicleData, CancellationToken cancellationToken = default);
@@ -76,7 +76,7 @@ internal sealed class VehiclesService : IVehiclesService
         return vehicle;
     }
 
-    public async Task<List<LightInfoVehicleDTO>> GetAllLightVehicles(RealmPlayer player, CancellationToken cancellationToken = default)
+    public async Task<List<LightInfoVehicleDto>> GetAllLightVehicles(RealmPlayer player, CancellationToken cancellationToken = default)
     {
         if (player.User.IsSignedIn)
         {

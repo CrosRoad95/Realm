@@ -77,9 +77,9 @@ public class NewsServiceTests : RealmIntegrationTestingBase
         await context.SaveChangesAsync();
 
         var newsList = await newsService.Get();
-        newsList.Should().BeEquivalentTo(new List<NewsDTO>
+        newsList.Should().BeEquivalentTo(new List<NewsDto>
         {
-            new NewsDTO
+            new NewsDto
             {
                 Id = 1,
                 Title = "title1",
@@ -88,7 +88,7 @@ public class NewsServiceTests : RealmIntegrationTestingBase
                 PublishTime = now.AddMinutes(-2),
                 Tags = new string[]{ "tag1", "tag2" }
             },
-            new NewsDTO
+            new NewsDto
             {
                 Id = 2,
                 Title = "title2",

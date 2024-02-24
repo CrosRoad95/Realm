@@ -19,15 +19,15 @@ public class PlayerJobStatisticsFeatureTests : RealmUnitTestingBase
         #endregion
 
         #region Assert
-        statistics.Should().BeEquivalentTo(new List<UserJobStatisticsDTO>
+        statistics.Should().BeEquivalentTo(new List<UserJobStatisticsDto>
         {
-            new UserJobStatisticsDTO
+            new UserJobStatisticsDto
             {
                 JobId = 1,
                 Points = 4,
                 TimePlayed = 4
             },
-            new UserJobStatisticsDTO
+            new UserJobStatisticsDto
             {
                 JobId = 2,
                 Points = 2,

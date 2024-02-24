@@ -2,7 +2,7 @@
 
 namespace RealmCore.Persistence.DTOs;
 
-public class UserMoneyHistoryDTO
+public class UserMoneyHistoryDto
 {
     public int Id { get; set; }
     public DateTime DateTime { get; set; }
@@ -12,12 +12,12 @@ public class UserMoneyHistoryDTO
     public string? Description { get; set; }
 
     [return: NotNullIfNotNull(nameof(userMoneyHistoryData))]
-    public static UserMoneyHistoryDTO? Map(UserMoneyHistoryData? userMoneyHistoryData)
+    public static UserMoneyHistoryDto? Map(UserMoneyHistoryData? userMoneyHistoryData)
     {
         if (userMoneyHistoryData == null)
             return null;
 
-        return new UserMoneyHistoryDTO
+        return new UserMoneyHistoryDto
         {
             Id = userMoneyHistoryData.Id,
             DateTime = userMoneyHistoryData.DateTime,

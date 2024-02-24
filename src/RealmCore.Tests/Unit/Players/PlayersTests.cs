@@ -80,8 +80,7 @@ public class PlayersTests : RealmUnitTestingBase
     public async Task TestAsyncBindsCooldown()
     {
         #region Arrange
-        var server = CreateServer();
-        var player = CreatePlayer();
+        var player = CreateServerWithOnePlayer();
         int executionCount = 0;
         player.SetBind("x", (player, keyState) =>
         {
@@ -104,8 +103,7 @@ public class PlayersTests : RealmUnitTestingBase
     public async Task TestAsyncBindsThrowingException()
     {
         #region Arrange
-        var server = CreateServer();
-        var player = CreatePlayer();
+        var player = CreateServerWithOnePlayer();
         player.SetBindAsync("x", (player, keyState) =>
         {
             throw new Exception("test123");
@@ -126,8 +124,7 @@ public class PlayersTests : RealmUnitTestingBase
     public void PlayerShouldBeAbleToFightWhenAtLeastOneFlagIsEnabled()
     {
         #region Arrange
-        var server = CreateServer();
-        var player = CreatePlayer();
+        var player = CreateServerWithOnePlayer();
         #endregion
 
         #region Act
@@ -143,8 +140,7 @@ public class PlayersTests : RealmUnitTestingBase
     public void PlayerShouldNotBeAbleToFightWhenNoFlagIsSet()
     {
         #region Arrange
-        var server = CreateServer();
-        var player = CreatePlayer();
+        var player = CreateServerWithOnePlayer();
         #endregion
 
         #region Act
@@ -161,13 +157,12 @@ public class PlayersTests : RealmUnitTestingBase
     public async Task FadeCameraShouldWork()
     {
         #region Arrange
-        var server = CreateServer();
-        var player = CreatePlayer();
+        var player = CreateServerWithOnePlayer();
         #endregion
 
         #region Act & Assert
-        await player.FadeCameraAsync(SlipeServer.Packets.Lua.Camera.CameraFade.Out, 0.1f);
-        await player.FadeCameraAsync(SlipeServer.Packets.Lua.Camera.CameraFade.In, 0.1f);
+        await player.FadeCameraAsync(CameraFade.Out, 0.1f);
+        await player.FadeCameraAsync(CameraFade.In, 0.1f);
         #endregion
     }
 
@@ -175,13 +170,12 @@ public class PlayersTests : RealmUnitTestingBase
     public async Task FadeCameraShouldBeCancelable()
     {
         #region Arrange
-        var server = CreateServer();
-        var player = CreatePlayer();
+        var player = CreateServerWithOnePlayer();
         var cancellationTokenSource = new CancellationTokenSource(100);
         #endregion
 
         #region Act
-        var act = async () => await player.FadeCameraAsync(SlipeServer.Packets.Lua.Camera.CameraFade.Out, 10.0f, cancellationTokenSource.Token);
+        var act = async () => await player.FadeCameraAsync(CameraFade.Out, 10.0f, cancellationTokenSource.Token);
         #endregion
 
         #region Asset
@@ -193,8 +187,7 @@ public class PlayersTests : RealmUnitTestingBase
     public async Task FadeCameraShouldBeCanceledWhenPlayerQuit()
     {
         #region Arrange
-        var server = CreateServer();
-        var player = CreatePlayer();
+        var player = CreateServerWithOnePlayer();
 
         var _ = Task.Run(async () =>
         {
@@ -216,8 +209,7 @@ public class PlayersTests : RealmUnitTestingBase
     public void SettingsShouldWork()
     {
         #region Arrange
-        var server = CreateServer();
-        var player = CreatePlayer();
+        var player = CreateServerWithOnePlayer();
         #endregion
 
         #region Act
@@ -242,8 +234,7 @@ public class PlayersTests : RealmUnitTestingBase
     public void UpgradesShouldWork()
     {
         #region Arrange
-        var server = CreateServer();
-        var player = CreatePlayer();
+        var player = CreateServerWithOnePlayer();
         #endregion
 
         #region Act
@@ -276,8 +267,7 @@ public class PlayersTests : RealmUnitTestingBase
     public void TryGetPlayerByNameTests(string nick, bool shouldExists)
     {
         #region Arrange
-        var server = CreateServer();
-        var player = CreatePlayer();
+        var player = CreateServerWithOnePlayer();
 
         var playersService = player.GetRequiredService<IPlayersService>();
         #endregion
@@ -306,8 +296,7 @@ public class PlayersTests : RealmUnitTestingBase
     public void SearchPlayersByNameTests(string pattern, bool shouldExists)
     {
         #region Arrange
-        var server = CreateServer();
-        var player = CreatePlayer();
+        var player = CreateServerWithOnePlayer();
 
         var playersService = player.GetRequiredService<IPlayersService>();
         #endregion
