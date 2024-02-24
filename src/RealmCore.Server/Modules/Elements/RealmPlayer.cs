@@ -679,6 +679,16 @@ public class RealmPlayer : Player, IDisposable, IPersistentElement
         }
     }
 
+    public new void WarpIntoVehicle(Vehicle vehicle, byte seat = 0)
+    {
+        base.WarpIntoVehicle(vehicle, seat);
+        if(Vehicle == vehicle)
+        {
+            Interior = vehicle.Interior;
+            Dimension = vehicle.Dimension;
+        }
+    }
+
     private void HandleCurrentInteractElementDestroyed(Element _)
     {
         CurrentInteractElement = null;

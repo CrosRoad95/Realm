@@ -1596,6 +1596,7 @@ internal sealed class CommandsLogic
         {
             await Task.Delay(5000, token);
         });
+
         _commandService.AddAsyncCommandHandler("asyncFadeCamera", async (player, args, token) =>
         {
             await using (await player.FadeCameraAsync(CameraFade.Out, 0.5f, token))
@@ -1603,7 +1604,12 @@ internal sealed class CommandsLogic
                 await Task.Delay(2000, token);
             }
         });
-    }
 
-    static int _hudPosition = 0;
+        _commandService.AddAsyncCommandHandler("warppedintovehicle", async (player, args, token) =>
+        {
+            var vehicle = _elementFactory.CreateVehicle(new Location(player.Position + new Vector3(4, 0, 0), player.Rotation, Interior: 4, Dimension: 3), VehicleModel.Perennial);
+
+            player.WarpIntoVehicle(vehicle);
+        });
+    }
 }
