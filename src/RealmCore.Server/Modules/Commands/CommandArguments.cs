@@ -1,19 +1,23 @@
-﻿namespace RealmCore.Server.Modules.Commands;
+﻿using RealmCore.Server.Modules.Search;
+
+namespace RealmCore.Server.Modules.Commands;
 
 public class CommandArguments
 {
     private readonly string[] _args;
-    private readonly IServiceProvider _serviceProvider;
+    private readonly RealmPlayer _player;
     private readonly IPlayersService _playersService;
+    private readonly IElementSearchService _searchService;
     private int _index;
 
     public int Index => _index;
 
-    public CommandArguments(string[] args, IServiceProvider serviceProvider)
+    public CommandArguments(RealmPlayer player, IPlayersService playersService, IElementSearchService searchService, string[] args)
     {
         _args = args;
-        _serviceProvider = serviceProvider;
-        _playersService = _serviceProvider.GetRequiredService<IPlayersService>();
+        _player = player;
+        _playersService = playersService;
+        _searchService = searchService;
     }
 
     internal void Left() // For test purpose
@@ -154,10 +158,10 @@ public class CommandArguments
         throw new CommandArgumentException(_index, "Liczba jest poza zakresem", value);
     }
 
-    public virtual RealmPlayer ReadPlayer(PlayerSearchOption searchOption = PlayerSearchOption.All)
+    public virtual RealmPlayer ReadPlayer(PlayerSearchOption searchOption = PlayerSearchOption.All, RealmPlayer? ignore = null)
     {
         var name = ReadArgument();
-        var users = _playersService.SearchPlayersByName(name, searchOption).ToList();
+        var users = _searchService.SearchPlayers(name, searchOption, ignore).ToList();
         if (users.Count == 1)
             return users[0];
         if (users.Count > 0)
@@ -165,11 +169,11 @@ public class CommandArguments
         throw new CommandArgumentException(_index, "Gracz o takiej nazwie nie został znaleziony", name);
     }
 
-    public virtual bool TryReadPlayerPlayer(out RealmPlayer? player)
+    public virtual bool TryReadPlayerPlayer(out RealmPlayer? player, PlayerSearchOption searchOption = PlayerSearchOption.All, RealmPlayer? ignore = null)
     {
         if (TryReadArgument(out string? name) && name != null)
         {
-            var players = _playersService.SearchPlayersByName(name).ToList();
+            var players = _searchService.SearchPlayers(name, searchOption, ignore).ToList();
             if (players.Count == 1)
             {
                 player = players[0];
@@ -183,13 +187,22 @@ public class CommandArguments
         return false;
     }
 
-    public virtual IEnumerable<RealmPlayer> ReadPlayers()
+    public virtual IEnumerable<RealmPlayer> SearchPlayers(string? pattern = null, PlayerSearchOption searchOption = PlayerSearchOption.All, RealmPlayer? ignore = null)
     {
-        var name = ReadArgument();
-        var users = _playersService.SearchPlayersByName(name).ToList();
-        if (users.Count == 0)
-            throw new CommandArgumentException(_index, "Nie znaleziono żadnego gracza o takiej nazwie", name);
-        return users;
+        pattern ??= ReadArgument();
+        var players = _searchService.SearchPlayers(pattern).ToList();
+        if (players.Count == 0 && !searchOption.HasFlag(PlayerSearchOption.AllowEmpty))
+            throw new CommandArgumentException(_index, "Nie znaleziono żadnego gracza.", pattern);
+        return players;
+    }
+
+    public virtual IEnumerable<RealmVehicle> SearchVehicles(string? pattern = null, PlayerSearchOption searchOption = PlayerSearchOption.All, RealmPlayer? ignore = null)
+    {
+        pattern ??= ReadArgument();
+        var vehicles = _searchService.SearchVehicles(pattern).ToList();
+        if (vehicles.Count == 0)
+            throw new CommandArgumentException(_index, "Nie znaleziono żadnego pojazdu.", pattern);
+        return vehicles;
     }
 
     public TEnum ReadEnum<TEnum>() where TEnum : struct

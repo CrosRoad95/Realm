@@ -1,4 +1,5 @@
-﻿using SlipeServer.Packets.Lua.Camera;
+﻿using RealmCore.Server.Modules.Search;
+using SlipeServer.Packets.Lua.Camera;
 
 namespace RealmCore.Tests.Unit.Players;
 
@@ -298,11 +299,11 @@ public class PlayersTests : RealmUnitTestingBase
         #region Arrange
         var player = CreateServerWithOnePlayer();
 
-        var playersService = player.GetRequiredService<IPlayersService>();
+        var searchService = player.GetRequiredService<IElementSearchService>();
         #endregion
 
         #region Act
-        var found = playersService.SearchPlayersByName(pattern, PlayerSearchOption.None);
+        var found = searchService.SearchPlayers(pattern, PlayerSearchOption.None);
         #endregion
 
         #region Assert

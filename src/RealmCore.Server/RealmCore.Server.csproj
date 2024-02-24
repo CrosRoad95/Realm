@@ -205,7 +205,7 @@
 		<Using Include="RealmCore.Server.Modules.Core" />
 		<Using Include="SlipeServer.Net.Wrappers" />
 		<Using Include="System.Text" />
-		
+		<Using Include="RealmCore.Server.Modules.Search" />
 	</ItemGroup>
 
 </Project>

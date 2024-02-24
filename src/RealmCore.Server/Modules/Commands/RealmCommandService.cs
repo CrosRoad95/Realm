@@ -1,4 +1,5 @@
 ﻿using Polly.RateLimit;
+using RealmCore.Server.Modules.Search;
 
 namespace RealmCore.Server.Modules.Commands;
 
@@ -185,7 +186,8 @@ public sealed class RealmCommandService
         _logger.LogInformation("{player} executed command {command} with arguments {commandArguments}.", player, command, arguments);
         try
         {
-            var commandArguments = new CommandArguments(arguments, player.ServiceProvider);
+            var commandArguments = new CommandArguments(player, player.ServiceProvider.GetRequiredService<IPlayersService>(), player.ServiceProvider.GetRequiredService<IElementSearchService>(), arguments);
+
             if (commandInfo is SyncCommandInfo syncCommandInfo)
             {
                 if (player.User.HasClaim("commandsNoLimit"))

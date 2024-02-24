@@ -1,6 +1,8 @@
 ﻿using RealmCore.Sample.Concepts.Gui.Blazor;
 using RealmCore.Sample.HudLayers;
 using RealmCore.Server.Modules.Players.Money;
+using RealmCore.Server.Modules.Search;
+using System.Media;
 using Color = System.Drawing.Color;
 
 namespace RealmCore.Sample.Logic;
@@ -1610,6 +1612,100 @@ internal sealed class CommandsLogic
             var vehicle = _elementFactory.CreateVehicle(new Location(player.Position + new Vector3(4, 0, 0), player.Rotation, Interior: 4, Dimension: 3), VehicleModel.Perennial);
 
             player.WarpIntoVehicle(vehicle);
+        });
+
+        _commandService.AddCommandHandler("searchplayers", (player, args) =>
+        {
+            var foundPlayers = args.SearchPlayers();
+            foreach (var foundPlayer in foundPlayers)
+            {
+                _chatBox.OutputTo(player, $"Found player: {foundPlayer.Name}");
+            }
+        });
+
+        _commandService.AddCommandHandler("searchVehicles", (player, args) =>
+        {
+            var foundVehicles = args.SearchVehicles();
+            foreach (var foundVehicle in foundVehicles)
+            {
+                _chatBox.OutputTo(player, $"Found vehicle: {foundVehicle.Name}");
+            }
+        });
+
+        _commandService.AddCommandHandler("select", (player, args) =>
+        {
+            var pattern = args.ReadArgument();
+            var foundPlayers = args.SearchPlayers(pattern, PlayerSearchOption.All | PlayerSearchOption.AllowEmpty);
+            var foundVehicles = args.SearchVehicles(pattern);
+            int a = 0;
+            foreach (var foundPlayer in foundPlayers)
+            {
+                if (player.SelectedElements.Add(foundPlayer))
+                    a++;
+            }
+            foreach (var foundVehicle in foundVehicles)
+            {
+                if (player.SelectedElements.Add(foundVehicle))
+                    a++;
+            }
+            _chatBox.OutputTo(player, $"Selected {a} elements.");
+        });
+
+        _commandService.AddCommandHandler("deselect", (player, args) =>
+        {
+            var pattern = args.ReadArgument();
+            var foundPlayers = args.SearchPlayers(pattern, PlayerSearchOption.All | PlayerSearchOption.AllowEmpty);
+            var foundVehicles = args.SearchVehicles(pattern);
+            int a = 0;
+            foreach (var foundPlayer in foundPlayers)
+            {
+                if (player.SelectedElements.Remove(foundPlayer))
+                    a++;
+            }
+            foreach (var foundVehicle in foundVehicles)
+            {
+                if (player.SelectedElements.Remove(foundVehicle))
+                    a++;
+            }
+            _chatBox.OutputTo(player, $"Deselected {a} elements.");
+        });
+
+        _commandService.AddCommandHandler("listselected", (player, args) =>
+        {
+            _chatBox.OutputTo(player, "Selected elements:");
+            foreach (var element in player.SelectedElements)
+            {
+                _chatBox.OutputTo(player, $"Selected element: {element}");
+            }
+        });
+
+        _commandService.AddCommandHandler("setcolor", (player, args) =>
+        {
+            var color = args.ReadEnum<KnownColor>();
+            foreach (var element in player.SelectedElements)
+            {
+                if (element is RealmVehicle vehicle)
+                {
+                    vehicle.Colors.Primary = Color.FromKnownColor(color);
+                }
+            }
+        });
+
+        _commandService.AddCommandHandler("setbind", (player, args) =>
+        {
+            player.SetBind("p", (player, keyState) =>
+            {
+                if (keyState == SlipeServer.Server.Elements.Enums.KeyState.Down)
+                {
+                    foreach (var element in player.SelectedElements)
+                        _elementOutlineService.SetElementOutline(element, Color.Green);
+                }
+                if (keyState == SlipeServer.Server.Elements.Enums.KeyState.Up)
+                {
+                    foreach (var element in player.SelectedElements)
+                        _elementOutlineService.RemoveElementOutline(element);
+                }
+            });
         });
     }
 }

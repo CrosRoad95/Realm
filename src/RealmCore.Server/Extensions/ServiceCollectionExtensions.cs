@@ -1,6 +1,7 @@
 ﻿using Coravel;
 using RealmCore.Server.Modules.Players.Money;
 using RealmCore.Server.Modules.Players.Settings;
+using RealmCore.Server.Modules.Search;
 
 namespace RealmCore.Server.Extensions;
 
@@ -96,6 +97,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<INewsService, NewsService>();
         services.AddScoped<IPlayerMoneyHistoryService, PlayerMoneyHistoryService>();
         services.AddScoped<IScopedMapsService, ScopedMapService>();
+        services.AddScoped<IElementSearchService, ElementSearchService>();
         services.AddSingleton<IBrowserGuiService, BrowserGuiService>();
         services.AddSingleton<IMapsService, MapsService>();
         services.AddSingleton<IPeriodicEventDispatcher, PeriodicEventDispatcher>();

@@ -175,6 +175,8 @@ public class RealmPlayer : Player, IDisposable, IPersistentElement
     public IPlayerInventoryFeature Inventory { get; init; }
     public IPlayerNotificationsFeature Notifications { get; init; }
     public IScopedElementFactory ElementFactory { get; init; }
+    public ElementBag SelectedElements = new();
+
     public RealmPlayer(IServiceProvider serviceProvider)
     {
         _serviceScope = serviceProvider.CreateScope();

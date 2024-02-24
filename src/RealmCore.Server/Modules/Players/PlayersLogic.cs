@@ -106,7 +106,7 @@ internal sealed class PlayersLogic
 
     private async Task HandlePlayerJoinedCore(RealmPlayer player, CancellationToken cancellationToken)
     {
-        if (_playersService.SearchPlayersByName(player.Name, PlayerSearchOption.CaseInsensitive, player).Any())
+        if (_playersService.TryGetPlayerByName(player.Name, out var foundPlayer, PlayerSearchOption.CaseInsensitive, player))
             throw new UserNameInUseException(player.Name);
 
         var start = Stopwatch.GetTimestamp();

@@ -24,6 +24,12 @@ public static class ElementExtensions
         var length = (a.Position - b.Position).Length();
         return length;
     }
+    
+    public static float DistanceToSquared(this Element a, Element b)
+    {
+        var length = (a.Position - b.Position).LengthSquared();
+        return length;
+    }
 
     public static TransformAndMotion GetTransformAndMotion(this Element element) => new()
     {
