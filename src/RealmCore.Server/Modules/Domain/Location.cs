@@ -10,6 +10,9 @@ public record Location(Vector3 Position, Vector3 Rotation = default, byte? Inter
     private static readonly Location _location = new();
     public static Location Zero => _location;
 
+    public byte GetInteriorOrDefault() => Interior ?? 0;
+    public byte GetDimensionOrDefault() => Dimension ?? 0;
+
     public override string ToString()
     {
         var sb = new StringBuilder();
