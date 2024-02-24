@@ -1,4 +1,6 @@
-﻿namespace RealmCore.Server.Extensions;
+﻿using SlipeServer.Server.Elements;
+
+namespace RealmCore.Server.Extensions;
 
 public static class ElementExtensions
 {
@@ -46,5 +48,28 @@ public static class ElementExtensions
     public static Vector3 GetPointFromDistanceRotation(this Element element, double distance, float? angle = null)
     {
         return element.Position.GetPointFromDistanceRotation(distance, angle ?? -element.Rotation.Z);
+    }
+
+    public static CancellationToken CreateCancellationToken(this Element? element)
+    {
+        if (element == null)
+            throw new NullReferenceException(nameof(element));
+
+        if (element.IsDestroyed)
+            throw new ElementDestroyedException(element);
+
+        var cancellationTokenSource = new CancellationTokenSource();
+
+        void handleDestroyed(Element element)
+        {
+            cancellationTokenSource.Cancel();
+            element.Destroyed -= handleDestroyed;
+        }
+        element.Destroyed += handleDestroyed;
+
+        if(element.IsDestroyed)
+            cancellationTokenSource.Cancel();
+
+        return cancellationTokenSource.Token;
     }
 }

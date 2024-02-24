@@ -1591,6 +1591,11 @@ internal sealed class CommandsLogic
             var fetched = await player.Events.FetchMore(10, token);
             _chatBox.OutputTo(player, $"fetched {fetched.Count} more events");
         });
+
+        _commandService.AddAsyncCommandHandler("wait", async (player, args, token) =>
+        {
+            await Task.Delay(5000, token);
+        });
     }
 
     static int _hudPosition = 0;

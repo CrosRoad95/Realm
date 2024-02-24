@@ -10,8 +10,6 @@ public class RealmPlayer : Player, IDisposable, IPersistentElement
     private readonly IServiceProvider _serviceProvider;
     private readonly IServiceScope _serviceScope;
 
-    private readonly CancellationTokenSource _cancellationTokenSource = new();
-    public CancellationToken CancellationToken => _cancellationTokenSource.Token;
     public IServiceProvider ServiceProvider => _serviceProvider;
 
     private Element? _focusedElement;
@@ -255,7 +253,7 @@ public class RealmPlayer : Player, IDisposable, IPersistentElement
 
     public async Task FadeCameraAsync(CameraFade cameraFade, float fadeTime = 0.5f, CancellationToken cancellationToken = default)
     {
-        var linkedCancellationToken = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, CancellationToken);
+        var linkedCancellationToken = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, this.CreateCancellationToken());
 
         Camera.Fade(cameraFade, fadeTime);
         try
@@ -463,7 +461,7 @@ public class RealmPlayer : Player, IDisposable, IPersistentElement
         {
             try
             {
-                await asyncBindCallback(this, keyState, CancellationToken);
+                await asyncBindCallback(this, keyState, this.CreateCancellationToken());
             }
             finally
             {
@@ -667,14 +665,6 @@ public class RealmPlayer : Player, IDisposable, IPersistentElement
     {
         IsSpawned = false;
         Wasted -= HandleWasted;
-        try
-        {
-            _serviceScope.Dispose();
-        }
-        finally
-        {
-            _cancellationTokenSource.Cancel();
-            _cancellationTokenSource.Dispose();
-        }
+        _serviceScope.Dispose();
     }
 }

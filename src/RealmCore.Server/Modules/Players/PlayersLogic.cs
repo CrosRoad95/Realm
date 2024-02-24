@@ -154,7 +154,7 @@ internal sealed class PlayersLogic
         using var handlePlayerJoinedActivity = new Activity("HandlePlayerJoined").Start();
         try
         {
-            await HandlePlayerJoinedCore(player, player.CancellationToken);
+            await HandlePlayerJoinedCore(player, player.CreateCancellationToken());
         }
         catch (UserNameInUseException ex)
         {

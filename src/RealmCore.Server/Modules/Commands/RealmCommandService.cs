@@ -198,15 +198,16 @@ public sealed class RealmCommandService
             }
             else if (commandInfo is AsyncCommandInfo asyncCommandInfo)
             {
+                var token = player.CreateCancellationToken();
                 if (player.User.HasClaim("commandsNoLimit"))
-                    await asyncCommandInfo.Callback(player, commandArguments, player.CancellationToken);
+                    await asyncCommandInfo.Callback(player, commandArguments, token);
                 else
                 {
                     var commandThrottlingPolicy = player.GetRequiredService<ICommandThrottlingPolicy>();
                     await commandThrottlingPolicy.ExecuteAsync(async (cancellationToken) =>
                     {
                         await asyncCommandInfo.Callback(player, commandArguments, cancellationToken);
-                    }, player.CancellationToken);
+                    }, token);
                 }
             }
         }
