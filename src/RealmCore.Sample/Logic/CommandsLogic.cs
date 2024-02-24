@@ -1596,6 +1596,13 @@ internal sealed class CommandsLogic
         {
             await Task.Delay(5000, token);
         });
+        _commandService.AddAsyncCommandHandler("asyncFadeCamera", async (player, args, token) =>
+        {
+            await using (await player.FadeCameraAsync(CameraFade.Out, 0.5f, token))
+            {
+                await Task.Delay(2000, token);
+            }
+        });
     }
 
     static int _hudPosition = 0;

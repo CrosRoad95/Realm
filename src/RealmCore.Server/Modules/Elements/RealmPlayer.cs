@@ -3,6 +3,27 @@ using RealmCore.Server.Modules.Players.Settings;
 
 namespace RealmCore.Server.Modules.Elements;
 
+internal struct FadeCameraScope : IAsyncDisposable
+{
+    private readonly RealmPlayer _player;
+    private readonly CameraFade _cameraFade;
+    private readonly float _fadeTime;
+    private readonly CancellationToken _cancellationToken;
+
+    public FadeCameraScope(RealmPlayer player, CameraFade cameraFade, float fadeTime, CancellationToken cancellationToken)
+    {
+        _player = player;
+        _cameraFade = cameraFade;
+        _fadeTime = fadeTime;
+        _cancellationToken = cancellationToken;
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        await _player.FadeCameraAsync(_cameraFade, _fadeTime, _cancellationToken);
+    }
+}
+
 public class RealmPlayer : Player, IDisposable, IPersistentElement
 {
     private readonly object _lock = new();
@@ -251,7 +272,7 @@ public class RealmPlayer : Player, IDisposable, IPersistentElement
         IsSpawned = true;
     }
 
-    public async Task FadeCameraAsync(CameraFade cameraFade, float fadeTime = 0.5f, CancellationToken cancellationToken = default)
+    public async Task<IAsyncDisposable> FadeCameraAsync(CameraFade cameraFade, float fadeTime = 0.5f, CancellationToken cancellationToken = default)
     {
         var linkedCancellationToken = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, this.CreateCancellationToken());
 
@@ -265,6 +286,8 @@ public class RealmPlayer : Player, IDisposable, IPersistentElement
             Camera.Fade(cameraFade == CameraFade.In ? CameraFade.Out : CameraFade.In, 0);
             throw;
         }
+
+        return new FadeCameraScope(this, cameraFade == CameraFade.In ? CameraFade.Out : CameraFade.In, fadeTime, cancellationToken);
     }
 
     public void SetBindAsync(string key, Func<RealmPlayer, KeyState, CancellationToken, Task> callback)
