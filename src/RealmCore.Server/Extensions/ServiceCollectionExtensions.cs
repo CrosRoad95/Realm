@@ -142,8 +142,8 @@ public static class ServiceCollectionExtensions
         services.AddScoped<ICommandThrottlingPolicy, CommandThrottlingPolicy>();
         #endregion
 
-        services.AddKeyedScoped<IElementFactory, ElementFactory>("ElementFactory");
-        services.AddScoped<IElementFactory>(x => x.GetRequiredKeyedService<IElementFactory>("ElementFactory"));
+        services.AddKeyedSingleton<IElementFactory, ElementFactory>("ElementFactory");
+        services.AddSingleton<IElementFactory>(x => x.GetRequiredKeyedService<IElementFactory>("ElementFactory"));
         services.AddScoped<IScopedElementFactory, ScopedElementFactory>();
         services.AddSingleton<IElementIdGenerator, RangedCollectionBasedElementIdGenerator>(x =>
             new RangedCollectionBasedElementIdGenerator(x.GetRequiredService<IElementCollection>(), IdGeneratorConstants.PlayerIdStart, IdGeneratorConstants.PlayerIdStop)

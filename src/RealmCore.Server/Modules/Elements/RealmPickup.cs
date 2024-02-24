@@ -13,7 +13,7 @@ public class RealmPickup : Pickup, ICollisionDetection, IElementName
     public RealmPickup(IServiceProvider serviceProvider, Vector3 position, ushort model) : base(position, model)
     {
         CollisionDetection = new(serviceProvider, this);
-        CollisionShape = new CollisionSphere(position, 1.5f);
+        CollisionShape = new RealmCollisionSphere(serviceProvider, position, 1.5f);
     }
 
     public void CheckElementWithin(Element element, bool matchInterior = true, bool matchDimension = true)

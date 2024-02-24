@@ -29,10 +29,12 @@ public class ElementFactory : IElementFactory
         if (element is Pickup pickup)
         {
             pickup.CollisionShape.AssociateWith(_mtaServer);
+            RelayCreated(pickup.CollisionShape);
         }
         if (element is RealmMarker marker)
         {
             marker.CollisionShape.AssociateWith(_mtaServer);
+            RelayCreated(marker.CollisionShape);
         }
         RelayCreated(element);
     }
@@ -42,8 +44,8 @@ public class ElementFactory : IElementFactory
         var vehicle = new RealmVehicle(_serviceProvider, (ushort)model, location.Position)
         {
             Rotation = location.Rotation,
-            Interior = location.Interior ?? 0,
-            Dimension = location.Dimension ?? 0,
+            Interior = location.GetInteriorOrDefault(),
+            Dimension = location.GetDimensionOrDefault(),
         };
 
         elementBuilder?.Invoke(vehicle);
@@ -55,8 +57,8 @@ public class ElementFactory : IElementFactory
     {
         var marker = new RealmMarker(_serviceProvider, location.Position, markerType, size)
         {
-            Interior = location.Interior ?? 0,
-            Dimension = location.Dimension ?? 0,
+            Interior = location.GetInteriorOrDefault(),
+            Dimension = location.GetDimensionOrDefault(),
             Color = color
         };
 
@@ -69,11 +71,11 @@ public class ElementFactory : IElementFactory
     {
         var pickup = new RealmPickup(_serviceProvider, location.Position, model)
         {
-            Interior = location.Interior ?? 0,
-            Dimension = location.Dimension ?? 0,
+            Interior = location.GetInteriorOrDefault(),
+            Dimension = location.GetDimensionOrDefault(),
         };
-        pickup.CollisionShape.Interior = location.Interior ?? 0;
-        pickup.CollisionShape.Dimension = location.Dimension ?? 0;
+        pickup.CollisionShape.Interior = location.GetInteriorOrDefault();
+        pickup.CollisionShape.Dimension = location.GetDimensionOrDefault();
 
         elementBuilder?.Invoke(pickup);
         AssociateWithServer(pickup);
@@ -84,8 +86,8 @@ public class ElementFactory : IElementFactory
     {
         var blip = new RealmBlip(location.Position, blipIcon)
         {
-            Interior = location.Interior ?? 0,
-            Dimension = location.Dimension ?? 0,
+            Interior = location.GetInteriorOrDefault(),
+            Dimension = location.GetDimensionOrDefault(),
         };
 
         elementBuilder?.Invoke(blip);
@@ -111,8 +113,8 @@ public class ElementFactory : IElementFactory
         var worldObject = new RealmWorldObject(model, location.Position)
         {
             Rotation = location.Rotation,
-            Interior = location.Interior ?? 0,
-            Dimension = location.Dimension ?? 0,
+            Interior = location.GetInteriorOrDefault(),
+            Dimension = location.GetDimensionOrDefault(),
         };
 
         elementBuilder?.Invoke(worldObject);
@@ -125,8 +127,8 @@ public class ElementFactory : IElementFactory
         var worldObject = new FocusableRealmWorldObject(model, location.Position)
         {
             Rotation = location.Rotation,
-            Interior = location.Interior ?? 0,
-            Dimension = location.Dimension ?? 0,
+            Interior = location.GetInteriorOrDefault(),
+            Dimension = location.GetDimensionOrDefault(),
         };
 
         elementBuilder?.Invoke(worldObject);
@@ -218,8 +220,8 @@ public class ElementFactory : IElementFactory
         var ped = new RealmPed(pedModel, location.Position)
         {
             Rotation = location.Rotation,
-            Interior = location.Interior ?? 0,
-            Dimension = location.Dimension ?? 0,
+            Interior = location.GetInteriorOrDefault(),
+            Dimension = location.GetDimensionOrDefault(),
         };
 
         elementBuilder?.Invoke(ped);

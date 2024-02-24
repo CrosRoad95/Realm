@@ -884,10 +884,42 @@ internal sealed class CommandsLogic
         //    playerElementComponent.Vehicle.Destroy();
         //});
 
+        _commandService.AddCommandHandler("createtestpickups", (player, args) =>
+        {
+            var pickup1 = _elementFactory.CreatePickup(new Location(new Vector3(340.4619f, -131.87402f, 1.578125f)), 1274);
+            var pickup2 = _elementFactory.CreatePickup(new Location(new Vector3(340.4619f, -131.87402f, 1.578125f), Vector3.Zero, Interior: 1), 1274);
+            var pickup3 = _elementFactory.CreatePickup(new Location(new Vector3(340.4619f, -131.87402f, 1.578125f), Vector3.Zero, Dimension: 1), 1274);
+
+            pickup1.CollisionDetection.Entered += (pickup, element) =>
+            {
+                _chatBox.Output("Enter pickup 1");
+            };
+
+            pickup2.CollisionDetection.Entered += (pickup, element) =>
+            {
+                _chatBox.Output("Enter pickup 2");
+            };
+
+            pickup3.CollisionDetection.Entered += (pickup, element) =>
+            {
+                _chatBox.Output("Enter pickup 3");
+            };
+        });
+
         _commandService.AddAsyncCommandHandler("spawnveh", async (player, args, token) =>
         {
             var vehicle = await _loadService.LoadVehicleById(args.ReadInt(), token);
             vehicle.SetLocation(player.GetLocation());
+        });
+        
+        _commandService.AddCommandHandler("interior", (player, args) =>
+        {
+            player.Interior = args.ReadByte();
+        });
+        
+        _commandService.AddCommandHandler("dimension", (player, args) =>
+        {
+            player.Dimension = args.ReadUShort();
         });
 
         //_commandService.AddCommandHandler("inventoryoccupied", (player, args) =>
