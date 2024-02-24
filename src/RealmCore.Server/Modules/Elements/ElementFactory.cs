@@ -61,6 +61,8 @@ public class ElementFactory : IElementFactory
             Dimension = location.GetDimensionOrDefault(),
             Color = color
         };
+        marker.CollisionShape.Interior = location.GetInteriorOrDefault();
+        marker.CollisionShape.Dimension = location.GetDimensionOrDefault();
 
         elementBuilder?.Invoke(marker);
         AssociateWithServer(marker);
