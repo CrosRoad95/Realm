@@ -109,3 +109,11 @@ public class ToggleControlsScope : IDisposable
         controls.EnterPassengerEnabled = _enterPassengerEnabled;
     }
 }
+
+public class ToggleAllControlsScope : ToggleControlsScope
+{
+    public ToggleAllControlsScope(RealmPlayer player) : base(player)
+    {
+        player.ToggleAllControls(false);
+    }
+}
