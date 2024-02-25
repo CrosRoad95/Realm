@@ -4,6 +4,7 @@ public class PlayerSessionsTests : RealmUnitTestingBase
 {
     internal sealed class TestSession : Session
     {
+        public override string Name => "Test";
         public int EndedCount { get; private set; }
 
         public TestSession(PlayerContext playerContext, IDateTimeProvider dateTimeProvider) : base(playerContext.Player, dateTimeProvider)
@@ -18,6 +19,7 @@ public class PlayerSessionsTests : RealmUnitTestingBase
 
     internal sealed class FailedToStartTestSession : Session
     {
+        public override string Name => "FailedToStart";
         public FailedToStartTestSession(PlayerContext playerContext, IDateTimeProvider dateTimeProvider) : base(playerContext.Player, dateTimeProvider)
         {
         }
@@ -30,6 +32,7 @@ public class PlayerSessionsTests : RealmUnitTestingBase
 
     internal sealed class TestJobSession : JobSession
     {
+        public override string Name => "TestJob";
         public TestJobSession(PlayerContext playerContext, IScopedElementFactory scopedElementFactory, IPeriodicEventDispatcher updateService, IDateTimeProvider dateTimeProvider) : base(playerContext, scopedElementFactory, updateService, dateTimeProvider)
         {
         }
@@ -294,4 +297,16 @@ public class PlayerSessionsTests : RealmUnitTestingBase
         session.Elapsed.Should().Be(TimeSpan.FromMinutes(1));
     }
 
+    [Fact]
+    public void SessionCancellationTokenShouldBeCancelledWhenSessionEnd()
+    {
+        var player = CreateServerWithOnePlayer();
+
+        var session = player.Sessions.BeginSession<TestSession>();
+        var token = session.CreateCancellationToken();
+        token.IsCancellationRequested.Should().BeFalse();
+
+        player.Sessions.EndSession<TestSession>();
+        token.IsCancellationRequested.Should().BeTrue();
+    }
 }

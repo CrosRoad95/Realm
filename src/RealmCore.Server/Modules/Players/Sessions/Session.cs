@@ -2,6 +2,7 @@
 
 public abstract class Session : IDisposable
 {
+    public abstract string Name { get; }
     public AtomicBool _disposed = new();
     protected readonly object _lock = new();
     private readonly TimeMeasurement _timeMeasurement;
@@ -45,6 +46,26 @@ public abstract class Session : IDisposable
             throw new SessionAlreadyEndedException(this);
 
         return _timeMeasurement.TryStop();
+    }
+
+    public CancellationToken CreateCancellationToken()
+    {
+        if (_disposed)
+            throw new SessionAlreadyEndedException(this);
+
+        var cancellationTokenSource = new CancellationTokenSource();
+
+        void handleEnded(Session session)
+        {
+            cancellationTokenSource.Cancel();
+            session.Ended -= handleEnded;
+        }
+        Ended += handleEnded;
+
+        if (_disposed)
+            cancellationTokenSource.Cancel();
+
+        return cancellationTokenSource.Token;
     }
 
     public void Dispose()

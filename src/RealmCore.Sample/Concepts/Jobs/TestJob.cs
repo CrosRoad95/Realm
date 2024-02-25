@@ -2,6 +2,7 @@
 
 internal class TestJob : JobSession
 {
+    public override string Name => "Test";
     public TestJob(PlayerContext playerContext, IScopedElementFactory scopedElementFactory, IPeriodicEventDispatcher updateService, IDateTimeProvider dateTimeProvider) : base(playerContext, scopedElementFactory, updateService, dateTimeProvider)
     {
     }
