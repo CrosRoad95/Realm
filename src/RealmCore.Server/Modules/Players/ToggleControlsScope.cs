@@ -114,6 +114,6 @@ public class ToggleAllControlsScope : ToggleControlsScope
 {
     public ToggleAllControlsScope(RealmPlayer player) : base(player)
     {
-        player.ToggleAllControls(false);
+        player.ToggleAllControls(false, true, false);
     }
 }
