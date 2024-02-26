@@ -129,6 +129,7 @@ public static class ServiceCollectionExtensions
         services.AddPlayerScopedFeature<IPlayerHudFeature, PlayerHudFeature>();
         services.AddPlayerScopedFeature<IPlayerInventoryFeature, PlayerInventoryFeature>();
         services.AddPlayerScopedFeature<IPlayerNotificationsFeature, PlayerNotificationsFeature>();
+        services.AddPlayerScopedFeature<IPlayerSchedulerFeature, PlayerSchedulerFeature>();
         #endregion
 
         #region Vehicle features

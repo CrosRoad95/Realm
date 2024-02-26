@@ -1707,5 +1707,25 @@ internal sealed class CommandsLogic
                 }
             });
         });
+
+        _commandService.AddCommandHandler("scheduler1", (player, args) =>
+        {
+            player.Scheduler.ScheduleJobOnce(() =>
+            {
+                _chatBox.OutputTo(player, "Once");
+                Console.WriteLine("Player once");
+                return Task.CompletedTask;
+            }, TimeSpan.FromSeconds(5));
+        });
+
+        _commandService.AddCommandHandler("scheduler2", (player, args) =>
+        {
+            player.Scheduler.ScheduleJob(() =>
+            {
+                _chatBox.OutputTo(player, "repeat");
+                Console.WriteLine("Player repeat");
+                return Task.CompletedTask;
+            }, TimeSpan.FromSeconds(2));
+        });
     }
 }

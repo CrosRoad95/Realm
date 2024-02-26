@@ -174,6 +174,7 @@ public class RealmPlayer : Player, IDisposable, IPersistentElement
     public IPlayerHudFeature Hud { get; init; }
     public IPlayerInventoryFeature Inventory { get; init; }
     public IPlayerNotificationsFeature Notifications { get; init; }
+    public IPlayerSchedulerFeature Scheduler { get; init; }
     public IScopedElementFactory ElementFactory { get; init; }
     public ElementBag SelectedElements = new();
 
@@ -209,6 +210,7 @@ public class RealmPlayer : Player, IDisposable, IPersistentElement
         Hud = GetRequiredService<IPlayerHudFeature>();
         Inventory = GetRequiredService<IPlayerInventoryFeature>();
         Notifications = GetRequiredService<IPlayerNotificationsFeature>();
+        Scheduler = GetRequiredService<IPlayerSchedulerFeature>();
         ElementFactory = GetRequiredService<IScopedElementFactory>();
         #endregion
 
