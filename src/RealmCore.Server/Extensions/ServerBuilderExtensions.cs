@@ -1,4 +1,6 @@
-﻿namespace RealmCore.Server.Extensions;
+﻿using RealmCore.Server.Modules.Players.PlayTime;
+
+namespace RealmCore.Server.Extensions;
 
 public static class ServerBuilderExtensions
 {
@@ -69,7 +71,8 @@ public static class ServerBuilderExtensions
         serverBuilder.AddScoreboard();
         #endregion
 
-        #region Resources Logics
+        #region Logics
+        serverBuilder.AddLogic<SchedulerLogic>();
         serverBuilder.AddLogic<BrowserGuiLogic>();
         serverBuilder.AddLogic<AdminResourceLogic>();
         serverBuilder.AddLogic<AFKResourceLogic>();
@@ -93,6 +96,7 @@ public static class ServerBuilderExtensions
         serverBuilder.AddLogic<VehicleAccessControllerLogic>();
         serverBuilder.AddLogic<MapsLogic>();
         serverBuilder.AddLogic<PlayersBindsLogic>();
+        serverBuilder.AddLogic<PlayTimeLogic>();
         #endregion
 
         #region Behaviours

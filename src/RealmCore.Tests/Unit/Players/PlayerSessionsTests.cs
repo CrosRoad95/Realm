@@ -33,7 +33,7 @@ public class PlayerSessionsTests : RealmUnitTestingBase
     internal sealed class TestJobSession : JobSession
     {
         public override string Name => "TestJob";
-        public TestJobSession(PlayerContext playerContext, IScopedElementFactory scopedElementFactory, IPeriodicEventDispatcher updateService, IDateTimeProvider dateTimeProvider) : base(playerContext, scopedElementFactory, updateService, dateTimeProvider)
+        public TestJobSession(PlayerContext playerContext, IScopedElementFactory scopedElementFactory, IDateTimeProvider dateTimeProvider) : base(playerContext, scopedElementFactory, dateTimeProvider)
         {
         }
 
@@ -154,7 +154,6 @@ public class PlayerSessionsTests : RealmUnitTestingBase
 
         var destination = new Vector3(400.0f, -82.01953f, 3.914598f);
         myObject.Position = destination;
-        server.ForceUpdate();
         completed.Should().Be(true);
         testJobSession.ObjectiveCount.Should().Be(0);
     }

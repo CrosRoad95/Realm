@@ -1,4 +1,6 @@
-﻿namespace RealmCore.Server.Modules.Vehicles;
+﻿using SlipeServer.Server.Elements;
+
+namespace RealmCore.Server.Modules.Vehicles;
 
 public interface IVehicleMileageCounterFeature : IVehicleFeature
 {
@@ -13,7 +15,6 @@ internal sealed class VehicleMileageCounterFeature : IVehicleMileageCounterFeatu
     private Vector3 _lastPosition;
     private float _mileage;
     private float _minimumDistanceThreshold = 2.0f;
-    private readonly IPeriodicEventDispatcher _updateService;
 
     public event Action<IVehicleMileageCounterFeature, float, float>? Traveled;
 
@@ -45,20 +46,29 @@ internal sealed class VehicleMileageCounterFeature : IVehicleMileageCounterFeatu
 
     public RealmVehicle Vehicle { get; init; }
 
-    public VehicleMileageCounterFeature(VehicleContext vehicleContext, IVehiclePersistenceFeature persistance, IPeriodicEventDispatcher updateService)
+    public VehicleMileageCounterFeature(VehicleContext vehicleContext, IVehiclePersistenceFeature persistance)
     {
-        _updateService = updateService;
         Vehicle = vehicleContext.Vehicle;
         persistance.Loaded += HandleLoaded;
-        _updateService.EveryMinute += HandleRareUpdate;
     }
 
     private void HandleLoaded(IVehiclePersistenceFeature persistance, RealmVehicle vehicle)
     {
         _mileage = persistance.VehicleData.Mileage;
+        vehicle.PositionChanged += HandlePositionChanged;
     }
 
-    public void HandleRareUpdate()
+    private void HandlePositionChanged(Element sender, ElementChangedEventArgs<Vector3> args)
+    {
+        var traveledDistance = Vehicle.Position - _lastPosition;
+        var traveledDistanceNumber = traveledDistance.Length();
+        if (_minimumDistanceThreshold > traveledDistanceNumber)
+            return;
+        _lastPosition = Vehicle.Position;
+        HandleUpdate(traveledDistanceNumber);
+    }
+
+    public void HandleUpdate(float traveledDistance)
     {
         if (Vehicle == null)
             return;
@@ -71,17 +81,12 @@ internal sealed class VehicleMileageCounterFeature : IVehicleMileageCounterFeatu
         if (!Vehicle.IsEngineOn || Vehicle.IsFrozen)
             return;
 
-        var traveledDistance = Vehicle.Position - _lastPosition;
-        var traveledDistanceNumber = traveledDistance.Length();
-        if (_minimumDistanceThreshold > traveledDistanceNumber)
-            return;
-        _lastPosition = Vehicle.Position;
-        _mileage += traveledDistanceNumber;
-        Traveled?.Invoke(this, _mileage, traveledDistanceNumber);
+        _mileage += traveledDistance;
+        Traveled?.Invoke(this, _mileage, traveledDistance);
     }
 
     public void Dispose()
     {
-        _updateService.EveryMinute -= HandleRareUpdate;
+        Vehicle.PositionChanged -= HandlePositionChanged;
     }
 }

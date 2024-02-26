@@ -1,5 +1,4 @@
-﻿using Coravel;
-using RealmCore.Server.Modules.Players.Money;
+﻿using RealmCore.Server.Modules.Players.Money;
 using RealmCore.Server.Modules.Players.Settings;
 using RealmCore.Server.Modules.Search;
 
@@ -100,8 +99,8 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IElementSearchService, ElementSearchService>();
         services.AddSingleton<IBrowserGuiService, BrowserGuiService>();
         services.AddSingleton<IMapsService, MapsService>();
-        services.AddSingleton<IPeriodicEventDispatcher, PeriodicEventDispatcher>();
         services.AddSingleton<IPlayersEventManager, PlayerEventManager>();
+        services.AddSingleton<ISchedulerService, SchedulerService>();
         #endregion
 
         #region Player features
@@ -168,10 +167,6 @@ public static class ServiceCollectionExtensions
         var serverFilesProvider = new ServerFilesProvider("Server");
 #endif
         services.AddSingleton<IServerFilesProvider>(serverFilesProvider);
-
-        #region 3-rd party
-        services.AddScheduler(); // Coravel
-        #endregion
 
         return services;
     }

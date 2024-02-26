@@ -68,13 +68,6 @@ public class RealmTestingServer : TestingServer<RealmTestingPlayer>
         player.TriggerResourceStarted(420);
     }
 
-    public void ForceUpdate()
-    {
-        var updateService = GetRequiredService<IPeriodicEventDispatcher>();
-        updateService.DispatchEverySecond();
-        updateService.DispatchEveryMinute();
-    }
-
     public RealmPlayer CreatePlayer(bool withSerialAndIp = true, string name = "FakePlayer")
     {
         _createPlayerName = name;

@@ -10,6 +10,7 @@ public interface IPlayerPlayTimeFeature : IPlayerFeature
 
     void InternalSetTotalPlayTime(ulong time);
     void Reset();
+    internal void Update();
 }
 
 internal sealed class PlayerPlayTimeFeature : IPlayerPlayTimeFeature, IDisposable
@@ -19,7 +20,6 @@ internal sealed class PlayerPlayTimeFeature : IPlayerPlayTimeFeature, IDisposabl
     private ulong _totalPlayTime = 0;
     private readonly IPlayerUserFeature _playerUserFeature;
     private readonly IDateTimeProvider _dateTimeProvider;
-    private readonly IPeriodicEventDispatcher _updateService;
     private int _lastMinute = 0;
     private int _lastMinuteTotal = -1;
 
@@ -31,16 +31,14 @@ internal sealed class PlayerPlayTimeFeature : IPlayerPlayTimeFeature, IDisposabl
 
     public RealmPlayer Player { get; init; }
 
-    public PlayerPlayTimeFeature(PlayerContext playerContext, IPlayerUserFeature playerUserFeature, IDateTimeProvider dateTimeProvider, IPeriodicEventDispatcher updateService)
+    public PlayerPlayTimeFeature(PlayerContext playerContext, IPlayerUserFeature playerUserFeature, IDateTimeProvider dateTimeProvider)
     {
         Player = playerContext.Player;
         _playerUserFeature = playerUserFeature;
         _dateTimeProvider = dateTimeProvider;
-        _updateService = updateService;
         _startDateTime = _dateTimeProvider.Now;
         _playerUserFeature.SignedIn += HandleSignedIn;
         _playerUserFeature.SignedOut += HandleSignedOut;
-        _updateService.EveryMinute += HandleRareUpdate;
     }
 
     private void HandleSignedIn(IPlayerUserFeature playerUserFeature, RealmPlayer _)
@@ -65,7 +63,7 @@ internal sealed class PlayerPlayTimeFeature : IPlayerPlayTimeFeature, IDisposabl
         _startDateTime = _dateTimeProvider.Now;
     }
 
-    public void HandleRareUpdate()
+    public void Update()
     {
         lock (_lock)
         {
@@ -87,6 +85,5 @@ internal sealed class PlayerPlayTimeFeature : IPlayerPlayTimeFeature, IDisposabl
     {
         _playerUserFeature.SignedIn -= HandleSignedIn;
         _playerUserFeature.SignedOut -= HandleSignedOut;
-        _updateService.EveryMinute -= HandleRareUpdate;
     }
 }

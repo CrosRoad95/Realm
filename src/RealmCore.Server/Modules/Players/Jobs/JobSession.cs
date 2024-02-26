@@ -9,7 +9,6 @@ public abstract class JobSession : Session
     private readonly object _objectivesLock = new();
     private readonly List<Objective> _objectives = [];
     protected readonly IScopedElementFactory _elementFactory;
-    private readonly IPeriodicEventDispatcher _updateService;
     private int _completedObjectives = 0;
     private bool _disposing = false;
 
@@ -19,20 +18,13 @@ public abstract class JobSession : Session
     public event Action<JobSession, Objective>? ObjectiveAdded;
     public event Action<JobSession, Objective>? ObjectiveCompleted;
     public event Action<JobSession, Objective>? ObjectiveInCompleted;
-    public JobSession(PlayerContext playerContext, IScopedElementFactory scopedElementFactory, IPeriodicEventDispatcher updateService, IDateTimeProvider dateTimeProvider) : base(playerContext.Player, dateTimeProvider)
+    public JobSession(PlayerContext playerContext, IScopedElementFactory scopedElementFactory, IDateTimeProvider dateTimeProvider) : base(playerContext.Player, dateTimeProvider)
     {
         _elementFactory = scopedElementFactory.CreateScope();
-        _updateService = updateService;
-    }
-
-    protected override void OnStarted()
-    {
-        _updateService.EverySecond += HandleUpdate;
     }
 
     protected override void OnEnded()
     {
-        _updateService.EverySecond -= HandleUpdate;
         _disposing = true;
 
         _elementFactory?.Dispose();
@@ -46,11 +38,6 @@ public abstract class JobSession : Session
                 RemoveObjective(objective);
             }
         }
-    }
-
-    private void HandleUpdate()
-    {
-        Update();
     }
 
     protected bool RemoveObjective(Objective objective)
@@ -112,15 +99,5 @@ public abstract class JobSession : Session
     {
         ObjectiveInCompleted?.Invoke(this, objective);
         objective.Dispose();
-    }
-
-    public virtual void Update()
-    {
-        List<Objective> objectives;
-        lock (_objectivesLock)
-            objectives = new List<Objective>(_objectives);
-
-        foreach (var item in objectives)
-            item.Update();
     }
 }
