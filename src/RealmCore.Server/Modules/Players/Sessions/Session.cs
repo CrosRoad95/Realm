@@ -5,7 +5,9 @@ public abstract class Session : IDisposable
     public abstract string Name { get; }
     public AtomicBool _disposed = new();
     protected readonly object _lock = new();
+    protected readonly IDateTimeProvider _dateTimeProvider;
     private readonly TimeMeasurement _timeMeasurement;
+    private bool _firstTime = true;
 
     public event Action<Session>? Started;
     public event Action<Session>? Ended;
@@ -13,12 +15,16 @@ public abstract class Session : IDisposable
     public TimeSpan Elapsed => _timeMeasurement.Elapsed;
     public bool IsRunning => _timeMeasurement.IsRunning;
     public RealmPlayer Player { get; private set; }
-    private bool _firstTime = true;
+
+    public DateTime CreatedAt { get; private set; }
+    public DateTime? StartedAt { get; private set; }
 
     public Session(RealmPlayer player, IDateTimeProvider dateTimeProvider)
     {
         Player = player;
+        _dateTimeProvider = dateTimeProvider;
         _timeMeasurement = new(dateTimeProvider);
+        CreatedAt = _dateTimeProvider.Now;
     }
 
     protected virtual void OnStarted() { }
@@ -31,6 +37,8 @@ public abstract class Session : IDisposable
 
         if (_timeMeasurement.TryStart())
         {
+            StartedAt ??= _dateTimeProvider.Now;
+
             Started?.Invoke(this);
             if (_firstTime)
             {
