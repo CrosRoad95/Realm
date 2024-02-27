@@ -17,6 +17,7 @@ public abstract class Db<T> : IdentityDbContext<UserData, RoleData, int,
     public DbSet<VehicleFuelData> VehicleFuels => Set<VehicleFuelData>();
     public DbSet<DailyVisitsData> DailyVisits => Set<DailyVisitsData>();
     public DbSet<UserStatData> UserStats => Set<UserStatData>();
+    public DbSet<UserGtaStatData> UserGtaStats => Set<UserGtaStatData>();
     public DbSet<JobStatisticsData> JobPoints => Set<JobStatisticsData>();
     public DbSet<JobUpgradeData> JobUpgrades => Set<JobUpgradeData>();
     public DbSet<AchievementData> Achievements => Set<AchievementData>();
@@ -115,6 +116,11 @@ public abstract class Db<T> : IdentityDbContext<UserData, RoleData, int,
 
             entityBuilder
                 .HasMany(x => x.Stats)
+                .WithOne()
+                .HasForeignKey(x => x.UserId);
+
+            entityBuilder
+                .HasMany(x => x.GtaSaStats)
                 .WithOne()
                 .HasForeignKey(x => x.UserId);
             //.OnDelete(DeleteBehavior.Cascade);
@@ -296,6 +302,13 @@ public abstract class Db<T> : IdentityDbContext<UserData, RoleData, int,
         {
             entityBuilder
                 .ToTable(nameof(UserStats))
+                .HasKey(x => new { x.UserId, x.StatId });
+        });
+        
+        modelBuilder.Entity<UserGtaStatData>(entityBuilder =>
+        {
+            entityBuilder
+                .ToTable(nameof(UserGtaStats))
                 .HasKey(x => new { x.UserId, x.StatId });
         });
 

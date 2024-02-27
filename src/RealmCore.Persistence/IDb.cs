@@ -23,6 +23,7 @@ public interface IDb : IDisposable
     DbSet<VehicleFuelData> VehicleFuels { get; }
     DbSet<DailyVisitsData> DailyVisits { get; }
     DbSet<UserStatData> UserStats { get; }
+    DbSet<UserGtaStatData> UserGtaStats { get; }
     DbSet<JobUpgradeData> JobUpgrades { get; }
     DbSet<AchievementData> Achievements { get; }
     DbSet<GroupData> Groups { get; }

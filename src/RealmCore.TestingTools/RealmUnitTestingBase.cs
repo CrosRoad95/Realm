@@ -131,6 +131,8 @@ public class TestDb : IDb
 
     public DbSet<NewsTagData> NewsTags => throw new NotSupportedException();
 
+    public DbSet<UserGtaStatData> UserGtaStats => throw new NotImplementedException();
+
     public event EventHandler<SavedChangesEventArgs>? SavedChanges;
 
     public EntityEntry Attach(object entity)

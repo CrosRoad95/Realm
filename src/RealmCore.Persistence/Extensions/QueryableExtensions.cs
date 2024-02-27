@@ -26,6 +26,7 @@ public static class QueryableExtensions
             .Include(x => x.Achievements)
             .Include(x => x.DailyVisits)
             .Include(x => x.Stats)
+            .Include(x => x.GtaSaStats)
             .Include(x => x.Discoveries)
             .Include(x => x.GroupMembers)
             .Include(x => x.FractionMembers)

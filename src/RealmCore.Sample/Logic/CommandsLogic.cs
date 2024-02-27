@@ -2,6 +2,7 @@
 using RealmCore.Sample.HudLayers;
 using RealmCore.Server.Modules.Players.Money;
 using RealmCore.Server.Modules.Search;
+using SlipeServer.Packets.Enums;
 using System.Media;
 using Color = System.Drawing.Color;
 
@@ -1725,6 +1726,12 @@ internal sealed class CommandsLogic
                 Console.WriteLine("Player repeat");
                 return Task.CompletedTask;
             }, TimeSpan.FromSeconds(2));
+        });
+
+        _commandService.AddCommandHandler("setstat", (player, args) =>
+        {
+            player.Statistics.SetGtaSa(PedStat.BIKE_SKILL, 999);
+            player.Statistics.SetGtaSa(PedStat.CYCLE_SKILL, 999);
         });
     }
 }

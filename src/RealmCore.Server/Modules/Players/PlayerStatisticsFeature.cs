@@ -3,6 +3,7 @@
 public interface IPlayerStatisticsFeature : IPlayerFeature, IEnumerable<UserStatDto>
 {
     IReadOnlyList<int> StatsIds { get; }
+    IReadOnlyList<int> GtaSaStatsIds { get; }
 
     event Action<IPlayerStatisticsFeature, int, float>? Decreased;
     event Action<IPlayerStatisticsFeature, int, float>? Increased;
@@ -11,6 +12,8 @@ public interface IPlayerStatisticsFeature : IPlayerFeature, IEnumerable<UserStat
     void Decrease(int statId, float value = 1);
     void Set(int statId, float value);
     float Get(int statId);
+    void SetGtaSa(PedStat statId, float value);
+    float GetGtaSa(PedStat statId);
 }
 
 internal sealed class PlayerStatisticsFeature : IPlayerStatisticsFeature, IDisposable
@@ -18,6 +21,7 @@ internal sealed class PlayerStatisticsFeature : IPlayerStatisticsFeature, IDispo
     private readonly object _lock = new();
     private readonly IPlayerUserFeature _playerUserFeature;
     private ICollection<UserStatData> _stats = [];
+    private ICollection<UserGtaStatData> _gtaSaStats = [];
 
     public event Action<IPlayerStatisticsFeature, int, float>? Decreased;
     public event Action<IPlayerStatisticsFeature, int, float>? Increased;
@@ -27,6 +31,15 @@ internal sealed class PlayerStatisticsFeature : IPlayerStatisticsFeature, IDispo
         {
             lock (_lock)
                 return _stats.Select(x => x.StatId).ToList();
+        }
+    }
+
+    public IReadOnlyList<int> GtaSaStatsIds
+    {
+        get
+        {
+            lock (_lock)
+                return _gtaSaStats.Select(x => x.StatId).ToList();
         }
     }
 
@@ -43,13 +56,30 @@ internal sealed class PlayerStatisticsFeature : IPlayerStatisticsFeature, IDispo
     private void HandleSignedIn(IPlayerUserFeature playerUserFeature, RealmPlayer _)
     {
         lock (_lock)
+        {
             _stats = playerUserFeature.UserData.Stats;
+            _gtaSaStats = playerUserFeature.UserData.GtaSaStats;
+
+            foreach (var gtaSaStat in _gtaSaStats)
+            {
+                Player.SetStat((PedStat)gtaSaStat.StatId, gtaSaStat.Value);
+            }
+        }
     }
 
     private void HandleSignedOut(IPlayerUserFeature playerUserFeature, RealmPlayer _)
     {
         lock (_lock)
+        {
             _stats = [];
+
+            foreach (var gtaSaStat in _gtaSaStats)
+            {
+                Player.SetStat((PedStat)gtaSaStat.StatId, 0);
+            }
+
+            _gtaSaStats = [];
+        }
     }
 
     private UserStatData GetStatById(int id)
@@ -63,6 +93,23 @@ internal sealed class PlayerStatisticsFeature : IPlayerStatisticsFeature, IDispo
                 Value = 0
             };
             _stats.Add(stat);
+            _playerUserFeature.IncreaseVersion();
+            return stat;
+        }
+        return stat;
+    }
+    
+    private UserGtaStatData GetGtaSaStatById(PedStat id)
+    {
+        var stat = _gtaSaStats.FirstOrDefault(x => x.StatId == (int)id);
+        if (stat == null)
+        {
+            stat = new UserGtaStatData
+            {
+                StatId = (int)id,
+                Value = 0
+            };
+            _gtaSaStats.Add(stat);
             _playerUserFeature.IncreaseVersion();
             return stat;
         }
@@ -118,6 +165,27 @@ internal sealed class PlayerStatisticsFeature : IPlayerStatisticsFeature, IDispo
             return stat.Value;
         }
     }
+    
+    public void SetGtaSa(PedStat statId, float value)
+    {
+        lock (_lock)
+        {
+            var stat = GetGtaSaStatById(statId);
+            var old = stat.Value;
+            stat.Value = value;
+            Player.SetStat(statId, value);
+            _playerUserFeature.IncreaseVersion();
+        }
+    }
+
+    public float GetGtaSa(PedStat statId)
+    {
+        lock (_lock)
+        {
+            var stat = GetGtaSaStatById(statId);
+            return stat.Value;
+        }
+    }
 
     public IEnumerator<UserStatDto> GetEnumerator()
     {
@@ -132,6 +200,7 @@ internal sealed class PlayerStatisticsFeature : IPlayerStatisticsFeature, IDispo
         lock (_lock)
         {
             _stats = [];
+            _gtaSaStats = [];
         }
     }
 }
