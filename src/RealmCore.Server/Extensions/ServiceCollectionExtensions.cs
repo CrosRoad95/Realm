@@ -97,6 +97,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IPlayerMoneyHistoryService, PlayerMoneyHistoryService>();
         services.AddScoped<IScopedMapsService, ScopedMapService>();
         services.AddScoped<IElementSearchService, ElementSearchService>();
+        services.AddScoped<IPlayerUserService, PlayerUserService>();
         services.AddSingleton<IBrowserGuiService, BrowserGuiService>();
         services.AddSingleton<IMapsService, MapsService>();
         services.AddSingleton<IPlayersEventManager, PlayerEventManager>();

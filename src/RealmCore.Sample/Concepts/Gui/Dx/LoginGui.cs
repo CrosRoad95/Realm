@@ -33,7 +33,7 @@ public sealed class LoginGui : DxGui, IGuiHandlers
                     return;
                 }
 
-                var user = await _userManager.GetUserByUserName(loginData.Login, _dateTimeProvider.Now);
+                var user = await Player.GetRequiredService<IPlayerUserService>().GetUserByUserName(loginData.Login, _dateTimeProvider.Now);
 
                 if (user == null)
                 {

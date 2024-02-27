@@ -41,7 +41,7 @@ internal sealed class PlayerGroupsFeature : IPlayerGroupsFeature
         try
         {
             var group = _groupMembers.FirstOrDefault(x => x.GroupId == groupMemberData.GroupId);
-            if (group == null)
+            if (group != null)
                 return false;
 
             _groupMembers.Add(groupMemberData);
@@ -84,7 +84,6 @@ internal sealed class PlayerGroupsFeature : IPlayerGroupsFeature
             _lock.Release();
         }
     }
-
 
     public GroupMemberData? GetMemberOrDefault(int groupId)
     {

@@ -50,7 +50,11 @@ public class RealmServer<TRealmPlayer> : MtaServer<TRealmPlayer> where TRealmPla
         var logger = GetRequiredService<ILogger<RealmServer>>();
         await GetRequiredService<IDb>().MigrateAsync();
         await GetRequiredService<IFractionService>().LoadFractions(cancellationToken);
-        await GetRequiredService<SeederServerBuilder>().Build(cancellationToken);
+
+        {
+            using var seederServerBuilder = GetRequiredService<SeederServerBuilder>();
+            await seederServerBuilder.Build(cancellationToken);
+        }
         await GetRequiredService<ILoadService>().LoadAll(cancellationToken);
 
         var gameplayOptions = GetRequiredService<IOptions<GameplayOptions>>();

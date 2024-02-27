@@ -104,19 +104,18 @@ public class RealmTestingServer : TestingServer<RealmTestingPlayer>
 
     public async Task<RealmPlayer> SignInPlayer(RealmPlayer player)
     {
-        var userManager = GetRequiredService<UserManager<UserData>>();
-        var user = await userManager.GetUserByUserName(player.Name, DateTimeProvider.Now);
+        var user = await player.GetRequiredService<IPlayerUserService>().GetUserByUserName(player.Name, DateTimeProvider.Now);
 
         if (user == null)
         {
-            user = new UserData
-            {
-                UserName = player.Name,
-                Upgrades = new List<UserUpgradeData>(),
-                DailyVisits = new(),
-            };
-            await userManager.CreateAsync(user);
+            await GetRequiredService<IUsersService>().SignUp(player.Name, "asdASD123!@#");
+
+            user = await player.GetRequiredService<IPlayerUserService>().GetUserByUserName(player.Name, DateTimeProvider.Now);
         }
+
+        if (user == null)
+            throw new InvalidOperationException();
+
         var success = await player.GetRequiredService<IUsersService>().SignIn(player, user);
         success.Should().BeTrue();
         return player;

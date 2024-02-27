@@ -20,8 +20,6 @@ public class PlayerNotificationsTests : RealmIntegrationTestingBase
         player.Notifications.Count().Should().Be(1);
         var notification = player.Notifications.First();
 
-        var now = server.DateTimeProvider.Now;
-
         notification.Should().BeEquivalentTo(new UserNotificationDto
         {
             Id = 1,

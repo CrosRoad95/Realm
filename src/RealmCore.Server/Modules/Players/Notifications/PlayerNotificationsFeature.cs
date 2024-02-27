@@ -63,6 +63,7 @@ internal sealed class PlayerNotificationsFeature : IPlayerNotificationsFeature, 
         _lock.Wait();
         try
         {
+            _userNotificationDataList.Add(userNotificationData);
             Created?.Invoke(this, UserNotificationDto.Map(userNotificationData));
         }
         finally

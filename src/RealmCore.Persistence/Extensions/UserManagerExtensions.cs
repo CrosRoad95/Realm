@@ -89,15 +89,6 @@ public static class UserManagerExtensions
         return await query.FirstOrDefaultAsync(cancellationToken);
     }
 
-    public static async Task<UserData?> GetUserByUserName(this UserManager<UserData> userManager, string userName, DateTime now, CancellationToken cancellationToken = default)
-    {
-        var query = userManager.Users
-            .TagWithSource(nameof(UserManagerExtensions))
-            .IncludeAll(now)
-            .Where(u => u.UserName == userName);
-        return await query.FirstOrDefaultAsync(cancellationToken);
-    }
-
     public static async Task<UserData?> GetUserByLoginCaseInsensitive(this UserManager<UserData> userManager, string login, DateTime now, CancellationToken cancellationToken = default)
     {
         var query = userManager.Users

@@ -20,7 +20,6 @@ internal sealed class PlayersNotifications : IPlayersNotifications
     private readonly IUserNotificationRepository _userNotificationRepository;
     private readonly IDateTimeProvider _dateTimeProvider;
     private readonly IUsersInUse _usersInUse;
-    private ICollection<UserNotificationData> _userNotificationDataList = [];
 
     public event Action<UserNotificationDto>? Created;
     public event Action<UserNotificationDto>? Read;
