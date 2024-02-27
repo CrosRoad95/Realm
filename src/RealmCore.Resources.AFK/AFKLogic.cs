@@ -10,14 +10,14 @@ internal class AFKLogic
     private readonly IAFKService _AFKService;
     private readonly AFKResource _resource;
 
-    public AFKLogic(MtaServer mtaServer, LuaEventService luaEventService, IAFKService AFKService)
+    public AFKLogic(MtaServer server, LuaEventService luaEventService, IAFKService AFKService)
     {
         luaEventService.AddEventHandler("internalAFKStart", HandleAFKStart);
         luaEventService.AddEventHandler("internalAFKStop", HandleAFKStop);
         _AFKService = AFKService;
-        _resource = mtaServer.GetAdditionalResource<AFKResource>();
+        _resource = server.GetAdditionalResource<AFKResource>();
 
-        mtaServer.PlayerJoined += HandlePlayerJoin;
+        server.PlayerJoined += HandlePlayerJoin;
     }
 
     private void HandlePlayerJoin(Player player)

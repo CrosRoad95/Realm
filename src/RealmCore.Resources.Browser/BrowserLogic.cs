@@ -5,27 +5,25 @@ using SlipeServer.Server.Services;
 
 namespace RealmCore.Resources.Browser;
 
-internal class BrowserLogic
+internal sealed class BrowserLogic
 {
     private readonly IBrowserService _browserService;
     private readonly ILogger<BrowserLogic> _logger;
     private readonly ILuaEventHub<IBrowserEventHub> _luaEventHub;
-    private readonly FromLuaValueMapper _fromLuaValueMapper;
     private readonly IOptions<BrowserOptions> _browserOptions;
     private readonly BrowserResource _resource;
 
-    public BrowserLogic(MtaServer mtaServer, LuaEventService luaEventService, IBrowserService BrowserService,
-        ILogger<BrowserLogic> logger, ILuaEventHub<IBrowserEventHub> luaEventHub, FromLuaValueMapper fromLuaValueMapper, IOptions<BrowserOptions> browserOptions)
+    public BrowserLogic(MtaServer server, LuaEventService luaEventService, IBrowserService BrowserService,
+        ILogger<BrowserLogic> logger, ILuaEventHub<IBrowserEventHub> luaEventHub, IOptions<BrowserOptions> browserOptions)
     {
         luaEventService.AddEventHandler("internalBrowserCreated", HandleBrowserCreated);
         luaEventService.AddEventHandler("internalBrowserDocumentReady", HandleBrowserDocumentReady);
         _browserService = BrowserService;
         _logger = logger;
         _luaEventHub = luaEventHub;
-        _fromLuaValueMapper = fromLuaValueMapper;
         _browserOptions = browserOptions;
-        _resource = mtaServer.GetAdditionalResource<BrowserResource>();
-        mtaServer.PlayerJoined += HandlePlayerJoin;
+        _resource = server.GetAdditionalResource<BrowserResource>();
+        server.PlayerJoined += HandlePlayerJoin;
         BrowserService.MessageHandler = HandleMessage;
     }
 

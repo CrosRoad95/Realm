@@ -1,19 +1,22 @@
 ﻿namespace RealmCore.Sample.Logic;
 
-internal sealed class AchievementsLogic
+internal sealed class AchievementsLogic : PlayerLogic
 {
     private readonly IOverlayService _overlayService;
 
-    public AchievementsLogic(MtaServer mtaServer, IOverlayService overlayService)
+    public AchievementsLogic(MtaServer server, IOverlayService overlayService) : base(server)
     {
-        mtaServer.PlayerJoined += HandlePlayerJoined;
         _overlayService = overlayService;
     }
 
-    private void HandlePlayerJoined(Player plr)
+    protected override void PlayerJoined(RealmPlayer player)
     {
-        var player = (RealmPlayer)plr;
         player.Achievements.Unlocked += HandleUnlocked;
+    }
+
+    protected override void PlayerLeft(RealmPlayer player)
+    {
+        player.Achievements.Unlocked -= HandleUnlocked;
     }
 
     private void HandleUnlocked(IPlayerAchievementsFeature achievementService, int achievementId)

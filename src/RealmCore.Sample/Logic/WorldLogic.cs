@@ -24,11 +24,11 @@ internal class WorldLogic
     private readonly IElementFactory _elementFactory;
     private readonly IOverlayService _overlayService;
 
-    public WorldLogic(IElementFactory elementFactory, MtaServer mtaServer)
+    public WorldLogic(IElementFactory elementFactory, MtaServer server)
     {
         _elementFactory = elementFactory;
         HandleServerStarted();
-        mtaServer.PlayerJoined += HandlePlayerJoined;
+        server.PlayerJoined += HandlePlayerJoined;
     }
 
     private void HandlePlayerJoined(Player plr)

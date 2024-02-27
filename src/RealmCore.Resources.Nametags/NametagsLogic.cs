@@ -10,15 +10,15 @@ internal class NametagsLogic
     private readonly ILuaEventHub<INametagsEventHub> _luaEventHub;
     private readonly NametagsResource _resource;
     private readonly object _lock = new();
-    private LuaValue _nametagsCache = new(new Dictionary<LuaValue, LuaValue>());
+    private readonly LuaValue _nametagsCache = new(new Dictionary<LuaValue, LuaValue>());
 
-    public NametagsLogic(MtaServer mtaServer, INametagsService nametagsService, ILogger<NametagsLogic> logger, ILuaEventHub<INametagsEventHub> luaEventHub)
+    public NametagsLogic(MtaServer server, INametagsService nametagsService, ILogger<NametagsLogic> logger, ILuaEventHub<INametagsEventHub> luaEventHub)
     {
         _logger = logger;
         _luaEventHub = luaEventHub;
-        _resource = mtaServer.GetAdditionalResource<NametagsResource>();
+        _resource = server.GetAdditionalResource<NametagsResource>();
 
-        mtaServer.PlayerJoined += HandlePlayerJoin;
+        server.PlayerJoined += HandlePlayerJoin;
 
         nametagsService.HandleSetNametag = HandleSetNametag;
         nametagsService.HandleRemoveNametag = HandleRemoveNametag;

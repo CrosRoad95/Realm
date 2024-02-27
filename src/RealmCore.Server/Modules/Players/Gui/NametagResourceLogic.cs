@@ -4,9 +4,9 @@ internal sealed class NametagResourceLogic
 {
     private readonly INametagsService _nametagsService;
 
-    public NametagResourceLogic(MtaServer mtaServer, INametagsService nametagsService)
+    public NametagResourceLogic(MtaServer server, INametagsService nametagsService)
     {
-        mtaServer.PlayerJoined += HandlePlayerJoined;
+        server.PlayerJoined += HandlePlayerJoined;
         _nametagsService = nametagsService;
     }
 

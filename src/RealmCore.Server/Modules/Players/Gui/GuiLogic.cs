@@ -1,6 +1,6 @@
 ﻿namespace RealmCore.Server.Modules.Players.Gui;
 
-internal class GuiLogic
+internal sealed class GuiLogic
 {
     private readonly IElementCollection _elementCollection;
 

@@ -212,8 +212,7 @@ internal sealed class CommandsLogic
 
         _commandService.AddCommandHandler("accessinfo", (player, args) =>
         {
-            var vehicle = player.Vehicle as RealmVehicle;
-            if (vehicle == null)
+            if (player.Vehicle is not RealmVehicle vehicle)
             {
                 _chatBox.OutputTo(player, "Enter vehicle!");
                 return;
@@ -327,7 +326,7 @@ internal sealed class CommandsLogic
         {
             var amount = args.ReadUInt();
             player.Level.GiveExperience(amount);
-            _chatBox.OutputTo(player, $"gave experience: {amount}, level: {player.Level.Level}, experience: {player.Level.Experience}");
+            _chatBox.OutputTo(player, $"gave experience: {amount}, level: {player.Level.Current}, experience: {player.Level.Experience}");
         });
 
         _commandService.AddCommandHandler("cvforsale", (player, args) =>

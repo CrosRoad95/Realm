@@ -52,11 +52,11 @@ public sealed class RealmCommandService
     public List<string> CommandNames => _commands.Keys.Concat(_commands.Keys).ToList();
     public int Count => _commands.Count;
 
-    public RealmCommandService(ILogger<RealmCommandService> logger, ChatBox chatBox, MtaServer mtaServer, IEnumerable<IInGameCommand> inGameCommands)
+    public RealmCommandService(ILogger<RealmCommandService> logger, ChatBox chatBox, MtaServer server, IEnumerable<IInGameCommand> inGameCommands)
     {
         _logger = logger;
         _chatBox = chatBox;
-        mtaServer.PlayerJoined += HandlePlayerJoined;
+        server.PlayerJoined += HandlePlayerJoined;
 
         foreach (var inGameCommand in inGameCommands)
         {

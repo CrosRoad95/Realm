@@ -5,7 +5,7 @@ internal sealed class ReactiveDxGuiLogic : PlayerLogic
     private readonly IGuiSystemService _guiSystemService;
     private readonly LuaValueMapper _luaValueMapper;
 
-    public ReactiveDxGuiLogic(MtaServer mtaServer, IGuiSystemService guiSystemService, LuaValueMapper luaValueMapper) : base(mtaServer)
+    public ReactiveDxGuiLogic(MtaServer server, IGuiSystemService guiSystemService, LuaValueMapper luaValueMapper) : base(server)
     {
         _guiSystemService = guiSystemService;
         _luaValueMapper = luaValueMapper;

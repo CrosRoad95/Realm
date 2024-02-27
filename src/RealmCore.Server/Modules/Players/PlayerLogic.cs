@@ -1,10 +1,15 @@
-﻿namespace RealmCore.Server.Modules.Players;
+﻿using SlipeServer.Server;
+
+namespace RealmCore.Server.Modules.Players;
 
 public abstract class PlayerLogic
 {
-    public PlayerLogic(MtaServer mtaServer)
+    protected readonly MtaServer _server;
+
+    public PlayerLogic(MtaServer server)
     {
-        mtaServer.PlayerJoined += HandlePlayerJoined;
+        server.PlayerJoined += HandlePlayerJoined;
+        _server = server;
     }
 
     private void HandlePlayerJoined(Player plr)

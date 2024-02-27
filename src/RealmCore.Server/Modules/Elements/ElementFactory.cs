@@ -2,15 +2,15 @@
 
 public class ElementFactory : IElementFactory
 {
-    private readonly MtaServer _mtaServer;
+    private readonly MtaServer _server;
     private readonly IServiceProvider _serviceProvider;
 
     public event Action<Element>? ElementCreated;
-    public ElementFactory(MtaServer mtaServer, IServiceProvider serviceProvider)
+    public ElementFactory(MtaServer server, IServiceProvider serviceProvider)
     {
-        _mtaServer = mtaServer;
+        _server = server;
         _serviceProvider = serviceProvider;
-        _mtaServer.PlayerJoined += HandlePlayerJoined;
+        _server.PlayerJoined += HandlePlayerJoined;
     }
 
     private void HandlePlayerJoined(Player player)
@@ -25,15 +25,15 @@ public class ElementFactory : IElementFactory
 
     public void AssociateWithServer(Element element)
     {
-        element.AssociateWith(_mtaServer);
+        element.AssociateWith(_server);
         if (element is Pickup pickup)
         {
-            pickup.CollisionShape.AssociateWith(_mtaServer);
+            pickup.CollisionShape.AssociateWith(_server);
             RelayCreated(pickup.CollisionShape);
         }
         if (element is RealmMarker marker)
         {
-            marker.CollisionShape.AssociateWith(_mtaServer);
+            marker.CollisionShape.AssociateWith(_server);
             RelayCreated(marker.CollisionShape);
         }
         RelayCreated(element);

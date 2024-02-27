@@ -8,7 +8,7 @@ using SlipeServer.Server.Services;
 
 namespace RealmCore.Resources.Admin;
 
-internal class AdminLogic
+internal sealed class AdminLogic
 {
     private readonly AdminResource _resource;
     private readonly LuaEventService _luaEventService;
@@ -22,10 +22,10 @@ internal class AdminLogic
     private readonly object _enabledForPlayersLock = new();
     private readonly List<Player> _enabledForPlayers = [];
 
-    public AdminLogic(MtaServer mtaServer, LuaEventService luaEventService, IAdminService adminService, IElementCollection elementCollection, ILuaEventHub<IAdminEventHub> luaEventHub, FromLuaValueMapper fromLuaValueMapper, LuaValueMapper luaValueMapper)
+    public AdminLogic(MtaServer server, LuaEventService luaEventService, IAdminService adminService, IElementCollection elementCollection, ILuaEventHub<IAdminEventHub> luaEventHub, FromLuaValueMapper fromLuaValueMapper, LuaValueMapper luaValueMapper)
     {
-        mtaServer.PlayerJoined += HandlePlayerJoin;
-        _resource = mtaServer.GetAdditionalResource<AdminResource>();
+        server.PlayerJoined += HandlePlayerJoin;
+        _resource = server.GetAdditionalResource<AdminResource>();
         _luaEventService = luaEventService;
         _adminService = adminService;
         _elementCollection = elementCollection;

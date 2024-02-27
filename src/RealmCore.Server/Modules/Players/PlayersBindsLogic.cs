@@ -4,7 +4,7 @@ internal sealed class PlayersBindsLogic : PlayerLogic
 {
     private readonly ILogger<PlayersBindsLogic> _logger;
 
-    public PlayersBindsLogic(MtaServer mtaServer, ILogger<PlayersBindsLogic> logger) : base(mtaServer)
+    public PlayersBindsLogic(MtaServer server, ILogger<PlayersBindsLogic> logger) : base(server)
     {
         _logger = logger;
     }

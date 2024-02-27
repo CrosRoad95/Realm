@@ -4,15 +4,15 @@
 internal class ServerInfoCommand : IInGameCommand
 {
     private readonly ILogger<HelpCommand> _logger;
-    private readonly MtaServer _mtaServer;
+    private readonly MtaServer _server;
     private readonly IDateTimeProvider _dateTimeProvider;
     private readonly IElementCollection _elementCollection;
     private readonly IMapsService _mapsService;
 
-    public ServerInfoCommand(ILogger<HelpCommand> logger, MtaServer mtaServer, IDateTimeProvider dateTimeProvider, IElementCollection elementCollection, IMapsService mapsService)
+    public ServerInfoCommand(ILogger<HelpCommand> logger, MtaServer server, IDateTimeProvider dateTimeProvider, IElementCollection elementCollection, IMapsService mapsService)
     {
         _logger = logger;
-        _mtaServer = mtaServer;
+        _server = server;
         _dateTimeProvider = dateTimeProvider;
         _elementCollection = elementCollection;
         _mapsService = mapsService;
@@ -20,7 +20,7 @@ internal class ServerInfoCommand : IInGameCommand
 
     public Task Handle(RealmPlayer player, CommandArguments args, CancellationToken cancellationToken)
     {
-        _logger.LogInformation("Server uptime: {uptime}", _dateTimeProvider.Now - _mtaServer.StartDatetime);
+        _logger.LogInformation("Server uptime: {uptime}", _dateTimeProvider.Now - _server.StartDatetime);
         _logger.LogInformation("Players: {playerCount}, logged in players: {loggedInPlayers}", _elementCollection.GetByType<RealmPlayer>().Count(), _elementCollection.GetByType<RealmPlayer>().Where(x => x.User.IsSignedIn).Count());
         _logger.LogInformation("Vehicles: {vehiclesCount}", _elementCollection.GetByType<RealmVehicle>());
         _logger.LogInformation("Elements count: {elementsCount}", _elementCollection.Count);

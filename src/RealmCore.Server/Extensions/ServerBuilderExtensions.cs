@@ -81,7 +81,7 @@ public static class ServerBuilderExtensions
         serverBuilder.AddLogic<NametagResourceLogic>();
         serverBuilder.AddLogic<StatisticsCounterResourceLogic>();
         serverBuilder.AddLogic<WatermarkResourceLogic>();
-        serverBuilder.AddLogic<PlayerAdministrationServiceLogic>();
+        serverBuilder.AddLogic<AdministrationLogic>();
         serverBuilder.AddLogic<FocusableElementsLogic>();
         serverBuilder.AddLogic<PlayerHudLogic>();
         serverBuilder.AddLogic<VehiclesTuningLogic>();
@@ -92,7 +92,6 @@ public static class ServerBuilderExtensions
         serverBuilder.AddLogic<PlayersLogic>();
         serverBuilder.AddLogic<GuiLogic>();
         serverBuilder.AddLogic<ServerLogic>();
-        serverBuilder.AddLogic<VehicleEnginesCollectionLogic>();
         serverBuilder.AddLogic<VehicleAccessControllerLogic>();
         serverBuilder.AddLogic<MapsLogic>();
         serverBuilder.AddLogic<PlayersBindsLogic>();

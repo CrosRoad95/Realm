@@ -2,14 +2,14 @@
 
 internal sealed class ServerLogic
 {
-    private readonly MtaServer _mtaServer;
+    private readonly MtaServer _server;
     private readonly IOptionsMonitor<GameplayOptions> _gameplayOptions;
     private readonly IOptionsMonitor<ServerListOptions> _serverListOptions;
     private readonly ILogger<ServerLogic> _logger;
 
-    public ServerLogic(MtaServer mtaServer, IOptionsMonitor<GameplayOptions> gameplayOptions, IOptionsMonitor<ServerListOptions> serverListOptions, ILogger<ServerLogic> logger)
+    public ServerLogic(MtaServer server, IOptionsMonitor<GameplayOptions> gameplayOptions, IOptionsMonitor<ServerListOptions> serverListOptions, ILogger<ServerLogic> logger)
     {
-        _mtaServer = mtaServer;
+        _server = server;
         _gameplayOptions = gameplayOptions;
         _serverListOptions = serverListOptions;
         _logger = logger;
@@ -23,21 +23,21 @@ internal sealed class ServerLogic
     private void UpdateGameplayOptions(bool firstUpdate = false)
     {
         if (!string.IsNullOrWhiteSpace(_gameplayOptions.CurrentValue.Password))
-            _mtaServer.Password = _gameplayOptions.CurrentValue.Password;
+            _server.Password = _gameplayOptions.CurrentValue.Password;
         else
-            _mtaServer.Password = null;
+            _server.Password = null;
 
         if (!firstUpdate)
-            _logger.LogInformation("Gameplay options updated. Password={serverPassword}", _mtaServer.Password);
+            _logger.LogInformation("Gameplay options updated. Password={serverPassword}", _server.Password);
     }
 
     private void UpdateServerListOptions(bool firstUpdate = false)
     {
-        _mtaServer.GameType = _serverListOptions.CurrentValue.GameType;
-        _mtaServer.MapName = _serverListOptions.CurrentValue.MapName;
+        _server.GameType = _serverListOptions.CurrentValue.GameType;
+        _server.MapName = _serverListOptions.CurrentValue.MapName;
 
         if (!firstUpdate)
-            _logger.LogInformation("Server list options updated. GameType={gameType}, MapName={mapName}", _mtaServer.GameType, _mtaServer.MapName);
+            _logger.LogInformation("Server list options updated. GameType={gameType}, MapName={mapName}", _server.GameType, _server.MapName);
     }
 
     private void GameplayOptionsChanged(GameplayOptions gameplayOptions)

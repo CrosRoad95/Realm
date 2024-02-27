@@ -3,12 +3,10 @@
 internal sealed class BoneAttachResourceLogic : PlayerLogic
 {
     private readonly BoneAttachService _boneAttachService;
-    private readonly MtaServer _mtaServer;
 
-    public BoneAttachResourceLogic(BoneAttachService boneAttachService, MtaServer mtaServer) : base(mtaServer)
+    public BoneAttachResourceLogic(BoneAttachService boneAttachService, MtaServer server) : base(server)
     {
         _boneAttachService = boneAttachService;
-        _mtaServer = mtaServer;
     }
 
     protected override void PlayerJoined(RealmPlayer player)

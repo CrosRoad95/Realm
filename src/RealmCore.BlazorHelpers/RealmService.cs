@@ -9,8 +9,8 @@ internal sealed class RealmService<T> : IRealmService<T> where T : notnull
 {
     public T Service { get; private set; }
 
-    public RealmService(MtaServer mtaServer)
+    public RealmService(MtaServer server)
     {
-        Service = mtaServer.GetRequiredService<T>();
+        Service = server.GetRequiredService<T>();
     }
 }

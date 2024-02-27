@@ -1,24 +1,22 @@
 ﻿namespace RealmCore.Server.Modules.Players.Administration;
 
-internal sealed class PlayerAdministrationServiceLogic
+internal sealed class AdministrationLogic : PlayerLogic
 {
     private readonly NoClipService _noClipService;
     private readonly DebugLog _debugLog;
     private readonly IClientInterfaceService _clientInterfaceService;
     private readonly IAdminService _adminService;
 
-    public PlayerAdministrationServiceLogic(MtaServer mtaServer, NoClipService noClipService, DebugLog debugLog, IClientInterfaceService clientInterfaceService, IAdminService adminService)
+    public AdministrationLogic(MtaServer server, NoClipService noClipService, DebugLog debugLog, IClientInterfaceService clientInterfaceService, IAdminService adminService) : base(server)
     {
         _noClipService = noClipService;
         _debugLog = debugLog;
         _clientInterfaceService = clientInterfaceService;
         _adminService = adminService;
-        mtaServer.PlayerJoined += HandlePlayerJoined;
     }
 
-    private void HandlePlayerJoined(Player plr)
+    protected override void PlayerJoined(RealmPlayer player)
     {
-        var player = (RealmPlayer)plr;
         var admin = player.Admin;
 
         admin.NoClipStateChanged += HandleNoClipStateChanged;
@@ -26,6 +24,17 @@ internal sealed class PlayerAdministrationServiceLogic
         admin.DevelopmentModeStateChanged += HandleDevelopmentModeStateChanged;
         admin.InteractionDebugRenderingStateChanged += HandleInteractionDebugRenderingStateChanged;
         admin.AdminModeChanged += HandleAdminModeChanged;
+    }
+
+    protected override void PlayerLeft(RealmPlayer player)
+    {
+        var admin = player.Admin;
+
+        admin.NoClipStateChanged -= HandleNoClipStateChanged;
+        admin.DebugViewStateChanged -= HandleDebugViewStateChanged;
+        admin.DevelopmentModeStateChanged -= HandleDevelopmentModeStateChanged;
+        admin.InteractionDebugRenderingStateChanged -= HandleInteractionDebugRenderingStateChanged;
+        admin.AdminModeChanged -= HandleAdminModeChanged;
     }
 
     private void HandleNoClipStateChanged(IPlayerAdminFeature admin, bool enabled)

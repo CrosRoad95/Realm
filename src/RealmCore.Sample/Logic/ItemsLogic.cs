@@ -4,7 +4,7 @@ public class ItemsLogic : PlayerLogic
 {
     private readonly ChatBox _chatBox;
 
-    public ItemsLogic(MtaServer mtaServer, ItemsCollection itemsCollection, IElementFactory elementFactory, ChatBox chatBox) : base(mtaServer)
+    public ItemsLogic(MtaServer server, ItemsCollection itemsCollection, ChatBox chatBox) : base(server)
     {
         itemsCollection.Add(1, new ItemsCollectionItem
         {

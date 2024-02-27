@@ -39,11 +39,11 @@ public static class ElementExtensions
         Dimension = element.Dimension,
     };
 
-    public static Location GetLocation(this Element element) => new(element.Position, element.Rotation, element.Interior, element.Dimension);
+    public static Location GetLocation(this Element element, Vector3 offsetPosition = default) => new(element.Position + offsetPosition, element.Rotation, element.Interior, element.Dimension);
 
-    public static void SetLocation(this Element element, Location location)
+    public static void SetLocation(this Element element, Location location, Vector3 offsetPosition = default)
     {
-        element.Position = location.Position;
+        element.Position = location.Position + offsetPosition;
         element.Rotation = location.Rotation;
         if(location.Dimension != null)
             element.Dimension = location.Dimension.Value;

@@ -7,5 +7,11 @@ public class VehicleEngineCollectionItem : CollectionItemBase
 
 public class VehicleEnginesCollection : CollectionBase<VehicleEngineCollectionItem>
 {
-
+    public VehicleEnginesCollection()
+    {
+        Add(1, new VehicleEngineCollectionItem
+        {
+            UpgradeId = 1,
+        });
+    }
 }

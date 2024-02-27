@@ -2,23 +2,22 @@
 
 public class DefaultBanLogic
 {
-    private readonly MtaServer _mtaServer;
+    private readonly MtaServer _server;
     private readonly IOptionsMonitor<GameplayOptions> _gameplayOptions;
     private readonly ILogger<DefaultBanLogic> _logger;
     private readonly IDateTimeProvider _dateTimeProvider;
 
-    public DefaultBanLogic(MtaServer mtaServer, IOptionsMonitor<GameplayOptions> gameplayOptions, ILogger<DefaultBanLogic> logger,  IDateTimeProvider dateTimeProvider)
+    public DefaultBanLogic(MtaServer server, IOptionsMonitor<GameplayOptions> gameplayOptions, ILogger<DefaultBanLogic> logger, IDateTimeProvider dateTimeProvider)
     {
-        _mtaServer = mtaServer;
+        _server = server;
         _gameplayOptions = gameplayOptions;
         _logger = logger;
         _dateTimeProvider = dateTimeProvider;
-        _mtaServer.PlayerJoined += HandlePlayerJoined;
+        _server.PlayerJoined += HandlePlayerJoined;
     }
 
-    private async Task HandlePlayerJoinedCore(Player plr)
+    private async Task HandlePlayerJoinedCore(RealmPlayer player)
     {
-        var player = (RealmPlayer)plr;
         var serial = player.Client.Serial;
         if (serial == null)
             player.Client.FetchSerial();
@@ -45,7 +44,7 @@ public class DefaultBanLogic
     {
         try
         {
-            await HandlePlayerJoinedCore(player);
+            await HandlePlayerJoinedCore((RealmPlayer)player);
         }
         catch (Exception ex)
         {

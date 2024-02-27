@@ -1,20 +1,26 @@
 ﻿namespace RealmCore.Server.Modules.Chat;
 
-public class DefaultChatLogic
+public class DefaultChatLogic : PlayerLogic
 {
     private readonly ChatBox _chatBox;
     private readonly ILogger<DefaultChatLogic> _logger;
     private readonly IElementCollection _elementCollection;
 
-    public DefaultChatLogic(MtaServer server, ChatBox chatBox, ILogger<DefaultChatLogic> logger, IElementCollection elementCollection)
+    public DefaultChatLogic(MtaServer server, ChatBox chatBox, ILogger<DefaultChatLogic> logger, IElementCollection elementCollection) : base(server)
     {
         _chatBox = chatBox;
         _logger = logger;
         _elementCollection = elementCollection;
-        server.PlayerJoined += (player) =>
-        {
-            player.CommandEntered += HandlePlayerCommandEntered;
-        };
+    }
+
+    protected override void PlayerJoined(RealmPlayer player)
+    {
+        player.CommandEntered += HandlePlayerCommandEntered;
+    }
+
+    protected override void PlayerLeft(RealmPlayer player)
+    {
+        player.CommandEntered -= HandlePlayerCommandEntered;
     }
 
     private void HandlePlayerCommandEntered(Player plr, PlayerCommandEventArgs arguments)

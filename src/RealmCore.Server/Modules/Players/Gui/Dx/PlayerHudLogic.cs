@@ -4,7 +4,7 @@ internal sealed class PlayerHudLogic : PlayerLogic
 {
     private readonly IOverlayService _overlayService;
 
-    public PlayerHudLogic(MtaServer mtaServer, IOverlayService overlayService) : base(mtaServer)
+    public PlayerHudLogic(MtaServer server, IOverlayService overlayService) : base(server)
     {
         _overlayService = overlayService;
     }

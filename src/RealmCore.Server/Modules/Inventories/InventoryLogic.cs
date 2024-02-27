@@ -5,7 +5,7 @@ internal sealed class InventoryLogic : PlayerLogic
     private readonly ISaveService _saveService;
     private readonly ILogger<InventoryLogic> _logger;
 
-    public InventoryLogic(MtaServer mtaServer, ISaveService saveService, ILogger<InventoryLogic> logger) : base(mtaServer)
+    public InventoryLogic(MtaServer server, ISaveService saveService, ILogger<InventoryLogic> logger) : base(server)
     {
         _saveService = saveService;
         _logger = logger;

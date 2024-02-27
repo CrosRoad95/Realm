@@ -12,18 +12,18 @@ internal class AssetsLogic
     private readonly AssetsCollection _assetsCollection;
     private readonly IAssetsService _assetsService;
     private readonly LuaEventService _luaEventService;
-    public AssetsLogic(MtaServer mtaServer, AssetsCollection assetsCollection, IAssetsService assetsService, LuaEventService luaEventService)
+    public AssetsLogic(MtaServer server, AssetsCollection assetsCollection, IAssetsService assetsService, LuaEventService luaEventService)
     {
         _assetsCollection = assetsCollection;
         _assetsService = assetsService;
         _luaEventService = luaEventService;
         luaEventService.AddEventHandler("internalRequestAssets", HandleInternalRequestAssets);
-        _resource = mtaServer.GetAdditionalResource<AssetsResource>();
+        _resource = server.GetAdditionalResource<AssetsResource>();
 
         _assetsService.ReplaceModelForPlayer = HandleReplaceModelForPlayer;
         _assetsService.RestoreModelForPlayer = HandleRestoreModelForPlayer;
 
-        mtaServer.PlayerJoined += HandlePlayerJoin;
+        server.PlayerJoined += HandlePlayerJoin;
     }
 
     private void HandlePlayerJoin(Player player)

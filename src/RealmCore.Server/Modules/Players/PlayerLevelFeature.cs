@@ -10,7 +10,7 @@ public enum LevelChange
 public interface IPlayerLevelFeature : IPlayerFeature
 {
     uint NextLevelRequiredExperience { get; }
-    uint Level { get; set; }
+    uint Current { get; set; }
     uint Experience { get; set; }
 
     event Action<IPlayerLevelFeature, uint, LevelChange>? LevelChanged;
@@ -66,11 +66,11 @@ internal sealed class PlayerLevelFeature : IPlayerLevelFeature, IDisposable
     {
         get
         {
-            return _levelsCollection.GetExperienceRequiredForLevel(Level + 1);
+            return _levelsCollection.GetExperienceRequiredForLevel(Current + 1);
         }
     }
 
-    public uint Level
+    public uint Current
     {
         get => _level; set
         {

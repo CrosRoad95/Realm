@@ -1,8 +1,7 @@
 ﻿namespace RealmCore.Server.Modules.Players;
 
-internal sealed class PlayersLogic
+internal sealed class PlayersLogic : PlayerLogic
 {
-    private readonly MtaServer _mtaServer;
     private readonly IClientInterfaceService _clientInterfaceService;
     private readonly ILogger<PlayersLogic> _logger;
     private readonly IResourceProvider _resourceProvider;
@@ -13,9 +12,8 @@ internal sealed class PlayersLogic
     private readonly IPlayersService _playersService;
     private readonly ConcurrentDictionary<RealmPlayer, Latch> _playerResources = new();
 
-    public PlayersLogic(MtaServer mtaServer, IClientInterfaceService clientInterfaceService, ILogger<PlayersLogic> logger, IResourceProvider resourceProvider, IUsersInUse activeUsers, IPlayersEventManager playerEventManager, IOptions<GuiBrowserOptions> guiBrowserOptions, ClientConsole clientConsole, IPlayersService playersService)
+    public PlayersLogic(MtaServer server, IClientInterfaceService clientInterfaceService, ILogger<PlayersLogic> logger, IResourceProvider resourceProvider, IUsersInUse activeUsers, IPlayersEventManager playerEventManager, IOptions<GuiBrowserOptions> guiBrowserOptions, ClientConsole clientConsole, IPlayersService playersService) : base(server)
     {
-        _mtaServer = mtaServer;
         _clientInterfaceService = clientInterfaceService;
         _logger = logger;
         _resourceProvider = resourceProvider;
@@ -24,7 +22,7 @@ internal sealed class PlayersLogic
         _guiBrowserOptions = guiBrowserOptions;
         _clientConsole = clientConsole;
         _playersService = playersService;
-        _mtaServer.PlayerJoined += HandlePlayerJoined;
+        _server.PlayerJoined += HandlePlayerJoined;
     }
 
     private async Task FetchClientData(RealmPlayer player, CancellationToken cancellationToken = default)
