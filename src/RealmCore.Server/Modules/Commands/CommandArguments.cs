@@ -243,7 +243,12 @@ public class CommandArguments
 
     public bool TryReadEnum<TEnum>(out TEnum outValue) where TEnum : struct
     {
-        var str = ReadArgument();
+        if (!TryReadArgument(out var str))
+        {
+            outValue = default;
+            return false;
+        }
+
         if (int.TryParse(str, out int intValue))
         {
             if (Enum.IsDefined(typeof(TEnum), intValue))
