@@ -5,11 +5,18 @@ internal sealed class PlayTimeLogic
     private readonly ISchedulerService _schedulerService;
     private readonly IElementCollection _elementCollection;
 
-    public PlayTimeLogic(ISchedulerService schedulerService, IElementCollection elementCollection)
+    public PlayTimeLogic(ISchedulerService schedulerService, IElementCollection elementCollection, ILogger<PlayTimeLogic> logger)
     {
         _schedulerService = schedulerService;
         _elementCollection = elementCollection;
-        _schedulerService.ScheduleJob(UpdatePlayTime, TimeSpan.FromSeconds(1), CancellationToken.None);
+        try
+        {
+            _schedulerService.ScheduleJob(UpdatePlayTime, TimeSpan.FromSeconds(1), CancellationToken.None);
+        }
+        catch(Exception ex)
+        {
+            logger.LogHandleError(ex);
+        }
     }
 
     private Task UpdatePlayTime()

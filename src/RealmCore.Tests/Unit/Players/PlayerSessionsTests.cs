@@ -154,6 +154,7 @@ public class PlayerSessionsTests : RealmUnitTestingBase
 
         var destination = new Vector3(400.0f, -82.01953f, 3.914598f);
         myObject.Position = destination;
+        objective.Update();
         completed.Should().Be(true);
         testJobSession.ObjectiveCount.Should().Be(0);
     }
