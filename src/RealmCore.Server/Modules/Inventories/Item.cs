@@ -35,13 +35,13 @@ public class Item : IEquatable<Item>, IEquatable<Metadata>
     public string Name { get; init; }
     public decimal Size { get; init; }
     public ItemAction AvailableActions { get; init; }
-    private readonly Metadata _metaData;
+    private readonly Metadata _metadata;
     public Metadata MetaData
     {
         get
         {
             lock (_lock)
-                return new Metadata(_metaData);
+                return new Metadata(_metadata);
         }
     }
 
@@ -50,7 +50,7 @@ public class Item : IEquatable<Item>, IEquatable<Metadata>
         get
         {
             lock (_lock)
-                return _metaData.Keys.ToList();
+                return _metadata.Keys.ToList();
         }
     }
 
@@ -64,7 +64,7 @@ public class Item : IEquatable<Item>, IEquatable<Metadata>
         Size = item.Size;
         Name = item.Name;
         _number = item.Number;
-        _metaData = new Metadata(item.MetaData);
+        _metadata = new Metadata(item.MetaData);
         AvailableActions = item.AvailableActions;
     }
 
@@ -78,11 +78,11 @@ public class Item : IEquatable<Item>, IEquatable<Metadata>
         _number = number;
         if (metaData != null)
         {
-            _metaData = metaData;
+            _metadata = metaData;
         }
         else
         {
-            _metaData = [];
+            _metadata = [];
         }
     }
 
@@ -92,7 +92,7 @@ public class Item : IEquatable<Item>, IEquatable<Metadata>
         {
             if (value is string or double or int)
             {
-                _metaData[key] = value;
+                _metadata[key] = value;
                 MetadataChanged?.Invoke(this, key);
                 return true;
             }
@@ -104,9 +104,9 @@ public class Item : IEquatable<Item>, IEquatable<Metadata>
     {
         lock (_lock)
         {
-            if (_metaData.ContainsKey(key))
+            if (_metadata.ContainsKey(key))
             {
-                _metaData.Remove(key);
+                _metadata.Remove(key);
                 MetadataRemoved?.Invoke(this, key);
                 return true;
             }
@@ -118,10 +118,10 @@ public class Item : IEquatable<Item>, IEquatable<Metadata>
     {
         lock (_lock)
         {
-            if (_metaData.ContainsKey(key))
+            if (_metadata.ContainsKey(key))
             {
-                var value = callback((T)_metaData[key]) ?? throw new NullReferenceException("Callback result can not be null");
-                _metaData[key] = value;
+                var value = callback((T)_metadata[key]) ?? throw new NullReferenceException("Callback result can not be null");
+                _metadata[key] = value;
                 MetadataChanged?.Invoke(this, key);
             }
         }
@@ -131,7 +131,7 @@ public class Item : IEquatable<Item>, IEquatable<Metadata>
     {
         lock (_lock)
         {
-            if (_metaData.TryGetValue(key, out var value))
+            if (_metadata.TryGetValue(key, out var value))
                 return value;
             return null;
         }
@@ -141,7 +141,7 @@ public class Item : IEquatable<Item>, IEquatable<Metadata>
     {
         lock (_lock)
         {
-            if (_metaData.TryGetValue(key, out var outValue))
+            if (_metadata.TryGetValue(key, out var outValue))
             {
                 value = (T)outValue;
                 return true;
@@ -171,10 +171,22 @@ public class Item : IEquatable<Item>, IEquatable<Metadata>
         return Convert.ChangeType(value, type);
     }
 
+    public bool TryEnumValue<TEnum>(string key, out TEnum outValue) where TEnum: struct
+    {
+        string? metadata = (string?)GetMetadata(key);
+        if (metadata == null)
+        {
+            outValue = default;
+            return false;
+        }
+
+        return Enum.TryParse(metadata, out outValue);
+    }
+
     public bool HasMetadata(string key)
     {
         lock (_lock)
-            return _metaData.ContainsKey(key);
+            return _metadata.ContainsKey(key);
     }
 
     public override string ToString() => Name;
@@ -192,7 +204,7 @@ public class Item : IEquatable<Item>, IEquatable<Metadata>
         if (ItemId != other.ItemId)
             return false;
 
-        return Equals(other._metaData);
+        return Equals(other._metadata);
     }
 
     public bool Equals(Metadata? other)
@@ -202,12 +214,12 @@ public class Item : IEquatable<Item>, IEquatable<Metadata>
 
         lock (_lock)
         {
-            if (_metaData.Count != other.Count)
+            if (_metadata.Count != other.Count)
                 return false;
 
-            foreach (var key in _metaData.Keys)
+            foreach (var key in _metadata.Keys)
             {
-                if (!_metaData[key].Equals(other[key]))
+                if (!_metadata[key].Equals(other[key]))
                 {
                     return false;
                 }
