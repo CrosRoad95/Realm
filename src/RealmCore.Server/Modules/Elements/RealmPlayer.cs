@@ -40,6 +40,8 @@ public class RealmPlayer : Player, IDisposable, IPersistentElement
     private string? _nametagText;
     public virtual Vector2 ScreenSize { get; set; }
     private CultureInfo _culture = new("pl-PL");
+    private RealmBlip? _blip = null;
+
     private readonly Dictionary<string, Func<RealmPlayer, KeyState, CancellationToken, Task>> _asyncBinds = [];
     private readonly Dictionary<string, Action<RealmPlayer, KeyState>> _binds = [];
     private readonly SemaphoreSlim _bindsLock = new(1);
@@ -698,10 +700,54 @@ public class RealmPlayer : Player, IDisposable, IPersistentElement
         CurrentInteractElement = null;
     }
 
+    public bool AddBlip(Color color)
+    {
+        if (_blip != null)
+            return false;
+
+        _blip = GetRequiredService<IElementFactory>().CreateBlip(this.GetLocation(), BlipIcon.Marker, blip =>
+        {
+            blip.Color = color;
+        });
+
+        PositionChanged += HandlePositionChanged;
+        return true;
+    }
+
+    private void HandlePositionChanged(Element sender, ElementChangedEventArgs<Vector3> args)
+    {
+        if(_blip != null)
+        {
+            _blip.Position = Position;
+            // TODO: update interior and dimension only if needed
+            _blip.Interior = Interior;
+            _blip.Dimension = Dimension;
+        }
+    }
+
+    public bool RemoveBlip()
+    {
+        if (_blip != null)
+        {
+            PositionChanged -= HandlePositionChanged;
+            return _blip.Destroy();
+        }
+        return false;
+    }
+
+    public bool SetBlipColor(Color color)
+    {
+        if (_blip == null)
+            return false;
+        _blip.Color = color;
+        return true;
+    }
+
     public void Dispose()
     {
         IsSpawned = false;
         Wasted -= HandleWasted;
+        RemoveBlip();
         _serviceScope.Dispose();
     }
 }

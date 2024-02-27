@@ -96,6 +96,7 @@ public static class ServerBuilderExtensions
         serverBuilder.AddLogic<MapsLogic>();
         serverBuilder.AddLogic<PlayersBindsLogic>();
         serverBuilder.AddLogic<PlayTimeLogic>();
+        serverBuilder.AddLogic<PlayerBlipLogic>();
         #endregion
 
         #region Behaviours
