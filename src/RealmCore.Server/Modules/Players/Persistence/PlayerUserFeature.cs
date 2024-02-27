@@ -1,5 +1,12 @@
 ﻿namespace RealmCore.Server.Modules.Players.Persistence;
 
+public interface IUsesUserPersistentData
+{
+    void SignIn(UserData userData);
+    void SignOut();
+    event Action? VersionIncreased;
+}
+
 public interface IPlayerUserFeature : IPlayerFeature
 {
     internal UserData UserData { get; }
@@ -87,6 +94,11 @@ internal sealed class PlayerUserFeature : IPlayerUserFeature, IDisposable
             _user = user;
             _claimsPrincipal = claimsPrincipal;
             SignedIn?.Invoke(this, Player);
+            foreach (var playerFeature in Player.GetRequiredService<IEnumerable<IPlayerFeature>>())
+            {
+                if(playerFeature is IUsesUserPersistentData usesPlayerPersistentData)
+                    usesPlayerPersistentData.SignIn(user);
+            }
         }
     }
 
@@ -102,6 +114,12 @@ internal sealed class PlayerUserFeature : IPlayerUserFeature, IDisposable
                 _claimsPrincipal = null;
                 SignedOut?.Invoke(this, Player);
                 ClearAuthorizedPoliciesCache();
+
+                foreach (var playerFeature in Player.GetRequiredService<IEnumerable<IPlayerFeature>>())
+                {
+                    if (playerFeature is IUsesUserPersistentData usesPlayerPersistentData)
+                        usesPlayerPersistentData.SignOut();
+                }
             }
         }
     }
