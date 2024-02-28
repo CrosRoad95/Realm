@@ -1,4 +1,4 @@
-﻿namespace RealmCore.Server.Modules.Players;
+﻿namespace RealmCore.Server.Modules.Players.AFK;
 
 public interface IPlayerAFKFeature : IPlayerFeature
 {
@@ -8,6 +8,7 @@ public interface IPlayerAFKFeature : IPlayerFeature
     event Action<IPlayerAFKFeature, bool, TimeSpan>? StateChanged;
 
     CancellationToken CreateCancellationToken(bool? expectedAfkState = null);
+    void SetCooldown(int afkCooldown);
     internal void HandleAFKStarted();
     internal void HandleAFKStopped();
 }
@@ -19,22 +20,19 @@ internal sealed class PlayerAFKFeature : IPlayerAFKFeature
     public bool IsAFK { get; private set; }
     public event Action<IPlayerAFKFeature, bool, TimeSpan>? StateChanged;
     private event Action<bool>? InternalStateChanged;
-    private readonly IOptionsMonitor<GameplayOptions> _gameplayOptions;
     private readonly IDateTimeProvider _dateTimeProvider;
     private readonly IDebounce _debounce;
     public RealmPlayer Player { get; init; }
-    public PlayerAFKFeature(PlayerContext playerContext, IOptionsMonitor<GameplayOptions> gameplayOptions, IDateTimeProvider dateTimeProvider, IDebounceFactory debounceFactory)
+    public PlayerAFKFeature(PlayerContext playerContext, IDateTimeProvider dateTimeProvider, IDebounceFactory debounceFactory)
     {
         Player = playerContext.Player;
-        _gameplayOptions = gameplayOptions;
         _dateTimeProvider = dateTimeProvider;
-        _gameplayOptions.OnChange(HandleOptionsChanged);
-        _debounce = debounceFactory.Create(_gameplayOptions.CurrentValue.AfkCooldown ?? 5000);
+        _debounce = debounceFactory.Create(5000);
     }
 
-    private void HandleOptionsChanged(GameplayOptions gameplayOptions)
+    public void SetCooldown(int afkCooldown)
     {
-        _debounce.Milliseconds = gameplayOptions.AfkCooldown ?? 5000;
+        _debounce.Milliseconds = afkCooldown;
     }
 
     private void StateHasChanged(DateTime now)

@@ -1,4 +1,5 @@
-﻿using RealmCore.Server.Modules.Players.Money;
+﻿using RealmCore.Server.Modules.Players.AFK;
+using RealmCore.Server.Modules.Players.Money;
 using RealmCore.Server.Modules.Players.PlayTime;
 
 namespace RealmCore.Server.Extensions;
@@ -99,6 +100,7 @@ public static class ServerBuilderExtensions
         serverBuilder.AddLogic<PlayTimeLogic>();
         serverBuilder.AddLogic<PlayerBlipLogic>();
         serverBuilder.AddLogic<PlayerMoneyLogic>();
+        serverBuilder.AddLogic<AFKLogic>();
         #endregion
 
         #region Behaviours
