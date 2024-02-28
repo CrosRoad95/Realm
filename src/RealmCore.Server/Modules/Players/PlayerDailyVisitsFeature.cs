@@ -12,60 +12,58 @@ public interface IPlayerDailyVisitsFeature : IPlayerFeature
     internal void Update(DateTime now);
 }
 
-internal sealed class PlayerDailyVisitsFeature : IPlayerDailyVisitsFeature, IDisposable
+internal sealed class PlayerDailyVisitsFeature : IPlayerDailyVisitsFeature, IUsesUserPersistentData
 {
     private readonly object _lock = new();
-    private readonly IPlayerUserFeature _playerUserFeature;
     private DailyVisitsData? _dailyVisitsData;
+
     public DateTime LastVisit
     {
-        get => _dailyVisitsData?.LastVisit ?? throw new InvalidOperationException(); set
+        get => _dailyVisitsData?.LastVisit ?? throw new UserNotSignedInException(); set
         {
             if (_dailyVisitsData == null)
-                throw new InvalidOperationException();
+                throw new UserNotSignedInException();
             _dailyVisitsData.LastVisit = value;
         }
     }
     public int VisitsInRow
     {
-        get => _dailyVisitsData?.VisitsInRow ?? throw new InvalidOperationException(); set
+        get => _dailyVisitsData?.VisitsInRow ?? throw new UserNotSignedInException(); set
         {
             if (_dailyVisitsData == null)
-                throw new InvalidOperationException();
+                throw new UserNotSignedInException();
             _dailyVisitsData.VisitsInRow = value;
         }
     }
     public int VisitsInRowRecord
     {
-        get => _dailyVisitsData?.VisitsInRowRecord ?? throw new InvalidOperationException(); set
+        get => _dailyVisitsData?.VisitsInRowRecord ?? throw new UserNotSignedInException(); set
         {
             if (_dailyVisitsData == null)
-                throw new InvalidOperationException();
+                throw new UserNotSignedInException();
             _dailyVisitsData.VisitsInRowRecord = value;
         }
     }
 
     public event Action<IPlayerDailyVisitsFeature, int, bool>? Visited;
     public event Action<IPlayerDailyVisitsFeature, int>? VisitsRecord;
+    public event Action? VersionIncreased;
 
     public RealmPlayer Player { get; init; }
 
-    public PlayerDailyVisitsFeature(PlayerContext playerContext, IPlayerUserFeature playerUserFeature)
+    public PlayerDailyVisitsFeature(PlayerContext playerContext)
     {
         Player = playerContext.Player;
-        playerUserFeature.SignedIn += HandleSignedIn;
-        playerUserFeature.SignedOut += HandleSignedOut;
-        _playerUserFeature = playerUserFeature;
     }
 
-    private void HandleSignedIn(IPlayerUserFeature playerUserFeature, RealmPlayer player)
+    public void SignIn(UserData userData)
     {
-        var now = player.GetRequiredService<IDateTimeProvider>().Now;
+        var now = Player.GetRequiredService<IDateTimeProvider>().Now;
         lock (_lock)
         {
-            if (playerUserFeature.UserData?.DailyVisits != null)
+            if (userData?.DailyVisits != null)
             {
-                _dailyVisitsData = playerUserFeature.UserData?.DailyVisits;
+                _dailyVisitsData = userData?.DailyVisits;
             }
             else
             {
@@ -80,10 +78,9 @@ internal sealed class PlayerDailyVisitsFeature : IPlayerDailyVisitsFeature, IDis
         Update(now);
     }
 
-    private void HandleSignedOut(IPlayerUserFeature playerUserFeature, RealmPlayer _)
+    public void SignOut()
     {
-        lock (_lock)
-            _dailyVisitsData = null;
+        _dailyVisitsData = null;
     }
 
     public void Update(DateTime now)
@@ -110,13 +107,8 @@ internal sealed class PlayerDailyVisitsFeature : IPlayerDailyVisitsFeature, IDis
             VisitsRecord?.Invoke(this, VisitsInRowRecord);
         }
 
-        _playerUserFeature.IncreaseVersion();
+        VersionIncreased?.Invoke();
         Visited?.Invoke(this, VisitsInRow, reset);
         LastVisit = nowDate;
-    }
-
-    public void Dispose()
-    {
-
     }
 }
