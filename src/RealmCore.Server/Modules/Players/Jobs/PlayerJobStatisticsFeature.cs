@@ -8,34 +8,31 @@ public interface IPlayerJobStatisticsFeature : IPlayerFeature, IEnumerable<UserJ
     (ulong, ulong) GetTotalPoints(short jobId);
 }
 
-internal sealed class PlayerJobStatisticsFeature : IPlayerJobStatisticsFeature
+internal sealed class PlayerJobStatisticsFeature : IPlayerJobStatisticsFeature, IUsesUserPersistentData
 {
     private readonly object _lock = new();
     private ICollection<JobStatisticsData> _jobStatistics = [];
-    private readonly IPlayerUserFeature _playerUserFeature;
     private readonly IDateTimeProvider _dateTimeProvider;
 
     public event Action<IPlayerJobStatisticsFeature, short, ulong>? PointsAdded;
     public event Action<IPlayerJobStatisticsFeature, short, ulong>? TimePlayedAdded;
+    public event Action? VersionIncreased;
 
     public RealmPlayer Player { get; init; }
 
-    public PlayerJobStatisticsFeature(PlayerContext playerContext, IPlayerUserFeature playerUserFeature, IDateTimeProvider dateTimeProvider)
+    public PlayerJobStatisticsFeature(PlayerContext playerContext, IDateTimeProvider dateTimeProvider)
     {
         Player = playerContext.Player;
-        playerUserFeature.SignedIn += HandleSignedIn;
-        playerUserFeature.SignedOut += HandleSignedOut;
-        _playerUserFeature = playerUserFeature;
         _dateTimeProvider = dateTimeProvider;
     }
 
-    private void HandleSignedIn(IPlayerUserFeature playerUserFeature, RealmPlayer _)
+    public void SignIn(UserData userData)
     {
         lock (_lock)
-            _jobStatistics = playerUserFeature.UserData.JobStatistics;
+            _jobStatistics = userData.JobStatistics;
     }
 
-    private void HandleSignedOut(IPlayerUserFeature playerUserFeature, RealmPlayer _)
+    public void SignOut()
     {
         lock (_lock)
             _jobStatistics = [];
@@ -54,7 +51,7 @@ internal sealed class PlayerJobStatisticsFeature : IPlayerJobStatisticsFeature
                     JobId = jobId,
                     Date = today,
                 };
-                _playerUserFeature.IncreaseVersion();
+                VersionIncreased?.Invoke();
                 _jobStatistics.Add(jobStatisticsData);
             }
 
@@ -70,7 +67,7 @@ internal sealed class PlayerJobStatisticsFeature : IPlayerJobStatisticsFeature
         {
             var jobStatisticsData = GetJobStatisticsData(jobId);
             jobStatisticsData.Points += points;
-            _playerUserFeature.IncreaseVersion();
+            VersionIncreased?.Invoke();
             PointsAdded?.Invoke(this, jobId, jobStatisticsData.Points);
         }
     }
@@ -83,7 +80,7 @@ internal sealed class PlayerJobStatisticsFeature : IPlayerJobStatisticsFeature
         {
             var jobStatisticsData = GetJobStatisticsData(jobId);
             jobStatisticsData.TimePlayed += timePlayed;
-            _playerUserFeature.IncreaseVersion();
+            VersionIncreased?.Invoke();
             TimePlayedAdded?.Invoke(this, jobId, jobStatisticsData.TimePlayed);
         }
     }
@@ -98,7 +95,7 @@ internal sealed class PlayerJobStatisticsFeature : IPlayerJobStatisticsFeature
             var jobStatisticsData = GetJobStatisticsData(jobId);
             jobStatisticsData.Points += points;
             jobStatisticsData.TimePlayed += timePlayed;
-            _playerUserFeature.IncreaseVersion();
+            VersionIncreased?.Invoke();
             PointsAdded?.Invoke(this, jobId, jobStatisticsData.Points);
             TimePlayedAdded?.Invoke(this, jobId, jobStatisticsData.TimePlayed);
         }

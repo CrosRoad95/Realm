@@ -1,6 +1,4 @@
-﻿using RealmCore.Server.Modules.Server;
-
-namespace RealmCore.Sample.Logic;
+﻿namespace RealmCore.Sample.Logic;
 
 internal class TestLogic
 {

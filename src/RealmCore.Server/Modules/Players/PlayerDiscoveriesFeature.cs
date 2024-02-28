@@ -8,30 +8,27 @@ public interface IPlayerDiscoveriesFeature : IPlayerFeature, IEnumerable<int>
     bool TryDiscover(int discoveryId);
 }
 
-internal sealed class PlayerDiscoveriesFeature : IPlayerDiscoveriesFeature, IDisposable
+internal sealed class PlayerDiscoveriesFeature : IPlayerDiscoveriesFeature, IUsesUserPersistentData
 {
     private readonly object _lock = new();
     private ICollection<DiscoveryData> _discoveries = [];
-    private readonly IPlayerUserFeature _playerUserFeature;
 
     public event Action<IPlayerDiscoveriesFeature, int>? Discovered;
+    public event Action? VersionIncreased;
 
     public RealmPlayer Player { get; init; }
-    public PlayerDiscoveriesFeature(PlayerContext playerContext, IPlayerUserFeature playerUserFeature)
+    public PlayerDiscoveriesFeature(PlayerContext playerContext)
     {
         Player = playerContext.Player;
-        playerUserFeature.SignedIn += HandleSignedIn;
-        playerUserFeature.SignedOut += HandleSignedOut;
-        _playerUserFeature = playerUserFeature;
     }
 
-    private void HandleSignedIn(IPlayerUserFeature playerUserFeature, RealmPlayer _)
+    public void SignIn(UserData userData)
     {
         lock (_lock)
-            _discoveries = playerUserFeature.UserData.Discoveries;
+            _discoveries = userData.Discoveries;
     }
 
-    private void HandleSignedOut(IPlayerUserFeature playerUserFeature, RealmPlayer _)
+    public void SignOut()
     {
         lock (_lock)
             _discoveries = [];
@@ -50,7 +47,7 @@ internal sealed class PlayerDiscoveriesFeature : IPlayerDiscoveriesFeature, IDis
                 DiscoveryId = discoveryId
             };
             _discoveries.Add(discoveryData);
-            _playerUserFeature.IncreaseVersion();
+            VersionIncreased?.Invoke();
             Discovered?.Invoke(this, discoveryId);
             return true;
         }
@@ -69,10 +66,4 @@ internal sealed class PlayerDiscoveriesFeature : IPlayerDiscoveriesFeature, IDis
     }
 
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
-
-    public void Dispose()
-    {
-        lock (_lock)
-            _discoveries = [];
-    }
 }

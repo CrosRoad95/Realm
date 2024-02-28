@@ -1,10 +1,4 @@
-﻿
-
-using Quartz;
-using System;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
-
-namespace RealmCore.Server.Modules.Players;
+﻿namespace RealmCore.Server.Modules.Players;
 
 public interface IPlayerSchedulerFeature : IPlayerFeature, ISchedulerService
 {

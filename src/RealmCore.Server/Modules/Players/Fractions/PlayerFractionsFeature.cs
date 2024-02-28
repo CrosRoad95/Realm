@@ -9,28 +9,31 @@ public interface IPlayerFractionsFeature : IPlayerFeature
     internal bool RemoveMember(int fractionId);
 }
 
-internal sealed class PlayerFractionsFeature : IPlayerFractionsFeature
+internal sealed class PlayerFractionsFeature : IPlayerFractionsFeature, IUsesUserPersistentData
 {
     private readonly object _lock = new();
-    private readonly IPlayerUserFeature _playerUserFeature;
     private ICollection<FractionMemberData> _fractionMembers = [];
 
     public event Action<IPlayerFractionsFeature, FractionMemberDto>? Added;
     public event Action<IPlayerFractionsFeature, FractionMemberDto>? Removed;
+    public event Action? VersionIncreased;
 
     public RealmPlayer Player { get; init; }
-    public PlayerFractionsFeature(PlayerContext playerContext, IPlayerUserFeature playerUserFeature)
+    public PlayerFractionsFeature(PlayerContext playerContext)
     {
         Player = playerContext.Player;
-        playerUserFeature.SignedIn += HandleSignedIn;
-        playerUserFeature.SignedOut += HandleSignedOut;
-        _playerUserFeature = playerUserFeature;
     }
 
-    private void HandleSignedIn(IPlayerUserFeature playerUserFeature, RealmPlayer _)
+    public void SignIn(UserData userData)
     {
-        lock(_lock)
-            _fractionMembers = playerUserFeature.UserData.FractionMembers;
+        lock (_lock)
+            _fractionMembers = userData.FractionMembers;
+    }
+
+    public void SignOut()
+    {
+        lock (_lock)
+            _fractionMembers = [];
     }
 
     public bool IsMember(int fractionId)
@@ -54,7 +57,7 @@ internal sealed class PlayerFractionsFeature : IPlayerFractionsFeature
             {
                 _fractionMembers.Add(fractionMemberData);
                 Added?.Invoke(this, FractionMemberDto.Map(fractionMemberData));
-                _playerUserFeature.IncreaseVersion();
+                VersionIncreased?.Invoke();
             }
         }
     }
@@ -70,13 +73,7 @@ internal sealed class PlayerFractionsFeature : IPlayerFractionsFeature
             Removed?.Invoke(this, FractionMemberDto.Map(fraction));
         }
 
-        _playerUserFeature.IncreaseVersion();
+        VersionIncreased?.Invoke();
         return true;
-    }
-
-    private void HandleSignedOut(IPlayerUserFeature playerUserFeature, RealmPlayer _)
-    {
-        lock (_lock)
-            _fractionMembers = [];
     }
 }

@@ -13,44 +13,40 @@ public interface IPlayerPlayTimeFeature : IPlayerFeature
     internal void Update();
 }
 
-internal sealed class PlayerPlayTimeFeature : IPlayerPlayTimeFeature, IDisposable
+internal sealed class PlayerPlayTimeFeature : IPlayerPlayTimeFeature, IUsesUserPersistentData
 {
     private readonly object _lock = new();
     private DateTime _startDateTime;
     private ulong _totalPlayTime = 0;
-    private readonly IPlayerUserFeature _playerUserFeature;
     private readonly IDateTimeProvider _dateTimeProvider;
     private int _lastMinute = 0;
     private int _lastMinuteTotal = -1;
 
     public event Action<IPlayerPlayTimeFeature>? MinutePlayed;
     public event Action<IPlayerPlayTimeFeature>? MinuteTotalPlayed;
+    public event Action? VersionIncreased;
 
     public TimeSpan PlayTime => _dateTimeProvider.Now - _startDateTime;
     public TimeSpan TotalPlayTime => PlayTime + TimeSpan.FromSeconds(_totalPlayTime);
 
     public RealmPlayer Player { get; init; }
 
-    public PlayerPlayTimeFeature(PlayerContext playerContext, IPlayerUserFeature playerUserFeature, IDateTimeProvider dateTimeProvider)
+    public PlayerPlayTimeFeature(PlayerContext playerContext, IDateTimeProvider dateTimeProvider)
     {
         Player = playerContext.Player;
-        _playerUserFeature = playerUserFeature;
         _dateTimeProvider = dateTimeProvider;
         _startDateTime = _dateTimeProvider.Now;
-        _playerUserFeature.SignedIn += HandleSignedIn;
-        _playerUserFeature.SignedOut += HandleSignedOut;
     }
 
-    private void HandleSignedIn(IPlayerUserFeature playerUserFeature, RealmPlayer _)
+
+    public void SignIn(UserData userData)
     {
-        lock (_lock)
-            _totalPlayTime = playerUserFeature.UserData.PlayTime;
+        _totalPlayTime = userData.PlayTime;
     }
 
-    private void HandleSignedOut(IPlayerUserFeature playerUserFeature, RealmPlayer _)
+    public void SignOut()
     {
-        lock (_lock)
-            _totalPlayTime = 0;
+        _totalPlayTime = 0;
     }
 
     public void InternalSetTotalPlayTime(ulong time)
@@ -77,13 +73,8 @@ internal sealed class PlayerPlayTimeFeature : IPlayerPlayTimeFeature, IDisposabl
             {
                 _lastMinuteTotal = (int)TotalPlayTime.TotalMinutes;
                 MinuteTotalPlayed?.Invoke(this);
-                _playerUserFeature.IncreaseVersion();
+                VersionIncreased?.Invoke();
             }
         }
-    }
-    public void Dispose()
-    {
-        _playerUserFeature.SignedIn -= HandleSignedIn;
-        _playerUserFeature.SignedOut -= HandleSignedOut;
     }
 }

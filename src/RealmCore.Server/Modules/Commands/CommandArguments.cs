@@ -1,6 +1,4 @@
-﻿using RealmCore.Server.Modules.Search;
-
-namespace RealmCore.Server.Modules.Commands;
+﻿namespace RealmCore.Server.Modules.Commands;
 
 public class CommandArguments
 {

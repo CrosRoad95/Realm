@@ -8,32 +8,45 @@ public interface IPlayerGroupsFeature : IPlayerFeature
     GroupMemberData? GetMemberOrDefault(int groupId);
 }
 
-internal sealed class PlayerGroupsFeature : IPlayerGroupsFeature
+internal sealed class PlayerGroupsFeature : IPlayerGroupsFeature, IUsesUserPersistentData
 {
     private readonly SemaphoreSlim _lock = new(1);
-    private readonly IPlayerUserFeature _playerUserFeature;
     private ICollection<GroupMemberData> _groupMembers = [];
+
+    public event Action? VersionIncreased;
+
     public RealmPlayer Player { get; init; }
-    public PlayerGroupsFeature(PlayerContext playerContext, IPlayerUserFeature playerUserFeature)
+    public PlayerGroupsFeature(PlayerContext playerContext)
     {
         Player = playerContext.Player;
-        playerUserFeature.SignedIn += HandleSignedIn;
-        playerUserFeature.SignedOut += HandleSignedOut;
-        _playerUserFeature = playerUserFeature;
     }
 
-    private void HandleSignedIn(IPlayerUserFeature playerUserFeature, RealmPlayer _)
+    public void SignIn(UserData userData)
     {
         _lock.Wait();
         try
         {
-            _groupMembers = playerUserFeature.UserData.GroupMembers;
+            _groupMembers = userData.GroupMembers;
         }
         finally
         {
             _lock.Release();
         }
     }
+
+    public void SignOut()
+    {
+        _lock.Wait();
+        try
+        {
+            _groupMembers = [];
+        }
+        finally
+        {
+            _lock.Release();
+        }
+    }
+
 
     public bool AddGroupMember(GroupMemberData groupMemberData)
     {
@@ -50,7 +63,8 @@ internal sealed class PlayerGroupsFeature : IPlayerGroupsFeature
         {
             _lock.Release();
         }
-        _playerUserFeature.IncreaseVersion();
+
+        VersionIncreased?.Invoke();
         return true;
     }
 
@@ -68,7 +82,8 @@ internal sealed class PlayerGroupsFeature : IPlayerGroupsFeature
         {
             _lock.Release();
         }
-        _playerUserFeature.IncreaseVersion();
+
+        VersionIncreased?.Invoke();
         return true;
     }
 
@@ -98,8 +113,4 @@ internal sealed class PlayerGroupsFeature : IPlayerGroupsFeature
         }
     }
 
-    private void HandleSignedOut(IPlayerUserFeature playerUserFeature, RealmPlayer _)
-    {
-
-    }
 }

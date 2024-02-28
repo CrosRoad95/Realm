@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace RealmCore.Server.Modules.Server;
+﻿namespace RealmCore.Server.Modules.Server;
 
 internal sealed class ExecuteTaskJob : IJob
 {

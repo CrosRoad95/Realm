@@ -10,34 +10,31 @@ public interface IPlayerNotificationsFeature : IPlayerFeature, IEnumerable<UserN
     void RelayRead(UserNotificationData userNotificationData);
 }
 
-internal sealed class PlayerNotificationsFeature : IPlayerNotificationsFeature, IDisposable
+internal sealed class PlayerNotificationsFeature : IPlayerNotificationsFeature, IUsesUserPersistentData
 {
     private readonly SemaphoreSlim _lock = new(1);
-    private readonly IPlayerUserFeature _playerUserFeature;
     private readonly IDb _db;
 
     private ICollection<UserNotificationData> _userNotificationDataList = [];
 
     public event Action<IPlayerNotificationsFeature, UserNotificationDto>? Created;
     public event Action<IPlayerNotificationsFeature, UserNotificationDto>? Read;
+    public event Action? VersionIncreased;
 
     public RealmPlayer Player { get; }
 
-    public PlayerNotificationsFeature(PlayerContext playerContext, IPlayerUserFeature playerUserFeature, IDb db)
+    public PlayerNotificationsFeature(PlayerContext playerContext, IDb db)
     {
         Player = playerContext.Player;
-        playerUserFeature.SignedIn += HandleSignedIn;
-        playerUserFeature.SignedOut += HandleSignedOut;
-        _playerUserFeature = playerUserFeature;
         _db = db;
     }
 
-    private void HandleSignedIn(IPlayerUserFeature playerUserFeature, RealmPlayer _)
+    public void SignIn(UserData userData)
     {
         _lock.Wait();
         try
         {
-            _userNotificationDataList = playerUserFeature.UserData.Notifications;
+            _userNotificationDataList = userData.Notifications;
         }
         finally
         {
@@ -45,7 +42,7 @@ internal sealed class PlayerNotificationsFeature : IPlayerNotificationsFeature, 
         }
     }
 
-    private void HandleSignedOut(IPlayerUserFeature playerUserFeature, RealmPlayer _)
+    public void SignOut()
     {
         _lock.Wait();
         try
@@ -57,6 +54,7 @@ internal sealed class PlayerNotificationsFeature : IPlayerNotificationsFeature, 
             _lock.Release();
         }
     }
+
 
     public void RelayCreated(UserNotificationData userNotificationData)
     {
@@ -123,17 +121,4 @@ internal sealed class PlayerNotificationsFeature : IPlayerNotificationsFeature, 
     }
 
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
-
-    public void Dispose()
-    {
-        _lock.Wait();
-        try
-        {
-            _userNotificationDataList = [];
-        }
-        finally
-        {
-            _lock.Release();
-        }
-    }
 }

@@ -22,15 +22,15 @@ public interface IPlayerSettingsFeature : IPlayerFeature, IEnumerable<UserSettin
     bool TryRemove(int settingId);
 }
 
-internal sealed class PlayerSettingsFeature : IPlayerSettingsFeature, IDisposable
+internal sealed class PlayerSettingsFeature : IPlayerSettingsFeature, IUsesUserPersistentData, IDisposable
 {
     private readonly object _lock = new();
     private ICollection<UserSettingData> _settings = [];
-    private readonly IPlayerUserFeature _playerUserFeature;
 
     public event Action<IPlayerSettingsFeature, UserSettingDto>? Added;
     public event Action<IPlayerSettingsFeature, UserSettingDto>? Changed;
     public event Action<IPlayerSettingsFeature, UserSettingDto>? Removed;
+    public event Action? VersionIncreased;
 
     public int[] SettingsIds
     {
@@ -42,18 +42,21 @@ internal sealed class PlayerSettingsFeature : IPlayerSettingsFeature, IDisposabl
     }
 
     public RealmPlayer Player { get; init; }
-    public PlayerSettingsFeature(PlayerContext playerContext, IPlayerUserFeature playerUserFeature)
+    public PlayerSettingsFeature(PlayerContext playerContext)
     {
         Player = playerContext.Player;
-        playerUserFeature.SignedIn += HandleSignedIn;
-        playerUserFeature.SignedOut += HandleSignedOut;
-        _playerUserFeature = playerUserFeature;
     }
 
-    private void HandleSignedIn(IPlayerUserFeature playerUserFeature, RealmPlayer _)
+
+    public void SignIn(UserData userData)
     {
         lock (_lock)
-            _settings = playerUserFeature.UserData.Settings;
+            _settings = userData.Settings;
+    }
+
+    public void SignOut()
+    {
+        Reset();
     }
 
     public void Reset()
@@ -62,11 +65,6 @@ internal sealed class PlayerSettingsFeature : IPlayerSettingsFeature, IDisposabl
         {
             Remove(settingId);
         }
-    }
-
-    private void HandleSignedOut(IPlayerUserFeature playerUserFeature, RealmPlayer _)
-    {
-        Reset();
     }
 
     public bool Has(int settingId)
@@ -97,7 +95,7 @@ internal sealed class PlayerSettingsFeature : IPlayerSettingsFeature, IDisposabl
                 Added?.Invoke(this, UserSettingDto.Map(setting));
             }
         }
-        _playerUserFeature.IncreaseVersion();
+        VersionIncreased?.Invoke();
     }
 
     public string Get(int settingId)
@@ -136,7 +134,7 @@ internal sealed class PlayerSettingsFeature : IPlayerSettingsFeature, IDisposabl
 
             _settings.Remove(setting);
             Removed?.Invoke(this, UserSettingDto.Map(setting));
-            _playerUserFeature.IncreaseVersion();
+            VersionIncreased?.Invoke();
         }
     }
     
@@ -149,7 +147,7 @@ internal sealed class PlayerSettingsFeature : IPlayerSettingsFeature, IDisposabl
             {
                 _settings.Remove(setting);
                 Removed?.Invoke(this, UserSettingDto.Map(setting));
-                _playerUserFeature.IncreaseVersion();
+                VersionIncreased?.Invoke();
                 return true;
             }
             return false;

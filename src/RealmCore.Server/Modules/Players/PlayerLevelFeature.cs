@@ -19,47 +19,38 @@ public interface IPlayerLevelFeature : IPlayerFeature
     void GiveExperience(uint amount);
 }
 
-internal sealed class PlayerLevelFeature : IPlayerLevelFeature, IDisposable
+internal sealed class PlayerLevelFeature : IPlayerLevelFeature, IUsesUserPersistentData
 {
     private readonly object _lock = new();
     private readonly LevelsCollection _levelsCollection;
-    private readonly IPlayerUserFeature _playerUserFeature;
     private uint _level;
     private uint _experience;
 
     public event Action<IPlayerLevelFeature, uint, LevelChange>? LevelChanged;
     public event Action<IPlayerLevelFeature, uint>? ExperienceChanged;
+    public event Action? VersionIncreased;
 
     public RealmPlayer Player { get; init; }
-    public PlayerLevelFeature(PlayerContext playerContext, LevelsCollection levelsCollection, IPlayerUserFeature playerUserFeature)
+    public PlayerLevelFeature(PlayerContext playerContext, LevelsCollection levelsCollection)
     {
         Player = playerContext.Player;
-        playerUserFeature.SignedIn += HandleSignedIn;
-        playerUserFeature.SignedOut += HandleSignedOut;
         _levelsCollection = levelsCollection;
-        _playerUserFeature = playerUserFeature;
     }
 
-    private void HandleSignedIn(IPlayerUserFeature playerUserFeature, RealmPlayer _)
+    public void SignIn(UserData userData)
     {
-        lock (_lock)
-        {
-            _level = playerUserFeature.UserData.Level;
-            _experience = playerUserFeature.UserData.Experience;
-            LevelChanged?.Invoke(this, _level, LevelChange.Set);
-            ExperienceChanged?.Invoke(this, _experience);
-        }
+        _level = userData.Level;
+        _experience = userData.Experience;
+        LevelChanged?.Invoke(this, _level, LevelChange.Set);
+        ExperienceChanged?.Invoke(this, _experience);
     }
 
-    private void HandleSignedOut(IPlayerUserFeature playerUserFeature, RealmPlayer _)
+    public void SignOut()
     {
-        lock (_lock)
-        {
-            _level = 0;
-            _experience = 0;
-            LevelChanged?.Invoke(this, _level, LevelChange.Set);
-            ExperienceChanged?.Invoke(this, _experience);
-        }
+        _level = 0;
+        _experience = 0;
+        LevelChanged?.Invoke(this, _level, LevelChange.Set);
+        ExperienceChanged?.Invoke(this, _experience);
     }
 
     public uint NextLevelRequiredExperience
@@ -129,18 +120,9 @@ internal sealed class PlayerLevelFeature : IPlayerLevelFeature, IDisposable
         {
             _experience -= NextLevelRequiredExperience;
             _level++;
-            _playerUserFeature.IncreaseVersion();
+            VersionIncreased?.Invoke();
             LevelChanged?.Invoke(this, _level, LevelChange.Increase);
             CheckForNextLevel();
-        }
-    }
-
-    public void Dispose()
-    {
-        lock (_lock)
-        {
-            _level = 0;
-            _experience = 0;
         }
     }
 }

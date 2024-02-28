@@ -19,23 +19,29 @@ public interface IVehicleInventoryFeature : IVehicleFeature, IElementInventoryFe
 
 }
 
-internal sealed class PlayerInventoryFeature : ElementInventoryFeature, IPlayerInventoryFeature
+internal sealed class PlayerInventoryFeature : ElementInventoryFeature, IPlayerInventoryFeature, IUsesUserPersistentData
 {
     private readonly ItemsCollection _itemsCollection;
+
+    public event Action? VersionIncreased;
 
     public RealmPlayer Player { get; }
     protected override Element Element => Player;
 
-    public PlayerInventoryFeature(PlayerContext playerContext, IPlayerUserFeature playerUserFeature, ItemsCollection itemsCollection)
+    public PlayerInventoryFeature(PlayerContext playerContext, ItemsCollection itemsCollection)
     {
         Player = playerContext.Player;
-        playerUserFeature.SignedIn += HandleSignedIn;
         _itemsCollection = itemsCollection;
     }
 
-    private void HandleSignedIn(IPlayerUserFeature playerUserFeature, RealmPlayer player)
+    public void SignIn(UserData userData)
     {
-        Load(Player, playerUserFeature.UserData.Inventories, _itemsCollection);
+        Load(Player, userData.Inventories, _itemsCollection);
+    }
+
+    public void SignOut()
+    {
+
     }
 }
 

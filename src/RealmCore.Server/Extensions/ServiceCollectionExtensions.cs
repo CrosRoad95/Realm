@@ -1,7 +1,6 @@
 ﻿using RealmCore.Server.Modules.Players.AFK;
 using RealmCore.Server.Modules.Players.Money;
 using RealmCore.Server.Modules.Players.Settings;
-using RealmCore.Server.Modules.Search;
 
 namespace RealmCore.Server.Extensions;
 

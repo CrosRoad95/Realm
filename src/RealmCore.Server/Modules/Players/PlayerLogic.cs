@@ -1,6 +1,4 @@
-﻿using SlipeServer.Server;
-
-namespace RealmCore.Server.Modules.Players;
+﻿namespace RealmCore.Server.Modules.Players;
 
 public abstract class PlayerLogic
 {

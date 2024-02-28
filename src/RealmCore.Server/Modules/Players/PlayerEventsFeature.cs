@@ -9,31 +9,29 @@ public interface IPlayerEventsFeature : IPlayerFeature, IEnumerable<UserEventDto
     IReadOnlyCollection<UserEventData> Get(IEnumerable<int>? events = null, int limit = 10);
 }
 
-internal class PlayerEventsFeature : IPlayerEventsFeature, IDisposable
+internal class PlayerEventsFeature : IPlayerEventsFeature, IUsesUserPersistentData
 {
     private readonly SemaphoreSlim _lock = new(1);
-    private readonly IPlayerUserFeature _playerUserFeature;
     private readonly IDateTimeProvider _dateTimeProvider;
     private readonly IDb _db;
     private ICollection<UserEventData> _userEventData = [];
     public event Action<IPlayerEventsFeature, IEnumerable<UserEventDto>>? Added;
+    public event Action? VersionIncreased;
+
     public RealmPlayer Player { get; init; }
-    public PlayerEventsFeature(PlayerContext playerContext, IPlayerUserFeature playerUserFeature, IDateTimeProvider dateTimeProvider, IDb db)
+    public PlayerEventsFeature(PlayerContext playerContext, IDateTimeProvider dateTimeProvider, IDb db)
     {
         Player = playerContext.Player;
-        playerUserFeature.SignedIn += HandleSignedIn;
-        playerUserFeature.SignedOut += HandleSignedOut;
-        _playerUserFeature = playerUserFeature;
         _dateTimeProvider = dateTimeProvider;
         _db = db;
     }
 
-    private void HandleSignedIn(IPlayerUserFeature playerUserFeature, RealmPlayer _)
+    public void SignIn(UserData userData)
     {
         _lock.Wait();
         try
         {
-            _userEventData = playerUserFeature.UserData.Events;
+            _userEventData = userData.Events;
         }
         finally
         {
@@ -41,7 +39,7 @@ internal class PlayerEventsFeature : IPlayerEventsFeature, IDisposable
         }
     }
 
-    private void HandleSignedOut(IPlayerUserFeature playerUserFeature, RealmPlayer _)
+    public void SignOut()
     {
         _lock.Wait();
         try
@@ -92,7 +90,7 @@ internal class PlayerEventsFeature : IPlayerEventsFeature, IDisposable
         {
             _userEventData.Add(userEvent);
         }
-        _playerUserFeature.IncreaseVersion();
+        VersionIncreased?.Invoke();
         Added?.Invoke(this, [UserEventDto.Map(userEvent)]);
     }
 

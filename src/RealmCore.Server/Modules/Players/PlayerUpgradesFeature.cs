@@ -10,37 +10,34 @@ public interface IPlayerUpgradesFeature : IPlayerFeature, IEnumerable<int>
     bool TryRemove(int upgradeId);
 }
 
-internal sealed class PlayerUpgradesFeature : IPlayerUpgradesFeature, IDisposable
+internal sealed class PlayerUpgradesFeature : IPlayerUpgradesFeature, IUsesUserPersistentData
 {
     public event Action<IPlayerUpgradesFeature, int, bool>? Added;
     public event Action<IPlayerUpgradesFeature, int>? Removed;
+    public event Action? VersionIncreased;
 
     private ICollection<UserUpgradeData> _upgrades = [];
     private readonly object _lock = new();
-    private readonly IPlayerUserFeature _playerUserFeature;
 
     public RealmPlayer Player { get; init; }
-    public PlayerUpgradesFeature(PlayerContext playerContext, IPlayerUserFeature playerUserFeature)
+    public PlayerUpgradesFeature(PlayerContext playerContext)
     {
         Player = playerContext.Player;
-        playerUserFeature.SignedIn += HandleSignedIn;
-        playerUserFeature.SignedOut += HandleSignedOut;
-        _playerUserFeature = playerUserFeature;
     }
 
-    private void HandleSignedIn(IPlayerUserFeature playerUserFeature, RealmPlayer _)
+    public void SignIn(UserData userData)
     {
         lock (_lock)
         {
-            _upgrades = playerUserFeature.UserData.Upgrades;
-            foreach (var userUpgradeData in playerUserFeature.UserData.Upgrades)
+            _upgrades = userData.Upgrades;
+            foreach (var userUpgradeData in userData.Upgrades)
             {
                 Added?.Invoke(this, userUpgradeData.UpgradeId, true);
             }
         }
     }
 
-    private void HandleSignedOut(IPlayerUserFeature playerUserFeature, RealmPlayer _)
+    public void SignOut()
     {
         lock (_lock)
         {
@@ -67,7 +64,8 @@ internal sealed class PlayerUpgradesFeature : IPlayerUpgradesFeature, IDisposabl
             {
                 UpgradeId = upgradeId,
             });
-            _playerUserFeature.IncreaseVersion();
+
+            VersionIncreased?.Invoke();
             Added?.Invoke(this, upgradeId, false);
             return true;
         }
@@ -81,7 +79,7 @@ internal sealed class PlayerUpgradesFeature : IPlayerUpgradesFeature, IDisposabl
             if (upgrade == null)
                 return false;
             _upgrades.Remove(upgrade);
-            _playerUserFeature.IncreaseVersion();
+            VersionIncreased?.Invoke();
             Removed?.Invoke(this, upgradeId);
             return true;
         }
@@ -94,12 +92,4 @@ internal sealed class PlayerUpgradesFeature : IPlayerUpgradesFeature, IDisposabl
     }
 
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
-
-    public void Dispose()
-    {
-        lock (_lock)
-        {
-            _upgrades = [];
-        }
-    }
 }

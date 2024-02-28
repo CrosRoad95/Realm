@@ -12,33 +12,28 @@ public interface IPlayerIntegrationsFeature : IPlayerFeature
     IIntegration[] Integrations { get; }
 }
 
-internal sealed class PlayerIntegrationsFeature : IPlayerIntegrationsFeature, IDisposable
+internal sealed class PlayerIntegrationsFeature : IPlayerIntegrationsFeature, IUsesUserPersistentData
 {
     public IDiscordIntegration Discord { get; private set; }
     public RealmPlayer Player { get; init; }
 
     public IIntegration[] Integrations => [Discord];
 
-    public PlayerIntegrationsFeature(PlayerContext playerContext, IDateTimeProvider dateTimeProvider, IPlayerUserFeature playerUserFeature)
+    public PlayerIntegrationsFeature(PlayerContext playerContext, IDateTimeProvider dateTimeProvider)
     {
         Player = playerContext.Player;
         Discord = new DiscordIntegration(Player, dateTimeProvider);
-        playerUserFeature.SignedIn += HandleSignedIn;
-        playerUserFeature.SignedOut += HandleSignedOut;
     }
 
-    private void HandleSignedIn(IPlayerUserFeature playerUserFeature, RealmPlayer _)
+    public event Action? VersionIncreased;
+
+    public void SignIn(UserData userData)
     {
-        if (playerUserFeature.UserData.DiscordIntegration != null)
-            Discord.Integrate(playerUserFeature.UserData.DiscordIntegration.DiscordUserId);
+        if (userData.DiscordIntegration != null)
+            Discord.Integrate(userData.DiscordIntegration.DiscordUserId);
     }
 
-    private void HandleSignedOut(IPlayerUserFeature playerUserFeature, RealmPlayer _)
-    {
-        Discord.TryRemove();
-    }
-
-    public void Dispose()
+    public void SignOut()
     {
         Discord.TryRemove();
     }

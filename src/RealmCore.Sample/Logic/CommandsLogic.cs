@@ -3,7 +3,6 @@ using RealmCore.Sample.HudLayers;
 using RealmCore.Server.Modules.Players.Money;
 using RealmCore.Server.Modules.Search;
 using SlipeServer.Packets.Enums;
-using System.Media;
 using Color = System.Drawing.Color;
 
 namespace RealmCore.Sample.Logic;

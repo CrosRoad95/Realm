@@ -1,6 +1,5 @@
 ﻿using RealmCore.Resources.Base.Interfaces;
 using SlipeServer.Server.Events;
-using SlipeServer.Server.Mappers;
 using SlipeServer.Server.Services;
 
 namespace RealmCore.Resources.Browser;

@@ -29,16 +29,16 @@ public interface IPlayerBansFeature : IPlayerFeature, IEnumerable<BanDto>
     BanDto? GetByIdOrDefault(int type);
 }
 
-internal sealed class PlayerBansFeature : IPlayerBansFeature
+internal sealed class PlayerBansFeature : IPlayerBansFeature, IUsesUserPersistentData
 {
     private readonly SemaphoreSlim _lock = new(1);
     private ICollection<BanData> _bans = [];
-    private readonly IPlayerUserFeature _playerUserFeature;
     private readonly IDateTimeProvider _dateTimeProvider;
     private readonly IDb _db;
 
     public event Action<IPlayerBansFeature, BanDto>? Added;
     public event Action<IPlayerBansFeature, BanDto>? Deactivated;
+    public event Action? VersionIncreased;
 
     public BanDto[] ActiveBans
     {
@@ -58,22 +58,19 @@ internal sealed class PlayerBansFeature : IPlayerBansFeature
     }
 
     public RealmPlayer Player { get; init; }
-    public PlayerBansFeature(PlayerContext playerContext, IPlayerUserFeature playerUserFeature, IDateTimeProvider dateTimeProvider, IDb db)
+    public PlayerBansFeature(PlayerContext playerContext, IDateTimeProvider dateTimeProvider, IDb db)
     {
         Player = playerContext.Player;
-        playerUserFeature.SignedIn += HandleSignedIn;
-        playerUserFeature.SignedOut += HandleSignedOut;
-        _playerUserFeature = playerUserFeature;
         _dateTimeProvider = dateTimeProvider;
         _db = db;
     }
 
-    private void HandleSignedIn(IPlayerUserFeature playerUserFeature, RealmPlayer _)
+    public void SignIn(UserData userData)
     {
         _lock.Wait();
         try
         {
-            _bans = playerUserFeature.UserData.Bans;
+            _bans = userData.Bans;
         }
         finally
         {
@@ -81,7 +78,7 @@ internal sealed class PlayerBansFeature : IPlayerBansFeature
         }
     }
 
-    private void HandleSignedOut(IPlayerUserFeature playerUserFeature, RealmPlayer _)
+    public void SignOut()
     {
         _lock.Wait();
         try
@@ -120,7 +117,7 @@ internal sealed class PlayerBansFeature : IPlayerBansFeature
             _lock.Release();
         }
 
-        _playerUserFeature.IncreaseVersion();
+        VersionIncreased?.Invoke();
         Added?.Invoke(this, BanDto.Map(banData));
     }
 
@@ -169,7 +166,7 @@ internal sealed class PlayerBansFeature : IPlayerBansFeature
 
         if (removed && ban != null)
         {
-            _playerUserFeature.IncreaseVersion();
+            VersionIncreased?.Invoke();
             Deactivated?.Invoke(this, BanDto.Map(ban));
             return true;
         }

@@ -1,5 +1,4 @@
 ﻿using Polly.RateLimit;
-using RealmCore.Server.Modules.Search;
 
 namespace RealmCore.Server.Modules.Commands;
 
