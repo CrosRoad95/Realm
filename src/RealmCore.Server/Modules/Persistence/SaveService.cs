@@ -99,7 +99,7 @@ internal sealed class SaveService : ISaveService
         if (vehicle.Inventory.TryGetPrimary(out var inventory))
             vehicleData.Inventories = [Inventory.CreateData(inventory)];
         vehicleData.LastUsed = vehicle.Persistence.LastUsed;
-        await vehicle.ServiceProvider.GetRequiredService<IDb>().SaveChangesAsync(cancellationToken);
+        await vehicle.GetRequiredService<IDb>().SaveChangesAsync(cancellationToken);
         return true;
     }
 

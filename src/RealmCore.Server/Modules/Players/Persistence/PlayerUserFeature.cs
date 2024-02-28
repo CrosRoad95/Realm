@@ -44,7 +44,7 @@ public interface IPlayerUserFeature : IPlayerFeature
     internal void SetAuthorizedPolicyState(string policy, bool authorized);
 }
 
-internal sealed class PlayerUserFeature : IPlayerUserFeature, IDisposable
+internal sealed class PlayerUserFeature : IPlayerUserFeature
 {
     private readonly object _lock = new();
     private UserData? _user;
@@ -306,10 +306,5 @@ internal sealed class PlayerUserFeature : IPlayerUserFeature, IDisposable
     public void UpdateLastNewsRead()
     {
         UserData.LastNewsReadDateTime = _dateTimeProvider.Now;
-    }
-
-    public void Dispose()
-    {
-        SignOut();
     }
 }

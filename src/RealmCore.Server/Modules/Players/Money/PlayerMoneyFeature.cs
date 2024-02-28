@@ -3,6 +3,8 @@
 public interface IPlayerMoneyFeature : IPlayerFeature
 {
     decimal Amount { get; set; }
+    decimal Limit { get; }
+    byte Precision { get; }
 
     event Action<IPlayerMoneyFeature, decimal>? Set;
     event Action<IPlayerMoneyFeature, decimal>? Added;
@@ -16,23 +18,28 @@ public interface IPlayerMoneyFeature : IPlayerFeature
     bool TryTakeMoney(decimal amount, Func<bool> action, bool force = false);
     Task<bool> TryTakeMoneyAsync(decimal amount, Func<Task<bool>> action, bool force = false);
     void TransferMoney(RealmPlayer player, decimal amount, bool force = false);
+    void SetMoneyLimitAndPrecision(decimal moneyLimit, byte precision);
 }
 
-internal sealed class PlayerMoneyFeature : IPlayerMoneyFeature, IDisposable
+internal sealed class PlayerMoneyFeature : IPlayerMoneyFeature, IUsesUserPersistentData, IDisposable
 {
     private readonly ReaderWriterLockSlim _lock = new();
     private decimal _money = 0;
     private decimal _previousMoney = 0;
     private decimal _moneyLimit;
     private byte _moneyPrecision;
-    private readonly IOptionsMonitor<GameplayOptions>? _gameplayOptions;
-    private readonly IPlayerUserFeature _playerUserFeature;
+    private UserData? _userData;
 
     public RealmPlayer Player { get; init; }
 
     public event Action<IPlayerMoneyFeature, decimal>? Set;
     public event Action<IPlayerMoneyFeature, decimal>? Added;
     public event Action<IPlayerMoneyFeature, decimal>? Taken;
+    public event Action? VersionIncreased;
+
+    public decimal Limit => _moneyLimit;
+    public byte Precision => _moneyPrecision;
+
     public decimal Amount
     {
         get => _money;
@@ -50,8 +57,8 @@ internal sealed class PlayerMoneyFeature : IPlayerMoneyFeature, IDisposable
                     return;
                 _money = value;
 
-                if (_playerUserFeature.IsSignedIn)
-                    _playerUserFeature.UserData.Money = _money;
+                if(_userData != null)
+                    _userData.Money = _money;
                 TryUpdateVersion();
 
                 Set?.Invoke(this, _money);
@@ -67,25 +74,17 @@ internal sealed class PlayerMoneyFeature : IPlayerMoneyFeature, IDisposable
         }
     }
 
-    public PlayerMoneyFeature(PlayerContext playerContext, IOptionsMonitor<GameplayOptions> gameplayOptions, IPlayerUserFeature playerUserFeature)
+    public PlayerMoneyFeature(PlayerContext playerContext)
     {
         Player = playerContext.Player;
-        _gameplayOptions = gameplayOptions;
-        _playerUserFeature = playerUserFeature;
-        _moneyLimit = _gameplayOptions.CurrentValue.MoneyLimit;
-        _moneyPrecision = _gameplayOptions.CurrentValue.MoneyPrecision;
-        _gameplayOptions.OnChange(HandleGameplayOptionsChanged);
-
-        _playerUserFeature.SignedIn += HandleSignedIn;
-        _playerUserFeature.SignedOut += HandleSignedOut;
     }
 
-    private void HandleSignedIn(IPlayerUserFeature userService, RealmPlayer player)
+    public void SignIn(UserData userData)
     {
-        Amount = userService.UserData.Money;
+        Amount = userData.Money;
     }
 
-    private void HandleSignedOut(IPlayerUserFeature userService, RealmPlayer player)
+    public void SignOut()
     {
         Amount = 0;
     }
@@ -95,7 +94,7 @@ internal sealed class PlayerMoneyFeature : IPlayerMoneyFeature, IDisposable
         if (Math.Abs(_money - _previousMoney) > 200)
         {
             _previousMoney = _money;
-            _playerUserFeature.IncreaseVersion();
+            VersionIncreased?.Invoke();
         }
     }
 
@@ -104,10 +103,10 @@ internal sealed class PlayerMoneyFeature : IPlayerMoneyFeature, IDisposable
         _money = amount;
     }
 
-    private void HandleGameplayOptionsChanged(GameplayOptions gameplayOptions)
+    public void SetMoneyLimitAndPrecision(decimal moneyLimit, byte precision)
     {
-        _moneyLimit = gameplayOptions.MoneyLimit;
-        _moneyPrecision = gameplayOptions.MoneyPrecision;
+        _moneyLimit = moneyLimit;
+        _moneyPrecision = precision;
     }
 
     private decimal Normalize(decimal amount) => amount.Truncate(_moneyPrecision);

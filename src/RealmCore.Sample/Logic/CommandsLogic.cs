@@ -129,26 +129,26 @@ internal sealed class CommandsLogic
         {
             var amount = args.ReadDecimal();
             player.Money.GiveMoney(amount);
-            _chatBox.OutputTo(player, $"gave money: {amount}, total money: {player.Money}");
+            _chatBox.OutputTo(player, $"give money: {amount}, total money: {player.Money.Amount}");
         });
 
         _commandService.AddCommandHandler("takemoney", (player, args) =>
         {
             var amount = args.ReadDecimal();
             player.Money.TakeMoney(amount);
-            _chatBox.OutputTo(player, $"taken money: {amount}, total money: {player.Money}");
+            _chatBox.OutputTo(player, $"take money: {amount}, total money: {player.Money.Amount}");
         });
 
         _commandService.AddCommandHandler("setmoney", (player, args) =>
         {
             var amount = args.ReadDecimal();
             player.Money.Amount = amount;
-            _chatBox.OutputTo(player, $"taken money: {amount}, total money: {player.Money}");
+            _chatBox.OutputTo(player, $"set money: {amount}, total money: {player.Money.Amount}");
         });
 
         _commandService.AddCommandHandler("money", (player, args) =>
         {
-            _chatBox.OutputTo(player, $"total money: {player.Money}");
+            _chatBox.OutputTo(player, $"total money: {player.Money.Amount}");
         });
 
         _commandService.AddCommandHandler("cvwithlicenserequired", (player, args) =>

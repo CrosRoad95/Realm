@@ -50,7 +50,7 @@ internal sealed class VehiclesService : IVehiclesService
     public async Task<RealmVehicle> CreatePersistantVehicle(Location location, VehicleModel model, CancellationToken cancellationToken = default)
     {
         var vehicle = _elementFactory.CreateVehicle(location, model);
-        var vehicleData = await vehicle.ServiceProvider.GetRequiredService<IVehicleRepository>().CreateVehicle((ushort)model, _dateTimeProvider.Now, cancellationToken);
+        var vehicleData = await vehicle.GetRequiredService<IVehicleRepository>().CreateVehicle((ushort)model, _dateTimeProvider.Now, cancellationToken);
         try
         {
             SetActive(vehicleData.Id, vehicle);
