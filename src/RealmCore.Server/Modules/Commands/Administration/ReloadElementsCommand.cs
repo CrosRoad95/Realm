@@ -3,6 +3,8 @@
 [CommandName("reloadelements")]
 internal class ReloadElementsCommand : IInGameCommand
 {
+    public string[] RequiredPolicies { get; } = ["Owner"];
+
     private readonly IElementCollection _elementCollection;
     private readonly ISaveService _saveService;
     private readonly ILogger<SaveCommand> _logger;
@@ -26,7 +28,8 @@ internal class ReloadElementsCommand : IInGameCommand
                 if (await _saveService.Save(element, false, cancellationToken))
                 {
                     savedElements++;
-                    element.Destroy();
+                    if(element is not RealmPlayer)
+                        element.Destroy();
                 }
             }
             catch (Exception ex)

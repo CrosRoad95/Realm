@@ -1,4 +1,4 @@
-﻿namespace RealmCore.Server.Modules.Players.Membership;
+﻿namespace RealmCore.Server.Modules.Players.Fractions;
 
 public interface IPlayerFractionsFeature : IPlayerFeature
 {
@@ -41,7 +41,7 @@ internal sealed class PlayerFractionsFeature : IPlayerFractionsFeature, IUsesUse
         lock (_lock)
             return _fractionMembers.Any(x => x.FractionId == fractionId);
     }
-    
+
     public FractionMemberDto GetById(int fractionId)
     {
         lock (_lock)
@@ -53,7 +53,7 @@ internal sealed class PlayerFractionsFeature : IPlayerFractionsFeature, IUsesUse
         lock (_lock)
         {
             var fraction = _fractionMembers.FirstOrDefault(x => x.FractionId == fractionMemberData.FractionId);
-            if(fraction != null)
+            if (fraction != null)
             {
                 _fractionMembers.Add(fractionMemberData);
                 Added?.Invoke(this, FractionMemberDto.Map(fractionMemberData));

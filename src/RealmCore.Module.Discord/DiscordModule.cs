@@ -2,7 +2,7 @@
 
 namespace RealmCore.Module.Discord;
 
-internal class DiscordModule : IModule
+internal class DiscordModule : IExternalModule
 {
     private readonly ILogger<DiscordModule> _logger;
     private readonly IDiscordStatusChannelUpdateHandler? _discordStatusChannelUpdateHandler;

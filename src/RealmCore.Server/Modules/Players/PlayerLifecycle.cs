@@ -1,10 +1,10 @@
 ﻿namespace RealmCore.Server.Modules.Players;
 
-public abstract class PlayerLogic
+public abstract class PlayerLifecycle
 {
     protected readonly MtaServer _server;
 
-    public PlayerLogic(MtaServer server)
+    public PlayerLifecycle(MtaServer server)
     {
         server.PlayerJoined += HandlePlayerJoined;
         _server = server;

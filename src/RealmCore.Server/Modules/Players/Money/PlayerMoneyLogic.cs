@@ -1,6 +1,6 @@
 ﻿namespace RealmCore.Server.Modules.Players.Money;
 
-internal sealed class PlayerMoneyLogic : PlayerLogic
+internal sealed class PlayerMoneyLogic : PlayerLifecycle
 {
     private readonly IOptionsMonitor<GameplayOptions> _gameplayOptions;
     private readonly IElementCollection _elementCollection;

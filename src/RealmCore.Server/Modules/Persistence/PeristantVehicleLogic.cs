@@ -1,6 +1,6 @@
 ﻿namespace RealmCore.Server.Modules.Persistence;
 
-internal sealed class PeristantVehicleLogic : VehicleLogic
+internal sealed class PeristantVehicleLogic : VehicleLifecycle
 {
     private readonly IVehiclesInUse _activeVehicles;
 

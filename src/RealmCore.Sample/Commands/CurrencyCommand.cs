@@ -7,6 +7,7 @@ public sealed class CurrencyCommand : IInGameCommand
     private readonly IOptions<GameplayOptions> _gameplayOptions;
     private readonly ChatBox _chatBox;
 
+    public string[] RequiredPolicies { get; } = [];
     public CurrencyCommand(ILogger<CurrencyCommand> logger, IOptions<GameplayOptions> gameplayOptions, ChatBox chatBox)
     {
         _logger = logger;

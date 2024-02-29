@@ -1,6 +1,6 @@
 ﻿namespace RealmCore.Server.Modules.Players;
 
-internal sealed class PlayerBlipLogic : PlayerLogic
+internal sealed class PlayerBlipLogic : PlayerLifecycle
 {
     public PlayerBlipLogic(MtaServer server) : base(server)
     {

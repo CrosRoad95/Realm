@@ -1,8 +1,8 @@
 ﻿namespace RealmCore.Server.Modules.Vehicles;
 
-public abstract class VehicleLogic
+public abstract class VehicleLifecycle
 {
-    public VehicleLogic(IElementFactory elementFactory)
+    public VehicleLifecycle(IElementFactory elementFactory)
     {
         elementFactory.ElementCreated += HandleElementCreated;
     }

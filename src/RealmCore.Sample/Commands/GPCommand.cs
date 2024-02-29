@@ -5,6 +5,7 @@ public sealed class GPCommand : IInGameCommand
 {
     private readonly ILogger<GPCommand> _logger;
 
+    public string[] RequiredPolicies { get; } = [];
     public GPCommand(ILogger<GPCommand> logger)
     {
         _logger = logger;

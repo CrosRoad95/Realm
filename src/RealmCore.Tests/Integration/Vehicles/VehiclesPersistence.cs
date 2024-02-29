@@ -1,4 +1,5 @@
 ﻿using RealmCore.Server.Modules.Elements.Focusable;
+using RealmCore.Server.Modules.Pickups;
 
 namespace RealmCore.Tests.Integration.Vehicles;
 

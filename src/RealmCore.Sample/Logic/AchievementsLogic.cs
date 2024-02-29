@@ -1,6 +1,6 @@
 ﻿namespace RealmCore.Sample.Logic;
 
-internal sealed class AchievementsLogic : PlayerLogic
+internal sealed class AchievementsLogic : PlayerLifecycle
 {
     private readonly IOverlayService _overlayService;
 

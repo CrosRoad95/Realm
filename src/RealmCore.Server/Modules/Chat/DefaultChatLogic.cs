@@ -1,6 +1,6 @@
 ﻿namespace RealmCore.Server.Modules.Chat;
 
-public class DefaultChatLogic : PlayerLogic
+public class DefaultChatLogic : PlayerLifecycle
 {
     private readonly ChatBox _chatBox;
     private readonly ILogger<DefaultChatLogic> _logger;

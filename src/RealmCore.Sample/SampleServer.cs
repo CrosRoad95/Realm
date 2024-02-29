@@ -49,7 +49,7 @@ public class SampleServer : RealmServer
         serverBuilder.AddLogic<PlayerGameplayLogic>();
         serverBuilder.AddScopedLogic<CommandsLogic>();
         serverBuilder.AddLogic<MapsLogic>();
-        serverBuilder.AddLogic<DefaultModulesLogic>();
+        serverBuilder.AddLogic<ExternalModulesLogic>();
         serverBuilder.AddLogic<ProceduralObjectsLogic>();
         serverBuilder.AddLogic<AssetsLogic>();
         serverBuilder.AddLogic<DefaultBanLogic>();

@@ -1,12 +1,12 @@
 ﻿namespace RealmCore.Sample.Commands;
 
-
 [CommandName("display3ring")]
 public sealed class Display3dRing : IInGameCommand
 {
     private readonly ILogger<Display3dRing> _logger;
     private readonly IOverlayService _overlayService;
 
+    public string[] RequiredPolicies { get; } = [];
     public Display3dRing(ILogger<Display3dRing> logger, IOverlayService overlayService)
     {
         _logger = logger;

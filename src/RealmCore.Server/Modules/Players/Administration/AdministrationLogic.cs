@@ -1,6 +1,6 @@
 ﻿namespace RealmCore.Server.Modules.Players.Administration;
 
-internal sealed class AdministrationLogic : PlayerLogic
+internal sealed class AdministrationLogic : PlayerLifecycle
 {
     private readonly NoClipService _noClipService;
     private readonly DebugLog _debugLog;

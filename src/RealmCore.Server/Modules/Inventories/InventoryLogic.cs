@@ -1,6 +1,6 @@
 ﻿namespace RealmCore.Server.Modules.Inventories;
 
-internal sealed class InventoryLogic : PlayerLogic
+internal sealed class InventoryLogic : PlayerLifecycle
 {
     private readonly ISaveService _saveService;
     private readonly ILogger<InventoryLogic> _logger;

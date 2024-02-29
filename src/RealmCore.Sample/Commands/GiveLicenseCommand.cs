@@ -6,6 +6,7 @@ public sealed class GiveLicenseCommand : IInGameCommand
     private readonly ILogger<GiveLicenseCommand> _logger;
     private readonly ChatBox _chatBox;
 
+    public string[] RequiredPolicies { get; } = [];
     public GiveLicenseCommand(ILogger<GiveLicenseCommand> logger, ChatBox chatBox)
     {
         _logger = logger;

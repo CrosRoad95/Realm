@@ -1,6 +1,6 @@
 ﻿namespace RealmCore.Sample.Logic;
 
-public class ItemsLogic : PlayerLogic
+public class ItemsLogic : PlayerLifecycle
 {
     private readonly ChatBox _chatBox;
 

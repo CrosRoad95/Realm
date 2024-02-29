@@ -6,6 +6,7 @@ public sealed class InventoryCommand : IInGameCommand
     private readonly ILogger<InventoryCommand> _logger;
     private readonly ChatBox _chatBox;
 
+    public string[] RequiredPolicies { get; } = [];
     public InventoryCommand(ILogger<InventoryCommand> logger, ChatBox chatBox)
     {
         _logger = logger;

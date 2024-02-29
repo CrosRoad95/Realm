@@ -1,6 +1,6 @@
 ﻿namespace RealmCore.Server.Modules.Players.Gui.Dx;
 
-internal sealed class PlayerHudLogic : PlayerLogic
+internal sealed class PlayerHudLogic : PlayerLifecycle
 {
     private readonly IOverlayService _overlayService;
 

@@ -171,7 +171,6 @@
 		<Using Include="RealmCore.Server.Modules.Players.Jobs" />
 		<Using Include="RealmCore.Server.Modules.Players.Jobs.Objectives" />
 		<Using Include="RealmCore.Server.Modules.Players.Licenses" />
-		<Using Include="RealmCore.Server.Modules.Players.Membership" />
 		<Using Include="RealmCore.Server.Modules.Players.Persistence" />
 		<Using Include="RealmCore.Server.Modules.Security" />
 		<Using Include="RealmCore.Server.Modules.Seeder" />
@@ -193,7 +192,6 @@
 		<Using Include="RealmCore.Resources.GuiSystem" />
 		<Using Include="RealmCore.Server.Modules.Integrations" />
 		<Using Include="RealmCore.Persistence.DTOs" />
-		<Using Include="RealmCore.Server.Modules.Gameplay" />
 		<Using Include="RealmCore.Persistence.Extensions" />
 		<Using Include="RealmCore.Server.Modules.World.Xml" />
 		<Using Include="RealmCore.Server.Modules.World.Xml.Map" />
@@ -207,6 +205,7 @@
 		<Using Include="RealmCore.Server.Modules.Search" />
 		<Using Include="Quartz" />
 		<Using Include="Quartz.Impl" />
+		<Using Include="Polly.RateLimit" />
 	</ItemGroup>
 
 </Project>

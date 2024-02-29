@@ -1,5 +1,5 @@
 ﻿namespace RealmCore.Interfaces.Extend;
 
-public interface IModule
+public interface IExternalModule
 {
 }

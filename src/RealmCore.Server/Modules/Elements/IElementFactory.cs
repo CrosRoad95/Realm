@@ -1,4 +1,6 @@
-﻿namespace RealmCore.Server.Modules.Elements;
+﻿using RealmCore.Server.Modules.Pickups;
+
+namespace RealmCore.Server.Modules.Elements;
 
 public interface IElementFactory
 {

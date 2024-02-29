@@ -3,6 +3,8 @@
 [CommandName("serverinfo")]
 internal class ServerInfoCommand : IInGameCommand
 {
+    public string[] RequiredPolicies { get; } = ["Owner"];
+
     private readonly ILogger<HelpCommand> _logger;
     private readonly MtaServer _server;
     private readonly IDateTimeProvider _dateTimeProvider;

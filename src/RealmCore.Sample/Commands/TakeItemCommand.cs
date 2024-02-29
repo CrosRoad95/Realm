@@ -6,6 +6,7 @@ public sealed class TakeItemCommand : IInGameCommand
     private readonly ILogger<TakeItemCommand> _logger;
     private readonly ChatBox _chatBox;
 
+    public string[] RequiredPolicies { get; } = [];
     public TakeItemCommand(ILogger<TakeItemCommand> logger, ChatBox chatBox)
     {
         _logger = logger;

@@ -6,6 +6,7 @@ public sealed class AddPointsCommand : IInGameCommand
     private readonly ILogger<AddPointsCommand> _logger;
     private readonly ChatBox _chatBox;
 
+    public string[] RequiredPolicies { get; } = [];
     public AddPointsCommand(ILogger<AddPointsCommand> logger, ChatBox chatBox)
     {
         _logger = logger;

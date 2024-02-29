@@ -1,4 +1,4 @@
-﻿namespace RealmCore.Tests.Unit.Vehicles;
+﻿namespace RealmCore.Tests.Integration.Vehicles;
 
 public class VehiclePartDamageServiceTests : RealmUnitTestingBase
 {

@@ -7,7 +7,7 @@ public class CommandArgumentException : Exception
 
     internal CommandArgumentException(int index, string? message, string? argument) : base(message)
     {
-        Index = index;
+        Index = index + 1;
         Argument = argument;
     }
 }

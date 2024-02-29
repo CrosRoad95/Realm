@@ -1,6 +1,4 @@
-﻿using Polly.RateLimit;
-
-namespace RealmCore.Server.Modules.Commands;
+﻿namespace RealmCore.Server.Modules.Commands;
 
 public sealed class RealmCommandService
 {
@@ -19,7 +17,7 @@ public sealed class RealmCommandService
         }
     }
 
-    internal class SyncCommandInfo : CommandInfo
+    internal sealed class SyncCommandInfo : CommandInfo
     {
         public override bool IsAsync => false;
 
@@ -31,7 +29,7 @@ public sealed class RealmCommandService
         }
     }
 
-    internal class AsyncCommandInfo : CommandInfo
+    internal sealed class AsyncCommandInfo : CommandInfo
     {
         public override bool IsAsync => true;
         internal Func<RealmPlayer, CommandArguments, CancellationToken, Task> Callback { get; }
@@ -72,6 +70,16 @@ public sealed class RealmCommandService
             {
                 if (player.GetRequiredService(type) is not IInGameCommand inGameCommand)
                     throw new InvalidOperationException();
+
+                if (inGameCommand.RequiredPolicies.Length > 0)
+                {
+                    var authorized = player.User.HasAuthorizedPolicies(inGameCommand.RequiredPolicies);
+                    if (!authorized)
+                    {
+                        _logger.LogInformation("Failed to execute command {command} because one of authorized policy failed", commandName);
+                        return;
+                    }
+                }
 
                 await inGameCommand.Handle(player, args, token);
             });
@@ -185,7 +193,7 @@ public sealed class RealmCommandService
         _logger.LogInformation("{player} executed command {command} with arguments {commandArguments}.", player, command, arguments);
         try
         {
-            var commandArguments = new CommandArguments(player, player.ServiceProvider.GetRequiredService<IPlayersService>(), player.ServiceProvider.GetRequiredService<IElementSearchService>(), arguments);
+            var commandArguments = new CommandArguments(player, player.ServiceProvider.GetRequiredService<IElementSearchService>(), arguments);
 
             if (commandInfo is SyncCommandInfo syncCommandInfo)
             {

@@ -4,17 +4,15 @@ public class CommandArguments
 {
     private readonly string[] _args;
     private readonly RealmPlayer _player;
-    private readonly IPlayersService _playersService;
     private readonly IElementSearchService _searchService;
     private int _index;
 
     public int Index => _index;
 
-    public CommandArguments(RealmPlayer player, IPlayersService playersService, IElementSearchService searchService, string[] args)
+    public CommandArguments(RealmPlayer player, IElementSearchService searchService, string[] args)
     {
         _args = args;
         _player = player;
-        _playersService = playersService;
         _searchService = searchService;
     }
 
@@ -167,7 +165,7 @@ public class CommandArguments
         throw new CommandArgumentException(_index, "Gracz o takiej nazwie nie został znaleziony", name);
     }
 
-    public virtual bool TryReadPlayerPlayer(out RealmPlayer? player, PlayerSearchOption searchOption = PlayerSearchOption.All, RealmPlayer? ignore = null)
+    public virtual bool TryReadPlayer(out RealmPlayer player, PlayerSearchOption searchOption = PlayerSearchOption.All, RealmPlayer? ignore = null)
     {
         if (TryReadArgument(out string? name) && name != null)
         {
@@ -181,8 +179,26 @@ public class CommandArguments
                 throw new CommandArgumentException(_index, "Znaleziono więcej niż 1 gracza o takiej nazwie", name);
             throw new CommandArgumentException(_index, "Gracz o takiej nazwie nie został znaleziony", name);
         }
-        player = null;
+        player = default!;
         return false;
+    }
+    
+    public virtual bool TryReadPlayerOrDefault(out RealmPlayer player, PlayerSearchOption searchOption = PlayerSearchOption.All, RealmPlayer? ignore = null)
+    {
+        if (TryReadArgument(out string? name) && name != null)
+        {
+            var players = _searchService.SearchPlayers(name, searchOption, ignore).ToList();
+            if (players.Count == 1)
+            {
+                player = players[0];
+                return true;
+            }
+            if (players.Count > 0)
+                throw new CommandArgumentException(_index, "Znaleziono więcej niż 1 gracza o takiej nazwie", name);
+            throw new CommandArgumentException(_index, "Gracz o takiej nazwie nie został znaleziony", name);
+        }
+        player = _player;
+        return true;
     }
 
     public virtual IEnumerable<RealmPlayer> SearchPlayers(string? pattern = null, PlayerSearchOption searchOption = PlayerSearchOption.All, RealmPlayer? ignore = null)

@@ -6,6 +6,7 @@ public sealed class LicensesCommand : IInGameCommand
     private readonly ILogger<LicensesCommand> _logger;
     private readonly ChatBox _chatBox;
     private readonly IDateTimeProvider _dateTimeProvider;
+    public string[] RequiredPolicies { get; } = [];
 
     public LicensesCommand(ILogger<LicensesCommand> logger, ChatBox chatBox, IDateTimeProvider dateTimeProvider)
     {

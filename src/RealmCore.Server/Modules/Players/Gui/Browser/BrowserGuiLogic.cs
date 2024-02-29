@@ -1,6 +1,6 @@
-﻿namespace RealmCore.Server.Modules.Players.Gui;
+﻿namespace RealmCore.Server.Modules.Players.Gui.Browser;
 
-internal sealed class BrowserGuiLogic : PlayerLogic
+internal sealed class BrowserGuiLogic : PlayerLifecycle
 {
     private readonly ILogger<BrowserGuiLogic> _logger;
     private readonly IOptions<GuiBrowserOptions> _guiBrowserOptions;
@@ -50,7 +50,7 @@ internal sealed class BrowserGuiLogic : PlayerLogic
 
     protected override void PlayerJoined(RealmPlayer player)
     {
-        if(_guiBrowserOptions.Value.BrowserSupport)
+        if (_guiBrowserOptions.Value.BrowserSupport)
             player.Gui.Changed += HandleGuiChanged;
     }
 

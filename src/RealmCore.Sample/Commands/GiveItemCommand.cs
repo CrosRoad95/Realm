@@ -7,6 +7,7 @@ public sealed class GiveItemCommand : IInGameCommand
     private readonly ItemsCollection _itemsCollection;
     private readonly ChatBox _chatBox;
 
+    public string[] RequiredPolicies { get; } = [];
     public GiveItemCommand(ILogger<GiveItemCommand> logger, ItemsCollection itemsCollection, ChatBox chatBox)
     {
         _logger = logger;

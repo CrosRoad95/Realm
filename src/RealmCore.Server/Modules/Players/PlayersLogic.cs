@@ -1,6 +1,6 @@
 ﻿namespace RealmCore.Server.Modules.Players;
 
-internal sealed class PlayersLogic : PlayerLogic
+internal sealed class PlayersLogic : PlayerLifecycle
 {
     private readonly IClientInterfaceService _clientInterfaceService;
     private readonly ILogger<PlayersLogic> _logger;

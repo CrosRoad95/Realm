@@ -1,4 +1,4 @@
-﻿namespace RealmCore.Server.Modules.Gameplay;
+﻿namespace RealmCore.Server.Modules.Domain;
 
 public class GameplayException : Exception
 {

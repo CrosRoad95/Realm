@@ -1,6 +1,6 @@
 ﻿namespace RealmCore.Server.Modules.Players.Gui.Dx;
 
-internal sealed class ReactiveDxGuiLogic : PlayerLogic
+internal sealed class ReactiveDxGuiLogic : PlayerLifecycle
 {
     private readonly IGuiSystemService _guiSystemService;
     private readonly LuaValueMapper _luaValueMapper;

@@ -1,4 +1,4 @@
-﻿namespace RealmCore.Server.Modules.Vehicles;
+﻿namespace RealmCore.Server.Modules.Vehicles.Tuning;
 
 public delegate void HandlingDelegate(VehicleHandlingContext vehicleHandlingContext);
 public delegate void ModifyHandlingDelegate(ref VehicleHandling vehicleHandling);

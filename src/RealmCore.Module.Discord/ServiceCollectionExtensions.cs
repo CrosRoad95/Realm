@@ -19,7 +19,7 @@ public static class ServiceCollectionExtensions
         services.AddSingleton(x => Commands.BindService(x.GetRequiredService<DiscordTextBasedCommandsStub>()));
 
         services.AddSingleton<IDiscordService, DiscordService>();
-        services.AddSingleton<IModule, DiscordModule>();
+        services.AddSingleton<IExternalModule, DiscordModule>();
         return services;
     }
 }

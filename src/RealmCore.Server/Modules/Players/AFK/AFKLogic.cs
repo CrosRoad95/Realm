@@ -1,6 +1,6 @@
 ﻿namespace RealmCore.Server.Modules.Players.AFK;
 
-internal sealed class AFKLogic : PlayerLogic
+internal sealed class AFKLogic : PlayerLifecycle
 {
     private readonly IElementCollection _elementCollection;
     private readonly IOptionsMonitor<GameplayOptions> _gameplayOptions;

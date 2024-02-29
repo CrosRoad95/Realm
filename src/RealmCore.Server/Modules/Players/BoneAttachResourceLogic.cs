@@ -1,6 +1,6 @@
 ﻿namespace RealmCore.Server.Modules.Players;
 
-internal sealed class BoneAttachResourceLogic : PlayerLogic
+internal sealed class BoneAttachResourceLogic : PlayerLifecycle
 {
     private readonly BoneAttachService _boneAttachService;
 

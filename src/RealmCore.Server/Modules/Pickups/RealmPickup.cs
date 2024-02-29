@@ -1,4 +1,4 @@
-﻿namespace RealmCore.Server.Modules.Elements;
+﻿namespace RealmCore.Server.Modules.Pickups;
 
 public class RealmPickup : Pickup, ICollisionDetection, IElementName
 {

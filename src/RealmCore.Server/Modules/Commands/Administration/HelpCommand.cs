@@ -12,6 +12,8 @@ internal class HelpCommand : IInGameCommand
         _logger = logger;
     }
 
+    public string[] RequiredPolicies { get; } = [];
+
     public Task Handle(RealmPlayer player, CommandArguments args, CancellationToken cancellationToken)
     {
         _logger.LogInformation("Commands:");
