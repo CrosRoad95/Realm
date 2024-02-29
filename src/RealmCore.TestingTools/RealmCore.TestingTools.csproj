@@ -4,11 +4,10 @@
 		<TargetFramework>net8.0</TargetFramework>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
-		<LangVersion>preview</LangVersion>
+		<OutputType>Library</OutputType>
+		<IsPackable>true</IsPackable>
 		<Version>0.0.0</Version>
 		<Authors>Sebastian Jura</Authors>
-		<Platforms>AnyCPU;x64</Platforms>
-		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
 	</PropertyGroup>
 
 	<ItemGroup>
