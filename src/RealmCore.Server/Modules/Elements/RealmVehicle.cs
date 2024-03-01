@@ -4,6 +4,7 @@ public class RealmVehicle : Vehicle, IPersistentElement
 {
     private readonly IServiceProvider _serviceProvider;
     private readonly IServiceScope _serviceScope;
+    private VehicleAccessController _accessController = VehicleDefaultAccessController.Instance;
 
     public IServiceProvider ServiceProvider => _serviceProvider;
     public int PersistentId => Persistence.Id;
@@ -18,7 +19,23 @@ public class RealmVehicle : Vehicle, IPersistentElement
     public IVehicleEventsFeature Events { get; init; }
     public IVehicleFuelFeature Fuel { get; init; }
     public IVehicleInventoryFeature Inventory { get; init; }
-    public VehicleAccessController AccessController { get; set; } = VehicleDefaultAccessController.Instance;
+
+    public VehicleAccessController AccessController
+    {
+        get => _accessController; set
+        {
+            if(value == null)
+                throw new ArgumentNullException(nameof(value));
+
+            if (_accessController != value)
+            {
+                _accessController = value;
+                AccessControllerChanged?.Invoke(this, _accessController, value);
+            }
+        }
+    }
+
+    public event Action<RealmVehicle, VehicleAccessController, VehicleAccessController>? AccessControllerChanged;
 
     public RealmVehicle(IServiceProvider serviceProvider, ushort model, Vector3 position) : base(model, position)
     {
