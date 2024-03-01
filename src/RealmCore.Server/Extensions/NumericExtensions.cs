@@ -6,4 +6,6 @@ public static class NumericExtensions
     {
         return amount.ToString("C", currencyCulture);
     }
+
+    public static bool IsFuzzyZero(this float value) => value < 0.001f;
 }

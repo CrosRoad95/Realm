@@ -1,4 +1,6 @@
-﻿namespace RealmCore.Server.Modules.Elements;
+﻿using SlipeServer.Server.Elements;
+
+namespace RealmCore.Server.Modules.Elements;
 
 public class RealmVehicle : Vehicle, IPersistentElement
 {
@@ -35,6 +37,7 @@ public class RealmVehicle : Vehicle, IPersistentElement
         }
     }
 
+    public bool IsInMove => Velocity.LengthSquared() > 0.001f;
     public event Action<RealmVehicle, VehicleAccessController, VehicleAccessController>? AccessControllerChanged;
 
     public RealmVehicle(IServiceProvider serviceProvider, ushort model, Vector3 position) : base(model, position)
