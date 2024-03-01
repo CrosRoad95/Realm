@@ -13,6 +13,19 @@ public record Location(Vector3 Position, Vector3 Rotation = default, byte? Inter
     public byte GetInteriorOrDefault() => Interior ?? 0;
     public ushort GetDimensionOrDefault() => Dimension ?? 0;
 
+    public bool CompareInteriorAndDimension(Location other)
+    {
+        return GetInteriorOrDefault() == other.GetInteriorOrDefault() && GetDimensionOrDefault() == other.GetDimensionOrDefault();
+    }
+
+    public float DistanceTo(Location other)
+    {
+        if (!CompareInteriorAndDimension(other))
+            return float.MaxValue;
+
+        return (Position - other.Position).Length();
+    }
+
     public override string ToString()
     {
         var sb = new StringBuilder();
