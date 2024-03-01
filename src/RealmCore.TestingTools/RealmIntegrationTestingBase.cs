@@ -16,17 +16,22 @@ public abstract class RealmIntegrationTestingBase : IAsyncLifetime
         }
     }
 
+    protected TRealmTestingServer CreateServer<TRealmTestingServer>(string connectionString, Action<ServiceCollection>? configureServices = null) where TRealmTestingServer: RealmTestingServer
+    {
+        return (TRealmTestingServer)new RealmTestingServer(new TestConfigurationProvider(connectionString), configureServices);
+    }
+
     protected async Task<RealmTestingServer> CreateServerAsync(Action<ServiceCollection>? configureServices = null)
     {
         if (_server == null)
         {
-            _server = new RealmTestingServer(new TestConfigurationProvider(_MySqlContainer.GetConnectionString()), configureServices);
+            _server = CreateServer<RealmTestingServer>(_MySqlContainer.GetConnectionString(), configureServices);
             await _server.GetRequiredService<IDb>().MigrateAsync();
         }
         return _server;
     }
 
-    protected async Task<RealmPlayer> CreatePlayerAsync(bool signedIn = true)
+    protected virtual async Task<RealmPlayer> CreatePlayerAsync(bool signedIn = true)
     {
         if (_server == null)
             throw new Exception("Server not created.");
@@ -39,7 +44,7 @@ public abstract class RealmIntegrationTestingBase : IAsyncLifetime
         return player;
     }
 
-    protected async Task<RealmVehicle> CreateVehicleAsync()
+    protected virtual async Task<RealmVehicle> CreateVehicleAsync()
     {
         if (_server == null)
             throw new Exception("Server not created.");

@@ -93,12 +93,12 @@ internal sealed class PlayerUserFeature : IPlayerUserFeature
         {
             _user = user;
             _claimsPrincipal = claimsPrincipal;
-            SignedIn?.Invoke(this, Player);
             foreach (var playerFeature in Player.GetRequiredService<IEnumerable<IPlayerFeature>>())
             {
                 if(playerFeature is IUsesUserPersistentData usesPlayerPersistentData)
                     usesPlayerPersistentData.SignIn(user);
             }
+            SignedIn?.Invoke(this, Player);
         }
     }
 
