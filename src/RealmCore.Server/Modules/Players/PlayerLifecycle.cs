@@ -1,6 +1,6 @@
 ﻿namespace RealmCore.Server.Modules.Players;
 
-public abstract class PlayerLifecycle
+public abstract class PlayerLifecycle<TPlayer> where TPlayer: RealmPlayer
 {
     protected readonly MtaServer _server;
 
@@ -12,21 +12,33 @@ public abstract class PlayerLifecycle
 
     private void HandlePlayerJoined(Player plr)
     {
-        var player = (RealmPlayer)plr;
+        var player = (TPlayer)plr;
         player.User.SignedIn += HandleSignedIn;
         player.Disconnected += HandleDisconnected;
         PlayerJoined(player);
     }
 
+    private void HandleSignedIn(IPlayerUserFeature arg1, RealmPlayer arg2)
+    {
+        throw new NotImplementedException();
+    }
+
     private void HandleDisconnected(Player plr, PlayerQuitEventArgs e)
     {
-        var player = (RealmPlayer)plr;
+        var player = (TPlayer)plr;
         player.User.SignedIn -= HandleSignedIn;
         player.Disconnected -= HandleDisconnected;
         PlayerLeft(player);
     }
 
-    protected virtual void PlayerJoined(RealmPlayer player) { }
-    protected virtual void PlayerLeft(RealmPlayer player) { }
-    protected virtual void HandleSignedIn(IPlayerUserFeature userService, RealmPlayer player) { }
+    protected virtual void PlayerJoined(TPlayer player) { }
+    protected virtual void PlayerLeft(TPlayer player) { }
+    protected virtual void PlayerSignedIn(IPlayerUserFeature userService, TPlayer player) { }
+}
+
+public abstract class PlayerLifecycle : PlayerLifecycle<RealmPlayer>
+{
+    protected PlayerLifecycle(MtaServer server) : base(server)
+    {
+    }
 }
