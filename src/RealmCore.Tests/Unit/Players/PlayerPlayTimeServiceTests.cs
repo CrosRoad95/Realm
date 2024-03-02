@@ -1,4 +1,6 @@
-﻿namespace RealmCore.Tests.Unit.Players;
+﻿using RealmCore.Server.Modules.Players.PlayTime;
+
+namespace RealmCore.Tests.Unit.Players;
 
 public class PlayerPlayTimeServiceTests : RealmUnitTestingBase
 {
@@ -27,5 +29,25 @@ public class PlayerPlayTimeServiceTests : RealmUnitTestingBase
 
         playTime2.PlayTime.Should().Be(TimeSpan.FromSeconds(50));
         playTime2.TotalPlayTime.Should().Be(TimeSpan.FromSeconds(1050));
+    }
+
+    [Fact]
+    public void CategoryPlayTimeShouldWork()
+    {
+        var server = CreateServer();
+        var player = CreatePlayer();
+
+        var playTime = player.PlayTime;
+
+        playTime.Category = 1;
+        server.DateTimeProvider.AddOffset(TimeSpan.FromSeconds(30));
+        playTime.Category = 2;
+        server.DateTimeProvider.AddOffset(TimeSpan.FromSeconds(30));
+        playTime.UpdateCategoryPlayTime(playTime.Category, server.DateTimeProvider.Now);
+
+        playTime.ToList().Should().BeEquivalentTo([
+            new PlayerPlayTimeDto(1, TimeSpan.FromSeconds(30)),
+            new PlayerPlayTimeDto(2, TimeSpan.FromSeconds(30))
+        ]);
     }
 }

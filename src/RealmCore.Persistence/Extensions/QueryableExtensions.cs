@@ -38,6 +38,7 @@ public static class QueryableExtensions
             .Include(x => x.Bans.Where(x => x.Active && x.End > now))
             .Include(x => x.Inventories)
             .ThenInclude(x => x!.InventoryItems)
+            .Include(x => x.PlayTimes)
             .AsSplitQuery();
     }
 

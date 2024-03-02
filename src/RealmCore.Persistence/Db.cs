@@ -46,6 +46,7 @@ public abstract class Db<T> : IdentityDbContext<UserData, RoleData, int,
     public DbSet<NewsData> News => Set<NewsData>();
     public DbSet<TagData> Tags => Set<TagData>();
     public DbSet<NewsTagData> NewsTags => Set<NewsTagData>();
+    public DbSet<UserPlayTimeData> UsersPlayTimes => Set<UserPlayTimeData>();
 
     public Db(DbContextOptions<T> options) : base(options)
     {
@@ -192,9 +193,14 @@ public abstract class Db<T> : IdentityDbContext<UserData, RoleData, int,
                 .HasMany(x => x.Opinions)
                 .WithOne(x => x.User)
                 .HasForeignKey(x => x.UserId);
-            
+
             entityBuilder
                 .HasMany(x => x.Bans)
+                .WithOne(x => x.User)
+                .HasForeignKey(x => x.UserId);
+
+            entityBuilder
+                .HasMany(x => x.PlayTimes)
                 .WithOne(x => x.User)
                 .HasForeignKey(x => x.UserId);
 
@@ -799,6 +805,13 @@ public abstract class Db<T> : IdentityDbContext<UserData, RoleData, int,
                 .WithOne(x => x.Tag)
                 .HasForeignKey(x => x.TagId)
                 .HasPrincipalKey(x => x.Id);
+        });
+
+        modelBuilder.Entity<UserPlayTimeData>(entityBuilder =>
+        {
+            entityBuilder
+                .ToTable(nameof(UsersPlayTimes))
+                .HasKey(x => new { x.UserId, x.Category });
         });
     }
 

@@ -16,13 +16,15 @@ internal sealed class SaveService : ISaveService
 {
     private readonly IDb _dbContext;
     private readonly IEnumerable<IUserDataSaver> _userDataSavers;
+    private readonly IDateTimeProvider _dateTimeProvider;
 
     public event Action<Element>? ElementSaved;
 
-    public SaveService(IDb dbContext, IEnumerable<IUserDataSaver> userDataSavers)
+    public SaveService(IDb dbContext, IEnumerable<IUserDataSaver> userDataSavers, IDateTimeProvider dateTimeProvider)
     {
         _dbContext = dbContext;
         _userDataSavers = userDataSavers;
+        _dateTimeProvider = dateTimeProvider;
     }
 
     private async Task<bool> SaveVehicle(RealmVehicle vehicle, bool firstTime = false, CancellationToken cancellationToken = default)
@@ -137,6 +139,8 @@ internal sealed class SaveService : ISaveService
 
         if(player.IsSpawned)
             user.LastTransformAndMotion = player.GetTransformAndMotion();
+
+        player.PlayTime.UpdateCategoryPlayTime(player.PlayTime.Category, _dateTimeProvider.Now);
         user.PlayTime = (ulong)player.PlayTime.TotalPlayTime.TotalSeconds;
 
         db.Users.Update(user);

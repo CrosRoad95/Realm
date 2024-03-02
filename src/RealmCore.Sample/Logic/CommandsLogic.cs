@@ -1732,5 +1732,20 @@ internal sealed class CommandsLogic
             player.Statistics.SetGtaSa(PedStat.BIKE_SKILL, 999);
             player.Statistics.SetGtaSa(PedStat.CYCLE_SKILL, 999);
         });
+
+        _commandService.AddCommandHandler("playtimecategory", (player, args) =>
+        {
+            player.PlayTime.Category = args.ReadInt();
+            _chatBox.OutputTo(player, $"Category changed to {player.PlayTime.Category}");
+        });
+
+        _commandService.AddCommandHandler("playtimelist", (player, args) =>
+        {
+            _chatBox.OutputTo(player, $"Play time list:");
+            foreach (var item in player.PlayTime)
+            {
+                _chatBox.OutputTo(player, $"{item.Category} = {item.PlayTime}");
+            }
+        });
     }
 }
