@@ -14,7 +14,7 @@ public static class QueryableExtensions
 
     public static IQueryable<VehicleData> IsNotRemoved(this IQueryable<VehicleData> query)
     {
-        return query.Where(x => !x.Removed);
+        return query.Where(x => !x.IsRemoved);
     }
 
     public static IQueryable<UserData> IncludeAll(this IQueryable<UserData> query, DateTime now)

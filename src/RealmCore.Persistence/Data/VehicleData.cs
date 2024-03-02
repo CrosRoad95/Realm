@@ -21,7 +21,6 @@ public sealed class VehicleData
     public bool TaxiLightState { get; set; }
     public float Health { get; set; }
     public bool IsFrozen { get; set; }
-    public bool Removed { get; set; }
     public DateTime CreatedAt { get; set; }
     public bool Spawned { get; set; }
     public float Mileage { get; set; }
