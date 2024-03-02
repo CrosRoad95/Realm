@@ -1747,5 +1747,12 @@ internal sealed class CommandsLogic
                 _chatBox.OutputTo(player, $"{item.Category} = {item.PlayTime}");
             }
         });
+
+        _commandService.AddAsyncCommandHandler("toggleAllControlsScope", async (player, args, token) =>
+        {
+            using var _ = new ToggleAllControlsScope(player);
+
+            await Task.Delay(500, token);
+        });
     }
 }

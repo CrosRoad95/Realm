@@ -2,7 +2,7 @@
 
 public class ToggleControlsScope : IDisposable
 {
-    private readonly RealmPlayer _player;
+    protected readonly RealmPlayer _player;
     private readonly bool _fireEnabled;
     private readonly bool _aimWeaponEnabled;
     private readonly bool _nextWeaponEnabled;
@@ -71,7 +71,7 @@ public class ToggleControlsScope : IDisposable
         _enterPassengerEnabled = controls.EnterPassengerEnabled;
     }
 
-    public void Dispose()
+    public virtual void Dispose()
     {
         if (_player.IsDestroyed)
             return;
@@ -115,5 +115,16 @@ public class ToggleAllControlsScope : ToggleControlsScope
     public ToggleAllControlsScope(RealmPlayer player) : base(player)
     {
         player.ToggleAllControls(false, true, false);
+    }
+
+    public override void Dispose()
+    {
+        if (_player.IsDestroyed)
+            return;
+
+        if (!_player.ExitToggleControlScope())
+            throw new InvalidOperationException("Scope already exited");
+
+        _player.ToggleAllControls(true, true, false);
     }
 }
