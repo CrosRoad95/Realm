@@ -8,20 +8,21 @@ public abstract class RealmUnitTestingBase
 {
     private RealmTestingServer? _server;
 
-    protected RealmTestingServer CreateServer()
+    protected virtual RealmTestingServer CreateServer(TestConfigurationProvider? cnofiguration = null, Action<ServiceCollection>? configureServices = null)
     {
         if (_server == null)
         {
-            _server = new RealmTestingServer(new TestConfigurationProvider(""), services =>
+            _server = new RealmTestingServer(cnofiguration ?? new TestConfigurationProvider(""), services =>
             {
-                services.AddScoped<IDb, TestDb>();
+                services.AddScoped<IDb, NullDb>();
                 services.AddScoped<IUserEventRepository>(x => null);
+                configureServices?.Invoke(services);
             });
         }
         return _server;
     }
 
-    protected RealmPlayer CreatePlayer(string name = "TestPlayer")
+    protected virtual RealmPlayer CreatePlayer(string name = "TestPlayer")
     {
         if (_server == null)
             throw new Exception("Server not created.");
@@ -47,7 +48,7 @@ public abstract class RealmUnitTestingBase
     }
 }
 
-public class TestDb : IDb
+public class NullDb : IDb
 {
     public DatabaseFacade Database => throw new NotSupportedException();
 

@@ -18,9 +18,9 @@ public abstract class PlayerLifecycle<TPlayer> where TPlayer: RealmPlayer
         PlayerJoined(player);
     }
 
-    private void HandleSignedIn(IPlayerUserFeature arg1, RealmPlayer arg2)
+    private void HandleSignedIn(IPlayerUserFeature user, RealmPlayer player)
     {
-        throw new NotImplementedException();
+        PlayerSignedIn(user, (TPlayer)player);
     }
 
     private void HandleDisconnected(Player plr, PlayerQuitEventArgs e)
