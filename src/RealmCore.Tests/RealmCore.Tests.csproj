@@ -129,6 +129,7 @@
 		<Using Include="RealmCore.Server.Modules.Domain" />
 		<Using Include="RealmCore.Server.Modules.Core" />
 		<Using Include="RealmCore.Server.Modules.Players.Sessions" />
+		<Using Include="FluentAssertions.Execution" />
 	</ItemGroup>
 
 </Project>

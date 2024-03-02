@@ -1,4 +1,5 @@
 ﻿using RealmCore.Server.Modules.Players.AFK;
+using RealmCore.Server.Modules.Players.DailyVisits;
 using RealmCore.Server.Modules.Players.Money;
 using RealmCore.Server.Modules.Players.PlayTime;
 
@@ -101,6 +102,7 @@ public static class ServerBuilderExtensions
         serverBuilder.AddLogic<PlayerBlipLogic>();
         serverBuilder.AddLogic<PlayerMoneyLogic>();
         serverBuilder.AddLogic<AFKLogic>();
+        serverBuilder.AddLogic<PlayerDailyVisitsLogic>();
         #endregion
 
         #region Behaviours

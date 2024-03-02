@@ -125,10 +125,10 @@ internal sealed class UsersService : IUsersService
         var userManager = player.GetRequiredService<UserManager<UserData>>();
         var signInManager = player.GetRequiredService<SignInManager<UserData>>();
         var userLoginHistoryRepository = player.GetRequiredService<IUserLoginHistoryRepository>();
-        var saveService = player.GetRequiredService<ISaveService>();
+        //var saveService = player.GetRequiredService<ISaveService>();
 
         // TODO: Fix it
-        user.Settings = await player.GetRequiredService<IDb>().UserSettings.Where(x => x.UserId == user.Id).ToListAsync(cancellationToken);
+        //user.Settings = await player.GetRequiredService<IDb>().UserSettings.Where(x => x.UserId == user.Id).ToListAsync(cancellationToken);
 
         try
         {
@@ -146,7 +146,7 @@ internal sealed class UsersService : IUsersService
             await AuthorizePolicies(player);
             await userLoginHistoryRepository.Add(user.Id, _dateTimeProvider.Now, player.Client.IPAddress?.ToString() ?? "", serial, cancellationToken);
             UpdateLastData(player);
-            await saveService.Save(player, true, cancellationToken);
+            //await saveService.Save(player, true, cancellationToken);
 
             SignedIn?.Invoke(player);
             return true;

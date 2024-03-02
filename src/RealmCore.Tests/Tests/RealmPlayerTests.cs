@@ -7,6 +7,8 @@ public class RealmPlayerTests : RealmIntegrationTestingBase
     [Fact]
     public async Task SavingAndLoadingPlayerShouldWork()
     {
+        using var _ = new AssertionScope();
+        
         var server = await CreateServerAsync();
         var now = server.DateTimeProvider.Now;
         {
@@ -17,8 +19,7 @@ public class RealmPlayerTests : RealmIntegrationTestingBase
 
             player.PlayTime.InternalSetTotalPlayTime(1337);
             player.Money.Amount = 12.345m;
-            player.DailyVisits.Update(now.AddHours(24));
-            player.DailyVisits.VisitsInRow.Should().Be(1);
+            player.DailyVisits.VisitsInRow.Should().Be(0);
             player.Settings.Set(1, "test");
             player.Bans.Add(1, reason: "test");
             player.Upgrades.TryAdd(1);
@@ -38,7 +39,7 @@ public class RealmPlayerTests : RealmIntegrationTestingBase
             player.Position.Should().Be(new Vector3(1, 2, 3));
             player.PlayTime.TotalPlayTime.Should().Be(TimeSpan.FromSeconds(1337));
             player.Money.Amount.Should().Be(12.345m);
-            //player.DailyVisits.VisitsInRow.Should().Be(2); // TODO:
+            player.DailyVisits.VisitsInRow.Should().Be(1);
             player.DailyVisits.LastVisit.Date.Should().Be(server.DateTimeProvider.Now.Date);
             player.Settings.Get(1).Should().Be("test");
             player.Bans.IsBanned(1).Should().BeTrue();

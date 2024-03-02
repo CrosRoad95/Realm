@@ -58,24 +58,23 @@ internal sealed class PlayerDailyVisitsFeature : IPlayerDailyVisitsFeature, IUse
 
     public void SignIn(UserData userData)
     {
-        var now = Player.GetRequiredService<IDateTimeProvider>().Now;
         lock (_lock)
         {
-            if (userData?.DailyVisits != null)
+            if (userData.DailyVisits != null)
             {
-                _dailyVisitsData = userData?.DailyVisits;
+                _dailyVisitsData = userData.DailyVisits;
             }
             else
             {
                 _dailyVisitsData = new DailyVisitsData
                 {
-                    LastVisit = now,
+                    LastVisit = DateTime.MinValue,
                     VisitsInRow = 0,
                     VisitsInRowRecord = 0,
                 };
+                userData.DailyVisits = _dailyVisitsData;
             }
         }
-        Update(now);
     }
 
     public void SignOut()
@@ -86,6 +85,13 @@ internal sealed class PlayerDailyVisitsFeature : IPlayerDailyVisitsFeature, IUse
     public void Update(DateTime now)
     {
         var nowDate = now.Date;
+
+        if(LastVisit == DateTime.MinValue)
+        {
+            LastVisit = nowDate;
+            return;
+        }
+
         if (LastVisit.Date == nowDate)
             return;
 
