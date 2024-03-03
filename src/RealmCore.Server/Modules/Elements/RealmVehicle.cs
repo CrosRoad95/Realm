@@ -1,6 +1,4 @@
-﻿using SlipeServer.Server.Elements;
-
-namespace RealmCore.Server.Modules.Elements;
+﻿namespace RealmCore.Server.Modules.Elements;
 
 public class RealmVehicle : Vehicle, IPersistentElement
 {

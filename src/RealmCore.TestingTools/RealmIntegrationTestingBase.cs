@@ -16,16 +16,16 @@ public abstract class RealmIntegrationTestingBase : IAsyncLifetime
         }
     }
 
-    protected TRealmTestingServer CreateServer<TRealmTestingServer>(string connectionString, Action<ServiceCollection>? configureServices = null) where TRealmTestingServer: RealmTestingServer
+    protected TRealmTestingServer CreateServer<TRealmTestingServer>(string connectionString, Action<ServerBuilder>? configureBuilder = null, Action<ServiceCollection>? configureServices = null) where TRealmTestingServer: RealmTestingServer
     {
-        return (TRealmTestingServer)new RealmTestingServer(new TestConfigurationProvider(connectionString), configureServices);
+        return (TRealmTestingServer)new RealmTestingServer(new TestConfigurationProvider(connectionString), configureBuilder, configureServices);
     }
 
-    protected async Task<RealmTestingServer> CreateServerAsync(Action<ServiceCollection>? configureServices = null)
+    protected async Task<RealmTestingServer> CreateServerAsync(Action<ServerBuilder>? configureBuilder = null, Action<ServiceCollection>? configureServices = null)
     {
         if (_server == null)
         {
-            _server = CreateServer<RealmTestingServer>(_MySqlContainer.GetConnectionString(), configureServices);
+            _server = CreateServer<RealmTestingServer>(_MySqlContainer.GetConnectionString(), configureBuilder, configureServices);
             await _server.GetRequiredService<IDb>().MigrateAsync();
         }
         return _server;

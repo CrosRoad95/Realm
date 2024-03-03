@@ -113,5 +113,9 @@
 		<Using Include="RealmCore.Server.Modules.Players.Groups" />
 		<Using Include="RealmCore.Server.Modules.Domain" />
 		<Using Include="Xunit" />
+		<Using Include="SlipeServer.Server.ServerBuilders" />
+		<Using Include="Microsoft.EntityFrameworkCore.Infrastructure" />
+		<Using Include="Microsoft.EntityFrameworkCore.ChangeTracking" />
+		<Using Include="Microsoft.EntityFrameworkCore" />
 	</ItemGroup>
 </Project>

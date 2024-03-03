@@ -33,7 +33,6 @@ internal sealed class PlayerPlayTimeFeature : IPlayerPlayTimeFeature, IUsesUserP
     public TimeSpan PlayTime => _dateTimeProvider.Now - _startDateTime;
     public TimeSpan TotalPlayTime => PlayTime + TimeSpan.FromSeconds(_totalPlayTime);
     private ICollection<UserPlayTimeData> _playTimes = [];
-    private UserData? _userData;
     private int? _category;
 
     public event Action<IPlayerPlayTimeFeature, int?, int?>? CategoryChanged;
@@ -65,7 +64,7 @@ internal sealed class PlayerPlayTimeFeature : IPlayerPlayTimeFeature, IUsesUserP
 
     public void SignIn(UserData userData)
     {
-        _userData = userData;
+        _totalPlayTime = userData.PlayTime;
         _playTimes = userData.PlayTimes;
     }
 

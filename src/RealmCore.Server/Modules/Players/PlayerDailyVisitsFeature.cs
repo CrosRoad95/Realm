@@ -86,12 +86,6 @@ internal sealed class PlayerDailyVisitsFeature : IPlayerDailyVisitsFeature, IUse
     {
         var nowDate = now.Date;
 
-        if(LastVisit == DateTime.MinValue)
-        {
-            LastVisit = nowDate;
-            return;
-        }
-
         if (LastVisit.Date == nowDate)
             return;
 

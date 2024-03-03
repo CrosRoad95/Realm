@@ -134,21 +134,6 @@ public static class UserManagerExtensions
         return await query.AnyAsync(cancellationToken);
     }
 
-    public static async Task<bool> TryUpdateLastNickName(this UserManager<UserData> userManager, int userId, string nick, CancellationToken cancellationToken = default)
-    {
-        var query = userManager.Users
-            .TagWithSource(nameof(UserManagerExtensions))
-            .Where(x => x.Id == userId);
-        var user = await query.FirstOrDefaultAsync(cancellationToken);
-        if (user == null)
-            return false;
-
-        user.Nick = nick;
-        await userManager.UpdateAsync(user);
-        return true;
-        //return await query.ExecuteUpdateAsync(x => x.SetProperty(y => y.Nick, nick), cancellationToken) == 1;
-    }
-
     public static async Task<bool> UpdateLastNewsReadDateTime(this UserManager<UserData> userManager, int userId, DateTime now, CancellationToken cancellationToken = default)
     {
         var query = userManager.Users

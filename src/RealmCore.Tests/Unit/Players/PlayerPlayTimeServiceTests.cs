@@ -1,6 +1,4 @@
-﻿using RealmCore.Server.Modules.Players.PlayTime;
-
-namespace RealmCore.Tests.Unit.Players;
+﻿namespace RealmCore.Tests.Unit.Players;
 
 public class PlayerPlayTimeServiceTests : RealmUnitTestingBase
 {

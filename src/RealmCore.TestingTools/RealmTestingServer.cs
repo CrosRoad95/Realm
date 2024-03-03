@@ -22,7 +22,7 @@ public class RealmTestingServer : TestingServer<RealmTestingPlayer>
         return player.Client;
     }
 
-    public RealmTestingServer(TestConfigurationProvider testConfigurationProvider = null, Action<ServiceCollection>? configureServices = null) : base((testConfigurationProvider ?? new("")).GetRequired<SlipeServer.Server.Configuration>("server"), (serverBuilder) =>
+    public RealmTestingServer(TestConfigurationProvider testConfigurationProvider = null, Action<ServerBuilder>? configureBuilder = null, Action<ServiceCollection>? configureServices = null) : base((testConfigurationProvider ?? new("")).GetRequired<SlipeServer.Server.Configuration>("server"), (serverBuilder) =>
     {
         var resourceProvider = new Mock<IResourceProvider>(MockBehavior.Strict);
 
@@ -58,6 +58,8 @@ public class RealmTestingServer : TestingServer<RealmTestingPlayer>
 
             configureServices?.Invoke(services);
         });
+
+        configureBuilder?.Invoke(serverBuilder);
     })
     {
         PlayerJoined += HandlePlayerJoined;
@@ -68,20 +70,17 @@ public class RealmTestingServer : TestingServer<RealmTestingPlayer>
         player.TriggerResourceStarted(420);
     }
 
-    public RealmPlayer CreatePlayer(bool withSerialAndIp = true, string name = "FakePlayer")
+    public RealmPlayer CreatePlayer(string name = "FakePlayer")
     {
         _createPlayerName = name;
         var player = AddFakePlayer();
         player.Name = name;
 
-        if (withSerialAndIp)
+        player.Client = new FakeClient(player)
         {
-            player.Client = new FakeClient(player)
-            {
-                Serial = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
-                IPAddress = System.Net.IPAddress.Parse("127.0.0.1")
-            };
-        }
+            Serial = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+            IPAddress = System.Net.IPAddress.Parse("127.0.0.1")
+        };
 
         GetRequiredService<IPlayersEventManager>().RelayLoaded(player);
         return player;

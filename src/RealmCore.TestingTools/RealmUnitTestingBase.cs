@@ -1,24 +1,17 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.ChangeTracking;
-using Microsoft.EntityFrameworkCore.Infrastructure;
-
-namespace RealmCore.TestingTools;
+﻿namespace RealmCore.TestingTools;
 
 public abstract class RealmUnitTestingBase
 {
     protected RealmTestingServer? _server;
 
-    protected virtual RealmTestingServer CreateServer(TestConfigurationProvider? cnofiguration = null, Action<ServiceCollection>? configureServices = null)
+    protected virtual RealmTestingServer CreateServer(TestConfigurationProvider? cnofiguration = null, Action<ServerBuilder>? configureBuilder = null, Action<ServiceCollection>? configureServices = null)
     {
-        if (_server == null)
-        {
-            _server = new RealmTestingServer(cnofiguration ?? new TestConfigurationProvider(""), services =>
+        _server ??= new RealmTestingServer(cnofiguration ?? new TestConfigurationProvider(""), configureBuilder, services =>
             {
                 services.AddScoped<IDb, NullDb>();
                 services.AddScoped<IUserEventRepository>(x => null);
                 configureServices?.Invoke(services);
             });
-        }
         return _server;
     }
 

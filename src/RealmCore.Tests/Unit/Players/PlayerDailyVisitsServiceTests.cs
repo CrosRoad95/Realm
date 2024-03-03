@@ -28,19 +28,9 @@ public class PlayerDailyVisitsServiceTests : RealmUnitTestingBase
             _record = record;
         };
 
-        var dayCounter = 0;
-        dailyVisits.VisitsInRow.Should().Be(dayCounter);
-        dailyVisits.VisitsInRowRecord.Should().Be(0);
-
-        testDateTimeProvider.AddOffset(TimeSpan.FromDays(1));
-        dailyVisits.Update(testDateTimeProvider.Now);
-        dayCounter++;
-
+        var dayCounter = 1;
         dailyVisits.VisitsInRow.Should().Be(dayCounter);
         dailyVisits.VisitsInRowRecord.Should().Be(1);
-        _day.Should().Be(dayCounter);
-        _reset.Should().BeFalse();
-        _record.Should().Be(1);
 
         testDateTimeProvider.AddOffset(TimeSpan.FromDays(1));
         dailyVisits.Update(testDateTimeProvider.Now);
@@ -51,15 +41,25 @@ public class PlayerDailyVisitsServiceTests : RealmUnitTestingBase
         _day.Should().Be(dayCounter);
         _reset.Should().BeFalse();
         _record.Should().Be(2);
+
+        testDateTimeProvider.AddOffset(TimeSpan.FromDays(1));
+        dailyVisits.Update(testDateTimeProvider.Now);
+        dayCounter++;
+
+        dailyVisits.VisitsInRow.Should().Be(dayCounter);
+        dailyVisits.VisitsInRowRecord.Should().Be(3);
+        _day.Should().Be(dayCounter);
+        _reset.Should().BeFalse();
+        _record.Should().Be(3);
 
         testDateTimeProvider.AddOffset(TimeSpan.FromDays(2));
         dailyVisits.Update(testDateTimeProvider.Now);
         dayCounter = 0;
 
         dailyVisits.VisitsInRow.Should().Be(dayCounter);
-        dailyVisits.VisitsInRowRecord.Should().Be(2);
+        dailyVisits.VisitsInRowRecord.Should().Be(3);
         _day.Should().Be(0);
         _reset.Should().BeTrue();
-        _record.Should().Be(2);
+        _record.Should().Be(3);
     }
 }

@@ -130,6 +130,7 @@
 		<Using Include="RealmCore.Server.Modules.Core" />
 		<Using Include="RealmCore.Server.Modules.Players.Sessions" />
 		<Using Include="FluentAssertions.Execution" />
+		<Using Include="RealmCore.Server.Modules.Players.PlayTime" />
 	</ItemGroup>
 
 </Project>

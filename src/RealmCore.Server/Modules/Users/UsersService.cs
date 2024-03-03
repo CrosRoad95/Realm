@@ -148,6 +148,7 @@ internal sealed class UsersService : IUsersService
             UpdateLastData(player);
             //await saveService.Save(player, true, cancellationToken);
 
+            await player.GetRequiredService<IPlayerUserService>().TryUpdateLastNickname(user.Id, player.Name, cancellationToken);
             SignedIn?.Invoke(player);
             return true;
 
