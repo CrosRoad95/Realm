@@ -121,5 +121,8 @@
 		<Using Include="RealmCore.TestingTools.Classes" />
 		<Using Include="RealmCore.Server.Modules.Elements.Focusable" />
 		<Using Include="RealmCore.TestingTools.Extensions" />
+		<Using Include="SlipeServer.Server.Resources" />
+		<Using Include="SlipeServer.Server.Resources.Interpreters" />
+		<Using Include="SlipeServer.Server.Resources.Providers" />
 	</ItemGroup>
 </Project>

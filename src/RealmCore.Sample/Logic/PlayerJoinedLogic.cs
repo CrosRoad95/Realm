@@ -94,12 +94,15 @@ internal sealed class PlayerJoinedLogic
         }
     }
 
-    private void HandlePlayerLoaded(RealmPlayer player)
+    private void HandlePlayerLoaded(Player plr)
     {
-        player.Browser.Ready += HandleReady;
+        if(plr is RealmPlayer player)
+        {
+            player.Browser.Ready += HandleReady;
 
-        ShowLoginSequence(player);
-        player.Level.LevelChanged += HandleLevelChanged;
+            ShowLoginSequence(player);
+            player.Level.LevelChanged += HandleLevelChanged;
+        }
     }
 
     private void HandleLevelChanged(IPlayerLevelFeature levelService, uint level, LevelChange levelChange)

@@ -4,7 +4,7 @@ using SlipeServer.Server.Resources;
 
 namespace RealmCore.TestingTools;
 
-public class RealmTestingServer<TRealmTestingPlayer> : TestingServer<TRealmTestingPlayer> where TRealmTestingPlayer: RealmTestingPlayer
+public class RealmTestingServer<TPlayer> : TestingServer<TPlayer> where TPlayer: Player
 {
     public TestDateTimeProvider DateTimeProvider => (TestDateTimeProvider)GetRequiredService<IDateTimeProvider>();
     public TestDebounceFactory TestDebounceFactory => (TestDebounceFactory)GetRequiredService<IDebounceFactory>();
@@ -61,12 +61,12 @@ public class RealmTestingServer<TRealmTestingPlayer> : TestingServer<TRealmTesti
         PlayerJoined += HandlePlayerJoined;
     }
 
-    private void HandlePlayerJoined(RealmTestingPlayer player)
+    private void HandlePlayerJoined(Player player)
     {
         player.TriggerResourceStarted(420);
     }
 
-    public TRealmTestingPlayer CreatePlayer(string name = "FakePlayer")
+    public TPlayer CreatePlayer(string name = "FakePlayer")
     {
         _createPlayerName = name;
         var player = AddFakePlayer();

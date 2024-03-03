@@ -2,16 +2,16 @@
 
 public interface IPlayersEventManager
 {
-    event Action<RealmPlayer>? PlayerLoaded;
+    event Action<Player>? PlayerLoaded;
 
-    void RelayLoaded(RealmPlayer player);
+    void RelayLoaded(Player player);
 }
 
 internal sealed class PlayerEventManager : IPlayersEventManager
 {
-    public event Action<RealmPlayer>? PlayerLoaded;
+    public event Action<Player>? PlayerLoaded;
 
-    public void RelayLoaded(RealmPlayer player)
+    public void RelayLoaded(Player player)
     {
         PlayerLoaded?.Invoke(player);
     }
