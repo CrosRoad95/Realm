@@ -1,13 +1,10 @@
 ﻿using SlipeServer.Server.Resources.Providers;
 using SlipeServer.Server.Resources.Interpreters;
 using SlipeServer.Server.Resources;
-using SlipeServer.Net.Wrappers;
-using RealmCore.TestingTools.Classes;
-using RealmCore.Server.Modules.Elements.Focusable;
 
 namespace RealmCore.TestingTools;
 
-public class RealmTestingServer : TestingServer<RealmTestingPlayer>
+public class RealmTestingServer<TRealmTestingPlayer> : TestingServer<TRealmTestingPlayer> where TRealmTestingPlayer: RealmTestingPlayer
 {
     public TestDateTimeProvider DateTimeProvider => (TestDateTimeProvider)GetRequiredService<IDateTimeProvider>();
     public TestDebounceFactory TestDebounceFactory => (TestDebounceFactory)GetRequiredService<IDebounceFactory>();
@@ -22,7 +19,7 @@ public class RealmTestingServer : TestingServer<RealmTestingPlayer>
         return player.Client;
     }
 
-    public RealmTestingServer(TestConfigurationProvider testConfigurationProvider = null, Action<ServerBuilder>? configureBuilder = null, Action<ServiceCollection>? configureServices = null) : base((testConfigurationProvider ?? new("")).GetRequired<SlipeServer.Server.Configuration>("server"), (serverBuilder) =>
+    public RealmTestingServer(TestConfigurationProvider? testConfigurationProvider = null, Action<ServerBuilder>? configureBuilder = null, Action<ServiceCollection>? configureServices = null) : base((testConfigurationProvider ?? new("")).GetRequired<SlipeServer.Server.Configuration>("server"), (serverBuilder) =>
     {
         var resourceProvider = new Mock<IResourceProvider>(MockBehavior.Strict);
 
@@ -31,8 +28,7 @@ public class RealmTestingServer : TestingServer<RealmTestingPlayer>
         //var saveServiceMock = new Mock<ISaveService>(MockBehavior.Strict);
         //saveServiceMock.Setup(x => x.SaveNewPlayerInventory(It.IsAny<InventoryComponent>(), It.IsAny<int>())).ReturnsAsync(1);
         var guiSystemServiceMock = new Mock<IGuiSystemService>(MockBehavior.Strict);
-        serverBuilder.ConfigureServer(testConfigurationProvider ?? new(""), SlipeServer.Server.ServerBuilders.ServerBuilderDefaultBehaviours.None);
-        serverBuilder.AddBrowserResource();
+        serverBuilder.ConfigureServer(testConfigurationProvider ?? new(""), ServerBuilderDefaultBehaviours.None);
         serverBuilder.ConfigureServices(services =>
         {
             services.ConfigureRealmServices();
@@ -70,7 +66,7 @@ public class RealmTestingServer : TestingServer<RealmTestingPlayer>
         player.TriggerResourceStarted(420);
     }
 
-    public RealmPlayer CreatePlayer(string name = "FakePlayer")
+    public TRealmTestingPlayer CreatePlayer(string name = "FakePlayer")
     {
         _createPlayerName = name;
         var player = AddFakePlayer();
@@ -131,6 +127,14 @@ public class RealmTestingServer : TestingServer<RealmTestingPlayer>
         };
         await userManager.CreateAsync(user);
         return user;
+    }
+}
+
+public class RealmTestingServer : RealmTestingServer<RealmTestingPlayer>
+{
+    public RealmTestingServer(TestConfigurationProvider? testConfigurationProvider = null, Action<ServerBuilder>? configureBuilder = null, Action<ServiceCollection>? configureServices = null) : base(testConfigurationProvider, configureBuilder, configureServices)
+    {
+
     }
 }
 

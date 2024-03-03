@@ -117,5 +117,9 @@
 		<Using Include="Microsoft.EntityFrameworkCore.Infrastructure" />
 		<Using Include="Microsoft.EntityFrameworkCore.ChangeTracking" />
 		<Using Include="Microsoft.EntityFrameworkCore" />
+		<Using Include="SlipeServer.Net.Wrappers" />
+		<Using Include="RealmCore.TestingTools.Classes" />
+		<Using Include="RealmCore.Server.Modules.Elements.Focusable" />
+		<Using Include="RealmCore.TestingTools.Extensions" />
 	</ItemGroup>
 </Project>

@@ -18,7 +18,11 @@ public abstract class RealmIntegrationTestingBase : IAsyncLifetime
 
     protected TRealmTestingServer CreateServer<TRealmTestingServer>(string connectionString, Action<ServerBuilder>? configureBuilder = null, Action<ServiceCollection>? configureServices = null) where TRealmTestingServer: RealmTestingServer
     {
-        return (TRealmTestingServer)new RealmTestingServer(new TestConfigurationProvider(connectionString), configureBuilder, configureServices);
+        return (TRealmTestingServer)new RealmTestingServer(new TestConfigurationProvider(connectionString), configureBuilder, services =>
+        {
+            services.AddRealmTestingServices(true);
+            configureServices?.Invoke(services);
+        });
     }
 
     protected async Task<RealmTestingServer> CreateServerAsync(Action<ServerBuilder>? configureBuilder = null, Action<ServiceCollection>? configureServices = null)

@@ -6,7 +6,7 @@ namespace RealmCore.Discord.Integration.Extensions;
 
 public static class ServiceCollectionExtensions
 {
-    public static IServiceCollection AddRealmDiscordBotIntegration(this IServiceCollection services, RealmConfigurationProvider realmConfigurationProvider)
+    public static IServiceCollection AddRealmDiscordBotIntegration(this IServiceCollection services, IRealmConfigurationProvider realmConfigurationProvider)
     {
         services.Configure<GrpcOptions>(realmConfigurationProvider.GetSection("Grpc"));
         services.Configure<DiscordBotOptions>(realmConfigurationProvider.GetSection("Discord"));

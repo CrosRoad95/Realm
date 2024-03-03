@@ -10,7 +10,7 @@ namespace RealmCore.Console.Extra;
 
 public static class ServerBuilderExtensions
 {
-    public static void AddExtras(this SlipeServer.Server.ServerBuilders.ServerBuilder serverBuilder, RealmConfigurationProvider realmConfigurationProvider)
+    public static void AddExtras(this SlipeServer.Server.ServerBuilders.ServerBuilder serverBuilder, IRealmConfigurationProvider realmConfigurationProvider)
     {
         serverBuilder.ConfigureServices(services =>
         {

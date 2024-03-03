@@ -4,7 +4,7 @@ public interface IPlayersEventManager
 {
     event Action<RealmPlayer>? PlayerLoaded;
 
-    internal void RelayLoaded(RealmPlayer player);
+    void RelayLoaded(RealmPlayer player);
 }
 
 internal sealed class PlayerEventManager : IPlayersEventManager
