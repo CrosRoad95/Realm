@@ -124,5 +124,6 @@
 		<Using Include="SlipeServer.Server.Resources" />
 		<Using Include="SlipeServer.Server.Resources.Interpreters" />
 		<Using Include="SlipeServer.Server.Resources.Providers" />
+		<Using Include="RealmCore.TestingTools" />
 	</ItemGroup>
 </Project>

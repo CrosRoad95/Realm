@@ -1,11 +1,12 @@
 ﻿namespace RealmCore.TestingTools;
 
-public abstract class RealmIntegrationTestingBase : IAsyncLifetime
+public abstract class RealmIntegrationTestingBase<TRealmTestingServer, TRealmPlayer> : RealmTestingBase<TRealmTestingServer, TRealmPlayer>, IAsyncLifetime
+    where TRealmTestingServer : RealmTestingServer<TRealmPlayer>
+    where TRealmPlayer : Player
 {
     protected abstract string DatabaseName { get; }
 
     private MySqlContainer? _mySqlContainer;
-    private RealmTestingServer? _server;
     private MySqlContainer _MySqlContainer
     {
         get
@@ -16,35 +17,41 @@ public abstract class RealmIntegrationTestingBase : IAsyncLifetime
         }
     }
 
-    protected TRealmTestingServer CreateServer<TRealmTestingServer>(string connectionString, Action<ServerBuilder>? configureBuilder = null, Action<ServiceCollection>? configureServices = null) where TRealmTestingServer: RealmTestingServer
-    {
-        return (TRealmTestingServer)new RealmTestingServer(new TestConfigurationProvider(connectionString), configureBuilder, services =>
-        {
-            services.AddRealmTestingServices(true);
-            configureServices?.Invoke(services);
-        });
-    }
-
-    protected async Task<RealmTestingServer> CreateServerAsync(Action<ServerBuilder>? configureBuilder = null, Action<ServiceCollection>? configureServices = null)
+    protected async Task<TRealmTestingServer> CreateServerAsync(Action<ServerBuilder>? configureBuilder = null, Action<ServiceCollection>? configureServices = null)
     {
         if (_server == null)
         {
-            _server = CreateServer<RealmTestingServer>(_MySqlContainer.GetConnectionString(), configureBuilder, configureServices);
+            _server = CreateServer(new TestConfigurationProvider(_MySqlContainer.GetConnectionString()), configureBuilder, configureServices);
             await _server.GetRequiredService<IDb>().MigrateAsync();
         }
         return _server;
     }
 
-    protected virtual async Task<RealmPlayer> CreatePlayerAsync(bool signedIn = true)
+    protected virtual async Task<TRealmPlayer> CreatePlayerAsync(bool signedIn = true, string name = "TestPlayer")
     {
         if (_server == null)
             throw new Exception("Server not created.");
-        var player = _server.CreatePlayer();
+        var player = CreatePlayer(name);
         if (signedIn)
         {
-            await _server.SignInPlayer(player);
-            player.PersistentId.Should().NotBe(0);
+            if(player is RealmPlayer realmPlayer)
+            {
+                await _server.SignInPlayer(realmPlayer);
+                realmPlayer.PersistentId.Should().NotBe(0);
+            }
         }
+        return player;
+    }
+
+    protected override TRealmPlayer CreatePlayer(string name = "TestPlayer")
+    {
+        if (_server == null)
+            throw new Exception("Server not created.");
+
+        var player = _server.CreatePlayer(name: name);
+        if (player.IsDestroyed)
+            return player;
+
         return player;
     }
 
@@ -61,4 +68,18 @@ public abstract class RealmIntegrationTestingBase : IAsyncLifetime
     public Task InitializeAsync() => _MySqlContainer.StartAsync();
 
     public Task DisposeAsync() => _MySqlContainer.DisposeAsync().AsTask();
+}
+
+public abstract class RealmIntegrationTestingBase : RealmIntegrationTestingBase<RealmTestingServer, RealmTestingPlayer>
+{
+    protected override RealmTestingServer CreateServer(TestConfigurationProvider? cnofiguration = null, Action<ServerBuilder>? configureBuilder = null, Action<ServiceCollection>? configureServices = null)
+    {
+        _server ??= new RealmTestingServer(cnofiguration ?? new TestConfigurationProvider(""), configureBuilder, services =>
+        {
+            services.AddRealmTestingServices(true);
+            configureServices?.Invoke(services);
+        });
+        return _server;
+    }
+
 }

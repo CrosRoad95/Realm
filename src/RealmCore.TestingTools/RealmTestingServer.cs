@@ -1,19 +1,15 @@
-﻿using SlipeServer.Server.Resources.Providers;
-using SlipeServer.Server.Resources.Interpreters;
-using SlipeServer.Server.Resources;
-
-namespace RealmCore.TestingTools;
+﻿namespace RealmCore.TestingTools;
 
 public class RealmTestingServer<TPlayer> : TestingServer<TPlayer> where TPlayer: Player
 {
     public TestDateTimeProvider DateTimeProvider => (TestDateTimeProvider)GetRequiredService<IDateTimeProvider>();
     public TestDebounceFactory TestDebounceFactory => (TestDebounceFactory)GetRequiredService<IDebounceFactory>();
 
-    private string _createPlayerName = "";
+    protected string _createPlayerName = "";
 
     protected override IClient CreateClient(uint binaryAddress, INetWrapper netWrapper)
     {
-        var player = Instantiate<RealmTestingPlayer>();
+        var player = Instantiate<TPlayer>();
         player.Name = _createPlayerName;
         player.Client = new TestingClient(binaryAddress, netWrapper, player);
         return player.Client;

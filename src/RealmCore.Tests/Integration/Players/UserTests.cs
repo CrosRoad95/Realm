@@ -32,7 +32,7 @@ public class UserTests : RealmIntegrationTestingBase
 
         #region Assert
         validPassword.Should().BeTrue();
-        lastNick.Should().Be("FakePlayer");
+        lastNick.Should().Be("TestPlayer");
         player.User.IsSignedIn.Should().BeTrue();
         player.PersistentId.Should().Be(userId);
         #endregion
