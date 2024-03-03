@@ -6,7 +6,7 @@ namespace RealmCore.TestingTools;
 
 public abstract class RealmUnitTestingBase
 {
-    private RealmTestingServer? _server;
+    protected RealmTestingServer? _server;
 
     protected virtual RealmTestingServer CreateServer(TestConfigurationProvider? cnofiguration = null, Action<ServiceCollection>? configureServices = null)
     {
