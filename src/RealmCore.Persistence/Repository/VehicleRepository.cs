@@ -80,24 +80,18 @@ internal sealed class VehicleRepository : IVehicleRepository
 
         return await query.FirstOrDefaultAsync(cancellationToken);
     }
-
     public async Task<List<VehicleData>> GetVehiclesByUserId(int userId, IEnumerable<int>? accessTypes = null, CancellationToken cancellationToken = default)
     {
-        if(accessTypes != null && accessTypes.Count() == 0)
-            throw new InvalidOperationException("Sequence contains no elements");
-
-        IQueryable<VehicleData> query2;
-        var query = _db.Vehicles
-            .AsNoTracking()
-            .TagWithSource(nameof(VehicleRepository))
-            .Where(x => !x.IsRemoved);
-        if (accessTypes != null)
-            query2 = query.Where(x => x.UserAccesses.Any(y => y.UserId == userId && accessTypes.Contains(y.AccessType)));
-        else
-            query2 = query.Where(x => x.UserAccesses.Any(y => y.UserId == userId));
-
+        var query = BuildGetVehiclesByUserIdQuery(userId, accessTypes);
 
         return await query.ToListAsync(cancellationToken);
+    }
+
+    public async Task<int> CountVehiclesByUserId(int userId, IEnumerable<int>? accessTypes = null, CancellationToken cancellationToken = default)
+    {
+        var query = BuildGetVehiclesByUserIdQuery(userId, accessTypes);
+
+        return await query.CountAsync(cancellationToken);
     }
 
     public async Task<VehicleData?> GetReadOnlyVehicleById(int id, CancellationToken cancellationToken = default)
@@ -219,4 +213,27 @@ internal sealed class VehicleRepository : IVehicleRepository
             .Select(x => x.UserId);
         return await query.ToListAsync(cancellationToken);
     }
+
+    private IQueryable<VehicleData> BuildGetVehiclesByUserIdQuery(int userId, IEnumerable<int>? accessTypes)
+    {
+        if (accessTypes != null && !accessTypes.Any())
+        {
+            throw new InvalidOperationException("Sequence contains no elements");
+        }
+
+        var query = _db.Vehicles
+            .AsNoTracking()
+            .TagWithSource(nameof(VehicleRepository))
+            .Where(x => !x.IsRemoved);
+
+        if (accessTypes != null)
+        {
+            return query.Where(x => x.UserAccesses.Any(y => y.UserId == userId && accessTypes.Contains(y.AccessType)));
+        }
+        else
+        {
+            return query.Where(x => x.UserAccesses.Any(y => y.UserId == userId));
+        }
+    }
+
 }
