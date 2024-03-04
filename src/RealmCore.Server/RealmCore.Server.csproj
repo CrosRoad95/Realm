@@ -38,6 +38,7 @@
 		<ProjectReference Include="..\RealmCore.Resources.GuiSystem\RealmCore.Resources.GuiSystem.csproj" />
 		<ProjectReference Include="..\RealmCore.Resources.ClientInterface\RealmCore.Resources.ClientInterface.csproj" />
 		<ProjectReference Include="..\RealmCore.Resources.ElementOutline\RealmCore.Resources.ElementOutline.csproj" />
+		<ProjectReference Include="..\RealmCore.Resources.MapNames\RealmCore.Resources.MapNames.csproj" />
 		<ProjectReference Include="..\RealmCore.Resources.Nametags\RealmCore.Resources.Nametags.csproj" />
 		<ProjectReference Include="..\RealmCore.Resources.Overlay\RealmCore.Resources.Overlay.csproj" />
 		<ProjectReference Include="..\RealmCore.Resources.StatisticsCounter\RealmCore.Resources.StatisticsCounter.csproj" />
@@ -211,6 +212,11 @@
 		<Using Include="Microsoft.Extensions.Hosting" />
 		<Using Include="SlipeServer.Server.Resources" />
 		<Using Include="SlipeServer.Server.Resources.Serving" />
+		<Using Include="RealmCore.Resources.MapNames" />
+		<Using Include="RealmCore.Server.Modules.Players.Money" />
+		<Using Include="RealmCore.Server.Modules.Players.DailyVisits" />
+		<Using Include="RealmCore.Server.Modules.Players.AFK" />
+		<Using Include="RealmCore.Server.Modules.Players.PlayTime" />
 	</ItemGroup>
 
 </Project>

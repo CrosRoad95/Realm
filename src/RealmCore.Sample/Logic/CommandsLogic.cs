@@ -1,4 +1,5 @@
-﻿using RealmCore.Sample.Concepts.Gui.Blazor;
+﻿using RealmCore.Resources.MapNames;
+using RealmCore.Sample.Concepts.Gui.Blazor;
 using RealmCore.Sample.HudLayers;
 using RealmCore.Server.Modules.Players.Money;
 using RealmCore.Server.Modules.Search;
@@ -22,6 +23,7 @@ internal sealed class CommandsLogic
     private readonly IUserWhitelistedSerialsRepository _userWhitelistedSerialsRepository;
     private readonly IVehicleRepository _vehicleRepository;
     private readonly IPlayerMoneyHistoryService _userMoneyHistoryService;
+    private readonly IMapNamesService _mapNamesService;
 
     private class TestState
     {
@@ -37,7 +39,7 @@ internal sealed class CommandsLogic
     public CommandsLogic(RealmCommandService commandService, IElementFactory elementFactory,
         ItemsCollection itemsCollection, ChatBox chatBox, ILogger<CommandsLogic> logger,
         IDateTimeProvider dateTimeProvider, INametagsService nametagsService, IUsersService usersService, IVehiclesService vehiclesService,
-        GameWorld gameWorld, IElementOutlineService elementOutlineService, IAssetsService assetsService, ISpawnMarkersService spawnMarkersService, ILoadService loadService, IFeedbackService feedbackService, IOverlayService overlayService, AssetsCollection assetsCollection, VehicleUpgradesCollection vehicleUpgradeCollection, VehicleEnginesCollection vehicleEnginesCollection, IUserWhitelistedSerialsRepository userWhitelistedSerialsRepository, IVehicleRepository vehicleRepository, IPlayerMoneyHistoryService userMoneyHistoryService)
+        GameWorld gameWorld, IElementOutlineService elementOutlineService, IAssetsService assetsService, ISpawnMarkersService spawnMarkersService, ILoadService loadService, IFeedbackService feedbackService, IOverlayService overlayService, AssetsCollection assetsCollection, VehicleUpgradesCollection vehicleUpgradeCollection, VehicleEnginesCollection vehicleEnginesCollection, IUserWhitelistedSerialsRepository userWhitelistedSerialsRepository, IVehicleRepository vehicleRepository, IPlayerMoneyHistoryService userMoneyHistoryService, IMapNamesService mapNamesService)
     {
         _commandService = commandService;
         _elementFactory = elementFactory;
@@ -52,6 +54,7 @@ internal sealed class CommandsLogic
         _userWhitelistedSerialsRepository = userWhitelistedSerialsRepository;
         _vehicleRepository = vehicleRepository;
         _userMoneyHistoryService = userMoneyHistoryService;
+        _mapNamesService = mapNamesService;
         var debounce = new Debounce(500);
         var debounceCounter = 0;
         _commandService.AddAsyncCommandHandler("debounce", async (player, args, token) =>
@@ -1754,5 +1757,48 @@ internal sealed class CommandsLogic
 
             await Task.Delay(500, token);
         });
+
+        _commandService.AddCommandHandler("mapnameadd", (player, args) =>
+        {
+            var id1 = _mapNamesService.AddNameFor(new MapName("test1", Color.White, new Vector3(1000, 0, 0)), player);
+            var id2 = _mapNamesService.AddNameFor(new MapName("test2", Color.Red, new Vector3(1000, 500, 0), Category: 1), player);
+            var id3 = _mapNamesService.AddNameFor(new MapName("destroyed", Color.Red, new Vector3(1000, 1000, 0), Category: 1), player);
+             _mapNamesService.RemoveFor(id3, player);
+        });
+        
+        _commandService.AddAsyncCommandHandler("mapnameaddtemp", async (player, args, token) =>
+        {
+            var id = _mapNamesService.AddName(new MapName("temp name", Color.Yellow, new Vector3(-1000, 0, 0)));
+            await Task.Delay(3000, token);
+            _mapNamesService.Remove(id);
+        });
+
+        _commandService.AddAsyncCommandHandler("mapnameaddtemprename", async (player, args, token) =>
+        {
+            var id = _mapNamesService.AddName(new MapName("temp name", Color.Yellow, new Vector3(-1000, 0, 0)));
+            for (int i = 0; i < 10; i++)
+            {
+                _mapNamesService.SetNameFor(id, $"new name {i}", player);
+                await Task.Delay(1000, token);
+            }
+            _mapNamesService.Remove(id);
+        });
+
+        _commandService.AddCommandHandler("changecategories0", (player, args) =>
+        {
+            _mapNamesService.SetVisibleCategories(player, [0]);
+        });
+
+        _commandService.AddCommandHandler("changecategories1", (player, args) =>
+        {
+            _mapNamesService.SetVisibleCategories(player, [1]);
+        });
+
+        var permId = _mapNamesService.AddName(new MapName("permanent", Color.White, Vector3.Zero));
+        _commandService.AddCommandHandler("mapnamerename", (player, args) =>
+        {
+            _mapNamesService.SetName(permId, args.ReadAllAsString());
+        });
+
     }
 }

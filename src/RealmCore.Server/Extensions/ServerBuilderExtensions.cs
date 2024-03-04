@@ -1,9 +1,4 @@
-﻿using RealmCore.Server.Modules.Players.AFK;
-using RealmCore.Server.Modules.Players.DailyVisits;
-using RealmCore.Server.Modules.Players.Money;
-using RealmCore.Server.Modules.Players.PlayTime;
-
-namespace RealmCore.Server.Extensions;
+﻿namespace RealmCore.Server.Extensions;
 
 public static class ServerBuilderExtensions
 {
@@ -64,6 +59,7 @@ public static class ServerBuilderExtensions
         serverBuilder.AddElementOutlineResource();
         serverBuilder.AddAdminResource();
         serverBuilder.AddAFKResource();
+        serverBuilder.AddMapNamesResource();
         serverBuilder.AddStatisticsCounterResource();
         serverBuilder.AddOverlayResource();
         serverBuilder.AddAssetsResource();

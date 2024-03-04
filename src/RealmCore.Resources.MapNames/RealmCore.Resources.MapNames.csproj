@@ -1,0 +1,43 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>net8.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+		<Version>0.0.0</Version>
+		<Authors>Sebastian Jura</Authors>
+		<Platforms>AnyCPU;x64</Platforms>
+	</PropertyGroup>
+
+	<ItemGroup>
+	  <None Remove="Lua\render.lua" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <EmbeddedResource Include="Lua\render.lua" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\RealmCore.Resources.Base\RealmCore.Resources.Base.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<Using Include="Microsoft.Extensions.Logging" />
+		<Using Include="Microsoft.Extensions.Options" />
+		<Using Include="SlipeServer.Server" />
+		<Using Include="SlipeServer.Server.Elements" />
+		<Using Include="SlipeServer.Server.Resources" />
+		<Using Include="System.Runtime.CompilerServices" />
+		<Using Include="System.Reflection" />
+		<Using Include="SlipeServer.Resources.Base" />
+		<Using Include="SlipeServer.Server.ServerBuilders" />
+		<Using Include="Microsoft.Extensions.DependencyInjection" />
+		<Using Include="SlipeServer.Server.Services" />
+		<Using Include="System.Drawing" />
+		<Using Include="RealmCore.Resources.Base" />
+		<Using Include="System.Numerics" />
+		<Using Include="System.Collections.Concurrent" />
+		<Using Include="RealmCore.Resources.Base.Interfaces" />
+	</ItemGroup>
+
+</Project>
