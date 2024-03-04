@@ -12,4 +12,13 @@ public class VehiclesTests : RealmUnitTestingBase
         vehicle.Velocity = new Vector3(0.1f, 0.1f, 0.1f);
         vehicle.IsInMove.Should().BeTrue();
     }
+
+    [Fact]
+    public void VehicleContextShouldWork()
+    {
+        var server = CreateServer();
+        var vehicle = server.CreateVehicle();
+
+        vehicle.GetRequiredService<VehicleContext>().Vehicle.Should().Be(vehicle);
+    }
 }

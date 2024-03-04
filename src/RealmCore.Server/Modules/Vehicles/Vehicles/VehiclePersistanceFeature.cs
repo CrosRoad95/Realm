@@ -21,7 +21,7 @@ internal sealed class VehiclePersistanceFeature : IVehiclePersistenceFeature
     public VehicleData VehicleData => _vehicleData ?? throw new VehicleNotLoadedException();
 
     public bool IsLoaded => _vehicleData != null;
-    public int Id => VehicleData.Id;
+    public int Id => VehicleData?.Id ?? throw new PersistantVehicleNotLoadedException();
     public byte Kind
     {
         get => VehicleData.Kind;

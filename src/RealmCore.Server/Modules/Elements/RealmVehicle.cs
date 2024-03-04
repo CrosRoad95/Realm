@@ -43,6 +43,8 @@ public class RealmVehicle : Vehicle, IPersistentElement
         _serviceScope = serviceProvider.CreateScope();
         _serviceProvider = _serviceScope.ServiceProvider;
 
+        _serviceProvider.GetRequiredService<VehicleContext>().Set(this);
+
         #region Initialize scope services
         GetRequiredService<VehicleContext>().Vehicle = this;
         Access = GetRequiredService<IVehicleAccessFeature>();

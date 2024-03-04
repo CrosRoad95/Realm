@@ -127,7 +127,7 @@ internal sealed partial class PlayerGameplayLogic
                         player.Gui.Close<BuyVehicleGui>();
                         if (realmVehicleForSale.TrySell())
                         {
-                            await player.GetRequiredService<IVehiclesService>().ConvertToPersistantVehicle(vehicle);
+                            await vehicle.GetRequiredService<IVehicleService>().ConvertToPersistantVehicle();
                             vehicle.Access.AddAsOwner(player);
                             vehicle.Fuel.AddFuelContainer(1, 20, 20, 0.01f, 2, true);
                         }

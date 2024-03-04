@@ -16,15 +16,15 @@ public class VehiclesPersistence : RealmIntegrationTestingBase
         });
 
         var factory = server.GetRequiredService<IElementFactory>();
-        var vehicleService = server.GetRequiredService<IVehiclesService>();
+        var vehiclesService = server.GetRequiredService<IVehiclesService>();
         var saveService = server.GetRequiredService<ISaveService>();
         var loadService = server.GetRequiredService<ILoadService>();
 
-        var vehicle = await vehicleService.CreatePersistantVehicle(Location.Zero, (VehicleModel)404);
+        var vehicle = await vehiclesService.CreatePersistantVehicle(Location.Zero, (VehicleModel)404);
         vehicle.Should().BeOfType<TestRealmVehicle>();
 
         await saveService.Save(vehicle);
-        await vehicleService.Destroy(vehicle);
+        await vehiclesService.Destroy(vehicle);
 
         var loadedVehicle = await loadService.LoadVehicleById(vehicle.PersistentId);
         loadedVehicle.Should().BeOfType<TestRealmVehicle>();

@@ -87,7 +87,7 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<IUsersService, UsersService>();
         services.AddScoped<ISaveService, SaveService>();
         services.AddScoped<ILoadService, LoadService>();
-        services.AddScoped<IVehiclesService, VehiclesService>();
+        services.AddScoped<IVehicleService, VehicleService>();
         services.AddScoped<IGroupService, GroupService>();
         services.AddScoped<IFractionService, FractionService>();
         services.AddScoped<IRewardService, RewardService>();
@@ -103,6 +103,7 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<IMapsService, MapsService>();
         services.AddSingleton<IPlayersEventManager, PlayerEventManager>();
         services.AddSingleton<ISchedulerService, SchedulerService>();
+        services.AddSingleton<IVehiclesService, VehiclesService>();
         #endregion
 
         #region Player features
