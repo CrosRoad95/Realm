@@ -2,5 +2,5 @@
 
 public interface IUserDataSaver
 {
-    Task SaveAsync(RealmPlayer player, bool firstTime = false, CancellationToken cancellationToken = default);
+    Task SaveAsync(UserData userData, RealmPlayer player, CancellationToken cancellationToken = default);
 }

@@ -25,7 +25,7 @@ internal class ReloadElementsCommand : IInGameCommand
         {
             try
             {
-                if (await _saveService.Save(element, false, cancellationToken))
+                if (await _saveService.Save(element, cancellationToken))
                 {
                     savedElements++;
                     if(element is not RealmPlayer)

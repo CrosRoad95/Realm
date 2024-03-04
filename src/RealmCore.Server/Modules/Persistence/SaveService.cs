@@ -7,7 +7,7 @@ public interface ISaveService
 {
     event Action<Element>? ElementSaved;
 
-    Task<bool> Save(Element element, bool firstTime = false, CancellationToken cancellationToken = default);
+    Task<bool> Save(Element element, CancellationToken cancellationToken = default);
     internal Task<int> SaveNewPlayerInventory(Inventory inventory, int userId, CancellationToken cancellationToken = default);
     internal Task<int> SaveNewVehicleInventory(Inventory inventory, int vehicleId, CancellationToken cancellationToken = default);
 }
@@ -27,10 +27,10 @@ internal sealed class SaveService : ISaveService
         _dateTimeProvider = dateTimeProvider;
     }
 
-    private async Task<bool> SaveVehicle(RealmVehicle vehicle, bool firstTime = false, CancellationToken cancellationToken = default)
+    private async Task<bool> SaveVehicle(RealmVehicle vehicle, CancellationToken cancellationToken = default)
     {
         if (!vehicle.Persistence.IsLoaded)
-            return false;
+            throw new VehicleNotLoadedException();
 
         var vehicleData = vehicle.Persistence.VehicleData;
 
@@ -101,8 +101,50 @@ internal sealed class SaveService : ISaveService
         if (vehicle.Inventory.TryGetPrimary(out var inventory))
             vehicleData.Inventories = [Inventory.CreateData(inventory)];
         vehicleData.LastUsed = vehicle.Persistence.LastUsed;
+        var db = vehicle.GetRequiredService<IDb>();
+
+        db.Vehicles.Update(vehicleData);
+
         await vehicle.GetRequiredService<IDb>().SaveChangesAsync(cancellationToken);
         return true;
+    }
+
+    private async Task<bool> SavePlayer(RealmPlayer player, CancellationToken cancellationToken = default)
+    {
+        if (!player.User.IsSignedIn)
+            return false;
+
+        var userData = player.User.UserData;
+        var db = player.GetRequiredService<IDb>();
+
+        if(player.IsSpawned)
+            userData.LastTransformAndMotion = player.GetTransformAndMotion();
+
+        player.PlayTime.UpdateCategoryPlayTime(player.PlayTime.Category, _dateTimeProvider.Now);
+        userData.PlayTime = (ulong)player.PlayTime.TotalPlayTime.TotalSeconds;
+
+        db.Users.Update(userData);
+
+        foreach (var item in _userDataSavers)
+            await item.SaveAsync(userData, player, cancellationToken);
+
+        var savedEntities = await db.SaveChangesAsync(cancellationToken);
+
+        return true;
+    }
+
+    public async Task<bool> Save(Element element, CancellationToken cancellationToken = default)
+    {
+        bool saved = element switch
+        {
+            RealmPlayer player => await SavePlayer(player, cancellationToken),
+            RealmVehicle vehicle => await SaveVehicle(vehicle, cancellationToken),
+            _ => false
+        };
+
+        if (saved)
+            ElementSaved?.Invoke(element);
+        return saved;
     }
 
     public async Task<int> SaveNewPlayerInventory(Inventory inventory, int userId, CancellationToken cancellationToken = default)
@@ -129,41 +171,4 @@ internal sealed class SaveService : ISaveService
         return inventory.Id;
     }
 
-    private async Task<bool> SavePlayer(RealmPlayer player, bool firstTime = false, CancellationToken cancellationToken = default)
-    {
-        if (!player.User.IsSignedIn)
-            return false;
-
-        var user = player.User.UserData;
-        var db = player.GetRequiredService<IDb>();
-
-        if(player.IsSpawned)
-            user.LastTransformAndMotion = player.GetTransformAndMotion();
-
-        player.PlayTime.UpdateCategoryPlayTime(player.PlayTime.Category, _dateTimeProvider.Now);
-        user.PlayTime = (ulong)player.PlayTime.TotalPlayTime.TotalSeconds;
-
-        db.Users.Update(user);
-
-        foreach (var item in _userDataSavers)
-            await item.SaveAsync(player, firstTime, cancellationToken);
-
-        var savedEntities = await db.SaveChangesAsync(cancellationToken);
-
-        return true;
-    }
-
-    public async Task<bool> Save(Element element, bool firstTime = false, CancellationToken cancellationToken = default)
-    {
-        bool saved = element switch
-        {
-            RealmPlayer player => await SavePlayer(player, firstTime, cancellationToken),
-            RealmVehicle vehicle => await SaveVehicle(vehicle, firstTime, cancellationToken),
-            _ => false
-        };
-
-        if (saved)
-            ElementSaved?.Invoke(element);
-        return saved;
-    }
 }

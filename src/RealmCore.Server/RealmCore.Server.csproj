@@ -206,6 +206,7 @@
 		<Using Include="Quartz" />
 		<Using Include="Quartz.Impl" />
 		<Using Include="Polly.RateLimit" />
+		<Using Include="Microsoft.AspNetCore.Authorization" />
 	</ItemGroup>
 
 </Project>

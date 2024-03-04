@@ -1,6 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
-
-namespace RealmCore.Server.Modules.Users;
+﻿namespace RealmCore.Server.Modules.Users;
 
 public interface IUsersService
 {
@@ -23,12 +21,13 @@ internal sealed class UsersService : IUsersService
     private readonly IUsersInUse _activeUsers;
     private readonly ISaveService _saveService;
     private readonly IServiceProvider _serviceProvider;
+    private readonly AuthorizationPoliciesProvider _authorizationPoliciesProvider;
 
     public event Action<RealmPlayer>? SignedIn;
     public event Action<RealmPlayer>? SignedOut;
 
     public UsersService(ILogger<UsersService> logger,
-        IDateTimeProvider dateTimeProvider, IUsersInUse activeUsers, ISaveService saveService, IServiceProvider serviceProvider, IAuthorizationService? authorizationService = null)
+        IDateTimeProvider dateTimeProvider, IUsersInUse activeUsers, ISaveService saveService, IServiceProvider serviceProvider, AuthorizationPoliciesProvider authorizationPoliciesProvider, IAuthorizationService? authorizationService = null)
     {
         _logger = logger;
         _dateTimeProvider = dateTimeProvider;
@@ -36,6 +35,7 @@ internal sealed class UsersService : IUsersService
         _activeUsers = activeUsers;
         _saveService = saveService;
         _serviceProvider = serviceProvider;
+        _authorizationPoliciesProvider = authorizationPoliciesProvider;
     }
 
     public async Task<int> SignUp(string username, string password, CancellationToken cancellationToken = default)
@@ -86,8 +86,7 @@ internal sealed class UsersService : IUsersService
 
     private async Task<string?> AuthorizePolicies(RealmPlayer player)
     {
-        var authorizationPoliciesProvider = player.GetRequiredService<AuthorizationPoliciesProvider>();
-        foreach (var policy in authorizationPoliciesProvider.Policies)
+        foreach (var policy in _authorizationPoliciesProvider.Policies)
             if (!await AuthorizePolicy(player, policy))
                 return policy;
         return null;
@@ -125,7 +124,6 @@ internal sealed class UsersService : IUsersService
         var userManager = player.GetRequiredService<UserManager<UserData>>();
         var signInManager = player.GetRequiredService<SignInManager<UserData>>();
         var userLoginHistoryRepository = player.GetRequiredService<IUserLoginHistoryRepository>();
-        //var saveService = player.GetRequiredService<ISaveService>();
 
         // TODO: Fix it
         //user.Settings = await player.GetRequiredService<IDb>().UserSettings.Where(x => x.UserId == user.Id).ToListAsync(cancellationToken);
@@ -146,7 +144,6 @@ internal sealed class UsersService : IUsersService
             await AuthorizePolicies(player);
             await userLoginHistoryRepository.Add(user.Id, _dateTimeProvider.Now, player.Client.IPAddress?.ToString() ?? "", serial, cancellationToken);
             UpdateLastData(player);
-            //await saveService.Save(player, true, cancellationToken);
 
             await player.GetRequiredService<IPlayerUserService>().TryUpdateLastNickname(user.Id, player.Name, cancellationToken);
             SignedIn?.Invoke(player);
@@ -171,7 +168,7 @@ internal sealed class UsersService : IUsersService
         if (!_activeUsers.TrySetInactive(player.PersistentId))
             throw new InvalidOperationException();
 
-        await _saveService.Save(player, false, cancellationToken);
+        await _saveService.Save(player, cancellationToken);
         player.User.SignOut();
         player.RemoveFromVehicle();
         player.Position = new Vector3(6000, 6000, 99999);

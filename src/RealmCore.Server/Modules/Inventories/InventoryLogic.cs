@@ -2,12 +2,10 @@
 
 internal sealed class InventoryLogic : PlayerLifecycle
 {
-    private readonly ISaveService _saveService;
     private readonly ILogger<InventoryLogic> _logger;
 
-    public InventoryLogic(MtaServer server, ISaveService saveService, ILogger<InventoryLogic> logger) : base(server)
+    public InventoryLogic(MtaServer server, ILogger<InventoryLogic> logger) : base(server)
     {
-        _saveService = saveService;
         _logger = logger;
     }
 
@@ -18,14 +16,19 @@ internal sealed class InventoryLogic : PlayerLifecycle
 
         if (inventory.Owner is RealmPlayer player)
         {
-            var inventoryId = await _saveService.SaveNewPlayerInventory(inventory, player.PersistentId);
-            inventory.Id = inventoryId;
+            if (player.User.IsSignedIn)
+            {
+                var saveService = player.GetRequiredService<ISaveService>();
+                var inventoryId = await saveService.SaveNewPlayerInventory(inventory, player.PersistentId);
+                inventory.Id = inventoryId;
+            }
         }
         else if (inventory.Owner is RealmVehicle vehicle)
         {
             if (vehicle.Persistence.IsLoaded)
             {
-                var inventoryId = await _saveService.SaveNewVehicleInventory(inventory, vehicle.Persistence.Id);
+                var saveService = vehicle.GetRequiredService<ISaveService>();
+                var inventoryId = await saveService.SaveNewVehicleInventory(inventory, vehicle.Persistence.Id);
                 inventory.Id = inventoryId;
             }
         }
@@ -34,6 +37,11 @@ internal sealed class InventoryLogic : PlayerLifecycle
     protected override void PlayerJoined(RealmPlayer player)
     {
         player.Inventory.PrimarySet += HandlePrimarySet;
+    }
+
+    protected override void PlayerLeft(RealmPlayer player)
+    {
+        player.Inventory.PrimarySet -= HandlePrimarySet;
     }
 
     private async void HandlePrimarySet(IElementInventoryFeature inventoryService, Inventory inventory)
