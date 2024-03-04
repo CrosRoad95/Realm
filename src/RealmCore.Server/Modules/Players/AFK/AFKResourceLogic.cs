@@ -1,4 +1,4 @@
-﻿namespace RealmCore.Server.Modules.Players;
+﻿namespace RealmCore.Server.Modules.Players.AFK;
 
 internal sealed class AFKResourceLogic
 {
@@ -21,7 +21,7 @@ internal sealed class AFKResourceLogic
     private void HandlePlayerAFKStopped(Player plr)
     {
         var player = (RealmPlayer)plr;
-    using var _ = _logger.BeginElement(player);
+        using var _ = _logger.BeginElement(player);
         player.AFK.HandleAFKStopped();
     }
 }

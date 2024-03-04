@@ -1,4 +1,4 @@
-﻿namespace RealmCore.Server.Modules.Players;
+﻿namespace RealmCore.Server.Modules.Players.DailyVisits;
 
 public interface IPlayerDailyVisitsFeature : IPlayerFeature
 {

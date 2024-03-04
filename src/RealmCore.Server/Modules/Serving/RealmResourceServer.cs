@@ -1,7 +1,4 @@
-﻿using SlipeServer.Server.Resources;
-using SlipeServer.Server.Resources.Serving;
-
-namespace RealmCore.Server.Modules.Serving;
+﻿namespace RealmCore.Server.Modules.Serving;
 
 internal sealed class RealmResourceServer : IResourceServer
 {

@@ -207,6 +207,10 @@
 		<Using Include="Quartz.Impl" />
 		<Using Include="Polly.RateLimit" />
 		<Using Include="Microsoft.AspNetCore.Authorization" />
+		<Using Include="RealmCore.Server.Modules.Players.Sessions" />
+		<Using Include="Microsoft.Extensions.Hosting" />
+		<Using Include="SlipeServer.Server.Resources" />
+		<Using Include="SlipeServer.Server.Resources.Serving" />
 	</ItemGroup>
 
 </Project>

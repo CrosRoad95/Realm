@@ -1,6 +1,4 @@
-﻿using RealmCore.Server.Modules.Players.Sessions;
-
-namespace RealmCore.Server.Modules.Players.Jobs;
+﻿namespace RealmCore.Server.Modules.Players.Jobs;
 
 public abstract class JobSession : Session
 {

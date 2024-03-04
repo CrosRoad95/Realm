@@ -1,6 +1,4 @@
-﻿using Microsoft.Extensions.Hosting;
-
-namespace RealmCore.Server.Modules.Server;
+﻿namespace RealmCore.Server.Modules.Server;
 
 internal sealed class SchedulerLogic
 {
