@@ -71,7 +71,6 @@ public static class ServerBuilderExtensions
         #endregion
 
         #region Logics
-        serverBuilder.AddLogic<SchedulerLogic>();
         serverBuilder.AddLogic<BrowserGuiLogic>();
         serverBuilder.AddLogic<AdminResourceLogic>();
         serverBuilder.AddLogic<AFKResourceLogic>();

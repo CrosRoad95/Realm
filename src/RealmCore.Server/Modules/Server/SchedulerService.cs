@@ -105,6 +105,7 @@ internal sealed class SchedulerService : ISchedulerService
     public SchedulerService()
     {
         _stdSchedulerFactory = new();
+        StartAsync().Wait();
     }
 
     public async Task StartAsync()
