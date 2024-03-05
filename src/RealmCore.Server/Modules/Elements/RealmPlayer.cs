@@ -299,94 +299,123 @@ public class RealmPlayer : Player, IDisposable, IPersistentElement
     public void SetBindAsync(string key, Func<RealmPlayer, KeyState, CancellationToken, Task> callback)
     {
         _bindsLock.Wait();
-        if (_asyncBinds.ContainsKey(key))
+        try
+        {
+            CheckIfBindIsInUse(key);
+
+            SetBind(key, KeyState.Both);
+            _asyncBinds[key] = callback;
+        }
+        finally
         {
             _bindsLock.Release();
-            throw new BindAlreadyExistsException(key);
         }
-
-        SetBind(key, KeyState.Both);
-        _asyncBinds[key] = callback;
-        _bindsLock.Release();
     }
 
     public void SetBindAsync(string key, Func<RealmPlayer, CancellationToken, Task> callback)
     {
         _bindsLock.Wait();
-        if (_asyncBinds.ContainsKey(key))
+        try
+        {
+            CheckIfBindIsInUse(key);
+
+            SetBind(key, KeyState.Down);
+            _asyncBinds[key] = async (player, keyState, cancellationToken) =>
+            {
+                if (keyState == KeyState.Down)
+                    await callback(this, cancellationToken);
+            };
+        }
+        finally
         {
             _bindsLock.Release();
+        }
+    }
+
+    private void CheckIfBindIsInUse(string key)
+    {
+        if (_asyncBinds.ContainsKey(key))
+        {
             throw new BindAlreadyExistsException(key);
         }
-
-        SetBind(key, KeyState.Down);
-        _asyncBinds[key] = async (player, keyState, cancellationToken) =>
+        if (_asyncBinds.ContainsKey(key))
         {
-            if (keyState == KeyState.Down)
-                await callback(this, cancellationToken);
-        };
-        _bindsLock.Release();
+            throw new BindAlreadyExistsException(key);
+        }
     }
 
     public void SetBind(string key, Action<RealmPlayer, KeyState> callback)
     {
         _bindsLock.Wait();
-        if (_asyncBinds.ContainsKey(key))
+        try
+        {
+            CheckIfBindIsInUse(key);
+            SetBind(key, KeyState.Both);
+            _binds[key] = callback;
+        }
+        finally
         {
             _bindsLock.Release();
-            throw new BindAlreadyExistsException(key);
         }
-
-        SetBind(key, KeyState.Both);
-        _binds[key] = callback;
-        _bindsLock.Release();
     }
 
     public void SetBind(string key, Action<RealmPlayer> callback)
     {
         _bindsLock.Wait();
-        if (_binds.ContainsKey(key))
+        try
+        {
+            CheckIfBindIsInUse(key);
+            SetBind(key, KeyState.Down);
+            _binds[key] = (player, keyState) =>
+            {
+                if (keyState == KeyState.Down)
+                    callback(this);
+            };
+        }
+        finally
         {
             _bindsLock.Release();
-            throw new BindAlreadyExistsException(key);
         }
-
-        SetBind(key, KeyState.Down);
-        _binds[key] = (player, keyState) =>
-        {
-            if (keyState == KeyState.Down)
-                callback(this);
-        };
-        _bindsLock.Release();
     }
 
-    public void Unbind(string key)
+    public void RemoveBind(string key)
     {
         _bindsLock.Wait();
-        if (!_asyncBinds.ContainsKey(key) || !_binds.ContainsKey(key))
+        try
+        {
+            if (!_asyncBinds.ContainsKey(key) || !_binds.ContainsKey(key))
+            {
+                _bindsLock.Release();
+                throw new BindDoesNotExistsException(key);
+            }
+            RemoveBind(key, KeyState.Both);
+            _asyncBinds.Remove(key);
+            _binds.Remove(key);
+        }
+        finally
         {
             _bindsLock.Release();
-            throw new BindDoesNotExistsException(key);
         }
-        RemoveBind(key, KeyState.Both);
-        _asyncBinds.Remove(key);
-        _binds.Remove(key);
 
-        _bindsLock.Release();
     }
 
     public void RemoveAllBinds()
     {
         _bindsLock.Wait();
-        foreach (var pair in _asyncBinds)
-            RemoveBind(pair.Key, KeyState.Both);
-        foreach (var pair in _binds)
-            RemoveBind(pair.Key, KeyState.Both);
+        try
+        {
+            foreach (var pair in _asyncBinds)
+                RemoveBind(pair.Key, KeyState.Both);
+            foreach (var pair in _binds)
+                RemoveBind(pair.Key, KeyState.Both);
 
-        _asyncBinds.Clear();
-        _binds.Clear();
-
-        _bindsLock.Release();
+            _asyncBinds.Clear();
+            _binds.Clear();
+        }
+        finally
+        {
+            _bindsLock.Release();
+        }
     }
 
     public void ResetCooldown(string key, KeyState keyState = KeyState.Down)
