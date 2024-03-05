@@ -1,4 +1,6 @@
-﻿namespace RealmCore.Server.Modules.Players.PlayTime;
+﻿using RealmCore.Persistence.Data;
+
+namespace RealmCore.Server.Modules.Players.PlayTime;
 
 public interface IPlayerPlayTimeFeature : IPlayerFeature, IEnumerable<PlayerPlayTimeDto>
 {
@@ -12,8 +14,9 @@ public interface IPlayerPlayTimeFeature : IPlayerFeature, IEnumerable<PlayerPlay
 
     void InternalSetTotalPlayTime(ulong time);
     void Reset();
-    internal void UpdateCategoryPlayTime(int? category, DateTime now);
+    internal void UpdateCategoryPlayTime(int? category);
     internal void Update();
+    TimeSpan GetByCategory(int category);
 }
 
 internal sealed class PlayerPlayTimeFeature : IPlayerPlayTimeFeature, IUsesUserPersistentData
@@ -87,32 +90,51 @@ internal sealed class PlayerPlayTimeFeature : IPlayerPlayTimeFeature, IUsesUserP
         }
     }
 
-    public void UpdateCategoryPlayTime(int? category, DateTime now)
+    public TimeSpan GetByCategory(int category)
     {
         lock (_lock)
         {
-            if (_lastCategoryPlayTime != null)
+            if (category == _category)
+                UpdateCategoryPlayTimeCore(_category);
+
+            var userPlayTime = _playTimes.Where(x => x.Category == category).FirstOrDefault();
+            if (userPlayTime == null)
+                return TimeSpan.Zero;
+            return TimeSpan.FromSeconds(userPlayTime.PlayTime);
+        }
+    }
+
+    private void UpdateCategoryPlayTimeCore(int? category)
+    {
+        var now = _dateTimeProvider.Now;
+
+        if (_lastCategoryPlayTime != null)
+        {
+            if (category != null)
             {
-                if (category != null)
+                var playTime = now - _lastCategoryPlayTime;
+                var userPlayTime = _playTimes.Where(x => x.Category == category).FirstOrDefault();
+                if (userPlayTime != null)
                 {
-                    var playTime = now - _lastCategoryPlayTime;
-                    var userPlayTime = _playTimes.Where(x => x.Category == category).FirstOrDefault();
-                    if (userPlayTime != null)
+                    userPlayTime.PlayTime += (int)playTime.Value.TotalSeconds;
+                }
+                else
+                {
+                    _playTimes.Add(new UserPlayTimeData
                     {
-                        userPlayTime.PlayTime += (int)playTime.Value.TotalSeconds;
-                    }
-                    else
-                    {
-                        _playTimes.Add(new UserPlayTimeData
-                        {
-                            Category = category.Value,
-                            PlayTime = (int)playTime.Value.TotalSeconds,
-                        });
-                    }
+                        Category = category.Value,
+                        PlayTime = (int)playTime.Value.TotalSeconds,
+                    });
                 }
             }
-            _lastCategoryPlayTime = now;
         }
+        _lastCategoryPlayTime = now;
+    }
+    
+    public void UpdateCategoryPlayTime(int? category)
+    {
+        lock (_lock)
+            UpdateCategoryPlayTimeCore(category);
     }
 
     public void Update()
@@ -137,7 +159,10 @@ internal sealed class PlayerPlayTimeFeature : IPlayerPlayTimeFeature, IUsesUserP
     public IEnumerator<PlayerPlayTimeDto> GetEnumerator()
     {
         lock (_lock)
+        {
+            UpdateCategoryPlayTimeCore(_category);
             return new List<PlayerPlayTimeDto>(_playTimes.Select(PlayerPlayTimeDto.Map)).AsReadOnly().GetEnumerator();
+        }
     }
 
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();

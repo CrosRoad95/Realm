@@ -43,6 +43,6 @@ internal sealed class PlayTimeLogic : PlayerLifecycle
 
     private void HandleCategoryChanged(IPlayerPlayTimeFeature playerPlayTime, int? previous, int? current)
     {
-        playerPlayTime.Player.PlayTime.UpdateCategoryPlayTime(previous, _dateTimeProvider.Now);
+        playerPlayTime.Player.PlayTime.UpdateCategoryPlayTime(previous);
     }
 }

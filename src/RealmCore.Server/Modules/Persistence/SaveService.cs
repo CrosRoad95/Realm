@@ -120,7 +120,7 @@ internal sealed class SaveService : ISaveService
         if(player.IsSpawned)
             userData.LastTransformAndMotion = player.GetTransformAndMotion();
 
-        player.PlayTime.UpdateCategoryPlayTime(player.PlayTime.Category, _dateTimeProvider.Now);
+        player.PlayTime.UpdateCategoryPlayTime(player.PlayTime.Category);
         userData.PlayTime = (ulong)player.PlayTime.TotalPlayTime.TotalSeconds;
 
         //db.Users.Update(userData);
