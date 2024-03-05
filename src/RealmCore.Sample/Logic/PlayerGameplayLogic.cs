@@ -112,7 +112,7 @@ internal sealed partial class PlayerGameplayLogic
         }
     }
 
-    private void HandleFocusedElementChanged(RealmPlayer player, Element? element)
+    private void HandleFocusedElementChanged(RealmPlayer player, Element? previous, Element? element)
     {
         if(element is RealmVehicleForSale realmVehicleForSale)
         {

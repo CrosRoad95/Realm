@@ -103,7 +103,7 @@ internal sealed class SaveService : ISaveService
         vehicleData.LastUsed = vehicle.Persistence.LastUsed;
         var db = vehicle.GetRequiredService<IDb>();
 
-        db.Vehicles.Update(vehicleData);
+        //db.Vehicles.Update(vehicleData);
 
         await vehicle.GetRequiredService<IDb>().SaveChangesAsync(cancellationToken);
         return true;
@@ -123,7 +123,7 @@ internal sealed class SaveService : ISaveService
         player.PlayTime.UpdateCategoryPlayTime(player.PlayTime.Category, _dateTimeProvider.Now);
         userData.PlayTime = (ulong)player.PlayTime.TotalPlayTime.TotalSeconds;
 
-        db.Users.Update(userData);
+        //db.Users.Update(userData);
 
         foreach (var item in _userDataSavers)
             await item.SaveAsync(userData, player, cancellationToken);

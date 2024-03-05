@@ -56,9 +56,8 @@ internal sealed class PlayerMoneyFeature : IPlayerMoneyFeature, IUsesUserPersist
                 if (_money == value)
                     return;
                 _money = value;
+                SyncMoney();
 
-                if(_userData != null)
-                    _userData.Money = _money;
                 TryUpdateVersion();
 
                 Set?.Invoke(this, _money);
@@ -102,6 +101,7 @@ internal sealed class PlayerMoneyFeature : IPlayerMoneyFeature, IUsesUserPersist
     public void SetMoneyInternal(decimal amount)
     {
         _money = amount;
+        SyncMoney();
     }
 
     public void SetMoneyLimitAndPrecision(decimal moneyLimit, byte precision)
@@ -111,6 +111,12 @@ internal sealed class PlayerMoneyFeature : IPlayerMoneyFeature, IUsesUserPersist
     }
 
     private decimal Normalize(decimal amount) => amount.Truncate(_moneyPrecision);
+
+    private void SyncMoney()
+    {
+        if (_userData != null)
+            _userData.Money = _money;
+    }
 
     public void GiveMoney(decimal amount)
     {
@@ -129,6 +135,7 @@ internal sealed class PlayerMoneyFeature : IPlayerMoneyFeature, IUsesUserPersist
                 throw new GameplayException("Unable to give money beyond limit.");
 
             _money += amount;
+            SyncMoney();
             TryUpdateVersion();
             Added?.Invoke(this, amount);
         }
@@ -159,6 +166,7 @@ internal sealed class PlayerMoneyFeature : IPlayerMoneyFeature, IUsesUserPersist
             throw new GameplayException("Unable to take money, not enough money.");
 
         _money -= amount;
+        SyncMoney();
         TryUpdateVersion();
         Taken?.Invoke(this, amount);
     }

@@ -53,7 +53,7 @@ public class RealmPlayer : Player, IDisposable, IPersistentElement
     private readonly ConcurrentDictionary<int, bool> _enableFightFlags = new();
     private readonly List<AttachedBoneWorldObject> _attachedBoneElements = [];
 
-    public event Action<RealmPlayer, Element?>? FocusedElementChanged;
+    public event Action<RealmPlayer, Element?, Element?>? FocusedElementChanged;
     public event Action<RealmPlayer, Element?>? ClickedElementChanged;
     public event Action<RealmPlayer, Element?, Element?>? CurrentInteractElementChanged;
     public event Action<RealmPlayer, AttachedBoneWorldObject>? WorldObjectAttached;
@@ -84,8 +84,9 @@ public class RealmPlayer : Player, IDisposable, IPersistentElement
                         break;
                 }
 
+                var previous = _focusedElement;
                 _focusedElement = value;
-                FocusedElementChanged?.Invoke(this, value);
+                FocusedElementChanged?.Invoke(this, previous, value);
 
                 switch (value)
                 {
