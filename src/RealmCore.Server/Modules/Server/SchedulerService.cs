@@ -110,8 +110,9 @@ internal sealed class SchedulerService : ISchedulerService
 
     public async Task StartAsync()
     {
-        _scheduler = await _stdSchedulerFactory.GetScheduler();
-        await _scheduler.Start();
+        _scheduler = await _stdSchedulerFactory.GetScheduler(Guid.NewGuid().ToString());
+        if(_scheduler != null)
+            await _scheduler.Start();
     }
 
     public ScheduledJob ScheduleJob(Func<Task> job, TimeSpan every, CancellationToken cancellationToken = default)
