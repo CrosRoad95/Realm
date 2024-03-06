@@ -110,8 +110,12 @@ internal sealed class SchedulerService : ISchedulerService
 
     public async Task StartAsync()
     {
-        _scheduler = await _stdSchedulerFactory.GetScheduler(Guid.NewGuid().ToString());
-        if(_scheduler != null)
+        _scheduler = await _stdSchedulerFactory.GetScheduler();
+
+        if (_scheduler == null)
+            throw new InvalidOperationException();
+
+        if (_scheduler != null)
             await _scheduler.Start();
     }
 
