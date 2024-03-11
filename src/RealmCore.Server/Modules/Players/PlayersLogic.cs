@@ -196,7 +196,9 @@ internal sealed class PlayersLogic : PlayerLifecycle
             _playerResources.TryRemove(player, out var _);
             if (player.User.IsSignedIn)
             {
-                _activeUsers.TrySetInactive(player.PersistentId);
+                if (_activeUsers.TrySetInactive(player.PersistentId))
+                    _playerEventManager.RelayUnloading(player);
+
                 await player.GetRequiredService<ISaveService>().Save(player);
             }
         }

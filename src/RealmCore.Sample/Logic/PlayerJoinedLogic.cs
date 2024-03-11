@@ -20,8 +20,17 @@ internal sealed class PlayerJoinedLogic
         _scoreboardService = scoreboardService;
         _guiSystemService = guiSystemService;
         playersService.PlayerLoaded += HandlePlayerLoaded;
+        playersService.PlayerUnloading += HandlePlayerUnloading;
         usersService.SignedIn += HandleSignedIn;
         usersService.SignedOut += HandleSignedOut;
+    }
+
+    private void HandlePlayerUnloading(Player obj)
+    {
+        if(obj is RealmPlayer player)
+        {
+            player.Events.Add(42);
+        }
     }
 
     private void HandleReady(IPlayerBrowserFeature playerBrowser)
