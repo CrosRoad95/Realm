@@ -170,7 +170,7 @@ public sealed class RealmCommandService
         if (!player.User.IsSignedIn)
             return;
 
-        var activity = new Activity("CommandHandler").Start();
+        using var activity = Activity.StartActivity("CommandHandler");
         var start = Stopwatch.GetTimestamp();
 
         using var _ = _logger.BeginElement(player);
@@ -258,7 +258,8 @@ public sealed class RealmCommandService
         finally
         {
             _logger.LogInformation("Ended async command {command} execution with in {totalMilliseconds}milliseconds", command, (Stopwatch.GetTimestamp() - start) / (float)TimeSpan.TicksPerMillisecond);
-            activity.Stop();
         }
     }
+
+    public static readonly ActivitySource Activity = new("RealmCore.Commands", "1.0.0");
 }

@@ -149,7 +149,7 @@ internal sealed class PlayersLogic : PlayerLifecycle
     {
         var player = (RealmPlayer)plr;
         using var _ = _logger.BeginElement(player);
-        using var handlePlayerJoinedActivity = new Activity("HandlePlayerJoined").Start();
+        using var handlePlayerJoinedActivity = Activity.StartActivity("PlayerJoined");
         try
         {
             await HandlePlayerJoinedCore(player, player.CreateCancellationToken());
@@ -174,7 +174,7 @@ internal sealed class PlayersLogic : PlayerLifecycle
             {
                 what = "Gui przeglądarki ładowało się zbyt długo.";
             }
-            var traceId = Activity.Current?.TraceId.ToString() ?? "<nieznany>";
+            var traceId = System.Diagnostics.Activity.Current?.TraceId.ToString() ?? "<nieznany>";
             var message = $"{what}. Jeżeli błąd się powtórzy zgłoś się do administracji.\n\nTrace id: {traceId}";
             _clientConsole.OutputTo(player, message);
             player.Kick(message);
@@ -214,4 +214,6 @@ internal sealed class PlayersLogic : PlayerLifecycle
             _logger.LogHandleError(ex);
         }
     }
+
+    public static readonly ActivitySource Activity = new("RealmCore.Players", "1.0.0");
 }
