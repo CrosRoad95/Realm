@@ -3,6 +3,7 @@
 public interface IPlayerMoneyHistoryService
 {
     Task Add(RealmPlayer player, decimal change, int? category = null, string? description = null, CancellationToken cancellationToken = default);
+    Task Add(RealmPlayer player, decimal amount, decimal change, int? category = null, string? description = null, CancellationToken cancellationToken = default);
     Task<List<UserMoneyHistoryDto>> Get(RealmPlayer player, int limit = 10, CancellationToken cancellationToken = default);
 }
 
