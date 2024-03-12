@@ -6,7 +6,7 @@ public abstract class PlayerLifecycle<TPlayer> where TPlayer: RealmPlayer
 
     public PlayerLifecycle(MtaServer server)
     {
-        server.PlayerJoined += HandlePlayerJoined;
+        server.GetRequiredService<IPlayersEventManager>().PlayerJoined += HandlePlayerJoined;
         _server = server;
     }
 

@@ -4,16 +4,16 @@ internal sealed class NametagResourceLogic
 {
     private readonly INametagsService _nametagsService;
 
-    public NametagResourceLogic(MtaServer server, INametagsService nametagsService)
+    public NametagResourceLogic(IPlayersEventManager playersEventManager, INametagsService nametagsService)
     {
-        server.PlayerJoined += HandlePlayerJoined;
+        playersEventManager.PlayerJoined += HandlePlayerJoined;
         _nametagsService = nametagsService;
     }
 
     private void HandlePlayerJoined(Player plr)
     {
-        var player = (RealmPlayer)plr;
-        player.NametagTextChanged += HandleNametagTextChanged;
+        if(plr is RealmPlayer player)
+            player.NametagTextChanged += HandleNametagTextChanged;
     }
 
     private void HandleNametagTextChanged(RealmPlayer player, string? nametagText)

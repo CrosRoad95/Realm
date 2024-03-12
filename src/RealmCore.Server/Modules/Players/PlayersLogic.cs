@@ -22,7 +22,6 @@ internal sealed class PlayersLogic : PlayerLifecycle
         _guiBrowserOptions = guiBrowserOptions;
         _clientConsole = clientConsole;
         _playersService = playersService;
-        _server.PlayerJoined += HandlePlayerJoined;
     }
 
     private async Task FetchClientData(RealmPlayer player, CancellationToken cancellationToken = default)
@@ -148,9 +147,8 @@ internal sealed class PlayersLogic : PlayerLifecycle
         player.Disconnected += HandleDisconnected;
     }
 
-    private async void HandlePlayerJoined(Player plr)
+    protected override async void PlayerJoined(RealmPlayer player)
     {
-        var player = (RealmPlayer)plr;
         using var _ = _logger.BeginElement(player);
         using var handlePlayerJoinedActivity = Activity.StartActivity("PlayerJoined");
         try

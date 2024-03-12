@@ -4,9 +4,9 @@ internal sealed class ScopedCollisionShapeBehaviour
 {
     private readonly ILogger<ScopedCollisionShapeBehaviour> _logger;
 
-    public ScopedCollisionShapeBehaviour(MtaServer server, ILogger<ScopedCollisionShapeBehaviour> logger)
+    public ScopedCollisionShapeBehaviour(IPlayersEventManager playersEventManager, ILogger<ScopedCollisionShapeBehaviour> logger)
     {
-        server.PlayerJoined += HandlePlayerJoined;
+        playersEventManager.PlayerJoined += HandlePlayerJoined;
         _logger = logger;
     }
 

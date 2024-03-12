@@ -1,23 +1,20 @@
 ﻿namespace RealmCore.Server.Modules.Players.Bans;
 
-public class DefaultBanLogic
+public sealed class PlayerBanPipeline : IPlayerJoinedPipeline
 {
-    private readonly MtaServer _server;
     private readonly IOptionsMonitor<GameplayOptions> _gameplayOptions;
-    private readonly ILogger<DefaultBanLogic> _logger;
     private readonly IDateTimeProvider _dateTimeProvider;
 
-    public DefaultBanLogic(MtaServer server, IOptionsMonitor<GameplayOptions> gameplayOptions, ILogger<DefaultBanLogic> logger, IDateTimeProvider dateTimeProvider)
+    public PlayerBanPipeline(IOptionsMonitor<GameplayOptions> gameplayOptions, IDateTimeProvider dateTimeProvider)
     {
-        _server = server;
         _gameplayOptions = gameplayOptions;
-        _logger = logger;
         _dateTimeProvider = dateTimeProvider;
-        _server.PlayerJoined += HandlePlayerJoined;
     }
 
-    private async Task HandlePlayerJoinedCore(RealmPlayer player)
+    public async Task<bool> Next(Player plr)
     {
+        var player = (RealmPlayer)plr;
+
         var serial = player.Client.Serial;
         if (serial == null)
             player.Client.FetchSerial();
@@ -25,7 +22,7 @@ public class DefaultBanLogic
         if (player.Client.Serial == null)
         {
             player.Kick("Failed to fetch serial");
-            return;
+            return false;
         }
 
         var now = _dateTimeProvider.Now;
@@ -37,18 +34,8 @@ public class DefaultBanLogic
         if (ban != null)
         {
             player.Kick($"You are banned, reason: {ban.Reason} until: {ban.End}");
+            return false;
         }
-    }
-
-    private async void HandlePlayerJoined(Player player)
-    {
-        try
-        {
-            await HandlePlayerJoinedCore((RealmPlayer)player);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Something went wrong while handling player join");
-        }
+        return true;
     }
 }

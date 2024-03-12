@@ -98,6 +98,7 @@ public static class ServerBuilderExtensions
         serverBuilder.AddLogic<PlayerMoneyLogic>();
         serverBuilder.AddLogic<AFKLogic>();
         serverBuilder.AddLogic<PlayerDailyVisitsLogic>();
+        serverBuilder.AddLogic<PlayerJoinedPipeline>();
         #endregion
 
         #region Behaviours

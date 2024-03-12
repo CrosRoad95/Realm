@@ -11,6 +11,7 @@ using RealmCore.Server.Modules.Chat;
 using RealmCore.Server.Modules.Integrations.External;
 using RealmCore.Sample.Data;
 using RealmCore.Sample.Server;
+using RealmCore.Server.Extensions;
 
 [assembly: ExcludeFromCodeCoverage]
 
@@ -52,7 +53,6 @@ public class SampleServer : RealmServer
         serverBuilder.AddLogic<ExternalModulesLogic>();
         serverBuilder.AddLogic<ProceduralObjectsLogic>();
         serverBuilder.AddLogic<AssetsLogic>();
-        serverBuilder.AddLogic<DefaultBanLogic>();
         serverBuilder.AddLogic<DefaultChatLogic>();
         serverBuilder.AddLogic<TestLogic>();
 
@@ -87,10 +87,22 @@ public class SampleServer : RealmServer
 
             var realmLogger = new RealmLogger("RealmCore", LogEventLevel.Information);
             services.AddLogging(x => x.AddSerilog(realmLogger.GetLogger(), dispose: true));
+
+            services.AddPlayerJoinedPipeline<PlayerBanPipeline>();
+            services.AddPlayerJoinedPipeline<SamplePlayerJoinedPipeline>();
         });
 
         //serverBuilder.AddExtras(realmConfigurationProvider);
     })
     {
+    }
+}
+
+public class SamplePlayerJoinedPipeline : IPlayerJoinedPipeline
+{
+    public async Task<bool> Next(Player player)
+    {
+        //throw new NotImplementedException();
+        return true;
     }
 }

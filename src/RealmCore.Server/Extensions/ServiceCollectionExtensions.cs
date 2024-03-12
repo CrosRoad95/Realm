@@ -47,6 +47,12 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IVehicleFeature>(x => x.GetRequiredService<T1>()); 
         return services;
     }
+    
+    public static ServiceCollection AddPlayerJoinedPipeline<T>(this ServiceCollection services) where T : class, IPlayerJoinedPipeline
+    {
+        services.AddTransient<IPlayerJoinedPipeline, T>();
+        return services;
+    }
 
     internal static ServiceCollection ConfigureRealmServices(this ServiceCollection services)
     {
