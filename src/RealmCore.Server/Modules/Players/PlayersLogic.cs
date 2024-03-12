@@ -115,15 +115,18 @@ internal sealed class PlayersLogic : PlayerLifecycle
 
         if (player.ScreenSize.X == 0)
         {
+            using var activity = Activity.StartActivity("FetchClientData");
             await FetchClientData(player, cancellationToken);
         }
         else
         {
+            using var activity = Activity.StartActivity("StartAllResourcesForPlayer");
             await StartAllResourcesForPlayer(player, cancellationToken);
         }
 
         if (_guiBrowserOptions.Value.BrowserSupport)
         {
+            using var activity = Activity.StartActivity("WaitForBrowser");
             await WaitForBrowser(player, TimeSpan.FromSeconds(60), cancellationToken);
         }
 

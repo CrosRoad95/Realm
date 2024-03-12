@@ -26,6 +26,8 @@ internal sealed class LoadService : ILoadService
 
     public async Task<RealmVehicle> LoadVehicleById(int id, CancellationToken cancellationToken = default)
     {
+        using var activity = Activity.StartActivity(nameof(LoadVehicleById));
+
         var vehicleData = await _vehicleRepository.GetVehicleById(id, cancellationToken) ?? throw new PersistantVehicleNotFoundException($"Failed to load vehicle data of id {id}");
 
         try
@@ -35,12 +37,15 @@ internal sealed class LoadService : ILoadService
         catch (Exception ex)
         {
             _logger.LogError(ex, "Failed to spawn vehicle: {vehicleId}", vehicleData.Id);
+            activity?.SetStatus(ActivityStatusCode.Error, ex.ToString());
             throw;
         }
     }
 
     private async Task LoadAllVehicles(CancellationToken cancellationToken = default)
     {
+        using var activity = Activity.StartActivity(nameof(LoadAllVehicles));
+
         var results = await _vehicleRepository.GetAllSpawnedVehicles(cancellationToken);
 
         int i = 0;
@@ -59,4 +64,6 @@ internal sealed class LoadService : ILoadService
         if (i > 0)
             _logger.LogInformation("Loaded: {amount} vehicles", i);
     }
+
+    public static readonly ActivitySource Activity = new("RealmCore.LoadService", "1.0.0");
 }

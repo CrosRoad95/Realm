@@ -20,6 +20,8 @@ internal sealed class UserNotificationRepository : IUserNotificationRepository
 
     public async Task<List<UserNotificationData>> Get(int userId, int limit = 10, CancellationToken cancellationToken = default)
     {
+        using var activity = Activity.StartActivity(nameof(Get));
+
         var query = _db.UserNotifications
             .TagWithSource(nameof(UserNotificationRepository))
             .AsNoTracking()
@@ -32,6 +34,8 @@ internal sealed class UserNotificationRepository : IUserNotificationRepository
     
     public async Task<UserNotificationData?> GetById(int notificationId, CancellationToken cancellationToken = default)
     {
+        using var activity = Activity.StartActivity(nameof(GetById));
+
         var query = _db.UserNotifications
             .TagWithSource(nameof(UserNotificationRepository))
             .AsNoTracking()
@@ -42,6 +46,8 @@ internal sealed class UserNotificationRepository : IUserNotificationRepository
     
     public async Task<UserNotificationData> Create(int userId, DateTime now, string title, string content, string? excerpt = null, CancellationToken cancellationToken = default)
     {
+        using var activity = Activity.StartActivity(nameof(Create));
+
         var userNotificationData = new UserNotificationData
         {
             UserId = userId,
@@ -57,6 +63,8 @@ internal sealed class UserNotificationRepository : IUserNotificationRepository
 
     public async Task<int> CountUnread(int userId, CancellationToken cancellationToken = default)
     {
+        using var activity = Activity.StartActivity(nameof(CountUnread));
+
         var query = _db.UserNotifications
             .TagWithSource(nameof(UserNotificationRepository))
             .AsNoTracking()
@@ -67,6 +75,8 @@ internal sealed class UserNotificationRepository : IUserNotificationRepository
 
     public async Task<bool> MarkAsRead(int id, DateTime now, CancellationToken cancellationToken = default)
     {
+        using var activity = Activity.StartActivity(nameof(MarkAsRead));
+
         var notification = await _db.UserNotifications
             .TagWithSource(nameof(UserNotificationRepository))
             .Where(x => x.Id == id)
@@ -78,4 +88,6 @@ internal sealed class UserNotificationRepository : IUserNotificationRepository
         notification.ReadTime = now;
         return await _db.SaveChangesAsync(cancellationToken) == 1;
     }
+
+    public static readonly ActivitySource Activity = new("RealmCore.UserNotificationRepository", "1.0.0");
 }

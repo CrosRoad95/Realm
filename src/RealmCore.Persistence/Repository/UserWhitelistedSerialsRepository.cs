@@ -18,6 +18,8 @@ internal sealed class UserWhitelistedSerialsRepository : IUserWhitelistedSerials
 
     public async Task<bool> IsSerialWhitelisted(int userId, string serial, CancellationToken cancellationToken = default)
     {
+        using var activity = Activity.StartActivity(nameof(IsSerialWhitelisted));
+
         var query = _db.UserWhitelistedSerials
             .AsNoTracking()
             .TagWith(nameof(UserWhitelistedSerialsRepository))
@@ -27,6 +29,8 @@ internal sealed class UserWhitelistedSerialsRepository : IUserWhitelistedSerials
 
     public async Task<bool> TryAddWhitelistedSerial(int userId, string serial, CancellationToken cancellationToken = default)
     {
+        using var activity = Activity.StartActivity(nameof(TryAddWhitelistedSerial));
+
         if (serial.Length != 32)
             throw new ArgumentException(null, nameof(serial));
 
@@ -53,6 +57,8 @@ internal sealed class UserWhitelistedSerialsRepository : IUserWhitelistedSerials
 
     public async Task<bool> TryRemoveWhitelistedSerial(int userId, string serial, CancellationToken cancellationToken = default)
     {
+        using var activity = Activity.StartActivity(nameof(TryRemoveWhitelistedSerial));
+
         if (serial.Length != 32)
             throw new ArgumentException(null, nameof(serial));
 
@@ -75,4 +81,6 @@ internal sealed class UserWhitelistedSerialsRepository : IUserWhitelistedSerials
             _db.ChangeTracker.Clear();
         }
     }
+
+    public static readonly ActivitySource Activity = new("RealmCore.UserWhitelistedSerialsRepository", "1.0.0");
 }

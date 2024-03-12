@@ -2,12 +2,12 @@
 
 public interface IFractionRepository
 {
-    Task<bool> CreateFraction(int id, string fractionName, string fractionCode, CancellationToken cancellationToken = default);
+    Task<bool> Create(int id, string fractionName, string fractionCode, CancellationToken cancellationToken = default);
     Task<bool> Exists(int id, string code, string name, CancellationToken cancellationToken = default);
     Task<List<FractionData>> GetAll(CancellationToken cancellationToken = default);
     Task<List<FractionMemberData>> GetAllMembers(int fractionId, CancellationToken cancellationToken = default);
     Task<FractionMemberData?> TryAddMember(int fractionId, int userId, int rank = 1, string rankName = "", CancellationToken cancellationToken = default);
-    Task<FractionData?> TryCreateFraction(int id, string fractionName, string fractionCode, CancellationToken cancellationToken = default);
+    Task<FractionData?> TryCreate(int id, string fractionName, string fractionCode, CancellationToken cancellationToken = default);
 }
 
 internal sealed class FractionRepository : IFractionRepository
@@ -23,6 +23,8 @@ internal sealed class FractionRepository : IFractionRepository
 
     public async Task<List<FractionData>> GetAll(CancellationToken cancellationToken = default)
     {
+        using var activity = Activity.StartActivity(nameof(GetAll));
+
         var query = _db.Fractions
             .Include(x => x.Members)
             .TagWithSource(nameof(FractionRepository))
@@ -33,6 +35,8 @@ internal sealed class FractionRepository : IFractionRepository
 
     public async Task<List<FractionMemberData>> GetAllMembers(int id, CancellationToken cancellationToken = default)
     {
+        using var activity = Activity.StartActivity(nameof(GetAllMembers));
+
         var query = _db.FractionMembers.Where(x => x.FractionId == id)
             .TagWithSource(nameof(FractionRepository))
             .AsNoTracking();
@@ -42,6 +46,8 @@ internal sealed class FractionRepository : IFractionRepository
 
     public async Task<bool> Exists(int id, string code, string name, CancellationToken cancellationToken = default)
     {
+        using var activity = Activity.StartActivity(nameof(Exists));
+
         var query = _db.Fractions
             .TagWithSource(nameof(FractionRepository))
             .AsNoTracking()
@@ -50,8 +56,10 @@ internal sealed class FractionRepository : IFractionRepository
         return await query.AnyAsync(cancellationToken);
     }
 
-    public async Task<bool> CreateFraction(int id, string name, string code, CancellationToken cancellationToken = default)
+    public async Task<bool> Create(int id, string name, string code, CancellationToken cancellationToken = default)
     {
+        using var activity = Activity.StartActivity(nameof(Create));
+
         _db.Fractions.Add(new FractionData
         {
             Id = id,
@@ -62,8 +70,10 @@ internal sealed class FractionRepository : IFractionRepository
         return await _db.SaveChangesAsync(cancellationToken) == 1;
     }
     
-    public async Task<FractionData?> TryCreateFraction(int id, string name, string code, CancellationToken cancellationToken = default)
+    public async Task<FractionData?> TryCreate(int id, string name, string code, CancellationToken cancellationToken = default)
     {
+        using var activity = Activity.StartActivity(nameof(TryCreate));
+
         var result = await _transactionContext.ExecuteAsync(async (db) =>
         {
             var existsQuery = _db.Fractions
@@ -90,6 +100,8 @@ internal sealed class FractionRepository : IFractionRepository
 
     public async Task<FractionMemberData?> TryAddMember(int fractionId, int userId, int rank = 1, string rankName = "", CancellationToken cancellationToken = default)
     {
+        using var activity = Activity.StartActivity(nameof(TryAddMember));
+
         var fractionMember = new FractionMemberData
         {
             FractionId = fractionId,
@@ -110,4 +122,6 @@ internal sealed class FractionRepository : IFractionRepository
             return null;
         }
     }
+
+    public static readonly ActivitySource Activity = new("RealmCore.FractionRepository", "1.0.0");
 }

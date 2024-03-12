@@ -47,26 +47,44 @@ public class RealmServer<TRealmPlayer> : MtaServer<TRealmPlayer> where TRealmPla
 
     public async Task StartCore(CancellationToken cancellationToken = default)
     {
-        var logger = GetRequiredService<ILogger<RealmServer>>();
-        await GetRequiredService<IDb>().MigrateAsync();
-        await GetRequiredService<IFractionService>().LoadFractions(cancellationToken);
-
         {
-            using var seederServerBuilder = GetRequiredService<SeederServerBuilder>();
-            await seederServerBuilder.Build(cancellationToken);
+            using var activity = Activity.StartActivity(nameof(StartCore));
+
+            var logger = GetRequiredService<ILogger<RealmServer>>();
+
+            {
+                using var activityMigrate = Activity.StartActivity("Database migration");
+                await GetRequiredService<IDb>().MigrateAsync();
+            }
+
+            {
+                using var activityLoadFraction = Activity.StartActivity("Load fractions");
+                await GetRequiredService<IFractionService>().LoadFractions(cancellationToken);
+            }
+
+            {
+                using var activitySeeder = Activity.StartActivity("Seeder");
+                using var seederServerBuilder = GetRequiredService<SeederServerBuilder>();
+                await seederServerBuilder.Build(cancellationToken);
+            }
+
+            {
+                using var activityLoadAll = Activity.StartActivity("Load all");
+
+                await GetRequiredService<ILoadService>().LoadAll(cancellationToken);
+            }
+
+            var gameplayOptions = GetRequiredService<IOptions<GameplayOptions>>();
+            CultureInfo.CurrentCulture = gameplayOptions.Value.Culture;
+            CultureInfo.CurrentUICulture = gameplayOptions.Value.Culture;
+            var realmCommandService = GetRequiredService<RealmCommandService>();
+
+            base.Start();
+            logger.LogInformation("Server started.");
+            logger.LogInformation("Found resources: {resourcesCount}", RealmResourceServer._resourceCounter);
+            logger.LogInformation("Created commands: {commandsCount}", realmCommandService.Count);
+            ServerStarted?.Invoke();
         }
-        await GetRequiredService<ILoadService>().LoadAll(cancellationToken);
-
-        var gameplayOptions = GetRequiredService<IOptions<GameplayOptions>>();
-        CultureInfo.CurrentCulture = gameplayOptions.Value.Culture;
-        CultureInfo.CurrentUICulture = gameplayOptions.Value.Culture;
-        var realmCommandService = GetRequiredService<RealmCommandService>();
-
-        base.Start();
-        logger.LogInformation("Server started.");
-        logger.LogInformation("Found resources: {resourcesCount}", RealmResourceServer._resourceCounter);
-        logger.LogInformation("Created commands: {commandsCount}", realmCommandService.Count);
-        ServerStarted?.Invoke();
         await Task.Delay(-1, cancellationToken);
     }
 
@@ -99,6 +117,9 @@ public class RealmServer<TRealmPlayer> : MtaServer<TRealmPlayer> where TRealmPla
         base.Stop();
         logger.LogInformation("Server stopped, saved: {savedElementsCount} elements.", i);
     }
+
+
+    public static readonly ActivitySource Activity = new("RealmCore.RealmServer", "1.0.0");
 }
 
 public class RealmServer : RealmServer<RealmPlayer>

@@ -20,6 +20,8 @@ internal sealed class RatingRepository : IRatingRepository
 
     public async Task<bool> Rate(int userId, int ratingId, int rating, DateTime dateTime, CancellationToken cancellationToken = default)
     {
+        using var activity = Activity.StartActivity(nameof(Rate));
+
         _db.Ratings.Add(new RatingData
         {
             UserId = userId,
@@ -33,6 +35,8 @@ internal sealed class RatingRepository : IRatingRepository
 
     public async Task ChangeLastRating(int userId, int ratingId, int rating, DateTime dateTime, CancellationToken cancellationToken = default)
     {
+        using var activity = Activity.StartActivity(nameof(ChangeLastRating));
+
         await _transactionContext.ExecuteAsync(async (db) =>
         {
             var query = db.Ratings
@@ -61,6 +65,8 @@ internal sealed class RatingRepository : IRatingRepository
 
     public async Task<(int, DateTime)?> GetLastRating(int userId, int ratingId, CancellationToken cancellationToken = default)
     {
+        using var activity = Activity.StartActivity(nameof(GetLastRating));
+
         var query = _db.Ratings
             .Where(x => x.UserId == userId && x.RatingId == ratingId)
             .OrderByDescending(x => x.DateTime);
@@ -71,4 +77,6 @@ internal sealed class RatingRepository : IRatingRepository
 
         return (ratingData.Rating, ratingData.DateTime);
     }
+
+    public static readonly ActivitySource Activity = new("RealmCore.RatingRepository", "1.0.0");
 }

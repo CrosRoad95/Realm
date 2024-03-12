@@ -17,6 +17,8 @@ internal sealed class JobRepository : IJobRepository
 
     public async Task<List<UserJobStatisticsDto>> GetJobStatistics(short jobId, int limit = 10, CancellationToken cancellationToken = default)
     {
+        using var activity = Activity.StartActivity(nameof(GetJobStatistics));
+
         var query = _db.JobPoints
             .TagWithSource(nameof(JobRepository))
             .AsNoTrackingWithIdentityResolution()
@@ -37,6 +39,8 @@ internal sealed class JobRepository : IJobRepository
 
     public async Task<UserJobStatisticsDto?> GetUserJobStatistics(int userId, short jobId, CancellationToken cancellationToken = default)
     {
+        using var activity = Activity.StartActivity(nameof(GetUserJobStatistics));
+
         var query = _db.JobPoints
             .TagWithSource(nameof(JobRepository))
             .AsNoTrackingWithIdentityResolution()
@@ -52,4 +56,6 @@ internal sealed class JobRepository : IJobRepository
 
         return await query.FirstOrDefaultAsync(cancellationToken);
     }
+
+    public static readonly ActivitySource Activity = new("RealmCore.JobRepository", "1.0.0");
 }

@@ -10,8 +10,8 @@ public class FractionRepositoryTests : RealmIntegrationTestingBase
         var server = await CreateServerAsync();
         var fractionRepository = server.GetRequiredService<IFractionRepository>();
 
-        var fraction1 = await fractionRepository.TryCreateFraction(1, "foo", "bar");
-        var fraction2 = await fractionRepository.TryCreateFraction(1, "foo", "bar");
+        var fraction1 = await fractionRepository.TryCreate(1, "foo", "bar");
+        var fraction2 = await fractionRepository.TryCreate(1, "foo", "bar");
 
         fraction1.Should().BeEquivalentTo(new FractionData
         {

@@ -17,6 +17,8 @@ internal sealed class UserRewardRepository : IUserRewardRepository
 
     public async Task<bool> TryAddReward(int userId, int rewardId, CancellationToken cancellationToken = default)
     {
+        using var activity = Activity.StartActivity(nameof(TryAddReward));
+
         try
         {
             _db.UserRewards.Add(new UserRewardData
@@ -32,4 +34,6 @@ internal sealed class UserRewardRepository : IUserRewardRepository
             return false;
         }
     }
+
+    public static readonly ActivitySource Activity = new("RealmCore.UserRewardRepository", "1.0.0");
 }

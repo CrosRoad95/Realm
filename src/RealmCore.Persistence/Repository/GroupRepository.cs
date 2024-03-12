@@ -24,6 +24,8 @@ internal sealed class GroupRepository : IGroupRepository
 
     public async Task<GroupData?> GetByName(string groupName, CancellationToken cancellationToken = default)
     {
+        using var activity = Activity.StartActivity(nameof(GetByName));
+
         var query = _db.Groups
             .TagWithSource(nameof(GroupRepository))
             .Include(x => x.Members)
@@ -34,6 +36,8 @@ internal sealed class GroupRepository : IGroupRepository
 
     public async Task<GroupData?> GetGroupByNameOrShortcut(string groupName, string shortcut, CancellationToken cancellationToken = default)
     {
+        using var activity = Activity.StartActivity(nameof(GetGroupByNameOrShortcut));
+
         var query = _db.Groups
             .TagWithSource(nameof(GroupRepository))
             .Include(x => x.Members)
@@ -44,6 +48,8 @@ internal sealed class GroupRepository : IGroupRepository
 
     public async Task<bool> ExistsByName(string groupName, CancellationToken cancellationToken = default)
     {
+        using var activity = Activity.StartActivity(nameof(ExistsByName));
+
         var query = _db.Groups
             .TagWithSource(nameof(GroupRepository))
             .AsNoTrackingWithIdentityResolution()
@@ -54,6 +60,8 @@ internal sealed class GroupRepository : IGroupRepository
 
     public async Task<bool> ExistsByNameOrShortcut(string groupName, string shortcut, CancellationToken cancellationToken = default)
     {
+        using var activity = Activity.StartActivity(nameof(ExistsByNameOrShortcut));
+
         var query = _db.Groups
             .TagWithSource(nameof(GroupRepository))
             .AsNoTrackingWithIdentityResolution()
@@ -63,6 +71,8 @@ internal sealed class GroupRepository : IGroupRepository
 
     public async Task<bool> ExistsByShortcut(string shortcut, CancellationToken cancellationToken = default)
     {
+        using var activity = Activity.StartActivity(nameof(ExistsByShortcut));
+
         var query = _db.Groups
             .TagWithSource(nameof(GroupRepository))
             .AsNoTrackingWithIdentityResolution()
@@ -73,6 +83,8 @@ internal sealed class GroupRepository : IGroupRepository
 
     public async Task<int> GetGroupIdByName(string groupName, CancellationToken cancellationToken = default)
     {
+        using var activity = Activity.StartActivity(nameof(GetGroupIdByName));
+
         var query = _db.Groups
             .TagWithSource(nameof(GroupRepository))
             .Where(x => x.Name == groupName)
@@ -82,6 +94,8 @@ internal sealed class GroupRepository : IGroupRepository
 
     public async Task<GroupData> Create(string groupName, string shortcut, byte kind = 1, CancellationToken cancellationToken = default)
     {
+        using var activity = Activity.StartActivity(nameof(Create));
+
         var group = new GroupData
         {
             Name = groupName,
@@ -95,6 +109,8 @@ internal sealed class GroupRepository : IGroupRepository
 
     public async Task<GroupMemberData?> TryAddMember(int groupId, int userId, int rank = 1, string rankName = "", CancellationToken cancellationToken = default)
     {
+        using var activity = Activity.StartActivity(nameof(TryAddMember));
+
         var groupMember = new GroupMemberData
         {
             GroupId = groupId,
@@ -116,6 +132,8 @@ internal sealed class GroupRepository : IGroupRepository
     
     public async Task<bool> IsUserInGroup(int groupId, int userId, CancellationToken cancellationToken = default)
     {
+        using var activity = Activity.StartActivity(nameof(IsUserInGroup));
+
         var query = _db.GroupMembers
             .TagWithSource(nameof(GroupRepository))
             .Where(x => x.GroupId == groupId && x.UserId == userId);
@@ -125,10 +143,14 @@ internal sealed class GroupRepository : IGroupRepository
 
     public async Task<bool> TryRemoveMember(int groupId, int userId, CancellationToken cancellationToken = default)
     {
+        using var activity = Activity.StartActivity(nameof(TryRemoveMember));
+
         var query = _db.GroupMembers
             .TagWithSource(nameof(GroupRepository))
             .Where(x => x.GroupId == groupId && x.UserId == userId);
 
         return await query.ExecuteDeleteAsync(cancellationToken) == 1;
     }
+
+    public static readonly ActivitySource Activity = new("RealmCore.GroupRepository", "1.0.0");
 }

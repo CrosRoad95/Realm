@@ -39,7 +39,7 @@ internal sealed class FeedbackService : IFeedbackService
 
     public async Task AddOpinion(RealmPlayer player, int opinionId, string opinion, CancellationToken cancellationToken = default)
     {
-        await _opinionRepository.AddOpinion(player.PersistentId, opinionId, opinion, _dateTimeProvider.Now, cancellationToken);
+        await _opinionRepository.Add(player.PersistentId, opinionId, opinion, _dateTimeProvider.Now, cancellationToken);
     }
 
     public async Task<DateTime?> GetLastOpinionDateTime(RealmPlayer player, int opinionId, CancellationToken cancellationToken = default)

@@ -18,6 +18,8 @@ internal sealed class UserEventRepository : IUserEventRepository
 
     public async Task AddEvent(int userId, int eventType, DateTime dateTime, string? metadata = null, CancellationToken cancellationToken = default)
     {
+        using var activity = Activity.StartActivity(nameof(AddEvent));
+
         _db.UserEvents.Add(new UserEventData
         {
             UserId = userId,
@@ -30,6 +32,8 @@ internal sealed class UserEventRepository : IUserEventRepository
 
     public async Task<List<UserEventData>> GetAllEventsByUserId(int userId, IEnumerable<int>? events = null, CancellationToken cancellationToken = default)
     {
+        using var activity = Activity.StartActivity(nameof(GetAllEventsByUserId));
+
         var query = _db.UserEvents
             .AsNoTracking()
             .TagWithSource(nameof(VehicleEventRepository))
@@ -41,6 +45,8 @@ internal sealed class UserEventRepository : IUserEventRepository
 
     public async Task<List<UserEventData>> GetLastEventsByUserId(int userId, int limit = 10, IEnumerable<int>? events = null, CancellationToken cancellationToken = default)
     {
+        using var activity = Activity.StartActivity(nameof(GetLastEventsByUserId));
+
         var query = _db.UserEvents
             .AsNoTracking()
             .TagWithSource(nameof(VehicleEventRepository))
@@ -51,4 +57,6 @@ internal sealed class UserEventRepository : IUserEventRepository
             query = query.Where(x => events.Contains(x.EventType));
         return await query.ToListAsync(cancellationToken);
     }
+
+    public static readonly ActivitySource Activity = new("RealmCore.UserEventRepository", "1.0.0");
 }

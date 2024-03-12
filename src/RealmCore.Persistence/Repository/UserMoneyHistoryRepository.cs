@@ -17,6 +17,8 @@ internal sealed class UserMoneyHistoryRepository : IUserMoneyHistoryRepository
 
     public async Task<UserMoneyHistoryData> Add(int userId, DateTime now, decimal currentBalance, decimal amount, int? category = null, string? description = null, CancellationToken cancellationToken = default)
     {
+        using var activity = Activity.StartActivity(nameof(Add));
+
         var userMoneyHistoryData = new UserMoneyHistoryData
         {
             UserId = userId,
@@ -33,6 +35,8 @@ internal sealed class UserMoneyHistoryRepository : IUserMoneyHistoryRepository
 
     public async Task<List<UserMoneyHistoryData>> Get(int userId, int limit = 10, CancellationToken cancellationToken = default)
     {
+        using var activity = Activity.StartActivity(nameof(Get));
+
         var query = _db.UserMoneyHistory
             .TagWithSource(nameof(UserMoneyHistoryRepository))
             .AsNoTracking()
@@ -42,4 +46,6 @@ internal sealed class UserMoneyHistoryRepository : IUserMoneyHistoryRepository
 
         return await query.ToListAsync(cancellationToken);
     }
+
+    public static readonly ActivitySource Activity = new("RealmCore.UserMoneyHistoryRepository", "1.0.0");
 }

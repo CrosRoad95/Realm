@@ -31,7 +31,7 @@ public class DefaultBanLogic
         var now = _dateTimeProvider.Now;
         var bansRepository = player.GetRequiredService<IBanRepository>();
 
-        var bans = await player.GetRequiredService<IBanRepository>().GetBansBySerial(player.Client.Serial, _dateTimeProvider.Now, _gameplayOptions.CurrentValue.BanType);
+        var bans = await player.GetRequiredService<IBanRepository>().GetBySerial(player.Client.Serial, _dateTimeProvider.Now, _gameplayOptions.CurrentValue.BanType);
 
         var ban = bans.FirstOrDefault(x => x.IsActive(now));
         if (ban != null)

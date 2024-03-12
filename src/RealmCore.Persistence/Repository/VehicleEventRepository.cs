@@ -18,6 +18,8 @@ internal sealed class VehicleEventRepository : IVehicleEventRepository
 
     public async Task AddEvent(int vehicleId, int eventType, DateTime dateTime, string? metadata = null, CancellationToken cancellationToken = default)
     {
+        using var activity = Activity.StartActivity(nameof(AddEvent));
+
         _db.VehicleEvents.Add(new VehicleEventData
         {
             VehicleId = vehicleId,
@@ -30,6 +32,8 @@ internal sealed class VehicleEventRepository : IVehicleEventRepository
 
     public async Task<List<VehicleEventData>> GetAllEventsByVehicleId(int vehicleId, IEnumerable<int>? events = null, CancellationToken cancellationToken = default)
     {
+        using var activity = Activity.StartActivity(nameof(GetAllEventsByVehicleId));
+
         var query = _db.VehicleEvents
             .AsNoTracking()
             .TagWithSource(nameof(VehicleEventRepository))
@@ -41,6 +45,8 @@ internal sealed class VehicleEventRepository : IVehicleEventRepository
 
     public async Task<List<VehicleEventData>> GetLastEventsByVehicleId(int vehicleId, int limit = 10, IEnumerable<int>? events = null, CancellationToken cancellationToken = default)
     {
+        using var activity = Activity.StartActivity(nameof(GetLastEventsByVehicleId));
+
         var query = _db.VehicleEvents
             .AsNoTracking()
             .TagWithSource(nameof(VehicleEventRepository))
@@ -51,4 +57,6 @@ internal sealed class VehicleEventRepository : IVehicleEventRepository
             query = query.Where(x => events.Contains(x.EventType));
         return await query.ToListAsync(cancellationToken);
     }
+
+    public static readonly ActivitySource Activity = new("RealmCore.VehicleEventRepository", "1.0.0");
 }

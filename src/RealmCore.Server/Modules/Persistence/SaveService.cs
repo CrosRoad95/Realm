@@ -135,6 +135,8 @@ internal sealed class SaveService : ISaveService
 
     public async Task<bool> Save(Element element, CancellationToken cancellationToken = default)
     {
+        using var activity = Activity.StartActivity(nameof(Save));
+
         bool saved = element switch
         {
             RealmPlayer player => await SavePlayer(player, cancellationToken),
@@ -149,6 +151,8 @@ internal sealed class SaveService : ISaveService
 
     public async Task<int> SaveNewPlayerInventory(Inventory inventory, int userId, CancellationToken cancellationToken = default)
     {
+        using var activity = Activity.StartActivity(nameof(SaveNewPlayerInventory));
+
         var inventoryData = Inventory.CreateData(inventory);
         _dbContext.UserInventories.Add(new UserInventoryData
         {
@@ -161,6 +165,8 @@ internal sealed class SaveService : ISaveService
 
     public async Task<int> SaveNewVehicleInventory(Inventory inventory, int vehicleId, CancellationToken cancellationToken = default)
     {
+        using var activity = Activity.StartActivity(nameof(SaveNewVehicleInventory));
+
         var inventoryData = Inventory.CreateData(inventory);
         _dbContext.VehicleInventories.Add(new VehicleInventoryData
         {
@@ -171,4 +177,5 @@ internal sealed class SaveService : ISaveService
         return inventory.Id;
     }
 
+    public static readonly ActivitySource Activity = new("RealmCore.SaveService", "1.0.0");
 }

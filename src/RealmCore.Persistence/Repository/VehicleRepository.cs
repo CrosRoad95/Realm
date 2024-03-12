@@ -2,6 +2,7 @@
 
 public interface IVehicleRepository
 {
+    Task<int> CountVehiclesByUserId(int userId, IEnumerable<int>? accessTypes = null, CancellationToken cancellationToken = default);
     Task<VehicleData> CreateVehicle(ushort model, DateTime now, CancellationToken cancellationToken = default);
     Task<List<VehicleData>> GetAllSpawnedVehicles(CancellationToken cancellationToken = default);
     Task<List<VehicleUserAccessData>> GetAllVehicleAccesses(int vehicleId, CancellationToken cancellationToken = default);
@@ -29,6 +30,8 @@ internal sealed class VehicleRepository : IVehicleRepository
 
     public async Task<VehicleData> CreateVehicle(ushort model, DateTime now, CancellationToken cancellationToken = default)
     {
+        using var activity = Activity.StartActivity(nameof(CreateVehicle));
+
         var vehicle = new VehicleData
         {
             Model = model,
@@ -49,6 +52,8 @@ internal sealed class VehicleRepository : IVehicleRepository
 
     public async Task<List<LightInfoVehicleDto>> GetLightVehiclesByUserId(int userId, CancellationToken cancellationToken = default)
     {
+        using var activity = Activity.StartActivity(nameof(GetLightVehiclesByUserId));
+
         var query = _db.Vehicles
             .AsNoTracking()
             .TagWithSource(nameof(VehicleRepository))
@@ -66,6 +71,8 @@ internal sealed class VehicleRepository : IVehicleRepository
 
     public async Task<LightInfoVehicleDto?> GetLightVehicleById(int vehicleId, CancellationToken cancellationToken = default)
     {
+        using var activity = Activity.StartActivity(nameof(GetLightVehicleById));
+
         var query = _db.Vehicles
             .AsNoTracking()
             .TagWithSource(nameof(VehicleRepository))
@@ -82,6 +89,8 @@ internal sealed class VehicleRepository : IVehicleRepository
     }
     public async Task<List<VehicleData>> GetVehiclesByUserId(int userId, IEnumerable<int>? accessTypes = null, CancellationToken cancellationToken = default)
     {
+        using var activity = Activity.StartActivity(nameof(GetVehiclesByUserId));
+
         var query = BuildGetVehiclesByUserIdQuery(userId, accessTypes);
 
         return await query.ToListAsync(cancellationToken);
@@ -89,6 +98,8 @@ internal sealed class VehicleRepository : IVehicleRepository
 
     public async Task<int> CountVehiclesByUserId(int userId, IEnumerable<int>? accessTypes = null, CancellationToken cancellationToken = default)
     {
+        using var activity = Activity.StartActivity(nameof(CountVehiclesByUserId));
+
         var query = BuildGetVehiclesByUserIdQuery(userId, accessTypes);
 
         return await query.CountAsync(cancellationToken);
@@ -96,6 +107,8 @@ internal sealed class VehicleRepository : IVehicleRepository
 
     public async Task<VehicleData?> GetReadOnlyVehicleById(int id, CancellationToken cancellationToken = default)
     {
+        using var activity = Activity.StartActivity(nameof(GetReadOnlyVehicleById));
+
         var query = _db.Vehicles
             .AsNoTracking()
             .TagWithSource(nameof(VehicleRepository))
@@ -107,6 +120,8 @@ internal sealed class VehicleRepository : IVehicleRepository
 
     public async Task<List<VehicleData>> GetAllSpawnedVehicles(CancellationToken cancellationToken = default)
     {
+        using var activity = Activity.StartActivity(nameof(GetAllSpawnedVehicles));
+
         var query = _db.Vehicles
             .AsNoTracking()
             .TagWithSource(nameof(VehicleRepository))
@@ -119,6 +134,8 @@ internal sealed class VehicleRepository : IVehicleRepository
 
     public async Task<VehicleData?> GetVehicleById(int id, CancellationToken cancellationToken = default)
     {
+        using var activity = Activity.StartActivity(nameof(GetVehicleById));
+
         var query = _db.Vehicles
             .AsNoTracking()
             .TagWithSource(nameof(VehicleRepository))
@@ -131,6 +148,8 @@ internal sealed class VehicleRepository : IVehicleRepository
 
     public async Task<bool> SetSpawned(int id, bool spawned, CancellationToken cancellationToken = default)
     {
+        using var activity = Activity.StartActivity(nameof(SetSpawned));
+
         var query = _db.Vehicles
             .TagWithSource(nameof(VehicleRepository))
             .Where(x => !x.IsRemoved)
@@ -147,6 +166,8 @@ internal sealed class VehicleRepository : IVehicleRepository
 
     public async Task<bool> SetKind(int id, byte kind, CancellationToken cancellationToken = default)
     {
+        using var activity = Activity.StartActivity(nameof(SetKind));
+
         var query = _db.Vehicles
             .AsNoTracking()
             .TagWithSource(nameof(VehicleRepository))
@@ -159,6 +180,8 @@ internal sealed class VehicleRepository : IVehicleRepository
 
     public async Task<bool> IsSpawned(int id, CancellationToken cancellationToken = default)
     {
+        using var activity = Activity.StartActivity(nameof(IsSpawned));
+
         var query = _db.Vehicles
             .AsNoTracking()
             .TagWithSource(nameof(VehicleRepository))
@@ -171,6 +194,8 @@ internal sealed class VehicleRepository : IVehicleRepository
 
     public async Task<bool> SoftRemove(int id, CancellationToken cancellationToken = default)
     {
+        using var activity = Activity.StartActivity(nameof(SoftRemove));
+
         var query = _db.Vehicles
             .AsNoTracking()
             .TagWithSource(nameof(VehicleRepository))
@@ -183,6 +208,8 @@ internal sealed class VehicleRepository : IVehicleRepository
 
     public async Task<List<VehicleUserAccessData>> GetAllVehicleAccesses(int vehicleId, CancellationToken cancellationToken = default)
     {
+        using var activity = Activity.StartActivity(nameof(GetAllVehicleAccesses));
+
         var query = _db.VehicleUserAccess
             .AsNoTracking()
             .TagWithSource(nameof(VehicleRepository))
@@ -194,6 +221,8 @@ internal sealed class VehicleRepository : IVehicleRepository
 
     public async Task<bool> HasUserAccessTo(int userId, int vehicleId, byte[]? accessType = null, CancellationToken cancellationToken = default)
     {
+        using var activity = Activity.StartActivity(nameof(HasUserAccessTo));
+
         var query = _db.VehicleUserAccess
             .AsNoTracking()
             .TagWithSource(nameof(VehicleRepository))
@@ -205,6 +234,8 @@ internal sealed class VehicleRepository : IVehicleRepository
 
     public async Task<List<int>> GetOwner(int vehicleId, CancellationToken cancellationToken = default)
     {
+        using var activity = Activity.StartActivity(nameof(GetOwner));
+
         var query = _db.VehicleUserAccess
             .AsNoTracking()
             .TagWithSource(nameof(VehicleRepository))
@@ -216,6 +247,8 @@ internal sealed class VehicleRepository : IVehicleRepository
 
     private IQueryable<VehicleData> BuildGetVehiclesByUserIdQuery(int userId, IEnumerable<int>? accessTypes)
     {
+        using var activity = Activity.StartActivity(nameof(BuildGetVehiclesByUserIdQuery));
+
         if (accessTypes != null && !accessTypes.Any())
         {
             throw new InvalidOperationException("Sequence contains no elements");
@@ -236,4 +269,5 @@ internal sealed class VehicleRepository : IVehicleRepository
         }
     }
 
+    public static readonly ActivitySource Activity = new("RealmCore.VehicleRepository", "1.0.0");
 }

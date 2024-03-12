@@ -2,7 +2,7 @@
 
 public interface IOpinionRepository
 {
-    Task<bool> AddOpinion(int userId, int opinionId, string opinion, DateTime dateTime, CancellationToken cancellationToken = default);
+    Task<bool> Add(int userId, int opinionId, string opinion, DateTime dateTime, CancellationToken cancellationToken = default);
     Task<DateTime?> GetLastOpinionDateTime(int userId, int opinionId, CancellationToken cancellationToken = default);
 }
 
@@ -15,8 +15,10 @@ internal sealed class OpinionRepository : IOpinionRepository
         _db = db;
     }
 
-    public async Task<bool> AddOpinion(int userId, int opinionId, string opinion, DateTime dateTime, CancellationToken cancellationToken = default)
+    public async Task<bool> Add(int userId, int opinionId, string opinion, DateTime dateTime, CancellationToken cancellationToken = default)
     {
+        using var activity = Activity.StartActivity(nameof(Add));
+
         _db.Opinions.Add(new OpinionData
         {
             UserId = userId,
@@ -30,6 +32,8 @@ internal sealed class OpinionRepository : IOpinionRepository
 
     public async Task<DateTime?> GetLastOpinionDateTime(int userId, int opinionId, CancellationToken cancellationToken = default)
     {
+        using var activity = Activity.StartActivity(nameof(GetLastOpinionDateTime));
+
         var query = _db.Opinions
             .Where(x => x.UserId == userId && x.OpinionId == opinionId)
             .OrderByDescending(x => x.DateTime);
@@ -38,4 +42,6 @@ internal sealed class OpinionRepository : IOpinionRepository
 
         return opinionData?.DateTime;
     }
+
+    public static readonly ActivitySource Activity = new("RealmCore.OpinionRepository", "1.0.0");
 }

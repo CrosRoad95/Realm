@@ -21,6 +21,8 @@ internal sealed class NewsRepository : INewsRepository
 
     public async Task Add(string title, string excerpt, string content, DateTime publishTime, string[] tags, int? createdByUserId = null, CancellationToken cancellationToken = default)
     {
+        using var activity = Activity.StartActivity(nameof(Add));
+
         await _transactionContext.ExecuteAsync(async db =>
         {
             var newsTags = new List<NewsTagData>();
@@ -53,6 +55,8 @@ internal sealed class NewsRepository : INewsRepository
 
     public async Task<List<NewsData>> Get(DateTime now, int limit = 10, CancellationToken cancellationToken = default)
     {
+        using var activity = Activity.StartActivity(nameof(Get));
+
         var query = _db.News
             .TagWithSource(nameof(UserNotificationRepository))
             .AsNoTracking()
@@ -64,4 +68,6 @@ internal sealed class NewsRepository : INewsRepository
 
         return await query.ToListAsync(cancellationToken);
     }
+
+    public static readonly ActivitySource Activity = new("RealmCore.NewsRepository", "1.0.0");
 }
