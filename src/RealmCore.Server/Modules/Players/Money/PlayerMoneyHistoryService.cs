@@ -19,8 +19,13 @@ internal sealed class PlayerMoneyHistoryService : IPlayerMoneyHistoryService
 
     public async Task Add(RealmPlayer player, decimal change, int? category = null, string? description = null, CancellationToken cancellationToken = default)
     {
-        var money = player.Money.Amount;
-        await _userMoneyHistoryRepository.Add(player.PersistentId, _dateTimeProvider.Now, money + change, change, category, description, cancellationToken);
+        var amount = player.Money.Amount;
+        await _userMoneyHistoryRepository.Add(player.PersistentId, _dateTimeProvider.Now, amount + change, change, category, description, cancellationToken);
+    }
+    
+    public async Task Add(RealmPlayer player, decimal amount, decimal change, int? category = null, string? description = null, CancellationToken cancellationToken = default)
+    {
+        await _userMoneyHistoryRepository.Add(player.PersistentId, _dateTimeProvider.Now, amount + change, change, category, description, cancellationToken);
     }
 
     public async Task<List<UserMoneyHistoryDto>> Get(RealmPlayer player, int limit = 10, CancellationToken cancellationToken = default)
