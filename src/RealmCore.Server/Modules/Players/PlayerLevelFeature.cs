@@ -25,6 +25,7 @@ internal sealed class PlayerLevelFeature : IPlayerLevelFeature, IUsesUserPersist
     private readonly LevelsCollection _levelsCollection;
     private uint _level;
     private uint _experience;
+    private UserData? _userData;
 
     public event Action<IPlayerLevelFeature, uint, LevelChange>? LevelChanged;
     public event Action<IPlayerLevelFeature, uint>? ExperienceChanged;
@@ -41,6 +42,7 @@ internal sealed class PlayerLevelFeature : IPlayerLevelFeature, IUsesUserPersist
     {
         _level = userData.Level;
         _experience = userData.Experience;
+        _userData = userData;
         LevelChanged?.Invoke(this, _level, LevelChange.Set);
         ExperienceChanged?.Invoke(this, _experience);
     }
@@ -49,6 +51,7 @@ internal sealed class PlayerLevelFeature : IPlayerLevelFeature, IUsesUserPersist
     {
         _level = 0;
         _experience = 0;
+        _userData = null;
         LevelChanged?.Invoke(this, _level, LevelChange.Set);
         ExperienceChanged?.Invoke(this, _experience);
     }
@@ -84,6 +87,10 @@ internal sealed class PlayerLevelFeature : IPlayerLevelFeature, IUsesUserPersist
                     }
                 }
                 _level = value;
+                if(_userData != null)
+                {
+                    _userData.Level = _level;
+                }
             }
         }
     }
@@ -99,6 +106,10 @@ internal sealed class PlayerLevelFeature : IPlayerLevelFeature, IUsesUserPersist
                     _experience = value;
                     CheckForNextLevel();
                     ExperienceChanged?.Invoke(this, value);
+                    if (_userData != null)
+                    {
+                        _userData.Experience = _experience;
+                    }
                 }
             }
         }
@@ -109,6 +120,10 @@ internal sealed class PlayerLevelFeature : IPlayerLevelFeature, IUsesUserPersist
         lock (_lock)
         {
             _experience += amount;
+            if (_userData != null)
+            {
+                _userData.Experience = _experience;
+            }
             CheckForNextLevel();
             ExperienceChanged?.Invoke(this, Experience);
         }
