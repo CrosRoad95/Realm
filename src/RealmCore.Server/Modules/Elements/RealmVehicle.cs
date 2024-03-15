@@ -1,4 +1,6 @@
-﻿namespace RealmCore.Server.Modules.Elements;
+﻿using RealmCore.Server.Modules.Vehicles.Persistence;
+
+namespace RealmCore.Server.Modules.Elements;
 
 public class RealmVehicle : Vehicle, IPersistentElement
 {
@@ -42,11 +44,10 @@ public class RealmVehicle : Vehicle, IPersistentElement
     {
         _serviceScope = serviceProvider.CreateScope();
         _serviceProvider = _serviceScope.ServiceProvider;
-
-        _serviceProvider.GetRequiredService<VehicleContext>().Set(this);
+        GetRequiredService<VehicleContext>().Vehicle = this;
+        GetRequiredService<ElementContext>().Element = this;
 
         #region Initialize scope services
-        GetRequiredService<VehicleContext>().Vehicle = this;
         Access = GetRequiredService<IVehicleAccessFeature>();
         Persistence = GetRequiredService<IVehiclePersistenceFeature>();
         MileageCounter = GetRequiredService<IVehicleMileageCounterFeature>();

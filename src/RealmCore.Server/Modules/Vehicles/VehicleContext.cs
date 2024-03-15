@@ -2,13 +2,15 @@
 
 public sealed class VehicleContext
 {
-    public RealmVehicle Vehicle { get; internal set; }
+    private RealmVehicle? _vehicle;
 
-    public void Set(RealmVehicle realmVehicle)
+    public RealmVehicle Vehicle { get => _vehicle ?? throw new InvalidVehicleContextException(); internal set => _vehicle = value; }
+
+    public void Set(RealmVehicle element)
     {
         if (Vehicle != null)
-            throw new InvalidOperationException();
+            throw new InvalidOperationException("Vehicle already set");
 
-        Vehicle = realmVehicle;
+        Vehicle = element;
     }
 }

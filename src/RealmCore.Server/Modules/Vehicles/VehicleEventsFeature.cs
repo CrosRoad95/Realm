@@ -1,28 +1,26 @@
-﻿namespace RealmCore.Server.Modules.Vehicles;
+﻿using RealmCore.Server.Modules.Vehicles.Persistence;
+
+namespace RealmCore.Server.Modules.Vehicles;
 
 public interface IVehicleEventsFeature : IVehicleFeature, IEnumerable<VehicleEventDto>
 {
     void AddEvent(int eventType, string? metadata = null);
 }
 
-internal sealed class VehicleEventsFeature : IVehicleEventsFeature
+internal sealed class VehicleEventsFeature : IVehicleEventsFeature, IUsesVehiclePersistentData
 {
     private readonly object _lock = new();
     private ICollection<VehicleEventData> _vehicleEvents = [];
     private readonly IDateTimeProvider _dateTimeProvider;
 
+    public event Action? VersionIncreased;
+
     public RealmVehicle Vehicle { get; init; }
 
-    public VehicleEventsFeature(VehicleContext vehicleContext, IVehiclePersistenceFeature vehiclePersistanceService, IDateTimeProvider dateTimeProvider)
+    public VehicleEventsFeature(VehicleContext vehicleContext, IDateTimeProvider dateTimeProvider)
     {
         Vehicle = vehicleContext.Vehicle;
-        vehiclePersistanceService.Loaded += HandleLoaded;
         _dateTimeProvider = dateTimeProvider;
-    }
-
-    private void HandleLoaded(IVehiclePersistenceFeature persistanceService, RealmVehicle vehicle)
-    {
-        _vehicleEvents = persistanceService.VehicleData.VehicleEvents;
     }
 
     public void AddEvent(int eventType, string? metadata = null)
@@ -46,4 +44,14 @@ internal sealed class VehicleEventsFeature : IVehicleEventsFeature
     }
 
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+
+    public void Loaded(VehicleData vehicleData)
+    {
+        _vehicleEvents = vehicleData.VehicleEvents;
+    }
+
+    public void Unloaded()
+    {
+
+    }
 }

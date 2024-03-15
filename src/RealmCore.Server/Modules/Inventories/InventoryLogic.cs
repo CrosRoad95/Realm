@@ -19,8 +19,7 @@ internal sealed class InventoryLogic : PlayerLifecycle
             if (player.User.IsSignedIn)
             {
                 var saveService = player.GetRequiredService<ISaveService>();
-                var inventoryId = await saveService.SaveNewPlayerInventory(inventory, player.PersistentId);
-                inventory.Id = inventoryId;
+                await saveService.SaveNewInventory(inventory);
             }
         }
         else if (inventory.Owner is RealmVehicle vehicle)
@@ -28,8 +27,7 @@ internal sealed class InventoryLogic : PlayerLifecycle
             if (vehicle.Persistence.IsLoaded)
             {
                 var saveService = vehicle.GetRequiredService<ISaveService>();
-                var inventoryId = await saveService.SaveNewVehicleInventory(inventory, vehicle.Persistence.Id);
-                inventory.Id = inventoryId;
+                await saveService.SaveNewInventory(inventory);
             }
         }
     }

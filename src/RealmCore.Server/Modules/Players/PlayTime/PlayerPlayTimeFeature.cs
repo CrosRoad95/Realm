@@ -1,6 +1,4 @@
-﻿using RealmCore.Persistence.Data;
-
-namespace RealmCore.Server.Modules.Players.PlayTime;
+﻿namespace RealmCore.Server.Modules.Players.PlayTime;
 
 public interface IPlayerPlayTimeFeature : IPlayerFeature, IEnumerable<PlayerPlayTimeDto>
 {

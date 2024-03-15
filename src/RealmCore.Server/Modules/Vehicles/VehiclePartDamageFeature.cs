@@ -1,4 +1,6 @@
-﻿namespace RealmCore.Server.Modules.Vehicles;
+﻿using RealmCore.Server.Modules.Vehicles.Persistence;
+
+namespace RealmCore.Server.Modules.Vehicles;
 
 public interface IVehiclePartDamageFeature : IVehicleFeature
 {
@@ -17,11 +19,12 @@ public interface IVehiclePartDamageFeature : IVehicleFeature
     bool TryGetState(short partId, out float state);
 }
 
-internal sealed class VehiclePartDamageFeature : IVehiclePartDamageFeature
+internal sealed class VehiclePartDamageFeature : IVehiclePartDamageFeature, IUsesVehiclePersistentData
 {
     private readonly object _lock = new();
     private ICollection<VehiclePartDamageData> _vehiclePartDamages = [];
     public event Action<IVehiclePartDamageFeature, short>? PartDestroyed;
+    public event Action? VersionIncreased;
 
     public IReadOnlyList<short> Parts
     {
@@ -36,15 +39,9 @@ internal sealed class VehiclePartDamageFeature : IVehiclePartDamageFeature
 
     public RealmVehicle Vehicle { get; init; }
 
-    public VehiclePartDamageFeature(VehicleContext vehicleContext, IVehiclePersistenceFeature vehiclePersistanceService)
+    public VehiclePartDamageFeature(VehicleContext vehicleContext)
     {
         Vehicle = vehicleContext.Vehicle;
-        vehiclePersistanceService.Loaded += HandleLoaded;
-    }
-
-    private void HandleLoaded(IVehiclePersistenceFeature persistance, RealmVehicle vehicle)
-    {
-        _vehiclePartDamages = persistance.VehicleData.PartDamages;
     }
 
     public void AddPart(short partId, float state)
@@ -124,5 +121,15 @@ internal sealed class VehiclePartDamageFeature : IVehiclePartDamageFeature
             var vehiclePartDamage = _vehiclePartDamages.First(x => x.PartId == partId);
             return vehiclePartDamage.State;
         }
+    }
+
+    public void Loaded(VehicleData vehicleData)
+    {
+        _vehiclePartDamages = vehicleData.PartDamages;
+    }
+
+    public void Unloaded()
+    {
+
     }
 }

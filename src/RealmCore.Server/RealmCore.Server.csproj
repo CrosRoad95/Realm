@@ -177,7 +177,6 @@
 		<Using Include="RealmCore.Server.Modules.Seeder" />
 		<Using Include="RealmCore.Server.Modules.Users" />
 		<Using Include="RealmCore.Server.Modules.Vehicles.Access" />
-		<Using Include="RealmCore.Server.Modules.Vehicles.Vehicles" />
 		<Using Include="RealmCore.Server.Modules.World.IdGenerators" />
 		<Using Include="RealmCore.Server.Modules.World.Spawning" />
 		<Using Include="RealmCore.Server.Extensions" />
@@ -217,6 +216,7 @@
 		<Using Include="RealmCore.Server.Modules.Players.DailyVisits" />
 		<Using Include="RealmCore.Server.Modules.Players.AFK" />
 		<Using Include="RealmCore.Server.Modules.Players.PlayTime" />
+		<Using Include="RealmCore.Server.Modules.Pickups" />
 	</ItemGroup>
 
 </Project>

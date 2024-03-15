@@ -17,13 +17,12 @@ public class VehiclesPersistence : RealmIntegrationTestingBase
 
         var factory = server.GetRequiredService<IElementFactory>();
         var vehiclesService = server.GetRequiredService<IVehiclesService>();
-        var saveService = server.GetRequiredService<ISaveService>();
         var loadService = server.GetRequiredService<ILoadService>();
 
         var vehicle = await vehiclesService.CreatePersistantVehicle(Location.Zero, (VehicleModel)404);
         vehicle.Should().BeOfType<TestRealmVehicle>();
 
-        await saveService.Save(vehicle);
+        await vehicle.GetRequiredService<ISaveService>().Save();
         await vehiclesService.Destroy(vehicle);
 
         var loadedVehicle = await loadService.LoadVehicleById(vehicle.PersistentId);
@@ -200,5 +199,10 @@ internal class TestElementFactory : IElementFactory
     public void RelayCreated(Element element)
     {
 
+    }
+
+    public Task<RealmVehicle> CreateVehicle(Location location, VehicleModel model, Func<RealmVehicle, Task> elementBuilder)
+    {
+        throw new NotImplementedException();
     }
 }

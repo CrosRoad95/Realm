@@ -1,6 +1,4 @@
-﻿using RealmCore.Server.Modules.Pickups;
-
-namespace RealmCore.Server.Modules.World.Triggers.Pickups;
+﻿namespace RealmCore.Server.Modules.World.Triggers.Pickups;
 
 internal sealed class PickupLogic
 {

@@ -1,4 +1,6 @@
-﻿namespace RealmCore.Server.Extensions;
+﻿using static RealmCore.Server.Extensions.Vector3Extensions;
+
+namespace RealmCore.Server.Extensions;
 
 public static class ElementExtensions
 {
@@ -52,6 +54,14 @@ public static class ElementExtensions
     public static Vector3 GetPointFromDistanceRotation(this Element element, double distance, float? angle = null)
     {
         return element.Position.GetPointFromDistanceRotation(distance, angle ?? -element.Rotation.Z);
+    }
+    
+    public static Vector3 GetPointFromDistanceRotationOffset(this Element element, double distance, float? angle = null)
+    {
+        double a = Math.PI / 2 - MathUtils.ToRadians(angle ?? -element.Rotation.Z);
+        double dx = Math.Cos(a) * distance;
+        double dy = Math.Sin(a) * distance;
+        return new Vector3((float)dx, (float)dy, 0);
     }
 
     public static CancellationToken CreateCancellationToken(this Element? element)

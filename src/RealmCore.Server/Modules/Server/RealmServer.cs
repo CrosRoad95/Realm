@@ -93,15 +93,22 @@ public class RealmServer<TRealmPlayer> : MtaServer<TRealmPlayer> where TRealmPla
         var logger = GetRequiredService<ILogger<RealmServer>>();
         logger.LogInformation("Server stopping.");
         int i = 0;
-        var saveService = GetRequiredService<ISaveService>();
 
         var elementCollection = GetRequiredService<IElementCollection>();
         foreach (var element in elementCollection.GetAll())
         {
             try
             {
-                if (await saveService.Save(element))
+                if(element is RealmVehicle vehicle)
+                {
+                    await vehicle.GetRequiredService<ISaveService>().Save();
                     i++;
+                }
+                else if(element is RealmPlayer player)
+                {
+                    await player.GetRequiredService<ISaveService>().Save();
+                    i++;
+                }
             }
             catch (Exception ex)
             {

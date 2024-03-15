@@ -1,4 +1,6 @@
-﻿namespace RealmCore.Server.Modules.Vehicles.Tuning;
+﻿using RealmCore.Server.Modules.Vehicles.Persistence;
+
+namespace RealmCore.Server.Modules.Vehicles.Tuning;
 
 public interface IVehicleEnginesFeature : IVehicleFeature
 {
@@ -14,7 +16,7 @@ public interface IVehicleEnginesFeature : IVehicleFeature
     void Remove(short engineId);
 }
 
-internal sealed class VehicleEnginesFeature : IVehicleEnginesFeature
+internal sealed class VehicleEnginesFeature : IVehicleEnginesFeature, IUsesVehiclePersistentData
 {
     private readonly object _lock = new();
     private ICollection<VehicleEngineData> _vehicleEngine = [];
@@ -22,6 +24,7 @@ internal sealed class VehicleEnginesFeature : IVehicleEnginesFeature
     public event Action<IVehicleEnginesFeature, short>? ActiveEngineChanged;
     public event Action<IVehicleEnginesFeature, short>? EngineAdded;
     public event Action<IVehicleEnginesFeature, short>? EngineRemoved;
+    public event Action? VersionIncreased;
 
     public short ActiveEngineId
     {
@@ -56,15 +59,9 @@ internal sealed class VehicleEnginesFeature : IVehicleEnginesFeature
 
     public RealmVehicle Vehicle { get; }
 
-    public VehicleEnginesFeature(VehicleContext vehicleContext, IVehiclePersistenceFeature vehiclePersistanceService)
+    public VehicleEnginesFeature(VehicleContext vehicleContext)
     {
         Vehicle = vehicleContext.Vehicle;
-        vehiclePersistanceService.Loaded += HandleLoaded;
-    }
-
-    private void HandleLoaded(IVehiclePersistenceFeature persistance, RealmVehicle vehicle)
-    {
-        _vehicleEngine = persistance.VehicleData.VehicleEngines;
     }
 
     private bool InternalHasEngine(short engineId)
@@ -102,5 +99,14 @@ internal sealed class VehicleEnginesFeature : IVehicleEnginesFeature
             _vehicleEngine.Remove(engine);
         }
         EngineRemoved?.Invoke(this, engineId);
+    }
+
+    public void Loaded(VehicleData vehicleData)
+    {
+        _vehicleEngine = vehicleData.VehicleEngines;
+    }
+
+    public void Unloaded()
+    {
     }
 }

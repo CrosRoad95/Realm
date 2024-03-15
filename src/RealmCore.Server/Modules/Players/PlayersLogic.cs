@@ -200,7 +200,7 @@ internal sealed class PlayersLogic : PlayerLifecycle
                 if (_activeUsers.TrySetInactive(player.PersistentId))
                     _playerEventManager.RelayUnloading(player);
 
-                await player.GetRequiredService<ISaveService>().Save(player);
+                await player.GetRequiredService<ISaveService>().Save();
             }
         }
         catch (Exception ex)

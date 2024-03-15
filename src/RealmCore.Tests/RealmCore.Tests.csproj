@@ -104,7 +104,6 @@
 		<Using Include="RealmCore.Server.Modules.Seeder" />
 		<Using Include="RealmCore.Server.Modules.Users" />
 		<Using Include="RealmCore.Server.Modules.Vehicles.Access" />
-		<Using Include="RealmCore.Server.Modules.Vehicles.Vehicles" />
 		<Using Include="RealmCore.Server.Modules.World.IdGenerators" />
 		<Using Include="RealmCore.Server.Modules.World.Spawning" />
 		<Using Include="RealmCore.Server.Extensions" />

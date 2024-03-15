@@ -19,7 +19,6 @@ internal sealed class UsersService : IUsersService
     private readonly IDateTimeProvider _dateTimeProvider;
     private readonly IAuthorizationService? _authorizationService;
     private readonly IUsersInUse _activeUsers;
-    private readonly ISaveService _saveService;
     private readonly IServiceProvider _serviceProvider;
     private readonly AuthorizationPoliciesProvider _authorizationPoliciesProvider;
 
@@ -27,13 +26,12 @@ internal sealed class UsersService : IUsersService
     public event Action<RealmPlayer>? SignedOut;
 
     public UsersService(ILogger<UsersService> logger,
-        IDateTimeProvider dateTimeProvider, IUsersInUse activeUsers, ISaveService saveService, IServiceProvider serviceProvider, AuthorizationPoliciesProvider authorizationPoliciesProvider, IAuthorizationService? authorizationService = null)
+        IDateTimeProvider dateTimeProvider, IUsersInUse activeUsers, IServiceProvider serviceProvider, AuthorizationPoliciesProvider authorizationPoliciesProvider, IAuthorizationService? authorizationService = null)
     {
         _logger = logger;
         _dateTimeProvider = dateTimeProvider;
         _authorizationService = authorizationService;
         _activeUsers = activeUsers;
-        _saveService = saveService;
         _serviceProvider = serviceProvider;
         _authorizationPoliciesProvider = authorizationPoliciesProvider;
     }
@@ -168,7 +166,7 @@ internal sealed class UsersService : IUsersService
         if (!_activeUsers.TrySetInactive(player.PersistentId))
             throw new InvalidOperationException();
 
-        await _saveService.Save(player, cancellationToken);
+        await player.GetRequiredService<ISaveService>().Save(cancellationToken);
         player.User.SignOut();
         player.RemoveFromVehicle();
         player.Position = new Vector3(6000, 6000, 99999);

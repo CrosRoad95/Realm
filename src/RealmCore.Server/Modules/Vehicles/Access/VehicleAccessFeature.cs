@@ -1,4 +1,6 @@
-﻿namespace RealmCore.Server.Modules.Vehicles.Access;
+﻿using RealmCore.Server.Modules.Vehicles.Persistence;
+
+namespace RealmCore.Server.Modules.Vehicles.Access;
 
 public interface IVehicleAccessFeature : IVehicleFeature, IEnumerable<VehicleUserAccessDto>
 {
@@ -15,24 +17,20 @@ public interface IVehicleAccessFeature : IVehicleFeature, IEnumerable<VehicleUse
     bool TryGetAccess(RealmPlayer player, out VehicleUserAccessDto vehicleAccess);
 }
 
-internal sealed class VehicleAccessFeature : IVehicleAccessFeature
+internal sealed class VehicleAccessFeature : IVehicleAccessFeature, IUsesVehiclePersistentData
 {
     private readonly object _lock = new();
     private ICollection<VehicleUserAccessData> _userAccesses = [];
-    private int VehicleId { get; set; }
+
+    public event Action? VersionIncreased;
+
+    private int? VehicleId { get; set; }
 
     public RealmVehicle Vehicle { get; init; }
 
-    public VehicleAccessFeature(VehicleContext vehicleContext, IVehiclePersistenceFeature vehiclePersistanceService)
+    public VehicleAccessFeature(VehicleContext vehicleContext)
     {
         Vehicle = vehicleContext.Vehicle;
-        vehiclePersistanceService.Loaded += HandleLoaded;
-    }
-
-    private void HandleLoaded(IVehiclePersistenceFeature persistance, RealmVehicle vehicle)
-    {
-        _userAccesses = persistance.VehicleData.UserAccesses;
-        VehicleId = persistance.Id;
     }
 
     public IReadOnlyList<VehicleUserAccessDto> Owners
@@ -99,7 +97,7 @@ internal sealed class VehicleAccessFeature : IVehicleAccessFeature
                 UserId = userId,
                 AccessType = accessType,
                 CustomValue = customValue,
-                VehicleId = VehicleId
+                VehicleId = VehicleId ?? 0
             };
 
             _userAccesses.Add(vehicleUserAccessData);
@@ -138,4 +136,16 @@ internal sealed class VehicleAccessFeature : IVehicleAccessFeature
     }
 
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+
+    public void Loaded(VehicleData vehicleData)
+    {
+        _userAccesses = vehicleData.UserAccesses;
+        VehicleId = vehicleData.Id;
+    }
+
+    public void Unloaded()
+    {
+        _userAccesses = [];
+        VehicleId = null;
+    }
 }

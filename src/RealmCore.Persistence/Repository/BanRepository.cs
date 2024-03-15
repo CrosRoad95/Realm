@@ -1,6 +1,4 @@
-﻿using System.Diagnostics;
-
-namespace RealmCore.Persistence.Repository;
+﻿namespace RealmCore.Persistence.Repository;
 
 public interface IBanRepository
 {

@@ -1,4 +1,6 @@
-﻿namespace RealmCore.Server.Modules.Vehicles;
+﻿using RealmCore.Server.Modules.Vehicles.Persistence;
+
+namespace RealmCore.Server.Modules.Vehicles;
 
 public interface IVehicleMileageCounterFeature : IVehicleFeature
 {
@@ -8,13 +10,14 @@ public interface IVehicleMileageCounterFeature : IVehicleFeature
     event Action<IVehicleMileageCounterFeature, float, float>? Traveled;
 }
 
-internal sealed class VehicleMileageCounterFeature : IVehicleMileageCounterFeature, IDisposable
+internal sealed class VehicleMileageCounterFeature : IVehicleMileageCounterFeature, IUsesVehiclePersistentData, IDisposable
 {
     private Vector3 _lastPosition;
     private float _mileage;
     private float _minimumDistanceThreshold = 2.0f;
 
     public event Action<IVehicleMileageCounterFeature, float, float>? Traveled;
+    public event Action? VersionIncreased;
 
     public float Mileage
     {
@@ -44,16 +47,10 @@ internal sealed class VehicleMileageCounterFeature : IVehicleMileageCounterFeatu
 
     public RealmVehicle Vehicle { get; init; }
 
-    public VehicleMileageCounterFeature(VehicleContext vehicleContext, IVehiclePersistenceFeature persistance)
+    public VehicleMileageCounterFeature(VehicleContext vehicleContext)
     {
         Vehicle = vehicleContext.Vehicle;
-        persistance.Loaded += HandleLoaded;
-    }
-
-    private void HandleLoaded(IVehiclePersistenceFeature persistance, RealmVehicle vehicle)
-    {
-        _mileage = persistance.VehicleData.Mileage;
-        vehicle.PositionChanged += HandlePositionChanged;
+        Vehicle.PositionChanged += HandlePositionChanged;
     }
 
     private void HandlePositionChanged(Element sender, ElementChangedEventArgs<Vector3> args)
@@ -86,5 +83,14 @@ internal sealed class VehicleMileageCounterFeature : IVehicleMileageCounterFeatu
     public void Dispose()
     {
         Vehicle.PositionChanged -= HandlePositionChanged;
+    }
+
+    public void Loaded(VehicleData vehicleData)
+    {
+        _mileage = vehicleData.Mileage;
+    }
+
+    public void Unloaded()
+    {
     }
 }

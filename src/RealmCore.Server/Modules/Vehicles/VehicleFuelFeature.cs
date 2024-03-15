@@ -1,4 +1,6 @@
-﻿namespace RealmCore.Server.Modules.Vehicles;
+﻿using RealmCore.Server.Modules.Vehicles.Persistence;
+
+namespace RealmCore.Server.Modules.Vehicles;
 
 public interface IVehicleFuelFeature : IVehicleFeature, IEnumerable<FuelContainer>
 {
@@ -10,7 +12,7 @@ public interface IVehicleFuelFeature : IVehicleFeature, IEnumerable<FuelContaine
     void Update(bool forceUpdate = false);
 }
 
-internal sealed class VehicleFuelFeature : IVehicleFuelFeature
+internal sealed class VehicleFuelFeature : IVehicleFuelFeature, IUsesVehiclePersistentData
 {
     private readonly object _lock = new();
     private ICollection<VehicleFuelData> _vehicleFuelData = [];
@@ -19,6 +21,8 @@ internal sealed class VehicleFuelFeature : IVehicleFuelFeature
 
     public RealmVehicle Vehicle { get; init; }
     public event Action<IVehicleFuelFeature, FuelContainer?>? ActiveChanged;
+    public event Action? VersionIncreased;
+
     public FuelContainer? Active
     {
         get => _active; private set
@@ -39,10 +43,9 @@ internal sealed class VehicleFuelFeature : IVehicleFuelFeature
         }
     }
 
-    public VehicleFuelFeature(VehicleContext vehicleContext, IVehiclePersistenceFeature persistenceFeature)
+    public VehicleFuelFeature(VehicleContext vehicleContext)
     {
         Vehicle = vehicleContext.Vehicle;
-        persistenceFeature.Loaded += HandleLoaded;
         Vehicle.PositionChanged += HandlePositionChanged;
     }
 
@@ -92,19 +95,6 @@ internal sealed class VehicleFuelFeature : IVehicleFuelFeature
         }
     }
 
-    private void HandleLoaded(IVehiclePersistenceFeature persistance, RealmVehicle vehicle)
-    {
-        _vehicleFuelData = persistance.VehicleData.Fuels;
-        lock (_lock)
-        {
-            foreach (var fuelData in persistance.VehicleData.Fuels)
-            {
-                _fuelContainers.Add(new FuelContainer(Vehicle, fuelData));
-            }
-            InternalUpdate(true);
-        }
-    }
-
     public IEnumerator<FuelContainer> GetEnumerator()
     {
         lock (_lock)
@@ -112,4 +102,22 @@ internal sealed class VehicleFuelFeature : IVehicleFuelFeature
     }
 
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+
+    public void Loaded(VehicleData vehicleData)
+    {
+        _vehicleFuelData = vehicleData.Fuels;
+        lock (_lock)
+        {
+            foreach (var fuelData in vehicleData.Fuels)
+            {
+                _fuelContainers.Add(new FuelContainer(Vehicle, fuelData));
+            }
+            InternalUpdate(true);
+        }
+    }
+
+    public void Unloaded()
+    {
+
+    }
 }

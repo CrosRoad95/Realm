@@ -1,4 +1,6 @@
-﻿namespace RealmCore.Server.Modules.Vehicles.Vehicles;
+﻿using RealmCore.Server.Modules.Vehicles.Persistence;
+
+namespace RealmCore.Server.Modules.Vehicles.Tuning;
 
 public interface IVehicleUpgradesFeature : IVehicleFeature, IEnumerable<int>
 {
@@ -17,7 +19,7 @@ public interface IVehicleUpgradesFeature : IVehicleFeature, IEnumerable<int>
     bool RemoveUpgrade(int upgradeId, bool rebuild = true);
 }
 
-internal sealed class VehicleUpgradesFeature : IVehicleUpgradesFeature
+internal sealed class VehicleUpgradesFeature : IVehicleUpgradesFeature, IUsesVehiclePersistentData
 {
     private readonly object _lock = new();
     private ICollection<VehicleUpgradeData> _upgrades = [];
@@ -34,18 +36,13 @@ internal sealed class VehicleUpgradesFeature : IVehicleUpgradesFeature
     public event Action<IVehicleUpgradesFeature, int>? UpgradeAdded;
     public event Action<IVehicleUpgradesFeature, int>? UpgradeRemoved;
     public event Action<IVehicleUpgradesFeature>? Rebuild;
+    public event Action? VersionIncreased;
 
     public RealmVehicle Vehicle { get; init; }
 
-    public VehicleUpgradesFeature(VehicleContext vehicleContext, IVehiclePersistenceFeature persistance)
+    public VehicleUpgradesFeature(VehicleContext vehicleContext)
     {
         Vehicle = vehicleContext.Vehicle;
-        persistance.Loaded += HandleLoaded;
-    }
-
-    private void HandleLoaded(IVehiclePersistenceFeature persistance, RealmVehicle vehicle)
-    {
-        _upgrades = persistance.VehicleData.Upgrades;
     }
 
     public void ForceRebuild() => Rebuild?.Invoke(this);
@@ -146,4 +143,13 @@ internal sealed class VehicleUpgradesFeature : IVehicleUpgradesFeature
 
     public IEnumerator<int> GetEnumerator() => Upgrades.GetEnumerator();
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+
+    public void Loaded(VehicleData vehicleData)
+    {
+        _upgrades = vehicleData.Upgrades;
+    }
+
+    public void Unloaded()
+    {
+    }
 }

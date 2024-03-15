@@ -1,6 +1,4 @@
-﻿using RealmCore.Server.Modules.Pickups;
-
-namespace RealmCore.Server.Modules.Elements;
+﻿namespace RealmCore.Server.Modules.Elements;
 
 public interface IElementFactory
 {
@@ -21,5 +19,6 @@ public interface IElementFactory
     RealmPickup CreatePickup(Location location, ushort model, Action<RealmPickup>? elementBuilder = null);
     RealmRadarArea CreateRadarArea(Vector2 position, Vector2 size, Color color, byte? interior = null, ushort? dimension = null, Action<RealmRadarArea>? elementBuilder = null);
     RealmVehicle CreateVehicle(Location location, VehicleModel model, Action<RealmVehicle>? elementBuilder = null);
+    Task<RealmVehicle> CreateVehicle(Location location, VehicleModel model, Func<RealmVehicle, Task> elementBuilder);
     void RelayCreated(Element element);
 }

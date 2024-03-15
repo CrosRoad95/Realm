@@ -24,6 +24,7 @@ internal sealed class CommandsLogic
     private readonly IVehicleRepository _vehicleRepository;
     private readonly IPlayerMoneyHistoryService _userMoneyHistoryService;
     private readonly IMapNamesService _mapNamesService;
+    private readonly IVehiclesInUse _vehiclesInUse;
 
     private class TestState
     {
@@ -39,7 +40,7 @@ internal sealed class CommandsLogic
     public CommandsLogic(RealmCommandService commandService, IElementFactory elementFactory,
         ItemsCollection itemsCollection, ChatBox chatBox, ILogger<CommandsLogic> logger,
         IDateTimeProvider dateTimeProvider, INametagsService nametagsService, IUsersService usersService, IVehiclesService vehiclesService,
-        GameWorld gameWorld, IElementOutlineService elementOutlineService, IAssetsService assetsService, ISpawnMarkersService spawnMarkersService, ILoadService loadService, IFeedbackService feedbackService, IOverlayService overlayService, AssetsCollection assetsCollection, VehicleUpgradesCollection vehicleUpgradeCollection, VehicleEnginesCollection vehicleEnginesCollection, IUserWhitelistedSerialsRepository userWhitelistedSerialsRepository, IVehicleRepository vehicleRepository, IPlayerMoneyHistoryService userMoneyHistoryService, IMapNamesService mapNamesService)
+        GameWorld gameWorld, IElementOutlineService elementOutlineService, IAssetsService assetsService, ISpawnMarkersService spawnMarkersService, ILoadService loadService, IFeedbackService feedbackService, IOverlayService overlayService, AssetsCollection assetsCollection, VehicleUpgradesCollection vehicleUpgradeCollection, VehicleEnginesCollection vehicleEnginesCollection, IUserWhitelistedSerialsRepository userWhitelistedSerialsRepository, IVehicleRepository vehicleRepository, IPlayerMoneyHistoryService userMoneyHistoryService, IMapNamesService mapNamesService, IVehiclesInUse vehiclesInUse)
     {
         _commandService = commandService;
         _elementFactory = elementFactory;
@@ -55,6 +56,7 @@ internal sealed class CommandsLogic
         _vehicleRepository = vehicleRepository;
         _userMoneyHistoryService = userMoneyHistoryService;
         _mapNamesService = mapNamesService;
+        _vehiclesInUse = vehiclesInUse;
         var debounce = new Debounce(500);
         var debounceCounter = 0;
         _commandService.AddAsyncCommandHandler("debounce", async (player, args, token) =>
@@ -181,6 +183,73 @@ internal sealed class CommandsLogic
             vehicle.Fuel.AddFuelContainer(1, 20, 20, 0.01f, 2, true);
             vehicle.PartDamage.AddPart(1, 1337);
             vehicle.Access.AddAsOwner(player);
+            _chatBox.OutputTo(player, $"Stworzono pojazd o id: {vehicle.PersistentId}");
+        });
+        
+        _commandService.AddCommandHandler("cvveh", (player, args) =>
+        {
+            var vehicle = _elementFactory.CreateVehicle(new Location(player.Position + new Vector3(4, 0, 0), player.Rotation), (VehicleModel)404);
+            vehicle.Upgrades.AddUpgrade(1);
+            vehicle.Fuel.AddFuelContainer(1, 20, 20, 0.01f, 2, true);
+            vehicle.PartDamage.AddPart(1, 1337);
+            vehicle.Access.AddAsOwner(player);
+            _chatBox.OutputTo(player, "Stworzono pojazd.");
+        });
+        
+        _commandService.AddAsyncCommandHandler("converttopersistent", async (player, args, token) =>
+        {
+            if(player.Vehicle == null)
+            {
+                _chatBox.OutputTo(player, "Wejdź do pojazdu.");
+                return;
+            }
+            var vehicle = await _vehiclesService.ConvertToPersistantVehicle(player.Vehicle, token);
+            vehicle.Access.AddAsOwner(player);
+            _chatBox.OutputTo(player, $"Skonwertowano pojazd, id: {vehicle.PersistentId}");
+        });
+
+        _commandService.AddAsyncCommandHandler("spawnveh", async (player, args, token) =>
+        {
+            var vehicle = await _loadService.LoadVehicleById(args.ReadInt(), token);
+            var location = player.GetLocation(player.GetPointFromDistanceRotationOffset(3));
+            vehicle.SetLocation(location);
+            _chatBox.OutputTo(player, $"Załadowano pojazd na pozycji: {location}");
+        });
+
+        _commandService.AddAsyncCommandHandler("despawn", async (player, args, token) =>
+        {
+            if(player.Vehicle == null)
+            {
+                _chatBox.OutputTo(player, "Wejdź do pojazdu.");
+                return;
+            }
+            await _vehiclesService.Destroy(player.Vehicle);
+        });
+        
+        _commandService.AddCommandHandler("vehiclesinuse", (player, args) =>
+        {
+            _chatBox.OutputTo(player, $"Pojazdy w użyciu: {string.Join(", ", _vehiclesInUse.ActiveVehiclesIds)}");
+        });
+        
+        _commandService.AddCommandHandler("gp", (player, args) =>
+        {
+            _chatBox.OutputTo(player, player.GetLocation().ToString());
+        });
+        
+        _commandService.AddCommandHandler("myveh", (player, args) =>
+        {
+            _chatBox.OutputTo(player, player.Vehicle?.ToString() ?? "brak");
+        });
+        
+        _commandService.AddCommandHandler("showaccess", (player, args) =>
+        {
+            _chatBox.OutputTo(player, player.Vehicle?.AccessController?.ToString() ?? "brak");
+        });
+        
+        _commandService.AddCommandHandler("savemyveh", (player, args) =>
+        {
+            var vehicle = player.Vehicle ?? throw new InvalidOperationException();
+            vehicle.GetRequiredService<ISaveService>().Save();
         });
 
         _commandService.AddCommandHandler("exclusivecv", (player, args) =>
@@ -208,7 +277,7 @@ internal sealed class CommandsLogic
 
         _commandService.AddCommandHandler("addmeasowner", (player, args) =>
         {
-            var vehicle = (RealmVehicle)player.Vehicle;
+            var vehicle = player.Vehicle;
             if(vehicle != null)
                 vehicle.Access.AddAsOwner(player);
         });
@@ -876,12 +945,6 @@ internal sealed class CommandsLogic
         //    markerEntity.AddComponent(new Text3dComponent("offset z+1", player.Position + new Vector3(0, 0, 1)));
         //});
 
-        //_commandService.AddAsyncCommandHandler("despawn", async (player, args) =>
-        //{
-        //    var playerElementComponent = player.GetRequiredComponent<PlayerElementComponent>();
-        //    await _vehiclesService.Destroy(playerElementComponent.Vehicle.UpCast());
-        //});
-
         //_commandService.AddCommandHandler("disposeveh", (player, args) =>
         //{
         //    var playerElementComponent = player.GetRequiredComponent<PlayerElementComponent>();
@@ -910,12 +973,6 @@ internal sealed class CommandsLogic
             };
         });
 
-        _commandService.AddAsyncCommandHandler("spawnveh", async (player, args, token) =>
-        {
-            var vehicle = await _loadService.LoadVehicleById(args.ReadInt(), token);
-            vehicle.SetLocation(player.GetLocation());
-        });
-        
         _commandService.AddCommandHandler("interior", (player, args) =>
         {
             player.Interior = args.ReadByte();

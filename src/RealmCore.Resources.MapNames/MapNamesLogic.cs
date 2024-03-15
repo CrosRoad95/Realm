@@ -1,6 +1,4 @@
-﻿using SlipeServer.Server.Elements;
-
-namespace RealmCore.Resources.MapNames;
+﻿namespace RealmCore.Resources.MapNames;
 
 internal sealed class MapNamesLogic
 {

@@ -1,4 +1,6 @@
-﻿namespace RealmCore.Server.Modules.Persistence;
+﻿using RealmCore.Server.Modules.Vehicles.Persistence;
+
+namespace RealmCore.Server.Modules.Persistence;
 
 internal sealed class PeristantVehicleLogic : VehicleLifecycle
 {

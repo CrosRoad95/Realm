@@ -171,6 +171,12 @@ public sealed class RealmCommandService
             return;
 
         using var activity = Activity.StartActivity("CommandHandler");
+        if(activity != null)
+        {
+            activity.SetTag("Command", command);
+            activity.SetTag("Arguments", arguments);
+        }
+
         var start = Stopwatch.GetTimestamp();
 
         using var _ = _logger.BeginElement(player);

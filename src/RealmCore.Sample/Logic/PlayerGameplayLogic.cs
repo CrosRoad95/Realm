@@ -10,14 +10,16 @@ internal sealed partial class PlayerGameplayLogic
     private readonly ChatBox _chatBox;
     private readonly VehicleUpgradesCollection _vehicleUpgradeCollection;
     private readonly VehicleEnginesCollection _vehicleEnginesCollection;
+    private readonly IVehiclesService _vehiclesService;
     private readonly ILogger<PlayerGameplayLogic> _logger;
 
-    public PlayerGameplayLogic(ILogger<PlayerGameplayLogic> logger, IServiceProvider serviceProvider, ChatBox chatBox, VehicleUpgradesCollection vehicleUpgradeCollection, VehicleEnginesCollection vehicleEnginesCollection, IUsersService usersService)
+    public PlayerGameplayLogic(ILogger<PlayerGameplayLogic> logger, IServiceProvider serviceProvider, ChatBox chatBox, VehicleUpgradesCollection vehicleUpgradeCollection, VehicleEnginesCollection vehicleEnginesCollection, IUsersService usersService, IVehiclesService vehiclesService)
     {
         _serviceProvider = serviceProvider;
         _chatBox = chatBox;
         _vehicleUpgradeCollection = vehicleUpgradeCollection;
         _vehicleEnginesCollection = vehicleEnginesCollection;
+        _vehiclesService = vehiclesService;
         _logger = logger;
         usersService.SignedIn += HandleSignedIn;
     }
@@ -127,7 +129,7 @@ internal sealed partial class PlayerGameplayLogic
                         player.Gui.Close<BuyVehicleGui>();
                         if (realmVehicleForSale.TrySell())
                         {
-                            await vehicle.GetRequiredService<IVehicleService>().ConvertToPersistantVehicle();
+                            vehicle = await _vehiclesService.ConvertToPersistantVehicle(vehicle);
                             vehicle.Access.AddAsOwner(player);
                             vehicle.Fuel.AddFuelContainer(1, 20, 20, 0.01f, 2, true);
                         }

@@ -184,9 +184,10 @@ public class RealmPlayer : Player, IDisposable, IPersistentElement
     {
         _serviceScope = serviceProvider.CreateScope();
         _serviceProvider = _serviceScope.ServiceProvider;
+        GetRequiredService<PlayerContext>().Player = this;
+        GetRequiredService<ElementContext>().Element = this;
 
         #region Initialize scope services
-        GetRequiredService<PlayerContext>().Player = this;
         Money = GetRequiredService<IPlayerMoneyFeature>();
         AFK = GetRequiredService<IPlayerAFKFeature>();
         Browser = GetRequiredService<IPlayerBrowserFeature>();

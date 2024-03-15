@@ -1,4 +1,11 @@
-﻿namespace RealmCore.Server.Modules.Vehicles.Vehicles;
+﻿namespace RealmCore.Server.Modules.Vehicles.Persistence;
+
+public interface IUsesVehiclePersistentData
+{
+    void Loaded(VehicleData vehicleData);
+    void Unloaded();
+    event Action? VersionIncreased;
+}
 
 public interface IVehiclePersistenceFeature : IVehicleFeature
 {
@@ -10,7 +17,7 @@ public interface IVehiclePersistenceFeature : IVehicleFeature
 
     event Action<IVehiclePersistenceFeature, RealmVehicle>? Loaded;
 
-    void Load(VehicleData vehicleData);
+    void Load(VehicleData vehicleData, bool preserveLocation = false);
 }
 
 internal sealed class VehiclePersistanceFeature : IVehiclePersistenceFeature
@@ -50,7 +57,7 @@ internal sealed class VehiclePersistanceFeature : IVehiclePersistenceFeature
         _dateTimeProvider = dateTimeProvider;
     }
 
-    public void Load(VehicleData vehicleData)
+    public void Load(VehicleData vehicleData, bool preserveLocation = false)
     {
         lock (_lock)
         {
@@ -58,6 +65,15 @@ internal sealed class VehiclePersistanceFeature : IVehiclePersistenceFeature
                 throw new InvalidOperationException();
 
             _vehicleData = vehicleData;
+            Vehicle.Model = vehicleData.Model;
+            if (!preserveLocation)
+            {
+                Vehicle.Position = vehicleData.TransformAndMotion.Position;
+                Vehicle.Rotation = vehicleData.TransformAndMotion.Rotation;
+                Vehicle.Interior = vehicleData.TransformAndMotion.Interior;
+                Vehicle.Dimension = vehicleData.TransformAndMotion.Dimension;
+            }
+
             Vehicle.Colors.Primary = vehicleData.Color.Color1;
             Vehicle.Colors.Secondary = vehicleData.Color.Color2;
             Vehicle.Colors.Color3 = vehicleData.Color.Color3;
@@ -100,6 +116,12 @@ internal sealed class VehiclePersistanceFeature : IVehiclePersistenceFeature
             Vehicle.IsTaxiLightOn = vehicleData.TaxiLightState;
             Vehicle.Health = vehicleData.Health;
             Vehicle.IsFrozen = vehicleData.IsFrozen;
+
+            foreach (var playerFeature in Vehicle.GetRequiredService<IEnumerable<IVehicleFeature>>())
+            {
+                if (playerFeature is IUsesVehiclePersistentData usesVehiclePersistentData)
+                    usesVehiclePersistentData.Loaded(vehicleData);
+            }
             Loaded?.Invoke(this, Vehicle);
         }
     }

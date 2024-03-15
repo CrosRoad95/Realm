@@ -1,6 +1,4 @@
-﻿using RealmCore.Server.Modules.Pickups;
-
-namespace RealmCore.Server.Modules.Elements;
+﻿namespace RealmCore.Server.Modules.Elements;
 
 internal sealed class InnerScopedElementFactory : ScopedElementFactory
 {
@@ -275,5 +273,10 @@ internal class ScopedElementFactory : IScopedElementFactory
         }
         Disposed?.Invoke(this);
         _disposed = true;
+    }
+
+    public Task<RealmVehicle> CreateVehicle(Location location, VehicleModel model, Func<RealmVehicle, Task> elementBuilder)
+    {
+        throw new NotImplementedException();
     }
 }

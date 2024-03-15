@@ -1,4 +1,5 @@
 ﻿using RealmCore.Server.Modules.Players.Settings;
+using RealmCore.Server.Modules.Vehicles.Persistence;
 
 namespace RealmCore.Server.Extensions;
 
@@ -70,6 +71,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<ScopedMapIdGenerator>();
         services.AddScoped<PlayerContext>();
         services.AddScoped<VehicleContext>();
+        services.AddScoped<ElementContext>();
         #endregion
 
         #region Registries

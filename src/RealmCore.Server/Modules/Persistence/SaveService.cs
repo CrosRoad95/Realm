@@ -7,24 +7,25 @@ public interface ISaveService
 {
     event Action<Element>? ElementSaved;
 
-    Task<bool> Save(Element element, CancellationToken cancellationToken = default);
-    internal Task<int> SaveNewPlayerInventory(Inventory inventory, int userId, CancellationToken cancellationToken = default);
-    internal Task<int> SaveNewVehicleInventory(Inventory inventory, int vehicleId, CancellationToken cancellationToken = default);
+    Task<bool> Save(CancellationToken cancellationToken = default);
+    Task SaveNewInventory(Inventory inventory, CancellationToken cancellationToken = default);
 }
 
-internal sealed class SaveService : ISaveService
+internal sealed partial class SaveService : ISaveService
 {
-    private readonly IDb _dbContext;
+    private readonly IDb _db;
     private readonly IEnumerable<IUserDataSaver> _userDataSavers;
     private readonly IDateTimeProvider _dateTimeProvider;
 
     public event Action<Element>? ElementSaved;
+    private readonly Element _element;
 
-    public SaveService(IDb dbContext, IEnumerable<IUserDataSaver> userDataSavers, IDateTimeProvider dateTimeProvider)
+    public SaveService(IDb db, IEnumerable<IUserDataSaver> userDataSavers, IDateTimeProvider dateTimeProvider, ElementContext elementContext)
     {
-        _dbContext = dbContext;
+        _db = db;
         _userDataSavers = userDataSavers;
         _dateTimeProvider = dateTimeProvider;
+        _element = elementContext.Element;
     }
 
     private async Task<bool> SaveVehicle(RealmVehicle vehicle, CancellationToken cancellationToken = default)
@@ -85,7 +86,6 @@ internal sealed class SaveService : ISaveService
         vehicleData.TaxiLightState = vehicle.IsTaxiLightOn;
         vehicleData.Health = vehicle.Health;
         vehicleData.IsFrozen = vehicle.IsFrozen;
-        vehicleData.TransformAndMotion = vehicle.GetTransformAndMotion();
         vehicleData.UserAccesses = vehicle.Access.Select(x => new VehicleUserAccessData
         {
             Id = x.Id,
@@ -101,11 +101,8 @@ internal sealed class SaveService : ISaveService
         if (vehicle.Inventory.TryGetPrimary(out var inventory))
             vehicleData.Inventories = [Inventory.CreateData(inventory)];
         vehicleData.LastUsed = vehicle.Persistence.LastUsed;
-        var db = vehicle.GetRequiredService<IDb>();
 
-        //db.Vehicles.Update(vehicleData);
-
-        await vehicle.GetRequiredService<IDb>().SaveChangesAsync(cancellationToken);
+        var savedEntities = await _db.SaveChangesAsync(cancellationToken);
         return true;
     }
 
@@ -115,7 +112,6 @@ internal sealed class SaveService : ISaveService
             return false;
 
         var userData = player.User.UserData;
-        var db = player.GetRequiredService<IDb>();
 
         if(player.IsSpawned)
             userData.LastTransformAndMotion = player.GetTransformAndMotion();
@@ -123,57 +119,86 @@ internal sealed class SaveService : ISaveService
         player.PlayTime.UpdateCategoryPlayTime(player.PlayTime.Category);
         userData.PlayTime = (ulong)player.PlayTime.TotalPlayTime.TotalSeconds;
 
-        //db.Users.Update(userData);
-
         foreach (var item in _userDataSavers)
             await item.SaveAsync(userData, player, cancellationToken);
 
-        var savedEntities = await db.SaveChangesAsync(cancellationToken);
+        var savedEntities = await _db.SaveChangesAsync(cancellationToken);
 
         return true;
     }
 
-    public async Task<bool> Save(Element element, CancellationToken cancellationToken = default)
+    public async Task<bool> Save(CancellationToken cancellationToken = default)
     {
         using var activity = Activity.StartActivity(nameof(Save));
-
-        bool saved = element switch
+        try
         {
-            RealmPlayer player => await SavePlayer(player, cancellationToken),
-            RealmVehicle vehicle => await SaveVehicle(vehicle, cancellationToken),
-            _ => false
-        };
+            bool saved = _element switch
+            {
+                RealmPlayer player => await SavePlayer(player, cancellationToken),
+                RealmVehicle vehicle => await SaveVehicle(vehicle, cancellationToken),
+                _ => false
+            };
 
-        if (saved)
-            ElementSaved?.Invoke(element);
-        return saved;
+            if (saved)
+                ElementSaved?.Invoke(_element);
+
+            activity?.SetStatus(ActivityStatusCode.Ok);
+            return saved;
+        }
+        catch (Exception ex)
+        {
+            activity?.SetStatus(ActivityStatusCode.Error, ex.ToString());
+            throw;
+        }
     }
 
-    public async Task<int> SaveNewPlayerInventory(Inventory inventory, int userId, CancellationToken cancellationToken = default)
+    public async Task SaveNewInventory(Inventory inventory, CancellationToken cancellationToken = default)
     {
-        using var activity = Activity.StartActivity(nameof(SaveNewPlayerInventory));
+        using var activity = Activity.StartActivity(nameof(SaveNewInventory));
 
+        try
+        {
+            int inventoryId = _element switch
+            {
+                RealmPlayer player => await SaveNewPlayerInventory(inventory, player.PersistentId, cancellationToken),
+                RealmVehicle vehicle => await SaveNewVehicleInventory(inventory, vehicle.PersistentId, cancellationToken),
+                _ => 0
+            };
+
+            if (inventoryId == 0)
+                throw new FailedToSaveInventoryException();
+
+            inventory.Id = inventoryId;
+            activity?.SetStatus(ActivityStatusCode.Ok);
+        }
+        catch(Exception ex)
+        {
+            activity?.SetStatus(ActivityStatusCode.Error, ex.ToString());
+            throw;
+        }
+    }
+
+    private async Task<int> SaveNewPlayerInventory(Inventory inventory, int userId, CancellationToken cancellationToken = default)
+    {
         var inventoryData = Inventory.CreateData(inventory);
-        _dbContext.UserInventories.Add(new UserInventoryData
+        _db.UserInventories.Add(new UserInventoryData
         {
             Inventory = inventoryData,
             UserId = userId
         });
-        await _dbContext.SaveChangesAsync(cancellationToken);
+        await _db.SaveChangesAsync(cancellationToken);
         return inventory.Id;
     }
 
-    public async Task<int> SaveNewVehicleInventory(Inventory inventory, int vehicleId, CancellationToken cancellationToken = default)
+    private async Task<int> SaveNewVehicleInventory(Inventory inventory, int vehicleId, CancellationToken cancellationToken = default)
     {
-        using var activity = Activity.StartActivity(nameof(SaveNewVehicleInventory));
-
         var inventoryData = Inventory.CreateData(inventory);
-        _dbContext.VehicleInventories.Add(new VehicleInventoryData
+        _db.VehicleInventories.Add(new VehicleInventoryData
         {
             Inventory = inventoryData,
             VehicleId = vehicleId
         });
-        await _dbContext.SaveChangesAsync(cancellationToken);
+        await _db.SaveChangesAsync(cancellationToken);
         return inventory.Id;
     }
 

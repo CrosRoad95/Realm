@@ -11,7 +11,6 @@ using RealmCore.Server.Modules.Chat;
 using RealmCore.Server.Modules.Integrations.External;
 using RealmCore.Sample.Data;
 using RealmCore.Sample.Server;
-using RealmCore.Server.Extensions;
 
 [assembly: ExcludeFromCodeCoverage]
 
@@ -71,7 +70,6 @@ public class SampleServer : RealmServer
             services.AddInGameCommand<CreateGroupCommand>();
             services.AddInGameCommand<GiveItemCommand>();
             services.AddInGameCommand<GiveLicenseCommand>();
-            services.AddInGameCommand<GPCommand>();
             services.AddInGameCommand<InventoryCommand>();
             services.AddInGameCommand<LicensesCommand>();
             services.AddInGameCommand<TakeItemCommand>();

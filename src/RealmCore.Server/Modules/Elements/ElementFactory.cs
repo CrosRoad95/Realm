@@ -1,6 +1,4 @@
-﻿using RealmCore.Server.Modules.Pickups;
-
-namespace RealmCore.Server.Modules.Elements;
+﻿namespace RealmCore.Server.Modules.Elements;
 
 public class ElementFactory : IElementFactory
 {
@@ -50,11 +48,43 @@ public class ElementFactory : IElementFactory
             Dimension = location.GetDimensionOrDefault(),
         };
 
-        elementBuilder?.Invoke(vehicle);
+        try
+        {
+            elementBuilder?.Invoke(vehicle);
+        }
+        catch (Exception)
+        {
+            vehicle.Destroy();
+            throw;
+        }
+
         AssociateWithServer(vehicle);
         return vehicle;
     }
+    
+    public async Task<RealmVehicle> CreateVehicle(Location location, VehicleModel model, Func<RealmVehicle, Task> elementBuilder)
+    {
+        var vehicle = new RealmVehicle(_serviceProvider, (ushort)model, location.Position)
+        {
+            Rotation = location.Rotation,
+            Interior = location.GetInteriorOrDefault(),
+            Dimension = location.GetDimensionOrDefault(),
+        };
 
+        try
+        {
+            await elementBuilder.Invoke(vehicle);
+        }
+        catch (Exception)
+        {
+            vehicle.Destroy();
+            throw;
+        }
+
+        AssociateWithServer(vehicle);
+        return vehicle;
+    }
+    
     public RealmMarker CreateMarker(Location location, MarkerType markerType, float size, Color color, Action<RealmMarker>? elementBuilder = null)
     {
         var marker = new RealmMarker(_serviceProvider, location.Position, markerType, size)
