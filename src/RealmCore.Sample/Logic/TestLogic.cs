@@ -1,12 +1,15 @@
-﻿namespace RealmCore.Sample.Logic;
+﻿using SlipeServer.Server.Elements;
 
-internal class TestLogic
+namespace RealmCore.Sample.Logic;
+
+internal class TestLogic : PlayerLifecycle
 {
     private readonly IElementFactory _elementFactory;
     private readonly ISchedulerService _schedulerService;
     private readonly ILogger<TestLogic> _logger;
+    private readonly ChatBox _chatBox;
 
-    public TestLogic(IElementFactory elementFactory, ISchedulerService schedulerService, ILogger<TestLogic> logger)
+    public TestLogic(IElementFactory elementFactory, ISchedulerService schedulerService, ILogger<TestLogic> logger, ChatBox chatBox, MtaServer mtaServer) : base(mtaServer)
     {
         var marker = elementFactory.CreateMarker(new Location(335.50684f, -83.71094f, 1.4105641f), MarkerType.Cylinder, 1, Color.Red);
         marker.Size = 4;
@@ -14,8 +17,18 @@ internal class TestLogic
         _elementFactory = elementFactory;
         _schedulerService = schedulerService;
         _logger = logger;
-
+        _chatBox = chatBox;
         SchedulerTests();
+    }
+
+    protected override void PlayerJoined(RealmPlayer player)
+    {
+        player.FocusedVehiclePartChanged += HandleFocusedVehiclePartChanged;
+    }
+
+    private void HandleFocusedVehiclePartChanged(RealmPlayer player, string? arg2, string? arg3)
+    {
+        _chatBox.OutputTo(player, $"Changed focused vehicle element to: {arg3 ?? "<brak>"}");
     }
 
     private void SchedulerTests()

@@ -38,6 +38,7 @@ internal sealed class FocusableElementsLogic
         {
             var player = (RealmPlayer)plr;
             player.FocusedElement = focusedElement;
+            player.FocusedVehiclePart = vehiclePart;
         }
     }
 }

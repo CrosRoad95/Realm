@@ -1,6 +1,7 @@
 ﻿using RealmCore.Resources.MapNames;
 using RealmCore.Sample.Concepts.Gui.Blazor;
 using RealmCore.Sample.HudLayers;
+using RealmCore.Server.Modules.Elements.Focusable;
 using RealmCore.Server.Modules.Players.Money;
 using RealmCore.Server.Modules.Search;
 using SlipeServer.Packets.Enums;
@@ -25,6 +26,7 @@ internal sealed class CommandsLogic
     private readonly IPlayerMoneyHistoryService _userMoneyHistoryService;
     private readonly IMapNamesService _mapNamesService;
     private readonly IVehiclesInUse _vehiclesInUse;
+    private readonly IServiceProvider _serviceProvider;
 
     private class TestState
     {
@@ -40,7 +42,7 @@ internal sealed class CommandsLogic
     public CommandsLogic(RealmCommandService commandService, IElementFactory elementFactory,
         ItemsCollection itemsCollection, ChatBox chatBox, ILogger<CommandsLogic> logger,
         IDateTimeProvider dateTimeProvider, INametagsService nametagsService, IUsersService usersService, IVehiclesService vehiclesService,
-        GameWorld gameWorld, IElementOutlineService elementOutlineService, IAssetsService assetsService, ISpawnMarkersService spawnMarkersService, ILoadService loadService, IFeedbackService feedbackService, IOverlayService overlayService, AssetsCollection assetsCollection, VehicleUpgradesCollection vehicleUpgradeCollection, VehicleEnginesCollection vehicleEnginesCollection, IUserWhitelistedSerialsRepository userWhitelistedSerialsRepository, IVehicleRepository vehicleRepository, IPlayerMoneyHistoryService userMoneyHistoryService, IMapNamesService mapNamesService, IVehiclesInUse vehiclesInUse)
+        GameWorld gameWorld, IElementOutlineService elementOutlineService, IAssetsService assetsService, ISpawnMarkersService spawnMarkersService, ILoadService loadService, IFeedbackService feedbackService, IOverlayService overlayService, AssetsCollection assetsCollection, VehicleUpgradesCollection vehicleUpgradeCollection, VehicleEnginesCollection vehicleEnginesCollection, IUserWhitelistedSerialsRepository userWhitelistedSerialsRepository, IVehicleRepository vehicleRepository, IPlayerMoneyHistoryService userMoneyHistoryService, IMapNamesService mapNamesService, IVehiclesInUse vehiclesInUse, IServiceProvider serviceProvider)
     {
         _commandService = commandService;
         _elementFactory = elementFactory;
@@ -57,6 +59,7 @@ internal sealed class CommandsLogic
         _userMoneyHistoryService = userMoneyHistoryService;
         _mapNamesService = mapNamesService;
         _vehiclesInUse = vehiclesInUse;
+        _serviceProvider = serviceProvider;
         var debounce = new Debounce(500);
         var debounceCounter = 0;
         _commandService.AddAsyncCommandHandler("debounce", async (player, args, token) =>
@@ -1855,6 +1858,13 @@ internal sealed class CommandsLogic
         _commandService.AddCommandHandler("mapnamerename", (player, args) =>
         {
             _mapNamesService.SetName(permId, args.ReadAllAsString());
+        });
+        
+        _commandService.AddAsyncCommandHandler("focusablevehicle", async (player, args, token) =>
+        {
+            var veh = new FocusableRealmVehicle(_serviceProvider, 404, player.Position);
+            _elementFactory.AssociateWithServer(veh);
+            _elementFactory.RelayCreated(veh);
         });
 
     }

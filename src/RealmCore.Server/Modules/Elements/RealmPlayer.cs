@@ -33,6 +33,7 @@ public class RealmPlayer : Player, IDisposable, IPersistentElement
     public IServiceProvider ServiceProvider => _serviceProvider;
 
     private Element? _focusedElement;
+    private string? _focusedVehiclePart;
     private Element? _lastClickedElement;
     private readonly object _currentInteractElementLock = new();
     private Element? _currentInteractElement;
@@ -54,6 +55,7 @@ public class RealmPlayer : Player, IDisposable, IPersistentElement
     private readonly List<AttachedBoneWorldObject> _attachedBoneElements = [];
 
     public event Action<RealmPlayer, Element?, Element?>? FocusedElementChanged;
+    public event Action<RealmPlayer, string?, string?>? FocusedVehiclePartChanged;
     public event Action<RealmPlayer, Element?>? ClickedElementChanged;
     public event Action<RealmPlayer, Element?, Element?>? CurrentInteractElementChanged;
     public event Action<RealmPlayer, AttachedBoneWorldObject>? WorldObjectAttached;
@@ -97,6 +99,20 @@ public class RealmPlayer : Player, IDisposable, IPersistentElement
                         worldObject.AddFocusedPlayer(this);
                         break;
                 }
+            }
+        }
+    }
+    
+    public string? FocusedVehiclePart
+    {
+        get => _focusedVehiclePart;
+        internal set
+        {
+            if (value != _focusedVehiclePart)
+            {
+                var previous = _focusedVehiclePart;
+                _focusedVehiclePart = value;
+                FocusedVehiclePartChanged?.Invoke(this, previous, value);
             }
         }
     }
