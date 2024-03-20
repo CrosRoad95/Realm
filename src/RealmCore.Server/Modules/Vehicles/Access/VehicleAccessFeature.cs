@@ -1,6 +1,4 @@
-﻿using RealmCore.Server.Modules.Vehicles.Persistence;
-
-namespace RealmCore.Server.Modules.Vehicles.Access;
+﻿namespace RealmCore.Server.Modules.Vehicles.Access;
 
 public interface IVehicleAccessFeature : IVehicleFeature, IEnumerable<VehicleUserAccessDto>
 {

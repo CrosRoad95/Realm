@@ -45,13 +45,28 @@ internal sealed class PlayerInventoryFeature : ElementInventoryFeature, IPlayerI
     }
 }
 
-internal sealed class VehicleInventoryFeature : ElementInventoryFeature, IVehicleInventoryFeature
+internal sealed class VehicleInventoryFeature : ElementInventoryFeature, IVehicleInventoryFeature, IUsesVehiclePersistentData
 {
+    private readonly ItemsCollection _itemsCollection;
+
     public RealmVehicle Vehicle { get; }
     protected override Element Element => Vehicle;
-    public VehicleInventoryFeature(VehicleContext vehicleContext) : base()
+    public VehicleInventoryFeature(VehicleContext vehicleContext, ItemsCollection itemsCollection) : base()
     {
         Vehicle = vehicleContext.Vehicle;
+        _itemsCollection = itemsCollection;
+    }
+
+    public event Action? VersionIncreased;
+
+    public void Loaded(VehicleData vehicleData)
+    {
+        Load(Vehicle, vehicleData.Inventories, _itemsCollection);
+    }
+
+    public void Unloaded()
+    {
+
     }
 }
 

@@ -1,6 +1,4 @@
-﻿using RealmCore.Server.Modules.Vehicles.Persistence;
-
-namespace RealmCore.Server.Modules.Elements;
+﻿namespace RealmCore.Server.Modules.Elements;
 
 public class RealmVehicle : Vehicle, IPersistentElement
 {

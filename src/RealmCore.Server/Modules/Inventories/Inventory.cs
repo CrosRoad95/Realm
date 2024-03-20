@@ -563,7 +563,7 @@ public class Inventory
     {
         var items = inventory.InventoryItems
             .Select(x =>
-                new Item(itemsCollection, x.ItemId, x.Number, JsonConvert.DeserializeObject<Metadata>(x.MetaData, _jsonSerializerSettings))
+                new Item(itemsCollection, x.ItemId, x.Number, JsonConvert.DeserializeObject<Metadata>(x.MetaData, _jsonSerializerSettings), x.Id)
             )
             .ToList();
         return new Inventory(element, inventory.Size, inventory.Id, items);
@@ -582,13 +582,7 @@ public class Inventory
 
     private static List<InventoryItemData> MapItems(IReadOnlyList<Item> items)
     {
-        var itemsData = items.Select(item => new InventoryItemData
-        {
-            Id = item.Id,
-            ItemId = item.ItemId,
-            Number = item.Number,
-            MetaData = JsonConvert.SerializeObject(item.MetaData, Formatting.None),
-        }).ToList();
+        var itemsData = items.Select(item => Item.CreateData(item)).ToList();
 
         return itemsData;
     }

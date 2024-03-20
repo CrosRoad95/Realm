@@ -3,7 +3,7 @@
 public class Item : IEquatable<Item>, IEquatable<Metadata>
 {
     private readonly object _lock = new();
-    public string Id { get; internal set; } = Guid.NewGuid().ToString();
+    public string Id { get; internal set; }
     public string LocalId { get; } = Guid.NewGuid().ToString();
     public uint ItemId { get; private set; }
 
@@ -68,13 +68,14 @@ public class Item : IEquatable<Item>, IEquatable<Metadata>
         AvailableActions = item.AvailableActions;
     }
 
-    internal Item(ItemsCollection itemsCollection, uint itemId, uint number, Metadata? metaData = null)
+    internal Item(ItemsCollection itemsCollection, uint itemId, uint number, Metadata? metaData = null, string? id = null)
     {
         var itemsCollectionItem = itemsCollection.Get(itemId);
         AvailableActions = itemsCollectionItem.AvailableActions;
         Size = itemsCollectionItem.Size;
         Name = itemsCollectionItem.Name;
         ItemId = itemsCollectionItem.Id;
+        Id = id ?? Guid.NewGuid().ToString();
         _number = number;
         if (metaData != null)
         {
@@ -226,5 +227,16 @@ public class Item : IEquatable<Item>, IEquatable<Metadata>
             }
             return true;
         }
+    }
+
+    public static InventoryItemData CreateData(Item item)
+    {
+        return new InventoryItemData
+        {
+            Id = item.Id,
+            ItemId = item.ItemId,
+            Number = item.Number,
+            MetaData = JsonConvert.SerializeObject(item.MetaData, Formatting.None),
+        };
     }
 }

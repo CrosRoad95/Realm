@@ -1,6 +1,4 @@
-﻿using RealmCore.Server.Modules.Vehicles.Persistence;
-
-namespace RealmCore.Server.Modules.Vehicles.Tuning;
+﻿namespace RealmCore.Server.Modules.Vehicles.Tuning;
 
 public interface IVehicleEnginesFeature : IVehicleFeature
 {

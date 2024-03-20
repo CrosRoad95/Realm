@@ -1,5 +1,4 @@
 ﻿using RealmCore.Server.Modules.Players.Settings;
-using RealmCore.Server.Modules.Vehicles.Persistence;
 
 namespace RealmCore.Server.Extensions;
 

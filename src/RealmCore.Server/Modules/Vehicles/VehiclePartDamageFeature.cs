@@ -1,6 +1,4 @@
-﻿using RealmCore.Server.Modules.Vehicles.Persistence;
-
-namespace RealmCore.Server.Modules.Vehicles;
+﻿namespace RealmCore.Server.Modules.Vehicles;
 
 public interface IVehiclePartDamageFeature : IVehicleFeature
 {

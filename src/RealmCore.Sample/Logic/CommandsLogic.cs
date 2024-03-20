@@ -993,13 +993,19 @@ internal sealed class CommandsLogic
         //    _chatBox.OutputTo(player, $"Inventory: {inv.Number}/{inv.Size}");
         //});
 
-        //_commandService.AddCommandHandler("giveitem4", (player, args) =>
-        //{
-        //    var inv = player.GetRequiredComponent<inventory>();
-        //    inv.AddSingleItem(_itemsRegistry, 4);
-        //    var playerElementComponent = player.GetRequiredComponent<PlayerElementComponent>();
-        //    _chatBox.OutputTo(player, "Item given");
-        //});
+        _commandService.AddCommandHandler("givedefaultinventory", (player, args) =>
+        {
+            player.Inventory.CreatePrimaryInventory(20);
+            _chatBox.OutputTo(player, "Inventory created");
+        });
+
+        _commandService.AddCommandHandler("listitems", (player, args) =>
+        {
+            foreach (var item in player.Inventory.Primary!.Items)
+            {
+                _chatBox.OutputTo(player, $"Item: {item.ItemId}");
+            }
+        });
 
         //_commandService.AddCommandHandler("itemwithmetadata", (player, args) =>
         //{

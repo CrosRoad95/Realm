@@ -99,7 +99,8 @@ internal sealed partial class SaveService : ISaveService
         vehicleData.Paintjob = vehicle.PaintJob;
 
         if (vehicle.Inventory.TryGetPrimary(out var inventory))
-            vehicleData.Inventories = [Inventory.CreateData(inventory)];
+            vehicleData.Inventories = SaveInventory(vehicleData.Inventories, inventory);
+
         vehicleData.LastUsed = vehicle.Persistence.LastUsed;
 
         var savedEntities = await _db.SaveChangesAsync(cancellationToken);
@@ -119,12 +120,44 @@ internal sealed partial class SaveService : ISaveService
         player.PlayTime.UpdateCategoryPlayTime(player.PlayTime.Category);
         userData.PlayTime = (ulong)player.PlayTime.TotalPlayTime.TotalSeconds;
 
+        if (player.Inventory.TryGetPrimary(out var inventory))
+            userData.Inventories = SaveInventory(userData.Inventories, inventory);
+
         foreach (var item in _userDataSavers)
             await item.SaveAsync(userData, player, cancellationToken);
 
         var savedEntities = await _db.SaveChangesAsync(cancellationToken);
 
         return true;
+    }
+
+    private ICollection<InventoryData> SaveInventory(ICollection<InventoryData> inventoriesData, Inventory inventory)
+    {
+        var existingInventoryData = inventoriesData.FirstOrDefault(x => x.Id == inventory.Id);
+        if (existingInventoryData == null)
+        {
+            inventoriesData = [Inventory.CreateData(inventory)];
+        }
+        else
+        {
+            foreach (var item in inventory.Items)
+            {
+                var existingItem = existingInventoryData.InventoryItems.FirstOrDefault(x => x.Id == item.Id);
+                var itemData = Item.CreateData(item);
+                if (existingItem == null)
+                {
+                    existingInventoryData.InventoryItems.Add(itemData);
+                }
+                else
+                {
+                    existingItem.MetaData = itemData.MetaData;
+                    existingItem.Number = itemData.Number;
+                    existingItem.ItemId = itemData.ItemId;
+                }
+            }
+        }
+
+        return inventoriesData;
     }
 
     public async Task<bool> Save(CancellationToken cancellationToken = default)

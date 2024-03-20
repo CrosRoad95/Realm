@@ -74,6 +74,7 @@
 		<Using Include="Microsoft.AspNetCore.WebUtilities" />
 		<Using Include="RealmCore.Server.Modules.Players.Groups" />
 		<Using Include="RealmCore.Server.Modules.Players.Notifications" />
+		<Using Include="RealmCore.Server.Modules.Vehicles.Persistence" />
 		<Using Include="System" />
 		<Using Include="System.Collections.Generic" />
 		<Using Include="System.Linq" />
