@@ -1860,6 +1860,26 @@ internal sealed class CommandsLogic
             _mapNamesService.SetName(permId, args.ReadAllAsString());
         });
         
+        _commandService.AddAsyncCommandHandler("trytakemoneyasync", async (player, args, token) =>
+        {
+            await player.Money.TryTakeMoneyAsync(10, async () =>
+            {
+                return true;
+            }, true);
+
+            await player.Money.TryTakeMoneyAsync(10, async () =>
+            {
+                return false;
+            }, true);
+
+            await player.Money.TryTakeMoneyAsync(10, async () =>
+            {
+                throw new Exception();
+            }, true);
+
+            _chatBox.OutputTo(player, "took 10 money");
+        });
+        
         _commandService.AddAsyncCommandHandler("focusablevehicle", async (player, args, token) =>
         {
             var veh = new FocusableRealmVehicle(_serviceProvider, 404, player.Position);

@@ -50,7 +50,7 @@ internal sealed class PlayerMoneyFeature : IPlayerMoneyFeature, IUsesUserPersist
             if (Math.Abs(value) > _moneyLimit)
                 throw new GameplayException("Unable to set money beyond limit.");
 
-            _lock.EnterWriteLock();
+            _lock.TryEnterWriteLock(TimeSpan.FromSeconds(15));
             try
             {
                 if (_money == value)
@@ -128,7 +128,7 @@ internal sealed class PlayerMoneyFeature : IPlayerMoneyFeature, IUsesUserPersist
         if (amount < 0)
             throw new GameplayException("Unable to give money, amount can not get negative.");
 
-        _lock.EnterWriteLock();
+        _lock.TryEnterWriteLock(TimeSpan.FromSeconds(15));
         try
         {
             if (Math.Abs(_money) + amount > _moneyLimit)
@@ -173,7 +173,7 @@ internal sealed class PlayerMoneyFeature : IPlayerMoneyFeature, IUsesUserPersist
 
     public void TakeMoney(decimal amount, bool force = false)
     {
-        _lock.EnterWriteLock();
+        _lock.TryEnterWriteLock(TimeSpan.FromSeconds(15));
         try
         {
             TakeMoneyCore(amount, force);
@@ -188,14 +188,14 @@ internal sealed class PlayerMoneyFeature : IPlayerMoneyFeature, IUsesUserPersist
         }
     }
 
-    internal bool InternalHasMoney(decimal amount, bool force = false) => _money >= amount || force;
+    internal bool HasMoneyCore(decimal amount, bool force = false) => _money >= amount || force;
 
     public bool HasMoney(decimal amount, bool force = false)
     {
-        _lock.EnterReadLock();
+        _lock.TryEnterReadLock(TimeSpan.FromSeconds(15));
         try
         {
-            return InternalHasMoney(amount, force);
+            return HasMoneyCore(amount, force);
         }
         finally
         {
@@ -218,10 +218,10 @@ internal sealed class PlayerMoneyFeature : IPlayerMoneyFeature, IUsesUserPersist
 
     public bool TryTakeMoney(decimal amount, Func<bool> action, bool force = false)
     {
-        _lock.EnterWriteLock();
+        _lock.TryEnterWriteLock(TimeSpan.FromSeconds(15));
         try
         {
-            if (!InternalHasMoney(amount, force))
+            if (!HasMoneyCore(amount, force))
                 return false;
 
             if (action())
@@ -231,10 +231,6 @@ internal sealed class PlayerMoneyFeature : IPlayerMoneyFeature, IUsesUserPersist
             }
             return false;
         }
-        catch
-        {
-            throw;
-        }
         finally
         {
             _lock.ExitWriteLock();
@@ -243,11 +239,11 @@ internal sealed class PlayerMoneyFeature : IPlayerMoneyFeature, IUsesUserPersist
 
     public async Task<bool> TryTakeMoneyAsync(decimal amount, Func<Task<bool>> action, bool force = false)
     {
-        _lock.EnterWriteLock();
+        _lock.TryEnterWriteLock(TimeSpan.FromSeconds(15));
 
         try
         {
-            if (!InternalHasMoney(amount, force))
+            if (!HasMoneyCore(amount, force))
                 return false;
 
             if (await action())
