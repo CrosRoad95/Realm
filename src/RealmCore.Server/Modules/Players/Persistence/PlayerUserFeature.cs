@@ -133,7 +133,7 @@ internal sealed class PlayerUserFeature : IPlayerUserFeature
 
     public bool TryFlushVersion(int minimalVersion)
     {
-        if (minimalVersion >= _version)
+        if (minimalVersion <= _version)
         {
             Interlocked.Exchange(ref _version, 0);
             return true;

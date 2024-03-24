@@ -12,16 +12,24 @@ internal sealed class BoneAttachResourceLogic : PlayerLifecycle
     protected override void PlayerJoined(RealmPlayer player)
     {
         player.WorldObjectAttached += HandleWorldObjectAttached;
+        player.WorldObjectDetached += HandleWorldObjectDetached;
     }
 
     protected override void PlayerLeft(RealmPlayer player)
     {
         player.WorldObjectAttached -= HandleWorldObjectAttached;
+        player.WorldObjectDetached -= HandleWorldObjectDetached;
     }
 
     private void HandleWorldObjectAttached(RealmPlayer player, AttachedBoneWorldObject attachedBoneWorldObject)
     {
         _boneAttachService.Attach(attachedBoneWorldObject.WorldObject, player, attachedBoneWorldObject.BoneId, attachedBoneWorldObject.PositionOffset, attachedBoneWorldObject.RotationOffset);
         attachedBoneWorldObject.WorldObject.AreCollisionsEnabled = false; // TODO: remember previous state
+    }
+
+    private void HandleWorldObjectDetached(RealmPlayer player, AttachedBoneWorldObject attachedBoneWorldObject)
+    {
+        _boneAttachService.Detach(attachedBoneWorldObject.WorldObject);
+        attachedBoneWorldObject.WorldObject.AreCollisionsEnabled = true;
     }
 }
