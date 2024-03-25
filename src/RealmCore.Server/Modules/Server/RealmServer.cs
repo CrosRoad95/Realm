@@ -1,4 +1,5 @@
 ﻿global using ILogger = Microsoft.Extensions.Logging.ILogger;
+using Microsoft.Extensions.Configuration;
 
 [assembly: InternalsVisibleTo("RealmCore.TestingTools")]
 [assembly: InternalsVisibleTo("RealmCore.Tests")]
@@ -17,9 +18,9 @@ public class RealmServer<TRealmPlayer> : MtaServer<TRealmPlayer> where TRealmPla
         return player.Client;
     }
 
-    public RealmServer(IRealmConfigurationProvider realmConfigurationProvider, Action<ServerBuilder>? configureServerBuilder = null, Action<ServerBuilder>? postConfigureServerBuilder = null) : base(serverBuilder =>
+    public RealmServer(IConfiguration configuration, Action<ServerBuilder>? configureServerBuilder = null, Action<ServerBuilder>? postConfigureServerBuilder = null) : base(serverBuilder =>
     {
-        serverBuilder.ConfigureServer(realmConfigurationProvider);
+        serverBuilder.ConfigureServer(configuration);
         configureServerBuilder?.Invoke(serverBuilder);
 
         serverBuilder.ConfigureServices(services =>
@@ -131,7 +132,7 @@ public class RealmServer<TRealmPlayer> : MtaServer<TRealmPlayer> where TRealmPla
 
 public class RealmServer : RealmServer<RealmPlayer>
 {
-    public RealmServer(IRealmConfigurationProvider realmConfigurationProvider, Action<ServerBuilder>? configureServerBuilder = null) : base(realmConfigurationProvider, configureServerBuilder)
+    public RealmServer(IConfiguration configuration, Action<ServerBuilder>? configureServerBuilder = null) : base(configuration, configureServerBuilder)
     {
     }
 }

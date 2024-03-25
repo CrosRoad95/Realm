@@ -9,7 +9,7 @@ using RealmCore.Discord.Integration.Extensions;
 using RealmCore.Discord.Integration.Interfaces;
 using Discord.WebSocket;
 
-var realmConfigurationProvider = new RealmConfigurationProvider();
+var realmConfigurationProvider = new RealmConfiguration();
 var services = new ServiceCollection();
 var realmLogger = new RealmLogger("DiscordBot", LogEventLevel.Verbose);
 realmLogger.LoggerConfiguration.WriteTo.Seq("http://localhost:5341");

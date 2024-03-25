@@ -1,4 +1,4 @@
-﻿using RealmCore.Configuration;
+﻿using Microsoft.Extensions.Configuration;
 using RealmCore.Discord.Integration.Stubs;
 using RealmCore.Module.Grpc.Options;
 
@@ -6,10 +6,10 @@ namespace RealmCore.Discord.Integration.Extensions;
 
 public static class ServiceCollectionExtensions
 {
-    public static IServiceCollection AddRealmDiscordBotIntegration(this IServiceCollection services, IRealmConfigurationProvider realmConfigurationProvider)
+    public static IServiceCollection AddRealmDiscordBotIntegration(this IServiceCollection services, IConfiguration configuration)
     {
-        services.Configure<GrpcOptions>(realmConfigurationProvider.GetSection("Grpc"));
-        services.Configure<DiscordBotOptions>(realmConfigurationProvider.GetSection("Discord"));
+        services.Configure<GrpcOptions>(configuration.GetSection("Grpc"));
+        services.Configure<DiscordBotOptions>(configuration.GetSection("Discord"));
         services.AddSingleton<IRealmDiscordClient, RealmDiscordClient>();
         services.AddSingleton(new DiscordSocketClient(new DiscordSocketConfig
         {

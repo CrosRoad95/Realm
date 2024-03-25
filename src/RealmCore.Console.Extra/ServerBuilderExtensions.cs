@@ -1,5 +1,5 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using RealmCore.Configuration;
+﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using RealmCore.Console.Extra.Integrations.Discord.Handlers;
 using RealmCore.Module.Discord;
 using RealmCore.Module.Discord.Interfaces;
@@ -10,11 +10,11 @@ namespace RealmCore.Console.Extra;
 
 public static class ServerBuilderExtensions
 {
-    public static void AddExtras(this SlipeServer.Server.ServerBuilders.ServerBuilder serverBuilder, IRealmConfigurationProvider realmConfigurationProvider)
+    public static void AddExtras(this SlipeServer.Server.ServerBuilders.ServerBuilder serverBuilder, IConfiguration configuration)
     {
         serverBuilder.ConfigureServices(services =>
         {
-            services.Configure<GrpcOptions>(realmConfigurationProvider.GetSection("Grpc"));
+            services.Configure<GrpcOptions>(configuration.GetSection("Grpc"));
 
             #region Discord integration specific
             services.AddSingleton<IDiscordStatusChannelUpdateHandler, DiscordStatusChannelUpdateHandler>();

@@ -22,7 +22,7 @@ public class SampleServer : RealmServer
 {
     static bool withDgs = true;
 
-    public SampleServer() : base(new RealmConfigurationProvider(), serverBuilder =>
+    public SampleServer() : base(new RealmConfiguration(), serverBuilder =>
     {
         if (withDgs)
         {

@@ -1,14 +1,15 @@
-﻿using System.Diagnostics.CodeAnalysis;
+﻿using Microsoft.Extensions.Primitives;
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 
 namespace RealmCore.Configuration;
 
 [ExcludeFromCodeCoverage]
-public class RealmConfigurationProvider : IRealmConfigurationProvider
+public class RealmConfiguration : IConfiguration
 {
     public readonly IConfiguration _configuration;
 
-    public RealmConfigurationProvider()
+    public RealmConfiguration()
     {
         var configurationBuilder =
             new ConfigurationBuilder()
@@ -25,10 +26,11 @@ public class RealmConfigurationProvider : IRealmConfigurationProvider
         _configuration = configurationBuilder.Build();
     }
 
-    public T? Get<T>(string name) => _configuration.GetSection(name).Get<T>();
+    public string? this[string key] { get => _configuration[key]; set => _configuration[key] = value; }
 
-    public T GetRequired<T>(string name) => _configuration.GetSection(name).Get<T>() ??
-        throw new Exception($"Missing configuration '{name}'");
+    public IEnumerable<IConfigurationSection> GetChildren() => _configuration.GetChildren();
 
-    public IConfigurationSection GetSection(string name) => _configuration.GetSection(name);
+    public IChangeToken GetReloadToken() => _configuration.GetReloadToken();
+
+    public IConfigurationSection GetSection(string key) => _configuration.GetSection(key);
 }

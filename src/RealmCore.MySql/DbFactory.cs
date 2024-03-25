@@ -14,7 +14,7 @@ public sealed class DbFactory : IDesignTimeDbContextFactory<MySqlDb>
 
     public MySqlDb CreateDbContext(string[] args)
     {
-        var realmConfigurationProvider = new RealmConfigurationProvider();
+        var realmConfigurationProvider = new RealmConfiguration();
         var connectionString = realmConfigurationProvider.Get<string>("Database:ConnectionString");
 
         var builder = new DbContextOptionsBuilder<MySqlDb>();

@@ -1,6 +1,8 @@
-﻿namespace RealmCore.TestingTools;
+﻿using Microsoft.Extensions.Primitives;
 
-public class TestConfigurationProvider : IRealmConfigurationProvider
+namespace RealmCore.TestingTools;
+
+public class TestConfigurationProvider : IConfiguration
 {
     private readonly IConfiguration _configuration;
     public TestConfigurationProvider(string connectionString, int? basePort = null)
@@ -28,9 +30,11 @@ public class TestConfigurationProvider : IRealmConfigurationProvider
             }).Build();
     }
 
-    public T? Get<T>(string name) => _configuration.GetSection(name).Get<T>();
-    public T GetRequired<T>(string name) => _configuration.GetSection(name).Get<T>() ??
-        throw new Exception($"Missing configuration '{name}'");
+    public string? this[string key] { get => _configuration[key]; set => _configuration[key] = value; }
 
-    public IConfigurationSection GetSection(string name) => _configuration.GetSection(name);
+    public IEnumerable<IConfigurationSection> GetChildren() => _configuration.GetChildren();
+
+    public IChangeToken GetReloadToken() => _configuration.GetReloadToken();
+
+    public IConfigurationSection GetSection(string key) => _configuration.GetSection(key);
 }

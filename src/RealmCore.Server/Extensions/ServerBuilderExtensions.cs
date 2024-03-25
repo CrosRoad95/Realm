@@ -1,10 +1,12 @@
-﻿namespace RealmCore.Server.Extensions;
+﻿using Microsoft.Extensions.Configuration;
+
+namespace RealmCore.Server.Extensions;
 
 public static class ServerBuilderExtensions
 {
-    public static ServerBuilder ConfigureServer(this ServerBuilder serverBuilder, IRealmConfigurationProvider realmConfigurationProvider, ServerBuilderDefaultBehaviours? serverBuilderDefaultBehaviours = null)
+    public static ServerBuilder ConfigureServer(this ServerBuilder serverBuilder, IConfiguration configuration, ServerBuilderDefaultBehaviours? serverBuilderDefaultBehaviours = null)
     {
-        var _serverConfiguration = realmConfigurationProvider.GetRequired<SlipeServer.Server.Configuration>("Server");
+        var _serverConfiguration = configuration.GetRequired<SlipeServer.Server.Configuration>("Server");
         serverBuilder.UseConfiguration(_serverConfiguration);
         if (serverBuilderDefaultBehaviours != null)
         {
@@ -27,17 +29,17 @@ public static class ServerBuilderExtensions
         serverBuilder.ConfigureServices(services =>
         {
             // Options
-            services.Configure<GameplayOptions>(realmConfigurationProvider.GetSection("Gameplay"));
-            services.Configure<ServerListOptions>(realmConfigurationProvider.GetSection("ServerList"));
-            services.Configure<AssetsOptions>(realmConfigurationProvider.GetSection("Assets"));
-            services.Configure<GuiBrowserOptions>(realmConfigurationProvider.GetSection("GuiBrowser"));
-            services.Configure<BrowserOptions>(realmConfigurationProvider.GetSection("Browser"));
+            services.Configure<GameplayOptions>(configuration.GetSection("Gameplay"));
+            services.Configure<ServerListOptions>(configuration.GetSection("ServerList"));
+            services.Configure<AssetsOptions>(configuration.GetSection("Assets"));
+            services.Configure<GuiBrowserOptions>(configuration.GetSection("GuiBrowser"));
+            services.Configure<BrowserOptions>(configuration.GetSection("Browser"));
 
-            var connectionString = realmConfigurationProvider.Get<string>("Database:ConnectionString");
+            var connectionString = configuration.Get<string>("Database:ConnectionString");
             if (!string.IsNullOrEmpty(connectionString))
             {
                 services.AddPersistence<MySqlDb>(db => db.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString)));
-                services.AddRealmIdentity<MySqlDb>(realmConfigurationProvider.GetRequired<IdentityConfiguration>("Identity"));
+                services.AddRealmIdentity<MySqlDb>(configuration.GetRequired<IdentityConfiguration>("Identity"));
             }
 
             services.AddSingleton<HelpCommand>();
