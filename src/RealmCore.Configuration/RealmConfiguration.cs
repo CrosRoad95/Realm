@@ -11,17 +11,17 @@ public class RealmConfiguration : IConfiguration
 
     public RealmConfiguration()
     {
-        var configurationBuilder =
-            new ConfigurationBuilder()
-            .AddJsonFile("appsettings.json", false)
-            .AddJsonFile("appsettings.server.json", true, true)
-            .AddJsonFile("appsettings.development.json", true, true)
-            .AddJsonFile("appsettings.local.json", true, true)
-            .AddEnvironmentVariables();
+        var configurationBuilder = new ConfigurationBuilder();
 
         var entryAssembly = Assembly.GetEntryAssembly();
         if (entryAssembly != null)
             configurationBuilder.AddUserSecrets(entryAssembly);
+
+        configurationBuilder.AddJsonFile("appsettings.json", false);
+        configurationBuilder.AddJsonFile("appsettings.server.json", true, true);
+        configurationBuilder.AddJsonFile("appsettings.development.json", true, true);
+        configurationBuilder.AddJsonFile("appsettings.local.json", true, true);
+        configurationBuilder.AddEnvironmentVariables();
 
         _configuration = configurationBuilder.Build();
     }
