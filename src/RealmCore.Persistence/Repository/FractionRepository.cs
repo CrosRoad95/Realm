@@ -7,7 +7,7 @@ public interface IFractionRepository
     Task<List<FractionData>> GetAll(CancellationToken cancellationToken = default);
     Task<List<FractionMemberData>> GetAllMembers(int fractionId, CancellationToken cancellationToken = default);
     Task<FractionMemberData?> TryAddMember(int fractionId, int userId, int rank = 1, string rankName = "", CancellationToken cancellationToken = default);
-    Task<FractionData?> TryCreate(int id, string fractionName, string fractionCode, CancellationToken cancellationToken = default);
+    Task<FractionData?> CreateOrGet(int id, string fractionName, string fractionCode, CancellationToken cancellationToken = default);
 }
 
 internal sealed class FractionRepository : IFractionRepository
@@ -70,18 +70,19 @@ internal sealed class FractionRepository : IFractionRepository
         return await _db.SaveChangesAsync(cancellationToken) == 1;
     }
     
-    public async Task<FractionData?> TryCreate(int id, string name, string code, CancellationToken cancellationToken = default)
+    public async Task<FractionData> CreateOrGet(int id, string name, string code, CancellationToken cancellationToken = default)
     {
-        using var activity = Activity.StartActivity(nameof(TryCreate));
+        using var activity = Activity.StartActivity(nameof(CreateOrGet));
 
         var result = await _transactionContext.ExecuteAsync(async (db) =>
         {
-            var existsQuery = _db.Fractions
+            var query = _db.Fractions
                 .TagWithSource(nameof(FractionRepository))
                 .AsNoTracking()
                 .Where(x => x.Id == id && x.Code == code && x.Name == name);
-            if (await existsQuery.AnyAsync(cancellationToken))
-                return null;
+            var existingFraction = await query.FirstOrDefaultAsync(cancellationToken);
+            if (existingFraction != null)
+                return existingFraction;
 
             var fractionData = new FractionData
             {

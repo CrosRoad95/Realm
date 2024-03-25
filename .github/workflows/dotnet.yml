@@ -21,5 +21,7 @@ jobs:
       run: dotnet restore
     - name: Build
       run: dotnet build --no-restore
+    - name: Set Environment Variable
+      run: echo "RealmCoreTestingDatabaseConnectionString=${{ secrets.DATABASE_CONNECTION_STRING }}" >> $GITHUB_ENV
     - name: Test
       run: dotnet test --no-build --verbosity normal

@@ -1,6 +1,7 @@
 ﻿namespace RealmCore.Tests.Integration.Players;
 
-public class UserNotificationRepositoryTests : RealmIntegrationTestingBase
+[Collection("IntegrationTests")]
+public class UserNotificationRepositoryTests : RealmRemoteDatabaseIntegrationTestingBase
 {
     protected override string DatabaseName => "UserNotificationRepositoryTests";
 

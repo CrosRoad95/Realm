@@ -29,7 +29,10 @@ internal sealed class BoneAttachResourceLogic : PlayerLifecycle
 
     private void HandleWorldObjectDetached(RealmPlayer player, AttachedBoneWorldObject attachedBoneWorldObject)
     {
-        _boneAttachService.Detach(attachedBoneWorldObject.WorldObject);
-        attachedBoneWorldObject.WorldObject.AreCollisionsEnabled = true;
+        if (_boneAttachService.IsAttached(attachedBoneWorldObject.WorldObject))
+        {
+            _boneAttachService.Detach(attachedBoneWorldObject.WorldObject);
+            attachedBoneWorldObject.WorldObject.AreCollisionsEnabled = true;
+        }
     }
 }

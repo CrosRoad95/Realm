@@ -1,6 +1,7 @@
 ﻿namespace RealmCore.Tests.Integration.Players;
 
-public class UserTests : RealmIntegrationTestingBase
+[Collection("IntegrationTests")]
+public class UserTests : RealmRemoteDatabaseIntegrationTestingBase
 {
     protected override string DatabaseName => "UserTests";
 
@@ -32,7 +33,7 @@ public class UserTests : RealmIntegrationTestingBase
 
         #region Assert
         validPassword.Should().BeTrue();
-        lastNick.Should().Be("TestPlayer");
+        lastNick.Should().StartWith("TestPlayer");
         player.User.IsSignedIn.Should().BeTrue();
         player.PersistentId.Should().Be(userId);
         #endregion

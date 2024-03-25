@@ -102,8 +102,8 @@ internal sealed class VehiclePersistanceFeature : IVehiclePersistenceFeature
             Vehicle.Damage.Doors[3] = (byte)vehicleData.DamageState.FrontRightDoor;
             Vehicle.Damage.Doors[4] = (byte)vehicleData.DamageState.RearLeftDoor;
             Vehicle.Damage.Doors[5] = (byte)vehicleData.DamageState.RearRightDoor;
-            Vehicle.DoorRatios = new float[6] { vehicleData.DoorOpenRatio.Hood, vehicleData.DoorOpenRatio.Trunk, vehicleData.DoorOpenRatio.FrontLeft,
-                vehicleData.DoorOpenRatio.FrontRight, vehicleData.DoorOpenRatio.RearLeft, vehicleData.DoorOpenRatio.RearRight };
+            Vehicle.DoorRatios = [ vehicleData.DoorOpenRatio.Hood, vehicleData.DoorOpenRatio.Trunk, vehicleData.DoorOpenRatio.FrontLeft,
+                vehicleData.DoorOpenRatio.FrontRight, vehicleData.DoorOpenRatio.RearLeft, vehicleData.DoorOpenRatio.RearRight ];
             Vehicle.SetWheelState(VehicleWheel.FrontLeft, (VehicleWheelState)vehicleData.WheelStatus.FrontLeft);
             Vehicle.SetWheelState(VehicleWheel.FrontRight, (VehicleWheelState)vehicleData.WheelStatus.FrontRight);
             Vehicle.SetWheelState(VehicleWheel.RearLeft, (VehicleWheelState)vehicleData.WheelStatus.RearLeft);

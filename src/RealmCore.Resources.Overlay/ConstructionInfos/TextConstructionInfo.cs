@@ -23,8 +23,8 @@ internal struct TextConstructionInfo
 
     public LuaValue[] AsLuaValue()
     {
-        return new LuaValue[]
-            {
+        return
+            [
                 isComputed ? "computedValue" : "text",
                 id,
                 text,
@@ -38,6 +38,6 @@ internal struct TextConstructionInfo
                 font,
                 alignX.AsString(),
                 alignY.AsString()
-            };
+            ];
     }
 }

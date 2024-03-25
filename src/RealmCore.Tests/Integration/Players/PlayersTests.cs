@@ -1,6 +1,7 @@
 ﻿namespace RealmCore.Tests.Integration.Players;
 
-public class PlayersTests : RealmIntegrationTestingBase
+[Collection("IntegrationTests")]
+public class PlayersTests : RealmRemoteDatabaseIntegrationTestingBase
 {
     protected override string DatabaseName => "PlayersTests";
 

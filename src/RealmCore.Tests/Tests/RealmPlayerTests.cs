@@ -1,6 +1,7 @@
 ﻿namespace RealmCore.Tests.Tests;
 
-public class RealmPlayerTests : RealmIntegrationTestingBase
+[Collection("IntegrationTests")]
+public class RealmPlayerTests : RealmRemoteDatabaseIntegrationTestingBase
 {
     protected override string DatabaseName => "RealmPlayerTests";
 
@@ -8,12 +9,13 @@ public class RealmPlayerTests : RealmIntegrationTestingBase
     public async Task SavingAndLoadingPlayerShouldWork()
     {
         using var _ = new AssertionScope();
-        
+        var name = $"foo{Guid.NewGuid()}";
+
         var server = await CreateServerAsync();
         var now = server.DateTimeProvider.Now;
         {
             var player = await CreatePlayerAsync(false);
-            player.Name = "foo";
+            player.Name = name;
             await server.SignInPlayer(player);
             player.Spawn(new Vector3(1, 2, 3));
 
@@ -50,7 +52,7 @@ public class RealmPlayerTests : RealmIntegrationTestingBase
         for(int i = 0; i < 2; i++)
         {
             var player = await CreatePlayerAsync(false);
-            player.Name = "foo";
+            player.Name = name;
             await server.SignInPlayer(player);
             player.TrySpawnAtLastPosition().Should().BeTrue();
 

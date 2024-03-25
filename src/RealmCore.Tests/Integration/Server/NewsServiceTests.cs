@@ -1,6 +1,7 @@
 ﻿namespace RealmCore.Tests.Integration.Server;
 
-public class NewsServiceTests : RealmIntegrationTestingBase
+[Collection("IntegrationTests")]
+public class NewsServiceTests : RealmRemoteDatabaseIntegrationTestingBase
 {
     protected override string DatabaseName => "PlayerNotificationsTests";
 
@@ -13,16 +14,21 @@ public class NewsServiceTests : RealmIntegrationTestingBase
         var newsService = server.GetRequiredService<INewsService>();
         var context = server.GetRequiredService<IDb>();
 
+        var tag1 = Guid.NewGuid().ToString();
+        var tag2 = Guid.NewGuid().ToString();
+        var tag3 = Guid.NewGuid().ToString();
+
         var tags = new List<TagData>
         {
-            new TagData{ Tag = "tag1" },
-            new TagData{ Tag = "tag2" },
-            new TagData{ Tag = "tag3" },
+            new TagData{ Tag = tag1 },
+            new TagData{ Tag = tag2 },
+            new TagData{ Tag = tag3 },
         };
+        var title = Guid.NewGuid().ToString();
 
         context.News.Add(new NewsData
         {
-            Title = "title1",
+            Title = $"title1{title}",
             Excerpt = "excerpt",
             Content = "content",
             PublishTime = now.AddMinutes(-2),
@@ -40,7 +46,7 @@ public class NewsServiceTests : RealmIntegrationTestingBase
         });
         context.News.Add(new NewsData
         {
-            Title = "title2",
+            Title = $"title2{title}",
             Excerpt = "excerpt",
             Content = "content",
             PublishTime = now.AddMinutes(-1),
@@ -58,7 +64,7 @@ public class NewsServiceTests : RealmIntegrationTestingBase
         });
         context.News.Add(new NewsData
         {
-            Title = "title2 not visible",
+            Title = $"title2 not visible{title}",
             Excerpt = "excerpt",
             Content = "content",
             PublishTime = now.AddMinutes(1),
@@ -76,27 +82,31 @@ public class NewsServiceTests : RealmIntegrationTestingBase
         });
         await context.SaveChangesAsync();
 
-        var newsList = await newsService.Get();
+        var newsList = await newsService.Get(2);
         newsList.Should().BeEquivalentTo(new List<NewsDto>
         {
             new NewsDto
             {
-                Id = 1,
-                Title = "title1",
+                Title = $"title1{title}",
                 Excerpt = "excerpt",
                 Content = "content",
                 PublishTime = now.AddMinutes(-2),
-                Tags = new string[]{ "tag1", "tag2" }
+                Tags = [tag1, tag2]
             },
             new NewsDto
             {
-                Id = 2,
-                Title = "title2",
+                Title = $"title2{title}",
                 Excerpt = "excerpt",
                 Content = "content",
                 PublishTime = now.AddMinutes(-1),
-                Tags = new string[]{ "tag2", "tag3" }
+                Tags = [tag2, tag3]
             },
-        }, options => options.Using<DateTime>(ctx => ctx.Subject.Should().BeCloseTo(ctx.Expectation)).WhenTypeIs<DateTime>());
+        }, options =>
+        {
+            options.Using<DateTime>(ctx => ctx.Subject.Should().BeCloseTo(ctx.Expectation)).WhenTypeIs<DateTime>();
+            options.Excluding(ctx => ctx.Id);
+
+            return options;
+        });
     }
 }

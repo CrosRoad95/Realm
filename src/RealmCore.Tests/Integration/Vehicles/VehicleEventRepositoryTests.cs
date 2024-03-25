@@ -1,6 +1,7 @@
 ﻿namespace RealmCore.Tests.Integration.Vehicles;
 
-public class VehicleEventRepositoryTests : RealmIntegrationTestingBase
+[Collection("IntegrationTests")]
+public class VehicleEventRepositoryTests : RealmRemoteDatabaseIntegrationTestingBase
 {
     protected override string DatabaseName => "VehicleEventRepositoryTests";
 

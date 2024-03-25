@@ -1,37 +1,30 @@
 ﻿namespace RealmCore.TestingTools;
 
-public abstract class RealmIntegrationTestingBase<TRealmTestingServer, TRealmPlayer> : RealmTestingBase<TRealmTestingServer, TRealmPlayer>, IAsyncLifetime
+public abstract class RealmIntegrationTestingBase<TRealmTestingServer, TRealmPlayer> : RealmTestingBase<TRealmTestingServer, TRealmPlayer>
     where TRealmTestingServer : RealmTestingServer<TRealmPlayer>
     where TRealmPlayer : Player
 {
-    protected abstract string DatabaseName { get; }
-
-    private MySqlContainer? _mySqlContainer;
-    private MySqlContainer _MySqlContainer
-    {
-        get
-        {
-            if (_mySqlContainer == null)
-                _mySqlContainer = new MySqlBuilder().WithDatabase(DatabaseName).Build();
-            return _mySqlContainer;
-        }
-    }
+    protected abstract string GetConnectionString();
 
     protected async Task<TRealmTestingServer> CreateServerAsync(Action<ServerBuilder>? configureBuilder = null, Action<ServiceCollection>? configureServices = null)
     {
         if (_server == null)
         {
-            _server = CreateServer(new TestConfigurationProvider(_MySqlContainer.GetConnectionString()), configureBuilder, configureServices);
+            _server = CreateServer(new TestConfigurationProvider(GetConnectionString()), configureBuilder, configureServices);
             await _server.GetRequiredService<IDb>().MigrateAsync();
         }
         return _server;
     }
 
-    protected virtual async Task<TRealmPlayer> CreatePlayerAsync(bool signedIn = true, string name = "TestPlayer")
+    protected virtual async Task<TRealmPlayer> CreatePlayerAsync(bool signedIn = true, string baseName = "TestPlayer")
     {
+
         if (_server == null)
             throw new Exception("Server not created.");
+
+        var name = $"{baseName}{Guid.NewGuid()}";
         var player = CreatePlayer(name);
+
         if (signedIn)
         {
             if(player is RealmPlayer realmPlayer)
@@ -43,12 +36,14 @@ public abstract class RealmIntegrationTestingBase<TRealmTestingServer, TRealmPla
         return player;
     }
 
-    protected override TRealmPlayer CreatePlayer(string name = "TestPlayer")
+    protected override TRealmPlayer CreatePlayer(string baseName = "TestPlayer")
     {
         if (_server == null)
             throw new Exception("Server not created.");
 
+        var name = $"{baseName}{Guid.NewGuid()}";
         var player = _server.CreatePlayer(name: name);
+
         if (player.IsDestroyed)
             return player;
 
@@ -64,22 +59,4 @@ public abstract class RealmIntegrationTestingBase<TRealmTestingServer, TRealmPla
         vehicle.PersistentId.Should().NotBe(0);
         return vehicle;
     }
-
-    public Task InitializeAsync() => _MySqlContainer.StartAsync();
-
-    public Task DisposeAsync() => _MySqlContainer.DisposeAsync().AsTask();
-}
-
-public abstract class RealmIntegrationTestingBase : RealmIntegrationTestingBase<RealmTestingServer, RealmTestingPlayer>
-{
-    protected override RealmTestingServer CreateServer(TestConfigurationProvider? cnofiguration = null, Action<ServerBuilder>? configureBuilder = null, Action<ServiceCollection>? configureServices = null)
-    {
-        _server ??= new RealmTestingServer(cnofiguration ?? new TestConfigurationProvider(""), configureBuilder, services =>
-        {
-            services.AddRealmTestingServices(true);
-            configureServices?.Invoke(services);
-        });
-        return _server;
-    }
-
 }

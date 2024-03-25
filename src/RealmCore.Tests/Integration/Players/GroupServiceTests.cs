@@ -1,6 +1,7 @@
 ﻿namespace RealmCore.Tests.Integration.Players;
 
-public class GroupServiceTests : RealmIntegrationTestingBase
+[Collection("IntegrationTests")]
+public class GroupServiceTests : RealmRemoteDatabaseIntegrationTestingBase
 {
     protected override string DatabaseName => "PlayerNotificationsTests";
 
@@ -8,15 +9,16 @@ public class GroupServiceTests : RealmIntegrationTestingBase
     public async Task GroupShouldBePossibleToCreate()
     {
         var server = await CreateServerAsync();
-        var player = await CreatePlayerAsync();
 
         var groupService = server.GetRequiredService<IGroupService>();
 
-        await groupService.CreateGroup("foo", "TG1", GroupKind.Regular);
+        var groupName = Guid.NewGuid().ToString();
 
-        var group = await groupService.GetGroupByName("foo");
+        await groupService.CreateGroup(groupName, groupName[..8], GroupKind.Regular);
 
-        group.Value.name.Should().Be("foo");
+        var group = await groupService.GetGroupByName(groupName);
+
+        group.Value.name.Should().Be(groupName);
     }
 
     //[Fact]
@@ -42,12 +44,13 @@ public class GroupServiceTests : RealmIntegrationTestingBase
 
         var groupService = server.GetRequiredService<IGroupService>();
 
-        var group = await groupService.CreateGroup("Test group3", "TG3", GroupKind.Regular);
+        var groupName = Guid.NewGuid().ToString();
+        var group = await groupService.CreateGroup(groupName, groupName[..8], GroupKind.Regular);
 
         await groupService.TryAddMember(player, group.id, 1, "Leader");
 
         var member = player.Groups.GetMemberOrDefault(group.id) ?? throw new InvalidOperationException();
-        var group2 = await groupService.GetGroupByName("Test group3");
+        var group2 = await groupService.GetGroupByName(groupName);
         member.GroupId.Should().Be(group.id);
         member.RankName.Should().Be("Leader");
         member.Rank.Should().Be(1);

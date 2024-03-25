@@ -1,6 +1,7 @@
 ﻿namespace RealmCore.Tests.Integration.Players;
 
-public class PlayerNotificationsTests : RealmIntegrationTestingBase
+[Collection("IntegrationTests")]
+public class PlayerNotificationsTests : RealmRemoteDatabaseIntegrationTestingBase
 {
     protected override string DatabaseName => "PlayerNotificationsTests";
 
@@ -15,14 +16,14 @@ public class PlayerNotificationsTests : RealmIntegrationTestingBase
         var playerNotificationsFeatureMonitor = player.Notifications.Monitor();
         var playerNotificationsMonitor = playerNotifications.Monitor();
 
-        await playerNotifications.Create(player, "test title", "test desc", "excerpt", CancellationToken.None);
+        var createdNotificationDto = await playerNotifications.Create(player, "test title", "test desc", "excerpt", CancellationToken.None);
 
         player.Notifications.Count().Should().Be(1);
         var notification = player.Notifications.First();
 
         notification.Should().BeEquivalentTo(new UserNotificationDto
         {
-            Id = 1,
+            Id = createdNotificationDto.Id,
             Title = "test title",
             Content = "test desc",
             Excerpt = "excerpt",

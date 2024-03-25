@@ -3,7 +3,8 @@ using RealmCore.Server.Modules.Pickups;
 
 namespace RealmCore.Tests.Integration.Vehicles;
 
-public class VehiclesPersistence : RealmIntegrationTestingBase
+[Collection("IntegrationTests")]
+public class VehiclesPersistence : RealmRemoteDatabaseIntegrationTestingBase
 {
     protected override string DatabaseName => "VehiclesPersistence";
 
@@ -201,8 +202,18 @@ internal class TestElementFactory : IElementFactory
 
     }
 
-    public Task<RealmVehicle> CreateVehicle(Location location, VehicleModel model, Func<RealmVehicle, Task> elementBuilder)
+    public async Task<RealmVehicle> CreateVehicle(Location location, VehicleModel model, Func<RealmVehicle, Task> elementBuilder)
     {
-        throw new NotImplementedException();
+        var vehicle = new TestRealmVehicle(_serviceProvider, model, location.Position)
+        {
+            Rotation = location.Rotation,
+            Interior = location.Interior ?? 0,
+            Dimension = location.Dimension ?? 0,
+        };
+
+        if(elementBuilder != null)
+            await elementBuilder(vehicle);
+        AssociateWithServer(vehicle);
+        return vehicle;
     }
 }

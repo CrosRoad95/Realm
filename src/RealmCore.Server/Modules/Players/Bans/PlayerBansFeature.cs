@@ -108,7 +108,7 @@ internal sealed class PlayerBansFeature : IPlayerBansFeature, IUsesUserPersisten
         {
             var ban = GetBanByType(type);
             if (ban != null)
-                throw new InvalidOperationException();
+                throw new InvalidOperationException(); // TODO: Replace with fluent exception
 
             _bans.Add(banData);
         }
