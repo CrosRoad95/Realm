@@ -18,12 +18,16 @@ internal class TestJob : JobSession
         objective.AddBlip(BlipIcon.North);
         objective.Completed += ObjectiveACompleted;
 
-        var worldObject = _elementFactory2.CreateFocusableObject(new Location(379.00f, -102.77f, 1.24f), ObjectModel.Gunbox);
+        var worldObject = _elementFactory2.CreateFocusableObject(new Location(379.00f, -95.77f, 1.24f), ObjectModel.Gunbox);
         worldObject.Interaction = new LiftableInteraction();
         worldObject.TrySetOwner(Player);
+
         var objective2 = AddObjective(new TransportObjectObjective(worldObject, new Location(379.00f, -112.77f, 2.0f)));
+        objective2.AddMarker(MarkerType.Arrow, 1, Color.Green);
         objective2.Completed += ObjectiveBCompleted;
-        var objective3 = AddObjective(new TransportObjectObjective(new Location(379.00f, -105.77f, 1.0f), 2.0f, true));
+
+        var objective3 = AddObjective(new TransportObjectObjective(new Location(379.00f, -105.77f, 2.0f), 4.0f));
+        objective3.AddMarker(MarkerType.Arrow, 1, Color.White);
         objective3.Completed += ObjectiveDCompleted;
 
         var subObjective1 = new MarkerEnterObjective(new Location(386.9004f, -89.74414f, 3.8843315f));

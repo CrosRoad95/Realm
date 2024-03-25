@@ -5,8 +5,6 @@ public class TransportObjectObjective : Objective
     private Element? _element;
     private readonly Location _destination;
     private readonly float _range;
-    private readonly bool _withMarker;
-    private RealmMarker? _marker;
     private IElementCollection _elementCollection = default!;
     private IScopedElementFactory _scopedElementFactory = default!;
     public Func<Element, bool>? CheckElement { get; set; }
@@ -22,11 +20,10 @@ public class TransportObjectObjective : Objective
         _element.Destroyed += HandleDestroyed;
     }
 
-    public TransportObjectObjective(Location destination, float range = 2, bool withMarker = false)
+    public TransportObjectObjective(Location destination, float range = 2)
     {
         _destination = destination;
         _range = range;
-        _withMarker = withMarker;
     }
 
     private void HandleDestroyed(Element element)
@@ -42,8 +39,6 @@ public class TransportObjectObjective : Objective
     {
         _elementCollection = Player.GetRequiredService<IElementCollection>();
         _scopedElementFactory = Player.GetRequiredService<IScopedElementFactory>();
-        if (_withMarker)
-            _marker = ElementFactory.CreateMarker(_destination, MarkerType.Cylinder, 1, Color.Red);
     }
 
     public override void Update()
@@ -60,7 +55,7 @@ public class TransportObjectObjective : Objective
                     {
                         if (worldObject.Interaction is LiftableInteraction liftableInteraction)
                         {
-                            if (liftableInteraction.Owner == null)
+                            if (liftableInteraction.Owner == null || liftableInteraction.Owner == Player)
                                 Complete(this, element);
                         }
                         else
@@ -76,7 +71,7 @@ public class TransportObjectObjective : Objective
                     {
                         if (worldObject.Interaction is LiftableInteraction liftableInteraction)
                         {
-                            if (liftableInteraction.Owner == null)
+                            if (liftableInteraction.Owner == null || liftableInteraction.Owner == Player)
                                 Complete(this, element);
                         }
                         else
@@ -93,7 +88,7 @@ public class TransportObjectObjective : Objective
                 if (_element is RealmWorldObject worldObject)
                 {
                     if (worldObject.Interaction is LiftableInteraction liftableInteraction)
-                        if (liftableInteraction.Owner == null)
+                        if (liftableInteraction.Owner == null || liftableInteraction.Owner == Player)
                             Complete(this, _element);
                 }
             }
@@ -106,12 +101,6 @@ public class TransportObjectObjective : Objective
         {
             _element.Destroy();
             _element = null;
-        }
-
-        if (_marker != null)
-        {
-            _marker.Destroy();
-            _marker = null;
         }
 
         CheckElement = null;

@@ -1,4 +1,6 @@
-﻿namespace RealmCore.Server.Modules.Players.Jobs.Objectives;
+﻿using SlipeServer.Server.Elements;
+
+namespace RealmCore.Server.Modules.Players.Jobs.Objectives;
 
 public abstract class Objective : IDisposable
 {
@@ -16,6 +18,8 @@ public abstract class Objective : IDisposable
     public RealmPlayer Player { get => _player ?? throw new InvalidOperationException(); internal set => _player = value; }
 
     private Blip? _blip;
+    private RealmMarker? _marker;
+
     public abstract Location Location { get; }
     protected abstract void Load();
     public virtual void Update() { }
@@ -58,16 +62,31 @@ public abstract class Objective : IDisposable
 
         _blip = ElementFactory.CreateBlip(Location, blipIcon);
     }
+    
+    public void AddMarker(MarkerType markerType, float size, Color color)
+    {
+        if (_marker != null)
+            throw new InvalidOperationException();
+
+        _marker = ElementFactory.CreateMarker(Location, markerType, size, color);
+    }
 
     public void RemoveBlip()
     {
-        if (_blip != null && _blip.Destroy())
-            _blip = null;
+        _blip?.Destroy();
+        _blip = null;
+    }
+
+    public void RemoveMarker()
+    {
+        _marker?.Destroy();
+        _marker = null;
     }
 
     public virtual void Dispose()
     {
         RemoveBlip();
+        RemoveMarker();
 
         Disposed?.Invoke(this);
     }
