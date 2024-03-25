@@ -2,9 +2,12 @@
 
 internal class TestJob : JobSession
 {
+    private readonly IElementFactory _elementFactory2;
+
     public override string Name => "Test";
-    public TestJob(PlayerContext playerContext, IScopedElementFactory scopedElementFactory, IDateTimeProvider dateTimeProvider) : base(playerContext, scopedElementFactory, dateTimeProvider)
+    public TestJob(PlayerContext playerContext, IDateTimeProvider dateTimeProvider, IElementFactory elementFactory) : base(playerContext, dateTimeProvider)
     {
+        _elementFactory2 = elementFactory;
     }
 
     public override short JobId => 1;
@@ -15,12 +18,12 @@ internal class TestJob : JobSession
         objective.AddBlip(BlipIcon.North);
         objective.Completed += ObjectiveACompleted;
 
-        var worldObject = _elementFactory.CreateObject(new Location(379.00f, -102.77f, 1.24f), ObjectModel.Gunbox);
+        var worldObject = _elementFactory2.CreateFocusableObject(new Location(379.00f, -102.77f, 1.24f), ObjectModel.Gunbox);
         worldObject.Interaction = new LiftableInteraction();
         worldObject.TrySetOwner(Player);
         var objective2 = AddObjective(new TransportObjectObjective(worldObject, new Location(379.00f, -112.77f, 2.0f)));
         objective2.Completed += ObjectiveBCompleted;
-        var objective3 = AddObjective(new TransportObjectObjective(new Location(379.00f, -105.77f, 2.0f), 2, true));
+        var objective3 = AddObjective(new TransportObjectObjective(new Location(379.00f, -105.77f, 1.0f), 2.0f, true));
         objective3.Completed += ObjectiveDCompleted;
 
         var subObjective1 = new MarkerEnterObjective(new Location(386.9004f, -89.74414f, 3.8843315f));

@@ -9,11 +9,13 @@ public interface IClientInterfaceService
     event Action<Player, CultureInfo>? ClientCultureInfoChanged;
     event Action<Player, int, int>? ClientScreenSizeChanged;
     event Action<Player, Element?, string?>? FocusedElementChanged;
+    event Action<Player, Element?>? ClickedElementChanged;
 
     internal event Action<Element>? FocusableAdded;
     internal event Action<Element>? FocusableRemoved;
     internal event Action<Player, bool>? FocusableRenderingChanged;
-    event Action<Player, Element?>? ClickedElementChanged;
+    internal event Action<Element, Player>? FocusableForAdded;
+    internal event Action<Element, Player>? FocusableForRemoved;
 
     void AddFocusable(Element element);
     void RemoveFocusable(Element element);
@@ -27,6 +29,8 @@ public interface IClientInterfaceService
     internal void BroadcastPlayerScreenSize(Player player, int x, int y);
     internal void BroadcastPlayerElementFocusChanged(Player player, Element? newFocusedElement, string? childElement);
     void BroadcastClickedElementChanged(Player player, Element? clickedElement);
+    void AddFocusableFor(Element element, Player player);
+    void RemoveFocusableFor(Element element, Player player);
 }
 
 internal sealed class ClientInterfaceService : IClientInterfaceService
@@ -38,6 +42,8 @@ internal sealed class ClientInterfaceService : IClientInterfaceService
     public event Action<Player, Element?>? ClickedElementChanged;
     public event Action<Element>? FocusableAdded;
     public event Action<Element>? FocusableRemoved;
+    public event Action<Element, Player>? FocusableForAdded;
+    public event Action<Element, Player>? FocusableForRemoved;
     public event Action<Player, bool>? FocusableRenderingChanged;
 
     public ClientInterfaceService()
@@ -93,6 +99,16 @@ internal sealed class ClientInterfaceService : IClientInterfaceService
     public void RemoveFocusable(Element element)
     {
         FocusableRemoved?.Invoke(element);
+    }
+
+    public void AddFocusableFor(Element element, Player player)
+    {
+        FocusableForAdded?.Invoke(element, player);
+    }
+
+    public void RemoveFocusableFor(Element element, Player player)
+    {
+        FocusableForRemoved?.Invoke(element, player);
     }
 
     public void SetFocusableRenderingEnabled(Player player, bool enabled)

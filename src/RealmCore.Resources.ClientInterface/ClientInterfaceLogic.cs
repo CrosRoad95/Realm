@@ -33,9 +33,21 @@ internal class ClientInterfaceLogic
         luaEventService.AddEventHandler("sendScreenSize", HandleScreenSize);
         luaEventService.AddEventHandler("internalChangeFocusedElement", HandleFocusedElementChanged);
         luaEventService.AddEventHandler("clickedElementChanged", HandleClickedElementChanged);
+        _clientInterfaceService.FocusableRenderingChanged += HandlePlayerFocusableRenderingEnabled;
         _clientInterfaceService.FocusableAdded += HandleFocusableAdded;
         _clientInterfaceService.FocusableRemoved += HandleFocusableRemoved;
-        _clientInterfaceService.FocusableRenderingChanged += HandlePlayerFocusableRenderingEnabled;
+        _clientInterfaceService.FocusableForAdded += HandleFocusableForAdded;
+        _clientInterfaceService.FocusableForRemoved += HandleFocusableForRemoved;
+    }
+
+    private void HandleFocusableForRemoved(Element element, Player player)
+    {
+        _luaEventHub.Invoke(player, x => x.RemoveFocusable(), element);
+    }
+
+    private void HandleFocusableForAdded(Element element, Player player)
+    {
+        _luaEventHub.Invoke(player, x => x.AddFocusable(), element);
     }
 
     private void HandleFocusableAdded(Element element)

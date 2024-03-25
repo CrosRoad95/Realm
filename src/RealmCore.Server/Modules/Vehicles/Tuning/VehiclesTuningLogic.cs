@@ -10,7 +10,7 @@ internal sealed class VehiclesTuningLogic
         elementFactory.ElementCreated += HandleElementCreated;
     }
 
-    private void HandleElementCreated(Element element)
+    private void HandleElementCreated(IElementFactory elementFactory, Element element)
     {
         if (element is RealmVehicle vehicle)
             vehicle.Upgrades.Rebuild += HandleRebuild;

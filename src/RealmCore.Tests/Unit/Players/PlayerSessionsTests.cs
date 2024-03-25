@@ -33,7 +33,7 @@ public class PlayerSessionsTests : RealmUnitTestingBase
     internal sealed class TestJobSession : JobSession
     {
         public override string Name => "TestJob";
-        public TestJobSession(PlayerContext playerContext, IScopedElementFactory scopedElementFactory, IDateTimeProvider dateTimeProvider) : base(playerContext, scopedElementFactory, dateTimeProvider)
+        public TestJobSession(PlayerContext playerContext, IDateTimeProvider dateTimeProvider) : base(playerContext, dateTimeProvider)
         {
         }
 

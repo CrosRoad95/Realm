@@ -16,7 +16,7 @@ internal sealed class ClientInterfaceResourceLogic
         _elementFactory.ElementCreated += HandleElementCreated;
     }
 
-    private void HandleElementCreated(Element element)
+    private void HandleElementCreated(IElementFactory elementFactory, Element element)
     {
         if (element is IFocusableElement focusableElement)
         {

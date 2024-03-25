@@ -1,10 +1,10 @@
 ﻿namespace RealmCore.Server.Modules.World;
 
-internal sealed class FocusableElementsLogic
+internal sealed class FocusableElementsLogic : PlayerLifecycle
 {
     private readonly IClientInterfaceService _clientInterfaceService;
 
-    public FocusableElementsLogic(IElementFactory elementFactory, IClientInterfaceService clientInterfaceService)
+    public FocusableElementsLogic(MtaServer mtaServer, IElementFactory elementFactory, IClientInterfaceService clientInterfaceService) : base(mtaServer)
     {
         _clientInterfaceService = clientInterfaceService;
         _clientInterfaceService.FocusedElementChanged += HandleFocusedElementChanged;
@@ -12,7 +12,7 @@ internal sealed class FocusableElementsLogic
         elementFactory.ElementCreated += HandleElementCreated;
     }
 
-    private void HandleElementCreated(Element element)
+    private void HandleElementCreated(IElementFactory elementFactory, Element element)
     {
         if (element is IFocusableElement)
         {
@@ -20,13 +20,41 @@ internal sealed class FocusableElementsLogic
             element.Destroyed += HandleDestroyed;
         }
     }
+    
+    private void HandleScopedElementCreated(IElementFactory elementFactory, Element element)
+    {
+        if (element is not IFocusableElement)
+            return;
+
+        var scopedElementFactory = (IScopedElementFactory)elementFactory;
+        var player = scopedElementFactory.Player;
+        _clientInterfaceService.AddFocusableFor(element, player);
+
+        void handleScopedDestroyed(Element element)
+        {
+            element.Destroyed -= handleScopedDestroyed;
+            _clientInterfaceService.RemoveFocusableFor(element, player);
+        }
+
+        element.Destroyed += handleScopedDestroyed;
+    }
+
+    protected override void PlayerJoined(RealmPlayer player)
+    {
+        player.ElementFactory.ElementCreated += HandleScopedElementCreated;
+    }
+
+    protected override void PlayerLeft(RealmPlayer player)
+    {
+        player.ElementFactory.ElementCreated -= HandleScopedElementCreated;
+    }
 
     private void HandleDestroyed(Element element)
     {
         element.Destroyed -= HandleDestroyed;
         _clientInterfaceService.RemoveFocusable(element);
     }
-
+    
     private void HandleClickedElementChanged(Player plr, Element? clickedElement)
     {
         ((RealmPlayer)plr).LastClickedElement = clickedElement;

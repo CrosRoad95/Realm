@@ -4,7 +4,7 @@ public abstract class JobSession : Session
 {
     public abstract short JobId { get; }
 
-    private readonly object _objectivesLock = new();
+    private readonly object _lock = new();
     private readonly List<Objective> _objectives = [];
     protected readonly IScopedElementFactory _elementFactory;
     private int _completedObjectives = 0;
@@ -16,9 +16,25 @@ public abstract class JobSession : Session
     public event Action<JobSession, Objective>? ObjectiveAdded;
     public event Action<JobSession, Objective>? ObjectiveCompleted;
     public event Action<JobSession, Objective>? ObjectiveInCompleted;
-    public JobSession(PlayerContext playerContext, IScopedElementFactory scopedElementFactory, IDateTimeProvider dateTimeProvider) : base(playerContext.Player, dateTimeProvider)
+
+    public JobSession(PlayerContext playerContext, IDateTimeProvider dateTimeProvider) : base(playerContext.Player, dateTimeProvider)
     {
-        _elementFactory = scopedElementFactory.CreateScope();
+        _elementFactory = Player.ElementFactory.CreateScope();
+
+        Player.Scheduler.ScheduleJob(HandleUpdate, TimeSpan.FromMilliseconds(200), CreateCancellationToken());
+    }
+
+    private Task HandleUpdate()
+    {
+        lock (_lock)
+        {
+            foreach (var objective in _objectives)
+            {
+                objective.Update();
+            }
+        }
+
+        return Task.CompletedTask;
     }
 
     protected override void OnEnded()
@@ -27,7 +43,7 @@ public abstract class JobSession : Session
 
         _elementFactory?.Dispose();
 
-        lock (_objectivesLock)
+        lock (_lock)
         {
             while (_objectives.Count > 0)
             {
@@ -41,7 +57,7 @@ public abstract class JobSession : Session
     protected bool RemoveObjective(Objective objective)
     {
         var empty = false;
-        lock (_objectivesLock)
+        lock (_lock)
         {
             if (!_objectives.Remove(objective))
                 return false;
@@ -55,7 +71,7 @@ public abstract class JobSession : Session
 
     protected TObjective AddObjective<TObjective>(TObjective objective) where TObjective : Objective
     {
-        lock (_objectivesLock)
+        lock (_lock)
             _objectives.Add(objective);
 
         try
@@ -64,7 +80,7 @@ public abstract class JobSession : Session
         }
         catch (Exception)
         {
-            lock (_objectivesLock)
+            lock (_lock)
                 _objectives.Remove(objective);
             throw;
         }

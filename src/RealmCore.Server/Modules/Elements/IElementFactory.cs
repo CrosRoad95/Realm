@@ -2,7 +2,7 @@
 
 public interface IElementFactory
 {
-    event Action<Element>? ElementCreated;
+    event Action<IElementFactory, Element>? ElementCreated;
 
     void AssociateWithServer(Element element);
     RealmBlip CreateBlip(Location location, BlipIcon blipIcon, Action<RealmBlip>? elementBuilder = null);

@@ -7,7 +7,6 @@ public class TransportObjectObjective : Objective
     private readonly float _range;
     private readonly bool _withMarker;
     private RealmMarker? _marker;
-    private bool _loaded = false;
     private IElementCollection _elementCollection = default!;
     private IScopedElementFactory _scopedElementFactory = default!;
     public Func<Element, bool>? CheckElement { get; set; }
@@ -45,14 +44,10 @@ public class TransportObjectObjective : Objective
         _scopedElementFactory = Player.GetRequiredService<IScopedElementFactory>();
         if (_withMarker)
             _marker = ElementFactory.CreateMarker(_destination, MarkerType.Cylinder, 1, Color.Red);
-        _loaded = true;
     }
 
     public override void Update()
     {
-        if (!_loaded)
-            return;
-
         if (_element == null)
         {
             // TODO: Check interior, dimension

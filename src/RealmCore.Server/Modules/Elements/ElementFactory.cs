@@ -5,7 +5,7 @@ public class ElementFactory : IElementFactory
     private readonly MtaServer _server;
     private readonly IServiceProvider _serviceProvider;
 
-    public event Action<Element>? ElementCreated;
+    public event Action<IElementFactory, Element>? ElementCreated;
     public ElementFactory(MtaServer server, IPlayersEventManager playersEventManager, IServiceProvider serviceProvider)
     {
         _server = server;
@@ -15,12 +15,12 @@ public class ElementFactory : IElementFactory
 
     private void HandlePlayerJoined(Player player)
     {
-        ElementCreated?.Invoke(player);
+        RelayCreated(player);
     }
 
     public void RelayCreated(Element element)
     {
-        ElementCreated?.Invoke(element);
+        ElementCreated?.Invoke(this, element);
     }
 
     public void AssociateWithServer(Element element)

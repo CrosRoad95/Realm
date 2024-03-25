@@ -12,12 +12,14 @@ internal class ScopedElementFactory : IScopedElementFactory
     private readonly RealmPlayer _player;
     private bool _disposed;
     public event Action<ScopedElementFactory>? Disposed;
-    public event Action<Element>? ElementCreated;
+    public event Action<IElementFactory, Element>? ElementCreated;
     private readonly object _lock = new();
     private readonly List<Element> _createdElements = [];
     private readonly List<ICollisionDetection> _collisionDetection = [];
     private readonly ScopedMapIdGenerator _elementIdGenerator;
 
+    public RealmPlayer Player => _player;
+    
     public IEnumerable<Element> CreatedElements
     {
         get
@@ -53,7 +55,7 @@ internal class ScopedElementFactory : IScopedElementFactory
         _elementIdGenerator = elementIdGenerator;
     }
 
-    private void HandleInnerElementCreated(Element createdElement)
+    private void HandleInnerElementCreated(IElementFactory elementFactory, Element createdElement)
     {
         Add(createdElement);
     }
@@ -87,7 +89,6 @@ internal class ScopedElementFactory : IScopedElementFactory
             _createdElements.Add(element);
             if (element is ICollisionDetection collisionDetection)
                 _collisionDetection.Add(collisionDetection);
-            ElementCreated?.Invoke(element);
             element.Destroyed += HandleDestroyed;
         }
     }
@@ -125,6 +126,8 @@ internal class ScopedElementFactory : IScopedElementFactory
                 marker.CollisionShape.Id = (ElementId)_elementIdGenerator.GetId();
             marker.CollisionShape.AssociateWith(_player);
         }
+
+        RelayCreated(element);
     }
 
     public RealmCollisionSphere CreateCollisionSphere(Vector3 position, float radius, byte? interior = null, ushort? dimension = null, Action<RealmCollisionSphere>? elementBuilder = null)
@@ -252,7 +255,7 @@ internal class ScopedElementFactory : IScopedElementFactory
 
     public void RelayCreated(Element element)
     {
-        ElementCreated?.Invoke(element);
+        ElementCreated?.Invoke(this, element);
     }
 
     private void ThrowIfDisposed()

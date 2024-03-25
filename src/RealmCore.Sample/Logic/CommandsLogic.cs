@@ -421,7 +421,13 @@ internal sealed class CommandsLogic
 
         _commandService.AddCommandHandler("spawnbox", (player, args) =>
         {
-            var worldObject = _elementFactory.CreateObject(new Location(player.Position + new Vector3(4, 0, -0.65f), Vector3.Zero), ObjectModel.Gunbox);
+            var worldObject = _elementFactory.CreateFocusableObject(new Location(player.Position + new Vector3(4, 0, -0.65f), Vector3.Zero), ObjectModel.Gunbox);
+            worldObject.Interaction = new LiftableInteraction();
+        });
+        
+        _commandService.AddCommandHandler("spawnscopedbox", (player, args) =>
+        {
+            var worldObject = player.ElementFactory.CreateFocusableObject(new Location(player.Position + new Vector3(4, 0, -0.65f), Vector3.Zero), ObjectModel.Gunbox);
             worldObject.Interaction = new LiftableInteraction();
         });
 

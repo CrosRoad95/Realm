@@ -15,7 +15,7 @@ internal class SamplePickupsLogic
         elementFactory.ElementCreated += HandleElementCreated;
     }
 
-    private void HandleElementCreated(Element element)
+    private void HandleElementCreated(IElementFactory elementFactory, Element element)
     {
         {
         if (element is RealmPickup pickup && pickup.ElementName != null && pickup.ElementName.StartsWith("fractionTestPickup"))
@@ -46,13 +46,10 @@ internal class SamplePickupsLogic
             {
                 pickup.CollisionDetection.Entered += (enteredPickup, element) =>
                 {
-                    var player = (RealmPlayer)element;
-
-                    var jobSession = player.Sessions.GetSession<JobSession>();
-                    if (jobSession != null || jobSession is not JobSession)
+                    if (element is not RealmPlayer player)
                         return;
 
-                    if (player.Sessions.TryGetSession(out JobSession pendingJobSession))
+                    if (player.Sessions.TryGetSession(out JobSession jobSession))
                     {
                         player.Sessions.EndSession(jobSession);
                         var elapsed = jobSession.Elapsed;

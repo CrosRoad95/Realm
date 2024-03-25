@@ -12,7 +12,7 @@ internal sealed class PickupLogic
         _elementFactory.ElementCreated += HandleElementCreated;
     }
 
-    private void HandleElementCreated(Element element)
+    private void HandleElementCreated(IElementFactory elementFactory, Element element)
     {
         if (element is not RealmPickup pickup)
             return;

@@ -55,9 +55,9 @@ internal sealed partial class PlayerGameplayLogic
             if (element == null)
                 return;
 
-            if (element is RealmWorldObject interactWorldObject && element is IInteraction interaction && interaction.Interaction != null && player.DistanceTo(element) < interaction.Interaction.MaxDistance)
+            if (element is RealmWorldObject interactWorldObject && element is IInteractionHolder interactionHolder && interactionHolder.Interaction != null && player.DistanceTo(element) < interactionHolder.Interaction.MaxDistance)
             {
-                switch (interaction)
+                switch (interactionHolder.Interaction)
                 {
                     case LiftableInteraction liftableInteraction when keyState == KeyState.Down:
                         if (player.IsLookingAt(element) && liftableInteraction.TryLift(player))
@@ -138,7 +138,7 @@ internal sealed partial class PlayerGameplayLogic
                 player.Gui.Current = buyVehicleGui;
             }
         }
-        if (element is IInteraction interaction)
+        if (element is IInteractionHolder interaction)
         {
             if (interaction.Interaction != null)
             {

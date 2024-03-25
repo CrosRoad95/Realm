@@ -14,7 +14,7 @@ internal sealed class ScopedCollisionShapeBehaviour
     {
         var player = (RealmPlayer)plr;
 
-        void handleElementCreated(Element element)
+        void handleElementCreated(IElementFactory elementFactory, Element element)
         {
             if (element is not ICollisionDetection collisionDetection)
                 return;

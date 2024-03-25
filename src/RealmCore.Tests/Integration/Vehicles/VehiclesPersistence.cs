@@ -98,7 +98,7 @@ internal class TestElementFactory : IElementFactory
     private readonly IElementFactory _innerFactory;
     private readonly IServiceProvider _serviceProvider;
 
-    public event Action<Element>? ElementCreated;
+    public event Action<IElementFactory, Element>? ElementCreated;
 
     public TestElementFactory([FromKeyedServices("ElementFactory")] IElementFactory innerFactory, IServiceProvider serviceProvider)
     {
@@ -107,9 +107,9 @@ internal class TestElementFactory : IElementFactory
         _innerFactory.ElementCreated += HandleElementCreated;
     }
 
-    private void HandleElementCreated(Element element)
+    private void HandleElementCreated(IElementFactory elementFactory, Element element)
     {
-        ElementCreated?.Invoke(element);
+        ElementCreated?.Invoke(this, element);
     }
 
     public void AssociateWithServer(Element element)

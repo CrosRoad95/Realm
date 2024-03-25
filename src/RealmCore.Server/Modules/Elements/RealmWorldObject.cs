@@ -1,6 +1,6 @@
 ﻿namespace RealmCore.Server.Modules.Elements;
 
-public class RealmWorldObject : WorldObject, IInteraction
+public class RealmWorldObject : WorldObject, IInteractionHolder
 {
     private readonly object _lock = new();
     private RealmPlayer? _owner;
