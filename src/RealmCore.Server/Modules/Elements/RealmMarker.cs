@@ -20,14 +20,14 @@ public class RealmMarker : Marker, ICollisionDetection, IElementName
         CollisionShape.ElementLeft += HandleElementLeft;
     }
 
-    private void HandleElementLeft(Element leftElement)
-    {
-        CollisionDetection.RelayLeft(leftElement);
-    }
-
     private void HandleElementEntered(Element enteredElement)
     {
         CollisionDetection.RelayEntered(enteredElement);
+    }
+
+    private void HandleElementLeft(Element leftElement)
+    {
+        CollisionDetection.RelayLeft(leftElement);
     }
 
     public void CheckElementWithin(Element element, bool matchInterior = true, bool matchDimension = true)

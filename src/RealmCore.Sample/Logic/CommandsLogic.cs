@@ -462,6 +462,14 @@ internal sealed class CommandsLogic
             _chatBox.OutputTo(player, $"Setting1: {player.Settings.Get(1)}");
         });
 
+        _commandService.AddCommandHandler("spawncolshapeforme", (player, args) =>
+        {
+            var marker = player.ElementFactory.CreateMarker(new Location(player.Position + new Vector3(4, 0, 0), Vector3.Zero), MarkerType.Arrow, 2, Color.Red);
+            marker.CollisionDetection.Entered += (that, enteredElement) =>
+            {
+                _chatBox.Output($"entered2 {enteredElement}");
+            };
+        });
         // TODO:
         //_commandService.AddCommandHandler("spawnboxforme", (player, args) =>
         //{

@@ -68,7 +68,6 @@
 		<Using Include="RealmCore.Server.Modules.Vehicles.Tuning" />
 		<Using Include="RealmCore.Server.Modules.World" />
 		<Using Include="RealmCore.Server.Modules.World.Triggers.CollisionShapes" />
-		<Using Include="RealmCore.Server.Modules.World.Triggers.Pickups" />
 		<Using Include="RealmCore.Resources.ClientInterface" />
 		<Using Include="RealmCore.Resources.Admin" />
 		<Using Include="RealmCore.Resources.AFK" />

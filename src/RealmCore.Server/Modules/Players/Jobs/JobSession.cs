@@ -4,7 +4,6 @@ public abstract class JobSession : Session
 {
     public abstract short JobId { get; }
 
-    private readonly object _lock = new();
     private readonly List<Objective> _objectives = [];
     protected readonly IScopedElementFactory _elementFactory;
     private int _completedObjectives = 0;

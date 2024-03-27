@@ -164,6 +164,7 @@ public static class ServiceCollectionExtensions
         services.AddKeyedSingleton<IElementFactory, ElementFactory>("ElementFactory");
         services.AddSingleton<IElementFactory>(x => x.GetRequiredKeyedService<IElementFactory>("ElementFactory"));
         services.AddScoped<IScopedElementFactory, ScopedElementFactory>();
+        services.AddScoped<PlayerScopedCollisionShapeBehaviour>();
         services.AddSingleton<IElementIdGenerator, RangedCollectionBasedElementIdGenerator>(x =>
             new RangedCollectionBasedElementIdGenerator(x.GetRequiredService<IElementCollection>(), IdGeneratorConstants.PlayerIdStart, IdGeneratorConstants.PlayerIdStop)
         );

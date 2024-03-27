@@ -14,6 +14,18 @@ public class RealmPickup : Pickup, ICollisionDetection, IElementName
     {
         CollisionDetection = new(serviceProvider, this);
         CollisionShape = new RealmCollisionSphere(serviceProvider, position, 1.5f);
+        CollisionShape.ElementEntered += HandleElementEntered;
+        CollisionShape.ElementLeft += HandleElementLeft;
+    }
+
+    private void HandleElementEntered(Element enteredElement)
+    {
+        CollisionDetection.RelayEntered(enteredElement);
+    }
+
+    private void HandleElementLeft(Element leftElement)
+    {
+        CollisionDetection.RelayLeft(leftElement);
     }
 
     public void CheckElementWithin(Element element, bool matchInterior = true, bool matchDimension = true)

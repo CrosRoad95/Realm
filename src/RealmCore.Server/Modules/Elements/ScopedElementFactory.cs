@@ -1,4 +1,7 @@
-﻿namespace RealmCore.Server.Modules.Elements;
+﻿using SlipeServer.Server.Elements;
+using System.Drawing;
+
+namespace RealmCore.Server.Modules.Elements;
 
 internal sealed class InnerScopedElementFactory : ScopedElementFactory
 {
@@ -198,11 +201,6 @@ internal class ScopedElementFactory : IScopedElementFactory
         throw new NotImplementedException();
     }
 
-    public RealmMarker CreateMarker(Location location, MarkerType markerType, Color color, Action<Element>? elementBuilder = null)
-    {
-        throw new NotImplementedException();
-    }
-
     public RealmPed CreatePed(Location location, PedModel pedModel, Action<RealmPed>? elementBuilder = null)
     {
         throw new NotImplementedException();
@@ -210,7 +208,16 @@ internal class ScopedElementFactory : IScopedElementFactory
 
     public RealmPickup CreatePickup(Location location, ushort model, Action<RealmPickup>? elementBuilder = null)
     {
-        throw new NotImplementedException();
+        ThrowIfDisposed();
+        var pickup = new RealmPickup(_player.ServiceProvider, location.Position, model)
+        {
+            Interior = location.Interior ?? _player.Interior,
+            Dimension = location.Dimension ?? _player.Dimension
+        };
+
+        elementBuilder?.Invoke(pickup);
+        AssociateWithPlayer(pickup);
+        return pickup;
     }
 
     public RealmRadarArea CreateRadarArea(Vector2 position, Vector2 size, Color color, byte? interior = null, ushort? dimension = null, Action<RealmRadarArea>? elementBuilder = null)
