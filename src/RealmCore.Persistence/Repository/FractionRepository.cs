@@ -78,6 +78,7 @@ internal sealed class FractionRepository : IFractionRepository
         {
             var query = _db.Fractions
                 .TagWithSource(nameof(FractionRepository))
+                .Include(x => x.Members)
                 .AsNoTracking()
                 .Where(x => x.Id == id && x.Code == code && x.Name == name);
             var existingFraction = await query.FirstOrDefaultAsync(cancellationToken);

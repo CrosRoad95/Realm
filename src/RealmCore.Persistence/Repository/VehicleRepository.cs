@@ -55,6 +55,7 @@ internal sealed class VehicleRepository : IVehicleRepository
         using var activity = Activity.StartActivity(nameof(GetLightVehiclesByUserId));
 
         var query = CreateQueryBase()
+            .TagWithSource(nameof(VehicleRepository))
             .AsNoTracking()
             .Where(x => x.UserAccesses.Any(x => x.UserId == userId))
             .Select(x => new LightInfoVehicleDto
@@ -72,6 +73,7 @@ internal sealed class VehicleRepository : IVehicleRepository
         using var activity = Activity.StartActivity(nameof(GetLightVehicleById));
 
         var query = CreateQueryBase()
+            .TagWithSource(nameof(VehicleRepository))
             .AsNoTracking()
             .Where(x => x.Id == vehicleId)
             .Select(x => new LightInfoVehicleDto
@@ -106,6 +108,7 @@ internal sealed class VehicleRepository : IVehicleRepository
         using var activity = Activity.StartActivity(nameof(GetReadOnlyById));
 
         var query = CreateQueryBase()
+            .TagWithSource(nameof(VehicleRepository))
             .AsNoTracking()
             .Where(x => x.Id == id);
 
@@ -117,6 +120,7 @@ internal sealed class VehicleRepository : IVehicleRepository
         using var activity = Activity.StartActivity(nameof(GetAllSpawnedVehiclesIds));
 
         var query = CreateQueryBase()
+            .TagWithSource(nameof(VehicleRepository))
             .IsSpawned()
             .Select(x => x.Id);
 
@@ -128,6 +132,7 @@ internal sealed class VehicleRepository : IVehicleRepository
         using var activity = Activity.StartActivity(nameof(GetById));
 
         var query = CreateQueryBase()
+            .TagWithSource(nameof(VehicleRepository))
             .Where(x => x.Id == id)
             .IncludeAll();
 
@@ -139,6 +144,7 @@ internal sealed class VehicleRepository : IVehicleRepository
         using var activity = Activity.StartActivity(nameof(SetSpawned));
 
         var query = CreateQueryBase()
+            .TagWithSource(nameof(VehicleRepository))
             .Where(x => x.Id == id);
 
         var vehicle = await query.FirstAsync(cancellationToken);
@@ -155,6 +161,7 @@ internal sealed class VehicleRepository : IVehicleRepository
         using var activity = Activity.StartActivity(nameof(SetKind));
 
         var query = CreateQueryBase()
+            .TagWithSource(nameof(VehicleRepository))
             .AsNoTracking()
             .Where(x => x.Id == id);
 
@@ -167,6 +174,7 @@ internal sealed class VehicleRepository : IVehicleRepository
         using var activity = Activity.StartActivity(nameof(IsSpawned));
 
         var query = CreateQueryBase()
+            .TagWithSource(nameof(VehicleRepository))
             .AsNoTracking()
             .Where(x => x.Id == id)
             .Select(x => x.Spawned);
@@ -179,6 +187,7 @@ internal sealed class VehicleRepository : IVehicleRepository
         using var activity = Activity.StartActivity(nameof(SoftRemove));
 
         var query = CreateQueryBase()
+            .TagWithSource(nameof(VehicleRepository))
             .AsNoTracking()
             .Where(x => x.Id == id);
 
@@ -191,8 +200,8 @@ internal sealed class VehicleRepository : IVehicleRepository
         using var activity = Activity.StartActivity(nameof(GetAllVehicleAccesses));
 
         var query = _db.VehicleUserAccess
-            .AsNoTracking()
             .TagWithSource(nameof(VehicleRepository))
+            .AsNoTracking()
             .Include(x => x.User)
             .Where(x => x.Vehicle != null && !x.Vehicle.IsRemoved)
             .Where(x => x.VehicleId == vehicleId);
@@ -204,8 +213,8 @@ internal sealed class VehicleRepository : IVehicleRepository
         using var activity = Activity.StartActivity(nameof(HasUserAccessTo));
 
         var query = _db.VehicleUserAccess
-            .AsNoTracking()
             .TagWithSource(nameof(VehicleRepository))
+            .AsNoTracking()
             .Where(x => x.VehicleId == vehicleId && x.UserId == userId && (accessType == null || accessType.Contains(x.AccessType)))
             .Where(x => x.Vehicle != null && !x.Vehicle.IsRemoved)
             .Select(x => x.UserId);
@@ -217,8 +226,8 @@ internal sealed class VehicleRepository : IVehicleRepository
         using var activity = Activity.StartActivity(nameof(GetOwner));
 
         var query = _db.VehicleUserAccess
-            .AsNoTracking()
             .TagWithSource(nameof(VehicleRepository))
+            .AsNoTracking()
             .Where(x => x.Vehicle != null && !x.Vehicle.IsRemoved)
             .Where(x => x.VehicleId == vehicleId && x.AccessType == 0)
             .Select(x => x.UserId);
@@ -235,8 +244,8 @@ internal sealed class VehicleRepository : IVehicleRepository
         }
 
         var query = _db.Vehicles
-            .AsNoTracking()
             .TagWithSource(nameof(VehicleRepository))
+            .AsNoTracking()
             .Where(x => !x.IsRemoved);
 
         if (accessTypes != null)
@@ -252,7 +261,6 @@ internal sealed class VehicleRepository : IVehicleRepository
     private IQueryable<VehicleData> CreateQueryBase()
     {
         var query = _db.Vehicles
-            .TagWithSource(nameof(VehicleRepository))
             .Where(x => !x.IsRemoved);
 
         return query;
