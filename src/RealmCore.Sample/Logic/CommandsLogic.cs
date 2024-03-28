@@ -1900,11 +1900,35 @@ internal sealed class CommandsLogic
             _chatBox.OutputTo(player, "took 10 money");
         });
         
-        _commandService.AddAsyncCommandHandler("focusablevehicle", async (player, args, token) =>
+        _commandService.AddCommandHandler("focusablevehicle", (player, args) =>
         {
             var veh = new FocusableRealmVehicle(_serviceProvider, 404, player.Position);
             _elementFactory.AssociateWithServer(veh);
             _elementFactory.RelayCreated(veh);
+        });
+        
+        _commandService.AddCommandHandler("createcolsphere", (player, args) =>
+        {
+            var sphere = _elementFactory.CreateCollisionSphere(player.Position, 5);
+
+            void handleEntered(RealmCollisionSphere arg1, Element element)
+            {
+                if(element == player)
+                {
+                    _chatBox.OutputTo(player, "entered");
+                }
+            }
+
+            void handleLeft(RealmCollisionSphere arg1, Element element)
+            {
+                if (element == player)
+                {
+                    _chatBox.OutputTo(player, "left");
+                }
+            }
+
+            sphere.CollisionDetection.Entered += handleEntered;
+            sphere.CollisionDetection.Left += handleLeft;
         });
 
     }

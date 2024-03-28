@@ -1,6 +1,4 @@
-﻿using SlipeServer.Server.Elements;
-
-namespace RealmCore.Tests.Unit.World;
+﻿namespace RealmCore.Tests.Unit.World;
 
 public class CollisionDetectionTests : RealmUnitTestingBase
 {
@@ -39,9 +37,22 @@ public class CollisionDetectionTests : RealmUnitTestingBase
         player.Position = new Vector3(100, 0, 0);
         collisionSphere.CheckElementWithin(player);
 
+        collisionSphere.CheckElementWithin(realmWorldObject);
+        realmWorldObject.Position = new Vector3(100, 0, 0);
+        collisionSphere.CheckElementWithin(realmWorldObject);
+
         using var _ = new AssertionScope();
-        elementEntered.Should().Be(2);
-        elementLeft.Should().Be(2);
+
+        if (usePlayerElementFactory)
+        {
+            elementEntered.Should().Be(1);
+            elementLeft.Should().Be(1);
+        }
+        else
+        {
+            elementEntered.Should().Be(2);
+            elementLeft.Should().Be(2);
+        }
     }
 
     [InlineData(true)]
