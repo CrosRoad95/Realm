@@ -1,12 +1,13 @@
 ﻿namespace RealmCore.Server.Modules.Users;
 
-public class UserStatDto
+public sealed class UserStatDto
 {
-    public int StatId { get; set; }
-    public float Value { get; set; }
+    public required int StatId { get; init; }
+    public required float Value { get; init; }
 
     public UserStatDto() { }
 
+    [SetsRequiredMembers]
     public UserStatDto(int statId, float value)
     {
         StatId = statId;

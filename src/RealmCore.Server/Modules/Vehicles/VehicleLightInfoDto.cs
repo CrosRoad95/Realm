@@ -1,8 +1,8 @@
 ﻿namespace RealmCore.Server.Modules.Vehicles;
 
-public class VehicleLightInfoDto
+public sealed class VehicleLightInfoDto
 {
-    public int Id { get; set; }
-    public ushort Model { get; set; }
-    public Vector3? Position { get; set; }
+    public required int Id { get; init; }
+    public required ushort Model { get; init; }
+    public required Vector3? Position { get; init; }
 }

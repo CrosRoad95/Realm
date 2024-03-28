@@ -23,16 +23,23 @@ public class PlayerJobStatisticsFeatureTests : RealmUnitTestingBase
         {
             new UserJobStatisticsDto
             {
+                UserId = -1,
                 JobId = 1,
                 Points = 4,
                 TimePlayed = 4
             },
             new UserJobStatisticsDto
             {
+                UserId = -1,
                 JobId = 2,
                 Points = 2,
                 TimePlayed = 2
             }
+        }, options =>
+        {
+            options.Excluding(ctx => ctx.UserId);
+
+            return options;
         });
         #endregion
     }

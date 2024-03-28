@@ -2,13 +2,13 @@
 
 public sealed class UserNotificationDto : IEquatable<UserNotificationDto>
 {
-    public int Id { get; set; }
-    public int UserId { get; set; }
-    public DateTime SentTime { get; set; }
-    public DateTime? ReadTime { get; set; }
-    public string Title { get; set; }
-    public string Excerpt { get; set; }
-    public string Content { get; set; }
+    public required int Id { get; set; }
+    public required int UserId { get; set; }
+    public required DateTime SentTime { get; set; }
+    public required DateTime? ReadTime { get; set; }
+    public required string Title { get; set; }
+    public required string Excerpt { get; set; }
+    public required string Content { get; set; }
 
     [return: NotNullIfNotNull(nameof(userNotificationData))]
     public static UserNotificationDto? Map(UserNotificationData? userNotificationData)

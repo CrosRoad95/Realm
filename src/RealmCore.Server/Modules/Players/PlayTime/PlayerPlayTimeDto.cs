@@ -2,9 +2,10 @@
 
 public sealed class PlayerPlayTimeDto : IEquatable<PlayerPlayTimeDto>
 {
-    public int Category { get; set; }
-    public TimeSpan PlayTime { get; set; }
+    public required int Category { get; init; }
+    public required TimeSpan PlayTime { get; init; }
 
+    [SetsRequiredMembers]
     public PlayerPlayTimeDto(int category, TimeSpan playTime)
     {
         Category = category;

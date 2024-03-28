@@ -1,14 +1,14 @@
 ﻿namespace RealmCore.Server.Modules.Players.Bans;
 
-public class BanDto : IEqualityComparer<BanDto>
+public sealed class BanDto : IEqualityComparer<BanDto>
 {
-    public int Id { get; init; }
-    public DateTime End { get; init; }
-    public int? UserId { get; init; }
-    public string? Serial { get; init; }
-    public string? Reason { get; init; }
-    public string? Responsible { get; init; }
-    public int Type { get; init; }
+    public required int Id { get; init; }
+    public required DateTime End { get; init; }
+    public required int? UserId { get; init; }
+    public required string? Serial { get; init; }
+    public required string? Reason { get; init; }
+    public required string? Responsible { get; init; }
+    public required int Type { get; init; }
 
     public bool Equals(BanDto? x, BanDto? y) => x?.Id == y?.Id;
 

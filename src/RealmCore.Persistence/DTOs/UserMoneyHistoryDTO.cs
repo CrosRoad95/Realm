@@ -2,14 +2,14 @@
 
 namespace RealmCore.Persistence.DTOs;
 
-public class UserMoneyHistoryDto
+public sealed class UserMoneyHistoryDto
 {
-    public int Id { get; set; }
-    public DateTime DateTime { get; set; }
-    public decimal Amount { get; set; }
-    public decimal CurrentBalance { get; set; }
-    public int? Category { get; set; }
-    public string? Description { get; set; }
+    public required int Id { get; init; }
+    public required DateTime DateTime { get; init; }
+    public required decimal Amount { get; init; }
+    public required decimal CurrentBalance { get; init; }
+    public required int? Category { get; init; }
+    public required string? Description { get; init; }
 
     [return: NotNullIfNotNull(nameof(userMoneyHistoryData))]
     public static UserMoneyHistoryDto? Map(UserMoneyHistoryData? userMoneyHistoryData)

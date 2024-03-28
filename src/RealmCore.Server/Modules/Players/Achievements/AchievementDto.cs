@@ -1,11 +1,11 @@
 ﻿namespace RealmCore.Server.Modules.Players.Achievements;
 
-public class AchievementDto : IEquatable<AchievementDto>
+public sealed class AchievementDto : IEquatable<AchievementDto>
 {
-    public int AchievementId { get; set; }
-    public float Progress { get; set; }
-    public string? Value { get; set; }
-    public DateTime? PrizeReceivedDateTime { get; set; }
+    public required int AchievementId { get; init; }
+    public required float Progress { get; init; }
+    public required string? Value { get; init; }
+    public required DateTime? PrizeReceivedDateTime { get; init; }
 
     [return: NotNullIfNotNull(nameof(achievementData))]
     public static AchievementDto? Map(AchievementData? achievementData)

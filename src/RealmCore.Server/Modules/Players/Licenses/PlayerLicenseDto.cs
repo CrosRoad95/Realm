@@ -1,10 +1,10 @@
 ﻿namespace RealmCore.Server.Modules.Players.Licenses;
 
-public class PlayerLicenseDto
+public sealed class PlayerLicenseDto
 {
-    public int LicenseId { get; init; }
-    public DateTime? SuspendedUntil { get; init; }
-    public string? SuspendedReason { get; init; }
+    public required int LicenseId { get; init; }
+    public required DateTime? SuspendedUntil { get; init; }
+    public required string? SuspendedReason { get; init; }
 
     public bool IsSuspended(DateTime now) => SuspendedUntil != null && SuspendedUntil > now;
 

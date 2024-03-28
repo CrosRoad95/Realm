@@ -1,9 +1,9 @@
 ﻿namespace RealmCore.Persistence.DTOs;
 
-public class UserJobStatisticsDto
+public sealed class UserJobStatisticsDto
 {
-    public int UserId { get; set; }
-    public int JobId { get; set; }
-    public ulong Points { get; set; }
-    public ulong TimePlayed { get; set; }
+    public required int UserId { get; init; }
+    public required int JobId { get; init; }
+    public required ulong Points { get; init; }
+    public required ulong TimePlayed { get; init; }
 }

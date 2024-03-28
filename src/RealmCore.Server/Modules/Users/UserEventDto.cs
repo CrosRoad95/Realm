@@ -2,11 +2,11 @@
 
 public class UserEventDto
 {
-    public int Id { get; set; }
-    public int UserId { get; set; }
-    public int EventType { get; set; }
-    public string? Metadata { get; set; }
-    public DateTime DateTime { get; set; }
+    public required int Id { get; init; }
+    public required int UserId { get; init; }
+    public required int EventType { get; init; }
+    public required string? Metadata { get; init; }
+    public required DateTime DateTime { get; init; }
 
     [return: NotNullIfNotNull(nameof(userEventData))]
     public static UserEventDto? Map(UserEventData? userEventData)

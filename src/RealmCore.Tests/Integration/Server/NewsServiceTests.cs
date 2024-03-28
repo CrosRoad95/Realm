@@ -87,6 +87,7 @@ public class NewsServiceTests : RealmRemoteDatabaseIntegrationTestingBase
         {
             new NewsDto
             {
+                Id = -1,
                 Title = $"title1{title}",
                 Excerpt = "excerpt",
                 Content = "content",
@@ -95,6 +96,7 @@ public class NewsServiceTests : RealmRemoteDatabaseIntegrationTestingBase
             },
             new NewsDto
             {
+                Id = -1,
                 Title = $"title2{title}",
                 Excerpt = "excerpt",
                 Content = "content",

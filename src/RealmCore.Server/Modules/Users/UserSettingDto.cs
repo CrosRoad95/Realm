@@ -1,9 +1,9 @@
 ﻿namespace RealmCore.Server.Modules.Users;
 
-public class UserSettingDto
+public sealed class UserSettingDto
 {
-    public int SettingId { get; set; }
-    public string Value { get; set; }
+    public required int SettingId { get; init; }
+    public required string Value { get; init; }
 
     [return: NotNullIfNotNull(nameof(userSettingData))]
     public static UserSettingDto? Map(UserSettingData? userSettingData)

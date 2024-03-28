@@ -2,8 +2,8 @@
 
 public sealed class UserSettingDto : IEquatable<UserSettingDto>
 {
-    public int SettingId { get; init; }
-    public string Value { get; init; }
+    public required int SettingId { get; init; }
+    public required string Value { get; init; }
 
     [return: NotNullIfNotNull(nameof(userSettingData))]
     public static UserSettingDto? Map(UserSettingData? userSettingData)

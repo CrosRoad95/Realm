@@ -1,11 +1,11 @@
 ﻿namespace RealmCore.Server.Modules.Vehicles;
 
-public class VehicleEventDto
+public sealed class VehicleEventDto
 {
-    public int Id { get; set; }
-    public int EventType { get; set; }
-    public string? Metadata { get; set; }
-    public DateTime DateTime { get; set; }
+    public required int Id { get; init; }
+    public required int EventType { get; init; }
+    public required string? Metadata { get; init; }
+    public required DateTime DateTime { get; init; }
 
 
     [return: NotNullIfNotNull(nameof(vehicleEventData))]

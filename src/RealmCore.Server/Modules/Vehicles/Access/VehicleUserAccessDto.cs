@@ -1,13 +1,13 @@
 ﻿namespace RealmCore.Server.Modules.Vehicles.Access;
 
-public class VehicleUserAccessDto
+public sealed class VehicleUserAccessDto
 {
-    public int Id { get; set; }
-    public int VehicleId { get; set; }
-    public int UserId { get; set; }
-    public byte AccessType { get; set; }
+    public required int Id { get; init; }
+    public required int VehicleId { get; init; }
+    public required int UserId { get; init; }
+    public required byte AccessType { get; init; }
+    public required string? CustomValue { get; init; }
     public bool IsOwner => AccessType == 0;
-    public string? CustomValue { get; set; }
 
     [return: NotNullIfNotNull(nameof(vehicleUserAccessData))]
     public static VehicleUserAccessDto? Map(VehicleUserAccessData? vehicleUserAccessData)

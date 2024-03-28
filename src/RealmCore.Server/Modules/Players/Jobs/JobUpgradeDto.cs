@@ -2,8 +2,8 @@
 
 public sealed class JobUpgradeDto : IEquatable<JobUpgradeDto>
 {
-    public short JobId { get; init; }
-    public int UpgradeId { get; init; }
+    public required short JobId { get; init; }
+    public required int UpgradeId { get; init; }
 
     [return: NotNullIfNotNull(nameof(jobUpgradeData))]
     public static JobUpgradeDto? Map(JobUpgradeData? jobUpgradeData)

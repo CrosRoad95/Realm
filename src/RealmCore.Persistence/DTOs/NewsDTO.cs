@@ -2,14 +2,14 @@
 
 namespace RealmCore.Persistence.DTOs;
 
-public class NewsDto
+public sealed class NewsDto
 {
-    public int Id { get; set; }
-    public string Title { get; set; }
-    public string Excerpt { get; set; }
-    public string Content { get; set; }
-    public DateTime PublishTime { get; set; }
-    public string[] Tags { get; set; }
+    public required int Id { get; init; }
+    public required string Title { get; init; }
+    public required string Excerpt { get; init; }
+    public required string Content { get; init; }
+    public required DateTime PublishTime { get; init; }
+    public required string[] Tags { get; init; }
 
     [return: NotNullIfNotNull(nameof(newsData))]
     public static NewsDto? Map(NewsData? newsData)
