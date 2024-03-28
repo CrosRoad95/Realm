@@ -18,7 +18,7 @@ public class VehiclesPersistence : RealmRemoteDatabaseIntegrationTestingBase
 
         var factory = server.GetRequiredService<IElementFactory>();
         var vehiclesService = server.GetRequiredService<IVehiclesService>();
-        var loadService = server.GetRequiredService<ILoadService>();
+        var loadService = server.GetRequiredService<IVehicleLoader>();
 
         var vehicle = await vehiclesService.CreatePersistantVehicle(Location.Zero, (VehicleModel)404);
         vehicle.Should().BeOfType<TestRealmVehicle>();
@@ -35,7 +35,7 @@ public class VehiclesPersistence : RealmRemoteDatabaseIntegrationTestingBase
     {
         var server = await CreateServerAsync();
         var vehiclesService = server.GetRequiredService<IVehiclesService>();
-        var loadService = server.GetRequiredService<ILoadService>();
+        var loadService = server.GetRequiredService<IVehicleLoader>();
         var activeVehicles = server.GetRequiredService<IVehiclesInUse>();
         var vehicle = await vehiclesService.CreatePersistantVehicle(Location.Zero, (VehicleModel)404);
         var id = vehicle.PersistentId;
@@ -58,7 +58,7 @@ public class VehiclesPersistence : RealmRemoteDatabaseIntegrationTestingBase
         var player = server.CreatePlayer();
         await server.SignInPlayer(player);
         var vehiclesService = server.GetRequiredService<IVehiclesService>();
-        var loadService = server.GetRequiredService<ILoadService>();
+        var loadService = server.GetRequiredService<IVehicleLoader>();
         var vehicle1 = await vehiclesService.CreatePersistantVehicle(new Location(new Vector3(1, 2, 3), new Vector3(4, 5, 6)), (VehicleModel)404);
         vehicle1.Access.AddAsOwner(player);
         vehicle1.MileageCounter.Mileage = 123;

@@ -23,10 +23,10 @@ internal sealed class VehiclesService : IVehiclesService
     private readonly IUsersInUse _activeUsers;
     private readonly IVehiclesInUse _vehiclesInUse;
     private readonly ILogger<VehicleService> _logger;
-    private readonly ILoadService _loadService;
+    private readonly IVehicleLoader _loadService;
     private readonly JsonSerializerSettings _jsonSerializerSettings;
 
-    public VehiclesService(IVehicleRepository vehicleRepository, IElementFactory elementFactory, ItemsCollection itemsCollection, IVehicleEventRepository vehicleEventRepository, IDateTimeProvider dateTimeProvider, VehicleUpgradesCollection vehicleUpgradeCollection, VehicleEnginesCollection vehicleEnginesCollection, IUsersInUse activeUsers, IVehiclesInUse vehiclesInUse, ILogger<VehicleService> logger, ILoadService loadService)
+    public VehiclesService(IVehicleRepository vehicleRepository, IElementFactory elementFactory, ItemsCollection itemsCollection, IVehicleEventRepository vehicleEventRepository, IDateTimeProvider dateTimeProvider, VehicleUpgradesCollection vehicleUpgradeCollection, VehicleEnginesCollection vehicleEnginesCollection, IUsersInUse activeUsers, IVehiclesInUse vehiclesInUse, ILogger<VehicleService> logger, IVehicleLoader loadService)
     {
         _vehicleRepository = vehicleRepository;
         _elementFactory = elementFactory;

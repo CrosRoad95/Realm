@@ -217,6 +217,8 @@
 		<Using Include="RealmCore.Server.Modules.Players.AFK" />
 		<Using Include="RealmCore.Server.Modules.Players.PlayTime" />
 		<Using Include="RealmCore.Server.Modules.Pickups" />
+		<Using Include="RealmCore.Server.Modules.Server.Loading" />
+		<Using Include="Microsoft.Extensions.Configuration" />
 	</ItemGroup>
 
 </Project>

@@ -29,6 +29,12 @@ public static class ServiceCollectionExtensions
         services.AddTransient<TInGameCommand>();
         return services;
     }
+    
+    public static ServiceCollection AddServerLoader<TServerLoader>(this ServiceCollection services) where TServerLoader : class, IServerLoader
+    {
+        services.AddTransient<IServerLoader, TServerLoader>();
+        return services;
+    }
 
     public static ServiceCollection AddPlayerScopedFeature<T1, T2>(this ServiceCollection services)
         where T1 : class, IPlayerFeature
@@ -90,7 +96,7 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<IPlayersService, PlayersService>();
         services.AddSingleton<IUsersService, UsersService>();
         services.AddScoped<ISaveService, SaveService>();
-        services.AddScoped<ILoadService, LoadService>();
+        services.AddScoped<IVehicleLoader, VehicleLoader>();
         services.AddScoped<IVehicleService, VehicleService>();
         services.AddScoped<IGroupService, GroupService>();
         services.AddScoped<IFractionService, FractionService>();
@@ -176,6 +182,10 @@ public static class ServiceCollectionExtensions
         var serverFilesProvider = new ServerFilesProvider("Server");
 #endif
         services.AddSingleton<IServerFilesProvider>(serverFilesProvider);
+        services.AddServerLoader<MigrateDatabaseServerLoader>();
+        services.AddServerLoader<LoadFractionsServerLoader>();
+        services.AddServerLoader<SeederServerLoader>();
+        services.AddServerLoader<VehicleServerLoader>();
 
         return services;
     }

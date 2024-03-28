@@ -1,19 +1,19 @@
 ﻿namespace RealmCore.Server.Modules.Persistence;
 
-public interface ILoadService
+public interface IVehicleLoader
 {
     Task LoadAll(CancellationToken cancellationToken = default);
     Task<RealmVehicle> LoadVehicleById(int id, CancellationToken cancellationToken = default);
 }
 
-internal sealed class LoadService : ILoadService
+internal sealed class VehicleLoader : IVehicleLoader
 {
     private readonly IVehicleRepository _vehicleRepository;
-    private readonly ILogger<LoadService> _logger;
+    private readonly ILogger<VehicleLoader> _logger;
     private readonly IElementFactory _elementFactory;
     private readonly IVehiclesInUse _vehiclesInUse;
 
-    public LoadService(IVehicleRepository vehicleRepository, ILogger<LoadService> logger, IElementFactory elementFactory, IVehiclesInUse vehiclesInUse)
+    public VehicleLoader(IVehicleRepository vehicleRepository, ILogger<VehicleLoader> logger, IElementFactory elementFactory, IVehiclesInUse vehiclesInUse)
     {
         _vehicleRepository = vehicleRepository;
         _logger = logger;

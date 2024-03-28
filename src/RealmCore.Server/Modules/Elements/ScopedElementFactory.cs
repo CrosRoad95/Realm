@@ -1,7 +1,4 @@
-﻿using SlipeServer.Server.Elements;
-using System.Drawing;
-
-namespace RealmCore.Server.Modules.Elements;
+﻿namespace RealmCore.Server.Modules.Elements;
 
 internal sealed class InnerScopedElementFactory : ScopedElementFactory
 {

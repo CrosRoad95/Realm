@@ -8,9 +8,9 @@ internal class ReloadElementsCommand : IInGameCommand
     private readonly IElementCollection _elementCollection;
     private readonly ISaveService _saveService;
     private readonly ILogger<SaveCommand> _logger;
-    private readonly ILoadService _loadService;
+    private readonly IVehicleLoader _loadService;
 
-    public ReloadElementsCommand(IElementCollection elementCollection, ISaveService saveService, ILogger<SaveCommand> logger, ILoadService loadService)
+    public ReloadElementsCommand(IElementCollection elementCollection, ISaveService saveService, ILogger<SaveCommand> logger, IVehicleLoader loadService)
     {
         _elementCollection = elementCollection;
         _saveService = saveService;

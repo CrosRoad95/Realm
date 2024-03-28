@@ -1,11 +1,18 @@
 ﻿global using ILogger = Microsoft.Extensions.Logging.ILogger;
-using Microsoft.Extensions.Configuration;
 
 [assembly: InternalsVisibleTo("RealmCore.TestingTools")]
 [assembly: InternalsVisibleTo("RealmCore.Tests")]
 [assembly: InternalsVisibleTo("DynamicProxyGenAssembly2")]
 
 namespace RealmCore.Server.Modules.Server;
+
+public sealed class ServerLoadingException : Exception
+{
+    public ServerLoadingException(string message) : base(message)
+    {
+
+    }
+}
 
 public class RealmServer<TRealmPlayer> : MtaServer<TRealmPlayer> where TRealmPlayer: RealmPlayer
 {
@@ -52,27 +59,28 @@ public class RealmServer<TRealmPlayer> : MtaServer<TRealmPlayer> where TRealmPla
             using var activity = Activity.StartActivity(nameof(StartCore));
 
             var logger = GetRequiredService<ILogger<RealmServer>>();
-
             {
-                using var activityMigrate = Activity.StartActivity("Database migration");
-                await GetRequiredService<IDb>().MigrateAsync();
-            }
-
-            {
-                using var activityLoadFraction = Activity.StartActivity("Load fractions");
-                await GetRequiredService<IFractionService>().LoadFractions(cancellationToken);
-            }
-
-            {
-                using var activitySeeder = Activity.StartActivity("Seeder");
-                using var seederServerBuilder = GetRequiredService<SeederServerBuilder>();
-                await seederServerBuilder.Build(cancellationToken);
-            }
-
-            {
-                using var activityLoadAll = Activity.StartActivity("Load all");
-
-                await GetRequiredService<ILoadService>().LoadAll(cancellationToken);
+                var serverLoaders = GetRequiredService<IEnumerable<IServerLoader>>();
+                using var serverLoadersActivity = Activity.StartActivity("Loading server");
+                bool anyFailed = false;
+                foreach (var item in serverLoaders)
+                {
+                    using var serverLoaderActivity = Activity.StartActivity($"Loading {item}");
+                    try
+                    {
+                        await item.Load();
+                    }
+                    catch(Exception ex)
+                    {
+                        anyFailed = true;
+                        serverLoaderActivity?.SetStatus(ActivityStatusCode.Error);
+                        logger.LogError(ex, "Failed to load server loader.");
+                    }
+                }
+                if (anyFailed)
+                {
+                    throw new ServerLoadingException("Server failed to load.");
+                }
             }
 
             var gameplayOptions = GetRequiredService<IOptions<GameplayOptions>>();
@@ -125,7 +133,6 @@ public class RealmServer<TRealmPlayer> : MtaServer<TRealmPlayer> where TRealmPla
         base.Stop();
         logger.LogInformation("Server stopped, saved: {savedElementsCount} elements.", i);
     }
-
 
     public static readonly ActivitySource Activity = new("RealmCore.RealmServer", "1.0.0");
 }
