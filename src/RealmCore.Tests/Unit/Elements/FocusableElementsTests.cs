@@ -11,7 +11,7 @@ public class FocusableElementsTests : RealmUnitTestingBase
         obj.AddFocusedPlayer(player);
 
         obj.FocusedPlayerCount.Should().Be(1);
-        obj.FocusedPlayers.Should().BeEquivalentTo(player);
+        obj.FocusedPlayers.First().Should().BeEquivalentTo(player);
     }
 
     [Fact]

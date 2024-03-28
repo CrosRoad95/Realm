@@ -46,8 +46,8 @@ public class VehiclesPersistence : RealmRemoteDatabaseIntegrationTestingBase
         await vehiclesService.Destroy(vehicle);
 
         var spawn = async () => await loadService.LoadVehicleById(id);
-        spawn.Should().NotThrow();
-        spawn.Should().Throw<PersistantVehicleAlreadySpawnedException>().WithMessage("Failed to create already existing vehicle.");
+        await spawn.Should().NotThrowAsync();
+        await spawn.Should().ThrowAsync<PersistantVehicleAlreadySpawnedException>().WithMessage("Failed to create already existing vehicle.");
     }
 
     [Fact]

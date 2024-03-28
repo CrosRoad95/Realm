@@ -103,7 +103,7 @@ public class NewsServiceTests : RealmRemoteDatabaseIntegrationTestingBase
             },
         }, options =>
         {
-            options.Using<DateTime>(ctx => ctx.Subject.Should().BeCloseTo(ctx.Expectation)).WhenTypeIs<DateTime>();
+            options.Using<DateTime>(ctx => ctx.Subject.Should().BeCloseTo(ctx.Expectation, TimeSpan.FromMilliseconds(20))).WhenTypeIs<DateTime>();
             options.Excluding(ctx => ctx.Id);
 
             return options;

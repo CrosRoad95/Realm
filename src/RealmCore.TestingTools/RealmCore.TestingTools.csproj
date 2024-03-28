@@ -13,7 +13,7 @@
 	<ItemGroup>
 		<PackageReference Include="Microsoft.Data.SqlClient" Version="5.1.5" />
 		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.1.0" />
-		<PackageReference Include="SlipeServer.Server.TestTools" Version="0.1.0-CI-20231101-170208" />
+		<PackageReference Include="SlipeServer.Server.TestTools" Version="0.1.0-CI-20240327-224211" />
 		<PackageReference Include="Testcontainers" Version="3.7.0" />
 		<PackageReference Include="Testcontainers.MySql" Version="3.7.0" />
 		<PackageReference Include="xunit" Version="2.4.1" />
