@@ -147,7 +147,6 @@ public static class ServiceCollectionExtensions
 
         #region Vehicle features
         services.AddVehicleScopedFeature<IVehicleAccessFeature, VehicleAccessFeature>();
-        services.AddVehicleScopedFeature<IVehicleAccessFeature, VehicleAccessFeature>();
         services.AddVehicleScopedFeature<IVehiclePersistenceFeature, VehiclePersistanceFeature>();
         services.AddVehicleScopedFeature<IVehicleMileageCounterFeature, VehicleMileageCounterFeature>();
         services.AddVehicleScopedFeature<IVehicleUpgradesFeature, VehicleUpgradesFeature>();

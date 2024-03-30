@@ -104,12 +104,23 @@ internal sealed class VehicleFuelFeature : IVehicleFuelFeature, IUsesVehiclePers
     public void Loaded(VehicleData vehicleData)
     {
         _vehicleFuelData = vehicleData.Fuels;
+        FuelContainer? active = null;
         lock (_lock)
         {
             foreach (var fuelData in vehicleData.Fuels)
             {
-                _fuelContainers.Add(new FuelContainer(Vehicle, fuelData));
+                var fuelContainer = new FuelContainer(Vehicle, fuelData);
+                if (fuelData.Active && active == null)
+                {
+                    active = fuelContainer;
+                }
+                _fuelContainers.Add(fuelContainer);
             }
+        }
+
+        if (active != null)
+        {
+            Active = active;
             InternalUpdate(true);
         }
     }

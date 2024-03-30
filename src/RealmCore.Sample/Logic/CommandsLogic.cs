@@ -1931,5 +1931,12 @@ internal sealed class CommandsLogic
             sphere.CollisionDetection.Left += handleLeft;
         });
 
+        _commandService.AddCommandHandler("activefuelcontainer", (player, args) =>
+        {
+            var active = player.Vehicle?.Fuel.Active?.FuelType;
+            _chatBox.OutputTo(player, $"Vehicle id: {player.Vehicle?.PersistentId}");
+            _chatBox.OutputTo(player, $"Active container: {active}");
+        });
+
     }
 }
