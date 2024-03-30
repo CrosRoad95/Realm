@@ -10,10 +10,10 @@ public class RealmPickup : Pickup, ICollisionDetection, IElementName
     public CollisionDetection<RealmPickup> CollisionDetection { get; private set; }
     public CollisionDetection InternalCollisionDetection => CollisionDetection;
 
-    public RealmPickup(IServiceProvider serviceProvider, Vector3 position, ushort model) : base(position, model)
+    public RealmPickup(Vector3 position, ushort model) : base(position, model)
     {
-        CollisionDetection = new(serviceProvider, this);
-        CollisionShape = new RealmCollisionSphere(serviceProvider, position, 1.5f);
+        CollisionDetection = new(this);
+        CollisionShape = new RealmCollisionSphere(position, 1.5f);
         CollisionShape.ElementEntered += HandleElementEntered;
         CollisionShape.ElementLeft += HandleElementLeft;
     }

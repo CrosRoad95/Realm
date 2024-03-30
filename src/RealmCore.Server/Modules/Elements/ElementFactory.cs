@@ -87,7 +87,7 @@ public class ElementFactory : IElementFactory
     
     public RealmMarker CreateMarker(Location location, MarkerType markerType, float size, Color color, Action<RealmMarker>? elementBuilder = null)
     {
-        var marker = new RealmMarker(_serviceProvider, location.Position, markerType, size)
+        var marker = new RealmMarker(location.Position, markerType, size)
         {
             Interior = location.GetInteriorOrDefault(),
             Dimension = location.GetDimensionOrDefault(),
@@ -103,7 +103,7 @@ public class ElementFactory : IElementFactory
 
     public RealmPickup CreatePickup(Location location, ushort model, Action<RealmPickup>? elementBuilder = null)
     {
-        var pickup = new RealmPickup(_serviceProvider, location.Position, model)
+        var pickup = new RealmPickup(location.Position, model)
         {
             Interior = location.GetInteriorOrDefault(),
             Dimension = location.GetDimensionOrDefault(),
@@ -173,7 +173,7 @@ public class ElementFactory : IElementFactory
     #region Collision shapes
     public RealmCollisionCircle CreateCollisionCircle(Vector2 position, float radius, byte? interior = null, ushort? dimension = null, Action<RealmCollisionCircle>? elementBuilder = null)
     {
-        var collisionSphere = new RealmCollisionCircle(_serviceProvider, new Vector2(0, 0), radius)
+        var collisionSphere = new RealmCollisionCircle(new Vector2(0, 0), radius)
         {
             Interior = interior ?? 0,
             Dimension = dimension ?? 0,
@@ -186,7 +186,7 @@ public class ElementFactory : IElementFactory
 
     public RealmCollisionCuboid CreateCollisionCuboid(Vector3 position, Vector3 dimensions, byte? interior = null, ushort? dimension = null, Action<RealmCollisionCuboid>? elementBuilder = null)
     {
-        var collisionCuboid = new RealmCollisionCuboid(_serviceProvider, position, dimensions)
+        var collisionCuboid = new RealmCollisionCuboid(position, dimensions)
         {
             Interior = interior ?? 0,
             Dimension = dimension ?? 0,
@@ -199,7 +199,7 @@ public class ElementFactory : IElementFactory
 
     public RealmCollisionPolygon CreateCollisionPolygon(Vector3 position, IEnumerable<Vector2> vertices, byte? interior = null, ushort? dimension = null, Action<RealmCollisionPolygon>? elementBuilder = null)
     {
-        var collisionPolygon = new RealmCollisionPolygon(_serviceProvider, position, vertices)
+        var collisionPolygon = new RealmCollisionPolygon(position, vertices)
         {
             Interior = interior ?? 0,
             Dimension = dimension ?? 0,
@@ -212,7 +212,7 @@ public class ElementFactory : IElementFactory
 
     public RealmCollisionRectangle CreateCollisionRectangle(Vector2 position, Vector2 dimensions, byte? interior = null, ushort? dimension = null, Action<RealmCollisionRectangle>? elementBuilder = null)
     {
-        var collisionRectangle = new RealmCollisionRectangle(_serviceProvider, position, dimensions)
+        var collisionRectangle = new RealmCollisionRectangle(position, dimensions)
         {
             Interior = interior ?? 0,
             Dimension = dimension ?? 0,
@@ -225,7 +225,7 @@ public class ElementFactory : IElementFactory
 
     public RealmCollisionSphere CreateCollisionSphere(Vector3 position, float radius, byte? interior = null, ushort? dimension = null, Action<RealmCollisionSphere>? elementBuilder = null)
     {
-        var collisionSphere = new RealmCollisionSphere(_serviceProvider, position, radius)
+        var collisionSphere = new RealmCollisionSphere(position, radius)
         {
             Interior = interior ?? 0,
             Dimension = dimension ?? 0,
@@ -238,7 +238,7 @@ public class ElementFactory : IElementFactory
 
     public RealmCollisionTube CreateCollisionTube(Vector3 position, float radius, float height, byte? interior = null, ushort? dimension = null, Action<RealmCollisionTube>? elementBuilder = null)
     {
-        var collisionTube = new RealmCollisionTube(_serviceProvider, position, radius, height)
+        var collisionTube = new RealmCollisionTube(position, radius, height)
         {
             Interior = interior ?? 0,
             Dimension = dimension ?? 0,

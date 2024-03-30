@@ -133,7 +133,7 @@ internal class ScopedElementFactory : IScopedElementFactory
     public RealmCollisionSphere CreateCollisionSphere(Vector3 position, float radius, byte? interior = null, ushort? dimension = null, Action<RealmCollisionSphere>? elementBuilder = null)
     {
         ThrowIfDisposed();
-        var collisionSphere = new RealmCollisionSphere(_player.ServiceProvider, position, radius)
+        var collisionSphere = new RealmCollisionSphere(position, radius)
         {
             Interior = interior ?? _player.Interior,
             Dimension = dimension ?? _player.Dimension
@@ -147,7 +147,7 @@ internal class ScopedElementFactory : IScopedElementFactory
     public RealmMarker CreateMarker(Location location, MarkerType markerType, float size, Color color, Action<RealmMarker>? elementBuilder = null)
     {
         ThrowIfDisposed();
-        var marker = new RealmMarker(_player.ServiceProvider, location.Position, markerType, size)
+        var marker = new RealmMarker(location.Position, markerType, size)
         {
             Color = color,
             Interior = location.Interior ?? _player.Interior,
@@ -206,7 +206,7 @@ internal class ScopedElementFactory : IScopedElementFactory
     public RealmPickup CreatePickup(Location location, ushort model, Action<RealmPickup>? elementBuilder = null)
     {
         ThrowIfDisposed();
-        var pickup = new RealmPickup(_player.ServiceProvider, location.Position, model)
+        var pickup = new RealmPickup(location.Position, model)
         {
             Interior = location.Interior ?? _player.Interior,
             Dimension = location.Dimension ?? _player.Dimension

@@ -11,10 +11,10 @@ public class RealmMarker : Marker, ICollisionDetection, IElementName
     public CollisionDetection InternalCollisionDetection => CollisionDetection;
     public string? ElementName { get; set; }
 
-    public RealmMarker(IServiceProvider serviceProvider, Vector3 position, MarkerType markerType, float size) : base(position, markerType)
+    public RealmMarker(Vector3 position, MarkerType markerType, float size) : base(position, markerType)
     {
         Size = size;
-        CollisionDetection = new(serviceProvider, this);
+        CollisionDetection = new(this);
         CollisionShape = new CollisionSphere(position, size);
         CollisionShape.ElementEntered += HandleElementEntered;
         CollisionShape.ElementLeft += HandleElementLeft;

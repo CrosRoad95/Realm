@@ -20,8 +20,6 @@ internal class SamplePickupsLogic
         {
         if (element is RealmPickup pickup && pickup.ElementName != null && pickup.ElementName.StartsWith("fractionTestPickup"))
             {
-                pickup.CollisionDetection.AddRule(new MustBePlayerInFractionRule(1));
-
                 pickup.CollisionDetection.Entered += async (enteredPickup, element) =>
                 {
                     var player = (RealmPlayer)element;
@@ -79,8 +77,6 @@ internal class SamplePickupsLogic
         {
             if (element is RealmPickup pickup && pickup.ElementName != null && pickup.ElementName.StartsWith("withText3d"))
             {
-                pickup.CollisionDetection.AddRule<MustBePlayerOnFootOnlyRule>();
-                pickup.CollisionDetection.AddRule<MustHaveNoWorldObjectAttachedRule>();
                 pickup.AddOpenGuiLogic<TestGui>();
             }
         }
@@ -88,7 +84,6 @@ internal class SamplePickupsLogic
         {
             if (element is RealmPickup pickup && pickup.ElementName != null && pickup.ElementName.StartsWith("testMarker"))
             {
-                pickup.CollisionDetection.AddRule<MustBePlayerOnFootOnlyRule>();
                 pickup.CollisionDetection.Entered += (enteredPickup, element) =>
                 {
                     _chatBox.OutputTo((RealmPlayer)element, $"Entered marker");

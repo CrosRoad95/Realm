@@ -25,10 +25,7 @@ internal sealed class PlayerScopedCollisionShapeBehaviour : IDisposable
                 return;
             try
             {
-                if (collisionDetection.InternalCollisionDetection.CheckRules(enteredElement))
-                {
-                    collisionDetection.InternalCollisionDetection.RelayEntered(enteredElement);
-                }
+                collisionDetection.InternalCollisionDetection.RelayEntered(enteredElement);
             }
             catch (Exception ex)
             {

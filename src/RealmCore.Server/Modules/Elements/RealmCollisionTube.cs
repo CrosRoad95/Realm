@@ -6,8 +6,8 @@ public class RealmCollisionTube : CollisionTube, ICollisionDetection
     public CollisionDetection<RealmCollisionTube> CollisionDetection { get; private set; }
     public CollisionDetection InternalCollisionDetection => CollisionDetection;
 
-    public RealmCollisionTube(IServiceProvider serviceProvider, Vector3 position, float Radius, float Height) : base(position, Radius, Height)
+    public RealmCollisionTube(Vector3 position, float radius, float height) : base(position, radius, height)
     {
-        CollisionDetection = new(serviceProvider, this);
+        CollisionDetection = new(this);
     }
 }

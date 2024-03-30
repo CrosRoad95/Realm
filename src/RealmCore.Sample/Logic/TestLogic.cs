@@ -11,7 +11,6 @@ internal class TestLogic : PlayerLifecycle
     {
         var marker = elementFactory.CreateMarker(new Location(335.50684f, -83.71094f, 1.4105641f), MarkerType.Cylinder, 1, Color.Red);
         marker.Size = 4;
-        marker.CollisionDetection.AddRule<MustBeVehicleRule>();
         _elementFactory = elementFactory;
         _schedulerService = schedulerService;
         _logger = logger;
