@@ -175,11 +175,11 @@ public class Hud3dTests
 
 internal class SampleHud3d : Hud3d<SampleState>
 {
-    public SampleHud3d() : base(x =>
+    public SampleHud3d() : base((builder, context) =>
         {
-            x.AddText(x => x.Text, new Vector2(10, 10), new Size(10, 10));
-            x.AddText(x => x.Number, new Vector2(20, 20), new Size(20, 20));
-            x.AddRectangle(new Vector2(30, 30), new Size(30, 30), Color.DeepPink);
+            builder.AddText(x => x.Text, new Vector2(10, 10), new Size(10, 10));
+            builder.AddText(x => x.Number, new Vector2(20, 20), new Size(20, 20));
+            builder.AddRectangle(new Vector2(30, 30), new Size(30, 30), Color.DeepPink);
         }, new Vector3(4, 2, 0), new SampleState
         {
             Text = "sample text",
@@ -191,13 +191,13 @@ internal class SampleHud3d : Hud3d<SampleState>
 
 internal class SampleHud3d2 : Hud3d<SampleState>
 {
-    public SampleHud3d2() : base(x =>
+    public SampleHud3d2() : base((builder, context) =>
         {
-            x.AddText(x => x.Text, new Vector2(10, 10), new Size(10, 10));
-            x.AddText("test", new Vector2(20, 20), new Size(20, 20), font: "default");
-            x.AddText(x => x.Text, new Vector2(10, 10), new Size(10, 10));
-            x.AddText("test", new Vector2(20, 20), new Size(20, 20), font: "default");
-            x.AddText(x => x.Text, new Vector2(10, 10), new Size(10, 10));
+            builder.AddText(x => x.Text, new Vector2(10, 10), new Size(10, 10));
+            builder.AddText("test", new Vector2(20, 20), new Size(20, 20), font: "default");
+            builder.AddText(x => x.Text, new Vector2(10, 10), new Size(10, 10));
+            builder.AddText("test", new Vector2(20, 20), new Size(20, 20), font: "default");
+            builder.AddText(x => x.Text, new Vector2(10, 10), new Size(10, 10));
         }, new Vector3(4, 2, 0), new SampleState
         {
             Text = "sample text",
@@ -210,9 +210,9 @@ internal class SampleHud3d2 : Hud3d<SampleState>
 
 internal class SampleStateLessHud3d : Hud3d
 {
-    public SampleStateLessHud3d() : base(x =>
+    public SampleStateLessHud3d() : base((builder, context) =>
         {
-            x.AddText("test", new Vector2(10, 10), new Size(10, 10), font: "sans");
+            builder.AddText("test", new Vector2(10, 10), new Size(10, 10), font: "sans");
         }, new Vector3(4, 2, 0))
     {
     }

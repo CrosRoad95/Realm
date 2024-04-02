@@ -70,7 +70,7 @@ public abstract class HudLayer<TState> : IHudLayer where TState : class, new()
         return null;
     }
 
-    protected abstract void Build(IHudBuilder<TState> hudBuilderCallback);
+    protected abstract void Build(IHudBuilder<TState> hudBuilderCallback, IHudBuilderContext hudBuilderContext);
 
     protected virtual void HudCreated() { }
 
@@ -82,20 +82,16 @@ public abstract class HudLayer<TState> : IHudLayer where TState : class, new()
 
         List<DynamicHudElement> dynamicHudElement = [];
 
-        overlayService.CreateHud(player, _id, e =>
+        overlayService.CreateHud(player, _id, (builder, context) =>
         {
-            e.DynamicHudElementAdded = dynamicHudElement.Add;
+            builder.DynamicHudElementAdded = dynamicHudElement.Add;
             try
             {
-                Build(e);
-            }
-            catch (Exception)
-            {
-                throw;
+                Build(builder, context);
             }
             finally
             {
-                e.DynamicHudElementAdded = null;
+                builder.DynamicHudElementAdded = null;
             }
         }, player.ScreenSize, _offset, _defaultState);
 

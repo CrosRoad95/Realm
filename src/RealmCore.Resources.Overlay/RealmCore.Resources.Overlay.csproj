@@ -39,6 +39,7 @@
 		<Using Include="Microsoft.Extensions.DependencyInjection" />
 		<Using Include="RealmCore.Resources.Assets" />
 		<Using Include="SlipeServer.Server.ServerBuilders" />
+		<Using Include="RealmCore.Resources.Base" />
 	</ItemGroup>
 
 </Project>

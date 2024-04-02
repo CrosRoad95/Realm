@@ -1,6 +1,7 @@
 ﻿[assembly: InternalsVisibleTo("RealmCore.TestingTools")]
 [assembly: InternalsVisibleTo("RealmCore.Tests")]
 
+
 namespace RealmCore.Resources.Overlay;
 
 public static class ServerBuilderExtensions
@@ -10,6 +11,8 @@ public static class ServerBuilderExtensions
         builder.AddBuildStep(server =>
         {
             var resource = new OverlayResource(server);
+            resource.AddLuaEventHub<IHudEventHub>();
+
             resource.InjectAssetsExportedFunctions();
 
             server.AddAdditionalResource(resource, resource.AdditionalFiles);
@@ -19,6 +22,8 @@ public static class ServerBuilderExtensions
         {
             services.AddSingleton<IOverlayService, OverlayService>();
         });
+
+        builder.AddLuaEventHub<IHudEventHub, OverlayResource>();
 
         builder.AddLogic<OverlayLogic>();
     }

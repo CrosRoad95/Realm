@@ -53,18 +53,23 @@ addEventHandler("onClientRender", root, function()
 	end
 end)
 
-addEvent("addDisplay3dRing", true)
-addEventHandler("addDisplay3dRing", localPlayer, function(id, x,y,z, time)
-	displays[id] = {
-		type = "ring3d",
-		position = {x,y,z},
-		start = getTickCount(),
-		time = time,
-	}
-end)
+function handleAddDisplay3dRing(id, x,y,z, time)
+	if(displays[id])then
+		outputDebugString("Failed to addDisplay3dRing of id: '"..tostring(hudId).."' already exists.", 1);
+	else
+		displays[id] = {
+			type = "ring3d",
+			position = {x,y,z},
+			start = getTickCount(),
+			time = time,
+		}
+	end
+end
 
-
-addEvent("removeDisplay3dRing", true)
-addEventHandler("removeDisplay3dRing", localPlayer, function(id)
-	displays[id] = nil
-end)
+function handleRemoveDisplay3dRing(id)
+	if(displays[id])then
+		displays[id] = nil
+	else
+		outputDebugString("Failed to removeDisplay3dRing of id: '"..tostring(hudId).."' not found.", 1);
+	end
+end

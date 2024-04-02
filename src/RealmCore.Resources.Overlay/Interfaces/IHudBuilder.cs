@@ -2,9 +2,6 @@
 
 public interface IHudBuilder<TState>
 {
-    float Right { get; }
-    float Bottom { get; }
-
     Action<DynamicHudElement>? DynamicHudElementAdded { get; set; }
 
     IHudBuilder<TState> AddRectangle(Vector2 position, Size size, Color color);

@@ -31,18 +31,19 @@ public class SampleStatefulHudLayer : HudLayer<SampleHudState>
         };
     }
 
-    protected override void Build(IHudBuilder<SampleHudState> x)
+    protected override void Build(IHudBuilder<SampleHudState> builder, IHudBuilderContext context)
     {
-        x.AddRectangle(new Vector2(x.Right - 400, 600), new Size(400, 20), Color.DarkBlue);
-        x.AddText(x => x.Text1, new Vector2(x.Right - 200, 600), new Size(200, 20), font: "default", alignX: HorizontalAlign.Center, alignY: VerticalAlign.Center);
-        x.AddText("custom font", new Vector2(x.Right - 400, 600), new Size(200, 20), font: _assetsCollection.GetFont("Better Together.otf"), alignX: HorizontalAlign.Center, alignY: VerticalAlign.Center);
+        builder.AddRectangle(new Vector2(context.Right - 400, 600), new Size(400, 20), Color.DarkBlue);
+        builder.AddText(x => x.Text1, new Vector2(context.Right - 200, 600), new Size(200, 20), font: "default", alignX: HorizontalAlign.Center, alignY: VerticalAlign.Center).AddShadow(new Vector2(4, 4));
+        builder.AddText("default value", new Vector2(context.Right - 400, 600), new Size(200, 20), font: "sans", alignX: HorizontalAlign.Center, alignY: VerticalAlign.Center).AddShadow(new Vector2(-4, -4));
     }
 
     public void Update()
     {
+        var text1 = Guid.NewGuid().ToString()[..8];
         UpdateState(x =>
         {
-            x.Text1 = Guid.NewGuid().ToString()[..8];
+            x.Text1 = text1;
         });
     }
 }

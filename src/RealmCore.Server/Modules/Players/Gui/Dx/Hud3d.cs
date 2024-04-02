@@ -28,7 +28,7 @@ public abstract class Hud3dBase : IDisposable
 
 public class Hud3d<TState> : Hud3dBase where TState : class
 {
-    private readonly Action<IHudBuilder<TState>> _hudBuilderCallback;
+    private readonly Action<IHudBuilder<TState>, IHudBuilderContext> _hudBuilderCallback;
     private readonly List<DynamicHudElement> _dynamicHudElements = [];
     private readonly TState? _state;
 
@@ -36,7 +36,7 @@ public class Hud3d<TState> : Hud3dBase where TState : class
 
     public Vector3 Position { get; }
 
-    public Hud3d(Action<IHudBuilder<TState>> hudBuilderCallback, Vector3 position, TState? defaultState = null) : base()
+    public Hud3d(Action<IHudBuilder<TState>, IHudBuilderContext> hudBuilderCallback, Vector3 position, TState? defaultState = null) : base()
     {
         _hudBuilderCallback = hudBuilderCallback;
         Position = position;
@@ -67,20 +67,16 @@ public class Hud3d<TState> : Hud3dBase where TState : class
 
     internal override void BuildHud(IOverlayService overlayService)
     {
-        overlayService.CreateHud3d(_id.ToString(), e =>
+        overlayService.CreateHud3d(_id.ToString(), (builder, context) =>
         {
-            e.DynamicHudElementAdded = HandleDynamicHudElementAdded;
+            builder.DynamicHudElementAdded = HandleDynamicHudElementAdded;
             try
             {
-                _hudBuilderCallback(e);
-            }
-            catch (Exception)
-            {
-                throw;
+                _hudBuilderCallback(builder, context);
             }
             finally
             {
-                e.DynamicHudElementAdded = null;
+                builder.DynamicHudElementAdded = null;
             }
         }, _state, Position);
     }
@@ -88,7 +84,7 @@ public class Hud3d<TState> : Hud3dBase where TState : class
 
 public class Hud3d : Hud3d<object>
 {
-    public Hud3d(Action<IHudBuilder<object>> hudBuilderCallback, Vector3 position) : base(hudBuilderCallback, position)
+    public Hud3d(Action<IHudBuilder<object>, IHudBuilderContext> hudBuilderCallback, Vector3 position) : base(hudBuilderCallback, position)
     {
     }
 }

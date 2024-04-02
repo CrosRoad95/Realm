@@ -652,11 +652,25 @@ internal sealed class CommandsLogic
         {
             player.Hud.RemoveLayer<SampleHudLayer>();
             player.Hud.RemoveLayer<SampleHud2Layer>();
+            player.Hud.RemoveLayer<SampleStatefulHudLayer>();
         });
 
         _commandService.AddCommandHandler("createHud2", (player, args) =>
         {
             var hud = player.Hud.AddLayer<SampleStatefulHudLayer>();
+        });
+        
+        _commandService.AddCommandHandler("removeHud2", (player, args) =>
+        {
+            player.Hud.TryRemoveLayer<SampleStatefulHudLayer>();
+        });
+        
+        _commandService.AddCommandHandler("setStateHud2", (player, args) =>
+        {
+            if(player.Hud.TryGetLayer(out SampleStatefulHudLayer layer))
+            {
+                layer.Update();
+            }
         });
 
         //_commandService.AddCommandHandler("createhud3", async (player, args) =>

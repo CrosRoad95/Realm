@@ -33,6 +33,6 @@ internal class TextAndHudBuilder<TState> : ITextAndHudBuilder<TState>
                 });
             }
         }
-        _innerHudBuilder.AddLuaValue(constructionInfo.AsLuaValue(), true);
+        _innerHudBuilder.AddLuaValue(constructionInfo, AddElementLocation.BeforeLastElement);
     }
 }

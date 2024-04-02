@@ -9,7 +9,7 @@ public static class ResourcesExtensions
 local hub = {};
 function hubBind(name, func)
     if(type(name) ~= "string" or type(func) ~= "function")then
-        error("Failed to bind");
+        error("Failed to bind event, expected name to be string, got "..type(name).." ("..tostring(name).."), expected callback to be function, got: "..type(func));
     end
     hub[name] = func;
 end

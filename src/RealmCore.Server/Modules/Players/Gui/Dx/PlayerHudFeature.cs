@@ -4,13 +4,15 @@ public interface IPlayerHudFeature : IPlayerFeature
 {
     IReadOnlyList<IHudLayer> Layers { get; }
 
-    event Action<IPlayerHudFeature, IHudLayer>? LayerCreated;
+    event Action<IPlayerHudFeature, IHudLayer>? LayerAdded;
     event Action<IPlayerHudFeature, IHudLayer>? LayerRemoved;
 
     bool AddLayer(IHudLayer hudLayer);
     THudLayer? AddLayer<THudLayer>(params object[] parameters) where THudLayer : IHudLayer;
-    bool RemoveLayer(IHudLayer hudLayer);
-    bool RemoveLayer<THudLayer>() where THudLayer : IHudLayer;
+    void RemoveLayer(IHudLayer hudLayer);
+    void RemoveLayer<THudLayer>() where THudLayer : IHudLayer;
+    bool TryRemoveLayer(IHudLayer hudLayer);
+    bool TryRemoveLayer<THudLayer>() where THudLayer : IHudLayer;
     bool TryGetLayer<THudLayer>(out THudLayer layer) where THudLayer : IHudLayer;
 }
 
@@ -20,7 +22,7 @@ internal sealed class PlayerHudFeature : IPlayerHudFeature, IDisposable
 
     private readonly List<IHudLayer> _hudLayers = [];
 
-    public event Action<IPlayerHudFeature, IHudLayer>? LayerCreated;
+    public event Action<IPlayerHudFeature, IHudLayer>? LayerAdded;
     public event Action<IPlayerHudFeature, IHudLayer>? LayerRemoved;
 
     public IReadOnlyList<IHudLayer> Layers
@@ -50,7 +52,7 @@ internal sealed class PlayerHudFeature : IPlayerHudFeature, IDisposable
             _hudLayers.Add(hudLayer);
         }
 
-        LayerCreated?.Invoke(this, hudLayer);
+        LayerAdded?.Invoke(this, hudLayer);
         return true;
     }
 
@@ -62,7 +64,51 @@ internal sealed class PlayerHudFeature : IPlayerHudFeature, IDisposable
         return default;
     }
 
-    public bool RemoveLayer(IHudLayer hudLayer)
+    public void RemoveLayer(IHudLayer hudLayer)
+    {
+        lock (_lock)
+        {
+            if (!_hudLayers.Remove(hudLayer))
+                throw new HudLayerNotFoundException(hudLayer.GetType());
+        }
+
+        hudLayer.Dispose();
+        LayerRemoved?.Invoke(this, hudLayer);
+    }
+
+    public void RemoveLayer<THudLayer>() where THudLayer : IHudLayer
+    {
+        THudLayer? hudLayer;
+        lock (_lock)
+        {
+            hudLayer = _hudLayers.OfType<THudLayer>().FirstOrDefault();
+
+            if (hudLayer == null || !_hudLayers.Remove(hudLayer))
+                throw new HudLayerNotFoundException(typeof(THudLayer));
+        }
+
+        hudLayer.Dispose();
+        LayerRemoved?.Invoke(this, hudLayer);
+    }
+
+    public bool TryRemoveLayer<THudLayer>() where THudLayer : IHudLayer
+    {
+        IHudLayer? hudLayer;
+        lock (_lock)
+        {
+            hudLayer = _hudLayers.OfType<THudLayer>().FirstOrDefault();
+
+            if (hudLayer == null || !_hudLayers.Remove(hudLayer))
+                return false;
+        }
+
+        hudLayer.Dispose();
+        LayerRemoved?.Invoke(this, hudLayer);
+
+        return true;
+    }
+    
+    public bool TryRemoveLayer(IHudLayer hudLayer)
     {
         lock (_lock)
         {
@@ -72,20 +118,8 @@ internal sealed class PlayerHudFeature : IPlayerHudFeature, IDisposable
 
         hudLayer.Dispose();
         LayerRemoved?.Invoke(this, hudLayer);
+
         return true;
-    }
-
-    public bool RemoveLayer<THudLayer>() where THudLayer : IHudLayer
-    {
-        IHudLayer? hudLayer;
-        lock (_lock)
-        {
-            hudLayer = _hudLayers.OfType<THudLayer>().FirstOrDefault();
-        }
-
-        if (hudLayer == null)
-            return false;
-        return RemoveLayer(hudLayer);
     }
     
     public bool TryGetLayer<THudLayer>(out THudLayer layer) where THudLayer : IHudLayer

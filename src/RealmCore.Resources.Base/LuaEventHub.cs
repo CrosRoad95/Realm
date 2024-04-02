@@ -1,4 +1,6 @@
-﻿namespace RealmCore.Resources.Base;
+﻿using System.Linq.Expressions;
+
+namespace RealmCore.Resources.Base;
 
 public class LuaEventHub<THub, TResource> : ILuaEventHub<THub> where TResource : Resource
 {
@@ -59,6 +61,9 @@ public class LuaEventHub<THub, TResource> : ILuaEventHub<THub> where TResource :
             case MemberExpression memberExpression:
                 var value = Expression.Lambda(memberExpression).Compile().DynamicInvoke();
                 return _luaValueMapper.Map(value);
+            case NewExpression newExpression:
+                var instantiate = Expression.Lambda<Func<LuaValue>>(newExpression).Compile();
+                return instantiate();
             default:
                 throw new NotSupportedException();
         }

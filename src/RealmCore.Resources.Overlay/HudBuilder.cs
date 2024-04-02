@@ -6,24 +6,27 @@ using SlipeServer.Packets.Definitions.Lua;
 
 namespace RealmCore.Resources.Overlay;
 
-internal class HudBuilder<TState> : IHudBuilder<TState>
+internal enum AddElementLocation
+{
+    Default,
+    AtTheBeginning,
+    BeforeLastElement
+}
+
+internal sealed class HudBuilder<TState> : IHudBuilder<TState>
 {
     private readonly List<LuaValue> _luaValues = [];
     private readonly TState _state;
     private readonly IAssetsService _assetsService;
-    private readonly Vector2 _screenSize;
-    public float Right => _screenSize.X;
-    public float Bottom => _screenSize.Y;
     private int _id = 0;
 
     internal IEnumerable<LuaValue> HudElementsDefinitions => _luaValues;
     public Action<DynamicHudElement>? DynamicHudElementAdded { get; set; }
 
-    public HudBuilder(TState defaultState, IAssetsService assetsService, Vector2 screenSize)
+    public HudBuilder(TState defaultState, IAssetsService assetsService)
     {
         _state = defaultState;
         _assetsService = assetsService;
-        _screenSize = screenSize;
     }
 
     public ITextAndHudBuilder<TState> AddText(string text, Vector2 position, Size size, Color? color = null, Size? scale = null, string font = "default", HorizontalAlign alignX = HorizontalAlign.Left, VerticalAlign alignY = VerticalAlign.Top)
@@ -31,29 +34,28 @@ internal class HudBuilder<TState> : IHudBuilder<TState>
         return AddText(b => b.WithText(text).WithPosition(position).WithSize(size).WithColor(color ?? Color.White).WithFont(font).WithHorizontalAlign(alignX).WithVerticalAlign(alignY));
     }
 
-    public void AddLuaValue(LuaValue luaValue, bool atTheBeginning = false)
+    private void AddLuaValue(LuaValue luaValue, AddElementLocation addElementLocation = AddElementLocation.Default)
     {
-        if(atTheBeginning)
+        switch (addElementLocation)
         {
-            _luaValues.Insert(0, luaValue);
-        }
-        else
-        {
-            _luaValues.Add(luaValue);
+            case AddElementLocation.Default:
+                _luaValues.Add(luaValue);
+                break;
+            case AddElementLocation.AtTheBeginning:
+                _luaValues.Insert(0, luaValue);
+                break;
+            case AddElementLocation.BeforeLastElement:
+                _luaValues.Insert(_luaValues.Count - 1, luaValue);
+                break;
+            default:
+                break;
         }
     }
-
-    public void AddLuaValue(TextConstructionInfo textConstructionInfo, bool atTheBeginning = false)
+    
+    internal void AddLuaValue(TextConstructionInfo textConstructionInfo, AddElementLocation addElementLocation = AddElementLocation.Default)
     {
         var luaValue = textConstructionInfo.AsLuaValue();
-        if (atTheBeginning)
-        {
-            _luaValues.Insert(0, luaValue);
-        }
-        else
-        {
-            _luaValues.Add(luaValue);
-        }
+        AddLuaValue(luaValue, addElementLocation);
     }
 
     public int AllocateId() => Interlocked.Increment(ref _id);

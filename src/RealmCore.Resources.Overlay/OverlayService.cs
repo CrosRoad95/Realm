@@ -20,9 +20,9 @@ public interface IOverlayService
 
     void AddNotification(Player player, string message);
     string AddRing3dDisplay(Player player, Vector3 position, TimeSpan time);
-    void CreateHud(Player player, string hudId, Action<IHudBuilder<object>> hudBuilderCallback, Vector2 screenSize, Vector2? position = null);
-    void CreateHud<TState>(Player player, string hudId, Action<IHudBuilder<TState>> hudBuilderCallback, Vector2 screenSize, Vector2? position, TState defaultState) where TState : class;
-    void CreateHud3d<TState>(string hudId, Action<IHudBuilder<TState>> hudBuilderCallback, TState state, Vector3? position = null) where TState : class;
+    void CreateHud(Player player, string hudId, Action<IHudBuilder<object>, IHudBuilderContext> hudBuilderCallback, Vector2 screenSize, Vector2? position = null);
+    void CreateHud<TState>(Player player, string hudId, Action<IHudBuilder<TState>, IHudBuilderContext> hudBuilderCallback, Vector2 screenSize, Vector2? position, TState defaultState) where TState : class;
+    void CreateHud3d<TState>(string hudId, Action<IHudBuilder<TState>, IHudBuilderContext> hudBuilderCallback, TState state, Vector3? position = null) where TState : class;
     void RemoveHudLayer(Player player, string hudId);
     void RemoveHud3d(string hudId);
     void RemoveRing3dDisplay(Player player, string id);
@@ -87,24 +87,27 @@ internal sealed class OverlayService : IOverlayService
         Hud3dStateChanged?.Invoke(hudId, state);
     }
 
-    public void CreateHud3d<TState>(string hudId, Action<IHudBuilder<TState>> hudBuilderCallback, TState state, Vector3? position = null) where TState : class
+    public void CreateHud3d<TState>(string hudId, Action<IHudBuilder<TState>, IHudBuilderContext> hudBuilderCallback, TState state, Vector3? position = null) where TState : class
     {
-        var hudBuilder = new HudBuilder<TState>(state, _assetsService, new Vector2(0, 0));
-        hudBuilderCallback(hudBuilder);
+        var hudBuilder = new HudBuilder<TState>(state, _assetsService);
+        var context = new HudBuilderContext(Vector2.Zero);
+        hudBuilderCallback(hudBuilder, context);
         Hud3dCreated?.Invoke(hudId, position ?? Vector3.Zero, hudBuilder.HudElementsDefinitions);
     }
 
-    public void CreateHud(Player player, string hudId, Action<IHudBuilder<object>> hudBuilderCallback, Vector2 screenSize, Vector2? position = null)
+    public void CreateHud(Player player, string hudId, Action<IHudBuilder<object>, IHudBuilderContext> hudBuilderCallback, Vector2 screenSize, Vector2? position = null)
     {
-        var hudBuilder = new HudBuilder<object>(new object(), _assetsService, screenSize);
-        hudBuilderCallback(hudBuilder);
+        var hudBuilder = new HudBuilder<object>(new object(), _assetsService);
+        var context = new HudBuilderContext(screenSize);
+        hudBuilderCallback(hudBuilder, context);
         HudCreated?.Invoke(player, hudId, position ?? Vector2.Zero, hudBuilder.HudElementsDefinitions);
     }
 
-    public void CreateHud<TState>(Player player, string hudId, Action<IHudBuilder<TState>> hudBuilderCallback, Vector2 screenSize, Vector2? position, TState defaultState) where TState : class
+    public void CreateHud<TState>(Player player, string hudId, Action<IHudBuilder<TState>, IHudBuilderContext> hudBuilderCallback, Vector2 screenSize, Vector2? position, TState defaultState) where TState : class
     {
-        var hudBuilder = new HudBuilder<TState>(defaultState, _assetsService, screenSize);
-        hudBuilderCallback(hudBuilder);
+        var hudBuilder = new HudBuilder<TState>(defaultState, _assetsService);
+        var context = new HudBuilderContext(screenSize);
+        hudBuilderCallback(hudBuilder, context);
         HudCreated?.Invoke(player, hudId, position ?? Vector2.Zero, hudBuilder.HudElementsDefinitions);
     }
 

@@ -11,13 +11,13 @@ internal sealed class PlayerHudLogic : PlayerLifecycle
 
     protected override void PlayerJoined(RealmPlayer player)
     {
-        player.Hud.LayerCreated += HandleLayerCreated;
+        player.Hud.LayerAdded += HandleLayerCreated;
         player.Hud.LayerRemoved += HandleLayerRemoved;
     }
 
     protected override void PlayerLeft(RealmPlayer player)
     {
-        player.Hud.LayerCreated -= HandleLayerCreated;
+        player.Hud.LayerAdded -= HandleLayerCreated;
         player.Hud.LayerRemoved -= HandleLayerRemoved;
     }
 
