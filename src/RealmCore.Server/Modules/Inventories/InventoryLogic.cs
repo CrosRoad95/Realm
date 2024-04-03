@@ -4,7 +4,7 @@ internal sealed class InventoryLogic : PlayerLifecycle
 {
     private readonly ILogger<InventoryLogic> _logger;
 
-    public InventoryLogic(MtaServer server, ILogger<InventoryLogic> logger) : base(server)
+    public InventoryLogic(PlayersEventManager playersEventManager, ILogger<InventoryLogic> logger) : base(playersEventManager)
     {
         _logger = logger;
     }

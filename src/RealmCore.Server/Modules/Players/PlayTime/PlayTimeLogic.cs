@@ -6,7 +6,7 @@ internal sealed class PlayTimeLogic : PlayerLifecycle
     private readonly IElementCollection _elementCollection;
     private readonly IDateTimeProvider _dateTimeProvider;
 
-    public PlayTimeLogic(MtaServer mtaServer, ISchedulerService schedulerService, IElementCollection elementCollection, ILogger<PlayTimeLogic> logger, IDateTimeProvider dateTimeProvider) : base(mtaServer)
+    public PlayTimeLogic(PlayersEventManager playersEventManager, ISchedulerService schedulerService, IElementCollection elementCollection, ILogger<PlayTimeLogic> logger, IDateTimeProvider dateTimeProvider) : base(playersEventManager)
     {
         _schedulerService = schedulerService;
         _elementCollection = elementCollection;

@@ -4,7 +4,7 @@ internal sealed class FocusableElementsLogic : PlayerLifecycle
 {
     private readonly IClientInterfaceService _clientInterfaceService;
 
-    public FocusableElementsLogic(MtaServer mtaServer, IElementFactory elementFactory, IClientInterfaceService clientInterfaceService) : base(mtaServer)
+    public FocusableElementsLogic(PlayersEventManager playersEventManager, IElementFactory elementFactory, IClientInterfaceService clientInterfaceService) : base(playersEventManager)
     {
         _clientInterfaceService = clientInterfaceService;
         _clientInterfaceService.FocusedElementChanged += HandleFocusedElementChanged;

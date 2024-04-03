@@ -4,7 +4,7 @@ internal sealed class AchievementsLogic : PlayerLifecycle
 {
     private readonly IOverlayService _overlayService;
 
-    public AchievementsLogic(MtaServer server, IOverlayService overlayService) : base(server)
+    public AchievementsLogic(PlayersEventManager playersEventManager, IOverlayService overlayService) : base(playersEventManager)
     {
         _overlayService = overlayService;
     }

@@ -6,19 +6,17 @@ internal sealed class PlayersLogic : PlayerLifecycle
     private readonly ILogger<PlayersLogic> _logger;
     private readonly IResourceProvider _resourceProvider;
     private readonly IUsersInUse _activeUsers;
-    private readonly IPlayersEventManager _playerEventManager;
     private readonly IOptions<GuiBrowserOptions> _guiBrowserOptions;
     private readonly ClientConsole _clientConsole;
     private readonly IPlayersService _playersService;
     private readonly ConcurrentDictionary<RealmPlayer, Latch> _playerResources = new();
 
-    public PlayersLogic(MtaServer server, IClientInterfaceService clientInterfaceService, ILogger<PlayersLogic> logger, IResourceProvider resourceProvider, IUsersInUse activeUsers, IPlayersEventManager playerEventManager, IOptions<GuiBrowserOptions> guiBrowserOptions, ClientConsole clientConsole, IPlayersService playersService) : base(server)
+    public PlayersLogic(PlayersEventManager playersEventManager, IClientInterfaceService clientInterfaceService, ILogger<PlayersLogic> logger, IResourceProvider resourceProvider, IUsersInUse activeUsers, IOptions<GuiBrowserOptions> guiBrowserOptions, ClientConsole clientConsole, IPlayersService playersService) : base(playersEventManager)
     {
         _clientInterfaceService = clientInterfaceService;
         _logger = logger;
         _resourceProvider = resourceProvider;
         _activeUsers = activeUsers;
-        _playerEventManager = playerEventManager;
         _guiBrowserOptions = guiBrowserOptions;
         _clientConsole = clientConsole;
         _playersService = playersService;
@@ -136,15 +134,21 @@ internal sealed class PlayersLogic : PlayerLifecycle
         if (player.IsDestroyed)
             return;
         player.Disconnected += HandleDisconnected;
+        player.Spawned += HandleSpawned;
 
-        _playerEventManager.RelayLoaded(player);
+        _playersEventManager.RelayLoaded(player);
     }
 
+    private void HandleSpawned(Player sender, PlayerSpawnedEventArgs e)
+    {
+        _playersEventManager.RelayLoaded((RealmPlayer)e.Source);
+    }
 
     private void HandleDisconnected(Player player, PlayerQuitEventArgs playerQuitEventArgs)
     {
         _logger.LogInformation("Player {playerName} disconnected", player.Name);
-        player.Disconnected += HandleDisconnected;
+        player.Disconnected -= HandleDisconnected;
+        player.Spawned -= HandleSpawned;
     }
 
     protected override async void PlayerJoined(RealmPlayer player)
@@ -198,7 +202,7 @@ internal sealed class PlayersLogic : PlayerLifecycle
             if (player.User.IsSignedIn)
             {
                 if (_activeUsers.TrySetInactive(player.PersistentId))
-                    _playerEventManager.RelayUnloading(player);
+                    _playersEventManager.RelayUnloading(player);
 
                 await player.GetRequiredService<ISaveService>().Save();
             }

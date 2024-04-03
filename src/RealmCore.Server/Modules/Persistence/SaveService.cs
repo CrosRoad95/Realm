@@ -30,9 +30,6 @@ internal sealed partial class SaveService : ISaveService
 
     private async Task<bool> SaveVehicle(RealmVehicle vehicle, CancellationToken cancellationToken = default)
     {
-        if (!vehicle.Persistence.IsLoaded)
-            throw new VehicleNotLoadedException();
-
         var vehicleData = vehicle.Persistence.VehicleData;
 
         vehicleData.TransformAndMotion = vehicle.GetTransformAndMotion();

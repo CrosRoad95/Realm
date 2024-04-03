@@ -1,6 +1,6 @@
 ﻿namespace RealmCore.Server.Modules.Server;
 
-internal class AssetsOptions
+internal sealed class AssetsOptions
 {
     public string Base64Key { get; set; }
 }

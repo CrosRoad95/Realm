@@ -74,7 +74,7 @@ public class RealmTestingServer<TPlayer> : TestingServer<TPlayer> where TPlayer:
             IPAddress = System.Net.IPAddress.Parse("127.0.0.1")
         };
 
-        GetRequiredService<IPlayersEventManager>().RelayLoaded(player);
+        GetRequiredService<PlayersEventManager>().RelayLoaded(player);
         return player;
     }
 

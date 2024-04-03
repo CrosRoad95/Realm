@@ -25,7 +25,6 @@ internal sealed class PlayerMoneyFeature : IPlayerMoneyFeature, IUsesUserPersist
 {
     private readonly ReaderWriterLockSlim _lock = new();
     private decimal _money = 0;
-    private decimal _previousMoney = 0;
     private decimal _moneyLimit;
     private byte _moneyPrecision;
     private UserData? _userData;
@@ -57,9 +56,7 @@ internal sealed class PlayerMoneyFeature : IPlayerMoneyFeature, IUsesUserPersist
                     return;
                 _money = value;
                 SyncMoney();
-
-                TryUpdateVersion();
-
+                VersionIncreased?.Invoke();
                 Set?.Invoke(this, _money);
             }
             catch (Exception)
@@ -87,15 +84,6 @@ internal sealed class PlayerMoneyFeature : IPlayerMoneyFeature, IUsesUserPersist
     public void SignOut()
     {
         Amount = 0;
-    }
-
-    private void TryUpdateVersion()
-    {
-        if (Math.Abs(_money - _previousMoney) > 200)
-        {
-            _previousMoney = _money;
-            VersionIncreased?.Invoke();
-        }
     }
 
     public void SetMoneyInternal(decimal amount)
@@ -136,7 +124,7 @@ internal sealed class PlayerMoneyFeature : IPlayerMoneyFeature, IUsesUserPersist
 
             _money += amount;
             SyncMoney();
-            TryUpdateVersion();
+            VersionIncreased?.Invoke();
             Added?.Invoke(this, amount);
         }
         catch (Exception)
@@ -167,7 +155,7 @@ internal sealed class PlayerMoneyFeature : IPlayerMoneyFeature, IUsesUserPersist
 
         _money -= amount;
         SyncMoney();
-        TryUpdateVersion();
+        VersionIncreased?.Invoke();
         Taken?.Invoke(this, amount);
     }
 
@@ -265,8 +253,8 @@ internal sealed class PlayerMoneyFeature : IPlayerMoneyFeature, IUsesUserPersist
 
     public void TransferMoney(RealmPlayer player, decimal amount, bool force = false)
     {
-        if (amount == 0)
-            return;
+        if (amount <= 0)
+            throw new GameplayException("Unable to transfer money, amount can smaller or equal to zero.");
 
         TakeMoney(amount, force);
         player.Money.GiveMoney(amount);

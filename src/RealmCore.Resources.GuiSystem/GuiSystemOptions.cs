@@ -2,7 +2,7 @@
 
 namespace RealmCore.Resources.GuiSystem;
 
-public class GuiSystemOptions
+public sealed class GuiSystemOptions
 {
     internal readonly Dictionary<string, byte[]?> _providers = [];
     internal readonly Dictionary<string, byte[]> _guis = [];

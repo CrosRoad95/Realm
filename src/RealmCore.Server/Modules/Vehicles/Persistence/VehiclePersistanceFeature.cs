@@ -25,7 +25,7 @@ internal sealed class VehiclePersistanceFeature : IVehiclePersistenceFeature
     private readonly object _lock = new();
     private VehicleData? _vehicleData;
     private readonly IDateTimeProvider _dateTimeProvider;
-    public VehicleData VehicleData => _vehicleData ?? throw new VehicleNotLoadedException();
+    public VehicleData VehicleData => _vehicleData ?? throw new PersistantVehicleNotLoadedException();
 
     public bool IsLoaded => _vehicleData != null;
     public int Id => VehicleData?.Id ?? throw new PersistantVehicleNotLoadedException();
@@ -62,7 +62,7 @@ internal sealed class VehiclePersistanceFeature : IVehiclePersistenceFeature
         lock (_lock)
         {
             if (_vehicleData != null)
-                throw new InvalidOperationException();
+                throw new VehicleAlreadyLoadedException();
 
             _vehicleData = vehicleData;
             Vehicle.Model = vehicleData.Model;

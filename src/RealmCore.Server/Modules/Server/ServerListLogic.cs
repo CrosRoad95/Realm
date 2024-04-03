@@ -1,13 +1,14 @@
 ﻿namespace RealmCore.Server.Modules.Server;
 
-internal sealed class ServerLogic
+internal sealed class ServerListLogic
 {
     private readonly MtaServer _server;
     private readonly IOptionsMonitor<GameplayOptions> _gameplayOptions;
     private readonly IOptionsMonitor<ServerListOptions> _serverListOptions;
-    private readonly ILogger<ServerLogic> _logger;
+    private readonly ILogger<ServerListLogic> _logger;
+    private readonly Debounce _debounce = new(500);
 
-    public ServerLogic(MtaServer server, IOptionsMonitor<GameplayOptions> gameplayOptions, IOptionsMonitor<ServerListOptions> serverListOptions, ILogger<ServerLogic> logger)
+    public ServerListLogic(MtaServer server, IOptionsMonitor<GameplayOptions> gameplayOptions, IOptionsMonitor<ServerListOptions> serverListOptions, ILogger<ServerListLogic> logger)
     {
         _server = server;
         _gameplayOptions = gameplayOptions;
@@ -22,6 +23,9 @@ internal sealed class ServerLogic
 
     private void UpdateGameplayOptions(bool firstUpdate = false)
     {
+        if (_gameplayOptions.CurrentValue.Password == _server.Password)
+            return;
+
         if (!string.IsNullOrWhiteSpace(_gameplayOptions.CurrentValue.Password))
             _server.Password = _gameplayOptions.CurrentValue.Password;
         else
@@ -33,6 +37,10 @@ internal sealed class ServerLogic
 
     private void UpdateServerListOptions(bool firstUpdate = false)
     {
+        var value = _serverListOptions.CurrentValue;
+        if (value.GameType == _server.GameType && value.MapName == _server.MapName)
+            return;
+
         _server.GameType = _serverListOptions.CurrentValue.GameType;
         _server.MapName = _serverListOptions.CurrentValue.MapName;
 
@@ -42,11 +50,17 @@ internal sealed class ServerLogic
 
     private void GameplayOptionsChanged(GameplayOptions gameplayOptions)
     {
-        UpdateGameplayOptions();
+        _debounce.Invoke(() =>
+        {
+            UpdateGameplayOptions();
+        });
     }
 
     private void ServerListOptionsChanged(ServerListOptions serverListOptions)
     {
-        UpdateServerListOptions();
+        _debounce.Invoke(() =>
+        {
+            UpdateServerListOptions();
+        });
     }
 }

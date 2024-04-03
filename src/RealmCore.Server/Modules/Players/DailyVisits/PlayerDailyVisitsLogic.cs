@@ -4,7 +4,7 @@ internal sealed class PlayerDailyVisitsLogic : PlayerLifecycle
 {
     private readonly IDateTimeProvider _dateTimeProvider;
 
-    public PlayerDailyVisitsLogic(MtaServer server, IDateTimeProvider dateTimeProvider) : base(server)
+    public PlayerDailyVisitsLogic(PlayersEventManager playersEventManager, IDateTimeProvider dateTimeProvider) : base(playersEventManager)
     {
         _dateTimeProvider = dateTimeProvider;
     }

@@ -61,7 +61,7 @@ internal sealed class PlayerScopedCollisionShapeBehaviour : IDisposable
 
 internal sealed class ScopedCollisionShapeBehaviour : PlayerLifecycle
 {
-    public ScopedCollisionShapeBehaviour(MtaServer mtaServer) : base(mtaServer)
+    public ScopedCollisionShapeBehaviour(PlayersEventManager playersEventManager) : base(playersEventManager)
     {
     }
 

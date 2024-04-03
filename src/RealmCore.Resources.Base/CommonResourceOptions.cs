@@ -1,6 +1,6 @@
 ﻿namespace RealmCore.Resources.Base;
 
-public class CommonResourceOptions
+public sealed class CommonResourceOptions
 {
     public CommonResourceOptions()
     {

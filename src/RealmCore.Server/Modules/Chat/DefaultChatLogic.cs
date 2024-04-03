@@ -6,7 +6,7 @@ public class DefaultChatLogic : PlayerLifecycle
     private readonly ILogger<DefaultChatLogic> _logger;
     private readonly IElementCollection _elementCollection;
 
-    public DefaultChatLogic(MtaServer server, ChatBox chatBox, ILogger<DefaultChatLogic> logger, IElementCollection elementCollection) : base(server)
+    public DefaultChatLogic(PlayersEventManager playersEventManager, ChatBox chatBox, ILogger<DefaultChatLogic> logger, IElementCollection elementCollection) : base(playersEventManager)
     {
         _chatBox = chatBox;
         _logger = logger;

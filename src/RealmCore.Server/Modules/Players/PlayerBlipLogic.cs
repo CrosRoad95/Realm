@@ -2,7 +2,7 @@
 
 internal sealed class PlayerBlipLogic : PlayerLifecycle
 {
-    public PlayerBlipLogic(MtaServer server) : base(server)
+    public PlayerBlipLogic(PlayersEventManager playersEventManager) : base(playersEventManager)
     {
     }
 

@@ -1,6 +1,6 @@
 ﻿namespace RealmCore.Server.Modules.Server;
 
-public class GameplayOptions
+public sealed class GameplayOptions
 {
     public long MoneyLimit { get; set; }
     public byte MoneyPrecision { get; set; }

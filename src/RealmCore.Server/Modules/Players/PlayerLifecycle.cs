@@ -2,12 +2,19 @@
 
 public abstract class PlayerLifecycle<TPlayer> where TPlayer: RealmPlayer
 {
-    protected readonly MtaServer _server;
+    protected readonly PlayersEventManager _playersEventManager;
 
-    public PlayerLifecycle(MtaServer server)
+    public PlayerLifecycle(PlayersEventManager playersEventManager)
     {
-        server.GetRequiredService<IPlayersEventManager>().PlayerJoined += HandlePlayerJoined;
-        _server = server;
+        playersEventManager.Joined += HandlePlayerJoined;
+        playersEventManager.Spawned += HandlePlayerSpawned;
+        _playersEventManager = playersEventManager;
+    }
+
+    private void HandlePlayerSpawned(Player plr)
+    {
+        var player = (TPlayer)plr;
+        PlayerSpawned(player);
     }
 
     private void HandlePlayerJoined(Player plr)
@@ -34,11 +41,12 @@ public abstract class PlayerLifecycle<TPlayer> where TPlayer: RealmPlayer
     protected virtual void PlayerJoined(TPlayer player) { }
     protected virtual void PlayerLeft(TPlayer player) { }
     protected virtual void PlayerSignedIn(IPlayerUserFeature userService, TPlayer player) { }
+    protected virtual void PlayerSpawned(TPlayer player) { }
 }
 
 public abstract class PlayerLifecycle : PlayerLifecycle<RealmPlayer>
 {
-    protected PlayerLifecycle(MtaServer server) : base(server)
+    protected PlayerLifecycle(PlayersEventManager playersEventManager) : base(playersEventManager)
     {
     }
 }

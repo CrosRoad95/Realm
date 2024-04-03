@@ -4,7 +4,7 @@ public class ItemsLogic : PlayerLifecycle
 {
     private readonly ChatBox _chatBox;
 
-    public ItemsLogic(MtaServer server, ItemsCollection itemsCollection, ChatBox chatBox) : base(server)
+    public ItemsLogic(PlayersEventManager playersEventManager, ItemsCollection itemsCollection, ChatBox chatBox) : base(playersEventManager)
     {
         itemsCollection.Add(1, new ItemsCollectionItem
         {

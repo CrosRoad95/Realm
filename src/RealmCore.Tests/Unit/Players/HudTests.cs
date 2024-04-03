@@ -1,8 +1,4 @@
-﻿
-using FluentAssertions.Events;
-using System.Threading;
-
-namespace RealmCore.Tests.Unit.Players;
+﻿namespace RealmCore.Tests.Unit.Players;
 
 public class HudTests : RealmUnitTestingBase
 {

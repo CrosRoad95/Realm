@@ -8,7 +8,7 @@ internal sealed class AFKLogic : PlayerLifecycle
     private int _afkCooldown;
 
     private const int _defaultAfkCooldown = 5000;
-    public AFKLogic(MtaServer server, IElementCollection elementCollection, IOptionsMonitor<GameplayOptions> gameplayOptions, ILogger<AFKLogic> logger) : base(server)
+    public AFKLogic(PlayersEventManager playersEventManager, IElementCollection elementCollection, IOptionsMonitor<GameplayOptions> gameplayOptions, ILogger<AFKLogic> logger) : base(playersEventManager)
     {
         gameplayOptions.OnChange(HandleGameplayOptionsChanged);
         _elementCollection = elementCollection;

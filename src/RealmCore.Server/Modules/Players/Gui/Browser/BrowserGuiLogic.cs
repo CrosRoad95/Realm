@@ -8,7 +8,7 @@ internal sealed class BrowserGuiLogic : PlayerLifecycle
     private readonly IBrowserGuiService _browserGuiService;
     private readonly IOptions<BrowserOptions> _browserOptions;
 
-    public BrowserGuiLogic(MtaServer server, ILogger<BrowserGuiLogic> logger, IOptions<GuiBrowserOptions> guiBrowserOptions, IBrowserService browserService, IBrowserGuiService browserGuiService, IOptions<BrowserOptions> browserOptions) : base(server)
+    public BrowserGuiLogic(PlayersEventManager playersEventManager, ILogger<BrowserGuiLogic> logger, IOptions<GuiBrowserOptions> guiBrowserOptions, IBrowserService browserService, IBrowserGuiService browserGuiService, IOptions<BrowserOptions> browserOptions) : base(playersEventManager)
     {
         _logger = logger;
         _guiBrowserOptions = guiBrowserOptions;

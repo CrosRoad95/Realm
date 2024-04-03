@@ -7,7 +7,7 @@ internal sealed class AdministrationLogic : PlayerLifecycle
     private readonly IClientInterfaceService _clientInterfaceService;
     private readonly IAdminService _adminService;
 
-    public AdministrationLogic(MtaServer server, NoClipService noClipService, DebugLog debugLog, IClientInterfaceService clientInterfaceService, IAdminService adminService) : base(server)
+    public AdministrationLogic(PlayersEventManager playersEventManager, NoClipService noClipService, DebugLog debugLog, IClientInterfaceService clientInterfaceService, IAdminService adminService) : base(playersEventManager)
     {
         _noClipService = noClipService;
         _debugLog = debugLog;

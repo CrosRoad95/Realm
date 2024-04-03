@@ -9,10 +9,10 @@ internal sealed class PlayerJoinedPipeline
 {
     private readonly MtaServer _mtaServer;
     private readonly IEnumerable<IPlayerJoinedPipeline> _playerPipelines;
-    private readonly IPlayersEventManager _playersEventManager;
+    private readonly PlayersEventManager _playersEventManager;
     private readonly ILogger<PlayerJoinedPipeline> _logger;
 
-    public PlayerJoinedPipeline(MtaServer mtaServer, IEnumerable<IPlayerJoinedPipeline> playerPipelines, IPlayersEventManager playersEventManager, ILogger<PlayerJoinedPipeline> logger)
+    public PlayerJoinedPipeline(MtaServer mtaServer, IEnumerable<IPlayerJoinedPipeline> playerPipelines, PlayersEventManager playersEventManager, ILogger<PlayerJoinedPipeline> logger)
     {
         _mtaServer = mtaServer;
         _playerPipelines = playerPipelines;

@@ -8,7 +8,7 @@ internal sealed class PlayerMoneyLogic : PlayerLifecycle
     private decimal _limit;
     private byte _precision;
 
-    public PlayerMoneyLogic(MtaServer server, IOptionsMonitor<GameplayOptions> gameplayOptions, IElementCollection elementCollection, ILogger<PlayerMoneyLogic> logger) : base(server)
+    public PlayerMoneyLogic(PlayersEventManager playersEventManager, IOptionsMonitor<GameplayOptions> gameplayOptions, IElementCollection elementCollection, ILogger<PlayerMoneyLogic> logger) : base(playersEventManager)
     {
         _gameplayOptions = gameplayOptions;
         _elementCollection = elementCollection;

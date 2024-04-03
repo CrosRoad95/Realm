@@ -1,6 +1,6 @@
 ﻿namespace RealmCore.Resources.Browser;
 
-public class BrowserOptions
+public sealed class BrowserOptions
 {
     public BrowserMode Mode { get; set; }
     public int BrowserWidth { get; set; }

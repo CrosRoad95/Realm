@@ -6,7 +6,7 @@ internal sealed class DxGuiSystemServiceLogic : PlayerLifecycle
     private readonly FromLuaValueMapper _fromLuaValueMapper;
     private readonly ILogger<DxGuiSystemServiceLogic> _logger;
 
-    public DxGuiSystemServiceLogic(FromLuaValueMapper fromLuaValueMapper, ILogger<DxGuiSystemServiceLogic> logger, MtaServer server, IGuiSystemService? guiSystemService = null) : base(server)
+    public DxGuiSystemServiceLogic(PlayersEventManager playersEventManager, FromLuaValueMapper fromLuaValueMapper, ILogger<DxGuiSystemServiceLogic> logger, IGuiSystemService? guiSystemService = null) : base(playersEventManager)
     {
         _fromLuaValueMapper = fromLuaValueMapper;
         _logger = logger;

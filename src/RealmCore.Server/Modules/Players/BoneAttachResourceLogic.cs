@@ -4,7 +4,7 @@ internal sealed class BoneAttachResourceLogic : PlayerLifecycle
 {
     private readonly BoneAttachService _boneAttachService;
 
-    public BoneAttachResourceLogic(BoneAttachService boneAttachService, MtaServer server) : base(server)
+    public BoneAttachResourceLogic(BoneAttachService boneAttachService, PlayersEventManager playersEventManager) : base(playersEventManager)
     {
         _boneAttachService = boneAttachService;
     }

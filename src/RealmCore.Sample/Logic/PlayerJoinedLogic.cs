@@ -11,7 +11,7 @@ internal sealed class PlayerJoinedLogic
     private readonly ScoreboardService _scoreboardService;
     private readonly IGuiSystemService? _guiSystemService;
 
-    public PlayerJoinedLogic(ILogger<PlayerJoinedLogic> logger, INametagsService nametagsService,ChatBox chatBox, Text3dService text3DService, IPlayersEventManager playersService, IUsersService usersService, ScoreboardService scoreboardService, IGuiSystemService? guiSystemService = null)
+    public PlayerJoinedLogic(ILogger<PlayerJoinedLogic> logger, INametagsService nametagsService,ChatBox chatBox, Text3dService text3DService, PlayersEventManager playersEventManager, IUsersService usersService, ScoreboardService scoreboardService, IGuiSystemService? guiSystemService = null)
     {
         _logger = logger;
         _nametagsService = nametagsService;
@@ -19,8 +19,8 @@ internal sealed class PlayerJoinedLogic
         _text3DService = text3DService;
         _scoreboardService = scoreboardService;
         _guiSystemService = guiSystemService;
-        playersService.PlayerLoaded += HandlePlayerLoaded;
-        playersService.PlayerUnloading += HandlePlayerUnloading;
+        playersEventManager.Loaded += HandlePlayerLoaded;
+        playersEventManager.Unloading += HandlePlayerUnloading;
         usersService.SignedIn += HandleSignedIn;
         usersService.SignedOut += HandleSignedOut;
     }

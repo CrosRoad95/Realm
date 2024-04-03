@@ -1,6 +1,4 @@
-﻿using System.Linq.Expressions;
-
-namespace RealmCore.Resources.Base;
+﻿namespace RealmCore.Resources.Base;
 
 public class LuaEventHub<THub, TResource> : ILuaEventHub<THub> where TResource : Resource
 {

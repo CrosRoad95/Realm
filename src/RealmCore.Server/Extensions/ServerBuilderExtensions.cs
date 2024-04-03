@@ -88,7 +88,7 @@ public static class ServerBuilderExtensions
         serverBuilder.AddLogic<InventoryLogic>();
         serverBuilder.AddLogic<PlayersLogic>();
         serverBuilder.AddLogic<GuiLogic>();
-        serverBuilder.AddLogic<ServerLogic>();
+        serverBuilder.AddLogic<ServerListLogic>();
         serverBuilder.AddLogic<VehicleAccessControllerLogic>();
         serverBuilder.AddLogic<MapsLogic>();
         serverBuilder.AddLogic<PlayersBindsLogic>();

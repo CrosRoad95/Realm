@@ -7,7 +7,7 @@ internal class TestLogic : PlayerLifecycle
     private readonly ILogger<TestLogic> _logger;
     private readonly ChatBox _chatBox;
 
-    public TestLogic(IElementFactory elementFactory, ISchedulerService schedulerService, ILogger<TestLogic> logger, ChatBox chatBox, MtaServer mtaServer) : base(mtaServer)
+    public TestLogic(PlayersEventManager playersEventManager, IElementFactory elementFactory, ISchedulerService schedulerService, ILogger<TestLogic> logger, ChatBox chatBox) : base(playersEventManager)
     {
         var marker = elementFactory.CreateMarker(new Location(335.50684f, -83.71094f, 1.4105641f), MarkerType.Cylinder, 1, Color.Red);
         marker.Size = 4;

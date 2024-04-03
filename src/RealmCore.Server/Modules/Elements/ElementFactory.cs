@@ -6,11 +6,11 @@ public class ElementFactory : IElementFactory
     private readonly IServiceProvider _serviceProvider;
 
     public event Action<IElementFactory, Element>? ElementCreated;
-    public ElementFactory(MtaServer server, IPlayersEventManager playersEventManager, IServiceProvider serviceProvider)
+    public ElementFactory(MtaServer server, PlayersEventManager playersEventManager, IServiceProvider serviceProvider)
     {
         _server = server;
         _serviceProvider = serviceProvider;
-        playersEventManager.PlayerJoined += HandlePlayerJoined;
+        playersEventManager.Joined += HandlePlayerJoined;
     }
 
     private void HandlePlayerJoined(Player player)

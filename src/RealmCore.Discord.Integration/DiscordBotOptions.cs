@@ -6,7 +6,7 @@ internal interface IChannelConfiguration
 
 }
 
-public class DiscordBotOptions
+public sealed class DiscordBotOptions
 {
     public class StatusChannelConfiguration : IChannelConfiguration
     {
