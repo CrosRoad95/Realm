@@ -5,6 +5,8 @@ using RealmCore.Server.Modules.Elements.Focusable;
 using RealmCore.Server.Modules.Players.Money;
 using RealmCore.Server.Modules.Search;
 using SlipeServer.Packets.Enums;
+using SlipeServer.Server.Elements.ColShapes;
+using SlipeServer.Server.Elements.Events;
 using Color = System.Drawing.Color;
 
 namespace RealmCore.Sample.Logic;
@@ -465,7 +467,7 @@ internal sealed class CommandsLogic
         _commandService.AddCommandHandler("spawncolshapeforme", (player, args) =>
         {
             var marker = player.ElementFactory.CreateMarker(new Location(player.Position + new Vector3(4, 0, 0), Vector3.Zero), MarkerType.Arrow, 2, Color.Red);
-            marker.CollisionDetection.Entered += (that, enteredElement) =>
+            marker.CollisionShape.ElementEntered += (that, enteredElement) =>
             {
                 _chatBox.Output($"entered2 {enteredElement}");
             };
@@ -988,17 +990,17 @@ internal sealed class CommandsLogic
             var pickup2 = _elementFactory.CreatePickup(new Location(new Vector3(340.4619f, -131.87402f, 1.578125f), Vector3.Zero, Interior: 1), 1274);
             var pickup3 = _elementFactory.CreatePickup(new Location(new Vector3(340.4619f, -131.87402f, 1.578125f), Vector3.Zero, Dimension: 1), 1274);
 
-            pickup1.CollisionDetection.Entered += (pickup, element) =>
+            pickup1.CollisionShape.ElementEntered += (pickup, element) =>
             {
                 _chatBox.Output("Enter pickup 1");
             };
 
-            pickup2.CollisionDetection.Entered += (pickup, element) =>
+            pickup2.CollisionShape.ElementEntered += (pickup, element) =>
             {
                 _chatBox.Output("Enter pickup 2");
             };
 
-            pickup3.CollisionDetection.Entered += (pickup, element) =>
+            pickup3.CollisionShape.ElementEntered += (pickup, element) =>
             {
                 _chatBox.Output("Enter pickup 3");
             };
@@ -1925,24 +1927,24 @@ internal sealed class CommandsLogic
         {
             var sphere = _elementFactory.CreateCollisionSphere(player.Position, 5);
 
-            void handleEntered(RealmCollisionSphere arg1, Element element)
+            void handleEntered(CollisionShape sender, CollisionShapeHitEventArgs e)
             {
-                if(element == player)
+                if(e.Element == player)
                 {
                     _chatBox.OutputTo(player, "entered");
                 }
             }
 
-            void handleLeft(RealmCollisionSphere arg1, Element element)
+            void handleLeft(CollisionShape sender, CollisionShapeLeftEventArgs e)
             {
-                if (element == player)
+                if (e.Element == player)
                 {
                     _chatBox.OutputTo(player, "left");
                 }
             }
 
-            sphere.CollisionDetection.Entered += handleEntered;
-            sphere.CollisionDetection.Left += handleLeft;
+            sphere.ElementEntered += handleEntered;
+            sphere.ElementLeft += handleLeft;
         });
 
         _commandService.AddCommandHandler("activefuelcontainer", (player, args) =>
@@ -1951,6 +1953,5 @@ internal sealed class CommandsLogic
             _chatBox.OutputTo(player, $"Vehicle id: {player.Vehicle?.PersistentId}");
             _chatBox.OutputTo(player, $"Active container: {active}");
         });
-
     }
 }

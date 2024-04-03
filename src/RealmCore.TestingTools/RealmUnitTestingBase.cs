@@ -1,4 +1,7 @@
-﻿namespace RealmCore.TestingTools;
+﻿using Microsoft.AspNetCore.Hosting.Server;
+using SlipeServer.Server.Behaviour;
+
+namespace RealmCore.TestingTools;
 
 public abstract class RealmUnitTestingBase<TRealmTestingServer, TRealmPlayer> : RealmTestingBase<TRealmTestingServer, TRealmPlayer>
     where TRealmTestingServer : RealmTestingServer<TRealmPlayer>
@@ -35,13 +38,16 @@ public abstract class RealmUnitTestingBase<TRealmTestingServer, TRealmPlayer> : 
 
 public abstract class RealmUnitTestingBase : RealmUnitTestingBase<RealmTestingServer, RealmTestingPlayer>
 {
-    protected override RealmTestingServer CreateServer(TestConfigurationProvider? cnofiguration = null, Action<ServerBuilder>? configureBuilder = null, Action<ServiceCollection>? configureServices = null)
+    protected override RealmTestingServer CreateServer(TestConfigurationProvider? configuration = null, Action<ServerBuilder>? configureBuilder = null, Action<ServiceCollection>? configureServices = null)
     {
-        _server ??= new RealmTestingServer(cnofiguration ?? new TestConfigurationProvider(""), configureBuilder, services =>
+        _server ??= new RealmTestingServer(configuration ?? new TestConfigurationProvider(""), configureBuilder, services =>
         {
             services.AddRealmTestingServices(false);
             configureServices?.Invoke(services);
         });
+
+        _server.Instantiate<CollisionShapeBehaviour>();
+
         return _server;
     }
 

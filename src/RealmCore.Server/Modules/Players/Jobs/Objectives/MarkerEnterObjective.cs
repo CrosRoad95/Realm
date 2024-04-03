@@ -16,12 +16,12 @@ public class MarkerEnterObjective : Objective
     protected override void Load()
     {
         _marker = ElementFactory.CreateMarker(_destination, MarkerType.Arrow, 1, Color.White);
-        _marker.CollisionDetection.Entered += HandleEntered;
+        _marker.CollisionShape.ElementEntered += HandleElementEntered;
     }
 
-    private void HandleEntered(RealmMarker marker, Element enteredElement)
+    private void HandleElementEntered(CollisionShape sender, CollisionShapeHitEventArgs e)
     {
-        if (Player == enteredElement)
+        if (Player == e.Element)
             Complete(this);
     }
 
@@ -29,7 +29,7 @@ public class MarkerEnterObjective : Objective
     {
         if (_marker != null)
         {
-            _marker.CollisionDetection.Entered -= HandleEntered;
+            _marker.CollisionShape.ElementEntered -= HandleElementEntered;
             _marker?.Destroy();
         }
         base.Dispose();

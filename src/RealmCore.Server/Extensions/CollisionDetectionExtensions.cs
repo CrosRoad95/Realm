@@ -6,13 +6,13 @@ public static class CollisionDetectionExtensions
     /// Open browser path
     /// </summary>
     /// <typeparam name="TGui"></typeparam>
-    /// <param name="collisionDetection"></param>
+    /// <param name="collisionShape"></param>
     /// <param name="path"></param>
-    public static void AddOpenGuiLogic<TGui>(this ICollisionDetection collisionDetection, string path)
+    public static void AddOpenGuiLogic<TGui>(this CollisionShape collisionShape, string path)
     {
-        collisionDetection.ElementEntered += (element) =>
+        collisionShape.ElementEntered += (collisionShape, args) =>
         {
-            if (element is RealmPlayer player)
+            if (args.Element is RealmPlayer player)
             {
                 if (!player.Browser.Visible)
                 {
@@ -20,9 +20,9 @@ public static class CollisionDetectionExtensions
                 }
             }
         };
-        collisionDetection.ElementLeft += (element) =>
+        collisionShape.ElementLeft += (collisionShape, args) =>
         {
-            if (element is RealmPlayer player)
+            if (args.Element is RealmPlayer player)
             {
                 if (!player.Browser.Visible)
                 {
@@ -32,32 +32,32 @@ public static class CollisionDetectionExtensions
         };
     }
 
-    public static void AddOpenGuiLogic<TGui>(this ICollisionDetection collisionDetection) where TGui : IPlayerGui
+    public static void AddOpenGuiLogic<TGui>(this CollisionShape collisionShape) where TGui : IPlayerGui
     {
-        collisionDetection.ElementEntered += (element) =>
+        collisionShape.ElementEntered += (collisionShape, args) =>
         {
-            if (element is RealmPlayer player)
+            if (args.Element is RealmPlayer player)
             {
                 if (player.Gui.Current == null)
                     player.Gui.SetCurrentWithDI<TGui>();
             }
         };
-        collisionDetection.ElementLeft += (element) =>
+        collisionShape.ElementLeft += (collisionShape, args) =>
         {
-            if (element is RealmPlayer player)
+            if (args.Element is RealmPlayer player)
             {
                 player.Gui.Close<TGui>();
             }
         };
     }
 
-    public static void AddOpenGuiLogic<TGui>(this ICollisionDetection collisionDetection, Func<RealmPlayer, Task<TGui>> factory, Action<Exception>? exceptionHandler) where TGui : IPlayerGui
+    public static void AddOpenGuiLogic<TGui>(this CollisionShape collisionShape, Func<RealmPlayer, Task<TGui>> factory, Action<Exception>? exceptionHandler) where TGui : IPlayerGui
     {
-        collisionDetection.ElementEntered += async (element) =>
+        collisionShape.ElementEntered += async (collisionShape, args) =>
         {
             try
             {
-                if (element is RealmPlayer player)
+                if (args.Element is RealmPlayer player)
                 {
                     if (player.Gui.Current == null)
                         player.Gui.Current = await factory(player);
@@ -68,47 +68,47 @@ public static class CollisionDetectionExtensions
                 exceptionHandler?.Invoke(ex);
             }
         };
-        collisionDetection.ElementLeft += (element) =>
+        collisionShape.ElementLeft += (collisionShape, args) =>
         {
-            if (element is RealmPlayer player)
+            if (args.Element is RealmPlayer player)
             {
                 player.Gui.Close<TGui>();
             }
         };
     }
 
-    public static void AddOpenGuiLogic<TGui>(this ICollisionDetection collisionDetection, Func<RealmPlayer, TGui> factory) where TGui : IPlayerGui
+    public static void AddOpenGuiLogic<TGui>(this CollisionShape collisionShape, Func<RealmPlayer, TGui> factory) where TGui : IPlayerGui
     {
-        collisionDetection.ElementEntered += (element) =>
+        collisionShape.ElementEntered += (collisionShape, args) =>
         {
-            if (element is RealmPlayer player)
+            if (args.Element is RealmPlayer player)
             {
                 if (player.Gui.Current == null)
                     player.Gui.Current = factory(player);
             }
         };
-        collisionDetection.ElementLeft += (element) =>
+        collisionShape.ElementLeft += (collisionShape, args) =>
         {
-            if (element is RealmPlayer player)
+            if (args.Element is RealmPlayer player)
             {
                 player.Gui.Close<TGui>();
             }
         };
     }
 
-    public static void AddOpenGuiLogic<TGui>(this ICollisionDetection collisionDetection, Func<TGui> factory) where TGui : IPlayerGui
+    public static void AddOpenGuiLogic<TGui>(this CollisionShape collisionShape, Func<TGui> factory) where TGui : IPlayerGui
     {
-        collisionDetection.ElementEntered += (element) =>
+        collisionShape.ElementEntered += (collisionShape, args) =>
         {
-            if (element is RealmPlayer player)
+            if (args.Element is RealmPlayer player)
             {
                 if (player.Gui.Current == null)
                     player.Gui.Current = factory();
             }
         };
-        collisionDetection.ElementLeft += (element) =>
+        collisionShape.ElementLeft += (collisionShape, args) =>
         {
-            if (element is RealmPlayer player)
+            if (args.Element is RealmPlayer player)
             {
                 player.Gui.Close<TGui>();
             }

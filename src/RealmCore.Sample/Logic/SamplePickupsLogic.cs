@@ -2,6 +2,8 @@
 using RealmCore.Sample.Concepts.Jobs;
 using RealmCore.Server.Modules.Pickups;
 using RealmCore.Server.Modules.Players.Fractions;
+using SlipeServer.Server.Elements.ColShapes;
+using SlipeServer.Server.Elements.Events;
 
 namespace RealmCore.Sample.Logic;
 
@@ -20,7 +22,7 @@ internal class SamplePickupsLogic
         {
         if (element is RealmPickup pickup && pickup.ElementName != null && pickup.ElementName.StartsWith("fractionTestPickup"))
             {
-                pickup.CollisionDetection.Entered += async (enteredPickup, element) =>
+                pickup.CollisionShape.ElementEntered += async (CollisionShape collisionShape, CollisionShapeHitEventArgs e) =>
                 {
                     var player = (RealmPlayer)element;
                     if(player.Sessions.TryGetSession(out FractionSession pendingFractionSession))
@@ -42,9 +44,9 @@ internal class SamplePickupsLogic
         {
             if (element is RealmPickup pickup && pickup.ElementName != null && pickup.ElementName.StartsWith("jobTestPickup"))
             {
-                pickup.CollisionDetection.Entered += (enteredPickup, element) =>
+                pickup.CollisionShape.ElementEntered += (CollisionShape collisionShape, CollisionShapeHitEventArgs e) =>
                 {
-                    if (element is not RealmPlayer player)
+                    if (e.Element is not RealmPlayer player)
                         return;
 
                     if (player.Sessions.TryGetSession(out JobSession jobSession))
@@ -77,20 +79,20 @@ internal class SamplePickupsLogic
         {
             if (element is RealmPickup pickup && pickup.ElementName != null && pickup.ElementName.StartsWith("withText3d"))
             {
-                pickup.AddOpenGuiLogic<TestGui>();
+                pickup.CollisionShape.AddOpenGuiLogic<TestGui>();
             }
         }
 
         {
             if (element is RealmPickup pickup && pickup.ElementName != null && pickup.ElementName.StartsWith("testMarker"))
             {
-                pickup.CollisionDetection.Entered += (enteredPickup, element) =>
+                pickup.CollisionShape.ElementEntered += (enteredPickup, args) =>
                 {
-                    _chatBox.OutputTo((RealmPlayer)element, $"Entered marker");
+                    _chatBox.OutputTo((RealmPlayer)args.Element, $"Entered marker");
                 };
-                pickup.CollisionDetection.Left += (leftPickup, element) =>
+                pickup.CollisionShape.ElementLeft += (leftPickup, args) =>
                 {
-                    _chatBox.OutputTo((RealmPlayer)element, $"Left marker");
+                    _chatBox.OutputTo((RealmPlayer)args.Element, $"Left marker");
                 };  
             }
         }

@@ -1,13 +1,10 @@
 ﻿namespace RealmCore.Server.Modules.Elements;
 
-public class RealmCollisionSphere : CollisionSphere, ICollisionDetection
+public class RealmCollisionSphere : CollisionSphere
 {
     public IElementCustomDataFeature CustomData { get; init; } = new ElementCustomDataFeature();
-    public CollisionDetection<RealmCollisionSphere> CollisionDetection { get; private set; }
-    public CollisionDetection InternalCollisionDetection => CollisionDetection;
 
     public RealmCollisionSphere(Vector3 position, float Radius) : base(position, Radius)
     {
-        CollisionDetection = new(this);
     }
 }

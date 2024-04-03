@@ -1,4 +1,6 @@
-﻿namespace RealmCore.Server.Extensions;
+﻿using SlipeServer.Server.Behaviour;
+
+namespace RealmCore.Server.Extensions;
 
 public static class ServerBuilderExtensions
 {
@@ -22,6 +24,7 @@ public static class ServerBuilderExtensions
 #else
             serverBuilder.AddDefaults(exceptBehaviours: exceptBehaviours);
 #endif
+            serverBuilder.AddBehaviour<CollisionShapeBehaviour>();
         }
 
         serverBuilder.ConfigureServices(services =>
@@ -83,7 +86,6 @@ public static class ServerBuilderExtensions
         serverBuilder.AddLogic<FocusableElementsLogic>();
         serverBuilder.AddLogic<PlayerHudLogic>();
         serverBuilder.AddLogic<VehiclesTuningLogic>();
-        serverBuilder.AddLogic<CollisionShapeLogic>();
         serverBuilder.AddLogic<PeristantVehicleLogic>();
         serverBuilder.AddLogic<InventoryLogic>();
         serverBuilder.AddLogic<PlayersLogic>();

@@ -1,4 +1,6 @@
 ﻿global using ILogger = Microsoft.Extensions.Logging.ILogger;
+using Microsoft.AspNetCore.Hosting.Server;
+using SlipeServer.Server.Behaviour;
 
 [assembly: InternalsVisibleTo("RealmCore.TestingTools")]
 [assembly: InternalsVisibleTo("RealmCore.Tests")]
@@ -44,6 +46,8 @@ public class RealmServer<TRealmPlayer> : MtaServer<TRealmPlayer> where TRealmPla
     {
         try
         {
+            Instantiate<CollisionShapeBehaviour>(); // TODO:
+
             await StartCore();
         }
         catch (Exception ex)

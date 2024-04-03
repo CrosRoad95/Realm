@@ -20,29 +20,26 @@ public class CollisionDetectionTests : RealmUnitTestingBase
             elementFactory = server.GetRequiredService<IElementFactory>();
         }
 
+        var position = new Vector3(100, 0, 0);
+        var collisionSphere = elementFactory.CreateCollisionSphere(position, 10);
         var realmWorldObject = elementFactory.CreateObject(Location.Zero, ObjectModel.Vegtree3);
-        var collisionSphere = elementFactory.CreateCollisionSphere(Vector3.Zero, 10);
         int elementEntered = 0;
         int elementLeft = 0;
-        collisionSphere.CollisionDetection.Entered += (that, e) =>
+        collisionSphere.ElementEntered += (that, e) =>
         {
             elementEntered++;
         };
-        collisionSphere.CollisionDetection.Left += (that, e) =>
+        collisionSphere.ElementLeft += (that, e) =>
         {
             elementLeft++;
         };
 
-        collisionSphere.CheckElementWithin(player);
-        player.Position = new Vector3(100, 0, 0);
-        collisionSphere.CheckElementWithin(player);
-
-        collisionSphere.CheckElementWithin(realmWorldObject);
-        realmWorldObject.Position = new Vector3(100, 0, 0);
-        collisionSphere.CheckElementWithin(realmWorldObject);
+        player.Position = position;
+        realmWorldObject.Position = position;
+        player.Position = new Vector3(0, 0, 0);
+        realmWorldObject.Position = new Vector3(0, 0, 0);
 
         using var _ = new AssertionScope();
-
         if (usePlayerElementFactory)
         {
             elementEntered.Should().Be(1);
@@ -73,30 +70,37 @@ public class CollisionDetectionTests : RealmUnitTestingBase
             elementFactory = server.GetRequiredService<IElementFactory>();
         }
 
+        var position = new Vector3(100, 0, 0);
+        var marker = elementFactory.CreateMarker(new Location(position), MarkerType.Cylinder, 1, Color.Red);
         var realmWorldObject = elementFactory.CreateObject(Location.Zero, ObjectModel.Vegtree3);
-        var marker = elementFactory.CreateMarker(Location.Zero, MarkerType.Cylinder, 1, Color.Red);
+
         int elementEntered = 0;
         int elementLeft = 0;
-        marker.CollisionDetection.Entered += (that, e) =>
+        marker.CollisionShape.ElementEntered += (that, e) =>
         {
             elementEntered++;
         };
-        marker.CollisionDetection.Left += (that, e) =>
+        marker.CollisionShape.ElementLeft += (that, e) =>
         {
             elementLeft++;
         };
 
-        marker.CheckElementWithin(player);
-        player.Position = new Vector3(100, 0, 0);
-        marker.CheckElementWithin(player);
-
-        marker.CheckElementWithin(realmWorldObject);
-        realmWorldObject.Position = new Vector3(100, 0, 0);
-        marker.CheckElementWithin(realmWorldObject);
+        player.Position = position;
+        realmWorldObject.Position = position;
+        player.Position = new Vector3(0, 0, 0);
+        realmWorldObject.Position = new Vector3(0, 0, 0);
 
         using var _ = new AssertionScope();
-        elementEntered.Should().Be(2);
-        elementLeft.Should().Be(2);
+        if (usePlayerElementFactory)
+        {
+            elementEntered.Should().Be(1);
+            elementLeft.Should().Be(1);
+        }
+        else
+        {
+            elementEntered.Should().Be(2);
+            elementLeft.Should().Be(2);
+        }
     }
 
     [InlineData(true)]
@@ -117,29 +121,21 @@ public class CollisionDetectionTests : RealmUnitTestingBase
             elementFactory = server.GetRequiredService<IElementFactory>();
         }
 
+        var position = new Vector3(100, 0, 0);
         var realmWorldObject = elementFactory.CreateObject(Location.Zero, ObjectModel.Vegtree3);
         var pickup = elementFactory.CreatePickup(Location.Zero, 1337);
         int elementEntered = 0;
-        int elementLeft = 0;
-        pickup.CollisionDetection.Entered += (that, e) =>
+        pickup.Used += (that, e) =>
         {
             elementEntered++;
         };
-        pickup.CollisionDetection.Left += (that, e) =>
-        {
-            elementLeft++;
-        };
 
-        pickup.CheckElementWithin(player);
-        player.Position = new Vector3(100, 0, 0);
-        pickup.CheckElementWithin(player);
-
-        pickup.CheckElementWithin(realmWorldObject);
-        realmWorldObject.Position = new Vector3(100, 0, 0);
-        pickup.CheckElementWithin(realmWorldObject);
+        player.Position = position;
+        realmWorldObject.Position = position;
+        player.Position = new Vector3(0, 0, 0);
+        realmWorldObject.Position = new Vector3(0, 0, 0);
 
         using var _ = new AssertionScope();
-        elementEntered.Should().Be(2);
-        elementLeft.Should().Be(2);
+        elementEntered.Should().Be(1);
     }
 }

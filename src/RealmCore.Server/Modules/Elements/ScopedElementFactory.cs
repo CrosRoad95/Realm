@@ -15,7 +15,7 @@ internal class ScopedElementFactory : IScopedElementFactory
     public event Action<IElementFactory, Element>? ElementCreated;
     private readonly object _lock = new();
     private readonly List<Element> _createdElements = [];
-    private readonly List<ICollisionDetection> _collisionDetection = [];
+    private readonly List<Element> _collisionDetection = [];
     private readonly ScopedMapIdGenerator _elementIdGenerator;
 
     public RealmPlayer Player => _player;
@@ -34,13 +34,14 @@ internal class ScopedElementFactory : IScopedElementFactory
         }
     }
 
-    public IEnumerable<ICollisionDetection> CreatedCollisionDetectionElements
+    public IEnumerable<Element> CreatedCollisionDetectionElements
     {
         get
         {
             lock (_lock)
             {
-                foreach (var collisionShape in _collisionDetection)
+                Element[] elements = [.. _collisionDetection];
+                foreach (var collisionShape in elements)
                 {
                     yield return collisionShape;
                 }
@@ -87,8 +88,8 @@ internal class ScopedElementFactory : IScopedElementFactory
         lock (_lock)
         {
             _createdElements.Add(element);
-            if (element is ICollisionDetection collisionDetection)
-                _collisionDetection.Add(collisionDetection);
+            if (element is Pickup or Marker or CollisionShape)
+                _collisionDetection.Add(element);
             element.Destroyed += HandleDestroyed;
         }
     }
@@ -99,8 +100,8 @@ internal class ScopedElementFactory : IScopedElementFactory
         {
             element.Destroyed -= HandleDestroyed;
             _createdElements.Remove(element);
-            if (element is ICollisionDetection collisionDetection)
-                _collisionDetection.Remove(collisionDetection);
+            if (element is Pickup or Marker or CollisionShape)
+                _collisionDetection.Remove(element);
         }
     }
 

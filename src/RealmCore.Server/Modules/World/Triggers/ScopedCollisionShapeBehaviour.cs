@@ -1,8 +1,11 @@
-﻿namespace RealmCore.Server.Modules.World.Triggers;
+﻿using SlipeServer.Server.Elements.ColShapes;
+
+namespace RealmCore.Server.Modules.World.Triggers;
 
 internal sealed class PlayerScopedCollisionShapeBehaviour : IDisposable
 {
     private RealmPlayer _player;
+    private readonly IScopedElementFactory _scopedElementFactory;
     private readonly ILogger<PlayerScopedCollisionShapeBehaviour> _logger;
 
     public PlayerScopedCollisionShapeBehaviour(PlayerContext playerContext, IScopedElementFactory scopedElementFactory, ILogger<PlayerScopedCollisionShapeBehaviour> logger)
@@ -10,46 +13,26 @@ internal sealed class PlayerScopedCollisionShapeBehaviour : IDisposable
         _player = playerContext.Player;
 
         _player.PositionChanged += HandlePositionChanged;
-        scopedElementFactory.ElementCreated += HandleElementCreated;
+        _scopedElementFactory = scopedElementFactory;
         _logger = logger;
-    }
-
-    private void HandleElementCreated(IElementFactory elementFactory, Element element)
-    {
-        if (element is not ICollisionDetection collisionDetection)
-            return;
-
-        void handleElementEntered(Element enteredElement)
-        {
-            if (enteredElement != _player)
-                return;
-            try
-            {
-                collisionDetection.InternalCollisionDetection.RelayEntered(enteredElement);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogHandleError(ex);
-            }
-        }
-
-        void handleElementLeft(Element leftElement)
-        {
-            if (leftElement != _player)
-                return;
-
-            collisionDetection.InternalCollisionDetection.RelayLeft(leftElement);
-        }
-
-        collisionDetection.ElementEntered += handleElementEntered;
-        collisionDetection.ElementLeft += handleElementLeft;
     }
 
     private void HandlePositionChanged(Element sender, ElementChangedEventArgs<Vector3> args)
     {
-        foreach (var collisionDetection in _player.ElementFactory.CreatedCollisionDetectionElements.ToList())
+        foreach (var collisionDetection in _scopedElementFactory.CreatedCollisionDetectionElements)
         {
-            collisionDetection.CheckElementWithin(_player);
+            switch (collisionDetection)
+            {
+                case CollisionShape collisionShape:
+                    collisionShape.CheckElementWithin(_player);
+                    break;
+                case RealmMarker marker:
+                    marker.CollisionShape.CheckElementWithin(_player);
+                    break;
+                case RealmPickup pickup:
+                    pickup.CollisionShape.CheckElementWithin(_player);
+                    break;
+            }
         }
     }
 
