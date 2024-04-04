@@ -141,7 +141,7 @@ internal sealed class PlayersLogic : PlayerLifecycle
 
     private void HandleSpawned(Player sender, PlayerSpawnedEventArgs e)
     {
-        _playersEventManager.RelayLoaded((RealmPlayer)e.Source);
+        _playersEventManager.RelaySpawned((RealmPlayer)e.Source);
     }
 
     private void HandleDisconnected(Player player, PlayerQuitEventArgs playerQuitEventArgs)
