@@ -2,9 +2,9 @@
 
 internal sealed class BoneAttachResourceLogic : PlayerLifecycle
 {
-    private readonly BoneAttachService _boneAttachService;
+    private readonly BoneAttachService? _boneAttachService;
 
-    public BoneAttachResourceLogic(BoneAttachService boneAttachService, PlayersEventManager playersEventManager) : base(playersEventManager)
+    public BoneAttachResourceLogic(PlayersEventManager playersEventManager, BoneAttachService? boneAttachService = null) : base(playersEventManager)
     {
         _boneAttachService = boneAttachService;
     }
@@ -23,12 +23,18 @@ internal sealed class BoneAttachResourceLogic : PlayerLifecycle
 
     private void HandleWorldObjectAttached(RealmPlayer player, AttachedBoneWorldObject attachedBoneWorldObject)
     {
+        if (_boneAttachService == null)
+            throw new NotSupportedException();
+
         _boneAttachService.Attach(attachedBoneWorldObject.WorldObject, player, attachedBoneWorldObject.BoneId, attachedBoneWorldObject.PositionOffset, attachedBoneWorldObject.RotationOffset);
         attachedBoneWorldObject.WorldObject.AreCollisionsEnabled = false; // TODO: remember previous state
     }
 
     private void HandleWorldObjectDetached(RealmPlayer player, AttachedBoneWorldObject attachedBoneWorldObject)
     {
+        if (_boneAttachService == null)
+            throw new NotSupportedException();
+
         if (_boneAttachService.IsAttached(attachedBoneWorldObject.WorldObject))
         {
             _boneAttachService.Detach(attachedBoneWorldObject.WorldObject);

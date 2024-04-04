@@ -1,5 +1,6 @@
 ﻿using RealmCore.Server.Modules.Search;
 using SlipeServer.Packets.Lua.Camera;
+using SlipeServer.Resources.BoneAttach;
 
 namespace RealmCore.Tests.Unit.Players;
 
@@ -30,7 +31,7 @@ public class PlayersTests : RealmUnitTestingBase
     public void YouShouldBeAbleAttachObjectToPlayer()
     {
         #region Arrange
-        var server = CreateServer();
+        var server = CreateServer(configureBuilder: builder => builder.AddBoneAttachResource(BoneAttachVersion.Release_1_2_0));
         var player = CreatePlayer();
         var worldObject = server.CreateObject();
         #endregion
@@ -49,7 +50,7 @@ public class PlayersTests : RealmUnitTestingBase
     public void AttachedElementShouldBeRemovedIfElementGetsDestroyed()
     {
         #region Arrange
-        var server = CreateServer();
+        var server = CreateServer(configureBuilder: builder => builder.AddBoneAttachResource(BoneAttachVersion.Release_1_2_0));
         var player = CreatePlayer();
         var worldObject = server.CreateObject();
         #endregion

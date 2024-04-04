@@ -2,9 +2,15 @@
 
 namespace RealmCore.Server.Extensions;
 
+[Flags]
+public enum ExcludeResources
+{
+    BoneAttach = 0x01
+}
+
 public static class ServerBuilderExtensions
 {
-    public static ServerBuilder ConfigureServer(this ServerBuilder serverBuilder, IConfiguration configuration, ServerBuilderDefaultBehaviours? serverBuilderDefaultBehaviours = null, HttpClient? httpClient = null)
+    public static ServerBuilder ConfigureServer(this ServerBuilder serverBuilder, IConfiguration configuration, ServerBuilderDefaultBehaviours? serverBuilderDefaultBehaviours = null, HttpClient? httpClient = null, ExcludeResources? excludeResources = null)
     {
         var _serverConfiguration = configuration.GetRequired<SlipeServer.Server.Configuration>("Server");
         serverBuilder.UseConfiguration(_serverConfiguration);
@@ -68,7 +74,8 @@ public static class ServerBuilderExtensions
         serverBuilder.AddAssetsResource();
         serverBuilder.AddText3dResource();
         serverBuilder.AddNametagsResource();
-        serverBuilder.AddBoneAttachResource(BoneAttachVersion.Release_1_2_0, httpClient);
+        if(excludeResources == null || (excludeResources != null && !excludeResources.Value.HasFlag(ExcludeResources.BoneAttach)))
+            serverBuilder.AddBoneAttachResource(BoneAttachVersion.Release_1_2_0, httpClient);
         serverBuilder.AddWatermarkResource();
         serverBuilder.AddScoreboard();
         #endregion
