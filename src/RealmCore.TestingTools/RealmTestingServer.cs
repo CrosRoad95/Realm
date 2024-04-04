@@ -1,4 +1,54 @@
-﻿namespace RealmCore.TestingTools;
+﻿using SlipeServer.Server.Resources.Interpreters.Meta;
+using System.IO;
+using System.IO.Compression;
+using System.Net;
+using System.Net.Http.Headers;
+using System.Xml.Serialization;
+
+namespace RealmCore.TestingTools;
+
+public class PAttach120DelegatingHandler : DelegatingHandler
+{
+    protected override async Task<HttpResponseMessage> SendAsync(
+      HttpRequestMessage request, CancellationToken cancellationToken)
+    {
+        if(request.RequestUri?.ToString() == "https://github.com/Patrick2562/mtasa-pAttach/releases/download/v1.2.0/pAttach-v1.2.0.zip")
+        {
+            string content = "<meta><script src=\"client.lua\" type=\"client\" /><export function=\"attach\" type=\"shared\" /></meta>";
+
+            using var memoryStream = new MemoryStream();
+            using (var archive = new ZipArchive(memoryStream, ZipArchiveMode.Create, true))
+            {
+
+                {
+                    var entry = archive.CreateEntry("pAttach/meta.xml");
+                    using var writer = new StreamWriter(entry.Open());
+                    await writer.WriteAsync(content);
+                }
+
+                {
+                    var entry = archive.CreateEntry("pAttach/client.lua");
+                    using var writer = new StreamWriter(entry.Open());
+                    await writer.WriteAsync("");
+                }
+            }
+
+            memoryStream.Seek(0, SeekOrigin.Begin);
+            HttpResponseMessage response = new HttpResponseMessage(HttpStatusCode.OK);
+            var data = memoryStream.ToArray();
+            response.Content = new ByteArrayContent(memoryStream.ToArray());
+            response.Content.Headers.ContentType = new MediaTypeHeaderValue("application/zip");
+            response.Content.Headers.ContentDisposition = new ContentDispositionHeaderValue("attachment")
+            {
+                FileName = "archive.zip"
+            };
+
+            return response;
+        }
+
+        return await base.SendAsync(request, cancellationToken);
+    }
+}
 
 public class RealmTestingServer<TPlayer> : TestingServer<TPlayer> where TPlayer: Player
 {
@@ -18,7 +68,7 @@ public class RealmTestingServer<TPlayer> : TestingServer<TPlayer> where TPlayer:
     public RealmTestingServer(TestConfigurationProvider? testConfigurationProvider = null, Action<ServerBuilder>? configureBuilder = null, Action<ServiceCollection>? configureServices = null) : base((testConfigurationProvider ?? new("")).GetRequired<SlipeServer.Server.Configuration>("server"), (serverBuilder) =>
     {
         var resourceProvider = new Mock<IResourceProvider>(MockBehavior.Strict);
-
+        var httpClient = new HttpClient(new PAttach120DelegatingHandler());
         resourceProvider.Setup(x => x.Refresh());
 
         //var saveServiceMock = new Mock<ISaveService>(MockBehavior.Strict);
@@ -27,6 +77,7 @@ public class RealmTestingServer<TPlayer> : TestingServer<TPlayer> where TPlayer:
         serverBuilder.ConfigureServer(testConfigurationProvider ?? new(""), ServerBuilderDefaultBehaviours.None);
         serverBuilder.ConfigureServices(services =>
         {
+            services.AddSingleton(httpClient);
             services.ConfigureRealmServices();
             services.Configure<AssetsOptions>(options =>
             {

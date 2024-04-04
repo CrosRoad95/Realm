@@ -4,7 +4,7 @@ namespace RealmCore.Server.Extensions;
 
 public static class ServerBuilderExtensions
 {
-    public static ServerBuilder ConfigureServer(this ServerBuilder serverBuilder, IConfiguration configuration, ServerBuilderDefaultBehaviours? serverBuilderDefaultBehaviours = null)
+    public static ServerBuilder ConfigureServer(this ServerBuilder serverBuilder, IConfiguration configuration, ServerBuilderDefaultBehaviours? serverBuilderDefaultBehaviours = null, HttpClient? httpClient = null)
     {
         var _serverConfiguration = configuration.GetRequired<SlipeServer.Server.Configuration>("Server");
         serverBuilder.UseConfiguration(_serverConfiguration);
@@ -68,7 +68,7 @@ public static class ServerBuilderExtensions
         serverBuilder.AddAssetsResource();
         serverBuilder.AddText3dResource();
         serverBuilder.AddNametagsResource();
-        serverBuilder.AddBoneAttachResource(BoneAttachVersion.Release_1_2_0);
+        serverBuilder.AddBoneAttachResource(BoneAttachVersion.Release_1_2_0, httpClient);
         serverBuilder.AddWatermarkResource();
         serverBuilder.AddScoreboard();
         #endregion
