@@ -16,7 +16,7 @@ public static class MonitorExtensions
     public static IEnumerable<string> GetOccurredEvents<T>(this IMonitor<T> monitor)
     {
         return monitor.OccurredEvents
-            .OrderBy(x => x.TimestampUtc)
+            .OrderBy(x => x.Sequence)
             .Select(x => x.EventName);
     }
 }

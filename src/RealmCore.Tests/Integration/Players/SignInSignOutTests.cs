@@ -1,7 +1,7 @@
-﻿namespace RealmCore.Tests.Tests;
+﻿namespace RealmCore.Tests.Integration.Players;
 
 [Collection("IntegrationTests")]
-public class RealmPlayerTests : RealmRemoteDatabaseIntegrationTestingBase
+public class SignInSignOutTests : RealmRemoteDatabaseIntegrationTestingBase
 {
     protected override string DatabaseName => "RealmPlayerTests";
 
@@ -49,7 +49,7 @@ public class RealmPlayerTests : RealmRemoteDatabaseIntegrationTestingBase
             player.Statistics.Should().BeEquivalentTo([new UserStatDto(1, 1), new UserStatDto(2, 2)]);
         }
 
-        for(int i = 0; i < 2; i++)
+        for (int i = 0; i < 2; i++)
         {
             var player = await CreatePlayerAsync(false);
             player.Name = name;
@@ -72,7 +72,7 @@ public class RealmPlayerTests : RealmRemoteDatabaseIntegrationTestingBase
             var player = server.CreatePlayer();
             await server.SignInPlayer(player);
 
-            for(int i = 0; i < 25; i++)
+            for (int i = 0; i < 25; i++)
             {
                 player.Events.Add(i % 5, $"test{i}");
             }

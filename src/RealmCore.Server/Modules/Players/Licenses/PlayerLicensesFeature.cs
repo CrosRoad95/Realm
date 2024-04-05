@@ -16,7 +16,7 @@ public interface IPlayerLicensesFeature : IPlayerFeature, IEnumerable<PlayerLice
 
 internal sealed class PlayerLicensesFeature : IPlayerLicensesFeature, IUsesUserPersistentData
 {
-    private readonly object _lock = new();
+    private readonly ReaderWriterLockSlimScoped _writerLockSlim = new();
     private readonly IDateTimeProvider _dateTimeProvider;
     private ICollection<UserLicenseData> _licenses = [];
 
@@ -34,32 +34,28 @@ internal sealed class PlayerLicensesFeature : IPlayerLicensesFeature, IUsesUserP
 
     public void SignIn(UserData userData)
     {
-        lock (_lock)
-            _licenses = userData.Licenses;
+        using var _ = _writerLockSlim.BeginWrite();
+        _licenses = userData.Licenses;
     }
 
     public void SignOut()
     {
-        lock (_lock)
-            _licenses = [];
+        using var _ = _writerLockSlim.BeginWrite();
+        _licenses = [];
     }
 
     public PlayerLicenseDto Get(int licenseId)
     {
-        lock (_lock)
-        {
-            var userLicenseData = InternalGetById(licenseId);
-            return PlayerLicenseDto.Map(userLicenseData);
-        }
+        using var _ = _writerLockSlim.BeginRead();
+        var userLicenseData = InternalGetById(licenseId);
+        return PlayerLicenseDto.Map(userLicenseData);
     }
 
     public bool IsSuspended(int licenseId)
     {
-        lock (_lock)
-        {
-            var userLicenseData = InternalGetById(licenseId);
-            return userLicenseData.IsSuspended(_dateTimeProvider.Now);
-        }
+        using var _ = _writerLockSlim.BeginRead();
+        var userLicenseData = InternalGetById(licenseId);
+        return userLicenseData.IsSuspended(_dateTimeProvider.Now);
     }
 
     public bool TryAdd(int licenseId)
@@ -69,22 +65,20 @@ internal sealed class PlayerLicensesFeature : IPlayerLicensesFeature, IUsesUserP
             LicenseId = licenseId,
         };
 
-        lock (_lock)
-        {
-            if (InternalHas(licenseId, true))
-                return false;
+        using var _ = _writerLockSlim.BeginWrite();
+        if (InternalHas(licenseId, true))
+            return false;
 
-            _licenses.Add(userLicenseData);
-            VersionIncreased?.Invoke();
-            Added?.Invoke(this, PlayerLicenseDto.Map(userLicenseData));
-            return true;
-        }
+        _licenses.Add(userLicenseData);
+        VersionIncreased?.Invoke();
+        Added?.Invoke(this, PlayerLicenseDto.Map(userLicenseData));
+        return true;
     }
 
     public bool Has(int licenseId, bool includeSuspended = false)
     {
-        lock (_lock)
-            return InternalHas(licenseId, includeSuspended);
+        using var _ = _writerLockSlim.BeginRead();
+        return InternalHas(licenseId, includeSuspended);
     }
 
     public void Suspend(int licenseId, TimeSpan timeSpan, string? reason = null)
@@ -92,33 +86,29 @@ internal sealed class PlayerLicensesFeature : IPlayerLicensesFeature, IUsesUserP
         if (timeSpan.Ticks <= 0)
             throw new Exception();
 
-        lock (_lock)
-        {
-            var userLicenseData = InternalGetById(licenseId);
+        using var _ = _writerLockSlim.BeginWrite();
+        var userLicenseData = InternalGetById(licenseId);
 
-            var now = _dateTimeProvider.Now;
-            if (userLicenseData.IsSuspended(_dateTimeProvider.Now))
-                throw new PlayerLicenseAlreadySuspendedException(licenseId);
+        var now = _dateTimeProvider.Now;
+        if (userLicenseData.IsSuspended(_dateTimeProvider.Now))
+            throw new PlayerLicenseAlreadySuspendedException(licenseId);
 
-            userLicenseData.SuspendedUntil = now + timeSpan;
-            userLicenseData.SuspendedReason = reason;
-            VersionIncreased?.Invoke();
-            Suspended?.Invoke(this, PlayerLicenseDto.Map(userLicenseData));
-        }
+        userLicenseData.SuspendedUntil = now + timeSpan;
+        userLicenseData.SuspendedReason = reason;
+        VersionIncreased?.Invoke();
+        Suspended?.Invoke(this, PlayerLicenseDto.Map(userLicenseData));
     }
 
     public void UnSuspend(int licenseId)
     {
-        lock (_lock)
-        {
-            var userLicenseData = InternalGetById(licenseId);
-            if (!userLicenseData.IsSuspended(_dateTimeProvider.Now))
-                throw new PlayerLicenseNotSuspendedException(licenseId);
+        using var _ = _writerLockSlim.BeginWrite();
+        var userLicenseData = InternalGetById(licenseId);
+        if (!userLicenseData.IsSuspended(_dateTimeProvider.Now))
+            throw new PlayerLicenseNotSuspendedException(licenseId);
 
-            userLicenseData.SuspendedUntil = null;
-            VersionIncreased?.Invoke();
-            UnSuspended?.Invoke(this, PlayerLicenseDto.Map(userLicenseData));
-        }
+        userLicenseData.SuspendedUntil = null;
+        VersionIncreased?.Invoke();
+        UnSuspended?.Invoke(this, PlayerLicenseDto.Map(userLicenseData));
     }
 
     private UserLicenseData InternalGetById(int licenseId)
@@ -137,14 +127,13 @@ internal sealed class PlayerLicensesFeature : IPlayerLicensesFeature, IUsesUserP
         if (includeSuspended)
             query = query.Where(x => !x.IsSuspended(_dateTimeProvider.Now));
 
-        lock (_lock)
-            return query.Any();
+        return query.Any();
     }
 
     public IEnumerator<PlayerLicenseDto> GetEnumerator()
     {
-        lock (_lock)
-            return new List<PlayerLicenseDto>(_licenses.Select(PlayerLicenseDto.Map)).AsReadOnly().GetEnumerator();
+        using var _ = _writerLockSlim.BeginRead();
+        return new List<PlayerLicenseDto>(_licenses.Select(PlayerLicenseDto.Map)).AsReadOnly().GetEnumerator();
     }
 
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
