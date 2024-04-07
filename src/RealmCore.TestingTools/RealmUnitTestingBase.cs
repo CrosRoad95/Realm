@@ -25,6 +25,8 @@ public abstract class RealmUnitTestingBase<TRealmTestingServer, TRealmPlayer> : 
             {
 
             });
+
+            realmPlayer.User.TryFlushVersion(0);
         }
         return player;
     }

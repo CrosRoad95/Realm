@@ -29,13 +29,13 @@ internal sealed class PlayerMoneyLogic : PlayerLifecycle
         _precision = gameplayOptions.MoneyPrecision;
 
         foreach (var player in _elementCollection.GetByType<RealmPlayer>())
-            player.Money.SetMoneyLimitAndPrecision(gameplayOptions.MoneyLimit, gameplayOptions.MoneyPrecision);
+            player.Money.SetLimitAndPrecision(gameplayOptions.MoneyLimit, gameplayOptions.MoneyPrecision);
 
         _logger.LogInformation("Set money limit to: {moneyLimit} and money precision to: {moneyPrecision}", _limit, _precision);
     }
 
     protected override void PlayerJoined(RealmPlayer player)
     {
-        player.Money.SetMoneyLimitAndPrecision(_limit, _precision);
+        player.Money.SetLimitAndPrecision(_limit, _precision);
     }
 }

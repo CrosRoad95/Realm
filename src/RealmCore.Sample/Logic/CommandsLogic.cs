@@ -137,14 +137,14 @@ internal sealed class CommandsLogic
         _commandService.AddCommandHandler("givemoney", (player, args) =>
         {
             var amount = args.ReadDecimal();
-            player.Money.GiveMoney(amount);
+            player.Money.Give(amount);
             _chatBox.OutputTo(player, $"give money: {amount}, total money: {player.Money.Amount}");
         });
 
         _commandService.AddCommandHandler("takemoney", (player, args) =>
         {
             var amount = args.ReadDecimal();
-            player.Money.TakeMoney(amount);
+            player.Money.Take(amount);
             _chatBox.OutputTo(player, $"take money: {amount}, total money: {player.Money.Amount}");
         });
 
@@ -557,23 +557,23 @@ internal sealed class CommandsLogic
         //    player.GetRequiredComponent<PlayerElementComponent>().StopAnimation();
         //});
 
-        //_commandService.AddCommandHandler("animation", (player, args) =>
-        //{
-        //    var animationName = args.ReadArgument();
-        //    if (Enum.TryParse<Animation>(animationName, out var animation))
-        //    {
-        //        try
-        //        {
-        //            player.GetRequiredComponent<PlayerElementComponent>().DoAnimation(animation);
-        //        }
-        //        catch (NotSupportedException)
-        //        {
-        //            _chatBox.OutputTo(player, $"Animation '{animationName}' is not supported");
-        //        }
-        //    }
-        //    else
-        //        _chatBox.OutputTo(player, $"Animation '{animationName}' not found.");
-        //});
+        _commandService.AddAsyncCommandHandler("animation", async (player, args, token) =>
+        {
+            var animationName = args.ReadArgument();
+            if (Enum.TryParse<Animation>(animationName, out var animation))
+            {
+                try
+                {
+                    await player.DoAnimationAsync(animation, cancellationToken: token);
+                }
+                catch (NotSupportedException)
+                {
+                    _chatBox.OutputTo(player, $"Animation '{animationName}' is not supported");
+                }
+            }
+            else
+                _chatBox.OutputTo(player, $"Animation '{animationName}' not found.");
+        });
 
         //_commandService.AddAsyncCommandHandler("animationasync", async (player, args) =>
         //{
@@ -1898,17 +1898,17 @@ internal sealed class CommandsLogic
         
         _commandService.AddAsyncCommandHandler("trytakemoneyasync", async (player, args, token) =>
         {
-            await player.Money.TryTakeMoneyAsync(10, async () =>
+            await player.Money.TryTakeAsync(10, async () =>
             {
                 return true;
             }, true);
 
-            await player.Money.TryTakeMoneyAsync(10, async () =>
+            await player.Money.TryTakeAsync(10, async () =>
             {
                 return false;
             }, true);
 
-            await player.Money.TryTakeMoneyAsync(10, async () =>
+            await player.Money.TryTakeAsync(10, async () =>
             {
                 throw new Exception();
             }, true);

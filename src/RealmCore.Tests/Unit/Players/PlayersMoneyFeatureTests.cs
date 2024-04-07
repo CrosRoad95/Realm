@@ -24,12 +24,12 @@ public class PlayersMoneyFeatureTests : RealmUnitTestingBase
         };
 
         for (int i = 0; i < times; i++)
-            player.Money.GiveMoney(moneyGiven);
+            player.Money.Give(moneyGiven);
         player.Money.Amount.Should().Be(expectedAmount);
         moneyAdded.Should().Be(expectedAmount);
 
         for (int i = 0; i < times; i++)
-            player.Money.TakeMoney(moneyGiven);
+            player.Money.Take(moneyGiven);
 
         player.Money.Amount.Should().Be(0);
         moneyTaken.Should().Be(expectedAmount);
@@ -42,12 +42,13 @@ public class PlayersMoneyFeatureTests : RealmUnitTestingBase
     [Theory]
     public void SettingAndGettingMoneyShouldWork(decimal moneySet, decimal expectedMoney)
     {
-        var server = CreateServer();
-        var player = CreatePlayer();
-        player.Money.SetMoneyInternal(1000000);
+        var player = CreateServerWithOnePlayer();
 
-        player.Money.Amount = moneySet;
-        player.Money.Amount.Should().Be(expectedMoney);
+        var money = player.Money;
+        money.SetInternal(1000000);
+
+        money.Amount = moneySet;
+        money.Amount.Should().Be(expectedMoney);
     }
 
     [Fact]
@@ -55,10 +56,10 @@ public class PlayersMoneyFeatureTests : RealmUnitTestingBase
     {
         var server = CreateServer();
         var player = CreatePlayer();
-        player.Money.SetMoneyInternal(1000000);
+        player.Money.SetInternal(1000000);
 
-        Action actGiveMoney = () => { player.Money.GiveMoney(-1); };
-        Action actTakeMoney = () => { player.Money.TakeMoney(-1); };
+        Action actGiveMoney = () => { player.Money.Give(-1); };
+        Action actTakeMoney = () => { player.Money.Take(-1); };
 
         actGiveMoney.Should().Throw<GameplayException>()
             .WithMessage("Unable to give money, amount can not get negative.");
@@ -74,8 +75,8 @@ public class PlayersMoneyFeatureTests : RealmUnitTestingBase
         var server = CreateServer();
         var player = CreatePlayer();
 
-        Action actGiveMoney = () => { player.Money.GiveMoney(amount); };
-        Action actTakeMoney = () => { player.Money.TakeMoney(amount); };
+        Action actGiveMoney = () => { player.Money.Give(amount); };
+        Action actTakeMoney = () => { player.Money.Take(amount); };
         Action actSetMoney = () => { player.Money.Amount = amount; };
 
         if (amount > 0)
@@ -97,14 +98,14 @@ public class PlayersMoneyFeatureTests : RealmUnitTestingBase
 
         await ParallelHelpers.Run(() =>
         {
-            player.Money.GiveMoney(1);
+            player.Money.Give(1);
         });
 
         player.Money.Amount.Should().Be(800);
 
         await ParallelHelpers.Run(() =>
         {
-            player.Money.TakeMoney(1);
+            player.Money.Take(1);
         });
 
         player.Money.Amount.Should().Be(0);
@@ -115,10 +116,10 @@ public class PlayersMoneyFeatureTests : RealmUnitTestingBase
     {
         var server = CreateServer();
         var player = CreatePlayer();
-        player.Money.SetMoneyInternal(1000000);
+        player.Money.SetInternal(1000000);
 
         player.Money.Amount = 15;
-        Action take = () => { player.Money.TakeMoney(10); };
+        Action take = () => { player.Money.Take(10); };
 
         take.Should().NotThrow<GameplayException>();
         take.Should().Throw<GameplayException>()
@@ -131,10 +132,10 @@ public class PlayersMoneyFeatureTests : RealmUnitTestingBase
     {
         var server = CreateServer();
         var player = CreatePlayer();
-        player.Money.SetMoneyInternal(1000000);
+        player.Money.SetInternal(1000000);
 
         player.Money.Amount = 15;
-        Action take = () => { player.Money.TakeMoney(10, true); };
+        Action take = () => { player.Money.Take(10, true); };
 
         take.Should().NotThrow<GameplayException>();
         take.Should().NotThrow<GameplayException>();
@@ -149,7 +150,7 @@ public class PlayersMoneyFeatureTests : RealmUnitTestingBase
         var player2 = CreatePlayer();
 
         player1.Money.Amount = 15;
-        player1.Money.TransferMoney(player2, 10);
+        player1.Money.Transfer(player2.Money, 10);
 
         player1.Money.Amount.Should().Be(5);
         player2.Money.Amount.Should().Be(10);
@@ -161,11 +162,11 @@ public class PlayersMoneyFeatureTests : RealmUnitTestingBase
         var server = CreateServer();
         var player1 = CreatePlayer();
         var player2 = CreatePlayer();
-        player1.Money.SetMoneyInternal(1000000);
-        player2.Money.SetMoneyInternal(1000000);
+        player1.Money.SetInternal(1000000);
+        player2.Money.SetInternal(1000000);
 
         player1.Money.Amount = 15;
-        Action transfer = () => { player1.Money.TransferMoney(player2, 20, false); };
+        Action transfer = () => { player1.Money.Transfer(player2.Money, 20, false); };
 
         transfer.Should().Throw<GameplayException>().WithMessage("Unable to take money, not enough money.");
     }
@@ -176,13 +177,13 @@ public class PlayersMoneyFeatureTests : RealmUnitTestingBase
         var server = CreateServer();
         var player1 = CreatePlayer();
         var player2 = CreatePlayer();
-        player1.Money.SetMoneyInternal(1000000);
+        player1.Money.SetInternal(1000000);
 
         player1.Money.Amount = 800;
 
         await ParallelHelpers.Run(() =>
         {
-            player1.Money.TransferMoney(player2, 1);
+            player1.Money.Transfer(player2.Money, 1);
         });
 
         player1.Money.Amount.Should().Be(0);
@@ -198,10 +199,10 @@ public class PlayersMoneyFeatureTests : RealmUnitTestingBase
     {
         var server = CreateServer();
         var player = CreatePlayer();
-        player.Money.SetMoneyInternal(1000000);
+        player.Money.SetInternal(1000000);
 
         player.Money.Amount = amount;
-        player.Money.HasMoney(requiredAmount, force).Should().Be(expectedResult);
+        player.Money.Has(requiredAmount, force).Should().Be(expectedResult);
     }
 
     [InlineData(6, 4)]
@@ -211,10 +212,10 @@ public class PlayersMoneyFeatureTests : RealmUnitTestingBase
     {
         var server = CreateServer();
         var player = CreatePlayer();
-        player.Money.SetMoneyInternal(1000000);
+        player.Money.SetInternal(1000000);
 
         player.Money.Amount = 10;
-        player.Money.TryTakeMoney(takenMoney);
+        player.Money.TryTake(takenMoney);
         player.Money.Amount.Should().Be(expectedMoney);
     }
 
@@ -223,10 +224,10 @@ public class PlayersMoneyFeatureTests : RealmUnitTestingBase
     {
         var server = CreateServer();
         var player = CreatePlayer();
-        player.Money.SetMoneyInternal(1000000);
+        player.Money.SetInternal(1000000);
 
         player.Money.Amount = 10;
-        player.Money.TryTakeMoney(5, () =>
+        player.Money.TryTake(5, () =>
         {
             return true;
         });
@@ -238,10 +239,10 @@ public class PlayersMoneyFeatureTests : RealmUnitTestingBase
     {
         var server = CreateServer();
         var player = CreatePlayer();
-        player.Money.SetMoneyInternal(1000000);
+        player.Money.SetInternal(1000000);
 
         player.Money.Amount = 10;
-        player.Money.TryTakeMoney(5, () =>
+        player.Money.TryTake(5, () =>
         {
             return false;
         });
@@ -253,12 +254,12 @@ public class PlayersMoneyFeatureTests : RealmUnitTestingBase
     {
         var server = CreateServer();
         var player = CreatePlayer();
-        player.Money.SetMoneyInternal(1000000);
+        player.Money.SetInternal(1000000);
 
         player.Money.Amount = 10;
         var act = () =>
         {
-            player.Money.TryTakeMoney(5, () =>
+            player.Money.TryTake(5, () =>
             {
                 throw new InvalidOperationException();
             });
@@ -273,12 +274,12 @@ public class PlayersMoneyFeatureTests : RealmUnitTestingBase
     {
         var server = CreateServer();
         var player = CreatePlayer();
-        player.Money.SetMoneyInternal(1000000);
+        player.Money.SetInternal(1000000);
 
         player.Money.Amount = 10;
         var act = async () =>
         {
-            await player.Money.TryTakeMoneyAsync(5, () =>
+            await player.Money.TryTakeAsync(5, () =>
             {
                 throw new InvalidOperationException();
             });
@@ -293,13 +294,13 @@ public class PlayersMoneyFeatureTests : RealmUnitTestingBase
     {
         var server = CreateServer();
         var player = CreatePlayer();
-        player.Money.SetMoneyInternal(1000000);
+        player.Money.SetInternal(1000000);
 
         player.Money.Amount = 100;
         bool success = false;
         var act = async () =>
         {
-            success = await player.Money.TryTakeMoneyAsync(5, () =>
+            success = await player.Money.TryTakeAsync(5, () =>
             {
                 return Task.FromResult(true);
             });
@@ -318,10 +319,10 @@ public class PlayersMoneyFeatureTests : RealmUnitTestingBase
     {
         var server = CreateServer();
         var player = CreatePlayer();
-        player.Money.SetMoneyInternal(1000000);
+        player.Money.SetInternal(1000000);
 
         player.Money.Amount = 100;
-        bool success = player.Money.TryTakeMoney(101, () =>
+        bool success = player.Money.TryTake(101, () =>
         {
             return true;
         });
@@ -335,10 +336,10 @@ public class PlayersMoneyFeatureTests : RealmUnitTestingBase
     {
         var server = CreateServer();
         var player = CreatePlayer();
-        player.Money.SetMoneyInternal(1000000);
+        player.Money.SetInternal(1000000);
 
         player.Money.Amount = 100;
-        bool success = await player.Money.TryTakeMoneyAsync(101, () =>
+        bool success = await player.Money.TryTakeAsync(101, () =>
         {
             return Task.FromResult(true);
         });
@@ -352,10 +353,10 @@ public class PlayersMoneyFeatureTests : RealmUnitTestingBase
     {
         var server = CreateServer();
         var player = CreatePlayer();
-        player.Money.SetMoneyInternal(1000000);
+        player.Money.SetInternal(1000000);
 
         player.Money.Amount = 100;
-        bool success = player.Money.TryTakeMoney(50, () =>
+        bool success = player.Money.TryTake(50, () =>
         {
             return false;
         });
@@ -369,10 +370,10 @@ public class PlayersMoneyFeatureTests : RealmUnitTestingBase
     {
         var server = CreateServer();
         var player = CreatePlayer();
-        player.Money.SetMoneyInternal(1000000);
+        player.Money.SetInternal(1000000);
 
         player.Money.Amount = 100;
-        bool success = await player.Money.TryTakeMoneyAsync(50, () =>
+        bool success = await player.Money.TryTakeAsync(50, () =>
         {
             return Task.FromResult(false);
         });
@@ -386,7 +387,7 @@ public class PlayersMoneyFeatureTests : RealmUnitTestingBase
     {
         var server = CreateServer();
         var player = CreatePlayer();
-        player.Money.SetMoneyInternal(1000000);
+        player.Money.SetInternal(1000000);
 
         var act = () =>
         {
@@ -399,5 +400,71 @@ public class PlayersMoneyFeatureTests : RealmUnitTestingBase
 
         act.Should().Throw<LockRecursionException>();
         player.Money.Amount.Should().Be(100);
+    }
+
+    [Fact]
+    public void UsingMoneyComponentShouldIncreaseVersions()
+    {
+        using var _ = new AssertionScope();
+
+        var server = CreateServer();
+        var player1 = CreatePlayer();
+        var player2 = CreatePlayer();
+        var money = player1.Money;
+        var user1 = player1.User;
+        var expectedVersion = 0;
+
+        user1.GetVersion().Should().Be(0);
+        money.SetInternal(50);
+        user1.GetVersion().Should().Be(expectedVersion, "SetMoneyInternal(50)");
+
+        money.Give(50);
+        user1.GetVersion().Should().Be(++expectedVersion, "Give(50)");
+
+        money.Take(5);
+        user1.GetVersion().Should().Be(++expectedVersion, "Take(5)");
+
+        money.TryTake(500);
+        user1.GetVersion().Should().Be(expectedVersion, "TryTake(500)");
+
+        money.TryTake(5);
+        user1.GetVersion().Should().Be(++expectedVersion, "TryTake(5)");
+
+        money.TryTake(5, () => true);
+        user1.GetVersion().Should().Be(++expectedVersion, "TryTake(5, () => true)");
+
+        money.TryTake(5, () => false);
+        user1.GetVersion().Should().Be(expectedVersion, "TryTake(5, () => false)");
+
+        money.TryTakeAsync(5, () => Task.FromResult(true)).Wait();
+        user1.GetVersion().Should().Be(++expectedVersion, "TryTakeAsync(5, () => Task.FromResult(true)).Wait()");
+
+        money.TryTakeAsync(5, () => Task.FromResult(false)).Wait();
+        user1.GetVersion().Should().Be(expectedVersion, "TryTakeAsync(5, () => Task.FromResult(false)).Wait()");
+    }
+
+    [Fact]
+    public void GivingAndTakingZeroMoneyShouldNotRaiseAnyEvent()
+    {
+        using var _ = new AssertionScope();
+
+        var server = CreateServer();
+        var player = CreatePlayer();
+        var money = player.Money;
+
+        using var monitor1 = money.Monitor();
+
+        money.Give(0);
+        money.Take(0);
+        money.Take(0, true);
+        money.TryTake(0);
+        money.TryTake(0, true);
+        money.TryTake(0, () => true);
+        money.TryTake(0, () => false);
+        money.TryTakeAsync(0, () => Task.FromResult(true)).Wait();
+        money.TryTakeAsync(0, () => Task.FromResult(false)).Wait();
+
+        player.User.GetVersion().Should().Be(0);
+        monitor1.OccurredEvents.Should().BeEmpty();
     }
 }

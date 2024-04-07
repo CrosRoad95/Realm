@@ -661,7 +661,7 @@ public class RealmPlayer : Player, IDisposable, IPersistentElement
         return false;
     }
 
-    public async Task DoAnimationAsync(Animation animation, TimeSpan? timeSpan = null, bool blockMovement = true)
+    public async Task DoAnimationAsync(Animation animation, TimeSpan? timeSpan = null, bool blockMovement = true, CancellationToken cancellationToken = default)
     {
         ToggleControlsScope? scope = null;
         if (blockMovement)
@@ -676,7 +676,7 @@ public class RealmPlayer : Player, IDisposable, IPersistentElement
         {
             DoAnimationInternal(animation, ref timeSpan);
             if (timeSpan != null)
-                await Task.Delay(timeSpan.Value);
+                await Task.Delay(timeSpan.Value, cancellationToken);
         }
         catch (Exception)
         {

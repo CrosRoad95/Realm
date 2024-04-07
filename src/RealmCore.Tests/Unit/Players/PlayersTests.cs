@@ -331,4 +331,19 @@ public class PlayersTests : RealmUnitTestingBase
         player1.IsDestroyed.Should().BeFalse();
         player2.IsDestroyed.Should().BeTrue();
     }
+
+    [Fact]
+    public void UserVersionShouldWorkAsExpected()
+    {
+        var player = CreateServerWithOnePlayer();
+        var user = player.User;
+
+        user.GetVersion().Should().Be(0);
+
+        user.IncreaseVersion();
+        user.GetVersion().Should().Be(1);
+        user.TryFlushVersion(1).Should().BeTrue();
+        user.GetVersion().Should().Be(0);
+        user.TryFlushVersion(1).Should().BeFalse();
+    }
 }

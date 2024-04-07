@@ -96,7 +96,10 @@ internal sealed class PlayerUserFeature : IPlayerUserFeature
             foreach (var playerFeature in Player.GetRequiredService<IEnumerable<IPlayerFeature>>())
             {
                 if(playerFeature is IUsesUserPersistentData usesPlayerPersistentData)
+                {
+                    usesPlayerPersistentData.VersionIncreased += IncreaseVersion;
                     usesPlayerPersistentData.SignIn(user);
+                }
             }
             SignedIn?.Invoke(this, Player);
         }
@@ -110,6 +113,7 @@ internal sealed class PlayerUserFeature : IPlayerUserFeature
             {
                 if (_user == null)
                     throw new InvalidOperationException();
+
                 _user = null;
                 _claimsPrincipal = null;
                 SignedOut?.Invoke(this, Player);
@@ -118,7 +122,10 @@ internal sealed class PlayerUserFeature : IPlayerUserFeature
                 foreach (var playerFeature in Player.GetRequiredService<IEnumerable<IPlayerFeature>>())
                 {
                     if (playerFeature is IUsesUserPersistentData usesPlayerPersistentData)
+                    {
+                        usesPlayerPersistentData.VersionIncreased -= IncreaseVersion;
                         usesPlayerPersistentData.SignOut();
+                    }
                 }
             }
         }
@@ -133,6 +140,12 @@ internal sealed class PlayerUserFeature : IPlayerUserFeature
 
     public bool TryFlushVersion(int minimalVersion)
     {
+        if (minimalVersion < 0)
+            throw new ArgumentOutOfRangeException();
+
+        if (_version == 0)
+            return false;
+
         if (minimalVersion <= _version)
         {
             Interlocked.Exchange(ref _version, 0);

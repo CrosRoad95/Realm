@@ -219,7 +219,14 @@ internal sealed class SeederServerBuilder : IDisposable
                 {
                     var discordUserId = integrations.Discord.UserId;
                     if (user.DiscordIntegration != null)
-                        user.DiscordIntegration.DiscordUserId = discordUserId;
+                    {
+                        if(user.DiscordIntegration.DiscordUserId != discordUserId)
+                        {
+                            user.DiscordIntegration.DiscordUserId = discordUserId;
+                            _logger.LogInformation("Seeder: Updated discord integration with discord user id {discordUserId} for user {userName}", discordUserId, pair.Key);
+                            _isUpToDate = false;
+                        }
+                    }
                     else
                     {
                         user.DiscordIntegration = new DiscordIntegrationData { DiscordUserId = discordUserId };

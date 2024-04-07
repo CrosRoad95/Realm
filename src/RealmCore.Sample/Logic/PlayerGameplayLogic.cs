@@ -35,7 +35,7 @@ internal sealed partial class PlayerGameplayLogic
         var worldObject = player.AttachedBoneElements.FirstOrDefault()?.WorldObject;
         if (worldObject != null && keyState == KeyState.Down)
         {
-            await player.DoAnimationAsync(Animation.CarryPutDown);
+            await player.DoAnimationAsync(Animation.CarryPutDown, cancellationToken: cancellationToken);
 
             var liftableInteraction = worldObject.Interaction as LiftableInteraction;
             if (liftableInteraction != null && liftableInteraction.TryDrop() && player.Detach(worldObject))
@@ -62,7 +62,7 @@ internal sealed partial class PlayerGameplayLogic
                     case LiftableInteraction liftableInteraction when keyState == KeyState.Down:
                         if (player.IsLookingAt(element) && liftableInteraction.TryLift(player))
                         {
-                            await player.DoAnimationAsync(Animation.CarryLiftUp);
+                            await player.DoAnimationAsync(Animation.CarryLiftUp, cancellationToken: cancellationToken);
 #pragma warning disable CA1849 // Call async methods when in an async method
                             player.DoAnimation(Animation.StartCarry);
 #pragma warning restore CA1849 // Call async methods when in an async method

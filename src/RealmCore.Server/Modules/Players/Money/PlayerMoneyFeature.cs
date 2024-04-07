@@ -10,20 +10,20 @@ public interface IPlayerMoneyFeature : IPlayerFeature
     event Action<IPlayerMoneyFeature, decimal>? Added;
     event Action<IPlayerMoneyFeature, decimal>? Taken;
 
-    internal void SetMoneyInternal(decimal amount);
-    void GiveMoney(decimal amount);
-    bool HasMoney(decimal amount, bool force = false);
-    void TakeMoney(decimal amount, bool force = false);
-    bool TryTakeMoney(decimal amount, bool force = false);
-    bool TryTakeMoney(decimal amount, Func<bool> action, bool force = false);
-    Task<bool> TryTakeMoneyAsync(decimal amount, Func<Task<bool>> action, bool force = false);
-    void TransferMoney(RealmPlayer player, decimal amount, bool force = false);
-    void SetMoneyLimitAndPrecision(decimal moneyLimit, byte precision);
+    internal void SetInternal(decimal amount);
+    void Give(decimal amount);
+    bool Has(decimal amount, bool force = false);
+    void Take(decimal amount, bool force = false);
+    bool TryTake(decimal amount, bool force = false);
+    bool TryTake(decimal amount, Func<bool> action, bool force = false);
+    Task<bool> TryTakeAsync(decimal amount, Func<Task<bool>> action, bool force = false);
+    void Transfer(IPlayerMoneyFeature destination, decimal amount, bool force = false);
+    void SetLimitAndPrecision(decimal moneyLimit, byte precision);
 }
 
 internal sealed class PlayerMoneyFeature : IPlayerMoneyFeature, IUsesUserPersistentData, IDisposable
 {
-    private readonly ReaderWriterLockSlim _lock = new();
+    private readonly ReaderWriterLockSlimScoped _lock = new();
     private decimal _money = 0;
     private decimal _moneyLimit;
     private byte _moneyPrecision;
@@ -49,24 +49,14 @@ internal sealed class PlayerMoneyFeature : IPlayerMoneyFeature, IUsesUserPersist
             if (Math.Abs(value) > _moneyLimit)
                 throw new GameplayException("Unable to set money beyond limit.");
 
-            _lock.TryEnterWriteLock(TimeSpan.FromSeconds(15));
-            try
-            {
-                if (_money == value)
-                    return;
-                _money = value;
-                SyncMoney();
-                VersionIncreased?.Invoke();
-                Set?.Invoke(this, _money);
-            }
-            catch (Exception)
-            {
-                throw;
-            }
-            finally
-            {
-                _lock.ExitWriteLock();
-            }
+            using var _ = _lock.BeginWrite();
+
+            if (_money == value)
+                return;
+            _money = value;
+            SyncMoney();
+            VersionIncreased?.Invoke();
+            Set?.Invoke(this, _money);
         }
     }
 
@@ -86,13 +76,13 @@ internal sealed class PlayerMoneyFeature : IPlayerMoneyFeature, IUsesUserPersist
         Amount = 0;
     }
 
-    public void SetMoneyInternal(decimal amount)
+    public void SetInternal(decimal amount)
     {
         _money = amount;
         SyncMoney();
     }
 
-    public void SetMoneyLimitAndPrecision(decimal moneyLimit, byte precision)
+    public void SetLimitAndPrecision(decimal moneyLimit, byte precision)
     {
         _moneyLimit = moneyLimit;
         _moneyPrecision = precision;
@@ -106,7 +96,7 @@ internal sealed class PlayerMoneyFeature : IPlayerMoneyFeature, IUsesUserPersist
             _userData.Money = _money;
     }
 
-    public void GiveMoney(decimal amount)
+    public void Give(decimal amount)
     {
         if (amount == 0)
             return;
@@ -116,25 +106,15 @@ internal sealed class PlayerMoneyFeature : IPlayerMoneyFeature, IUsesUserPersist
         if (amount < 0)
             throw new GameplayException("Unable to give money, amount can not get negative.");
 
-        _lock.TryEnterWriteLock(TimeSpan.FromSeconds(15));
-        try
-        {
-            if (Math.Abs(_money) + amount > _moneyLimit)
-                throw new GameplayException("Unable to give money beyond limit.");
+        using var _ = _lock.BeginWrite();
 
-            _money += amount;
-            SyncMoney();
-            VersionIncreased?.Invoke();
-            Added?.Invoke(this, amount);
-        }
-        catch (Exception)
-        {
-            throw;
-        }
-        finally
-        {
-            _lock.ExitWriteLock();
-        }
+        if (Math.Abs(_money) + amount > _moneyLimit)
+            throw new GameplayException("Unable to give money beyond limit.");
+
+        _money += amount;
+        SyncMoney();
+        VersionIncreased?.Invoke();
+        Added?.Invoke(this, amount);
     }
 
     private void TakeMoneyCore(decimal amount, bool force = false)
@@ -159,43 +139,25 @@ internal sealed class PlayerMoneyFeature : IPlayerMoneyFeature, IUsesUserPersist
         Taken?.Invoke(this, amount);
     }
 
-    public void TakeMoney(decimal amount, bool force = false)
+    public void Take(decimal amount, bool force = false)
     {
-        _lock.TryEnterWriteLock(TimeSpan.FromSeconds(15));
-        try
-        {
-            TakeMoneyCore(amount, force);
-        }
-        catch (Exception)
-        {
-            throw;
-        }
-        finally
-        {
-            _lock.ExitWriteLock();
-        }
+        using var _ = _lock.BeginWrite();
+        TakeMoneyCore(amount, force);
     }
 
     internal bool HasMoneyCore(decimal amount, bool force = false) => _money >= amount || force;
 
-    public bool HasMoney(decimal amount, bool force = false)
+    public bool Has(decimal amount, bool force = false)
     {
-        _lock.TryEnterReadLock(TimeSpan.FromSeconds(15));
-        try
-        {
-            return HasMoneyCore(amount, force);
-        }
-        finally
-        {
-            _lock.ExitReadLock();
-        }
+        using var _ = _lock.BeginWrite();
+        return HasMoneyCore(amount, force);
     }
 
-    public bool TryTakeMoney(decimal amount, bool force = false)
+    public bool TryTake(decimal amount, bool force = false)
     {
         try
         {
-            TakeMoney(amount, force);
+            Take(amount, force);
             return true;
         }
         catch
@@ -204,60 +166,41 @@ internal sealed class PlayerMoneyFeature : IPlayerMoneyFeature, IUsesUserPersist
         }
     }
 
-    public bool TryTakeMoney(decimal amount, Func<bool> action, bool force = false)
+    public bool TryTake(decimal amount, Func<bool> action, bool force = false)
     {
-        _lock.TryEnterWriteLock(TimeSpan.FromSeconds(15));
-        try
-        {
-            if (!HasMoneyCore(amount, force))
+        using var _ = _lock.BeginWrite();
+        if (!HasMoneyCore(amount, force))
                 return false;
 
-            if (action())
-            {
-                TakeMoneyCore(amount, force);
-                return true;
-            }
-            return false;
-        }
-        finally
+        if (action())
         {
-            _lock.ExitWriteLock();
+            TakeMoneyCore(amount, force);
+            return true;
         }
+        return false;
     }
 
-    public async Task<bool> TryTakeMoneyAsync(decimal amount, Func<Task<bool>> action, bool force = false)
+    public async Task<bool> TryTakeAsync(decimal amount, Func<Task<bool>> action, bool force = false)
     {
-        _lock.TryEnterWriteLock(TimeSpan.FromSeconds(15));
-
-        try
-        {
-            if (!HasMoneyCore(amount, force))
-                return false;
-
-            if (await action())
-            {
-                TakeMoneyCore(amount, force);
-                return true;
-            }
+        using var _ = _lock.BeginWrite();
+        if (!HasMoneyCore(amount, force))
             return false;
-        }
-        catch
+
+        if (await action())
         {
-            throw;
+            TakeMoneyCore(amount, force);
+            return true;
         }
-        finally
-        {
-            _lock.ExitWriteLock();
-        }
+        return false;
     }
 
-    public void TransferMoney(RealmPlayer player, decimal amount, bool force = false)
+    public void Transfer(IPlayerMoneyFeature destination, decimal amount, bool force = false)
     {
         if (amount <= 0)
             throw new GameplayException("Unable to transfer money, amount can smaller or equal to zero.");
 
-        TakeMoney(amount, force);
-        player.Money.GiveMoney(amount);
+        Take(amount, force);
+        destination.Give(amount);
     }
 
     public void Dispose()
