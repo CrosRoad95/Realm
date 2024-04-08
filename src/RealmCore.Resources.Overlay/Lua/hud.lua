@@ -113,6 +113,10 @@ local function renderHud3d(elements, oldrt)
 end
 
 function renderHuds()
+	if(isPlayerMapVisible())then
+		return;
+	end
+
 	for hudId,hud in pairs(huds)do
 		if(isHudVisible(hudId))then
 			renderHud(hud.position, hud.elements)
