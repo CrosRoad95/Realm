@@ -37,6 +37,7 @@ internal sealed class VehicleService : IVehicleService
             var id = _vehicle.Persistence.Id;
             await _vehicleRepository.SetSpawned(id, false, cancellationToken);
             _vehiclesInUse.TrySetInactive(id);
+            _vehicle.Persistence.Unload();
         }
 
         foreach (var occupants in _vehicle.Occupants.Values)

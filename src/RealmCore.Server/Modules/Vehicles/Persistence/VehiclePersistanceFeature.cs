@@ -1,4 +1,6 @@
-﻿namespace RealmCore.Server.Modules.Vehicles.Persistence;
+﻿using RealmCore.Persistence.Data;
+
+namespace RealmCore.Server.Modules.Vehicles.Persistence;
 
 public interface IUsesVehiclePersistentData
 {
@@ -17,7 +19,11 @@ public interface IVehiclePersistenceFeature : IVehicleFeature
 
     event Action<IVehiclePersistenceFeature, RealmVehicle>? Loaded;
 
+    int GetVersion();
+    void IncreaseVersion();
     void Load(VehicleData vehicleData, bool preserveLocation = false);
+    bool TryFlushVersion(int minimalVersion);
+    void Unload();
 }
 
 internal sealed class VehiclePersistanceFeature : IVehiclePersistenceFeature
@@ -25,6 +31,7 @@ internal sealed class VehiclePersistanceFeature : IVehiclePersistenceFeature
     private readonly object _lock = new();
     private VehicleData? _vehicleData;
     private readonly IDateTimeProvider _dateTimeProvider;
+    private int _version = 0;
     public VehicleData VehicleData => _vehicleData ?? throw new PersistantVehicleNotLoadedException();
 
     public bool IsLoaded => _vehicleData != null;
@@ -120,14 +127,59 @@ internal sealed class VehiclePersistanceFeature : IVehiclePersistenceFeature
             foreach (var playerFeature in Vehicle.GetRequiredService<IEnumerable<IVehicleFeature>>())
             {
                 if (playerFeature is IUsesVehiclePersistentData usesVehiclePersistentData)
+                {
+                    usesVehiclePersistentData.VersionIncreased += IncreaseVersion;
                     usesVehiclePersistentData.Loaded(vehicleData);
+                }
             }
             Loaded?.Invoke(this, Vehicle);
         }
     }
 
+    public void IncreaseVersion()
+    {
+        Interlocked.Increment(ref _version);
+    }
+
+    public int GetVersion() => _version;
+
+    public bool TryFlushVersion(int minimalVersion)
+    {
+        if (minimalVersion < 0)
+            throw new ArgumentOutOfRangeException();
+
+        if (_version == 0)
+            return false;
+
+        if (minimalVersion <= _version)
+        {
+            Interlocked.Exchange(ref _version, 0);
+            return true;
+        }
+        return false;
+    }
+
     public void UpdateLastUsed()
     {
         LastUsed = _dateTimeProvider.Now;
+    }
+
+    public void Unload()
+    {
+        lock (_lock)
+        {
+            if (IsLoaded)
+            {
+                foreach (var playerFeature in Vehicle.GetRequiredService<IEnumerable<IVehicleFeature>>())
+                {
+                    if (playerFeature is IUsesVehiclePersistentData usesVehiclePersistentData)
+                    {
+                        usesVehiclePersistentData.VersionIncreased -= IncreaseVersion;
+                    }
+                }
+
+                _vehicleData = null;
+            }
+        }
     }
 }
