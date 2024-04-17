@@ -2,6 +2,7 @@
 using RealmCore.Sample.Concepts.Gui.Blazor;
 using RealmCore.Sample.HudLayers;
 using RealmCore.Server.Modules.Elements.Focusable;
+using RealmCore.Server.Modules.Inventories;
 using RealmCore.Server.Modules.Players.Money;
 using RealmCore.Server.Modules.Search;
 using SlipeServer.Packets.Enums;
@@ -352,22 +353,6 @@ internal sealed class CommandsLogic
             _chatBox.OutputTo(player, "Upgrade added");
         });
 
-        _commandService.AddCommandHandler("additem", (player, args) =>
-        {
-            if (player.Inventory.TryGetPrimary(out var inventory))
-            {
-                inventory.AddItem(_itemsCollection, 1);
-                _chatBox.OutputTo(player, $"Test item added");
-            }
-        });
-        _commandService.AddCommandHandler("additem2", (player, args) =>
-        {
-            if (player.Inventory.TryGetPrimary(out var inventory))
-            {
-                inventory.AddItem(_itemsCollection, 2);
-                _chatBox.OutputTo(player, $"Test item added");
-            }
-        });
         _commandService.AddAsyncCommandHandler("addtestdata", async (player, args, token) =>
         {
             if (player.JobUpgrades.TryAdd(1, 1))
@@ -1023,19 +1008,6 @@ internal sealed class CommandsLogic
         //    _chatBox.OutputTo(player, $"Inventory: {inv.Number}/{inv.Size}");
         //});
 
-        _commandService.AddCommandHandler("givedefaultinventory", (player, args) =>
-        {
-            player.Inventory.CreatePrimaryInventory(20);
-            _chatBox.OutputTo(player, "Inventory created");
-        });
-
-        _commandService.AddCommandHandler("listitems", (player, args) =>
-        {
-            foreach (var item in player.Inventory.Primary!.Items)
-            {
-                _chatBox.OutputTo(player, $"Item: {item.ItemId}");
-            }
-        });
 
         //_commandService.AddCommandHandler("itemwithmetadata", (player, args) =>
         //{
@@ -1952,6 +1924,55 @@ internal sealed class CommandsLogic
             var active = player.Vehicle?.Fuel.Active?.FuelType;
             _chatBox.OutputTo(player, $"Vehicle id: {player.Vehicle?.PersistentId}");
             _chatBox.OutputTo(player, $"Active container: {active}");
+        });
+
+        AddInventoryCommands();
+    }
+
+    private void AddInventoryCommands()
+    {
+        _commandService.AddCommandHandler("additem1", (player, args) =>
+        {
+            if (player.Inventory.TryGetPrimary(out var inventory))
+            {
+                inventory.AddItem(_itemsCollection, 1);
+                _chatBox.OutputTo(player, $"Test item added");
+            }
+        });
+
+        _commandService.AddCommandHandler("additem2", (player, args) =>
+        {
+            if (player.Inventory.TryGetPrimary(out var inventory))
+            {
+                inventory.AddItem(_itemsCollection, 2);
+                _chatBox.OutputTo(player, "Test item added");
+            }
+            else
+            {
+                _chatBox.OutputTo(player, "Failed to add item");
+
+            }
+        });
+
+        _commandService.AddCommandHandler("givedefaultinventory", (player, args) =>
+        {
+            player.Inventory.CreatePrimaryInventory(20);
+            _chatBox.OutputTo(player, "Inventory created");
+        });
+
+        _commandService.AddCommandHandler("listitems", (player, args) =>
+        {
+            _chatBox.OutputTo(player, $"Nuumber: {player.Inventory.Primary!.Number}");
+            foreach (var item in player.Inventory.Primary!.Items)
+            {
+                _chatBox.OutputTo(player, $"Item: {item.ItemId}");
+            }
+        });
+
+        _commandService.AddCommandHandler("removeitem1", (player, args) =>
+        {
+            player.Inventory.Primary!.RemoveItem(1);
+            _chatBox.OutputTo(player, "Item removed");
         });
     }
 }

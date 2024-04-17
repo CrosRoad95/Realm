@@ -3,7 +3,7 @@
 public class Inventory
 {
     private readonly List<Item> _items = [];
-    private readonly ReaderWriterLockSlim _semaphore = new(LockRecursionPolicy.SupportsRecursion);
+    private readonly ReaderWriterLockSlim _lock = new(LockRecursionPolicy.SupportsRecursion);
     public event Action<Inventory, Item>? ItemAdded;
     public event Action<Inventory, Item>? ItemRemoved;
     public event Action<Inventory, Item>? ItemChanged;
@@ -34,14 +34,14 @@ public class Inventory
     {
         get
         {
-            _semaphore.EnterReadLock();
+            _lock.EnterReadLock();
             try
             {
                 return _items.Sum(x => x.Size * x.Number);
             }
             finally
             {
-                _semaphore.ExitReadLock();
+                _lock.ExitReadLock();
             }
         }
     }
@@ -50,14 +50,14 @@ public class Inventory
     {
         get
         {
-            _semaphore.EnterReadLock();
+            _lock.EnterReadLock();
             try
             {
                 return new List<Item>(_items);
             }
             finally
             {
-                _semaphore.ExitReadLock();
+                _lock.ExitReadLock();
             }
         }
     }
@@ -78,124 +78,124 @@ public class Inventory
 
     public bool HasItemById(uint itemId)
     {
-        _semaphore.EnterReadLock();
+        _lock.EnterReadLock();
         try
         {
             return _items.Any(x => x.ItemId == itemId);
         }
         finally
         {
-            _semaphore.ExitReadLock();
+            _lock.ExitReadLock();
         }
     }
 
     public bool HasItem(Func<Item, bool> callback)
     {
-        _semaphore.EnterReadLock();
+        _lock.EnterReadLock();
         try
         {
             return _items.Any(callback);
         }
         finally
         {
-            _semaphore.ExitReadLock();
+            _lock.ExitReadLock();
         }
     }
 
     public bool HasItem(Item item)
     {
-        _semaphore.EnterReadLock();
+        _lock.EnterReadLock();
         try
         {
             return _items.Contains(item);
         }
         finally
         {
-            _semaphore.ExitReadLock();
+            _lock.ExitReadLock();
         }
     }
 
     public int SumItemsById(uint itemId)
     {
-        _semaphore.EnterReadLock();
+        _lock.EnterReadLock();
         try
         {
             return _items.Count(x => x.ItemId == itemId);
         }
         finally
         {
-            _semaphore.ExitReadLock();
+            _lock.ExitReadLock();
         }
     }
 
     public int SumItemsNumberById(uint itemId)
     {
-        _semaphore.EnterReadLock();
+        _lock.EnterReadLock();
         try
         {
             return (int)_items.Where(x => x.ItemId == itemId).Sum(x => x.Number);
         }
         finally
         {
-            _semaphore.ExitReadLock();
+            _lock.ExitReadLock();
         }
     }
 
     public IReadOnlyList<Item> GetItemsById(uint itemId)
     {
-        _semaphore.EnterReadLock();
+        _lock.EnterReadLock();
         try
         {
             return new List<Item>(_items.Where(x => x.ItemId == itemId));
         }
         finally
         {
-            _semaphore.ExitReadLock();
+            _lock.ExitReadLock();
         }
     }
 
     public IReadOnlyList<Item> GetItemsByIdWithMetadata(uint itemId, string key, object? metadata)
     {
-        _semaphore.EnterReadLock();
+        _lock.EnterReadLock();
         try
         {
             return new List<Item>(_items.Where(x => x.ItemId == itemId && (x.GetMetadata(key)?.Equals(metadata) ?? false)));
         }
         finally
         {
-            _semaphore.ExitReadLock();
+            _lock.ExitReadLock();
         }
     }
 
     public Item? GetSingleItemByIdWithMetadata(uint itemId, Metadata metadata)
     {
-        _semaphore.EnterReadLock();
+        _lock.EnterReadLock();
         try
         {
             return _items.Where(x => x.ItemId == itemId && x.Equals(metadata)).FirstOrDefault();
         }
         finally
         {
-            _semaphore.ExitReadLock();
+            _lock.ExitReadLock();
         }
     }
 
     public bool HasItemWithMetadata(uint itemId, string key, object? metadata)
     {
-        _semaphore.EnterReadLock();
+        _lock.EnterReadLock();
         try
         {
             return _items.Any(x => x.ItemId == itemId && (x.GetMetadata(key)?.Equals(metadata) ?? false));
         }
         finally
         {
-            _semaphore.ExitReadLock();
+            _lock.ExitReadLock();
         }
     }
 
     public bool TryGetByLocalId(string localId, out Item item)
     {
-        _semaphore.EnterReadLock();
+        _lock.EnterReadLock();
         try
         {
             item = _items.FirstOrDefault(x => x.LocalId == localId)!;
@@ -203,13 +203,13 @@ public class Inventory
         }
         finally
         {
-            _semaphore.ExitReadLock();
+            _lock.ExitReadLock();
         }
     }
 
     public bool TryGetByItemId(uint itemId, out Item item)
     {
-        _semaphore.EnterReadLock();
+        _lock.EnterReadLock();
         try
         {
             item = _items.FirstOrDefault(x => x.ItemId == itemId)!;
@@ -217,13 +217,13 @@ public class Inventory
         }
         finally
         {
-            _semaphore.ExitReadLock();
+            _lock.ExitReadLock();
         }
     }
 
     public bool TryGetByIdAndMetadata(uint itemId, Metadata metadata, out Item item)
     {
-        _semaphore.EnterReadLock();
+        _lock.EnterReadLock();
         try
         {
             item = _items.FirstOrDefault(x => x.ItemId == itemId && x.Equals(metadata))!;
@@ -231,13 +231,13 @@ public class Inventory
         }
         finally
         {
-            _semaphore.ExitReadLock();
+            _lock.ExitReadLock();
         }
     }
 
     public Item AddSingleItem(ItemsCollection itemsCollection, uint itemId, Metadata? metadata = null, bool tryStack = true, bool force = false)
     {
-        _semaphore.EnterWriteLock();
+        _lock.EnterWriteLock();
         try
         {
             var item = AddItem(itemsCollection, itemId, 1, metadata, tryStack, force);
@@ -247,7 +247,7 @@ public class Inventory
         }
         finally
         {
-            _semaphore.ExitWriteLock();
+            _lock.ExitWriteLock();
         }
     }
 
@@ -263,7 +263,7 @@ public class Inventory
         if (requiredSpace > Size && !force)
             throw new InventoryNotEnoughSpaceException(Size, requiredSpace);
 
-        _semaphore.EnterWriteLock();
+        _lock.EnterWriteLock();
         try
         {
             List<Item> newItems = [];
@@ -293,16 +293,18 @@ public class Inventory
 
             foreach (var newItem in newItems)
             {
-                newItem.MetadataChanged += HandleItemChanged;
+                newItem.MetadataChanged += HandleItemMetadataChanged;
+                newItem.NumberChanged += HandleItemNumberChanged;
                 _items.Add(newItem);
                 ItemAdded?.Invoke(this, newItem);
+                ItemChanged?.Invoke(this, newItem);
             }
 
             return newItems.AsReadOnly();
         }
         finally
         {
-            _semaphore.ExitWriteLock();
+            _lock.ExitWriteLock();
         }
     }
 
@@ -316,22 +318,23 @@ public class Inventory
                 throw new InventoryNotEnoughSpaceException(Size, requiredSpace);
         }
 
-        _semaphore.EnterWriteLock();
+        _lock.EnterWriteLock();
         try
         {
-            newItem.MetadataChanged += HandleItemChanged;
+            newItem.MetadataChanged += HandleItemMetadataChanged;
+            newItem.NumberChanged += HandleItemNumberChanged;
             _items.Add(newItem);
             ItemAdded?.Invoke(this, newItem);
         }
         finally
         {
-            _semaphore.ExitWriteLock();
+            _lock.ExitWriteLock();
         }
     }
 
     public void AddItems(ItemsCollection itemsCollection, IEnumerable<Item> newItems, bool force = false)
     {
-        _semaphore.EnterWriteLock();
+        _lock.EnterWriteLock();
 
         if (!force)
         {
@@ -350,18 +353,24 @@ public class Inventory
         {
             foreach (var newItem in newItems)
             {
-                newItem.MetadataChanged += HandleItemChanged;
+                newItem.MetadataChanged += HandleItemMetadataChanged;
+                newItem.NumberChanged += HandleItemNumberChanged;
                 _items.Add(newItem);
                 ItemAdded?.Invoke(this, newItem);
             }
         }
         finally
         {
-            _semaphore.ExitWriteLock();
+            _lock.ExitWriteLock();
         }
     }
 
-    private void HandleItemChanged(Item item, string key)
+    private void HandleItemMetadataChanged(Item item, string key)
+    {
+        ItemChanged?.Invoke(this, item);
+    }
+    
+    private void HandleItemNumberChanged(Item item, uint from, uint to)
     {
         ItemChanged?.Invoke(this, item);
     }
@@ -369,7 +378,7 @@ public class Inventory
     public bool RemoveItemStack(Item item) => RemoveItem(item, item.Number);
     public bool RemoveItemStack(uint id)
     {
-        _semaphore.EnterWriteLock();
+        _lock.EnterWriteLock();
         try
         {
             if (TryGetByItemId(id, out var item))
@@ -378,20 +387,20 @@ public class Inventory
         }
         finally
         {
-            _semaphore.ExitWriteLock();
+            _lock.ExitWriteLock();
         }
     }
 
     public bool RemoveItem(Item item, uint number = 1)
     {
-        _semaphore.EnterWriteLock();
+        _lock.EnterWriteLock();
         try
         {
             return RemoveItem(item, out var _, out var _, number);
         }
         finally
         {
-            _semaphore.ExitWriteLock();
+            _lock.ExitWriteLock();
         }
     }
 
@@ -400,7 +409,7 @@ public class Inventory
         if (number <= 0)
             throw new ArgumentOutOfRangeException(nameof(number));
 
-        _semaphore.EnterWriteLock();
+        _lock.EnterWriteLock();
         try
         {
             if (!HasItem(item))
@@ -422,7 +431,8 @@ public class Inventory
                 if (!_items.Remove(item))
                     throw new InvalidOperationException();
 
-                item.MetadataChanged -= HandleItemChanged;
+                item.MetadataChanged -= HandleItemMetadataChanged;
+                item.NumberChanged -= HandleItemNumberChanged;
                 removedNumber = item.Number;
                 stackRemoved = true;
                 ItemRemoved?.Invoke(this, item);
@@ -431,13 +441,13 @@ public class Inventory
         }
         finally
         {
-            _semaphore.ExitWriteLock();
+            _lock.ExitWriteLock();
         }
     }
 
     public bool RemoveItem(uint id, uint number = 1)
     {
-        _semaphore.EnterWriteLock();
+        _lock.EnterWriteLock();
         try
         {
             if (SumItemsNumberById(id) >= number && TryGetByItemId(id, out var item))
@@ -452,7 +462,7 @@ public class Inventory
         }
         finally
         {
-            _semaphore.ExitWriteLock();
+            _lock.ExitWriteLock();
         }
     }
 
@@ -463,7 +473,7 @@ public class Inventory
 
     private IEnumerable<Item> RemoveAndGetItemByIdInternal(uint id, uint number = 1)
     {
-        _semaphore.EnterWriteLock();
+        _lock.EnterWriteLock();
         try
         {
             if (SumItemsNumberById(id) >= number && TryGetByItemId(id, out var item))
@@ -490,13 +500,13 @@ public class Inventory
         }
         finally
         {
-            _semaphore.ExitWriteLock();
+            _lock.ExitWriteLock();
         }
     }
 
     public bool TryUseItem(Item item, ItemAction flags)
     {
-        _semaphore.EnterReadLock();
+        _lock.EnterReadLock();
         try
         {
             if (HasItem(item) && (item.AvailableActions & flags) == flags)
@@ -509,7 +519,7 @@ public class Inventory
         }
         finally
         {
-            _semaphore.ExitReadLock();
+            _lock.ExitReadLock();
         }
     }
 

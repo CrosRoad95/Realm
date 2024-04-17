@@ -59,4 +59,24 @@ public abstract class RealmIntegrationTestingBase<TRealmTestingServer, TRealmPla
         vehicle.PersistentId.Should().NotBe(0);
         return vehicle;
     }
+
+    protected async Task DisconnectPlayer(RealmPlayer player)
+    {
+        var tcs = new TaskCompletionSource();
+        void handleElementSaved(Element element)
+        {
+            tcs.SetResult();
+        }
+
+        if (player.User.IsSignedIn)
+        {
+            player.GetRequiredService<ISaveService>().ElementSaved += handleElementSaved;
+            player.TriggerDisconnected(QuitReason.Quit);
+            await tcs.Task;
+        }
+        else
+        {
+            player.TriggerDisconnected(QuitReason.Quit);
+        }
+    }
 }

@@ -154,7 +154,7 @@ internal sealed class UsersService : IUsersService
                 player.User.SignOut();
             _activeUsers.TrySetInactive(user.Id);
             _logger.LogError(ex, "Failed to sign in a user.");
-            return false;
+            throw;
         }
     }
 

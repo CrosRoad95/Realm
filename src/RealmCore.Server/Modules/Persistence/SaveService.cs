@@ -152,6 +152,15 @@ internal sealed partial class SaveService : ISaveService
                     existingItem.ItemId = itemData.ItemId;
                 }
             }
+
+            var removedItems = existingInventoryData.InventoryItems.Select(x => x.Id)
+                .Except(inventory.Items.Select(x => x.Id))
+                .ToArray();
+
+            foreach (var removedItem in removedItems)
+            {
+                existingInventoryData.InventoryItems.Remove(existingInventoryData.InventoryItems.First(x => x.Id == removedItem));
+            }
         }
 
         return inventoriesData;

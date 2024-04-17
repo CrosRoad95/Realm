@@ -761,4 +761,28 @@ public class InventoryTests : RealmUnitTestingBase
         removedItem.Should().HaveCount(1);
         removedItem.First().MetaData.Should().BeEquivalentTo(metaData);
     }
+
+    [Fact]
+    public void YouShouldBeAbleToModifyInventoryInInventoryChangedEventCallback()
+    {
+        var server = CreateServer();
+        var player = CreatePlayer();
+        var itemsCollection = server.GetRequiredService<ItemsCollection>();
+        Seed(server);
+
+        var inventory = player.Inventory.CreatePrimaryInventory(100);
+
+        void handleItemAdded(Inventory that, Item addedItem)
+        {
+            if(that.Number < 5)
+            {
+                that.AddSingleItem(itemsCollection, 1);
+            }
+        }
+
+        inventory.ItemChanged += handleItemAdded;
+
+        inventory.AddSingleItem(itemsCollection, 1);
+        inventory.Number.Should().Be(5);
+    }
 }

@@ -24,9 +24,10 @@ public class VehiclesPersistence : RealmRemoteDatabaseIntegrationTestingBase
         vehicle.Should().BeOfType<TestRealmVehicle>();
 
         await vehicle.GetRequiredService<ISaveService>().Save();
+        var vehiclePersistentId = vehicle.PersistentId;
         await vehiclesService.Destroy(vehicle);
 
-        var loadedVehicle = await loadService.LoadVehicleById(vehicle.PersistentId);
+        var loadedVehicle = await loadService.LoadVehicleById(vehiclePersistentId);
         loadedVehicle.Should().BeOfType<TestRealmVehicle>();
     }
 
@@ -55,7 +56,7 @@ public class VehiclesPersistence : RealmRemoteDatabaseIntegrationTestingBase
     {
         var server = await CreateServerAsync();
         server.GetRequiredService<VehicleUpgradesCollection>().Add(250, new VehicleUpgradesCollectionItem(EmptyVehicleHandlingModifier.Instance));
-        var player = server.CreatePlayer();
+        var player = server.CreatePlayer("SpawnedVehicleShouldBeExactlyTheSameAsSavedOne");
         await server.SignInPlayer(player);
         var vehiclesService = server.GetRequiredService<IVehiclesService>();
         var loadService = server.GetRequiredService<IVehicleLoader>();

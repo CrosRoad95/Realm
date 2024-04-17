@@ -90,4 +90,55 @@ public class SignInSignOutTests : RealmRemoteDatabaseIntegrationTestingBase
             ;
         }
     }
+
+    [Fact]
+    public async Task RemovingItemShouldRemoveItFromDatabase()
+    {
+        using var _ = new AssertionScope();
+
+        var server = await CreateServerAsync();
+        var itemsCollection = server.GetRequiredService<ItemsCollection>();
+        itemsCollection.Add(1, new ItemsCollectionItem
+        {
+            Name = "test item id 1",
+            Size = 1,
+            StackSize = 8,
+            AvailableActions = ItemAction.Use,
+        });
+        itemsCollection.Add(2, new ItemsCollectionItem
+        {
+            Name = "test item id 2",
+            Size = 1,
+            StackSize = 8,
+            AvailableActions = ItemAction.Use,
+        });
+
+        var playerName = $"FakeInvPlayer{Guid.NewGuid()}";
+        var player1 = server.CreatePlayer(playerName);
+        await server.SignInPlayer(player1);
+
+        if (!player1.Inventory.TryGetPrimary(out var inventory1))
+        {
+            inventory1 = player1.Inventory.CreatePrimaryInventory(20);
+        }
+        inventory1.Number.Should().Be(0);
+        inventory1.AddItem(itemsCollection, 1);
+        inventory1.AddItem(itemsCollection, 1);
+        inventory1.AddItem(itemsCollection, 1);
+        inventory1.Number.Should().Be(3);
+
+        await DisconnectPlayer(player1);
+
+        var player2 = server.CreatePlayer(playerName);
+        await server.SignInPlayer(player2);
+        var inventory2 = player2.Inventory.Primary!;
+        inventory2.RemoveItem(1, 1);
+        player2.Inventory.Primary!.Number.Should().Be(2);
+        await DisconnectPlayer(player2);
+
+        var player3 = server.CreatePlayer(playerName);
+        await server.SignInPlayer(player3);
+        var inventory3 = player2.Inventory.Primary!;
+        player2.Inventory.Primary!.Number.Should().Be(2);
+    }
 }
