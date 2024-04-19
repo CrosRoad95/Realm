@@ -96,11 +96,11 @@ internal abstract class ElementInventoryFeature : IElementInventoryFeature
         return false;
     }
 
-    public Inventory CreatePrimaryInventory(uint defaultInventorySize)
+    public Inventory CreatePrimaryInventory(uint inventorySize)
     {
         if (Primary == null)
         {
-            Primary = new Inventory(Element, defaultInventorySize);
+            Primary = new Inventory(Element, inventorySize);
             PrimarySet?.Invoke(this, Primary);
         }
         return Primary;

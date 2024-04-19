@@ -3,7 +3,7 @@
 public class Inventory
 {
     private readonly List<Item> _items = [];
-    private readonly ReaderWriterLockSlim _lock = new(LockRecursionPolicy.SupportsRecursion);
+    private readonly ReaderWriterLockSlimScoped _lock = new(LockRecursionPolicy.SupportsRecursion);
     public event Action<Inventory, Item>? ItemAdded;
     public event Action<Inventory, Item>? ItemRemoved;
     public event Action<Inventory, Item>? ItemChanged;
@@ -34,15 +34,8 @@ public class Inventory
     {
         get
         {
-            _lock.EnterReadLock();
-            try
-            {
-                return _items.Sum(x => x.Size * x.Number);
-            }
-            finally
-            {
-                _lock.ExitReadLock();
-            }
+            using var _ = _lock.BeginRead();
+            return _items.Sum(x => x.Size * x.Number);
         }
     }
 
@@ -50,15 +43,8 @@ public class Inventory
     {
         get
         {
-            _lock.EnterReadLock();
-            try
-            {
-                return new List<Item>(_items);
-            }
-            finally
-            {
-                _lock.ExitReadLock();
-            }
+            using var _ = _lock.BeginRead();
+            return new List<Item>(_items);
         }
     }
 
@@ -78,177 +64,86 @@ public class Inventory
 
     public bool HasItemById(uint itemId)
     {
-        _lock.EnterReadLock();
-        try
-        {
-            return _items.Any(x => x.ItemId == itemId);
-        }
-        finally
-        {
-            _lock.ExitReadLock();
-        }
+        using var _ = _lock.BeginRead();
+        return _items.Any(x => x.ItemId == itemId);
     }
 
     public bool HasItem(Func<Item, bool> callback)
     {
-        _lock.EnterReadLock();
-        try
-        {
-            return _items.Any(callback);
-        }
-        finally
-        {
-            _lock.ExitReadLock();
-        }
+        using var _ = _lock.BeginRead();
+        return _items.Any(callback);
     }
 
     public bool HasItem(Item item)
     {
-        _lock.EnterReadLock();
-        try
-        {
-            return _items.Contains(item);
-        }
-        finally
-        {
-            _lock.ExitReadLock();
-        }
+        using var _ = _lock.BeginRead();
+        return _items.Contains(item);
     }
 
     public int SumItemsById(uint itemId)
     {
-        _lock.EnterReadLock();
-        try
-        {
-            return _items.Count(x => x.ItemId == itemId);
-        }
-        finally
-        {
-            _lock.ExitReadLock();
-        }
+        using var _ = _lock.BeginRead();
+        return _items.Count(x => x.ItemId == itemId);
     }
 
     public int SumItemsNumberById(uint itemId)
     {
-        _lock.EnterReadLock();
-        try
-        {
-            return (int)_items.Where(x => x.ItemId == itemId).Sum(x => x.Number);
-        }
-        finally
-        {
-            _lock.ExitReadLock();
-        }
+        using var _ = _lock.BeginRead();
+        return (int)_items.Where(x => x.ItemId == itemId).Sum(x => x.Number);
     }
 
     public IReadOnlyList<Item> GetItemsById(uint itemId)
     {
-        _lock.EnterReadLock();
-        try
-        {
-            return new List<Item>(_items.Where(x => x.ItemId == itemId));
-        }
-        finally
-        {
-            _lock.ExitReadLock();
-        }
+        using var _ = _lock.BeginRead();
+        return new List<Item>(_items.Where(x => x.ItemId == itemId));
     }
 
     public IReadOnlyList<Item> GetItemsByIdWithMetadata(uint itemId, string key, object? metadata)
     {
-        _lock.EnterReadLock();
-        try
-        {
-            return new List<Item>(_items.Where(x => x.ItemId == itemId && (x.GetMetadata(key)?.Equals(metadata) ?? false)));
-        }
-        finally
-        {
-            _lock.ExitReadLock();
-        }
+        using var _ = _lock.BeginRead();
+        return new List<Item>(_items.Where(x => x.ItemId == itemId && (x.GetMetadata(key)?.Equals(metadata) ?? false)));
     }
 
     public Item? GetSingleItemByIdWithMetadata(uint itemId, Metadata metadata)
     {
-        _lock.EnterReadLock();
-        try
-        {
-            return _items.Where(x => x.ItemId == itemId && x.Equals(metadata)).FirstOrDefault();
-        }
-        finally
-        {
-            _lock.ExitReadLock();
-        }
+        using var _ = _lock.BeginRead();
+        return _items.Where(x => x.ItemId == itemId && x.Equals(metadata)).FirstOrDefault();
     }
 
     public bool HasItemWithMetadata(uint itemId, string key, object? metadata)
     {
-        _lock.EnterReadLock();
-        try
-        {
-            return _items.Any(x => x.ItemId == itemId && (x.GetMetadata(key)?.Equals(metadata) ?? false));
-        }
-        finally
-        {
-            _lock.ExitReadLock();
-        }
+        using var _ = _lock.BeginRead();
+        return _items.Any(x => x.ItemId == itemId && (x.GetMetadata(key)?.Equals(metadata) ?? false));
     }
 
     public bool TryGetByLocalId(string localId, out Item item)
     {
-        _lock.EnterReadLock();
-        try
-        {
-            item = _items.FirstOrDefault(x => x.LocalId == localId)!;
-            return item != null;
-        }
-        finally
-        {
-            _lock.ExitReadLock();
-        }
+        using var _ = _lock.BeginRead();
+        item = _items.FirstOrDefault(x => x.LocalId == localId)!;
+        return item != null;
     }
 
     public bool TryGetByItemId(uint itemId, out Item item)
     {
-        _lock.EnterReadLock();
-        try
-        {
-            item = _items.FirstOrDefault(x => x.ItemId == itemId)!;
-            return item != null;
-        }
-        finally
-        {
-            _lock.ExitReadLock();
-        }
+        using var _ = _lock.BeginRead();
+        item = _items.FirstOrDefault(x => x.ItemId == itemId)!;
+        return item != null;
     }
 
     public bool TryGetByIdAndMetadata(uint itemId, Metadata metadata, out Item item)
     {
-        _lock.EnterReadLock();
-        try
-        {
-            item = _items.FirstOrDefault(x => x.ItemId == itemId && x.Equals(metadata))!;
-            return item != null;
-        }
-        finally
-        {
-            _lock.ExitReadLock();
-        }
+        using var _ = _lock.BeginRead();
+        item = _items.FirstOrDefault(x => x.ItemId == itemId && x.Equals(metadata))!;
+        return item != null;
     }
 
     public Item AddSingleItem(ItemsCollection itemsCollection, uint itemId, Metadata? metadata = null, bool tryStack = true, bool force = false)
     {
-        _lock.EnterWriteLock();
-        try
-        {
-            var item = AddItem(itemsCollection, itemId, 1, metadata, tryStack, force);
-            if (item.Any())
-                return item.First();
-            return GetSingleItemByIdWithMetadata(itemId, metadata ?? []) ?? throw new InvalidOperationException();
-        }
-        finally
-        {
-            _lock.ExitWriteLock();
-        }
+        using var _ = _lock.BeginWrite();
+        var item = AddItem(itemsCollection, itemId, 1, metadata, tryStack, force);
+        if (item.Any())
+            return item.First();
+        return GetSingleItemByIdWithMetadata(itemId, metadata ?? []) ?? throw new InvalidOperationException();
     }
 
     public IEnumerable<Item> AddItem(ItemsCollection itemsCollection, uint itemId, uint number = 1, Metadata? metadata = null, bool tryStack = true, bool force = false)
@@ -259,109 +154,75 @@ public class Inventory
         metadata ??= [];
 
         var itemsCollectionItem = itemsCollection.Get(itemId);
-        var requiredSpace = Number + itemsCollectionItem.Size * number;
+        var requiredSpace = Number + itemsCollection.CalculateSize(itemId, number);
         if (requiredSpace > Size && !force)
             throw new InventoryNotEnoughSpaceException(Size, requiredSpace);
 
-        _lock.EnterWriteLock();
-        try
+        using var _ = _lock.BeginWrite();
+        List<Item> newItems = [];
+        if (tryStack)
         {
-            List<Item> newItems = [];
-            if (tryStack)
+            foreach (var item in _items.Where(x => x.ItemId == itemId))
             {
-                foreach (var item in _items.Where(x => x.ItemId == itemId))
-                {
-                    if (!item.Equals(metadata))
-                        continue;
+                if (!item.Equals(metadata))
+                    continue;
 
-                    var added = Math.Min(number, itemsCollectionItem.StackSize - item.Number);
-                    item.Number += added;
-                    number -= added;
-                }
+                var added = Math.Min(number, itemsCollectionItem.StackSize - item.Number);
+                item.Number += added;
+                number -= added;
             }
-
-            while (number > 0)
-            {
-                var thisItemNumber = Math.Min(number, itemsCollectionItem.StackSize);
-                number -= thisItemNumber;
-                var item = new Item(itemsCollection, itemId, number, metadata)
-                {
-                    Number = thisItemNumber
-                };
-                newItems.Add(item);
-            }
-
-            foreach (var newItem in newItems)
-            {
-                newItem.MetadataChanged += HandleItemMetadataChanged;
-                newItem.NumberChanged += HandleItemNumberChanged;
-                _items.Add(newItem);
-                ItemAdded?.Invoke(this, newItem);
-                ItemChanged?.Invoke(this, newItem);
-            }
-
-            return newItems.AsReadOnly();
-        }
-        finally
-        {
-            _lock.ExitWriteLock();
-        }
-    }
-
-    public void AddItem(ItemsCollection itemsCollection, Item newItem, bool force = false)
-    {
-        if (!force)
-        {
-            var itemsCollectionItem = itemsCollection.Get(newItem.ItemId);
-            var requiredSpace = Number + itemsCollectionItem.Size * newItem.Number;
-            if (requiredSpace > Size)
-                throw new InventoryNotEnoughSpaceException(Size, requiredSpace);
         }
 
-        _lock.EnterWriteLock();
-        try
+        while (number > 0)
+        {
+            var thisItemNumber = Math.Min(number, itemsCollectionItem.StackSize);
+            number -= thisItemNumber;
+            var item = new Item(itemsCollection, itemId, number, metadata)
+            {
+                Number = thisItemNumber
+            };
+            newItems.Add(item);
+        }
+
+        foreach (var newItem in newItems)
         {
             newItem.MetadataChanged += HandleItemMetadataChanged;
             newItem.NumberChanged += HandleItemNumberChanged;
             _items.Add(newItem);
             ItemAdded?.Invoke(this, newItem);
+            ItemChanged?.Invoke(this, newItem);
         }
-        finally
-        {
-            _lock.ExitWriteLock();
-        }
+
+        return newItems.AsReadOnly();
+    }
+
+    public void AddItem(ItemsCollection itemsCollection, Item newItem, bool tryStack = true, bool force = false)
+    {
+        AddItem(itemsCollection, newItem.ItemId, newItem.Number, newItem.MetaData, tryStack, force);
     }
 
     public void AddItems(ItemsCollection itemsCollection, IEnumerable<Item> newItems, bool force = false)
     {
-        _lock.EnterWriteLock();
+        using var _ = _lock.BeginWrite();
 
         if (!force)
         {
             decimal requiredSpace = 0;
             foreach (var newItem in newItems)
             {
-                var itemsCollectionItem = itemsCollection.Get(newItem.ItemId);
-                requiredSpace += Number + itemsCollectionItem.Size * newItem.Number;
+                requiredSpace += Number + itemsCollection.CalculateSize(newItem.ItemId, newItem.Number);
             }
 
             if (requiredSpace > Size)
                 throw new InventoryNotEnoughSpaceException(Size, requiredSpace);
         }
 
-        try
+        foreach (var newItem in newItems)
         {
-            foreach (var newItem in newItems)
-            {
-                newItem.MetadataChanged += HandleItemMetadataChanged;
-                newItem.NumberChanged += HandleItemNumberChanged;
-                _items.Add(newItem);
-                ItemAdded?.Invoke(this, newItem);
-            }
-        }
-        finally
-        {
-            _lock.ExitWriteLock();
+            newItem.MetadataChanged += HandleItemMetadataChanged;
+            newItem.NumberChanged += HandleItemNumberChanged;
+            _items.Add(newItem);
+            ItemAdded?.Invoke(this, newItem);
         }
     }
 
@@ -378,30 +239,16 @@ public class Inventory
     public bool RemoveItemStack(Item item) => RemoveItem(item, item.Number);
     public bool RemoveItemStack(uint id)
     {
-        _lock.EnterWriteLock();
-        try
-        {
-            if (TryGetByItemId(id, out var item))
-                return RemoveItemStack(item);
-            return false;
-        }
-        finally
-        {
-            _lock.ExitWriteLock();
-        }
+        using var _ = _lock.BeginWrite();
+        if (TryGetByItemId(id, out var item))
+            return RemoveItemStack(item);
+        return false;
     }
 
     public bool RemoveItem(Item item, uint number = 1)
     {
-        _lock.EnterWriteLock();
-        try
-        {
-            return RemoveItem(item, out var _, out var _, number);
-        }
-        finally
-        {
-            _lock.ExitWriteLock();
-        }
+        using var _ = _lock.BeginWrite();
+        return RemoveItem(item, out var _, out var _, number);
     }
 
     public bool RemoveItem(Item item, out uint removedNumber, out bool stackRemoved, uint number = 1)
@@ -409,61 +256,48 @@ public class Inventory
         if (number <= 0)
             throw new ArgumentOutOfRangeException(nameof(number));
 
-        _lock.EnterWriteLock();
-        try
+        using var _ = _lock.BeginWrite();
+        if (!HasItem(item))
         {
-            if (!HasItem(item))
-            {
-                removedNumber = 0;
-                stackRemoved = false;
-                return false;
-            }
-
-            if (item.Number > number)
-            {
-                item.Number -= number;
-                removedNumber = number;
-                stackRemoved = false;
-                ItemChanged?.Invoke(this, item);
-            }
-            else
-            {
-                if (!_items.Remove(item))
-                    throw new InvalidOperationException();
-
-                item.MetadataChanged -= HandleItemMetadataChanged;
-                item.NumberChanged -= HandleItemNumberChanged;
-                removedNumber = item.Number;
-                stackRemoved = true;
-                ItemRemoved?.Invoke(this, item);
-            }
-            return true;
+            removedNumber = 0;
+            stackRemoved = false;
+            return false;
         }
-        finally
+
+        if (item.Number > number)
         {
-            _lock.ExitWriteLock();
+            item.Number -= number;
+            removedNumber = number;
+            stackRemoved = false;
+            ItemChanged?.Invoke(this, item);
         }
+        else
+        {
+            if (!_items.Remove(item))
+                throw new InvalidOperationException();
+
+            item.MetadataChanged -= HandleItemMetadataChanged;
+            item.NumberChanged -= HandleItemNumberChanged;
+            removedNumber = item.Number;
+            stackRemoved = true;
+            ItemRemoved?.Invoke(this, item);
+        }
+        return true;
     }
 
     public bool RemoveItem(uint id, uint number = 1)
     {
-        _lock.EnterWriteLock();
-        try
+        using var _ = _lock.BeginWrite();
+
+        if (SumItemsNumberById(id) >= number && TryGetByItemId(id, out var item))
         {
-            if (SumItemsNumberById(id) >= number && TryGetByItemId(id, out var item))
-            {
-                var success = RemoveItem(item, out var removedNumber, out var _, number);
-                var left = number - removedNumber;
-                if (left > 0)
-                    success = RemoveItem(id, left);
-                return success;
-            }
-            return false;
+            var success = RemoveItem(item, out var removedNumber, out var _, number);
+            var left = number - removedNumber;
+            if (left > 0)
+                success = RemoveItem(id, left);
+            return success;
         }
-        finally
-        {
-            _lock.ExitWriteLock();
-        }
+        return false;
     }
 
     public List<Item> RemoveAndGetItemById(uint id, uint number = 1)
@@ -473,54 +307,42 @@ public class Inventory
 
     private IEnumerable<Item> RemoveAndGetItemByIdInternal(uint id, uint number = 1)
     {
-        _lock.EnterWriteLock();
-        try
+        using var _ = _lock.BeginWrite();
+
+        if (SumItemsNumberById(id) >= number && TryGetByItemId(id, out var item))
         {
-            if (SumItemsNumberById(id) >= number && TryGetByItemId(id, out var item))
+            var success = RemoveItem(item, out var removedNumber, out bool stackRemoved, number);
+            if (item.Number > 0 && !stackRemoved)
             {
-                var success = RemoveItem(item, out var removedNumber, out bool stackRemoved, number);
-                if (item.Number > 0 && !stackRemoved)
+                item = new Item(item)
                 {
-                    item = new Item(item)
-                    {
-                        Number = removedNumber
-                    };
-                }
-                Debug.Assert(success == true);
-                var left = number - removedNumber;
-                if (left > 0)
-                {
-                    foreach (var removedItem in RemoveAndGetItemByIdInternal(id, left))
-                    {
-                        yield return removedItem;
-                    }
-                }
-                yield return item;
+                    Number = removedNumber
+                };
             }
-        }
-        finally
-        {
-            _lock.ExitWriteLock();
+            Debug.Assert(success == true);
+            var left = number - removedNumber;
+            if (left > 0)
+            {
+                foreach (var removedItem in RemoveAndGetItemByIdInternal(id, left))
+                {
+                    yield return removedItem;
+                }
+            }
+            yield return item;
         }
     }
 
     public bool TryUseItem(Item item, ItemAction flags)
     {
-        _lock.EnterReadLock();
-        try
-        {
-            if (HasItem(item) && (item.AvailableActions & flags) == flags)
-            {
-                ItemUsed?.Invoke(this, item, flags);
-                return true;
-            }
+        using var _ = _lock.BeginRead();
 
-            return false;
-        }
-        finally
+        if (HasItem(item) && (item.AvailableActions & flags) == flags)
         {
-            _lock.ExitReadLock();
+            ItemUsed?.Invoke(this, item, flags);
+            return true;
         }
+
+        return false;
     }
 
     public bool HasSpace(decimal space)
@@ -528,14 +350,9 @@ public class Inventory
         return Number + space <= Size;
     }
 
-    public bool HasSpaceForItem(uint itemId, ItemsCollection itemsCollection)
+    public bool HasSpaceForItem(ItemsCollection itemsCollection, uint itemId, uint number = 1)
     {
-        return Number + itemsCollection.Get(itemId).Size <= Size;
-    }
-
-    public bool HasSpaceForItem(uint itemId, uint number, ItemsCollection itemsCollection)
-    {
-        return Number + itemsCollection.Get(itemId).Size * number <= Size;
+        return Number + itemsCollection.CalculateSize(itemId, number) <= Size;
     }
 
     public bool TransferItem(Inventory destination, ItemsCollection itemsCollection, uint itemId, uint number, bool force)

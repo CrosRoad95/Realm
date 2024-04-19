@@ -1,4 +1,6 @@
-﻿namespace RealmCore.Tests.Unit.Elements;
+﻿using RealmCore.Server.Modules.Inventories;
+
+namespace RealmCore.Tests.Unit.Elements;
 
 public class InventoryTests : RealmUnitTestingBase
 {
@@ -303,11 +305,11 @@ public class InventoryTests : RealmUnitTestingBase
         var inventory = player.Inventory.CreatePrimaryInventory(100);
 
         inventory.Size = 100;
-        inventory.HasSpaceForItem(1, itemsCollection).Should().BeTrue();
-        inventory.HasSpaceForItem(4, itemsCollection).Should().BeTrue();
-        inventory.HasSpaceForItem(5, itemsCollection).Should().BeFalse();
-        inventory.HasSpaceForItem(1, 100, itemsCollection).Should().BeTrue();
-        inventory.HasSpaceForItem(1, 101, itemsCollection).Should().BeFalse();
+        inventory.HasSpaceForItem(itemsCollection, 1).Should().BeTrue();
+        inventory.HasSpaceForItem(itemsCollection, 4).Should().BeTrue();
+        inventory.HasSpaceForItem(itemsCollection, 5).Should().BeFalse();
+        inventory.HasSpaceForItem(itemsCollection, 1, 100).Should().BeTrue();
+        inventory.HasSpaceForItem(itemsCollection, 1, 101).Should().BeFalse();
     }
 
     private void HandleItemUsed(Inventory inventory, Item usedItem, ItemAction flags)
@@ -784,5 +786,52 @@ public class InventoryTests : RealmUnitTestingBase
 
         inventory.AddSingleItem(itemsCollection, 1);
         inventory.Number.Should().Be(5);
+    }
+
+    [Fact]
+    public void AddingItemObjectsToInventoryShouldWork()
+    {
+        var server = CreateServer();
+        var player = CreatePlayer();
+        var itemsCollection = server.GetRequiredService<ItemsCollection>();
+        Seed(server);
+
+        var item1 = new Item(itemsCollection, 1, 2);
+        var item2 = new Item(itemsCollection, 1, 2);
+
+        var inventory = player.Inventory.CreatePrimaryInventory(100);
+
+        inventory.AddItem(itemsCollection, item1);
+        inventory.AddItem(itemsCollection, item2);
+
+        var items = inventory.GetItemsById(1);
+        items.Should().HaveCount(1);
+
+        items.First().Number.Should().Be(4);
+    }
+
+    [Fact]
+    public void ItemsOfDifferentMetadataShouldNotStack()
+    {
+        var server = CreateServer();
+        var player = CreatePlayer();
+        var itemsCollection = server.GetRequiredService<ItemsCollection>();
+        Seed(server);
+
+        var item1 = new Item(itemsCollection, 1, 2, new(){
+            ["a"] = 1
+        });
+        var item2 = new Item(itemsCollection, 1, 2);
+
+        var inventory = player.Inventory.CreatePrimaryInventory(100);
+
+        inventory.AddItem(itemsCollection, item1);
+        inventory.AddItem(itemsCollection, item2);
+
+        var items = inventory.GetItemsById(1);
+        items.Should().HaveCount(2);
+
+        items.First().Number.Should().Be(2);
+        items.Last().Number.Should().Be(2);
     }
 }

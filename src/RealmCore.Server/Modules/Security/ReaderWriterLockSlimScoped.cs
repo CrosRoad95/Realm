@@ -24,9 +24,9 @@ public sealed class ReaderWriterLockSlimScoped
         }
     }
 
-    public ReaderWriterLockSlimScoped()
+    public ReaderWriterLockSlimScoped(LockRecursionPolicy lockRecursionPolicy = LockRecursionPolicy.NoRecursion)
     {
-        _lock = new();
+        _lock = new(lockRecursionPolicy);
     }
 
     public IDisposable BeginRead()
