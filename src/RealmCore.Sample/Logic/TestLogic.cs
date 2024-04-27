@@ -15,7 +15,7 @@ internal class TestLogic : PlayerLifecycle
         _schedulerService = schedulerService;
         _logger = logger;
         _chatBox = chatBox;
-        SchedulerTests();
+        //SchedulerTests();
     }
 
     protected override void PlayerJoined(RealmPlayer player)
