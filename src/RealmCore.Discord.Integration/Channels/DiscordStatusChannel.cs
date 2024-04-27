@@ -1,9 +1,8 @@
-﻿using Grpc.Core;
-using RealmCore.Discord.Integration.Extensions;
+﻿using RealmCore.Discord.Integration.Extensions;
 
 namespace RealmCore.Discord.Integration.Channels;
 
-public sealed class DiscordStatusChannel : ChannelBase
+public sealed class DiscordStatusChannel : IChannelBase
 {
     private readonly DiscordBotOptions.StatusChannelConfiguration? _configuration;
     private readonly BotIdProvider _botIdProvider;
@@ -22,7 +21,7 @@ public sealed class DiscordStatusChannel : ChannelBase
         _logger = logger;
     }
 
-    public override async Task StartAsync(SocketGuild socketGuild)
+    public async Task StartAsync(SocketGuild socketGuild)
     {
         if (_configuration == null)
             return;
@@ -30,7 +29,7 @@ public sealed class DiscordStatusChannel : ChannelBase
         var channel = (SocketTextChannel)socketGuild.GetChannel(_configuration.ChannelId);
         _statusDiscordMessage = await channel.TryGetLastMessageSendByUser(_botIdProvider.Id) as IUserMessage;
         if (_statusDiscordMessage == null)
-            _statusDiscordMessage = await channel.SendMessageAsync(string.Empty);
+            _statusDiscordMessage = await channel.SendMessageAsync("...");
 
         var timer = new PeriodicTimer(TimeSpan.FromSeconds(10));
         await Update();

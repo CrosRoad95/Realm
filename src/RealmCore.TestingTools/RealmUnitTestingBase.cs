@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Hosting.Server;
-using SlipeServer.Server.Behaviour;
+﻿using SlipeServer.Server.Behaviour;
 
 namespace RealmCore.TestingTools;
 

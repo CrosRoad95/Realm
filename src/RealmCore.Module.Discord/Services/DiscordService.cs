@@ -11,6 +11,11 @@ public delegate Task<TryConnectResponse> TryConnectUserChannel(string code, ulon
 public delegate Task PrivateMessageReceived(ulong userId, ulong messageId, string content, CancellationToken cancellationToken);
 public delegate Task TextBasedMessageReceived(ulong userId, ulong channelId, string command, CancellationToken cancellationToken);
 
+//public delegate Task<string> UpdateStatusChannel(IDiscordStatusChannelUpdateHandler handler, CancellationToken cancellationToken);
+//public delegate Task<TryConnectResponse> TryConnectUserChannel(IDiscordConnectUserHandler handler, string code, ulong userId, CancellationToken cancellationToken);
+//public delegate Task PrivateMessageReceived(IDiscordPrivateMessageReceivedHandler handler, ulong userId, ulong messageId, string content, CancellationToken cancellationToken);
+//public delegate Task TextBasedMessageReceived(IDiscordTextBasedCommandHandler handler, ulong userId, ulong channelId, string command, CancellationToken cancellationToken);
+
 public interface IDiscordService
 {
     internal UpdateStatusChannel? UpdateStatusChannel { get; set; }

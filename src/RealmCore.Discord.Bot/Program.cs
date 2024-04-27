@@ -1,27 +1,47 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using RealmCore.Configuration;
 using RealmCore.Logging;
 using Serilog;
 using Serilog.Events;
 using RealmCore.Discord.Integration.Channels;
 using RealmCore.Discord.Integration.Extensions;
-using RealmCore.Discord.Integration.Interfaces;
 using Discord.WebSocket;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Configuration;
+using Discord;
+using System.Reflection;
 
-var realmConfigurationProvider = new RealmConfiguration();
-var services = new ServiceCollection();
-var realmLogger = new RealmLogger("DiscordBot", LogEventLevel.Verbose);
+var app = Host.CreateDefaultBuilder(args)
+    .ConfigureAppConfiguration((hostingContext, builder) =>
+    {
+        var configuration = new ConfigurationBuilder()
+            .AddUserSecrets(Assembly.GetExecutingAssembly())
+            .AddEnvironmentVariables()
+            .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+            .AddJsonFile("appsettings.Local.json", optional: true, reloadOnChange: true)
+            .AddJsonFile($"appsettings.{hostingContext.HostingEnvironment.EnvironmentName}.json", optional: true)
+            .Build();
 
-services.AddLogging(x => x.AddSerilog(realmLogger.GetLogger(), dispose: true));
+        builder.Sources.Clear();
+        builder.AddConfiguration(configuration);
+    })
+    .ConfigureServices((hostingContext, services) =>
+    {
+        var realmLogger = new RealmLogger("SampleDiscordBot", LogEventLevel.Verbose);
 
-services.AddDiscordChannel<DiscordStatusChannel>();
-services.AddDiscordChannel<PrivateMessagesChannels>();
+        services.AddLogging(x => x.AddSerilog(realmLogger.GetLogger(), dispose: true));
 
-services.AddRealmDiscordBotIntegration(realmConfigurationProvider);
+        services.AddSingleton(new DiscordSocketClient(new DiscordSocketConfig
+        {
+            GatewayIntents = GatewayIntents.All
+        }));
 
-var serviceProvider = services.BuildServiceProvider();
+        services.AddDiscordChannel<DiscordStatusChannel>();
+        services.AddDiscordChannel<DiscordPrivateMessagesChannels>();
 
-var discordIntegration = serviceProvider.GetRequiredService<IRealmDiscordClient>();
+        var configuration = hostingContext.Configuration;
+        services.AddRealmDiscordBotIntegration(configuration);
 
-await discordIntegration.StartAsync();
-await Task.Delay(-1);
+    })
+    .Build();
+
+await app.RunAsync();

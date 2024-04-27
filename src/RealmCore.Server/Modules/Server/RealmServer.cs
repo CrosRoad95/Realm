@@ -1,5 +1,4 @@
 ﻿global using ILogger = Microsoft.Extensions.Logging.ILogger;
-using Microsoft.AspNetCore.Hosting.Server;
 using SlipeServer.Server.Behaviour;
 
 [assembly: InternalsVisibleTo("RealmCore.TestingTools")]

@@ -2,30 +2,27 @@
 
 internal interface IChannelConfiguration
 {
-    public ulong ChannelId { set; }
-
+    public ulong ChannelId { get; }
 }
 
 public sealed class DiscordBotOptions
 {
-    public class StatusChannelConfiguration : IChannelConfiguration
+    public sealed class StatusChannelConfiguration : IChannelConfiguration
     {
-        public ulong ChannelId { get; set; }
+        public required ulong ChannelId { get; init; }
     }
 
-    public class ConnectServerUserOptions : IChannelConfiguration
+    public sealed class ConnectServerUserOptions : IChannelConfiguration
     {
-        public ulong ChannelId { get; set; }
-        public string InformationMessage { get; set; }
-        public string SuccessMessage { get; set; }
+        public required ulong ChannelId { get; init; }
+        public required string InformationMessage { get; init; }
+        public required string SuccessMessage { get; init; }
     }
 
-    public string Token { get; set; } = "";
-    public ulong Guild { get; set; }
-    public string GrpcAddress { get; set; }
-    public string TextBasedCommandPrefix { get; set; } = "&";
+    public required string Token { get; init; } = "";
+    public required ulong Guild { get; init; }
+    public required string TextBasedCommandPrefix { get; init; } = "&";
 
-
-    public StatusChannelConfiguration? StatusChannel { get; set; }
-    public ConnectServerUserOptions? ConnectServerUserChannel { get; set; }
+    public StatusChannelConfiguration? StatusChannel { get; init; }
+    public ConnectServerUserOptions? ConnectServerUserChannel { get; init; }
 }

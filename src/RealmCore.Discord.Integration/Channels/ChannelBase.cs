@@ -1,6 +1,6 @@
 ﻿namespace RealmCore.Discord.Integration.Channels;
 
-public abstract class ChannelBase
+public interface IChannelBase
 {
-    public virtual Task StartAsync(SocketGuild socketGuild) { return Task.CompletedTask; }
+    Task StartAsync(SocketGuild socketGuild);
 }

@@ -1,6 +1,6 @@
 ﻿namespace RealmCore.Module.Discord.Interfaces;
 
-public interface IDiscordPrivateMessageReceived
+public interface IDiscordPrivateMessageReceivedHandler : IDiscordHandler
 {
-    Task HandlePrivateMessage(ulong userId, ulong messageId, string content);
+    Task HandlePrivateMessage(ulong userId, ulong messageId, string content, CancellationToken cancellationToken);
 }

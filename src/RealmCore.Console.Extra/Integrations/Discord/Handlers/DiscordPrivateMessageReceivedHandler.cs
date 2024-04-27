@@ -2,7 +2,7 @@
 
 namespace RealmCore.Console.Extra.Integrations.Discord.Handlers;
 
-public class DiscordPrivateMessageReceivedHandler : IDiscordPrivateMessageReceived
+public class DiscordPrivateMessageReceivedHandler : IDiscordPrivateMessageReceivedHandler
 {
     private readonly ChatBox _chatBox;
 
@@ -11,7 +11,7 @@ public class DiscordPrivateMessageReceivedHandler : IDiscordPrivateMessageReceiv
         _chatBox = chatBox;
     }
 
-    public Task HandlePrivateMessage(ulong userId, ulong messageId, string content)
+    public Task HandlePrivateMessage(ulong userId, ulong messageId, string content, CancellationToken cancellationToken)
     {
         _chatBox.Output($"{userId}: {content}");
         return Task.CompletedTask;

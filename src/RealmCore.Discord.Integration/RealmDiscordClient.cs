@@ -6,15 +6,16 @@ internal class RealmDiscordClient : IRealmDiscordClient
 {
     private readonly DiscordSocketClient _client;
     private readonly IOptions<DiscordBotOptions> _discordBotOptions;
-    private readonly ChannelBase[] _channels;
-    private readonly DiscordService[] _discordServices;
+    private readonly IChannelBase[] _channels;
+    private readonly IDiscordService[] _discordServices;
     private readonly CommandHandler _commandHandler;
     private readonly BotIdProvider _botIdProvider;
     private readonly TextBasedCommands _textBasedCommands;
+    private readonly ILogger<RealmDiscordClient> _logger;
 
     public event Action? Ready;
 
-    public RealmDiscordClient(DiscordSocketClient discordSocketClient, IOptions<DiscordBotOptions> discordBotOptions, IEnumerable<ChannelBase> channels, IEnumerable<DiscordService> discordServices, CommandHandler commandHandler, BotIdProvider botIdProvider, TextBasedCommands textBasedCommands)
+    public RealmDiscordClient(DiscordSocketClient discordSocketClient, IOptions<DiscordBotOptions> discordBotOptions, IEnumerable<IChannelBase> channels, IEnumerable<IDiscordService> discordServices, CommandHandler commandHandler, BotIdProvider botIdProvider, TextBasedCommands textBasedCommands, ILogger<RealmDiscordClient> logger)
     {
         _client = discordSocketClient;
         _discordBotOptions = discordBotOptions;
@@ -23,6 +24,7 @@ internal class RealmDiscordClient : IRealmDiscordClient
         _commandHandler = commandHandler;
         _botIdProvider = botIdProvider;
         _textBasedCommands = textBasedCommands;
+        _logger = logger;
         _client.Ready += HandleReady;
         _client.GuildMemberUpdated += HandleGuildMemberUpdated;
         _client.MessageReceived += HandleMessageReceived;
@@ -65,11 +67,31 @@ internal class RealmDiscordClient : IRealmDiscordClient
 
         foreach (var item in _channels)
         {
-            _ = Task.Run(async () => await item.StartAsync(socketGuild));
+            _ = Task.Run(async () =>
+            {
+                try
+                {
+                    await item.StartAsync(socketGuild);
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "Failed to start channel logic");
+                }
+            });
         }
         foreach (var item in _discordServices)
         {
-            _ = Task.Run(async () => await item.StartAsync(socketGuild));
+            _ = Task.Run(async () =>
+            {
+                try
+                {
+                    await item.StartAsync(socketGuild);
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "Failed to start discord service");
+                }
+            });
         }
         Ready?.Invoke();
     }

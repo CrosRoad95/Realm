@@ -1,6 +1,4 @@
-﻿using SlipeServer.Server.Elements.ColShapes;
-
-namespace RealmCore.Server.Modules.World.Triggers;
+﻿namespace RealmCore.Server.Modules.World.Triggers;
 
 internal sealed class PlayerScopedCollisionShapeBehaviour : IDisposable
 {

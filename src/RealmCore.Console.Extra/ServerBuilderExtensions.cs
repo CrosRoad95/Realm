@@ -19,7 +19,7 @@ public static class ServerBuilderExtensions
             #region Discord integration specific
             services.AddSingleton<IDiscordStatusChannelUpdateHandler, DiscordStatusChannelUpdateHandler>();
             services.AddSingleton<IDiscordConnectUserHandler, DiscordConnectUserHandler>();
-            services.AddSingleton<IDiscordPrivateMessageReceived, DiscordPrivateMessageReceivedHandler>();
+            services.AddSingleton<IDiscordPrivateMessageReceivedHandler, DiscordPrivateMessageReceivedHandler>();
             services.AddSingleton<IDiscordTextBasedCommandHandler, TextBasedCommandHandler>();
             #endregion
 
@@ -27,8 +27,5 @@ public static class ServerBuilderExtensions
             services.AddDiscordModule();
 
         });
-
-        serverBuilder.AddLogic<GRpcLogic>();
-        serverBuilder.AddLogic<DiscordIntegrationLogic>();
     }
 }

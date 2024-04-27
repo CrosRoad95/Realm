@@ -2,11 +2,8 @@
 
 public sealed class GrpcOptions
 {
-    public string Host { get; set; }
-    public ushort Port { get; set; }
+    public required string Host { get; set; }
+    public required ushort Port { get; set; }
+    public required string RemoteHost { get; init; }
+    public required ushort RemotePort { get; set; }
 }
-
-//public class GrpcServicesOptions
-//{
-//    public Dictionary<string, GrpcOptions> Services { get; set; }
-//}

@@ -28,80 +28,99 @@ service Commands {
   rpc SendTextBasedCommand (SendTextBasedCommandRequest) returns (SendTextBasedCommandResponse);
 }
 
+message Header {
+  int32 version = 1;
+}
+
 message HandshakeRequest {
-  string message = 1;
+  Header header = 1;
+  string message = 2;
 }
 
 message HandshakeReply {
-  string message = 1;
+  Header header = 1;
+  string message = 2;
 }
 
 message ContentRequest {
-  bool _unused = 1;
+  Header header = 1;
 }
 
 message ContentResponse {
-  string message = 1;
+  Header header = 1;
+  string message = 2;
 }
 
 message SendConnectionCodeRequest {
-  string code = 1;
-  uint64 userId = 2;
+  Header header = 1;
+  string code = 2;
+  uint64 userId = 3;
 }
 
 message SendConnectionCodeResponse {
-  bool success = 1;
-  string message = 2;
-}
-
-message SendMessageRequest {
-  uint64 channelId = 1;
-  string message = 2;
-}
-
-message SendMessageResponse {
-  bool success = 1;
-  uint64 messageId = 2;
-}
-
-message SendFileRequest {
-  uint64 channelId = 1;
-  bytes file = 2;
-  string fileName = 3;
-  string message = 4;
-}
-
-message SendFileResponse {
-  bool success = 1;
-  uint64 messageId = 2;
-}
-
-message SendMessageToUserRequest {
-  uint64 userId = 1;
-  string message = 2;
-}
-
-message SendMessageToUserResponse {
-  bool success = 1;
-  uint64 messageId = 2;
-}
-
-message SendPrivateMessageRequest {
-  uint64 userId = 1;
-  uint64 messageId = 2;
+  Header header = 1;
+  bool success = 2;
   string message = 3;
 }
 
+message SendMessageRequest {
+  Header header = 1;
+  uint64 channelId = 2;
+  string message = 3;
+}
+
+message SendMessageResponse {
+  Header header = 1;
+  bool success = 2;
+  uint64 messageId = 3;
+}
+
+message SendFileRequest {
+  Header header = 1;
+  uint64 channelId = 2;
+  bytes file = 3;
+  string fileName = 4;
+  string message = 5;
+}
+
+message SendFileResponse {
+  Header header = 1;
+  bool success = 2;
+  uint64 messageId = 3;
+}
+
+message SendMessageToUserRequest {
+  Header header = 1;
+  uint64 userId = 2;
+  string message = 3;
+}
+
+message SendMessageToUserResponse {
+  Header header = 1;
+  bool success = 2;
+  uint64 messageId = 3;
+}
+
+message SendPrivateMessageRequest {
+  Header header = 1;
+  uint64 userId = 2;
+  uint64 messageId = 3;
+  string message = 4;
+}
+
 message SendPrivateMessageResponse {
-  bool success = 1;
+  Header header = 1;
+  bool success = 2;
 }
 
 message SendTextBasedCommandRequest {
-  uint64 channelId = 1;
-  uint64 userId = 2;
-  string command = 3;
+  Header header = 1;
+  uint64 channelId = 2;
+  uint64 userId = 3;
+  string command = 4;
 }
 
 message SendTextBasedCommandResponse {
-  bool success = 1;
+  Header header = 1;
+  bool success = 4;
 }

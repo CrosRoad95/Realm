@@ -1,13 +1,11 @@
-﻿using Grpc.Core;
-
-namespace RealmCore.Discord.Integration.Stubs;
+﻿namespace RealmCore.Discord.Integration.Stubs;
 
 internal class MessagingServiceStub : Messaging.MessagingBase
 {
-    private readonly RealmDiscordClient _discordClient;
+    private readonly IRealmDiscordClient _discordClient;
     private readonly ILogger<MessagingServiceStub> _logger;
 
-    public MessagingServiceStub(RealmDiscordClient discordClient, ILogger<MessagingServiceStub> logger)
+    public MessagingServiceStub(IRealmDiscordClient discordClient, ILogger<MessagingServiceStub> logger)
     {
         _discordClient = discordClient;
         _logger = logger;

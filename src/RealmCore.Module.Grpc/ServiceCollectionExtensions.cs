@@ -1,4 +1,5 @@
-﻿using Grpc.Net.Client;
+﻿using Grpc.Core;
+using Grpc.Net.Client;
 using Microsoft.Extensions.Options;
 using RealmCore.Module.Grpc.Options;
 
@@ -26,7 +27,14 @@ public static class ServiceCollectionExtensions
             return server;
         });
         services.AddSingleton<GreeterServiceStub>();
-        services.AddSingleton(GrpcChannel.ForAddress("http://localhost:22020"));
+
+        services.AddSingleton(x =>
+        {
+            var options = x.GetRequiredService<IOptions<GrpcOptions>>();
+            return GrpcChannel.ForAddress($"http://{options.Value.RemoteHost}:{options.Value.RemotePort}");
+        });
+
+        services.AddHostedService<GrpcServerHostedService>();
         return services;
     }
 }

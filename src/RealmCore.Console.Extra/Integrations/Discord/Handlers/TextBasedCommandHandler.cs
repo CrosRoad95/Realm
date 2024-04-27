@@ -12,8 +12,8 @@ public class TextBasedCommandHandler : IDiscordTextBasedCommandHandler
         _discordService = discordService;
     }
 
-    public async Task HandleTextCommand(ulong userId, ulong channelId, string command)
+    public async Task HandleTextCommand(ulong userId, ulong channelId, string command, CancellationToken cancellationToken)
     {
-        await _discordService.HandleTextBasedCommand(userId, channelId, command[1..]);
+        await _discordService.HandleTextBasedCommand(userId, channelId, command[1..], cancellationToken);
     }
 }

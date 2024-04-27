@@ -20,6 +20,35 @@ public static class ServiceCollectionExtensions
 
         services.AddSingleton<IDiscordService, DiscordService>();
         services.AddSingleton<IExternalModule, DiscordModule>();
+
+        return services;
+    }
+
+    public static IServiceCollection AddDiscordStatusChannelUpdateHandler<T>(this IServiceCollection services) where T: class, IDiscordStatusChannelUpdateHandler
+    {
+        services.AddSingleton<IDiscordStatusChannelUpdateHandler, T>();
+        services.AddSingleton<IDiscordHandler>(x => x.GetRequiredService<IDiscordStatusChannelUpdateHandler>());
+        return services;
+    }
+
+    public static IServiceCollection AddDiscordConnectUserHandler<T>(this IServiceCollection services) where T: class, IDiscordConnectUserHandler
+    {
+        services.AddSingleton<IDiscordConnectUserHandler, T>();
+        services.AddSingleton<IDiscordHandler>(x => x.GetRequiredService<IDiscordConnectUserHandler>());
+        return services;
+    }
+
+    public static IServiceCollection AddDiscordPrivateMessageHandler<T>(this IServiceCollection services) where T: class, IDiscordPrivateMessageReceivedHandler
+    {
+        services.AddSingleton<IDiscordPrivateMessageReceivedHandler, T>();
+        services.AddSingleton<IDiscordHandler>(x => x.GetRequiredService<IDiscordPrivateMessageReceivedHandler>());
+        return services;
+    }
+
+    public static IServiceCollection AddDiscordTextBasedCommand<T>(this IServiceCollection services) where T: class, IDiscordTextBasedCommandHandler
+    {
+        services.AddSingleton<IDiscordTextBasedCommandHandler, T>();
+        services.AddSingleton<IDiscordHandler>(x => x.GetRequiredService<IDiscordTextBasedCommandHandler>());
         return services;
     }
 }

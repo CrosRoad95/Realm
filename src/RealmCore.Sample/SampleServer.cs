@@ -8,7 +8,6 @@ using RealmCore.Sample.Utilities;
 using RealmCore.Sample.Commands;
 using RealmCore.Sample.Data.Validators;
 using RealmCore.Server.Modules.Chat;
-using RealmCore.Server.Modules.Integrations.External;
 using RealmCore.Sample.Data;
 using RealmCore.Sample.Server;
 
@@ -47,7 +46,6 @@ public class SampleServer : RealmServer
         serverBuilder.AddLogic<PlayerGameplayLogic>();
         serverBuilder.AddScopedLogic<CommandsLogic>();
         serverBuilder.AddLogic<MapsLogic>();
-        serverBuilder.AddLogic<ExternalModulesLogic>();
         serverBuilder.AddLogic<ProceduralObjectsLogic>();
         serverBuilder.AddLogic<AssetsLogic>();
         serverBuilder.AddLogic<DefaultChatLogic>();

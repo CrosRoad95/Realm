@@ -26,6 +26,7 @@
 		<ProjectReference Include="..\RealmCore.Configuration\RealmCore.Configuration.csproj" />
 		<ProjectReference Include="..\RealmCore.Interfaces\RealmCore.Interfaces.csproj" />
 		<ProjectReference Include="..\RealmCore.Logging\RealmCore.Logging.csproj" />
+		<ProjectReference Include="..\RealmCore.Module.Discord\RealmCore.Module.Discord.csproj" />
 		<ProjectReference Include="..\RealmCore.Module.Grpc\RealmCore.Module.Grpc.csproj" />
 	</ItemGroup>
 
@@ -61,6 +62,9 @@
 		<Using Include="RealmCore.Discord.Integration.Channels" />
 		<Using Include="RealmCore.Discord.Integration.Interfaces" />
 		<Using Include="RealmCore.Discord.Integration.Services" />
+		<Using Include="Grpc.Core" />
+		<Using Include="RealmCore.Discord.Integration.Stubs" />
+		<Using Include="RealmCore.Module.Grpc.Options" />
 	</ItemGroup>
 
 </Project>

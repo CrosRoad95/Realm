@@ -8,6 +8,7 @@ public static class ServiceCollectionExtensions
         services.AddSingleton(realmServer);
         services.AddScoped(typeof(IRealmService<>), typeof(RealmService<>));
         services.AddHostedService<RealmServerHostedService>();
+        services.AddHostedService<ExternalModulesHostedService>();
         return services;
     }
 
@@ -17,6 +18,7 @@ public static class ServiceCollectionExtensions
         services.AddSingleton(realmServer);
         services.AddScoped(typeof(IRealmService<>), typeof(RealmService<>));
         services.AddHostedService<RealmServerHostedService>();
+        services.AddHostedService<ExternalModulesHostedService>();
         return services;
     }
 }

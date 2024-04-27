@@ -1,6 +1,4 @@
-﻿using RealmCore.Persistence.Data;
-
-namespace RealmCore.Server.Modules.Vehicles.Persistence;
+﻿namespace RealmCore.Server.Modules.Vehicles.Persistence;
 
 public interface IUsesVehiclePersistentData
 {

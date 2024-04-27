@@ -2,17 +2,19 @@
 
 namespace RealmCore.Discord.Integration.Channels;
 
-public sealed class PrivateMessagesChannels : ChannelBase
+public sealed class DiscordPrivateMessagesChannels : IChannelBase
 {
-    private readonly ILogger<PrivateMessagesChannels> _logger;
+    private readonly ILogger<DiscordPrivateMessagesChannels> _logger;
+    private readonly IntegrationHeader _integrationHeader;
     private readonly PrivateMessagesChannelsClient _statusChannelClient;
 
     public delegate Task<string> GetStatusChannelContent();
 
-    public PrivateMessagesChannels(ILogger<PrivateMessagesChannels> logger, GrpcChannel grpcChannel, DiscordSocketClient discordSocketClient)
+    public DiscordPrivateMessagesChannels(ILogger<DiscordPrivateMessagesChannels> logger, GrpcChannel grpcChannel, DiscordSocketClient discordSocketClient, IntegrationHeader integrationHeader)
     {
         _statusChannelClient = new(grpcChannel);
         _logger = logger;
+        _integrationHeader = integrationHeader;
         discordSocketClient.MessageReceived += HandleMessageReceived;
     }
 
@@ -22,10 +24,19 @@ public sealed class PrivateMessagesChannels : ChannelBase
         {
             await _statusChannelClient.ReceivedPrivateMessageAsync(new SendPrivateMessageRequest
             {
+                Header = new Header
+                {
+                    Version = _integrationHeader.Version
+                },
                 UserId = socketMessage.Author.Id,
                 MessageId = socketMessage.Id,
                 Message = socketMessage.Content,
             });
         }
+    }
+
+    public Task StartAsync(SocketGuild socketGuild)
+    {
+        return Task.CompletedTask;
     }
 }

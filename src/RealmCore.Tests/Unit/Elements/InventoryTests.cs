@@ -1,6 +1,4 @@
-﻿using RealmCore.Server.Modules.Inventories;
-
-namespace RealmCore.Tests.Unit.Elements;
+﻿namespace RealmCore.Tests.Unit.Elements;
 
 public class InventoryTests : RealmUnitTestingBase
 {

@@ -1,6 +1,4 @@
-﻿using Grpc.Core;
-
-namespace RealmCore.Discord.Integration.Commands;
+﻿namespace RealmCore.Discord.Integration.Commands;
 
 internal class ConnectUserToServerCommand : InteractionModuleBase<SocketInteractionContext>
 {

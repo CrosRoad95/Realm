@@ -1,6 +1,6 @@
 ﻿namespace RealmCore.Module.Discord.Interfaces;
 
-public interface IDiscordTextBasedCommandHandler
+public interface IDiscordTextBasedCommandHandler : IDiscordHandler
 {
-    Task HandleTextCommand(ulong userId, ulong messageId, string command);
+    Task HandleTextCommand(ulong userId, ulong messageId, string command, CancellationToken cancellationToken);
 }

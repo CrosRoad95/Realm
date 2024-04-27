@@ -1,12 +1,8 @@
-﻿using Grpc.Core;
-using RealmCore.Discord.Integration.Stubs;
-using RealmCore.Module.Grpc.Options;
+﻿namespace RealmCore.Discord.Integration;
 
-namespace RealmCore.Discord.Integration;
-
-internal class GrpcServer
+internal sealed class GrpcServer
 {
-    private readonly Server? _grpcServer;
+    private readonly Server _grpcServer;
     public GrpcServer(IOptions<GrpcOptions> grpcOptions, MessagingServiceStub messagingServiceStub)
     {
         _grpcServer = new Server
@@ -20,7 +16,10 @@ internal class GrpcServer
                 new ServerPort(grpcOptions.Value.Host, grpcOptions.Value.Port, ServerCredentials.Insecure)
             },
         };
+    }
 
+    public void Start()
+    {
         _grpcServer.Start();
     }
 }

@@ -1,6 +1,6 @@
 ﻿namespace RealmCore.Discord.Integration;
 
-public abstract class DiscordService
+public interface IDiscordService
 {
-    public virtual Task StartAsync(SocketGuild socketGuild) { return Task.CompletedTask; }
+    Task StartAsync(SocketGuild socketGuild);
 }

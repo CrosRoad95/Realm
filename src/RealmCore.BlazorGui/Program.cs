@@ -1,5 +1,7 @@
 using RealmCore.BlazorGui;
 using RealmCore.BlazorHelpers;
+using RealmCore.Discord.Integration.Extensions;
+using RealmCore.Module.Discord;
 using RealmCore.Sample;
 
 Directory.SetCurrentDirectory(Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly()!.Location)!);
@@ -10,6 +12,8 @@ builder.Services.AddCascadingAuthenticationState();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddRealmServer(new SampleServer());
 builder.AddRealmBlazorGuiSupport();
+builder.AddRealmServerDiscordBotIntegration();
+builder.Services.AddDiscordStatusChannelUpdateHandler<SampleDiscordStatusChannelUpdateHandler>();
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
@@ -32,4 +36,4 @@ app.MapRazorComponents<App>()
     .AddRealmBlazor()
     .AddInteractiveServerRenderMode();
 
-app.Run();
+await app.RunAsync();

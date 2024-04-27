@@ -2,7 +2,6 @@
 using RealmCore.Sample.Concepts.Gui.Blazor;
 using RealmCore.Sample.HudLayers;
 using RealmCore.Server.Modules.Elements.Focusable;
-using RealmCore.Server.Modules.Inventories;
 using RealmCore.Server.Modules.Players.Money;
 using RealmCore.Server.Modules.Search;
 using SlipeServer.Packets.Enums;

@@ -20,6 +20,7 @@
 	  <Using Include="System.Security.Claims" />
 	  <Using Include="SlipeServer.Server" />
 	  <Using Include="RealmCore.BlazorHelpers.Pages" />
+	  <Using Include="RealmCore.Server.Modules.Integrations.External" />
 	</ItemGroup>
 
 </Project>
