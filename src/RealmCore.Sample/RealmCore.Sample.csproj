@@ -14,6 +14,7 @@
   </ItemGroup>
 
 	<ItemGroup>
+		<ProjectReference Include="..\RealmCore.Discord.Integration\RealmCore.Discord.Integration.csproj" />
 		<ProjectReference Include="..\RealmCore.Server\RealmCore.Server.csproj" />
 	</ItemGroup>
 
@@ -97,6 +98,7 @@
 		<Using Include="RealmCore.Server.Modules.World.Xml.Map" />
 		<Using Include="RealmCore.Sample.Concepts.Gui.Dx" />
 		<Using Include="RealmCore.Server.Modules.Domain" />
+		<Using Include="RealmCore.Module.Discord.Services" />
 	</ItemGroup>
 
 </Project>

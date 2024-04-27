@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Builder;
+﻿using Greet;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using RealmCore.Module.Discord;
 using RealmCore.Module.Grpc;
@@ -22,16 +23,13 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<CommandHandler>();
         services.AddSingleton<BotIdProvider>();
 
-        services.AddSingleton<GrpcServer>();
+        services.AddSingleton<IGrpcServer, GrpcServer>();
         services.AddSingleton<MessagingServiceStub>();
+        services.AddSingleton(x => Messaging.BindService(x.GetRequiredService<MessagingServiceStub>()));
         services.AddSingleton<TextBasedCommands>();
         services.AddHostedService<RealmDiscordHostedService>();
-
-        services.AddSingleton(x =>
-        {
-            var options = x.GetRequiredService<IOptions<GrpcOptions>>();
-            return GrpcChannel.ForAddress($"http://{options.Value.RemoteHost}:{options.Value.RemotePort}");
-        });
+        services.AddHostedService<GrpcServerHostedService>();
+        services.AddRealmGrpc();
 
         return services;
     }
@@ -47,7 +45,9 @@ public static class ServiceCollectionExtensions
         var services = builder.Services;
         var configuration = builder.Configuration;
         services.Configure<GrpcOptions>(configuration.GetSection("Grpc"));
-        services.AddGrpcModule();
+        services.AddSingleton<IGrpcServer, GrpcServer>();
+        services.AddHostedService<GrpcServerHostedService>();
+        services.AddRealmGrpc();
         services.AddDiscordModule();
 
         return builder;

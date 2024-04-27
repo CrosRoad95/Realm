@@ -10,6 +10,7 @@ using RealmCore.Sample.Data.Validators;
 using RealmCore.Server.Modules.Chat;
 using RealmCore.Sample.Data;
 using RealmCore.Sample.Server;
+using RealmCore.Module.Discord;
 
 [assembly: ExcludeFromCodeCoverage]
 
@@ -84,6 +85,8 @@ public class SampleServer : RealmServer
 
             services.AddPlayerJoinedPipeline<PlayerBanPipeline>();
             services.AddPlayerJoinedPipeline<SamplePlayerJoinedPipeline>();
+
+            services.AddDiscordSupport();
         });
 
         //serverBuilder.AddExtras(realmConfigurationProvider);

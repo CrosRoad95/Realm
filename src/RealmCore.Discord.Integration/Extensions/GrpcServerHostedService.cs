@@ -1,19 +1,20 @@
 ﻿using Microsoft.Extensions.Hosting;
+using RealmCore.Module.Grpc;
 
-namespace RealmCore.Module.Grpc;
+namespace RealmCore.Discord.Integration.Extensions;
 
 internal sealed class GrpcServerHostedService : IHostedService
 {
-    private readonly IGrpcServer _server;
+    private readonly IGrpcServer _grpcServer;
 
-    public GrpcServerHostedService(IGrpcServer server)
+    public GrpcServerHostedService(IGrpcServer grpcServer)
     {
-        _server = server;
+        _grpcServer = grpcServer;
     }
 
     public Task StartAsync(CancellationToken cancellationToken)
     {
-        _server.Start();
+        _grpcServer.Start();
         return Task.CompletedTask;
     }
 

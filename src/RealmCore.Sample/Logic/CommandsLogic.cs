@@ -29,6 +29,7 @@ internal sealed class CommandsLogic
     private readonly IMapNamesService _mapNamesService;
     private readonly IVehiclesInUse _vehiclesInUse;
     private readonly IServiceProvider _serviceProvider;
+    private readonly RealmDiscordService? _discordService;
 
     private class TestState
     {
@@ -44,7 +45,7 @@ internal sealed class CommandsLogic
     public CommandsLogic(RealmCommandService commandService, IElementFactory elementFactory,
         ItemsCollection itemsCollection, ChatBox chatBox, ILogger<CommandsLogic> logger,
         IDateTimeProvider dateTimeProvider, INametagsService nametagsService, IUsersService usersService, IVehiclesService vehiclesService,
-        GameWorld gameWorld, IElementOutlineService elementOutlineService, IAssetsService assetsService, ISpawnMarkersService spawnMarkersService, IVehicleLoader loadService, IFeedbackService feedbackService, IOverlayService overlayService, AssetsCollection assetsCollection, VehicleUpgradesCollection vehicleUpgradeCollection, VehicleEnginesCollection vehicleEnginesCollection, IUserWhitelistedSerialsRepository userWhitelistedSerialsRepository, IVehicleRepository vehicleRepository, IPlayerMoneyHistoryService userMoneyHistoryService, IMapNamesService mapNamesService, IVehiclesInUse vehiclesInUse, IServiceProvider serviceProvider)
+        GameWorld gameWorld, IElementOutlineService elementOutlineService, IAssetsService assetsService, ISpawnMarkersService spawnMarkersService, IVehicleLoader loadService, IFeedbackService feedbackService, IOverlayService overlayService, AssetsCollection assetsCollection, VehicleUpgradesCollection vehicleUpgradeCollection, VehicleEnginesCollection vehicleEnginesCollection, IUserWhitelistedSerialsRepository userWhitelistedSerialsRepository, IVehicleRepository vehicleRepository, IPlayerMoneyHistoryService userMoneyHistoryService, IMapNamesService mapNamesService, IVehiclesInUse vehiclesInUse, IServiceProvider serviceProvider, RealmDiscordService? discordService = null)
     {
         _commandService = commandService;
         _elementFactory = elementFactory;
@@ -62,6 +63,7 @@ internal sealed class CommandsLogic
         _mapNamesService = mapNamesService;
         _vehiclesInUse = vehiclesInUse;
         _serviceProvider = serviceProvider;
+        _discordService = discordService;
         var debounce = new Debounce(500);
         var debounceCounter = 0;
         _commandService.AddAsyncCommandHandler("debounce", async (player, args, token) =>
@@ -1923,6 +1925,14 @@ internal sealed class CommandsLogic
             var active = player.Vehicle?.Fuel.Active?.FuelType;
             _chatBox.OutputTo(player, $"Vehicle id: {player.Vehicle?.PersistentId}");
             _chatBox.OutputTo(player, $"Active container: {active}");
+        });
+
+
+        _commandService.AddAsyncCommandHandler("discordtest", async (player, args, token) =>
+        {
+            if (_discordService == null || _discordService.SendMessage == null)
+                return;
+            await _discordService.SendMessage(1135218612764934224, "test", token);
         });
 
         AddInventoryCommands();

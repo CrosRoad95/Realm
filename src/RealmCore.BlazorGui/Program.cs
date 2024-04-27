@@ -2,7 +2,9 @@ using RealmCore.BlazorGui;
 using RealmCore.BlazorHelpers;
 using RealmCore.Discord.Integration.Extensions;
 using RealmCore.Module.Discord;
+using RealmCore.Module.Discord.Services;
 using RealmCore.Sample;
+using SlipeServer.Server;
 
 Directory.SetCurrentDirectory(Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly()!.Location)!);
 
@@ -13,6 +15,7 @@ builder.Services.AddHttpContextAccessor();
 builder.Services.AddRealmServer(new SampleServer());
 builder.AddRealmBlazorGuiSupport();
 builder.AddRealmServerDiscordBotIntegration();
+builder.Services.AddSingleton<Func<RealmDiscordService>>(x => () => x.GetRequiredService<MtaServer>().GetRequiredService<RealmDiscordService>());
 builder.Services.AddDiscordStatusChannelUpdateHandler<SampleDiscordStatusChannelUpdateHandler>();
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();

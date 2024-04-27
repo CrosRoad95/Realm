@@ -23,7 +23,7 @@ public static class ServerBuilderExtensions
             services.AddSingleton<IDiscordTextBasedCommandHandler, TextBasedCommandHandler>();
             #endregion
 
-            services.AddGrpcModule();
+            services.AddRealmGrpc();
             services.AddDiscordModule();
 
         });

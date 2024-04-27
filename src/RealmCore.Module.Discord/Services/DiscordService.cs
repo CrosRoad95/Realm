@@ -30,13 +30,25 @@ public interface IDiscordService
     Task<ulong> SendMessageToUser(ulong userId, string message, CancellationToken cancellationToken = default);
 }
 
+public class RealmDiscordService
+{
+    public Func<ulong, ulong, string, CancellationToken, Task>? HandleTextBasedCommand { get; set; }
+    public Func<ulong, Stream, string, string, CancellationToken, Task<ulong>>? SendFile { get; set; }
+    public Func<ulong, string, CancellationToken, Task<ulong>>? SendMessage { get; set; }
+    public Func<ulong, string, CancellationToken, Task<ulong>>? SendMessageToUser { get; set; }
+}
+
 internal class DiscordService : IDiscordService
 {
     private readonly Messaging.MessagingClient _messagingClient;
 
-    public DiscordService(GrpcChannel grpcChannel)
+    public DiscordService(GrpcChannel grpcChannel, Func<RealmDiscordService> realmDiscordServiceProvider)
     {
         _messagingClient = new(grpcChannel);
+        var realmDiscordService = realmDiscordServiceProvider();
+        realmDiscordService.SendMessage = SendMessage;
+        realmDiscordService.SendFile = SendFile;
+        realmDiscordService.SendMessageToUser = SendMessageToUser;
     }
 
     public UpdateStatusChannel? UpdateStatusChannel { get; set; }
@@ -50,7 +62,7 @@ internal class DiscordService : IDiscordService
         {
             ChannelId = channelId,
             Message = message,
-        }, cancellationToken: cancellationToken);
+        }, deadline: DateTime.UtcNow.Add(TimeSpan.FromSeconds(5)), cancellationToken: cancellationToken);
 
         if (response.Success)
             return response.MessageId;

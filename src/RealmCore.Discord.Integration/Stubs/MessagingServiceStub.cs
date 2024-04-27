@@ -13,9 +13,9 @@ internal class MessagingServiceStub : Messaging.MessagingBase
 
     public override async Task<SendMessageResponse> SendMessage(SendMessageRequest request, ServerCallContext context)
     {
-        var channel = (SocketTextChannel)_discordClient.GetChannel(request.ChannelId);
         try
         {
+            var channel = (SocketTextChannel)_discordClient.GetChannel(request.ChannelId);
             var message = await channel.SendMessageAsync(request.Message);
             return new SendMessageResponse
             {

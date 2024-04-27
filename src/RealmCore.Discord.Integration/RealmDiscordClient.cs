@@ -7,7 +7,6 @@ internal class RealmDiscordClient : IRealmDiscordClient
     private readonly DiscordSocketClient _client;
     private readonly IOptions<DiscordBotOptions> _discordBotOptions;
     private readonly IChannelBase[] _channels;
-    private readonly IDiscordService[] _discordServices;
     private readonly CommandHandler _commandHandler;
     private readonly BotIdProvider _botIdProvider;
     private readonly TextBasedCommands _textBasedCommands;
@@ -15,12 +14,11 @@ internal class RealmDiscordClient : IRealmDiscordClient
 
     public event Action? Ready;
 
-    public RealmDiscordClient(DiscordSocketClient discordSocketClient, IOptions<DiscordBotOptions> discordBotOptions, IEnumerable<IChannelBase> channels, IEnumerable<IDiscordService> discordServices, CommandHandler commandHandler, BotIdProvider botIdProvider, TextBasedCommands textBasedCommands, ILogger<RealmDiscordClient> logger)
+    public RealmDiscordClient(DiscordSocketClient discordSocketClient, IOptions<DiscordBotOptions> discordBotOptions, IEnumerable<IChannelBase> channels, CommandHandler commandHandler, BotIdProvider botIdProvider, TextBasedCommands textBasedCommands, ILogger<RealmDiscordClient> logger)
     {
         _client = discordSocketClient;
         _discordBotOptions = discordBotOptions;
         _channels = channels.ToArray();
-        _discordServices = discordServices.ToArray();
         _commandHandler = commandHandler;
         _botIdProvider = botIdProvider;
         _textBasedCommands = textBasedCommands;
@@ -76,20 +74,6 @@ internal class RealmDiscordClient : IRealmDiscordClient
                 catch (Exception ex)
                 {
                     _logger.LogError(ex, "Failed to start channel logic");
-                }
-            });
-        }
-        foreach (var item in _discordServices)
-        {
-            _ = Task.Run(async () =>
-            {
-                try
-                {
-                    await item.StartAsync(socketGuild);
-                }
-                catch (Exception ex)
-                {
-                    _logger.LogError(ex, "Failed to start discord service");
                 }
             });
         }

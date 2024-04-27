@@ -51,4 +51,10 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<IDiscordHandler>(x => x.GetRequiredService<IDiscordTextBasedCommandHandler>());
         return services;
     }
+
+    public static IServiceCollection AddDiscordSupport(this IServiceCollection services)
+    {
+        services.AddSingleton<RealmDiscordService>();
+        return services;
+    }
 }
