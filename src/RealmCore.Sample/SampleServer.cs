@@ -16,8 +16,6 @@ using RealmCore.Sample.Server;
 
 namespace RealmCore.Sample;
 
-//using RealmCore.Console.Extra;
-
 public class SampleServer : RealmServer
 {
     static bool withDgs = true;
@@ -93,14 +91,5 @@ public class SampleServer : RealmServer
         //serverBuilder.AddExtras(realmConfigurationProvider);
     })
     {
-    }
-}
-
-public class SamplePlayerJoinedPipeline : IPlayerJoinedPipeline
-{
-    public async Task<bool> Next(Player player)
-    {
-        //throw new NotImplementedException();
-        return true;
     }
 }

@@ -46,8 +46,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RealmCore.Module.Discord", 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RealmCore.Module.Grpc.Proto", "src\RealmCore.Module.Grpc.Proto\RealmCore.Module.Grpc.Proto.csproj", "{BCA0C11F-F5CD-46EA-9CE6-1C22BCF77E53}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RealmCore.Discord.Logger", "src\RealmCore.Discord.Logger\RealmCore.Discord.Logger.csproj", "{7A03C405-8770-493A-9C09-66A105DA0A7C}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RealmCore.Resources.Nametags", "src\RealmCore.Resources.Nametags\RealmCore.Resources.Nametags.csproj", "{9F84053A-97C9-42AC-A328-F14817C8FDAB}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RealmCore.Resources.Base", "src\RealmCore.Resources.Base\RealmCore.Resources.Base.csproj", "{0DE9EB8D-852E-489C-B283-4A066F9C1867}"

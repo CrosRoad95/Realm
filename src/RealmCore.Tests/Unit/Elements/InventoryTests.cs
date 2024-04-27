@@ -803,11 +803,13 @@ public class InventoryTests : RealmUnitTestingBase
 
         inventory.AddItem(itemsCollection, item1);
         inventory.AddItem(itemsCollection, item2);
+        inventory.AddItem(itemsCollection, item1);
+        inventory.AddItem(itemsCollection, item2);
 
         var items = inventory.GetItemsById(1);
         items.Should().HaveCount(1);
 
-        items.First().Number.Should().Be(4);
+        items.First().Number.Should().Be(8);
     }
 
     [Fact]
@@ -827,11 +829,13 @@ public class InventoryTests : RealmUnitTestingBase
 
         inventory.AddItem(itemsCollection, item1);
         inventory.AddItem(itemsCollection, item2);
+        inventory.AddItem(itemsCollection, item1);
+        inventory.AddItem(itemsCollection, item2);
 
         var items = inventory.GetItemsById(1);
         items.Should().HaveCount(2);
 
-        items.First().Number.Should().Be(2);
-        items.Last().Number.Should().Be(2);
+        items.First().Number.Should().Be(4);
+        items.Last().Number.Should().Be(4);
     }
 }

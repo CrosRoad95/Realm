@@ -354,6 +354,11 @@ public class Inventory
     {
         return Number + itemsCollection.CalculateSize(itemId, number) <= Size;
     }
+    
+    public bool HasSpaceForItems(ItemsCollection itemsCollection, Dictionary<uint, uint> items)
+    {
+        return Number + itemsCollection.CalculateSize(items) <= Size;
+    }
 
     public bool TransferItem(Inventory destination, ItemsCollection itemsCollection, uint itemId, uint number, bool force)
     {
