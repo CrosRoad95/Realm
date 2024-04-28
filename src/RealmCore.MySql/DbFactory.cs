@@ -1,6 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
-using RealmCore.Configuration;
 using System.Diagnostics.CodeAnalysis;
 
 namespace RealmCore.MySql;
@@ -14,11 +13,8 @@ public sealed class DbFactory : IDesignTimeDbContextFactory<MySqlDb>
 
     public MySqlDb CreateDbContext(string[] args)
     {
-        var realmConfigurationProvider = new RealmConfiguration();
-        var connectionString = realmConfigurationProvider.Get<string>("Database:ConnectionString");
-
         var builder = new DbContextOptionsBuilder<MySqlDb>();
-        builder.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString));
+        builder.UseMySql(args[0], ServerVersion.AutoDetect(args[0]));
         return new MySqlDb(builder.Options);
     }
 }

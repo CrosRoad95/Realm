@@ -11,6 +11,7 @@ using RealmCore.Server.Modules.Chat;
 using RealmCore.Sample.Data;
 using RealmCore.Sample.Server;
 using RealmCore.Module.Discord;
+using Microsoft.Extensions.Configuration;
 
 [assembly: ExcludeFromCodeCoverage]
 
@@ -20,7 +21,7 @@ public class SampleServer : RealmServer
 {
     static bool withDgs = true;
 
-    public SampleServer() : base(new RealmConfiguration(), serverBuilder =>
+    public SampleServer(IConfiguration configuration) : base(configuration, serverBuilder =>
     {
         if (withDgs)
         {

@@ -1927,7 +1927,6 @@ internal sealed class CommandsLogic
             _chatBox.OutputTo(player, $"Active container: {active}");
         });
 
-
         _commandService.AddAsyncCommandHandler("discordtest", async (player, args, token) =>
         {
             if (_discordService == null || _discordService.SendMessage == null)

@@ -22,7 +22,6 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\RealmCore.Configuration\RealmCore.Configuration.csproj" />
 		<ProjectReference Include="..\RealmCore.Interfaces\RealmCore.Interfaces.csproj" />
 	</ItemGroup>
 

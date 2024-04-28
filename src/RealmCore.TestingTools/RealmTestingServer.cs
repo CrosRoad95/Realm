@@ -1,4 +1,5 @@
-﻿using System.IO.Compression;
+﻿using SlipeServer.Server;
+using System.IO.Compression;
 using System.Net;
 using System.Net.Http.Headers;
 
@@ -62,7 +63,7 @@ public class RealmTestingServer<TPlayer> : TestingServer<TPlayer> where TPlayer:
         return player.Client;
     }
 
-    public RealmTestingServer(TestConfigurationProvider? testConfigurationProvider = null, Action<ServerBuilder>? configureBuilder = null, Action<ServiceCollection>? configureServices = null) : base((testConfigurationProvider ?? new("")).GetRequired<SlipeServer.Server.Configuration>("server"), (serverBuilder) =>
+    public RealmTestingServer(TestConfigurationProvider? testConfigurationProvider = null, Action<ServerBuilder>? configureBuilder = null, Action<ServiceCollection>? configureServices = null) : base((testConfigurationProvider ?? new("")).GetValue<Configuration>("server"), (serverBuilder) =>
     {
         var resourceProvider = new Mock<IResourceProvider>(MockBehavior.Strict);
         var httpClient = new HttpClient(new PAttach120DelegatingHandler());

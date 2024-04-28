@@ -5,14 +5,22 @@ using RealmCore.Module.Discord;
 using RealmCore.Module.Discord.Services;
 using RealmCore.Sample;
 using SlipeServer.Server;
+using System.Reflection;
 
 Directory.SetCurrentDirectory(Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly()!.Location)!);
 
 var builder = WebApplication.CreateBuilder(args);
 
+var configuration = builder.Configuration;
+
+configuration.AddUserSecrets(Assembly.GetEntryAssembly()!);
+configuration.AddJsonFile("appsettings.server.json", false, true);
+configuration.AddJsonFile("appsettings.development.json", true, true); // TODO: don't use hardcoded development
+configuration.AddJsonFile("appsettings.local.json", true, true);
+
 builder.Services.AddCascadingAuthenticationState();
 builder.Services.AddHttpContextAccessor();
-builder.Services.AddRealmServer(new SampleServer());
+builder.Services.AddRealmServer(x => new SampleServer(x.GetRequiredService<IConfiguration>()));
 builder.AddRealmBlazorGuiSupport();
 builder.AddRealmServerDiscordBotIntegration();
 builder.Services.AddSingleton<Func<RealmDiscordService>>(x => () => x.GetRequiredService<MtaServer>().GetRequiredService<RealmDiscordService>());

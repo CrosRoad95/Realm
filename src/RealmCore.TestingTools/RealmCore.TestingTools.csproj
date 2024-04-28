@@ -52,7 +52,6 @@
 		<Using Include="RealmCore.Server.Modules.World.Triggers" />
 		<Using Include="RealmCore.Persistence.Data.Helpers" />
 		<Using Include="RealmCore.Resources.Base.Interfaces" />
-		<Using Include="RealmCore.Configuration" />
 		<Using Include="RealmCore.MySql" />
 		<Using Include="RealmCore.Persistence" />
 		<Using Include="RealmCore.Resources.Base" />

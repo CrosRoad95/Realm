@@ -12,7 +12,10 @@ public static class ServerBuilderExtensions
 {
     public static ServerBuilder ConfigureServer(this ServerBuilder serverBuilder, IConfiguration configuration, ServerBuilderDefaultBehaviours? serverBuilderDefaultBehaviours = null, HttpClient? httpClient = null, ExcludeResources? excludeResources = null)
     {
-        var _serverConfiguration = configuration.GetRequired<SlipeServer.Server.Configuration>("Server");
+        var _serverConfiguration = configuration.GetSection("Server").Get<Configuration>();
+        if (_serverConfiguration == null)
+            throw new InvalidOperationException("Server configuration is null");
+
         serverBuilder.UseConfiguration(_serverConfiguration);
         if (serverBuilderDefaultBehaviours != null)
         {
@@ -42,11 +45,14 @@ public static class ServerBuilderExtensions
             services.Configure<GuiBrowserOptions>(configuration.GetSection("GuiBrowser"));
             services.Configure<BrowserOptions>(configuration.GetSection("Browser"));
 
-            var connectionString = configuration.Get<string>("Database:ConnectionString");
+            var connectionString = configuration.GetValue<string>("Database:ConnectionString");
             if (!string.IsNullOrEmpty(connectionString))
             {
                 services.AddPersistence<MySqlDb>(db => db.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString)));
-                services.AddRealmIdentity<MySqlDb>(configuration.GetRequired<IdentityConfiguration>("Identity"));
+                var identityConfiguration = configuration.GetSection("Identity").Get<IdentityConfiguration>();
+                if (identityConfiguration == null)
+                    throw new Exception("Identity configuration is null");
+                services.AddRealmIdentity<MySqlDb>(identityConfiguration);
             }
 
             services.AddSingleton<HelpCommand>();
