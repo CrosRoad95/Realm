@@ -16,15 +16,17 @@ internal sealed partial class SaveService : ISaveService
     private readonly IDb _db;
     private readonly IEnumerable<IUserDataSaver> _userDataSavers;
     private readonly IDateTimeProvider _dateTimeProvider;
+    private readonly IInventoryRepository _inventoryRepository;
 
     public event Action<Element>? ElementSaved;
     private readonly Element _element;
 
-    public SaveService(IDb db, IEnumerable<IUserDataSaver> userDataSavers, IDateTimeProvider dateTimeProvider, ElementContext elementContext)
+    public SaveService(IDb db, IEnumerable<IUserDataSaver> userDataSavers, IDateTimeProvider dateTimeProvider, ElementContext elementContext, IInventoryRepository inventoryRepository)
     {
         _db = db;
         _userDataSavers = userDataSavers;
         _dateTimeProvider = dateTimeProvider;
+        _inventoryRepository = inventoryRepository;
         _element = elementContext.Element;
     }
 
@@ -220,25 +222,13 @@ internal sealed partial class SaveService : ISaveService
     private async Task<int> SaveNewPlayerInventory(Inventory inventory, int userId, CancellationToken cancellationToken = default)
     {
         var inventoryData = Inventory.CreateData(inventory);
-        _db.UserInventories.Add(new UserInventoryData
-        {
-            Inventory = inventoryData,
-            UserId = userId
-        });
-        await _db.SaveChangesAsync(cancellationToken);
-        return inventory.Id;
+        return await _inventoryRepository.CreateInventoryForUserId(userId, inventoryData, cancellationToken);
     }
 
     private async Task<int> SaveNewVehicleInventory(Inventory inventory, int vehicleId, CancellationToken cancellationToken = default)
     {
         var inventoryData = Inventory.CreateData(inventory);
-        _db.VehicleInventories.Add(new VehicleInventoryData
-        {
-            Inventory = inventoryData,
-            VehicleId = vehicleId
-        });
-        await _db.SaveChangesAsync(cancellationToken);
-        return inventory.Id;
+        return await _inventoryRepository.CreateInventoryForVehicleId(vehicleId, inventoryData, cancellationToken);
     }
 
     public static readonly ActivitySource Activity = new("RealmCore.SaveService", "1.0.0");

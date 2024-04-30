@@ -161,6 +161,11 @@ public class RealmTestingServer<TPlayer> : TestingServer<TPlayer> where TPlayer:
         return player;
     }
 
+    public async Task SignOutPlayer(RealmPlayer player)
+    {
+        await player.GetRequiredService<IUsersService>().SignOut(player);
+    }
+
     public async Task<UserData> CreateAccount(string userName)
     {
         var userManager = GetRequiredService<UserManager<UserData>>();

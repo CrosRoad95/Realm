@@ -23,6 +23,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IOpinionRepository, OpinionRepository>();
         services.AddScoped<IUserWhitelistedSerialsRepository, UserWhitelistedSerialsRepository>();
         services.AddScoped<INewsRepository, NewsRepository>();
+        services.AddScoped<IInventoryRepository, InventoryRepository>();
         services.AddScoped<ITransactionContext, TransactionContext>();
 
         services.AddDbContext<IDb, T>(dbOptions);
