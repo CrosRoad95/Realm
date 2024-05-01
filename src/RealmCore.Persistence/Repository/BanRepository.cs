@@ -17,12 +17,10 @@ public interface IBanRepository
 internal sealed class BanRepository : IBanRepository
 {
     private readonly IDb _db;
-    private readonly ITransactionContext _transactionContext;
 
-    public BanRepository(IDb db, ITransactionContext transactionContext)
+    public BanRepository(IDb db)
     {
         _db = db;
-        _transactionContext = transactionContext;
     }
 
     public async Task<BanData> CreateForSerial(string serial, DateTime? until = null, string? reason = null, string? responsible = null, int type = 0, CancellationToken cancellationToken = default)
@@ -40,21 +38,17 @@ internal sealed class BanRepository : IBanRepository
         if (reason != null && reason.Length > 255)
             throw new ArgumentOutOfRangeException(nameof(reason));
 
-        var ban = await _transactionContext.ExecuteAsync(async db =>
+        var ban = new BanData
         {
-            var ban = new BanData
-            {
-                Serial = serial,
-                End = until ?? DateTime.MaxValue,
-                Reason = reason,
-                Responsible = responsible,
-                Type = type,
-                Active = true
-            };
-            db.Bans.Add(ban);
-            await db.SaveChangesAsync(cancellationToken);
-            return ban;
-        }, cancellationToken);
+            Serial = serial,
+            End = until ?? DateTime.MaxValue,
+            Reason = reason,
+            Responsible = responsible,
+            Type = type,
+            Active = true
+        };
+        _db.Bans.Add(ban);
+        await _db.SaveChangesAsync(cancellationToken);
         return ban;
     }
 
@@ -74,22 +68,18 @@ internal sealed class BanRepository : IBanRepository
         if (reason != null && reason.Length > 255)
             throw new ArgumentOutOfRangeException(nameof(reason));
 
-        var ban = await _transactionContext.ExecuteAsync(async db =>
+        var ban = new BanData
         {
-            var ban = new BanData
-            {
-                UserId = userId,
-                Serial = serial,
-                End = until ?? DateTime.MaxValue,
-                Reason = reason,
-                Responsible = responsible,
-                Type = type,
-                Active = true
-            };
-            db.Bans.Add(ban);
-            await db.SaveChangesAsync(cancellationToken);
-            return ban;
-        }, cancellationToken);
+            UserId = userId,
+            Serial = serial,
+            End = until ?? DateTime.MaxValue,
+            Reason = reason,
+            Responsible = responsible,
+            Type = type,
+            Active = true
+        };
+        _db.Bans.Add(ban);
+        await _db.SaveChangesAsync(cancellationToken);
         return ban;
     }
 
@@ -108,21 +98,17 @@ internal sealed class BanRepository : IBanRepository
         if (reason != null && reason.Length > 255)
             throw new ArgumentOutOfRangeException(nameof(reason));
 
-        var ban = await _transactionContext.ExecuteAsync(async db =>
+        var ban = new BanData
         {
-            var ban = new BanData
-            {
-                UserId = userId,
-                End = until ?? DateTime.MaxValue,
-                Reason = reason,
-                Responsible = responsible,
-                Type = type,
-                Active = true
-            };
-            _db.Bans.Add(ban);
-            await _db.SaveChangesAsync(cancellationToken);
-            return ban;
-        }, cancellationToken);
+            UserId = userId,
+            End = until ?? DateTime.MaxValue,
+            Reason = reason,
+            Responsible = responsible,
+            Type = type,
+            Active = true
+        };
+        _db.Bans.Add(ban);
+        await _db.SaveChangesAsync(cancellationToken);
         return ban;
     }
 

@@ -13,12 +13,10 @@ public interface IFractionRepository
 internal sealed class FractionRepository : IFractionRepository
 {
     private readonly IDb _db;
-    private readonly ITransactionContext _transactionContext;
 
-    public FractionRepository(IDb db, ITransactionContext transactionContext)
+    public FractionRepository(IDb db)
     {
         _db = db;
-        _transactionContext = transactionContext;
     }
 
     public async Task<List<FractionData>> GetAll(CancellationToken cancellationToken = default)
@@ -74,30 +72,25 @@ internal sealed class FractionRepository : IFractionRepository
     {
         using var activity = Activity.StartActivity(nameof(CreateOrGet));
 
-        var result = await _transactionContext.ExecuteAsync(async (db) =>
+        var query = _db.Fractions
+            .TagWithSource(nameof(FractionRepository))
+            .Include(x => x.Members)
+            .AsNoTracking()
+            .Where(x => x.Id == id && x.Code == code && x.Name == name);
+        var existingFraction = await query.FirstOrDefaultAsync(cancellationToken);
+        if (existingFraction != null)
+            return existingFraction;
+
+        var fractionData = new FractionData
         {
-            var query = _db.Fractions
-                .TagWithSource(nameof(FractionRepository))
-                .Include(x => x.Members)
-                .AsNoTracking()
-                .Where(x => x.Id == id && x.Code == code && x.Name == name);
-            var existingFraction = await query.FirstOrDefaultAsync(cancellationToken);
-            if (existingFraction != null)
-                return existingFraction;
+            Id = id,
+            Name = name,
+            Code = code
+        };
 
-            var fractionData = new FractionData
-            {
-                Id = id,
-                Name = name,
-                Code = code
-            };
-
-            _db.Fractions.Add(fractionData);
-            await _db.SaveChangesAsync(cancellationToken);
-            return fractionData;
-        }, cancellationToken);
-
-        return result;
+        _db.Fractions.Add(fractionData);
+        await _db.SaveChangesAsync(cancellationToken);
+        return fractionData;
     }
 
     public async Task<FractionMemberData?> TryAddMember(int fractionId, int userId, int rank = 1, string rankName = "", CancellationToken cancellationToken = default)

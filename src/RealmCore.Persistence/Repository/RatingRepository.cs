@@ -10,12 +10,10 @@ public interface IRatingRepository
 internal sealed class RatingRepository : IRatingRepository
 {
     private readonly IDb _db;
-    private readonly ITransactionContext _transactionContext;
 
-    public RatingRepository(IDb db, ITransactionContext transactionContext)
+    public RatingRepository(IDb db)
     {
         _db = db;
-        _transactionContext = transactionContext;
     }
 
     public async Task<bool> Rate(int userId, int ratingId, int rating, DateTime dateTime, CancellationToken cancellationToken = default)
@@ -37,30 +35,27 @@ internal sealed class RatingRepository : IRatingRepository
     {
         using var activity = Activity.StartActivity(nameof(ChangeLastRating));
 
-        await _transactionContext.ExecuteAsync(async (db) =>
+        var query = _db.Ratings
+            .Where(x => x.UserId == userId && x.RatingId == ratingId)
+            .OrderByDescending(x => x.DateTime);
+        var ratingData = await query.FirstOrDefaultAsync(cancellationToken);
+        if (ratingData != null)
         {
-            var query = db.Ratings
-                .Where(x => x.UserId == userId && x.RatingId == ratingId)
-                .OrderByDescending(x => x.DateTime);
-            var ratingData = await query.FirstOrDefaultAsync(cancellationToken);
-            if (ratingData != null)
+            ratingData.Rating = rating;
+            _db.Ratings.Update(ratingData);
+        }
+        else
+        {
+            _db.Ratings.Add(new RatingData
             {
-                ratingData.Rating = rating;
-                db.Ratings.Update(ratingData);
-            }
-            else
-            {
-                db.Ratings.Add(new RatingData
-                {
-                    UserId = userId,
-                    RatingId = ratingId,
-                    Rating = rating,
-                    DateTime = dateTime
-                });
-            }
+                UserId = userId,
+                RatingId = ratingId,
+                Rating = rating,
+                DateTime = dateTime
+            });
+        }
 
-            await db.SaveChangesAsync(cancellationToken);
-        }, cancellationToken);
+        await _db.SaveChangesAsync(cancellationToken);
     }
 
     public async Task<(int, DateTime)?> GetLastRating(int userId, int ratingId, CancellationToken cancellationToken = default)

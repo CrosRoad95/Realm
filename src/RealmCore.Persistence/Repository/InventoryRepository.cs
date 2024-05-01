@@ -14,12 +14,10 @@ public interface IInventoryRepository
 internal sealed class InventoryRepository : IInventoryRepository
 {
     private readonly IDb _db;
-    private readonly ITransactionContext _transactionContext;
 
-    public InventoryRepository(IDb db, ITransactionContext transactionContext)
+    public InventoryRepository(IDb db)
     {
         _db = db;
-        _transactionContext = transactionContext;
     }
 
     public async Task<int> CreateInventoryForUserId(int userId, InventoryData inventoryData, CancellationToken cancellationToken = default)
